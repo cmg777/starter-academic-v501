@@ -16,36 +16,39 @@ site_type: Person
 local_business_type: ''
 org_name: ''
 description: ''
-twitter: ''
+twitter: 'https://twitter.com/carlosmendez777'
 
 # Contact (edit or remove options as required)
 
 email: 
 phone: +81 052 789 4345
 address:
-  street: 450 Serra Mall
-  city: Stanford
-  region: CA
-  postcode: '94305'
-  country: United States
-  country_code: US
+  street: Furocho, Chikusa-ku
+  city: Nagoya
+  region: Aichi
+  postcode: '464-8601'
+  country: Japan
+  country_code: JP
 coordinates:
-  latitude: '37.4275'
-  longitude: '-122.1697'
-directions: Enter Building 1 and take the stairs to Office 200 on Floor 2
+  latitude: '35.153188'
+  longitude: '136.964190'
+directions: Enter the building of the Graduate School of Internatinal Developoment and turn right to Office 111 on Floor 1
 office_hours:
-  - 'Monday 10:00 to 13:00'
-  - 'Wednesday 09:00 to 10:00'
-appointment_url: 'https://calendly.com'
+  - 'By appointment on Wednesday 10:30 to 13:00'
+appointment_url: 'https://carlos777.youcanbook.me/'
 contact_links:
   - icon: twitter
     icon_pack: fab
     name: DM Me
     link: 'https://twitter.com/carlosmendez777'
-  - icon: skype
-    icon_pack: fab
-    name: Skype Me
-    link: 'skype:echo123?call'
+  - icon: video
+    icon_pack: fa
+    name: ZOOM Me (Book an appointment first)
+    link: 'https://us04web.zoom.us/j/4639287952?pwd=aGZwSURNNTJnbmVOQ1BKbHZxUGxYZz09'
+  - icon: envelope
+    icon_pack: fa
+    name: carlos [at] gsid.nagoya-u.ac.jp
+    link: 'mailto:carlosmendez777@gmail.com'
   - icon: keybase
     icon_pack: fab
     name: Chat on Keybase
