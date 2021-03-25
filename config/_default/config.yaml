@@ -4,8 +4,8 @@
 # This file is formatted using YAML syntax - learn more at https://learnxinyminutes.com/docs/yaml/
 
 title: Carlos Mendez # Website name
-baseurl: '' # Website URL
-copyright: '' # Footer text, e.g. '© {year} Me'
+baseurl: 'https://carlos-mendez.org/' # Website URL
+copyright: 'Carlos Mendez' # Footer text, e.g. '© {year} Me'
 
 ############################
 ## LANGUAGE
