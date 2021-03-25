@@ -9,19 +9,28 @@ main:
   weight: 10
 - name: Posts
   url: '#posts'
-  weight: 20
+  weight: 80
 - name: Projects
   url: '#projects'
   weight: 30
-- name: Talks
+- name: Presentations
   url: '#talks'
-  weight: 40
+  weight: 20
 - name: Publications
   url: '#featured'
   weight: 50
 - name: Contact
   url: '#contact'
+  weight: 90
+- name: ResearchLab
+  url: 'https://quarcs-lab.org/'
+  weight: 50
+- name: Students
+  url: '#people'
   weight: 60
+- name: Tutorials
+  url: 'https://deepnote.com/carlos-mendez'
+  weight: 50
 
 # Link to a PDF of your resume/CV from the menu.
 # To enable, copy your resume/CV to `static/uploads/resume.pdf` and uncomment the lines below.
