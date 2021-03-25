@@ -4,47 +4,36 @@
 #   The weight parameter defines the order that the links will appear in.
 
 main:
-
   - name = "Home"
     url = "#about"
     weight = 10
-
   - name = "Publications"
     url = "#featured"
     weight = 20
-
   - name = "Presentations"
     url = "#talks"
     weight = 30
-
   - name = "Research Lab"
     url = "https://quarcs-lab.org/"
     weight = 50
-
   - name = "Students"
     url = "#people"
     weight = 60
-
   - name = "Courses"
     url = "courses/"
     weight = 65
-
   - name = "Tutorials"
     url = "https://deepnote.com/carlos-mendez"
     weight = 68
-
   - name = "Projects"
     url = "#projects"
     weight = 70
-
   - name = "Posts"
     url = "#posts"
     weight = 80
-
   - name = "Contact"
     url = "#contact"
     weight = 90
-
 
 #  - name: Home
 #    url: '#about'
