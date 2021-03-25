@@ -25,14 +25,14 @@ phone: +81 052 789 4345
 address:
   street: Furocho, Chikusa-ku
   city: Nagoya
-  region: Aichi
+  region: Aichi, JAPAN
   postcode: '464-8601'
   country: Japan
   country_code: JP
 coordinates:
   latitude: '35.153188'
   longitude: '136.964190'
-directions: Enter the building of the Graduate School of Internatinal Developoment and turn right to Office 111 on Floor 1
+directions: Enter the building of the Graduate School of Internatinal Developoment and turn right to Office 111 on the 1st Floor
 office_hours:
   - 'Office hours: Wednesdays 10:30 to 13:00 (Book an appointment first)'
 appointment_url: 'https://carlos777.youcanbook.me/'
@@ -41,22 +41,18 @@ contact_links:
     icon_pack: fa
     name: ZOOM Me (Book an appointment first)
     link: 'https://us04web.zoom.us/j/4639287952?pwd=aGZwSURNNTJnbmVOQ1BKbHZxUGxYZz09'
-  - icon: envelope
-    icon_pack: fa
-    name: carlos [at] gsid.nagoya-u.ac.jp
-    link: 'mailto:carlosmendez777@gmail.com'
   - icon: twitter
     icon_pack: fab
     name: DM Me
     link: 'https://twitter.com/carlosmendez777'
-  - icon: keybase
+  - icon: telegram
     icon_pack: fab
-    name: Chat on Keybase
-    link: 'https://keybase.io/'
-  - icon: comments
-    icon_pack: fas
-    name: Discuss on Forum
-    link: 'https://discourse.gohugo.io'
+    name: Telegram Me
+    link: 'https://telegram.me/@carlosmendez777'
+  - icon: envelope
+    icon_pack: fa
+    name: carlos [at] gsid.nagoya-u.ac.jp
+    link: 'mailto:carlosmendez777@gmail.com'
 
 # Site header
 
