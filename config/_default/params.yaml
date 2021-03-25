@@ -41,14 +41,14 @@ contact_links:
     icon_pack: fa
     name: ZOOM Me (Book an appointment first)
     link: 'https://us04web.zoom.us/j/4639287952?pwd=aGZwSURNNTJnbmVOQ1BKbHZxUGxYZz09'
-  - icon: twitter
-    icon_pack: fab
-    name: DM Me
-    link: 'https://twitter.com/carlosmendez777'
   - icon: telegram
     icon_pack: fab
     name: Telegram Me
     link: 'https://telegram.me/@carlosmendez777'
+  - icon: twitter
+    icon_pack: fab
+    name: DM Me
+    link: 'https://twitter.com/carlosmendez777'
   - icon: envelope
     icon_pack: fa
     name: carlos [at] gsid.nagoya-u.ac.jp
@@ -58,7 +58,7 @@ contact_links:
 
 main_menu:
   enable: true
-  align: l
+  align: r
   show_logo: true
   show_language: false
   show_day_night: true
