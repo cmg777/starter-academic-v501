@@ -15,10 +15,10 @@ main:
   weight: 30
 - name: Presentations
   url: '#talks'
-  weight: 20
+  weight: 30
 - name: Publications
   url: '#featured'
-  weight: 50
+  weight: 20
 - name: Contact
   url: '#contact'
   weight: 90
@@ -30,7 +30,10 @@ main:
   weight: 60
 - name: Tutorials
   url: 'https://deepnote.com/carlos-mendez'
-  weight: 50
+  weight: 68
+- name: Courses
+  url: 'courses/'
+  weight: 65
 
 # Link to a PDF of your resume/CV from the menu.
 # To enable, copy your resume/CV to `static/uploads/resume.pdf` and uncomment the lines below.
