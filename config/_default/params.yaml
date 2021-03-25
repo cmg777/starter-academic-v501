@@ -34,13 +34,9 @@ coordinates:
   longitude: '136.964190'
 directions: Enter the building of the Graduate School of Internatinal Developoment and turn right to Office 111 on Floor 1
 office_hours:
-  - 'By appointment on Wednesday 10:30 to 13:00'
+  - 'Office hours: Wednesdays 10:30 to 13:00 (Book an appointment first)'
 appointment_url: 'https://carlos777.youcanbook.me/'
 contact_links:
-  - icon: twitter
-    icon_pack: fab
-    name: DM Me
-    link: 'https://twitter.com/carlosmendez777'
   - icon: video
     icon_pack: fa
     name: ZOOM Me (Book an appointment first)
@@ -49,6 +45,10 @@ contact_links:
     icon_pack: fa
     name: carlos [at] gsid.nagoya-u.ac.jp
     link: 'mailto:carlosmendez777@gmail.com'
+  - icon: twitter
+    icon_pack: fab
+    name: DM Me
+    link: 'https://twitter.com/carlosmendez777'
   - icon: keybase
     icon_pack: fab
     name: Chat on Keybase
@@ -80,7 +80,7 @@ address_format: en-us
 highlight: true
 highlight_languages:
   - r
-math: false
+math: true
 diagram: false
 privacy_pack: false
 edit_page:
@@ -124,7 +124,7 @@ breadcrumb:
   page_types:
     book: true
 comments:
-  provider: ''
+  provider: 'disqus'
   commentable:
     post: true
     book: true
@@ -132,7 +132,7 @@ comments:
     publication: true
     event: true
   disqus:
-    shortname: ''
+    shortname: 'carlosmendez'
     show_count: true
   commento:
     url: ''
