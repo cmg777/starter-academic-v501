@@ -1,77 +1,66 @@
 ---
-# Display name
-title: Nelson Bighetti
-
-# Is this the primary user of the site?
-superuser: true
-
-# Role/position/tagline
-role: Professor of Artificial Intelligence
-
-# Organizations/Affiliations to show in About widget
-organizations:
-- name: Stanford University
-  url: https://www.stanford.edu/
-
-# Short bio (displayed in user profile at end of posts)
-bio: My research interests include distributed robotics, mobile computing and programmable matter.
-
-# Interests to show in About widget
-interests:
-- Artificial Intelligence
-- Computational Linguistics
-- Information Retrieval
-
-# Education to show in About widget
+bio: My research interests focus on the integration of econometrics, spatial data science, and machine learning methods to understand and inform the process of development of countries, regions, and industries.
 education:
   courses:
-  - course: PhD in Artificial Intelligence
-    institution: Stanford University
+  - course: PhD in International Development
+    institution: Nagoya University
+    year: 2015
+  - course: MA in International Development
+    institution: Nagoya University
     year: 2012
-  - course: MEng in Artificial Intelligence
-    institution: Massachusetts Institute of Technology
-    year: 2009
-  - course: BSc in Artificial Intelligence
-    institution: Massachusetts Institute of Technology
+  - course: Lic in Commercial Engineering
+    institution: Bolivian Catholic University
     year: 2008
-
-# Social/Academic Networking
-# For available icons, see: https://sourcethemes.com/academic/docs/page-builder/#icons
-#   For an email link, use "fas" icon pack, "envelope" icon, and a link in the
-#   form "mailto:your-email@example.com" or "/#contact" for contact widget.
+email: "carlos@gsid.nagoya-u.ac.jp"
+highlight_name: false
+interests:
+- Regional Development
+- Macroeconomics
+- Spatial Econometrics
+- Machine Learning
+organizations:
+- name: Nagoya University
+  url: https://www.gsid.nagoya-u.ac.jp/index-en.html
+role: Associate Professor of Development Economics
 social:
 - icon: envelope
-  icon_pack: fas
-  link: '/#contact'
+  icon_pack: fa
+  link: "mailto:carlosmendez777@gmail.com"  
+- icon: cv
+  icon_pack: ai
+  link: https://www.overleaf.com/read/bgtjmgkkmfnc
+- icon: ideas-repec
+  icon_pack: ai
+  link: https://ideas.repec.org/f/pme631.html
+- icon: address-card
+  icon_pack: fa
+  link: https://researchmap.jp/carlos/
+- icon: researchgate
+  icon_pack: ai
+  link: https://www.researchgate.net/profile/Carlos_Mendez54
+- icon: orcid
+  icon_pack: ai
+  link: https://orcid.org/0000-0001-7978-2815 
+- icon: google-scholar
+  icon_pack: ai
+  link: https://scholar.google.co.jp/citations?user=v9dK0MoAAAAJ&hl=en
 - icon: twitter
   icon_pack: fab
-  link: https://twitter.com/GeorgeCushen
-- icon: graduation-cap  # Alternatively, use `google-scholar` icon from `ai` icon pack
-  icon_pack: fas
-  link: https://scholar.google.co.uk/citations?user=sIwtMXoAAAAJ
+  link: https://twitter.com/carlosmendez777
+- icon: facebook
+  icon_pack: fab
+  link: https://www.facebook.com/groups/QuaRCS.Lab/
 - icon: github
   icon_pack: fab
-  link: https://github.com/gcushen
-- icon: linkedin
-  icon_pack: fab
-  link: https://www.linkedin.com/
-
-# Link to a PDF of your resume/CV.
-# To use: copy your resume to `static/media/resume.pdf`, enable `ai` icons in `params.toml`, 
-# and uncomment the lines below.
-# - icon: cv
-#   icon_pack: ai
-#   link: media/resume.pdf
-
-# Enter email to display Gravatar (if Gravatar enabled in Config)
-email: ""
-
-# Highlight the author in author lists? (true/false)
-highlight_name: false
+  link: https://github.com/cmg777
+superuser: true
+title: Carlos Mendez
+# Organizational groups that you belong to (for People widget)
+#   Set this to `[]` or comment out if you are not using People widget.
+user_groups:
+- Principal Investigators
 ---
 
-Nelson Bighetti is a professor of artificial intelligence at the Stanford AI Lab. His research interests include distributed robotics, mobile computing and programmable matter. He leads the Robotic Neurobiology group, which develops self-reconfiguring robots, systems of self-organizing robots, and mobile sensor networks.
+After studying Commercial Engineering in Bolivia and Chile, I worked as a consultant for Pro-Mujer International, The World Bank, DANIDA, and JICA. I have a M.A. and a Ph.D. in International Development from Nagoya University. My research interests focus on the integration of econometrics, spatial data science, and machine learning methods to understand and inform the process of development of countries, regions, and industries. My current research deals with (1) the quantitative geography of poverty and inequality; (2) regional economic growth and convergence; (3) regional labor markets outcomes and macroeconomic shocks; and (4) structural change and productivity dynamics.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.
-
-{{< icon name="download" pack="fas" >}} Download my {{< staticref "media/demo_resume.pdf" "newtab" >}}resumé{{< /staticref >}}.
+{{< icon name="download" pack="fas" >}} Download my {{< staticref "media/CV.pdf" "newtab" >}}CV{{< /staticref >}}.
