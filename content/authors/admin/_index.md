@@ -35,8 +35,8 @@ social:
 - icon: address-card
   icon_pack: fa
   link: https://profs.provost.nagoya-u.ac.jp/html/100010240_en.html
-- icon: ror
-  icon_pack: ai
+- icon: ravelry
+  icon_pack: fab
   link: https://researchmap.jp/carlos/
 - icon: researchgate
   icon_pack: ai
