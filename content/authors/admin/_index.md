@@ -29,24 +29,24 @@ social:
 - icon: cv
   icon_pack: ai
   link: https://www.overleaf.com/read/bgtjmgkkmfnc
-- icon: ideas-repec
-  icon_pack: ai
-  link: https://ideas.repec.org/f/pme631.html
 - icon: address-card
   icon_pack: fa
   link: https://profs.provost.nagoya-u.ac.jp/html/100010240_en.html
-- icon: address-book
-  icon_pack: fa
-  link: https://researchmap.jp/carlos/
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Carlos_Mendez54
+- icon: address-book
+  icon_pack: fa
+  link: https://researchmap.jp/carlos/
 - icon: orcid
   icon_pack: ai
   link: https://orcid.org/0000-0001-7978-2815
 - icon: google-scholar
   icon_pack: ai
   link: https://scholar.google.co.jp/citations?user=v9dK0MoAAAAJ&hl=en
+- icon: ideas-repec
+  icon_pack: ai
+  link: https://ideas.repec.org/f/pme631.html
 - icon: twitter
   icon_pack: fab
   link: https://twitter.com/carlosmendez777
