@@ -34,13 +34,16 @@ social:
   link: https://ideas.repec.org/f/pme631.html
 - icon: address-card
   icon_pack: fa
+  link: https://profs.provost.nagoya-u.ac.jp/html/100010240_en.html
+- icon: ror
+  icon_pack: fa
   link: https://researchmap.jp/carlos/
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Carlos_Mendez54
 - icon: orcid
   icon_pack: ai
-  link: https://orcid.org/0000-0001-7978-2815 
+  link: https://orcid.org/0000-0001-7978-2815
 - icon: google-scholar
   icon_pack: ai
   link: https://scholar.google.co.jp/citations?user=v9dK0MoAAAAJ&hl=en
@@ -57,6 +60,7 @@ superuser: true
 title: Carlos Mendez
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
+#   https://wowchemy.com/docs/getting-started/page-builder/#icons
 user_groups:
 - Principal Investigators
 ---
