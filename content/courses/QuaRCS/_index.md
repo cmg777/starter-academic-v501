@@ -18,6 +18,7 @@ NOTE: This page/course is under construction!
 
 - [Discussion group and online materials](https://www.facebook.com/groups/QuaRCS.Lab/)
 
+- [Introduction to the QuaRCS-la and updates](https://wke.lt/w/s/mOmIKX)
 
 ## Description
 
