@@ -22,6 +22,9 @@ main:
 - name: Contact
   url: '#contact'
   weight: 90
+- name: Events
+  url: 'https://lu.ma/quarcs'
+  weight: 45
 - name: ResearchLab
   url: 'https://quarcs-lab.org/'
   weight: 50
