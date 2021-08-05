@@ -4,8 +4,8 @@ authors:
 - admin
 - Erick Gonzales
 
-date: "2021-03-17T00:00:00Z"
-doi: ""
+date: "2021-08-05T00:00:00Z"
+doi: "10.18800/economia.202101.007"
 
 # Schedule page publish date (NOT publication's date).
 publishDate: "2020-03-17T00:00:00Z"
@@ -40,9 +40,9 @@ tags:
 featured: false
 
 # links:
-# - name: ""
-#   url: ""
-url_pdf: ""
+- name: "URL"
+   url: "https://revistas.pucp.edu.pe/index.php/economia/article/view/24021"
+url_pdf: "https://revistas.pucp.edu.pe/index.php/economia/article/view/24021/22804"
 url_preprint: "http://dx.doi.org/10.13140/RG.2.2.19782.19522"
 url_code: ''
 url_dataset: ''
