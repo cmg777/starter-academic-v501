@@ -40,8 +40,6 @@ tags:
 featured: false
 
 # links:
-- name: "URL"
-   url: "https://revistas.pucp.edu.pe/index.php/economia/article/view/24021"
 url_pdf: "https://revistas.pucp.edu.pe/index.php/economia/article/view/24021/22804"
 url_preprint: "http://dx.doi.org/10.13140/RG.2.2.19782.19522"
 url_code: ''
