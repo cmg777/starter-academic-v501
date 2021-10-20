@@ -43,3 +43,7 @@ Continuously, at your own pace.
 {{< /spoiler >}}
 
 {{< cta cta_text="Begin the course" cta_link="python" >}}
+
+## Acknowledgments
+We are thankful to [DataCamp](http://datacamp.com/) for providing us full access to their entire course curriculum. We also appreciate the data and code contributions
+of the following scholars: Christopher Baum, Mark McGillivray, Rabiul Islam, Pietro Pizzuto, and Federico Rossi.      
