@@ -1,35 +1,32 @@
 ---
-bio: My research interests include TBA.
+bio: My research interests include macroeconomics, development economics, regional and spatial analysis, and applied econometrics.
 education:
   courses:
-  - course: MEng in TBA
-    institution: TBA
-    year: 2009
-  - course: BSc in TBA
-    institution: TBA
-    year: 2008
-email: ""
+  - course: M.A. in Economics
+    institution: International University of Japan
+    year: 2013
+email: "aginta.harry@c.mbox.nagoya-u.ac.jp"
 interests:
-- "Write the title of your thesis here"
+- "Regional inflation dynamics in Indonesia: Determinants, spatial factors, and convergence analysis"
 organizations:
-- name: 
-  url: ""
-role: "Doctoral student 2020-2023"
+- name: Nagoya University
+  url: "https://www4.gsid.nagoya-u.ac.jp/en/"
+role: "PhD student 2020-2023"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://researchmap.jp/carlos/
+  link: https://haginta.github.io/Harry-Aginta/
 - icon: researchgate
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Carlos_Mendez54
+  link: https://www.researchgate.net/profile/Harry-Aginta
 - icon: orcid
   icon_pack: ai
-  link: https://orcid.org/0000-0001-7978-2815 
+  link: https://orcid.org/0000-0002-0565-6207
 - icon: github
   icon_pack: fab
-  link: https://github.com/gcushen
+  link: https://github.com/haginta
 superuser: false
-title: Aginta Harry (Indonesia)
+title: Harry Aginta (Indonesia)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
@@ -37,4 +34,4 @@ user_groups:
 - Doctoral students
 ---
 
-ADD a longer bio here
+TBA
