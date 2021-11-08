@@ -7,7 +7,7 @@ education:
     year: 2020
 email: "chen.yilin@h.mbox.nagoya-u.ac.jp"
 interests:
-- "Regional economy development and structural change: Spatial evidence from north-eastern China 
+- "Regional economy development and structural change: Spatial evidence from north-eastern China" 
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
