@@ -1,32 +1,32 @@
 ---
-bio: My research interests include macroeconomics, development economics, regional and spatial analysis, and applied econometrics.
+bio: My research interests include  development economics, regional economics, and spatial econometrics.
 education:
   courses:
-  - course: M.A. in Economics
-    institution: International University of Japan
-    year: 2013
-email: "aginta.harry@c.mbox.nagoya-u.ac.jp"
+  - course: M.S. in Marketing
+    institution: University of Manchester
+    year: 2020
+email: "chen.yilin@h.mbox.nagoya-u.ac.jp"
 interests:
-- "Regional inflation dynamics in Indonesia: Determinants, spatial factors, and convergence analysis"
+- "Regional economy development and structural change: Spatial evidence from north-eastern China 
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "PhD student 2020-2023"
+role: "PhD research student 2021-2022"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://haginta.github.io/Harry-Aginta/
+  link: https://www.researchgate.net/profile/Yilin-Chen-41
 - icon: researchgate
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Harry-Aginta
+  link: https://www.researchgate.net/profile/Yilin-Chen-41
 - icon: orcid
   icon_pack: ai
-  link: https://orcid.org/0000-0002-0565-6207
+  link: https://www.researchgate.net/profile/Yilin-Chen-41
 - icon: github
   icon_pack: fab
-  link: https://github.com/haginta
+  link: https://github.com/eileenCHEN-9
 superuser: false
-title: Harry Aginta (Indonesia)
+title: Yilin Chen (China)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
