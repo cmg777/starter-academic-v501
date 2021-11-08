@@ -14,7 +14,7 @@ interests:
 organizations:
 - name: TBA
   url: ""
-role: "Doctoral student 2021-2024"
+role: "PhD student 2021-2024"
 social:
 - icon: address-card
   icon_pack: fa
