@@ -1,8 +1,8 @@
 ---
 bio: My research interests are regional economics, finance, and economic development.
-education:B.A.in Economics
+education:
   courses:
-  - course: B.A.in Economics (
+  - course: B.A.in Economics
     institution: Nanjing Forestry University
     year: 2020
 email: "li.jiaqi@d.mbox.nagoya-u.ac.jp"
