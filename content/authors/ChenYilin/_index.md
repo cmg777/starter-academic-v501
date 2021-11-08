@@ -1,32 +1,32 @@
 ---
-bio: Research interests: Regional development, ESTDA, club convergence, and spatial machine learning.
+bio: My research interests include macroeconomics, development economics, regional and spatial analysis, and applied econometrics.
 education:
   courses:
-  - course: Master of Science in marketing
-    institution: University of Manchester
-    year: 2020
-email: "chen.yilin@h.mbox.nagoya-u.ac.jp"
+  - course: M.A. in Economics
+    institution: International University of Japan
+    year: 2013
+email: "aginta.harry@c.mbox.nagoya-u.ac.jp"
 interests:
-- "Regional economy development and structural change: Spatial evidence from north-eastern China"
+- "Regional inflation dynamics in Indonesia: Determinants, spatial factors, and convergence analysis"
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "PhD research student 2021-2022"
+role: "PhD student 2020-2023"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://www.researchgate.net/profile/Yilin-Chen-41
+  link: https://haginta.github.io/Harry-Aginta/
 - icon: researchgate
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Yilin-Chen-41
+  link: https://www.researchgate.net/profile/Harry-Aginta
 - icon: orcid
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Yilin-Chen-41
+  link: https://orcid.org/0000-0002-0565-6207
 - icon: github
   icon_pack: fab
-  link: https://github.com/eileenCHEN-9
+  link: https://github.com/haginta
 superuser: false
-title: Yilin Chen (China)
+title: Harry Aginta (Indonesia)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
@@ -34,4 +34,4 @@ user_groups:
 - Doctoral students
 ---
 
-I am the research student in Graduate School of International Development at Nagoya University, for the preparation of PhD program. My research focuses on the economic developement and structural change in Northeastern China, using ESDA, spatial regression, club convergence, and spatial machine learning.
+TBA
