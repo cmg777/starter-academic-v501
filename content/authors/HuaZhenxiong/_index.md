@@ -15,18 +15,18 @@ role: "Master student 2021-2023"
 social:
 - icon: address-card
   icon_pack: fa
-  link: Link to your academic website
+  link: https://www.researchgate.net/profile/Zhenxiong-Hua
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Zhenxiong-Hua
 - icon: orcid
   icon_pack: ai
-  link: Link to your orcid.org
+  link: https://www.researchgate.net/profile/Zhenxiong-Hua
 - icon: github
   icon_pack: fab
-  link: Link to your Github profile
+  link: https://www.researchgate.net/profile/Zhenxiong-Hua
 superuser: false
-title: YourName (YourCountry)
+title: Hua Zhenxiong (China)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
@@ -34,4 +34,4 @@ user_groups:
 - Master students
 ---
 
-Hello everyone£¡My name is Zhenxiong Hua from China and you can also call me Jackie. I now a  M1 student at GSID . My current research topic is regional inequality and growth in Yangtze River Delta. I will try to apply ESDA, spatial regression and regional convergence methodologies.Thank you so much!
+Hello everyone! My name is Zhenxiong Hua from China and you can also call me Jackie. I now a  M1 student at GSID . My current research topic is regional inequality and growth in Yangtze River Delta. I will try to apply ESDA, spatial regression and regional convergence methodologies.Thank you so much!
