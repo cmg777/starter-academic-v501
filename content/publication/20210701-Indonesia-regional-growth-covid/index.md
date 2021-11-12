@@ -1,6 +1,8 @@
 ---
 title: "Regional Economic Growth Convergence and Spatial Growth Spillovers at Times of COVID-19 Pandemic in Indonesia"
 authors:
+- Harry Aginta
+- Cani Miranti
 - admin
 date: "2021-07-01T00:00:00Z"
 doi: ""
