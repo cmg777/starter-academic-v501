@@ -18,13 +18,13 @@ role: "PhD student 2021-2024"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://researchmap.jp/carlos/
+  link: https://www.researchgate.net/profile/Kpoviessi-Othniel
 - icon: researchgate
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Carlos_Mendez54
+  link: https://www.researchgate.net/profile/Kpoviessi-Othniel
 - icon: orcid
   icon_pack: ai
-  link: https://orcid.org/0000-0001-7978-2815 
+  link: https://www.researchgate.net/profile/Kpoviessi-Othniel
 - icon: github
   icon_pack: fab
   link: https://github.com/gcushen
