@@ -15,16 +15,16 @@ role: "Doctoral student 2020-2023"
 social:
 - icon: address-card
   icon_pack: fa
-  link: Link to your academic website
+  link: https://www.researchgate.net/profile/Wenxuan-Yang-4
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Wenxuan-Yang-4
 - icon: orcid
   icon_pack: ai
-  link: Link to your orcid.org
+  link: https://www.researchgate.net/profile/Wenxuan-Yang-4
 - icon: github
   icon_pack: fab
-  link: Link to your Github profile
+  link: https://www.researchgate.net/profile/Wenxuan-Yang-4
 superuser: false
 title: YANG Wenxuan (China)
 
