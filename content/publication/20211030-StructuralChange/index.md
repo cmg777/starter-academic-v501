@@ -70,6 +70,8 @@ projects: [convergence, clusters]
 # slides: example
 ---
 
+## This is a subsection
+
 Here comes some interactive content
 
-<iframe title="Embedded cell output" src="https://embed.deepnote.com/c7d01dc6-6684-48c8-9001-df0940bbcca1/0d2611f5-9049-4cad-b3e6-2f06faabd9c9/00036-2230e54e-46b3-409b-8e49-ecbd8a1138cf" height="600.98291015625" width="700"/>
+<iframe title="Embedded cell output" src="https://embed.deepnote.com/c7d01dc6-6684-48c8-9001-df0940bbcca1/0d2611f5-9049-4cad-b3e6-2f06faabd9c9/00036-2230e54e-46b3-409b-8e49-ecbd8a1138cf" height="600.98291015625" width="650"/>
