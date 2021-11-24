@@ -65,7 +65,7 @@ Among all the application requirements, we strongly recommend you write a clear 
 
 - Research proposal is consistent with the research lines, methods, and [projects](https://quarcs-lab.org/portfolio/all-publications/) of the QuarRCS lab
 - Undergraduate-level knowledge of economics and statistics
-- Ability to use statistical and mathematical software: Stata, R, Python, GeoDA, or Matlab. (at least ONE)
+- Ability to use statistical and mathematical software: Stata, R, Python, Julia, GeoDA, QGIS, or Matlab. (at least ONE)
 - High motivation to learn and use data science, spatial econometrics, and machine learning methods to conduct research.
 
 If you believe your current background does not match this profile, but still want to join us, your could first apply as a [*Research Student*](http://www.gsid.nagoya-u.ac.jp/en/admission/application/) for six months (or one year). During this time, you can develop your academic skills with us, brush up your research proposal, and prepare for the entrance examination of the master program.
@@ -75,7 +75,7 @@ If you believe your current background does not match this profile, but still wa
 
 - Research proposal is *highly* consistent with the research lines, methods, and [projects](https://quarcs-lab.org/portfolio/all-publications/) of the QuarRCS lab
 - *Advanced* knowledge of economics, econometrics, or statistics.
-- Ability to use and *write programs* in Stata, R, Python, GeoDA, or Matlab Python. (at least TWO)
+- Ability to use and *write programs* in Stata, R, Python, Julia, GeoDA, QGIS, or Matlab Python. (at least TWO)
 - *Plan to use* data science, spatial econometrics, and machine learning methods to conduct research.
 
 If you believe your current background does not match this profile, but still want to join us, your could first apply as a [*Research Student*](http://www.gsid.nagoya-u.ac.jp/en/admission/application/) for six months (or one year). During this time, you can develop your research skills with us, brush up your research proposal, and prepare for the entrance examination of the doctoral program.
