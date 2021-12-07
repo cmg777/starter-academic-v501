@@ -26,7 +26,7 @@ social:
   icon_pack: fab
   link: https://github.com/haginta
 superuser: false
-title: Harry Aginta (Indonesia)
+title: Aginta Harry (Indonesia)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.

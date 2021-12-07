@@ -26,7 +26,7 @@ social:
   icon_pack: fab
   link: https://github.com/eileenCHEN-9
 superuser: false
-title: Yilin Chen (China)
+title: Chen Yilin (China)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.

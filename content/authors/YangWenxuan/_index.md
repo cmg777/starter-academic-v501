@@ -26,7 +26,7 @@ social:
   icon_pack: fab
   link: https://www.researchgate.net/profile/Wenxuan-Yang-4
 superuser: false
-title: YANG Wenxuan (China)
+title: Wenxuan Yang (China)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.

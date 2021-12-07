@@ -26,7 +26,7 @@ social:
   icon_pack: fab
   link: https://github.com/balqisreigita
 superuser: false
-title: Balqis Reigita Utami (Indonesia)
+title: Utami Balqis (Indonesia)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.

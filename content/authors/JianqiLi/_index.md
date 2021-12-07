@@ -26,7 +26,7 @@ social:
   icon_pack: fab
   link: https://www.researchgate.net/profile/Jiaqi-Li-127
 superuser: false
-title: Jiaqi Li (China)
+title: Li Jiaqi (China)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.

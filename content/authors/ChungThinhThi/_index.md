@@ -26,7 +26,7 @@ social:
   icon_pack: fab
   link: https://www.researchgate.net/profile/Chung-Trinh-Thi
 superuser: false
-title: Trinh Thi Chung (Vietnam)
+title: Chung Trinh Thi (Vietnam)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
