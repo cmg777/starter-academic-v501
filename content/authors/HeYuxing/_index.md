@@ -15,16 +15,16 @@ role: "Research student 2020-2021"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://carlos-mendez.org/#people
+  link: https://www.researchgate.net/profile/Yuxing-He-3
 - icon: researchgate
   icon_pack: ai
-  link: https://carlos-mendez.org/#people
+  link: https://www.researchgate.net/profile/Yuxing-He-3
 - icon: orcid
   icon_pack: ai
-  link: https://carlos-mendez.org/#people
+  link: https://www.researchgate.net/profile/Yuxing-He-3
 - icon: github
   icon_pack: fab
-  link: https://carlos-mendez.org/#people
+  link: https://www.researchgate.net/profile/Yuxing-He-3
 superuser: false
 title: He Yuxing (China)
 
