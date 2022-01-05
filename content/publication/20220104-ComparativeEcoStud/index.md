@@ -77,11 +77,11 @@ projects: [convergence, clusters]
 
 Are initially low income regions growing faster than initally rich regions?
 
-<iframe title="Embedded cell output" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00009-9290c4fe-c6c0-4662-936c-2214fc1ee67b?height=600.96875" height="600.96875" width="500"/>
+<iframe title="Embedded cell output" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00009-9290c4fe-c6c0-4662-936c-2214fc1ee67b?height=600.96875" height="600.96875" width="400"/>
 
 The story is not so simple, heterogeneity matters!
 
-<iframe title="Embedded cell output" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00010-0c54d15f-d78c-4a2a-a592-99ed359e5c19?height=600.96875" height="600.96875" width="500"/>
+<iframe title="Embedded cell output" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00010-0c54d15f-d78c-4a2a-a592-99ed359e5c19?height=600.96875" height="600.96875" width="400"/>
 
 
 The spatial distribution of economic and social activity should also be included
