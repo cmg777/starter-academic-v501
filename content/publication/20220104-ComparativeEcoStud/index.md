@@ -75,7 +75,7 @@ projects: [convergence, clusters]
 
 ## Highlights
 
-- Are initially low income regions catching up with initially rich regions?
+- Are initially poor regions catching up with initially rich regions?
 
 <iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00009-9290c4fe-c6c0-4662-936c-2214fc1ee67b?height=600"> </iframe>
 
@@ -85,12 +85,12 @@ projects: [convergence, clusters]
 
 - How can we study the role of spatial dependence in the convergence process?
 
-<iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00013-2c8dadc5-5d0a-4033-8654-b279ddbeb28c?height=600"> </iframe>
+<iframe height="566" width="100%" frameborder="no" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00013-2c8dadc5-5d0a-4033-8654-b279ddbeb28c?height=566"> </iframe>
 
 
-- How can we study the role of spatial heterogeneity in the convergence process?
+- How spatially heterogenous is the convergence process?
 
-<iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00043-77ca5664-a6ca-4ebb-8b68-4a8ba9380699?height=600"> </iframe>
+<iframe height="456" width="100%" frameborder="no" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00043-77ca5664-a6ca-4ebb-8b68-4a8ba9380699?height=456"> </iframe>
 
 
 ## Summary slides
