@@ -38,13 +38,13 @@ tags:
 - South America
 
 
-featured: false
+featured: true
 
 # links:
 url_pdf: "https://rdcu.be/cElhh"
 #url_preprint: "http://dx.doi.org/10.13140/RG.2.2.19782.19522"
 url_code: 'https://deepnote.com/@carlos-mendez/PYTHON-Spatial-Convergence-CQNBIt6oSxSxxlnwsEyOgA'
-url_dataset: 'https://deepnote.com/@carlos-mendez/PYTHON-Spatial-Convergence-CQNBIt6oSxSxxlnwsEyOgA'
+url_dataset: 'https://www.nature.com/articles/sdata201938'
 url_poster: ''
 url_project: ''
 url_slides: 'https://project2020e-slides.netlify.app'
