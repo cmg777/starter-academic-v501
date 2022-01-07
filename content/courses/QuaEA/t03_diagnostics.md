@@ -11,10 +11,6 @@ Why do need to take this course?
 
 {{< icon name="clock" pack="fas" >}} 1-2 hours per week, for 8 weeks
 
-
-## Title section
-
-
 <style>
 .container {
   position: relative;
@@ -35,9 +31,40 @@ Why do need to take this course?
 }
 </style>
 
+## Title section
+ 
+ Here we go
+https://www.w3schools.com/howto/howto_css_responsive_iframes.asp
+
+
 <div class="container">
   <iframe class="responsive-iframe" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00019-61dab426-cf43-447f-9f4d-e97cb8b2d45f"></iframe>
 </div>
+
+
+Here we add another reponsive iframe
+
+<div class="container">
+  <iframe class="responsive-iframe" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00013-2c8dadc5-5d0a-4033-8654-b279ddbeb28c"></iframe>
+</div>
+
+
+Some GWR results
+
+<div class="container">
+  <iframe class="responsive-iframe" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00029-7d8e09bd-9b10-4421-b34f-1ef57aea38d6"></iframe>
+</div>
+
+
+And some slides
+
+<div class="container">
+  <iframe class="responsive-iframe" src="https://project2020e-slides.netlify.app"></iframe>
+</div>
+
+
+
+
 
 ## How to add videos
 
