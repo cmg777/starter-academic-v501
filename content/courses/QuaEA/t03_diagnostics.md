@@ -14,6 +14,31 @@ Why do need to take this course?
 
 ## Title section
 
+
+<style>
+.container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding-top: 75%; /* 4:3 Aspect Ratio */
+}
+
+.responsive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+</style>
+
+<div class="container">
+  <iframe class="responsive-iframe" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00019-61dab426-cf43-447f-9f4d-e97cb8b2d45f"></iframe>
+</div>
+
 ## How to add videos
 
 {{< youtube rfscVS0vtbw >}}
