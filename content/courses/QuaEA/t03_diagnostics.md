@@ -16,7 +16,7 @@ Why do need to take this course?
   position: relative;
   width: 100%;
   overflow: hidden;
-  padding-top: 75%; /* 4:3 Aspect Ratio */
+  padding-top: 99%; /* 75% = 4:3 Aspect Ratio */
 }
 
 .responsive-iframe {
