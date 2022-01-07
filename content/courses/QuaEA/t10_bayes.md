@@ -15,6 +15,8 @@ Why do need to take this course?
 ## Title section
 
 
+<iframe title="Embedded cell output" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00019-61dab426-cf43-447f-9f4d-e97cb8b2d45f?height=527.7589416503906" height="527.7589416503906" width="500"/>
+
 ## Learn
 
 The general form of the **normal** probability density function is:

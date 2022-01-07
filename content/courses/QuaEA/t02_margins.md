@@ -14,6 +14,14 @@ Why do need to take this course?
 
 ## Title section
 
+
+Can you add code blocks?
+
+```
+Maybe
+
+```
+
 ## How to add videos
 
 {{< youtube rfscVS0vtbw >}}

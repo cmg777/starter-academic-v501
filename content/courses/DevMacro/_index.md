@@ -1,7 +1,7 @@
 ---
 date: "2021-02-14"
 linkTitle: Development Macroeconomics
-summary: "."
+summary: "Why are some countries rich and other poor? What are there  economic crises?"
 title: "\U0001F4CA Development Macroeconomics"
 type: book
 ---

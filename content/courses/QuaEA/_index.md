@@ -1,7 +1,7 @@
 ---
 date: "2021-02-13"
 linkTitle: Applied Econometrics
-summary: "."
+summary: "How can we study economic data and produce research results?"
 title: "\U0001F4CA Applied Econometrics"
 type: book
 ---
