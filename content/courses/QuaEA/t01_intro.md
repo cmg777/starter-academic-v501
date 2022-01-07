@@ -1,17 +1,20 @@
 ---
 date: "2021-01-01"
-title: Python basics
+title: Introduction and overview
 type: book
-weight: 20
+weight: 10
 ---
 
-Build a foundation in Python.
+Why do need to take this course?
 
 <!--more-->
 
 {{< icon name="clock" pack="fas" >}} 1-2 hours per week, for 8 weeks
 
-## Learn
+
+## Title section
+
+## How to add videos
 
 {{< youtube rfscVS0vtbw >}}
 

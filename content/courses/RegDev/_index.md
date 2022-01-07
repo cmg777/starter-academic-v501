@@ -1,8 +1,8 @@
 ---
 date: "2021-02-13"
-linkTitle: Regional Development (Forthcoming in 2022)
+linkTitle: Regional Development
 summary: "."
-title: "\U0001F4CA Regional Development (Forthcoming in 2022)"
+title: "\U0001F4CA Regional Development"
 type: book
 ---
 

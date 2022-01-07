@@ -1,16 +1,19 @@
 ---
 date: "2021-01-01"
-math: true
-title: Statistics
+title: Model uncertainty 
 type: book
-weight: 40
+weight: 100
 ---
 
-Introduction to statistics for data science.
+Why do need to take this course?
 
 <!--more-->
 
 {{< icon name="clock" pack="fas" >}} 1-2 hours per week, for 8 weeks
+
+
+## Title section
+
 
 ## Learn
 
