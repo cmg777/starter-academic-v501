@@ -18,7 +18,7 @@ role: "Master student 2020-2022"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://researchmap.jp/carlos/
+  link: https://bit.ly/siew-sook-yan
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Carlos_Mendez54
@@ -34,7 +34,7 @@ title: SookYan Siew (Malaysia)
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-- Master students
+- Alumni master graduates
 ---
 
 ADD a longer bio here

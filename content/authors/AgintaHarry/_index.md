@@ -16,6 +16,9 @@ social:
 - icon: address-card
   icon_pack: fa
   link: https://haginta.github.io/Harry-Aginta/
+- icon: open-data
+  icon_pack: ai
+  link: https://deepnote.com/@harry-aginta
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Harry-Aginta
