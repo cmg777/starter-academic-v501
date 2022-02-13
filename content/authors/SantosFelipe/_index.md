@@ -18,7 +18,10 @@ role: "Master in International Development 2021"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://researchmap.jp/carlos/
+  link: https://felipe-santos.rbind.io/
+- icon: open-data
+  icon_pack: ai
+  link: https://deepnote.com/@carlos-mendez
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Carlos_Mendez54

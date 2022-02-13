@@ -19,6 +19,9 @@ social:
 - icon: address-card
   icon_pack: fa
   link: https://www.researchgate.net/profile/Kpoviessi-Othniel
+- icon: open-data
+  icon_pack: ai
+  link: https://deepnote.com/@carlos-mendez
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Kpoviessi-Othniel
