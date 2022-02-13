@@ -32,6 +32,9 @@ social:
 - icon: address-card
   icon_pack: fa
   link: https://profs.provost.nagoya-u.ac.jp/html/100010240_en.html
+- icon: open-data
+  icon_pack: ai
+  link: https://deepnote.com/@carlos-mendez
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Carlos_Mendez54
