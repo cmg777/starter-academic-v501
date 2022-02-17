@@ -29,7 +29,7 @@ social:
   icon_pack: fab
   link: https://www.researchgate.net/lab/Quantitative-Regional-and-Computational-Science-Lab-QuaRCS-lab-Carlos-Mendez
 superuser: false
-title: Minh Thu (Vietnan)
+title: Minh Thu (Vietnam)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.

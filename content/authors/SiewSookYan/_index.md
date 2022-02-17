@@ -19,6 +19,9 @@ social:
 - icon: address-card
   icon_pack: fa
   link: https://bit.ly/siew-sook-yan
+- icon: open-data
+  icon_pack: ai
+  link: http://deepnote.com/@siew-sook-yan
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Carlos_Mendez54
