@@ -34,7 +34,7 @@ title: Chung Trinh Thi (Vietnam)
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-- Master students
+- Alumni master graduates
 ---
 
 Thanks to the support of ADB-JSP programme, I currently focus on my Master at Nagoya University. I hope to expand my research capability and networks, to collaborate with interesting, hard-working people and carry out research which can solve real-world issues. Feel free to contact me. Thank you.
