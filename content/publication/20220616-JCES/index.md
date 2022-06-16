@@ -7,11 +7,11 @@ authors:
 
 
 
-date: "2022-06-17T00:00:00Z"
+date: "2022-06-16T00:00:00Z"
 doi: "10.1057/s41294-022-00194-3"
 
 # Schedule page publish date (NOT publication's date).
-publishDate: "2022-06-17T00:00:00Z"
+publishDate: "2022-06-16T00:00:00Z"
 
 # Publication type.
 # Legend: 0 = Uncategorized; 1 = Conference paper; 2 = Journal article;
@@ -71,24 +71,6 @@ projects: [convergence, clusters]
 # slides: example
 ---
 
-## Highlights
+## Highlights and interactive figures
 
-- Are initially poor regions catching up with initially rich regions?
-
-<iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00009-9290c4fe-c6c0-4662-936c-2214fc1ee67b?height=600"> </iframe>
-
-- Yes, but regional heterogeneity still matters!
-
-<iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00010-0c54d15f-d78c-4a2a-a592-99ed359e5c19?height=600"> </iframe>
-
-- How can we study the role of spatial dependence in the convergence process?
-
-<iframe height="566" width="100%" frameborder="no" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00013-2c8dadc5-5d0a-4033-8654-b279ddbeb28c?height=566"> </iframe>
-
-
-- How spatially heterogenous is the convergence process?
-
-<iframe height="456" width="100%" frameborder="no" src="https://embed.deepnote.com/09034122-dea8-4b14-b1c6-59f0b04c8e80/011f8733-916f-4201-bddd-adcb9db3dd5c/00043-77ca5664-a6ca-4ebb-8b68-4a8ba9380699?height=456"> </iframe>
-
-
-
+To be added.
