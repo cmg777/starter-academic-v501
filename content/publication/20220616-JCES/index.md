@@ -73,10 +73,6 @@ projects: [convergence, clusters]
 
 ## Interactive figures
 
-- Dynamics of per-capita income in EU countries.
-
-<iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/791b85ea-394f-4043-871c-97a0fe09ab86/4aac90f0-7dc6-4d39-929a-2ed579ec5aa7?height=600"> </iframe>
-
 
 - Dynamics of schooling in EU countries.
 
@@ -90,3 +86,8 @@ projects: [convergence, clusters]
 - Spatial distribution of the convergence clubs in learning. 
 
 <iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/6f6d59a2-f068-4848-a39c-8c7021e7a7ad/00015-6b46c060-195d-4202-b08d-4a245d49f6d9?height=600"> </iframe>
+
+- Dynamics of per-capita income in EU countries.
+
+<iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/791b85ea-394f-4043-871c-97a0fe09ab86/4aac90f0-7dc6-4d39-929a-2ed579ec5aa7?height=600"> </iframe>
+
