@@ -39,7 +39,7 @@ tags:
 featured: false
 
 # links:
-url_pdf: ""
+url_pdf: 'https://link.springer.com/content/pdf/10.1057/s41294-022-00194-3.pdf'
 #url_preprint: "http://dx.doi.org/10.13140/RG.2.2.19782.19522"
 url_code: ''
 url_dataset: ''
