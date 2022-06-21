@@ -78,20 +78,15 @@ projects: [convergence, clusters]
 <iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/791b85ea-394f-4043-871c-97a0fe09ab86/4aac90f0-7dc6-4d39-929a-2ed579ec5aa7?height=600"> </iframe>
 
 
-- Transitional paths for schooling and learning.
+- Dynamics of schooling in EU countries.
 
 <iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/6f6d59a2-f068-4848-a39c-8c7021e7a7ad/8b4728031b814d3c8dbdcdd301d10930?height=600"> </iframe>
+
+- Dynamics of learning in EU countries.
 
 <iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/6f6d59a2-f068-4848-a39c-8c7021e7a7ad/9e27558c6b28411bb7323b0821742362?height=600"> </iframe>
 
 
-- Convergence clubs in learning. 
+- Spatial distribution of the convergence clubs in learning. 
 
 <iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/6f6d59a2-f068-4848-a39c-8c7021e7a7ad/00015-6b46c060-195d-4202-b08d-4a245d49f6d9?height=600"> </iframe>
-
-- 
-
-
-
-
-<iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/791b85ea-394f-4043-871c-97a0fe09ab86/4aac90f0-7dc6-4d39-929a-2ed579ec5aa7?height=600"> </iframe>
