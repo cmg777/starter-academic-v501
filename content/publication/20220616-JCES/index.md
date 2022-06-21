@@ -83,7 +83,7 @@ projects: [convergence, clusters]
 <iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/6f6d59a2-f068-4848-a39c-8c7021e7a7ad/9e27558c6b28411bb7323b0821742362?height=600"> </iframe>
 
 
-- Spatial distribution of the convergence clubs in learning. 
+- Convergence clubs of learning outcomes.
 
 <iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/6f6d59a2-f068-4848-a39c-8c7021e7a7ad/00015-6b46c060-195d-4202-b08d-4a245d49f6d9?height=600"> </iframe>
 
