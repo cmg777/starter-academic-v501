@@ -4,6 +4,9 @@ weight: 1
 active: true
 headless: true
 
+# Order that this section appears on the page.
+weight: 65
+
 design:
   # Slide height is automatic unless you force a specific height (e.g. '400px')
   slide_height: ''
@@ -22,7 +25,7 @@ content:
         position: right
         color: '#666'
         brightness: 0.7
-        media: coders.jpg
+        media: open-book.jpg
     - title: Lunch & Learn ☕️
       content: 'Share your knowledge with the group and explore exciting new topics together!'
       align: left
@@ -38,7 +41,7 @@ content:
         position: center
         color: '#333'
         brightness: 0.5
-        media: welcome.jpg
+        media: open-book.jpg
       link:
         icon: graduation-cap
         icon_pack: fas
