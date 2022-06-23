@@ -19,7 +19,7 @@ interests:
 - Spatial Econometrics
 - Machine Learning
 organizations:
-- name: Nagoya University
+- name: Nagoya University, JAPAN
   url: https://www.gsid.nagoya-u.ac.jp/index-en.html
 role: Associate Professor of Development Economics
 social:
