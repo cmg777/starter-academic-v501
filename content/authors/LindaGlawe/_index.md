@@ -5,13 +5,13 @@ bio: My main research interests are macroeconomics, economic growth and developm
 #  - course: Bachelor of Islamic Economics
 #    institution: Airlangga University
 #    year: 2019
-#email: "utami.balqis.reigita@b.mbox.nagoya-u.ac.jp"
+#email: "TBA"
 interests:
 - "My main research interests are macroeconomics, economic growth and development, institutions, human capital, the Chinese economy, the European integration process, digitalization, and spatial econometrics."
 organizations:
 - name: University of Hagen
   url: "https://www.lindaglawe.com/"
-role: "Collaborator"
+role: "Postdoctoral researcher at the University of Hagen in Germany"
 social:
 - icon: address-card
   icon_pack: fa
@@ -29,7 +29,7 @@ social:
 #  icon_pack: fab
 #  link: https://github.com/balqisreigita
 superuser: false
-title: Linda Glawe (Germany)
+title: Linda Glawe
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
