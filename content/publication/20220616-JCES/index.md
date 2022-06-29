@@ -1,7 +1,7 @@
 ---
 title: "Schooling Ain’t Learning in Europe: A Club Convergence Perspective"
 authors:
-- Linda Glawe
+- LindaGlawe
 - admin
 
 
