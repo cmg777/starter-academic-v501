@@ -3,7 +3,7 @@ title: "Regional income convergence and conditioning factors in Turkey: Revisiti
 event: The 2022 (61st) Congress  of the European Regional Science Association   
 event_url: https://ersa.eventsair.com/ersa2022/
 location: Pecs Hungary and Virtual
-summary:  The 2022 (27th) Conference  of the Pacific Regional Science Conference Organisation (PRSCO)
+summary:  The 2022 (61st) Congress  of the European Regional Science Association   
 abstract: "This paper studies regional income convergence and its conditioning factors across 81 provinces of Turkey over the 2007–2019 period. Through the lens of a nonlinear dynamic factor model, we first test the hypothesis that all provinces would eventually converge to a common long-run equilibrium. We reject this hypothesis and find that the provincial dynamics of income per capita are characterized by 6 convergence clubs. Next, we evaluate the conditioning factors behind club formation. Our results suggest that spatial dependence across provinces plays an essential role in the formation of convergence clubs. The spatial distribution of the convergence clubs has a clear spatial pattern, and the dynamics of the provincial income distribution are spatially integrated. We also find that geographical neighbors are more important for middle and high-income provinces. Finally, we show that the performance of geographical neighbors affects the probability of club membership through spillovers in capital accumulation and structural change"
 
 # Talk start and end times.
