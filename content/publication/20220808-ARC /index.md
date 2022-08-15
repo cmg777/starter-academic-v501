@@ -46,7 +46,7 @@ url_code: ''
 url_dataset: ''
 url_poster: ''
 url_project: ''
-url_slides: ''
+url_slides: 'https://www.canva.com/design/DAFJAn-t4NU/EFldux653z2u7rfUHLFY7w/view?utm_content=DAFJAn-t4NU&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink'
 url_source: ''
 url_video: ''
 
