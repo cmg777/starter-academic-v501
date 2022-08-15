@@ -1,6 +1,6 @@
 ---
 title: "Regional inequality clubs in the Philippines: A view from outer space"
-event: The 2022 (27th) Conference  of the Pacific Regional Science Conference Organisation (PRSCO)  
+event: The 2022 (27th) Conference  of the Pacific Regional Science Conference Organisation 
 event_url: http://www.lst.hokkai-s-u.ac.jp/~soushi-s/prsco/
 location: Virtual Conference
 summary:  The 2022 (27th) Conference  of the Pacific Regional Science Conference Organisation (PRSCO)
