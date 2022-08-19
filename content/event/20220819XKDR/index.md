@@ -1,5 +1,5 @@
 ---
-title: "Regional income convergence and conditioning factors in Turkey: Revisiting the role of spatial dependence and neighbor effects"
+title: "Geospatial variation in development: Some insights from satellite images"
 event:  Chennai Mathematical Institute and XKDR Forum Workshop
 event_url: https://www.papers.xkdr.org/index.html
 location: India and Virtual
