@@ -26,7 +26,7 @@ social:
   icon_pack: fab
   link: https://www.linkedin.com/in/sayuri-salamanca-286742111/
 superuser: false
-title: Sayuri Salamanca (Colombia)
+title: Salamanca Sayuri (Colombia)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
