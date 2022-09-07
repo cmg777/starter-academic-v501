@@ -5,7 +5,7 @@ education:
   - course: B.A. in International Business Economics
     institution: Foreign Trade University
     year: 2016
-email: "trinh.thi.chung@c.mbox.nagoya-u.ac.jp"
+email: "x"
 interests:
 - "The determinants of FDI and how FDI impacts on income convergence in Vietnam"
 organizations:

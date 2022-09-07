@@ -5,7 +5,7 @@ education:
   - course: M.A. in Economics
     institution: International University of Japan
     year: 2013
-email: "aginta.harry@c.mbox.nagoya-u.ac.jp"
+email: "x"
 interests:
 - "Regional inflation dynamics in Indonesia: Determinants, spatial factors, and convergence analysis"
 organizations:

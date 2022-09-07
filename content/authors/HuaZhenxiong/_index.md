@@ -5,7 +5,7 @@ education:
   - course: B.A. in International Economics and Trade
     institution: Shanghai Gench University
     year: 2019
-email: "hua.zhenxiong@b.mbox.nagoya-u.ac.jp"
+email: "x"
 interests:
 - "Regional inequality and growth in Yangtze River Delta"
 organizations:

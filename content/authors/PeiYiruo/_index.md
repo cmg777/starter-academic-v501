@@ -5,7 +5,7 @@ education:
   - course: Bachelor of 
     institution: TBA University
     year: 2019
-email: "carlos@gsid.nagoya-u.ac.jp "
+email: "x"
 interests:
 - "Poverty and its determinants employing ESDA and spatial regression"
 organizations:

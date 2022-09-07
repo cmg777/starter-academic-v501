@@ -5,7 +5,7 @@ education:
   - course: B.A.in Economics
     institution: Nanjing Forestry University
     year: 2020
-email: "li.jiaqi@d.mbox.nagoya-u.ac.jp"
+email: "x"
 interests:
 - "The relationship between financial institutions and economic growth in 31 provinces of China-from a spatial perspective"
 organizations:

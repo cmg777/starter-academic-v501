@@ -5,7 +5,7 @@ education:
   - course: M.A. in Economics
     institution: Australian National University
     year: 2020
-email: "yang.wenxuan@h.mbox.nagoya-u.ac.jp"
+email: "x"
 interests:
 - "Regional Income Inquality in China from the Perspective of Spatial Economics"
 organizations:

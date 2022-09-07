@@ -5,7 +5,7 @@ education:
   - course: M.S. in Marketing
     institution: University of Manchester
     year: 2020
-email: "chen.yilin@h.mbox.nagoya-u.ac.jp"
+email: "x"
 interests:
 - "Regional economy development and structural change: Spatial evidence from north-eastern China" 
 organizations:

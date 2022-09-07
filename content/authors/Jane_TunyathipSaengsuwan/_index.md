@@ -5,7 +5,7 @@ education:
   - course: BA in Politcal Science
     institution: Chulalongkorn University
     year: 2016
-email: "janetunyathip@gmail.com"
+email: "x"
 interests:
 - "Globalization and the impact on income disparity in provinces of Thailand"
 organizations:
