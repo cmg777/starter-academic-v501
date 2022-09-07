@@ -18,7 +18,7 @@ social:
   link: https://www.researchgate.net/profile/Jiaqi-Li-127
 - icon: open-data
   icon_pack: ai
-  link: https://deepnote.com/@carlos-mendez
+  link: https://deepnote.com/@jiaqi-li-bonny 
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Jiaqi-Li-127
