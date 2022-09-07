@@ -18,7 +18,7 @@ social:
   link: https://www.researchgate.net/profile/Zhenxiong-Hua
 - icon: open-data
   icon_pack: ai
-  link: https://deepnote.com/@carlos-mendez
+  link: https://deepnote.com/@jackie-hua
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Zhenxiong-Hua

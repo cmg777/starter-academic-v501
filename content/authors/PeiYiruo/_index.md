@@ -18,7 +18,7 @@ social:
   link: https://www.researchgate.net/profile/Yiruo-Pei
 - icon: open-data
   icon_pack: ai
-  link: https://deepnote.com/@carlos-mendez
+  link: https://deepnote.com/@penny
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Yiruo-Pei
@@ -27,7 +27,7 @@ social:
   link: https://www.researchgate.net/profile/Yiruo-Pei
 - icon: github
   icon_pack: fab
-  link: https://www.researchgate.net/profile/Yiruo-Pei
+  link: https://github.com/Peipei98
 superuser: false
 title: Pei Yiruo (China)
 

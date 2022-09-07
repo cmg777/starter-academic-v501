@@ -5,20 +5,20 @@ education:
   - course: Bachelor of 
     institution: TBA University
     year: 2019
-email: "x "
+email: "x"
 interests:
 - "Poverty and its determinants employing ESDA and spatial regression"
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "Master student 2022-2023"
+role: "Research student 2020-2021"
 social:
 - icon: address-card
   icon_pack: fa
   link: https://www.researchgate.net/profile/Yuxing-He-3
 - icon: open-data
   icon_pack: ai
-  link: https://deepnote.com/@carlos-mendez
+  link: https://deepnote.com/@hann-he-1998
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Yuxing-He-3
