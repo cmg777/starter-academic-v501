@@ -5,7 +5,7 @@ education:
   - course: Bachelor of Islamic Economics
     institution: Airlangga University
     year: 2019
-email: "utami.balqis.reigita@b.mbox.nagoya-u.ac.jp"
+email: "_"
 interests:
 - "Poverty and its determinants employing ESDA and spatial regression"
 organizations:

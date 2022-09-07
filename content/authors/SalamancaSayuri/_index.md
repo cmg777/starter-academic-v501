@@ -5,7 +5,7 @@ education:
   - course: BA in Marketing and International Business
     institution: Autonoma University
     year: 2018
-email: "sayuri.salamanca19@gmail.com"
+email: "_"
 interests:
 - "Colombia’s Regional Development: Finding opportunities and constrains for Sustainable Development"
 organizations:
