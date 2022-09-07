@@ -1,6 +1,5 @@
 ---
 bio: My research interests are regional economics, finance, and economic development.
-education:
   courses:
   - course: B.A.in Economics
     institution: Nanjing Forestry University
