@@ -11,7 +11,7 @@ interests:
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "Research student 2020-2021"
+role: "Master student 2022-2023"
 social:
 - icon: address-card
   icon_pack: fa
