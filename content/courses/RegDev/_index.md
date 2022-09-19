@@ -1,7 +1,7 @@
 ---
 date: "2021-02-13"
 linkTitle: Regional Development
-summary: "."
+summary: "________________________________________________________"
 title: "\U0001F4CA Regional Development"
 type: book
 ---
@@ -10,4 +10,4 @@ type: book
 
 {{< toc hide_on="xl" >}}
 
-{{< cta cta_text="JOIN the course" cta_link="python" >}}
+{{< cta cta_text="JOIN the course" cta_link="https://carlos-mendez.my.canva.site/course-reg-development" >}}
