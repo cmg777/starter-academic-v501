@@ -2,7 +2,7 @@
 date: "2021-02-13"
 linkTitle: Introduction to Statistics and Data Science
 summary: "________________________________________________________"
-title: "\U0001F4CA Introduction to statistics and data science"
+title: "\U0001F4CA Introduction to Statistics and Data Science"
 type: book
 ---
 
