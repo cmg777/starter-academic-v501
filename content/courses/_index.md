@@ -6,5 +6,5 @@ title: Courses
 type: page
 ---
 
-I currently teach the following courses:
+I currently teach the following courses/seminars/modules:
 
