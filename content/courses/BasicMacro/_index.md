@@ -1,7 +1,7 @@
 ---
 date: "2021-02-13"
 linkTitle: Principles of Macroeconomics
-summary: "."
+summary: "________________________________________________________"
 title: "\U0001F4CA Principles of Macroeconomics"
 type: book
 ---

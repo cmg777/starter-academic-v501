@@ -8,7 +8,7 @@ type: book
 
 {{< figure src="featured.jpg" >}}
 
-
+{{< toc hide_on="xl" >}}
 
 {{< cta cta_text="JOIN the course" cta_link="https://carlos-mendez.my.canva.site/course-app-metrics" >}}
 
