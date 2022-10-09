@@ -7,7 +7,7 @@ active: true
 headless: true
 weight: 01
 title: Hugo Academic Starter
-hero_media: websiteCover1.png
+hero_media: websiteCover1.jpg
 cta:
   label: '**Get Started**'
   url: https://wowchemy.com/templates/
@@ -29,3 +29,4 @@ advanced:
 **The FREE, Hugo-based open source website builder and template trusted by 500,000+ sites.**
 
 **Build anything with widgets** - from landing pages, knowledge bases, and courses to academic resumés, conferences, and tech blogs.
+
