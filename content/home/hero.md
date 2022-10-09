@@ -6,7 +6,7 @@ active: true
 
 headless: true
 weight: 01
-title: QuaRCS-labJP
+title: 
 hero_media: websiteCover1.jpg
 
 design:
