@@ -5,7 +5,7 @@ widget: hero
 active: true
 
 headless: true
-weight: 01
+weight: 03
 title: 
 hero_media: 
 
