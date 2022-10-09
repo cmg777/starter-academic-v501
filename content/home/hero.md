@@ -30,3 +30,4 @@ advanced:
 
 **Build anything with widgets** - from landing pages, knowledge bases, and courses to academic resumés, conferences, and tech blogs.
 
+![](https://github.com/slides777/images/blob/main/websiteCover1.jpg)

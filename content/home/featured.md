@@ -9,8 +9,8 @@ headless: true
 # Order that this section appears on the page.
 weight: 20
 
-title: Featured
-subtitle: "content"
+title: Featured content
+subtitle: ""
 
 content:
   # Page type to display. E.g. post, talk, publication...
