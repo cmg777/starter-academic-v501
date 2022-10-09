@@ -5,7 +5,7 @@ headless: true
 # ... Put Your Section Options Here (title etc.) ...
 title: QuaRCS-lab Japan
 subtitle:
-weight: 55  # section position on page
+weight: 15  # section position on page
 
 # Activate this widget? true/false
 active: true
