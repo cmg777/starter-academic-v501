@@ -7,7 +7,7 @@ active: true
 headless: true
 weight: 10
 title: Hugo Academic Starter
-hero_media: hero-academic.png
+hero_media: websiteCover1.png
 cta:
   label: '**Get Started**'
   url: https://wowchemy.com/templates/
