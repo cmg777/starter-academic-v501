@@ -30,5 +30,5 @@ design:
 In the QuaRCS-lab JP, we conduct research on quantitative regional and computational science. We exploit the integration of macroeconomics, spatial data science, and machine learning to understand and inform the process of sustainable development across subnational regions and countries.
 
 
-<iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/dfe1465f-493d-4a8b-b11c-8412ba77aed7/6f6d59a2-f068-4848-a39c-8c7021e7a7ad/9e27558c6b28411bb7323b0821742362?height=600"> </iframe>
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600"> </iframe>
 
