@@ -23,10 +23,10 @@ main:
   url: '#contact'
   weight: 90
 - name: Events
-  url: 'https://lu.ma/quarcs'
+  url: '#eventsOnline'
   weight: 45
 - name: ResearchLab
-  url: 'https://carlos-mendez.my.canva.site/quarcs-labjp'
+  url: '#researchLab'
   weight: 50
 - name: Students
   url: '#people'
