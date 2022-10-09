@@ -7,7 +7,7 @@ active: true
 headless: true
 weight: 01
 title: 
-hero_media: websiteCover1.jpg
+hero_media: 
 
 design:
   background:
