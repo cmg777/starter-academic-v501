@@ -16,6 +16,6 @@ design:
   columns: '1'
 ---
 
-[![The template is mobile first with a responsive design to ensure that your site looks stunning on every device.](https://raw.githubusercontent.com/wowchemy/wowchemy-hugo-modules/main/starters/academic/preview.png)](https://deepnote.com/@carlos-mendez)
+[![content](https://github.com/slides777/images/raw/3c2b44207d3810b24836ed1102f88a2c19ad1396/myTutorials.jpg)](https://deepnote.com/@carlos-mendez)
 
-<iframe height="600" width="100%" frameborder="no" src="https://deepnote.com/@carlos-mendez?height=600"> </iframe>
+
