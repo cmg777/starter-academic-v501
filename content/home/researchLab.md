@@ -34,5 +34,5 @@ In the QuaRCS-lab JP, we conduct research on quantitative regional and computati
 Let's explore regional development from outer space: 
 
 
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600"> </iframe>
+<iframe height="800" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=800"> </iframe>
 
