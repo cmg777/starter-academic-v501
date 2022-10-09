@@ -3,9 +3,9 @@ widget: blank
 headless: true
 
 # ... Put Your Section Options Here (title etc.) ...
-title: QuaRCS-lab Japan
+title: Events
 subtitle:
-weight: 55  # section position on page
+weight: 75  # section position on page
 
 # Activate this widget? true/false
 active: true
@@ -30,5 +30,5 @@ design:
 In the QuaRCS-lab JP, we conduct research on quantitative regional and computational science. We exploit the integration of macroeconomics, spatial data science, and machine learning to understand and inform the process of sustainable development across subnational regions and countries.
 
 
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600"> </iframe>
+<iframe height="1600" width="100%" frameborder="no" src="https://lu.ma/quarcs?height=1600"> </iframe>
 
