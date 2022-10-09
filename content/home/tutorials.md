@@ -3,17 +3,17 @@ widget: blank
 headless: true
 
 # ... Put Your Section Options Here (title etc.) ...
-title: 
+title: Tutorials
 subtitle:
-weight: 15  # section position on page
+weight: 70  # section position on page
 
 # Activate this widget? true/false
-active: true
+active: True
 
 design:
   background:
     # Name of image in `assets/media/`.
-    image: websiteCover2.jpg
+    image: websiteCover0.jpg
     # Darken the image? Range 0-1 where 0 is transparent and 1 is opaque.
     image_darken: 0
     #  Options are `cover` (default), `contain`, or `actual` size.
@@ -29,3 +29,4 @@ design:
 ---
 
 
+<iframe height="600" width="100%" frameborder="no" src="https://deepnote.com/@carlos-mendez?height=600"> </iframe>
