@@ -23,4 +23,7 @@ design:
 </center>
 
 
+{{% callout note %}}
+Discover and execute more tutorials [HERE](https://deepnote.com/@carlos-mendez).
+{{% /callout %}}
 
