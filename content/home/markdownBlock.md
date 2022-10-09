@@ -5,7 +5,10 @@ headless: true
 # ... Put Your Section Options Here (title etc.) ...
 title: My New Section
 subtitle:
-weight: 01  # section position on page
+weight: 02  # section position on page
+
+# Activate this widget? true/false
+active: false
 
 design:
   # Choose how many columns the section has. Valid values: 1 or 2.
