@@ -17,7 +17,7 @@ interests:
 - Regional Development
 - Macroeconomics
 - Spatial Econometrics
-- Machine Learning
+- Spatial Big Data Analytics
 organizations:
 - name: Nagoya University, JAPAN
   url: https://www.gsid.nagoya-u.ac.jp/index-en.html
