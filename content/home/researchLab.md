@@ -27,7 +27,7 @@ design:
   # Choose how many columns the section has. Valid values: 1 or 2.
   columns: '1'
 ---
-In the QuaRCS-lab JP, we conduct research on quantitative regional and computational science. We exploit the integration of economics, spatial data science, and spatial econometrics to understand and inform the process of sustainable development across subnational regions and countries.
+In the QuaRCS-lab JP, we conduct research on quantitative regional and computational science. We exploit the integration of development economics, spatial data science, and applied econometrics to understand and inform the process of sustainable development across subnational regions and countries.
 
 <iframe height="600" width="100%" frameborder="no" src="https://www.youtube-nocookie.com/embed/41zWBXUrdKU"?height=600"> </iframe>
 
@@ -35,4 +35,13 @@ Let's explore regional development from outer space:
 
 
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600"> </iframe>
+
+<center>
+
+{{% callout note %}}
+Using your Discord credentials, [enter the lab HERE](https://discord.com).
+{{% /callout %}}
+
+</center>
+
 
