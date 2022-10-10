@@ -41,7 +41,7 @@ Let's explore regional development from outer space:
 
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected?height=600"> </iframe>
 
-Do you want more updated data? Let's explore the [new VIIR-like nighttime lights HERE.](https://carlosmendez777.users.earthengine.app/view/worldviirs-like) What can you discover? How is the world changing? What can we learn from the space-time patterns of nighttime lights?
+Do you want see more updated data? Then, let's explore the [new VIIR-like nighttime lights HERE.](https://carlosmendez777.users.earthengine.app/view/worldviirs-like) What can you discover? How is the world changing? What can we learn from the space-time patterns of nighttime lights? To contextualize these questions, below you will find a brief introduction to the exciting field of regional/geospatial development.
 
 <div style="position: relative; width: 100%; height: 0; padding-top: 75.0000%;
  padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
@@ -50,7 +50,7 @@ Do you want more updated data? Let's explore the [new VIIR-like nighttime lights
     src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
   </iframe>
 </div>
-<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?utm_content=DAFBnI0WI-U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to open the slides in separate tab.</a> 
+<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?utm_content=DAFBnI0WI-U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to open the slides in a separate tab.</a> 
 
 <br>
 <br>
@@ -58,7 +58,7 @@ Do you want more updated data? Let's explore the [new VIIR-like nighttime lights
 <center>
 
 {{% callout note %}}
-Use your Discord credentials, [enter the lab HERE](https://discord.com).
+Use your Discord credentials to [enter the lab HERE](https://discord.com).
 {{% /callout %}}
 
 </center>
