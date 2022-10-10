@@ -18,11 +18,11 @@ design:
 
 <center>
 
+[![](https://github.com/slides777/images/raw/3c2b44207d3810b24836ed1102f88a2c19ad1396/myTutorials.jpg)](https://deepnote.com/@carlos-mendez)
+
 {{% callout note %}}
 Discover and execute more tutorials [HERE](https://deepnote.com/@carlos-mendez).
 {{% /callout %}}
-
-[![](https://github.com/slides777/images/raw/3c2b44207d3810b24836ed1102f88a2c19ad1396/myTutorials.jpg)](https://deepnote.com/@carlos-mendez)
 
 </center>
 
