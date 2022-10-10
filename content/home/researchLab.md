@@ -50,7 +50,7 @@ Do you want more updated data? Let's explore the [new VIIR-like nighttime lights
     src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
   </iframe>
 </div>
-<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?utm_content=DAFBnI0WI-U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Click HERE to open the slides in another tab.</a> 
+<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?utm_content=DAFBnI0WI-U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to open the slides in separate tab.</a> 
 
 
 
