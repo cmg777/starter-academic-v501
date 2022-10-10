@@ -1,5 +1,5 @@
 ---
-bio: My research interests focus on the integration of macroeconomics, spatial data science, and econometrics to understand and inform the process of sustainable development across subnational regions and countries.
+bio: My research interests focus on the integration of development economics, spatial data science, and econometrics to understand and inform the process of sustainable development across subnational regions and countries.
 education:
   courses:
   - course: PhD in International Development
@@ -68,7 +68,7 @@ user_groups:
 - Principal Investigators
 ---
 
-After studying Commercial Engineering in Bolivia and Chile, I worked as a consultant for Pro-Mujer International, The World Bank, DANIDA, and JICA. I have a M.A. and a Ph.D. in International Development from Nagoya University, Japan. My research interests focus on the integration of macroeconomics, spatial data science, and econometrics  to understand and inform the process of sustainable development across subnational regions and countries. My current research deals with (1) geospatial inequality and development; (2) regional economic growth and convergence; (3) regional labor markets outcomes and macroeconomic shocks; and (4) structural change and productivity dynamics.
+After studying Commercial Engineering in Bolivia and Chile, I worked as a consultant for Pro-Mujer International, The World Bank, DANIDA, and JICA. I have a M.A. and a Ph.D. in International Development from Nagoya University, Japan. My research interests focus on the integration of development economics, spatial data science, and econometrics  to understand and inform the process of sustainable development across subnational regions and countries. My current research deals with (1) geospatial inequality and development; (2) regional economic growth and convergence; (3) regional labor markets outcomes and macroeconomic shocks; and (4) structural change and productivity dynamics.
 
 {{< icon name="download" pack="fas" >}} Download my {{< staticref "media/CV.pdf" "newtab" >}}CV{{< /staticref >}}.
 
