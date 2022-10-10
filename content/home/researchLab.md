@@ -27,7 +27,12 @@ design:
   # Choose how many columns the section has. Valid values: 1 or 2.
   columns: '1'
 ---
-In the QuaRCS-lab JP, we conduct research on quantitative regional and computational science. We exploit the integration of development economics, spatial data science, and applied econometrics to understand and inform the process of sustainable development across subnational regions and countries.
+
+{{% callout note %}}
+In the QuaRCS-lab JP, we conduct research on [quantitative regional and computational science](https://quarcs-lab.org). We exploit the integration of development economics, spatial data science, and applied econometrics to understand and inform the process of sustainable development across subnational regions and countries.
+{{% /callout %}}
+
+
 
 <iframe height="600" width="100%" frameborder="no" src="https://www.youtube-nocookie.com/embed/41zWBXUrdKU"?height=600"> </iframe>
 
@@ -36,7 +41,7 @@ Let's explore regional development from outer space:
 
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected?height=600"> </iframe>
 
-Explore the new VIIR-like nighttime lights [HERE](https://carlosmendez777.users.earthengine.app/view/worldviirs-like) What can you discover?
+Explore the new VIIR-like nighttime lights [HERE.](https://carlosmendez777.users.earthengine.app/view/worldviirs-like) What can you discover?
 
 <div style="position: relative; width: 100%; height: 0; padding-top: 75.0000%;
  padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
