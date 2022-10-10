@@ -41,7 +41,12 @@ Let's explore regional development from outer space:
 
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected?height=600"> </iframe>
 
+
+
+{{% callout note %}}
 Do you want see more updated data? Then, let's explore the [new VIIRS-like nighttime lights HERE.](https://carlosmendez777.users.earthengine.app/view/worldviirs-like) What can you discover? How is the world changing? What can we learn from the space-time patterns of nighttime lights? To contextualize these questions, below you will find a brief introduction to new advances in the exciting field of regional/geospatial development.
+{{% /callout %}}
+
 
 <div style="position: relative; width: 100%; height: 0; padding-top: 75.0000%;
  padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
