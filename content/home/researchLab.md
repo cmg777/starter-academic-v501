@@ -63,7 +63,7 @@ Do you want see more updated data? Then, let's explore the [new VIIRS-like night
 <center>
 
 {{% callout note %}}
-Use your Discord credentials to [enter the lab HERE](https://discord.com).
+Use your Discord credentials to [enter the QuaRCS-lab JP here](https://discord.com).
 {{% /callout %}}
 
 </center>
