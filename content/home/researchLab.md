@@ -44,7 +44,7 @@ Let's explore regional development from outer space:
 
 
 {{% callout note %}}
-Do you want see more updated data? Then, let's explore the [new VIIRS-like nighttime lights HERE.](https://carlosmendez777.users.earthengine.app/view/worldviirs-like) What can you discover? How is the world changing? What can we learn from the space-time patterns of nighttime lights? To contextualize these questions, below you will find a brief introduction to new advances in the exciting field of regional/geospatial development.
+Do you want see more updated data? Then, let's explore the [new VIIRS-like nighttime lights HERE.](https://carlosmendez777.users.earthengine.app/view/worldviirs-like) What can you discover? How is the world changing? What can we learn from the space-time patterns of nighttime lights? To help  contextualize these questions, below you will find a brief introduction to recent advances in the exciting field of regional/geospatial development.
 {{% /callout %}}
 
 
