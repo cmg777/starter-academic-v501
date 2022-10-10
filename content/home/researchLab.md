@@ -29,7 +29,7 @@ design:
 ---
 
 {{% callout note %}}
-In the QuaRCS-lab JP, we conduct research on [quantitative regional and computational science](https://quarcs-lab.org). We exploit the integration of development economics, spatial data science, and applied econometrics to understand and inform the process of sustainable development across subnational regions and countries.
+In the QuaRCS-lab, we conduct research on [quantitative regional and computational science](https://quarcs-lab.org). We exploit the integration of development economics, spatial data science, and applied econometrics to understand and inform the process of sustainable development across subnational regions and countries.
 {{% /callout %}}
 
 
@@ -50,7 +50,7 @@ Explore the new VIIR-like nighttime lights [HERE.](https://carlosmendez777.users
     src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
   </iframe>
 </div>
-<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?utm_content=DAFBnI0WI-U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Introduction to regional development</a> by Carlos Mendez
+<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?utm_content=DAFBnI0WI-U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Click HERE to open the slides in another tab.</a> 
 
 
 
