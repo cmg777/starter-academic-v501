@@ -38,13 +38,9 @@ In the QuaRCS-lab, we conduct research on [quantitative regional and computation
 
 <center>
 {{% callout note %}}
-When the sun goes down and the lights turn on, [there’s still a lot to explore.](https://earth.app.goo.gl/oZzBfT)
+When the sun goes down and the lights turn on, [there’s still a lot to explore.](https://earth.app.goo.gl/oZzBfT) Let's explore the dynamics regional development from outer space: 
 {{% /callout %}}
 </center>
-
-<br>
-
-Let's explore the dynamics regional development from outer space: 
 
 
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected?height=600"> </iframe>
