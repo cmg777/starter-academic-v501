@@ -43,7 +43,6 @@ When the sun goes down and the lights turn on, [there’s still a lot to explore
 </center>
 
 <br>
-<br>
 
 Let's explore the dynamics regional development from outer space: 
 
