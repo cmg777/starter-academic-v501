@@ -38,7 +38,7 @@ In the QuaRCS-lab, we conduct research on [quantitative regional and computation
 
 <center>
 {{% callout note %}}
-When the sun goes down and the lights turn on, [there’s still a lot to explore.](https://earth.app.goo.gl/oZzBfT) Let's explore the dynamics regional development from outer space: 
+When the sun goes down and the lights turn on, [there’s still a lot to explore.](https://earth.app.goo.gl/oZzBfT) Let's explore regional development dynamics from outer space: 
 {{% /callout %}}
 </center>
 
