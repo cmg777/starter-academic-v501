@@ -37,6 +37,7 @@ In the QuaRCS-lab, we conduct research on [quantitative regional and computation
 <iframe height="600" width="100%" frameborder="no" src="https://www.youtube-nocookie.com/embed/41zWBXUrdKU"?height=600"> </iframe>
 
 <br>
+<br>
 
 <center>
 {{% callout note %}}
@@ -56,6 +57,9 @@ What is the relationship between nighttime lights, population, and GDP?
 <br>
 
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/explore-gdp-ntl-pop?height=600"> </iframe>
+
+<br>
+<br>
 
 
 {{% callout note %}}
