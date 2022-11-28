@@ -42,13 +42,21 @@ When the sun goes down and the lights turn on, [there’s still a lot to explore
 {{% /callout %}}
 </center>
 
+<br>
 
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected?height=600"> </iframe>
 
+<br>
+
+What is the relationship between nighttime lights, population and GDP?
+
+<br>
+
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/explore-gdp-ntl-pop?height=600"> </iframe>
 
 
 {{% callout note %}}
-Do you want see more updated data? Then, let's explore the [new VIIRS-like nighttime lights HERE.](https://carlosmendez777.users.earthengine.app/view/worldviirs-like) What can you discover? How is the world changing? What can we learn from the space-time patterns of nighttime lights? To help  contextualize these questions, below you will find a brief introduction to recent advances in the exciting field of regional/geospatial development.
+ What can you discover? How is the world changing? What can we learn from these space-time patterns? To contextualize these questions, below you will find a brief introduction to recent advances in the exciting field of regional/geospatial development.
 {{% /callout %}}
 
 
