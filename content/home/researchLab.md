@@ -36,6 +36,8 @@ In the QuaRCS-lab, we conduct research on [quantitative regional and computation
 
 <iframe height="600" width="100%" frameborder="no" src="https://www.youtube-nocookie.com/embed/41zWBXUrdKU"?height=600"> </iframe>
 
+<br>
+
 <center>
 {{% callout note %}}
 When the sun goes down and the lights turn on, [there’s still a lot to explore.](https://earth.app.goo.gl/oZzBfT) Let's explore regional development dynamics from outer space: 
@@ -47,8 +49,9 @@ When the sun goes down and the lights turn on, [there’s still a lot to explore
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected?height=600"> </iframe>
 
 <br>
+<br>
 
-What is the relationship between nighttime lights, population and GDP?
+What is the relationship between nighttime lights, population, and GDP?
 
 <br>
 
