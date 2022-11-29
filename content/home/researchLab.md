@@ -47,7 +47,7 @@ When the sun goes down and the lights turn on, [there’s still a lot to explore
 
 <br>
 
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected?height=600"> </iframe>
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600"> </iframe>
 
 <br>
 <br>
