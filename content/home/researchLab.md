@@ -66,8 +66,23 @@ What is the relationship between nighttime lights, population, and GDP across sp
 <br>
 
 
+
+<center>
 {{% callout note %}}
- What can you discover? How is the world changing? Where is development happening? To contextualize these questions, below you will find an overview of recent advances in the exciting field of regional/geospatial development.
+What is luminosity-based GDP? How is changing over time and across space? 
+{{% /callout %}}
+</center>
+
+<br>
+
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
+
+<br>
+<br>
+
+
+{{% callout note %}}
+ What can you discover from these visualizations? Where is development happening? How is the world changing?  To contextualize these questions, below you will find an overview of recent advances in the exciting field of regional/geospatial development.
 {{% /callout %}}
 
 
