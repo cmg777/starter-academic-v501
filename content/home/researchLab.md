@@ -55,7 +55,7 @@ When the sun goes down and the lights turn on, [there’s still a lot to explore
 
 <center>
 {{% callout note %}}
-What is luminosity-based GDP? How is it changing across time and space? 
+What is luminosity-based GDP? How is it changing across space and time? 
 {{% /callout %}}
 </center>
 
