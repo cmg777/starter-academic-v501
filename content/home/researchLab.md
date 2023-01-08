@@ -69,7 +69,7 @@ What is the relationship between nighttime lights, population, and GDP across sp
 
 <center>
 {{% callout note %}}
-What is luminosity-based GDP? How is changing over time and across space? 
+What is luminosity-based GDP? How is it changing over time and across space? 
 {{% /callout %}}
 </center>
 
