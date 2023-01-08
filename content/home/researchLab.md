@@ -52,20 +52,6 @@ When the sun goes down and the lights turn on, [there’s still a lot to explore
 <br>
 <br>
 
-<center>
-{{% callout note %}}
-What is the relationship between nighttime lights, population, and GDP across space and time? 
-{{% /callout %}}
-</center>
-
-<br>
-
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/explore-gdp-ntl-pop?height=600"> </iframe>
-
-<br>
-<br>
-
-
 
 <center>
 {{% callout note %}}
@@ -76,6 +62,18 @@ What is luminosity-based GDP? How is it changing over time and across space?
 <br>
 
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
+
+<br>
+<br>
+<center>
+{{% callout note %}}
+What is the relationship between nighttime lights, population, and GDP across space and time? 
+{{% /callout %}}
+</center>
+
+<br>
+
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/explore-gdp-ntl-pop?height=600"> </iframe>
 
 <br>
 <br>
