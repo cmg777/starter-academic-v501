@@ -72,7 +72,7 @@ What is luminosity-based GDP? How is it changing across space and time?
 {{% callout note %}}
 What is the relationship between nighttime lights, population, and GDP across space and time?
 <br> 
-(To use this app, click on the "Layers" menu )
+(To use this app, click on the "Layers" menu)
 <br>
 {{% /callout %}}
 </center>
@@ -103,9 +103,9 @@ What is the relationship between nighttime lights, population, and GDP across sp
 <br>
 <center>
 {{% callout note %}}
-QUIZ: The map below utilizes a simple regression model, NTL = a + b(t), to depict the trends of nighttime lights. [The RGB composite system is employed for pixel visualization](https://jeffhowarth.github.io/eeprimer/concepts/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. In this context, how would you interpret the yellow and cyan colors?
+QUIZ: Based on the regression  NTL = a + b(t),  the map below shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/concepts/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. In this context, how would you interpret the yellow and cyan colors?
 <br> 
-(To explore this app further, click on the "Layers" menu )
+(Click on the "Layers" menu to learn more about this app.)
 <br>
 {{% /callout %}}
 </center>
