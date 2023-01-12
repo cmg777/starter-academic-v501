@@ -101,6 +101,21 @@ What is the relationship between nighttime lights, population, and GDP across sp
 
 <br>
 <br>
+<center>
+{{% callout note %}}
+QUIZ: The map below uses a simple regression model (NTL = a + b(t)) to show the trends of nighttime lights. [An RGB composite is used for pixel visualization](https://jeffhowarth.github.io/eeprimer/concepts/additive_color/), where postive/negative slope values are shown as red/blue gradients and the intercept is shown as a green gradient. How would you interpret the yellow and cyan colors?
+<br> 
+(To explore this app further, click on the "Layers" menu )
+<br>
+{{% /callout %}}
+</center>
+
+<br>
+
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
+
+<br>
+<br>
 
 <center>
 
