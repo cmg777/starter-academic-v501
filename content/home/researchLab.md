@@ -103,7 +103,7 @@ What is the relationship between nighttime lights, population, and GDP across sp
 <br>
 <center>
 {{% callout note %}}
-QUIZ: The map below uses a simple regression model (NTL = a + b(t)) to show the trends of nighttime lights. [An RGB composite is used for pixel visualization](https://jeffhowarth.github.io/eeprimer/concepts/additive_color/), where postive/negative slope values are shown as red/blue gradients and the intercept is shown as a green gradient. How would you interpret the yellow and cyan colors?
+QUIZ: The map below utilizes a simple regression model, NTL = a + b(t), to depict the trends of nighttime lights. [The RGB composite system is employed for pixel visualization](https://jeffhowarth.github.io/eeprimer/concepts/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. In this context, how would you interpret the yellow and cyan colors?
 <br> 
 (To explore this app further, click on the "Layers" menu )
 <br>
