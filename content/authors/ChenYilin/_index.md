@@ -15,7 +15,7 @@ role: "PhD student 2022-2025"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://yilinchen.my.canva.site/
+  link: https://www.researchgate.net/profile/Yilin-Chen-41
 - icon: open-data
   icon_pack: ai
   link: https://deepnote.com/@yilin-chen
