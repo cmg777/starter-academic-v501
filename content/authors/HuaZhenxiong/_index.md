@@ -34,7 +34,7 @@ title: Hua Zhenxiong (China)
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-- Master students
+- Alumni master graduates
 ---
 
 Hello everyone! My name is Zhenxiong Hua from China and you can also call me Jackie. I now a  M1 student at GSID . My current research topic is regional inequality and growth in Yangtze River Delta. I will try to apply ESDA, spatial regression and regional convergence methodologies.Thank you so much!
