@@ -15,19 +15,19 @@ role: "PhD research student 2023-2024"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://www.researchgate.net/profile/Yilin-Chen-41
+  link: https://www.researchgate.net/profile/Favio-Sergio-Leiva-Cardenas/research
 - icon: open-data
   icon_pack: ai
-  link: https://deepnote.com/@yilin-chen
+  link: https://favioleiva.youcanbook.me/
 - icon: researchgate
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Yilin-Chen-41
+  link: https://www.researchgate.net/profile/Favio-Sergio-Leiva-Cardenas/research
 - icon: orcid
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Yilin-Chen-41
+  link: https://orcid.org/0000-0001-9315-3097
 - icon: github
   icon_pack: fab
-  link: https://github.com/eileenCHEN-9
+  link: https://github.com/Favioleiva
 superuser: false
 title: Leiva Favio (Peru)
 
