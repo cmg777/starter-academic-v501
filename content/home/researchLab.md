@@ -43,7 +43,9 @@ In the QuaRCS-lab, we conduct research on [quantitative regional and computation
 {{% callout note %}}
 When the sun goes down and the lights turn on, [there’s still a lot to explore.](https://earth.app.goo.gl/oZzBfT) 
 <br>
-Let's study regional development dynamics from outer space: 
+Let's study regional development from outer space!
+<br>
+(Move the slider and start exploring)
 <br>
 {{% /callout %}}
 </center>
@@ -53,20 +55,8 @@ Let's study regional development dynamics from outer space:
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600"> </iframe>
 
 <br>
-<br>
 
 
-<center>
-{{% callout note %}}
-What is luminosity-based GDP? How is it changing across space and time? 
-{{% /callout %}}
-</center>
-
-<br>
-
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
-
-<br>
 <br>
 <center>
 {{% callout note %}}
@@ -84,6 +74,21 @@ QUIZ: Based on the regression  NTL = a + b(t),  the map below shows the trends o
 <br>
 
 
+
+
+
+
+<center>
+{{% callout note %}}
+What is luminosity-based GDP? How is it changing across space and time? 
+{{% /callout %}}
+</center>
+
+<br>
+
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
+
+<br>
 
 <br>
 
