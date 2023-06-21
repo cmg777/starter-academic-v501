@@ -72,6 +72,7 @@ QUIZ: Based on the regression  NTL = a + b(t),  the map below shows the trends o
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
 
 <br>
+<br>
 
 
 
@@ -81,6 +82,9 @@ QUIZ: Based on the regression  NTL = a + b(t),  the map below shows the trends o
 <center>
 {{% callout note %}}
 What is luminosity-based GDP? How is it changing across space and time? 
+<br> 
+(Click anywhere in the map below and discover it.)
+<br>
 {{% /callout %}}
 </center>
 
