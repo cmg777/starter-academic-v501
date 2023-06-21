@@ -29,5 +29,16 @@ design:
 ---
 
 
-<iframe height="1600" width="100%" frameborder="no" src="https://lu.ma/quarcs"> </iframe>
+
+
+<br>
+
+<center>
+{{% callout note %}}
+https://lu.ma/quarcs
+<br>
+{{% /callout %}}
+</center>
+
+<br>
 
