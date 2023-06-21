@@ -29,7 +29,7 @@ social:
   icon_pack: fab
   link: https://github.com/Manulobu
 superuser: false
-title: Sour Heng (Cambodia)
+title: Lopez Manuel (Chile)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
