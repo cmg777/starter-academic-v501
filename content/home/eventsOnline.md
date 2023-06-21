@@ -29,5 +29,5 @@ design:
 ---
 
 
-<iframe height="1600" width="100%" frameborder="no" src="https://lu.ma/quarcs?height=1600"> </iframe>
+<iframe height="1600" width="100%" frameborder="no" src="https://lu.ma/quarcs"> </iframe>
 
