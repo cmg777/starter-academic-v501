@@ -70,18 +70,21 @@ What is luminosity-based GDP? How is it changing across space and time?
 <br>
 <center>
 {{% callout note %}}
-What is the relationship between nighttime lights, population, and GDP across space and time?
+QUIZ: Based on the regression  NTL = a + b(t),  the map below shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/concepts/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. In this context, how would you interpret the yellow and cyan colors?
 <br> 
-(To use this app, click on the "Layers" menu)
+(Click on the "Layers" menu to learn more about this app.)
 <br>
 {{% /callout %}}
 </center>
 
 <br>
 
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/explore-gdp-ntl-pop?height=600"> </iframe>
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
 
 <br>
+
+
+
 <br>
 
 
@@ -99,22 +102,7 @@ What is the relationship between nighttime lights, population, and GDP across sp
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?utm_content=DAFBnI0WI-U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to see the slides in a separate tab.</a> 
 
-<br>
-<br>
-<center>
-{{% callout note %}}
-QUIZ: Based on the regression  NTL = a + b(t),  the map below shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/concepts/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. In this context, how would you interpret the yellow and cyan colors?
-<br> 
-(Click on the "Layers" menu to learn more about this app.)
-<br>
-{{% /callout %}}
-</center>
 
-<br>
-
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
-
-<br>
 <br>
 
 <center>
