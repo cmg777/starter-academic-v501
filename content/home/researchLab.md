@@ -83,7 +83,7 @@ QUIZ: Based on the regression  NTL = a + b(t),  the map below shows the trends o
 {{% callout note %}}
 What is luminosity-based GDP? How is it changing across space and time? 
 <br> 
-(Click anywhere in the map below and discover it.)
+(Click anywhere on the map below and discover it.)
 <br>
 {{% /callout %}}
 </center>
