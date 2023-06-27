@@ -11,30 +11,30 @@ interests:
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "Master student 2023-2025"
+role: "PhD student 2022-2025"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://www.researchgate.net/profile/He-Du-12
+  link: https://nilaphy.my.canva.site/
 - icon: open-data
   icon_pack: ai
-  link: https://deepnote.com/@du-he
+  link: https://www.linkedin.com/in/nilaphy-phommachanh/
 - icon: researchgate
   icon_pack: ai
-  link: https://www.researchgate.net/profile/He-Du-12
+  link: https://www.researchgate.net/profile/Nilaphy-Phommachanh
 - icon: orcid
   icon_pack: ai
   link: https://carlos-mendez.org/#people
 - icon: github
   icon_pack: fab
-  link: https://github.com/DuHe1123
+  link: https://carlos-mendez.org/#people
 superuser: false
-title: He Du (China)
+title: Phommachanh Nilaphy (Laos)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-- Master students
+- Doctoral students
 ---
 
 ADD a longer bio here
