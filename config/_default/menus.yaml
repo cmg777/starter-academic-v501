@@ -29,7 +29,7 @@ main:
   url: '#eventsOnline'
   weight: 70
 - name: Tutorials
-  url: '#project'
+  url: '#projects'
   weight: 75
 
 - name: Posts
