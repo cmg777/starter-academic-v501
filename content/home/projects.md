@@ -33,7 +33,7 @@ content:
     tag: clusters
   - name: Convergence dynamics
   - tag: convergence
-  - name: Spatial inequality
+  - name: Spatial econometrics
     tag: spatial
   - name: World development
     tag: world
