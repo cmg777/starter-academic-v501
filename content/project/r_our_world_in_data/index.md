@@ -13,8 +13,7 @@ slides:
 summary: What is the relation between internet usage and democracy?
 tags:
 - spatial
-- R
-- explore
+- r
 title: Our World in Data
 url_code: ""
 url_pdf: ""
