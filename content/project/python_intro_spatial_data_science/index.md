@@ -10,12 +10,12 @@ links:
   name: Deepnote
   url: https://deepnote.com/@carlos-mendez/PYTHON-Spatial-data-science-4dda4dc4-af8c-48fd-9bdf-7b18a5efef8e
 slides: 
-summary: Introduction to spatial data science with Python
+summary: Measuring the evolution of spatial dependence and spatial inequality with Python
 tags:
 - spatial
 - python
 - explore
-title: Our World in Data
+title: Introduction to spatial data science
 url_code: ""
 url_pdf: ""
 url_slides: ""
