@@ -5,8 +5,8 @@ image:
   caption: ""
   focal_point: Smart
 links:
-- icon: twitter
-  icon_pack: fab
+- icon: open-data
+  icon_pack: ai
   name: Deepnote
   url: https://deepnote.com/@carlos-mendez/R-Our-World-in-Data-d51a4b4a-53c6-423a-ae3f-3049f57d67c2
 slides: example
