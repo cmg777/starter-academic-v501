@@ -14,7 +14,6 @@ summary: Measuring the evolution of spatial dependence and spatial inequality wi
 tags:
 - spatial
 - python
-- explore
 title: Introduction to spatial data science
 url_code: ""
 url_pdf: ""
