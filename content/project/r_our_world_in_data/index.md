@@ -9,10 +9,12 @@ links:
   icon_pack: ai
   name: Deepnote
   url: https://deepnote.com/@carlos-mendez/R-Our-World-in-Data-d51a4b4a-53c6-423a-ae3f-3049f57d67c2
-slides: example
-summary: In this project, we study the evolution of spatial inequality across subnational regions.
+slides: 
+summary: What is the relation between internet usage and democracy?
 tags:
 - spatial
+- R
+- explore
 title: Our World in Data
 url_code: ""
 url_pdf: ""

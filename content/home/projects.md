@@ -37,6 +37,14 @@ content:
     tag: spatial
   - name: World development
     tag: world
+  - name: Python
+    tag: python
+  - name: GEE
+    tag: gee
+  - name: R
+    tag: r
+  - name: Stata
+    tag: stata
 design:
   # Choose how many columns the section has. Valid values: '1' or '2'.
   columns: '2'
