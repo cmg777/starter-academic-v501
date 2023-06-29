@@ -33,10 +33,12 @@ content:
     tag: '*'
   - name: World development
     tag: world
-  - name: Regional convergence
-  - tag: convergence
-  - name: Spatial econometrics
+  - name: Regional development
+    tag: convergence
+  - name: Spatial data science
     tag: spatial
+  - name: Other
+    tag: other
   - name: Python
     tag: python
   - name: GEE
