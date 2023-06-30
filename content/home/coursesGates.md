@@ -1,7 +1,7 @@
 ---
 # An instance of the Portfolio widget.
 # Documentation: https://wowchemy.com/docs/page-builder/
-widget: portfolio
+widget: coursesGates
 
 # Activate this widget? true/false
 active: true
@@ -11,14 +11,14 @@ active: true
 headless: true
 
 # Order that this section appears on the page.
-weight: 50
+weight: 75
 
-title: Tutorials
+title: Courses
 subtitle: ''
 
 content:
   # Page type to display. E.g. project.
-  page_type: project
+  page_type: coursesGates
 
   # Default filter index (e.g. 0 corresponds to the first `filter_button` instance below).
   filter_default: 0
@@ -31,22 +31,11 @@ content:
   filter_button:
   - name: All
     tag: '*'
-  - name: World development
-    tag: world
-  - name: Regional development
-    tag: convergence
-  - name: Spatial data science
-    tag: spatial
-  - name: Other
+  - name: Regular courses
+    tag: regular
+  - name: Other courses
     tag: other
-  - name: Python
-    tag: python
-  - name: GEE
-    tag: gee
-  - name: R
-    tag: r
-  - name: Stata
-    tag: stata
+
 design:
   # Choose how many columns the section has. Valid values: '1' or '2'.
   columns: '2'

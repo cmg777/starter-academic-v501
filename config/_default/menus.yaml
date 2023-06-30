@@ -25,6 +25,9 @@ main:
 - name: Courses
   url: 'courses/'
   weight: 70
+- name: CoursesGates
+  url: '#coursesGates'
+  weight: 75
 - name: Events
   url: '#eventsOnline'
   weight: 80
