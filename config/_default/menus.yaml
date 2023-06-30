@@ -25,10 +25,14 @@ main:
 - name: Courses
   url: 'courses/'
 <<<<<<< HEAD
+<<<<<<< HEAD
   weight: 70
 - name: CoursesGates
   url: '#coursesGates'
   weight: 75
+=======
+  weight: 60
+>>>>>>> parent of 35665a0 (dfdf)
 =======
   weight: 60
 >>>>>>> parent of 35665a0 (dfdf)
