@@ -10,30 +10,38 @@ main:
 - name: ResearchLab
   url: '#researchLab'
   weight: 20
+#- name: Projects
+#  url: '#projects'
+#  weight: 30
 - name: Publications
   url: '#featured'
   weight: 30
 - name: Presentations
   url: '#talks'
   weight: 40
-- name: Tutorials
-  url: '#projects'
-  weight: 50
 - name: Students
   url: '#people'
-  weight: 60
+  weight: 50
 - name: Courses
   url: 'courses/'
+<<<<<<< HEAD
   weight: 70
 - name: CoursesGates
   url: '#coursesGates'
   weight: 75
+=======
+  weight: 60
+>>>>>>> parent of 35665a0 (dfdf)
 - name: Events
   url: '#eventsOnline'
-  weight: 80
+  weight: 70
+- name: Tutorials
+  url: '#projects'
+  weight: 75
+
 - name: Posts
   url: '#posts'
-  weight: 85
+  weight: 80
 - name: Contact
   url: '#contact'
   weight: 90
