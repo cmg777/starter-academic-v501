@@ -8,7 +8,7 @@ links:
 - icon: open-data
   icon_pack: ai
   name: R note
-  url: https://r-synth.netlify.app/
+  url: https://carlos-mendez.quarto.pub/r-synthetic-control-tutorial/
 - icon: closed-access
   icon_pack: ai
   name: Notes
