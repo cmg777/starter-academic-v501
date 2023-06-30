@@ -9,8 +9,8 @@ links:
   icon_pack: ai
   name: R note
   url: https://r-synth.netlify.app/
-- icon: obp
-  icon_pack: ai
+- icon: note
+  icon_pack: fas
   name: Notes
   url: https://carlos-mendez.my.canva.site/synthetic-control-notes
 slides: 
