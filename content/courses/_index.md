@@ -9,3 +9,4 @@ type: page
 I currently teach the following courses/seminars/modules:
 
 - [Introduction to statistics and spatial data science](https://carlos-mendez.org)
+- [Applied econometrics](https://carlos-mendez.org)
