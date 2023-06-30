@@ -10,31 +10,27 @@ main:
 - name: ResearchLab
   url: '#researchLab'
   weight: 20
-#- name: Projects
-#  url: '#projects'
-#  weight: 30
 - name: Publications
   url: '#featured'
   weight: 30
 - name: Presentations
   url: '#talks'
   weight: 40
-- name: Students
-  url: '#people'
-  weight: 50
-- name: Courses
-  url: 'courses/'
-  weight: 60
-- name: Events
-  url: '#eventsOnline'
-  weight: 70
 - name: Tutorials
   url: '#projects'
-  weight: 75
-
+  weight: 50
+- name: Students
+  url: '#people'
+  weight: 60
+- name: Courses
+  url: 'courses/'
+  weight: 70
+- name: Events
+  url: '#eventsOnline'
+  weight: 80
 - name: Posts
   url: '#posts'
-  weight: 80
+  weight: 85
 - name: Contact
   url: '#contact'
   weight: 90
