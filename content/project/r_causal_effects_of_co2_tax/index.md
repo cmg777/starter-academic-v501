@@ -9,7 +9,7 @@ links:
   icon_pack: ai
   name: Original shinny app
   url: https://theresagraefe.shinyapps.io/RTutorCarbonTaxesAndCO2Emissions/
-- icon: open-data
+- icon: ciencia-vitae
   icon_pack: ai
   name: Shiny app via Posit
   url: https://posit.cloud/content/6187268
