@@ -9,9 +9,13 @@ links:
   icon_pack: ai
   name: Original shinny app
   url: https://theresagraefe.shinyapps.io/RTutorCarbonTaxesAndCO2Emissions/
-- icon: closed-access
-  icon_pack: open-data
-  name: Posit cloud
+- icon: open-data
+  icon_pack: ai
+  name: Shiny app via Posit
+  url: https://posit.cloud/content/6187268
+- icon: open-data
+  icon_pack: ai
+  name: Notes
   url: https://posit.cloud/content/6187268
 slides: 
 summary: Theresa Graefe (Ulm University) has created a very nice RTutor that allows you to replicate the main insights of a recent AEJ paper on the causal effects of a CO2 tax in Sweden. 
@@ -51,7 +55,7 @@ Please note that the free shinyapps.io account has a usage limit of 25 hours per
 
 https://posit.cloud/content/6187268
 
-To run the app in Posit cloud, you need to register for a free account. Then, run the following code in the console.
+To run the app in Posit cloud, you need to register for a free account. Then,  run the following code in the console.
 
 ```
 library(RTutor)
