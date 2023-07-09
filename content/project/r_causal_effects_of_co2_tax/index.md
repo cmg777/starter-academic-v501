@@ -10,7 +10,7 @@ links:
   name: Original shinny app
   url: https://theresagraefe.shinyapps.io/RTutorCarbonTaxesAndCO2Emissions/
 - icon: closed-access
-  icon_pack: ciencia-vitae
+  icon_pack: open-data
   name: Posit cloud
   url: https://posit.cloud/content/6187268
 slides: 
@@ -51,7 +51,13 @@ Please note that the free shinyapps.io account has a usage limit of 25 hours per
 
 https://posit.cloud/content/6187268
 
-To run the app in Posit cloud, you need to register for a free account. Then, you can clone the container and run the app. Carefully revise the README.md file in the container to learn how to run the app.
+To run the app in Posit cloud, you need to register for a free account. Then, run the following code in the console.
+
+```
+library(RTutor)
+run.ps(user.name="Jon Doe", package="RTutorCarbonTaxesAndCO2Emissions", load.sav=TRUE, sample.solution=FALSE)
+```
+
 
 To install the problem set locally, follow the installation instructions at the problem set's Github repository: https://github.com/TheresaGraefe/RTutorCarbonTax
 
