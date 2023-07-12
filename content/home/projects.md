@@ -37,6 +37,8 @@ content:
     tag: convergence
   - name: Spatial data science
     tag: spatial
+  - name: Causal inference
+    tag: causal
   - name: Other
     tag: other
   - name: Python
