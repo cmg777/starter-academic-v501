@@ -75,4 +75,4 @@ image:
 
 - Spatial distribution of the convergence clubs.
 
-<iframe height="600" width="100%" frameborder="no" src="https://embed.deepnote.com/0ec59ab1-e013-4a8e-b752-fda07050c981/1396432106354f4f8b7238e8aa564274/4b283869002d401ab50c7fba9e76b11f?height=584"> </iframe>
+<iframe height="500" width="100%" frameborder="no" src="https://embed.deepnote.com/0ec59ab1-e013-4a8e-b752-fda07050c981/1396432106354f4f8b7238e8aa564274/4b283869002d401ab50c7fba9e76b11f?height=500"> </iframe>
