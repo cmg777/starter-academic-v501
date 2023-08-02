@@ -1,5 +1,5 @@
 ---
-title: "Measuring and understanding regional inequality through the lens of the Indonesian experience: A book review of regional inequality and development by Takahiro Akita and Mitsuhiko Kataoka"
+title: "Measuring and understanding regional inequality through the lens of the Indonesian experience"
 authors:
 - admin
 date: "2023-05-02T00:00:00Z"
