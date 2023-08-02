@@ -1,5 +1,5 @@
 ---
-title: "Schooling Ain’t Learning in Europe: A Club Convergence Perspective"
+title: "Schooling ain’t learning in Europe: A club convergence perspective"
 authors:
 - LindaGlawe
 - admin
