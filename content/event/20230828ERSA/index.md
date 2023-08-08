@@ -60,7 +60,7 @@ math: true
     src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFq810AJT0&#x2F;view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
   </iframe>
 </div>
-<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFq810AJT0&#x2F;view?utm_content=DAFq810AJT0&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to see the slides in a separate tab</a> 
+<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFq810AJT0&#x2F;view?utm_content=DAFq810AJT0&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener"></a> 
 
 <center>
 
