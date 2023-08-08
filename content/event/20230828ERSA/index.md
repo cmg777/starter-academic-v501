@@ -26,7 +26,7 @@ image:
   focal_point: Right
 
 links:
-url_code:
+url_code: "https://deepnote.com/workspace/QuaRCS-network-d6c6e3f4-7a32-4fcf-a8d6-e77e93ece6d6/project/project2022p-India-NTL-processing-and-analysis-c5f1adf3-3c90-4877-a649-f225aaa8ab7a/notebook/notebook-89b4992feea848ac9d679c9091306a51"
 url_pdf: ""
 url_slides: "https://www.canva.com/design/DAFq810AJT0/Eb6PqorPetcLxE3P0g34nw/view?utm_content=DAFq810AJT0&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink"
 url_video: ""
@@ -52,18 +52,6 @@ projects:
 math: true
 ---
 
-<center>
-
-
-{{% callout note %}}
-Access the computational notebook [HERE](https://deepnote.com/workspace/QuaRCS-network-d6c6e3f4-7a32-4fcf-a8d6-e77e93ece6d6/project/project2022p-India-NTL-processing-and-analysis-c5f1adf3-3c90-4877-a649-f225aaa8ab7a/notebook/notebook-89b4992feea848ac9d679c9091306a51).
-{{% /callout %}}
-
-</center>
-
-
-<iframe height="500" width="100%" frameborder="no" src="https://embed.deepnote.com/0ec59ab1-e013-4a8e-b752-fda07050c981/1396432106354f4f8b7238e8aa564274/4b283869002d401ab50c7fba9e76b11f?height=500"> </iframe>
-
 
 <div style="position: relative; width: 100%; height: 0; padding-top: 75.0000%;
  padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
@@ -73,3 +61,12 @@ Access the computational notebook [HERE](https://deepnote.com/workspace/QuaRCS-n
   </iframe>
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFq810AJT0&#x2F;view?utm_content=DAFq810AJT0&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to see the slides in a separate tab</a> 
+
+<center>
+
+
+{{% callout note %}}
+Access the computational notebook [HERE](https://deepnote.com/workspace/QuaRCS-network-d6c6e3f4-7a32-4fcf-a8d6-e77e93ece6d6/project/project2022p-India-NTL-processing-and-analysis-c5f1adf3-3c90-4877-a649-f225aaa8ab7a/notebook/notebook-89b4992feea848ac9d679c9091306a51).
+{{% /callout %}}
+
+</center>
