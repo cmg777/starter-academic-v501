@@ -34,6 +34,8 @@ content:
   - name: World development
     tag: world
   - name: Regional development
+    tag: regional
+  - name: Convergence
     tag: convergence
   - name: Spatial data science
     tag: spatial
