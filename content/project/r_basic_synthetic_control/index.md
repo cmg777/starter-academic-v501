@@ -25,4 +25,4 @@ url_slides: ""
 url_video: ""
 ---
 
-TBA
+This method constructs a synthetic control unit as a weighted average of available control units that best approximate the relevant characteristics of the treated unit prior to treatment. You can run and extend the analysis of this case study using   [Google Colab](https://colab.research.google.com/drive/11LC9x24l4nczS_zR81SJ2LgCkpVALk1E?usp=sharing).
