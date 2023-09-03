@@ -15,7 +15,7 @@ tags:
 - other
 - r
 - causal
-title: Basic DiD
+title: Staggered DiD
 url_code: ""
 url_pdf: ""
 url_slides: ""
