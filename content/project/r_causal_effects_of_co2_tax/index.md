@@ -18,7 +18,7 @@ links:
   name: Notes
   url: https://posit.cloud/content/6187403
 slides: 
-summary: Theresa Graefe (Ulm University) has created a very nice RTutor that allows you to replicate the main insights of a recent AEJ paper on the causal effects of a CO2 tax in Sweden. 
+summary: Theresa Graefe (Ulm University) has created a very nice RTutor that allows you to replicate the main results of a recent AEJ paper on the causal effects of a CO2 tax in Sweden using the syntetic control method. 
 tags:
 - other
 - r
