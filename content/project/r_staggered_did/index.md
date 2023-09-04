@@ -1,5 +1,5 @@
 ---
-date: "2019-04-01T00:00:00Z"
+date: "2023-09-03T00:00:00Z"
 external_link: ""
 image:
   caption: ""
@@ -15,7 +15,7 @@ tags:
 - other
 - r
 - causal
-title: Staggered DiD
+title: Staggered DiD (Ex1)
 url_code: ""
 url_pdf: ""
 url_slides: ""
