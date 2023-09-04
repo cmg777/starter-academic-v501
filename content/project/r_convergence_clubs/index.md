@@ -22,11 +22,7 @@ url_slides: ""
 url_video: ""
 ---
 
-
-## Convergence clubs in labor productivity and its proximate sources: Evidence from developed and developing countries
-
 [![DOI](https://zenodo.org/badge/268529303.svg)](https://zenodo.org/badge/latestdoi/268529303)
-
 
 ## About the book
 
