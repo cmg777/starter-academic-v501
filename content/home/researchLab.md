@@ -56,6 +56,36 @@ Let's study regional development from outer space!
 
 <br>
 
+<br>
+
+
+{{% callout note %}}
+ What can you discover from these visualizations? Where is development happening? How is the world changing?  To contextualize these questions, below you will find an overview of recent advances in the exciting field of regional/geospatial development.
+{{% /callout %}}
+
+
+<div style="position: relative; width: 100%; height: 0; padding-top: 75.0000%;
+ padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
+ border-radius: 8px; will-change: transform;">
+  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+    src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+  </iframe>
+</div>
+<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?utm_content=DAFBnI0WI-U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to see the slides in a separate tab.</a> 
+
+
+<br>
+
+<center>
+
+{{% callout note %}}
+Use your Discord credentials to [enter the QuaRCS-lab JP here](https://discord.com).
+{{% /callout %}}
+
+</center>
+
+
+<br>
 
 <br>
 <center>
@@ -92,35 +122,7 @@ What is luminosity-based GDP? How is it changing across space and time?
 
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
 
-<br>
 
-<br>
-
-
-{{% callout note %}}
- What can you discover from these visualizations? Where is development happening? How is the world changing?  To contextualize these questions, below you will find an overview of recent advances in the exciting field of regional/geospatial development.
-{{% /callout %}}
-
-
-<div style="position: relative; width: 100%; height: 0; padding-top: 75.0000%;
- padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
- border-radius: 8px; will-change: transform;">
-  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-    src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
-  </iframe>
-</div>
-<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?utm_content=DAFBnI0WI-U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to see the slides in a separate tab.</a> 
-
-
-<br>
-
-<center>
-
-{{% callout note %}}
-Use your Discord credentials to [enter the QuaRCS-lab JP here](https://discord.com).
-{{% /callout %}}
-
-</center>
 
 
 
