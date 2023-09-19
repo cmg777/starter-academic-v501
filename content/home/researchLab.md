@@ -60,7 +60,7 @@ Let's study regional development from outer space!
 
 
 {{% callout note %}}
- What can you discover from these visualizations? Where is development happening? How is the world changing?  To contextualize these questions, below you will find an overview of recent advances in the exciting field of regional/geospatial development.
+ What can you discover from these visualizations? Where is development happening? How is the world changing?  To contextualize these questions, below you will find an overview of recent advances in the exciting new field of geospatial development.
 {{% /callout %}}
 
 
@@ -72,18 +72,6 @@ Let's study regional development from outer space!
   </iframe>
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFBnI0WI-U&#x2F;view?utm_content=DAFBnI0WI-U&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to see the slides in a separate tab.</a> 
-
-
-<br>
-
-<center>
-
-{{% callout note %}}
-Use your Discord credentials to [enter the QuaRCS-lab JP here](https://discord.com).
-{{% /callout %}}
-
-</center>
-
 
 <br>
 
