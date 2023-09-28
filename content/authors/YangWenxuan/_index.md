@@ -11,7 +11,7 @@ interests:
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "PhD student 2020-2024"
+role: "PhD in International Development 2023"
 social:
 - icon: address-card
   icon_pack: fa
@@ -34,7 +34,7 @@ title: Wenxuan Yang (China)
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-- Doctoral students (sub advisor)
+- Alumni doctoral graduates (sub advisor)
 ---
 
 ADD a longer bio here
