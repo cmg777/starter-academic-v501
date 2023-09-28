@@ -22,9 +22,12 @@ content:
   - Doctoral students
   - Doctoral students (sub advisor)
   - Master students
-  - Research students
+  - Master students (sub advisor)
   - Alumni doctoral graduates
+  - Alumni doctoral graduates (sub advisor)
   - Alumni master graduates
+  - Alumni master graduates (sub advisor)
+
 design:
   show_interests: false
   show_role: true
