@@ -23,6 +23,16 @@ url_video: ""
 ---
 
 
+# **A geocomputational notebook to monitor subnational human development**
+
+
+- Exploratory data analysis
+- Exploratory spatial data analysis
+  - Spatial mapping
+  - Spatial dependence
+  - Spatial inequality
+
+
 
 
 
