@@ -11,7 +11,7 @@ interests:
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "PhD research student 2022-2023"
+role: "PhD student 2023-2026"
 social:
 - icon: address-card
   icon_pack: fa
@@ -24,7 +24,7 @@ social:
   link: https://www.researchgate.net/profile/Katerine_Restrepo
 - icon: orcid
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Katerine_Restrepo
+  link: https://orcid.org/0000-0003-0328-4259
 - icon: github
   icon_pack: fab
   link: https://github.com/karestrepo
