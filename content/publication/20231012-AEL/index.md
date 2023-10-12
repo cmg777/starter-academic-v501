@@ -1,5 +1,5 @@
 ---
-title: "Convergence clubs and spatial structural change in the European Union"
+title: "Regional Okun’s law and endogeneity: evidence from the Indonesian districts"
 authors:
 - Harry Aginta
 - admin
