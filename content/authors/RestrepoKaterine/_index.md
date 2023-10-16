@@ -15,10 +15,10 @@ role: "PhD student 2023-2026"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://www.researchgate.net/profile/Katerine_Restrepo
+  link: https://katerinerestrepo.my.canva.site/
 - icon: open-data
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Katerine_Restrepo
+  link: https://deepnote.com/@karestrepo
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Katerine_Restrepo
