@@ -32,9 +32,19 @@ design:
 In the QuaRCS-lab, we conduct research on [quantitative regional and computational science](https://quarcs-lab.org). We exploit the integration of development economics, spatial data science, and applied econometrics to understand and inform the process of sustainable development across subnational regions and countries.
 {{% /callout %}}
 
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
 
+<br>
+<br>
 
-<iframe height="600" width="100%" frameborder="no" src="https://www.youtube-nocookie.com/embed/41zWBXUrdKU"?height=600"> </iframe>
+<center>
+{{% callout note %}}
+QUIZ: Based on the regression  NTL = a + b(t),  the map above shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/concepts/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. In this context, how would you interpret the yellow and cyan colors?
+<br> 
+(Click on the "Layers" menu to learn more about this app.)
+<br>
+{{% /callout %}}
+</center>
 
 <br>
 <br>
@@ -72,30 +82,6 @@ Let's study regional development from outer space!
   </iframe>
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFvs6DEMI4&#x2F;view?utm_content=DAFvs6DEMI4&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to see the slides in a separate tab.</a> 
-
-
-
-<br>
-
-<br>
-<center>
-{{% callout note %}}
-QUIZ: Based on the regression  NTL = a + b(t),  the map below shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/concepts/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. In this context, how would you interpret the yellow and cyan colors?
-<br> 
-(Click on the "Layers" menu to learn more about this app.)
-<br>
-{{% /callout %}}
-</center>
-
-<br>
-
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
-
-<br>
-<br>
-
-
-
 
 
 
