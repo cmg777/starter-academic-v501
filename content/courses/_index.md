@@ -6,10 +6,9 @@ title: Courses
 type: page
 ---
 
-I currently teach the following courses/seminars:
+I currently teach the following graduate-level courses:
 
 - Statistics and data science
 - Applied econometrics
 - Regional development
-- Research seminar in economic development (for master students)
-- Research seminar in economic development (for doctoral students)
+- Research seminar in economic development 
