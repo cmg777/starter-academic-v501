@@ -96,8 +96,6 @@ What is luminosity-based GDP? How is it changing across space and time?
 
 
 <br>
-
-
 <br>
 
 <center>
@@ -107,5 +105,4 @@ If yes, [click here](https://discord.gg/pfEmxwSEHy) to join our global community
 {{% /callout %}}
 </center>
 
-<br>
 
