@@ -64,6 +64,22 @@ Let's study regional development from outer space!
 <br>
 
 
+<center>
+{{% callout note %}}
+What is luminosity-based GDP? How is it changing across space and time? 
+<br> 
+(Click anywhere on the map below and discover it.)
+<br>
+{{% /callout %}}
+</center>
+
+<br>
+
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
+
+<br>
+
+
 {{% callout note %}}
  What can you discover from these visualizations? Where is development happening? How is the world changing?  To contextualize these questions, below you will find an overview of recent advances in the exciting new field of geospatial development.
 {{% /callout %}}
@@ -80,20 +96,7 @@ Let's study regional development from outer space!
 
 
 <br>
-<br>
 
-<center>
-{{% callout note %}}
-What is luminosity-based GDP? How is it changing across space and time? 
-<br> 
-(Click anywhere on the map below and discover it.)
-<br>
-{{% /callout %}}
-</center>
-
-<br>
-
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
 
 <br>
 
