@@ -39,7 +39,7 @@ In the QuaRCS-lab and its [global network](https://quarcs-lab.org/), we conduct 
 
 <center>
 {{% callout note %}}
-QUIZ: Based on the regression  NTL = a + b(t),  the map above shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/concepts/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. In this context, how would you interpret the yellow and cyan colors?
+QUIZ: Based on the regression  NTL = a + b(t),  the map above shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/rudiments/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. Given these parameters, how would you interpret the yellow and cyan colors?
 {{% /callout %}}
 </center>
 
