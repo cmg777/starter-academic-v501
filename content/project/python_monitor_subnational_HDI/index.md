@@ -9,7 +9,9 @@ links:
   icon_pack: ai
   name: GoogleColab
   url: https://colab.research.google.com/drive/1MtUkRi8Q27KPC67qJmD-c-lER6-47Jjx?usp=sharing
-  name: GoogleColab_V2
+- icon: ciencia-vitae
+  icon_pack: ai
+  name: GoogleColab WIP
   url: https://colab.research.google.com/drive/1MtUkRi8Q27KPC67qJmD-c-lER6-47Jjx?usp=sharing
 slides: 
 summary: A geocomputational notebook to monitor subnational human development using Python. Besides exploratory data analysis, the notebook introduces geospatial mapping, spatial dependence, and spatial inequality.
