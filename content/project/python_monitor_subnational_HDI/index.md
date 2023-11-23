@@ -11,8 +11,12 @@ links:
   url: https://colab.research.google.com/drive/1MtUkRi8Q27KPC67qJmD-c-lER6-47Jjx?usp=sharing
 - icon: ciencia-vitae
   icon_pack: ai
-  name: GoogleColab WIP
+  name: GoogleColab GEE
   url: https://colab.research.google.com/drive/1gnxp4V9a9CXVSv_J6uiuowmWJXYdEiBv#scrollTo=SqB8rdDFeelR
+- icon: ciencia-vitae
+  icon_pack: ai
+  name: NTL-GNI validation
+  url: https://colab.research.google.com/drive/1YTVFNtgbhOnruMCT3SLd-F_i7WTS6vwl?usp=sharing
 slides: 
 summary: A geocomputational notebook to monitor subnational human development using Python. Besides exploratory data analysis, the notebook introduces geospatial mapping, spatial dependence, and spatial inequality.
 tags:
