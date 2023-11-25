@@ -24,7 +24,7 @@ publication_short: ""
 abstract: "We analyze the space-time dynamics of Indonesia’s provincial unemployment by simultaneously accounting for their serial persistence, spatial dependence, and common factors. The results show that unemployment rates vary widely across provinces, but have similar patterns over time, indicating the presence of common latent factors. Using the average national unemployment rate as a proxy for common factors, the results indicate that the space-time dynamics of provincial unemployment are characterized by both significant serial persistence and spatial dependence. The results also quantify which regions are most sensitive to national unemployment shocks, providing a deeper understanding of regional unemployment heterogeneity."
 
 # Summary. An optional shortened abstract.
-summary: ""
+summary: "We analyze the space-time dynamics of Indonesia’s provincial unemployment by simultaneously accounting for their serial persistence, spatial dependence, and common factors."
 
 tags:
 - regional unemployment
