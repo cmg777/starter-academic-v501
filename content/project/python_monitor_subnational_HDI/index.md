@@ -11,9 +11,25 @@ links:
   url: https://colab.research.google.com/drive/1MtUkRi8Q27KPC67qJmD-c-lER6-47Jjx?usp=sharing
 - icon: ciencia-vitae
   icon_pack: ai
-  name: GoogleColab WIP
-  url: https://colab.research.google.com/drive/1gnxp4V9a9CXVSv_J6uiuowmWJXYdEiBv?usp=sharing
-slides: 
+  name: GoogleColab GEE
+  url: https://colab.research.google.com/drive/1gnxp4V9a9CXVSv_J6uiuowmWJXYdEiBv#scrollTo=SqB8rdDFeelR
+- icon: ciencia-vitae
+  icon_pack: ai
+  name: VIIRS-like
+  url: https://colab.research.google.com/drive/1YTVFNtgbhOnruMCT3SLd-F_i7WTS6vwl?usp=sharing
+- icon: ciencia-vitae
+  icon_pack: ai
+  name: DMSP-like
+  url: https://colab.research.google.com/drive/17_HL93ZqrPx-1QL91bPyxEVjfpvKpA9d?usp=sharing
+- icon: ciencia-vitae
+  icon_pack: ai
+  name: VIIRS
+  url: https://colab.research.google.com/drive/1Ec8dCEL1pb0IrB3j8X4uZGC-Oee-xaek?usp=sharing
+- icon: ciencia-vitae
+  icon_pack: ai
+  name: DMSPcc
+  url: https://colab.research.google.com/drive/1vw3D3XyVZlseSoEBvvhYGJnbRUw5qXp9?usp=sharing
+slides:
 summary: A geocomputational notebook to monitor subnational human development using Python. Besides exploratory data analysis, the notebook introduces geospatial mapping, spatial dependence, and spatial inequality.
 tags:
 - spatial
@@ -35,8 +51,3 @@ url_video: ""
   - Spatial mapping
   - Spatial dependence
   - Spatial inequality
-
-
-
-
-
