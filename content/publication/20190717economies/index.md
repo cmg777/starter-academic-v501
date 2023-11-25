@@ -29,7 +29,7 @@ tags:
 - welfare
 - machine learning
 - distribution dynamics
-featured: true
+featured: false
 
 # links:
 # - name: ""
