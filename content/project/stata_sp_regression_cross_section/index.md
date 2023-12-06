@@ -11,7 +11,7 @@ links:
   url: https://colab.research.google.com/drive/1P8apVk4SwJdlVMAoKXu9H8PLsukA2QI2?usp=sharing
 
 slides: 
-summary: An introduction to cross-sectional spatial regression in Stata
+summary: An introduction to cross-sectional spatial regression analysis in Stata
 tags:
 #- other
 - stata
