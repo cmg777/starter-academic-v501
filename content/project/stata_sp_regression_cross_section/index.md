@@ -16,6 +16,8 @@ tags:
 #- other
 - stata
 #- causal
+- spatial
+- regional
 title: Spatial regression in Stata (cross-section)
 url_code: ""
 url_pdf: ""
