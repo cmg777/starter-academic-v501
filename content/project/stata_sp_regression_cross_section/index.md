@@ -16,10 +16,11 @@ tags:
 #- other
 - stata
 #- causal
-title: Basic DiD
+title: Spatial regression in Stata (cross-section)
 url_code: ""
 url_pdf: ""
 url_slides: ""
 url_video: ""
 ---
 
+.
