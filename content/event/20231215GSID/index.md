@@ -3,7 +3,7 @@ title: "Mapping multidimensional poverty in Cambodia: Integrating big data, soci
 event: GSID-ISEE 2023 research workshop  
 event_url: https://lu.ma/gsid-isee2023
 location: Nagoya, Japan
-summary:  GSID-ISEE 2023 research workshop  
+summary:  GSID-ISEE 2023 Research Workshop  
 abstract: "Cambodia, while experiencing rapid economic growth, faces persistent poverty challenges, making it one of Southeast Asia's economically vulnerable nations. Addressing this requires comprehensive insights into poverty's diverse dimensions. This study combines big data, machine learning, and the Cambodia Socio-Economic Survey to analyze poverty across education, health, and living standards. It calculates deprivation probabilities across a geospatial grid. A random forest algorithm yields high predictive accuracy and identifies key predictors of poverty vulnerability. Overall, this study underscores the potential of big-earth observation data and machine learning in complementing surveys to map poverty vulnerabilities at various scales."
 
 # Talk start and end times.
