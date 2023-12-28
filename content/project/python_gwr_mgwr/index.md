@@ -7,7 +7,7 @@ image:
 links:
 - icon: open-data
   icon_pack: ai
-  name: GoogleColab
+  name: [Python] GoogleColab
   url: https://colab.research.google.com/drive/1nZBcqxCrFu8Rvt1L2a6150zUwkffDwdE?usp=sharing
 slides:
 summary: A geocomputational notebook to study spatial heterogeneity using the GWR and MGWR frameworks.
