@@ -39,7 +39,10 @@ In the QuaRCS-lab and its [global network](https://quarcs-lab.org/), we conduct 
 
 <center>
 {{% callout note %}}
-QUIZ: Based on the regression  NTL = a + b(t),  the map above shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/rudiments/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. Given these parameters, how would you interpret the yellow and cyan colors?
+QUIZ: Based on the regression  NTL = a + b(t),  the map above shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/rudiments/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. 
+<br>
+Given these parameters, how would you interpret the yellow and cyan colors?
+<br>
 <br>
 (Hint: You can copy and past this quiz into ChatGPT and start a conversation)
 <br>
@@ -57,7 +60,7 @@ Let's study regional development from outer space!
 {{% /callout %}}
 </center>
 
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/HMWNHYH0p7Y?si=vtfGlmsLMswVe37J" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe width="600" height="100%" src="https://www.youtube-nocookie.com/embed/HMWNHYH0p7Y?si=vtfGlmsLMswVe37J" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 
 <br>
