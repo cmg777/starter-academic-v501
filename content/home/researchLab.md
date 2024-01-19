@@ -64,7 +64,7 @@ Let's study regional development from outer space!
 
 <br>
 
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600"> </iframe>
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600" allowfullscreen> </iframe>
 
 <br>
 <br>
