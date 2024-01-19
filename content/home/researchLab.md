@@ -63,7 +63,6 @@ Given these parameters, how would you interpret the yellow and cyan colors?
 
 
 <br>
-
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
 <br>
 
@@ -78,9 +77,7 @@ What is luminosity-based GDP? How is it changing across space and time?
 </center>
 
 <br>
-
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
-
 <br>
 
 
