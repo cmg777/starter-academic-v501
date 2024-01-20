@@ -31,18 +31,6 @@ design:
 {{% callout note %}}
 In the QuaRCS-lab and its [global network](https://quarcs-lab.org/), we conduct research on [quantitative regional and computational science](https://quarcs-lab.org). We exploit the integration of development economics, spatial data science, and applied econometrics to understand and inform the process of sustainable development across subnational regions and countries.
 {{% /callout %}}
-
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
-
-<br>
-<br>
-
-<center>
-{{% callout note %}}
-QUIZ: Based on the regression  NTL = a + b(t),  the map above shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/rudiments/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. Given these parameters, how would you interpret the yellow and cyan colors?
-{{% /callout %}}
-</center>
-
 <br>
 
 <center>
@@ -51,16 +39,31 @@ When the sun goes down and the lights turn on, [there’s still a lot to explore
 <br>
 Let's study regional development from outer space!
 <br>
-(Move the slider and start exploring)
-<br>
 {{% /callout %}}
 </center>
+
+<iframe width="100%" height="600" src="https://www.youtube-nocookie.com/embed/HMWNHYH0p7Y?si=vtfGlmsLMswVe37J" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 <br>
 
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600"> </iframe>
 
 <br>
+
+<center>
+{{% callout note %}}
+QUIZ: Based on the regression  NTL = a + b(t),  the map below shows the trends of nighttime lights. [An RGB composite is used for visualization](https://jeffhowarth.github.io/eeprimer/rudiments/additive_color/), where positive and negative slope values are represented by red and blue gradients respectively, and the intercept is represented by a green gradient. 
+<br>
+Given these parameters, how would you interpret the yellow and cyan colors?
+<br>
+(Hint: You can copy and past this quiz into ChatGPT and start a conversation)
+<br>
+{{% /callout %}}
+</center>
+
+
+<br>
+<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
 <br>
 
 
@@ -74,11 +77,9 @@ What is luminosity-based GDP? How is it changing across space and time?
 </center>
 
 <br>
-
 <iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
+<br>
 
-<br>
-<br>
 
 {{% callout note %}}
  What can you discover from these visualizations? Where is development happening? How is the world changing?  To contextualize these questions, below you will find an overview of recent advances in the exciting new field of geospatial development.
