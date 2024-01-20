@@ -46,7 +46,7 @@ url_poster: ''
 url_project: ''
 url_slides: ''
 url_source: ''
-url_video: ''
+url_video: 'https://youtu.be/4RWepEd0m8o'
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
@@ -69,4 +69,7 @@ image:
 #   Otherwise, set `slides: ""`.
 # slides: example
 ---
+
+<iframe width="100%" height="600" src="https://www.youtube.com/embed/4RWepEd0m8o?si=ZU0SEWF_QggteQqs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 
