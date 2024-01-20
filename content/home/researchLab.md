@@ -56,7 +56,7 @@ QUIZ: Based on the regression  NTL = a + b(t),  the map below shows the trends o
 <br>
 Given these parameters, how would you interpret the yellow and cyan colors?
 <br>
-(Hint: You can copy and past this quiz into ChatGPT and start a conversation)
+(Hint: Copy and paste this quiz into ChatGPT)
 <br>
 {{% /callout %}}
 </center>
