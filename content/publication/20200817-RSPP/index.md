@@ -40,14 +40,13 @@ featured: true
 # - name: ""
 #   url: ""
 url_pdf: "https://doi.org/10.1111/rsp3.12335"
-url_preprint: "https://carlos-mendez.rbind.io/pdf/manuscript-project2019L.pdf"
 url_code: ''
 url_dataset: ''
 url_poster: ''
 url_project: ''
 url_slides: ''
 url_source: ''
-url_video: ''
+url_video: 'https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag'
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
@@ -70,3 +69,5 @@ projects: [convergence]
 #   Otherwise, set `slides: ""`.
 # slides: example
 ---
+
+<iframe width="100%" height="400" src="https://www.youtube-nocookie.com/embed/srNtOUf_e_w?si=kvHPIzbCUIhIRX3s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
