@@ -15,7 +15,7 @@ tags:
 - spatial
 - python
 - regional
-title: Studing spatial heterogeneity
+title: Studying spatial heterogeneity
 url_code: ""
 url_pdf: ""
 url_slides: ""
