@@ -24,8 +24,9 @@ design:
     # Text color (true=light, false=dark, or remove for the dynamic theme color).
     text_color_light: true
 
-#advanced:
+advanced:
 #  css_class: fullscreen
+   css_class: mine
 ---
 
 
