@@ -25,8 +25,8 @@ design:
     text_color_light: true
 
 advanced:
-#  css_class: fullscreen
-   css_class: mine
+  css_class: fullscreen
+#  css_class: mine
 ---
 
 
