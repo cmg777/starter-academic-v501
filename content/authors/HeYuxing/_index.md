@@ -34,7 +34,7 @@ title: He Yuxing (China)
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-- Alumni doctoral graduates
+- Alumni master graduates
 ---
 
 ADD a longer bio here
