@@ -14,7 +14,7 @@ interests:
 organizations:
 - name: TBA
   url: ""
-role: "PhD student 2021-2024"
+role: "PhD in Inteenational Development 2023"
 social:
 - icon: address-card
   icon_pack: fa

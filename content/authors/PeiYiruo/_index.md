@@ -11,7 +11,7 @@ interests:
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "Master student 2022-2024"
+role: "Master in International Development 2023"
 social:
 - icon: address-card
   icon_pack: fa

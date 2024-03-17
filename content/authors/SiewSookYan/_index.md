@@ -14,7 +14,7 @@ interests:
 organizations:
 - name: TBA
   url: ""
-role: "Master in International Development 2022"
+role: "Master in International Development 2021"
 social:
 - icon: address-card
   icon_pack: fa
