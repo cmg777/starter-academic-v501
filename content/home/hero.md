@@ -2,7 +2,7 @@
 widget: hero
 
 # Activate this widget? true/false
-active: true
+active: false
 
 headless: true
 weight: 03
