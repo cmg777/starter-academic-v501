@@ -1,5 +1,5 @@
 ---
-bio: My research interests include TBA.
+bio: My research interests include causal inference, spatial data science, and anthropology.
 education:
   courses:
   - course: MEng in TBA
@@ -14,23 +14,23 @@ interests:
 organizations:
 - name: TBA
   url: ""
-role: "PhD in Inteenational Development 2023"
+role: "PhD student 2024-2027"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://www.researchgate.net/profile/Kpoviessi-Othniel
+  link: https://carlos-mendez.org
 - icon: open-data
   icon_pack: ai
-  link: https://deepnote.com/@carlos-mendez
+  link: https://carlos-mendez.org
 - icon: researchgate
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Kpoviessi-Othniel
+  link: https://carlos-mendez.org
 - icon: orcid
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Kpoviessi-Othniel
+  link: https://carlos-mendez.org
 - icon: github
   icon_pack: fab
-  link: https://github.com/gcushen
+  link: https://github.com/cesarechevarria
 superuser: false
 title: Cesar Echevarria (Peru)
 
