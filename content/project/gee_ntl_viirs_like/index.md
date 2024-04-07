@@ -10,12 +10,12 @@ links:
   name: "[GEE] Google Earth Engine App"
   url: https://carlosmendez777.users.earthengine.app/view/worldviirs-like
 slides:
-summary: "An interactive exploration of the space-time dynamics of night-time lights using VIIRS-like data."
+summary: "An interactive exploration of the space-time dynamics of nighttime lights using VIIRS-like data."
 tags:
 - spatial
 - gee
 - regional
-title: "Space-time dynamics of night-time lights: VIIRS-like data"
+title: "Space-time dynamics of nighttime lights: VIIRS-like data"
 url_code: ""
 url_pdf: ""
 url_slides: ""
