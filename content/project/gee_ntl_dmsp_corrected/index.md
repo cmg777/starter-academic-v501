@@ -38,3 +38,6 @@ Let's study regional development from outer space!
 <br>
 
 See app in [full screen HERE](https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected)
+
+
+About the data: https://developers.google.com/earth-engine/datasets/catalog/NOAA_VIIRS_DNB_ANNUAL_V21#description  
