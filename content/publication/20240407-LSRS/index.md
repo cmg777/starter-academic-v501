@@ -35,7 +35,7 @@ tags:
 - Türkiye
 
 
-featured: false
+featured: true
 
 # links:
 url_pdf: 'https://link.springer.com/article/10.1007/s12076-024-00375-x'
