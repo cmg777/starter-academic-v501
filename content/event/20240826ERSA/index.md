@@ -1,9 +1,9 @@
 ---
 title: "Nighttime Lights and Economic Activity: Evidence from Developed and Developing Countries"
-event: 63st Congress  of the European Regional Science Association   
+event: 63rd Congress  of the European Regional Science Association   
 event_url: https://ersa.eventsair.com/ersa2024
 location: Azores, Portugal and Virtual
-summary:  63nd Congress  of the European Regional Science Association   
+summary:  63rd Congress  of the European Regional Science Association   
 abstract: "Satellite nighttime lights (NTL) are becoming a popular resource for assessing economic performance across countries and subnational regions. However, most economic studies use outdated and imprecise data from the Defense Meteorological Satellite Program (DMSP). This study compares the predictive economic content of nightlight images from the Visible Infrared Imaging Radiometer Suite (VIIRS) and newly processed images from the Defense Meteorological Satellite Program (DMSP). Specifically, we analyze the predictive performance of NTL luminosity across 139 countries and 1,557 subnational regions during the 2013-2019 period. The main findings of our multi-country and multi-region analyses are threefold. First, consistent with the findings from single-country analyses, NTL luminosity better predicts economic differences between economies than economic changes within a single economy over time. Second, both VIIRS and the new DMSP products perform similarly at the national level, but VIIRS excels for subnational analysis in developing countries. Third, at the national level, NTL inequality correlates with GDP inequality in developing countries, but this relationship fails to hold in developed countries. Across subnational regions of developing countries, the VIIRS data offers a more accurate characterization of economic inequality compared to the DMSP data. Overall, these results highlight how improved geospatial measurement technologies can advance our understanding of economic activity."
 
 # Talk start and end times.
