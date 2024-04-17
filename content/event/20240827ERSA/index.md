@@ -27,7 +27,7 @@ image:
 
 links:
 url_code: "https://bit.ly/project2022p"
-url_pdf: ""
+url_pdf: "https://bit.ly/project2022p"
 url_slides: "https://www.canva.com/design/DAGCpV2wckk/UdqCADFdaaQs3f50h5fwKg/view?utm_content=DAGCpV2wckk&utm_campaign=designshare&utm_medium=embeds&utm_source=link"
 url_video: ""
 
