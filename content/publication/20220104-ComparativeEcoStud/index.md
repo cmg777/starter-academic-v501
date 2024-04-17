@@ -38,7 +38,7 @@ tags:
 - South America
 
 
-featured: true
+featured: false
 
 # links:
 url_pdf: "https://rdcu.be/cElhh"
