@@ -24,7 +24,7 @@ publication_short: ""
 abstract: "Nighttime lights (NTL) data are increasingly used as a proxy for monitoring national, subnational, and supranational economic activity. These data offer advantages over traditional economic indicators such as GDP, including greater spatial granularity, timeliness, lower cost, and comparability between regions regardless of statistical capacity or political interference. Despite these benefits, the use of NTL data in regional science has been limited. This is in part due to the lack of accessible methods for processing and analyzing satellite images. To address this issue, this paper presents a user-friendly geocomputational notebook that illustrates how to process and analyze satellite NTL images. The evolution of regional disparities in India is presented as an illustrative example. The notebook first introduces a cloud-based Python environment for visualizing, analyzing, and transforming raster satellite images into tabular data. Next, it presents interactive tools for exploring the space-time patterns of the tabulated data. Finally, it describes methods for evaluating the usefulness of NTL data in terms of their cross-sectional predictions, time-series predictions, and regional inequality dynamics."
 
 # Summary. An optional shortened abstract.
-summary: ""
+summary: "This paper introduces a user-friendly geocomputational notebook that illustrates how to process and analyze satellite NTL images."
 
 tags:
 - nighttime lights
@@ -78,14 +78,7 @@ image:
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGCpV2wckk&#x2F;UdqCADFdaaQs3f50h5fwKg&#x2F;view?utm_content=DAGCpV2wckk&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Slides</a> by Carlos Mendez
 
-<center>
 
-
-{{% callout note %}}
-Access the computational notebook [HERE](https://bit.ly/project2022p).
-{{% /callout %}}
-
-</center>
 
 <center>
 
