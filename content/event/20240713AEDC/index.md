@@ -28,7 +28,7 @@ image:
 links:
 url_code: ""
 url_pdf: ""
-url_slides: "https://www.canva.com/design/DAFvvfEGyKo/ZVp9DoSUYSrepeSoNBuKeA/view?utm_content=DAFvvfEGyKo&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink"
+url_slides: "https://www.canva.com/design/DAGCvS7hFLE/BlNj9bQUB2GXy4h1LLuMqQ/view?utm_content=DAGCvS7hFLE&utm_campaign=designshare&utm_medium=embeds&utm_source=link"
 url_video: ""
 
 
