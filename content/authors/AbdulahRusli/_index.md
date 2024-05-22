@@ -18,7 +18,7 @@ social:
   link: www.rabdulah.net
 - icon: open-data
   icon_pack: ai
-  link: www.rabdulah.net
+  link: https://rabdulah.net/2024/05/co-emission-map-of-jakarta-2019-2020/
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Rusli-Abdulah
