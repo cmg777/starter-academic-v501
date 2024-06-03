@@ -6,7 +6,7 @@ authors:
 
 
 date: "2024-04-17T00:00:00Z"
-doi: ""
+doi: "10.18335/region.v11i1.493"
 
 # Schedule page publish date (NOT publication's date).
 publishDate: "2024-04-17T00:00:00Z"
@@ -37,14 +37,14 @@ tags:
 featured: true
 
 # links:
-url_pdf: 'https://bit.ly/project2022p'
-url_preprint: "https://bit.ly/project2022p"
+url_pdf: 'https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493/457'
+#url_preprint: "https://bit.ly/project2022p"
 url_code: 'https://bit.ly/project2022p'
 url_dataset: 'https://bit.ly/project2022p'
 url_poster: ''
 url_project: ''
 url_slides: 'https://www.canva.com/design/DAGCpV2wckk/UdqCADFdaaQs3f50h5fwKg/view?utm_content=DAGCpV2wckk&utm_campaign=designshare&utm_medium=embeds&utm_source=link'
-url_source: ''
+url_source: 'https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493'
 url_video: 'https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag'
 
 # Featured image
