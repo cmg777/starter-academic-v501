@@ -32,9 +32,9 @@ address:
 coordinates:
   latitude: '35.153188'
   longitude: '136.964190'
-directions: Enter the building of the Graduate School of Internatinal Developoment and turn right to Office 111 on the 1st Floor
+directions: Enter the building of the Graduate School of International Development and turn right to Office 111 on the 1st Floor
 office_hours:
-  - 'Office hours: Mondays 17:30 to 18:30 (Book an appointment first)'
+  - 'Office hours: Tuesdays 17:00 to 18:30 (Book an appointment first)'
 appointment_url: 'https://carlos777.youcanbook.me/'
 contact_links:
   - icon: video
