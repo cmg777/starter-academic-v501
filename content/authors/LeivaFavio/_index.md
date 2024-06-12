@@ -15,7 +15,7 @@ role: "PhD research student 2023-2024"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://www.researchgate.net/profile/Favio-Sergio-Leiva-Cardenas/research
+  link: https://favioleiva.github.io/
 - icon: open-data
   icon_pack: ai
   link: https://favioleiva.youcanbook.me/
