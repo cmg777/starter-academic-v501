@@ -1,9 +1,9 @@
 ---
-bio: My research interests include  development economics, regional economics, and spatial econometrics.
+bio: TBA.
 education:
   courses:
-  - course: M.S. in Marketing
-    institution: University of Manchester
+  - course: TBA
+    institution: TBA
     year: 2020
 email: "x"
 interests:
@@ -11,25 +11,25 @@ interests:
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "PhD student 2023-2024"
+role: "PhD student 2024-2027"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://favioleiva.github.io/
+  link: https://www.researchgate.net/profile/Phon-Sophat
 - icon: open-data
   icon_pack: ai
-  link: https://favioleiva.youcanbook.me/
+  link: https://www.researchgate.net/profile/Phon-Sophat
 - icon: researchgate
   icon_pack: ai
-  link: https://www.researchgate.net/profile/Favio-Sergio-Leiva-Cardenas/research
+  link: https://www.researchgate.net/profile/Phon-Sophat
 - icon: orcid
   icon_pack: ai
-  link: https://orcid.org/0000-0001-9315-3097
+  link: https://orcid.org/0000-0002-2336-0186
 - icon: github
   icon_pack: fab
-  link: https://github.com/Favioleiva
+  link: https://orcid.org/0000-0002-2336-0186
 superuser: false
-title: Leiva Favio (Peru)
+title: Phon Sophat(Cambodia)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
