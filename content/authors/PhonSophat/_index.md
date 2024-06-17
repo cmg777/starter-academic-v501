@@ -29,7 +29,7 @@ social:
   icon_pack: fab
   link: https://orcid.org/0000-0002-2336-0186
 superuser: false
-title: Phon Sophat(Cambodia)
+title: Phon Sophat (Cambodia)
 
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
