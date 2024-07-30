@@ -108,4 +108,9 @@ url_video: ""
 
     - The parallel trends assumption implies that residuals ($\epsilon_{igt}$) are uncorrelated with the treatment dummy, leading to a consistent estimator for the average treatment effect.
 
-You can run and extend the analysis of this case study using  [Google Colab](https://colab.research.google.com/drive/1A5zxj9SU8phTTCHBkt1fQkFX1xhFbycI?usp=sharing).
+<center>
+{{% callout note %}}
+Learn by coding using this [Google Colab notebook](https://colab.research.google.com/drive/1A5zxj9SU8phTTCHBkt1fQkFX1xhFbycI?usp=sharing).
+{{% /callout %}}
+</center>
+
