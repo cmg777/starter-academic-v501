@@ -25,9 +25,9 @@ url_video: ""
 ## Homogeneous Treatment Effects
 
 - 🎯 **Purpose**: 
-  Estimates treatment effects when the treatment is not randomly assigned.
+  Estimate treatment effects when the treatment is not randomly assigned.
 - 📉 **Parallel Trends Assumption**: 
-  Assumes that in the absence of treatment, the treated and untreated groups would have followed parallel paths over time.
+  In the absence of treatment, the treated and untreated groups would have followed parallel paths over time.
 - 🔄 **Two-Way Fixed-Effects (TWFE) Model**:
   - **Static Model**:
 
