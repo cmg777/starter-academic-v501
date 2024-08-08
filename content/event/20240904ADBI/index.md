@@ -1,7 +1,7 @@
 ---
 title: "Monitoring economic development from outer space"
 event: Workshop of the Asian Development Bank Institute   
-event_url: https://ersa.eventsair.com/ersa2024
+event_url: https://www.adb.org/news/events/workshop-on-poverty-impact-and-vulnerability-estimator-system-solutions
 location: Tokyo, Japan
 summary:  Workshop of the Asian Development Bank Institute    
 abstract: "This presentation examines the use of satellite images to understand and predict economic activities.  Beyond nighttime lights, significant development gaps within countries are observable through satellite data. The integration of large-scale geospatial data, including daytime images and GIS layers, enhances our understanding of poverty across multiple dimensions and scales. The combination of survey data with satellite imagery provides a more comprehensive tool for predicting and understanding economic development."
