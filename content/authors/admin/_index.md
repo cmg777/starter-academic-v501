@@ -71,7 +71,7 @@ user_groups:
 - Principal Investigators
 ---
 
-After studying Commercial Engineering in Bolivia and Chile, I worked as a consultant for Pro-Mujer International, The World Bank, DANIDA, and JICA. I have a M.A. and a Ph.D. in International Development from Nagoya University, Japan. My research interests focus on the integration of development economics, spatial data science, and applied econometrics  to understand and inform the process of sustainable development across regions. My current research deals with (1) geospatial big data analytics and socieonomic development; (2) geospatial inequality, poverty, and growth interactions; (3) regional infrastructure and mobility flows; and (4) local structural change and productivity dynamics.
+After studying Commercial Engineering in Bolivia and Chile, I worked as a consultant for Pro-Mujer International, The World Bank, DANIDA, and JICA. I have a M.A. and a Ph.D. in International Development from Nagoya University, Japan. My research interests focus on the integration of development economics, spatial data science, and applied econometrics  to understand and inform the process of sustainable development across regions. My current research deals with (1) geospatial big data analytics and socioeconomic development; (2) geospatial inequality, poverty, and growth interactions; (3) regional infrastructure and mobility flows; and (4) spatial structural change and productivity dynamics.
 
 {{< icon name="download" pack="fas" >}} Download my {{< staticref "media/CV.pdf" "newtab" >}}CV{{< /staticref >}}.
 
