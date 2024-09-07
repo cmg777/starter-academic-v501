@@ -1,5 +1,5 @@
 ---
-bio: My research interests focus on the integration of development economics, spatial data science, and econometrics to understand and inform the process of sustainable development across subnational regions and countries.
+bio: My research interests focus on the integration of development economics, spatial data science, and econometrics to understand and inform the process of sustainable development across regions.
 education:
   courses:
   - course: PhD in International Development
@@ -14,11 +14,10 @@ education:
 email: "carlos@gsid.nagoya-u.ac.jp"
 highlight_name: false
 interests:
+- Applied Econometrics
+- Spatial Big Data Analytics
 - Regional Development
 - Development Macroeconomics
-- Applied Econometrics
-- Spatial Econometrics
-- Spatial Big Data Analytics
 organizations:
 - name: Nagoya University, JAPAN
   url: https://www.gsid.nagoya-u.ac.jp/index-en.html
@@ -72,7 +71,7 @@ user_groups:
 - Principal Investigators
 ---
 
-After studying Commercial Engineering in Bolivia and Chile, I worked as a consultant for Pro-Mujer International, The World Bank, DANIDA, and JICA. I have a M.A. and a Ph.D. in International Development from Nagoya University, Japan. My research interests focus on the integration of development economics, spatial data science, and applied econometrics  to understand and inform the process of sustainable development across subnational regions and countries. My current research deals with (1) geospatial inequality and development; (2) regional economic growth and convergence; (3) regional labor markets  and macroeconomic shocks; and (4) structural change and productivity dynamics.
+After studying Commercial Engineering in Bolivia and Chile, I worked as a consultant for Pro-Mujer International, The World Bank, DANIDA, and JICA. I have a M.A. and a Ph.D. in International Development from Nagoya University, Japan. My research interests focus on the integration of development economics, spatial data science, and applied econometrics  to understand and inform the process of sustainable development across regions. My current research deals with (1) geospatial big data analytics and socieonomic development; (2) geospatial inequality, poverty, and growth interactions; (3) regional infrastructure and mobility flows; and (4) local structural change and productivity dynamics.
 
 {{< icon name="download" pack="fas" >}} Download my {{< staticref "media/CV.pdf" "newtab" >}}CV{{< /staticref >}}.
 
