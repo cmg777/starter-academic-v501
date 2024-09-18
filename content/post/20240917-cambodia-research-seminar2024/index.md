@@ -36,10 +36,12 @@ The seminar also aims to provide  networking opportunities designed to foster re
 ## Keynote presentations
 
 - Big data and artificial intelligence for mapping poverty vulnerability in Cambodia
-By Theara Khoun (UNDP Cambodia)
+
+Theara Khoun (UNDP Cambodia)
 
 - Monitoring the dynamics of local human development in Cambodia: A view from outer space
-By Carlos Mendez (Nagoya University, Japan)
+
+Carlos Mendez (Nagoya University, Japan)
 
 ## Panel discussion
 
@@ -51,8 +53,8 @@ Building an interdisciplinary network to study Geospatial Socioeconomic Developm
 
 <iframe
   src="https://lu.ma/embed/event/evt-Trfi3mKiVVDs3iX/simple"
-  width="600"
-  height="450"
+  width="100%"
+  height="650"
   frameborder="0"
   style="border: 1px solid #bfcbda88; border-radius: 4px;"
   allowfullscreen=""
