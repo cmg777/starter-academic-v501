@@ -33,9 +33,20 @@ The seminar aims to provide an overview of new data and methods to monitor susta
 
 The seminar also aims to provide  networking opportunities designed to foster research collaboration among participants. These interactions will facilitate the exchange of ideas, the development of new research projects, and the establishment of long-term professional connections. By bringing together scholars with diverse expertise, the seminar encourages the creation of interdisciplinary and international partnerships that can lead to innovative research outcomes.
 
+## Keynote presentations
+
+- Big data and artificial intelligence for mapping poverty vulnerability in Cambodia
+By Theara Khoun (UNDP Cambodia)
+
+- Monitoring the dynamics of local human development in Cambodia: A view from outer space
+By Carlos Mendez (Nagoya University, Japan)
+
+## Panel discussion
+
+Building an interdisciplinary network to study Geospatial Socioeconomic Development
+
+
 ## Registration page
-
-
 
 
 <iframe
