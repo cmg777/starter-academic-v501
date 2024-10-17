@@ -15,7 +15,7 @@ role: "PhD student 2023-2026"
 social:
 - icon: address-card
   icon_pack: fa
-  link: www.rabdulah.net
+  link: https://rabdulah.net/ 
 - icon: open-data
   icon_pack: ai
   link: https://rabdulah.net/2024/05/co-emission-map-of-jakarta-2019-2020/
