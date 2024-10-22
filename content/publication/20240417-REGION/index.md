@@ -49,7 +49,7 @@ url_video: 'https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag'
 - icon: open-data
   icon_pack: ai
   name: "AI Podcast"
-  url: 'https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected'
+  url: https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
