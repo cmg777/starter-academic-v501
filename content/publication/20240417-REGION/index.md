@@ -36,6 +36,8 @@ tags:
 
 featured: true
 
+# Icons: https://fontawesome.com/search
+
 links:
   - name: "AI Video"
     url: "https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag"
@@ -43,12 +45,12 @@ links:
     icon: youtube
   - name: "AI Podcast"
     url: "https://soundcloud.com/user-562952877/mendez-2024-exploring-economic/s-oxNNkyMZQig?si=73478fdd84b343b1af240cc54f933bd8&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing"
-    icon_pack: fab
-    icon: soundcloud
+    icon_pack: fas
+    icon: headphones
   - name: "Slides"
     url: "https://carlos-mendez.my.canva.site/project2022p-india-ntl-images-geo-notebook-for-processing-and-exploration"
-    icon_pack: fab
-    icon: slideshare
+    icon_pack: fas
+    icon: tv
   - name: "Colab notebook"
     url: "https://bit.ly/project2022p"
     icon_pack: ai
