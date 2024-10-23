@@ -47,9 +47,9 @@ url_project: ''
 url_slides: 'https://carlos-mendez.my.canva.site/project2022p-india-ntl-images-geo-notebook-for-processing-and-exploration'
 url_source: 'https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493'
 url_video: 'https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag'
-- name: Podcast
+- name: 'Podcast'
   url: 'https://soundcloud.com/user-562952877/mendez-2024-exploring-economic/s-oxNNkyMZQig?si=73478fdd84b343b1af240cc54f933bd8&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
-  
+
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
