@@ -46,7 +46,10 @@ url_project: ''
 url_slides: 'https://carlos-mendez.my.canva.site/project2022p-india-ntl-images-geo-notebook-for-processing-and-exploration'
 url_source: 'https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493'
 url_video: 'https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag'
-
+- icon: open-data
+  icon_pack: ai
+  name: "AI Podcast"
+  url: 'https://soundcloud.com/user-562952877/mendez-2024-exploring-economic/s-oxNNkyMZQig?si=3d997051e84149979fc40450269f17be&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
@@ -70,12 +73,6 @@ image:
 # slides: example
 ---
 
-{{% callout note %}}
-AI Podcast
-{{% /callout %}}
-
-<iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1939257887%3Fsecret_token%3Ds-oxNNkyMZQig&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/user-562952877" title="cmg777" target="_blank" style="color: #cccccc; text-decoration: none;">cmg777</a> · <a href="https://soundcloud.com/user-562952877/mendez-2024-exploring-economic/s-oxNNkyMZQig" title="Mendez 2024 Exploring economic activity from outer space" target="_blank" style="color: #cccccc; text-decoration: none;">Mendez 2024 Exploring economic activity from outer space</a></div>
-
 <center>
 
 {{% callout note %}}
@@ -93,4 +90,9 @@ Access the computational notebook [HERE](https://bit.ly/project2022p).
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGCpV2wckk&#x2F;ob078h3EKvMp3owtOp68ow&#x2F;view?utm_content=DAGCpV2wckk&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Slides</a> by Carlos Mendez
 
+{{% callout note %}}
+AI Podcast
+{{% /callout %}}
+
+<iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1939257887%3Fsecret_token%3Ds-oxNNkyMZQig&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/user-562952877" title="cmg777" target="_blank" style="color: #cccccc; text-decoration: none;">cmg777</a> · <a href="https://soundcloud.com/user-562952877/mendez-2024-exploring-economic/s-oxNNkyMZQig" title="Mendez 2024 Exploring economic activity from outer space" target="_blank" style="color: #cccccc; text-decoration: none;">Mendez 2024 Exploring economic activity from outer space</a></div>
 
