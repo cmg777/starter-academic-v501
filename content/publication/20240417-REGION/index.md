@@ -47,7 +47,8 @@ url_project: ''
 url_slides: 'https://carlos-mendez.my.canva.site/project2022p-india-ntl-images-geo-notebook-for-processing-and-exploration'
 url_source: 'https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493'
 url_video: 'https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag'
-
+- name: Custom Link
+  url: http://example.org
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
