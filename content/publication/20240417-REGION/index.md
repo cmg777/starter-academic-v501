@@ -37,8 +37,6 @@ tags:
 featured: true
 
 # links:
-- name: Custom
-  url: http://example.org
 url_pdf: 'https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493/457'
 #url_preprint: "https://bit.ly/project2022p"
 url_code: 'https://bit.ly/project2022p'
