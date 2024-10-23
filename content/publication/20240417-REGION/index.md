@@ -101,6 +101,20 @@ Access the computational notebook [HERE](https://bit.ly/project2022p).
 
 </center>
 
+{{% callout note %}}
+AI Video
+(made with Invideo AI)
+{{% /callout %}}
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/srNtOUf_e_w?si=gIkHVwyI1wNayJb8&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+
+{{% callout note %}}
+Slides
+(made with Canva PRO)
+{{% /callout %}}
+
+
 <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%;
  padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
  border-radius: 8px; will-change: transform;">
