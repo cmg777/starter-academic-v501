@@ -51,16 +51,16 @@ links:
     icon: open-data
   - name: "Published article"
     url: "https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493"
-    icon_pack: fab
-    icon: book
+    icon_pack: ai
+    icon: archive
   - name: "Slides"
     url: "https://carlos-mendez.my.canva.site/project2022p-india-ntl-images-geo-notebook-for-processing-and-exploration"
     icon_pack: fab
     icon: slideshare
-url_pdf: 'https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493/457'
+#url_pdf: 'https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493/457'
 #url_preprint: "https://bit.ly/project2022p"
-url_code: 'https://bit.ly/project2022p'
-url_dataset: 'https://bit.ly/project2022p'
+#url_code: 'https://bit.ly/project2022p'
+#url_dataset: 'https://bit.ly/project2022p'
 url_poster: ''
 url_project: ''
 #url_slides: 'https://carlos-mendez.my.canva.site/project2022p-india-ntl-images-geo-notebook-for-processing-and-exploration'
