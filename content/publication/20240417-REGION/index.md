@@ -47,8 +47,8 @@ links:
     icon: soundcloud
   - name: "Colab notebook"
     url: "https://bit.ly/project2022p"
-    icon_pack: fab
-    icon: code
+    icon_pack: ai
+    icon: open-data
   - name: "Published article"
     url: "https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493"
     icon_pack: fab
