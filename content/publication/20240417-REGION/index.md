@@ -41,15 +41,12 @@ url_pdf: 'https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493/45
 #url_preprint: "https://bit.ly/project2022p"
 url_code: 'https://bit.ly/project2022p'
 url_dataset: 'https://bit.ly/project2022p'
-url_poster: ''
+url_poster: 'https://soundcloud.com/user-562952877/mendez-2024-exploring-economic/s-oxNNkyMZQig?si=3d997051e84149979fc40450269f17be&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing'
 url_project: ''
 url_slides: 'https://carlos-mendez.my.canva.site/project2022p-india-ntl-images-geo-notebook-for-processing-and-exploration'
 url_source: 'https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493'
 url_video: 'https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag'
-- icon: open-data
-  icon_pack: ai
-  name: "AI Podcast"
-  url: https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected
+
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
