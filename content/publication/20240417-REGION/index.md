@@ -101,10 +101,12 @@ Access the computational notebook [HERE](https://bit.ly/project2022p).
 
 </center>
 
+
 {{% callout note %}}
 AI Video
 (made with Invideo AI)
 {{% /callout %}}
+
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
   <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
@@ -116,6 +118,7 @@ AI Video
     allowfullscreen>
   </iframe>
 </div>
+
 
 
 {{% callout note %}}
@@ -133,10 +136,12 @@ Slides
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGCpV2wckk&#x2F;ob078h3EKvMp3owtOp68ow&#x2F;view?utm_content=DAGCpV2wckk&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Slides</a> by Carlos Mendez
 
+
 {{% callout note %}}
 AI Podcast
 (made with NotebookLM)
 {{% /callout %}}
+
 
 <iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1939257887%3Fsecret_token%3Ds-oxNNkyMZQig&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/user-562952877" title="cmg777" target="_blank" style="color: #cccccc; text-decoration: none;">cmg777</a> · <a href="https://soundcloud.com/user-562952877/mendez-2024-exploring-economic/s-oxNNkyMZQig" title="Mendez 2024 Exploring economic activity from outer space" target="_blank" style="color: #cccccc; text-decoration: none;">Mendez 2024 Exploring economic activity from outer space</a></div>
 
