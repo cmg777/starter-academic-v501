@@ -37,6 +37,7 @@ tags:
 
 featured: true
 
+# Icons: https://fontawesome.com/search
 links:
   - name: "AI Video"
     url: "https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag"
@@ -46,10 +47,16 @@ links:
     url: "https://on.soundcloud.com/J3ZaFc9kGWYcN5cF9"
     icon_pack: fas
     icon: headphones
+  - name: "AI Mindmap"
+    url: "https://mapify.so/share-link/fGCoa7QgaP"
+    icon_pack: fas
+    icon: brain
   - name: "Published article"
     url: "https://link.springer.com/article/10.1007/s12076-024-00375-x"
     icon_pack: fas
     icon: university
+
+
 #url_pdf: 'https://link.springer.com/article/10.1007/s12076-024-00375-x'
 url_preprint: "https://www.overleaf.com/read/bzqgsrrmbbhc#9f94fc"
 url_code: ''

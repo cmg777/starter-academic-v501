@@ -46,6 +46,10 @@ links:
     url: "https://soundcloud.com/user-562952877/regional-unemployment-dynamics-in-indonesia/s-18qbBpEnmdR?si=6ae535405a4a41ef98812d3a3514a0ea&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing"
     icon_pack: fas
     icon: headphones
+  - name: "AI Mindmap"
+    url: "https://mapify.so/share-link/rcZbnUbESW"
+    icon_pack: fas
+    icon: brain
   - name: "Published article"
     url: "https://link.springer.com/article/10.1007/s12076-023-00364-6"
     icon_pack: fas

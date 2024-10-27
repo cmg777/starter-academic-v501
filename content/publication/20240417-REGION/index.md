@@ -47,6 +47,10 @@ links:
     url: "https://soundcloud.com/user-562952877/mendez-2024-exploring-economic/s-oxNNkyMZQig?si=73478fdd84b343b1af240cc54f933bd8&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing"
     icon_pack: fas
     icon: headphones
+  - name: "AI Mindmap"
+    url: "https://mapify.so/share-link/Vw5YkbadTW"
+    icon_pack: fas
+    icon: brain
   - name: "Slides"
     url: "https://carlos-mendez.my.canva.site/project2022p-india-ntl-images-geo-notebook-for-processing-and-exploration"
     icon_pack: fas
