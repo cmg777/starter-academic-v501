@@ -35,18 +35,36 @@ tags:
 
 featured: true
 
-# links:
-# - name: ""
-#   url: ""
-url_pdf: "https://www.springer.com/gp/book/9789811586286#aboutBook"
-url_preprint: ""
-url_code: "https://github.com/quarcs-lab/mendez2020-convergence-clubs-code-data"
-url_dataset: "https://github.com/quarcs-lab/mendez2020-convergence-clubs-code-data"
+links:
+  - name: "Video overview"
+    url: "https://youtu.be/QPYLi9WaBfs?si=lqcVe056eQphQy0j"
+    icon_pack: fab
+    icon: youtube
+  - name: "Slides"
+    url: "https://mendez2020book.netlify.app/?fbclid=IwAR2VVu0dXxP0BZNLdazo5D8vWc5cvXC1xKpMTs1p7l1tI-Ls3PqKIyxpW_M#1"
+    icon_pack: fas
+    icon: tv
+  - name: "Data and code"
+    url: "https://github.com/quarcs-lab/mendez2020-convergence-clubs-code-data"
+    icon_pack: ai
+    icon: open-data
+  - name: "Stata video tutorial"
+    url: "https://youtu.be/FO8Ngl57HRQ"
+    icon_pack: fab
+    icon: youtube
+  - name: "Published book"
+    url: "https://www.springer.com/gp/book/9789811586286#aboutBook"
+    icon_pack: fas
+    icon: university
+#url_pdf: "https://www.springer.com/gp/book/9789811586286#aboutBook"
+#url_preprint: ""
+#url_code: "https://github.com/quarcs-lab/mendez2020-convergence-clubs-code-data"
+#url_dataset: "https://github.com/quarcs-lab/mendez2020-convergence-clubs-code-data"
 url_poster: 'https://quarcs-lab.org/portfolio/book-mendez2020'
-url_project: ''
-url_slides: 'https://mendez2020book.netlify.app/?fbclid=IwAR2VVu0dXxP0BZNLdazo5D8vWc5cvXC1xKpMTs1p7l1tI-Ls3PqKIyxpW_M#1'
-url_source: ''
-url_video: 'https://youtu.be/FO8Ngl57HRQ'
+#url_project: ''
+#url_slides: 'https://mendez2020book.netlify.app/?fbclid=IwAR2VVu0dXxP0BZNLdazo5D8vWc5cvXC1xKpMTs1p7l1tI-Ls3PqKIyxpW_M#1'
+#url_source: ''
+#url_video: 'https://youtu.be/FO8Ngl57HRQ'
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
