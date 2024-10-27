@@ -46,19 +46,11 @@ links:
     url: "https://soundcloud.com/user-562952877/mendez-2024-exploring-economic/s-oxNNkyMZQig?si=73478fdd84b343b1af240cc54f933bd8&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing"
     icon_pack: fas
     icon: headphones
-  - name: "Slides"
-    url: "https://carlos-mendez.my.canva.site/project2022p-india-ntl-images-geo-notebook-for-processing-and-exploration"
-    icon_pack: fas
-    icon: tv
-  - name: "Colab notebook"
-    url: "https://bit.ly/project2022p"
-    icon_pack: ai
-    icon: open-data
   - name: "Published article"
-    url: "https://openjournals.wu.ac.at/ojs/index.php/region/article/view/493"
+    url: "https://link.springer.com/article/10.1007/s12076-024-00375-x"
     icon_pack: fas
     icon: university
-url_pdf: 'https://link.springer.com/article/10.1007/s12076-024-00375-x'
+#url_pdf: 'https://link.springer.com/article/10.1007/s12076-024-00375-x'
 url_preprint: "https://www.overleaf.com/read/bzqgsrrmbbhc#9f94fc"
 url_code: ''
 url_dataset: ''
