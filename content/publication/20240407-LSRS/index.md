@@ -43,7 +43,7 @@ links:
     icon_pack: fab
     icon: youtube
   - name: "AI Podcast"
-    url: "https://soundcloud.com/user-562952877/mendez-2024-exploring-economic/s-oxNNkyMZQig?si=73478fdd84b343b1af240cc54f933bd8&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing"
+    url: "https://on.soundcloud.com/J3ZaFc9kGWYcN5cF9"
     icon_pack: fas
     icon: headphones
   - name: "Published article"
