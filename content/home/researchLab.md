@@ -29,7 +29,7 @@ design:
 ---
 
 {{% callout note %}}
-In the QuaRCS-lab and its [global network](https://quarcs-lab.org/), we conduct research on [quantitative regional and computational science](https://quarcs-lab.org). We exploit the integration of development economics, spatial data science, and applied econometrics to understand and inform the process of sustainable development across subnational regions and countries.
+In the QuaRCS-lab and its [global network](https://quarcs.netlify.app), we conduct research on [quantitative regional and computational science](https://quarcs-lab.org). We exploit the integration of development economics, spatial data science, and applied econometrics to understand and inform the process of sustainable development across subnational regions and countries.
 {{% /callout %}}
 <br>
 
