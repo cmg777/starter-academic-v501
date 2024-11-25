@@ -30,7 +30,7 @@ url_slides: ""
 url_video: ""
 ---
 
-## 📊 Growth Unlocked: The Augmented Solow Model Explained
+## 📊 The Augmented Solow Model: An Overview usying Python, R, and Stata
 
 **How do countries grow richer, and why do some grow faster than others?** Today, we're diving into a computational exploration of economic growth using the **augmented Solow model**, an enhanced version of Solow's foundational 1956 model that includes insights from Mankiw, Romer, and Weil (1992). This model helps explain **why some countries grow richer than others** and whether poor countries are indeed catching up to the wealthier ones. Let's unpack the model, the equations, and what the data says.
 
