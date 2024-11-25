@@ -30,11 +30,9 @@ url_slides: ""
 url_video: ""
 ---
 
+## 📊 Growth Unlocked: The Augmented Solow Model Explained
 
-
-**How do countries grow richer, and why do some grow faster than others?** 
-
-Let's dive into a computational exploration of economic growth using the **augmented Solow model**, an enhanced version of Solow's foundational 1956 model that includes insights from Mankiw, Romer, and Weil (1992). This model helps explain **why some countries grow richer than others** and whether poor countries are catching up to the wealthier ones. Let's unpack the model, the equations, and what the data says.
+**How do countries grow richer, and why do some grow faster than others?** Today, we're diving into a computational exploration of economic growth using the **augmented Solow model**, an enhanced version of Solow's foundational 1956 model that includes insights from Mankiw, Romer, and Weil (1992). This model helps explain **why some countries grow richer than others** and whether poor countries are indeed catching up to the wealthier ones. Let's unpack the model, the equations, and what the data says.
 
 ### 🔍 The Classic Solow Model: A Quick Recap
 The **Solow model** is one of the cornerstones of economic growth theory. It explains how countries grow by focusing on three main ingredients:
@@ -45,47 +43,15 @@ The **Solow model** is one of the cornerstones of economic growth theory. It exp
 
 The original Solow model tells us that growth can occur through accumulating **physical capital**, increasing the **workforce**, and through **technological progress**. However, over time, capital experiences diminishing returns — the more you invest, the less extra output you get, unless technology improves.
 
-The **production function** that represents this is:
-
-📊 **Production Function**:
-\[ Y = K^\alpha (A L)^{1-\alpha} \]
-
-Where:
-- \( Y \) is output (GDP)
-- \( K \) is physical capital
-- \( A \) is technology
-- \( L \) is labor
-- \( \alpha \) represents the elasticity of output with respect to capital
-
-The **capital accumulation equation** explains how investment (\(sY\)) and depreciation (\(\delta K\)) interact:
-
-📊 **Capital Accumulation**:
-\[ \Delta K = s Y - \delta K \]
-
-Where:
-- \( s \) is the savings rate
-- \( \delta \) is the depreciation rate
-
 ### 🧠 Why Augment the Model?
 In 1992, **Mankiw, Romer, and Weil** suggested adding **human capital** to the mix. Human capital, like education and health, can significantly enhance productivity. By adding this to the model, we get a richer understanding of growth disparities between nations.
 
-The **augmented Solow model** looks like this:
-
-📊 **Augmented Production Function**:
-\[ Y = K^\alpha H^\beta (A L)^{1-\alpha-\beta} \]
-
-Where:
-- \( H \) is human capital, representing education and skills.
-- \( \beta \) is the elasticity of output with respect to human capital.
-
-This equation shows that growth is not just about physical investments and labor but also about how well the workforce is trained and educated. Human capital plays a pivotal role in enhancing productivity, which can accelerate growth, particularly in poorer countries.
+This shows that growth is not just about physical investments and labor but also about how well the workforce is trained and educated. Human capital plays a pivotal role in enhancing productivity, which can accelerate growth, particularly in poorer countries.
 
 ### 📈 Convergence: Are Poorer Countries Catching Up?
 A critical prediction of the Solow model is **convergence** — the idea that poorer countries should grow faster than richer countries, eventually catching up in terms of per capita income.
 
 However, data shows **conditional convergence** rather than unconditional convergence. This means countries tend to converge to their own steady-state levels of income, which are defined by their individual characteristics like **savings rate**, **population growth**, and **human capital** levels.
-
-
 
 ### 🗃️ Data Analysis & Key Insights
 The dataset used in this analysis includes cross-country data on economic indicators like GDP, investment rates, and education levels.
@@ -97,12 +63,9 @@ The dataset used in this analysis includes cross-country data on economic indica
 
 The Python notebook processes these datasets to estimate the parameters for **savings**, **population growth**, and **human capital**, helping us understand the role of these factors in determining income levels and growth rates across countries.
 
-### 📽️ Learn More with Video
-For a foundational overview of the Solow growth model, check out this introductory video:
-
-[![Introduction to the Solow Model](https://www.youtube.com/embed/md0cjl51JTk)](https://www.youtube.com/embed/md0cjl51JTk)
 
 ### 🔗 Further Resources
+- **Video review**: For a foundational overview of the Solow growth model, check out [this introductory video](https://youtu.be/md0cjl51JTk?si=P4OEEYJqMoBYl3Ir)
 - **Stata Replication Code**: To replicate the key tables and figures from Mankiw, Romer, and Weil, access the [GitHub Gist here](https://gist.github.com/cmg777/a1181c89de80e5eb5e8c8b).
 - **Primer on the Solow Model**: For those new to the basics, [this primer](https://wke.lt/w/s/NOD3t3) is a great place to start.
 
