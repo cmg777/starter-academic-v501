@@ -9,7 +9,7 @@ date: "2020-12-13T00:00:00Z"
 draft: false
 featured: false
 image:
-  caption: 'Image credit: [**QuaRCS-Lab**](https://quarcs-lab.org)'
+  caption: 'Image credit: [**QuaRCS-Lab**](https://quarcs.netlify.app)'
   focal_point: ""
   placement: 2
   preview_only: false
@@ -24,12 +24,12 @@ tags:
 title: "So, you want me to be your academic advisor..."
 ---
 
-### 1. What is the academic mission of the  [QuarRCS lab](https://quarcs-lab.org)?
+### 1. What is the academic mission of the  [QuarRCS lab](https://quarcs.netlify.app)?
 
 We conduct research on quantitative regional and computational science. We exploit the integration of spatial data science, econometrics, and machine learning to understand and inform the process of sustainable development across subnational regions and countries.
 
 
-### 2. What are the current *lines of research* of the [QuarRCS lab](https://quarcs-lab.org)?
+### 2. What are the current *lines of research* of the [QuarRCS lab](https://quarcs.netlify.app)?
 
 - The quantitative geography of sustainable development: Remote sensing, spatial econometrics, and spatial machine learning
 - Regional growth, inequality, and convergence: Perspectives from spatial econometrics and machine learning
@@ -39,7 +39,7 @@ We conduct research on quantitative regional and computational science. We explo
 
 
 
-### 3. What *research methods* are commonly used to conduct research in the [QuarRCS lab](https://quarcs-lab.org)?
+### 3. What *research methods* are commonly used to conduct research in the [QuarRCS lab](https://quarcs.netlify.app)?
 
  - Geocomputational methods
  - Spatial econometrics
@@ -51,19 +51,19 @@ We conduct research on quantitative regional and computational science. We explo
  
 
 
-### 4. How could I join the [QuarRCS lab](https://quarcs-lab.org)?
+### 4. How could I join the [QuarRCS lab](https://quarcs.netlify.app)?
 
 Official admission follows the procedures and programs described in the Admission Policy of the Graduate School of International Development at Nagoya University. Please, carefully revise the following websites.
 
 - [Admission policy of the Graduate School of Internation Development (GSID)](http://www.gsid.nagoya-u.ac.jp/en/admission/adm_policy/)
 - [Application for admission and requirements ](http://www.gsid.nagoya-u.ac.jp/en/admission/application/)
 
-Among all the application requirements, we strongly recommend you write a clear and concise research proposal. Your chances of acceptance largely depend on this proposal. Since the number of applications to this research lab have been increasing, the selection process has become very competitive. Thus, to increase your chances of acceptance, you could prepare a proposal that is consistent with our previously described **lines of research** and **research methods**.  To have a more concrete reference, you could review our [research outcomes](https://quarcs-lab.org/research/), [projects](https://quarcs-lab.org/portfolio/all-publications/), [presentations](hhttps://carlos-mendez.org/#talks), and [tutorials](https://deepnote.com/carlos-mendez).
+Among all the application requirements, we strongly recommend you write a clear and concise research proposal. Your chances of acceptance largely depend on this proposal. Since the number of applications to this research lab have been increasing, the selection process has become very competitive. Thus, to increase your chances of acceptance, you could prepare a proposal that is consistent with our previously described **lines of research** and **research methods**.  To have a more concrete reference, you could review our [research outcomes](https://quarcs.netlify.app/research/), [projects](https://quarcs.netlify.app/portfolio/all-publications/) and [presentations](hhttps://carlos-mendez.org/#talks).
 
 
-### 5. What is the  profile of those who successfully join the  [QuarRCS lab](https://quarcs-lab.org) as *master* students?
+### 5. What is the  profile of those who successfully join the  [QuarRCS lab](https://quarcs.netlify.app) as *master* students?
 
-- Research proposal is consistent with the research lines, methods, and [projects](https://quarcs-lab.org/portfolio/all-publications/) of the QuarRCS lab
+- Research proposal is consistent with the research lines, methods, and [projects](https://quarcs.netlify.app/portfolio/all-publications/) of the QuarRCS lab
 - Undergraduate-level knowledge of economics and statistics
 - Ability to use statistical and mathematical software: Stata, R, Python, Julia, GeoDA, QGIS, or Matlab. (at least ONE)
 - High motivation to learn and use data science, spatial econometrics, and machine learning methods to conduct research.
@@ -71,9 +71,9 @@ Among all the application requirements, we strongly recommend you write a clear 
 If you believe your current background does not match this profile, but still want to join us, your could first apply as a [*Research Student*](http://www.gsid.nagoya-u.ac.jp/en/admission/application/) for six months (or one year). During this time, you can develop your academic skills with us, brush up your research proposal, and prepare for the entrance examination of the master program.
 
 
-### 6. What is the  profile of those who successfully join the  [QuarRCS lab](https://quarcs-lab.org) as *doctoral* students?
+### 6. What is the  profile of those who successfully join the  [QuarRCS lab](https://quarcs.netlify.app) as *doctoral* students?
 
-- Research proposal is *highly* consistent with the research lines, methods, and [projects](https://quarcs-lab.org/portfolio/all-publications/) of the QuarRCS lab
+- Research proposal is *highly* consistent with the research lines, methods, and [projects](https://quarcs.netlify.app/portfolio/all-publications/) of the QuarRCS lab
 - *Advanced* knowledge of economics, econometrics, or statistics.
 - Ability to use and *write programs* in Stata, R, Python, Julia, GeoDA, QGIS, or Matlab Python. (at least TWO)
 - *Plan to use* data science, spatial econometrics, and machine learning methods to conduct research.
@@ -82,7 +82,7 @@ If you believe your current background does not match this profile, but still wa
 
 ### 7. What research projects are currently being developed by the members of the  QuarRCS-lab ?
 
-The research interests, topics, and projects of lab's members are [listed HERE.](https://quarcs-lab.org/portfolio/all-publications/)
+The research interests, topics, and projects of lab's members are [listed HERE.](https://quarcs.netlify.app/portfolio/all-publications/)
 
 
 ### 8. How should I write my research proposal?
@@ -108,7 +108,7 @@ Your research proposal should clearly state the following:
 
 ### 9. What papers can I read to write my research proposal and develop an understanding of the research lines of the QuaRCS lab?
 
-You can read the [papers written by the members of the QuaRCS lab](https://quarcs-lab.org/portfolio/all-publications/). You can also read the [recent papers of Prof. Carlos Mendez](https://carlos-mendez.org/#featured). Finally, you can also check [the reading list of the QuaRCs lab](https://www.mendeley.com/community/quarcs-lab/) 
+You can read the [papers written by the members of the QuaRCS lab](https://quarcs.netlify.app/portfolio/all-publications/). You can also read the [recent papers of Prof. Carlos Mendez](https://carlos-mendez.org/#featured). 
 
 > In case you haven't found the answer for your question please feel free to contact us by using any the following:
 
