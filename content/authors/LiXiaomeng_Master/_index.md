@@ -11,7 +11,7 @@ interests:
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "PhD student 2025-2028"
+role: "Master in International Development 2025"
 social:
 - icon: address-card
   icon_pack: fa
@@ -34,7 +34,7 @@ title: Li Xiaomeng (China)
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-- Doctoral students
+- Alumni master graduates
 ---
 
 ADD a longer bio here
