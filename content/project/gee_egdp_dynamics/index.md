@@ -37,13 +37,14 @@ url_video: ""
   }
 </style>
 
+<center>
 {{% callout note %}}
 When the sun goes down and the lights turn on, [there’s still a lot to explore.](https://earth.app.goo.gl/oZzBfT)
 <br>
 Let's study regional development from outer space!
 <br>
 {{% /callout %}}
-{{% /callout %}}
+</center>
 
 <br>
 
