@@ -24,27 +24,26 @@ url_video: ""
 
 <style>
   .full-width-iframe {
-    width: 100%;
-    padding: 0;
-    margin: 0;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .full-width-iframe iframe {
-    display: block; /* To prevent extra space below the iframe */
-    width: 100%;
-    height: 600px; /* Or whatever height you need */
-    border: none; /* Redundant since you have frameborder="no", but good practice */
+    display: block !important;
+    width: 100% !important;
+    height: 600px !important;
+    border: none !important;
   }
 </style>
 
-<center>
 {{% callout note %}}
 When the sun goes down and the lights turn on, [there’s still a lot to explore.](https://earth.app.goo.gl/oZzBfT)
 <br>
 Let's study regional development from outer space!
 <br>
 {{% /callout %}}
-</center>
+{{% /callout %}}
 
 <br>
 
