@@ -22,9 +22,24 @@ url_slides: ""
 url_video: ""
 ---
 
+<style>
+  .full-width-iframe {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .full-width-iframe iframe {
+    display: block; /* To prevent extra space below the iframe */
+    width: 100%;
+    height: 600px; /* Or whatever height you need */
+    border: none; /* Redundant since you have frameborder="no", but good practice */
+  }
+</style>
+
 <center>
 {{% callout note %}}
-When the sun goes down and the lights turn on, [there’s still a lot to explore.](https://earth.app.goo.gl/oZzBfT) 
+When the sun goes down and the lights turn on, [there’s still a lot to explore.](https://earth.app.goo.gl/oZzBfT)
 <br>
 Let's study regional development from outer space!
 <br>
@@ -33,7 +48,9 @@ Let's study regional development from outer space!
 
 <br>
 
-<iframe height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.earthengine.app/view/dynamicsegdpv2?height=600"> </iframe>
+<div class="full-width-iframe">
+  <iframe height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.earthengine.app/view/dynamicsegdpv2?height=600"> </iframe>
+</div>
 
 <br>
 
