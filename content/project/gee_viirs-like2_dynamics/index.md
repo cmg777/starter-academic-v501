@@ -111,8 +111,8 @@ Let's study regional development from outer space!
 - The SVNL dataset fills a **crucial gap in long-term nighttime light data.**
 - Facilitates **detailed analysis of human activities** from 1992-2023.
 - Future work includes **further refinements using additional remote sensing data.**
-- **Dataset Access:** [Data repository](https://doi.org/10.6084/m9.figshare.22262545.v8)
-- **GEE dataset Access:** [Awesomme GEE community Catalog](https://gee-community-catalog.org/projects/srunet_npp_viirs_ntl/)
+- **Dataset Access:** [Original data repository](https://doi.org/10.6084/m9.figshare.22262545.v8)
+- **GEE dataset Access:** [Awesomme GEE community catalog](https://gee-community-catalog.org/projects/srunet_npp_viirs_ntl/)
 - **Exploratory Tool:** [GEE web app by Carlos Mendez](https://carlos-mendez.projects.earthengine.app/view/viirs-like2-dynamics) 
 
 
