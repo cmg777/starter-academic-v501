@@ -15,7 +15,7 @@ tags:
 - spatial
 - gee
 - regional
-title: "Space-time dynamics of (VIIRS-like) nighttime lights 1992-2023"
+title: "Space-time dynamics of nighttime lights 1992-2023"
 url_code: ""
 url_pdf: ""
 url_slides: ""
@@ -46,20 +46,6 @@ Let's study regional development from outer space!
 {{% /callout %}}
 </center>
 
-<br>
-
-<div class="full-width-iframe">
-  <iframe height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.earthengine.app/view/viirs-like2-dynamics?height=600"> </iframe>
-</div>
-
-<br>
-
-See web app in [full screen HERE](https://carlos-mendez.projects.earthengine.app/view/viirs-like2-dynamics)
-
-
-**A Global Annual Simulated VIIRS Nighttime Light Dataset (1992-2023)**
-
----
 
 ### 🌐  A Global Annual Simulated VIIRS Nighttime Light Dataset (1992-2023)
 - **Authors:** Xiuxiu Chen, Zeyu Wang, Feng Zhang, Guoqiang Shen, Qiuxiao Chen
@@ -125,9 +111,20 @@ See web app in [full screen HERE](https://carlos-mendez.projects.earthengine.app
 - The SVNL dataset fills a **crucial gap in long-term nighttime light data.**
 - Facilitates **detailed analysis of human activities** from 1992-2023.
 - Future work includes **further refinements using additional remote sensing data.**
-- **Dataset Access:** [https://doi.org/10.6084/m9.figshare.22262545.v8](https://doi.org/10.6084/m9.figshare.22262545.v8)
+- **Dataset Access:** [Data repository](https://doi.org/10.6084/m9.figshare.22262545.v8)
+- **GEE dataset Access:** [Awesomme GEE community Catalog](https://gee-community-catalog.org/projects/srunet_npp_viirs_ntl/)
+- **Exploratory Tool:** [GEE web app by Carlos Mendez](https://carlos-mendez.projects.earthengine.app/view/viirs-like2-dynamics) 
 
 
+<br>
+
+<div class="full-width-iframe">
+  <iframe height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.earthengine.app/view/viirs-like2-dynamics?height=600"> </iframe>
+</div>
+
+<br>
+
+See web app in [full screen HERE](https://carlos-mendez.projects.earthengine.app/view/viirs-like2-dynamics)
 
 
 
