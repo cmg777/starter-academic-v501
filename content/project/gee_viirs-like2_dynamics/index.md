@@ -15,7 +15,7 @@ tags:
 - spatial
 - gee
 - regional
-title: "Space-time dynamics of nighttime lights 1992-2023"
+title: "Regional dynamics of VIIRS-like nighttime lights 1992-2023"
 url_code: ""
 url_pdf: ""
 url_slides: ""
