@@ -10,7 +10,7 @@ links:
   name: "[GEE] Google Earth Engine App"
   url: https://carlos-mendez.projects.earthengine.app/view/dynamicsegdpv2
 slides:
-summary: "An interactive exploration of the space-time dynamics of luminosity-based GDP."
+summary: "An interactive exploration of the space-time dynamics of luminosity-based GDP over the 1992-2019 period."
 tags:
 - spatial
 - gee
