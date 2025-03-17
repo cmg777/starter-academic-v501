@@ -15,7 +15,7 @@ tags:
 - spatial
 - gee
 - regional
-title: "Regional dynamics of DMPS-like nighttime lights 1992-2019"
+title: "Regional dynamics of DMSP-like nighttime lights 1992-2019"
 url_code: ""
 url_pdf: ""
 url_slides: ""
