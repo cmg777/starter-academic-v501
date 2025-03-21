@@ -87,6 +87,11 @@ image:
 # slides: example
 ---
 
+**🤖 AI Podcast Summary**
+
+<iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2059684160&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/user-562952877" title="QuaRCS-lab" target="_blank" style="color: #cccccc; text-decoration: none;">QuaRCS-lab</a> · <a href="https://soundcloud.com/user-562952877/vietnam-subnational-gdp" title="Vietnam Subnational GDP Prediction Using Remote Sensing and Machine Learning" target="_blank" style="color: #cccccc; text-decoration: none;">Vietnam Subnational GDP Prediction Using Remote Sensing and Machine Learning</a></div>
+
+
 **🛰️ Introduction & Context**
 - Challenge: Limited subnational GDP data in Vietnam before 2010
 - Need: Long-term data for economic development analysis
@@ -138,7 +143,7 @@ image:
 - New dataset supports informed economic policy decisions
 - Potentially replicable method for other developing countries
 
-<iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2059684160&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/user-562952877" title="QuaRCS-lab" target="_blank" style="color: #cccccc; text-decoration: none;">QuaRCS-lab</a> · <a href="https://soundcloud.com/user-562952877/vietnam-subnational-gdp" title="Vietnam Subnational GDP Prediction Using Remote Sensing and Machine Learning" target="_blank" style="color: #cccccc; text-decoration: none;">Vietnam Subnational GDP Prediction Using Remote Sensing and Machine Learning</a></div>
+
 
 
 
