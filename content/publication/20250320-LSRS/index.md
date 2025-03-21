@@ -1,5 +1,5 @@
 ---
-title: "Predicting subnational GDP in Vietnam with remote sensing data: a machine learning approach"
+title: "Predicting subnational GDP in Vietnam with remote sensing data: A machine learning approach"
 authors:
 - Hussein Suleiman
 - Minh-Thu Thi Nguyen
