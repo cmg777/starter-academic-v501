@@ -112,12 +112,6 @@ image:
   - Ridge Regression
   - eXtreme Gradient Boosting (XGBoost)
 
-**📈 Algorithm Evaluation Results**
-- Ridge Regression outperformed other models
-- Accuracy:
-  - Harmonized DMSP: 99.15% accuracy
-  - VIIRS-like: 99.17% accuracy
-
 **🔦 Key Findings**
 - Predictions consistent across different nighttime datasets
 - Ridge Regression chosen for final model
@@ -126,11 +120,11 @@ image:
 **🌍 Application & Significance**
 - Created GDP data from 1992-2009
 - Enables detailed long-term analysis of regional economic trends
-- Assists policymakers and researchers in addressing inequality and economic development
+- Assists policymakers and researchers in addressing regional inequality and growth
 
 **⚠️ Limitations**
 - Remote sensing measurement/calibration discrepancies
-- Dependence on official GDP benchmarks (potential biases)
+- Dependence on official GDP benchmarks 
 - Interpretability challenges of machine learning methods
 
 **🚀 Future Research Directions**
