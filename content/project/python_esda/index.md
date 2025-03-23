@@ -9,6 +9,10 @@ links:
   icon_pack: ai
   name: "[Python] GoogleColab"
   url: https://colab.research.google.com/drive/1JHf8wPxSxBdKKhXaKQZUzhEpVznKGiep?usp=sharing
+- icon: open-data
+  icon_pack: ai
+  name: "Streamlit web app"
+  url: https://esda101apppy-9tfhzlscjggqshk3hk7qow.streamlit.app/
 slides:
 summary: An interactive geocomputational notebook to study spatial clusters and outliers
 tags:
@@ -24,6 +28,7 @@ url_video: ""
 
 
 # **A geocomputational notebook to study Exploratory Spatial Data Analysis (ESDA)**
+
 
 
 
