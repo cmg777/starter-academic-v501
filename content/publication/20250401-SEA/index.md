@@ -152,9 +152,9 @@ image:
 
 ### 📊 Data Overview  
 - Unit of analysis: 5,562 municipalities (2007–2012).  
-- 🔺 Violence proxied by change in homicide rate.  
-- 🔸 Political variables: Party ID, alignment, abstention, etc.  
-- 🔹 Socioeconomic variables: Population density, HDI, GINI, Bolsa Família, etc.  
+- Violence proxied by change in homicide rate.  
+- Political variables: Party ID, alignment, abstention, etc.  
+- Socioeconomic variables: Population density, HDI, GINI, Bolsa Família, etc.  
 
 ---
 
@@ -174,10 +174,10 @@ image:
 ---
 
 ### 🔍 OLS Results Highlights  
-- 📈 **PMDB** mayors → Increased violence.  
-- 📉 **PT** & **PSDB** → No consistent effect.  
-- 📊 Vote abstention → Strongly linked to higher homicide rates.  
-- ⚠️ Unexpected: GINI index showed negative correlation.  
+- **PMDB** mayors → Increased violence.  
+- **PT** & **PSDB** → No consistent effect.  
+- Vote abstention → Strongly linked to higher homicide rates.  
+- Unexpected: GINI index showed negative correlation.  
 
 ---
 
