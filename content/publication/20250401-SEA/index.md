@@ -119,12 +119,12 @@ image:
 
 ### 💻 Replication Notebooks  
 
-- All analyses are fully **reproducible in cloud-based Jupyter notebooks** via Google Colab:  
+All analyses are fully **reproducible in cloud-based Jupyter notebooks** via Google Colab:  
 
 
 📊 [1. Descriptive Statistics](https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing)
 
-📈 [2. Ordinary Least Squares (OLS](https://colab.research.google.com/drive/1B7LHLfO5EWVsW_HAH6xebSmiJWi0_Xtv?usp=sharing)
+📈 [2. Ordinary Least Squares (OLS)](https://colab.research.google.com/drive/1B7LHLfO5EWVsW_HAH6xebSmiJWi0_Xtv?usp=sharing)
 
 🗺️ [3. Geographically Weighted Regression (GWR)](https://colab.research.google.com/drive/19COBTQysC1UtsKh4cMxWsDFQm_eU4BBV?usp=sharing)
 
