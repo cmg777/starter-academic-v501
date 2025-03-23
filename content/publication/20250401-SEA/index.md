@@ -6,11 +6,11 @@ authors:
 
 
 
-date: "2025-03-23T00:00:00Z"
+date: "2025-03-22T00:00:00Z"
 doi: "10.1080/17421772.2025.2477571" 
 
 # Schedule page publish date (NOT publication's date).
-publishDate: "2025-04-01T00:00:00Z"
+publishDate: "2025-03-22T00:00:00Z"
 
 # Publication type.
 # Legend: 0 = Uncategorized; 1 = Conference paper; 2 = Journal article;
@@ -42,6 +42,10 @@ featured: false
 
 # Icons: https://fontawesome.com/search
 links:
+  - name: "Article"
+    url: "https://doi.org/10.1080/17421772.2025.2477571"
+    icon_pack: fas
+    icon: university
   #- name: "AI Video"
   #  url: "https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag"
   #  icon_pack: fab
@@ -54,10 +58,10 @@ links:
   #  url: "https://mapify.so/share-link/fGCoa7QgaP"
   #  icon_pack: fas
   #  icon: brain
-  - name: "Article"
-    url: "https://doi.org/10.1080/17421772.2025.2477571"
-    icon_pack: fas
-    icon: university
+  - name: "Notebook: "
+    url: "https://bit.ly/project2022p"
+    icon_pack: ai
+    icon: open-data
 
 
 #url_pdf: 'https://link.springer.com/article/10.1007/s12076-024-00375-x'
