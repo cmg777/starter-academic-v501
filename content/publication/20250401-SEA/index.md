@@ -151,29 +151,38 @@ All analyses are fully **reproducible in cloud-based Jupyter notebooks** via Goo
 ---
 
 ### 📊 Data Overview  
-- Unit of analysis: 5,562 municipalities (2007–2012).  
-- Violence proxied by change in homicide rate.  
-- Political variables: Party ID, alignment, abstention, etc.  
-- Socioeconomic variables: Population density, HDI, GINI, Bolsa Família, etc.  
+- **Unit of analysis**: 5,562 municipalities (2007–2012)  
+- **Dependent variable**: Change in homicide rate (Δ 2011–2012 vs. 2007–2008)  
+
+**Political Variables**  
+- Margin of victory (%)  
+- Party alignment with state governor  
+- Vote abstention (%)  
+- Mayor's party identification:  
+  - **Brazilian Democratic Movement Party (PMDB)**  
+  - **Brazilian Social Democracy Party (PSDB)**  
+  - **Workers' Party (PT)**  
+
+**Socioeconomic Variables**  
+- Population density 
+- Young male population (%) 
+- Gini index (income inequality)  
+- Human Development Index (HDI)  
+- Households headed by single mothers (%)  
+- Adult employment rate (%)  
+- Bolsa Família eligibility (%)  
+
 
 ---
 
 ### 🧭 Modeling Frameworks  
 - **OLS**: Global effect estimates.  
-- **GWR**: Localized effect estimates, single spatial scale.  
-- **MGWR**: Variable-specific scales, greater accuracy.  
+- **GWR**: Localized effect estimates with a single spatial scale.  
+- **MGWR**: Localized effect estimates　with multiple spatial scales.  
 
 ---
 
-### 📌 Key Descriptive Insights  
-- High variance in homicide rate across municipalities.  
-- **Brazilian Democratic Movement Party (PMDB)** was dominant;  
-  **Workers' Party (PT)** and **Brazilian Social Democracy Party (PSDB)** followed.  
-- Young male %, single-mother households, and population density linked to higher violence.  
-
----
-
-### 🔍 OLS Results Highlights  
+### 🔍 OLS Results 
 - **PMDB** mayors → Increased violence.  
 - **PT** & **PSDB** → No consistent effect.  
 - Vote abstention → Strongly linked to higher homicide rates.  
@@ -181,7 +190,7 @@ All analyses are fully **reproducible in cloud-based Jupyter notebooks** via Goo
 
 ---
 
-### 🗺️ GWR Findings: Political Variables  
+### 🗺️ GWR Results: Political Variables  
 - **PMDB**: Positive correlation in the northeast.  
 - **PT**: Violence-reducing in many regions.  
 - **PSDB**: Mixed effects—north (↑), south (↓).  
@@ -189,21 +198,14 @@ All analyses are fully **reproducible in cloud-based Jupyter notebooks** via Goo
 
 ---
 
-### 🧮 GWR Findings: Socioeconomic Variables  
+### 🧮 GWR Results: Socioeconomic Variables  
 - Population density & Bolsa Família → Heterogeneous effects.  
 - Young male % & single mothers → Generally increased violence.  
 - Effect direction & significance vary spatially.  
 
 ---
 
-### 📐 MGWR Advantages & Insights  
-- MGWR applies **individual bandwidths** per variable.  
-- Enables better capture of spatial heterogeneity and scale.  
-- More realistic modeling of violence determinants.  
-
----
-
-### 🗺️ MGWR: Political Variables  
+### 🗺️ MGWR Results: Political Variables  
 - **PMDB** still ↑ violence in northeast.  
 - **PSDB** now only ↓ violence in southern Brazil.  
 - **PT** effect mostly disappears after statistical corrections.  
@@ -211,7 +213,7 @@ All analyses are fully **reproducible in cloud-based Jupyter notebooks** via Goo
 
 ---
 
-### 🌆 MGWR: Socioeconomic Variables  
+### 🌆 MGWR Results: Socioeconomic Variables  
 - Bolsa Família: No significant impact.  
 - Young male %: Significant across more areas due to large spatial scale.  
 - Population density & single mothers: Small-scale, heterogeneous influence.  
@@ -230,9 +232,5 @@ All analyses are fully **reproducible in cloud-based Jupyter notebooks** via Goo
 - Confirms heterogeneity in violence determinants.  
 - Suggests need for regional, tailored policy interventions.  
 - Further investigation needed into residual violence clusters.  
-
-Perfect! Here's the new slide added to your presentation deck:
-
----
 
 
