@@ -63,19 +63,19 @@ links:
     icon_pack: ai
     icon: open-data
   - name: "Notebook: OLS"
-    url: "https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing"
+    url: "https://colab.research.google.com/drive/1B7LHLfO5EWVsW_HAH6xebSmiJWi0_Xtv?usp=sharing"
     icon_pack: ai
     icon: open-data
   - name: "Notebook: GWR"
-    url: "https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing"
+    url: "https://colab.research.google.com/drive/19COBTQysC1UtsKh4cMxWsDFQm_eU4BBV?usp=sharing"
     icon_pack: ai
     icon: open-data
   - name: "Notebook: MGWR"
-    url: "https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing"
+    url: "https://colab.research.google.com/drive/1MO5FluSwc3JnJ3a-oegYkH3NQsEhJH0E?usp=sharing"
     icon_pack: ai
     icon: open-data
   - name: "Notebook: GWR vs MGWR"
-    url: "https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing"
+    url: "https://colab.research.google.com/drive/14ZriYHYgyj8OxZUtn3rjoFZnsOrNcc2Q?usp=sharing"
     icon_pack: ai
     icon: open-data
 
