@@ -143,7 +143,7 @@ All analyses are fully **reproducible in cloud-based Jupyter notebooks** via Goo
 ---
 
 ### 🧪 Methodological Innovations  
-- Replicated R-based results using Python (Cloud-based jupyter notebooks).  
+- Used **cloud-based computational notebooks** for full replication and open science.  
 - Adopted **Multiscale Geographically Weighted Regression (MGWR)**.  
 - Identified persistent **geographical violence clusters**.  
 - Applied a **multiple testing correction** to ensure robustness.  
