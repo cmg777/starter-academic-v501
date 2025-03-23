@@ -58,11 +58,26 @@ links:
   #  url: "https://mapify.so/share-link/fGCoa7QgaP"
   #  icon_pack: fas
   #  icon: brain
-  - name: "Notebook: "
-    url: "https://bit.ly/project2022p"
+  - name: "Notebook: Stats"
+    url: "https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing"
     icon_pack: ai
     icon: open-data
-
+  - name: "Notebook: OLS"
+    url: "https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing"
+    icon_pack: ai
+    icon: open-data
+  - name: "Notebook: GWR"
+    url: "https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing"
+    icon_pack: ai
+    icon: open-data
+  - name: "Notebook: MGWR"
+    url: "https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing"
+    icon_pack: ai
+    icon: open-data
+  - name: "Notebook: GWR vs MGWR"
+    url: "https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing"
+    icon_pack: ai
+    icon: open-data
 
 #url_pdf: 'https://link.springer.com/article/10.1007/s12076-024-00375-x'
 #url_preprint: "https://www.overleaf.com/read/bzqgsrrmbbhc#9f94fc"
@@ -102,6 +117,24 @@ image:
 
 ---
 
+### 💻 Replication Notebooks  
+
+- All analyses are fully **reproducible in cloud-based Jupyter notebooks** via Google Colab:  
+
+
+📊 [1. Descriptive Statistics](https://colab.research.google.com/drive/1JmRZNIqa8CPtPlOpcN66GkM-X45f2Lkb?usp=sharing)
+
+📈 [2. Ordinary Least Squares (OLS](https://colab.research.google.com/drive/1B7LHLfO5EWVsW_HAH6xebSmiJWi0_Xtv?usp=sharing)
+
+🗺️ [3. Geographically Weighted Regression (GWR)](https://colab.research.google.com/drive/19COBTQysC1UtsKh4cMxWsDFQm_eU4BBV?usp=sharing)
+
+📐 [4. Multiscale GWR (MGWR)](https://colab.research.google.com/drive/1MO5FluSwc3JnJ3a-oegYkH3NQsEhJH0E?usp=sharing)
+
+🔄 [5. Comparing GWR vs MGWR Coefficients](https://colab.research.google.com/drive/14ZriYHYgyj8OxZUtn3rjoFZnsOrNcc2Q?usp=sharing)
+
+
+---
+
 ### 🌍 Introduction  
 - Territorial violence in Brazil exhibits strong spatial patterns.  
 - Builds on Ingram & Marchesini da Costa (2019) using MGWR.  
@@ -110,10 +143,10 @@ image:
 ---
 
 ### 🧪 Methodological Innovations  
-- ✅ Replicated R-based results using Python (Cloud-based jupyter notebooks).  
-- ✅ Adopted **Multiscale Geographically Weighted Regression (MGWR)**.  
-- ✅ Identified persistent **geographical violence clusters**.  
-- ✅ Applied a **multiple testing correction** to ensure robustness.  
+- Replicated R-based results using Python (Cloud-based jupyter notebooks).  
+- Adopted **Multiscale Geographically Weighted Regression (MGWR)**.  
+- Identified persistent **geographical violence clusters**.  
+- Applied a **multiple testing correction** to ensure robustness.  
 
 ---
 
@@ -198,7 +231,8 @@ image:
 - Suggests need for regional, tailored policy interventions.  
 - Further investigation needed into residual violence clusters.  
 
+Perfect! Here's the new slide added to your presentation deck:
 
-
+---
 
 
