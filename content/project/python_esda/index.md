@@ -33,7 +33,12 @@ This notebook provides an interactive geocomputational tool to study spatial clu
 > Access the notebook [HERE](https://colab.research.google.com/drive/1JHf8wPxSxBdKKhXaKQZUzhEpVznKGiep?usp=sharing) and the Streamlit web app [HERE](https://esda101-bolivia339.streamlit.app/)
 
 
-<iframe title="Embedded cell output" src="https://embed.deepnote.com/ca3b9ea3-6231-4e68-a181-0ac030c8e452/e6645c01c3ac4d0ba38c1c13d4841229/3996aff8c4d041589ad763f52a526110?height=674.6015625" height="674.6015625" width="500"/>
-
+<div style="width: 800px; height: 600px; position: relative;"> 
+    <iframe 
+        title="Contained Full Size Deepnote Cell Output" 
+        src="https://embed.deepnote.com/ca3b9ea3-6231-4e68-a181-0ac030c8e452/e6645c01c3ac4d0ba38c1c13d4841229/3996aff8c4d041589ad763f52a526110?height=674.6015625" 
+        style="width: 100%; height: 100%; border: none;"
+    ></iframe>
+</div>
 
 
