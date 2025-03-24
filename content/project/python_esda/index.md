@@ -12,7 +12,7 @@ links:
 - icon: open-data
   icon_pack: ai
   name: "Streamlit web app"
-  url: https://esda101apppy-9tfhzlscjggqshk3hk7qow.streamlit.app/
+  url: https://esda101-bolivia339.streamlit.app/
 slides:
 summary: An interactive geocomputational notebook to study spatial clusters and outliers
 tags:
@@ -29,6 +29,11 @@ url_video: ""
 
 # **A geocomputational notebook to study Exploratory Spatial Data Analysis (ESDA)**
 
+
+<iframe
+  src="https://esda101-bolivia339.streamlit.app/?embed=true"
+  style="height: 450px; width: 100%;"
+></iframe>
 
 
 
