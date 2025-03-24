@@ -27,15 +27,18 @@ url_video: ""
 ---
 
 <style>
+/* Ensure iframe container spans full width */
 .iframe-container {
+  position: relative;
   width: 100vw; /* Full viewport width */
   margin-left: calc(50% - 50vw); /* Center align */
 }
 
+/* Style iframe for full width and fixed height */
 .iframe-container iframe {
-  width: 100%; /* Full width of the container */
+  width: 100%; /* Full width of container */
   height: 800px; /* Adjust height as needed */
-  border: none; /* Remove border for a clean look */
+  border: none; /* Remove border for clean look */
 }
 </style>
 
@@ -45,5 +48,7 @@ url_video: ""
   <iframe
     src="https://esda101-bolivia339.streamlit.app/?embed=true"
     title="Streamlit App"
+    allowfullscreen
+    loading="lazy"
   ></iframe>
 </div>
