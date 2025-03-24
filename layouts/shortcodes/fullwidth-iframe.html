@@ -1,0 +1,9 @@
+<div class="full-width-iframe-container">
+    <iframe src="{{ .Get "src" }}"
+            width="100%"
+            height="{{ .Get "height" | default "800px" }}"
+            frameborder="0"
+            allowfullscreen
+            loading="lazy">
+    </iframe>
+</div>
