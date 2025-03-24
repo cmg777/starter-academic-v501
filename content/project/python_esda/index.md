@@ -27,7 +27,14 @@ url_video: ""
 ---
 
 <style>
-/* Ensure the iframe container spans full width */
+/* Style for the initial content */
+.initial-content {
+  max-width: 800px; /* Constrain the width for readability */
+  margin: auto; /* Center align */
+  padding-bottom: 20px; /* Add spacing below the content */
+}
+
+/* Full-width iframe container */
 .full-width-container {
   position: relative;
   width: 100vw; /* Full viewport width */
@@ -38,12 +45,6 @@ url_video: ""
   width: 100%; /* Full width of container */
   height: 800px; /* Adjust height as needed */
   border: none; /* Remove border for clean look */
-}
-
-/* Optional styling for initial content to keep it constrained */
-.initial-content {
-  max-width: 800px; /* Constrain initial content width */
-  margin: auto; /* Center align initial content */
 }
 </style>
 
