@@ -25,7 +25,6 @@ url_pdf: ""
 url_slides: ""
 url_video: ""
 ---
-
 <style>
 /* Style for the initial content */
 .initial-content {
@@ -33,27 +32,28 @@ url_video: ""
   margin: auto; /* Center align */
   padding-bottom: 20px; /* Add spacing below the content */
 }
-
-/* Full-width iframe container */
+/* Full-width iframe container - fixed to ensure it takes full width */
 .full-width-container {
   position: relative;
-  width: 100vw; /* Full viewport width */
-  margin-left: calc(50% - 50vw); /* Center align */
+  width: 100vw !important; /* Force full viewport width */
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw !important;
+  margin-right: -50vw !important;
+  max-width: 100vw !important; /* Ensure no constraints from parent elements */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
-
 .full-width-container iframe {
-  width: 100%; /* Full width of container */
+  display: block; /* Remove inline spacing */
+  width: 100% !important; /* Force full width */
   height: 800px; /* Adjust height as needed */
   border: none; /* Remove border for clean look */
 }
 </style>
-
 <div class="initial-content">
 # **A geocomputational notebook to study Exploratory Spatial Data Analysis (ESDA)**
-
 This notebook provides an interactive geocomputational tool to study spatial clusters and outliers. It includes features like map controls, dataset exploration, and visualizations. Use the controls below to explore the data.
 </div>
-
 <div class="full-width-container">
   <iframe
     src="https://esda101-bolivia339.streamlit.app/?embed=true"
