@@ -32,7 +32,7 @@ url_video: ""
 
 <iframe
   src="https://esda101-bolivia339.streamlit.app/?embed=true"
-  style="height: 450px; width: 100%;"
+  style="height: 100%; width: 100%;"
 ></iframe>
 
 
