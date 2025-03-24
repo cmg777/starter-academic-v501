@@ -27,14 +27,24 @@ url_video: ""
 ---
 
 <style>
-/* Ensure iframe container spans full width */
+/* Override theme constraints */
+body {
+  overflow-x: hidden;
+}
+
+.article-container, .post-content {
+  max-width: 100vw !important; /* Ensure the content spans full width */
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Full-width iframe styling */
 .iframe-container {
   position: relative;
   width: 100vw; /* Full viewport width */
   margin-left: calc(50% - 50vw); /* Center align */
 }
 
-/* Style iframe for full width and fixed height */
 .iframe-container iframe {
   width: 100%; /* Full width of container */
   height: 800px; /* Adjust height as needed */
