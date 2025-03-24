@@ -30,6 +30,8 @@ url_video: ""
 
 This notebook provides an interactive geocomputational tool to study spatial clusters and outliers. It includes features like map controls, dataset exploration, and visualizations. Use the controls below to explore the data.
 
+{{< fullwidth-iframe src="https://esda101-bolivia339.streamlit.app/?embed=true" height="800px" >}}
+
 
 <style>
 .full-width-iframe-container {
@@ -44,4 +46,3 @@ This notebook provides an interactive geocomputational tool to study spatial clu
 }
 </style>
 
-{{< fullwidth-iframe src="https://esda101-bolivia339.streamlit.app/?embed=true" height="800px" >}}
