@@ -47,7 +47,7 @@ body {
 
 .iframe-container iframe {
   width: 100%; /* Full width of container */
-  height: 800px; /* Adjust height as needed */
+  height: 1200px; /* Adjust height as needed */
   border: none; /* Remove border for clean look */
 }
 </style>
