@@ -28,7 +28,7 @@ url_video: ""
 
 # A geocomputational notebook to study Exploratory Spatial Data Analysis (ESDA)
 
-This notebook provides an interactive geocomputational tool to study spatial clusters and outliers. It includes features like map controls, dataset exploration, and visualizations.  Use the controls below to explore the data.
+This notebook provides an interactive geocomputational tool to study spatial clusters and outliers. It includes features like map controls, dataset exploration, and visualizations.
 
 
 <body>
