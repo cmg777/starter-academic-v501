@@ -30,7 +30,16 @@ url_video: ""
 
 This notebook provides an interactive geocomputational tool to study spatial clusters and outliers. It includes features like map controls, dataset exploration, and visualizations. Use the controls below to explore the data.
 
+
 {{< iframe-container src="https://esda101-bolivia339.streamlit.app/?embed=true" title="ESDA Streamlit App" >}}
+
+{{/* Define the shortcode inline */}}
+{{ $_hugo_config := `{ "version": 1 }` }}
+{{ define "iframe-container" }}
+<div class="iframe-container">
+    <iframe src="{{ .Get "src" }}" title="{{ .Get "title" | default "Embedded Content" }}" width="100%" height="100%" style="border:none;"></iframe>
+</div>
+{{ end }}
 
 <style>
 .iframe-container {
@@ -50,11 +59,3 @@ This notebook provides an interactive geocomputational tool to study spatial clu
     border: none;
 }
 </style>
-
-{{/* Define the shortcode inline */}}
-{{ $_hugo_config := `{ "version": 1 }` }}
-{{ define "iframe-container" }}
-<div class="iframe-container" style="position: relative; width: 100%; padding-bottom: {{ .Get "aspect-ratio" | default "56.25%" }}; height: 0; overflow: hidden;">
-    <iframe src="{{ .Get "src" }}" title="{{ .Get "title" | default "Embedded Content" }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
-</div>
-{{ end }}
