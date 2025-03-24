@@ -32,17 +32,15 @@ This notebook provides an interactive geocomputational tool to study spatial clu
 
 {{< fullwidth-iframe src="https://esda101-bolivia339.streamlit.app/?embed=true" height="800px" >}}
 
-
 <style>
 .full-width-iframe-container {
-    width: 100vw; /* Use 100% of the viewport width */
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%); /* Center the container */
-    overflow-x: hidden; /* Prevent horizontal scrollbars */
+    width: 100vw !important; /* Use 100% of the viewport width */
+    position: relative !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important; /* Center the container */
+    overflow-x: hidden !important; /* Prevent horizontal scrollbars */
 
     /* Add padding/margin to the container if you want space around the iframe: */
-    padding: 20px; /* Example: Add 20px padding on all sides */
+    padding: 20px !important; /* Example: Add 20px padding on all sides */
 }
 </style>
-
