@@ -30,10 +30,16 @@ url_video: ""
 # **A geocomputational notebook to study Exploratory Spatial Data Analysis (ESDA)**
 
 
-<iframe
-  src="https://esda101-bolivia339.streamlit.app/?embed=true"
-  style="height: 800px; width: 100%;"
-></iframe>
+.fullwidth-iframe {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  height: 500px; /* Adjust as needed */
+}
+
+<iframe src="https://esda101-bolivia339.streamlit.app/?embed=true" class="fullwidth-iframe"></iframe>
+
+
+
 
 
 
