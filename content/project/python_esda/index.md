@@ -26,17 +26,24 @@ url_slides: ""
 url_video: ""
 ---
 
+<style>
+.iframe-container {
+  width: 100vw; /* Full viewport width */
+  margin-left: calc(50% - 50vw); /* Center align */
+}
+
+.iframe-container iframe {
+  width: 100%; /* Full width of the container */
+  height: 800px; /* Adjust height as needed */
+  border: none; /* Remove border for a clean look */
+}
+</style>
 
 # **A geocomputational notebook to study Exploratory Spatial Data Analysis (ESDA)**
 
-
-<iframe
-  src="https://esda101-bolivia339.streamlit.app/?embed=true"
-  style="height: 1200px; width: 100%;"
-></iframe>
-
-
-
-
-
-
+<div class="iframe-container">
+  <iframe
+    src="https://esda101-bolivia339.streamlit.app/?embed=true"
+    title="Streamlit App"
+  ></iframe>
+</div>
