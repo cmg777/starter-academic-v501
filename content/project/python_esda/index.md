@@ -37,6 +37,12 @@ This [interactive application](https://esda101-bolivia339.streamlit.app/) enable
 
 > ⚠️ This application is open source and still work in progress. Source code is available at: [github.com/cmg777/streamlit_esda101](https://github.com/cmg777/streamlit_esda101)
 
+<!-- Add script to the <head> of your page to load the embeddable map component -->
+<script type="module" src="https://js.arcgis.com/embeddable-components/4.32/arcgis-embeddable-components.esm.js"></script>
+<!-- Add custom element to <body> of your page -->
+ <arcgis-embedded-map style="height:600px;width:700px;" item-id="eeb5d375c75246509daeae554e1003b4" theme="dark" legend-enabled share-enabled portal-url="https://www.arcgis.com" ></arcgis-embedded-map>
+
+
 ---
 
 
