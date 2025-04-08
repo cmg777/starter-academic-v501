@@ -1,5 +1,5 @@
 ---
-date: "2024-04-08T00:00:00Z"
+date: "2025-04-08T00:00:00Z"
 external_link: ""
 image:
   caption: ""
@@ -16,6 +16,18 @@ url_slides: ""
 url_video: ""
 ---
 
-## ESDA
 
-Mendez C. (2024). Exploratory spatial data analysis of municipal development in Bolivia.
+
+## Exploratory data analysis
+
+- Mendez C. (2024). [Exploratory spatial data analysis of municipal development in Bolivia.](https://colab.research.google.com/drive/1JHf8wPxSxBdKKhXaKQZUzhEpVznKGiep?usp=sharing)
+
+## Causal inference
+
+- TBA
+- TBA
+
+## Machine learnig
+
+- TBA
+- TBA
