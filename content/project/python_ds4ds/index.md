@@ -47,7 +47,7 @@ url_video: ""
 - TBA
 - TBA
 
-## Machine learnig
+## Machine learning
 
 - TBA
 - TBA
