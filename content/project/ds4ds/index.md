@@ -24,7 +24,7 @@ url_video: ""
 
 ## Basic statistics
 
-- TBA
+- Mendez C. (2024) [Gapminder introduction to data science and statistics using Python](https://colab.research.google.com/drive/1yQXb87X9SlwzJue_C5VQkWwnuf-RRSKH?usp=sharing)
 - TBA
 
 ## Basic econometrics
