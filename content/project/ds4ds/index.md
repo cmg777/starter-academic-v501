@@ -24,8 +24,9 @@ url_video: ""
 
 ## Basic statistics
 
+- Mendez C. (2025) [Introduction to statistics (real differences and relationships) using Python](https://colab.research.google.com/drive/18Wt4yk0cXZQqWY5CRZ9GtyXf_DxvqeP6?usp=sharing)
 - Mendez C. (2024) [Gapminder introduction to data science and statistics using Python](https://colab.research.google.com/drive/1yQXb87X9SlwzJue_C5VQkWwnuf-RRSKH?usp=sharing)
-- TBA
+- 
 
 ## Basic econometrics
 
