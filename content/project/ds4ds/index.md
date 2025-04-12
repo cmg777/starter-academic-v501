@@ -47,7 +47,7 @@ url_video: ""
 
 ## Causal inference
 
-- TBA
+- Mendez C. (2024) [Heterogeneous treatment effects via two-stage DID using R](https://colab.research.google.com/drive/1A5zxj9SU8phTTCHBkt1fQkFX1xhFbycI?usp=sharing)
 - TBA
 
 ## Machine learning
