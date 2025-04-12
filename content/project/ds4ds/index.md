@@ -38,7 +38,7 @@ url_video: ""
 - Mendez C. (2025) [Introduction to growth equations using Python](https://colab.research.google.com/drive/1HexTTpbPJclnpc6gfRKxl46s5t4FYSEH?usp=sharing)
 - Mendez C. &  Leiva F. (2023) [The Solow growth model and its convergence prediction using Python](https://colab.research.google.com/drive/1mTgF08Jbf6oNxONbGHyWJZrkygiX0E9N?usp=sharing)
 - Mendez C. (2023) [The Solow growth model and its convergence prediction using R](https://colab.research.google.com/drive/1MbagABPt4e38e6LhgLuaoBCheuA7ZJ85?usp=sharing)
-
+- Mendez C. (2021) [Convergence clubs in labor productivity and its proximate sources using R](https://colab.research.google.com/drive/1GjO43UJIhtqX39qja5yUl4j9suwKIpMl?usp=sharing)
 
 ## Exploratory data analysis
 
