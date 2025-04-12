@@ -9,7 +9,7 @@ tags:
 - spatial
 - python
 - regional
-title: Data science for development studies (DS4DS)
+title: Data science notebooks for development studies (DSN4DS)
 url_code: ""
 url_pdf: ""
 url_slides: ""
@@ -26,11 +26,11 @@ url_video: ""
 
 - Mendez C. (2025) [Introduction to statistical differences and relationships using Python](https://colab.research.google.com/drive/18Wt4yk0cXZQqWY5CRZ9GtyXf_DxvqeP6?usp=sharing)
 - Mendez C. (2024) [Gapminder introduction to data science using Python](https://colab.research.google.com/drive/1yQXb87X9SlwzJue_C5VQkWwnuf-RRSKH?usp=sharing)
-- 
+- Mendez C. (2024) [Descriptive statistics and multi-boundary mapping using Pyton](https://colab.research.google.com/drive/19VEvdgzQaoZ-Hind9Nrb8LEw_RFMCxPW?usp=sharing)
 
 ## Basic econometrics
 
-- TBA
+- Mendez C. (2025) [OLS regressions and stargazer tables using Python](https://colab.research.google.com/drive/1QDPBuwW5-Ty7rL4bif7ldxVJ1B9F5e9O?usp=sharing)
 - TBA
 
 ## Economic growth and development
