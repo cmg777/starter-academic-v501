@@ -16,6 +16,11 @@ url_slides: ""
 url_video: ""
 ---
 
+How to cite this project:
+
+> Mendez C. (2025) Computational Data Science Notebooks for Development Studies. Zenodo [https://doi.org/10.5281/zenodo.15250204](https://doi.org/10.5281/zenodo.15250204)
+
+Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://github.com/cmg777/ds4ds)
 
 ## Basic economics
 
