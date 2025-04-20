@@ -26,12 +26,6 @@ url_slides: ""
 url_video: ""
 ---
 
-<iframe
-    src="https://cmg777.github.io/open-results/files/mapBolivia339imds.html"
-    style="width:100%; height:6in; border:none;">
-</iframe>
-
-
 
 # Exploratory Spatial Data Analysis (ESDA) of Regional Development
 
@@ -41,6 +35,20 @@ This [interactive application](https://esda101-bolivia339.streamlit.app/) enable
 - 📈 Distribution and comparative analysis tools  
 - 💾 Downloadable datasets  
 - 🧮 Access to a cloud-based computational notebook on [Google Colab](https://colab.research.google.com/drive/1JHf8wPxSxBdKKhXaKQZUzhEpVznKGiep?usp=sharing)  
+
+<iframe
+    src="https://cmg777.github.io/open-results/files/mapBolivia339imds.html"
+    style="width:100%; height:6in; border:none;">
+</iframe>
+
+
+Another style with flexibility 
+
+
+<iframe
+    src="https://cmg777.github.io/open-results/files/mapBolivia339imds.html"
+    style="width:100%; height:100vh; border:none;">
+</iframe>
 
 > ⚠️ This application is open source and still work in progress. Source code is available at: [github.com/cmg777/streamlit_esda101](https://github.com/cmg777/streamlit_esda101)
 
