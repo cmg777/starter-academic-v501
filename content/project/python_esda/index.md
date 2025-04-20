@@ -28,8 +28,9 @@ url_video: ""
 
 <iframe
     src="https://cmg777.github.io/open-results/files/mapBolivia339imds.html"
-    style="width:100%; height:100%; border:none;">
+    style="width:100%; height:6in; border:none;">
 </iframe>
+
 
 
 # Exploratory Spatial Data Analysis (ESDA) of Regional Development
