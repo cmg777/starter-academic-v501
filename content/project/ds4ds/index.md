@@ -9,7 +9,7 @@ tags:
 - spatial
 - python
 - regional
-title: Data science notebooks for development studies (DSN4DS)
+title: Computational data science notebooks for development studies
 url_code: ""
 url_pdf: ""
 url_slides: ""
