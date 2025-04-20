@@ -38,15 +38,6 @@ This [interactive application](https://esda101-bolivia339.streamlit.app/) enable
 
 <iframe
     src="https://cmg777.github.io/open-results/files/mapBolivia339imds.html"
-    style="width:100%; height:6in; border:none;">
-</iframe>
-
-
-Another style with flexibility 
-
-
-<iframe
-    src="https://cmg777.github.io/open-results/files/mapBolivia339imds.html"
     style="width:100%; height:100vh; border:none;">
 </iframe>
 
