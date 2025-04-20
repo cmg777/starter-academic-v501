@@ -32,6 +32,7 @@ Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://git
 ## Basic econometrics
 
 - Mendez C. (2025) [OLS regressions and stargazer tables using Python](https://colab.research.google.com/drive/1QDPBuwW5-Ty7rL4bif7ldxVJ1B9F5e9O?usp=sharing)
+- Mendez C. (2025) [OLS regressions and stargazer tables using R](https://colab.research.google.com/drive/1PHLfFIIMRO5BIQ2v3g9XPFhIsHBVrGVz?usp=sharing)
 - TBA
 
 ## Economic growth and development
