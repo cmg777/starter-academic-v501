@@ -70,5 +70,5 @@ Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://git
 
 ## Feature engineering and geocomputation
 
-- TBA
+- Mendez C. (2025) [Regional dynamics of luminosity-based using Google Earth Engine](https://code.earthengine.google.com/b8a4fa3a96056d220bcb31b6a561cb1e)
 - TBA
