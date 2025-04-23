@@ -23,17 +23,13 @@ How to cite this project:
 Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://github.com/cmg777/ds4ds)
 
 
-## Basic statistics
+## Basic statistics and econometrics
 
 - Mendez C. (2024) [Gapminder introduction to data science using Python](https://colab.research.google.com/drive/1yQXb87X9SlwzJue_C5VQkWwnuf-RRSKH?usp=sharing)
 - Mendez C. (2025) [Introduction to statistical differences and relationships using Python](https://colab.research.google.com/drive/18Wt4yk0cXZQqWY5CRZ9GtyXf_DxvqeP6?usp=sharing)
 - Mendez C. (2024) [Descriptive statistics and multi-boundary mapping using Python](https://colab.research.google.com/drive/19VEvdgzQaoZ-Hind9Nrb8LEw_RFMCxPW?usp=sharing)
+- Mendez C. (2025) [Use regressions to explore relationships](https://colab.research.google.com/drive/16MAqYI-SWOT6GmZHDko1PHJFWu-bkc8-?usp=sharing)
 
-## Basic econometrics
-
-- Mendez C. (2025) [OLS regressions and stargazer tables using Python](https://colab.research.google.com/drive/1QDPBuwW5-Ty7rL4bif7ldxVJ1B9F5e9O?usp=sharing)
-- Mendez C. (2025) [OLS regressions and stargazer tables using R](https://colab.research.google.com/drive/1PHLfFIIMRO5BIQ2v3g9XPFhIsHBVrGVz?usp=sharing)
-- TBA
 
 ## Economic growth and development
 
