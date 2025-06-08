@@ -44,6 +44,10 @@ links:
 #    url: "https://youtu.be/srNtOUf_e_w?si=ccLDJ7WWtafc6Gag"
 #    icon_pack: fab
 #    icon: youtube
+  - name: "AI Chatbot"
+    url: "https://notebooklm.google.com/notebook/1c806ac1-e15b-4e67-a575-bf5bf3080fb6"
+    icon_pack: fa
+    icon: comments
   - name: "AI Podcast"
     url: "https://youtu.be/K1yj-Aw2Vlg"
     icon_pack: fas
