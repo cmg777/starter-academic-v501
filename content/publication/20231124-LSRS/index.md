@@ -35,7 +35,7 @@ tags:
 - Indonesia
 
 
-featured: true
+featured: false
 
 links:
   - name: "AI Video"
