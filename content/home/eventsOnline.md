@@ -45,7 +45,7 @@ design:
 
 <center>
 {{% callout note %}}
-Search for other events at <https://lu.ma/cmg>.
+Search other events at <https://lu.ma/cmg>.
 <br>
 {{% /callout %}}
 </center>
