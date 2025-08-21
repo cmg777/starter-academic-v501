@@ -31,14 +31,13 @@ design:
 
 
 <iframe
-  src="https://lu.ma/embed/calendar/cal-xWNE07b0pNnTnJE/events"
-  width="600"
-  height="450"
-  frameborder="0"
-  style="border: 1px solid #bfcbda88; border-radius: 4px;"
-  allowfullscreen=""
-  aria-hidden="false"
-  tabindex="0"
+  src="https://lu.ma/embed/calendar/cal-xWNE07b0pNnTnJE/events"
+  height="450"
+  frameborder="0"
+  style="border: 1px solid #bfcbda88; border-radius: 4px; width: 100%;"
+  allowfullscreen=""
+  aria-hidden="false"
+  tabindex="0"
 ></iframe>
 
 
@@ -46,7 +45,7 @@ design:
 
 <center>
 {{% callout note %}}
-https://lu.ma/cmg
+Search for other events at <https://lu.ma/cmg>.
 <br>
 {{% /callout %}}
 </center>
