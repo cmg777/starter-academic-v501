@@ -30,12 +30,22 @@ design:
 
 
 
+<iframe
+  src="https://lu.ma/embed/calendar/cal-xWNE07b0pNnTnJE/events"
+  height="450"
+  frameborder="0"
+  style="border: 1px solid #bfcbda88; border-radius: 4px; width: 100%;"
+  allowfullscreen=""
+  aria-hidden="false"
+  tabindex="0"
+></iframe>
+
 
 <br>
 
 <center>
 {{% callout note %}}
-https://lu.ma/quarcs
+Search other events at <https://lu.ma/cmg>.
 <br>
 {{% /callout %}}
 </center>

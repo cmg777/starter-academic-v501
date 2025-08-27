@@ -51,12 +51,13 @@ Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://git
 
 ## Machine learning
 
-- TBA
+- Mendez C. (2025) [Introductory machine learning for econometrics: Exploring the Mincer equation in Python](https://colab.research.google.com/drive/1dV4eylUEGUWFRknaK7yK-kTgt_QtpO_G?usp=sharing)
 - TBA
   
 ## Spatial econometrics
 
 - TBA
+
 - TBA
   
 ## Bayesian econometrics
