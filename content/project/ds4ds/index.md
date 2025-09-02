@@ -4,12 +4,12 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: Computational data science notebooks to foster development studies.
+summary: Computational data science notebooks and apps to foster development studies.
 tags:
 - spatial
 - python
 - regional
-title: Computational data science notebooks for development studies
+title: Computational data science notebooks and apps for development studies
 url_code: ""
 url_pdf: ""
 url_slides: ""
@@ -18,7 +18,7 @@ url_video: ""
 
 How to cite this project:
 
-> Mendez C. (2025) Computational Data Science Notebooks for Development Studies. Zenodo [https://doi.org/10.5281/zenodo.15250204](https://doi.org/10.5281/zenodo.15250204)
+> Mendez C. (2025) Computational Data Science Notebooks and Apps for Development Studies. Zenodo [https://doi.org/10.5281/zenodo.15250204](https://doi.org/10.5281/zenodo.15250204)
 
 Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://github.com/cmg777/ds4ds)
 
@@ -27,6 +27,8 @@ Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://git
 
 - Mendez C. (2024) [Gapminder introduction to data science using Python](https://colab.research.google.com/drive/1yQXb87X9SlwzJue_C5VQkWwnuf-RRSKH?usp=sharing)
 - Mendez C. (2025) [Introduction to statistical differences and relationships using Python](https://colab.research.google.com/drive/18Wt4yk0cXZQqWY5CRZ9GtyXf_DxvqeP6?usp=sharing)
+- Mendez C. (2025) [Statistics is about differences, relationships, and predictions]
+(https://colab.research.google.com/drive/17GPVtS4VaFgZaazDca9zYG46hxEZLzWN?usp=sharing)
 - Mendez C. (2024) [Descriptive statistics and multi-boundary mapping using Python](https://colab.research.google.com/drive/19VEvdgzQaoZ-Hind9Nrb8LEw_RFMCxPW?usp=sharing)
 - Mendez C. (2025) [Use regressions to explore relationships using Python](https://colab.research.google.com/drive/16MAqYI-SWOT6GmZHDko1PHJFWu-bkc8-?usp=sharing)
 
@@ -52,7 +54,7 @@ Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://git
 ## Machine learning
 
 - Mendez C. (2025) [Introductory machine learning for econometrics: Exploring the Mincer equation in Python](https://colab.research.google.com/drive/1dV4eylUEGUWFRknaK7yK-kTgt_QtpO_G?usp=sharing)
-- TBA
+- Mendez C. (2025) [An interactive app to learn SHAP plots with XGBoost predictions](https://g.co/gemini/share/f3436ed96fe7)
   
 ## Spatial econometrics
 
