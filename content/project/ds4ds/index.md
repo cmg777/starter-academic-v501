@@ -27,8 +27,7 @@ Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://git
 
 - Mendez C. (2024) [Gapminder introduction to data science using Python](https://colab.research.google.com/drive/1yQXb87X9SlwzJue_C5VQkWwnuf-RRSKH?usp=sharing)
 - Mendez C. (2025) [Introduction to statistical differences and relationships using Python](https://colab.research.google.com/drive/18Wt4yk0cXZQqWY5CRZ9GtyXf_DxvqeP6?usp=sharing)
-- Mendez C. (2025) [Statistics is about differences, relationships, and predictions]
-(https://colab.research.google.com/drive/17GPVtS4VaFgZaazDca9zYG46hxEZLzWN?usp=sharing)
+- Mendez C. (2025) [Statistics is about differences, relationships, and predictions](https://colab.research.google.com/drive/17GPVtS4VaFgZaazDca9zYG46hxEZLzWN?usp=sharing)
 - Mendez C. (2024) [Descriptive statistics and multi-boundary mapping using Python](https://colab.research.google.com/drive/19VEvdgzQaoZ-Hind9Nrb8LEw_RFMCxPW?usp=sharing)
 - Mendez C. (2025) [Use regressions to explore relationships using Python](https://colab.research.google.com/drive/16MAqYI-SWOT6GmZHDko1PHJFWu-bkc8-?usp=sharing)
 
