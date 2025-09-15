@@ -4,7 +4,7 @@ event: "International and interdisciplinary workshop, Royal University of Phenom
 event_url: https://luma.com/ebw5y0k4
 location: Phenom Penh, Cambodia
 summary:  "International and Interdisciplinary Workshop, Royal University of Phnom Penh"    
-abstract: "_"
+abstract: "The Asian Satellite Campuses Institute (ASCI), the Graduate School of International Development (GSID), and the Institute for Space–Earth Environmental Research (ISEE) at Nagoya University, in collaboration with the Royal University of Phnom Penh and the United Nations Development Programme (UNDP) in Cambodia, are convening a hybrid research workshop titled “Development Studies in the Age of AI: New Data, New Methods, and New Insights. This hybrid workshop (on-site and online) provides an interdisciplinary platform to advance research on sustainable development in Cambodia and Asia by integrating satellite imagery with socioeconomic data."
 
 # Talk start and end times.
 #   End time can optionally be hidden by prefixing the line with `#`.
@@ -74,5 +74,17 @@ math: true
   </iframe>
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGye-QAKJY&#x2F;W0nsfoueC3jXXgojBCFhOQ&#x2F;view?utm_content=DAGye-QAKJY&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Slides</a> by Carlos Mendez
+
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe 
+    src="https://carlos-mendez.notion.site/SLIDES-Development-studies-in-the-age-of-AI-26ba08da773f80969ae8e5ca86934856?source=copy_link" 
+    title="Notion Slides: Development Studies in the Age of AI" 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" 
+    allowfullscreen>
+  </iframe>
+</div>
+
+Source: <https://bit.ly/gdo-cambodia>
 
 
