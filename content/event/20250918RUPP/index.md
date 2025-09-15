@@ -75,16 +75,6 @@ math: true
 </div>
 <a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAGye-QAKJY&#x2F;W0nsfoueC3jXXgojBCFhOQ&#x2F;view?utm_content=DAGye-QAKJY&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">Slides</a> by Carlos Mendez
 
-
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-  <iframe 
-    src="https://carlos-mendez.notion.site/SLIDES-Development-studies-in-the-age-of-AI-26ba08da773f80969ae8e5ca86934856?source=copy_link" 
-    title="Notion Slides: Development Studies in the Age of AI" 
-    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" 
-    allowfullscreen>
-  </iframe>
-</div>
-
 Source: <https://bit.ly/gdo-cambodia>
 
 
