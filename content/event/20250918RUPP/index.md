@@ -8,7 +8,7 @@ abstract: "The Asian Satellite Campuses Institute (ASCI), the Graduate School of
 
 # Talk start and end times.
 #   End time can optionally be hidden by prefixing the line with `#`.
-date: "2025-09-18T10:10:00Z"
+date: "2025-09-18T14:00:00Z"
 #date_end: "2030-06-01T15:00:00Z"
 all_day: false
 
