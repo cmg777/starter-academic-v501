@@ -18,7 +18,7 @@ url_video: "https://youtu.be/9CcppQpArWI?si=j4-eerh6SIRTpC9E"
 
 How to cite this project:
 
-> Mendez C., Khoun T., Poortinga A. (2025) GeoDevelopment Observatory of Cambodia. https://bit.ly/gdo-cambodia](https://bit.ly/gdo-cambodia)
+> Mendez C., Khoun T., Poortinga A. (2025) GeoDevelopment Observatory of Cambodia.[https://bit.ly/gdo-cambodia](https://bit.ly/gdo-cambodia)
 
 
 The GeoDevelopment Observatory (GDO) of Cambodia provides a public access platform for the analysis, monitoring, and evaluation of sustainable regional development. The observatory integrates environmental, social, and economic indicators—designated as GeoDevelopment Indicators—collected from satellite imagery, ground-based surveys, and administrative records. These multi-dimensional datasets are analyzed using AI-enhanced computational notebooks and specialized web applications within the GeoDevelopment Tools framework. The technical analyses are then converted into GeoDevelopment Insights, which present the data in accessible formats for different user groups. Researchers utilize the platform for conducting empirical analyses, decision-makers access it for policy development and implementation, and citizens engage with it to understand development patterns in their regions. This systematic approach facilitates the transformation of complex sustainability data into usable information for monitoring progress, evaluating interventions, and informing sustainable regional development policies. 
