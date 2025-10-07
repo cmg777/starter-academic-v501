@@ -1,11 +1,11 @@
 ---
 title: "Mapping the dimensions of poverty through big data, socioeconomic surveys and machine learning in Cambodia"
 authors:
-- Khoun 
-- Poortinga 
-- Thwal 
-- Gonzalez de Alba
-- McMahon
+- Khoun Theara
+- Poortinga Ate
+- Thwal Soe
+- Gonzalez de Alba 
+- McMahon Andrea
 - admin
 
 
