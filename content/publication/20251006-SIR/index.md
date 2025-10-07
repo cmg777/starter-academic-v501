@@ -170,9 +170,7 @@ Notes: The Random Forest algorithm was selected due to robustness and ability to
 
 **Living Standards (6):** Cooking fuel, sanitation, water, electricity, housing, assets
 
-Notes:
-
-Ten indicators were chosen following the Global MPI. Equal weights applied across three main dimensions. These indicators reflect SDG priorities like education, health, clean water, and energy.
+Notes: Ten indicators were chosen following the Global MPI. Equal weights applied across three main dimensions. These indicators reflect SDG priorities like education, health, clean water, and energy.
 
 ---
 
