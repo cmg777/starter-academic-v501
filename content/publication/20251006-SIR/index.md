@@ -63,11 +63,11 @@ links:
 #    url: "https://carlos-mendez.my.canva.site/project2022p-india-ntl-images-geo-notebook-for-processing-and-exploration"
 #    icon_pack: fas
 #    icon: tv
-#  - name: "Colab notebook"
-#    url: "https://bit.ly/project2022p"
-#    icon_pack: ai
-#    icon: open-data
-  - name: "Published article (Open Access)"
+  - name: "Poverty Mapping Tool"
+    url: "https://cambodiapovertymapping.sig-gis.com/map"
+    icon_pack: ai
+    icon: open-data
+  - name: "Published Article (Open Access)"
     url: "https://doi.org/10.1007/s11205-025-03718-3"
     icon_pack: fas
     icon: university
