@@ -208,7 +208,7 @@ Notes: While promising, ML struggles when data lack spatial correlation. Improve
 
 ---
 
-# ✅ Conclusion
+### ✅ Conclusion
 
 - **10 MPI indicators mapped** using EO + survey + ML
 - Best results for **infrastructure-related deprivations**
