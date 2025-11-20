@@ -48,7 +48,7 @@ Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://git
 
 - Mendez C. (2025) [Introduction to directed acyclical graphs (DAGs) using R](https://colab.research.google.com/drive/1yzz3iheYoM1kMwnS8oA4tEdVQKSNw0aM?usp=sharing)
 - Mendez C. (2024) [Heterogeneous treatment effects via two-stage DID using R](https://colab.research.google.com/drive/1A5zxj9SU8phTTCHBkt1fQkFX1xhFbycI?usp=sharing)
-- TBA
+- Mendez C. (2025) [Synthetic control explorer: Estimate counterfactuals with weighted combinations of control units](https://cmg777.github.io/open-results/files/synthetic_control_explorer2.html)
 
 ## Machine learning
 
