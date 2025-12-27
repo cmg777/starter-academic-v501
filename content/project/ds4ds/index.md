@@ -53,7 +53,7 @@ Contribute and provide feedback at [https://github.com/cmg777/ds4ds](https://git
 ## Machine learning
 
 - Mendez C. (2025) [Introductory machine learning for econometrics: Exploring the Mincer equation in Python](https://colab.research.google.com/drive/1dV4eylUEGUWFRknaK7yK-kTgt_QtpO_G?usp=sharing)
-- Mendez C. (2025) [An interactive app to learn SHAP plots with XGBoost predictions](https://g.co/gemini/share/f3436ed96fe7)
+- Mendez C. (2025) [An interactive app to learn SHAP plots with XGBoost predictions](https://ai.studio/apps/drive/1AOCpYZvP9S58zBq3Z7mESzeUCk04Z8Bg?fullscreenApplet=true)
   
 ## Spatial econometrics
 
