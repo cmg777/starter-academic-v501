@@ -93,7 +93,7 @@ What about the distribution of population? What can we learn from the spatial dy
 </center>
 
 <br>
-<iframe height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.eart?height=600"> </iframe>
+<iframe height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1?height=600"> </iframe>
 <br>
 
 
