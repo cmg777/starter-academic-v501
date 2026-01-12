@@ -83,8 +83,22 @@ What is luminosity-based GDP? How is it changing across space and time?
 <br>
 
 
+<center>
 {{% callout note %}}
- What can you discover from these visualizations? Where is development happening? How is the world changing?  To contextualize these questions, below you will find an overview of recent advances in the exciting new field of geospatial development.
+What about the distribution of population? What can we learn from the spatial dynamics of population? 
+<br> 
+(Click anywhere on the map below and discover it.)
+<br>
+{{% /callout %}}
+</center>
+
+<br>
+<iframe height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.eart?height=600"> </iframe>
+<br>
+
+
+{{% callout note %}}
+Overall, what can you discover from these visualizations? Where is development happening? How is the world changing?  To contextualize these questions, below you will find an overview of recent advances in the exciting new field of geospatial development.
 {{% /callout %}}
 
 
