@@ -31,26 +31,13 @@ content:
   filter_button:
   - name: All
     tag: '*'
-  - name: World development
-    tag: world
   - name: Regional development
     tag: regional
   - name: Convergence
     tag: convergence
   - name: Spatial data science
     tag: spatial
-  - name: Causal inference
-    tag: causal
-  - name: Other
-    tag: other
-  - name: Python
-    tag: python
-  - name: GEE
-    tag: gee
-  - name: R
-    tag: r
-  - name: Stata
-    tag: stata
+
 design:
   # Choose how many columns the section has. Valid values: '1' or '2'.
   columns: '2'

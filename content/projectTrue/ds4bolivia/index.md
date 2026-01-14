@@ -4,7 +4,7 @@ external_link: "https://github.com/quarcs-lab/ds4bolivia"
 image:
   caption: ""
   focal_point: Smart
-summary: A Data Science Repository to Study GeoSpatial Development in Bolivia studies.
+summary: A Data Science Repository to Study GeoSpatial Development in Bolivia
 tags:
 - spatial
 - python
