@@ -1,6 +1,6 @@
 ---
 date: "2026-01-14T00:00:00Z"
-external_link: "https://github.com/quarcs-lab/ds4bolivia"
+external_link: ""
 image:
   caption: ""
   focal_point: Smart
