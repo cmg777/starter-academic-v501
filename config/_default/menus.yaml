@@ -17,10 +17,10 @@ main:
   url: '#talks'
   weight: 40
 - name: Projects
-  url: '#projectsTrue'
+  url: '#projects'
   weight: 45
 - name: Tutorials
-  url: '#projects'
+  url: '#tutorials'
   weight: 50
 - name: Students
   url: '#people'
