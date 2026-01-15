@@ -10,6 +10,13 @@ tags:
 - python
 - regional
 title: "DS4Bolivia"
+
+links:
+  - name: "Website"
+    url: "https://quarcs-lab.github.io/ds4bolivia"
+    icon_pack: ai
+    icon: open-data
+
 url_code: "https://github.com/quarcs-lab/ds4bolivia"
 url_pdf: ""
 url_slides: "https://carlos-mendez.my.canva.site/ds4bolivia-introduction-pdf"
