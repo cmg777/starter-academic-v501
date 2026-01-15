@@ -12,8 +12,8 @@ tags:
 title: "DS4Bolivia"
 url_code: "https://github.com/quarcs-lab/ds4bolivia"
 url_pdf: ""
-url_slides: ""
-url_video: ""
+url_slides: "https://carlos-mendez.my.canva.site/ds4bolivia-introduction-pdf"
+url_video: "https://youtu.be/kJ4Y6_hWadw"
 ---
 
 
