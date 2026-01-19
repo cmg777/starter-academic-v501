@@ -33,8 +33,6 @@ content:
     tag: '*'
   - name: Regional development
     tag: regional
-  - name: Convergence
-    tag: convergence
   - name: Spatial data science
     tag: spatial
 
