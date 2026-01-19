@@ -1,5 +1,12 @@
+/* Target the specific section by its ID */
 #hero2 {
-  .biography-title {
-    color: red;
+  /* Force the container to take full width and remove padding */
+  .container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
 }
