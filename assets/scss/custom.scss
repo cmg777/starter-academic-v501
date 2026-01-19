@@ -1,6 +1,5 @@
-/* Target the specific section by its ID */
+/* --- 1. HOMEPAGE FIX (Specific to Hero 2) --- */
 #hero2 {
-  /* Force the container to take full width and remove padding */
   .container {
     max-width: 100% !important;
     width: 100% !important;
@@ -11,13 +10,9 @@
   }
 }
 
-/* 1. Force parents to allow content to overflow (Fixes invisibility) */
-body, .page-body, .universal-wrapper, .article-container, .container, section {
-  overflow-x: visible !important;
-  overflow-y: visible !important;
-}
+/* --- 2. GLOBAL PROJECT FIX (For dashboards/index.md) --- */
 
-/* 2. The Breakout Class (Your existing logic, refined) */
+/* The Breakout Class */
 .full-width-iframe-container {
   width: 100vw;
   position: relative;
@@ -25,8 +20,18 @@ body, .page-body, .universal-wrapper, .article-container, .container, section {
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
-  
-  /* Ensure the container itself has height */
-  display: block; 
-  overflow: hidden; /* Keep scrollbars from appearing on the iframe itself */
+  display: block;
+}
+
+/* The Visibility Reset */
+/* We target the containers that usually "crop" the content. */
+/* REMOVED 'body' and '.page-body' from here to prevent horizontal scrolling */
+.universal-wrapper, .article-container, .container, section {
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+}
+
+/* Optional: Ensure the main page wrapper hides any accidental overflow */
+body {
+  overflow-x: hidden;
 }
