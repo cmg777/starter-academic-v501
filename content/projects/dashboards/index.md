@@ -19,12 +19,10 @@ url_video: ""
 
 ## GeoExplorer: Space-time dynamics
 
-
 <br>
-<iframe height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1?height=600"> </iframe>
+{{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1?height=600" height="600px" >}}
 <br>
 
-
-[Code](https://code.earthengine.google.com/46da0676f419e67f4000315b33f86cae?hideCode=true)
+[Open app in GEE](https://code.earthengine.google.com/46da0676f419e67f4000315b33f86cae?hideCode=true)
 
 
