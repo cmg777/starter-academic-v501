@@ -14,9 +14,10 @@ education:
 email: "carlos@gsid.nagoya-u.ac.jp"
 highlight_name: false
 interests:
+- Regional Development
 - Applied Econometrics
 - Spatial Big Data Analytics
-- Regional Development
+- Spatial Machine Learning
 - Development Macroeconomics
 organizations:
 - name: Nagoya University, JAPAN
