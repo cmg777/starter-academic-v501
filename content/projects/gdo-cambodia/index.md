@@ -10,7 +10,13 @@ tags:
 - python
 - regional
 title: GeoDevelopment Observatory of Cambodia
-url_code: "https://github.com/gdo-cambodia"
+links:
+  - name: "Website"
+    url: "https://bit.ly/gdo-cambodia"
+    icon_pack: ai
+    icon: open-data
+
+url_code: ""
 url_pdf: ""
 url_slides: "https://www.canva.com/design/DAGye-QAKJY/W0nsfoueC3jXXgojBCFhOQ/view?utm_content=DAGye-QAKJY&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h875fb1fec0"
 url_video: "https://youtu.be/9CcppQpArWI?si=j4-eerh6SIRTpC9E"
