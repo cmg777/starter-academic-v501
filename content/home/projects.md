@@ -11,14 +11,14 @@ active: true
 headless: true
 
 # Order that this section appears on the page.
-weight: 70
+weight: 35
 
-title: Tutorials
+title: Projects
 subtitle: ''
 
 content:
   # Page type to display. E.g. project.
-  page_type: project
+  page_type: projects
 
   # Default filter index (e.g. 0 corresponds to the first `filter_button` instance below).
   filter_default: 0
@@ -31,26 +31,13 @@ content:
   filter_button:
   - name: All
     tag: '*'
-  - name: World development
-    tag: world
   - name: Regional development
     tag: regional
   - name: Convergence
     tag: convergence
   - name: Spatial data science
     tag: spatial
-  - name: Causal inference
-    tag: causal
-  - name: Other
-    tag: other
-  - name: Python
-    tag: python
-  - name: GEE
-    tag: gee
-  - name: R
-    tag: r
-  - name: Stata
-    tag: stata
+
 design:
   # Choose how many columns the section has. Valid values: '1' or '2'.
   columns: '2'
@@ -66,10 +53,6 @@ design:
   flip_alt_rows: true
 ---
 
-{{% callout note %}}
-Discover and execute more tutorials [HERE](https://deepnote.com/@carlos-mendez).
-{{% /callout %}}
 
-</center>
 
 

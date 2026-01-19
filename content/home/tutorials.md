@@ -4,7 +4,7 @@
 widget: portfolio
 
 # Activate this widget? true/false
-active: false
+active: true
 
 
 # This file represents a page section.
@@ -13,11 +13,11 @@ headless: true
 # Order that this section appears on the page.
 weight: 70
 
-title: Tutorials
+title: tutorials
 subtitle: ''
 
 content:
-  # Page type to display. E.g. tutorials folder
+  # Page type to display. E.g. project.
   page_type: tutorials
 
   # Default filter index (e.g. 0 corresponds to the first `filter_button` instance below).
@@ -29,14 +29,28 @@ content:
   # To filter by a specific tag, set `tag` to an existing tag name.
   # To remove the toolbar, delete the entire `filter_button` block.
   filter_button:
-  - name: Python
-    tag: python
-  - name: R
-  - tag: r
-  - name: Stata
-    tag: stata
+  - name: All
+    tag: '*'
+  - name: World development
+    tag: world
+  - name: Regional development
+    tag: regional
+  - name: Convergence
+    tag: convergence
+  - name: Spatial data science
+    tag: spatial
+  - name: Causal inference
+    tag: causal
   - name: Other
     tag: other
+  - name: Python
+    tag: python
+  - name: GEE
+    tag: gee
+  - name: R
+    tag: r
+  - name: Stata
+    tag: stata
 design:
   # Choose how many columns the section has. Valid values: '1' or '2'.
   columns: '2'
@@ -46,23 +60,16 @@ design:
   #   2 = Compact
   #   3 = Card
   #   5 = Showcase
-  view: 3
+  view: 5
 
   # For Showcase view, flip alternate rows?
-  flip_alt_rows: false
+  flip_alt_rows: true
 ---
-
-
-<center>
-
-[![](https://github.com/slides777/images/raw/3c2b44207d3810b24836ed1102f88a2c19ad1396/myTutorials.jpg)](https://deepnote.com/@carlos-mendez)
 
 {{% callout note %}}
 Discover and execute more tutorials [HERE](https://deepnote.com/@carlos-mendez).
 {{% /callout %}}
 
 </center>
-
-
 
 
