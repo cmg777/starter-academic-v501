@@ -11,7 +11,13 @@
   }
 }
 
-/* NEW: Global utility to break out of standard page margins */
+/* 1. Force parents to allow content to overflow (Fixes invisibility) */
+body, .page-body, .universal-wrapper, .article-container, .container, section {
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+}
+
+/* 2. The Breakout Class (Your existing logic, refined) */
 .full-width-iframe-container {
   width: 100vw;
   position: relative;
@@ -19,4 +25,8 @@
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
+  
+  /* Ensure the container itself has height */
+  display: block; 
+  overflow: hidden; /* Keep scrollbars from appearing on the iframe itself */
 }
