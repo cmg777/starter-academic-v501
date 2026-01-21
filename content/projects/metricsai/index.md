@@ -1,10 +1,10 @@
 ---
-date: "2026-01-14T00:00:00Z"
-external_link: "https://quarcs-lab.github.io/metricsai/"
+date: "2026-01-21T00:00:00Z"
+external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: An Introduction to Econometrics with Python and AI in the Cloud
+summary: An introduction to econometrics with Python and AI in the cloud
 tags:
 - python
 title: "metricsAI"
