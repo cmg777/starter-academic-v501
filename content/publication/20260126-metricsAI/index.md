@@ -226,4 +226,10 @@ Together, they form a complete and coherent learning environment.
 * 🤖 Enhanced by AI
 * 🌍 Accessible and rigorous
 
+---
 
+## 🖼️ Visual Summary
+
+![](https://github.com/quarcs-lab/metricsai/blob/main/images/ch00_visual_summary.jpg)
+
+ 
