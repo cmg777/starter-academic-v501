@@ -1,5 +1,5 @@
 ---
-title: "Econometrics powered by AI: An introduction using cloud-based Python notebooks"
+title: "Econometrics powered by AI"
 authors:
 - admin
 
@@ -14,13 +14,13 @@ publishDate: "2026-01-26T00:00:00Z"
 # Legend: 0 = Uncategorized; 1 = Conference paper; 2 = Journal article;
 # 3 = Preprint / Working Paper; 4 = Report; 5 = Book; 6 = Book section;
 # 7 = Thesis; 8 = Patent
-publication_types: ["2"]
+publication_types: ["5"]
 
 # Publication name and optional abbreviated publication name.
-publication: "*Book*"
+#publication: "*Book*"
 publication_short: ""
 
-abstract: "This book and its related website introduce a modern approach to econometrics education that integrates theoretical foundations with cloud-based computation and AI-enhanced learning tools. Designed as a computational companion to A. Colin Cameron’s 'Analysis of Economics Data: An Introduction to Econometrics', it addresses persistent challenges in learning econometrics—-passive textbook engagement, technical barriers, and the gap between theory and implementation—-by combining three pillars: foundational econometric concepts, interactive Python notebooks accessible through a zero-installation cloud environment, and AI-powered learning resources. Across seventeen chapters spanning statistical foundations to advanced topics such as panel data and causal inference, learners work hands-on with real data using modern Python libraries while remaining grounded in established statistical and econometric theory. Visual summaries, slides, quizzes, podcasts, videos and AI tutors provide multimodal reinforcement and personalized feedback, supporting diverse learning styles. Together, these elements form a comprehensive learning ecosystem that reimagines how econometrics can be taught and learned in the era of cloud computing and artificial intelligence."
+abstract: "This book and its related website introduce a modern approach to econometrics education that integrates theoretical foundations with cloud-based computation and AI-enhanced learning tools. Designed as a computational companion to A. Colin Cameron’s *'Analysis of Economics Data: An Introduction to Econometrics'*, it addresses persistent challenges in learning econometrics—-passive textbook engagement, technical barriers, and the gap between theory and implementation—-by combining three pillars: foundational econometric concepts, interactive Python notebooks accessible through a zero-installation cloud environment, and AI-powered learning resources. Across seventeen chapters spanning statistical foundations to advanced topics such as panel data and causal inference, learners work hands-on with real data using modern Python libraries while remaining grounded in established statistical and econometric theory. Visual summaries, slides, quizzes, podcasts, videos and AI tutors provide multimodal reinforcement and personalized feedback, supporting diverse learning styles. Together, these elements form a comprehensive learning ecosystem that reimagines how econometrics can be taught and learned in the era of cloud computing and artificial intelligence."
 
 # Summary. An optional shortened abstract.
 summary: "Learning econometrics should be a more accessible and interactive experience."
@@ -38,8 +38,8 @@ featured: true
 links:
   - name: "Website"
     url: "https://quarcs-lab.github.io/metricsai/"
-    icon_pack: fas
-    icon: brain
+    icon_pack: ai
+    icon: open-data
   - name: "AI Video"
     url: "https://www.youtube.com/watch?v=J_iSc5x6PUI"
     icon_pack: fab
