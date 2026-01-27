@@ -103,7 +103,7 @@ image:
 ---
 
 
-# 📘 Econometrics Powered by AI
+# 🤖 Econometrics Powered by AI
 
 **An Introduction Using Cloud-based Python Notebooks**
 
