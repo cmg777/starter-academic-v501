@@ -106,10 +106,10 @@ image:
 # 🤖 Econometrics Powered by AI
 
 **An Introduction Using Cloud-based Python Notebooks**
-
 <img src="https://raw.githubusercontent.com/quarcs-lab/metricsai/main/images/ch00_visual_summary.jpg"
      alt="Chapter 0 visual summary"
      style="max-width: 100%; height: auto;">
+
 
 ---
 
