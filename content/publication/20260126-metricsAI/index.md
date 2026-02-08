@@ -52,6 +52,10 @@ links:
     url: "https://notebooklm.google.com/notebook/a873c784-e761-4e96-8557-eefdd59d9495"
     icon_pack: fas
     icon: comments
+  - name: "Book"
+    url: "https://leanpub.com/econometrics-ai"
+    icon_pack: fab
+    icon: book
 #  - name: "AI Podcast"
 #    url: "https://youtu.be/K1yj-Aw2Vlg"
 #    icon_pack: fas
