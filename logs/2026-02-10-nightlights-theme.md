@@ -31,12 +31,35 @@ Replaced the default "ocean" theme with a custom "nightlights" theme inspired by
 - **Menu centered** — Set `align: c` in params.yaml and added `flex-grow: 1` CSS on `.navbar-nav` to better distribute space.
 - **Callout accent** — Overrode `.callout-note` border color to match the cyan accent (`#00d4c8`).
 
-## Follow-up Fix: Button hover on dark sections
+## Follow-up Fix: Button styling on dark sections (Section 6)
 
-**Issue:** On dark-background sections (Featured Publications), `.btn-outline-primary` buttons became invisible on hover. Wowchemy's `.home-section.dark a { color: #1e40af }` (specificity `0,2,1`) overrode Bootstrap's `:hover { color: #fff }` (specificity `0,2,0`), making text the same color as the hover background.
+**Issue:** On dark-background sections (Featured Publications), `.btn-outline-primary` buttons became invisible on hover. Wowchemy's `.home-section.dark a { color: #1e40af }` overrode Bootstrap's hover text color, making text the same color as the background.
 
-**Fix:** Added Section 6 to `custom.scss` — overrides hover/focus/active states for `.btn-outline-primary` inside `.home-section.dark` using the accent color (`#00d4c8`) background with dark navy text (`#0e1545`).
+**Fix:** Added Section 6 to `custom.scss`:
+- Normal state: solid filled buttons using navbar navy (`#0e1545`) with white text
+- Hover/focus/active: cyan accent (`#00d4c8`) background with dark navy text (`#0e1545`)
+
+## Follow-up Fix: Navbar brand/search overlap on small screens (Section 7)
+
+**Issue:** On viewports < 992px, the brand name "Carlos Mendez" and the search icon overlapped. The brand wrapper uses `position: absolute` (full width, centered), while `ul.nav-icons` (search icon) remained in flex flow with `ml-auto` — both siblings occupying the same visual space.
+
+**Fix:** Added Section 7 to `custom.scss`:
+- Absolutely positioned `ul.nav-icons` to `right: 1rem` with vertical centering, removing it from flex flow
+- Constrained `.navbar-brand-mobile-wrapper` with `left: 3rem; right: 3rem` plus overflow handling
+- Added smaller font/padding for menu items on small desktops (992px-1199px)
+
+## Documentation updates
+
+- `README.md` — Updated Local Development section with Hugo binary path (`~/Library/Application Support/Hugo/0.84.2/hugo`)
+- `CLAUDE.md` — Replaced "Hugo not installed" note with actual binary path and dev server command
 
 ## Current Status
 
-Theme is deployed. Button hover fix applied to `custom.scss`.
+All fixes verified locally and deployed. Custom SCSS now has 7 sections:
+1. Hero2 full-width fix
+2. Full-width iframe breakout
+3. Collapsible dashboard sections
+4. Nightlights callout accent
+5. Navbar menu centering
+6. Dark-section button styling (solid fill + accent hover)
+7. Navbar brand/search overlap fix (mobile + small desktop)
