@@ -64,3 +64,46 @@ body {
     justify-content: center;
   }
 }
+
+/* --- 7. Navbar brand/search overlap fix on small screens --- */
+/* Mobile/tablet: brand is absolutely positioned full-width; reserve space for icons */
+@media (max-width: 991.98px) {
+  .navbar-brand-mobile-wrapper {
+    left: 3.5rem;
+    right: 3.5rem;
+    overflow: hidden;
+    text-align: center;
+  }
+  .navbar-brand {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+  }
+}
+/* Small desktops: shrink menu font so items + brand + search fit */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  #navbar-main .main-menu-item .nav-link {
+    font-size: 0.85rem;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+}
+
+/* --- 6. Dark-section button styling --- */
+/* Make buttons solid/filled on dark backgrounds instead of outline */
+.home-section.dark .btn-outline-primary {
+  background-color: #0e1545;
+  border-color: #0e1545;
+  color: #fff;
+}
+
+.home-section.dark .btn-outline-primary:hover,
+.home-section.dark .btn-outline-primary:focus,
+.home-section.dark .btn-outline-primary:active,
+.home-section.dark .btn-outline-primary:not(:disabled):not(.disabled):active,
+.home-section.dark .btn-outline-primary:not(:disabled):not(.disabled).active {
+  background-color: #00d4c8;
+  border-color: #00d4c8;
+  color: #0e1545;
+}

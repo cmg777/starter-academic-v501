@@ -160,13 +160,22 @@ Each author has a folder with `_index.md` containing name, role, organization, b
 
 ## Local Development
 
-**Prerequisites:** Hugo Extended (0.89.4+), Go (1.15+), Git
+**Prerequisites:** Go (1.15+), Git
+
+A local Hugo Extended binary is available at:
+
+```bash
+~/Library/Application Support/Hugo/0.84.2/hugo
+```
+
+> **Note:** This is v0.84.2 (the Netlify build uses 0.89.4). It works for local previews; the theme minimum is 0.78.
 
 ```bash
 # Run the dev server
+"$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender
+
+# Or use the convenience script (requires hugo in PATH)
 ./view.sh
-# or
-hugo server --disableFastRender
 ```
 
 The site will be available at `http://localhost:1313/`.

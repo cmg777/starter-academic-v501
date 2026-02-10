@@ -14,9 +14,9 @@ See @README.md for full documentation of the directory structure, tech stack, an
 
 # Key Commands
 
-- `./view.sh` or `hugo server --disableFastRender` — run local dev server at localhost:1313
+- Local Hugo binary: `"$HOME/Library/Application Support/Hugo/0.84.2/hugo"` (v0.84.2 Extended)
+- Run local dev server: `"$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender`
 - `./update_wowchemy.sh` — update Wowchemy modules and sync Hugo version in netlify.toml
-- Hugo is not installed locally on this machine; use Netlify builds to verify
 
 # Content Conventions
 
