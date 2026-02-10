@@ -17,18 +17,22 @@
   width: 100vw;
   position: relative;
   left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  transform: translateX(-50%);
   display: block;
 }
 
 /* The Visibility Reset */
-/* We target the containers that usually "crop" the content. */
-/* Added .page-body and article back — body overflow-x:hidden catches any overflow */
-.universal-wrapper, .article-container, .container, section, .page-body, article {
-  overflow-x: visible !important;
-  overflow-y: visible !important;
+/* Every ancestor between body and the iframe must allow overflow */
+.universal-wrapper,
+.article-container,
+.article-style,
+.container,
+section,
+.page-body,
+.page-wrapper,
+article,
+main {
+  overflow: visible !important;
 }
 
 /* Optional: Ensure the main page wrapper hides any accidental overflow */
