@@ -4,9 +4,6 @@ weight: 1
 active: true
 headless: true
 
-# Order that this section appears on the page.
-weight: 65
-
 design:
   # Slide height is automatic unless you force a specific height (e.g. '400px')
   slide_height: ''

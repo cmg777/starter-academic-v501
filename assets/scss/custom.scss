@@ -51,3 +51,16 @@ details.dashboard-entry summary {
 body {
   overflow-x: hidden;
 }
+
+/* --- 4. Nightlights theme accent refinements --- */
+.callout-note {
+  border-left-color: #00d4c8;
+}
+
+/* --- 5. Navbar menu centering adjustments --- */
+.navbar {
+  .navbar-nav {
+    flex-grow: 1;
+    justify-content: center;
+  }
+}

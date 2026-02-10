@@ -1,0 +1,22 @@
+# Nightlights theme — derived from the NTL world map background image
+# Color palette: deep navy, cyan/teal accents, with warm highlights
+
+# Theme metadata
+name = "Nightlights"
+
+# Is theme light or dark?
+light = true
+
+# Primary
+primary = "#0f1b3d"
+
+# Menu
+menu_primary = "#1a237e"
+menu_text = "rgba(255, 255, 255, 0.85)"
+menu_text_active = "#00d4c8"
+menu_title = "#fff"
+
+# Home sections
+home_section_odd = "rgb(255, 255, 255)"
+home_section_even = "rgb(240, 245, 250)"
+
