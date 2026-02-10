@@ -25,8 +25,8 @@
 
 /* The Visibility Reset */
 /* We target the containers that usually "crop" the content. */
-/* REMOVED 'body' and '.page-body' from here to prevent horizontal scrolling */
-.universal-wrapper, .article-container, .container, section {
+/* Added .page-body and article back — body overflow-x:hidden catches any overflow */
+.universal-wrapper, .article-container, .container, section, .page-body, article {
   overflow-x: visible !important;
   overflow-y: visible !important;
 }
