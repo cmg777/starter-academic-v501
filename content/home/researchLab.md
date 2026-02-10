@@ -33,7 +33,7 @@ In the QuaRCS-lab and its [global network](https://quarcs.netlify.app), we condu
 {{% /callout %}}
 <br>
 
-<iframe width="100%" height="600" src="https://www.youtube-nocookie.com/embed/Hy-b7kjLFds?si=OMz_cEqVoAVl61qV" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe loading="lazy" width="100%" height="600" src="https://www.youtube-nocookie.com/embed/Hy-b7kjLFds?si=OMz_cEqVoAVl61qV" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 
 <center>
@@ -48,7 +48,7 @@ Let's study regional development from outer space!
 
 <br>
 
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600"> </iframe>
+<iframe loading="lazy" height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/worldviirs-like?height=600"> </iframe>
 
 <br>
 
@@ -65,7 +65,7 @@ Given these parameters, how would you interpret the yellow and cyan colors?
 
 
 <br>
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
+<iframe loading="lazy" height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
 <br>
 
 
@@ -79,7 +79,7 @@ What is luminosity-based GDP? How is it changing across space and time?
 </center>
 
 <br>
-<iframe height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
+<iframe loading="lazy" height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
 
 <center>
 {{% callout note %}}
@@ -91,7 +91,7 @@ What about the distribution of population? What can we learn from the spatial dy
 </center>
 
 <br>
-<iframe height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1?height=600"> </iframe>
+<iframe loading="lazy" height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1?height=600"> </iframe>
 <br>
 
 

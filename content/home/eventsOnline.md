@@ -31,6 +31,7 @@ design:
 
 
 <iframe
+  loading="lazy"
   src="https://lu.ma/embed/calendar/cal-xWNE07b0pNnTnJE/events"
   height="450"
   frameborder="0"
