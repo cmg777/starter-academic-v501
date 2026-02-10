@@ -66,11 +66,18 @@ body {
 }
 
 /* --- 7. Navbar brand/search overlap fix on small screens --- */
-/* Mobile/tablet: brand is absolutely positioned full-width; reserve space for icons */
 @media (max-width: 991.98px) {
+  /* Lock icons to the right edge so they don't flow into brand space */
+  ul.nav-icons {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  /* Constrain brand wrapper to leave room for hamburger (left) and icons (right) */
   .navbar-brand-mobile-wrapper {
-    left: 3.5rem;
-    right: 3.5rem;
+    left: 3rem;
+    right: 3rem;
     overflow: hidden;
     text-align: center;
   }
