@@ -15,7 +15,7 @@ links:
     icon_pack: ai
     icon: open-data
 
-url_code: "https://github.com/quarcs-lab/metricsai"
+#url_code: "https://github.com/quarcs-lab/metricsai"
 url_pdf: ""
 url_slides: ""
 url_video: ""
