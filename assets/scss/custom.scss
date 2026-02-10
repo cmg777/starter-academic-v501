@@ -35,6 +35,18 @@ main {
   overflow: visible !important;
 }
 
+/* --- 3. Collapsible dashboard sections --- */
+details.dashboard-entry {
+  margin-bottom: 1.5rem;
+}
+
+details.dashboard-entry summary {
+  cursor: pointer;
+  padding: 0.75rem 0;
+  font-size: 1rem;
+  list-style: revert;
+}
+
 /* Optional: Ensure the main page wrapper hides any accidental overflow */
 body {
   overflow-x: hidden;
