@@ -6,9 +6,9 @@
 # Appearance
 
 theme: ocean
-day_night: false
+day_night: true
 font: 'Native'
-font_size: L
+font_size: M
 
 # SEO
 
@@ -16,7 +16,7 @@ site_type: Person
 local_business_type: ''
 org_name: ''
 description: ''
-twitter: 'https://twitter.com/carlosmendez777'
+twitter: 'https://x.com/carlosmendez777'
 
 # Contact (edit or remove options as required)
 
@@ -47,8 +47,8 @@ contact_links:
     link: 'https://telegram.me/@carlosmendez777'
   - icon: twitter
     icon_pack: fab
-    name: DM Me
-    link: 'https://twitter.com/carlosmendez777'
+    name: DM Me on X
+    link: 'https://x.com/carlosmendez777'
   - icon: envelope
     icon_pack: fa
     name: carlos [at] gsid.nagoya-u.ac.jp
@@ -123,10 +123,10 @@ comments:
   provider: 'disqus'
   commentable:
     post: true
-    book: true
-    project: true
-    publication: true
-    event: true
+    book: false
+    project: false
+    publication: false
+    event: false
   disqus:
     shortname: 'carlosmendez'
     show_count: true

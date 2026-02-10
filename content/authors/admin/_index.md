@@ -50,7 +50,7 @@ social:
 #  link: https://ideas.repec.org/f/pme631.html
 - icon: twitter
   icon_pack: fab
-  link: https://twitter.com/carlosmendez777
+  link: https://x.com/carlosmendez777
 - icon: linkedin
   icon_pack: fab
   link: https://www.linkedin.com/in/mendezguerra/
