@@ -8,7 +8,7 @@ name = "Nightlights"
 light = true
 
 # Primary
-primary = "#0f1b3d"
+primary = "#0e1545"
 
 # Menu
 menu_primary = "#0e1545"
