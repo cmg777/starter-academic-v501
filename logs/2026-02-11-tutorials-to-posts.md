@@ -1,4 +1,4 @@
-# Tutorials to Posts, Alumni Page, and Events Redirect
+# Tutorials to Posts, Alumni Page, Events Redirect, and Category Recategorization
 
 **Date:** 2026-02-11
 
@@ -9,6 +9,7 @@
 3. **Added search and filter to the Posts & Tutorials listing page** — matching the publication page pattern
 4. **Separated alumni to dedicated `/alumni/` page** — homepage Students section shows only current students (14 people); alumni (26 people) displayed on a new widget page at `/alumni/`
 5. **Removed Events widget from homepage** — deactivated the embedded lu.ma calendar; Events nav link now redirects to external `https://lu.ma/cmg`
+6. **Recategorized posts by tool/language** — replaced generic "Tutorial" and "Demo" categories with tool-specific categories: GEE (8), Python (8), R (9), Stata (3), Post (3)
 
 ## Files Modified / Created / Deleted
 
@@ -43,11 +44,20 @@
 - `content/home/eventsOnline.md` — **MODIFIED**: `active: true` changed to `active: false`
 - `config/_default/menus.yaml` — **MODIFIED**: Events URL changed from `#eventsOnline` to `https://lu.ma/cmg`
 
+### Post Category Recategorization (29 files)
+
+- 8 `content/post/gee_*/index.md` — **MODIFIED**: `categories: [Tutorial]` changed to `[GEE]`
+- 7 `content/post/python_*/index.md` — **MODIFIED**: `categories: [Tutorial]` changed to `[Python]`
+- 8 `content/post/r_*/index.md` — **MODIFIED**: `categories: [Tutorial]` changed to `[R]`
+- `content/post/rpy_solow_model/index.md` — **MODIFIED**: `categories: [Tutorial]` changed to `[R, Python]`
+- 3 `content/post/stata_*/index.md` — **MODIFIED**: `categories: [Tutorial]` changed to `[Stata]`
+- 2 Demo posts — **MODIFIED**: `categories: [Demo]` changed to `[Post]`
+
 ## Technical Details
 
 ### Tutorials-to-Posts Migration
 
-All 27 tutorial folders were moved from `content/tutorials/` to `content/post/`, keeping their original descriptive-slug folder names. Front matter was updated to include post-standard fields (`authors`, `categories`, `draft`, `featured`). All tutorials received `categories: [Tutorial]` for filtering.
+All 27 tutorial folders were moved from `content/tutorials/` to `content/post/`, keeping their original descriptive-slug folder names. Front matter was updated to include post-standard fields (`authors`, `categories`, `draft`, `featured`). Categories were later recategorized by tool/language (see below).
 
 The homepage now has a single "Posts & Tutorials" section (weight 80) using the `pages` widget with `count: 5` in Compact view. The separate Tutorials section (weight 70, `portfolio` widget) was removed.
 
@@ -65,7 +75,7 @@ Custom Hugo section template that overrides the default post listing page. Gener
 **Key implementation details:**
 - Reuses `#container-publications` ID so Wowchemy's bundled JS initializes Isotope on this container
 - Each item gets CSS classes: `isotope-item pubtype-{N} year-{YYYY}` matching the publication pattern
-- Categories are sorted alphabetically and assigned stable numeric indices (`pubtype-1` = Demo, `pubtype-2` = Post, `pubtype-3` = Tutorial)
+- Categories are sorted alphabetically and assigned stable numeric indices (`pubtype-1` = GEE, `pubtype-2` = Post, `pubtype-3` = Python, `pubtype-4` = R, `pubtype-5` = Stata)
 - All 30 items rendered on one page (no pagination) so Isotope filtering works across all items
 - Items rendered in Compact view: thumbnail (150x150), title, summary, date, category badge
 
@@ -82,6 +92,10 @@ Also moved Hussein Suleiman and Minh Thu from "Doctoral students (sub advisor)" 
 ### Events Redirect
 
 Deactivated the Events widget on the homepage (embedded lu.ma calendar iframe) and changed the navigation bar Events link from the homepage anchor (`#eventsOnline`) to the external lu.ma page (`https://lu.ma/cmg`). The widget file is preserved (not deleted) with `active: false` in case it needs to be re-enabled later.
+
+### Post Category Recategorization
+
+Replaced the generic "Tutorial" category (27 posts) and "Demo" category (2 posts) with tool-specific categories. The `/post/` listing page filter dropdown now shows 5 meaningful categories: GEE, Post, Python, R, Stata. No template changes were needed — `layouts/section/post.html` builds the filter UI dynamically from front matter. The `rpy_solow_model` post has dual categories `[R, Python]` and appears under both filters.
 
 ## Current Status
 

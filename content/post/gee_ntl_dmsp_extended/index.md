@@ -2,7 +2,7 @@
 authors:
   - admin
 categories:
-  - Tutorial
+  - GEE
 draft: false
 featured: false
 date: "2024-03-01T00:00:00Z"

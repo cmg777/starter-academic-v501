@@ -3,7 +3,7 @@ authors:
 - admin
 
 categories:
-- Demo
+- Post
 
 date: "2024-09-17T00:00:00Z"
 draft: false

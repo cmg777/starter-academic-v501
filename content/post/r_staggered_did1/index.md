@@ -2,7 +2,7 @@
 authors:
   - admin
 categories:
-  - Tutorial
+  - R
 draft: false
 featured: false
 date: "2023-09-02T00:00:00Z"

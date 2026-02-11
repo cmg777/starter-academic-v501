@@ -2,7 +2,8 @@
 authors:
   - admin
 categories:
-  - Tutorial
+  - R
+  - Python
 draft: false
 featured: false
 date: "2023-07-29T00:00:00Z"
