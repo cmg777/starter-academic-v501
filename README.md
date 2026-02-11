@@ -24,7 +24,7 @@ Academic portfolio website for **Carlos Mendez**, Associate Professor of Develop
 ├── config/_default/          # Hugo configuration
 │   ├── config.yaml           # Site title, baseURL, modules, markup settings
 │   ├── params.yaml           # Theme, contact info, features, analytics
-│   ├── menus.yaml            # Navigation menu (11 items)
+│   ├── menus.yaml            # Navigation menu (10 items)
 │   └── languages.yaml        # Language / i18n settings
 │
 ├── content/                  # All site content (Markdown + YAML front matter)
@@ -32,10 +32,9 @@ Academic portfolio website for **Carlos Mendez**, Associate Professor of Develop
 │   ├── authors/              # Author profiles (~43 authors)
 │   ├── publication/          # Academic publications (~41 entries)
 │   ├── event/                # Conference talks & presentations (~30 entries)
-│   ├── tutorials/            # Technical tutorials (~27 entries)
 │   ├── projects/             # Research projects & dashboards (~5 entries)
 │   ├── courses/              # Teaching materials
-│   ├── post/                 # Blog posts
+│   ├── post/                 # Blog posts & tutorials (~30 entries)
 │   └── slides/               # Presentation slides
 │
 ├── assets/
@@ -79,7 +78,7 @@ Site appearance and features:
 
 ### `config/_default/menus.yaml`
 
-Navigation links: AboutMe, ResearchLab, Publications, Presentations, Projects, Tutorials, Students, Courses, Events, Posts, Contact.
+Navigation links: AboutMe, ResearchLab, Publications, Presentations, Projects, Students, Courses, Events, Posts & Tutorials, Contact.
 
 ## Homepage Widgets
 
@@ -95,9 +94,8 @@ The homepage is assembled from individual markdown files in `content/home/`, eac
 | Presentations | `talks.md` | 30 | pages |
 | Projects | `projects.md` | 35 | portfolio |
 | Gallery | `gallery/` | 66 | blank |
-| Tutorials | `tutorials.md` | 70 | portfolio |
 | Events | `eventsOnline.md` | 75 | blank (lu.ma calendar) |
-| Posts | `posts.md` | 80 | pages |
+| Posts & Tutorials | `posts.md` | 80 | pages |
 | Tag Cloud | `tags.md` | 120 | tag_cloud |
 | Contact | `contact.md` | 130 | contact |
 
@@ -136,10 +134,11 @@ Three sections:
 - **Folder naming:** `YYYYMMDD-abbreviation` (e.g., `20241113GDSL`)
 - **Front matter:** title, date, event name, location, abstract, links
 
-### Tutorials (`content/tutorials/`)
+### Posts & Tutorials (`content/post/`)
 
-- **Folder naming:** descriptive slug (e.g., `gee_ntl_viirs_like`)
-- **Tags:** world, regional, spatial, causal, python, gee, r, stata
+- **Folder naming:** `YYYYMMDD-slug` for posts, descriptive slug for tutorials (e.g., `gee_ntl_viirs_like`)
+- **Categories:** `Tutorial` for tutorial content, `Post`/`Demo` for blog posts
+- **Tags:** world, regional, spatial, causal, python, gee, r, stata (tutorials); Academic, Seminar, etc. (posts)
 
 ### Dashboards (`content/projects/dashboards/`)
 
@@ -220,8 +219,10 @@ hugo new content/event/YYYYMMDD-abbreviation/index.md
 ### New Tutorial
 
 ```bash
-hugo new content/tutorials/slug-name/index.md
+hugo new content/post/slug-name/index.md
 ```
+
+Add `categories: [Tutorial]` to the front matter to categorize it as a tutorial.
 
 ### New Dashboard
 

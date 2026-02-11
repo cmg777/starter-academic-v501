@@ -24,7 +24,7 @@ See @README.md for full documentation of the directory structure, tech stack, an
 
 - Publications: `content/publication/YYYYMMDD-abbreviation/index.md`
 - Events: `content/event/YYYYMMDD-abbreviation/index.md`
-- Tutorials: `content/tutorials/descriptive-slug/index.md`
+- Posts & Tutorials: `content/post/descriptive-slug/index.md`
 - Authors: `content/authors/firstname-lastname/_index.md`
 
 ## Front Matter

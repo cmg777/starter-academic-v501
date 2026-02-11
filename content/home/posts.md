@@ -9,7 +9,7 @@ headless: true
 # Order that this section appears on the page.
 weight: 80
 
-title: Recent Posts
+title: Posts & Tutorials
 subtitle:
 
 content:
@@ -39,3 +39,7 @@ design:
   #   4 = Citation (publication only)
   view: 2
 ---
+
+{{% callout note %}}
+Find more posts and tutorials [here](/post/).
+{{% /callout %}}

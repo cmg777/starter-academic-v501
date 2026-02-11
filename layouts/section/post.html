@@ -1,0 +1,138 @@
+{{/* Custom section template for Posts & Tutorials listing page */}}
+{{/* Adds Isotope.js search + filter UI matching the publication page pattern */}}
+{{ define "main" }}
+
+<div class="universal-wrapper pt-3">
+  <h1>{{ .Title }}</h1>
+</div>
+
+<div class="universal-wrapper">
+  <div class="row">
+    <div class="col-lg-12">
+
+      {{/* --- Build category and year maps from all posts --- */}}
+      {{ $catMap := dict }}
+      {{ $catIndex := 1 }}
+      {{ $yearMap := dict }}
+      {{ range .Pages }}
+        {{ range .Params.categories }}
+          {{ if not (index $catMap .) }}
+            {{ $catMap = merge $catMap (dict . $catIndex) }}
+            {{ $catIndex = add $catIndex 1 }}
+          {{ end }}
+        {{ end }}
+        {{ $year := (string .Date.Year) }}
+        {{ if not (index $yearMap $year) }}
+          {{ $yearMap = merge $yearMap (dict $year true) }}
+        {{ end }}
+      {{ end }}
+
+      {{/* --- Sort categories alphabetically, years descending --- */}}
+      {{ $catKeys := slice }}
+      {{ range $k, $v := $catMap }}
+        {{ $catKeys = $catKeys | append $k }}
+      {{ end }}
+      {{ $catKeys = sort $catKeys }}
+
+      {{ $yearKeys := slice }}
+      {{ range $k, $v := $yearMap }}
+        {{ $yearKeys = $yearKeys | append $k }}
+      {{ end }}
+      {{ $yearKeys = sort $yearKeys "value" "desc" }}
+
+      {{/* --- Reassign stable indices after sorting --- */}}
+      {{ $catMapSorted := dict }}
+      {{ $idx := 1 }}
+      {{ range $catKeys }}
+        {{ $catMapSorted = merge $catMapSorted (dict . $idx) }}
+        {{ $idx = add $idx 1 }}
+      {{ end }}
+
+      {{/* --- Filter UI --- */}}
+      <div class="form-row mb-4">
+        <div class="col-auto">
+          <input type="search" class="filter-search" placeholder="Search..." autocapitalize="off"
+          autocomplete="off" autocorrect="off" role="textbox" spellcheck="false">
+        </div>
+        {{ if gt (len $catKeys) 1 }}
+        <div class="col-auto">
+          <select class="pub-filters pubtype-select form-control form-control-sm" data-filter-group="pubtype">
+            <option value="*">Category</option>
+            {{ range $catKeys }}
+              <option value=".pubtype-{{ index $catMapSorted . }}">
+                {{ . }}
+              </option>
+            {{ end }}
+          </select>
+        </div>
+        {{ end }}
+        <div class="col-auto">
+          <select class="pub-filters form-control form-control-sm" data-filter-group="year">
+            <option value="*">Date</option>
+            {{ range $yearKeys }}
+              <option value=".year-{{ . }}">
+                {{ . }}
+              </option>
+            {{ end }}
+          </select>
+        </div>
+      </div>
+
+      {{/* --- Isotope container with all items --- */}}
+      <div id="container-publications">
+        {{ range .Pages.ByDate.Reverse }}
+          {{/* Build class string: isotope-item + category classes + year class */}}
+          {{ $classes := "isotope-item" }}
+          {{ range .Params.categories }}
+            {{ $ci := index $catMapSorted . }}
+            {{ if $ci }}
+              {{ $classes = printf "%s pubtype-%d" $classes $ci }}
+            {{ end }}
+          {{ end }}
+          {{ $classes = printf "%s year-%d" $classes .Date.Year }}
+
+          <div class="grid-sizer col-lg-12 {{ $classes }}">
+            <div class="media stream-item">
+              {{ $image := .Resources.GetMatch "featured*" }}
+              {{ if $image }}
+              <div class="mr-3">
+                <a href="{{ .RelPermalink }}">
+                  {{ $thumb := $image.Fill "150x150" }}
+                  <img src="{{ $thumb.RelPermalink }}" alt="{{ .Title }}" loading="lazy"
+                       width="{{ $thumb.Width }}" height="{{ $thumb.Height }}">
+                </a>
+              </div>
+              {{ end }}
+              <div class="media-body">
+                <div class="section-subheading article-title mb-0 mt-0">
+                  <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                </div>
+                {{ with .Params.summary }}
+                <a href="{{ $.RelPermalink }}" class="summary-link">
+                  <div class="article-style">
+                    {{ . | plainify | truncate 200 }}
+                  </div>
+                </a>
+                {{ end }}
+                <div class="stream-meta article-metadata">
+                  <div class="article-metadata">
+                    <span class="article-date">
+                      {{ dateFormat "Jan 2, 2006" .Date }}
+                    </span>
+                    {{ with .Params.categories }}
+                      {{ range . }}
+                        &middot; <span class="badge badge-light">{{ . }}</span>
+                      {{ end }}
+                    {{ end }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {{ end }}
+      </div>
+
+    </div>
+  </div>
+</div>
+{{ end }}

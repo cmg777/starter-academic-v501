@@ -19,9 +19,6 @@ main:
 - name: Projects
   url: '#projects'
   weight: 45
-- name: Tutorials
-  url: '#tutorials'
-  weight: 50
 - name: Students
   url: '#people'
   weight: 60
@@ -31,7 +28,7 @@ main:
 - name: Events
   url: '#eventsOnline'
   weight: 80
-- name: Posts
+- name: Posts & Tutorials
   url: '#posts'
   weight: 85
 - name: Contact
