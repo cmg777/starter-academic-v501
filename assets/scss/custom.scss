@@ -201,3 +201,26 @@ body {
     width: 12%;
   }
 }
+
+/* --- 9. Mobile-friendly iframes and embeds --- */
+
+/* All iframes should respect their container width */
+iframe {
+  max-width: 100%;
+}
+
+/* Cap iframe heights on mobile for iframes with HTML height attributes.
+   Responsive iframes (position:absolute, height:100%) use inline styles
+   instead, so this selector skips them. */
+@media (max-width: 767.98px) {
+  iframe[height] {
+    max-height: 60vh !important;
+  }
+
+  /* Disable full-viewport breakout on phones — container is already near full-width */
+  .full-width-iframe-container {
+    width: 100%;
+    left: auto;
+    transform: none;
+  }
+}
