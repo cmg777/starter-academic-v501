@@ -8,7 +8,7 @@ subtitle:
 weight: 75  # section position on page
 
 # Activate this widget? true/false
-active: true
+active: false
 
 design:
   background:

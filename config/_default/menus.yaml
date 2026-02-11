@@ -26,7 +26,7 @@ main:
   url: 'courses/'
   weight: 70
 - name: Events
-  url: '#eventsOnline'
+  url: 'https://lu.ma/cmg'
   weight: 80
 - name: Posts & Tutorials
   url: '#posts'

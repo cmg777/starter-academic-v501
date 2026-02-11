@@ -12,7 +12,7 @@ headless: true
 # Order that this section appears on the page.
 weight: 50
 
-title: Students and alumni
+title: Students
 subtitle:
 
 content:
@@ -23,10 +23,6 @@ content:
   - Doctoral students (sub advisor)
   - Master students
   - Master students (sub advisor)
-  - Alumni doctoral graduates
-  - Alumni doctoral graduates (sub advisor)
-  - Alumni master graduates
-  - Alumni master graduates (sub advisor)
 
 design:
   show_interests: false
