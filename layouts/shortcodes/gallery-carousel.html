@@ -1,0 +1,87 @@
+{{/* Gallery Carousel Shortcode */}}
+{{/* Renders page bundle images as a Bootstrap Carousel */}}
+{{/* Usage: {{< gallery-carousel height="500px" interval="3000" album="gallery" >}} */}}
+
+{{ $album := (.Get "album") | default "gallery" }}
+{{ $height := (.Get "height") | default "500px" }}
+{{ $interval := (.Get "interval") | default "3000" }}
+{{ $id := printf "gallery-carousel-%s" $album }}
+
+{{/* Resolve images: in widget context, resources live on the parent page */}}
+{{ $images := slice }}
+{{ if .Page.Parent }}
+  {{ $dir := path.Base (path.Dir .Page.File.Path) }}
+  {{ $pattern := printf "%s/%s/*" $dir $album }}
+  {{ $images = .Page.Parent.Resources.Match $pattern }}
+{{ else }}
+  {{ $images = .Page.Resources.Match (printf "%s/*" $album) }}
+{{ end }}
+
+{{/* Filter to images only (skip .DS_Store etc.) */}}
+{{ $filtered := slice }}
+{{ range $images }}
+  {{ if eq .ResourceType "image" }}
+    {{ $filtered = $filtered | append . }}
+  {{ end }}
+{{ end }}
+{{ $images = $filtered }}
+{{ $count := len $images }}
+
+{{ if gt $count 0 }}
+<div id="{{ $id }}" class="carousel slide gallery-carousel" data-ride="carousel" data-interval="{{ $interval }}">
+
+  {{/* Dot indicators */}}
+  <ol class="carousel-indicators">
+    {{ range $index, $img := $images }}
+    <li data-target="#{{ $id }}" data-slide-to="{{ $index }}"{{ if eq $index 0 }} class="active"{{ end }}></li>
+    {{ end }}
+  </ol>
+
+  {{/* Slides */}}
+  <div class="carousel-inner">
+    {{ range $index, $img := $images }}
+      {{ $resized := .Fit "1200x700" }}
+    <div class="carousel-item{{ if eq $index 0 }} active{{ end }}">
+      <div class="gallery-carousel-slide" style="height: {{ $height }};">
+        <img src="{{ $resized.RelPermalink }}"
+             alt="Gallery image {{ add $index 1 }}"
+             loading="{{ if eq $index 0 }}eager{{ else }}lazy{{ end }}"
+             width="{{ $resized.Width }}"
+             height="{{ $resized.Height }}">
+      </div>
+    </div>
+    {{ end }}
+  </div>
+
+  {{/* Navigation arrows */}}
+  {{ if gt $count 1 }}
+  <a class="carousel-control-prev" href="#{{ $id }}" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#{{ $id }}" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+  {{ end }}
+
+  {{/* Slide counter */}}
+  <div class="gallery-carousel-counter">
+    <span class="gallery-carousel-current">1</span> / {{ $count }}
+  </div>
+
+</div>
+
+{{/* Counter update script — uses Bootstrap carousel event */}}
+<script>
+(function() {
+  var el = document.getElementById('{{ $id }}');
+  if (!el) return;
+  var counter = el.querySelector('.gallery-carousel-current');
+  if (!counter) return;
+  $(el).on('slid.bs.carousel', function(e) {
+    counter.textContent = e.to + 1;
+  });
+})();
+</script>
+{{ end }}

@@ -17,6 +17,7 @@ title:
 subtitle:
 
 design:
+  columns: "1"
   background:
     # Name of image in `assets/media/`.
     image: websiteCover5.jpg
@@ -33,4 +34,4 @@ design:
 
 ---
 
-{{< gallery >}}
+{{< gallery-carousel height="500px" interval="3000" >}}

@@ -114,3 +114,90 @@ body {
   border-color: #00d4c8;
   color: #0e1545;
 }
+
+/* --- 8. Gallery carousel styling --- */
+.gallery-carousel {
+  position: relative;
+  background: #0e1545;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem auto;
+  max-width: 1200px;
+}
+
+.gallery-carousel-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #0e1545;
+}
+
+.gallery-carousel-slide img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Navigation arrows */
+.gallery-carousel .carousel-control-prev,
+.gallery-carousel .carousel-control-next {
+  width: 8%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery-carousel:hover .carousel-control-prev,
+.gallery-carousel:hover .carousel-control-next {
+  opacity: 0.9;
+}
+
+.gallery-carousel .carousel-control-prev-icon,
+.gallery-carousel .carousel-control-next-icon {
+  background-color: rgba(0, 212, 200, 0.7);
+  border-radius: 50%;
+  padding: 12px;
+  background-size: 50%;
+}
+
+/* Dot indicators */
+.gallery-carousel .carousel-indicators li {
+  background-color: rgba(255, 255, 255, 0.4);
+  border: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 0 4px;
+  transition: background-color 0.3s ease;
+}
+
+.gallery-carousel .carousel-indicators li.active {
+  background-color: #00d4c8;
+}
+
+/* Slide counter */
+.gallery-carousel-counter {
+  position: absolute;
+  bottom: 10px;
+  right: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Responsive: smaller height on mobile, always-visible arrows */
+@media (max-width: 767.98px) {
+  .gallery-carousel-slide {
+    height: 300px !important;
+  }
+
+  .gallery-carousel .carousel-control-prev,
+  .gallery-carousel .carousel-control-next {
+    opacity: 0.7;
+    width: 12%;
+  }
+}
