@@ -41,7 +41,7 @@ links:
     icon_pack: ai
     icon: open-data
   - name: "Book"
-    url: "https://leanpub.com/econometrics-ai"
+    url: "https://quarcs-lab.github.io/metricsai/book/_book/index.html"
     icon_pack: fas
     icon: book
   - name: "Videos"
