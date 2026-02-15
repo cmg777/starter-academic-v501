@@ -34,4 +34,4 @@ design:
 
 ---
 
-{{< gallery-carousel height="500px" interval="3000" >}}
+{{< gallery-carousel height="650px" interval="3000" >}}

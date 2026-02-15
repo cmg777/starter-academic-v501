@@ -33,7 +33,7 @@ Replaced the homepage gallery grid layout (which displayed all 17 photos vertica
 - Dark navy (`#0e1545`) background fills gaps around non-uniform aspect ratio images
 - `object-fit: contain` preserves full images without cropping (1 portrait among 16 landscape)
 - `max-width: 1200px` with `border-radius: 8px` for contained card-like appearance
-- Responsive: 500px height desktop, 300px mobile (< 768px)
+- Responsive: 650px height desktop, 400px mobile (< 768px) — increased from original 500px/300px on 2026-02-15
 
 ## Key Decisions
 
