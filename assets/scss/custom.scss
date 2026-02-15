@@ -224,3 +224,14 @@ iframe {
     transform: none;
   }
 }
+
+/* --- 10. Larger compact-view thumbnails --- */
+.media.stream-item img {
+  max-width: 350px;
+}
+
+@media (max-width: 767.98px) {
+  .media.stream-item img {
+    max-width: 200px;
+  }
+}
