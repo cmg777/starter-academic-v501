@@ -76,6 +76,7 @@ address_format: en-us
 highlight: true
 highlight_languages:
   - r
+  - python
 math: true
 diagram: false
 privacy_pack: false

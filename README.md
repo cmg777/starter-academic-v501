@@ -116,10 +116,13 @@ Renders an iframe that breaks out of the content container to span the full view
 
 ### Custom CSS: `assets/scss/custom.scss`
 
-Three sections:
+Six sections:
 1. **Homepage fix** -- Full-width container for Hero2 widget
 2. **Full-width iframe breakout** -- Viewport-width breakout class + overflow resets for all ancestor containers
 3. **Collapsible dashboards** -- Styling for `<details>` sections on the dashboards project page
+4. **Notebook-style post styling** -- Teal-accented code blocks, figure borders, table styling, blockquotes, blue headings, learning objectives lists, mobile adjustments
+5. **Python syntax highlighting** -- Site-consistent colors for highlight.js tokens
+6. **Left-side Table of Contents** -- Sticky sidebar TOC activated by `toc: true` in front matter
 
 ## Content Conventions
 
@@ -227,6 +230,38 @@ Add `categories: [Tutorial]` to the front matter to categorize it as a tutorial.
 ### New Dashboard
 
 Add a new `<details>` block to `content/projects/dashboards/index.md` following the pattern documented above.
+
+### New Data Science Post (via Claude Code Skill)
+
+The `data-science-post` skill automates creating notebook-style data science blog posts. It produces a Hugo page bundle with case-study framing, Python code blocks, matplotlib figures, and interpretation paragraphs.
+
+**Location:** `.claude/skills/data-science-post/SKILL.md`
+
+**Usage** (in Claude Code):
+
+```
+/project:data-science-post <topic> dataset: <dataset> [references: <URLs>]
+```
+
+**Examples:**
+
+```
+/project:data-science-post double machine learning dataset: DS4Bolivia references: https://docs.doubleml.org/stable/intro/intro.html
+/project:data-science-post k-means clustering dataset: https://archive.ics.uci.edu/ml/datasets/Iris
+/project:data-science-post spatial regression dataset: PySAL example data references: https://pysal.org/spreg/
+```
+
+**What it produces:**
+
+| Output | Path |
+|--------|------|
+| Blog post | `content/post/python_<topic-slug>/index.md` |
+| Python script (optional) | `content/post/python_<topic-slug>/script.py` |
+| Figures (>= 3) | `content/post/python_<topic-slug>/<slug>_*.png` |
+
+The skill enforces the sandwich pattern (explanation, code, interpretation), uses the site color palette (`#6a9bcc`, `#d97757`, `#141413`, `#00d4c8`), and requires at least 8 interpretation paragraphs with specific numeric values. Posts inherit notebook-style CSS styling from `assets/scss/custom.scss` and use `toc: true` for the left-side table of contents.
+
+**Reference post:** `content/post/python_ml_random_forest/index.md`
 
 ### New Author
 

@@ -235,3 +235,249 @@ iframe {
     max-width: 200px;
   }
 }
+
+/* --- 11. Notebook-style post styling --- */
+
+/* A. Code blocks — dark IDE-like appearance */
+.article-style pre {
+  background: #f6f8fa;
+  border-left: 3px solid #00d4c8;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.article-style pre code {
+  color: #24292e;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  background: transparent;
+}
+
+/* Inline code — subtle tinted background */
+.article-style code {
+  background: rgba(0, 212, 200, 0.08);
+  color: #0e1545;
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.875em;
+}
+
+/* Reset inline code styles inside pre blocks */
+.article-style pre code {
+  padding: 0;
+  border-radius: 0;
+}
+
+/* B. Output figures — polished with border and shadow */
+.article-style img {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Caption styling — italic text directly after an image */
+.article-style img + em,
+.article-style p > img + br + em {
+  display: block;
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: -0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Don't apply figure borders to the featured/header image */
+.article-header img,
+.featured-image img {
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* C. Tables — clean, minimal design */
+.article-style table {
+  width: auto;
+  margin: 1.5rem auto;
+  border-collapse: collapse;
+}
+
+.article-style table thead th {
+  border-bottom: 2px solid #00d4c8;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.6rem 1.2rem;
+  color: #0e1545;
+}
+
+.article-style table tbody td {
+  text-align: center;
+  padding: 0.5rem 1.2rem;
+  border-bottom: 1px solid #eee;
+}
+
+.article-style table tbody tr:hover {
+  background-color: rgba(0, 212, 200, 0.05);
+}
+
+/* Remove Bootstrap striping for cleaner look */
+.article-style .table-striped tbody tr:nth-of-type(odd) {
+  background-color: transparent;
+}
+
+/* D. Blockquotes — teal accent */
+.article-style blockquote {
+  border-left-color: #00d4c8;
+  background: rgba(0, 212, 200, 0.04);
+  border-radius: 0 4px 4px 0;
+  padding: 0.75rem 1.25rem;
+}
+
+/* E. Headings — section separators */
+.article-style h2 {
+  color: #1a3a8a;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(0, 212, 200, 0.3);
+  padding-bottom: 0.4rem;
+  margin-top: 2.5rem;
+}
+
+.article-style h3 {
+  margin-top: 2rem;
+  color: #1a3a8a;
+  font-weight: 600;
+}
+
+/* Post title */
+.article-container h1,
+.container-fluid h1 {
+  color: #1a3a8a;
+}
+
+/* F. Learning objectives list styling */
+.article-style h2 + p + ul,
+.article-style h2 + ul {
+  background: rgba(0, 212, 200, 0.04);
+  border-left: 3px solid #00d4c8;
+  padding: 0.75rem 1rem 0.75rem 2rem;
+  border-radius: 0 4px 4px 0;
+}
+
+/* G. Mobile adjustments */
+@media (max-width: 767.98px) {
+  .article-style pre {
+    padding: 0.75rem;
+    border-radius: 4px;
+  }
+
+  .article-style pre code {
+    font-size: 0.7rem;
+  }
+
+  .article-style table {
+    font-size: 0.85rem;
+  }
+
+  .article-style table thead th,
+  .article-style table tbody td {
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+/* --- 12. Python syntax highlighting — site-consistent colors --- */
+.article-style pre code.hljs {
+  background: #f6f8fa;
+}
+.hljs-keyword { color: #0e1545; font-weight: 600; }
+.hljs-built_in { color: #0077aa; }
+.hljs-string { color: #2e7d32; }
+.hljs-number { color: #d4500e; }
+.hljs-comment { color: #6c757d; font-style: italic; }
+.hljs-function .hljs-title { color: #00897b; }
+.hljs-title.function_ { color: #00897b; }
+.hljs-params { color: #24292e; }
+.hljs-literal { color: #0e1545; font-weight: 600; }
+.hljs-meta { color: #6c757d; }
+
+/* --- 13. Left-side Table of Contents --- */
+.docs-toc {
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  order: -1;
+  padding: 1.25rem 1rem;
+  font-size: 0.82rem;
+  background: rgba(26, 58, 138, 0.03);
+  border-left: 3px solid #00d4c8;
+  border-radius: 0 6px 6px 0;
+  margin-top: 1rem;
+}
+
+.docs-toc::-webkit-scrollbar { width: 3px; }
+.docs-toc::-webkit-scrollbar-thumb { background: rgba(0, 212, 200, 0.3); border-radius: 3px; }
+
+.docs-toc .toc-top {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.docs-toc-title {
+  font-weight: 700;
+  color: #1a3a8a;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 212, 200, 0.2);
+}
+
+.docs-toc-title:hover {
+  color: #00d4c8;
+  text-decoration: none;
+}
+
+.docs-toc #TableOfContents ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.docs-toc #TableOfContents > ul > li {
+  margin-bottom: 0.15rem;
+}
+
+.docs-toc #TableOfContents ul ul {
+  padding-left: 0.85rem;
+  margin-top: 0.1rem;
+  border-left: 1px solid rgba(0, 212, 200, 0.15);
+}
+
+.docs-toc #TableOfContents a {
+  display: block;
+  color: #555;
+  padding: 0.25rem 0.6rem;
+  text-decoration: none;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  line-height: 1.4;
+}
+
+.docs-toc #TableOfContents a:hover {
+  color: #1a3a8a;
+  background: rgba(26, 58, 138, 0.06);
+}
+
+.docs-toc #TableOfContents a.active {
+  color: #1a3a8a;
+  font-weight: 600;
+  background: rgba(0, 212, 200, 0.1);
+  border-left: 2px solid #00d4c8;
+}

@@ -59,16 +59,50 @@ Usage in content files:
 
 ## Custom CSS (assets/scss/custom.scss)
 
-Three sections:
+Six sections:
 1. Hero2 full-width fix
 2. Full-width iframe breakout + ancestor overflow resets
 3. Collapsible dashboard entry styling
+4. Notebook-style post styling (code blocks, figures, tables, blockquotes, headings, learning objectives)
+5. Python syntax highlighting colors
+6. Left-side Table of Contents
 
 When adding new page types that use the fullwidth-iframe shortcode, check that ancestor containers have `overflow: visible`. If the iframe doesn't break out of margins, the likely fix is adding the new container class to the overflow reset in custom.scss.
 
 ## Collapsible Dashboards
 
 The dashboards project page (content/projects/dashboards/index.md) uses native `<details>/<summary>` elements. Each dashboard entry wraps its citation in `<summary>` and the fullwidth-iframe shortcode inside `<details class="dashboard-entry">`. This defers iframe loading until the user expands the section.
+
+# Claude Code Skills
+
+## data-science-post
+
+**Location:** `.claude/skills/data-science-post/SKILL.md`
+
+Generates notebook-style data science blog posts for the site. The user provides a topic, dataset, and optional reference URLs. The skill produces a Hugo page bundle at `content/post/python_<topic-slug>/` with:
+
+- `index.md` -- full tutorial with YAML front matter, case-study framing, code blocks, figures, and interpretation paragraphs
+- `script.py` -- standalone Python script (optional)
+- `*.png` -- at least 3 matplotlib figures using the site color palette
+
+**Invocation:**
+```
+/project:data-science-post <topic> dataset: <dataset> [references: <URLs>]
+```
+
+**Examples:**
+```
+/project:data-science-post double machine learning dataset: DS4Bolivia references: https://docs.doubleml.org/stable/intro/intro.html
+/project:data-science-post k-means clustering dataset: https://archive.ics.uci.edu/ml/datasets/Iris
+/project:data-science-post spatial regression dataset: PySAL example data references: https://pysal.org/spreg/
+```
+
+**Key conventions enforced by the skill:**
+- Sandwich pattern: conceptual explanation before every code block, interpretation paragraph after
+- At least 8 interpretation paragraphs with specific numeric values
+- Site color palette: steel blue `#6a9bcc`, warm orange `#d97757`, near black `#141413`, teal `#00d4c8`
+- `toc: true` in front matter enables the left-side table of contents
+- Reference post for conventions: `content/post/python_ml_random_forest/index.md`
 
 # Hugo Version Constraints
 
