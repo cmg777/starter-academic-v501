@@ -6,16 +6,10 @@ satellite image embeddings using Random Forest regression. Data comes from
 the DS4Bolivia repository (https://github.com/quarcs-lab/ds4bolivia).
 
 Usage:
-    uv run python code/ml_intro_rf.py
+    python script.py
 """
 
-import sys
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
-from config import set_seeds, RANDOM_SEED, IMAGES_DIR, TABLES_DIR, DATA_DIR
-
-set_seeds()
 
 import numpy as np
 import pandas as pd
@@ -30,36 +24,32 @@ from sklearn.inspection import PartialDependenceDisplay, permutation_importance
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
+RANDOM_SEED = 42
+np.random.seed(RANDOM_SEED)
+
 TARGET = "imds"
 TARGET_LABEL = "IMDS (Municipal Sustainable Development Index)"
 
 FEATURE_COLS = [f"A{i:02d}" for i in range(64)]
 
+OUTPUT_DIR = Path(__file__).parent
+
 DS4BOLIVIA_BASE = "https://raw.githubusercontent.com/quarcs-lab/ds4bolivia/master"
-CACHE_PATH = DATA_DIR / "rawData" / "ds4bolivia_merged.csv"
 
 # ---------------------------------------------------------------------------
 # 1. Data Loading
 # ---------------------------------------------------------------------------
 # We load three datasets from DS4Bolivia and merge them on asdf_id, which
-# uniquely identifies each of Bolivia's 339 municipalities. Caching the
-# merged file avoids repeated network requests on subsequent runs.
+# uniquely identifies each of Bolivia's 339 municipalities.
 
-if CACHE_PATH.exists():
-    print(f"Loading cached data from {CACHE_PATH}")
-    df = pd.read_csv(CACHE_PATH)
-else:
-    print("Downloading data from DS4Bolivia...")
-    sdg = pd.read_csv(f"{DS4BOLIVIA_BASE}/sdg/sdg.csv")
-    embeddings = pd.read_csv(
-        f"{DS4BOLIVIA_BASE}/satelliteEmbeddings/satelliteEmbeddings2017.csv"
-    )
-    regions = pd.read_csv(f"{DS4BOLIVIA_BASE}/regionNames/regionNames.csv")
+print("Downloading data from DS4Bolivia...")
+sdg = pd.read_csv(f"{DS4BOLIVIA_BASE}/sdg/sdg.csv")
+embeddings = pd.read_csv(
+    f"{DS4BOLIVIA_BASE}/satelliteEmbeddings/satelliteEmbeddings2017.csv"
+)
+regions = pd.read_csv(f"{DS4BOLIVIA_BASE}/regionNames/regionNames.csv")
 
-    df = sdg.merge(embeddings, on="asdf_id").merge(regions, on="asdf_id")
-    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(CACHE_PATH, index=False)
-    print(f"Cached merged data to {CACHE_PATH}")
+df = sdg.merge(embeddings, on="asdf_id").merge(regions, on="asdf_id")
 
 print(f"Dataset shape: {df.shape}")
 
@@ -88,9 +78,9 @@ ax.set_xlabel(TARGET_LABEL)
 ax.set_ylabel("Count")
 ax.set_title(f"Distribution of {TARGET_LABEL}")
 ax.legend()
-plt.savefig(IMAGES_DIR / "ml_target_distribution.png", dpi=300, bbox_inches="tight")
+plt.savefig(OUTPUT_DIR / "ml_target_distribution.png", dpi=300, bbox_inches="tight")
 plt.close()
-print("Saved: images/ml_target_distribution.png")
+print("Saved: ml_target_distribution.png")
 
 # Correlation heatmap of top-10 correlated embeddings with target
 correlations = X.corrwith(y).abs().sort_values(ascending=False)
@@ -101,9 +91,9 @@ fig, ax = plt.subplots(figsize=(10, 8))
 sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="RdBu_r", center=0,
             square=True, ax=ax, vmin=-1, vmax=1)
 ax.set_title(f"Correlations: Top-10 Embeddings & {TARGET_LABEL}")
-plt.savefig(IMAGES_DIR / "ml_embedding_correlations.png", dpi=300, bbox_inches="tight")
+plt.savefig(OUTPUT_DIR / "ml_embedding_correlations.png", dpi=300, bbox_inches="tight")
 plt.close()
-print("Saved: images/ml_embedding_correlations.png")
+print("Saved: ml_embedding_correlations.png")
 
 # ---------------------------------------------------------------------------
 # 3. Train/Test Split
@@ -192,9 +182,9 @@ ax.set_ylabel(f"Predicted {TARGET_LABEL}")
 ax.set_title(f"Actual vs Predicted {TARGET_LABEL}")
 ax.legend()
 ax.set_aspect("equal")
-plt.savefig(IMAGES_DIR / "ml_actual_vs_predicted.png", dpi=300, bbox_inches="tight")
+plt.savefig(OUTPUT_DIR / "ml_actual_vs_predicted.png", dpi=300, bbox_inches="tight")
 plt.close()
-print("Saved: images/ml_actual_vs_predicted.png")
+print("Saved: ml_actual_vs_predicted.png")
 
 # Residuals plot
 residuals = y_test - tuned_pred
@@ -204,9 +194,9 @@ ax.axhline(0, color="#d97757", linestyle="--", linewidth=2)
 ax.set_xlabel(f"Predicted {TARGET_LABEL}")
 ax.set_ylabel("Residuals")
 ax.set_title("Residuals vs Predicted Values")
-plt.savefig(IMAGES_DIR / "ml_residuals.png", dpi=300, bbox_inches="tight")
+plt.savefig(OUTPUT_DIR / "ml_residuals.png", dpi=300, bbox_inches="tight")
 plt.close()
-print("Saved: images/ml_residuals.png")
+print("Saved: ml_residuals.png")
 
 # ---------------------------------------------------------------------------
 # 7. Feature Importance
@@ -220,9 +210,9 @@ fig, ax = plt.subplots(figsize=(10, 6))
 top20_mdi.sort_values().plot.barh(ax=ax, color="#6a9bcc", edgecolor="white")
 ax.set_xlabel("Mean Decrease in Impurity")
 ax.set_title(f"Top-20 Feature Importance (MDI) for {TARGET_LABEL}")
-plt.savefig(IMAGES_DIR / "ml_feature_importance_mdi.png", dpi=300, bbox_inches="tight")
+plt.savefig(OUTPUT_DIR / "ml_feature_importance_mdi.png", dpi=300, bbox_inches="tight")
 plt.close()
-print("Saved: images/ml_feature_importance_mdi.png")
+print("Saved: ml_feature_importance_mdi.png")
 
 # Permutation importance — more reliable, measures actual predictive impact
 perm_result = permutation_importance(
@@ -235,9 +225,9 @@ fig, ax = plt.subplots(figsize=(10, 6))
 top20_perm.sort_values().plot.barh(ax=ax, color="#d97757", edgecolor="white")
 ax.set_xlabel("Mean Decrease in R² (Permutation)")
 ax.set_title(f"Top-20 Feature Importance (Permutation) for {TARGET_LABEL}")
-plt.savefig(IMAGES_DIR / "ml_feature_importance_permutation.png", dpi=300, bbox_inches="tight")
+plt.savefig(OUTPUT_DIR / "ml_feature_importance_permutation.png", dpi=300, bbox_inches="tight")
 plt.close()
-print("Saved: images/ml_feature_importance_permutation.png")
+print("Saved: ml_feature_importance_permutation.png")
 
 # ---------------------------------------------------------------------------
 # 8. Partial Dependence Plots
@@ -254,9 +244,9 @@ PartialDependenceDisplay.from_estimator(
 )
 fig.suptitle(f"Partial Dependence Plots — Top-6 Features for {TARGET_LABEL}", fontsize=14)
 plt.tight_layout(rect=[0, 0, 1, 0.95])
-plt.savefig(IMAGES_DIR / "ml_partial_dependence.png", dpi=300, bbox_inches="tight")
+plt.savefig(OUTPUT_DIR / "ml_partial_dependence.png", dpi=300, bbox_inches="tight")
 plt.close()
-print("Saved: images/ml_partial_dependence.png")
+print("Saved: ml_partial_dependence.png")
 
 # ---------------------------------------------------------------------------
 # 9. Save Results
@@ -266,14 +256,14 @@ results_df = pd.DataFrame({
     "Baseline": [f"{baseline_r2:.4f}", f"{baseline_rmse:.2f}", f"{baseline_mae:.2f}"],
     "Tuned": [f"{tuned_r2:.4f}", f"{tuned_rmse:.2f}", f"{tuned_mae:.2f}"],
 })
-results_df.to_csv(TABLES_DIR / "ml_rf_results.csv", index=False)
-print(f"\nSaved: tables/ml_rf_results.csv")
+results_df.to_csv(OUTPUT_DIR / "ml_rf_results.csv", index=False)
+print(f"\nSaved: ml_rf_results.csv")
 
 params_df = pd.DataFrame(
     [{"Parameter": k, "Value": v} for k, v in search.best_params_.items()]
 )
-params_df.to_csv(TABLES_DIR / "ml_rf_best_params.csv", index=False)
-print(f"Saved: tables/ml_rf_best_params.csv")
+params_df.to_csv(OUTPUT_DIR / "ml_rf_best_params.csv", index=False)
+print(f"Saved: ml_rf_best_params.csv")
 
 # ---------------------------------------------------------------------------
 # 10. Summary
