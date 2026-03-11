@@ -37,7 +37,9 @@ toc: true
 
 ## Overview
 
-This notebook introduces machine learning through a practical application: predicting Bolivia's Municipal Sustainable Development Index (IMDS) from satellite image embeddings using Random Forest regression. IMDS is a composite index (0–100 scale) that captures how well each of Bolivia's 339 municipalities is progressing toward sustainable development goals. Satellite embeddings are 64-dimensional feature vectors extracted from 2017 satellite imagery — they compress visual information about land use, urbanization, and terrain into numbers a model can learn from.
+Can satellite imagery predict how well a municipality is developing? This notebook explores that question by applying Random Forest regression to predict Bolivia's Municipal Sustainable Development Index (IMDS) from satellite image embeddings. IMDS is a composite index (0--100 scale) that captures how well each of Bolivia's 339 municipalities is progressing toward sustainable development goals. Satellite embeddings are 64-dimensional feature vectors extracted from 2017 satellite imagery --- they compress visual information about land use, urbanization, and terrain into numbers a model can learn from.
+
+The Random Forest algorithm is a natural starting point for this kind of tabular prediction task: it handles non-linear relationships, requires minimal preprocessing, and provides built-in measures of feature importance. By the end of this tutorial, we will know how much development-related signal satellite imagery actually contains --- and where its predictive power falls short.
 
 **Learning objectives:**
 
@@ -45,6 +47,7 @@ This notebook introduces machine learning through a practical application: predi
 - Follow ML best practices: train/test split, cross-validation, hyperparameter tuning
 - Interpret model performance metrics (R², RMSE, MAE)
 - Analyze feature importance and partial dependence plots
+- Build intuition for when ML adds value over simpler approaches
 
 ```python
 import sys
@@ -80,7 +83,7 @@ CACHE_PATH = DATA_DIR / "rawData" / "ds4bolivia_merged.csv"
 
 ## Data Loading
 
-The data comes from the [DS4Bolivia](https://github.com/quarcs-lab/ds4bolivia) repository, which provides standardized datasets for studying Bolivian development. We merge three tables on `asdf_id` — the unique identifier for each municipality: SDG indices (our target variables), satellite embeddings (our features), and region names (for context).
+The data comes from the [DS4Bolivia](https://github.com/quarcs-lab/ds4bolivia) repository, which provides standardized datasets for studying Bolivian development. We merge three tables on `asdf_id` --- the unique identifier for each municipality: SDG indices (our target variables), satellite embeddings (our features), and region names (for context).
 
 ```python
 if CACHE_PATH.exists():
@@ -111,11 +114,29 @@ print(f"\nTarget variable ({TARGET}) summary:")
 print(y.describe().round(2))
 ```
 
-All 339 Bolivian municipalities loaded successfully with no missing values — the dataset provides complete national coverage. The merged data has 88 columns: the 64 satellite embedding features, SDG indices, and region identifiers. IMDS scores range from 35.70 to 80.20 with a mean of 51.05 and standard deviation of 6.77, meaning most municipalities cluster within about 7 points of the national average on the 0–100 scale.
+```
+Downloading data from DS4Bolivia...
+Cached merged data to data/rawData/ds4bolivia_merged.csv
+Dataset shape: (339, 88)
+Observations after dropping missing: 339
+
+Target variable (imds) summary:
+count    339.00
+mean      51.05
+std        6.77
+min       35.70
+25%       46.67
+50%       50.50
+75%       54.31
+max       80.20
+Name: imds, dtype: float64
+```
+
+All 339 Bolivian municipalities loaded successfully with no missing values --- the dataset provides complete national coverage. The merged data has 88 columns: the 64 satellite embedding features, SDG indices, and region identifiers. IMDS scores range from 35.70 to 80.20 with a mean of 51.05 and standard deviation of 6.77, meaning most municipalities cluster within about 7 points of the national average on the 0--100 scale.
 
 ## Exploratory Data Analysis
 
-Before building any model, we explore the data to understand its structure. EDA helps us spot issues — skewed distributions, outliers, or weak feature correlations — that could affect model performance. It also builds intuition about what patterns the model might find.
+Before building any model, we explore the data to understand its structure. EDA helps us spot issues --- skewed distributions, outliers, or weak feature correlations --- that could affect model performance. It also builds intuition about what patterns the model might find.
 
 ### Target Distribution
 
@@ -136,7 +157,7 @@ plt.show()
 
 ![Distribution of IMDS scores across Bolivia's municipalities. The dashed line marks the mean, the dotted line marks the median.](ml_target_distribution.png)
 
-The distribution is roughly bell-shaped with a slight right skew — the mean (51.1) sits just above the median (50.5), indicating a small tail of higher-performing municipalities. Most scores fall between 47 and 55, meaning the majority of Bolivia's municipalities have similar mid-range development levels. The handful of outliers above 70 likely correspond to larger urban centers like La Paz, Santa Cruz, and Cochabamba, which have significantly higher development infrastructure.
+The distribution is roughly bell-shaped with a slight right skew --- the mean (51.1) sits just above the median (50.5), indicating a small tail of higher-performing municipalities. Most scores fall between 47 and 55, meaning the majority of Bolivia's municipalities have similar mid-range development levels. The handful of outliers above 70 likely correspond to larger urban centers like La Paz, Santa Cruz, and Cochabamba, which have significantly higher development infrastructure.
 
 ### Embedding Correlations
 
@@ -157,11 +178,11 @@ plt.show()
 
 ![Correlation matrix of the top-10 most correlated satellite embedding dimensions with IMDS.](ml_embedding_correlations.png)
 
-The heatmap reveals that the strongest individual correlations between embedding dimensions and IMDS are moderate (in the 0.25–0.40 range), which is typical for satellite-derived features predicting complex socioeconomic outcomes. Several embedding dimensions are also correlated with each other, suggesting they capture overlapping spatial patterns — the Random Forest can handle this multicollinearity well since it selects feature subsets at each split.
+The heatmap reveals that the strongest individual correlations between embedding dimensions and IMDS are moderate (in the 0.25--0.40 range), which is typical for satellite-derived features predicting complex socioeconomic outcomes. Several embedding dimensions are also correlated with each other, suggesting they capture overlapping spatial patterns --- the Random Forest can handle this multicollinearity well since it selects feature subsets at each split.
 
 ## Train/Test Split
 
-We split the data into training (80%) and test (20%) sets *before* any model fitting. This is a fundamental ML practice: if the model ever "sees" the test data during training or tuning, our performance estimate will be overly optimistic — a problem called **data leakage**. The `random_state` ensures the same split every time we run the notebook, making results reproducible.
+We split the data into training (80%) and test (20%) sets *before* any model fitting. This is a fundamental ML practice: if the model ever "sees" the test data during training or tuning, our performance estimate will be overly optimistic --- a problem called **data leakage**. The `random_state` ensures the same split every time we run the notebook, making results reproducible.
 
 ```python
 X_train, X_test, y_train, y_test = train_test_split(
@@ -171,7 +192,12 @@ print(f"Training set: {len(X_train)} municipalities")
 print(f"Test set:     {len(X_test)} municipalities")
 ```
 
-The split gives us 271 municipalities for training and 68 for testing. With only 339 total observations, this is a relatively small dataset for ML — the test set of 68 means each test prediction represents about 1.5% of the data. This makes cross-validation especially important for getting reliable performance estimates, since a single 68-sample test set could be unrepresentative by chance.
+```
+Training set: 271 municipalities
+Test set:     68 municipalities
+```
+
+The split gives us 271 municipalities for training and 68 for testing. With only 339 total observations, this is a relatively small dataset for ML --- the test set of 68 means each test prediction represents about 1.5% of the data. This makes cross-validation especially important for getting reliable performance estimates, since a single 68-sample test set could be unrepresentative by chance.
 
 ## Baseline Model
 
@@ -189,7 +215,14 @@ print(f"5-Fold CV R² scores: {cv_scores.round(4)}")
 print(f"Mean CV R²:          {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
 ```
 
-The 5-fold CV R² scores range from 0.152 to 0.345, with a mean of 0.2526 (+/- 0.0728). This means the baseline model explains about 25% of the variation in IMDS on average, but the high variability across folds (standard deviation of 0.07) reflects the small dataset — different subsets of 271 municipalities can look quite different from each other. An R² around 0.25 is a reasonable starting point for predicting a complex social outcome from satellite imagery alone.
+```
+5-Fold CV R² scores: [0.152  0.2239 0.2611 0.3449 0.2809]
+Mean CV R²:          0.2526 (+/- 0.0728)
+```
+
+The 5-fold CV R² scores range from 0.152 to 0.345, with a mean of 0.2526 (+/- 0.0728). This means the baseline model explains about 25% of the variation in IMDS on average, but the high variability across folds (standard deviation of 0.07) reflects the small dataset --- different subsets of 271 municipalities can look quite different from each other. An R² around 0.25 is a reasonable starting point for predicting a complex social outcome from satellite imagery alone.
+
+### Test Evaluation
 
 ```python
 baseline_rf.fit(X_train, y_train)
@@ -203,11 +236,17 @@ print(f"Baseline Test RMSE: {baseline_rmse:.2f}")
 print(f"Baseline Test MAE:  {baseline_mae:.2f}")
 ```
 
-On the held-out test set, the baseline achieves R² = 0.2307, RMSE = 6.52, and MAE = 4.68. In practical terms, the model's predictions are typically off by about 4.7 IMDS points (MAE) on a scale where most values fall between 47 and 55. The RMSE of 6.52 is higher than the MAE, indicating some larger errors are pulling it up. This baseline gives us a concrete reference — any improvement from tuning should beat these numbers.
+```
+Baseline Test R²:   0.2307
+Baseline Test RMSE: 6.52
+Baseline Test MAE:  4.68
+```
+
+On the held-out test set, the baseline achieves R² = 0.2307, RMSE = 6.52, and MAE = 4.68. In practical terms, the model's predictions are typically off by about 4.7 IMDS points (MAE) on a scale where most values fall between 47 and 55. The RMSE of 6.52 is higher than the MAE, indicating some larger errors are pulling it up. This baseline gives us a concrete reference --- any improvement from tuning should beat these numbers.
 
 ## Hyperparameter Tuning
 
-The baseline model uses scikit-learn's defaults, but we can often do better by searching for optimal hyperparameters. **RandomizedSearchCV** is more efficient than exhaustive grid search — it samples random combinations and evaluates each with cross-validation. Here's what each hyperparameter controls:
+The baseline model uses scikit-learn's defaults, but we can often do better by searching for optimal hyperparameters. **RandomizedSearchCV** is more efficient than exhaustive grid search --- it samples random combinations and evaluates each with cross-validation. Here's what each hyperparameter controls:
 
 - **n_estimators**: Number of trees in the forest (more trees = more stable but slower)
 - **max_depth**: How deep each tree can grow (deeper = more complex patterns but risk overfitting)
@@ -241,11 +280,22 @@ for param, value in search.best_params_.items():
     print(f"  {param}: {value}")
 ```
 
-The best configuration found uses 500 trees with max_depth=30, max_features=sqrt, min_samples_leaf=1, and min_samples_split=4. The best CV R² of 0.2721 is modestly higher than the baseline's 0.2526 — about a 2 percentage point improvement in explained variance. The tuning selected a deeper, more complex model (max_depth=30 vs the default of unlimited) while constraining feature subsampling to sqrt(64)=8 features per split, which encourages tree diversity.
+```
+Best CV R²: 0.2721
+
+Best parameters:
+  max_depth: 30
+  max_features: sqrt
+  min_samples_leaf: 1
+  min_samples_split: 4
+  n_estimators: 500
+```
+
+The best configuration found uses 500 trees with max_depth=30, max_features=sqrt, min_samples_leaf=1, and min_samples_split=4. The best CV R² of 0.2721 is modestly higher than the baseline's 0.2526 --- about a 2 percentage point improvement in explained variance. The tuning selected a deeper, more complex model (max_depth=30 vs the default of unlimited) while constraining feature subsampling to sqrt(64)=8 features per split, which encourages tree diversity.
 
 ## Model Evaluation
 
-Now we evaluate the tuned model on the held-out test set — data the model has never seen during training or tuning. Three complementary metrics tell us different things:
+Now we evaluate the tuned model on the held-out test set --- data the model has never seen during training or tuning. Three complementary metrics tell us different things:
 
 - **R²** (coefficient of determination): What fraction of the target's variance the model explains. R² = 1.0 is perfect; R² = 0 means the model is no better than predicting the mean.
 - **RMSE** (Root Mean Squared Error): Average prediction error in the same units as the target. Penalizes large errors more heavily.
@@ -263,11 +313,17 @@ print(f"Tuned Test RMSE: {tuned_rmse:.2f}")
 print(f"Tuned Test MAE:  {tuned_mae:.2f}")
 ```
 
-The tuned model achieves R² = 0.2297, RMSE = 6.52, and MAE = 4.72 on the test set — essentially identical to the baseline (R² = 0.2307, RMSE = 6.52, MAE = 4.68). This is a common finding with small datasets: the tuning improved CV performance slightly but the gains didn't transfer to the specific test set. The model explains about 23% of IMDS variation, meaning satellite embeddings capture real but limited predictive signal for municipal development.
+```
+Tuned Test R²:   0.2297
+Tuned Test RMSE: 6.52
+Tuned Test MAE:  4.72
+```
+
+The tuned model achieves R² = 0.2297, RMSE = 6.52, and MAE = 4.72 on the test set --- essentially identical to the baseline (R² = 0.2307, RMSE = 6.52, MAE = 4.68). This is a common finding with small datasets: the tuning improved CV performance slightly but the gains didn't transfer to the specific test set. The model explains about 23% of IMDS variation, meaning satellite embeddings capture real but limited predictive signal for municipal development.
 
 ### Actual vs Predicted
 
-This scatter plot shows how well the model's predictions match reality. Points falling exactly on the dashed 45° line would indicate perfect predictions; scatter around the line shows prediction error.
+This scatter plot shows how well the model's predictions match reality. Points falling exactly on the dashed 45-degree line would indicate perfect predictions; scatter around the line shows prediction error.
 
 ```python
 fig, ax = plt.subplots(figsize=(7, 7))
@@ -287,11 +343,11 @@ plt.show()
 
 ![Actual vs predicted IMDS scores on the test set. The dashed line represents perfect prediction.](ml_actual_vs_predicted.png)
 
-The scatter shows moderate agreement between actual and predicted IMDS values, with noticeable spread around the 45-degree line. Predictions tend to cluster in the 47–55 range (near the training mean), with the model struggling to predict extreme values — municipalities with very high or low IMDS scores are pulled toward the center. This "regression to the mean" effect is typical when the model has limited predictive power.
+The scatter shows moderate agreement between actual and predicted IMDS values, with noticeable spread around the 45-degree line. Predictions tend to cluster in the 47--55 range (near the training mean), with the model struggling to predict extreme values --- municipalities with very high or low IMDS scores are pulled toward the center. This "regression to the mean" effect is typical when the model has limited predictive power.
 
 ### Residual Analysis
 
-Residuals (actual − predicted) should ideally be randomly scattered around zero with no obvious pattern. Patterns in residuals can reveal systematic biases — for example, if the model consistently underpredicts high-IMDS municipalities, it suggests the features miss something important about well-developed areas.
+Residuals (actual minus predicted) should ideally be randomly scattered around zero with no obvious pattern. Patterns in residuals can reveal systematic biases --- for example, if the model consistently underpredicts high-IMDS municipalities, it suggests the features miss something important about well-developed areas.
 
 ```python
 residuals = y_test - tuned_pred
@@ -307,7 +363,7 @@ plt.show()
 
 ![Residuals (actual minus predicted) vs predicted IMDS values. Random scatter around zero indicates no systematic bias.](ml_residuals.png)
 
-The residuals appear roughly randomly scattered around zero, which is encouraging — there's no strong systematic bias. However, the spread is wider at the extremes, suggesting the model's errors are larger for municipalities with unusually high or low predicted IMDS. This heteroscedasticity is consistent with the regression-to-the-mean pattern seen in the scatter plot above.
+The residuals appear roughly randomly scattered around zero, which is encouraging --- there's no strong systematic bias. However, the spread is wider at the extremes, suggesting the model's errors are larger for municipalities with unusually high or low predicted IMDS. This heteroscedasticity is consistent with the regression-to-the-mean pattern seen in the scatter plot above.
 
 ## Feature Importance
 
@@ -331,7 +387,7 @@ plt.show()
 
 ![Top-20 satellite embedding features ranked by Mean Decrease in Impurity.](ml_feature_importance_mdi.png)
 
-The MDI plot shows that importance is distributed across many embedding dimensions rather than concentrated in just a few. This suggests the satellite imagery captures multiple independent visual patterns relevant to development — no single dimension dominates. However, MDI can be inflated for continuous features, so we'll cross-check with permutation importance next.
+The MDI plot shows that importance is distributed across many embedding dimensions rather than concentrated in just a few. This suggests the satellite imagery captures multiple independent visual patterns relevant to development --- no single dimension dominates. However, MDI can be inflated for continuous features, so we'll cross-check with permutation importance next.
 
 ### Permutation Importance
 
@@ -354,11 +410,11 @@ plt.show()
 
 ![Top-20 satellite embedding features ranked by permutation importance (mean decrease in R² when feature is shuffled).](ml_feature_importance_permutation.png)
 
-Permutation importance gives a more trustworthy picture: it measures the actual drop in R² when each feature is shuffled. The ranking differs somewhat from MDI, which is expected — permutation importance is less biased and directly measures predictive contribution on the test set. The top features here are the ones that genuinely help the model distinguish between municipalities with different IMDS levels.
+Permutation importance gives a more trustworthy picture: it measures the actual drop in R² when each feature is shuffled. The ranking differs somewhat from MDI, which is expected --- permutation importance is less biased and directly measures predictive contribution on the test set. The top features here are the ones that genuinely help the model distinguish between municipalities with different IMDS levels.
 
 ## Partial Dependence Plots
 
-Partial dependence plots show the marginal effect of a single feature on predictions, averaging over all other features. They reveal non-linear relationships that a simple correlation coefficient can't capture — for example, a feature might have no effect below a threshold but a strong effect above it. We plot the top-6 most important features (by permutation importance).
+Partial dependence plots show the marginal effect of a single feature on predictions, averaging over all other features. They reveal non-linear relationships that a simple correlation coefficient can't capture --- for example, a feature might have no effect below a threshold but a strong effect above it. We plot the top-6 most important features (by permutation importance).
 
 ```python
 top6_features = perm_importance.sort_values(ascending=False).head(6).index.tolist()
@@ -375,7 +431,7 @@ plt.show()
 
 ![Partial dependence plots for the top-6 most important satellite embedding features, showing how each feature's value affects the predicted IMDS score.](ml_partial_dependence.png)
 
-The partial dependence plots reveal non-linear relationships between the top features and predicted IMDS. Some dimensions show threshold effects — the predicted IMDS changes sharply at certain embedding values then levels off. These non-linearities justify using Random Forest over a linear model, as a linear regression would miss these step-like patterns. The embedding dimensions likely correspond to visual landscape features (urbanization, vegetation cover, infrastructure density) that change abruptly between rural and urban municipalities.
+The partial dependence plots reveal non-linear relationships between the top features and predicted IMDS. Some dimensions show threshold effects --- the predicted IMDS changes sharply at certain embedding values then levels off. These non-linearities justify using Random Forest over a linear model, as a linear regression would miss these step-like patterns. The embedding dimensions likely correspond to visual landscape features (urbanization, vegetation cover, infrastructure density) that change abruptly between rural and urban municipalities.
 
 ## Summary and Results
 
@@ -385,15 +441,32 @@ The partial dependence plots reveal non-linear relationships between the top fea
 | RMSE   | 6.52     | 6.52   |
 | MAE    | 4.68     | 4.72   |
 
-The summary table confirms that tuning provided negligible improvement over the baseline for this dataset: both models achieve R² around 0.23, RMSE of 6.52, and MAE near 4.7. The key takeaway is that satellite embeddings explain roughly a quarter of the variation in Bolivia's Municipal Sustainable Development Index — a meaningful signal that demonstrates remote sensing data captures real development-related patterns, while also highlighting that the majority of development variation is driven by factors not visible from space.
+The summary table confirms that tuning provided negligible improvement over the baseline for this dataset: both models achieve R² around 0.23, RMSE of 6.52, and MAE near 4.7. The key takeaway is that satellite embeddings explain roughly a quarter of the variation in Bolivia's Municipal Sustainable Development Index --- a meaningful signal that demonstrates remote sensing data captures real development-related patterns, while also highlighting that the majority of development variation is driven by factors not visible from space.
 
-### Limitations and Next Steps
+## Limitations and Next Steps
 
 This analysis demonstrates that satellite embeddings contain real predictive signal for municipal development outcomes, but several limitations apply:
 
-- **Moderate R²**: The model captures meaningful patterns but leaves much variation unexplained — development is driven by many factors invisible from space (governance, migration, informal economy).
+- **Moderate R²**: The model captures meaningful patterns but leaves much variation unexplained --- development is driven by many factors invisible from space (governance, migration, informal economy).
 - **Temporal mismatch**: We use 2017 satellite imagery with SDG indices from a potentially different period.
-- **Feature interpretability**: Embedding dimensions (A00–A63) are abstract; connecting them to physical landscape features requires further analysis.
+- **Feature interpretability**: Embedding dimensions (A00--A63) are abstract; connecting them to physical landscape features requires further analysis.
 - **Small sample**: With only 339 municipalities, complex models risk overfitting despite cross-validation.
 
 **Next steps** could include: trying other algorithms (gradient boosting, regularized regression), incorporating additional features (geographic, demographic), or using explainability tools like SHAP values for richer interpretation.
+
+## Exercises
+
+1. **Try a different algorithm.** Replace `RandomForestRegressor` with `GradientBoostingRegressor` from scikit-learn. Does the R² improve? How do the feature importance rankings change compared to Random Forest?
+
+2. **Predict a different SDG index.** The DS4Bolivia dataset contains 15 individual SDG indices (`sdg1` through `sdg15`) alongside the composite IMDS. Pick one SDG index as the target and re-run the full pipeline. Which SDG dimensions are most predictable from satellite imagery, and which are hardest?
+
+3. **Add geographic features.** Merge the region names data and create dummy variables for Bolivia's nine departments. Does combining satellite embeddings with administrative region information improve model performance? What does this tell you about spatial patterns in development?
+
+## References
+
+1. [scikit-learn --- RandomForestRegressor](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)
+2. [scikit-learn --- RandomizedSearchCV](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.RandomizedSearchCV.html)
+3. [scikit-learn --- Permutation Importance](https://scikit-learn.org/stable/modules/permutation_importance.html)
+4. [scikit-learn --- Partial Dependence Plots](https://scikit-learn.org/stable/modules/partial_dependence.html)
+5. [DS4Bolivia --- Open Data for Bolivian Development](https://github.com/quarcs-lab/ds4bolivia)
+6. [Breiman, L. (2001). Random Forests. Machine Learning, 45(1), 5--32.](https://doi.org/10.1023/A:1010933404324)
