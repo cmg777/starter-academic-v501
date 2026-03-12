@@ -318,9 +318,19 @@ DoWhy identifies the **backdoor estimand** as the primary identification strateg
 
 With the estimand identified, we now apply statistical methods to compute the actual causal effect estimate. DoWhy supports multiple estimation methods, each with different assumptions and properties. We compare five approaches to see how robust the estimate is across methods.
 
+Causal estimation methods fall into **three broad paradigms**, distinguished by what they model:
+
+1. **Outcome modeling** (Regression Adjustment) --- directly models the relationship $E[Y \mid X, T]$ between covariates, treatment, and outcome. Its validity depends on correctly specifying this outcome model.
+2. **Treatment modeling** (IPW) --- models the treatment assignment mechanism $P(T \mid X)$ and reweights observations to remove confounding. Its validity depends on correctly specifying the propensity score model.
+3. **Hybrid approaches** (Doubly Robust, Stratification, Matching) --- use the propensity score in different ways, sometimes combining it with outcome modeling for added robustness.
+
+Understanding these paradigms helps clarify why different methods can give somewhat different estimates and why comparing across paradigms is a powerful robustness check. If outcome modeling and treatment modeling agree, we can be more confident that neither model is badly misspecified.
+
 ### Method 1: Regression Adjustment
 
-The simplest approach adjusts for confounders by including them as covariates in a linear regression. The treatment effect is the coefficient on the treatment indicator after controlling for all covariates. This assumes a linear relationship between covariates and the outcome, which may be restrictive but provides a transparent baseline.
+Regression adjustment is grounded in the **potential outcomes framework**: each individual has two potential outcomes --- $Y(1)$ if treated and $Y(0)$ if not --- and the causal effect is their difference. Since we only observe one outcome per person, regression adjustment estimates both potential outcomes by modeling $E[Y \mid X, T]$, the conditional expectation of the outcome given covariates and treatment status. The treatment effect is the coefficient on the treatment indicator, which captures the difference in expected outcomes between treated and control units **at the same covariate values** --- effectively comparing apples to apples.
+
+The key assumption is that the outcome model must be **correctly specified**. If the true relationship between covariates and the outcome is nonlinear or includes interactions, a simple linear model will produce biased estimates. In econometrics, this approach is closely related to the **Frisch-Waugh-Lovell theorem**, which shows that the treatment coefficient in a multiple regression is identical to what you would get by first partialing out the covariates from both the treatment and the outcome, then regressing the residuals on each other. This makes regression adjustment the simplest and most transparent baseline estimator.
 
 ```python
 estimate_ra = model.estimate_effect(
@@ -339,7 +349,11 @@ The regression adjustment estimate is \\$1,676, slightly lower than the naive di
 
 ### Method 2: Inverse Probability Weighting (IPW)
 
-IPW takes a fundamentally different approach from regression adjustment. Instead of modeling the outcome, it models the **treatment assignment mechanism**. Each observation is weighted by the inverse of its probability of receiving the treatment it actually received (the **propensity score**). This reweighting creates a "pseudo-population" in which treatment assignment is independent of the observed confounders, mimicking what a randomized experiment would look like.
+IPW takes a fundamentally different approach from regression adjustment. Instead of modeling the outcome, it models the **treatment assignment mechanism**. The central concept is the **propensity score**, $e(X) = P(T = 1 \mid X)$ --- the probability that a unit receives treatment given its observed covariates. A person with a propensity score of 0.8 has an 80% chance of being treated based on their characteristics; a person with a score of 0.2 has only a 20% chance.
+
+The key intuition behind inverse weighting is that **units who are unlikely to receive the treatment they actually received carry more information** about the causal effect. Consider a treated individual with a low propensity score (say 0.1) --- this person was unlikely to be treated, yet was treated. Their outcome is especially informative because they are "similar" to the control group in all observable respects. IPW upweights such surprising cases by assigning them a weight of $1/e(X) = 10$, while a treated person with $e(X) = 0.9$ receives a weight of only $1/0.9 \approx 1.1$. This reweighting creates a "pseudo-population" in which treatment assignment is independent of the observed confounders, mimicking what a randomized experiment would look like.
+
+A critical contrast with regression adjustment: IPW makes **no assumptions about how covariates relate to the outcome** --- it only requires that the propensity score model is correctly specified. However, IPW has a key vulnerability: when propensity scores are extreme (near 0 or 1), the inverse weights become very large, producing **unstable estimates with high variance**. This is why practitioners often use weight trimming or stabilized weights in practice.
 
 The IPW estimator is:
 
@@ -365,6 +379,10 @@ The IPW estimate of \\$1,559 is the lowest among all methods. IPW is sensitive t
 ### Method 3: Doubly Robust (AIPW)
 
 The **doubly robust** estimator --- also called **Augmented Inverse Probability Weighting (AIPW)** --- combines both regression adjustment and IPW into a single estimator. The key advantage is that the estimate is consistent if *either* the outcome model *or* the propensity score model is correctly specified (hence "doubly robust"). This provides an important safeguard against model misspecification.
+
+The intuition is straightforward: AIPW starts with the regression adjustment estimate ($\hat{\mu}\_1(X) - \hat{\mu}\_0(X)$, the difference in predicted outcomes under treatment and control) and then **adds a correction term** based on the IPW-weighted prediction errors. If the outcome model is perfectly specified, the prediction errors $Y - \hat{\mu}(X)$ are pure noise and the correction averages to zero --- the regression adjustment alone does the work. If the outcome model is misspecified but the propensity score model is correct, the IPW-weighted correction term exactly compensates for the bias in the outcome predictions. This is why the estimator only needs **one** of the two models to be correct --- whichever model is right "rescues" the other.
+
+Beyond its robustness property, AIPW achieves the **semiparametric efficiency bound** when both models are correctly specified, meaning no other estimator that makes the same assumptions can have lower variance. This makes it a natural default choice in modern causal inference.
 
 The AIPW estimator is:
 
@@ -404,7 +422,11 @@ The doubly robust estimate of \\$1,620 falls between the regression adjustment (
 
 ### Method 4: Propensity Score Stratification
 
-Propensity score stratification works by first estimating each individual's probability of receiving treatment given their covariates (the **propensity score**), then dividing the sample into strata with similar propensity scores. Within each stratum, treated and control individuals are more comparable, so the within-stratum treatment effect is less biased. The overall ATE is a weighted average of the stratum-specific effects.
+Propensity score stratification builds on a powerful result from Rosenbaum and Rubin (1983): **conditioning on the scalar propensity score is sufficient to remove all confounding from observed covariates**, even though the score compresses multiple covariates into a single number. This means that within a group of individuals who all have similar propensity scores, treatment assignment is effectively random with respect to the observed confounders --- just as in a randomized experiment.
+
+Stratification is a **discrete approximation** to this idea. Instead of conditioning on the exact propensity score (which would require infinite data), we bin observations into a small number of strata --- typically 5 quintiles. Within each stratum, treated and control individuals have similar propensity scores and are therefore more comparable, so the within-stratum treatment effect is less confounded. The overall ATE is a weighted average of these stratum-specific effects. A classic result from Cochran (1968) shows that **5 strata typically remove over 90% of the bias** from observed confounders, making this a surprisingly effective yet simple approach.
+
+There is a practical trade-off in choosing the number of strata: more strata produce finer covariate balance within each group, reducing bias, but also leave fewer observations per stratum, increasing variance. Five strata is the conventional choice, balancing these considerations well.
 
 ```python
 estimate_ps_strat = model.estimate_effect(
@@ -423,7 +445,11 @@ Propensity score stratification with 5 strata estimates the ATE at \\$1,617, ver
 
 ### Method 5: Propensity Score Matching
 
-Propensity score matching pairs each treated individual with one or more control individuals who have similar propensity scores. The treatment effect is estimated by comparing outcomes within matched pairs. This is conceptually the most intuitive approach --- it mimics what we would see if we could directly compare individuals who are identical except for their treatment status.
+Propensity score matching constructs a comparison group by finding, for each treated individual, the control individual(s) with the most similar propensity score. The treatment effect is then estimated by comparing outcomes within these matched pairs. This is conceptually the most intuitive approach --- it directly mimics what we would see if we could compare individuals who are identical except for their treatment status.
+
+An important subtlety is that matching typically **discards unmatched control units** --- those with no treated counterpart nearby in propensity score space. This means the estimand shifts from the **Average Treatment Effect (ATE)** toward the **Average Treatment Effect on the Treated (ATT)**, which answers a slightly different question: "What was the effect of treatment for those who were actually treated?" rather than "What would the effect be if we treated everyone?"
+
+Several practical choices affect matching quality. **With-replacement** matching allows each control to be matched to multiple treated units, reducing bias but increasing variance. **1:k matching** uses $k$ nearest controls per treated unit, averaging out noise but potentially introducing worse matches. **Caliper restrictions** discard matches where the propensity score difference exceeds a threshold, preventing poor matches at the cost of losing some treated observations. These choices create a fundamental **bias-variance trade-off**: tighter matching criteria reduce bias from imperfect comparisons but may discard many observations, increasing the variance of the estimate.
 
 ```python
 estimate_ps_match = model.estimate_effect(
