@@ -181,17 +181,63 @@ fenced Python code blocks.
 |---------|---------|----------|
 | **Colab badge** | `<a href="..." target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>` (if applicable) | If exists |
 | **Overview** | 1-2 paragraphs: What question are we answering? Why does this method matter? Frame as: "We want to know X. Method Y can help because Z." | Yes |
-| **Learning objectives** | 3-5 bullet points under `**Learning objectives:**` label | Yes |
+| **Learning objectives** | 3-5 bullet points using strong action verbs (Understand, Implement, Estimate, Assess, Compare). Avoid vague verbs like "explore" or "see" | Yes |
 | **Setup & imports** | Imports, config variables, seed, data URLs | Yes |
 | **Data loading** | Load dataset, explain structure, print shape/stats | Yes |
 | **EDA** | At least 1 figure, connected to case study question | Yes |
 | **Data preparation** | Scaling, encoding, train/test split as needed | If needed |
+| **Baseline** | Simple approach first (naive OLS, difference in means, basic model) to establish a benchmark and motivate the full method | Encouraged |
 | **Core method** (1-3 sections) | Main technique with conceptual explanations. Each major step gets its own `##`. At least 1 figure | Yes |
 | **Evaluation & results** | Metrics, comparison tables, at least 1 figure | Yes |
+| **Validation & robustness** | At least one robustness check: learner comparison, refutation test, residual analysis, or sensitivity analysis | Encouraged |
 | **Discussion** | What findings mean for the case study question. Connect to real-world context | Yes |
-| **Summary and next steps** | Results table + key takeaways + limitations + suggestions | Yes |
+| **Summary and next steps** | Takeaways (concrete insights with numbers) + limitations + next steps | Yes |
 | **Exercises** | 2-3 self-study challenges for the reader | Encouraged |
 | **References** | Numbered list of clickable links to all sources | Yes |
+
+**Narrative flow rules:**
+
+- **Transitions.** End each section with a sentence that previews the
+  next step or links back to the case study question. The reader should
+  never wonder "why are we doing this now?"
+- **Question-answer arc.** The Overview poses a question. The Discussion
+  must explicitly answer it with specific findings. Check that these
+  two sections mirror each other.
+- **Result ordering.** Present the most important finding first in the
+  Evaluation & Results section. Do not bury the key result after
+  preliminary diagnostics.
+- **"So what?" moment.** At least one paragraph (typically in Discussion)
+  must state a clear practical implication -- what a policymaker,
+  analyst, or practitioner would do with this finding.
+
+**Takeaways requirements:**
+
+- Takeaways must be concrete insights with numbers, not generic
+  summaries. Bad: "We learned about Random Forest." Good: "Satellite
+  embeddings explain 23% of development variation (R^2 = 0.23), with
+  embedding A05 contributing 3x more than the median feature."
+- Cover at least 4 dimensions: (1) a method insight (when to use this
+  method), (2) a data insight (what the data revealed), (3) a practical
+  limitation (when this approach fails), (4) a next step (what to try
+  next).
+- Do not restate section headings. Each takeaway should stand alone as
+  something the reader remembers a week later.
+
+**Narrative arc:**
+
+Structure the post as a journey that follows this arc:
+1. **Question** (Overview) -- pose the case study question
+2. **Intuition** (EDA) -- show the data, build understanding
+3. **Simple baseline** -- establish a benchmark with the simplest approach
+4. **Full method** -- introduce and apply the main technique
+5. **Validation** -- test whether results hold (robustness checks)
+6. **Takeaways** -- answer the original question with specific findings
+
+**Subsection structure:**
+
+When a method has multiple conceptual steps (e.g., model fitting,
+cross-validation, test evaluation), use `###` subsections to break them
+up. This creates visual structure in the TOC and helps readers navigate.
 
 ### 2.2 The sandwich pattern
 
@@ -201,6 +247,28 @@ fenced Python code blocks.
 - What technique/step this is and why it matters
 - How it connects to the case study question
 - Written generically (no output values -- they haven't been computed yet)
+
+**Beginner accessibility rules (apply to all explanation paragraphs):**
+
+- **Define jargon on first use.** The first time a technical term appears
+  (e.g., "cross-fitting", "confounders", "regularization"), follow it
+  immediately with a plain-language definition in the same sentence or
+  the next sentence. Example: "...using *cross-fitting* -- a procedure
+  that splits the data into folds so that the model never predicts on
+  the same data it was trained on."
+- **Explain why, not just what.** Every code block needs a sentence
+  explaining *why* this step is needed for the analysis, not just what
+  it does mechanically. Bad: "Next we scale the features." Good: "Next
+  we scale the features so that variables with larger ranges do not
+  dominate the distance calculations."
+- **No complexity jumps.** If a code block is substantially more complex
+  than the previous one, add a bridging paragraph that previews the new
+  concept before the code.
+- **Concrete before abstract.** When introducing a concept, give a
+  real-world analogy or concrete example first, then the formal
+  definition. Example: "Think of cross-validation as a rotating exam:
+  the model takes turns training on different subsets and testing on the
+  remainder, so no single lucky split determines the score."
 
 **2. Code block** -- focused, well-commented, one logical step:
 
@@ -234,6 +302,32 @@ image reference serves as the visible output).
 - Explains what they mean in plain language
 - Connects to the case study question
 - 2-4 sentences, single continuous paragraph
+
+### 2.2b Function documentation
+
+The first time a Python function is used in the post, introduce it
+properly so the reader understands what it does and can learn more.
+
+**For each key function on first use:**
+
+1. **Link to docs.** In the explanation paragraph before the code block,
+   link the function name to its official documentation. Use markdown:
+   `[train_test_split()](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html)`.
+2. **State its purpose.** One plain-language sentence explaining what the
+   function does. Example: "We use
+   [DoubleMLPLR()](https://docs.doubleml.org/stable/api/generated/doubleml.DoubleMLPLR.html)
+   to estimate the causal effect of the treatment while controlling for
+   confounders using machine learning."
+3. **Explain key arguments.** Briefly describe 2-3 arguments the reader
+   needs to understand. Example: "`ml_l` sets the learner for the
+   outcome model, `ml_m` sets the learner for the treatment model, and
+   `n_folds` controls how many cross-fitting folds are used."
+
+Not every function needs this treatment -- focus on the functions that
+are central to the analysis (model constructors, key sklearn/statsmodels
+calls, data transformation functions). Standard pandas/numpy operations
+like `pd.read_csv()` or `np.mean()` can be skipped unless used in a
+non-obvious way.
 
 ### 2.3 Code block conventions
 
@@ -294,8 +388,46 @@ stripping the backslash. This breaks LaTeX commands that use punctuation.
 | Percent `95%` | `$\text{CI}\_{95\\%}$` | `$\text{CI}_{95\%}$` | percent |
 | Thick space | `$[-0.14, \\; -0.00]$` | `$[-0.14, \; -0.00]$` | thick space |
 
+**Worked example -- a full equation with all escaping applied:**
+
+What you want rendered:
+$$Y_i = \theta_0 \, D_i + g_0(X_i) + U_i, \quad E[U_i | D_i, X_i] = 0$$
+
+What you write in `index.md`:
+```
+$$Y\_i = \theta\_0 \\, D\_i + g\_0(X\_i) + U\_i, \\quad E[U\_i | D\_i, X\_i] = 0$$
+```
+
+Key escaping applied: every `_` → `\_`, every `\,` → `\\,`, every `\quad` is fine (letter command).
+
 **WARNING:** Always visually verify math rendering in the Hugo dev server.
 LaTeX errors are silent -- broken math renders as raw text or wrong symbols.
+
+### 2.4b Equation requirements
+
+Every post that introduces a quantitative method must present its key
+equations. Equations ground intuition in formal notation and connect
+the math to the code.
+
+**Minimum:** 2 display-math equations for any post introducing a
+quantitative method.
+
+**For each equation:**
+
+1. **Plain-language explanation.** Immediately after the equation, write
+   a sentence starting with "In words, this says..." or equivalent.
+   Example: "In words, this equation says that the outcome $Y$ equals
+   the treatment effect $\theta$ times the treatment $D$, plus
+   everything else that affects $Y$ through the controls $X$."
+
+2. **Variable mapping.** Map math symbols to code variables so beginners
+   can connect the formula to the implementation. Example: "$Y$
+   corresponds to our `inuidur1` column, $D$ is the `tg` treatment
+   indicator, and $X$ includes the 15 covariate columns."
+
+3. **Notation consistency.** Use the same symbol for the same concept
+   throughout the entire post. Do not switch between $Y$ and $y$, or
+   $D$ and $T$, without explicit explanation.
 
 ### 2.5 Figure conventions
 
@@ -316,6 +448,19 @@ Hugo resolves images from the page bundle, so use just the filename. Use the
 site color palette (see top of this document) for all matplotlib plots.
 At least 3 figures total.
 
+**Figure placement:** Place the figure image reference (`![alt](file.png)`)
+immediately after the code block that generates it, before the
+interpretation paragraph. The figure serves as visual output; the
+interpretation paragraph then explains what the reader is seeing.
+
+### 2.5b Diagrams
+
+If the method has a causal, structural, or multi-step framework, include
+at least one diagram to visualize the structure. Examples: a DAG for
+causal inference, a flowchart for a multi-step pipeline, an architecture
+diagram for an ensemble model. Generate diagrams with matplotlib or
+include a pre-made image in the page bundle.
+
 ### 2.6 Tables
 
 Write Markdown tables directly (styled by CSS section 11C -- teal header
@@ -327,6 +472,11 @@ underlines, hover effects):
 | R^2    | 0.231    | 0.230 |
 | RMSE   | 6.52     | 6.52  |
 ```
+
+When comparing multiple estimation approaches or model configurations,
+use a Markdown table to display key metrics side-by-side. This is one of
+the most effective pedagogical tools -- readers can scan a table faster
+than re-reading multiple paragraphs of results.
 
 ### 2.7 References section
 
@@ -340,7 +490,27 @@ Final section of every post:
 3. [Dataset Name -- Source](https://dataset-url)
 ```
 
-Include at minimum: library docs, dataset source, and any papers/tutorials used.
+Include at minimum:
+- **Original method paper** -- cite the academic paper that introduced
+  the method (not just library documentation). Example: for DoubleML,
+  cite Chernozhukov et al. (2018), not just the Python package docs.
+- **Dataset source** -- cite with author, year, and title (not just a
+  raw URL). Example: `[DS4Bolivia -- QUARCS Lab (2021)](https://...)`.
+- **Library documentation** -- link to the main library docs page.
+- **Order:** Number references in order of first mention in the post.
+
+### 2.8 Writing clarity
+
+- **Sentence length.** Keep sentences under ~40 words. If a sentence
+  needs re-reading, split it. Target ~25 words average per paragraph.
+- **Active voice.** Prefer "We estimate the model" over "The model is
+  estimated." Active voice is clearer and more engaging.
+- **Analogies for complex concepts.** For each new technical concept,
+  provide a real-world analogy or concrete example before the formal
+  definition. At least 2 analogies per post.
+- **Consistent terminology.** Pick one term for each concept and use it
+  throughout. Do not alternate between "treatment variable",
+  "intervention", and "policy" for the same concept without explanation.
 
 ---
 
@@ -367,9 +537,13 @@ Each interpretation paragraph must:
 
 1. **Quote specific numbers** (e.g., "R^2 = 0.23", "339 observations", "mean of 51.05")
 2. **Explain what those numbers mean** in plain language a beginner can understand
-3. **Connect findings to the case study question** and real-world context
-4. **Be a single continuous paragraph** (no bullet points, no hard line breaks)
-5. **Be 2-4 sentences** -- concise but substantive
+3. **Translate to domain meaning** -- convert abstract metrics into
+   real-world statements. Bad: "MAE = 4.72." Good: "Predictions are
+   typically off by about 4.7 IMDS points -- meaningful uncertainty that
+   would make targeting aid to specific municipalities difficult."
+4. **Connect findings to the case study question** and real-world context
+5. **Be a single continuous paragraph** (no bullet points, no hard line breaks)
+6. **Be 2-4 sentences** -- concise but substantive
 
 ### Good vs bad
 
@@ -501,11 +675,19 @@ post header. Choose whichever best represents the post at a glance.
    - At least 8 interpretation paragraphs with specific numbers
    - References section at the end
    - Colab badge (if applicable)
-2. **Run Hugo dev server:**
+2. **Run the code:**
+   - If `script.py` exists, run it: `python3 content/post/python_<slug>/script.py`
+   - If not, assemble code blocks from `index.md` into a temporary script and run it
+   - Compare actual printed output against the output blocks in `index.md`
+   - Flag any discrepancies: different numbers, errors, deprecation warnings
+   - Verify that all referenced PNG files were generated
+   - If any output differs, update the output blocks in the post to match
+     actual results
+3. **Run Hugo dev server:**
    ```bash
    "$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender
    ```
-3. **Visual checks:**
+4. **Visual checks:**
    - Post renders at `http://localhost:1313/post/python_<slug>/`
    - Left-side TOC shows sections and subsections
    - Code blocks have syntax highlighting
@@ -514,7 +696,7 @@ post header. Choose whichever best represents the post at a glance.
    - **All LaTeX math renders correctly** (no raw text, no wrong symbols)
    - Output blocks appear after code that prints results
    - Featured image displays in post header and listings
-4. **Report** to user: what was created + local preview URL
+5. **Report** to user: what was created + local preview URL
 
 ---
 
@@ -542,3 +724,28 @@ post header. Choose whichever best represents the post at a glance.
 - [ ] Date set to current date
 - [ ] Data loading matches user-specified dataset
 - [ ] Notebook companion (if created) uses raw LaTeX (no Goldmark escaping)
+- [ ] Technical jargon defined on first use (no unexplained terms)
+- [ ] At least 2 display-math equations (for quantitative method posts)
+- [ ] Each equation has plain-language explanation and variable mapping
+- [ ] Notation consistent throughout (same symbol = same concept)
+- [ ] At least 2 analogies or concrete examples for complex concepts
+- [ ] No sentence exceeds ~40 words
+- [ ] Active voice preferred throughout
+- [ ] Transitions between all sections (no abrupt jumps)
+- [ ] Discussion answers the Overview question explicitly
+- [ ] "So what?" practical implication stated
+- [ ] Takeaways are concrete with numbers (not generic summaries)
+- [ ] Takeaways cover: method insight, data insight, limitation, next step
+- [ ] References include original method paper (not just library docs)
+- [ ] Dataset source cited with author/year/title
+- [ ] References numbered in order of first mention
+- [ ] Code executed and output blocks match actual results
+- [ ] Key Python functions linked to docs and explained on first use
+- [ ] Simple baseline established before the full method
+- [ ] At least one robustness/validation check included
+- [ ] Comparison summary table for multiple approaches or configurations
+- [ ] Diagram included for causal/structural/multi-step methods
+- [ ] Learning objectives use strong action verbs (Understand, Implement, Estimate, Assess, Compare)
+- [ ] Interpretation paragraphs translate metrics into domain-meaningful statements
+- [ ] Figure image references placed immediately after generating code block
+- [ ] Narrative follows arc: Question → Intuition → Baseline → Method → Validation → Takeaways

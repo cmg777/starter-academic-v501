@@ -38,6 +38,7 @@ Academic portfolio website for **Carlos Mendez**, Associate Professor of Develop
 │   └── slides/               # Presentation slides
 │
 ├── assets/
+│   ├── js/mathjax-config.js  # MathJax override (processEscapes: true)
 │   ├── media/                # Site images (covers, icons)
 │   └── scss/custom.scss      # Custom CSS overrides
 │
@@ -262,6 +263,25 @@ The `data-science-post` skill automates creating notebook-style data science blo
 The skill enforces the sandwich pattern (explanation, code, interpretation), uses the site color palette (`#6a9bcc`, `#d97757`, `#141413`, `#00d4c8`), and requires at least 8 interpretation paragraphs with specific numeric values. Posts inherit notebook-style CSS styling from `assets/scss/custom.scss` and use `toc: true` for the left-side table of contents.
 
 **Reference post:** `content/post/python_ml_random_forest/index.md`
+
+### Review a Data Science Post (via Claude Code Skill)
+
+The `referee-post` skill reviews data science posts as an expert professor. It produces a structured referee report without modifying the post.
+
+**Location:** `.claude/skills/referee-post/SKILL.md`
+
+**Usage** (in Claude Code):
+
+```
+/project:referee-post <post slug>
+```
+
+**Examples:**
+
+```
+/project:referee-post python_dowhy
+/project:referee-post python_doubleml
+```
 
 ### New Author
 

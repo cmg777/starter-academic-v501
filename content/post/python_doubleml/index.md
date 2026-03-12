@@ -40,7 +40,7 @@ toc: true
 
 ## Overview
 
-Does a cash bonus actually cause unemployed workers to find jobs faster, or do the workers who receive bonuses simply differ from those who do not? This is the core challenge of **causal inference**: separating a genuine treatment effect from the confounding influence of observed and unobserved characteristics. Standard regression can adjust for covariates, but when the relationship between confounders and outcomes is complex and nonlinear, linear models may fail to fully remove bias.
+Does a cash bonus actually cause unemployed workers to find jobs faster, or do the workers who receive bonuses simply differ from those who do not? This is the core challenge of **causal inference**: separating a genuine treatment effect from the influence of *confounders* -- variables that affect both the treatment and the outcome, creating spurious associations. Standard regression can adjust for these confounders, but when their relationship with the outcome is complex and nonlinear, linear models may fail to fully remove bias.
 
 **Double Machine Learning (DML)** addresses this problem by using flexible machine learning models to partial out the confounding variation, then estimating the causal effect on the cleaned residuals. In this tutorial we apply DML to the Pennsylvania Bonus Experiment, a real randomized study where some unemployment insurance claimants received a cash bonus for finding employment quickly. We estimate how much the bonus reduced unemployment duration, and we compare DML estimates against naive and covariate-adjusted OLS to see how debiasing changes the results.
 
@@ -66,7 +66,6 @@ The following code imports all necessary libraries and sets the configuration va
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.base import clone
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LassoCV, LinearRegression
@@ -81,7 +80,6 @@ np.random.seed(RANDOM_SEED)
 OUTCOME = "inuidur1"
 OUTCOME_LABEL = "Log Unemployment Duration"
 TREATMENT = "tg"
-TREATMENT_LABEL = "Cash Bonus (tg)"
 COVARIATES = [
     "female", "black", "othrace", "dep1", "dep2",
     "q2", "q3", "q4", "q5", "q6",
@@ -109,23 +107,24 @@ Dataset shape: (5099, 26)
 Observations: 5099
 
 Treatment groups:
-0    3354
-1    1745
-Name: tg, dtype: int64
+tg
+Control    3354
+Bonus      1745
+Name: count, dtype: int64
 
 Outcome (inuidur1) summary:
 count    5099.000
 mean        2.028
 std         1.215
 min         0.000
-25%         0.693
+25%         1.099
 50%         2.398
-75%         3.135
-max         3.950
+75%         3.219
+max         3.951
 Name: inuidur1, dtype: float64
 ```
 
-The dataset contains 5,099 unemployment insurance claimants with 26 variables. The treatment is unevenly split: 1,745 claimants received the bonus offer while 3,354 served as controls. The outcome variable, log unemployment duration (`inuidur1`), ranges from 0.0 to 3.95 with a mean of 2.028 and standard deviation of 1.215, indicating substantial variation in how long claimants remained unemployed. The median (2.398) exceeds the mean, suggesting a left-skewed distribution where some claimants found jobs very quickly.
+The dataset contains 5,099 unemployment insurance claimants with 26 variables. The treatment is unevenly split: 1,745 claimants received the bonus offer while 3,354 served as controls. The outcome variable, log unemployment duration (`inuidur1`), ranges from 0.0 to 3.95 with a mean of 2.028 and standard deviation of 1.215, indicating substantial variation in how long claimants remained unemployed. The median (2.398) exceeds the mean, suggesting a left-skewed distribution where some claimants found jobs very quickly. The interquartile range spans from 1.099 to 3.219, meaning the middle 50% of claimants had log durations in this band.
 
 ## Exploratory data analysis
 
@@ -188,7 +187,7 @@ Adding covariates $X$ linearly gives:
 
 $$Y\_i = \alpha + \beta \\, D\_i + X\_i' \gamma + \epsilon\_i \quad \text{(with covariates)}$$
 
-In both cases, $\beta$ is the estimated treatment effect. But if the true relationship between $X$ and $Y$ is nonlinear, the linear specification may leave residual confounding in $\hat{\beta}$.
+In our data, $Y\_i$ is `inuidur1` (log unemployment duration), $D\_i$ is `tg` (the bonus indicator), and $X\_i$ contains the 15 demographic and labor market covariates. In both cases, $\beta$ is the estimated treatment effect. But if the true relationship between $X$ and $Y$ is nonlinear, the linear specification may leave residual confounding in $\hat{\beta}$.
 
 ### Naive OLS baseline
 
@@ -226,7 +225,7 @@ $$Y = D \\, \theta\_0 + g\_0(X) + \varepsilon, \quad E[\varepsilon \mid D, X] = 
 
 $$D = m\_0(X) + V, \quad E[V \mid X] = 0$$
 
-Here, $\theta\_0$ is the causal parameter of interest, $g\_0(\cdot)$ is the nuisance function that captures how covariates affect the outcome, and $m\_0(\cdot)$ models how covariates predict treatment assignment. The error terms $\varepsilon$ and $V$ are orthogonal to the covariates by construction. The challenge is that both $g\_0$ and $m\_0$ can be arbitrarily complex — DML uses machine learning to estimate them flexibly.
+Here, $\theta\_0$ is the causal parameter of interest -- the effect of the bonus on unemployment duration that we want to estimate. The function $g\_0(\cdot)$ is a *nuisance function*, meaning it is not our target but something we must estimate along the way; it captures how covariates affect the outcome. Similarly, $m\_0(\cdot)$ models how covariates predict treatment assignment. Think of nuisance functions as scaffolding: essential during construction but not part of the final result. The error terms $\varepsilon$ and $V$ are orthogonal to the covariates by construction. In our data, $Y$ = `inuidur1`, $D$ = `tg`, and $X$ includes the 15 covariate columns in `COVARIATES`. The challenge is that both $g\_0$ and $m\_0$ can be arbitrarily complex — DML uses machine learning to estimate them flexibly.
 
 ### The partialling-out estimator
 
@@ -240,15 +239,15 @@ Finally, it regresses the outcome residuals on the treatment residuals to obtain
 
 $$\hat{\theta}\_0 = \left( \frac{1}{N} \sum\_{i=1}^{N} \tilde{D}\_i^2 \right)^{-1} \frac{1}{N} \sum\_{i=1}^{N} \tilde{D}\_i \\, \tilde{Y}\_i$$
 
-This "cleaning" step removes confounding variation, leaving only the causal relationship between $D$ and $Y$.
+Think of this like noise-canceling headphones: the ML models learn the "noise" pattern (how covariates influence both $Y$ and $D$), and we subtract it away so that only the "signal" -- the causal relationship between $D$ and $Y$ -- remains.
 
 ### Cross-fitting: why it matters
 
-A naive implementation of partialling-out would use the same data to fit the ML models and compute residuals, introducing **regularization bias**. DML solves this with **cross-fitting**: the data is split into $K$ folds, and each fold's residuals are computed using ML models trained on the other $K-1$ folds. The cross-fitted estimator is:
+A naive implementation of partialling-out would use the same data to fit the ML models and compute residuals. This introduces **regularization bias** -- a distortion that occurs because the ML model's complexity penalty contaminates the causal estimate. DML solves this with **cross-fitting**: the data is split into $K$ folds, and each fold's residuals are computed using ML models trained on the other $K-1$ folds. Think of it like grading exams: to avoid bias, we split the class into groups where each group's predictions are made by a model that never saw their data. The cross-fitted estimator is:
 
 $$\hat{\theta}\_0^{CF} = \left( \frac{1}{N} \sum\_{k=1}^{K} \sum\_{i \in I\_k} \left(\tilde{D}\_i^{(k)}\right)^2 \right)^{-1} \frac{1}{N} \sum\_{k=1}^{K} \sum\_{i \in I\_k} \tilde{D}\_i^{(k)} \\, \tilde{Y}\_i^{(k)}$$
 
-where $\tilde{Y}\_i^{(k)}$ and $\tilde{D}\_i^{(k)}$ are residuals for observation $i$ in fold $k$, computed using models trained on all folds except $k$. This ensures that the residuals are computed out-of-sample, eliminating overfitting bias and preserving valid statistical inference (standard errors, p-values, confidence intervals).
+where $\tilde{Y}\_i^{(k)}$ and $\tilde{D}\_i^{(k)}$ are residuals for observation $i$ in fold $k$, computed using models trained on all folds except $k$. In words, we average the treatment effect estimates across all folds, where each fold's estimate uses residuals computed from models that never saw that fold's data. This ensures that the residuals are computed out-of-sample, eliminating overfitting bias and preserving valid statistical inference (standard errors, p-values, confidence intervals).
 
 ## Setting up DoubleML
 
@@ -356,7 +355,7 @@ The interval excludes zero, confirming that the bonus has a genuine causal impac
 
 ## Sensitivity: does the choice of ML learner matter?
 
-A key advantage of DML is that it is *agnostic* to the choice of ML learner, as long as the learner is flexible enough to approximate the true confounding function. To verify that our results are not driven by the specific choice of Random Forest, we re-estimate the model using Lasso (L1-regularized linear regression), a fundamentally different class of learner.
+A key advantage of DML is that it is *agnostic* to the choice of ML learner, as long as the learner is flexible enough to approximate the true confounding function. To verify that our results are not driven by the specific choice of Random Forest, we re-estimate the model using Lasso, a fundamentally different class of learner. Lasso is a linear regression with L1 regularization, meaning it adds a penalty proportional to the absolute size of each coefficient, which drives some coefficients to exactly zero and effectively performs variable selection.
 
 ```python
 ml_l_lasso = LassoCV()
@@ -459,17 +458,17 @@ The robustness across learners (Random Forest vs. Lasso) is a strength of DML. B
 
 This tutorial demonstrated Double Machine Learning for causal inference using the Pennsylvania Bonus Experiment. The key takeaways are:
 
-- DML separates causal estimation from nuisance function estimation, allowing flexible ML models to handle confounders
-- Cross-fitting eliminates regularization bias, enabling valid statistical inference
-- The bonus reduces log unemployment duration by ~7.4% (p = 0.038), a modest but statistically significant effect
-- Results are robust across Random Forest and Lasso learners, with nearly identical estimates
+- **Method:** DML's main advantage over OLS is not the point estimate (both give ~7% here) but the *infrastructure* -- valid standard errors, confidence intervals, and robustness to nonlinear confounding. On this RCT the estimates are similar; on observational data where $g\_0(X)$ is complex, OLS would break down while DML remains valid
+- **Data:** The cash bonus reduces unemployment duration by 7.4% ($p = 0.038$, 95% CI: [-14.3%, -0.4%]). The wide CI means the true effect could be anywhere from negligible to substantial -- policymakers should not over-interpret the point estimate
+- **Robustness:** Random Forest and Lasso produce nearly identical estimates (-0.0736 vs -0.0712), differing by less than 7% of the standard error. This learner-agnosticism is a core strength of the DML framework
+- **Limitation:** The PLR model assumes a constant treatment effect ($\theta\_0$ is the same for everyone). If the bonus helps some subgroups more than others (e.g., younger vs. older workers), PLR will average over this heterogeneity -- use the Interactive Regression Model (IRM) to detect it
 
 **Limitations:**
 
 - The Pennsylvania Bonus Experiment is a randomized trial, which is the easiest setting for causal inference. DML's advantages are more pronounced in observational studies where confounding is severe
 - We used the PLR model, which assumes a linear treatment effect ($\theta\_0$ is constant). More complex treatment heterogeneity could be explored with the Interactive Regression Model (IRM)
 - The confidence intervals are wide, reflecting limited sample size and moderate signal strength
-- We did not explore heterogeneous treatment effects (e.g., does the bonus work differently for men vs. women?)
+- We did not explore heterogeneous treatment effects -- situations where the bonus might help some subgroups (e.g., younger workers, women) more than others
 
 **Next steps:**
 
@@ -488,8 +487,19 @@ This tutorial demonstrated Double Machine Learning for causal inference using th
 
 ## References
 
-1. [DoubleML -- Python Documentation](https://docs.doubleml.org/stable/intro/intro.html)
-2. [Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., & Robins, J. (2018). Double/Debiased Machine Learning for Treatment and Structural Parameters. The Econometrics Journal, 21(1), C1--C68.](https://doi.org/10.1111/ectj.12097)
-3. [Pennsylvania Bonus Experiment Dataset -- DoubleML](https://docs.doubleml.org/stable/api/datasets.html#doubleml.datasets.fetch_bonus)
-4. [scikit-learn -- RandomForestRegressor](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)
-5. [scikit-learn -- LassoCV](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html)
+**Academic references:**
+
+1. [Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., & Robins, J. (2018). Double/Debiased Machine Learning for Treatment and Structural Parameters. The Econometrics Journal, 21(1), C1--C68.](https://doi.org/10.1111/ectj.12097)
+2. [Pennsylvania Bonus Experiment Dataset -- DoubleML](https://docs.doubleml.org/stable/api/datasets.html#doubleml.datasets.fetch_bonus)
+
+**Package and API documentation:**
+
+3. [DoubleML -- Python Documentation](https://docs.doubleml.org/stable/intro/intro.html)
+4. [DoubleMLPLR -- API Reference](https://docs.doubleml.org/stable/api/generated/doubleml.DoubleMLPLR.html)
+5. [DoubleMLData -- API Reference](https://docs.doubleml.org/stable/api/generated/doubleml.DoubleMLData.html)
+6. [scikit-learn -- RandomForestRegressor](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html)
+7. [scikit-learn -- LassoCV](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html)
+8. [scikit-learn -- LinearRegression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)
+9. [NumPy -- Documentation](https://numpy.org/doc/stable/)
+10. [pandas -- Documentation](https://pandas.pydata.org/docs/)
+11. [Matplotlib -- Documentation](https://matplotlib.org/stable/)

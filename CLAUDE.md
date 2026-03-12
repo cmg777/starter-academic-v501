@@ -104,6 +104,30 @@ Generates notebook-style data science blog posts for the site. The user provides
 - `toc: true` in front matter enables the left-side table of contents
 - Reference post for conventions: `content/post/python_ml_random_forest/index.md`
 
+## referee-post
+
+**Location:** `.claude/skills/referee-post/SKILL.md`
+
+Reviews data science blog posts as an expert professor of data science and econometrics. Produces a structured referee report covering code correctness, pedagogical explanations, result interpretations, and references. Read-only — does not modify the post.
+
+**Invocation:**
+```
+/project:referee-post <post slug>
+```
+
+**Examples:**
+```
+/project:referee-post python_doubleml
+/project:referee-post python_dowhy
+/project:referee-post content/post/python_ml_random_forest/
+```
+
+**Report includes:**
+- Verdict: ACCEPT / MINOR REVISION / MAJOR REVISION
+- Five review passes: structure, code quality, sandwich pattern, interpretations, academic rigor
+- Issue tables with severity (HIGH/MEDIUM/LOW), location, and suggested fixes
+- Priority action items ranked by impact
+
 # Hugo Version Constraints
 
 - Current: Hugo 0.89.4 (set in netlify.toml)
@@ -130,3 +154,4 @@ The `logs/` directory documents the current status and evolution of this website
 - Use em dashes (—) not double hyphens (--) in text content
 - Background images for homepage widgets are in assets/media/ (prefer .webp over .jpg)
 - All iframes should include `loading="lazy"` for performance
+- In posts with math enabled, use `\\$` for literal currency dollar signs (e.g., `\\$1,736`). The site overrides MathJax with `processEscapes: true` (`assets/js/mathjax-config.js`), so `\$` in HTML renders as a literal `$`. Do NOT use `&#36;` — it does not work.

@@ -1,0 +1,4 @@
+Metric,Baseline,Tuned
+R²,0.2307,0.2297
+RMSE,6.52,6.52
+MAE,4.68,4.72

@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Python
+  - Tutorial
 draft: false
 featured: false
 date: "2026-03-10T00:00:00Z"
@@ -70,7 +71,6 @@ from sklearn.model_selection import train_test_split, cross_val_score, Randomize
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from sklearn.inspection import PartialDependenceDisplay, permutation_importance
-from IPython.display import Markdown
 
 # Configuration
 TARGET = "imds"
@@ -125,9 +125,9 @@ count    339.00
 mean      51.05
 std        6.77
 min       35.70
-25%       46.67
+25%       47.00
 50%       50.50
-75%       54.31
+75%       54.85
 max       80.20
 Name: imds, dtype: float64
 ```
@@ -178,11 +178,11 @@ plt.show()
 
 ![Correlation matrix of the top-10 most correlated satellite embedding dimensions with IMDS.](ml_embedding_correlations.png)
 
-The heatmap reveals that the strongest individual correlations between embedding dimensions and IMDS are moderate (in the 0.25--0.40 range), which is typical for satellite-derived features predicting complex socioeconomic outcomes. Several embedding dimensions are also correlated with each other, suggesting they capture overlapping spatial patterns --- the Random Forest can handle this multicollinearity well since it selects feature subsets at each split.
+The heatmap reveals that the strongest individual correlations between embedding dimensions and IMDS are moderate (in the 0.25--0.40 range), which is typical for satellite-derived features predicting complex socioeconomic outcomes. Several embedding dimensions are also correlated with each other, suggesting they capture overlapping spatial patterns --- the Random Forest can handle this *multicollinearity* --- features carrying overlapping information --- well since it selects feature subsets at each split. With these moderate correlations, the model has real signal to work with, so let's proceed to building it.
 
 ## Train/Test Split
 
-We split the data into training (80%) and test (20%) sets *before* any model fitting. This is a fundamental ML practice: if the model ever "sees" the test data during training or tuning, our performance estimate will be overly optimistic --- a problem called **data leakage**. The `random_state` ensures the same split every time we run the notebook, making results reproducible.
+Now that we understand the data's structure, we can prepare it for modeling. We split the data into training (80%) and test (20%) sets *before* any model fitting. This is a fundamental ML practice: if the model ever "sees" the test data during training or tuning, our performance estimate will be overly optimistic --- a problem called **data leakage**. The `random_state` ensures the same split every time we run the notebook, making results reproducible.
 
 ```python
 X_train, X_test, y_train, y_test = train_test_split(
@@ -201,11 +201,15 @@ The split gives us 271 municipalities for training and 68 for testing. With only
 
 ## Baseline Model
 
-Before tuning anything, we establish a baseline using a Random Forest with default hyperparameters. **Random Forest** works by building many decision trees on random subsets of the data and features, then averaging their predictions. This "wisdom of crowds" approach reduces overfitting compared to a single decision tree.
+Before tuning anything, we establish a baseline using a Random Forest with default hyperparameters. **Random Forest** works by building many decision trees on random subsets of the data and features, then averaging their predictions. This "wisdom of crowds" approach reduces overfitting compared to a single decision tree. Formally, the prediction is:
+
+$$\hat{y} = \frac{1}{B} \sum\_{b=1}^{B} T\_b(\mathbf{x})$$
+
+In words, the predicted value $\hat{y}$ is the average of predictions from all $B$ individual trees. Each tree $T\_b$ sees a different random subset of training rows and features, so the trees make different errors --- averaging cancels out much of the noise. Here $B$ corresponds to the `n_estimators` parameter (100 in our baseline, 500 after tuning) and $\mathbf{x}$ is the 64-dimensional satellite embedding vector for a given municipality.
 
 ### Cross-Validation
 
-We evaluate the baseline with 5-fold cross-validation on the training set. Instead of a single train/validation split, k-fold CV rotates through 5 different validation sets and averages the scores. This gives a more reliable and stable performance estimate, especially important with smaller datasets like ours.
+Think of cross-validation as a rotating exam: the model takes turns training on different subsets and testing on the remainder, so no single lucky split determines the score. We evaluate the baseline with 5-fold cross-validation on the training set. Instead of a single train/validation split, k-fold CV rotates through 5 different validation sets and averages the scores. This gives a more reliable and stable performance estimate, especially important with smaller datasets like ours.
 
 ```python
 baseline_rf = RandomForestRegressor(n_estimators=100, random_state=RANDOM_SEED)
@@ -216,13 +220,15 @@ print(f"Mean CV R²:          {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})
 ```
 
 ```
-5-Fold CV R² scores: [0.152  0.2239 0.2611 0.3449 0.2809]
+5-Fold CV R² scores: [0.152  0.1867 0.2704 0.3084 0.3454]
 Mean CV R²:          0.2526 (+/- 0.0728)
 ```
 
 The 5-fold CV R² scores range from 0.152 to 0.345, with a mean of 0.2526 (+/- 0.0728). This means the baseline model explains about 25% of the variation in IMDS on average, but the high variability across folds (standard deviation of 0.07) reflects the small dataset --- different subsets of 271 municipalities can look quite different from each other. An R² around 0.25 is a reasonable starting point for predicting a complex social outcome from satellite imagery alone.
 
 ### Test Evaluation
+
+We now fit the baseline on the full training set and evaluate on the held-out test data. This gives our first concrete performance estimate --- a reference point that any tuning should improve upon.
 
 ```python
 baseline_rf.fit(X_train, y_train)
@@ -301,6 +307,12 @@ Now we evaluate the tuned model on the held-out test set --- data the model has 
 - **RMSE** (Root Mean Squared Error): Average prediction error in the same units as the target. Penalizes large errors more heavily.
 - **MAE** (Mean Absolute Error): Average absolute error. More robust to outliers than RMSE.
 
+$$R^2 = 1 - \frac{\sum\_{i=1}^{n}(y\_i - \hat{y}\_i)^2}{\sum\_{i=1}^{n}(y\_i - \bar{y})^2}$$
+
+$$\text{RMSE} = \sqrt{\frac{1}{n}\sum\_{i=1}^{n}(y\_i - \hat{y}\_i)^2} \qquad \text{MAE} = \frac{1}{n}\sum\_{i=1}^{n}|y\_i - \hat{y}\_i|$$
+
+In these formulas, $y\_i$ is the actual IMDS value for municipality $i$, $\hat{y}\_i$ is the model's prediction, and $\bar{y}$ is the mean IMDS across all test municipalities. R² compares total prediction error to the naive baseline of always guessing the mean --- higher is better. RMSE and MAE both measure average error in IMDS points, but RMSE penalizes large misses more heavily because it squares the errors before averaging. In code, $y\_i$ is `y_test`, $\hat{y}\_i$ is `tuned_pred`, and $n$ is 68 (the test set size).
+
 ```python
 best_rf = search.best_estimator_
 tuned_pred = best_rf.predict(X_test)
@@ -363,7 +375,7 @@ plt.show()
 
 ![Residuals (actual minus predicted) vs predicted IMDS values. Random scatter around zero indicates no systematic bias.](ml_residuals.png)
 
-The residuals appear roughly randomly scattered around zero, which is encouraging --- there's no strong systematic bias. However, the spread is wider at the extremes, suggesting the model's errors are larger for municipalities with unusually high or low predicted IMDS. This heteroscedasticity is consistent with the regression-to-the-mean pattern seen in the scatter plot above.
+The residuals appear roughly randomly scattered around zero, which is encouraging --- there's no strong systematic bias. However, the spread is wider at the extremes, suggesting the model's errors are larger for municipalities with unusually high or low predicted IMDS. This pattern --- the spread of errors changing across the prediction range, known as *heteroscedasticity* --- is consistent with the regression-to-the-mean effect seen in the scatter plot above.
 
 ## Feature Importance
 
@@ -371,7 +383,7 @@ Which satellite embedding dimensions matter most for predicting IMDS? We compare
 
 ### Mean Decrease in Impurity (MDI)
 
-MDI measures how much each feature reduces prediction error across all splits in all trees. It's fast to compute (built into the trained model) but can be biased toward high-cardinality or correlated features.
+MDI measures how much each feature reduces prediction error across all splits in all trees. It's fast to compute (built into the trained model) but can be biased toward *high-cardinality* features --- those with many distinct values, like continuous numbers --- or correlated features.
 
 ```python
 mdi_importance = pd.Series(best_rf.feature_importances_, index=FEATURE_COLS)
@@ -387,11 +399,11 @@ plt.show()
 
 ![Top-20 satellite embedding features ranked by Mean Decrease in Impurity.](ml_feature_importance_mdi.png)
 
-The MDI plot shows that importance is distributed across many embedding dimensions rather than concentrated in just a few. This suggests the satellite imagery captures multiple independent visual patterns relevant to development --- no single dimension dominates. However, MDI can be inflated for continuous features, so we'll cross-check with permutation importance next.
+The MDI plot shows that A30 and A59 rank highest, but importance is distributed across many embedding dimensions rather than concentrated in just a few. This suggests the satellite imagery captures multiple independent visual patterns relevant to development --- no single dimension dominates. However, MDI can be inflated for continuous features, so we'll cross-check with permutation importance next.
 
 ### Permutation Importance
 
-Permutation importance is more reliable: it randomly shuffles each feature and measures how much the model's accuracy drops. A large drop means the feature was important; no drop means the feature could be removed without loss. Unlike MDI, permutation importance is evaluated on the test set and is not biased by feature scale or cardinality.
+Permutation importance is more reliable. Imagine scrambling all the values in one column of a spreadsheet --- if the model's accuracy barely changes, that column wasn't contributing much. That's exactly what permutation importance does: it randomly shuffles each feature and measures how much the model's R² drops. Unlike MDI, permutation importance is evaluated on the test set and is not biased by feature scale or cardinality.
 
 ```python
 perm_result = permutation_importance(
@@ -410,7 +422,7 @@ plt.show()
 
 ![Top-20 satellite embedding features ranked by permutation importance (mean decrease in R² when feature is shuffled).](ml_feature_importance_permutation.png)
 
-Permutation importance gives a more trustworthy picture: it measures the actual drop in R² when each feature is shuffled. The ranking differs somewhat from MDI, which is expected --- permutation importance is less biased and directly measures predictive contribution on the test set. The top features here are the ones that genuinely help the model distinguish between municipalities with different IMDS levels.
+Permutation importance gives a more trustworthy picture. A59 emerges as the clear top feature under both methods, with A42 and A26 also ranking highly. The ranking differs somewhat from MDI (A30 drops considerably), which is expected --- permutation importance is less biased and directly measures predictive contribution on the test set. These top features are the embedding dimensions that genuinely help the model distinguish between municipalities with different IMDS levels. Let's now visualize how these features affect predictions.
 
 ## Partial Dependence Plots
 
@@ -441,7 +453,12 @@ The partial dependence plots reveal non-linear relationships between the top fea
 | RMSE   | 6.52     | 6.52   |
 | MAE    | 4.68     | 4.72   |
 
-The summary table confirms that tuning provided negligible improvement over the baseline for this dataset: both models achieve R² around 0.23, RMSE of 6.52, and MAE near 4.7. The key takeaway is that satellite embeddings explain roughly a quarter of the variation in Bolivia's Municipal Sustainable Development Index --- a meaningful signal that demonstrates remote sensing data captures real development-related patterns, while also highlighting that the majority of development variation is driven by factors not visible from space.
+The summary table confirms that tuning provided negligible improvement over the baseline for this dataset: both models achieve R² around 0.23, RMSE of 6.52, and MAE near 4.7. Key takeaways from this analysis:
+
+- **Method insight:** Random Forest with default hyperparameters performed just as well as the tuned model (R² = 0.2307 vs 0.2297), suggesting the performance ceiling comes from the features themselves, not model configuration. When the signal in the data is limited, sophisticated tuning adds little.
+- **Data insight:** Satellite embeddings explain roughly a quarter of IMDS variation --- a meaningful signal showing that remote sensing captures real development-related patterns. Feature importance is broadly distributed across embedding dimensions (A59, A42, A26 rank highest), meaning IMDS prediction relies on many visual patterns rather than a single dominant signal.
+- **Practical limitation:** The model's regression-to-the-mean behavior (predictions cluster in the 47--55 range) means it cannot reliably identify the highest- or lowest-performing municipalities individually. A policymaker using these predictions to target aid would miss the most extreme cases.
+- **Next step:** The 77% of unexplained variance likely comes from factors invisible to satellites --- governance quality, migration patterns, informal economies. Combining satellite embeddings with administrative or survey data would be the natural next experiment to boost predictive power.
 
 ## Limitations and Next Steps
 
@@ -468,5 +485,5 @@ This analysis demonstrates that satellite embeddings contain real predictive sig
 2. [scikit-learn --- RandomizedSearchCV](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.RandomizedSearchCV.html)
 3. [scikit-learn --- Permutation Importance](https://scikit-learn.org/stable/modules/permutation_importance.html)
 4. [scikit-learn --- Partial Dependence Plots](https://scikit-learn.org/stable/modules/partial_dependence.html)
-5. [DS4Bolivia --- Open Data for Bolivian Development](https://github.com/quarcs-lab/ds4bolivia)
+5. [QUARCS Lab. DS4Bolivia --- Open Data for Bolivian Development.](https://github.com/quarcs-lab/ds4bolivia)
 6. [Breiman, L. (2001). Random Forests. Machine Learning, 45(1), 5--32.](https://doi.org/10.1023/A:1010933404324)
