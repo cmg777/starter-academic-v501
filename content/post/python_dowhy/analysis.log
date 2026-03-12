@@ -1,0 +1,912 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      Stata 19.0
+___/   /   /___/   /   /___/       SE—Standard Edition
+
+ Statistics and Data Science       Copyright 1985-2025 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Single-user  perpetual
+Serial number: 401906342834
+  Licensed to: Carlos Mendez
+               Nagoya University
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+. do analysis.do 
+
+. /*===========================================================================
+> ===
+>   Cross-Validation: Causal Inference Methods in Stata
+> 
+>   Replicates the DoWhy (Python) analysis of the Lalonde/NSW dataset using
+>   Stata's teffects suite and manual implementations.
+> 
+>   Dataset: lalonde_dowhy.csv (exported from Python script)
+>   Treatment: treat (1=Job Training, 0=Control)
+>   Outcome: re78 (Real Earnings in 1978, USD)
+>   Covariates: age educ black hisp married nodegr re74 re75
+> 
+>   Usage: do analysis.do
+> 
+>   Requirements: Stata 13+ (for teffects)
+> =============================================================================
+> =*/
+. 
+. clear all
+
+. set more off
+
+. set seed 42
+
+. version 13
+
+. 
+. * ── Data Loading ─────────────────────────────────────────────────────────
+. 
+. import delimited "lalonde_dowhy.csv", clear
+(10 vars, 445 obs)
+
+. 
+. * Label variables
+. label variable treat   "Job Training (1=Training, 0=Control)"
+
+. label variable re78    "Real Earnings in 1978 (USD)"
+
+. label variable age     "Age"
+
+. label variable educ    "Years of Education"
+
+. label variable black   "Black"
+
+. label variable hisp    "Hispanic"
+
+. label variable married "Married"
+
+. label variable nodegr  "No High School Degree"
+
+. label variable re74    "Real Earnings in 1974 (USD)"
+
+. label variable re75    "Real Earnings in 1975 (USD)"
+
+. 
+. * Verify data
+. describe
+
+Contains data
+ Observations:           445                  
+    Variables:            10                  
+-------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+treat           byte    %8.0g                 Job Training (1=Training,
+                                                0=Control)
+re78            float   %9.0g                 Real Earnings in 1978 (USD)
+age             byte    %8.0g                 Age
+educ            byte    %8.0g                 Years of Education
+black           byte    %8.0g                 Black
+hisp            byte    %8.0g                 Hispanic
+married         byte    %8.0g                 Married
+nodegr          byte    %8.0g                 No High School Degree
+re74            float   %9.0g                 Real Earnings in 1974 (USD)
+re75            float   %9.0g                 Real Earnings in 1975 (USD)
+-------------------------------------------------------------------------------
+Sorted by: 
+     Note: Dataset has changed since last saved.
+
+. summarize
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       treat |        445    .4157303    .4934022          0          1
+        re78 |        445    5300.764    6631.492          0   60307.93
+         age |        445    25.37079    7.100282         17         55
+        educ |        445    10.19551    1.792119          3         16
+       black |        445    .8337079    .3727617          0          1
+-------------+---------------------------------------------------------
+        hisp |        445    .0876404    .2830895          0          1
+     married |        445    .1685393    .3747658          0          1
+      nodegr |        445    .7820225    .4133367          0          1
+        re74 |        445    2102.265    5363.582          0   39570.68
+        re75 |        445    1377.138    3150.961          0   25142.24
+
+. tabulate treat
+
+        Job |
+   Training |
+(1=Training |
+          , |
+ 0=Control) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        260       58.43       58.43
+          1 |        185       41.57      100.00
+------------+-----------------------------------
+      Total |        445      100.00
+
+. 
+. display _newline(2)
+
+
+
+
+. display "============================================================"
+============================================================
+
+. display "CAUSAL INFERENCE: NSW Job Training Program (Stata)"
+CAUSAL INFERENCE: NSW Job Training Program (Stata)
+
+. display "============================================================"
+============================================================
+
+. 
+. * Define covariates for convenience
+. local covariates "age educ black hisp married nodegr re74 re75"
+
+. 
+. * ── Method 1: Naive Difference in Means ──────────────────────────────────
+. 
+. display _newline(1)
+
+
+
+. display "--- Method 1: Naive Difference in Means ---"
+--- Method 1: Naive Difference in Means ---
+
+. 
+. ttest re78, by(treat)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |     260    4554.801    340.0931    5483.836    3885.102    5224.501
+       1 |     185    6349.144    578.4229    7867.402    5207.949    7490.338
+---------+--------------------------------------------------------------------
+Combined |     445    5300.764    314.3629    6631.492     4682.94    5918.588
+---------+--------------------------------------------------------------------
+    diff |           -1794.342    632.8534                -3038.11   -550.5745
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t =  -2.8353
+H0: diff = 0                                     Degrees of freedom =      443
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.0024         Pr(|T| > |t|) = 0.0048          Pr(T > t) = 0.9976
+
+. 
+. * Store the ATE (treat=1 mean minus treat=0 mean)
+. summarize re78 if treat == 1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        re78 |        185    6349.144    7867.402          0   60307.93
+
+. scalar mean_treated = r(mean)
+
+. summarize re78 if treat == 0
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        re78 |        260    4554.801    5483.836          0   39483.53
+
+. scalar mean_control = r(mean)
+
+. scalar naive_ate = mean_treated - mean_control
+
+. 
+. display _newline(1)
+
+
+
+. display "Mean earnings (Training): $" %10.2f mean_treated
+Mean earnings (Training): $   6349.14
+
+. display "Mean earnings (Control):  $" %10.2f mean_control
+Mean earnings (Control):  $   4554.80
+
+. display "Naive ATE:                $" %10.2f naive_ate
+Naive ATE:                $   1794.34
+
+. 
+. * ── Method 2: Regression Adjustment ──────────────────────────────────────
+. 
+. display _newline(2)
+
+
+
+
+. display "--- Method 2a: Regression Adjustment (teffects ra) ---"
+--- Method 2a: Regression Adjustment (teffects ra) ---
+
+. 
+. teffects ra (re78 `covariates') (treat)
+
+Iteration 0:  EE criterion = 3.262e-23  
+Iteration 1:  EE criterion = 1.130e-24  
+
+Treatment-effects estimation                    Number of obs     =        445
+Estimator      : regression adjustment
+Outcome model  : linear
+Treatment model: none
+------------------------------------------------------------------------------
+             |               Robust
+        re78 | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       treat |
+   (1 vs 0)  |   1621.583   679.0541     2.39   0.017     290.6616    2952.505
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |   4557.537     336.52    13.54   0.000      3897.97    5217.104
+------------------------------------------------------------------------------
+
+. matrix b_ra = e(b)
+
+. scalar ra_ate = b_ra[1,1]
+
+. 
+. display _newline(1)
+
+
+
+. display "RA ATE (teffects ra):     $" %10.2f ra_ate
+RA ATE (teffects ra):     $   1621.58
+
+. 
+. * Pooled OLS (matches Python's backdoor.linear_regression)
+. display _newline(1)
+
+
+
+. display "--- Method 2b: Regression Adjustment (Pooled OLS) ---"
+--- Method 2b: Regression Adjustment (Pooled OLS) ---
+
+. 
+. regress re78 treat `covariates'
+
+      Source |       SS           df       MS      Number of obs   =       445
+-------------+----------------------------------   F(9, 435)       =      2.80
+       Model |  1.0706e+09         9   118954547   Prob > F        =    0.0033
+    Residual |  1.8455e+10       435  42425415.7   R-squared       =    0.0548
+-------------+----------------------------------   Adj R-squared   =    0.0353
+       Total |  1.9526e+10       444  43976681.9   Root MSE        =    6513.5
+
+------------------------------------------------------------------------------
+        re78 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       treat |   1676.343    638.682     2.62   0.009     421.0563    2931.629
+         age |   55.31668   45.28394     1.22   0.223    -33.68585    144.3192
+        educ |   395.7343   227.4148     1.74   0.083     -51.2341    842.7027
+       black |  -2159.522   1169.036    -1.85   0.065    -4457.183    138.1388
+        hisp |   164.0327   1549.457     0.11   0.916     -2881.32    3209.386
+     married |  -138.7253   879.7279    -0.16   0.875    -1867.771    1590.321
+      nodegr |  -70.68064   1004.387    -0.07   0.944    -2044.736    1903.374
+        re74 |   .0821412   .0774216     1.06   0.289    -.0700258    .2343082
+        re75 |   .0527641   .1354758     0.39   0.697    -.2135045    .3190327
+       _cons |   785.0614   3374.969     0.23   0.816    -5848.211    7418.334
+------------------------------------------------------------------------------
+
+. scalar ra_ate_ols = _b[treat]
+
+. 
+. display _newline(1)
+
+
+
+. display "RA ATE (pooled OLS):      $" %10.2f ra_ate_ols
+RA ATE (pooled OLS):      $   1676.34
+
+. 
+. * ── Method 3: Inverse Probability Weighting (IPW) ────────────────────────
+. 
+. display _newline(2)
+
+
+
+
+. display "--- Method 3: Inverse Probability Weighting (IPW) ---"
+--- Method 3: Inverse Probability Weighting (IPW) ---
+
+. 
+. teffects ipw (re78) (treat `covariates', logit)
+
+Iteration 0:  EE criterion = 9.955e-16  
+Iteration 1:  EE criterion = 4.758e-23  
+
+Treatment-effects estimation                    Number of obs     =        445
+Estimator      : inverse-probability weights
+Outcome model  : weighted mean
+Treatment model: logit
+------------------------------------------------------------------------------
+             |               Robust
+        re78 | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       treat |
+   (1 vs 0)  |   1641.315   671.0452     2.45   0.014     326.0908     2956.54
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |   4549.768   336.8785    13.51   0.000     3889.498    5210.037
+------------------------------------------------------------------------------
+
+. matrix b_ipw = e(b)
+
+. scalar ipw_ate = b_ipw[1,1]
+
+. 
+. display _newline(1)
+
+
+
+. display "IPW ATE:                  $" %10.2f ipw_ate
+IPW ATE:                  $   1641.32
+
+. 
+. * ── Method 4: Doubly Robust (IPWRA / AIPW) ───────────────────────────────
+. 
+. display _newline(2)
+
+
+
+
+. display "--- Method 4: Doubly Robust (IPWRA) ---"
+--- Method 4: Doubly Robust (IPWRA) ---
+
+. 
+. teffects ipwra (re78 `covariates') (treat `covariates', logit), iterate(300)
+
+Iteration 0:  EE criterion = 9.955e-16  (not concave)
+Iteration 1:  EE criterion = 9.955e-16  (not concave)
+Iteration 2:  EE criterion = 9.955e-16  (not concave)
+Iteration 3:  EE criterion = 9.955e-16  (not concave)
+Iteration 4:  EE criterion = 9.955e-16  (not concave)
+Iteration 5:  EE criterion = 9.955e-16  (not concave)
+Iteration 6:  EE criterion = 9.955e-16  (not concave)
+Iteration 7:  EE criterion = 9.955e-16  (not concave)
+Iteration 8:  EE criterion = 9.955e-16  (not concave)
+Iteration 9:  EE criterion = 9.955e-16  (not concave)
+Iteration 10: EE criterion = 9.955e-16  (not concave)
+Iteration 11: EE criterion = 9.955e-16  (not concave)
+Iteration 12: EE criterion = 9.955e-16  (not concave)
+Iteration 13: EE criterion = 9.955e-16  (not concave)
+Iteration 14: EE criterion = 9.955e-16  (not concave)
+Iteration 15: EE criterion = 9.955e-16  (not concave)
+Iteration 16: EE criterion = 9.955e-16  (not concave)
+Iteration 17: EE criterion = 9.955e-16  (not concave)
+Iteration 18: EE criterion = 9.955e-16  (not concave)
+Iteration 19: EE criterion = 9.955e-16  (not concave)
+Iteration 20: EE criterion = 9.955e-16  (not concave)
+Iteration 21: EE criterion = 9.955e-16  (not concave)
+Iteration 22: EE criterion = 9.955e-16  (not concave)
+Iteration 23: EE criterion = 9.955e-16  (not concave)
+Iteration 24: EE criterion = 9.955e-16  (not concave)
+Iteration 25: EE criterion = 9.955e-16  (not concave)
+Iteration 26: EE criterion = 9.955e-16  (not concave)
+Iteration 27: EE criterion = 9.955e-16  (not concave)
+Iteration 28: EE criterion = 9.955e-16  (not concave)
+Iteration 29: EE criterion = 9.955e-16  (not concave)
+Iteration 30: EE criterion = 9.955e-16  (not concave)
+Iteration 31: EE criterion = 9.955e-16  (not concave)
+Iteration 32: EE criterion = 9.955e-16  (not concave)
+Iteration 33: EE criterion = 9.955e-16  (not concave)
+Iteration 34: EE criterion = 9.955e-16  (not concave)
+Iteration 35: EE criterion = 9.955e-16  (not concave)
+Iteration 36: EE criterion = 9.955e-16  (not concave)
+Iteration 37: EE criterion = 9.955e-16  (not concave)
+Iteration 38: EE criterion = 9.955e-16  (not concave)
+Iteration 39: EE criterion = 9.955e-16  (not concave)
+Iteration 40: EE criterion = 9.955e-16  (not concave)
+Iteration 41: EE criterion = 9.955e-16  (not concave)
+Iteration 42: EE criterion = 9.955e-16  (not concave)
+Iteration 43: EE criterion = 9.955e-16  (not concave)
+Iteration 44: EE criterion = 9.955e-16  (not concave)
+Iteration 45: EE criterion = 9.955e-16  (not concave)
+Iteration 46: EE criterion = 9.955e-16  (not concave)
+Iteration 47: EE criterion = 9.955e-16  (not concave)
+Iteration 48: EE criterion = 9.955e-16  (not concave)
+Iteration 49: EE criterion = 9.955e-16  (not concave)
+Iteration 50: EE criterion = 9.955e-16  (not concave)
+Iteration 51: EE criterion = 9.955e-16  (not concave)
+Iteration 52: EE criterion = 9.955e-16  (not concave)
+Iteration 53: EE criterion = 9.955e-16  (not concave)
+Iteration 54: EE criterion = 9.955e-16  (not concave)
+Iteration 55: EE criterion = 9.955e-16  (not concave)
+Iteration 56: EE criterion = 9.955e-16  (not concave)
+Iteration 57: EE criterion = 9.955e-16  (not concave)
+Iteration 58: EE criterion = 9.955e-16  (not concave)
+Iteration 59: EE criterion = 9.955e-16  (not concave)
+Iteration 60: EE criterion = 9.955e-16  (not concave)
+Iteration 61: EE criterion = 9.955e-16  (not concave)
+Iteration 62: EE criterion = 9.955e-16  (not concave)
+Iteration 63: EE criterion = 9.955e-16  (not concave)
+Iteration 64: EE criterion = 9.955e-16  (not concave)
+Iteration 65: EE criterion = 9.955e-16  (not concave)
+Iteration 66: EE criterion = 9.955e-16  (not concave)
+Iteration 67: EE criterion = 9.955e-16  (not concave)
+Iteration 68: EE criterion = 9.955e-16  (not concave)
+Iteration 69: EE criterion = 9.955e-16  (not concave)
+Iteration 70: EE criterion = 9.955e-16  (not concave)
+Iteration 71: EE criterion = 9.955e-16  (not concave)
+Iteration 72: EE criterion = 9.955e-16  (not concave)
+Iteration 73: EE criterion = 9.955e-16  (not concave)
+Iteration 74: EE criterion = 9.955e-16  (not concave)
+Iteration 75: EE criterion = 9.955e-16  (not concave)
+Iteration 76: EE criterion = 9.955e-16  (not concave)
+Iteration 77: EE criterion = 9.955e-16  (not concave)
+Iteration 78: EE criterion = 9.955e-16  (not concave)
+Iteration 79: EE criterion = 9.955e-16  (not concave)
+Iteration 80: EE criterion = 9.955e-16  (not concave)
+Iteration 81: EE criterion = 9.955e-16  (not concave)
+Iteration 82: EE criterion = 9.955e-16  (not concave)
+Iteration 83: EE criterion = 9.955e-16  (not concave)
+Iteration 84: EE criterion = 9.955e-16  (not concave)
+Iteration 85: EE criterion = 9.955e-16  (not concave)
+Iteration 86: EE criterion = 9.955e-16  (not concave)
+Iteration 87: EE criterion = 9.955e-16  (not concave)
+Iteration 88: EE criterion = 9.955e-16  (not concave)
+Iteration 89: EE criterion = 9.955e-16  (not concave)
+Iteration 90: EE criterion = 9.955e-16  (not concave)
+Iteration 91: EE criterion = 9.955e-16  (not concave)
+Iteration 92: EE criterion = 9.955e-16  (not concave)
+Iteration 93: EE criterion = 9.955e-16  (not concave)
+Iteration 94: EE criterion = 9.955e-16  (not concave)
+Iteration 95: EE criterion = 9.955e-16  (not concave)
+Iteration 96: EE criterion = 9.955e-16  (not concave)
+Iteration 97: EE criterion = 9.955e-16  (not concave)
+Iteration 98: EE criterion = 9.955e-16  (not concave)
+Iteration 99: EE criterion = 9.955e-16  (not concave)
+Iteration 100: EE criterion = 9.954e-16  (not concave)
+Iteration 101: EE criterion = 9.954e-16  (not concave)
+Iteration 102: EE criterion = 9.954e-16  (not concave)
+Iteration 103: EE criterion = 9.954e-16  (not concave)
+Iteration 104: EE criterion = 9.954e-16  (not concave)
+Iteration 105: EE criterion = 9.954e-16  (not concave)
+Iteration 106: EE criterion = 9.954e-16  (not concave)
+Iteration 107: EE criterion = 9.954e-16  (not concave)
+Iteration 108: EE criterion = 9.954e-16  (not concave)
+Iteration 109: EE criterion = 9.954e-16  (not concave)
+Iteration 110: EE criterion = 9.954e-16  (not concave)
+Iteration 111: EE criterion = 9.954e-16  (not concave)
+Iteration 112: EE criterion = 9.954e-16  (not concave)
+Iteration 113: EE criterion = 9.954e-16  (not concave)
+Iteration 114: EE criterion = 9.954e-16  (not concave)
+Iteration 115: EE criterion = 9.954e-16  (not concave)
+Iteration 116: EE criterion = 9.954e-16  (not concave)
+Iteration 117: EE criterion = 9.954e-16  (not concave)
+Iteration 118: EE criterion = 9.954e-16  (not concave)
+Iteration 119: EE criterion = 9.954e-16  (not concave)
+Iteration 120: EE criterion = 9.954e-16  (not concave)
+Iteration 121: EE criterion = 9.954e-16  (not concave)
+Iteration 122: EE criterion = 9.954e-16  (not concave)
+Iteration 123: EE criterion = 9.954e-16  (not concave)
+Iteration 124: EE criterion = 9.954e-16  (not concave)
+Iteration 125: EE criterion = 9.954e-16  (not concave)
+Iteration 126: EE criterion = 9.954e-16  (not concave)
+Iteration 127: EE criterion = 9.954e-16  (not concave)
+Iteration 128: EE criterion = 9.954e-16  (not concave)
+Iteration 129: EE criterion = 9.954e-16  (not concave)
+Iteration 130: EE criterion = 9.954e-16  (not concave)
+Iteration 131: EE criterion = 9.954e-16  (not concave)
+Iteration 132: EE criterion = 9.954e-16  (not concave)
+Iteration 133: EE criterion = 9.954e-16  (not concave)
+Iteration 134: EE criterion = 9.954e-16  (not concave)
+Iteration 135: EE criterion = 9.954e-16  (not concave)
+Iteration 136: EE criterion = 9.954e-16  (not concave)
+Iteration 137: EE criterion = 9.954e-16  (not concave)
+Iteration 138: EE criterion = 9.954e-16  (not concave)
+Iteration 139: EE criterion = 9.954e-16  (not concave)
+Iteration 140: EE criterion = 9.954e-16  (not concave)
+Iteration 141: EE criterion = 9.954e-16  (not concave)
+Iteration 142: EE criterion = 9.954e-16  (not concave)
+Iteration 143: EE criterion = 9.954e-16  (not concave)
+Iteration 144: EE criterion = 9.954e-16  (not concave)
+Iteration 145: EE criterion = 9.954e-16  (not concave)
+Iteration 146: EE criterion = 9.954e-16  (not concave)
+Iteration 147: EE criterion = 9.954e-16  (not concave)
+Iteration 148: EE criterion = 9.954e-16  (not concave)
+Iteration 149: EE criterion = 9.954e-16  (not concave)
+Iteration 150: EE criterion = 9.954e-16  (not concave)
+Iteration 151: EE criterion = 9.954e-16  (not concave)
+Iteration 152: EE criterion = 9.954e-16  (not concave)
+Iteration 153: EE criterion = 9.954e-16  (not concave)
+Iteration 154: EE criterion = 9.954e-16  (not concave)
+Iteration 155: EE criterion = 9.954e-16  (not concave)
+Iteration 156: EE criterion = 9.954e-16  (not concave)
+Iteration 157: EE criterion = 9.954e-16  (not concave)
+Iteration 158: EE criterion = 9.954e-16  (not concave)
+Iteration 159: EE criterion = 9.954e-16  (not concave)
+Iteration 160: EE criterion = 9.954e-16  (not concave)
+Iteration 161: EE criterion = 9.954e-16  (not concave)
+Iteration 162: EE criterion = 9.954e-16  (not concave)
+Iteration 163: EE criterion = 9.954e-16  (not concave)
+Iteration 164: EE criterion = 9.954e-16  (not concave)
+Iteration 165: EE criterion = 9.954e-16  (not concave)
+Iteration 166: EE criterion = 9.954e-16  (not concave)
+Iteration 167: EE criterion = 9.954e-16  (not concave)
+Iteration 168: EE criterion = 9.954e-16  (not concave)
+Iteration 169: EE criterion = 9.954e-16  (not concave)
+Iteration 170: EE criterion = 9.954e-16  (not concave)
+Iteration 171: EE criterion = 9.954e-16  (not concave)
+Iteration 172: EE criterion = 9.954e-16  (not concave)
+Iteration 173: EE criterion = 9.954e-16  (not concave)
+Iteration 174: EE criterion = 9.954e-16  (not concave)
+Iteration 175: EE criterion = 9.954e-16  (not concave)
+Iteration 176: EE criterion = 9.954e-16  (not concave)
+Iteration 177: EE criterion = 9.954e-16  (not concave)
+Iteration 178: EE criterion = 9.954e-16  (not concave)
+Iteration 179: EE criterion = 9.954e-16  (not concave)
+Iteration 180: EE criterion = 9.954e-16  (not concave)
+Iteration 181: EE criterion = 9.954e-16  (not concave)
+Iteration 182: EE criterion = 9.954e-16  (not concave)
+Iteration 183: EE criterion = 9.954e-16  (not concave)
+Iteration 184: EE criterion = 9.954e-16  (not concave)
+Iteration 185: EE criterion = 9.954e-16  (not concave)
+Iteration 186: EE criterion = 9.954e-16  (not concave)
+Iteration 187: EE criterion = 9.954e-16  (not concave)
+Iteration 188: EE criterion = 9.954e-16  (not concave)
+Iteration 189: EE criterion = 9.954e-16  (not concave)
+Iteration 190: EE criterion = 9.954e-16  (not concave)
+Iteration 191: EE criterion = 9.954e-16  (not concave)
+Iteration 192: EE criterion = 9.954e-16  (not concave)
+Iteration 193: EE criterion = 9.954e-16  (not concave)
+Iteration 194: EE criterion = 9.954e-16  (not concave)
+Iteration 195: EE criterion = 9.954e-16  (not concave)
+Iteration 196: EE criterion = 9.954e-16  (not concave)
+Iteration 197: EE criterion = 9.954e-16  (not concave)
+Iteration 198: EE criterion = 9.954e-16  (not concave)
+Iteration 199: EE criterion = 9.954e-16  (not concave)
+Iteration 200: EE criterion = 9.954e-16  (not concave)
+Iteration 201: EE criterion = 9.954e-16  (not concave)
+Iteration 202: EE criterion = 9.954e-16  (not concave)
+Iteration 203: EE criterion = 9.954e-16  (not concave)
+Iteration 204: EE criterion = 9.954e-16  (not concave)
+Iteration 205: EE criterion = 9.954e-16  (not concave)
+Iteration 206: EE criterion = 9.954e-16  (not concave)
+Iteration 207: EE criterion = 9.954e-16  (not concave)
+Iteration 208: EE criterion = 9.954e-16  (not concave)
+Iteration 209: EE criterion = 9.954e-16  (not concave)
+Iteration 210: EE criterion = 9.954e-16  (not concave)
+Iteration 211: EE criterion = 9.954e-16  (not concave)
+Iteration 212: EE criterion = 9.954e-16  (not concave)
+Iteration 213: EE criterion = 9.954e-16  (not concave)
+Iteration 214: EE criterion = 9.954e-16  (not concave)
+Iteration 215: EE criterion = 9.954e-16  (not concave)
+Iteration 216: EE criterion = 9.954e-16  (not concave)
+Iteration 217: EE criterion = 9.954e-16  (not concave)
+Iteration 218: EE criterion = 9.954e-16  (not concave)
+Iteration 219: EE criterion = 9.953e-16  (not concave)
+Iteration 220: EE criterion = 9.953e-16  (not concave)
+Iteration 221: EE criterion = 9.953e-16  (not concave)
+Iteration 222: EE criterion = 9.953e-16  (not concave)
+Iteration 223: EE criterion = 9.953e-16  (not concave)
+Iteration 224: EE criterion = 9.953e-16  (not concave)
+Iteration 225: EE criterion = 9.953e-16  (not concave)
+Iteration 226: EE criterion = 9.953e-16  (not concave)
+Iteration 227: EE criterion = 9.953e-16  (not concave)
+Iteration 228: EE criterion = 9.953e-16  (not concave)
+Iteration 229: EE criterion = 9.953e-16  (not concave)
+Iteration 230: EE criterion = 9.953e-16  (not concave)
+Iteration 231: EE criterion = 9.953e-16  (not concave)
+Iteration 232: EE criterion = 9.953e-16  (not concave)
+Iteration 233: EE criterion = 9.953e-16  (not concave)
+Iteration 234: EE criterion = 9.953e-16  (not concave)
+Iteration 235: EE criterion = 9.953e-16  (not concave)
+Iteration 236: EE criterion = 9.953e-16  (not concave)
+Iteration 237: EE criterion = 9.953e-16  (not concave)
+Iteration 238: EE criterion = 9.953e-16  (not concave)
+Iteration 239: EE criterion = 9.953e-16  (not concave)
+Iteration 240: EE criterion = 9.953e-16  (not concave)
+Iteration 241: EE criterion = 9.953e-16  (not concave)
+Iteration 242: EE criterion = 9.953e-16  (not concave)
+Iteration 243: EE criterion = 9.953e-16  (not concave)
+Iteration 244: EE criterion = 9.953e-16  (not concave)
+Iteration 245: EE criterion = 9.953e-16  (not concave)
+Iteration 246: EE criterion = 9.953e-16  (not concave)
+Iteration 247: EE criterion = 9.953e-16  (not concave)
+Iteration 248: EE criterion = 9.953e-16  (not concave)
+Iteration 249: EE criterion = 9.953e-16  (not concave)
+Iteration 250: EE criterion = 9.953e-16  (not concave)
+Iteration 251: EE criterion = 9.953e-16  (not concave)
+Iteration 252: EE criterion = 9.953e-16  (not concave)
+Iteration 253: EE criterion = 9.953e-16  (not concave)
+Iteration 254: EE criterion = 9.953e-16  (not concave)
+Iteration 255: EE criterion = 9.953e-16  (not concave)
+Iteration 256: EE criterion = 9.953e-16  (not concave)
+Iteration 257: EE criterion = 9.953e-16  (not concave)
+Iteration 258: EE criterion = 9.953e-16  (not concave)
+Iteration 259: EE criterion = 9.953e-16  (not concave)
+Iteration 260: EE criterion = 9.953e-16  (not concave)
+Iteration 261: EE criterion = 9.953e-16  (not concave)
+Iteration 262: EE criterion = 9.953e-16  (not concave)
+Iteration 263: EE criterion = 9.953e-16  (not concave)
+Iteration 264: EE criterion = 9.953e-16  (not concave)
+Iteration 265: EE criterion = 9.953e-16  (not concave)
+Iteration 266: EE criterion = 9.953e-16  (not concave)
+Iteration 267: EE criterion = 9.953e-16  (not concave)
+Iteration 268: EE criterion = 9.953e-16  (not concave)
+Iteration 269: EE criterion = 9.953e-16  (not concave)
+Iteration 270: EE criterion = 9.953e-16  (not concave)
+Iteration 271: EE criterion = 9.953e-16  (not concave)
+Iteration 272: EE criterion = 9.953e-16  (not concave)
+Iteration 273: EE criterion = 9.953e-16  (not concave)
+Iteration 274: EE criterion = 9.953e-16  (not concave)
+Iteration 275: EE criterion = 9.953e-16  (not concave)
+Iteration 276: EE criterion = 9.953e-16  (not concave)
+Iteration 277: EE criterion = 9.953e-16  (not concave)
+Iteration 278: EE criterion = 9.953e-16  (not concave)
+Iteration 279: EE criterion = 9.953e-16  (not concave)
+Iteration 280: EE criterion = 9.953e-16  (not concave)
+Iteration 281: EE criterion = 9.953e-16  (not concave)
+Iteration 282: EE criterion = 9.953e-16  (not concave)
+Iteration 283: EE criterion = 9.953e-16  (not concave)
+Iteration 284: EE criterion = 9.953e-16  (not concave)
+Iteration 285: EE criterion = 9.953e-16  (not concave)
+Iteration 286: EE criterion = 9.953e-16  (not concave)
+Iteration 287: EE criterion = 9.953e-16  (not concave)
+Iteration 288: EE criterion = 9.953e-16  (not concave)
+Iteration 289: EE criterion = 9.953e-16  (not concave)
+Iteration 290: EE criterion = 9.953e-16  (not concave)
+Iteration 291: EE criterion = 9.953e-16  (not concave)
+Iteration 292: EE criterion = 9.953e-16  (not concave)
+Iteration 293: EE criterion = 9.953e-16  (not concave)
+Iteration 294: EE criterion = 9.953e-16  (not concave)
+Iteration 295: EE criterion = 9.953e-16  (not concave)
+Iteration 296: EE criterion = 9.953e-16  (not concave)
+Iteration 297: EE criterion = 9.953e-16  (not concave)
+Iteration 298: EE criterion = 9.953e-16  (not concave)
+Iteration 299: EE criterion = 9.953e-16  (not concave)
+Iteration 300: EE criterion = 9.953e-16  (not concave)
+convergence not achieved
+    The Gauss-Newton stopping criterion has been met but missing standard
+    errors indicate some of the parameters are not identified.
+
+Treatment-effects estimation                    Number of obs     =        445
+Estimator      : IPW regression adjustment
+Outcome model  : linear
+Treatment model: logit
+------------------------------------------------------------------------------
+             |               Robust
+        re78 | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       treat |
+   (1 vs 0)  |    1617.18   663.0892     2.44   0.015     317.5487    2916.811
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |   4553.923   336.7631    13.52   0.000      3893.88    5213.967
+------------------------------------------------------------------------------
+Warning: Convergence not achieved.
+
+. matrix b_dr = e(b)
+
+. scalar dr_ate = b_dr[1,1]
+
+. 
+. display _newline(1)
+
+
+
+. display "DR ATE (teffects ipwra):  $" %10.2f dr_ate
+DR ATE (teffects ipwra):  $   1617.18
+
+. 
+. * ── Method 5: Propensity Score Stratification ─────────────────────────────
+. 
+. display _newline(2)
+
+
+
+
+. display "--- Method 5: Propensity Score Stratification (5 strata) ---"
+--- Method 5: Propensity Score Stratification (5 strata) ---
+
+. 
+. * Step 1: Estimate propensity scores
+. logit treat `covariates'
+
+Iteration 0:  Log likelihood =     -302.1  
+Iteration 1:  Log likelihood = -293.62952  
+Iteration 2:  Log likelihood = -293.60822  
+Iteration 3:  Log likelihood = -293.60822  
+
+Logistic regression                                     Number of obs =    445
+                                                        LR chi2(8)    =  16.98
+                                                        Prob > chi2   = 0.0303
+Log likelihood = -293.60822                             Pseudo R2     = 0.0281
+
+------------------------------------------------------------------------------
+       treat | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |   .0046982   .0143268     0.33   0.743    -.0233819    .0327782
+        educ |   -.071239   .0717266    -0.99   0.321    -.2118206    .0693425
+       black |  -.2247005   .3655324    -0.61   0.539    -.9411308    .4917297
+        hisp |  -.8527817   .5065604    -1.68   0.092    -1.845622    .1400584
+     married |   .1636176   .2769247     0.59   0.555    -.3791449    .7063802
+      nodegr |  -.9035053   .3134894    -2.88   0.004    -1.517933   -.2890773
+        re74 |  -.0000316   .0000258    -1.22   0.221    -.0000823     .000019
+        re75 |   .0000616   .0000436     1.41   0.157    -.0000238     .000147
+       _cons |   1.177674   1.055966     1.12   0.265    -.8919813    3.247329
+------------------------------------------------------------------------------
+
+. predict ps, pr
+
+. 
+. * Step 2: Create 5 strata based on PS quintiles
+. xtile ps_strata = ps, nquantiles(5)
+
+. 
+. * Step 3: Compute stratum-specific ATEs and weighted average
+. scalar ps_strat_ate = 0
+
+. scalar total_weight = 0
+
+. 
+. forvalues s = 1/5 {
+  2.     quietly count if treat == 1 & ps_strata == `s'
+  3.     scalar n_t = r(N)
+  4.     quietly count if treat == 0 & ps_strata == `s'
+  5.     scalar n_c = r(N)
+  6. 
+.     * Skip strata with no treated or no control observations
+.     if n_t > 0 & n_c > 0 {
+  7.         quietly summarize re78 if treat == 1 & ps_strata == `s'
+  8.         scalar mean_t = r(mean)
+  9.         quietly summarize re78 if treat == 0 & ps_strata == `s'
+ 10.         scalar mean_c = r(mean)
+ 11.         scalar ate_s = mean_t - mean_c
+ 12.         scalar w_s = n_t + n_c
+ 13.         scalar ps_strat_ate = ps_strat_ate + ate_s * w_s
+ 14.         scalar total_weight = total_weight + w_s
+ 15.         display "  Stratum `s': ATE = $" %10.2f ate_s " (n_t=" %3.0f n_t "
+> , n_c=" %3.0f n_c ")"
+ 16.     }
+ 17.     else {
+ 18.         display "  Stratum `s': SKIPPED (empty treatment or control group)
+> "
+ 19.     }
+ 20. }
+  Stratum 1: ATE = $     51.58 (n_t= 27, n_c= 62)
+  Stratum 2: ATE = $   2641.49 (n_t= 30, n_c= 59)
+  Stratum 3: ATE = $    -91.79 (n_t= 33, n_c= 56)
+  Stratum 4: ATE = $   1245.20 (n_t= 47, n_c= 42)
+  Stratum 5: ATE = $   4086.51 (n_t= 48, n_c= 41)
+
+. 
+. scalar ps_strat_ate = ps_strat_ate / total_weight
+
+. 
+. display _newline(1)
+
+
+
+. display "PS Stratification ATE:    $" %10.2f ps_strat_ate
+PS Stratification ATE:    $   1586.60
+
+. 
+. * Clean up
+. drop ps ps_strata
+
+. 
+. * ── Method 6: Propensity Score Matching ───────────────────────────────────
+. 
+. display _newline(2)
+
+
+
+
+. display "--- Method 6: Propensity Score Matching ---"
+--- Method 6: Propensity Score Matching ---
+
+. 
+. teffects psmatch (re78) (treat `covariates', logit)
+
+Treatment-effects estimation                   Number of obs      =        445
+Estimator      : propensity-score matching     Matches: requested =          1
+Outcome model  : matching                                     min =          1
+Treatment model: logit                                        max =          8
+------------------------------------------------------------------------------
+             |              AI robust
+        re78 | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       treat |
+   (1 vs 0)  |   1993.288   740.8807     2.69   0.007     541.1886    3445.387
+------------------------------------------------------------------------------
+
+. matrix b_match = e(b)
+
+. scalar match_ate = b_match[1,1]
+
+. 
+. display _newline(1)
+
+
+
+. display "PS Matching ATE:          $" %10.2f match_ate
+PS Matching ATE:          $   1993.29
+
+. 
+. * ── Summary: Cross-Validation Table ──────────────────────────────────────
+. 
+. display _newline(3)
+
+
+
+
+
+. display "============================================================"
+============================================================
+
+. display "CROSS-VALIDATION: Python (DoWhy) vs Stata"
+CROSS-VALIDATION: Python (DoWhy) vs Stata
+
+. display "============================================================"
+============================================================
+
+. display "Method                         Python ATE    Stata ATE"
+Method                         Python ATE    Stata ATE
+
+. display "------------------------------------------------------------"
+------------------------------------------------------------
+
+. display "Naive (Diff. in Means)         $  1,794.34   $" %10.2f naive_ate
+Naive (Diff. in Means)         $  1,794.34   $   1794.34
+
+. display "Regression Adj. (pooled OLS)   $  1,676.34   $" %10.2f ra_ate_ols
+Regression Adj. (pooled OLS)   $  1,676.34   $   1676.34
+
+. display "Regression Adj. (teffects ra)  $  1,676.34   $" %10.2f ra_ate
+Regression Adj. (teffects ra)  $  1,676.34   $   1621.58
+
+. display "IPW                            $  1,559.41   $" %10.2f ipw_ate
+IPW                            $  1,559.41   $   1641.32
+
+. display "Doubly Robust (IPWRA)          $  1,620.04   $" %10.2f dr_ate
+Doubly Robust (IPWRA)          $  1,620.04   $   1617.18
+
+. display "PS Stratification              $  1,617.07   $" %10.2f ps_strat_ate
+PS Stratification              $  1,617.07   $   1586.60
+
+. display "PS Matching                    $  1,735.69   $" %10.2f match_ate
+PS Matching                    $  1,735.69   $   1993.29
+
+. display "============================================================"
+============================================================
+
+. display _newline(1)
+
+
+
+. display "Notes:"
+Notes:
+
+. display "- Naive and Pooled OLS should match Python exactly (same arithmetic)
+> "
+- Naive and Pooled OLS should match Python exactly (same arithmetic)
+
+. display "- IPW/DR/Stratification may differ: Python uses L2-regularized logit
+> "
+- IPW/DR/Stratification may differ: Python uses L2-regularized logit
+
+. display "  (scikit-learn), Stata uses MLE logit (no regularization)"
+  (scikit-learn), Stata uses MLE logit (no regularization)
+
+. display "- PS Matching differences reflect algorithm implementation details"
+- PS Matching differences reflect algorithm implementation details
+
+. display "  (tie-breaking, replacement, caliper)"
+  (tie-breaking, replacement, caliper)
+
+. 
+end of do-file

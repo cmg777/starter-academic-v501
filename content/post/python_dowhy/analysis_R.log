@@ -1,0 +1,81 @@
+Dataset shape: 445 x 10 
+
+Treatment groups:
+
+  0   1 
+260 185 
+
+Outcome (re78) summary:
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+      0       0    3702    5301    8125   60308 
+
+Covariate summary:
+      age             educ          black             hisp        
+ Min.   :17.00   Min.   : 3.0   Min.   :0.0000   Min.   :0.00000  
+ 1st Qu.:20.00   1st Qu.: 9.0   1st Qu.:1.0000   1st Qu.:0.00000  
+ Median :24.00   Median :10.0   Median :1.0000   Median :0.00000  
+ Mean   :25.37   Mean   :10.2   Mean   :0.8337   Mean   :0.08764  
+ 3rd Qu.:28.00   3rd Qu.:11.0   3rd Qu.:1.0000   3rd Qu.:0.00000  
+ Max.   :55.00   Max.   :16.0   Max.   :1.0000   Max.   :1.00000  
+    married           nodegr           re74              re75      
+ Min.   :0.0000   Min.   :0.000   Min.   :    0.0   Min.   :    0  
+ 1st Qu.:0.0000   1st Qu.:1.000   1st Qu.:    0.0   1st Qu.:    0  
+ Median :0.0000   Median :1.000   Median :    0.0   Median :    0  
+ Mean   :0.1685   Mean   :0.782   Mean   : 2102.3   Mean   : 1377  
+ 3rd Qu.:0.0000   3rd Qu.:1.000   3rd Qu.:  824.4   3rd Qu.: 1221  
+ Max.   :1.0000   Max.   :1.000   Max.   :39570.7   Max.   :25142  
+
+============================================================
+CAUSAL INFERENCE: NSW Job Training Program (R)
+============================================================
+
+--- Method 1: Naive Difference in Means ---
+Mean earnings (Training): $6349.14
+Mean earnings (Control):  $4554.80
+Naive ATE:                $1794.34
+
+--- Method 2: Regression Adjustment (Pooled OLS) ---
+RA ATE (pooled OLS):      $1676.34
+Std. Error:               $638.68
+p-value:                  0.0090
+
+--- Method 3: Inverse Probability Weighting (IPW) ---
+IPW ATE (normalized):     $1641.32
+IPW ATE (Horvitz-Thompson): $1613.13
+
+--- Method 4: Doubly Robust (AIPW) ---
+DR ATE (AIPW):            $1619.05
+
+--- Method 5: Propensity Score Stratification (5 strata) ---
+  Stratum 1: ATE = $51.58 (n_t=27, n_c=62)
+  Stratum 2: ATE = $2641.49 (n_t=30, n_c=59)
+  Stratum 3: ATE = $-91.79 (n_t=33, n_c=56)
+  Stratum 4: ATE = $1245.20 (n_t=47, n_c=42)
+  Stratum 5: ATE = $4086.51 (n_t=48, n_c=41)
+
+PS Stratification ATE:    $1586.60
+
+--- Method 6: Propensity Score Matching ---
+PS Matching ATE:          $2164.43
+Matched sample size:      370
+
+
+============================================================
+CROSS-VALIDATION: Python (DoWhy) vs R
+============================================================
+Method                             Python ATE        R ATE
+------------------------------------------------------------
+Naive (Diff. in Means)           $   1794.34   $   1794.34
+Regression Adj. (OLS)            $   1676.34   $   1676.34
+IPW (Horvitz-Thompson)           $   1559.41   $   1613.13
+Doubly Robust (AIPW)             $   1620.04   $   1619.05
+PS Stratification                $   1617.07   $   1586.60
+PS Matching                      $   1735.69   $   2164.43
+============================================================
+
+Notes:
+- Naive and OLS should match Python exactly (same arithmetic)
+- IPW/DR/Stratification may differ: Python uses L2-regularized
+  logit (scikit-learn), R uses MLE logit (no regularization)
+- PS Matching differences reflect algorithm implementation
+  details (MatchIt vs DoWhy matching)

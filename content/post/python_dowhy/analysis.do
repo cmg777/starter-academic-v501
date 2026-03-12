@@ -106,7 +106,7 @@ display "IPW ATE:                  $" %10.2f ipw_ate
 display _newline(2)
 display "--- Method 4: Doubly Robust (IPWRA) ---"
 
-teffects ipwra (re78 `covariates') (treat `covariates', logit)
+teffects ipwra (re78 `covariates') (treat `covariates', logit), iterate(300)
 matrix b_dr = e(b)
 scalar dr_ate = b_dr[1,1]
 

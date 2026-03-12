@@ -14,8 +14,9 @@ See @README.md for full documentation of the directory structure, tech stack, an
 
 # Key Commands
 
-- Local Hugo binary: `"$HOME/Library/Application Support/Hugo/0.84.2/hugo"` (v0.84.2 Extended)
-- Run local dev server: `"$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender`
+- Local Hugo binary: `"$HOME/Library/Application Support/Hugo/0.109.0/hugo"` (v0.109.0 Extended)
+- Run local dev server: `"$HOME/Library/Application Support/Hugo/0.109.0/hugo" server --disableFastRender`
+- Build site: `"$HOME/Library/Application Support/Hugo/0.109.0/hugo" --gc --minify`
 - `./update_wowchemy.sh` — update Wowchemy modules and sync Hugo version in netlify.toml
 
 # Content Conventions
@@ -130,9 +131,10 @@ Reviews data science blog posts as an expert professor of data science and econo
 
 # Hugo Version Constraints
 
-- Current: Hugo 0.89.4 (set in netlify.toml)
+- Netlify: Hugo 0.89.4 (set in netlify.toml)
+- Local: Hugo 0.109.0 Extended (at `~/Library/Application Support/Hugo/0.109.0/hugo`)
 - Theme minimum: 0.78 (set in theme.toml)
-- Do NOT upgrade past 0.90.x without adding security policy config (Hugo 0.91+ enforces security policies that block Wowchemy's WC_POST_CSS env var)
+- Hugo 0.91+ requires security policy for `WC_POST_CSS` env var — already configured in `config/_default/config.yaml` under `security.funcs.getenv`
 - Do NOT upgrade past 0.99.x without verifying Wowchemy v5 template compatibility (Hugo 0.100+ removed Blackfriday renderer)
 - Wowchemy modules are pinned to commit 20210324 in go.mod; updating them is a separate decision from updating Hugo
 

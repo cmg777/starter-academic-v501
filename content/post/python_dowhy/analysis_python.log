@@ -1,0 +1,120 @@
+Saved: lalonde_dowhy.csv
+Dataset shape: (445, 12)
+
+Treatment groups:
+treat
+Control     260
+Training    185
+Name: count, dtype: int64
+
+Outcome (re78) summary:
+count      445.00
+mean      5300.76
+std       6631.49
+min          0.00
+25%          0.00
+50%       3701.81
+75%       8124.72
+max      60307.93
+Name: re78, dtype: float64
+
+Covariate summary:
+          age    educ   black    hisp  married  nodegr      re74      re75
+count  445.00  445.00  445.00  445.00   445.00  445.00    445.00    445.00
+mean    25.37   10.20    0.83    0.09     0.17    0.78   2102.27   1377.14
+std      7.10    1.79    0.37    0.28     0.37    0.41   5363.58   3150.96
+min     17.00    3.00    0.00    0.00     0.00    0.00      0.00      0.00
+25%     20.00    9.00    1.00    0.00     0.00    1.00      0.00      0.00
+50%     24.00   10.00    1.00    0.00     0.00    1.00      0.00      0.00
+75%     28.00   11.00    1.00    0.00     0.00    1.00    824.39   1220.84
+max     55.00   16.00    1.00    1.00     1.00    1.00  39570.68  25142.24
+
+Saved: dowhy_outcome_by_treatment.png
+Saved: dowhy_covariate_balance.png
+
+Mean earnings (Training): $6,349.14
+Mean earnings (Control):  $4,554.80
+Naive ATE (difference):   $1,794.34
+Saved: dowhy_causal_graph.png
+
+CausalModel created successfully.
+
+Estimand type: EstimandType.NONPARAMETRIC_ATE
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+   d                                                          
+────────(E[re78|re74,age,black,educ,married,hisp,re75,nodegr])
+d[treat]                                                      
+Estimand assumption 1, Unconfoundedness: If U→{treat} and U→re78 then P(re78|treat,re74,age,black,educ,married,hisp,re75,nodegr,U) = P(re78|treat,re74,age,black,educ,married,hisp,re75,nodegr)
+
+### Estimand : 2
+Estimand name: iv
+No such variable(s) found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable(s) found!
+
+### Estimand : 4
+Estimand name: general_adjustment
+Estimand expression:
+   d                                                          
+────────(E[re78|re74,age,black,educ,married,hisp,re75,nodegr])
+d[treat]                                                      
+Estimand assumption 1, Unconfoundedness: If U→{treat} and U→re78 then P(re78|treat,re74,age,black,educ,married,hisp,re75,nodegr,U) = P(re78|treat,re74,age,black,educ,married,hisp,re75,nodegr)
+
+
+--- Regression Adjustment ---
+Estimated ATE: $1,676.34
+CI not available for this method
+
+--- Inverse Probability Weighting (IPW) ---
+Estimated ATE: $1,559.64
+
+--- Doubly Robust (AIPW) ---
+Estimated ATE: $1,620.01
+
+--- Propensity Score Stratification ---
+Estimated ATE: $1,617.07
+
+--- Propensity Score Matching ---
+Estimated ATE: $1,822.97
+
+Saved: dowhy_estimate_comparison.png
+
+--- Refutation: Placebo Treatment ---
+Refute: Use a Placebo Treatment
+Estimated effect:1676.3426437672697
+New effect:61.82194654249368
+p value:0.9199999999999999
+
+
+--- Refutation: Random Common Cause ---
+Refute: Add a random common cause
+Estimated effect:1676.3426437672697
+New effect:1675.606781672308
+p value:0.9
+
+
+--- Refutation: Data Subset ---
+Refute: Use a subset of data
+Estimated effect:1676.3426437672697
+New effect:1727.583871150852
+p value:0.8
+
+
+============================================================
+SUMMARY
+============================================================
+Method                                  ATE
+------------------------------------------
+Naive (Diff. in Means)         $  1,794.34
+Regression Adjustment          $  1,676.34
+IPW                            $  1,559.64
+Doubly Robust (AIPW)           $  1,620.01
+PS Stratification              $  1,617.07
+PS Matching                    $  1,822.97
+
+Copied dowhy_estimate_comparison.png -> featured.png
