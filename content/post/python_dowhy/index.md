@@ -23,6 +23,14 @@ links:
   icon_pack: fas
   name: "Jupyter notebook"
   url: notebook.ipynb
+- icon: r-project
+  icon_pack: fab
+  name: "R script"
+  url: analysis.R
+- icon: file-code
+  icon_pack: fas
+  name: "Stata do-file"
+  url: analysis.do
 slides:
 summary: Estimating the causal effect of a job training program on earnings using DoWhy's four-step causal inference framework with the Lalonde dataset
 tags:

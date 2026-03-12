@@ -47,6 +47,10 @@ df = lalonde_dataset()
 # Convert boolean treat to int for DoWhy compatibility
 df[TREATMENT] = df[TREATMENT].astype(int)
 
+# Export for Stata/R cross-validation
+df[["treat", "re78", "age", "educ", "black", "hisp", "married", "nodegr", "re74", "re75"]].to_csv("lalonde_dowhy.csv", index=False)
+print("Saved: lalonde_dowhy.csv")
+
 print(f"Dataset shape: {df.shape}")
 print(f"\nTreatment groups:")
 print(df[TREATMENT].value_counts().sort_index().rename({0: "Control", 1: "Training"}))
