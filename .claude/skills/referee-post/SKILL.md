@@ -111,6 +111,12 @@ is worse than no post at all for a beginner following along.
    or import failures. These are all HIGH-severity issues.
 5. **Check figure generation:** do the saved PNGs match what the post references?
    Are any figure files missing?
+6. **Check image freshness:** Compare numeric values shown in chart images
+   (e.g., bar labels, axis values) against the output blocks in the post.
+   If the chart shows different numbers than the output blocks, the images are
+   stale and must be regenerated. This is a HIGH-severity issue.
+7. **Check for orphaned images:** List all PNGs in the post directory and verify
+   each is referenced in `index.md`. Flag any unreferenced PNGs for deletion.
 
 If `script.py` exists, run it as-is. If not, assemble the script from code
 blocks in `index.md`. If the code requires a dataset download, allow network
@@ -263,6 +269,25 @@ Higher-level review of the post as a whole:
 - [ ] LaTeX math (if present) is correctly escaped for Goldmark:
   - `\_` for subscripts, `\\,` `\\;` `\\%` for LaTeX punctuation commands
   - `\theta`, `\hat`, `\text` need no escaping (backslash + letter)
+- [ ] Currency dollar signs use `\\$` in `index.md` (not bare `$` which triggers MathJax)
+
+#### Causal inference-specific checks (apply when post uses causal methods)
+
+- [ ] **Estimand precision:** Does the post clearly state which estimand
+      (ATE, ATT, LATE, etc.) each method targets? Flag any method where the
+      estimand is ambiguous or incorrectly labeled.
+- [ ] **Estimand consistency:** If multiple methods are compared, flag any that
+      target different estimands without explicit acknowledgment (e.g., PS
+      matching targets ATT while IPW targets ATE).
+- [ ] **Randomized vs observational framing:** If the data is from a randomized
+      experiment, flag language that implies covariate adjustment "removes
+      confounding bias." In randomized settings, the naive estimator is unbiased
+      in expectation; adjustment improves **precision**, not removes bias. This
+      distinction matters pedagogically.
+- [ ] **Confounding language:** Flag imprecise use of "confounder" in randomized
+      settings. Pre-treatment covariates in RCTs are prognostic variables that
+      improve precision, not confounders that create bias (though adjusting for
+      them is still correct and useful).
 
 #### Takeaways quality
 
@@ -364,6 +389,14 @@ strength? What is the single most important improvement needed?>
 | # | Location | Post shows | Actual output | Severity |
 |---|----------|-----------|---------------|----------|
 | 1 | After block N | "R² = 0.45" | "R² = 0.43" | HIGH/LOW |
+
+<If image freshness issues were found:>
+
+| # | Image file | Issue | Severity |
+|---|-----------|-------|----------|
+| 1 | comparison_chart.png | Chart shows $1,876 but output block says $1,736 | HIGH |
+
+**Orphaned images:** <list any PNGs not referenced in index.md>
 
 ---
 
@@ -680,3 +713,8 @@ Each dimension is scored 1-10:
 - [ ] All issues have specific locations and actionable suggestions
 - [ ] Priority action items are ranked by impact
 - [ ] Scores assigned for all seven dimensions
+- [ ] Checked image freshness (chart values match output blocks)
+- [ ] Checked for orphaned PNGs not referenced in index.md
+- [ ] Checked currency dollar signs use `\\$` in index.md (if math enabled)
+- [ ] For causal posts: verified estimand labels (ATE/ATT) for each method
+- [ ] For causal posts: verified randomized vs observational framing is accurate

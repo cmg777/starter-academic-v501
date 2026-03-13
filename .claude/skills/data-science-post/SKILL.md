@@ -378,6 +378,7 @@ stripping the backslash. This breaks LaTeX commands that use punctuation.
 - **LaTeX letter commands** (`\theta` `\hat` `\text` `\frac` `\sum`): No escaping needed -- Goldmark only escapes `\` + punctuation, not `\` + letter
 - **Display math** (`$$...$$`): Same escaping rules apply -- Goldmark does NOT treat `$$` as a protected block
 - **Multiple underscores**: Goldmark pairs `_` across an entire paragraph for emphasis. Even separate inline math like `$\theta_0$` and `$g_0(X)$` on the same line can have their underscores paired as `<em>` tags. Always escape every `_` in math as `\_`
+- **Currency dollar signs**: MathJax treats `$...$` as inline math. Use `\\$` for literal dollar signs in prose (Goldmark outputs `\$`, MathJax treats as literal thanks to `processEscapes: true` in `assets/js/mathjax-config.js`). Do NOT use `&#36;` -- it does not work. In notebook `.ipynb`, use `\$` instead (no Goldmark layer)
 
 **Quick reference:**
 
@@ -458,8 +459,37 @@ interpretation paragraph then explains what the reader is seeing.
 If the method has a causal, structural, or multi-step framework, include
 at least one diagram to visualize the structure. Examples: a DAG for
 causal inference, a flowchart for a multi-step pipeline, an architecture
-diagram for an ensemble model. Generate diagrams with matplotlib or
-include a pre-made image in the page bundle.
+diagram for an ensemble model.
+
+**Options for diagrams:**
+
+- **Mermaid diagrams** (preferred for flowcharts and DAGs) -- Hugo supports
+  Mermaid natively. Add `diagram: true` to front matter, then use fenced
+  code blocks with the `mermaid` language tag. Use site colors in `style`
+  directives (e.g., `style A fill:#6a9bcc,stroke:#141413,color:#fff`).
+- **Matplotlib** -- for quantitative diagrams that need precise layout.
+- **Pre-made image** -- include in the page bundle.
+
+### 2.5c Color families for related methods
+
+When comparing multiple related methods (e.g., propensity score variants,
+ensemble methods, regularization approaches), use a **color family** to
+visually group them in comparison charts. This makes it immediately clear
+which methods belong together.
+
+**Example from the DoWhy post (6 estimation methods):**
+
+| Method | Color | Rationale |
+|--------|-------|-----------|
+| Naive (baseline) | `#999999` (gray) | Distinct: not a causal method |
+| Regression Adjustment | `#6a9bcc` (steel blue) | Outcome modeling paradigm |
+| IPW | `#d97757` (warm orange) | Treatment modeling paradigm |
+| AIPW | `#00d4c8` (teal) | Doubly robust paradigm |
+| PS Stratification | `#e8956a` (light orange) | Treatment modeling -- warm orange family |
+| PS Matching | `#c4623d` (dark orange) | Treatment modeling -- warm orange family |
+
+The warm orange family (`#d97757`, `#e8956a`, `#c4623d`) groups all three
+propensity score methods visually, while distinct paradigms get distinct colors.
 
 ### 2.6 Tables
 
@@ -499,7 +529,35 @@ Include at minimum:
 - **Library documentation** -- link to the main library docs page.
 - **Order:** Number references in order of first mention in the post.
 
-### 2.8 Writing clarity
+### 2.8 Causal inference posts: estimand precision
+
+When a post compares **multiple causal estimation methods**, explicitly state
+which **estimand** each method targets. This is a common source of confusion
+and errors.
+
+**Required elements:**
+
+1. **Define the estimand(s) early** -- before the estimation section, add a
+   subsection explaining the target estimand (e.g., ATE vs ATT) with formal
+   notation and a plain-language policy question each answers.
+2. **Flag estimand shifts** -- if any method targets a different estimand than
+   the others (e.g., PS matching targets ATT while IPW targets ATE), state
+   this explicitly in both the method explanation and the comparison discussion.
+3. **Randomized vs observational framing** -- in randomized experiments, the
+   naive difference-in-means is **unbiased in expectation**. Do NOT claim
+   covariate adjustment "removes confounding bias" -- instead frame it as
+   **improving precision** by accounting for finite-sample covariate imbalances.
+   In observational studies, confounding bias is a genuine concern and should
+   be described as such.
+
+**Example (from DoWhy post):**
+
+> **In this tutorial, we estimate the ATE** --- the average effect across the
+> entire study population. Four of our five methods target the ATE directly.
+> The exception is **propensity score matching**, which discards unmatched
+> controls and therefore shifts the estimand toward the ATT.
+
+### 2.9 Writing clarity
 
 - **Sentence length.** Keep sentences under ~40 words. If a sentence
   needs re-reading, split it. Target ~25 words average per paragraph.
@@ -676,13 +734,32 @@ post header. Choose whichever best represents the post at a glance.
    - References section at the end
    - Colab badge (if applicable)
 2. **Run the code:**
-   - If `script.py` exists, run it: `python3 content/post/python_<slug>/script.py`
+   - If `script.py` exists, run it from the post directory:
+     `cd content/post/python_<slug> && python3 script.py`
    - If not, assemble code blocks from `index.md` into a temporary script and run it
    - Compare actual printed output against the output blocks in `index.md`
    - Flag any discrepancies: different numbers, errors, deprecation warnings
    - Verify that all referenced PNG files were generated
    - If any output differs, update the output blocks in the post to match
      actual results
+   - **Image freshness:** After ANY code or color change, re-run the script to
+     regenerate ALL images. Stale PNGs (showing old values or colors) are a
+     common and hard-to-detect bug. Compare chart values against output blocks.
+   - **Orphaned images:** List all PNGs in the directory, cross-reference with
+     `index.md` image references, and delete any PNGs not referenced in the post.
+   - **External tool dependencies:** If the script depends on optional tools
+     (e.g., graphviz for DAG rendering), wrap those calls in try/except so the
+     rest of the script can still run. Example:
+     ```python
+     try:
+         model.view_model(layout="dot")
+     except Exception as e:
+         print(f"Skipping (tool not available): {e}")
+     ```
+   - **Floating-point drift:** Numeric output may vary slightly across runs
+     (e.g., `$1,559.41` vs `$1,559.47`) due to floating-point non-determinism.
+     Always use the values from the LATEST run in output blocks and verify
+     that rounded values in charts and summary tables are consistent.
 3. **Run Hugo dev server:**
    ```bash
    "$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender
@@ -740,6 +817,14 @@ post header. Choose whichever best represents the post at a glance.
 - [ ] Dataset source cited with author/year/title
 - [ ] References numbered in order of first mention
 - [ ] Code executed and output blocks match actual results
+- [ ] All PNGs regenerated after any code/color changes (no stale images)
+- [ ] No orphaned PNGs in page bundle (every PNG referenced in post)
+- [ ] Currency dollar signs use `\\$` in index.md, `\$` in notebook.ipynb
+- [ ] Causal posts: estimand (ATE/ATT) explicitly stated for each method
+- [ ] Causal posts: randomized vs observational framing is accurate
+- [ ] External tool dependencies wrapped in try/except (graphviz, etc.)
+- [ ] Color families used for related method groups in comparison charts
+- [ ] `diagram: true` in front matter if Mermaid diagrams are used
 - [ ] Key Python functions linked to docs and explained on first use
 - [ ] Simple baseline established before the full method
 - [ ] At least one robustness/validation check included

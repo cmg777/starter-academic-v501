@@ -9,14 +9,15 @@ See @README.md for full documentation of the directory structure, tech stack, an
 - Hugo 0.89.4 (static site generator)
 - Wowchemy v5 theme (via Hugo Modules, pinned in go.mod)
 - Goldmark markdown renderer with `unsafe: true` (inline HTML allowed)
+- Mermaid diagrams supported (add `diagram: true` to front matter)
 - SCSS for custom styles (assets/scss/custom.scss)
 - Netlify for deployment (auto-deploy on push to master)
 
 # Key Commands
 
-- Local Hugo binary: `"$HOME/Library/Application Support/Hugo/0.109.0/hugo"` (v0.109.0 Extended)
-- Run local dev server: `"$HOME/Library/Application Support/Hugo/0.109.0/hugo" server --disableFastRender`
-- Build site: `"$HOME/Library/Application Support/Hugo/0.109.0/hugo" --gc --minify`
+- Local Hugo binary: `"$HOME/Library/Application Support/Hugo/0.84.2/hugo"` (v0.84.2 Extended)
+- Run local dev server: `"$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender`
+- Build site: `"$HOME/Library/Application Support/Hugo/0.84.2/hugo" --gc --minify`
 - `./update_wowchemy.sh` — update Wowchemy modules and sync Hugo version in netlify.toml
 
 # Content Conventions
@@ -103,7 +104,10 @@ Generates notebook-style data science blog posts for the site. The user provides
 - At least 8 interpretation paragraphs with specific numeric values
 - Site color palette: steel blue `#6a9bcc`, warm orange `#d97757`, near black `#141413`, teal `#00d4c8`
 - `toc: true` in front matter enables the left-side table of contents
-- Reference post for conventions: `content/post/python_ml_random_forest/index.md`
+- Currency dollar signs: use `\\$` in `index.md` (MathJax-enabled), `\$` in notebook
+- Causal posts: explicitly state estimand (ATE/ATT) for each method; distinguish randomized vs observational framing
+- After code changes, re-run script.py to regenerate ALL images; delete orphaned PNGs
+- Reference posts: `content/post/python_ml_random_forest/index.md` (ML), `content/post/python_dowhy/index.md` (causal inference)
 
 ## referee-post
 

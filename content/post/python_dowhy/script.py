@@ -74,25 +74,55 @@ plt.savefig("dowhy_outcome_by_treatment.png", dpi=300, bbox_inches="tight")
 plt.close()
 print("\nSaved: dowhy_outcome_by_treatment.png")
 
-# ── EDA: Covariate Balance ───────────────────────────────────────────
+# ── EDA: Covariate Balance (Categorical) ────────────────────────────
 
-covariate_means = df.groupby(TREATMENT)[COVARIATES].mean()
+categorical_vars = ["black", "hisp", "married", "nodegr"]
+cat_means = df.groupby(TREATMENT)[categorical_vars].mean()
 
-fig, ax = plt.subplots(figsize=(12, 6))
-x = np.arange(len(COVARIATES))
+fig, ax = plt.subplots(figsize=(8, 5))
+x = np.arange(len(categorical_vars))
 width = 0.35
-ax.bar(x - width / 2, covariate_means.loc[0], width, label="Control",
+ax.bar(x - width / 2, cat_means.loc[0], width, label="Control",
        color=STEEL_BLUE, edgecolor="white")
-ax.bar(x + width / 2, covariate_means.loc[1], width, label="Training",
+ax.bar(x + width / 2, cat_means.loc[1], width, label="Training",
        color=WARM_ORANGE, edgecolor="white")
 ax.set_xticks(x)
-ax.set_xticklabels(COVARIATES, rotation=45, ha="right")
-ax.set_ylabel("Mean Value")
-ax.set_title("Covariate Balance: Control vs Training Group")
+ax.set_xticklabels(categorical_vars, rotation=45, ha="right")
+ax.set_ylabel("Proportion")
+ax.set_ylim(0, 1)
+ax.set_title("Covariate Balance: Categorical Variables")
 ax.legend()
-plt.savefig("dowhy_covariate_balance.png", dpi=300, bbox_inches="tight")
+plt.savefig("dowhy_covariate_balance_categorical.png", dpi=300, bbox_inches="tight")
 plt.close()
-print("Saved: dowhy_covariate_balance.png")
+print("Saved: dowhy_covariate_balance_categorical.png")
+
+# ── EDA: Covariate Balance — SMD Love Plot ─────────────────────────
+
+treated = df[df[TREATMENT] == 1]
+control = df[df[TREATMENT] == 0]
+
+smd_values = {}
+for var in COVARIATES:
+    diff = treated[var].mean() - control[var].mean()
+    pooled_sd = np.sqrt((treated[var].std()**2 + control[var].std()**2) / 2)
+    smd_values[var] = diff / pooled_sd
+
+smd_df = pd.DataFrame({"variable": list(smd_values.keys()),
+                        "smd": list(smd_values.values())})
+smd_df["abs_smd"] = smd_df["smd"].abs()
+smd_df = smd_df.sort_values("abs_smd")
+
+fig, ax = plt.subplots(figsize=(8, 5))
+colors = [STEEL_BLUE if v < 0.1 else WARM_ORANGE for v in smd_df["abs_smd"]]
+ax.barh(smd_df["variable"], smd_df["abs_smd"], color=colors,
+        edgecolor="white", height=0.6)
+ax.axvline(0.1, color=NEAR_BLACK, linewidth=1, linestyle="--", label="SMD = 0.1 threshold")
+ax.set_xlabel("Absolute Standardized Mean Difference")
+ax.set_title("Covariate Balance: Love Plot (All Covariates)")
+ax.legend(loc="lower right")
+plt.savefig("dowhy_covariate_balance_smd.png", dpi=300, bbox_inches="tight")
+plt.close()
+print("Saved: dowhy_covariate_balance_smd.png")
 
 # ── Naive ATE ─────────────────────────────────────────────────────────
 
@@ -104,55 +134,6 @@ print(f"\nMean earnings (Training): ${mean_treated:,.2f}")
 print(f"Mean earnings (Control):  ${mean_control:,.2f}")
 print(f"Naive ATE (difference):   ${naive_ate:,.2f}")
 
-# ── Causal Graph Visualization ────────────────────────────────────────
-
-fig, ax = plt.subplots(figsize=(10, 7))
-confounders = COVARIATES
-n_conf = len(confounders)
-
-# Position nodes
-treatment_pos = (0.2, 0.5)
-outcome_pos = (0.8, 0.5)
-conf_positions = []
-for i, c in enumerate(confounders):
-    y = 0.9 - (i / (n_conf - 1)) * 0.8
-    conf_positions.append((0.5, y))
-
-# Draw edges from confounders
-for i, (cx, cy) in enumerate(conf_positions):
-    ax.annotate("", xy=treatment_pos, xytext=(cx, cy),
-                arrowprops=dict(arrowstyle="->", color="#cccccc", lw=1.0))
-    ax.annotate("", xy=outcome_pos, xytext=(cx, cy),
-                arrowprops=dict(arrowstyle="->", color="#cccccc", lw=1.0))
-
-# Treatment -> Outcome (main causal arrow)
-ax.annotate("", xy=outcome_pos, xytext=treatment_pos,
-            arrowprops=dict(arrowstyle="->", color=WARM_ORANGE, lw=3.0))
-
-# Draw nodes
-for i, c in enumerate(confounders):
-    cx, cy = conf_positions[i]
-    ax.plot(cx, cy, "o", color=STEEL_BLUE, markersize=20, zorder=5)
-    ax.text(cx + 0.06, cy, c, fontsize=9, va="center", ha="left", color=NEAR_BLACK)
-
-ax.plot(*treatment_pos, "s", color=WARM_ORANGE, markersize=30, zorder=5)
-ax.text(treatment_pos[0], treatment_pos[1] - 0.07, "treat", fontsize=11,
-        ha="center", fontweight="bold", color=NEAR_BLACK)
-
-ax.plot(*outcome_pos, "s", color=TEAL, markersize=30, zorder=5)
-ax.text(outcome_pos[0], outcome_pos[1] - 0.07, "re78", fontsize=11,
-        ha="center", fontweight="bold", color=NEAR_BLACK)
-
-ax.set_xlim(0, 1)
-ax.set_ylim(0, 1)
-ax.set_title("Causal Graph: NSW Job Training Program", fontsize=14)
-ax.text(0.5, 0.02, "Confounders (blue circles) affect both treatment assignment and earnings outcome",
-        ha="center", fontsize=9, color="#666666")
-ax.axis("off")
-plt.savefig("dowhy_causal_graph.png", dpi=300, bbox_inches="tight")
-plt.close()
-print("Saved: dowhy_causal_graph.png")
-
 # ── DoWhy: Model ──────────────────────────────────────────────────────
 
 model = CausalModel(
@@ -162,6 +143,15 @@ model = CausalModel(
     common_causes=COVARIATES,
 )
 print("\nCausalModel created successfully.")
+
+# Visualize the causal graph using DoWhy's built-in method
+try:
+    model.view_model(layout="dot")
+    import shutil
+    shutil.move("causal_model.png", "dowhy_causal_graph.png")
+    print("Saved: dowhy_causal_graph.png")
+except Exception as e:
+    print(f"Skipping causal graph (graphviz not available): {e}")
 
 # ── DoWhy: Identify ──────────────────────────────────────────────────
 
@@ -241,7 +231,7 @@ methods = ["Naive\n(Diff. in Means)", "Regression\nAdjustment", "IPW",
            "Doubly Robust\n(AIPW)", "PS\nStratification", "PS\nMatching"]
 estimates = [naive_ate, estimate_ra.value, estimate_ipw.value,
              dr_ate, estimate_ps_strat.value, estimate_ps_match.value]
-colors = ["#999999", STEEL_BLUE, WARM_ORANGE, TEAL, "#8b5cf6", "#f59e0b"]
+colors = ["#999999", STEEL_BLUE, WARM_ORANGE, TEAL, "#e8956a", "#c4623d"]
 
 bars = ax.barh(methods, estimates, color=colors, edgecolor="white", height=0.6)
 

@@ -10,7 +10,7 @@ Academic portfolio website for **Carlos Mendez**, Associate Professor of Develop
 |-----------|-----------------|
 | Static site generator | [Hugo](https://gohugo.io/) 0.89.4 |
 | Theme | [Wowchemy](https://wowchemy.com/) v5 (via Hugo Modules) |
-| Markup | Goldmark (with `unsafe: true` for inline HTML) |
+| Markup | Goldmark (with `unsafe: true` for inline HTML, Mermaid diagrams) |
 | Styling | SCSS (`assets/scss/custom.scss`) |
 | Deployment | [Netlify](https://www.netlify.com/) with auto-deploy on push |
 | CMS | Netlify CMS (optional) |
@@ -260,9 +260,12 @@ The `data-science-post` skill automates creating notebook-style data science blo
 | Python script (optional) | `content/post/python_<topic-slug>/script.py` |
 | Figures (>= 3) | `content/post/python_<topic-slug>/<slug>_*.png` |
 
-The skill enforces the sandwich pattern (explanation, code, interpretation), uses the site color palette (`#6a9bcc`, `#d97757`, `#141413`, `#00d4c8`), and requires at least 8 interpretation paragraphs with specific numeric values. Posts inherit notebook-style CSS styling from `assets/scss/custom.scss` and use `toc: true` for the left-side table of contents.
+The skill enforces the sandwich pattern (explanation, code, interpretation), uses the site color palette (`#6a9bcc`, `#d97757`, `#141413`, `#00d4c8`), and requires at least 8 interpretation paragraphs with specific numeric values. Posts inherit notebook-style CSS styling from `assets/scss/custom.scss` and use `toc: true` for the left-side table of contents. Currency dollar signs use `\\$` in `index.md` (MathJax-enabled) and `\$` in notebooks. After code changes, re-run `script.py` to regenerate all images.
 
-**Reference post:** `content/post/python_ml_random_forest/index.md`
+**Reference posts:**
+
+- ML: `content/post/python_ml_random_forest/index.md`
+- Causal inference: `content/post/python_dowhy/index.md`
 
 ### Review a Data Science Post (via Claude Code Skill)
 
