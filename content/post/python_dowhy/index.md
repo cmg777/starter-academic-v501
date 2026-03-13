@@ -51,7 +51,9 @@ diagram: true
 
 <a href="https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_dowhy/notebook.ipynb" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/episode/7h6S9YzEroATdQabvJxi1W?si=wpvmHsCARQqP8LohogGRFg&utm_source=generator&t=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<div style="background:#1a3a8a; border-radius:12px; padding:8px;">
+<iframe style="border-radius:8px" src="https://open.spotify.com/embed/episode/7h6S9YzEroATdQabvJxi1W?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
 
 ## Overview
 
