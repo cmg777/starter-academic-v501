@@ -286,6 +286,56 @@ The `referee-post` skill reviews data science posts as an expert professor. It p
 /project:referee-post python_doubleml
 ```
 
+### Generate Infographic Instructions (via Claude Code Skill)
+
+The `infographic-instructions` skill generates a sketchnote-style infographic instructions file summarizing an existing blog post into 6 panels with the site color palette.
+
+**Location:** `.claude/skills/infographic-instructions/SKILL.md`
+
+**Usage** (in Claude Code):
+
+```
+/project:infographic-instructions <post slug>
+```
+
+**Examples:**
+
+```
+/project:infographic-instructions python_partial_identification
+/project:infographic-instructions python_dowhy
+```
+
+**What it produces:**
+
+| Output | Path |
+|--------|------|
+| Infographic instructions | `content/post/<slug>/infographic_instructions.md` |
+
+The file includes a descriptive title, sketchnote design style guidance with topic-specific illustration suggestions, the site color palette with role assignments, and 6 panels of concise, infographic-ready sentences with specific numbers from the post.
+
+**Reference output:** `content/post/python_partial_identification/infographic_instructions.md`
+
+### Proofread a Data Science Post (via Claude Code Skill)
+
+The `proofread-post` skill runs a final proofreading pass on a data science post before publication. It checks correctness, display, and consistency without modifying any files. Lighter and faster than `referee-post`.
+
+**Location:** `.claude/skills/proofread-post/SKILL.md`
+
+**Usage** (in Claude Code):
+
+```
+/project:proofread-post <post slug>
+```
+
+**Examples:**
+
+```
+/project:proofread-post python_partial_identification
+/project:proofread-post python_dowhy
+```
+
+**9-point checklist:** front matter, markdown structure, math notation (Goldmark escaping), code/output pairing, images (references + orphans), code consistency (index.md vs script.py), Mermaid diagrams, references/links, site conventions.
+
 ### New Author
 
 Create `content/authors/firstname-lastname/_index.md` with profile front matter and add `avatar.jpg`.
