@@ -2,25 +2,47 @@
 
 ## Design Style
 
-- **Sketchnote aesthetic**: hand-drawn feel with informal lettering, doodle-style icons, and hand-sketched arrows connecting ideas
-- Use simple illustrations: stick figures for workers, magnifying glass for "unmeasured," brackets for bounds, a scale/balance for trade-offs
-- Panels flow top-to-bottom or left-to-right with visual connectors (arrows, dotted lines)
-- Key numbers should be large and bold; supporting text should be compact
+- **Chalkboard sketchnote aesthetic**: dark background with chalk-drawn lettering, chalk-dust textures, and hand-sketched icons that look drawn in white or colored chalk
+- Use simple chalk-style illustrations: stick figures for workers, magnifying glass for "unmeasured," brackets for bounds, a scale/balance for trade-offs
+- Panel borders: chalk-drawn rounded rectangles with slightly uneven edges (hand-drawn feel)
+- Connectors: chalk arrows and dotted chalk lines between panels showing narrative flow
+- Key numbers: oversized chalk-style numerals, optionally circled or underlined with a chalk swoosh
+- Subtle chalk dust / smudge effects near text edges for realism
 
 ## Color Palette
 
 | Role | Color | Hex |
 |------|-------|-----|
-| Primary / headers | Steel blue | `#6a9bcc` |
-| Accents / highlights | Warm orange | `#d97757` |
-| Text / outlines | Near black | `#141413` |
-| Call-outs / emphasis | Teal | `#00d4c8` |
-| Panel titles | Heading blue | `#1a3a8a` |
+| Background | Navy blue | `#0e1545` |
+| Body text / outlines | Chalk white | `#f0ece2` |
+| Panel titles / headers | Steel blue (bright) | `#8bb8e0` |
+| Accents / key numbers | Warm orange | `#e8956a` |
+| Call-outs / positive emphasis | Teal | `#00d4c8` |
+| Underlines / secondary accents | Muted chalk gray | `#b0a89a` |
 
-- Use steel blue for panel borders and section headers
-- Use warm orange for key numbers and warning highlights (e.g., bias)
-- Use teal for positive emphasis (e.g., "32% tighter")
-- Use near black for body text and sketch outlines
+- Use steel blue for panel titles and chalk-drawn borders
+- Use warm orange for key numbers, bold callouts, and warning highlights (e.g., bias)
+- Use teal for positive emphasis (e.g., "32% tighter", improvement metrics)
+- Use chalk white for body text and sketch outlines
+- Use muted gray for connectors, dotted lines, and de-emphasized annotations
+- Never use pure white (`#ffffff`) -- chalk is always slightly warm/creamy
+
+## Visual Hierarchy
+
+- **Panel titles**: largest text, steel blue, all caps or small caps chalk lettering
+- **Key numbers**: second largest, warm orange, optionally circled or underlined
+- **Body sentences**: chalk white, compact hand-lettered style
+- **Annotations / labels**: muted chalk gray, smaller size
+- **Icons / illustrations**: chalk white outlines with occasional color fills (teal or orange)
+
+## Panel Layout
+
+- **Landscape orientation** (e.g., 1920x1080 or 16:9 aspect ratio)
+- 6 panels arranged in a 3x2 grid (3 columns x 2 rows)
+- Each panel: chalk-drawn rounded rectangle border in steel blue
+- Panels connected by chalk arrows or dotted lines showing the narrative flow (1->2->3->4->5->6)
+- Small panel number in top-left corner of each panel (warm orange, circled)
+- Leave breathing room between panels -- the dark background itself is a design element
 
 ## Panel Content (6 Panels)
 

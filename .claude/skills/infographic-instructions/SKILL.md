@@ -1,16 +1,17 @@
 ---
 name: infographic-instructions
-description: Generate a sketchnote-style infographic instructions file that summarizes an existing blog post into 6 panels with the site color palette. Produces an infographic_instructions.md file in the post's page bundle.
+description: Generate a chalkboard-style infographic instructions file that summarizes an existing blog post into 6 panels on a dark background with the site color palette. Produces an infographic_instructions.md file in the post's page bundle.
 argument-hint: "<post slug, e.g. python_partial_identification>"
 disable-model-invocation: true
 user-invocable: true
 ---
 
-# Infographic Instructions: Sketchnote Summary Generator
+# Infographic Instructions: Chalkboard Summary Generator
 
 Read an existing blog post on this site and produce an `infographic_instructions.md`
-file in the post's page bundle. The file contains design style guidance (sketchnote
-aesthetic), the site color palette with role assignments, and 6 panels of concise,
+file in the post's page bundle. The file contains design style guidance (chalkboard
+aesthetic with dark background), the site color palette adapted for dark-background
+contrast, layout specifications (landscape, 3x2 grid), and 6 panels of concise,
 infographic-ready sentences summarizing the post's key ideas.
 
 ## Example invocations
@@ -52,7 +53,7 @@ the reference for tone, structure, and level of detail.
 Write `infographic_instructions.md` in the post's page bundle directory
 (e.g. `content/post/<slug>/infographic_instructions.md`).
 
-The file has three sections:
+The file has three main sections (the second section contains four subsections):
 
 ### Section 1: Title (H1)
 
@@ -68,9 +69,9 @@ A single H1 heading that is a concise, descriptive summary of the post's topic.
 - "Predicting Housing Prices with Random Forests"
 - "Estimating Causal Effects with Double Machine Learning"
 
-### Section 2: Design Style
+### Section 2: Design Style and Layout
 
-Include both subsections exactly as shown below, adapting the illustration
+Include all four subsections exactly as shown below, adapting the illustration
 suggestions to match the post's specific topic.
 
 #### Design Style subsection
@@ -78,10 +79,12 @@ suggestions to match the post's specific topic.
 ```markdown
 ## Design Style
 
-- **Sketchnote aesthetic**: hand-drawn feel with informal lettering, doodle-style icons, and hand-sketched arrows connecting ideas
-- Use simple illustrations: <2-3 topic-specific icon suggestions>
-- Panels flow top-to-bottom or left-to-right with visual connectors (arrows, dotted lines)
-- Key numbers should be large and bold; supporting text should be compact
+- **Chalkboard sketchnote aesthetic**: dark background with chalk-drawn lettering, chalk-dust textures, and hand-sketched icons that look drawn in white or colored chalk
+- Use simple chalk-style illustrations: <2-3 topic-specific icon suggestions>
+- Panel borders: chalk-drawn rounded rectangles with slightly uneven edges (hand-drawn feel)
+- Connectors: chalk arrows and dotted chalk lines between panels showing narrative flow
+- Key numbers: oversized chalk-style numerals, optionally circled or underlined with a chalk swoosh
+- Subtle chalk dust / smudge effects near text edges for realism
 ```
 
 The illustration suggestions must be specific to the post's content. Examples:
@@ -98,16 +101,48 @@ This subsection is identical for every post -- copy it exactly:
 
 | Role | Color | Hex |
 |------|-------|-----|
-| Primary / headers | Steel blue | `#6a9bcc` |
-| Accents / highlights | Warm orange | `#d97757` |
-| Text / outlines | Near black | `#141413` |
-| Call-outs / emphasis | Teal | `#00d4c8` |
-| Panel titles | Heading blue | `#1a3a8a` |
+| Background | Navy blue | `#0e1545` |
+| Body text / outlines | Chalk white | `#f0ece2` |
+| Panel titles / headers | Steel blue (bright) | `#8bb8e0` |
+| Accents / key numbers | Warm orange | `#e8956a` |
+| Call-outs / positive emphasis | Teal | `#00d4c8` |
+| Underlines / secondary accents | Muted chalk gray | `#b0a89a` |
 
-- Use steel blue for panel borders and section headers
-- Use warm orange for key numbers and warning highlights (e.g., bias)
-- Use teal for positive emphasis (e.g., "32% tighter")
-- Use near black for body text and sketch outlines
+- Use steel blue for panel titles and chalk-drawn borders
+- Use warm orange for key numbers, bold callouts, and warning highlights (e.g., bias)
+- Use teal for positive emphasis (e.g., "32% tighter", improvement metrics)
+- Use chalk white for body text and sketch outlines
+- Use muted gray for connectors, dotted lines, and de-emphasized annotations
+- Never use pure white (`#ffffff`) -- chalk is always slightly warm/creamy
+```
+
+#### Visual Hierarchy subsection
+
+This subsection is identical for every post -- copy it exactly:
+
+```markdown
+## Visual Hierarchy
+
+- **Panel titles**: largest text, steel blue, all caps or small caps chalk lettering
+- **Key numbers**: second largest, warm orange, optionally circled or underlined
+- **Body sentences**: chalk white, compact hand-lettered style
+- **Annotations / labels**: muted chalk gray, smaller size
+- **Icons / illustrations**: chalk white outlines with occasional color fills (teal or orange)
+```
+
+#### Panel Layout subsection
+
+This subsection is identical for every post -- copy it exactly:
+
+```markdown
+## Panel Layout
+
+- **Landscape orientation** (e.g., 1920x1080 or 16:9 aspect ratio)
+- 6 panels arranged in a 3x2 grid (3 columns x 2 rows)
+- Each panel: chalk-drawn rounded rectangle border in steel blue
+- Panels connected by chalk arrows or dotted lines showing the narrative flow (1->2->3->4->5->6)
+- Small panel number in top-left corner of each panel (warm orange, circled)
+- Leave breathing room between panels -- the dark background itself is a design element
 ```
 
 ### Section 3: Panel Content (6 Panels)
@@ -155,15 +190,19 @@ After writing the file:
 3. **Check sentence count:** 2-3 sentences per panel (12-18 total)
 4. **Check for specific numbers:** at least 6 of the sentences should contain a specific number from the post
 5. **Check title:** is it a concise summary, not "Infographic Instructions"?
-6. **Check illustrations:** are the suggested icons specific to this post's topic?
+6. **Check illustrations:** are the suggested chalk icons specific to this post's topic?
+7. **Check all four design subsections are present:** Design Style, Color Palette, Visual Hierarchy, Panel Layout
+8. **Check landscape orientation** is specified in Panel Layout
 
 ---
 
 ## Quality checklist
 
 - [ ] Title is a concise, descriptive summary of the post topic (not "Infographic Instructions")
-- [ ] Design Style section includes topic-specific illustration suggestions
-- [ ] Color Palette table is present with all 5 site colors
+- [ ] Design Style section specifies chalkboard aesthetic with topic-specific chalk illustration suggestions
+- [ ] Color Palette table is present with all 6 dark-background colors (background, chalk white, steel blue, warm orange, teal, muted gray)
+- [ ] Visual Hierarchy section is present with 5 text levels
+- [ ] Panel Layout section specifies landscape orientation, 3x2 grid
 - [ ] Exactly 6 panels with descriptive titles
 - [ ] Each panel has 2-3 bullet point sentences
 - [ ] Sentences are short, punchy, and self-contained

@@ -50,4 +50,191 @@
   {{ end }}
 </article>
 
+<script>
+(function() {
+  /* --- Create overlay structure --- */
+  var overlay = document.createElement('div');
+  overlay.className = 'image-lightbox-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-label', 'Enlarged image viewer');
+  overlay.setAttribute('aria-modal', 'true');
+
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'image-lightbox-close';
+  closeBtn.setAttribute('aria-label', 'Close image viewer');
+  closeBtn.type = 'button';
+
+  var prevBtn = document.createElement('button');
+  prevBtn.className = 'image-lightbox-nav image-lightbox-prev';
+  prevBtn.setAttribute('aria-label', 'Previous image');
+  prevBtn.type = 'button';
+
+  var nextBtn = document.createElement('button');
+  nextBtn.className = 'image-lightbox-nav image-lightbox-next';
+  nextBtn.setAttribute('aria-label', 'Next image');
+  nextBtn.type = 'button';
+
+  var lightboxImg = document.createElement('img');
+  lightboxImg.alt = '';
+
+  var caption = document.createElement('div');
+  caption.className = 'image-lightbox-caption';
+
+  overlay.appendChild(closeBtn);
+  overlay.appendChild(prevBtn);
+  overlay.appendChild(nextBtn);
+  overlay.appendChild(lightboxImg);
+  overlay.appendChild(caption);
+  document.body.appendChild(overlay);
+
+  /* --- State --- */
+  var triggerElement = null;
+  var lightboxImages = [];
+  var currentIndex = -1;
+  var miniThumb = null;
+
+  /* --- Collect lightbox-eligible images --- */
+  var images = document.querySelectorAll('.article-style img, img.featured-image');
+  for (var i = 0; i < images.length; i++) {
+    (function(img) {
+      if (img.src && img.src.match(/^https?:\/\//) && !img.src.includes(window.location.hostname)) {
+        img.style.cursor = 'default';
+        return;
+      }
+      lightboxImages.push({ src: img.src, alt: img.alt, element: img });
+      img.addEventListener('click', function(e) {
+        e.preventDefault();
+        triggerElement = img;
+        for (var j = 0; j < lightboxImages.length; j++) {
+          if (lightboxImages[j].element === img) {
+            currentIndex = j;
+            break;
+          }
+        }
+        openLightbox(lightboxImages[currentIndex].src, lightboxImages[currentIndex].alt);
+      });
+    })(images[i]);
+  }
+
+  /* --- Navigation --- */
+  function updateNavButtons() {
+    prevBtn.disabled = (currentIndex <= 0);
+    nextBtn.disabled = (currentIndex >= lightboxImages.length - 1);
+    var singleImage = lightboxImages.length <= 1;
+    prevBtn.style.display = singleImage ? 'none' : '';
+    nextBtn.style.display = singleImage ? 'none' : '';
+  }
+
+  function navigateTo(index) {
+    if (index < 0 || index >= lightboxImages.length) return;
+    currentIndex = index;
+    var entry = lightboxImages[currentIndex];
+    lightboxImg.src = entry.src;
+    lightboxImg.alt = entry.alt || '';
+    caption.textContent = entry.alt || '';
+    caption.style.display = entry.alt ? 'block' : 'none';
+    updateNavButtons();
+  }
+
+  prevBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    navigateTo(currentIndex - 1);
+  });
+
+  nextBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    navigateTo(currentIndex + 1);
+  });
+
+  /* --- Open / Close with animation --- */
+  function openLightbox(src, altText) {
+    lightboxImg.src = src;
+    lightboxImg.alt = altText || '';
+    caption.textContent = altText || '';
+    caption.style.display = altText ? 'block' : 'none';
+    overlay.classList.remove('closing');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    updateNavButtons();
+    closeBtn.focus();
+    if (miniThumb) miniThumb.classList.remove('visible');
+  }
+
+  function closeLightbox() {
+    if (!overlay.classList.contains('active')) return;
+    overlay.classList.add('closing');
+    overlay.addEventListener('transitionend', function handler(e) {
+      if (e.propertyName !== 'opacity') return;
+      overlay.removeEventListener('transitionend', handler);
+      overlay.classList.remove('active', 'closing');
+      lightboxImg.src = '';
+      document.body.style.overflow = '';
+      if (triggerElement) {
+        triggerElement.focus();
+        triggerElement = null;
+      }
+    });
+  }
+
+  /* --- Dismissal behaviors --- */
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeLightbox();
+  });
+
+  closeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeLightbox();
+  });
+
+  lightboxImg.addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeLightbox();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (!overlay.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navigateTo(currentIndex - 1);
+    if (e.key === 'ArrowRight') navigateTo(currentIndex + 1);
+  });
+
+  /* --- Floating mini-thumbnail --- */
+  var featuredImg = document.querySelector('img.featured-image');
+  if (featuredImg) {
+    miniThumb = document.createElement('div');
+    miniThumb.className = 'image-mini-thumbnail';
+    var thumbImg = document.createElement('img');
+    thumbImg.alt = featuredImg.alt || 'Featured image';
+    thumbImg.src = featuredImg.src;
+    miniThumb.appendChild(thumbImg);
+    document.body.appendChild(miniThumb);
+
+    miniThumb.addEventListener('click', function() {
+      for (var j = 0; j < lightboxImages.length; j++) {
+        if (lightboxImages[j].element === featuredImg) {
+          triggerElement = featuredImg;
+          currentIndex = j;
+          openLightbox(lightboxImages[j].src, lightboxImages[j].alt);
+          break;
+        }
+      }
+    });
+
+    var thumbObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+          if (!overlay.classList.contains('active')) {
+            miniThumb.classList.add('visible');
+          }
+        } else {
+          miniThumb.classList.remove('visible');
+        }
+      });
+    }, { threshold: 0 });
+
+    thumbObserver.observe(featuredImg);
+  }
+})();
+</script>
+
 {{- end -}}
