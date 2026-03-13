@@ -752,3 +752,168 @@ iframe {
     right: 16px;
   }
 }
+
+/* ==========================================================================
+   15. Dark mode overrides
+   Deep navy palette continuous with navbar (#0e1545).
+   Accent teal (#00d4c8) and steel blue (#6a9bcc) carry over from light mode.
+   ========================================================================== */
+
+/* --- 15a. Smooth transition on toggle --- */
+body,
+.home-section,
+.navbar {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* --- 15b. Collapsible dashboard sections --- */
+.dark details.dashboard-entry summary {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+/* --- 15c. Callout/alert notes --- */
+.dark .callout-note,
+.dark .alert-note {
+  background-color: rgba(0, 212, 200, 0.08);
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.dark .alert-warning {
+  background-color: rgba(255, 56, 96, 0.1);
+  color: #ff9eae;
+}
+
+/* --- 15d. Notebook-style post styling --- */
+
+/* A. Code blocks */
+.dark .article-style pre {
+  background: #1a2236;
+  border-left-color: #00d4c8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark .article-style pre code {
+  color: #e0e6f0;
+}
+
+/* Inline code */
+.dark .article-style code {
+  background: rgba(0, 212, 200, 0.12);
+  color: #a8d8ea;
+}
+
+/* Reset inline code styles inside pre blocks */
+.dark .article-style pre code {
+  background: transparent;
+}
+
+/* B. Output figures */
+.dark .article-style img {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark .article-style img + em,
+.dark .article-style p > img + br + em {
+  color: rgba(255, 255, 255, 0.54);
+}
+
+/* C. Tables */
+.dark .article-style table thead th {
+  border-bottom-color: #00d4c8;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dark .article-style table tbody td {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.dark .article-style table tbody tr:hover {
+  background-color: rgba(0, 212, 200, 0.08);
+}
+
+/* D. Blockquotes */
+.dark .article-style blockquote {
+  border-left-color: #00d4c8;
+  background: rgba(0, 212, 200, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* E. Headings */
+.dark .article-style h2 {
+  color: #6a9bcc;
+  border-bottom-color: rgba(0, 212, 200, 0.3);
+}
+
+.dark .article-style h3 {
+  color: #6a9bcc;
+}
+
+.dark .article-container h1,
+.dark .container-fluid h1 {
+  color: #6a9bcc;
+}
+
+/* F. Learning objectives list */
+.dark .article-style h2 + p + ul,
+.dark .article-style h2 + ul {
+  background: rgba(0, 212, 200, 0.06);
+  border-left-color: #00d4c8;
+}
+
+/* --- 15e. Python syntax highlighting --- */
+.dark .article-style pre code.hljs {
+  background: #1a2236;
+}
+
+.dark .hljs-keyword { color: #7ec8e3; font-weight: 600; }
+.dark .hljs-built_in { color: #6ab7f5; }
+.dark .hljs-string { color: #98d8a0; }
+.dark .hljs-number { color: #d97757; }
+.dark .hljs-comment { color: rgba(255, 255, 255, 0.4); font-style: italic; }
+.dark .hljs-function .hljs-title,
+.dark .hljs-title.function_ { color: #00d4c8; }
+.dark .hljs-params { color: #e0e6f0; }
+.dark .hljs-literal { color: #7ec8e3; font-weight: 600; }
+.dark .hljs-meta { color: rgba(255, 255, 255, 0.4); }
+
+/* --- 15f. Left-side Table of Contents --- */
+.dark .docs-toc {
+  background: rgba(15, 23, 41, 0.85);
+  border-color: rgba(255, 255, 255, 0.08);
+  border-left: 3px solid #00d4c8;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dark .docs-toc::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 200, 0.3);
+}
+
+.dark .docs-toc-title {
+  color: #6a9bcc;
+  border-bottom-color: rgba(0, 212, 200, 0.2);
+}
+
+.dark .docs-toc-title:hover {
+  color: #00d4c8;
+}
+
+.dark .docs-toc #TableOfContents a {
+  color: rgba(255, 255, 255, 0.54);
+}
+
+.dark .docs-toc #TableOfContents a:hover {
+  color: #6a9bcc;
+  background: rgba(106, 155, 204, 0.1);
+}
+
+.dark .docs-toc #TableOfContents a.active {
+  color: #6a9bcc;
+  background: rgba(0, 212, 200, 0.1);
+  border-left-color: #00d4c8;
+}
+
+.dark .docs-toc #TableOfContents ul ul {
+  border-left-color: rgba(0, 212, 200, 0.15);
+}

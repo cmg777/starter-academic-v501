@@ -288,7 +288,7 @@ The `referee-post` skill reviews data science posts as an expert professor. It p
 
 ### Generate Infographic Instructions (via Claude Code Skill)
 
-The `infographic-instructions` skill generates a sketchnote-style infographic instructions file summarizing an existing blog post into 6 panels with the site color palette.
+The `infographic-instructions` skill generates an AI-image-generation prompt that creates a chalkboard-style infographic summarizing a blog post into 6 panels. The output is a copy-pasteable prompt optimized for Gemini, DALL-E, Midjourney, or Ideogram. Includes an interactive confirmation step before generation.
 
 **Location:** `.claude/skills/infographic-instructions/SKILL.md`
 
@@ -307,11 +307,11 @@ The `infographic-instructions` skill generates a sketchnote-style infographic in
 
 **What it produces:**
 
-| Output | Path |
-|--------|------|
-| Infographic instructions | `content/post/<slug>/infographic_instructions.md` |
+| Output             | Path                                                |
+|--------------------|-----------------------------------------------------|
+| Infographic prompt | `content/post/<slug>/infographic_instructions.md`   |
 
-The file includes a descriptive title, sketchnote design style guidance with topic-specific illustration suggestions, the site color palette with role assignments, and 6 panels of concise, infographic-ready sentences with specific numbers from the post.
+The file contains four sections: (A) a full flowing-prose image generation prompt with scene description, composition, color system, panel-by-panel visual scenes, enrichment elements, and text rendering guidance; (B) a negative prompt; (C) a condensed ~300-word prompt for token-limited tools; and (D) a structured panel reference data appendix. The skill asks the user to confirm template selection, title, panel topics, target AI tool, and text rendering preference before generating.
 
 **Reference output:** `content/post/python_partial_identification/infographic_instructions.md`
 
@@ -324,7 +324,7 @@ The `proofread-post` skill runs a final proofreading pass on a data science post
 **Usage** (in Claude Code):
 
 ```
-/project:proofread-post <post slug>
+/project:proofread-post <post slug> [focus: frontmatter | markdown | math | code | images | mermaid | refs | style | grammar]
 ```
 
 **Examples:**
@@ -332,9 +332,11 @@ The `proofread-post` skill runs a final proofreading pass on a data science post
 ```
 /project:proofread-post python_partial_identification
 /project:proofread-post python_dowhy
+/project:proofread-post python_dowhy focus: math
+/project:proofread-post python_doubleml focus: code
 ```
 
-**9-point checklist:** front matter, markdown structure, math notation (Goldmark escaping), code/output pairing, images (references + orphans), code consistency (index.md vs script.py), Mermaid diagrams, references/links, site conventions.
+**10-point checklist:** front matter and `links:` validation, markdown structure (heading hierarchy, callout/shortcode pairing, learning objectives, Colab badge), math (Goldmark escaping + correctness + accessible language with plain-language companions and variable mapping), code/output pairing, images (references + orphans + captions), code consistency and supporting files (CSVs, R/Stata scripts), Mermaid diagrams (syntax + site palette colors), references/links, site conventions, grammar/spelling/typos (prose only). Use `focus:` to run only specific checks.
 
 ### New Author
 

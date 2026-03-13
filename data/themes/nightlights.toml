@@ -20,3 +20,15 @@ menu_title = "#fff"
 home_section_odd = "rgb(255, 255, 255)"
 home_section_even = "rgb(240, 245, 250)"
 
+# Dark mode variant — deep navy palette continuous with navbar
+[dark]
+background = "#0f1729"
+home_section_odd = "#0f1729"
+home_section_even = "#131d33"
+menu_primary = "#0e1545"
+menu_text = "rgba(255, 255, 255, 0.85)"
+menu_text_active = "#00d4c8"
+menu_title = "#fff"
+link = "#6a9bcc"
+link_hover = "#00d4c8"
+

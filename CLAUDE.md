@@ -137,7 +137,7 @@ Reviews data science blog posts as an expert professor of data science and econo
 
 **Location:** `.claude/skills/infographic-instructions/SKILL.md`
 
-Generates a sketchnote-style infographic instructions file that summarizes an existing blog post into 6 panels with the site color palette. Produces `infographic_instructions.md` in the post's page bundle with design style guidance, color palette, and panel-by-panel text content.
+Generates an AI-image-generation prompt that creates a chalkboard-style infographic summarizing a blog post into 6 panels. The output is a copy-pasteable prompt optimized for Gemini, DALL-E, Midjourney, or Ideogram. Includes an interactive confirmation step before generation.
 
 **Invocation:**
 ```
@@ -152,20 +152,20 @@ Generates a sketchnote-style infographic instructions file that summarizes an ex
 ```
 
 **Output includes:**
-- Title: concise summary of the post topic
-- Design style: sketchnote aesthetic with topic-specific illustration suggestions
-- Color palette: site colors with role assignments
-- 6 panels with 2-3 infographic-ready sentences each, including specific numbers from the post
+- Section A: Full flowing-prose image generation prompt (scene description, composition, colors, 6 panel visual scenes, margin elements, texture, text rendering guidance)
+- Section B: Negative prompt (what to exclude)
+- Section C: Condensed ~300-word prompt for token-limited tools
+- Section D: Panel reference data appendix (structured text, icons, mini-viz, callouts)
 
 ## proofread-post
 
 **Location:** `.claude/skills/proofread-post/SKILL.md`
 
-Final proofreading pass on a data science post before publication. Checks correctness, display, and consistency without modifying any files. Lighter and faster than `referee-post` -- use this right before committing or publishing.
+Final proofreading pass on a data science post before publication. Checks correctness, display, and consistency without modifying any files. Lighter and faster than `referee-post` -- use this right before committing or publishing. Supports a `focus:` argument to run only specific checks.
 
 **Invocation:**
 ```
-/project:proofread-post <post slug>
+/project:proofread-post <post slug> [focus: frontmatter | markdown | math | code | images | mermaid | refs | style | grammar]
 ```
 
 **Examples:**
@@ -173,19 +173,22 @@ Final proofreading pass on a data science post before publication. Checks correc
 /project:proofread-post python_partial_identification
 /project:proofread-post python_dowhy
 /project:proofread-post content/post/python_ml_random_forest/
+/project:proofread-post python_dowhy focus: math
+/project:proofread-post python_doubleml focus: code
 ```
 
-**Checks performed (9-point checklist):**
+**Checks performed (10-point checklist):**
 
-- Front matter completeness (title, authors, date, tags, toc, diagram, featured image)
-- Markdown structure (code fences, HTML tags, heading hierarchy)
-- Math notation (LaTeX escaping for Goldmark: `\_`, `\\,`, `\\$`)
+- Front matter completeness (title, authors, date, tags, toc, diagram, featured image) and `links:` validation (relative URLs point to existing files, valid `icon_pack` values)
+- Markdown structure (code fences, HTML tags, heading hierarchy, no level jumps), callout/shortcode pairing, learning objectives section, Colab badge
+- Math: rendering (LaTeX escaping for Goldmark), correctness (notation, operators), and accessibility (plain-language companion sentences, variable-to-code mapping)
 - Code/output pairing (every `print()` has a matching output block)
-- Images (all references valid, alt text present, no orphaned PNGs)
-- Code consistency (index.md vs script.py parameter sync)
-- Mermaid diagrams (syntax, `diagram: true` in front matter)
+- Images (all references valid, alt text present, no orphaned PNGs, captions)
+- Code consistency (index.md vs script.py parameter sync) and supporting files (CSVs, R/Stata scripts exist if referenced)
+- Mermaid diagrams (syntax, `diagram: true`, site palette colors, dashed borders for latent variables)
 - References and links (syntax check, numbered list)
 - Site conventions (em dashes, no emojis, color palette)
+- Grammar, spelling, and typos (prose only -- skips code blocks, output, YAML, URLs)
 
 # Hugo Version Constraints
 
