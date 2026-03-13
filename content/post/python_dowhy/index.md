@@ -31,12 +31,16 @@ links:
   icon_pack: fas
   name: "Stata do-file"
   url: analysis.do
+- icon: spotify
+  icon_pack: fab
+  name: "Podcast"
+  url: https://open.spotify.com/episode/7h6S9YzEroATdQabvJxi1W?si=wpvmHsCARQqP8LohogGRFg
 slides:
 summary: Estimating the causal effect of a job training program on earnings using DoWhy's four-step causal inference framework with the Lalonde dataset
 tags:
 - python
 - causal
-title: "Introduction to Causal Inference: DoWhy and the Lalonde Dataset"
+title: "Introduction to Causal Inference: The DoWhy Approach with the Lalonde Dataset"
 url_code: ""
 url_pdf: ""
 url_slides: ""
@@ -46,6 +50,8 @@ diagram: true
 ---
 
 <a href="https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_dowhy/notebook.ipynb" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/episode/7h6S9YzEroATdQabvJxi1W?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 
 ## Overview
 
