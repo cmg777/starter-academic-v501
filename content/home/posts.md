@@ -9,7 +9,7 @@ headless: true
 # Order that this section appears on the page.
 weight: 31
 
-title: Posts
+title: Posts & Tutorials
 subtitle:
 
 content:
