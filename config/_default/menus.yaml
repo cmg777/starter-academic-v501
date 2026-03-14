@@ -28,9 +28,9 @@ main:
 - name: Events
   url: 'https://lu.ma/cmg'
   weight: 80
-- name: Posts & Tutorials
+- name: Posts
   url: '#posts'
-  weight: 85
+  weight: 41
 - name: Contact
   url: '#contact'
   weight: 90
