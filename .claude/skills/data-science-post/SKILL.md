@@ -39,6 +39,19 @@ matplotlib plots, and are referenced in the CSS styling below.
 | Teal | `#00d4c8` | Highlights (use sparingly) |
 | Heading blue | `#1a3a8a` | CSS only -- headings, titles |
 
+### Dark theme palette
+
+For posts that use dark-background figures (e.g., to match the site's dark
+navbar/footer), use this extended palette for figure backgrounds, grid lines,
+and text. Reference post: `content/post/python_fwl/script.py`.
+
+| Name | Hex | Use in plots |
+|------|-----|-------------|
+| Dark navy | `#0f1729` | Figure + axes background (`facecolor`) |
+| Grid line | `#1f2b5e` | Grid lines (subtle contrast on dark bg) |
+| Light text | `#c8d0e0` | Axis labels, tick labels, legend text |
+| White text | `#e8ecf2` | Titles, bold annotations |
+
 ## Deliverables
 
 | Output | Path |
@@ -107,6 +120,38 @@ else:
 Join on `asdf_id` (339 Bolivian municipalities). Select columns by topic:
 supervised -> SDG target + embedding features; unsupervised -> embeddings;
 causal -> SDG outcome + treatment; spatial -> add region identifiers.
+
+### Simulated data (DGP)
+
+When the topic is about a statistical or causal inference method (e.g., FWL
+theorem, instrumental variables, regression discontinuity), a transparent
+**data generating process** is often better than a real dataset. The reader
+can verify results against known true parameters.
+
+```python
+def simulate_data(n=50, seed=42):
+    """Simulate data with known causal structure.
+
+    True DGP:
+        confounder ~ N(50, 10)
+        treatment  = f(confounder) + noise
+        outcome    = true_effect * treatment + g(confounder) + noise
+
+    The true causal effect of treatment on outcome is <true_effect>.
+    """
+    rng = np.random.default_rng(seed)
+    confounder = rng.normal(50, 10, n)
+    treatment = ...  # function of confounder + noise
+    outcome = ...    # function of treatment + confounder + noise
+    return pd.DataFrame({...})
+```
+
+Key conventions for simulated data:
+- Document the true DGP in the docstring (exact equations)
+- State the **true causal effect** so readers can verify estimates
+- Use `np.random.default_rng(seed)` (modern NumPy API) for the DGP function
+- Keep N small enough for clear scatter plots (50-200), large enough for stable estimates
+- Print shape, head, and descriptive stats after generation (same as real data)
 
 ### User-described dataset
 
@@ -453,6 +498,72 @@ At least 3 figures total.
 immediately after the code block that generates it, before the
 interpretation paragraph. The figure serves as visual output; the
 interpretation paragraph then explains what the reader is seeing.
+
+**CSS note:** `.article-style img` has no `border` or `box-shadow` -- just
+`border-radius: 4px` and margins. Dark-background figures render cleanly
+without any visible border artifacts.
+
+### 2.5a Dark theme figures
+
+For posts where dark-background figures better match the site aesthetic, use
+the dark theme palette and spine-free styling. Set rcParams once at the top
+of the script:
+
+```python
+# Dark theme palette
+DARK_NAVY = "#0f1729"
+GRID_LINE = "#1f2b5e"
+LIGHT_TEXT = "#c8d0e0"
+WHITE_TEXT = "#e8ecf2"
+
+plt.rcParams.update({
+    "figure.facecolor": DARK_NAVY,
+    "axes.facecolor": DARK_NAVY,
+    "axes.edgecolor": DARK_NAVY,
+    "axes.linewidth": 0,
+    "axes.labelcolor": LIGHT_TEXT,
+    "axes.titlecolor": WHITE_TEXT,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.spines.left": False,
+    "axes.spines.bottom": False,
+    "axes.grid": True,
+    "grid.color": GRID_LINE,
+    "grid.linewidth": 0.6,
+    "grid.alpha": 0.8,
+    "xtick.color": LIGHT_TEXT,
+    "ytick.color": LIGHT_TEXT,
+    "xtick.major.size": 0,
+    "ytick.major.size": 0,
+    "text.color": WHITE_TEXT,
+    "font.size": 12,
+    "legend.frameon": False,
+    "legend.fontsize": 11,
+    "legend.labelcolor": LIGHT_TEXT,
+    "figure.edgecolor": DARK_NAVY,
+    "savefig.facecolor": DARK_NAVY,
+    "savefig.edgecolor": DARK_NAVY,
+})
+```
+
+**Critical for dark theme figures:**
+
+1. After every `plt.subplots()` call, add `fig.patch.set_linewidth(0)` to
+   eliminate any residual figure border
+2. Save with matching facecolor/edgecolor and `pad_inches=0`:
+   ```python
+   fig, ax = plt.subplots(figsize=(8, 6))
+   fig.patch.set_linewidth(0)
+   # ... plot code ...
+   plt.savefig("<slug>_<name>.png", dpi=300, bbox_inches="tight",
+               facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
+   ```
+3. Use site palette colors for data: steel blue for points, warm orange for
+   fit lines, teal for highlighted series
+4. Use `edgecolors=DARK_NAVY` on scatter points for clean edges against the
+   dark background
+
+Reference implementation: `content/post/python_fwl/script.py`
 
 ### 2.5b Diagrams
 
@@ -834,3 +945,7 @@ post header. Choose whichever best represents the post at a glance.
 - [ ] Interpretation paragraphs translate metrics into domain-meaningful statements
 - [ ] Figure image references placed immediately after generating code block
 - [ ] Narrative follows arc: Question → Intuition → Baseline → Method → Validation → Takeaways
+- [ ] Dark theme figures (if used): `fig.patch.set_linewidth(0)` after every `plt.subplots()`
+- [ ] Dark theme figures (if used): savefig includes `facecolor`, `edgecolor`, `pad_inches=0`
+- [ ] Dark theme figures (if used): scatter `edgecolors` match background color
+- [ ] Simulated DGP (if used): true parameters documented in docstring, verified against estimates
