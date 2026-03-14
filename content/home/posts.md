@@ -40,6 +40,6 @@ design:
   view: 2
 ---
 
-<div style="text-align: center; margin-top: 1.5rem;">
-  <a href="/post/" class="btn btn-outline-primary">View All Posts & Tutorials</a>
-</div>
+{{% callout note %}}
+Quickly discover relevant content by [filtering posts](./post/).
+{{% /callout %}}

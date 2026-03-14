@@ -52,7 +52,7 @@
     {{ $image = $featured.Resize "1200x" }}
   {{ end }}
 {{else if eq $placement 3}}
-  {{ $image_container = "container-fluid" }}
+  {{ $image_container = "container" }}
   {{ $image = $featured.Fit "2560x2560" }}
 {{else}}
   {{ $image_container = "article-container" }}
@@ -63,7 +63,7 @@
 
 {{/* Featured image FIRST */}}
 {{ if eq $placement 3 }}
-<div class="article-header container-fluid featured-image-wrapper mb-4">
+<div class="article-header container featured-image-wrapper mt-5 mb-4">
 {{ else }}
 <div class="article-header {{$image_container}} featured-image-wrapper mb-4" style="max-width: {{$image.Width}}px; max-height: {{$image.Height}}px;">
 {{ end }}
