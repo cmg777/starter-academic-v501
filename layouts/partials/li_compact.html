@@ -47,6 +47,15 @@
       <a href="{{$link}}" {{ $target | safeHTMLAttr }}>{{ $item.Title }}</a>
     </div>
 
+    <div class="post-card-meta">
+      <span class="post-card-date">{{ $item.Date.Format "Jan 2, 2006" }}</span>
+      {{ with $item.Params.categories }}
+        {{ range . }}
+        <span class="post-card-category">{{ . }}</span>
+        {{ end }}
+      {{ end }}
+    </div>
+
     {{ with $summary }}
     <a href="{{ $link }}" {{ $target | safeHTMLAttr }} class="summary-link">
       <div class="article-style">

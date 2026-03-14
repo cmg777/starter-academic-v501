@@ -258,7 +258,7 @@ iframe {
 
 .post-card-body {
   padding: 1.25rem 1.5rem;
-  border-top: 3px solid #00d4c8;
+  border-top: 3px solid #d97757;
 }
 
 @media (max-width: 767.98px) {
@@ -363,10 +363,10 @@ iframe {
   background-color: transparent;
 }
 
-/* D. Blockquotes — teal accent */
+/* D. Blockquotes — warm orange accent */
 .article-style blockquote {
-  border-left-color: #00d4c8;
-  background: rgba(0, 212, 200, 0.04);
+  border-left-color: #d97757;
+  background: rgba(217, 119, 87, 0.04);
   border-radius: 0 4px 4px 0;
   padding: 0.75rem 1.25rem;
 }
@@ -375,9 +375,10 @@ iframe {
 .article-style h2 {
   color: #1a3a8a;
   font-weight: 700;
-  border-bottom: 2px solid rgba(0, 212, 200, 0.3);
+  border-bottom: 2px solid rgba(26, 58, 138, 0.15);
   padding-bottom: 0.4rem;
   margin-top: 2.5rem;
+  letter-spacing: -0.01em;
 }
 
 .article-style h3 {
@@ -874,15 +875,16 @@ body,
 
 /* D. Blockquotes */
 .dark .article-style blockquote {
-  border-left-color: #00d4c8;
-  background: rgba(0, 212, 200, 0.06);
+  border-left-color: #d97757;
+  background: rgba(217, 119, 87, 0.06);
   color: rgba(255, 255, 255, 0.8);
 }
 
 /* E. Headings */
 .dark .article-style h2 {
   color: #6a9bcc;
-  border-bottom-color: rgba(0, 212, 200, 0.3);
+  border-bottom-color: rgba(106, 155, 204, 0.2);
+  letter-spacing: -0.01em;
 }
 
 .dark .article-style h3 {
@@ -948,5 +950,29 @@ body,
 .dark .docs-toc #TableOfContents a.active {
   color: #6a9bcc;
   background: rgba(0, 212, 200, 0.1);
+}
+
+/* --- 16. Post card metadata --- */
+.post-card-meta {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.post-card-category {
+  background: rgba(0, 212, 200, 0.15);
+  color: #00d4c8;
+  padding: 0.1rem 0.5rem;
+  border-radius: 3px;
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* --- 17. Back-to-top button --- */
+.back-to-top {
+  background: #0e1545;
+  color: #00d4c8;
+  border: 1px solid rgba(0, 212, 200, 0.3);
 }
 

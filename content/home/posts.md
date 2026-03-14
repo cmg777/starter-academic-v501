@@ -40,6 +40,6 @@ design:
   view: 2
 ---
 
-{{% callout note %}}
-Find more posts and tutorials [here](/post/).
-{{% /callout %}}
+<div style="text-align: center; margin-top: 1.5rem;">
+  <a href="/post/" class="btn btn-outline-primary">View All Posts & Tutorials</a>
+</div>

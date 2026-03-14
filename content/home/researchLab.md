@@ -66,25 +66,11 @@ Given these parameters, how would you interpret the yellow and cyan colors?
 
 <br>
 <iframe loading="lazy" height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/dmsp-reg?height=600"> </iframe>
-<br>
-
 
 <center>
 {{% callout note %}}
-What is luminosity-based GDP? How is it changing across space and time? 
-<br> 
-(Click anywhere on the map below and discover it.)
+What about the distribution of population? What can we learn from the spatial dynamics of population?
 <br>
-{{% /callout %}}
-</center>
-
-<br>
-<iframe loading="lazy" height="600" width="100%" frameborder="no" src="https://carlosmendez777.users.earthengine.app/view/egdp-dynamics?height=600"> </iframe>
-
-<center>
-{{% callout note %}}
-What about the distribution of population? What can we learn from the spatial dynamics of population? 
-<br> 
 (Click anywhere on the map below and discover it.)
 <br>
 {{% /callout %}}
@@ -92,32 +78,3 @@ What about the distribution of population? What can we learn from the spatial dy
 
 <br>
 <iframe loading="lazy" height="600" width="100%" frameborder="no" src="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1?height=600"> </iframe>
-<br>
-
-
-{{% callout note %}}
-Overall, what can you discover from these visualizations? Where is development happening? How is the world changing?  To contextualize these questions, below you will find an overview of recent advances in the exciting new field of geospatial development.
-{{% /callout %}}
-
-
-<div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%;
- padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
- border-radius: 8px; will-change: transform;">
-  <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-    src="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFvs6DEMI4&#x2F;view?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
-  </iframe>
-</div>
-<a href="https:&#x2F;&#x2F;www.canva.com&#x2F;design&#x2F;DAFvs6DEMI4&#x2F;view?utm_content=DAFvs6DEMI4&amp;utm_campaign=designshare&amp;utm_medium=embeds&amp;utm_source=link" target="_blank" rel="noopener">You can also click HERE to see the slides in a separate tab.</a> 
-
-
-<br>
-<br>
-
-<center>
-{{% callout note %}}
-Do you conduct similar research? Are you interested in learning these and related topics? Do you want to collaborate with us? 
-If yes, [click HERE](https://discord.gg/pfEmxwSEHy) to join our global community of researchers and learners.
-{{% /callout %}}
-</center>
-
-
