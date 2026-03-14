@@ -43,6 +43,8 @@ Academic portfolio website for **Carlos Mendez**, Associate Professor of Develop
 │   └── scss/custom.scss      # Custom CSS overrides
 │
 ├── layouts/
+│   ├── partials/             # Hugo template overrides
+│   │   └── page_header.html  # Image-first layout (featured image above title)
 │   └── shortcodes/           # Custom Hugo shortcodes
 │       └── fullwidth-iframe.html
 │
@@ -103,6 +105,12 @@ The homepage is assembled from individual markdown files in `content/home/`, eac
 Inactive widgets: `hero.md`, `skills.md`, `experience.md`, `accomplishments.md`, `demo.md`.
 
 ## Custom Components
+
+### Template Override: `page_header.html`
+
+**File:** `layouts/partials/page_header.html`
+
+Overrides the Wowchemy theme default to render the featured image **above** the title, metadata, and link buttons (image-first layout). The theme default shows the title first. Data science posts use `image.placement: 3` in front matter for full-width rendering (2560x2560 Fit). Colab links go in the `links:` front matter section, not as badges in the post body.
 
 ### Shortcode: `fullwidth-iframe`
 

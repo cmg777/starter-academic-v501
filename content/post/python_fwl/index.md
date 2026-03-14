@@ -39,8 +39,6 @@ toc: true
 diagram: true
 ---
 
-<a href="https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_fwl/notebook.ipynb" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
-
 ## Overview
 
 Including multiple variables in a regression raises a natural question: what does it actually mean to "control for" a confounder? The output is a coefficient, but a multivariate regression cannot be plotted on a simple two-dimensional scatter plot. This makes it hard to build intuition about what the regression is doing behind the scenes.

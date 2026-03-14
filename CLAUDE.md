@@ -35,6 +35,7 @@ See @README.md for full documentation of the directory structure, tech stack, an
 - Publications require: title, authors, date, publication_types (0-8), publication, abstract, tags
 - The `admin` author in the authors field refers to Carlos Mendez (content/authors/admin/)
 - Use `featured: true` to highlight important publications on the homepage
+- Data science posts use `image.placement: 3` for full-width featured images above the title
 
 ## Publication Types
 
@@ -58,6 +59,14 @@ Usage in content files:
 ```
 {{</* fullwidth-iframe src="https://example.com/app" height="800px" */>}}
 ```
+
+## Page Header Override
+
+Located at `layouts/partials/page_header.html`. Overrides the Wowchemy theme default to render the **featured image above the title** (image-first layout). The theme default shows title first, then image.
+
+- All data science posts use `image.placement: 3` in front matter for full-width featured images (2560x2560 Fit)
+- Colab badges are NOT placed in the post body — the `links:` front matter section provides Colab, script, and notebook buttons in the metadata area
+- The image wrapper uses `mb-4` (no top margin) to sit flush against the navbar
 
 ## Custom CSS (assets/scss/custom.scss)
 

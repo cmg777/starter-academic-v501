@@ -11,6 +11,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
+  placement: 3
 links:
 - icon: open-data
   icon_pack: ai
@@ -33,8 +34,6 @@ url_slides: ""
 url_video: ""
 toc: true
 ---
-
-<a href="https://colab.research.google.com/github/cmg777/claude4data/blob/master/notebooks/notebook-04.ipynb" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
 
 ## Overview
 

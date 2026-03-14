@@ -11,11 +11,20 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
+  placement: 3
 links:
+- icon: open-data
+  icon_pack: ai
+  name: "[Python] Google Colab"
+  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_partial_identification/notebook.ipynb
 - icon: code
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: book
+  icon_pack: fas
+  name: "Jupyter notebook"
+  url: notebook.ipynb
 slides:
 summary: Computing causal bounds under unmeasured confounding using Manski and Tian-Pearl bounds with the CausalBoundingEngine package in Python
 tags:
