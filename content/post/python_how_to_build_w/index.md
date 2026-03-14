@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Python
+  - Spatial Spillovers
 draft: false
 featured: false
 date: "2023-12-02T00:00:00Z"
@@ -25,6 +26,7 @@ tags:
 - spatial
 - regional
 - python
+- spatial spillovers
 title: Construct and export spatial connectivity structures (W)
 url_code: ""
 url_pdf: ""

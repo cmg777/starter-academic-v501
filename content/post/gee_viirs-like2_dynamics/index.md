@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - GEE
+  - Remote Sensing
 draft: false
 featured: false
 date: "2025-03-14T00:00:00Z"
@@ -21,6 +22,7 @@ tags:
 - spatial
 - gee
 - regional
+- remote sensing
 title: "Regional dynamics of VIIRS-like nighttime lights 1992-2023"
 url_code: ""
 url_pdf: ""

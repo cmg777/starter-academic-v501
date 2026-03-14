@@ -3,6 +3,8 @@ authors:
   - admin
 categories:
   - Python
+  - Exploratory Data Analysis
+  - Spatial Spillovers
 draft: false
 featured: false
 date: "2024-03-01T00:00:00Z"
@@ -25,6 +27,8 @@ tags:
 - spatial
 - python
 - regional
+- exploratory data analysis
+- spatial spillovers
 title: Exploratory Spatial Data Analysis (ESDA)
 url_code: ""
 url_pdf: ""

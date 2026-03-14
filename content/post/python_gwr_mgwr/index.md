@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Python
+  - Spatial Heterogeneity
 draft: false
 featured: false
 date: "2023-12-23T00:00:00Z"
@@ -25,6 +26,7 @@ tags:
 - spatial
 - python
 - regional
+- spatial heterogeneity
 title: Studying spatial heterogeneity
 url_code: ""
 url_pdf: ""

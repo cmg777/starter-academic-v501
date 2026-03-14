@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Python
+  - Exploratory Data Analysis
 draft: false
 featured: false
 date: "2023-08-27T00:00:00Z"
@@ -21,6 +22,7 @@ tags:
 - spatial
 - python
 - regional
+- exploratory data analysis
 title: Spatial inequality dynamics
 url_code: ""
 url_pdf: ""

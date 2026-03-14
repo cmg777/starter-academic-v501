@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - R
+  - Causal Inference
 draft: false
 featured: false
 date: "2023-09-02T00:00:00Z"
@@ -21,6 +22,7 @@ tags:
 - other
 - r
 - causal
+- causal inference
 title: Staggered DiD 
 url_code: ""
 url_pdf: ""

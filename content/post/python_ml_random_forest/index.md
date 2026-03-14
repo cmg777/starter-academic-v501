@@ -4,6 +4,7 @@ authors:
 categories:
   - Python
   - Tutorial
+  - Machine Learning
 draft: false
 featured: false
 date: "2026-03-10T00:00:00Z"
@@ -27,6 +28,7 @@ tags:
 - python
 - spatial
 - regional
+- machine learning
 title: "Introduction to Machine Learning: Random Forest Regression"
 url_code: ""
 url_pdf: ""

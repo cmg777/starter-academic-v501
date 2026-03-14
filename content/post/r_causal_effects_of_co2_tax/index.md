@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - R
+  - Causal Inference
 draft: false
 featured: false
 date: "2023-04-01T00:00:00Z"
@@ -28,6 +29,7 @@ summary: Theresa Graefe (Ulm University) has created a very nice RTutor that all
 tags:
 - other
 - r
+- causal inference
 title: Causal effects of a CO2 tax
 url_code: ""
 url_pdf: ""

@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - GEE
+  - Remote Sensing
 draft: false
 featured: false
 date: "2024-03-01T00:00:00Z"
@@ -21,6 +22,7 @@ tags:
 - spatial
 - gee
 - regional
+- remote sensing
 title: "Space-time dynamics of nighttime lights: DMSP-extended data"
 url_code: ""
 url_pdf: ""

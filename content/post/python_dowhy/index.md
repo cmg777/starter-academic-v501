@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Python
+  - Causal Inference
 draft: false
 featured: false
 date: "2026-03-12T00:00:00Z"
@@ -41,6 +42,7 @@ summary: Estimating the causal effect of a job training program on earnings usin
 tags:
 - python
 - causal
+- causal inference
 title: "Introduction to Causal Inference: The DoWhy Approach with the Lalonde Dataset"
 url_code: ""
 url_pdf: ""

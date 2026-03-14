@@ -3,6 +3,8 @@ authors:
   - admin
 categories:
   - Python
+  - Causal Inference
+  - Machine Learning
 draft: false
 featured: false
 date: "2026-03-10T00:00:00Z"
@@ -29,6 +31,8 @@ summary: Estimating the causal effect of a cash bonus on unemployment duration u
 tags:
   - python
   - causal
+  - causal inference
+  - machine learning
 title: "Introduction to Causal Inference: Double Machine Learning"
 url_code: ""
 url_pdf: ""

@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Stata
+  - Spatial Spillovers
 draft: false
 featured: false
 date: "2023-12-01T00:00:00Z"
@@ -24,6 +25,7 @@ tags:
 #- causal
 - spatial
 - regional
+- spatial spillovers
 title: Spatial regression in Stata (cross-section)
 url_code: ""
 url_pdf: ""

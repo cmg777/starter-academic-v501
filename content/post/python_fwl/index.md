@@ -4,6 +4,7 @@ authors:
 categories:
   - Python
   - Tutorial
+  - Causal Inference
 draft: false
 featured: false
 date: "2026-03-14T00:00:00Z"
@@ -30,6 +31,7 @@ summary: Understanding the Frisch-Waugh-Lovell theorem to isolate causal relatio
 tags:
   - python
   - causal
+  - causal inference
 title: "The FWL Theorem: Making Multivariate Regressions Intuitive"
 url_code: ""
 url_pdf: ""

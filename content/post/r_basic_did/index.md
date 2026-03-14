@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - R
+  - Causal Inference
 draft: false
 featured: false
 date: "2019-04-01T00:00:00Z"
@@ -26,6 +27,7 @@ tags:
 - other
 - r
 - causal
+- causal inference
 title: Basic DiD
 url_code: ""
 url_pdf: ""

@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - R
+  - Causal Inference
 draft: false
 featured: false
 date: "2024-07-29T00:00:00Z"
@@ -21,6 +22,7 @@ tags:
 - other
 - r
 - causal
+- causal inference
 title: Heterogeneous treatment effects via two-stage DID 
 url_code: ""
 url_pdf: ""

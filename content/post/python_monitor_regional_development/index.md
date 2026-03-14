@@ -3,6 +3,8 @@ authors:
   - admin
 categories:
   - Python
+  - Exploratory Data Analysis
+  - Remote Sensing
 draft: false
 featured: false
 date: "2023-08-26T00:00:00Z"
@@ -21,6 +23,8 @@ tags:
 - spatial
 - python
 - regional
+- exploratory data analysis
+- remote sensing
 title: Monitoring regional sustainable development
 url_code: ""
 url_pdf: ""

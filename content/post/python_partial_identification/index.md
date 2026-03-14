@@ -4,6 +4,7 @@ authors:
 categories:
   - Python
   - Tutorial
+  - Causal Inference
 draft: false
 featured: false
 date: "2026-03-13T00:00:00Z"
@@ -30,6 +31,7 @@ summary: Computing causal bounds under unmeasured confounding using Manski and T
 tags:
   - python
   - causal
+  - causal inference
 title: "Introduction to Partial Identification: Bounding Causal Effects Under Unmeasured Confounding"
 url_code: ""
 url_pdf: ""

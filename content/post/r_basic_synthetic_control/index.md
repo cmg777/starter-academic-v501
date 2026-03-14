@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - R
+  - Causal Inference
 draft: false
 featured: false
 date: "2019-04-01T00:00:00Z"
@@ -24,6 +25,7 @@ summary: This method constructs a synthetic control unit as a weighted average o
 tags:
 - causal
 - r
+- causal inference
 title: Basic synthetic control 
 url_code: ""
 url_pdf: ""

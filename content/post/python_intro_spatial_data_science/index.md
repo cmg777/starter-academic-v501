@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Python
+  - Exploratory Data Analysis
 draft: false
 featured: false
 date: "2019-04-01T00:00:00Z"
@@ -20,6 +21,7 @@ summary: Measuring the evolution of spatial dependence and spatial inequality
 tags:
 - spatial
 - python
+- exploratory data analysis
 title: Introduction to spatial data science
 url_code: ""
 url_pdf: ""
