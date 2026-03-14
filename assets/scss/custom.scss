@@ -118,7 +118,7 @@ body {
 /* --- 8. Gallery carousel styling --- */
 .gallery-carousel {
   position: relative;
-  background: #0e1545;
+  background: #00011f;
   border-radius: 8px;
   overflow: hidden;
   margin: 1rem auto;
@@ -130,7 +130,7 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #0e1545;
+  background: #00011f;
 }
 
 .gallery-carousel-slide img {
@@ -225,14 +225,45 @@ iframe {
   }
 }
 
-/* --- 10. Larger compact-view thumbnails --- */
-.media.stream-item img {
-  max-width: 350px;
+/* --- 10. Full-width stacked post cards --- */
+.post-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.post-card-image {
+  width: 100%;
+  overflow: hidden;
+}
+
+.post-card-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.post-card:hover .post-card-image img {
+  transform: scale(1.02);
+}
+
+.post-card-body {
+  padding: 1.25rem 1.5rem;
+  border-top: 3px solid #00d4c8;
 }
 
 @media (max-width: 767.98px) {
-  .media.stream-item img {
-    max-width: 200px;
+  .post-card-body {
+    padding: 1rem;
   }
 }
 
@@ -294,6 +325,12 @@ iframe {
   border: none !important;
   box-shadow: none !important;
   border-radius: 0 !important;
+}
+
+/* Full-width featured image for placement 3 */
+.featured-image-wrapper img {
+  width: 100%;
+  height: auto;
 }
 
 /* C. Tables — clean, minimal design */
@@ -758,6 +795,20 @@ body,
 .home-section,
 .navbar {
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* --- 15a-2. Dark mode homepage section backgrounds --- */
+/* Wowchemy v5 ignores [dark] home_section_* from the theme TOML, so override here */
+.dark .home-section {
+  background: #0f1729 !important;
+}
+
+.dark .home-section:nth-of-type(even) {
+  background: #131d33 !important;
+}
+
+.dark body {
+  background: #0f1729;
 }
 
 /* --- 15b. Collapsible dashboard sections --- */

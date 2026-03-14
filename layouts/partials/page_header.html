@@ -53,7 +53,7 @@
   {{ end }}
 {{else if eq $placement 3}}
   {{ $image_container = "container-fluid" }}
-  {{ $image := $featured.Fit "2560x2560" }}
+  {{ $image = $featured.Fit "2560x2560" }}
 {{else}}
   {{ $image_container = "article-container" }}
   {{ if gt $featured.Width 720 }}
@@ -62,7 +62,11 @@
 {{end}}
 
 {{/* Featured image FIRST */}}
+{{ if eq $placement 3 }}
+<div class="article-header container-fluid featured-image-wrapper mb-4">
+{{ else }}
 <div class="article-header {{$image_container}} featured-image-wrapper mb-4" style="max-width: {{$image.Width}}px; max-height: {{$image.Height}}px;">
+{{ end }}
   <div style="position: relative">
     <img src="{{ $image.RelPermalink }}" alt="{{ with $.Params.image.alt_text }}{{.}}{{ end }}" class="featured-image">
     {{ with $.Params.image.caption }}<span class="article-header-caption">{{ . | markdownify | emojify }}</span>{{ end }}
