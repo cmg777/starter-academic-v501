@@ -1,3 +1,13 @@
+/* --- 0. Scroll offset for fixed navbar --- */
+html {
+  scroll-padding-top: 90px;
+}
+
+/* Extra bottom padding so bottom-of-page sections can scroll to the top */
+.js-widget-page {
+  padding-bottom: 60vh;
+}
+
 /* --- 1. HOMEPAGE FIX (Specific to Hero 2) --- */
 #hero2 {
   .container {
