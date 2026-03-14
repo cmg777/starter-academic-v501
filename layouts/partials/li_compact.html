@@ -28,6 +28,9 @@
   {{ $summary = $item.Summary }}
 {{ end }}
 
+{{/* Posts use full-width stacked cards; everything else uses classic compact layout */}}
+{{ if eq $item.Type "post" }}
+
 <div class="post-card stream-item">
   <div class="post-card-image">
     {{ $resource := ($item.Resources.ByType "image").GetMatch "*featured*" }}
@@ -59,3 +62,63 @@
     {{ end }}
   </div>
 </div>
+
+{{ else }}
+
+<div class="media stream-item">
+  <div class="media-body">
+
+    <div class="section-subheading article-title mb-0 mt-0">
+      <a href="{{$link}}" {{ $target | safeHTMLAttr }}>{{ $item.Title }}</a>
+    </div>
+
+    {{ with $summary }}
+    <a href="{{ $link }}" {{ $target | safeHTMLAttr }} class="summary-link">
+      <div class="article-style">
+        {{.}}
+      </div>
+    </a>
+    {{ end }}
+
+    <div class="stream-meta article-metadata">
+
+      {{ if eq $item.Type "event" }}
+      <div>
+        <span>
+          {{ partial "functions/get_event_dates" $item }}
+        </span>
+        {{ with $item.Params.location }}
+        <span class="middot-divider"></span>
+        <span>{{ . }}</span>
+        {{ end }}
+      </div>
+      {{ end }}
+
+      {{ if and $show_authors_only $item.Params.authors }}
+      <div>
+        {{ partial "page_metadata_authors" $item }}
+      </div>
+      {{ else if not $show_authors_only }}
+        {{ partial "page_metadata" (dict "page" $item "is_list" 1) }}
+      {{ end }}
+    </div>
+
+    {{ if $has_attachments }}
+    <div class="btn-links">
+      {{ partial "page_links" (dict "page" $item "is_list" 1) }}
+    </div>
+    {{ end }}
+
+  </div>
+  <div class="ml-3">
+    {{ $resource := ($item.Resources.ByType "image").GetMatch "*featured*" }}
+    {{ with $resource }}
+    {{ $image := .Resize "350x" }}
+    <a href="{{$link}}" {{ $target | safeHTMLAttr }}>
+      <img src="{{ $image.RelPermalink }}" alt="{{ $item.Title }}" loading="lazy">
+    </a>
+    {{end}}
+  </div>
+</div>
+
+{{ end }}
