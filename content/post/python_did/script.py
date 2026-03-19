@@ -17,7 +17,6 @@ References:
     - Rambachan & Roth (2023). Review of Economic Studies.
 """
 
-import shutil
 import subprocess
 import sys
 
@@ -54,14 +53,40 @@ WARM_ORANGE = "#d97757"
 NEAR_BLACK = "#141413"
 TEAL = "#00d4c8"
 
+# ── Dark-theme palette ──────────────────────────────────────────────
+DARK_NAVY = "#0f1729"
+GRID_LINE = "#1f2b5e"
+LIGHT_TEXT = "#c8d0e0"
+WHITE_TEXT = "#e8ecf2"
+
 # ── Matplotlib defaults ─────────────────────────────────────────────
 plt.rcParams.update({
-    "font.size": 12,
+    "figure.facecolor": DARK_NAVY,
+    "axes.facecolor": DARK_NAVY,
+    "axes.edgecolor": DARK_NAVY,
+    "axes.linewidth": 0,
+    "axes.labelcolor": LIGHT_TEXT,
+    "axes.titlecolor": WHITE_TEXT,
     "axes.spines.top": False,
     "axes.spines.right": False,
-    "figure.facecolor": "white",
-    "axes.facecolor": "white",
-    "savefig.facecolor": "white",
+    "axes.spines.left": False,
+    "axes.spines.bottom": False,
+    "axes.grid": True,
+    "grid.color": GRID_LINE,
+    "grid.linewidth": 0.6,
+    "grid.alpha": 0.8,
+    "xtick.color": LIGHT_TEXT,
+    "ytick.color": LIGHT_TEXT,
+    "xtick.major.size": 0,
+    "ytick.major.size": 0,
+    "text.color": WHITE_TEXT,
+    "font.size": 12,
+    "legend.frameon": False,
+    "legend.fontsize": 11,
+    "legend.labelcolor": LIGHT_TEXT,
+    "figure.edgecolor": DARK_NAVY,
+    "savefig.facecolor": DARK_NAVY,
+    "savefig.edgecolor": DARK_NAVY,
 })
 
 
@@ -86,7 +111,7 @@ print(f"Dataset shape: {data_2x2.shape}")
 print(f"Columns: {data_2x2.columns.tolist()}")
 print(f"\nTreatment groups:")
 print(data_2x2.groupby("treated")["unit"].nunique().rename({0: "Control", 1: "Treated"}))
-print(f"\nPeriods: {sorted(data_2x2['period'].unique())}")
+print(f"\nPeriods: {sorted(int(p) for p in data_2x2['period'].unique())}")
 print(f"Treatment period: 5 (post = 1 for periods >= 5)")
 print(f"True treatment effect: 5.0")
 
@@ -106,6 +131,7 @@ print(data_2x2.groupby(["treated", "post"])["outcome"].describe().to_string())
 
 # Box plot: outcome distribution by treatment group and period type
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 groups = [
     ("Control, Pre",  data_2x2[(data_2x2["treated"] == 0) & (data_2x2["post"] == 0)]["outcome"]),
     ("Control, Post", data_2x2[(data_2x2["treated"] == 0) & (data_2x2["post"] == 1)]["outcome"]),
@@ -117,7 +143,7 @@ bp = ax.boxplot(
     tick_labels=[g[0] for g in groups],
     patch_artist=True,
     widths=0.5,
-    medianprops=dict(color=NEAR_BLACK, linewidth=2),
+    medianprops=dict(color=WHITE_TEXT, linewidth=2),
 )
 box_colors = [STEEL_BLUE, STEEL_BLUE, WARM_ORANGE, WARM_ORANGE]
 for patch, color in zip(bp["boxes"], box_colors):
@@ -125,7 +151,8 @@ for patch, color in zip(bp["boxes"], box_colors):
     patch.set_alpha(0.6)
 ax.set_ylabel("Outcome")
 ax.set_title("Outcome Distribution by Treatment Group and Period")
-plt.savefig("did_outcome_distribution.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_outcome_distribution.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 if IN_COLAB:
     plt.show()
 plt.close()
@@ -136,18 +163,20 @@ treated_means = data_2x2[data_2x2["treated"] == 1].groupby("period")["outcome"].
 control_means = data_2x2[data_2x2["treated"] == 0].groupby("period")["outcome"].mean()
 
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 ax.plot(control_means.index, control_means.values, "o-",
         color=STEEL_BLUE, linewidth=2, markersize=7, label="Control group")
 ax.plot(treated_means.index, treated_means.values, "s-",
         color=WARM_ORANGE, linewidth=2, markersize=7, label="Treated group")
-ax.axvline(x=4.5, color=NEAR_BLACK, linestyle="--", linewidth=1.5,
+ax.axvline(x=4.5, color=LIGHT_TEXT, linestyle="--", linewidth=1.5,
            alpha=0.7, label="Treatment onset")
 ax.set_xlabel("Period")
 ax.set_ylabel("Average Outcome")
 ax.set_title("Parallel Trends: Treatment vs Control Groups")
 ax.legend(loc="upper left")
 ax.set_xticks(range(10))
-plt.savefig("did_parallel_trends.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_parallel_trends.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 if IN_COLAB:
     plt.show()
 plt.close()
@@ -160,6 +189,7 @@ results_2x2.print_summary()
 
 # 5d. Counterfactual visualization
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 ax.plot(control_means.index, control_means.values, "o-",
         color=STEEL_BLUE, linewidth=2, markersize=7, label="Control group")
 ax.plot(treated_means.index, treated_means.values, "s-",
@@ -173,13 +203,14 @@ ax.plot(counterfactual.index, counterfactual.values, "s--",
 ax.fill_between(counterfactual.index, counterfactual.values,
                 treated_means.loc[5:].values, alpha=0.2, color=TEAL,
                 label=f"Treatment effect (ATT ≈ {results_2x2.att:.1f})")
-ax.axvline(x=4.5, color=NEAR_BLACK, linestyle="--", linewidth=1.5, alpha=0.7)
+ax.axvline(x=4.5, color=LIGHT_TEXT, linestyle="--", linewidth=1.5, alpha=0.7)
 ax.set_xlabel("Period")
 ax.set_ylabel("Average Outcome")
 ax.set_title("DiD Treatment Effect: Observed vs Counterfactual")
 ax.legend(loc="upper left")
 ax.set_xticks(range(10))
-plt.savefig("did_treatment_effect.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_treatment_effect.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 if IN_COLAB:
     plt.show()
 plt.close()
@@ -231,6 +262,7 @@ results_event.print_summary()
 es_df = results_event.to_dataframe()
 
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 pre = es_df[~es_df["is_post"]]
 post = es_df[es_df["is_post"]]
 
@@ -242,11 +274,11 @@ ax.errorbar(post["period"], post["effect"], yerr=1.96 * post["se"],
             markersize=8, label="Post-treatment")
 
 # Reference period
-ax.plot(4, 0, "D", color=NEAR_BLACK, markersize=10, zorder=5,
+ax.plot(4, 0, "D", color=WHITE_TEXT, markersize=10, zorder=5,
         label="Reference period")
 
-ax.axhline(y=0, color=NEAR_BLACK, linewidth=1, alpha=0.5)
-ax.axvline(x=4.5, color=NEAR_BLACK, linestyle="--", linewidth=1.5, alpha=0.5)
+ax.axhline(y=0, color=LIGHT_TEXT, linewidth=1, alpha=0.5)
+ax.axvline(x=4.5, color=LIGHT_TEXT, linestyle="--", linewidth=1.5, alpha=0.5)
 ax.axhline(y=5.0, color=TEAL, linestyle=":", linewidth=1.5, alpha=0.7,
            label="True effect (5.0)")
 ax.set_xlabel("Period")
@@ -254,7 +286,8 @@ ax.set_ylabel("Estimated Effect")
 ax.set_title("Event Study: Dynamic Treatment Effects")
 ax.legend(loc="upper left")
 ax.set_xticks(range(10))
-plt.savefig("did_event_study.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_event_study.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 if IN_COLAB:
     plt.show()
 plt.close()
@@ -288,21 +321,31 @@ print("\n--- Exploring the staggered dataset ---")
 print("\nFirst 10 rows:")
 print(data_stag.head(10).to_string(index=False))
 
+early_unit = data_stag[data_stag["first_treat"] == 3]["unit"].iloc[0]
+print(f"\nEarly-treated unit (cohort 3, unit {early_unit}):")
+print(data_stag[data_stag["unit"] == early_unit].to_string(index=False))
+
+late_unit = data_stag[data_stag["first_treat"] == 7]["unit"].iloc[0]
+print(f"\nLate-treated unit (cohort 7, unit {late_unit}):")
+print(data_stag[data_stag["unit"] == late_unit].to_string(index=False))
+
 print("\nSummary statistics:")
 print(data_stag.describe().to_string())
 
-print("\nCrosstab — units by cohort × period:")
-print(pd.crosstab(data_stag["first_treat"], data_stag["period"]))
+print("\nCrosstab — treated units by cohort × period:")
+print(pd.crosstab(data_stag["first_treat"], data_stag["period"],
+                  values=data_stag["treated"], aggfunc="sum").fillna(0).astype(int))
 
 print("\nMean outcome by cohort × period:")
 print(data_stag.groupby(["first_treat", "period"])["outcome"].mean().unstack().to_string(float_format="%.2f"))
 
 # Line plot: cohort mean outcomes over time
 cohort_means = data_stag.groupby(["first_treat", "period"])["outcome"].mean().unstack(level=0)
-cohort_colors = {0: STEEL_BLUE, 3: WARM_ORANGE, 5: TEAL, 7: NEAR_BLACK}
+cohort_colors = {0: STEEL_BLUE, 3: WARM_ORANGE, 5: TEAL, 7: WHITE_TEXT}
 cohort_labels = {0: "Never-treated", 3: "Cohort 3", 5: "Cohort 5", 7: "Cohort 7"}
 
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 for ft in sorted(cohort_means.columns):
     ax.plot(cohort_means.index, cohort_means[ft], "o-",
             color=cohort_colors[ft], linewidth=2, markersize=6,
@@ -316,7 +359,8 @@ ax.set_ylabel("Mean Outcome")
 ax.set_title("Staggered Adoption: Cohort Mean Outcomes Over Time")
 ax.legend(loc="upper left")
 ax.set_xticks(range(10))
-plt.savefig("did_staggered_trends.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_staggered_trends.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 if IN_COLAB:
     plt.show()
 plt.close()
@@ -332,21 +376,25 @@ bacon_results.print_summary()
 
 # Bacon decomposition plot
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+fig.patch.set_linewidth(0)
 
 # Left: scatter by comparison type
 bacon_df = bacon_results.to_dataframe()
 type_colors = {
     "Treated vs Never-treated": STEEL_BLUE,
     "Earlier vs Later treated": WARM_ORANGE,
-    "Later vs Earlier (forbidden)": "#c4623d",
+    "Later vs Earlier (forbidden)": "#e8856c",
+    "treated_vs_never": STEEL_BLUE,
+    "earlier_vs_later": WARM_ORANGE,
+    "later_vs_earlier": "#e8856c",
 }
 for comp_type in bacon_df["comparison_type"].unique():
     subset = bacon_df[bacon_df["comparison_type"] == comp_type]
-    color = type_colors.get(comp_type, NEAR_BLACK)
+    color = type_colors.get(comp_type, LIGHT_TEXT)
     axes[0].scatter(subset["weight"], subset["estimate"],
-                    s=80, color=color, alpha=0.7, edgecolors="white",
+                    s=80, color=color, alpha=0.7, edgecolors=DARK_NAVY,
                     label=comp_type)
-axes[0].axhline(y=bacon_results.twfe_estimate, color=NEAR_BLACK,
+axes[0].axhline(y=bacon_results.twfe_estimate, color=WHITE_TEXT,
                 linestyle="--", linewidth=1.5, alpha=0.7,
                 label=f"TWFE = {bacon_results.twfe_estimate:.2f}")
 axes[0].set_xlabel("Weight")
@@ -359,9 +407,9 @@ type_summary = bacon_df.groupby("comparison_type").agg(
     weight=("weight", "sum"),
     avg_effect=("estimate", lambda x: np.average(x, weights=bacon_df.loc[x.index, "weight"])),
 ).reset_index()
-bar_colors = [type_colors.get(t, NEAR_BLACK) for t in type_summary["comparison_type"]]
+bar_colors = [type_colors.get(t, LIGHT_TEXT) for t in type_summary["comparison_type"]]
 bars = axes[1].barh(range(len(type_summary)), type_summary["weight"],
-                    color=bar_colors, edgecolor="white", height=0.6)
+                    color=bar_colors, edgecolor=DARK_NAVY, height=0.6)
 axes[1].set_yticks(range(len(type_summary)))
 axes[1].set_yticklabels(type_summary["comparison_type"], fontsize=10)
 axes[1].set_xlabel("Total Weight")
@@ -372,7 +420,8 @@ for i, (w, e) in enumerate(zip(type_summary["weight"], type_summary["avg_effect"
     axes[1].text(w + 0.01, i, f"{w:.1%} (avg = {e:.2f})", va="center", fontsize=10)
 
 plt.tight_layout()
-plt.savefig("did_bacon_decomposition.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_bacon_decomposition.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 if IN_COLAB:
     plt.show()
 plt.close()
@@ -386,7 +435,7 @@ print("\n" + "=" * 70)
 print("SECTION 9: Callaway-Sant'Anna")
 print("=" * 70)
 
-cs = CallawaySantAnna(control_group="never_treated")
+cs = CallawaySantAnna(control_group="never_treated", base_period="universal")
 results_cs = cs.fit(
     data_stag, outcome="outcome", unit="unit",
     time="period", first_treat="first_treat",
@@ -398,6 +447,7 @@ results_cs.print_summary()
 cs_df = results_cs.to_dataframe("event_study")
 
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 pre_cs = cs_df[cs_df["relative_period"] < 0]
 post_cs = cs_df[cs_df["relative_period"] >= 0]
 
@@ -408,13 +458,14 @@ ax.errorbar(post_cs["relative_period"], post_cs["effect"],
             yerr=1.96 * post_cs["se"], fmt="s", color=TEAL,
             capsize=4, linewidth=2, markersize=8, label="Post-treatment")
 
-ax.axhline(y=0, color=NEAR_BLACK, linewidth=1, alpha=0.5)
-ax.axvline(x=-0.5, color=NEAR_BLACK, linestyle="--", linewidth=1.5, alpha=0.5)
+ax.axhline(y=0, color=LIGHT_TEXT, linewidth=1, alpha=0.5)
+ax.axvline(x=-0.5, color=LIGHT_TEXT, linestyle="--", linewidth=1.5, alpha=0.5)
 ax.set_xlabel("Periods Relative to Treatment")
 ax.set_ylabel("Estimated ATT")
 ax.set_title("Callaway-Sant'Anna: Event Study for Staggered Adoption")
 ax.legend(loc="upper left")
-plt.savefig("did_staggered_att.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_staggered_att.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 if IN_COLAB:
     plt.show()
 plt.close()
@@ -451,13 +502,14 @@ print(f"(Effect remains significant for M < {breakdown_M:.1f})")
 
 # Sensitivity plot
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 ax.fill_between(sens_df["M"], sens_df["ci_lb"], sens_df["ci_ub"],
                 alpha=0.25, color=STEEL_BLUE, label="95% Robust CI")
 ax.plot(sens_df["M"], sens_df["ci_lb"], "-", color=STEEL_BLUE,
         linewidth=2)
 ax.plot(sens_df["M"], sens_df["ci_ub"], "-", color=STEEL_BLUE,
         linewidth=2)
-ax.axhline(y=0, color=NEAR_BLACK, linewidth=1.5, alpha=0.7)
+ax.axhline(y=0, color=LIGHT_TEXT, linewidth=1.5, alpha=0.7)
 
 # Mark the overall ATT
 att_val = results_cs.overall_att
@@ -473,18 +525,13 @@ ax.set_xlabel("Sensitivity Parameter M\n(maximum post-treatment violation relati
 ax.set_ylabel("Treatment Effect (ATT)")
 ax.set_title("HonestDiD Sensitivity Analysis: Robustness of the ATT")
 ax.legend(loc="upper left")
-plt.savefig("did_honest_sensitivity.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_honest_sensitivity.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 if IN_COLAB:
     plt.show()
 plt.close()
 print("\nFigure saved: did_honest_sensitivity.png")
 
-
-# =====================================================================
-# Copy featured image
-# =====================================================================
-shutil.copy("did_treatment_effect.png", "featured.png")
-print("\nFigure saved: featured.png (copy of did_treatment_effect.png)")
 
 print("\n" + "=" * 70)
 print("All figures generated successfully.")

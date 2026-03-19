@@ -42,28 +42,30 @@ diagram: true
 
 ## Overview
 
-A government launches a job training program in some cities but not others. Did the program actually increase employment, or were those cities already on an upward trajectory? This is the core challenge of **policy evaluation**: separating the genuine effect of an intervention from pre-existing trends and selection differences between treated and untreated groups. The seminal study by [Card and Krueger (1994)](https://www.jstor.org/stable/2118030) used exactly this approach to examine how a minimum wage increase in New Jersey affected fast-food employment compared to neighboring Pennsylvania.
+An education ministry rolls out AI tutoring bots in some cities but not others. Did the AI tools actually improve learning, or were those cities already on an upward trajectory? This is the core challenge of **policy evaluation**: separating the genuine effect of an intervention from pre-existing trends and selection differences between treated and untreated groups. The seminal study by [Card and Krueger (1994)](https://www.jstor.org/stable/2118030) pioneered this approach in a different context --- examining how a minimum wage increase in New Jersey affected fast-food employment compared to neighboring Pennsylvania.
 
 **Difference-in-Differences (DiD)** is the workhorse method for answering such questions. The idea is elegantly simple: compare the change in outcomes over time between a group that received treatment and a group that did not. If both groups were evolving similarly before treatment --- the *parallel trends* assumption --- then the difference in their changes isolates the causal effect. Think of it as using the control group as a mirror: it shows what would have happened to the treated group had the policy never been implemented.
 
-The **[diff-diff](https://diff-diff.readthedocs.io/en/stable/)** Python package provides a unified, scikit-learn-style API for 13+ DiD estimators. These range from the classic 2x2 design to modern methods for staggered adoption. In this tutorial, we start with the simplest case, build up to event studies and multi-cohort designs, and finish with sensitivity analysis that quantifies how robust the findings are to violations of parallel trends. All examples use synthetic **panel data** --- datasets where the same units (cities, firms, individuals) are observed repeatedly over multiple time periods --- with known true effects, so every estimate can be verified against ground truth.
+The **[diff-diff](https://diff-diff.readthedocs.io/en/stable/)** Python package, developed by [Gerber (2026)](https://github.com/igerber/diff-diff), provides a unified, scikit-learn-style API for 13+ DiD estimators validated against their R counterparts. These range from the classic 2x2 design to modern methods for staggered adoption. In this tutorial, we start with the simplest case, build up to event studies and multi-cohort designs, and finish with sensitivity analysis that quantifies how robust the findings are to violations of parallel trends. All examples use synthetic **panel data** --- datasets where the same units (cities, firms, individuals) are observed repeatedly over multiple time periods --- with known true effects, so every estimate can be verified against ground truth.
 
 **Learning objectives:**
 
 - Understand the logic of the 2x2 DiD design and why it identifies causal effects under parallel trends
-- Implement classic DiD estimation using `DifferenceInDifferences().fit()`
+- Estimate the Average Treatment Effect on the Treated (ATT) using classic DiD
 - Test the parallel trends assumption with pre-treatment trend comparisons
-- Construct event study plots to visualize dynamic treatment effects over time
-- Apply Callaway-Sant'Anna for staggered adoption designs where units adopt treatment at different times
-- Assess robustness with Bacon decomposition diagnostics and HonestDiD sensitivity analysis
+- Interpret event study plots that reveal dynamic treatment effects over time
+- Recognize why Two-Way Fixed Effects fails under staggered adoption and how Callaway-Sant'Anna corrects for it
+- Assess robustness of causal conclusions using Bacon decomposition diagnostics and HonestDiD sensitivity analysis
+
+<a href="https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_did/notebook.ipynb" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
 
 ## Conceptual framework: What is Difference-in-Differences?
 
-Imagine a city installs new streetlights on some blocks but not others, and you want to know whether the lights reduced crime. You could compare crime rates on lit blocks versus unlit blocks after installation. But lit blocks might have been safer to begin with --- perhaps the city prioritized high-traffic areas. A simple post-treatment comparison confounds the lighting effect with pre-existing differences. Alternatively, you could compare a single block before and after the lights went up --- but crime might have been falling everywhere due to seasonal patterns or broader policing changes, not the streetlights.
+Imagine a school district deploys AI tutoring bots in some schools but not others, and you want to know whether the AI tools improved learning outcomes. You could compare learning scores at AI-equipped schools versus non-equipped schools after deployment. But AI-equipped schools might have had stronger students to begin with --- perhaps the district piloted the technology in its highest-performing schools. A simple post-treatment comparison confounds the AI effect with pre-existing differences. Alternatively, you could compare a single school before and after the AI rollout --- but learning scores might have been rising everywhere due to a new curriculum or improved teacher training, not the AI tools.
 
-DiD combines these two simpler approaches so that selection bias and the effect of time are, in turns, eliminated ([Cunningham, 2021](https://mixtape.scunning.com/09-difference_in_differences)). The logic proceeds through **successive differencing**:
+DiD combines these two simpler approaches so that selection bias and the effect of time are, in turns, eliminated. The logic proceeds through **successive differencing**:
 
-- **First difference**: Compare a unit before and after treatment. This eliminates time-invariant differences between groups (e.g., one neighborhood is always safer than another), but confounds the treatment effect with common time trends (e.g., citywide crime decline).
+- **First difference**: Compare a unit before and after treatment. This eliminates time-invariant differences between groups (e.g., one school always scores higher than another), but confounds the treatment effect with common time trends (e.g., district-wide learning improvements from a new curriculum).
 - **Second difference**: Difference the first differences between treated and control groups. This eliminates the common time trends, leaving only the treatment effect.
 
 ```mermaid
@@ -94,13 +96,40 @@ $$\hat{\delta}^{2 \times 2}\_{kU} = \big( \bar{Y}\_k^{Post} - \bar{Y}\_k^{Pre} \
 
 In words: take the before-and-after change in the treated group, subtract the before-and-after change in the control group, and the remainder is the treatment effect. Here $\bar{Y}\_k^{Post}$ is the average outcome for treated units in the post-treatment period (rows where `treated = 1` and `post = 1`), and similarly for the other three terms.
 
-### What DiD actually estimates
+### What DiD actually estimates: The potential outcomes framework
 
-Using potential outcomes notation, we can decompose what the 2x2 estimator actually recovers ([Cunningham, 2021](https://mixtape.scunning.com/09-difference_in_differences)):
+The sample-means formula above tells us *how to compute* DiD from data, but it does not tell us *what causal quantity* DiD recovers or *under what assumptions* it is valid. To answer these deeper questions, we need the **potential outcomes framework** ([Rubin, 1974](https://doi.org/10.1037/h0037350)).
 
-$$\hat{\delta}^{2 \times 2}\_{kU} = \underbrace{E[Y^1\_k | Post] - E[Y^0\_k | Post]}\_{ATT} + \underbrace{\big( E[Y^0\_k | Post] - E[Y^0\_k | Pre] \big) - \big( E[Y^0\_U | Post] - E[Y^0\_U | Pre] \big)}\_{Bias}$$
+The key idea is that every unit has *two* potential outcomes at every point in time, but we only ever observe one of them:
 
-Here $Y^1\_k$ is the potential outcome for treated units *with* treatment, and $Y^0\_k$ is their potential outcome *without* treatment (what their `outcome` would show had the policy never been implemented). The first term is the **ATT** --- the quantity we want. The second term is the **non-parallel trends bias** --- the difference in how the two groups' untreated outcomes would have evolved over time. If the bias term is zero, the DiD estimator cleanly identifies the ATT.
+- $Y^1\_{i}$ --- the outcome unit $i$ would experience **with** treatment
+- $Y^0\_{i}$ --- the outcome unit $i$ would experience **without** treatment
+
+For a treated city, we observe $Y^1$ (what actually happened after adopting AI tutoring) but never $Y^0$ (what *would have* happened had the city not adopted AI). For a control city, we observe $Y^0$ but never $Y^1$. This is the **fundamental problem of causal inference**: for any individual unit, the causal effect $Y^1\_{i} - Y^0\_{i}$ is unobservable because one potential outcome is always missing.
+
+Since we cannot measure individual effects, we aim for the **Average Treatment Effect on the Treated (ATT)** --- the average causal effect across all treated units in the post-treatment period:
+
+$$ATT = E[Y^1\_k - Y^0\_k | Post]$$
+
+In words: what is the average difference between what treated units actually experienced and what they *would have* experienced without treatment, measured in the post-treatment period? Here $E[\cdot]$ denotes the expected value (population average), $k$ indexes the treated group, and the conditioning on $Post$ restricts attention to the post-treatment period. In our data, $E[Y^1\_k | Post]$ corresponds to the average `outcome` for rows where `treated = 1` and `post = 1` --- that is, $\bar{Y}\_k^{Post}$ from the previous formula.
+
+The challenge is that $E[Y^0\_k | Post]$ --- the average untreated outcome for the treated group after treatment --- is a **counterfactual** that we never observe. Treated cities received the policy, so we cannot see what their outcomes would have been without it. This is where DiD's clever trick comes in.
+
+### From sample means to potential outcomes
+
+Let us now connect the sample-means formula to potential outcomes by rewriting each $\bar{Y}$ term. For the **control group**, which never receives treatment, the observed outcome always equals the untreated potential outcome: $Y\_U = Y^0\_U$ in both periods. For the **treated group**, the observed outcome equals the untreated potential outcome before treatment ($Y\_k = Y^0\_k$ when $Pre$) and the treated potential outcome after ($Y\_k = Y^1\_k$ when $Post$). Substituting these into the DiD formula:
+
+$$\hat{\delta}^{2 \times 2}\_{kU} = \big( \underbrace{\bar{Y}\_k^{Post}}\_{= E[Y^1\_k | Post]} - \underbrace{\bar{Y}\_k^{Pre}}\_{= E[Y^0\_k | Pre]} \big) - \big( \underbrace{\bar{Y}\_U^{Post}}\_{= E[Y^0\_U | Post]} - \underbrace{\bar{Y}\_U^{Pre}}\_{= E[Y^0\_U | Pre]} \big)$$
+
+On the left of the outer subtraction, the treated group's pre-treatment mean uses $Y^0\_k$ (no treatment yet) and post-treatment mean uses $Y^1\_k$ (treatment is active). On the right, both control group means use $Y^0\_U$ (never treated). Now we apply a standard algebraic trick: **add and subtract** the unobserved counterfactual $E[Y^0\_k | Post]$ inside the first parenthesis:
+
+$$= \big( E[Y^1\_k | Post] - E[Y^0\_k | Post] + E[Y^0\_k | Post] - E[Y^0\_k | Pre] \big) - \big( E[Y^0\_U | Post] - E[Y^0\_U | Pre] \big)$$
+
+Rearranging by grouping the first two terms and the last three:
+
+$$= \underbrace{E[Y^1\_k | Post] - E[Y^0\_k | Post]}\_{ATT} + \underbrace{\big( E[Y^0\_k | Post] - E[Y^0\_k | Pre] \big) - \big( E[Y^0\_U | Post] - E[Y^0\_U | Pre] \big)}\_{Bias}$$
+
+This is the fundamental decomposition of the DiD estimator ([Cunningham, 2021](https://mixtape.scunning.com/09-difference_in_differences)). The first term is the **ATT** --- the causal quantity we want. The second term is the **non-parallel trends bias** --- the difference in how the two groups' untreated outcomes would have evolved over time. The bias term compares the untreated trajectory of the treated group ($E[Y^0\_k | Post] - E[Y^0\_k | Pre]$) against the untreated trajectory of the control group ($E[Y^0\_U | Post] - E[Y^0\_U | Pre]$). If the bias term is zero, the DiD estimator cleanly identifies the ATT.
 
 ### Parallel trends assumption
 
@@ -108,7 +137,7 @@ The bias term vanishes when the treated and control groups would have followed t
 
 $$E[Y^0\_k | Post] - E[Y^0\_k | Pre] = E[Y^0\_U | Post] - E[Y^0\_U | Pre]$$
 
-This is the **parallel trends assumption**. It does not require the groups to have the same outcome levels --- only the same *trends*. Two cities can have different crime rates, but if their crime rates were rising at the same speed before the policy, DiD can credibly estimate the policy's impact. Importantly, this assumption is **fundamentally untestable** because the counterfactual outcome $E[Y^0\_k | Post]$ --- what would have happened to the treated group absent treatment --- is never observed. We can check whether trends were parallel in the pre-treatment period, but this does not guarantee they would have remained parallel afterward. This limitation is why Section 11 introduces HonestDiD sensitivity analysis.
+This is the **parallel trends assumption**. It does not require the groups to have the same outcome levels --- only the same *trends*. Two cities can have different learning scores, but if their learning scores were rising at the same speed before the AI rollout, DiD can credibly estimate the policy's impact. Importantly, this assumption is **fundamentally untestable** because the counterfactual outcome $E[Y^0\_k | Post]$ --- what would have happened to the treated group absent treatment --- is never observed. We can check whether trends were parallel in the pre-treatment period, but this does not guarantee they would have remained parallel afterward. This limitation is why Section 11 introduces HonestDiD sensitivity analysis.
 
 ### Regression formulation
 
@@ -157,6 +186,12 @@ STEEL_BLUE = "#6a9bcc"
 WARM_ORANGE = "#d97757"
 NEAR_BLACK = "#141413"
 TEAL = "#00d4c8"
+
+# Dark-theme palette
+DARK_NAVY = "#0f1729"
+GRID_LINE = "#1f2b5e"
+LIGHT_TEXT = "#c8d0e0"
+WHITE_TEXT = "#e8ecf2"
 ```
 
 ## Classic 2x2 DiD design
@@ -182,7 +217,7 @@ print(f"Columns: {data_2x2.columns.tolist()}")
 print(f"\nTreatment groups:")
 print(data_2x2.groupby("treated")["unit"].nunique().rename(
     {0: "Control", 1: "Treated"}))
-print(f"\nPeriods: {sorted(data_2x2['period'].unique())}")
+print(f"\nPeriods: {sorted(int(p) for p in data_2x2['period'].unique())}")
 print(f"Treatment period: 5 (post = 1 for periods >= 5)")
 print(f"True treatment effect: 5.0")
 ```
@@ -285,6 +320,7 @@ The box plot below visualizes these distributions:
 
 ```python
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 groups = [
     ("Control, Pre",  data_2x2[(data_2x2["treated"] == 0) & (data_2x2["post"] == 0)]["outcome"]),
     ("Control, Post", data_2x2[(data_2x2["treated"] == 0) & (data_2x2["post"] == 1)]["outcome"]),
@@ -296,7 +332,7 @@ bp = ax.boxplot(
     tick_labels=[g[0] for g in groups],
     patch_artist=True,
     widths=0.5,
-    medianprops=dict(color=NEAR_BLACK, linewidth=2),
+    medianprops=dict(color=WHITE_TEXT, linewidth=2),
 )
 box_colors = [STEEL_BLUE, STEEL_BLUE, WARM_ORANGE, WARM_ORANGE]
 for patch, color in zip(bp["boxes"], box_colors):
@@ -304,7 +340,8 @@ for patch, color in zip(bp["boxes"], box_colors):
     patch.set_alpha(0.6)
 ax.set_ylabel("Outcome")
 ax.set_title("Outcome Distribution by Treatment Group and Period")
-plt.savefig("did_outcome_distribution.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_outcome_distribution.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 ```
 
@@ -321,18 +358,20 @@ treated_means = data_2x2[data_2x2["treated"] == 1].groupby("period")["outcome"].
 control_means = data_2x2[data_2x2["treated"] == 0].groupby("period")["outcome"].mean()
 
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 ax.plot(control_means.index, control_means.values, "o-",
         color=STEEL_BLUE, linewidth=2, markersize=7, label="Control group")
 ax.plot(treated_means.index, treated_means.values, "s-",
         color=WARM_ORANGE, linewidth=2, markersize=7, label="Treated group")
-ax.axvline(x=4.5, color=NEAR_BLACK, linestyle="--", linewidth=1.5,
+ax.axvline(x=4.5, color=LIGHT_TEXT, linestyle="--", linewidth=1.5,
            alpha=0.7, label="Treatment onset")
 ax.set_xlabel("Period")
 ax.set_ylabel("Average Outcome")
 ax.set_title("Parallel Trends: Treatment vs Control Groups")
 ax.legend(loc="upper left")
 ax.set_xticks(range(10))
-plt.savefig("did_parallel_trends.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_parallel_trends.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 ```
 
@@ -381,6 +420,7 @@ DiD's power lies in constructing a **counterfactual** --- what would have happen
 
 ```python
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 ax.plot(control_means.index, control_means.values, "o-",
         color=STEEL_BLUE, linewidth=2, markersize=7, label="Control group")
 ax.plot(treated_means.index, treated_means.values, "s-",
@@ -395,13 +435,14 @@ ax.plot(counterfactual.index, counterfactual.values, "s--",
 ax.fill_between(counterfactual.index, counterfactual.values,
                 treated_means.loc[5:].values, alpha=0.2, color=TEAL,
                 label=f"Treatment effect (ATT ≈ {results_2x2.att:.1f})")
-ax.axvline(x=4.5, color=NEAR_BLACK, linestyle="--", linewidth=1.5, alpha=0.7)
+ax.axvline(x=4.5, color=LIGHT_TEXT, linestyle="--", linewidth=1.5, alpha=0.7)
 ax.set_xlabel("Period")
 ax.set_ylabel("Average Outcome")
 ax.set_title("DiD Treatment Effect: Observed vs Counterfactual")
 ax.legend(loc="upper left")
 ax.set_xticks(range(10))
-plt.savefig("did_treatment_effect.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_treatment_effect.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 ```
 
@@ -455,8 +496,8 @@ $$Y\_{it} = \gamma\_i + \lambda\_t + \sum\_{k=-K+1}^{-2} \beta\_k^{lead} D\_{it}
 Let us unpack each component of this equation:
 
 - $Y\_{it}$ is the outcome for unit $i$ at time $t$ --- the variable we are trying to explain (our `outcome` column).
-- $\gamma\_i$ are **unit fixed effects** --- a separate intercept for each unit that absorbs all time-invariant characteristics. For example, if one city always has higher employment than another due to geography or industry composition, $\gamma\_i$ captures that permanent difference. In practice, this is equivalent to demeaning each unit's outcome by its own time-average.
-- $\lambda\_t$ are **time fixed effects** --- a separate intercept for each period that absorbs shocks common to all units at a given time. If a recession hits in period 3 and lowers outcomes for everyone equally, $\lambda\_t$ captures that common downturn. Together with unit fixed effects, this implements the "two-way" in TWFE.
+- $\gamma\_i$ are **unit fixed effects** --- a separate intercept for each unit that absorbs all time-invariant characteristics. For example, if one city always has higher learning scores than another due to demographics or school funding levels, $\gamma\_i$ captures that permanent difference. In practice, this is equivalent to demeaning each unit's outcome by its own time-average.
+- $\lambda\_t$ are **time fixed effects** --- a separate intercept for each period that absorbs shocks common to all units at a given time. If a national curriculum reform in period 3 raises learning outcomes for everyone equally, $\lambda\_t$ captures that common shift. Together with unit fixed effects, this implements the "two-way" in TWFE.
 - $D\_{it}^k$ is a **relative-time indicator** (also called an event-time dummy): it equals 1 when unit $i$ at time $t$ is exactly $k$ periods away from its treatment onset, and 0 otherwise. For a unit first treated at period 5, we have $D\_{i,3}^{-2} = 1$ (two periods before treatment), $D\_{i,5}^{0} = 1$ (the treatment period itself), $D\_{i,7}^{2} = 1$ (two periods after treatment), and so on.
 - $\beta\_k^{lead}$ (for $k = -K+1, \ldots, -2$) are the **lead coefficients** --- pre-treatment effects at each period before treatment. These serve as **placebo tests**: if the treated and control groups were evolving similarly before the intervention, all lead coefficients should be close to zero and statistically insignificant. A significant lead coefficient signals a pre-existing divergence, which would undermine the parallel trends assumption. The summation starts at $k = -K+1$ (the earliest available lead) and stops at $k = -2$, because the period immediately before treatment ($k = -1$) is **omitted as the reference period** and normalized to zero. All other coefficients are estimated relative to this baseline.
 - $\beta\_k^{lag}$ (for $k = 0, 1, \ldots, L$) are the **lag coefficients** --- post-treatment effects at each period after treatment onset. The coefficient $\beta\_0^{lag}$ captures the **instantaneous effect** at the moment treatment begins, $\beta\_1^{lag}$ captures the effect one period later, and so on through $\beta\_L^{lag}$ at $L$ periods after treatment. These coefficients trace out the **dynamic treatment effect trajectory**: they reveal whether the effect appears immediately or builds up gradually, whether it persists or fades out, and whether it stabilizes at a constant level or continues to grow.
@@ -537,6 +578,7 @@ The event study plot below makes these dynamics visible:
 es_df = results_event.to_dataframe()
 
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 pre = es_df[~es_df["is_post"]]
 post = es_df[es_df["is_post"]]
 
@@ -548,11 +590,11 @@ ax.errorbar(post["period"], post["effect"], yerr=1.96 * post["se"],
             markersize=8, label="Post-treatment")
 
 # Reference period
-ax.plot(4, 0, "D", color=NEAR_BLACK, markersize=10, zorder=5,
+ax.plot(4, 0, "D", color=WHITE_TEXT, markersize=10, zorder=5,
         label="Reference period")
 
-ax.axhline(y=0, color=NEAR_BLACK, linewidth=1, alpha=0.5)
-ax.axvline(x=4.5, color=NEAR_BLACK, linestyle="--", linewidth=1.5, alpha=0.5)
+ax.axhline(y=0, color=LIGHT_TEXT, linewidth=1, alpha=0.5)
+ax.axvline(x=4.5, color=LIGHT_TEXT, linestyle="--", linewidth=1.5, alpha=0.5)
 ax.axhline(y=5.0, color=TEAL, linestyle=":", linewidth=1.5, alpha=0.7,
            label="True effect (5.0)")
 ax.set_xlabel("Period")
@@ -560,7 +602,8 @@ ax.set_ylabel("Estimated Effect")
 ax.set_title("Event Study: Dynamic Treatment Effects")
 ax.legend(loc="upper left")
 ax.set_xticks(range(10))
-plt.savefig("did_event_study.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_event_study.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 ```
 
@@ -572,9 +615,9 @@ With the classic 2x2 case established, the next question is: what happens when d
 
 ## Staggered adoption: Why TWFE fails
 
-In many real-world policies, treatment does not begin simultaneously for all units. Minimum wage increases roll out state by state, environmental regulations phase in over years, and school programs expand district by district. This is **staggered adoption** --- different units start treatment at different times.
+In many real-world policies, treatment does not begin simultaneously for all units. AI tutoring platforms roll out city by city, digital infrastructure investments phase in over years, and educational technology grants expand district by district. This is **staggered adoption** --- different units start treatment at different times.
 
-The traditional approach is **Two-Way Fixed Effects (TWFE)** regression, which estimates a single treatment coefficient using unit and time fixed effects ([Cunningham, 2021](https://mixtape.scunning.com/09-difference_in_differences)):
+The traditional approach is **Two-Way Fixed Effects (TWFE)** regression, which estimates a single treatment coefficient using unit and time fixed effects:
 
 $$Y\_{it} = \gamma\_i + \lambda\_t + \delta \cdot D\_{it} + \varepsilon\_{it}$$
 
@@ -638,9 +681,62 @@ data_stag.head(10)
     0       9 12.035899            0        0      0          0.0
 ```
 
-Compared to the 2x2 dataset, two key differences stand out. First, `first_treat` replaces the binary `post` indicator --- it records the *period* in which each unit first receives treatment (0 means never treated). Second, `treated` is now **time-varying**: it switches from 0 to 1 at each unit's treatment onset, rather than being a fixed group label. The `treat` column is a secondary treatment indicator, and `true_effect` records the ground truth effect for verification.
+Unit 0 is never-treated, so all indicators stay at zero across all 10 periods. To understand the staggered structure, we need to see what happens to treated units. The columns have distinct roles:
 
-Summary statistics show the expanded scale:
+- **`first_treat`**: the period when a unit first receives treatment (0 = never treated)
+- **`treat`**: **time-invariant** group membership --- equals 1 for any unit *ever* assigned to treatment, 0 for never-treated
+- **`treated`**: **time-varying** post-treatment indicator --- equals 0 before treatment onset and switches to 1 at `first_treat`
+- **`true_effect`**: the known ground-truth treatment effect at each period, used for verification
+
+The distinction between `treat` and `treated` is crucial: `treat` tells you *who* is in the treatment group (a permanent label), while `treated` tells you *when* they are actually under treatment (a dynamic state). For never-treated units, both are always 0. For treated units, `treat` is always 1, but `treated` flips from 0 to 1 at the unit's treatment onset.
+
+An early-treated unit from cohort 3 illustrates this structure:
+
+```python
+early_unit = data_stag[data_stag["first_treat"] == 3]["unit"].iloc[0]
+data_stag[data_stag["unit"] == early_unit]
+```
+
+```
+ unit  period   outcome  first_treat  treated  treat  true_effect
+   90       0 13.299816            3        0      1          0.0
+   90       1 12.897337            3        0      1          0.0
+   90       2 11.882534            3        0      1          0.0
+   90       3 14.724679            3        1      1          2.0
+   90       4 16.139340            3        1      1          2.2
+   90       5 14.433891            3        1      1          2.4
+   90       6 15.949127            3        1      1          2.6
+   90       7 15.832888            3        1      1          2.8
+   90       8 17.125174            3        1      1          3.0
+   90       9 16.685332            3        1      1          3.2
+```
+
+Unit 90 has `treat=1` throughout (it belongs to the treatment group), but `treated` flips from 0 to 1 at period 3 --- the moment it enters the post-treatment state. The `true_effect` is 0 in the pre-treatment periods, then starts at 2.0 and grows by 0.2 each period, reaching 3.2 by period 9. This growing effect pattern is what makes staggered DiD challenging: the treatment effect for cohort 3 at period 7 (2.8) is very different from the effect at period 3 (2.0).
+
+Now compare with a late-treated unit from cohort 7:
+
+```python
+late_unit = data_stag[data_stag["first_treat"] == 7]["unit"].iloc[0]
+data_stag[data_stag["unit"] == late_unit]
+```
+
+```
+ unit  period   outcome  first_treat  treated  treat  true_effect
+   91       0  7.987886            7        0      1          0.0
+   91       1  8.168639            7        0      1          0.0
+   91       2  8.904022            7        0      1          0.0
+   91       3  7.984438            7        0      1          0.0
+   91       4  8.373931            7        0      1          0.0
+   91       5  7.543381            7        0      1          0.0
+   91       6  8.981115            7        0      1          0.0
+   91       7 10.105654            7        1      1          2.0
+   91       8 10.505532            7        1      1          2.2
+   91       9 11.074785            7        1      1          2.4
+```
+
+Unit 91 also has `treat=1` throughout, but `treated` does not flip until period 7 --- giving it a much longer pre-treatment phase (7 periods vs 3 for cohort 3) and only 3 post-treatment periods. Its `true_effect` starts at 2.0 at period 7 and reaches only 2.4 by period 9, compared to cohort 3's 3.2. This asymmetry --- early cohorts accumulating larger effects over more post-treatment periods --- is precisely what causes TWFE to produce biased estimates when it uses already-treated cohort 3 units as "controls" for cohort 7.
+
+Let us examine how the staggered structure differs from the 2x2 case in scale and treatment coverage. With multiple cohorts adopting at different times, the fraction of observations in post-treatment state is no longer 50%:
 
 ```python
 data_stag.describe()
@@ -660,22 +756,23 @@ max     299.000000     9.00000    20.616391     7.000000     1.000000     1.0000
 
 With 3,000 observations and 300 units, this panel is three times larger than the 2x2 case. The `first_treat` variable has a mean of 3.60, reflecting the mix of never-treated (0) and cohorts treated at periods 3, 5, and 7. The `treated` mean of 0.34 tells us that 34% of all unit-period observations are in a post-treatment state --- less than half because late cohorts contribute fewer treated periods than early cohorts.
 
-A crosstab of cohort membership by period shows the balanced panel design:
+A crosstab of the number of **treated** (post-treatment) units by cohort and period reveals the staggered rollout:
 
 ```python
-pd.crosstab(data_stag["first_treat"], data_stag["period"])
+pd.crosstab(data_stag["first_treat"], data_stag["period"],
+            values=data_stag["treated"], aggfunc="sum").fillna(0).astype(int)
 ```
 
 ```
-period        0   1   2   3   4   5   6   7   8   9
+period       0  1  2   3   4   5   6   7   8   9
 first_treat
-0            90  90  90  90  90  90  90  90  90  90
-3            60  60  60  60  60  60  60  60  60  60
-5            75  75  75  75  75  75  75  75  75  75
-7            75  75  75  75  75  75  75  75  75  75
+0            0  0  0   0   0   0   0   0   0   0
+3            0  0  0  60  60  60  60  60  60  60
+5            0  0  0   0   0  75  75  75  75  75
+7            0  0  0   0   0   0   0  75  75  75
 ```
 
-Every cohort has the same number of units in every period --- this is a balanced panel. The never-treated group (90 units) is the largest, providing a stable comparison baseline. Cohort 3 is the smallest (60 units) and experiences treatment the longest (7 post-treatment periods), while cohort 7 has only 3 post-treatment periods. This asymmetry is exactly what creates problems for TWFE: cohort 3 units have been treated for a long time when cohort 7 units first adopt, making already-treated units unreliable controls.
+The staggered structure is immediately visible: zeros cascade to treatment counts as each cohort enters the post-treatment state. At period 2, no units are yet treated. At period 3, 60 units from cohort 3 enter treatment. At period 5, cohort 5 adds 75 more, bringing the total to 135. By period 7, all 210 treated units are in post-treatment. The never-treated group (row 0) remains at zero throughout. This growing treated population --- and the fact that cohort 3 has been treated for 4 periods by the time cohort 7 starts --- is the asymmetry that makes TWFE unreliable. When TWFE uses cohort 3 as a "control" for cohort 7, it compares against units whose outcomes already incorporate a treatment effect of 2.8, not the untreated counterfactual.
 
 The pivoted outcome means by cohort and period reveal the staggered treatment pattern:
 
@@ -698,10 +795,11 @@ The line plot below visualizes these divergent trajectories:
 
 ```python
 cohort_means = data_stag.groupby(["first_treat", "period"])["outcome"].mean().unstack(level=0)
-cohort_colors = {0: STEEL_BLUE, 3: WARM_ORANGE, 5: TEAL, 7: NEAR_BLACK}
+cohort_colors = {0: STEEL_BLUE, 3: WARM_ORANGE, 5: TEAL, 7: WHITE_TEXT}
 cohort_labels = {0: "Never-treated", 3: "Cohort 3", 5: "Cohort 5", 7: "Cohort 7"}
 
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 for ft in sorted(cohort_means.columns):
     ax.plot(cohort_means.index, cohort_means[ft], "o-",
             color=cohort_colors[ft], linewidth=2, markersize=6,
@@ -715,7 +813,8 @@ ax.set_ylabel("Mean Outcome")
 ax.set_title("Staggered Adoption: Cohort Mean Outcomes Over Time")
 ax.legend(loc="upper left")
 ax.set_xticks(range(10))
-plt.savefig("did_staggered_trends.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_staggered_trends.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 ```
 
@@ -793,20 +892,24 @@ The following plot visualizes the decomposition:
 bacon_df = bacon_results.to_dataframe()
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+fig.patch.set_linewidth(0)
 
 # Left panel: scatter by comparison type
 type_colors = {
     "Treated vs Never-treated": STEEL_BLUE,
     "Earlier vs Later treated": WARM_ORANGE,
-    "Later vs Earlier (forbidden)": "#c4623d",
+    "Later vs Earlier (forbidden)": "#e8856c",
+    "treated_vs_never": STEEL_BLUE,
+    "earlier_vs_later": WARM_ORANGE,
+    "later_vs_earlier": "#e8856c",
 }
 for comp_type in bacon_df["comparison_type"].unique():
     subset = bacon_df[bacon_df["comparison_type"] == comp_type]
-    color = type_colors.get(comp_type, NEAR_BLACK)
+    color = type_colors.get(comp_type, LIGHT_TEXT)
     axes[0].scatter(subset["weight"], subset["estimate"],
-                    s=80, color=color, alpha=0.7, edgecolors="white",
+                    s=80, color=color, alpha=0.7, edgecolors=DARK_NAVY,
                     label=comp_type)
-axes[0].axhline(y=bacon_results.twfe_estimate, color=NEAR_BLACK,
+axes[0].axhline(y=bacon_results.twfe_estimate, color=WHITE_TEXT,
                 linestyle="--", linewidth=1.5, alpha=0.7,
                 label=f"TWFE = {bacon_results.twfe_estimate:.2f}")
 axes[0].set_xlabel("Weight")
@@ -820,10 +923,10 @@ type_summary = bacon_df.groupby("comparison_type").agg(
     avg_effect=("estimate", lambda x: np.average(
         x, weights=bacon_df.loc[x.index, "weight"])),
 ).reset_index()
-bar_colors = [type_colors.get(t, NEAR_BLACK)
+bar_colors = [type_colors.get(t, LIGHT_TEXT)
               for t in type_summary["comparison_type"]]
 axes[1].barh(range(len(type_summary)), type_summary["weight"],
-             color=bar_colors, edgecolor="white", height=0.6)
+             color=bar_colors, edgecolor=DARK_NAVY, height=0.6)
 axes[1].set_yticks(range(len(type_summary)))
 axes[1].set_yticklabels(type_summary["comparison_type"], fontsize=10)
 axes[1].set_xlabel("Total Weight")
@@ -835,7 +938,8 @@ for i, (w, e) in enumerate(zip(type_summary["weight"],
                  va="center", fontsize=10)
 
 plt.tight_layout()
-plt.savefig("did_bacon_decomposition.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_bacon_decomposition.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 ```
 
@@ -859,7 +963,9 @@ In words: take the change in outcomes from the period just before treatment ($g 
 
 ### The doubly robust estimator
 
-In practice, Callaway and Sant'Anna implement a **doubly robust** version of this estimator that combines inverse-probability weighting with an outcome regression adjustment:
+In practice, Callaway and Sant'Anna implement a **doubly robust** version of this estimator. Before diving into the formal equation, here is the core idea: the doubly robust estimator adjusts the comparison between treated and control units in *two* ways simultaneously --- by reweighting the control group to look more similar to the treated group (inverse-probability weighting), and by directly modeling and subtracting the expected outcome change for controls (outcome regression). Think of it as wearing both a belt *and* suspenders: if either adjustment is correctly specified, the estimate is valid, even if the other one is wrong. This double protection makes the estimator more reliable than methods that rely on a single modeling assumption.
+
+The formal equation combines inverse-probability weighting with an outcome regression adjustment:
 
 $$ATT(g, t) = \mathbb{E}\left[\left(\frac{G\_g}{\mathbb{E}[G\_g]} - \frac{\frac{p\_g(X)}{1-p\_g(X)}}{\mathbb{E}\left[\frac{p\_g(X)}{1-p\_g(X)}\right]}\right)\left(Y\_t - Y\_{g-1} - m\_{g,t}^{nev}(X)\right)\right]$$
 
@@ -872,7 +978,7 @@ This term determines *how much each observation contributes* to the ATT estimate
 - $G\_g$ is a **group indicator** that equals 1 if the unit belongs to cohort $g$ and 0 otherwise. Dividing by $\mathbb{E}[G\_g]$ (the share of units in cohort $g$) normalizes so that treated units receive equal weight on average. For a treated unit in cohort $g$, the first fraction contributes a positive value; for never-treated units, $G\_g = 0$ so the first fraction is zero.
 - $p\_g(X)$ is the **generalized propensity score** --- the probability of being in cohort $g$ (rather than the never-treated group) given covariates $X$. This is estimated via logit regression of cohort membership on covariates. The ratio $\frac{p\_g(X)}{1-p\_g(X)}$ are the odds of being in cohort $g$, and dividing by its expectation normalizes the weights. For never-treated units, this second fraction creates a **negative weight** that is larger for control units whose covariates resemble the treated cohort --- effectively selecting the most comparable controls. For treated units, the two fractions partially cancel, leaving a net positive weight.
 
-The intuition is similar to propensity score matching: if a never-treated city has covariates (population, income, industry mix) that look very much like a treated city, it receives a larger (more negative) weight, making it contribute more as a counterfactual. Cities with covariates far from the treated group receive near-zero weight. This **rebalances** the control group so that the covariate distribution of the weighted controls matches that of the treated cohort.
+The intuition is similar to propensity score matching: if a never-treated city has covariates (population, per-student spending, teacher-student ratio) that look very much like a treated city, it receives a larger (more negative) weight, making it contribute more as a counterfactual. Cities with covariates far from the treated group receive near-zero weight. This **rebalances** the control group so that the covariate distribution of the weighted controls matches that of the treated cohort.
 
 **The outcome term:** $Y\_t - Y\_{g-1} - m\_{g,t}^{nev}(X)$
 
@@ -881,7 +987,7 @@ This term measures the **adjusted outcome change** for each unit:
 - $Y\_t - Y\_{g-1}$ is the raw change in outcomes from the baseline period ($g - 1$, the period just before cohort $g$ starts treatment) to the current period $t$. This is the same first difference used in any DiD estimator.
 - $m\_{g,t}^{nev}(X)$ is the **outcome regression adjustment** --- the expected change $E[Y\_t - Y\_{g-1} \mid X, G = \infty]$ for never-treated units with covariates $X$. In practice, this is estimated by regressing the outcome change $\Delta Y = Y\_t - Y\_{g-1}$ on covariates $X$ using only the never-treated group. Subtracting $m\_{g,t}^{nev}(X)$ removes the portion of the outcome change that would have occurred *anyway* based on observable characteristics --- even without treatment. What remains is the treatment-induced change that cannot be explained by covariates alone.
 
-Think of it this way: if cities with larger populations tend to grow faster regardless of treatment, $m\_{g,t}^{nev}(X)$ captures that covariate-driven growth trajectory. Subtracting it ensures that the estimated treatment effect is not confounded by differential growth rates across different types of cities.
+Think of it this way: if cities with higher per-student spending tend to improve learning scores faster regardless of AI adoption, $m\_{g,t}^{nev}(X)$ captures that covariate-driven growth trajectory. Subtracting it ensures that the estimated treatment effect is not confounded by differential growth rates across different types of cities.
 
 **Why "doubly robust"?** The estimator combines *both* adjustment strategies --- inverse-probability weighting (through the weighting term) and outcome regression (through $m\_{g,t}^{nev}(X)$). The key advantage is that the ATT estimate is consistent if *either* the propensity score model or the outcome regression model is correctly specified --- both do not need to be right simultaneously. If the propensity score model is wrong but the outcome regression is correct, the $m\_{g,t}^{nev}(X)$ adjustment still removes confounding. If the outcome regression is wrong but the propensity score is correct, the reweighting still produces a valid comparison group. This double layer of protection makes the estimator more reliable in practice than methods relying on a single modeling assumption.
 
@@ -901,10 +1007,10 @@ $$\theta\_D(e) = \sum\_{g} ATT(g, g + e) \cdot P(G = g \mid g + e \leq T)$$
 
 This event study aggregation is the CS analogue of the leads-and-lags event study, but free from the forbidden comparison contamination that plagues TWFE-based event studies.
 
-The [`CallawaySantAnna()`](https://diff-diff.readthedocs.io/en/stable/) class takes `control_group` to specify which units serve as controls. Using `"never_treated"` restricts comparisons to units that never received treatment, the cleanest possible counterfactual.
+The [`CallawaySantAnna()`](https://diff-diff.readthedocs.io/en/stable/) class takes `control_group` to specify which units serve as controls. Using `"never_treated"` restricts comparisons to units that never received treatment, the cleanest possible counterfactual. The `base_period="universal"` option uses a single reference period ($g - 1$) for all relative time comparisons within each cohort, rather than letting each relative period use its own baseline. This ensures that the pre-treatment coefficients are proper placebo tests: each one measures the outcome change from $g - 1$ to an earlier period, so a coefficient near zero means the treated and control groups were evolving similarly over that specific interval. With a universal base period, the period immediately before treatment ($e = -1$) is normalized to zero by construction.
 
 ```python
-cs = CallawaySantAnna(control_group="never_treated")
+cs = CallawaySantAnna(control_group="never_treated", base_period="universal")
 results_cs = cs.fit(
     data_stag, outcome="outcome", unit="unit",
     time="period", first_treat="first_treat",
@@ -924,7 +1030,7 @@ Never-treated units:                   90
 Treatment cohorts:                      3
 Time periods:                          10
 Control group:                 never_treated
-Base period:                      varying
+Base period:                    universal
 
 -------------------------------------------------------------------------------------
                    Overall Average Treatment Effect on the Treated
@@ -941,12 +1047,13 @@ ATT                   2.4136       0.0552     43.753     0.0000    ***
 -------------------------------------------------------------------------------------
 Rel. Period         Estimate    Std. Err.     t-stat      P>|t|   Sig.
 -------------------------------------------------------------------------------------
--6                    0.1156       0.1044      1.108     0.2681
--5                   -0.2476       0.0979     -2.529     0.0114      *
--4                    0.1344       0.0759      1.770     0.0766      .
--3                   -0.1112       0.0709     -1.568     0.1168
--2                   -0.0013       0.0631     -0.020     0.9837
--1                    0.0709       0.0631      1.124     0.2610
+-7                   -0.1344       0.1171     -1.148     0.2510
+-6                   -0.0188       0.1126     -0.167     0.8671
+-5                   -0.1435       0.0813     -1.766     0.0774      .
+-4                   -0.0091       0.0744     -0.122     0.9028
+-3                   -0.0697       0.0560     -1.244     0.2134
+-2                   -0.0709       0.0631     -1.124     0.2610
+-1                    0.0000          nan        nan        nan
 0                     1.9713       0.0645     30.551     0.0000    ***
 1                     2.1416       0.0577     37.124     0.0000    ***
 2                     2.2969       0.0644     35.644     0.0000    ***
@@ -962,7 +1069,7 @@ Signif. codes: '***' 0.001, '**' 0.01, '*' 0.05, '.' 0.1
 
 The overall CS estimate of the ATT is 2.41 (SE = 0.06, p < 0.001), with a 95% CI of [2.31, 2.52]. This is higher than the TWFE estimate of 2.18, confirming that TWFE was biased downward by the forbidden comparisons. The event study reveals dynamic effects that grow over time: the effect starts at 1.97 in the first period after treatment and increases to 3.27 by six periods post-treatment. This pattern of growing effects is exactly the scenario where TWFE fails most dramatically --- the forbidden comparisons use units with large accumulated effects as controls for newly-treated units, producing a downward-biased average.
 
-The pre-treatment estimates mostly hover near zero, with one significant coefficient at relative period -5 (estimate = -0.25, p = 0.01). While p = 0.01 is below the conventional 5% threshold, this is one test out of six pre-treatment periods. Applying a Bonferroni correction --- which guards against false positives when running multiple tests by dividing the significance threshold by the number of tests --- gives a corrected threshold of 0.05/6 = 0.008, under which this result would not be significant. A single borderline rejection among multiple tests is consistent with normal sampling variability and does not undermine the parallel trends assumption.
+With the universal base period, relative period -1 is the reference and is normalized to zero by construction. The remaining pre-treatment estimates all hover near zero --- the largest in magnitude is -0.14 at relative period -5 (p = 0.08), which does not reach significance at the 5% level. None of the seven pre-treatment coefficients are individually significant, providing clean support for the parallel trends assumption. This contrasts with the varying base period specification, where each pre-treatment coefficient uses a different baseline, making the placebo tests harder to interpret collectively.
 
 The event study plot visualizes these dynamics, showing how the treatment effect builds over time relative to treatment onset:
 
@@ -970,6 +1077,7 @@ The event study plot visualizes these dynamics, showing how the treatment effect
 cs_df = results_cs.to_dataframe("event_study")
 
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 pre_cs = cs_df[cs_df["relative_period"] < 0]
 post_cs = cs_df[cs_df["relative_period"] >= 0]
 
@@ -980,19 +1088,20 @@ ax.errorbar(post_cs["relative_period"], post_cs["effect"],
             yerr=1.96 * post_cs["se"], fmt="s", color=TEAL,
             capsize=4, linewidth=2, markersize=8, label="Post-treatment")
 
-ax.axhline(y=0, color=NEAR_BLACK, linewidth=1, alpha=0.5)
-ax.axvline(x=-0.5, color=NEAR_BLACK, linestyle="--", linewidth=1.5, alpha=0.5)
+ax.axhline(y=0, color=LIGHT_TEXT, linewidth=1, alpha=0.5)
+ax.axvline(x=-0.5, color=LIGHT_TEXT, linestyle="--", linewidth=1.5, alpha=0.5)
 ax.set_xlabel("Periods Relative to Treatment")
 ax.set_ylabel("Estimated ATT")
 ax.set_title("Callaway-Sant'Anna: Event Study for Staggered Adoption")
 ax.legend(loc="upper left")
-plt.savefig("did_staggered_att.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_staggered_att.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 ```
 
-![Callaway-Sant'Anna event study plot showing pre-treatment effects near zero and post-treatment effects growing steadily from about 2.0 to 3.3.](did_staggered_att.png)
+![Callaway-Sant'Anna event study plot showing pre-treatment effects near zero (with period -1 normalized to zero) and post-treatment effects growing steadily from about 2.0 to 3.3.](did_staggered_att.png)
 
-The CS event study plot shows the hallmark pattern of a valid DiD analysis: pre-treatment coefficients (steel blue) cluster around zero with narrow confidence intervals, then post-treatment coefficients (teal) rise sharply and progressively. The upward slope in the post-treatment period reveals that the treatment effect accumulates over time, growing from roughly 2.0 immediately after treatment to 3.3 six periods later. This dynamic pattern would have been obscured by TWFE's single pooled estimate and further distorted by its forbidden comparisons.
+The CS event study plot shows the hallmark pattern of a valid DiD analysis: pre-treatment coefficients (steel blue) cluster tightly around zero --- with relative period -1 pinned at exactly zero as the universal base period --- then post-treatment coefficients (teal) rise sharply and progressively. The upward slope in the post-treatment period reveals that the treatment effect accumulates over time, growing from roughly 2.0 immediately after treatment to 3.3 six periods later. This dynamic pattern would have been obscured by TWFE's single pooled estimate and further distorted by its forbidden comparisons.
 
 ## Choosing the right estimator
 
@@ -1068,32 +1177,33 @@ print(f"\nBreakdown value of M: {breakdown_M:.1f}")
 
 ```
 M = 0.0: CI = [2.5324, 2.6592]  significant
-M = 0.5: CI = [2.4086, 2.7830]  significant
-M = 1.0: CI = [2.2848, 2.9068]  significant
-M = 1.5: CI = [2.1610, 3.0306]  significant
-M = 2.0: CI = [2.0372, 3.1544]  significant
-M = 3.0: CI = [1.7896, 3.4020]  significant
-M = 4.0: CI = [1.5420, 3.6496]  significant
-M = 5.0: CI = [1.2944, 3.8972]  significant
-M = 7.0: CI = [0.7992, 4.3924]  significant
-M = 10.0: CI = [0.0564, 5.1352]  significant
-M = 12.0: CI = [-0.4387, 5.6304]  includes zero
-M = 15.0: CI = [-1.1815, 6.3732]  includes zero
+M = 0.5: CI = [2.4606, 2.7310]  significant
+M = 1.0: CI = [2.3889, 2.8028]  significant
+M = 1.5: CI = [2.3171, 2.8745]  significant
+M = 2.0: CI = [2.2453, 2.9463]  significant
+M = 3.0: CI = [2.1018, 3.0898]  significant
+M = 4.0: CI = [1.9583, 3.2334]  significant
+M = 5.0: CI = [1.8148, 3.3769]  significant
+M = 7.0: CI = [1.5277, 3.6639]  significant
+M = 10.0: CI = [1.0971, 4.0945]  significant
+M = 12.0: CI = [0.8101, 4.3816]  significant
+M = 15.0: CI = [0.3795, 4.8122]  significant
 
-Breakdown value of M: 12.0
+Breakdown value of M: 15.0
 ```
 
-At $M = 0$ (perfect parallel trends), the CI is narrow: [2.53, 2.66]. As $M$ increases, the CI widens symmetrically. At $M = 10$, the lower bound barely remains positive (0.06), and at $M = 12$, it crosses zero (-0.44). The breakdown value of $M = 12$ means the treatment effect remains statistically significant even if post-treatment violations of parallel trends are up to 12 times larger than the worst pre-treatment deviation. This is exceptionally robust --- in practice, a breakdown value above $M = 3$ is considered strong evidence that the finding is not driven by parallel trends violations.
+At $M = 0$ (perfect parallel trends), the CI is narrow: [2.53, 2.66]. As $M$ increases, the CI widens symmetrically. At $M = 10$, the lower bound remains comfortably positive (1.10), and even at $M = 15$, it barely stays above zero (0.38). The breakdown value exceeds $M = 15$ --- the treatment effect remains statistically significant even if post-treatment violations of parallel trends are more than 15 times larger than the worst pre-treatment deviation. This is exceptionally robust --- in practice, a breakdown value above $M = 3$ is considered strong evidence that the finding is not driven by parallel trends violations. The improvement over the varying base period specification (which had a breakdown of $M = 12$) reflects the universal base period's tighter pre-treatment estimates, which give HonestDiD a smaller "worst pre-treatment deviation" to scale against.
 
 The sensitivity plot maps the robust CI as a function of $M$, making the breakdown point visually apparent:
 
 ```python
 fig, ax = plt.subplots(figsize=(9, 5))
+fig.patch.set_linewidth(0)
 ax.fill_between(sens_df["M"], sens_df["ci_lb"], sens_df["ci_ub"],
                 alpha=0.25, color=STEEL_BLUE, label="95% Robust CI")
 ax.plot(sens_df["M"], sens_df["ci_lb"], "-", color=STEEL_BLUE, linewidth=2)
 ax.plot(sens_df["M"], sens_df["ci_ub"], "-", color=STEEL_BLUE, linewidth=2)
-ax.axhline(y=0, color=NEAR_BLACK, linewidth=1.5, alpha=0.7)
+ax.axhline(y=0, color=LIGHT_TEXT, linewidth=1.5, alpha=0.7)
 
 att_val = results_cs.overall_att
 ax.axhline(y=att_val, color=TEAL, linestyle=":", linewidth=1.5,
@@ -1108,15 +1218,26 @@ ax.set_xlabel("Sensitivity Parameter M\n"
 ax.set_ylabel("Treatment Effect (ATT)")
 ax.set_title("HonestDiD Sensitivity Analysis: Robustness of the ATT")
 ax.legend(loc="upper left")
-plt.savefig("did_honest_sensitivity.png", dpi=300, bbox_inches="tight")
+plt.savefig("did_honest_sensitivity.png", dpi=300, bbox_inches="tight",
+            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 ```
 
-![HonestDiD sensitivity plot showing the 95% robust CI widening as M increases. The CI band is steel blue, the ATT is a teal dotted line, and the breakdown point at M=12 is marked with an orange dashed line.](did_honest_sensitivity.png)
+![HonestDiD sensitivity plot showing the 95% robust CI widening as M increases. The CI band is steel blue, the ATT is a teal dotted line, and the breakdown point at M=15 is marked with an orange dashed line.](did_honest_sensitivity.png)
 
-The sensitivity plot tells the robustness story at a glance. The steel blue band shows the 95% robust CI expanding as $M$ grows --- allowing for larger violations of parallel trends. The teal dotted line marks the overall ATT of 2.41, which sits comfortably within the CI for all values of $M$. The warm orange dashed line at $M = 12$ marks the breakdown point where the lower CI bound crosses zero. In practical terms, the treatment conclusion would only be overturned if post-treatment parallel trend violations were more than 12 times worse than anything observed in the pre-treatment data --- an extreme scenario that would require a dramatic structural break coinciding precisely with the treatment timing.
+The sensitivity plot tells the robustness story at a glance. The steel blue band shows the 95% robust CI expanding as $M$ grows --- allowing for larger violations of parallel trends. The teal dotted line marks the overall ATT of 2.41, which sits comfortably within the CI for all values of $M$. The warm orange dashed line at $M = 15$ marks the boundary of our grid, with the lower CI bound still positive (0.38) at that point --- the true breakdown lies even further out. In practical terms, the treatment conclusion would only be overturned if post-treatment parallel trend violations were more than 15 times worse than anything observed in the pre-treatment data --- an extreme scenario that would require a dramatic structural break coinciding precisely with the treatment timing.
 
-Best practice is to always report the breakdown value alongside the point estimate. A finding with a breakdown at $M = 0.5$ is fragile --- even mild violations destroy the conclusion. A finding with a breakdown at $M = 10$ or above, as in this example, provides strong evidence that the effect is genuine regardless of moderate parallel trends violations.
+Best practice is to always report the breakdown value alongside the point estimate. A finding with a breakdown at $M = 0.5$ is fragile --- even mild violations destroy the conclusion. A finding with a breakdown at $M = 15$ or above, as in this example, provides strong evidence that the effect is genuine regardless of moderate parallel trends violations.
+
+## Discussion
+
+Returning to the motivating question --- did AI tutoring actually improve learning? --- the evidence from both the classic and modern DiD estimators is clear: treatment produced a genuine, statistically significant positive effect. In the 2x2 setting, the estimated ATT of 5.12 (95% CI: [4.64, 5.60]) closely matches the true effect of 5.0, confirming that the classic estimator works well when all units start treatment simultaneously. The event study further validates this finding by showing near-zero pre-treatment coefficients (the largest is -0.52 with p = 0.31) and stable post-treatment effects around 4.7--5.0.
+
+The staggered adoption setting reveals a more nuanced picture. Naive TWFE estimation produces a biased estimate of 2.18, pulled downward by the 28.3% weight on forbidden comparisons where already-treated units serve as controls. The Callaway-Sant'Anna estimator corrects this bias, finding an overall ATT of 2.41 --- and the event study shows that the effect is not constant but grows over time, from 1.97 immediately after treatment to 3.27 six periods later. For an education policymaker, this dynamic pattern means the AI initiative's full benefits take time to materialize: evaluating the program too early would underestimate its long-run impact.
+
+The HonestDiD sensitivity analysis provides the final piece of evidence. With a breakdown value exceeding $M = 15$, the treatment conclusion is robust to post-treatment parallel trends violations more than 15 times larger than anything observed pre-treatment. This level of robustness far exceeds the $M = 3$ threshold typically considered strong in applied research. Even a skeptic who doubts the parallel trends assumption would find it difficult to argue that the treatment had no effect.
+
+Two important caveats apply. First, these results use synthetic data with known true effects, so the estimators are guaranteed to work under their assumptions. Real-world applications face additional challenges --- measurement error in learning assessments, spillover effects between treated and control cities (e.g., students in control cities accessing AI tools on their own), and the possibility that AI adoption depends on unobserved factors correlated with learning outcomes. Second, the treatment effects in the staggered dataset grow linearly over time by construction. In practice, effects may follow more complex trajectories --- plateauing, fading out, or accelerating --- which would require careful specification of the event study window and aggregation weights.
 
 ## Summary and key takeaways
 
@@ -1126,7 +1247,7 @@ This tutorial walked through the DiD toolkit from its simplest form to its most 
 
 **Data insight:** The classic DiD recovered the true effect of 5.0 within sampling error (95% CI: [4.64, 5.60]). In the staggered setting, TWFE estimated 2.18 while the cleaner CS estimator found 2.41 --- a 10% upward correction driven by eliminating the 28.3% weight on forbidden comparisons that dragged TWFE down. The CS event study further revealed that treatment effects grow over time, from 1.97 immediately after treatment to 3.27 six periods later.
 
-**Practical limitation:** Parallel trends is untestable for the post-treatment period. Pre-treatment tests (p = 0.29 in our example) can only fail to reject, not confirm. HonestDiD provides a principled solution by computing robust confidence intervals under bounded violations. Our breakdown value of $M = 12$ means the conclusion survives violations up to 12 times the worst pre-treatment departure --- exceptionally strong robustness.
+**Practical limitation:** Parallel trends is untestable for the post-treatment period. Pre-treatment tests (p = 0.29 in our example) can only fail to reject, not confirm. HonestDiD provides a principled solution by computing robust confidence intervals under bounded violations. Our breakdown value exceeding $M = 15$ means the conclusion survives violations more than 15 times the worst pre-treatment departure --- exceptionally strong robustness.
 
 **Next steps:** This tutorial used synthetic data --- the 2x2 dataset with a constant treatment effect and the staggered dataset with effects that grow over time. Real-world applications should consider adding covariates to the CS estimator (via the `covariates` argument), exploring continuous treatment intensity with `ContinuousDiD()`, and comparing CS results against `SunAbraham()` or `ImputationDiD()` as robustness checks. The `diff-diff` package supports all of these within the same API.
 
@@ -1143,7 +1264,7 @@ This tutorial walked through the DiD toolkit from its simplest form to its most 
 ## References
 
 1. [Callaway, B. & Sant'Anna, P. H. C. (2021). Difference-in-Differences with Multiple Time Periods. *Journal of Econometrics*, 225(2), 200--230.](https://doi.org/10.1016/j.jeconom.2020.12.001)
-2. [diff-diff --- Python Package Documentation](https://diff-diff.readthedocs.io/en/stable/)
+2. [Gerber, I. (2026). diff-diff: Difference-in-Differences Causal Inference for Python. GitHub repository.](https://github.com/igerber/diff-diff) --- [Documentation](https://diff-diff.readthedocs.io/en/stable/)
 3. [Goodman-Bacon, A. (2021). Difference-in-Differences with Variation in Treatment Timing. *Journal of Econometrics*, 225(2), 254--277.](https://doi.org/10.1016/j.jeconom.2021.03.014)
 4. [Rambachan, A. & Roth, J. (2023). A More Credible Approach to Parallel Trends. *Review of Economic Studies*, 90(5), 2555--2591.](https://doi.org/10.1093/restud/rdad018)
 5. [Roth, J. (2022). Pretest with Caution: Event-Study Estimates after Testing for Parallel Trends. *American Economic Review: Insights*, 4(3), 305--322.](https://doi.org/10.1257/aeri.20210236)
@@ -1151,3 +1272,4 @@ This tutorial walked through the DiD toolkit from its simplest form to its most 
 7. [Card, D. & Krueger, A. B. (1994). Minimum Wages and Employment: A Case Study of the Fast-Food Industry in New Jersey and Pennsylvania. *American Economic Review*, 84(4), 772--793.](https://www.jstor.org/stable/2118030)
 8. [Cunningham, S. (2021). *Causal Inference: The Mixtape*. Yale University Press. Chapter 9: Difference-in-Differences.](https://mixtape.scunning.com/09-difference_in_differences)
 9. [de Chaisemartin, C. & D'Haultfoeuille, X. (2020). Two-Way Fixed Effects Estimators with Heterogeneous Treatment Effects. *American Economic Review*, 110(9), 2964--2996.](https://doi.org/10.1257/aer.20181169)
+10. [Rubin, D. B. (1974). Estimating Causal Effects of Treatments in Randomized and Nonrandomized Studies. *Journal of Educational Psychology*, 66(5), 688--701.](https://doi.org/10.1037/h0037350)
