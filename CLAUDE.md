@@ -117,7 +117,8 @@ Generates notebook-style data science blog posts for the site. The user provides
 - Causal posts: explicitly state estimand (ATE/ATT) for each method; distinguish randomized vs observational framing
 - After code changes, re-run script.py to regenerate ALL images; delete orphaned PNGs
 - Dark theme figures: optional dark navy background palette for figures (`#0f1729`, `#1f2b5e`, `#c8d0e0`, `#e8ecf2`)
-- Reference posts: `content/post/python_ml_random_forest/index.md` (ML), `content/post/python_dowhy/index.md` (causal inference), `content/post/python_fwl/index.md` (dark theme figures, simulated data)
+- Output blocks: use ` ```text ` (not bare ` ``` `) to prevent highlight.js auto-detection coloring
+- Reference posts: `content/post/python_ml_random_forest/index.md` (ML), `content/post/python_dowhy/index.md` (causal inference), `content/post/python_fwl/index.md` (dark theme figures, simulated data), `content/post/python_pyfixest/index.md` (panel data, fixed effects, dark theme figures)
 
 ## referee-post
 

@@ -166,7 +166,7 @@ For every code block that produces output, verify the four-layer sandwich:
    it matters. Accessible to a beginner. Connects to the case study question.
    Does not forward-reference results. Length: 2-4 sentences.
 2. **Code block** is present and well-commented (`python` language tag).
-3. **Output block** exists (fenced code with **no language tag**) for code that
+3. **Output block** exists (fenced code with **`text` language tag**) for code that
    prints results via `print()`, `.describe()`, `.head()`, etc.
 4. **Post-interpretation paragraph** exists with specific numbers from the output.
 

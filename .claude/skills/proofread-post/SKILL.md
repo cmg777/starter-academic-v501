@@ -194,7 +194,7 @@ Verify every code block that produces output has a matching output block:
 - [ ] Every code block containing `print()`, `.describe()`, `.head()`, `.info()`,
       `.value_counts()`, or similar output-producing calls has a corresponding
       output block immediately after it
-- [ ] Output blocks use fenced code with **no language tag** (not ````python`)
+- [ ] Output blocks use fenced code with the **`text` language tag** (not ````python` or bare ` ``` `)
 - [ ] Output values in the blocks look reasonable (no placeholder text like "...")
 - [ ] Code blocks use the `python` language tag
 

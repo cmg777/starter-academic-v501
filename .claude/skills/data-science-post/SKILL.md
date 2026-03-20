@@ -327,10 +327,11 @@ print(result)
 
 **3. Output block** -- shows expected printed output (required when code calls
 `print()`, `.describe()`, `.head()`, `.summary()`, or displays a DataFrame repr).
-Use a fenced code block with **no language tag**:
+Use a fenced code block with the **`text` language tag** (prevents highlight.js
+from auto-detecting a language and applying unwanted syntax coloring):
 
 ````
-```
+```text
 Dataset shape: (5099, 26)
 Treatment groups:
 0    3354
@@ -895,7 +896,7 @@ post header. Choose whichever best represents the post at a glance.
 - [ ] Overview motivates the case study question
 - [ ] Learning objectives present (3-5 bullets)
 - [ ] Every output-producing code block has the sandwich (explanation -> code -> output -> interpretation)
-- [ ] Every `print()` / `.describe()` / `.head()` code block has an output block (no language tag)
+- [ ] Every `print()` / `.describe()` / `.head()` code block has an output block (`text` language tag)
 - [ ] At least 8 interpretation paragraphs with specific numbers
 - [ ] At least 3 figures with `dpi=300, bbox_inches="tight"`
 - [ ] Matplotlib uses site colors (`#6a9bcc`, `#d97757`, `#141413`)
