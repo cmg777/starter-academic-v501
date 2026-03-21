@@ -702,13 +702,14 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
 # ── Configuration (change these for your own dataset) ────────────
-CSV_FILE = "health_data.csv"             # Path to your CSV file
+CSV_FILE = "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca/health_data.csv"
+ID_COL = "country"                       # Row identifier column
 POSITIVE_COLS = ["life_exp"]             # Higher = better
 NEGATIVE_COLS = ["infant_mort"]          # Higher = worse (will be flipped)
 
 # Step 1: Load raw data from CSV
 df_sk = pd.read_csv(CSV_FILE)
-print(f"Loaded: {df_sk.shape[0]} countries, {df_sk.shape[1]} columns")
+print(f"Loaded: {df_sk.shape[0]} rows, {df_sk.shape[1]} columns")
 
 # Step 2: Polarity adjustment — flip negative indicators
 # Multiplying by -1 so that "higher = better" for all variables
@@ -730,51 +731,52 @@ pca_sk.fit(Z_sk)
 df_sk["pc1"] = pca_sk.transform(Z_sk)[:, 0]
 
 # Step 6: Normalization — Min-Max scaling to 0-1
-df_sk["health_index"] = (
+df_sk["pc1_index"] = (
     (df_sk["pc1"] - df_sk["pc1"].min())
     / (df_sk["pc1"].max() - df_sk["pc1"].min())
 )
 
 # Export results
-df_sk.to_csv("health_index_results.csv", index=False)
+df_sk.to_csv("pc1_index_results.csv", index=False)
 
 # Summary
+indicator_cols = POSITIVE_COLS + NEGATIVE_COLS
 print(f"\nPC1 weights: {pca_sk.components_[0].round(4)}")
 print(f"Variance explained: {pca_sk.explained_variance_ratio_.round(4)}")
-print(f"\nTop 5 countries:")
-print(df_sk.nlargest(5, "health_index")[
-    ["country", "life_exp", "infant_mort", "health_index"]
+print(f"\nTop 5:")
+print(df_sk.nlargest(5, "pc1_index")[
+    [ID_COL] + indicator_cols + ["pc1_index"]
 ].to_string(index=False))
-print(f"\nBottom 5 countries:")
-print(df_sk.nsmallest(5, "health_index")[
-    ["country", "life_exp", "infant_mort", "health_index"]
+print(f"\nBottom 5:")
+print(df_sk.nsmallest(5, "pc1_index")[
+    [ID_COL] + indicator_cols + ["pc1_index"]
 ].to_string(index=False))
-print(f"\nSaved: health_index_results.csv")
+print(f"\nSaved: pc1_index_results.csv")
 ```
 
 ```text
-Loaded: 50 countries, 3 columns
+Loaded: 50 rows, 3 columns
 
 PC1 weights: [0.7071 0.7071]
 Variance explained: [0.9797]
 
-Top 5 countries:
-   country  life_exp  infant_mort  health_index
-Country_12      84.7          3.8      1.000000
-Country_32      83.4          4.0      0.975454
-Country_23      81.6          3.5      0.948950
-Country_06      83.6          8.6      0.934637
-Country_03      81.3         11.6      0.865729
+Top 5:
+   country  life_exp  infant_mort  pc1_index
+Country_12      84.7          3.8   1.000000
+Country_32      83.4          4.0   0.975454
+Country_23      81.6          3.5   0.948950
+Country_06      83.6          8.6   0.934637
+Country_03      81.3         11.6   0.865729
 
-Bottom 5 countries:
-   country  life_exp  infant_mort  health_index
-Country_05      54.9         53.8      0.000000
-Country_28      57.7         58.7      0.001533
-Country_29      58.8         55.9      0.047636
-Country_18      58.5         54.9      0.052046
-Country_50      57.2         51.9      0.058316
+Bottom 5:
+   country  life_exp  infant_mort  pc1_index
+Country_05      54.9         53.8   0.000000
+Country_28      57.7         58.7   0.001533
+Country_29      58.8         55.9   0.047636
+Country_18      58.5         54.9   0.052046
+Country_50      57.2         51.9   0.058316
 
-Saved: health_index_results.csv
+Saved: pc1_index_results.csv
 ```
 
 The entire six-step manual pipeline collapses into roughly 15 lines of sklearn code. The configuration block at the top (`CSV_FILE`, `POSITIVE_COLS`, `NEGATIVE_COLS`) makes the script reusable: to build a different composite index, simply point it to a new CSV and specify which columns are positive and which are negative. The rankings match our manual results exactly --- Country\_12 leads at 1.00 and Country\_05 anchors the bottom at 0.00.

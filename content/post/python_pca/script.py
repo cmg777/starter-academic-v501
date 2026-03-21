@@ -485,13 +485,14 @@ print("SKLEARN PCA: Full pipeline from CSV")
 print("=" * 60)
 
 # Configuration (change these for your own dataset)
-CSV_FILE = "health_data.csv"
+CSV_FILE = "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca/health_data.csv"
+ID_COL = "country"
 POSITIVE_COLS = ["life_exp"]
 NEGATIVE_COLS = ["infant_mort"]
 
 # Step 1: Load raw data from CSV
 df_sk = pd.read_csv(CSV_FILE)
-print(f"Loaded: {df_sk.shape[0]} countries, {df_sk.shape[1]} columns")
+print(f"Loaded: {df_sk.shape[0]} rows, {df_sk.shape[1]} columns")
 
 # Step 2: Polarity adjustment — flip negative indicators
 for col in NEGATIVE_COLS:
@@ -510,26 +511,27 @@ pca_sk.fit(Z_sk)
 df_sk["pc1"] = pca_sk.transform(Z_sk)[:, 0]
 
 # Step 6: Normalization — Min-Max scaling to 0-1
-df_sk["health_index"] = (
+df_sk["pc1_index"] = (
     (df_sk["pc1"] - df_sk["pc1"].min())
     / (df_sk["pc1"].max() - df_sk["pc1"].min())
 )
 
 # Export results
-df_sk.to_csv("health_index_results.csv", index=False)
+df_sk.to_csv("pc1_index_results.csv", index=False)
 
 # Summary
+indicator_cols = POSITIVE_COLS + NEGATIVE_COLS
 print(f"\nPC1 weights: {pca_sk.components_[0].round(4)}")
 print(f"Variance explained: {pca_sk.explained_variance_ratio_.round(4)}")
-print(f"\nTop 5 countries:")
-print(df_sk.nlargest(5, "health_index")[
-    ["country", "life_exp", "infant_mort", "health_index"]
+print(f"\nTop 5:")
+print(df_sk.nlargest(5, "pc1_index")[
+    [ID_COL] + indicator_cols + ["pc1_index"]
 ].to_string(index=False))
-print(f"\nBottom 5 countries:")
-print(df_sk.nsmallest(5, "health_index")[
-    ["country", "life_exp", "infant_mort", "health_index"]
+print(f"\nBottom 5:")
+print(df_sk.nsmallest(5, "pc1_index")[
+    [ID_COL] + indicator_cols + ["pc1_index"]
 ].to_string(index=False))
-print(f"\nSaved: health_index_results.csv")
+print(f"\nSaved: pc1_index_results.csv")
 
 
 # ── Comparison: Manual vs scikit-learn ───────────────────────────────
