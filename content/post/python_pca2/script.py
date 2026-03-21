@@ -80,7 +80,8 @@ print("=" * 60)
 print("DATA LOADING AND RESHAPING")
 print("=" * 60)
 
-raw = pd.read_csv("data.csv")
+DATA_URL = "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca2/data.csv"
+raw = pd.read_csv(DATA_URL)
 print(f"\nRaw dataset: {raw.shape[0]} regions, {raw.shape[1]} columns")
 print(f"Countries: {raw['country'].nunique()} ({', '.join(sorted(raw['country'].unique()))})")
 
@@ -941,7 +942,8 @@ import mapclassify
 import contextily as cx
 
 # Load GeoJSON and merge pooled HDI
-gdf = gpd.read_file("data.geojson")
+GEO_URL = "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca2/data.geojson"
+gdf = gpd.read_file(GEO_URL)
 
 # Merge HDI for both periods
 hdi_2013 = df_pooled_p1[["GDLcode", "hdi"]].rename(columns={"hdi": "hdi_2013"})

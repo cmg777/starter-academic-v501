@@ -13,6 +13,10 @@ image:
   focal_point: Smart
   placement: 3
 links:
+- icon: google-colab
+  icon_pack: ai
+  name: "Google Colab"
+  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_pca2/notebook.ipynb
 - icon: code
   icon_pack: fas
   name: "Python script"
@@ -143,7 +147,8 @@ plt.rcParams.update({
 The dataset is a subsample from the [Subnational Human Development Database](https://globaldatalab.org/shdi/) constructed by [Smits and Permanyer (2019)](https://doi.org/10.1038/sdata.2019.38), which provides sub-national development indicators for countries worldwide. We use the South American subset with three HDI component indices for 2013 and 2019. The original data is in wide format (one row per region, with year-specific columns), so we reshape it into a long panel format suitable for pooled PCA.
 
 ```python
-raw = pd.read_csv("data.csv")
+DATA_URL = "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca2/data.csv"
+raw = pd.read_csv(DATA_URL)
 print(f"Raw dataset: {raw.shape[0]} regions, {raw.shape[1]} columns")
 print(f"Countries: {raw['country'].nunique()}")
 
@@ -1004,7 +1009,8 @@ import mapclassify
 import contextily as cx
 
 # Load GeoJSON boundaries and merge pooled HDI using GDLcode
-gdf = gpd.read_file("data.geojson")
+GEO_URL = "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca2/data.geojson"
+gdf = gpd.read_file(GEO_URL)
 hdi_2013 = df_pooled_p1[["GDLcode", "hdi"]].rename(columns={"hdi": "hdi_2013"})
 hdi_2019 = df_pooled_p2[["GDLcode", "hdi"]].rename(columns={"hdi": "hdi_2019"})
 gdf = gdf.merge(hdi_2013, on="GDLcode")
