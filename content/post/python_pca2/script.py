@@ -18,8 +18,6 @@ References:
       around the World. Oxford Economic Papers.
 """
 
-import shutil
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -1265,11 +1263,6 @@ print(f"| Pooled Eigen-decomposition | Cov matrix | eigenvalues, eigenvectors | 
 print(f"| Scoring | Z * eigvec | PC1 scores | 2019 mean > 2013 mean |")
 print(f"| Pooled Normalization | PC1 | HDI (0-1) | Comparable across periods |")
 
-
-# ── Featured image ───────────────────────────────────────────────────
-
-shutil.copy("pca2_pooled_hdi_bars.png", "featured.png")
-print("\nSaved: featured.png")
 
 print("\n" + "=" * 60)
 print("DONE -- all figures generated successfully")
