@@ -192,7 +192,7 @@ df["region_country"] = df.apply(
     lambda r: make_label(r["region"], r["country"]), axis=1
 )
 
-df.to_csv("hdi_panel_data.csv", index=False)
+df.to_csv("data_long.csv", index=False)
 INDICATORS = ["education", "health", "income"]
 
 print(f"\nPanel dataset: {df.shape[0]} rows (= {raw.shape[0]} regions x 2 periods)")
@@ -328,9 +328,6 @@ c1_edu, c1_inc = p1["education"].mean(), p1["income"].mean()
 c2_edu, c2_inc = p2["education"].mean(), p2["income"].mean()
 ax.annotate("", xy=(c2_edu, c2_inc), xytext=(c1_edu, c1_inc),
             arrowprops=dict(arrowstyle="-|>", color=TEAL, lw=2.5))
-ax.text(c2_edu + 0.01, c2_inc + 0.01, "Education up,\nIncome down",
-        color=TEAL, fontsize=10, fontweight="bold")
-
 ax.set_xlabel("Education Index")
 ax.set_ylabel("Income Index")
 ax.set_title("Education vs. Income by period (153 South American regions)")
@@ -946,15 +943,20 @@ The change validation is even more compelling than the level validation. **Poole
 The pooled PCA pipeline with scikit-learn is nearly identical to the [single-period pipeline from the previous tutorial](/post/python_pca/#12-replicating-the-analysis-with-scikit-learn). The key insight is that sklearn's `fit_transform` on the stacked data IS pooled PCA --- no special panel-data library is needed.
 
 ```python
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
 # ── Configuration (change these for your own dataset) ────────────
-CSV_FILE = "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca2/hdi_panel_data.csv"
-ID_COL = "region_country"
+CSV_URL = "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca2/data_long.csv"
+ID_COL = "region"
 PERIOD_COL = "period"
 POSITIVE_COLS = ["education", "health", "income"]
 NEGATIVE_COLS = []
 
-# Step 0: Load panel data
-df_sk = pd.read_csv(CSV_FILE)
+# Step 0: Load long-format panel data
+df_sk = pd.read_csv(CSV_URL)
 print(f"Loaded: {df_sk.shape[0]} rows, {df_sk.shape[1]} columns")
 
 # Step 1: Polarity adjustment
@@ -978,7 +980,6 @@ df_sk["pc1_index"] = (
 
 df_sk.to_csv("pc1_index_results.csv", index=False)
 
-indicator_cols = POSITIVE_COLS + NEGATIVE_COLS
 print(f"\nPC1 weights: {pca_sk.components_[0].round(4)}")
 print(f"Variance explained: {pca_sk.explained_variance_ratio_.round(4)}")
 print(f"\nSaved: pc1_index_results.csv")

@@ -121,7 +121,7 @@ df["region_country"] = df.apply(
     lambda r: make_label(r["region"], r["country"]), axis=1
 )
 
-df.to_csv("hdi_panel_data.csv", index=False)
+df.to_csv("data_long.csv", index=False)
 
 print(f"\nPanel dataset: {df.shape[0]} rows (= {raw.shape[0]} regions x 2 periods)")
 print(f"\nFirst 6 rows:")
@@ -222,9 +222,6 @@ c1_edu, c1_inc = p1["education"].mean(), p1["income"].mean()
 c2_edu, c2_inc = p2["education"].mean(), p2["income"].mean()
 ax.annotate("", xy=(c2_edu, c2_inc), xytext=(c1_edu, c1_inc),
             arrowprops=dict(arrowstyle="-|>", color=TEAL, lw=2.5))
-ax.text(c2_edu + 0.01, c2_inc + 0.01, "Education up,\nIncome down",
-        color=TEAL, fontsize=10, fontweight="bold")
-
 ax.set_xlabel("Education Index", fontsize=13)
 ax.set_ylabel("Income Index", fontsize=13)
 ax.set_title("Education vs. Income by period (153 South American regions)",
@@ -869,13 +866,13 @@ print("\n" + "=" * 60)
 print("SKLEARN PIPELINE: Pooled PCA for panel data")
 print("=" * 60)
 
-CSV_FILE = "hdi_panel_data.csv"
-ID_COL = "region_country"
+CSV_URL = "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca2/data_long.csv"
+ID_COL = "region"
 PERIOD_COL = "period"
 POSITIVE_COLS = ["education", "health", "income"]
 NEGATIVE_COLS = []
 
-df_sk = pd.read_csv(CSV_FILE)
+df_sk = pd.read_csv(CSV_URL)
 print(f"Loaded: {df_sk.shape[0]} rows, {df_sk.shape[1]} columns")
 
 for col in NEGATIVE_COLS:
@@ -895,13 +892,9 @@ df_sk["pc1_index"] = (
 
 df_sk.to_csv("pc1_index_results.csv", index=False)
 
-indicator_cols = POSITIVE_COLS + NEGATIVE_COLS
 print(f"\nPC1 weights: {pca_sk.components_[0].round(4)}")
 print(f"Variance explained: {pca_sk.explained_variance_ratio_.round(4)}")
-print(f"\nTop 5:")
-print(df_sk.nlargest(5, "pc1_index")[
-    [ID_COL, PERIOD_COL] + indicator_cols + ["pc1_index"]
-].to_string(index=False))
+print(f"\nSaved: pc1_index_results.csv")
 print(f"\nBottom 5:")
 print(df_sk.nsmallest(5, "pc1_index")[
     [ID_COL, PERIOD_COL] + indicator_cols + ["pc1_index"]
