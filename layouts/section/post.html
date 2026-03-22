@@ -96,11 +96,12 @@
               {{ $image := .Resources.GetMatch "featured*" }}
               {{ if $image }}
               <div class="mr-3">
-                <a href="{{ .RelPermalink }}">
-                  {{ $thumb := $image.Fill "150x150" }}
-                  <img src="{{ $thumb.RelPermalink }}" alt="{{ .Title }}" loading="lazy"
-                       width="{{ $thumb.Width }}" height="{{ $thumb.Height }}">
-                </a>
+                {{ $thumb := $image.Fill "700x460 Center" }}
+                {{ $full := $image.Fit "1920x1920" }}
+                <img src="{{ $thumb.RelPermalink }}" data-full="{{ $full.RelPermalink }}"
+                     alt="{{ .Title }}" loading="lazy"
+                     class="post-listing-thumb"
+                     style="cursor:zoom-in; width:700px; border-radius:6px;">
               </div>
               {{ end }}
               <div class="media-body">
@@ -135,4 +136,118 @@
     </div>
   </div>
 </div>
+
+{{/* Lightbox for post listing thumbnails */}}
+<script>
+(function() {
+  if (window.__postListingLightboxInit) return;
+  window.__postListingLightboxInit = true;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var imgs = document.querySelectorAll('.post-listing-thumb');
+    if (!imgs.length) return;
+
+    var overlay = document.createElement('div');
+    overlay.className = 'image-lightbox-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-label', 'Enlarged image viewer');
+    overlay.setAttribute('aria-modal', 'true');
+
+    var closeBtn = document.createElement('button');
+    closeBtn.className = 'image-lightbox-close';
+    closeBtn.setAttribute('aria-label', 'Close image viewer');
+    closeBtn.type = 'button';
+
+    var prevBtn = document.createElement('button');
+    prevBtn.className = 'image-lightbox-nav image-lightbox-prev';
+    prevBtn.setAttribute('aria-label', 'Previous image');
+    prevBtn.type = 'button';
+
+    var nextBtn = document.createElement('button');
+    nextBtn.className = 'image-lightbox-nav image-lightbox-next';
+    nextBtn.setAttribute('aria-label', 'Next image');
+    nextBtn.type = 'button';
+
+    var lightboxImg = document.createElement('img');
+    lightboxImg.alt = '';
+
+    var caption = document.createElement('div');
+    caption.className = 'image-lightbox-caption';
+
+    overlay.appendChild(closeBtn);
+    overlay.appendChild(prevBtn);
+    overlay.appendChild(nextBtn);
+    overlay.appendChild(lightboxImg);
+    overlay.appendChild(caption);
+    document.body.appendChild(overlay);
+
+    var lightboxImages = [];
+    var currentIndex = -1;
+
+    for (var i = 0; i < imgs.length; i++) {
+      (function(img, idx) {
+        lightboxImages.push({ src: img.dataset.full || img.src, alt: img.alt });
+        img.addEventListener('click', function(e) {
+          e.preventDefault();
+          currentIndex = idx;
+          openLightbox(lightboxImages[idx].src, lightboxImages[idx].alt);
+        });
+      })(imgs[i], i);
+    }
+
+    function updateNavButtons() {
+      prevBtn.disabled = (currentIndex <= 0);
+      nextBtn.disabled = (currentIndex >= lightboxImages.length - 1);
+      prevBtn.style.display = lightboxImages.length <= 1 ? 'none' : '';
+      nextBtn.style.display = lightboxImages.length <= 1 ? 'none' : '';
+    }
+
+    function navigateTo(index) {
+      if (index < 0 || index >= lightboxImages.length) return;
+      currentIndex = index;
+      lightboxImg.src = lightboxImages[currentIndex].src;
+      lightboxImg.alt = lightboxImages[currentIndex].alt || '';
+      caption.textContent = lightboxImages[currentIndex].alt || '';
+      caption.style.display = lightboxImages[currentIndex].alt ? 'block' : 'none';
+      updateNavButtons();
+    }
+
+    function openLightbox(src, altText) {
+      lightboxImg.src = src;
+      lightboxImg.alt = altText || '';
+      caption.textContent = altText || '';
+      caption.style.display = altText ? 'block' : 'none';
+      overlay.classList.remove('closing');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      updateNavButtons();
+      closeBtn.focus();
+    }
+
+    function closeLightbox() {
+      if (!overlay.classList.contains('active')) return;
+      overlay.classList.add('closing');
+      overlay.addEventListener('transitionend', function handler(e) {
+        if (e.propertyName !== 'opacity') return;
+        overlay.removeEventListener('transitionend', handler);
+        overlay.classList.remove('active', 'closing');
+        lightboxImg.src = '';
+        document.body.style.overflow = '';
+      });
+    }
+
+    prevBtn.addEventListener('click', function(e) { e.stopPropagation(); navigateTo(currentIndex - 1); });
+    nextBtn.addEventListener('click', function(e) { e.stopPropagation(); navigateTo(currentIndex + 1); });
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeLightbox(); });
+    closeBtn.addEventListener('click', function(e) { e.stopPropagation(); closeLightbox(); });
+    lightboxImg.addEventListener('click', function(e) { e.stopPropagation(); closeLightbox(); });
+    document.addEventListener('keydown', function(e) {
+      if (!overlay.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navigateTo(currentIndex - 1);
+      if (e.key === 'ArrowRight') navigateTo(currentIndex + 1);
+    });
+  });
+})();
+</script>
 {{ end }}
