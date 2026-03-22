@@ -276,6 +276,8 @@ The skill enforces the sandwich pattern (explanation, code, interpretation), use
 - Causal inference: `content/post/python_dowhy/index.md`
 - Dark theme figures / simulated data: `content/post/python_fwl/index.md`
 - Panel data / fixed effects: `content/post/python_pyfixest/index.md`
+- ESDA / spatial autocorrelation / LISA: `content/post/python_esda2/index.md`
+- MGWR / spatially varying coefficients: `content/post/python_mgwr/index.md`
 
 ### Review a Data Science Post (via Claude Code Skill)
 

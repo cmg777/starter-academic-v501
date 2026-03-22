@@ -57,7 +57,6 @@ and text. Reference post: `content/post/python_fwl/script.py`.
 | Output | Path |
 |--------|------|
 | Blog post | `content/post/python_<topic-slug>/index.md` |
-| Featured image | `content/post/python_<topic-slug>/featured.png` |
 | Python script (optional) | `content/post/python_<topic-slug>/script.py` |
 | Jupyter notebook (optional) | `content/post/python_<topic-slug>/notebook.ipynb` |
 | Figures (>= 3) | `content/post/python_<topic-slug>/<slug>_*.png` |
@@ -821,18 +820,11 @@ If the notebook is pushed to the GitHub repo, add a Colab link:
 
 ---
 
-## Step 4c: Create featured image
+## Step 4c: Featured image
 
-Save a `featured.png` in the page bundle. Hugo auto-detects this file as the
-post's thumbnail (no need to set `featured: true` in front matter). Options:
-
-- **Results chart** -- save the most informative figure (e.g., coefficient
-  comparison, model performance summary) as `featured.png`
-- **Visual summary** -- create an infographic using Excalidraw or matplotlib
-  that captures the key workflow and results in one image
-
-The featured image appears in post listings, social sharing previews, and the
-post header. Choose whichever best represents the post at a glance.
+Do **not** generate a `featured.png`. The user will manually add a featured
+image to the page bundle later. The script should not copy or create
+`featured.png`.
 
 ---
 
@@ -902,7 +894,7 @@ post header. Choose whichever best represents the post at a glance.
 - [ ] Matplotlib uses site colors (`#6a9bcc`, `#d97757`, `#141413`)
 - [ ] All LaTeX math uses Goldmark-safe escaping (`\_` for subscripts, `\\` for punctuation commands)
 - [ ] Math rendering visually verified in Hugo dev server
-- [ ] `featured.png` exists in the page bundle
+- [ ] `featured.png` is NOT generated (user adds it manually)
 - [ ] Summary table compares key metrics
 - [ ] Discussion connects findings to case study question
 - [ ] Limitations and next steps section
