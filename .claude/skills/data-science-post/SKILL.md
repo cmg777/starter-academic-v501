@@ -681,6 +681,31 @@ and errors.
   throughout. Do not alternate between "treatment variable",
   "intervention", and "policy" for the same concept without explanation.
 
+### 2.10 Academic integrity and originality
+
+Respecting copyrights and avoiding plagiarism is non-negotiable. Every
+sentence in the post must be original writing.
+
+- **Always paraphrase.** Never copy-paste text from references,
+  documentation, tutorials, or any external source. Read the source,
+  understand the idea, then rewrite it entirely in your own words while
+  preserving the original meaning. Even short phrases should be
+  rephrased — do not reproduce verbatim passages, even with attribution.
+- **Proper attribution.** When using ideas, methods, results, or data
+  from another source, cite it explicitly in the text (e.g., "Following
+  the approach introduced by Chernozhukov et al. (2018)...") and include
+  the full reference in the References section.
+- **Code attribution.** If code is adapted from documentation, tutorials,
+  or other sources, add a comment in the code crediting the original
+  source (e.g., `# Adapted from scikit-learn docs: <URL>`) and include
+  the source in the References section.
+- **Images and figures.** Only use self-generated figures produced by
+  `script.py`. Never include images from external sources without
+  explicit permission and proper attribution.
+- **When in doubt, cite.** If you are unsure whether an idea is common
+  knowledge or attributable to a specific source, err on the side of
+  citing.
+
 ---
 
 ## Step 3: Interpret results -- THIS IS THE MOST IMPORTANT STEP
@@ -942,3 +967,6 @@ image to the page bundle later. The script should not copy or create
 - [ ] Dark theme figures (if used): savefig includes `facecolor`, `edgecolor`, `pad_inches=0`
 - [ ] Dark theme figures (if used): scatter `edgecolors` match background color
 - [ ] Simulated DGP (if used): true parameters documented in docstring, verified against estimates
+- [ ] All text is original — no copy-pasted passages from references, docs, or tutorials
+- [ ] External ideas and methods properly attributed in-text and in References
+- [ ] Code adapted from external sources credited with comments and references
