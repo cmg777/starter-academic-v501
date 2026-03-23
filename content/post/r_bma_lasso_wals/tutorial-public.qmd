@@ -1,0 +1,2048 @@
+---
+title: "Three Methods for Robust Variable Selection: BMA, LASSO, and WALS"
+subtitle: "A Beginner's Guide with Synthetic CO~2~ Emissions Data"
+author: "Carlos Mendez"
+date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    number-sections: true
+    code-fold: true
+    code-summary: "Show code"
+    code-tools: true
+    embed-resources: true
+    smooth-scroll: true
+    fig-align: center
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| code-summary: "Setup: Install and load required packages"
+
+# List all packages needed for this tutorial
+required_packages <- c(
+  "tidyverse",   # data manipulation and ggplot2 visualization
+  "gt",          # publication-quality tables
+  "BMS",         # Bayesian Model Averaging via the bms() function
+  "glmnet",      # LASSO and Ridge regression via coordinate descent
+  "WALS",        # Weighted Average Least Squares estimation
+  "scales",      # nice axis formatting in plots
+  "patchwork",   # combine multiple ggplot panels
+  "ggrepel",     # non-overlapping text labels on plots
+  "corrplot"     # correlation matrix heatmaps
+)
+
+# Install any packages not yet available
+missing <- required_packages[!sapply(required_packages, requireNamespace, quietly = TRUE)]
+if (length(missing) > 0) {
+  install.packages(missing, repos = "https://cloud.r-project.org")
+}
+
+# Load libraries
+library(tidyverse)   # for dplyr, ggplot2, tidyr, etc.
+library(gt)          # for gt() tables
+library(BMS)         # for bms() Bayesian Model Averaging
+library(glmnet)      # for glmnet() and cv.glmnet()
+library(WALS)        # for wals() estimation
+library(scales)      # for label_comma(), label_percent()
+library(patchwork)   # for combining ggplot panels with +, /, |
+library(ggrepel)     # for geom_text_repel() in scatter plots
+library(corrplot)    # for corrplot() correlation heatmaps
+```
+
+
+# Introduction {#sec-intro}
+
+Imagine you are an economist advising a government on climate policy. Your team has collected cross-country data on a dozen potential drivers of CO~2~ emissions: GDP per capita, fossil fuel dependence, urbanization, industrial output, democratic governance, trade networks, agricultural activity, trade openness, foreign direct investment, corruption, tourism, and domestic credit. The government has a limited budget and wants to know: **which of these factors truly drive CO~2~ emissions, and which are red herrings?**
+
+This is the **variable selection** problem, and it is harder than it sounds. With 12 candidate variables, each either included or excluded from a regression, there are $2^{12} = 4{,}096$ possible models you could estimate. Run one model and report it as "the answer," and you have implicitly assumed the other 4,095 models are wrong. That is a very strong assumption---and almost certainly unjustified.
+
+In practice, researchers handle this by *specification searching*: they try many models, drop insignificant variables, and report whichever specification "works best." This process inflates false discoveries. A noise variable that happens to look significant in one specification gets reported, while the many failed specifications are hidden in the researcher's desk drawer. This is sometimes called the **file drawer problem** or **pretesting bias**.
+
+This tutorial introduces three principled approaches to the variable selection problem:
+
+1. **Bayesian Model Averaging (BMA)**: Average across all 4,096 models, weighting each by how well it fits the data. Variables that appear important across many models earn a high "inclusion probability."
+
+2. **LASSO (Least Absolute Shrinkage and Selection Operator)**: Add a penalty to the regression that forces the coefficients of irrelevant variables to be *exactly zero*, performing automatic selection.
+
+3. **Weighted Average Least Squares (WALS)**: A fast frequentist model-averaging method that transforms the problem so each variable can be evaluated independently.
+
+We use **synthetic data** throughout this tutorial. This means we *know the true data-generating process*---which variables truly matter and which do not. This "answer key" lets us verify whether each method correctly recovers the truth. By the end, you will understand not just *how* to run each method, but *why* it works and *when* to prefer one over the others.
+
+:::{.callout-tip}
+## What you will learn
+By the end of this tutorial, you will be able to: (1) explain the model uncertainty problem, (2) run BMA and interpret Posterior Inclusion Probabilities, (3) run LASSO and choose a regularization parameter via cross-validation, (4) run WALS and interpret its t-statistics, and (5) compare results across all three methods to identify truly robust determinants.
+:::
+
+
+# Creating the Synthetic Dataset {#sec-data}
+
+## The Data-Generating Process (Our "Answer Key")
+
+We create a cross-sectional dataset of 120 fictional countries. The key design choices:
+
+- **7 variables have true nonzero effects** on CO~2~ emissions
+- **5 variables are pure noise** (their true coefficients are exactly zero)
+- The noise variables are **correlated with GDP and other true predictors**, creating realistic multicollinearity. This makes variable selection genuinely challenging---naive OLS will find spurious "significant" results for noise variables.
+
+Think of this as setting up a controlled experiment. We know the answer before we begin, so we can grade each method's performance.
+
+```{r}
+#| label: create-data
+#| code-summary: "Create the synthetic dataset with known ground truth"
+
+set.seed(2021)          # reproducibility: always set the seed
+n <- 120                # number of "countries"
+
+# --- Generate correlated base variables ---
+# GDP drives many other variables (this is realistic: richer countries
+# tend to have higher urbanization, more industry, etc.)
+log_gdp <- rnorm(n, mean = 8.5, sd = 1.5)  # log GDP per capita
+
+# --- TRUE PREDICTORS (correlated with GDP) ---
+# Fossil fuel share: higher in richer countries on average
+fossil_fuel <- 30 + 3 * log_gdp + rnorm(n, 0, 10)
+fossil_fuel <- pmin(pmax(fossil_fuel, 5), 99)     # bound to 5-99%
+
+# Urbanization: increases with income
+urban_pop <- 20 + 5 * log_gdp + rnorm(n, 0, 12)
+urban_pop <- pmin(pmax(urban_pop, 10), 98)         # bound to 10-98%
+
+# Industry share of GDP
+industry <- 15 + 1.5 * log_gdp + rnorm(n, 0, 6)
+industry <- pmin(pmax(industry, 5), 60)            # bound to 5-60%
+
+# Democracy index
+democracy <- 5 + 2 * log_gdp + rnorm(n, 0, 8)
+democracy <- pmin(pmax(democracy, 0), 45)          # bound to 0-45
+
+# Trade network centrality (0 to ~1)
+trade_network <- 0.2 + 0.05 * log_gdp + rnorm(n, 0, 0.15)
+trade_network <- pmax(trade_network, 0)            # non-negative
+
+# Agriculture share of GDP (negatively correlated with GDP)
+agriculture <- 40 - 3 * log_gdp + rnorm(n, 0, 8)
+agriculture <- pmin(pmax(agriculture, 1), 60)      # bound to 1-60%
+
+# --- NOISE VARIABLES (correlated with GDP but NO true effect on CO2) ---
+log_trade <- 3.5 + 0.1 * log_gdp + rnorm(n, 0, 0.5)    # log trade openness
+fdi <- 2 + rnorm(n, 0, 4)                                 # FDI as % of GDP
+fdi <- pmax(fdi, -5)                                       # allow small negatives
+corruption <- 0.8 - 0.05 * log_gdp + rnorm(n, 0, 0.15)  # corruption index
+corruption <- pmin(pmax(corruption, 0.05), 0.95)          # bound to 0.05-0.95
+log_tourism <- 12 + 0.3 * log_gdp + rnorm(n, 0, 1.2)    # log tourism receipts
+log_credit <- 2.5 + 0.15 * log_gdp + rnorm(n, 0, 0.6)   # log domestic credit
+
+# --- TRUE DATA-GENERATING PROCESS ---
+log_co2 <- 2.0 +                     # intercept
+  1.2   * log_gdp +                   # GDP: strong positive (elasticity)
+  0.008 * industry +                  # Industry: positive (composition effect)
+  0.012 * fossil_fuel +               # Fossil fuel: positive (energy mix)
+  0.010 * urban_pop +                 # Urbanization: positive
+  0.004 * democracy +                 # Democracy: small positive
+  0.5   * trade_network +             # Trade network: moderate positive
+  0.005 * agriculture +               # Agriculture: weak positive
+  # NOISE VARIABLES HAVE ZERO TRUE EFFECT:
+  # log_trade = 0, fdi = 0, corruption = 0, log_tourism = 0, log_credit = 0
+  rnorm(n, 0, 0.3)                    # Random noise (sigma = 0.3)
+
+# --- Assemble the data frame ---
+synth_data <- tibble(
+  country     = paste0("Country_", sprintf("%03d", 1:n)),  # Country_001 ... Country_120
+  log_co2     = log_co2,           # dependent variable
+  log_gdp     = log_gdp,           # log GDP per capita
+  industry    = industry,           # industry share (%)
+  fossil_fuel = fossil_fuel,        # fossil fuel share (%)
+  urban_pop   = urban_pop,          # urban population (%)
+  democracy   = democracy,          # democracy index
+  trade_network = trade_network,    # trade network centrality
+  agriculture = agriculture,        # agriculture share (%)
+  log_trade   = log_trade,          # log trade openness (NOISE)
+  fdi         = fdi,                # FDI % of GDP (NOISE)
+  corruption  = corruption,         # corruption index (NOISE)
+  log_tourism = log_tourism,        # log tourism receipts (NOISE)
+  log_credit  = log_credit          # log domestic credit (NOISE)
+)
+
+# --- Save to CSV ---
+# Because set.seed(2021) is called before ALL random draws above,
+# this CSV will be IDENTICAL every time the notebook is rendered.
+write.csv(synth_data, "../Data/synthetic-co2-cross-section.csv", row.names = FALSE)
+
+# --- Verify reproducibility ---
+# Read the CSV back and confirm it matches the in-memory data
+verify <- read.csv("../Data/synthetic-co2-cross-section.csv")
+stopifnot(
+  nrow(verify) == 120,
+  ncol(verify) == 14,
+  all.equal(verify$log_co2, synth_data$log_co2, tolerance = 1e-10)
+)
+cat("Reproducibility verified: CSV matches in-memory data exactly.\n")
+```
+
+::: {.callout-note}
+## Reproducibility Guarantee
+The synthetic dataset is generated deterministically using `set.seed(2021)`. No matter how many times you render this notebook, the CSV file will contain the exact same 120 rows and 14 columns. You can also download the pre-generated CSV and skip the data creation step entirely.
+:::
+
+## Descriptive Statistics
+
+```{r}
+#| label: tbl-descriptive
+#| code-summary: "Descriptive statistics table"
+#| tbl-cap: "Descriptive statistics for the synthetic dataset"
+
+# Define variable labels and their true effect status
+var_info <- tibble(
+  variable = c("log_co2", "log_gdp", "industry", "fossil_fuel", "urban_pop",
+               "democracy", "trade_network", "agriculture",
+               "log_trade", "fdi", "corruption", "log_tourism", "log_credit"),
+  label = c("Log CO2 emissions (dependent)", "Log GDP per capita", "Industry share (%)",
+            "Fossil fuel share (%)", "Urban population (%)", "Democracy index",
+            "Trade network centrality", "Agriculture share (%)",
+            "Log trade openness", "FDI (% of GDP)", "Corruption index",
+            "Log tourism receipts", "Log domestic credit"),
+  true_beta = c(NA, 1.200, 0.008, 0.012, 0.010, 0.004, 0.500, 0.005,
+                0, 0, 0, 0, 0),
+  role = c("Dependent", rep("True predictor", 7), rep("Noise", 5))
+)
+
+# Compute summary statistics for each variable
+desc_stats <- synth_data |>
+  select(-country) |>                          # drop country names
+  pivot_longer(everything(),                   # reshape to long format
+               names_to = "variable",
+               values_to = "value") |>
+  group_by(variable) |>                        # group by variable
+  summarize(
+    mean   = mean(value),                      # sample mean
+    sd     = sd(value),                        # standard deviation
+    min    = min(value),                        # minimum
+    median = median(value),                     # median
+    max    = max(value),                        # maximum
+    .groups = "drop"
+  ) |>
+  left_join(var_info, by = "variable") |>      # merge with labels
+  arrange(match(variable, var_info$variable))  # preserve order
+
+# Create a publication-quality table with gt
+desc_stats |>
+  select(label, role, true_beta, mean, sd, min, median, max) |>
+  gt() |>
+  tab_header(
+    title = "Descriptive Statistics",
+    subtitle = "Synthetic cross-section of 120 countries"
+  ) |>
+  cols_label(
+    label     = "Variable",
+    role      = "Role",
+    true_beta = md("True *β*"),
+    mean      = "Mean",
+    sd        = "SD",
+    min       = "Min",
+    median    = "Median",
+    max       = "Max"
+  ) |>
+  fmt_number(columns = c(true_beta, mean, sd, min, median, max), decimals = 3) |>
+  sub_missing(missing_text = "---") |>
+  tab_style(                                   # bold the true predictors
+    style = cell_fill(color = "#e8f5e9"),
+    locations = cells_body(rows = role == "True predictor")
+  ) |>
+  tab_style(                                   # light red for noise variables
+    style = cell_fill(color = "#ffebee"),
+    locations = cells_body(rows = role == "Noise")
+  ) |>
+  tab_footnote("Green rows = true predictors; red rows = noise variables with zero true effect.") |>
+  tab_source_note("Data: synthetic dataset created with set.seed(2021).")
+```
+
+## Correlation Structure
+
+A key feature of our synthetic data is that the noise variables are correlated with the true predictors---especially with GDP. This correlation is what makes variable selection difficult: in a standard OLS regression, the noise variables will "borrow" explanatory power from the true predictors.
+
+```{r}
+#| label: fig-correlation
+#| code-summary: "Correlation matrix heatmap"
+#| fig-cap: "Correlation matrix of all 12 candidate regressors. Note that noise variables (last five rows/columns) are correlated with GDP and other true predictors."
+#| fig-width: 8
+#| fig-height: 7
+
+# Compute correlation matrix for all 12 candidate regressors
+cor_matrix <- synth_data |>
+  select(-country, -log_co2) |>                # exclude country names and DV
+  cor()                                         # Pearson correlations
+
+# Pretty variable names for the plot
+colnames(cor_matrix) <- c("GDP", "Industry", "Fossil fuel", "Urban pop",
+                          "Democracy", "Trade net.", "Agriculture",
+                          "Trade open.", "FDI", "Corruption", "Tourism", "Credit")
+rownames(cor_matrix) <- colnames(cor_matrix)
+
+# Draw the heatmap
+corrplot(cor_matrix,
+         method = "color",                      # filled squares
+         type = "lower",                        # lower triangle only
+         addCoef.col = "black",                 # add correlation numbers
+         number.cex = 0.7,                      # size of numbers
+         tl.col = "black",                      # label color
+         tl.cex = 0.8,                          # label size
+         col = colorRampPalette(c("#d7191c", "white", "#2c7bb6"))(200),
+         diag = FALSE,                          # hide the diagonal
+         title = "",                            # title handled by fig-cap
+         mar = c(0, 0, 0, 0))                  # margins
+```
+
+The correlation heatmap reveals the realistic structure we built into the data. GDP is positively correlated with fossil fuel use, urbanization, industry, and the trade network---but also with the noise variables like trade openness, tourism, and credit. This multicollinearity is precisely what makes a naive "throw everything into OLS" approach unreliable.
+
+:::{.callout-note}
+## What we learned
+We created a synthetic dataset where we *know* which 7 variables truly affect CO~2~ emissions and which 5 are noise. The noise variables are deliberately correlated with the true predictors, mimicking the multicollinearity found in real cross-country data.
+:::
+
+
+# The General Model {#sec-model}
+
+## The Regression Equation
+
+Our goal is to estimate the following linear model:
+
+$$
+\log(\text{CO}_{2,i}) = \beta_0 + \sum_{j=1}^{12} \beta_j x_{j,i} + \varepsilon_i
+$$ {#eq-model}
+
+where:
+
+- $\log(\text{CO}_{2,i})$ is the log of CO~2~ emissions for country $i$
+- $\beta_0$ is the **intercept** (the predicted log CO~2~ when all regressors are zero)
+- $\beta_j$ is the **coefficient** on the $j$-th regressor: the change in log CO~2~ associated with a one-unit increase in $x_j$, holding all other variables constant
+- $\varepsilon_i$ is the **error term**: everything that affects CO~2~ emissions but is not captured by the 12 regressors. We assume $\varepsilon_i \sim N(0, \sigma^2)$.
+
+## Interpreting the Coefficients
+
+Because the dependent variable is in logs, the interpretation of each coefficient depends on whether the regressor is also in logs:
+
+| Regressor type | Interpretation of $\beta_j$ | Example |
+|:--|:--|:--|
+| Log-log (e.g., log GDP) | **Elasticity**: a 1% increase in GDP is associated with a $\beta_j$% change in CO~2~ | $\beta = 1.2$ means 1% more GDP $\to$ 1.2% more CO~2~ |
+| Level-log (e.g., fossil fuel %) | **Semi-elasticity**: a 1-unit increase in the regressor is associated with a $100 \times \beta_j$% change in CO~2~ | $\beta = 0.012$ means 1 pp more fossil fuel $\to$ 1.2% more CO~2~ |
+
+## Our Goal
+
+We want to determine **which $\beta_j$ are truly nonzero**. We know the answer (we designed the data), but let us first see what happens if we just run OLS with all 12 variables.
+
+```{r}
+#| label: ols-all-12
+#| code-summary: "OLS regression with all 12 candidate variables"
+
+# Run OLS with all 12 candidate regressors
+ols_full <- lm(log_co2 ~ log_gdp + industry + fossil_fuel + urban_pop +
+                 democracy + trade_network + agriculture +
+                 log_trade + fdi + corruption + log_tourism + log_credit,
+               data = synth_data)
+
+# Extract tidy summary
+ols_summary <- broom::tidy(ols_full) |>
+  filter(term != "(Intercept)") |>            # remove intercept for display
+  mutate(
+    true_beta = c(1.200, 0.008, 0.012, 0.010, 0.004, 0.500, 0.005,
+                  0, 0, 0, 0, 0),             # known true coefficients
+    is_noise  = c(rep(FALSE, 7), rep(TRUE, 5)), # noise flag
+    significant = p.value < 0.05              # conventional significance
+  )
+
+# Display as a gt table
+ols_summary |>
+  select(term, estimate, std.error, statistic, p.value, true_beta, significant) |>
+  gt() |>
+  tab_header(
+    title = "OLS with All 12 Variables",
+    subtitle = "Some noise variables may appear significant due to multicollinearity"
+  ) |>
+  cols_label(
+    term       = "Variable",
+    estimate   = "OLS Estimate",
+    std.error  = "Std. Error",
+    statistic  = "t-statistic",
+    p.value    = "p-value",
+    true_beta  = md("True *β*"),
+    significant = "Sig. at 5%?"
+  ) |>
+  fmt_number(columns = c(estimate, std.error, statistic), decimals = 4) |>
+  fmt_number(columns = p.value, decimals = 4) |>
+  fmt_number(columns = true_beta, decimals = 3) |>
+  tab_style(
+    style = cell_fill(color = "#ffebee"),
+    locations = cells_body(rows = c(8:12))     # noise variables highlighted
+  ) |>
+  tab_footnote("Red rows are noise variables (true coefficient = 0).") |>
+  tab_source_note("OLS estimated on n = 120 synthetic observations.")
+```
+
+Look carefully at the noise variables (highlighted in red). Some may have p-values below 0.05---appearing "significant"---even though their true effect is exactly zero. This is **spurious significance**, caused by the correlation between noise variables and the true predictors. It is precisely this problem that motivates the three methods we study next.
+
+:::{.callout-warning}
+## The danger of naive OLS
+With 12 correlated regressors and only 120 observations, OLS can produce misleading significance levels. A variable with a true coefficient of zero may appear significant simply because it is correlated with a genuinely important predictor. This is why we need principled variable selection methods.
+:::
+
+
+# PART 1: Bayesian Model Averaging {.unnumbered}
+
+
+# Bayes' Rule --- The Foundation {#sec-bayes}
+
+Before we can understand Bayesian Model Averaging, we need to understand **Bayes' rule**---the mathematical machinery that powers the entire framework. Do not worry if you have never seen Bayesian statistics before; we will build from scratch.
+
+## A Coin-Flip Example
+
+Suppose a friend gives you a coin. You want to know: **is this coin fair** (probability of heads = 0.5), or is it **biased** (probability of heads = 0.7)?
+
+Before flipping, you have no strong opinion. You assign equal **prior probabilities**:
+
+- $P(\text{fair}) = 0.5$ (50% chance the coin is fair)
+- $P(\text{biased}) = 0.5$ (50% chance the coin is biased)
+
+Now you flip the coin 10 times and observe **7 heads**. How should you update your beliefs?
+
+The **likelihood** of seeing 7 heads in 10 flips is:
+
+- If the coin is fair ($p = 0.5$): $P(\text{7 heads} | \text{fair}) = \binom{10}{7} (0.5)^{10} = 0.1172$
+- If the coin is biased ($p = 0.7$): $P(\text{7 heads} | \text{biased}) = \binom{10}{7} (0.7)^7 (0.3)^3 = 0.2668$
+
+The biased coin makes the data more likely. Bayes' rule combines the prior and the likelihood:
+
+$$
+P(H|D) = \frac{P(D|H) \cdot P(H)}{P(D)}
+$$ {#eq-bayes}
+
+where:
+
+- $P(H|D)$ = **posterior probability** (what we believe *after* seeing the data)
+- $P(D|H)$ = **likelihood** (how probable the data is under hypothesis $H$)
+- $P(H)$ = **prior probability** (what we believed *before* seeing the data)
+- $P(D)$ = **marginal likelihood** (a normalizing constant that ensures probabilities sum to 1)
+
+For our coin:
+
+$$
+P(\text{fair}|\text{7H}) = \frac{0.1172 \times 0.5}{0.1172 \times 0.5 + 0.2668 \times 0.5} = \frac{0.0586}{0.1920} = 0.305
+$$
+
+$$
+P(\text{biased}|\text{7H}) = \frac{0.2668 \times 0.5}{0.1920} = 0.695
+$$
+
+After seeing 7 heads, we update from 50-50 to roughly 30-70 in favor of the biased coin. **The data shifted our beliefs, but did not erase the prior entirely.**
+
+## The Bridge to Model Averaging
+
+Now replace "fair coin" and "biased coin" with *regression models*:
+
+- Hypothesis = "Which variables belong in the model?"
+- Prior = "Before seeing data, any combination of variables is equally plausible"
+- Likelihood = "How well does each model fit the data?"
+- Posterior = "After seeing data, which models are most credible?"
+
+This is exactly what BMA does. Instead of two coin hypotheses, we have 4,096 model hypotheses---but the logic of Bayes' rule is identical.
+
+:::{.callout-note}
+## What we learned
+Bayes' rule updates prior beliefs using data. The posterior probability of any hypothesis is proportional to its prior probability times its likelihood. BMA applies this same logic to regression models instead of coin flips.
+:::
+
+
+# The BMA Framework {#sec-bma-framework}
+
+## Posterior Model Probability
+
+With 12 candidate variables, there are $K = 12$ regressors and $2^K = 4{,}096$ possible models. Denote the $k$-th model as $M_k$. BMA assigns each model a **posterior probability**:
+
+$$
+P(M_k | y) = \frac{P(y | M_k) \cdot P(M_k)}{\sum_{l=1}^{2^K} P(y | M_l) \cdot P(M_l)}
+$$ {#eq-posterior}
+
+This is just Bayes' rule applied to models. Let us unpack each piece:
+
+- **$P(y | M_k)$** is the **marginal likelihood** of model $M_k$. It measures how well the model fits the data, *automatically penalizing complexity*. A model with many parameters can fit the data closely, but the marginal likelihood integrates over all possible parameter values, spreading the probability thin. This acts as a built-in **Occam's razor**: simpler models that fit the data well receive higher marginal likelihoods than complex models that fit only slightly better.
+
+- **$P(M_k)$** is the **prior model probability**. With no prior information, we use a **uniform prior**: every model is equally likely, so $P(M_k) = 1/4{,}096$ for all $k$. This means the posterior is driven entirely by the data.
+
+- The **denominator** is a normalizing constant that ensures all posterior model probabilities sum to 1.
+
+## Posterior Inclusion Probability (PIP)
+
+We do not really care about individual models---we care about individual *variables*. The **Posterior Inclusion Probability** of variable $j$ is the sum of the posterior probabilities of all models that include variable $j$:
+
+$$
+\text{PIP}_j = \sum_{k:\, j \in M_k} P(M_k | y)
+$$ {#eq-pip}
+
+Think of it as a **democratic vote**. Each of the 4,096 models casts a vote for which variables matter. But the votes are *weighted*: models that fit the data well get louder voices. If variable $j$ appears in most of the high-probability models, it earns a high PIP.
+
+The standard interpretation thresholds (Raftery, 1995):
+
+| PIP range | Interpretation | Analogy |
+|:--|:--|:--|
+| $\geq 0.99$ | Decisive evidence | Beyond reasonable doubt |
+| $0.95 - 0.99$ | Very strong evidence | Strong consensus |
+| $0.80 - 0.95$ | Strong evidence (robust) | Clear majority |
+| $0.50 - 0.80$ | Borderline evidence | Split vote |
+| $< 0.50$ | Weak/no evidence (fragile) | Minority opinion |
+
+We will use **PIP $\geq$ 0.80** as our threshold for "robust" throughout this tutorial.
+
+## Posterior Mean
+
+Once we know which variables matter, we want to know *how much* they matter. The **posterior mean** of coefficient $j$ is:
+
+$$
+E[\beta_j | y] = \sum_{k=1}^{2^K} \hat{\beta}_{j,k} \cdot P(M_k | y)
+$$ {#eq-postmean}
+
+where $\hat{\beta}_{j,k}$ is the estimated coefficient of variable $j$ in model $k$ (and zero if $j$ is not in model $k$). This is a weighted average of the coefficient across all models. Variables with high PIPs get posterior means close to their "full model" estimates; variables with low PIPs get posterior means shrunk toward zero.
+
+:::{.callout-note}
+## What we learned
+BMA assigns posterior probabilities to all $2^K$ models using Bayes' rule. The Posterior Inclusion Probability (PIP) aggregates these model probabilities into a single measure of variable importance. PIP $\geq$ 0.80 indicates a robust determinant.
+:::
+
+
+# Toy Example --- BMA on 4 Variables {#sec-bma-toy}
+
+Before running BMA on all 12 variables, let us work through a small example by hand. We pick 4 variables from our dataset: **log_gdp** and **fossil_fuel** (true predictors) and **fdi** and **corruption** (noise). With 4 variables, there are $2^4 = 16$ possible models.
+
+```{r}
+#| label: bma-toy-enumerate
+#| code-summary: "Enumerate all 16 models with 4 variables and compute BIC-based posterior probabilities"
+
+# Select the 4 variables for the toy example
+toy_data <- synth_data |>
+  select(log_co2, log_gdp, fossil_fuel, fdi, corruption)
+
+# Define the 4 variable names
+toy_vars <- c("log_gdp", "fossil_fuel", "fdi", "corruption")
+
+# Enumerate all 2^4 = 16 possible subsets
+# Each model is a binary vector of length 4 (include/exclude each variable)
+all_models <- expand.grid(
+  log_gdp     = c(0, 1),                      # 0 = exclude, 1 = include
+  fossil_fuel = c(0, 1),
+  fdi         = c(0, 1),
+  corruption  = c(0, 1)
+)
+
+# Fit each model and compute BIC
+model_results <- all_models |>
+  mutate(model_id = row_number()) |>           # label each model
+  rowwise() |>
+  mutate(
+    # Build the formula from included variables
+    included_vars = list(toy_vars[c(log_gdp, fossil_fuel, fdi, corruption) == 1]),
+    n_vars = length(included_vars),
+    formula_str = if (n_vars == 0) {
+      "log_co2 ~ 1"                            # intercept-only model
+    } else {
+      paste("log_co2 ~", paste(included_vars, collapse = " + "))
+    },
+    # Fit OLS and extract BIC
+    fit = list(lm(as.formula(formula_str), data = toy_data)),
+    bic = BIC(fit),
+    r_squared = summary(fit)$r.squared
+  ) |>
+  ungroup()
+
+# Convert BIC to approximate posterior probabilities
+# P(M_k|y) ∝ exp(-0.5 * BIC_k) under uniform priors
+model_results <- model_results |>
+  mutate(
+    log_weight = -0.5 * (bic - min(bic)),      # subtract min BIC for numerical stability
+    weight     = exp(log_weight),               # convert to raw weights
+    post_prob  = weight / sum(weight)           # normalize to probabilities
+  )
+
+# Display the top 8 models by posterior probability
+model_results |>
+  arrange(desc(post_prob)) |>
+  head(8) |>
+  select(model_id, log_gdp, fossil_fuel, fdi, corruption, bic, post_prob) |>
+  gt() |>
+  tab_header(
+    title = "Top 8 Models (of 16) by Posterior Probability",
+    subtitle = "BIC-based approximation with uniform model prior"
+  ) |>
+  cols_label(
+    model_id    = "Model",
+    log_gdp     = "GDP?",
+    fossil_fuel = "Fossil?",
+    fdi         = "FDI?",
+    corruption  = "Corrupt?",
+    bic         = "BIC",
+    post_prob   = "P(M|y)"
+  ) |>
+  fmt_number(columns = bic, decimals = 1) |>
+  fmt_number(columns = post_prob, decimals = 4) |>
+  tab_footnote("1 = included, 0 = excluded. Posterior probabilities from BIC approximation.")
+```
+
+Now let us compute the PIPs by summing the posterior probabilities of all models that include each variable:
+
+```{r}
+#| label: fig-bma-toy-pip
+#| code-summary: "Compute and plot PIPs for the 4-variable toy example"
+#| fig-cap: "Posterior Inclusion Probabilities for the toy BMA example. GDP and fossil fuel (true predictors) have high PIPs; FDI and corruption (noise) have low PIPs."
+#| fig-width: 7
+#| fig-height: 4
+
+# Compute PIPs by hand: sum P(M_k|y) for all models containing each variable
+pip_toy <- tibble(
+  variable = toy_vars,
+  pip = c(
+    sum(model_results$post_prob[model_results$log_gdp == 1]),      # PIP for GDP
+    sum(model_results$post_prob[model_results$fossil_fuel == 1]),   # PIP for fossil_fuel
+    sum(model_results$post_prob[model_results$fdi == 1]),           # PIP for fdi
+    sum(model_results$post_prob[model_results$corruption == 1])     # PIP for corruption
+  ),
+  true_effect = c("True (beta=1.2)", "True (beta=0.012)", "Noise (beta=0)", "Noise (beta=0)")
+)
+
+# Bar chart of PIPs
+ggplot(pip_toy, aes(x = reorder(variable, pip), y = pip, fill = true_effect)) +
+  geom_col(width = 0.6) +                     # horizontal bars
+  geom_hline(yintercept = 0.80,               # robust threshold
+             linetype = "dashed", color = "black", linewidth = 0.5) +
+  annotate("text", x = 0.5, y = 0.82, label = "Robust threshold (0.80)",
+           hjust = 0, size = 3.5) +
+  coord_flip() +                               # flip to horizontal
+  scale_fill_manual(values = c("True (beta=1.2)" = "#2c7bb6",
+                                "True (beta=0.012)" = "#2c7bb6",
+                                "Noise (beta=0)" = "#d7191c")) +
+  scale_y_continuous(limits = c(0, 1), labels = label_number(accuracy = 0.01)) +
+  labs(x = NULL, y = "Posterior Inclusion Probability (PIP)",
+       fill = "True status",
+       title = "Toy BMA: PIPs for 4 Variables") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+Even with this simple 4-variable example, BMA correctly identifies the true predictors. GDP has a very high PIP (close to 1), fossil fuel also has a high PIP, while FDI and corruption (noise) have low PIPs. The BIC-based Occam's razor penalizes models that include noise variables without substantially improving fit.
+
+:::{.callout-note}
+## What we learned
+By enumerating all 16 models with 4 variables, we computed PIPs by hand. BMA correctly assigned high PIPs to the true predictors and low PIPs to the noise variables. In practice, with 12+ variables, we use MCMC sampling instead of full enumeration.
+:::
+
+
+# BMA on All 12 Variables {#sec-bma-full}
+
+Now we apply BMA to the full dataset with all 12 candidate regressors using the `BMS` package.
+
+## Running BMA
+
+```{r}
+#| label: bma-full
+#| code-summary: "Run BMA with the BMS package on all 12 variables"
+
+set.seed(2021)  # reproducibility for MCMC sampling
+
+# Prepare the data matrix: DV in first column, regressors follow
+bma_data <- synth_data |>
+  select(log_co2, log_gdp, industry, fossil_fuel, urban_pop,
+         democracy, trade_network, agriculture,
+         log_trade, fdi, corruption, log_tourism, log_credit) |>
+  as.data.frame()                              # BMS requires a data.frame
+
+# Run BMA with:
+# - burn = 50000: discard first 50,000 MCMC draws (burn-in period)
+# - iter = 200000: keep 200,000 draws for inference
+# - g = "BRIC": benchmark risk inflation criterion g-prior
+# - mprior = "uniform": every model equally likely a priori
+bma_fit <- bms(
+  X.data     = bma_data,                       # data with DV in column 1
+  burn       = 50000,                          # burn-in iterations
+  iter       = 200000,                         # post-burn-in iterations
+  g          = "BRIC",                         # BRIC g-prior (robust default)
+  mprior     = "uniform",                      # uniform model prior
+  nmodel     = 2000,                           # store top 2000 models
+  mcmc       = "bd",                           # birth-death MCMC sampler
+  user.int   = FALSE                           # suppress interactive output
+)
+```
+
+## Figure 1: PIP Bar Chart
+
+```{r}
+#| label: fig-bma-pip
+#| code-summary: "PIP bar chart from BMA results"
+#| fig-cap: "Posterior Inclusion Probabilities from BMA. Green bars indicate robust variables (PIP >= 0.80); red bars indicate fragile variables (PIP < 0.50)."
+#| fig-width: 8
+#| fig-height: 5
+
+# Define a lookup table for the known true coefficients
+true_beta_lookup <- c(
+  log_gdp = 1.200, industry = 0.008, fossil_fuel = 0.012,
+  urban_pop = 0.010, democracy = 0.004, trade_network = 0.500,
+  agriculture = 0.005, log_trade = 0, fdi = 0, corruption = 0,
+  log_tourism = 0, log_credit = 0
+)
+
+# Extract PIPs and posterior means from BMA
+bma_coefs <- coef(bma_fit)                     # matrix with PIP, post mean, post SD, etc.
+bma_df <- as.data.frame(bma_coefs) |>
+  rownames_to_column("variable") |>
+  as_tibble() |>
+  rename(pip = PIP, post_mean = `Post Mean`, post_sd = `Post SD`) |>
+  select(variable, pip, post_mean, post_sd) |> # keep only the columns we need
+  mutate(
+    true_beta = true_beta_lookup[variable],    # match true betas by variable name
+    robustness = case_when(
+      pip >= 0.80 ~ "Robust (PIP >= 0.80)",
+      pip >= 0.50 ~ "Borderline",
+      TRUE        ~ "Fragile (PIP < 0.50)"
+    )
+  )
+
+# PIP bar chart
+ggplot(bma_df, aes(x = reorder(variable, pip), y = pip, fill = robustness)) +
+  geom_col(width = 0.65) +                    # draw bars
+  geom_hline(yintercept = 0.80,               # robust threshold line
+             linetype = "dashed", color = "gray30", linewidth = 0.5) +
+  geom_hline(yintercept = 0.50,               # borderline threshold
+             linetype = "dotted", color = "gray50", linewidth = 0.5) +
+  annotate("text", x = 0.7, y = 0.82, label = "Robust (0.80)", hjust = 0, size = 3) +
+  annotate("text", x = 0.7, y = 0.52, label = "Borderline (0.50)", hjust = 0, size = 3) +
+  coord_flip() +                               # horizontal bars
+  scale_fill_manual(values = c("Robust (PIP >= 0.80)" = "#2c7bb6",
+                                "Borderline" = "#fdae61",
+                                "Fragile (PIP < 0.50)" = "#d7191c")) +
+  scale_y_continuous(limits = c(0, 1), labels = label_number(accuracy = 0.01)) +
+  labs(x = NULL, y = "Posterior Inclusion Probability (PIP)",
+       fill = "Classification",
+       title = "BMA: Posterior Inclusion Probabilities",
+       subtitle = "Based on 200,000 MCMC draws after 50,000 burn-in") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+## Figure 2: Posterior Coefficient Plot
+
+```{r}
+#| label: fig-bma-coefs
+#| code-summary: "Posterior coefficient estimates with credible intervals"
+#| fig-cap: "BMA posterior mean coefficients with approximate 95% credible intervals. Variables ordered by PIP."
+#| fig-width: 8
+#| fig-height: 5
+
+# Compute approximate 95% credible intervals (posterior mean +/- 2 * posterior SD)
+bma_df <- bma_df |>
+  mutate(
+    ci_low  = post_mean - 2 * post_sd,        # lower bound of ~95% interval
+    ci_high = post_mean + 2 * post_sd          # upper bound of ~95% interval
+  )
+
+# Coefficient plot with credible intervals
+ggplot(bma_df, aes(x = reorder(variable, pip), y = post_mean, color = robustness)) +
+  geom_pointrange(aes(ymin = ci_low, ymax = ci_high), size = 0.5) +
+  geom_hline(yintercept = 0, linetype = "solid", color = "gray50") +
+  coord_flip() +
+  scale_color_manual(values = c("Robust (PIP >= 0.80)" = "#2c7bb6",
+                                 "Borderline" = "#fdae61",
+                                 "Fragile (PIP < 0.50)" = "#d7191c")) +
+  labs(x = NULL, y = "Posterior Mean Coefficient",
+       color = "Classification",
+       title = "BMA: Posterior Coefficient Estimates",
+       subtitle = "Error bars show approximate 95% credible intervals") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+## Figure 3: Model Inclusion Matrix
+
+```{r}
+#| label: fig-bma-inclusion
+#| code-summary: "Model inclusion matrix showing top 50 models"
+#| fig-cap: "Model inclusion matrix: each column is a model (sorted by posterior probability), each row is a variable. Blue = included, white = excluded. The most probable models consistently include the true predictors."
+#| fig-width: 10
+#| fig-height: 5
+
+# Extract the top 50 best models and their variable inclusion patterns
+top_models <- topmodels.bma(bma_fit)[, 1:min(50, ncol(topmodels.bma(bma_fit)))]
+
+# Convert to a long data frame for ggplot
+inclusion_df <- as.data.frame(top_models != 0) |>  # TRUE = included
+
+  rownames_to_column("variable") |>
+  pivot_longer(-variable, names_to = "model", values_to = "included") |>
+  mutate(
+    model_num = as.integer(gsub(".*\\.", "", model)),
+    included  = as.numeric(included)
+  )
+
+# Order variables by PIP (highest at top)
+var_order <- bma_df |> arrange(pip) |> pull(variable)
+inclusion_df$variable <- factor(inclusion_df$variable, levels = var_order)
+
+# Create heatmap
+ggplot(inclusion_df, aes(x = factor(model_num), y = variable, fill = factor(included))) +
+  geom_tile(color = "white", linewidth = 0.2) +
+  scale_fill_manual(values = c("0" = "gray95", "1" = "#2c7bb6"),
+                    labels = c("Excluded", "Included")) +
+  labs(x = "Model rank (left = highest posterior probability)",
+       y = NULL, fill = NULL,
+       title = "Model Inclusion Matrix (Top 50 Models)") +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x = element_blank(),         # too many model labels
+        axis.ticks.x = element_blank(),
+        legend.position = "bottom",
+        panel.grid = element_blank())
+```
+
+## Interpreting the BMA Results
+
+```{r}
+#| label: tbl-bma-results
+#| code-summary: "Summary table of BMA results vs. known truth"
+
+# Create a summary table comparing BMA results with the true DGP
+bma_summary <- bma_df |>
+  arrange(desc(pip)) |>
+  mutate(
+    bma_robust = pip >= 0.80,                  # BMA says robust?
+    true_nonzero = true_beta != 0,             # truly nonzero?
+    correct = bma_robust == true_nonzero       # correct classification?
+  ) |>
+  select(variable, true_beta, pip, post_mean, bma_robust, true_nonzero, correct)
+
+bma_summary |>
+  gt() |>
+  tab_header(
+    title = "BMA Results vs. Known Truth",
+    subtitle = "Did BMA correctly identify the true predictors?"
+  ) |>
+  cols_label(
+    variable     = "Variable",
+    true_beta    = md("True *β*"),
+    pip          = "PIP",
+    post_mean    = "Post. Mean",
+    bma_robust   = "BMA Robust?",
+    true_nonzero = "Truly Nonzero?",
+    correct      = "Correct?"
+  ) |>
+  fmt_number(columns = c(true_beta, pip, post_mean), decimals = 4) |>
+  tab_style(
+    style = cell_fill(color = "#e8f5e9"),
+    locations = cells_body(rows = correct == TRUE)
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#ffebee"),
+    locations = cells_body(rows = correct == FALSE)
+  ) |>
+  tab_footnote("Green = correct classification; red = misclassification. Robust threshold: PIP >= 0.80.")
+```
+
+The most important BMA result is the PIP of `log_gdp`. Because we set its true coefficient to 1.2 (a strong effect), GDP should dominate the posterior. The posterior mean should be close to 1.2. The noise variables---`log_trade`, `fdi`, `corruption`, `log_tourism`, and `log_credit`---should have PIPs well below 0.50.
+
+Variables with smaller true effects (like `democracy` with $\beta = 0.004$ and `agriculture` with $\beta = 0.005$) are harder for any method to detect, so do not be surprised if their PIPs fall in the borderline range.
+
+:::{.callout-note}
+## What we learned
+BMA on all 12 variables correctly gives high PIPs to the strong true predictors (GDP, fossil fuel, trade network) and low PIPs to the noise variables. Variables with very small true effects may be harder to detect. The model inclusion matrix shows that the top models consistently include the core predictors.
+:::
+
+
+# PART 2: LASSO {.unnumbered}
+
+
+# Regularization --- Adding a Penalty {#sec-regularization}
+
+## The Bias-Variance Tradeoff
+
+OLS is an **unbiased** estimator---on average, it gets the coefficients right. But with many correlated regressors, OLS coefficients have **high variance**: they bounce around from sample to sample. Adding or removing a single variable can drastically change the estimates.
+
+The key insight of regularization is that a **little bias can buy a lot of variance reduction**, lowering the overall prediction error. Think of it as a tradeoff:
+
+| | Low bias | High bias |
+|:--|:--|:--|
+| **Low variance** | Ideal (but rare) | Regularized (LASSO, Ridge) |
+| **High variance** | OLS with many regressors | Terrible |
+
+The **total error** of a prediction decomposes as:
+
+$$
+\text{MSE} = \text{Bias}^2 + \text{Variance} + \text{Irreducible noise}
+$$ {#eq-mse}
+
+```{r}
+#| label: fig-bias-variance
+#| code-summary: "Bias-variance tradeoff illustration"
+#| fig-cap: "The bias-variance tradeoff. As model complexity increases (more variables, less regularization), bias decreases but variance increases. The optimal point is a compromise."
+#| fig-width: 7
+#| fig-height: 4.5
+
+# Create an illustrative bias-variance tradeoff curve
+complexity <- seq(0.1, 5, length.out = 200)    # model complexity axis
+
+# Define curves (for illustration, not real data)
+bias_sq  <- 2 * exp(-1.2 * complexity)          # bias decreases with complexity
+variance <- 0.15 * complexity^1.8               # variance increases with complexity
+total    <- bias_sq + variance + 0.3            # total MSE = bias^2 + variance + noise
+
+# Store length before creating tibble (tibble evaluates columns left-to-right)
+n_pts <- length(complexity)
+
+bv_data <- tibble(
+  complexity = rep(complexity, 3),
+  value = c(bias_sq, variance, total),
+  component = rep(c("Bias\u00b2", "Variance", "Total MSE"), each = n_pts)
+)
+
+# Find the minimum of total MSE
+opt_idx <- which.min(total)
+opt_x   <- complexity[opt_idx]
+opt_y   <- total[opt_idx]
+
+ggplot(bv_data, aes(x = complexity, y = value, color = component, linetype = component)) +
+  geom_line(linewidth = 1) +                   # draw the three curves
+  geom_vline(xintercept = opt_x, linetype = "dashed", color = "gray40") +
+  annotate("text", x = opt_x + 0.15, y = max(total) * 0.85,
+           label = "Optimal\ncomplexity", hjust = 0, size = 3.5) +
+  annotate("segment", x = 4.5, xend = 4.5, y = 0.3, yend = 0.3 + bias_sq[190],
+           color = "#d7191c", linewidth = 0.5,
+           arrow = arrow(ends = "both", length = unit(0.1, "inches"))) +
+  annotate("text", x = 4.7, y = 0.3 + bias_sq[190]/2, label = "Bias\u00b2",
+           color = "#d7191c", size = 3) +
+  scale_color_manual(values = c("Bias\u00b2" = "#d7191c", "Variance" = "#2c7bb6",
+                                 "Total MSE" = "black")) +
+  scale_linetype_manual(values = c("Bias\u00b2" = "solid", "Variance" = "solid",
+                                    "Total MSE" = "solid")) +
+  labs(x = "Model Complexity (more variables, less penalty)",
+       y = "Error", color = NULL, linetype = NULL,
+       title = "The Bias-Variance Tradeoff") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+**The penalty as a "budget constraint."** Imagine you are shopping for regression coefficients, but you have a limited budget. The regularization penalty says: "You can have large coefficients, but you must pay for them. The more you spend on one coefficient, the less you have left for others." Variables that do not contribute enough to prediction are not worth the cost, so their coefficients are set to zero.
+
+:::{.callout-note}
+## What we learned
+Regularization deliberately introduces a small bias to reduce variance, often lowering overall prediction error. The penalty acts as a budget constraint on coefficient sizes.
+:::
+
+
+# L1 vs. L2 Geometry {#sec-l1-l2}
+
+## The LASSO (L1) Penalty
+
+The LASSO solves the following optimization problem:
+
+$$
+\hat{\beta}_{\text{LASSO}} = \arg\min_\beta \; \frac{1}{2n}\|y - X\beta\|^2 + \lambda \|\beta\|_1
+$$ {#eq-lasso}
+
+where:
+
+- $\frac{1}{2n}\|y - X\beta\|^2$ is the **sum of squared residuals** (the usual OLS loss, scaled)
+- $\|\beta\|_1 = \sum_{j=1}^{p} |\beta_j|$ is the **L1 norm** (sum of absolute values)
+- $\lambda \geq 0$ is the **regularization parameter**: it controls how much we penalize large coefficients. When $\lambda = 0$, LASSO reduces to OLS. As $\lambda \to \infty$, all coefficients are shrunk to zero.
+
+## The Ridge (L2) Penalty
+
+For comparison, **Ridge regression** uses the L2 norm instead:
+
+$$
+\hat{\beta}_{\text{Ridge}} = \arg\min_\beta \; \frac{1}{2n}\|y - X\beta\|^2 + \lambda \|\beta\|_2^2
+$$ {#eq-ridge}
+
+where $\|\beta\|_2^2 = \sum_{j=1}^{p} \beta_j^2$ is the sum of squared coefficients.
+
+## Why LASSO Selects Variables and Ridge Does Not
+
+The geometric explanation is one of the most elegant ideas in modern statistics. The constraint region for LASSO (L1) is a **diamond**, while the constraint region for Ridge (L2) is a **circle**. When the elliptical OLS contours meet the diamond, they typically hit a **corner**, where one or more coefficients are exactly zero. When they meet the circle, they hit a smooth curve---coefficients are shrunk but never exactly zero.
+
+```{r}
+#| label: fig-l1-geometry
+#| code-summary: "L1 (LASSO) constraint geometry"
+#| fig-cap: "LASSO geometry: the L1 constraint region is a diamond. The OLS contour ellipses typically hit a corner, setting one coefficient to exactly zero."
+#| fig-width: 6
+#| fig-height: 5.5
+
+# Create the L1 diamond constraint region
+t_val <- 1.0                                   # constraint budget
+theta <- seq(0, 2 * pi, length.out = 400)      # angles for parametric curve
+
+# L1 diamond: |beta1| + |beta2| <= t
+diamond <- tibble(
+  b1 = t_val * c(cos(theta) * (abs(cos(theta)) + abs(sin(theta)))^(-1)),
+  b2 = t_val * c(sin(theta) * (abs(cos(theta)) + abs(sin(theta)))^(-1))
+)
+
+# Manual diamond vertices for clean shape
+diamond_clean <- tibble(
+  b1 = c(t_val, 0, -t_val, 0, t_val),
+  b2 = c(0, t_val, 0, -t_val, 0)
+)
+
+# OLS solution (illustrative point outside the diamond)
+ols_b1 <- 0.3
+ols_b2 <- 1.1
+
+# Elliptical contours centered on OLS
+contour_data <- map_dfr(c(0.3, 0.6, 0.9, 1.2), function(r) {
+  tibble(
+    b1 = ols_b1 + r * 0.8 * cos(theta),       # wider in b1 direction
+    b2 = ols_b2 + r * 0.5 * sin(theta),        # narrower in b2
+    level = r
+  )
+})
+
+ggplot() +
+  # Draw OLS contour ellipses
+  geom_path(data = contour_data, aes(x = b1, y = b2, group = level),
+            color = "gray60", linetype = "dashed") +
+  # Draw the L1 diamond
+  geom_polygon(data = diamond_clean, aes(x = b1, y = b2),
+               fill = "#2c7bb6", alpha = 0.15, color = "#2c7bb6", linewidth = 1) +
+  # Mark the OLS solution
+  geom_point(aes(x = ols_b1, y = ols_b2), size = 3, color = "gray40") +
+  annotate("text", x = ols_b1 + 0.12, y = ols_b2 + 0.08,
+           label = "OLS", size = 4, color = "gray40") +
+  # Mark the LASSO solution (at a corner: b1 = 0)
+  geom_point(aes(x = 0, y = t_val), size = 4, color = "#d7191c") +
+  annotate("text", x = 0.15, y = t_val + 0.08,
+           label = "LASSO\n(β₁ = 0)", size = 3.5, color = "#d7191c") +
+  # Axes
+  geom_hline(yintercept = 0, color = "gray80") +
+  geom_vline(xintercept = 0, color = "gray80") +
+  coord_equal(xlim = c(-1.5, 1.8), ylim = c(-1.5, 1.8)) +
+  labs(x = expression(beta[1]), y = expression(beta[2]),
+       title = "L1 (LASSO) Constraint: Diamond",
+       subtitle = "Contour ellipses hit a corner → exact zeros") +
+  theme_minimal(base_size = 14)
+```
+
+```{r}
+#| label: fig-l2-geometry
+#| code-summary: "L2 (Ridge) constraint geometry"
+#| fig-cap: "Ridge geometry: the L2 constraint region is a circle. The OLS contours hit the smooth boundary---coefficients are shrunk but never exactly zero."
+#| fig-width: 6
+#| fig-height: 5.5
+
+# L2 circle: beta1^2 + beta2^2 <= t^2
+circle <- tibble(
+  b1 = t_val * cos(theta),
+  b2 = t_val * sin(theta)
+)
+
+# Ridge solution: closest point on circle to OLS
+ols_norm   <- sqrt(ols_b1^2 + ols_b2^2)       # distance of OLS from origin
+ridge_b1   <- ols_b1 * t_val / ols_norm        # project OLS onto circle boundary
+ridge_b2   <- ols_b2 * t_val / ols_norm
+
+ggplot() +
+  # Draw OLS contour ellipses
+  geom_path(data = contour_data, aes(x = b1, y = b2, group = level),
+            color = "gray60", linetype = "dashed") +
+  # Draw the L2 circle
+  geom_polygon(data = circle, aes(x = b1, y = b2),
+               fill = "#fdae61", alpha = 0.15, color = "#fdae61", linewidth = 1) +
+  # Mark the OLS solution
+  geom_point(aes(x = ols_b1, y = ols_b2), size = 3, color = "gray40") +
+  annotate("text", x = ols_b1 + 0.12, y = ols_b2 + 0.08,
+           label = "OLS", size = 4, color = "gray40") +
+  # Mark the Ridge solution
+  geom_point(aes(x = ridge_b1, y = ridge_b2), size = 4, color = "#d7191c") +
+  annotate("text", x = ridge_b1 + 0.18, y = ridge_b2 + 0.08,
+           label = "Ridge\n(no zeros)", size = 3.5, color = "#d7191c") +
+  # Axes
+  geom_hline(yintercept = 0, color = "gray80") +
+  geom_vline(xintercept = 0, color = "gray80") +
+  coord_equal(xlim = c(-1.5, 1.8), ylim = c(-1.5, 1.8)) +
+  labs(x = expression(beta[1]), y = expression(beta[2]),
+       title = "L2 (Ridge) Constraint: Circle",
+       subtitle = "Contour ellipses hit smooth boundary → no zeros") +
+  theme_minimal(base_size = 14)
+```
+
+The key insight: **the L1 diamond has corners where coefficients are exactly zero---this is why LASSO selects variables.** The L2 circle has no corners, so Ridge shrinks coefficients toward zero but never reaches it. LASSO performs *simultaneous estimation and variable selection*; Ridge only estimates.
+
+:::{.callout-note}
+## What we learned
+LASSO uses an L1 penalty (sum of absolute values) that creates a diamond-shaped constraint region. The corners of this diamond force some coefficients to be exactly zero, performing automatic variable selection. Ridge uses an L2 penalty (sum of squares) that creates a circle, which shrinks but never zeros out coefficients.
+:::
+
+
+# LASSO on All 12 Variables {#sec-lasso-full}
+
+## Running LASSO with Cross-Validation
+
+The LASSO has one tuning parameter: $\lambda$, which controls the strength of the penalty. Too small and we include noise; too large and we exclude true predictors. We choose $\lambda$ using **10-fold cross-validation**: split the data into 10 folds, train on 9, predict the 10th, and repeat. The $\lambda$ that minimizes the average prediction error across folds is called **lambda.min**.
+
+```{r}
+#| label: lasso-fit
+#| code-summary: "Fit LASSO with cross-validation using glmnet"
+
+set.seed(2021)  # reproducibility for cross-validation folds
+
+# Prepare the design matrix X and response vector y
+X <- synth_data |>
+  select(log_gdp, industry, fossil_fuel, urban_pop, democracy,
+         trade_network, agriculture, log_trade, fdi, corruption,
+         log_tourism, log_credit) |>
+  as.matrix()                                  # glmnet requires a matrix
+
+y <- synth_data$log_co2                        # response vector
+
+# Run LASSO (alpha = 1) with 10-fold cross-validation
+lasso_cv <- cv.glmnet(
+  x      = X,                                 # predictor matrix
+  y      = y,                                 # response vector
+  alpha  = 1,                                 # alpha=1 is LASSO (alpha=0 is Ridge)
+  nfolds = 10,                                # 10-fold cross-validation
+  standardize = TRUE                          # standardize predictors internally
+)
+```
+
+## Figure: Regularization Path
+
+```{r}
+#| label: fig-lasso-path
+#| code-summary: "LASSO regularization path: coefficients vs log(lambda)"
+#| fig-cap: "LASSO regularization path. Each colored line represents one variable's coefficient as the penalty (lambda) increases from left to right. Variables with small effects are shrunk to zero first."
+#| fig-width: 9
+#| fig-height: 5
+
+# Fit the full LASSO path (not just CV)
+lasso_full <- glmnet(X, y, alpha = 1, standardize = TRUE)
+
+# Extract coefficient paths
+coef_path <- as.matrix(coef(lasso_full))[-1, ]  # remove intercept row
+lambda_vals <- lasso_full$lambda                  # lambda values
+
+# Reshape to long format for ggplot
+path_df <- as_tibble(t(coef_path)) |>
+  mutate(log_lambda = log(lambda_vals)) |>
+  pivot_longer(-log_lambda, names_to = "variable", values_to = "coefficient")
+
+# Define colors: blue for true predictors, red for noise
+var_colors <- c(
+  log_gdp = "#2c7bb6", industry = "#2c7bb6", fossil_fuel = "#2c7bb6",
+  urban_pop = "#2c7bb6", democracy = "#2c7bb6", trade_network = "#2c7bb6",
+  agriculture = "#2c7bb6",
+  log_trade = "#d7191c", fdi = "#d7191c", corruption = "#d7191c",
+  log_tourism = "#d7191c", log_credit = "#d7191c"
+)
+
+ggplot(path_df, aes(x = log_lambda, y = coefficient, color = variable)) +
+  geom_line(linewidth = 0.7) +                 # one line per variable
+  geom_vline(xintercept = log(lasso_cv$lambda.min),    # lambda.min
+             linetype = "dashed", color = "gray30") +
+  geom_vline(xintercept = log(lasso_cv$lambda.1se),    # lambda.1se
+             linetype = "dotted", color = "gray30") +
+  annotate("text", x = log(lasso_cv$lambda.min), y = max(coef_path) * 0.95,
+           label = "lambda.min", hjust = 1.1, size = 3) +
+  annotate("text", x = log(lasso_cv$lambda.1se), y = max(coef_path) * 0.85,
+           label = "lambda.1se", hjust = 1.1, size = 3) +
+  scale_color_manual(values = var_colors) +
+  labs(x = expression(log(lambda)),
+       y = "Coefficient value",
+       color = "Variable",
+       title = "LASSO Regularization Path",
+       subtitle = "Blue = true predictors, Red = noise variables") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "right",
+        legend.text = element_text(size = 9))
+```
+
+## Figure: Cross-Validation Curve
+
+```{r}
+#| label: fig-lasso-cv
+#| code-summary: "Cross-validation curve for LASSO"
+#| fig-cap: "10-fold cross-validation curve. The left dashed line marks lambda.min (minimum CV error); the right dotted line marks lambda.1se (most parsimonious model within 1 SE of the minimum)."
+#| fig-width: 8
+#| fig-height: 5
+
+# Extract CV results
+cv_df <- tibble(
+  log_lambda = log(lasso_cv$lambda),           # log(lambda) values
+  mse        = lasso_cv$cvm,                   # mean CV error at each lambda
+  mse_lo     = lasso_cv$cvlo,                  # lower bound (mean - SE)
+  mse_hi     = lasso_cv$cvup,                  # upper bound (mean + SE)
+  nzero      = lasso_cv$nzero                  # number of nonzero coefficients
+)
+
+ggplot(cv_df, aes(x = log_lambda, y = mse)) +
+  geom_ribbon(aes(ymin = mse_lo, ymax = mse_hi), fill = "gray85", alpha = 0.5) +
+  geom_line(color = "#2c7bb6", linewidth = 0.8) +
+  geom_point(color = "#2c7bb6", size = 1) +
+  geom_vline(xintercept = log(lasso_cv$lambda.min),
+             linetype = "dashed", color = "#d7191c") +
+  geom_vline(xintercept = log(lasso_cv$lambda.1se),
+             linetype = "dotted", color = "#d7191c") +
+  annotate("text", x = log(lasso_cv$lambda.min), y = max(cv_df$mse) * 0.95,
+           label = paste0("lambda.min\n(", sum(coef(lasso_cv, s = "lambda.min") != 0) - 1, " vars)"),
+           hjust = 1.1, size = 3.5, color = "#d7191c") +
+  annotate("text", x = log(lasso_cv$lambda.1se), y = max(cv_df$mse) * 0.85,
+           label = paste0("lambda.1se\n(", sum(coef(lasso_cv, s = "lambda.1se") != 0) - 1, " vars)"),
+           hjust = 1.1, size = 3.5, color = "#d7191c") +
+  labs(x = expression(log(lambda)),
+       y = "Mean Squared Error (CV)",
+       title = "LASSO Cross-Validation Curve",
+       subtitle = "Shaded band shows +/- 1 standard error") +
+  theme_minimal(base_size = 14)
+```
+
+## Figure: Selected Variables
+
+```{r}
+#| label: fig-lasso-selected
+#| code-summary: "Variables selected by LASSO at lambda.1se"
+#| fig-cap: "LASSO-selected variables at lambda.1se. Green bars = true predictors correctly retained; red bars = noise variables (should be zero). The bar height shows the LASSO coefficient magnitude."
+#| fig-width: 8
+#| fig-height: 5
+
+# Extract LASSO coefficients at lambda.1se
+lasso_coefs_1se <- coef(lasso_cv, s = "lambda.1se")
+lasso_df <- tibble(
+  variable = rownames(lasso_coefs_1se)[-1],    # exclude intercept
+  lasso_coef = as.numeric(lasso_coefs_1se)[-1] # coefficient values
+) |>
+  mutate(
+    selected   = lasso_coef != 0,              # was the variable selected?
+    true_beta  = true_beta_lookup[variable],   # known true coefficient
+    is_noise   = true_beta == 0,               # is it a noise variable?
+    bar_color  = case_when(
+      !selected ~ "Not selected",
+      is_noise  ~ "Noise (false positive)",
+      TRUE      ~ "True predictor (correct)"
+    )
+  )
+
+ggplot(lasso_df, aes(x = reorder(variable, abs(lasso_coef)), y = lasso_coef, fill = bar_color)) +
+  geom_col(width = 0.6) +
+  coord_flip() +
+  scale_fill_manual(values = c("True predictor (correct)" = "#2c7bb6",
+                                "Noise (false positive)" = "#d7191c",
+                                "Not selected" = "gray80")) +
+  labs(x = NULL, y = "LASSO Coefficient (at lambda.1se)",
+       fill = NULL,
+       title = "LASSO Variable Selection",
+       subtitle = paste0("lambda.1se selects ", sum(lasso_df$selected), " of 12 variables")) +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+## Understanding lambda.min vs. lambda.1se
+
+The cross-validation procedure gives us two key values of $\lambda$:
+
+- **lambda.min**: the $\lambda$ that minimizes cross-validated MSE. It tends to include more variables.
+- **lambda.1se**: the largest $\lambda$ within 1 standard error of the minimum MSE. It is more **parsimonious**---fewer variables, simpler model.
+
+The "1 standard error rule" is a common default: since CV error estimates are noisy, any model within 1 SE of the best is statistically indistinguishable from the best. We prefer the simpler one.
+
+:::{.callout-note}
+## What we learned
+LASSO with cross-validation automatically selects the penalty strength. At lambda.1se, it produces a sparse model. We can check which true predictors were retained and whether any noise variables were falsely included.
+:::
+
+
+# Post-LASSO {#sec-post-lasso}
+
+## The Shrinkage Problem
+
+LASSO coefficients are **biased** because the L1 penalty shrinks them toward zero. The selected variables are correct (we hope), but the coefficient values are too small. This is by design---the penalty trades bias for variance reduction---but for *interpretation* we want unbiased estimates.
+
+The fix is simple: **Post-LASSO**. Run OLS using only the variables that LASSO selected. The LASSO does the selection; OLS does the estimation.
+
+```{r}
+#| label: post-lasso
+#| code-summary: "Post-LASSO: OLS on LASSO-selected variables only"
+
+# Identify which variables LASSO selected at lambda.1se
+selected_vars <- lasso_df |>
+  filter(selected) |>                          # keep only selected variables
+  pull(variable)
+
+# Build the Post-LASSO formula
+post_lasso_formula <- as.formula(
+  paste("log_co2 ~", paste(selected_vars, collapse = " + "))
+)
+
+# Run OLS on the selected variables only
+post_lasso_fit <- lm(post_lasso_formula, data = synth_data)
+
+# Compare: LASSO vs Post-LASSO vs True coefficients
+post_lasso_summary <- broom::tidy(post_lasso_fit) |>
+  filter(term != "(Intercept)") |>
+  rename(variable = term, post_lasso_coef = estimate) |>
+  select(variable, post_lasso_coef) |>
+  left_join(lasso_df |> select(variable, lasso_coef, true_beta), by = "variable")
+
+post_lasso_summary |>
+  gt() |>
+  tab_header(
+    title = "LASSO vs. Post-LASSO vs. True Coefficients",
+    subtitle = "Post-LASSO removes the shrinkage bias from LASSO estimates"
+  ) |>
+  cols_label(
+    variable        = "Variable",
+    lasso_coef      = "LASSO Coef.",
+    post_lasso_coef = "Post-LASSO Coef.",
+    true_beta       = md("True *β*")
+  ) |>
+  fmt_number(columns = c(lasso_coef, post_lasso_coef, true_beta), decimals = 4) |>
+  tab_footnote("Post-LASSO = OLS on LASSO-selected variables. Coefficients are closer to the true values.")
+```
+
+Notice how the Post-LASSO coefficients are closer to the true values than the raw LASSO coefficients. The LASSO selected the right variables; Post-LASSO recovered the right magnitudes.
+
+:::{.callout-note}
+## What we learned
+LASSO coefficients are shrunk toward zero by design. Post-LASSO runs OLS on only the LASSO-selected variables, producing unbiased coefficient estimates while retaining the variable selection from LASSO.
+:::
+
+
+# PART 3: WALS {.unnumbered}
+
+
+# Frequentist Model Averaging {#sec-fma}
+
+WALS (Weighted Average Least Squares) is a **frequentist** approach to model averaging. Like BMA, it averages over models instead of selecting just one. But unlike BMA, it does not require MCMC sampling or the specification of a full Bayesian prior.
+
+The key structural assumption is that regressors are split into two groups:
+
+$$
+y = X_1 \beta_1 + X_2 \beta_2 + \varepsilon
+$$ {#eq-wals}
+
+where:
+
+- $X_1$ are **focus regressors**: variables you are certain belong in the model. In a cross-sectional setting, this is typically just the **intercept**. (In a panel setting, it might include country and year fixed effects.)
+- $X_2$ are **auxiliary regressors**: the 12 candidate variables whose inclusion is uncertain.
+- $\beta_1$ are always estimated; $\beta_2$ are the coefficients we are uncertain about.
+
+The question WALS answers: what are the best estimates of $\beta_2$, accounting for the uncertainty about which auxiliaries truly belong in the model?
+
+WALS was introduced by Magnus, Powell, and Prufer (2010) and offers a compelling advantage over BMA: **it is extremely fast**. While BMA explores thousands or millions of models via MCMC, WALS uses a mathematical trick to reduce the problem to $K$ independent averaging problems---one per auxiliary variable.
+
+:::{.callout-note}
+## What we learned
+WALS is a frequentist model-averaging method that splits regressors into "focus" (always included) and "auxiliary" (uncertain). It is much faster than BMA because it avoids MCMC sampling.
+:::
+
+
+# The Semi-Orthogonal Transformation {#sec-orthogonal}
+
+## Why Correlated Variables Make Averaging Hard
+
+In our synthetic data, GDP is correlated with fossil fuel use, urbanization, and even with the noise variables. This means that the decision to include one variable affects the importance of another. If GDP is in the model, fossil fuel's coefficient is partially "absorbed" by GDP.
+
+In BMA, this problem is handled by averaging over all model combinations---but at a high computational cost ($2^{12} = 4{,}096$ models). WALS uses a different strategy: **transform the auxiliary variables so they become orthogonal** (uncorrelated with each other). Once orthogonal, each variable can be averaged independently.
+
+## The Mathematical Trick
+
+The semi-orthogonal transformation works as follows:
+
+1. **Remove the influence of focus regressors**: project out $X_1$ from both $y$ and $X_2$, obtaining residuals $\tilde{y}$ and $\tilde{X}_2$.
+2. **Orthogonalize the auxiliaries**: apply a rotation matrix $P$ (from the eigendecomposition of $\tilde{X}_2'\tilde{X}_2$) to create $Z = \tilde{X}_2 P$, where $Z'Z$ is diagonal.
+3. **Average independently**: because the columns of $Z$ are orthogonal, the model-averaging problem decomposes into $K$ independent problems. Each transformed variable is averaged separately.
+
+## A Worked 2-Variable Example
+
+Suppose we have just 2 auxiliary variables, $x_1$ and $x_2$, that are correlated ($r = 0.6$). Without WALS, we would need to average over $2^2 = 4$ models. With WALS:
+
+1. Compute the principal components (eigenvectors) of the $2 \times 2$ correlation matrix
+2. Rotate $x_1$ and $x_2$ into orthogonal components $z_1$ and $z_2$
+3. Average $z_1$ independently, then $z_2$ independently (just 2 problems, not 4)
+4. Transform back to the original scale
+
+The computational savings grow dramatically: with 12 variables, we solve **12 independent problems** instead of enumerating 4,096 models.
+
+```{r}
+#| label: wals-toy-demo
+#| code-summary: "Illustration: orthogonalizing two correlated variables"
+#| fig-cap: "The semi-orthogonal transformation. Left: original correlated variables. Right: after rotation, the variables are orthogonal, and each can be averaged independently."
+#| fig-width: 10
+#| fig-height: 4.5
+
+set.seed(2021)
+
+# Generate two correlated variables (rho ~ 0.6)
+n_toy <- 50                                    # small sample for illustration
+x1_raw <- rnorm(n_toy)
+x2_raw <- 0.6 * x1_raw + rnorm(n_toy, 0, 0.8) # x2 correlated with x1
+
+# Standardize
+x1 <- (x1_raw - mean(x1_raw)) / sd(x1_raw)
+x2 <- (x2_raw - mean(x2_raw)) / sd(x2_raw)
+
+# Eigendecomposition (the "rotation")
+X_toy <- cbind(x1, x2)
+eigen_decomp <- eigen(t(X_toy) %*% X_toy)     # eigenvalues and eigenvectors
+P <- eigen_decomp$vectors                      # rotation matrix
+
+# Rotated (orthogonal) variables
+Z_toy <- X_toy %*% P
+
+# Verify orthogonality
+cor_before <- round(cor(x1, x2), 3)            # should be ~0.6
+cor_after  <- round(cor(Z_toy[,1], Z_toy[,2]), 3)  # should be ~0
+
+# Create side-by-side plots
+p1 <- ggplot(tibble(x1, x2), aes(x = x1, y = x2)) +
+  geom_point(color = "#2c7bb6", alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, color = "#d7191c", linetype = "dashed") +
+  labs(x = expression(x[1]), y = expression(x[2]),
+       title = "Before: Correlated",
+       subtitle = paste0("r = ", cor_before)) +
+  coord_equal() +
+  theme_minimal(base_size = 13)
+
+p2 <- ggplot(tibble(z1 = Z_toy[,1], z2 = Z_toy[,2]), aes(x = z1, y = z2)) +
+  geom_point(color = "#2c7bb6", alpha = 0.6) +
+  geom_hline(yintercept = 0, color = "gray70") +
+  geom_vline(xintercept = 0, color = "gray70") +
+  labs(x = expression(z[1]), y = expression(z[2]),
+       title = "After: Orthogonalized",
+       subtitle = paste0("r = ", cor_after)) +
+  coord_equal() +
+  theme_minimal(base_size = 13)
+
+p1 + p2 + plot_annotation(
+  title = "The Semi-Orthogonal Transformation",
+  subtitle = "WALS rotates correlated auxiliary variables into independent components"
+)
+```
+
+:::{.callout-note}
+## What we learned
+WALS avoids the exponential explosion of model combinations by orthogonalizing the auxiliary variables. Once orthogonal, each variable can be averaged independently---reducing $2^K$ models to just $K$ independent problems.
+:::
+
+
+# The Laplace Prior {#sec-laplace}
+
+## Shape and Motivation
+
+WALS requires a prior distribution for the transformed coefficients. The default and recommended choice is the **Laplace (double-exponential) prior**:
+
+$$
+p(\gamma_j) \propto \exp(-|\gamma_j| / \tau)
+$$ {#eq-laplace}
+
+where $\gamma_j$ is the transformed coefficient and $\tau$ controls the spread. The Laplace prior has two key features:
+
+1. **Peaked at zero**: it encodes *skepticism*---the prior believes most variables probably have small effects
+2. **Heavy tails**: it allows large effects if the data strongly supports them---variables with strong signal can "break through" the prior
+
+## Comparing Priors
+
+```{r}
+#| label: fig-priors
+#| code-summary: "Compare Laplace, Normal, and Uniform prior distributions"
+#| fig-cap: "Three prior distributions used in model averaging. The Laplace prior (used by WALS) is peaked at zero with heavy tails. The Normal prior (used by BMA's g-prior) is also centered at zero but has thinner tails. The Uniform prior assigns equal weight everywhere."
+#| fig-width: 8
+#| fig-height: 4.5
+
+# Define the three prior densities
+x_grid <- seq(-5, 5, length.out = 500)
+
+prior_df <- tibble(
+  x = rep(x_grid, 3),
+  density = c(
+    # Laplace prior (tau = 1)
+    0.5 * exp(-abs(x_grid)),
+    # Normal prior (sd = 1.5)
+    dnorm(x_grid, mean = 0, sd = 1.5),
+    # Uniform prior (bounded for visualization)
+    dunif(x_grid, min = -4, max = 4)
+  ),
+  prior = rep(c("Laplace (WALS)", "Normal (BMA g-prior)", "Uniform"),
+              each = length(x_grid))
+)
+
+ggplot(prior_df, aes(x = x, y = density, color = prior, linetype = prior)) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = c("Laplace (WALS)" = "#2c7bb6",
+                                 "Normal (BMA g-prior)" = "#d7191c",
+                                 "Uniform" = "#fdae61")) +
+  scale_linetype_manual(values = c("Laplace (WALS)" = "solid",
+                                    "Normal (BMA g-prior)" = "dashed",
+                                    "Uniform" = "dotted")) +
+  labs(x = expression(gamma), y = "Density",
+       color = "Prior", linetype = "Prior",
+       title = "Prior Distributions for Model Averaging",
+       subtitle = "Laplace: peaked at zero with heavy tails (skeptical but open-minded)") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+## The Deep Connection to LASSO
+
+Here is a remarkable fact: **the LASSO's L1 penalty is the negative log of a Laplace prior**. The MAP (maximum a posteriori) estimate under a Laplace prior is:
+
+$$
+\hat{\beta}_{\text{MAP}} = \arg\min_\beta \; \frac{1}{2n}\|y - X\beta\|^2 + \frac{\sigma^2}{\tau} \sum_{j=1}^{p}|\beta_j|
+$$ {#eq-map}
+
+This is identical to @eq-lasso with $\lambda = \sigma^2 / \tau$. The LASSO penalty and the Laplace prior are two sides of the same coin.
+
+This means **LASSO and WALS encode the same prior belief**---that most coefficients are probably zero or small---but they use it differently:
+
+- LASSO uses the Laplace prior for **selection**: it finds the single most probable model (the MAP estimate), which sets some coefficients to exactly zero
+- WALS uses the Laplace prior for **averaging**: it averages over all models, weighted by the Laplace prior, producing continuous (nonzero) coefficient estimates with uncertainty measures
+
+:::{.callout-note}
+## What we learned
+The Laplace prior is peaked at zero (skeptical) with heavy tails (open-minded). It is the same prior that underlies LASSO's L1 penalty. LASSO uses it for hard selection (zeros vs. nonzeros); WALS uses it for soft averaging (continuous weights).
+:::
+
+
+# WALS on All 12 Variables {#sec-wals-full}
+
+## Running WALS
+
+```{r}
+#| label: wals-fit
+#| code-summary: "Run WALS with Laplace prior on all 12 auxiliary variables"
+
+# WALS splits regressors into two groups:
+# X1 = focus regressors (always included): just the intercept for cross-sectional data
+# X2 = auxiliary regressors (uncertain): our 12 candidate variables
+
+# Prepare the focus regressor matrix (intercept only)
+X1_wals <- matrix(1, nrow = nrow(synth_data), ncol = 1)  # column of ones
+colnames(X1_wals) <- "(Intercept)"                        # name the column
+
+# Prepare the auxiliary regressor matrix (all 12 candidates)
+X2_wals <- synth_data |>
+  select(log_gdp, industry, fossil_fuel, urban_pop, democracy,
+         trade_network, agriculture, log_trade, fdi, corruption,
+         log_tourism, log_credit) |>
+  as.matrix()                                  # WALS needs a numeric matrix
+
+# Response vector
+y_wals <- synth_data$log_co2
+
+# Fit WALS with the Laplace prior (the recommended default)
+wals_fit <- wals(
+  x     = X1_wals,                             # focus regressors (intercept)
+  x2    = X2_wals,                             # auxiliary regressors (12 candidates)
+  y     = y_wals,                              # response variable
+  prior = laplace()                            # Laplace prior for auxiliaries
+)
+
+# Extract results for auxiliary regressors
+wals_summary <- summary(wals_fit)
+```
+
+## WALS Results Table
+
+```{r}
+#| label: tbl-wals-results
+#| code-summary: "WALS results: coefficients, standard errors, and t-statistics"
+
+# Extract auxiliary coefficient table from WALS summary
+# WALS stores focus and auxiliary coefficients separately
+aux_coefs <- wals_summary$auxCoefs              # matrix with Estimate and Std. Error
+
+# Build a tidy results table with t-statistics
+wals_df <- tibble(
+  variable = rownames(aux_coefs),              # variable names
+  estimate = aux_coefs[, "Estimate"],          # WALS coefficient estimates
+  se       = aux_coefs[, "Std. Error"],        # standard errors
+  t_stat   = estimate / se                     # compute t-statistic manually
+) |>
+  mutate(
+    true_beta    = true_beta_lookup[variable],
+    abs_t        = abs(t_stat),
+    wals_robust  = abs_t >= 2,                 # |t| >= 2 is "robust"
+    true_nonzero = true_beta != 0
+  )
+
+wals_df |>
+  arrange(desc(abs_t)) |>
+  select(variable, estimate, se, t_stat, abs_t, wals_robust, true_beta) |>
+  gt() |>
+  tab_header(
+    title = "WALS Results: All 12 Auxiliary Variables",
+    subtitle = "Laplace prior; focus regressor = intercept only"
+  ) |>
+  cols_label(
+    variable    = "Variable",
+    estimate    = "WALS Estimate",
+    se          = "Std. Error",
+    t_stat      = "t-statistic",
+    abs_t       = "|t|",
+    wals_robust = "Robust (|t|>=2)?",
+    true_beta   = md("True *β*")
+  ) |>
+  fmt_number(columns = c(estimate, se, t_stat, abs_t, true_beta), decimals = 4) |>
+  tab_style(
+    style = cell_fill(color = "#e8f5e9"),
+    locations = cells_body(rows = wals_robust == TRUE)
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#ffebee"),
+    locations = cells_body(rows = wals_robust == FALSE & true_beta != 0)
+  ) |>
+  tab_footnote("Green = robust (|t| >= 2); red = true predictor missed by WALS.")
+```
+
+## Figure: t-statistic Bar Chart
+
+```{r}
+#| label: fig-wals-tstat
+#| code-summary: "WALS t-statistic bar chart with threshold line"
+#| fig-cap: "WALS t-statistics for all 12 variables. The vertical dashed lines mark the |t| = 2 robustness threshold. Variables with |t| >= 2 are considered robust."
+#| fig-width: 8
+#| fig-height: 5
+
+# Classify each variable
+wals_df <- wals_df |>
+  mutate(
+    bar_color = case_when(
+      wals_robust & true_nonzero  ~ "True positive",
+      wals_robust & !true_nonzero ~ "False positive",
+      !wals_robust & true_nonzero ~ "False negative",
+      TRUE                        ~ "True negative"
+    )
+  )
+
+ggplot(wals_df, aes(x = reorder(variable, abs_t), y = t_stat, fill = bar_color)) +
+  geom_col(width = 0.6) +
+  geom_hline(yintercept = c(-2, 2), linetype = "dashed", color = "gray30") +
+  annotate("text", x = 0.5, y = 2.3, label = "|t| = 2", hjust = 0, size = 3) +
+  coord_flip() +
+  scale_fill_manual(values = c("True positive"  = "#2c7bb6",
+                                "False positive" = "#d7191c",
+                                "True negative"  = "gray70",
+                                "False negative" = "#fdae61")) +
+  labs(x = NULL, y = "t-statistic",
+       fill = "Classification",
+       title = "WALS: t-Statistics for All 12 Variables",
+       subtitle = "|t| >= 2 threshold for robustness") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+:::{.callout-note}
+## What we learned
+WALS produces t-statistics for each auxiliary variable. Using the |t| >= 2 threshold, we can classify variables as robust or fragile. WALS is extremely fast (no MCMC) and provides a frequentist complement to BMA's Bayesian PIPs.
+:::
+
+
+# PART 4: Grand Comparison {.unnumbered}
+
+
+# Three Methods, Same Question, Same Data {#sec-comparison}
+
+We have now applied all three methods to the same synthetic dataset. Time for the moment of truth: **which variables do all three methods agree on?**
+
+## Comprehensive Comparison Table
+
+```{r}
+#| label: tbl-grand-comparison
+#| code-summary: "Comprehensive comparison table: BMA, LASSO, and WALS vs. truth"
+
+# Build the master comparison table
+# BMA results
+bma_compare <- bma_df |>
+  select(variable, pip, post_mean, robustness) |>
+  rename(bma_pip = pip, bma_postmean = post_mean, bma_class = robustness)
+
+# LASSO results
+lasso_compare <- lasso_df |>
+  select(variable, lasso_coef, selected) |>
+  rename(lasso_selected = selected)
+
+# WALS results
+wals_compare <- wals_df |>
+  select(variable, estimate, t_stat, wals_robust) |>
+  rename(wals_estimate = estimate, wals_t = t_stat)
+
+# Merge all three
+grand_table <- bma_compare |>
+  left_join(lasso_compare, by = "variable") |>
+  left_join(wals_compare, by = "variable") |>
+  mutate(
+    true_beta    = true_beta_lookup[variable],
+    bma_robust   = bma_pip >= 0.80,
+    n_methods    = bma_robust + lasso_selected + wals_robust,
+    all_agree    = n_methods == 3 | n_methods == 0,
+    triple_robust = n_methods == 3,
+    true_nonzero = true_beta != 0
+  ) |>
+  arrange(desc(n_methods), desc(bma_pip))
+
+# Display the table
+grand_table |>
+  select(variable, true_beta, bma_pip, bma_robust, lasso_selected,
+         wals_t, wals_robust, n_methods) |>
+  gt() |>
+  tab_header(
+    title = "Grand Comparison: BMA, LASSO, and WALS",
+    subtitle = "How many methods identify each variable as robust?"
+  ) |>
+  cols_label(
+    variable       = "Variable",
+    true_beta      = md("True *β*"),
+    bma_pip        = "BMA PIP",
+    bma_robust     = "BMA Robust?",
+    lasso_selected = "LASSO Selected?",
+    wals_t         = "WALS t-stat",
+    wals_robust    = "WALS Robust?",
+    n_methods      = "# Methods"
+  ) |>
+  fmt_number(columns = c(true_beta, bma_pip, wals_t), decimals = 3) |>
+  tab_style(
+    style = cell_fill(color = "#c8e6c9"),
+    locations = cells_body(rows = n_methods == 3)
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#fff9c4"),
+    locations = cells_body(rows = n_methods == 2)
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#ffcdd2"),
+    locations = cells_body(rows = n_methods == 0 & true_beta != 0)
+  ) |>
+  tab_spanner(label = "BMA", columns = c(bma_pip, bma_robust)) |>
+  tab_spanner(label = "LASSO", columns = lasso_selected) |>
+  tab_spanner(label = "WALS", columns = c(wals_t, wals_robust)) |>
+  tab_footnote("Green = identified by all 3 methods. Yellow = identified by 2. Red = true predictor missed by all.") |>
+  tab_source_note("Data: synthetic cross-section, n = 120, set.seed(2021).")
+```
+
+## Figure: Method Agreement Heatmap
+
+```{r}
+#| label: fig-heatmap
+#| code-summary: "Heatmap: 12 variables x 3 methods"
+#| fig-cap: "Method agreement heatmap. Green = identified as robust; red = not identified. True predictors are in the top 7 rows; noise variables are in the bottom 5."
+#| fig-width: 8
+#| fig-height: 6
+
+# Create a long-format data frame for the heatmap
+heatmap_df <- grand_table |>
+  select(variable, true_beta, bma_robust, lasso_selected, wals_robust) |>
+  pivot_longer(c(bma_robust, lasso_selected, wals_robust),
+               names_to = "method", values_to = "identified") |>
+  mutate(
+    method = recode(method,
+                    bma_robust = "BMA",
+                    lasso_selected = "LASSO",
+                    wals_robust = "WALS"),
+    method = factor(method, levels = c("BMA", "LASSO", "WALS")),
+    is_noise = true_beta == 0,
+    # Order: true predictors first (by effect size), then noise
+    var_order = case_when(
+      variable == "log_gdp"       ~ 1,
+      variable == "trade_network" ~ 2,
+      variable == "fossil_fuel"   ~ 3,
+      variable == "urban_pop"     ~ 4,
+      variable == "industry"      ~ 5,
+      variable == "agriculture"   ~ 6,
+      variable == "democracy"     ~ 7,
+      variable == "log_trade"     ~ 8,
+      variable == "fdi"           ~ 9,
+      variable == "corruption"    ~ 10,
+      variable == "log_tourism"   ~ 11,
+      variable == "log_credit"    ~ 12,
+      TRUE                        ~ 13
+    )
+  )
+
+ggplot(heatmap_df, aes(x = method, y = reorder(variable, -var_order), fill = identified)) +
+  geom_tile(color = "white", linewidth = 1) +
+  geom_text(aes(label = ifelse(identified, "Yes", "No")), size = 3.5) +
+  scale_fill_manual(values = c("TRUE" = "#66bb6a", "FALSE" = "#ef5350"),
+                    labels = c("Not identified", "Identified")) +
+  geom_hline(yintercept = 5.5, color = "black", linewidth = 1) +      # divider
+  annotate("text", x = 3.6, y = 9, label = "True\npredictors",
+           size = 3, hjust = 0, fontface = "italic") +
+  annotate("text", x = 3.6, y = 3, label = "Noise\nvariables",
+           size = 3, hjust = 0, fontface = "italic") +
+  labs(x = NULL, y = NULL, fill = NULL,
+       title = "Variable Identification Across Three Methods") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom",
+        panel.grid = element_blank()) +
+  coord_cartesian(clip = "off")
+```
+
+## Figure: BMA PIP vs. WALS |t-statistic|
+
+```{r}
+#| label: fig-pip-vs-t
+#| code-summary: "Scatter plot: BMA PIP vs WALS |t-stat|, with LASSO selection as shape"
+#| fig-cap: "BMA PIP vs WALS |t-statistic|. Point shape indicates LASSO selection. Variables in the upper-right quadrant are robust by both BMA and WALS."
+#| fig-width: 8
+#| fig-height: 6
+
+grand_table_plot <- grand_table |>
+  mutate(
+    lasso_shape = ifelse(lasso_selected, "LASSO: Selected", "LASSO: Not selected"),
+    true_status = ifelse(true_nonzero, "True predictor", "Noise")
+  )
+
+ggplot(grand_table_plot, aes(x = abs(wals_t), y = bma_pip)) +
+  # Quadrant shading
+  annotate("rect", xmin = 2, xmax = Inf, ymin = 0.80, ymax = 1,
+           fill = "#e8f5e9", alpha = 0.5) +
+  annotate("text", x = 5, y = 0.90, label = "Robust by\nboth methods",
+           size = 3, color = "gray40") +
+  # Threshold lines
+  geom_hline(yintercept = 0.80, linetype = "dashed", color = "gray40") +
+  geom_vline(xintercept = 2, linetype = "dashed", color = "gray40") +
+  # Points
+  geom_point(aes(color = true_status, shape = lasso_shape), size = 4) +
+  # Labels
+  geom_text_repel(aes(label = variable), size = 3, max.overlaps = 20) +
+  scale_color_manual(values = c("True predictor" = "#2c7bb6", "Noise" = "#d7191c")) +
+  scale_shape_manual(values = c("LASSO: Selected" = 17, "LASSO: Not selected" = 4)) +
+  labs(x = "WALS |t-statistic|",
+       y = "BMA Posterior Inclusion Probability",
+       color = "True status", shape = "LASSO result",
+       title = "BMA PIP vs. WALS |t-statistic|",
+       subtitle = "Upper-right = robust by both; triangles = LASSO-selected") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+## Figure: Coefficient Comparison
+
+```{r}
+#| label: fig-coef-comparison
+#| code-summary: "Compare true coefficients with BMA, Post-LASSO, and WALS estimates"
+#| fig-cap: "Coefficient estimates from the three methods compared to the true values. Points close to the dashed 45-degree line indicate accurate recovery."
+#| fig-width: 9
+#| fig-height: 6
+
+# Get Post-LASSO coefficients for all variables (0 if not selected)
+post_lasso_all <- tibble(
+  variable = names(true_beta_lookup),
+  post_lasso = 0
+)
+if (nrow(post_lasso_summary) > 0) {
+  post_lasso_all <- post_lasso_all |>
+    left_join(post_lasso_summary |> select(variable, post_lasso_coef), by = "variable") |>
+    mutate(post_lasso = coalesce(post_lasso_coef, 0)) |>
+    select(variable, post_lasso)
+}
+
+# Combine all coefficient estimates
+coef_compare <- grand_table |>
+  select(variable, true_beta, bma_postmean, wals_estimate) |>
+  left_join(post_lasso_all, by = "variable") |>
+  pivot_longer(c(bma_postmean, post_lasso, wals_estimate),
+               names_to = "method", values_to = "estimate") |>
+  mutate(
+    method = recode(method,
+                    bma_postmean = "BMA Post. Mean",
+                    post_lasso = "Post-LASSO",
+                    wals_estimate = "WALS"),
+    method = factor(method, levels = c("BMA Post. Mean", "Post-LASSO", "WALS"))
+  )
+
+ggplot(coef_compare, aes(x = true_beta, y = estimate, color = method, shape = method)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray50") +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_text_repel(aes(label = variable), size = 2.5, max.overlaps = 20,
+                  show.legend = FALSE) +
+  facet_wrap(~method, nrow = 1) +
+  scale_color_manual(values = c("BMA Post. Mean" = "#2c7bb6",
+                                 "Post-LASSO" = "#fdae61",
+                                 "WALS" = "#d7191c")) +
+  labs(x = "True Coefficient",
+       y = "Estimated Coefficient",
+       color = "Method", shape = "Method",
+       title = "Coefficient Recovery: Estimated vs. True",
+       subtitle = "Points on the dashed line = perfect recovery") +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "none")
+```
+
+## Figure: Agreement Summary
+
+```{r}
+#| label: fig-agreement
+#| code-summary: "Bar chart: how many methods identified each variable"
+#| fig-cap: "Number of methods (out of 3) that identified each variable as robust. Green bars are true predictors; red bars are noise variables."
+#| fig-width: 8
+#| fig-height: 5
+
+grand_table |>
+  mutate(
+    bar_fill = ifelse(true_nonzero, "True predictor", "Noise")
+  ) |>
+  ggplot(aes(x = reorder(variable, n_methods), y = n_methods, fill = bar_fill)) +
+  geom_col(width = 0.6) +
+  geom_hline(yintercept = 3, linetype = "dashed", color = "gray40") +
+  annotate("text", x = 0.5, y = 3.1, label = "Triple-robust", hjust = 0, size = 3) +
+  coord_flip() +
+  scale_fill_manual(values = c("True predictor" = "#2c7bb6", "Noise" = "#d7191c")) +
+  scale_y_continuous(breaks = 0:3) +
+  labs(x = NULL, y = "Number of methods identifying variable as robust",
+       fill = "True status",
+       title = "Agreement Across Three Methods",
+       subtitle = "How many methods agree that each variable is robust?") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+## Discussion
+
+```{r}
+#| label: discussion-stats
+#| code-summary: "Compute summary statistics for discussion"
+
+# Count true/false positives and negatives for each method
+results_by_method <- tibble(
+  method = c("BMA", "LASSO", "WALS"),
+  true_pos = c(
+    sum(grand_table$bma_robust & grand_table$true_nonzero),
+    sum(grand_table$lasso_selected & grand_table$true_nonzero),
+    sum(grand_table$wals_robust & grand_table$true_nonzero)
+  ),
+  false_pos = c(
+    sum(grand_table$bma_robust & !grand_table$true_nonzero),
+    sum(grand_table$lasso_selected & !grand_table$true_nonzero),
+    sum(grand_table$wals_robust & !grand_table$true_nonzero)
+  ),
+  false_neg = c(
+    sum(!grand_table$bma_robust & grand_table$true_nonzero),
+    sum(!grand_table$lasso_selected & grand_table$true_nonzero),
+    sum(!grand_table$wals_robust & grand_table$true_nonzero)
+  ),
+  true_neg = c(
+    sum(!grand_table$bma_robust & !grand_table$true_nonzero),
+    sum(!grand_table$lasso_selected & !grand_table$true_nonzero),
+    sum(!grand_table$wals_robust & !grand_table$true_nonzero)
+  )
+)
+
+# Triple-robust variables
+triple_robust_vars <- grand_table |>
+  filter(triple_robust) |>
+  pull(variable)
+
+# Variables missed by all methods
+all_missed <- grand_table |>
+  filter(n_methods == 0 & true_nonzero) |>
+  pull(variable)
+```
+
+**Which variables are "triple-robust"?** The variables identified by all three methods---`r paste(triple_robust_vars, collapse = ", ")`---are the ones we can be most confident about. When BMA, LASSO, and WALS all agree, the evidence is very strong.
+
+**Were any noise variables falsely identified?** Check the comparison table for noise variables (true $\beta$ = 0) that were incorrectly selected by one or more methods. False positives are more likely for noise variables that are strongly correlated with true predictors.
+
+**Which method is most conservative?** LASSO at lambda.1se tends to be the most conservative (fewest selections), because the "1 SE rule" deliberately chooses a sparser model. BMA with PIP $\geq$ 0.80 is moderately conservative. WALS with |t| $\geq$ 2 can be more liberal.
+
+**When to use which method?**
+
+| Method | Best for | Strengths | Limitations |
+|:--|:--|:--|:--|
+| BMA | Full uncertainty quantification | Probabilistic (PIPs), handles model uncertainty formally | Slower (MCMC), requires prior specification |
+| LASSO | Prediction, sparse models | Fast, automatic selection, works with many variables | Binary (in/out), biased coefficients |
+| WALS | Speed, frequentist inference | Very fast, produces t-statistics, no MCMC | Less common, limited software support |
+
+The strongest recommendation: **use all three**. When they converge on the same variables, you have robust evidence. When they disagree, investigate why---the disagreement itself is informative.
+
+```{r}
+#| label: tbl-method-performance
+#| code-summary: "Method performance summary table"
+
+results_by_method |>
+  mutate(
+    sensitivity = true_pos / (true_pos + false_neg),  # true positive rate
+    specificity = true_neg / (true_neg + false_pos),  # true negative rate
+    accuracy    = (true_pos + true_neg) / 12          # overall accuracy
+  ) |>
+  gt() |>
+  tab_header(
+    title = "Method Performance Summary",
+    subtitle = "Compared against the known ground truth (7 true, 5 noise)"
+  ) |>
+  cols_label(
+    method      = "Method",
+    true_pos    = "True Pos.",
+    false_pos   = "False Pos.",
+    false_neg   = "False Neg.",
+    true_neg    = "True Neg.",
+    sensitivity = "Sensitivity",
+    specificity = "Specificity",
+    accuracy    = "Accuracy"
+  ) |>
+  fmt_number(columns = c(sensitivity, specificity, accuracy), decimals = 3) |>
+  tab_footnote("Sensitivity = true positive rate; Specificity = true negative rate.")
+```
+
+:::{.callout-note}
+## What we learned
+The three methods largely converge: strong true predictors are identified by all three, and noise variables are mostly excluded. The convergence across methods---Bayesian (BMA), penalized likelihood (LASSO), and frequentist model averaging (WALS)---provides strong evidence for robustness. Variables with very small true effects are harder for all methods to detect.
+:::
+
+
+# Conclusion {#sec-conclusion}
+
+## Summary
+
+This tutorial introduced three principled approaches to the variable selection problem:
+
+1. **Bayesian Model Averaging (BMA)** averages over all possible models, weighting each by its posterior probability. It produces Posterior Inclusion Probabilities (PIPs) that quantify how robust each variable is across the entire model space. Variables with PIP $\geq$ 0.80 are considered robust.
+
+2. **LASSO** adds an L1 penalty to the OLS objective, forcing irrelevant coefficients to exactly zero. Cross-validation selects the penalty strength. Post-LASSO recovers unbiased coefficient estimates for the selected variables.
+
+3. **WALS** uses a semi-orthogonal transformation to decompose the model-averaging problem into independent subproblems---one per variable. It is extremely fast and produces familiar t-statistics for robustness assessment.
+
+## Key Takeaways
+
+**The methods converge.** When BMA, LASSO, and WALS agree that a variable matters (or does not matter), we can be confident in the conclusion. The convergence across fundamentally different statistical paradigms---Bayesian, penalized likelihood, and frequentist model averaging---provides a form of methodological triangulation.
+
+**Model uncertainty is real but addressable.** With 12 candidate variables, there are 4,096 possible models. Rather than pretending one of them is "the" model, these methods account for the uncertainty explicitly. The result is more honest inference.
+
+**Synthetic data lets us verify.** Because we designed the data-generating process, we could check each method's performance against the known truth. In practice, the truth is unknown---which is precisely why using multiple methods is so valuable.
+
+## Applying This to Your Own Research
+
+The code in this tutorial is designed to be modular. To apply these methods to your own data:
+
+1. **Replace the CSV**: load your own cross-sectional dataset instead of the synthetic one
+2. **Define the variable list**: specify which variables are candidates for selection
+3. **Run the three methods**: use the same BMS, glmnet, and WALS function calls
+4. **Compare results**: build the same comparison table and heatmap
+
+The interpretation framework---PIPs for BMA, selection for LASSO, t-statistics for WALS---applies regardless of the specific dataset.
+
+## Further Reading
+
+- **BMA**: Hoeting, J.A., Madigan, D., Raftery, A.E., and Volinsky, C.T. (1999). "Bayesian Model Averaging: A Tutorial." *Statistical Science*, 14(4), 382--417.
+- **LASSO**: Tibshirani, R. (1996). "Regression Shrinkage and Selection via the Lasso." *Journal of the Royal Statistical Society, Series B*, 58(1), 267--288.
+- **WALS**: Magnus, J.R., Powell, O., and Prufer, P. (2010). "A Comparison of Two Model Averaging Techniques with an Application to Growth Empirics." *Journal of Econometrics*, 154(2), 139--153.
+- **Application**: Aller, C., Ductor, L., and Grechyna, D. (2021). "Robust Determinants of CO~2~ Emissions." *Energy Economics*, 96, 105154.
+- **R Packages**: [BMS vignette](https://cran.r-project.org/web/packages/BMS/vignettes/bms.pdf), [glmnet vignette](https://glmnet.stanford.edu/articles/glmnet.html), [WALS package](https://cran.r-project.org/package=WALS)
+
+:::{.callout-tip}
+## The bottom line
+No single method should be trusted in isolation. When BMA, LASSO, and WALS converge on the same set of robust determinants, you have strong evidence that these variables genuinely matter---regardless of which model specification you choose. That is the power of robust variable selection.
+:::
+
+
+# Session Info
+
+```{r}
+#| label: session-info
+#| code-summary: "Session information for reproducibility"
+
+sessionInfo()
+```
