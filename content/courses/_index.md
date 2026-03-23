@@ -1,9 +1,10 @@
 ---
-header:
-  caption: ""
-  image: ""
 title: Courses
 type: page
+image:
+  placement: 2      # 1=right-float, 2=centered, 3=full-width
+  caption: ""
+  focal_point: "Center"
 ---
 
 I currently teach the following graduate-level courses:
