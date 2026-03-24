@@ -86,11 +86,13 @@ The dashboards project page (content/projects/dashboards/index.md) uses native `
 
 # Claude Code Skills
 
+All skills follow a three-phase interaction pattern: (1) confirm intent before work begins, (2) execute the core workflow, (3) offer follow-up actions after delivery. Skills use progressive disclosure via `references/` subdirectories -- detailed reference material is loaded on demand, keeping the core SKILL.md focused.
+
 ## data-science-post
 
 **Location:** `.claude/skills/data-science-post/SKILL.md`
 
-Generates notebook-style data science blog posts for the site. The user provides a topic, dataset, and optional reference URLs. The skill produces a Hugo page bundle at `content/post/python_<topic-slug>/` with:
+Generates notebook-style data science blog posts for the site. The user provides a topic, dataset, and optional reference URLs. The skill confirms topic scope and design choices before writing, then produces a Hugo page bundle at `content/post/python_<topic-slug>/` with:
 
 - `index.md` -- full tutorial with YAML front matter, case-study framing, code blocks, figures, and interpretation paragraphs
 - `script.py` -- standalone Python script (optional)
@@ -120,11 +122,19 @@ Generates notebook-style data science blog posts for the site. The user provides
 - Output blocks: use ` ```text ` (not bare ` ``` `) to prevent highlight.js auto-detection coloring
 - Reference posts: `content/post/python_ml_random_forest/index.md` (ML), `content/post/python_dowhy/index.md` (causal inference), `content/post/python_fwl/index.md` (dark theme figures, simulated data), `content/post/python_pyfixest/index.md` (panel data, fixed effects, dark theme figures), `content/post/python_esda2/index.md` (ESDA, spatial autocorrelation, LISA), `content/post/python_mgwr/index.md` (MGWR, spatially varying coefficients)
 
+**Reference files** (loaded on demand):
+- `references/latex-escaping.md` -- Goldmark/KaTeX escaping rules, equation requirements
+- `references/figure-conventions.md` -- dark theme setup, Mermaid diagrams, color families
+- `references/causal-inference.md` -- estimand precision, ATE/ATT, framing guidelines
+- `references/data-sources.md` -- data loading patterns (URL, named, DS4Bolivia, simulated DGP)
+- `references/companion-deliverables.md` -- script.py, notebook.ipynb templates
+- `references/quality-checklist.md` -- full verification checklist
+
 ## referee-post
 
 **Location:** `.claude/skills/referee-post/SKILL.md`
 
-Reviews data science blog posts as an expert professor of data science and econometrics. Produces a structured referee report covering code correctness, pedagogical explanations, result interpretations, and references. Read-only — does not modify the post.
+Reviews data science blog posts as an expert professor of data science and econometrics. Confirms review scope before starting, then produces a structured referee report covering code correctness, pedagogical explanations, result interpretations, and references. Read-only -- does not modify the post. Offers follow-up actions after delivering the report.
 
 **Invocation:**
 ```
@@ -140,15 +150,19 @@ Reviews data science blog posts as an expert professor of data science and econo
 
 **Report includes:**
 - Verdict: ACCEPT / MINOR REVISION / MAJOR REVISION
-- Five review passes: structure, code quality, sandwich pattern, interpretations, academic rigor
+- Up to 11 review passes: structure, code execution, code quality, beginner accessibility, sandwich pattern, equations, interpretations, writing clarity, academic rigor, narrative flow, deliverable consistency
 - Issue tables with severity (HIGH/MEDIUM/LOW), location, and suggested fixes
 - Priority action items ranked by impact
+
+**Reference files** (loaded on demand):
+- `references/report-template.md` -- full report template with all section formats
+- `references/scoring-and-criteria.md` -- severity definitions, verdict criteria, scoring guidelines
 
 ## infographic-instructions
 
 **Location:** `.claude/skills/infographic-instructions/SKILL.md`
 
-Generates an AI-image-generation prompt that creates a chalkboard-style infographic summarizing a blog post into 6 panels. The output is a copy-pasteable prompt optimized for Gemini, DALL-E, Midjourney, or Ideogram. Includes an interactive confirmation step before generation.
+Generates an AI-image-generation prompt that creates a chalkboard-style infographic summarizing a blog post into 6 panels. The output is a copy-pasteable prompt optimized for Gemini, DALL-E, Midjourney, or Ideogram. Confirms template, title, and rendering preferences before generating. Offers follow-up adjustments after delivery.
 
 **Invocation:**
 ```
@@ -168,11 +182,15 @@ Generates an AI-image-generation prompt that creates a chalkboard-style infograp
 - Section C: Condensed ~300-word prompt for token-limited tools
 - Section D: Panel reference data appendix (structured text, icons, mini-viz, callouts)
 
+**Reference files** (loaded on demand):
+- `references/panel-templates.md` -- three panel templates (Causal, ML, Exploratory) and element rules
+- `references/static-sections.md` -- negative prompt template and condensed prompt structure
+
 ## proofread-post
 
 **Location:** `.claude/skills/proofread-post/SKILL.md`
 
-Final proofreading pass on a data science post before publication. Checks correctness, display, and consistency without modifying any files. Lighter and faster than `referee-post` -- use this right before committing or publishing. Supports a `focus:` argument to run only specific checks.
+Quick final QA before publishing a data science post. Checks correctness, display, and consistency without modifying any files. Lighter and faster than `referee-post` -- use this right before committing or publishing. Supports a `focus:` argument to run only specific checks. Announces scope and offers follow-up after delivery.
 
 **Invocation:**
 ```

@@ -1,6 +1,6 @@
 ---
 name: data-science-post
-description: Create a notebook-style data science blog post for carlos-mendez.org (Hugo/Wowchemy). The user provides a topic, dataset, and optional references. The skill produces a Hugo post with case-study framing, code blocks, figure references, and interpretation paragraphs.
+description: Create a notebook-style data science blog post for carlos-mendez.org. Use when the user wants to write a Python tutorial, create a data science post, demonstrate a statistical or causal inference method, or produce content for the python_* post series. Produces a Hugo page bundle with case-study framing, sandwich-pattern code blocks, matplotlib figures, and interpretation paragraphs. Confirms topic scope and design choices before writing.
 argument-hint: "<topic> dataset: <dataset name or URL> [references: <URLs, papers, or notes>]"
 disable-model-invocation: true
 user-invocable: true
@@ -71,7 +71,7 @@ and text. Reference post: `content/post/python_fwl/script.py`.
    - **References** -- everything after `references:` (optional)
    - **Topic slug** -- lowercase, underscores (e.g., "double machine learning" -> `doubleml`)
 2. **Fetch reference URLs** -- use WebFetch to read each URL and understand the library's API, key classes/functions, and recommended usage patterns. Critical for producing accurate, idiomatic code
-3. **Fetch dataset information** -- if the dataset is a URL, use WebFetch to understand its structure. If it's a named dataset, look up the standard loading pattern
+3. **Fetch dataset information** -- if the dataset is a URL, use WebFetch to understand its structure. If it's a named dataset, look up the standard loading pattern. Read `references/data-sources.md` for data loading patterns (URL download with cache, named datasets, DS4Bolivia joins, simulated DGP for method tutorials, user-described data)
 4. **Check for conflicts** -- verify `content/post/python_<topic-slug>/` doesn't already exist
 5. **Identify dependencies** -- determine which Python packages the topic requires. Note them in the setup code block so readers can install them:
    - DoubleML: `pip install doubleml`
@@ -82,86 +82,43 @@ and text. Reference post: `content/post/python_fwl/script.py`.
 
 ---
 
-## Data Source Handling
+## Step 0.5: Confirm scope and design choices
 
-The user specifies the dataset. Design the data loading code to match.
+Before creating any files, present the user with a confirmation summary and
+**wait for their response**. This step prevents rework by aligning on the
+post's framing, scope, and deliverables upfront. Display all items in a
+single formatted block:
 
-### URL to a CSV or data file
+1. **Topic understanding**: "I'll create a tutorial about [TOPIC] using the
+   [DATASET]. The case study question will be: '[QUESTION]'. Does this
+   capture your intent?"
 
-```python
-DATA_URL = "https://example.com/path/to/data.csv"
-CACHE_PATH = Path("data.csv")
+2. **Post type**: "[Causal inference / ML prediction / Exploratory analysis /
+   Statistical method tutorial] -- based on [brief reasoning]. Change?"
 
-if CACHE_PATH.exists():
-    df = pd.read_csv(CACHE_PATH)
-else:
-    df = pd.read_csv(DATA_URL)
-    df.to_csv(CACHE_PATH, index=False)
-```
+3. **Figure theme**: "Light background (default) or dark navy background?
+   Dark theme matches the site's navbar/footer aesthetic and works well for
+   scatter plots and line charts."
 
-### Named dataset from a well-known source
+4. **Post scope** -- ask about optional sections based on the topic:
+   - "Should I include a baseline comparison before the main method?"
+   - "Should I include a robustness/sensitivity analysis section?"
+   - "Should I include exercises for self-study?"
 
-- **scikit-learn**: `from sklearn.datasets import load_iris; df = pd.DataFrame(...)`
-- **Seaborn**: `df = sns.load_dataset("penguins")`
-- **World Bank / FRED**: Use `pandas_datareader` or direct URL download
-- **GitHub-hosted CSV**: Download via raw URL
+5. **Companion deliverables**: "Which deliverables should I create?
+   - index.md (always)
+   - script.py (standalone Python script)
+   - notebook.ipynb (Jupyter notebook for Google Colab)"
 
-### DS4Bolivia
+6. **Ambiguity resolution** (conditional) -- if the topic could be framed
+   as either causal or predictive, ask: "This topic could be framed as
+   [causal estimation of X] or [prediction of Y]. Which framing do you
+   prefer?"
 
-**Base URL:** `https://raw.githubusercontent.com/quarcs-lab/ds4bolivia/master`
-
-| Dataset | Path | Key columns |
-|---------|------|-------------|
-| SDG indices | `/sdg/sdg.csv` | `asdf_id`, `imds`, `sdg1`-`sdg15` |
-| Satellite embeddings | `/satelliteEmbeddings/satelliteEmbeddings2017.csv` | `asdf_id`, `A00`-`A63` |
-| Region names | `/regionNames/regionNames.csv` | `asdf_id`, municipality/department names |
-
-Join on `asdf_id` (339 Bolivian municipalities). Select columns by topic:
-supervised -> SDG target + embedding features; unsupervised -> embeddings;
-causal -> SDG outcome + treatment; spatial -> add region identifiers.
-
-### Simulated data (DGP)
-
-When the topic is about a statistical or causal inference method (e.g., FWL
-theorem, instrumental variables, regression discontinuity), a transparent
-**data generating process** is often better than a real dataset. The reader
-can verify results against known true parameters.
-
-```python
-def simulate_data(n=50, seed=42):
-    """Simulate data with known causal structure.
-
-    True DGP:
-        confounder ~ N(50, 10)
-        treatment  = f(confounder) + noise
-        outcome    = true_effect * treatment + g(confounder) + noise
-
-    The true causal effect of treatment on outcome is <true_effect>.
-    """
-    rng = np.random.default_rng(seed)
-    confounder = rng.normal(50, 10, n)
-    treatment = ...  # function of confounder + noise
-    outcome = ...    # function of treatment + confounder + noise
-    return pd.DataFrame({...})
-```
-
-Key conventions for simulated data:
-- Document the true DGP in the docstring (exact equations)
-- State the **true causal effect** so readers can verify estimates
-- Use `np.random.default_rng(seed)` (modern NumPy API) for the DGP function
-- Keep N small enough for clear scatter plots (50-200), large enough for stable estimates
-- Print shape, head, and descriptive stats after generation (same as real data)
-
-### User-described dataset
-
-If the user describes data without a URL or name, ask: format? access method? key variables?
-
-### General principles
-
-- Always cache downloaded data locally
-- Print dataset shape and basic stats after loading
-- Define `TARGET`, `FEATURE_COLS`, and config variables near the top
-- Use `RANDOM_SEED = 42` for reproducibility
+**Handling responses:**
+- "Looks good" / "proceed" / no changes: continue with stated defaults
+- Specific adjustments: incorporate them and proceed
+- Major reframing requested: revise the scope and re-present the summary
 
 ---
 
@@ -410,197 +367,24 @@ from config import set_seeds, RANDOM_SEED, IMAGES_DIR, TABLES_DIR, DATA_DIR
 set_seeds()
 ```
 
-### 2.4 LaTeX math in Hugo/Goldmark
+### 2.4 LaTeX math and equations
 
-Hugo's Goldmark renderer processes markdown **before** KaTeX renders math.
-Goldmark treats `\` + any ASCII punctuation character as an escape sequence,
-stripping the backslash. This breaks LaTeX commands that use punctuation.
+For LaTeX math in Hugo, escape subscripts as `\_` and LaTeX punctuation
+commands as `\\,`, `\\;`, etc. Letter commands like `\theta` need no
+escaping. Currency dollar signs use `\\$` in `index.md`. Read
+`references/latex-escaping.md` for the complete escaping guide, worked
+examples, and equation requirements (plain-language explanations, variable
+mapping, notation consistency). Minimum 2 display-math equations for
+quantitative method posts.
 
-**Escaping rules:**
+### 2.5 Figures, diagrams, and color families
 
-- **Subscripts** (`_`): Write `\_` -- Goldmark strips `\`, KaTeX sees `_`
-- **LaTeX punctuation commands** (`\,` `\;` `\%` `\!`): Write `\\,` `\\;` `\\%` `\\!` -- Goldmark converts `\\` to `\`, preserving the LaTeX command
-- **LaTeX letter commands** (`\theta` `\hat` `\text` `\frac` `\sum`): No escaping needed -- Goldmark only escapes `\` + punctuation, not `\` + letter
-- **Display math** (`$$...$$`): Same escaping rules apply -- Goldmark does NOT treat `$$` as a protected block
-- **Multiple underscores**: Goldmark pairs `_` across an entire paragraph for emphasis. Even separate inline math like `$\theta_0$` and `$g_0(X)$` on the same line can have their underscores paired as `<em>` tags. Always escape every `_` in math as `\_`
-- **Currency dollar signs**: MathJax treats `$...$` as inline math. Use `\\$` for literal dollar signs in prose (Goldmark outputs `\$`, MathJax treats as literal thanks to `processEscapes: true` in `assets/js/mathjax-config.js`). Do NOT use `&#36;` -- it does not work. In notebook `.ipynb`, use `\$` instead (no Goldmark layer)
-
-**Quick reference:**
-
-| Want | Write in markdown | Goldmark produces | KaTeX sees |
-|------|-------------------|-------------------|------------|
-| Subscript `x_i` | `$x\_i$` | `$x_i$` | subscript |
-| Thin space | `$D \\, \theta\_0$` | `$D \, \theta_0$` | thin space |
-| Percent `95%` | `$\text{CI}\_{95\\%}$` | `$\text{CI}_{95\%}$` | percent |
-| Thick space | `$[-0.14, \\; -0.00]$` | `$[-0.14, \; -0.00]$` | thick space |
-
-**Worked example -- a full equation with all escaping applied:**
-
-What you want rendered:
-$$Y_i = \theta_0 \, D_i + g_0(X_i) + U_i, \quad E[U_i | D_i, X_i] = 0$$
-
-What you write in `index.md`:
-```
-$$Y\_i = \theta\_0 \\, D\_i + g\_0(X\_i) + U\_i, \\quad E[U\_i | D\_i, X\_i] = 0$$
-```
-
-Key escaping applied: every `_` → `\_`, every `\,` → `\\,`, every `\quad` is fine (letter command).
-
-**WARNING:** Always visually verify math rendering in the Hugo dev server.
-LaTeX errors are silent -- broken math renders as raw text or wrong symbols.
-
-### 2.4b Equation requirements
-
-Every post that introduces a quantitative method must present its key
-equations. Equations ground intuition in formal notation and connect
-the math to the code.
-
-**Minimum:** 2 display-math equations for any post introducing a
-quantitative method.
-
-**For each equation:**
-
-1. **Plain-language explanation.** Immediately after the equation, write
-   a sentence starting with "In words, this says..." or equivalent.
-   Example: "In words, this equation says that the outcome $Y$ equals
-   the treatment effect $\theta$ times the treatment $D$, plus
-   everything else that affects $Y$ through the controls $X$."
-
-2. **Variable mapping.** Map math symbols to code variables so beginners
-   can connect the formula to the implementation. Example: "$Y$
-   corresponds to our `inuidur1` column, $D$ is the `tg` treatment
-   indicator, and $X$ includes the 15 covariate columns."
-
-3. **Notation consistency.** Use the same symbol for the same concept
-   throughout the entire post. Do not switch between $Y$ and $y$, or
-   $D$ and $T$, without explicit explanation.
-
-### 2.5 Figure conventions
-
-In code blocks, save figures with:
-
-```python
-plt.savefig("<slug>_<name>.png", dpi=300, bbox_inches="tight")
-plt.show()
-```
-
-After the code block, reference the figure with:
-
-```markdown
-![Descriptive alt text.](<slug>_<name>.png)
-```
-
-Hugo resolves images from the page bundle, so use just the filename. Use the
-site color palette (see top of this document) for all matplotlib plots.
-At least 3 figures total.
-
-**Figure placement:** Place the figure image reference (`![alt](file.png)`)
-immediately after the code block that generates it, before the
-interpretation paragraph. The figure serves as visual output; the
-interpretation paragraph then explains what the reader is seeing.
-
-**CSS note:** `.article-style img` has no `border` or `box-shadow` -- just
-`border-radius: 4px` and margins. Dark-background figures render cleanly
-without any visible border artifacts.
-
-### 2.5a Dark theme figures
-
-For posts where dark-background figures better match the site aesthetic, use
-the dark theme palette and spine-free styling. Set rcParams once at the top
-of the script:
-
-```python
-# Dark theme palette
-DARK_NAVY = "#0f1729"
-GRID_LINE = "#1f2b5e"
-LIGHT_TEXT = "#c8d0e0"
-WHITE_TEXT = "#e8ecf2"
-
-plt.rcParams.update({
-    "figure.facecolor": DARK_NAVY,
-    "axes.facecolor": DARK_NAVY,
-    "axes.edgecolor": DARK_NAVY,
-    "axes.linewidth": 0,
-    "axes.labelcolor": LIGHT_TEXT,
-    "axes.titlecolor": WHITE_TEXT,
-    "axes.spines.top": False,
-    "axes.spines.right": False,
-    "axes.spines.left": False,
-    "axes.spines.bottom": False,
-    "axes.grid": True,
-    "grid.color": GRID_LINE,
-    "grid.linewidth": 0.6,
-    "grid.alpha": 0.8,
-    "xtick.color": LIGHT_TEXT,
-    "ytick.color": LIGHT_TEXT,
-    "xtick.major.size": 0,
-    "ytick.major.size": 0,
-    "text.color": WHITE_TEXT,
-    "font.size": 12,
-    "legend.frameon": False,
-    "legend.fontsize": 11,
-    "legend.labelcolor": LIGHT_TEXT,
-    "figure.edgecolor": DARK_NAVY,
-    "savefig.facecolor": DARK_NAVY,
-    "savefig.edgecolor": DARK_NAVY,
-})
-```
-
-**Critical for dark theme figures:**
-
-1. After every `plt.subplots()` call, add `fig.patch.set_linewidth(0)` to
-   eliminate any residual figure border
-2. Save with matching facecolor/edgecolor and `pad_inches=0`:
-   ```python
-   fig, ax = plt.subplots(figsize=(8, 6))
-   fig.patch.set_linewidth(0)
-   # ... plot code ...
-   plt.savefig("<slug>_<name>.png", dpi=300, bbox_inches="tight",
-               facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
-   ```
-3. Use site palette colors for data: steel blue for points, warm orange for
-   fit lines, teal for highlighted series
-4. Use `edgecolors=DARK_NAVY` on scatter points for clean edges against the
-   dark background
-
-Reference implementation: `content/post/python_fwl/script.py`
-
-### 2.5b Diagrams
-
-If the method has a causal, structural, or multi-step framework, include
-at least one diagram to visualize the structure. Examples: a DAG for
-causal inference, a flowchart for a multi-step pipeline, an architecture
-diagram for an ensemble model.
-
-**Options for diagrams:**
-
-- **Mermaid diagrams** (preferred for flowcharts and DAGs) -- Hugo supports
-  Mermaid natively. Add `diagram: true` to front matter, then use fenced
-  code blocks with the `mermaid` language tag. Use site colors in `style`
-  directives (e.g., `style A fill:#6a9bcc,stroke:#141413,color:#fff`).
-- **Matplotlib** -- for quantitative diagrams that need precise layout.
-- **Pre-made image** -- include in the page bundle.
-
-### 2.5c Color families for related methods
-
-When comparing multiple related methods (e.g., propensity score variants,
-ensemble methods, regularization approaches), use a **color family** to
-visually group them in comparison charts. This makes it immediately clear
-which methods belong together.
-
-**Example from the DoWhy post (6 estimation methods):**
-
-| Method | Color | Rationale |
-|--------|-------|-----------|
-| Naive (baseline) | `#999999` (gray) | Distinct: not a causal method |
-| Regression Adjustment | `#6a9bcc` (steel blue) | Outcome modeling paradigm |
-| IPW | `#d97757` (warm orange) | Treatment modeling paradigm |
-| AIPW | `#00d4c8` (teal) | Doubly robust paradigm |
-| PS Stratification | `#e8956a` (light orange) | Treatment modeling -- warm orange family |
-| PS Matching | `#c4623d` (dark orange) | Treatment modeling -- warm orange family |
-
-The warm orange family (`#d97757`, `#e8956a`, `#c4623d`) groups all three
-propensity score methods visually, while distinct paradigms get distinct colors.
+Save figures with `dpi=300, bbox_inches="tight"`, reference with
+`![alt](slug_name.png)`. Place figure references immediately after the
+generating code block, before the interpretation paragraph. At least 3
+figures total. Read `references/figure-conventions.md` for dark theme
+setup (rcParams, savefig options), Mermaid diagram guidance, and color
+family design for multi-method comparison charts.
 
 ### 2.6 Tables
 
@@ -640,33 +424,12 @@ Include at minimum:
 - **Library documentation** -- link to the main library docs page.
 - **Order:** Number references in order of first mention in the post.
 
-### 2.8 Causal inference posts: estimand precision
+### 2.8 Causal inference posts
 
-When a post compares **multiple causal estimation methods**, explicitly state
-which **estimand** each method targets. This is a common source of confusion
-and errors.
-
-**Required elements:**
-
-1. **Define the estimand(s) early** -- before the estimation section, add a
-   subsection explaining the target estimand (e.g., ATE vs ATT) with formal
-   notation and a plain-language policy question each answers.
-2. **Flag estimand shifts** -- if any method targets a different estimand than
-   the others (e.g., PS matching targets ATT while IPW targets ATE), state
-   this explicitly in both the method explanation and the comparison discussion.
-3. **Randomized vs observational framing** -- in randomized experiments, the
-   naive difference-in-means is **unbiased in expectation**. Do NOT claim
-   covariate adjustment "removes confounding bias" -- instead frame it as
-   **improving precision** by accounting for finite-sample covariate imbalances.
-   In observational studies, confounding bias is a genuine concern and should
-   be described as such.
-
-**Example (from DoWhy post):**
-
-> **In this tutorial, we estimate the ATE** --- the average effect across the
-> entire study population. Four of our five methods target the ATE directly.
-> The exception is **propensity score matching**, which discards unmatched
-> controls and therefore shifts the estimand toward the ATT.
+For causal inference posts, explicitly state which estimand (ATE/ATT) each
+method targets and use correct framing for randomized vs observational data.
+Read `references/causal-inference.md` for full requirements on estimand
+precision, confounding language, and framing guidelines.
 
 ### 2.9 Writing clarity
 
@@ -690,7 +453,7 @@ sentence in the post must be original writing.
   documentation, tutorials, or any external source. Read the source,
   understand the idea, then rewrite it entirely in your own words while
   preserving the original meaning. Even short phrases should be
-  rephrased — do not reproduce verbatim passages, even with attribution.
+  rephrased -- do not reproduce verbatim passages, even with attribution.
 - **Proper attribution.** When using ideas, methods, results, or data
   from another source, cite it explicitly in the text (e.g., "Following
   the approach introduced by Chernozhukov et al. (2018)...") and include
@@ -771,85 +534,13 @@ If fewer than 8, go back and add more.
 
 ---
 
-## Step 4: Create script.py (optional)
+## Step 4: Create companion deliverables
 
-If the post warrants a standalone script, create
-`content/post/python_<topic-slug>/script.py`:
-
-```python
-"""
-<Tutorial Title>: <Topic> Case Study
-
-<One-paragraph description>
-
-Usage:
-    python script.py
-
-References:
-    - <URL 1>
-    - <URL 2>
-"""
-
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from pathlib import Path
-
-RANDOM_SEED = 42
-np.random.seed(RANDOM_SEED)
-
-# ... full analysis pipeline ...
-```
-
-Include in front matter links:
-
-```yaml
-- icon: code
-  icon_pack: fas
-  name: "Python script"
-  url: script.py
-```
-
----
-
-## Step 4b: Create notebook.ipynb (optional)
-
-If the post would benefit from a companion Jupyter notebook, create
-`content/post/python_<topic-slug>/notebook.ipynb` (nbformat 4, Python 3 kernel).
-
-Structure the notebook as alternating markdown cells (explanations) and code
-cells (matching the blog post code blocks). The notebook should be runnable
-end-to-end in Google Colab.
-
-**IMPORTANT:** LaTeX in Jupyter notebooks does **NOT** need Goldmark escaping.
-Use raw `_` for subscripts, `\,` for thin space, `\%` for percent, etc.
-The escaping rules in section 2.4 apply only to `index.md`.
-
-Include the notebook in front matter links:
-
-```yaml
-- icon: book
-  icon_pack: fas
-  name: "Jupyter notebook"
-  url: notebook.ipynb
-```
-
-If the notebook is pushed to the GitHub repo, add a Colab link:
-
-```yaml
-- icon: open-data
-  icon_pack: ai
-  name: "[Python] Google Colab"
-  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_<topic-slug>/notebook.ipynb
-```
-
----
-
-## Step 4c: Featured image
-
-Do **not** generate a `featured.png`. The user will manually add a featured
-image to the page bundle later. The script should not copy or create
-`featured.png`.
+If script.py or notebook.ipynb were confirmed in Step 0.5, read
+`references/companion-deliverables.md` for the templates and conventions.
+Key points: script.py includes a docstring header and mirrors the post's
+analysis pipeline; notebook.ipynb uses raw LaTeX (no Goldmark escaping);
+do NOT generate `featured.png` -- the user adds it manually.
 
 ---
 
@@ -878,15 +569,8 @@ image to the page bundle later. The script should not copy or create
      `index.md` image references, and delete any PNGs not referenced in the post.
    - **External tool dependencies:** If the script depends on optional tools
      (e.g., graphviz for DAG rendering), wrap those calls in try/except so the
-     rest of the script can still run. Example:
-     ```python
-     try:
-         model.view_model(layout="dot")
-     except Exception as e:
-         print(f"Skipping (tool not available): {e}")
-     ```
-   - **Floating-point drift:** Numeric output may vary slightly across runs
-     (e.g., `$1,559.41` vs `$1,559.47`) due to floating-point non-determinism.
+     rest of the script can still run.
+   - **Floating-point drift:** Numeric output may vary slightly across runs.
      Always use the values from the LATEST run in output blocks and verify
      that rounded values in charts and summary tables are consistent.
 3. **Run Hugo dev server:**
@@ -902,71 +586,20 @@ image to the page bundle later. The script should not copy or create
    - **All LaTeX math renders correctly** (no raw text, no wrong symbols)
    - Output blocks appear after code that prints results
    - Featured image displays in post header and listings
-5. **Report** to user: what was created + local preview URL
+5. **Run the full quality checklist** from `references/quality-checklist.md`.
+   Key checks: sandwich pattern on every output block, at least 8
+   interpretations with numbers, at least 3 figures, LaTeX rendering, no
+   orphaned PNGs, original writing with proper attribution.
+6. **Report** to user: what was created + local preview URL
 
 ---
 
-## Quality checklist
+## Step 5.5: Follow-up
 
-- [ ] Front matter follows Wowchemy conventions (match reference post)
-- [ ] `toc: true` is set
-- [ ] Overview motivates the case study question
-- [ ] Learning objectives present (3-5 bullets)
-- [ ] Every output-producing code block has the sandwich (explanation -> code -> output -> interpretation)
-- [ ] Every `print()` / `.describe()` / `.head()` code block has an output block (`text` language tag)
-- [ ] At least 8 interpretation paragraphs with specific numbers
-- [ ] At least 3 figures with `dpi=300, bbox_inches="tight"`
-- [ ] Matplotlib uses site colors (`#6a9bcc`, `#d97757`, `#141413`)
-- [ ] All LaTeX math uses Goldmark-safe escaping (`\_` for subscripts, `\\` for punctuation commands)
-- [ ] Math rendering visually verified in Hugo dev server
-- [ ] `featured.png` is NOT generated (user adds it manually)
-- [ ] Summary table compares key metrics
-- [ ] Discussion connects findings to case study question
-- [ ] Limitations and next steps section
-- [ ] Exercises (2-3 challenges, encouraged)
-- [ ] References section with numbered clickable links
-- [ ] No emojis in post content
-- [ ] Summary in front matter is a single line
-- [ ] Date set to current date
-- [ ] Data loading matches user-specified dataset
-- [ ] Notebook companion (if created) uses raw LaTeX (no Goldmark escaping)
-- [ ] Technical jargon defined on first use (no unexplained terms)
-- [ ] At least 2 display-math equations (for quantitative method posts)
-- [ ] Each equation has plain-language explanation and variable mapping
-- [ ] Notation consistent throughout (same symbol = same concept)
-- [ ] At least 2 analogies or concrete examples for complex concepts
-- [ ] No sentence exceeds ~40 words
-- [ ] Active voice preferred throughout
-- [ ] Transitions between all sections (no abrupt jumps)
-- [ ] Discussion answers the Overview question explicitly
-- [ ] "So what?" practical implication stated
-- [ ] Takeaways are concrete with numbers (not generic summaries)
-- [ ] Takeaways cover: method insight, data insight, limitation, next step
-- [ ] References include original method paper (not just library docs)
-- [ ] Dataset source cited with author/year/title
-- [ ] References numbered in order of first mention
-- [ ] Code executed and output blocks match actual results
-- [ ] All PNGs regenerated after any code/color changes (no stale images)
-- [ ] No orphaned PNGs in page bundle (every PNG referenced in post)
-- [ ] Currency dollar signs use `\\$` in index.md, `\$` in notebook.ipynb
-- [ ] Causal posts: estimand (ATE/ATT) explicitly stated for each method
-- [ ] Causal posts: randomized vs observational framing is accurate
-- [ ] External tool dependencies wrapped in try/except (graphviz, etc.)
-- [ ] Color families used for related method groups in comparison charts
-- [ ] `diagram: true` in front matter if Mermaid diagrams are used
-- [ ] Key Python functions linked to docs and explained on first use
-- [ ] Simple baseline established before the full method
-- [ ] At least one robustness/validation check included
-- [ ] Comparison summary table for multiple approaches or configurations
-- [ ] Diagram included for causal/structural/multi-step methods
-- [ ] Learning objectives use strong action verbs (Understand, Implement, Estimate, Assess, Compare)
-- [ ] Interpretation paragraphs translate metrics into domain-meaningful statements
-- [ ] Figure image references placed immediately after generating code block
-- [ ] Narrative follows arc: Question → Intuition → Baseline → Method → Validation → Takeaways
-- [ ] Dark theme figures (if used): `fig.patch.set_linewidth(0)` after every `plt.subplots()`
-- [ ] Dark theme figures (if used): savefig includes `facecolor`, `edgecolor`, `pad_inches=0`
-- [ ] Dark theme figures (if used): scatter `edgecolors` match background color
-- [ ] Simulated DGP (if used): true parameters documented in docstring, verified against estimates
-- [ ] All text is original — no copy-pasted passages from references, docs, or tutorials
-- [ ] External ideas and methods properly attributed in-text and in References
-- [ ] Code adapted from external sources credited with comments and references
+After delivering the post and reporting results, offer the user next steps:
+
+"The post is ready at `content/post/python_<slug>/`. Want me to:
+- Adjust any section or add more figures?
+- Run `/project:proofread-post` for a final QA check?
+- Run `/project:referee-post` for a deep expert review?
+- Create the infographic prompt with `/project:infographic-instructions`?"

@@ -1,6 +1,6 @@
 ---
 name: infographic-instructions
-description: Generate an AI-image-generation prompt that creates a chalkboard-style infographic summarizing a blog post into 6 panels. Produces a copy-pasteable prompt optimized for Gemini, DALL-E, Midjourney, or Ideogram, with a condensed variant and panel reference data.
+description: Generate a chalkboard infographic prompt for a blog post -- use after publishing a data science post to create a visual summary. Produces a copy-pasteable AI image prompt (Gemini, DALL-E, Midjourney, Ideogram) with 6 panels, negative prompt, condensed variant, and panel reference data. Confirms template, title, and rendering preferences before generating.
 argument-hint: "<post slug, e.g. python_partial_identification>"
 disable-model-invocation: true
 user-invocable: true
@@ -225,80 +225,11 @@ Row 1: Panel 1 (top-left)    | Panel 2 (top-center)    | Panel 3 (top-right)
 Row 2: Panel 4 (bottom-left) | Panel 5 (bottom-center) | Panel 6 (bottom-right)
 ```
 
-**Panel templates** -- choose based on post content:
-
-**Template A -- Causal Inference** (use when post tags include "causal", or
-methods like DML/DoWhy/IV/RCT/partial identification are central)
-
-| Panel | Purpose | What to extract |
-|-------|---------|-----------------|
-| 1 | **The Problem** | Why this matters, what question it answers |
-| 2 | **Case Study** | Dataset, sample size, treatment/outcome setup |
-| 3 | **Core Method** | How the method works, key result with numbers |
-| 4 | **Extensions / Comparisons** | Methods compared, which won and by how much |
-| 5 | **Key Insight** | Most surprising takeaway -- the "aha" moment |
-| 6 | **Bottom Line** | When to use this method, practical guidance |
-
-**Template B -- ML / Prediction** (use when post focuses on prediction,
-classification, or model performance)
-
-| Panel | Purpose | What to extract |
-|-------|---------|-----------------|
-| 1 | **The Question** | Prediction target, why it matters |
-| 2 | **The Data** | Dataset, sample size, key features |
-| 3 | **The Model** | Model architecture, baseline performance |
-| 4 | **Tuning / Validation** | Tuning results, improvement over baseline |
-| 5 | **Feature Insights** | Feature importance, what the model reveals |
-| 6 | **Bottom Line** | Performance limits, what could improve it |
-
-**Template C -- Exploratory / Descriptive** (use when post focuses on data
-patterns, spatial analysis, or descriptive statistics)
-
-| Panel | Purpose | What to extract |
-|-------|---------|-----------------|
-| 1 | **The Question** | Pattern investigated, why it matters |
-| 2 | **The Data** | Dataset, scope, key variables |
-| 3 | **Pattern 1** | First finding with specific numbers |
-| 4 | **Pattern 2** | Second finding, contrast to Pattern 1 |
-| 5 | **Synthesis** | How patterns connect, joint insight |
-| 6 | **Implications** | Policy implications, next steps |
-
-**Panel title rules:**
-- Titles should be descriptive and specific to the post content
-- Do NOT use generic titles like "Results" or "Analysis"
-- Include the method name or key concept
-- Examples: "MANSKI BOUNDS", "RANDOM FOREST VS. GRADIENT BOOSTING", "THE BACKDOOR CRITERION"
-
-**Panel 4 comparison visual:**
-Panel 4 (comparisons/extensions) must include a chalk-drawn comparison
-visual as its mini-viz: side-by-side bars, overlapping intervals, or a
-small check/cross table. Color-code the best method in teal (#00d4c8),
-others in chalk white (#f0ece2).
-
-**Icon rules:**
-- Each panel's icon must be a concrete, specific chalk-drawn illustration
-- Icons should be distinct across panels (no repeats)
-- Examples: "chalk-drawn brackets [ ] flanking a question mark", "a chalk stick figure with a magnifying glass", "two overlapping interval bars"
-
-**Mini-viz rules:**
-- Each panel's mini-viz must describe a concrete chart type with specific data values from the post
-- NOT generic (e.g., "a chart") -- always specific (e.g., "a chalk number line from -0.3 to 0.7 with bracket markers at the endpoints")
-- Examples:
-  - "A chalk number line from -0.3 to 0.7 with bracket markers at the bound endpoints"
-  - "Two horizontal bars: a wide bar labeled 'Manski' (width 1.0) in chalk white and a narrow bar labeled 'Entropy' (width 0.68) highlighted in teal (#00d4c8)"
-  - "A chalk bar chart with 4 bars for each method's estimate, the RF DML bar highlighted in teal"
-  - "A chalk scatter plot with a trend line and residual arrows showing the partialling-out idea"
-
-**Callout rules:**
-- Exactly one callout per panel -- the single most impactful phrase
-- Must contain a specific number or a memorable phrase
-- Described with rendering instructions: size, color, chalk style
-
-**Connector rules:**
-- Each panel except Panel 1 gets a connector arrow from the previous panel
-- The arrow carries a transition phrase (5-10 words) in muted gray chalk
-- Phrases are specific to the post content
-- Example: "A chalk arrow connects from Panel 2, with the phrase 'But what if confounders are hidden?' in small muted gray chalk along the arrow."
+**Panel templates and element rules** -- read `references/panel-templates.md`
+for the three templates (Causal Inference, ML/Prediction,
+Exploratory/Descriptive) and all rules for panel titles, icons, mini-viz,
+callouts, connectors, and the Panel 4 comparison visual. Select the template
+that matches the post's tags and content.
 
 #### A6. Margin elements paragraph
 
@@ -374,63 +305,12 @@ rendered large in warm orange. Background formulas at 10% opacity.
 
 ---
 
-### Section B: Negative Prompt
+### Sections B and C: Negative Prompt and Condensed Prompt
 
-Separated from Section A by a `---` horizontal rule and labeled `## Negative Prompt`.
-
-The negative prompt is mostly static with a few topic-specific additions:
-
-```
-Do not include: photorealistic rendering, glossy or reflective surfaces,
-drop shadows, gradient color fills, emojis or Unicode symbols, computer-
-generated sans-serif typography, neon glow effects, 3D perspective or
-depth, watermarks, stock photo elements, smooth vector curves, pure white
-(#ffffff) -- all whites should be warm/creamy chalk white (#f0ece2).
-All lines should appear hand-drawn with varying weight and chalk texture.
-Do not use clean digital borders or perfectly straight lines.
-```
-
-Add 1-2 topic-specific exclusions if relevant (e.g., "Do not include
-photographs of actual chalkboards or classrooms").
-
----
-
-### Section C: Condensed Prompt
-
-Separated by `---` and labeled `## Condensed Prompt (~300 words)`.
-
-A compressed version of Section A for token-limited tools (Midjourney ~6000
-chars, DALL-E ~4000 chars). Write in telegram-style -- dense, no filler:
-
-Structure:
-1. Style + format + dimensions (1 sentence)
-2. Layout (1 sentence)
-3. Colors with hex codes (1 sentence listing all 6)
-4. Title text (1 sentence)
-5. One sentence per panel: position, title, key visual, key number
-6. Margin elements (1 sentence)
-7. Atmosphere (1 sentence)
-8. Negative prompt (1 sentence)
-
-Target: under 400 words / 2500 characters.
-
-**Example structure:**
-
-```
-Chalkboard infographic, 1920x1080 landscape, navy background (#0e1545).
-Academic chalk-drawn sketchnote style with hand-lettered text, chalk dust,
-and faint formula textures. Six panels in a 3x2 grid with steel blue
-(#8bb8e0) chalk borders connected by chalk arrows. Title: "[TITLE]" in
-steel blue small-caps, subtitle: "[guiding question]" in italic chalk
-white. Colors: chalk white (#f0ece2) body text, warm orange (#e8956a) key
-numbers, teal (#00d4c8) positive highlights, muted gray (#b0a89a)
-annotations. Panel 1 (top-left): "[TITLE]" -- [icon description], [key
-number in orange]. Panel 2 (top-center): ... [continue for all 6 panels].
-Professor's margin note bottom-right: "[note text]". Color legend
-bottom-left: [concept]: teal, [concept]: orange, [concept]: white. Faint
-background formulas: [formula 1], [formula 2] at 15% opacity. No
-photorealism, no gradients, no emojis, no drop shadows, no pure white.
-```
+Read `references/static-sections.md` for the negative prompt template
+(mostly static, add topic-specific exclusions) and the condensed prompt
+structure (telegram-style, under 400 words, for token-limited tools like
+Midjourney and DALL-E).
 
 ---
 
@@ -547,3 +427,16 @@ After writing the file:
 - [ ] No emojis
 - [ ] Em dashes (--) used, not double hyphens
 - [ ] File saved as `infographic_instructions.md` in the post's page bundle
+
+---
+
+## Step 2.5 -- Follow-up
+
+After verification, offer the user next steps:
+
+"The infographic prompt is ready at `content/post/<slug>/infographic_instructions.md`.
+Would you like me to:
+- Adjust any panel content (numbers, headlines, callouts)?
+- Change the text rendering option (A/B/C)?
+- Regenerate with a different template?
+- Create a variant for a different AI tool?"

@@ -240,11 +240,16 @@ Add `categories: [Tutorial]` to the front matter to categorize it as a tutorial.
 
 Add a new `<details>` block to `content/projects/dashboards/index.md` following the pattern documented above.
 
+### Skill Architecture
+
+All Claude Code skills follow a three-phase interaction pattern: (1) confirm intent before work begins, (2) execute the core workflow, (3) offer follow-up actions after delivery. Skills use **progressive disclosure** via `references/` subdirectories -- detailed reference material (LaTeX escaping rules, report templates, panel templates, etc.) is loaded on demand only when relevant, keeping the core SKILL.md focused on the workflow.
+
 ### New Data Science Post (via Claude Code Skill)
 
-The `data-science-post` skill automates creating notebook-style data science blog posts. It produces a Hugo page bundle with case-study framing, Python code blocks, matplotlib figures, and interpretation paragraphs.
+The `data-science-post` skill automates creating notebook-style data science blog posts. It confirms topic scope and design choices before writing, then produces a Hugo page bundle with case-study framing, Python code blocks, matplotlib figures, and interpretation paragraphs.
 
 **Location:** `.claude/skills/data-science-post/SKILL.md`
+**Reference files:** `.claude/skills/data-science-post/references/` (latex-escaping, figure-conventions, causal-inference, data-sources, companion-deliverables, quality-checklist)
 
 **Usage** (in Claude Code):
 
@@ -281,9 +286,10 @@ The skill enforces the sandwich pattern (explanation, code, interpretation), use
 
 ### Review a Data Science Post (via Claude Code Skill)
 
-The `referee-post` skill reviews data science posts as an expert professor. It produces a structured referee report without modifying the post.
+The `referee-post` skill reviews data science posts as an expert professor. It confirms review scope before starting, produces a structured referee report without modifying the post, and offers follow-up actions.
 
 **Location:** `.claude/skills/referee-post/SKILL.md`
+**Reference files:** `.claude/skills/referee-post/references/` (report-template, scoring-and-criteria)
 
 **Usage** (in Claude Code):
 
@@ -300,9 +306,10 @@ The `referee-post` skill reviews data science posts as an expert professor. It p
 
 ### Generate Infographic Instructions (via Claude Code Skill)
 
-The `infographic-instructions` skill generates an AI-image-generation prompt that creates a chalkboard-style infographic summarizing a blog post into 6 panels. The output is a copy-pasteable prompt optimized for Gemini, DALL-E, Midjourney, or Ideogram. Includes an interactive confirmation step before generation.
+The `infographic-instructions` skill generates an AI-image-generation prompt that creates a chalkboard-style infographic summarizing a blog post into 6 panels. The output is a copy-pasteable prompt optimized for Gemini, DALL-E, Midjourney, or Ideogram. Confirms template, title, and rendering preferences before generating, and offers follow-up adjustments.
 
 **Location:** `.claude/skills/infographic-instructions/SKILL.md`
+**Reference files:** `.claude/skills/infographic-instructions/references/` (panel-templates, static-sections)
 
 **Usage** (in Claude Code):
 
@@ -329,7 +336,7 @@ The file contains four sections: (A) a full flowing-prose image generation promp
 
 ### Proofread a Data Science Post (via Claude Code Skill)
 
-The `proofread-post` skill runs a final proofreading pass on a data science post before publication. It checks correctness, display, and consistency without modifying any files. Lighter and faster than `referee-post`.
+The `proofread-post` skill runs a final proofreading pass on a data science post before publication. It checks correctness, display, and consistency without modifying any files. Lighter and faster than `referee-post`. Announces scope and offers follow-up after delivery.
 
 **Location:** `.claude/skills/proofread-post/SKILL.md`
 

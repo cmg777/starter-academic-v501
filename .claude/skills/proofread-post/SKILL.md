@@ -1,6 +1,6 @@
 ---
 name: proofread-post
-description: Final proofreading pass on a data science post -- checks correctness, display, and consistency before publication. Read-only -- produces a pass/fail checklist without modifying any files.
+description: Quick final QA before publishing a data science post. Checks front matter, markdown structure, math rendering, code/output pairing, images, Mermaid diagrams, references, site conventions, and grammar. Lighter and faster than referee-post. Use focus: to run only specific checks. Read-only.
 argument-hint: "<post slug, e.g. python_partial_identification> [focus: frontmatter | markdown | math | code | images | mermaid | refs | style | grammar]"
 disable-model-invocation: true
 user-invocable: true
@@ -71,6 +71,17 @@ in the conversation without modifying any files.
 
 5. **Read the full post** -- the entire `index.md`. If `script.py` exists, read
    it too (needed for consistency check in Step 6).
+
+---
+
+## Step 0.5 -- Announce scope
+
+Before running checks, briefly announce what you will do. This is a fast QA
+tool, so proceed immediately after displaying the message (do not wait for
+confirmation -- the user invoked the skill, so intent is clear).
+
+"Proofreading **[POST TITLE]** (`content/post/<slug>/index.md`).
+Running: [all 10 checks / focused checks: LIST]."
 
 ---
 
@@ -400,3 +411,15 @@ Mark skipped steps as "SKIP" in the checklist.
 - [ ] If `focus:` was used, only ran the matching steps and marked others as SKIP
 - [ ] Report uses the exact template format above
 - [ ] All issues have specific locations and actionable suggestions
+
+---
+
+## Step 12 -- Follow-up
+
+After delivering the report, offer the user next steps:
+
+"Should I:
+- Run a deeper check on any flagged area?
+- Expand to the full 10-check pass (if focus was used)?
+- Run `/project:referee-post` for a comprehensive expert review?
+- Apply fixes for any HIGH-severity issues directly?"
