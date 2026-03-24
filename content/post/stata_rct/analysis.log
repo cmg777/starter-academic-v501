@@ -1,0 +1,885 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      Stata 18.0
+___/   /   /___/   /   /___/       MP—Parallel Edition
+
+ Statistics and Data Science       Copyright 1985-2023 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Single-user 2-core  perpetual
+Serial number: 501806221597
+  Licensed to: Carlos Mendez
+               Nagoya University
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. More than 2 billion observations are allowed; see help obs_advice.
+      4. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+. do analysis.do 
+
+. ****************************************************
+. * Evaluating a Cash Transfer Program (RCT)
+. * with Panel Data in Stata
+. *
+. * Companion do-file for the tutorial at:
+. *   carlos-mendez.org/post/stata_rct/
+. *
+. * Dataset: dataSIM4RCT.dta
+. *   2,000 households, balanced panel (2021--2024)
+. *   Stratified randomization, imperfect compliance
+. *   True treatment effect: 0.12 log points (~12%)
+. *
+. * Usage:
+. *   1. Open Stata
+. *   2. Run: do analysis.do
+. *   3. All graphs are saved as PNG files
+. ****************************************************
+. 
+. clear all
+
+. set more off
+
+. 
+. *---------------------------------------------------
+. * Section 4: Data loading and exploration
+. *---------------------------------------------------
+. 
+. use "https://github.com/quarcs-lab/data-open/raw/master/ametrics/dataSIM4RCT.
+> dta", clear
+
+. 
+. * Describe key variables
+. des y age edu female poverty treat D
+
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+y               float   %9.0g                 Log monthly consumption
+age             float   %9.0g                 
+edu             float   %9.0g                 
+female          float   %9.0g                 
+poverty         float   %9.0g                 
+treat           float   %9.0g                 Assignment to offer (Z)
+D               float   %9.0g                 Receipt of cash transfer
+
+. 
+. * Summary statistics at baseline
+. sum y age edu female poverty treat D if post==0
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+           y |      2,000     10.0154    .4348886   8.454445   11.48253
+         age |      2,000      35.126    9.650839         18         68
+         edu |      2,000     12.0275      1.9889          6         18
+      female |      2,000       .5085    .5000528          0          1
+     poverty |      2,000       .3125    .4636283          0          1
+-------------+---------------------------------------------------------
+       treat |      2,000        .518    .4998009          0          1
+           D |      2,000           0           0          0          0
+
+. 
+. * Summary statistics at endline
+. sum y age edu female poverty treat D if post==1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+           y |      2,000     10.1137    .4382183   8.638689   11.55002
+         age |      2,000      35.126    9.650839         18         68
+         edu |      2,000     12.0275      1.9889          6         18
+      female |      2,000       .5085    .5000528          0          1
+     poverty |      2,000       .3125    .4636283          0          1
+-------------+---------------------------------------------------------
+       treat |      2,000        .518    .4998009          0          1
+           D |      2,000       .4615    .4986402          0          1
+
+. 
+. * Declare panel structure
+. xtset id year
+
+Panel variable: id (strongly balanced)
+ Time variable: year, 2021 to 2024, but with gaps
+         Delta: 1 unit
+
+. 
+. *---------------------------------------------------
+. * Section 5: Baseline balance checks
+. *---------------------------------------------------
+. 
+. * 5.1 T-tests and proportion tests
+. preserve
+
+. keep if post==0
+(2,000 observations deleted)
+
+. 
+. ttest y,      by(treat)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |     964    10.02523    .0140108    .4350124    9.997735    10.05273
+       1 |   1,036    10.00626    .0135081    .4347839    9.979754    10.03277
+---------+--------------------------------------------------------------------
+Combined |   2,000     10.0154    .0097244    .4348886    9.996333    10.03447
+---------+--------------------------------------------------------------------
+    diff |            .0189696    .0194617               -.0191977    .0571369
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t =   0.9747
+H0: diff = 0                                     Degrees of freedom =     1998
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.8351         Pr(|T| > |t|) = 0.3298          Pr(T > t) = 0.1649
+
+. ttest age,    by(treat)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |     964    35.33506    .3164756    9.826045      34.714    35.95612
+       1 |   1,036    34.93147    .2947006    9.485516    34.35319    35.50975
+---------+--------------------------------------------------------------------
+Combined |   2,000      35.126    .2157993    9.650839    34.70278    35.54922
+---------+--------------------------------------------------------------------
+    diff |            .4035951    .4318923               -.4434114    1.250601
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t =   0.9345
+H0: diff = 0                                     Degrees of freedom =     1998
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.8249         Pr(|T| > |t|) = 0.3502          Pr(T > t) = 0.1751
+
+. ttest edu,    by(treat)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |     964    11.97407    .0628956    1.952805    11.85064    12.09749
+       1 |   1,036    12.07722    .0628074     2.02158    11.95398    12.20046
+---------+--------------------------------------------------------------------
+Combined |   2,000     12.0275    .0444731      1.9889    11.94028    12.11472
+---------+--------------------------------------------------------------------
+    diff |           -.1031537    .0889963                -.277689    .0713817
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t =  -1.1591
+H0: diff = 0                                     Degrees of freedom =     1998
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.1233         Pr(|T| > |t|) = 0.2466          Pr(T > t) = 0.8767
+
+. prtest female,  by(treat)
+
+Two-sample test of proportions                     0: Number of obs =      964
+                                                   1: Number of obs =     1036
+------------------------------------------------------------------------------
+       Group |       Mean   Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+           0 |   .4844398   .0160961                       .452892    .5159876
+           1 |    .530888   .0155046                      .5004996    .5612764
+-------------+----------------------------------------------------------------
+        diff |  -.0464482    .022349                     -.0902514    -.002645
+             |  under H0:    .022372    -2.08   0.038
+------------------------------------------------------------------------------
+        diff = prop(0) - prop(1)                                  z =  -2.0762
+    H0: diff = 0
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(Z < z) = 0.0189         Pr(|Z| > |z|) = 0.0379          Pr(Z > z) = 0.9811
+
+. prtest poverty, by(treat)
+
+Two-sample test of proportions                     0: Number of obs =      964
+                                                   1: Number of obs =     1036
+------------------------------------------------------------------------------
+       Group |       Mean   Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+           0 |   .3070539   .0148566                      .2779356    .3361723
+           1 |   .3175676   .0144633                        .28922    .3459152
+-------------+----------------------------------------------------------------
+        diff |  -.0105136   .0207342                     -.0511518    .0301246
+             |  under H0:   .0207424    -0.51   0.612
+------------------------------------------------------------------------------
+        diff = prop(0) - prop(1)                                  z =  -0.5069
+    H0: diff = 0
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(Z < z) = 0.3061         Pr(|Z| > |z|) = 0.6122          Pr(Z > z) = 0.6939
+
+. 
+. * 5.2 Balance table (iebaltab)
+. capture ssc install ietoolkit, replace
+
+. iebaltab y age edu female poverty, grpvar(treat)
+
+
+. 
+. * 5.3 Visual balance plot
+. capture net install balanceplot, from("https://tdmize.github.io/data") replac
+> e
+
+. balanceplot y age edu i.female i.poverty, group(treat) table nodropdv
+
+
+Base category = 0_0
+Reference category = 1_1
+
+
+N Used In Balance Calculations
+- N for treat = 0_0 : 964
+- N for treat = 1_1 : 1036
+
+
+
+Results stored in matrix: bias_0_1
+
+
+
+Difference in Means Across Groups of treat: base(0_0) vs ref(1_1)
+
+             |  mean_base    mean_ref  ttest_pval    std_diff 
+-------------+-----------------------------------------------
+           y |     10.025      10.006       0.330      -4.362 
+         age |     35.335      34.931       0.350      -4.179 
+         edu |     11.974      12.077       0.247       5.190 
+    1.female |      0.484       0.531       0.038       9.296 
+   1.poverty |      0.307       0.318       0.612       2.268 
+
+. graph export "stata_rct_balance_plot.png", replace width(1200)
+file stata_rct_balance_plot.png written in PNG format
+
+. 
+. * 5.4 AIPW as a formal balance test
+. teffects aipw (y age edu i.female i.poverty) (treat age edu i.female i.povert
+> y)
+
+Iteration 0:  EE criterion =  2.872e-17  
+Iteration 1:  EE criterion =  3.407e-30  
+
+Treatment-effects estimation                    Number of obs     =      2,000
+Estimator      : augmented IPW
+Outcome model  : linear by ML
+Treatment model: logit
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       treat |
+   (1 vs 0)  |  -.0244086    .018861    -1.29   0.196    -.0613754    .0125582
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |   10.02792   .0138363   724.75   0.000      10.0008    10.05504
+------------------------------------------------------------------------------
+
+. 
+. * Diagnostic checks
+. tebalance overid
+
+Iteration 0:  Criterion =  .20558532  
+Iteration 1:  Criterion =  .20774777  (backed up)
+Iteration 2:  Criterion =  .21224786  
+Iteration 3:  Criterion =  .22059216  (backed up)
+Iteration 4:  Criterion =  .22082465  (backed up)
+Iteration 5:  Criterion =  .22290893  
+Iteration 6:  Criterion =  .22491111  
+Iteration 7:  Criterion =  .23183975  
+Iteration 8:  Criterion =   .2329628  
+Iteration 9:  Criterion =  .23527828  
+Iteration 10: Criterion =  .23608747  
+Iteration 11: Criterion =  .23672004  
+Iteration 12: Criterion =  .23713449  
+Iteration 13: Criterion =  .23716776  
+Iteration 14: Criterion =  .23718314  
+Iteration 15: Criterion =  .23718369  
+Iteration 16: Criterion =  .23718379  
+
+Overidentification test for covariate balance
+H0: Covariates are balanced
+
+         chi2(5)      =  3.21614
+         Prob > chi2  =   0.6667
+
+. tebalance summarize
+
+Covariate balance summary
+
+                         Raw     Weighted
+-----------------------------------------
+Number of obs =        2,000      2,000.0
+Treated obs   =        1,036      1,000.1
+Control obs   =          964        999.9
+-----------------------------------------
+
+-----------------------------------------------------------------
+                |Standardized differences          Variance ratio
+                |        Raw    Weighted           Raw   Weighted
+----------------+------------------------------------------------
+            age |  -.0417918    .0002505      .9318894   .9446877
+            edu |   .0519015   -6.96e-06      1.071677   1.078214
+                |
+         female |
+             1  |   .0929611    6.51e-06      .9970775   .9999996
+                |
+        poverty |
+             1  |   .0226764    .0002864      1.018475   1.000233
+-----------------------------------------------------------------
+
+. 
+. tebalance density y
+
+. graph export "stata_rct_density_y.png", replace width(1200)
+file stata_rct_density_y.png written in PNG format
+
+. 
+. teffects overlap
+
+. graph export "stata_rct_overlap_baseline.png", replace width(1200)
+file stata_rct_overlap_baseline.png written in PNG format
+
+. 
+. restore
+
+. 
+. *---------------------------------------------------
+. * Section 8: Cross-sectional estimation at endline
+. *---------------------------------------------------
+. 
+. preserve
+
+. keep if post==1
+(2,000 observations deleted)
+
+. 
+. * 8.1 Simple difference in means
+. reg y treat, robust
+
+Linear regression                               Number of obs     =      2,000
+                                                F(1, 1998)        =      35.43
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0174
+                                                Root MSE          =     .43449
+
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       treat |   .1157465   .0194443     5.95   0.000     .0776132    .1538798
+       _cons |   10.05374    .014001   718.07   0.000     10.02628     10.0812
+------------------------------------------------------------------------------
+
+. 
+. * 8.2 Regression Adjustment -- ATE and ATT
+. teffects ra (y c.age c.edu i.female i.poverty) (treat), ate
+
+Iteration 0:  EE criterion =  7.437e-29  
+Iteration 1:  EE criterion =  6.125e-31  
+
+Treatment-effects estimation                    Number of obs     =      2,000
+Estimator      : regression adjustment
+Outcome model  : linear
+Treatment model: none
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       treat |
+   (1 vs 0)  |   .1125431   .0190927     5.89   0.000     .0751221    .1499641
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |   10.05503   .0138703   724.93   0.000     10.02785    10.08222
+------------------------------------------------------------------------------
+
+. teffects ra (y c.age c.edu i.female i.poverty) (treat), atet
+
+Iteration 0:  EE criterion =  7.445e-29  
+Iteration 1:  EE criterion =  2.549e-31  
+
+Treatment-effects estimation                    Number of obs     =      2,000
+Estimator      : regression adjustment
+Outcome model  : linear
+Treatment model: none
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+       treat |
+   (1 vs 0)  |   .1132537   .0191498     5.91   0.000     .0757208    .1507865
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |   10.05623   .0140082   717.88   0.000     10.02878    10.08369
+------------------------------------------------------------------------------
+
+. 
+. * 8.3 Inverse Probability Weighting -- ATE and ATT
+. teffects ipw (y) (treat c.age c.edu i.female i.poverty), ate
+
+Iteration 0:  EE criterion =  2.872e-17  
+Iteration 1:  EE criterion =  2.842e-31  
+
+Treatment-effects estimation                    Number of obs     =      2,000
+Estimator      : inverse-probability weights
+Outcome model  : weighted mean
+Treatment model: logit
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       treat |
+   (1 vs 0)  |   .1126713   .0190886     5.90   0.000     .0752583    .1500844
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |   10.05495   .0138651   725.20   0.000     10.02778    10.08213
+------------------------------------------------------------------------------
+
+. teffects ipw (y) (treat c.age c.edu i.female i.poverty), atet
+
+Iteration 0:  EE criterion =  2.872e-17  
+Iteration 1:  EE criterion =  1.559e-31  
+
+Treatment-effects estimation                    Number of obs     =      2,000
+Estimator      : inverse-probability weights
+Outcome model  : weighted mean
+Treatment model: logit
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+       treat |
+   (1 vs 0)  |   .1134031   .0191397     5.93   0.000     .0758899    .1509162
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |   10.05608   .0140004   718.27   0.000     10.02864    10.08352
+------------------------------------------------------------------------------
+
+. 
+. * 8.4 Doubly Robust (IPWRA) -- ATE and ATT
+. teffects ipwra (y c.age c.edu i.female i.poverty) ///
+>                (treat c.age c.edu i.female i.poverty), vce(robust)
+
+Iteration 0:  EE criterion =  2.872e-17  
+Iteration 1:  EE criterion =  1.480e-30  
+
+Treatment-effects estimation                    Number of obs     =      2,000
+Estimator      : IPW regression adjustment
+Outcome model  : linear
+Treatment model: logit
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       treat |
+   (1 vs 0)  |    .112639   .0190901     5.90   0.000     .0752231    .1500549
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |     10.055   .0138677   725.07   0.000     10.02782    10.08218
+------------------------------------------------------------------------------
+
+. 
+. teffects ipwra (y c.age c.edu i.female i.poverty) ///
+>                (treat c.age c.edu i.female i.poverty), atet vce(robust)
+
+Iteration 0:  EE criterion =  2.872e-17  
+Iteration 1:  EE criterion =  2.098e-31  
+
+Treatment-effects estimation                    Number of obs     =      2,000
+Estimator      : IPW regression adjustment
+Outcome model  : linear
+Treatment model: logit
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+       treat |
+   (1 vs 0)  |   .1133162   .0191469     5.92   0.000     .0757889    .1508435
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |   10.05617   .0140019   718.20   0.000     10.02873    10.08361
+------------------------------------------------------------------------------
+
+. 
+. * 8.5 Doubly Robust (AIPW) -- ATE
+. teffects aipw (y c.age c.edu i.female i.poverty) ///
+>               (treat c.age c.edu i.female i.poverty)
+
+Iteration 0:  EE criterion =  2.872e-17  
+Iteration 1:  EE criterion =  1.848e-31  
+
+Treatment-effects estimation                    Number of obs     =      2,000
+Estimator      : augmented IPW
+Outcome model  : linear by ML
+Treatment model: logit
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       treat |
+   (1 vs 0)  |   .1126412   .0190903     5.90   0.000      .075225    .1500574
+-------------+----------------------------------------------------------------
+POmean       |
+       treat |
+          0  |     10.055    .013868   725.05   0.000     10.02782    10.08218
+------------------------------------------------------------------------------
+
+. 
+. restore
+
+. 
+. *---------------------------------------------------
+. * Section 9: Difference-in-Differences
+. *---------------------------------------------------
+. 
+. * 9.3 Basic DiD with panel fixed effects
+. gen treat_post = treat * post
+
+. label var treat_post "Treated x Post (1 only for treated in 2024)"
+
+. 
+. xtset id year
+
+Panel variable: id (strongly balanced)
+ Time variable: year, 2021 to 2024, but with gaps
+         Delta: 1 unit
+
+. xtdidregress (y) (treat_post), group(id) time(year) vce(cluster id)
+
+Treatment and time information
+
+Time variable: year
+Control:       treat_post = 0
+Treatment:     treat_post = 1
+-----------------------------------
+             |   Control  Treatment
+-------------+---------------------
+Group        |
+          id |       964       1036
+-------------+---------------------
+Time         |
+     Minimum |      2021       2024
+     Maximum |      2021       2024
+-----------------------------------
+
+Difference-in-differences regression                     Number of obs = 4,000
+Data type: Longitudinal
+
+                                 (Std. err. adjusted for 2,000 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+  treat_post |
+   (1 vs 0)  |   .1347161   .0272737     4.94   0.000     .0812282     .188204
+------------------------------------------------------------------------------
+Note: ATET estimate adjusted for panel effects and time effects.
+
+. 
+. * 9.4 Doubly Robust DiD (DRDID)
+. capture ssc install drdid, replace
+
+. drdid y c.age c.edu i.female i.poverty, ivar(id) time(year) treatment(treat) 
+> dripw
+  0
+
+Doubly robust difference-in-differences                  Number of obs = 4,000
+Outcome model  : least squares
+Treatment model: inverse probability
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+       treat |
+   (1 vs 0)  |   .1374784    .027387     5.02   0.000     .0838008     .191156
+------------------------------------------------------------------------------
+
+. 
+. * Alternative: Stata 17+ built-in command
+. xthdidregress aipw (y c.age c.edu i.female i.poverty) ///
+>                    (treat_post c.age c.edu i.female i.poverty), group(id)
+note: variable _did_cohort, containing cohort indicators formed by treatment
+      variable treat_post and group variable id, was added to the dataset.
+
+Computing ATET for each cohort and time:
+Cohort 2024 (1): . done
+
+Treatment and time information
+
+Time variable: year
+Time interval: 2021 to 2024
+Control:       _did_cohort = 0
+Treatment:     _did_cohort > 0
+-------------------------------
+                  | _did_cohort
+------------------+------------
+Number of cohorts |           2
+------------------+------------
+Number of obs     |
+    Never treated |        1928
+             2024 |        2072
+-------------------------------
+
+Heterogeneous-treatment-effects regression            Number of obs    = 4,000
+                                                      Number of panels = 2,000
+Estimator:       Augmented IPW
+Panel variable:  id
+Treatment level: id
+Control group:   Never treated
+
+                                 (Std. err. adjusted for 2,000 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+Cohort       |       ATET   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        year |
+       2024  |   .1374784    .027387     5.02   0.000     .0838008     .191156
+------------------------------------------------------------------------------
+Note: ATET computed using covariates.
+
+. 
+. *---------------------------------------------------
+. * Section 10: Endogenous treatment (Advanced)
+. *---------------------------------------------------
+. 
+. * 10.2 Endogenous treatment regression
+. preserve
+
+. keep if post==1
+(2,000 observations deleted)
+
+. 
+. etregress y c.age i.female i.poverty c.edu, ///
+>     treat(D = treat c.age i.female i.poverty c.edu) vce(robust)
+
+Iteration 0:  Log pseudolikelihood = -1797.6297  
+Iteration 1:  Log pseudolikelihood = -1797.6297  
+
+Linear regression with endogenous treatment             Number of obs =  2,000
+Estimator: Maximum likelihood                           Wald chi2(5)  =  92.23
+Log pseudolikelihood = -1797.6297                       Prob > chi2   = 0.0000
+
+------------------------------------------------------------------------------
+             |               Robust
+             | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+y            |
+         age |    .003187   .0010016     3.18   0.001      .001224    .0051501
+    1.female |   .0801465   .0189552     4.23   0.000      .042995     .117298
+   1.poverty |  -.1030302   .0205984    -5.00   0.000    -.1434023    -.062658
+         edu |   .0182634   .0045243     4.04   0.000     .0093959    .0271308
+         1.D |      .1471   .0246775     5.96   0.000     .0987329    .1954671
+       _cons |   9.705642   .0694641   139.72   0.000     9.569495    9.841789
+-------------+----------------------------------------------------------------
+D            |
+       treat |    2.55806   .0802103    31.89   0.000      2.40085    2.715269
+         age |   .0014954   .0039348     0.38   0.704    -.0062166    .0092074
+    1.female |  -.0400483   .0758177    -0.53   0.597    -.1886483    .1085516
+   1.poverty |  -.0655305   .0821766    -0.80   0.425    -.2265936    .0955327
+         edu |   .0214726   .0191507     1.12   0.262     -.016062    .0590072
+       _cons |  -1.844408   .2847883    -6.48   0.000    -2.402582   -1.286233
+-------------+----------------------------------------------------------------
+     /athrho |  -.0060068   .0481062    -0.12   0.901    -.1002933    .0882796
+    /lnsigma |  -.8567973   .0156472   -54.76   0.000    -.8874653   -.8261293
+-------------+----------------------------------------------------------------
+         rho |  -.0060068   .0481045                     -.0999584     .088051
+       sigma |   .4245195   .0066426                       .411698    .4377404
+      lambda |    -.00255   .0204219                     -.0425761    .0374761
+------------------------------------------------------------------------------
+Wald test of indep. eqns. (rho = 0): chi2(1) =     0.02   Prob > chi2 = 0.9006
+
+. 
+. gen byte esample = e(sample)
+
+. 
+. * ATE of receipt
+. margins r.D if esample==1
+
+Contrasts of predictive margins                          Number of obs = 2,000
+Model VCE: Robust
+
+Expression: Linear prediction, predict()
+
+------------------------------------------------
+             |         df        chi2     P>chi2
+-------------+----------------------------------
+           D |          1       35.53     0.0000
+------------------------------------------------
+
+--------------------------------------------------------------
+             |            Delta-method
+             |   Contrast   std. err.     [95% conf. interval]
+-------------+------------------------------------------------
+           D |
+   (1 vs 0)  |      .1471   .0246775      .0987329    .1954671
+--------------------------------------------------------------
+
+. 
+. * ATT of receipt
+. margins, predict(cte) subpop(if D==1 & esample==1)
+
+Predictive margins                                     Number of obs   = 2,000
+Model VCE: Robust                                      Subpop. no. obs =   923
+
+Expression: Conditional treatment effect, predict(cte)
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       _cons |      .1471   .0246775     5.96   0.000     .0987329    .1954671
+------------------------------------------------------------------------------
+
+. 
+. restore
+
+. 
+. * 10.3 Doubly robust estimation of receipt effect
+. preserve
+
+. keep if post==1
+(2,000 observations deleted)
+
+. 
+. teffects ipwra (y y0 c.age i.female i.poverty c.edu) ///
+>                (D c.age i.female i.poverty c.edu treat), vce(robust)
+
+Iteration 0:  EE criterion =  4.191e-16  
+Iteration 1:  EE criterion =  2.472e-29  
+
+Treatment-effects estimation                    Number of obs     =      2,000
+Estimator      : IPW regression adjustment
+Outcome model  : linear
+Treatment model: logit
+------------------------------------------------------------------------------
+             |               Robust
+           y | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+           D |
+   (1 vs 0)  |   .1172686   .0322495     3.64   0.000     .0540608    .1804764
+-------------+----------------------------------------------------------------
+POmean       |
+           D |
+          0  |   10.03361   .0171459   585.19   0.000           10    10.06722
+------------------------------------------------------------------------------
+
+. 
+. * Diagnostic checks
+. tebalance summarize age edu i.female i.poverty
+
+Covariate balance summary
+
+                         Raw     Weighted
+-----------------------------------------
+Number of obs =        2,000      2,000.0
+Treated obs   =          923        999.0
+Control obs   =        1,077      1,001.0
+-----------------------------------------
+
+-----------------------------------------------------------------
+                |Standardized differences          Variance ratio
+                |        Raw    Weighted           Raw   Weighted
+----------------+------------------------------------------------
+            age |  -.0229917   -.0091187      .9957372   1.132753
+            edu |   .0714012    .0130735      1.045596   .9719336
+                |
+         female |
+             1  |   .0589745   -.0079862      .9978819   1.000002
+                |
+        poverty |
+             1  |  -.0062371    .0210919      .9951149   1.016377
+-----------------------------------------------------------------
+
+. tebalance summarize, baseline
+
+Covariate balance summary
+
+                         Raw     Weighted
+-----------------------------------------
+Number of obs =        2,000      2,000.0
+Treated obs   =          923        999.0
+Control obs   =        1,077      1,001.0
+-----------------------------------------
+
+-----------------------------------------------------------------
+                |           Means                  Variances     
+                |    Control     Treated       Control    Treated
+----------------+------------------------------------------------
+            age |   35.22841     35.0065       93.3567   92.95874
+                |
+         female |
+             1  |   .4948932     .524377      .2502062   .2496763
+                |
+        poverty |
+             1  |   .3138347    .3109426      .2155426   .2144897
+                |
+            edu |   11.96193    12.10401      3.871226   4.047739
+          treat |   .1569174    .9393283      .1324173   .0570525
+-----------------------------------------------------------------
+
+. 
+. tebalance density y0
+
+. graph export "stata_rct_density_y0_receipt.png", replace width(1200)
+file stata_rct_density_y0_receipt.png written in PNG format
+
+. 
+. tebalance density age
+
+. 
+. teffects overlap
+
+. graph export "stata_rct_overlap_receipt.png", replace width(1200)
+file stata_rct_overlap_receipt.png written in PNG format
+
+. 
+. restore
+
+. 
+. *---------------------------------------------------
+. * End of analysis
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================"
+============================================
+
+. di "  Analysis complete."
+  Analysis complete.
+
+. di "  True treatment effect: 0.12 log points"
+  True treatment effect: 0.12 log points
+
+. di "  See comparison table in the tutorial."
+  See comparison table in the tutorial.
+
+. di "============================================"
+============================================
+
+. 
+end of do-file

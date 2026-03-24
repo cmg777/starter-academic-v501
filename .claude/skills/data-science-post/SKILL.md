@@ -120,6 +120,13 @@ single formatted block:
 - Specific adjustments: incorporate them and proceed
 - Major reframing requested: revise the scope and re-present the summary
 
+**Plan archival:** When a plan is created and approved (e.g., via plan mode),
+save the approved plan as `plan.md` in the post directory
+(e.g., `content/post/python_<topic-slug>/plan.md`). This documents the
+design decisions and outline that guided the post's creation. The plan file
+is not referenced in the post itself --- it serves as internal documentation
+for future reference and revisions.
+
 ---
 
 ## Step 1: Create the post
