@@ -92,15 +92,15 @@ All skills follow a three-phase interaction pattern: (1) confirm intent before w
 
 **Location:** `.claude/skills/data-science-post/SKILL.md`
 
-Generates notebook-style data science blog posts for the site. The user provides a topic, dataset, and optional reference URLs. The skill confirms topic scope and design choices before writing, then produces a Hugo page bundle at `content/post/python_<topic-slug>/` with:
+Generates notebook-style data science blog posts for the site in **Python, Stata, or R**. The user provides a topic, dataset, and optional reference URLs or PDFs. The skill confirms topic scope and design choices before writing, then produces a Hugo page bundle with:
 
 - `index.md` -- full tutorial with YAML front matter, case-study framing, code blocks, figures, and interpretation paragraphs
-- `script.py` -- standalone Python script (optional)
-- `*.png` -- at least 3 matplotlib figures using the site color palette
+- Companion files: `script.py` (Python), `analysis.do` + `analysis.log` (Stata), or `analysis.R` (R)
+- `*.png` -- at least 3 figures using the site color palette
 
 **Invocation:**
 ```
-/project:data-science-post <topic> dataset: <dataset> [references: <URLs>]
+/project:data-science-post <topic> dataset: <dataset> [references: <URLs, PDFs, or notes>]
 ```
 
 **Examples:**
@@ -108,6 +108,7 @@ Generates notebook-style data science blog posts for the site. The user provides
 /project:data-science-post double machine learning dataset: DS4Bolivia references: https://docs.doubleml.org/stable/intro/intro.html
 /project:data-science-post k-means clustering dataset: https://archive.ics.uci.edu/ml/datasets/Iris
 /project:data-science-post spatial regression dataset: PySAL example data references: https://pysal.org/spreg/
+/project:data-science-post RCT evaluation with panel data in Stata dataset: dataSIM4RCT.dta references: causal.pdf
 ```
 
 **Key conventions enforced by the skill:**
@@ -120,7 +121,9 @@ Generates notebook-style data science blog posts for the site. The user provides
 - After code changes, re-run script.py to regenerate ALL images; delete orphaned PNGs
 - Dark theme figures: optional dark navy background palette for figures (`#0f1729`, `#1f2b5e`, `#c8d0e0`, `#e8ecf2`)
 - Output blocks: use ` ```text ` (not bare ` ``` `) to prevent highlight.js auto-detection coloring
-- Reference posts: `content/post/python_ml_random_forest/index.md` (ML), `content/post/python_dowhy/index.md` (causal inference), `content/post/python_fwl/index.md` (dark theme figures, simulated data), `content/post/python_pyfixest/index.md` (panel data, fixed effects, dark theme figures), `content/post/python_esda2/index.md` (ESDA, spatial autocorrelation, LISA), `content/post/python_mgwr/index.md` (MGWR, spatially varying coefficients)
+- Reference posts (Python): `content/post/python_ml_random_forest/index.md` (ML), `content/post/python_dowhy/index.md` (causal inference), `content/post/python_fwl/index.md` (dark theme figures, simulated data), `content/post/python_pyfixest/index.md` (panel data, fixed effects, dark theme figures), `content/post/python_esda2/index.md` (ESDA, spatial autocorrelation, LISA), `content/post/python_mgwr/index.md` (MGWR, spatially varying coefficients)
+- Reference posts (Stata): `content/post/stata_rct/index.md` (RCT with panel data, RA/IPW/DR/DiD/DRDID, Mermaid diagrams, equations with analogies)
+- PDF reference handling: delegate large PDFs to Explore agents to avoid context bloat; extract only relevant pages (5--15); clean up PDFs before committing
 
 **Reference files** (loaded on demand):
 - `references/latex-escaping.md` -- Goldmark/KaTeX escaping rules, equation requirements
