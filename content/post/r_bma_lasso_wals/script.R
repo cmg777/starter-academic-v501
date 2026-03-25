@@ -73,12 +73,8 @@ theme_site <- function(base_size = 14) {
 set.seed(2021)
 
 # --- 1. Load data ---
-DATA_URL <- "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_bma_lasso_wals/synthetic-co2-cross-section.csv"
-# Fall back to local file if the remote URL is not yet available
-synth_data <- tryCatch(
-  read.csv(DATA_URL),
-  error = function(e) read.csv("synthetic-co2-cross-section.csv")
-)
+# Load the pre-generated synthetic dataset (created with set.seed(2017))
+synth_data <- read.csv("synthetic-co2-cross-section.csv")
 cat("Data loaded:", nrow(synth_data), "rows,", ncol(synth_data), "columns\n")
 
 # Known true coefficients
@@ -327,34 +323,66 @@ p_coefs <- ggplot(bma_df, aes(x = reorder(variable, pip), y = post_mean, color =
 ggsave("bma_lasso_wals_05_bma_coefs.png", p_coefs, width = 10, height = 6, dpi = 300)
 
 # ============================================================
-# FIGURE 06: BMA model inclusion matrix
+# FIGURE 06: Variable-inclusion map
 # ============================================================
-cat("Generating Figure 06: BMA model inclusion matrix...\n")
+cat("Generating Figure 06: Variable-inclusion map...\n")
 
-top_models <- topmodels.bma(bma_fit)[, 1:min(50, ncol(topmodels.bma(bma_fit)))]
+# Extract top 100 models and their coefficient estimates
+top_coefs <- topmodels.bma(bma_fit)
+n_top <- min(100, ncol(top_coefs))
+top_coefs <- top_coefs[, 1:n_top]
 
-inclusion_df <- as.data.frame(top_models != 0) |>
-  rownames_to_column("variable") |>
-  pivot_longer(-variable, names_to = "model", values_to = "included") |>
+# Extract posterior model probabilities (MCMC-based)
+model_pmps <- pmp.bma(bma_fit)[1:n_top, 1]
+
+# Cumulative x positions: each model's width = its PMP
+cum_pmp <- c(0, cumsum(model_pmps))
+
+# Order variables by PIP (highest at top)
+var_order <- bma_df |> arrange(desc(pip)) |> pull(variable)
+
+# Build rectangle data for every variable x model combination
+rect_data <- expand.grid(
+  var_idx   = seq_len(nrow(top_coefs)),
+  model_idx = seq_len(n_top)
+) |>
   mutate(
-    model_num = as.integer(gsub(".*\\.", "", model)),
-    included  = as.numeric(included)
+    variable   = rownames(top_coefs)[var_idx],
+    coef_value = mapply(function(v, m) top_coefs[v, m], var_idx, model_idx),
+    sign = case_when(
+      coef_value > 0 ~ "Positive",
+      coef_value < 0 ~ "Negative",
+      TRUE           ~ "Not included"
+    ),
+    xmin = cum_pmp[model_idx],
+    xmax = cum_pmp[model_idx + 1],
+    variable = factor(variable, levels = rev(var_order))
   )
 
-var_order <- bma_df |> arrange(pip) |> pull(variable)
-inclusion_df$variable <- factor(inclusion_df$variable, levels = var_order)
-
-p_incl <- ggplot(inclusion_df, aes(x = factor(model_num), y = variable, fill = factor(included))) +
-  geom_tile(color = DARK_BG, linewidth = 0.2) +
-  scale_fill_manual(values = c("0" = DARK_PANEL, "1" = STEEL_BLUE),
-                    labels = c("Excluded", "Included")) +
-  labs(x = "Model rank (left = highest posterior probability)",
-       y = NULL, fill = NULL,
-       title = "Model Inclusion Matrix (Top 50 Models)") +
+# Plot the variable-inclusion map
+p_incl <- ggplot(rect_data, aes(xmin = xmin, xmax = xmax,
+                                 ymin = as.numeric(variable) - 0.45,
+                                 ymax = as.numeric(variable) + 0.45,
+                                 fill = sign)) +
+  geom_rect() +
+  scale_fill_manual(
+    name   = "Coefficient",
+    values = c("Positive"     = STEEL_BLUE,
+               "Negative"     = WARM_ORANGE,
+               "Not included" = "#3a3f55")
+  ) +
+  scale_x_continuous(expand = c(0, 0),
+                     labels = scales::label_number(accuracy = 0.1)) +
+  scale_y_continuous(breaks = seq_along(var_order),
+                     labels = rev(var_order),
+                     expand = c(0, 0)) +
+  labs(title    = "Variable-Inclusion Map",
+       subtitle = paste0("Top ", n_top, " models shown out of ",
+                         nrow(pmp.bma(bma_fit)), " visited"),
+       x = "Cumulative posterior model probability",
+       y = NULL) +
   theme_site(base_size = 12) +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        panel.grid = element_blank())
+  theme(panel.grid = element_blank())
 
 ggsave("bma_lasso_wals_06_bma_inclusion.png", p_incl, width = 12, height = 6, dpi = 300)
 

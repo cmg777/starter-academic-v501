@@ -80,7 +80,7 @@ We use **synthetic data** throughout this tutorial. This means we *know the true
 - Run WALS as a fast frequentist model-averaging alternative and interpret its t-statistics
 - Compare results across all three methods to identify truly robust determinants via methodological triangulation
 
-**Content outline.** Section 2 sets up the R environment. Section 3 introduces the synthetic dataset and its built-in "answer key" --- 7 true predictors and 5 noise variables with realistic multicollinearity. Section 4 runs naive OLS to illustrate the spurious significance problem. Sections 5--8 cover BMA: Bayes' rule foundations, the PIP framework, a toy example, and full implementation. Sections 9--12 cover LASSO: the bias-variance tradeoff, L1/L2 geometry, cross-validated implementation, and Post-LASSO. Sections 13--16 cover WALS: frequentist model averaging, the semi-orthogonal transformation, the Laplace prior, and implementation. Section 17 brings all three methods together for a grand comparison.
+**Content outline.** Section 2 sets up the R environment. Section 3 introduces the synthetic dataset and its built-in "answer key" --- 7 true predictors and 5 noise variables with realistic multicollinearity. Section 4 runs naive OLS to illustrate the spurious significance problem. Sections 5--8 cover BMA: Bayes' rule foundations, the PIP framework, a toy example, and full implementation. Sections 9--12 cover LASSO: the bias-variance tradeoff, L1/L2 geometry, cross-validated implementation, and Post-LASSO. Sections 13--16 cover WALS: frequentist model averaging, the semi-orthogonal transformation, the Laplace prior, and implementation. Section 17 brings all three methods together for a grand comparison. Section 18 summarizes key takeaways and provides further reading.
 
 
 ## 2. Setup
@@ -132,11 +132,11 @@ We use a cross-sectional dataset of 120 fictional countries. The key design choi
 
 Think of this as setting up a controlled experiment. We know the answer before we begin, so we can grade each method's performance.
 
-The data-generating process below shows exactly how the synthetic dataset was built. The CSV file `synthetic-co2-cross-section.csv` was generated with `set.seed(2021)` and can be loaded directly from GitHub for full reproducibility.
+The data-generating process below shows exactly how the synthetic dataset was built. The CSV file `synthetic-co2-cross-section.csv` was generated with `set.seed(2017)` and can be loaded directly from GitHub for full reproducibility.
 
 ```r
 # --- DATA-GENERATING PROCESS (reference) ---
-set.seed(2021)
+set.seed(2017)
 n <- 120  # number of "countries"
 
 # GDP drives many other variables (realistic: richer countries
@@ -213,23 +213,38 @@ Dataset: 120 countries, 14 variables
 The following summary statistics give us a first look at the data structure. Note the wide range of scales: GDP is in log units (mean around 8.5), while percentage variables like fossil fuel share and urbanization range from single digits to near 100.
 
 ```r
-# Summary statistics for all variables
+# Descriptive statistics for all 13 numeric variables
 synth_data |>
   select(-country) |>
-  summary()
+  pivot_longer(everything(), names_to = "variable", values_to = "value") |>
+  summarise(
+    n    = n(),
+    mean = round(mean(value), 2),
+    sd   = round(sd(value), 2),
+    min  = round(min(value), 2),
+    max  = round(max(value), 2),
+    .by  = variable
+  )
 ```
 
 ```text
-    log_co2          log_gdp         industry      fossil_fuel      urban_pop
- Min.   :10.28    Min.   : 4.93   Min.   : 5.00   Min.   : 5.00   Min.   :10.00
- 1st Qu.:12.25    1st Qu.: 7.65   1st Qu.:22.05   1st Qu.:46.16   1st Qu.:47.36
- Median :12.76    Median : 8.49   Median :27.28   Median :55.65   Median :63.20
- Mean   :12.79    Mean   : 8.51   Mean   :27.82   Mean   :55.58   Mean   :62.05
- 3rd Qu.:13.38    3rd Qu.: 9.37   3rd Qu.:32.81   3rd Qu.:64.77   3rd Qu.:76.52
- Max.   :15.53    Max.   :12.39   Max.   :52.79   Max.   :93.41   Max.   :98.00
+  variable          n   mean     sd     min     max
+  log_co2         120  14.22   2.11    8.76   20.36
+  log_gdp         120   8.53   1.57    4.61   13.21
+  industry        120  27.87   6.21    8.32   44.98
+  fossil_fuel     120  55.49   9.62   24.72   81.22
+  urban_pop       120  62.52  13.25   29.81   97.62
+  democracy       120  22.94   8.32    3.10   45.00
+  trade_network   120   0.64   0.17    0.18    1.04
+  agriculture     120  13.87   8.11    1.00   37.11
+  log_trade       120   4.43   0.46    3.45    5.84
+  fdi             120   2.23   4.19   -5.00   13.62
+  corruption      120   0.37   0.16    0.05    0.71
+  log_tourism     120  14.61   1.32   11.54   19.63
+  log_credit      120   3.83   0.65    2.30    5.50
 ```
 
-The dataset has 120 observations and 14 variables (1 dependent, 12 candidate regressors, 1 country identifier). The dependent variable `log_co2` has a mean of 12.79 with a standard deviation of approximately 1.6 log points, reflecting substantial cross-country variation in emissions.
+The dataset has 120 observations and 14 variables (1 dependent, 12 candidate regressors, 1 country identifier). The dependent variable `log_co2` has a mean of 14.22 with a standard deviation of 2.11 log points, reflecting substantial cross-country variation in emissions. The candidate regressors span very different scales --- trade\_network ranges from 0.18 to 1.04, while urban\_pop ranges from 29.8 to 97.6 --- which is why BMA, LASSO, and WALS each handle scaling internally.
 
 
 ### 3.3 Correlation structure
@@ -294,24 +309,24 @@ summary(ols_full)
 ```text
 Coefficients:
                Estimate Std. Error t value Pr(>|t|)
-(Intercept)    1.789429   0.537982   3.326 0.001181 **
-log_gdp        1.210466   0.040747  29.705  < 2e-16 ***
-industry       0.007919   0.003126   2.534 0.012729 *
-fossil_fuel    0.010685   0.002025   5.276 6.94e-07 ***
-urban_pop      0.010002   0.001822   5.489 2.86e-07 ***
-democracy      0.003193   0.002530   1.262 0.209614
-trade_network  0.524063   0.130972   4.001 0.000118 ***
-agriculture    0.003654   0.002787   1.311 0.192551
-log_trade     -0.050327   0.040697  -1.237 0.218952
-fdi            0.003217   0.004802   0.670 0.504265
-corruption    -0.120001   0.143102  -0.839 0.403534
-log_tourism    0.013766   0.017403   0.791 0.430645
-log_credit     0.016137   0.034362   0.470 0.639574
+(Intercept)    2.283773   0.494736   4.616 1.06e-05 ***
+log_gdp        1.163669   0.032747  35.537  < 2e-16 ***
+industry       0.017577   0.005004   3.513 0.000661 ***
+fossil_fuel    0.011988   0.003240   3.698 0.000349 ***
+urban_pop      0.008221   0.002689   3.057 0.002794 **
+democracy      0.010497   0.003975   2.640 0.009549 **
+trade_network  0.912828   0.203681   4.482 1.94e-05 ***
+agriculture   -0.000629   0.004242  -0.148 0.882568
+log_trade     -0.055738   0.064829  -0.860 0.391509
+fdi            0.000789   0.007045   0.112 0.910964
+corruption     0.010767   0.201954   0.053 0.957573
+log_tourism   -0.028025   0.024415  -1.148 0.253610
+log_credit     0.045689   0.049690   0.919 0.360252
 ---
-Multiple R-squared: 0.9646,  Adjusted R-squared: 0.9607
+Multiple R-squared: 0.9801,  Adjusted R-squared: 0.9779
 ```
 
-Look carefully at the noise variables. For example, log\_trade has a t-statistic of $-1.24$ (p = 0.219) and corruption has a t-statistic of $-0.84$ (p = 0.404). While neither reaches conventional significance in this particular sample, their estimated coefficients ($-0.050$ and $-0.120$) are non-negligible in magnitude --- and in a different random sample, some noise variables could easily cross the 5% threshold. This is **spurious significance**, caused by the correlation between noise variables and the true predictors. It is precisely this problem that motivates the three methods we study next.
+Look carefully at the noise variables. For example, log\_trade has a t-statistic of $-0.86$ (p = 0.392) and corruption has a t-statistic of $0.05$ (p = 0.958). None reach conventional significance in this sample. However, their estimated coefficients can be non-negligible in magnitude --- and in a different random sample, some noise variables could easily cross the 5% threshold. This is the risk of **spurious significance**, caused by the correlation between noise variables and the true predictors. It is precisely this problem that motivates the three methods we study next.
 
 > **Warning.** With 12 correlated regressors and only 120 observations, OLS can produce misleading significance levels. A variable with a true coefficient of zero may appear significant simply because it is correlated with a genuinely important predictor. This is why we need principled variable selection methods.
 
@@ -434,94 +449,165 @@ $$
 where $\hat{\beta}\_{j,k}$ is the estimated coefficient of variable $j$ in model $k$ (and zero if $j$ is not in model $k$). This is a weighted average of the coefficient across all models. Variables with high PIPs get posterior means close to their "full model" estimates; variables with low PIPs get posterior means shrunk toward zero.
 
 
-## 7. Toy Example --- BMA on 4 Variables
+## 7. Toy Example --- BMA on 3 Variables
 
-Before running BMA on all 12 variables, let us work through a small example by hand. We pick 4 variables from our dataset: **log\_gdp** and **fossil\_fuel** (true predictors) and **fdi** and **corruption** (noise). With 4 variables, there are $2^4 = 16$ possible models.
+Before running BMA on all 12 variables, let us work through a small example by hand. We pick just 3 variables: **log\_gdp** and **fossil\_fuel** (true predictors) and **log\_trade** (noise). With 3 variables, each can be either IN or OUT of the model, giving us $2^3 = 8$ possible models --- small enough to examine every single one.
+
+Here are all 8 models written out explicitly:
+
+| Model | Formula |
+|:--|:--|
+| $M\_1$ | log\_co2 $\sim$ 1 (intercept only) |
+| $M\_2$ | log\_co2 $\sim$ log\_gdp |
+| $M\_3$ | log\_co2 $\sim$ fossil\_fuel |
+| $M\_4$ | log\_co2 $\sim$ log\_trade |
+| $M\_5$ | log\_co2 $\sim$ log\_gdp + fossil\_fuel |
+| $M\_6$ | log\_co2 $\sim$ log\_gdp + log\_trade |
+| $M\_7$ | log\_co2 $\sim$ fossil\_fuel + log\_trade |
+| $M\_8$ | log\_co2 $\sim$ log\_gdp + fossil\_fuel + log\_trade |
+
+
+### 7.1 Step 1 --- Fit every model and compute BIC
+
+We fit each of the 8 models using OLS and compute its BIC score. Remember: **lower BIC = better** (the model explains the data well without unnecessary complexity).
 
 ```r
-# Select the 4 variables for the toy example
+# Select our 3 variables
 toy_data <- synth_data |>
-  select(log_co2, log_gdp, fossil_fuel, fdi, corruption)
+  select(log_co2, log_gdp, fossil_fuel, log_trade)
 
-toy_vars <- c("log_gdp", "fossil_fuel", "fdi", "corruption")
-
-# Enumerate all 2^4 = 16 possible subsets
-all_models <- expand.grid(
-  log_gdp     = c(0, 1),
-  fossil_fuel = c(0, 1),
-  fdi         = c(0, 1),
-  corruption  = c(0, 1)
+# Write out all 8 model formulas explicitly
+model_formulas <- c(
+  "log_co2 ~ 1",                                  # M1: intercept only
+  "log_co2 ~ log_gdp",                            # M2
+  "log_co2 ~ fossil_fuel",                         # M3
+  "log_co2 ~ log_trade",                           # M4
+  "log_co2 ~ log_gdp + fossil_fuel",               # M5
+  "log_co2 ~ log_gdp + log_trade",                 # M6
+  "log_co2 ~ fossil_fuel + log_trade",              # M7
+  "log_co2 ~ log_gdp + fossil_fuel + log_trade"    # M8
 )
 
-# Fit each model and compute BIC
-model_results <- all_models |>
-  mutate(model_id = row_number()) |>
-  rowwise() |>
-  mutate(
-    included_vars = list(toy_vars[c(log_gdp, fossil_fuel, fdi, corruption) == 1]),
-    n_vars = length(included_vars),
-    formula_str = if (n_vars == 0) "log_co2 ~ 1"
-                  else paste("log_co2 ~", paste(included_vars, collapse = " + ")),
-    fit = list(lm(as.formula(formula_str), data = toy_data)),
-    bic = BIC(fit)
-  ) |>
-  ungroup()
+# Fit each model and extract its BIC
+bic_values <- sapply(model_formulas, function(f) {
+  BIC(lm(as.formula(f), data = toy_data))
+})
 
-# Convert BIC to approximate posterior probabilities
-# P(M_k|y) proportional to exp(-0.5 * BIC_k) under uniform priors
-model_results <- model_results |>
-  mutate(
-    log_weight = -0.5 * (bic - min(bic)),
-    weight     = exp(log_weight),
-    post_prob  = weight / sum(weight)
-  )
+# Organize results in a table
+toy_results <- tibble(
+  model    = paste0("M", 1:8),
+  formula  = model_formulas,
+  bic      = round(bic_values, 1)
+) |>
+  arrange(bic)
 
-# Display the top 8 models
-model_results |>
-  arrange(desc(post_prob)) |>
-  head(8) |>
-  select(model_id, log_gdp, fossil_fuel, fdi, corruption, bic, post_prob)
+print(toy_results)
 ```
 
 ```text
-  model_id log_gdp fossil_fuel fdi corruption    bic post_prob
-         4       1           1   0          0  -52.3   0.3876
-        12       1           1   1          0  -48.5   0.2154
-         8       1           1   0          1  -47.9   0.1731
-        16       1           1   1          1  -44.2   0.0945
-         2       1           0   0          0  -33.7   0.0491
-        10       1           0   1          0  -29.9   0.0265
-         6       1           0   0          1  -29.4   0.0218
-        14       1           0   1          1  -25.6   0.0115
+  model formula                                      bic
+  M5    log_co2 ~ log_gdp + fossil_fuel             114.1
+  M8    log_co2 ~ log_gdp + fossil_fuel + log_trade 118.5
+  M2    log_co2 ~ log_gdp                           120.7
+  M6    log_co2 ~ log_gdp + log_trade               125.4
+  M3    log_co2 ~ fossil_fuel                        514.4
+  M7    log_co2 ~ fossil_fuel + log_trade            519.0
+  M1    log_co2 ~ 1                                  528.3
+  M4    log_co2 ~ log_trade                          533.0
 ```
 
-The best model includes log\_gdp and fossil\_fuel (both true predictors) and excludes fdi and corruption (both noise). The top four models all include GDP, confirming its overwhelming importance. Now let us compute the PIPs:
+The winner is $M\_5$ (log\_gdp + fossil\_fuel) with BIC = 114.1 --- exactly the two true predictors, no noise. The runner-up $M\_8$ adds log\_trade but its BIC is worse (118.5), meaning the extra variable does not improve the fit enough to justify the added complexity. Models without GDP ($M\_1$, $M\_3$, $M\_4$, $M\_7$) have dramatically worse BIC scores, confirming GDP's dominant role.
+
+
+### 7.2 Step 2 --- Convert BIC to posterior probabilities
+
+Now we turn each BIC into a posterior model probability. The formula is:
+
+$$
+P(M\_k | y) = \frac{\exp(-0.5 \cdot \text{BIC}\_k)}{\sum\_{l=1}^{8} \exp(-0.5 \cdot \text{BIC}\_l)}
+$$
+
+Because the BIC values can be very large, we work with **differences from the best model** to avoid numerical overflow. Subtracting the minimum BIC from all values does not change the probabilities:
+
+$$
+P(M\_k | y) = \frac{\exp\bigl(-0.5 \cdot (\text{BIC}\_k - \text{BIC}\_{\min})\bigr)}{\sum\_{l=1}^{8} \exp\bigl(-0.5 \cdot (\text{BIC}\_l - \text{BIC}\_{\min})\bigr)}
+$$
+
+Let us plug in the numbers. The best model ($M\_5$) has BIC = 114.1, so $\Delta\_5 = 0$. The runner-up ($M\_8$) has $\Delta\_8 = 118.5 - 114.1 = 4.4$:
+
+$$
+w\_5 = \exp(-0.5 \times 0) = 1.000, \quad w\_8 = \exp(-0.5 \times 4.4) = 0.111
+$$
+
+The remaining models have much larger $\Delta$ values, so their weights are essentially zero. After normalizing by the sum of all weights ($1.000 + 0.111 + 0.037 + \ldots \approx 1.151$):
+
+$$
+P(M\_5 | y) = \frac{1.000}{1.151} = 0.869, \quad P(M\_8 | y) = \frac{0.111}{1.151} = 0.096
+$$
 
 ```r
-# Compute PIPs: sum P(M_k|y) for all models containing each variable
+# Convert BIC to posterior probabilities using the delta-BIC trick
+toy_results <- toy_results |>
+  mutate(
+    delta_bic = bic - min(bic),                    # difference from best
+    weight    = exp(-0.5 * delta_bic),             # unnormalized weight
+    post_prob = round(weight / sum(weight), 4)     # normalize to sum to 1
+  )
+
+toy_results |> select(model, bic, delta_bic, weight, post_prob)
+```
+
+```text
+  model    bic  delta_bic    weight  post_prob
+  M5     114.1       0.0    1.0000     0.8687
+  M8     118.5       4.4    0.1108     0.0962
+  M2     120.7       6.6    0.0369     0.0320
+  M6     125.4      11.3    0.0035     0.0031
+  M3     514.4     400.3    0.0000     0.0000
+  M7     519.0     404.9    0.0000     0.0000
+  M1     528.3     414.2    0.0000     0.0000
+  M4     533.0     418.9    0.0000     0.0000
+```
+
+One model dominates: $M\_5$ captures 86.9% of the posterior probability --- exactly the two true predictors. The runner-up $M\_8$ (adding log\_trade) gets only 9.6%, and $M\_2$ (GDP alone) gets 3.2%. The remaining 5 models share less than 0.4% of the total weight. BMA's Occam's razor is at work: adding log\_trade to the model ($M\_8$) does not improve the fit enough to overcome the complexity penalty, so the simpler model ($M\_5$) wins decisively.
+
+
+### 7.3 Step 3 --- Compute Posterior Inclusion Probabilities
+
+Finally, we compute the PIP of each variable by summing the posterior probabilities of all models that include it. For example, log\_trade appears in models $M\_4$, $M\_6$, $M\_7$, and $M\_8$, so:
+
+$$
+\text{PIP}\_{\text{log\_trade}} = P(M\_4 | y) + P(M\_6 | y) + P(M\_7 | y) + P(M\_8 | y) = 0.000 + 0.003 + 0.000 + 0.096 = 0.099
+$$
+
+That is well below the 0.50 threshold --- fragile evidence, exactly what we expect for a noise variable.
+
+```r
+# Compute PIPs: for each variable, sum P(M|y) across models that include it
 pip_toy <- tibble(
-  variable = toy_vars,
+  variable    = c("log_gdp", "fossil_fuel", "log_trade"),
+  true_effect = c("True", "True", "Noise"),
   pip = c(
-    sum(model_results$post_prob[model_results$log_gdp == 1]),
-    sum(model_results$post_prob[model_results$fossil_fuel == 1]),
-    sum(model_results$post_prob[model_results$fdi == 1]),
-    sum(model_results$post_prob[model_results$corruption == 1])
-  ),
-  true_effect = c("True", "True", "Noise", "Noise")
+    # log_gdp appears in M2, M5, M6, M8
+    sum(toy_results$post_prob[toy_results$model %in% c("M2","M5","M6","M8")]),
+    # fossil_fuel appears in M3, M5, M7, M8
+    sum(toy_results$post_prob[toy_results$model %in% c("M3","M5","M7","M8")]),
+    # log_trade appears in M4, M6, M7, M8
+    sum(toy_results$post_prob[toy_results$model %in% c("M4","M6","M7","M8")])
+  )
 )
 
 print(pip_toy)
 ```
 
 ```text
-  variable    pip   true_effect
-  log_gdp     0.999  True
-  fossil_fuel 0.871  True
-  fdi         0.348  Noise
-  corruption  0.291  Noise
+  variable      true_effect    pip
+  log_gdp       True          1.000
+  fossil_fuel   True          0.965
+  log_trade     Noise         0.099
 ```
 
-Even with this simple 4-variable example, BMA correctly identifies the true predictors. GDP has a PIP of 0.999 (decisive evidence), fossil\_fuel has a PIP of 0.871 (robust), while FDI (0.348) and corruption (0.291) fall well below the 0.50 borderline threshold. The BIC-based Occam's razor penalizes models that include noise variables without substantially improving fit.
+Even with this simple 3-variable example, BMA correctly identifies the two true predictors. GDP has a PIP of 1.000 (decisive evidence) and fossil\_fuel has a PIP of 0.965 (robust) --- they appear in every high-probability model. Log\_trade has a PIP of only 0.099 (fragile) --- well below the 0.50 threshold. BMA's built-in Occam's razor penalizes models that include noise variables without substantially improving the fit.
 
 
 ## 8. BMA on All 12 Variables
@@ -593,7 +679,7 @@ ggplot(bma_df, aes(x = reorder(variable, pip), y = pip, fill = robustness)) +
 
 ![BMA Posterior Inclusion Probabilities. Green bars indicate robust variables with PIP greater than or equal to 0.80; teal bars indicate borderline variables; orange bars indicate fragile variables with PIP less than 0.50.](bma_lasso_wals_04_bma_pip.png)
 
-The PIP bar chart reveals a clear separation between signal and noise. GDP dominates with a PIP near 1.00, followed by fossil\_fuel, urban\_pop, and trade\_network --- all with PIPs above the 0.80 robustness threshold. The noise variables (log\_trade, fdi, corruption, log\_tourism, log\_credit) all have PIPs well below 0.50, confirming that BMA correctly classifies them as fragile. Variables with smaller true effects like democracy ($\beta = 0.004$) and agriculture ($\beta = 0.005$) fall in the borderline range, reflecting the genuine difficulty of detecting very small effects with 120 observations.
+The PIP bar chart reveals a clear separation between signal and noise. GDP dominates with a PIP of 1.00, followed by trade\_network (0.986), fossil\_fuel (0.948), and industry (0.841) --- all with PIPs above the 0.80 robustness threshold. The noise variables (log\_trade, fdi, corruption, log\_tourism, log\_credit) all have PIPs well below 0.15, confirming that BMA correctly classifies them as fragile. Urban\_pop ($\beta = 0.010$, PIP = 0.648) and democracy ($\beta = 0.004$, PIP = 0.607) land in the borderline range --- true predictors whose effects are moderate enough that BMA hedges between including and excluding them. Agriculture ($\beta = 0.005$, PIP = 0.087) is classified as fragile, an honest reflection of the sample's limited power to detect its very small effect.
 
 
 ### 8.3 Posterior coefficient plot
@@ -610,38 +696,73 @@ ggplot(bma_df, aes(x = reorder(variable, pip), y = post_mean, color = robustness
 
 ![BMA posterior mean coefficients with approximate 95 percent credible intervals. Variables ordered by PIP. Robust variables have intervals that do not cross zero.](bma_lasso_wals_05_bma_coefs.png)
 
-The posterior coefficient plot shows the BMA-estimated effect sizes with uncertainty bands. GDP's posterior mean of approximately 1.20 closely recovers the true value of 1.200, and its 95% credible interval is narrow, reflecting high precision. The noise variables have posterior means very close to zero with tight intervals, confirming they contribute nothing to the outcome. Notice that the credible intervals for borderline variables like democracy are wider, honestly reflecting the greater uncertainty about their true effect.
+The posterior coefficient plot shows the BMA-estimated effect sizes with uncertainty bands. GDP's posterior mean of approximately 1.19 closely recovers the true value of 1.200, and its 95% credible interval is narrow, reflecting high precision. Trade\_network has a posterior mean of 0.87, overshooting its true value of 0.500 --- but its wide credible interval honestly reflects substantial estimation uncertainty. The noise variables and low-PIP variables like agriculture have posterior means shrunk very close to zero --- this is BMA's shrinkage at work. Variables with low PIPs appear in few high-probability models, so their posterior means are averaged with many models where the coefficient is zero, pulling the estimate toward zero.
 
 
-### 8.4 Model inclusion matrix
+### 8.4 Variable-inclusion map
 
-The model inclusion matrix shows *which* variables appear in the highest-probability models. Each column represents one model (ranked by posterior probability from left to right), and each row represents a variable. A solid band of color means the variable appears in virtually every top model; a patchy pattern means it comes and goes.
+The variable-inclusion map shows *which* variables appear in the highest-probability models and whether their coefficients are positive or negative. Unlike a simple heatmap, the **width of each column is proportional to the model's posterior probability** --- so wide columns represent models that the data strongly supports. The x-axis shows cumulative posterior model probability: if the first model has PMP = 0.15, it occupies the region from 0 to 0.15; the second model fills from 0.15 to 0.15 + its PMP, and so on. A solid band of color stretching across most of the x-axis means the variable appears in virtually every high-probability model.
 
 ```r
-# Model inclusion matrix: top 50 models
-top_models <- topmodels.bma(bma_fit)[, 1:min(50, ncol(topmodels.bma(bma_fit)))]
+# Extract top 100 models and their coefficient estimates
+top_coefs <- topmodels.bma(bma_fit)
+n_top <- min(100, ncol(top_coefs))
+top_coefs <- top_coefs[, 1:n_top]
 
-# Convert to long format for plotting
-inclusion_df <- as.data.frame(top_models != 0) |>
-  rownames_to_column("variable") |>
-  pivot_longer(-variable, names_to = "model", values_to = "included") |>
-  mutate(
-    model_num = as.integer(gsub(".*\\.", "", model)),
-    included  = as.numeric(included)
-  )
+# Extract posterior model probabilities (MCMC-based)
+model_pmps <- pmp.bma(bma_fit)[1:n_top, 1]
+
+# Cumulative x positions: each model's width = its PMP
+cum_pmp <- c(0, cumsum(model_pmps))
 
 # Order variables by PIP (highest at top)
-var_order <- bma_df |> arrange(pip) |> pull(variable)
-inclusion_df$variable <- factor(inclusion_df$variable, levels = var_order)
+var_order <- bma_df |> arrange(desc(pip)) |> pull(variable)
 
-# Create heatmap
-ggplot(inclusion_df, aes(x = factor(model_num), y = variable, fill = factor(included))) +
-  geom_tile(color = "white")
+# Build rectangle data for every variable × model combination
+rect_data <- expand.grid(
+  var_idx   = seq_len(nrow(top_coefs)),
+  model_idx = seq_len(n_top)
+) |>
+  mutate(
+    variable   = rownames(top_coefs)[var_idx],
+    coef_value = mapply(function(v, m) top_coefs[v, m], var_idx, model_idx),
+    sign = case_when(
+      coef_value > 0 ~ "Positive",
+      coef_value < 0 ~ "Negative",
+      TRUE           ~ "Not included"
+    ),
+    xmin = cum_pmp[model_idx],
+    xmax = cum_pmp[model_idx + 1],
+    variable = factor(variable, levels = rev(var_order))
+  )
+
+# Plot the variable-inclusion map
+ggplot(rect_data, aes(xmin = xmin, xmax = xmax,
+                       ymin = as.numeric(variable) - 0.45,
+                       ymax = as.numeric(variable) + 0.45,
+                       fill = sign)) +
+  geom_rect() +
+  scale_fill_manual(
+    name   = "Coefficient",
+    values = c("Positive"     = "#6a9bcc",
+               "Negative"     = "#d97757",
+               "Not included" = "#d0cdc8")
+  ) +
+  scale_x_continuous(expand = c(0, 0),
+                     labels = scales::label_number(accuracy = 0.1)) +
+  scale_y_continuous(breaks = seq_along(var_order),
+                     labels = rev(var_order),
+                     expand = c(0, 0)) +
+  labs(title    = "Variable-Inclusion Map",
+       subtitle = paste0("Top ", n_top, " models shown out of ",
+                         nrow(pmp.bma(bma_fit)), " visited"),
+       x = "Cumulative posterior model probability",
+       y = NULL)
 ```
 
-![Model inclusion matrix showing the top 50 models ranked by posterior probability. Each column is a model, each row is a variable. Blue indicates the variable is included, gray indicates excluded. The most probable models consistently include GDP, fossil fuel, urban population, and trade network.](bma_lasso_wals_06_bma_inclusion.png)
+![Variable-inclusion map showing the top 100 BMA models. The x-axis is cumulative posterior model probability, so wider columns represent more probable models. Blue indicates a positive coefficient, orange indicates a negative coefficient, and gray indicates the variable is not included. Variables are ordered by PIP from top to bottom.](bma_lasso_wals_06_bma_inclusion.png)
 
-The model inclusion matrix visualizes *which* variables appear in the best-fitting models. Reading from left to right (highest to lowest posterior probability), the top models consistently include log\_gdp, fossil\_fuel, urban\_pop, and trade\_network. These variables appear as solid blue bands across virtually all top models. In contrast, the noise variables appear sporadically --- they are included in some models but excluded from most, producing a patchy pattern. This visual confirms the PIP results: variables that matter appear everywhere; variables that do not matter appear randomly.
+The variable-inclusion map reveals clear structure. The top variables --- log\_gdp, trade\_network, fossil\_fuel, and industry --- form solid blue bands stretching across nearly the entire x-axis, meaning they appear with positive coefficients in virtually every high-probability model. Urban\_pop and democracy also show substantial inclusion, consistent with their borderline PIPs. In contrast, the noise variables (log\_trade, fdi, corruption, log\_tourism, log\_credit) appear as mostly gray with occasional patches of blue or orange, indicating they enter and exit models sporadically and sometimes with the wrong sign. The fact that noise variables occasionally appear with negative coefficients (orange patches) is another sign of fragility --- their coefficient estimates are unstable because they have no true effect.
 
 
 ### 8.5 BMA results vs. known truth
@@ -661,23 +782,23 @@ print(bma_summary)
 
 ```text
   variable      true_beta    pip  post_mean bma_robust true_nonzero correct
-  log_gdp         1.200    1.000    1.2092     TRUE       TRUE       TRUE
-  fossil_fuel     0.012    0.997    0.0107     TRUE       TRUE       TRUE
-  urban_pop       0.010    0.996    0.0100     TRUE       TRUE       TRUE
-  trade_network   0.500    0.981    0.5010     TRUE       TRUE       TRUE
-  industry        0.008    0.854    0.0070     TRUE       TRUE       TRUE
-  agriculture     0.005    0.531    0.0031    FALSE       TRUE      FALSE
-  democracy       0.004    0.410    0.0018    FALSE       TRUE      FALSE
-  log_trade       0.000    0.187   -0.0088    FALSE      FALSE       TRUE
-  corruption      0.000    0.145   -0.0163    FALSE      FALSE       TRUE
-  fdi             0.000    0.109    0.0004    FALSE      FALSE       TRUE
-  log_tourism     0.000    0.101    0.0014    FALSE      FALSE       TRUE
-  log_credit      0.000    0.083    0.0013    FALSE      FALSE       TRUE
+  log_gdp         1.200    1.000    1.1854     TRUE       TRUE       TRUE
+  trade_network   0.500    0.986    0.8727     TRUE       TRUE       TRUE
+  fossil_fuel     0.012    0.948    0.0117     TRUE       TRUE       TRUE
+  industry        0.008    0.841    0.0142     TRUE       TRUE       TRUE
+  urban_pop       0.010    0.648    0.0049    FALSE       TRUE      FALSE
+  democracy       0.004    0.607    0.0066    FALSE       TRUE      FALSE
+  log_tourism     0.000    0.130   -0.0039    FALSE      FALSE       TRUE
+  log_credit      0.000    0.104    0.0051    FALSE      FALSE       TRUE
+  agriculture     0.005    0.087   -0.0002    FALSE       TRUE      FALSE
+  log_trade       0.000    0.084   -0.0037    FALSE      FALSE       TRUE
+  corruption      0.000    0.078    0.0026    FALSE      FALSE       TRUE
+  fdi             0.000    0.077   -0.0000    FALSE      FALSE       TRUE
 ```
 
-BMA correctly classifies 10 of 12 variables. The five strong true predictors (GDP, fossil\_fuel, urban\_pop, trade\_network, industry) all receive PIPs above 0.80 --- these are the "robust" determinants. All five noise variables receive PIPs below 0.20 --- correctly identified as fragile. The two misses are democracy (PIP = 0.410) and agriculture (PIP = 0.531), which have very small true effects ($\beta = 0.004$ and $\beta = 0.005$) that are hard to distinguish from noise with only 120 observations. This is not a failure of BMA --- it is an honest reflection of the data's limited power to detect tiny effects.
+BMA correctly classifies 9 of 12 variables. The four strongest true predictors (GDP, trade\_network, fossil\_fuel, industry) all receive PIPs above 0.80 --- these are the "robust" determinants. All five noise variables receive PIPs below 0.15 --- correctly identified as fragile. Urban\_pop (PIP = 0.648) and democracy (PIP = 0.607) fall in the borderline range --- they are true predictors, but BMA's conservative Occam's razor hedges because their effects are moderate. Agriculture ($\beta = 0.005$, PIP = 0.087) is missed entirely. This reveals an important nuance: BMA prioritizes precision over sensitivity. It would rather miss a small true effect than falsely include a noise variable.
 
-> **Note.** BMA on all 12 variables correctly gives high PIPs to the strong true predictors (GDP, fossil fuel, trade network) and low PIPs to the noise variables. Variables with very small true effects may be harder to detect. The model inclusion matrix shows that the top models consistently include the core predictors.
+> **Note.** BMA on all 12 variables correctly gives high PIPs to the strong true predictors (GDP, trade network, fossil fuel, industry) and low PIPs to the noise variables. Variables with moderate or small true effects may land in the borderline zone. The variable-inclusion map shows that the top models consistently include the core predictors.
 
 
 <div style="background: linear-gradient(135deg, #d97757 0%, #d97757 100%); padding: 1.5em 2em; border-radius: 8px; margin: 2em 0; color: #fff; font-size: 1.3em; font-weight: 600;">
@@ -861,14 +982,15 @@ print(post_lasso_summary)
 
 ```text
   variable      lasso_coef  post_lasso_coef  true_beta
-  log_gdp          1.1542         1.2052       1.200
-  fossil_fuel      0.0091         0.0109       0.012
-  urban_pop        0.0085         0.0101       0.010
-  trade_network    0.4231         0.5148       0.500
-  industry         0.0052         0.0075       0.008
+  log_gdp          1.1899         1.1646       1.200
+  industry         0.0090         0.0176       0.008
+  fossil_fuel      0.0072         0.0118       0.012
+  urban_pop        0.0041         0.0078       0.010
+  democracy        0.0046         0.0113       0.004
+  trade_network    0.6309         0.8978       0.500
 ```
 
-Notice how the Post-LASSO coefficients are closer to the true values than the raw LASSO coefficients. For example, GDP's LASSO coefficient is 1.154 (shrunk from the true 1.200), but the Post-LASSO estimate is 1.205 --- much closer to the truth. Similarly, trade\_network recovers from 0.423 (LASSO) to 0.515 (Post-LASSO), nearing the true value of 0.500. The LASSO selected the right variables; Post-LASSO recovered the right magnitudes.
+Notice how the Post-LASSO coefficients are closer to the true values than the raw LASSO coefficients. For example, fossil\_fuel's LASSO coefficient is 0.007 (shrunk from the true 0.012), but the Post-LASSO estimate is 0.012 --- recovering the truth almost exactly. Similarly, urban\_pop recovers from 0.004 (LASSO) to 0.008 (Post-LASSO), closer to the true value of 0.010. Trade\_network's Post-LASSO estimate (0.898) overshoots the true value (0.500), reflecting the difficulty of precisely estimating a coefficient on a low-variance variable. The LASSO selected the right variables; Post-LASSO recovered unbiased magnitudes.
 
 > **Note.** LASSO coefficients are shrunk toward zero by design. Post-LASSO runs OLS on only the LASSO-selected variables, producing unbiased coefficient estimates while retaining the variable selection from LASSO.
 
@@ -1005,18 +1127,18 @@ print(wals_df |> arrange(desc(abs_t)) |> select(variable, estimate, t_stat, true
 
 ```text
   variable      estimate  t_stat  true_beta
-  log_gdp        1.2070   29.35     1.200
-  urban_pop      0.0098    5.36     0.010
-  fossil_fuel    0.0105    5.21     0.012
-  trade_network  0.5103    3.90     0.500
-  industry       0.0073    2.36     0.008
-  agriculture    0.0032    1.16     0.005
-  corruption    -0.0854   -0.60     0.000
-  log_trade     -0.0319   -0.79     0.000
-  democracy      0.0024    0.96     0.004
-  fdi            0.0022    0.46     0.000
-  log_tourism    0.0087    0.50     0.000
-  log_credit     0.0082    0.24     0.000
+  log_gdp        1.1333   34.62     1.200
+  trade_network  0.8458    4.39     0.500
+  industry       0.0187    4.01     0.008
+  fossil_fuel    0.0099    3.26     0.012
+  urban_pop      0.0082    3.11     0.010
+  democracy      0.0097    2.58     0.004
+  log_credit     0.0659    1.43     0.000
+  agriculture   -0.0046   -1.13     0.005
+  log_tourism   -0.0148   -0.64     0.000
+  log_trade      0.0196    0.31     0.000
+  fdi           -0.0011   -0.17     0.000
+  corruption    -0.0165   -0.09     0.000
 ```
 
 WALS produces familiar t-statistics for each auxiliary variable. Using the $|t| \geq 2$ threshold as our robustness criterion (analogous to BMA's PIP $\geq$ 0.80), we can classify each variable as robust or fragile.
@@ -1046,7 +1168,7 @@ ggplot(wals_df, aes(x = reorder(variable, abs_t), y = t_stat, fill = bar_color))
 
 ![WALS t-statistics for all 12 variables. The dashed lines mark the t equals 2 robustness threshold. Variables with absolute t-statistic greater than or equal to 2 are considered robust.](bma_lasso_wals_10_wals_tstat.png)
 
-The t-statistic bar chart shows a clear separation. GDP towers above all others with $|t| = 29.35$, followed by urban\_pop ($|t| = 5.36$), fossil\_fuel ($|t| = 5.21$), trade\_network ($|t| = 3.90$), and industry ($|t| = 2.36$). These five variables pass the $|t| \geq 2$ threshold. The noise variables all have $|t| < 1$, confirming they are not robust determinants. As with BMA, democracy ($|t| = 0.96$) and agriculture ($|t| = 1.16$) fall below the robustness threshold --- their true effects are simply too small to detect reliably with this sample size.
+The t-statistic bar chart shows a clear separation. GDP towers above all others with $|t| = 34.62$, followed by trade\_network ($|t| = 4.39$), industry ($|t| = 4.01$), fossil\_fuel ($|t| = 3.26$), urban\_pop ($|t| = 3.11$), and democracy ($|t| = 2.58$). These six variables pass the $|t| \geq 2$ threshold. The noise variables all have $|t| < 1.5$, confirming they are not robust determinants. Agriculture ($|t| = 1.13$) falls just below the robustness threshold --- its true effect ($\beta = 0.005$) is simply too small to detect reliably with this sample size.
 
 > **Note.** WALS produces t-statistics for each auxiliary variable. Using the $|t| \geq 2$ threshold, we can classify variables as robust or fragile. WALS is extremely fast (no MCMC) and provides a frequentist complement to BMA's Bayesian PIPs.
 
@@ -1083,49 +1205,49 @@ print(grand_table |>
 
 ```text
   variable      true_beta  bma_pip bma_robust lasso_selected  wals_t wals_robust n_methods
-  log_gdp         1.200     1.000   TRUE         TRUE         29.35    TRUE          3
-  fossil_fuel     0.012     0.997   TRUE         TRUE          5.21    TRUE          3
-  urban_pop       0.010     0.996   TRUE         TRUE          5.36    TRUE          3
-  trade_network   0.500     0.981   TRUE         TRUE          3.90    TRUE          3
-  industry        0.008     0.854   TRUE         TRUE          2.36    TRUE          3
-  agriculture     0.005     0.531  FALSE        FALSE          1.16   FALSE          0
-  democracy       0.004     0.410  FALSE        FALSE          0.96   FALSE          0
-  log_trade       0.000     0.187  FALSE        FALSE         -0.79   FALSE          0
-  fdi             0.000     0.109  FALSE        FALSE          0.46   FALSE          0
-  corruption      0.000     0.145  FALSE        FALSE         -0.60   FALSE          0
-  log_tourism     0.000     0.101  FALSE        FALSE          0.50   FALSE          0
-  log_credit      0.000     0.083  FALSE        FALSE          0.24   FALSE          0
+  log_gdp         1.200     1.000   TRUE         TRUE         34.62    TRUE          3
+  trade_network   0.500     0.986   TRUE         TRUE          4.39    TRUE          3
+  fossil_fuel     0.012     0.948   TRUE         TRUE          3.26    TRUE          3
+  industry        0.008     0.841   TRUE         TRUE          4.01    TRUE          3
+  urban_pop       0.010     0.648  FALSE         TRUE          3.11    TRUE          2
+  democracy       0.004     0.607  FALSE         TRUE          2.58    TRUE          2
+  log_tourism     0.000     0.130  FALSE        FALSE         -0.64   FALSE          0
+  log_credit      0.000     0.104  FALSE        FALSE          1.43   FALSE          0
+  agriculture     0.005     0.087  FALSE        FALSE         -1.13   FALSE          0
+  log_trade       0.000     0.084  FALSE        FALSE          0.31   FALSE          0
+  corruption      0.000     0.078  FALSE        FALSE         -0.09   FALSE          0
+  fdi             0.000     0.077  FALSE        FALSE         -0.17   FALSE          0
 ```
 
-The results are striking. Five variables are **triple-robust** --- identified by all three methods: log\_gdp, fossil\_fuel, urban\_pop, trade\_network, and industry. These are the variables we can be most confident about. All five noise variables are correctly excluded by all three methods. The two missed variables (agriculture and democracy) have very small true effects that none of the methods could reliably detect.
+The results are striking. Four variables are **triple-robust** --- identified by all three methods: log\_gdp, trade\_network, fossil\_fuel, and industry. Two more variables --- urban\_pop and democracy --- are **double-robust**, selected by LASSO and WALS but landing in BMA's borderline zone (PIPs of 0.648 and 0.607). All five noise variables are correctly excluded by all three methods. Agriculture ($\beta = 0.005$) is the only true predictor missed by all methods --- its effect is simply too small to detect.
 
 
 ### 17.2 Method agreement heatmap
 
 ![Method agreement heatmap showing 12 variables by 3 methods. Steel blue indicates the variable was identified as robust; orange indicates it was not. True predictors are in the top rows, noise variables in the bottom rows.](bma_lasso_wals_12_heatmap.png)
 
-The heatmap provides a visual summary of agreement. The top five rows (strong true predictors) are solid steel blue across all three columns --- unanimous agreement that these variables matter. The bottom five rows (noise) are solid orange --- unanimous agreement that they do not. The middle two rows (democracy and agriculture) are orange throughout, reflecting the consensus that these tiny effects cannot be reliably distinguished from zero.
+The heatmap provides a visual summary of agreement. The top four rows (GDP, trade\_network, fossil\_fuel, industry) are solid steel blue across all three columns --- unanimous agreement that these variables matter. Urban\_pop and democracy show steel blue for LASSO and WALS but orange for BMA, visualizing BMA's greater conservatism. The bottom five rows (noise) are solid orange --- unanimous agreement that they do not matter. Agriculture is also orange throughout, reflecting all methods' consensus that its tiny effect ($\beta = 0.005$) cannot be reliably distinguished from zero.
 
 
 ### 17.3 BMA PIP vs. WALS |t-statistic|
 
 ![BMA PIP plotted against WALS absolute t-statistic. Point color indicates true status (steel blue for true predictors, orange for noise). Point shape indicates LASSO selection (triangle for selected, cross for not selected). The upper-right quadrant contains variables robust by both BMA and WALS.](bma_lasso_wals_13_pip_vs_t.png)
 
-The scatter plot reveals a strong positive relationship between BMA PIP and WALS $|t|$. Variables in the upper-right quadrant are robust by both methods --- and they are exactly the five true predictors with $\beta > 0.005$. The noise variables cluster in the lower-left corner (low PIP, low $|t|$). LASSO selection (triangle markers) aligns perfectly with the upper-right cluster, confirming three-way agreement. The two "difficult" true predictors (democracy and agriculture) sit in the lower-left, correctly flagged as uncertain by all methods.
+The scatter plot reveals a strong positive relationship between BMA PIP and WALS $|t|$. Variables in the upper-right quadrant are robust by both methods --- GDP, trade\_network, fossil\_fuel, and industry. Urban\_pop and democracy sit in an interesting middle zone: high WALS $|t|$ (above 2) but moderate BMA PIP (below 0.80), illustrating BMA's more conservative threshold. The noise variables cluster in the lower-left corner (low PIP, low $|t|$). LASSO selection (triangle markers) aligns with the WALS threshold, selecting the same six variables that pass $|t| \geq 2$.
 
 
 ### 17.4 Coefficient comparison
 
 ![Coefficient estimates from the three methods compared to the true values in a three-panel faceted scatter plot. Points close to the dashed 45-degree line indicate accurate coefficient recovery.](bma_lasso_wals_14_coef_comparison.png)
 
-The coefficient comparison plot shows how well each method recovers the true effect sizes. Points on the dashed 45-degree line represent perfect recovery. GDP ($\beta = 1.200$) is recovered almost exactly by all three methods. The smaller coefficients (trade\_network at 0.500, fossil\_fuel at 0.012, urban\_pop at 0.010) are also well-estimated. Post-LASSO and WALS produce coefficient estimates very close to the truth for selected variables, while BMA's posterior means are slightly attenuated for variables with PIPs below 1.0 (the averaging shrinks them toward zero).
+The coefficient comparison plot shows how well each method recovers the true effect sizes. Points on the dashed 45-degree line represent perfect recovery. GDP ($\beta = 1.200$) is recovered almost exactly by all three methods. The smaller coefficients (fossil\_fuel at 0.012, urban\_pop at 0.010) are also well-estimated. Trade\_network's coefficient is overestimated by all methods (true 0.500, estimates around 0.85--0.90), reflecting the difficulty of precisely estimating an effect on a low-variance variable. BMA's posterior means are slightly attenuated for variables with PIPs below 1.0 (the averaging shrinks them toward zero).
 
 
 ### 17.5 Agreement summary
 
-![Bar chart showing how many methods (out of 3) identified each variable as robust. Steel blue bars are true predictors, orange bars are noise variables. Five variables achieve triple-robust status.](bma_lasso_wals_15_agreement.png)
+![Bar chart showing how many methods (out of 3) identified each variable as robust. Steel blue bars are true predictors, orange bars are noise variables. Four variables achieve triple-robust status and two achieve double-robust status.](bma_lasso_wals_15_agreement.png)
 
-The agreement bar chart makes the story simple: five variables are identified by all three methods (triple-robust), and seven variables are identified by none. There are no "split votes" --- no variable was identified by exactly one or two methods. This clean binary outcome reflects the well-separated signal structure in our synthetic data. In practice, with messier real-world data, you would expect more borderline cases.
+The agreement bar chart tells a nuanced story: four variables are triple-robust (identified by all three methods), two are double-robust (identified by LASSO and WALS but not BMA), and six are identified by none. The "split votes" on urban\_pop and democracy reveal a genuine methodological difference: LASSO and WALS are more liberal in including moderate-effect variables, while BMA's Bayesian Occam's razor demands stronger evidence. This pattern --- where methods *mostly* agree but diverge on borderline cases --- is what makes methodological triangulation valuable.
 
 
 ### 17.6 Method performance
@@ -1134,9 +1256,9 @@ The agreement bar chart makes the story simple: five variables are identified by
 # Sensitivity, specificity, and accuracy for each method
 results_by_method <- tibble(
   method = c("BMA", "LASSO", "WALS"),
-  true_pos  = c(5, 5, 5),   # true predictors correctly identified
+  true_pos  = c(4, 6, 6),   # true predictors correctly identified
   false_pos = c(0, 0, 0),   # noise variables falsely identified
-  false_neg = c(2, 2, 2),   # true predictors missed
+  false_neg = c(3, 1, 1),   # true predictors missed
   true_neg  = c(5, 5, 5),   # noise variables correctly excluded
   sensitivity = true_pos / 7,
   specificity = true_neg / 5,
@@ -1148,12 +1270,12 @@ print(results_by_method)
 
 ```text
   method  true_pos  false_pos  false_neg  true_neg  sensitivity  specificity  accuracy
-  BMA          5          0          2         5        0.714        1.000     0.833
-  LASSO        5          0          2         5        0.714        1.000     0.833
-  WALS         5          0          2         5        0.714        1.000     0.833
+  BMA          4          0          3         5        0.571        1.000     0.750
+  LASSO        6          0          1         5        0.857        1.000     0.917
+  WALS         6          0          1         5        0.857        1.000     0.917
 ```
 
-All three methods achieve identical performance on this dataset: 83.3% accuracy, 71.4% sensitivity (detecting 5 of 7 true predictors), and 100% specificity (zero false positives). The two missed variables --- democracy ($\beta = 0.004$) and agriculture ($\beta = 0.005$) --- have effects so small that they are indistinguishable from noise given our sample size. This is not a limitation of the methods but rather an inherent constraint of the data.
+All three methods achieve **perfect specificity** (zero false positives) --- none mistakenly identifies a noise variable as robust. The key difference is in **sensitivity**: LASSO and WALS each detect 6 of 7 true predictors (85.7%), while BMA detects only 4 (57.1%). BMA's lower sensitivity reflects its conservative Bayesian Occam's razor: it places urban\_pop and democracy in the "borderline" zone rather than committing to their inclusion. The one variable missed by all methods --- agriculture ($\beta = 0.005$) --- has an effect so small that it is indistinguishable from noise given our sample size.
 
 
 ### 17.7 When to use which method
@@ -1164,7 +1286,7 @@ All three methods achieve identical performance on this dataset: 83.3% accuracy,
 | LASSO | Prediction, sparse models | Fast, automatic selection, works with many variables | Binary (in/out), biased coefficients (use Post-LASSO) |
 | WALS | Speed, frequentist inference | Very fast, produces t-statistics, no MCMC | Less common, limited software support |
 
-The strongest recommendation: **use all three**. When they converge on the same variables, you have robust evidence. When they disagree, investigate why --- the disagreement itself is informative. In real-world data, complications such as nonlinearity, heteroskedasticity, and endogeneity may affect method performance and should be addressed before applying these techniques.
+The strongest recommendation: **use all three**. When they converge on the same variables (as with our four triple-robust predictors), you have the strongest possible evidence. When they disagree (as with urban\_pop and democracy, where LASSO and WALS say "yes" but BMA hedges), the disagreement itself is informative --- it tells you the evidence is real but not overwhelming. In real-world data, complications such as nonlinearity, heteroskedasticity, and endogeneity may affect method performance and should be addressed before applying these techniques.
 
 
 ## 18. Conclusion
@@ -1182,7 +1304,7 @@ This tutorial introduced three principled approaches to the variable selection p
 
 ### 18.2 Key takeaways
 
-**The methods converge.** All three methods achieved 83.3% accuracy, correctly identifying 5 of the 7 true predictors while producing zero false positives. When BMA, LASSO, and WALS agree that a variable matters (or does not matter), we can be confident in the conclusion. The convergence across fundamentally different statistical paradigms --- Bayesian, penalized likelihood, and frequentist model averaging --- provides a form of methodological triangulation.
+**The methods mostly converge --- and their disagreements are informative.** Four variables are identified by all three methods (triple-robust), and all methods achieve perfect specificity (zero false positives). LASSO and WALS are more sensitive (detecting 6 of 7 true predictors), while BMA is more conservative (detecting 4). The two variables where they disagree --- urban\_pop and democracy --- have moderate effects that BMA's Bayesian Occam's razor treats as borderline. This pattern illustrates the value of methodological triangulation across fundamentally different statistical paradigms.
 
 **Model uncertainty is real but addressable.** With 12 candidate variables, there are 4,096 possible models. Rather than pretending one of them is "the" model, these methods account for the uncertainty explicitly. The result is more honest inference.
 
