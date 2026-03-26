@@ -19,12 +19,12 @@ links:
   name: "R script"
   url: analysis.R
 slides:
-summary: A comprehensive guide to Difference-in-Differences with staggered treatment --- from TWFE pitfalls through Callaway-Sant'Anna group-time ATTs, doubly robust estimation, and HonestDiD sensitivity analysis --- applied to minimum wage effects on teen employment.
+summary: A guide to Difference-in-Differences with staggered treatment --- from TWFE pitfalls through Callaway-Sant'Anna group-time ATTs, doubly robust estimation, and HonestDiD sensitivity analysis --- applied to minimum wage effects on teen employment.
 tags:
   - r
   - causal
   - causal inference
-title: "Difference-in-Differences for Policy Evaluation: A Comprehensive Tutorial in R"
+title: "Difference-in-Differences for Policy Evaluation: A Tutorial using R"
 url_code: ""
 url_pdf: ""
 url_slides: ""
