@@ -1,0 +1,673 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      Stata 18.0
+___/   /   /___/   /   /___/       MP—Parallel Edition
+
+ Statistics and Data Science       Copyright 1985-2023 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Single-user 2-core  perpetual
+Serial number: 501806221597
+  Licensed to: Carlos Mendez
+               Nagoya University
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. More than 2 billion observations are allowed; see help obs_advice.
+      4. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+. do analysis.do 
+
+. ****************************************************
+. * Sensitivity Analysis for Parallel Trends
+. * in Difference-in-Differences Using honestdid
+. *
+. * Companion do-file for the tutorial at:
+. *   carlos-mendez.org/post/stata_honestdid/
+. *
+. * Dataset: ehec_data.dta (Medicaid expansion)
+. *   US states, 2008--2015
+. *   Treatment: Medicaid expansion in 2014
+. *   Control: Never-expanded states
+. *
+. * Required packages:
+. *   reghdfe, ftools, honestdid, coefplot, csdid, drdid
+. *
+. * Usage:
+. *   1. Open Stata (17+ recommended)
+. *   2. Run: do analysis.do
+. *   3. All graphs are saved as PNG files
+. *   4. See analysis.log for full output
+. ****************************************************
+. 
+. clear all
+
+. set more off
+
+. 
+. *---------------------------------------------------
+. * Section 4: Setup --- data loading and packages
+. *---------------------------------------------------
+. 
+. * Install required packages
+. capture ssc install require, replace
+
+. capture ssc install ftools, replace
+
+. capture ssc install reghdfe, replace
+
+. capture ssc install coefplot, replace
+
+. capture ssc install drdid, replace
+
+. capture ssc install csdid, replace
+
+. capture net install honestdid, from("https://raw.githubusercontent.com/mcacer
+> esb/stata-honestdid/main") replace
+
+. 
+. * Update reghdfe dependencies
+. capture reghdfe, compile
+
+. capture reghdfe, reload
+
+. 
+. * Load data
+. use "https://raw.githubusercontent.com/Mixtape-Sessions/Advanced-DID/main/Exe
+> rcises/Data/ehec_data.dta", clear
+
+. 
+. * Examine the data
+. des
+
+Contains data from https://raw.githubusercontent.com/Mixtape-Sessions/Advanced-
+> DID/main/Exercises/Data/ehec_data.dta
+ Observations:           552                  
+    Variables:             5                  16 Jun 2021 10:58
+-------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+stfips          byte    %8.0g      STATEFIP   state FIPS code
+year            int     %8.0g      YEAR       Census/ACS survey year
+dins            float   %9.0g                 Insurance Rate among low-income
+                                                childless adults
+yexp2           float   %9.0g                 Year of Medicaid Expansion
+W               float   %9.0g                 total survey weight among
+                                                low-income childless adults
+-------------------------------------------------------------------------------
+Sorted by: stfips  year
+
+. tab year
+
+ Census/ACS |
+survey year |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2008 |         46        8.33        8.33
+       2009 |         46        8.33       16.67
+       2010 |         46        8.33       25.00
+       2011 |         46        8.33       33.33
+       2012 |         46        8.33       41.67
+       2013 |         46        8.33       50.00
+       2014 |         46        8.33       58.33
+       2015 |         46        8.33       66.67
+       2016 |         46        8.33       75.00
+       2017 |         46        8.33       83.33
+       2018 |         46        8.33       91.67
+       2019 |         46        8.33      100.00
+------------+-----------------------------------
+      Total |        552      100.00
+
+. tab yexp2, m
+
+    Year of |
+   Medicaid |
+  Expansion |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2014 |        264       47.83       47.83
+       2015 |         36        6.52       54.35
+       2016 |         24        4.35       58.70
+       2017 |         12        2.17       60.87
+       2019 |         24        4.35       65.22
+          . |        192       34.78      100.00
+------------+-----------------------------------
+      Total |        552      100.00
+
+. 
+. * Restrict to 2008--2015 and drop 2015 expansion cohort for clean 2-group des
+> ign
+. keep if (year <= 2015) & (missing(yexp2) | (yexp2 == 2014))
+(248 observations deleted)
+
+. 
+. * Create treatment indicator
+. gen byte D = (yexp2 == 2014)
+
+. 
+. * Verify sample
+. tab D
+
+          D |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        128       42.11       42.11
+          1 |        176       57.89      100.00
+------------+-----------------------------------
+      Total |        304      100.00
+
+. tab year
+
+ Census/ACS |
+survey year |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2008 |         38       12.50       12.50
+       2009 |         38       12.50       25.00
+       2010 |         38       12.50       37.50
+       2011 |         38       12.50       50.00
+       2012 |         38       12.50       62.50
+       2013 |         38       12.50       75.00
+       2014 |         38       12.50       87.50
+       2015 |         38       12.50      100.00
+------------+-----------------------------------
+      Total |        304      100.00
+
+. 
+. * Summary statistics
+. tabstat dins, by(D) stat(mean sd min max n) format(%9.4f)
+
+Summary for variables: dins
+Group variable: D 
+
+       D |      Mean        SD       Min       Max         N
+---------+--------------------------------------------------
+       0 |    0.6351    0.0565    0.5120    0.7790  128.0000
+       1 |    0.6861    0.0807    0.5394    0.8683  176.0000
+---------+--------------------------------------------------
+   Total |    0.6646    0.0757    0.5120    0.8683  304.0000
+------------------------------------------------------------
+
+. 
+. *---------------------------------------------------
+. * Section 5: The 2x2 DiD --- concept and estimation
+. *---------------------------------------------------
+. 
+. * 5.1 Collapsing to two periods
+. gen byte post = (year >= 2014)
+
+. 
+. * Compute the four group means
+. preserve
+
+. collapse (mean) dins, by(D post)
+
+. list, clean noobs
+
+    D   post       dins  
+    0      0   .6189702  
+    0      1   .6836083  
+    1      0   .6544622  
+    1      1   .7808657  
+
+. 
+. * 2x2 means plot with counterfactual trend
+. separate dins, by(D) gen(dins_)
+
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+dins_0          float   %9.0g                 dins, D == 0
+dins_1          float   %9.0g                 dins, D == 1
+
+. 
+. * Compute counterfactual: treated pre-mean + control group's change
+. quietly sum dins_0 if post == 0
+
+. local ctrl_pre = r(mean)
+
+. quietly sum dins_0 if post == 1
+
+. local ctrl_post = r(mean)
+
+. local ctrl_change = `ctrl_post' - `ctrl_pre'
+
+. quietly sum dins_1 if post == 0
+
+. local treat_pre = r(mean)
+
+. local cf_post = `treat_pre' + `ctrl_change'
+
+. gen dins_cf = `treat_pre' if post == 0
+(2 missing values generated)
+
+. replace dins_cf = `cf_post' if post == 1
+(2 real changes made)
+
+. 
+. twoway (connected dins_0 post, lcolor("106 155 204") mcolor("106 155 204") //
+> /
+>             lpattern(dash) msymbol(circle) lwidth(medthick)) ///
+>        (connected dins_1 post, lcolor("217 119 87") mcolor("217 119 87") ///
+>             msymbol(diamond) lwidth(medthick)) ///
+>        (connected dins_cf post, lcolor("217 119 87") mcolor("217 119 87") ///
+>             lpattern(shortdash) msymbol(none) lwidth(medthin)), ///
+>        legend(order(1 "Control (Never-treated)" 2 "Treated (2014 Expanders)" 
+> ///
+>             3 "Counterfactual (Treated without expansion)") ///
+>             ring(0) pos(11) size(small)) ///
+>        ytitle("Insurance share") xtitle("") ///
+>        xlabel(0 "Pre (2008-2013)" 1 "Post (2014-2015)") ///
+>        title("2x2 DiD: Group Means and Counterfactual") ///
+>        graphregion(color(white)) plotregion(color(white))
+
+. graph export "stata_honestdid_2x2_means.png", replace width(1200)
+file stata_honestdid_2x2_means.png written in PNG format
+
+. restore
+
+. 
+. * 5.2 Regression-based 2x2 DiD
+. reg dins i.D##i.post, cluster(stfips)
+
+Linear regression                               Number of obs     =        304
+                                                F(3, 37)          =     182.58
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.4722
+                                                Root MSE          =     .05526
+
+                                (Std. err. adjusted for 38 clusters in stfips)
+------------------------------------------------------------------------------
+             |               Robust
+        dins | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         1.D |    .035492   .0176856     2.01   0.052    -.0003425    .0713265
+      1.post |   .0646382   .0052781    12.25   0.000     .0539437    .0753326
+             |
+      D#post |
+        1 1  |   .0617653   .0085367     7.24   0.000     .0444682    .0790624
+             |
+       _cons |   .6189702   .0122906    50.36   0.000     .5940671    .6438732
+------------------------------------------------------------------------------
+
+. 
+. *---------------------------------------------------
+. * Section 6: Sensitivity analysis for the 2x2 DiD
+. *---------------------------------------------------
+. 
+. * 6.1 Restrict to 3-year window: 2012, 2013, 2014
+. preserve
+
+. keep if inrange(year, 2012, 2014)
+(190 observations deleted)
+
+. 
+. * Create Dyear variable (treatment-year interaction)
+. gen Dyear = cond(D, year, 2013)
+
+. 
+. * Event study with 2013 as reference (3-year window)
+. reghdfe dins b2013.Dyear, absorb(stfips year) cluster(stfips) noconstant
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =        114
+Absorbing 2 HDFE groups                           F(   2,     37) =      16.27
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9604
+                                                  Adj R-squared   =     0.9378
+                                                  Within R-sq.    =     0.3728
+Number of clusters (stfips)  =         38         Root MSE        =     0.0174
+
+                                (Std. err. adjusted for 38 clusters in stfips)
+------------------------------------------------------------------------------
+             |               Robust
+        dins | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       Dyear |
+       2012  |  -.0062865   .0059107    -1.06   0.294    -.0182626    .0056897
+       2014  |   .0423401   .0082657     5.12   0.000     .0255923     .059088
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+      stfips |        38          38           0    *|
+        year |         3           1           2     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * Display coefficient matrix for reference
+. matrix list e(b)
+
+e(b)[1,3]
+          2012.      2013b.       2014.
+         Dyear       Dyear       Dyear
+y1  -.00628646           0   .04234014
+
+. 
+. * 6.3 Sensitivity analysis: relative magnitudes (2x2)
+. * Note: with b2013.Dyear, e(b) = [2012, 2013(omitted), 2014]
+. * So numpre(1) picks the 2012 coefficient as the 1 pre-period
+. * and treats the rest (including omitted 2013) as post
+. * We use pre() and post() explicitly to skip the omitted coefficient
+. honestdid, pre(1/1) post(3/3) mvec(0(0.5)2)
+Warning: M = 0 with Delta^RM imposes exact parallel trends in the
+post-treatment period, even if pre-treatment parallel trends is violated
+
+|    M    |   lb   |   ub   |
+| ------- | ------ | ------ |
+|       . |  0.026 |  0.059 | (Original)
+|  0.0000 |  0.026 |  0.059 | 
+|  0.5000 |  0.022 |  0.060 | 
+|  1.0000 |  0.017 |  0.064 | 
+|  1.5000 |  0.010 |  0.069 | 
+|  2.0000 |  0.003 |  0.076 | 
+(method = C-LF, Delta = DeltaRM, alpha = 0.050)
+
+. 
+. * 6.4 Sensitivity plot (2x2)
+. honestdid, pre(1/1) post(3/3) mvec(0(0.5)2) coefplot
+Warning: M = 0 with Delta^RM imposes exact parallel trends in the
+post-treatment period, even if pre-treatment parallel trends is violated
+
+|    M    |   lb   |   ub   |
+| ------- | ------ | ------ |
+|       . |  0.026 |  0.059 | (Original)
+|  0.0000 |  0.026 |  0.059 | 
+|  0.5000 |  0.022 |  0.060 | 
+|  1.0000 |  0.017 |  0.064 | 
+|  1.5000 |  0.010 |  0.069 | 
+|  2.0000 |  0.003 |  0.076 | 
+(method = C-LF, Delta = DeltaRM, alpha = 0.050)
+
+. graph export "stata_honestdid_2x2_rm.png", replace width(1200)
+file stata_honestdid_2x2_rm.png written in PNG format
+
+. 
+. restore
+
+. 
+. *---------------------------------------------------
+. * Section 7: From 2x2 to event study (full panel)
+. *---------------------------------------------------
+. 
+. * Create Dyear for event study (full sample, 2008-2015)
+. gen Dyear = cond(D, year, 2013)
+
+. 
+. * Full event study: 2008--2015 with 2013 as reference
+. reghdfe dins b2013.Dyear, absorb(stfips year) cluster(stfips) noconstant
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =        304
+Absorbing 2 HDFE groups                           F(   7,     37) =      10.37
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9505
+                                                  Adj R-squared   =     0.9405
+                                                  Within R-sq.    =     0.4003
+Number of clusters (stfips)  =         38         Root MSE        =     0.0185
+
+                                (Std. err. adjusted for 38 clusters in stfips)
+------------------------------------------------------------------------------
+             |               Robust
+        dins | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       Dyear |
+       2008  |  -.0095956   .0076769    -1.25   0.219    -.0251505    .0059593
+       2009  |  -.0132771   .0073502    -1.81   0.079      -.02817    .0016159
+       2010  |  -.0018712   .0067698    -0.28   0.784    -.0155881    .0118457
+       2011  |  -.0064012   .0070425    -0.91   0.369    -.0206707    .0078682
+       2012  |  -.0062865    .005944    -1.06   0.297    -.0183302    .0057573
+       2014  |   .0423401   .0083124     5.09   0.000     .0254977    .0591826
+       2015  |   .0687134   .0108512     6.33   0.000     .0467268    .0906999
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+      stfips |        38          38           0    *|
+        year |         8           1           7     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * Display coefficient matrix for reference
+. matrix list e(b)
+
+e(b)[1,8]
+          2008.       2009.       2010.       2011.       2012.      2013b.
+         Dyear       Dyear       Dyear       Dyear       Dyear       Dyear
+y1  -.00959564  -.01327706  -.00187119  -.00640123  -.00628646           0
+
+          2014.       2015.
+         Dyear       Dyear
+y1   .04234014   .06871336
+
+. 
+. * Event study plot
+. coefplot, vertical yline(0, lcolor(gs8)) ///
+>     xline(5.5, lpattern(dash) lcolor(gs8)) ///
+>     ciopts(recast(rcap)) ///
+>     ytitle("Effect on insurance share") xtitle("Year") ///
+>     title("Event Study: Medicaid Expansion and Insurance Coverage") ///
+>     graphregion(color(white)) plotregion(color(white))
+
+. graph export "stata_honestdid_event_study.png", replace width(1200)
+file stata_honestdid_event_study.png written in PNG format
+
+. 
+. * 7.3 Conventional pre-trends test
+. test 2008.Dyear 2009.Dyear 2010.Dyear 2011.Dyear 2012.Dyear
+
+ ( 1)  2008.Dyear = 0
+ ( 2)  2009.Dyear = 0
+ ( 3)  2010.Dyear = 0
+ ( 4)  2011.Dyear = 0
+ ( 5)  2012.Dyear = 0
+
+       F(  5,    37) =    0.86
+            Prob > F =    0.5178
+
+. 
+. *---------------------------------------------------
+. * Section 9: Sensitivity --- relative magnitudes (full)
+. *---------------------------------------------------
+. 
+. * Note: e(b) = [2008, 2009, 2010, 2011, 2012, 2013(omitted), 2014, 2015]
+. * Pre-period coefficients: positions 1-5 (2008-2012)
+. * Omitted 2013: position 6
+. * Post-period coefficients: positions 7-8 (2014-2015)
+. 
+. * 9.1 Relative magnitudes: full panel (first post-period)
+. honestdid, pre(1/5) post(7/8) mvec(0(0.5)2)
+Warning: M = 0 with Delta^RM imposes exact parallel trends in the
+post-treatment period, even if pre-treatment parallel trends is violated
+
+|    M    |   lb   |   ub   |
+| ------- | ------ | ------ |
+|       . |  0.026 |  0.059 | (Original)
+|  0.0000 |  0.027 |  0.058 | 
+|  0.5000 |  0.021 |  0.063 | 
+|  1.0000 |  0.013 |  0.071 | 
+|  1.5000 |  0.003 |  0.081 | 
+|  2.0000 | -0.007 |  0.091 | 
+(method = C-LF, Delta = DeltaRM, alpha = 0.050)
+
+. 
+. * Sensitivity plot
+. honestdid, pre(1/5) post(7/8) mvec(0(0.5)2) coefplot
+Warning: M = 0 with Delta^RM imposes exact parallel trends in the
+post-treatment period, even if pre-treatment parallel trends is violated
+
+|    M    |   lb   |   ub   |
+| ------- | ------ | ------ |
+|       . |  0.026 |  0.059 | (Original)
+|  0.0000 |  0.027 |  0.058 | 
+|  0.5000 |  0.021 |  0.063 | 
+|  1.0000 |  0.013 |  0.071 | 
+|  1.5000 |  0.003 |  0.081 | 
+|  2.0000 | -0.007 |  0.091 | 
+(method = C-LF, Delta = DeltaRM, alpha = 0.050)
+
+. graph export "stata_honestdid_rm_full.png", replace width(1200)
+file stata_honestdid_rm_full.png written in PNG format
+
+. 
+. * 9.2 Average effect across 2014 and 2015
+. matrix l_vec = 0.5 \ 0.5
+
+. honestdid, pre(1/5) post(7/8) mvec(0(0.5)2) l_vec(l_vec)
+Warning: M = 0 with Delta^RM imposes exact parallel trends in the
+post-treatment period, even if pre-treatment parallel trends is violated
+
+|    M    |   lb   |   ub   |
+| ------- | ------ | ------ |
+|       . |  0.039 |  0.072 | (Original)
+|  0.0000 |  0.039 |  0.072 | 
+|  0.5000 |  0.029 |  0.079 | 
+|  1.0000 |  0.014 |  0.092 | 
+|  1.5000 | -0.002 |  0.107 | 
+|  2.0000 | -0.019 |  0.123 | 
+(method = C-LF, Delta = DeltaRM, alpha = 0.050)
+
+. 
+. *---------------------------------------------------
+. * Section 10: Sensitivity --- smoothness restrictions
+. *---------------------------------------------------
+. 
+. * 10.2 Smoothness restriction
+. honestdid, pre(1/5) post(7/8) mvec(0(0.005)0.04) delta(sd)
+
+|    M    |   lb   |   ub   |
+| ------- | ------ | ------ |
+|       . |  0.026 |  0.059 | (Original)
+|  0.0000 |  0.026 |  0.058 | 
+|  0.0050 |  0.013 |  0.061 | 
+|  0.0100 |  0.007 |  0.065 | 
+|  0.0150 |  0.002 |  0.070 | 
+|  0.0200 | -0.003 |  0.075 | 
+|  0.0250 | -0.008 |  0.080 | 
+|  0.0300 | -0.013 |  0.085 | 
+|  0.0350 | -0.018 |  0.090 | 
+|  0.0400 | -0.023 |  0.095 | 
+(method = FLCI, Delta = DeltaSD, alpha = 0.050)
+
+. 
+. * Smoothness sensitivity plot
+. honestdid, pre(1/5) post(7/8) mvec(0(0.005)0.04) delta(sd) coefplot
+
+|    M    |   lb   |   ub   |
+| ------- | ------ | ------ |
+|       . |  0.026 |  0.059 | (Original)
+|  0.0000 |  0.026 |  0.058 | 
+|  0.0050 |  0.013 |  0.061 | 
+|  0.0100 |  0.007 |  0.065 | 
+|  0.0150 |  0.002 |  0.070 | 
+|  0.0200 | -0.003 |  0.075 | 
+|  0.0250 | -0.008 |  0.080 | 
+|  0.0300 | -0.013 |  0.085 | 
+|  0.0350 | -0.018 |  0.090 | 
+|  0.0400 | -0.023 |  0.095 | 
+(method = FLCI, Delta = DeltaSD, alpha = 0.050)
+
+. graph export "stata_honestdid_sd_full.png", replace width(1200)
+file stata_honestdid_sd_full.png written in PNG format
+
+. 
+. *---------------------------------------------------
+. * Section 11: Staggered DiD with csdid + honestdid
+. *---------------------------------------------------
+. 
+. * Reload full dataset for staggered analysis
+. use "https://raw.githubusercontent.com/Mixtape-Sessions/Advanced-DID/main/Exe
+> rcises/Data/ehec_data.dta", clear
+
+. 
+. * Keep only 2014-expanders and never-expanders, years 2008-2015
+. keep if (year <= 2015) & (missing(yexp2) | (yexp2 == 2014))
+(248 observations deleted)
+
+. 
+. * Replace missing yexp2 with 0 for csdid (never-treated)
+. replace yexp2 = 0 if missing(yexp2)
+(128 real changes made)
+
+. 
+. * Callaway-Sant'Anna estimator
+. csdid dins, ivar(stfips) time(year) gvar(yexp2) long2 notyet
+.......
+Difference-in-difference with Multiple Time Periods
+
+                                                           Number of obs = 304
+Outcome model  : regression adjustment
+Treatment model: none
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+g2014        |
+ t_2008_2013 |  -.0095956   .0073982    -1.30   0.195    -.0240958    .0049045
+ t_2009_2013 |  -.0132771   .0070833    -1.87   0.061    -.0271601     .000606
+ t_2010_2013 |  -.0018712    .006524    -0.29   0.774    -.0146579    .0109155
+ t_2011_2013 |  -.0064012   .0067868    -0.94   0.346    -.0197031    .0069006
+ t_2012_2013 |  -.0062865   .0057282    -1.10   0.272    -.0175135    .0049406
+ t_2013_2014 |   .0423401   .0080105     5.29   0.000     .0266398    .0580405
+ t_2013_2015 |   .0687134   .0104571     6.57   0.000     .0482177     .089209
+------------------------------------------------------------------------------
+Control: Not yet Treated
+
+See Callaway and Sant'Anna (2021) for details
+
+. 
+. * Aggregate to event study
+. csdid_estat event, window(-5 1) estore(csdid)
+ATT by Periods Before and After treatment
+Event Study:Dynamic effects
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     Pre_avg |  -.0074863   .0056726    -1.32   0.187    -.0186045    .0036318
+    Post_avg |   .0555267   .0083153     6.68   0.000     .0392291    .0718244
+         Tm6 |  -.0095956   .0073982    -1.30   0.195    -.0240958    .0049045
+         Tm5 |  -.0132771   .0070833    -1.87   0.061    -.0271601     .000606
+         Tm4 |  -.0018712    .006524    -0.29   0.774    -.0146579    .0109155
+         Tm3 |  -.0064012   .0067868    -0.94   0.346    -.0197031    .0069006
+         Tm2 |  -.0062865   .0057282    -1.10   0.272    -.0175135    .0049406
+         Tp0 |   .0423401   .0080105     5.29   0.000     .0266398    .0580405
+         Tp1 |   .0687134   .0104571     6.57   0.000     .0482177     .089209
+------------------------------------------------------------------------------
+
+. 
+. * Restore csdid results and apply honestdid
+. estimates restore csdid
+(results csdid are active now)
+
+. * csdid_estat stores: Pre_avg(1), Post_avg(2), Tm6(3)..Tm2(7), Tp0(8), Tp1(9)
+. honestdid, pre(3/7) post(8/9) mvec(0(0.5)2) coefplot
+Warning: M = 0 with Delta^RM imposes exact parallel trends in the
+post-treatment period, even if pre-treatment parallel trends is violated
+
+|    M    |   lb   |   ub   |
+| ------- | ------ | ------ |
+|       . |  0.027 |  0.058 | (Original)
+|  0.0000 |  0.027 |  0.058 | 
+|  0.5000 |  0.022 |  0.062 | 
+|  1.0000 |  0.014 |  0.071 | 
+|  1.5000 |  0.004 |  0.080 | 
+|  2.0000 | -0.007 |  0.090 | 
+(method = C-LF, Delta = DeltaRM, alpha = 0.050)
+
+. graph export "stata_honestdid_csdid.png", replace width(1200)
+file stata_honestdid_csdid.png written in PNG format
+
+. 
+. ****************************************************
+. * End of analysis
+. ****************************************************
+. 
+end of do-file
