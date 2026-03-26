@@ -690,7 +690,7 @@ The two approaches offer complementary views of robustness:
 | Relative Magnitudes | $\bar{M}$ | ~1.5--2 | Post violation can be up to 1.5--2x the max pre violation |
 | Smoothness | $M$ | ~0.015--0.02 | Rate of trend divergence can shift by up to 1.5--2 pp between periods |
 
-### When to choose which restriction
+### 10.4 When to choose which restriction
 
 - Use **DeltaRM** when: (a) you have few pre-periods --- it works with just one, (b) the pre-treatment coefficients look like random noise around zero with no clear trend, or (c) you want a dimensionless measure of robustness that is easy to communicate
 - Use **DeltaSD** when: (a) you have two or more pre-periods, (b) there is a visible pre-trend (non-zero slope) and you want to formalize how much the slope can change, or (c) you want bounds measured in the outcome's units
@@ -698,7 +698,7 @@ The two approaches offer complementary views of robustness:
 
 In general, relative magnitudes is the more popular choice because it is intuitive and works with minimal data. Smoothness restrictions are complementary --- they capture a different form of violation (abrupt changes in trend direction rather than large absolute deviations).
 
-### How to report honestdid results in a paper
+### 10.5 How to report honestdid results in a paper
 
 Many readers will want to apply this method in their own work. Here is example text you can adapt for a manuscript:
 
@@ -786,7 +786,7 @@ The staggered-robust estimates from `csdid` produce a breakdown value between $\
 
 ## 12. Discussion and summary
 
-### Summary of all sensitivity analyses
+### 12.1 Summary of all sensitivity analyses
 
 The table below collects every sensitivity analysis from this tutorial. Scanning across the rows reveals which settings and restrictions yield stronger or weaker robustness.
 
@@ -802,7 +802,7 @@ The first-period treatment effect is the most robust finding across all approach
 
 This tutorial demonstrated how to move beyond the binary question "Do parallel trends hold?" to the much more useful question "How robust are my results to violations of parallel trends?" The `honestdid` package makes this transition straightforward in Stata.
 
-### Key takeaways
+### 12.2 Key takeaways
 
 1. **Method insight --- the breakdown value replaces the pre-trends test.** The breakdown value is the single most informative number to report alongside any DiD estimate. It tells the reader exactly how much they need to doubt parallel trends before the result breaks down. For the Medicaid expansion, the breakdown value is approximately $\bar{M}$ = 1.5--2 under relative magnitudes and $M$ = 0.015--0.02 under smoothness restrictions.
 
