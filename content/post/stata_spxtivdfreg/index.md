@@ -6,7 +6,7 @@ categories:
   - Spatial Spillovers
 draft: false
 featured: false
-date: "2025-07-01T00:00:00Z"
+date: "2026-03-27T00:00:00Z"
 external_link: ""
 image:
   caption: ""
@@ -27,8 +27,8 @@ links:
   url: https://doi.org/10.18637/jss.v113.i06
 - icon: database
   icon_pack: fas
-  name: "Replication data"
-  url: https://doi.org/10.18637/jss.v113.i06
+  name: "Dataset (.dta)"
+  url: https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_spxtivdfreg/references/v113i06.dta
 slides:
 summary: Estimate spatial dynamic panel models with unobserved common factors using the spxtivdfreg package in Stata --- an IV approach that handles spatial lags, temporal persistence, endogenous regressors, and latent factors simultaneously
 tags:
@@ -156,7 +156,7 @@ The dataset contains quarterly financial ratios for 350 US commercial banks from
 
 ```stata
 clear all
-use v113i06.dta
+use "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_spxtivdfreg/references/v113i06.dta", clear
 xtset ID TIME
 ```
 
@@ -232,9 +232,10 @@ The dependent variable `NPL` measures credit risk as the share of non-performing
 The spatial weight matrix $W$ is a 350-by-350 matrix that defines the network structure among banks. Unlike geographic contiguity matrices used in regional analysis, this matrix is constructed from **economic distance** --- specifically, Spearman's rank correlation of bank debt-to-asset ratios. Two banks are defined as "neighbors" if their debt ratio correlation exceeds the 95th percentile of the empirical distribution.
 
 ```stata
-* The W matrix is loaded from W.csv by spxtivdfreg
-* 350 x 350, row-standardized
-* 6,300 nonzero entries (average ~18 neighbors per bank)
+* Download the W matrix to the current working directory
+copy "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_spxtivdfreg/references/W.csv" "W.csv", replace
+* The W matrix (350 x 350, row-standardized, 6,300 nonzero entries) is loaded
+* automatically by spxtivdfreg via the spmatrix("W.csv", import) option
 ```
 
 The matrix is row-standardized so that each row sums to one, meaning the spatial lag of a variable equals the **weighted average** among a bank's neighbors. With 6,300 nonzero entries across 350 banks, the average bank has approximately 18 neighbors --- banks whose debt structures are sufficiently correlated to suggest economic interdependence. To illustrate: suppose Bank A and Bank B have a Spearman rank correlation of 0.92 in their quarterly debt ratios, while the 95th percentile threshold is 0.87. Since 0.92 exceeds 0.87, Bank A and Bank B are classified as neighbors ($w\_{AB} > 0$). After row-standardization, $w\_{AB}$ equals $1/18$ if Bank A has 18 neighbors. This economic-distance approach captures financial contagion channels that geographic proximity alone would miss, since two banks on opposite coasts can be highly interconnected through similar lending portfolios.

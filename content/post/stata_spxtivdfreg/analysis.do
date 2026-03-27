@@ -16,8 +16,8 @@
 *
 * Usage:
 *   1. Open Stata 14+
-*   2. Set working directory to folder containing v113i06.dta and W.csv
-*   3. Run: do analysis.do
+*   2. Run: do analysis.do
+*   (Data and W matrix are loaded from GitHub automatically)
 ****************************************************
 
 clear all
@@ -32,8 +32,11 @@ capture ssc install ftools, replace
 * Section 3: Setup and data loading
 *---------------------------------------------------
 
-* 3.1 Load data
-use v113i06.dta, clear
+* 3.1 Load data from GitHub
+use "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_spxtivdfreg/references/v113i06.dta", clear
+
+* Download W matrix to current working directory
+copy "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_spxtivdfreg/references/W.csv" "W.csv", replace
 
 * 3.2 Panel setup
 xtset ID TIME
