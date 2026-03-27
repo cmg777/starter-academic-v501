@@ -1,0 +1,961 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      Stata 19.0
+___/   /   /___/   /   /___/       SE—Standard Edition
+
+ Statistics and Data Science       Copyright 1985-2025 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Single-user  perpetual
+Serial number: 401906342834
+  Licensed to: CarlosMendez
+               Nagoya University
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+. do analysis.do 
+
+. ****************************************************
+. * Visualizing Regression with the FWL Theorem
+. * in Stata
+. *
+. * Companion do-file for the tutorial at:
+. *   carlos-mendez.org/post/stata_fwl/
+. *
+. * Datasets: Loaded from GitHub (CSV files from R FWL tutorial)
+. *   store_data.csv   -- 200 obs, simulated retail data
+. *   flights_sample.csv -- 5,000 obs, NYC flights 2013
+. *   wagepan.csv      -- 4,360 obs, wage panel 1980-1987
+. *
+. * Packages: scatterfit, reghdfe, ftools, estout
+. *
+. * Usage:
+. *   1. Open Stata
+. *   2. Run: do analysis.do
+. *   3. All graphs are saved as PNG files
+. ****************************************************
+. 
+. clear all
+
+. set more off
+
+. 
+. * Install packages if not already installed
+. capture ssc install ftools, replace
+
+. capture ssc install require, replace
+
+. capture ssc install reghdfe, replace
+
+. capture ssc install estout, replace
+
+. capture net install scatterfit, from("https://raw.githubusercontent.com/leoja
+> hrens/scatterfit/master") replace
+
+. 
+. *===============================================================
+. * PART 1: SIMULATED STORE DATA
+. *===============================================================
+. 
+. *---------------------------------------------------
+. * Section 3: Load and explore the store data
+. *---------------------------------------------------
+. 
+. import delimited "https://raw.githubusercontent.com/cmg777/starter-academic-v
+> 501/master/content/post/r_fwlplot/store_data.csv", clear
+(encoding automatically selected: ISO-8859-1)
+(4 vars, 200 obs)
+
+. 
+. describe
+
+Contains data
+ Observations:           200                  
+    Variables:             4                  
+-------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+sales           float   %9.0g                 
+coupons         float   %9.0g                 
+income          float   %9.0g                 
+dayofweek       byte    %8.0g                 
+-------------------------------------------------------------------------------
+Sorted by: 
+     Note: Dataset has changed since last saved.
+
+. summarize sales coupons income dayofweek
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       sales |        200     33.6747    3.811032      24.89      45.23
+     coupons |        200    34.85685    6.788834      18.72      53.25
+      income |        200    49.72545    9.745807      20.07      77.02
+   dayofweek |        200       3.915    1.996926          1          7
+
+. correlate sales coupons income
+(obs=200)
+
+             |    sales  coupons   income
+-------------+---------------------------
+       sales |   1.0000
+     coupons |  -0.1664   1.0000
+      income |   0.5003  -0.7087   1.0000
+
+
+. 
+. *---------------------------------------------------
+. * Section 4: scatterfit -- Naive vs. Controlled
+. *---------------------------------------------------
+. 
+. * 4.1 Naive scatter: coupons appear to hurt sales
+. scatterfit sales coupons, ///
+>     regparameters(coef pval) ///
+>     opts(name(naive, replace) title("A. Naive: No Controls"))
+
+. 
+. * 4.2 Controlled scatter: FWL reveals the true positive effect
+. scatterfit sales coupons, controls(income) ///
+>     regparameters(coef pval) ///
+>     opts(name(controlled, replace) title("B. FWL: Controlling for Income"))
+
+. 
+. * Figure 1: Combine naive and controlled
+. graph combine naive controlled, ///
+>     title("What Does 'Controlling for Income' Look Like?") ///
+>     subtitle("scatterfit reveals the true positive effect hidden by confoundi
+> ng") ///
+>     rows(1) xsize(12) ysize(5)
+
+. graph export "stata_fwl_fig1_naive_vs_controlled.png", replace width(2400)
+file stata_fwl_fig1_naive_vs_controlled.png written in PNG format
+
+. 
+. * 4.3 Regression table comparison
+. regress sales coupons
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(1, 198)       =      5.64
+       Model |  79.9959925         1  79.9959925   Prob > F        =    0.0185
+    Residual |   2810.2735       198  14.1933005   R-squared       =    0.0277
+-------------+----------------------------------   Adj R-squared   =    0.0228
+       Total |  2890.26949       199  14.5239673   Root MSE        =    3.7674
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |  -.0933926   .0393387    -2.37   0.019    -.1709692    -.015816
+       _cons |   36.93007    1.39686    26.44   0.000     34.17544     39.6847
+------------------------------------------------------------------------------
+
+. estimates store naive_ols
+
+. 
+. regress sales coupons income
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(2, 197)       =     46.67
+       Model |  929.170581         2   464.58529   Prob > F        =    0.0000
+    Residual |  1961.09891       197  9.95481681   R-squared       =    0.3215
+-------------+----------------------------------   Adj R-squared   =    0.3146
+       Total |  2890.26949       199  14.5239673   Root MSE        =    3.1551
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |   .2122882    .046699     4.55   0.000      .120194    .3043824
+      income |   .3004465   .0325301     9.24   0.000     .2362946    .3645984
+       _cons |   11.33517   3.008026     3.77   0.000     5.403102    17.26723
+------------------------------------------------------------------------------
+
+. estimates store full_ols
+
+. 
+. estimates table naive_ols full_ols, ///
+>     stats(r2 N) b(%9.4f) se(%9.4f)
+
+--------------------------------------
+    Variable | naive_ols   full_ols   
+-------------+------------------------
+     coupons |   -0.0934      0.2123  
+             |    0.0393      0.0467  
+      income |                0.3004  
+             |                0.0325  
+       _cons |   36.9301     11.3352  
+             |    1.3969      3.0080  
+-------------+------------------------
+          r2 |    0.0277      0.3215  
+           N |       200         200  
+--------------------------------------
+                          Legend: b/se
+
+. 
+. * 4.4 OVB calculation
+. * gamma = effect of income on sales (in full model)
+. regress sales coupons income
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(2, 197)       =     46.67
+       Model |  929.170581         2   464.58529   Prob > F        =    0.0000
+    Residual |  1961.09891       197  9.95481681   R-squared       =    0.3215
+-------------+----------------------------------   Adj R-squared   =    0.3146
+       Total |  2890.26949       199  14.5239673   Root MSE        =    3.1551
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |   .2122882    .046699     4.55   0.000      .120194    .3043824
+      income |   .3004465   .0325301     9.24   0.000     .2362946    .3645984
+       _cons |   11.33517   3.008026     3.77   0.000     5.403102    17.26723
+------------------------------------------------------------------------------
+
+. local gamma = _b[income]
+
+. display "gamma (income -> sales): " %9.4f `gamma'
+gamma (income -> sales):    0.3004
+
+. 
+. * delta = regression of coupons on income
+. regress coupons income
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(1, 198)       =    199.82
+       Model |  4606.80958         1  4606.80958   Prob > F        =    0.0000
+    Residual |   4564.7557       198  23.0543217   R-squared       =    0.5023
+-------------+----------------------------------   Adj R-squared   =    0.4998
+       Total |  9171.56528       199  46.0882677   Root MSE        =    4.8015
+
+------------------------------------------------------------------------------
+     coupons | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      income |  -.4936916   .0349246   -14.14   0.000    -.5625636   -.4248197
+       _cons |   59.40589    1.76952    33.57   0.000     55.91637    62.89541
+------------------------------------------------------------------------------
+
+. local delta = _b[income]
+
+. display "delta (income -> coupons): " %9.4f `delta'
+delta (income -> coupons):   -0.4937
+
+. 
+. * OVB = gamma * delta
+. local ovb = `gamma' * `delta'
+
+. display "OVB = gamma * delta: " %9.4f `ovb'
+OVB = gamma * delta:   -0.1483
+
+. 
+. * Verify: naive ~ true + OVB
+. regress sales coupons
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(1, 198)       =      5.64
+       Model |  79.9959925         1  79.9959925   Prob > F        =    0.0185
+    Residual |   2810.2735       198  14.1933005   R-squared       =    0.0277
+-------------+----------------------------------   Adj R-squared   =    0.0228
+       Total |  2890.26949       199  14.5239673   Root MSE        =    3.7674
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |  -.0933926   .0393387    -2.37   0.019    -.1709692    -.015816
+       _cons |   36.93007    1.39686    26.44   0.000     34.17544     39.6847
+------------------------------------------------------------------------------
+
+. local naive_coef = _b[coupons]
+
+. regress sales coupons income
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(2, 197)       =     46.67
+       Model |  929.170581         2   464.58529   Prob > F        =    0.0000
+    Residual |  1961.09891       197  9.95481681   R-squared       =    0.3215
+-------------+----------------------------------   Adj R-squared   =    0.3146
+       Total |  2890.26949       199  14.5239673   Root MSE        =    3.1551
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |   .2122882    .046699     4.55   0.000      .120194    .3043824
+      income |   .3004465   .0325301     9.24   0.000     .2362946    .3645984
+       _cons |   11.33517   3.008026     3.77   0.000     5.403102    17.26723
+------------------------------------------------------------------------------
+
+. local true_coef = _b[coupons]
+
+. 
+. display "Naive coefficient:  " %9.4f `naive_coef'
+Naive coefficient:    -0.0934
+
+. display "True coefficient:   " %9.4f `true_coef'
+True coefficient:      0.2123
+
+. display "True + OVB:         " %9.4f `true_coef' + `ovb'
+True + OVB:            0.0640
+
+. 
+. *---------------------------------------------------
+. * Section 5: Manual FWL Verification
+. *---------------------------------------------------
+. 
+. * Step 1: Residualize sales on income
+. regress sales income
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(1, 198)       =     66.11
+       Model |  723.454039         1  723.454039   Prob > F        =    0.0000
+    Residual |  2166.81545       198  10.9435124   R-squared       =    0.2503
+-------------+----------------------------------   Adj R-squared   =    0.2465
+       Total |  2890.26949       199  14.5239673   Root MSE        =    3.3081
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      income |   .1956416   .0240621     8.13   0.000     .1481906    .2430925
+       _cons |   23.94634   1.219151    19.64   0.000     21.54215    26.35052
+------------------------------------------------------------------------------
+
+. predict resid_sales, residuals
+
+. 
+. * Step 2: Residualize coupons on income
+. regress coupons income
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(1, 198)       =    199.82
+       Model |  4606.80958         1  4606.80958   Prob > F        =    0.0000
+    Residual |   4564.7557       198  23.0543217   R-squared       =    0.5023
+-------------+----------------------------------   Adj R-squared   =    0.4998
+       Total |  9171.56528       199  46.0882677   Root MSE        =    4.8015
+
+------------------------------------------------------------------------------
+     coupons | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      income |  -.4936916   .0349246   -14.14   0.000    -.5625636   -.4248197
+       _cons |   59.40589    1.76952    33.57   0.000     55.91637    62.89541
+------------------------------------------------------------------------------
+
+. predict resid_coupons, residuals
+
+. 
+. * Step 3: Regress residuals on residuals
+. regress resid_sales resid_coupons
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(1, 198)       =     20.77
+       Model |  205.716532         1  205.716532   Prob > F        =    0.0000
+    Residual |  1961.09891       198  9.90453996   R-squared       =    0.0949
+-------------+----------------------------------   Adj R-squared   =    0.0904
+       Total |  2166.81544       199  10.8885198   Root MSE        =    3.1471
+
+------------------------------------------------------------------------------
+ resid_sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+resid_coup~s |   .2122882    .046581     4.56   0.000     .1204297    .3041466
+       _cons |  -2.87e-09    .222537    -0.00   1.000    -.4388468    .4388468
+------------------------------------------------------------------------------
+
+. 
+. * Verify: this coefficient matches the full regression
+. regress sales coupons income
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(2, 197)       =     46.67
+       Model |  929.170581         2   464.58529   Prob > F        =    0.0000
+    Residual |  1961.09891       197  9.95481681   R-squared       =    0.3215
+-------------+----------------------------------   Adj R-squared   =    0.3146
+       Total |  2890.26949       199  14.5239673   Root MSE        =    3.1551
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |   .2122882    .046699     4.55   0.000      .120194    .3043824
+      income |   .3004465   .0325301     9.24   0.000     .2362946    .3645984
+       _cons |   11.33517   3.008026     3.77   0.000     5.403102    17.26723
+------------------------------------------------------------------------------
+
+. display "Full OLS coupons coef: " %12.6f _b[coupons]
+Full OLS coupons coef:     0.212288
+
+. regress resid_sales resid_coupons
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(1, 198)       =     20.77
+       Model |  205.716532         1  205.716532   Prob > F        =    0.0000
+    Residual |  1961.09891       198  9.90453996   R-squared       =    0.0949
+-------------+----------------------------------   Adj R-squared   =    0.0904
+       Total |  2166.81544       199  10.8885198   Root MSE        =    3.1471
+
+------------------------------------------------------------------------------
+ resid_sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+resid_coup~s |   .2122882    .046581     4.56   0.000     .1204297    .3041466
+       _cons |  -2.87e-09    .222537    -0.00   1.000    -.4388468    .4388468
+------------------------------------------------------------------------------
+
+. display "FWL manual coef:       " %12.6f _b[resid_coupons]
+FWL manual coef:           0.212288
+
+. 
+. * Clean up residual variables
+. drop resid_sales resid_coupons
+
+. 
+. * 5.2 Three-panel progression
+. scatterfit sales coupons, ///
+>     regparameters(coef pval) ///
+>     opts(name(panel_a, replace) title("A. No Controls"))
+
+. 
+. scatterfit sales coupons, controls(income) ///
+>     regparameters(coef pval) ///
+>     opts(name(panel_b, replace) title("B. + Income"))
+
+. 
+. scatterfit sales coupons, controls(income dayofweek) ///
+>     regparameters(coef pval) ///
+>     opts(name(panel_c, replace) title("C. + Income + Day"))
+
+. 
+. * Figure 2: Three-panel progression
+. graph combine panel_a panel_b panel_c, ///
+>     title("Progressive Controls: How the Scatter Changes") ///
+>     rows(1) xsize(14) ysize(5)
+
+. graph export "stata_fwl_fig2_three_panels.png", replace width(2800)
+file stata_fwl_fig2_three_panels.png written in PNG format
+
+. 
+. * Three-model regression comparison
+. regress sales coupons
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(1, 198)       =      5.64
+       Model |  79.9959925         1  79.9959925   Prob > F        =    0.0185
+    Residual |   2810.2735       198  14.1933005   R-squared       =    0.0277
+-------------+----------------------------------   Adj R-squared   =    0.0228
+       Total |  2890.26949       199  14.5239673   Root MSE        =    3.7674
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |  -.0933926   .0393387    -2.37   0.019    -.1709692    -.015816
+       _cons |   36.93007    1.39686    26.44   0.000     34.17544     39.6847
+------------------------------------------------------------------------------
+
+. estimates store m1_naive
+
+. 
+. regress sales coupons income
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(2, 197)       =     46.67
+       Model |  929.170581         2   464.58529   Prob > F        =    0.0000
+    Residual |  1961.09891       197  9.95481681   R-squared       =    0.3215
+-------------+----------------------------------   Adj R-squared   =    0.3146
+       Total |  2890.26949       199  14.5239673   Root MSE        =    3.1551
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |   .2122882    .046699     4.55   0.000      .120194    .3043824
+      income |   .3004465   .0325301     9.24   0.000     .2362946    .3645984
+       _cons |   11.33517   3.008026     3.77   0.000     5.403102    17.26723
+------------------------------------------------------------------------------
+
+. estimates store m2_income
+
+. 
+. regress sales coupons income dayofweek
+
+      Source |       SS           df       MS      Number of obs   =       200
+-------------+----------------------------------   F(3, 196)       =     37.61
+       Model |  1055.96987         3  351.989957   Prob > F        =    0.0000
+    Residual |  1834.29962       196  9.35867153   R-squared       =    0.3654
+-------------+----------------------------------   Adj R-squared   =    0.3556
+       Total |  2890.26949       199  14.5239673   Root MSE        =    3.0592
+
+------------------------------------------------------------------------------
+       sales | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     coupons |   .2219317   .0453549     4.89   0.000     .1324855     .311378
+      income |   .2960617   .0315635     9.38   0.000      .233814    .3583093
+   dayofweek |   .4028817   .1094526     3.68   0.000     .1870256    .6187377
+       _cons |   9.639778   2.952713     3.26   0.001     3.816612    15.46294
+------------------------------------------------------------------------------
+
+. estimates store m3_full
+
+. 
+. estimates table m1_naive m2_income m3_full, ///
+>     stats(r2 r2_a N) b(%9.4f) se(%9.4f)
+
+--------------------------------------------------
+    Variable | m1_naive    m2_income    m3_full   
+-------------+------------------------------------
+     coupons |   -0.0934      0.2123      0.2219  
+             |    0.0393      0.0467      0.0454  
+      income |                0.3004      0.2961  
+             |                0.0325      0.0316  
+   dayofweek |                            0.4029  
+             |                            0.1095  
+       _cons |   36.9301     11.3352      9.6398  
+             |    1.3969      3.0080      2.9527  
+-------------+------------------------------------
+          r2 |    0.0277      0.3215      0.3654  
+        r2_a |    0.0228      0.3146      0.3556  
+           N |       200         200         200  
+--------------------------------------------------
+                                      Legend: b/se
+
+. 
+. *---------------------------------------------------
+. * Section 6: Binned Scatter Plots
+. *---------------------------------------------------
+. 
+. * 6.2 Unbinned vs. binned FWL scatter
+. scatterfit sales coupons, controls(income) ///
+>     regparameters(coef pval) ///
+>     opts(name(unbinned, replace) title("A. Unbinned (all points)"))
+
+. 
+. scatterfit sales coupons, controls(income) binned ///
+>     regparameters(coef pval) ///
+>     opts(name(binned, replace) title("B. Binned (20 quantiles)"))
+
+. 
+. * Figure 3: Binned vs. unbinned
+. graph combine unbinned binned, ///
+>     title("Binned Scatter: Summarizing Patterns in Large Data") ///
+>     subtitle("Both show the same FWL-residualized relationship") ///
+>     rows(1) xsize(12) ysize(5)
+
+. graph export "stata_fwl_fig3_binned_scatter.png", replace width(2400)
+file stata_fwl_fig3_binned_scatter.png written in PNG format
+
+. 
+. *===============================================================
+. * PART 2: NYC FLIGHTS DATA
+. *===============================================================
+. 
+. *---------------------------------------------------
+. * Section 7: Fixed Effects with Flights
+. *---------------------------------------------------
+. 
+. import delimited "https://raw.githubusercontent.com/cmg777/starter-academic-v
+> 501/master/content/post/r_fwlplot/flights_sample.csv", clear
+(encoding automatically selected: ISO-8859-1)
+(9 vars, 5,000 obs)
+
+. 
+. describe
+
+Contains data
+ Observations:         5,000                  
+    Variables:             9                  
+-------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+dep_delay       int     %8.0g                 
+arr_delay       int     %8.0g                 
+air_time        int     %8.0g                 
+origin          str3    %9s                   
+dest            str3    %9s                   
+carrier         str2    %9s                   
+month           byte    %8.0g                 
+day             byte    %8.0g                 
+hour            byte    %8.0g                 
+-------------------------------------------------------------------------------
+Sorted by: 
+     Note: Dataset has changed since last saved.
+
+. summarize dep_delay air_time
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+   dep_delay |      5,000      7.3172    22.83736        -20        119
+    air_time |      5,000    150.3636    93.47726         22        650
+
+. tabulate origin
+
+     origin |      Freq.     Percent        Cum.
+------------+-----------------------------------
+        EWR |      1,726       34.52       34.52
+        JFK |      1,714       34.28       68.80
+        LGA |      1,560       31.20      100.00
+------------+-----------------------------------
+      Total |      5,000      100.00
+
+. 
+. * Encode string variables for fixed effects
+. encode origin, gen(origin_fe)
+
+. encode dest, gen(dest_fe)
+
+. 
+. * 7.2 Progressive FE with scatterfit
+. scatterfit dep_delay air_time, ///
+>     regparameters(coef pval) ///
+>     opts(name(fe_none, replace) title("A. No Fixed Effects"))
+
+. 
+. scatterfit dep_delay air_time, fcontrols(origin_fe) ///
+>     regparameters(coef pval) ///
+>     opts(name(fe_origin, replace) title("B. Origin FE"))
+
+. 
+. scatterfit dep_delay air_time, fcontrols(origin_fe dest_fe) ///
+>     regparameters(coef pval) ///
+>     opts(name(fe_both, replace) title("C. Origin + Dest FE"))
+
+. 
+. * Figure 4: Progressive FE
+. graph combine fe_none fe_origin fe_both, ///
+>     title("What Do Fixed Effects 'Do' to the Data?") ///
+>     subtitle("Each panel adds more fixed effects, residualizing progressively
+> ") ///
+>     rows(1) xsize(14) ysize(5)
+
+. graph export "stata_fwl_fig4_fixed_effects.png", replace width(2800)
+file stata_fwl_fig4_fixed_effects.png written in PNG format
+
+. 
+. * 7.3 Regression table comparison
+. regress dep_delay air_time
+
+      Source |       SS           df       MS      Number of obs   =     5,000
+-------------+----------------------------------   F(1, 4998)      =      2.08
+       Model |  1085.80422         1  1085.80422   Prob > F        =    0.1491
+    Residual |  2606117.12     4,998  521.431996   R-squared       =    0.0004
+-------------+----------------------------------   Adj R-squared   =    0.0002
+       Total |  2607202.92     4,999  521.544893   Root MSE        =    22.835
+
+------------------------------------------------------------------------------
+   dep_delay | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    air_time |  -.0049857    .003455    -1.44   0.149    -.0117591    .0017876
+       _cons |   8.066871   .6117002    13.19   0.000     6.867671    9.266072
+------------------------------------------------------------------------------
+
+. estimates store fe0
+
+. 
+. reghdfe dep_delay air_time, absorb(origin_fe) vce(robust)
+(MWFE estimator converged in 1 iterations)
+
+HDFE Linear regression                            Number of obs   =      5,000
+Absorbing 1 HDFE group                            F(   1,   4996) =       5.50
+                                                  Prob > F        =     0.0191
+                                                  R-squared       =     0.0055
+                                                  Adj R-squared   =     0.0049
+                                                  Within R-sq.    =     0.0010
+                                                  Root MSE        =    22.7809
+
+------------------------------------------------------------------------------
+             |               Robust
+   dep_delay | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    air_time |  -.0079142    .003375    -2.34   0.019    -.0145306   -.0012977
+       _cons |   8.507204   .6448571    13.19   0.000     7.243001    9.771407
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   origin_fe |         3           0           3     |
+-----------------------------------------------------+
+
+. estimates store fe1
+
+. 
+. reghdfe dep_delay air_time, absorb(origin_fe dest_fe) vce(robust)
+(dropped 6 singleton observations)
+(MWFE estimator converged in 4 iterations)
+
+HDFE Linear regression                            Number of obs   =      4,994
+Absorbing 2 HDFE groups                           F(   1,   4901) =       1.49
+                                                  Prob > F        =     0.2216
+                                                  R-squared       =     0.0310
+                                                  Adj R-squared   =     0.0128
+                                                  Within R-sq.    =     0.0003
+                                                  Root MSE        =    22.5918
+
+------------------------------------------------------------------------------
+             |               Robust
+   dep_delay | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    air_time |  -.0324066    .026507    -1.22   0.222    -.0843722     .019559
+       _cons |   12.14163   4.018647     3.02   0.003     4.263277    20.01997
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+   origin_fe |         3           0           3     |
+     dest_fe |        90           1          89     |
+-----------------------------------------------------+
+
+. estimates store fe2
+
+. 
+. estimates table fe0 fe1 fe2, ///
+>     stats(r2 N) b(%9.4f) se(%9.4f)
+
+--------------------------------------------------
+    Variable |    fe0         fe1         fe2     
+-------------+------------------------------------
+    air_time |   -0.0050     -0.0079     -0.0324  
+             |    0.0035      0.0034      0.0265  
+       _cons |    8.0669      8.5072     12.1416  
+             |    0.6117      0.6449      4.0186  
+-------------+------------------------------------
+          r2 |    0.0004      0.0055      0.0310  
+           N |      5000        5000        4994  
+--------------------------------------------------
+                                      Legend: b/se
+
+. 
+. *===============================================================
+. * PART 3: WAGE PANEL DATA
+. *===============================================================
+. 
+. *---------------------------------------------------
+. * Section 8: Panel Data -- Returns to Experience
+. *---------------------------------------------------
+. 
+. import delimited "https://raw.githubusercontent.com/cmg777/starter-academic-v
+> 501/master/content/post/r_fwlplot/wagepan.csv", clear
+(encoding automatically selected: ISO-8859-1)
+(44 vars, 4,360 obs)
+
+. 
+. describe nr year lwage exper expersq educ
+
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+nr              int     %8.0g                 
+year            int     %8.0g                 
+lwage           float   %9.0g                 
+exper           byte    %8.0g                 
+expersq         int     %8.0g                 
+educ            byte    %8.0g                 
+
+. summarize lwage exper expersq educ
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       lwage |      4,360    1.649147    .5326094  -3.579079    4.05186
+       exper |      4,360    6.514679    2.825873          0         18
+     expersq |      4,360    50.42477    40.78199          0        324
+        educ |      4,360    11.76697    1.746181          3         16
+
+. 
+. * Declare panel structure
+. xtset nr year
+
+Panel variable: nr (strongly balanced)
+ Time variable: year, 1980 to 1987
+         Delta: 1 unit
+
+. 
+. * 8.2 Pooled OLS vs. FE
+. regress lwage educ exper expersq
+
+      Source |       SS           df       MS      Number of obs   =     4,360
+-------------+----------------------------------   F(3, 4356)      =    251.67
+       Model |  182.664676         3  60.8882255   Prob > F        =    0.0000
+    Residual |  1053.86497     4,356  .241934106   R-squared       =    0.1477
+-------------+----------------------------------   Adj R-squared   =    0.1471
+       Total |  1236.52964     4,359  .283672779   Root MSE        =    .49187
+
+------------------------------------------------------------------------------
+       lwage | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        educ |   .1021177   .0046816    21.81   0.000     .0929395     .111296
+       exper |   .1050292    .010175    10.32   0.000      .085081    .1249775
+     expersq |  -.0035763   .0007198    -4.97   0.000    -.0049874   -.0021651
+       _cons |  -.0563692   .0639355    -0.88   0.378    -.1817152    .0689768
+------------------------------------------------------------------------------
+
+. estimates store pool
+
+. 
+. reghdfe lwage exper expersq, absorb(nr)
+(MWFE estimator converged in 1 iterations)
+
+HDFE Linear regression                            Number of obs   =      4,360
+Absorbing 1 HDFE group                            F(   2,   3813) =     397.97
+                                                  Prob > F        =     0.0000
+                                                  R-squared       =     0.6173
+                                                  Adj R-squared   =     0.5625
+                                                  Within R-sq.    =     0.1727
+                                                  Root MSE        =     0.3523
+
+------------------------------------------------------------------------------
+       lwage | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       exper |    .122257   .0081889    14.93   0.000      .106202    .1383121
+     expersq |  -.0045228   .0006025    -7.51   0.000    -.0057042   -.0033415
+       _cons |   1.080743   .0262616    41.15   0.000     1.029255    1.132231
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          nr |       545           0         545     |
+-----------------------------------------------------+
+
+. estimates store fe_ind
+
+. 
+. reghdfe lwage exper expersq, absorb(nr year)
+(MWFE estimator converged in 2 iterations)
+note: exper is probably collinear with the fixed effects (all partialled-out va
+> lues are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =      4,360
+Absorbing 2 HDFE groups                           F(   1,   3807) =      59.29
+                                                  Prob > F        =     0.0000
+                                                  R-squared       =     0.6185
+                                                  Adj R-squared   =     0.5632
+                                                  Within R-sq.    =     0.0153
+                                                  Root MSE        =     0.3520
+
+------------------------------------------------------------------------------
+       lwage | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       exper |          0  (omitted)
+     expersq |  -.0054179   .0007036    -7.70   0.000    -.0067974   -.0040384
+       _cons |   1.922343   .0358774    53.58   0.000     1.852003    1.992684
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          nr |       545           0         545     |
+        year |         8           1           7     |
+-----------------------------------------------------+
+
+. estimates store fe_twfe
+
+. 
+. estimates table pool fe_ind fe_twfe, ///
+>     stats(r2 N) b(%9.4f) se(%9.4f)
+
+--------------------------------------------------
+    Variable |   pool       fe_ind      fe_twfe   
+-------------+------------------------------------
+        educ |    0.1021                          
+             |    0.0047                          
+       exper |    0.1050      0.1223   (omitted)  
+             |    0.0102      0.0082              
+     expersq |   -0.0036     -0.0045     -0.0054  
+             |    0.0007      0.0006      0.0007  
+       _cons |   -0.0564      1.0807      1.9223  
+             |    0.0639      0.0263      0.0359  
+-------------+------------------------------------
+          r2 |    0.1477      0.6173      0.6185  
+           N |      4360        4360        4360  
+--------------------------------------------------
+                                      Legend: b/se
+
+. 
+. * 8.3 scatterfit with individual FE
+. * Sample 150 individuals for visual clarity
+. preserve
+
+. set seed 456
+
+. bysort nr: gen first = (_n == 1)
+
+. gen rand = runiform() if first
+(3,815 missing values generated)
+
+. bysort nr (rand): replace rand = rand[1]
+(3,815 real changes made)
+
+. sort rand nr year
+
+. egen rank = group(rand) if first
+(3,815 missing values generated)
+
+. bysort nr (rank): replace rank = rank[1]
+(3,815 real changes made)
+
+. keep if rank <= 150
+(3,160 observations deleted)
+
+. 
+. scatterfit lwage exper, ///
+>     regparameters(coef pval) ///
+>     opts(name(wage_raw, replace) title("A. Raw: Pooled Cross-Section"))
+
+. 
+. scatterfit lwage exper, fcontrols(nr) ///
+>     regparameters(coef pval) ///
+>     opts(name(wage_fe, replace) title("B. FWL: Individual Fixed Effects"))
+
+. 
+. * Figure 5: Raw vs. individual FE
+. graph combine wage_raw wage_fe, ///
+>     title("Controlling for Unobserved Ability") ///
+>     subtitle("Individual FE removes person-specific wage levels") ///
+>     rows(1) xsize(12) ysize(5)
+
+. graph export "stata_fwl_fig5_panel_data.png", replace width(2400)
+file stata_fwl_fig5_panel_data.png written in PNG format
+
+. 
+. restore
+
+. 
+. *---------------------------------------------------
+. * Section 9: Advanced Features
+. *---------------------------------------------------
+. 
+. * Reload store data for advanced features
+. import delimited "https://raw.githubusercontent.com/cmg777/starter-academic-v
+> 501/master/content/post/r_fwlplot/store_data.csv", clear
+(encoding automatically selected: ISO-8859-1)
+(4 vars, 200 obs)
+
+. 
+. * 9.1 Linear fit with full regression parameters on the plot
+. scatterfit sales coupons, controls(income) ///
+>     regparameters(coef se pval r2 n)
+
+. graph export "stata_fwl_fig6_advanced.png", replace width(1600)
+file stata_fwl_fig6_advanced.png written in PNG format
+
+. 
+. * 9.2 Quadratic fit (no regparameters — only available for linear)
+. scatterfit sales coupons, controls(income) ///
+>     fit(quadratic) ///
+>     opts(name(quad_fit, replace))
+
+. 
+. * 9.3 Lowess fit (without controls — lowess does not support controls())
+. scatterfit sales coupons, ///
+>     fit(lowess) ///
+>     opts(name(lowess_fit, replace))
+
+. 
+. display "Analysis complete. All figures generated."
+Analysis complete. All figures generated.
+
+. 
+end of do-file
