@@ -548,7 +548,7 @@ HOVAL
 -------------------------------------------------------------------
 ```
 
-The direct effect of income is **-1.03**, similar to the SAR. The indirect (spillover) effect of income is **-1.50** and marginally significant (p = 0.064), much larger than in the SAR (-0.76), because the SDM accounts for both the spatial feedback channel ($\rho$) and the direct effect of neighbors' income ($\theta_{INC}$). The total effect of income is **-2.52**, substantially larger than the SAR's -1.86. For housing value, the indirect effect is **+0.22** (insignificant), suggesting that neighbors' housing values do not generate meaningful crime spillovers once the global feedback is accounted for.
+The direct effect of income is **-1.03**, similar to the SAR. The indirect (spillover) effect of income is **-1.50** and marginally significant (p = 0.064), much larger than in the SAR (-0.76), because the SDM accounts for both the spatial feedback channel ($\rho$) and the direct effect of neighbors' income ($\theta\_{INC}$). The total effect of income is **-2.52**, substantially larger than the SAR's -1.86. For housing value, the indirect effect is **+0.22** (insignificant), suggesting that neighbors' housing values do not generate meaningful crime spillovers once the global feedback is accounted for.
 
 ---
 
@@ -569,7 +569,7 @@ The SLX model restricts $\rho = 0$ --- there is no spatial autoregressive feedba
 test ([W]CRIME = 0)
 ```
 
-The test **rejects** the SLX restriction at the 1% level. The spatial autoregressive parameter $\rho$ is significantly different from zero, meaning that the global feedback channel is an important feature of the data. The LR test confirms this: $-2(\text{LogL}_{SLX} - \text{LogL}_{SDM}) \approx 7.4$ with 1 df (critical value 3.84). Dropping $\rho$ would misspecify the model.
+The test **rejects** the SLX restriction at the 1% level. The spatial autoregressive parameter $\rho$ is significantly different from zero, meaning that the global feedback channel is an important feature of the data. The LR test confirms this: $-2(\text{LogL}\_{SLX} - \text{LogL}\_{SDM}) \approx 7.4$ with 1 df (critical value 3.84). Dropping $\rho$ would misspecify the model.
 
 ### 7.2 Reduce to SAR? (test $\theta = 0$)
 
@@ -580,7 +580,7 @@ The SAR model restricts $\theta = 0$ --- the spatial lags of the explanatory var
 test ([CRIME]W_INC = 0) ([CRIME]W_HOVAL = 0)
 ```
 
-The test **fails to reject** the SAR restriction. The spatial lags of income and housing value are jointly insignificant, suggesting that the SAR specification may be adequate. The LR test also fails to reject: $-2(\text{LogL}_{SAR} - \text{LogL}_{SDM}) \approx 2.0$ with 2 df (critical value 5.99). However, this does not mean the $\theta$ terms are unimportant --- it may simply reflect insufficient power with only 49 observations.
+The test **fails to reject** the SAR restriction. The spatial lags of income and housing value are jointly insignificant, suggesting that the SAR specification may be adequate. The LR test also fails to reject: $-2(\text{LogL}\_{SAR} - \text{LogL}\_{SDM}) \approx 2.0$ with 2 df (critical value 5.99). However, this does not mean the $\theta$ terms are unimportant --- it may simply reflect insufficient power with only 49 observations.
 
 ### 7.3 Reduce to SEM? (common factor restriction)
 
@@ -591,7 +591,7 @@ The SEM imposes the common factor restriction $\theta + \rho \beta = 0$. Under t
 testnl ([CRIME]W_INC = -[W]CRIME * [CRIME]INC) ([CRIME]W_HOVAL = -[W]CRIME * [CRIME]HOVAL)
 ```
 
-The test **fails to reject** the SEM common factor restriction. The LR test yields $-2(\text{LogL}_{SEM} - \text{LogL}_{SDM}) \approx 4.0$ with 2 df (critical value 5.99), confirming the SEM is not rejected. This means that the spatial dependence in the Columbus data could be interpreted as arising from spatially correlated unobservables rather than substantive crime spillovers.
+The test **fails to reject** the SEM common factor restriction. The LR test yields $-2(\text{LogL}\_{SEM} - \text{LogL}\_{SDM}) \approx 4.0$ with 2 df (critical value 5.99), confirming the SEM is not rejected. This means that the spatial dependence in the Columbus data could be interpreted as arising from spatially correlated unobservables rather than substantive crime spillovers.
 
 ### 7.4 SDM vs. SLX: the key comparison
 
@@ -705,7 +705,7 @@ W            |
 ------------------------------------------------------------------------------
 ```
 
-In the SAC model, $\rho$ is **0.478** (z = 2.95, p = 0.003) and $\lambda$ is **0.166** (z = 0.56, p = 0.576). When both are included, $\rho$ remains significant but $\lambda$ becomes insignificant, suggesting that the spatial lag model (SAR) dominates the spatial error structure. The coefficient of $\rho$ in the SAC (0.478) is close to the SAR value (0.431), and $\lambda$ in the SAC (0.166) is much smaller than in the SEM (0.562). The LR test of SAC versus SAR is approximately 0.3 with 1 df, and SAC versus SEM is approximately 2.3 with 1 df --- neither reaches the 5% critical value of 3.84, making it difficult to choose among these three models. However, since $\rho$ is significant while $\lambda$ is not, the SAR is the more parsimonious choice.
+In the SAC model, $\rho$ is **0.478** (z = 2.95, p = 0.003) and $\lambda$ is **0.166** (z = 0.56, p = 0.576). When both are included, $\rho$ remains significant but $\lambda$ becomes insignificant, suggesting that the spatial lag model (SAR) dominates the spatial error structure. The coefficient of $\rho$ in the SAC (0.478) is close to the SAR value (0.428), and $\lambda$ in the SAC (0.166) is much smaller than in the SEM (0.562). The LR test of SAC versus SAR is approximately 0.3 with 1 df, and SAC versus SEM is approximately 2.3 with 1 df --- neither reaches the 5% critical value of 3.84, making it difficult to choose among these three models. However, since $\rho$ is significant while $\lambda$ is not, the SAR is the more parsimonious choice.
 
 ```stata
 estat impact
@@ -726,7 +726,7 @@ HOVAL
 -------------------------------------------------------------------
 ```
 
-The SAC's effect decomposition falls between the SAR and SEM. The direct effect of income (-1.06) is similar to the SAR (-1.09), and the indirect effects are somewhat attenuated because the spatial error term absorbs a portion of the spatial dependence. One key limitation of the SAC (shared with the SAR) is that the ratio between the indirect and direct effect is the same for every explanatory variable, because spillovers operate only through the spatial multiplier $(I - \rho W)^{-1}$. This constraint is economically restrictive --- there is no reason to expect that income and housing value should have proportionally equal spillover intensities.
+The SAC's effect decomposition falls between the SAR and SEM. The direct effect of income (-1.06) is similar to the SAR (-1.10), and the indirect effects are somewhat attenuated because the spatial error term absorbs a portion of the spatial dependence. One key limitation of the SAC (shared with the SAR) is that the ratio between the indirect and direct effect is the same for every explanatory variable, because spillovers operate only through the spatial multiplier $(I - \rho W)^{-1}$. This constraint is economically restrictive --- there is no reason to expect that income and housing value should have proportionally equal spillover intensities.
 
 ### 8.3 GNS (General Nesting Spatial)
 
@@ -779,7 +779,7 @@ The direct effects remain significant and stable (consistent with all other mode
 
 ## 9. Model comparison
 
-### 9.1 Coefficient and AIC comparison
+### 9.1 Coefficient comparison
 
 We compare all eight models side by side, focusing on the key coefficients and model fit. Values are based on ML estimation; t-values in parentheses.
 
@@ -814,7 +814,7 @@ Several patterns emerge. First, the income coefficient is **consistently negativ
 
 The direct effects of income and housing value are broadly consistent across models: approximately -0.94 to -1.60 for income and -0.27 to -0.30 for housing value. The **indirect effects** reveal the most important differences:
 
-1. **The OLS, SEM, and SAR models produce no or wrong spillover effects.** OLS has zero spillovers by construction. The SEM's spillovers are zero by construction. The SAR constrains the ratio between indirect and direct effects to be equal for every variable, which forces the housing value spillover to be negative (-0.19) even though the SLX, SDM, SDEM, and GNS all suggest it is positive.
+1. **The OLS, SEM, and SAR models produce no or wrong spillover effects.** OLS has zero spillovers by construction. The SEM's spillovers are zero by construction. The SAR constrains the ratio between indirect and direct effects to be equal for every variable, which forces the housing value spillover to be negative (-0.20) even though the SLX, SDM, SDEM, and GNS all suggest it is positive.
 
 2. **The SLX, SDM, SDEM, and GNS models agree on the pattern**: income spillovers are large and negative (-1.20 to -1.50), while housing value spillovers are small and positive (+0.13 to +0.22) and insignificant. This consistency across different model specifications strengthens the case that the income spillover is a robust finding.
 
@@ -826,7 +826,7 @@ The direct effects of income and housing value are broadly consistent across mod
 
 The Columbus crime dataset illustrates a recurring challenge in spatial econometrics: choosing among models that capture spatial dependence through different channels. Following Elhorst (2014, Section 2.9), the evidence points toward the **SDM** and **SDEM** as the preferred specifications, though neither the SAR nor SEM can be formally rejected.
 
-**Why not SAR, SEM, or SAC?** The specification tests fail to reject both the SAR restriction ($\theta = 0$) and the SEM common factor restriction ($\theta + \rho\beta = 0$), which might suggest these simpler models are adequate. However, as Elhorst (2014) emphasizes, these models have structural limitations. The SAR and SAC constrain the ratio between the indirect and direct effect to be **the same for every explanatory variable** --- a consequence of spillovers operating solely through the spatial multiplier $(I - \rho W)^{-1}\beta_k$. In the Columbus data, this forces the housing value spillover to be negative (proportional to the direct effect), even though the SLX, SDM, SDEM, and GNS models all estimate it as positive. The SEM, on the other hand, produces **zero spillover effects** by construction, which may be too restrictive if one believes that crime is genuinely affected by conditions in neighboring areas.
+**Why not SAR, SEM, or SAC?** The specification tests fail to reject both the SAR restriction ($\theta = 0$) and the SEM common factor restriction ($\theta + \rho\beta = 0$), which might suggest these simpler models are adequate. However, as Elhorst (2014) emphasizes, these models have structural limitations. The SAR and SAC constrain the ratio between the indirect and direct effect to be **the same for every explanatory variable** --- a consequence of spillovers operating solely through the spatial multiplier $(I - \rho W)^{-1}\beta\_k$. In the Columbus data, this forces the housing value spillover to be negative (proportional to the direct effect), even though the SLX, SDM, SDEM, and GNS models all estimate it as positive. The SEM, on the other hand, produces **zero spillover effects** by construction, which may be too restrictive if one believes that crime is genuinely affected by conditions in neighboring areas.
 
 **Why SDM and SDEM?** Both models allow the indirect effect to differ freely across explanatory variables. In both, the spillover effect of income is negative and significant (SDM: -1.50, marginally significant; SDEM: -1.20, significant at 5%), while the spillover effect of housing value is positive but insignificant. This flexibility produces economically sensible results: neighborhoods surrounded by higher-income areas experience less crime (consistent with crime displacement and opportunity theory), but neighbors' housing values have no significant independent effect on crime.
 
