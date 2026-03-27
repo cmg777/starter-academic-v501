@@ -45,6 +45,22 @@ label var CRIME "Crime"
 label var INC   "Income"
 label var HOVAL "House value"
 
+* 3.3 Generate spatial lags of X manually
+* NOTE: We compute W*X explicitly rather than using spregress ivarlag(),
+* which may produce incorrect signs for the spatial lag coefficients.
+* See Elhorst (2014, Table 2.2) for the reference results.
+mata: spmatrix_matafromsp(W_mata, id_vec, "WqueenS_fromStata15")
+mata: st_view(inc=., ., "INC")
+mata: st_view(hoval=., ., "HOVAL")
+gen double W_INC = .
+gen double W_HOVAL = .
+mata: st_store(., "W_INC", W_mata * inc)
+mata: st_store(., "W_HOVAL", W_mata * hoval)
+label var W_INC   "W * Income"
+label var W_HOVAL "W * House value"
+
+summarize CRIME INC HOVAL W_INC W_HOVAL
+
 *---------------------------------------------------
 * Section 4: OLS baseline and spatial diagnostics
 *---------------------------------------------------
@@ -96,7 +112,8 @@ estat impact
 *---------------------------------------------------
 
 * 6.1 SLX (Spatial Lag of X)
-spregress CRIME INC HOVAL, ml ivarlag(WqueenS_fromStata15: INC HOVAL)
+* NOTE: We use regress with manually computed W*X instead of spregress ivarlag()
+regress CRIME INC HOVAL W_INC W_HOVAL
 eststo SLX
 
 estat ic
@@ -106,7 +123,8 @@ quietly estadd scalar AIC = s[1,5]
 estat impact
 
 * 6.2 SDM (Spatial Durbin Model)
-spregress CRIME INC HOVAL, ml dvarlag(WqueenS_fromStata15) ivarlag(WqueenS_fromStata15: INC HOVAL)
+* NOTE: We include W*X as regular regressors instead of using ivarlag()
+spregress CRIME INC HOVAL W_INC W_HOVAL, ml dvarlag(WqueenS_fromStata15)
 eststo SDM
 
 estat ic
@@ -119,23 +137,24 @@ estat impact
 * Section 7: Wald specification tests from SDM
 *---------------------------------------------------
 
-quietly spregress CRIME INC HOVAL, ml dvarlag(WqueenS_fromStata15) ivarlag(WqueenS_fromStata15: INC HOVAL)
+quietly spregress CRIME INC HOVAL W_INC W_HOVAL, ml dvarlag(WqueenS_fromStata15)
 
 * Wald test: Reduce to SLX? (rho = 0; NO if p < 0.05)
 test ([WqueenS_fromStata15]CRIME = 0)
 
 * Wald test: Reduce to SAR? (theta = 0; NO if p < 0.05)
-test ([WqueenS_fromStata15]INC = 0) ([WqueenS_fromStata15]HOVAL = 0)
+test ([CRIME]W_INC = 0) ([CRIME]W_HOVAL = 0)
 
 * Wald test: Reduce to SEM? (common factor; NO if p < 0.05)
-testnl ([WqueenS_fromStata15]INC = -[WqueenS_fromStata15]CRIME*[CRIME]INC) ([WqueenS_fromStata15]HOVAL = -[WqueenS_fromStata15]CRIME*[CRIME]HOVAL)
+testnl ([CRIME]W_INC = -[WqueenS_fromStata15]CRIME*[CRIME]INC) ([CRIME]W_HOVAL = -[WqueenS_fromStata15]CRIME*[CRIME]HOVAL)
 
 *---------------------------------------------------
 * Section 8: Extended spatial models
 *---------------------------------------------------
 
 * 8.1 SDEM (Spatial Durbin Error Model)
-spregress CRIME INC HOVAL, ml ivarlag(WqueenS_fromStata15: INC HOVAL) errorlag(WqueenS_fromStata15)
+* NOTE: We include W*X as regular regressors instead of using ivarlag()
+spregress CRIME INC HOVAL W_INC W_HOVAL, ml errorlag(WqueenS_fromStata15)
 eststo SDEM
 
 estat ic
@@ -155,7 +174,8 @@ quietly estadd scalar AIC = s[1,5]
 estat impact
 
 * 8.3 GNS (General Nesting Spatial)
-spregress CRIME INC HOVAL, ml dvarlag(WqueenS_fromStata15) ivarlag(WqueenS_fromStata15: INC HOVAL) errorlag(WqueenS_fromStata15)
+* NOTE: We include W*X as regular regressors instead of using ivarlag()
+spregress CRIME INC HOVAL W_INC W_HOVAL, ml dvarlag(WqueenS_fromStata15) errorlag(WqueenS_fromStata15)
 eststo GNS
 
 estat ic

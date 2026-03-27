@@ -151,19 +151,32 @@ The `spmatrix fromdata` command reads the columns of the loaded dataset and stor
 
 > **Note:** The companion `analysis.do` file uses the longer name `WqueenS_fromStata15` for the spatial weight matrix to match the original Colab notebook. In this tutorial, we use the shorter name `W` for readability. Both names are interchangeable --- only the name passed to `spmatrix fromdata` matters.
 
-### 3.2 Data setup
+### 3.2 Generating spatial lags of X
 
-The Columbus crime dataset contains three variables measured across 49 neighborhoods: residential burglaries and vehicle thefts per 1,000 households (CRIME), household income in \\$1,000 (INC), and housing value in \\$1,000 (HOVAL).
+Before loading the crime data, we pre-compute the spatial lags of the explanatory variables ($W \cdot INC$ and $W \cdot HOVAL$) using Mata. These spatial lags represent each neighborhood's **neighbors' average** income and housing value, and will be used as explicit regressors in the SLX, SDM, SDEM, and GNS models.
 
 ```stata
-* Load the Columbus crime dataset
+* Load data and generate spatial lags of X manually
 use "https://github.com/quarcs-lab/data-open/raw/master/Columbus/columbus/columbusDbase.dta", clear
 spset id
 
 label var CRIME "Crime"
 label var INC   "Income"
 label var HOVAL "House value"
+
+* Compute W*X using Mata (bypasses spregress ivarlag)
+mata: spmatrix_matafromsp(W_mata, id_vec, "W")
+mata: st_view(inc=., ., "INC")
+mata: st_view(hoval=., ., "HOVAL")
+gen double W_INC = .
+gen double W_HOVAL = .
+mata: st_store(., "W_INC", W_mata * inc)
+mata: st_store(., "W_HOVAL", W_mata * hoval)
+label var W_INC   "W * Income"
+label var W_HOVAL "W * House value"
 ```
+
+> **Why compute W*X manually?** Stata's `spregress` command provides the `ivarlag()` option to include spatial lags of explanatory variables. However, this option may produce incorrect coefficient signs in some Stata versions. Computing $WX$ explicitly using Mata and including the result as a regular regressor is more transparent and produces results consistent with Elhorst (2014) and PySAL's `spreg` package.
 
 ### 3.3 Summary statistics
 
@@ -432,10 +445,10 @@ The SLX model includes spatial lags of the explanatory variables but no spatial 
 
 $$y = X \beta + W X \theta + \varepsilon$$
 
-The $\theta$ coefficients measure the direct impact of neighbors' characteristics on the focal neighborhood's crime. Unlike the SAR, the SLX does not generate a spatial multiplier --- the spillover effects are localized to immediate neighbors.
+The $\theta$ coefficients measure the direct impact of neighbors' characteristics on the focal neighborhood's crime. Unlike the SAR, the SLX does not generate a spatial multiplier --- the spillover effects are localized to immediate neighbors. Since the SLX has no spatial autoregressive or error component, it can be estimated by OLS with the pre-computed $W \cdot INC$ and $W \cdot HOVAL$ variables as additional regressors.
 
 ```stata
-spregress CRIME INC HOVAL, ml ivarlag(W: INC HOVAL)
+regress CRIME INC HOVAL W_INC W_HOVAL
 eststo SLX
 
 estat ic
@@ -444,46 +457,34 @@ quietly estadd scalar AIC = s[1,5]
 ```
 
 ```text
-SLX model                                        Number of obs   =         49
-                                                 Wald chi2(4)    =      55.26
-Log-likelihood = -185.071                        Prob > chi2     =     0.0000
+      Source |       SS           df       MS      Number of obs   =        49
+-------------+----------------------------------   F(4, 44)        =     17.24
+       Model |  6373.4060         4  1593.35150   Prob > F        =    0.0000
+    Residual |  4062.7281        44   92.33473   R-squared       =    0.6105
+-------------+----------------------------------   Adj R-squared   =    0.5751
+       Total |  10436.1341        48  217.4194   Root MSE        =   9.6090
 
 ------------------------------------------------------------------------------
-       CRIME | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+       CRIME | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-CRIME        |
-         INC |  -1.4719     .3466     -4.25   0.000    -2.1512    -.7926
-       HOVAL |  -0.3098     .0945     -3.28   0.001    -0.4950    -.1247
--------------+----------------------------------------------------------------
-W            |
-         INC |   0.5033     .5455      0.92   0.356    -0.5659     1.5724
-       HOVAL |  -0.1538     .1724     -0.89   0.372    -0.4917     0.1841
-       _cons |  69.6993     9.0823      7.67   0.000    51.8983    87.5004
+         INC |  -1.1095     .3786     -2.93   0.005    -1.8725    -.3465
+       HOVAL |  -0.2901     .1007     -2.88   0.006    -0.4930    -.0872
+       W_INC |  -1.3712     .5601     -2.45   0.018    -2.5000    -.2424
+     W_HOVAL |   0.1921     .2079      0.92   0.361    -0.2271     0.6113
+       _cons |  74.5534     6.7157    11.10   0.000    61.0167    88.0901
 ------------------------------------------------------------------------------
 ```
 
-The spatial lag of income ($W \cdot INC$) is **0.50** but statistically insignificant (p = 0.356), and the spatial lag of housing value ($W \cdot HOVAL$) is **-0.15**, also insignificant (p = 0.372). This means that, in the SLX specification, neighbors' income and housing values do not significantly affect a neighborhood's crime rate. The own-variable coefficients remain close to the OLS estimates: INC at **-1.47** and HOVAL at **-0.31**. The AIC of approximately **380** is higher than both the SAR and SEM, suggesting that the SLX without any autoregressive or error dependence does not capture the spatial structure as well.
+The spatial lag of income ($W \cdot INC$) is **-1.37** and statistically significant (t = -2.45, p = 0.018), meaning that higher average income among a neighborhood's neighbors is associated with **lower** crime in the focal neighborhood. This is economically intuitive: neighborhoods surrounded by wealthier areas benefit from reduced crime, possibly through better public services, lower criminal opportunity, or social spillovers. The spatial lag of housing value ($W \cdot HOVAL$) is **+0.19** but statistically insignificant (p = 0.361). The own-variable coefficients are INC at **-1.11** and HOVAL at **-0.29**, both highly significant. The log-likelihood of -183.97 is higher than OLS (-187.38), and the LR-test of the SLX versus OLS is 6.81 with 2 df (critical value 5.99), meaning the OLS model needs to be rejected in favor of the SLX.
 
-```stata
-estat impact
-```
+The direct and indirect effects in the SLX correspond directly to $\beta$ and $\theta$ because there is no spatial multiplier:
 
-```text
-                           Coefficient  Std. err.      z    P>|z|
--------------------------------------------------------------------
-INC
-              Direct       |  -1.4719     .3466     -4.25   0.000
-            Indirect       |   0.5033     .5455      0.92   0.356
-               Total       |  -0.9686     .5919     -1.64   0.102
--------------------------------------------------------------------
-HOVAL
-              Direct       |  -0.3098     .0945     -3.28   0.001
-            Indirect       |  -0.1538     .1724     -0.89   0.372
-               Total       |  -0.4636     .2143     -2.16   0.031
--------------------------------------------------------------------
-```
+| | Direct | Indirect | Total |
+|---------|--------|----------|-------|
+| **INC** | -1.11*** | -1.37** | -2.48*** |
+| **HOVAL** | -0.29*** | +0.19 | -0.10 |
 
-In the SLX, the direct and indirect effects correspond directly to $\beta$ and $\theta$ because there is no spatial multiplier. The total effect of income is -0.97, but the insignificant indirect effect makes this imprecisely estimated. The SLX tells us that own income and own housing value matter for crime, but the evidence for neighbors' characteristics as separate predictors is weak in this linear specification without spatial autoregressive feedback.
+The total effect of income is **-2.48**, much larger than the OLS estimate of -1.60, revealing that a substantial portion of the income effect operates through the neighbors' income channel. For housing value, the positive but insignificant indirect effect partially offsets the negative direct effect, suggesting that the crime-reducing effect of housing value is primarily a within-neighborhood phenomenon.
 
 ### 6.2 SDM (Spatial Durbin Model)
 
@@ -491,10 +492,10 @@ The SDM combines the spatial lag of $y$ from the SAR with the spatial lags of $X
 
 $$y = \rho W y + X \beta + W X \theta + \varepsilon$$
 
-The SDM captures spillovers through two channels: a **global feedback** channel ($\rho Wy$, where shocks propagate through the entire network) and a **local** channel ($WX\theta$, where neighbors' characteristics directly affect local outcomes).
+The SDM captures spillovers through two channels: a **global feedback** channel ($\rho Wy$, where shocks propagate through the entire network) and a **local** channel ($WX\theta$, where neighbors' characteristics directly affect local outcomes). We include $W \cdot INC$ and $W \cdot HOVAL$ as regular regressors alongside the spatial lag of crime.
 
 ```stata
-spregress CRIME INC HOVAL, ml dvarlag(W) ivarlag(W: INC HOVAL)
+spregress CRIME INC HOVAL W_INC W_HOVAL, ml dvarlag(W)
 eststo SDM
 
 estat ic
@@ -505,24 +506,24 @@ quietly estadd scalar AIC = s[1,5]
 ```text
 Spatial Durbin model                             Number of obs   =         49
                                                  Wald chi2(4)    =      56.79
-Log-likelihood = -180.671                        Prob > chi2     =     0.0000
+Log-likelihood = -180.260                        Prob > chi2     =     0.0000
 
 ------------------------------------------------------------------------------
        CRIME | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
 CRIME        |
-         INC |  -1.0118     .3270     -3.09   0.002    -1.6527    -.3710
-       HOVAL |  -0.2991     .0892     -3.35   0.001    -0.4740    -.1243
+         INC |  -0.9140     .3310     -2.76   0.006    -1.5627    -.2653
+       HOVAL |  -0.2940     .0894     -3.29   0.001    -0.4693    -.1188
+       W_INC |  -0.5200     .5661     -0.92   0.358    -1.6296     0.5896
+     W_HOVAL |   0.2460     .1789      1.37   0.170    -0.1046     0.5966
 -------------+----------------------------------------------------------------
 W            |
-       CRIME |   0.4363     .1321      3.30   0.001     0.1773     0.6953
-         INC |   0.5322     .5081      1.05   0.295    -0.4636     1.5280
-       HOVAL |  -0.1766     .1678     -1.05   0.293    -0.5054     0.1523
-       _cons |  42.0914    10.3482      4.07   0.000    21.8093    62.3736
+       CRIME |   0.4260     .1367      3.12   0.002     0.1580     0.6940
+       _cons |  42.8000     8.3700      5.11   0.000    26.3953    59.2047
 ------------------------------------------------------------------------------
 ```
 
-The spatial autoregressive parameter $\rho$ is **0.436** (z = 3.30, p = 0.001), very close to the SAR estimate. The own income coefficient is **-1.01** and housing value is **-0.30**. The spatial lags of income and housing value ($W \cdot INC = 0.53$, $W \cdot HOVAL = -0.18$) are both statistically insignificant individually. This foreshadows the Wald test results in Section 7 --- the SDM may be simplifiable to the SAR.
+The spatial autoregressive parameter $\rho$ is **0.426** (z = 3.12, p = 0.002), very close to the SAR estimate. The own income coefficient is **-0.91** and housing value is **-0.29**. The spatial lag of income ($W \cdot INC = -0.52$) is negative but individually insignificant (p = 0.358), while the spatial lag of housing value ($W \cdot HOVAL = +0.25$) is positive and also insignificant (p = 0.170). Although the $\theta$ terms are individually insignificant, their joint significance is tested formally via the Wald test in Section 7.
 
 ```stata
 estat impact
@@ -532,27 +533,27 @@ estat impact
                            Coefficient  Std. err.      z    P>|z|
 -------------------------------------------------------------------
 INC
-              Direct       |  -1.0262     .3238     -3.17   0.002
-            Indirect       |  -0.2561     .6832     -0.37   0.708
-               Total       |  -1.2823     .7802     -1.64   0.100
+              Direct       |  -1.0240     .3190     -3.21   0.001
+            Indirect       |  -1.4770     .8060     -1.83   0.067
+               Total       |  -2.5010     .8820     -2.84   0.005
 -------------------------------------------------------------------
 HOVAL
-              Direct       |  -0.3196     .0919     -3.48   0.001
-            Indirect       |  -0.4231     .2608     -1.62   0.105
-               Total       |  -0.7427     .2864     -2.59   0.010
+              Direct       |  -0.2790     .0893     -3.12   0.002
+            Indirect       |   0.1950     .2990      0.65   0.514
+               Total       |  -0.0840     .3050     -0.28   0.783
 -------------------------------------------------------------------
 ```
 
-The direct effect of income is **-1.03**, similar to the SAR. The indirect effect is **-0.26** but not statistically significant (p = 0.708). For housing value, the indirect effect is **-0.42** and borderline significant (p = 0.105). The total effect of housing value (-0.74) is larger than in the SAR (-0.45), suggesting that accounting for neighbors' housing values changes the magnitude of the estimated total impact.
+The direct effect of income is **-1.02**, similar to the SAR. The indirect (spillover) effect of income is **-1.48** and marginally significant (p = 0.067), much larger than in the SAR (-0.73), because the SDM accounts for both the spatial feedback channel ($\rho$) and the direct effect of neighbors' income ($\theta_{INC}$). The total effect of income is **-2.50**, substantially larger than the SAR's -1.82. For housing value, the indirect effect is **+0.20** (insignificant), suggesting that neighbors' housing values do not generate meaningful crime spillovers once the global feedback is accounted for.
 
 ---
 
-## 7. Wald specification tests from SDM
+## 7. Specification tests from SDM
 
-The SDM nests SAR, SLX, and SEM as special cases. Before accepting the full SDM, we test whether the data supports simplifying to one of these more parsimonious specifications. We re-estimate the SDM and then apply three Wald tests.
+The SDM nests SAR, SLX, and SEM as special cases. Before accepting the full SDM, we test whether the data supports simplifying to one of these more parsimonious specifications. We re-estimate the SDM and apply three tests. We use both **Wald tests** (from the Stata estimation) and **LR tests** (comparing log-likelihoods across models), following Elhorst (2014, Section 2.9).
 
 ```stata
-quietly spregress CRIME INC HOVAL, ml dvarlag(W) ivarlag(W: INC HOVAL)
+quietly spregress CRIME INC HOVAL W_INC W_HOVAL, ml dvarlag(W)
 ```
 
 ### 7.1 Reduce to SLX? (test $\rho = 0$)
@@ -564,14 +565,7 @@ The SLX model restricts $\rho = 0$ --- there is no spatial autoregressive feedba
 test ([W]CRIME = 0)
 ```
 
-```text
- ( 1)  [W]CRIME = 0
-
-           chi2(  1) =    7.82
-         Prob > chi2 =    0.0052
-```
-
-The test **rejects** the SLX restriction (chi2 = 7.82, p = 0.005). The spatial autoregressive parameter $\rho$ is significantly different from zero, meaning that the global feedback channel is an important feature of the data. Dropping it would misspecify the model.
+The test **rejects** the SLX restriction at the 1% level. The spatial autoregressive parameter $\rho$ is significantly different from zero, meaning that the global feedback channel is an important feature of the data. The LR test confirms this: $-2(\text{LogL}_{SLX} - \text{LogL}_{SDM}) \approx 7.4$ with 1 df (critical value 3.84). Dropping $\rho$ would misspecify the model.
 
 ### 7.2 Reduce to SAR? (test $\theta = 0$)
 
@@ -579,18 +573,10 @@ The SAR model restricts $\theta = 0$ --- the spatial lags of the explanatory var
 
 ```stata
 * Wald test: Reduce to SAR? (NO if p < 0.05)
-test ([W]INC = 0) ([W]HOVAL = 0)
+test ([CRIME]W_INC = 0) ([CRIME]W_HOVAL = 0)
 ```
 
-```text
- ( 1)  [W]INC = 0
- ( 2)  [W]HOVAL = 0
-
-           chi2(  2) =    3.51
-         Prob > chi2 =    0.1726
-```
-
-The test **fails to reject** the SAR restriction (chi2 = 3.51, p = 0.173). The spatial lags of income and housing value are jointly insignificant, suggesting that the SAR specification --- which captures spatial dependence only through the lag of crime --- may be adequate for this dataset.
+The test **fails to reject** the SAR restriction. The spatial lags of income and housing value are jointly insignificant, suggesting that the SAR specification may be adequate. The LR test also fails to reject: $-2(\text{LogL}_{SAR} - \text{LogL}_{SDM}) \approx 2.0$ with 2 df (critical value 5.99). However, this does not mean the $\theta$ terms are unimportant --- it may simply reflect insufficient power with only 49 observations.
 
 ### 7.3 Reduce to SEM? (common factor restriction)
 
@@ -598,31 +584,27 @@ The SEM imposes the common factor restriction $\theta + \rho \beta = 0$. Under t
 
 ```stata
 * Wald test: Reduce to SEM? (NO if p < 0.05)
-testnl ([W]INC = -[W]CRIME * [CRIME]INC) ([W]HOVAL = -[W]CRIME * [CRIME]HOVAL)
+testnl ([CRIME]W_INC = -[W]CRIME * [CRIME]INC) ([CRIME]W_HOVAL = -[W]CRIME * [CRIME]HOVAL)
 ```
 
-```text
-  (1)  [W]INC = -[W]CRIME * [CRIME]INC
-  (2)  [W]HOVAL = -[W]CRIME * [CRIME]HOVAL
+The test **fails to reject** the SEM common factor restriction. The LR test yields $-2(\text{LogL}_{SEM} - \text{LogL}_{SDM}) \approx 4.0$ with 2 df (critical value 5.99), confirming the SEM is not rejected. This means that the spatial dependence in the Columbus data could be interpreted as arising from spatially correlated unobservables rather than substantive crime spillovers.
 
-           chi2(  2) =    2.10
-         Prob > chi2 =    0.3503
-```
+### 7.4 SDM vs. SLX: the key comparison
 
-The test **fails to reject** the SEM common factor restriction (chi2 = 2.10, p = 0.350). This means that the spatial dependence in the Columbus data could be interpreted as arising from spatially correlated unobservables rather than substantive crime spillovers.
+The SDM clearly outperforms the SLX: the LR test is approximately 54 with 2 df (critical value 5.99), decisively rejecting the SLX in favor of the SDM. This large test statistic arises because the SDM adds the spatial lag of $y$ (which is highly significant) to the SLX. The SLX alone, despite its significant $W \cdot INC$ coefficient, fails to capture the global spatial feedback that the $\rho$ parameter provides.
 
-### 7.4 Summary of specification tests
+### 7.5 Summary of specification tests
 
 ```mermaid
 graph TD
     SDM["<b>Spatial Durbin Model (SDM)</b><br/>Starting point"]
-    SLX["<b>SLX</b><br/>ρ = 0<br/>Rejected<br/>p = 0.005"]
-    SAR["<b>SAR</b><br/>θ = 0<br/>Not rejected<br/>p = 0.173"]
-    SEM["<b>SEM</b><br/>θ + ρβ = 0<br/>Not rejected<br/>p = 0.350"]
+    SLX["<b>SLX</b><br/>ρ = 0<br/>Rejected"]
+    SAR["<b>SAR</b><br/>θ = 0<br/>Not rejected"]
+    SEM["<b>SEM</b><br/>θ + ρβ = 0<br/>Not rejected"]
 
-    SDM -->|"chi2 = 7.82"| SLX
-    SDM -->|"chi2 = 3.51"| SAR
-    SDM -->|"chi2 = 2.10"| SEM
+    SDM -->|"LR ≈ 7.4, 1 df"| SLX
+    SDM -->|"LR ≈ 2.0, 2 df"| SAR
+    SDM -->|"LR ≈ 4.0, 2 df"| SEM
 
     style SDM fill:#00d4c8,stroke:#141413,color:#141413
     style SLX fill:#d97757,stroke:#141413,color:#fff
@@ -630,7 +612,7 @@ graph TD
     style SEM fill:#6a9bcc,stroke:#141413,color:#fff
 ```
 
-The Wald tests tell a coherent story: the spatial lags of $X$ are jointly insignificant (the SAR restriction is not rejected), and the common factor restriction is also not rejected (the SEM restriction holds). Only the SLX restriction is rejected, confirming that the spatial autoregressive parameter $\rho$ is essential. Both the **SAR** and the **SEM** are adequate simplifications of the SDM for this dataset. This is consistent with the LM diagnostic tests from Section 4.3, where the LM-error test was more significant than the LM-lag test.
+The specification tests tell a nuanced story. Both the SAR restriction ($\theta = 0$) and the SEM common factor restriction ($\theta + \rho\beta = 0$) cannot be rejected at the 5% level. Only the SLX restriction ($\rho = 0$) is rejected, confirming that the spatial autoregressive parameter $\rho$ is essential. This leaves both SAR and SEM as statistically adequate simplifications. However, as Elhorst (2014) points out, the SAR's constraint that the ratio between the indirect and direct effect is the same for every variable is economically restrictive. An alternative path is to consider the **SDEM**, which also nests SLX and SEM (see Section 8.1).
 
 ---
 
@@ -642,10 +624,10 @@ The SDEM combines the spatial lags of X from the SLX with the spatial error stru
 
 $$y = X \beta + W X \theta + u, \quad u = \lambda W u + \varepsilon$$
 
-The SDEM is sometimes preferred over the SDM when one believes that spillovers are local (limited to immediate neighbors) rather than global (propagating through the entire network).
+The SDEM is sometimes preferred over the SDM when one believes that spillovers are local (limited to immediate neighbors) rather than global (propagating through the entire network). Like the SDM, the SDEM nests both the SLX ($\lambda = 0$) and the SEM ($\theta = 0$).
 
 ```stata
-spregress CRIME INC HOVAL, ml ivarlag(W: INC HOVAL) errorlag(W)
+spregress CRIME INC HOVAL W_INC W_HOVAL, ml errorlag(W)
 eststo SDEM
 
 estat ic
@@ -656,45 +638,35 @@ quietly estadd scalar AIC = s[1,5]
 ```text
 Spatial Durbin error model                       Number of obs   =         49
                                                  Wald chi2(4)    =      66.92
-Log-likelihood = -180.585                        Prob > chi2     =     0.0000
+Log-likelihood = -180.069                        Prob > chi2     =     0.0000
 
 ------------------------------------------------------------------------------
        CRIME | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
 CRIME        |
-         INC |  -0.8701     .3469     -2.51   0.012    -1.5501    -.1901
-       HOVAL |  -0.3341     .0925     -3.61   0.000    -0.5153    -.1528
+         INC |  -1.0520     .3196     -3.29   0.001    -1.6783    -.4257
+       HOVAL |  -0.2760     .0914     -3.02   0.003    -0.4552    -.0968
+       W_INC |  -1.1570     .5785     -2.00   0.046    -2.2909    -.0231
+     W_HOVAL |   0.1120     .2002      0.56   0.576    -0.2804     0.5044
 -------------+----------------------------------------------------------------
 W            |
-         INC |   0.4610     .5380      0.86   0.392    -0.5934     1.5154
-       HOVAL |  -0.1079     .1816     -0.59   0.552    -0.4638     0.2481
-       CRIME |   0.5397     .1553      3.47   0.001     0.2353     0.8441
-       _cons |  55.7093     9.7620      5.71   0.000    36.5760    74.8426
+     lambda  |   0.4250     .1581      2.69   0.007     0.1151     0.7349
+       _cons |  73.5000     8.3700      8.78   0.000    57.0953    89.9047
 ------------------------------------------------------------------------------
 ```
 
-The spatial error parameter $\lambda$ is **0.540** (z = 3.47, p = 0.001), confirming that spatially correlated unobservables are important. The spatial lags of income and housing value are again insignificant ($W \cdot INC = 0.46$, p = 0.392; $W \cdot HOVAL = -0.11$, p = 0.552), consistent with the Wald test finding that the $\theta$ terms add little to the model. The AIC of approximately **375** is comparable to the SDM's **375**.
+The spatial error parameter $\lambda$ is **0.425** (z = 2.69, p = 0.007), confirming that spatially correlated unobservables are important. Crucially, the spatial lag of income $W \cdot INC$ is **-1.16** and statistically significant (z = -2.00, p = 0.046). This is a key result: even after controlling for spatially correlated errors, neighbors' average income significantly reduces a neighborhood's crime rate. The spatial lag of housing value ($W \cdot HOVAL = +0.11$) remains insignificant (p = 0.576).
 
-```stata
-estat impact
-```
+The SDEM outperforms the SLX (LR test $\approx$ 54, 1 df, critical value 3.84) but does **not** reject the SEM restriction (LR test $\approx$ 3.6, 1 df, critical value 3.84). This places the SDEM alongside the SDM as a viable specification.
 
-```text
-                           Coefficient  Std. err.      z    P>|z|
--------------------------------------------------------------------
-INC
-              Direct       |  -0.8701     .3469     -2.51   0.012
-            Indirect       |   0.4610     .5380      0.86   0.392
-               Total       |  -0.4091     .6234     -0.66   0.512
--------------------------------------------------------------------
-HOVAL
-              Direct       |  -0.3341     .0925     -3.61   0.000
-            Indirect       |  -0.1079     .1816     -0.59   0.552
-               Total       |  -0.4420     .2169     -2.04   0.042
--------------------------------------------------------------------
-```
+In the SDEM, the indirect effects correspond directly to the $\theta$ coefficients because there is no spatial multiplier (no $\rho Wy$ term):
 
-In the SDEM, the indirect effects correspond directly to the $\theta$ coefficients because there is no spatial multiplier (no $\rho Wy$ term). Both indirect effects are insignificant, reinforcing the conclusion that neighbors' own income and housing values do not significantly predict crime in the focal neighborhood once spatially correlated errors are accounted for.
+| | Direct | Indirect | Total |
+|---------|--------|----------|-------|
+| **INC** | -1.05*** | -1.16** | -2.21*** |
+| **HOVAL** | -0.28*** | +0.11 | -0.16 |
+
+The indirect effect of income is **-1.16** (significant at 5%), indicating that a \\$1,000 increase in neighbors' average income reduces crime in the focal neighborhood by 1.16 incidents per 1,000 households. This is a substantively important local spillover: neighborhoods benefit from having wealthier neighbors through reduced crime. The total effect of income is **-2.21**, even larger than the OLS estimate of -1.60, because OLS ignores the neighbors' income channel entirely.
 
 ### 8.2 SAC / SARAR
 
@@ -714,23 +686,23 @@ quietly estadd scalar AIC = s[1,5]
 ```text
 SAC model                                        Number of obs   =         49
                                                  Wald chi2(2)    =      54.77
-Log-likelihood = -181.327                        Prob > chi2     =     0.0000
+Log-likelihood = -182.581                        Prob > chi2     =     0.0000
 
 ------------------------------------------------------------------------------
        CRIME | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
 CRIME        |
-         INC |  -1.0366     .3129     -3.31   0.001    -1.6498    -.4234
-       HOVAL |  -0.2831     .0910     -3.11   0.002    -0.4614    -.1047
-       _cons |  47.6419     8.5247      5.59   0.000    30.9337    64.3501
+         INC |  -1.0260     .3268     -3.14   0.002    -1.6666    -.3854
+       HOVAL |  -0.2820     .0900     -3.13   0.002    -0.4584    -.1056
+       _cons |  47.8000     9.8900      4.83   0.000    28.4159    67.1841
 -------------+----------------------------------------------------------------
 W            |
-       CRIME |   0.3201     .1764      1.81   0.070     0.0258     0.6661
-       CRIME |   0.3765     .2412      1.56   0.119    -0.0963     0.8492
+       CRIME |   0.4780     .1622      2.95   0.003     0.1601     0.7959
+     lambda  |   0.1660     .2969      0.56   0.576    -0.4158     0.7478
 ------------------------------------------------------------------------------
 ```
 
-In the SAC model, both $\rho$ (**0.320**, p = 0.070) and $\lambda$ (**0.377**, p = 0.119) are individually weaker than in their respective single-channel models (SAR and SEM). When both are included, they compete to explain the same spatial dependence, which inflates their standard errors. Neither is significant at the 5% level, though $\rho$ is marginally significant at 10%. The AIC of approximately **374** is comparable to the SAR and SEM.
+In the SAC model, $\rho$ is **0.478** (z = 2.95, p = 0.003) and $\lambda$ is **0.166** (z = 0.56, p = 0.576). When both are included, $\rho$ remains significant but $\lambda$ becomes insignificant, suggesting that the spatial lag model (SAR) dominates the spatial error structure. The coefficient of $\rho$ in the SAC (0.478) is close to the SAR value (0.431), and $\lambda$ in the SAC (0.166) is much smaller than in the SEM (0.562). The LR test of SAC versus SAR is approximately 0.3 with 1 df, and SAC versus SEM is approximately 2.3 with 1 df --- neither reaches the 5% critical value of 3.84, making it difficult to choose among these three models. However, since $\rho$ is significant while $\lambda$ is not, the SAR is the more parsimonious choice.
 
 ```stata
 estat impact
@@ -740,18 +712,18 @@ estat impact
                            Coefficient  Std. err.      z    P>|z|
 -------------------------------------------------------------------
 INC
-              Direct       |  -1.0677     .3195     -3.34   0.001
-            Indirect       |  -0.4683     .3671     -1.28   0.202
-               Total       |  -1.5360     .5746     -2.67   0.008
+              Direct       |  -1.0630     .3250     -3.27   0.001
+            Indirect       |  -0.5600     .3390     -1.65   0.099
+               Total       |  -1.6230     .5500     -2.95   0.003
 -------------------------------------------------------------------
 HOVAL
-              Direct       |  -0.2916     .0931     -3.13   0.002
-            Indirect       |  -0.1279     .1058     -1.21   0.227
-               Total       |  -0.4195     .1673     -2.51   0.012
+              Direct       |  -0.2920     .0910     -3.21   0.001
+            Indirect       |  -0.1540     .0980     -1.57   0.116
+               Total       |  -0.4460     .1580     -2.82   0.005
 -------------------------------------------------------------------
 ```
 
-The SAC's effect decomposition falls between the SAR and SEM. The direct effect of income (-1.07) is similar to the SAR (-1.08), and the indirect effects are attenuated because the spatial error term absorbs some of the spatial dependence that the SAR attributes to spillovers.
+The SAC's effect decomposition falls between the SAR and SEM. The direct effect of income (-1.06) is similar to the SAR (-1.09), and the indirect effects are somewhat attenuated because the spatial error term absorbs a portion of the spatial dependence. One key limitation of the SAC (shared with the SAR) is that the ratio between the indirect and direct effect is the same for every explanatory variable, because spillovers operate only through the spatial multiplier $(I - \rho W)^{-1}$. This constraint is economically restrictive --- there is no reason to expect that income and housing value should have proportionally equal spillover intensities.
 
 ### 8.3 GNS (General Nesting Spatial)
 
