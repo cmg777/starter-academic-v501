@@ -148,25 +148,25 @@ The correlation matrix confirms the confounding structure. Coupons and sales hav
 
 ### 4.1 The naive scatter
 
-The simplest `scatterfit` call plots the raw relationship. The `regparameters()` option prints the regression coefficient and p-value directly on the plot --- a feature unique to this Stata package:
+The simplest `scatterfit` call plots the raw relationship. The `regparameters()` option prints the regression coefficient, p-value, and R-squared directly on the plot --- a feature unique to this Stata package:
 
 ```stata
-scatterfit sales coupons, regparameters(coef pval) ///
+scatterfit sales coupons, regparameters(coef pval r2) ///
     opts(name(naive, replace) title("A. Naive: No Controls"))
 ```
 
-The slope is **-0.093** ($p = 0.019$, meaning there is only a 1.9% chance of seeing this result if coupons truly had no effect): coupons appear to *reduce* sales. This is statistically significant but substantively wrong --- the true effect is +0.2.
+The slope is **-0.093** ($p = 0.018$, $R^2 = 0.028$): coupons appear to *reduce* sales. This is statistically significant but substantively wrong --- the true effect is +0.2. The near-zero R-squared confirms that the naive model explains almost none of the variation in sales.
 
 ### 4.2 Controlling for income: one option
 
 Now add income as a control. In `scatterfit`, the `controls()` option specifies continuous variables to partial out using the FWL procedure. Behind the scenes, `scatterfit` calls `reghdfe` to residualize both sales and coupons on income, then plots the residuals:
 
 ```stata
-scatterfit sales coupons, controls(income) regparameters(coef pval) ///
+scatterfit sales coupons, controls(income) regparameters(coef pval r2) ///
     opts(name(controlled, replace) title("B. FWL: Controlling for Income"))
 ```
 
-The slope reverses to **+0.212** ($p < 0.001$) --- close to the true value of +0.2. Combining both panels:
+The slope reverses to **+0.212** ($p < 0.001$, $R^2 = 0.32$) --- close to the true value of +0.2. The R-squared jumps from 0.03 to 0.32, showing that controlling for income explains a large share of the variation. Combining both panels:
 
 ```stata
 graph combine naive controlled, ///
@@ -174,9 +174,9 @@ graph combine naive controlled, ///
 graph export "stata_fwl_fig1_naive_vs_controlled.png", replace
 ```
 
-![Naive scatter (left) shows a negative slope; after FWL residualization with controls(income), the slope reverses to positive](stata_fwl_fig1_naive_vs_controlled.png)
+![Naive scatter (left) shows a negative slope with R2 of 0.028; after FWL residualization with controls(income), the slope reverses to positive with R2 of 0.32](stata_fwl_fig1_naive_vs_controlled.png)
 
-The left panel shows the raw relationship: more coupons, lower sales. The right panel shows the *same* data after removing the influence of income from both axes via `controls(income)`. The true positive effect of coupons emerges clearly.
+The left panel shows the raw relationship: more coupons, lower sales ($R^2 = 0.028$). The right panel shows the *same* data after removing the influence of income from both axes via `controls(income)`. The true positive effect of coupons emerges clearly, and the $R^2$ rises to 0.32.
 
 ### 4.3 The regression table confirms
 
@@ -279,18 +279,18 @@ The `scatterfit` command handles any number of controls automatically:
 
 ```stata
 scatterfit sales coupons, ///
-    regparameters(coef pval) opts(name(panel_a, replace) title("A. No Controls"))
+    regparameters(coef pval r2) opts(name(panel_a, replace) title("A. No Controls"))
 scatterfit sales coupons, controls(income) ///
-    regparameters(coef pval) opts(name(panel_b, replace) title("B. + Income"))
+    regparameters(coef pval r2) opts(name(panel_b, replace) title("B. + Income"))
 scatterfit sales coupons, controls(income dayofweek) ///
-    regparameters(coef pval) opts(name(panel_c, replace) title("C. + Income + Day"))
+    regparameters(coef pval r2) opts(name(panel_c, replace) title("C. + Income + Day"))
 
 graph combine panel_a panel_b panel_c, ///
     title("Progressive Controls: How the Scatter Changes") rows(1)
 graph export "stata_fwl_fig2_three_panels.png", replace
 ```
 
-![Three-panel progression: no controls (left), controlling for income (center), controlling for income and day of week (right)](stata_fwl_fig2_three_panels.png)
+![Three-panel progression showing coefficient, p-value, and R2: no controls (left, R2 = 0.028), controlling for income (center, R2 = 0.32), controlling for income and day of week (right, R2 = 0.37)](stata_fwl_fig2_three_panels.png)
 
 ```stata
 estimates table m1_naive m2_income m3_full, stats(r2 r2_a N)
@@ -315,7 +315,7 @@ estimates table m1_naive m2_income m3_full, stats(r2 r2_a N)
 --------------------------------------------------
 ```
 
-The coupon coefficient progresses from -0.093 (naive, wrong sign), to +0.212 (controlling for income), to +0.222 (adding day of week). The R-squared jumps from 0.028 to 0.365. Each scatterfit panel shows a tighter cloud as more variation is absorbed by the controls.
+The coupon coefficient progresses from -0.093 (naive, wrong sign), to +0.212 (controlling for income), to +0.222 (adding day of week). The R-squared --- now visible directly on each panel --- jumps from 0.028 to 0.32 to 0.37. Each scatterfit panel shows a tighter cloud as more variation is absorbed by the controls.
 
 ## 6. Binned Scatter Plots
 
@@ -327,19 +327,19 @@ With large datasets (thousands or millions of observations), scatter plots becom
 
 ```stata
 scatterfit sales coupons, controls(income) ///
-    regparameters(coef pval) opts(name(unbinned, replace) title("A. Unbinned (all points)"))
+    regparameters(coef pval r2) opts(name(unbinned, replace) title("A. Unbinned (all points)"))
 
 scatterfit sales coupons, controls(income) binned ///
-    regparameters(coef pval) opts(name(binned, replace) title("B. Binned (20 quantiles)"))
+    regparameters(coef pval r2) opts(name(binned, replace) title("B. Binned (20 quantiles)"))
 
 graph combine unbinned binned, ///
     title("Binned Scatter: Summarizing Patterns in Large Data") rows(1)
 graph export "stata_fwl_fig3_binned_scatter.png", replace
 ```
 
-![Unbinned scatter (left) vs. binned scatter with 20 quantiles (right), both showing the same FWL-residualized relationship](stata_fwl_fig3_binned_scatter.png)
+![Unbinned scatter (left) vs. binned scatter with 20 quantiles (right), both showing the same FWL-residualized relationship with coefficient, p-value, and R2 annotations](stata_fwl_fig3_binned_scatter.png)
 
-Both panels show the same FWL-residualized relationship, but the binned version (right) replaces 200 individual points with 20 bin-mean markers. For our small dataset the difference is modest, but for the flights data (5,000+ observations) or production datasets (millions of rows), binning is essential. The `nquantiles()` option controls how many bins to use:
+Both panels show the same FWL-residualized relationship ($\beta = 0.21$, $R^2 = 0.32$), but the binned version (right) replaces 200 individual points with 20 bin-mean markers. For our small dataset the difference is modest, but for the flights data (5,000+ observations) or production datasets (millions of rows), binning is essential. The `nquantiles()` option controls how many bins to use:
 
 ```stata
 * Fewer bins = smoother but less detail
@@ -379,25 +379,25 @@ The `fcontrols()` option specifies categorical variables to absorb as fixed effe
 
 ```stata
 * No fixed effects
-scatterfit dep_delay air_time, regparameters(coef pval) ///
+scatterfit dep_delay air_time, regparameters(coef pval r2) ///
     opts(name(fe_none, replace) title("A. No Fixed Effects"))
 
 * Origin airport FE
 scatterfit dep_delay air_time, fcontrols(origin_fe) ///
-    regparameters(coef pval) opts(name(fe_origin, replace) title("B. Origin FE"))
+    regparameters(coef pval r2) opts(name(fe_origin, replace) title("B. Origin FE"))
 
 * Origin + destination FE
 scatterfit dep_delay air_time, fcontrols(origin_fe dest_fe) ///
-    regparameters(coef pval) opts(name(fe_both, replace) title("C. Origin + Dest FE"))
+    regparameters(coef pval r2) opts(name(fe_both, replace) title("C. Origin + Dest FE"))
 
 graph combine fe_none fe_origin fe_both, ///
     title("What Do Fixed Effects 'Do' to the Data?") rows(1)
 graph export "stata_fwl_fig4_fixed_effects.png", replace
 ```
 
-![Progressive FWL plots: no FE (left), origin FE (center), origin + destination FE (right)](stata_fwl_fig4_fixed_effects.png)
+![Progressive FWL plots with coefficient, p-value, and R2: no FE (left, R2 near 0), origin FE (center), origin + destination FE (right)](stata_fwl_fig4_fixed_effects.png)
 
-Panel A shows the raw cloud with a nearly flat slope. Panel B removes the three origin-airport means, tightening the horizontal spread. Panel C removes the destination means as well, collapsing the variation to *within-route* deviations. The `fcontrols()` option handles all the demeaning internally using `reghdfe`.
+Panel A shows the raw cloud with a nearly flat slope ($R^2 \approx 0$). Panel B removes the three origin-airport means, tightening the horizontal spread. Panel C removes the destination means as well, collapsing the variation to *within-route* deviations and increasing $R^2$ substantially. The `fcontrols()` option handles all the demeaning internally using `reghdfe`.
 
 ### 7.3 Regression table
 
@@ -501,10 +501,10 @@ egen rank = group(rand) if first
 bysort nr (rank): replace rank = rank[1]
 keep if rank <= 150
 
-scatterfit lwage exper, regparameters(coef pval) ///
+scatterfit lwage exper, regparameters(coef pval r2) ///
     opts(name(wage_raw, replace) title("A. Raw: Pooled Cross-Section"))
 
-scatterfit lwage exper, fcontrols(nr) regparameters(coef pval) ///
+scatterfit lwage exper, fcontrols(nr) regparameters(coef pval r2) ///
     opts(name(wage_fe, replace) title("B. FWL: Individual Fixed Effects"))
 
 graph combine wage_raw wage_fe, ///
@@ -513,9 +513,9 @@ graph export "stata_fwl_fig5_panel_data.png", replace
 restore
 ```
 
-![Raw pooled cross-section (left) vs. individual fixed-effects residualized scatter (right) for log wage vs. experience](stata_fwl_fig5_panel_data.png)
+![Raw pooled cross-section (left, R2 = 0.043) vs. individual fixed-effects residualized scatter (right, R2 = 0.59) for log wage vs. experience](stata_fwl_fig5_panel_data.png)
 
-The visual difference is dramatic. Panel A shows a wide fan with a shallow slope --- individuals at the same experience level have wildly different wages, reflecting unobserved ability. Panel B applies `fcontrols(nr)` to strip away each person's average wage and experience, leaving only *within-person* deviations. The slope steepens sharply: the within-person return to experience is about 0.12 log points per year (roughly 12%), much larger than the pooled bivariate slope. Once we control for who each person is, the experience-wage relationship is much more precisely identified.
+The visual difference is dramatic. Panel A shows a wide fan with a shallow slope ($R^2 = 0.043$) --- individuals at the same experience level have wildly different wages, reflecting unobserved ability. Panel B applies `fcontrols(nr)` to strip away each person's average wage and experience, leaving only *within-person* deviations. The $R^2$ jumps from 0.04 to 0.59, showing that individual fixed effects explain most of the wage variation. The slope steepens sharply: the within-person return to experience is about 0.07 log points per year (roughly 7%), and the relationship is much more precisely identified once we control for who each person is.
 
 ## 9. Advanced: Fit Types and Regression Parameters
 
@@ -600,7 +600,7 @@ Across the three tutorials (Python, R, Stata), the key numbers are the same beca
 | Control for Z | manual `resid()` | `fwl_plot(y ~ x + z)` | `scatterfit y x, controls(z)` |
 | Fixed effects | not supported | `fwl_plot(y ~ x \| fe)` | `scatterfit y x, fcontrols(fe)` |
 | Binned scatter | not supported | not supported | `scatterfit y x, binned` |
-| Stats on plot | not supported | not supported | `regparameters(coef pval)` |
+| Stats on plot | not supported | not supported | `regparameters(coef pval r2)` |
 
 Students who learn FWL in one language can immediately apply it in another.
 

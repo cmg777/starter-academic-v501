@@ -48,12 +48,12 @@ correlate sales coupons income
 
 * 4.1 Naive scatter: coupons appear to hurt sales
 scatterfit sales coupons, ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(43 50) ///
     opts(name(naive, replace) title("A. Naive: No Controls"))
 
 * 4.2 Controlled scatter: FWL reveals the true positive effect
 scatterfit sales coupons, controls(income) ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(43 50) ///
     opts(name(controlled, replace) title("B. FWL: Controlling for Income"))
 
 * Figure 1: Combine naive and controlled
@@ -124,15 +124,15 @@ drop resid_sales resid_coupons
 
 * 5.2 Three-panel progression
 scatterfit sales coupons, ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(43 50) ///
     opts(name(panel_a, replace) title("A. No Controls"))
 
 scatterfit sales coupons, controls(income) ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(43 50) ///
     opts(name(panel_b, replace) title("B. + Income"))
 
 scatterfit sales coupons, controls(income dayofweek) ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(43 50) ///
     opts(name(panel_c, replace) title("C. + Income + Day"))
 
 * Figure 2: Three-panel progression
@@ -160,11 +160,11 @@ estimates table m1_naive m2_income m3_full, ///
 
 * 6.2 Unbinned vs. binned FWL scatter
 scatterfit sales coupons, controls(income) ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(43 50) ///
     opts(name(unbinned, replace) title("A. Unbinned (all points)"))
 
 scatterfit sales coupons, controls(income) binned ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(43 50) ///
     opts(name(binned, replace) title("B. Binned (20 quantiles)"))
 
 * Figure 3: Binned vs. unbinned
@@ -194,15 +194,15 @@ encode dest, gen(dest_fe)
 
 * 7.2 Progressive FE with scatterfit
 scatterfit dep_delay air_time, ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(100 600) ///
     opts(name(fe_none, replace) title("A. No Fixed Effects"))
 
 scatterfit dep_delay air_time, fcontrols(origin_fe) ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(100 600) ///
     opts(name(fe_origin, replace) title("B. Origin FE"))
 
 scatterfit dep_delay air_time, fcontrols(origin_fe dest_fe) ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(100 600) ///
     opts(name(fe_both, replace) title("C. Origin + Dest FE"))
 
 * Figure 4: Progressive FE
@@ -267,11 +267,11 @@ bysort nr (rank): replace rank = rank[1]
 keep if rank <= 150
 
 scatterfit lwage exper, ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(3.5 17) ///
     opts(name(wage_raw, replace) title("A. Raw: Pooled Cross-Section"))
 
 scatterfit lwage exper, fcontrols(nr) ///
-    regparameters(coef pval) ///
+    regparameters(coef pval r2) parpos(2.5 9.5) ///
     opts(name(wage_fe, replace) title("B. FWL: Individual Fixed Effects"))
 
 * Figure 5: Raw vs. individual FE
