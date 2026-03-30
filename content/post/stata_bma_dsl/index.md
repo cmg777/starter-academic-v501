@@ -384,29 +384,27 @@ The PIP chart is BMA's signature output. We color-code bars by ground truth: ste
 
 The PIP chart cleanly separates the variables into two groups. At the top (PIP near 1.0): fossil fuel share, GDP terms, industry, and renewable energy --- all true predictors correctly identified. At the bottom (PIP near 0.0): the seven noise variables (globalization, corruption, services, trade, FDI, credit, population density) plus urban population and democracy. BMA correctly assigns zero-like PIPs to all noise variables, and correctly flags 3 of 5 true predictors as robust. The two misses (urban, democracy) have small true coefficients (0.007 and --0.005), making them genuinely hard to detect.
 
-### 5.6 Variable inclusion map
+### 5.6 Coefficient density plots
 
-The [`bmagraph varmap`](https://www.stata.com/manuals/bmabmagraphvarmap.pdf) command shows which variables are included in each sampled model, ordered by posterior probability.
-
-```stata
-bmagraph varmap
-```
-
-![Variable inclusion map from BMA showing which variables appear in each sampled model. With only 15 variable groups, labels are clearly readable.](stata_bma_dsl_fig4_varmap.png)
-
-The variable inclusion map shows solid bands of color for fossil fuel, industry, renewable energy, and the GDP terms --- these variables appear in virtually every high-probability model. The noise variables flicker in and out with no consistent pattern, confirming they are not robust predictors. With only 15 candidate variable groups (compared to 30 in the original dataset), the map is much easier to read.
-
-### 5.7 Coefficient density plots
-
-The [`bmagraph coefdensity`](https://www.stata.com/manuals/bmabmagraphcoefdensity.pdf) command shows the posterior distribution of each coefficient across all sampled models.
+The [`bmagraph coefdensity`](https://www.stata.com/manuals/bmabmagraphcoefdensity.pdf) command shows the posterior distribution of each coefficient across all sampled models. We generate individual density plots for the six variables with PIP > 0.95 and combine them into a single figure:
 
 ```stata
-bmagraph coefdensity $gdp_vars
+* Generate density for each high-PIP variable, then combine
+bmagraph coefdensity ln_gdp, title("GDP (log)") name(dens_gdp, replace)
+bmagraph coefdensity ln_gdp_sq, title("GDP squared") name(dens_gdp_sq, replace)
+bmagraph coefdensity ln_gdp_cb, title("GDP cubed") name(dens_gdp_cb, replace)
+bmagraph coefdensity fossil_fuel, title("Fossil fuel share") name(dens_fossil, replace)
+bmagraph coefdensity renewable, title("Renewable energy") name(dens_renew, replace)
+bmagraph coefdensity industry, title("Industry VA") name(dens_industry, replace)
+
+graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
+    dens_fossil dens_renew dens_industry, ///
+    cols(3) rows(2) title("BMA: Posterior Coefficient Densities")
 ```
 
-![Posterior coefficient density plots for the three GDP polynomial terms from BMA.](stata_bma_dsl_fig5_coefdensity.png)
+![Posterior coefficient density plots for six variables with PIP above 0.95. Top row: the three GDP polynomial terms. Bottom row: fossil fuel share, renewable energy, and industry VA. All densities are concentrated well away from zero.](stata_bma_dsl_fig4_coefdensity.png)
 
-The coefficient densities for all three GDP terms are concentrated well away from zero, consistent with their PIPs near 1.0. The cubic term ($\beta\_3$) has a density centered near --0.030, matching the true DGP value almost exactly. The tight, unimodal shapes confirm the inverted-N finding is robust across the model space, not driven by a handful of outlier models.
+The six densities tell a clear story. The GDP terms (top row) are tightly concentrated around their true values: $\beta\_1$ near --7.1, $\beta\_2$ near 0.81, $\beta\_3$ near --0.030. The control variables (bottom row) are also well away from zero: fossil fuel is centered near +0.014 (true: +0.015), renewable energy near --0.007 (true: --0.010), and industry near +0.009 (true: +0.010). None of these densities show a meaningful spike at zero, confirming these are genuinely robust predictors across the model space.
 
 
 ## 6. Double-Selection LASSO
@@ -525,7 +523,7 @@ LASSO selected 100 of the 112 candidate controls (which include 80 country dummi
 
 The curves are normalized to zero at the sample-mean GDP so both methods are directly comparable:
 
-![Predicted EKC curves from BMA and DSL, normalized at the sample mean. Both methods trace a clear inverted-N shape with closely aligned turning points.](stata_bma_dsl_fig6_ekc_curves.png)
+![Predicted EKC curves from BMA and DSL, normalized at the sample mean. Both methods trace a clear inverted-N shape with closely aligned turning points.](stata_bma_dsl_fig5_ekc_curves.png)
 
 Both curves trace a clear inverted-N: CO<sub>2</sub> falls at low incomes, rises through industrialization, and falls again at high incomes. The BMA curve (solid blue) and DSL curve (dashed orange) are nearly indistinguishable, with turning points closely aligned. The normalization at mean GDP makes the shape immediately visible --- a major improvement over plotting raw cubic components that would sit at different y-levels.
 
@@ -533,7 +531,7 @@ Both curves trace a clear inverted-N: CO<sub>2</sub> falls at low incomes, rises
 
 The ultimate test: do BMA and DSL correctly identify the 5 true predictors and reject the 7 noise variables?
 
-![Dot plot showing BMA Posterior Inclusion Probabilities for each variable, color-coded by ground truth. True predictors (circles, blue) cluster above the 0.5 threshold; noise variables (diamonds, gray) cluster below it.](stata_bma_dsl_fig7_answer_key.png)
+![Dot plot showing BMA Posterior Inclusion Probabilities for each variable, color-coded by ground truth. True predictors (circles, blue) cluster above the 0.5 threshold; noise variables (diamonds, gray) cluster below it.](stata_bma_dsl_fig6_answer_key.png)
 
 **BMA's report card:** Of the 8 true predictors (3 GDP terms + 5 controls), BMA correctly assigns PIP > 0.5 to 6 --- the three GDP terms, fossil fuel, industry, and renewable energy. It misses urban (PIP ~ 0.05) and democracy (PIP ~ 0.10), whose true coefficients are small (0.007 and --0.005). All 7 noise variables receive PIPs well below 0.5. BMA makes **zero false positives** (no noise variable incorrectly flagged as important) and **two false negatives** (two weak true predictors missed).
 

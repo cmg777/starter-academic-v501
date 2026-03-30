@@ -3,7 +3,7 @@
        log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_bma_
 > dsl/analysis.log
   log type:  text
- opened on:  31 Mar 2026, 00:18:13
+ opened on:  31 Mar 2026, 08:11:08
 
 . 
 . display _newline "============================================="
@@ -17,16 +17,15 @@
   Data: Synthetic panel (80 countries, 1995-2014)
 
 . display "  Started: $S_DATE $S_TIME"
-  Started: 31 Mar 2026 00:18:13
+  Started: 31 Mar 2026 08:11:08
 
 . display "============================================="
 =============================================
 
 . 
-. * Load synthetic data (use local file; GitHub URL available after push)
-. * GitHub URL: https://github.com/cmg777/starter-academic-v501/raw/master/cont
-> ent/post/stata_bma_dsl/synthetic_ekc_panel.csv
-. import delimited "synthetic_ekc_panel.csv", clear
+. * Load synthetic data from GitHub for reproducibility
+. import delimited "https://github.com/cmg777/starter-academic-v501/raw/master/
+> content/post/stata_bma_dsl/synthetic_ekc_panel.csv", clear
 (encoding automatically selected: ISO-8859-1)
 (18 vars, 1,600 obs)
 
@@ -490,7 +489,7 @@ Saved: stata_bma_dsl_fig2_instability.png
   BMA ESTIMATION
 
 . display "  Starting: $S_DATE $S_TIME"
-  Starting: 31 Mar 2026 00:18:19
+  Starting: 31 Mar 2026 08:11:15
 
 . display "============================================="
 =============================================
@@ -647,7 +646,7 @@ file _bma_temp.dta not found; file saved.
 . 
 . display _newline "BMA completed: $S_DATE $S_TIME"
 
-BMA completed: 31 Mar 2026 00:18:33
+BMA completed: 31 Mar 2026 08:11:27
 
 . estimates store bma_uip
 
@@ -1125,45 +1124,61 @@ Saved: stata_bma_dsl_fig3_pip.png
 
 . 
 . *---------------------------------------------*
-. * 4d. Variable inclusion map -- Figure 4      *
+. * 4d. Coefficient densities -- Figure 4       *
 . *---------------------------------------------*
-. estimates restore bma_uip
-(results bma_uip are active now)
+. * bmagraph coefdensity with multiple vars shows only the last one.
+. * Generate individual density plots and combine them.
+. 
+. bmagraph coefdensity ln_gdp, ///
+>     title("GDP (log)", size(medium)) ///
+>     name(dens_gdp, replace)
 
 . 
-. bmagraph varmap, ///
->     title("BMA: Variable Inclusion Map", size(medium)) ///
->     subtitle("Each column is a model, ordered by posterior probability", size
-> (small)) ///
->     name(fig4_varmap, replace)
-
-Computing model probabilities ...
+. bmagraph coefdensity ln_gdp_sq, ///
+>     title("GDP squared", size(medium)) ///
+>     name(dens_gdp_sq, replace)
 
 . 
-. graph export "stata_bma_dsl_fig4_varmap.png", replace width(2400)
-file stata_bma_dsl_fig4_varmap.png written in PNG format
-
-. display _newline "Saved: stata_bma_dsl_fig4_varmap.png"
-
-Saved: stata_bma_dsl_fig4_varmap.png
+. bmagraph coefdensity ln_gdp_cb, ///
+>     title("GDP cubed", size(medium)) ///
+>     name(dens_gdp_cb, replace)
 
 . 
-. *---------------------------------------------*
-. * 4e. Coefficient density -- Figure 5         *
-. *---------------------------------------------*
-. bmagraph coefdensity $gdp_vars, ///
->     title("BMA: Posterior Coefficient Densities (GDP Terms)", size(medium)) /
-> //
->     subtitle("Density far from zero = strong evidence", size(small)) ///
->     name(fig5_density, replace)
+. bmagraph coefdensity fossil_fuel, ///
+>     title("Fossil fuel share", size(medium)) ///
+>     name(dens_fossil, replace)
 
 . 
-. graph export "stata_bma_dsl_fig5_coefdensity.png", replace width(2400)
-file stata_bma_dsl_fig5_coefdensity.png written in PNG format
+. bmagraph coefdensity renewable, ///
+>     title("Renewable energy", size(medium)) ///
+>     name(dens_renew, replace)
 
-. display _newline "Saved: stata_bma_dsl_fig5_coefdensity.png"
+. 
+. bmagraph coefdensity industry, ///
+>     title("Industry VA", size(medium)) ///
+>     name(dens_industry, replace)
 
-Saved: stata_bma_dsl_fig5_coefdensity.png
+. 
+. graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
+>     dens_fossil dens_renew dens_industry, ///
+>     cols(3) rows(2) ///
+>     title("BMA: Posterior Coefficient Densities", size(medium)) ///
+>     subtitle("Density far from zero = strong evidence the variable matters", 
+> size(small)) ///
+>     note("Top row: GDP polynomial terms. Bottom row: strongest true controls.
+> " ///
+>          "All six variables have PIP > 0.95.") ///
+>     scheme(s2color) xsize(12) ysize(8) ///
+>     name(fig4_density, replace)
+
+. 
+. graph export "stata_bma_dsl_fig4_coefdensity.png", replace width(2400)
+(file stata_bma_dsl_fig4_coefdensity.png not found)
+file stata_bma_dsl_fig4_coefdensity.png written in PNG format
+
+. display _newline "Saved: stata_bma_dsl_fig4_coefdensity.png"
+
+Saved: stata_bma_dsl_fig4_coefdensity.png
 
 . 
 . 
@@ -1181,7 +1196,7 @@ Saved: stata_bma_dsl_fig5_coefdensity.png
   DSL ESTIMATION
 
 . display "  Starting: $S_DATE $S_TIME"
-  Starting: 31 Mar 2026 00:18:39
+  Starting: 31 Mar 2026 08:11:36
 
 . display "============================================="
 =============================================
@@ -1218,7 +1233,7 @@ Note: Chi-squared test is a Wald test of the coefficients of the variables
 . 
 . display _newline "DSL completed: $S_DATE $S_TIME"
 
-DSL completed: 31 Mar 2026 00:18:41
+DSL completed: 31 Mar 2026 08:11:38
 
 . estimates store dsl_plugin
 
@@ -1427,15 +1442,16 @@ Number of observations (_N) was 0, now 500.
 >          "Vertical dashed lines mark turning points (blue = BMA, orange = DSL
 > ).") ///
 >     scheme(s2color) ///
->     name(fig6_ekc, replace)
+>     name(fig5_ekc, replace)
 
 . 
-. graph export "stata_bma_dsl_fig6_ekc_curves.png", replace width(2400)
-file stata_bma_dsl_fig6_ekc_curves.png written in PNG format
+. graph export "stata_bma_dsl_fig5_ekc_curves.png", replace width(2400)
+(file stata_bma_dsl_fig5_ekc_curves.png not found)
+file stata_bma_dsl_fig5_ekc_curves.png written in PNG format
 
-. display _newline "Saved: stata_bma_dsl_fig6_ekc_curves.png"
+. display _newline "Saved: stata_bma_dsl_fig5_ekc_curves.png"
 
-Saved: stata_bma_dsl_fig6_ekc_curves.png
+Saved: stata_bma_dsl_fig5_ekc_curves.png
 
 . restore
 
@@ -1811,15 +1827,16 @@ variable label was str22 now str23
 >          "Only candidate variables shown (country and year FE excluded).") //
 > /
 >     scheme(s2color) ysize(7) xsize(9) ///
->     name(fig7_answer, replace)
+>     name(fig6_answer, replace)
 
 . 
-. graph export "stata_bma_dsl_fig7_answer_key.png", replace width(2400)
-file stata_bma_dsl_fig7_answer_key.png written in PNG format
+. graph export "stata_bma_dsl_fig6_answer_key.png", replace width(2400)
+(file stata_bma_dsl_fig6_answer_key.png not found)
+file stata_bma_dsl_fig6_answer_key.png written in PNG format
 
-. display _newline "Saved: stata_bma_dsl_fig7_answer_key.png"
+. display _newline "Saved: stata_bma_dsl_fig6_answer_key.png"
 
-Saved: stata_bma_dsl_fig7_answer_key.png
+Saved: stata_bma_dsl_fig6_answer_key.png
 
 . restore
 
@@ -1955,7 +1972,7 @@ Saved: stata_bma_dsl_comparison.csv
 =============================================
 
 . display "  TUTORIAL COMPLETE: $S_DATE $S_TIME"
-  TUTORIAL COMPLETE: 31 Mar 2026 00:18:44
+  TUTORIAL COMPLETE: 31 Mar 2026 08:11:42
 
 . display "============================================="
 =============================================
@@ -1976,17 +1993,15 @@ Output files:
 . display "  stata_bma_dsl_fig3_pip.png         -- BMA PIPs (color-coded)"
   stata_bma_dsl_fig3_pip.png         -- BMA PIPs (color-coded)
 
-. display "  stata_bma_dsl_fig4_varmap.png      -- BMA variable inclusion map"
-  stata_bma_dsl_fig4_varmap.png      -- BMA variable inclusion map
+. display "  stata_bma_dsl_fig4_coefdensity.png -- BMA coefficient densities (6
+>  panels)"
+  stata_bma_dsl_fig4_coefdensity.png -- BMA coefficient densities (6 panels)
 
-. display "  stata_bma_dsl_fig5_coefdensity.png -- BMA coefficient densities"
-  stata_bma_dsl_fig5_coefdensity.png -- BMA coefficient densities
+. display "  stata_bma_dsl_fig5_ekc_curves.png  -- EKC curves (normalized)"
+  stata_bma_dsl_fig5_ekc_curves.png  -- EKC curves (normalized)
 
-. display "  stata_bma_dsl_fig6_ekc_curves.png  -- EKC curves (normalized)"
-  stata_bma_dsl_fig6_ekc_curves.png  -- EKC curves (normalized)
-
-. display "  stata_bma_dsl_fig7_answer_key.png  -- answer key evaluation"
-  stata_bma_dsl_fig7_answer_key.png  -- answer key evaluation
+. display "  stata_bma_dsl_fig6_answer_key.png  -- answer key evaluation"
+  stata_bma_dsl_fig6_answer_key.png  -- answer key evaluation
 
 . display "  stata_bma_dsl_comparison.csv       -- coefficient comparison"
   stata_bma_dsl_comparison.csv       -- coefficient comparison
@@ -1999,5 +2014,5 @@ Output files:
        log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_bma_
 > dsl/analysis.log
   log type:  text
- closed on:  31 Mar 2026, 00:18:44
+ closed on:  31 Mar 2026, 08:11:42
 -------------------------------------------------------------------------------

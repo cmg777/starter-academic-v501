@@ -370,28 +370,47 @@ display _newline "Saved: stata_bma_dsl_fig3_pip.png"
 restore
 
 *---------------------------------------------*
-* 4d. Variable inclusion map -- Figure 4      *
+* 4d. Coefficient densities -- Figure 4       *
 *---------------------------------------------*
-estimates restore bma_uip
+* bmagraph coefdensity with multiple vars shows only the last one.
+* Generate individual density plots and combine them.
 
-bmagraph varmap, ///
-    title("BMA: Variable Inclusion Map", size(medium)) ///
-    subtitle("Each column is a model, ordered by posterior probability", size(small)) ///
-    name(fig4_varmap, replace)
+bmagraph coefdensity ln_gdp, ///
+    title("GDP (log)", size(medium)) ///
+    name(dens_gdp, replace)
 
-graph export "stata_bma_dsl_fig4_varmap.png", replace width(2400)
-display _newline "Saved: stata_bma_dsl_fig4_varmap.png"
+bmagraph coefdensity ln_gdp_sq, ///
+    title("GDP squared", size(medium)) ///
+    name(dens_gdp_sq, replace)
 
-*---------------------------------------------*
-* 4e. Coefficient density -- Figure 5         *
-*---------------------------------------------*
-bmagraph coefdensity $gdp_vars, ///
-    title("BMA: Posterior Coefficient Densities (GDP Terms)", size(medium)) ///
-    subtitle("Density far from zero = strong evidence", size(small)) ///
-    name(fig5_density, replace)
+bmagraph coefdensity ln_gdp_cb, ///
+    title("GDP cubed", size(medium)) ///
+    name(dens_gdp_cb, replace)
 
-graph export "stata_bma_dsl_fig5_coefdensity.png", replace width(2400)
-display _newline "Saved: stata_bma_dsl_fig5_coefdensity.png"
+bmagraph coefdensity fossil_fuel, ///
+    title("Fossil fuel share", size(medium)) ///
+    name(dens_fossil, replace)
+
+bmagraph coefdensity renewable, ///
+    title("Renewable energy", size(medium)) ///
+    name(dens_renew, replace)
+
+bmagraph coefdensity industry, ///
+    title("Industry VA", size(medium)) ///
+    name(dens_industry, replace)
+
+graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
+    dens_fossil dens_renew dens_industry, ///
+    cols(3) rows(2) ///
+    title("BMA: Posterior Coefficient Densities", size(medium)) ///
+    subtitle("Density far from zero = strong evidence the variable matters", size(small)) ///
+    note("Top row: GDP polynomial terms. Bottom row: strongest true controls." ///
+         "All six variables have PIP > 0.95.") ///
+    scheme(s2color) xsize(12) ysize(8) ///
+    name(fig4_density, replace)
+
+graph export "stata_bma_dsl_fig4_coefdensity.png", replace width(2400)
+display _newline "Saved: stata_bma_dsl_fig4_coefdensity.png"
 
 
 *=============================================================================*
@@ -512,10 +531,10 @@ twoway ///
     note("Curves normalized to zero at sample-mean GDP." ///
          "Vertical dashed lines mark turning points (blue = BMA, orange = DSL).") ///
     scheme(s2color) ///
-    name(fig6_ekc, replace)
+    name(fig5_ekc, replace)
 
-graph export "stata_bma_dsl_fig6_ekc_curves.png", replace width(2400)
-display _newline "Saved: stata_bma_dsl_fig6_ekc_curves.png"
+graph export "stata_bma_dsl_fig5_ekc_curves.png", replace width(2400)
+display _newline "Saved: stata_bma_dsl_fig5_ekc_curves.png"
 restore
 
 *---------------------------------------------*
@@ -593,10 +612,10 @@ graph twoway ///
     note("Dashed line = 0.5 threshold. Circle = true predictor, diamond = noise." ///
          "Only candidate variables shown (country and year FE excluded).") ///
     scheme(s2color) ysize(7) xsize(9) ///
-    name(fig7_answer, replace)
+    name(fig6_answer, replace)
 
-graph export "stata_bma_dsl_fig7_answer_key.png", replace width(2400)
-display _newline "Saved: stata_bma_dsl_fig7_answer_key.png"
+graph export "stata_bma_dsl_fig6_answer_key.png", replace width(2400)
+display _newline "Saved: stata_bma_dsl_fig6_answer_key.png"
 restore
 
 *---------------------------------------------*
@@ -659,10 +678,9 @@ display "  analysis.log                       -- this log"
 display "  stata_bma_dsl_fig1_scatter.png     -- scatter plot"
 display "  stata_bma_dsl_fig2_instability.png -- coefficient instability"
 display "  stata_bma_dsl_fig3_pip.png         -- BMA PIPs (color-coded)"
-display "  stata_bma_dsl_fig4_varmap.png      -- BMA variable inclusion map"
-display "  stata_bma_dsl_fig5_coefdensity.png -- BMA coefficient densities"
-display "  stata_bma_dsl_fig6_ekc_curves.png  -- EKC curves (normalized)"
-display "  stata_bma_dsl_fig7_answer_key.png  -- answer key evaluation"
+display "  stata_bma_dsl_fig4_coefdensity.png -- BMA coefficient densities (6 panels)"
+display "  stata_bma_dsl_fig5_ekc_curves.png  -- EKC curves (normalized)"
+display "  stata_bma_dsl_fig6_answer_key.png  -- answer key evaluation"
 display "  stata_bma_dsl_comparison.csv       -- coefficient comparison"
 
 capture erase "_bma_temp.dta"
