@@ -46,7 +46,6 @@ toc: true
 diagram: true
 ---
 
-
 ## 1. Overview
 
 Can countries grow their way out of pollution? The **Environmental Kuznets Curve (EKC)** hypothesis says yes --- up to a point. As economies develop, pollution first rises with industrialization and then falls as countries grow wealthy enough to afford cleaner technology. But recent research suggests a more complex **inverted-N** shape: pollution falls at very low incomes, rises through industrialization, and then falls again at high incomes.
@@ -85,7 +84,6 @@ We use **synthetic panel data** with a known "answer key" --- we designed the da
 - Implement post-double-selection LASSO with `dsregress` and understand its four-step algorithm: LASSO on outcome, LASSO on each variable of interest, union, then OLS
 - Evaluate both methods against a known ground truth to assess their accuracy
 
-
 ## 2. Setup and Synthetic Data
 
 ### 2.1 Why synthetic data?
@@ -104,22 +102,22 @@ In words, log CO<sub>2</sub> depends on a cubic function of log GDP (producing t
 
 The **answer key** --- which variables are true predictors and which are noise:
 
-| Variable | Group | In DGP? | True coefficient | Effect on CO<sub>2</sub> |
-|----------|-------|---------|-----------------|--------------------------|
-| `fossil_fuel` | Energy | **Yes** | +0.015 | More fossil fuels → more CO<sub>2</sub> |
-| `renewable` | Energy | **Yes** | --0.010 | More renewables → less CO<sub>2</sub> |
-| `urban` | Socio | **Yes** | +0.007 | More urbanization → more CO<sub>2</sub> |
-| `democracy` | Institutional | **Yes** | --0.005 | More democracy → less CO<sub>2</sub> |
-| `industry` | Economic | **Yes** | +0.010 | More industry → more CO<sub>2</sub> |
-| `globalization` | Socio | No | 0 | Noise (but correlated with GDP) |
-| `pop_density` | Socio | No | 0 | Noise |
-| `corruption` | Institutional | No | 0 | Noise |
-| `services` | Economic | No | 0 | Noise (but correlated with GDP) |
-| `trade` | Economic | No | 0 | Noise (but correlated with GDP) |
-| `fdi` | Economic | No | 0 | Noise |
-| `credit` | Economic | No | 0 | Noise (but correlated with GDP) |
+| Variable | Group | In DGP? | True coef. | GDP corr. | Role |
+|----------|-------|---------|-----------|-----------|------|
+| `fossil_fuel` | Energy | **Yes** | +0.015 | moderate | More fossil fuels → more CO<sub>2</sub> |
+| `renewable` | Energy | **Yes** | --0.010 | moderate | More renewables → less CO<sub>2</sub> |
+| `urban` | Socio | **Yes** | +0.007 | moderate | More urbanization → more CO<sub>2</sub> |
+| `democracy` | Institutional | **Yes** | --0.005 | low | More democracy → less CO<sub>2</sub> |
+| `industry` | Economic | **Yes** | +0.010 | moderate | More industry → more CO<sub>2</sub> |
+| `globalization` | Socio | No | 0 | **high** | Noise --- tricky (correlated with GDP) |
+| `pop_density` | Socio | No | 0 | low | Noise |
+| `corruption` | Institutional | No | 0 | low | Noise |
+| `services` | Economic | No | 0 | **high** | Noise --- tricky (correlated with GDP) |
+| `trade` | Economic | No | 0 | moderate | Noise --- tricky (correlated with GDP) |
+| `fdi` | Economic | No | 0 | low | Noise |
+| `credit` | Economic | No | 0 | moderate | Noise --- tricky (correlated with GDP) |
 
-Several noise variables (`globalization`, `services`, `trade`, `credit`) are deliberately correlated with GDP. This makes the selection problem harder --- a naive regression would find them "significant" because they piggyback on GDP's true effect.
+The "GDP corr." column is key to understanding why this problem is non-trivial. Four noise variables (`globalization`, `services`, `trade`, `credit`) are deliberately correlated with GDP. A naive regression would find them "significant" because they piggyback on GDP's true effect. The challenge for BMA and DSL is to see through this correlation and correctly identify that only the 5 true controls belong in the model.
 
 ### 2.3 Load the data
 
@@ -165,12 +163,19 @@ summarize $outcome $gdp_vars $controls
    ln_gdp_cb |      1,600    931.105     373.829   339.2306   1715.243
  fossil_fuel |      1,600    54.7724    19.14168    6.36807         95
    renewable |      1,600    29.5413    11.96568          1    64.2207
-       urban |      1,600    61.3267    16.51937   12.96508         95
-         ... |      (remaining controls shown in full log)
+       urban |      1,600    53.6742     14.778   15.95174   91.63234
+globalizat~n |      1,600    57.6498    12.71537   26.75758         95
+ pop_density |      1,600    121.344    210.2646          1   1571.771
+   democracy |      1,600    2.33346    4.179503  -6.12244         10
+  corruption |      1,600    52.3523    28.52792          0        100
+    industry |      1,600    24.6433    6.180478   5.843938   45.32926
+    services |      1,600    43.5598    9.366089   17.82623   64.07455
+       trade |      1,600    67.4355    19.36148   10.04306   128.0595
+         fdi |      1,600    2.98237    4.373857  -11.50437   16.19903
+      credit |      1,600    53.4402    18.20204   11.32991   123.2399
 ```
 
 The dataset contains 1,600 observations from 80 countries over 20 years (1995--2014). Log GDP per capita ranges from 6.97 to 11.97, spanning the full income spectrum from about \\$1,065 to \\$158,000 in synthetic international dollars. Log CO<sub>2</sub> has a mean of --19.04 with substantial variation (standard deviation 0.79), reflecting the wide range of development levels in our synthetic panel.
-
 
 ## 3. Exploratory Data Analysis
 
@@ -209,8 +214,7 @@ graph TD
     style P3 fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
-For an inverted-N, we need $\beta\_1 < 0$, $\beta\_2 > 0$, $\beta\_3 < 0$. Our synthetic DGP was designed with exactly this sign pattern ($\beta\_1 = -7.1$, $\beta\_2 = 0.81$, $\beta\_3 = -0.03$), so BMA and DSL should recover it --- but can they also correctly identify which of the 12 controls truly matter?
-
+For an inverted-N, we need $\beta\_1 < 0$, $\beta\_2 > 0$, $\beta\_3 < 0$. Our synthetic DGP was designed with exactly this sign pattern ($\beta\_1 = -7.1$, $\beta\_2 = 0.81$, $\beta\_3 = -0.03$), so BMA and DSL should recover it --- but can they also correctly identify which of the 12 controls truly matter? Let us start with standard panel regressions to see how sensitive the GDP coefficients are to the choice of controls.
 
 ## 4. Baseline --- Standard Fixed Effects
 
@@ -258,11 +262,19 @@ HDFE Linear regression                            Number of obs   =      1,600
  fossil_fuel |   .0138444   .0013164    10.52   0.000
    renewable |   -.006795   .0019783    -3.43   0.001
        urban |   .0057534   .0025655     2.24   0.025
-         ... |   (see analysis.log for full output)
+globalizat~n |   .0015186   .0012978     1.17   0.242
+ pop_density |   .0000794   .0003123     0.25   0.799
+   democracy |  -.0002971   .0076989    -0.04   0.969
+  corruption |   .0009812   .0008083     1.21   0.225
+    industry |   .0086336   .0020061     4.30   0.000
+    services |  -.0005642   .0019249    -0.29   0.769
+       trade |  -.0002458   .0007895    -0.31   0.756
+         fdi |  -.0017599   .0019212    -0.92   0.360
+      credit |    -.00139   .0008142    -1.71   0.088
 ------------------------------------------------------------------------------
 ```
 
-Adding all 12 controls raises the within R² from 0.40 to 0.73, confirming the controls carry substantial explanatory power.
+Adding all 12 controls raises the within R² from 0.40 to 0.73, confirming the controls carry substantial explanatory power. Notice that the five true predictors (fossil fuel, renewable, urban, democracy, industry) have the expected signs, while most noise variables are statistically insignificant --- but a researcher without the answer key would not know which is which.
 
 ### 4.3 The model uncertainty problem
 
@@ -286,7 +298,6 @@ $$x^* = \frac{-\hat{\beta}\_2 \pm \sqrt{\hat{\beta}\_2^2 - 3\hat{\beta}\_1\hat{\
 | Maximum (CO<sub>2</sub> starts falling) | \\$25,656 | \\$27,694 | \\$34,647 |
 
 The turning points shift modestly between specifications --- the minimum stays near \\$2,400--\\$2,500 while the maximum moves from \\$25,656 to \\$27,694 depending on controls. Neither matches the true DGP values perfectly, motivating BMA and DSL as principled alternatives to ad hoc control selection.
-
 
 ## 5. Bayesian Model Averaging
 
@@ -364,6 +375,8 @@ Sampling correlation = 0.9997
 Note: 9 predictors with PIP less than .5 not shown.
 ```
 
+> The Stata output says "PIP less than .5" because that is the default display threshold. We set `pipcutoff(0.8)` to use a stricter robustness criterion --- variables shown in the table all exceed 0.80.
+
 BMA sampled 163 distinct models with a very high sampling correlation of 0.9997. Six variables have PIP above the 0.80 robustness threshold: the three GDP terms (PIP = 0.994--1.000) and three of the five true controls --- fossil fuel (PIP = 1.000), industry (PIP = 0.999), and renewable energy (PIP = 0.959). The BMA posterior means (--7.139, 0.808, --0.030) are remarkably close to the true DGP values (--7.100, 0.810, --0.030), substantially closer than the sparse FE estimates.
 
 Two true controls --- urban (coefficient 0.007) and democracy (coefficient --0.005) --- have PIPs well below 0.80. Their true effects are small, making them hard to distinguish from noise. This is a realistic limitation: even a powerful method like BMA struggles with weak signals.
@@ -375,7 +388,7 @@ Using the BMA posterior means, the turning points are:
 - **Minimum:** \\$2,411 GDP per capita (true: \\$1,895)
 - **Maximum:** \\$27,269 GDP per capita (true: \\$34,647)
 
-Both turning points are in the right ballpark but not exact --- the maximum is underestimated because the BMA cubic coefficient (--0.030) is slightly less negative than the true value (--0.030). The inverted-N shape is clearly recovered.
+Both turning points are in the right ballpark but not exact. The turning point formula amplifies small differences across all three coefficients --- even though each BMA posterior mean is within 1% of the true DGP value, the compound effect shifts the maximum turning point from \\$34,647 (true) to \\$27,269 (BMA). The inverted-N shape is clearly recovered.
 
 ### 5.5 Posterior Inclusion Probabilities
 
@@ -406,7 +419,6 @@ graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
 ![Posterior coefficient density plots for six variables with PIP above 0.95. Top row: the three GDP polynomial terms. Bottom row: fossil fuel share, renewable energy, and industry VA. All densities are concentrated well away from zero.](stata_bma_dsl_fig4_coefdensity.png)
 
 The six densities tell a clear story. The GDP terms (top row) are tightly concentrated around their true values: $\beta\_1$ near --7.1, $\beta\_2$ near 0.81, $\beta\_3$ near --0.030. The control variables (bottom row) are also well away from zero: fossil fuel is centered near +0.014 (true: +0.015), renewable energy near --0.007 (true: --0.010), and industry near +0.009 (true: +0.010). None of these densities show a meaningful spike at zero, confirming these are genuinely robust predictors across the model space.
-
 
 ## 6. Post-Double-Selection LASSO
 
@@ -485,7 +497,7 @@ Post-double-selection completed in seconds. Internally, `dsregress` ran four sep
 - **Minimum:** \\$2,478 GDP per capita (true: \\$1,895)
 - **Maximum:** \\$25,656 GDP per capita (true: \\$34,647)
 
-The DSL turning points are similar to the sparse FE values, reflecting the same coefficient estimates.
+The post-double-selection turning points are numerically identical to the sparse FE values. This is because LASSO selected 100 of 112 controls at each step --- nearly all of them --- so the union in Step 3 includes essentially every control, making the final OLS in Step 4 equivalent to the sparse specification. In datasets with fewer informative controls (e.g., cross-sectional data without country FE dummies), LASSO would be more selective.
 
 ### 6.4 LASSO selection
 
@@ -510,7 +522,6 @@ lassoinfo
 
 The `lassoinfo` output shows each of the four LASSO steps (one for the outcome, three for the GDP terms). Each step selected about 100 of the 112 candidate controls. The 112 candidates include 80 country dummies, 19 year dummies, and the 12 candidate variables plus the constant. Since most country and year dummies are informative in panel data, LASSO retains them while zeroing out only about 12 of the weakest candidates at each step. The union across all four steps (Step 3 of the algorithm) yields the final control set for the OLS regression in Step 4. Because so many controls survive selection, the post-double-selection estimate ends up close to the kitchen-sink FE --- this is expected when the candidate set is dominated by informative fixed effects.
 
-
 ## 7. Head-to-Head Comparison
 
 ### 7.1 Coefficient comparison
@@ -522,6 +533,8 @@ The `lassoinfo` output shows each of the four LASSO steps (one for the outcome, 
 | $\beta\_3$ (GDP³) | --0.031 | --0.030 | --0.030 | --0.031 | --0.030 |
 | **Min TP** | \\$2,478 | \\$2,426 | \\$2,411 | \\$2,478 | \\$1,895 |
 | **Max TP** | \\$25,656 | \\$27,694 | \\$27,269 | \\$25,656 | \\$34,647 |
+
+Note that the DSL column is identical to Sparse FE --- this is not a copy-paste error. Because LASSO selected nearly all controls (dominated by informative country and year dummies), the post-double-selection final OLS coincides with the sparse specification. BMA and Kitchen-Sink FE, by contrast, produce estimates closer to the true DGP.
 
 ### 7.2 Predicted EKC curves
 
@@ -543,7 +556,6 @@ The ultimate test: do BMA and DSL correctly identify the 5 true predictors and r
 
 **Bottom line:** Both methods recover the inverted-N EKC shape. BMA provides more granular variable-level inference (PIPs), while DSL provides fast, valid coefficient estimates. The synthetic data "answer key" confirms that both are doing their job --- with the expected limitation that weak signals are hard to detect.
 
-
 ## 8. Discussion
 
 Both BMA and DSL identify the **inverted-N** EKC shape with turning points close to the true DGP values. BMA correctly identifies 6 of 8 true predictors (3 GDP terms + fossil fuel, industry, renewable) with zero false positives among noise variables.
@@ -556,8 +568,11 @@ If this were real data, the inverted-N would imply three phases:
 
 3. **Declining phase** (above ~\\$27,000): Wealthy countries where clean technology and regulation reduce emissions.
 
-**Caveats.** This is synthetic data --- the patterns are sharper than real-world data, and we can verify ground truth only because we designed the DGP. With real data, model uncertainty is genuinely unresolvable. The original study by Gravina and Lanzafame (2025) addresses additional complications including endogeneity (via 2SLS-BMA) and alternative pollutants (SO<sub>2</sub>, PM2.5).
+### When to use BMA vs post-double-selection
 
+The two methods serve different purposes. **Use BMA** when the research question is "which variables robustly predict the outcome?" --- BMA provides PIPs, coefficient densities, and a rich picture of the model space. It excels in exploratory settings where variable importance is the goal. **Use post-double-selection** when the question is "what is the causal effect of a specific variable of interest, controlling for high-dimensional confounders?" --- DSL provides fast, valid inference on the coefficients of interest with standard errors and confidence intervals. In practice, using both (as in this tutorial) provides the strongest evidence: if a Bayesian and a frequentist method agree, the finding is unlikely to be an artifact of any single modeling choice.
+
+**Caveats.** This is synthetic data --- the patterns are sharper than real-world data, and we can verify ground truth only because we designed the DGP. With real data, model uncertainty is genuinely unresolvable, and there is no answer key to check against. The original study by Gravina and Lanzafame (2025) addresses additional complications including endogeneity (via 2SLS-BMA) and alternative pollutants (SO<sub>2</sub>, PM2.5).
 
 ## 9. Summary and Next Steps
 
@@ -573,12 +588,11 @@ If this were real data, the inverted-N would imply three phases:
 
 ### Exercises
 
-1. **Sensitivity to the g-prior.** Re-run `bmaregress` with `gprior(bric)` instead of `gprior(uip)`. Do the PIPs change? Does the BIC prior identify the same true predictors?
+1. **Sensitivity to the g-prior.** Re-run `bmaregress` with `gprior(bric)` instead of `gprior(uip)`. The BIC prior penalizes model complexity more heavily. Do the PIPs change? Does it still identify fossil fuel, industry, and renewable as robust? (*Hint:* BIC priors tend to be more conservative, so borderline variables may drop below the threshold.)
 
-2. **Test for inverted-U.** Drop `ln_gdp_cb` and re-run with only linear and squared GDP terms. What do BMA and DSL say about the simpler quadratic specification?
+2. **Test for inverted-U.** Drop `ln_gdp_cb` and re-run with only linear and squared GDP terms. What do BMA and DSL say about the simpler quadratic specification? (*Hint:* since the DGP includes a cubic term, the quadratic model is misspecified --- check whether the coefficients absorb the cubic effect or produce a visibly different EKC shape.)
 
-3. **Increase noise.** Re-generate the synthetic data with `sigma_eps = 0.30` (double the noise). How does this affect BMA's ability to distinguish true predictors from noise?
-
+3. **Increase noise.** Re-generate the synthetic data with `sigma_eps = 0.30` (double the noise) in `generate_data.do` and re-run the full analysis. How does this affect BMA's ability to distinguish true predictors from noise? (*Hint:* expect more variables with PIPs in the ambiguous 0.3--0.7 range, and possibly some noise variables crossing the 0.80 threshold --- false positives become more likely with noisier data.)
 
 ## References
 
