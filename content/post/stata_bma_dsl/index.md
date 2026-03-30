@@ -316,7 +316,7 @@ In words, the probability of model $k$ being correct equals how well it fits the
 
 $$\text{PIP}\_j = \sum\_{k:\\, x\_j \in M\_k} P(M\_k | \text{data})$$
 
-PIP > 0.5 means the variable appears in more than half of the probability-weighted model space.
+PIP > 0.80 is a common threshold for considering a variable "robust" --- it means the variable appears in the vast majority of the probability-weighted model space.
 
 ### 5.2 Key options
 
@@ -363,9 +363,9 @@ Sampling correlation = 0.9997
 Note: 9 predictors with PIP less than .5 not shown.
 ```
 
-BMA sampled 163 distinct models with a very high sampling correlation of 0.9997. Six variables have PIP above the 0.5 threshold: the three GDP terms (PIP = 0.994--1.000) and three of the five true controls --- fossil fuel (PIP = 1.000), industry (PIP = 0.999), and renewable energy (PIP = 0.959). The BMA posterior means (--7.139, 0.808, --0.030) are remarkably close to the true DGP values (--7.100, 0.810, --0.030), substantially closer than the sparse FE estimates.
+BMA sampled 163 distinct models with a very high sampling correlation of 0.9997. Six variables have PIP above the 0.80 robustness threshold: the three GDP terms (PIP = 0.994--1.000) and three of the five true controls --- fossil fuel (PIP = 1.000), industry (PIP = 0.999), and renewable energy (PIP = 0.959). The BMA posterior means (--7.139, 0.808, --0.030) are remarkably close to the true DGP values (--7.100, 0.810, --0.030), substantially closer than the sparse FE estimates.
 
-Two true controls --- urban (coefficient 0.007) and democracy (coefficient --0.005) --- have PIPs below 0.5. Their true effects are small, making them hard to distinguish from noise. This is a realistic limitation: even a powerful method like BMA struggles with weak signals.
+Two true controls --- urban (coefficient 0.007) and democracy (coefficient --0.005) --- have PIPs well below 0.80. Their true effects are small, making them hard to distinguish from noise. This is a realistic limitation: even a powerful method like BMA struggles with weak signals.
 
 ### 5.4 Turning points
 
@@ -380,7 +380,7 @@ Both turning points are in the right ballpark but not exact --- the maximum is u
 
 The PIP chart is BMA's signature output. We color-code bars by ground truth: steel blue for true predictors, gray for noise.
 
-![Horizontal bar chart showing Posterior Inclusion Probabilities for all 15 variables. True predictors are colored in steel blue, noise variables in gray. A dashed orange line marks the 0.5 threshold. Variable labels are clearly readable.](stata_bma_dsl_fig3_pip.png)
+![Horizontal bar chart showing Posterior Inclusion Probabilities for all 15 variables. True predictors are colored in steel blue, noise variables in gray. A dashed orange line marks the 0.80 robustness threshold.](stata_bma_dsl_fig3_pip.png)
 
 The PIP chart cleanly separates the variables into two groups. At the top (PIP near 1.0): fossil fuel share, GDP terms, industry, and renewable energy --- all true predictors correctly identified. At the bottom (PIP near 0.0): the seven noise variables (globalization, corruption, services, trade, FDI, credit, population density) plus urban population and democracy. BMA correctly assigns zero-like PIPs to all noise variables, and correctly flags 3 of 5 true predictors as robust. The two misses (urban, democracy) have small true coefficients (0.007 and --0.005), making them genuinely hard to detect.
 
@@ -531,9 +531,9 @@ Both curves trace a clear inverted-N: CO<sub>2</sub> falls at low incomes, rises
 
 The ultimate test: do BMA and DSL correctly identify the 5 true predictors and reject the 7 noise variables?
 
-![Dot plot showing BMA Posterior Inclusion Probabilities for each variable, color-coded by ground truth. True predictors (circles, blue) cluster above the 0.5 threshold; noise variables (diamonds, gray) cluster below it.](stata_bma_dsl_fig6_answer_key.png)
+![Dot plot showing BMA Posterior Inclusion Probabilities for each variable, color-coded by ground truth. True predictors (circles, blue) cluster above the 0.80 threshold; noise variables (diamonds, gray) cluster below it.](stata_bma_dsl_fig6_answer_key.png)
 
-**BMA's report card:** Of the 8 true predictors (3 GDP terms + 5 controls), BMA correctly assigns PIP > 0.5 to 6 --- the three GDP terms, fossil fuel, industry, and renewable energy. It misses urban (PIP ~ 0.05) and democracy (PIP ~ 0.10), whose true coefficients are small (0.007 and --0.005). All 7 noise variables receive PIPs well below 0.5. BMA makes **zero false positives** (no noise variable incorrectly flagged as important) and **two false negatives** (two weak true predictors missed).
+**BMA's report card:** Of the 8 true predictors (3 GDP terms + 5 controls), BMA correctly assigns PIP > 0.80 to 6 --- the three GDP terms, fossil fuel, industry, and renewable energy. It misses urban (PIP ~ 0.05) and democracy (PIP ~ 0.10), whose true coefficients are small (0.007 and --0.005). All 7 noise variables receive PIPs well below 0.80. BMA makes **zero false positives** (no noise variable incorrectly flagged as robust) and **two false negatives** (two weak true predictors missed).
 
 **DSL's report card:** DSL selected 100 of 112 total controls (including FE dummies), making it less discriminating for candidate variables. However, the final OLS coefficients for the GDP terms are consistent with the DGP, and DSL runs in seconds rather than minutes.
 

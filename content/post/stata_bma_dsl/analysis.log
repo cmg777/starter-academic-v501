@@ -3,7 +3,7 @@
        log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_bma_
 > dsl/analysis.log
   log type:  text
- opened on:  31 Mar 2026, 08:11:08
+ opened on:  31 Mar 2026, 08:15:30
 
 . 
 . display _newline "============================================="
@@ -17,7 +17,7 @@
   Data: Synthetic panel (80 countries, 1995-2014)
 
 . display "  Started: $S_DATE $S_TIME"
-  Started: 31 Mar 2026 08:11:08
+  Started: 31 Mar 2026 08:15:30
 
 . display "============================================="
 =============================================
@@ -489,7 +489,7 @@ Saved: stata_bma_dsl_fig2_instability.png
   BMA ESTIMATION
 
 . display "  Starting: $S_DATE $S_TIME"
-  Starting: 31 Mar 2026 08:11:15
+  Starting: 31 Mar 2026 08:15:36
 
 . display "============================================="
 =============================================
@@ -499,7 +499,7 @@ Saved: stata_bma_dsl_fig2_instability.png
 >     ($fe, always), ///
 >     mprior(uniform) groupfv gprior(uip) ///
 >     mcmcsize(50000) dots(5000, every(10000)) ///
->     rseed(9988) inputorder pipcutoff(0.5) ///
+>     rseed(9988) inputorder pipcutoff(0.8) ///
 >     saving("_bma_temp.dta", replace)
 
 Burn-in (2500):  done
@@ -638,7 +638,7 @@ Always       |
        _cons |  1.093558   5.730563                               0          1
 ------------------------------------------------------------------------------
 Note: Coefficient posterior means and std. dev. estimated from 163 models.
-Note: 9 predictors with PIP less than .5 not shown.
+Note: 9 predictors with PIP less than .8 not shown.
 Note: Acceptance rate is low.
 
 file _bma_temp.dta not found; file saved.
@@ -646,7 +646,7 @@ file _bma_temp.dta not found; file saved.
 . 
 . display _newline "BMA completed: $S_DATE $S_TIME"
 
-BMA completed: 31 Mar 2026 08:11:27
+BMA completed: 31 Mar 2026 08:15:56
 
 . estimates store bma_uip
 
@@ -1096,19 +1096,19 @@ variable label was str22 now str23
 >         color("106 155 204")) ///
 >     (bar pip order if is_true == 0, horizontal barwidth(0.6) ///
 >         color(gs11)), ///
->     xline(0.5, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
->     ylabel(1(1)`nvars', valuelabel angle(0) labsize(medsmall) nogrid) ///
+>     xline(0.8, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
+>     ylabel(1(1)`nvars', valuelabel angle(0) labsize(small) nogrid) ///
 >     xlabel(0(0.2)1, format(%3.1f)) ///
 >     ytitle("") ///
 >     xtitle("Posterior Inclusion Probability (PIP)") ///
->     title("BMA: Which Variables Matter?", size(medium)) ///
->     subtitle("Dashed line = 0.5 robustness threshold", size(small)) ///
+>     title("BMA: Which Variables Matter?", size(medsmall)) ///
+>     subtitle("Dashed line = 0.8 robustness threshold", size(small)) ///
 >     legend(order(1 "True predictor (in DGP)" 2 "Noise variable (not in DGP)")
 >  ///
->         rows(1) position(6) size(small)) ///
+>         rows(1) position(6) size(vsmall)) ///
 >     note("Variables sorted by PIP. Blue = true predictor, gray = noise." ///
->          "Only candidate variables shown (country and year FE excluded).") //
-> /
+>          "Only candidate variables shown (country and year FE excluded).", si
+> ze(vsmall)) ///
 >     scheme(s2color) ysize(7) xsize(9) ///
 >     name(fig3_pip, replace)
 
@@ -1173,7 +1173,6 @@ Saved: stata_bma_dsl_fig3_pip.png
 
 . 
 . graph export "stata_bma_dsl_fig4_coefdensity.png", replace width(2400)
-(file stata_bma_dsl_fig4_coefdensity.png not found)
 file stata_bma_dsl_fig4_coefdensity.png written in PNG format
 
 . display _newline "Saved: stata_bma_dsl_fig4_coefdensity.png"
@@ -1196,7 +1195,7 @@ Saved: stata_bma_dsl_fig4_coefdensity.png
   DSL ESTIMATION
 
 . display "  Starting: $S_DATE $S_TIME"
-  Starting: 31 Mar 2026 08:11:36
+  Starting: 31 Mar 2026 08:16:06
 
 . display "============================================="
 =============================================
@@ -1233,7 +1232,7 @@ Note: Chi-squared test is a Wald test of the coefficients of the variables
 . 
 . display _newline "DSL completed: $S_DATE $S_TIME"
 
-DSL completed: 31 Mar 2026 08:11:38
+DSL completed: 31 Mar 2026 08:16:08
 
 . estimates store dsl_plugin
 
@@ -1446,7 +1445,6 @@ Number of observations (_N) was 0, now 500.
 
 . 
 . graph export "stata_bma_dsl_fig5_ekc_curves.png", replace width(2400)
-(file stata_bma_dsl_fig5_ekc_curves.png not found)
 file stata_bma_dsl_fig5_ekc_curves.png written in PNG format
 
 . display _newline "Saved: stata_bma_dsl_fig5_ekc_curves.png"
@@ -1812,26 +1810,26 @@ variable label was str22 now str23
 >         mcolor("106 155 204") msymbol(circle) msize(large)) ///
 >     (scatter order pip if is_true == 0, ///
 >         mcolor(gs9) msymbol(diamond) msize(large)), ///
->     xline(0.5, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
->     ylabel(1(1)`nvars', valuelabel angle(0) labsize(medsmall) nogrid) ///
+>     xline(0.8, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
+>     ylabel(1(1)`nvars', valuelabel angle(0) labsize(small) nogrid) ///
 >     xlabel(0(0.2)1, format(%3.1f)) ///
 >     ytitle("") ///
 >     xtitle("BMA Posterior Inclusion Probability") ///
->     title("Answer Key: Do BMA and DSL Recover the Truth?", size(medium)) ///
->     subtitle("True predictors should have PIP > 0.5; noise should have PIP < 
-> 0.5", size(small)) ///
->     legend(order(1 "True predictor" 2 "Noise variable") ///
->         rows(1) position(6) size(small)) ///
->     note("Dashed line = 0.5 threshold. Circle = true predictor, diamond = noi
-> se." ///
->          "Only candidate variables shown (country and year FE excluded).") //
+>     title("Answer Key: Do BMA and DSL Recover the Truth?", size(medsmall)) //
 > /
+>     subtitle("True predictors should have PIP > 0.8; noise should have PIP < 
+> 0.8", size(small)) ///
+>     legend(order(1 "True predictor" 2 "Noise variable") ///
+>         rows(1) position(6) size(vsmall)) ///
+>     note("Dashed line = 0.8 threshold. Circle = true predictor, diamond = noi
+> se." ///
+>          "Only candidate variables shown (country and year FE excluded).", si
+> ze(vsmall)) ///
 >     scheme(s2color) ysize(7) xsize(9) ///
 >     name(fig6_answer, replace)
 
 . 
 . graph export "stata_bma_dsl_fig6_answer_key.png", replace width(2400)
-(file stata_bma_dsl_fig6_answer_key.png not found)
 file stata_bma_dsl_fig6_answer_key.png written in PNG format
 
 . display _newline "Saved: stata_bma_dsl_fig6_answer_key.png"
@@ -1972,7 +1970,7 @@ Saved: stata_bma_dsl_comparison.csv
 =============================================
 
 . display "  TUTORIAL COMPLETE: $S_DATE $S_TIME"
-  TUTORIAL COMPLETE: 31 Mar 2026 08:11:42
+  TUTORIAL COMPLETE: 31 Mar 2026 08:16:11
 
 . display "============================================="
 =============================================
@@ -2014,5 +2012,5 @@ Output files:
        log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_bma_
 > dsl/analysis.log
   log type:  text
- closed on:  31 Mar 2026, 08:11:42
+ closed on:  31 Mar 2026, 08:16:11
 -------------------------------------------------------------------------------

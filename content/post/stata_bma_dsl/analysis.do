@@ -244,7 +244,7 @@ bmaregress $outcome $gdp_vars $controls ///
     ($fe, always), ///
     mprior(uniform) groupfv gprior(uip) ///
     mcmcsize(50000) dots(5000, every(10000)) ///
-    rseed(9988) inputorder pipcutoff(0.5) ///
+    rseed(9988) inputorder pipcutoff(0.8) ///
     saving("_bma_temp.dta", replace)
 
 display _newline "BMA completed: $S_DATE $S_TIME"
@@ -351,17 +351,17 @@ graph twoway ///
         color("106 155 204")) ///
     (bar pip order if is_true == 0, horizontal barwidth(0.6) ///
         color(gs11)), ///
-    xline(0.5, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
-    ylabel(1(1)`nvars', valuelabel angle(0) labsize(medsmall) nogrid) ///
+    xline(0.8, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
+    ylabel(1(1)`nvars', valuelabel angle(0) labsize(small) nogrid) ///
     xlabel(0(0.2)1, format(%3.1f)) ///
     ytitle("") ///
     xtitle("Posterior Inclusion Probability (PIP)") ///
-    title("BMA: Which Variables Matter?", size(medium)) ///
-    subtitle("Dashed line = 0.5 robustness threshold", size(small)) ///
+    title("BMA: Which Variables Matter?", size(medsmall)) ///
+    subtitle("Dashed line = 0.8 robustness threshold", size(small)) ///
     legend(order(1 "True predictor (in DGP)" 2 "Noise variable (not in DGP)") ///
-        rows(1) position(6) size(small)) ///
+        rows(1) position(6) size(vsmall)) ///
     note("Variables sorted by PIP. Blue = true predictor, gray = noise." ///
-         "Only candidate variables shown (country and year FE excluded).") ///
+         "Only candidate variables shown (country and year FE excluded).", size(vsmall)) ///
     scheme(s2color) ysize(7) xsize(9) ///
     name(fig3_pip, replace)
 
@@ -600,17 +600,17 @@ graph twoway ///
         mcolor("106 155 204") msymbol(circle) msize(large)) ///
     (scatter order pip if is_true == 0, ///
         mcolor(gs9) msymbol(diamond) msize(large)), ///
-    xline(0.5, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
-    ylabel(1(1)`nvars', valuelabel angle(0) labsize(medsmall) nogrid) ///
+    xline(0.8, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
+    ylabel(1(1)`nvars', valuelabel angle(0) labsize(small) nogrid) ///
     xlabel(0(0.2)1, format(%3.1f)) ///
     ytitle("") ///
     xtitle("BMA Posterior Inclusion Probability") ///
-    title("Answer Key: Do BMA and DSL Recover the Truth?", size(medium)) ///
-    subtitle("True predictors should have PIP > 0.5; noise should have PIP < 0.5", size(small)) ///
+    title("Answer Key: Do BMA and DSL Recover the Truth?", size(medsmall)) ///
+    subtitle("True predictors should have PIP > 0.8; noise should have PIP < 0.8", size(small)) ///
     legend(order(1 "True predictor" 2 "Noise variable") ///
-        rows(1) position(6) size(small)) ///
-    note("Dashed line = 0.5 threshold. Circle = true predictor, diamond = noise." ///
-         "Only candidate variables shown (country and year FE excluded).") ///
+        rows(1) position(6) size(vsmall)) ///
+    note("Dashed line = 0.8 threshold. Circle = true predictor, diamond = noise." ///
+         "Only candidate variables shown (country and year FE excluded).", size(vsmall)) ///
     scheme(s2color) ysize(7) xsize(9) ///
     name(fig6_answer, replace)
 
