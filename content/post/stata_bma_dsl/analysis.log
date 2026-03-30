@@ -3,7 +3,7 @@
        log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_bma_
 > dsl/analysis.log
   log type:  text
- opened on:  31 Mar 2026, 08:15:30
+ opened on:  31 Mar 2026, 08:50:57
 
 . 
 . display _newline "============================================="
@@ -17,7 +17,7 @@
   Data: Synthetic panel (80 countries, 1995-2014)
 
 . display "  Started: $S_DATE $S_TIME"
-  Started: 31 Mar 2026 08:15:30
+  Started: 31 Mar 2026 08:50:57
 
 . display "============================================="
 =============================================
@@ -170,33 +170,36 @@ Saved: stata_bma_dsl_fig1_scatter.png
 . *---------------------------------------------*
 . * 3a. Sparse specification (no controls)      *
 . *---------------------------------------------*
-. reghdfe $outcome $gdp_vars, absorb(country_id year)
+. reghdfe $outcome $gdp_vars, absorb(country_id year) vce(cluster country_id)
 (MWFE estimator converged in 2 iterations)
 
 HDFE Linear regression                            Number of obs   =      1,600
-Absorbing 2 HDFE groups                           F(   3,   1498) =      18.31
-                                                  Prob > F        =     0.0000
+Absorbing 2 HDFE groups                           F(   3,     79) =      16.62
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
                                                   R-squared       =     0.9620
                                                   Adj R-squared   =     0.9594
                                                   Within R-sq.    =     0.0354
-                                                  Root MSE        =     0.1584
+Number of clusters (country_id) =         80      Root MSE        =     0.1584
 
+                            (Std. err. adjusted for 80 clusters in country_id)
 ------------------------------------------------------------------------------
-      ln_co2 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+             |               Robust
+      ln_co2 | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      ln_gdp |  -7.498046   1.841643    -4.07   0.000    -11.11052   -3.885574
-   ln_gdp_sq |    .848967   .1924619     4.41   0.000     .4714435     1.22649
-   ln_gdp_cb |  -.0314993   .0066242    -4.76   0.000     -.044493   -.0185057
-       _cons |   2.672866   5.816436     0.46   0.646    -8.736357    14.08209
+      ln_gdp |  -7.498046   1.623988    -4.62   0.000    -10.73051    -4.26558
+   ln_gdp_sq |    .848967   .1704533     4.98   0.000     .5096881    1.188246
+   ln_gdp_cb |  -.0314993    .005931    -5.31   0.000    -.0433047    -.019694
+       _cons |   2.672866   5.155102     0.52   0.606    -7.588108    12.93384
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
 -----------------------------------------------------+
  Absorbed FE | Categories  - Redundant  = Num. Coefs |
 -------------+---------------------------------------|
-  country_id |        80           0          80     |
+  country_id |        80          80           0    *|
         year |        20           1          19     |
 -----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
 
 . estimates store fe_sparse
 
@@ -225,45 +228,49 @@ Absorbed degrees of freedom:
 . *---------------------------------------------*
 . * 3b. Kitchen-sink specification              *
 . *---------------------------------------------*
-. reghdfe $outcome $gdp_vars $controls, absorb(country_id year)
+. reghdfe $outcome $gdp_vars $controls, absorb(country_id year) vce(cluster cou
+> ntry_id)
 (MWFE estimator converged in 2 iterations)
 
 HDFE Linear regression                            Number of obs   =      1,600
-Absorbing 2 HDFE groups                           F(  15,   1486) =      14.14
-                                                  Prob > F        =     0.0000
+Absorbing 2 HDFE groups                           F(  15,     79) =      15.77
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
                                                   R-squared       =     0.9655
                                                   Adj R-squared   =     0.9629
                                                   Within R-sq.    =     0.1249
-                                                  Root MSE        =     0.1515
+Number of clusters (country_id) =         80      Root MSE        =     0.1515
 
+                            (Std. err. adjusted for 80 clusters in country_id)
 ------------------------------------------------------------------------------
-      ln_co2 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+             |               Robust
+      ln_co2 | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      ln_gdp |  -7.130693   1.769542    -4.03   0.000    -10.60176   -3.659628
-   ln_gdp_sq |   .8059928     .18496     4.36   0.000     .4431823    1.168803
-   ln_gdp_cb |  -.0298133    .006366    -4.68   0.000    -.0423006    -.017326
- fossil_fuel |   .0138444   .0013164    10.52   0.000     .0112621    .0164267
-   renewable |   -.006795   .0019783    -3.43   0.001    -.0106756   -.0029144
-       urban |   .0057534   .0025655     2.24   0.025      .000721    .0107857
-globalizat~n |   .0015186   .0012978     1.17   0.242    -.0010272    .0040644
- pop_density |   .0000794   .0003123     0.25   0.799    -.0005332     .000692
-   democracy |  -.0002971   .0076989    -0.04   0.969     -.015399    .0148048
-  corruption |   .0009812   .0008083     1.21   0.225    -.0006044    .0025669
-    industry |   .0086336   .0020061     4.30   0.000     .0046986    .0125686
-    services |  -.0005642   .0019249    -0.29   0.769    -.0043401    .0032117
-       trade |  -.0002458   .0007895    -0.31   0.756    -.0017944    .0013029
-         fdi |  -.0017599   .0019212    -0.92   0.360    -.0055284    .0020086
-      credit |    -.00139   .0008142    -1.71   0.088     -.002987    .0002071
-       _cons |    .499146   5.585077     0.09   0.929    -10.45633    11.45462
+      ln_gdp |  -7.130693   1.562581    -4.56   0.000    -10.24093   -4.020453
+   ln_gdp_sq |   .8059928   .1647973     4.89   0.000      .477972    1.134014
+   ln_gdp_cb |  -.0298133   .0057365    -5.20   0.000    -.0412314   -.0183951
+ fossil_fuel |   .0138444   .0014853     9.32   0.000      .010888    .0168008
+   renewable |   -.006795   .0019322    -3.52   0.001    -.0106409   -.0029491
+       urban |   .0057534   .0021432     2.68   0.009     .0014875    .0100192
+globalizat~n |   .0015186   .0012832     1.18   0.240    -.0010357    .0040728
+ pop_density |   .0000794   .0002303     0.34   0.731     -.000379    .0005378
+   democracy |  -.0002971    .007735    -0.04   0.969    -.0156933    .0150991
+  corruption |   .0009812   .0008415     1.17   0.247    -.0006936    .0026561
+    industry |   .0086336   .0017848     4.84   0.000     .0050811    .0121861
+    services |  -.0005642   .0017205    -0.33   0.744    -.0039889    .0028604
+       trade |  -.0002458   .0007695    -0.32   0.750    -.0017774    .0012858
+         fdi |  -.0017599   .0019509    -0.90   0.370     -.005643    .0021232
+      credit |    -.00139   .0007516    -1.85   0.068     -.002886    .0001061
+       _cons |    .499146   4.926364     0.10   0.920    -9.306537    10.30483
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
 -----------------------------------------------------+
  Absorbed FE | Categories  - Redundant  = Num. Coefs |
 -------------+---------------------------------------|
-  country_id |        80           0          80     |
+  country_id |        80          80           0    *|
         year |        20           1          19     |
 -----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
 
 . estimates store fe_kitchen
 
@@ -489,7 +496,7 @@ Saved: stata_bma_dsl_fig2_instability.png
   BMA ESTIMATION
 
 . display "  Starting: $S_DATE $S_TIME"
-  Starting: 31 Mar 2026 08:15:36
+  Starting: 31 Mar 2026 08:51:02
 
 . display "============================================="
 =============================================
@@ -646,7 +653,7 @@ file _bma_temp.dta not found; file saved.
 . 
 . display _newline "BMA completed: $S_DATE $S_TIME"
 
-BMA completed: 31 Mar 2026 08:15:56
+BMA completed: 31 Mar 2026 08:51:14
 
 . estimates store bma_uip
 
@@ -1127,48 +1134,40 @@ Saved: stata_bma_dsl_fig3_pip.png
 . * 4d. Coefficient densities -- Figure 4       *
 . *---------------------------------------------*
 . * bmagraph coefdensity with multiple vars shows only the last one.
-. * Generate individual density plots and combine them.
+. * Generate individual plots for the 4 key variables and combine in a 2x2 grid
+> .
 . 
 . bmagraph coefdensity ln_gdp, ///
->     title("GDP (log)", size(medium)) ///
+>     title("GDP per capita (log)", size(medsmall)) ///
 >     name(dens_gdp, replace)
 
 . 
-. bmagraph coefdensity ln_gdp_sq, ///
->     title("GDP squared", size(medium)) ///
->     name(dens_gdp_sq, replace)
-
-. 
 . bmagraph coefdensity ln_gdp_cb, ///
->     title("GDP cubed", size(medium)) ///
+>     title("GDP cubed (log)", size(medsmall)) ///
 >     name(dens_gdp_cb, replace)
 
 . 
 . bmagraph coefdensity fossil_fuel, ///
->     title("Fossil fuel share", size(medium)) ///
+>     title("Fossil fuel share (%)", size(medsmall)) ///
 >     name(dens_fossil, replace)
 
 . 
-. bmagraph coefdensity renewable, ///
->     title("Renewable energy", size(medium)) ///
->     name(dens_renew, replace)
-
-. 
 . bmagraph coefdensity industry, ///
->     title("Industry VA", size(medium)) ///
+>     title("Industry VA (% GDP)", size(medsmall)) ///
 >     name(dens_industry, replace)
 
 . 
-. graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
->     dens_fossil dens_renew dens_industry, ///
->     cols(3) rows(2) ///
+. graph combine dens_gdp dens_gdp_cb ///
+>     dens_fossil dens_industry, ///
+>     cols(2) rows(2) ///
 >     title("BMA: Posterior Coefficient Densities", size(medium)) ///
 >     subtitle("Density far from zero = strong evidence the variable matters", 
 > size(small)) ///
->     note("Top row: GDP polynomial terms. Bottom row: strongest true controls.
+>     note("Top row: GDP linear and cubic terms (key for the inverted-N shape).
 > " ///
->          "All six variables have PIP > 0.95.") ///
->     scheme(s2color) xsize(12) ysize(8) ///
+>          "Bottom row: two strongest true controls (PIP = 1.00 and 0.999).") /
+> //
+>     scheme(s2color) xsize(10) ysize(8) ///
 >     name(fig4_density, replace)
 
 . 
@@ -1195,7 +1194,7 @@ Saved: stata_bma_dsl_fig4_coefdensity.png
   DSL ESTIMATION
 
 . display "  Starting: $S_DATE $S_TIME"
-  Starting: 31 Mar 2026 08:16:06
+  Starting: 31 Mar 2026 08:51:21
 
 . display "============================================="
 =============================================
@@ -1203,7 +1202,7 @@ Saved: stata_bma_dsl_fig4_coefdensity.png
 . 
 . dsregress $outcome $gdp_vars, ///
 >     controls(($fe) $controls) ///
->     vce(robust)
+>     vce(cluster country_id)
 
 Estimating lasso for ln_co2 using plugin
 Estimating lasso for ln_gdp using plugin
@@ -1212,27 +1211,29 @@ Estimating lasso for ln_gdp_cb using plugin
 
 Double-selection linear model         Number of obs               =      1,600
                                       Number of controls          =        112
-                                      Number of selected controls =        100
-                                      Wald chi2(3)                =      54.16
+                                      Number of selected controls =        102
+                                      Wald chi2(3)                =      53.15
                                       Prob > chi2                 =     0.0000
 
+                            (Std. err. adjusted for 80 clusters in country_id)
 ------------------------------------------------------------------------------
              |               Robust
       ln_co2 | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      ln_gdp |  -7.498046   1.850901    -4.05   0.000    -11.12574   -3.870348
-   ln_gdp_sq |   .8489669   .1932619     4.39   0.000     .4701806    1.227753
-   ln_gdp_cb |  -.0314993   .0066521    -4.74   0.000    -.0445373   -.0184614
+      ln_gdp |  -7.433319   1.628321    -4.57   0.000    -10.62477   -4.241868
+   ln_gdp_sq |   .8401567   .1713522     4.90   0.000     .5043126    1.176001
+   ln_gdp_cb |  -.0310764    .005952    -5.22   0.000    -.0427421   -.0194107
 ------------------------------------------------------------------------------
 Note: Chi-squared test is a Wald test of the coefficients of the variables
       of interest jointly equal to zero. Lassos select controls for model
       estimation. Type lassoinfo to see number of selected variables in each
       lasso.
+Note: Lassos are performed accounting for clusters in country_id.
 
 . 
 . display _newline "DSL completed: $S_DATE $S_TIME"
 
-DSL completed: 31 Mar 2026 08:16:08
+DSL completed: 31 Mar 2026 08:51:23
 
 . estimates store dsl_plugin
 
@@ -1256,15 +1257,15 @@ DSL completed: 31 Mar 2026 08:16:08
 
 . display "  b1 (GDP):   " %9.4f `b1_dsl' _col(35) cond(`b1_dsl' < 0, "NEGATIVE
 > ", "positive")
-  b1 (GDP):     -7.4980           NEGATIVE
+  b1 (GDP):     -7.4333           NEGATIVE
 
 . display "  b2 (GDP^2): " %9.4f `b2_dsl' _col(35) cond(`b2_dsl' > 0, "POSITIVE
 > ", "negative")
-  b2 (GDP^2):    0.8490           POSITIVE
+  b2 (GDP^2):    0.8402           POSITIVE
 
 . display "  b3 (GDP^3): " %9.4f `b3_dsl' _col(35) cond(`b3_dsl' < 0, "NEGATIVE
 > ", "positive")
-  b3 (GDP^3):   -0.0315           NEGATIVE
+  b3 (GDP^3):   -0.0311           NEGATIVE
 
 . 
 . local se1_dsl = sqrt(e(V)[1,1])
@@ -1286,7 +1287,7 @@ DSL completed: 31 Mar 2026 08:16:08
 
 . display "  Discriminant: " %8.4f `disc_dsl' ///
 >     cond(`disc_dsl' > 0, " (turning points exist)", " (no turning points)")
-  Discriminant:   0.0122 (turning points exist)
+  Discriminant:   0.0129 (turning points exist)
 
 . 
 . local min_dsl = exp((-`b2_dsl' + sqrt(`disc_dsl')) / (3 * `b3_dsl'))
@@ -1295,10 +1296,10 @@ DSL completed: 31 Mar 2026 08:16:08
 
 . 
 . display "  Minimum: $" %8.0fc `min_dsl'
-  Minimum: $   2,478
+  Minimum: $   2,429
 
 . display "  Maximum: $" %8.0fc `max_dsl'
-  Maximum: $  25,656
+  Maximum: $  27,672
 
 . 
 . *---------------------------------------------*
@@ -1317,10 +1318,10 @@ DSL completed: 31 Mar 2026 08:16:08
             |           Selection             selected
    Variable |    Model     method    lambda  variables
 ------------+-----------------------------------------
-     ln_co2 |   linear     plugin  .0895429        100
-     ln_gdp |   linear     plugin  .0895429        100
-  ln_gdp_sq |   linear     plugin  .0895429        100
-  ln_gdp_cb |   linear     plugin  .0895429        100
+     ln_co2 |   linear     plugin  .3818852        102
+     ln_gdp |   linear     plugin  .3818852        100
+  ln_gdp_sq |   linear     plugin  .3818852        100
+  ln_gdp_cb |   linear     plugin  .3818852        100
 ------------------------------------------------------
 
 . 
@@ -1347,15 +1348,15 @@ DSL completed: 31 Mar 2026 08:16:08
 
 . display "  b1 (GDP):   " %9.4f `b1_sparse' " " %9.4f `b1_kitchen' " " %9.4f `
 > b1_bma' " " %9.4f `b1_dsl'
-  b1 (GDP):     -7.4980   -7.1307   -7.1390   -7.4980
+  b1 (GDP):     -7.4980   -7.1307   -7.1390   -7.4333
 
 . display "  b2 (GDP^2): " %9.4f `b2_sparse' " " %9.4f `b2_kitchen' " " %9.4f `
 > b2_bma' " " %9.4f `b2_dsl'
-  b2 (GDP^2):    0.8490    0.8060    0.8078    0.8490
+  b2 (GDP^2):    0.8490    0.8060    0.8078    0.8402
 
 . display "  b3 (GDP^3): " %9.4f `b3_sparse' " " %9.4f `b3_kitchen' " " %9.4f `
 > b3_bma' " " %9.4f `b3_dsl'
-  b3 (GDP^3):   -0.0315   -0.0298   -0.0299   -0.0315
+  b3 (GDP^3):   -0.0315   -0.0298   -0.0299   -0.0311
 
 . 
 . display _newline "  TRUE DGP:   b1 = -7.1000, b2 = 0.8100, b3 = -0.0300"
@@ -1970,7 +1971,7 @@ Saved: stata_bma_dsl_comparison.csv
 =============================================
 
 . display "  TUTORIAL COMPLETE: $S_DATE $S_TIME"
-  TUTORIAL COMPLETE: 31 Mar 2026 08:16:11
+  TUTORIAL COMPLETE: 31 Mar 2026 08:51:26
 
 . display "============================================="
 =============================================
@@ -2012,5 +2013,5 @@ Output files:
        log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_bma_
 > dsl/analysis.log
   log type:  text
- closed on:  31 Mar 2026, 08:16:11
+ closed on:  31 Mar 2026, 08:51:26
 -------------------------------------------------------------------------------

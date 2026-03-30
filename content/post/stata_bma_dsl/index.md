@@ -223,7 +223,7 @@ Before reaching for sophisticated methods, let us see what standard panel regres
 ### 4.1 Sparse specification
 
 ```stata
-reghdfe $outcome $gdp_vars, absorb(country_id year)
+reghdfe $outcome $gdp_vars, absorb(country_id year) vce(cluster country_id)
 estimates store fe_sparse
 ```
 
@@ -231,21 +231,25 @@ estimates store fe_sparse
 HDFE Linear regression                            Number of obs   =      1,600
                                                   R-squared       =     0.9620
                                                   Within R-sq.    =     0.0354
+Number of clusters (country_id) =         80
+
+                            (Std. err. adjusted for 80 clusters in country_id)
 ------------------------------------------------------------------------------
-      ln_co2 | Coefficient  Std. err.      t    P>|t|
+             |               Robust
+      ln_co2 | Coefficient  std. err.      t    P>|t|
 -------------+----------------------------------------------------------------
-      ln_gdp |  -7.498046   1.841643    -4.07   0.000
-   ln_gdp_sq |    .848967   .1924619     4.41   0.000
-   ln_gdp_cb |  -.0314993   .0066242    -4.76   0.000
+      ln_gdp |  -7.498046   1.623988    -4.62   0.000
+   ln_gdp_sq |    .848967   .1704533     4.98   0.000
+   ln_gdp_cb |  -.0314993    .005931    -5.31   0.000
 ------------------------------------------------------------------------------
 ```
 
-The sparse model finds the inverted-N sign pattern ($\beta\_1 < 0$, $\beta\_2 > 0$, $\beta\_3 < 0$), all significant at the 0.1% level. The within R² is just 0.035 --- the GDP polynomial alone explains only about 3.5% of within-country CO<sub>2</sub> variation after absorbing country and year fixed effects. The overall R² of 0.96 is high because the country fixed effects capture most of the variation.
+The sparse model finds the inverted-N sign pattern ($\beta\_1 < 0$, $\beta\_2 > 0$, $\beta\_3 < 0$), all significant at the 0.1% level with cluster-robust standard errors (clustered at the country level). The within R² is just 0.035 --- the GDP polynomial alone explains only about 3.5% of within-country CO<sub>2</sub> variation after absorbing country and year fixed effects. The overall R² of 0.96 is high because the country fixed effects capture most of the variation.
 
 ### 4.2 Kitchen-sink specification
 
 ```stata
-reghdfe $outcome $gdp_vars $controls, absorb(country_id year)
+reghdfe $outcome $gdp_vars $controls, absorb(country_id year) vce(cluster country_id)
 estimates store fe_kitchen
 ```
 
@@ -253,24 +257,28 @@ estimates store fe_kitchen
 HDFE Linear regression                            Number of obs   =      1,600
                                                   R-squared       =     0.9655
                                                   Within R-sq.    =     0.1249
+Number of clusters (country_id) =         80
+
+                            (Std. err. adjusted for 80 clusters in country_id)
 ------------------------------------------------------------------------------
-      ln_co2 | Coefficient  Std. err.      t    P>|t|
+             |               Robust
+      ln_co2 | Coefficient  std. err.      t    P>|t|
 -------------+----------------------------------------------------------------
-      ln_gdp |  -7.130693   1.769542    -4.03   0.000
-   ln_gdp_sq |   .8059928     .18496     4.36   0.000
-   ln_gdp_cb |  -.0298133    .006366    -4.68   0.000
- fossil_fuel |   .0138444   .0013164    10.52   0.000
-   renewable |   -.006795   .0019783    -3.43   0.001
-       urban |   .0057534   .0025655     2.24   0.025
-globalizat~n |   .0015186   .0012978     1.17   0.242
- pop_density |   .0000794   .0003123     0.25   0.799
-   democracy |  -.0002971   .0076989    -0.04   0.969
-  corruption |   .0009812   .0008083     1.21   0.225
-    industry |   .0086336   .0020061     4.30   0.000
-    services |  -.0005642   .0019249    -0.29   0.769
-       trade |  -.0002458   .0007895    -0.31   0.756
-         fdi |  -.0017599   .0019212    -0.92   0.360
-      credit |    -.00139   .0008142    -1.71   0.088
+      ln_gdp |  -7.130693   1.562581    -4.56   0.000
+   ln_gdp_sq |   .8059928   .1647973     4.89   0.000
+   ln_gdp_cb |  -.0298133   .0057365    -5.20   0.000
+ fossil_fuel |   .0138444   .0014853     9.32   0.000
+   renewable |   -.006795   .0019322    -3.52   0.001
+       urban |   .0057534   .0021432     2.68   0.009
+globalizat~n |   .0015186   .0012832     1.18   0.240
+ pop_density |   .0000794   .0002303     0.34   0.731
+   democracy |  -.0002971    .007735    -0.04   0.969
+  corruption |   .0009812   .0008415     1.17   0.247
+    industry |   .0086336   .0017848     4.84   0.000
+    services |  -.0005642   .0017205    -0.33   0.744
+       trade |  -.0002458   .0007695    -0.32   0.750
+         fdi |  -.0017599   .0019509    -0.90   0.370
+      credit |    -.00139   .0007516    -1.85   0.068
 ------------------------------------------------------------------------------
 ```
 
@@ -400,25 +408,22 @@ The PIP chart cleanly separates the variables into two groups. At the top (PIP n
 
 ### 5.6 Coefficient density plots
 
-The [`bmagraph coefdensity`](https://www.stata.com/manuals/bmabmagraphcoefdensity.pdf) command shows the posterior distribution of each coefficient across all sampled models. We generate individual density plots for the six variables with PIP > 0.95 and combine them into a single figure:
+The [`bmagraph coefdensity`](https://www.stata.com/manuals/bmabmagraphcoefdensity.pdf) command shows the posterior distribution of each coefficient across all sampled models. We focus on four key variables in a readable 2x2 grid --- the GDP linear and cubic terms (which determine the inverted-N shape) and the two strongest controls:
 
 ```stata
-* Generate density for each high-PIP variable, then combine
-bmagraph coefdensity ln_gdp, title("GDP (log)") name(dens_gdp, replace)
-bmagraph coefdensity ln_gdp_sq, title("GDP squared") name(dens_gdp_sq, replace)
-bmagraph coefdensity ln_gdp_cb, title("GDP cubed") name(dens_gdp_cb, replace)
-bmagraph coefdensity fossil_fuel, title("Fossil fuel share") name(dens_fossil, replace)
-bmagraph coefdensity renewable, title("Renewable energy") name(dens_renew, replace)
-bmagraph coefdensity industry, title("Industry VA") name(dens_industry, replace)
+* Generate density for each key variable, then combine in a 2x2 grid
+bmagraph coefdensity ln_gdp, title("GDP per capita (log)") name(dens_gdp, replace)
+bmagraph coefdensity ln_gdp_cb, title("GDP cubed (log)") name(dens_gdp_cb, replace)
+bmagraph coefdensity fossil_fuel, title("Fossil fuel share (%)") name(dens_fossil, replace)
+bmagraph coefdensity industry, title("Industry VA (% GDP)") name(dens_industry, replace)
 
-graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
-    dens_fossil dens_renew dens_industry, ///
-    cols(3) rows(2) title("BMA: Posterior Coefficient Densities")
+graph combine dens_gdp dens_gdp_cb dens_fossil dens_industry, ///
+    cols(2) rows(2) title("BMA: Posterior Coefficient Densities")
 ```
 
-![Posterior coefficient density plots for six variables with PIP above 0.95. Top row: the three GDP polynomial terms. Bottom row: fossil fuel share, renewable energy, and industry VA. All densities are concentrated well away from zero.](stata_bma_dsl_fig4_coefdensity.png)
+![Posterior coefficient density plots for four key variables in a 2x2 grid. Top row: GDP linear and cubic terms. Bottom row: fossil fuel share and industry VA. All densities are concentrated well away from zero.](stata_bma_dsl_fig4_coefdensity.png)
 
-The six densities tell a clear story. The GDP terms (top row) are tightly concentrated around their true values: $\beta\_1$ near --7.1, $\beta\_2$ near 0.81, $\beta\_3$ near --0.030. The control variables (bottom row) are also well away from zero: fossil fuel is centered near +0.014 (true: +0.015), renewable energy near --0.007 (true: --0.010), and industry near +0.009 (true: +0.010). None of these densities show a meaningful spike at zero, confirming these are genuinely robust predictors across the model space.
+The four densities tell a clear story. The GDP linear term (top left) is centered near --7.1 and the cubic term (top right) near --0.030, both matching the true DGP values closely. Fossil fuel (bottom left) is centered near +0.014 (true: +0.015) and industry (bottom right) near +0.009 (true: +0.010). None of these densities show a meaningful spike at zero, confirming these are genuinely robust predictors across the model space.
 
 ## 6. Post-Double-Selection LASSO
 
@@ -470,34 +475,35 @@ The tuning parameter $\lambda$ controls how harsh the penalty is --- think of it
 ```stata
 dsregress $outcome $gdp_vars, ///
     controls(($fe) $controls) ///
-    vce(robust)
+    vce(cluster country_id)
 ```
 
 ```text
 Double-selection linear model         Number of obs               =      1,600
                                       Number of controls          =        112
-                                      Number of selected controls =        100
-                                      Wald chi2(3)                =      54.16
+                                      Number of selected controls =        102
+                                      Wald chi2(3)                =      53.15
                                       Prob > chi2                 =     0.0000
 
+                            (Std. err. adjusted for 80 clusters in country_id)
 ------------------------------------------------------------------------------
              |               Robust
       ln_co2 | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      ln_gdp |  -7.498046   1.850901    -4.05   0.000    -11.12574   -3.870348
-   ln_gdp_sq |   .8489669   .1932619     4.39   0.000     .4701806    1.227753
-   ln_gdp_cb |  -.0314993   .0066521    -4.74   0.000    -.0445373   -.0184614
+      ln_gdp |  -7.433319   1.628321    -4.57   0.000    -10.62477   -4.241868
+   ln_gdp_sq |   .8401567   .1713522     4.90   0.000     .5043126    1.176001
+   ln_gdp_cb |  -.0310764    .005952    -5.22   0.000    -.0427421   -.0194107
 ------------------------------------------------------------------------------
 ```
 
-Post-double-selection completed in seconds. Internally, `dsregress` ran four separate LASSO regressions (Step 1 on CO<sub>2</sub>, Steps 2a--2c on each GDP term), took the union of all selected controls, and then ran a final OLS of CO<sub>2</sub> on the GDP terms plus that union. All three GDP terms are significant at the 0.1% level with robust standard errors. The Wald test strongly rejects the null that GDP terms are jointly zero ($\chi^2 = 54.16$, p < 0.001).
+Post-double-selection completed in seconds with cluster-robust standard errors at the country level. Internally, `dsregress` ran four separate LASSO regressions (Step 1 on CO<sub>2</sub>, Steps 2a--2c on each GDP term), took the union of all selected controls, and then ran a final OLS of CO<sub>2</sub> on the GDP terms plus that union. All three GDP terms are significant at the 0.1% level. The Wald test strongly rejects the null that GDP terms are jointly zero ($\chi^2 = 53.15$, p < 0.001).
 
 ### 6.3 Turning points
 
-- **Minimum:** \\$2,478 GDP per capita (true: \\$1,895)
-- **Maximum:** \\$25,656 GDP per capita (true: \\$34,647)
+- **Minimum:** \\$2,429 GDP per capita (true: \\$1,895)
+- **Maximum:** \\$27,672 GDP per capita (true: \\$34,647)
 
-The post-double-selection turning points are numerically identical to the sparse FE values. This is because LASSO selected 100 of 112 controls at each step --- nearly all of them --- so the union in Step 3 includes essentially every control, making the final OLS in Step 4 equivalent to the sparse specification. In datasets with fewer informative controls (e.g., cross-sectional data without country FE dummies), LASSO would be more selective.
+The post-double-selection turning points (\\$2,429 and \\$27,672) fall between the sparse FE and kitchen-sink estimates, closer to the BMA values. With cluster-robust standard errors, the LASSO selection retained 102 of 112 controls for the outcome equation and 100 for each GDP term. The union of selected controls in Step 3 includes a few more candidate variables than without clustering, producing coefficients (--7.433, 0.840, --0.031) that lie between the sparse and kitchen-sink specifications.
 
 ### 6.4 LASSO selection
 
@@ -513,16 +519,16 @@ lassoinfo
             |           Selection             selected
    Variable |    Model     method    lambda  variables
 ------------+-----------------------------------------
-     ln_co2 |   linear     plugin  .0895429        100
-     ln_gdp |   linear     plugin  .0895429        100
-  ln_gdp_sq |   linear     plugin  .0895429        100
-  ln_gdp_cb |   linear     plugin  .0895429        100
+     ln_co2 |   linear     plugin  .3818852        102
+     ln_gdp |   linear     plugin  .3818852        100
+  ln_gdp_sq |   linear     plugin  .3818852        100
+  ln_gdp_cb |   linear     plugin  .3818852        100
 ------------------------------------------------------
 ```
 
-The `lassoinfo` output shows each of the four LASSO steps (one for the outcome, three for the GDP terms). Each step selected about 100 of the 112 candidate controls. But note the composition: the 112 candidates include 80 country dummies + 19 year dummies = 99 FE dummies, plus the 12 candidate variables and the constant. LASSO retains nearly all of the informative FE dummies while dropping about 12 variables at each step --- likely most of the 12 candidate controls. The union across all four steps (Step 3) yields the final control set for Step 4's OLS. Because the dropped variables are primarily the candidate controls (not FE), the final OLS regression effectively includes FE but few candidate controls --- producing coefficients identical to the sparse FE specification, not the kitchen-sink.
+The `lassoinfo` output shows each of the four LASSO steps. The outcome equation selected 102 of 112 controls, while each GDP equation selected 100. The 112 candidates include 80 country dummies + 19 year dummies = 99 FE dummies, plus the 12 candidate variables and the constant. LASSO retains nearly all informative FE dummies and drops about 10--12 of the weakest candidates at each step. The union across all four steps (Step 3) yields the final control set for Step 4's OLS. With cluster-robust standard errors, the lambda is larger (0.382 vs 0.090 without clustering), leading to slightly different selection and producing DSL coefficients (--7.433, 0.840, --0.031) that fall between the sparse and kitchen-sink FE.
 
-This reveals a limitation of post-double-selection in panel data settings: when the control set is dominated by informative fixed effects (99 of 112 variables), LASSO has little room to select among the candidate controls of interest. DSL is most powerful in cross-sectional settings or when the candidate set contains many genuinely irrelevant variables relative to FE.
+In panel data settings where FE dummies dominate the control set (99 of 112 variables), LASSO has limited room to discriminate among the candidate controls of interest. Post-double-selection is most powerful in cross-sectional settings or when the candidate set contains many genuinely irrelevant variables.
 
 ## 7. Head-to-Head Comparison
 
@@ -530,13 +536,13 @@ This reveals a limitation of post-double-selection in panel data settings: when 
 
 | | Sparse FE | Kitchen-Sink FE | BMA | DSL | True DGP |
 |---|-----------|-----------------|-----|-----|----------|
-| $\beta\_1$ (GDP) | --7.498 | --7.131 | --7.139 | --7.498 | --7.100 |
-| $\beta\_2$ (GDP²) | 0.849 | 0.806 | 0.808 | 0.849 | 0.810 |
+| $\beta\_1$ (GDP) | --7.498 | --7.131 | --7.139 | --7.433 | --7.100 |
+| $\beta\_2$ (GDP²) | 0.849 | 0.806 | 0.808 | 0.840 | 0.810 |
 | $\beta\_3$ (GDP³) | --0.031 | --0.030 | --0.030 | --0.031 | --0.030 |
-| **Min TP** | \\$2,478 | \\$2,426 | \\$2,411 | \\$2,478 | \\$1,895 |
-| **Max TP** | \\$25,656 | \\$27,694 | \\$27,269 | \\$25,656 | \\$34,647 |
+| **Min TP** | \\$2,478 | \\$2,426 | \\$2,411 | \\$2,429 | \\$1,895 |
+| **Max TP** | \\$25,656 | \\$27,694 | \\$27,269 | \\$27,672 | \\$34,647 |
 
-Note that the DSL column is identical to Sparse FE --- this is not a copy-paste error. As discussed in Section 6.4, LASSO dropped most candidate controls while retaining FE dummies, so the final OLS effectively has FE but no candidate controls --- the same specification as sparse FE. BMA and Kitchen-Sink FE, by contrast, include the candidate controls and produce estimates closer to the true DGP.
+BMA and Kitchen-Sink FE produce estimates closest to the true DGP values. DSL falls between the sparse and kitchen-sink specifications, reflecting the partial selection of candidate controls alongside the FE dummies. All four methods recover the inverted-N sign pattern.
 
 ### 7.2 Predicted EKC curves
 
@@ -554,7 +560,7 @@ The ultimate test: do BMA and DSL correctly identify the 5 true predictors and r
 
 **BMA's report card:** Of the 8 true predictors (3 GDP terms + 5 controls), BMA correctly assigns PIP > 0.80 to 6 --- the three GDP terms, fossil fuel, industry, and renewable energy. It misses urban (PIP ~ 0.05) and democracy (PIP ~ 0.10), whose true coefficients are small (0.007 and --0.005). All 7 noise variables receive PIPs well below 0.80. BMA makes **zero false positives** (no noise variable incorrectly flagged as robust) and **two false negatives** (two weak true predictors missed).
 
-**Post-double-selection's report card:** The union of all four LASSO steps selected 100 of 112 total controls (including FE dummies), making the final OLS regression nearly equivalent to the kitchen-sink specification. This is expected when the candidate set is dominated by informative fixed effects. The GDP coefficients in the final OLS are consistent with the DGP, and the entire procedure runs in seconds rather than minutes.
+**Post-double-selection's report card:** With cluster-robust SEs, the union of all four LASSO steps selected 102 of 112 total controls (including FE dummies). The resulting DSL coefficients (--7.433, 0.840, --0.031) fall between the sparse and kitchen-sink FE, closer to the true DGP than the sparse specification. The entire procedure runs in seconds rather than minutes.
 
 **Bottom line:** Both methods recover the inverted-N EKC shape. BMA provides more granular variable-level inference (PIPs), while DSL provides fast, valid coefficient estimates. The synthetic data "answer key" confirms that both are doing their job --- with the expected limitation that weak signals are hard to detect.
 
@@ -580,13 +586,13 @@ The two methods serve different purposes. **Use BMA** when the research question
 
 ### Takeaways
 
-- **Both methods confirm the inverted-N shape.** BMA (Bayesian, averaging across models) and post-double-selection (frequentist, LASSO-based) both recover the inverted-N EKC. However, BMA produces coefficients closer to the true DGP (--7.139 vs --7.100 for $\beta\_1$), while DSL replicates the sparse FE estimates (--7.498) because LASSO drops the candidate controls in this panel setting. BMA is the stronger performer here.
+- **Both methods confirm the inverted-N shape.** BMA (Bayesian, averaging across models) and post-double-selection (frequentist, LASSO-based) both recover the inverted-N EKC. BMA produces coefficients closest to the true DGP (--7.139 vs --7.100 for $\beta\_1$). DSL with cluster-robust SEs gives --7.433, falling between the sparse and kitchen-sink FE. Both methods outperform the naive sparse specification.
 
 - **Both methods recover the ground truth.** BMA correctly identifies 6 of 8 true predictors with zero false positives. The three strongest true controls (fossil fuel, industry, renewable energy) all receive PIPs above 0.95. The two misses (urban, democracy) have small true coefficients, illustrating that even good methods have limits with weak signals.
 
 - **Model uncertainty is real.** The GDP linear coefficient shifts from --7.498 (sparse) to --7.131 (kitchen-sink) depending on which controls are included. The maximum turning point moves by \\$2,000. BMA and DSL provide principled solutions.
 
-- **BMA and post-double-selection serve different purposes.** BMA excels at variable selection (PIPs, coefficient densities) and produced more accurate coefficient estimates in this panel setting. Post-double-selection is fastest and provides standard frequentist inference, but its value-add over simple FE is limited when the control set is dominated by informative fixed effects. In cross-sectional settings with many irrelevant controls, DSL would be more discriminating.
+- **BMA and post-double-selection serve different purposes.** BMA excels at variable selection (PIPs, coefficient densities) and produced the most accurate coefficient estimates in this setting. Post-double-selection is fastest and provides standard frequentist inference with cluster-robust SEs. In panel settings dominated by FE dummies, LASSO has limited room to discriminate among candidate controls; DSL would be more powerful in cross-sectional settings with many irrelevant variables.
 
 ### Exercises
 

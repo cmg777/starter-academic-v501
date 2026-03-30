@@ -109,7 +109,7 @@ display "============================================="
 *---------------------------------------------*
 * 3a. Sparse specification (no controls)      *
 *---------------------------------------------*
-reghdfe $outcome $gdp_vars, absorb(country_id year)
+reghdfe $outcome $gdp_vars, absorb(country_id year) vce(cluster country_id)
 estimates store fe_sparse
 
 local b1_sparse = _b[ln_gdp]
@@ -124,7 +124,7 @@ display "  b3 (GDP^3): " %9.4f `b3_sparse'
 *---------------------------------------------*
 * 3b. Kitchen-sink specification              *
 *---------------------------------------------*
-reghdfe $outcome $gdp_vars $controls, absorb(country_id year)
+reghdfe $outcome $gdp_vars $controls, absorb(country_id year) vce(cluster country_id)
 estimates store fe_kitchen
 
 local b1_kitchen = _b[ln_gdp]
@@ -373,40 +373,32 @@ restore
 * 4d. Coefficient densities -- Figure 4       *
 *---------------------------------------------*
 * bmagraph coefdensity with multiple vars shows only the last one.
-* Generate individual density plots and combine them.
+* Generate individual plots for the 4 key variables and combine in a 2x2 grid.
 
 bmagraph coefdensity ln_gdp, ///
-    title("GDP (log)", size(medium)) ///
+    title("GDP per capita (log)", size(medsmall)) ///
     name(dens_gdp, replace)
 
-bmagraph coefdensity ln_gdp_sq, ///
-    title("GDP squared", size(medium)) ///
-    name(dens_gdp_sq, replace)
-
 bmagraph coefdensity ln_gdp_cb, ///
-    title("GDP cubed", size(medium)) ///
+    title("GDP cubed (log)", size(medsmall)) ///
     name(dens_gdp_cb, replace)
 
 bmagraph coefdensity fossil_fuel, ///
-    title("Fossil fuel share", size(medium)) ///
+    title("Fossil fuel share (%)", size(medsmall)) ///
     name(dens_fossil, replace)
 
-bmagraph coefdensity renewable, ///
-    title("Renewable energy", size(medium)) ///
-    name(dens_renew, replace)
-
 bmagraph coefdensity industry, ///
-    title("Industry VA", size(medium)) ///
+    title("Industry VA (% GDP)", size(medsmall)) ///
     name(dens_industry, replace)
 
-graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
-    dens_fossil dens_renew dens_industry, ///
-    cols(3) rows(2) ///
+graph combine dens_gdp dens_gdp_cb ///
+    dens_fossil dens_industry, ///
+    cols(2) rows(2) ///
     title("BMA: Posterior Coefficient Densities", size(medium)) ///
     subtitle("Density far from zero = strong evidence the variable matters", size(small)) ///
-    note("Top row: GDP polynomial terms. Bottom row: strongest true controls." ///
-         "All six variables have PIP > 0.95.") ///
-    scheme(s2color) xsize(12) ysize(8) ///
+    note("Top row: GDP linear and cubic terms (key for the inverted-N shape)." ///
+         "Bottom row: two strongest true controls (PIP = 1.00 and 0.999).") ///
+    scheme(s2color) xsize(10) ysize(8) ///
     name(fig4_density, replace)
 
 graph export "stata_bma_dsl_fig4_coefdensity.png", replace width(2400)
@@ -424,7 +416,7 @@ display "============================================="
 
 dsregress $outcome $gdp_vars, ///
     controls(($fe) $controls) ///
-    vce(robust)
+    vce(cluster country_id)
 
 display _newline "DSL completed: $S_DATE $S_TIME"
 estimates store dsl_plugin
