@@ -229,8 +229,8 @@ estimates store fe_sparse
 
 ```text
 HDFE Linear regression                            Number of obs   =      1,600
-                                                  R-squared       =     0.9928
-                                                  Within R-sq.    =     0.4023
+                                                  R-squared       =     0.9620
+                                                  Within R-sq.    =     0.0354
 ------------------------------------------------------------------------------
       ln_co2 | Coefficient  Std. err.      t    P>|t|
 -------------+----------------------------------------------------------------
@@ -240,7 +240,7 @@ HDFE Linear regression                            Number of obs   =      1,600
 ------------------------------------------------------------------------------
 ```
 
-The sparse model finds the inverted-N sign pattern ($\beta\_1 < 0$, $\beta\_2 > 0$, $\beta\_3 < 0$), all significant at the 0.1% level. The within R² of 0.40 means the GDP polynomial alone explains 40% of within-country CO<sub>2</sub> variation.
+The sparse model finds the inverted-N sign pattern ($\beta\_1 < 0$, $\beta\_2 > 0$, $\beta\_3 < 0$), all significant at the 0.1% level. The within R² is just 0.035 --- the GDP polynomial alone explains only about 3.5% of within-country CO<sub>2</sub> variation after absorbing country and year fixed effects. The overall R² of 0.96 is high because the country fixed effects capture most of the variation.
 
 ### 4.2 Kitchen-sink specification
 
@@ -251,8 +251,8 @@ estimates store fe_kitchen
 
 ```text
 HDFE Linear regression                            Number of obs   =      1,600
-                                                  R-squared       =     0.9971
-                                                  Within R-sq.    =     0.7316
+                                                  R-squared       =     0.9655
+                                                  Within R-sq.    =     0.1249
 ------------------------------------------------------------------------------
       ln_co2 | Coefficient  Std. err.      t    P>|t|
 -------------+----------------------------------------------------------------
@@ -274,7 +274,7 @@ globalizat~n |   .0015186   .0012978     1.17   0.242
 ------------------------------------------------------------------------------
 ```
 
-Adding all 12 controls raises the within R² from 0.40 to 0.73, confirming the controls carry substantial explanatory power. Notice that the five true predictors (fossil fuel, renewable, urban, democracy, industry) have the expected signs, while most noise variables are statistically insignificant --- but a researcher without the answer key would not know which is which.
+Adding all 12 controls raises the within R² from 0.035 to 0.125 --- a meaningful improvement, though the country and year FE still dominate the overall explanatory power (R² = 0.97). The three strongest true predictors (fossil fuel, industry, urban) are clearly significant, while most noise variables are statistically insignificant. Democracy's estimate (--0.0003, p = 0.97) is far from its true value (--0.005) and indistinguishable from zero --- illustrating why weak signals are hard to detect even with the correct model.
 
 ### 4.3 The model uncertainty problem
 
@@ -351,11 +351,11 @@ bmaregress $outcome $gdp_vars $controls ///
 
 ```text
 Bayesian model averaging                          No. of obs         =   1,600
-Linear regression                                 No. of predictors  =     116
+Linear regression                                 No. of predictors  =     113
 MC3 sampling                                                  Groups =      15
-                                                              Always =     101
+                                                              Always =      98
                                                   No. of models      =     163
-Priors:                                           Mean model size    = 107.261
+Priors:                                           Mean model size    = 104.578
   Models: Uniform                                 MCMC sample size   =  50,000
    Coef.: Zellner's g                             Acceptance rate    =  0.0904
        g: Unit-information, g = 1,600             Shrinkage, g/(1+g) =  0.9994
@@ -377,7 +377,7 @@ Note: 9 predictors with PIP less than .5 not shown.
 
 > The Stata output says "PIP less than .5" because that is the default display threshold. We set `pipcutoff(0.8)` to use a stricter robustness criterion --- variables shown in the table all exceed 0.80.
 
-BMA sampled 163 distinct models with a very high sampling correlation of 0.9997. Six variables have PIP above the 0.80 robustness threshold: the three GDP terms (PIP = 0.994--1.000) and three of the five true controls --- fossil fuel (PIP = 1.000), industry (PIP = 0.999), and renewable energy (PIP = 0.959). The BMA posterior means (--7.139, 0.808, --0.030) are remarkably close to the true DGP values (--7.100, 0.810, --0.030), substantially closer than the sparse FE estimates.
+BMA sampled 163 distinct models out of 4,096 possible. This might seem low, but the sampling correlation of 0.9997 (very close to 1.0) confirms that the MC$^3$ chain adequately explored the model space --- the posterior probability is concentrated on a relatively small number of high-quality models. The acceptance rate of 0.09 is below the typical 20--40% range, but the high sampling correlation provides reassurance that the results are reliable. Six variables have PIP above the 0.80 robustness threshold: the three GDP terms (PIP = 0.994--1.000) and three of the five true controls --- fossil fuel (PIP = 1.000), industry (PIP = 0.999), and renewable energy (PIP = 0.959). The BMA posterior means (--7.139, 0.808, --0.030) are remarkably close to the true DGP values (--7.100, 0.810, --0.030), substantially closer than the sparse FE estimates.
 
 Two true controls --- urban (coefficient 0.007) and democracy (coefficient --0.005) --- have PIPs well below 0.80. Their true effects are small, making them hard to distinguish from noise. This is a realistic limitation: even a powerful method like BMA struggles with weak signals.
 
@@ -477,7 +477,7 @@ dsregress $outcome $gdp_vars, ///
 Double-selection linear model         Number of obs               =      1,600
                                       Number of controls          =        112
                                       Number of selected controls =        100
-                                      Wald chi2(3)                =      70.46
+                                      Wald chi2(3)                =      54.16
                                       Prob > chi2                 =     0.0000
 
 ------------------------------------------------------------------------------
@@ -490,7 +490,7 @@ Double-selection linear model         Number of obs               =      1,600
 ------------------------------------------------------------------------------
 ```
 
-Post-double-selection completed in seconds. Internally, `dsregress` ran four separate LASSO regressions (Step 1 on CO<sub>2</sub>, Steps 2a--2c on each GDP term), took the union of all selected controls, and then ran a final OLS of CO<sub>2</sub> on the GDP terms plus that union. All three GDP terms are significant at the 0.1% level with robust standard errors. The Wald test strongly rejects the null that GDP terms are jointly zero ($\chi^2 = 70.46$, p < 0.001).
+Post-double-selection completed in seconds. Internally, `dsregress` ran four separate LASSO regressions (Step 1 on CO<sub>2</sub>, Steps 2a--2c on each GDP term), took the union of all selected controls, and then ran a final OLS of CO<sub>2</sub> on the GDP terms plus that union. All three GDP terms are significant at the 0.1% level with robust standard errors. The Wald test strongly rejects the null that GDP terms are jointly zero ($\chi^2 = 54.16$, p < 0.001).
 
 ### 6.3 Turning points
 
@@ -520,7 +520,9 @@ lassoinfo
 ------------------------------------------------------
 ```
 
-The `lassoinfo` output shows each of the four LASSO steps (one for the outcome, three for the GDP terms). Each step selected about 100 of the 112 candidate controls. The 112 candidates include 80 country dummies, 19 year dummies, and the 12 candidate variables plus the constant. Since most country and year dummies are informative in panel data, LASSO retains them while zeroing out only about 12 of the weakest candidates at each step. The union across all four steps (Step 3 of the algorithm) yields the final control set for the OLS regression in Step 4. Because so many controls survive selection, the post-double-selection estimate ends up close to the kitchen-sink FE --- this is expected when the candidate set is dominated by informative fixed effects.
+The `lassoinfo` output shows each of the four LASSO steps (one for the outcome, three for the GDP terms). Each step selected about 100 of the 112 candidate controls. But note the composition: the 112 candidates include 80 country dummies + 19 year dummies = 99 FE dummies, plus the 12 candidate variables and the constant. LASSO retains nearly all of the informative FE dummies while dropping about 12 variables at each step --- likely most of the 12 candidate controls. The union across all four steps (Step 3) yields the final control set for Step 4's OLS. Because the dropped variables are primarily the candidate controls (not FE), the final OLS regression effectively includes FE but few candidate controls --- producing coefficients identical to the sparse FE specification, not the kitchen-sink.
+
+This reveals a limitation of post-double-selection in panel data settings: when the control set is dominated by informative fixed effects (99 of 112 variables), LASSO has little room to select among the candidate controls of interest. DSL is most powerful in cross-sectional settings or when the candidate set contains many genuinely irrelevant variables relative to FE.
 
 ## 7. Head-to-Head Comparison
 
@@ -534,7 +536,7 @@ The `lassoinfo` output shows each of the four LASSO steps (one for the outcome, 
 | **Min TP** | \\$2,478 | \\$2,426 | \\$2,411 | \\$2,478 | \\$1,895 |
 | **Max TP** | \\$25,656 | \\$27,694 | \\$27,269 | \\$25,656 | \\$34,647 |
 
-Note that the DSL column is identical to Sparse FE --- this is not a copy-paste error. Because LASSO selected nearly all controls (dominated by informative country and year dummies), the post-double-selection final OLS coincides with the sparse specification. BMA and Kitchen-Sink FE, by contrast, produce estimates closer to the true DGP.
+Note that the DSL column is identical to Sparse FE --- this is not a copy-paste error. As discussed in Section 6.4, LASSO dropped most candidate controls while retaining FE dummies, so the final OLS effectively has FE but no candidate controls --- the same specification as sparse FE. BMA and Kitchen-Sink FE, by contrast, include the candidate controls and produce estimates closer to the true DGP.
 
 ### 7.2 Predicted EKC curves
 
@@ -578,13 +580,13 @@ The two methods serve different purposes. **Use BMA** when the research question
 
 ### Takeaways
 
-- **Method convergence is powerful evidence.** BMA (Bayesian, averaging across thousands of models) and DSL (frequentist, LASSO-based selection) agree on the inverted-N EKC shape with turning points near \\$2,400 (minimum) and \\$26,000--\\$27,000 (maximum).
+- **Both methods confirm the inverted-N shape.** BMA (Bayesian, averaging across models) and post-double-selection (frequentist, LASSO-based) both recover the inverted-N EKC. However, BMA produces coefficients closer to the true DGP (--7.139 vs --7.100 for $\beta\_1$), while DSL replicates the sparse FE estimates (--7.498) because LASSO drops the candidate controls in this panel setting. BMA is the stronger performer here.
 
 - **Both methods recover the ground truth.** BMA correctly identifies 6 of 8 true predictors with zero false positives. The three strongest true controls (fossil fuel, industry, renewable energy) all receive PIPs above 0.95. The two misses (urban, democracy) have small true coefficients, illustrating that even good methods have limits with weak signals.
 
 - **Model uncertainty is real.** The GDP linear coefficient shifts from --7.498 (sparse) to --7.131 (kitchen-sink) depending on which controls are included. The maximum turning point moves by \\$2,000. BMA and DSL provide principled solutions.
 
-- **BMA and DSL complement each other.** BMA gives PIPs, coefficient densities, and variable inclusion maps but takes minutes. DSL runs in seconds with standard frequentist inference. Use BMA when you need to know *which* variables matter; use DSL for fast, valid inference on specific coefficients.
+- **BMA and post-double-selection serve different purposes.** BMA excels at variable selection (PIPs, coefficient densities) and produced more accurate coefficient estimates in this panel setting. Post-double-selection is fastest and provides standard frequentist inference, but its value-add over simple FE is limited when the control set is dominated by informative fixed effects. In cross-sectional settings with many irrelevant controls, DSL would be more discriminating.
 
 ### Exercises
 
