@@ -1,47 +1,36 @@
 # Stata BMA and Double-Selection LASSO Tutorial
 
-**Date:** 2026-03-30
+**Date:** 2026-03-30 (initial), 2026-03-31 (revised with synthetic data)
 
 ## Summary
 
-Added a Stata tutorial post (`content/post/stata_bma_dsl/`) comparing Bayesian Model Averaging (BMA) and Double-Selection LASSO (DSL) for testing the Environmental Kuznets Curve hypothesis using panel data from 84 countries (1995--2015). Complements the R BMA/LASSO/WALS tutorial (`r_bma_lasso_wals/`) by using real panel data with country and year fixed effects, and replacing WALS with DSL --- a method designed for causal inference with many controls.
+Stata tutorial (`content/post/stata_bma_dsl/`) comparing Bayesian Model Averaging (BMA) and Double-Selection LASSO (DSL) for the Environmental Kuznets Curve. Uses **synthetic panel data** (80 countries, 1995--2014) with a known answer key: 5 true predictors and 7 noise variables. This lets readers verify whether each method correctly recovers the ground truth.
+
+**Revision (2026-03-31):** Replaced the original Gravina & Lanzafame (2025) dataset with fully synthetic data to address data rights, reduce complexity (12 controls instead of 24), and produce readable figures. Added DGP section, answer-key evaluation figure, color-coded PIP chart, and normalized EKC curves.
 
 ## Key files
 
-- `content/post/stata_bma_dsl/index.md` -- full tutorial (11 sections + references, ~700 lines)
-- `content/post/stata_bma_dsl/analysis.do` -- Stata do-file with baseline FE, BMA, DSL, and comparison
-- `content/post/stata_bma_dsl/analysis.log` -- full Stata 19 output log
-- `content/post/stata_bma_dsl/AFG_ML_master_dataset.dta` -- dataset from Gravina & Lanzafame (2025)
-- `content/post/stata_bma_dsl/stata_bma_dsl_fig[1-6]*.png` -- 6 figures
-- `content/post/stata_bma_dsl/stata_bma_dsl_comparison.csv` -- coefficient comparison table
-- `content/post/stata_bma_dsl/infographic_instructions.md` -- chalkboard infographic AI prompt
+- `content/post/stata_bma_dsl/index.md` -- full tutorial (9 sections, ~600 lines)
+- `content/post/stata_bma_dsl/analysis.do` -- analysis script using macros throughout
+- `content/post/stata_bma_dsl/generate_data.do` -- standalone DGP script
+- `content/post/stata_bma_dsl/synthetic_ekc_panel.csv` -- synthetic dataset (1,600 obs)
+- `content/post/stata_bma_dsl/analysis.log` -- full Stata 19 output
+- `content/post/stata_bma_dsl/stata_bma_dsl_fig[1-7]*.png` -- 7 figures
+- `content/post/stata_bma_dsl/infographic_instructions.md` -- AI image prompt
 
 ## Key results
 
-- All four methods (sparse FE, kitchen-sink FE, BMA, DSL) find inverted-N EKC shape (b1 < 0, b2 > 0, b3 < 0)
-- BMA turning points: $1,275 (min) and $41,561 (max) GDP per capita
-- DSL turning points: $557 (min) and $35,743 (max) GDP per capita
-- Baseline FE coefficient instability: b1 shifts 29% (from -5.67 to -7.34) between sparse and kitchen-sink specs
-- BMA: 15 of 27 variables have PIP > 0.5; all 3 GDP terms have PIP = 1.00
-- DSL: 107 of 132 controls selected by LASSO; all GDP terms significant at 1%
-- BMA sampled 2,162 models with sampling correlation 0.96
-- Key robust controls: fossil fuel share, tourism, private credit, alternative energy, forest cover, industry VA, Gini index
-
-## Pedagogical features
-
-- Starts with standard FE regressions to motivate model uncertainty before introducing BMA/DSL
-- Concept-then-estimation split: BMA theory (Section 5) then results (Section 6), DSL theory (Section 7) then results (Section 8)
-- 4 Mermaid diagrams: tutorial pipeline, EKC shapes, BMA workflow, DSL workflow
-- 5 display-math equations with plain-language explanations and variable mappings
-- 20 interpretation paragraphs with specific numbers (2.5x the minimum of 8)
-- 4 analogies: horse race (BMA), smart research assistant (DSL), strictness dial (lambda), flickering (low-PIP variables)
-- Cross-reference to the R BMA/LASSO/WALS tutorial
-- `bmagraph varmap` and `bmagraph coefdensity` BMA diagnostics included
+- DGP: b1=-7.1, b2=0.81, b3=-0.03 (inverted-N), turning points at $1,895 and $34,647
+- BMA: b1=-7.139, b2=0.808, b3=-0.030, turning points $2,411 and $27,269
+- DSL: b1=-7.498, b2=0.849, b3=-0.031, turning points $2,478 and $25,656
+- BMA correctly identifies 6/8 true predictors (misses urban and democracy, both weak signals)
+- BMA makes 0 false positives: all 7 noise variables get PIP < 0.5
+- PIPs for true controls: fossil_fuel=1.000, industry=0.999, renewable=0.959
 
 ## Technical notes
 
-- Requires Stata 18+ for `bmaregress` and `dsregress` (run with Stata 19 SE)
-- BMA runtime: ~2 minutes with mcmcsize(50000) on Stata 19 SE
-- Dataset loaded from GitHub URL for reproducibility
-- `reghdfe` used for baseline two-way FE regressions
-- `wdi_trade_gdp` dropped by `reghdfe` due to collinearity with imports + exports
+- Synthetic data generated with `set seed 20250330` for reproducibility
+- Noise variables (globalization, services, trade, credit) correlated with GDP to make selection non-trivial
+- PIP chart filters to 15 candidate variables only (excludes 100+ FE dummies from pip matrix)
+- EKC curves normalized at sample-mean GDP for direct visual comparison
+- Requires Stata 18+ (bmaregress, dsregress) plus reghdfe and labutil packages

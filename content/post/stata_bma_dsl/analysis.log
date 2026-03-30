@@ -3,7 +3,7 @@
        log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_bma_
 > dsl/analysis.log
   log type:  text
- opened on:  30 Mar 2026, 23:03:30
+ opened on:  31 Mar 2026, 00:18:13
 
 . 
 . display _newline "============================================="
@@ -13,241 +13,113 @@
 . display "  TUTORIAL: BMA and DSL for the EKC"
   TUTORIAL: BMA and DSL for the EKC
 
+. display "  Data: Synthetic panel (80 countries, 1995-2014)"
+  Data: Synthetic panel (80 countries, 1995-2014)
+
 . display "  Started: $S_DATE $S_TIME"
-  Started: 30 Mar 2026 23:03:30
+  Started: 31 Mar 2026 00:18:13
 
 . display "============================================="
 =============================================
 
 . 
-. * Load the dataset (84 countries, 1995-2015)
-. use "AFG_ML_master_dataset.dta", clear
+. * Load synthetic data (use local file; GitHub URL available after push)
+. * GitHub URL: https://github.com/cmg777/starter-academic-v501/raw/master/cont
+> ent/post/stata_bma_dsl/synthetic_ekc_panel.csv
+. import delimited "synthetic_ekc_panel.csv", clear
+(encoding automatically selected: ISO-8859-1)
+(18 vars, 1,600 obs)
 
-. xtset id year, yearly
+. 
+. xtset country_id year, yearly
 
-Panel variable: id (unbalanced)
- Time variable: year, 1946 to 2022, but with gaps
+Panel variable: country_id (strongly balanced)
+ Time variable: year, 1995 to 2014
          Delta: 1 year
 
 . 
-. *---------------------------------------------*
-. * Generate variables                          *
-. *---------------------------------------------*
-. 
-. * Our outcome: CO2 emissions per capita, in logs
-. * We use logs because the relationship is multiplicative, not additive.
-. gen wdi_lnco2 = ln(wdi_co2)
-(11,443 missing values generated)
+. * Label variables for readable output
+. label variable country_id    "Country ID"
 
-. label variable wdi_lnco2 "CO2 emissions per capita (log)"
+. label variable year          "Year"
 
-. 
-. * GDP per capita terms -- the heart of the EKC test
-. * We need linear, squared, and cubed terms to fit a cubic polynomial.
-. * rgdpo = real GDP (output-side), pop = population
-. gen pwt_gdppc = ln(rgdpo/pop)
-(10,053 missing values generated)
+. label variable ln_co2        "CO2 per capita (log)"
 
-. gen pwt_gdppc_sq = pwt_gdppc^2
-(10,053 missing values generated)
+. label variable ln_gdp        "GDP per capita (log)"
 
-. gen pwt_gdppc_cb = pwt_gdppc^3
-(10,053 missing values generated)
+. label variable ln_gdp_sq     "GDP per capita squared (log)"
 
-. label variable pwt_gdppc    "Real GDP per capita (log)"
+. label variable ln_gdp_cb     "GDP per capita cubed (log)"
 
-. label variable pwt_gdppc_sq "Real GDP per capita squared (log)"
+. label variable fossil_fuel   "Fossil fuel share (%)"
 
-. label variable pwt_gdppc_cb "Real GDP per capita cubed (log)"
+. label variable renewable     "Renewable energy (%)"
 
-. 
-. * Control variables -- these are the 24 "candidate" variables that BMA and DS
-> L
-. * will evaluate. Each captures a different channel through which economic
-. * development might affect CO2 emissions.
-. gen ist = pl_i/pl_c
-(10,053 missing values generated)
+. label variable urban         "Urban population (%)"
 
-. gen gini_mkt = ln(swiid_gini_mkt)
-(14,442 missing values generated)
+. label variable globalization "Globalization index"
 
-. gen wdi_tourism_arr_pop = ln(wdi_tourism_arrivals / wdi_pop)
-(14,652 missing values generated)
+. label variable pop_density   "Population density"
 
-. gen lab_prod = ln(rgdpe/emp)
-(10,923 missing values generated)
+. label variable democracy     "Democracy score"
 
-. gen ln_credit = ln(fds_pr_credit_gdp)
-(12,222 missing values generated)
+. label variable corruption    "Corruption index"
 
-. gen ln_rat = ln(1 + iead_rat)
-(9,788 missing values generated)
+. label variable industry      "Industry VA (% GDP)"
 
-. gen gdppc_level = rgdpo/pop
-(10,053 missing values generated)
+. label variable services      "Services VA (% GDP)"
+
+. label variable trade         "Trade openness (% GDP)"
+
+. label variable fdi           "FDI inflows (% GDP)"
+
+. label variable credit        "Domestic credit (% GDP)"
 
 . 
-. label variable ist                    "Investment-specific tech progress"
+. display _newline "=== Dataset summary ==="
 
-. label variable gini_mkt               "Gini Index (log)"
+=== Dataset summary ===
 
-. label variable wdi_tourism_arr_pop    "International tourism (log)"
+. xtdescribe
 
-. label variable lab_prod               "Labor productivity (log)"
+country_id:  1, 2, ..., 80                                   n =         80
+    year:  1995, 1996, ..., 2014                             T =         20
+           Delta(year) = 1 year
+           Span(year)  = 20 periods
+           (country_id*year uniquely identifies each observation)
 
-. label variable ln_credit              "Private credit to GDP (log)"
+Distribution of T_i:   min      5%     25%       50%       75%     95%     max
+                        20      20      20        20        20      20      20
 
-. label variable ln_rat                 "IEAs ratified per year (log)"
+     Freq.  Percent    Cum. |  Pattern
+ ---------------------------+----------------------
+       80    100.00  100.00 |  11111111111111111111
+ ---------------------------+----------------------
+       80    100.00         |  XXXXXXXXXXXXXXXXXXXX
 
-. label variable wdi_fossil             "Fossil fuel energy (%)"
-
-. label variable wdi_energy_imp         "Energy imports (%)"
-
-. label variable wdi_alt_energy         "Alternative & nuclear energy (%)"
-
-. label variable wdi_urbanpop           "Urban population (%)"
-
-. label variable KOFGI                  "KOF Globalization Index"
-
-. label variable wdi_pop_dens           "Population density"
-
-. label variable ctfp                   "TFP level"
-
-. label variable em_envmin_upd          "Environmental ministry (dummy)"
-
-. label variable fao_luforest           "Forest land (%)"
-
-. label variable wdi_agri_va_gdp        "Agriculture value added (% GDP)"
-
-. label variable wdi_industry_va_gdp    "Industry value added (% GDP)"
-
-. label variable wdi_services_gdp       "Services value added (% GDP)"
-
-. label variable bl_1564_lh_ipo         "Tertiary education (%)"
-
-. label variable wdi_fdi_net_inflows_gdp "FDI net inflows (% GDP)"
-
-. label variable wdi_inflation          "Inflation (%)"
-
-. label variable wdi_imports_gdp        "Imports (% GDP)"
-
-. label variable wdi_exports_gdp        "Exports (% GDP)"
-
-. label variable wdi_trade_gdp          "Total trade (% GDP)"
-
-. label variable polity2                "Polity Score Index"
-
-. label variable corruption             "Corruption Index"
-
-. label variable dpi_polariz            "Political Polarization"
-
-. 
-. *---------------------------------------------*
-. * Define variable groups (macros)             *
-. *---------------------------------------------*
-. * These macros organize variables by category. BMA and DSL will evaluate
-. * all of them as potential controls alongside the three GDP terms.
-. 
-. global outcome      "wdi_lnco2"
-
-. global gdppc_vars   "pwt_gdppc pwt_gdppc_sq pwt_gdppc_cb"
-
-. global energy_vars  "wdi_fossil wdi_energy_imp wdi_alt_energy"
-
-. global sociodemo    "wdi_urbanpop KOFGI wdi_pop_dens"
-
-. global tech_vars    "ctfp ist"
-
-. global env_vars     "em_envmin_upd ln_rat fao_luforest"
-
-. global econ_vars    "wdi_agri_va_gdp wdi_industry_va_gdp wdi_services_gdp bl_
-> 1564_lh_ipo wdi_fdi_net_inflows_gdp gini_mkt wdi_tourism_arr_pop lab_prod wdi
-> _inflation wdi_imports_gdp wdi_exports_gdp wdi_trade_gdp ln_credit"
-
-. global inst_vars    "polity2 corruption dpi_polariz"
-
-. 
-. * All controls combined (for baseline regressions)
-. global all_controls "$energy_vars $sociodemo $env_vars $tech_vars $inst_vars 
-> $econ_vars"
-
-. 
-. * Fixed effects -- always included in every model
-. global fe_vars      "i.id i.year"
-
-. 
-. *---------------------------------------------*
-. * Restrict to analysis sample                 *
-. *---------------------------------------------*
-. * The paper uses 84 countries with complete data (no missing values).
-. 
-. keep if countrycode == "ARM" | countrycode == "AUS" | countrycode == "AUT" | 
-> ///
->     countrycode == "BEL" | countrycode == "BGR" | countrycode == "BHR" | ///
->     countrycode == "BOL" | countrycode == "BRA" | countrycode == "BWA" | ///
->     countrycode == "CAN" | countrycode == "CHL" | countrycode == "CHN" | ///
->     countrycode == "CMR" | countrycode == "COL" | countrycode == "CRI" | ///
->     countrycode == "CYP" | countrycode == "CZE" | countrycode == "DNK" | ///
->     countrycode == "DOM" | countrycode == "ECU" | countrycode == "EGY" | ///
->     countrycode == "ESP" | countrycode == "EST" | countrycode == "FIN" | ///
->     countrycode == "FRA" | countrycode == "GAB" | countrycode == "GBR" | ///
->     countrycode == "GRC" | countrycode == "GTM" | countrycode == "HND" | ///
->     countrycode == "HRV" | countrycode == "HUN" | countrycode == "IDN" | ///
->     countrycode == "IND" | countrycode == "IRL" | countrycode == "IRN" | ///
->     countrycode == "ISR" | countrycode == "ITA" | countrycode == "JAM" | ///
->     countrycode == "JOR" | countrycode == "JPN" | countrycode == "KAZ" | ///
->     countrycode == "KEN" | countrycode == "KOR" | countrycode == "LKA" | ///
->     countrycode == "LTU" | countrycode == "LUX" | countrycode == "LVA" | ///
->     countrycode == "MAR" | countrycode == "MEX" | countrycode == "MNG" | ///
->     countrycode == "MOZ" | countrycode == "MYS" | countrycode == "NAM" | ///
->     countrycode == "NER" | countrycode == "NIC" | countrycode == "NLD" | ///
->     countrycode == "NOR" | countrycode == "NZL" | countrycode == "PAN" | ///
->     countrycode == "PER" | countrycode == "PHL" | countrycode == "POL" | ///
->     countrycode == "PRT" | countrycode == "PRY" | countrycode == "RUS" | ///
->     countrycode == "SAU" | countrycode == "SDN" | countrycode == "SEN" | ///
->     countrycode == "SGP" | countrycode == "SVK" | countrycode == "SVN" | ///
->     countrycode == "SWE" | countrycode == "TGO" | countrycode == "THA" | ///
->     countrycode == "TUN" | countrycode == "TUR" | countrycode == "TZA" | ///
->     countrycode == "UKR" | countrycode == "URY" | countrycode == "USA" | ///
->     countrycode == "VEN" | countrycode == "ZAF" | countrycode == "ZMB"
-(14,111 observations deleted)
-
-. 
-. drop if year < 1995 | year > 2015
-(4,577 observations deleted)
-
-. 
-. * Flag observations with any missing values across all variables
-. cap drop nmissing
-
-. egen nmissing = rowmiss($outcome $gdppc_vars $energy_vars $sociodemo ///
->     $env_vars $tech_vars $inst_vars $econ_vars)
-
-. 
-. display _newline "=== Analysis sample ==="
-
-=== Analysis sample ===
-
-. count if nmissing == 0
-  1,215
-
-. display "Expected: 1,215 observations (84 countries x ~14.5 years avg)"
-Expected: 1,215 observations (84 countries x ~14.5 years avg)
-
-. 
-. * Quick summary of key variables
-. display _newline "=== Summary statistics ==="
-
-=== Summary statistics ===
-
-. summarize $outcome $gdppc_vars if nmissing == 0
+. summarize $outcome $gdp_vars $controls
 
     Variable |        Obs        Mean    Std. dev.       Min        Max
 -------------+---------------------------------------------------------
-   wdi_lnco2 |      1,215    1.245312    1.200862  -2.641238   3.211837
-   pwt_gdppc |      1,215    9.557503    1.008008   6.827685   11.45795
-pwt_gdppc_sq |      1,215     92.3611    18.82408   46.61728   131.2846
-pwt_gdppc_cb |      1,215     901.667     266.832   318.2881   1504.252
+      ln_co2 |      1,600    -19.0385    .7863276  -21.03685   -16.8315
+      ln_gdp |      1,600    9.583865    1.329675   6.974263    11.9704
+   ln_gdp_sq |      1,600    93.61741    25.55106   48.64035   143.2904
+   ln_gdp_cb |      1,600    931.1045     373.829   339.2306   1715.243
+ fossil_fuel |      1,600     54.7724    19.14168    6.36807         95
+-------------+---------------------------------------------------------
+   renewable |      1,600    29.54128    11.96568          1    64.2207
+       urban |      1,600    53.67416      14.778   15.95174   91.63234
+globalizat~n |      1,600    57.64978    12.71537   26.75758         95
+ pop_density |      1,600    121.3443    210.2646          1   1571.771
+   democracy |      1,600    2.333462    4.179503   -6.12244         10
+-------------+---------------------------------------------------------
+  corruption |      1,600    52.35226    28.52792          0        100
+    industry |      1,600    24.64331    6.180478   5.843938   45.32926
+    services |      1,600    43.55976    9.366089   17.82623   64.07455
+       trade |      1,600    67.43547    19.36148   10.04306   128.0595
+         fdi |      1,600    2.982371    4.373857  -11.50437   16.19903
+-------------+---------------------------------------------------------
+      credit |      1,600    53.44019    18.20204   11.32991   123.2399
 
 . 
 . 
@@ -256,25 +128,21 @@ pwt_gdppc_cb |      1,215     901.667     266.832   318.2881   1504.252
 . *  SECTION 2: EXPLORE THE DATA -- FIGURE 1
 . *============================================================================
 > =*
-. *
-. *  Before running any models, let's look at the raw data. Does the scatter
-. *  of log GDP vs log CO2 suggest a nonlinear relationship?
 . 
-. twoway (scatter wdi_lnco2 pwt_gdppc if nmissing == 0, ///
->         msize(tiny) mcolor(navy%40) msymbol(circle)), ///
->     ytitle("Log CO2 emissions per capita") ///
->     xtitle("Log real GDP per capita") ///
->     title("Raw Data: CO2 Emissions vs. Income", size(medium)) ///
->     subtitle("84 countries, 1995-2015 (N = 1,215)", size(small)) ///
+. twoway (scatter $outcome ln_gdp, ///
+>         msize(vsmall) mcolor("106 155 204"%40) msymbol(circle)), ///
+>     ytitle("Log CO2 per capita") ///
+>     xtitle("Log GDP per capita") ///
+>     title("Synthetic Data: CO2 vs. Income", size(medium)) ///
+>     subtitle("80 countries, 1995-2014 (N = 1,600)", size(small)) ///
 >     note("Each dot is a country-year observation." ///
->          "Notice the nonlinear pattern -- motivates testing for a cubic shape
-> .") ///
+>          "The nonlinear pattern motivates testing for a cubic EKC shape.") //
+> /
 >     scheme(s2color) ///
 >     name(fig1_scatter, replace)
 
 . 
 . graph export "stata_bma_dsl_fig1_scatter.png", replace width(2400)
-(file stata_bma_dsl_fig1_scatter.png not found)
 file stata_bma_dsl_fig1_scatter.png written in PNG format
 
 . display _newline "Saved: stata_bma_dsl_fig1_scatter.png"
@@ -285,25 +153,16 @@ Saved: stata_bma_dsl_fig1_scatter.png
 . 
 . *============================================================================
 > =*
-. *  SECTION 3: BASELINE -- STANDARD FIXED EFFECTS
+. *  SECTION 3: BASELINE FIXED EFFECTS
 . *============================================================================
 > =*
-. *
-. *  Before using BMA or DSL, let's see what standard panel regressions say.
-. *  We run two specifications:
-. *    (a) SPARSE: GDP polynomial terms + country & year FE only (no controls)
-. *    (b) KITCHEN-SINK: GDP terms + ALL 24 controls + country & year FE
-. *
-. *  If the coefficients are stable across both, we don't need fancy methods.
-. *  If they change dramatically, that proves model uncertainty is a real probl
-> em.
 . 
 . display _newline "============================================="
 
 =============================================
 
-. display "  BASELINE: Standard Fixed Effects Regressions"
-  BASELINE: Standard Fixed Effects Regressions
+. display "  BASELINE: Standard Fixed Effects"
+  BASELINE: Standard Fixed Effects
 
 . display "============================================="
 =============================================
@@ -312,209 +171,184 @@ Saved: stata_bma_dsl_fig1_scatter.png
 . *---------------------------------------------*
 . * 3a. Sparse specification (no controls)      *
 . *---------------------------------------------*
-. 
-. reghdfe $outcome $gdppc_vars if nmissing == 0, absorb(id year)
-(dropped 2 singleton observations)
-(MWFE estimator converged in 6 iterations)
+. reghdfe $outcome $gdp_vars, absorb(country_id year)
+(MWFE estimator converged in 2 iterations)
 
-HDFE Linear regression                            Number of obs   =      1,213
-Absorbing 2 HDFE groups                           F(   3,   1108) =     136.55
+HDFE Linear regression                            Number of obs   =      1,600
+Absorbing 2 HDFE groups                           F(   3,   1498) =      18.31
                                                   Prob > F        =     0.0000
-                                                  R-squared       =     0.9892
-                                                  Adj R-squared   =     0.9882
-                                                  Within R-sq.    =     0.2699
-                                                  Root MSE        =     0.1304
+                                                  R-squared       =     0.9620
+                                                  Adj R-squared   =     0.9594
+                                                  Within R-sq.    =     0.0354
+                                                  Root MSE        =     0.1584
 
 ------------------------------------------------------------------------------
-   wdi_lnco2 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+      ln_co2 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-   pwt_gdppc |  -5.666898   1.278373    -4.43   0.000    -8.175203   -3.158592
-pwt_gdppc_sq |   .7661527   .1394049     5.50   0.000     .4926254     1.03968
-pwt_gdppc_cb |  -.0313049   .0050348    -6.22   0.000    -.0411838    -.021426
-       _cons |   12.86944     3.8832     3.31   0.001     5.250188     20.4887
+      ln_gdp |  -7.498046   1.841643    -4.07   0.000    -11.11052   -3.885574
+   ln_gdp_sq |    .848967   .1924619     4.41   0.000     .4714435     1.22649
+   ln_gdp_cb |  -.0314993   .0066242    -4.76   0.000     -.044493   -.0185057
+       _cons |   2.672866   5.816436     0.46   0.646    -8.736357    14.08209
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
 -----------------------------------------------------+
  Absorbed FE | Categories  - Redundant  = Num. Coefs |
 -------------+---------------------------------------|
-          id |        82           0          82     |
-        year |        21           1          20     |
+  country_id |        80           0          80     |
+        year |        20           1          19     |
 -----------------------------------------------------+
 
 . estimates store fe_sparse
 
 . 
-. * Extract coefficients
-. local b1_sparse = _b[pwt_gdppc]
+. local b1_sparse = _b[ln_gdp]
 
-. local b2_sparse = _b[pwt_gdppc_sq]
+. local b2_sparse = _b[ln_gdp_sq]
 
-. local b3_sparse = _b[pwt_gdppc_cb]
+. local b3_sparse = _b[ln_gdp_cb]
 
 . 
 . display _newline "=== Sparse FE Coefficients ==="
 
 === Sparse FE Coefficients ===
 
-. display "  b1 (GDP):       " %9.4f `b1_sparse'
-  b1 (GDP):         -5.6669
+. display "  b1 (GDP):   " %9.4f `b1_sparse'
+  b1 (GDP):     -7.4980
 
-. display "  b2 (GDP^2):     " %9.4f `b2_sparse'
-  b2 (GDP^2):        0.7662
+. display "  b2 (GDP^2): " %9.4f `b2_sparse'
+  b2 (GDP^2):    0.8490
 
-. display "  b3 (GDP^3):     " %9.4f `b3_sparse'
-  b3 (GDP^3):       -0.0313
+. display "  b3 (GDP^3): " %9.4f `b3_sparse'
+  b3 (GDP^3):   -0.0315
 
 . 
 . *---------------------------------------------*
-. * 3b. Kitchen-sink specification (all controls)*
+. * 3b. Kitchen-sink specification              *
 . *---------------------------------------------*
-. 
-. reghdfe $outcome $gdppc_vars $all_controls if nmissing == 0, absorb(id year)
-(dropped 2 singleton observations)
-(MWFE estimator converged in 7 iterations)
-note: wdi_trade_gdp omitted because of collinearity
+. reghdfe $outcome $gdp_vars $controls, absorb(country_id year)
+(MWFE estimator converged in 2 iterations)
 
-HDFE Linear regression                            Number of obs   =      1,213
-Absorbing 2 HDFE groups                           F(  29,   1082) =      54.09
+HDFE Linear regression                            Number of obs   =      1,600
+Absorbing 2 HDFE groups                           F(  15,   1486) =      14.14
                                                   Prob > F        =     0.0000
-                                                  R-squared       =     0.9940
-                                                  Adj R-squared   =     0.9932
-                                                  Within R-sq.    =     0.5918
-                                                  Root MSE        =     0.0987
+                                                  R-squared       =     0.9655
+                                                  Adj R-squared   =     0.9629
+                                                  Within R-sq.    =     0.1249
+                                                  Root MSE        =     0.1515
 
 ------------------------------------------------------------------------------
-   wdi_lnco2 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+      ln_co2 | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-   pwt_gdppc |  -7.335271   1.339273    -5.48   0.000    -9.963138   -4.707404
-pwt_gdppc_sq |   .8654894   .1485562     5.83   0.000     .5739986     1.15698
-pwt_gdppc_cb |  -.0326609   .0054737    -5.97   0.000    -.0434011   -.0219207
-  wdi_fossil |   .0143633   .0012394    11.59   0.000     .0119315    .0167951
-wdi_energy~p |  -.0000393   .0001474    -0.27   0.790    -.0003284    .0002498
-wdi_alt_en~y |  -.0095788   .0024493    -3.91   0.000    -.0143846   -.0047729
-wdi_urbanpop |   .0071536   .0019154     3.73   0.000     .0033953    .0109119
-       KOFGI |   .0044996   .0019443     2.31   0.021     .0006846    .0083147
-wdi_pop_dens |   .0000689   .0000395     1.74   0.082    -8.64e-06    .0001464
-em_envmin_~d |  -.0034682    .026867    -0.13   0.897    -.0561856    .0492492
-      ln_rat |   .0045507   .0051438     0.88   0.377    -.0055423    .0146436
-fao_luforest |  -.0136642   .0031457    -4.34   0.000    -.0198364   -.0074919
-        ctfp |   .0471054   .0703512     0.67   0.503    -.0909348    .1851455
-         ist |   .0069065   .0038126     1.81   0.070    -.0005744    .0143874
-     polity2 |   -.004271   .0028219    -1.51   0.130    -.0098081     .001266
-  corruption |   .0173682   .0068089     2.55   0.011      .004008    .0307284
- dpi_polariz |  -.0236471    .005647    -4.19   0.000    -.0347274   -.0125668
-wdi_agri_v~p |  -.0078337   .0023766    -3.30   0.001    -.0124969   -.0031706
-wdi_indust~p |   .0100877     .00224     4.50   0.000     .0056924    .0144831
-wdi_servic~p |  -.0061858   .0014567    -4.25   0.000    -.0090441   -.0033275
-bl_1564_lh~o |   .0003373    .001327     0.25   0.799    -.0022665    .0029412
-wdi_fdi_ne~p |   .0008907   .0004901     1.82   0.069    -.0000711    .0018524
-    gini_mkt |   .6294517   .1358696     4.63   0.000      .362854    .8960495
-wdi_touris~p |   .0867995   .0137434     6.32   0.000     .0598327    .1137662
-    lab_prod |  -.1033045   .0787042    -1.31   0.190    -.2577346    .0511257
-wdi_inflat~n |   .0001987   .0001026     1.94   0.053    -2.58e-06       .0004
-wdi_import~p |   .0020576   .0009974     2.06   0.039     .0001006    .0040147
-wdi_export~p |   -.004814    .000971    -4.96   0.000    -.0067191   -.0029088
-wdi_trade_~p |          0  (omitted)
-   ln_credit |   .0735298   .0133299     5.52   0.000     .0473743    .0996852
-       _cons |   18.23871   3.931154     4.64   0.000     10.52516    25.95226
+      ln_gdp |  -7.130693   1.769542    -4.03   0.000    -10.60176   -3.659628
+   ln_gdp_sq |   .8059928     .18496     4.36   0.000     .4431823    1.168803
+   ln_gdp_cb |  -.0298133    .006366    -4.68   0.000    -.0423006    -.017326
+ fossil_fuel |   .0138444   .0013164    10.52   0.000     .0112621    .0164267
+   renewable |   -.006795   .0019783    -3.43   0.001    -.0106756   -.0029144
+       urban |   .0057534   .0025655     2.24   0.025      .000721    .0107857
+globalizat~n |   .0015186   .0012978     1.17   0.242    -.0010272    .0040644
+ pop_density |   .0000794   .0003123     0.25   0.799    -.0005332     .000692
+   democracy |  -.0002971   .0076989    -0.04   0.969     -.015399    .0148048
+  corruption |   .0009812   .0008083     1.21   0.225    -.0006044    .0025669
+    industry |   .0086336   .0020061     4.30   0.000     .0046986    .0125686
+    services |  -.0005642   .0019249    -0.29   0.769    -.0043401    .0032117
+       trade |  -.0002458   .0007895    -0.31   0.756    -.0017944    .0013029
+         fdi |  -.0017599   .0019212    -0.92   0.360    -.0055284    .0020086
+      credit |    -.00139   .0008142    -1.71   0.088     -.002987    .0002071
+       _cons |    .499146   5.585077     0.09   0.929    -10.45633    11.45462
 ------------------------------------------------------------------------------
 
 Absorbed degrees of freedom:
 -----------------------------------------------------+
  Absorbed FE | Categories  - Redundant  = Num. Coefs |
 -------------+---------------------------------------|
-          id |        82           0          82     |
-        year |        21           1          20     |
+  country_id |        80           0          80     |
+        year |        20           1          19     |
 -----------------------------------------------------+
 
 . estimates store fe_kitchen
 
 . 
-. * Extract coefficients
-. local b1_kitchen = _b[pwt_gdppc]
+. local b1_kitchen = _b[ln_gdp]
 
-. local b2_kitchen = _b[pwt_gdppc_sq]
+. local b2_kitchen = _b[ln_gdp_sq]
 
-. local b3_kitchen = _b[pwt_gdppc_cb]
+. local b3_kitchen = _b[ln_gdp_cb]
 
 . 
 . display _newline "=== Kitchen-Sink FE Coefficients ==="
 
 === Kitchen-Sink FE Coefficients ===
 
-. display "  b1 (GDP):       " %9.4f `b1_kitchen'
-  b1 (GDP):         -7.3353
+. display "  b1 (GDP):   " %9.4f `b1_kitchen'
+  b1 (GDP):     -7.1307
 
-. display "  b2 (GDP^2):     " %9.4f `b2_kitchen'
-  b2 (GDP^2):        0.8655
+. display "  b2 (GDP^2): " %9.4f `b2_kitchen'
+  b2 (GDP^2):    0.8060
 
-. display "  b3 (GDP^3):     " %9.4f `b3_kitchen'
-  b3 (GDP^3):       -0.0327
+. display "  b3 (GDP^3): " %9.4f `b3_kitchen'
+  b3 (GDP^3):   -0.0298
 
 . 
 . *---------------------------------------------*
-. * 3c. Compare the two specifications          *
+. * 3c. Compare specifications                  *
 . *---------------------------------------------*
-. 
 . display _newline "=== Coefficient Comparison ==="
 
 === Coefficient Comparison ===
 
-. display _newline "                    Sparse FE       Kitchen-Sink FE"
+. display _newline "                Sparse FE     Kitchen-Sink FE"
 
-                    Sparse FE       Kitchen-Sink FE
+                Sparse FE     Kitchen-Sink FE
 
-. display "  b1 (GDP):       " %9.4f `b1_sparse' "       " %9.4f `b1_kitchen'
-  b1 (GDP):         -5.6669         -7.3353
+. display "  b1 (GDP):   " %9.4f `b1_sparse' "     " %9.4f `b1_kitchen'
+  b1 (GDP):     -7.4980       -7.1307
 
-. display "  b2 (GDP^2):     " %9.4f `b2_sparse' "       " %9.4f `b2_kitchen'
-  b2 (GDP^2):        0.7662          0.8655
+. display "  b2 (GDP^2): " %9.4f `b2_sparse' "     " %9.4f `b2_kitchen'
+  b2 (GDP^2):    0.8490        0.8060
 
-. display "  b3 (GDP^3):     " %9.4f `b3_sparse' "       " %9.4f `b3_kitchen'
-  b3 (GDP^3):       -0.0313         -0.0327
+. display "  b3 (GDP^3): " %9.4f `b3_sparse' "     " %9.4f `b3_kitchen'
+  b3 (GDP^3):   -0.0315       -0.0298
 
 . 
-. * Compute turning points for both specifications
+. * Turning points
 . local disc_sparse = (`b2_sparse')^2 - 3 * `b1_sparse' * `b3_sparse'
 
 . local disc_kitchen = (`b2_kitchen')^2 - 3 * `b1_kitchen' * `b3_kitchen'
 
 . 
-. display _newline "=== Turning Points Comparison ==="
+. display _newline "=== Turning Points ==="
 
-=== Turning Points Comparison ===
+=== Turning Points ===
 
-. 
 . if `disc_sparse' > 0 {
 .     local min_sparse = exp((-`b2_sparse' + sqrt(`disc_sparse')) / (3 * `b3_sp
 > arse'))
 .     local max_sparse = exp((-`b2_sparse' - sqrt(`disc_sparse')) / (3 * `b3_sp
 > arse'))
-.     display "  Sparse  -- Min: $" %10.0fc `min_sparse' "  Max: $" %10.0fc `ma
-> x_sparse'
-  Sparse  -- Min: $       289  Max: $    42,203
+.     display "  Sparse:  Min $" %8.0fc `min_sparse' "  Max $" %8.0fc `max_spar
+> se'
+  Sparse:  Min $   2,478  Max $  25,656
 . }
 
 . else {
-.     display "  Sparse  -- No real turning points (discriminant < 0)"
+.     display "  Sparse: No real turning points"
 .     local min_sparse = .
 .     local max_sparse = .
 . }
 
-. 
 . if `disc_kitchen' > 0 {
 .     local min_kitchen = exp((-`b2_kitchen' + sqrt(`disc_kitchen')) / (3 * `b3
 > _kitchen'))
 .     local max_kitchen = exp((-`b2_kitchen' - sqrt(`disc_kitchen')) / (3 * `b3
 > _kitchen'))
-.     display "  Kitchen -- Min: $" %10.0fc `min_kitchen' "  Max: $" %10.0fc `m
-> ax_kitchen'
-  Kitchen -- Min: $     1,159  Max: $    40,573
+.     display "  Kitchen: Min $" %8.0fc `min_kitchen' "  Max $" %8.0fc `max_kit
+> chen'
+  Kitchen: Min $   2,426  Max $  27,694
 . }
 
 . else {
-.     display "  Kitchen -- No real turning points (discriminant < 0)"
+.     display "  Kitchen: No real turning points"
 .     local min_kitchen = .
 .     local max_kitchen = .
 . }
@@ -523,9 +357,6 @@ Absorbed degrees of freedom:
 . *---------------------------------------------*
 . * 3d. Coefficient instability chart -- Fig 2  *
 . *---------------------------------------------*
-. * This bar chart shows how the GDP coefficients change between the two
-. * specifications, visually demonstrating the model uncertainty problem.
-. 
 . preserve
 
 . clear
@@ -546,7 +377,6 @@ Number of observations (_N) was 0, now 6.
 . gen order = _n
 
 . 
-. * Sparse specification
 . replace spec = "Sparse FE" in 1
 variable spec was str1 now str9
 (1 real change made)
@@ -580,7 +410,6 @@ variable coef_name was str8 now str11
 (1 real change made)
 
 . 
-. * Kitchen-sink specification
 . replace spec = "Kitchen-Sink FE" in 4
 variable spec was str9 now str15
 (1 real change made)
@@ -614,32 +443,29 @@ variable spec was str9 now str15
 . 
 . graph twoway ///
 >     (bar value order if spec == "Sparse FE", ///
->         barwidth(0.35) color(navy%70)) ///
+>         barwidth(0.35) color("106 155 204")) ///
 >     (bar value order if spec == "Kitchen-Sink FE", ///
->         barwidth(0.35) color(cranberry%70)), ///
->     xlabel(1 "b1 (GDP)" 2 "b2 (GDP{superscript:2})" 3 "b3 (GDP{superscript:3}
-> )" ///
->            4 "b1 (GDP)" 5 "b2 (GDP{superscript:2})" 6 "b3 (GDP{superscript:3}
-> )", ///
+>         barwidth(0.35) color("217 119 87")), ///
+>     xlabel(1 `""b1" "(GDP)""' 2 `""b2" "(GDP{sup:2})""' 3 `""b3" "(GDP{sup:3}
+> )""' ///
+>            4 `""b1" "(GDP)""' 5 `""b2" "(GDP{sup:2})""' 6 `""b3" "(GDP{sup:3}
+> )""', ///
 >         angle(0) labsize(small)) ///
 >     xline(3.5, lcolor(gs10) lpattern(dash)) ///
->     ylabel(, format(%4.2f)) ///
+>     ylabel(, format(%5.2f)) ///
 >     ytitle("Coefficient value") ///
->     title("Coefficient Instability: Which Controls to Include?", size(medium)
-> ) ///
->     subtitle("Same GDP terms, different control sets -- coefficients shift dr
-> amatically", size(small)) ///
->     legend(order(1 "Sparse FE (no controls)" 2 "Kitchen-Sink FE (all 24 contr
+>     title("Coefficient Instability Across Specifications", size(medium)) ///
+>     subtitle("Same GDP terms, different control sets", size(small)) ///
+>     legend(order(1 "Sparse FE (no controls)" 2 "Kitchen-Sink FE (all 12 contr
 > ols)") ///
 >         rows(1) position(6) size(small)) ///
->     note("This instability motivates BMA and DSL: principled methods" ///
->          "for deciding which controls belong in the model.") ///
+>     note("Adding controls shifts GDP coefficients --- which specification is 
+> correct?") ///
 >     scheme(s2color) ///
->     name(fig2_instability, replace)
+>     name(fig2_instab, replace)
 
 . 
 . graph export "stata_bma_dsl_fig2_instability.png", replace width(2400)
-(file stata_bma_dsl_fig2_instability.png not found)
 file stata_bma_dsl_fig2_instability.png written in PNG format
 
 . display _newline "Saved: stata_bma_dsl_fig2_instability.png"
@@ -655,257 +481,207 @@ Saved: stata_bma_dsl_fig2_instability.png
 . *  SECTION 4: BAYESIAN MODEL AVERAGING (BMA)
 . *============================================================================
 > =*
-. *
-. *  HOW BMA WORKS:
-. *  1. Consider all possible subsets of control variables (2^24 models).
-. *  2. Estimate each model and compute its posterior probability (how well
-. *     it fits the data, penalized for complexity).
-. *  3. Average coefficients across models, weighted by posterior probability.
-. *  4. For each variable, compute its Posterior Inclusion Probability (PIP):
-. *     the sum of posterior probabilities of all models that include it.
-. *     PIP > 0.5 = "robust" (more likely in than out).
-. *
-. *  KEY OPTIONS EXPLAINED:
-. *  - gprior(uip): Unit Information Prior -- sets the prior on coefficient
-. *    magnitudes equal to the information in one observation. This is a
-. *    standard, relatively uninformative choice.
-. *  - mprior(uniform): Every model is equally likely a priori.
-. *  - groupfv: Treats all country dummies as a single group (in/out together).
-. *  - mcmcsize(50000): Number of MCMC draws to explore model space.
-. *    The paper uses 200,000 for precision; we use 50,000 for speed.
-. *  - inputorder: Keeps variables in the order we specified, so GDP terms
-. *    are always in columns 1-3 of the coefficient matrix.
-. *  - The (i.id i.year, always) part means country and year fixed effects
-. *    are ALWAYS included -- they are not subject to model selection.
 . 
 . display _newline "============================================="
 
 =============================================
 
-. display "  STEP 1: BMA ESTIMATION"
-  STEP 1: BMA ESTIMATION
+. display "  BMA ESTIMATION"
+  BMA ESTIMATION
 
-. display "  This will take ~10-15 minutes."
-  This will take ~10-15 minutes.
-
-. display "  Starting at: $S_DATE $S_TIME"
-  Starting at: 30 Mar 2026 23:03:36
+. display "  Starting: $S_DATE $S_TIME"
+  Starting: 31 Mar 2026 00:18:19
 
 . display "============================================="
 =============================================
 
 . 
-. bmaregress $outcome $gdppc_vars $energy_vars $sociodemo $env_vars ///
->     $tech_vars $inst_vars $econ_vars ///
->     ($fe_vars, always) if nmissing == 0, ///
+. bmaregress $outcome $gdp_vars $controls ///
+>     ($fe, always), ///
 >     mprior(uniform) groupfv gprior(uip) ///
 >     mcmcsize(50000) dots(5000, every(10000)) ///
 >     rseed(9988) inputorder pipcutoff(0.5) ///
->     saving("_tutorial_bma_temp.dta", replace)
+>     saving("_bma_temp.dta", replace)
 
 Burn-in (2500):  done
 Simulation (50000): .10000.20000.30000.40000.50000 done
 
 Computing model probabilities ...
 
-Bayesian model averaging                          No. of obs         =   1,215
-Linear regression                                 No. of predictors  =     133
-MC3 sampling                                                  Groups =      30
-                                                              Always =     103
-                                                  No. of models      =   2,162
-                                                      For CPMP >= .9 =     538
-Priors:                                           Mean model size    = 119.622
+Bayesian model averaging                          No. of obs         =   1,600
+Linear regression                                 No. of predictors  =     113
+MC3 sampling                                                  Groups =      15
+                                                              Always =      98
+                                                  No. of models      =     163
+                                                      For CPMP >= .9 =      14
+Priors:                                           Mean model size    = 104.578
   Models: Uniform                                 Burn-in            =   2,500
    Cons.: Noninformative                          MCMC sample size   =  50,000
-   Coef.: Zellner's g                             Acceptance rate    =  0.1616
-       g: Unit-information, g = 1,215             Shrinkage, g/(1+g) =  0.9992
-  sigma2: Noninformative                          Mean sigma2        =   0.010
+   Coef.: Zellner's g                             Acceptance rate    =  0.0904
+       g: Unit-information, g = 1,600             Shrinkage, g/(1+g) =  0.9994
+  sigma2: Noninformative                          Mean sigma2        =   0.022
 
-Sampling correlation = 0.9606
+Sampling correlation = 0.9997
 
 ------------------------------------------------------------------------------
-          wdi_lnco2 |      Mean   Std. dev.                   Group        PIP
---------------------+---------------------------------------------------------
-          pwt_gdppc | -7.299918   1.377286                        1     .99999
-       pwt_gdppc_sq |  .8536555   .1526838                        2          1
-       pwt_gdppc_cb | -.0319984    .005596                        3          1
-         wdi_fossil |  .0149067   .0012757                        4          1
-     wdi_alt_energy | -.0103889   .0024522                        6     .99948
-       wdi_urbanpop |  .0072089   .0020386                        7     .98936
-       fao_luforest | -.0141887   .0031996                       12     .99902
-        dpi_polariz | -.0224291    .005997                       17     .99382
-    wdi_agri_va_gdp | -.0054271   .0037768                       18     .74354
-wdi_industry_va_gdp |  .0103737   .0030139                       19     .99778
-   wdi_services_gdp | -.0048496   .0022893                       20     .89484
-           gini_mkt |  .5537974   .1407305                       23     .99619
-wdi_tourism_arr_pop |  .0935994    .014159                       24          1
-    wdi_exports_gdp | -.0036046   .0023678                       28     .83308
-          ln_credit |  .0684559   .0136515                       30          1
---------------------+---------------------------------------------------------
-Always              |
-                 id |
-               AUS  |  1.346348   .1371264                        0          1
-               AUT  |  1.441011   .1644955                        0          1
-               BEL  |  1.430077   .1514198                        0          1
-               BGR  |  1.434615   .1196675                        0          1
-               BHR  |  .9525558   .1787367                        0          1
-               BOL  |  .3027978   .1676809                        0          1
-               BRA  |  .9230001   .1946803                        0          1
-               BWA  |  .0279623   .1310369                        0          1
-               CAN  |  1.976348   .1536936                        0          1
-               CHL  |  .4049499   .1289903                        0          1
-               CHN  |  .6865328    .123095                        0          1
-               CMR  |  -.245306   .1596241                        0          1
-               COL  |   .489271   .1773692                        0          1
-               CRI  |  .7116829   .1650888                        0          1
-               CYP  |  .5948569   .1246705                        0          1
-               CZE  |  1.499916   .1332806                        0          1
-               DNK  |  .6578925   .1511585                        0          1
-               DOM  |  .1543596    .133335                        0          1
-               ECU  |  .6240112   .1699274                        0          1
-               EGY  | -.3117962   .1141324                        0          1
-               ESP  |   .902756   .1353857                        0          1
-               EST  |  2.546676   .1922697                        0          1
-               FIN  |  2.506046   .2382052                        0          1
-               FRA  |  1.401557   .1473287                        0          1
-               GAB  |  1.906872   .3076636                        0          1
-               GBR  |  .6953605   .1324297                        0          1
-               GRC  |  .8204101   .1247157                        0          1
-               GTM  |  .2868603    .135321                        0          1
-               HND  |  .6120165   .1827898                        0          1
-               HRV  |  .7237644   .1270266                        0          1
-               HUN  |  .6902746   .1102125                        0          1
-               IDN  |  .6913373   .2104829                        0          1
-               IND  |  .4798803   .1403458                        0          1
-               IRL  |  .8266006   .1347247                        0          1
-               IRN  |  .5971629   .1282776                        0          1
-               ISR  |  .5624886   .1326485                        0          1
-               ITA  |  .8081378   .1302944                        0          1
-               JAM  |  .9568669   .1589412                        0          1
-               JOR  | -.2241393    .129784                        0          1
-               JPN  |  1.845881    .222676                        0          1
-               KAZ  |  1.233647   .1168795                        0          1
-               KEN  | -.4704858   .1659804                        0          1
-               KOR  |  2.032182   .2280776                        0          1
-               LKA  |  .1615003   .1577835                        0          1
-               LTU  |  1.137426   .1319355                        0          1
-               LUX  |  2.399074   .1890885                        0          1
-               LVA  |  .9515373   .1611549                        0          1
-               MAR  | -.4033868    .105391                        0          1
-               MEX  |  .3868835   .1240109                        0          1
-               MNG  |  .8234302   .1091759                        0          1
-               MOZ  | -.5135852   .1755179                        0          1
-               MYS  |  1.159787   .1935896                        0          1
-               NAM  | -.3145348     .11926                        0          1
-               NER  | -1.490251   .1817934                        0          1
-               NIC  |  .1049416   .1316209                        0          1
-               NLD  |  .9642961   .1474372                        0          1
-               NOR  |  1.819366   .1661186                        0          1
-               NZL  |  1.426286   .1506439                        0          1
-               PAN  |  .6932397   .1699785                        0          1
-               PER  |  .2216647   .1814576                        0          1
-               PHL  |  .0081737   .1239691                        0          1
-               POL  |  .8663125   .1204526                        0          1
-               PRT  |  .7979015   .1329736                        0          1
-               PRY  |  .2142502   .1598148                        0          1
-               RUS  |  1.748039   .1628759                        0          1
-               SAU  |  .7233554   .1443184                        0          1
-               SDN  | -.3300227   .1485161                        0          1
-               SEN  |  1.50e-06    .160763                        0          1
-               SGP  |  .9461151   .2702218                        0          1
-               SVK  |  1.637982    .152041                        0          1
-               SVN  |  2.127979   .1937937                        0          1
-               SWE  |    2.3097    .238739                        0          1
-               TGO  |  .1853207   .1621754                        0          1
-               THA  |  .7549847   .1494183                        0          1
-               TUN  |  -.397703    .109259                        0          1
-               TUR  |  .4258422   .1120633                        0          1
-               TZA  |  -.103716   .2082154                        0          1
-               UKR  |  1.399879     .10886                        0          1
-               URY  | -.2602391   .1205293                        0          1
-               USA  |  1.980007   .1452723                        0          1
-               VEN  |  1.274066    .198851                        0          1
-               ZAF  |  1.006749   .1207248                        0          1
-               ZMB  | -.0039036   .1985535                        0          1
-                    |
-               year |
-              1996  |  .0166875   .0203673                        0          1
-              1997  |  .0266269   .0209029                        0          1
-              1998  |  .0155867   .0217605                        0          1
-              1999  |  .0061652   .0225945                        0          1
-              2000  | -.0024835   .0244647                        0          1
-              2001  |  .0001009   .0259021                        0          1
-              2002  | -.0058741   .0260804                        0          1
-              2003  | -.0030601   .0275187                        0          1
-              2004  |  -.002305   .0290164                        0          1
-              2005  | -.0134983   .0307447                        0          1
-              2006  | -.0308936   .0325385                        0          1
-              2007  | -.0522353   .0350421                        0          1
-              2008  | -.0382424    .035394                        0          1
-              2009  | -.0379611   .0362715                        0          1
-              2010  | -.0274795   .0376033                        0          1
-              2011  | -.0444888   .0390695                        0          1
-              2012  | -.0400458   .0410699                        0          1
-              2013  |  -.062484   .0412959                        0          1
-              2014  | -.0612491   .0430221                        0          1
-              2015  | -.1047694   .0457825                        0          1
-                    |
-              _cons |  17.34837   4.030718                        0          1
+      ln_co2 |      Mean   Std. dev.                          Group        PIP
+-------------+----------------------------------------------------------------
+      ln_gdp |  -7.13901   1.811093                               1     .99401
+   ln_gdp_sq |  .8078437   .1892418                               2     .99991
+   ln_gdp_cb | -.0299182   .0065105                               3     .99976
+ fossil_fuel |  .0138139    .001283                               4          1
+   renewable | -.0068332   .0023506                               5     .95945
+    industry |  .0085503   .0019766                              11     .99867
+-------------+----------------------------------------------------------------
+Always       |
+  country_id |
+          2  | -.1179799   .1145024                               0          1
+          3  |  -.034187    .112363                               0          1
+          4  | -.6996246    .201126                               0          1
+          5  |   .829754   .0962586                               0          1
+          6  | -.0613427   .1977392                               0          1
+          7  |  -.106526   .1839812                               0          1
+          8  | -.7705366   .1379249                               0          1
+          9  | -.2429933   .0680603                               0          1
+         10  |  .5178117   .1919635                               0          1
+         11  | -.7845254   .0788075                               0          1
+         12  |  .1495013   .1486364                               0          1
+         13  | -.3565051   .1804139                               0          1
+         14  | -.2302201   .1129516                               0          1
+         15  |  -1.39671   .0789442                               0          1
+         16  | -.1258029    .119203                               0          1
+         17  | -.9472684    .080517                               0          1
+         18  | -.5984079   .1323325                               0          1
+         19  |  .0637678   .1512518                               0          1
+         20  |   .047098   .0749263                               0          1
+         21  | -.7812588   .0754839                               0          1
+         22  | -1.067352   .0694149                               0          1
+         23  | -.4488343   .1185606                               0          1
+         24  | -.1361108   .1251686                               0          1
+         25  | -.7238642   .0923753                               0          1
+         26  |  .2767268   .1140441                               0          1
+         27  | -.4335896   .1797908                               0          1
+         28  |  .0344115   .2160191                               0          1
+         29  | -.8559822   .0736341                               0          1
+         30  | -.6669463   .0588199                               0          1
+         31  | -1.063821   .0735287                               0          1
+         32  | -.0100271   .0715373                               0          1
+         33  | -.0187315   .1794103                               0          1
+         34  | -1.441324    .081423                               0          1
+         35  | -.9283798   .0670747                               0          1
+         36  | -.7646781   .0827938                               0          1
+         37  |  1.124507    .178476                               0          1
+         38  | -.7379022   .0603345                               0          1
+         39  | -.5532597   .0691558                               0          1
+         40  |  .1730358   .1658478                               0          1
+         41  | -.0445621   .1416842                               0          1
+         42  | -.0645891   .0871661                               0          1
+         43  |  .0542686   .1401205                               0          1
+         44  |  .2162265   .1089101                               0          1
+         45  |  .2122891   .0646419                               0          1
+         46  |  .0155558   .0630781                               0          1
+         47  | -.6256494   .0867368                               0          1
+         48  | -.7090819   .1312863                               0          1
+         49  |  .3528996   .0727821                               0          1
+         50  | -.6129385   .0933364                               0          1
+         51  | -.7249113   .1131649                               0          1
+         52  |  .3607882   .1539638                               0          1
+         53  | -.5461417   .0778006                               0          1
+         54  | -1.386536    .071729                               0          1
+         55  | -.8530744   .1779728                               0          1
+         56  | -.0452429   .2174362                               0          1
+         57  | -.6174655   .1009132                               0          1
+         58  | -.5480472   .0728281                               0          1
+         59  |  .1442367   .0903137                               0          1
+         60  | -.0574758   .1607972                               0          1
+         61  |  .7003917   .1163897                               0          1
+         62  |  .4690104    .187726                               0          1
+         63  |   .213479   .0663604                               0          1
+         64  | -.5242577   .1286337                               0          1
+         65  | -1.008797   .0644648                               0          1
+         66  | -.2275966    .065082                               0          1
+         67  |  .6036724   .2213786                               0          1
+         68  |  -1.20648   .0676923                               0          1
+         69  | -.2588551   .1749428                               0          1
+         70  | -.0976466   .1188324                               0          1
+         71  | -.2397095   .1954438                               0          1
+         72  |  .4040474   .1056883                               0          1
+         73  |  .0335636   .0835823                               0          1
+         74  | -.3093181   .1042782                               0          1
+         75  | -.1423568    .065284                               0          1
+         76  | -.9109642   .0855667                               0          1
+         77  | -.3019021   .2164476                               0          1
+         78  | -.7025789   .1919114                               0          1
+         79  |   .236688   .1904104                               0          1
+         80  | -.1709559   .1039995                               0          1
+             |
+        year |
+       1996  | -.0023553   .0234941                               0          1
+       1997  | -.0016326   .0236192                               0          1
+       1998  |  .0057287   .0241149                               0          1
+       1999  |  .0109971   .0243942                               0          1
+       2000  |  -.009301   .0251807                               0          1
+       2001  | -.0078331   .0256468                               0          1
+       2002  | -.0283858   .0267905                               0          1
+       2003  | -.0164654   .0273342                               0          1
+       2004  | -.0461652   .0282498                               0          1
+       2005  | -.0467576   .0293353                               0          1
+       2006  | -.0446844   .0300448                               0          1
+       2007  | -.0507042   .0316104                               0          1
+       2008  | -.0759235   .0329535                               0          1
+       2009  | -.0892308   .0338976                               0          1
+       2010  | -.0889439   .0349373                               0          1
+       2011  | -.0694394   .0364631                               0          1
+       2012  | -.0976314   .0383168                               0          1
+       2013  | -.1221188   .0389121                               0          1
+       2014  | -.1000245   .0401478                               0          1
+             |
+       _cons |  1.093558   5.730563                               0          1
 ------------------------------------------------------------------------------
-Note: Coefficient posterior means and std. dev. estimated from 2,162 models.
-Note: 15 predictors with PIP less than .5 not shown.
+Note: Coefficient posterior means and std. dev. estimated from 163 models.
+Note: 9 predictors with PIP less than .5 not shown.
+Note: Acceptance rate is low.
 
-file _tutorial_bma_temp.dta not found; file saved.
-
-. 
-. display _newline "BMA completed at: $S_DATE $S_TIME"
-
-BMA completed at: 30 Mar 2026 23:05:32
+file _bma_temp.dta not found; file saved.
 
 . 
-. * Store estimates so we can come back to them later
+. display _newline "BMA completed: $S_DATE $S_TIME"
+
+BMA completed: 31 Mar 2026 00:18:33
+
 . estimates store bma_uip
 
 . 
 . *---------------------------------------------*
-. * 4a. Extract and interpret BMA coefficients  *
+. * 4a. Extract BMA coefficients                *
 . *---------------------------------------------*
-. * The BMA posterior means are in e(b_bma) -- NOT e(b) like regular Stata.
-. * This is because BMA averages coefficients across many models.
-. 
 . matrix bma_coefs = e(b_bma)
 
 . 
-. * The cubic coefficients tell us the shape:
-. local b1_bma = bma_coefs[1,1]    // ln(GDP)
+. local b1_bma = bma_coefs[1,1]
 
-. local b2_bma = bma_coefs[1,2]    // ln(GDP)^2
+. local b2_bma = bma_coefs[1,2]
 
-. local b3_bma = bma_coefs[1,3]    // ln(GDP)^3
+. local b3_bma = bma_coefs[1,3]
 
 . 
 . display _newline "=== BMA Coefficient Signs ==="
 
 === BMA Coefficient Signs ===
 
-. display "  b1 (GDP):       " %9.4f `b1_bma' _col(40) cond(`b1_bma' < 0, "NEGA
-> TIVE", "positive")
-  b1 (GDP):         -7.2999            NEGATIVE
+. display "  b1 (GDP):   " %9.4f `b1_bma' _col(35) cond(`b1_bma' < 0, "NEGATIVE
+> ", "positive")
+  b1 (GDP):     -7.1390           NEGATIVE
 
-. display "  b2 (GDP^2):     " %9.4f `b2_bma' _col(40) cond(`b2_bma' > 0, "POSI
-> TIVE", "negative")
-  b2 (GDP^2):        0.8537            POSITIVE
+. display "  b2 (GDP^2): " %9.4f `b2_bma' _col(35) cond(`b2_bma' > 0, "POSITIVE
+> ", "negative")
+  b2 (GDP^2):    0.8078           POSITIVE
 
-. display "  b3 (GDP^3):     " %9.4f `b3_bma' _col(40) cond(`b3_bma' < 0, "NEGA
-> TIVE", "positive")
-  b3 (GDP^3):       -0.0320            NEGATIVE
-
-. display _newline "  For an inverted-N, we need: b1 < 0, b2 > 0, b3 < 0"
-
-  For an inverted-N, we need: b1 < 0, b2 > 0, b3 < 0
+. display "  b3 (GDP^3): " %9.4f `b3_bma' _col(35) cond(`b3_bma' < 0, "NEGATIVE
+> ", "positive")
+  b3 (GDP^3):   -0.0299           NEGATIVE
 
 . 
-. * Get posterior standard deviations
 . matrix bma_se = e(se_bma)
 
 . local se1_bma = bma_se[1,1]
@@ -916,15 +692,8 @@ BMA completed at: 30 Mar 2026 23:05:32
 
 . 
 . *---------------------------------------------*
-. * 4b. Compute turning points                  *
+. * 4b. BMA turning points                      *
 . *---------------------------------------------*
-. * The cubic has two turning points (where the slope = 0):
-. *   First derivative: b1 + 2*b2*x + 3*b3*x^2 = 0
-. *   This is a quadratic in x. Using the quadratic formula:
-. *     x* = (-b2 +/- sqrt(b2^2 - 3*b1*b3)) / (3*b3)
-. *   The discriminant (b2^2 - 3*b1*b3) must be > 0 for real turning points.
-. *   We then exponentiate because x = ln(GDP), so GDP = exp(x).
-. 
 . local disc_bma = (`b2_bma')^2 - 3 * `b1_bma' * `b3_bma'
 
 . 
@@ -932,126 +701,71 @@ BMA completed at: 30 Mar 2026 23:05:32
 
 === BMA Turning Points ===
 
-. display "  Discriminant: " %12.6f `disc_bma' ///
->     cond(`disc_bma' > 0, "  (> 0: turning points exist!)", "  (< 0: no turnin
-> g points)")
-  Discriminant:     0.027971  (> 0: turning points exist!)
+. display "  Discriminant: " %8.4f `disc_bma' ///
+>     cond(`disc_bma' > 0, " (turning points exist)", " (no turning points)")
+  Discriminant:   0.0119 (turning points exist)
 
 . 
-. * Compute the two turning points (in international dollars)
 . local min_bma = exp((-`b2_bma' + sqrt(`disc_bma')) / (3 * `b3_bma'))
 
 . local max_bma = exp((-`b2_bma' - sqrt(`disc_bma')) / (3 * `b3_bma'))
 
 . 
-. display "  Minimum (CO2 starts rising):  $" %10.0fc `min_bma'
-  Minimum (CO2 starts rising):  $     1,275
+. display "  Minimum: $" %8.0fc `min_bma'
+  Minimum: $   2,411
 
-. display "  Maximum (CO2 starts falling): $" %10.0fc `max_bma'
-  Maximum (CO2 starts falling): $    41,561
-
-. display _newline "  Interpretation: CO2 falls below $" %10.0fc `min_bma' ///
->     ", rises between the two,"
-
-  Interpretation: CO2 falls below $     1,275, rises between the two,
-
-. display "  and falls again above $" %10.0fc `max_bma' " -- an inverted-N."
-  and falls again above $    41,561 -- an inverted-N.
+. display "  Maximum: $" %8.0fc `max_bma'
+  Maximum: $  27,269
 
 . 
 . *---------------------------------------------*
 . * 4c. PIP bar chart -- Figure 3               *
 . *---------------------------------------------*
-. * The PIP chart is the signature output of BMA. It shows which variables
-. * are "robust" (PIP > 0.5) across all the models BMA considered.
-. * We build this chart manually from the e(pip) matrix.
+. * Build a clean PIP chart with readable labels and color-coding
 . 
 . matrix pip_mat = e(pip)
 
-. local nvars = colsof(pip_mat)
+. local nvars_all = colsof(pip_mat)
 
 . 
 . preserve
 
 . clear
 
-. set obs `nvars'
-Number of observations (_N) was 0, now 136.
+. set obs `nvars_all'
+Number of observations (_N) was 0, now 116.
 
 . 
 . gen varname = ""
-(136 missing values generated)
+(116 missing values generated)
 
 . gen pip = .
-(136 missing values generated)
+(116 missing values generated)
 
 . 
-. * Extract variable names and PIP values from the matrix
 . local varnames : colnames pip_mat
 
-. forvalues i = 1/`nvars' {
+. forvalues i = 1/`nvars_all' {
   2.     local vname : word `i' of `varnames'
   3.     replace varname = "`vname'" in `i'
   4.     replace pip = pip_mat[1,`i'] in `i'
   5. }
-variable varname was str1 now str9
+variable varname was str1 now str6
 (1 real change made)
 (1 real change made)
-variable varname was str9 now str12
-(1 real change made)
-(1 real change made)
+variable varname was str6 now str9
 (1 real change made)
 (1 real change made)
 (1 real change made)
 (1 real change made)
-variable varname was str12 now str14
-(1 real change made)
+variable varname was str9 now str11
 (1 real change made)
 (1 real change made)
 (1 real change made)
 (1 real change made)
 (1 real change made)
 (1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-variable varname was str14 now str15
-(1 real change made)
-(1 real change made)
-variable varname was str15 now str19
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-variable varname was str19 now str23
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
-(1 real change made)
+variable varname was str11 now str13
 (1 real change made)
 (1 real change made)
 (1 real change made)
@@ -1274,31 +988,133 @@ variable varname was str19 now str23
 (1 real change made)
 
 . 
-. * Sort by PIP (highest first) and create a plotting order
+. * Keep ONLY the 15 candidate variables (drop FE dummies and constant)
+. keep if inlist(varname, "ln_gdp", "ln_gdp_sq", "ln_gdp_cb", ///
+>     "fossil_fuel", "renewable", "urban", "globalization") | ///
+>     inlist(varname, "pop_density", "democracy", "corruption", ///
+>     "industry", "services", "trade", "fdi", "credit")
+(101 observations deleted)
+
+. local nvars = _N
+
+. 
+. * Create readable labels
+. gen label = ""
+(15 missing values generated)
+
+. replace label = "GDP per capita (log)"      if varname == "ln_gdp"
+variable label was str1 now str20
+(1 real change made)
+
+. replace label = "GDP squared (log)"         if varname == "ln_gdp_sq"
+(1 real change made)
+
+. replace label = "GDP cubed (log)"           if varname == "ln_gdp_cb"
+(1 real change made)
+
+. replace label = "Fossil fuel share (%)"     if varname == "fossil_fuel"
+variable label was str20 now str21
+(1 real change made)
+
+. replace label = "Renewable energy (%)"      if varname == "renewable"
+(1 real change made)
+
+. replace label = "Urban population (%)"      if varname == "urban"
+(1 real change made)
+
+. replace label = "Globalization index"       if varname == "globalization"
+(1 real change made)
+
+. replace label = "Population density"        if varname == "pop_density"
+(1 real change made)
+
+. replace label = "Democracy score"           if varname == "democracy"
+(1 real change made)
+
+. replace label = "Corruption index"          if varname == "corruption"
+(1 real change made)
+
+. replace label = "Industry VA (% GDP)"       if varname == "industry"
+(1 real change made)
+
+. replace label = "Services VA (% GDP)"       if varname == "services"
+(1 real change made)
+
+. replace label = "Trade openness (% GDP)"    if varname == "trade"
+variable label was str21 now str22
+(1 real change made)
+
+. replace label = "FDI inflows (% GDP)"       if varname == "fdi"
+(1 real change made)
+
+. replace label = "Domestic credit (% GDP)"   if varname == "credit"
+variable label was str22 now str23
+(1 real change made)
+
+. 
+. * Mark true vs noise predictors
+. gen is_true = inlist(varname, "fossil_fuel", "renewable", "urban", ///
+>     "democracy", "industry", "ln_gdp", "ln_gdp_sq", "ln_gdp_cb")
+
+. 
+. * Sort by PIP (highest first) and create plotting order
 . gsort -pip
 
 . gen order = _n
 
 . 
-. * Create the horizontal bar chart
+. * Apply readable labels to the order variable
+. labmask order, values(label)
+
+. 
+. * Display PIP values for the log
+. list varname label pip is_true, sep(0)
+
+     +--------------------------------------------------------------+
+     |       varname                     label        pip   is_true |
+     |--------------------------------------------------------------|
+  1. |   fossil_fuel     Fossil fuel share (%)          1         1 |
+  2. |     ln_gdp_sq         GDP squared (log)   .9999081         1 |
+  3. |     ln_gdp_cb           GDP cubed (log)   .9997622         1 |
+  4. |      industry       Industry VA (% GDP)   .9986705         1 |
+  5. |        ln_gdp      GDP per capita (log)   .9940143         1 |
+  6. |     renewable      Renewable energy (%)   .9594516         1 |
+  7. |         urban      Urban population (%)   .2675386         1 |
+  8. |        credit   Domestic credit (% GDP)   .1169078         0 |
+  9. |    corruption          Corruption index   .0581883         0 |
+ 10. | globalization       Globalization index   .0433192         0 |
+ 11. |           fdi       FDI inflows (% GDP)   .0410655         0 |
+ 12. |      services       Services VA (% GDP)   .0254143         0 |
+ 13. |   pop_density        Population density   .0253422         0 |
+ 14. |         trade    Trade openness (% GDP)   .0246842         0 |
+ 15. |     democracy           Democracy score   .0234042         1 |
+     +--------------------------------------------------------------+
+
+. 
+. * Create the bar chart with color coding
 . graph twoway ///
->     (bar pip order, horizontal barwidth(0.7) color(navy%70)), ///
->     xline(0.5, lcolor(cranberry) lpattern(dash) lwidth(medium)) ///
->     ylabel(1(1)`nvars', valuelabel angle(0) labsize(vsmall) nogrid) ///
->     xlabel(0(0.1)1, format(%3.1f)) ///
->     ytitle("") xtitle("Posterior Inclusion Probability (PIP)") ///
+>     (bar pip order if is_true == 1, horizontal barwidth(0.6) ///
+>         color("106 155 204")) ///
+>     (bar pip order if is_true == 0, horizontal barwidth(0.6) ///
+>         color(gs11)), ///
+>     xline(0.5, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
+>     ylabel(1(1)`nvars', valuelabel angle(0) labsize(medsmall) nogrid) ///
+>     xlabel(0(0.2)1, format(%3.1f)) ///
+>     ytitle("") ///
+>     xtitle("Posterior Inclusion Probability (PIP)") ///
 >     title("BMA: Which Variables Matter?", size(medium)) ///
->     subtitle("Variables sorted by PIP. Dashed line = 0.5 threshold.", size(sm
-> all)) ///
->     note("PIP > 0.5 means the variable appears in more than half of the" ///
->          "highest-probability models. These are considered 'robust' predictor
-> s.") ///
->     scheme(s2color) ///
+>     subtitle("Dashed line = 0.5 robustness threshold", size(small)) ///
+>     legend(order(1 "True predictor (in DGP)" 2 "Noise variable (not in DGP)")
+>  ///
+>         rows(1) position(6) size(small)) ///
+>     note("Variables sorted by PIP. Blue = true predictor, gray = noise." ///
+>          "Only candidate variables shown (country and year FE excluded).") //
+> /
+>     scheme(s2color) ysize(7) xsize(9) ///
 >     name(fig3_pip, replace)
 
 . 
 . graph export "stata_bma_dsl_fig3_pip.png", replace width(2400)
-(file stata_bma_dsl_fig3_pip.png not found)
 file stata_bma_dsl_fig3_pip.png written in PNG format
 
 . display _newline "Saved: stata_bma_dsl_fig3_pip.png"
@@ -1308,15 +1124,9 @@ Saved: stata_bma_dsl_fig3_pip.png
 . restore
 
 . 
-. 
 . *---------------------------------------------*
 . * 4d. Variable inclusion map -- Figure 4      *
 . *---------------------------------------------*
-. * bmagraph varmap shows which variables are included in which models,
-. * ordered by model posterior probability. Each column is a model, each
-. * row is a variable. Blue = included, blank = excluded.
-. * This gives a visual "fingerprint" of the model space BMA explored.
-. 
 . estimates restore bma_uip
 (results bma_uip are active now)
 
@@ -1325,17 +1135,12 @@ Saved: stata_bma_dsl_fig3_pip.png
 >     title("BMA: Variable Inclusion Map", size(medium)) ///
 >     subtitle("Each column is a model, ordered by posterior probability", size
 > (small)) ///
->     note("Blue = variable included. Models on the left have higher posterior 
-> probability." ///
->          "Variables appearing blue across most top models have high PIPs.") /
-> //
 >     name(fig4_varmap, replace)
 
 Computing model probabilities ...
 
 . 
 . graph export "stata_bma_dsl_fig4_varmap.png", replace width(2400)
-(file stata_bma_dsl_fig4_varmap.png not found)
 file stata_bma_dsl_fig4_varmap.png written in PNG format
 
 . display _newline "Saved: stata_bma_dsl_fig4_varmap.png"
@@ -1343,28 +1148,17 @@ file stata_bma_dsl_fig4_varmap.png written in PNG format
 Saved: stata_bma_dsl_fig4_varmap.png
 
 . 
-. 
 . *---------------------------------------------*
-. * 4e. Coefficient density plots -- Figure 5   *
+. * 4e. Coefficient density -- Figure 5         *
 . *---------------------------------------------*
-. * bmagraph coefdensity shows the posterior distribution of each coefficient.
-. * The density is a mixture: a spike at zero (from models excluding the
-. * variable) and a continuous distribution (from models including it).
-. * A density concentrated far from zero = strong evidence the variable matters
-> .
-. 
-. bmagraph coefdensity $gdppc_vars, ///
+. bmagraph coefdensity $gdp_vars, ///
 >     title("BMA: Posterior Coefficient Densities (GDP Terms)", size(medium)) /
 > //
->     subtitle("Density far from zero = strong evidence the variable matters", 
-> size(small)) ///
->     note("Each density is a weighted average across all sampled models." ///
->          "Spike at zero comes from models that exclude the variable.") ///
->     name(fig5_coefdensity, replace)
+>     subtitle("Density far from zero = strong evidence", size(small)) ///
+>     name(fig5_density, replace)
 
 . 
 . graph export "stata_bma_dsl_fig5_coefdensity.png", replace width(2400)
-(file stata_bma_dsl_fig5_coefdensity.png not found)
 file stata_bma_dsl_fig5_coefdensity.png written in PNG format
 
 . display _newline "Saved: stata_bma_dsl_fig5_coefdensity.png"
@@ -1378,70 +1172,43 @@ Saved: stata_bma_dsl_fig5_coefdensity.png
 . *  SECTION 5: DOUBLE-SELECTION LASSO (DSL)
 . *============================================================================
 > =*
-. *
-. *  HOW DSL WORKS:
-. *  1. Run LASSO on the outcome (CO2) using all controls -> selects controls
-. *     that predict CO2.
-. *  2. Run LASSO on each treatment variable (GDP, GDP^2, GDP^3) using all
-. *     controls -> selects controls that predict GDP terms.
-. *  3. Take the UNION of all selected controls from steps 1 and 2.
-. *  4. Run OLS of CO2 on GDP terms + selected controls -> valid inference.
-. *
-. *  The "double selection" avoids omitted variable bias: if a control
-. *  affects both CO2 and GDP, leaving it out would bias the GDP coefficients.
-. *
-. *  KEY DIFFERENCES FROM BMA:
-. *  - BMA is Bayesian (posterior probabilities); DSL is frequentist (p-values)
-> .
-. *  - BMA averages across models; DSL selects ONE model.
-. *  - BMA takes ~15 minutes; DSL takes ~15 seconds.
-. *  - Both handle model uncertainty, but through different philosophies.
-. *
-. *  KEY OPTIONS:
-. *  - controls(): Variables for LASSO to consider. Parenthesized variables
-. *    (i.id, i.year) are forced in -- not subject to selection.
-. *  - vce(robust): Heteroskedasticity-robust standard errors.
 . 
 . display _newline "============================================="
 
 =============================================
 
-. display "  STEP 2: DSL ESTIMATION"
-  STEP 2: DSL ESTIMATION
+. display "  DSL ESTIMATION"
+  DSL ESTIMATION
 
-. display "  This runs in seconds -- much faster than BMA."
-  This runs in seconds -- much faster than BMA.
-
-. display "  Starting at: $S_DATE $S_TIME"
-  Starting at: 30 Mar 2026 23:05:40
+. display "  Starting: $S_DATE $S_TIME"
+  Starting: 31 Mar 2026 00:18:39
 
 . display "============================================="
 =============================================
 
 . 
-. dsregress $outcome $gdppc_vars, ///
->     controls(($fe_vars) $energy_vars $sociodemo $env_vars ///
->     $tech_vars $inst_vars $econ_vars) ///
+. dsregress $outcome $gdp_vars, ///
+>     controls(($fe) $controls) ///
 >     vce(robust)
 
-Estimating lasso for wdi_lnco2 using plugin
-Estimating lasso for pwt_gdppc using plugin
-Estimating lasso for pwt_gdppc_sq using plugin
-Estimating lasso for pwt_gdppc_cb using plugin
+Estimating lasso for ln_co2 using plugin
+Estimating lasso for ln_gdp using plugin
+Estimating lasso for ln_gdp_sq using plugin
+Estimating lasso for ln_gdp_cb using plugin
 
-Double-selection linear model         Number of obs               =      1,215
-                                      Number of controls          =        132
-                                      Number of selected controls =        107
-                                      Wald chi2(3)                =     100.25
+Double-selection linear model         Number of obs               =      1,600
+                                      Number of controls          =        112
+                                      Number of selected controls =        100
+                                      Wald chi2(3)                =      54.16
                                       Prob > chi2                 =     0.0000
 
 ------------------------------------------------------------------------------
              |               Robust
-   wdi_lnco2 | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+      ln_co2 | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-   pwt_gdppc |  -6.919841   2.305794    -3.00   0.003    -11.43911   -2.400568
-pwt_gdppc_sq |   .8772975   .2458176     3.57   0.000     .3955039    1.359091
-pwt_gdppc_cb |  -.0348007   .0087297    -3.99   0.000    -.0519106   -.0176909
+      ln_gdp |  -7.498046   1.850901    -4.05   0.000    -11.12574   -3.870348
+   ln_gdp_sq |   .8489669   .1932619     4.39   0.000     .4701806    1.227753
+   ln_gdp_cb |  -.0314993   .0066521    -4.74   0.000    -.0445373   -.0184614
 ------------------------------------------------------------------------------
 Note: Chi-squared test is a Wald test of the coefficients of the variables
       of interest jointly equal to zero. Lassos select controls for model
@@ -1449,20 +1216,16 @@ Note: Chi-squared test is a Wald test of the coefficients of the variables
       lasso.
 
 . 
-. display _newline "DSL completed at: $S_DATE $S_TIME"
+. display _newline "DSL completed: $S_DATE $S_TIME"
 
-DSL completed at: 30 Mar 2026 23:05:44
+DSL completed: 31 Mar 2026 00:18:41
 
-. 
-. * Store estimates
 . estimates store dsl_plugin
 
 . 
 . *---------------------------------------------*
-. * 5a. Extract and interpret DSL coefficients  *
+. * 5a. Extract DSL coefficients                *
 . *---------------------------------------------*
-. * DSL coefficients are in e(b) -- standard Stata convention.
-. 
 . matrix dsl_coefs = e(b)
 
 . 
@@ -1477,20 +1240,19 @@ DSL completed at: 30 Mar 2026 23:05:44
 
 === DSL Coefficient Signs ===
 
-. display "  b1 (GDP):       " %9.4f `b1_dsl' _col(40) cond(`b1_dsl' < 0, "NEGA
-> TIVE", "positive")
-  b1 (GDP):         -6.9198            NEGATIVE
+. display "  b1 (GDP):   " %9.4f `b1_dsl' _col(35) cond(`b1_dsl' < 0, "NEGATIVE
+> ", "positive")
+  b1 (GDP):     -7.4980           NEGATIVE
 
-. display "  b2 (GDP^2):     " %9.4f `b2_dsl' _col(40) cond(`b2_dsl' > 0, "POSI
-> TIVE", "negative")
-  b2 (GDP^2):        0.8773            POSITIVE
+. display "  b2 (GDP^2): " %9.4f `b2_dsl' _col(35) cond(`b2_dsl' > 0, "POSITIVE
+> ", "negative")
+  b2 (GDP^2):    0.8490           POSITIVE
 
-. display "  b3 (GDP^3):     " %9.4f `b3_dsl' _col(40) cond(`b3_dsl' < 0, "NEGA
-> TIVE", "positive")
-  b3 (GDP^3):       -0.0348            NEGATIVE
+. display "  b3 (GDP^3): " %9.4f `b3_dsl' _col(35) cond(`b3_dsl' < 0, "NEGATIVE
+> ", "positive")
+  b3 (GDP^3):   -0.0315           NEGATIVE
 
 . 
-. * Get standard errors
 . local se1_dsl = sqrt(e(V)[1,1])
 
 . local se2_dsl = sqrt(e(V)[2,2])
@@ -1499,10 +1261,8 @@ DSL completed at: 30 Mar 2026 23:05:44
 
 . 
 . *---------------------------------------------*
-. * 5b. Compute DSL turning points              *
+. * 5b. DSL turning points                      *
 . *---------------------------------------------*
-. * Same formula as BMA -- the math doesn't change, only the coefficients do.
-. 
 . local disc_dsl = (`b2_dsl')^2 - 3 * `b1_dsl' * `b3_dsl'
 
 . 
@@ -1510,10 +1270,9 @@ DSL completed at: 30 Mar 2026 23:05:44
 
 === DSL Turning Points ===
 
-. display "  Discriminant: " %12.6f `disc_dsl' ///
->     cond(`disc_dsl' > 0, "  (> 0: turning points exist!)", "  (< 0: no turnin
-> g points)")
-  Discriminant:     0.047205  (> 0: turning points exist!)
+. display "  Discriminant: " %8.4f `disc_dsl' ///
+>     cond(`disc_dsl' > 0, " (turning points exist)", " (no turning points)")
+  Discriminant:   0.0122 (turning points exist)
 
 . 
 . local min_dsl = exp((-`b2_dsl' + sqrt(`disc_dsl')) / (3 * `b3_dsl'))
@@ -1521,22 +1280,19 @@ DSL completed at: 30 Mar 2026 23:05:44
 . local max_dsl = exp((-`b2_dsl' - sqrt(`disc_dsl')) / (3 * `b3_dsl'))
 
 . 
-. display "  Minimum (CO2 starts rising):  $" %10.0fc `min_dsl'
-  Minimum (CO2 starts rising):  $       557
+. display "  Minimum: $" %8.0fc `min_dsl'
+  Minimum: $   2,478
 
-. display "  Maximum (CO2 starts falling): $" %10.0fc `max_dsl'
-  Maximum (CO2 starts falling): $    35,743
+. display "  Maximum: $" %8.0fc `max_dsl'
+  Maximum: $  25,656
 
 . 
 . *---------------------------------------------*
-. * 5c. Which controls did LASSO select?        *
+. * 5c. LASSO selection summary                 *
 . *---------------------------------------------*
-. * After dsregress, lassoinfo shows how many controls were selected
-. * in each LASSO step. This is the "variable selection" part.
-. 
-. display _newline "=== LASSO Selection Summary ==="
+. display _newline "=== LASSO Selection ==="
 
-=== LASSO Selection Summary ===
+=== LASSO Selection ===
 
 . lassoinfo
 
@@ -1547,17 +1303,17 @@ DSL completed at: 30 Mar 2026 23:05:44
             |           Selection             selected
    Variable |    Model     method    lambda  variables
 ------------+-----------------------------------------
-  wdi_lnco2 |   linear     plugin  .1094886        105
-  pwt_gdppc |   linear     plugin  .1094886        107
-pwt_gdppc~q |   linear     plugin  .1094886        106
-pwt_gdppc~b |   linear     plugin  .1094886        106
+     ln_co2 |   linear     plugin  .0895429        100
+     ln_gdp |   linear     plugin  .0895429        100
+  ln_gdp_sq |   linear     plugin  .0895429        100
+  ln_gdp_cb |   linear     plugin  .0895429        100
 ------------------------------------------------------
 
 . 
 . 
 . *============================================================================
 > =*
-. *  SECTION 6: COMPARE RESULTS
+. *  SECTION 6: COMPARISON
 . *============================================================================
 > =*
 . 
@@ -1571,68 +1327,74 @@ pwt_gdppc~b |   linear     plugin  .1094886        106
 . display "============================================="
 =============================================
 
-. display _newline "                    Sparse FE     Kitchen FE    BMA (UIP)  
->    DSL (Plugin)"
+. display _newline "                Sparse FE   Kitchen FE  BMA (UIP)   DSL"
 
-                    Sparse FE     Kitchen FE    BMA (UIP)     DSL (Plugin)
+                Sparse FE   Kitchen FE  BMA (UIP)   DSL
 
-. display "  b1 (GDP):       " %9.4f `b1_sparse' "   " %9.4f `b1_kitchen' "   "
->  %9.4f `b1_bma' "   " %9.4f `b1_dsl'
-  b1 (GDP):         -5.6669     -7.3353     -7.2999     -6.9198
+. display "  b1 (GDP):   " %9.4f `b1_sparse' " " %9.4f `b1_kitchen' " " %9.4f `
+> b1_bma' " " %9.4f `b1_dsl'
+  b1 (GDP):     -7.4980   -7.1307   -7.1390   -7.4980
 
-. display "  b2 (GDP^2):     " %9.4f `b2_sparse' "   " %9.4f `b2_kitchen' "   "
->  %9.4f `b2_bma' "   " %9.4f `b2_dsl'
-  b2 (GDP^2):        0.7662      0.8655      0.8537      0.8773
+. display "  b2 (GDP^2): " %9.4f `b2_sparse' " " %9.4f `b2_kitchen' " " %9.4f `
+> b2_bma' " " %9.4f `b2_dsl'
+  b2 (GDP^2):    0.8490    0.8060    0.8078    0.8490
 
-. display "  b3 (GDP^3):     " %9.4f `b3_sparse' "   " %9.4f `b3_kitchen' "   "
->  %9.4f `b3_bma' "   " %9.4f `b3_dsl'
-  b3 (GDP^3):       -0.0313     -0.0327     -0.0320     -0.0348
-
-. display "  ----------------------------------------------------------------"
-  ----------------------------------------------------------------
+. display "  b3 (GDP^3): " %9.4f `b3_sparse' " " %9.4f `b3_kitchen' " " %9.4f `
+> b3_bma' " " %9.4f `b3_dsl'
+  b3 (GDP^3):   -0.0315   -0.0298   -0.0299   -0.0315
 
 . 
-. display _newline "  TURNING POINTS (GDP per capita in international $):"
+. display _newline "  TRUE DGP:   b1 = -7.1000, b2 = 0.8100, b3 = -0.0300"
 
-  TURNING POINTS (GDP per capita in international $):
-
-. display "                    Sparse FE     Kitchen FE    BMA (UIP)     DSL (P
-> lugin)"
-                    Sparse FE     Kitchen FE    BMA (UIP)     DSL (Plugin)
-
-. if `min_sparse' != . {
-.     display "  Minimum ($):    " %9.0fc `min_sparse' "   " %9.0fc `min_kitche
-> n' "   " %9.0fc `min_bma' "   " %9.0fc `min_dsl'
-  Minimum ($):          289       1,159       1,275         557
-.     display "  Maximum ($):    " %9.0fc `max_sparse' "   " %9.0fc `max_kitche
-> n' "   " %9.0fc `max_bma' "   " %9.0fc `max_dsl'
-  Maximum ($):       42,203      40,573      41,561      35,743
-. }
-
-. else {
-.     display "  Sparse FE has no real turning points"
-.     display "  Kitchen Min ($):  " %9.0fc `min_kitchen' "   BMA: " %9.0fc `mi
-> n_bma' "   DSL: " %9.0fc `min_dsl'
-.     display "  Kitchen Max ($):  " %9.0fc `max_kitchen' "   BMA: " %9.0fc `ma
-> x_bma' "   DSL: " %9.0fc `max_dsl'
-. }
+  TRUE DGP:   b1 = -7.1000, b2 = 0.8100, b3 = -0.0300
 
 . 
 . *---------------------------------------------*
 . * 6a. Predicted EKC curves -- Figure 6        *
 . *---------------------------------------------*
-. * We plot the cubic polynomial from each method over the observed range
-. * of log GDP, overlaid. This is the "payoff" figure.
+. * Normalize both curves so they are comparable on the same y-scale
 . 
-. * Save the range of log GDP in the data
-. quietly summarize pwt_gdppc if nmissing == 0
+. quietly summarize ln_gdp
 
 . local xmin = r(min)
 
 . local xmax = r(max)
 
+. local xmean = r(mean)
+
 . 
-. * Also grab turning points in log scale for vertical lines
+. preserve
+
+. clear
+
+. set obs 500
+Number of observations (_N) was 0, now 500.
+
+. gen lngdp = `xmin' + (_n - 1) * (`xmax' - `xmin') / 499
+
+. 
+. * Compute cubic component for each method
+. gen fit_bma = `b1_bma' * lngdp + `b2_bma' * lngdp^2 + `b3_bma' * lngdp^3
+
+. gen fit_dsl = `b1_dsl' * lngdp + `b2_dsl' * lngdp^2 + `b3_dsl' * lngdp^3
+
+. 
+. * Normalize: subtract value at the sample mean GDP
+. local norm_bma = `b1_bma' * `xmean' + `b2_bma' * `xmean'^2 + `b3_bma' * `xmea
+> n'^3
+
+. local norm_dsl = `b1_dsl' * `xmean' + `b2_dsl' * `xmean'^2 + `b3_dsl' * `xmea
+> n'^3
+
+. 
+. replace fit_bma = fit_bma - `norm_bma'
+(500 real changes made)
+
+. replace fit_dsl = fit_dsl - `norm_dsl'
+(500 real changes made)
+
+. 
+. * Turning point vertical lines (in log scale)
 . local lnmin_bma = ln(`min_bma')
 
 . local lnmax_bma = ln(`max_bma')
@@ -1642,50 +1404,33 @@ pwt_gdppc~b |   linear     plugin  .1094886        106
 . local lnmax_dsl = ln(`max_dsl')
 
 . 
-. preserve
-
-. 
-. * Create a grid of 500 points spanning the GDP range
-. clear
-
-. set obs 500
-Number of observations (_N) was 0, now 500.
-
-. gen lngdp = `xmin' + (_n - 1) * (`xmax' - `xmin') / 499
-
-. 
-. * Compute predicted log(CO2) from each method's cubic
-. gen fitted_bma = `b1_bma' * lngdp + `b2_bma' * lngdp^2 + `b3_bma' * lngdp^3
-
-. gen fitted_dsl = `b1_dsl' * lngdp + `b2_dsl' * lngdp^2 + `b3_dsl' * lngdp^3
-
-. 
-. * Plot both curves
 . twoway ///
->     (line fitted_bma lngdp, lcolor(navy) lwidth(medthick) lpattern(solid)) //
-> /
->     (line fitted_dsl lngdp, lcolor(cranberry) lwidth(medthick) lpattern(dash)
+>     (line fit_bma lngdp, lcolor("106 155 204") lwidth(medthick) lpattern(soli
+> d)) ///
+>     (line fit_dsl lngdp, lcolor("217 119 87") lwidth(medthick) lpattern(dash)
 > ), ///
->     xline(`lnmin_bma', lcolor(navy%50) lpattern(shortdash) lwidth(thin)) ///
->     xline(`lnmax_bma', lcolor(navy%50) lpattern(shortdash) lwidth(thin)) ///
->     xline(`lnmin_dsl', lcolor(cranberry%50) lpattern(shortdash) lwidth(thin))
->  ///
->     xline(`lnmax_dsl', lcolor(cranberry%50) lpattern(shortdash) lwidth(thin))
->  ///
->     ytitle("Predicted log CO2 per capita" "(cubic component only)") ///
->     xtitle("Log real GDP per capita") ///
+>     xline(`lnmin_bma', lcolor("106 155 204"%50) lpattern(shortdash) lwidth(th
+> in)) ///
+>     xline(`lnmax_bma', lcolor("106 155 204"%50) lpattern(shortdash) lwidth(th
+> in)) ///
+>     xline(`lnmin_dsl', lcolor("217 119 87"%50) lpattern(shortdash) lwidth(thi
+> n)) ///
+>     xline(`lnmax_dsl', lcolor("217 119 87"%50) lpattern(shortdash) lwidth(thi
+> n)) ///
+>     yline(0, lcolor(gs12) lpattern(dot)) ///
+>     ytitle("Predicted log CO2 (normalized at mean GDP)") ///
+>     xtitle("Log GDP per capita") ///
 >     title("Predicted EKC Shape: BMA vs. DSL", size(medium)) ///
 >     subtitle("Both methods trace an inverted-N curve", size(small)) ///
->     legend(order(1 "BMA (UIP g-prior)" 2 "DSL (Plugin LASSO)") ///
->         rows(1) position(6) size(small)) ///
->     note("Vertical dashed lines mark turning points." ///
->          "Navy = BMA turning points; Red = DSL turning points.") ///
+>     legend(order(1 "BMA" 2 "DSL") rows(1) position(6) size(small)) ///
+>     note("Curves normalized to zero at sample-mean GDP." ///
+>          "Vertical dashed lines mark turning points (blue = BMA, orange = DSL
+> ).") ///
 >     scheme(s2color) ///
 >     name(fig6_ekc, replace)
 
 . 
 . graph export "stata_bma_dsl_fig6_ekc_curves.png", replace width(2400)
-(file stata_bma_dsl_fig6_ekc_curves.png not found)
 file stata_bma_dsl_fig6_ekc_curves.png written in PNG format
 
 . display _newline "Saved: stata_bma_dsl_fig6_ekc_curves.png"
@@ -1696,9 +1441,392 @@ Saved: stata_bma_dsl_fig6_ekc_curves.png
 
 . 
 . *---------------------------------------------*
-. * 6b. Export comparison CSV                   *
+. * 6b. Answer-key evaluation -- Figure 7       *
 . *---------------------------------------------*
+. * Compare BMA PIPs against ground truth
 . 
+. estimates restore bma_uip
+(results bma_uip are active now)
+
+. matrix pip_mat = e(pip)
+
+. local nvars_all = colsof(pip_mat)
+
+. 
+. preserve
+
+. clear
+
+. set obs `nvars_all'
+Number of observations (_N) was 0, now 116.
+
+. 
+. gen varname = ""
+(116 missing values generated)
+
+. gen pip = .
+(116 missing values generated)
+
+. 
+. local varnames : colnames pip_mat
+
+. forvalues i = 1/`nvars_all' {
+  2.     local vname : word `i' of `varnames'
+  3.     replace varname = "`vname'" in `i'
+  4.     replace pip = pip_mat[1,`i'] in `i'
+  5. }
+variable varname was str1 now str6
+(1 real change made)
+(1 real change made)
+variable varname was str6 now str9
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+variable varname was str9 now str11
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+variable varname was str11 now str13
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+
+. 
+. * Keep ONLY the 15 candidate variables
+. keep if inlist(varname, "ln_gdp", "ln_gdp_sq", "ln_gdp_cb", ///
+>     "fossil_fuel", "renewable", "urban", "globalization") | ///
+>     inlist(varname, "pop_density", "democracy", "corruption", ///
+>     "industry", "services", "trade", "fdi", "credit")
+(101 observations deleted)
+
+. local nvars = _N
+
+. 
+. * Readable labels
+. gen label = ""
+(15 missing values generated)
+
+. replace label = "GDP per capita (log)"      if varname == "ln_gdp"
+variable label was str1 now str20
+(1 real change made)
+
+. replace label = "GDP squared (log)"         if varname == "ln_gdp_sq"
+(1 real change made)
+
+. replace label = "GDP cubed (log)"           if varname == "ln_gdp_cb"
+(1 real change made)
+
+. replace label = "Fossil fuel share (%)"     if varname == "fossil_fuel"
+variable label was str20 now str21
+(1 real change made)
+
+. replace label = "Renewable energy (%)"      if varname == "renewable"
+(1 real change made)
+
+. replace label = "Urban population (%)"      if varname == "urban"
+(1 real change made)
+
+. replace label = "Globalization index"       if varname == "globalization"
+(1 real change made)
+
+. replace label = "Population density"        if varname == "pop_density"
+(1 real change made)
+
+. replace label = "Democracy score"           if varname == "democracy"
+(1 real change made)
+
+. replace label = "Corruption index"          if varname == "corruption"
+(1 real change made)
+
+. replace label = "Industry VA (% GDP)"       if varname == "industry"
+(1 real change made)
+
+. replace label = "Services VA (% GDP)"       if varname == "services"
+(1 real change made)
+
+. replace label = "Trade openness (% GDP)"    if varname == "trade"
+variable label was str21 now str22
+(1 real change made)
+
+. replace label = "FDI inflows (% GDP)"       if varname == "fdi"
+(1 real change made)
+
+. replace label = "Domestic credit (% GDP)"   if varname == "credit"
+variable label was str22 now str23
+(1 real change made)
+
+. 
+. * Ground truth
+. gen is_true = inlist(varname, "fossil_fuel", "renewable", "urban", ///
+>     "democracy", "industry", "ln_gdp", "ln_gdp_sq", "ln_gdp_cb")
+
+. 
+. * Sort: true predictors first (by PIP), then noise (by PIP)
+. gsort -is_true -pip
+
+. gen order = _n
+
+. labmask order, values(label)
+
+. 
+. * Dot plot: BMA PIP by variable, colored by ground truth
+. graph twoway ///
+>     (scatter order pip if is_true == 1, ///
+>         mcolor("106 155 204") msymbol(circle) msize(large)) ///
+>     (scatter order pip if is_true == 0, ///
+>         mcolor(gs9) msymbol(diamond) msize(large)), ///
+>     xline(0.5, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
+>     ylabel(1(1)`nvars', valuelabel angle(0) labsize(medsmall) nogrid) ///
+>     xlabel(0(0.2)1, format(%3.1f)) ///
+>     ytitle("") ///
+>     xtitle("BMA Posterior Inclusion Probability") ///
+>     title("Answer Key: Do BMA and DSL Recover the Truth?", size(medium)) ///
+>     subtitle("True predictors should have PIP > 0.5; noise should have PIP < 
+> 0.5", size(small)) ///
+>     legend(order(1 "True predictor" 2 "Noise variable") ///
+>         rows(1) position(6) size(small)) ///
+>     note("Dashed line = 0.5 threshold. Circle = true predictor, diamond = noi
+> se." ///
+>          "Only candidate variables shown (country and year FE excluded).") //
+> /
+>     scheme(s2color) ysize(7) xsize(9) ///
+>     name(fig7_answer, replace)
+
+. 
+. graph export "stata_bma_dsl_fig7_answer_key.png", replace width(2400)
+file stata_bma_dsl_fig7_answer_key.png written in PNG format
+
+. display _newline "Saved: stata_bma_dsl_fig7_answer_key.png"
+
+Saved: stata_bma_dsl_fig7_answer_key.png
+
+. restore
+
+. 
+. *---------------------------------------------*
+. * 6c. Export comparison CSV                   *
+. *---------------------------------------------*
 . preserve
 
 . clear
@@ -1725,136 +1853,87 @@ variable method was str9 now str15
 (1 real change made)
 
 . 
-. gen b_gdppc = .
+. gen b_gdp = .
 (4 missing values generated)
 
-. replace b_gdppc = `b1_sparse' in 1
+. replace b_gdp = `b1_sparse' in 1
 (1 real change made)
 
-. replace b_gdppc = `b1_kitchen' in 2
+. replace b_gdp = `b1_kitchen' in 2
 (1 real change made)
 
-. replace b_gdppc = `b1_bma' in 3
+. replace b_gdp = `b1_bma' in 3
 (1 real change made)
 
-. replace b_gdppc = `b1_dsl' in 4
+. replace b_gdp = `b1_dsl' in 4
 (1 real change made)
 
 . 
-. gen b_gdppc_sq = .
+. gen b_gdp_sq = .
 (4 missing values generated)
 
-. replace b_gdppc_sq = `b2_sparse' in 1
+. replace b_gdp_sq = `b2_sparse' in 1
 (1 real change made)
 
-. replace b_gdppc_sq = `b2_kitchen' in 2
+. replace b_gdp_sq = `b2_kitchen' in 2
 (1 real change made)
 
-. replace b_gdppc_sq = `b2_bma' in 3
+. replace b_gdp_sq = `b2_bma' in 3
 (1 real change made)
 
-. replace b_gdppc_sq = `b2_dsl' in 4
+. replace b_gdp_sq = `b2_dsl' in 4
 (1 real change made)
 
 . 
-. gen b_gdppc_cb = .
+. gen b_gdp_cb = .
 (4 missing values generated)
 
-. replace b_gdppc_cb = `b3_sparse' in 1
+. replace b_gdp_cb = `b3_sparse' in 1
 (1 real change made)
 
-. replace b_gdppc_cb = `b3_kitchen' in 2
+. replace b_gdp_cb = `b3_kitchen' in 2
 (1 real change made)
 
-. replace b_gdppc_cb = `b3_bma' in 3
+. replace b_gdp_cb = `b3_bma' in 3
 (1 real change made)
 
-. replace b_gdppc_cb = `b3_dsl' in 4
+. replace b_gdp_cb = `b3_dsl' in 4
 (1 real change made)
 
 . 
-. gen se_gdppc = .
+. gen min_tp = .
 (4 missing values generated)
 
-. replace se_gdppc = . in 1
-(0 real changes made)
+. replace min_tp = `min_sparse' in 1
+(1 real change made)
 
-. replace se_gdppc = . in 2
-(0 real changes made)
+. replace min_tp = `min_kitchen' in 2
+(1 real change made)
 
-. replace se_gdppc = `se1_bma' in 3
-(0 real changes made)
+. replace min_tp = `min_bma' in 3
+(1 real change made)
 
-. replace se_gdppc = `se1_dsl' in 4
+. replace min_tp = `min_dsl' in 4
 (1 real change made)
 
 . 
-. gen se_gdppc_sq = .
+. gen max_tp = .
 (4 missing values generated)
 
-. replace se_gdppc_sq = . in 1
-(0 real changes made)
-
-. replace se_gdppc_sq = . in 2
-(0 real changes made)
-
-. replace se_gdppc_sq = `se2_bma' in 3
-(0 real changes made)
-
-. replace se_gdppc_sq = `se2_dsl' in 4
+. replace max_tp = `max_sparse' in 1
 (1 real change made)
 
-. 
-. gen se_gdppc_cb = .
-(4 missing values generated)
-
-. replace se_gdppc_cb = . in 1
-(0 real changes made)
-
-. replace se_gdppc_cb = . in 2
-(0 real changes made)
-
-. replace se_gdppc_cb = `se3_bma' in 3
-(0 real changes made)
-
-. replace se_gdppc_cb = `se3_dsl' in 4
+. replace max_tp = `max_kitchen' in 2
 (1 real change made)
 
-. 
-. gen minimum_tp = .
-(4 missing values generated)
-
-. replace minimum_tp = `min_sparse' in 1
+. replace max_tp = `max_bma' in 3
 (1 real change made)
 
-. replace minimum_tp = `min_kitchen' in 2
-(1 real change made)
-
-. replace minimum_tp = `min_bma' in 3
-(1 real change made)
-
-. replace minimum_tp = `min_dsl' in 4
-(1 real change made)
-
-. 
-. gen maximum_tp = .
-(4 missing values generated)
-
-. replace maximum_tp = `max_sparse' in 1
-(1 real change made)
-
-. replace maximum_tp = `max_kitchen' in 2
-(1 real change made)
-
-. replace maximum_tp = `max_bma' in 3
-(1 real change made)
-
-. replace maximum_tp = `max_dsl' in 4
+. replace max_tp = `max_dsl' in 4
 (1 real change made)
 
 . 
 . export delimited "stata_bma_dsl_comparison.csv", replace
-(file stata_bma_dsl_comparison.csv not found)
 file stata_bma_dsl_comparison.csv saved
 
 . display _newline "Saved: stata_bma_dsl_comparison.csv"
@@ -1867,7 +1946,7 @@ Saved: stata_bma_dsl_comparison.csv
 . 
 . *============================================================================
 > =*
-. *  SECTION 7: WRAP-UP
+. *  WRAP-UP
 . *============================================================================
 > =*
 . 
@@ -1875,11 +1954,8 @@ Saved: stata_bma_dsl_comparison.csv
 
 =============================================
 
-. display "  TUTORIAL COMPLETE"
-  TUTORIAL COMPLETE
-
-. display "  Finished: $S_DATE $S_TIME"
-  Finished: 30 Mar 2026 23:05:46
+. display "  TUTORIAL COMPLETE: $S_DATE $S_TIME"
+  TUTORIAL COMPLETE: 31 Mar 2026 00:18:44
 
 . display "============================================="
 =============================================
@@ -1891,14 +1967,14 @@ Output files:
 . display "  analysis.log                       -- this log"
   analysis.log                       -- this log
 
-. display "  stata_bma_dsl_fig1_scatter.png     -- raw data scatter"
-  stata_bma_dsl_fig1_scatter.png     -- raw data scatter
+. display "  stata_bma_dsl_fig1_scatter.png     -- scatter plot"
+  stata_bma_dsl_fig1_scatter.png     -- scatter plot
 
 . display "  stata_bma_dsl_fig2_instability.png -- coefficient instability"
   stata_bma_dsl_fig2_instability.png -- coefficient instability
 
-. display "  stata_bma_dsl_fig3_pip.png         -- BMA inclusion probabilities"
-  stata_bma_dsl_fig3_pip.png         -- BMA inclusion probabilities
+. display "  stata_bma_dsl_fig3_pip.png         -- BMA PIPs (color-coded)"
+  stata_bma_dsl_fig3_pip.png         -- BMA PIPs (color-coded)
 
 . display "  stata_bma_dsl_fig4_varmap.png      -- BMA variable inclusion map"
   stata_bma_dsl_fig4_varmap.png      -- BMA variable inclusion map
@@ -1906,23 +1982,22 @@ Output files:
 . display "  stata_bma_dsl_fig5_coefdensity.png -- BMA coefficient densities"
   stata_bma_dsl_fig5_coefdensity.png -- BMA coefficient densities
 
-. display "  stata_bma_dsl_fig6_ekc_curves.png  -- predicted EKC curves"
-  stata_bma_dsl_fig6_ekc_curves.png  -- predicted EKC curves
+. display "  stata_bma_dsl_fig6_ekc_curves.png  -- EKC curves (normalized)"
+  stata_bma_dsl_fig6_ekc_curves.png  -- EKC curves (normalized)
 
-. display "  stata_bma_dsl_comparison.csv       -- full comparison table"
-  stata_bma_dsl_comparison.csv       -- full comparison table
+. display "  stata_bma_dsl_fig7_answer_key.png  -- answer key evaluation"
+  stata_bma_dsl_fig7_answer_key.png  -- answer key evaluation
 
-. 
-. *---------------------------------------------*
-. * Clean up temporary files                    *
-. *---------------------------------------------*
-. capture erase "_tutorial_bma_temp.dta"
+. display "  stata_bma_dsl_comparison.csv       -- coefficient comparison"
+  stata_bma_dsl_comparison.csv       -- coefficient comparison
 
 . 
+. capture erase "_bma_temp.dta"
+
 . log close
       name:  <unnamed>
        log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_bma_
 > dsl/analysis.log
   log type:  text
- closed on:  30 Mar 2026, 23:05:46
+ closed on:  31 Mar 2026, 00:18:44
 -------------------------------------------------------------------------------
