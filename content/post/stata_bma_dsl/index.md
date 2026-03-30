@@ -71,7 +71,7 @@ graph LR
 
 1. **Bayesian Model Averaging (BMA)** estimates thousands of models and averages the results, weighting each by how well it fits the data. Each variable gets a **Posterior Inclusion Probability (PIP)** --- the fraction of high-quality models that include it.
 
-2. **Double-Selection LASSO (DSL)** uses machine learning to automatically select which controls matter, running LASSO twice to protect against omitted variable bias.
+2. **Post-Double-Selection LASSO (DSL)** uses LASSO to automatically select which controls matter --- once for the outcome, once for each variable of interest --- then runs OLS with the union of all selected controls. This "select, then regress" approach protects against omitted variable bias.
 
 We use **synthetic panel data** with a known "answer key" --- we designed the data so that 5 controls truly affect CO<sub>2</sub> and 7 are pure noise. This lets us grade each method: does it correctly identify the true predictors? The data is inspired by the panel dataset of Gravina and Lanzafame (2025) but is fully synthetic and not identical to the original.
 
@@ -81,8 +81,8 @@ We use **synthetic panel data** with a known "answer key" --- we designed the da
 
 - Understand the EKC hypothesis and why a cubic polynomial tests for an inverted-N shape
 - Recognize model uncertainty as a practical challenge when many controls are available
-- Implement BMA with `bmaregress` and interpret PIPs, variable inclusion maps, and coefficient densities
-- Implement DSL with `dsregress` and understand the double-selection rationale
+- Implement BMA with `bmaregress` and interpret PIPs and coefficient densities
+- Implement post-double-selection LASSO with `dsregress` and understand its four-step algorithm: LASSO on outcome, LASSO on each variable of interest, union, then OLS
 - Evaluate both methods against a known ground truth to assess their accuracy
 
 
@@ -322,11 +322,12 @@ PIP > 0.80 is a common threshold for considering a variable "robust" --- it mean
 
 Stata 18's [`bmaregress`](https://www.stata.com/manuals/bmabmaregress.pdf) uses:
 
-- **`gprior(uip)`** --- Unit Information Prior: "let the data speak" about coefficient magnitudes
-- **`mprior(uniform)`** --- all models equally likely a priori
-- **`groupfv`** --- country dummies enter/exit models as a group
-- **`mcmcsize(50000)`** --- sample 50,000 models via MCMC
-- **`($fe, always)`** --- country and year FE always included
+- **`gprior(uip)`** --- Unit Information Prior: sets the prior precision on coefficients equal to the information in one observation (g = N). This is a standard, relatively uninformative choice that lets the data dominate
+- **`mprior(uniform)`** --- all $2^{12} = 4{,}096$ models are equally likely a priori; no model is privileged before seeing the data
+- **`groupfv`** --- treats all country dummies as a single group that enters or exits models together, rather than selecting individual country dummies
+- **`mcmcsize(50000)`** --- draws 50,000 models from the model space using MC$^3$ (Markov chain Monte Carlo model composition) sampling
+- **`($fe, always)`** --- country and year fixed effects are always included in every model; they are not subject to model selection
+- **`pipcutoff(0.8)`** --- display only variables with PIP above 0.80 in the output table
 
 ### 5.3 Estimation
 
@@ -334,7 +335,7 @@ Stata 18's [`bmaregress`](https://www.stata.com/manuals/bmabmaregress.pdf) uses:
 bmaregress $outcome $gdp_vars $controls ///
     ($fe, always), ///
     mprior(uniform) groupfv gprior(uip) ///
-    mcmcsize(50000) rseed(9988) inputorder pipcutoff(0.5)
+    mcmcsize(50000) rseed(9988) inputorder pipcutoff(0.8)
 ```
 
 ```text
@@ -407,47 +408,50 @@ graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
 The six densities tell a clear story. The GDP terms (top row) are tightly concentrated around their true values: $\beta\_1$ near --7.1, $\beta\_2$ near 0.81, $\beta\_3$ near --0.030. The control variables (bottom row) are also well away from zero: fossil fuel is centered near +0.014 (true: +0.015), renewable energy near --0.007 (true: --0.010), and industry near +0.009 (true: +0.010). None of these densities show a meaningful spike at zero, confirming these are genuinely robust predictors across the model space.
 
 
-## 6. Double-Selection LASSO
+## 6. Post-Double-Selection LASSO
 
 ### 6.1 The idea
 
-DSL is like a smart research assistant who reads the data twice --- once to find controls that predict CO<sub>2</sub>, and again to find controls that predict GDP. The final regression uses only controls that matter for at least one task.
+Stata's [`dsregress`](https://www.stata.com/manuals/lassodsregress.pdf) implements the **post-double-selection** method of Belloni, Chernozhukov, and Hansen (2014). Think of it as a smart research assistant who reads the data twice --- once to find controls that predict the outcome (CO<sub>2</sub>), and again to find controls that predict the variables of interest (GDP terms) --- then runs a clean OLS regression using only the controls that survived at least one selection.
+
+The "double" in double-selection refers to the **union** of two separate LASSO selections. Why is this union necessary? If a control variable predicts both CO<sub>2</sub> *and* GDP but a single LASSO run on CO<sub>2</sub> happens to miss it, omitting it from the final regression would bias the GDP coefficient. The second LASSO step (on GDP) catches variables that the first step might miss, and vice versa.
+
+The algorithm has four steps:
 
 ```mermaid
 graph TD
-    Step1["<b>LASSO Step 1</b><br/>CO2 ~ all controls<br/>→ Select controls for CO2"]
-    Step2a["<b>LASSO Step 2a</b><br/>GDP ~ all controls"]
-    Step2b["<b>LASSO Step 2b</b><br/>GDP² ~ all controls"]
-    Step2c["<b>LASSO Step 2c</b><br/>GDP³ ~ all controls"]
-    Union["<b>Union</b><br/>Combine selected"]
-    OLS["<b>Final OLS</b><br/>CO2 ~ GDP terms<br/>+ selected controls"]
+    Controls["<b>12 Candidate Controls</b><br/>+ country & year FE"]
 
-    Step1 --> Union
-    Step2a --> Union
-    Step2b --> Union
-    Step2c --> Union
-    Union --> OLS
+    Controls --> Step1["<b>Step 1: LASSO on Outcome</b><br/>CO2 ~ all controls<br/>→ Selected set X̃y"]
+    Controls --> Step2["<b>Step 2: LASSO on Each Variable of Interest</b><br/>GDP ~ all controls → X̃₁<br/>GDP² ~ all controls → X̃₂<br/>GDP³ ~ all controls → X̃₃"]
 
+    Step1 --> Union["<b>Step 3: Take the Union</b><br/>X̂ = X̃y ∪ X̃₁ ∪ X̃₂ ∪ X̃₃<br/>Only controls surviving<br/>at least one selection"]
+    Step2 --> Union
+
+    Union --> OLS["<b>Step 4: Final OLS</b><br/>CO2 ~ GDP + GDP² + GDP³ + X̂<br/>Standard OLS with valid<br/>inference on GDP terms"]
+
+    style Controls fill:#141413,stroke:#141413,color:#fff
     style Step1 fill:#6a9bcc,stroke:#141413,color:#fff
-    style Step2a fill:#d97757,stroke:#141413,color:#fff
-    style Step2b fill:#d97757,stroke:#141413,color:#fff
-    style Step2c fill:#d97757,stroke:#141413,color:#fff
-    style Union fill:#141413,stroke:#141413,color:#fff
+    style Step2 fill:#d97757,stroke:#141413,color:#fff
+    style Union fill:#1a3a8a,stroke:#141413,color:#fff
     style OLS fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
-At the heart of DSL is the LASSO, which adds a penalty that shrinks irrelevant coefficients to exactly zero:
+At the heart of each LASSO step is a penalized regression that shrinks irrelevant coefficients to exactly zero:
 
 $$\min\_{\boldsymbol{\beta}} \left\\{ \frac{1}{2N} \sum\_{i=1}^{N}(y\_i - \mathbf{x}\_i'\boldsymbol{\beta})^2 + \lambda \sum\_{j=1}^{p} |\beta\_j| \right\\}$$
 
-The tuning parameter $\lambda$ controls how harsh the penalty is --- think of it as a "strictness dial." The "double" in double-selection protects against omitted variable bias: if a control affects both CO<sub>2</sub> and GDP but LASSO only checks one side, leaving it out would bias the GDP coefficient.
+The tuning parameter $\lambda$ controls how harsh the penalty is --- think of it as a "strictness dial." LASSO sets weak coefficients to exactly zero, performing automatic variable selection. The `dsregress` command uses a "plugin" method to choose $\lambda$ based on the data.
 
-| Feature | BMA | DSL |
-|---------|-----|-----|
+> **Note.** Stata also offers [`poregress`](https://www.stata.com/manuals/lassoporegress.pdf) (partialing-out regression), which implements a different approach: instead of selecting controls and running OLS, partialing-out *residualizes* both the outcome and the treatment against all controls, then regresses residuals on residuals. Both methods provide valid inference, but they differ in how they handle controls. This tutorial uses `dsregress` (post-double-selection) because its select-then-regress logic is more intuitive for beginners.
+
+| Feature | BMA | Post-Double-Selection |
+|---------|-----|-----------------------|
 | Philosophy | Bayesian (posteriors) | Frequentist (p-values) |
-| Strategy | Average across models | Select one model |
+| Strategy | Average across models | Select controls, then OLS |
 | Output | PIPs for every variable | Set of selected controls |
 | Speed | Minutes (MCMC) | Seconds (optimization) |
+| Reference | Raftery et al. (1997) | Belloni, Chernozhukov, Hansen (2014) |
 
 ### 6.2 Estimation
 
@@ -474,7 +478,7 @@ Double-selection linear model         Number of obs               =      1,600
 ------------------------------------------------------------------------------
 ```
 
-DSL completed in seconds. All three GDP terms are significant at the 0.1% level with robust standard errors. The DSL coefficients (--7.498, 0.849, --0.031) are identical to the sparse FE estimates, which is expected: when LASSO selects all available controls (as it does with panel FE dummies), the final OLS is equivalent to the sparse specification. The Wald test strongly rejects the null that GDP terms are jointly zero ($\chi^2 = 70.46$, p < 0.001).
+Post-double-selection completed in seconds. Internally, `dsregress` ran four separate LASSO regressions (Step 1 on CO<sub>2</sub>, Steps 2a--2c on each GDP term), took the union of all selected controls, and then ran a final OLS of CO<sub>2</sub> on the GDP terms plus that union. All three GDP terms are significant at the 0.1% level with robust standard errors. The Wald test strongly rejects the null that GDP terms are jointly zero ($\chi^2 = 70.46$, p < 0.001).
 
 ### 6.3 Turning points
 
@@ -504,7 +508,7 @@ lassoinfo
 ------------------------------------------------------
 ```
 
-LASSO selected 100 of the 112 candidate controls (which include 80 country dummies, 19 year dummies, and 12 candidate variables plus the constant) at each step. With panel data, most country and year dummies are informative, so LASSO retains them while zeroing out only the weakest candidates. The selection is less discriminating than BMA's PIPs for our 12 candidate controls, because LASSO operates on the full set including all FE dummies.
+The `lassoinfo` output shows each of the four LASSO steps (one for the outcome, three for the GDP terms). Each step selected about 100 of the 112 candidate controls. The 112 candidates include 80 country dummies, 19 year dummies, and the 12 candidate variables plus the constant. Since most country and year dummies are informative in panel data, LASSO retains them while zeroing out only about 12 of the weakest candidates at each step. The union across all four steps (Step 3 of the algorithm) yields the final control set for the OLS regression in Step 4. Because so many controls survive selection, the post-double-selection estimate ends up close to the kitchen-sink FE --- this is expected when the candidate set is dominated by informative fixed effects.
 
 
 ## 7. Head-to-Head Comparison
@@ -535,7 +539,7 @@ The ultimate test: do BMA and DSL correctly identify the 5 true predictors and r
 
 **BMA's report card:** Of the 8 true predictors (3 GDP terms + 5 controls), BMA correctly assigns PIP > 0.80 to 6 --- the three GDP terms, fossil fuel, industry, and renewable energy. It misses urban (PIP ~ 0.05) and democracy (PIP ~ 0.10), whose true coefficients are small (0.007 and --0.005). All 7 noise variables receive PIPs well below 0.80. BMA makes **zero false positives** (no noise variable incorrectly flagged as robust) and **two false negatives** (two weak true predictors missed).
 
-**DSL's report card:** DSL selected 100 of 112 total controls (including FE dummies), making it less discriminating for candidate variables. However, the final OLS coefficients for the GDP terms are consistent with the DGP, and DSL runs in seconds rather than minutes.
+**Post-double-selection's report card:** The union of all four LASSO steps selected 100 of 112 total controls (including FE dummies), making the final OLS regression nearly equivalent to the kitchen-sink specification. This is expected when the candidate set is dominated by informative fixed effects. The GDP coefficients in the final OLS are consistent with the DGP, and the entire procedure runs in seconds rather than minutes.
 
 **Bottom line:** Both methods recover the inverted-N EKC shape. BMA provides more granular variable-level inference (PIPs), while DSL provides fast, valid coefficient estimates. The synthetic data "answer key" confirms that both are doing their job --- with the expected limitation that weak signals are hard to detect.
 
