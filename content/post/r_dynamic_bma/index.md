@@ -38,7 +38,9 @@ diagram: true
 
 Imagine you are advising a government on how to accelerate long-run economic growth. Your team has compiled a panel dataset covering 73 countries across four decades, with nine candidate drivers: investment, education, population growth, trade openness, government spending, life expectancy, democracy, investment prices, and population size. The natural question is: **which of these factors truly drive economic growth --- and can we trust our answers when today's GDP might itself be shaped by those same factors?**
 
-This last concern is *reverse causality* --- the possibility that GDP growth causes higher investment rather than the other way around. Cross-sectional Bayesian Model Averaging (BMA) handles model uncertainty by averaging across thousands of model specifications, but it assumes regressors are strictly exogenous. When that assumption fails, BMA can confidently point to the wrong variables.
+What is BMA? Imagine trying to predict salaries using education, experience, age, and industry. You could build one model with all four variables, or drop industry, or use only experience and education. With just 4 candidates, there are $2^4 = 16$ possible models. Which is correct? **Bayesian Model Averaging (BMA)** does not pick one --- it averages predictions from all 16, giving more weight to models that fit the data well. This avoids betting everything on one specification that might be wrong.
+
+This last concern is *reverse causality* --- the possibility that GDP growth causes higher investment rather than the other way around. Cross-sectional BMA handles model uncertainty this way, but it assumes regressors are strictly exogenous. When that assumption fails, BMA can confidently point to the wrong variables.
 
 This tutorial introduces the [Bayesian Dynamic Systems Modeling](https://cran.r-project.org/web/packages/bdsm/index.html) R package --- which extends BMA to dynamic panel data with weakly exogenous regressors. Built on the methodology of Moral-Benito (2012, 2013, 2016), it simultaneously addresses model uncertainty and reverse causality by incorporating a lagged dependent variable, entity fixed effects, and time fixed effects into the BMA framework.
 
@@ -48,9 +50,9 @@ This tutorial introduces the [Bayesian Dynamic Systems Modeling](https://cran.r-
 
 - Understand why cross-sectional BMA can be misleading when regressors are endogenous, and how dynamic panel BMA addresses this
 - Prepare panel data for the Bayesian DSM package using `join_lagged_col()` and `feature_standardization()`
-- Run Bayesian Model Averaging with `bma()` and interpret Posterior Inclusion Probabilities (PIPs), posterior means, and model probabilities
-- Assess the sensitivity of results to prior specification by varying the expected model size and applying dilution priors
-- Analyze jointness to discover which growth determinants are complements versus substitutes
+- Run Bayesian Model Averaging with `bma()` and interpret Posterior Inclusion Probabilities (PIPs --- how often a variable appears in the best-fitting models), posterior means, and model probabilities
+- Assess the sensitivity of results to prior specification by varying the expected model size (how many variables the prior expects to matter) and applying dilution priors (which adjust for correlated variables)
+- Analyze jointness (which variables tend to appear in models together) to discover which growth determinants are complements versus substitutes
 
 The tutorial proceeds in two stages. First, a **warm-up** with only 3 regressors and 8 models to build intuition for the workflow. Then the **full analysis** with all 9 regressors and 512 models, including sensitivity analysis and jointness.
 
@@ -85,6 +87,8 @@ Think of it this way: imagine judging a runner's training program by their final
 
 When BMA is applied to cross-sectional data with endogenous regressors, it can confidently assign high inclusion probabilities to variables that appear important only because they are *consequences* of growth rather than *causes* of it. The model averaging machinery works perfectly --- but the individual models it averages over are biased.
 
+The solution is to include *last period's GDP* as a regressor. By controlling for where a country *was*, we isolate which new factors push it forward --- breaking the feedback loop. The next section shows why this dynamic structure arises naturally from economic growth theory.
+
 ### 3.2 From the Solow model to a dynamic equation
 
 Why does a dynamic equation --- one with lagged GDP on the right-hand side --- arise naturally in growth economics? The answer comes from the **Solow growth model** and its convergence prediction.
@@ -115,9 +119,9 @@ Each component of the dynamic panel equation plays a distinct role:
 - **Entity fixed effects** ($\eta\_i$): Like grading on a curve within each classroom --- these absorb time-invariant country traits such as geography, colonial history, and institutional heritage. We compare each country to its own average, not to other countries.
 - **Time fixed effects** ($\zeta\_t$): These remove global shocks that affect all countries simultaneously, such as oil crises or the Asian financial crisis.
 
-The key assumption is **weak exogeneity**: current regressors can be correlated with *past* shocks but not with the *current* shock $v\_{it}$. This is much weaker than strict exogeneity --- it allows past GDP growth to influence current investment (feedback effects) while requiring only that the current unexpected shock to GDP does not simultaneously cause changes in investment. In practical terms, weak exogeneity permits the realistic feedback loops that plague growth regressions while still allowing consistent estimation.
+To understand this assumption, consider a concrete example. Suppose an oil price shock in 1985 affects both GDP and trade openness simultaneously. Weak exogeneity allows this kind of contemporaneous correlation between regressors and the fixed effects. What it rules out is that the *unexplained* part of today's GDP shock --- the idiosyncratic error $v\_{it}$ --- directly causes today's investment to change within the same period.
 
-A concrete example helps clarify this. Suppose an oil price shock in 1985 affects both GDP and trade openness simultaneously. Weak exogeneity allows this kind of contemporaneous correlation between regressors and the fixed effects. What it rules out is that the *unexplained* part of today's GDP shock --- the idiosyncratic error $v\_{it}$ --- directly causes today's investment to change within the same period.
+The key assumption is **weak exogeneity**: current regressors can be correlated with *past* shocks but not with the *current* shock $v\_{it}$. This is much weaker than strict exogeneity --- it allows past GDP growth to influence current investment (feedback effects) while requiring only that the current unexpected shock to GDP does not simultaneously cause changes in investment. In practical terms, weak exogeneity permits the realistic feedback loops that plague growth regressions while still allowing consistent estimation.
 
 ### 3.4 From cross-sectional to dynamic panel BMA
 
@@ -155,6 +159,8 @@ bma_small <- bma(small_model_space, df = data_small_prep, round = 3)
 print(bma_small[[1]])  # Binomial prior
 ```
 
+*Focus on two columns: **PIP** (how certain are we this variable matters? higher = more certain) and **PM** (our best estimate of its effect size).*
+
 ```text
           PIP     PM   PSD  PSDR  PMcon PSDcon PSDRcon %(+)
 gdp_lag    NA  1.081 0.099 0.199  1.081  0.099   0.199  100
@@ -167,7 +173,11 @@ Even with only 8 models to average over, the BMA results are informative. The la
 
 Investment share (`ish`) has PIP = 0.720 and a positive posterior mean of 0.085, suggesting moderate evidence that higher investment drives growth. Secondary education (`sed`) has PIP = 0.712 but a negative sign, which is surprising --- we will revisit this when we include all 9 regressors. Population growth (`pgrw`) shows the weakest evidence at PIP = 0.657 with a near-zero posterior mean of --0.014.
 
+Why is education's sign negative? This is surprising --- theory predicts education should boost growth. In this small 3-variable model, education may be picking up a confounding effect that is better explained by the missing variables. When we include all 9 regressors in the full analysis, the education sign becomes positive. This illustrates exactly why model uncertainty matters: conclusions can flip depending on which variables are included.
+
 Let us visualize the prior and posterior model probabilities to see how the data reshapes our beliefs about which models are best.
+
+A brief note on terminology: the *prior* represents our initial guess about which models are good, before seeing any data. The *posterior* is what the data tells us after we look at the evidence. If the data is informative, the posterior will concentrate on a few good models, even if the prior treated all models equally.
 
 ```r
 # Prior vs. posterior model probabilities
@@ -300,12 +310,14 @@ Think of demeaning by time as subtracting the global average for each decade. If
 
 ```r
 # Step 1: Standardize all regressors (mean=0, sd=1)
+# Makes variables comparable: GDP and population are on vastly different scales
 data_std <- feature_standardization(
   df = economic_growth,
   excluded_cols = c(country, year, gdp)
 )
 
 # Step 2: Demean by time period (remove time fixed effects)
+# Subtracts each decade's global average, isolating country-specific variation
 data_prepared <- feature_standardization(
   df = data_std,
   group_by_col = year,
@@ -332,6 +344,8 @@ After preparation, all regressor values are centered around zero. Country 1's in
 ## 7. Estimating the Full Model Space
 
 With 9 candidate regressors, there are $2^9 = 512$ possible regression models. The package estimates every single one via numerical optimization of the *marginal likelihood* --- the probability of observing the data given a particular model, after integrating out all parameter uncertainty. Think of this as a cooking competition with 512 recipes --- each uses a different combination of 9 ingredients, and the marginal likelihood scores each recipe by balancing flavor (fit) against unnecessary complexity (overfitting).
+
+To be concrete: model 1 might include only investment and education. Model 2 adds trade openness. Model 3 uses education and democracy but drops investment. Each of the 512 combinations gets its own likelihood estimated separately, and BMA weights them by how well they fit the data.
 
 The [`optim_model_space()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function handles this computation. For the full 9-regressor case, this is the most computationally intensive step --- it can take several minutes depending on the machine. The package helpfully includes a precomputed `full_model_space` object so we can skip the wait:
 
@@ -401,7 +415,7 @@ The lagged GDP coefficient of 0.619 is notably lower than the BMA posterior mean
 
 Notice how the FE model forces a binary judgment: education is 'insignificant' (p = 0.63) and trade is 'significant' (p = 0.002). BMA replaces this all-or-nothing verdict with a nuanced probability scale: education has PIP = 0.72 (moderate evidence) and trade has PIP = 0.77 (positive evidence). The difference between 'insignificant' and 'moderate evidence' matters for policy --- a policymaker who ignores education entirely because of a p-value threshold may be discarding useful information.
 
-With this benchmark in mind, let us now see what BMA reveals when it averages across all 512 model specifications.
+The kitchen-sink model commits to one specification and produces one set of p-values. But we saw that which variables look 'significant' depends entirely on which others are in the model. Drop one variable, and the significance pattern reshuffles. BMA solves this by never committing to a single specification --- it averages over all 512, letting the data decide which matter most.
 
 ## 9. Bayesian Model Averaging
 
@@ -437,6 +451,8 @@ The binomial prior results reveal a clear hierarchy among the 9 candidate regres
 ### 9.2 Understanding the BMA statistics
 
 Each column in the BMA output captures a different aspect of the evidence:
+
+> **Beginner tip:** For a first reading, focus on three columns: **PIP** (does this variable matter?), **PM** (what is its average effect?), and **%(+)** (is the effect consistently positive or negative?). The remaining columns (PSDR, PMcon, PSDcon, PSDRcon) are useful for advanced robustness checks but can be skipped on a first pass.
 
 | Statistic | Full name | Interpretation |
 |-----------|-----------|----------------|
@@ -562,6 +578,8 @@ best8 <- best_models(bma_results, criterion = 1, best = 8)
 print(best8[[1]])  # Inclusion matrix
 ```
 
+*Reading the inclusion matrix: each column is a model (ranked by fit), each row is a variable. A value of 1 means the variable is included in that model. Look for variables that appear in every top model --- those are the most robust.*
+
 ```text
         'No. 1' 'No. 2' 'No. 3' 'No. 4' 'No. 5' 'No. 6' 'No. 7' 'No. 8'
 gdp_lag   1.000   1.000   1.000   1.000   1.000   1.000   1.000   1.000
@@ -582,6 +600,8 @@ A striking pattern emerges: the top model includes *all 9 regressors* (PMP = 8.9
 Two variables are never dropped across the top 8 models: `pop` and `lnlex` --- they appear in all 8, consistent with their high PIPs of 0.990 and 0.864. The variables dropped in models 2--8 are `ipr`, `polity`, `sed`, `pgrw`, `gsh`, `opem`, and `ish` --- precisely the variables with the lowest PIPs.
 
 In the best model (No. 1), the lagged GDP coefficient is 0.954 (SE = 0.076, significant at 1%), confirming the very slow convergence we derived from the Solow model. Investment share has a positive and significant coefficient of 0.079, while democracy has a negative and significant coefficient of --0.092. Life expectancy is positive and significant at 0.151. Education, despite being included in 7 of the top 8 models, has a large standard error (0.034, SE = 0.065) --- explaining its moderate PIP despite frequent inclusion.
+
+This combination --- high inclusion rate but imprecise coefficient --- happens when most models agree that education *belongs* in the model but disagree about its magnitude. Some estimate a positive effect of +0.08, others a negative --0.02. The variable is probably relevant, but the data does not pin down its direction.
 
 Beyond these top models, how do the coefficients distribute across all 512 specifications? The next section examines the full posterior distributions.
 
