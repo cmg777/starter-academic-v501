@@ -92,8 +92,6 @@ graph LR
 
 Real-world datasets rarely come with an answer key. We never know which control variables *truly* belong in the model. By generating synthetic data with a known data-generating process (DGP), we can verify whether BMA and DSL correctly recover the truth. This is the same "answer key" approach used in the [companion R tutorial](/post/r_bma_lasso_wals/), applied here to panel data.
 
-> **Important.** This synthetic dataset is inspired by but **not identical** to the panel data in Gravina and Lanzafame (2025). It mimics the structure (countries, years, similar variable types) but all observations are computer-generated. Do not cite these results as empirical findings.
-
 ### 2.2 The data-generating process
 
 The outcome --- log CO<sub>2</sub> per capita --- follows a cubic EKC with country and year fixed effects:
@@ -120,6 +118,8 @@ The **answer key** --- which variables are true predictors and which are noise:
 | `credit` | Economic | No | 0 | moderate | Noise --- tricky (correlated with GDP) |
 
 The "GDP corr." column is key to understanding why this problem is non-trivial. Four noise variables (`globalization`, `services`, `trade`, `credit`) are deliberately correlated with GDP. A naive regression would find them "significant" because they piggyback on GDP's true effect. The challenge for BMA and DSL is to see through this correlation and correctly identify that only the 5 true controls belong in the model.
+
+With the DGP and answer key defined, we now load the synthetic data and set up the Stata environment.
 
 ### 2.3 Load the data
 
@@ -177,7 +177,7 @@ globalizat~n |      1,600    57.6498    12.71537   26.75758         95
       credit |      1,600    53.4402    18.20204   11.32991   123.2399
 ```
 
-The dataset contains 1,600 observations from 80 countries over 20 years (1995--2014). Log GDP per capita ranges from 6.97 to 11.97, spanning the full income spectrum from about \\$1,065 to \\$158,000 in synthetic international dollars. Log CO<sub>2</sub> has a mean of --19.04 with substantial variation (standard deviation 0.79), reflecting the wide range of development levels in our synthetic panel.
+The dataset contains 1,600 observations from 80 countries over 20 years (1995--2014). Log GDP per capita ranges from 6.97 to 11.97, spanning the full income spectrum from about \\$1,065 to \\$158,000 in synthetic international dollars. Log CO<sub>2</sub> has a mean of --19.04 with substantial variation (standard deviation 0.79), reflecting the wide range of development levels in our synthetic panel. With the data loaded, we next visualize the raw income--pollution relationship.
 
 ## 3. Exploratory Data Analysis
 
@@ -286,6 +286,8 @@ globalizat~n |   .0015186   .0012832     1.18   0.240    -.0010357    .0040728
 
 Adding all 12 controls raises the within R² from 0.035 to 0.125 --- a meaningful improvement, though the country and year FE still dominate the overall explanatory power (R² = 0.966). The three strongest true predictors (fossil fuel, industry, urban) are clearly significant, while most noise variables are statistically insignificant. Democracy's estimate (--0.0003, p = 0.97) is far from its true value (--0.005) and indistinguishable from zero --- illustrating why weak signals are hard to detect even with the correct model.
 
+The critical question is: which specification should we trust? The next subsection shows that the GDP coefficients --- and hence the EKC shape --- shift depending on which controls we include.
+
 ### 4.3 The model uncertainty problem
 
 | Coefficient | Sparse FE | Kitchen-Sink FE | True DGP |
@@ -315,7 +317,7 @@ graph twoway ///
 
 ![Bar chart comparing GDP polynomial coefficients between sparse and kitchen-sink fixed effects specifications. The coefficients shift between the two models, demonstrating model uncertainty.](stata_bma_dsl_fig2_instability.png)
 
-The **turning points** --- where the EKC changes direction --- are found by setting the first derivative to zero:
+To understand the practical implications of these coefficient shifts, we compute the income thresholds where emissions change direction. The **turning points** are found by setting the first derivative of the cubic to zero:
 
 $$x^* = \frac{-\hat{\beta}\_2 \pm \sqrt{\hat{\beta}\_2^2 - 3\hat{\beta}\_1\hat{\beta}\_3}}{3\hat{\beta}\_3}, \quad \text{GDP}^* = \exp(x^*)$$
 
@@ -346,7 +348,9 @@ graph TD
     style PIP fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
-**Step 1: Model posterior probabilities.** The posterior probability of model $M\_k$ follows Bayes' rule:
+Formally, this betting process follows Bayes' rule, which tells us how to weight models by their fit and complexity.
+
+**Step 1: Model posterior probabilities.** The posterior probability of model $M\_k$ is:
 
 $$P(M\_k | \text{data}) = \frac{P(\text{data} | M\_k) \cdot P(M\_k)}{\sum\_{l=1}^{K} P(\text{data} | M\_l) \cdot P(M\_l)}$$
 
@@ -386,7 +390,7 @@ A key assumption underlying BMA is that the true data-generating process is well
 
 ### 5.2 Key options
 
-Stata 18's [`bmaregress`](https://www.stata.com/manuals/bmabmaregress.pdf) command has three families of options: **priors** (what you believe before seeing the data), **MCMC controls** (how the algorithm explores the model space), and **output formatting** (what gets displayed). The full option list is in the [Stata manual](https://www.stata.com/manuals/bmabmaregress.pdf); here we explain the ones used in this tutorial:
+With the conceptual framework in place, we now turn to implementation. Stata 18's [`bmaregress`](https://www.stata.com/manuals/bmabmaregress.pdf) command has three families of options: **priors** (what you believe before seeing the data), **MCMC controls** (how the algorithm explores the model space), and **output formatting** (what gets displayed). The full option list is in the [Stata manual](https://www.stata.com/manuals/bmabmaregress.pdf); here we explain the ones used in this tutorial:
 
 **Prior specifications** (see [`bmaregress` priors](https://www.stata.com/manuals/bmabmaregresspostestimation.pdf) for alternatives):
 
@@ -626,6 +630,8 @@ The union in Step 3 ensures that a confounder missed by the $Y$-LASSO but caught
 
 The `dsregress` command uses a "plugin" method to choose $\lambda$ --- an analytical formula that sets the penalty based on the sample size and noise level, without requiring cross-validation. A key assumption underlying DSL is *approximate sparsity*: only a small number of controls truly matter, so LASSO can safely set the rest to zero. When the true model is dense (many small effects rather than a few large ones), LASSO may struggle to select the right variables.
 
+Before implementing DSL, it helps to see the two methods side by side:
+
 | Feature | BMA | Post-Double-Selection |
 |---------|-----|-----------------------|
 | Philosophy | Bayesian (posteriors) | Frequentist (p-values) |
@@ -636,7 +642,7 @@ The `dsregress` command uses a "plugin" method to choose $\lambda$ --- an analyt
 
 ### 6.2 Key options
 
-Stata 18's [`dsregress`](https://www.stata.com/manuals/lassodsregress.pdf) command has a concise syntax, but each element plays a specific role. The full option list is in the [Stata LASSO manual](https://www.stata.com/manuals/lasso.pdf); here we explain the ones used in this tutorial:
+With the algorithm clear, let us examine the Stata implementation. The [`dsregress`](https://www.stata.com/manuals/lassodsregress.pdf) command has a concise syntax, but each element plays a specific role. The full option list is in the [Stata LASSO manual](https://www.stata.com/manuals/lasso.pdf); here we explain the ones used in this tutorial:
 
 **Syntax structure:** `dsregress depvar varsofinterest, controls(controlvars) [options]`
 
@@ -686,6 +692,8 @@ Post-double-selection completed in seconds with cluster-robust standard errors a
 The post-double-selection turning points (\\$2,429 and \\$27,672) fall between the sparse FE and kitchen-sink estimates, closer to the BMA values. With cluster-robust standard errors, the LASSO selection retained 102 of 112 controls for the outcome equation and 100 for each GDP term. The union of selected controls in Step 3 includes a few more candidate variables than without clustering, producing coefficients (--7.433, 0.840, --0.031) that lie between the sparse and kitchen-sink specifications.
 
 ### 6.5 LASSO selection
+
+To understand which controls LASSO kept and which it dropped, we inspect the selection details:
 
 ```stata
 lassoinfo
@@ -887,7 +895,11 @@ Both BMA and DSL identify the **inverted-N** EKC shape with turning points close
 
 The policy implication is important: the inverted-N suggests that the "environmental improvement" phase is not automatic. Unlike the simpler inverted-U hypothesis, which predicts a single turning point after which pollution monotonically declines, the inverted-N warns that countries at very low income levels may *already* be on a declining emissions path that reverses once industrialization begins. This makes the middle-income range --- where emissions rise steeply --- the critical window for environmental policy intervention.
 
-The three robust control variables identified by BMA reinforce this narrative. Fossil fuel dependence (PIP = 1.000) is the single strongest predictor of CO<sub>2</sub> emissions, with a coefficient close to the true DGP value. Renewable energy share (PIP = 0.959) enters with a negative sign, confirming that energy mix transitions reduce emissions. Industry value-added (PIP = 0.999) captures the composition effect --- economies dominated by manufacturing produce more CO<sub>2</sub> per unit of GDP than service-based economies.
+The three robust control variables identified by BMA reinforce this narrative:
+
+- **Fossil fuel dependence** (PIP = 1.000) is the single strongest predictor of CO<sub>2</sub> emissions, with a coefficient close to the true DGP value.
+- **Renewable energy share** (PIP = 0.959) enters with a negative sign, confirming that energy mix transitions reduce emissions.
+- **Industry value-added** (PIP = 0.999) captures the composition effect --- economies dominated by manufacturing produce more CO<sub>2</sub> per unit of GDP than service-based economies.
 
 ### 8.2 When to use BMA vs post-double-selection
 
@@ -919,7 +931,7 @@ The practical takeaway for applied researchers: in panel data settings, always i
 
 **Panel FE and LASSO.** In our panel setting, 99 of 112 candidate controls are FE dummies that LASSO retains almost entirely. This limits DSL's ability to discriminate among the 12 candidate controls. In cross-sectional settings or settings with many genuinely irrelevant variables, DSL would have more room to operate and potentially match BMA's accuracy.
 
-**Extensions.** The original study by Gravina and Lanzafame (2025) addresses additional complications including endogeneity (via 2SLS-BMA), alternative pollutants (SO<sub>2</sub>, PM2.5), and non-linear specifications. Researchers working with real EKC data should also consider spatial dependence across countries and structural breaks in the income--pollution relationship.
+**Extensions.** Researchers working with real EKC data should also consider endogeneity (via 2SLS-BMA, as in Gravina and Lanzafame, 2025), alternative pollutants (SO<sub>2</sub>, PM2.5), spatial dependence across countries, and structural breaks in the income--pollution relationship.
 
 ## 9. Summary and Next Steps
 
@@ -1024,7 +1036,9 @@ d_globaliz~n |  -.0004567   .0082494    -0.06   0.956    -.0169368    .0160235
 ------------------------------------------------------------------------------
 ```
 
-The FD sparse OLS finds the inverted-N sign pattern with all three terms significant at the 5% level --- but the coefficients are noisier than the FE estimates (e.g., $\beta\_1 = -10.36$ vs --7.50 for sparse FE). The R² of 0.14 is low, reflecting the loss of within-country time-series variation when collapsing 20 years into a single difference. Adding controls in the kitchen-sink raises R² to 0.37 but makes the GDP terms individually insignificant (p = 0.07--0.11) --- a consequence of having only 80 observations and 15 regressors. Among the controls, fossil fuel (p = 0.033), renewable energy (p = 0.035), and industry (p = 0.005) are significant --- the same three strong predictors identified by BMA with fixed effects.
+The FD sparse OLS finds the inverted-N sign pattern with all three terms significant at the 5% level --- but the coefficients are noisier than the FE estimates (e.g., $\beta\_1 = -10.36$ vs --7.50 for sparse FE). The R² of 0.14 is low, reflecting the loss of within-country time-series variation when collapsing 20 years into a single difference.
+
+Adding controls in the kitchen-sink raises R² to 0.37 but makes the GDP terms individually insignificant (p = 0.07--0.11) --- a consequence of having only 80 observations and 15 regressors. Among the controls, fossil fuel (p = 0.033), renewable energy (p = 0.035), and industry (p = 0.005) are significant --- the same three strong predictors identified by BMA with fixed effects.
 
 ### A.4 BMA on first differences
 
@@ -1074,7 +1088,9 @@ The FD-BMA result is dramatically different from the FE-based BMA. Only **one va
 | d\_industry | **0.998** | 0.999 |
 | d\_democracy | 0.094 | 0.023 |
 
-With only 80 cross-sectional observations, BMA's evidence threshold is much harder to clear. The GDP terms --- which are *the core of the EKC* --- do not survive because the 20-year differences are noisy and the cubic polynomial requires precise estimation of three correlated terms simultaneously. The change in industry share is the only variable with a strong enough signal-to-noise ratio to clear BMA's bar. The FE-based BMA (N = 1,600) has 20x more observations to work with, which is why it identifies 6 robust variables.
+With only 80 cross-sectional observations, BMA's evidence threshold is much harder to clear. The GDP terms --- which are *the core of the EKC* --- do not survive because the 20-year differences are noisy and the cubic polynomial requires precise estimation of three correlated terms simultaneously.
+
+The change in industry share is the only variable with a strong enough signal-to-noise ratio to clear BMA's bar. The FE-based BMA (N = 1,600) has 20x more observations to work with, which is why it identifies 6 robust variables.
 
 ### A.5 DSL on first differences
 
