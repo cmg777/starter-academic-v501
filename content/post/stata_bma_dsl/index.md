@@ -294,6 +294,23 @@ Adding all 12 controls raises the within R² from 0.035 to 0.125 --- a meaningfu
 
 Both specifications recover the correct sign pattern, but the magnitudes shift. The kitchen-sink FE estimates (--7.131, 0.806, --0.030) are closer to the true DGP values (--7.100, 0.810, --0.030) than the sparse FE (--7.498, 0.849, --0.031), because the omitted true controls create bias in the sparse model. But which of the 12 controls actually belongs?
 
+```stata
+* Compare coefficients side by side (simplified from analysis.do)
+graph twoway ///
+    (bar value order if spec == "Sparse FE", ///
+        barwidth(0.35) color("106 155 204")) ///
+    (bar value order if spec == "Kitchen-Sink FE", ///
+        barwidth(0.35) color("217 119 87")), ///
+    xlabel(1 `""b1" "(GDP)""' 2 `""b2" "(GDP sq)""' 3 `""b3" "(GDP cb)""' ///
+           4 `""b1" "(GDP)""' 5 `""b2" "(GDP sq)""' 6 `""b3" "(GDP cb)""') ///
+    xline(3.5, lcolor(gs10) lpattern(dash)) ///
+    ytitle("Coefficient value") ///
+    title("Coefficient Instability Across Specifications") ///
+    legend(order(1 "Sparse FE (no controls)" 2 "Kitchen-Sink FE (all 12 controls)") ///
+        rows(1) position(6)) ///
+    scheme(s2color)
+```
+
 ![Bar chart comparing GDP polynomial coefficients between sparse and kitchen-sink fixed effects specifications. The coefficients shift between the two models, demonstrating model uncertainty.](stata_bma_dsl_fig2_instability.png)
 
 The **turning points** --- where the EKC changes direction --- are found by setting the first derivative to zero:
@@ -400,7 +417,32 @@ Both turning points are in the right ballpark but not exact. The turning point f
 
 ### 5.5 Posterior Inclusion Probabilities
 
-The PIP chart is BMA's signature output. We color-code bars by ground truth: steel blue for true predictors, gray for noise.
+The PIP chart is BMA's signature output. We extract PIPs from the estimation results, label each variable, and color-code bars by ground truth: steel blue for true predictors, gray for noise.
+
+```stata
+* Extract PIPs and create a horizontal bar chart
+matrix pip_mat = e(pip)
+* ... (create dataset of variable names and PIPs, add readable labels) ...
+
+* Mark true vs noise predictors
+gen is_true = inlist(varname, "fossil_fuel", "renewable", "urban", ///
+    "democracy", "industry", "ln_gdp", "ln_gdp_sq", "ln_gdp_cb")
+gsort -pip
+
+graph twoway ///
+    (bar pip order if is_true == 1, horizontal barwidth(0.6) ///
+        color("106 155 204")) ///
+    (bar pip order if is_true == 0, horizontal barwidth(0.6) ///
+        color(gs11)), ///
+    xline(0.8, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
+    ylabel(1(1)15, valuelabel angle(0) labsize(small)) ///
+    xlabel(0(0.2)1, format(%3.1f)) ///
+    xtitle("Posterior Inclusion Probability (PIP)") ///
+    title("BMA: Which Variables Matter?") ///
+    legend(order(1 "True predictor (in DGP)" 2 "Noise variable (not in DGP)") ///
+        rows(1) position(6)) ///
+    scheme(s2color)
+```
 
 ![Horizontal bar chart showing Posterior Inclusion Probabilities for all 15 variables. True predictors are colored in steel blue, noise variables in gray. A dashed orange line marks the 0.80 robustness threshold.](stata_bma_dsl_fig3_pip.png)
 
@@ -411,14 +453,32 @@ The PIP chart cleanly separates the variables into two groups. At the top (PIP n
 The [`bmagraph coefdensity`](https://www.stata.com/manuals/bmabmagraphcoefdensity.pdf) command shows the posterior distribution of each coefficient across all sampled models. We focus on four key variables in a readable 2x2 grid --- the GDP linear and cubic terms (which determine the inverted-N shape) and the two strongest controls:
 
 ```stata
-* Generate density for each key variable, then combine in a 2x2 grid
-bmagraph coefdensity ln_gdp, title("GDP per capita (log)") name(dens_gdp, replace)
-bmagraph coefdensity ln_gdp_cb, title("GDP cubed (log)") name(dens_gdp_cb, replace)
-bmagraph coefdensity fossil_fuel, title("Fossil fuel share (%)") name(dens_fossil, replace)
-bmagraph coefdensity industry, title("Industry VA (% GDP)") name(dens_industry, replace)
+* Generate density for each key variable with clean formatting
+bmagraph coefdensity ln_gdp, title("GDP per capita (log)", size(small)) ///
+    xtitle("Coefficient value", size(vsmall)) ytitle("Density", size(vsmall)) ///
+    ylabel(, labsize(vsmall)) xlabel(, labsize(vsmall)) ///
+    legend(size(tiny) symxsize(3) cols(1)) scheme(s2color) ///
+    name(dens_gdp, replace)
+bmagraph coefdensity ln_gdp_cb, title("GDP cubed (log)", size(small)) ///
+    xtitle("Coefficient value", size(vsmall)) ytitle("Density", size(vsmall)) ///
+    ylabel(, labsize(vsmall)) xlabel(, labsize(vsmall)) ///
+    legend(size(tiny) symxsize(3) cols(1)) scheme(s2color) ///
+    name(dens_gdp_cb, replace)
+bmagraph coefdensity fossil_fuel, title("Fossil fuel share (%)", size(small)) ///
+    xtitle("Coefficient value", size(vsmall)) ytitle("Density", size(vsmall)) ///
+    ylabel(, labsize(vsmall)) xlabel(, labsize(vsmall)) ///
+    legend(size(tiny) symxsize(3) cols(1)) scheme(s2color) ///
+    name(dens_fossil, replace)
+bmagraph coefdensity industry, title("Industry VA (% GDP)", size(small)) ///
+    xtitle("Coefficient value", size(vsmall)) ytitle("Density", size(vsmall)) ///
+    ylabel(, labsize(vsmall)) xlabel(, labsize(vsmall)) ///
+    legend(size(tiny) symxsize(3) cols(1)) scheme(s2color) ///
+    name(dens_industry, replace)
 
 graph combine dens_gdp dens_gdp_cb dens_fossil dens_industry, ///
-    cols(2) rows(2) title("BMA: Posterior Coefficient Densities")
+    cols(2) rows(2) imargin(small) ///
+    title("BMA: Posterior Coefficient Densities", size(medsmall)) ///
+    scheme(s2color) xsize(10) ysize(8)
 ```
 
 ![Posterior coefficient density plots for four key variables in a 2x2 grid. Top row: GDP linear and cubic terms. Bottom row: fossil fuel share and industry VA. All densities are concentrated well away from zero.](stata_bma_dsl_fig4_coefdensity.png)
@@ -548,6 +608,39 @@ BMA and Kitchen-Sink FE produce estimates closest to the true DGP values. DSL fa
 
 The curves are normalized to zero at the sample-mean GDP so both methods are directly comparable:
 
+```stata
+* Generate predicted EKC curves for BMA and DSL, normalized at mean GDP
+summarize ln_gdp
+local xmin = r(min)
+local xmax = r(max)
+local xmean = r(mean)
+
+clear
+set obs 500
+gen lngdp = `xmin' + (_n - 1) * (`xmax' - `xmin') / 499
+
+* Cubic component for each method (using stored coefficients)
+gen fit_bma = `b1_bma' * lngdp + `b2_bma' * lngdp^2 + `b3_bma' * lngdp^3
+gen fit_dsl = `b1_dsl' * lngdp + `b2_dsl' * lngdp^2 + `b3_dsl' * lngdp^3
+
+* Normalize: subtract value at sample-mean GDP
+local norm_bma = `b1_bma' * `xmean' + `b2_bma' * `xmean'^2 + `b3_bma' * `xmean'^3
+local norm_dsl = `b1_dsl' * `xmean' + `b2_dsl' * `xmean'^2 + `b3_dsl' * `xmean'^3
+replace fit_bma = fit_bma - `norm_bma'
+replace fit_dsl = fit_dsl - `norm_dsl'
+
+twoway ///
+    (line fit_bma lngdp, lcolor("106 155 204") lwidth(medthick)) ///
+    (line fit_dsl lngdp, lcolor("217 119 87") lwidth(medthick) lpattern(dash)), ///
+    xline(`lnmin_bma', lcolor("106 155 204"%50) lpattern(shortdash)) ///
+    xline(`lnmax_bma', lcolor("106 155 204"%50) lpattern(shortdash)) ///
+    ytitle("Predicted log CO2 (normalized at mean GDP)") ///
+    xtitle("Log GDP per capita") ///
+    title("Predicted EKC Shape: BMA vs. DSL") ///
+    legend(order(1 "BMA" 2 "DSL") rows(1) position(6)) ///
+    scheme(s2color)
+```
+
 ![Predicted EKC curves from BMA and DSL, normalized at the sample mean. Both methods trace a clear inverted-N shape with closely aligned turning points.](stata_bma_dsl_fig5_ekc_curves.png)
 
 Both curves trace a clear inverted-N: CO<sub>2</sub> falls at low incomes, rises through industrialization, and falls again at high incomes. The BMA curve (solid blue) and DSL curve (dashed orange) are nearly indistinguishable, with turning points closely aligned. The normalization at mean GDP makes the shape immediately visible --- a major improvement over plotting raw cubic components that would sit at different y-levels.
@@ -555,6 +648,24 @@ Both curves trace a clear inverted-N: CO<sub>2</sub> falls at low incomes, rises
 ### 7.3 Answer key: grading the methods
 
 The ultimate test: do BMA and DSL correctly identify the 5 true predictors and reject the 7 noise variables?
+
+```stata
+* Dot plot: BMA PIPs color-coded by ground truth
+* (extract PIPs, label variables, mark true vs noise --- see analysis.do)
+graph twoway ///
+    (scatter order pip if is_true == 1, ///
+        mcolor("106 155 204") msymbol(circle) msize(large)) ///
+    (scatter order pip if is_true == 0, ///
+        mcolor(gs9) msymbol(diamond) msize(large)), ///
+    xline(0.8, lcolor("217 119 87") lpattern(dash) lwidth(medium)) ///
+    ylabel(1(1)15, valuelabel angle(0) labsize(small)) ///
+    xlabel(0(0.2)1, format(%3.1f)) ///
+    xtitle("BMA Posterior Inclusion Probability") ///
+    title("Answer Key: Do BMA and DSL Recover the Truth?") ///
+    legend(order(1 "True predictor" 2 "Noise variable") ///
+        rows(1) position(6)) ///
+    scheme(s2color)
+```
 
 ![Dot plot showing BMA Posterior Inclusion Probabilities for each variable, color-coded by ground truth. True predictors (circles, blue) cluster above the 0.80 threshold; noise variables (diamonds, gray) cluster below it.](stata_bma_dsl_fig6_answer_key.png)
 
