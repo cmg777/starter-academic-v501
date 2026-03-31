@@ -473,7 +473,55 @@ Under the binomial prior, only `pop` (PIP = 0.990) reaches *very strong* evidenc
 
 The **sign stability** column (%(+)) provides an additional robustness check. Seven of the nine regressors have perfectly stable signs: investment share, population growth, population, trade openness, and life expectancy are always positive (100%), while investment price and democracy are always negative (0%). Government share has %(+) = 30.9%, meaning its sign is negative in about 70% of models --- moderately unstable. Education has %(+) = 69.9%, with a positive coefficient in about 70% of models but negative in 30%.
 
-The following chart visualizes the PIPs with color-coded evidence tiers:
+The following chart visualizes the PIPs with color-coded evidence tiers. We first define a dark-theme palette and extract the BMA statistics into a data frame, then build the plot:
+
+```r
+# Dark theme palette (matching site navbar/footer)
+DARK_BG      <- "#0f1729"
+LIGHT_TEXT   <- "#c8d0e0"
+LIGHTER_TEXT <- "#e8ecf2"
+
+# Extract BMA statistics into a data frame
+bma_tab <- bma_results[[1]]
+pip_df <- data.frame(
+  variable = rownames(bma_tab)[-1],
+  pip      = bma_tab[-1, "PIP"],
+  pm       = bma_tab[-1, "PM"],
+  psd      = bma_tab[-1, "PSD"],
+  sign_pos = bma_tab[-1, "%(+)"]
+)
+
+# Readable labels and robustness classification
+var_labels <- c(ish = "Investment share", sed = "Education",
+  pgrw = "Population growth", pop = "Population",
+  ipr = "Investment price", opem = "Trade openness",
+  gsh = "Government share", lnlex = "Life expectancy",
+  polity = "Democracy")
+pip_df$label <- var_labels[pip_df$variable]
+pip_df$robustness <- cut(pip_df$pip,
+  breaks = c(0, 0.50, 0.75, 1),
+  labels = c("Weak (PIP < 0.50)", "Moderate (0.50-0.75)",
+             "Positive (PIP >= 0.75)"),
+  include.lowest = TRUE)
+
+# PIP bar chart
+ggplot(pip_df, aes(x = reorder(label, pip), y = pip,
+                   fill = robustness)) +
+  geom_col(width = 0.65) +
+  geom_hline(yintercept = 0.75, linetype = "dashed",
+             color = LIGHT_TEXT) +
+  geom_hline(yintercept = 0.50, linetype = "dotted",
+             color = LIGHT_TEXT, alpha = 0.6) +
+  coord_flip() +
+  scale_fill_manual(values = c(
+    "Positive (PIP >= 0.75)" = "#6a9bcc",
+    "Moderate (0.50-0.75)"   = "#00d4c8",
+    "Weak (PIP < 0.50)"     = "#d97757")) +
+  labs(x = NULL, y = "Posterior Inclusion Probability (PIP)",
+       fill = "Evidence strength",
+       title = "BMA: Posterior Inclusion Probabilities",
+       subtitle = "Binomial prior (EMS = 4.5), 512 models averaged")
+```
 
 ![Posterior Inclusion Probabilities for all 9 regressors, sorted by PIP with threshold lines.](r_dynamic_bma_pip.png)
 
@@ -539,7 +587,30 @@ Beyond these top models, how do the coefficients distribute across all 512 speci
 
 ## 12. Coefficient Distributions
 
-Before examining individual coefficient distributions, it is helpful to see all posterior means and their uncertainty at a glance:
+Before examining individual coefficient distributions, it is helpful to see all posterior means and their uncertainty at a glance. We compute approximate 95% credible intervals as the posterior mean plus or minus two posterior standard deviations:
+
+```r
+# Approximate 95% credible intervals
+pip_df$ci_low  <- pip_df$pm - 2 * pip_df$psd
+pip_df$ci_high <- pip_df$pm + 2 * pip_df$psd
+
+# Coefficient point-range plot
+ggplot(pip_df, aes(x = reorder(label, pip), y = pm,
+                   color = robustness)) +
+  geom_hline(yintercept = 0, linetype = "solid",
+             color = LIGHT_TEXT, alpha = 0.4) +
+  geom_pointrange(aes(ymin = ci_low, ymax = ci_high),
+                  size = 0.6, linewidth = 0.8) +
+  coord_flip() +
+  scale_color_manual(values = c(
+    "Positive (PIP >= 0.75)" = "#6a9bcc",
+    "Moderate (0.50-0.75)"   = "#00d4c8",
+    "Weak (PIP < 0.50)"     = "#d97757")) +
+  labs(x = NULL, y = "Posterior Mean Coefficient",
+       color = "Evidence strength",
+       title = "BMA: Posterior Coefficient Estimates",
+       subtitle = "Points = posterior mean, bars = PM +/- 2*PSD")
+```
 
 ![Posterior coefficient estimates with approximate 95% credible intervals for all 9 regressors.](r_dynamic_bma_coef.png)
 
@@ -574,6 +645,55 @@ These results hold under the default binomial prior. But how sensitive are they 
 ## 13. Sensitivity to Prior Specification
 
 A critical step in any BMA analysis is checking whether the results change when we alter our prior beliefs. If a variable's PIP is high under one prior but low under another, we should be cautious about declaring it a robust determinant. The following chart compares PIPs across three prior specifications at a glance:
+
+```r
+# Extract PIPs from three prior specifications
+bma_tab_bb   <- bma_results[[2]]  # Binomial-beta
+bma_tab_ems2 <- bma_ems2[[1]]     # Skeptical (EMS = 2)
+
+sens_df <- data.frame(
+  label    = pip_df$label,
+  Binomial = pip_df$pip,
+  BinBeta  = bma_tab_bb[-1, "PIP"],
+  EMS2     = bma_tab_ems2[-1, "PIP"])
+
+# Pivot to long format for ggplot
+sens_long <- sens_df %>%
+  pivot_longer(cols = c(Binomial, BinBeta, EMS2),
+               names_to = "prior", values_to = "pip") %>%
+  mutate(prior = factor(prior,
+    levels = c("EMS2", "Binomial", "BinBeta"),
+    labels = c("Skeptical (EMS=2)", "Binomial (EMS=4.5)",
+               "Binomial-Beta")))
+
+# Connecting segments showing the range across priors
+seg_df <- sens_df %>%
+  mutate(pip_min = pmin(Binomial, BinBeta, EMS2),
+         pip_max = pmax(Binomial, BinBeta, EMS2))
+
+# Dumbbell chart
+ggplot() +
+  geom_vline(xintercept = 0.75, linetype = "dashed",
+             color = LIGHT_TEXT) +
+  geom_vline(xintercept = 0.50, linetype = "dotted",
+             color = LIGHT_TEXT, alpha = 0.6) +
+  geom_segment(data = seg_df,
+    aes(x = pip_min, xend = pip_max,
+        y = reorder(label, Binomial),
+        yend = reorder(label, Binomial)),
+    color = LIGHT_TEXT, alpha = 0.3, linewidth = 1.5) +
+  geom_point(data = sens_long,
+    aes(x = pip, y = reorder(label, pip), color = prior),
+    size = 3.5) +
+  scale_color_manual(values = c(
+    "Skeptical (EMS=2)"  = "#d97757",
+    "Binomial (EMS=4.5)" = "#6a9bcc",
+    "Binomial-Beta"      = "#00d4c8")) +
+  labs(x = "Posterior Inclusion Probability (PIP)", y = NULL,
+       color = "Model prior",
+       title = "Prior Sensitivity: How Robust Are the PIPs?",
+       subtitle = "Same data, three different prior specifications")
+```
 
 ![Prior sensitivity: PIPs under three different prior specifications.](r_dynamic_bma_sensitivity.png)
 
