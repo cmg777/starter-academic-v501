@@ -209,7 +209,7 @@ categories:
   - Python
 draft: false
 featured: false
-date: "<YYYY-MM-DDT00:00:00Z>"
+date: "<YYYY-MM-DDT00:00:00Z>"   # use yesterday's date to avoid future-post exclusion
 external_link: ""
 image:
   caption: ""
@@ -249,7 +249,7 @@ categories:
   - <additional-category>
 draft: false
 featured: false
-date: "<YYYY-MM-DDT00:00:00Z>"
+date: "<YYYY-MM-DDT00:00:00Z>"   # use yesterday's date to avoid future-post exclusion
 external_link: ""
 image:
   caption: ""
@@ -285,7 +285,7 @@ diagram: true
 
 **Common front matter notes:**
 
-- Set `date` to the current date
+- Set `date` to **yesterday's date** (e.g., if today is 2026-04-01, use `2026-03-31T00:00:00Z`). Netlify production builds exclude future-dated posts (`--buildFuture` is only used for deploy previews), and timezone differences between the local machine and the UTC build server can cause "today's" date to be treated as future content
 - `image.placement: 3` enables full-width featured image above the title
 - Omit links that are not applicable
 - `toc: true` enables the left-side table of contents sidebar
