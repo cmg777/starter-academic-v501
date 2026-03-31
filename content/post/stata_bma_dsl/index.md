@@ -346,13 +346,29 @@ graph TD
     style PIP fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
-The posterior probability of model $M\_k$ follows Bayes' rule:
+**Step 1: Model posterior probabilities.** The posterior probability of model $M\_k$ follows Bayes' rule:
 
 $$P(M\_k | \text{data}) = \frac{P(\text{data} | M\_k) \cdot P(M\_k)}{\sum\_{l=1}^{K} P(\text{data} | M\_l) \cdot P(M\_l)}$$
 
-In words, the probability of model $k$ being correct equals how well it fits the data (likelihood) times our prior belief, divided by the total across all models. The **Posterior Inclusion Probability** for variable $j$ is the sum of posterior probabilities across all models that include it:
+In words, the probability of model $k$ being correct equals how well it fits the data (the *marginal likelihood* $P(\text{data} | M\_k)$) times our prior belief ($P(M\_k)$), divided by the total across all models. Models that fit the data well *and* are parsimonious receive higher posterior weight --- this is BMA's built-in Occam's razor.
+
+The marginal likelihood $P(\text{data} | M\_k)$ is not the same as the ordinary likelihood. It integrates over all possible coefficient values, penalizing models with many parameters that "waste" probability mass on parameter regions the data does not support:
+
+$$P(\text{data} | M\_k) = \int P(\text{data} | \boldsymbol{\beta}\_k, M\_k) \\, P(\boldsymbol{\beta}\_k | M\_k) \\, d\boldsymbol{\beta}\_k$$
+
+In words, the marginal likelihood asks: "If we averaged this model's fit across all plausible coefficient values (weighted by the prior $P(\boldsymbol{\beta}\_k | M\_k)$), how well does it explain the data?" This integral is what makes BMA automatically penalize overly complex models --- a model with many parameters spreads its prior probability thinly across a high-dimensional space, and only recovers that probability if the data strongly supports those extra dimensions.
+
+**Step 2: Posterior Inclusion Probabilities.** The **PIP** for variable $j$ sums the posterior probabilities across all models that include it:
 
 $$\text{PIP}\_j = \sum\_{k:\\, x\_j \in M\_k} P(M\_k | \text{data})$$
+
+In words, PIP answers: "Across all the models BMA considered, what fraction of the total posterior weight belongs to models that include variable $j$?" If fossil fuel appears in every high-probability model, its PIP approaches 1.0. If democracy only appears in low-probability models, its PIP stays near 0.
+
+**Step 3: BMA posterior mean.** BMA does not just select variables --- it also produces model-averaged coefficient estimates. The posterior mean of coefficient $\beta\_j$ averages across all models, weighted by their posterior probabilities:
+
+$$\hat{\beta}\_j^{\text{BMA}} = \sum\_{k=1}^{K} P(M\_k | \text{data}) \cdot \hat{\beta}\_{j,k}$$
+
+where $\hat{\beta}\_{j,k}$ is the coefficient estimate of variable $j$ in model $M\_k$ (set to zero if $j$ is not in $M\_k$). In words, the BMA estimate is a weighted average of the coefficient across all models, including models where the variable is absent (contributing zero). This shrinks the coefficient toward zero in proportion to the evidence against inclusion --- a variable with PIP = 0.5 has its BMA coefficient shrunk by roughly half compared to its conditional estimate.
 
 Think of PIP as a **democratic vote** across all candidate models. Each model casts a weighted vote for which variables matter, with better-fitting models getting louder voices. [Raftery (1995)](https://doi.org/10.2307/271063) proposed standard interpretation thresholds based on the strength of evidence:
 
@@ -539,9 +555,24 @@ graph TD
 
 At the heart of each LASSO step is a penalized regression that shrinks irrelevant coefficients to exactly zero:
 
-$$\min\_{\boldsymbol{\beta}} \left\\{ \frac{1}{2N} \sum\_{i=1}^{N}(y\_i - \mathbf{x}\_i'\boldsymbol{\beta})^2 + \lambda \sum\_{j=1}^{p} |\beta\_j| \right\\}$$
+$$\hat{\boldsymbol{\beta}}^{\text{LASSO}} = \arg\min\_{\boldsymbol{\beta}} \left\\{ \frac{1}{2N} \sum\_{i=1}^{N}(y\_i - \mathbf{x}\_i'\boldsymbol{\beta})^2 + \lambda \sum\_{j=1}^{p} |\beta\_j| \right\\}$$
 
-The tuning parameter $\lambda$ controls how harsh the penalty is --- think of it as a "strictness dial." LASSO sets weak coefficients to exactly zero, performing automatic variable selection. The `dsregress` command uses a "plugin" method to choose $\lambda$ --- an analytical formula that sets the penalty based on the sample size and noise level, without requiring cross-validation. A key assumption underlying DSL is *approximate sparsity*: only a small number of controls truly matter, so LASSO can safely set the rest to zero. When the true model is dense (many small effects rather than a few large ones), LASSO may struggle to select the right variables.
+In words, LASSO minimizes the sum of squared residuals (the usual OLS objective) plus a penalty term $\lambda \sum |\beta\_j|$ that charges a cost proportional to the *absolute value* of each coefficient. The tuning parameter $\lambda$ controls how harsh this penalty is --- think of it as a "strictness dial." When $\lambda = 0$, LASSO is just OLS. As $\lambda$ increases, more coefficients are forced to exactly zero. The L1 (absolute value) penalty is what makes LASSO a variable selector: unlike the L2 (squared) penalty used in Ridge regression, the L1 penalty has sharp corners at zero that drive weak coefficients to exactly zero rather than merely shrinking them.
+
+**Why "double" selection?** The key insight of Belloni, Chernozhukov, and Hansen (2014) is that a single LASSO selection can miss important confounders. Consider our panel setting. We want to estimate the effect of GDP terms ($\mathbf{D}$) on CO<sub>2</sub> ($Y$), controlling for other variables ($\mathbf{W}$). The model is:
+
+$$Y\_i = \mathbf{D}\_i' \boldsymbol{\alpha} + \mathbf{W}\_i' \boldsymbol{\beta} + \varepsilon\_i$$
+
+A confounder $W\_j$ that affects both $Y$ and $\mathbf{D}$ must be included to avoid omitted variable bias. But if $W\_j$ has a weak effect on $Y$, the LASSO on $Y$ might miss it. The double-selection strategy solves this by running LASSO twice:
+
+- **Step 1** selects controls that predict $Y$: $\\quad \hat{S}\_Y = \\{j : \hat{\beta}\_j^{\text{LASSO}(Y)} \neq 0\\}$
+- **Step 2** selects controls that predict each $D\_k$: $\\quad \hat{S}\_{D\_k} = \\{j : \hat{\gamma}\_{j,k}^{\text{LASSO}(D\_k)} \neq 0\\}$
+- **Step 3** takes the union: $\\quad \hat{S} = \hat{S}\_Y \cup \hat{S}\_{D\_1} \cup \hat{S}\_{D\_2} \cup \hat{S}\_{D\_3}$
+- **Step 4** runs OLS of $Y$ on $\mathbf{D}$ and $\mathbf{W}\_{\hat{S}}$ with standard inference
+
+The union in Step 3 ensures that a confounder missed by the $Y$-LASSO but caught by the $D$-LASSO is still included. This "safety net" property is what gives post-double-selection its valid inference guarantees --- the final OLS produces consistent estimates of $\boldsymbol{\alpha}$ even if each individual LASSO makes some selection mistakes.
+
+The `dsregress` command uses a "plugin" method to choose $\lambda$ --- an analytical formula that sets the penalty based on the sample size and noise level, without requiring cross-validation. A key assumption underlying DSL is *approximate sparsity*: only a small number of controls truly matter, so LASSO can safely set the rest to zero. When the true model is dense (many small effects rather than a few large ones), LASSO may struggle to select the right variables.
 
 | Feature | BMA | Post-Double-Selection |
 |---------|-----|-----------------------|
