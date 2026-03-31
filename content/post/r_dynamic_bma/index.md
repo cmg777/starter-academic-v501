@@ -529,25 +529,11 @@ polity    1.000   1.000   0.000   1.000   1.000   1.000   1.000   1.000
 PMP       0.089   0.044   0.042   0.036   0.035   0.029   0.026   0.025
 ```
 
-A striking pattern emerges: the top model includes *all 9 regressors* (PMP = 8.9%), and the next 7 best models are each formed by dropping exactly one variable from the full set. This "kitchen sink minus one" pattern confirms that the data supports large models. Among the top 8 models, `pop` and `lnlex` are never dropped --- they appear in all 8, consistent with their high PIPs of 0.990 and 0.864. The variables dropped in models 2--8 are `ipr`, `polity`, `sed`, `pgrw`, `gsh`, `opem`, and `ish` --- precisely the variables with the lowest PIPs.
+A striking pattern emerges: the top model includes *all 9 regressors* (PMP = 8.9%), and the next 7 best models are each formed by dropping exactly one variable from the full set. This "kitchen sink minus one" pattern confirms that the data supports large models.
 
-The graphical inclusion table provides a visual summary:
+Two variables are never dropped across the top 8 models: `pop` and `lnlex` --- they appear in all 8, consistent with their high PIPs of 0.990 and 0.864. The variables dropped in models 2--8 are `ipr`, `polity`, `sed`, `pgrw`, `gsh`, `opem`, and `ish` --- precisely the variables with the lowest PIPs.
 
-```r
-grid::grid.draw(best8[[7]])  # gTree inclusion plot
-```
-
-![Inclusion patterns for the top 8 models under the binomial prior.](r_bdsm_06_best_models_inclusion.png)
-
-The estimation results table shows the coefficient values and significance levels:
-
-```r
-grid::grid.draw(best8[[8]])  # gTree estimates plot
-```
-
-![Coefficient estimates and significance for the top 8 models.](r_bdsm_07_best_models_estimates.png)
-
-In the best model, the lagged GDP coefficient is 0.954 (SE = 0.076, significant at 1%), confirming strong persistence. Investment share has a positive and significant coefficient of 0.079, while polity has a negative and significant coefficient of --0.092. Life expectancy is positive and significant at 0.151. The large standard error on education (0.034, SE = 0.065) explains its relatively lower PIP despite being included in 7 of the top 8 models.
+In the best model (No. 1), the lagged GDP coefficient is 0.954 (SE = 0.076, significant at 1%), confirming the very slow convergence we derived from the Solow model. Investment share has a positive and significant coefficient of 0.079, while democracy has a negative and significant coefficient of --0.092. Life expectancy is positive and significant at 0.151. Education, despite being included in 7 of the top 8 models, has a large standard error (0.034, SE = 0.065) --- explaining its moderate PIP despite frequent inclusion.
 
 Beyond these top models, how do the coefficients distribute across all 512 specifications? The next section examines the full posterior distributions.
 
