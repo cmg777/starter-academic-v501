@@ -352,9 +352,47 @@ The result is a list with two elements. The `$params` matrix contains 106 estima
 
 ---
 
-## 8. Bayesian Model Averaging
+## 8. Benchmark: Kitchen-Sink Fixed Effects
 
-### 8.1 Running BMA
+Before running BMA, it is useful to establish a benchmark. What happens if we simply throw all 9 regressors into a single fixed effects regression? This "kitchen-sink" approach is the default in applied work --- but it commits to one model specification and ignores the uncertainty about which variables belong.
+
+```r
+# Kitchen-sink FE regression with all 9 regressors
+fe_full <- lm(gdp ~ lag_gdp + ish + sed + pgrw + pop + ipr +
+              opem + gsh + lnlex + polity +
+              factor(country) + factor(year),
+              data = original_economic_growth)
+summary(fe_full)
+```
+
+```text
+FE regression coefficients:
+        Estimate Std. Error t value Pr(>|t|)
+lag_gdp   0.6188     0.0501 12.3521   0.0000
+ish       0.4646     0.2331  1.9934   0.0475
+sed       0.0162     0.0337  0.4798   0.6319
+pgrw     -2.3352     2.1409 -1.0907   0.2767
+pop       0.0016     0.0004  4.5092   0.0000
+ipr      -0.0003     0.0003 -1.0817   0.2806
+opem      0.1199     0.0379  3.1652   0.0018
+gsh      -0.7448     0.2700 -2.7585   0.0063
+lnlex     0.1153     0.2440  0.4727   0.6369
+polity   -0.1656     0.0570 -2.9065   0.0041
+
+Significant at 5%: lag_gdp, ish, pop, opem, gsh, polity
+R-squared: 0.988
+N observations: 292
+```
+
+The kitchen-sink model finds 6 of 10 variables significant at the 5% level: lagged GDP, investment share, population, trade openness, government share, and democracy. Education, population growth, investment price, and life expectancy are insignificant. But this result depends entirely on this particular specification --- drop one variable or add another, and the significance pattern may change. This is the model uncertainty problem that BMA is designed to solve.
+
+The lagged GDP coefficient of 0.619 is notably lower than the BMA posterior mean (0.919), suggesting that the kitchen-sink model's coefficient estimates are pulled by multicollinearity among the 9 regressors. BMA handles this by averaging over specifications that include different subsets.
+
+---
+
+## 9. Bayesian Model Averaging
+
+### 9.1 Running BMA
 
 Now we can perform Bayesian Model Averaging across all 512 models. The [`bma()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function takes the precomputed model space and the prepared data, weights each model by its posterior probability, and computes weighted averages of the coefficients:
 
@@ -381,7 +419,7 @@ polity  0.678 -0.057 0.046 0.053 -0.084  0.030   0.044   0.000
 
 The binomial prior results reveal a clear hierarchy among the 9 candidate regressors. Population size (`pop`) dominates with PIP = 0.990 --- appearing in virtually every high-quality model --- followed by life expectancy (`lnlex`) at 0.864 and investment share (`ish`) at 0.773. At the other end, investment price (`ipr`) at 0.656 and democracy (`polity`) at 0.678 show the weakest evidence, though even these exceed 0.5. The lagged GDP coefficient of 0.919 confirms strong persistence: a country's current GDP is heavily determined by its past GDP.
 
-### 8.2 Understanding the BMA statistics
+### 9.2 Understanding the BMA statistics
 
 Each column in the BMA output captures a different aspect of the evidence:
 
@@ -403,7 +441,7 @@ In words, this equation says that each model's posterior probability is its prio
 
 The **PSDR** (or equivalently |PM/PSD|) is a key robustness criterion. Raftery (1995) considers a variable *robust* when |PM/PSD| > 1. More stringent thresholds include |PM/PSD| > 1.3 (Masanjala and Papageorgiou, 2008) and |PM/PSD| > 2 (Sala-i-Martin et al., 2004).
 
-### 8.3 Interpreting PIPs with Raftery's classification
+### 9.3 Interpreting PIPs with Raftery's classification
 
 Raftery (1995) provides a standard classification for the strength of evidence based on PIP values:
 
@@ -418,11 +456,17 @@ Under the binomial prior, only `pop` (PIP = 0.990) reaches *very strong* evidenc
 
 The **sign stability** column (%(+)) provides an additional robustness check. Seven of the nine regressors have perfectly stable signs: investment share, population growth, population, trade openness, and life expectancy are always positive (100%), while investment price and democracy are always negative (0%). Government share has %(+) = 30.9%, meaning its sign is negative in about 70% of models --- moderately unstable. Education has %(+) = 69.9%, with a positive coefficient in about 70% of models but negative in 30%.
 
+The following chart visualizes the PIPs with color-coded evidence tiers:
+
+![Posterior Inclusion Probabilities for all 9 regressors, sorted by PIP with threshold lines.](r_dynamic_bma_pip.png)
+
+Population dominates the chart at PIP = 0.990, followed by life expectancy at 0.864. Five variables clear the 0.75 "positive evidence" threshold, while the remaining four --- democracy, education, population growth, and investment price --- fall in the "moderate" zone between 0.50 and 0.75. Compared to the kitchen-sink benchmark where 6 of 10 variables were significant at 5%, BMA paints a more nuanced picture: it grades each variable on a continuous scale of importance rather than imposing a binary significant/insignificant cutoff.
+
 ---
 
-## 9. Visualizing Model Probabilities
+## 10. Visualizing Model Probabilities
 
-### 9.1 Prior versus posterior model probabilities
+### 10.1 Prior versus posterior model probabilities
 
 The [`model_pmp()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function visualizes how the data transforms our prior beliefs about which models are best. The prior assigns probability to each of the 512 models, and the data concentrates posterior mass on the models that fit best:
 
@@ -444,7 +488,7 @@ pmp_top <- model_pmp(bma_results, top = 10)
 
 The best model (which includes all 9 regressors) receives 8.9% of posterior probability. The top 10 models together account for roughly 38% of the total, leaving the remaining 502 models to share 62%. This tells us that while the full model is favored, there is substantial model uncertainty --- no single specification dominates.
 
-### 9.2 Model sizes
+### 10.2 Model sizes
 
 The [`model_sizes()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function shows the distribution of prior and posterior probabilities across model sizes (number of included regressors, excluding the lagged dependent variable):
 
@@ -458,7 +502,7 @@ The posterior strongly favors larger models. While the binomial prior centers ma
 
 ---
 
-## 10. Examining Top Models
+## 11. Examining Top Models
 
 The [`best_models()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function lets us inspect the specific variable combinations and coefficient estimates in the top-ranked models:
 
@@ -504,9 +548,15 @@ In the best model, the lagged GDP coefficient is 0.954 (SE = 0.076, significant 
 
 ---
 
-## 11. Coefficient Distributions
+## 12. Coefficient Distributions
 
-The [`coef_hist()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function visualizes the posterior distribution of each coefficient across all 512 models, weighted by posterior model probability. This reveals not just the average coefficient but the full range of plausible values:
+Before examining individual coefficient distributions, it is helpful to see all posterior means and their uncertainty at a glance:
+
+![Posterior coefficient estimates with approximate 95% credible intervals for all 9 regressors.](r_dynamic_bma_coef.png)
+
+Population and life expectancy have the largest positive posterior means, with credible intervals that do not cross zero --- consistent with their high PIPs. Democracy (polity) has a clearly negative effect, also with an interval that excludes zero. Investment price is negative but with a wider interval. Education and government share have credible intervals that straddle zero, reflecting sign instability. Compared to the kitchen-sink FE model, BMA produces posterior means that account for model uncertainty: the intervals are wider than standard confidence intervals because they incorporate variation *across* model specifications, not just *within* a single specification.
+
+The [`coef_hist()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function provides more detailed views of the full posterior distribution of each coefficient across all 512 models, weighted by posterior model probability:
 
 ```r
 coef_plots <- coef_hist(bma_results)
@@ -557,11 +607,15 @@ print(coef_kern[[5]])  # Population kernel density
 
 ---
 
-## 12. Sensitivity to Prior Specification
+## 13. Sensitivity to Prior Specification
 
-A critical step in any BMA analysis is checking whether the results change when we alter our prior beliefs. If a variable's PIP is high under one prior but low under another, we should be cautious about declaring it a robust determinant.
+A critical step in any BMA analysis is checking whether the results change when we alter our prior beliefs. If a variable's PIP is high under one prior but low under another, we should be cautious about declaring it a robust determinant. The following chart compares PIPs across three prior specifications at a glance:
 
-### 12.1 Binomial versus binomial-beta prior
+![Prior sensitivity: PIPs under three different prior specifications.](r_dynamic_bma_sensitivity.png)
+
+The width of each horizontal segment shows how much a variable's PIP changes across priors. Population is rock-solid: its PIP barely moves (0.964--0.998) regardless of the prior. Life expectancy shows moderate sensitivity (0.637--0.974). The bottom four variables --- democracy, education, population growth, and investment price --- are the most sensitive, with PIPs ranging from 0.34--0.94 depending on the prior. This visual makes the key message immediately clear: **only population and life expectancy are robust across all prior specifications**.
+
+### 13.1 Binomial versus binomial-beta prior
 
 The default analysis already computes both priors. The **binomial prior** assigns each variable an independent probability of inclusion equal to EMS/K (where EMS is the expected model size and K is the number of regressors). The **binomial-beta prior** is more flexible --- it places a prior on the inclusion probability itself, allowing the data to determine how many variables should be included.
 
@@ -602,7 +656,7 @@ Comparing PIPs across the two priors:
 
 The ranking is stable across priors --- `pop` and `lnlex` remain the top two, and `ipr` and `polity` remain the bottom two. However, the absolute PIP values depend heavily on the prior, with the binomial-beta prior being far more inclusive. This is expected: the binomial-beta prior concentrates mass on larger models when the data supports them.
 
-### 12.2 Varying expected model size
+### 13.2 Varying expected model size
 
 The expected model size (EMS) controls how many regressors the prior expects to be relevant. The default EMS = K/2 = 4.5. Let us see what happens with a skeptical prior (EMS = 2, expecting only 2 of 9 regressors to matter) and a generous prior (EMS = 8):
 
@@ -661,7 +715,7 @@ sizes_ems8 <- model_sizes(bma_ems8)
 
 The EMS = 2 plot reveals a dramatic prior-posterior conflict: the prior expects 2-regressor models, but the posterior clusters around 4--5. With EMS = 8, the prior and posterior are better aligned, both favoring 8--9 regressor models. This prior-posterior tension is itself informative --- it shows the data strongly prefers larger models than the skeptical prior allows.
 
-### 12.3 Dilution prior
+### 13.3 Dilution prior
 
 When regressors are correlated with each other, standard priors can overcount evidence by giving high probability to models that include near-duplicate variables. The **dilution prior** (George, 2010) penalizes models whose regressors are highly correlated, adjusting the model prior by the determinant of the correlation matrix:
 
@@ -700,15 +754,15 @@ sizes_dil <- model_sizes(bma_dil)
 
 ---
 
-## 13. Jointness Analysis
+## 14. Jointness Analysis
 
-### 13.1 What is jointness?
+### 14.1 What is jointness?
 
 So far we have examined each regressor individually. But growth determinants do not work in isolation --- they interact. **Jointness** measures whether two regressors tend to appear in models *together* (complements) or *separately* (substitutes).
 
 Think of peanut butter and jelly: each is fine alone, but they show up together so often that their inclusion is correlated. In growth regressions, investment and trade openness might be complements --- countries that invest heavily also trade more, and models that capture one effect benefit from including the other. Conversely, two measures of education (enrollment and literacy) might be substitutes --- including one makes the other redundant.
 
-### 13.2 Three jointness measures
+### 14.2 Three jointness measures
 
 The package implements three jointness measures. The [`jointness()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function computes pairwise relationships between all regressors:
 
@@ -718,7 +772,7 @@ The package implements three jointness measures. The [`jointness()`](https://cra
 
 **Doppelhofer-Weeks (DW)** classifies relationships as: below --2 (strong substitutes), --2 to --1 (significant substitutes), --1 to 1 (unrelated), 1 to 2 (significant complements), above 2 (strong complements).
 
-### 13.3 Jointness matrices
+### 14.3 Jointness matrices
 
 The HCGHM jointness matrix (above diagonal = binomial prior, below diagonal = binomial-beta prior):
 
@@ -766,9 +820,9 @@ Under the binomial prior (above diagonal), the DW values are all between --1 and
 
 ---
 
-## 14. Summary of Findings
+## 15. Summary of Findings
 
-### 14.1 The robust determinants
+### 15.1 The robust determinants
 
 Combining evidence across all prior specifications, we can classify each regressor by its robustness:
 
@@ -786,15 +840,15 @@ Combining evidence across all prior specifications, we can classify each regress
 
 Only two variables --- **population** and **life expectancy** --- survive as robust determinants across all prior specifications, maintaining PIP above 0.5 even under the most skeptical prior (EMS = 2). Both have stable positive signs and their coefficients are precisely estimated. Investment share and trade openness show positive evidence under the default prior but become ambiguous under the skeptical prior.
 
-### 14.2 Connecting to cross-sectional results
+### 15.2 Connecting to cross-sectional results
 
 In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we found that BMA, LASSO, and WALS converged on the same set of robust variables for CO<sub>2</sub> emissions in synthetic data. The dynamic panel BMA analysis here reveals an important nuance: **controlling for reverse causality through the lagged dependent variable and fixed effects changes the landscape of robust determinants**. The strong persistence of GDP (lagged coefficient = 0.92) absorbs much of the cross-sectional variation, leaving fewer variables with strong independent explanatory power. This is exactly the kind of insight that cross-sectional BMA misses.
 
 ---
 
-## 15. Conclusion
+## 16. Conclusion
 
-### 15.1 Key takeaways
+### 16.1 Key takeaways
 
 1. **Method insight:** Dynamic panel BMA handles endogeneity that cross-sectional BMA cannot. By including a lagged dependent variable ($\alpha$ = 0.92) and entity/time fixed effects, the Bayesian DSM package allows BMA to work with weakly exogenous regressors, avoiding the bias that plagues standard growth regressions.
 
@@ -804,7 +858,7 @@ In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we found t
 
 4. **Jointness insight:** All regressor pairs are complements (HCGHM > 0), with the strongest complementarity between population and life expectancy (0.71). No substitution effects were detected, suggesting these growth determinants capture distinct dimensions of the development process.
 
-### 15.2 Limitations and next steps
+### 16.2 Limitations and next steps
 
 - **Computation cost:** The `optim_model_space()` step estimates all $2^K$ models via numerical optimization. With 9 regressors (512 models), this is feasible. With 15+ regressors ($2^{15}$ = 32,768 models), computation time grows exponentially. For larger variable sets, Markov Chain Monte Carlo (MCMC) sampling over the model space may be necessary.
 
@@ -812,7 +866,7 @@ In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we found t
 
 - **Extensions:** The package offers additional features not covered here, including parallel computing for faster model space estimation (`cl` parameter in `optim_model_space()`), robust standard errors for heteroskedasticity, and the full suite of reduced-form parameters for understanding the dynamic feedback structure.
 
-### 15.3 Exercises
+### 16.3 Exercises
 
 1. **Vary the dilution parameter.** Run `bma()` with `dilution = 1` and `dil.Par = 2` (stronger dilution). How do the PIPs change compared to `dil.Par = 0.5`? Which variables are most affected by multicollinearity adjustment?
 
