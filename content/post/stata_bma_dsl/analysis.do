@@ -376,45 +376,37 @@ restore
 * Generate individual plots for all 6 robust variables (PIP > 0.80)
 * and combine in a 3x2 grid. Use consistent small fonts, legends off.
 
-* Consistent formatting for all panels
-local panel_opts `" xtitle("Coefficient value", size(vsmall)) "'
-local panel_opts `" `panel_opts' ytitle("Density", size(vsmall)) "'
-local panel_opts `" `panel_opts' ylabel(, labsize(vsmall) angle(0)) "'
-local panel_opts `" `panel_opts' xlabel(, labsize(vsmall)) "'
-local panel_opts `" `panel_opts' legend(off) scheme(s2color) "'
+* All axis text at vsmall, zero reference line, no legend
+local popts ///
+    xtitle("Coefficient", size(vsmall)) ///
+    ytitle("Density", size(vsmall)) ///
+    ylabel(, labsize(vsmall) angle(0) axis(1)) ///
+    ylabel(, labsize(vsmall) angle(0) axis(2)) ///
+    ytitle("Probability", size(vsmall) axis(2)) ///
+    xlabel(, labsize(vsmall)) ///
+    xline(0, lcolor(gs10) lpattern(dash) lwidth(thin)) ///
+    legend(off) scheme(s2color)
 
 bmagraph coefdensity ln_gdp, ///
-    title("GDP per capita (log)", size(small)) ///
-    `panel_opts' name(dens_gdp, replace)
-
+    title("GDP per capita (log)", size(small)) `popts' name(dens_gdp, replace)
 bmagraph coefdensity ln_gdp_sq, ///
-    title("GDP squared (log)", size(small)) ///
-    `panel_opts' name(dens_gdp_sq, replace)
-
+    title("GDP squared (log)", size(small)) `popts' name(dens_gdp_sq, replace)
 bmagraph coefdensity ln_gdp_cb, ///
-    title("GDP cubed (log)", size(small)) ///
-    `panel_opts' name(dens_gdp_cb, replace)
-
+    title("GDP cubed (log)", size(small)) `popts' name(dens_gdp_cb, replace)
 bmagraph coefdensity fossil_fuel, ///
-    title("Fossil fuel share (%)", size(small)) ///
-    `panel_opts' name(dens_fossil, replace)
-
+    title("Fossil fuel share (%)", size(small)) `popts' name(dens_fossil, replace)
 bmagraph coefdensity renewable, ///
-    title("Renewable energy (%)", size(small)) ///
-    `panel_opts' name(dens_renewable, replace)
-
+    title("Renewable energy (%)", size(small)) `popts' name(dens_renewable, replace)
 bmagraph coefdensity industry, ///
-    title("Industry VA (% GDP)", size(small)) ///
-    `panel_opts' name(dens_industry, replace)
+    title("Industry VA (% GDP)", size(small)) `popts' name(dens_industry, replace)
 
 graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
     dens_fossil dens_renewable dens_industry, ///
     cols(3) rows(2) imargin(small) ///
     title("BMA: Posterior Coefficient Densities", size(medsmall)) ///
     subtitle("All 6 robust variables (PIP > 0.80)", size(small)) ///
-    note("How to read: x-axis = coefficient value, left y-axis = density (blue curve), right y-axis = probability (red line)." ///
-         "Blue curve = posterior density conditional on inclusion. Red line = probability of noninclusion (1 - PIP)." ///
-         "A red line near zero and a blue curve far from zero = strong evidence the variable matters.", size(vsmall)) ///
+    note("Blue curve = posterior density conditional on inclusion. Red line = probability of noninclusion (1 - PIP)." ///
+         "Dashed gray line = zero. A blue curve far from zero = strong evidence the variable matters.", size(vsmall)) ///
     scheme(s2color) xsize(12) ysize(7) ///
     name(fig4_density, replace)
 
