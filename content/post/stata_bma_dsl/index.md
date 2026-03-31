@@ -37,7 +37,7 @@ tags:
   - panel
   - econometrics
   - world
-title: "Taming Model Uncertainty in the Environmental Kuznets Curve: BMA and Double-Selection LASSO with Panel Data" "
+title: "Taming Model Uncertainty in the Environmental Kuznets Curve: BMA and Double-Selection LASSO with Panel Data"
 url_code: ""
 url_pdf: ""
 url_slides: ""
