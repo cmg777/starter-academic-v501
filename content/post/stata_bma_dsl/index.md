@@ -370,14 +370,25 @@ A key assumption underlying BMA is that the true data-generating process is well
 
 ### 5.2 Key options
 
-Stata 18's [`bmaregress`](https://www.stata.com/manuals/bmabmaregress.pdf) uses:
+Stata 18's [`bmaregress`](https://www.stata.com/manuals/bmabmaregress.pdf) command has three families of options: **priors** (what you believe before seeing the data), **MCMC controls** (how the algorithm explores the model space), and **output formatting** (what gets displayed). The full option list is in the [Stata manual](https://www.stata.com/manuals/bmabmaregress.pdf); here we explain the ones used in this tutorial:
 
-- **`gprior(uip)`** --- Unit Information Prior: sets the prior precision on coefficients equal to the information in one observation (g = N). This is a standard, relatively uninformative choice that lets the data dominate
-- **`mprior(uniform)`** --- all $2^{12} = 4{,}096$ models are equally likely a priori; no model is privileged before seeing the data
-- **`groupfv`** --- treats all country dummies as a single group that enters or exits models together, rather than selecting individual country dummies
-- **`mcmcsize(50000)`** --- draws 50,000 models from the model space using MC$^3$ (Markov chain Monte Carlo model composition) sampling
+**Prior specifications** (see [`bmaregress` priors](https://www.stata.com/manuals/bmabmaregresspostestimation.pdf) for alternatives):
+
+- **[`gprior(uip)`](https://www.stata.com/manuals/bmabmaregress.pdf)** --- Unit Information Prior: sets the prior precision on coefficients equal to the information in one observation ($g = N$). This is a standard, relatively uninformative choice that lets the data dominate. Alternatives include `gprior(bric)` (benchmark risk inflation criterion, $g = \max(N, p^2)$), `gprior(zs)` (Zellner-Siow), and `gprior(hyper)` (hyper-g prior with data-driven $g$)
+- **[`mprior(uniform)`](https://www.stata.com/manuals/bmabmaregress.pdf)** --- all $2^{12} = 4{,}096$ models are equally likely a priori; no model is privileged before seeing the data. The alternative `mprior(binomial)` applies a beta-binomial prior that penalizes very large or very small models, often producing more conservative PIPs
+
+**MCMC controls:**
+
+- **`mcmcsize(50000)`** --- draws 50,000 models from the model space using MC$^3$ (Markov chain Monte Carlo model composition) sampling. Larger values improve posterior estimates but increase computation time
+- **`burnin(5000)`** --- discards the first 5,000 draws to allow the chain to reach its stationary distribution before collecting samples
+- **`rseed(9988)`** --- fixes the random number seed for exact reproducibility. Students running the same command will get identical results
+- **[`groupfv`](https://www.stata.com/manuals/bmabmaregress.pdf)** --- treats all dummies from a single factor variable (e.g., `i.country_id`) as one group that enters or exits models together, rather than selecting individual country dummies independently
 - **`($fe, always)`** --- country and year fixed effects are always included in every model; they are not subject to model selection
-- **`pipcutoff(0.8)`** --- display only variables with PIP above 0.80 in the output table
+
+**Output formatting:**
+
+- **`pipcutoff(0.8)`** --- display only variables with PIP above 0.80 in the output table. This is a *display* threshold only --- it does not affect the underlying estimation
+- **`inputorder`** --- display variables in the order they were specified in the command, rather than sorted by PIP
 
 ### 5.3 Estimation
 
@@ -534,8 +545,6 @@ $$\min\_{\boldsymbol{\beta}} \left\\{ \frac{1}{2N} \sum\_{i=1}^{N}(y\_i - \mathb
 
 The tuning parameter $\lambda$ controls how harsh the penalty is --- think of it as a "strictness dial." LASSO sets weak coefficients to exactly zero, performing automatic variable selection. The `dsregress` command uses a "plugin" method to choose $\lambda$ --- an analytical formula that sets the penalty based on the sample size and noise level, without requiring cross-validation. A key assumption underlying DSL is *approximate sparsity*: only a small number of controls truly matter, so LASSO can safely set the rest to zero. When the true model is dense (many small effects rather than a few large ones), LASSO may struggle to select the right variables.
 
-> **Note.** Stata also offers [`poregress`](https://www.stata.com/manuals/lassoporegress.pdf) (partialing-out regression), which implements a different approach: instead of selecting controls and running OLS, partialing-out *residualizes* both the outcome and the treatment against all controls, then regresses residuals on residuals. Both methods provide valid inference, but they differ in how they handle controls. This tutorial uses `dsregress` (post-double-selection) because its select-then-regress logic is more intuitive for beginners.
-
 | Feature | BMA | Post-Double-Selection |
 |---------|-----|-----------------------|
 | Philosophy | Bayesian (posteriors) | Frequentist (p-values) |
@@ -544,7 +553,23 @@ The tuning parameter $\lambda$ controls how harsh the penalty is --- think of it
 | Speed | Minutes (MCMC) | Seconds (optimization) |
 | Reference | Raftery et al. (1997) | Belloni, Chernozhukov, Hansen (2014) |
 
-### 6.2 Estimation
+### 6.2 Key options
+
+Stata 18's [`dsregress`](https://www.stata.com/manuals/lassodsregress.pdf) command has a concise syntax, but each element plays a specific role. The full option list is in the [Stata LASSO manual](https://www.stata.com/manuals/lasso.pdf); here we explain the ones used in this tutorial:
+
+**Syntax structure:** `dsregress depvar varsofinterest, controls(controlvars) [options]`
+
+- **`$outcome`** (`ln_co2`) --- the dependent variable. DSL will run LASSO on this variable against all controls (Step 1)
+- **`$gdp_vars`** (`ln_gdp ln_gdp_sq ln_gdp_cb`) --- the *variables of interest*. These are never penalized by LASSO; they always appear in the final OLS. DSL runs a separate LASSO for each one against all controls (Steps 2a--2c)
+- **[`controls(($fe) $controls)`](https://www.stata.com/manuals/lassodsregress.pdf)** --- the candidate controls subject to LASSO selection. Parentheses around `$fe` tell Stata to treat factor variables (country and year dummies) as always-included in the LASSO penalty but available for selection. The 12 candidate controls are subject to the standard LASSO penalty
+- **[`vce(cluster country_id)`](https://www.stata.com/manuals/lassodsregress.pdf)** --- compute cluster-robust standard errors at the country level in the final OLS (Step 4). This also affects the LASSO penalty through the [`selection(plugin)`](https://www.stata.com/manuals/lassolasso.pdf) method, which adjusts $\lambda$ for cluster dependence
+- **`selection(plugin)`** (default) --- choose $\lambda$ using a data-driven analytical formula rather than cross-validation. The alternative [`selection(cv)`](https://www.stata.com/manuals/lassolasso.pdf) uses cross-validation but is slower
+- **[`lassoinfo`](https://www.stata.com/manuals/lassolassoinfo.pdf)** (post-estimation) --- reports the number of selected controls and the $\lambda$ value for each LASSO step
+- **[`lassocoef`](https://www.stata.com/manuals/lassolassocoef.pdf)** (post-estimation) --- displays which specific variables were selected or dropped by LASSO
+
+> **Related commands.** Stata also offers [`poregress`](https://www.stata.com/manuals/lassoporegress.pdf) (partialing-out regression), which *residualizes* both the outcome and the treatment against all controls instead of selecting then regressing. Both methods provide valid inference. [`xporegress`](https://www.stata.com/manuals/lassoxporegress.pdf) extends this to cross-fit partialing-out for even more robust inference. This tutorial uses `dsregress` because its select-then-regress logic is more intuitive for beginners.
+
+### 6.3 Estimation
 
 ```stata
 dsregress $outcome $gdp_vars, ///
@@ -572,14 +597,14 @@ Double-selection linear model         Number of obs               =      1,600
 
 Post-double-selection completed in seconds with cluster-robust standard errors at the country level. Internally, `dsregress` ran four separate LASSO regressions (Step 1 on CO<sub>2</sub>, Steps 2a--2c on each GDP term), took the union of all selected controls, and then ran a final OLS of CO<sub>2</sub> on the GDP terms plus that union. All three GDP terms are significant at the 0.1% level. The Wald test strongly rejects the null that GDP terms are jointly zero ($\chi^2 = 53.15$, p < 0.001).
 
-### 6.3 Turning points
+### 6.4 Turning points
 
 - **Minimum:** \\$2,429 GDP per capita (true: \\$1,895)
 - **Maximum:** \\$27,672 GDP per capita (true: \\$34,647)
 
 The post-double-selection turning points (\\$2,429 and \\$27,672) fall between the sparse FE and kitchen-sink estimates, closer to the BMA values. With cluster-robust standard errors, the LASSO selection retained 102 of 112 controls for the outcome equation and 100 for each GDP term. The union of selected controls in Step 3 includes a few more candidate variables than without clustering, producing coefficients (--7.433, 0.840, --0.031) that lie between the sparse and kitchen-sink specifications.
 
-### 6.4 LASSO selection
+### 6.5 LASSO selection
 
 ```stata
 lassoinfo
