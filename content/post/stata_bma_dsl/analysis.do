@@ -469,6 +469,45 @@ display "  Maximum: $" %8.0fc `max_dsl'
 display _newline "=== LASSO Selection ==="
 lassoinfo
 
+*---------------------------------------------*
+* 5d. Pooled DSL (without fixed effects)      *
+*---------------------------------------------*
+* Run DSL without country/year FE to show how LASSO behaves
+* when it has only 12 candidate controls (no FE dummies).
+* This demonstrates LASSO's selection power but also the cost
+* of omitting fixed effects (severe omitted variable bias).
+
+display _newline "=== DSL WITHOUT FIXED EFFECTS (POOLED) ==="
+dsregress $outcome $gdp_vars, ///
+    controls($controls) ///
+    vce(cluster country_id)
+estimates store dsl_pooled
+
+matrix dsl_pooled_coefs = e(b)
+local b1_pooled = dsl_pooled_coefs[1,1]
+local b2_pooled = dsl_pooled_coefs[1,2]
+local b3_pooled = dsl_pooled_coefs[1,3]
+
+local se1_pooled = sqrt(e(V)[1,1])
+local se2_pooled = sqrt(e(V)[2,2])
+local se3_pooled = sqrt(e(V)[3,3])
+
+display _newline "Pooled DSL coefficients:"
+display "  b1 = " %9.4f `b1_pooled'
+display "  b2 = " %9.4f `b2_pooled'
+display "  b3 = " %9.4f `b3_pooled'
+
+* Turning points
+local disc_pooled = (`b2_pooled')^2 - 3 * `b1_pooled' * `b3_pooled'
+if `disc_pooled' > 0 {
+    local min_pooled = exp((-`b2_pooled' + sqrt(`disc_pooled')) / (3 * `b3_pooled'))
+    local max_pooled = exp((-`b2_pooled' - sqrt(`disc_pooled')) / (3 * `b3_pooled'))
+    display "  Minimum: $" %8.0fc `min_pooled'
+    display "  Maximum: $" %8.0fc `max_pooled'
+}
+
+lassoinfo
+
 
 *=============================================================================*
 *  SECTION 6: COMPARISON

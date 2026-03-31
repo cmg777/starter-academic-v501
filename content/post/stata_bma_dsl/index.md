@@ -656,21 +656,75 @@ lassoinfo
 
 The `lassoinfo` output shows each of the four LASSO steps. The outcome equation selected 102 of 112 controls, while each GDP equation selected 100. The 112 candidates include 80 country dummies + 19 year dummies = 99 FE dummies, plus the 12 candidate variables and the constant. LASSO retains nearly all informative FE dummies and drops about 10--12 of the weakest candidates at each step. The union across all four steps (Step 3) yields the final control set for Step 4's OLS. With cluster-robust standard errors, the lambda is larger (0.382 vs 0.090 without clustering), leading to slightly different selection and producing DSL coefficients (--7.433, 0.840, --0.031) that fall between the sparse and kitchen-sink FE.
 
-Why does DSL not match BMA's accuracy here? In panel data settings where FE dummies dominate the control set (99 of 112 variables), LASSO retains nearly all FE dummies and has limited room to discriminate among the 12 candidate controls of interest --- it dropped only 10--12 variables at each step, most of them weak FE dummies rather than noise controls. This "almost everything selected" outcome means DSL's final OLS is close to the kitchen-sink specification, which explains why its coefficients (--7.433, 0.840, --0.031) fall between sparse and kitchen-sink FE rather than converging to the true DGP. Post-double-selection is most powerful in cross-sectional settings or when the candidate set contains many genuinely irrelevant variables that LASSO can zero out.
+Why does DSL not match BMA's accuracy here? In panel data settings where FE dummies dominate the control set (99 of 112 variables), LASSO retains nearly all FE dummies and has limited room to discriminate among the 12 candidate controls of interest --- it dropped only 10--12 variables at each step, most of them weak FE dummies rather than noise controls. This "almost everything selected" outcome means DSL's final OLS is close to the kitchen-sink specification, which explains why its coefficients (--7.433, 0.840, --0.031) fall between sparse and kitchen-sink FE rather than converging to the true DGP. To see LASSO's selection power unleashed, we next run DSL *without* fixed effects.
+
+### 6.6 Pooled DSL (without fixed effects)
+
+What happens when LASSO has only 12 candidate controls instead of 112? To answer this, we run DSL on the pooled data --- treating the panel as a cross-sectional dataset without country or year fixed effects. This gives LASSO full room to discriminate among the candidate controls, but at the cost of omitting the unobserved country heterogeneity that fixed effects would absorb.
+
+```stata
+* DSL without FE -- pooled cross-section with cluster-robust SEs
+dsregress $outcome $gdp_vars, ///
+    controls($controls) ///
+    vce(cluster country_id)
+```
+
+```text
+Double-selection linear model         Number of obs               =      1,600
+                                      Number of controls          =         12
+                                      Number of selected controls =          7
+                                      Wald chi2(3)                =      25.05
+                                      Prob > chi2                 =     0.0000
+
+                            (Std. err. adjusted for 80 clusters in country_id)
+------------------------------------------------------------------------------
+             |               Robust
+      ln_co2 | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      ln_gdp |  -22.03297   5.277295    -4.18   0.000    -32.37628   -11.68966
+   ln_gdp_sq |   2.366878   .5652276     4.19   0.000     1.259052    3.474703
+   ln_gdp_cb |   -.084224   .0199055    -4.23   0.000    -.1232381     -.04521
+------------------------------------------------------------------------------
+```
+
+The pooled DSL still finds the correct inverted-N sign pattern ($\beta\_1 < 0$, $\beta\_2 > 0$, $\beta\_3 < 0$), but the magnitudes are dramatically different from the true DGP. The linear coefficient (--22.03) is more than *three times* the true value (--7.10), and the other terms are similarly inflated. This is **omitted variable bias**: without country fixed effects, the GDP terms absorb not only their own effect on CO<sub>2</sub> but also the persistent cross-country differences in emissions levels that fixed effects would have captured.
+
+```stata
+lassoinfo
+```
+
+```text
+    Estimate: active
+     Command: dsregress
+------------------------------------------------------
+            |                                   No. of
+            |           Selection             selected
+   Variable |    Model     method    lambda  variables
+------------+-----------------------------------------
+     ln_co2 |   linear     plugin  .3818852          5
+     ln_gdp |   linear     plugin  .3818852          7
+  ln_gdp_sq |   linear     plugin  .3818852          7
+  ln_gdp_cb |   linear     plugin  .3818852          7
+------------------------------------------------------
+```
+
+Now the contrast with the FE-based DSL is stark. The outcome LASSO selected only **5 of 12** controls (vs 102 of 112 with FE), and the GDP LASSOes selected **7 of 12** (vs 100 of 112). Without FE dummies flooding the candidate set, LASSO can genuinely discriminate --- it zeroed out 5--7 controls as irrelevant. The turning points are \\$5,581 (minimum) and \\$24,532 (maximum), far from the true values (\\$1,895 and \\$34,647).
+
+This comparison illustrates a fundamental tradeoff in panel data econometrics: **fixed effects remove bias but limit LASSO's selection power**. With FE, the estimates are unbiased but LASSO selects almost everything. Without FE, LASSO selects sharply but the estimates are biased by unobserved heterogeneity. The FE-based DSL from Section 6.3 is the correct specification for this data, even though LASSO's selection looks less impressive.
 
 ## 7. Head-to-Head Comparison
 
 ### 7.1 Coefficient comparison
 
-| | Sparse FE | Kitchen-Sink FE | BMA | DSL | True DGP |
-|---|-----------|-----------------|-----|-----|----------|
-| $\beta\_1$ (GDP) | --7.498 | --7.131 | --7.139 | --7.433 | --7.100 |
-| $\beta\_2$ (GDP²) | 0.849 | 0.806 | 0.808 | 0.840 | 0.810 |
-| $\beta\_3$ (GDP³) | --0.031 | --0.030 | --0.030 | --0.031 | --0.030 |
-| **Min TP** | \\$2,478 | \\$2,426 | \\$2,411 | \\$2,429 | \\$1,895 |
-| **Max TP** | \\$25,656 | \\$27,694 | \\$27,269 | \\$27,672 | \\$34,647 |
+| | Sparse FE | Kitchen-Sink FE | BMA | DSL (with FE) | DSL (pooled) | True DGP |
+|---|-----------|-----------------|-----|---------------|--------------|----------|
+| $\beta\_1$ (GDP) | --7.498 | --7.131 | --7.139 | --7.433 | --22.033 | --7.100 |
+| $\beta\_2$ (GDP²) | 0.849 | 0.806 | 0.808 | 0.840 | 2.367 | 0.810 |
+| $\beta\_3$ (GDP³) | --0.031 | --0.030 | --0.030 | --0.031 | --0.084 | --0.030 |
+| **Min TP** | \\$2,478 | \\$2,426 | \\$2,411 | \\$2,429 | \\$5,581 | \\$1,895 |
+| **Max TP** | \\$25,656 | \\$27,694 | \\$27,269 | \\$27,672 | \\$24,532 | \\$34,647 |
 
-BMA and Kitchen-Sink FE produce estimates closest to the true DGP values. DSL falls between the sparse and kitchen-sink specifications, reflecting the partial selection of candidate controls alongside the FE dummies. All four methods recover the inverted-N sign pattern.
+BMA and Kitchen-Sink FE produce estimates closest to the true DGP values. DSL with FE falls between the sparse and kitchen-sink specifications. All five FE-based methods recover the inverted-N sign pattern with similar magnitudes. The pooled DSL stands out as a cautionary tale: while it also finds the correct sign pattern, its coefficients are inflated 2--3x because country-level heterogeneity is absorbed into the GDP terms instead of being captured by fixed effects. Its turning points (\\$5,581 and \\$24,532) are substantially displaced from the truth.
 
 ### 7.2 Uncertainty: confidence and credible intervals
 
@@ -681,16 +735,19 @@ Point estimates tell only half the story. How *uncertain* is each method, and do
 | **Sparse FE** | [--10.731, --4.266] | Yes | [0.510, 1.188] | Yes | [--0.043, --0.020] | Yes |
 | **Kitchen-Sink FE** | [--10.241, --4.021] | Yes | [0.478, 1.134] | Yes | [--0.041, --0.018] | Yes |
 | **BMA** (credible) | [--10.761, --3.517] | Yes | [0.429, 1.186] | Yes | [--0.043, --0.017] | Yes |
-| **DSL** | [--10.625, --4.242] | Yes | [0.504, 1.176] | Yes | [--0.043, --0.019] | Yes |
+| **DSL (with FE)** | [--10.625, --4.242] | Yes | [0.504, 1.176] | Yes | [--0.043, --0.019] | Yes |
+| **DSL (pooled)** | [--32.376, --11.690] | **No** | [1.259, 3.475] | **No** | [--0.123, --0.045] | **No** |
 | **True DGP** | --7.100 | | 0.810 | | --0.030 | |
 
-All four methods produce intervals that contain the true parameter values for all three GDP terms --- a reassuring result. But the intervals differ in important ways:
+The four FE-based methods all produce intervals that contain the true parameter values --- a reassuring result. The pooled DSL, however, **fails to cover the truth for any of the three coefficients**. Its intervals are wide (the $\beta\_1$ interval spans 20.7 units) but centered so far from the truth that even this large width cannot compensate for the bias. This is a textbook demonstration of why confidence intervals require an unbiased (or at least consistent) estimator to be meaningful --- wide intervals from a biased model provide false comfort.
 
-**Width reflects uncertainty.** BMA produces the widest interval for $\beta\_1$ (width = 7.24), followed by Sparse FE (6.47), DSL (6.38), and Kitchen-Sink FE (6.22). BMA's wider intervals reflect its honest accounting of model uncertainty --- it averages across thousands of models, each contributing slightly different coefficient estimates, which inflates the posterior standard deviation. The frequentist methods condition on a single model and therefore understate the total uncertainty.
+**Width reflects uncertainty.** Among the FE-based methods, BMA produces the widest interval for $\beta\_1$ (width = 7.24), followed by Sparse FE (6.47), DSL with FE (6.38), and Kitchen-Sink FE (6.22). BMA's wider intervals reflect its honest accounting of model uncertainty --- it averages across thousands of models, each contributing slightly different coefficient estimates, which inflates the posterior standard deviation. The frequentist methods condition on a single model and therefore understate the total uncertainty.
 
-**Centering reflects bias.** Kitchen-Sink FE and BMA center their intervals closest to the true value (--7.131 and --7.139 vs. true --7.100), while Sparse FE (--7.498) and DSL (--7.433) are further away. This echoes the point estimate comparison: omitting true controls (Sparse FE) or nearly including everything (DSL) shifts the center away from the truth.
+**Centering reflects bias.** Kitchen-Sink FE and BMA center their intervals closest to the true value (--7.131 and --7.139 vs. true --7.100), while Sparse FE (--7.498) and DSL with FE (--7.433) are slightly further away. The pooled DSL (--22.033) is dramatically off-center, illustrating that omitted variable bias overwhelms any precision gained from better variable selection.
 
-**Coverage is not guaranteed in practice.** In this simulation, all intervals cover the truth. But with real data, the true DGP is unknown, and 95% coverage is only an *average* property. BMA's credible intervals have a different interpretation from frequentist confidence intervals: a 95% BMA credible interval says "given the data and priors, there is a 95% posterior probability the true coefficient lies in this range," while a 95% confidence interval says "if we repeated this procedure many times, 95% of the intervals would contain the truth."
+**Coverage requires correct specification.** The pooled DSL result drives home a critical lesson: a confidence interval is only as good as the model behind it. The 95% label promises that, in repeated sampling, 95% of intervals would contain the truth --- but this guarantee holds only if the model is correctly specified. When country fixed effects are omitted, the model is misspecified, and the intervals fail despite being statistically "valid" within the pooled framework.
+
+**Bayesian vs frequentist interpretation.** BMA's credible intervals have a different interpretation: a 95% BMA credible interval says "given the data and priors, there is a 95% posterior probability the true coefficient lies in this range," while a 95% confidence interval says "if we repeated this procedure many times, 95% of the intervals would contain the truth." In practice, both require correct model specification to be reliable.
 
 ### 7.3 Predicted EKC curves
 
