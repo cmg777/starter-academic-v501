@@ -475,40 +475,38 @@ The PIP chart cleanly separates the variables into two groups. At the top (PIP n
 
 ### 5.6 Coefficient density plots
 
-The [`bmagraph coefdensity`](https://www.stata.com/manuals/bmabmagraphcoefdensity.pdf) command shows the posterior distribution of each coefficient across all sampled models. We focus on four key variables in a readable 2x2 grid --- the GDP linear and cubic terms (which determine the inverted-N shape) and the two strongest controls:
+The [`bmagraph coefdensity`](https://www.stata.com/manuals/bmabmagraphcoefdensity.pdf) command shows the posterior distribution of each coefficient across all sampled models. We plot all six variables with PIP above 0.80 in a 3x2 grid --- the three GDP polynomial terms (top row) and the three robust controls (bottom row). In each panel, the blue curve shows the density conditional on the variable being included in the model, and the red horizontal line shows the probability of noninclusion (1 -- PIP). When the red line is flat near zero and the blue curve is far from zero, the variable is strongly supported.
 
 ```stata
-* Generate density for each key variable with clean formatting
-bmagraph coefdensity ln_gdp, title("GDP per capita (log)", size(small)) ///
-    xtitle("Coefficient value", size(vsmall)) ytitle("Density", size(vsmall)) ///
-    ylabel(, labsize(vsmall)) xlabel(, labsize(vsmall)) ///
-    legend(size(tiny) symxsize(3) cols(1)) scheme(s2color) ///
-    name(dens_gdp, replace)
-bmagraph coefdensity ln_gdp_cb, title("GDP cubed (log)", size(small)) ///
-    xtitle("Coefficient value", size(vsmall)) ytitle("Density", size(vsmall)) ///
-    ylabel(, labsize(vsmall)) xlabel(, labsize(vsmall)) ///
-    legend(size(tiny) symxsize(3) cols(1)) scheme(s2color) ///
-    name(dens_gdp_cb, replace)
-bmagraph coefdensity fossil_fuel, title("Fossil fuel share (%)", size(small)) ///
-    xtitle("Coefficient value", size(vsmall)) ytitle("Density", size(vsmall)) ///
-    ylabel(, labsize(vsmall)) xlabel(, labsize(vsmall)) ///
-    legend(size(tiny) symxsize(3) cols(1)) scheme(s2color) ///
-    name(dens_fossil, replace)
-bmagraph coefdensity industry, title("Industry VA (% GDP)", size(small)) ///
-    xtitle("Coefficient value", size(vsmall)) ytitle("Density", size(vsmall)) ///
-    ylabel(, labsize(vsmall)) xlabel(, labsize(vsmall)) ///
-    legend(size(tiny) symxsize(3) cols(1)) scheme(s2color) ///
-    name(dens_industry, replace)
+* Consistent formatting for all panels
+local panel_opts `" xtitle("Coefficient value", size(vsmall)) "'
+local panel_opts `" `panel_opts' ytitle("Density", size(vsmall)) "'
+local panel_opts `" `panel_opts' ylabel(, labsize(vsmall) angle(0)) "'
+local panel_opts `" `panel_opts' xlabel(, labsize(vsmall)) "'
+local panel_opts `" `panel_opts' legend(off) scheme(s2color) "'
 
-graph combine dens_gdp dens_gdp_cb dens_fossil dens_industry, ///
-    cols(2) rows(2) imargin(small) ///
+* Generate density for all 6 robust variables (PIP > 0.80)
+bmagraph coefdensity ln_gdp,      title("GDP per capita (log)", size(small)) `panel_opts' name(dens_gdp, replace)
+bmagraph coefdensity ln_gdp_sq,   title("GDP squared (log)", size(small))    `panel_opts' name(dens_gdp_sq, replace)
+bmagraph coefdensity ln_gdp_cb,   title("GDP cubed (log)", size(small))      `panel_opts' name(dens_gdp_cb, replace)
+bmagraph coefdensity fossil_fuel, title("Fossil fuel share (%)", size(small)) `panel_opts' name(dens_fossil, replace)
+bmagraph coefdensity renewable,   title("Renewable energy (%)", size(small))  `panel_opts' name(dens_renewable, replace)
+bmagraph coefdensity industry,    title("Industry VA (% GDP)", size(small))   `panel_opts' name(dens_industry, replace)
+
+graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
+    dens_fossil dens_renewable dens_industry, ///
+    cols(3) rows(2) imargin(small) ///
     title("BMA: Posterior Coefficient Densities", size(medsmall)) ///
-    scheme(s2color) xsize(10) ysize(8)
+    subtitle("All 6 robust variables (PIP > 0.80)", size(small)) ///
+    note("Blue curve = posterior density conditional on inclusion." ///
+         "Red line = probability of noninclusion (1 - PIP)." ///
+         "Near-zero red line + blue curve far from zero = strong evidence.", size(vsmall)) ///
+    scheme(s2color) xsize(12) ysize(7)
 ```
 
-![Posterior coefficient density plots for four key variables in a 2x2 grid. Top row: GDP linear and cubic terms. Bottom row: fossil fuel share and industry VA. All densities are concentrated well away from zero.](stata_bma_dsl_fig4_coefdensity.png)
+![Posterior coefficient density plots for all six robust variables in a 3x2 grid. Top row: GDP linear, squared, and cubic terms. Bottom row: fossil fuel, renewable energy, and industry. All densities are concentrated well away from zero.](stata_bma_dsl_fig4_coefdensity.png)
 
-The four densities tell a clear story. The GDP linear term (top left) is centered near --7.1 and the cubic term (top right) near --0.030, both matching the true DGP values closely. Fossil fuel (bottom left) is centered near +0.014 (true: +0.015) and industry (bottom right) near +0.009 (true: +0.010). None of these densities show a meaningful spike at zero, confirming these are genuinely robust predictors across the model space.
+All six densities are concentrated well away from zero, confirming that every variable with PIP above 0.80 has a genuinely non-zero effect. The three GDP terms (top row) form the inverted-N polynomial: the linear term is centered near --7.1 (true: --7.1), the squared term near +0.81 (true: +0.81), and the cubic term near --0.030 (true: --0.030). The three controls (bottom row) show tight, unimodal densities: fossil fuel near +0.014 (true: +0.015), renewable energy near --0.007 (true: --0.010), and industry near +0.009 (true: +0.010). Renewable energy's posterior mean (--0.007) is slightly attenuated compared to the true value (--0.010), reflecting the BMA shrinkage that occurs when a variable's PIP is below 1.0 --- models that exclude it pull the average toward zero.
 
 ## 6. Post-Double-Selection LASSO
 

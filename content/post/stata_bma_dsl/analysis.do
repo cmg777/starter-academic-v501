@@ -373,65 +373,49 @@ restore
 * 4d. Coefficient densities -- Figure 4       *
 *---------------------------------------------*
 * bmagraph coefdensity with multiple vars shows only the last one.
-* Generate individual plots for the 4 key variables and combine in a 2x2 grid.
-* Use small font sizes and clean labels to avoid overlap when combined.
+* Generate individual plots for all 6 robust variables (PIP > 0.80)
+* and combine in a 3x2 grid. Use consistent small fonts, legends off.
+
+* Consistent formatting for all panels
+local panel_opts `" xtitle("Coefficient value", size(vsmall)) "'
+local panel_opts `" `panel_opts' ytitle("Density", size(vsmall)) "'
+local panel_opts `" `panel_opts' ylabel(, labsize(vsmall) angle(0)) "'
+local panel_opts `" `panel_opts' xlabel(, labsize(vsmall)) "'
+local panel_opts `" `panel_opts' legend(off) scheme(s2color) "'
 
 bmagraph coefdensity ln_gdp, ///
     title("GDP per capita (log)", size(small)) ///
-    xtitle("Coefficient value", size(vsmall)) ///
-    ytitle("Density", size(vsmall)) ///
-    ylabel(, labsize(vsmall) angle(0)) ///
-    xlabel(, labsize(vsmall)) ///
-    legend(size(tiny) symxsize(3) cols(1) ///
-        order(1 "Density conditional on inclusion" ///
-              2 "Prob. of noninclusion (1-PIP)")) ///
-    scheme(s2color) ///
-    name(dens_gdp, replace)
+    `panel_opts' name(dens_gdp, replace)
+
+bmagraph coefdensity ln_gdp_sq, ///
+    title("GDP squared (log)", size(small)) ///
+    `panel_opts' name(dens_gdp_sq, replace)
 
 bmagraph coefdensity ln_gdp_cb, ///
     title("GDP cubed (log)", size(small)) ///
-    xtitle("Coefficient value", size(vsmall)) ///
-    ytitle("Density", size(vsmall)) ///
-    ylabel(, labsize(vsmall) angle(0)) ///
-    xlabel(, labsize(vsmall)) ///
-    legend(size(tiny) symxsize(3) cols(1) ///
-        order(1 "Density conditional on inclusion" ///
-              2 "Prob. of noninclusion (1-PIP)")) ///
-    scheme(s2color) ///
-    name(dens_gdp_cb, replace)
+    `panel_opts' name(dens_gdp_cb, replace)
 
 bmagraph coefdensity fossil_fuel, ///
     title("Fossil fuel share (%)", size(small)) ///
-    xtitle("Coefficient value", size(vsmall)) ///
-    ytitle("Density", size(vsmall)) ///
-    ylabel(, labsize(vsmall) angle(0)) ///
-    xlabel(, labsize(vsmall)) ///
-    legend(size(tiny) symxsize(3) cols(1) ///
-        order(1 "Density conditional on inclusion" ///
-              2 "Prob. of noninclusion (1-PIP)")) ///
-    scheme(s2color) ///
-    name(dens_fossil, replace)
+    `panel_opts' name(dens_fossil, replace)
+
+bmagraph coefdensity renewable, ///
+    title("Renewable energy (%)", size(small)) ///
+    `panel_opts' name(dens_renewable, replace)
 
 bmagraph coefdensity industry, ///
     title("Industry VA (% GDP)", size(small)) ///
-    xtitle("Coefficient value", size(vsmall)) ///
-    ytitle("Density", size(vsmall)) ///
-    ylabel(, labsize(vsmall) angle(0)) ///
-    xlabel(, labsize(vsmall)) ///
-    legend(size(tiny) symxsize(3) cols(1) ///
-        order(1 "Density conditional on inclusion" ///
-              2 "Prob. of noninclusion (1-PIP)")) ///
-    scheme(s2color) ///
-    name(dens_industry, replace)
+    `panel_opts' name(dens_industry, replace)
 
-graph combine dens_gdp dens_gdp_cb ///
-    dens_fossil dens_industry, ///
-    cols(2) rows(2) imargin(small) ///
+graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
+    dens_fossil dens_renewable dens_industry, ///
+    cols(3) rows(2) imargin(small) ///
     title("BMA: Posterior Coefficient Densities", size(medsmall)) ///
-    subtitle("Density far from zero = strong evidence the variable matters", size(small)) ///
-    note("Top row: GDP linear and cubic terms (key for the inverted-N shape)." ///
-         "Bottom row: two strongest true controls (PIP = 1.00 and 0.999).", size(vsmall)) ///
-    scheme(s2color) xsize(10) ysize(8) ///
+    subtitle("All 6 robust variables (PIP > 0.80)", size(small)) ///
+    note("How to read: x-axis = coefficient value, left y-axis = density (blue curve), right y-axis = probability (red line)." ///
+         "Blue curve = posterior density conditional on inclusion. Red line = probability of noninclusion (1 - PIP)." ///
+         "A red line near zero and a blue curve far from zero = strong evidence the variable matters.", size(vsmall)) ///
+    scheme(s2color) xsize(12) ysize(7) ///
     name(fig4_density, replace)
 
 graph export "stata_bma_dsl_fig4_coefdensity.png", replace width(2400)
