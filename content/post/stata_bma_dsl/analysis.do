@@ -5,7 +5,7 @@
 *           80 countries, 1995-2014, 12 controls (5 true, 7 noise)
 *  Purpose: Learn BMA and DSL for the Environmental Kuznets Curve (EKC)
 *  Requires: Stata 18+ (bmaregress, dsregress), reghdfe, labutil
-*  Outputs:  analysis.log, 7 PNG figures, comparison CSV
+*  Outputs:  analysis.log, 6 PNG figures, comparison CSV
 *=============================================================================*
 
 clear all
@@ -374,30 +374,63 @@ restore
 *---------------------------------------------*
 * bmagraph coefdensity with multiple vars shows only the last one.
 * Generate individual plots for the 4 key variables and combine in a 2x2 grid.
+* Use small font sizes and clean labels to avoid overlap when combined.
 
 bmagraph coefdensity ln_gdp, ///
-    title("GDP per capita (log)", size(medsmall)) ///
+    title("GDP per capita (log)", size(small)) ///
+    xtitle("Coefficient value", size(vsmall)) ///
+    ytitle("Density", size(vsmall)) ///
+    ylabel(, labsize(vsmall) angle(0)) ///
+    xlabel(, labsize(vsmall)) ///
+    legend(size(tiny) symxsize(3) cols(1) ///
+        order(1 "Density conditional on inclusion" ///
+              2 "Prob. of noninclusion (1-PIP)")) ///
+    scheme(s2color) ///
     name(dens_gdp, replace)
 
 bmagraph coefdensity ln_gdp_cb, ///
-    title("GDP cubed (log)", size(medsmall)) ///
+    title("GDP cubed (log)", size(small)) ///
+    xtitle("Coefficient value", size(vsmall)) ///
+    ytitle("Density", size(vsmall)) ///
+    ylabel(, labsize(vsmall) angle(0)) ///
+    xlabel(, labsize(vsmall)) ///
+    legend(size(tiny) symxsize(3) cols(1) ///
+        order(1 "Density conditional on inclusion" ///
+              2 "Prob. of noninclusion (1-PIP)")) ///
+    scheme(s2color) ///
     name(dens_gdp_cb, replace)
 
 bmagraph coefdensity fossil_fuel, ///
-    title("Fossil fuel share (%)", size(medsmall)) ///
+    title("Fossil fuel share (%)", size(small)) ///
+    xtitle("Coefficient value", size(vsmall)) ///
+    ytitle("Density", size(vsmall)) ///
+    ylabel(, labsize(vsmall) angle(0)) ///
+    xlabel(, labsize(vsmall)) ///
+    legend(size(tiny) symxsize(3) cols(1) ///
+        order(1 "Density conditional on inclusion" ///
+              2 "Prob. of noninclusion (1-PIP)")) ///
+    scheme(s2color) ///
     name(dens_fossil, replace)
 
 bmagraph coefdensity industry, ///
-    title("Industry VA (% GDP)", size(medsmall)) ///
+    title("Industry VA (% GDP)", size(small)) ///
+    xtitle("Coefficient value", size(vsmall)) ///
+    ytitle("Density", size(vsmall)) ///
+    ylabel(, labsize(vsmall) angle(0)) ///
+    xlabel(, labsize(vsmall)) ///
+    legend(size(tiny) symxsize(3) cols(1) ///
+        order(1 "Density conditional on inclusion" ///
+              2 "Prob. of noninclusion (1-PIP)")) ///
+    scheme(s2color) ///
     name(dens_industry, replace)
 
 graph combine dens_gdp dens_gdp_cb ///
     dens_fossil dens_industry, ///
-    cols(2) rows(2) ///
-    title("BMA: Posterior Coefficient Densities", size(medium)) ///
+    cols(2) rows(2) imargin(small) ///
+    title("BMA: Posterior Coefficient Densities", size(medsmall)) ///
     subtitle("Density far from zero = strong evidence the variable matters", size(small)) ///
     note("Top row: GDP linear and cubic terms (key for the inverted-N shape)." ///
-         "Bottom row: two strongest true controls (PIP = 1.00 and 0.999).") ///
+         "Bottom row: two strongest true controls (PIP = 1.00 and 0.999).", size(vsmall)) ///
     scheme(s2color) xsize(10) ysize(8) ///
     name(fig4_density, replace)
 
@@ -670,7 +703,7 @@ display "  analysis.log                       -- this log"
 display "  stata_bma_dsl_fig1_scatter.png     -- scatter plot"
 display "  stata_bma_dsl_fig2_instability.png -- coefficient instability"
 display "  stata_bma_dsl_fig3_pip.png         -- BMA PIPs (color-coded)"
-display "  stata_bma_dsl_fig4_coefdensity.png -- BMA coefficient densities (6 panels)"
+display "  stata_bma_dsl_fig4_coefdensity.png -- BMA coefficient densities (4 panels)"
 display "  stata_bma_dsl_fig5_ekc_curves.png  -- EKC curves (normalized)"
 display "  stata_bma_dsl_fig6_answer_key.png  -- answer key evaluation"
 display "  stata_bma_dsl_comparison.csv       -- coefficient comparison"

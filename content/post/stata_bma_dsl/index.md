@@ -282,7 +282,7 @@ globalizat~n |   .0015186   .0012832     1.18   0.240
 ------------------------------------------------------------------------------
 ```
 
-Adding all 12 controls raises the within R² from 0.035 to 0.125 --- a meaningful improvement, though the country and year FE still dominate the overall explanatory power (R² = 0.97). The three strongest true predictors (fossil fuel, industry, urban) are clearly significant, while most noise variables are statistically insignificant. Democracy's estimate (--0.0003, p = 0.97) is far from its true value (--0.005) and indistinguishable from zero --- illustrating why weak signals are hard to detect even with the correct model.
+Adding all 12 controls raises the within R² from 0.035 to 0.125 --- a meaningful improvement, though the country and year FE still dominate the overall explanatory power (R² = 0.966). The three strongest true predictors (fossil fuel, industry, urban) are clearly significant, while most noise variables are statistically insignificant. Democracy's estimate (--0.0003, p = 0.97) is far from its true value (--0.005) and indistinguishable from zero --- illustrating why weak signals are hard to detect even with the correct model.
 
 ### 4.3 The model uncertainty problem
 
@@ -380,10 +380,10 @@ Sampling correlation = 0.9997
    renewable | -.0068332   .0023506            5     .95945
     industry |  .0085503   .0019766           11     .99867
 ------------------------------------------------------------------------------
-Note: 9 predictors with PIP less than .5 not shown.
+Note: 9 predictors with PIP less than .8 not shown.
 ```
 
-> The Stata output says "PIP less than .5" because that is the default display threshold. We set `pipcutoff(0.8)` to use a stricter robustness criterion --- variables shown in the table all exceed 0.80.
+> The Stata output says "PIP less than .8" because we set `pipcutoff(0.8)` as the display threshold --- only variables exceeding this stricter robustness criterion appear in the table.
 
 BMA sampled 163 distinct models out of 4,096 possible. This might seem low, but the sampling correlation of 0.9997 (very close to 1.0) confirms that the MC$^3$ chain adequately explored the model space --- the posterior probability is concentrated on a relatively small number of high-quality models. The acceptance rate of 0.09 is below the typical 20--40% range, but the high sampling correlation provides reassurance that the results are reliable. Six variables have PIP above the 0.80 robustness threshold: the three GDP terms (PIP = 0.994--1.000) and three of the five true controls --- fossil fuel (PIP = 1.000), industry (PIP = 0.999), and renewable energy (PIP = 0.959). The BMA posterior means (--7.139, 0.808, --0.030) are remarkably close to the true DGP values (--7.100, 0.810, --0.030), substantially closer than the sparse FE estimates.
 
@@ -558,7 +558,7 @@ The ultimate test: do BMA and DSL correctly identify the 5 true predictors and r
 
 ![Dot plot showing BMA Posterior Inclusion Probabilities for each variable, color-coded by ground truth. True predictors (circles, blue) cluster above the 0.80 threshold; noise variables (diamonds, gray) cluster below it.](stata_bma_dsl_fig6_answer_key.png)
 
-**BMA's report card:** Of the 8 true predictors (3 GDP terms + 5 controls), BMA correctly assigns PIP > 0.80 to 6 --- the three GDP terms, fossil fuel, industry, and renewable energy. It misses urban (PIP ~ 0.05) and democracy (PIP ~ 0.10), whose true coefficients are small (0.007 and --0.005). All 7 noise variables receive PIPs well below 0.80. BMA makes **zero false positives** (no noise variable incorrectly flagged as robust) and **two false negatives** (two weak true predictors missed).
+**BMA's report card:** Of the 8 true predictors (3 GDP terms + 5 controls), BMA correctly assigns PIP > 0.80 to 6 --- the three GDP terms, fossil fuel, industry, and renewable energy. It misses urban (PIP ~ 0.27) and democracy (PIP ~ 0.02), whose true coefficients are small (0.007 and --0.005). All 7 noise variables receive PIPs well below 0.80. BMA makes **zero false positives** (no noise variable incorrectly flagged as robust) and **two false negatives** (two weak true predictors missed).
 
 **Post-double-selection's report card:** With cluster-robust SEs, the union of all four LASSO steps selected 102 of 112 total controls (including FE dummies). The resulting DSL coefficients (--7.433, 0.840, --0.031) fall between the sparse and kitchen-sink FE, closer to the true DGP than the sparse specification. The entire procedure runs in seconds rather than minutes.
 
