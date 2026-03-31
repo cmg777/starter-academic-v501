@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_bma_
-> dsl/analysis.log
+       log:  /Users/carlosmendez/Documents/Github/starter-academic-v501/content
+> /post/stata_bma_dsl/analysis.log
   log type:  text
- opened on:  31 Mar 2026, 08:50:57
+ opened on:  31 Mar 2026, 11:59:52
 
 . 
 . display _newline "============================================="
@@ -17,7 +17,7 @@
   Data: Synthetic panel (80 countries, 1995-2014)
 
 . display "  Started: $S_DATE $S_TIME"
-  Started: 31 Mar 2026 08:50:57
+  Started: 31 Mar 2026 11:59:52
 
 . display "============================================="
 =============================================
@@ -496,7 +496,7 @@ Saved: stata_bma_dsl_fig2_instability.png
   BMA ESTIMATION
 
 . display "  Starting: $S_DATE $S_TIME"
-  Starting: 31 Mar 2026 08:51:02
+  Starting: 31 Mar 2026 11:59:56
 
 . display "============================================="
 =============================================
@@ -572,7 +572,7 @@ Always       |
          30  | -.6669463   .0588199                               0          1
          31  | -1.063821   .0735287                               0          1
          32  | -.0100271   .0715373                               0          1
-         33  | -.0187315   .1794103                               0          1
+         33  | -.0187314   .1794103                               0          1
          34  | -1.441324    .081423                               0          1
          35  | -.9283798   .0670747                               0          1
          36  | -.7646781   .0827938                               0          1
@@ -653,7 +653,7 @@ file _bma_temp.dta not found; file saved.
 . 
 . display _newline "BMA completed: $S_DATE $S_TIME"
 
-BMA completed: 31 Mar 2026 08:51:14
+BMA completed: 31 Mar 2026 12:00:08
 
 . estimates store bma_uip
 
@@ -1136,37 +1136,70 @@ Saved: stata_bma_dsl_fig3_pip.png
 . * bmagraph coefdensity with multiple vars shows only the last one.
 . * Generate individual plots for the 4 key variables and combine in a 2x2 grid
 > .
+. * Use small font sizes and clean labels to avoid overlap when combined.
 . 
 . bmagraph coefdensity ln_gdp, ///
->     title("GDP per capita (log)", size(medsmall)) ///
+>     title("GDP per capita (log)", size(small)) ///
+>     xtitle("Coefficient value", size(vsmall)) ///
+>     ytitle("Density", size(vsmall)) ///
+>     ylabel(, labsize(vsmall) angle(0)) ///
+>     xlabel(, labsize(vsmall)) ///
+>     legend(size(tiny) symxsize(3) cols(1) ///
+>         order(1 "Density conditional on inclusion" ///
+>               2 "Prob. of noninclusion (1-PIP)")) ///
+>     scheme(s2color) ///
 >     name(dens_gdp, replace)
 
 . 
 . bmagraph coefdensity ln_gdp_cb, ///
->     title("GDP cubed (log)", size(medsmall)) ///
+>     title("GDP cubed (log)", size(small)) ///
+>     xtitle("Coefficient value", size(vsmall)) ///
+>     ytitle("Density", size(vsmall)) ///
+>     ylabel(, labsize(vsmall) angle(0)) ///
+>     xlabel(, labsize(vsmall)) ///
+>     legend(size(tiny) symxsize(3) cols(1) ///
+>         order(1 "Density conditional on inclusion" ///
+>               2 "Prob. of noninclusion (1-PIP)")) ///
+>     scheme(s2color) ///
 >     name(dens_gdp_cb, replace)
 
 . 
 . bmagraph coefdensity fossil_fuel, ///
->     title("Fossil fuel share (%)", size(medsmall)) ///
+>     title("Fossil fuel share (%)", size(small)) ///
+>     xtitle("Coefficient value", size(vsmall)) ///
+>     ytitle("Density", size(vsmall)) ///
+>     ylabel(, labsize(vsmall) angle(0)) ///
+>     xlabel(, labsize(vsmall)) ///
+>     legend(size(tiny) symxsize(3) cols(1) ///
+>         order(1 "Density conditional on inclusion" ///
+>               2 "Prob. of noninclusion (1-PIP)")) ///
+>     scheme(s2color) ///
 >     name(dens_fossil, replace)
 
 . 
 . bmagraph coefdensity industry, ///
->     title("Industry VA (% GDP)", size(medsmall)) ///
+>     title("Industry VA (% GDP)", size(small)) ///
+>     xtitle("Coefficient value", size(vsmall)) ///
+>     ytitle("Density", size(vsmall)) ///
+>     ylabel(, labsize(vsmall) angle(0)) ///
+>     xlabel(, labsize(vsmall)) ///
+>     legend(size(tiny) symxsize(3) cols(1) ///
+>         order(1 "Density conditional on inclusion" ///
+>               2 "Prob. of noninclusion (1-PIP)")) ///
+>     scheme(s2color) ///
 >     name(dens_industry, replace)
 
 . 
 . graph combine dens_gdp dens_gdp_cb ///
 >     dens_fossil dens_industry, ///
->     cols(2) rows(2) ///
->     title("BMA: Posterior Coefficient Densities", size(medium)) ///
+>     cols(2) rows(2) imargin(small) ///
+>     title("BMA: Posterior Coefficient Densities", size(medsmall)) ///
 >     subtitle("Density far from zero = strong evidence the variable matters", 
 > size(small)) ///
 >     note("Top row: GDP linear and cubic terms (key for the inverted-N shape).
 > " ///
->          "Bottom row: two strongest true controls (PIP = 1.00 and 0.999).") /
-> //
+>          "Bottom row: two strongest true controls (PIP = 1.00 and 0.999).", s
+> ize(vsmall)) ///
 >     scheme(s2color) xsize(10) ysize(8) ///
 >     name(fig4_density, replace)
 
@@ -1194,7 +1227,7 @@ Saved: stata_bma_dsl_fig4_coefdensity.png
   DSL ESTIMATION
 
 . display "  Starting: $S_DATE $S_TIME"
-  Starting: 31 Mar 2026 08:51:21
+  Starting: 31 Mar 2026 12:00:11
 
 . display "============================================="
 =============================================
@@ -1233,7 +1266,7 @@ Note: Lassos are performed accounting for clusters in country_id.
 . 
 . display _newline "DSL completed: $S_DATE $S_TIME"
 
-DSL completed: 31 Mar 2026 08:51:23
+DSL completed: 31 Mar 2026 12:00:12
 
 . estimates store dsl_plugin
 
@@ -1971,7 +2004,7 @@ Saved: stata_bma_dsl_comparison.csv
 =============================================
 
 . display "  TUTORIAL COMPLETE: $S_DATE $S_TIME"
-  TUTORIAL COMPLETE: 31 Mar 2026 08:51:26
+  TUTORIAL COMPLETE: 31 Mar 2026 12:00:14
 
 . display "============================================="
 =============================================
@@ -1992,9 +2025,9 @@ Output files:
 . display "  stata_bma_dsl_fig3_pip.png         -- BMA PIPs (color-coded)"
   stata_bma_dsl_fig3_pip.png         -- BMA PIPs (color-coded)
 
-. display "  stata_bma_dsl_fig4_coefdensity.png -- BMA coefficient densities (6
+. display "  stata_bma_dsl_fig4_coefdensity.png -- BMA coefficient densities (4
 >  panels)"
-  stata_bma_dsl_fig4_coefdensity.png -- BMA coefficient densities (6 panels)
+  stata_bma_dsl_fig4_coefdensity.png -- BMA coefficient densities (4 panels)
 
 . display "  stata_bma_dsl_fig5_ekc_curves.png  -- EKC curves (normalized)"
   stata_bma_dsl_fig5_ekc_curves.png  -- EKC curves (normalized)
@@ -2010,8 +2043,8 @@ Output files:
 
 . log close
       name:  <unnamed>
-       log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_bma_
-> dsl/analysis.log
+       log:  /Users/carlosmendez/Documents/Github/starter-academic-v501/content
+> /post/stata_bma_dsl/analysis.log
   log type:  text
- closed on:  31 Mar 2026, 08:51:26
+ closed on:  31 Mar 2026, 12:00:14
 -------------------------------------------------------------------------------
