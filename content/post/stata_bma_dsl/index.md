@@ -354,7 +354,19 @@ In words, the probability of model $k$ being correct equals how well it fits the
 
 $$\text{PIP}\_j = \sum\_{k:\\, x\_j \in M\_k} P(M\_k | \text{data})$$
 
-PIP > 0.80 is a common threshold for considering a variable "robust" --- it means the variable appears in the vast majority of the probability-weighted model space. A key assumption underlying BMA is that the true data-generating process is well-approximated by a weighted combination of the candidate models (the "M-closed" assumption). When the candidate set omits important functional forms or interactions, BMA's posterior probabilities may be unreliable.
+Think of PIP as a **democratic vote** across all candidate models. Each model casts a weighted vote for which variables matter, with better-fitting models getting louder voices. [Raftery (1995)](https://doi.org/10.2307/271063) proposed standard interpretation thresholds based on the strength of evidence:
+
+| PIP range | Evidence | Analogy |
+|-----------|----------|---------|
+| $\geq 0.99$ | Decisive | Beyond reasonable doubt |
+| $0.95 - 0.99$ | Very strong | Strong consensus |
+| $0.80 - 0.95$ | Strong (robust) | Clear majority |
+| $0.50 - 0.80$ | Borderline | Split vote |
+| $< 0.50$ | Weak/none (fragile) | Minority opinion |
+
+We use **PIP $\geq$ 0.80** as our robustness threshold throughout this tutorial --- a variable with PIP above 0.80 appears in the vast majority of the probability-weighted model space, providing "strong evidence" by Raftery's classification. This is the most widely used cutoff in applied BMA studies.
+
+A key assumption underlying BMA is that the true data-generating process is well-approximated by a weighted combination of the candidate models (the "M-closed" assumption). When the candidate set omits important functional forms or interactions, BMA's posterior probabilities may be unreliable.
 
 ### 5.2 Key options
 
@@ -721,5 +733,6 @@ The two methods serve different purposes. **Use BMA** when the research question
 2. [Fernandez, C., Ley, E., & Steel, M. F. J. (2001). Model uncertainty in cross-country growth regressions. *Journal of Applied Econometrics*, 16(5), 563--576.](https://doi.org/10.1002/jae.623)
 3. [Belloni, A., Chernozhukov, V., & Hansen, C. (2014). Inference on treatment effects after selection among high-dimensional controls. *Review of Economic Studies*, 81(2), 608--650.](https://doi.org/10.1093/restud/rdt044)
 4. [Raftery, A. E., Madigan, D., & Hoeting, J. A. (1997). Bayesian model averaging for linear regression models. *Journal of the American Statistical Association*, 92(437), 179--191.](https://doi.org/10.1080/01621459.1997.10473615)
-5. [Stata 18 Manual: `bmaregress` --- Bayesian Model Averaging regression](https://www.stata.com/manuals/bmabmaregress.pdf)
-6. [Stata 18 Manual: `dsregress` --- Double-Selection LASSO linear regression](https://www.stata.com/manuals/lassodsregress.pdf)
+5. [Raftery, A. E. (1995). Bayesian model selection in social research. *Sociological Methodology*, 25, 111--163.](https://doi.org/10.2307/271063)
+6. [Stata 18 Manual: `bmaregress` --- Bayesian Model Averaging regression](https://www.stata.com/manuals/bmabmaregress.pdf)
+7. [Stata 18 Manual: `dsregress` --- Double-Selection LASSO linear regression](https://www.stata.com/manuals/lassodsregress.pdf)
