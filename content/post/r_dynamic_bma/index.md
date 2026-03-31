@@ -485,7 +485,7 @@ Raftery (1995) provides a standard classification for the strength of evidence b
 | 0.75 -- 0.95 | Positive |
 | 0.50 -- 0.75 | Weak |
 
-Under the binomial prior, only `pop` (PIP = 0.990) reaches *very strong* evidence. Life expectancy (`lnlex` at 0.864), investment share (`ish` at 0.773), trade openness (`opem` at 0.766), and government share (`gsh` at 0.751) fall in the *positive* evidence range. The remaining variables --- education, population growth, investment price, and democracy --- show *weak* evidence (0.65--0.72). No variable has PIP below 0.5, suggesting the data supports relatively large models.
+Under the binomial prior, `pop` (PIP = 0.990) reaches *strong* evidence --- just short of the "very strong" threshold at 0.99. Life expectancy (`lnlex` at 0.864), investment share (`ish` at 0.773), trade openness (`opem` at 0.766), and government share (`gsh` at 0.751) fall in the *positive* evidence range. The remaining four variables --- education, population growth, investment price, and democracy --- show *weak* evidence (0.65--0.72). No variable has PIP below 0.5, suggesting the data supports relatively large models.
 
 The **sign stability** column (%(+)) provides an additional robustness check. Seven of the nine regressors have perfectly stable signs: investment share, population growth, population, trade openness, and life expectancy are always positive (100%), while investment price and democracy are always negative (0%). Government share has %(+) = 30.9%, meaning its sign is negative in about 70% of models --- moderately unstable. Education has %(+) = 69.9%, with a positive coefficient in about 70% of models but negative in 30%.
 
@@ -567,7 +567,19 @@ size_plots <- model_sizes(bma_results)
 
 ![Prior and posterior distribution over model sizes.](r_bdsm_05_model_sizes.png)
 
-The posterior strongly favors larger models. While the binomial prior centers mass on models with 4--5 regressors (EMS = 4.5), the posterior shifts toward 7--8 regressors, with a posterior expected model size of 6.9. Under the binomial-beta prior, the shift is even more dramatic: the posterior expected model size reaches 8.6, meaning the data wants to include nearly all 9 candidate regressors. This is consistent with the finding that all variables have PIP above 0.65 --- the data sees signal in most candidates.
+The expected model sizes confirm this visually:
+
+```r
+print(bma_results[[16]])
+```
+
+```text
+              Prior models size Posterior model size
+Binomial                    4.5                6.908
+Binomial-beta               4.5                8.556
+```
+
+The posterior strongly favors larger models. While the binomial prior centers mass on models with 4--5 regressors (EMS = 4.5), the posterior shifts toward 7 regressors (6.908). Under the binomial-beta prior, the shift is even more dramatic: the posterior expected model size reaches 8.556, meaning the data wants to include nearly all 9 candidate regressors. This is consistent with the finding that all variables have PIP above 0.65 --- the data sees signal in most candidates.
 
 ## 11. Examining Top Models
 
@@ -599,7 +611,23 @@ A striking pattern emerges: the top model includes *all 9 regressors* (PMP = 8.9
 
 Two variables are never dropped across the top 8 models: `pop` and `lnlex` --- they appear in all 8, consistent with their high PIPs of 0.990 and 0.864. The variables dropped in models 2--8 are `ipr`, `polity`, `sed`, `pgrw`, `gsh`, `opem`, and `ish` --- precisely the variables with the lowest PIPs.
 
-In the best model (No. 1), the lagged GDP coefficient is 0.954 (SE = 0.076, significant at 1%), confirming the very slow convergence we derived from the Solow model. Investment share has a positive and significant coefficient of 0.079, while democracy has a negative and significant coefficient of --0.092. Life expectancy is positive and significant at 0.151. Education, despite being included in 7 of the top 8 models, has a large standard error (0.034, SE = 0.065) --- explaining its moderate PIP despite frequent inclusion.
+We can also examine the coefficient estimates in the best model using the knitr-formatted output:
+
+```r
+# Estimation results for the best model (knitr format)
+print(best8[[5]])
+```
+
+```text
+Best model (No. 1) estimates:
+gdp_lag  0.954 (0.076)***    pop    0.065 (0.056)
+ish      0.079 (0.032)**     ipr   -0.056 (0.027)**
+sed      0.034 (0.065)       opem   0.043 (0.025)*
+pgrw     0.025 (0.033)       gsh   -0.043 (0.050)
+lnlex    0.151 (0.060)**     polity -0.092 (0.032)***
+```
+
+In the best model (No. 1), the lagged GDP coefficient is 0.954 (SE = 0.076, significant at 1%), confirming the very slow convergence we derived from the Solow model. Investment share has a positive and significant coefficient of 0.079, while democracy has a negative and highly significant coefficient of --0.092. Life expectancy is positive and significant at 0.151. Education, despite being included in 7 of the top 8 models, has a large standard error (0.034, SE = 0.065) --- explaining its moderate PIP despite frequent inclusion.
 
 This combination --- high inclusion rate but imprecise coefficient --- happens when most models agree that education *belongs* in the model but disagree about its magnitude. Some estimate a positive effect of +0.08, others a negative --0.02. The variable is probably relevant, but the data does not pin down its direction.
 

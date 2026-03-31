@@ -175,11 +175,6 @@ pmp_plots <- model_pmp(bma_results)
 print(pmp_plots[[3]])
 dev.off()
 
-png("r_bdsm_04_model_pmp_top10.png", width = 800, height = 500, res = 100)
-pmp_top <- model_pmp(bma_results, top = 10)
-print(pmp_top[[3]])
-dev.off()
-
 png("r_bdsm_05_model_sizes.png", width = 800, height = 500, res = 100)
 size_plots <- model_sizes(bma_results)
 print(size_plots[[3]])
@@ -198,19 +193,7 @@ print(best8[[1]])
 cat("\n=== Best 8 Models (Binomial) - Estimates (regular SE) ===\n")
 print(best8[[5]])
 
-# gTree plots (elements 7=inclusion, 8=estimates regular, 9=estimates robust)
-png("r_bdsm_06_best_models_inclusion.png", width = 900, height = 600, res = 100)
-grid::grid.draw(best8[[7]])
-dev.off()
-
-png("r_bdsm_07_best_models_estimates.png", width = 900, height = 600, res = 100)
-grid::grid.draw(best8[[8]])
-dev.off()
-
-# Best models with robust SE
-best5_robust <- best_models(bma_results, criterion = 1, best = 5, robust = TRUE)
-cat("\n=== Best 5 Models (Binomial) - Estimates (robust SE) ===\n")
-print(best5_robust[[5]])
+# (gTree plots removed from post --- text output above is clearer)
 
 cat("Best model plots saved.\n")
 
@@ -228,20 +211,7 @@ png("r_bdsm_09_coef_hist_pop.png", width = 700, height = 450, res = 100)
 print(coef_plots[[5]])
 dev.off()
 
-png("r_bdsm_10_coef_hist_lnlex.png", width = 700, height = 450, res = 100)
-print(coef_plots[[9]])
-dev.off()
-
-png("r_bdsm_11_coef_hist_polity.png", width = 700, height = 450, res = 100)
-print(coef_plots[[10]])
-dev.off()
-
-# Kernel densities
-coef_kern <- coef_hist(bma_results, kernel = 1)
-
-png("r_bdsm_12_coef_kernel_pop.png", width = 700, height = 450, res = 100)
-print(coef_kern[[5]])
-dev.off()
+# (lnlex, polity histograms and kernel density removed from post)
 
 cat("Coefficient distribution plots saved.\n")
 
@@ -262,16 +232,7 @@ print(bma_ems8[[1]])
 cat("\nExpected model sizes (EMS=8):\n")
 print(bma_ems8[[16]])
 
-# Model sizes comparison plots
-png("r_bdsm_14_sizes_ems2.png", width = 800, height = 500, res = 100)
-sizes_ems2 <- model_sizes(bma_ems2)
-print(sizes_ems2[[3]])
-dev.off()
-
-png("r_bdsm_15_sizes_ems8.png", width = 800, height = 500, res = 100)
-sizes_ems8 <- model_sizes(bma_ems8)
-print(sizes_ems8[[3]])
-dev.off()
+# (EMS model_sizes plots removed from post --- dumbbell chart covers sensitivity)
 
 # Dilution prior (omega = 0.5)
 bma_dil <- bma(full_model_space, df = data_prepared, round = 3, dilution = 1)
