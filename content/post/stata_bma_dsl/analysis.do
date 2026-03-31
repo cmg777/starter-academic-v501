@@ -741,6 +741,83 @@ restore
 
 
 *=============================================================================*
+*  APPENDIX A: FIRST-DIFFERENCES ANALYSIS
+*=============================================================================*
+* Create a cross-sectional dataset by taking (2014 value) - (1995 value)
+* for each country. This removes time-invariant FE and produces a setting
+* where BMA and DSL operate on pure cross-sectional data (N=80).
+
+display _newline "============================================="
+display "  APPENDIX A: FIRST DIFFERENCES"
+display "============================================="
+
+preserve
+
+* Keep only first and last years
+keep if year == 1995 | year == 2014
+
+* Reshape to wide
+reshape wide $outcome $gdp_vars $controls, i(country_id) j(year)
+
+* Compute first differences: delta_var = var(2014) - var(1995)
+foreach v in $outcome $gdp_vars $controls {
+    gen d_`v' = `v'2014 - `v'1995
+}
+
+summarize d_*
+
+*---------------------------------------------*
+* A1. FD: Sparse OLS                          *
+*---------------------------------------------*
+display _newline "=== FD: Sparse OLS ==="
+regress d_ln_co2 d_ln_gdp d_ln_gdp_sq d_ln_gdp_cb, robust
+
+*---------------------------------------------*
+* A2. FD: Kitchen-sink OLS                    *
+*---------------------------------------------*
+display _newline "=== FD: Kitchen-sink OLS ==="
+regress d_ln_co2 d_ln_gdp d_ln_gdp_sq d_ln_gdp_cb ///
+    d_fossil_fuel d_renewable d_urban d_industry d_democracy ///
+    d_services d_trade d_fdi d_credit d_pop_density ///
+    d_corruption d_globalization, robust
+
+*---------------------------------------------*
+* A3. FD: BMA                                 *
+*---------------------------------------------*
+display _newline "=== FD: BMA ==="
+bmaregress d_ln_co2 d_ln_gdp d_ln_gdp_sq d_ln_gdp_cb ///
+    d_fossil_fuel d_renewable d_urban d_industry d_democracy ///
+    d_services d_trade d_fdi d_credit d_pop_density ///
+    d_corruption d_globalization, ///
+    mprior(uniform) gprior(uip) ///
+    mcmcsize(50000) rseed(9988) pipcutoff(0.5) burnin(5000)
+
+* List all PIPs
+matrix pip_fd = e(pip)
+local varnames_fd : colnames pip_fd
+local ncols_fd = colsof(pip_fd)
+display _newline "FD BMA PIPs:"
+forvalues i = 1/`ncols_fd' {
+    local vname : word `i' of `varnames_fd'
+    display "  `vname': " %8.6f pip_fd[1,`i']
+}
+
+*---------------------------------------------*
+* A4. FD: DSL                                 *
+*---------------------------------------------*
+display _newline "=== FD: DSL ==="
+dsregress d_ln_co2 d_ln_gdp d_ln_gdp_sq d_ln_gdp_cb, ///
+    controls(d_fossil_fuel d_renewable d_urban d_industry d_democracy ///
+             d_services d_trade d_fdi d_credit d_pop_density ///
+             d_corruption d_globalization) ///
+    rseed(9988)
+
+lassoinfo
+
+restore
+
+
+*=============================================================================*
 *  WRAP-UP
 *=============================================================================*
 

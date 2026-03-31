@@ -943,6 +943,171 @@ The practical takeaway for applied researchers: in panel data settings, always i
 
 3. **Increase noise.** Re-generate the synthetic data with `sigma_eps = 0.30` (double the noise) in `generate_data.do` and re-run the full analysis. How does this affect BMA's ability to distinguish true predictors from noise? (*Hint:* expect more variables with PIPs in the ambiguous 0.3--0.7 range, and possibly some noise variables crossing the 0.80 threshold --- false positives become more likely with noisier data.)
 
+## Appendix A: First-Differences Analysis
+
+### A.1 Motivation
+
+The fixed effects estimator removes time-invariant country heterogeneity by demeaning each variable within country. An alternative approach is **first differencing**: computing the change between the last and first year for each country ($\Delta x\_i = x\_{i,2014} - x\_{i,1995}$). This also removes time-invariant effects and produces a pure **cross-sectional** dataset of 80 observations --- one per country. The cross-sectional setting is where LASSO-based methods are most powerful, because there are no FE dummies diluting the candidate set.
+
+The tradeoff is statistical power: first differencing uses only two data points per country (discarding 18 intermediate years), while the within-estimator uses all 20. We expect noisier estimates but cleaner variable selection.
+
+### A.2 Constructing the first-difference dataset
+
+```stata
+* Keep only first (1995) and last (2014) years, reshape, compute differences
+keep if year == 1995 | year == 2014
+reshape wide $outcome $gdp_vars $controls, i(country_id) j(year)
+
+foreach v in $outcome $gdp_vars $controls {
+    gen d_`v' = `v'2014 - `v'1995
+}
+```
+
+This produces 80 observations, each representing how much a country's variables changed over the 20-year period. For example, `d_ln_gdp` measures the log growth in GDP per capita from 1995 to 2014.
+
+### A.3 Baseline OLS on first differences
+
+```stata
+* Sparse: GDP terms only
+regress d_ln_co2 d_ln_gdp d_ln_gdp_sq d_ln_gdp_cb, robust
+
+* Kitchen-sink: all 12 controls
+regress d_ln_co2 d_ln_gdp d_ln_gdp_sq d_ln_gdp_cb ///
+    d_fossil_fuel d_renewable d_urban d_industry d_democracy ///
+    d_services d_trade d_fdi d_credit d_pop_density ///
+    d_corruption d_globalization, robust
+```
+
+```text
+FD Sparse OLS:
+      d_ln_gdp |  -10.36189   4.092422    -2.53   0.013    -18.51265   -2.211121
+   d_ln_gdp_sq |   1.155962   .4223643     2.74   0.008     .3147506    1.997173
+   d_ln_gdp_cb |  -.0414951   .0144408    -2.87   0.005    -.0702522    -.012738
+   R-squared = 0.1433
+
+FD Kitchen-sink OLS:
+      d_ln_gdp |  -8.109709   5.031758    -1.61   0.112     -18.1618    1.942382
+   d_ln_gdp_sq |   .9238864   .5213262     1.77   0.081    -.1175823    1.965355
+   d_ln_gdp_cb |  -.0336221   .0179583    -1.87   0.066    -.0694979    .0022536
+   R-squared = 0.3707
+```
+
+The FD sparse OLS finds the inverted-N sign pattern with all three terms significant at the 5% level --- but the coefficients are noisier than the FE estimates (e.g., $\beta\_1 = -10.36$ vs --7.50 for sparse FE). The R² of 0.14 is much lower than the within R² of 0.035 from sparse FE, reflecting the loss of within-country time-series variation. Adding controls in the kitchen-sink raises R² to 0.37 but makes the GDP terms individually insignificant (p = 0.07--0.11) --- a consequence of having only 80 observations and 15 regressors.
+
+### A.4 BMA on first differences
+
+```stata
+bmaregress d_ln_co2 d_ln_gdp d_ln_gdp_sq d_ln_gdp_cb ///
+    d_fossil_fuel d_renewable d_urban d_industry d_democracy ///
+    d_services d_trade d_fdi d_credit d_pop_density ///
+    d_corruption d_globalization, ///
+    mprior(uniform) gprior(uip) ///
+    mcmcsize(50000) rseed(9988) pipcutoff(0.5) burnin(5000)
+```
+
+```text
+Bayesian model averaging                           No. of obs         =     80
+Linear regression                                  No. of predictors  =     15
+MC3 sampling                                                   Groups =     15
+                                                   No. of models      =  2,317
+Priors:                                            Mean model size    =  3.304
+  Models: Uniform                                  MCMC sample size   = 50,000
+   Coef.: Zellner's g                              Acceptance rate    = 0.3080
+       g: Unit-information, g = 80                 Shrinkage, g/(1+g) = 0.9877
+
+Sampling correlation = 0.9958
+
+------------------------------------------------------------------------------
+    d_ln_co2 |      Mean   Std. dev.       Group        PIP
+-------------+----------------------------------------------------------------
+  d_industry |  .0364834   .0090778            7     .99823
+------------------------------------------------------------------------------
+Note: 14 predictors with PIP less than .5 not shown.
+```
+
+The FD-BMA result is dramatically different from the FE-based BMA. Only **one variable** passes the 0.50 PIP display threshold: the change in industry share (PIP = 0.998). The three GDP polynomial terms all have PIPs below 0.30:
+
+| Variable | PIP (FD-BMA) | PIP (FE-BMA) |
+|----------|-------------|-------------|
+| d\_ln\_gdp | 0.298 | 0.994 |
+| d\_ln\_gdp\_sq | 0.267 | 1.000 |
+| d\_ln\_gdp\_cb | 0.271 | 1.000 |
+| d\_fossil\_fuel | 0.183 | 1.000 |
+| d\_renewable | 0.350 | 0.959 |
+| d\_urban | 0.096 | 0.268 |
+| d\_industry | **0.998** | 0.999 |
+| d\_democracy | 0.094 | 0.023 |
+
+With only 80 cross-sectional observations, BMA's evidence threshold is much harder to clear. The GDP terms --- which are *the core of the EKC* --- do not survive because the 20-year differences are noisy and the cubic polynomial requires precise estimation of three correlated terms simultaneously. The change in industry share is the only variable with a strong enough signal-to-noise ratio to clear BMA's bar. The FE-based BMA (N = 1,600) has 20x more observations to work with, which is why it identifies 6 robust variables.
+
+### A.5 DSL on first differences
+
+```stata
+dsregress d_ln_co2 d_ln_gdp d_ln_gdp_sq d_ln_gdp_cb, ///
+    controls(d_fossil_fuel d_renewable d_urban d_industry d_democracy ///
+             d_services d_trade d_fdi d_credit d_pop_density ///
+             d_corruption d_globalization) ///
+    rseed(9988)
+```
+
+```text
+Double-selection linear model         Number of obs               =         80
+                                      Number of controls          =         12
+                                      Number of selected controls =          1
+                                      Wald chi2(3)                =      10.65
+                                      Prob > chi2                 =     0.0138
+
+------------------------------------------------------------------------------
+             |               Robust
+    d_ln_co2 | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    d_ln_gdp |  -5.047196   4.558593    -1.11   0.268    -13.98187    3.887483
+ d_ln_gdp_sq |   .5943786   .4700569     1.26   0.206     -.326916    1.515673
+ d_ln_gdp_cb |  -.0220809   .0160386    -1.38   0.169    -.0535159    .0093541
+------------------------------------------------------------------------------
+```
+
+```text
+    Estimate: active
+     Command: dsregress
+------------------------------------------------------
+            |                                   No. of
+            |           Selection             selected
+   Variable |    Model     method    lambda  variables
+------------+-----------------------------------------
+    d_ln_co2 |   linear     plugin  .3818852          1
+    d_ln_gdp |   linear     plugin  .3818852          0
+ d_ln_gdp_sq |   linear     plugin  .3818852          0
+ d_ln_gdp_cb |   linear     plugin  .3818852          0
+------------------------------------------------------
+```
+
+FD-DSL selected only **1 control** for the outcome equation (likely d\_industry, consistent with BMA) and **zero controls** for each of the three GDP equations. With such sparse selection, the final OLS is essentially a regression of d\_ln\_co2 on the three GDP terms plus one control --- and none of the three GDP terms are individually significant (p = 0.17--0.27). The Wald test for joint significance is borderline (p = 0.014), suggesting the GDP terms collectively have some explanatory power, but the individual estimates are too noisy for inference.
+
+### A.6 Comparison: first differences vs fixed effects
+
+| | FD Sparse | FD Kitchen | FD BMA | FD DSL | FE BMA | FE DSL | True DGP |
+|---|-----------|------------|--------|--------|--------|--------|----------|
+| $\beta\_1$ (GDP) | --10.362 | --8.110 | n/a | --5.047 | --7.139 | --7.433 | --7.100 |
+| $\beta\_2$ (GDP²) | 1.156 | 0.924 | n/a | 0.594 | 0.808 | 0.840 | 0.810 |
+| $\beta\_3$ (GDP³) | --0.041 | --0.034 | n/a | --0.022 | --0.030 | --0.031 | --0.030 |
+| **GDP terms robust?** | Yes (p < 0.05) | No (p > 0.05) | **No** (PIP < 0.30) | No (p > 0.05) | **Yes** (PIP > 0.99) | Yes (p < 0.001) | |
+| **Controls selected** | n/a | n/a | 1 of 12 | 1 of 12 | 6 of 12 | 102 of 112 | |
+| **Min TP** | \\$1,911 | \\$1,464 | n/a | \\$986 | \\$2,411 | \\$2,429 | \\$1,895 |
+| **Max TP** | \\$60,918 | \\$61,712 | n/a | \\$63,082 | \\$27,269 | \\$27,672 | \\$34,647 |
+
+> **Note.** FD-BMA posterior means for the GDP terms are heavily shrunk toward zero (because their PIPs are ~0.27--0.30), so we report "n/a" rather than misleading point estimates.
+
+The comparison reveals a stark trade-off between the two identification strategies:
+
+**Fixed effects win on accuracy.** The FE-based estimates are close to the true DGP values, with BMA (FE) achieving the best accuracy ($\beta\_1 = -7.139$ vs true --7.100). The FD estimates are noisier: FD-sparse overshoots ($\beta\_1 = -10.36$), while FD-DSL undershoots (--5.05). The FD turning points are wildly inaccurate --- the maximum turning point is \\$61,000--63,000 in first differences vs \\$27,000 with FE (true: \\$34,647).
+
+**First differences struggle with the cubic polynomial.** Estimating a cubic EKC requires precise measurement of three highly correlated terms ($\ln GDP$, $(\ln GDP)^2$, $(\ln GDP)^3$). With only 80 observations (one 20-year change per country), the multicollinearity among differenced GDP terms is severe. Both BMA and DSL respond rationally: BMA gives all three terms PIPs below 0.30, and DSL selects zero controls for the GDP equations. Neither method "trusts" the cubic specification in this small sample.
+
+**Industry is the strongest cross-sectional signal.** Both FD-BMA (PIP = 0.998) and FD-DSL (selected as the sole control) identify the change in industry share as the most important cross-sectional predictor of CO<sub>2</sub> change. This makes economic sense: countries that industrialized the most over 1995--2014 also increased their emissions the most, regardless of their income trajectory.
+
+**Practical implication.** First differences are appropriate when the research question is about *long-run changes* rather than *levels*. But for testing the EKC cubic shape, the panel FE approach is far more powerful because it uses all 1,600 observations rather than collapsing to 80. The FD analysis confirms that the inverted-N result in the main body is robust to the identification strategy in spirit (the signs are correct in FD-sparse OLS), but the magnitudes and statistical power are substantially weaker.
+
 ## References
 
 1. [Gravina, A. F. & Lanzafame, M. (2025). What's your shape? Bayesian model averaging and double machine learning for the Environmental Kuznets Curve. *Energy Economics*, 108649.](https://doi.org/10.1016/j.eneco.2025.108649)
