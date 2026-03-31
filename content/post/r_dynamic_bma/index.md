@@ -54,21 +54,14 @@ This tutorial introduces the [Bayesian Dynamic Systems Modeling](https://cran.r-
 
 The tutorial proceeds in two stages. First, a **warm-up** with only 3 regressors and 8 models to build intuition for the workflow. Then the **full analysis** with all 9 regressors and 512 models, including sensitivity analysis and jointness.
 
-```mermaid
-graph LR
-    A["<b>Data Prep</b><br/>Lag DV, demean,<br/>standardize"] --> B["<b>Model Space</b><br/>Estimate all<br/>2<sup>K</sup> models"]
-    B --> C["<b>BMA</b><br/>PIPs, posterior<br/>means, model probs"]
-    C --> D["<b>Sensitivity</b><br/>Vary priors,<br/>EMS, dilution"]
-    D --> E["<b>Jointness</b><br/>Complements vs.<br/>substitutes"]
-    E --> F["<b>Findings</b><br/>Robust growth<br/>determinants"]
-
-    style A fill:#6a9bcc,stroke:#141413,color:#fff
-    style B fill:#d97757,stroke:#141413,color:#fff
-    style C fill:#00d4c8,stroke:#141413,color:#fff
-    style D fill:#6a9bcc,stroke:#141413,color:#fff
-    style E fill:#d97757,stroke:#141413,color:#fff
-    style F fill:#1a3a8a,stroke:#141413,color:#fff
-```
+| Step | What | Why |
+|:----:|------|-----|
+| **1. Data Prep** | Lag DV, demean, standardize | Remove fixed effects, ensure comparability |
+| **2. Model Space** | Estimate all 2<sup>K</sup> models | Compute marginal likelihood for each specification |
+| **3. BMA** | PIPs, posterior means, model probs | Weight models by data fit |
+| **4. Sensitivity** | Vary priors, EMS, dilution | Check if findings depend on assumptions |
+| **5. Jointness** | Complements vs. substitutes | Discover regressor relationships |
+| **6. Findings** | Robust growth determinants | Answer the case study question |
 
 ---
 
@@ -120,39 +113,15 @@ The key assumption is **weak exogeneity**: current regressors can be correlated 
 
 ### 3.3 From cross-sectional to dynamic panel BMA
 
-The comparison between the two approaches can be summarized as follows:
+The comparison between the two approaches:
 
-```mermaid
-graph TD
-    subgraph CS["<b>Cross-Sectional BMA</b>"]
-        CS1["Single time snapshot"]
-        CS2["Strict exogeneity assumed"]
-        CS3["No lagged DV"]
-        CS4["No fixed effects"]
-    end
-
-    subgraph DP["<b>Dynamic Panel BMA</b>"]
-        DP1["Multiple time periods"]
-        DP2["Weak exogeneity only"]
-        DP3["Lagged DV included"]
-        DP4["Entity + time FE"]
-    end
-
-    CS --> U["Model uncertainty<br/>addressed by both"]
-    DP --> U
-
-    style CS fill:#d97757,stroke:#141413,color:#fff
-    style DP fill:#6a9bcc,stroke:#141413,color:#fff
-    style U fill:#00d4c8,stroke:#141413,color:#fff
-    style CS1 fill:#d97757,stroke:#141413,color:#fff
-    style CS2 fill:#d97757,stroke:#141413,color:#fff
-    style CS3 fill:#d97757,stroke:#141413,color:#fff
-    style CS4 fill:#d97757,stroke:#141413,color:#fff
-    style DP1 fill:#6a9bcc,stroke:#141413,color:#fff
-    style DP2 fill:#6a9bcc,stroke:#141413,color:#fff
-    style DP3 fill:#6a9bcc,stroke:#141413,color:#fff
-    style DP4 fill:#6a9bcc,stroke:#141413,color:#fff
-```
+| Feature | Cross-Sectional BMA | Dynamic Panel BMA |
+|---------|:-------------------:|:-----------------:|
+| Time dimension | Single snapshot | Multiple periods |
+| Exogeneity | Strict (assumed) | Weak (allowed) |
+| Lagged DV | Not included | Included |
+| Fixed effects | None | Entity + time |
+| **Model uncertainty** | **Addressed** | **Addressed** |
 
 In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we averaged across 4,096 models of CO<sub>2</sub> emissions using synthetic data. Here we apply the same BMA principle --- weighting models by how well they fit the data --- but to a panel of 73 countries over four decades, using the methodology that handles the endogeneity that cross-sectional BMA cannot.
 
