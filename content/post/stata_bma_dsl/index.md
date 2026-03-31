@@ -765,9 +765,9 @@ graph twoway ///
 
 ## 8. Discussion
 
-Both BMA and DSL identify the **inverted-N** EKC shape with turning points close to the true DGP values. BMA correctly identifies 6 of 8 true predictors (3 GDP terms + fossil fuel, industry, renewable) with zero false positives among noise variables.
+### 8.1 What the results mean for the EKC
 
-If this were real data, the inverted-N would imply three phases:
+Both BMA and DSL identify the **inverted-N** EKC shape with turning points close to the true DGP values. BMA correctly identifies 6 of 8 true predictors (3 GDP terms + fossil fuel, industry, renewable) with zero false positives among noise variables. The inverted-N shape implies three phases of the income--pollution relationship:
 
 1. **Declining phase** (below ~\\$2,400): Very poor countries where CO<sub>2</sub> may fall as subsistence agriculture shifts toward slightly cleaner energy.
 
@@ -775,11 +775,29 @@ If this were real data, the inverted-N would imply three phases:
 
 3. **Declining phase** (above ~\\$27,000): Wealthy countries where clean technology and regulation reduce emissions.
 
-### When to use BMA vs post-double-selection
+The policy implication is important: the inverted-N suggests that the "environmental improvement" phase is not automatic. Unlike the simpler inverted-U hypothesis, which predicts a single turning point after which pollution monotonically declines, the inverted-N warns that countries at very low income levels may *already* be on a declining emissions path that reverses once industrialization begins. This makes the middle-income range --- where emissions rise steeply --- the critical window for environmental policy intervention.
 
-The two methods serve different purposes. **Use BMA** when the research question is "which variables robustly predict the outcome?" --- BMA provides PIPs, coefficient densities, and a rich picture of the model space. It excels in exploratory settings where variable importance is the goal. **Use post-double-selection** when the question is "what is the causal effect of a specific variable of interest, controlling for high-dimensional confounders?" --- DSL provides fast, valid inference on the coefficients of interest with standard errors and confidence intervals. In practice, using both (as in this tutorial) provides the strongest evidence: if a Bayesian and a frequentist method agree, the finding is unlikely to be an artifact of any single modeling choice.
+The three robust control variables identified by BMA reinforce this narrative. Fossil fuel dependence (PIP = 1.000) is the single strongest predictor of CO<sub>2</sub> emissions, with a coefficient close to the true DGP value. Renewable energy share (PIP = 0.959) enters with a negative sign, confirming that energy mix transitions reduce emissions. Industry value-added (PIP = 0.999) captures the composition effect --- economies dominated by manufacturing produce more CO<sub>2</sub> per unit of GDP than service-based economies.
 
-**Caveats.** This is synthetic data --- the patterns are sharper than real-world data, and we can verify ground truth only because we designed the DGP. With real data, model uncertainty is genuinely unresolvable, and there is no answer key to check against. The original study by Gravina and Lanzafame (2025) addresses additional complications including endogeneity (via 2SLS-BMA) and alternative pollutants (SO<sub>2</sub>, PM2.5).
+### 8.2 When to use BMA vs post-double-selection
+
+The two methods answer fundamentally different research questions:
+
+**Use BMA** when the question is *"which variables robustly predict the outcome?"* BMA provides PIPs, coefficient densities, and a complete picture of the model space. It excels in exploratory settings where variable importance is the goal. In our simulation, BMA produced the most accurate coefficient estimates (--7.139 vs true --7.100) and provided rich diagnostics (PIP chart, density plots) that make the evidence for each variable transparent. The cost is computational: BMA requires MCMC sampling (minutes to hours depending on the model space).
+
+**Use post-double-selection** when the question is *"what is the causal effect of a specific variable of interest, controlling for high-dimensional confounders?"* DSL provides fast, valid inference on the coefficients of interest with standard errors and confidence intervals. It is designed for settings where you have a clear treatment variable and many potential controls. In our simulation, DSL completed in seconds and produced valid standard errors, but its coefficient estimates (--7.433) were less accurate than BMA's because LASSO had limited room to discriminate among controls in the FE-heavy panel setting.
+
+**Use both together** (as in this tutorial) when you want the strongest possible evidence. If a Bayesian and a frequentist method agree on the sign, magnitude, and significance of an effect, the finding is unlikely to be an artifact of any single modeling choice. Disagreements between the methods are also informative --- they signal areas where the evidence is sensitive to assumptions.
+
+### 8.3 Limitations and caveats
+
+**Synthetic vs real data.** This is synthetic data --- the patterns are sharper than real-world data, and we can verify ground truth only because we designed the DGP. With real data, model uncertainty is genuinely unresolvable, and there is no answer key to check against. The separation between true predictors and noise variables is cleaner here than in most applications.
+
+**Weak signals are hard to detect.** Both methods missed urban population (PIP = 0.27) and democracy (PIP = 0.02), whose true coefficients are small (0.007 and --0.005). This is not a failure of the methods --- it is a fundamental statistical limitation. Detecting a coefficient of 0.005 in the presence of panel-level noise requires either a much larger sample or a stronger signal.
+
+**Panel FE and LASSO.** In our panel setting, 99 of 112 candidate controls are FE dummies that LASSO retains almost entirely. This limits DSL's ability to discriminate among the 12 candidate controls. In cross-sectional settings or settings with many genuinely irrelevant variables, DSL would have more room to operate and potentially match BMA's accuracy.
+
+**Extensions.** The original study by Gravina and Lanzafame (2025) addresses additional complications including endogeneity (via 2SLS-BMA), alternative pollutants (SO<sub>2</sub>, PM2.5), and non-linear specifications. Researchers working with real EKC data should also consider spatial dependence across countries and structural breaks in the income--pollution relationship.
 
 ## 9. Summary and Next Steps
 
