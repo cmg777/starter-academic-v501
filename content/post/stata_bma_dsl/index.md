@@ -335,7 +335,7 @@ In words, the probability of model $k$ being correct equals how well it fits the
 
 $$\text{PIP}\_j = \sum\_{k:\\, x\_j \in M\_k} P(M\_k | \text{data})$$
 
-PIP > 0.80 is a common threshold for considering a variable "robust" --- it means the variable appears in the vast majority of the probability-weighted model space.
+PIP > 0.80 is a common threshold for considering a variable "robust" --- it means the variable appears in the vast majority of the probability-weighted model space. A key assumption underlying BMA is that the true data-generating process is well-approximated by a weighted combination of the candidate models (the "M-closed" assumption). When the candidate set omits important functional forms or interactions, BMA's posterior probabilities may be unreliable.
 
 ### 5.2 Key options
 
@@ -383,9 +383,9 @@ Sampling correlation = 0.9997
 Note: 9 predictors with PIP less than .8 not shown.
 ```
 
-> The Stata output says "PIP less than .8" because we set `pipcutoff(0.8)` as the display threshold --- only variables exceeding this stricter robustness criterion appear in the table.
+> The Stata output says "PIP less than .8" because we set `pipcutoff(0.8)` as the display threshold --- only variables exceeding this stricter robustness criterion appear in the table. The 9 hidden variables are the two weak true controls (urban, democracy) and all 7 noise variables (services, trade, FDI, credit, population density, corruption, globalization). Figure 3 below shows PIP values for all 15 variables.
 
-BMA sampled 163 distinct models out of 4,096 possible. This might seem low, but the sampling correlation of 0.9997 (very close to 1.0) confirms that the MC$^3$ chain adequately explored the model space --- the posterior probability is concentrated on a relatively small number of high-quality models. The acceptance rate of 0.09 is below the typical 20--40% range, but the high sampling correlation provides reassurance that the results are reliable. Six variables have PIP above the 0.80 robustness threshold: the three GDP terms (PIP = 0.994--1.000) and three of the five true controls --- fossil fuel (PIP = 1.000), industry (PIP = 0.999), and renewable energy (PIP = 0.959). The BMA posterior means (--7.139, 0.808, --0.030) are remarkably close to the true DGP values (--7.100, 0.810, --0.030), substantially closer than the sparse FE estimates.
+The output shows 113 predictors in 15 groups: the 80 country dummies (grouped as 1 by `groupfv`) + 19 year dummies (grouped as 1) + 12 candidate controls (each its own group) + the 3 GDP terms (each its own group) = 15 selection groups total, with 98 variables "always" included (the country and year FE). BMA sampled 163 distinct models out of 4,096 possible. This might seem low, but the MC$^3$ algorithm does not need to visit every model --- it concentrates on the high-posterior-probability region. The sampling correlation of 0.9997 (very close to 1.0) confirms that the MC$^3$ chain adequately explored the model space --- the posterior probability is concentrated on a relatively small number of high-quality models. The acceptance rate of 0.09 is below the typical 20--40% range, but the high sampling correlation provides reassurance that the results are reliable. Six variables have PIP above the 0.80 robustness threshold: the three GDP terms (PIP = 0.994--1.000) and three of the five true controls --- fossil fuel (PIP = 1.000), industry (PIP = 0.999), and renewable energy (PIP = 0.959). The BMA posterior means (--7.139, 0.808, --0.030) are remarkably close to the true DGP values (--7.100, 0.810, --0.030), substantially closer than the sparse FE estimates.
 
 Two true controls --- urban (coefficient 0.007) and democracy (coefficient --0.005) --- have PIPs well below 0.80. Their true effects are small, making them hard to distinguish from noise. This is a realistic limitation: even a powerful method like BMA struggles with weak signals.
 
@@ -458,7 +458,7 @@ At the heart of each LASSO step is a penalized regression that shrinks irrelevan
 
 $$\min\_{\boldsymbol{\beta}} \left\\{ \frac{1}{2N} \sum\_{i=1}^{N}(y\_i - \mathbf{x}\_i'\boldsymbol{\beta})^2 + \lambda \sum\_{j=1}^{p} |\beta\_j| \right\\}$$
 
-The tuning parameter $\lambda$ controls how harsh the penalty is --- think of it as a "strictness dial." LASSO sets weak coefficients to exactly zero, performing automatic variable selection. The `dsregress` command uses a "plugin" method to choose $\lambda$ based on the data.
+The tuning parameter $\lambda$ controls how harsh the penalty is --- think of it as a "strictness dial." LASSO sets weak coefficients to exactly zero, performing automatic variable selection. The `dsregress` command uses a "plugin" method to choose $\lambda$ --- an analytical formula that sets the penalty based on the sample size and noise level, without requiring cross-validation. A key assumption underlying DSL is *approximate sparsity*: only a small number of controls truly matter, so LASSO can safely set the rest to zero. When the true model is dense (many small effects rather than a few large ones), LASSO may struggle to select the right variables.
 
 > **Note.** Stata also offers [`poregress`](https://www.stata.com/manuals/lassoporegress.pdf) (partialing-out regression), which implements a different approach: instead of selecting controls and running OLS, partialing-out *residualizes* both the outcome and the treatment against all controls, then regresses residuals on residuals. Both methods provide valid inference, but they differ in how they handle controls. This tutorial uses `dsregress` (post-double-selection) because its select-then-regress logic is more intuitive for beginners.
 
@@ -528,7 +528,7 @@ lassoinfo
 
 The `lassoinfo` output shows each of the four LASSO steps. The outcome equation selected 102 of 112 controls, while each GDP equation selected 100. The 112 candidates include 80 country dummies + 19 year dummies = 99 FE dummies, plus the 12 candidate variables and the constant. LASSO retains nearly all informative FE dummies and drops about 10--12 of the weakest candidates at each step. The union across all four steps (Step 3) yields the final control set for Step 4's OLS. With cluster-robust standard errors, the lambda is larger (0.382 vs 0.090 without clustering), leading to slightly different selection and producing DSL coefficients (--7.433, 0.840, --0.031) that fall between the sparse and kitchen-sink FE.
 
-In panel data settings where FE dummies dominate the control set (99 of 112 variables), LASSO has limited room to discriminate among the candidate controls of interest. Post-double-selection is most powerful in cross-sectional settings or when the candidate set contains many genuinely irrelevant variables.
+Why does DSL not match BMA's accuracy here? In panel data settings where FE dummies dominate the control set (99 of 112 variables), LASSO retains nearly all FE dummies and has limited room to discriminate among the 12 candidate controls of interest --- it dropped only 10--12 variables at each step, most of them weak FE dummies rather than noise controls. This "almost everything selected" outcome means DSL's final OLS is close to the kitchen-sink specification, which explains why its coefficients (--7.433, 0.840, --0.031) fall between sparse and kitchen-sink FE rather than converging to the true DGP. Post-double-selection is most powerful in cross-sectional settings or when the candidate set contains many genuinely irrelevant variables that LASSO can zero out.
 
 ## 7. Head-to-Head Comparison
 
