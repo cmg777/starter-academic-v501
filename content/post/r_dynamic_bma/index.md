@@ -19,7 +19,7 @@ links:
   name: "R script"
   url: analysis.R
 slides:
-summary: Dynamic panel Bayesian Model Averaging with the bdsm R package, applied to cross-country economic growth determinants --- handling reverse causality through lagged dependent variables, fixed effects, and weak exogeneity.
+summary: Dynamic panel Bayesian Model Averaging with the Bayesian Dynamic Systems Modeling (BDSM) R package, applied to cross-country economic growth determinants --- handling reverse causality through lagged dependent variables, fixed effects, and weak exogeneity.
 tags:
   - r
   - econometrics
@@ -40,14 +40,14 @@ Imagine you are advising a government on how to accelerate long-run economic gro
 
 This last concern is *reverse causality* --- the possibility that GDP growth causes higher investment rather than the other way around. Cross-sectional Bayesian Model Averaging (BMA) handles model uncertainty by averaging across thousands of model specifications, but it assumes regressors are strictly exogenous. When that assumption fails, BMA can confidently point to the wrong variables.
 
-This tutorial introduces the [`bdsm`](https://cran.r-project.org/web/packages/bdsm/index.html) R package --- **Bayesian Dynamic Systems Modeling** --- which extends BMA to dynamic panel data with weakly exogenous regressors. Built on the methodology of Moral-Benito (2012, 2013, 2016), it simultaneously addresses model uncertainty and reverse causality by incorporating a lagged dependent variable, entity fixed effects, and time fixed effects into the BMA framework.
+This tutorial introduces the [Bayesian Dynamic Systems Modeling](https://cran.r-project.org/web/packages/bdsm/index.html) R package --- which extends BMA to dynamic panel data with weakly exogenous regressors. Built on the methodology of Moral-Benito (2012, 2013, 2016), it simultaneously addresses model uncertainty and reverse causality by incorporating a lagged dependent variable, entity fixed effects, and time fixed effects into the BMA framework.
 
 > **Companion tutorial.** For a cross-sectional perspective using BMA, LASSO, and WALS on synthetic data, see the [R tutorial on variable selection](/post/r_bma_lasso_wals/). The current tutorial builds on those foundations by moving from cross-sectional to panel data and from strict to weak exogeneity.
 
 **Learning objectives:**
 
 - Understand why cross-sectional BMA can be misleading when regressors are endogenous, and how dynamic panel BMA addresses this
-- Prepare panel data for the `bdsm` package using `join_lagged_col()` and `feature_standardization()`
+- Prepare panel data for the Bayesian DSM package using `join_lagged_col()` and `feature_standardization()`
 - Run Bayesian Model Averaging with `bma()` and interpret Posterior Inclusion Probabilities (PIPs), posterior means, and model probabilities
 - Assess the sensitivity of results to prior specification by varying the expected model size and applying dilution priors
 - Analyze jointness to discover which growth determinants are complements versus substitutes
@@ -74,7 +74,7 @@ graph LR
 
 ## 2. Setup
 
-We need the `bdsm` package for dynamic panel BMA and `tidyverse` for data manipulation. The `parallel` package (included with base R) enables parallel computing for the model space estimation step.
+We need the Bayesian Dynamic Systems Modeling package for dynamic panel BMA and `tidyverse` for data manipulation. The `parallel` package (included with base R) enables parallel computing for the model space estimation step.
 
 ```r
 # Install bdsm if needed
@@ -104,7 +104,7 @@ When BMA is applied to cross-sectional data with endogenous regressors, it can c
 
 ### 3.2 The dynamic panel solution
 
-The `bdsm` package addresses this by estimating a **dynamic panel model**:
+The Bayesian DSM package addresses this by estimating a **dynamic panel model**:
 
 $$y\_{it} = \alpha \cdot y\_{it-1} + \beta' x\_{it} + \eta\_i + \zeta\_t + v\_{it}$$
 
@@ -160,7 +160,7 @@ In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we average
 
 ## 4. Warm-Up: BMA with 3 Regressors
 
-Before tackling the full 9-regressor model space, let us start with a smaller example to build intuition. The `bdsm` package ships with a precomputed `small_model_space` object that uses only 3 regressors: investment share (`ish`), secondary education (`sed`), and population growth (`pgrw`). With 3 regressors, there are $2^3 = 8$ possible models --- small enough to inspect every one.
+Before tackling the full 9-regressor model space, let us start with a smaller example to build intuition. The package ships with a precomputed `small_model_space` object that uses only 3 regressors: investment share (`ish`), secondary education (`sed`), and population growth (`pgrw`). With 3 regressors, there are $2^3 = 8$ possible models --- small enough to inspect every one.
 
 ```r
 # Load the precomputed small model space
@@ -224,7 +224,7 @@ The posterior favors models with 2 regressors (plus the lagged DV), matching the
 
 ### 5.1 Loading the data
 
-The `bdsm` package includes two versions of the Moral-Benito (2016) economic growth dataset. The `economic_growth` version has the lagged dependent variable already merged into the panel structure (with NAs in the initial period), while `original_economic_growth` keeps it as a separate column.
+The package includes two versions of the Moral-Benito (2016) economic growth dataset. The `economic_growth` version has the lagged dependent variable already merged into the panel structure (with NAs in the initial period), while `original_economic_growth` keeps it as a separate column.
 
 ```r
 data("economic_growth")
@@ -302,14 +302,14 @@ The 292 usable observations span 73 countries over four decades. Log GDP per cap
 
 ## 6. Data Preparation
 
-The `bdsm` package requires two data preprocessing steps before estimation: standardization (scaling) and demeaning (removing entity and time fixed effects). These steps ensure numerical stability and allow the model to focus on within-country, within-period variation.
+The Bayesian DSM package requires two data preprocessing steps before estimation: standardization (scaling) and demeaning (removing entity and time fixed effects). These steps ensure numerical stability and allow the model to focus on within-country, within-period variation.
 
 ### 6.1 Understanding the data structure
 
 If your data has the lagged dependent variable as a separate column (like `original_economic_growth`), you first need to merge it into the panel structure using [`join_lagged_col()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw). This function creates the initial period row with NAs:
 
 ```r
-# Demonstration: converting original format to bdsm format
+# Demonstration: converting original format to package format
 eg_joined <- join_lagged_col(
   df = original_economic_growth,
   col = gdp,
@@ -368,9 +368,9 @@ After preparation, all regressor values are centered around zero. Country 1's in
 
 ## 7. Estimating the Full Model Space
 
-With 9 candidate regressors, there are $2^9 = 512$ possible regression models. The `bdsm` package estimates every single one via numerical optimization of the *marginal likelihood* --- the probability of observing the data given a particular model, after integrating out all parameter uncertainty. Think of this as a cooking competition with 512 recipes --- each uses a different combination of 9 ingredients, and the marginal likelihood scores each recipe by balancing flavor (fit) against unnecessary complexity (overfitting).
+With 9 candidate regressors, there are $2^9 = 512$ possible regression models. The package estimates every single one via numerical optimization of the *marginal likelihood* --- the probability of observing the data given a particular model, after integrating out all parameter uncertainty. Think of this as a cooking competition with 512 recipes --- each uses a different combination of 9 ingredients, and the marginal likelihood scores each recipe by balancing flavor (fit) against unnecessary complexity (overfitting).
 
-The [`optim_model_space()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function handles this computation. For the full 9-regressor case, this is the most computationally intensive step --- it can take several minutes depending on the machine. The `bdsm` package helpfully includes a precomputed `full_model_space` object so we can skip the wait:
+The [`optim_model_space()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function handles this computation. For the full 9-regressor case, this is the most computationally intensive step --- it can take several minutes depending on the machine. The package helpfully includes a precomputed `full_model_space` object so we can skip the wait:
 
 ```r
 # Load precomputed model space (or compute from scratch)
@@ -756,7 +756,7 @@ Think of peanut butter and jelly: each is fine alone, but they show up together 
 
 ### 13.2 Three jointness measures
 
-The `bdsm` package implements three jointness measures. The [`jointness()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function computes pairwise relationships between all regressors:
+The package implements three jointness measures. The [`jointness()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function computes pairwise relationships between all regressors:
 
 **Hofmarcher et al. (HCGHM)** ranges from --1 (perfect substitutes) to +1 (perfect complements), with 0 indicating independence. This is the recommended default measure.
 
@@ -842,7 +842,7 @@ In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we found t
 
 ### 15.1 Key takeaways
 
-1. **Method insight:** Dynamic panel BMA handles endogeneity that cross-sectional BMA cannot. By including a lagged dependent variable ($\alpha$ = 0.92) and entity/time fixed effects, the `bdsm` package allows BMA to work with weakly exogenous regressors, avoiding the bias that plagues standard growth regressions.
+1. **Method insight:** Dynamic panel BMA handles endogeneity that cross-sectional BMA cannot. By including a lagged dependent variable ($\alpha$ = 0.92) and entity/time fixed effects, the Bayesian DSM package allows BMA to work with weakly exogenous regressors, avoiding the bias that plagues standard growth regressions.
 
 2. **Data insight:** Of 9 candidate growth determinants, only population size (PIP = 0.990) and life expectancy (PIP = 0.864) are robust across all prior specifications. This confirms the "fragility" of growth determinants documented by Sala-i-Martin et al. (2004) --- most variables that appear important in one specification become ambiguous under different priors.
 
@@ -856,7 +856,7 @@ In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we found t
 
 - **Weak exogeneity assumption:** While weaker than strict exogeneity, the weak exogeneity assumption still requires that current regressors are uncorrelated with current shocks. If contemporaneous feedback is strong (e.g., a GDP shock immediately changes investment in the same period), the estimates may still be biased.
 
-- **Extensions:** The `bdsm` package offers additional features not covered here, including parallel computing for faster model space estimation (`cl` parameter in `optim_model_space()`), robust standard errors for heteroskedasticity, and the full suite of reduced-form parameters for understanding the dynamic feedback structure.
+- **Extensions:** The package offers additional features not covered here, including parallel computing for faster model space estimation (`cl` parameter in `optim_model_space()`), robust standard errors for heteroskedasticity, and the full suite of reduced-form parameters for understanding the dynamic feedback structure.
 
 ### 15.3 Exercises
 
@@ -873,7 +873,7 @@ In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we found t
 1. [Moral-Benito, E. (2012). Determinants of Economic Growth: A Bayesian Panel Data Approach. *Review of Economics and Statistics*, 94(2), 566--579.](https://doi.org/10.1162/REST_a_00154)
 2. [Moral-Benito, E. (2013). Likelihood-Based Estimation of Dynamic Panels with Predetermined Regressors. *Journal of Business and Economic Statistics*, 31(4), 451--472.](https://doi.org/10.1080/07350015.2013.818003)
 3. [Moral-Benito, E. (2016). Growth Empirics in Panel Data Under Model Uncertainty and Weak Exogeneity. *Journal of Applied Econometrics*, 31(3), 582--602.](https://doi.org/10.1002/jae.2429)
-4. [Wyszynski, M., Beck, K., and Dubel, M. (2025). bdsm: Bayesian Dynamic Systems Modeling. R package version 0.3.0. CRAN.](https://cran.r-project.org/web/packages/bdsm/index.html)
+4. [Wyszynski, M., Beck, K., and Dubel, M. (2025). Bayesian Dynamic Systems Modeling. R package version 0.3.0. CRAN.](https://cran.r-project.org/web/packages/bdsm/index.html)
 5. [Sala-i-Martin, X., Doppelhofer, G., and Miller, R.I. (2004). Determinants of Long-Term Growth: A Bayesian Averaging of Classical Estimates (BACE) Approach. *American Economic Review*, 94(4), 813--835.](https://doi.org/10.1257/0002828042002570)
 6. [Fernandez, C., Ley, E., and Steel, M.F.J. (2001). Model Uncertainty in Cross-Country Growth Regressions. *Journal of Applied Econometrics*, 16(5), 563--576.](https://doi.org/10.1002/jae.623)
 7. [Doppelhofer, G. and Weeks, M. (2009). Jointness of Growth Determinants. *Journal of Applied Econometrics*, 24(2), 209--244.](https://doi.org/10.1002/jae.1046)
