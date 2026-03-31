@@ -54,14 +54,7 @@ This tutorial introduces the [Bayesian Dynamic Systems Modeling](https://cran.r-
 
 The tutorial proceeds in two stages. First, a **warm-up** with only 3 regressors and 8 models to build intuition for the workflow. Then the **full analysis** with all 9 regressors and 512 models, including sensitivity analysis and jointness.
 
-| Step | What | Why |
-|:----:|------|-----|
-| **1. Data Prep** | Lag DV, demean, standardize | Remove fixed effects, ensure comparability |
-| **2. Model Space** | Estimate all 2<sup>K</sup> models | Compute marginal likelihood for each specification |
-| **3. BMA** | PIPs, posterior means, model probs | Weight models by data fit |
-| **4. Sensitivity** | Vary priors, EMS, dilution | Check if findings depend on assumptions |
-| **5. Jointness** | Complements vs. substitutes | Discover regressor relationships |
-| **6. Findings** | Robust growth determinants | Answer the case study question |
+**Data Prep** (lag DV, demean, standardize) **&rarr; Model Space** (estimate all 2<sup>K</sup> models) **&rarr; BMA** (PIPs, posterior means) **&rarr; Sensitivity** (vary priors, EMS, dilution) **&rarr; Jointness** (complements vs. substitutes) **&rarr; Findings** (robust growth determinants)
 
 ---
 
@@ -113,15 +106,7 @@ The key assumption is **weak exogeneity**: current regressors can be correlated 
 
 ### 3.3 From cross-sectional to dynamic panel BMA
 
-The comparison between the two approaches:
-
-| Feature | Cross-Sectional BMA | Dynamic Panel BMA |
-|---------|:-------------------:|:-----------------:|
-| Time dimension | Single snapshot | Multiple periods |
-| Exogeneity | Strict (assumed) | Weak (allowed) |
-| Lagged DV | Not included | Included |
-| Fixed effects | None | Entity + time |
-| **Model uncertainty** | **Addressed** | **Addressed** |
+**Cross-sectional BMA** uses a single time snapshot, assumes strict exogeneity, includes no lagged dependent variable, and has no fixed effects. **Dynamic panel BMA** uses multiple time periods, requires only weak exogeneity, includes a lagged dependent variable, and controls for entity and time fixed effects. Both approaches address model uncertainty by averaging across all possible model specifications.
 
 In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we averaged across 4,096 models of CO<sub>2</sub> emissions using synthetic data. Here we apply the same BMA principle --- weighting models by how well they fit the data --- but to a panel of 73 countries over four decades, using the methodology that handles the endogeneity that cross-sectional BMA cannot.
 
