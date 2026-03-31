@@ -672,7 +672,7 @@ Why does DSL not match BMA's accuracy here? In panel data settings where FE dumm
 
 BMA and Kitchen-Sink FE produce estimates closest to the true DGP values. DSL falls between the sparse and kitchen-sink specifications, reflecting the partial selection of candidate controls alongside the FE dummies. All four methods recover the inverted-N sign pattern.
 
-### 7.1b Uncertainty: confidence and credible intervals
+### 7.2 Uncertainty: confidence and credible intervals
 
 Point estimates tell only half the story. How *uncertain* is each method, and does the interval actually contain the truth? The table below shows 95% confidence intervals (for the frequentist methods) and approximate 95% credible intervals (for BMA, computed as posterior mean $\pm$ 2 posterior SD). The last column checks whether the true DGP value falls inside the interval.
 
@@ -692,7 +692,7 @@ All four methods produce intervals that contain the true parameter values for al
 
 **Coverage is not guaranteed in practice.** In this simulation, all intervals cover the truth. But with real data, the true DGP is unknown, and 95% coverage is only an *average* property. BMA's credible intervals have a different interpretation from frequentist confidence intervals: a 95% BMA credible interval says "given the data and priors, there is a 95% posterior probability the true coefficient lies in this range," while a 95% confidence interval says "if we repeated this procedure many times, 95% of the intervals would contain the truth."
 
-### 7.2 Predicted EKC curves
+### 7.3 Predicted EKC curves
 
 The curves are normalized to zero at the sample-mean GDP so both methods are directly comparable:
 
@@ -733,7 +733,7 @@ twoway ///
 
 Both curves trace a clear inverted-N: CO<sub>2</sub> falls at low incomes, rises through industrialization, and falls again at high incomes. The BMA curve (solid blue) and DSL curve (dashed orange) are nearly indistinguishable, with turning points closely aligned. The normalization at mean GDP makes the shape immediately visible --- a major improvement over plotting raw cubic components that would sit at different y-levels.
 
-### 7.3 Answer key: grading the methods
+### 7.4 Answer key: grading the methods
 
 The ultimate test: do BMA and DSL correctly identify the 5 true predictors and reject the 7 noise variables?
 
