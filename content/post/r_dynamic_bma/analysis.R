@@ -3,7 +3,11 @@
 # Standalone R script for carlos-mendez.org
 # ============================================================
 #
-# This script generates all figures and output for the blog post.
+# Reproduces the full analysis from the blog post:
+#   PART 1 — Full BMA analysis (9 regressors, 512 models)
+#   PART 2 — Benchmark fixed effects regression
+#   PART 3 — Custom dark-theme ggplot visualizations
+#
 # Run: Rscript analysis.R
 # Output: PNG files in the current directory
 # ============================================================
@@ -12,7 +16,8 @@
 required_packages <- c(
   "bdsm",       # Bayesian Dynamic Systems Modeling
   "tidyverse",  # data manipulation and visualization
-  "parallel"    # parallel computing for model space estimation
+  "parallel",   # parallel computing for model space estimation
+  "scales"      # number formatting for ggplot axes
 )
 
 missing <- required_packages[!sapply(required_packages, requireNamespace, quietly = TRUE)]
@@ -23,72 +28,20 @@ if (length(missing) > 0) {
 library(bdsm)
 library(tidyverse)
 library(parallel)
+library(scales)
 
 set.seed(42)
 
 
 # ============================================================
-# PART 1: WARM-UP WITH A SMALL MODEL SPACE
-# ============================================================
-
-cat("\n========================================\n")
-cat("PART 1: WARM-UP (3 Regressors, 8 Models)\n")
-cat("========================================\n")
-
-# Use the precomputed small_model_space (ish, sed, pgrw only)
-data("economic_growth")
-data("small_model_space")
-
-# Prepare data subset matching the 3 regressors
-data_small <- economic_growth %>%
-  select(year, country, gdp, ish, sed, pgrw)
-
-data_small_std <- feature_standardization(
-  df = data_small,
-  excluded_cols = c(country, year, gdp)
-)
-
-data_small_prep <- feature_standardization(
-  df = data_small_std,
-  group_by_col = year,
-  excluded_cols = country,
-  scale = FALSE
-)
-
-cat("Small model space: 3 regressors -> 2^3 = 8 models\n")
-cat("Regressors: ish (investment share), sed (education), pgrw (population growth)\n")
-
-bma_small <- bma(small_model_space, df = data_small_prep, round = 3)
-cat("\n=== Small BMA Results (Binomial) ===\n")
-print(bma_small[[1]])
-cat("\n=== Small BMA Results (Binomial-Beta) ===\n")
-print(bma_small[[2]])
-cat("\nExpected model sizes:\n")
-print(bma_small[[16]])
-
-# Visualize small model space
-png("r_bdsm_01_small_pmp.png", width = 800, height = 500, res = 100)
-pmp_small <- model_pmp(bma_small)
-print(pmp_small[[3]])
-dev.off()
-
-png("r_bdsm_02_small_sizes.png", width = 800, height = 500, res = 100)
-sizes_small <- model_sizes(bma_small)
-print(sizes_small[[3]])
-dev.off()
-
-cat("Small model space plots saved.\n")
-
-
-# ============================================================
-# PART 2: FULL ANALYSIS - ECONOMIC GROWTH
+# PART 1: FULL ANALYSIS - ECONOMIC GROWTH
 # ============================================================
 
 cat("\n\n========================================\n")
-cat("PART 2: FULL ANALYSIS (9 Regressors, 512 Models)\n")
+cat("PART 1: FULL ANALYSIS (9 Regressors, 512 Models)\n")
 cat("========================================\n")
 
-# --- 2.1 Load data ---
+# --- 1.1 Load data ---
 data("economic_growth")
 data("original_economic_growth")
 data("full_model_space")
@@ -108,7 +61,7 @@ print(head(original_economic_growth, 8))
 cat("\n=== Summary statistics (excluding initial period NAs) ===\n")
 print(summary(original_economic_growth))
 
-# --- 2.2 Data preparation ---
+# --- 1.2 Data preparation ---
 cat("\n--- Data Preparation ---\n")
 
 # Demonstrate join_lagged_col
@@ -145,7 +98,7 @@ data_prepared <- feature_standardization(
 cat("\nAfter demeaning by year (first 6 rows):\n")
 print(head(data_prepared, 6))
 
-# --- 2.3 Model space ---
+# --- 1.3 Model space ---
 cat("\n--- Model Space (Precomputed) ---\n")
 cat("Parameters matrix:", dim(full_model_space$params), "\n")
 cat("Statistics matrix:", dim(full_model_space$stats), "\n")
@@ -154,7 +107,7 @@ cat("Number of models: 2^9 =", ncol(full_model_space$params), "\n")
 cat("\nFirst 5 parameter rows, first 3 columns:\n")
 print(full_model_space$params[1:5, 1:3])
 
-# --- 2.4 BMA with default prior ---
+# --- 1.4 BMA with default prior ---
 cat("\n--- Bayesian Model Averaging (EMS = 4.5) ---\n")
 bma_results <- bma(full_model_space, df = data_prepared, round = 3)
 
@@ -167,7 +120,7 @@ print(bma_results[[2]])
 cat("\nExpected model sizes:\n")
 print(bma_results[[16]])
 
-# --- 2.5 Visualize model probabilities ---
+# --- 1.5 Visualize model probabilities ---
 cat("\n--- Model Probabilities ---\n")
 
 png("r_bdsm_03_model_pmp_combined.png", width = 800, height = 500, res = 100)
@@ -182,7 +135,7 @@ dev.off()
 
 cat("Model probability and size plots saved.\n")
 
-# --- 2.6 Best models ---
+# --- 1.6 Best models ---
 cat("\n--- Best Models ---\n")
 
 best8 <- best_models(bma_results, criterion = 1, best = 8)
@@ -197,16 +150,12 @@ print(best8[[5]])
 
 cat("Best model plots saved.\n")
 
-# --- 2.7 Coefficient distributions ---
+# --- 1.7 Coefficient distributions ---
 cat("\n--- Coefficient Distributions ---\n")
 
 coef_plots <- coef_hist(bma_results)
 
-# Save histograms for key variables
-png("r_bdsm_08_coef_hist_gdplag.png", width = 700, height = 450, res = 100)
-print(coef_plots[[1]])
-dev.off()
-
+# Save histogram for key variable
 png("r_bdsm_09_coef_hist_pop.png", width = 700, height = 450, res = 100)
 print(coef_plots[[5]])
 dev.off()
@@ -215,7 +164,7 @@ dev.off()
 
 cat("Coefficient distribution plots saved.\n")
 
-# --- 2.8 Sensitivity to prior specification ---
+# --- 1.8 Sensitivity to prior specification ---
 cat("\n--- Prior Sensitivity Analysis ---\n")
 
 # EMS = 2 (small models)
@@ -253,7 +202,7 @@ print(bma_dil2[[1]])
 
 cat("Prior sensitivity plots saved.\n")
 
-# --- 2.9 Jointness analysis ---
+# --- 1.9 Jointness analysis ---
 cat("\n--- Jointness Analysis ---\n")
 
 cat("\n=== Jointness (HCGHM, default) ===\n")
@@ -270,11 +219,11 @@ print(j_dw)
 
 
 # ============================================================
-# PART 3: BENCHMARK - STANDARD FIXED EFFECTS MODEL
+# PART 2: BENCHMARK - STANDARD FIXED EFFECTS MODEL
 # ============================================================
 
 cat("\n\n========================================\n")
-cat("PART 3: BENCHMARK FIXED EFFECTS MODEL\n")
+cat("PART 2: BENCHMARK FIXED EFFECTS MODEL\n")
 cat("========================================\n")
 
 # Estimate a standard FE regression with ALL 9 regressors (kitchen-sink)
@@ -302,14 +251,12 @@ cat("N observations:", nobs(fe_full), "\n")
 
 
 # ============================================================
-# PART 4: CUSTOM GGPLOT VISUALIZATIONS (DARK THEME)
+# PART 3: CUSTOM GGPLOT VISUALIZATIONS (DARK THEME)
 # ============================================================
 
 cat("\n\n========================================\n")
-cat("PART 4: CUSTOM GGPLOT VISUALIZATIONS\n")
+cat("PART 3: CUSTOM GGPLOT VISUALIZATIONS\n")
 cat("========================================\n")
-
-library(scales)
 
 # --- Site color palette ---
 STEEL_BLUE   <- "#6a9bcc"
