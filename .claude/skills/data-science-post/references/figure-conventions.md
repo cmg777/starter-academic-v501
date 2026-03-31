@@ -100,6 +100,20 @@ at least one diagram to visualize the structure. Examples: a DAG for
 causal inference, a flowchart for a multi-step pipeline, an architecture
 diagram for an ensemble model.
 
+**Placement rules for Mermaid diagrams:**
+
+1. Every Mermaid diagram MUST have an explanatory paragraph immediately
+   before it (introducing what the diagram shows) AND an explanatory
+   paragraph immediately after it (interpreting the diagram and connecting
+   it to the narrative). No "orphan" diagrams without surrounding text.
+2. If a Mermaid diagram serves as a methodological overview/roadmap, place
+   it at the END of the Overview/Introduction section (after learning
+   objectives), not in the middle of the section.
+3. The pre-diagram paragraph should tell the reader what the diagram
+   represents (e.g., "The following diagram summarizes the four-step
+   algorithm:"). The post-diagram paragraph should explain the key
+   takeaway or connect the diagram to the case study question.
+
 **Options for diagrams:**
 
 - **Mermaid diagrams** (preferred for flowcharts and DAGs) -- Hugo supports

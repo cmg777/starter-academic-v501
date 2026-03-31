@@ -269,6 +269,11 @@ If the post contains Mermaid code blocks:
 - [ ] Unobserved/latent variables use dashed borders (`stroke-dasharray: 5 5`)
       per the convention established in `python_partial_identification`
 - [ ] Diagrams are properly closed (matching ``` fences)
+- [ ] Every Mermaid diagram has an explanatory paragraph immediately before it
+      (introducing what the diagram shows) AND immediately after it (interpreting
+      the diagram). No "orphan" diagrams without surrounding prose.
+- [ ] Overview/roadmap diagrams are placed at the END of the Overview section
+      (after learning objectives), not in the middle
 
 If no Mermaid blocks exist, mark this step as N/A.
 

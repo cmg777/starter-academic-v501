@@ -54,20 +54,6 @@ Testing for this shape requires a cubic polynomial in GDP per capita --- and bey
 
 This tutorial introduces two principled solutions:
 
-```mermaid
-graph LR
-    A["<b>EDA</b><br/>Scatter plot"] --> B["<b>Baseline FE</b><br/>Standard panel<br/>regressions"]
-    B --> C["<b>BMA</b><br/>Bayesian Model<br/>Averaging"]
-    C --> D["<b>DSL</b><br/>Double-Selection<br/>LASSO"]
-    D --> E["<b>Comparison</b><br/>Check against<br/>answer key"]
-
-    style A fill:#141413,stroke:#141413,color:#fff
-    style B fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#d97757,stroke:#141413,color:#fff
-    style D fill:#00d4c8,stroke:#141413,color:#141413
-    style E fill:#1a3a8a,stroke:#141413,color:#fff
-```
-
 1. **Bayesian Model Averaging (BMA)** estimates thousands of models and averages the results, weighting each by how well it fits the data. Each variable gets a **Posterior Inclusion Probability (PIP)** --- the fraction of high-quality models that include it.
 
 2. **Post-Double-Selection LASSO (DSL)** uses LASSO to automatically select which controls matter --- once for the outcome, once for each variable of interest --- then runs OLS with the union of all selected controls. This "select, then regress" approach protects against omitted variable bias.
@@ -83,6 +69,22 @@ We use **synthetic panel data** with a known "answer key" --- we designed the da
 - Implement BMA with `bmaregress` and interpret PIPs and coefficient densities
 - Implement post-double-selection LASSO with `dsregress` and understand its four-step algorithm: LASSO on outcome, LASSO on each variable of interest, union, then OLS
 - Evaluate both methods against a known ground truth to assess their accuracy
+
+The following diagram summarizes the methodological sequence of this tutorial. We begin with exploratory data analysis to visualize the raw income--pollution relationship, then estimate baseline fixed effects regressions to expose the model uncertainty problem. Next, we apply BMA and DSL as two alternative solutions, and finally compare both methods against the known answer key.
+
+```mermaid
+graph LR
+    A["<b>EDA</b><br/>Scatter plot"] --> B["<b>Baseline FE</b><br/>Standard panel<br/>regressions"]
+    B --> C["<b>BMA</b><br/>Bayesian Model<br/>Averaging"]
+    C --> D["<b>DSL</b><br/>Double-Selection<br/>LASSO"]
+    D --> E["<b>Comparison</b><br/>Check against<br/>answer key"]
+
+    style A fill:#141413,stroke:#141413,color:#fff
+    style B fill:#6a9bcc,stroke:#141413,color:#fff
+    style C fill:#d97757,stroke:#141413,color:#fff
+    style D fill:#00d4c8,stroke:#141413,color:#141413
+    style E fill:#1a3a8a,stroke:#141413,color:#fff
+```
 
 ## 2. Setup and Synthetic Data
 
@@ -193,7 +195,7 @@ twoway (scatter $outcome ln_gdp, ///
 
 ![Scatter plot of log CO2 per capita versus log GDP per capita for 80 synthetic countries. The cloud of points shows a clear nonlinear pattern consistent with the inverted-N EKC shape.](stata_bma_dsl_fig1_scatter.png)
 
-The scatter reveals a distinctly nonlinear pattern. At low income levels, CO<sub>2</sub> emissions increase steeply with GDP. At higher income levels, the relationship flattens and bends. This curvature motivates the cubic EKC specification.
+The scatter reveals a distinctly nonlinear pattern. At low income levels, CO<sub>2</sub> emissions increase steeply with GDP. At higher income levels, the relationship flattens and bends. This curvature motivates the cubic EKC specification. The diagram below shows the two competing EKC shapes --- the classic inverted-U (quadratic) and the more complex inverted-N (cubic) with its three distinct phases:
 
 ```mermaid
 graph TD
@@ -236,11 +238,11 @@ Number of clusters (country_id) =         80
                             (Std. err. adjusted for 80 clusters in country_id)
 ------------------------------------------------------------------------------
              |               Robust
-      ln_co2 | Coefficient  std. err.      t    P>|t|
+      ln_co2 | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      ln_gdp |  -7.498046   1.623988    -4.62   0.000
-   ln_gdp_sq |    .848967   .1704533     4.98   0.000
-   ln_gdp_cb |  -.0314993    .005931    -5.31   0.000
+      ln_gdp |  -7.498046   1.623988    -4.62   0.000    -10.73051    -4.26558
+   ln_gdp_sq |    .848967   .1704533     4.98   0.000     .5096881    1.188246
+   ln_gdp_cb |  -.0314993    .005931    -5.31   0.000    -.0433047    -.019694
 ------------------------------------------------------------------------------
 ```
 
@@ -262,23 +264,23 @@ Number of clusters (country_id) =         80
                             (Std. err. adjusted for 80 clusters in country_id)
 ------------------------------------------------------------------------------
              |               Robust
-      ln_co2 | Coefficient  std. err.      t    P>|t|
+      ln_co2 | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      ln_gdp |  -7.130693   1.562581    -4.56   0.000
-   ln_gdp_sq |   .8059928   .1647973     4.89   0.000
-   ln_gdp_cb |  -.0298133   .0057365    -5.20   0.000
- fossil_fuel |   .0138444   .0014853     9.32   0.000
-   renewable |   -.006795   .0019322    -3.52   0.001
-       urban |   .0057534   .0021432     2.68   0.009
-globalizat~n |   .0015186   .0012832     1.18   0.240
- pop_density |   .0000794   .0002303     0.34   0.731
-   democracy |  -.0002971    .007735    -0.04   0.969
-  corruption |   .0009812   .0008415     1.17   0.247
-    industry |   .0086336   .0017848     4.84   0.000
-    services |  -.0005642   .0017205    -0.33   0.744
-       trade |  -.0002458   .0007695    -0.32   0.750
-         fdi |  -.0017599   .0019509    -0.90   0.370
-      credit |    -.00139   .0007516    -1.85   0.068
+      ln_gdp |  -7.130693   1.562581    -4.56   0.000    -10.24093   -4.020453
+   ln_gdp_sq |   .8059928   .1647973     4.89   0.000      .477972    1.134014
+   ln_gdp_cb |  -.0298133   .0057365    -5.20   0.000    -.0412314   -.0183951
+ fossil_fuel |   .0138444   .0014853     9.32   0.000      .010888    .0168008
+   renewable |   -.006795   .0019322    -3.52   0.001    -.0106409   -.0029491
+       urban |   .0057534   .0021432     2.68   0.009     .0014875    .0100192
+globalizat~n |   .0015186   .0012832     1.18   0.240    -.0010357    .0040728
+ pop_density |   .0000794   .0002303     0.34   0.731     -.000379    .0005378
+   democracy |  -.0002971    .007735    -0.04   0.969    -.0156933    .0150991
+  corruption |   .0009812   .0008415     1.17   0.247    -.0006936    .0026561
+    industry |   .0086336   .0017848     4.84   0.000     .0050811    .0121861
+    services |  -.0005642   .0017205    -0.33   0.744    -.0039889    .0028604
+       trade |  -.0002458   .0007695    -0.32   0.750    -.0017774    .0012858
+         fdi |  -.0017599   .0019509    -0.90   0.370     -.005643    .0021232
+      credit |    -.00139   .0007516    -1.85   0.068     -.002886    .0001061
 ------------------------------------------------------------------------------
 ```
 
