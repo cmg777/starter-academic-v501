@@ -54,9 +54,8 @@ This tutorial introduces the [Bayesian Dynamic Systems Modeling](https://cran.r-
 
 The tutorial proceeds in two stages. First, a **warm-up** with only 3 regressors and 8 models to build intuition for the workflow. Then the **full analysis** with all 9 regressors and 512 models, including sensitivity analysis and jointness.
 
-**Data Prep** (lag DV, demean, standardize) **&rarr; Model Space** (estimate all 2<sup>K</sup> models) **&rarr; BMA** (PIPs, posterior means) **&rarr; Sensitivity** (vary priors, EMS, dilution) **&rarr; Jointness** (complements vs. substitutes) **&rarr; Findings** (robust growth determinants)
-
----
+**Data Prep** (lag DV, demean, standardize) **&rarr; Model Space** (estimate all 2<sup>K</sup> models)
+**&rarr; BMA** (PIPs, posterior means) **&rarr; Sensitivity** (vary priors, EMS, dilution) **&rarr; Jointness** (complements vs. substitutes) **&rarr; Findings** (robust growth determinants)
 
 ## 2. Setup
 
@@ -76,8 +75,6 @@ library(parallel)
 set.seed(42)
 ```
 
----
-
 ## 3. Why Dynamic Panel BMA?
 
 ### 3.1 The endogeneity problem
@@ -88,15 +85,31 @@ Think of it this way: imagine judging a runner's training program by their final
 
 When BMA is applied to cross-sectional data with endogenous regressors, it can confidently assign high inclusion probabilities to variables that appear important only because they are *consequences* of growth rather than *causes* of it. The model averaging machinery works perfectly --- but the individual models it averages over are biased.
 
-### 3.2 The dynamic panel solution
+### 3.2 From the Solow model to a dynamic equation
 
-The Bayesian DSM package addresses this by estimating a **dynamic panel model**:
+Why does a dynamic equation --- one with lagged GDP on the right-hand side --- arise naturally in growth economics? The answer comes from the **Solow growth model** and its convergence prediction.
 
-$$y\_{it} = \alpha \cdot y\_{it-1} + \beta' x\_{it} + \eta\_i + \zeta\_t + v\_{it}$$
+The Solow model predicts that poorer countries should grow faster than richer ones, conditional on their structural characteristics. This is called **beta convergence**. Mathematically, the model implies that around the steady state, log GDP per capita evolves according to (Barro and Sala-i-Martin, 2004):
 
-In words, this equation says that a country's GDP in period $t$ depends on its GDP in the previous period ($y\_{it-1}$), a set of candidate growth determinants ($x\_{it}$), a country-specific fixed effect ($\eta\_i$), a time-specific shock ($\zeta\_t$), and an idiosyncratic error ($v\_{it}$).
+$$\ln y\_{it} = (1 - e^{-\lambda \tau}) \ln y^*\_i + e^{-\lambda \tau} \ln y\_{i,t-1}$$
 
-Each component plays a distinct role:
+In words, a country's current GDP ($\ln y\_{it}$) is a weighted average of two forces: its long-run steady-state level ($\ln y^*\_i$), determined by fundamentals like savings and technology, and its GDP in the previous period ($\ln y\_{i,t-1}$), which captures where the country currently stands. The parameter $\lambda$ is the **speed of convergence** --- how fast countries close the gap to their steady state --- and $\tau$ is the time between observations (10 years in our data).
+
+Now define $\alpha = e^{-\lambda \tau}$. The convergence equation becomes:
+
+$$\ln y\_{it} = \alpha \ln y\_{i,t-1} + (1 - \alpha) \ln y^*\_i$$
+
+This is already a dynamic equation --- current GDP depends on lagged GDP. The next step is to recognize that the steady state $\ln y^*\_i$ is not observed directly. Instead, it depends on country characteristics such as investment rates, education, trade openness, and institutional quality. Writing these as $\beta' x\_{it}$, and adding country fixed effects ($\eta\_i$) for unobserved fundamentals, time effects ($\zeta\_t$) for global shocks, and an error term ($v\_{it}$), we arrive at:
+
+$$\ln y\_{it} = \alpha \ln y\_{i,t-1} + \beta' x\_{it} + \eta\_i + \zeta\_t + v\_{it}$$
+
+This is the **dynamic panel model** that the Bayesian DSM package estimates. The coefficient $\alpha$ has a direct economic interpretation: it measures the **persistence of GDP** across periods. A value of $\alpha$ close to 1 means slow convergence --- countries stay near their current income level for a long time. A value close to 0 means fast convergence --- countries quickly reach their steady state. Our BMA results will reveal $\alpha \approx 0.92$, indicating very slow convergence: after a decade, countries have closed only about 8% of the gap between their current GDP and their steady state.
+
+The key insight is that the lagged dependent variable is not an ad hoc addition --- it arises directly from the Solow model's convergence prediction. Any study of growth determinants that omits lagged GDP is implicitly assuming $\alpha = 0$, which means assuming *instantaneous convergence* --- a prediction strongly rejected by the data.
+
+### 3.3 Weak exogeneity and the role of each component
+
+Each component of the dynamic panel equation plays a distinct role:
 
 - **Lagged dependent variable** ($y\_{it-1}$): Think of this as a student's previous exam score --- it captures all the accumulated history that got a country to its current level. After controlling for where a country *was*, we can ask: among countries at the same starting point, which factors predict who grows faster?
 - **Entity fixed effects** ($\eta\_i$): Like grading on a curve within each classroom --- these absorb time-invariant country traits such as geography, colonial history, and institutional heritage. We compare each country to its own average, not to other countries.
@@ -104,13 +117,13 @@ Each component plays a distinct role:
 
 The key assumption is **weak exogeneity**: current regressors can be correlated with *past* shocks but not with the *current* shock $v\_{it}$. This is much weaker than strict exogeneity --- it allows past GDP growth to influence current investment (feedback effects) while requiring only that the current unexpected shock to GDP does not simultaneously cause changes in investment. In practical terms, weak exogeneity permits the realistic feedback loops that plague growth regressions while still allowing consistent estimation.
 
-### 3.3 From cross-sectional to dynamic panel BMA
+A concrete example helps clarify this. Suppose an oil price shock in 1985 affects both GDP and trade openness simultaneously. Weak exogeneity allows this kind of contemporaneous correlation between regressors and the fixed effects. What it rules out is that the *unexplained* part of today's GDP shock --- the idiosyncratic error $v\_{it}$ --- directly causes today's investment to change within the same period.
+
+### 3.4 From cross-sectional to dynamic panel BMA
 
 **Cross-sectional BMA** uses a single time snapshot, assumes strict exogeneity, includes no lagged dependent variable, and has no fixed effects. **Dynamic panel BMA** uses multiple time periods, requires only weak exogeneity, includes a lagged dependent variable, and controls for entity and time fixed effects. Both approaches address model uncertainty by averaging across all possible model specifications.
 
 In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we averaged across 4,096 models of CO<sub>2</sub> emissions using synthetic data. Here we apply the same BMA principle --- weighting models by how well they fit the data --- but to a panel of 73 countries over four decades, using the methodology that handles the endogeneity that cross-sectional BMA cannot.
-
----
 
 ## 4. Warm-Up: BMA with 3 Regressors
 
@@ -150,7 +163,9 @@ sed     0.712 -0.051 0.067 0.137 -0.072  0.069   0.158    0
 pgrw    0.657 -0.014 0.035 0.077 -0.021  0.042   0.094    0
 ```
 
-Even with only 8 models to average over, the BMA results are informative. The lagged dependent variable (`gdp_lag`) is included in every model by construction, with a posterior mean of 1.081 --- indicating strong persistence in GDP levels across decades. Investment share (`ish`) has PIP = 0.720 and a positive posterior mean of 0.085, suggesting moderate evidence that higher investment drives growth. Secondary education (`sed`) has PIP = 0.712 but a negative sign, which is surprising --- we will revisit this when we include all 9 regressors. Population growth (`pgrw`) shows the weakest evidence at PIP = 0.657 with a near-zero posterior mean of --0.014.
+Even with only 8 models to average over, the BMA results are informative. The lagged dependent variable (`gdp_lag`) is included in every model by construction, with a posterior mean of 1.081 --- indicating strong persistence in GDP levels across decades.
+
+Investment share (`ish`) has PIP = 0.720 and a positive posterior mean of 0.085, suggesting moderate evidence that higher investment drives growth. Secondary education (`sed`) has PIP = 0.712 but a negative sign, which is surprising --- we will revisit this when we include all 9 regressors. Population growth (`pgrw`) shows the weakest evidence at PIP = 0.657 with a near-zero posterior mean of --0.014.
 
 Let us visualize the prior and posterior model probabilities to see how the data reshapes our beliefs about which models are best.
 
@@ -171,8 +186,6 @@ sizes_small <- model_sizes(bma_small)
 ![Prior and posterior distribution over model sizes for the warm-up.](r_bdsm_02_small_sizes.png)
 
 The posterior favors models with 2 regressors (plus the lagged DV), matching the posterior expected model size of 2.09. This makes sense: with only 3 candidates and moderate PIPs for each, the data supports including about two of the three variables. Now let us scale up to the full model space.
-
----
 
 ## 5. The Dataset
 
@@ -252,8 +265,6 @@ summary(original_economic_growth)
 
 The 292 usable observations span 73 countries over four decades. Log GDP per capita ranges from 6.02 to 10.45, reflecting substantial income inequality --- the richest country is roughly 80 times wealthier than the poorest in per capita terms. Investment share averages 16.9% of GDP but ranges from 1.2% to 65.3%, indicating enormous variation in capital accumulation across countries and decades. Population growth averages 1.9% per decade, with one country experiencing slight population decline (--0.6%).
 
----
-
 ## 6. Data Preparation
 
 The Bayesian DSM package requires two data preprocessing steps before estimation: standardization (scaling) and demeaning (removing entity and time fixed effects). These steps ensure numerical stability and allow the model to focus on within-country, within-period variation.
@@ -318,8 +329,6 @@ head(data_prepared, 5)
 
 After preparation, all regressor values are centered around zero. Country 1's investment share (`ish`) was 0.49 standard deviations below the global average in 1970 but 0.46 standard deviations above average in 1990, showing meaningful within-country variation over time. The GDP column retains its original scale because it is the dependent variable.
 
----
-
 ## 7. Estimating the Full Model Space
 
 With 9 candidate regressors, there are $2^9 = 512$ possible regression models. The package estimates every single one via numerical optimization of the *marginal likelihood* --- the probability of observing the data given a particular model, after integrating out all parameter uncertainty. Think of this as a cooking competition with 512 recipes --- each uses a different combination of 9 ingredients, and the marginal likelihood scores each recipe by balancing flavor (fit) against unnecessary complexity (overfitting).
@@ -350,7 +359,9 @@ Statistics matrix: 22 512
 
 The result is a list with two elements. The `$params` matrix contains 106 estimated parameters for each of the 512 models --- these include the structural parameters ($\alpha$, $\beta$), reduced-form parameters, and variance components. The `$stats` matrix stores 22 statistics per model, including the log-likelihood, BIC, regular standard errors, and robust (heteroskedasticity-consistent) standard errors.
 
----
+Why use marginal likelihood instead of R-squared? Unlike R-squared, which always improves when you add variables, the marginal likelihood penalizes complexity. It accounts for the fact that more parameters make it easier to fit noise. A model with 9 regressors that barely improves fit over a 5-regressor model will receive a *lower* marginal likelihood score --- the extra parameters were not worth the complexity cost.
+
+Before jumping into BMA, let us first establish a benchmark using a standard regression approach --- this will help us appreciate what BMA adds.
 
 ## 8. Benchmark: Kitchen-Sink Fixed Effects
 
@@ -388,13 +399,17 @@ The kitchen-sink model finds 6 of 10 variables significant at the 5% level: lagg
 
 The lagged GDP coefficient of 0.619 is notably lower than the BMA posterior mean (0.919), suggesting that the kitchen-sink model's coefficient estimates are pulled by multicollinearity among the 9 regressors. BMA handles this by averaging over specifications that include different subsets.
 
----
+Notice how the FE model forces a binary judgment: education is 'insignificant' (p = 0.63) and trade is 'significant' (p = 0.002). BMA replaces this all-or-nothing verdict with a nuanced probability scale: education has PIP = 0.72 (moderate evidence) and trade has PIP = 0.77 (positive evidence). The difference between 'insignificant' and 'moderate evidence' matters for policy --- a policymaker who ignores education entirely because of a p-value threshold may be discarding useful information.
+
+With this benchmark in mind, let us now see what BMA reveals when it averages across all 512 model specifications.
 
 ## 9. Bayesian Model Averaging
 
 ### 9.1 Running BMA
 
 Now we can perform Bayesian Model Averaging across all 512 models. The [`bma()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function takes the precomputed model space and the prepared data, weights each model by its posterior probability, and computes weighted averages of the coefficients:
+
+*Focus on two columns: **PIP** (how important is this variable?) and **%(+)** (is its effect consistently positive or negative?).*
 
 ```r
 bma_results <- bma(full_model_space, df = data_prepared, round = 3)
@@ -439,6 +454,8 @@ $$\mathbb{P}(M\_j | \text{data}) = \frac{\exp(-\frac{1}{2} BIC\_j) \cdot \mathbb
 
 In words, this equation says that each model's posterior probability is its prior probability times a data-fit term (approximated by the BIC), divided by the sum across all $2^K$ models to ensure the probabilities add to 1. Models that fit the data well without too many parameters receive higher posterior probability. The PIP for a variable is then the sum of PMPs across all models that include it.
 
+To make this concrete: if model A has BIC = --800 and model B has BIC = --790, model A fits the data better. After exponentiating and normalizing, model A might receive 73% of the posterior probability while model B gets 27%. The PIP of a variable included only in model A would then be at least 0.73.
+
 The **PSDR** (or equivalently |PM/PSD|) is a key robustness criterion. Raftery (1995) considers a variable *robust* when |PM/PSD| > 1. More stringent thresholds include |PM/PSD| > 1.3 (Masanjala and Papageorgiou, 2008) and |PM/PSD| > 2 (Sala-i-Martin et al., 2004).
 
 ### 9.3 Interpreting PIPs with Raftery's classification
@@ -462,8 +479,6 @@ The following chart visualizes the PIPs with color-coded evidence tiers:
 
 Population dominates the chart at PIP = 0.990, followed by life expectancy at 0.864. Five variables clear the 0.75 "positive evidence" threshold, while the remaining four --- democracy, education, population growth, and investment price --- fall in the "moderate" zone between 0.50 and 0.75. Compared to the kitchen-sink benchmark where 6 of 10 variables were significant at 5%, BMA paints a more nuanced picture: it grades each variable on a continuous scale of importance rather than imposing a binary significant/insignificant cutoff.
 
----
-
 ## 10. Visualizing Model Probabilities
 
 ### 10.1 Prior versus posterior model probabilities
@@ -478,16 +493,6 @@ pmp_plots <- model_pmp(bma_results)
 
 The prior (dashed line) is relatively flat, reflecting the uniform prior assumption. The posterior (solid line) concentrates dramatically: a handful of models capture the bulk of the posterior mass, while most models receive negligible probability. This concentration is the signature of informative data --- the 73-country, 4-decade panel provides enough information to strongly favor certain model specifications.
 
-Zooming in on the top 10 models:
-
-```r
-pmp_top <- model_pmp(bma_results, top = 10)
-```
-
-![Prior and posterior model probabilities for the top 10 models.](r_bdsm_04_model_pmp_top10.png)
-
-The best model (which includes all 9 regressors) receives 8.9% of posterior probability. The top 10 models together account for roughly 38% of the total, leaving the remaining 502 models to share 62%. This tells us that while the full model is favored, there is substantial model uncertainty --- no single specification dominates.
-
 ### 10.2 Model sizes
 
 The [`model_sizes()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_vignette.Rnw) function shows the distribution of prior and posterior probabilities across model sizes (number of included regressors, excluding the lagged dependent variable):
@@ -499,8 +504,6 @@ size_plots <- model_sizes(bma_results)
 ![Prior and posterior distribution over model sizes.](r_bdsm_05_model_sizes.png)
 
 The posterior strongly favors larger models. While the binomial prior centers mass on models with 4--5 regressors (EMS = 4.5), the posterior shifts toward 7--8 regressors, with a posterior expected model size of 6.9. Under the binomial-beta prior, the shift is even more dramatic: the posterior expected model size reaches 8.6, meaning the data wants to include nearly all 9 candidate regressors. This is consistent with the finding that all variables have PIP above 0.65 --- the data sees signal in most candidates.
-
----
 
 ## 11. Examining Top Models
 
@@ -546,7 +549,7 @@ grid::grid.draw(best8[[8]])  # gTree estimates plot
 
 In the best model, the lagged GDP coefficient is 0.954 (SE = 0.076, significant at 1%), confirming strong persistence. Investment share has a positive and significant coefficient of 0.079, while polity has a negative and significant coefficient of --0.092. Life expectancy is positive and significant at 0.151. The large standard error on education (0.034, SE = 0.065) explains its relatively lower PIP despite being included in 7 of the top 8 models.
 
----
+Beyond these top models, how do the coefficients distribute across all 512 specifications? The next section examines the full posterior distributions.
 
 ## 12. Coefficient Distributions
 
@@ -562,15 +565,7 @@ The [`coef_hist()`](https://cran.r-project.org/web/packages/bdsm/vignettes/bdsm_
 coef_plots <- coef_hist(bma_results)
 ```
 
-For the lagged dependent variable:
-
-```r
-print(coef_plots[[1]])
-```
-
-![Posterior coefficient distribution for the lagged dependent variable.](r_bdsm_08_coef_hist_gdplag.png)
-
-For population --- the variable with the highest PIP:
+**Population** --- the most robust determinant:
 
 ```r
 print(coef_plots[[5]])
@@ -578,34 +573,17 @@ print(coef_plots[[5]])
 
 ![Posterior coefficient distribution for population.](r_bdsm_09_coef_hist_pop.png)
 
-For life expectancy:
+**Lagged GDP** --- the persistence parameter:
 
 ```r
-print(coef_plots[[9]])
+print(coef_plots[[1]])
 ```
 
-![Posterior coefficient distribution for life expectancy.](r_bdsm_10_coef_hist_lnlex.png)
+![Posterior coefficient distribution for the lagged dependent variable.](r_bdsm_08_coef_hist_gdplag.png)
 
-For democracy (polity):
+Population has a tight, entirely positive distribution centered around 0.12, confirming strong and stable evidence for a positive effect on growth. The lagged GDP distribution is tightly concentrated around 0.92, confirming strong persistence.
 
-```r
-print(coef_plots[[10]])
-```
-
-![Posterior coefficient distribution for democracy (polity).](r_bdsm_11_coef_hist_polity.png)
-
-The coefficient distributions tell a nuanced story. Population has a tight, entirely positive distribution centered around 0.12, confirming strong and stable evidence for a positive effect on growth. Life expectancy is also entirely positive but with a wider distribution (centered around 0.10), reflecting more uncertainty about the magnitude. Democracy (polity) shows a tight, entirely negative distribution centered around --0.08, providing robust evidence that more democratic governance is associated with slower growth in this sample --- a controversial but well-documented finding in the growth literature. The lagged GDP distribution is tightly concentrated around 0.92, confirming strong persistence.
-
-Kernel density estimates provide smoother visualizations:
-
-```r
-coef_kern <- coef_hist(bma_results, kernel = 1)
-print(coef_kern[[5]])  # Population kernel density
-```
-
-![Kernel density of population coefficient.](r_bdsm_12_coef_kernel_pop.png)
-
----
+These results hold under the default binomial prior. But how sensitive are they to our choice of prior? The next section stress-tests the findings.
 
 ## 13. Sensitivity to Prior Specification
 
@@ -618,6 +596,8 @@ The width of each horizontal segment shows how much a variable's PIP changes acr
 ### 13.1 Binomial versus binomial-beta prior
 
 The default analysis already computes both priors. The **binomial prior** assigns each variable an independent probability of inclusion equal to EMS/K (where EMS is the expected model size and K is the number of regressors). The **binomial-beta prior** is more flexible --- it places a prior on the inclusion probability itself, allowing the data to determine how many variables should be included.
+
+*Compare these PIPs to the binomial results above --- notice how the rankings stay the same but the absolute values increase.*
 
 ```r
 # Binomial-beta results (already computed)
@@ -660,6 +640,8 @@ The ranking is stable across priors --- `pop` and `lnlex` remain the top two, an
 
 The expected model size (EMS) controls how many regressors the prior expects to be relevant. The default EMS = K/2 = 4.5. Let us see what happens with a skeptical prior (EMS = 2, expecting only 2 of 9 regressors to matter) and a generous prior (EMS = 8):
 
+*Watch how dramatically the PIPs drop when the prior is skeptical about how many variables matter.*
+
 ```r
 # Skeptical prior: EMS = 2
 bma_ems2 <- bma(full_model_space, df = data_prepared, round = 3, EMS = 2)
@@ -682,40 +664,11 @@ polity  0.372 -0.029 0.042 0.046 -0.079  0.031   0.043   0.000
 
 With the skeptical EMS = 2 prior, only `pop` (PIP = 0.964) and `lnlex` (PIP = 0.637) remain above 0.5 under the binomial prior. Investment share drops to 0.483 and democracy falls to 0.372. This tells us that population and life expectancy are the most robust determinants --- they survive even when the prior is heavily biased toward sparse models.
 
-```r
-# Generous prior: EMS = 8
-bma_ems8 <- bma(full_model_space, df = data_prepared, round = 3, EMS = 8)
-print(bma_ems8[[1]])
-```
-
-```text
-          PIP     PM   PSD  PSDR  PMcon PSDcon PSDRcon    %(+)
-gdp_lag    NA  0.943 0.078 0.131  0.943  0.078   0.131 100.000
-ish     0.966  0.077 0.035 0.066  0.079  0.032   0.065 100.000
-sed     0.953  0.035 0.063 0.095  0.037  0.064   0.097  69.922
-pgrw    0.953  0.024 0.033 0.059  0.026  0.033   0.061  99.609
-pop     0.999  0.078 0.061 0.082  0.078  0.061   0.082 100.000
-ipr     0.941 -0.051 0.029 0.052 -0.054  0.027   0.052   0.000
-opem    0.965  0.041 0.026 0.034  0.043  0.025   0.034 100.000
-gsh     0.961 -0.035 0.049 0.121 -0.037  0.049   0.123  30.859
-lnlex   0.981  0.136 0.067 0.104  0.139  0.065   0.104 100.000
-polity  0.945 -0.085 0.037 0.052 -0.090  0.031   0.050   0.000
-```
-
-With EMS = 8, all variables exceed PIP = 0.94 and the posterior expected model size reaches 8.66. The model sizes plots show how the prior-posterior mismatch varies:
-
-```r
-sizes_ems2 <- model_sizes(bma_ems2)
-sizes_ems8 <- model_sizes(bma_ems8)
-```
-
-![Model sizes under the skeptical prior (EMS = 2).](r_bdsm_14_sizes_ems2.png)
-
-![Model sizes under the generous prior (EMS = 8).](r_bdsm_15_sizes_ems8.png)
-
-The EMS = 2 plot reveals a dramatic prior-posterior conflict: the prior expects 2-regressor models, but the posterior clusters around 4--5. With EMS = 8, the prior and posterior are better aligned, both favoring 8--9 regressor models. This prior-posterior tension is itself informative --- it shows the data strongly prefers larger models than the skeptical prior allows.
+With EMS = 8, all PIPs exceed 0.94 --- nearly identical to the binomial-beta results, confirming that the data's preference for large models is consistent across prior specifications.
 
 ### 13.3 Dilution prior
+
+Imagine two variables that measure almost the same thing --- say, 'years of schooling' and 'literacy rate.' Including both in a model is redundant, and any model that includes both gets an inflated likelihood simply because it has two ways to capture the same variation.
 
 When regressors are correlated with each other, standard priors can overcount evidence by giving high probability to models that include near-duplicate variables. The **dilution prior** (George, 2010) penalizes models whose regressors are highly correlated, adjusting the model prior by the determinant of the correlation matrix:
 
@@ -751,8 +704,6 @@ sizes_dil <- model_sizes(bma_dil)
 ```
 
 ![Model sizes under the dilution prior.](r_bdsm_16_sizes_dilution.png)
-
----
 
 ## 14. Jointness Analysis
 
@@ -797,28 +748,9 @@ All HCGHM values are positive, meaning every pair of regressors acts as compleme
 
 Under the binomial-beta prior (below diagonal), all jointness values increase substantially --- reaching 0.944 for the `pop`-`lnlex` pair. This is because the binomial-beta prior favors larger models, making it more likely that any two variables appear together.
 
-The Doppelhofer-Weeks measure:
+The Doppelhofer-Weeks measure confirms these patterns: all pairwise DW values fall between --1 and +1, with the strongest relationship again between population and life expectancy (DW = 0.153).
 
-```r
-jointness(bma_results, measure = "DW")
-```
-
-```text
-         ish   sed   pgrw    pop    ipr   opem    gsh  lnlex polity
-ish       NA 0.050  0.019  0.004  0.016  0.030  0.007 -0.005  0.067
-sed    0.983    NA -0.024 -0.030  0.003 -0.010 -0.001  0.004 -0.026
-pgrw   0.969 0.900     NA -0.002  0.046 -0.001 -0.001 -0.009  0.008
-pop    1.013 0.952  0.982     NA -0.019 -0.023  0.048  0.153  0.012
-ipr    0.979 0.925  0.974  0.968     NA  0.048  0.018  0.023  0.035
-opem   1.007 0.932  0.944  0.986  1.001     NA  0.032  0.139  0.029
-gsh    0.967 0.925  0.935  1.036  0.956  0.986     NA  0.034  0.000
-lnlex  0.978 0.952  0.948  1.167  0.979  1.100  0.995     NA -0.056
-polity 1.008 0.896  0.933  0.989  0.962  0.971  0.928  0.900     NA
-```
-
-Under the binomial prior (above diagonal), the DW values are all between --1 and +1, indicating that no pair has *statistically significant* complementarity or substitutability. The strongest relationship is `pop`-`lnlex` at 0.153, suggesting these two variables are mildly complementary. The `opem`-`lnlex` pair at 0.139 suggests that trade openness and life expectancy also tend to be included together. No pair shows strong substitution effects.
-
----
+Having examined the evidence from every angle --- PIPs, coefficients, sensitivity, and jointness --- let us now synthesize the findings.
 
 ## 15. Summary of Findings
 
@@ -838,13 +770,13 @@ Combining evidence across all prior specifications, we can classify each regress
 | polity | 0.678 | 0.929 | 0.372 | -- | Sensitive |
 | ipr | 0.656 | 0.924 | 0.344 | -- | Sensitive |
 
+> **Bottom line:** If you are advising a government on growth policy, population dynamics and public health (life expectancy) are the two levers with the strongest evidence across all modeling assumptions. Investment and trade openness show promise under the default prior but become ambiguous under skeptical specifications. Education and democracy --- despite their intuitive appeal --- are fragile in this framework.
+
 Only two variables --- **population** and **life expectancy** --- survive as robust determinants across all prior specifications, maintaining PIP above 0.5 even under the most skeptical prior (EMS = 2). Both have stable positive signs and their coefficients are precisely estimated. Investment share and trade openness show positive evidence under the default prior but become ambiguous under the skeptical prior.
 
 ### 15.2 Connecting to cross-sectional results
 
 In the [companion cross-sectional tutorial](/post/r_bma_lasso_wals/), we found that BMA, LASSO, and WALS converged on the same set of robust variables for CO<sub>2</sub> emissions in synthetic data. The dynamic panel BMA analysis here reveals an important nuance: **controlling for reverse causality through the lagged dependent variable and fixed effects changes the landscape of robust determinants**. The strong persistence of GDP (lagged coefficient = 0.92) absorbs much of the cross-sectional variation, leaving fewer variables with strong independent explanatory power. This is exactly the kind of insight that cross-sectional BMA misses.
-
----
 
 ## 16. Conclusion
 
