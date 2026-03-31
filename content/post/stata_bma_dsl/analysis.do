@@ -413,6 +413,40 @@ graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
 graph export "stata_bma_dsl_fig4_coefdensity.png", replace width(2400)
 display _newline "Saved: stata_bma_dsl_fig4_coefdensity.png"
 
+*---------------------------------------------*
+* 4e. Pooled BMA (without fixed effects)      *
+*---------------------------------------------*
+* Run BMA without country/year FE to show the cost of omitting FE.
+* Without FE, noise variables get spuriously high PIPs.
+
+display _newline "=== BMA WITHOUT FIXED EFFECTS (POOLED) ==="
+bmaregress $outcome $gdp_vars $controls, ///
+    mprior(uniform) gprior(uip) ///
+    mcmcsize(50000) rseed(9988) pipcutoff(0.5) burnin(5000)
+estimates store bma_pooled
+
+matrix bma_pooled_tbl = r(table)
+local b1_bma_p = bma_pooled_tbl[1,1]
+local b2_bma_p = bma_pooled_tbl[1,2]
+local b3_bma_p = bma_pooled_tbl[1,3]
+local sd1_bma_p = bma_pooled_tbl[2,1]
+local sd2_bma_p = bma_pooled_tbl[2,2]
+local sd3_bma_p = bma_pooled_tbl[2,3]
+
+display _newline "Pooled BMA coefficients:"
+display "  b1 = " %9.4f `b1_bma_p'
+display "  b2 = " %9.4f `b2_bma_p'
+display "  b3 = " %9.4f `b3_bma_p'
+
+* Turning points
+local disc_bma_p = (`b2_bma_p')^2 - 3 * `b1_bma_p' * `b3_bma_p'
+if `disc_bma_p' > 0 {
+    local min_bma_p = exp((-`b2_bma_p' + sqrt(`disc_bma_p')) / (3 * `b3_bma_p'))
+    local max_bma_p = exp((-`b2_bma_p' - sqrt(`disc_bma_p')) / (3 * `b3_bma_p'))
+    display "  Minimum: $" %8.0fc `min_bma_p'
+    display "  Maximum: $" %8.0fc `max_bma_p'
+}
+
 
 *=============================================================================*
 *  SECTION 5: DOUBLE-SELECTION LASSO (DSL)

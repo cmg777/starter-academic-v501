@@ -524,6 +524,58 @@ graph combine dens_gdp dens_gdp_sq dens_gdp_cb ///
 
 All six densities are concentrated well away from zero, confirming that every variable with PIP above 0.80 has a genuinely non-zero effect. The three GDP terms (top row) form the inverted-N polynomial: the linear term is centered near --7.1 (true: --7.1), the squared term near +0.81 (true: +0.81), and the cubic term near --0.030 (true: --0.030). The three controls (bottom row) show tight, unimodal densities: fossil fuel near +0.014 (true: +0.015), renewable energy near --0.007 (true: --0.010), and industry near +0.009 (true: +0.010). Renewable energy's posterior mean (--0.007) is slightly attenuated compared to the true value (--0.010), reflecting the BMA shrinkage that occurs when a variable's PIP is below 1.0 --- models that exclude it pull the average toward zero.
 
+### 5.7 Pooled BMA (without fixed effects)
+
+To parallel the pooled DSL comparison in Section 6.6, we also run BMA without country or year fixed effects --- treating the panel as a pooled cross-section. This removes the `($fe, always)` and `groupfv` options, leaving only the 12 candidate controls and 3 GDP terms as predictors (15 total, vs 113 with FE).
+
+```stata
+* BMA without FE -- pooled cross-section
+bmaregress ln_co2 ln_gdp ln_gdp_sq ln_gdp_cb ///
+    fossil_fuel renewable urban industry democracy ///
+    services trade fdi credit pop_density ///
+    corruption globalization, ///
+    mprior(uniform) gprior(uip) ///
+    mcmcsize(50000) rseed(9988) pipcutoff(0.5) burnin(5000)
+```
+
+```text
+Bayesian model averaging                           No. of obs         =  1,600
+Linear regression                                  No. of predictors  =     15
+MC3 sampling                                                   Groups =     15
+                                                               Always =      0
+                                                   No. of models      =      34
+Priors:                                            Mean model size    = 11.978
+  Models: Uniform                                  MCMC sample size   = 50,000
+   Coef.: Zellner's g                              Acceptance rate    = 0.0733
+       g: Unit-information, g = 1,600              Shrinkage, g/(1+g) = 0.9994
+
+Sampling correlation = 0.9996
+
+------------------------------------------------------------------------------
+      ln_co2 |      Mean   Std. dev.       Group        PIP
+-------------+----------------------------------------------------------------
+      ln_gdp | -21.25807   1.641676            1          1
+   ln_gdp_sq |  2.284729   .1748838            2          1
+   ln_gdp_cb | -.0813937   .0061308            3          1
+ fossil_fuel |  .0188853   .0010554            4          1
+   renewable | -.0192089   .0013911            5          1
+       urban |  .0103139   .0012072            6          1
+    industry |  .0138361   .0023478            7          1
+    services |  .0164633   .0016573            9          1
+ pop_density | -.0004314   .0000567           13          1
+      credit |  .0041017   .0008414           12     .99984
+       trade | -.0020939    .001084           10     .86009
+   democracy |   .007879   .0042984            8     .84142
+------------------------------------------------------------------------------
+Note: 3 predictors with PIP less than .5 not shown.
+```
+
+The pooled BMA results are striking in two ways. First, the GDP coefficients are severely biased --- the same pattern as pooled DSL: $\beta\_1 = -21.26$ (true: --7.10), $\beta\_2 = 2.28$ (true: 0.81), $\beta\_3 = -0.081$ (true: --0.03). Without country fixed effects, the GDP terms absorb persistent cross-country differences in emissions levels, inflating the coefficients by a factor of 2--3x.
+
+Second, the PIPs tell a completely different story than with FE. Without fixed effects, **12 of 15 variables have PIP above 0.80** --- including noise variables like services (PIP = 1.000), population density (PIP = 1.000), credit (PIP = 1.000), and trade (PIP = 0.860). With FE, only 6 variables cleared the 0.80 threshold and all 7 noise variables had PIPs near zero. The pooled BMA commits **5 false positives** (services, pop\_density, credit, trade, and democracy incorrectly flagged as robust noise variables or given inflated PIPs) compared to **zero** false positives with FE. This happens because the noise variables are correlated with omitted country effects --- without FE to absorb those effects, the correlations create spurious associations that BMA interprets as genuine predictive power.
+
+The turning points (\\$5,752 minimum, \\$23,298 maximum) are far from the truth, and the 95% credible intervals fail to cover the true values for all three GDP terms --- the same coverage failure seen in pooled DSL. The lesson is clear: **fixed effects are not optional in panel BMA**. They are essential for correct variable selection, not just coefficient estimation.
+
 ## 6. Post-Double-Selection LASSO
 
 ### 6.1 The idea
@@ -716,15 +768,15 @@ This comparison illustrates a fundamental tradeoff in panel data econometrics: *
 
 ### 7.1 Coefficient comparison
 
-| | Sparse FE | Kitchen-Sink FE | BMA | DSL (with FE) | DSL (pooled) | True DGP |
-|---|-----------|-----------------|-----|---------------|--------------|----------|
-| $\beta\_1$ (GDP) | --7.498 | --7.131 | --7.139 | --7.433 | --22.033 | --7.100 |
-| $\beta\_2$ (GDP²) | 0.849 | 0.806 | 0.808 | 0.840 | 2.367 | 0.810 |
-| $\beta\_3$ (GDP³) | --0.031 | --0.030 | --0.030 | --0.031 | --0.084 | --0.030 |
-| **Min TP** | \\$2,478 | \\$2,426 | \\$2,411 | \\$2,429 | \\$5,581 | \\$1,895 |
-| **Max TP** | \\$25,656 | \\$27,694 | \\$27,269 | \\$27,672 | \\$24,532 | \\$34,647 |
+| | Sparse FE | Kitchen-Sink FE | BMA (FE) | DSL (FE) | BMA (pooled) | DSL (pooled) | True DGP |
+|---|-----------|-----------------|----------|----------|--------------|--------------|----------|
+| $\beta\_1$ (GDP) | --7.498 | --7.131 | --7.139 | --7.433 | --21.258 | --22.033 | --7.100 |
+| $\beta\_2$ (GDP²) | 0.849 | 0.806 | 0.808 | 0.840 | 2.285 | 2.367 | 0.810 |
+| $\beta\_3$ (GDP³) | --0.031 | --0.030 | --0.030 | --0.031 | --0.081 | --0.084 | --0.030 |
+| **Min TP** | \\$2,478 | \\$2,426 | \\$2,411 | \\$2,429 | \\$5,752 | \\$5,581 | \\$1,895 |
+| **Max TP** | \\$25,656 | \\$27,694 | \\$27,269 | \\$27,672 | \\$23,298 | \\$24,532 | \\$34,647 |
 
-BMA and Kitchen-Sink FE produce estimates closest to the true DGP values. DSL with FE falls between the sparse and kitchen-sink specifications. All five FE-based methods recover the inverted-N sign pattern with similar magnitudes. The pooled DSL stands out as a cautionary tale: while it also finds the correct sign pattern, its coefficients are inflated 2--3x because country-level heterogeneity is absorbed into the GDP terms instead of being captured by fixed effects. Its turning points (\\$5,581 and \\$24,532) are substantially displaced from the truth.
+The table reveals a sharp divide between FE-based and pooled specifications. The four FE-based methods (columns 2--5) all produce GDP coefficients within a narrow range of the true values --- BMA (FE) and Kitchen-Sink FE are closest, with estimates within 1% of the truth. The two pooled methods (columns 6--7) are dramatically biased, with coefficients inflated 2--3x. Strikingly, BMA (pooled) and DSL (pooled) agree closely with *each other* (--21.26 vs --22.03 for $\beta\_1$), confirming that the bias comes from omitting fixed effects, not from the choice of variable selection method. Both pooled methods produce turning points displaced from the truth (\\$5,600--5,800 vs true \\$1,895 for the minimum).
 
 ### 7.2 Uncertainty: confidence and credible intervals
 
@@ -734,12 +786,13 @@ Point estimates tell only half the story. How *uncertain* is each method, and do
 |---|---|---|---|---|---|---|
 | **Sparse FE** | [--10.731, --4.266] | Yes | [0.510, 1.188] | Yes | [--0.043, --0.020] | Yes |
 | **Kitchen-Sink FE** | [--10.241, --4.021] | Yes | [0.478, 1.134] | Yes | [--0.041, --0.018] | Yes |
-| **BMA** (credible) | [--10.761, --3.517] | Yes | [0.429, 1.186] | Yes | [--0.043, --0.017] | Yes |
-| **DSL (with FE)** | [--10.625, --4.242] | Yes | [0.504, 1.176] | Yes | [--0.043, --0.019] | Yes |
+| **BMA (FE)** (credible) | [--10.761, --3.517] | Yes | [0.429, 1.186] | Yes | [--0.043, --0.017] | Yes |
+| **DSL (FE)** | [--10.625, --4.242] | Yes | [0.504, 1.176] | Yes | [--0.043, --0.019] | Yes |
+| **BMA (pooled)** (credible) | [--24.541, --17.975] | **No** | [1.935, 2.635] | **No** | [--0.094, --0.069] | **No** |
 | **DSL (pooled)** | [--32.376, --11.690] | **No** | [1.259, 3.475] | **No** | [--0.123, --0.045] | **No** |
 | **True DGP** | --7.100 | | 0.810 | | --0.030 | |
 
-The four FE-based methods all produce intervals that contain the true parameter values --- a reassuring result. The pooled DSL, however, **fails to cover the truth for any of the three coefficients**. Its intervals are wide (the $\beta\_1$ interval spans 20.7 units) but centered so far from the truth that even this large width cannot compensate for the bias. This is a textbook demonstration of why confidence intervals require an unbiased (or at least consistent) estimator to be meaningful --- wide intervals from a biased model provide false comfort.
+The four FE-based methods all produce intervals that contain the true parameter values --- a reassuring result. Both pooled methods, however, **fail to cover the truth for any of the three coefficients**. The pooled DSL intervals are wide (the $\beta\_1$ interval spans 20.7 units) but centered so far from the truth that even this width cannot compensate. The pooled BMA credible intervals are actually *narrower* (spanning 6.6 units for $\beta\_1$) but even more precisely wrong --- they are tightly concentrated around the biased estimate. This is the worst-case scenario: **false precision from a misspecified model**.
 
 **Width reflects uncertainty.** Among the FE-based methods, BMA produces the widest interval for $\beta\_1$ (width = 7.24), followed by Sparse FE (6.47), DSL with FE (6.38), and Kitchen-Sink FE (6.22). BMA's wider intervals reflect its honest accounting of model uncertainty --- it averages across thousands of models, each contributing slightly different coefficient estimates, which inflates the posterior standard deviation. The frequentist methods condition on a single model and therefore understate the total uncertainty.
 
@@ -846,7 +899,19 @@ The two methods answer fundamentally different research questions:
 
 **Use both together** (as in this tutorial) when you want the strongest possible evidence. If a Bayesian and a frequentist method agree on the sign, magnitude, and significance of an effect, the finding is unlikely to be an artifact of any single modeling choice. Disagreements between the methods are also informative --- they signal areas where the evidence is sensitive to assumptions.
 
-### 8.3 Limitations and caveats
+### 8.3 Pooled vs fixed effects: a cautionary comparison
+
+The pooled specifications (Sections 5.7 and 6.6) provide a powerful pedagogical contrast. When we strip away fixed effects and run both BMA and DSL on pooled data, three things happen simultaneously:
+
+**LASSO selection improves but estimates worsen.** Without 99 FE dummies diluting the candidate set, LASSO in pooled DSL selected only 5--7 of 12 controls (vs 102 of 112 with FE). This is closer to the "textbook" LASSO scenario where the method has genuine discriminating power. Yet the resulting coefficient estimates are 2--3x the true values because omitted country heterogeneity biases everything.
+
+**BMA PIPs become unreliable.** With fixed effects, BMA assigned PIP near zero to all 7 noise variables --- zero false positives. Without FE, 5 noise variables (services, pop\_density, credit, trade, and inflated democracy) received PIPs above 0.80. The noise variables are correlated with omitted country effects, and BMA interprets these spurious correlations as genuine predictive power. This demonstrates that **PIP thresholds are only meaningful when the model set is correctly specified**.
+
+**Both methods agree on the bias.** Pooled BMA and pooled DSL produce remarkably similar biased coefficients ($\beta\_1 = -21.26$ vs $-22.03$), confirming that the problem is not the variable selection method but the omitted fixed effects. The agreement between a Bayesian and a frequentist method on the *wrong* answer reinforces the lesson: **method agreement is not a substitute for correct model specification**.
+
+The practical takeaway for applied researchers: in panel data settings, always include entity fixed effects (or equivalent controls for unobserved heterogeneity) before applying BMA or DSL. Running these methods on pooled data without FE will produce misleading results --- not because the methods fail, but because the models they average over or select from are all misspecified.
+
+### 8.4 Limitations and caveats
 
 **Synthetic vs real data.** This is synthetic data --- the patterns are sharper than real-world data, and we can verify ground truth only because we designed the DGP. With real data, model uncertainty is genuinely unresolvable, and there is no answer key to check against. The separation between true predictors and noise variables is cleaner here than in most applications.
 
@@ -867,6 +932,8 @@ The two methods answer fundamentally different research questions:
 - **Model uncertainty is real.** The GDP linear coefficient shifts from --7.498 (sparse) to --7.131 (kitchen-sink) depending on which controls are included. The maximum turning point moves by \\$2,000. BMA and DSL provide principled solutions.
 
 - **BMA and post-double-selection serve different purposes.** BMA excels at variable selection (PIPs, coefficient densities) and produced the most accurate coefficient estimates in this setting. Post-double-selection is fastest and provides standard frequentist inference with cluster-robust SEs. In panel settings dominated by FE dummies, LASSO has limited room to discriminate among candidate controls; DSL would be more powerful in cross-sectional settings with many irrelevant variables.
+
+- **Fixed effects are essential, not optional.** Running either method on pooled data without FE produces coefficients inflated 2--3x (BMA pooled: --21.26, DSL pooled: --22.03, vs true --7.10 for $\beta\_1$). Worse, pooled BMA assigns high PIPs to 5 noise variables that the FE-based BMA correctly rejects. Confidence and credible intervals from pooled models fail to cover the true values for all three coefficients. The lesson: always include fixed effects in panel data before applying variable selection methods.
 
 ### Exercises
 
