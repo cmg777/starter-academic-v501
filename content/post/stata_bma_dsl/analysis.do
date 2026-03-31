@@ -423,8 +423,7 @@ display _newline "=== BMA WITHOUT FIXED EFFECTS (POOLED) ==="
 bmaregress $outcome $gdp_vars $controls, ///
     mprior(uniform) gprior(uip) ///
     mcmcsize(50000) rseed(9988) pipcutoff(0.5) burnin(5000)
-estimates store bma_pooled
-
+* Note: bmaregress does not support estimates store
 matrix bma_pooled_tbl = r(table)
 local b1_bma_p = bma_pooled_tbl[1,1]
 local b2_bma_p = bma_pooled_tbl[1,2]

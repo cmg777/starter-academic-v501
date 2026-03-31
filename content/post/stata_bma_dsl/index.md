@@ -760,7 +760,7 @@ lassoinfo
 ------------------------------------------------------
 ```
 
-Now the contrast with the FE-based DSL is stark. The outcome LASSO selected only **5 of 12** controls (vs 102 of 112 with FE), and the GDP LASSOes selected **7 of 12** (vs 100 of 112). Without FE dummies flooding the candidate set, LASSO can genuinely discriminate --- it zeroed out 5--7 controls as irrelevant. The turning points are \\$5,581 (minimum) and \\$24,532 (maximum), far from the true values (\\$1,895 and \\$34,647).
+Now the contrast with the FE-based DSL is stark. The outcome LASSO selected only **5 of 12** controls (vs 102 of 112 with FE), and the GDP LASSOes selected **7 of 12** (vs 100 of 112). Without FE dummies flooding the candidate set, LASSO can genuinely discriminate --- it zeroed out 5--7 controls as irrelevant. The turning points are \\$5,581 (minimum) and \\$24,532 (maximum), far from the true values.
 
 This comparison illustrates a fundamental tradeoff in panel data econometrics: **fixed effects remove bias but limit LASSO's selection power**. With FE, the estimates are unbiased but LASSO selects almost everything. Without FE, LASSO selects sharply but the estimates are biased by unobserved heterogeneity. The FE-based DSL from Section 6.3 is the correct specification for this data, even though LASSO's selection looks less impressive.
 
@@ -978,21 +978,53 @@ regress d_ln_co2 d_ln_gdp d_ln_gdp_sq d_ln_gdp_cb ///
     d_corruption d_globalization, robust
 ```
 
-```text
-FD Sparse OLS:
-      d_ln_gdp |  -10.36189   4.092422    -2.53   0.013    -18.51265   -2.211121
-   d_ln_gdp_sq |   1.155962   .4223643     2.74   0.008     .3147506    1.997173
-   d_ln_gdp_cb |  -.0414951   .0144408    -2.87   0.005    -.0702522    -.012738
-   R-squared = 0.1433
+**FD Sparse OLS:**
 
-FD Kitchen-sink OLS:
-      d_ln_gdp |  -8.109709   5.031758    -1.61   0.112     -18.1618    1.942382
-   d_ln_gdp_sq |   .9238864   .5213262     1.77   0.081    -.1175823    1.965355
-   d_ln_gdp_cb |  -.0336221   .0179583    -1.87   0.066    -.0694979    .0022536
-   R-squared = 0.3707
+```text
+Linear regression                               Number of obs     =         80
+                                                Prob > F          =     0.0009
+                                                R-squared         =     0.1433
+------------------------------------------------------------------------------
+             |               Robust
+    d_ln_co2 | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    d_ln_gdp |  -10.36189   4.092422    -2.53   0.013    -18.51265   -2.211121
+ d_ln_gdp_sq |   1.155962   .4223643     2.74   0.008     .3147506    1.997173
+ d_ln_gdp_cb |  -.0414947   .0143721    -2.89   0.005    -.0701192   -.0128702
+       _cons |  -.3036562   .0724366    -4.19   0.000    -.4479262   -.1593861
+------------------------------------------------------------------------------
 ```
 
-The FD sparse OLS finds the inverted-N sign pattern with all three terms significant at the 5% level --- but the coefficients are noisier than the FE estimates (e.g., $\beta\_1 = -10.36$ vs --7.50 for sparse FE). The R² of 0.14 is much lower than the within R² of 0.035 from sparse FE, reflecting the loss of within-country time-series variation. Adding controls in the kitchen-sink raises R² to 0.37 but makes the GDP terms individually insignificant (p = 0.07--0.11) --- a consequence of having only 80 observations and 15 regressors.
+**FD Kitchen-sink OLS:**
+
+```text
+Linear regression                               Number of obs     =         80
+                                                Prob > F          =     0.0029
+                                                R-squared         =     0.3707
+------------------------------------------------------------------------------
+             |               Robust
+    d_ln_co2 | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    d_ln_gdp |  -8.109709   5.031758    -1.61   0.112     -18.1618    1.942382
+ d_ln_gdp_sq |   .9238864   .5213262     1.77   0.081    -.1175823    1.965355
+ d_ln_gdp_cb |  -.0336221   .0179583    -1.87   0.066    -.0694979    .0022536
+d_fossil_f~l |   .0147108   .0067313     2.19   0.033     .0012635    .0281582
+ d_renewable |  -.0237808   .0110384    -2.15   0.035    -.0458327    -.001729
+     d_urban |   .0002501    .014913     0.02   0.987    -.0295421    .0300424
+  d_industry |   .0309085   .0105974     2.92   0.005     .0097377    .0520793
+ d_democracy |    .019337   .0290345     0.67   0.508     -.038666      .07734
+  d_services |  -.0047239   .0098816    -0.48   0.634    -.0244647    .0150169
+     d_trade |    .006726   .0044062     1.53   0.132    -.0020764    .0155284
+       d_fdi |   .0000124   .0091898     0.00   0.999    -.0183463    .0183712
+    d_credit |   .0028644   .0043456     0.66   0.512    -.0058169    .0115457
+d_pop_dens~y |   .0006396   .0004991     1.28   0.205    -.0003575    .0016366
+d_corruption |  -.0036115   .0033497    -1.08   0.285    -.0103033    .0030803
+d_globaliz~n |  -.0004567   .0082494    -0.06   0.956    -.0169368    .0160235
+       _cons |  -.0085823   .1746184    -0.05   0.961    -.3574226     .340258
+------------------------------------------------------------------------------
+```
+
+The FD sparse OLS finds the inverted-N sign pattern with all three terms significant at the 5% level --- but the coefficients are noisier than the FE estimates (e.g., $\beta\_1 = -10.36$ vs --7.50 for sparse FE). The R² of 0.14 is low, reflecting the loss of within-country time-series variation when collapsing 20 years into a single difference. Adding controls in the kitchen-sink raises R² to 0.37 but makes the GDP terms individually insignificant (p = 0.07--0.11) --- a consequence of having only 80 observations and 15 regressors. Among the controls, fossil fuel (p = 0.033), renewable energy (p = 0.035), and industry (p = 0.005) are significant --- the same three strong predictors identified by BMA with fixed effects.
 
 ### A.4 BMA on first differences
 
@@ -1009,11 +1041,15 @@ bmaregress d_ln_co2 d_ln_gdp d_ln_gdp_sq d_ln_gdp_cb ///
 Bayesian model averaging                           No. of obs         =     80
 Linear regression                                  No. of predictors  =     15
 MC3 sampling                                                   Groups =     15
+                                                               Always =      0
                                                    No. of models      =  2,317
+                                                       For CPMP >= .9 =    581
 Priors:                                            Mean model size    =  3.304
-  Models: Uniform                                  MCMC sample size   = 50,000
+  Models: Uniform                                  Burn-in            =  5,000
+   Cons.: Noninformative                           MCMC sample size   = 50,000
    Coef.: Zellner's g                              Acceptance rate    = 0.3080
        g: Unit-information, g = 80                 Shrinkage, g/(1+g) = 0.9877
+  sigma2: Noninformative                           Mean sigma2        =  0.051
 
 Sampling correlation = 0.9958
 
@@ -1067,6 +1103,10 @@ Double-selection linear model         Number of obs               =         80
 ------------------------------------------------------------------------------
 ```
 
+```stata
+lassoinfo
+```
+
 ```text
     Estimate: active
      Command: dsregress
@@ -1093,8 +1133,8 @@ FD-DSL selected only **1 control** for the outcome equation (likely d\_industry,
 | $\beta\_3$ (GDP³) | --0.041 | --0.034 | n/a | --0.022 | --0.030 | --0.031 | --0.030 |
 | **GDP terms robust?** | Yes (p < 0.05) | No (p > 0.05) | **No** (PIP < 0.30) | No (p > 0.05) | **Yes** (PIP > 0.99) | Yes (p < 0.001) | |
 | **Controls selected** | n/a | n/a | 1 of 12 | 1 of 12 | 6 of 12 | 102 of 112 | |
-| **Min TP** | \\$1,911 | \\$1,464 | n/a | \\$986 | \\$2,411 | \\$2,429 | \\$1,895 |
-| **Max TP** | \\$60,918 | \\$61,712 | n/a | \\$63,082 | \\$27,269 | \\$27,672 | \\$34,647 |
+| **Min TP** | \\$1,913 | \\$1,465 | n/a | \\$987 | \\$2,411 | \\$2,429 | \\$1,895 |
+| **Max TP** | \\$60,817 | \\$61,655 | n/a | \\$62,983 | \\$27,269 | \\$27,672 | \\$34,647 |
 
 > **Note.** FD-BMA posterior means for the GDP terms are heavily shrunk toward zero (because their PIPs are ~0.27--0.30), so we report "n/a" rather than misleading point estimates.
 
