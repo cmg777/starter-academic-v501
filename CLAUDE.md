@@ -86,141 +86,156 @@ The dashboards project page (content/projects/dashboards/index.md) uses native `
 
 # Claude Code Skills
 
-All skills follow a three-phase interaction pattern: (1) confirm intent before work begins, (2) execute the core workflow, (3) offer follow-up actions after delivery. Skills use progressive disclosure via `references/` subdirectories -- detailed reference material is loaded on demand, keeping the core SKILL.md focused.
+Eight skills organized as Write/Review pairs across four artifact stages. Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
 
-## data-science-post
+## Pipeline overview
 
-**Location:** `.claude/skills/data-science-post/SKILL.md`
+| Stage | Write | Review |
+|-------|-------|--------|
+| Script | `/project:write-script` | `/project:review-script` |
+| Results report | `/project:write-results-report` | `/project:review-results-report` |
+| Blog post | `/project:write-post` | `/project:review-post` |
+| Infographic | `/project:write-infographic` | `/project:review-infographic` |
 
-Generates notebook-style data science blog posts for the site in **Python, Stata, or R**. The user provides a topic, dataset, and optional reference URLs or PDFs. The skill confirms topic scope and design choices before writing, then produces a Hugo page bundle with:
+## Shared conventions
 
-- `index.md` -- full tutorial with YAML front matter, case-study framing, code blocks, figures, and interpretation paragraphs
-- Companion files: `script.py` (Python), `analysis.do` + `analysis.log` (Stata), or `analysis.R` (R)
-- `*.png` -- at least 3 figures using the site color palette
-
-**Invocation:**
-```
-/project:data-science-post <topic> dataset: <dataset> [references: <URLs, PDFs, or notes>]
-```
-
-**Examples:**
-```
-/project:data-science-post double machine learning dataset: DS4Bolivia references: https://docs.doubleml.org/stable/intro/intro.html
-/project:data-science-post k-means clustering dataset: https://archive.ics.uci.edu/ml/datasets/Iris
-/project:data-science-post spatial regression dataset: PySAL example data references: https://pysal.org/spreg/
-/project:data-science-post RCT evaluation with panel data in Stata dataset: dataSIM4RCT.dta references: causal.pdf
-```
-
-**Key conventions enforced by the skill:**
-- Sandwich pattern: conceptual explanation before every code block, interpretation paragraph after
-- At least 8 interpretation paragraphs with specific numeric values
 - Site color palette: steel blue `#6a9bcc`, warm orange `#d97757`, near black `#141413`, teal `#00d4c8`
-- `toc: true` in front matter enables the left-side table of contents
-- Currency dollar signs: use `\\$` in `index.md` (MathJax-enabled), `\$` in notebook
-- Causal posts: explicitly state estimand (ATE/ATT) for each method; distinguish randomized vs observational framing
-- After code changes, re-run script.py to regenerate ALL images; delete orphaned PNGs
-- Dark theme figures: optional dark navy background palette for figures (`#0f1729`, `#1f2b5e`, `#c8d0e0`, `#e8ecf2`)
+- Dark theme palette: `#0f1729`, `#1f2b5e`, `#c8d0e0`, `#e8ecf2`
+- Currency dollar signs: `\\$` in `index.md` (MathJax-enabled), `\$` in notebook
 - Output blocks: use ` ```text ` (not bare ` ``` `) to prevent highlight.js auto-detection coloring
+- Causal posts: explicitly state estimand (ATE/ATT) for each method; distinguish randomized vs observational framing
+- PDF reference handling: delegate large PDFs to Explore agents; extract only relevant pages (5--15); clean up before committing
 - Reference posts (Python): `content/post/python_ml_random_forest/index.md` (ML), `content/post/python_dowhy/index.md` (causal inference), `content/post/python_fwl/index.md` (dark theme figures, simulated data), `content/post/python_pyfixest/index.md` (panel data, fixed effects, dark theme figures), `content/post/python_esda2/index.md` (ESDA, spatial autocorrelation, LISA), `content/post/python_mgwr/index.md` (MGWR, spatially varying coefficients)
 - Reference posts (Stata): `content/post/stata_rct/index.md` (RCT with panel data, RA/IPW/DR/DiD/DRDID, Mermaid diagrams, equations with analogies)
-- PDF reference handling: delegate large PDFs to Explore agents to avoid context bloat; extract only relevant pages (5--15); clean up PDFs before committing
 
-**Reference files** (loaded on demand):
-- `references/latex-escaping.md` -- Goldmark/KaTeX escaping rules, equation requirements
-- `references/figure-conventions.md` -- dark theme setup, Mermaid diagrams, color families
-- `references/causal-inference.md` -- estimand precision, ATE/ATT, framing guidelines
-- `references/data-sources.md` -- data loading patterns (URL, named, DS4Bolivia, simulated DGP)
-- `references/companion-deliverables.md` -- script.py, notebook.ipynb templates
-- `references/quality-checklist.md` -- full verification checklist
+## write-script
 
-## referee-post
+**Location:** `.claude/skills/write-script/SKILL.md`
 
-**Location:** `.claude/skills/referee-post/SKILL.md`
-
-Reviews data science blog posts as an expert professor of data science and econometrics. Confirms review scope before starting, then produces a structured referee report covering code correctness, pedagogical explanations, result interpretations, and references. Read-only -- does not modify the post. Offers follow-up actions after delivering the report.
+Write and execute a data science script (Python/Stata/R). Produces the script file, execution_log.txt, and PNG figures. Does NOT write the blog post or results report.
 
 **Invocation:**
 ```
-/project:referee-post <post slug>
+/project:write-script <topic> dataset: <dataset> [references: <URLs>] [language: python|stata|r] [theme: light|dark]
 ```
 
 **Examples:**
 ```
-/project:referee-post python_doubleml
-/project:referee-post python_dowhy
-/project:referee-post content/post/python_ml_random_forest/
+/project:write-script double machine learning dataset: DS4Bolivia references: https://docs.doubleml.org/stable/intro/intro.html
+/project:write-script k-means clustering dataset: https://archive.ics.uci.edu/ml/datasets/Iris
+/project:write-script spatial regression in R dataset: PySAL example data
+/project:write-script RCT evaluation in Stata dataset: dataSIM4RCT.dta references: causal.pdf
 ```
 
-**Report includes:**
-- Verdict: ACCEPT / MINOR REVISION / MAJOR REVISION
-- Up to 11 review passes: structure, code execution, code quality, beginner accessibility, sandwich pattern, equations, interpretations, writing clarity, academic rigor, narrative flow, deliverable consistency
-- Issue tables with severity (HIGH/MEDIUM/LOW), location, and suggested fixes
-- Priority action items ranked by impact
+**Reference files:** `references/data-sources.md`, `references/figure-conventions.md`, `references/causal-inference.md`, `references/script-templates.md`, `references/execution-protocol.md`
 
-**Reference files** (loaded on demand):
-- `references/report-template.md` -- full report template with all section formats
-- `references/scoring-and-criteria.md` -- severity definitions, verdict criteria, scoring guidelines
+## review-script
 
-## infographic-instructions
+**Location:** `.claude/skills/review-script/SKILL.md`
 
-**Location:** `.claude/skills/infographic-instructions/SKILL.md`
-
-Generates an AI-image-generation prompt that creates a chalkboard-style infographic summarizing a blog post into 6 panels. The output is a copy-pasteable prompt optimized for Gemini, DALL-E, Midjourney, or Ideogram. Confirms template, title, and rendering preferences before generating. Offers follow-up adjustments after delivery.
+Expert review of a data science script. Runs the code, checks output, reviews quality across 8 dimensions (execution, structure, code quality, reproducibility, figures, data handling, statistical correctness, causal inference). Produces a scored review report. Read-only.
 
 **Invocation:**
 ```
-/project:infographic-instructions <post slug>
+/project:review-script <post slug>
+```
+
+**Reference files:** `references/review-checklist.md`, `references/scoring-and-criteria.md`
+
+## write-results-report
+
+**Location:** `.claude/skills/write-results-report/SKILL.md`
+
+Execute a data science script and produce a structured results report (`results_report.md`) with interpretations. Bridges the gap between raw code output and the blog post. Every number gets domain context. At least 5 key findings with specific numbers.
+
+**Invocation:**
+```
+/project:write-results-report <post slug>
+```
+
+**Reference files:** `references/report-structure.md`, `references/interpretation-guide.md`
+
+## review-results-report
+
+**Location:** `.claude/skills/review-results-report/SKILL.md`
+
+Expert review of a results report. Verifies accuracy against script output, checks interpretation quality, validates completeness. Read-only.
+
+**Invocation:**
+```
+/project:review-results-report <post slug>
+```
+
+**Reference files:** `references/review-checklist.md`, `references/scoring-and-criteria.md`
+
+## write-post
+
+**Location:** `.claude/skills/write-post/SKILL.md`
+
+Write a notebook-style data science blog post (`index.md`). Has two modes: (A) consume existing script + results_report.md with real numbers, or (B) standalone with inline code blocks and `[VERIFY]` markers. Enforces sandwich pattern, 8+ interpretations, 3+ figures, LaTeX escaping.
+
+**Invocation:**
+```
+/project:write-post <topic> dataset: <dataset> [references: <URLs>]
+/project:write-post <post slug>
 ```
 
 **Examples:**
 ```
-/project:infographic-instructions python_partial_identification
-/project:infographic-instructions python_dowhy
-/project:infographic-instructions python_doubleml
+/project:write-post double machine learning dataset: DS4Bolivia
+/project:write-post python_doubleml
+/project:write-post k-means clustering dataset: Iris
 ```
 
-**Output includes:**
-- Section A: Full flowing-prose image generation prompt (scene description, composition, colors, 6 panel visual scenes, margin elements, texture, text rendering guidance)
-- Section B: Negative prompt (what to exclude)
-- Section C: Condensed ~300-word prompt for token-limited tools
-- Section D: Panel reference data appendix (structured text, icons, mini-viz, callouts)
+**Key conventions:**
+- Sandwich pattern: explanation -> code -> output -> interpretation
+- At least 8 interpretation paragraphs with specific numeric values
+- At least 2 display-math equations with plain-language explanations and variable mapping
+- `toc: true` and `image.placement: 3` in front matter
+- Beginner accessibility: define jargon, explain "why", analogies, concrete before abstract
 
-**Reference files** (loaded on demand):
-- `references/panel-templates.md` -- three panel templates (Causal, ML, Exploratory) and element rules
-- `references/static-sections.md` -- negative prompt template and condensed prompt structure
+**Reference files:** `references/latex-escaping.md`, `references/figure-conventions.md`, `references/causal-inference.md`, `references/front-matter-templates.md`, `references/quality-checklist.md`
 
-## proofread-post
+## review-post
 
-**Location:** `.claude/skills/proofread-post/SKILL.md`
+**Location:** `.claude/skills/review-post/SKILL.md`
 
-Quick final QA before publishing a data science post. Checks correctness, display, and consistency without modifying any files. Lighter and faster than `referee-post` -- use this right before committing or publishing. Supports a `focus:` argument to run only specific checks. Announces scope and offers follow-up after delivery.
+Comprehensive review of a data science blog post. Merges deep expert review with final proofreading into one thorough pass across 12 dimensions. Produces a scored report with verdict (ACCEPT / MINOR REVISION / MAJOR REVISION), dimension scores, and priority action items. Supports `focus:` for targeted reviews. Read-only.
 
 **Invocation:**
 ```
-/project:proofread-post <post slug> [focus: frontmatter | markdown | math | code | images | mermaid | refs | style | grammar]
+/project:review-post <post slug> [focus: code | structure | math | explanations | interpretations | writing | grammar | rigor | images]
 ```
 
-**Examples:**
+**12 review dimensions:** code execution, front matter & links, markdown structure, code quality, sandwich pattern, beginner accessibility, mathematical equations, interpretations, writing clarity & grammar, academic rigor, narrative flow, images/Mermaid/deliverables.
+
+**Reference files:** `references/report-template.md`, `references/scoring-and-criteria.md`, `references/latex-escaping.md`
+
+## write-infographic
+
+**Location:** `.claude/skills/write-infographic/SKILL.md`
+
+Generate a chalkboard-style infographic prompt for a blog post. Produces `infographic_instructions.md` with 4 sections: (A) full flowing-prose AI image prompt, (B) negative prompt, (C) condensed ~300-word prompt, (D) panel reference data. Confirms template, title, and rendering preferences before generating.
+
+**Invocation:**
 ```
-/project:proofread-post python_partial_identification
-/project:proofread-post python_dowhy
-/project:proofread-post content/post/python_ml_random_forest/
-/project:proofread-post python_dowhy focus: math
-/project:proofread-post python_doubleml focus: code
+/project:write-infographic <post slug>
 ```
 
-**Checks performed (10-point checklist):**
+**Reference files:** `references/panel-templates.md`, `references/static-sections.md`
 
-- Front matter completeness (title, authors, date, tags, toc, diagram, featured image) and `links:` validation (relative URLs point to existing files, valid `icon_pack` values)
-- Markdown structure (code fences, HTML tags, heading hierarchy, no level jumps), callout/shortcode pairing, learning objectives section, Colab badge
-- Math: rendering (LaTeX escaping for Goldmark), correctness (notation, operators), and accessibility (plain-language companion sentences, variable-to-code mapping)
-- Code/output pairing (every `print()` has a matching output block)
-- Images (all references valid, alt text present, no orphaned PNGs, captions)
-- Code consistency (index.md vs script.py parameter sync) and supporting files (CSVs, R/Stata scripts exist if referenced)
-- Mermaid diagrams (syntax, `diagram: true`, site palette colors, dashed borders for latent variables)
-- References and links (syntax check, numbered list)
-- Site conventions (em dashes, no emojis, color palette)
-- Grammar, spelling, and typos (prose only -- skips code blocks, output, YAML, URLs)
+## review-infographic
+
+**Location:** `.claude/skills/review-infographic/SKILL.md`
+
+Expert review of infographic instructions. Cross-checks every number against the source post, evaluates prompt quality and panel completeness, and suggests variant improvements. Read-only.
+
+**Invocation:**
+```
+/project:review-infographic <post slug>
+```
+
+**Reference files:** `references/review-checklist.md`, `references/panel-templates.md`
 
 # Hugo Version Constraints
 

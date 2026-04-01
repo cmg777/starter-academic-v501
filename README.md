@@ -242,120 +242,83 @@ Add a new `<details>` block to `content/projects/dashboards/index.md` following 
 
 ### Skill Architecture
 
-All Claude Code skills follow a three-phase interaction pattern: (1) confirm intent before work begins, (2) execute the core workflow, (3) offer follow-up actions after delivery. Skills use **progressive disclosure** via `references/` subdirectories -- detailed reference material (LaTeX escaping rules, report templates, panel templates, etc.) is loaded on demand only when relevant, keeping the core SKILL.md focused on the workflow.
+Eight Claude Code skills organized as Write/Review pairs across four artifact stages. Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
 
-### New Data Science Post (via Claude Code Skill)
+| Stage | Write skill | Review skill |
+|-------|-------------|--------------|
+| Script | `write-script` | `review-script` |
+| Results report | `write-results-report` | `review-results-report` |
+| Blog post | `write-post` | `review-post` |
+| Infographic | `write-infographic` | `review-infographic` |
 
-The `data-science-post` skill automates creating notebook-style data science blog posts. It confirms topic scope and design choices before writing, then produces a Hugo page bundle with case-study framing, Python code blocks, matplotlib figures, and interpretation paragraphs.
+### Write Data Science Script
 
-**Location:** `.claude/skills/data-science-post/SKILL.md`
-**Reference files:** `.claude/skills/data-science-post/references/` (latex-escaping, figure-conventions, causal-inference, data-sources, companion-deliverables, quality-checklist)
+**Skill:** `/project:write-script <topic> dataset: <dataset> [references: <URLs>] [language: python|stata|r] [theme: light|dark]`
+**Location:** `.claude/skills/write-script/SKILL.md`
 
-**Usage** (in Claude Code):
+Write and execute a data science script (Python/Stata/R). Produces script.py, execution_log.txt, and PNG figures.
 
-```
-/project:data-science-post <topic> dataset: <dataset> [references: <URLs>]
-```
+### Review Data Science Script
 
-**Examples:**
+**Skill:** `/project:review-script <post slug>`
+**Location:** `.claude/skills/review-script/SKILL.md`
 
-```
-/project:data-science-post double machine learning dataset: DS4Bolivia references: https://docs.doubleml.org/stable/intro/intro.html
-/project:data-science-post k-means clustering dataset: https://archive.ics.uci.edu/ml/datasets/Iris
-/project:data-science-post spatial regression dataset: PySAL example data references: https://pysal.org/spreg/
-```
+Expert review of a script across 8 dimensions. Runs the code, checks output, produces a scored report. Read-only.
 
-**What it produces:**
+### Write Results Report
 
-| Output | Path |
-|--------|------|
-| Blog post | `content/post/python_<topic-slug>/index.md` |
-| Python script (optional) | `content/post/python_<topic-slug>/script.py` |
-| Figures (>= 3) | `content/post/python_<topic-slug>/<slug>_*.png` |
+**Skill:** `/project:write-results-report <post slug>`
+**Location:** `.claude/skills/write-results-report/SKILL.md`
 
-The skill enforces the sandwich pattern (explanation, code, interpretation), uses the site color palette (`#6a9bcc`, `#d97757`, `#141413`, `#00d4c8`), and requires at least 8 interpretation paragraphs with specific numeric values. Posts inherit notebook-style CSS styling from `assets/scss/custom.scss` and use `toc: true` for the left-side table of contents. Currency dollar signs use `\\$` in `index.md` (MathJax-enabled) and `\$` in notebooks. After code changes, re-run `script.py` to regenerate all images.
+Execute a script and produce `results_report.md` with structured interpretations. Bridges raw code output and the blog post.
 
-**Reference posts:**
+### Review Results Report
 
-- ML: `content/post/python_ml_random_forest/index.md`
-- Causal inference: `content/post/python_dowhy/index.md`
-- Dark theme figures / simulated data: `content/post/python_fwl/index.md`
-- Panel data / fixed effects: `content/post/python_pyfixest/index.md`
-- ESDA / spatial autocorrelation / LISA: `content/post/python_esda2/index.md`
-- MGWR / spatially varying coefficients: `content/post/python_mgwr/index.md`
+**Skill:** `/project:review-results-report <post slug>`
+**Location:** `.claude/skills/review-results-report/SKILL.md`
 
-### Review a Data Science Post (via Claude Code Skill)
+Verify results report accuracy against script output, check interpretation quality. Read-only.
 
-The `referee-post` skill reviews data science posts as an expert professor. It confirms review scope before starting, produces a structured referee report without modifying the post, and offers follow-up actions.
+### Write Data Science Post
 
-**Location:** `.claude/skills/referee-post/SKILL.md`
-**Reference files:** `.claude/skills/referee-post/references/` (report-template, scoring-and-criteria)
+**Skill:** `/project:write-post <topic> dataset: <dataset> [references: <URLs>]` OR `/project:write-post <post slug>`
+**Location:** `.claude/skills/write-post/SKILL.md`
 
-**Usage** (in Claude Code):
+Write a notebook-style blog post (`index.md`). Two modes: (A) consume existing script + results report, or (B) standalone with `[VERIFY]` markers. Enforces sandwich pattern, 8+ interpretations, LaTeX escaping.
 
-```
-/project:referee-post <post slug>
-```
+### Review Data Science Post
 
-**Examples:**
+**Skill:** `/project:review-post <post slug> [focus: code | structure | math | explanations | interpretations | writing | grammar | rigor | images]`
+**Location:** `.claude/skills/review-post/SKILL.md`
 
-```
-/project:referee-post python_dowhy
-/project:referee-post python_doubleml
-```
+Comprehensive review across 12 dimensions (merges deep expert review with proofreading). Produces a scored report with verdict. Read-only.
 
-### Generate Infographic Instructions (via Claude Code Skill)
+### Write Infographic Instructions
 
-The `infographic-instructions` skill generates an AI-image-generation prompt that creates a chalkboard-style infographic summarizing a blog post into 6 panels. The output is a copy-pasteable prompt optimized for Gemini, DALL-E, Midjourney, or Ideogram. Confirms template, title, and rendering preferences before generating, and offers follow-up adjustments.
+**Skill:** `/project:write-infographic <post slug>`
+**Location:** `.claude/skills/write-infographic/SKILL.md`
 
-**Location:** `.claude/skills/infographic-instructions/SKILL.md`
-**Reference files:** `.claude/skills/infographic-instructions/references/` (panel-templates, static-sections)
+Generate a chalkboard-style infographic prompt with 4 sections (full prompt, negative prompt, condensed prompt, panel reference data).
 
-**Usage** (in Claude Code):
+### Review Infographic Instructions
+
+**Skill:** `/project:review-infographic <post slug>`
+**Location:** `.claude/skills/review-infographic/SKILL.md`
+
+Cross-check infographic accuracy against source post, evaluate quality, suggest variant improvements. Read-only.
+
+### Full Pipeline Example
 
 ```
-/project:infographic-instructions <post slug>
+/project:write-script double machine learning dataset: DS4Bolivia
+/project:review-script python_doubleml
+/project:write-results-report python_doubleml
+/project:review-results-report python_doubleml
+/project:write-post python_doubleml
+/project:review-post python_doubleml
+/project:write-infographic python_doubleml
+/project:review-infographic python_doubleml
 ```
-
-**Examples:**
-
-```
-/project:infographic-instructions python_partial_identification
-/project:infographic-instructions python_dowhy
-```
-
-**What it produces:**
-
-| Output             | Path                                                |
-|--------------------|-----------------------------------------------------|
-| Infographic prompt | `content/post/<slug>/infographic_instructions.md`   |
-
-The file contains four sections: (A) a full flowing-prose image generation prompt with scene description, composition, color system, panel-by-panel visual scenes, enrichment elements, and text rendering guidance; (B) a negative prompt; (C) a condensed ~300-word prompt for token-limited tools; and (D) a structured panel reference data appendix. The skill asks the user to confirm template selection, title, panel topics, target AI tool, and text rendering preference before generating.
-
-**Reference output:** `content/post/python_partial_identification/infographic_instructions.md`
-
-### Proofread a Data Science Post (via Claude Code Skill)
-
-The `proofread-post` skill runs a final proofreading pass on a data science post before publication. It checks correctness, display, and consistency without modifying any files. Lighter and faster than `referee-post`. Announces scope and offers follow-up after delivery.
-
-**Location:** `.claude/skills/proofread-post/SKILL.md`
-
-**Usage** (in Claude Code):
-
-```
-/project:proofread-post <post slug> [focus: frontmatter | markdown | math | code | images | mermaid | refs | style | grammar]
-```
-
-**Examples:**
-
-```
-/project:proofread-post python_partial_identification
-/project:proofread-post python_dowhy
-/project:proofread-post python_dowhy focus: math
-/project:proofread-post python_doubleml focus: code
-```
-
-**10-point checklist:** front matter and `links:` validation, markdown structure (heading hierarchy, callout/shortcode pairing, learning objectives, Colab badge), math (Goldmark escaping + correctness + accessible language with plain-language companions and variable mapping), code/output pairing, images (references + orphans + captions), code consistency and supporting files (CSVs, R/Stata scripts), Mermaid diagrams (syntax + site palette colors), references/links, site conventions, grammar/spelling/typos (prose only). Use `focus:` to run only specific checks.
 
 ### New Author
 
