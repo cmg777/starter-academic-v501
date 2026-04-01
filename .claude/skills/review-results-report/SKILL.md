@@ -18,12 +18,12 @@ interpretation quality. Produces an inline review report with a verdict.
 - Evaluates interpretation paragraphs for depth, specificity, and domain meaning
 - Assesses key findings for accuracy, diversity, and actionability
 - Produces a structured review with verdict, issues table, and priority fixes
+- Saves the review as `results_report_review.md` in the post directory
 
 **What this skill does NOT do:**
-- Does NOT modify results_report.md or any other file
+- Does NOT modify results_report.md or the script
 - Does NOT re-run the script
 - Does NOT write or edit the blog post
-- Does NOT create new files
 
 ---
 
@@ -226,9 +226,10 @@ Flag findings that are:
 
 ---
 
-## Step 7 -- Produce review report
+## Step 7 -- Produce and save review report
 
-Deliver the review inline using the format from `references/review-checklist.md`.
+Deliver the review inline using the format from `references/review-checklist.md`,
+then save it as `content/post/<slug>/results_report_review.md`.
 
 ### Severity definitions
 
@@ -277,6 +278,12 @@ how many matched, and list any mismatches with the correct values.>
 | **ACCEPT** | No HIGH issues, at most 2 MEDIUM issues. Report accurately captures script results with good interpretations. |
 | **MINOR REVISION** | No HIGH issues but 3+ MEDIUM, or 1 HIGH that is easy to fix. Needs targeted improvements. |
 | **MAJOR REVISION** | 2+ HIGH issues, or fundamental accuracy problems. Report cannot be trusted as a source for the blog post. |
+
+### Save the review
+
+After delivering the review inline, save the full review report to
+`content/post/<slug>/results_report_review.md`. This file serves as an
+audit trail and can be referenced when writing the blog post.
 
 ---
 
