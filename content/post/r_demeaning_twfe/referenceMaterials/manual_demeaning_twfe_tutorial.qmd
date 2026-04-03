@@ -1,0 +1,297 @@
+---
+title: "Manual Demeaning vs Two-Way Fixed Effects"
+subtitle: "Showing equivalence through the Frisch-Waugh-Lovell theorem"
+author: "Positron Assistant"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+## Motivation
+
+Two-way fixed effects (TWFE) is one of the most commonly used estimators in applied economics. Software packages like `fixest` make it easy to estimate TWFE models with a single line of code. But what does the estimator actually *do* to the data?
+
+Understanding the mechanics behind TWFE is important for several reasons:
+
+- It clarifies *why* time-invariant regressors (like geography or colonial origin) are dropped in fixed effects models --- they are eliminated by the demeaning process.
+- It helps diagnose situations where FE may not work as expected.
+- It connects the estimator to a fundamental result in econometrics: the **Frisch-Waugh-Lovell (FWL) theorem**.
+
+In this tutorial, we use the same Barro convergence panel dataset generated in `barro_convergence_fixest_tutorial.R`. We will:
+
+1. Estimate a TWFE model using `fixest` (the standard, package-based approach).
+2. Manually demean the data by removing country means and time means.
+3. Run ordinary least squares (OLS) on the demeaned data using base R's `lm()`.
+4. Compare the two sets of coefficients and confirm they are identical.
+
+
+## The Frisch-Waugh-Lovell Theorem and Two-Way Demeaning
+
+### The FWL theorem in plain language
+
+The Frisch-Waugh-Lovell theorem says: if you want to estimate the effect of $X$ on $Y$ while controlling for a set of variables $Z$, you can do it in two equivalent ways:
+
+1. **The direct way**: regress $Y$ on both $X$ and $Z$ simultaneously.
+2. **The residualisation way**: first regress $Y$ on $Z$ and save the residuals; then regress $X$ on $Z$ and save the residuals; finally regress the $Y$-residuals on the $X$-residuals.
+
+Both approaches give exactly the same coefficient on $X$.
+
+### Applying FWL to two-way fixed effects
+
+In a TWFE model, the "controls" $Z$ are the full set of country dummies and time dummies. Including all these dummies in a regression is equivalent to subtracting the group means from every variable. For a generic variable $x_{it}$ observed for country $i$ in period $t$, the **two-way demeaned** version is:
+
+$$
+\tilde{x}_{it} = x_{it} - \bar{x}_{i\cdot} - \bar{x}_{\cdot t} + \bar{x}_{\cdot\cdot}
+$$
+
+where:
+
+- $x_{it}$ is the observed value for country $i$ at time $t$,
+- $\bar{x}_{i\cdot} = \frac{1}{T}\sum_{t=1}^{T} x_{it}$ is the **country mean** (average over all periods for country $i$),
+- $\bar{x}_{\cdot t} = \frac{1}{N}\sum_{i=1}^{N} x_{it}$ is the **time mean** (average over all countries in period $t$),
+- $\bar{x}_{\cdot\cdot} = \frac{1}{NT}\sum_{i}\sum_{t} x_{it}$ is the **grand mean** (overall average).
+
+### Why add back the grand mean?
+
+When we subtract both the country mean and the time mean, the grand mean gets subtracted *twice* --- once as part of $\bar{x}_{i\cdot}$ and once as part of $\bar{x}_{\cdot t}$. Adding $\bar{x}_{\cdot\cdot}$ back corrects for this double subtraction.
+
+
+## Load the Data
+
+We load the panel dataset that was previously generated and saved as a CSV file by the Barro convergence tutorial. This demonstrates a realistic workflow where data preparation and analysis happen in separate scripts.
+
+```{r}
+library(fixest)
+library(dplyr)
+
+panel_data <- read.csv("data/barro_convergence_panel.csv")
+panel_data$id   <- factor(panel_data$id)
+panel_data$time <- factor(panel_data$time)
+```
+
+The dataset is a balanced panel. Let us verify its dimensions and inspect the first few rows.
+
+```{r}
+cat("Countries:", nlevels(panel_data$id), "\n")
+cat("Time periods:", nlevels(panel_data$time), "\n")
+cat("Total observations:", nrow(panel_data), "\n")
+```
+
+```{r}
+head(panel_data, 10)
+```
+
+The key variables for our growth regression are:
+
+- `growth`: annualised GDP per capita growth rate (dependent variable),
+- `ln_y_initial`: log of initial income (convergence term),
+- `log_s_k`: log of the investment share,
+- `log_n_gd`: log of population growth plus the depreciation rate,
+- `log_hcap`: log of human capital,
+- `gov_cons`: government consumption share.
+
+
+## Two-Way Fixed Effects with fixest
+
+The `fixest` package makes TWFE estimation straightforward. The formula uses `|` to separate the regressors (left) from the fixed effects dimensions (right). Writing `| id + time` tells `feols()` to absorb both country and time fixed effects.
+
+```{r}
+twfe_model <- feols(
+  growth ~ ln_y_initial + log_s_k + log_n_gd + log_hcap + gov_cons | id + time,
+  data = panel_data
+)
+
+summary(twfe_model)
+```
+
+The coefficient on `ln_y_initial` is the convergence parameter. A negative value indicates **beta-convergence**: countries with lower initial income tend to grow faster, conditional on the other covariates. The coefficients on investment and human capital are expected to be positive (these factors promote growth), while population growth and government consumption are expected to have negative effects.
+
+Internally, `fixest` performs an efficient iterative demeaning algorithm to remove the fixed effects before estimating the slope coefficients. We will now replicate this process by hand.
+
+
+## Manual Demeaning --- Step by Step
+
+We now walk through the demeaning procedure one step at a time. The goal is to transform every variable (both the dependent variable and all regressors) so that the country and time effects are removed.
+
+### Step 1: Compute Country Means
+
+For each country, we compute the average of each variable across all time periods. This gives us one mean per country per variable.
+
+```{r}
+vars_to_demean <- c("growth", "ln_y_initial", "log_s_k",
+                    "log_n_gd", "log_hcap", "gov_cons")
+
+country_means <- panel_data |>
+  group_by(id) |>
+  summarise(across(all_of(vars_to_demean), mean), .groups = "drop")
+```
+
+Each row in `country_means` represents one country's time-average. Here are the first five countries:
+
+```{r}
+head(country_means, 5)
+```
+
+For example, the first row shows the average growth rate, average initial income, and so on for country 1 across all eight time periods.
+
+### Step 2: Compute Time Period Means
+
+Next, for each time period, we compute the average of each variable across all countries. This captures common shocks or trends that affect all countries in a given period.
+
+```{r}
+time_means <- panel_data |>
+  group_by(time) |>
+  summarise(across(all_of(vars_to_demean), mean), .groups = "drop")
+```
+
+Each row represents one time period's cross-sectional average:
+
+```{r}
+time_means
+```
+
+These time means capture global patterns --- for instance, if all countries experienced slower growth in a particular period due to a worldwide recession.
+
+### Step 3: Compute the Grand Mean
+
+The grand mean is simply the overall average of each variable across all countries and all time periods. It is a single number per variable.
+
+```{r}
+grand_means <- colMeans(panel_data[vars_to_demean])
+grand_means
+```
+
+We need this to correct for the double subtraction that occurs when we remove both country and time means, as explained in Section 2.
+
+### Step 4: Apply the Demeaning Formula
+
+Now we bring everything together. For each observation, the demeaned value is:
+
+$$
+\tilde{x}_{it} = x_{it} - \bar{x}_{i\cdot} - \bar{x}_{\cdot t} + \bar{x}_{\cdot\cdot}
+$$
+
+First, we merge the country means and time means back into the main dataset:
+
+```{r}
+panel_data <- merge(panel_data, country_means,
+                    by = "id", suffixes = c("", "_country_mean"))
+
+panel_data <- merge(panel_data, time_means,
+                    by = "time", suffixes = c("", "_time_mean"))
+```
+
+Then we apply the demeaning formula to each variable:
+
+```{r}
+panel_data$growth_dm <- panel_data$growth -
+  panel_data$growth_country_mean -
+  panel_data$growth_time_mean +
+  grand_means["growth"]
+
+panel_data$ln_y_initial_dm <- panel_data$ln_y_initial -
+  panel_data$ln_y_initial_country_mean -
+  panel_data$ln_y_initial_time_mean +
+  grand_means["ln_y_initial"]
+
+panel_data$log_s_k_dm <- panel_data$log_s_k -
+  panel_data$log_s_k_country_mean -
+  panel_data$log_s_k_time_mean +
+  grand_means["log_s_k"]
+
+panel_data$log_n_gd_dm <- panel_data$log_n_gd -
+  panel_data$log_n_gd_country_mean -
+  panel_data$log_n_gd_time_mean +
+  grand_means["log_n_gd"]
+
+panel_data$log_hcap_dm <- panel_data$log_hcap -
+  panel_data$log_hcap_country_mean -
+  panel_data$log_hcap_time_mean +
+  grand_means["log_hcap"]
+
+panel_data$gov_cons_dm <- panel_data$gov_cons -
+  panel_data$gov_cons_country_mean -
+  panel_data$gov_cons_time_mean +
+  grand_means["gov_cons"]
+```
+
+Let us compare a few rows of original and demeaned data to see the transformation at work:
+
+```{r}
+panel_data |>
+  select(id, time, growth, growth_dm, ln_y_initial, ln_y_initial_dm) |>
+  head(8)
+```
+
+Notice how the demeaned values are centred closer to zero. The country-specific level and the period-specific trend have been removed, leaving only the *within-variation* that identifies the TWFE coefficients.
+
+
+## OLS on the Demeaned Data
+
+With the demeaning complete, we now run a standard OLS regression on the demeaned variables. We deliberately use base R's `lm()` rather than `feols()` to emphasise that this is plain ordinary least squares --- no fixed effects machinery is involved.
+
+```{r}
+manual_model <- lm(
+  growth_dm ~ ln_y_initial_dm + log_s_k_dm + log_n_gd_dm + log_hcap_dm + gov_cons_dm,
+  data = panel_data
+)
+
+summary(manual_model)
+```
+
+Two things to note in the output:
+
+1. **The intercept** should be approximately zero (or very close to it). After proper two-way demeaning, the mean of all demeaned variables is near zero, so there is nothing left for the intercept to capture.
+2. **The slope coefficients** are the quantities we want to compare with the TWFE model.
+
+
+## Comparison of Results
+
+We now place the coefficients from both approaches side by side. If the Frisch-Waugh-Lovell theorem holds (and it does, mathematically), the slope coefficients must be identical up to floating-point precision.
+
+```{r}
+twfe_coefs   <- coef(twfe_model)
+manual_coefs <- coef(manual_model)[-1]  # drop the intercept
+names(manual_coefs) <- names(twfe_coefs)
+
+comparison <- data.frame(
+  Variable       = c("Initial income (log)", "Investment share (log)",
+                     "Pop growth + g + d (log)", "Human capital (log)",
+                     "Gov consumption share"),
+  fixest_TWFE    = round(twfe_coefs, 8),
+  Manual_Demean  = round(manual_coefs, 8),
+  Difference     = round(twfe_coefs - manual_coefs, 12)
+)
+rownames(comparison) <- NULL
+
+comparison
+```
+
+The `Difference` column should contain values that are zero or negligibly small (on the order of $10^{-15}$ or less). These tiny differences arise from floating-point arithmetic, not from any substantive discrepancy.
+
+We can confirm this formally using R's `all.equal()` function, which tests whether two numeric vectors are equal within a small tolerance (by default, about $1.5 \times 10^{-8}$):
+
+```{r}
+all.equal(unname(twfe_coefs), unname(manual_coefs))
+```
+
+The result `TRUE` confirms that the two approaches produce the same coefficient estimates.
+
+
+## Key Takeaways
+
+This tutorial has demonstrated a fundamental equivalence in econometrics:
+
+1. **TWFE is not a special estimator.** It is ordinary least squares applied to data that has been demeaned by group (country) and time. The `fixest` package automates this process efficiently, but the underlying operation is straightforward.
+
+2. **The Frisch-Waugh-Lovell theorem guarantees the equivalence.** Including a full set of country and time dummies in a regression is algebraically identical to subtracting country means and time means (and adding back the grand mean) before running OLS.
+
+3. **Demeaning reveals what FE can and cannot identify.** Any variable that does not vary within a country over time (e.g., geography, colonial history) has a country mean equal to itself. After demeaning, such a variable becomes zero everywhere and drops out of the regression. This is why fixed effects models cannot estimate the effect of time-invariant characteristics.
+
+4. **A caveat on standard errors.** While the *coefficients* from `lm()` on demeaned data match those from `feols()`, the *standard errors* do not. The `lm()` function does not know that degrees of freedom were consumed by estimating the country and time effects. The `fixest` package correctly adjusts for this, producing valid standard errors. In applied work, always use the dedicated panel estimator for inference.

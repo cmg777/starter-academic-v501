@@ -1,0 +1,252 @@
+Warning message:
+package ‘fixest’ was built under R version 4.3.3 
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.2     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.5.2     ✔ tibble    3.2.1
+✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+✔ purrr     1.0.1     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+Warning message:
+package ‘ggplot2’ was built under R version 4.3.3 
+
+Attaching package: ‘scales’
+
+The following object is masked from ‘package:purrr’:
+
+    discard
+
+The following object is masked from ‘package:readr’:
+
+    col_factor
+
+The following object is masked from ‘package:fixest’:
+
+    pvalue
+
+Warning message:
+package ‘scales’ was built under R version 4.3.3 
+
+========================================
+1. DATA LOADING AND PANEL STRUCTURE
+========================================
+Countries: 150 
+Time periods: 8 
+Total observations: 1200 
+Balanced panel: TRUE 
+
+Summary of key variables:
+     growth           ln_y_initial      log_s_k          log_n_gd     
+ Min.   :-0.238451   Min.   :1.923   Min.   :-2.387   Min.   :-2.900  
+ 1st Qu.:-0.157869   1st Qu.:4.047   1st Qu.:-1.722   1st Qu.:-2.704  
+ Median :-0.121765   Median :5.159   Median :-1.537   Median :-2.656  
+ Mean   :-0.124364   Mean   :5.364   Mean   :-1.570   Mean   :-2.657  
+ 3rd Qu.:-0.091247   3rd Qu.:6.538   3rd Qu.:-1.393   3rd Qu.:-2.606  
+ Max.   :-0.003983   Max.   :9.874   Max.   :-1.021   Max.   :-2.427  
+    log_hcap          gov_cons     
+ Min.   :0.02165   Min.   :0.0704  
+ 1st Qu.:0.56623   1st Qu.:0.1261  
+ Median :0.68201   Median :0.1454  
+ Mean   :0.66457   Mean   :0.1461  
+ 3rd Qu.:0.79619   3rd Qu.:0.1666  
+ Max.   :1.09248   Max.   :0.2201  
+
+Saved: r_demeaning_twfe_panel_structure.png
+
+========================================
+2. TWFE ESTIMATION WITH FIXEST
+========================================
+
+TWFE model summary:
+OLS estimation, Dep. Var.: growth
+Observations: 1,200
+Fixed-effects: id: 150,  time: 8
+Standard-errors: Clustered (id) 
+              Estimate Std. Error    t value  Pr(>|t|)    
+ln_y_initial -0.055286   0.003744 -14.765156 < 2.2e-16 ***
+log_s_k       0.019725   0.007583   2.601311  0.010223 *  
+log_n_gd     -0.049614   0.022168  -2.238117  0.026696 *  
+log_hcap      0.009081   0.014564   0.623549  0.533877    
+gov_cons     -0.102795   0.046398  -2.215501  0.028243 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+RMSE: 0.020517     Adj. R2: 0.755103
+                 Within R2: 0.176777
+
+TWFE coefficients:
+      variable                  label coefficient  std_error    t_value
+1 ln_y_initial     Log Initial Income -0.05528601 0.00374436 -14.765156
+2      log_s_k   Log Investment Share  0.01972490 0.00758268   2.601311
+3     log_n_gd         Log(n + g + d) -0.04961397 0.02216773  -2.238117
+4     log_hcap      Log Human Capital  0.00908115 0.01456365   0.623549
+5     gov_cons Gov. Consumption Share -0.10279532 0.04639822  -2.215501
+      p_value
+1 5.74994e-31
+2 1.02233e-02
+3 2.66963e-02
+4 5.33877e-01
+5 2.82426e-02
+Saved: twfe_results.csv
+
+========================================
+3. MANUAL DEMEANING STEP-BY-STEP
+========================================
+
+Step 3a: Computing country means...
+First 5 country means:
+# A tibble: 5 × 7
+  id    growth ln_y_initial log_s_k log_n_gd log_hcap gov_cons
+  <fct>  <dbl>        <dbl>   <dbl>    <dbl>    <dbl>    <dbl>
+1 1     -0.127         5.72   -1.61    -2.68    0.626   0.143 
+2 2     -0.106         4.80   -1.86    -2.52    0.170   0.0890
+3 3     -0.140         6.09   -1.41    -2.66    0.935   0.167 
+4 4     -0.130         5.54   -1.32    -2.68    0.544   0.153 
+5 5     -0.138         5.74   -1.43    -2.72    0.909   0.165 
+
+Step 3b: Computing time means...
+All time period means:
+# A tibble: 8 × 7
+  time   growth ln_y_initial log_s_k log_n_gd log_hcap gov_cons
+  <fct>   <dbl>        <dbl>   <dbl>    <dbl>    <dbl>    <dbl>
+1 1     -0.189          7.96   -1.59    -2.66    0.658    0.146
+2 2     -0.166          7.01   -1.57    -2.66    0.662    0.146
+3 3     -0.140          6.18   -1.57    -2.66    0.663    0.147
+4 4     -0.127          5.48   -1.56    -2.66    0.668    0.147
+5 5     -0.110          4.85   -1.57    -2.66    0.668    0.147
+6 6     -0.101          4.30   -1.57    -2.65    0.669    0.146
+7 7     -0.0859         3.79   -1.56    -2.66    0.666    0.144
+8 8     -0.0758         3.36   -1.57    -2.66    0.662    0.144
+
+Step 3c: Computing grand means...
+Grand means:
+      growth ln_y_initial      log_s_k     log_n_gd     log_hcap     gov_cons 
+  -0.1243637    5.3643127   -1.5699117   -2.6569021    0.6645657    0.1461335 
+
+Step 3d: Applying the demeaning formula...
+Formula: x_tilde_it = x_it - x_bar_i. - x_bar_.t + x_bar_..
+
+Mean of demeaned variables (should be ~0):
+  growth_dm           : -8.114169e-17
+  ln_y_initial_dm     : 8.295170e-15
+  log_s_k_dm          : -1.482923e-15
+  log_n_gd_dm         : 1.599953e-15
+  log_hcap_dm         : 5.384582e-17
+  gov_cons_dm         : 1.832302e-16
+
+Original vs demeaned (first 8 rows, country 1):
+# A tibble: 8 × 6
+  id    time   growth growth_dm ln_y_initial ln_y_initial_dm
+  <fct> <fct>   <dbl>     <dbl>        <dbl>           <dbl>
+1 1     1     -0.179    0.0134          8.25         -0.0672
+2 1     2     -0.151    0.0167          7.36         -0.0129
+3 1     3     -0.126    0.0161          6.60          0.0581
+4 1     4     -0.128    0.00173         5.97          0.126 
+5 1     5     -0.118   -0.00511         5.33          0.122 
+6 1     6     -0.139   -0.0348          4.74          0.0836
+7 1     7     -0.107   -0.0182          4.05         -0.103 
+8 1     8     -0.0683   0.0100          3.51         -0.207 
+Saved: data_demeaned.csv
+
+========================================
+4. OLS ON DEMEANED DATA
+========================================
+
+OLS on demeaned data summary:
+
+Call:
+lm(formula = growth_dm ~ ln_y_initial_dm + log_s_k_dm + log_n_gd_dm + 
+    log_hcap_dm + gov_cons_dm, data = panel_dm)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.069598 -0.013451  0.000593  0.013004  0.073873 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      5.035e-16  5.938e-04   0.000  1.00000    
+ln_y_initial_dm -5.529e-02  3.618e-03 -15.282  < 2e-16 ***
+log_s_k_dm       1.972e-02  6.846e-03   2.881  0.00403 ** 
+log_n_gd_dm     -4.961e-02  1.820e-02  -2.726  0.00651 ** 
+log_hcap_dm      9.081e-03  1.370e-02   0.663  0.50751    
+gov_cons_dm     -1.028e-01  4.411e-02  -2.331  0.01994 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.02057 on 1194 degrees of freedom
+Multiple R-squared:  0.1768,	Adjusted R-squared:  0.1733 
+F-statistic: 51.28 on 5 and 1194 DF,  p-value: < 2.2e-16
+
+
+Intercept value: 5.034944e-16 (should be ~0)
+Intercept is effectively zero: TRUE
+Saved: ols_demeaned_results.csv
+
+========================================
+5. COEFFICIENT COMPARISON
+========================================
+
+Side-by-side coefficient comparison:
+      variable                  label      feols_TWFE      manual_OLS
+1 ln_y_initial     Log Initial Income -0.055286009819 -0.055286009819
+2      log_s_k   Log Investment Share  0.019724899416  0.019724899416
+3     log_n_gd         Log(n + g + d) -0.049613972524 -0.049613972524
+4     log_hcap      Log Human Capital  0.009081150621  0.009081150621
+5     gov_cons Gov. Consumption Share -0.102795317426 -0.102795317426
+        difference
+1 -4.163336342e-17
+2  3.469446952e-18
+3 -2.775557562e-16
+4  3.469446952e-17
+5 -3.053113318e-16
+
+Maximum absolute difference: 3.053113e-16
+all.equal() test: TRUE 
+Saved: coefficient_comparison.csv
+Saved: r_demeaning_twfe_coef_comparison.png
+
+========================================
+6. VISUALIZING WHAT DEMEANING DOES
+========================================
+Saved: r_demeaning_twfe_scatter_before_after.png
+Saved: r_demeaning_twfe_decomposition.png
+
+========================================
+7. STANDARD ERROR COMPARISON
+========================================
+
+Standard error comparison:
+      variable                  label se_naive_lm se_feols_iid se_feols_cluster
+1 ln_y_initial     Log Initial Income  0.00361766   0.00388000       0.00374436
+2      log_s_k   Log Investment Share  0.00684559   0.00734199       0.00758268
+3     log_n_gd         Log(n + g + d)  0.01820117   0.01952104       0.02216773
+4     log_hcap      Log Human Capital  0.01369872   0.01469209       0.01456365
+5     gov_cons Gov. Consumption Share  0.04410809   0.04730660       0.04639822
+
+Why SEs differ:
+- Naive lm() uses df = N*T - K = 1195 
+- Correct df = N*T - N - T + 1 - K = 1038 
+- feols() clustered SEs also account for within-entity correlation
+Saved: se_comparison.csv
+Saved: r_demeaning_twfe_se_comparison.png
+
+========================================
+8. SUMMARY
+========================================
+
+Generated PNG files:
+[1] "r_demeaning_twfe_coef_comparison.png"     
+[2] "r_demeaning_twfe_decomposition.png"       
+[3] "r_demeaning_twfe_panel_structure.png"     
+[4] "r_demeaning_twfe_scatter_before_after.png"
+[5] "r_demeaning_twfe_se_comparison.png"       
+
+Generated CSV files:
+[1] "coefficient_comparison.csv" "country_means.csv"         
+[3] "data_demeaned.csv"          "ols_demeaned_results.csv"  
+[5] "se_comparison.csv"          "source_data.csv"           
+[7] "time_means.csv"             "twfe_results.csv"          
+
+=== Script completed successfully ===
