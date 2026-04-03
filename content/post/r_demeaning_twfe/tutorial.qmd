@@ -1,0 +1,435 @@
+---
+title: "What Does TWFE Actually Do? Manual Demeaning and the FWL Theorem"
+subtitle: "Showing equivalence through the Frisch-Waugh-Lovell theorem"
+author: "Carlos Mendez"
+date: "2026-04-02"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    theme: darkly
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 300
+execute:
+  warning: false
+  message: false
+---
+
+## Overview
+
+Two-way fixed effects (TWFE) is one of the most widely used estimators in applied economics. Packages like `fixest` make it easy to estimate TWFE models with a single line of code. But what does the estimator actually *do* to the data? Why do time-invariant regressors like geography or colonial origin get dropped? And if you run `lm()` on manually demeaned data, should you get the same answer?
+
+This tutorial answers these questions by taking TWFE apart. We estimate a standard growth regression with country and time fixed effects, then replicate the exact same coefficients by hand --- subtracting country means, time means, and adding back the grand mean before running ordinary least squares. The result is not an approximation: the coefficients match to 12 significant digits. The theoretical foundation for this equivalence is the **Frisch-Waugh-Lovell (FWL) theorem**, a fundamental result in econometrics that connects controlling for variables in a regression to projecting them out by residualization.
+
+We use a balanced panel of 150 countries observed over 8 time periods from the Barro convergence dataset. Along the way, we also discover why standard errors from naive `lm()` on demeaned data are wrong --- and why you should always use a dedicated panel estimator for inference.
+
+**Learning objectives:**
+
+- Understand what two-way fixed effects does mechanically to the data and why time-invariant regressors are dropped
+- Implement the two-way demeaning formula step by step: subtract country means, subtract time means, add back the grand mean
+- Verify the Frisch-Waugh-Lovell theorem empirically by comparing `feols()` and `lm()` coefficients
+- Interpret why naive standard errors from `lm()` on demeaned data are incorrect and how `fixest` corrects them
+- Visualize the demeaning transformation to build intuition about within-variation identification
+
+## The Frisch-Waugh-Lovell Theorem
+
+Before diving into code, let us build the conceptual foundation. The FWL theorem answers a simple question: if you want to estimate the effect of $X$ on $Y$ while controlling for a set of variables $Z$, do you need to include everything in one big regression?
+
+Think of it like noise-canceling headphones. Instead of listening to music with the engine noise mixed in, the headphones first *subtract out* the engine noise from what you hear. The result is the same music you would hear in a silent room. The FWL theorem says: instead of including all control variables in one regression, you can first "subtract them out" from both $Y$ and $X$, and then regress the residuals on each other. The coefficient on $X$ will be identical either way.
+
+### Applying FWL to two-way fixed effects
+
+In a TWFE model, the "controls" $Z$ are the full set of country dummies and time dummies. Including all these dummies is equivalent to subtracting group means. For a variable $x_{it}$ observed for country $i$ in period $t$, the **two-way demeaned** version is:
+
+$$\tilde{x}_{it} = x_{it} - \bar{x}_{i \cdot} - \bar{x}_{\cdot t} + \bar{x}_{\cdot \cdot}$$
+
+In words, this formula says: take the observed value, subtract the country average (to remove persistent country differences), subtract the time-period average (to remove common shocks), and add back the overall average (to correct for double-subtracting the grand mean).
+
+### Why add back the grand mean?
+
+When we subtract both the country mean and the time mean, the grand mean gets subtracted *twice* --- once as part of $\bar{x}_{i \cdot}$ and once as part of $\bar{x}_{\cdot t}$. Adding $\bar{x}_{\cdot \cdot}$ back corrects for this double subtraction. Think of it like a Venn diagram with two overlapping circles. If you subtract both circles entirely, the overlap region gets removed twice. Adding the overlap back once restores the correct amount.
+
+The FWL theorem guarantees this equivalence formally:
+
+$$\hat{\beta}_{\text{TWFE}} = \hat{\beta}_{\text{OLS on demeaned data}}$$
+
+## Setup
+
+```{r}
+#| label: setup
+
+# Install fixest if needed
+if (!requireNamespace("fixest", quietly = TRUE)) {
+  install.packages("fixest")
+}
+
+library(fixest)
+library(tidyverse)
+library(scales)
+
+set.seed(42)
+
+# Site color palette
+STEEL_BLUE   <- "#6a9bcc"
+WARM_ORANGE  <- "#d97757"
+NEAR_BLACK   <- "#141413"
+TEAL         <- "#00d4c8"
+
+# Variable labels for human-readable axis text
+VAR_LABELS <- c(
+  growth       = "GDP per Capita Growth",
+  ln_y_initial = "Log Initial Income",
+  log_s_k      = "Log Investment Share",
+  log_n_gd     = "Log(n + g + d)",
+  log_hcap     = "Log Human Capital",
+  gov_cons     = "Gov. Consumption Share"
+)
+
+# Variables to demean (dependent + all regressors)
+VARS_TO_DEMEAN <- c("growth", "ln_y_initial", "log_s_k",
+                     "log_n_gd", "log_hcap", "gov_cons")
+```
+
+## Data Loading and Panel Structure
+
+We load a balanced panel dataset directly from GitHub for full reproducibility.
+
+```{r}
+#| label: data-loading
+
+# Load data from GitHub (reproducible in any environment)
+DATA_URL <- "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_demeaning_twfe/referenceMaterials/barro_convergence_panel.csv"
+
+panel_data <- read.csv(DATA_URL)
+panel_data$id   <- factor(panel_data$id)
+panel_data$time <- factor(panel_data$time)
+
+n_countries <- nlevels(panel_data$id)
+n_periods   <- nlevels(panel_data$time)
+
+cat("Countries:", n_countries, "\n")
+cat("Time periods:", n_periods, "\n")
+cat("Total observations:", nrow(panel_data), "\n")
+cat("Balanced panel:", all(table(panel_data$id) == n_periods), "\n")
+```
+
+```{r}
+#| label: fig-panel-structure
+#| fig-cap: "Panel structure heatmap showing all 150 countries observed across 8 time periods."
+
+panel_grid <- expand.grid(
+  id   = levels(panel_data$id),
+  time = levels(panel_data$time)
+)
+panel_grid$present <- 1
+
+ggplot(panel_grid, aes(x = time, y = id, fill = factor(present))) +
+  geom_tile(color = "white", linewidth = 0.05) +
+  scale_fill_manual(values = c("1" = STEEL_BLUE), guide = "none") +
+  labs(title = "Panel Structure: Countries x Time Periods",
+       subtitle = paste0("Balanced panel: ", n_countries, " countries x ",
+                         n_periods, " periods = ", nrow(panel_data), " obs"),
+       x = "Time Period", y = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(),
+        panel.grid = element_blank(),
+        plot.title = element_text(face = "bold", color = NEAR_BLACK),
+        plot.subtitle = element_text(color = "gray40"))
+```
+
+## TWFE Estimation with fixest
+
+```{r}
+#| label: twfe-estimation
+
+twfe_model <- feols(
+  growth ~ ln_y_initial + log_s_k + log_n_gd + log_hcap + gov_cons | id + time,
+  data = panel_data
+)
+
+summary(twfe_model)
+```
+
+The convergence coefficient on log initial income is -0.055 (t = -14.77, p < 2.2e-16). The model explains 75.5% of total variation (Adj. R² = 0.755), though only 17.7% of the within-variation (Within R² = 0.177).
+
+## Manual Demeaning --- Step by Step
+
+```{r}
+#| label: compute-means
+
+# Step 1: Country means
+country_means <- panel_data |>
+  group_by(id) |>
+  summarise(across(all_of(VARS_TO_DEMEAN), mean), .groups = "drop")
+
+# Step 2: Time means
+time_means <- panel_data |>
+  group_by(time) |>
+  summarise(across(all_of(VARS_TO_DEMEAN), mean), .groups = "drop")
+
+# Step 3: Grand mean
+grand_means <- colMeans(panel_data[VARS_TO_DEMEAN])
+cat("Grand means:\n")
+print(grand_means)
+```
+
+```{r}
+#| label: apply-demeaning
+
+# Step 4: Apply the demeaning formula
+panel_dm <- panel_data |>
+  left_join(
+    country_means |> rename_with(~ paste0(.x, "_cmean"), all_of(VARS_TO_DEMEAN)),
+    by = "id"
+  ) |>
+  left_join(
+    time_means |> rename_with(~ paste0(.x, "_tmean"), all_of(VARS_TO_DEMEAN)),
+    by = "time"
+  )
+
+for (v in VARS_TO_DEMEAN) {
+  panel_dm[[paste0(v, "_dm")]] <-
+    panel_dm[[v]] -
+    panel_dm[[paste0(v, "_cmean")]] -
+    panel_dm[[paste0(v, "_tmean")]] +
+    grand_means[v]
+}
+
+# Verify demeaned means are approximately zero
+cat("Mean of demeaned variables (should be ~0):\n")
+dm_vars <- paste0(VARS_TO_DEMEAN, "_dm")
+for (v in dm_vars) {
+  cat(sprintf("  %-20s: %e\n", v, mean(panel_dm[[v]])))
+}
+```
+
+## OLS on the Demeaned Data
+
+```{r}
+#| label: ols-demeaned
+
+manual_model <- lm(
+  growth_dm ~ ln_y_initial_dm + log_s_k_dm + log_n_gd_dm + log_hcap_dm + gov_cons_dm,
+  data = panel_dm
+)
+
+summary(manual_model)
+```
+
+The intercept is 5.03 × 10⁻¹⁶ --- effectively zero, confirming proper demeaning.
+
+## Coefficient Comparison: The Proof
+
+```{r}
+#| label: coefficient-comparison
+
+twfe_coefs   <- coef(twfe_model)
+manual_coefs <- coef(manual_model)[-1]
+names(manual_coefs) <- names(twfe_coefs)
+
+comparison <- tibble(
+  variable   = names(twfe_coefs),
+  label      = VAR_LABELS[names(twfe_coefs)],
+  feols_TWFE = twfe_coefs,
+  manual_OLS = manual_coefs,
+  difference = twfe_coefs - manual_coefs
+)
+
+cat("Side-by-side coefficient comparison:\n")
+print(as.data.frame(comparison), digits = 12)
+
+cat(sprintf("\nMaximum absolute difference: %e\n", max(abs(comparison$difference))))
+cat("all.equal() test:", all.equal(unname(twfe_coefs), unname(manual_coefs)), "\n")
+```
+
+All five slope coefficients are identical to at least 12 significant digits. The largest difference is 3.05 × 10⁻¹⁶ --- the FWL theorem is confirmed.
+
+```{r}
+#| label: fig-coef-comparison
+#| fig-cap: "TWFE and manual demeaning coefficients overlap perfectly."
+
+comp_plot_data <- comparison |>
+  pivot_longer(cols = c(feols_TWFE, manual_OLS),
+               names_to = "method", values_to = "estimate") |>
+  mutate(
+    method = if_else(method == "feols_TWFE", "feols (TWFE)", "Manual Demeaning (OLS)"),
+    label  = factor(label, levels = rev(VAR_LABELS[names(twfe_coefs)]))
+  )
+
+ggplot(comp_plot_data, aes(x = estimate, y = label, color = method, shape = method)) +
+  geom_point(size = 4, position = position_dodge(width = 0.4)) +
+  scale_color_manual(values = c("feols (TWFE)" = STEEL_BLUE,
+                                "Manual Demeaning (OLS)" = WARM_ORANGE)) +
+  scale_shape_manual(values = c("feols (TWFE)" = 16,
+                                "Manual Demeaning (OLS)" = 17)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray60") +
+  labs(title = "Coefficient Comparison: TWFE vs Manual Demeaning",
+       subtitle = "Coefficients are identical (FWL theorem)",
+       x = "Coefficient Estimate", y = NULL, color = NULL, shape = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold", color = NEAR_BLACK),
+        plot.subtitle = element_text(color = "gray40"),
+        legend.position = "bottom")
+```
+
+## Visualizing What Demeaning Does
+
+```{r}
+#| label: fig-scatter-before-after
+#| fig-cap: "Raw data shows wide cross-country spread; demeaned data collapses to a narrow range around zero."
+#| fig-width: 12
+
+subset_ids <- levels(panel_dm$id)[1:10]
+subset_data <- panel_dm |> filter(id %in% subset_ids)
+
+raw_panel <- subset_data |>
+  select(id, time, x = ln_y_initial, y = growth) |>
+  mutate(panel = "Raw Data")
+
+dm_panel <- subset_data |>
+  select(id, time, x = ln_y_initial_dm, y = growth_dm) |>
+  mutate(panel = "After Two-Way Demeaning")
+
+scatter_long <- bind_rows(raw_panel, dm_panel) |>
+  mutate(panel = factor(panel, levels = c("Raw Data", "After Two-Way Demeaning")))
+
+ggplot(scatter_long, aes(x = x, y = y, color = id)) +
+  geom_point(size = 2, alpha = 0.8) +
+  facet_wrap(~ panel, scales = "free") +
+  scale_color_viridis_d(option = "turbo", guide = "none") +
+  labs(title = "What Demeaning Does: Raw vs Two-Way Demeaned Data",
+       subtitle = "Demeaning strips between-country levels and common time trends",
+       x = "Log Initial Income (raw / demeaned)",
+       y = "GDP Growth (raw / demeaned)") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold", color = NEAR_BLACK, size = 14),
+        plot.subtitle = element_text(color = "gray40", size = 11),
+        strip.text = element_text(face = "bold", size = 12))
+```
+
+```{r}
+#| label: fig-decomposition
+#| fig-cap: "Demeaning decomposition for Country 1: observed, country mean, time means, grand mean, and demeaned residual."
+
+country_id <- "1"
+country_sub <- panel_dm |> filter(id == country_id)
+
+c_mean <- country_means |> filter(id == country_id) |> pull(growth)
+t_means_vec <- time_means$growth
+g_mean <- grand_means["growth"]
+
+decomp_data <- tibble(
+  period       = as.numeric(as.character(country_sub$time)),
+  observed     = country_sub$growth,
+  country_mean = c_mean,
+  time_mean    = t_means_vec,
+  grand_mean   = g_mean,
+  demeaned     = country_sub$growth_dm
+)
+
+ggplot(decomp_data, aes(x = period)) +
+  geom_line(aes(y = observed, color = "Observed (x_it)"), linewidth = 1.2) +
+  geom_point(aes(y = observed, color = "Observed (x_it)"), size = 3) +
+  geom_hline(aes(yintercept = country_mean, color = "Country mean (x_i.)"),
+             linetype = "dashed", linewidth = 0.9) +
+  geom_line(aes(y = time_mean, color = "Time mean (x_.t)"),
+            linetype = "dotdash", linewidth = 0.9) +
+  geom_point(aes(y = time_mean, color = "Time mean (x_.t)"), size = 2) +
+  geom_hline(aes(yintercept = grand_mean, color = "Grand mean (x_..)"),
+             linetype = "dotted", linewidth = 0.9) +
+  geom_line(aes(y = demeaned, color = "Demeaned (x_tilde_it)"), linewidth = 1.2) +
+  geom_point(aes(y = demeaned, color = "Demeaned (x_tilde_it)"), size = 3) +
+  scale_color_manual(values = c(
+    "Observed (x_it)"       = STEEL_BLUE,
+    "Country mean (x_i.)"   = WARM_ORANGE,
+    "Time mean (x_.t)"      = TEAL,
+    "Grand mean (x_..)"     = "gray50",
+    "Demeaned (x_tilde_it)" = NEAR_BLACK
+  )) +
+  scale_x_continuous(breaks = 1:8) +
+  labs(title = paste("Demeaning Decomposition: Country", country_id, "(Growth)"),
+       subtitle = expression(tilde(x)[it] == x[it] - bar(x)[i.] - bar(x)[.t] + bar(x)[..]),
+       x = "Time Period", y = "Growth Rate", color = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold", color = NEAR_BLACK),
+        plot.subtitle = element_text(color = "gray40", size = 12),
+        legend.position = "bottom") +
+  guides(color = guide_legend(nrow = 2))
+```
+
+## A Caveat: Standard Errors Differ
+
+While the coefficients are identical, the standard errors from `lm()` on demeaned data are wrong. Naive `lm()` ignores the 157 degrees of freedom consumed by estimating 150 country effects and 8 time effects.
+
+```{r}
+#| label: se-comparison
+
+manual_se_naive <- summary(manual_model)$coefficients[-1, "Std. Error"]
+names(manual_se_naive) <- names(twfe_coefs)
+
+se_comparison <- tibble(
+  variable         = names(twfe_coefs),
+  label            = VAR_LABELS[names(twfe_coefs)],
+  se_naive_lm      = manual_se_naive,
+  se_feols_iid     = se(twfe_model, se = "iid"),
+  se_feols_cluster = se(twfe_model)
+)
+
+cat("Standard error comparison:\n")
+print(as.data.frame(se_comparison), digits = 6)
+
+cat("\nWhy SEs differ:\n")
+cat("- Naive lm() uses df = N*T - K =", nrow(panel_data) - length(manual_coefs), "\n")
+cat("- Correct df = N*T - N - T + 1 - K =",
+    nrow(panel_data) - n_countries - n_periods + 1 - length(twfe_coefs), "\n")
+```
+
+```{r}
+#| label: fig-se-comparison
+#| fig-cap: "Naive lm() SEs are systematically smaller than both feols variants."
+
+se_plot_data <- se_comparison |>
+  pivot_longer(cols = starts_with("se_"), names_to = "se_type", values_to = "se_value") |>
+  mutate(
+    se_type = case_match(se_type,
+      "se_naive_lm"      ~ "Naive lm()",
+      "se_feols_iid"     ~ "feols (IID)",
+      "se_feols_cluster" ~ "feols (Clustered)"
+    ),
+    se_type = factor(se_type, levels = c("Naive lm()", "feols (IID)", "feols (Clustered)")),
+    label   = factor(label, levels = VAR_LABELS[names(twfe_coefs)])
+  )
+
+ggplot(se_plot_data, aes(x = label, y = se_value, fill = se_type)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  scale_fill_manual(values = c("Naive lm()" = "gray70",
+                                "feols (IID)" = WARM_ORANGE,
+                                "feols (Clustered)" = STEEL_BLUE)) +
+  labs(title = "Standard Error Comparison: Why Naive SEs Are Wrong",
+       subtitle = "Naive lm() ignores absorbed degrees of freedom",
+       x = NULL, y = "Standard Error", fill = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold", color = NEAR_BLACK),
+        plot.subtitle = element_text(color = "gray40", size = 10),
+        axis.text.x = element_text(angle = 25, hjust = 1),
+        legend.position = "bottom")
+```
+
+## Summary
+
+**Key takeaways:**
+
+1. TWFE estimation via `feols()` and OLS on manually demeaned data produce identical coefficients --- the maximum difference across 5 coefficients is 3.05 × 10⁻¹⁶, confirming the FWL theorem.
+
+2. The demeaning formula subtracts entity means and time means, then adds back the grand mean to correct for double subtraction.
+
+3. The Within R² of 0.177 versus the overall Adjusted R² of 0.755 shows that most variation in growth is absorbed by the fixed effects, not by the regressors.
+
+4. Naive `lm()` standard errors understate uncertainty by 7--22% because they ignore the 157 degrees of freedom consumed by the fixed effects. Always use a dedicated panel estimator for inference.
+
+---
+
+*Full tutorial: [carlos-mendez.org/post/r_demeaning_twfe/](https://carlos-mendez.org/post/r_demeaning_twfe/)*
