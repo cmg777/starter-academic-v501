@@ -14,10 +14,18 @@ image:
   focal_point: Smart
   placement: 3
 links:
+- icon: google-colab
+  icon_pack: ai
+  name: "[R] Google Colab"
+  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/r_demeaning_twfe/notebook.ipynb
 - icon: code
   icon_pack: fas
   name: "R script"
   url: analysis.R
+- icon: book
+  icon_pack: fas
+  name: "Jupyter notebook"
+  url: notebook.ipynb
 slides:
 summary: Manual demeaning vs two-way fixed effects --- showing that TWFE is just OLS on demeaned data through the Frisch-Waugh-Lovell theorem, with a hands-on proof using a Barro convergence panel of 150 countries.
 tags:
