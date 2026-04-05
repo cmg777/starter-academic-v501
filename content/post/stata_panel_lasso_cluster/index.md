@@ -48,14 +48,16 @@ diagram: true
 
 ## 1. Overview
 
-Do all countries respond the same way to inflation, interest rates, or democratic transitions? Standard panel data models force a stark choice: either assume every country shares the same slope coefficients (pooled or fixed-effects regression) or allow every country to have its own parameters (unit-by-unit estimation). The first approach is too restrictive --- it masks important heterogeneity. The second is too noisy --- with limited time periods, individual estimates are imprecise.
+Do all countries respond the same way to inflation? To interest rates? To democratic transitions? Most panel data models assume yes. They force every country to share the same slope coefficients. That is a strong assumption --- and often a wrong one.
 
-The **Classifier-LASSO** (C-LASSO) method, developed by Su, Shi, and Phillips (2016), offers a middle path. It discovers **latent groups** where slope coefficients are homogeneous within each group but heterogeneous across groups. Think of it like a sorting hat for countries: rather than treating all 98 countries as identical or all as unique, C-LASSO finds that they naturally cluster into a small number of groups with shared behavioral patterns.
+Here is a preview of what we will discover. When we estimate the effect of inflation on savings across 56 countries, the pooled model says: "no significant effect." But that average is a lie. One group of countries saves *less* when inflation rises. Another group saves *more*. The pooled estimate averages a negative and a positive effect, producing a misleading zero.
 
-This tutorial demonstrates the `classifylasso` Stata command (Huang, Wang, and Zhou 2024) using two applications:
+The **Classifier-LASSO** (C-LASSO) method solves this problem. Developed by Su, Shi, and Phillips (2016), it discovers **latent groups** in your panel data. Countries within each group share the same coefficients. Countries across groups can differ. Think of it like a sorting hat: rather than treating all countries as identical or all as unique, C-LASSO sorts them into a small number of groups with shared behavioral patterns.
 
-1. **Savings behavior** across 56 countries (1995--2010) --- where we discover that inflation affects savings in opposite directions depending on the country group
-2. **Democracy and economic growth** across 98 countries (1970--2010) --- where the pooled estimate that "democracy promotes growth" turns out to mask a striking split: +2.15 in one group of countries and -0.94 in another
+This tutorial demonstrates the `classifylasso` Stata command (Huang, Wang, and Zhou 2024) with two applications:
+
+1. **Savings behavior** across 56 countries (1995--2010) --- where inflation affects savings in *opposite directions* depending on the country group
+2. **Democracy and economic growth** across 98 countries (1970--2010) --- where the pooled estimate of +1.05 masks a split of +2.15 in one group and -0.94 in another
 
 **Learning objectives:**
 
@@ -65,7 +67,7 @@ This tutorial demonstrates the `classifylasso` Stata command (Huang, Wang, and Z
 - Use postestimation commands (`classogroup`, `classocoef`, `predict gid`) to visualize and interpret results
 - Compare pooled fixed-effects estimates with group-specific C-LASSO estimates
 
-The following diagram summarizes the progression of this tutorial. We begin with data exploration, establish pooled benchmarks, then apply C-LASSO with increasing complexity --- from a simple static model to a dynamic specification with bias correction --- before turning to the policy-relevant democracy application.
+The diagram below maps the tutorial's progression. We start simple and build complexity step by step.
 
 ```mermaid
 graph LR
@@ -89,23 +91,25 @@ graph LR
 
 ### 2.1 Three approaches to slope heterogeneity
 
-Consider a panel dataset with $N$ countries observed over $T$ time periods. The standard fixed-effects model is:
+Imagine 56 students taking the same exam. **Approach 1** assumes they all studied the same way --- one average study strategy explains everyone's score. **Approach 2** gives each student a unique strategy --- but with only a few data points per student, the estimates are noisy. **Approach 3** (C-LASSO) discovers that students naturally fall into 2--3 study groups. Students within a group share the same strategy. Students across groups differ.
+
+The same logic applies to panel data. The standard fixed-effects model is:
 
 $$y\_{it} = \mu\_i + \boldsymbol{\beta}' \mathbf{x}\_{it} + u\_{it}$$
 
-In words, the outcome $y\_{it}$ for country $i$ at time $t$ depends on country-specific intercepts $\mu\_i$ (fixed effects) and a common slope vector $\boldsymbol{\beta}$ applied to the regressors $\mathbf{x}\_{it}$. The key assumption is that $\boldsymbol{\beta}$ is the **same for all countries**. This may be too restrictive --- countries with different economic structures may respond very differently to the same macroeconomic shocks.
+Here, $y\_{it}$ is the outcome for country $i$ at time $t$. The term $\mu\_i$ captures country-specific intercepts (fixed effects). The slope vector $\boldsymbol{\beta}$ links the regressors $\mathbf{x}\_{it}$ to the outcome. The critical assumption: $\boldsymbol{\beta}$ is the **same for all countries**. Japan and Nigeria get the same coefficient on inflation. That may be wrong.
 
-At the other extreme, we could estimate country-by-country regressions, allowing each country its own $\boldsymbol{\beta}\_i$. But with limited time periods (say, $T = 15$), these individual estimates are noisy and we lose the ability to make cross-country comparisons.
+At the other extreme, we could run separate regressions for each country. But with only $T = 15$ time periods per country, individual estimates are noisy. We lose statistical power.
 
-C-LASSO introduces a structured middle ground. It assumes that countries belong to $K$ latent groups, where all countries within a group share the same coefficients:
+C-LASSO introduces a middle ground. It assumes countries belong to $K$ latent groups:
 
 $$\boldsymbol{\beta}\_i = \boldsymbol{\alpha}\_k \quad \text{if} \quad i \in G\_k, \quad k = 1, \ldots, K$$
 
-In words, country $i$'s slope coefficients $\boldsymbol{\beta}\_i$ equal the group-specific parameter $\boldsymbol{\alpha}\_k$ if country $i$ belongs to latent group $G\_k$. The number of groups $K$, the group memberships, and the group-specific coefficients $\boldsymbol{\alpha}\_k$ are all estimated simultaneously from the data. This is analogous to clustering students by learning style rather than assuming all students learn identically or that every student is unique.
+In words, country $i$ gets the slope coefficients of its group $G\_k$. The method estimates three things simultaneously: the number of groups $K$, which countries belong to which group, and each group's coefficients $\boldsymbol{\alpha}\_k$. You do not need to specify the groups in advance. The data reveals them.
 
-### 2.2 Why not just use K-means or other clustering?
+### 2.2 Why not just use K-means?
 
-A natural question is: why not cluster the individual regression coefficients using K-means? The C-LASSO approach has two key advantages. First, it estimates group membership and group-specific coefficients **jointly** rather than in two separate steps, which avoids the propagation of first-stage estimation error. Second, the penalty structure of C-LASSO naturally shrinks similar units toward the same group, providing a statistically principled way to determine group membership.
+A natural question: why not run individual regressions first and then cluster the coefficients with K-means? C-LASSO has two advantages. First, it estimates group membership and coefficients **jointly**. A two-step approach (estimate, then cluster) propagates first-stage errors into the grouping. Second, C-LASSO's penalty structure naturally pulls similar countries toward the same group. It is a statistically principled sorting mechanism, not an ad-hoc post-processing step.
 
 ---
 
@@ -113,25 +117,31 @@ A natural question is: why not cluster the individual regression coefficients us
 
 ### 3.1 The C-LASSO objective function
 
-The C-LASSO estimator minimizes a penalized least-squares objective function:
+C-LASSO minimizes a penalized least-squares objective:
 
 $$Q\_{NT,\lambda}^{(K)} = \frac{1}{NT} \sum\_{i=1}^{N} \sum\_{t=1}^{T} (y\_{it} - \boldsymbol{\beta}\_i' \mathbf{x}\_{it})^2 + \frac{\lambda\_{NT}}{N} \sum\_{i=1}^{N} \prod\_{k=1}^{K} \|\boldsymbol{\beta}\_i - \boldsymbol{\alpha}\_k\|$$
 
-In words, the first term is the standard sum of squared residuals --- it measures how well the model fits the data. The second term is a **penalty** that encourages $\boldsymbol{\beta}\_i$ to be close to one of the group centers $\boldsymbol{\alpha}\_k$. The novel "mixed additive-multiplicative" structure of this penalty means that if $\boldsymbol{\beta}\_i$ is close to **any** group center $\boldsymbol{\alpha}\_k$, the product $\prod\_k \|\boldsymbol{\beta}\_i - \boldsymbol{\alpha}\_k\|$ becomes small, effectively shrinking that unit into the nearest group. The tuning parameter $\lambda\_{NT} = c\_\lambda T^{-1/3}$ controls the strength of this shrinkage.
+The first term is the standard sum of squared residuals. It measures how well the model fits the data. The second term is the **penalty**. It encourages each country's coefficients $\boldsymbol{\beta}\_i$ to be close to one of the group centers $\boldsymbol{\alpha}\_k$.
+
+Think of each group center as a **planet with gravitational pull**. If a country's coefficients are close to *any* planet, the product $\prod\_k \|\boldsymbol{\beta}\_i - \boldsymbol{\alpha}\_k\|$ shrinks toward zero. The penalty becomes small. The country gets pulled into that group. If the coefficients are far from all planets, the penalty stays large. The tuning parameter $\lambda\_{NT} = c\_\lambda T^{-1/3}$ controls how strong this gravitational pull is.
 
 ### 3.2 Three-step estimation procedure
 
-The `classifylasso` command implements a three-step procedure:
+The `classifylasso` command works in three steps:
 
-1. **Classifier-LASSO estimation.** For each candidate number of groups $K$, the algorithm iteratively updates group centers and membership assignments until convergence. Starting values come from unit-by-unit regressions.
+1. **Sort countries into groups.** For each candidate number of groups $K$, the algorithm iteratively updates group centers and reassigns countries until convergence. Starting values come from unit-by-unit regressions.
 
-2. **Postlasso estimation.** Given the group classification from step 1, re-estimate the coefficients within each group using standard OLS. Think of it as a two-stage process: the LASSO penalty first sorts countries into groups (even if its coefficient estimates are biased by the penalty), then OLS re-estimates the coefficients within each group without any penalty. This "postlasso" step improves finite-sample performance and enables standard inference (standard errors, confidence intervals).
+2. **Re-estimate within groups (postlasso).** The LASSO penalty biases the coefficient estimates. So after sorting, we discard the penalized estimates and re-run plain OLS within each group. Think of it like a talent show: LASSO is the audition that selects who is in which group, but the final performance (the coefficient estimates) is unpenalized. This postlasso step gives us valid standard errors and confidence intervals.
 
-3. **Information criterion.** When $K$ is unknown, the command tests $K \in \{1, 2, \ldots, K\_{\max}\}$ and selects the $K$ that minimizes an information criterion --- a measure that balances model fit against complexity, penalizing additional groups to prevent overfitting (similar in spirit to AIC or BIC). The tuning parameter $\rho\_{NT} = c\_\rho (NT)^{-1/2}$ controls this penalty.
+3. **Pick the best $K$ (information criterion).** How many groups are there? The command tests $K = 1, 2, \ldots, K\_{\max}$ and picks the $K$ that minimizes an information criterion. The IC acts like a **referee** balancing two concerns: fit (more groups fit better) and complexity (more groups risk overfitting). It works like AIC or BIC. The tuning parameter $\rho\_{NT} = c\_\rho (NT)^{-1/2}$ controls how harshly the referee penalizes extra groups.
 
 ### 3.3 Dynamic panels and Nickell bias
 
-When lagged dependent variables appear among the regressors (e.g., $y\_{i,t-1}$), the standard fixed-effects estimator suffers from **Nickell bias** --- a systematic bias that arises because the demeaned lagged dependent variable is correlated with the demeaned error term. The `classifylasso` command offers a `dynamic` option that applies the **half-panel jackknife** method (Dhaene and Jochmans 2015) to correct this bias. The idea is to split the time series in half, estimate the model on each half separately, and combine the estimates in a way that cancels the bias term.
+What if your model includes a lagged dependent variable, like $y\_{i,t-1}$? This creates a problem called **Nickell bias**. When you demean the data to remove fixed effects, the demeaned lagged outcome becomes correlated with the demeaned error. The result: biased coefficients.
+
+The `classifylasso` command offers a `dynamic` option to fix this. It uses the **half-panel jackknife** (Dhaene and Jochmans 2015). The idea is simple: split the time series in half. Estimate the model on each half. Combine the two estimates in a way that cancels the bias. Problem solved.
+
+Now that we understand the method, let's apply it to real data.
 
 ---
 
@@ -139,7 +149,7 @@ When lagged dependent variables appear among the regressors (e.g., $y\_{i,t-1}$)
 
 ### 4.1 Load and describe the data
 
-Our first application uses a panel of 56 countries observed over 15 years, originally analyzed by Su, Shi, and Phillips (2016). The outcome is the savings-to-GDP ratio, and the regressors include lagged savings, CPI inflation, real interest rates, and GDP growth.
+Our first application uses a panel of 56 countries over 15 years, from Su, Shi, and Phillips (2016). The outcome is the savings-to-GDP ratio. The regressors are lagged savings, CPI inflation, real interest rates, and GDP growth.
 
 ```stata
 use "refMaterials/saving.dta", clear
@@ -157,7 +167,7 @@ summarize savings lagsavings cpi interest gdp
          gdp |        840    1.06e-08    1.000596  -3.554419   2.461317
 ```
 
-The panel is strongly balanced: 56 countries $\times$ 15 years = 840 observations. All variables are standardized to have mean zero and standard deviation one. This standardization means that coefficient magnitudes should be interpreted in standard-deviation terms (e.g., "a one-SD increase in CPI is associated with a 0.18-SD change in savings"). The balanced structure is essential for C-LASSO, which requires all units to be observed in all time periods.
+The panel is strongly balanced: 56 countries $\times$ 15 years = 840 observations. All variables are standardized to mean zero and standard deviation one. This means coefficients are in standard-deviation units. A coefficient of 0.18 means "a one-SD increase in CPI is associated with a 0.18-SD change in savings." The balanced structure matters: C-LASSO requires all countries to be observed in all time periods.
 
 ### 4.2 Visualize cross-country heterogeneity
 
@@ -174,7 +184,9 @@ graph export "stata_panel_lasso_cluster_fig1_savings_scatter.png", replace width
 ![Spaghetti plot of savings-to-GDP ratio across 56 countries, showing wide dispersion in trajectories.](stata_panel_lasso_cluster_fig1_savings_scatter.png)
 *Figure 1: Savings-to-GDP ratio across 56 countries (1995--2010). Each line represents one country, revealing substantial heterogeneity in savings dynamics.*
 
-The spaghetti plot reveals substantial heterogeneity. Some countries maintain consistently positive savings ratios while others fluctuate below zero. The lines do not move in lockstep --- different countries appear to follow fundamentally different savings dynamics. This visual pattern motivates the search for latent groups: perhaps subsets of countries share similar responses to macroeconomic conditions, even if the full panel does not.
+The spaghetti plot tells a clear story: countries do not move in lockstep. Some maintain positive savings ratios throughout. Others swing below zero. The lines diverge, cross, and cluster --- suggesting that different countries follow fundamentally different savings dynamics. This is exactly the kind of heterogeneity that C-LASSO is designed to detect. Perhaps subsets of countries share similar responses, even if the full panel does not.
+
+But first, let's see what the standard models say.
 
 ---
 
@@ -201,7 +213,11 @@ interest             0.0059         0.0059
 gdp                  0.1882         0.1882
 ```
 
-The pooled OLS and fixed-effects estimates are virtually identical, with an R-squared of 0.438. Lagged savings dominates with a coefficient of 0.605 ($p < 0.001$), indicating strong persistence. GDP growth also matters ($\hat{\beta} = 0.188$, $p < 0.001$). But notice that CPI (0.030) and the interest rate (0.006) are both statistically insignificant. Is this because inflation and interest rates truly do not affect savings? Or is it because the pooled model averages over country groups with **opposite-sign effects**, producing a near-zero average? C-LASSO will answer this question.
+The pooled OLS and fixed-effects estimates are virtually identical. R-squared is 0.438. Lagged savings dominates (coefficient 0.605, $p < 0.001$). GDP growth matters too (0.188, $p < 0.001$).
+
+Now look at the two remaining variables. CPI: 0.030. Interest rate: 0.006. Both statistically insignificant. A textbook conclusion would be: "Inflation and interest rates do not affect savings."
+
+But what if the average is lying? Imagine a city where half the neighborhoods warm up by 5 degrees and the other half cool down by 5 degrees. The citywide average temperature change is zero. A meteorologist reporting "no change" would be wrong --- there *are* changes, just in opposite directions. This is exactly what we will discover with C-LASSO.
 
 ---
 
@@ -209,7 +225,7 @@ The pooled OLS and fixed-effects estimates are virtually identical, with an R-sq
 
 ### 6.1 Estimation
 
-We start with the simplest C-LASSO specification --- a static model without the lagged dependent variable. This allows us to focus on the core mechanics of `classifylasso` before introducing the dynamic bias correction.
+We start with the simplest C-LASSO specification: a static model without the lagged dependent variable. This lets us focus on the core mechanics before adding complexity.
 
 ```stata
 classifylasso savings cpi interest gdp, grouplist(1/5) tolerance(1e-4)
@@ -248,7 +264,15 @@ Group 2 (22 countries, 330 obs):  Within R-sq. = 0.2369
          gdp |   0.1117   (z =  2.23, p = 0.026)
 ```
 
-The results are striking. Group 1 (34 countries) shows **negative** effects of CPI (-0.181) and interest rates (-0.197) on savings, while Group 2 (22 countries) shows **positive** effects: CPI at +0.478 and interest at +0.263. This sign reversal explains why the pooled CPI coefficient was near zero and insignificant --- the pooled model was averaging a negative effect in one group with a positive effect in another, producing a misleading null result. In Group 1, higher inflation erodes the real value of savings, discouraging saving. In Group 2, higher inflation may trigger **precautionary savings** --- households save more precisely because the economic environment is uncertain.
+The results are striking. Look at CPI.
+
+In **Group 1** (34 countries), higher inflation *reduces* savings: coefficient $-0.181$ ($p < 0.001$). In **Group 2** (22 countries), higher inflation *increases* savings: coefficient $+0.478$ ($p < 0.001$). The sign flips completely.
+
+The same reversal appears for the interest rate: $-0.197$ in Group 1 versus $+0.263$ in Group 2.
+
+Now the pooled CPI coefficient of $+0.030$ makes sense. It was averaging $-0.181$ and $+0.478$ --- a negative and a positive effect canceling each other out. The "insignificant" result was not evidence of no effect. It was evidence of **two opposing effects** hidden inside the average.
+
+Why the reversal? In Group 1, higher inflation erodes the real value of savings, discouraging people from saving. In Group 2, higher inflation may trigger **precautionary savings** --- households save *more* precisely because the economic environment feels uncertain. Same macroeconomic shock, opposite behavioral response.
 
 ### 6.3 Group selection plot
 
@@ -260,7 +284,9 @@ graph export "stata_panel_lasso_cluster_fig2_group_selection_static.png", replac
 ![Information criterion and iteration count by number of groups for the static savings model. IC is minimized at K=2.](stata_panel_lasso_cluster_fig2_group_selection_static.png)
 *Figure 2: Group selection for the static savings model. The information criterion (left axis) is minimized at K=2, with a clear U-shape from K=3 onward.*
 
-The group selection plot confirms the IC minimum at $K = 2$ (marked by a triangle). The left axis shows the IC values and the right axis shows the number of iterations needed for convergence. The algorithm converged quickly for $K = 2$ (about 3 iterations) but required the maximum 20 iterations for $K \geq 3$, suggesting that models with more groups are overparameterized and struggle to find stable group assignments.
+The triangle marks the IC minimum at $K = 2$. The left axis shows IC values; the right axis shows iterations to convergence. Notice: $K = 2$ converged quickly (about 3 iterations). Models with $K \geq 3$ hit the maximum 20 iterations. When the algorithm struggles to converge, it is a sign of overparameterization --- too many groups for the data to support.
+
+So far, we have found two groups with a static model. But we omitted lagged savings. Let's add it back.
 
 ---
 
@@ -268,7 +294,7 @@ The group selection plot confirms the IC minimum at $K = 2$ (marked by a triangl
 
 ### 7.1 Adding the lagged dependent variable
 
-The static model omitted lagged savings to keep things simple. But savings are highly persistent (the pooled coefficient on `lagsavings` was 0.605), so omitting it may bias the other coefficients. We now estimate the full dynamic specification, replicating Su, Shi, and Phillips (2016), and use the `dynamic` option to correct for Nickell bias via the half-panel jackknife.
+Savings are highly persistent. The pooled coefficient on `lagsavings` was 0.605 --- a country's savings this year strongly predicts its savings next year. Omitting this variable may bias everything else. We now add it back and replicate Su, Shi, and Phillips (2016). The `dynamic` option activates the half-panel jackknife to correct Nickell bias.
 
 ```stata
 use "refMaterials/saving.dta", clear
@@ -294,7 +320,11 @@ Group 2 (25 countries, 375 obs):  Within R-sq. = 0.4372
          gdp |   0.1127   (z =  2.38, p = 0.018)
 ```
 
-The dynamic model again selects $K = 2$ groups. The sign reversal on CPI persists: $-0.160$ in Group 1 versus $+0.197$ in Group 2. The same pattern holds for the interest rate: $-0.149$ versus $+0.123$. Crucially, both groups show nearly identical savings persistence (lagsavings coefficients of 0.695 and 0.694), indicating that the heterogeneity lies in how countries respond to macroeconomic shocks, not in their baseline savings dynamics. The within R-squared improves substantially compared to the static model (0.499 and 0.437 versus 0.202 and 0.237), confirming that lagged savings is a critical predictor.
+Again, C-LASSO selects $K = 2$ groups. The sign reversal on CPI survives: $-0.160$ in Group 1 versus $+0.197$ in Group 2. Same for the interest rate: $-0.149$ versus $+0.123$.
+
+Here is what is interesting about the `lagsavings` coefficient. Both groups show nearly identical persistence: 0.695 in Group 1 and 0.694 in Group 2. Think of it like a speedometer. Both groups of countries cruise at the same speed (savings persistence). But they swerve in opposite directions when they hit a pothole (an inflation or interest rate shock). The heterogeneity is about *reactions to shocks*, not about baseline behavior.
+
+Adding lagged savings also improved the fit. Within R-squared jumped from 0.20--0.24 (static) to 0.44--0.50 (dynamic). The lagged variable clearly matters.
 
 ### 7.2 Coefficient plots
 
@@ -311,12 +341,18 @@ graph export "stata_panel_lasso_cluster_fig4_coef_interest.png", replace width(2
 ![CPI coefficient estimates and 95% confidence bands by group, showing a clear sign reversal with non-overlapping confidence intervals.](stata_panel_lasso_cluster_fig3_coef_cpi.png)
 *Figure 3: Heterogeneous effects of CPI on savings. Group 1 (31 countries) shows a negative effect; Group 2 (25 countries) shows a positive effect. Confidence bands do not overlap.*
 
-The CPI coefficient plot is the "smoking gun" of this tutorial. The two horizontal lines represent the group-specific coefficient estimates, and the dashed lines show 95% confidence bands. The bands do not overlap --- this is not a marginal difference but a statistically robust sign reversal. For 31 countries in Group 1, higher inflation reduces savings ($-0.160$, $p < 0.001$). For 25 countries in Group 2, higher inflation increases savings ($+0.197$, $p < 0.001$). A pooled model, by averaging these opposing forces, would find CPI "insignificant" --- a classic case of aggregation bias masking genuine heterogeneity.
+This is the "smoking gun" figure. The two horizontal lines are the group-specific coefficients. The dashed lines show 95% confidence bands. The bands do not overlap. This is not a marginal difference. It is a robust sign reversal.
+
+For 31 countries (Group 1), higher inflation reduces savings ($-0.160$, $p < 0.001$). For 25 countries (Group 2), higher inflation increases savings ($+0.197$, $p < 0.001$). A pooled model averages these opposing forces and finds CPI "insignificant." That is aggregation bias at work.
 
 ![Interest rate coefficient estimates and 95% confidence bands by group, showing the same sign reversal pattern as CPI.](stata_panel_lasso_cluster_fig4_coef_interest.png)
 *Figure 4: Heterogeneous effects of the interest rate on savings. The same sign reversal pattern as CPI: negative in Group 1, positive in Group 2.*
 
-The interest rate plot shows the same pattern. Group 1 countries save less when interest rates rise ($-0.149$), while Group 2 countries save more ($+0.123$). One interpretation is that Group 1 countries, with more developed financial markets, experience a substitution effect (higher returns favor consumption over saving), while Group 2 countries see an income effect (higher returns make saving more attractive for households with limited financial access).
+The interest rate tells the same story. Group 1 countries save *less* when rates rise ($-0.149$). Group 2 countries save *more* ($+0.123$).
+
+Why? One interpretation: in Group 1 (more developed financial markets), higher returns make consumption more attractive --- the **substitution effect** dominates. In Group 2 (limited financial access), higher returns make saving more rewarding --- the **income effect** dominates.
+
+We have now established that latent groups exist in savings data. The next question: does the same pattern appear in a completely different economic context?
 
 ---
 
@@ -324,7 +360,9 @@ The interest rate plot shows the same pattern. Group 1 countries save less when 
 
 ### 8.1 The Acemoglu et al. (2019) question
 
-Acemoglu, Naidu, Restrepo, and Robinson (2019) argued in the *Journal of Political Economy* that "democracy does cause growth." Their pooled two-way fixed-effects model, controlling for lagged GDP, found a positive and significant effect. But does this average effect apply to all 98 countries in their sample? Or does it mask heterogeneity?
+"Democracy does cause growth." That is the title of a famous 2019 paper by Acemoglu, Naidu, Restrepo, and Robinson in the *Journal of Political Economy*. Their evidence: a pooled two-way fixed-effects model with lagged GDP finds a positive, significant effect.
+
+But we have learned to be skeptical of pooled estimates. Does this average apply to all 98 countries? Or does it mask the same kind of sign reversal we found in savings?
 
 ### 8.2 Data exploration
 
@@ -348,7 +386,7 @@ tabulate Democracy
           1 |      2,190       54.50
 ```
 
-The panel covers 98 countries from 1970 to 2010 (4,018 observations). The binary `Democracy` indicator shows that about 55% of country-year observations are classified as democratic, reflecting the global wave of democratization over this period. The dependent variable `lnPGDP` (log per-capita GDP, scaled) ranges widely from 406 to 1,094, capturing the full spectrum from low-income to high-income countries.
+The panel covers 98 countries from 1970 to 2010 --- 4,018 observations. The binary `Democracy` indicator is 1 for democratic country-years and 0 otherwise. About 55% of observations are democratic, reflecting the global wave of democratization. The dependent variable `lnPGDP` (log per-capita GDP, scaled) ranges from 406 to 1,094 --- the full spectrum from low-income to high-income countries.
 
 ### 8.3 Pooled fixed-effects benchmark
 
@@ -367,7 +405,9 @@ HDFE Linear regression                            Number of obs   =      3,920
          ly1 |    .970495   .0059964        161.85   0.000
 ```
 
-The pooled model finds that democracy is associated with a statistically significant 1.055-unit increase in log per-capita GDP ($p = 0.005$, clustered SE = 0.370). The lagged GDP coefficient of 0.970 indicates strong persistence. This result replicates the central finding of Acemoglu et al. (2019): on average, democracy promotes growth. But the pooled model assumes this effect is the same for all 98 countries. Is it?
+Democracy is associated with a 1.055-unit increase in log per-capita GDP ($p = 0.005$, clustered SE = 0.370). Lagged GDP has a coefficient of 0.970 --- strong persistence. This replicates Acemoglu et al. (2019): on average, democracy promotes growth.
+
+On average. But we already know what "on average" can hide. Let's run C-LASSO.
 
 ### 8.4 C-LASSO: revealing the heterogeneity
 
@@ -390,7 +430,16 @@ Group 2 (41 countries, 1,640 obs):  Within R-sq. = 0.9538
          ly1 |   0.979327   (z = 95.73, p < 0.001)
 ```
 
-This is the tutorial's most striking finding. The pooled coefficient of $+1.055$ is **not representative of any actual country group**. Note that these group-specific coefficients reflect conditional associations within the panel model; a causal interpretation requires the same identifying assumptions as Acemoglu et al. (2019). Instead, it is a weighted average of two fundamentally different effects. Group 1 (57 countries) shows a large, positive democracy effect of $+2.151$ ($p < 0.001$) --- more than twice the pooled estimate. Group 2 (41 countries) shows a statistically significant **negative** effect of $-0.936$ ($p = 0.007$). The democracy coefficient literally changes sign depending on which group of countries is examined. For roughly 58% of countries, democratic transitions are associated with substantial GDP gains; for the remaining 42%, they are associated with GDP declines.
+This is the tutorial's most striking finding.
+
+The pooled coefficient of $+1.055$ is **not representative of any actual country group**. It is a weighted average of two fundamentally different effects:
+
+- **Group 1** (57 countries): democracy effect = $+2.151$ ($p < 0.001$). More than twice the pooled estimate.
+- **Group 2** (41 countries): democracy effect = $-0.936$ ($p = 0.007$). Negative and significant.
+
+The coefficient literally changes sign. For 58% of countries, democratic transitions are associated with GDP gains. For the remaining 42%, they are associated with GDP declines. The pooled model sees one number. C-LASSO sees two stories.
+
+Note: these are conditional associations within the panel model. A causal interpretation requires the same identifying assumptions as Acemoglu et al. (2019).
 
 ### 8.5 Visualizing the democracy-growth split
 
@@ -405,12 +454,16 @@ graph export "stata_panel_lasso_cluster_fig6_democracy_coef.png", replace width(
 ![Information criterion and iteration count for the democracy model. IC is minimized at K=2, though values are close across specifications.](stata_panel_lasso_cluster_fig5_democracy_selection.png)
 *Figure 5: Group selection for the democracy-growth model. IC is minimized at K=2, though values are close across all K (range 3.267--3.280).*
 
-The group selection plot shows that $K = 2$ is selected, but the IC values are very close across all $K$ (ranging from 3.267 to 3.280 --- a span of just 0.013). This suggests the 2-group structure, while optimal, is not overwhelmingly favored over alternatives. Researchers should consider sensitivity to the IC tuning parameter $\rho$.
+The IC selects $K = 2$. But look closely: the IC values range from 3.267 to 3.280 --- a span of just 0.013. The 2-group structure is optimal but not overwhelmingly so. This is a useful reminder: always check sensitivity to the tuning parameter $\rho$.
 
 ![Democracy coefficient polarization across two groups: Group 1 (57 countries) shows a positive effect around +2.2, Group 2 (41 countries) shows a negative effect around -1.0.](stata_panel_lasso_cluster_fig6_democracy_coef.png)
 *Figure 6: Heterogeneous effects of democracy on economic growth. Group 1 (57 countries) shows a positive effect (+2.15); Group 2 (41 countries) shows a negative effect (-0.94). The pooled estimate of +1.05 describes neither group.*
 
-The coefficient plot for `Democracy` is the key figure of this tutorial. Each dot represents a country's individual coefficient estimate, and the horizontal lines show the group-specific postlasso estimates with 95% confidence bands. The polarization is unmistakable: Group 1 (the left cluster) has a strongly positive democracy effect, while Group 2 (the right cluster) has a negative effect. The confidence bands do not overlap with zero for either group, confirming that both effects are statistically significant. This is not a case of "some countries benefit and others see no effect" --- it is a genuine sign reversal.
+This is the key figure of the tutorial. Each dot is one country's individual coefficient estimate. The horizontal lines show group-specific postlasso estimates with 95% confidence bands.
+
+The polarization is unmistakable. Group 1 (left cluster): strongly positive. Group 2 (right cluster): negative. Neither group's confidence band crosses zero. Both effects are statistically significant.
+
+This is not "some countries benefit, others see no effect." It is a genuine sign reversal. Democracy is associated with growth in one group and with decline in another.
 
 ---
 
@@ -429,13 +482,17 @@ The coefficient plot for `Democracy` is the key figure of this tutorial. Each do
 
 ### 9.2 Simpson's paradox in panel data
 
-This comparison illustrates a form of **Simpson's paradox** in panel data. The pooled estimate of $+1.055$ lies between the two group-specific effects ($+2.151$ and $-0.936$) but describes neither group accurately. A policymaker relying on the pooled result would conclude that democracy universally promotes growth --- missing the fact that for 41 countries (42% of the sample), the relationship runs in the opposite direction.
+This is **Simpson's paradox** --- the phenomenon where a trend that appears in aggregated data reverses when you look at subgroups.
 
-The pooled CPI coefficient in the savings model showed the same pattern on a smaller scale: the insignificant pooled estimate of $+0.030$ masked significant effects of $-0.160$ and $+0.197$ in the two groups. When heterogeneous effects have opposite signs, pooled estimation does not just underestimate the magnitude --- it can produce a qualitatively wrong conclusion.
+Here is a concrete analogy. A hospital treats two types of patients: mild cases and severe cases. For mild cases, Treatment A has a higher survival rate. For severe cases, Treatment A also has a higher survival rate. But when you pool all patients together, Treatment B appears better --- because it treats a disproportionate number of mild (easy) cases. The aggregate reverses the subgroup trend.
+
+The same thing happened here. The pooled democracy estimate of $+1.055$ sits between $+2.151$ and $-0.936$. It describes neither group accurately. A policymaker relying on the pooled result would conclude that democracy universally promotes growth. They would miss that for 41 countries (42% of the sample), the relationship runs in the opposite direction.
+
+The savings model showed the same pattern. The insignificant pooled CPI coefficient ($+0.030$) masked significant effects of $-0.160$ and $+0.197$. When effects have opposite signs, pooling does not just underestimate the magnitude. It produces a qualitatively wrong conclusion.
 
 ### 9.3 Robustness of the group structure
 
-Across all three C-LASSO specifications in this tutorial --- static savings, dynamic savings, and democracy --- the information criterion consistently selected $K = 2$ groups. The sign reversal on CPI and interest rates was preserved when moving from the static to the dynamic savings model, despite a shift in group composition (34/22 to 31/25). This consistency across specifications suggests the latent groups reflect genuine structural heterogeneity rather than an artifact of a particular model choice.
+Across all three C-LASSO specifications --- static savings, dynamic savings, and democracy --- the IC consistently selected $K = 2$ groups. The CPI sign reversal survived the switch from static to dynamic, despite a shift in group composition (34/22 to 31/25). This consistency suggests the latent groups are real structural features of the data, not artifacts of a particular specification.
 
 ---
 
@@ -453,7 +510,7 @@ Across all three C-LASSO specifications in this tutorial --- static savings, dyn
 
 ### 10.2 Limitations
 
-The IC values in the democracy model were very close across $K = 1$ through $K = 5$ (range 3.267--3.280), suggesting the 2-group structure, while optimal, is not overwhelmingly dominant. The datasets use numeric country codes rather than names, limiting interpretability. Finally, C-LASSO is computationally intensive --- the democracy model with two-way FE, clustered SEs, and dynamic bias correction took over 2.5 hours.
+Three caveats. First, the IC values in the democracy model were very close across $K = 1$ through $K = 5$ (range 3.267--3.280). The 2-group structure is optimal but not dominant. Second, the datasets use numeric country codes, not names. We cannot easily identify which countries are in which group. Third, C-LASSO is computationally intensive. The democracy model took over 2.5 hours. Plan accordingly.
 
 ### 10.3 Exercises
 
