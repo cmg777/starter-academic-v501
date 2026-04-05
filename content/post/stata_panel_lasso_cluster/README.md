@@ -5,7 +5,7 @@ Stata tutorial demonstrating the Classifier-LASSO method (Su, Shi, Phillips 2016
 ## Pipeline Progress
 
 - [x] Script (`analysis.do`)
-- [ ] Results report (`results_report.md`)
+- [x] Results report (`results_report.md`)
 - [ ] Blog post (`index.md`)
 - [ ] Infographic (`infographic_instructions.md`)
 
