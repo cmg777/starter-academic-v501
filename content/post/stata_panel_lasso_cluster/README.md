@@ -6,7 +6,7 @@ Stata tutorial demonstrating the Classifier-LASSO method (Su, Shi, Phillips 2016
 
 - [x] Script (`analysis.do`)
 - [x] Results report (`results_report.md`)
-- [ ] Blog post (`index.md`)
+- [x] Blog post (`index.md`)
 - [ ] Infographic (`infographic_instructions.md`)
 
 ## Datasets
