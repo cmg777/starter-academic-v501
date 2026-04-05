@@ -21,11 +21,11 @@ links:
 - icon: database
   icon_pack: fas
   name: "Savings data (.dta)"
-  url: refMaterials/saving.dta
+  url: https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_panel_lasso_cluster/refMaterials/saving.dta
 - icon: database
   icon_pack: fas
   name: "Democracy data (.dta)"
-  url: refMaterials/democracy.dta
+  url: https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_panel_lasso_cluster/refMaterials/democracy.dta
 - icon: file-alt
   icon_pack: fas
   name: "Stata log"
@@ -152,7 +152,7 @@ Now that we understand the method, let's apply it to real data.
 Our first application uses a panel of 56 countries over 15 years, from Su, Shi, and Phillips (2016). The outcome is the savings-to-GDP ratio. The regressors are lagged savings, CPI inflation, real interest rates, and GDP growth.
 
 ```stata
-use "refMaterials/saving.dta", clear
+use "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_panel_lasso_cluster/refMaterials/saving.dta", clear
 xtset code year
 summarize savings lagsavings cpi interest gdp
 ```
@@ -297,7 +297,7 @@ So far, we have found two groups with a static model. But we omitted lagged savi
 Savings are highly persistent. The pooled coefficient on `lagsavings` was 0.605 --- a country's savings this year strongly predicts its savings next year. Omitting this variable may bias everything else. We now add it back and replicate Su, Shi, and Phillips (2016). The `dynamic` option activates the half-panel jackknife to correct Nickell bias.
 
 ```stata
-use "refMaterials/saving.dta", clear
+use "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_panel_lasso_cluster/refMaterials/saving.dta", clear
 xtset code year
 classifylasso savings lagsavings cpi interest gdp, ///
     grouplist(1/5) lambda(1.5485) tolerance(1e-4) dynamic
@@ -367,7 +367,7 @@ But we have learned to be skeptical of pooled estimates. Does this average apply
 ### 8.2 Data exploration
 
 ```stata
-use "refMaterials/democracy.dta", clear
+use "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_panel_lasso_cluster/refMaterials/democracy.dta", clear
 xtset country year
 summarize lnPGDP Democracy ly1
 tabulate Democracy

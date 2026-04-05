@@ -50,7 +50,7 @@ display _newline "============================================="
 display "  SECTION 1: Load and Explore Savings Data"
 display "=============================================" _newline
 
-use "refMaterials/saving.dta", clear
+use "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_panel_lasso_cluster/refMaterials/saving.dta", clear
 
 // Declare panel structure
 xtset code year
@@ -202,7 +202,7 @@ display "lagged dependent variables are included with fixed effects." _newline
 display "NOTE: This may take several minutes to compute..." _newline
 
 // Reload data to start fresh
-use "refMaterials/saving.dta", clear
+use "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_panel_lasso_cluster/refMaterials/saving.dta", clear
 xtset code year
 
 // Dynamic model: savings = f(lagsavings, cpi, interest, gdp) + country FE
@@ -281,7 +281,7 @@ display "Application: Does democracy cause economic growth?"
 display "Acemoglu et al. (2019, JPE) find a positive average effect."
 display "But is this effect homogeneous across all countries?" _newline
 
-use "refMaterials/democracy.dta", clear
+use "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_panel_lasso_cluster/refMaterials/democracy.dta", clear
 
 // Declare panel structure
 xtset country year
