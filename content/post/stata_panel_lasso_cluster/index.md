@@ -125,13 +125,13 @@ The `classifylasso` command implements a three-step procedure:
 
 1. **Classifier-LASSO estimation.** For each candidate number of groups $K$, the algorithm iteratively updates group centers and membership assignments until convergence. Starting values come from unit-by-unit regressions.
 
-2. **Postlasso estimation.** Given the group classification from step 1, re-estimate the coefficients within each group using standard OLS. This "postlasso" step improves finite-sample performance and enables standard inference (standard errors, confidence intervals).
+2. **Postlasso estimation.** Given the group classification from step 1, re-estimate the coefficients within each group using standard OLS. Think of it as a two-stage process: the LASSO penalty first sorts countries into groups (even if its coefficient estimates are biased by the penalty), then OLS re-estimates the coefficients within each group without any penalty. This "postlasso" step improves finite-sample performance and enables standard inference (standard errors, confidence intervals).
 
-3. **Information criterion.** When $K$ is unknown, the command tests $K \in \{1, 2, \ldots, K\_{\max}\}$ and selects the $K$ that minimizes an information criterion with tuning parameter $\rho\_{NT} = c\_\rho (NT)^{-1/2}$.
+3. **Information criterion.** When $K$ is unknown, the command tests $K \in \{1, 2, \ldots, K\_{\max}\}$ and selects the $K$ that minimizes an information criterion --- a measure that balances model fit against complexity, penalizing additional groups to prevent overfitting (similar in spirit to AIC or BIC). The tuning parameter $\rho\_{NT} = c\_\rho (NT)^{-1/2}$ controls this penalty.
 
 ### 3.3 Dynamic panels and Nickell bias
 
-When lagged dependent variables appear among the regressors (e.g., $y\_{i,t-1}$), the standard fixed-effects estimator suffers from **Nickell bias** --- a systematic bias that arises because the demeaned lagged dependent variable is correlated with the demeaned error term. The `classifylasso` command offers a `dynamic` option that applies the **half-panel jackknife** method (Dhaene and Jochmans 2015) to correct this bias.
+When lagged dependent variables appear among the regressors (e.g., $y\_{i,t-1}$), the standard fixed-effects estimator suffers from **Nickell bias** --- a systematic bias that arises because the demeaned lagged dependent variable is correlated with the demeaned error term. The `classifylasso` command offers a `dynamic` option that applies the **half-panel jackknife** method (Dhaene and Jochmans 2015) to correct this bias. The idea is to split the time series in half, estimate the model on each half separately, and combine the estimates in a way that cancels the bias term.
 
 ---
 
@@ -172,6 +172,7 @@ graph export "stata_panel_lasso_cluster_fig1_savings_scatter.png", replace width
 ```
 
 ![Spaghetti plot of savings-to-GDP ratio across 56 countries, showing wide dispersion in trajectories.](stata_panel_lasso_cluster_fig1_savings_scatter.png)
+*Figure 1: Savings-to-GDP ratio across 56 countries (1995--2010). Each line represents one country, revealing substantial heterogeneity in savings dynamics.*
 
 The spaghetti plot reveals substantial heterogeneity. Some countries maintain consistently positive savings ratios while others fluctuate below zero. The lines do not move in lockstep --- different countries appear to follow fundamentally different savings dynamics. This visual pattern motivates the search for latent groups: perhaps subsets of countries share similar responses to macroeconomic conditions, even if the full panel does not.
 
@@ -257,6 +258,7 @@ graph export "stata_panel_lasso_cluster_fig2_group_selection_static.png", replac
 ```
 
 ![Information criterion and iteration count by number of groups for the static savings model. IC is minimized at K=2.](stata_panel_lasso_cluster_fig2_group_selection_static.png)
+*Figure 2: Group selection for the static savings model. The information criterion (left axis) is minimized at K=2, with a clear U-shape from K=3 onward.*
 
 The group selection plot confirms the IC minimum at $K = 2$ (marked by a triangle). The left axis shows the IC values and the right axis shows the number of iterations needed for convergence. The algorithm converged quickly for $K = 2$ (about 3 iterations) but required the maximum 20 iterations for $K \geq 3$, suggesting that models with more groups are overparameterized and struggle to find stable group assignments.
 
@@ -307,10 +309,12 @@ graph export "stata_panel_lasso_cluster_fig4_coef_interest.png", replace width(2
 ```
 
 ![CPI coefficient estimates and 95% confidence bands by group, showing a clear sign reversal with non-overlapping confidence intervals.](stata_panel_lasso_cluster_fig3_coef_cpi.png)
+*Figure 3: Heterogeneous effects of CPI on savings. Group 1 (31 countries) shows a negative effect; Group 2 (25 countries) shows a positive effect. Confidence bands do not overlap.*
 
 The CPI coefficient plot is the "smoking gun" of this tutorial. The two horizontal lines represent the group-specific coefficient estimates, and the dashed lines show 95% confidence bands. The bands do not overlap --- this is not a marginal difference but a statistically robust sign reversal. For 31 countries in Group 1, higher inflation reduces savings ($-0.160$, $p < 0.001$). For 25 countries in Group 2, higher inflation increases savings ($+0.197$, $p < 0.001$). A pooled model, by averaging these opposing forces, would find CPI "insignificant" --- a classic case of aggregation bias masking genuine heterogeneity.
 
 ![Interest rate coefficient estimates and 95% confidence bands by group, showing the same sign reversal pattern as CPI.](stata_panel_lasso_cluster_fig4_coef_interest.png)
+*Figure 4: Heterogeneous effects of the interest rate on savings. The same sign reversal pattern as CPI: negative in Group 1, positive in Group 2.*
 
 The interest rate plot shows the same pattern. Group 1 countries save less when interest rates rise ($-0.149$), while Group 2 countries save more ($+0.123$). One interpretation is that Group 1 countries, with more developed financial markets, experience a substitution effect (higher returns favor consumption over saving), while Group 2 countries see an income effect (higher returns make saving more attractive for households with limited financial access).
 
@@ -386,7 +390,7 @@ Group 2 (41 countries, 1,640 obs):  Within R-sq. = 0.9538
          ly1 |   0.979327   (z = 95.73, p < 0.001)
 ```
 
-This is the tutorial's most striking finding. The pooled coefficient of $+1.055$ is **not representative of any actual country group**. Instead, it is a weighted average of two fundamentally different effects. Group 1 (57 countries) shows a large, positive democracy effect of $+2.151$ ($p < 0.001$) --- more than twice the pooled estimate. Group 2 (41 countries) shows a statistically significant **negative** effect of $-0.936$ ($p = 0.007$). The democracy coefficient literally changes sign depending on which group of countries is examined. For roughly 58% of countries, democratic transitions are associated with substantial GDP gains; for the remaining 42%, they are associated with GDP declines.
+This is the tutorial's most striking finding. The pooled coefficient of $+1.055$ is **not representative of any actual country group**. Note that these group-specific coefficients reflect conditional associations within the panel model; a causal interpretation requires the same identifying assumptions as Acemoglu et al. (2019). Instead, it is a weighted average of two fundamentally different effects. Group 1 (57 countries) shows a large, positive democracy effect of $+2.151$ ($p < 0.001$) --- more than twice the pooled estimate. Group 2 (41 countries) shows a statistically significant **negative** effect of $-0.936$ ($p = 0.007$). The democracy coefficient literally changes sign depending on which group of countries is examined. For roughly 58% of countries, democratic transitions are associated with substantial GDP gains; for the remaining 42%, they are associated with GDP declines.
 
 ### 8.5 Visualizing the democracy-growth split
 
@@ -399,10 +403,12 @@ graph export "stata_panel_lasso_cluster_fig6_democracy_coef.png", replace width(
 ```
 
 ![Information criterion and iteration count for the democracy model. IC is minimized at K=2, though values are close across specifications.](stata_panel_lasso_cluster_fig5_democracy_selection.png)
+*Figure 5: Group selection for the democracy-growth model. IC is minimized at K=2, though values are close across all K (range 3.267--3.280).*
 
 The group selection plot shows that $K = 2$ is selected, but the IC values are very close across all $K$ (ranging from 3.267 to 3.280 --- a span of just 0.013). This suggests the 2-group structure, while optimal, is not overwhelmingly favored over alternatives. Researchers should consider sensitivity to the IC tuning parameter $\rho$.
 
 ![Democracy coefficient polarization across two groups: Group 1 (57 countries) shows a positive effect around +2.2, Group 2 (41 countries) shows a negative effect around -1.0.](stata_panel_lasso_cluster_fig6_democracy_coef.png)
+*Figure 6: Heterogeneous effects of democracy on economic growth. Group 1 (57 countries) shows a positive effect (+2.15); Group 2 (41 countries) shows a negative effect (-0.94). The pooled estimate of +1.05 describes neither group.*
 
 The coefficient plot for `Democracy` is the key figure of this tutorial. Each dot represents a country's individual coefficient estimate, and the horizontal lines show the group-specific postlasso estimates with 95% confidence bands. The polarization is unmistakable: Group 1 (the left cluster) has a strongly positive democracy effect, while Group 2 (the right cluster) has a negative effect. The confidence bands do not overlap with zero for either group, confirming that both effects are statistically significant. This is not a case of "some countries benefit and others see no effect" --- it is a genuine sign reversal.
 
