@@ -4,6 +4,7 @@ authors:
 categories:
   - Python
   - Causal Inference
+  - Cross-sectional Data
 draft: false
 featured: false
 date: "2026-03-12T00:00:00Z"

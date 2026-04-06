@@ -4,6 +4,8 @@ authors:
 categories:
   - Python
   - Exploratory Data Analysis
+  - Spatial Analysis
+  - Cross-sectional Data
 draft: false
 featured: false
 date: "2019-04-01T00:00:00Z"

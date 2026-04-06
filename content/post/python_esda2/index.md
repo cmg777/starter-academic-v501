@@ -5,7 +5,8 @@ categories:
   - Python
   - Tutorial
   - Exploratory Data Analysis
-  - Spatial Spillovers
+  - Spatial Analysis
+  - Cross-sectional Data
 draft: false
 featured: false
 date: "2026-03-22T00:00:00Z"

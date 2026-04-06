@@ -4,7 +4,8 @@ authors:
 categories:
   - Python
   - Tutorial
-  - Spatial Spillovers
+  - Spatial Analysis
+  - Cross-sectional Data
 draft: false
 featured: false
 date: "2026-03-22T00:00:00Z"

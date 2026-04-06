@@ -3,7 +3,7 @@ authors:
   - admin
 categories:
   - R
-  - Convergence
+  - Growth
 draft: false
 featured: false
 date: "2023-09-03T00:00:00Z"

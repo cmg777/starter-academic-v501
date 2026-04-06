@@ -4,6 +4,7 @@ authors:
 categories:
   - Python
   - Tutorial
+  - Cross-sectional Data
 draft: false
 featured: false
 date: "2026-03-21T00:00:00Z"

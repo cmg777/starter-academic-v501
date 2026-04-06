@@ -3,8 +3,9 @@ authors:
   - admin
 categories:
   - R
-  - Spatial Spillovers
+  - Spatial Analysis
   - Tutorial
+  - Panel Data
 draft: false
 featured: false
 date: "2026-03-27T00:00:00Z"

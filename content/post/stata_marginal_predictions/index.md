@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Stata
+  - Cross-sectional Data
 draft: false
 featured: false
 date: "2019-04-01T00:00:00Z"

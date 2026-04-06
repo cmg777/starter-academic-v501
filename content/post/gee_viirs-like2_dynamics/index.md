@@ -4,6 +4,7 @@ authors:
 categories:
   - GEE
   - Remote Sensing
+  - Interactive Dashboard
 draft: false
 featured: false
 date: "2025-03-14T00:00:00Z"

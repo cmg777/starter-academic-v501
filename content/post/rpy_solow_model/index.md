@@ -4,7 +4,7 @@ authors:
 categories:
   - R
   - Python
-  - Convergence
+  - Growth
 draft: false
 featured: false
 date: "2023-07-29T00:00:00Z"

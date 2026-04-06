@@ -5,6 +5,8 @@ categories:
   - Stata
   - Tutorial
   - Econometrics
+  - Cross-sectional Data
+  - Variable Selection
 draft: false
 featured: false
 date: "2026-03-29T00:00:00Z"

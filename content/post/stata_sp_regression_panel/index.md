@@ -3,7 +3,8 @@ authors:
   - admin
 categories:
   - Stata
-  - Spatial Spillovers
+  - Spatial Analysis
+  - Panel Data
 draft: false
 featured: false
 date: "2023-12-01T00:00:00Z"

@@ -3,7 +3,8 @@ authors:
   - admin
 categories:
   - Python
-  - Spatial Spillovers
+  - Spatial Analysis
+  - Cross-sectional Data
 draft: false
 featured: false
 date: "2023-12-02T00:00:00Z"

@@ -5,6 +5,7 @@ categories:
   - R
   - Tutorial
   - Econometrics
+  - Panel Data
 draft: false
 featured: false
 date: "2026-04-02T00:00:00Z"
