@@ -41,10 +41,6 @@ contact_links:
     icon_pack: fa
     name: ZOOM Me (Book an appointment first)
     link: 'https://us04web.zoom.us/j/4639287952?pwd=aGZwSURNNTJnbmVOQ1BKbHZxUGxYZz09'
-  - icon: telegram
-    icon_pack: fab
-    name: Telegram Me
-    link: 'https://telegram.me/@carlosmendez777'
   - icon: twitter
     icon_pack: fab
     name: DM Me on X
