@@ -50,6 +50,10 @@ Stata tutorial demonstrating the Classifier-LASSO method (Su, Shi, Phillips 2016
 - `ftools` (SSC) — Fast tools for large datasets
 - `outreg2` (SSC) — Export regression tables
 
+## To-Do
+- [x] The datasets use numeric country codes, not names. We cannot easily identify which countries are in which group. Fix this.
+
+
 ## References
 
 - Su, Shi, Phillips (2016). "Identifying latent structures in panel data." *Econometrica* 84: 2215-2264.
