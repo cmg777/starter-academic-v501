@@ -582,3 +582,7 @@ For a practitioner --- say, the marketing director of the retail chain --- the t
 5. [Belloni, A., Chernozhukov, V., and Hansen, C. (2014). Inference on Treatment Effects after Selection among High-Dimensional Controls. *Review of Economic Studies*, 81(2), 608--650.](https://academic.oup.com/restud/article-abstract/81/2/608/1523757)
 6. [pyfixest --- Fast Estimation of Fixed-Effects Models in Python](https://pyfixest.org/pyfixest.html)
 7. [statsmodels --- Statistical Modeling in Python](https://www.statsmodels.org/stable/index.html)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

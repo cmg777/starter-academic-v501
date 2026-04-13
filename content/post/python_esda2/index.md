@@ -1139,3 +1139,7 @@ For policy, these findings suggest that **spatially targeted interventions** may
 7. [Mendez, C. (2026). Pooled PCA for Building Development Indicators Across Time.](/post/python_pca2/)
 8. [Mendez, C. and Gonzales, E. (2021). Human Capital Constraints, Spatial Dependence, and Regionalization in Bolivia. *Economia*, 44(87).](https://carlos-mendez.org/publication/20210318-economia/)
 9. [Mendez, C. (2026). Monitoring Regional Development with Python.](/post/python_monitor_regional_development/)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

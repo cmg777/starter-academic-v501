@@ -833,3 +833,7 @@ This analysis demonstrates DoWhy's workflow on a well-understood dataset, but se
 7. [Rosenbaum, P. R. & Rubin, D. B. (1983). The Central Role of the Propensity Score in Observational Studies for Causal Effects. Biometrika, 70(1), 41--55.](https://doi.org/10.1093/biomet/70.1.41)
 8. [Cochran, W. G. (1968). The Effectiveness of Adjustment by Subclassification in Removing Bias in Observational Studies. Biometrics, 24(2), 295--313.](https://doi.org/10.2307/2528036)
 9. [Nita, C. J. Causal Inference with Python --- Introduction to DoWhy. Medium.](https://medium.com/@chrisjames.nita/causal-inference-with-python-introduction-to-dowhy-ff5799e48985)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

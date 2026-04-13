@@ -464,3 +464,7 @@ For policy, these findings challenge the assumption that national-level converge
 4. [Fotheringham, A. S., Brunsdon, C., and Charlton, M. (2002). *Geographically Weighted Regression: The Analysis of Spatially Varying Relationships*. Wiley.](https://www.wiley.com/en-us/Geographically+Weighted+Regression-p-9780471496168)
 5. [Mendez, C. and Jiang, Q. (2024). Spatial Heterogeneity Modeling for Regional Economic Analysis: A Computational Approach Using Python and Cloud Computing. Working Paper, Nagoya University.](https://carlos-mendez.org/publication/20241219-ae/)
 6. [mgwr documentation](https://mgwr.readthedocs.io/)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

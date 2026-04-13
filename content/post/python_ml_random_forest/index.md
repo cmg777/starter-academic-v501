@@ -489,3 +489,7 @@ This analysis demonstrates that satellite embeddings contain real predictive sig
 4. [scikit-learn --- Partial Dependence Plots](https://scikit-learn.org/stable/modules/partial_dependence.html)
 5. [QUARCS Lab. DS4Bolivia --- Open Data for Bolivian Development.](https://github.com/quarcs-lab/ds4bolivia)
 6. [Breiman, L. (2001). Random Forests. Machine Learning, 45(1), 5--32.](https://doi.org/10.1023/A:1010933404324)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

@@ -1346,3 +1346,7 @@ The cash transfer program increased household consumption by approximately **11-
 5. [World Bank `ietoolkit` / `iebaltab` documentation](https://dimewiki.worldbank.org/iebaltab)
 6. [Mize, T. `balanceplot` --- Stata module for covariate balance visualization](https://tdmize.github.io/data/)
 7. [RCT Analysis: Cash Transfers, Panel Data, and Doubly Robust Estimation (YouTube)](https://youtu.be/Gr_fu5deDMk)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

@@ -1263,3 +1263,7 @@ PyFixest makes the entire workflow --- from simple OLS through two-way FE, IV, C
 8. [Mundlak, Y. (1978). On the Pooling of Time Series and Cross Section Data. *Econometrica*, 46(1), 69--85.](https://doi.org/10.2307/1913646)
 9. [Wooldridge, J.M. (2010). *Econometric Analysis of Cross Section and Panel Data.* 2nd ed. MIT Press.](https://mitpress.mit.edu/9780262232586/)
 10. [Olea, J.L.M. and Pflueger, C. (2013). A Robust Test for Weak Instruments. Journal of Business & Economic Statistics.](https://doi.org/10.1080/00401706.2013.806694)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.
