@@ -887,3 +887,7 @@ polity  0.372 -0.029 0.042 0.046 -0.079  0.031   0.043   0.000
 7. [Doppelhofer, G. and Weeks, M. (2009). Jointness of Growth Determinants. *Journal of Applied Econometrics*, 24(2), 209--244.](https://doi.org/10.1002/jae.1046)
 8. [Ley, E. and Steel, M.F.J. (2009). On the Effect of Prior Assumptions in Bayesian Model Averaging with Applications to Growth Regression. *Journal of Applied Econometrics*, 24(4), 651--674.](https://doi.org/10.1002/jae.1057)
 9. [Raftery, A.E. (1995). Bayesian Model Selection in Social Research. *Sociological Methodology*, 25, 111--163.](https://doi.org/10.2307/271063)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

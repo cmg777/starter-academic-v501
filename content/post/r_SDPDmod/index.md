@@ -836,3 +836,7 @@ For further study, see the companion [Stata spatial panel tutorial](/post/stata_
 4. [LeSage, J. P. (2014). Spatial Econometric Panel Data Model Specification: A Bayesian Approach. *Spatial Statistics*, 9, 122--145.](https://doi.org/10.1016/j.spasta.2014.02.002)
 5. [Elhorst, J. P. (2014). *Spatial Econometrics: From Cross-Sectional Data to Spatial Panels.* Springer.](https://doi.org/10.1007/978-3-642-40340-8)
 6. [LeSage, J. P. & Pace, R. K. (2009). *Introduction to Spatial Econometrics.* Chapman & Hall/CRC.](https://doi.org/10.1201/9781420064254)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

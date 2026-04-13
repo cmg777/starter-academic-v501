@@ -894,3 +894,7 @@ Using our PCA-based health index to study changes over time introduces further c
 9. [Visualizing Principal Component Analysis (PCA) (YouTube)](https://youtu.be/nEvKduLXFvk)
 10. [Numiqo -- PCA Interactive Lab](https://numiqo.com/lab/pca)
 11. [Peiro-Palomino, J., Picazo-Tadeo, A. J., and Rios, V. (2023). Social Progress around the World: Trends and Convergence. *Oxford Economic Papers*, 75(2), 281--306.](https://doi.org/10.1093/oep/gpac022)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

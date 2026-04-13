@@ -716,3 +716,7 @@ Following the recommendations of [Petersen (2009)](https://doi.org/10.1093/rfs/h
 5. [Driscoll, J. C. & Kraay, A. C. (1998). Consistent Covariance Matrix Estimation with Spatially Dependent Panel Data. *Review of Economics and Statistics*, 80(4), 549--560.](https://doi.org/10.1162/003465398557549)
 6. [Newey, W. K. & West, K. D. (1987). A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix. *Econometrica*, 55(3), 703--708.](https://doi.org/10.2307/1913610)
 7. [Petersen, M. A. (2009). Estimating Standard Errors in Finance Panel Data Sets. *Review of Financial Studies*, 22(1), 435--480.](https://doi.org/10.1093/rfs/hhn053)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

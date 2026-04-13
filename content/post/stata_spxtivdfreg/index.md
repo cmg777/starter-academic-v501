@@ -615,3 +615,7 @@ For further study, the companion tutorial on [spatial panel regression with xsml
 4. [Pesaran, M. H. (2006). Estimation and inference in large heterogeneous panels with a multifactor error structure. *Econometrica*, 74(4), 967--1012.](https://doi.org/10.1111/j.1468-0262.2006.00692.x)
 5. [Elhorst, J. P. (2014). *Spatial Econometrics: From Cross-Sectional Data to Spatial Panels*. Springer.](https://link.springer.com/book/10.1007/978-3-642-40340-8)
 6. [Belotti, F., Hughes, G., & Mortari, A. P. (2017). Spatial panel-data models using Stata. *Stata Journal*, 17(1), 139--180.](https://doi.org/10.1177/1536867X1701700109)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

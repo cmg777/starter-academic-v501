@@ -1175,3 +1175,7 @@ The comparison reveals a stark trade-off between the two identification strategi
 5. [Raftery, A. E. (1995). Bayesian model selection in social research. *Sociological Methodology*, 25, 111--163.](https://doi.org/10.2307/271063)
 6. [Stata 18 Manual: `bmaregress` --- Bayesian Model Averaging regression](https://www.stata.com/manuals/bmabmaregress.pdf)
 7. [Stata 18 Manual: `dsregress` --- Double-Selection LASSO linear regression](https://www.stata.com/manuals/lassodsregress.pdf)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

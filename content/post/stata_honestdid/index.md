@@ -859,3 +859,7 @@ honestdid, pre(1/5) post(7/8) mvec(0(0.5)2) l_vec(l_vec)
 6. [Mixtape Sessions --- Advanced DiD (dataset source).](https://github.com/Mixtape-Sessions/Advanced-DID)
 7. [csdid Stata Package --- Rios-Avila, F.](https://friosavila.github.io/stpackages/csdid.html)
 8. [reghdfe --- Linear Models with Many Levels of Fixed Effects --- Correia, S.](https://scorreia.com/software/reghdfe/)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

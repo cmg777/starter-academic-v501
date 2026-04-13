@@ -1343,3 +1343,7 @@ The interpretation framework --- PIPs for BMA, selection for LASSO, t-statistics
 4. Raftery, A.E. (1995). Bayesian Model Selection in Social Research. *Sociological Methodology*, 25, 111--163.
 5. Aller, C., Ductor, L., and Grechyna, D. (2021). Robust Determinants of CO<sub>2</sub> Emissions. *Energy Economics*, 96, 105154.
 6. Belloni, A. and Chernozhukov, V. (2013). Least Squares After Model Selection in High-Dimensional Sparse Models. *Bernoulli*, 19(2), 521--547.
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

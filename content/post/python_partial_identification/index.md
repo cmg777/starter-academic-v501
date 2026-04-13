@@ -741,3 +741,7 @@ This framework complements the point-identification methods covered in previous 
 4. [CausalBoundingEngine -- Python Package for Causal Bounding Methods.](https://pypi.org/project/causalboundingengine/)
 5. [Huntington-Klein, N. (2021). The Effect: An Introduction to Research Design and Causality, Chapter 21: Partial Identification.](https://theeffectbook.net/ch-PartialIdentification.html)
 6. [Manski, C. F. (2003). Partial Identification of Probability Distributions. Springer.](https://doi.org/10.1007/b97478)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

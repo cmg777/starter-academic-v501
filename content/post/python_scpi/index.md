@@ -604,3 +604,7 @@ These results align with Abadie (2021), who reached similar qualitative conclusi
 4. [scpi_pkg --- Python package for Synthetic Control with Prediction Intervals.](https://nppackages.github.io/scpi/)
 5. [Abadie, A. (2021). Using Synthetic Controls: Feasibility, Data Requirements, and Methodological Aspects. *Journal of Economic Literature*, 59(2), 391--425.](https://doi.org/10.1257/jel.20191450)
 6. [Cattaneo, M. D., Feng, Y., Palomba, F., and Titiunik, R. scpi_pkg illustration scripts (GitHub).](https://github.com/nppackages/scpi)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

@@ -587,3 +587,7 @@ The modern DID toolkit demonstrated here --- `did` for group-time ATTs, `twfewei
 9. `twfeweights` package: [GitHub](https://github.com/bcallaway11/twfeweights)
 
 10. `HonestDiD` package: [CRAN](https://cran.r-project.org/package=HonestDiD) | [GitHub](https://github.com/asheshrambachan/HonestDiD)
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.

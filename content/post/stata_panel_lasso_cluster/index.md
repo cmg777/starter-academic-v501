@@ -533,3 +533,7 @@ Three caveats. First, the IC values in the democracy model were very close acros
 3. Acemoglu, D., Naidu, S., Restrepo, P., and Robinson, J. A. (2019). [Democracy does cause growth](https://doi.org/10.1086/700936). *Journal of Political Economy*, 127(1), 47--100.
 
 4. Dhaene, G. and Jochmans, K. (2015). [Split-panel jackknife estimation of fixed-effect models](https://doi.org/10.1093/restud/rdv007). *Review of Economic Studies*, 82(3), 991--1030.
+
+#### Acknowledgements
+
+AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of this post more accessible to students. Nevertheless, the content in this post may still have errors. Caution is needed when applying the contents of this post to true research projects.
