@@ -1072,7 +1072,15 @@ body,
   }
 }
 
-/* --- 18. Back-to-top button --- */
+/* --- 18. Citation year color: match author name color --- */
+.pub-list-item {
+  color: rgba(0, 0, 0, 0.54);
+}
+.dark .pub-list-item {
+  color: rgba(255, 255, 255, 0.54);
+}
+
+/* --- 19. Back-to-top button --- */
 .back-to-top {
   background: #0e1545;
   color: #00d4c8;
