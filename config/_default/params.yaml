@@ -73,7 +73,7 @@ highlight: true
 highlight_languages:
   - r
   - python
-math: true
+math: false
 diagram: true
 privacy_pack: false
 edit_page:
@@ -117,9 +117,9 @@ breadcrumb:
   page_types:
     book: true
 comments:
-  provider: 'disqus'
+  provider: ''
   commentable:
-    post: true
+    post: false
     book: false
     project: false
     publication: false
@@ -141,7 +141,7 @@ map:
   api_key: ''
   zoom: 15
 marketing:
-  google_analytics: 'UA-119157933-1'
+  google_analytics: 'G-8H5LPC98XW'
   google_tag_manager: ''
   google_site_verification: ''
   baidu_site_verification: ''

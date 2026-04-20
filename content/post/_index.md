@@ -12,4 +12,8 @@ view: 2
 header:
   caption: ""
   image: ""
+
+# Enable math rendering for all posts
+cascade:
+  math: true
 ---

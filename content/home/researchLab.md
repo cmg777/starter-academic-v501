@@ -33,7 +33,9 @@ In the QuaRCS-lab and its [global network](https://quarcs.netlify.app), we condu
 {{% /callout %}}
 <br>
 
-<iframe loading="lazy" width="100%" height="600" src="https://www.youtube-nocookie.com/embed/Hy-b7kjLFds?si=OMz_cEqVoAVl61qV" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<div id="yt-facade" style="position:relative;width:100%;height:600px;cursor:pointer;background:#000 url('https://img.youtube.com/vi/Hy-b7kjLFds/hqdefault.jpg') center/cover no-repeat;" onclick="this.innerHTML='<iframe width=100% height=600 src=https://www.youtube-nocookie.com/embed/Hy-b7kjLFds?autoplay=1 frameborder=0 allow=accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share allowfullscreen></iframe>';this.style.background='none';">
+  <svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.85;" width="68" height="48" viewBox="0 0 68 48"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="red"/><path d="M45 24L27 14v20" fill="#fff"/></svg>
+</div>
 
 
 <center>
