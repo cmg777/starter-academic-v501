@@ -20,6 +20,7 @@ I currently teach the following graduate-level courses:
   <div class="course-icon"><i class="fas fa-chart-bar"></i></div>
   <h3>Statistics &amp; Data Science</h3>
   <p>Website: <a href="https://quarcs-lab.github.io/metricsai/">Econometrics Powered by AI</a></p>
+  <p>Website: <a href="https://cmg777.github.io/intro2causal/">Mastering Causal Metrics</a></p>
 </div>
 
 <div class="course-card">
