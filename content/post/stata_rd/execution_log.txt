@@ -1,0 +1,972 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/Github/starter-academic-v501/content
+> /post/stata_rd/analysis.log
+  log type:  text
+ opened on:  24 Apr 2026, 08:19:38
+
+. 
+. *---------------------------------------------------
+. * Section 1: Data loading and exploration
+. *---------------------------------------------------
+. 
+. use "https://github.com/quarcs-lab/data-open/raw/master/isds/tutoring.dta", c
+> lear
+
+. 
+. * Describe variables
+. des
+
+Contains data from https://github.com/quarcs-lab/data-open/raw/master/isds/tuto
+> ring.dta
+ Observations:         1,000                  
+    Variables:             5                  6 Apr 2024 18:18
+-------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+id              int     %8.0g                 ID of student
+entrance_exam   float   %9.0g                 Entrance exam score
+tutoring_text   str8    %9s                   Enrolled in the tutoring program?
+exit_exam       float   %9.0g                 Exit exam score
+tutoring        float   %9.0g                 Enrolled in the tutoring program?
+                                                (Yes = 1, No=0)
+-------------------------------------------------------------------------------
+Sorted by: 
+
+. 
+. * Summary statistics
+. sum
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+          id |      1,000       500.5    288.8194          1       1000
+entrance_e~m |      1,000     78.1427     12.7265       28.8       99.8
+tutoring_t~t |          0
+   exit_exam |      1,000     66.1646    7.625894       42.8       84.5
+    tutoring |      1,000        .241    .4279043          0          1
+
+. 
+. * Treatment distribution
+. tab tutoring
+
+Enrolled in |
+        the |
+   tutoring |
+   program? |
+  (Yes = 1, |
+      No=0) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        759       75.90       75.90
+          1 |        241       24.10      100.00
+------------+-----------------------------------
+      Total |      1,000      100.00
+
+. 
+. * Create treat variable (explicit copy for cleaner code below)
+. clonevar treat = tutoring
+
+. label var treat "Tutoring program (1 = Yes, 0 = No)"
+
+. 
+. * Center running variable at cutoff
+. gen centered = entrance_exam - 70
+
+. label var centered "Entrance exam centered at cutoff (70)"
+
+. 
+. *---------------------------------------------------
+. * Section 2: Verify sharp design
+. *---------------------------------------------------
+. 
+. * In a sharp RDD, treatment is a deterministic function
+. * of the running variable at the cutoff
+. 
+. gen byte below_cutoff = (entrance_exam <= 70)
+
+. label var below_cutoff "Scored at or below cutoff (70)"
+
+. 
+. tab below_cutoff treat, row
+
++----------------+
+| Key            |
+|----------------|
+|   frequency    |
+| row percentage |
++----------------+
+
+ Scored at |
+  or below | Tutoring program (1 =
+    cutoff |     Yes, 0 = No)
+      (70) |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       759          0 |       759 
+           |    100.00       0.00 |    100.00 
+-----------+----------------------+----------
+         1 |         0        241 |       241 
+           |      0.00     100.00 |    100.00 
+-----------+----------------------+----------
+     Total |       759        241 |     1,000 
+           |     75.90      24.10 |    100.00 
+
+. 
+. * Confirm: 100% treated below, 0% treated above
+. di _newline
+
+
+
+. di "If the table above shows 100% compliance,"
+If the table above shows 100% compliance,
+
+. di "this is a sharp RDD."
+this is a sharp RDD.
+
+. 
+. *---------------------------------------------------
+. * Section 3: Figure 1 -- Scatter plot with cutoff
+. *---------------------------------------------------
+. 
+. twoway (scatter exit_exam entrance_exam if treat==1, ///
+>         mcolor("106 155 204") msize(small) msymbol(circle)) ///
+>        (scatter exit_exam entrance_exam if treat==0, ///
+>         mcolor("217 119 87") msize(small) msymbol(circle)), ///
+>     xline(70, lcolor(black) lwidth(medium) lpattern(dash)) ///
+>     legend(order(1 "Tutored (score {&le} 70)" ///
+>                  2 "Not tutored (score > 70)") ///
+>            position(5) ring(0) col(1)) ///
+>     title("Exit Exam Scores by Entrance Exam Score") ///
+>     subtitle("Vertical dashed line at cutoff = 70") ///
+>     xtitle("Entrance Exam Score") ///
+>     ytitle("Exit Exam Score") ///
+>     scheme(s2color) ///
+>     name(scatter_raw, replace)
+
+. graph export "stata_rd_fig1_scatter_raw.png", replace width(2400)
+(file stata_rd_fig1_scatter_raw.png not found)
+file stata_rd_fig1_scatter_raw.png written in PNG format
+
+. 
+. *---------------------------------------------------
+. * Section 4: Figure 2 -- Histogram of running variable
+. *---------------------------------------------------
+. 
+. * Visual check for manipulation/bunching around cutoff
+. 
+. histogram entrance_exam, ///
+>     bin(30) ///
+>     fcolor("106 155 204") lcolor(white) ///
+>     xline(70, lcolor(black) lwidth(medium) lpattern(dash)) ///
+>     title("Distribution of Entrance Exam Scores") ///
+>     subtitle("Check for bunching at the cutoff (70)") ///
+>     xtitle("Entrance Exam Score") ///
+>     ytitle("Density") ///
+>     scheme(s2color) ///
+>     name(hist_running, replace)
+(bin=30, start=28.799999, width=2.3666668)
+
+. graph export "stata_rd_fig2_histogram_running.png", replace width(2400)
+(file stata_rd_fig2_histogram_running.png not found)
+file stata_rd_fig2_histogram_running.png written in PNG format
+
+. 
+. *---------------------------------------------------
+. * Section 5: Figure 3 -- RD Plot (rdplot)
+. *---------------------------------------------------
+. 
+. * Binned scatter with local polynomial fits on each side
+. 
+. rdplot exit_exam entrance_exam, c(70) p(1) ///
+>     graph_options(title("RD Plot: Exit Exam Score") ///
+>                   xtitle("Entrance Exam Score") ///
+>                   ytitle("Exit Exam Score") ///
+>                   legend(position(5) ring(0) col(1)) ///
+>                   name(rdplot_main, replace))
+Mass points detected in the running variable.
+
+RD Plot with evenly spaced mimicking variance number of bins using polynomial r
+> egression.
+
+        Cutoff c = 70 | Left of c  Right of c        Number of obs  =       100
+> 0
+----------------------+----------------------        Kernel         =    Unifor
+> m
+        Number of obs |       237         763
+   Eff. Number of obs |       237         763
+  Order poly. fit (p) |         1           1
+     BW poly. fit (h) |    41.200      29.800
+ Number of bins scale |     1.000       1.000
+
+Outcome: exit_exam. Running variable: entrance_exam.
+---------------------------------------------
+                      | Left of c  Right of c
+----------------------+----------------------
+        Bins selected |        38          29
+   Average bin length |     1.084       1.028
+    Median bin length |     1.084       1.028
+----------------------+----------------------
+    IMSE-optimal bins |         8           9
+  Mimicking Var. bins |        38          29
+----------------------+----------------------
+Rel. to IMSE-optimal: | 
+        Implied scale |     4.750       3.222
+    WIMSE var. weight |     0.009       0.029
+    WIMSE bias weight |     0.991       0.971
+---------------------------------------------
+
+
+. graph export "stata_rd_fig3_rdplot.png", replace width(2400)
+(file stata_rd_fig3_rdplot.png not found)
+file stata_rd_fig3_rdplot.png written in PNG format
+
+. 
+. *---------------------------------------------------
+. * Section 6: Parametric RDD (OLS)
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================"
+============================================
+
+. di "  Parametric RDD Estimation"
+  Parametric RDD Estimation
+
+. di "============================================"
+============================================
+
+. 
+. * Model 1: Simple linear -- same slope on both sides
+. di _newline
+
+
+
+. di "--- Model 1: Simple linear RDD ---"
+--- Model 1: Simple linear RDD ---
+
+. reg exit_exam entrance_exam treat, robust
+
+Linear regression                               Number of obs     =      1,000
+                                                F(2, 997)         =     199.06
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.2685
+                                                Root MSE          =     6.5288
+
+------------------------------------------------------------------------------
+             |               Robust
+   exit_exam | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+entrance_e~m |   .5097654   .0260511    19.57   0.000     .4586441    .5608868
+       treat |   10.80043   .8063233    13.39   0.000      9.21815    12.38272
+       _cons |   23.72725   2.202253    10.77   0.000     19.40566    28.04883
+------------------------------------------------------------------------------
+
+. estimates store m1_linear
+
+. 
+. * Model 2: Different slopes on each side (interaction)
+. di _newline
+
+
+
+. di "--- Model 2: Linear with different slopes ---"
+--- Model 2: Linear with different slopes ---
+
+. gen interact = centered * treat
+
+. label var interact "Centered x Treat interaction"
+
+. reg exit_exam centered treat interact, robust
+
+Linear regression                               Number of obs     =      1,000
+                                                F(3, 996)         =     133.65
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.2685
+                                                Root MSE          =     6.5321
+
+------------------------------------------------------------------------------
+             |               Robust
+   exit_exam | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    centered |   .5102012    .032201    15.84   0.000     .4470116    .5733908
+       treat |   10.79696   .8157404    13.24   0.000     9.196192    12.39773
+    interact |  -.0014004   .0545284    -0.03   0.980    -.1084041    .1056033
+       _cons |   59.40479   .5104966   116.37   0.000     58.40302    60.40656
+------------------------------------------------------------------------------
+
+. estimates store m2_interact
+
+. 
+. * Model 3: Quadratic specification
+. di _newline
+
+
+
+. di "--- Model 3: Quadratic specification ---"
+--- Model 3: Quadratic specification ---
+
+. gen centered2 = centered^2
+
+. label var centered2 "Centered squared"
+
+. reg exit_exam centered centered2 treat ///
+>     c.centered#c.treat c.centered2#c.treat, robust
+
+Linear regression                               Number of obs     =      1,000
+                                                F(5, 994)         =      87.66
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.2711
+                                                Root MSE          =      6.527
+
+------------------------------------------------------------------------------
+             |               Robust
+   exit_exam | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    centered |   .3280536   .1249398     2.63   0.009     .0828776    .5732295
+   centered2 |   .0065482   .0042147     1.55   0.121    -.0017225    .0148189
+       treat |   9.223345   1.197548     7.70   0.000     6.873333    11.57336
+             |
+  c.centered#|
+     c.treat |   .0216037   .1926001     0.11   0.911    -.3563458    .3995532
+             |
+ c.centered2#|
+     c.treat |  -.0118178   .0060364    -1.96   0.051    -.0236634    .0000279
+             |
+       _cons |   60.32171   .8138902    74.12   0.000     58.72457    61.91885
+------------------------------------------------------------------------------
+
+. estimates store m3_quadratic
+
+. 
+. * Compare all parametric models
+. di _newline
+
+
+
+. di "--- Comparison of parametric models ---"
+--- Comparison of parametric models ---
+
+. estimates table m1_linear m2_interact m3_quadratic, ///
+>     b(%9.3f) se(%9.3f) stats(r2 N)
+
+--------------------------------------------------
+    Variable | m1_linear   m2_inte~t   m3_quad~c  
+-------------+------------------------------------
+entrance_e~m |     0.510                          
+             |     0.026                          
+       treat |    10.800      10.797       9.223  
+             |     0.806       0.816       1.198  
+    centered |                 0.510       0.328  
+             |                 0.032       0.125  
+    interact |                -0.001              
+             |                 0.055              
+   centered2 |                             0.007  
+             |                             0.004  
+             |
+  c.centered#|
+     c.treat |                             0.022  
+             |                             0.193  
+             |
+ c.centered2#|
+     c.treat |                            -0.012  
+             |                             0.006  
+             |
+       _cons |    23.727      59.405      60.322  
+             |     2.202       0.510       0.814  
+-------------+------------------------------------
+          r2 |     0.268       0.268       0.271  
+           N |      1000        1000        1000  
+--------------------------------------------------
+                                      Legend: b/se
+
+. 
+. *---------------------------------------------------
+. * Section 7: Nonparametric RDD (rdrobust)
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================"
+============================================
+
+. di "  Nonparametric RDD Estimation (rdrobust)"
+  Nonparametric RDD Estimation (rdrobust)
+
+. di "============================================"
+============================================
+
+. 
+. * Default: MSE-optimal bandwidth, triangular kernel
+. * Note: rdrobust estimates the jump from left to right of the cutoff.
+. * Since tutored students are to the LEFT (score <= 70) and score higher,
+. * the RD effect is NEGATIVE (right minus left < 0). This is the same
+. * finding as the positive parametric coefficient on treat (~10.8), just
+. * with opposite sign convention. The magnitudes also differ because
+. * rdrobust uses only observations within the optimal bandwidth (~10 points
+. * around the cutoff), while the parametric model uses the full sample.
+. di _newline
+
+
+
+. di "--- Default (MSE-optimal, triangular kernel) ---"
+--- Default (MSE-optimal, triangular kernel) ---
+
+. rdrobust exit_exam entrance_exam, c(70)
+Mass points detected in the running variable.
+
+Sharp RD estimates using local polynomial regression.
+
+     Cutoff c = 70 | Left of c  Right of c            Number of obs =       100
+> 0
+-------------------+----------------------            BW type       =      mser
+> d
+     Number of obs |       237         763            Kernel        = Triangula
+> r
+Eff. Number of obs |       144         256            VCE method    =         N
+> N
+    Order est. (p) |         1           1
+    Order bias (q) |         2           2
+       BW est. (h) |     9.984       9.984
+       BW bias (b) |    14.578      14.578
+         rho (h/b) |     0.685       0.685
+        Unique obs |       155         262
+
+Outcome: exit_exam. Running variable: entrance_exam.
+-------------------------------------------------------------------------------
+> -
+                   | Point         | Robust Inference
+                   | Estimate      | z-stat        P>|z|    [95% Conf. Interval
+> ]
+-------------------+-----------------------------------------------------------
+> -
+         RD Effect | -8.5793       | -4.3034       0.000    -12.1422    -4.5429
+> 7
+-------------------------------------------------------------------------------
+> -
+Estimates adjusted for mass points in the running variable.
+
+. 
+. * Store main results
+. local rd_coef = e(tau_cl)
+
+. local rd_se   = e(se_tau_cl)
+
+. local rd_bw   = e(h_l)
+
+. local rd_N    = e(N_h_l) + e(N_h_r)
+
+. 
+. di _newline
+
+
+
+. di "Summary of main RD estimate:"
+Summary of main RD estimate:
+
+. di "  RD estimate:     " %9.3f `rd_coef'
+  RD estimate:        -8.579
+
+. di "  Robust SE:       " %9.3f `rd_se'
+  Robust SE:           1.617
+
+. di "  Bandwidth (h):   " %9.3f `rd_bw'
+  Bandwidth (h):       9.984
+
+. di "  Effective N:     " `rd_N'
+  Effective N:     400
+
+. 
+. * Uniform kernel for comparison
+. di _newline
+
+
+
+. di "--- Uniform kernel ---"
+--- Uniform kernel ---
+
+. rdrobust exit_exam entrance_exam, c(70) kernel(uniform)
+Mass points detected in the running variable.
+
+Sharp RD estimates using local polynomial regression.
+
+     Cutoff c = 70 | Left of c  Right of c            Number of obs =       100
+> 0
+-------------------+----------------------            BW type       =      mser
+> d
+     Number of obs |       237         763            Kernel        =    Unifor
+> m
+Eff. Number of obs |       119         173            VCE method    =         N
+> N
+    Order est. (p) |         1           1
+    Order bias (q) |         2           2
+       BW est. (h) |     7.223       7.223
+       BW bias (b) |    12.422      12.422
+         rho (h/b) |     0.582       0.582
+        Unique obs |       155         262
+
+Outcome: exit_exam. Running variable: entrance_exam.
+-------------------------------------------------------------------------------
+> -
+                   | Point         | Robust Inference
+                   | Estimate      | z-stat        P>|z|    [95% Conf. Interval
+> ]
+-------------------+-----------------------------------------------------------
+> -
+         RD Effect | -8.2003       | -4.0141       0.000    -11.7749    -4.0486
+> 7
+-------------------------------------------------------------------------------
+> -
+Estimates adjusted for mass points in the running variable.
+
+. 
+. * Epanechnikov kernel for comparison
+. di _newline
+
+
+
+. di "--- Epanechnikov kernel ---"
+--- Epanechnikov kernel ---
+
+. rdrobust exit_exam entrance_exam, c(70) kernel(epanechnikov)
+Mass points detected in the running variable.
+
+Sharp RD estimates using local polynomial regression.
+
+     Cutoff c = 70 | Left of c  Right of c            Number of obs =       100
+> 0
+-------------------+----------------------            BW type       =      mser
+> d
+     Number of obs |       237         763            Kernel        = Epanechni
+> kov
+Eff. Number of obs |       129         200            VCE method    =         N
+> N
+    Order est. (p) |         1           1
+    Order bias (q) |         2           2
+       BW est. (h) |     8.179       8.179
+       BW bias (b) |    12.680      12.680
+         rho (h/b) |     0.645       0.645
+        Unique obs |       155         262
+
+Outcome: exit_exam. Running variable: entrance_exam.
+-------------------------------------------------------------------------------
+> -
+                   | Point         | Robust Inference
+                   | Estimate      | z-stat        P>|z|    [95% Conf. Interval
+> ]
+-------------------+-----------------------------------------------------------
+> -
+         RD Effect | -8.3882       | -4.0224       0.000    -12.1749    -4.1973
+> 5
+-------------------------------------------------------------------------------
+> -
+Estimates adjusted for mass points in the running variable.
+
+. 
+. *---------------------------------------------------
+. * Section 8: Bandwidth sensitivity
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================"
+============================================
+
+. di "  Bandwidth Sensitivity Analysis"
+  Bandwidth Sensitivity Analysis
+
+. di "============================================"
+============================================
+
+. 
+. * Show all available bandwidth selectors
+. di _newline
+
+
+
+. di "--- Bandwidth selection methods ---"
+--- Bandwidth selection methods ---
+
+. rdbwselect exit_exam entrance_exam, c(70) all
+Mass points detected in the running variable.
+
+Bandwidth estimators for sharp RD local polynomial regression.
+
+       Cutoff c =  | Left of c  Right of c            Number of obs =       100
+> 0
+-------------------+----------------------            Kernel        = Triangula
+> r
+     Number of obs |       237         763            VCE method    =         N
+> N
+Min of entrance_exam |    28.800    70.000
+Max of entrance_exam |    69.900    99.800
+    Order est. (p) |         1           1
+    Order bias (q) |         2           2
+        Unique obs |       155         262
+
+Outcome: exit_exam. Running variable: entrance_exam.
+-------------------------------------------------------------------------------
+> -
+                   |         BW est. (h)          |        BW bias (b)
+            Method | Left of c         Right of c | Left of c        Right of c
+-------------------+------------------------------+----------------------------
+> -
+             mserd |     9.984              9.984 |    14.578            14.578
+            msetwo |    11.558             10.041 |    17.057            14.759
+            msesum |    12.058             12.058 |    17.552            17.552
+          msecomb1 |     9.984              9.984 |    14.578            14.578
+          msecomb2 |    11.558             10.041 |    17.057            14.759
+-------------------+------------------------------+----------------------------
+> -
+             cerrd |     7.068              7.068 |    14.578            14.578
+            certwo |     8.182              7.109 |    17.057            14.759
+            cersum |     8.536              8.536 |    17.552            17.552
+          cercomb1 |     7.068              7.068 |    14.578            14.578
+          cercomb2 |     8.182              7.109 |    17.057            14.759
+-------------------------------------------------------------------------------
+> -
+Estimates adjusted for mass points in the running variable.
+
+. 
+. * Estimate at multiple manual bandwidths
+. di _newline
+
+
+
+. di "--- Manual bandwidth sensitivity ---"
+--- Manual bandwidth sensitivity ---
+
+. di "BW       Coef         SE          p-value"
+BW       Coef         SE          p-value
+
+. di "----     ---------    ---------   ---------"
+----     ---------    ---------   ---------
+
+. 
+. foreach bw in 5 7 10 12 15 20 {
+  2.     quietly rdrobust exit_exam entrance_exam, c(70) h(`bw')
+  3.     local coef_`bw' = e(tau_cl)
+  4.     local se_`bw'   = e(se_tau_cl)
+  5.     local pv_`bw'   = e(pv_cl)
+  6.     di "`bw'" _col(10) %9.3f `coef_`bw'' ///
+>        _col(23) %9.3f `se_`bw'' ///
+>        _col(36) %9.3f `pv_`bw''
+  7. }
+5           -8.202        2.337        0.000
+7           -8.237        1.919        0.000
+10          -8.581        1.615        0.000
+12          -8.675        1.486        0.000
+15          -8.842        1.312        0.000
+20          -9.157        1.131        0.000
+
+. 
+. *---------------------------------------------------
+. * Section 9: McCrary density test (rddensity)
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================"
+============================================
+
+. di "  McCrary Density Test"
+  McCrary Density Test
+
+. di "============================================"
+============================================
+
+. 
+. * Formal test: is there bunching at the cutoff?
+. * H0: density is continuous at the cutoff
+. * A non-significant p-value supports the RDD assumption
+. 
+. rddensity entrance_exam, c(70)
+Computing data-driven bandwidth selectors.
+
+Point estimates and standard errors have been adjusted for repeated observation
+> s.
+(Use option nomasspoints to suppress this adjustment.)
+
+RD Manipulation test using local polynomial density estimation.
+
+     c =    70.000 | Left of c  Right of c          Number of obs =         100
+> 0
+-------------------+----------------------          Model         = unrestricte
+> d
+     Number of obs |       237         763          BW method     =         com
+> b
+Eff. Number of obs |       208         577          Kernel        =   triangula
+> r
+    Order est. (p) |         2           2          VCE method    =    jackknif
+> e
+    Order bias (q) |         3           3
+       BW est. (h) |    22.444      19.966
+
+Running variable: entrance_exam.
+------------------------------------------
+            Method |      T          P>|T|
+-------------------+----------------------
+            Robust |   -0.5521      0.5809
+------------------------------------------
+
+P-values of binomial tests. (H0: prob = .5)
+-----------------------------------------------------
+ Window Length / 2 |       <c         >=c |     P>|T|
+-------------------+----------------------+----------
+             0.300 |        9          11 |    0.8238
+             0.600 |       15          16 |    1.0000
+             0.900 |       20          21 |    1.0000
+             1.200 |       23          24 |    1.0000
+             1.500 |       29          32 |    0.7982
+             1.800 |       36          38 |    0.9076
+             2.100 |       43          47 |    0.7520
+             2.400 |       44          52 |    0.4752
+             2.700 |       47          57 |    0.3776
+             3.000 |       53          64 |    0.3553
+-----------------------------------------------------
+
+. 
+. * Store p-value
+. local density_pval = e(pv_q)
+
+. di _newline
+
+
+
+. di "Density test p-value: " %9.4f `density_pval'
+Density test p-value:    0.5809
+
+. di "If p > 0.05, no evidence of manipulation."
+If p > 0.05, no evidence of manipulation.
+
+. 
+. * Figure 4: Density plot using lpdensity
+. * Generate density estimates on each side of the cutoff
+. * and plot them manually since rddensity plot can be fragile
+. 
+. * Left side density
+. preserve
+
+. keep if entrance_exam <= 70
+(759 observations deleted)
+
+. kdensity entrance_exam, generate(xL densL) nograph
+
+. save "_tmpL.dta", replace
+(file _tmpL.dta not found)
+file _tmpL.dta saved
+
+. restore
+
+. 
+. * Right side density
+. preserve
+
+. keep if entrance_exam > 70
+(241 observations deleted)
+
+. kdensity entrance_exam, generate(xR densR) nograph
+
+. save "_tmpR.dta", replace
+(file _tmpR.dta not found)
+file _tmpR.dta saved
+
+. restore
+
+. 
+. * Combine and plot
+. preserve
+
+. use "_tmpL.dta", clear
+
+. append using "_tmpR.dta"
+
+. 
+. twoway (line densL xL, lcolor("106 155 204") lwidth(medthick)) ///
+>        (line densR xR, lcolor("217 119 87") lwidth(medthick)), ///
+>     xline(70, lcolor(black) lwidth(medium) lpattern(dash)) ///
+>     legend(order(1 "Below cutoff" 2 "Above cutoff") ///
+>            position(5) ring(0) col(1)) ///
+>     title("Density of the Running Variable") ///
+>     subtitle("No bunching at the cutoff supports the RDD assumption") ///
+>     xtitle("Entrance Exam Score") ///
+>     ytitle("Density") ///
+>     scheme(s2color) ///
+>     name(density_test, replace)
+
+. graph export "stata_rd_fig4_density_test.png", replace width(2400)
+(file stata_rd_fig4_density_test.png not found)
+file stata_rd_fig4_density_test.png written in PNG format
+
+. restore
+
+. 
+. * Clean up temp files
+. capture erase "_tmpL.dta"
+
+. capture erase "_tmpR.dta"
+
+. 
+. *---------------------------------------------------
+. * Section 10: Placebo cutoffs (robustness)
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================"
+============================================
+
+. di "  Placebo Cutoff Tests"
+  Placebo Cutoff Tests
+
+. di "============================================"
+============================================
+
+. 
+. * If the effect is real, only the true cutoff (70)
+. * should show a significant discontinuity
+. 
+. * Use postfile to collect results for plotting
+. tempname pf
+
+. tempfile placebo_results
+
+. postfile `pf' cutoff coef se pval using `placebo_results', replace
+(file /var/folders/3h/bdq32hpj7ln850s11fd2qvqw0000gn/T//St60985.000004 not
+    found)
+
+. 
+. di _newline
+
+
+
+. di "Cutoff   Coef         SE          p-value"
+Cutoff   Coef         SE          p-value
+
+. di "------   ---------    ---------   ---------"
+------   ---------    ---------   ---------
+
+. 
+. foreach c in 50 55 60 65 70 75 80 85 90 {
+  2.     capture quietly rdrobust exit_exam entrance_exam, c(`c')
+  3.     if _rc == 0 {
+  4.         local pc = e(tau_cl)
+  5.         local ps = e(se_tau_cl)
+  6.         local pp = e(pv_cl)
+  7.         if `c' == 70 {
+  8.             di "`c' *" _col(10) %9.3f `pc' ///
+>                _col(23) %9.3f `ps' ///
+>                _col(36) %9.3f `pp'
+  9.         }
+ 10.         else {
+ 11.             di "`c'" _col(10) %9.3f `pc' ///
+>                _col(23) %9.3f `ps' ///
+>                _col(36) %9.3f `pp'
+ 12.         }
+ 13.         post `pf' (`c') (`pc') (`ps') (`pp')
+ 14.     }
+ 15.     else {
+ 16.         di "`c'" _col(10) "  (insufficient data)"
+ 17.     }
+ 18. }
+50          12.728       21.302        0.550
+55           0.557        3.052        0.855
+60           0.569        3.193        0.859
+65           3.296        1.742        0.058
+70 *        -8.579        1.617        0.000
+75          -1.548        1.691        0.360
+80          -1.095        1.472        0.457
+85           0.817        1.605        0.611
+90          -0.540        1.900        0.776
+
+. 
+. postclose `pf'
+
+. 
+. * Figure 5: Placebo cutoff plot
+. preserve
+
+. use `placebo_results', clear
+
+. 
+. gen ci_upper = coef + 1.96 * se
+
+. gen ci_lower = coef - 1.96 * se
+
+. gen byte is_true = (cutoff == 70)
+
+. 
+. twoway (rcap ci_upper ci_lower cutoff if is_true==0, ///
+>             lcolor("106 155 204")) ///
+>        (scatter coef cutoff if is_true==0, ///
+>             mcolor("106 155 204") msymbol(circle)) ///
+>        (rcap ci_upper ci_lower cutoff if is_true==1, ///
+>             lcolor("217 119 87") lwidth(thick)) ///
+>        (scatter coef cutoff if is_true==1, ///
+>             mcolor("217 119 87") msymbol(diamond) msize(large)), ///
+>     yline(0, lcolor(black) lpattern(dash)) ///
+>     legend(order(2 "Placebo cutoffs" 4 "True cutoff (70)") ///
+>            position(5) ring(0) col(1)) ///
+>     title("Placebo Cutoff Test") ///
+>     subtitle("Only the true cutoff should show a significant effect") ///
+>     xtitle("Cutoff Value") ///
+>     ytitle("RD Estimate") ///
+>     scheme(s2color) ///
+>     name(placebo_cutoffs, replace)
+
+. graph export "stata_rd_fig5_placebo_cutoffs.png", replace width(2400)
+(file stata_rd_fig5_placebo_cutoffs.png not found)
+file stata_rd_fig5_placebo_cutoffs.png written in PNG format
+
+. restore
+
+. 
+. *---------------------------------------------------
+. * End of analysis
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================"
+============================================
+
+. di "  Analysis complete."
+  Analysis complete.
+
+. di "  Sharp RDD: tutoring at entrance_exam <= 70"
+  Sharp RDD: tutoring at entrance_exam <= 70
+
+. di "  Estimand: LATE at the cutoff"
+  Estimand: LATE at the cutoff
+
+. di "  See the tutorial for interpretation."
+  See the tutorial for interpretation.
+
+. di "============================================"
+============================================
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/Github/starter-academic-v501/content
+> /post/stata_rd/analysis.log
+  log type:  text
+ closed on:  24 Apr 2026, 08:19:44
+-------------------------------------------------------------------------------
