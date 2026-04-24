@@ -6,6 +6,7 @@ categories:
   - Tutorial
   - Spatial Analysis
   - Cross-sectional Data
+  - GWR and MGWR
 draft: false
 featured: false
 date: "2026-03-22T00:00:00Z"

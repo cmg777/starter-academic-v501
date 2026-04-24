@@ -5,6 +5,7 @@ categories:
   - Stata
   - Spatial Analysis
   - Panel Data
+  - Spatial Regression (SAR, SEM, SDM)
 draft: false
 featured: false
 date: "2023-12-01T00:00:00Z"

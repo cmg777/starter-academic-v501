@@ -4,6 +4,7 @@ authors:
 categories:
   - Stata
   - Causal Inference
+  - Difference-in-Differences (DiD)
 draft: false
 featured: false
 date: "2026-03-26T00:00:00Z"

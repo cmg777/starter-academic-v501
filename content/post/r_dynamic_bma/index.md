@@ -7,6 +7,7 @@ categories:
   - Econometrics
   - Panel Data
   - Variable Selection
+  - Bayesian Model Averaging (BMA)
 draft: false
 featured: false
 date: "2026-03-29T00:00:00Z"

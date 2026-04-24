@@ -5,6 +5,7 @@ categories:
   - R
   - Causal Inference
   - Panel Data
+  - Difference-in-Differences (DiD)
 draft: false
 featured: false
 date: "2024-07-29T00:00:00Z"

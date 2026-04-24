@@ -5,6 +5,7 @@ categories:
   - Python
   - Spatial Analysis
   - Cross-sectional Data
+  - GWR and MGWR
 draft: false
 featured: false
 date: "2023-12-23T00:00:00Z"

@@ -5,6 +5,9 @@ categories:
   - Stata
   - Causal Inference
   - Panel Data
+  - Difference-in-Differences (DiD)
+  - IPW and Doubly Robust
+  - Randomized Controlled Trial (RCT)
 draft: false
 featured: false
 date: "2026-03-24T00:00:00Z"

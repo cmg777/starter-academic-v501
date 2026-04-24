@@ -7,6 +7,7 @@ categories:
   - Econometrics
   - Panel Data
   - Variable Selection
+  - LASSO
 draft: false
 featured: false
 date: "2026-04-04T00:00:00Z"

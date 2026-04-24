@@ -7,6 +7,7 @@ categories:
   - Exploratory Data Analysis
   - Spatial Analysis
   - Cross-sectional Data
+  - Spatial Autocorrelation (ESDA)
 draft: false
 featured: false
 date: "2026-03-22T00:00:00Z"

@@ -5,6 +5,7 @@ categories:
   - Python
   - Tutorial
   - Cross-sectional Data
+  - Principal Component Analysis (PCA)
 draft: false
 featured: false
 date: "2026-03-21T00:00:00Z"

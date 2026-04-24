@@ -5,6 +5,7 @@ categories:
   - R
   - Python
   - Growth
+  - Solow Growth Model
 draft: false
 featured: false
 date: "2023-07-29T00:00:00Z"

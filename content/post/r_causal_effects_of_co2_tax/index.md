@@ -4,6 +4,7 @@ authors:
 categories:
   - R
   - Causal Inference
+  - Synthetic Control
 draft: false
 featured: false
 date: "2023-04-01T00:00:00Z"

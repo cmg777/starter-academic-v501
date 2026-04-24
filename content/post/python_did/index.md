@@ -5,6 +5,7 @@ categories:
   - Python
   - Causal Inference
   - Panel Data
+  - Difference-in-Differences (DiD)
 draft: false
 featured: false
 date: "2026-03-19T00:00:00Z"

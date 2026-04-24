@@ -4,6 +4,7 @@ authors:
 categories:
   - R
   - Causal Inference
+  - Difference-in-Differences (DiD)
 draft: false
 featured: false
 date: "2019-04-01T00:00:00Z"

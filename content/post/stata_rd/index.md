@@ -4,6 +4,7 @@ authors:
 categories:
   - Stata
   - Causal Inference
+  - Regression Discontinuity (RDD)
 draft: false
 featured: false
 date: "2026-04-23T00:00:00Z"

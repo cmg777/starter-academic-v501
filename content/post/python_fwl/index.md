@@ -6,6 +6,7 @@ categories:
   - Tutorial
   - Causal Inference
   - Cross-sectional Data
+  - FWL Theorem
 draft: false
 featured: false
 date: "2026-03-14T00:00:00Z"

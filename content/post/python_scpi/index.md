@@ -4,6 +4,7 @@ authors:
 categories:
   - Python
   - Causal Inference
+  - Synthetic Control
 draft: false
 featured: false
 date: "2026-03-22T00:00:00Z"
