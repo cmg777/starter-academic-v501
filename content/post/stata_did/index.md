@@ -69,7 +69,7 @@ The following diagram summarizes the case study setup and the analytical approac
 
 ```mermaid
 graph LR
-    subgraph Setting ["Case Study Setting"]
+    subgraph "Case Study Setting"
     A["<b>35 High Schools</b><br/>in One Region"]
     B["<b>10 Treated Schools</b><br/>(tutoring program)"]
     C["<b>25 Comparison Schools</b><br/>(no program)"]
@@ -77,21 +77,22 @@ graph LR
     A --> C
     end
 
-    subgraph Design ["DiD Design"]
+    subgraph "DiD Design"
     D["<b>Pre-Program</b><br/>GPA at baseline"]
     E["<b>Post-Program</b><br/>GPA after intervention"]
     F["<b>DiD Estimate</b><br/>ATT = 25.32"]
     D --> E --> F
     end
 
-    subgraph Methods ["Estimation Methods"]
+    subgraph "Estimation Methods"
     G["<b>Manual 2x2</b><br/>Subtraction"]
     H["<b>TWFE Regression</b><br/>5 approaches"]
     I["<b>Event Study</b><br/>Dynamic effects"]
     G --> H --> I
     end
 
-    Setting --> Design --> Methods
+    C --> D
+    F --> G
 
     style A fill:#6a9bcc,stroke:#141413,color:#fff
     style B fill:#d97757,stroke:#141413,color:#fff
