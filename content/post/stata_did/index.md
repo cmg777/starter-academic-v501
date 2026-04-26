@@ -64,30 +64,27 @@ We progress from a naive before-after comparison (which overstates the effect) t
 The following diagram summarizes the case study setup and the analytical approach we follow throughout this tutorial.
 
 ```mermaid
-flowchart LR
-    subgraph Setting["Case Study Setting"]
-        direction TB
-        A["35 High Schools<br/>in One Region"]
-        B["10 Treated Schools<br/>(tutoring program)"]
-        C["25 Comparison Schools<br/>(no program)"]
-        A --> B
-        A --> C
+graph LR
+    subgraph Setting ["Case Study Setting"]
+    A["<b>35 High Schools</b><br/>in One Region"]
+    B["<b>10 Treated Schools</b><br/>(tutoring program)"]
+    C["<b>25 Comparison Schools</b><br/>(no program)"]
+    A --> B
+    A --> C
     end
 
-    subgraph Design["DiD Design"]
-        direction TB
-        D["Pre-Program<br/>GPA at baseline"]
-        E["Post-Program<br/>GPA after intervention"]
-        F["DiD Estimate<br/>ATT = 25.32"]
-        D --> E --> F
+    subgraph Design ["DiD Design"]
+    D["<b>Pre-Program</b><br/>GPA at baseline"]
+    E["<b>Post-Program</b><br/>GPA after intervention"]
+    F["<b>DiD Estimate</b><br/>ATT = 25.32"]
+    D --> E --> F
     end
 
-    subgraph Methods["Estimation Methods"]
-        direction TB
-        G["Manual 2x2<br/>Subtraction"]
-        H["TWFE Regression<br/>5 approaches"]
-        I["Event Study<br/>Dynamic effects"]
-        G --> H --> I
+    subgraph Methods ["Estimation Methods"]
+    G["<b>Manual 2x2</b><br/>Subtraction"]
+    H["<b>TWFE Regression</b><br/>5 approaches"]
+    I["<b>Event Study</b><br/>Dynamic effects"]
+    G --> H --> I
     end
 
     Setting --> Design --> Methods
