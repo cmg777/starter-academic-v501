@@ -49,7 +49,7 @@ diagram: true
 
 ## Overview
 
-How can we evaluate whether a government program actually works when a randomized control trial (RCT) is not feasible? Education researchers frequently face this challenge: a new policy is rolled out in some schools but not others, and we need to know whether it made a difference. **Difference-in-Differences (DiD)** is one of the most widely used quasi-experimental designs for answering this kind of causal question.
+How can we evaluate whether a government program actually works when a randomized controlled trial (RCT) is not feasible? Education researchers frequently face this challenge: a new policy is rolled out in some schools but not others, and we need to know whether it made a difference. **Difference-in-Differences (DiD)** is one of the most widely used quasi-experimental designs for answering this kind of causal question.
 
 In this tutorial, we introduce the DiD method through a case study based on Corral and Yang (2024). A fictitious government implements an after-school tutoring program in 10 of 35 high schools to improve the GPA of low-income students. We compare these treated schools against 25 comparison schools that did not receive the program. Our goal is to estimate the **Average Treatment Effect on the Treated (ATT)** --- by how many GPA points did the program improve academic performance?
 
@@ -593,7 +593,7 @@ Panel variable: id (strongly balanced)
 Time variable: time, 1 to 2
 ```
 
-The dataset covers 35 schools observed at two time points (70 total observations). Ten schools (28.6%) are in the treated group and received the after-school tutoring program, while 25 schools serve as the comparison group. The panel is strongly balanced, meaning every school is observed in both periods with no missing data. GPA ranges from 59.4 to 99.2 on a 0-100 scale, with substantial variation (SD = 10.88). The `xtsum` output reveals that most GPA variation is within-school over time (within SD = 10.82) rather than between schools (between SD = 1.12), suggesting a large treatment effect drives the time-series variation.
+The dataset covers 35 schools observed at two time points (70 total observations). Ten schools (28.6%) are in the treated group and received the after-school tutoring program, while 25 schools serve as the comparison group. The panel is strongly balanced, meaning every school is observed in both periods with no missing data. GPA ranges from 59.4 to 99.2 on a 0-100 scale, with substantial variation (SD = 10.88). The `xtsum` output reveals that most GPA variation is within-school over time (within SD = 10.82) rather than between schools (between SD = 1.12), suggesting that a large treatment effect drives the time-series variation.
 
 ### Treatment visualization
 
