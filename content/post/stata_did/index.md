@@ -104,105 +104,96 @@ The study uses panel data: the same 35 schools are observed at two time points (
 
 ---
 
-<div id="podcast-player" style="margin: 2rem 0; padding: 0;">
 <style>
+.podcast-overlay {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  animation: podSlideUp 0.35s ease-out;
+}
+@keyframes podSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.podcast-overlay.pod-closing {
+  animation: podSlideDown 0.3s ease-in forwards;
+}
+@keyframes podSlideDown {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
 .podcast-container {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border-radius: 16px;
-  padding: 24px 28px;
-  max-width: 700px;
-  margin: 0 auto;
+  padding: 18px 24px 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-  border: 1px solid rgba(106,155,204,0.15);
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.5);
+  border-top: 1px solid rgba(106,155,204,0.2);
 }
-.podcast-header {
+.podcast-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.podcast-top-row {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 .podcast-icon {
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   background: linear-gradient(135deg, #d97757, #e8956a);
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 .podcast-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   fill: #fff;
 }
+.podcast-title-block {
+  flex: 1;
+  min-width: 0;
+}
 .podcast-title-block h4 {
-  margin: 0 0 2px 0;
+  margin: 0 0 1px 0;
   color: #f0ece2;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .podcast-title-block span {
   color: #8b9dc3;
-  font-size: 12px;
+  font-size: 11px;
 }
-.podcast-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  justify-content: center;
-}
-.podcast-btn {
+.podcast-close-btn {
   background: none;
   border: none;
   cursor: pointer;
   padding: 6px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s;
+  transition: background 0.2s;
+  flex-shrink: 0;
 }
-.podcast-btn svg {
-  fill: #c8d0e0;
-  transition: fill 0.2s;
+.podcast-close-btn:hover {
+  background: rgba(255,255,255,0.1);
 }
-.podcast-btn:hover svg {
-  fill: #f0ece2;
-}
-.podcast-btn-skip {
-  position: relative;
-}
-.podcast-btn-skip span {
-  position: absolute;
-  font-size: 8px;
-  font-weight: 700;
-  color: #c8d0e0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  margin-top: 1px;
-}
-.podcast-btn-play {
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, #d97757, #e8956a);
-  border-radius: 50%;
-  box-shadow: 0 4px 16px rgba(217,119,87,0.4);
-  transition: all 0.2s;
-}
-.podcast-btn-play:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 24px rgba(217,119,87,0.5);
-}
-.podcast-btn-play svg {
-  fill: #fff;
-  width: 24px;
-  height: 24px;
+.podcast-close-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: #8b9dc3;
 }
 .podcast-progress-wrap {
   margin-bottom: 12px;
@@ -212,7 +203,7 @@ The study uses panel data: the same 35 schools are observed at two time points (
   justify-content: space-between;
   font-size: 11px;
   color: #8b9dc3;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   font-variant-numeric: tabular-nums;
 }
 .podcast-bar-bg {
@@ -223,6 +214,7 @@ The study uses panel data: the same 35 schools are observed at two time points (
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  transition: height 0.15s;
 }
 .podcast-bar-buffered {
   position: absolute;
@@ -243,19 +235,77 @@ The study uses panel data: the same 35 schools are observed at two time points (
   transition: width 0.1s linear;
 }
 .podcast-bar-bg:hover {
-  height: 8px;
-  margin-top: -1px;
+  height: 10px;
+  margin-top: -2px;
 }
-.podcast-bottom-row {
+.podcast-controls-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.podcast-transport {
+  display: flex;
+  align-items: center;
   gap: 8px;
+}
+.podcast-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+.podcast-btn svg {
+  fill: #c8d0e0;
+  transition: fill 0.2s;
+}
+.podcast-btn:hover svg {
+  fill: #f0ece2;
+}
+.podcast-btn-skip {
+  position: relative;
+}
+.podcast-btn-skip span {
+  position: absolute;
+  font-size: 7px;
+  font-weight: 700;
+  color: #c8d0e0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  margin-top: 1px;
+}
+.podcast-btn-play {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #d97757, #e8956a);
+  border-radius: 50%;
+  box-shadow: 0 3px 12px rgba(217,119,87,0.4);
+  transition: all 0.2s;
+}
+.podcast-btn-play:hover {
+  transform: scale(1.08);
+  box-shadow: 0 5px 20px rgba(217,119,87,0.5);
+}
+.podcast-btn-play svg {
+  fill: #fff;
+  width: 22px;
+  height: 22px;
+}
+.podcast-extras {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .podcast-volume-wrap {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 .podcast-volume-wrap svg {
   fill: #8b9dc3;
@@ -270,7 +320,7 @@ The study uses panel data: the same 35 schools are observed at two time points (
 .podcast-volume-slider {
   -webkit-appearance: none;
   appearance: none;
-  width: 70px;
+  width: 60px;
   height: 4px;
   background: rgba(255,255,255,0.12);
   border-radius: 2px;
@@ -292,12 +342,12 @@ The study uses panel data: the same 35 schools are observed at two time points (
   color: #c8d0e0;
   font-size: 11px;
   font-weight: 600;
-  padding: 4px 10px;
+  padding: 3px 9px;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
   font-family: inherit;
-  min-width: 44px;
+  min-width: 40px;
   text-align: center;
 }
 .podcast-speed-btn:hover {
@@ -309,11 +359,11 @@ The study uses panel data: the same 35 schools are observed at two time points (
   background: none;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 8px;
-  padding: 5px 12px;
+  padding: 4px 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   color: #8b9dc3;
   font-size: 11px;
   font-family: inherit;
@@ -330,38 +380,29 @@ The study uses panel data: the same 35 schools are observed at two time points (
   height: 14px;
   fill: currentColor;
 }
-@media (max-width: 500px) {
-  .podcast-container { padding: 16px 18px; }
-  .podcast-bottom-row { flex-wrap: wrap; justify-content: center; gap: 10px; }
-  .podcast-volume-slider { width: 50px; }
+@media (max-width: 600px) {
+  .podcast-container { padding: 14px 16px 16px; }
+  .podcast-volume-wrap { display: none; }
+  .podcast-title-block h4 { font-size: 13px; }
+  .podcast-extras { gap: 8px; }
 }
 </style>
 
+<div class="podcast-overlay" id="podOverlay">
 <div class="podcast-container">
-  <audio id="podAudio" preload="metadata" src="https://files.catbox.moe/s6tyrz.wav"></audio>
+<div class="podcast-inner">
+  <audio id="podAudio" preload="none" src="https://files.catbox.moe/s6tyrz.wav"></audio>
 
-  <div class="podcast-header">
+  <div class="podcast-top-row">
     <div class="podcast-icon">
       <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v4a5 5 0 0 0 10 0V6a5 5 0 0 0-5-5zm0 16a7 7 0 0 1-7-7H3a9 9 0 0 0 8 8.94V22h2v-3.06A9 9 0 0 0 21 10h-2a7 7 0 0 1-7 7z"/></svg>
     </div>
     <div class="podcast-title-block">
-      <h4>AI-Generated Podcast: Introduction to DiD in Stata</h4>
-      <span id="podDurationLabel">Loading duration...</span>
+      <h4>AI Podcast: Introduction to DiD in Stata</h4>
+      <span id="podDurationLabel">Click play to load</span>
     </div>
-  </div>
-
-  <div class="podcast-controls">
-    <button class="podcast-btn podcast-btn-skip" onclick="podSkip(-15)" title="Back 15s">
-      <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-      <span>15</span>
-    </button>
-    <button class="podcast-btn podcast-btn-play" id="podPlayBtn" onclick="podToggle()" title="Play">
-      <svg id="podIconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      <svg id="podIconPause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-    </button>
-    <button class="podcast-btn podcast-btn-skip" onclick="podSkip(15)" title="Forward 15s">
-      <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
-      <span>15</span>
+    <button class="podcast-close-btn" onclick="podClose()" title="Close player">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
     </button>
   </div>
 
@@ -376,33 +417,68 @@ The study uses panel data: the same 35 schools are observed at two time points (
     </div>
   </div>
 
-  <div class="podcast-bottom-row">
-    <div class="podcast-volume-wrap">
-      <svg id="podVolIcon" onclick="podMute()" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.47 4.47 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>
-      <input type="range" class="podcast-volume-slider" id="podVolume" min="0" max="1" step="0.05" value="0.8">
+  <div class="podcast-controls-row">
+    <div class="podcast-transport">
+      <button class="podcast-btn podcast-btn-skip" onclick="podSkip(-15)" title="Back 15s">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+        <span>15</span>
+      </button>
+      <button class="podcast-btn podcast-btn-play" id="podPlayBtn" onclick="podToggle()" title="Play">
+        <svg id="podIconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="podIconPause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <button class="podcast-btn podcast-btn-skip" onclick="podSkip(15)" title="Forward 15s">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+        <span>15</span>
+      </button>
     </div>
-    <button class="podcast-speed-btn" id="podSpeedBtn" onclick="podCycleSpeed()" title="Playback speed">1x</button>
-    <a class="podcast-download-btn" href="https://files.catbox.moe/s6tyrz.wav" download="stata_did_podcast.wav" title="Download podcast">
-      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      Download
-    </a>
+    <div class="podcast-extras">
+      <div class="podcast-volume-wrap">
+        <svg id="podVolIcon" onclick="podMute()" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.47 4.47 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>
+        <input type="range" class="podcast-volume-slider" id="podVolume" min="0" max="1" step="0.05" value="0.8">
+      </div>
+      <button class="podcast-speed-btn" id="podSpeedBtn" onclick="podCycleSpeed()" title="Playback speed">1x</button>
+      <a class="podcast-download-btn" href="https://files.catbox.moe/s6tyrz.wav" download="stata_did_podcast.wav" title="Download">
+        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      </a>
+    </div>
   </div>
+</div>
+</div>
 </div>
 
 <script>
 (function(){
+  var overlay = document.getElementById('podOverlay');
   var a = document.getElementById('podAudio');
   var speeds = [0.75, 1, 1.25, 1.5, 2];
   var si = 1;
+  var opened = false;
   function fmt(s){
     if(isNaN(s)) return '0:00';
     var m=Math.floor(s/60), sec=Math.floor(s%60);
     return m+':'+(sec<10?'0':'')+sec;
   }
+  /* Intercept clicks on the YAML podcast button */
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('a[href="#podcast-player"]');
+    if(link){
+      e.preventDefault();
+      if(!opened){
+        overlay.style.display = 'block';
+        overlay.classList.remove('pod-closing');
+        a.preload = 'metadata';
+        a.load();
+        opened = true;
+      } else {
+        overlay.style.display = 'block';
+        overlay.classList.remove('pod-closing');
+      }
+    }
+  });
   a.volume = 0.8;
   a.addEventListener('loadedmetadata', function(){
     document.getElementById('podDuration').textContent = fmt(a.duration);
-    var mins = Math.floor(a.duration/60);
     document.getElementById('podDurationLabel').textContent = fmt(a.duration) + ' minutes';
   });
   a.addEventListener('timeupdate', function(){
@@ -424,11 +500,11 @@ The study uses panel data: the same 35 schools are observed at two time points (
     if(a.paused){a.play();document.getElementById('podIconPlay').style.display='none';document.getElementById('podIconPause').style.display='';}
     else{a.pause();document.getElementById('podIconPlay').style.display='';document.getElementById('podIconPause').style.display='none';}
   };
-  window.podSkip = function(s){a.currentTime = Math.max(0,Math.min(a.duration,a.currentTime+s));};
+  window.podSkip = function(s){a.currentTime = Math.max(0,Math.min(a.duration||0,a.currentTime+s));};
   window.podSeek = function(e){
     var rect = document.getElementById('podBarBg').getBoundingClientRect();
     var pct = (e.clientX - rect.left)/rect.width;
-    a.currentTime = pct * a.duration;
+    a.currentTime = pct * (a.duration||0);
   };
   window.podMute = function(){
     a.muted = !a.muted;
@@ -439,13 +515,19 @@ The study uses panel data: the same 35 schools are observed at two time points (
     a.playbackRate = speeds[si];
     document.getElementById('podSpeedBtn').textContent = speeds[si]+'x';
   };
+  window.podClose = function(){
+    overlay.classList.add('pod-closing');
+    setTimeout(function(){ overlay.style.display='none'; }, 300);
+    a.pause();
+    document.getElementById('podIconPlay').style.display='';
+    document.getElementById('podIconPause').style.display='none';
+  };
   document.getElementById('podVolume').addEventListener('input', function(){
     a.volume = this.value;
     a.muted = false;
   });
 })();
 </script>
-</div>
 
 ---
 
