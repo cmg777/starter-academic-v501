@@ -419,8 +419,8 @@ The study uses panel data: the same 35 schools are observed at two time points (
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 900px;
+  width: 94%;
+  max-width: 1600px;
 }
 .video-top-row {
   display: flex;
@@ -491,7 +491,7 @@ The study uses panel data: the same 35 schools are observed at two time points (
   border-radius: 8px;
 }
 @media (max-width: 600px) {
-  .video-container { width: 95%; }
+  .video-container { width: 98%; }
   .video-top-row h4 { font-size: 13px; }
 }
 </style>
