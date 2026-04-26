@@ -1,0 +1,1400 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_did/analysis.log
+  log type:  text
+ opened on:  26 Apr 2026, 11:26:07
+
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================"
+============================================
+
+. di "  Difference-in-Differences (DiD) Tutorial"
+  Difference-in-Differences (DiD) Tutorial
+
+. di "  Corral & Yang (2024)"
+  Corral & Yang (2024)
+
+. di "  $S_DATE $S_TIME"
+  26 Apr 2026 11:26:07
+
+. di "============================================"
+============================================
+
+. 
+. 
+. *===================================================
+. *  PART 1: THE 2x2 DiD DESIGN
+. *  Dataset: tutoring_did.dta (35 schools x 2 periods)
+. *===================================================
+. 
+. 
+. *---------------------------------------------------
+. * Section 1: Load and explore the 2x2 DiD dataset
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 1: DATA LOADING & EXPLORATION"
+  SECTION 1: DATA LOADING & EXPLORATION
+
+. di "========================================"
+========================================
+
+. 
+. use "https://github.com/quarcs-lab/data-open/raw/master/isds/tutoring_did.dta
+> ", clear
+
+. 
+. * Inspect variable labels and storage types
+. describe
+
+Contains data from https://github.com/quarcs-lab/data-open/raw/master/isds/tuto
+> ring_did.dta
+ Observations:            70                  
+    Variables:             7                  20 Jul 2025 14:00
+-------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+id              float   %9.0g                 School ID
+time            float   %9.0g                 Year (Intial = 1, Final = 2)
+treated         float   %9.0g                 Group membership (Treated = 1,
+                                                Nontreated = 0)
+post            float   %9.0g                 Post policy period (Yes = 1,
+                                                No=0)
+txp             float   %9.0g                 Treated x Post
+gpa             float   %9.0g                 School GPA (average GPA of
+                                                low-income students)
+female_share    float   %9.0g                 Share of female students in the
+                                                school
+-------------------------------------------------------------------------------
+Sorted by: 
+
+. 
+. * Check means, SD, min, max
+. summarize
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+          id |         70          18    10.17243          1         35
+        time |         70         1.5    .5036102          1          2
+     treated |         70    .2857143    .4550158          0          1
+        post |         70          .5    .5036102          0          1
+         txp |         70    .1428571    .3524537          0          1
+-------------+---------------------------------------------------------
+         gpa |         70    77.11754    10.87694   59.39085   99.15061
+female_share |         70    .5279242    .0265513   .4712442   .5695165
+
+. 
+. * Show a few rows for context
+. list in 1/6
+
+     +--------------------------------------------------------+
+     | id   time   treated   post   txp        gpa   female~e |
+     |--------------------------------------------------------|
+  1. |  1      1         0      0     0   72.38992    .501643 |
+  2. |  1      2         0      1     0   81.30275   .5432417 |
+  3. |  2      1         0      0     0   69.89978   .5266564 |
+  4. |  2      2         0      1     0   81.39222    .562699 |
+  5. |  3      1         0      0     0   72.65748   .5476224 |
+     |--------------------------------------------------------|
+  6. |  3      2         0      1     0   82.16635   .5110617 |
+     +--------------------------------------------------------+
+
+. 
+. * Declare panel structure: id = school, time = period
+. xtset id time
+
+Panel variable: id (strongly balanced)
+ Time variable: time, 1 to 2
+         Delta: 1 unit
+
+. 
+. * Panel summary: within/between variance, balancedness
+. xtsum
+
+Variable         |      Mean   Std. dev.       Min        Max |    Observations
+-----------------+--------------------------------------------+----------------
+id       overall |        18   10.17243          1         35 |     N =      70
+         between |             10.24695          1         35 |     n =      35
+         within  |                    0         18         18 |     T =       2
+                 |                                            |
+time     overall |       1.5   .5036102          1          2 |     N =      70
+         between |                    0        1.5        1.5 |     n =      35
+         within  |             .5036102          1          2 |     T =       2
+                 |                                            |
+treated  overall |  .2857143   .4550158          0          1 |     N =      70
+         between |             .4583492          0          1 |     n =      35
+         within  |                    0   .2857143   .2857143 |     T =       2
+                 |                                            |
+post     overall |        .5   .5036102          0          1 |     N =      70
+         between |                    0         .5         .5 |     n =      35
+         within  |             .5036102          0          1 |     T =       2
+                 |                                            |
+txp      overall |  .1428571   .3524537          0          1 |     N =      70
+         between |             .2291746          0         .5 |     n =      35
+         within  |              .269191  -.3571429   .6428571 |     T =       2
+                 |                                            |
+gpa      overall |  77.11754   10.87694   59.39085   99.15061 |     N =      70
+         between |             1.124764   74.90352   79.88043 |     n =      35
+         within  |             10.81948   57.84736   96.38773 |     T =       2
+                 |                                            |
+female~e overall |  .5279242   .0265513   .4712442   .5695165 |     N =      70
+         between |             .0156944   .4964049   .5614545 |     n =      35
+         within  |             .0214995   .4787881   .5770604 |     T =       2
+
+. 
+. di _newline
+
+
+
+. di "Panel: 35 schools x 2 time periods = 70 observations"
+Panel: 35 schools x 2 time periods = 70 observations
+
+. di "Treatment: 10 schools receive after-school tutoring"
+Treatment: 10 schools receive after-school tutoring
+
+. di "Comparison: 25 schools do not"
+Comparison: 25 schools do not
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 2: Treatment visualization (panelview)
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 2: TREATMENT VISUALIZATION"
+  SECTION 2: TREATMENT VISUALIZATION
+
+. di "========================================"
+========================================
+
+. 
+. panelview gpa txp, i(id) t(time) type(treat) ///
+>     prepost bytiming ///
+>     xtitle("Time Period") ytitle("School ID") ///
+>     legend(position(6)) ///
+>     name(panelview_2x2, replace)
+
+   #  Variable        # Missing   % Missing
+--------------------------------------------
+   1  gpa                   0         0.0
+   2  txp                   0         0.0
+
+Missing for |
+   how many |
+ variables? |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |         70      100.00      100.00
+------------+-----------------------------------
+      Total |         70      100.00
+Note: White cells represent missing values/observations in data.
+
+. 
+. graph export "stata_did_panelview_2x2.png", replace width(2400)
+(file stata_did_panelview_2x2.png not found)
+file stata_did_panelview_2x2.png written in PNG format
+
+. 
+. di "Figure saved: stata_did_panelview_2x2.png"
+Figure saved: stata_did_panelview_2x2.png
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 3: Interrupted Time Series (ITS) -- Figure 1
+. *   Naive pre/post comparison for treated group only
+. *   Shows why a simple comparison overstates the effect
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 3: INTERRUPTED TIME SERIES"
+  SECTION 3: INTERRUPTED TIME SERIES
+
+. di "  (Figure 1 -- Treated Group Only)"
+  (Figure 1 -- Treated Group Only)
+
+. di "========================================"
+========================================
+
+. 
+. preserve
+
+. collapse (mean) gpa, by(time treated)
+
+. 
+. twoway (connected gpa time if treated==1, ///
+>         msymbol(O) mcolor(gs1) lcolor(gs1) ///
+>         ylab(0(10)100) xlab(1(1)2)), ///
+>     ytitle("GPA") xtitle("Time") ///
+>     xline(1.5, lcolor(red) lpattern(dash)) ///
+>     title("Figure 1: Interrupted Time Series (Treated Group Only)") ///
+>     note("Source: Corral & Yang (2024). Simulated data.") ///
+>     graphregion(color(white)) plotregion(color(white)) ///
+>     name(fig1_its, replace)
+
+. 
+. graph export "stata_did_its.png", replace width(2400)
+(file stata_did_its.png not found)
+file stata_did_its.png written in PNG format
+
+. restore
+
+. 
+. di "Figure saved: stata_did_its.png"
+Figure saved: stata_did_its.png
+
+. di _newline
+
+
+
+. di "Naive ITS comparison:"
+Naive ITS comparison:
+
+. di "  Treated group GPA jumped from ~60 to ~96"
+  Treated group GPA jumped from ~60 to ~96
+
+. di "  Naive change: ~36 GPA points"
+  Naive change: ~36 GPA points
+
+. di "  BUT: this ignores secular time trends!"
+  BUT: this ignores secular time trends!
+
+. di "  We need a comparison group to isolate the causal effect."
+  We need a comparison group to isolate the causal effect.
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 4: Parallel Trends & Counterfactual -- Figure 2
+. *   Shows treated, control, and counterfactual trends
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 4: PARALLEL TRENDS"
+  SECTION 4: PARALLEL TRENDS
+
+. di "  (Figure 2 -- Counterfactual)"
+  (Figure 2 -- Counterfactual)
+
+. di "========================================"
+========================================
+
+. 
+. preserve
+
+. collapse (mean) gpa, by(time treated)
+
+. 
+. * Compute counterfactual: what would treated look like without treatment?
+. * Counterfactual = treated_pre + control_change
+. quietly sum gpa if treated==0 & time==1
+
+. local ctrl_pre = r(mean)
+
+. quietly sum gpa if treated==0 & time==2
+
+. local ctrl_post = r(mean)
+
+. local ctrl_change = `ctrl_post' - `ctrl_pre'
+
+. 
+. quietly sum gpa if treated==1 & time==1
+
+. local treat_pre = r(mean)
+
+. local cf_post = `treat_pre' + `ctrl_change'
+
+. 
+. di "Control pre:  `ctrl_pre'"
+Control pre:  71.21514129638672
+
+. di "Control post: `ctrl_post'"
+Control post: 82.10103607177734
+
+. di "Control change: `ctrl_change'"
+Control change: 10.88589477539063
+
+. di "Treated pre:  `treat_pre'"
+Treated pre:  60.16577911376953
+
+. di "Counterfactual post: `cf_post'"
+Counterfactual post: 71.05167388916016
+
+. 
+. * Add counterfactual observations (treated==2 for dashed line)
+. * After collapse, dataset has: time, treated, gpa (4 rows)
+. local N = _N
+
+. insobs 2
+(2 observations added)
+
+. replace time = 1 in `=`N'+1'
+(1 real change made)
+
+. replace time = 2 in `=`N'+2'
+(1 real change made)
+
+. replace treated = 2 in `=`N'+1'
+(1 real change made)
+
+. replace treated = 2 in `=`N'+2'
+(1 real change made)
+
+. replace gpa = `treat_pre' in `=`N'+1'
+(1 real change made)
+
+. replace gpa = `cf_post' in `=`N'+2'
+(1 real change made)
+
+. 
+. twoway (connected gpa time if treated==1, ///
+>             msymbol(O) mcolor(gs1) lcolor(gs1)) ///
+>        (connected gpa time if treated==0, ///
+>             msymbol(+) mcolor(gs5) lcolor(gs5)) ///
+>        (connected gpa time if treated==2, ///
+>             msymbol(O) mcolor(gs1) lcolor(gs1) lpattern(shortdash_dot)), ///
+>     ylab(0(10)100) xlab(1(1)2) ///
+>     legend(order(1 "Treated" 2 "Comparison" 3 "Counterfactual")) ///
+>     ytitle("GPA") xtitle("Time") ///
+>     xline(1.5, lcolor(red) lpattern(dash)) ///
+>     title("Figure 2: DiD Design with Counterfactual Trend") ///
+>     note("Source: Corral & Yang (2024). Dashed line = counterfactual (treated
+>  without program).") ///
+>     graphregion(color(white)) plotregion(color(white)) ///
+>     name(fig2_counterfactual, replace)
+
+. 
+. graph export "stata_did_counterfactual.png", replace width(2400)
+(file stata_did_counterfactual.png not found)
+file stata_did_counterfactual.png written in PNG format
+
+. restore
+
+. 
+. di "Figure saved: stata_did_counterfactual.png"
+Figure saved: stata_did_counterfactual.png
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 5: DiD Means Table -- Table 1
+. *   Manual calculation of the 2x2 DiD estimate
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 5: DiD MEANS TABLE (Table 1)"
+  SECTION 5: DiD MEANS TABLE (Table 1)
+
+. di "========================================"
+========================================
+
+. 
+. * Means table by treatment status and time period
+. table treated post, stat(mean gpa) nformat(%12.2f)
+
+----------------------------------------------------------------------------------------
+                                               |    Post policy period (Yes = 1, No=0)  
+                                               |            0             1        Total
+-----------------------------------------------+----------------------------------------
+Group membership (Treated = 1, Nontreated = 0) |                                        
+  0                                            |        71.22         82.10        76.66
+  1                                            |        60.17         96.37        78.27
+  Total                                        |        68.06         86.18        77.12
+----------------------------------------------------------------------------------------
+
+. 
+. * Manual DiD calculation
+. di _newline
+
+
+
+. di "Manual DiD Calculation (Table 1):"
+Manual DiD Calculation (Table 1):
+
+. di "================================="
+=================================
+
+. di "Treated change:  96.37 - 60.17 = " %5.2f 96.37 - 60.17
+Treated change:  96.37 - 60.17 = 36.20
+
+. di "Control change:  82.10 - 71.22 = " %5.2f 82.10 - 71.22
+Control change:  82.10 - 71.22 = 10.88
+
+. di "---------------------------------"
+---------------------------------
+
+. di "DiD estimate:    36.20 - 10.88 = " %5.2f 36.20 - 10.88
+DiD estimate:    36.20 - 10.88 = 25.32
+
+. di _newline
+
+
+
+. di "The after-school program increased GPA by ~25.32 points."
+The after-school program increased GPA by ~25.32 points.
+
+. di "This is lower than the naive ITS estimate (~36 points),"
+This is lower than the naive ITS estimate (~36 points),
+
+. di "illustrating the importance of using a comparison group."
+illustrating the importance of using a comparison group.
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 6: DiD Plots (diff_plot + diff commands)
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 6: DiD PLOTS"
+  SECTION 6: DiD PLOTS
+
+. di "========================================"
+========================================
+
+. 
+. * Visual DiD plot showing both groups
+. diff_plot gpa, group(treated) time(post)
+
+. graph export "stata_did_diff_plot.png", replace width(2400)
+(file stata_did_diff_plot.png not found)
+file stata_did_diff_plot.png written in PNG format
+
+. 
+. di "Figure saved: stata_did_diff_plot.png"
+Figure saved: stata_did_diff_plot.png
+
+. 
+. * Formal DiD table using the diff command
+. diff gpa, treated(treated) period(post)
+
+DIFFERENCE-IN-DIFFERENCES ESTIMATION RESULTS
+--------------------------------------------
+Number of observations in the DIFF-IN-DIFF: 70
+            Before         After    
+   Control: 25             25          50
+   Treated: 10             10          20
+            35             35
+--------------------------------------------------------
+ Outcome var.   | gpa     | S. Err. |   |t|   |  P>|t|
+----------------+---------+---------+---------+---------
+Before          |         |         |         | 
+   Control      | 71.215  |         |         | 
+   Treated      | 60.166  |         |         | 
+   Diff (T-C)   | -11.049 | 0.443   | -24.94  | 0.000***
+After           |         |         |         | 
+   Control      | 82.101  |         |         | 
+   Treated      | 96.367  |         |         | 
+   Diff (T-C)   | 14.266  | 0.443   | 32.20   | 0.000***
+                |         |         |         | 
+Diff-in-Diff    | 25.315  | 0.627   | 40.40   | 0.000***
+--------------------------------------------------------
+R-square:    0.99
+* Means and Standard Errors are estimated by linear regression
+**Inference: *** p<0.01; ** p<0.05; * p<0.1
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 7: DiD Regression Approaches
+. *   Five equivalent methods for estimating the DiD
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 7: DiD REGRESSION APPROACHES"
+  SECTION 7: DiD REGRESSION APPROACHES
+
+. di "========================================"
+========================================
+
+. 
+. * 7.1 Classical DiD Regression
+. *   Y = alpha + B1*Treat + B2*Post + B3*(Treat x Post) + e
+. *   B3 is the DiD estimate (~25.31)
+. di _newline
+
+
+
+. di "--- 7.1 Classical DiD Regression ---"
+--- 7.1 Classical DiD Regression ---
+
+. reg gpa treated post txp, robust
+
+Linear regression                               Number of obs     =         70
+                                                F(3, 66)          =    2660.87
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.9887
+                                                Root MSE          =      1.184
+
+------------------------------------------------------------------------------
+             |               Robust
+         gpa | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     treated |  -11.04936   .2878309   -38.39   0.000    -11.62404   -10.47469
+        post |   10.88589   .3389564    32.12   0.000     10.20915    11.56264
+         txp |    25.3149   .6149733    41.16   0.000     24.08706    26.54273
+       _cons |   71.21514   .2183689   326.12   0.000     70.77915    71.65113
+------------------------------------------------------------------------------
+
+. 
+. * 7.2 Stata Built-in DiD (Stata 17+)
+. *   Note: requires Stata 17+; wrapped in capture for backward compatibility
+. di _newline
+
+
+
+. di "--- 7.2 Stata Built-in DiD (didregress, Stata 17+) ---"
+--- 7.2 Stata Built-in DiD (didregress, Stata 17+) ---
+
+. capture noisily didregress (gpa) (txp), group(id) time(time)
+
+Treatment and time information
+
+Time variable: time
+Control:       txp = 0
+Treatment:     txp = 1
+-----------------------------------
+             |   Control  Treatment
+-------------+---------------------
+Group        |
+          id |        25         10
+-------------+---------------------
+Time         |
+     Minimum |         1          2
+     Maximum |         1          2
+-----------------------------------
+
+Difference-in-differences regression                        Number of obs = 70
+Data type: Repeated cross-sectional
+
+                                    (Std. err. adjusted for 35 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+         gpa | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+         txp |
+   (1 vs 0)  |    25.3149   .8337103    30.36   0.000     23.62059     27.0092
+------------------------------------------------------------------------------
+Note: ATET estimate adjusted for group effects and time effects.
+
+. 
+. * 7.3 Standard Two-Way Fixed Effects (TWFE) with xtreg
+. *   Y = B3*(Treat x Post) + gamma_i + theta_t + e
+. *   Unit FE (gamma_i) absorb time-invariant school differences
+. *   Time FE (theta_t) absorb common shocks
+. di _newline
+
+
+
+. di "--- 7.3 Standard TWFE (xtreg) ---"
+--- 7.3 Standard TWFE (xtreg) ---
+
+. xtreg gpa txp i.time, fe vce(cluster id)
+
+Fixed-effects (within) regression               Number of obs     =         70
+Group variable: id                              Number of groups  =         35
+
+R-squared:                                      Obs per group:
+     Within  = 0.9946                                         min =          2
+     Between = 0.4294                                         avg =        2.0
+     Overall = 0.8224                                         max =          2
+
+                                                F(2, 34)          =    3360.56
+corr(u_i, Xb) = -0.4644                         Prob > F          =     0.0000
+
+                                    (Std. err. adjusted for 35 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+         gpa | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         txp |    25.3149   .5851062    43.27   0.000     24.12582    26.50398
+      2.time |   10.88589   .3320367    32.79   0.000     10.21111    11.56067
+       _cons |   68.05818   .1371096   496.38   0.000     67.77954    68.33682
+-------------+----------------------------------------------------------------
+     sigma_u |  5.1352376
+     sigma_e |  1.1473933
+         rho |   .9524505   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+
+. 
+. * 7.4 High-Dimensional TWFE with reghdfe
+. *   Faster alternative for models with many fixed effects
+. di _newline
+
+
+
+. di "--- 7.4 High-Dimensional TWFE (reghdfe) ---"
+--- 7.4 High-Dimensional TWFE (reghdfe) ---
+
+. reghdfe gpa txp, absorb(id time) cluster(id)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =         70
+Absorbing 2 HDFE groups                           F(   1,     34) =    1871.90
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9947
+                                                  Adj R-squared   =     0.9889
+                                                  Within R-sq.    =     0.9814
+Number of clusters (id)      =         35         Root MSE        =     1.1474
+
+                                    (Std. err. adjusted for 35 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+         gpa | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         txp |    25.3149   .5851062    43.27   0.000     24.12582    26.50398
+       _cons |   73.50113   .0835866   879.34   0.000     73.33126      73.671
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          id |        35          35           0    *|
+        time |         2           1           1     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. * 7.5 TWFE with Covariate (female_share)
+. *   Adding exogenous controls can improve precision
+. *   NOTE: Never control for variables affected by treatment
+. di _newline
+
+
+
+. di "--- 7.5 TWFE with Covariate ---"
+--- 7.5 TWFE with Covariate ---
+
+. reghdfe gpa txp female_share, absorb(id time) cluster(id)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =         70
+Absorbing 2 HDFE groups                           F(   2,     34) =    1125.13
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9947
+                                                  Adj R-squared   =     0.9886
+                                                  Within R-sq.    =     0.9815
+Number of clusters (id)      =         35         Root MSE        =     1.1609
+
+                                    (Std. err. adjusted for 35 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+         gpa | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         txp |   25.32806   .6047651    41.88   0.000     24.09903    26.55709
+female_share |  -3.216239   8.700428    -0.37   0.714    -20.89764    14.46516
+       _cons |   75.19718   4.552635    16.52   0.000     65.94511    84.44925
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          id |        35          35           0    *|
+        time |         2           1           1     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. di _newline
+
+
+
+. di "All five approaches yield DiD estimate ~25.31-25.33"
+All five approaches yield DiD estimate ~25.31-25.33
+
+. di "This confirms the manual calculation from Table 1."
+This confirms the manual calculation from Table 1.
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 8: Table 2 Replication
+. *   Three specifications exported with outreg2
+. *   (1) Baseline TWFE
+. *   (2) + Covariate (female_share)
+. *   (3) + Clustered SEs at school level
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 8: TABLE 2 REPLICATION"
+  SECTION 8: TABLE 2 REPLICATION
+
+. di "========================================"
+========================================
+
+. 
+. * Specification (1): Baseline TWFE, no controls, no clustering
+. reghdfe gpa i.txp, absorb(id time)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =         70
+Absorbing 2 HDFE groups                           F(   1,     33) =    1738.48
+                                                  Prob > F        =     0.0000
+                                                  R-squared       =     0.9947
+                                                  Adj R-squared   =     0.9889
+                                                  Within R-sq.    =     0.9814
+                                                  Root MSE        =     1.1474
+
+------------------------------------------------------------------------------
+         gpa | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       1.txp |    25.3149   .6071435    41.70   0.000     24.07965    26.55014
+       _cons |   73.50113   .1622659   452.97   0.000       73.171    73.83126
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          id |        35           0          35     |
+        time |         2           1           1     |
+-----------------------------------------------------+
+
+. outreg2 using table2.doc, replace keep(1.txp) ///
+>     addtext(Controls, No, Clustered SEs, No) dec(2)
+table2.doc
+dir : seeout
+
+. 
+. * Specification (2): + Covariate (female_share), no clustering
+. reghdfe gpa i.txp c.female_share, absorb(id time)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =         70
+Absorbing 2 HDFE groups                           F(   2,     32) =     849.26
+                                                  Prob > F        =     0.0000
+                                                  R-squared       =     0.9947
+                                                  Adj R-squared   =     0.9886
+                                                  Within R-sq.    =     0.9815
+                                                  Root MSE        =     1.1609
+
+------------------------------------------------------------------------------
+         gpa | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       1.txp |   25.32806   .6148823    41.19   0.000     24.07559    26.58054
+female_share |  -3.216239   6.607589    -0.49   0.630    -16.67546    10.24298
+       _cons |   75.19718   3.488308    21.56   0.000     68.09173    82.30263
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          id |        35           0          35     |
+        time |         2           1           1     |
+-----------------------------------------------------+
+
+. outreg2 using table2.doc, append keep(1.txp) ///
+>     addtext(Controls, Yes, Clustered SEs, No) dec(2)
+table2.doc
+dir : seeout
+
+. 
+. * Specification (3): No controls, + clustered SEs at school level
+. reghdfe gpa i.txp, absorb(id time) cluster(id)
+(MWFE estimator converged in 2 iterations)
+
+HDFE Linear regression                            Number of obs   =         70
+Absorbing 2 HDFE groups                           F(   1,     34) =    1871.90
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9947
+                                                  Adj R-squared   =     0.9889
+                                                  Within R-sq.    =     0.9814
+Number of clusters (id)      =         35         Root MSE        =     1.1474
+
+                                    (Std. err. adjusted for 35 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+         gpa | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       1.txp |    25.3149   .5851062    43.27   0.000     24.12582    26.50398
+       _cons |   73.50113   .0835866   879.34   0.000     73.33126      73.671
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          id |        35          35           0    *|
+        time |         2           1           1     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. outreg2 using table2.doc, append keep(1.txp) ///
+>     addtext(Controls, No, Clustered SEs, Yes) dec(2)
+table2.doc
+dir : seeout
+
+. 
+. di _newline
+
+
+
+. di "Table 2 saved to: table2.doc"
+Table 2 saved to: table2.doc
+
+. di "Expected results:"
+Expected results:
+
+. di "  (1) Treatment = 25.31*** (no controls, no clustering)"
+  (1) Treatment = 25.31*** (no controls, no clustering)
+
+. di "  (2) Treatment = 25.33*** (+ female_share control)"
+  (2) Treatment = 25.33*** (+ female_share control)
+
+. di "  (3) Treatment = 25.31*** (+ clustered SEs at school level)"
+  (3) Treatment = 25.31*** (+ clustered SEs at school level)
+
+. di "  All: N=70, R-squared ~0.99"
+  All: N=70, R-squared ~0.99
+
+. di _newline
+
+
+
+. di "In this simulated example, clustering has minimal effect"
+In this simulated example, clustering has minimal effect
+
+. di "on standard errors. In real-world applications, clustering"
+on standard errors. In real-world applications, clustering
+
+. di "typically changes SEs substantially."
+typically changes SEs substantially.
+
+. 
+. 
+. *===================================================
+. *  PART 2: EVENT STUDY DESIGN
+. *  Dataset: tutoring_didevent.dta (35 schools x 8 periods)
+. *  Extends the 2x2 DiD to examine dynamic effects
+. *===================================================
+. 
+. 
+. *---------------------------------------------------
+. * Section 9: Load and explore the event study dataset
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 9: EVENT STUDY DATA"
+  SECTION 9: EVENT STUDY DATA
+
+. di "========================================"
+========================================
+
+. 
+. use "https://github.com/quarcs-lab/data-open/raw/master/isds/tutoring_dideven
+> t.dta", clear
+
+. 
+. * Inspect the dataset
+. describe
+
+Contains data from https://github.com/quarcs-lab/data-open/raw/master/isds/tuto
+> ring_didevent.dta
+ Observations:           280                  
+    Variables:             8                  13 Apr 2024 11:36
+-------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+id              float   %9.0g                 
+time            float   %9.0g                 
+treated         float   %9.0g                 
+gpa             float   %9.0g                 
+female_share    float   %9.0g                 
+post            float   %9.0g                 
+txp             float   %9.0g                 
+timeToTreat     float   %9.0g                 
+-------------------------------------------------------------------------------
+Sorted by: 
+
+. summarize
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+          id |        280          18    10.11759          1         35
+        time |        280         4.5     2.29539          1          8
+     treated |        280    .2857143    .4525628          0          1
+         gpa |        280    80.14277    12.19731   60.07783    107.677
+female_share |        280     .521468    .0284086   .4700719   .5698913
+-------------+---------------------------------------------------------
+        post |        280          .5    .5008953          0          1
+         txp |        280    .1428571    .3505537          0          1
+ timeToTreat |         80         -.5    2.305744         -4          3
+
+. 
+. * Declare panel structure
+. xtset id time
+
+Panel variable: id (strongly balanced)
+ Time variable: time, 1 to 8
+         Delta: 1 unit
+
+. 
+. * Panel summary
+. xtsum
+
+Variable         |      Mean   Std. dev.       Min        Max |    Observations
+-----------------+--------------------------------------------+----------------
+id       overall |        18   10.11759          1         35 |     N =     280
+         between |             10.24695          1         35 |     n =      35
+         within  |                    0         18         18 |     T =       8
+                 |                                            |
+time     overall |       4.5    2.29539          1          8 |     N =     280
+         between |                    0        4.5        4.5 |     n =      35
+         within  |              2.29539          1          8 |     T =       8
+                 |                                            |
+treated  overall |  .2857143   .4525628          0          1 |     N =     280
+         between |             .4583492          0          1 |     n =      35
+         within  |                    0   .2857143   .2857143 |     T =       8
+                 |                                            |
+gpa      overall |  80.14277   12.19731   60.07783    107.677 |     N =     280
+         between |             1.254617   78.53637   82.74301 |     n =      35
+         within  |             12.13424   57.86199   105.5741 |     T =       8
+                 |                                            |
+female~e overall |   .521468   .0284086   .4700719   .5698913 |     N =     280
+         between |             .0115522   .4933694   .5432372 |     n =      35
+         within  |             .0260182   .4618352   .5773155 |     T =       8
+                 |                                            |
+post     overall |        .5   .5008953          0          1 |     N =     280
+         between |                    0         .5         .5 |     n =      35
+         within  |             .5008953          0          1 |     T =       8
+                 |                                            |
+txp      overall |  .1428571   .3505537          0          1 |     N =     280
+         between |             .2291746          0         .5 |     n =      35
+         within  |             .2677398  -.3571429   .6428571 |     T =       8
+                 |                                            |
+timeTo~t overall |       -.5   2.305744         -4          3 |     N =      80
+         between |                    0        -.5        -.5 |     n =      10
+         within  |             2.305744         -4          3 |     T =       8
+
+. 
+. di _newline
+
+
+
+. di "Panel: 35 schools x 8 time periods = 280 observations"
+Panel: 35 schools x 8 time periods = 280 observations
+
+. di "4 pre-treatment periods + 4 post-treatment periods"
+4 pre-treatment periods + 4 post-treatment periods
+
+. di "timeToTreat: relative time to treatment onset"
+timeToTreat: relative time to treatment onset
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 10: Treatment visualization (panelview)
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 10: EVENT STUDY PANEL VIEW"
+  SECTION 10: EVENT STUDY PANEL VIEW
+
+. di "========================================"
+========================================
+
+. 
+. panelview gpa txp, i(id) t(time) type(treat) ///
+>     prepost bytiming ///
+>     xtitle("Time Period") ytitle("School ID") ///
+>     legend(position(6)) ///
+>     name(panelview_event, replace)
+
+   #  Variable        # Missing   % Missing
+--------------------------------------------
+   1  gpa                   0         0.0
+   2  txp                   0         0.0
+
+Missing for |
+   how many |
+ variables? |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        280      100.00      100.00
+------------+-----------------------------------
+      Total |        280      100.00
+Note: White cells represent missing values/observations in data.
+
+. 
+. graph export "stata_did_panelview_event.png", replace width(2400)
+(file stata_did_panelview_event.png not found)
+file stata_did_panelview_event.png written in PNG format
+
+. 
+. di "Figure saved: stata_did_panelview_event.png"
+Figure saved: stata_did_panelview_event.png
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 11: Event Study Estimation -- Figure 3
+. *   Replaces single DiD interaction with leads & lags
+. *   Y_it = alpha + sum(theta_j * treat_it(t=k+j)) + gamma_i + theta_t + e
+. *   Leads (pre-treatment): test parallel trends
+. *   Lags (post-treatment): capture dynamic effects
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 11: EVENT STUDY ESTIMATION"
+  SECTION 11: EVENT STUDY ESTIMATION
+
+. di "  (Figure 3 -- Dynamic Effects)"
+  (Figure 3 -- Dynamic Effects)
+
+. di "========================================"
+========================================
+
+. 
+. eventdd gpa i.time, timevar(timeToTreat) ///
+>     method(hdfe, absorb(id time) cluster(id)) ///
+>     keepdummies ///
+>     graph_op(ylab(-10(5)30) ///
+>         ytitle("GPA Effect") ///
+>         xtitle("Time to Treatment") ///
+>         xlab(-4(1)4) ///
+>         title("Figure 3: Event Study -- Dynamic Treatment Effects") ///
+>         note("Source: Corral & Yang (2024). Reference period: t = -1.") ///
+>         graphregion(color(white)) plotregion(color(white)))
+(MWFE estimator converged in 2 iterations)
+note: 2bn.time is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 3bn.time is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 4bn.time is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 5bn.time is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 6bn.time is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 7bn.time is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+note: 8bn.time is probably collinear with the fixed effects (all partialled-out
+>  values are close to zero; tol = 1.0e-09)
+
+HDFE Linear regression                            Number of obs   =        280
+Absorbing 2 HDFE groups                           F(   7,     34) =    1457.71
+Statistics robust to heteroskedasticity           Prob > F        =     0.0000
+                                                  R-squared       =     0.9913
+                                                  Adj R-squared   =     0.9895
+                                                  Within R-sq.    =     0.9610
+Number of clusters (id)      =         35         Root MSE        =     1.2483
+
+                                    (Std. err. adjusted for 35 clusters in id)
+------------------------------------------------------------------------------
+             |               Robust
+         gpa | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+        time |
+          2  |          0  (omitted)
+          3  |          0  (omitted)
+          4  |          0  (omitted)
+          5  |          0  (omitted)
+          6  |          0  (omitted)
+          7  |          0  (omitted)
+          8  |          0  (omitted)
+             |
+       lead4 |   .3419624   .4012858     0.85   0.400    -.4735485    1.157473
+       lead3 |   -.322034   .4413151    -0.73   0.471    -1.218894    .5748262
+       lead2 |    .593332    .423475     1.40   0.170    -.2672727    1.453937
+        lag0 |   25.02759   .4450759    56.23   0.000     24.12309    25.93209
+        lag1 |    24.7052   .5592648    44.17   0.000     23.56863    25.84176
+        lag2 |   24.76849   .7386192    33.53   0.000     23.26744    26.26955
+        lag3 |   25.70145   .7965068    32.27   0.000     24.08276    27.32015
+       _cons |    76.5422   .0735882  1040.14   0.000     76.39265    76.69175
+------------------------------------------------------------------------------
+
+Absorbed degrees of freedom:
+-----------------------------------------------------+
+ Absorbed FE | Categories  - Redundant  = Num. Coefs |
+-------------+---------------------------------------|
+          id |        35          35           0    *|
+        time |         8           1           7     |
+-----------------------------------------------------+
+* = FE nested within cluster; treated as redundant for DoF computation
+
+. 
+. graph export "stata_did_event_study.png", replace width(2400)
+(file stata_did_event_study.png not found)
+file stata_did_event_study.png written in PNG format
+
+. 
+. di "Figure saved: stata_did_event_study.png"
+Figure saved: stata_did_event_study.png
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 12: Table 4 Replication
+. *   Event study coefficients (leads and lags)
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================"
+========================================
+
+. di "  SECTION 12: TABLE 4 REPLICATION"
+  SECTION 12: TABLE 4 REPLICATION
+
+. di "========================================"
+========================================
+
+. 
+. outreg2 using table4.doc, replace ///
+>     keep(lead4 lead3 lead2 lag0 lag1 lag2 lag3) dec(2)
+table4.doc
+dir : seeout
+
+. 
+. di _newline
+
+
+
+. di "Table 4 saved to: table4.doc"
+Table 4 saved to: table4.doc
+
+. di _newline
+
+
+
+. di "Event Study Results (Table 4):"
+Event Study Results (Table 4):
+
+. di "  Pre-treatment coefficients (leads):"
+  Pre-treatment coefficients (leads):
+
+. di "    lead4 = " %7.3f _b[lead4] "  (SE = " %5.3f _se[lead4] ")"
+    lead4 =   0.342  (SE = 0.401)
+
+. di "    lead3 = " %7.3f _b[lead3] "  (SE = " %5.3f _se[lead3] ")"
+    lead3 =  -0.322  (SE = 0.441)
+
+. di "    lead2 = " %7.3f _b[lead2] "  (SE = " %5.3f _se[lead2] ")"
+    lead2 =   0.593  (SE = 0.423)
+
+. di "  Post-treatment coefficients (lags):"
+  Post-treatment coefficients (lags):
+
+. di "    lag0  = " %7.3f _b[lag0] "  (SE = " %5.3f _se[lag0] ")"
+    lag0  =  25.028  (SE = 0.445)
+
+. di "    lag1  = " %7.3f _b[lag1] "  (SE = " %5.3f _se[lag1] ")"
+    lag1  =  24.705  (SE = 0.559)
+
+. di "    lag2  = " %7.3f _b[lag2] "  (SE = " %5.3f _se[lag2] ")"
+    lag2  =  24.768  (SE = 0.739)
+
+. di "    lag3  = " %7.3f _b[lag3] "  (SE = " %5.3f _se[lag3] ")"
+    lag3  =  25.701  (SE = 0.797)
+
+. di _newline
+
+
+
+. di "Interpretation:"
+Interpretation:
+
+. di "  Pre-treatment coefficients are close to zero and mostly"
+  Pre-treatment coefficients are close to zero and mostly
+
+. di "  insignificant, supporting the parallel trends assumption."
+  insignificant, supporting the parallel trends assumption.
+
+. di "  Post-treatment coefficients are consistently around 25 points,"
+  Post-treatment coefficients are consistently around 25 points,
+
+. di "  confirming the 2x2 DiD result and showing a constant effect."
+  confirming the 2x2 DiD result and showing a constant effect.
+
+. di "  N=280, 35 schools, R-squared ~0.992"
+  N=280, 35 schools, R-squared ~0.992
+
+. 
+. 
+. *---------------------------------------------------
+. * Section 13: Closing
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================"
+============================================
+
+. di "  ANALYSIS COMPLETE"
+  ANALYSIS COMPLETE
+
+. di "============================================"
+============================================
+
+. di "  DiD estimate: ~25.32 GPA points"
+  DiD estimate: ~25.32 GPA points
+
+. di "  Estimand: ATT (Average Treatment on Treated)"
+  Estimand: ATT (Average Treatment on Treated)
+
+. di _newline
+
+
+
+. di "  Figures:"
+  Figures:
+
+. di "    stata_did_panelview_2x2.png"
+    stata_did_panelview_2x2.png
+
+. di "    stata_did_its.png"
+    stata_did_its.png
+
+. di "    stata_did_counterfactual.png"
+    stata_did_counterfactual.png
+
+. di "    stata_did_diff_plot.png"
+    stata_did_diff_plot.png
+
+. di "    stata_did_panelview_event.png"
+    stata_did_panelview_event.png
+
+. di "    stata_did_event_study.png"
+    stata_did_event_study.png
+
+. di _newline
+
+
+
+. di "  Tables:"
+  Tables:
+
+. di "    table2.doc (3 regression specifications)"
+    table2.doc (3 regression specifications)
+
+. di "    table4.doc (event study coefficients)"
+    table4.doc (event study coefficients)
+
+. di _newline
+
+
+
+. di "  Reference:"
+  Reference:
+
+. di "    Corral, D. & Yang, M. (2024). An introduction"
+    Corral, D. & Yang, M. (2024). An introduction
+
+. di "    to the difference-in-differences design in"
+    to the difference-in-differences design in
+
+. di "    education policy research."
+    education policy research.
+
+. di "============================================"
+============================================
+
+. di _newline
+
+
+
+. di "=== Script completed successfully ==="
+=== Script completed successfully ===
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_did/analysis.log
+  log type:  text
+ closed on:  26 Apr 2026, 11:26:18
+-------------------------------------------------------------------------------
