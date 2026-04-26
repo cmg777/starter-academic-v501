@@ -34,7 +34,7 @@ links:
 - icon: podcast
   icon_pack: fas
   name: AI Podcast
-  url: "#podcast-player"
+  url: "/post/stata_did/#podcast-player"
 summary: "Learn Difference-in-Differences (DiD) in Stata using a case study of an after-school tutoring program. Covers the 2x2 design, TWFE regression, event studies, and parallel trends testing based on Corral and Yang (2024)."
 tags:
 - stata
@@ -526,6 +526,13 @@ The study uses panel data: the same 35 schools are observed at two time points (
     a.volume = this.value;
     a.muted = false;
   });
+  /* Auto-open player when arriving from homepage with #podcast-player hash */
+  if(window.location.hash === '#podcast-player'){
+    overlay.style.display = 'block';
+    a.preload = 'metadata';
+    a.load();
+    opened = true;
+  }
 })();
 </script>
 
