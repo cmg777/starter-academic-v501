@@ -12,7 +12,7 @@ A comprehensive tutorial on Difference-in-Differences (DiD) in Stata, based on C
 
 | File | Description |
 |------|-------------|
-| `index.md` | Main tutorial (~600 lines, 10 sections) |
+| `index.md` | Main tutorial (~600 lines, 10 sections) + inline audio player |
 | `analysis.do` | Companion Stata do-file with all commands |
 | `analysis.log` | Full Stata log from running analysis.do |
 | `featured.webp` | Featured image for post header |
@@ -52,3 +52,18 @@ A comprehensive tutorial on Difference-in-Differences (DiD) in Stata, based on C
 ### Infographic
 
 Chalkboard-style infographic prompt generated for Gemini (Option A -- all text). Six panels following the Causal Inference template: The Problem, The Case Study, The DiD Design, Five Methods One Answer, Parallel Trends Hold, Bottom Line. Reviewed and accepted with all numbers verified against source post.
+
+### AI Podcast
+
+Audio player streamed from external URL (`https://files.catbox.moe/s6tyrz.wav`). Implementation details:
+
+- **YAML button**: "AI Podcast" link in front matter `links:` section, URL points to `/post/stata_did/#podcast-player`
+- **Player UI**: Fixed bottom bar that slides up on click (not embedded in post body). Hidden by default. Features: play/pause, skip +/-15s, seekable progress bar with buffered indicator, playback speed (0.75x-2x), volume slider, download button, close button
+- **Homepage support**: When clicked from the homepage, navigates to the post page; JS detects `#podcast-player` hash on page load and auto-opens the player
+- **On-page support**: JS intercepts clicks on the button by matching text content "AI Podcast" (not by href, because Wowchemy's `relURL` mangles fragment-only URLs)
+- **Audio loading**: `preload: none` -- audio only loads when the player is opened, not on page load
+
+### Post fixes applied
+
+- **Mermaid diagram**: Changed `flowchart LR` to `graph LR` and removed `direction TB` inside subgraphs (unsupported by Wowchemy v5's bundled Mermaid version)
+- **Infographic review fixes**: Upgraded Panel 2 mini-viz to grouped bar chart, added distinct icon to Panel 3, added third body sentence to all 6 panels, fixed Panel 5 event study to show period -1 benchmark at zero with confidence interval whiskers
