@@ -63,7 +63,19 @@ Audio player streamed from external URL (`https://files.catbox.moe/s6tyrz.wav`).
 - **On-page support**: JS intercepts clicks on the button by matching text content "AI Podcast" (not by href, because Wowchemy's `relURL` mangles fragment-only URLs)
 - **Audio loading**: `preload: none` -- audio only loads when the player is opened, not on page load
 
+### AI Video
+
+YouTube video embedded in-page via modal overlay (`https://youtu.be/qObP9bGU5rM`). Implementation details:
+
+- **YAML button**: "AI Video" link with YouTube icon (`fab`), URL points to `/post/stata_did/#video-player`
+- **Player UI**: Full-screen dark backdrop overlay with centered 16:9 YouTube iframe (94% width, max 1600px). Fade-in/out animations. Close via X button or backdrop click.
+- **Lazy loading**: Iframe `src` is empty on page load; set only when the button is clicked. Cleared on close (stops video).
+- **Homepage support**: JS detects `#video-player` hash on page load and auto-opens the player
+- **On-page support**: JS intercepts clicks on the button by matching text content "AI Video" (same pattern as podcast)
+
 ### Post fixes applied
 
-- **Mermaid diagram**: Changed `flowchart LR` to `graph LR` and removed `direction TB` inside subgraphs (unsupported by Wowchemy v5's bundled Mermaid version)
+- **Mermaid diagram (fix 1)**: Changed `flowchart LR` to `graph LR` and removed `direction TB` inside subgraphs (unsupported by Wowchemy v5's bundled Mermaid version)
+- **Mermaid diagram (fix 2)**: Changed `subgraph ID ["Label"]` to `subgraph "Label"` syntax and replaced inter-subgraph connections (`Setting --> Design --> Methods`) with node-level connections (`C --> D`, `F --> G`) for Wowchemy v5 compatibility
+- **Proofreading**: Fixed "randomized control trial" → "randomized controlled trial"; minor grammar improvement in data exploration section
 - **Infographic review fixes**: Upgraded Panel 2 mini-viz to grouped bar chart, added distinct icon to Panel 3, added third body sentence to all 6 panels, fixed Panel 5 event study to show period -1 benchmark at zero with confidence interval whiskers
