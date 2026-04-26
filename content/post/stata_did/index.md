@@ -459,21 +459,21 @@ The study uses panel data: the same 35 schools are observed at two time points (
     var m=Math.floor(s/60), sec=Math.floor(s%60);
     return m+':'+(sec<10?'0':'')+sec;
   }
-  /* Intercept clicks on the YAML podcast button */
+  /* Intercept clicks on the YAML podcast button (match by text, not href,
+     because Wowchemy's relURL mangles fragment-only URLs) */
   document.addEventListener('click', function(e){
-    var link = e.target.closest('a[href="#podcast-player"]');
-    if(link){
-      e.preventDefault();
-      if(!opened){
-        overlay.style.display = 'block';
-        overlay.classList.remove('pod-closing');
-        a.preload = 'metadata';
-        a.load();
-        opened = true;
-      } else {
-        overlay.style.display = 'block';
-        overlay.classList.remove('pod-closing');
-      }
+    var link = e.target.closest('a.btn-page-header');
+    if(!link) return;
+    var text = link.textContent.trim();
+    if(text.indexOf('AI Podcast') === -1) return;
+    e.preventDefault();
+    e.stopPropagation();
+    overlay.style.display = 'block';
+    overlay.classList.remove('pod-closing');
+    if(!opened){
+      a.preload = 'metadata';
+      a.load();
+      opened = true;
     }
   });
   a.volume = 0.8;
