@@ -338,7 +338,7 @@ The study uses panel data: the same 35 schools are observed at two time points (
 </style>
 
 <div class="podcast-container">
-  <audio id="podAudio" preload="metadata" src="podcast.m4a"></audio>
+  <audio id="podAudio" preload="metadata" src="https://files.catbox.moe/s6tyrz.wav"></audio>
 
   <div class="podcast-header">
     <div class="podcast-icon">
@@ -382,7 +382,7 @@ The study uses panel data: the same 35 schools are observed at two time points (
       <input type="range" class="podcast-volume-slider" id="podVolume" min="0" max="1" step="0.05" value="0.8">
     </div>
     <button class="podcast-speed-btn" id="podSpeedBtn" onclick="podCycleSpeed()" title="Playback speed">1x</button>
-    <a class="podcast-download-btn" href="podcast.m4a" download="stata_did_podcast.m4a" title="Download podcast">
+    <a class="podcast-download-btn" href="https://files.catbox.moe/s6tyrz.wav" download="stata_did_podcast.wav" title="Download podcast">
       <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
       Download
     </a>
