@@ -35,6 +35,10 @@ links:
   icon_pack: fas
   name: AI Podcast
   url: "/post/stata_did/#podcast-player"
+- icon: youtube
+  icon_pack: fab
+  name: AI Video
+  url: "/post/stata_did/#video-player"
 summary: "Learn Difference-in-Differences (DiD) in Stata using a case study of an after-school tutoring program. Covers the 2x2 design, TWFE regression, event studies, and parallel trends testing based on Corral and Yang (2024)."
 tags:
 - stata
@@ -387,6 +391,109 @@ The study uses panel data: the same 35 schools are observed at two time points (
   .podcast-title-block h4 { font-size: 13px; }
   .podcast-extras { gap: 8px; }
 }
+/* Video player overlay */
+.video-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.85);
+  animation: vidFadeIn 0.3s ease-out;
+}
+@keyframes vidFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.video-overlay.vid-closing {
+  animation: vidFadeOut 0.25s ease-in forwards;
+}
+@keyframes vidFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.video-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 900px;
+}
+.video-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.video-top-row h4 {
+  margin: 0;
+  color: #f0ece2;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.video-icon {
+  width: 34px;
+  height: 34px;
+  background: #ff0000;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.video-icon svg {
+  width: 18px;
+  height: 18px;
+  fill: #fff;
+}
+.video-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.video-close-btn:hover {
+  background: rgba(255,255,255,0.15);
+}
+.video-close-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: #c8d0e0;
+}
+.video-frame-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #000;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+.video-frame-wrap iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 8px;
+}
+@media (max-width: 600px) {
+  .video-container { width: 95%; }
+  .video-top-row h4 { font-size: 13px; }
+}
 </style>
 
 <div class="podcast-overlay" id="podOverlay">
@@ -533,6 +640,63 @@ The study uses panel data: the same 35 schools are observed at two time points (
     a.preload = 'metadata';
     a.load();
     opened = true;
+  }
+})();
+</script>
+
+<div class="video-overlay" id="vidOverlay">
+<div class="video-container">
+  <div class="video-top-row">
+    <h4>
+      <span class="video-icon">
+        <svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+      </span>
+      AI Video: Introduction to DiD in Stata
+    </h4>
+    <button class="video-close-btn" onclick="vidClose()" title="Close video">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+  </div>
+  <div class="video-frame-wrap">
+    <iframe id="vidFrame" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  var overlay = document.getElementById('vidOverlay');
+  var frame = document.getElementById('vidFrame');
+  var vidSrc = 'https://www.youtube.com/embed/qObP9bGU5rM?enablejsapi=1&rel=0';
+  function vidOpen(){
+    frame.src = vidSrc;
+    overlay.style.display = 'block';
+    overlay.classList.remove('vid-closing');
+  }
+  window.vidClose = function(){
+    overlay.classList.add('vid-closing');
+    setTimeout(function(){
+      overlay.style.display = 'none';
+      frame.src = '';
+    }, 250);
+  };
+  /* Intercept clicks on the YAML video button */
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('a.btn-page-header');
+    if(!link) return;
+    var text = link.textContent.trim();
+    if(text.indexOf('AI Video') === -1) return;
+    e.preventDefault();
+    e.stopPropagation();
+    vidOpen();
+  });
+  /* Close on backdrop click */
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay) vidClose();
+  });
+  /* Auto-open when arriving from homepage with #video-player hash */
+  if(window.location.hash === '#video-player'){
+    vidOpen();
   }
 })();
 </script>
