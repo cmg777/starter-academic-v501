@@ -130,7 +130,8 @@ legend_patches = [
     mpatches.Patch(facecolor="#e8956a", label="Treated (pre-program)"),
     mpatches.Patch(facecolor=WARM_ORANGE, label="Treated (post-program)"),
 ]
-ax.legend(handles=legend_patches, loc="upper right", fontsize=10)
+ax.legend(handles=legend_patches, loc="lower center", bbox_to_anchor=(0.5, -0.12),
+          ncol=3, fontsize=10)
 ax.invert_yaxis()
 plt.tight_layout()
 plt.savefig("did101_panelview.png", **SAVE_KWARGS)
@@ -162,9 +163,8 @@ ax.annotate(f"{treated_means[0]:.2f}", (0, treated_means[0]),
 ax.annotate(f"{treated_means[1]:.2f}", (1, treated_means[1]),
             textcoords="offset points", xytext=(10, -12), fontsize=12,
             color=WARM_ORANGE, fontweight="bold")
-ax.annotate(f"Naive change\n= {treated_means[1] - treated_means[0]:.2f}",
-            xy=(0.5, (treated_means[0] + treated_means[1]) / 2),
-            fontsize=12, color="#ff6b6b", ha="center",
+ax.annotate(f"Naive change = {treated_means[1] - treated_means[0]:.2f}",
+            xy=(0.7, 88), fontsize=12, color="#ff6b6b", ha="center",
             bbox=dict(boxstyle="round,pad=0.3", facecolor=DARK_NAVY,
                       edgecolor="#ff6b6b", alpha=0.9))
 ax.set_xticks([0, 1])
@@ -172,7 +172,7 @@ ax.set_xticklabels(["Pre-Program", "Post-Program"], fontsize=12)
 ax.set_ylabel("Average GPA", fontsize=12)
 ax.set_title("Naive Before-After Comparison (Treated Group Only)",
              fontsize=14, fontweight="bold", pad=12)
-ax.legend(loc="upper left", fontsize=11)
+ax.legend(loc="lower right", fontsize=11)
 ax.set_ylim(50, 105)
 plt.tight_layout()
 plt.savefig("did101_its.png", **SAVE_KWARGS)
@@ -205,7 +205,7 @@ print(f"\nCounterfactual: {pre_treated:.2f} + ({post_control:.2f} - {pre_control
 print(f"DiD estimate:   {post_treated:.2f} - {counterfactual:.2f} = {did_manual:.2f}")
 
 # Figure 3: Counterfactual plot
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plt.subplots(figsize=(11, 6))
 
 # Comparison group
 ax.plot([0, 1], [pre_control, post_control], color=STEEL_BLUE, marker="o",
@@ -219,21 +219,22 @@ ax.plot([0, 1], [pre_treated, counterfactual], color=TEAL, marker="D",
 
 # DiD gap annotation
 mid_y = (post_treated + counterfactual) / 2
-ax.annotate("", xy=(1.05, post_treated), xytext=(1.05, counterfactual),
+ax.annotate("", xy=(1.08, post_treated), xytext=(1.08, counterfactual),
             arrowprops=dict(arrowstyle="<->", color=TEAL, lw=2))
-ax.text(1.12, mid_y, f"DiD = {did_manual:.2f}", fontsize=13, color=TEAL,
+ax.text(1.16, mid_y, f"DiD = {did_manual:.2f}", fontsize=13, color=TEAL,
         fontweight="bold", va="center")
 
-# Value labels
-for x, y, label in [(0, pre_control, f"{pre_control:.2f}"),
-                     (1, post_control, f"{post_control:.2f}"),
-                     (0, pre_treated, f"{pre_treated:.2f}"),
-                     (1, post_treated, f"{post_treated:.2f}"),
-                     (1, counterfactual, f"{counterfactual:.2f}")]:
-    offset = (-35, 8) if x == 0 else (10, 8)
-    color = TEAL if y == counterfactual else WHITE_TEXT
-    ax.annotate(label, (x, y), textcoords="offset points", xytext=offset,
-                fontsize=11, color=color, fontweight="bold")
+# Value labels — position each carefully to avoid overlaps
+ax.annotate(f"{pre_control:.2f}", (0, pre_control), textcoords="offset points",
+            xytext=(-40, -5), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+ax.annotate(f"{post_control:.2f}", (1, post_control), textcoords="offset points",
+            xytext=(-45, 5), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+ax.annotate(f"{pre_treated:.2f}", (0, pre_treated), textcoords="offset points",
+            xytext=(-40, -15), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+ax.annotate(f"{post_treated:.2f}", (1, post_treated), textcoords="offset points",
+            xytext=(12, 5), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+ax.annotate(f"{counterfactual:.2f}", (1, counterfactual), textcoords="offset points",
+            xytext=(12, -12), fontsize=11, color=TEAL, fontweight="bold")
 
 ax.set_xticks([0, 1])
 ax.set_xticklabels(["Pre-Program", "Post-Program"], fontsize=12)
@@ -242,7 +243,7 @@ ax.set_title("Difference-in-Differences: Identifying the Causal Effect",
              fontsize=14, fontweight="bold", pad=12)
 ax.legend(loc="upper left", fontsize=11)
 ax.set_ylim(50, 105)
-ax.set_xlim(-0.15, 1.3)
+ax.set_xlim(-0.15, 1.45)
 plt.tight_layout()
 plt.savefig("did101_counterfactual.png", **SAVE_KWARGS)
 plt.close()
@@ -266,8 +267,8 @@ print(f"\nDiD = ({post_treated:.2f} - {pre_treated:.2f}) - ({post_control:.2f} -
 print(f"    = {post_treated - pre_treated:.2f} - {post_control - pre_control:.2f}")
 print(f"    = {did_calc:.2f}")
 
-# Figure 4: Annotated difference plot
-fig, ax = plt.subplots(figsize=(10, 6))
+# Figure 4: Annotated difference plot — redesigned for clarity
+fig, ax = plt.subplots(figsize=(12, 7))
 
 # Lines
 ax.plot([0, 1], [pre_control, post_control], color=STEEL_BLUE, marker="o",
@@ -277,44 +278,45 @@ ax.plot([0, 1], [pre_treated, post_treated], color=WARM_ORANGE, marker="o",
 ax.plot([0, 1], [pre_treated, counterfactual], color=TEAL, marker="D",
         markersize=8, linewidth=2, linestyle="--", label="Counterfactual", zorder=4)
 
-# Vertical arrows for differences
-# Treated change
-ax.annotate("", xy=(0.85, post_treated), xytext=(0.85, pre_treated),
-            arrowprops=dict(arrowstyle="<->", color=WARM_ORANGE, lw=1.5))
-ax.text(0.75, (post_treated + pre_treated) / 2,
-        f"Δ Treated\n= {post_treated - pre_treated:.2f}",
-        fontsize=10, color=WARM_ORANGE, ha="right", va="center")
-
-# Comparison change
-ax.annotate("", xy=(0.15, post_control), xytext=(0.15, pre_control),
+# Comparison change arrow — far left, outside the data lines
+ax.annotate("", xy=(-0.08, post_control), xytext=(-0.08, pre_control),
             arrowprops=dict(arrowstyle="<->", color=STEEL_BLUE, lw=1.5))
-ax.text(0.25, (post_control + pre_control) / 2,
+ax.text(-0.13, (post_control + pre_control) / 2,
         f"Δ Comparison\n= {post_control - pre_control:.2f}",
-        fontsize=10, color=STEEL_BLUE, ha="left", va="center")
+        fontsize=10, color=STEEL_BLUE, ha="right", va="center")
 
-# DiD
-ax.annotate("", xy=(1.08, post_treated), xytext=(1.08, counterfactual),
-            arrowprops=dict(arrowstyle="<->", color=TEAL, lw=2))
-ax.text(1.15, mid_y, f"DiD\n= {did_calc:.2f}",
-        fontsize=12, color=TEAL, fontweight="bold", va="center")
+# Treated change arrow — far right of data area
+ax.annotate("", xy=(1.12, post_treated), xytext=(1.12, pre_treated),
+            arrowprops=dict(arrowstyle="<->", color=WARM_ORANGE, lw=1.5))
+ax.text(1.18, (post_treated + pre_treated) / 2,
+        f"Δ Treated\n= {post_treated - pre_treated:.2f}",
+        fontsize=10, color=WARM_ORANGE, ha="left", va="center")
 
-# Labels
-for x, y, label in [(0, pre_control, f"{pre_control:.2f}"),
-                     (1, post_control, f"{post_control:.2f}"),
-                     (0, pre_treated, f"{pre_treated:.2f}"),
-                     (1, post_treated, f"{post_treated:.2f}")]:
-    offset = (-40, 0) if x == 0 else (12, 0)
-    ax.annotate(label, (x, y), textcoords="offset points", xytext=offset,
-                fontsize=11, color=WHITE_TEXT, fontweight="bold")
+# DiD arrow — furthest right
+mid_y_did = (post_treated + counterfactual) / 2
+ax.annotate("", xy=(1.35, post_treated), xytext=(1.35, counterfactual),
+            arrowprops=dict(arrowstyle="<->", color=TEAL, lw=2.5))
+ax.text(1.41, mid_y_did, f"DiD\n= {did_calc:.2f}",
+        fontsize=13, color=TEAL, fontweight="bold", va="center")
+
+# Value labels — positioned to avoid overlaps
+ax.annotate(f"{pre_control:.2f}", (0, pre_control), textcoords="offset points",
+            xytext=(8, 8), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+ax.annotate(f"{post_control:.2f}", (1, post_control), textcoords="offset points",
+            xytext=(8, 8), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+ax.annotate(f"{pre_treated:.2f}", (0, pre_treated), textcoords="offset points",
+            xytext=(8, -15), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+ax.annotate(f"{post_treated:.2f}", (1, post_treated), textcoords="offset points",
+            xytext=(8, 8), fontsize=11, color=WHITE_TEXT, fontweight="bold")
 
 ax.set_xticks([0, 1])
 ax.set_xticklabels(["Pre-Program", "Post-Program"], fontsize=12)
 ax.set_ylabel("Average GPA", fontsize=12)
 ax.set_title("Manual DiD: Double-Difference Calculation",
              fontsize=14, fontweight="bold", pad=12)
-ax.legend(loc="upper left", fontsize=11)
-ax.set_ylim(50, 105)
-ax.set_xlim(-0.15, 1.35)
+ax.legend(loc="lower center", bbox_to_anchor=(0.4, -0.12), ncol=3, fontsize=11)
+ax.set_ylim(48, 105)
+ax.set_xlim(-0.25, 1.55)
 plt.tight_layout()
 plt.savefig("did101_diff_plot.png", **SAVE_KWARGS)
 plt.close()
@@ -400,14 +402,15 @@ fig, ax = plt.subplots(figsize=(9, 5))
 labels = list(se_results.keys())
 ses = [se_results[l]["se"] for l in labels]
 colors = [STEEL_BLUE, WARM_ORANGE, TEAL, "#e8956a"]
-bars = ax.barh(labels, ses, color=colors, height=0.5, edgecolor=DARK_NAVY)
+bars = ax.barh(labels, ses, color=colors, height=0.45, edgecolor=DARK_NAVY)
 for bar, se_val in zip(bars, ses):
-    ax.text(bar.get_width() + 0.005, bar.get_y() + bar.get_height() / 2,
-            f"{se_val:.4f}", va="center", fontsize=11, color=WHITE_TEXT)
+    ax.text(bar.get_width() + 0.015, bar.get_y() + bar.get_height() / 2,
+            f"{se_val:.4f}", va="center", fontsize=12, color=WHITE_TEXT,
+            fontweight="bold")
 ax.set_xlabel("Standard Error of DiD Estimate (txp)", fontsize=12)
 ax.set_title("Standard Errors Across Inference Methods",
              fontsize=14, fontweight="bold", pad=12)
-ax.set_xlim(0, max(ses) * 1.3)
+ax.set_xlim(0, max(ses) * 1.4)
 plt.tight_layout()
 plt.savefig("did101_se_comparison.png", **SAVE_KWARGS)
 plt.close()
@@ -512,12 +515,13 @@ ax.errorbar(estimates, y_pos, xerr=[errors_lower, errors_upper],
             elinewidth=2, ecolor=STEEL_BLUE, zorder=5)
 
 for i, (est, lo, hi) in enumerate(zip(estimates, ci_lower, ci_upper)):
-    ax.text(est, i + 0.25, f"{est:.2f}", ha="center", fontsize=11,
+    ax.text(est, i - 0.3, f"{est:.2f}", ha="center", fontsize=11,
             color=WHITE_TEXT, fontweight="bold")
 
 ax.axvline(x=estimates[0], color=GRID_LINE, linestyle=":", linewidth=1, alpha=0.5)
 ax.set_yticks(y_pos)
 ax.set_yticklabels(model_names, fontsize=11)
+ax.set_ylim(-0.6, 2.6)
 ax.set_xlabel("DiD Estimate (txp coefficient)", fontsize=12)
 ax.set_title("Coefficient Comparison Across Specifications",
              fontsize=14, fontweight="bold", pad=12)
@@ -581,7 +585,8 @@ legend_patches = [
     mpatches.Patch(facecolor="#e8956a", label="Treated (pre)"),
     mpatches.Patch(facecolor=WARM_ORANGE, label="Treated (post)"),
 ]
-ax.legend(handles=legend_patches, loc="upper right", fontsize=10)
+ax.legend(handles=legend_patches, loc="lower center", bbox_to_anchor=(0.5, -0.1),
+          ncol=3, fontsize=10)
 ax.invert_yaxis()
 plt.tight_layout()
 plt.savefig("did101_panelview_event.png", **SAVE_KWARGS)
