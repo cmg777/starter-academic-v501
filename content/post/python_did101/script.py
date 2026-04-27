@@ -268,7 +268,7 @@ print(f"    = {post_treated - pre_treated:.2f} - {post_control - pre_control:.2f
 print(f"    = {did_calc:.2f}")
 
 # Figure 4: Annotated difference plot — redesigned for clarity
-fig, ax = plt.subplots(figsize=(12, 7))
+fig, ax = plt.subplots(figsize=(11, 7))
 
 # Lines
 ax.plot([0, 1], [pre_control, post_control], color=STEEL_BLUE, marker="o",
@@ -278,36 +278,36 @@ ax.plot([0, 1], [pre_treated, post_treated], color=WARM_ORANGE, marker="o",
 ax.plot([0, 1], [pre_treated, counterfactual], color=TEAL, marker="D",
         markersize=8, linewidth=2, linestyle="--", label="Counterfactual", zorder=4)
 
-# Comparison change arrow — far left, outside the data lines
+# Comparison change — arrow on the left margin
 ax.annotate("", xy=(-0.08, post_control), xytext=(-0.08, pre_control),
             arrowprops=dict(arrowstyle="<->", color=STEEL_BLUE, lw=1.5))
 ax.text(-0.13, (post_control + pre_control) / 2,
         f"Δ Comparison\n= {post_control - pre_control:.2f}",
         fontsize=10, color=STEEL_BLUE, ha="right", va="center")
 
-# Treated change arrow — far right of data area
-ax.annotate("", xy=(1.12, post_treated), xytext=(1.12, pre_treated),
-            arrowprops=dict(arrowstyle="<->", color=WARM_ORANGE, lw=1.5))
-ax.text(1.18, (post_treated + pre_treated) / 2,
-        f"Δ Treated\n= {post_treated - pre_treated:.2f}",
-        fontsize=10, color=WARM_ORANGE, ha="left", va="center")
+# Treated change — text label along the treated line (no arrow)
+ax.text(0.55, 84, f"Δ Treated = {post_treated - pre_treated:.2f}",
+        fontsize=11, color=WARM_ORANGE, ha="center", va="bottom",
+        rotation=32, fontstyle="italic")
 
-# DiD arrow — furthest right
+# DiD arrow — right side, spanning only counterfactual-to-treated gap
 mid_y_did = (post_treated + counterfactual) / 2
-ax.annotate("", xy=(1.35, post_treated), xytext=(1.35, counterfactual),
+ax.annotate("", xy=(1.1, post_treated), xytext=(1.1, counterfactual),
             arrowprops=dict(arrowstyle="<->", color=TEAL, lw=2.5))
-ax.text(1.41, mid_y_did, f"DiD\n= {did_calc:.2f}",
-        fontsize=13, color=TEAL, fontweight="bold", va="center")
+ax.text(1.17, mid_y_did, f"DiD = {did_calc:.2f}",
+        fontsize=14, color=TEAL, fontweight="bold", va="center")
 
 # Value labels — positioned to avoid overlaps
 ax.annotate(f"{pre_control:.2f}", (0, pre_control), textcoords="offset points",
-            xytext=(8, 8), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+            xytext=(10, 8), fontsize=11, color=WHITE_TEXT, fontweight="bold")
 ax.annotate(f"{post_control:.2f}", (1, post_control), textcoords="offset points",
-            xytext=(8, 8), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+            xytext=(-45, 8), fontsize=11, color=WHITE_TEXT, fontweight="bold")
 ax.annotate(f"{pre_treated:.2f}", (0, pre_treated), textcoords="offset points",
-            xytext=(8, -15), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+            xytext=(10, -15), fontsize=11, color=WHITE_TEXT, fontweight="bold")
 ax.annotate(f"{post_treated:.2f}", (1, post_treated), textcoords="offset points",
-            xytext=(8, 8), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+            xytext=(-45, 8), fontsize=11, color=WHITE_TEXT, fontweight="bold")
+ax.annotate(f"{counterfactual:.2f}", (1, counterfactual), textcoords="offset points",
+            xytext=(-50, -12), fontsize=11, color=TEAL, fontweight="bold")
 
 ax.set_xticks([0, 1])
 ax.set_xticklabels(["Pre-Program", "Post-Program"], fontsize=12)
@@ -316,7 +316,7 @@ ax.set_title("Manual DiD: Double-Difference Calculation",
              fontsize=14, fontweight="bold", pad=12)
 ax.legend(loc="lower center", bbox_to_anchor=(0.4, -0.12), ncol=3, fontsize=11)
 ax.set_ylim(48, 105)
-ax.set_xlim(-0.25, 1.55)
+ax.set_xlim(-0.28, 1.42)
 plt.tight_layout()
 plt.savefig("did101_diff_plot.png", **SAVE_KWARGS)
 plt.close()
