@@ -1,0 +1,29 @@
+\documentclass[]{article}
+\setlength{\pdfpagewidth}{8.5in} \setlength{\pdfpageheight}{11in}
+\begin{document}
+\begin{tabular}{lccccccc} \hline
+ & (1) & (2) & (3) & (4) & (5) & (6) & (7) \\
+VARIABLES & ucdp\_death\_dummy\_dt & ucdp\_death\_dummy\_dt & ucdp\_death\_dummy\_dt & ucdp\_death\_dummy\_dt & ucdp\_death\_dummy\_dt & ucdp\_death\_dummy\_dt & ucdp\_death\_dummy\_dt \\ \hline
+ &  &  &  &  &  &  &  \\
+llnlight01\_dt & 0.000777 &  &  &  & -0.303*** & -0.293*** & -0.296*** \\
+ & (0.00115) &  &  &  & (0.111) & (0.0848) & (0.0756) \\
+o.Iyear17 & - & - & - & - & - & - & - \\
+ &  &  &  &  &  &  &  \\
+l2lnrain01\_dt &  & -0.0109*** &  & -0.00720* &  &  &  \\
+ &  & (0.00337) &  & (0.00371) &  &  &  \\
+l2meanpdsi\_dt &  &  & -0.00162*** & -0.00134*** &  &  &  \\
+ &  &  & (0.000389) & (0.000426) &  &  &  \\
+Constant & -0.00867*** & -0.00869*** & -0.00886*** & -0.00881*** &  &  &  \\
+ & (0.00172) & (0.00171) & (0.00171) & (0.00171) &  &  &  \\
+ &  &  &  &  &  &  &  \\
+Observations & 96,591 & 96,591 & 96,591 & 96,591 & 96,591 & 96,591 & 96,591 \\
+R-squared & 0.004 & 0.004 & 0.004 & 0.004 & -0.544 & -0.508 & -0.519 \\
+Number of objectid & 5,689 & 5,689 & 5,689 & 5,689 & 5,689 & 5,689 & 5,689 \\
+Dependant & ucdp\_death\_dummy & ucdp\_death\_dummy & ucdp\_death\_dummy & ucdp\_death\_dummy & ucdp\_death\_dummy & ucdp\_death\_dummy & ucdp\_death\_dummy \\
+Year and region fixed effects & Yes & Yes & Yes & Yes & Yes & Yes & Yes \\
+Regional time trends & Yes & Yes & Yes & Yes & Yes & Yes & Yes \\
+ Instrumental variables & None & None & None & None & Rain & Drought & Rain and Drought \\ \hline
+\multicolumn{8}{c}{ Robust standard errors in parentheses} \\
+\multicolumn{8}{c}{ *** p$<$0.01, ** p$<$0.05, * p$<$0.1} \\
+\end{tabular}
+\end{document}

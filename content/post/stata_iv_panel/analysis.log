@@ -1,0 +1,1900 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_iv_panel/analysis.log
+  log type:  text
+ opened on:  27 Apr 2026, 14:53:23
+
+. 
+. // Install required packages (idempotent)
+. capture ssc install estout, replace
+
+. capture ssc install ivreg2, replace
+
+. capture ssc install ranktest, replace
+
+. capture ssc install xtivreg2, replace
+
+. capture ssc install outreg2, replace
+
+. capture ssc install schemepack, replace
+
+. 
+. // Set graph scheme for clean output
+. set scheme white_tableau
+
+. 
+. // Site color palette
+. local steel_blue   "68 155 204"
+
+. local warm_orange  "217 119 87"
+
+. local near_black   "20 20 19"
+
+. local teal         "0 212 200"
+
+. 
+. display _n "=== Setup complete ==="
+
+=== Setup complete ===
+
+. 
+. 
+. // ── 1. Data Loading ───────────────────────────────────────────────────────
+> ──
+. 
+. display _n "=== Section 1: Data Loading ==="
+
+=== Section 1: Data Loading ===
+
+. 
+. use "reference/EL_regional_conflict_replication.dta", clear
+
+. 
+. // Declare panel structure
+. tsset objectid year
+
+Panel variable: objectid (unbalanced)
+ Time variable: year, 1994 to 2010, but with gaps
+         Delta: 1 unit
+
+. 
+. // Basic data overview
+. describe
+
+Contains data from reference/EL_regional_conflict_replication.dta
+ Observations:        96,591                  
+    Variables:            14                  5 Sep 2022 01:06
+                                              (_dta has notes)
+-------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+objectid        long    %12.0g                Value
+year            float   %9.0g                 
+countrycode     str3    %9s                   ISO
+countryname     str32   %32s                  NAME_0
+ucdp_death_du~y float   %9.0g                 Conflict (>1 deaths)
+ucdp_25death_~y float   %9.0g                 Conflict (>25 deaths)
+llnlight01      float   %9.0g                 Ln Lights(t-1)
+l2lnrain01      float   %9.0g                 Ln Rain(t-2)
+l2meanpdsi      float   %9.0g                 (Non) Drought(t-2)
+ucdp_death_du~t float   %9.0g                 Conflict (>1 deaths)
+ucdp_25death_~t float   %9.0g                 Conflict (>25 deaths)
+llnlight01_dt   float   %9.0g                 Ln Lights(t-1)
+l2lnrain01_dt   float   %9.0g                 Ln Rain(t-2)
+l2meanpdsi_dt   float   %9.0g                 (Non) Drought(t-2)
+-------------------------------------------------------------------------------
+Sorted by: objectid  year
+
+. display _n "Panel structure:"
+
+Panel structure:
+
+. display "  Regions (objectid): " _N
+  Regions (objectid): 96591
+
+. xtsum objectid
+
+Variable         |      Mean   Std. dev.       Min        Max |    Observations
+-----------------+--------------------------------------------+----------------
+objectid overall |  19459.86    10626.6        329      39162 |     N =   96591
+         between |             10625.27        329      39162 |     n =    5689
+         within  |                    0   19459.86   19459.86 | T-bar = 16.9786
+
+. 
+. // Export raw data summary
+. preserve
+
+.     collapse (mean) ucdp_death_dummy ucdp_25death_dummy llnlight01 l2lnrain01
+>  l2meanpdsi, by(year)
+
+.     export delimited using "yearly_averages.csv", replace
+(file yearly_averages.csv not found)
+file yearly_averages.csv saved
+
+. restore
+
+. 
+. display _n "=== Data loading complete ==="
+
+=== Data loading complete ===
+
+. 
+. 
+. // ── 2. Descriptive Statistics (Table 1) ───────────────────────────────────
+> ──
+. 
+. display _n "=== Section 2: Descriptive Statistics ==="
+
+=== Section 2: Descriptive Statistics ===
+
+. 
+. // Panel summary statistics (between and within variation)
+. xtsum ucdp_death_dummy ucdp_25death_dummy llnlight01 l2lnrain01 l2meanpdsi
+
+Variable         |      Mean   Std. dev.       Min        Max |    Observations
+-----------------+--------------------------------------------+----------------
+ucdp_d~y overall |  .0455425   .2084919          0          1 |     N =   96591
+         between |             .1176404          0          1 |     n =    5689
+         within  |             .1721562  -.8956339    .986719 | T-bar = 16.9786
+                 |                                            |
+ucdp_2~y overall |  .0144527   .1193481          0          1 |     N =   96591
+         between |             .0575476          0   .9411765 |     n =    5689
+         within  |             .1045561  -.9267238   .9556292 | T-bar = 16.9786
+                 |                                            |
+llnli~01 overall | -1.611658   2.619427   -4.60517   4.143293 |     N =   96591
+         between |             2.568635   -4.60517   4.140281 |     n =    5689
+         within  |             .5277626  -7.699739   2.693339 | T-bar = 16.9786
+                 |                                            |
+l2lnr~01 overall |    3.8302   1.477743   -4.60517   6.093216 |     N =   96591
+         between |             1.493749   -4.60517   5.514849 |     n =    5689
+         within  |             .1993702  -2.741027   5.494656 | T-bar = 16.9786
+                 |                                            |
+l2mean~i overall | -1.215386   2.033711   -12.1292    12.6313 |     N =   96591
+         between |             1.064342  -6.024061   2.538623 |     n =    5689
+         within  |             1.733175  -8.565653   10.55658 | T-bar = 16.9786
+
+. 
+. // Standard summary statistics
+. summarize ucdp_death_dummy ucdp_25death_dummy llnlight01 l2lnrain01 l2meanpds
+> i
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+ucdp_death~y |     96,591    .0455425    .2084919          0          1
+ucdp_25dea~y |     96,591    .0144527    .1193481          0          1
+  llnlight01 |     96,591   -1.611658    2.619427   -4.60517   4.143293
+  l2lnrain01 |     96,591      3.8302    1.477743   -4.60517   6.093216
+  l2meanpdsi |     96,591   -1.215386    2.033711   -12.1292    12.6313
+
+. 
+. // Formatted Table 1 using estout
+. eststo clear
+
+. generate y_temp = uniform()
+
+. quietly reg y_temp ucdp_death_dummy ucdp_25death_dummy llnlight01 l2lnrain01 
+> l2meanpdsi, noconstant
+
+. quietly estadd summ
+
+. esttab, label ///
+>     cells("mean(fmt(%8.3f)) sd(fmt(%8.3f)) min(fmt(%8.3f)) max(fmt(%8.3f))") 
+> ///
+>     collabels("Mean" "Std.Dev." "Min" "Max") ///
+>     addnote("Notes: Sample period is 1994-2010. N = 96,591 region-year observ
+> ations.") ///
+>     nogap nomtitle nonumber noobs compress
+
+--------------------------------------------------------
+                      Mean  Std.Dev.       Min       Max
+--------------------------------------------------------
+Conflict (>1 d~)     0.046     0.208     0.000     1.000
+Conflict (>25 ~)     0.014     0.119     0.000     1.000
+Ln Lights(t-1)      -1.612     2.619    -4.605     4.143
+Ln Rain(t-2)         3.830     1.478    -4.605     6.093
+(Non) Drought~2)    -1.215     2.034   -12.129    12.631
+--------------------------------------------------------
+Notes: Sample period is 1994-2010. N = 96,591 region-year observations.
+
+. drop y_temp
+
+. eststo clear
+
+. 
+. // Export Table 1 as CSV
+. preserve
+
+.     collapse (mean) mean_conflict01=ucdp_death_dummy mean_conflict25=ucdp_25d
+> eath_dummy ///
+>              mean_light=llnlight01 mean_rain=l2lnrain01 mean_drought=l2meanpd
+> si ///
+>              (sd) sd_conflict01=ucdp_death_dummy sd_conflict25=ucdp_25death_d
+> ummy ///
+>              sd_light=llnlight01 sd_rain=l2lnrain01 sd_drought=l2meanpdsi ///
+>              (min) min_conflict01=ucdp_death_dummy min_conflict25=ucdp_25deat
+> h_dummy ///
+>              min_light=llnlight01 min_rain=l2lnrain01 min_drought=l2meanpdsi 
+> ///
+>              (max) max_conflict01=ucdp_death_dummy max_conflict25=ucdp_25deat
+> h_dummy ///
+>              max_light=llnlight01 max_rain=l2lnrain01 max_drought=l2meanpdsi
+
+.     generate n = _N
+
+.     export delimited using "table1_summary_stats.csv", replace
+(file table1_summary_stats.csv not found)
+file table1_summary_stats.csv saved
+
+. restore
+
+. 
+. display _n "=== Descriptive statistics complete ==="
+
+=== Descriptive statistics complete ===
+
+. 
+. 
+. // ── 3. OLS with Fixed Effects — Reduced Form (Tables 2-3, Cols 1-4) ───────
+> ─
+. 
+. display _n "=== Section 3: OLS with Fixed Effects ==="
+
+=== Section 3: OLS with Fixed Effects ===
+
+. 
+. // Generate year dummies for inclusion in regressions
+. quietly tab year, gen(Iyear)
+
+. 
+. // --- Table 2: Conflict with 1+ deaths ---
+. display _n "--- Table 2: Conflict (1+ deaths) ---"
+
+--- Table 2: Conflict (1+ deaths) ---
+
+. 
+. eststo clear
+
+. 
+. // Col 1: Light -> Conflict
+. eststo t2m1: quietly xtreg ucdp_death_dummy_dt llnlight01_dt Iyear*, fe robus
+> t cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "None", replace
+
+. 
+. // Col 2: Rain -> Conflict (reduced form)
+. eststo t2m2: quietly xtreg ucdp_death_dummy_dt l2lnrain01_dt Iyear*, fe robus
+> t cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "None", replace
+
+. 
+. // Col 3: Drought -> Conflict (reduced form)
+. eststo t2m3: quietly xtreg ucdp_death_dummy_dt l2meanpdsi_dt Iyear*, fe robus
+> t cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "None", replace
+
+. 
+. // Col 4: Rain + Drought -> Conflict (reduced form)
+. eststo t2m4: quietly xtreg ucdp_death_dummy_dt l2meanpdsi_dt l2lnrain01_dt Iy
+> ear*, fe robust cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "None", replace
+
+. 
+. display _n "OLS estimates for Table 2 (cols 1-4) stored."
+
+OLS estimates for Table 2 (cols 1-4) stored.
+
+. 
+. // --- Table 3: Conflict with 25+ deaths ---
+. display _n "--- Table 3: Conflict (25+ deaths) ---"
+
+--- Table 3: Conflict (25+ deaths) ---
+
+. 
+. // Col 1: Light -> Conflict25
+. eststo t3m1: quietly xtreg ucdp_25death_dummy_dt llnlight01_dt Iyear*, fe rob
+> ust cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "None", replace
+
+. 
+. // Col 2: Rain -> Conflict25 (reduced form)
+. eststo t3m2: quietly xtreg ucdp_25death_dummy_dt l2lnrain01_dt Iyear*, fe rob
+> ust cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "None", replace
+
+. 
+. // Col 3: Drought -> Conflict25 (reduced form)
+. eststo t3m3: quietly xtreg ucdp_25death_dummy_dt l2meanpdsi_dt Iyear*, fe rob
+> ust cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "None", replace
+
+. 
+. // Col 4: Rain + Drought -> Conflict25 (reduced form)
+. eststo t3m4: quietly xtreg ucdp_25death_dummy_dt l2meanpdsi_dt l2lnrain01_dt 
+> Iyear*, fe robust cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "None", replace
+
+. 
+. display _n "OLS estimates for Table 3 (cols 1-4) stored."
+
+OLS estimates for Table 3 (cols 1-4) stored.
+
+. 
+. 
+. // ── 4. 2SLS/IV with Fixed Effects (Tables 2-3, Cols 5-7) ──────────────────
+> ─
+. 
+. display _n "=== Section 4: 2SLS/IV Estimation ==="
+
+=== Section 4: 2SLS/IV Estimation ===
+
+. display _n "Estimand: Causal effect of economic shocks on conflict probabilit
+> y"
+
+Estimand: Causal effect of economic shocks on conflict probability
+
+. display _n "Instruments: Lagged rainfall (t-2) and drought intensity (t-2)"
+
+Instruments: Lagged rainfall (t-2) and drought intensity (t-2)
+
+. display _n "Exclusion restriction: Weather(t-2) -> Light(t-1) -> Conflict(t)"
+
+Exclusion restriction: Weather(t-2) -> Light(t-1) -> Conflict(t)
+
+. 
+. // --- Table 2 (continued): 2SLS for Conflict 1+ ---
+. display _n "--- Table 2: 2SLS Estimates (cols 5-7) ---"
+
+--- Table 2: 2SLS Estimates (cols 5-7) ---
+
+. 
+. // Col 5: IV with Rain
+. eststo t2m5: quietly xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2lnrain01_d
+> t) Iyear*, fe robust cluster(objectid) first
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "Rain(t-2)", replace
+
+. 
+. // Col 6: IV with Drought
+. eststo t2m6: quietly xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_d
+> t) Iyear*, fe robust cluster(objectid) first
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "Drought(t-2)", replace
+
+. 
+. // Col 7: IV with Both instruments
+. eststo t2m7: quietly xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_d
+> t l2lnrain01_dt) Iyear*, fe robust cluster(objectid) first
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "Both", replace
+
+. 
+. // Display Table 2 (full)
+. display _n "=== TABLE 2: Effects on regional conflicts (1+ deaths) ==="
+
+=== TABLE 2: Effects on regional conflicts (1+ deaths) ===
+
+. #delimit ;
+delimiter now ;
+. esttab t2m1 t2m2 t2m3 t2m4 t2m5 t2m6 t2m7,
+>     keep(llnlight01_dt l2lnrain01_dt l2meanpdsi_dt)
+>     se
+>     label
+>     stats(N N_g r2 FE_region Trend_region FE_year Instrument,
+>         fmt(0 0 2)
+>         label("Observations" "N Regions" "R-squared" "Region FE" "Region tren
+> d" "Year FE" "Instrument"))
+>     mtitles("OLS" "OLS" "OLS" "OLS" "2SLS" "2SLS" "2SLS")
+>     nonotes
+>     addnote("Notes: Sample period is 1994-2010. Standard errors adjusted for 
+> clustering at the regional level."
+>             "Dependent variable: Conflict with 1+ deaths. Standard errors in 
+> parentheses."
+>             "* p<0.10, ** p<0.05, *** p<0.01")
+>     star(* 0.10 ** 0.05 *** 0.01)
+>     b(%7.3f)
+>     compress
+>     replace ;
+
+-------------------------------------------------------------------------------
+> ----------------------------
+                       (1)          (2)          (3)          (4)          (5) 
+>          (6)          (7)   
+                       OLS          OLS          OLS          OLS         2SLS 
+>         2SLS         2SLS   
+-------------------------------------------------------------------------------
+> ----------------------------
+Ln Lights(t-1)       0.001                                              -0.303*
+> **    -0.293***    -0.296***
+                   (0.001)                                             (0.111) 
+>      (0.085)      (0.076)   
+
+Ln Rain(t-2)                     -0.011***                 -0.007*             
+>                             
+                                (0.003)                   (0.004)              
+>                             
+
+(Non) Drought~2)                              -0.002***    -0.001***           
+>                             
+                                             (0.000)      (0.000)              
+>                             
+-------------------------------------------------------------------------------
+> ----------------------------
+Observations         96591        96591        96591        96591        96591 
+>        96591        96591   
+N Regions             5689         5689         5689         5689         5689 
+>         5689         5689   
+R-squared             0.00         0.00         0.00         0.00        -0.54 
+>        -0.51        -0.52   
+Region FE              Yes          Yes          Yes          Yes          Yes 
+>          Yes          Yes   
+Region trend           Yes          Yes          Yes          Yes          Yes 
+>          Yes          Yes   
+Year FE                Yes          Yes          Yes          Yes          Yes 
+>          Yes          Yes   
+Instrument            None         None         None         None    Rain(t-2) 
+>    Drought(t-2)         Both   
+-------------------------------------------------------------------------------
+> ----------------------------
+Notes: Sample period is 1994-2010. Standard errors adjusted for clustering at t
+> he regional level.
+Dependent variable: Conflict with 1+ deaths. Standard errors in parentheses.
+* p<0.10, ** p<0.05, *** p<0.01
+
+. #delimit cr
+delimiter now cr
+. 
+. // --- Table 3 (continued): 2SLS for Conflict 25+ ---
+. display _n "--- Table 3: 2SLS Estimates (cols 5-7) ---"
+
+--- Table 3: 2SLS Estimates (cols 5-7) ---
+
+. 
+. // Col 5: IV with Rain
+. eststo t3m5: quietly xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2lnrain01
+> _dt) Iyear*, fe robust cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "Rain(t-2)", replace
+
+. 
+. // Col 6: IV with Drought
+. eststo t3m6: quietly xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2meanpdsi
+> _dt) Iyear*, fe robust cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "Drought(t-2)", replace
+
+. 
+. // Col 7: IV with Both instruments
+. eststo t3m7: quietly xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2meanpdsi
+> _dt l2lnrain01_dt) Iyear*, fe robust cluster(objectid)
+
+. quietly estadd local FE_region    "Yes", replace
+
+. quietly estadd local Trend_region "Yes", replace
+
+. quietly estadd local FE_year      "Yes", replace
+
+. quietly estadd local Instrument   "Both", replace
+
+. 
+. // Display Table 3 (full)
+. display _n "=== TABLE 3: Effects on regional conflicts (25+ deaths) ==="
+
+=== TABLE 3: Effects on regional conflicts (25+ deaths) ===
+
+. #delimit ;
+delimiter now ;
+. esttab t3m1 t3m2 t3m3 t3m4 t3m5 t3m6 t3m7,
+>     keep(llnlight01_dt l2lnrain01_dt l2meanpdsi_dt)
+>     se
+>     label
+>     stats(N N_g r2 FE_region Trend_region FE_year Instrument,
+>         fmt(0 0 2)
+>         label("Observations" "N Regions" "R-squared" "Region FE" "Region tren
+> d" "Year FE" "Instrument"))
+>     mtitles("OLS" "OLS" "OLS" "OLS" "2SLS" "2SLS" "2SLS")
+>     nonotes
+>     addnote("Notes: Sample period is 1994-2010. Standard errors adjusted for 
+> clustering at the regional level."
+>             "Dependent variable: Conflict with 25+ deaths. Standard errors in
+>  parentheses."
+>             "* p<0.10, ** p<0.05, *** p<0.01")
+>     star(* 0.10 ** 0.05 *** 0.01)
+>     b(%7.3f)
+>     compress
+>     replace ;
+
+-------------------------------------------------------------------------------
+> ----------------------------
+                       (1)          (2)          (3)          (4)          (5) 
+>          (6)          (7)   
+                       OLS          OLS          OLS          OLS         2SLS 
+>         2SLS         2SLS   
+-------------------------------------------------------------------------------
+> ----------------------------
+Ln Lights(t-1)       0.001                                              -0.092 
+>       -0.093**     -0.093** 
+                   (0.001)                                             (0.057) 
+>      (0.046)      (0.040)   
+
+Ln Rain(t-2)                     -0.003*                   -0.002              
+>                             
+                                (0.002)                   (0.002)              
+>                             
+
+(Non) Drought~2)                              -0.001**     -0.000*             
+>                             
+                                             (0.000)      (0.000)              
+>                             
+-------------------------------------------------------------------------------
+> ----------------------------
+Observations         96591        96591        96591        96591        96591 
+>        96591        96591   
+N Regions             5689         5689         5689         5689         5689 
+>         5689         5689   
+R-squared             0.00         0.00         0.00         0.00        -0.14 
+>        -0.14        -0.14   
+Region FE              Yes          Yes          Yes          Yes          Yes 
+>          Yes          Yes   
+Region trend           Yes          Yes          Yes          Yes          Yes 
+>          Yes          Yes   
+Year FE                Yes          Yes          Yes          Yes          Yes 
+>          Yes          Yes   
+Instrument            None         None         None         None    Rain(t-2) 
+>    Drought(t-2)         Both   
+-------------------------------------------------------------------------------
+> ----------------------------
+Notes: Sample period is 1994-2010. Standard errors adjusted for clustering at t
+> he regional level.
+Dependent variable: Conflict with 25+ deaths. Standard errors in parentheses.
+* p<0.10, ** p<0.05, *** p<0.01
+
+. #delimit cr
+delimiter now cr
+. 
+. eststo clear
+
+. 
+. 
+. // ── 5. First-Stage Results and Diagnostics (Table 4) ──────────────────────
+> ──
+. 
+. display _n "=== Section 5: First-Stage Results and IV Diagnostics ==="
+
+=== Section 5: First-Stage Results and IV Diagnostics ===
+
+. 
+. // First-stage with Rain as instrument
+. display _n "--- First Stage: Rain(t-2) -> Light(t-1) ---"
+
+--- First Stage: Rain(t-2) -> Light(t-1) ---
+
+. eststo fs1: xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2lnrain01_dt) Iyear*
+> , fe robust cluster(objectid) first
+Warning - collinearities detected
+Vars dropped:       Iyear17
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+Warning - collinearities detected
+Vars dropped:  Iyear17
+
+First-stage regressions
+-----------------------
+
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+
+First-stage regression of llnlight01_dt:
+
+Statistics robust to heteroskedasticity and clustering on objectid
+Number of obs =                  96591
+Number of clusters (objectid) =   5689
+------------------------------------------------------------------------------
+             |               Robust
+llnlight01~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+l2lnrain01~t |   .0360693   .0072692     4.96   0.000     .0218217    .0503169
+      Iyear1 |   .1621198   .0071988    22.52   0.000     .1480103    .1762293
+      Iyear2 |  -.2300151   .0096504   -23.83   0.000    -.2489299   -.2111003
+      Iyear3 |   .2088411   .0066666    31.33   0.000     .1957745    .2219076
+      Iyear4 |   .2011741   .0068272    29.47   0.000     .1877929    .2145554
+      Iyear5 |   -.007674   .0074362    -1.03   0.302    -.0222488    .0069009
+      Iyear6 |   .0517506   .0078119     6.62   0.000     .0364394    .0670619
+      Iyear7 |   .0510439   .0082413     6.19   0.000     .0348911    .0671967
+      Iyear8 |  -.0048014   .0080271    -0.60   0.550    -.0205345    .0109316
+      Iyear9 |   .2272877   .0090691    25.06   0.000     .2095123     .245063
+     Iyear10 |   .2289018   .0087508    26.16   0.000     .2117504    .2460533
+     Iyear11 |  -.0930477   .0080567   -11.55   0.000    -.1088388   -.0772566
+     Iyear12 |  -.0007095    .008474    -0.08   0.933    -.0173184    .0158994
+     Iyear13 |  -.0077135   .0081401    -0.95   0.343    -.0236681     .008241
+     Iyear14 |   .0743706    .008446     8.81   0.000     .0578165    .0909247
+     Iyear15 |   .1775274   .0073881    24.03   0.000     .1630468    .1920081
+     Iyear16 |   .1039426    .006106    17.02   0.000     .0919749    .1159103
+     Iyear17 |          0  (omitted)
+------------------------------------------------------------------------------
+F test of excluded instruments:
+  F(  1,  5688) =    24.62
+  Prob > F      =   0.0000
+Sanderson-Windmeijer multivariate F test of excluded instruments:
+  F(  1,  5688) =    24.62
+  Prob > F      =   0.0000
+
+
+
+Summary results for first-stage regressions
+-------------------------------------------
+
+                                           (Underid)            (Weak id)
+Variable     | F(  1,  5688)  P-val | SW Chi-sq(  1) P-val | SW F(  1,  5688)
+llnlight01_d |      24.62    0.0000 |       24.63   0.0000 |       24.62
+
+NB: first-stage test statistics cluster-robust
+
+Stock-Yogo weak ID F test critical values for single endogenous regressor:
+                                   10% maximal IV size             16.38
+                                   15% maximal IV size              8.96
+                                   20% maximal IV size              6.66
+                                   25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for i.i.d. errors only.
+
+Underidentification test
+Ho: matrix of reduced form coefficients has rank=K1-1 (underidentified)
+Ha: matrix has rank=K1 (identified)
+Kleibergen-Paap rk LM statistic          Chi-sq(1)=27.44    P-val=0.0000
+
+Weak identification test
+Ho: equation is weakly identified
+Cragg-Donald Wald F statistic                                      24.17
+Kleibergen-Paap Wald rk F statistic                                24.62
+
+Stock-Yogo weak ID test critical values for K1=1 and L1=1:
+                                   10% maximal IV size             16.38
+                                   15% maximal IV size              8.96
+                                   20% maximal IV size              6.66
+                                   25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+
+Weak-instrument-robust inference
+Tests of joint significance of endogenous regressors B1 in main equation
+Ho: B1=0 and orthogonality conditions are valid
+Anderson-Rubin Wald test           F(1,5688)=     10.54     P-val=0.0012
+Anderson-Rubin Wald test           Chi-sq(1)=     10.54     P-val=0.0012
+Stock-Wright LM S statistic        Chi-sq(1)=     10.37     P-val=0.0013
+
+NB: Underidentification, weak identification and weak-identification-robust
+    test statistics cluster-robust
+
+Number of clusters             N_clust  =       5689
+Number of observations               N  =      96591
+Number of regressors                 K  =         17
+Number of endogenous regressors      K1 =          1
+Number of instruments                L  =         17
+Number of excluded instruments       L1 =          1
+
+IV (2SLS) estimation
+--------------------
+
+Estimates efficient for homoskedasticity only
+Statistics robust to heteroskedasticity and clustering on objectid
+
+Number of clusters (objectid) =   5689                Number of obs =    96591
+                                                      F( 17,  5688) =    10.17
+                                                      Prob > F      =   0.0000
+Total (centered) SS     =  2512.033049                Centered R2   =  -0.5442
+Total (uncentered) SS   =  2512.033049                Uncentered R2 =  -0.5442
+Residual SS             =  3879.177476                Root MSE      =    .2066
+
+------------------------------------------------------------------------------
+             |               Robust
+ucdp_death~t | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+llnlight01~t |  -.3033282   .1107854    -2.74   0.006    -.5204636   -.0861928
+      Iyear1 |   .0587702   .0182029     3.23   0.001     .0230932    .0944472
+      Iyear2 |  -.0743488   .0259151    -2.87   0.004    -.1251416   -.0235561
+      Iyear3 |   .0518044   .0230236     2.25   0.024      .006679    .0969297
+      Iyear4 |   .0604805   .0225695     2.68   0.007     .0162452    .1047159
+      Iyear5 |   .0257732   .0037826     6.81   0.000     .0183594    .0331871
+      Iyear6 |   .0345351   .0072224     4.78   0.000     .0203795    .0486907
+      Iyear7 |   .0347076   .0066864     5.19   0.000     .0216025    .0478127
+      Iyear8 |    .010068   .0038102     2.64   0.008     .0026002    .0175358
+      Iyear9 |   .0911123   .0250906     3.63   0.000     .0419357    .1402889
+     Iyear10 |    .089894     .02545     3.53   0.000     .0400129    .1397751
+     Iyear11 |  -.0176401   .0111655    -1.58   0.114     -.039524    .0042439
+     Iyear12 |  -.0001902    .003797    -0.05   0.960    -.0076322    .0072518
+     Iyear13 |  -.0020389   .0037135    -0.55   0.583    -.0093173    .0052394
+     Iyear14 |   .0280824    .008687     3.23   0.001     .0110561    .0451086
+     Iyear15 |   .0636768    .020099     3.17   0.002     .0242834    .1030702
+     Iyear16 |   .0401534   .0119012     3.37   0.001     .0168274    .0634793
+     Iyear17 |          0  (omitted)
+------------------------------------------------------------------------------
+Underidentification test (Kleibergen-Paap rk LM statistic):             27.443
+                                                   Chi-sq(1) P-val =    0.0000
+------------------------------------------------------------------------------
+Weak identification test (Cragg-Donald Wald F statistic):               24.173
+                         (Kleibergen-Paap rk Wald F statistic):         24.621
+Stock-Yogo weak ID test critical values: 10% maximal IV size             16.38
+                                         15% maximal IV size              8.96
+                                         20% maximal IV size              6.66
+                                         25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+------------------------------------------------------------------------------
+Hansen J statistic (overidentification test of all instruments):         0.000
+                                                 (equation exactly identified)
+------------------------------------------------------------------------------
+Instrumented:         llnlight01_dt
+Included instruments: Iyear1 Iyear2 Iyear3 Iyear4 Iyear5 Iyear6 Iyear7 Iyear8
+                      Iyear9 Iyear10 Iyear11 Iyear12 Iyear13 Iyear14 Iyear15
+                      Iyear16
+Excluded instruments: l2lnrain01_dt
+Dropped collinear:    Iyear17
+------------------------------------------------------------------------------
+
+. display _n "First-stage F-stat (Rain): " e(widstat)
+
+First-stage F-stat (Rain): 24.620605
+
+. 
+. // First-stage with Drought as instrument
+. display _n "--- First Stage: Drought(t-2) -> Light(t-1) ---"
+
+--- First Stage: Drought(t-2) -> Light(t-1) ---
+
+. eststo fs2: xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_dt) Iyear*
+> , fe robust cluster(objectid) first
+Warning - collinearities detected
+Vars dropped:       Iyear17
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+Warning - collinearities detected
+Vars dropped:  Iyear17
+
+First-stage regressions
+-----------------------
+
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+
+First-stage regression of llnlight01_dt:
+
+Statistics robust to heteroskedasticity and clustering on objectid
+Number of obs =                  96591
+Number of clusters (objectid) =   5689
+------------------------------------------------------------------------------
+             |               Robust
+llnlight01~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+l2meanpdsi~t |   .0055157   .0008685     6.35   0.000     .0038134     .007218
+      Iyear1 |   .1617902   .0072031    22.46   0.000     .1476722    .1759083
+      Iyear2 |  -.2299293    .009624   -23.89   0.000    -.2487921   -.2110664
+      Iyear3 |    .211015   .0066875    31.55   0.000     .1979074    .2241225
+      Iyear4 |   .2012739   .0068281    29.48   0.000      .187891    .2146569
+      Iyear5 |   -.012051   .0075541    -1.60   0.111    -.0268568    .0027549
+      Iyear6 |   .0516968   .0078389     6.59   0.000     .0363325     .067061
+      Iyear7 |   .0463421   .0082258     5.63   0.000     .0302195    .0624647
+      Iyear8 |  -.0040847   .0080478    -0.51   0.612    -.0198583     .011689
+      Iyear9 |   .2242962   .0089647    25.02   0.000     .2067255    .2418668
+     Iyear10 |   .2291772   .0087421    26.22   0.000     .2120429    .2463116
+     Iyear11 |  -.0895078   .0081125   -11.03   0.000    -.1054081   -.0736075
+     Iyear12 |  -.0018213   .0084927    -0.21   0.830    -.0184669    .0148244
+     Iyear13 |   -.006848   .0081407    -0.84   0.400    -.0228037    .0091077
+     Iyear14 |   .0719372   .0083867     8.58   0.000     .0554994     .088375
+     Iyear15 |   .1775356   .0073867    24.03   0.000     .1630577    .1920135
+     Iyear16 |   .1025331   .0061098    16.78   0.000     .0905579    .1145083
+     Iyear17 |          0  (omitted)
+------------------------------------------------------------------------------
+F test of excluded instruments:
+  F(  1,  5688) =    40.33
+  Prob > F      =   0.0000
+Sanderson-Windmeijer multivariate F test of excluded instruments:
+  F(  1,  5688) =    40.33
+  Prob > F      =   0.0000
+
+
+
+Summary results for first-stage regressions
+-------------------------------------------
+
+                                           (Underid)            (Weak id)
+Variable     | F(  1,  5688)  P-val | SW Chi-sq(  1) P-val | SW F(  1,  5688)
+llnlight01_d |      40.33    0.0000 |       40.35   0.0000 |       40.33
+
+NB: first-stage test statistics cluster-robust
+
+Stock-Yogo weak ID F test critical values for single endogenous regressor:
+                                   10% maximal IV size             16.38
+                                   15% maximal IV size              8.96
+                                   20% maximal IV size              6.66
+                                   25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for i.i.d. errors only.
+
+Underidentification test
+Ho: matrix of reduced form coefficients has rank=K1-1 (underidentified)
+Ha: matrix has rank=K1 (identified)
+Kleibergen-Paap rk LM statistic          Chi-sq(1)=39.98    P-val=0.0000
+
+Weak identification test
+Ho: equation is weakly identified
+Cragg-Donald Wald F statistic                                      40.65
+Kleibergen-Paap Wald rk F statistic                                40.33
+
+Stock-Yogo weak ID test critical values for K1=1 and L1=1:
+                                   10% maximal IV size             16.38
+                                   15% maximal IV size              8.96
+                                   20% maximal IV size              6.66
+                                   25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+
+Weak-instrument-robust inference
+Tests of joint significance of endogenous regressors B1 in main equation
+Ho: B1=0 and orthogonality conditions are valid
+Anderson-Rubin Wald test           F(1,5688)=     17.24     P-val=0.0000
+Anderson-Rubin Wald test           Chi-sq(1)=     17.24     P-val=0.0000
+Stock-Wright LM S statistic        Chi-sq(1)=     18.32     P-val=0.0000
+
+NB: Underidentification, weak identification and weak-identification-robust
+    test statistics cluster-robust
+
+Number of clusters             N_clust  =       5689
+Number of observations               N  =      96591
+Number of regressors                 K  =         17
+Number of endogenous regressors      K1 =          1
+Number of instruments                L  =         17
+Number of excluded instruments       L1 =          1
+
+IV (2SLS) estimation
+--------------------
+
+Estimates efficient for homoskedasticity only
+Statistics robust to heteroskedasticity and clustering on objectid
+
+Number of clusters (objectid) =   5689                Number of obs =    96591
+                                                      F( 17,  5688) =    10.87
+                                                      Prob > F      =   0.0000
+Total (centered) SS     =  2512.033049                Centered R2   =  -0.5081
+Total (uncentered) SS   =  2512.033049                Uncentered R2 =  -0.5081
+Residual SS             =  3788.362167                Root MSE      =    .2041
+
+------------------------------------------------------------------------------
+             |               Robust
+ucdp_death~t | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+llnlight01~t |  -.2931316   .0848165    -3.46   0.001     -.459369   -.1268943
+      Iyear1 |   .0571301   .0139031     4.11   0.000     .0298805    .0843796
+      Iyear2 |  -.0719871   .0199655    -3.61   0.000    -.1111187   -.0328554
+      Iyear3 |   .0496888   .0178446     2.78   0.005     .0147139    .0846636
+      Iyear4 |   .0584275   .0171679     3.40   0.001      .024779     .092076
+      Iyear5 |   .0258154   .0037327     6.92   0.000     .0184995    .0331314
+      Iyear6 |   .0339741   .0060435     5.62   0.000      .022129    .0458192
+      Iyear7 |   .0341996    .005533     6.18   0.000     .0233551    .0450441
+      Iyear8 |   .0100926   .0037465     2.69   0.007     .0027495    .0174356
+      Iyear9 |   .0888318   .0193818     4.58   0.000     .0508441    .1268194
+     Iyear10 |   .0875773   .0195214     4.49   0.000     .0493161    .1258386
+     Iyear11 |  -.0166849   .0088815    -1.88   0.060    -.0340924    .0007225
+     Iyear12 |   -.000206   .0037316    -0.06   0.956    -.0075197    .0071077
+     Iyear13 |  -.0019693   .0036307    -0.54   0.588    -.0090853    .0051467
+     Iyear14 |   .0273638   .0070506     3.88   0.000     .0135448    .0411827
+     Iyear15 |   .0618618   .0153748     4.02   0.000     .0317278    .0919958
+     Iyear16 |   .0390875   .0092247     4.24   0.000     .0210074    .0571676
+     Iyear17 |          0  (omitted)
+------------------------------------------------------------------------------
+Underidentification test (Kleibergen-Paap rk LM statistic):             39.982
+                                                   Chi-sq(1) P-val =    0.0000
+------------------------------------------------------------------------------
+Weak identification test (Cragg-Donald Wald F statistic):               40.648
+                         (Kleibergen-Paap rk Wald F statistic):         40.332
+Stock-Yogo weak ID test critical values: 10% maximal IV size             16.38
+                                         15% maximal IV size              8.96
+                                         20% maximal IV size              6.66
+                                         25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+------------------------------------------------------------------------------
+Hansen J statistic (overidentification test of all instruments):         0.000
+                                                 (equation exactly identified)
+------------------------------------------------------------------------------
+Instrumented:         llnlight01_dt
+Included instruments: Iyear1 Iyear2 Iyear3 Iyear4 Iyear5 Iyear6 Iyear7 Iyear8
+                      Iyear9 Iyear10 Iyear11 Iyear12 Iyear13 Iyear14 Iyear15
+                      Iyear16
+Excluded instruments: l2meanpdsi_dt
+Dropped collinear:    Iyear17
+------------------------------------------------------------------------------
+
+. display _n "First-stage F-stat (Drought): " e(widstat)
+
+First-stage F-stat (Drought): 40.332128
+
+. 
+. // First-stage with Both instruments
+. display _n "--- First Stage: Both instruments -> Light(t-1) ---"
+
+--- First Stage: Both instruments -> Light(t-1) ---
+
+. eststo fs3: xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_dt l2lnrai
+> n01_dt) Iyear*, fe robust cluster(objectid) first
+Warning - collinearities detected
+Vars dropped:       Iyear17
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+Warning - collinearities detected
+Vars dropped:  Iyear17
+
+First-stage regressions
+-----------------------
+
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+
+First-stage regression of llnlight01_dt:
+
+Statistics robust to heteroskedasticity and clustering on objectid
+Number of obs =                  96591
+Number of clusters (objectid) =   5689
+------------------------------------------------------------------------------
+             |               Robust
+llnlight01~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+l2meanpdsi~t |   .0046142   .0009215     5.01   0.000     .0028081    .0064203
+l2lnrain01~t |   .0231511   .0075003     3.09   0.002     .0084506    .0378515
+      Iyear1 |   .1624512   .0072044    22.55   0.000     .1483307    .1765717
+      Iyear2 |  -.2291742   .0096265   -23.81   0.000     -.248042   -.2103063
+      Iyear3 |   .2113099   .0066896    31.59   0.000     .1981984    .2244214
+      Iyear4 |   .2011767   .0068264    29.47   0.000      .187797    .2145565
+      Iyear5 |  -.0130269   .0075358    -1.73   0.084     -.027797    .0017432
+      Iyear6 |   .0501433   .0078196     6.41   0.000     .0348168    .0654697
+      Iyear7 |   .0476971   .0082704     5.77   0.000     .0314873    .0639069
+      Iyear8 |   -.005346   .0080194    -0.67   0.505    -.0210639    .0103719
+      Iyear9 |   .2265218   .0090565    25.01   0.000     .2087711    .2442726
+     Iyear10 |   .2299452   .0087585    26.25   0.000     .2127786    .2471117
+     Iyear11 |  -.0897874   .0081099   -11.07   0.000    -.1056827   -.0738921
+     Iyear12 |  -.0027209   .0084898    -0.32   0.749    -.0193609    .0139191
+     Iyear13 |  -.0074102    .008139    -0.91   0.363    -.0233626    .0085422
+     Iyear14 |   .0741982   .0084486     8.78   0.000     .0576389    .0907574
+     Iyear15 |   .1773088   .0073862    24.01   0.000      .162832    .1917856
+     Iyear16 |   .1024814    .006114    16.76   0.000     .0904981    .1144647
+     Iyear17 |          0  (omitted)
+------------------------------------------------------------------------------
+F test of excluded instruments:
+  F(  2,  5688) =    25.32
+  Prob > F      =   0.0000
+Sanderson-Windmeijer multivariate F test of excluded instruments:
+  F(  2,  5688) =    25.32
+  Prob > F      =   0.0000
+
+
+
+Summary results for first-stage regressions
+-------------------------------------------
+
+                                           (Underid)            (Weak id)
+Variable     | F(  2,  5688)  P-val | SW Chi-sq(  2) P-val | SW F(  2,  5688)
+llnlight01_d |      25.32    0.0000 |       50.66   0.0000 |       25.32
+
+NB: first-stage test statistics cluster-robust
+
+Stock-Yogo weak ID F test critical values for single endogenous regressor:
+                                   10% maximal IV size             19.93
+                                   15% maximal IV size             11.59
+                                   20% maximal IV size              8.75
+                                   25% maximal IV size              7.25
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for i.i.d. errors only.
+
+Underidentification test
+Ho: matrix of reduced form coefficients has rank=K1-1 (underidentified)
+Ha: matrix has rank=K1 (identified)
+Kleibergen-Paap rk LM statistic          Chi-sq(2)=50.68    P-val=0.0000
+
+Weak identification test
+Ho: equation is weakly identified
+Cragg-Donald Wald F statistic                                      24.76
+Kleibergen-Paap Wald rk F statistic                                25.32
+
+Stock-Yogo weak ID test critical values for K1=1 and L1=2:
+                                   10% maximal IV size             19.93
+                                   15% maximal IV size             11.59
+                                   20% maximal IV size              8.75
+                                   25% maximal IV size              7.25
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+
+Weak-instrument-robust inference
+Tests of joint significance of endogenous regressors B1 in main equation
+Ho: B1=0 and orthogonality conditions are valid
+Anderson-Rubin Wald test           F(2,5688)=     11.23     P-val=0.0000
+Anderson-Rubin Wald test           Chi-sq(2)=     22.46     P-val=0.0000
+Stock-Wright LM S statistic        Chi-sq(2)=     23.38     P-val=0.0000
+
+NB: Underidentification, weak identification and weak-identification-robust
+    test statistics cluster-robust
+
+Number of clusters             N_clust  =       5689
+Number of observations               N  =      96591
+Number of regressors                 K  =         17
+Number of endogenous regressors      K1 =          1
+Number of instruments                L  =         18
+Number of excluded instruments       L1 =          2
+
+IV (2SLS) estimation
+--------------------
+
+Estimates efficient for homoskedasticity only
+Statistics robust to heteroskedasticity and clustering on objectid
+
+Number of clusters (objectid) =   5689                Number of obs =    96591
+                                                      F( 17,  5688) =    10.88
+                                                      Prob > F      =   0.0000
+Total (centered) SS     =  2512.033049                Centered R2   =  -0.5193
+Total (uncentered) SS   =  2512.033049                Uncentered R2 =  -0.5193
+Residual SS             =  3816.486116                Root MSE      =    .2049
+
+------------------------------------------------------------------------------
+             |               Robust
+ucdp_death~t | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+llnlight01~t |  -.2963267   .0755672    -3.92   0.000    -.4444357   -.1482177
+      Iyear1 |    .057644   .0125288     4.60   0.000     .0330879    .0822001
+      Iyear2 |  -.0727271   .0178633    -4.07   0.000    -.1077386   -.0377156
+      Iyear3 |   .0503517   .0158858     3.17   0.002      .019216    .0814873
+      Iyear4 |   .0590708   .0154049     3.83   0.000     .0288777     .089264
+      Iyear5 |   .0258022   .0037411     6.90   0.000     .0184698    .0331347
+      Iyear6 |   .0341499   .0056678     6.03   0.000     .0230413    .0452585
+      Iyear7 |   .0343588    .005235     6.56   0.000     .0240983    .0446193
+      Iyear8 |   .0100849    .003764     2.68   0.007     .0027076    .0174622
+      Iyear9 |   .0895464   .0173613     5.16   0.000     .0555188    .1235739
+     Iyear10 |   .0883033   .0174895     5.05   0.000     .0540245    .1225821
+     Iyear11 |  -.0169842   .0081401    -2.09   0.037    -.0329384     -.00103
+     Iyear12 |  -.0002011    .003751    -0.05   0.957    -.0075529    .0071508
+     Iyear13 |  -.0019911   .0036369    -0.55   0.584    -.0091193    .0051371
+     Iyear14 |   .0275889   .0065209     4.23   0.000     .0148082    .0403697
+     Iyear15 |   .0624306    .013838     4.51   0.000     .0353086    .0895525
+     Iyear16 |   .0394215   .0083195     4.74   0.000     .0231156    .0557275
+     Iyear17 |          0  (omitted)
+------------------------------------------------------------------------------
+Underidentification test (Kleibergen-Paap rk LM statistic):             50.681
+                                                   Chi-sq(2) P-val =    0.0000
+------------------------------------------------------------------------------
+Weak identification test (Cragg-Donald Wald F statistic):               24.763
+                         (Kleibergen-Paap rk Wald F statistic):         25.319
+Stock-Yogo weak ID test critical values: 10% maximal IV size             19.93
+                                         15% maximal IV size             11.59
+                                         20% maximal IV size              8.75
+                                         25% maximal IV size              7.25
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+------------------------------------------------------------------------------
+Hansen J statistic (overidentification test of all instruments):         0.007
+                                                   Chi-sq(1) P-val =    0.9319
+------------------------------------------------------------------------------
+Instrumented:         llnlight01_dt
+Included instruments: Iyear1 Iyear2 Iyear3 Iyear4 Iyear5 Iyear6 Iyear7 Iyear8
+                      Iyear9 Iyear10 Iyear11 Iyear12 Iyear13 Iyear14 Iyear15
+                      Iyear16
+Excluded instruments: l2meanpdsi_dt l2lnrain01_dt
+Dropped collinear:    Iyear17
+------------------------------------------------------------------------------
+
+. display _n "First-stage F-stat (Both): " e(widstat)
+
+First-stage F-stat (Both): 25.318906
+
+. display _n "Hansen J statistic: " e(j)
+
+Hansen J statistic: .0073071
+
+. display _n "Hansen J p-value: " e(jp)
+
+Hansen J p-value: .93187856
+
+. 
+. // Display IV diagnostics summary
+. display _n "=== IV DIAGNOSTICS SUMMARY ==="
+
+=== IV DIAGNOSTICS SUMMARY ===
+
+. display "Stock-Yogo 10% critical value (1 endogenous, 1 instrument): 16.38"
+Stock-Yogo 10% critical value (1 endogenous, 1 instrument): 16.38
+
+. display "Stock-Yogo 10% critical value (1 endogenous, 2 instruments): 19.93"
+Stock-Yogo 10% critical value (1 endogenous, 2 instruments): 19.93
+
+. 
+. eststo clear
+
+. 
+. 
+. // ── 6. Visualizations ─────────────────────────────────────────────────────
+> ──
+. 
+. display _n "=== Section 6: Visualizations ==="
+
+=== Section 6: Visualizations ===
+
+. 
+. // --- Figure 1: OLS vs 2SLS Coefficient Comparison (Conflict 1+) ---
+. display _n "--- Figure 1: OLS vs 2SLS Coefficient Comparison ---"
+
+--- Figure 1: OLS vs 2SLS Coefficient Comparison ---
+
+. 
+. // Re-estimate to capture scalars
+. quietly xtreg ucdp_death_dummy_dt llnlight01_dt Iyear*, fe robust cluster(obj
+> ectid)
+
+. local ols_b1 = _b[llnlight01_dt]
+
+. local ols_se1 = _se[llnlight01_dt]
+
+. 
+. quietly xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2lnrain01_dt) Iyear*, fe
+>  robust cluster(objectid)
+
+. local iv_rain_b = _b[llnlight01_dt]
+
+. local iv_rain_se = _se[llnlight01_dt]
+
+. 
+. quietly xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_dt) Iyear*, fe
+>  robust cluster(objectid)
+
+. local iv_drought_b = _b[llnlight01_dt]
+
+. local iv_drought_se = _se[llnlight01_dt]
+
+. 
+. quietly xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_dt l2lnrain01_
+> dt) Iyear*, fe robust cluster(objectid)
+
+. local iv_both_b = _b[llnlight01_dt]
+
+. local iv_both_se = _se[llnlight01_dt]
+
+. 
+. // Build coefficient plot data
+. preserve
+
+.     clear
+
+.     set obs 4
+Number of observations (_N) was 0, now 4.
+
+.     generate method = ""
+(4 missing values generated)
+
+.     generate coef = .
+(4 missing values generated)
+
+.     generate se = .
+(4 missing values generated)
+
+.     generate ci_lo = .
+(4 missing values generated)
+
+.     generate ci_hi = .
+(4 missing values generated)
+
+.     generate xpos = _n
+
+. 
+.     replace method = "OLS"           in 1
+variable method was str1 now str3
+(1 real change made)
+
+.     replace coef = `ols_b1'          in 1
+(1 real change made)
+
+.     replace se = `ols_se1'           in 1
+(1 real change made)
+
+. 
+.     replace method = "2SLS: Rain"    in 2
+variable method was str3 now str10
+(1 real change made)
+
+.     replace coef = `iv_rain_b'       in 2
+(1 real change made)
+
+.     replace se = `iv_rain_se'        in 2
+(1 real change made)
+
+. 
+.     replace method = "2SLS: Drought" in 3
+variable method was str10 now str13
+(1 real change made)
+
+.     replace coef = `iv_drought_b'    in 3
+(1 real change made)
+
+.     replace se = `iv_drought_se'     in 3
+(1 real change made)
+
+. 
+.     replace method = "2SLS: Both"    in 4
+(1 real change made)
+
+.     replace coef = `iv_both_b'       in 4
+(1 real change made)
+
+.     replace se = `iv_both_se'        in 4
+(1 real change made)
+
+. 
+.     replace ci_lo = coef - 1.96 * se
+(4 real changes made)
+
+.     replace ci_hi = coef + 1.96 * se
+(4 real changes made)
+
+. 
+.     // Export for CSV
+.     export delimited using "coef_comparison_conflict01.csv", replace
+(file coef_comparison_conflict01.csv not found)
+file coef_comparison_conflict01.csv saved
+
+. 
+.     // Plot
+.     twoway (bar coef xpos if xpos == 1, barwidth(0.6) color("`steel_blue'") f
+> intensity(80)) ///
+>            (bar coef xpos if xpos > 1, barwidth(0.6) color("`warm_orange'") f
+> intensity(80)) ///
+>            (rcap ci_hi ci_lo xpos, lcolor("`near_black'") lwidth(medthick)) /
+> //
+>            , xlabel(1 "OLS" 2 "2SLS: Rain" 3 "2SLS: Drought" 4 "2SLS: Both", 
+> labsize(small)) ///
+>              ylabel(, format(%5.2f)) ///
+>              ytitle("Coefficient on Light(t-1)") ///
+>              title("OLS vs 2SLS: Effect of Economic Activity on Conflict (1+ 
+> deaths)") ///
+>              subtitle("95% confidence intervals shown") ///
+>              yline(0, lpattern(dash) lcolor(gs10)) ///
+>              legend(off) ///
+>              graphregion(color(white)) plotregion(color(white)) ///
+>              note("Source: Hodler & Raschky (2014). 96,591 region-year observ
+> ations, 5,689 regions.")
+
+.     graph export "stata_iv_panel_coef_comparison.png", replace width(2400)
+(file stata_iv_panel_coef_comparison.png not found)
+file stata_iv_panel_coef_comparison.png written in PNG format
+
+. restore
+
+. 
+. display _n "Figure 1 exported: stata_iv_panel_coef_comparison.png"
+
+Figure 1 exported: stata_iv_panel_coef_comparison.png
+
+. 
+. 
+. // --- Figure 2: Reduced-Form Evidence (Weather -> Conflict) ---
+. display _n "--- Figure 2: Reduced-Form Coefficients ---"
+
+--- Figure 2: Reduced-Form Coefficients ---
+
+. 
+. // Reduced-form coefficients for both conflict measures
+. quietly xtreg ucdp_death_dummy_dt l2lnrain01_dt Iyear*, fe robust cluster(obj
+> ectid)
+
+. local rf_rain_c01 = _b[l2lnrain01_dt]
+
+. local rf_rain_se_c01 = _se[l2lnrain01_dt]
+
+. 
+. quietly xtreg ucdp_death_dummy_dt l2meanpdsi_dt Iyear*, fe robust cluster(obj
+> ectid)
+
+. local rf_drought_c01 = _b[l2meanpdsi_dt]
+
+. local rf_drought_se_c01 = _se[l2meanpdsi_dt]
+
+. 
+. quietly xtreg ucdp_25death_dummy_dt l2lnrain01_dt Iyear*, fe robust cluster(o
+> bjectid)
+
+. local rf_rain_c25 = _b[l2lnrain01_dt]
+
+. local rf_rain_se_c25 = _se[l2lnrain01_dt]
+
+. 
+. quietly xtreg ucdp_25death_dummy_dt l2meanpdsi_dt Iyear*, fe robust cluster(o
+> bjectid)
+
+. local rf_drought_c25 = _b[l2meanpdsi_dt]
+
+. local rf_drought_se_c25 = _se[l2meanpdsi_dt]
+
+. 
+. preserve
+
+.     clear
+
+.     set obs 4
+Number of observations (_N) was 0, now 4.
+
+.     generate str30 instrument = ""
+(4 missing values generated)
+
+.     generate str30 outcome = ""
+(4 missing values generated)
+
+.     generate coef = .
+(4 missing values generated)
+
+.     generate se = .
+(4 missing values generated)
+
+.     generate ci_lo = .
+(4 missing values generated)
+
+.     generate ci_hi = .
+(4 missing values generated)
+
+.     generate xpos = .
+(4 missing values generated)
+
+. 
+.     replace instrument = "Rain(t-2)"    in 1
+(1 real change made)
+
+.     replace outcome = "Conflict 1+"     in 1
+(1 real change made)
+
+.     replace coef = `rf_rain_c01'        in 1
+(1 real change made)
+
+.     replace xpos = 1                    in 1
+(1 real change made)
+
+.     replace se = `rf_rain_se_c01'       in 1
+(1 real change made)
+
+. 
+.     replace instrument = "Drought(t-2)" in 2
+(1 real change made)
+
+.     replace outcome = "Conflict 1+"     in 2
+(1 real change made)
+
+.     replace coef = `rf_drought_c01'     in 2
+(1 real change made)
+
+.     replace xpos = 2                    in 2
+(1 real change made)
+
+.     replace se = `rf_drought_se_c01'    in 2
+(1 real change made)
+
+. 
+.     replace instrument = "Rain(t-2)"    in 3
+(1 real change made)
+
+.     replace outcome = "Conflict 25+"    in 3
+(1 real change made)
+
+.     replace coef = `rf_rain_c25'        in 3
+(1 real change made)
+
+.     replace xpos = 3.5                  in 3
+(1 real change made)
+
+.     replace se = `rf_rain_se_c25'       in 3
+(1 real change made)
+
+. 
+.     replace instrument = "Drought(t-2)" in 4
+(1 real change made)
+
+.     replace outcome = "Conflict 25+"    in 4
+(1 real change made)
+
+.     replace coef = `rf_drought_c25'     in 4
+(1 real change made)
+
+.     replace xpos = 4.5                  in 4
+(1 real change made)
+
+.     replace se = `rf_drought_se_c25'    in 4
+(1 real change made)
+
+. 
+.     replace ci_lo = coef - 1.96 * se
+(4 real changes made)
+
+.     replace ci_hi = coef + 1.96 * se
+(4 real changes made)
+
+. 
+.     export delimited using "reduced_form_coefficients.csv", replace
+(file reduced_form_coefficients.csv not found)
+file reduced_form_coefficients.csv saved
+
+. 
+.     twoway (bar coef xpos if instrument == "Rain(t-2)", barwidth(0.6) color("
+> `steel_blue'") fintensity(80)) ///
+>            (bar coef xpos if instrument == "Drought(t-2)", barwidth(0.6) colo
+> r("`warm_orange'") fintensity(80)) ///
+>            (rcap ci_hi ci_lo xpos, lcolor("`near_black'") lwidth(medthick)) /
+> //
+>            , xlabel(1 `" "Rain" "(1+ deaths)" "' 2 `" "Drought" "(1+ deaths)"
+>  "' 3.5 `" "Rain" "(25+ deaths)" "' 4.5 `" "Drought" "(25+ deaths)" "', labsi
+> ze(small)) ///
+>              ylabel(, format(%6.4f)) ///
+>              ytitle("Reduced-Form Coefficient") ///
+>              title("Reduced-Form Evidence: Weather Shocks and Conflict") ///
+>              subtitle("Direct effect of instruments on conflict outcomes") //
+> /
+>              yline(0, lpattern(dash) lcolor(gs10)) ///
+>              legend(order(1 "Rain(t-2)" 2 "Drought(t-2)") rows(1) position(6)
+> ) ///
+>              graphregion(color(white)) plotregion(color(white)) ///
+>              note("All coefficients are negative: higher rainfall / lower dro
+> ught -> less conflict." ///
+>                   "95% confidence intervals. Clustered standard errors at reg
+> ional level.")
+
+.     graph export "stata_iv_panel_reduced_form.png", replace width(2400)
+(file stata_iv_panel_reduced_form.png not found)
+file stata_iv_panel_reduced_form.png written in PNG format
+
+. restore
+
+. 
+. display _n "Figure 2 exported: stata_iv_panel_reduced_form.png"
+
+Figure 2 exported: stata_iv_panel_reduced_form.png
+
+. 
+. 
+. // --- Figure 3: First-Stage Relationship (Weather -> Light) ---
+. display _n "--- Figure 3: First-Stage Binned Scatter ---"
+
+--- Figure 3: First-Stage Binned Scatter ---
+
+. 
+. // Binned scatter: rainfall residuals vs light residuals
+. // First partial out year FEs
+. quietly reg llnlight01_dt Iyear*
+
+. predict light_resid, residuals
+
+. quietly reg l2lnrain01_dt Iyear*
+
+. predict rain_resid, residuals
+
+. quietly reg l2meanpdsi_dt Iyear*
+
+. predict drought_resid, residuals
+
+. 
+. // Create binned scatter for rain -> light
+. preserve
+
+.     xtile rain_bin = rain_resid, nq(50)
+
+.     collapse (mean) light_resid rain_resid, by(rain_bin)
+
+. 
+.     twoway (scatter light_resid rain_resid, mcolor("`steel_blue'") msize(medi
+> um) msymbol(circle)) ///
+>            (lfit light_resid rain_resid, lcolor("`warm_orange'") lwidth(thick
+> )) ///
+>            , ytitle("Nighttime Light Intensity (residual)") ///
+>              xtitle("Rainfall (residual)") ///
+>              title("First Stage: Rainfall Predicts Economic Activity") ///
+>              subtitle("Binned scatter plot (50 bins), partialing out year fix
+> ed effects") ///
+>              legend(off) ///
+>              graphregion(color(white)) plotregion(color(white)) ///
+>              note("Positive slope: higher rainfall -> higher economic activit
+> y." ///
+>                   "Data: 96,591 region-year obs from 5,689 African regions, 1
+> 994-2010.")
+
+.     graph export "stata_iv_panel_first_stage_rain.png", replace width(2400)
+(file stata_iv_panel_first_stage_rain.png not found)
+file stata_iv_panel_first_stage_rain.png written in PNG format
+
+. restore
+
+. 
+. // Create binned scatter for drought -> light
+. preserve
+
+.     xtile drought_bin = drought_resid, nq(50)
+
+.     collapse (mean) light_resid drought_resid, by(drought_bin)
+
+. 
+.     twoway (scatter light_resid drought_resid, mcolor("`steel_blue'") msize(m
+> edium) msymbol(circle)) ///
+>            (lfit light_resid drought_resid, lcolor("`warm_orange'") lwidth(th
+> ick)) ///
+>            , ytitle("Nighttime Light Intensity (residual)") ///
+>              xtitle("Palmer Drought Severity Index (residual)") ///
+>              title("First Stage: Drought Intensity Predicts Economic Activity
+> ") ///
+>              subtitle("Binned scatter plot (50 bins), partialing out year fix
+> ed effects") ///
+>              legend(off) ///
+>              graphregion(color(white)) plotregion(color(white)) ///
+>              note("Positive slope: less drought (higher PDSI) -> higher econo
+> mic activity." ///
+>                   "Data: 96,591 region-year obs from 5,689 African regions, 1
+> 994-2010.")
+
+.     graph export "stata_iv_panel_first_stage_drought.png", replace width(2400
+> )
+(file stata_iv_panel_first_stage_drought.png not found)
+file stata_iv_panel_first_stage_drought.png written in PNG format
+
+. restore
+
+. 
+. drop light_resid rain_resid drought_resid
+
+. 
+. display _n "Figures 3a-3b exported: first-stage binned scatter plots"
+
+Figures 3a-3b exported: first-stage binned scatter plots
+
+. 
+. 
+. // --- Figure 4: Conflict Prevalence Over Time ---
+. display _n "--- Figure 4: Conflict Prevalence Over Time ---"
+
+--- Figure 4: Conflict Prevalence Over Time ---
+
+. 
+. preserve
+
+.     collapse (mean) conflict01=ucdp_death_dummy conflict25=ucdp_25death_dummy
+> , by(year)
+
+.     // Scale to percentage
+.     replace conflict01 = conflict01 * 100
+(17 real changes made)
+
+.     replace conflict25 = conflict25 * 100
+(17 real changes made)
+
+. 
+.     export delimited using "conflict_prevalence_by_year.csv", replace
+(file conflict_prevalence_by_year.csv not found)
+file conflict_prevalence_by_year.csv saved
+
+. 
+.     twoway (connected conflict01 year, lcolor("`steel_blue'") mcolor("`steel_
+> blue'") lwidth(medthick) msymbol(circle)) ///
+>            (connected conflict25 year, lcolor("`warm_orange'") mcolor("`warm_
+> orange'") lwidth(medthick) msymbol(triangle)) ///
+>            , ytitle("Share of Regions with Conflict (%)") ///
+>              xtitle("Year") ///
+>              title("Prevalence of Regional Conflict in Africa, 1992-2010") //
+> /
+>              legend(order(1 "1+ deaths" 2 "25+ deaths") rows(1) position(6)) 
+> ///
+>              graphregion(color(white)) plotregion(color(white)) ///
+>              ylabel(0(2)10, format(%3.1f)) ///
+>              xlabel(1992(2)2010) ///
+>              note("Source: UCDP Georeferenced Event Dataset. 5,689 subnationa
+> l regions, 53 African countries.")
+
+.     graph export "stata_iv_panel_conflict_prevalence.png", replace width(2400
+> )
+(file stata_iv_panel_conflict_prevalence.png not found)
+file stata_iv_panel_conflict_prevalence.png written in PNG format
+
+. restore
+
+. 
+. display _n "Figure 4 exported: stata_iv_panel_conflict_prevalence.png"
+
+Figure 4 exported: stata_iv_panel_conflict_prevalence.png
+
+. 
+. 
+. // ── 7. Export Regression Tables as CSV ────────────────────────────────────
+> ──
+. 
+. display _n "=== Section 7: CSV Table Exports ==="
+
+=== Section 7: CSV Table Exports ===
+
+. 
+. // Re-estimate all models for Table 2 export
+. eststo clear
+
+. 
+. eststo t2m1: quietly xtreg ucdp_death_dummy_dt llnlight01_dt Iyear*, fe robus
+> t cluster(objectid)
+
+. eststo t2m2: quietly xtreg ucdp_death_dummy_dt l2lnrain01_dt Iyear*, fe robus
+> t cluster(objectid)
+
+. eststo t2m3: quietly xtreg ucdp_death_dummy_dt l2meanpdsi_dt Iyear*, fe robus
+> t cluster(objectid)
+
+. eststo t2m4: quietly xtreg ucdp_death_dummy_dt l2meanpdsi_dt l2lnrain01_dt Iy
+> ear*, fe robust cluster(objectid)
+
+. eststo t2m5: quietly xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2lnrain01_d
+> t) Iyear*, fe robust cluster(objectid)
+
+. eststo t2m6: quietly xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_d
+> t) Iyear*, fe robust cluster(objectid)
+
+. eststo t2m7: quietly xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_d
+> t l2lnrain01_dt) Iyear*, fe robust cluster(objectid)
+
+. 
+. #delimit ;
+delimiter now ;
+. esttab t2m1 t2m2 t2m3 t2m4 t2m5 t2m6 t2m7 using "table2_conflict01.csv",
+>     keep(llnlight01_dt l2lnrain01_dt l2meanpdsi_dt)
+>     se
+>     label
+>     stats(N N_g r2, fmt(0 0 3) label("Observations" "N Regions" "R-squared"))
+>     mtitles("OLS" "OLS" "OLS" "OLS" "2SLS-Rain" "2SLS-Drought" "2SLS-Both")
+>     star(* 0.10 ** 0.05 *** 0.01)
+>     b(%9.4f)
+>     csv
+>     replace ;
+(file table2_conflict01.csv not found)
+(output written to table2_conflict01.csv)
+
+. #delimit cr
+delimiter now cr
+. 
+. eststo clear
+
+. 
+. // Re-estimate all models for Table 3 export
+. eststo t3m1: quietly xtreg ucdp_25death_dummy_dt llnlight01_dt Iyear*, fe rob
+> ust cluster(objectid)
+
+. eststo t3m2: quietly xtreg ucdp_25death_dummy_dt l2lnrain01_dt Iyear*, fe rob
+> ust cluster(objectid)
+
+. eststo t3m3: quietly xtreg ucdp_25death_dummy_dt l2meanpdsi_dt Iyear*, fe rob
+> ust cluster(objectid)
+
+. eststo t3m4: quietly xtreg ucdp_25death_dummy_dt l2meanpdsi_dt l2lnrain01_dt 
+> Iyear*, fe robust cluster(objectid)
+
+. eststo t3m5: quietly xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2lnrain01
+> _dt) Iyear*, fe robust cluster(objectid)
+
+. eststo t3m6: quietly xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2meanpdsi
+> _dt) Iyear*, fe robust cluster(objectid)
+
+. eststo t3m7: quietly xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2meanpdsi
+> _dt l2lnrain01_dt) Iyear*, fe robust cluster(objectid)
+
+. 
+. #delimit ;
+delimiter now ;
+. esttab t3m1 t3m2 t3m3 t3m4 t3m5 t3m6 t3m7 using "table3_conflict25.csv",
+>     keep(llnlight01_dt l2lnrain01_dt l2meanpdsi_dt)
+>     se
+>     label
+>     stats(N N_g r2, fmt(0 0 3) label("Observations" "N Regions" "R-squared"))
+>     mtitles("OLS" "OLS" "OLS" "OLS" "2SLS-Rain" "2SLS-Drought" "2SLS-Both")
+>     star(* 0.10 ** 0.05 *** 0.01)
+>     b(%9.4f)
+>     csv
+>     replace ;
+(file table3_conflict25.csv not found)
+(output written to table3_conflict25.csv)
+
+. #delimit cr
+delimiter now cr
+. 
+. eststo clear
+
+. 
+. display _n "=== CSV table exports complete ==="
+
+=== CSV table exports complete ===
+
+. 
+. 
+. // ── 8. Summary ────────────────────────────────────────────────────────────
+> ──
+. 
+. display _n "============================================="
+
+=============================================
+
+. display    "=== ANALYSIS SUMMARY ==="
+=== ANALYSIS SUMMARY ===
+
+. display    "============================================="
+=============================================
+
+. display _n "Paper: Hodler & Raschky (2014, Economics Letters)"
+
+Paper: Hodler & Raschky (2014, Economics Letters)
+
+. display    "Topic: Economic shocks and civil conflict at the regional level"
+Topic: Economic shocks and civil conflict at the regional level
+
+. display    "Method: Panel FE with 2SLS/IV estimation"
+Method: Panel FE with 2SLS/IV estimation
+
+. display _n "Data: 96,591 region-year observations"
+
+Data: 96,591 region-year observations
+
+. display    "      5,689 subnational regions"
+      5,689 subnational regions
+
+. display    "      53 African countries"
+      53 African countries
+
+. display    "      Period: 1994-2010"
+      Period: 1994-2010
+
+. display _n "Key findings:"
+
+Key findings:
+
+. display    "  - OLS: Light(t-1) has near-zero, insignificant effect on confli
+> ct"
+  - OLS: Light(t-1) has near-zero, insignificant effect on conflict
+
+. display    "  - 2SLS: Light(t-1) coefficient ~ -0.30 for Conflict 1+ (p<0.01)
+> "
+  - 2SLS: Light(t-1) coefficient ~ -0.30 for Conflict 1+ (p<0.01)
+
+. display    "  - 2SLS: Light(t-1) coefficient ~ -0.09 for Conflict 25+ (p<0.05
+> )"
+  - 2SLS: Light(t-1) coefficient ~ -0.09 for Conflict 25+ (p<0.05)
+
+. display    "  - 10% drop in nightlights -> ~3pp increase in conflict risk"
+  - 10% drop in nightlights -> ~3pp increase in conflict risk
+
+. display    "  - First-stage F-stats exceed Stock-Yogo 10% critical value (16.
+> 38)"
+  - First-stage F-stats exceed Stock-Yogo 10% critical value (16.38)
+
+. display    "  - OLS-2SLS gap consistent with attenuation bias from measuremen
+> t error"
+  - OLS-2SLS gap consistent with attenuation bias from measurement error
+
+. display _n "Figures generated: 5 PNG files"
+
+Figures generated: 5 PNG files
+
+. display    "Tables generated:  5 CSV files"
+Tables generated:  5 CSV files
+
+. 
+. display _n(2) "=== Script completed successfully ==="
+
+
+=== Script completed successfully ===
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_iv_panel/analysis.log
+  log type:  text
+ closed on:  27 Apr 2026, 14:55:16
+-------------------------------------------------------------------------------

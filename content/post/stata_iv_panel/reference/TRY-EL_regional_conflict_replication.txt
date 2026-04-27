@@ -1,0 +1,1486 @@
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlos/Github/00-DS/hello-papers/Raschky-2014-Economic-shocks-and-civil-conflict-at-the-regional-level/TRY-EL_regional_conflict_replication.txt
+  log type:  text
+ opened on:   5 Sep 2022, 01:06:50
+
+. 
+. use  "EL_regional_conflict_replication", clear
+
+. tsset objectid year
+
+Panel variable: objectid (unbalanced)
+ Time variable: year, 1994 to 2010, but with gaps
+         Delta: 1 unit
+
+. 
+. ** Construct year-specific indicators
+. quietly tab year, gen(Iyear)
+
+. 
+. 
+. 
+. ** Table 1: Descriptive statistics
+. xtsum ucdp_death_dummy ucdp_25death_dummy llnlight01 l2lnrain01 l2meanpdsi
+
+Variable         |      Mean   Std. dev.       Min        Max |    Observations
+-----------------+--------------------------------------------+----------------
+ucdp_d~y overall |  .0455425   .2084919          0          1 |     N =   96591
+         between |             .1176404          0          1 |     n =    5689
+         within  |             .1721562  -.8956339    .986719 | T-bar = 16.9786
+                 |                                            |
+ucdp_2~y overall |  .0144527   .1193481          0          1 |     N =   96591
+         between |             .0575476          0   .9411765 |     n =    5689
+         within  |             .1045561  -.9267238   .9556292 | T-bar = 16.9786
+                 |                                            |
+llnli~01 overall | -1.611658   2.619427   -4.60517   4.143293 |     N =   96591
+         between |             2.568635   -4.60517   4.140281 |     n =    5689
+         within  |             .5277626  -7.699739   2.693339 | T-bar = 16.9786
+                 |                                            |
+l2lnr~01 overall |    3.8302   1.477743   -4.60517   6.093216 |     N =   96591
+         between |             1.493749   -4.60517   5.514849 |     n =    5689
+         within  |             .1993702  -2.741027   5.494656 | T-bar = 16.9786
+                 |                                            |
+l2mean~i overall | -1.215386   2.033711   -12.1292    12.6313 |     N =   96591
+         between |             1.064342  -6.024061   2.538623 |     n =    5689
+         within  |             1.733175  -8.565653   10.55658 | T-bar = 16.9786
+
+. sum   ucdp_death_dummy ucdp_25death_dummy llnlight01 l2lnrain01 l2meanpdsi
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+ucdp_death~y |     96,591    .0455425    .2084919          0          1
+ucdp_25dea~y |     96,591    .0144527    .1193481          0          1
+  llnlight01 |     96,591   -1.611658    2.619427   -4.60517   4.143293
+  l2lnrain01 |     96,591      3.8302    1.477743   -4.60517   6.093216
+  l2meanpdsi |     96,591   -1.215386    2.033711   -12.1292    12.6313
+
+. 
+. eststo clear
+
+. generate y = uniform()
+
+. qui reg y ucdp_death_dummy ucdp_25death_dummy llnlight01 l2lnrain01 l2meanpdsi, noconstant
+
+. qui estadd summ
+
+.     esttab, label cells("mean(fmt(%8.2f)) sd(fmt(%8.2f)) min(fmt(%8.2f)) max(fmt(%8.2f))") collabels("Mean" "Std. Dev." "Minimum" "Maximum") addnote("Notes: Samp
+> le period is 1994–2010.")  nogap nomtitle nonumber  noobs  
+
+------------------------------------------------------------------------
+                             Mean    Std. Dev.      Minimum      Maximum
+------------------------------------------------------------------------
+Conflict (>1 deaths)         0.05         0.21         0.00         1.00
+Conflict (>25 deat~)         0.01         0.12         0.00         1.00
+Ln Lights(t-1)              -1.61         2.62        -4.61         4.14
+Ln Rain(t-2)                 3.83         1.48        -4.61         6.09
+(Non) Drought(t-2)          -1.22         2.03       -12.13        12.63
+------------------------------------------------------------------------
+Notes: Sample period is 1994–2010.
+
+. eststo clear
+
+. 
+. ** [Using estout] Table 2 (and Table 4):  Effects on regional conflicts with one or more conflict-related fatalities (first-stage results)
+. eststo clear
+
+. 
+. eststo mod1: qui xtreg ucdp_death_dummy_dt llnlight01_dt Iyear*, fe robust cluster(objectid)
+
+. qui estadd local FE_region    "Yes", replace
+
+. qui estadd local Trend_region "Yes", replace  
+
+. qui estadd local FE_year      "Yes", replace
+
+. qui estadd local Instrument   "None" , replace
+
+. 
+. 
+. eststo mod2: qui xtreg ucdp_death_dummy_dt l2lnrain01_dt Iyear*, fe robust cluster(objectid)
+
+. qui estadd local FE_region    "Yes", replace
+
+. qui estadd local Trend_region "Yes", replace  
+
+. qui estadd local FE_year      "Yes", replace
+
+. qui estadd local Instrument   "None" , replace
+
+. 
+. eststo mod3: qui xtreg ucdp_death_dummy_dt l2meanpdsi_dt Iyear*, fe robust cluster(objectid)
+
+. qui estadd local FE_region    "Yes", replace
+
+. qui estadd local Trend_region "Yes", replace  
+
+. qui estadd local FE_year      "Yes", replace
+
+. qui estadd local Instrument   "None" , replace
+
+. 
+. eststo mod4: qui xtreg ucdp_death_dummy_dt l2meanpdsi_dt l2lnrain01_dt Iyear*, fe robust cluster(objectid)
+
+. qui estadd local FE_region    "Yes", replace
+
+. qui estadd local Trend_region "Yes", replace  
+
+. qui estadd local FE_year      "Yes", replace
+
+. qui estadd local Instrument   "None" , replace
+
+. 
+. eststo mod5: qui xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2lnrain01_dt) Iyear*, fe robust cluster(objectid) first /*Includes First Stage Estimates for Table 
+> 4, Column (1)*/
+
+. qui estadd local FE_region    "Yes", replace
+
+. qui estadd local Trend_region "Yes", replace  
+
+. qui estadd local FE_year      "Yes", replace
+
+. qui estadd local Instrument   "Rain(t-2)" , replace
+
+. 
+. eststo mod6: qui xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_dt) Iyear*, fe robust cluster(objectid) first /*Includes First Stage Estimates for Table 
+> 4, Column (1)*/
+
+. qui estadd local FE_region    "Yes", replace
+
+. qui estadd local Trend_region "Yes", replace  
+
+. qui estadd local FE_year      "Yes", replace
+
+. qui estadd local Instrument   "Drought(t-2)" , replace
+
+. 
+. eststo mod7: qui xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_dt l2lnrain01_dt) Iyear*, fe robust cluster(objectid) first /*Includes First Stage Estima
+> tes for Table 4, Column (1)*/
+
+. qui estadd local FE_region    "Yes", replace
+
+. qui estadd local Trend_region "Yes", replace  
+
+. qui estadd local FE_year      "Yes", replace
+
+. qui estadd local Instrument   "Both" , replace
+
+. 
+. #delimit;
+delimiter now ;
+.     esttab mod1 mod2 mod3 mod4 mod5 mod6 mod7,
+>     keep(llnlight01_dt l2lnrain01_dt l2meanpdsi_dt)
+>     se
+>     label 
+>     stats(N N_g r2 FE_region Trend_region FE_year Instrument, 
+>         fmt(0 0 2)
+>         label("Observations" "N Regions" "R-squared" "Region FE" "Region trend" "Year FE" "Instrument"))
+>     mtitles("OLS" "OLS" "OLS" "OLS" "2SLS" "2SLS" "2SLS") 
+>     nonotes
+>     addnote("Notes: Sample period is 1994–2010. Standard errors are adjusted for clustering at the level of administrative regions." 
+>             "This is a second line below. Standard errors in parentheses"
+>             "* p<0.10, ** p<0.05, *** p<0.01")
+>     star(* 0.10 ** 0.05 *** 0.01)  
+>     b(%7.3f)
+>     compress
+>     replace;
+
+-----------------------------------------------------------------------------------------------------------
+                       (1)          (2)          (3)          (4)          (5)          (6)          (7)   
+                       OLS          OLS          OLS          OLS         2SLS         2SLS         2SLS   
+-----------------------------------------------------------------------------------------------------------
+Ln Lights(t-1)       0.001                                              -0.303***    -0.293***    -0.296***
+                   (0.001)                                             (0.111)      (0.085)      (0.076)   
+
+Ln Rain(t-2)                     -0.011***                 -0.007*                                         
+                                (0.003)                   (0.004)                                          
+
+(Non) Drought~2)                              -0.002***    -0.001***                                       
+                                             (0.000)      (0.000)                                          
+-----------------------------------------------------------------------------------------------------------
+Observations         96591        96591        96591        96591        96591        96591        96591   
+N Regions             5689         5689         5689         5689         5689         5689         5689   
+R-squared             0.00         0.00         0.00         0.00        -0.54        -0.51        -0.52   
+Region FE              Yes          Yes          Yes          Yes          Yes          Yes          Yes   
+Region trend           Yes          Yes          Yes          Yes          Yes          Yes          Yes   
+Year FE                Yes          Yes          Yes          Yes          Yes          Yes          Yes   
+Instrument            None         None         None         None    Rain(t-2)    Drought(t-2)         Both   
+-----------------------------------------------------------------------------------------------------------
+Notes: Sample period is 1994–2010. Standard errors are adjusted for clustering at the level of administrative regions.
+This is a second line below. Standard errors in parentheses
+* p<0.10, ** p<0.05, *** p<0.01
+
+. #delimit cr
+delimiter now cr
+. 
+. eststo clear
+
+. 
+. 
+. ** [Using estout]  Table 3: Effects on regional conflicts with 25 or more conflict-related fatalities
+. eststo clear
+
+. 
+. eststo: qui xtreg ucdp_25death_dummy_dt llnlight01_dt Iyear*, fe robust cluster(objectid)
+(est1 stored)
+
+. eststo: qui xtreg ucdp_25death_dummy_dt l2lnrain01_dt Iyear*, fe robust cluster(objectid)
+(est2 stored)
+
+. eststo: qui xtreg ucdp_25death_dummy_dt l2meanpdsi_dt Iyear*, fe robust cluster(objectid)
+(est3 stored)
+
+. eststo: qui xtreg ucdp_25death_dummy_dt l2meanpdsi_dt l2lnrain01_dt Iyear*, fe robust cluster(objectid)
+(est4 stored)
+
+. eststo: qui xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2lnrain01_dt) Iyear*, fe robust cluster(objectid)
+(est5 stored)
+
+. eststo: qui xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2meanpdsi_dt) Iyear*, fe robust cluster(objectid)
+(est6 stored)
+
+. eststo: qui xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2meanpdsi_dt l2lnrain01_dt) Iyear*, fe robust cluster(objectid)
+(est7 stored)
+
+. 
+. esttab, se stats(N N_g r2) star(* 0.10 ** 0.05 *** 0.01) drop(Iyear*) b(%7.3f)  replace
+
+----------------------------------------------------------------------------------------------------------------------------
+                      (1)             (2)             (3)             (4)             (5)             (6)             (7)   
+             ucdp_25dea~t    ucdp_25dea~t    ucdp_25dea~t    ucdp_25dea~t    ucdp_25dea~t    ucdp_25dea~t    ucdp_25dea~t   
+----------------------------------------------------------------------------------------------------------------------------
+llnlight01~t        0.001                                                          -0.092          -0.093**        -0.093** 
+                  (0.001)                                                         (0.057)         (0.046)         (0.040)   
+
+l2lnrain01~t                       -0.003*                         -0.002                                                   
+                                  (0.002)                         (0.002)                                                   
+
+l2meanpdsi~t                                       -0.001**        -0.000*                                                  
+                                                  (0.000)         (0.000)                                                   
+
+_cons               0.000          -0.000          -0.000          -0.000                                                   
+                  (0.001)         (0.001)         (0.001)         (0.001)                                                   
+----------------------------------------------------------------------------------------------------------------------------
+N                 9.7e+04         9.7e+04         9.7e+04         9.7e+04         9.7e+04         9.7e+04         9.7e+04   
+N_g              5689.000        5689.000        5689.000        5689.000        5689.000        5689.000        5689.000   
+r2                  0.002           0.002           0.002           0.002          -0.135          -0.140          -0.139   
+----------------------------------------------------------------------------------------------------------------------------
+Standard errors in parentheses
+* p<0.10, ** p<0.05, *** p<0.01
+
+. eststo clear
+
+. 
+. 
+. 
+. ** Table 2 (and Table 4):  Effects on regional conflicts with one or more conflict-related fatalities (first-stage results)
+. xtreg ucdp_death_dummy_dt llnlight01_dt Iyear*, fe robust cluster(objectid)
+note: Iyear17 omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =     96,591
+Group variable: objectid                        Number of groups  =      5,689
+
+R-squared:                                      Obs per group:
+     Within  = 0.0041                                         min =         16
+     Between = 0.0003                                         avg =       17.0
+     Overall = 0.0041                                         max =         17
+
+                                                F(17,5688)        =      16.27
+corr(u_i, Xb) = -0.0157                         Prob > F          =     0.0000
+
+                            (Std. err. adjusted for 5,689 clusters in objectid)
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_death_~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+llnlight01_dt |   .0007773   .0011548     0.67   0.501    -.0014866    .0030411
+       Iyear1 |   .0098546   .0025747     3.83   0.000     .0048072     .014902
+       Iyear2 |  -.0039111   .0024525    -1.59   0.111    -.0087189    .0008967
+       Iyear3 |   -.011292   .0025586    -4.41   0.000    -.0163077   -.0062763
+       Iyear4 |  -.0007491   .0026027    -0.29   0.774    -.0058513    .0043532
+       Iyear5 |   .0270318   .0030461     8.87   0.000     .0210604    .0330033
+       Iyear6 |   .0178043   .0030043     5.93   0.000     .0119148    .0236939
+       Iyear7 |   .0195577   .0031184     6.27   0.000     .0134444    .0256709
+       Iyear8 |   .0108009   .0029524     3.66   0.000     .0050131    .0165887
+       Iyear9 |   .0230969    .003226     7.16   0.000     .0167728     .029421
+      Iyear10 |   .0208005   .0033095     6.29   0.000     .0143125    .0272884
+      Iyear11 |   .0108463   .0029893     3.63   0.000      .004986    .0167065
+      Iyear12 |  -.0006618   .0027547    -0.24   0.810    -.0060621    .0047385
+      Iyear13 |   .0000393   .0026518     0.01   0.988    -.0051593    .0052379
+      Iyear14 |   .0066503   .0027839     2.39   0.017     .0011929    .0121077
+      Iyear15 |   .0095464   .0026833     3.56   0.000     .0042862    .0148066
+      Iyear16 |   .0083646   .0024238     3.45   0.001     .0036131    .0131161
+      Iyear17 |          0  (omitted)
+        _cons |  -.0086698   .0017172    -5.05   0.000    -.0120362   -.0053033
+--------------+----------------------------------------------------------------
+      sigma_u |  .00016605
+      sigma_e |  .16591413
+          rho |  1.002e-06   (fraction of variance due to u_i)
+-------------------------------------------------------------------------------
+
+. outreg2 using table2_regconf_140710.tex, replace tex se drop(Iyear*) addtext(Dependant, ucdp_death_dummy, Year and region fixed effects, Yes, Regional time trend
+> s, Yes, Instrumental variables, None) 
+table2_regconf_140710.tex
+dir : seeout
+
+. 
+. xtreg ucdp_death_dummy_dt l2lnrain01_dt Iyear*, fe robust cluster(objectid)
+note: Iyear17 omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =     96,591
+Group variable: objectid                        Number of groups  =      5,689
+
+R-squared:                                      Obs per group:
+     Within  = 0.0042                                         min =         16
+     Between = 0.0003                                         avg =       17.0
+     Overall = 0.0042                                         max =         17
+
+                                                F(17,5688)        =      16.30
+corr(u_i, Xb) = -0.0163                         Prob > F          =     0.0000
+
+                            (Std. err. adjusted for 5,689 clusters in objectid)
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_death_~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+l2lnrain01_dt |  -.0109408   .0033706    -3.25   0.001    -.0175485   -.0043332
+       Iyear1 |   .0095947   .0025582     3.75   0.000     .0045795    .0146098
+       Iyear2 |  -.0045788   .0024333    -1.88   0.060    -.0093491    .0001915
+       Iyear3 |   -.011543   .0025452    -4.54   0.000    -.0165326   -.0065534
+       Iyear4 |  -.0005413    .002579    -0.21   0.834    -.0055972    .0045146
+       Iyear5 |    .028101   .0030797     9.12   0.000     .0220637    .0341383
+       Iyear6 |   .0188377   .0030366     6.20   0.000     .0128848    .0247905
+       Iyear7 |   .0192245   .0031206     6.16   0.000     .0131069    .0253421
+       Iyear8 |   .0115244   .0029574     3.90   0.000     .0057268    .0173221
+       Iyear9 |   .0221696   .0032043     6.92   0.000      .015888    .0284511
+      Iyear10 |   .0204616   .0032758     6.25   0.000     .0140399    .0268834
+      Iyear11 |   .0105839   .0029945     3.53   0.000     .0047135    .0164543
+      Iyear12 |    .000025   .0027603     0.01   0.993    -.0053863    .0054363
+      Iyear13 |   .0003008    .002653     0.11   0.910    -.0049001    .0055017
+      Iyear14 |   .0055237   .0028023     1.97   0.049     .0000301    .0110173
+      Iyear15 |   .0098277   .0026678     3.68   0.000     .0045978    .0150576
+      Iyear16 |   .0086247   .0024173     3.57   0.000     .0038858    .0133636
+      Iyear17 |          0  (omitted)
+        _cons |  -.0086894   .0017118    -5.08   0.000    -.0120452   -.0053336
+--------------+----------------------------------------------------------------
+      sigma_u |  .00017554
+      sigma_e |  .16590235
+          rho |  1.120e-06   (fraction of variance due to u_i)
+-------------------------------------------------------------------------------
+
+. outreg2 using table2_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_death_dummy, Year and region fixed effects, Yes, Regional time trends
+> , Yes, Instrumental variables, None)
+table2_regconf_140710.tex
+dir : seeout
+
+. 
+. xtreg ucdp_death_dummy_dt l2meanpdsi_dt Iyear*, fe robust cluster(objectid)
+note: Iyear17 omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =     96,591
+Group variable: objectid                        Number of groups  =      5,689
+
+R-squared:                                      Obs per group:
+     Within  = 0.0043                                         min =         16
+     Between = 0.0003                                         avg =       17.0
+     Overall = 0.0043                                         max =         17
+
+                                                F(17,5688)        =      16.75
+corr(u_i, Xb) = -0.0171                         Prob > F          =     0.0000
+
+                            (Std. err. adjusted for 5,689 clusters in objectid)
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_death_~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+l2meanpdsi_dt |  -.0016168   .0003894    -4.15   0.000    -.0023802   -.0008534
+       Iyear1 |   .0097042   .0025636     3.79   0.000     .0046786    .0147298
+       Iyear2 |  -.0045875   .0024407    -1.88   0.060    -.0093723    .0001972
+       Iyear3 |  -.0121664   .0025445    -4.78   0.000    -.0171545   -.0071783
+       Iyear4 |  -.0005722    .002578    -0.22   0.824    -.0056262    .0044817
+       Iyear5 |    .029348   .0031097     9.44   0.000     .0232517    .0354442
+       Iyear6 |   .0188202   .0030271     6.22   0.000      .012886    .0247543
+       Iyear7 |   .0206153   .0031035     6.64   0.000     .0145312    .0266993
+       Iyear8 |   .0112899   .0029601     3.81   0.000      .005487    .0170929
+       Iyear9 |   .0230835   .0031948     7.23   0.000     .0168204    .0293465
+      Iyear10 |   .0203982   .0032792     6.22   0.000     .0139698    .0268267
+      Iyear11 |   .0095526   .0030032     3.18   0.001     .0036653      .01544
+      Iyear12 |   .0003279   .0027449     0.12   0.905    -.0050532    .0057089
+      Iyear13 |   .0000381   .0026511     0.01   0.989    -.0051591    .0052353
+      Iyear14 |   .0062767   .0027851     2.25   0.024     .0008169    .0117365
+      Iyear15 |   .0098205   .0026642     3.69   0.000     .0045976    .0150434
+      Iyear16 |   .0090318   .0024146     3.74   0.000     .0042983    .0137654
+      Iyear17 |          0  (omitted)
+        _cons |  -.0088554   .0017104    -5.18   0.000    -.0122085   -.0055023
+--------------+----------------------------------------------------------------
+      sigma_u |  .00018532
+      sigma_e |  .16589546
+          rho |  1.248e-06   (fraction of variance due to u_i)
+-------------------------------------------------------------------------------
+
+. outreg2 using table2_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_death_dummy, Year and region fixed effects, Yes, Regional time trends
+> , Yes, Instrumental variables, None)
+table2_regconf_140710.tex
+dir : seeout
+
+. 
+. xtreg ucdp_death_dummy_dt l2meanpdsi_dt l2lnrain01_dt Iyear*, fe robust cluster(objectid)
+note: Iyear17 omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =     96,591
+Group variable: objectid                        Number of groups  =      5,689
+
+R-squared:                                      Obs per group:
+     Within  = 0.0043                                         min =         16
+     Between = 0.0003                                         avg =       17.0
+     Overall = 0.0043                                         max =         17
+
+                                                F(18,5688)        =      15.85
+corr(u_i, Xb) = -0.0172                         Prob > F          =     0.0000
+
+                            (Std. err. adjusted for 5,689 clusters in objectid)
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_death_~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+l2meanpdsi_dt |  -.0013365   .0004258    -3.14   0.002    -.0021712   -.0005018
+l2lnrain01_dt |  -.0071991   .0037055    -1.94   0.052    -.0144633    .0000651
+       Iyear1 |   .0094987    .002561     3.71   0.000     .0044782    .0145192
+       Iyear2 |  -.0048224   .0024418    -1.97   0.048    -.0096093   -.0000354
+       Iyear3 |  -.0122581     .00255    -4.81   0.000     -.017257   -.0072592
+       Iyear4 |   -.000542   .0025788    -0.21   0.834    -.0055975    .0045135
+       Iyear5 |   .0296514   .0031177     9.51   0.000     .0235396    .0357633
+       Iyear6 |   .0193033   .0030449     6.34   0.000     .0133341    .0252724
+       Iyear7 |   .0201939    .003111     6.49   0.000     .0140952    .0262926
+       Iyear8 |   .0116822   .0029598     3.95   0.000     .0058797    .0174846
+       Iyear9 |   .0223914   .0032071     6.98   0.000     .0161042    .0286785
+      Iyear10 |   .0201594   .0032787     6.15   0.000     .0137318     .026587
+      Iyear11 |   .0096396   .0030023     3.21   0.001     .0037539    .0155252
+      Iyear12 |   .0006076   .0027499     0.22   0.825    -.0047832    .0059984
+      Iyear13 |   .0002129    .002653     0.08   0.936     -.004988    .0054138
+      Iyear14 |   .0055736   .0028019     1.99   0.047     .0000808    .0110665
+      Iyear15 |   .0098911   .0026664     3.71   0.000     .0046638    .0151183
+      Iyear16 |   .0090479   .0024149     3.75   0.000     .0043138     .013782
+      Iyear17 |          0  (omitted)
+        _cons |  -.0088108   .0017108    -5.15   0.000    -.0121646    -.005457
+--------------+----------------------------------------------------------------
+      sigma_u |  .00018847
+      sigma_e |  .16589171
+          rho |  1.291e-06   (fraction of variance due to u_i)
+-------------------------------------------------------------------------------
+
+. outreg2 using table2_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_death_dummy, Year and region fixed effects, Yes, Regional time trends
+> , Yes, Instrumental variables, None)
+table2_regconf_140710.tex
+dir : seeout
+
+. 
+. xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2lnrain01_dt) Iyear*, fe robust cluster(objectid) first /*Includes First Stage Estimates for Table 4, Column (1)*/
+Warning - collinearities detected
+Vars dropped:       Iyear17
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+Warning - collinearities detected
+Vars dropped:  Iyear17
+
+First-stage regressions
+-----------------------
+
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+
+First-stage regression of llnlight01_dt:
+
+Statistics robust to heteroskedasticity and clustering on objectid
+Number of obs =                  96591
+Number of clusters (objectid) =   5689
+-------------------------------------------------------------------------------
+              |               Robust
+llnlight01_dt | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+l2lnrain01_dt |   .0360693   .0072692     4.96   0.000     .0218217    .0503169
+       Iyear1 |   .1621198   .0071988    22.52   0.000     .1480103    .1762293
+       Iyear2 |  -.2300151   .0096504   -23.83   0.000    -.2489299   -.2111003
+       Iyear3 |   .2088411   .0066666    31.33   0.000     .1957745    .2219076
+       Iyear4 |   .2011741   .0068272    29.47   0.000     .1877929    .2145554
+       Iyear5 |   -.007674   .0074362    -1.03   0.302    -.0222488    .0069009
+       Iyear6 |   .0517506   .0078119     6.62   0.000     .0364394    .0670619
+       Iyear7 |   .0510439   .0082413     6.19   0.000     .0348911    .0671967
+       Iyear8 |  -.0048014   .0080271    -0.60   0.550    -.0205345    .0109316
+       Iyear9 |   .2272877   .0090691    25.06   0.000     .2095123     .245063
+      Iyear10 |   .2289018   .0087508    26.16   0.000     .2117504    .2460533
+      Iyear11 |  -.0930477   .0080567   -11.55   0.000    -.1088388   -.0772566
+      Iyear12 |  -.0007095    .008474    -0.08   0.933    -.0173184    .0158994
+      Iyear13 |  -.0077135   .0081401    -0.95   0.343    -.0236681     .008241
+      Iyear14 |   .0743706    .008446     8.81   0.000     .0578165    .0909247
+      Iyear15 |   .1775274   .0073881    24.03   0.000     .1630468    .1920081
+      Iyear16 |   .1039426    .006106    17.02   0.000     .0919749    .1159103
+      Iyear17 |          0  (omitted)
+-------------------------------------------------------------------------------
+F test of excluded instruments:
+  F(  1,  5688) =    24.62
+  Prob > F      =   0.0000
+Sanderson-Windmeijer multivariate F test of excluded instruments:
+  F(  1,  5688) =    24.62
+  Prob > F      =   0.0000
+
+
+
+Summary results for first-stage regressions
+-------------------------------------------
+
+                                           (Underid)            (Weak id)
+Variable     | F(  1,  5688)  P-val | SW Chi-sq(  1) P-val | SW F(  1,  5688)
+llnlight01_d |      24.62    0.0000 |       24.63   0.0000 |       24.62
+
+NB: first-stage test statistics cluster-robust
+
+Stock-Yogo weak ID F test critical values for single endogenous regressor:
+                                   10% maximal IV size             16.38
+                                   15% maximal IV size              8.96
+                                   20% maximal IV size              6.66
+                                   25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for i.i.d. errors only.
+
+Underidentification test
+Ho: matrix of reduced form coefficients has rank=K1-1 (underidentified)
+Ha: matrix has rank=K1 (identified)
+Kleibergen-Paap rk LM statistic          Chi-sq(1)=27.44    P-val=0.0000
+
+Weak identification test
+Ho: equation is weakly identified
+Cragg-Donald Wald F statistic                                      24.17
+Kleibergen-Paap Wald rk F statistic                                24.62
+
+Stock-Yogo weak ID test critical values for K1=1 and L1=1:
+                                   10% maximal IV size             16.38
+                                   15% maximal IV size              8.96
+                                   20% maximal IV size              6.66
+                                   25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+
+Weak-instrument-robust inference
+Tests of joint significance of endogenous regressors B1 in main equation
+Ho: B1=0 and orthogonality conditions are valid
+Anderson-Rubin Wald test           F(1,5688)=     10.54     P-val=0.0012
+Anderson-Rubin Wald test           Chi-sq(1)=     10.54     P-val=0.0012
+Stock-Wright LM S statistic        Chi-sq(1)=     10.37     P-val=0.0013
+
+NB: Underidentification, weak identification and weak-identification-robust
+    test statistics cluster-robust
+
+Number of clusters             N_clust  =       5689
+Number of observations               N  =      96591
+Number of regressors                 K  =         17
+Number of endogenous regressors      K1 =          1
+Number of instruments                L  =         17
+Number of excluded instruments       L1 =          1
+
+IV (2SLS) estimation
+--------------------
+
+Estimates efficient for homoskedasticity only
+Statistics robust to heteroskedasticity and clustering on objectid
+
+Number of clusters (objectid) =   5689                Number of obs =    96591
+                                                      F( 17,  5688) =    10.17
+                                                      Prob > F      =   0.0000
+Total (centered) SS     =  2512.033049                Centered R2   =  -0.5442
+Total (uncentered) SS   =  2512.033049                Uncentered R2 =  -0.5442
+Residual SS             =  3879.177476                Root MSE      =    .2066
+
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_death_~t | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+llnlight01_dt |  -.3033282   .1107854    -2.74   0.006    -.5204636   -.0861928
+       Iyear1 |   .0587702   .0182029     3.23   0.001     .0230932    .0944472
+       Iyear2 |  -.0743488   .0259151    -2.87   0.004    -.1251416   -.0235561
+       Iyear3 |   .0518044   .0230236     2.25   0.024      .006679    .0969297
+       Iyear4 |   .0604805   .0225695     2.68   0.007     .0162452    .1047159
+       Iyear5 |   .0257732   .0037826     6.81   0.000     .0183594    .0331871
+       Iyear6 |   .0345351   .0072224     4.78   0.000     .0203795    .0486907
+       Iyear7 |   .0347076   .0066864     5.19   0.000     .0216025    .0478127
+       Iyear8 |    .010068   .0038102     2.64   0.008     .0026002    .0175358
+       Iyear9 |   .0911123   .0250906     3.63   0.000     .0419357    .1402889
+      Iyear10 |    .089894     .02545     3.53   0.000     .0400129    .1397751
+      Iyear11 |  -.0176401   .0111655    -1.58   0.114     -.039524    .0042439
+      Iyear12 |  -.0001902    .003797    -0.05   0.960    -.0076322    .0072518
+      Iyear13 |  -.0020389   .0037135    -0.55   0.583    -.0093173    .0052394
+      Iyear14 |   .0280824    .008687     3.23   0.001     .0110561    .0451086
+      Iyear15 |   .0636768    .020099     3.17   0.002     .0242834    .1030702
+      Iyear16 |   .0401534   .0119012     3.37   0.001     .0168274    .0634793
+      Iyear17 |          0  (omitted)
+-------------------------------------------------------------------------------
+Underidentification test (Kleibergen-Paap rk LM statistic):             27.443
+                                                   Chi-sq(1) P-val =    0.0000
+------------------------------------------------------------------------------
+Weak identification test (Cragg-Donald Wald F statistic):               24.173
+                         (Kleibergen-Paap rk Wald F statistic):         24.621
+Stock-Yogo weak ID test critical values: 10% maximal IV size             16.38
+                                         15% maximal IV size              8.96
+                                         20% maximal IV size              6.66
+                                         25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+------------------------------------------------------------------------------
+Hansen J statistic (overidentification test of all instruments):         0.000
+                                                 (equation exactly identified)
+------------------------------------------------------------------------------
+Instrumented:         llnlight01_dt
+Included instruments: Iyear1 Iyear2 Iyear3 Iyear4 Iyear5 Iyear6 Iyear7 Iyear8
+                      Iyear9 Iyear10 Iyear11 Iyear12 Iyear13 Iyear14 Iyear15
+                      Iyear16
+Excluded instruments: l2lnrain01_dt
+Dropped collinear:    Iyear17
+------------------------------------------------------------------------------
+
+. outreg2 using table2_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_death_dummy, Year and region fixed effects, Yes, Regional time trends
+> , Yes, Instrumental variables, Rain)
+table2_regconf_140710.tex
+dir : seeout
+
+. 
+. xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_dt) Iyear*, fe robust cluster(objectid) first /*Includes First Stage Estimates for Table 4, Column (1)*/
+Warning - collinearities detected
+Vars dropped:       Iyear17
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+Warning - collinearities detected
+Vars dropped:  Iyear17
+
+First-stage regressions
+-----------------------
+
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+
+First-stage regression of llnlight01_dt:
+
+Statistics robust to heteroskedasticity and clustering on objectid
+Number of obs =                  96591
+Number of clusters (objectid) =   5689
+-------------------------------------------------------------------------------
+              |               Robust
+llnlight01_dt | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+l2meanpdsi_dt |   .0055157   .0008685     6.35   0.000     .0038134     .007218
+       Iyear1 |   .1617902   .0072031    22.46   0.000     .1476722    .1759083
+       Iyear2 |  -.2299293    .009624   -23.89   0.000    -.2487921   -.2110664
+       Iyear3 |    .211015   .0066875    31.55   0.000     .1979074    .2241225
+       Iyear4 |   .2012739   .0068281    29.48   0.000      .187891    .2146569
+       Iyear5 |   -.012051   .0075541    -1.60   0.111    -.0268568    .0027549
+       Iyear6 |   .0516968   .0078389     6.59   0.000     .0363325     .067061
+       Iyear7 |   .0463421   .0082258     5.63   0.000     .0302195    .0624647
+       Iyear8 |  -.0040847   .0080478    -0.51   0.612    -.0198583     .011689
+       Iyear9 |   .2242962   .0089647    25.02   0.000     .2067255    .2418668
+      Iyear10 |   .2291772   .0087421    26.22   0.000     .2120429    .2463116
+      Iyear11 |  -.0895078   .0081125   -11.03   0.000    -.1054081   -.0736075
+      Iyear12 |  -.0018213   .0084927    -0.21   0.830    -.0184669    .0148244
+      Iyear13 |   -.006848   .0081407    -0.84   0.400    -.0228037    .0091077
+      Iyear14 |   .0719372   .0083867     8.58   0.000     .0554994     .088375
+      Iyear15 |   .1775356   .0073867    24.03   0.000     .1630577    .1920135
+      Iyear16 |   .1025331   .0061098    16.78   0.000     .0905579    .1145083
+      Iyear17 |          0  (omitted)
+-------------------------------------------------------------------------------
+F test of excluded instruments:
+  F(  1,  5688) =    40.33
+  Prob > F      =   0.0000
+Sanderson-Windmeijer multivariate F test of excluded instruments:
+  F(  1,  5688) =    40.33
+  Prob > F      =   0.0000
+
+
+
+Summary results for first-stage regressions
+-------------------------------------------
+
+                                           (Underid)            (Weak id)
+Variable     | F(  1,  5688)  P-val | SW Chi-sq(  1) P-val | SW F(  1,  5688)
+llnlight01_d |      40.33    0.0000 |       40.35   0.0000 |       40.33
+
+NB: first-stage test statistics cluster-robust
+
+Stock-Yogo weak ID F test critical values for single endogenous regressor:
+                                   10% maximal IV size             16.38
+                                   15% maximal IV size              8.96
+                                   20% maximal IV size              6.66
+                                   25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for i.i.d. errors only.
+
+Underidentification test
+Ho: matrix of reduced form coefficients has rank=K1-1 (underidentified)
+Ha: matrix has rank=K1 (identified)
+Kleibergen-Paap rk LM statistic          Chi-sq(1)=39.98    P-val=0.0000
+
+Weak identification test
+Ho: equation is weakly identified
+Cragg-Donald Wald F statistic                                      40.65
+Kleibergen-Paap Wald rk F statistic                                40.33
+
+Stock-Yogo weak ID test critical values for K1=1 and L1=1:
+                                   10% maximal IV size             16.38
+                                   15% maximal IV size              8.96
+                                   20% maximal IV size              6.66
+                                   25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+
+Weak-instrument-robust inference
+Tests of joint significance of endogenous regressors B1 in main equation
+Ho: B1=0 and orthogonality conditions are valid
+Anderson-Rubin Wald test           F(1,5688)=     17.24     P-val=0.0000
+Anderson-Rubin Wald test           Chi-sq(1)=     17.24     P-val=0.0000
+Stock-Wright LM S statistic        Chi-sq(1)=     18.32     P-val=0.0000
+
+NB: Underidentification, weak identification and weak-identification-robust
+    test statistics cluster-robust
+
+Number of clusters             N_clust  =       5689
+Number of observations               N  =      96591
+Number of regressors                 K  =         17
+Number of endogenous regressors      K1 =          1
+Number of instruments                L  =         17
+Number of excluded instruments       L1 =          1
+
+IV (2SLS) estimation
+--------------------
+
+Estimates efficient for homoskedasticity only
+Statistics robust to heteroskedasticity and clustering on objectid
+
+Number of clusters (objectid) =   5689                Number of obs =    96591
+                                                      F( 17,  5688) =    10.87
+                                                      Prob > F      =   0.0000
+Total (centered) SS     =  2512.033049                Centered R2   =  -0.5081
+Total (uncentered) SS   =  2512.033049                Uncentered R2 =  -0.5081
+Residual SS             =  3788.362167                Root MSE      =    .2041
+
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_death_~t | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+llnlight01_dt |  -.2931316   .0848165    -3.46   0.001     -.459369   -.1268943
+       Iyear1 |   .0571301   .0139031     4.11   0.000     .0298805    .0843796
+       Iyear2 |  -.0719871   .0199655    -3.61   0.000    -.1111187   -.0328554
+       Iyear3 |   .0496888   .0178446     2.78   0.005     .0147139    .0846636
+       Iyear4 |   .0584275   .0171679     3.40   0.001      .024779     .092076
+       Iyear5 |   .0258154   .0037327     6.92   0.000     .0184995    .0331314
+       Iyear6 |   .0339741   .0060435     5.62   0.000      .022129    .0458192
+       Iyear7 |   .0341996    .005533     6.18   0.000     .0233551    .0450441
+       Iyear8 |   .0100926   .0037465     2.69   0.007     .0027495    .0174356
+       Iyear9 |   .0888318   .0193818     4.58   0.000     .0508441    .1268194
+      Iyear10 |   .0875773   .0195214     4.49   0.000     .0493161    .1258386
+      Iyear11 |  -.0166849   .0088815    -1.88   0.060    -.0340924    .0007225
+      Iyear12 |   -.000206   .0037316    -0.06   0.956    -.0075197    .0071077
+      Iyear13 |  -.0019693   .0036307    -0.54   0.588    -.0090853    .0051467
+      Iyear14 |   .0273638   .0070506     3.88   0.000     .0135448    .0411827
+      Iyear15 |   .0618618   .0153748     4.02   0.000     .0317278    .0919958
+      Iyear16 |   .0390875   .0092247     4.24   0.000     .0210074    .0571676
+      Iyear17 |          0  (omitted)
+-------------------------------------------------------------------------------
+Underidentification test (Kleibergen-Paap rk LM statistic):             39.982
+                                                   Chi-sq(1) P-val =    0.0000
+------------------------------------------------------------------------------
+Weak identification test (Cragg-Donald Wald F statistic):               40.648
+                         (Kleibergen-Paap rk Wald F statistic):         40.332
+Stock-Yogo weak ID test critical values: 10% maximal IV size             16.38
+                                         15% maximal IV size              8.96
+                                         20% maximal IV size              6.66
+                                         25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+------------------------------------------------------------------------------
+Hansen J statistic (overidentification test of all instruments):         0.000
+                                                 (equation exactly identified)
+------------------------------------------------------------------------------
+Instrumented:         llnlight01_dt
+Included instruments: Iyear1 Iyear2 Iyear3 Iyear4 Iyear5 Iyear6 Iyear7 Iyear8
+                      Iyear9 Iyear10 Iyear11 Iyear12 Iyear13 Iyear14 Iyear15
+                      Iyear16
+Excluded instruments: l2meanpdsi_dt
+Dropped collinear:    Iyear17
+------------------------------------------------------------------------------
+
+. outreg2 using table2_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_death_dummy, Year and region fixed effects, Yes, Regional time trends
+> , Yes, Instrumental variables, Drought)
+table2_regconf_140710.tex
+dir : seeout
+
+. 
+. xtivreg2 ucdp_death_dummy_dt (llnlight01_dt=l2meanpdsi_dt l2lnrain01_dt) Iyear*, fe robust cluster(objectid) first /*Includes First Stage Estimates for Table 4, 
+> Column (1)*/
+Warning - collinearities detected
+Vars dropped:       Iyear17
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+Warning - collinearities detected
+Vars dropped:  Iyear17
+
+First-stage regressions
+-----------------------
+
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+
+First-stage regression of llnlight01_dt:
+
+Statistics robust to heteroskedasticity and clustering on objectid
+Number of obs =                  96591
+Number of clusters (objectid) =   5689
+-------------------------------------------------------------------------------
+              |               Robust
+llnlight01_dt | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+l2meanpdsi_dt |   .0046142   .0009215     5.01   0.000     .0028081    .0064203
+l2lnrain01_dt |   .0231511   .0075003     3.09   0.002     .0084506    .0378515
+       Iyear1 |   .1624512   .0072044    22.55   0.000     .1483307    .1765717
+       Iyear2 |  -.2291742   .0096265   -23.81   0.000     -.248042   -.2103063
+       Iyear3 |   .2113099   .0066896    31.59   0.000     .1981984    .2244214
+       Iyear4 |   .2011767   .0068264    29.47   0.000      .187797    .2145565
+       Iyear5 |  -.0130269   .0075358    -1.73   0.084     -.027797    .0017432
+       Iyear6 |   .0501433   .0078196     6.41   0.000     .0348168    .0654697
+       Iyear7 |   .0476971   .0082704     5.77   0.000     .0314873    .0639069
+       Iyear8 |   -.005346   .0080194    -0.67   0.505    -.0210639    .0103719
+       Iyear9 |   .2265218   .0090565    25.01   0.000     .2087711    .2442726
+      Iyear10 |   .2299452   .0087585    26.25   0.000     .2127786    .2471117
+      Iyear11 |  -.0897874   .0081099   -11.07   0.000    -.1056827   -.0738921
+      Iyear12 |  -.0027209   .0084898    -0.32   0.749    -.0193609    .0139191
+      Iyear13 |  -.0074102    .008139    -0.91   0.363    -.0233626    .0085422
+      Iyear14 |   .0741982   .0084486     8.78   0.000     .0576389    .0907574
+      Iyear15 |   .1773088   .0073862    24.01   0.000      .162832    .1917856
+      Iyear16 |   .1024814    .006114    16.76   0.000     .0904981    .1144647
+      Iyear17 |          0  (omitted)
+-------------------------------------------------------------------------------
+F test of excluded instruments:
+  F(  2,  5688) =    25.32
+  Prob > F      =   0.0000
+Sanderson-Windmeijer multivariate F test of excluded instruments:
+  F(  2,  5688) =    25.32
+  Prob > F      =   0.0000
+
+
+
+Summary results for first-stage regressions
+-------------------------------------------
+
+                                           (Underid)            (Weak id)
+Variable     | F(  2,  5688)  P-val | SW Chi-sq(  2) P-val | SW F(  2,  5688)
+llnlight01_d |      25.32    0.0000 |       50.66   0.0000 |       25.32
+
+NB: first-stage test statistics cluster-robust
+
+Stock-Yogo weak ID F test critical values for single endogenous regressor:
+                                   10% maximal IV size             19.93
+                                   15% maximal IV size             11.59
+                                   20% maximal IV size              8.75
+                                   25% maximal IV size              7.25
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for i.i.d. errors only.
+
+Underidentification test
+Ho: matrix of reduced form coefficients has rank=K1-1 (underidentified)
+Ha: matrix has rank=K1 (identified)
+Kleibergen-Paap rk LM statistic          Chi-sq(2)=50.68    P-val=0.0000
+
+Weak identification test
+Ho: equation is weakly identified
+Cragg-Donald Wald F statistic                                      24.76
+Kleibergen-Paap Wald rk F statistic                                25.32
+
+Stock-Yogo weak ID test critical values for K1=1 and L1=2:
+                                   10% maximal IV size             19.93
+                                   15% maximal IV size             11.59
+                                   20% maximal IV size              8.75
+                                   25% maximal IV size              7.25
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+
+Weak-instrument-robust inference
+Tests of joint significance of endogenous regressors B1 in main equation
+Ho: B1=0 and orthogonality conditions are valid
+Anderson-Rubin Wald test           F(2,5688)=     11.23     P-val=0.0000
+Anderson-Rubin Wald test           Chi-sq(2)=     22.46     P-val=0.0000
+Stock-Wright LM S statistic        Chi-sq(2)=     23.38     P-val=0.0000
+
+NB: Underidentification, weak identification and weak-identification-robust
+    test statistics cluster-robust
+
+Number of clusters             N_clust  =       5689
+Number of observations               N  =      96591
+Number of regressors                 K  =         17
+Number of endogenous regressors      K1 =          1
+Number of instruments                L  =         18
+Number of excluded instruments       L1 =          2
+
+IV (2SLS) estimation
+--------------------
+
+Estimates efficient for homoskedasticity only
+Statistics robust to heteroskedasticity and clustering on objectid
+
+Number of clusters (objectid) =   5689                Number of obs =    96591
+                                                      F( 17,  5688) =    10.88
+                                                      Prob > F      =   0.0000
+Total (centered) SS     =  2512.033049                Centered R2   =  -0.5193
+Total (uncentered) SS   =  2512.033049                Uncentered R2 =  -0.5193
+Residual SS             =  3816.486116                Root MSE      =    .2049
+
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_death_~t | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+llnlight01_dt |  -.2963267   .0755672    -3.92   0.000    -.4444357   -.1482177
+       Iyear1 |    .057644   .0125288     4.60   0.000     .0330879    .0822001
+       Iyear2 |  -.0727271   .0178633    -4.07   0.000    -.1077386   -.0377156
+       Iyear3 |   .0503517   .0158858     3.17   0.002      .019216    .0814873
+       Iyear4 |   .0590708   .0154049     3.83   0.000     .0288777     .089264
+       Iyear5 |   .0258022   .0037411     6.90   0.000     .0184698    .0331347
+       Iyear6 |   .0341499   .0056678     6.03   0.000     .0230413    .0452585
+       Iyear7 |   .0343588    .005235     6.56   0.000     .0240983    .0446193
+       Iyear8 |   .0100849    .003764     2.68   0.007     .0027076    .0174622
+       Iyear9 |   .0895464   .0173613     5.16   0.000     .0555188    .1235739
+      Iyear10 |   .0883033   .0174895     5.05   0.000     .0540245    .1225821
+      Iyear11 |  -.0169842   .0081401    -2.09   0.037    -.0329384     -.00103
+      Iyear12 |  -.0002011    .003751    -0.05   0.957    -.0075529    .0071508
+      Iyear13 |  -.0019911   .0036369    -0.55   0.584    -.0091193    .0051371
+      Iyear14 |   .0275889   .0065209     4.23   0.000     .0148082    .0403697
+      Iyear15 |   .0624306    .013838     4.51   0.000     .0353086    .0895525
+      Iyear16 |   .0394215   .0083195     4.74   0.000     .0231156    .0557275
+      Iyear17 |          0  (omitted)
+-------------------------------------------------------------------------------
+Underidentification test (Kleibergen-Paap rk LM statistic):             50.681
+                                                   Chi-sq(2) P-val =    0.0000
+------------------------------------------------------------------------------
+Weak identification test (Cragg-Donald Wald F statistic):               24.763
+                         (Kleibergen-Paap rk Wald F statistic):         25.319
+Stock-Yogo weak ID test critical values: 10% maximal IV size             19.93
+                                         15% maximal IV size             11.59
+                                         20% maximal IV size              8.75
+                                         25% maximal IV size              7.25
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+------------------------------------------------------------------------------
+Hansen J statistic (overidentification test of all instruments):         0.007
+                                                   Chi-sq(1) P-val =    0.9319
+------------------------------------------------------------------------------
+Instrumented:         llnlight01_dt
+Included instruments: Iyear1 Iyear2 Iyear3 Iyear4 Iyear5 Iyear6 Iyear7 Iyear8
+                      Iyear9 Iyear10 Iyear11 Iyear12 Iyear13 Iyear14 Iyear15
+                      Iyear16
+Excluded instruments: l2meanpdsi_dt l2lnrain01_dt
+Dropped collinear:    Iyear17
+------------------------------------------------------------------------------
+
+. outreg2 using table2_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_death_dummy, Year and region fixed effects, Yes, Regional time trends
+> , Yes, Instrumental variables, Rain and Drought)
+table2_regconf_140710.tex
+dir : seeout
+
+. 
+. 
+. ** Table 3: Effects on regional conflicts with 25 or more conflict-related fatalities
+. xtreg ucdp_25death_dummy_dt llnlight01_dt Iyear*, fe robust cluster(objectid)
+note: Iyear17 omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =     96,591
+Group variable: objectid                        Number of groups  =      5,689
+
+R-squared:                                      Obs per group:
+     Within  = 0.0020                                         min =         16
+     Between = 0.0003                                         avg =       17.0
+     Overall = 0.0020                                         max =         17
+
+                                                F(17,5688)        =       7.63
+corr(u_i, Xb) = -0.0224                         Prob > F          =     0.0000
+
+                            (Std. err. adjusted for 5,689 clusters in objectid)
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_25deat~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+llnlight01_dt |   .0009329   .0007611     1.23   0.220     -.000559    .0024249
+       Iyear1 |   .0010366   .0016388     0.63   0.527    -.0021761    .0042494
+       Iyear2 |  -.0073834   .0014571    -5.07   0.000    -.0102399   -.0045268
+       Iyear3 |  -.0081419   .0015425    -5.28   0.000    -.0111657    -.005118
+       Iyear4 |  -.0003992   .0015871    -0.25   0.801    -.0035104    .0027121
+       Iyear5 |   .0112724   .0019613     5.75   0.000     .0074275    .0151173
+       Iyear6 |   .0050161    .001903     2.64   0.008     .0012856    .0087467
+       Iyear7 |    .001684   .0017408     0.97   0.333    -.0017288    .0050967
+       Iyear8 |   .0019112   .0017557     1.09   0.276    -.0015307    .0053531
+       Iyear9 |   .0036366   .0018861     1.93   0.054    -.0000609     .007334
+      Iyear10 |   .0002962   .0017782     0.17   0.868    -.0031898    .0037823
+      Iyear11 |  -.0016868   .0015065    -1.12   0.263      -.00464    .0012665
+      Iyear12 |  -.0031791   .0014258    -2.23   0.026    -.0059743   -.0003839
+      Iyear13 |  -.0022897   .0013487    -1.70   0.090    -.0049337    .0003543
+      Iyear14 |  -.0039411   .0012208    -3.23   0.001    -.0063342   -.0015479
+      Iyear15 |   4.25e-06   .0013023     0.00   0.997    -.0025487    .0025572
+      Iyear16 |   .0016575   .0011748     1.41   0.158    -.0006456    .0039606
+      Iyear17 |          0  (omitted)
+        _cons |   .0000441   .0008262     0.05   0.957    -.0015757    .0016638
+--------------+----------------------------------------------------------------
+      sigma_u |  .00010234
+      sigma_e |  .10098366
+          rho |  1.027e-06   (fraction of variance due to u_i)
+-------------------------------------------------------------------------------
+
+. outreg2 using table3_regconf_140710.tex, replace tex se drop(Iyear*) addtext(Dependant, ucdp_25death_dummy, Year and region fixed effects, Yes, Regional time tre
+> nds, Yes, Instrumental variables, None)
+table3_regconf_140710.tex
+dir : seeout
+
+. 
+. xtreg ucdp_25death_dummy_dt l2lnrain01_dt Iyear*, fe robust cluster(objectid)
+note: Iyear17 omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =     96,591
+Group variable: objectid                        Number of groups  =      5,689
+
+R-squared:                                      Obs per group:
+     Within  = 0.0021                                         min =         16
+     Between = 0.0003                                         avg =       17.0
+     Overall = 0.0021                                         max =         17
+
+                                                F(17,5688)        =       7.29
+corr(u_i, Xb) = -0.0229                         Prob > F          =     0.0000
+
+                            (Std. err. adjusted for 5,689 clusters in objectid)
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_25deat~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+l2lnrain01_dt |  -.0033027   .0019895    -1.66   0.097    -.0072029    .0005974
+       Iyear1 |   .0010705   .0016354     0.65   0.513    -.0021354    .0042764
+       Iyear2 |  -.0077467    .001435    -5.40   0.000    -.0105598   -.0049336
+       Iyear3 |  -.0080727   .0015409    -5.24   0.000    -.0110935    -.005052
+       Iyear4 |  -.0001958   .0015743    -0.12   0.901     -.003282    .0028903
+       Iyear5 |   .0115922   .0020084     5.77   0.000     .0076549    .0155296
+       Iyear6 |   .0053665    .001945     2.76   0.006     .0015535    .0091795
+       Iyear7 |   .0016182    .001744     0.93   0.354    -.0018008    .0050371
+       Iyear8 |   .0021279   .0017628     1.21   0.227    -.0013278    .0055837
+       Iyear9 |   .0035128   .0018801     1.87   0.062    -.0001728    .0071985
+      Iyear10 |   .0003526   .0017637     0.20   0.842     -.003105    .0038102
+      Iyear11 |  -.0018314   .0015033    -1.22   0.223    -.0047784    .0011156
+      Iyear12 |  -.0029707   .0014304    -2.08   0.038    -.0057749   -.0001666
+      Iyear13 |  -.0022155   .0013512    -1.64   0.101    -.0048643    .0004333
+      Iyear14 |  -.0042319   .0012112    -3.49   0.000    -.0066064   -.0018575
+      Iyear15 |   .0002135   .0012992     0.16   0.870    -.0023335    .0027604
+      Iyear16 |    .001809   .0011751     1.54   0.124    -.0004946    .0041127
+      Iyear17 |          0  (omitted)
+        _cons |  -8.82e-06   .0008225    -0.01   0.991    -.0016212    .0016036
+--------------+----------------------------------------------------------------
+      sigma_u |  .00010475
+      sigma_e |  .10098256
+          rho |  1.076e-06   (fraction of variance due to u_i)
+-------------------------------------------------------------------------------
+
+. outreg2 using table3_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_death_dummy, Year and region fixed effects, Yes, Regional time trends
+> , Yes, Instrumental variables, None)
+table3_regconf_140710.tex
+dir : seeout
+
+. 
+. xtreg ucdp_25death_dummy_dt l2meanpdsi_dt Iyear*, fe robust cluster(objectid)
+note: Iyear17 omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =     96,591
+Group variable: objectid                        Number of groups  =      5,689
+
+R-squared:                                      Obs per group:
+     Within  = 0.0021                                         min =         16
+     Between = 0.0003                                         avg =       17.0
+     Overall = 0.0021                                         max =         17
+
+                                                F(17,5688)        =       7.45
+corr(u_i, Xb) = -0.0234                         Prob > F          =     0.0000
+
+                            (Std. err. adjusted for 5,689 clusters in objectid)
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_25deat~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+l2meanpdsi_dt |   -.000514   .0002391    -2.15   0.032    -.0009828   -.0000452
+       Iyear1 |   .0010991   .0016363     0.67   0.502    -.0021086    .0043069
+       Iyear2 |  -.0077573   .0014398    -5.39   0.000    -.0105798   -.0049348
+       Iyear3 |  -.0082775   .0015289    -5.41   0.000    -.0112748   -.0052803
+       Iyear4 |  -.0002049   .0015732    -0.13   0.896    -.0032889    .0028792
+       Iyear5 |   .0120059   .0020393     5.89   0.000     .0080081    .0160037
+       Iyear6 |   .0053768   .0019155     2.81   0.005     .0016218    .0091319
+       Iyear7 |   .0020544   .0017261     1.19   0.234    -.0013295    .0054382
+       Iyear8 |    .002065   .0017633     1.17   0.242    -.0013917    .0055218
+       Iyear9 |   .0037857    .001868     2.03   0.043     .0001237    .0074477
+      Iyear10 |   .0003242   .0017591     0.18   0.854    -.0031243    .0037726
+      Iyear11 |  -.0021623   .0015147    -1.43   0.153    -.0051318    .0008071
+      Iyear12 |  -.0028634   .0014414    -1.99   0.047    -.0056892   -.0000377
+      Iyear13 |  -.0022948   .0013487    -1.70   0.089    -.0049388    .0003493
+      Iyear14 |  -.0040115   .0012211    -3.29   0.001    -.0064054   -.0016176
+      Iyear15 |   .0002135   .0012963     0.16   0.869    -.0023278    .0027547
+      Iyear16 |   .0019413   .0011724     1.66   0.098    -.0003569    .0042396
+      Iyear17 |          0  (omitted)
+        _cons |  -.0000611   .0008233    -0.07   0.941    -.0016751     .001553
+--------------+----------------------------------------------------------------
+      sigma_u |  .00010802
+      sigma_e |  .10098122
+          rho |  1.144e-06   (fraction of variance due to u_i)
+-------------------------------------------------------------------------------
+
+. outreg2 using table3_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_death_dummy, Year and region fixed effects, Yes, Regional time trends
+> , Yes, Instrumental variables, None)
+table3_regconf_140710.tex
+dir : seeout
+
+. 
+. xtreg ucdp_25death_dummy_dt l2meanpdsi_dt l2lnrain01_dt Iyear*, fe robust cluster(objectid)
+note: Iyear17 omitted because of collinearity.
+
+Fixed-effects (within) regression               Number of obs     =     96,591
+Group variable: objectid                        Number of groups  =      5,689
+
+R-squared:                                      Obs per group:
+     Within  = 0.0021                                         min =         16
+     Between = 0.0003                                         avg =       17.0
+     Overall = 0.0021                                         max =         17
+
+                                                F(18,5688)        =       7.03
+corr(u_i, Xb) = -0.0235                         Prob > F          =     0.0000
+
+                            (Std. err. adjusted for 5,689 clusters in objectid)
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_25deat~t | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+l2meanpdsi_dt |  -.0004326   .0002626    -1.65   0.100    -.0009473    .0000822
+l2lnrain01_dt |  -.0020917   .0021783    -0.96   0.337     -.006362    .0021786
+       Iyear1 |   .0010394   .0016364     0.64   0.525    -.0021685    .0042474
+       Iyear2 |  -.0078255   .0014403    -5.43   0.000    -.0106491   -.0050019
+       Iyear3 |  -.0083042   .0015315    -5.42   0.000    -.0113066   -.0053018
+       Iyear4 |  -.0001961   .0015743    -0.12   0.901    -.0032822      .00289
+       Iyear5 |   .0120941   .0020527     5.89   0.000     .0080701    .0161181
+       Iyear6 |   .0055172   .0019466     2.83   0.005     .0017012    .0093332
+       Iyear7 |   .0019319   .0017359     1.11   0.266    -.0014712     .005335
+       Iyear8 |    .002179   .0017651     1.23   0.217    -.0012812    .0056392
+       Iyear9 |   .0035846   .0018812     1.91   0.057    -.0001033    .0072725
+      Iyear10 |   .0002548   .0017668     0.14   0.885    -.0032088    .0037184
+      Iyear11 |   -.002137   .0015139    -1.41   0.158    -.0051048    .0008307
+      Iyear12 |  -.0027821   .0014406    -1.93   0.054    -.0056063     .000042
+      Iyear13 |   -.002244   .0013505    -1.66   0.097    -.0048914    .0004035
+      Iyear14 |  -.0042158   .0012111    -3.48   0.001    -.0065899   -.0018416
+      Iyear15 |    .000234   .0012993     0.18   0.857    -.0023131     .002781
+      Iyear16 |    .001946   .0011732     1.66   0.097    -.0003539    .0042459
+      Iyear17 |          0  (omitted)
+        _cons |  -.0000481   .0008228    -0.06   0.953    -.0016612     .001565
+--------------+----------------------------------------------------------------
+      sigma_u |  .00010893
+      sigma_e |  .10098113
+          rho |  1.164e-06   (fraction of variance due to u_i)
+-------------------------------------------------------------------------------
+
+. outreg2 using table3_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_death_dummy, Year and region fixed effects, Yes, Regional time trends
+> , Yes, Instrumental variables, None)
+table3_regconf_140710.tex
+dir : seeout
+
+. 
+. xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2lnrain01_dt) Iyear*, fe robust cluster(objectid)
+Warning - collinearities detected
+Vars dropped:       Iyear17
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+Warning - collinearities detected
+Vars dropped:  Iyear17
+
+IV (2SLS) estimation
+--------------------
+
+Estimates efficient for homoskedasticity only
+Statistics robust to heteroskedasticity and clustering on objectid
+
+Number of clusters (objectid) =   5689                Number of obs =    96591
+                                                      F( 17,  5688) =     6.19
+                                                      Prob > F      =   0.0000
+Total (centered) SS     =  928.7110007                Centered R2   =  -0.1352
+Total (uncentered) SS   =  928.7110007                Uncentered R2 =  -0.1352
+Residual SS             =  1054.246238                Root MSE      =    .1077
+
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_25deat~t | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+llnlight01_dt |  -.0915659     .05747    -1.59   0.111    -.2042051    .0210733
+       Iyear1 |   .0159151   .0094059     1.69   0.091    -.0025201    .0343504
+       Iyear2 |  -.0288082   .0134351    -2.14   0.032    -.0551406   -.0024758
+       Iyear3 |     .01105   .0119534     0.92   0.355    -.0123783    .0344783
+       Iyear4 |   .0182248   .0118349     1.54   0.124     -.004971    .0414207
+       Iyear5 |   .0108896   .0020462     5.32   0.000     .0068792       .0149
+       Iyear6 |   .0101051   .0040401     2.50   0.012     .0021866    .0180236
+       Iyear7 |   .0062921   .0033225     1.89   0.058      -.00022    .0128041
+       Iyear8 |   .0016883   .0018942     0.89   0.373    -.0020243    .0054008
+       Iyear9 |   .0243246   .0129787     1.87   0.061    -.0011131    .0497624
+      Iyear10 |   .0213122   .0129905     1.64   0.101    -.0041488    .0467732
+      Iyear11 |  -.0103514   .0057269    -1.81   0.071    -.0215759    .0008731
+      Iyear12 |  -.0030357   .0016274    -1.87   0.062    -.0062253     .000154
+      Iyear13 |  -.0029218   .0015774    -1.85   0.064    -.0060134    .0001698
+      Iyear14 |   .0025779   .0044252     0.58   0.560    -.0060953    .0112511
+      Iyear15 |   .0164689   .0105036     1.57   0.117    -.0041177    .0370556
+      Iyear16 |   .0113266   .0062571     1.81   0.070     -.000937    .0235903
+      Iyear17 |          0  (omitted)
+-------------------------------------------------------------------------------
+Underidentification test (Kleibergen-Paap rk LM statistic):             27.443
+                                                   Chi-sq(1) P-val =    0.0000
+------------------------------------------------------------------------------
+Weak identification test (Cragg-Donald Wald F statistic):               24.173
+                         (Kleibergen-Paap rk Wald F statistic):         24.621
+Stock-Yogo weak ID test critical values: 10% maximal IV size             16.38
+                                         15% maximal IV size              8.96
+                                         20% maximal IV size              6.66
+                                         25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+------------------------------------------------------------------------------
+Hansen J statistic (overidentification test of all instruments):         0.000
+                                                 (equation exactly identified)
+------------------------------------------------------------------------------
+Instrumented:         llnlight01_dt
+Included instruments: Iyear1 Iyear2 Iyear3 Iyear4 Iyear5 Iyear6 Iyear7 Iyear8
+                      Iyear9 Iyear10 Iyear11 Iyear12 Iyear13 Iyear14 Iyear15
+                      Iyear16
+Excluded instruments: l2lnrain01_dt
+Dropped collinear:    Iyear17
+------------------------------------------------------------------------------
+
+. outreg2 using table3_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_25death_dummy, Year and region fixed effects, Yes, Regional time tren
+> ds, Yes, Instrumental variables, Rain)
+table3_regconf_140710.tex
+dir : seeout
+
+. 
+. xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2meanpdsi_dt) Iyear*, fe robust cluster(objectid)
+Warning - collinearities detected
+Vars dropped:       Iyear17
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+Warning - collinearities detected
+Vars dropped:  Iyear17
+
+IV (2SLS) estimation
+--------------------
+
+Estimates efficient for homoskedasticity only
+Statistics robust to heteroskedasticity and clustering on objectid
+
+Number of clusters (objectid) =   5689                Number of obs =    96591
+                                                      F( 17,  5688) =     6.36
+                                                      Prob > F      =   0.0000
+Total (centered) SS     =  928.7110007                Centered R2   =  -0.1400
+Total (uncentered) SS   =  928.7110007                Uncentered R2 =  -0.1400
+Residual SS             =   1058.76487                Root MSE      =    .1079
+
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_25deat~t | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+llnlight01_dt |  -.0931917   .0460937    -2.02   0.043    -.1835336   -.0028497
+       Iyear1 |   .0161766     .00754     2.15   0.032     .0013984    .0309549
+       Iyear2 |  -.0291848    .010926    -2.67   0.008    -.0505994   -.0077702
+       Iyear3 |   .0113873    .009854     1.16   0.248    -.0079262    .0307008
+       Iyear4 |   .0185522   .0094361     1.97   0.049     .0000578    .0370466
+       Iyear5 |   .0108828   .0020619     5.28   0.000     .0068416    .0149241
+       Iyear6 |   .0101945   .0033284     3.06   0.002     .0036709    .0167182
+       Iyear7 |    .006373   .0028038     2.27   0.023     .0008777    .0118684
+       Iyear8 |   .0016844   .0018906     0.89   0.373    -.0020212    .0053899
+       Iyear9 |   .0246882   .0104892     2.35   0.019     .0041297    .0452468
+      Iyear10 |   .0216816   .0104899     2.07   0.039     .0011217    .0422415
+      Iyear11 |  -.0105037   .0046827    -2.24   0.025    -.0196816   -.0013258
+      Iyear12 |  -.0030332   .0016372    -1.85   0.064    -.0062421    .0001758
+      Iyear13 |  -.0029329   .0015618    -1.88   0.060    -.0059939    .0001281
+      Iyear14 |   .0026924   .0035669     0.75   0.450    -.0042986    .0096835
+      Iyear15 |   .0167583   .0083854     2.00   0.046     .0003232    .0331934
+      Iyear16 |   .0114966    .004969     2.31   0.021     .0017576    .0212356
+      Iyear17 |          0  (omitted)
+-------------------------------------------------------------------------------
+Underidentification test (Kleibergen-Paap rk LM statistic):             39.982
+                                                   Chi-sq(1) P-val =    0.0000
+------------------------------------------------------------------------------
+Weak identification test (Cragg-Donald Wald F statistic):               40.648
+                         (Kleibergen-Paap rk Wald F statistic):         40.332
+Stock-Yogo weak ID test critical values: 10% maximal IV size             16.38
+                                         15% maximal IV size              8.96
+                                         20% maximal IV size              6.66
+                                         25% maximal IV size              5.53
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+------------------------------------------------------------------------------
+Hansen J statistic (overidentification test of all instruments):         0.000
+                                                 (equation exactly identified)
+------------------------------------------------------------------------------
+Instrumented:         llnlight01_dt
+Included instruments: Iyear1 Iyear2 Iyear3 Iyear4 Iyear5 Iyear6 Iyear7 Iyear8
+                      Iyear9 Iyear10 Iyear11 Iyear12 Iyear13 Iyear14 Iyear15
+                      Iyear16
+Excluded instruments: l2meanpdsi_dt
+Dropped collinear:    Iyear17
+------------------------------------------------------------------------------
+
+. outreg2 using table3_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_25death_dummy, Year and region fixed effects, Yes, Regional time tren
+> ds, Yes, Instrumental variables, Drought)
+table3_regconf_140710.tex
+dir : seeout
+
+. 
+. xtivreg2 ucdp_25death_dummy_dt (llnlight01_dt=l2meanpdsi_dt l2lnrain01_dt) Iyear*, fe robust cluster(objectid)
+Warning - collinearities detected
+Vars dropped:       Iyear17
+
+FIXED EFFECTS ESTIMATION
+------------------------
+Number of groups =      5689                    Obs per group: min =        16
+                                                               avg =      17.0
+                                                               max =        17
+Warning - collinearities detected
+Vars dropped:  Iyear17
+
+IV (2SLS) estimation
+--------------------
+
+Estimates efficient for homoskedasticity only
+Statistics robust to heteroskedasticity and clustering on objectid
+
+Number of clusters (objectid) =   5689                Number of obs =    96591
+                                                      F( 17,  5688) =     6.32
+                                                      Prob > F      =   0.0000
+Total (centered) SS     =  928.7110007                Centered R2   =  -0.1385
+Total (uncentered) SS   =  928.7110007                Uncentered R2 =  -0.1385
+Residual SS             =   1057.34048                Root MSE      =    .1079
+
+-------------------------------------------------------------------------------
+              |               Robust
+ucdp_25deat~t | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+--------------+----------------------------------------------------------------
+llnlight01_dt |  -.0926822   .0399863    -2.32   0.020    -.1710539   -.0143106
+       Iyear1 |   .0160947   .0066036     2.44   0.015     .0031519    .0290375
+       Iyear2 |  -.0290668   .0095143    -3.06   0.002    -.0477145   -.0104191
+       Iyear3 |   .0112816   .0085394     1.32   0.186    -.0054554    .0280186
+       Iyear4 |   .0184496   .0082915     2.23   0.026     .0021985    .0347007
+       Iyear5 |    .010885   .0020533     5.30   0.000     .0068606    .0149093
+       Iyear6 |   .0101665   .0031643     3.21   0.001     .0039646    .0163684
+       Iyear7 |   .0063477    .002576     2.46   0.014     .0012988    .0113966
+       Iyear8 |   .0016856   .0018904     0.89   0.373    -.0020194    .0053906
+       Iyear9 |   .0245743   .0091413     2.69   0.007     .0066577     .042491
+      Iyear10 |   .0215658   .0090687     2.38   0.017     .0037914    .0393402
+      Iyear11 |   -.010456   .0041809    -2.50   0.012    -.0186505   -.0022615
+      Iyear12 |  -.0030339   .0016335    -1.86   0.063    -.0062355    .0001676
+      Iyear13 |  -.0029294   .0015533    -1.89   0.059    -.0059738    .0001149
+      Iyear14 |   .0026565    .003229     0.82   0.411    -.0036721    .0089852
+      Iyear15 |   .0166676   .0073822     2.26   0.024     .0021987    .0311365
+      Iyear16 |   .0114433   .0044094     2.60   0.009      .002801    .0200857
+      Iyear17 |          0  (omitted)
+-------------------------------------------------------------------------------
+Underidentification test (Kleibergen-Paap rk LM statistic):             50.681
+                                                   Chi-sq(2) P-val =    0.0000
+------------------------------------------------------------------------------
+Weak identification test (Cragg-Donald Wald F statistic):               24.763
+                         (Kleibergen-Paap rk Wald F statistic):         25.319
+Stock-Yogo weak ID test critical values: 10% maximal IV size             19.93
+                                         15% maximal IV size             11.59
+                                         20% maximal IV size              8.75
+                                         25% maximal IV size              7.25
+Source: Stock-Yogo (2005).  Reproduced by permission.
+NB: Critical values are for Cragg-Donald F statistic and i.i.d. errors.
+------------------------------------------------------------------------------
+Hansen J statistic (overidentification test of all instruments):         0.001
+                                                   Chi-sq(1) P-val =    0.9799
+------------------------------------------------------------------------------
+Instrumented:         llnlight01_dt
+Included instruments: Iyear1 Iyear2 Iyear3 Iyear4 Iyear5 Iyear6 Iyear7 Iyear8
+                      Iyear9 Iyear10 Iyear11 Iyear12 Iyear13 Iyear14 Iyear15
+                      Iyear16
+Excluded instruments: l2meanpdsi_dt l2lnrain01_dt
+Dropped collinear:    Iyear17
+------------------------------------------------------------------------------
+
+. outreg2 using table3_regconf_140710.tex, append tex se drop(Iyear*) addtext(Dependant, ucdp_25death_dummy, Year and region fixed effects, Yes, Regional time tren
+> ds, Yes, Instrumental variables, Rain and Drought)
+table3_regconf_140710.tex
+dir : seeout
+
+. 
+. 
+. /* The data file  already contains the detrended variables (*_dt). In any case, the code to generate the detrended variables is below
+> 
+> gen ucdp_death_dummy_dt=.
+> gen ucdp_25death_dummy_dt=.
+> gen llnlight01_dt=.
+> gen l2lnrain01_dt=.
+> gen l2meanpdsi_dt=.
+> 
+> #delimit ;
+> qui tab objectid, gen(Iregcode);
+> local i=1;
+> while (`i'< 5690)
+> {;
+> reg ucdp_death_dummy year if Iregcode`i'==1;
+> predict ucdp_death_dummy_resid if e(sample), r;
+> replace ucdp_death_dummy_dt=ucdp_death_dummy_resid if e(sample);
+> reg ucdp_25death_dummy year if Iregcode`i'==1;
+> predict ucdp_25death_dummy_resid if e(sample), r;
+> replace ucdp_25death_dummy_dt=ucdp_25death_dummy_resid if e(sample);
+> reg llnlight01 year if Iregcode`i'==1;
+> predict llnlight01_resid if e(sample), r;
+> replace llnlight01_dt=llnlight01_resid if e(sample);
+> reg l2lnrain01 year if Iregcode`i'==1;
+> predict l2lnrain01_resid if e(sample), r;
+> replace l2lnrain01_dt=l2lnrain01_resid if e(sample);
+> reg l2meanpdsi year if Iregcode`i'==1;
+> predict l2meanpdsi_resid if e(sample), r;
+> replace l2meanpdsi_dt=l2meanpdsi_resid if e(sample);
+> drop ucdp_death_dummy_resid ucdp_25death_dummy_resid llnlight01_resid l2lnrain01_resid l2meanpdsi_resid;
+> local i = `i' + 1;
+> };
+> #delimit cr
+> drop I*
+> 
+> 
+> */
+. 
+. ** Close log file
+. log close
+      name:  <unnamed>
+       log:  /Users/carlos/Github/00-DS/hello-papers/Raschky-2014-Economic-shocks-and-civil-conflict-at-the-regional-level/TRY-EL_regional_conflict_replication.txt
+  log type:  text
+ closed on:   5 Sep 2022, 01:07:26
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
