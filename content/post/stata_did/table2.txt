@@ -1,0 +1,14 @@
+	(1)	(2)	(3)
+VARIABLES	gpa	gpa	gpa
+			
+1.txp	25.31***	25.33***	25.31***
+	(0.61)	(0.61)	(0.59)
+Constant	73.50***	75.20***	73.50***
+	(0.16)	(3.49)	(0.08)
+			
+Observations	70	70	70
+R-squared	0.99	0.99	0.99
+Controls	No	Yes	No
+Clustered SEs	No	No	Yes
+Standard errors in parentheses			
+*** p<0.01, ** p<0.05, * p<0.1			

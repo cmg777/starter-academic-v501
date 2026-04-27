@@ -1,0 +1,24 @@
+	(1)
+VARIABLES	gpa
+	
+lead4	0.34
+	(0.40)
+lead3	-0.32
+	(0.44)
+lead2	0.59
+	(0.42)
+lag0	25.03***
+	(0.45)
+lag1	24.71***
+	(0.56)
+lag2	24.77***
+	(0.74)
+lag3	25.70***
+	(0.80)
+Constant	76.54***
+	(0.07)
+	
+Observations	280
+R-squared	0.99
+Robust standard errors in parentheses	
+*** p<0.01, ** p<0.05, * p<0.1	
