@@ -164,9 +164,9 @@ ax.annotate(f"{treated_means[1]:.2f}", (1, treated_means[1]),
             textcoords="offset points", xytext=(10, -12), fontsize=12,
             color=WARM_ORANGE, fontweight="bold")
 ax.annotate(f"Naive change = {treated_means[1] - treated_means[0]:.2f}",
-            xy=(0.7, 88), fontsize=12, color="#ff6b6b", ha="center",
+            xy=(0.35, 96), fontsize=12, color="#ff6b6b", ha="center",
             bbox=dict(boxstyle="round,pad=0.3", facecolor=DARK_NAVY,
-                      edgecolor="#ff6b6b", alpha=0.9))
+                      edgecolor="#ff6b6b", alpha=0.9), zorder=10)
 ax.set_xticks([0, 1])
 ax.set_xticklabels(["Pre-Program", "Post-Program"], fontsize=12)
 ax.set_ylabel("Average GPA", fontsize=12)
