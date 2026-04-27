@@ -1,0 +1,28 @@
+\renewcommand\cellalign{t}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{3}{c}{gpa} \\
+\cmidrule(lr){2-4} 
+ & (1) & (2) & (3) \\
+\midrule
+\addlinespace
+Treatment & \makecell{-11.049*** \\ (0.288)} &  &  \\
+Post & \makecell{10.886*** \\ (0.339)} &  &  \\
+Treatment:Post & \makecell{25.315*** \\ (0.615)} & \makecell{25.315*** \\ (0.585)} & \makecell{25.328*** \\ (0.605)} \\
+Female Share &  &  & \makecell{-3.216 \\ (8.700)} \\
+Constant & \makecell{71.215*** \\ (0.218)} &  &  \\
+\midrule
+\addlinespace
+id & - & x & x \\
+time & - & x & x \\
+\midrule
+\addlinespace
+Observations & 70 & 70 & 70 \\
+S.E. type & hetero & by: id & by: id \\
+$R^2$ & 0.989 & 0.995 & 0.995 \\
+$R^2$ Within & - & 0.981 & 0.982 \\
+\bottomrule
+\end{tabular}
+\footnotesize Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.
+\end{threeparttable}

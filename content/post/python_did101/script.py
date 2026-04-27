@@ -484,6 +484,38 @@ gt_table = (
 gt_table.save("did101_table2.png")
 print("Saved: did101_table2.png")
 
+# 9.4: LaTeX table export for manuscripts
+print("\n--- 9.4: LaTeX Table Export ---")
+latex_output = pf.etable(
+    [fit_ols, fit_twfe, fit_cov],
+    type="tex",
+    labels={
+        "txp": "Treatment $\\times$ Post",
+        "treated": "Treatment",
+        "post": "Post",
+        "female_share": "Female Share",
+        "Intercept": "Constant",
+    },
+    notes="Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.",
+)
+print(latex_output)
+
+# Save to .tex file
+pf.etable(
+    [fit_ols, fit_twfe, fit_cov],
+    type="tex",
+    labels={
+        "txp": "Treatment $\\times$ Post",
+        "treated": "Treatment",
+        "post": "Post",
+        "female_share": "Female Share",
+        "Intercept": "Constant",
+    },
+    notes="Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.",
+    file_name="did101_table2.tex",
+)
+print("Saved: did101_table2.tex")
+
 
 # ── Section 10: Coefficient Comparison ─────────────────────────────────────
 

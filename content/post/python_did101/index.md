@@ -1225,6 +1225,90 @@ gt_table.save("did101_table2.png")
 
 Great Tables provides fine-grained control over number formatting (`.fmt_number()`), column labels (`.cols_label()`), headers (`.tab_header()`), and styling (`.tab_style()`). The `.save()` method exports to PNG using a headless browser.
 
+### 9.4 Exporting LaTeX tables for manuscripts
+
+When submitting to academic journals, you need LaTeX-formatted tables rather than HTML or PNG. PyFixest's `etable()` can generate publication-ready LaTeX directly by setting `type="tex"`. The output uses `booktabs` for clean horizontal rules and `threeparttable` for properly aligned footnotes — the standard format expected by most economics and social science journals.
+
+```python
+latex_output = pf.etable(
+    [fit_ols, fit_twfe, fit_cov],
+    type="tex",
+    labels={
+        "txp": "Treatment $\\times$ Post",
+        "treated": "Treatment",
+        "post": "Post",
+        "female_share": "Female Share",
+        "Intercept": "Constant",
+    },
+    notes="Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.",
+)
+print(latex_output)
+```
+
+```text
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{3}{c}{gpa} \\
+\cmidrule(lr){2-4}
+ & (1) & (2) & (3) \\
+\midrule
+Treatment & \makecell{-11.049*** \\ (0.288)} &  &  \\
+Post & \makecell{10.886*** \\ (0.339)} &  &  \\
+Treatment:Post & \makecell{25.315*** \\ (0.615)} & \makecell{25.315*** \\ (0.585)} & \makecell{25.328*** \\ (0.605)} \\
+Female Share &  &  & \makecell{-3.216 \\ (8.700)} \\
+Constant & \makecell{71.215*** \\ (0.218)} &  &  \\
+\midrule
+id & - & x & x \\
+time & - & x & x \\
+\midrule
+Observations & 70 & 70 & 70 \\
+S.E. type & hetero & by: id & by: id \\
+$R^2$ & 0.989 & 0.995 & 0.995 \\
+$R^2$ Within & - & 0.981 & 0.982 \\
+\bottomrule
+\end{tabular}
+\footnotesize Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.
+\end{threeparttable}
+```
+
+To save the table directly to a `.tex` file that you can `\input{}` in your manuscript, use the `file_name` parameter:
+
+```python
+pf.etable(
+    [fit_ols, fit_twfe, fit_cov],
+    type="tex",
+    labels={
+        "txp": "Treatment $\\times$ Post",
+        "treated": "Treatment",
+        "post": "Post",
+        "female_share": "Female Share",
+        "Intercept": "Constant",
+    },
+    notes="Standard errors in parentheses. * p<0.05, ** p<0.01, *** p<0.001.",
+    file_name="did101_table2.tex",
+)
+```
+
+This saves the file to `did101_table2.tex`. In your LaTeX manuscript, include it with:
+
+```text
+\begin{table}[htbp]
+\centering
+\caption{DiD Estimates Across Specifications}
+\label{tab:did-results}
+\input{did101_table2.tex}
+\end{table}
+```
+
+The `labels` dictionary maps internal variable names to publication-friendly labels (e.g., `"txp"` becomes `"Treatment $\times$ Post"`). The `notes` parameter adds a footnote below the table. Your LaTeX document needs the `booktabs`, `makecell`, and `threeparttable` packages in the preamble:
+
+```text
+\usepackage{booktabs}
+\usepackage{makecell}
+\usepackage{threeparttable}
+```
+
 
 ## 10. Coefficient Comparison
 
