@@ -189,6 +189,9 @@ print("Saved: kuznets_scatter_pooled.png")
 # Figure 2: Scatter by period
 periods = sorted(df3["year"].unique())
 n_periods = len(periods)
+# Map numeric periods to actual year ranges (Lessmann & Seidel 2017, footnote 14)
+period_labels = {1: "1990--1994", 2: "1995--1999", 3: "2000--2004",
+                 4: "2005--2009", 5: "2010--2013"}
 fig, axes = plt.subplots(1, n_periods, figsize=(4 * n_periods, 5), sharey=True)
 fig.patch.set_linewidth(0)
 
@@ -206,7 +209,8 @@ for ax, period in zip(axes, periods):
         cp = np.polyfit(xp, yp, 3)
         xg = np.linspace(xp.min(), xp.max(), 100)
         ax.plot(xg, np.polyval(cp, xg), color=WARM_ORANGE, lw=2)
-    ax.set_title(f"Period {int(period)}", fontsize=12, fontweight="bold")
+    label = period_labels.get(int(period), f"Period {int(period)}")
+    ax.set_title(label, fontsize=12, fontweight="bold")
     ax.set_xlabel("Log GDP pc", fontsize=11)
 
 axes[0].set_ylabel("Regional Gini", fontsize=12)

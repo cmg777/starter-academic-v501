@@ -192,7 +192,7 @@ Observations per period:
   Period 1: 168 | Period 2: 175 | Period 3: 178 | Period 4: 179 | Period 5: 180
 ```
 
-The dataset contains 880 country-period observations spanning 180 countries across 5 time periods (approximately 1992--2012 in 4-year intervals). The panel is slightly *unbalanced* --- meaning not every country is observed in every period --- with 168 countries in the first period growing to 180 by the last. The mean regional Gini is 0.064 with substantial variation (SD = 0.033, range 0.002 to 0.160), indicating that some countries have highly equal regional income distributions while others show pronounced disparities. Log GDP per capita ranges from 5.25 (about \\$190, the poorest nations) to 11.67 (about \\$117,000, oil-rich Gulf states), capturing the full development spectrum. The polynomial terms (`log_GDPpc2`, `log_GDPpc3`) are pre-computed in the dataset to ensure consistency with the original Stata analysis. Let us now visualize the data to see if the Kuznets pattern is visible.
+The dataset contains 880 country-period observations spanning 180 countries across 5 time periods (5-year averages from 1990--1994 through 2010--2013, covering data from 1992--2012). The panel is slightly *unbalanced* --- meaning not every country is observed in every period --- with 168 countries in the first period growing to 180 by the last. The mean regional Gini is 0.064 with substantial variation (SD = 0.033, range 0.002 to 0.160), indicating that some countries have highly equal regional income distributions while others show pronounced disparities. Log GDP per capita ranges from 5.25 (about \\$190, the poorest nations) to 11.67 (about \\$117,000, oil-rich Gulf states), capturing the full development spectrum. The polynomial terms (`log_GDPpc2`, `log_GDPpc3`) are pre-computed in the dataset to ensure consistency with the original Stata analysis. Let us now visualize the data to see if the Kuznets pattern is visible.
 
 ### 3.2 The determinants dataset
 
@@ -268,22 +268,26 @@ To check whether the N-shape is a persistent feature of the data or an artifact 
 periods = sorted(df3["year"].unique())
 fig, axes = plt.subplots(1, len(periods), figsize=(20, 5), sharey=True)
 
+# Map numeric periods to actual year ranges (Lessmann & Seidel 2017)
+period_labels = {1: "1990--1994", 2: "1995--1999", 3: "2000--2004",
+                 4: "2005--2009", 5: "2010--2013"}
+
 for ax, period in zip(axes, periods):
     sub = df3[df3["year"] == period]
     ax.scatter(sub["log_GDPpc"], sub["gini"], alpha=0.4, s=20, color=STEEL_BLUE)
     cp = np.polyfit(sub["log_GDPpc"], sub["gini"], 3)
     xg = np.linspace(sub["log_GDPpc"].min(), sub["log_GDPpc"].max(), 100)
     ax.plot(xg, np.polyval(cp, xg), color=WARM_ORANGE, lw=2)
-    ax.set_title(f"Period {int(period)}")
+    ax.set_title(period_labels.get(int(period), f"Period {int(period)}"))
     ax.set_xlabel("Log GDP pc")
 
 axes[0].set_ylabel("Regional Gini")
 plt.savefig("kuznets_scatter_by_period.png", dpi=300, bbox_inches="tight")
 ```
 
-![Five-panel faceted scatter showing the Gini-GDP relationship separately for each time period, with cubic fit lines.](kuznets_scatter_by_period.png)
+![Five-panel faceted scatter showing the Gini-GDP relationship separately for each period (1990--1994 through 2010--2013), with cubic fit lines.](kuznets_scatter_by_period.png)
 
-The N-shaped pattern appears in all five time periods, ruling out the possibility that the result is driven by a single unusual time window. The cubic fit line bends in the same direction across every panel, suggesting a stable structural relationship. Now let us formalize this with regression analysis, starting with the simplest pooled OLS specification.
+The N-shaped pattern appears in all five periods from 1990--1994 through 2010--2013, ruling out the possibility that the result is driven by a single unusual time window. The cubic fit line bends in the same direction across every panel, suggesting a stable structural relationship. Now let us formalize this with regression analysis, starting with the simplest pooled OLS specification.
 
 ## 5. Pooled OLS baseline: Linear, quadratic, and cubic
 
