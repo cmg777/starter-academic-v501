@@ -1,10 +1,10 @@
 Variable,Coefficient,Significant_10pct,Direction
-Resource rents,0.018288701030511594,True,Increases inequality
-Arable land,-0.05287295250702529,True,Decreases inequality
-Trade openness,0.005084505300441186,True,Increases inequality
-FDI,0.00940700662834282,False,Increases inequality
-Gasoline price,0.0005752572445152493,False,Increases inequality
-Area × Gasoline,0.006005335997972136,True,Increases inequality
-Foreign aid,0.01524254169590347,True,Increases inequality
-School enrollment,-0.014065357749528884,True,Decreases inequality
-Ethnic Gini,0.07089800769516023,True,Increases inequality
+Resource rents,0.018288701030515515,True,Increases inequality
+Arable land,-0.052872952507011704,True,Decreases inequality
+Trade openness,0.0050845053004416685,True,Increases inequality
+FDI,0.009407006628342058,False,Increases inequality
+Gasoline price,0.0005752572446004095,False,Increases inequality
+Area × Gasoline,0.0060053359971114365,True,Increases inequality
+Foreign aid,0.01524254169569789,True,Increases inequality
+School enrollment,-0.014065357749312096,True,Decreases inequality
+Ethnic Gini,0.07089800769520435,True,Increases inequality

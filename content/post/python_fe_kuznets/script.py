@@ -567,23 +567,21 @@ y_fit_adj = y_fit + y_offset
 ax.plot(x_fit, y_fit_adj, color=WARM_ORANGE, lw=3, zorder=5,
         label="Fitted cubic polynomial")
 
-# Shade the three regions
+# Shade the three regions (common bottom for consistent fill)
 if len(real_roots) >= 2 and x_min < tp1_log < x_max:
+    y_bottom = y_fit_adj.min() - 0.005
     # Rising region (left)
     mask_rise1 = x_fit <= tp1_log
-    ax.fill_between(x_fit[mask_rise1], y_fit_adj[mask_rise1],
-                    y_fit_adj[mask_rise1].min() - 0.02,
+    ax.fill_between(x_fit[mask_rise1], y_fit_adj[mask_rise1], y_bottom,
                     alpha=0.15, color=WARM_ORANGE, label="Rising inequality")
     # Falling region (middle)
     mask_fall = (x_fit >= tp1_log) & (x_fit <= min(tp2_log, x_max))
-    ax.fill_between(x_fit[mask_fall], y_fit_adj[mask_fall],
-                    y_fit_adj[mask_fall].min() - 0.02,
+    ax.fill_between(x_fit[mask_fall], y_fit_adj[mask_fall], y_bottom,
                     alpha=0.15, color=STEEL_BLUE, label="Falling inequality")
     # Rising region (right) — only if tp2 is within data range
     if tp2_log < x_max:
         mask_rise2 = x_fit >= tp2_log
-        ax.fill_between(x_fit[mask_rise2], y_fit_adj[mask_rise2],
-                        y_fit_adj[mask_rise2].min() - 0.02,
+        ax.fill_between(x_fit[mask_rise2], y_fit_adj[mask_rise2], y_bottom,
                         alpha=0.15, color=WARM_ORANGE)
 
     # Vertical lines at turning points
@@ -662,7 +660,7 @@ for i, var in enumerate(var_names):
     ols_se = ols_tidy.loc[var, "Std. Error"]
     ax.barh(y_positions[i] + bar_height / 2, ols_coef, height=bar_height,
             color=STEEL_BLUE, alpha=0.8, label="Pooled OLS" if i == 0 else None,
-            xerr=1.96 * ols_se, capsize=4, error_kw={"color": LIGHT_TEXT, "lw": 1})
+            xerr=1.96 * ols_se, capsize=5, error_kw={"color": WHITE_TEXT, "lw": 1.5})
 
     # TWFE
     fe_tidy = fe_cubic.tidy()
@@ -670,7 +668,7 @@ for i, var in enumerate(var_names):
     fe_se = fe_tidy.loc[var, "Std. Error"]
     ax.barh(y_positions[i] - bar_height / 2, fe_coef, height=bar_height,
             color=WARM_ORANGE, alpha=0.8, label="TWFE" if i == 0 else None,
-            xerr=1.96 * fe_se, capsize=4, error_kw={"color": LIGHT_TEXT, "lw": 1})
+            xerr=1.96 * fe_se, capsize=5, error_kw={"color": WHITE_TEXT, "lw": 1.5})
 
 ax.axvline(0, color=LIGHT_TEXT, ls="-", lw=0.8, alpha=0.5)
 ax.set_yticks(y_positions)
@@ -732,13 +730,19 @@ ax.set_yticks(range(len(det_vars)))
 ax.set_xticklabels(det_labels, fontsize=9, rotation=45, ha="right", color=LIGHT_TEXT)
 ax.set_yticklabels(det_labels, fontsize=9, color=LIGHT_TEXT)
 
-# Add correlation values
+# Remove black grid lines from imshow
+ax.tick_params(top=False, bottom=False, left=False, right=False)
+for spine in ax.spines.values():
+    spine.set_visible(False)
+
+# Add correlation values with adaptive text color
 for i in range(len(det_vars)):
     for j in range(len(det_vars)):
         val = corr.values[i, j]
-        text_color = WHITE_TEXT if abs(val) > 0.5 else LIGHT_TEXT
+        # Use dark text on light cells, light text on dark cells
+        text_color = DARK_NAVY if abs(val) < 0.4 else WHITE_TEXT
         ax.text(j, i, f"{val:.2f}", ha="center", va="center",
-                fontsize=8, color=text_color)
+                fontsize=9, fontweight="bold", color=text_color)
 
 cbar = fig.colorbar(im, ax=ax, shrink=0.8)
 cbar.ax.tick_params(labelcolor=LIGHT_TEXT, color=LIGHT_TEXT)
