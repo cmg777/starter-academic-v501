@@ -1,0 +1,512 @@
+/Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/python_fe_kuznets/script.py:113: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df3 = pd.read_stata(URL_TAB03)
+/Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/python_fe_kuznets/script.py:131: UnicodeWarning: 
+One or more strings in the dta file could not be decoded using utf-8, and
+so the fallback encoding of latin-1 is being used.  This can happen when a file
+has been incorrectly encoded by Stata or some other software. You should verify
+the string values returned are correct.
+  df4 = pd.read_stata(URL_TAB04)
+/Users/carlosmendez/miniforge3/envs/quantecon/lib/python3.13/site-packages/pyfixest/estimation/formula/model_matrix.py:149: UserWarning: 1 singleton fixed effect(s) dropped from the model.
+  warnings.warn(
+OMP: Info #276: omp_set_nested routine deprecated, please use omp_set_max_active_levels instead.
+/Users/carlosmendez/miniforge3/envs/quantecon/lib/python3.13/site-packages/pyfixest/estimation/formula/model_matrix.py:149: UserWarning: 1 singleton fixed effect(s) dropped from the model.
+  warnings.warn(
+/Users/carlosmendez/miniforge3/envs/quantecon/lib/python3.13/site-packages/pyfixest/estimation/formula/model_matrix.py:149: UserWarning: 1 singleton fixed effect(s) dropped from the model.
+  warnings.warn(
+/Users/carlosmendez/miniforge3/envs/quantecon/lib/python3.13/site-packages/pyfixest/estimation/formula/model_matrix.py:149: UserWarning: 4 singleton fixed effect(s) dropped from the model.
+  warnings.warn(
+/Users/carlosmendez/miniforge3/envs/quantecon/lib/python3.13/site-packages/pyfixest/estimation/formula/model_matrix.py:149: UserWarning: 6 singleton fixed effect(s) dropped from the model.
+  warnings.warn(
+/Users/carlosmendez/miniforge3/envs/quantecon/lib/python3.13/site-packages/pyfixest/estimation/formula/model_matrix.py:149: UserWarning: 1 singleton fixed effect(s) dropped from the model.
+  warnings.warn(
+============================================================
+SECTION 1: Data Loading and Exploration
+============================================================
+
+--- Loading Table 3 dataset (Kuznets curve) ---
+Shape: (880, 7)
+Columns: ['id', 'year', 'country', 'gini', 'log_GDPpc', 'log_GDPpc2', 'log_GDPpc3']
+
+First 5 rows:
+    id  year      country      gini  log_GDPpc  log_GDPpc2  log_GDPpc3
+0  1.0   3.0  Afghanistan  0.096787   6.861248   47.076733  323.005157
+1  1.0   4.0  Afghanistan  0.108558   7.050077   49.703590  350.414185
+2  1.0   5.0  Afghanistan  0.114865   7.346541   53.971672  396.505127
+3  2.0   1.0       Angola  0.113715   7.896129   62.348846  492.314514
+4  2.0   2.0       Angola  0.119875   7.952297   63.239033  502.895569
+
+Descriptive statistics:
+             id      year      gini  log_GDPpc  log_GDPpc2  log_GDPpc3
+count  880.0000  880.0000  880.0000   880.0000    880.0000    880.0000
+mean    89.9932    3.0318    0.0641     8.7599     78.2732    712.3774
+std     51.9770    1.4090    0.0332     1.2403     21.6226    288.5019
+min      1.0000    1.0000    0.0019     5.2458     27.5184    144.3558
+25%     45.0000    2.0000    0.0381     7.7617     60.2448    467.6052
+50%     89.5000    3.0000    0.0605     8.8514     78.3474    693.4843
+75%    134.0000    4.0000    0.0847     9.7595     95.2473    929.5637
+max    180.0000    5.0000    0.1601    11.6716    136.2253   1589.9617
+
+Missing values:
+id            0
+year          0
+country       0
+gini          0
+log_GDPpc     0
+log_GDPpc2    0
+log_GDPpc3    0
+dtype: int64
+
+Panel structure:
+  Countries: 180
+  Time periods: [np.float32(1.0), np.float32(2.0), np.float32(3.0), np.float32(4.0), np.float32(5.0)]
+
+Observations per period:
+year
+1.0    168
+2.0    175
+3.0    178
+4.0    179
+5.0    180
+Name: id, dtype: int64
+
+--- Loading Table 4 dataset (Determinants) ---
+Shape: (880, 21)
+Columns: ['id', 'year', 'country', 'countryISO', 'gini', 'lnGDPpc', 'lnGDPpc2', 'lnGDPpc3', 'rents', 'land', 'trade', 'fdi', 'area', 'gasoline', 'areaXgasoline', 'polity2', 'federal', 'lnGPDpcXfederal', 'aid', 'school', 'ethnic_gini']
+
+Descriptive statistics:
+             id      year      gini  ...       aid    school  ethnic_gini
+count  880.0000  880.0000  880.0000  ...  711.0000  748.0000     845.0000
+mean    90.0886    3.0318    0.0641  ...    0.0470    0.7160       0.2724
+std     51.9931    1.4090    0.0332  ...    0.1549    0.3174       0.2552
+min      1.0000    1.0000    0.0019  ...   -0.0186    0.0533       0.0000
+25%     45.0000    2.0000    0.0381  ...    0.0023    0.4515       0.0337
+50%     89.5000    3.0000    0.0605  ...    0.0129    0.8002       0.1949
+75%    134.0000    4.0000    0.0847  ...    0.0449    0.9587       0.4969
+max    180.0000    5.0000    0.1601  ...    2.8205    1.5405       0.8118
+
+[8 rows x 19 columns]
+
+Saved: kuznets_summary_stats.csv
+
+============================================================
+SECTION 2: Visual Exploration — Inequality and Development
+============================================================
+Saved: kuznets_scatter_pooled.png
+Saved: kuznets_scatter_by_period.png
+Saved: kuznets_period_means.csv
+
+============================================================
+SECTION 3: Pooled OLS — Linear, Quadratic, Cubic
+============================================================
+
+--- Model 1: Pooled OLS — Linear ---
+  gini = b0 + b1 * ln(GDPpc) + error
+  This assumes inequality changes at a constant rate with development.
+
+###
+
+Estimation:  OLS
+Dep. var.: gini
+sample: None = all
+Inference:  CRV1
+Observations:  880
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| Intercept     |      0.159 |        0.016 |    10.126 |      0.000 |  0.128 |   0.190 |
+| log_GDPpc     |     -0.011 |        0.002 |    -6.360 |      0.000 | -0.014 |  -0.007 |
+---
+RMSE: 0.03 R2: 0.164 
+None
+
+--- Model 2: Pooled OLS — Quadratic ---
+  gini = b0 + b1 * ln(GDPpc) + b2 * ln(GDPpc)^2 + error
+  This allows the relationship to bend once (inverted-U).
+
+###
+
+Estimation:  OLS
+Dep. var.: gini
+sample: None = all
+Inference:  CRV1
+Observations:  880
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| Intercept     |      0.050 |        0.084 |     0.594 |      0.553 | -0.115 |   0.215 |
+| log_GDPpc     |      0.015 |        0.019 |     0.773 |      0.441 | -0.023 |   0.053 |
+| log_GDPpc2    |     -0.001 |        0.001 |    -1.357 |      0.176 | -0.004 |   0.001 |
+---
+RMSE: 0.03 R2: 0.17 
+None
+
+--- Model 3: Pooled OLS — Cubic ---
+  gini = b0 + b1 * ln(GDPpc) + b2 * ln(GDPpc)^2 + b3 * ln(GDPpc)^3 + error
+  This allows the relationship to bend twice (N-shape).
+
+###
+
+Estimation:  OLS
+Dep. var.: gini
+sample: None = all
+Inference:  CRV1
+Observations:  880
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| Intercept     |     -0.583 |        0.361 |    -1.613 |      0.109 | -1.296 |   0.130 |
+| log_GDPpc     |      0.241 |        0.130 |     1.850 |      0.066 | -0.016 |   0.497 |
+| log_GDPpc2    |     -0.028 |        0.015 |    -1.821 |      0.070 | -0.058 |   0.002 |
+| log_GDPpc3    |      0.001 |        0.001 |     1.713 |      0.088 | -0.000 |   0.002 |
+---
+RMSE: 0.03 R2: 0.176 
+None
+
+--- Pooled OLS Coefficient Comparison ---
+Variable           Linear    Quadratic      Cubic
+------------------------------------------------
+log_GDPpc         -0.0108       0.0148     0.2405
+log_GDPpc2            ---      -0.0015    -0.0279
+log_GDPpc3            ---          ---     0.0010
+
+Saved: kuznets_pooled_ols.csv
+
+============================================================
+SECTION 4: Why Fixed Effects? — Country Heterogeneity
+============================================================
+
+Pooled OLS treats all country-year observations as independent draws.
+But countries differ in geography, institutions, colonial history, and
+culture — factors that affect BOTH inequality AND development.
+
+If these unobserved factors are correlated with GDP per capita, pooled
+OLS coefficients are biased. Fixed effects solve this by focusing on
+WITHIN-country variation over time: how does inequality change when the
+SAME country becomes richer or poorer?
+
+Saved: kuznets_spaghetti.png
+
+The spaghetti plot reveals the key insight: individual countries follow
+their own trajectories that differ from the cross-sectional pattern.
+A country at log GDP = 8 may have very different inequality than another
+at the same GDP level — because of country-specific factors.
+
+Fixed effects remove these country-specific levels and focus only on
+how inequality changes WITHIN each country as it develops.
+
+
+============================================================
+SECTION 5: Two-Way Fixed Effects (Replicating Table 3)
+============================================================
+
+Country FE: absorbs all time-invariant country characteristics
+Year FE: absorbs common global shocks (e.g., financial crises)
+Clustered SEs: accounts for within-country serial correlation
+
+--- Model 1: Linear TWFE ---
+###
+
+Estimation:  OLS
+Dep. var.: gini, Fixed effects: id + year
+sample: None = all
+Inference:  CRV1
+Observations:  879
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| log_GDPpc     |     -0.003 |        0.003 |    -1.119 |      0.265 | -0.009 |   0.002 |
+---
+RMSE: 0.006 R2: 0.972 R2 Within: 0.009 
+None
+
+--- Model 2: Quadratic TWFE ---
+###
+
+Estimation:  OLS
+Dep. var.: gini, Fixed effects: id + year
+sample: None = all
+Inference:  CRV1
+Observations:  879
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| log_GDPpc     |      0.056 |        0.023 |     2.451 |      0.015 |  0.011 |   0.101 |
+| log_GDPpc2    |     -0.003 |        0.001 |    -2.686 |      0.008 | -0.006 |  -0.001 |
+---
+RMSE: 0.005 R2: 0.974 R2 Within: 0.095 
+None
+
+--- Model 3: Cubic TWFE ---
+###
+
+Estimation:  OLS
+Dep. var.: gini, Fixed effects: id + year
+sample: None = all
+Inference:  CRV1
+Observations:  879
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| log_GDPpc     |      0.293 |        0.078 |     3.759 |      0.000 |  0.139 |   0.447 |
+| log_GDPpc2    |     -0.032 |        0.009 |    -3.568 |      0.000 | -0.050 |  -0.014 |
+| log_GDPpc3    |      0.001 |        0.000 |     3.286 |      0.001 |  0.000 |   0.002 |
+---
+RMSE: 0.005 R2: 0.975 R2 Within: 0.142 
+None
+
+--- Alternative: PyFixest stepwise specification ---
+  pf.feols('gini ~ log_GDPpc + csw0(log_GDPpc2, log_GDPpc3) | id + year')
+  This estimates all three models in a single call using csw0().
+
+--- Pooled OLS vs TWFE: Cubic Model Comparison ---
+Variable         Pooled OLS         TWFE
+----------------------------------------
+log_GDPpc            0.2405       0.2931
+log_GDPpc2          -0.0279      -0.0320
+log_GDPpc3           0.0010       0.0011
+
+Saved: kuznets_twfe_results.csv
+
+============================================================
+SECTION 6: Publication-Quality Table 3 (Great Tables)
+============================================================
+Saved: kuznets_table3.png
+Saved: kuznets_table3_data.csv
+
+============================================================
+SECTION 7: The N-Shaped Kuznets Curve — Turning Points
+============================================================
+
+Cubic TWFE coefficients:
+  b1 (ln GDP pc)    = 0.293112
+  b2 (ln GDP pc ^2) = -0.031969
+  b3 (ln GDP pc ^3) = 0.001122
+
+First derivative: d(Gini)/d(ln GDP) = 0.2931 + -0.0639*x + 0.0034*x^2
+Setting the first derivative to zero and solving the quadratic:
+
+  Turning points (log scale): [ 7.73501537 11.25422212]
+  Turning points (USD PPP):   ['$2,287', '$77,205']
+
+  Peak inequality (local max):    ln(GDP) = 7.74  =>  $2,287
+  Minimum inequality (local min): ln(GDP) = 11.25  =>  $77,205
+
+  Interpretation:
+  - Below $2,287: inequality RISES with development
+    (initial industrialization concentrates income in leading regions)
+  - Between $2,287 and $77,205: inequality FALLS
+    (lagging regions catch up — the convergence story)
+  - Above $77,205: inequality may RISE again
+    (knowledge economy re-concentrates in specific regions)
+Saved: kuznets_fitted_curve.png
+Saved: kuznets_turning_points.csv
+
+============================================================
+SECTION 8: Pooled OLS vs TWFE — Coefficient Comparison
+============================================================
+Saved: kuznets_ols_vs_fe.png
+Saved: kuznets_ols_vs_fe_comparison.csv
+
+============================================================
+SECTION 9: Determinants of Regional Inequality — EDA
+============================================================
+
+Determinants dataset shape: (880, 21)
+Columns: ['id', 'year', 'country', 'countryISO', 'gini', 'lnGDPpc', 'lnGDPpc2', 'lnGDPpc3', 'rents', 'land', 'trade', 'fdi', 'area', 'gasoline', 'areaXgasoline', 'polity2', 'federal', 'lnGPDpcXfederal', 'aid', 'school', 'ethnic_gini']
+
+Descriptive statistics:
+             id      year      gini  ...       aid    school  ethnic_gini
+count  880.0000  880.0000  880.0000  ...  711.0000  748.0000     845.0000
+mean    90.0886    3.0318    0.0641  ...    0.0470    0.7160       0.2724
+std     51.9931    1.4090    0.0332  ...    0.1549    0.3174       0.2552
+min      1.0000    1.0000    0.0019  ...   -0.0186    0.0533       0.0000
+25%     45.0000    2.0000    0.0381  ...    0.0023    0.4515       0.0337
+50%     89.5000    3.0000    0.0605  ...    0.0129    0.8002       0.1949
+75%    134.0000    4.0000    0.0847  ...    0.0449    0.9587       0.4969
+max    180.0000    5.0000    0.1601  ...    2.8205    1.5405       0.8118
+
+[8 rows x 19 columns]
+Saved: kuznets_correlation_heatmap.png
+Saved: kuznets_determinants_summary.csv
+
+============================================================
+SECTION 10: Determinants of Regional Inequality (Table 4)
+============================================================
+
+We now ask: WHAT DRIVES regional inequality, beyond the Kuznets curve?
+Each model adds a different group of determinants while keeping the
+cubic polynomial and two-way fixed effects.
+
+--- Model 1: Resources (rents, land) ---
+###
+
+Estimation:  OLS
+Dep. var.: gini, Fixed effects: id + year
+sample: None = all
+Inference:  CRV1
+Observations:  857
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| lnGDPpc       |      0.350 |        0.075 |     4.637 |      0.000 |  0.201 |   0.499 |
+| lnGDPpc2      |     -0.038 |        0.009 |    -4.372 |      0.000 | -0.055 |  -0.021 |
+| lnGDPpc3      |      0.001 |        0.000 |     4.005 |      0.000 |  0.001 |   0.002 |
+| rents         |      0.018 |        0.007 |     2.698 |      0.008 |  0.005 |   0.032 |
+| land          |     -0.053 |        0.014 |    -3.725 |      0.000 | -0.081 |  -0.025 |
+---
+RMSE: 0.005 R2: 0.976 R2 Within: 0.193 
+None
+
+--- Model 2: Trade & Investment (trade, fdi) ---
+###
+
+Estimation:  OLS
+Dep. var.: gini, Fixed effects: id + year
+sample: None = all
+Inference:  CRV1
+Observations:  817
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| lnGDPpc       |      0.205 |        0.081 |     2.549 |      0.012 |  0.046 |   0.364 |
+| lnGDPpc2      |     -0.022 |        0.009 |    -2.398 |      0.018 | -0.040 |  -0.004 |
+| lnGDPpc3      |      0.001 |        0.000 |     2.168 |      0.032 |  0.000 |   0.001 |
+| trade         |      0.005 |        0.002 |     2.736 |      0.007 |  0.001 |   0.009 |
+| fdi           |      0.009 |        0.007 |     1.297 |      0.197 | -0.005 |   0.024 |
+---
+RMSE: 0.005 R2: 0.976 R2 Within: 0.135 
+None
+
+--- Model 3: Mobility (gasoline, area x gasoline) ---
+###
+
+Estimation:  OLS
+Dep. var.: gini, Fixed effects: id + year
+sample: None = all
+Inference:  CRV1
+Observations:  672
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| lnGDPpc       |      0.171 |        0.078 |     2.190 |      0.030 |  0.017 |   0.325 |
+| lnGDPpc2      |     -0.019 |        0.009 |    -2.123 |      0.035 | -0.036 |  -0.001 |
+| lnGDPpc3      |      0.001 |        0.000 |     1.988 |      0.049 |  0.000 |   0.001 |
+| gasoline      |      0.001 |        0.002 |     0.276 |      0.783 | -0.004 |   0.005 |
+| areaXgasoline |      0.006 |        0.003 |     1.984 |      0.049 |  0.000 |   0.012 |
+---
+RMSE: 0.004 R2: 0.982 R2 Within: 0.045 
+None
+
+--- Model 4: Aid & Education (aid, school) ---
+###
+
+Estimation:  OLS
+Dep. var.: gini, Fixed effects: id + year
+sample: None = all
+Inference:  CRV1
+Observations:  585
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| lnGDPpc       |      0.226 |        0.110 |     2.058 |      0.041 |  0.009 |   0.444 |
+| lnGDPpc2      |     -0.023 |        0.014 |    -1.714 |      0.089 | -0.050 |   0.004 |
+| lnGDPpc3      |      0.001 |        0.001 |     1.347 |      0.180 | -0.000 |   0.002 |
+| aid           |      0.015 |        0.007 |     2.225 |      0.028 |  0.002 |   0.029 |
+| school        |     -0.014 |        0.007 |    -1.949 |      0.053 | -0.028 |   0.000 |
+---
+RMSE: 0.005 R2: 0.976 R2 Within: 0.163 
+None
+
+--- Model 5: Ethnicity (ethnic_gini) ---
+###
+
+Estimation:  OLS
+Dep. var.: gini, Fixed effects: id + year
+sample: None = all
+Inference:  CRV1
+Observations:  844
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| lnGDPpc       |      0.149 |        0.059 |     2.532 |      0.012 |  0.033 |   0.266 |
+| lnGDPpc2      |     -0.015 |        0.007 |    -2.227 |      0.027 | -0.029 |  -0.002 |
+| lnGDPpc3      |      0.000 |        0.000 |     1.866 |      0.064 | -0.000 |   0.001 |
+| ethnic_gini   |      0.071 |        0.016 |     4.305 |      0.000 |  0.038 |   0.103 |
+---
+RMSE: 0.005 R2: 0.98 R2 Within: 0.282 
+None
+
+Saved: kuznets_determinants_results.csv
+
+============================================================
+SECTION 11: Publication-Quality Table 4 (Great Tables)
+============================================================
+Saved: kuznets_table4.png
+Saved: kuznets_table4_data.csv
+
+============================================================
+SECTION 12: Coefficient Stability — Is the N-Shape Robust?
+============================================================
+Saved: kuznets_coefficient_stability.png
+
+--- Coefficient Stability Summary ---
+Specification       ln(GDP)    ln(GDP)^2    ln(GDP)^3
+----------------------------------------------------
+Baseline (Table 3)     0.2931      -0.0320       0.0011
+Resources            0.3498      -0.0380       0.0013
+Trade                0.2054      -0.0222       0.0008
+Mobility             0.1711      -0.0186       0.0007
+Aid/Educ.            0.2264      -0.0232       0.0007
+Ethnicity            0.1492      -0.0153       0.0005
+
+============================================================
+SECTION 13: Determinants Summary — What Drives Inequality?
+============================================================
+Saved: kuznets_determinants_barplot.png
+
+--- Determinant Effects Summary ---
+Variable                Coefficient  Significant
+------------------------------------------------
+Resource rents               0.0183      Yes ***
+Arable land                 -0.0529      Yes ***
+Trade openness               0.0051      Yes ***
+FDI                          0.0094           No
+Gasoline price               0.0006           No
+Area × Gasoline              0.0060      Yes ***
+Foreign aid                  0.0152      Yes ***
+School enrollment           -0.0141      Yes ***
+Ethnic Gini                  0.0709      Yes ***
+
+Saved: kuznets_determinants_effects.csv
+
+============================================================
+SECTION 14: Artifact Inventory
+============================================================
+
+Figures saved (8 PNGs, dark theme, 300 DPI):
+  1. kuznets_scatter_pooled.png     — Scatter + polynomial fits
+  2. kuznets_scatter_by_period.png  — Per-period scatter facets
+  3. kuznets_spaghetti.png          — Country trajectories
+  4. kuznets_fitted_curve.png       — N-shaped curve + turning points
+  5. kuznets_ols_vs_fe.png          — Pooled OLS vs TWFE comparison
+  6. kuznets_correlation_heatmap.png — Determinant correlations
+  7. kuznets_coefficient_stability.png — Polynomial stability
+  8. kuznets_determinants_barplot.png — Determinant effects
+
+Tables saved (2 PNGs via Great Tables):
+  1. kuznets_table3.png — Kuznets curve (3 TWFE models)
+  2. kuznets_table4.png — Determinants (5 TWFE models)
+
+CSV exports (11 files):
+  kuznets_summary_stats.csv, kuznets_period_means.csv,
+  kuznets_pooled_ols.csv, kuznets_twfe_results.csv,
+  kuznets_table3_data.csv, kuznets_turning_points.csv,
+  kuznets_ols_vs_fe_comparison.csv, kuznets_determinants_summary.csv,
+  kuznets_determinants_results.csv, kuznets_table4_data.csv,
+  kuznets_determinants_effects.csv
+
+=== Script completed successfully ===

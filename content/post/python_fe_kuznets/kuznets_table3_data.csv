@@ -1,0 +1,12 @@
+Variable,(1) Gini,(2) Gini,(3) Gini
+ln(GDP pc),-0.003,0.056**,0.293***
+,(0.003),(0.023),(0.078)
+ln(GDP pc)²,,-0.003***,-0.032***
+,,(0.001),(0.009)
+ln(GDP pc)³,,,0.001***
+,,,(0.000)
+,,,
+Observations,879,879,879
+R-squared,0.972,0.974,0.975
+Country FE,Yes,Yes,Yes
+Year FE,Yes,Yes,Yes
