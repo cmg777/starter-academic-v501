@@ -18,6 +18,14 @@ links:
     icon_pack: fas
     name: "Python script"
     url: script.py
+  - icon: book
+    icon_pack: fas
+    name: "Jupyter notebook"
+    url: notebook.ipynb
+  - icon: open-data
+    icon_pack: ai
+    name: "[Python] Google Colab"
+    url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_panel_intro/notebook.ipynb
 slides:
 summary: A beginner-friendly tour of seven panel-data estimators — POLS, Between, First-Differences, Fixed Effects, Two-Way FE, Random Effects, and Correlated Random Effects (Mundlak) — applied to a two-period worker wage panel.
 tags:
