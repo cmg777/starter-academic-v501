@@ -732,7 +732,8 @@ ax.set_yticks(range(len(det_vars)))
 ax.set_xticklabels(det_labels, fontsize=9, rotation=45, ha="right", color=LIGHT_TEXT)
 ax.set_yticklabels(det_labels, fontsize=9, color=LIGHT_TEXT)
 
-# Remove black grid lines from imshow
+# Remove black grid lines from imshow (global rcParams enables grid)
+ax.grid(False)
 ax.tick_params(top=False, bottom=False, left=False, right=False)
 for spine in ax.spines.values():
     spine.set_visible(False)
