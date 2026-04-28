@@ -1,0 +1,468 @@
+============================================================
+SECTION 1: Data Loading
+============================================================
+
+Full dataset shape: (11045, 9)
+Columns: ['ID', 'year', 'age', 'wagerate', 'schooling', 'region', 'union', 'lwage', 'gender']
+
+Years available: [np.int16(2010), np.int16(2012), np.int16(2014), np.int16(2016), np.int16(2018)]
+
+First 5 rows:
+       ID  year   age  wagerate  schooling region union     lwage  gender
+0  5177.0  2010  38.0  6.642445       12.0  South    No  1.893480  Female
+1  5177.0  2012  41.0  8.494334       12.0  South    No  2.139399  Female
+2  5177.0  2014  43.0  7.827618       12.0  South    No  2.057658  Female
+3  5177.0  2016  44.0  9.474773       12.0  South    No  2.248633  Female
+4  5177.0  2018  46.0  7.410000       12.0  South    No  2.002831  Female
+Exported raw_data.csv (11045 rows, 9 cols)
+
+Filtered panel shape: (4418, 9)
+Individuals (N): 2209
+Time periods (T): 2
+Total observations (N*T): 4418
+
+Converted union to numeric: {0.0: 3696, 1.0: 722}
+Converted gender to female dummy: {1.0: 2284, 0.0: 2134}
+Dropped 20 rows with missing values
+Exported data_panel.csv (4398 rows, 10 cols)
+
+Key variables check:
+  lwage: float32, range [-1.73, 6.06]
+  union: float64, range [0.00, 1.00]
+  age: float32, range [25.00, 49.00]
+  schooling: float32, range [3.00, 17.00]
+Gender variable: female (from 'gender')
+
+============================================================
+SECTION 2: Descriptive Statistics
+============================================================
+
+Panel structure:
+  Individuals (N): 2199
+  Periods (T): 2
+  Observations (N*T): 4398
+  Balanced: True
+  Min obs per individual: 2
+  Max obs per individual: 2
+
+Descriptive statistics by year:
+       lwage                                  ... schooling                        
+       count    mean     std     min     25%  ...       min   25%   50%   75%   max
+year                                          ...                                  
+2010  2199.0  3.0698  0.6054 -1.7325  2.7024  ...       3.0  12.0  15.0  16.0  17.0
+2012  2199.0  3.1424  0.5889  0.9169  2.7827  ...       3.0  12.0  15.0  16.0  17.0
+
+[2 rows x 32 columns]
+
+Overall descriptive statistics:
+           lwage      union        age  schooling
+count  4398.0000  4398.0000  4398.0000  4398.0000
+mean      3.1061     0.1626    35.6794    14.5020
+std       0.5982     0.3690     6.2576     2.1825
+min      -1.7325     0.0000    25.0000     3.0000
+25%       2.7434     0.0000    30.0000    12.0000
+50%       3.0958     0.0000    35.0000    15.0000
+75%       3.4671     0.0000    41.0000    16.0000
+max       6.0635     1.0000    49.0000    17.0000
+Exported descriptive_stats.csv
+
+Between vs Within variation decomposition:
+Variable       Overall SD   Between SD    Within SD    Between %
+--------------------------------------------------------------
+lwage              0.5982       0.5570       0.2184        86.7%
+union              0.3690       0.3576       0.0911        93.9%
+age                6.2576       6.1755       1.0147        97.4%
+schooling          2.1825       2.1827       0.0000       100.0%
+
+Exported variation_decomposition.csv
+Saved panel_intro_variation.png
+
+============================================================
+SECTION 3: Pooled OLS (POLS)
+============================================================
+
+Pooled OLS: lwage ~ union (robust SE)
+###
+
+Estimation:  OLS
+Dep. var.: lwage
+sample: None = all
+Inference:  HC1
+Observations:  4398
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| Intercept     |      3.094 |        0.010 |   310.303 |      0.000 |  3.074 |   3.113 |
+| union         |      0.075 |        0.023 |     3.243 |      0.001 |  0.030 |   0.120 |
+---
+RMSE: 0.598 R2: 0.002 
+None
+
+Union coefficient: 0.0750 (SE: 0.0231)
+Note: POLS ignores the panel structure entirely.
+
+============================================================
+SECTION 4: First-Differencing Fixed Effects (FDFE)
+============================================================
+
+First-differenced data shape: (2199, 2)
+First 5 rows of differenced data:
+    d_lwage  d_union
+0  0.245919      0.0
+1  0.151266      0.0
+2 -0.057654      0.0
+3 -0.474149      0.0
+4 -0.229063      0.0
+
+First-Differencing FE: d_lwage ~ d_union (robust SE)
+###
+
+Estimation:  OLS
+Dep. var.: d_lwage
+sample: None = all
+Inference:  HC1
+Observations:  2199
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| Intercept     |      0.073 |        0.009 |     7.939 |      0.000 |  0.055 |   0.091 |
+| d_union       |      0.211 |        0.079 |     2.668 |      0.008 |  0.056 |   0.367 |
+---
+RMSE: 0.429 R2: 0.008 
+None
+
+Union coefficient (FD): 0.2113 (SE: 0.0792)
+Note: With T=2, first-differencing is numerically equivalent to the within estimator.
+
+============================================================
+SECTION 5: Time-Demeaning Fixed Effects (TDFE — Within Estimator)
+============================================================
+
+--- Manual demeaning (pedagogical) ---
+Manual demeaning: lwage_demeaned ~ union_demeaned
+Union coefficient (manual): 0.2103 (SE: 0.0574)
+
+--- pyfixest with absorbed FE ---
+TDFE: lwage ~ union | ID (robust SE)
+###
+
+Estimation:  OLS
+Dep. var.: lwage, Fixed effects: ID
+sample: None = all
+Inference:  HC1
+Observations:  4398
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| union         |      0.210 |        0.081 |     2.590 |      0.010 |  0.051 |   0.370 |
+---
+RMSE: 0.218 R2: 0.868 R2 Within: 0.008 
+None
+
+Union coefficient (TDFE): 0.2103 (SE: 0.0812)
+
+--- Verification: FD == TDFE with T=2 ---
+FD coefficient:   0.211314
+TDFE coefficient: 0.210318
+Difference:       0.0009959407
+Match: False
+
+============================================================
+SECTION 6: TDFE v2 (reghdfe-style — Clustered SE)
+============================================================
+TDFE v2: lwage ~ union | ID (clustered SE at ID)
+###
+
+Estimation:  OLS
+Dep. var.: lwage, Fixed effects: ID
+sample: None = all
+Inference:  CRV1
+Observations:  4398
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| union         |      0.210 |        0.081 |     2.590 |      0.010 |  0.051 |   0.370 |
+---
+RMSE: 0.218 R2: 0.868 R2 Within: 0.008 
+None
+
+Union coefficient: 0.2103
+Robust SE:    0.0812
+Clustered SE: 0.0812
+Note: Coefficients are identical; only standard errors differ.
+
+============================================================
+SECTION 7: Dummy Variable Fixed Effects (DVFE)
+============================================================
+Estimating DVFE (may take a moment with many dummies)...
+
+Union coefficient (DVFE): 0.2103 (SE: 0.0812)
+Number of individual dummies estimated: 2198
+
+--- Verification: DVFE == TDFE ---
+TDFE coefficient: 0.210318
+DVFE coefficient: 0.210318
+Difference:       0.0000000000
+Match: True
+Note: DVFE and within estimator produce identical slope coefficients.
+DVFE is impractical for large N (estimates N-1 individual intercepts).
+
+============================================================
+SECTION 8: Random Effects (RE)
+============================================================
+Random Effects: lwage ~ union (robust SE)
+                        RandomEffects Estimation Summary                        
+================================================================================
+Dep. Variable:                  lwage   R-squared:                        0.0035
+Estimator:              RandomEffects   R-squared (Between):              0.0010
+No. Observations:                4398   R-squared (Within):               0.0059
+Date:                Tue, Apr 28 2026   R-squared (Overall):              0.0017
+Time:                        20:51:42   Log-likelihood                   -1058.6
+Cov. Estimator:                Robust                                           
+                                        F-statistic:                      15.391
+Entities:                        2199   P-value                           0.0001
+Avg Obs:                       2.0000   Distribution:                  F(1,4396)
+Min Obs:                       2.0000                                           
+Max Obs:                       2.0000   F-statistic (robust):             13.372
+                                        P-value                           0.0003
+Time periods:                       2   Distribution:                  F(1,4396)
+Avg Obs:                       2199.0                                           
+Min Obs:                       2199.0                                           
+Max Obs:                       2199.0                                           
+                                                                                
+                             Parameter Estimates                              
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          3.0883     0.0131     236.48     0.0000      3.0627      3.1139
+union          0.1092     0.0299     3.6567     0.0003      0.0506      0.1677
+==============================================================================
+
+Union coefficient (RE): 0.1092 (SE: 0.0299)
+Note: RE assumes individual effects are uncorrelated with regressors.
+If this assumption fails, RE estimates are inconsistent (use FE instead).
+
+============================================================
+SECTION 9: Correlated Random Effects (CRE / Mundlak)
+============================================================
+CRE (Mundlak): lwage ~ union + union_bar (RE, robust SE)
+                        RandomEffects Estimation Summary                        
+================================================================================
+Dep. Variable:                  lwage   R-squared:                        0.0048
+Estimator:              RandomEffects   R-squared (Between):              0.0018
+No. Observations:                4398   R-squared (Within):               0.0077
+Date:                Tue, Apr 28 2026   R-squared (Overall):              0.0026
+Time:                        20:51:42   Log-likelihood                   -1055.8
+Cov. Estimator:                Robust                                           
+                                        F-statistic:                      10.513
+Entities:                        2199   P-value                           0.0000
+Avg Obs:                       2.0000   Distribution:                  F(2,4395)
+Min Obs:                       2.0000                                           
+Max Obs:                       2.0000   F-statistic (robust):             7.0170
+                                        P-value                           0.0009
+Time periods:                       2   Distribution:                  F(2,4395)
+Avg Obs:                       2199.0                                           
+Min Obs:                       2199.0                                           
+Max Obs:                       2199.0                                           
+                                                                                
+                             Parameter Estimates                              
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          3.0953     0.0129     239.75     0.0000      3.0700      3.1206
+union          0.2103     0.0703     2.9900     0.0028      0.0724      0.3482
+union_bar     -0.1441     0.0800    -1.8013     0.0717     -0.3010      0.0127
+==============================================================================
+
+Union coefficient (CRE):       0.2103 (SE: 0.0703)
+Union_bar (Mundlak term):      -0.1441 (SE: 0.0800)
+
+--- CRE vs FE comparison ---
+FE (within) coefficient:  0.210318
+CRE union coefficient:    0.210318
+Difference:               0.000000
+Insight: The CRE union coefficient approximates the FE estimate.
+The Mundlak term (union_bar) captures between-individual correlation.
+If union_bar is significant, individual effects are correlated with union
+=> RE is inconsistent, and FE should be preferred.
+
+============================================================
+FIGURE 2: Basic Methods — Union Coefficient Comparison
+============================================================
+Saved panel_intro_coef_comparison.png
+Exported basic_models_comparison.csv
+
+============================================================
+SECTION 10: Extended Models with Controls
+============================================================
+
+Available columns for controls:
+['ID', 'year', 'age', 'wagerate', 'schooling', 'region', 'union', 'lwage', 'gender', 'female', 'lwage_mean', 'union_mean_demean', 'lwage_demeaned', 'union_demeaned', 'ID_str', 'union_bar']
+
+--- POLS with controls ---
+POLS: lwage ~ union + age + schooling + female + C(year_factor)
+###
+
+Estimation:  OLS
+Dep. var.: lwage
+sample: None = all
+Inference:  HC1
+Observations:  4398
+
+| Coefficient            |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:-----------------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| Intercept              |      0.871 |        0.076 |    11.507 |      0.000 |  0.723 |   1.020 |
+| union                  |      0.057 |        0.020 |     2.806 |      0.005 |  0.017 |   0.097 |
+| age                    |      0.021 |        0.001 |    16.210 |      0.000 |  0.018 |   0.023 |
+| schooling              |      0.111 |        0.004 |    30.120 |      0.000 |  0.104 |   0.118 |
+| female                 |     -0.273 |        0.016 |   -17.093 |      0.000 | -0.304 |  -0.242 |
+| C(year_factor)[T.2012] |      0.031 |        0.016 |     1.942 |      0.052 | -0.000 |   0.062 |
+---
+RMSE: 0.525 R2: 0.23 
+None
+
+--- TWFE with controls ---
+TWFE: lwage ~ union + age | ID + year
+###
+
+Estimation:  OLS
+Dep. var.: lwage, Fixed effects: ID + year
+sample: None = all
+Inference:  CRV1
+Observations:  4398
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| union         |      0.213 |        0.079 |     2.686 |      0.007 |  0.057 |   0.368 |
+| age           |     -0.058 |        0.024 |    -2.418 |      0.016 | -0.104 |  -0.011 |
+---
+RMSE: 0.214 R2: 0.872 R2 Within: 0.011 
+None
+Note: schooling and gender are absorbed by individual FE (time-invariant).
+
+--- RE with controls ---
+RE with controls:
+                        RandomEffects Estimation Summary                        
+================================================================================
+Dep. Variable:                  lwage   R-squared:                        0.1586
+Estimator:              RandomEffects   R-squared (Between):              0.2596
+No. Observations:                4398   R-squared (Within):               0.0263
+Date:                Tue, Apr 28 2026   R-squared (Overall):              0.2285
+Time:                        20:52:33   Log-likelihood                   -1009.7
+Cov. Estimator:                Robust                                           
+                                        F-statistic:                      206.94
+Entities:                        2199   P-value                           0.0000
+Avg Obs:                       2.0000   Distribution:                  F(4,4393)
+Min Obs:                       2.0000                                           
+Max Obs:                       2.0000   F-statistic (robust):             205.26
+                                        P-value                           0.0000
+Time periods:                       2   Distribution:                  F(4,4393)
+Avg Obs:                       2199.0                                           
+Min Obs:                       2199.0                                           
+Max Obs:                       2199.0                                           
+                                                                                
+                             Parameter Estimates                              
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.8229     0.0985     8.3567     0.0000      0.6298      1.0159
+union          0.0861     0.0258     3.3330     0.0009      0.0355      0.1368
+age            0.0224     0.0016     13.965     0.0000      0.0192      0.0255
+schooling      0.1112     0.0047     23.507     0.0000      0.1019      0.1205
+female        -0.2731     0.0206    -13.249     0.0000     -0.3135     -0.2327
+==============================================================================
+
+--- CRE with controls ---
+CRE with controls:
+                        RandomEffects Estimation Summary                        
+================================================================================
+Dep. Variable:                  lwage   R-squared:                        0.1613
+Estimator:              RandomEffects   R-squared (Between):              0.2605
+No. Observations:                4398   R-squared (Within):               0.0315
+Date:                Tue, Apr 28 2026   R-squared (Overall):              0.2300
+Time:                        20:52:33   Log-likelihood                   -1002.5
+Cov. Estimator:                Robust                                           
+                                        F-statistic:                      140.77
+Entities:                        2199   P-value                           0.0000
+Avg Obs:                       2.0000   Distribution:                  F(6,4391)
+Min Obs:                       2.0000                                           
+Max Obs:                       2.0000   F-statistic (robust):             139.61
+                                        P-value                           0.0000
+Time periods:                       2   Distribution:                  F(6,4391)
+Avg Obs:                       2199.0                                           
+Min Obs:                       2199.0                                           
+Max Obs:                       2199.0                                           
+                                                                                
+                             Parameter Estimates                              
+==============================================================================
+            Parameter  Std. Err.     T-stat    P-value    Lower CI    Upper CI
+------------------------------------------------------------------------------
+const          0.8845     0.1005     8.7995     0.0000      0.6874      1.0815
+union          0.2103     0.0683     3.0816     0.0021      0.0765      0.3441
+union_bar     -0.1632     0.0765    -2.1335     0.0329     -0.3132     -0.0132
+age            0.0332     0.0046     7.2828     0.0000      0.0243      0.0421
+age_bar       -0.0122     0.0048    -2.5510     0.0108     -0.0216     -0.0028
+schooling      0.1108     0.0047     23.361     0.0000      0.1015      0.1201
+female        -0.2731     0.0206    -13.267     0.0000     -0.3134     -0.2327
+==============================================================================
+
+--------------------------------------------------------------------------------
+COMPARISON TABLE: Extended Models
+--------------------------------------------------------------------------------
+Variable                 POLS           TWFE             RE            CRE
+========================================================================
+Union           0.0571 (0.0204)  0.2129 (0.0793)  0.0861 (0.0258)  0.2103 (0.0683)
+Age             0.0209 (0.0013) -0.0576 (0.0238)  0.0224 (0.0016)  0.0332 (0.0046)
+Schooling       0.1108 (0.0037)       absorbed  0.1112 (0.0047)  0.1108 (0.0047)
+Female         -0.2731 (0.0160)       absorbed -0.2731 (0.0206) -0.2731 (0.0206)
+========================================================================
+N                        4398           4398           4398           4398
+
+Exported extended_models_comparison.csv
+
+============================================================
+FIGURE 3: Extended Models — Key Variable Coefficients
+============================================================
+Saved panel_intro_extended_models.png
+
+============================================================
+FIGURE 4: Individual Wage Trajectories
+============================================================
+Saved panel_intro_wage_trajectories.png
+
+============================================================
+SECTION 11: Summary of All Methods
+============================================================
+
+Method         Coef         SE Description
+----------------------------------------------------------------------
+POLS         0.0750     0.0231  Pooled OLS — ignores panel structure
+FDFE         0.2113     0.0792  First-differencing — eliminates individual FE
+TDFE         0.2103     0.0812  Within estimator — time-demeaned FE
+DVFE         0.2103     0.0812  Dummy variable — explicit individual dummies
+RE           0.1092     0.0299  Random effects — GLS (assumes no correlation)
+CRE          0.2103     0.0703  Correlated RE — Mundlak approach
+
+Key takeaways:
+  1. FD, TDFE, and DVFE produce identical coefficients (0.2103) — three
+     ways to implement the same within estimator.
+  2. POLS (0.0750) ignores unobserved heterogeneity and is likely biased.
+  3. RE (0.1092) is a weighted average of between and within estimators.
+  4. CRE (0.2103) bridges FE and RE — its within coefficient approximates FE.
+
+============================================================
+Generated PNG files:
+  panel_intro_coef_comparison.png
+  panel_intro_extended_models.png
+  panel_intro_variation.png
+  panel_intro_wage_trajectories.png
+
+Generated CSV files:
+  basic_models_comparison.csv
+  data_panel.csv
+  descriptive_stats.csv
+  extended_models_comparison.csv
+  raw_data.csv
+  variation_decomposition.csv
+
+=== Script completed successfully ===
