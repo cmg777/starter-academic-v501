@@ -660,7 +660,8 @@ for i, var in enumerate(var_names):
     ols_se = ols_tidy.loc[var, "Std. Error"]
     ax.barh(y_positions[i] + bar_height / 2, ols_coef, height=bar_height,
             color=STEEL_BLUE, alpha=0.8, label="Pooled OLS" if i == 0 else None,
-            xerr=1.96 * ols_se, capsize=5, error_kw={"color": WHITE_TEXT, "lw": 1.5})
+            xerr=1.96 * ols_se, capsize=5,
+            error_kw={"ecolor": WHITE_TEXT, "lw": 1.5, "capthick": 1.5})
 
     # TWFE
     fe_tidy = fe_cubic.tidy()
@@ -668,7 +669,8 @@ for i, var in enumerate(var_names):
     fe_se = fe_tidy.loc[var, "Std. Error"]
     ax.barh(y_positions[i] - bar_height / 2, fe_coef, height=bar_height,
             color=WARM_ORANGE, alpha=0.8, label="TWFE" if i == 0 else None,
-            xerr=1.96 * fe_se, capsize=5, error_kw={"color": WHITE_TEXT, "lw": 1.5})
+            xerr=1.96 * fe_se, capsize=5,
+            error_kw={"ecolor": WHITE_TEXT, "lw": 1.5, "capthick": 1.5})
 
 ax.axvline(0, color=LIGHT_TEXT, ls="-", lw=0.8, alpha=0.5)
 ax.set_yticks(y_positions)
