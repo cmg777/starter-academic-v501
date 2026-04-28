@@ -119,7 +119,6 @@ Generated files:
   panel_intro_extended_models.png
   panel_intro_trajectories.png
   panel_intro_variation.png
-  panel_intro_wage_trajectories.png
   raw_data.csv
   variation_decomposition.csv
 

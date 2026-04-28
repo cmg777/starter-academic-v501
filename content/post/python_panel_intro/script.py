@@ -219,7 +219,8 @@ ax.set_yticklabels([v.title() for v in variation_df["variable"]],
 ax.set_xlabel("Share of Total Variance (%)", fontsize=13, color=LIGHT_TEXT)
 ax.set_title("Between vs Within Variation in Panel Data",
              fontsize=15, fontweight="bold", color=WHITE_TEXT)
-ax.legend(loc="lower right")
+# Legend below the axis so the bars (which extend to 100%) are not covered.
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.18), ncol=2, fontsize=11)
 ax.set_xlim(0, 105)
 save_dark("panel_intro_variation.png")
 
@@ -252,7 +253,9 @@ legend_elements = [
     Line2D([0], [0], color=TEAL, lw=2.5, marker="o",
            markersize=6, label="Union status changed"),
 ]
-ax.legend(handles=legend_elements, loc="upper left")
+# Legend below the axis so it does not collide with title or data lines.
+ax.legend(handles=legend_elements, loc="upper center",
+          bbox_to_anchor=(0.5, -0.12), ncol=3, fontsize=11)
 ax.set_xlabel("Year", fontsize=13, color=LIGHT_TEXT)
 ax.set_ylabel("Log Wage", fontsize=13, color=LIGHT_TEXT)
 ax.set_title("Individual Wage Trajectories (30 sampled workers)",
