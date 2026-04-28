@@ -1,0 +1,14 @@
+predictor,treated,synthetic,sample_mean
+school.illit,3.321,7.645,10.983
+school.prim,85.893,82.285,80.911
+school.med,7.522,6.965,5.427
+school.high,3.264,3.105,2.679
+invest,24.647,21.583,21.424
+special.gdpcap.1960.1969,5.285,5.271,3.581
+special.sec.agriculture.1961.1969,6.844,6.179,21.353
+special.sec.energy.1961.1969,4.106,2.76,5.31
+special.sec.industry.1961.1969,45.082,37.636,22.425
+special.sec.construction.1961.1969,6.15,6.952,7.276
+special.sec.services.venta.1961.1969,33.754,41.104,36.528
+special.sec.services.nonventa.1961.1969,4.072,5.371,7.111
+special.popdens.1969,246.89,196.288,99.414
