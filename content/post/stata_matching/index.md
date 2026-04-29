@@ -51,7 +51,7 @@ diagram: true
 
 Does maternal smoking during pregnancy *cause* lower birth weight, or do smokers and non-smokers simply differ in other ways that happen to predict their babies' birth weights? It is one of the most-studied questions in applied econometrics, and the honest answer depends entirely on how we adjust for the differences between the two groups. In this tutorial we use Stata's `teffects` family of commands to walk through **six different treatment-effects estimators** on a single dataset --- 4,642 mother-infant pairs from the Cattaneo (2010) study --- and watch each one wrestle with the same question.
 
-The six estimators take three different routes. **Regression adjustment** models the outcome (birth weight). **Inverse-probability weighting** and **propensity-score matching** model the treatment (smoking). **IPWRA**, **AIPW**, and **nearest-neighbor matching** combine ideas from both sides. By the end of the post you will see how their answers agree, where they differ, and how to read each output panel without flinching.
+The six estimators take **four different routes** to the same causal estimand. **Regression adjustment (RA)** models only the outcome (birth weight). **Inverse-probability weighting (IPW)** and **propensity-score matching (PSM)** model only the treatment (smoking). **IPWRA** and **AIPW** model *both* the outcome and the treatment --- the **doubly robust** family. **Nearest-neighbor matching (NNM)** does not fit a parametric model at all: it matches each smoking mother directly to her most similar non-smoker in covariate space. By the end of the post you will see how their answers agree, where they differ, and how to read each output panel without flinching.
 
 The pedagogical hook is that we already have a clear (but biased) reference number to anchor the tour. A naive comparison of means says smokers' babies weigh **275 grams less** than non-smokers'. Every adjusted estimator we run will return a smaller number, and the gap between **−275 g** (naive) and what we eventually settle on (around **−230 g**) is exactly what causal-inference machinery buys us. That gap is the bias we would have if we treated this observational dataset as if it came from a randomized experiment. Watching it shrink is the whole pedagogical point.
 
@@ -81,10 +81,10 @@ flowchart LR
     X["X: maternal traits<br/>(age, education, marital,<br/>prenatal care, etc.)"] --> D["D: maternal smoking<br/>(mbsmoke)"]
     X --> Y["Y: birth weight<br/>(bweight)"]
     D --> Y
-    style X fill:#6a9bcc,stroke:#141413,color:#fff
-    style D fill:#d97757,stroke:#141413,color:#fff
-    style Y fill:#00d4c8,stroke:#141413,color:#141413
-    linkStyle 0,1,2 stroke:#141413,stroke-width:1.5px
+    style X fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    style D fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
+    style Y fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
+    linkStyle 0,1,2 stroke:#d97757,stroke-width:2.5px
 ```
 
 Read the diagram from left to right. Maternal characteristics `X` (steel blue) influence both the *decision* to smoke `D` (warm orange) and the *outcome* `Y` --- birth weight (teal). The arrow `D → Y` is the causal effect we want to isolate. The arrows `X → D` and `X → Y` together form the **back-door path** that contaminates a naive comparison: if we just compare smokers to non-smokers, we are picking up the differences in `X` between the two groups in addition to the direct effect of smoking. Every method in this tutorial blocks the back-door path in a different way.
@@ -126,12 +126,12 @@ flowchart LR
     end
     M --> O["We observe<br/>only ONE"]
     O --> Q["Other is<br/>missing → must<br/>be estimated"]
-    style Y1 fill:#d97757,stroke:#141413,color:#fff
-    style Y0 fill:#6a9bcc,stroke:#141413,color:#fff
-    style M fill:#fafafa,stroke:#141413,color:#141413
-    style O fill:#00d4c8,stroke:#141413,color:#141413
-    style Q fill:#e8e8e8,stroke:#141413,color:#141413
-    linkStyle 0,1 stroke:#141413,stroke-width:1.5px
+    style Y1 fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
+    style Y0 fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    style M fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
+    style O fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
+    style Q fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
+    linkStyle 0,1 stroke:#d97757,stroke-width:2.5px
 ```
 
 The fundamental problem is what makes causal inference a **missing-data problem in disguise**. Every estimator in this tutorial is, at heart, a different way of imputing the missing potential outcome. RA imputes it with a regression model. IPW imputes it implicitly by re-weighting. Matching imputes it with the actual outcome of a similar but un-treated unit.
@@ -249,23 +249,37 @@ flowchart TD
     Both --> AIPW["4. AIPW"]
     Direct --> NNM["5. Nearest-Neighbor<br/>Matching (NNM)"]
 
-    style Start fill:#141413,stroke:#141413,color:#fff
-    style Outcome fill:#6a9bcc,stroke:#141413,color:#fff
-    style Treatment fill:#d97757,stroke:#141413,color:#fff
-    style Both fill:#00d4c8,stroke:#141413,color:#141413
-    style Direct fill:#fafafa,stroke:#141413,color:#141413
-    style RA fill:#6a9bcc,stroke:#141413,color:#fff
-    style IPW fill:#d97757,stroke:#141413,color:#fff
-    style PSM fill:#d97757,stroke:#141413,color:#fff
-    style IPWRA fill:#00d4c8,stroke:#141413,color:#141413
-    style AIPW fill:#00d4c8,stroke:#141413,color:#141413
-    style NNM fill:#fafafa,stroke:#141413,color:#141413
-    linkStyle 0,1,2,3,4,5,6,7,8,9 stroke:#141413,stroke-width:1.5px
+    style Start fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    style Outcome fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    style Treatment fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
+    style Both fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
+    style Direct fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
+    style RA fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    style IPW fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
+    style PSM fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
+    style IPWRA fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
+    style AIPW fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
+    style NNM fill:#c8d0e0,stroke:#d97757,stroke-width:2px,color:#141413
+    linkStyle 0,1,2,3,4,5,6,7,8,9 stroke:#d97757,stroke-width:2.5px
 ```
 
-**How to read the taxonomy.** RA is the only estimator that relies *purely* on an outcome model; if that model is wrong, RA is biased. IPW and PSM both lean on a model of the treatment (also called the propensity score); if that model is wrong, they are biased. IPWRA and AIPW combine both kinds of model and inherit the **doubly robust** property: they remain consistent if *either* the outcome model or the treatment model is correctly specified --- you only need one of two to be right. NNM is the odd one out: it does not fit a parametric model at all but instead matches each treated mother directly to the most similar untreated mother in covariate space. Before we run any method, we will also estimate a **naive baseline** (a one-variable regression with no covariates) so we have a number to put the adjustments against.
+**How to read the taxonomy.** Each branch of the tree answers a different design question. **RA** (the leftmost branch) is the only estimator that relies *purely* on an outcome model; if that model is wrong, RA is biased. **IPW** and **PSM** (the orange branch) both rely *purely* on a treatment model (the propensity score); if that model is wrong, they are biased. They differ from each other in *how* they use the propensity score: IPW reweights every observation by the inverse propensity, while PSM matches each treated unit to the untreated unit with the most similar propensity score. **IPWRA** and **AIPW** (the teal branch) fit *both* an outcome model *and* a treatment model and combine them in a way that delivers the **doubly robust** property: they remain consistent if *either* model is correctly specified --- you only need one of two to be right. **NNM** (the white branch) is the odd one out: it does not fit a parametric model at all. It instead computes a multidimensional Mahalanobis distance between each treated mother and every untreated mother, picks the closest non-smoker(s), and compares outcomes directly. Before we run any method, we will also estimate a **naive baseline** (a one-variable regression with no covariates) so we have a number to put the adjustments against.
 
-The companion `analysis.do` file estimates each method in roughly 20 seconds. We walk through them one at a time below, and in §11 we line up all six estimates plus the naive baseline in a single forest plot.
+To make the similarities and differences explicit, the table below summarizes each method along five axes: what it models, what it does with the model output, what its key tuning option is, what its estimand is in Stata's `teffects`, and what it is biased against if the world is unkind.
+
+| Method | Models the outcome? | Models the treatment (propensity)? | Core mechanic | Estimands in `teffects` | Biased if... |
+|---|:---:|:---:|---|---|---|
+| **Naive** | No | No | Difference of means | ATE only | confounders exist (always) |
+| **1. RA** | ✓ | — | Predict $Y(1)$ and $Y(0)$ from a regression and average the gap | ATE, ATT | the outcome model is wrong |
+| **2. IPW** | — | ✓ | Reweight outcomes by $1/\hat e(X)$ for treated, $1/(1-\hat e(X))$ for controls | ATE, ATT | the propensity model is wrong |
+| **3. IPWRA** | ✓ | ✓ | Run RA *with IPW weights* | ATE, ATT | **both** models are wrong (doubly robust) |
+| **4. AIPW** | ✓ | ✓ | RA + IPW correction term using outcome residuals | ATE only | **both** models are wrong (doubly robust + efficient) |
+| **5. NNM** | — | — | Find the nearest neighbor(s) in Mahalanobis-distance covariate space | ATE, ATT | no parametric model is wrong, but matching can be poor in sparse regions |
+| **6. PSM** | — | ✓ | Find the nearest neighbor(s) in **propensity-score** space | ATE, ATT | the propensity model is wrong |
+
+A few observations worth pausing on. First, **NNM is the only method that uses neither an outcome nor a treatment model.** It is the most assumption-light estimator in the lineup, paying for that freedom in efficiency: its standard errors are typically larger than the model-based methods, as we will see. Second, **PSM is closer to IPW than to NNM.** Both PSM and IPW depend critically on a correctly specified propensity model; PSM just *matches* on the propensity score where IPW *reweights* by it. Third, **IPWRA and AIPW are siblings, not twins.** Both fit both kinds of model and both are doubly robust, but IPWRA combines them by literally running weighted regression, while AIPW combines them with an additive correction term derived from semiparametric efficiency theory --- a derivation that gives AIPW the smallest possible asymptotic variance among regular doubly robust estimators. Fourth, **RA is a special case** in the sense that its mechanics (predict, average the predicted gap) are also a step inside IPWRA and AIPW; you can think of those two as RA with a safety net.
+
+The companion `analysis.do` file estimates each method in roughly 20 seconds. We walk through them one at a time below, and in §13 we line up all six estimates plus the naive baseline in a single forest plot.
 
 ## 7. The naive baseline
 
@@ -530,12 +544,12 @@ flowchart LR
     P --> N["Find non-smoker<br/>with closest e(X)"]
     N --> C["Compare<br/>outcomes"]
     C --> A["Average<br/>across all<br/>smokers"]
-    style S fill:#d97757,stroke:#141413,color:#fff
-    style P fill:#6a9bcc,stroke:#141413,color:#fff
-    style N fill:#6a9bcc,stroke:#141413,color:#fff
-    style C fill:#00d4c8,stroke:#141413,color:#141413
-    style A fill:#141413,stroke:#141413,color:#fff
-    linkStyle 0,1,2,3 stroke:#141413,stroke-width:1.5px
+    style S fill:#d97757,stroke:#d97757,stroke-width:2px,color:#fff
+    style P fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    style N fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    style C fill:#00d4c8,stroke:#d97757,stroke-width:2px,color:#141413
+    style A fill:#6a9bcc,stroke:#d97757,stroke-width:2px,color:#fff
+    linkStyle 0,1,2,3 stroke:#d97757,stroke-width:2.5px
 ```
 
 The diagram restates the four steps. PSM is conceptually one of the simplest matching methods because the matching distance is one-dimensional: just the absolute difference in propensity scores.
