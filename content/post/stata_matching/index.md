@@ -144,7 +144,7 @@ $$\tau\_{ATE} = E[Y(1) - Y(0)]$$
 
 $$\tau\_{ATT} = E[Y(1) - Y(0) \mid D = 1]$$
 
-**Read it like this.** The ATE is the average effect we would expect if we randomly drew a mother from the population and forced her to smoke (vs. not smoke). The ATT is the average effect of smoking *for the mothers who actually smoked*. They answer different policy questions. ATE answers "what would happen if smoking became universal?" ATT answers "what is happening to those who currently smoke?"
+In words, the ATE is the average effect we would expect if we randomly drew a mother from the population and forced her to smoke (vs. not smoke). The ATT is the average effect of smoking *for the mothers who actually smoked*. The two answer different policy questions. ATE answers "what would happen if smoking became universal?", while ATT answers "what is happening to those who currently smoke?"
 
 In this tutorial every method that supports both estimands will report both. Most methods give us an ATE that is slightly more negative than the ATT, because mothers who actually smoke happen to differ from the average mother in ways that, in this dataset, dampen the harm. We will see this divergence concretely in §11 when we compare results across methods.
 
@@ -160,13 +160,13 @@ Every method in this tutorial relies on three assumptions. They are not free; if
 
 $$\\{Y(0), Y(1)\\} \perp D \mid X$$
 
-**Read it like this.** Conditional on the observed covariates `X`, the treatment `D` is "as good as randomly assigned" in the sense that it is independent of the potential outcomes. In our case this means that, *among mothers who look identical on age, education, marital status, prenatal care, parity, and father's age*, smoking is statistically the same as a coin flip with respect to birth-weight potential outcomes. This is a strong assumption. It is not testable directly. It is plausible only to the extent that `X` captures the *systematic* drivers of selection into smoking.
+In words, conditional on the observed covariates `X`, the treatment `D` is "as good as randomly assigned" in the sense that it is independent of the potential outcomes. In our case this means that, *among mothers who look identical on age, education, marital status, prenatal care, parity, and father's age*, smoking is statistically the same as a coin flip with respect to birth-weight potential outcomes. This is a strong assumption, and it is not testable directly. It is plausible only to the extent that `X` captures the *systematic* drivers of selection into smoking.
 
 **Assumption 2 (Overlap, also known as positivity):**
 
 $$0 < e(X) < 1, \quad \text{where} \quad e(X) = \Pr(D = 1 \mid X)$$
 
-**Read it like this.** For every value of `X` we observe in the data, both smokers and non-smokers exist. If there is some combination of covariates --- say, well-educated mothers over 35 with first-trimester prenatal care --- where literally nobody smokes, we cannot make a credible counterfactual prediction for those mothers. Overlap is testable, and we will check it visually in §10 with `teffects overlap`.
+In words, for every value of `X` we observe in the data, both smokers and non-smokers exist. If there is some combination of covariates --- say, well-educated mothers over 35 with first-trimester prenatal care --- where literally nobody smokes, we cannot make a credible counterfactual prediction for those mothers. Overlap is testable, and we will check it visually in §10 with `teffects overlap`.
 
 **Assumption 3 (SUTVA --- Stable Unit Treatment Value Assumption):**
 
@@ -212,7 +212,7 @@ tab mbsmoke, summarize(bweight)
       Total |   3361.68   578.82          4,642
 ```
 
-**Interpretation.** The analysis sample has 4,642 singleton births. Smokers are a minority --- 864 mothers, or **18.6%** of the sample --- which is exactly why a naive comparison is risky: when treated and control groups differ in size *and* in observable characteristics, a difference of means is dominated by whichever group has more variation in the confounders. The raw mean birth weight is 3,412.9 g among non-smokers and 3,137.7 g among smokers, a 275 g gap. Average maternal age is 26.5, 72% are married, 80% had a first-trimester prenatal visit, and average maternal education is 12.7 years. We will revisit each of these covariates as confounders below.
+The analysis sample has 4,642 singleton births. Smokers are a minority --- 864 mothers, or **18.6%** of the sample --- which is exactly why a naive comparison is risky: when treated and control groups differ in size *and* in observable characteristics, a difference of means is dominated by whichever group has more variation in the confounders. The raw mean birth weight is 3,412.9 g among non-smokers and 3,137.7 g among smokers, a 275 g gap. Average maternal age is 26.5, 72% are married, 80% had a first-trimester prenatal visit, and average maternal education is 12.7 years. We will revisit each of these covariates as confounders below.
 
 Before we estimate any treatment effect, it is useful to *see* the raw outcome distribution. The figure below plots a kernel density of `bweight`, separately for smokers and non-smokers, with no adjustment of any kind.
 
@@ -228,7 +228,7 @@ graph export "stata_matching_density_bweight.png", replace width(2400)
 
 ![Kernel density of infant birth weight by maternal smoking status. Non-smokers' distribution is centered around 3,400 grams; smokers' distribution is shifted left, centered around 3,150 grams.](stata_matching_density_bweight.png)
 
-**Interpretation.** Smokers' density (warm orange) sits visibly to the left of non-smokers' density (steel blue), with the modes separated by roughly 250 grams. Both distributions are unimodal, roughly bell-shaped, and have similar spreads. The picture is striking, but it is *exactly* the picture confounding produces: it shows us nothing about whether the leftward shift is caused by smoking, by the other characteristics that distinguish smoking from non-smoking mothers, or by some mixture. The next eight sections all aim to peel apart that mixture.
+Smokers' density (warm orange) sits visibly to the left of non-smokers' density (steel blue), with the modes separated by roughly 250 grams. Both distributions are unimodal, roughly bell-shaped, and have similar spreads. The picture is striking, but it is *exactly* the picture confounding produces: it shows us nothing about whether the leftward shift is caused by smoking, by the other characteristics that distinguish smoking from non-smoking mothers, or by some mixture. The next eight sections all aim to peel apart that mixture.
 
 ## 6. A roadmap to six estimators
 
@@ -263,7 +263,7 @@ flowchart TD
     linkStyle 0,1,2,3,4,5,6,7,8,9 stroke:#d97757,stroke-width:2.5px
 ```
 
-**How to read the taxonomy.** Each branch of the tree answers a different design question. **RA** (the leftmost branch) is the only estimator that relies *purely* on an outcome model; if that model is wrong, RA is biased. **IPW** and **PSM** (the orange branch) both rely *purely* on a treatment model (the propensity score); if that model is wrong, they are biased. They differ from each other in *how* they use the propensity score: IPW reweights every observation by the inverse propensity, while PSM matches each treated unit to the untreated unit with the most similar propensity score. **IPWRA** and **AIPW** (the teal branch) fit *both* an outcome model *and* a treatment model and combine them in a way that delivers the **doubly robust** property: they remain consistent if *either* model is correctly specified --- you only need one of two to be right. **NNM** (the white branch) is the odd one out: it does not fit a parametric model at all. It instead computes a multidimensional Mahalanobis distance between each treated mother and every untreated mother, picks the closest non-smoker(s), and compares outcomes directly. Before we run any method, we will also estimate a **naive baseline** (a one-variable regression with no covariates) so we have a number to put the adjustments against.
+Each branch of the tree answers a different design question. RA (the leftmost branch) is the only estimator that relies *purely* on an outcome model; if that model is wrong, RA is biased. IPW and PSM (the orange branch) both rely *purely* on a treatment model (the propensity score); if that model is wrong, they are biased. They differ from each other in *how* they use the propensity score: IPW reweights every observation by the inverse propensity, while PSM matches each treated unit to the untreated unit with the most similar propensity score. IPWRA and AIPW (the teal branch) fit *both* an outcome model *and* a treatment model and combine them in a way that delivers the **doubly robust** property: they remain consistent if *either* model is correctly specified --- you only need one of two to be right. NNM (the light-gray branch) is the odd one out: it does not fit a parametric model at all. It instead computes a multidimensional Mahalanobis distance between each treated mother and every untreated mother, picks the closest non-smoker(s), and compares outcomes directly. Before we run any method, we will also estimate a naive baseline (a one-variable regression with no covariates) so we have a number to put the adjustments against.
 
 To make the similarities and differences explicit, the table below summarizes each method along five axes: what it models, what it does with the model output, what its key tuning option is, what its estimand is in Stata's `teffects`, and what it is biased against if the world is unkind.
 
@@ -304,19 +304,19 @@ Linear regression                               Number of obs     =      4,642
 ------------------------------------------------------------------------------
 ```
 
-**Interpretation.** The unadjusted gap is **−275.3 grams** (95% CI: [−316.8, −233.7]; t = −12.97). This is the number a journalist who saw only `bweight` and `mbsmoke` would publish. It is a precise estimate of the wrong quantity: it absorbs both the causal effect of smoking and the contribution of every covariate that differs between smoking and non-smoking mothers. The R² is 3.4% --- smoking alone, without controls, explains only a tiny fraction of birth-weight variation, but the *average* gap is estimated very precisely thanks to the large sample. We will see every adjusted estimator pull this number toward zero.
+The unadjusted gap is **−275.3 grams** (95% CI: [−316.8, −233.7]; t = −12.97). This is the number a journalist who saw only `bweight` and `mbsmoke` would publish. It is a precise estimate of the wrong quantity: it absorbs both the causal effect of smoking and the contribution of every covariate that differs between smoking and non-smoking mothers. The R² is 3.4% --- smoking alone, without controls, explains only a tiny fraction of birth-weight variation, but the *average* gap is estimated very precisely thanks to the large sample. We will see every adjusted estimator pull this number toward zero.
 
 ## 8. Method 1 --- Regression Adjustment (RA)
 
-**Purpose.** Regression adjustment fits two outcome models, one for smokers and one for non-smokers, and then uses each of them to *predict* the outcome for everybody --- producing a predicted potential outcome under treatment and another under control. Averaging the predicted gap gives the ATE.
+Regression adjustment fits two outcome models, one for smokers and one for non-smokers, and then uses each of them to *predict* the outcome for everybody --- producing a predicted potential outcome under treatment and another under control. Averaging the predicted gap gives the ATE.
 
-**Analogy.** Imagine you have a class of students and you give half of them a tutoring program. Instead of comparing post-test scores directly (which would conflate the program with the differences between the kids who got it and the kids who didn't), you build two predictive models: one of "what score would this student have gotten if tutored?" and one of "what score would this student have gotten if not tutored?", using their grades, attendance, and so on. You then ask: averaging across the whole class, how much higher are the predicted "tutored" scores? That difference is the RA estimate of the ATE.
+A familiar analogy comes from the classroom. Imagine you have a class of students and you give half of them a tutoring program. Instead of comparing post-test scores directly (which would conflate the program with the differences between the kids who got it and the kids who didn't), you build two predictive models: one of "what score would this student have gotten if tutored?" and one of "what score would this student have gotten if not tutored?", using their grades, attendance, and so on. You then ask: averaging across the whole class, how much higher are the predicted "tutored" scores? That difference is the RA estimate of the ATE.
 
-**Estimand.** RA targets the ATE (and, with the `atet` option, the ATT):
+In our case, RA targets the ATE (and, with the `atet` option, the ATT):
 
 $$\hat{\tau}\_{RA} = \frac{1}{n}\sum\_{i=1}^{n}\left[\hat{\mu}\_1(X\_i) - \hat{\mu}\_0(X\_i)\right]$$
 
-**Read it like this.** $\hat{\mu}\_d(X)$ is the fitted regression $E[Y \mid D=d, X]$ for treatment arm $d$ --- in code, the prediction from a `regress` model fit on the `D=d` subsample. RA evaluates both fitted models at every observation's covariates, takes the difference, and averages.
+Here $\hat{\mu}\_d(X)$ denotes the fitted regression $E[Y \mid D=d, X]$ for treatment arm $d$ --- in code, the prediction from a `regress` model fit on the `D=d` subsample. RA evaluates both fitted models at every observation's covariates, takes the difference, and averages.
 
 In Stata, `teffects ra` does the whole sequence in one line. We pass two parenthesized blocks: the first specifies the **outcome equation** (`bweight` plus the covariates we want to control for), the second specifies the **treatment indicator** (`mbsmoke`). The `pomeans`, `ate`, and `atet` options switch between the three reportable quantities --- the two potential-outcome means, the ATE, and the ATT.
 
@@ -346,7 +346,7 @@ ATET         |
      mbsmoke |  -223.3017    22.7422    -9.82   0.000    -267.8755   -178.7278
 ```
 
-**Interpretation.** The RA estimate of the ATE is **−239.6 g** (95% CI: [−286.3, −192.9], z = −10.06). The two potential-outcome means say that, averaged over the entire sample, predicted birth weight is about 3,403 g if no mothers smoked and 3,164 g if all mothers smoked --- the gap between those two numbers is the ATE. The ATT is **−223.3 g**, slightly closer to zero, meaning that among the women who actually smoked, the model expects smoking to harm their babies somewhat less than it would harm the average baby in the sample. The naive gap of −275 g has just shrunk by 35.6 g, or **13%**, simply by adjusting for marital status, maternal age, prenatal care, and parity.
+The RA estimate of the ATE is **−239.6 g** (95% CI: [−286.3, −192.9], z = −10.06). The two potential-outcome means say that, averaged over the entire sample, predicted birth weight is about 3,403 g if no mothers smoked and 3,164 g if all mothers smoked --- the gap between those two numbers is the ATE. The ATT is **−223.3 g**, slightly closer to zero, meaning that among the women who actually smoked, the model expects smoking to harm their babies somewhat less than it would harm the average baby in the sample. The naive gap of −275 g has just shrunk by 35.6 g, or **13%**, simply by adjusting for marital status, maternal age, prenatal care, and parity.
 
 ### Manual recreation: regression adjustment by hand
 
@@ -374,15 +374,15 @@ summarize te_i
   Manual RA estimate of ATE: -239.64 grams
 ```
 
-**Interpretation.** The hand-built RA reproduces the canned `teffects ra` ATE to four significant figures (−239.64 g vs. −239.6392 g). The standard deviation of the predicted individual treatment effects (99 g) is large compared with the mean, which tells us that --- *if you trust the outcome model* --- the harm of smoking varies substantially across mothers depending on their covariate profile. A handful of mothers (the maximum is +8.3 g) even have positive predicted effects, but those are small and rare. The exact match between the manual and canned versions is the demystification we wanted: `teffects ra` is exactly two `regress` calls, two `predict` statements, and a difference.
+The hand-built RA reproduces the canned `teffects ra` ATE to four significant figures (−239.64 g vs. −239.6392 g). The standard deviation of the predicted individual treatment effects (99 g) is large compared with the mean, which tells us that --- *if you trust the outcome model* --- the harm of smoking varies substantially across mothers depending on their covariate profile. A handful of mothers (the maximum is +8.3 g) even have positive predicted effects, but those are small and rare. The exact match between the manual and canned versions is the demystification we wanted: `teffects ra` is exactly two `regress` calls, two `predict` statements, and a difference.
 
 ## 9. Method 2 --- Inverse-Probability Weighting (IPW)
 
-**Purpose.** Where RA models the outcome, IPW models the **treatment**. It estimates each mother's propensity to smoke as a function of her covariates, then re-weights every observation by the inverse of that propensity. The reweighted sample mimics what we would have seen if smoking had been randomly assigned.
+Where RA models the outcome, IPW models the **treatment**. It estimates each mother's propensity to smoke as a function of her covariates, then re-weights every observation by the inverse of that propensity. The reweighted sample mimics what we would have seen if smoking had been randomly assigned.
 
-**Analogy.** Think of a survey where rural respondents are under-sampled. To recover the population mean, the standard fix is to up-weight rural respondents proportionally. IPW does the same trick for *treatment*: under-represented combinations (e.g., a married 35-year-old smoker, or an unmarried 18-year-old non-smoker) get more weight, so the re-weighted sample looks like a randomized experiment.
+The mechanic is familiar from survey sampling. Think of a survey where rural respondents are under-sampled. To recover the population mean, the standard fix is to up-weight rural respondents proportionally. IPW does the same trick for *treatment*: under-represented combinations (e.g., a married 35-year-old smoker, or an unmarried 18-year-old non-smoker) get more weight, so the re-weighted sample looks like a randomized experiment.
 
-**Estimand.** IPW targets the ATE (and, with `atet`, the ATT):
+IPW targets the ATE (and, with `atet`, the ATT):
 
 $$\hat{\tau}\_{IPW} = \frac{1}{n}\sum\_i \left[\frac{D\_i Y\_i}{\hat{e}(X\_i)} - \frac{(1-D\_i) Y\_i}{1-\hat{e}(X\_i)}\right]$$
 
@@ -390,7 +390,7 @@ where the **propensity score** is
 
 $$e(X) = \Pr(D = 1 \mid X)$$
 
-**Read it like this.** Each mother contributes her own outcome, but a smoker (D=1) is up-weighted by 1/$\hat{e}(X)$ --- so an unlikely smoker (small $\hat{e}$) counts a lot --- and a non-smoker is up-weighted by 1/(1−$\hat{e}$). The weighted average of smokers' outcomes, minus the weighted average of non-smokers' outcomes, is the IPW estimate of the ATE.
+In words, each mother contributes her own outcome, but a smoker (D=1) is up-weighted by 1/$\hat{e}(X)$ --- so an unlikely smoker (small $\hat{e}$) counts a lot --- and a non-smoker is up-weighted by 1/(1−$\hat{e}$). The weighted average of smokers' outcomes, minus the weighted average of non-smokers' outcomes, is the IPW estimate of the ATE.
 
 In Stata, `teffects ipw` accepts a single outcome block (just `bweight`, with no covariates inside) followed by the **treatment block** with the propensity-score covariates. We use a `probit` link, which is `teffects`'s default.
 
@@ -412,7 +412,7 @@ ATE          |   -230.906   24.30987    -9.50   0.000    -278.5525   -183.2595
 ATET         |  -219.6338   23.38456    -9.39   0.000    -265.4667   -173.8009
 ```
 
-**Interpretation.** IPW gives an ATE of **−230.9 g** (95% CI: [−278.6, −183.3], z = −9.50). The point estimate is 8.7 g closer to zero than the RA estimate (−239.6 g) and 44 g closer to zero than the naive baseline. The fact that two methods that model entirely different sides of the data --- IPW models smoking, RA models birth weight --- agree to within about ten grams is the first strong signal that the underlying causal effect is real and not an artifact of one model's specification.
+IPW gives an ATE of **−230.9 g** (95% CI: [−278.6, −183.3], z = −9.50). The point estimate is 8.7 g closer to zero than the RA estimate (−239.6 g) and 44 g closer to zero than the naive baseline. The fact that two methods that model entirely different sides of the data --- IPW models smoking, RA models birth weight --- agree to within about ten grams is the first strong signal that the underlying causal effect is real and not an artifact of one model's specification.
 
 ### Manual recreation: IPW by hand
 
@@ -439,13 +439,13 @@ Logistic regression                                     Number of obs =  4,642
   Manual IPW estimate (coefficient on mbsmoke): -232.13 grams
 ```
 
-**Interpretation.** The logistic propensity model has a likelihood-ratio chi-square of 346.3 on 4 degrees of freedom (p < 0.0001), indicating that observable covariates carry real information about who smokes --- otherwise IPW would have nothing to correct. The pseudo-R² of 7.8% is moderate: covariates explain meaningful but not overwhelming variation in the smoking decision, which is *exactly the regime IPW likes* because it implies neither sparse overlap (which would happen with R² near 1) nor pointless reweighting (R² near 0). The manual IPW estimate of −232.1 g is within 1.2 g of the canned probit-IPW (−230.9 g) --- the small difference comes from logit vs. probit and from how `teffects` weights the contributions. Method-to-method agreement on the order of 1 gram tells us the two link functions are interchangeable here.
+The logistic propensity model has a likelihood-ratio chi-square of 346.3 on 4 degrees of freedom (p < 0.0001), indicating that observable covariates carry real information about who smokes --- otherwise IPW would have nothing to correct. The pseudo-R² of 7.8% is moderate: covariates explain meaningful but not overwhelming variation in the smoking decision, which is *exactly the regime IPW likes* because it implies neither sparse overlap (which would happen with R² near 1) nor pointless reweighting (R² near 0). The manual IPW estimate of −232.1 g is within 1.2 g of the canned probit-IPW (−230.9 g) --- the small difference comes from logit vs. probit and from how `teffects` weights the contributions. Method-to-method agreement on the order of 1 gram tells us the two link functions are interchangeable here.
 
 The figure below shows the propensity-score distributions by treatment status. It is the key diagnostic for IPW: where the two distributions overlap, we have credible reweighting; where they diverge, the inverse weights blow up.
 
 ![Histogram of estimated propensity scores by maternal smoking status. Both distributions span most of the unit interval, with substantial overlap.](stata_matching_propensity_distribution.png)
 
-**Interpretation.** Both distributions span most of the unit interval. Non-smokers (steel blue) cluster toward the left (most have a low estimated probability of smoking, consistent with smokers being a minority) but extend well into the high-propensity region; smokers (warm orange) cluster toward the right but extend well into the low-propensity region. There is no obvious zone where one group is absent, which is the visual signature of the **overlap assumption** holding. Without this overlap, IPW would be unstable --- a non-smoker with $\hat{e}(X) = 0.99$ would get a weight of 100, dominating the weighted mean.
+Both distributions span most of the unit interval. Non-smokers (steel blue) cluster toward the left (most have a low estimated probability of smoking, consistent with smokers being a minority) but extend well into the high-propensity region; smokers (warm orange) cluster toward the right but extend well into the low-propensity region. There is no obvious zone where one group is absent, which is the visual signature of the **overlap assumption** holding. Without this overlap, IPW would be unstable --- a non-smoker with $\hat{e}(X) = 0.99$ would get a weight of 100, dominating the weighted mean.
 
 ## 10. Methods 3 and 4 --- The doubly robust pair: IPWRA and AIPW
 
@@ -453,9 +453,9 @@ The next two estimators belong to the family of **doubly robust** methods. They 
 
 ### 10.1 IPWRA --- IPW + Regression Adjustment
 
-**Purpose.** IPWRA fits the IPW weights, then runs RA *with those weights*. If the propensity model is correct, the weighting alone delivers the ATE. If the outcome model is correct, the regression adjustment alone delivers the ATE. If both are correct, IPWRA is efficient. If only one is correct, IPWRA is still consistent.
+IPWRA fits the IPW weights, then runs RA *with those weights*. If the propensity model is correct, the weighting alone delivers the ATE. If the outcome model is correct, the regression adjustment alone delivers the ATE. If both are correct, IPWRA is efficient. If only one is correct, IPWRA is still consistent.
 
-**Analogy.** It is the suspenders-and-belt strategy. You have two candidate corrections for confounding. Combining them in this particular way means that if either one happens to be the right one, your final estimate is right too.
+It is the suspenders-and-belt strategy: with two candidate corrections for confounding, combining them in this particular way means that if either one happens to be the right one, the final estimate is right too.
 
 ```stata
 teffects ipwra (bweight mmarried mage prenatal1 fbaby) ///
@@ -471,17 +471,15 @@ ATE          |  -231.8723    25.1541    -9.22   0.000    -281.1735   -182.5712
 ATET         |  -220.6476   23.37268    -9.44   0.000    -266.4572    -174.838
 ```
 
-**Interpretation.** IPWRA gives an ATE of **−231.9 g** (95% CI: [−281.2, −182.6]) and an ATT of **−220.6 g**. Both estimates are essentially indistinguishable from the IPW results (−230.9 g ATE, −219.6 g ATT), differing by less than 1.3 g. That convergence is the doubly robust property paying off in practice: even if our outcome model is misspecified by some unknown amount, the IPW step is mopping up the bias --- and vice versa.
+IPWRA gives an ATE of **−231.9 g** (95% CI: [−281.2, −182.6]) and an ATT of **−220.6 g**. Both estimates are essentially indistinguishable from the IPW results (−230.9 g ATE, −219.6 g ATT), differing by less than 1.3 g. That convergence is the doubly robust property paying off in practice: even if our outcome model is misspecified by some unknown amount, the IPW step is mopping up the bias --- and vice versa.
 
 ### 10.2 AIPW --- Augmented IPW
 
-**Purpose.** AIPW is the *efficient* doubly robust estimator. It blends RA and IPW with a particular adjustment that achieves the **semiparametric efficiency bound** under standard regularity conditions, meaning no other regular estimator can have a smaller asymptotic variance.
-
-**Estimand.** AIPW targets the ATE only in `teffects aipw`. The estimator can be written as:
+AIPW is the *efficient* doubly robust estimator. It blends RA and IPW with a particular adjustment that achieves the **semiparametric efficiency bound** under standard regularity conditions, meaning no other regular estimator can have a smaller asymptotic variance. AIPW targets the ATE only in `teffects aipw`, and the estimator can be written as:
 
 $$\hat{\tau}\_{AIPW} = \frac{1}{n}\sum\_i \left\\{ [\hat{\mu}\_1(X\_i) - \hat{\mu}\_0(X\_i)] + \frac{D\_i [Y\_i - \hat{\mu}\_1(X\_i)]}{\hat{e}(X\_i)} - \frac{(1-D\_i)[Y\_i - \hat{\mu}\_0(X\_i)]}{1 - \hat{e}(X\_i)} \right\\}$$
 
-**Read it like this.** The first bracketed term is the RA estimator. The next two terms add a propensity-weighted correction based on the *residuals* from the outcome model. If the outcome model is exactly right, the residuals are mean-zero and the correction vanishes --- AIPW collapses to RA. If the outcome model is wrong but the propensity model is right, the correction debiases it. So AIPW is RA with an automatic safety net.
+The first bracketed term is the RA estimator. The next two terms add a propensity-weighted correction based on the *residuals* from the outcome model. If the outcome model is exactly right, the residuals are mean-zero and the correction vanishes --- AIPW collapses to RA. If the outcome model is wrong but the propensity model is right, the correction debiases it. AIPW is therefore RA with an automatic safety net.
 
 ```stata
 teffects aipw (bweight mmarried mage prenatal1 fbaby) ///
@@ -493,19 +491,19 @@ estimates store te_aipw
 ATE          |  -232.4759   24.83406    -9.36   0.000    -281.1497    -183.802
 ```
 
-**Interpretation.** AIPW gives an ATE of **−232.5 g** (95% CI: [−281.1, −183.8], z = −9.36), almost identical to IPWRA (−231.9 g). The two doubly robust estimators differ by 0.6 g, well within rounding noise. Stata's `teffects aipw` does not provide an ATT --- this is a software-implementation detail, not a conceptual limitation of the method, and we will note it in the comparison table. AIPW is the recommended default when both an outcome model and a treatment model are credible, because it inherits the doubly robust property *and* attains the efficiency bound.
+AIPW gives an ATE of **−232.5 g** (95% CI: [−281.1, −183.8], z = −9.36), almost identical to IPWRA (−231.9 g). The two doubly robust estimators differ by 0.6 g, well within rounding noise. Stata's `teffects aipw` does not provide an ATT --- this is a software-implementation detail, not a conceptual limitation of the method, and we will note it in the comparison table. AIPW is the recommended default when both an outcome model and a treatment model are credible, because it inherits the doubly robust property *and* attains the efficiency bound.
 
 ## 11. Method 5 --- Nearest-Neighbor Matching (NNM)
 
-**Purpose.** Matching estimators step away from parametric outcome and treatment models entirely. Instead, they ask: for every smoking mother, who is her **statistical twin** among the non-smoking mothers? Find that twin (or that small set of twins), and compute the difference in birth weights. Average across all the matched pairs.
+Matching estimators step away from parametric outcome and treatment models entirely. Instead, they ask: for every smoking mother, who is her **statistical twin** among the non-smoking mothers? Find that twin (or that small set of twins), and compute the difference in birth weights. Average across all the matched pairs.
 
-**Analogy.** If you are trying to estimate the effect of attending a private school, NNM is "for every private-school student, find a public-school student with the same age, same family income, same parental education, and same standardized-test score from third grade --- then compare their twelfth-grade test scores." The matching does the heavy lifting that a regression would otherwise do.
+If you are trying to estimate the effect of attending a private school, NNM is "for every private-school student, find a public-school student with the same age, same family income, same parental education, and same standardized-test score from third grade --- then compare their twelfth-grade test scores." The matching does the heavy lifting that a regression would otherwise do.
 
-**Estimand.** NNM targets the ATE (and, with `atet`, the ATT):
+NNM targets the ATE (and, with `atet`, the ATT):
 
 $$\hat{\tau}\_{NNM} = \frac{1}{n}\sum\_i (2D\_i - 1)\left[Y\_i - \frac{1}{M}\sum\_{j \in J\_M(i)} Y\_j\right]$$
 
-**Read it like this.** $J\_M(i)$ is the set of $M$ nearest neighbors of mother $i$ in the *opposite* treatment group, measured by Mahalanobis distance over the covariates. The expression in brackets is the difference between mother $i$'s observed outcome and the average outcome of her nearest neighbors. The factor $(2D\_i - 1)$ flips the sign so that smokers contribute (smoker outcome − matched non-smoker outcome) and non-smokers contribute (matched smoker outcome − non-smoker outcome). The default `M=1` uses a single nearest neighbor.
+Here $J\_M(i)$ is the set of $M$ nearest neighbors of mother $i$ in the *opposite* treatment group, measured by Mahalanobis distance over the covariates. The expression in brackets is the difference between mother $i$'s observed outcome and the average outcome of her nearest neighbors, and the factor $(2D\_i - 1)$ flips the sign so that smokers contribute (smoker outcome − matched non-smoker outcome) while non-smokers contribute (matched smoker outcome − non-smoker outcome). The default `M=1` uses a single nearest neighbor.
 
 In Stata, `teffects nnmatch` accepts the outcome variable plus the covariates to match on, then the treatment indicator. The `ematch()` option forces *exact* matching on a subset of (typically discrete) variables --- here marital status and prenatal care, so we never match a married mother to an unmarried one. The `biasadj()` option requests a small-sample bias correction for the continuous matching variables.
 
@@ -526,17 +524,17 @@ ATE          |  -210.0558   29.32803    -7.16   0.000    -267.5377   -152.5739
 ATET         |  -238.5204   30.41661    -7.84   0.000    -298.1359    -178.905
 ```
 
-**Interpretation.** NNM gives an ATE of **−210.1 g** (95% CI: [−267.5, −152.6], z = −7.16) and an ATT of **−238.5 g**. The ATE is the smallest in absolute value of any estimator we have run, and the confidence interval is the widest --- both are typical features of matching estimators, which trade some precision for the freedom from parametric assumptions. The Stata output also reveals that one observation needed up to 16 matches: this happens when several observations are tied at the same Mahalanobis distance, which is normal when the matching set includes discrete variables. Notice also that NNM is the only method so far where ATT (−238.5 g) is **larger in magnitude** than ATE (−210.1 g). This is a real feature of matching, not a bug: the actual smokers in this sample occupy a region of covariate space where the matched comparison estimates a larger-magnitude effect. We will return to this point in §13.
+NNM gives an ATE of **−210.1 g** (95% CI: [−267.5, −152.6], z = −7.16) and an ATT of **−238.5 g**. The ATE is the smallest in absolute value of any estimator we have run, and the confidence interval is the widest --- both are typical features of matching estimators, which trade some precision for the freedom from parametric assumptions. The Stata output also reveals that one observation needed up to 16 matches: this happens when several observations are tied at the same Mahalanobis distance, which is normal when the matching set includes discrete variables. Notice also that NNM is the only method so far where ATT (−238.5 g) is **larger in magnitude** than ATE (−210.1 g). This is a real feature of matching, not a bug: the actual smokers in this sample occupy a region of covariate space where the matched comparison estimates a larger-magnitude effect. We will return to this point in §13.
 
 ## 12. Method 6 --- Propensity-Score Matching (PSM)
 
-**Purpose.** PSM combines the matching idea with the propensity score. Instead of matching on a multidimensional Mahalanobis distance, it collapses all the covariates into a single number --- the estimated propensity --- and matches on that. The intuition is Rosenbaum and Rubin's foundational result: matching on the scalar propensity score is sufficient to balance every covariate that went into estimating it.
+PSM combines the matching idea with the propensity score. Instead of matching on a multidimensional Mahalanobis distance, it collapses all the covariates into a single number --- the estimated propensity --- and matches on that. The intuition is Rosenbaum and Rubin's foundational result: matching on the scalar propensity score is sufficient to balance every covariate that went into estimating it.
 
 The figure below illustrates the matching idea on a small subsample of 100 mothers, using the propensity scores we estimated in §9.
 
 ![Annotated scatter of smoking status against propensity score. An arrow indicates that each smoker is matched to nearby non-smokers in propensity-score space.](stata_matching_psm_logic.png)
 
-**Read the figure.** Each circle is one mother, plotted at her estimated propensity (x-axis) against her actual smoking status (y-axis: 0 for non-smoker, 1 for smoker). PSM matches each smoker (a warm-orange circle at y=1) to the non-smoker(s) (steel-blue circles at y=0) whose estimated propensity is closest. The arrow walks you through one match. After matching, each pair shares (approximately) the same propensity score, which by the Rosenbaum-Rubin theorem means they share the same *distribution* of every covariate that entered the propensity model. We can then compare their outcomes apples-to-apples.
+Each circle in the figure is one mother, plotted at her estimated propensity (x-axis) against her actual smoking status (y-axis: 0 for non-smoker, 1 for smoker). PSM matches each smoker (a warm-orange circle at y=1) to the non-smoker(s) (steel-blue circles at y=0) whose estimated propensity is closest, and the arrow walks you through one such match. After matching, each pair shares (approximately) the same propensity score, which by the Rosenbaum-Rubin theorem means they share the same *distribution* of every covariate that entered the propensity model. We can then compare their outcomes apples-to-apples.
 
 ```mermaid
 flowchart LR
@@ -569,7 +567,7 @@ ATE          |  -229.4492   25.88746    -8.86   0.000    -280.1877   -178.7107
 ATET         |  -224.5927   30.55147    -7.35   0.000    -284.4725   -164.7129
 ```
 
-**Interpretation.** PSM gives an ATE of **−229.4 g** (95% CI: [−280.2, −178.7], z = −8.86) and an ATT of **−224.6 g**. These numbers sit comfortably inside the cluster formed by IPW (−230.9 g), IPWRA (−231.9 g), and AIPW (−232.5 g). Five different methods that take very different routes through the data are now agreeing on roughly **−230 grams**, with confidence intervals that all comfortably exclude the naive estimate of −275 g. This convergence is the strongest evidence we have that the **−230 g neighborhood** is not an artifact of any one model's specification.
+PSM gives an ATE of **−229.4 g** (95% CI: [−280.2, −178.7], z = −8.86) and an ATT of **−224.6 g**. These numbers sit comfortably inside the cluster formed by IPW (−230.9 g), IPWRA (−231.9 g), and AIPW (−232.5 g). Five different methods that take very different routes through the data are now agreeing on roughly **−230 grams**, with confidence intervals that all comfortably exclude the naive estimate of −275 g. This convergence is the strongest evidence we have that the **−230 g neighborhood** is not an artifact of any one model's specification.
 
 The standard diagnostic for PSM is the **overlap plot** generated by `teffects overlap`, shown below. It plots the densities of the estimated propensity score separately for treated and control units after matching.
 
@@ -581,7 +579,7 @@ graph export "stata_matching_overlap.png", replace width(2400)
 
 ![Overlap plot from teffects overlap after PSM, showing kernel densities of the estimated propensity score for smokers and non-smokers. Both densities span most of the unit interval, supporting the overlap assumption.](stata_matching_overlap.png)
 
-**Interpretation.** Both density curves span most of the open unit interval (0, 1). There are no large regions where one group is essentially absent, which is the visual signature of a satisfied overlap assumption. If the smokers' density had collapsed to a small region near 1 (or non-smokers' density had collapsed near 0), we would have a problem --- the propensity-weighted comparisons would be dominated by a handful of extreme observations. Here, the assumption is plausible, and the comparisons are well-supported across the entire (0,1) interval.
+Both density curves span most of the open unit interval (0, 1). There are no large regions where one group is essentially absent, which is the visual signature of a satisfied overlap assumption. If the smokers' density had collapsed to a small region near 1 (or non-smokers' density had collapsed near 0), we would have a problem --- the propensity-weighted comparisons would be dominated by a handful of extreme observations. Here, the assumption is plausible, and the comparisons are well-supported across the entire (0,1) interval.
 
 ## 13. Comparing all six estimators
 
@@ -589,7 +587,7 @@ The most useful single output from this whole exercise is a side-by-side compari
 
 ![Forest plot of ATE estimates with 95% confidence intervals across seven specifications: naive baseline plus six adjusted estimators. The naive estimate is most negative; the six adjusted estimators cluster around -230 grams, with NNM the slight outlier at -210 grams.](stata_matching_forest_plot.png)
 
-**Interpretation.** Reading top to bottom: the naive baseline (−275 g) is the most negative estimate, with a 95% CI of [−316.8, −233.7] that lies entirely below every adjusted estimator's point estimate except RA (which is right at its upper bound). The six adjusted estimators land in two groups: a tight cluster of five (RA, IPW, IPWRA, AIPW, PSM) between −229 and −240 g, and NNM as a slight outlier at −210 g with a wider CI. **The convergence among the five is the headline.** They use different functional forms, different covariate sets, and different identification arguments, and they all return a number within ±10 g of each other. NNM's wider CI and slightly smaller magnitude reflect its non-parametric nature (it is doing more work with less help from a model) but its CI overlaps every other estimator's, so the disagreement is well within sampling variation.
+Reading top to bottom, the naive baseline (−275 g) is the most negative estimate, with a 95% CI of [−316.8, −233.7] that lies entirely below every adjusted estimator's point estimate except RA (which is right at its upper bound). The six adjusted estimators land in two groups: a tight cluster of five (RA, IPW, IPWRA, AIPW, PSM) between −229 and −240 g, and NNM as a slight outlier at −210 g with a wider CI. The convergence among the five is the headline finding of this analysis: they use different functional forms, different covariate sets, and different identification arguments, and they all return a number within ±10 g of each other. NNM's wider CI and slightly smaller magnitude reflect its non-parametric nature (it is doing more work with less help from a model) but its CI overlaps every other estimator's, so the disagreement is well within sampling variation.
 
 The numbers underlying the plot:
 
@@ -614,13 +612,11 @@ And the corresponding ATT estimates, where they are reported:
 | 5 | NNM | −238.5 |
 | 6 | PSM | −224.6 |
 
-**A word on the ATT vs. ATE divergence.** For RA, IPW, IPWRA, and PSM, the ATT is slightly closer to zero than the ATE. The interpretation is that smoking has a slightly less harmful effect on the babies of the women who actually smoked than it would have on a randomly selected mother. NNM reverses this pattern (its ATT of −238.5 g is *larger in magnitude* than its ATE of −210.1 g). This is interpretable: NNM is making the matched comparison around the *treated* mothers, which means it weights the data in a way that emphasizes the covariate region where actual smokers live --- a region in which smoking happens to do more damage. Whether you should report ATE or ATT depends on the policy question. ATE answers "what would happen to a randomly chosen pregnancy if she smoked?" ATT answers "what is happening to the babies of women who currently smoke?" These are different questions with different policy implications, and neither one is more "correct" in the abstract.
+The divergence between ATT and ATE deserves a moment of attention. For RA, IPW, IPWRA, and PSM, the ATT is slightly closer to zero than the ATE, meaning that smoking has a slightly less harmful effect on the babies of the women who actually smoked than it would have on a randomly selected mother. NNM reverses this pattern (its ATT of −238.5 g is *larger in magnitude* than its ATE of −210.1 g) because it makes the matched comparison around the *treated* mothers, which weights the data in a way that emphasizes the covariate region where actual smokers live --- a region in which smoking happens to do more damage. Whether you should report ATE or ATT depends on the policy question. ATE answers "what would happen to a randomly chosen pregnancy if she smoked?", while ATT answers "what is happening to the babies of women who currently smoke?" These are different questions with different policy implications, and neither one is more "correct" in the abstract.
 
 ## 14. Summary and key takeaways
 
-After running seven specifications on the same dataset, here is what we know.
-
-**Eight methodological lessons.**
+After running seven specifications on the same dataset, eight methodological lessons stand out.
 
 1. **The naive comparison is biased upward (toward larger magnitude) by about 35 to 65 grams.** Adjusting for observable covariates moves the answer from −275 g to roughly −230 g, a 13% to 24% reduction in the apparent harm.
 2. **Five of six adjusted estimators agree within 10 grams.** RA, IPW, IPWRA, AIPW, and PSM cluster between −229 and −240 g. When estimators with very different functional forms agree this closely, the maintained identification assumption (conditional independence) is probably approximately correct on this sample.
