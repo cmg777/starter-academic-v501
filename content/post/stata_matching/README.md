@@ -27,6 +27,15 @@ A naive (unadjusted) regression is included as a baseline foil.
 - [x] Post review (`post-review.md` — verdict ACCEPT)
 - [x] Infographic (`infographic_instructions.md`)
 - [x] Infographic review (`infographic_review.md` — verdict ACCEPT)
+- [x] Featured image (`featured.webp`)
+
+## Post-pipeline refinements
+
+- Reclassified NNM as a fourth family (uses neither outcome nor treatment model) and added a comparison table in §6 of the post.
+- Hardened Mermaid arrow and node colors to remain visible on both light and dark site themes.
+- Removed paragraph-leading rhetorical labels (Interpretation, Purpose, Analogy, etc.) for smoother reading flow.
+- Simplified Panel 2 of the infographic (was: 3-node DAG with selectively colored arrows; now: two side-by-side chalk profile cards with a warm orange "≠" symbol — fewer AI-rendering failure modes).
+- Trimmed the post's References list to the seven primary academic and dataset sources.
 
 ## Files
 
@@ -48,6 +57,7 @@ A naive (unadjusted) regression is included as a baseline foil.
 | `stata_matching_psm_logic.png` | Annotated scatter showing how PSM matches a smoker to nearest non-smoker(s) |
 | `stata_matching_overlap.png` | `teffects overlap` diagnostic after PSM |
 | `stata_matching_forest_plot.png` | Forest plot of seven ATE estimates with 95% CIs |
+| `featured.webp` | Featured cover image rendered above the post title (`image.placement: 3`) |
 
 ### Tables
 

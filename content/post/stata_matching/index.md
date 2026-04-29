@@ -659,8 +659,6 @@ Six exercises to consolidate what you've just read. Each can be answered in 5–
 5. [Abadie, A. and Imbens, G. W. (2006). Large sample properties of matching estimators for average treatment effects. *Econometrica*, 74(1), 235–267.](https://doi.org/10.1111/j.1468-0262.2006.00655.x)
 6. [Stata Corp. (2023). *Stata Treatment-Effects Reference Manual*: `teffects ra`, `teffects ipw`, `teffects ipwra`, `teffects aipw`, `teffects nnmatch`, `teffects psmatch`.](https://www.stata.com/manuals/te.pdf)
 7. [Cattaneo (2010) data on maternal smoking and birth weight (`cattaneo2.dta`)](https://github.com/quarcs-lab/data-open/raw/master/ametrics/cattaneo2.dta)
-8. [Carlos Mendez --- Video tutorial: Treatment-effects estimators in Stata](https://youtu.be/mvEUuEd4nCY)
-9. [Carlos Mendez --- Companion Stata `do`-file (`analysis.do`)](analysis.do)
 
 ---
 
