@@ -8,3 +8,6 @@ jsconfig.json
 node_modules/
 .Rproj.user
 .venv/
+
+# macOS
+.DS_Store
