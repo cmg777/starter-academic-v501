@@ -535,3 +535,7 @@ What this study does **not** say is also important. Because War is a continuous 
 8. [Marshall, M. G., and Elzinga-Marshall, G. (2017). Global Report 2017: Conflict, Governance and State Fragility. Center for Systemic Peace.](http://www.systemicpeace.org/inscrdata.html)
 9. [Gwartney, J., Lawson, R., and Hall, J. (2017). Economic Freedom of the World, 2017 Annual Report. Fraser Institute.](https://www.fraserinstitute.org/economic-freedom/)
 10. [CatoJ.dta dataset --- quarcs-lab data-open repository.](https://github.com/quarcs-lab/data-open/raw/master/panel/CatoJ.dta)
+
+<h2 id="acknowledgement">Acknowledgement</h2>
+
+A heartfelt thank-you to **Professor Christopher F. Baum** (Boston College) for generously sharing the data (`CatoJ.dta`) and the original replication do-file (`initialCode1.do`) that form the backbone of this tutorial. His willingness to make these materials publicly available --- and to develop and maintain the `xtabond2` Stata module that the entire dynamic-panel community relies on --- directly fosters the learning of applied econometrics. This tutorial would not exist without that contribution.
