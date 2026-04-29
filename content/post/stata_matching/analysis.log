@@ -1,0 +1,1316 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_matc
+> hing/analysis.log
+  log type:  text
+ opened on:  29 Apr 2026, 12:22:33
+
+. 
+. di _newline(2)
+
+
+
+
+. di "================================================================"
+================================================================
+
+. di "  Treatment Effects in Stata: Six Estimators"
+  Treatment Effects in Stata: Six Estimators
+
+. di "  Maternal Smoking and Birth Weight Case Study"
+  Maternal Smoking and Birth Weight Case Study
+
+. di "================================================================"
+================================================================
+
+. 
+. *---------------------------------------------------
+. * 1. Data loading and exploration
+. *---------------------------------------------------
+. 
+. di _newline(2) "=== 1. DATA LOADING AND EXPLORATION ==="
+
+
+=== 1. DATA LOADING AND EXPLORATION ===
+
+. 
+. use "https://github.com/quarcs-lab/data-open/raw/master/ametrics/cattaneo2.dt
+> a", clear
+(Excerpt from Cattaneo (2010) Journal of Econometrics 155: 138–154)
+
+. 
+. * Describe the variables we will use
+. describe bweight mbsmoke mage mmarried fage medu prenatal1 fbaby
+
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+bweight         int     %9.0g                 Infant birthweight (grams)
+mbsmoke         byte    %9.0g      mbsmoke    1 if mother smoked
+mage            byte    %9.0g                 Mother's age
+mmarried        byte    %11.0g     mmarried   1 if mother married
+fage            byte    %9.0g                 Father's age
+medu            byte    %9.0g                 Mother's education attainment
+prenatal1       byte    %9.0g      YesNo      1 if first prenatal visit in 1
+                                                trimester
+fbaby           byte    %9.0g      YesNo      1 if first baby
+
+. 
+. * A peek at the data
+. list bweight mbsmoke mmarried mage fage medu prenatal1 fbaby in 40/49, noobs
+
+  +---------------------------------------------------------------------------+
+  | bweight     mbsmoke      mmarried   mage   fage   medu   prenat~1   fbaby |
+  |---------------------------------------------------------------------------|
+  |    2790   Nonsmoker       Married     29     30     17        Yes     Yes |
+  |    4082   Nonsmoker       Married     30     31     12        Yes     Yes |
+  |    3089   Nonsmoker       Married     27     37     17        Yes      No |
+  |    2580      Smoker   Not married     18      0     10         No     Yes |
+  |    3714   Nonsmoker       Married     35     33     14        Yes      No |
+  |---------------------------------------------------------------------------|
+  |    4196   Nonsmoker       Married     35     35     16        Yes      No |
+  |    2523   Nonsmoker   Not married     16     19      9        Yes     Yes |
+  |    2693      Smoker   Not married     25     28     12        Yes      No |
+  |    3204   Nonsmoker       Married     27     33     16        Yes     Yes |
+  |    3572      Smoker   Not married     19     20     12        Yes     Yes |
+  +---------------------------------------------------------------------------+
+
+. 
+. * Summary statistics
+. summarize bweight mbsmoke mage mmarried fage medu prenatal1 fbaby
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     bweight |      4,642     3361.68    578.8196        340       5500
+     mbsmoke |      4,642    .1861267    .3892508          0          1
+        mage |      4,642    26.50452    5.619026         13         45
+    mmarried |      4,642    .6996984    .4584385          0          1
+        fage |      4,642    27.26713    9.354411          0         60
+-------------+---------------------------------------------------------
+        medu |      4,642    12.68957    2.520661          0         17
+   prenatal1 |      4,642    .8013787    .3990052          0          1
+       fbaby |      4,642    .4379578    .4961893          0          1
+
+. 
+. * Treatment prevalence
+. tab mbsmoke
+
+1 if mother |
+     smoked |      Freq.     Percent        Cum.
+------------+-----------------------------------
+  Nonsmoker |      3,778       81.39       81.39
+     Smoker |        864       18.61      100.00
+------------+-----------------------------------
+      Total |      4,642      100.00
+
+. 
+. * Sample size by treatment
+. tab mbsmoke, summarize(bweight)
+
+            |    Summary of Infant birthweight
+1 if mother |               (grams)
+     smoked |        Mean   Std. dev.       Freq.
+------------+------------------------------------
+  Nonsmoker |   3412.9116   570.68711       3,778
+     Smoker |   3137.6597   560.89305         864
+------------+------------------------------------
+      Total |   3361.6799   578.81962       4,642
+
+. 
+. *---------------------------------------------------
+. * 2. Naive comparison and descriptive plot
+. *---------------------------------------------------
+. 
+. di _newline(2) "=== 2. NAIVE COMPARISON (UNADJUSTED) ==="
+
+
+=== 2. NAIVE COMPARISON (UNADJUSTED) ===
+
+. 
+. * Naive difference in means: this is the BIASED comparison
+. regress bweight mbsmoke, vce(robust)
+
+Linear regression                               Number of obs     =      4,642
+                                                F(1, 4640)        =     168.33
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0343
+                                                Root MSE          =     568.88
+
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     mbsmoke |  -275.2519   21.21501   -12.97   0.000    -316.8434   -233.6604
+       _cons |   3412.912   9.285455   367.55   0.000     3394.708    3431.115
+------------------------------------------------------------------------------
+
+. estimates store te_naive
+
+. 
+. * Save the naive estimate so we can compare later
+. scalar naive_b  = _b[mbsmoke]
+
+. scalar naive_se = _se[mbsmoke]
+
+. di "Naive (unadjusted) gap: " %7.2f naive_b " grams (SE = " %5.2f naive_se ")
+> "
+Naive (unadjusted) gap: -275.25 grams (SE = 21.22)
+
+. 
+. * Figure 1: kernel density of bweight by smoking status
+. twoway ///
+>     (kdensity bweight if mbsmoke==0, lcolor("106 155 204") lwidth(medthick)) 
+> ///
+>     (kdensity bweight if mbsmoke==1, lcolor("217 119 87")  lwidth(medthick)) 
+> ///
+>     , ///
+>     title("Birth Weight by Maternal Smoking Status", size(medium)) ///
+>     subtitle("Raw, unadjusted distributions", size(small)) ///
+>     xtitle("Infant birth weight (grams)") ytitle("Density") ///
+>     legend(order(1 "Non-smokers" 2 "Smokers") position(6) rows(1)) ///
+>     graphregion(color(white)) plotregion(color(white)) ///
+>     note("Smokers' distribution is shifted left of non-smokers' --- but is th
+> is causal?", size(vsmall))
+
+. graph export "stata_matching_density_bweight.png", replace width(2400)
+file stata_matching_density_bweight.png written in PNG format
+
+. 
+. *---------------------------------------------------
+. * 3. Method 1: Regression Adjustment (RA)
+. *---------------------------------------------------
+. 
+. di _newline(2) "=== 3. METHOD 1: REGRESSION ADJUSTMENT (RA) ==="
+
+
+=== 3. METHOD 1: REGRESSION ADJUSTMENT (RA) ===
+
+. 
+. * teffects ra: potential-outcome means, ATE, ATT
+. teffects ra (bweight mmarried mage prenatal1 fbaby) (mbsmoke), pomeans nolog
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : regression adjustment
+Outcome model  : linear
+Treatment model: none
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+POmeans      |
+     mbsmoke |
+  Nonsmoker  |   3403.242   9.525207   357.29   0.000     3384.573    3421.911
+     Smoker  |   3163.603   21.86351   144.70   0.000     3120.751    3206.455
+------------------------------------------------------------------------------
+
+. teffects ra (bweight mmarried mage prenatal1 fbaby) (mbsmoke), ate    nolog
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : regression adjustment
+Outcome model  : linear
+Treatment model: none
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -239.6392   23.82402   -10.06   0.000    -286.3334    -192.945
+-------------+----------------------------------------------------------------
+POmean       |
+     mbsmoke |
+  Nonsmoker  |   3403.242   9.525207   357.29   0.000     3384.573    3421.911
+------------------------------------------------------------------------------
+
+. estimates store te_ra
+
+. teffects ra (bweight mmarried mage prenatal1 fbaby) (mbsmoke), atet   nolog
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : regression adjustment
+Outcome model  : linear
+Treatment model: none
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -223.3017    22.7422    -9.82   0.000    -267.8755   -178.7278
+-------------+----------------------------------------------------------------
+POmean       |
+     mbsmoke |
+  Nonsmoker  |   3360.961   12.75749   263.45   0.000     3335.957    3385.966
+------------------------------------------------------------------------------
+
+. estimates store te_ra_att
+
+. 
+. * Manual recreation: regress separately for D=0 and D=1, then average
+. preserve
+
+.     di _newline "--- Manual recreation of RA ---"
+
+--- Manual recreation of RA ---
+
+.     regress bweight mmarried mage prenatal1 fbaby if mbsmoke==0
+
+      Source |       SS           df       MS      Number of obs   =     3,778
+-------------+----------------------------------   F(4, 3773)      =     30.00
+       Model |    37916015         4  9479003.74   Prob > F        =    0.0000
+    Residual |  1.1922e+09     3,773  315979.752   R-squared       =    0.0308
+-------------+----------------------------------   Adj R-squared   =    0.0298
+       Total |  1.2301e+09     3,777  325683.776   Root MSE        =    562.12
+
+------------------------------------------------------------------------------
+     bweight | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    mmarried |   160.9513   24.55483     6.55   0.000     112.8092    209.0933
+        mage |   2.546828   1.935504     1.32   0.188    -1.247908    6.341564
+   prenatal1 |   64.40859   25.83668     2.49   0.013     13.75338    115.0638
+       fbaby |   -71.3286    19.4895    -3.66   0.000    -109.5396   -33.11763
+       _cons |   3202.746   51.20076    62.55   0.000     3102.362     3303.13
+------------------------------------------------------------------------------
+
+.     predict y0_hat, xb
+
+.     regress bweight mmarried mage prenatal1 fbaby if mbsmoke==1
+
+      Source |       SS           df       MS      Number of obs   =       864
+-------------+----------------------------------   F(4, 859)       =      3.69
+       Model |  4586519.21         4   1146629.8   Prob > F        =    0.0055
+    Residual |   266914157       859  310726.609   R-squared       =    0.0169
+-------------+----------------------------------   Adj R-squared   =    0.0123
+       Total |   271500676       863  314601.015   Root MSE        =    557.43
+
+------------------------------------------------------------------------------
+     bweight | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    mmarried |   133.6617   41.33023     3.23   0.001     52.54164    214.7818
+        mage |  -7.370881   3.983409    -1.85   0.065    -15.18924    .4474735
+   prenatal1 |   25.11133   43.64639     0.58   0.565    -60.55473    110.7774
+       fbaby |   41.43991   41.82146     0.99   0.322     -40.6443    123.5241
+       _cons |   3227.169   102.3392    31.53   0.000     3026.305    3428.033
+------------------------------------------------------------------------------
+
+.     predict y1_hat, xb
+
+.     generate te_i = y1_hat - y0_hat
+
+.     summarize te_i
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        te_i |      4,642   -239.6392      99.008  -488.4602   8.261719
+
+.     di "Manual RA estimate of ATE: " %7.2f r(mean) " grams"
+Manual RA estimate of ATE: -239.64 grams
+
+. restore
+
+. 
+. *---------------------------------------------------
+. * 4. Method 2: Inverse-Probability Weighting (IPW)
+. *---------------------------------------------------
+. 
+. di _newline(2) "=== 4. METHOD 2: INVERSE-PROBABILITY WEIGHTING (IPW) ==="
+
+
+=== 4. METHOD 2: INVERSE-PROBABILITY WEIGHTING (IPW) ===
+
+. 
+. * teffects ipw: probit treatment model, POMs, ATE, ATT
+. teffects ipw (bweight) (mbsmoke mmarried mage fbaby medu, probit), pomeans no
+> log
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : inverse-probability weights
+Outcome model  : weighted mean
+Treatment model: probit
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+POmeans      |
+     mbsmoke |
+  Nonsmoker  |   3402.429   9.576032   355.31   0.000      3383.66    3421.197
+     Smoker  |   3171.523   22.37227   141.76   0.000     3127.674    3215.372
+------------------------------------------------------------------------------
+
+. teffects ipw (bweight) (mbsmoke mmarried mage fbaby medu, probit), ate    nol
+> og
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : inverse-probability weights
+Outcome model  : weighted mean
+Treatment model: probit
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |   -230.906   24.30987    -9.50   0.000    -278.5525   -183.2595
+-------------+----------------------------------------------------------------
+POmean       |
+     mbsmoke |
+  Nonsmoker  |   3402.429   9.576032   355.31   0.000      3383.66    3421.197
+------------------------------------------------------------------------------
+
+. estimates store te_ipw
+
+. teffects ipw (bweight) (mbsmoke mmarried mage fbaby medu, probit), atet   nol
+> og
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : inverse-probability weights
+Outcome model  : weighted mean
+Treatment model: probit
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -219.6338   23.38456    -9.39   0.000    -265.4667   -173.8009
+-------------+----------------------------------------------------------------
+POmean       |
+     mbsmoke |
+  Nonsmoker  |   3357.294   13.76189   243.96   0.000     3330.321    3384.266
+------------------------------------------------------------------------------
+
+. estimates store te_ipw_att
+
+. 
+. * Manual recreation: estimate propensity scores, build IPW weights, weighted 
+> regression
+. di _newline "--- Manual recreation of IPW ---"
+
+--- Manual recreation of IPW ---
+
+. logistic mbsmoke mmarried mage fbaby medu, nolog
+
+Logistic regression                                     Number of obs =  4,642
+                                                        LR chi2(4)    = 346.31
+                                                        Prob > chi2   = 0.0000
+Log likelihood = -2057.5951                             Pseudo R2     = 0.0776
+
+------------------------------------------------------------------------------
+     mbsmoke | Odds ratio   Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+    mmarried |    .354782   .0319308   -11.51   0.000     .2974078    .4232244
+        mage |   .9963441   .0083578    -0.44   0.662      .980097     1.01286
+       fbaby |   .6209276   .0541327    -5.47   0.000     .5233991    .7366293
+        medu |   .8805241   .0147636    -7.59   0.000     .8520582     .909941
+       _cons |   2.786206   .6821068     4.19   0.000     1.724352     4.50195
+------------------------------------------------------------------------------
+Note: _cons estimates baseline odds.
+
+. predict ps, p
+
+. generate ipw_w = 1/ps        if mbsmoke==1
+(3,778 missing values generated)
+
+. replace  ipw_w = 1/(1-ps)    if mbsmoke==0
+(3,778 real changes made)
+
+. list bweight mbsmoke ps ipw_w in 40/49
+
+     +-------------------------------------------+
+     | bweight     mbsmoke         ps      ipw_w |
+     |-------------------------------------------|
+ 40. |    2790   Nonsmoker   .0596716   1.063458 |
+ 41. |    4082   Nonsmoker   .1067052   1.119451 |
+ 42. |    3089   Nonsmoker   .0933409    1.10295 |
+ 43. |    2580      Smoker   .3121328   3.203764 |
+ 44. |    3714   Nonsmoker   .1277395   1.146447 |
+     |-------------------------------------------|
+ 45. |    4196   Nonsmoker   .1019658   1.113543 |
+ 46. |    2523   Nonsmoker   .3417279   1.519129 |
+ 47. |    2693      Smoker   .3557771   2.810749 |
+ 48. |    3204   Nonsmoker   .0676847   1.072599 |
+ 49. |    3572      Smoker   .2595506   3.852813 |
+     +-------------------------------------------+
+
+. 
+. regress bweight mbsmoke [aweight=ipw_w]
+(sum of wgt is 9,154.62682104111)
+
+      Source |       SS           df       MS      Number of obs   =     4,642
+-------------+----------------------------------   F(1, 4640)      =    192.15
+       Model |  62512147.2         1  62512147.2   Prob > F        =    0.0000
+    Residual |  1.5095e+09     4,640  325332.601   R-squared       =    0.0398
+-------------+----------------------------------   Adj R-squared   =    0.0396
+       Total |  1.5721e+09     4,641  338732.044   Root MSE        =    570.38
+
+------------------------------------------------------------------------------
+     bweight | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     mbsmoke |  -232.1279   16.74591   -13.86   0.000    -264.9578   -199.2979
+       _cons |   3402.621   11.73618   289.93   0.000     3379.613     3425.63
+------------------------------------------------------------------------------
+
+. di "Manual IPW estimate (coefficient on mbsmoke): " %7.2f _b[mbsmoke] " grams
+> "
+Manual IPW estimate (coefficient on mbsmoke): -232.13 grams
+
+. 
+. * Figure 2: propensity-score distribution by treatment status
+. twoway ///
+>     (histogram ps if mbsmoke==0, fcolor("106 155 204%50") lcolor("106 155 204
+> ") width(0.025)) ///
+>     (histogram ps if mbsmoke==1, fcolor("217 119 87%50")  lcolor("217 119 87"
+> )  width(0.025)) ///
+>     , ///
+>     title("Estimated Propensity Scores", size(medium)) ///
+>     subtitle("Probability of smoking, by actual smoking status", size(small))
+>  ///
+>     xtitle("Estimated propensity score, e(X)") ytitle("Density") ///
+>     legend(order(1 "Non-smokers (D=0)" 2 "Smokers (D=1)") position(6) rows(1)
+> ) ///
+>     graphregion(color(white)) plotregion(color(white)) ///
+>     note("Where the two distributions overlap, we can credibly compare smoker
+> s and non-smokers.", size(vsmall))
+
+. graph export "stata_matching_propensity_distribution.png", replace width(2400
+> )
+file stata_matching_propensity_distribution.png written in PNG format
+
+. 
+. *---------------------------------------------------
+. * 5. Method 3: Inverse-Probability-Weighted Regression Adjustment (IPWRA)
+. *---------------------------------------------------
+. 
+. di _newline(2) "=== 5. METHOD 3: IPWRA ==="
+
+
+=== 5. METHOD 3: IPWRA ===
+
+. 
+. * IPWRA: combines outcome model + treatment model (doubly robust)
+. teffects ipwra (bweight mmarried mage prenatal1 fbaby) ///
+>                (mbsmoke mmarried mage fbaby medu, probit), pomeans aequations
+>  nolog
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : IPW regression adjustment
+Outcome model  : linear
+Treatment model: probit
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+POmeans      |
+     mbsmoke |
+  Nonsmoker  |   3402.699   9.570442   355.54   0.000     3383.941    3421.456
+     Smoker  |   3170.826   23.29268   136.13   0.000     3125.173    3216.479
+-------------+----------------------------------------------------------------
+OME0         |
+    mmarried |   156.7215   26.62711     5.89   0.000     104.5334    208.9097
+        mage |   3.119249   2.158588     1.45   0.148    -1.111506    7.350005
+   prenatal1 |   66.72463   28.58028     2.33   0.020     10.70831    122.7409
+       fbaby |  -71.64215   20.38959    -3.51   0.000     -111.605   -31.67929
+       _cons |   3188.271   55.72367    57.22   0.000     3079.055    3297.488
+-------------+----------------------------------------------------------------
+OME1         |
+    mmarried |    137.657   39.85045     3.45   0.001     59.55152    215.7624
+        mage |  -6.380565   5.420729    -1.18   0.239      -17.005    4.243868
+   prenatal1 |   28.52348   41.70547     0.68   0.494    -53.21774    110.2647
+       fbaby |   51.35695   51.04662     1.01   0.314     -48.6926    151.4065
+       _cons |   3198.271   138.9068    23.02   0.000     2926.019    3470.524
+-------------+----------------------------------------------------------------
+TME1         |
+    mmarried |  -.5848065   .0532985   -10.97   0.000    -.6892696   -.4803433
+        mage |  -.0023797   .0048267    -0.49   0.622    -.0118399    .0070804
+       fbaby |  -.2610501   .0492315    -5.30   0.000    -.3575421    -.164558
+        medu |  -.0784464   .0095783    -8.19   0.000    -.0972195   -.0596734
+       _cons |   .6177995   .1380763     4.47   0.000     .3471751     .888424
+------------------------------------------------------------------------------
+
+. teffects ipwra (bweight mmarried mage prenatal1 fbaby) ///
+>                (mbsmoke mmarried mage fbaby medu, probit), ate    nolog
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : IPW regression adjustment
+Outcome model  : linear
+Treatment model: probit
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -231.8723    25.1541    -9.22   0.000    -281.1735   -182.5712
+-------------+----------------------------------------------------------------
+POmean       |
+     mbsmoke |
+  Nonsmoker  |   3402.699   9.570442   355.54   0.000     3383.941    3421.456
+------------------------------------------------------------------------------
+
+. estimates store te_ipwra
+
+. teffects ipwra (bweight mmarried mage prenatal1 fbaby) ///
+>                (mbsmoke mmarried mage fbaby medu, probit), atet   nolog
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : IPW regression adjustment
+Outcome model  : linear
+Treatment model: probit
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -220.6476   23.37268    -9.44   0.000    -266.4572    -174.838
+-------------+----------------------------------------------------------------
+POmean       |
+     mbsmoke |
+  Nonsmoker  |   3358.307   13.78516   243.62   0.000     3331.289    3385.326
+------------------------------------------------------------------------------
+
+. estimates store te_ipwra_att
+
+. 
+. *---------------------------------------------------
+. * 6. Method 4: Augmented Inverse-Probability Weighting (AIPW)
+. *---------------------------------------------------
+. 
+. di _newline(2) "=== 6. METHOD 4: AIPW ==="
+
+
+=== 6. METHOD 4: AIPW ===
+
+. 
+. * AIPW: efficient and doubly robust; in Stata, ATE only.
+. teffects aipw (bweight mmarried mage prenatal1 fbaby) ///
+>               (mbsmoke mmarried mage fbaby medu, probit), pomeans aequations 
+> nolog
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : augmented IPW
+Outcome model  : linear by ML
+Treatment model: probit
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+POmeans      |
+     mbsmoke |
+  Nonsmoker  |   3402.688    9.57038   355.54   0.000      3383.93    3421.445
+     Smoker  |   3170.212    22.9462   138.16   0.000     3125.238    3215.186
+-------------+----------------------------------------------------------------
+OME0         |
+    mmarried |   160.9513    26.6162     6.05   0.000     108.7845    213.1181
+        mage |   2.546828   2.084324     1.22   0.222    -1.538373    6.632028
+   prenatal1 |   64.40859   27.52699     2.34   0.019     10.45669    118.3605
+       fbaby |   -71.3286   19.64701    -3.63   0.000     -109.836   -32.82117
+       _cons |   3202.746   54.01082    59.30   0.000     3096.886    3308.605
+-------------+----------------------------------------------------------------
+OME1         |
+    mmarried |   133.6617   40.86443     3.27   0.001      53.5689    213.7545
+        mage |  -7.370881    4.21817    -1.75   0.081    -15.63834    .8965804
+   prenatal1 |   25.11133   40.37541     0.62   0.534    -54.02302    104.2457
+       fbaby |   41.43991   39.70712     1.04   0.297    -36.38461    119.2644
+       _cons |   3227.169   104.4059    30.91   0.000     3022.537    3431.801
+-------------+----------------------------------------------------------------
+TME1         |
+    mmarried |  -.5848065   .0532985   -10.97   0.000    -.6892696   -.4803433
+        mage |  -.0023797   .0048267    -0.49   0.622    -.0118399    .0070804
+       fbaby |  -.2610501   .0492315    -5.30   0.000    -.3575421    -.164558
+        medu |  -.0784464   .0095783    -8.19   0.000    -.0972195   -.0596734
+       _cons |   .6177995   .1380763     4.47   0.000     .3471751     .888424
+------------------------------------------------------------------------------
+
+. teffects aipw (bweight mmarried mage prenatal1 fbaby) ///
+>               (mbsmoke mmarried mage fbaby medu, probit), ate    nolog
+
+Treatment-effects estimation                    Number of obs     =      4,642
+Estimator      : augmented IPW
+Outcome model  : linear by ML
+Treatment model: probit
+------------------------------------------------------------------------------
+             |               Robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -232.4759   24.83406    -9.36   0.000    -281.1497    -183.802
+-------------+----------------------------------------------------------------
+POmean       |
+     mbsmoke |
+  Nonsmoker  |   3402.688    9.57038   355.54   0.000      3383.93    3421.445
+------------------------------------------------------------------------------
+
+. estimates store te_aipw
+
+. 
+. *---------------------------------------------------
+. * 7. Method 5: Nearest-Neighbor Matching (NNM)
+. *---------------------------------------------------
+. 
+. di _newline(2) "=== 7. METHOD 5: NEAREST-NEIGHBOR MATCHING (NNM) ==="
+
+
+=== 7. METHOD 5: NEAREST-NEIGHBOR MATCHING (NNM) ===
+
+. 
+. * Basic NNM (one nearest neighbor on Mahalanobis distance)
+. teffects nnmatch (bweight mmarried mage fage medu prenatal1) (mbsmoke), nolog
+
+Treatment-effects estimation                   Number of obs      =      4,642
+Estimator      : nearest-neighbor matching     Matches: requested =          1
+Outcome model  : matching                                     min =          1
+Distance metric: Mahalanobis                                  max =         16
+------------------------------------------------------------------------------
+             |              AI robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -210.5435   29.32969    -7.18   0.000    -268.0286   -153.0584
+------------------------------------------------------------------------------
+
+. 
+. * NNM with exact matching on discrete covariates and bias adjustment on conti
+> nuous covariates
+. teffects nnmatch (bweight mmarried mage fage medu prenatal1) (mbsmoke), ///
+>          ematch(mmarried prenatal1)  biasadj(mage fage medu) nolog
+
+Treatment-effects estimation                   Number of obs      =      4,642
+Estimator      : nearest-neighbor matching     Matches: requested =          1
+Outcome model  : matching                                     min =          1
+Distance metric: Mahalanobis                                  max =         16
+------------------------------------------------------------------------------
+             |              AI robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -210.0558   29.32803    -7.16   0.000    -267.5377   -152.5739
+------------------------------------------------------------------------------
+
+. estimates store te_nnmatch
+
+. teffects nnmatch (bweight mmarried mage fage medu prenatal1) (mbsmoke), ///
+>          ematch(mmarried prenatal1)  biasadj(mage fage medu) atet nolog
+
+Treatment-effects estimation                   Number of obs      =      4,642
+Estimator      : nearest-neighbor matching     Matches: requested =          1
+Outcome model  : matching                                     min =          1
+Distance metric: Mahalanobis                                  max =         16
+------------------------------------------------------------------------------
+             |              AI robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -238.5204   30.41661    -7.84   0.000    -298.1359    -178.905
+------------------------------------------------------------------------------
+
+. estimates store te_nnmatch_att
+
+. 
+. *---------------------------------------------------
+. * 8. Method 6: Propensity-Score Matching (PSM)
+. *---------------------------------------------------
+. 
+. di _newline(2) "=== 8. METHOD 6: PROPENSITY-SCORE MATCHING (PSM) ==="
+
+
+=== 8. METHOD 6: PROPENSITY-SCORE MATCHING (PSM) ===
+
+. 
+. * Visualize the matching idea on a small subsample (Figure 3)
+. * Using the propensity score we already computed (ps)
+. preserve
+
+.     keep if _n < 100
+(4,543 observations deleted)
+
+.     #delimit ;
+delimiter now ;
+.     twoway
+>         (scatter mbsmoke ps if mbsmoke==0,
+>             msize(medium) msymbol(circle_hollow) mcolor("106 155 204"))
+>         (scatter mbsmoke ps if mbsmoke==1,
+>             msize(medium) msymbol(circle_hollow) mcolor("217 119 87"))
+>         (pcarrowi 0.92 0.09 0.08 0.09,
+>             recast(pcbarrow) lcolor("20 20 20") lwidth(medium)
+>             mcolor("20 20 20") msize(medium) barbsize(medium))
+>         ,
+>         title("How Propensity-Score Matching Works", size(medium))
+>         subtitle("Match a smoker with the most similar non-smoker(s)", size(s
+> mall))
+>         text(0.50 0.20
+>              "Match each smoker with the nearest non-smoker(s) {&rarr}"
+>              "in propensity-score space",
+>              color("20 20 20") just(left) placement(e) size(small))
+>         ytitle("")
+>         yscale(range(-0.1 1.1))
+>         ylabel(0 "Non-smoker" 1 "Smoker", angle(horizontal))
+>         xtitle("Estimated propensity score, e(X)") xlabel(0(0.1)1)
+>         legend(off)
+>         graphregion(color(white)) plotregion(color(white))
+>     ;
+
+.     #delimit cr
+delimiter now cr
+.     graph export "stata_matching_psm_logic.png", replace width(2400)
+file stata_matching_psm_logic.png written in PNG format
+
+. restore
+
+. 
+. * PSM estimation
+. teffects psmatch (bweight) (mbsmoke mmarried mage fage medu prenatal1), nolog
+
+Treatment-effects estimation                   Number of obs      =      4,642
+Estimator      : propensity-score matching     Matches: requested =          1
+Outcome model  : matching                                     min =          1
+Treatment model: logit                                        max =         16
+------------------------------------------------------------------------------
+             |              AI robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -229.4492   25.88746    -8.86   0.000    -280.1877   -178.7107
+------------------------------------------------------------------------------
+
+. estimates store te_psmatch
+
+. teffects psmatch (bweight) (mbsmoke mmarried mage fage medu prenatal1), atet 
+> nolog
+
+Treatment-effects estimation                   Number of obs      =      4,642
+Estimator      : propensity-score matching     Matches: requested =          1
+Outcome model  : matching                                     min =          1
+Treatment model: logit                                        max =         16
+------------------------------------------------------------------------------
+             |              AI robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -224.5927   30.55147    -7.35   0.000    -284.4725   -164.7129
+------------------------------------------------------------------------------
+
+. estimates store te_psmatch_att
+
+. 
+. * Overlap diagnostic (Figure 4)
+. teffects psmatch (bweight) (mbsmoke mmarried mage fage medu prenatal1), nolog
+
+Treatment-effects estimation                   Number of obs      =      4,642
+Estimator      : propensity-score matching     Matches: requested =          1
+Outcome model  : matching                                     min =          1
+Treatment model: logit                                        max =         16
+------------------------------------------------------------------------------
+             |              AI robust
+     bweight | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+     mbsmoke |
+    (Smoker  |
+         vs  |
+ Nonsmoker)  |  -229.4492   25.88746    -8.86   0.000    -280.1877   -178.7107
+------------------------------------------------------------------------------
+
+. teffects overlap, ///
+>     ptlevel(0) ///
+>     title("Overlap of Propensity Scores", size(medium)) ///
+>     subtitle("Required for valid causal comparison", size(small)) ///
+>     legend(order(1 "Non-smokers (D=0)" 2 "Smokers (D=1)") position(6) rows(1)
+> ) ///
+>     graphregion(color(white)) plotregion(color(white))
+(refitting the model using the generate() option)
+
+. graph export "stata_matching_overlap.png", replace width(2400)
+file stata_matching_overlap.png written in PNG format
+
+. 
+. *---------------------------------------------------
+. * 9. Comparison of all six methods
+. *---------------------------------------------------
+. 
+. di _newline(2) "=== 9. COMPARISON OF ALL SIX METHODS ==="
+
+
+=== 9. COMPARISON OF ALL SIX METHODS ===
+
+. 
+. * ATE comparison table for the six teffects estimators
+. di _newline "--- ATE estimates from teffects estimators ---"
+
+--- ATE estimates from teffects estimators ---
+
+. estimates table te_ra te_ipw te_ipwra te_aipw te_nnmatch te_psmatch ///
+>                 , b(%9.2f) se(%7.2f) stats(N) varwidth(16) modelwidth(11)
+
+--------------------------------------------------------------------------
+        Variable |    te_ra        te_ipw       te_ipwra       te_aipw    
+-----------------+--------------------------------------------------------
+ATE              |
+         mbsmoke |
+        (Smoker  |
+             vs  |
+     Nonsmoker)  |     -239.64       -230.91       -231.87       -232.48  
+                 |       23.82         24.31         25.15         24.83  
+-----------------+--------------------------------------------------------
+POmean           |
+         mbsmoke |
+      Nonsmoker  |     3403.24       3402.43       3402.70       3402.69  
+                 |        9.53          9.58          9.57          9.57  
+-----------------+--------------------------------------------------------
+OME0             |
+        mmarried |      160.95                      156.72        160.95  
+                 |       26.62                       26.63         26.62  
+            mage |        2.55                        3.12          2.55  
+                 |        2.08                        2.16          2.08  
+       prenatal1 |       64.41                       66.72         64.41  
+                 |       27.53                       28.58         27.53  
+           fbaby |      -71.33                      -71.64        -71.33  
+                 |       19.65                       20.39         19.65  
+           _cons |     3202.75                     3188.27       3202.75  
+                 |       54.01                       55.72         54.01  
+-----------------+--------------------------------------------------------
+OME1             |
+        mmarried |      133.66                      137.66        133.66  
+                 |       40.86                       39.85         40.86  
+            mage |       -7.37                       -6.38         -7.37  
+                 |        4.22                        5.42          4.22  
+       prenatal1 |       25.11                       28.52         25.11  
+                 |       40.38                       41.71         40.38  
+           fbaby |       41.44                       51.36         41.44  
+                 |       39.71                       51.05         39.71  
+           _cons |     3227.17                     3198.27       3227.17  
+                 |      104.41                      138.91        104.41  
+-----------------+--------------------------------------------------------
+TME1             |
+        mmarried |                     -0.58         -0.58         -0.58  
+                 |                      0.05          0.05          0.05  
+            mage |                     -0.00         -0.00         -0.00  
+                 |                      0.00          0.00          0.00  
+           fbaby |                     -0.26         -0.26         -0.26  
+                 |                      0.05          0.05          0.05  
+            medu |                     -0.08         -0.08         -0.08  
+                 |                      0.01          0.01          0.01  
+           _cons |                      0.62          0.62          0.62  
+                 |                      0.14          0.14          0.14  
+-----------------+--------------------------------------------------------
+Statistics       |                                                        
+               N |        4642          4642          4642          4642  
+--------------------------------------------------------------------------
+                                                              Legend: b/se
+
+
+----------------------------------------------
+        Variable | te_nnmatch    te_psmatch   
+-----------------+----------------------------
+ATE              |
+         mbsmoke |
+        (Smoker  |
+             vs  |
+     Nonsmoker)  |     -210.06       -229.45  
+                 |       29.33         25.89  
+-----------------+----------------------------
+POmean           |
+         mbsmoke |
+      Nonsmoker  |                            
+                 |                            
+-----------------+----------------------------
+OME0             |
+        mmarried |                            
+                 |                            
+            mage |                            
+                 |                            
+       prenatal1 |                            
+                 |                            
+           fbaby |                            
+                 |                            
+           _cons |                            
+                 |                            
+-----------------+----------------------------
+OME1             |
+        mmarried |                            
+                 |                            
+            mage |                            
+                 |                            
+       prenatal1 |                            
+                 |                            
+           fbaby |                            
+                 |                            
+           _cons |                            
+                 |                            
+-----------------+----------------------------
+TME1             |
+        mmarried |                            
+                 |                            
+            mage |                            
+                 |                            
+           fbaby |                            
+                 |                            
+            medu |                            
+                 |                            
+           _cons |                            
+                 |                            
+-----------------+----------------------------
+Statistics       |                            
+               N |        4642          4642  
+----------------------------------------------
+                                  Legend: b/se
+
+. 
+. * Naive baseline shown separately (different coefficient name in regress)
+. di _newline "--- Naive (unadjusted) baseline ---"
+
+--- Naive (unadjusted) baseline ---
+
+. estimates table te_naive, b(%9.2f) se(%7.2f) stats(N) varwidth(16) modelwidth
+> (11)
+
+--------------------------------
+        Variable |  te_naive    
+-----------------+--------------
+         mbsmoke |     -275.25  
+                 |       21.22  
+           _cons |     3412.91  
+                 |        9.29  
+-----------------+--------------
+               N |        4642  
+--------------------------------
+                    Legend: b/se
+
+. 
+. * ATT comparison table (note: AIPW does not provide ATT in Stata)
+. di _newline "--- ATT estimates (five methods) ---"
+
+--- ATT estimates (five methods) ---
+
+. estimates table te_ra_att te_ipw_att te_ipwra_att te_nnmatch_att te_psmatch_a
+> tt ///
+>                 , b(%9.2f) se(%7.2f) stats(N) varwidth(16) modelwidth(11)
+
+--------------------------------------------------------------------------
+        Variable |  te_ra_att    te_ipw_att    te_ipwra_~t   te_nnmatc~t  
+-----------------+--------------------------------------------------------
+ATET             |
+         mbsmoke |
+        (Smoker  |
+             vs  |
+     Nonsmoker)  |     -223.30       -219.63       -220.65       -238.52  
+                 |       22.74         23.38         23.37         30.42  
+-----------------+--------------------------------------------------------
+POmean           |
+         mbsmoke |
+      Nonsmoker  |     3360.96       3357.29       3358.31                
+                 |       12.76         13.76         13.79                
+-----------------+--------------------------------------------------------
+OME0             |
+        mmarried |      160.95                      139.32                
+                 |       26.62                       29.17                
+            mage |        2.55                        5.28                
+                 |        2.08                        2.92                
+       prenatal1 |       64.41                       73.34                
+                 |       27.53                       37.02                
+           fbaby |      -71.33                      -73.97                
+                 |       19.65                       30.93                
+           _cons |     3202.75                     3136.41                
+                 |       54.01                       72.56                
+-----------------+--------------------------------------------------------
+OME1             |
+        mmarried |      133.66                      133.66                
+                 |       40.86                       40.86                
+            mage |       -7.37                       -7.37                
+                 |        4.22                        4.22                
+       prenatal1 |       25.11                       25.11                
+                 |       40.38                       40.38                
+           fbaby |       41.44                       41.44                
+                 |       39.71                       39.71                
+           _cons |     3227.17                     3227.17                
+                 |      104.41                      104.41                
+-----------------+--------------------------------------------------------
+TME1             |
+        mmarried |                     -0.58         -0.58                
+                 |                      0.05          0.05                
+            mage |                     -0.00         -0.00                
+                 |                      0.00          0.00                
+           fbaby |                     -0.26         -0.26                
+                 |                      0.05          0.05                
+            medu |                     -0.08         -0.08                
+                 |                      0.01          0.01                
+           _cons |                      0.62          0.62                
+                 |                      0.14          0.14                
+-----------------+--------------------------------------------------------
+Statistics       |                                                        
+               N |        4642          4642          4642          4642  
+--------------------------------------------------------------------------
+                                                              Legend: b/se
+
+
+--------------------------------
+        Variable | te_psmatc~t  
+-----------------+--------------
+ATET             |
+         mbsmoke |
+        (Smoker  |
+             vs  |
+     Nonsmoker)  |     -224.59  
+                 |       30.55  
+-----------------+--------------
+POmean           |
+         mbsmoke |
+      Nonsmoker  |              
+                 |              
+-----------------+--------------
+OME0             |
+        mmarried |              
+                 |              
+            mage |              
+                 |              
+       prenatal1 |              
+                 |              
+           fbaby |              
+                 |              
+           _cons |              
+                 |              
+-----------------+--------------
+OME1             |
+        mmarried |              
+                 |              
+            mage |              
+                 |              
+       prenatal1 |              
+                 |              
+           fbaby |              
+                 |              
+           _cons |              
+                 |              
+-----------------+--------------
+TME1             |
+        mmarried |              
+                 |              
+            mage |              
+                 |              
+           fbaby |              
+                 |              
+            medu |              
+                 |              
+           _cons |              
+                 |              
+-----------------+--------------
+Statistics       |              
+               N |        4642  
+--------------------------------
+                    Legend: b/se
+
+. 
+. * Figure 5: forest plot of ATE estimates
+. * coefplot's rename + keep doesn't span regress (mbsmoke) and teffects
+. * (r1vs0.mbsmoke) cleanly, so we collect ATE and 95% CI manually via postfile
+> .
+. * Collect b, ll, ul, and a row index manually from each stored estimate
+. tempfile fp_data
+
+. capture postclose fp
+
+. postfile fp str20 method double(b ll ul) byte row using `fp_data', replace
+(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St60458.000003 not
+    found)
+
+. 
+. estimates restore te_naive
+(results te_naive are active now)
+
+. post fp ("0. Naive")  (_b[mbsmoke])             (_b[mbsmoke] - 1.96*_se[mbsmo
+> ke])             (_b[mbsmoke] + 1.96*_se[mbsmoke])             (7)
+
+. 
+. estimates restore te_ra
+(results te_ra are active now)
+
+. post fp ("1. RA")     (_b[r1vs0.mbsmoke])       (_b[r1vs0.mbsmoke] - 1.96*_se
+> [r1vs0.mbsmoke]) (_b[r1vs0.mbsmoke] + 1.96*_se[r1vs0.mbsmoke]) (6)
+
+. 
+. estimates restore te_ipw
+(results te_ipw are active now)
+
+. post fp ("2. IPW")    (_b[r1vs0.mbsmoke])       (_b[r1vs0.mbsmoke] - 1.96*_se
+> [r1vs0.mbsmoke]) (_b[r1vs0.mbsmoke] + 1.96*_se[r1vs0.mbsmoke]) (5)
+
+. 
+. estimates restore te_ipwra
+(results te_ipwra are active now)
+
+. post fp ("3. IPWRA")  (_b[r1vs0.mbsmoke])       (_b[r1vs0.mbsmoke] - 1.96*_se
+> [r1vs0.mbsmoke]) (_b[r1vs0.mbsmoke] + 1.96*_se[r1vs0.mbsmoke]) (4)
+
+. 
+. estimates restore te_aipw
+(results te_aipw are active now)
+
+. post fp ("4. AIPW")   (_b[r1vs0.mbsmoke])       (_b[r1vs0.mbsmoke] - 1.96*_se
+> [r1vs0.mbsmoke]) (_b[r1vs0.mbsmoke] + 1.96*_se[r1vs0.mbsmoke]) (3)
+
+. 
+. estimates restore te_nnmatch
+(results te_nnmatch are active now)
+
+. post fp ("5. NNM")    (_b[r1vs0.mbsmoke])       (_b[r1vs0.mbsmoke] - 1.96*_se
+> [r1vs0.mbsmoke]) (_b[r1vs0.mbsmoke] + 1.96*_se[r1vs0.mbsmoke]) (2)
+
+. 
+. estimates restore te_psmatch
+(results te_psmatch are active now)
+
+. post fp ("6. PSM")    (_b[r1vs0.mbsmoke])       (_b[r1vs0.mbsmoke] - 1.96*_se
+> [r1vs0.mbsmoke]) (_b[r1vs0.mbsmoke] + 1.96*_se[r1vs0.mbsmoke]) (1)
+
+. 
+. postclose fp
+
+. 
+. preserve
+
+.     use `fp_data', clear
+
+.     list method b ll ul, sep(0) noobs
+
+  +-------------------------------------------------+
+  |   method            b           ll           ul |
+  |-------------------------------------------------|
+  | 0. Naive   -275.25187   -316.83329   -233.67046 |
+  |    1. RA   -239.63921   -286.33429   -192.94413 |
+  |   2. IPW   -230.90597   -278.55333   -183.25862 |
+  | 3. IPWRA   -231.87233   -281.17438   -182.57029 |
+  |  4. AIPW   -232.47587   -281.15064    -183.8011 |
+  |   5. NNM   -210.05578   -267.53873   -152.57284 |
+  |   6. PSM   -229.44922   -280.18865    -178.7098 |
+  +-------------------------------------------------+
+
+.     export delimited using "ate_estimates.csv", replace
+file ate_estimates.csv saved
+
+. 
+.     * Build the forest plot
+.     twoway ///
+>         (rcap ll ul row, horizontal lcolor("106 155 204") lwidth(medthick)) /
+> //
+>         (scatter row b, msymbol(D) mcolor("217 119 87") msize(large)) ///
+>         , ///
+>         xline(0, lcolor("20 20 20") lpattern(dash)) ///
+>         ylabel(7 "0. Naive" 6 "1. RA" 5 "2. IPW" 4 "3. IPWRA" 3 "4. AIPW" ///
+>                2 "5. NNM" 1 "6. PSM", angle(horizontal) labsize(small) nogrid
+> ) ///
+>         ytitle("") ///
+>         xtitle("ATE on birth weight (grams)") ///
+>         title("Estimated Effect of Maternal Smoking on Birth Weight", size(me
+> dium)) ///
+>         subtitle("Six estimators + naive baseline, with 95% confidence interv
+> als", size(small)) ///
+>         legend(off) ///
+>         graphregion(color(white)) plotregion(color(white)) ///
+>         note("Negative values: smoking lowers birth weight. The naive estimat
+> e is biased; the six estimators move the answer closer to the truth.", size(v
+> small))
+
+.     graph export "stata_matching_forest_plot.png", replace width(2400)
+file stata_matching_forest_plot.png written in PNG format
+
+. restore
+
+. 
+. *---------------------------------------------------
+. * 10. End of analysis
+. *---------------------------------------------------
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================================"
+============================================================
+
+. di "  Analysis complete."
+  Analysis complete.
+
+. di ""
+
+
+. di "  Six teffects estimators compared on cattaneo2.dta:"
+  Six teffects estimators compared on cattaneo2.dta:
+
+. di "    Naive    : " %7.2f naive_b " grams"
+    Naive    : -275.25 grams
+
+. di "    RA, IPW, IPWRA, AIPW, NNM, PSM: see comparison table"
+    RA, IPW, IPWRA, AIPW, NNM, PSM: see comparison table
+
+. di ""
+
+
+. di "  Outputs:"
+  Outputs:
+
+. di "    - analysis.log"
+    - analysis.log
+
+. di "    - stata_matching_density_bweight.png"
+    - stata_matching_density_bweight.png
+
+. di "    - stata_matching_propensity_distribution.png"
+    - stata_matching_propensity_distribution.png
+
+. di "    - stata_matching_psm_logic.png"
+    - stata_matching_psm_logic.png
+
+. di "    - stata_matching_overlap.png"
+    - stata_matching_overlap.png
+
+. di "    - stata_matching_forest_plot.png"
+    - stata_matching_forest_plot.png
+
+. di ""
+
+
+. di "  Script completed successfully"
+  Script completed successfully
+
+. di "============================================================"
+============================================================
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_matc
+> hing/analysis.log
+  log type:  text
+ closed on:  29 Apr 2026, 12:22:54
+-------------------------------------------------------------------------------
