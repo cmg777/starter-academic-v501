@@ -1,0 +1,1060 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_dyna
+> mic_panel/analysis.log
+  log type:  text
+ opened on:  29 Apr 2026, 10:10:24
+
+. 
+. *----------------------------------------------------
+. * Section 2: Install dependencies (idempotent)
+. *----------------------------------------------------
+. * xtabond2  - Arellano-Bond / Blundell-Bond GMM (Roodman)
+. * estout    - publication-quality regression tables
+. * outreg2   - alternative table exporter
+. * coefplot  - plot regression coefficients
+. capture which xtabond2
+
+. if _rc capture ssc install xtabond2, replace
+
+. capture which estout
+
+. if _rc capture ssc install estout, replace
+
+. capture which outreg2
+
+. if _rc capture ssc install outreg2, replace
+
+. capture which coefplot
+
+. if _rc capture ssc install coefplot, replace
+
+. 
+. *----------------------------------------------------
+. * Section 3: Import data
+. *----------------------------------------------------
+. * The CatoJ.dta panel is hosted on GitHub by quarcs-lab.
+. use "https://github.com/quarcs-lab/data-open/raw/master/panel/CatoJ.dta", cle
+> ar
+
+. 
+. describe
+
+Contains data from https://github.com/quarcs-lab/data-open/raw/master/panel/Cat
+> oJ.dta
+ Observations:         1,663                  
+    Variables:            18                  26 Oct 2019 15:46
+-------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+Country         str35   %35s                  Country
+cty             long    %35.0g     cty        Country
+Year            int     %ty                   Year
+Sample          byte    %10.0g                Sample
+lnGDPpercapita  double  %10.0g                ln(GDP per capita)
+ChangeinlnGDP~a double  %10.0g                Change in ln(GDP per capita)
+lnGDPpercapit~g double  %10.0g                ln(GDP per capita) Lag
+EconFreeLag     double  %10.0g                Econ Free Lag
+PolitFreeLag    double  %10.0g                Polit Free Lag
+DemocIndxLag    double  %10.0g                Democ Indx Lag
+War             double  %10.0g                War
+WarLag          double  %10.0g                War Lag
+Coup            double  %10.0g                Coup
+CoupLag         double  %10.0g                Coup Lag
+Americas1       byte    %10.0g                Americas [1]
+Africa1         byte    %10.0g                Africa [1]
+MENA1           byte    %10.0g                MENA [1]
+Asia1           byte    %10.0g                Asia [1]
+-------------------------------------------------------------------------------
+Sorted by: cty  Year
+
+. sum
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     Country |          0
+         cty |      1,663    80.82441    45.80199          1        160
+        Year |      1,663    1988.596    18.06104       1955       2015
+      Sample |      1,663    1.188815    .3914796          1          2
+lnGDPperca~a |      1,663    8.768894    1.204839    5.63479   12.70269
+-------------+---------------------------------------------------------
+Changeinln~a |      1,663    .0955832    .1752815  -1.189208   1.282702
+lnGDPperca~g |      1,663    8.673311     1.19621    5.63479   12.88199
+ EconFreeLag |      1,663    4.674184    2.548064          0   9.234659
+PolitFreeLag |      1,663    40.27603    37.29169          0        100
+DemocIndxLag |      1,663    2.135558    6.888007          0       37.5
+-------------+---------------------------------------------------------
+         War |      1,663    .0824843    .1886522          0          1
+      WarLag |      1,663    .0845975    .1900241          0          1
+        Coup |      1,663    .0911606    .1912969          0          1
+     CoupLag |      1,663    .0926037    .1936088          0          1
+   Americas1 |      1,663    .1858088    .3890693          0          1
+-------------+---------------------------------------------------------
+     Africa1 |      1,663    .2375225     .425693          0          1
+       MENA1 |      1,663    .1292844    .3356154          0          1
+       Asia1 |      1,663    .1635598    .3699869          0          1
+
+. sum cty Year DemocIndxLag PolitFreeLag EconFreeLag
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+         cty |      1,663    80.82441    45.80199          1        160
+        Year |      1,663    1988.596    18.06104       1955       2015
+DemocIndxLag |      1,663    2.135558    6.888007          0       37.5
+PolitFreeLag |      1,663    40.27603    37.29169          0        100
+ EconFreeLag |      1,663    4.674184    2.548064          0   9.234659
+
+. 
+. * NOTE: It looks like a full balanced panel, but it isn't.  Some
+. * missing observations are coded as 0, so we fix this next.
+. 
+. *----------------------------------------------------
+. * Section 4: Recode missing-as-zero codes to actual missing
+. *----------------------------------------------------
+. * The lag-prefixed variables encode unavailable observations as 0.
+. * mvdecode replaces those zeros with Stata's missing-value marker
+. * so they are correctly excluded from the regressions below.
+. mvdecode DemocIndxLag PolitFreeLag EconFreeLag, mv(0)
+DemocIndxLag: 1438 missing values generated
+PolitFreeLag: 495 missing values generated
+ EconFreeLag: 314 missing values generated
+
+. sum      DemocIndxLag PolitFreeLag EconFreeLag
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+DemocIndxLag |        225    15.78415    11.64599         .1       37.5
+PolitFreeLag |      1,168    57.34507    31.63668   .0201857        100
+ EconFreeLag |      1,349    5.762171    1.315748   1.820347   9.234659
+
+. 
+. *----------------------------------------------------
+. * Section 5: Label key variables
+. *----------------------------------------------------
+. lab var lnGDPpercapita  lnGDPpc
+
+. lab var EconFreeLag     L.EconFreedom
+
+. lab var PolitFreeLag    L.PolitFreedom
+
+. 
+. *----------------------------------------------------
+. * Section 6: Exploratory data analysis
+. *----------------------------------------------------
+. 
+. * 6.1 Descriptive statistics --------------------------
+. estpost summarize lnGDPpercapita War Coup EconFreeLag PolitFreeLag, detail
+
+             |  e(count)   e(sum_w)    e(mean)     e(Var)      e(sd) 
+-------------+-------------------------------------------------------
+lnGDPperca~a |      1663       1663   8.768894   1.451637   1.204839 
+         War |      1663       1663   .0824843   .0355896   .1886522 
+        Coup |      1663       1663   .0911606   .0365945   .1912969 
+ EconFreeLag |      1349       1349   5.762171   1.731192   1.315748 
+PolitFreeLag |      1168       1168   57.34507   1000.879   31.63668 
+
+             | e(skewn~)  e(kurto~)     e(sum)     e(min)     e(max) 
+-------------+-------------------------------------------------------
+lnGDPperca~a | -.0311522   2.249679   14582.67    5.63479   12.70269 
+         War |  2.532639   8.790373   137.1714          0          1 
+        Coup |    2.5981   10.11349      151.6          0          1 
+ EconFreeLag | -.0206745   2.452404   7773.169   1.820347   9.234659 
+PolitFreeLag | -.0367516   1.571523   66979.05   .0201857        100 
+
+             |     e(p1)      e(p5)     e(p10)     e(p25)     e(p50) 
+-------------+-------------------------------------------------------
+lnGDPperca~a |  6.375025   6.761573   7.134094    7.80751   8.809415 
+         War |         0          0          0          0          0 
+        Coup |         0          0          0          0          0 
+ EconFreeLag |  2.933702    3.61899   4.072251   4.781393       5.78 
+PolitFreeLag |  8.333333   8.333333   16.66667         25   58.33333 
+
+             |    e(p75)     e(p90)     e(p95)     e(p99) 
+-------------+--------------------------------------------
+lnGDPperca~a |  9.704183   10.36151   10.62925   11.23101 
+         War |  .0285714   .3428571   .5714286   .8571429 
+        Coup |        .2         .4         .4          1 
+ EconFreeLag |  6.783959   7.447417   7.808637   8.712842 
+PolitFreeLag |  91.66667        100        100        100 
+
+. esttab using "summary_stats.csv", replace ///
+>     cells("count(label(N)) mean(label(Mean) fmt(3)) sd(label(SD) fmt(3)) min(
+> label(Min) fmt(3)) p50(label(Median) fmt(3)) max(label(Max) fmt(3))") ///
+>     nomtitle nonumber noobs ///
+>     title("Descriptive statistics: dynamic panel dataset")
+(output written to summary_stats.csv)
+
+. 
+. * 6.2 Figure: Mean War & Coup intensity over time ----
+. preserve
+
+.     collapse (mean) War Coup, by(Year)
+
+.     twoway (line War  Year, lcolor("106 155 204") lwidth(thick))      ///
+>            (line Coup Year, lcolor("217 119 87")  lwidth(thick)),     ///
+>            ytitle("Mean intensity (0 = none, 1 = max)")               ///
+>            xtitle("Year")                                             ///
+>            title("Mean war & coup intensity by year, 1955-2015")      ///
+>            legend(order(1 "War" 2 "Coup") position(6) cols(2))        ///
+>            graphregion(color(white)) plotregion(color(white))
+
+.     graph export "stata_dynamic_panel_war_coup_panel.png", replace width(2400
+> )
+file stata_dynamic_panel_war_coup_panel.png written in PNG format
+
+. restore
+
+. 
+. * 6.3 Figure: Number of countries with active war by year
+. preserve
+
+.     gen byte war_active = War > 0 & !missing(War)
+
+.     collapse (sum) war_active, by(Year)
+
+.     twoway bar war_active Year,                                       ///
+>            bcolor("106 155 204") barwidth(3.5)                        ///
+>            ytitle("Number of countries with War > 0")                 ///
+>            xtitle("Year")                                             ///
+>            title("Countries experiencing war by year, 1955-2015")     ///
+>            subtitle("Reproducing Figure 1 of Thies & Baum (2020)")    ///
+>            graphregion(color(white)) plotregion(color(white))
+
+.     graph export "stata_dynamic_panel_war_count_by_year.png", replace width(2
+> 400)
+file stata_dynamic_panel_war_count_by_year.png written in PNG format
+
+. restore
+
+. 
+. * 6.4 Figure: Distribution of log GDP per capita -----
+. histogram lnGDPpercapita,                                             ///
+>     fcolor("106 155 204%70") lcolor("20 20 19") bin(40)               ///
+>     ytitle("Density")                                                 ///
+>     xtitle("log GDP per capita (lnGDPpercapita)")                     ///
+>     title("Distribution of log GDP per capita")                       ///
+>     graphregion(color(white)) plotregion(color(white))
+(bin=40, start=5.6347896, width=.17669745)
+
+. graph export "stata_dynamic_panel_gdp_distribution.png", replace width(2400)
+file stata_dynamic_panel_gdp_distribution.png written in PNG format
+
+. 
+. *----------------------------------------------------
+. * Section 7: Long-run effects program (ssta)
+. *----------------------------------------------------
+. * This program (original code by Prof. Baum) is preserved verbatim.
+. * After each xtabond2 regression we call `ssta` to compute the
+. * sum of the contemporaneous and lagged War coefficients (and Coup):
+. *
+. *   SSwar = b[War] + b[L.War] + b[L2.War]
+. *
+. * Economically, SSwar measures the *cumulative* impact of war over
+. * three quinquennia (15 years) following the shock.  We also store
+. * the standard error and t-statistic of the linear combination.
+. capture program drop ssta
+
+. program ssta, rclass
+  1. qui {
+  2.     nlcom (_b[War]+_b[L.War]+_b[L2.War])  // / (1-_b[L.lnGDPpercapita])
+  3.     mat b = r(b)
+  4.     mat v = r(V)
+  5.     estadd scalar SSwar   = b[1,1]
+  6.     estadd scalar SSwarSE = sqrt(v[1,1])
+  7.     estadd scalar SSwarT  = b[1,1]/sqrt(v[1,1])
+  8.     nlcom (_b[Coup]+_b[L.Coup])  // / (1-_b[L.lnGDPpercapita])
+  9.     mat b = r(b)
+ 10.     mat v = r(V)
+ 11.     estadd scalar SScoup   = b[1,1]
+ 12.     estadd scalar SScoupSE = sqrt(v[1,1])
+ 13.     estadd scalar SScoupT  = b[1,1]/sqrt(v[1,1])
+ 14. }
+ 15. end
+
+. 
+. local addss SSwar SSwarSE SSwarT SScoup SScoupSE SScoupT
+
+. mata: mata set matafavor speed, perm
+(set matafavor preference recorded)
+
+. 
+. *----------------------------------------------------
+. * Section 8: Declare panel structure (5-year intervals)
+. *----------------------------------------------------
+. xtset cty Year, delta(5)
+
+Panel variable: cty (unbalanced)
+ Time variable: Year, 1955 to 2015, but with a gap
+         Delta: 5 years
+
+. xtdescribe
+
+     cty:  1, 2, ..., 160                                    n =        160
+    Year:  1955, 1960, ..., 2015                             T =         13
+           Delta(Year) = 5 years
+           Span(Year)  = 13 periods
+           (cty*Year uniquely identifies each observation)
+
+Distribution of T_i:   min      5%     25%       50%       75%     95%     max
+                         1       4       8        12        13      13      13
+
+     Freq.  Percent    Cum. |  Pattern
+ ---------------------------+---------------
+       77     48.12   48.12 |  1111111111111
+       27     16.88   65.00 |  ..11111111111
+       20     12.50   77.50 |  ........11111
+        7      4.38   81.88 |  .....11111111
+        6      3.75   85.62 |  .........1111
+        6      3.75   89.38 |  .111111111111
+        4      2.50   91.88 |  ...........11
+        4      2.50   94.38 |  ....111111111
+        4      2.50   96.88 |  ...1111111111
+        5      3.12  100.00 | (other patterns)
+ ---------------------------+---------------
+      160    100.00         |  XXXXXXXXXXXXX
+
+. 
+. *----------------------------------------------------
+. * Section 9: Dynamic panel regressions (4 models)
+. *----------------------------------------------------
+. * Each model uses xtabond2 with:
+. *   gmm(...)     - which variables are endogenous; the lag(2 6) range
+. *                  picks lags 2 to 6 of the variable as INTERNAL
+. *                  instruments for the differenced equation.
+. *   iv(...)      - strictly exogenous instruments (used as-is).
+. *   noleveleq    - estimate the difference equation only (Arellano-
+. *                  Bond), do not add the level equation (which would
+. *                  be Blundell-Bond / system GMM).
+. *   robust       - heteroskedasticity-robust (cluster) standard errors.
+. *   twostep      - two-step efficient estimator.
+. *
+. * The dependent variable is lnGDPpercapita, and L.lnGDPpercapita
+. * enters the right-hand side, making this a dynamic panel.
+. *
+. * Two warnings will appear in the log after each xtabond2 call.
+. * Both are normal -- not errors:
+. *
+. *   "Two-step estimated covariance matrix of moments is singular."
+. *       The unadjusted two-step variance is degenerate, so xtabond2
+. *       falls back to the Windmeijer (2005) finite-sample correction
+. *       for cluster-robust standard errors.  This is exactly what
+. *       `robust twostep` is supposed to do; the reported SEs and
+. *       t-statistics use the corrected formula.
+. *
+. *   "Number of instruments may be large relative to number of
+. *    observations."
+. *       Roodman (2009) calls this "instrument proliferation":
+. *       too many moment conditions relative to N can over-fit the
+. *       endogenous regressors and weaken the Hansen J test.  Our
+. *       lag(2 6) range deliberately limits the GMM lag depth to
+. *       contain this risk; we also report Hansen J p-values below
+. *       so the reader can judge instrument validity.
+. 
+. eststo clear
+
+. 
+. * Model 1: War & Coup, no institutional controls -----
+. eststo: xtabond2 L(0/1).lnGDPpercapita L(0/2).War L(0/1).Coup i.Year, ///
+>         gmm(lnGDPpercapita War Coup, lag(2 6))                        ///
+>         iv(L(0/2).War L(0/1).Coup)                                    ///
+>         iv(i.Year)                                                    ///
+>         noleveleq robust twostep
+Favoring speed over space. To switch, type or click on mata: mata set matafavor
+>  space, perm.
+1955b.Year dropped due to collinearity
+1960.Year dropped due to collinearity
+2010.Year dropped due to collinearity
+Warning: Two-step estimated covariance matrix of moments is singular.
+  Using a generalized inverse to calculate optimal weighting matrix for two-ste
+> p estimation.
+  Difference-in-Sargan/Hansen statistics may be negative.
+
+Dynamic panel-data estimation, two-step difference GMM
+------------------------------------------------------------------------------
+Group variable: cty                             Number of obs      =      1187
+Time variable : Year                            Number of groups   =       155
+Number of instruments = 146                     Obs per group: min =         1
+Wald chi2(15) =   3169.64                                      avg =      7.66
+Prob > chi2   =     0.000                                      max =        10
+------------------------------------------------------------------------------
+             |              Corrected
+lnGDPperca~a | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+lnGDPperca~a |
+         L1. |   .6787863    .051373    13.21   0.000     .5780972    .7794755
+             |
+         War |
+         --. |  -.2186432   .0569308    -3.84   0.000    -.3302255   -.1070609
+         L1. |  -.0655071   .0468636    -1.40   0.162    -.1573581    .0263438
+         L2. |  -.0687009   .0470814    -1.46   0.145    -.1609787    .0235769
+             |
+        Coup |
+         --. |   -.090843   .0284565    -3.19   0.001    -.1466167   -.0350692
+         L1. |   .0387093    .029151     1.33   0.184    -.0184257    .0958443
+             |
+        Year |
+       1965  |  -.2611315   .0550686    -4.74   0.000     -.369064    -.153199
+       1970  |  -.1940239   .0470275    -4.13   0.000    -.2861962   -.1018517
+       1975  |  -.1497198   .0375196    -3.99   0.000     -.223257   -.0761826
+       1980  |  -.1201203   .0302131    -3.98   0.000    -.1793369   -.0609038
+       1985  |  -.1633711   .0215068    -7.60   0.000    -.2055236   -.1212187
+       1990  |   -.142305   .0210282    -6.77   0.000    -.1835196   -.1010904
+       1995  |  -.1520839   .0229545    -6.63   0.000    -.1970739   -.1070939
+       2000  |  -.0853571   .0184544    -4.63   0.000     -.121527   -.0491872
+       2005  |  -.0216631   .0110329    -1.96   0.050    -.0432872    -.000039
+       2015  |   .0122262   .0122692     1.00   0.319     -.011821    .0362733
+------------------------------------------------------------------------------
+Instruments for first differences equation
+  Standard
+    D.(1955b.Year 1960.Year 1965.Year 1970.Year 1975.Year 1980.Year 1985.Year
+    1990.Year 1995.Year 2000.Year 2005.Year 2010.Year 2015.Year)
+    D.(War L.War L2.War Coup L.Coup)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(2/6).(lnGDPpercapita War Coup)
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -4.37  Pr > z =  0.000
+Arellano-Bond test for AR(2) in first differences: z =  -1.69  Pr > z =  0.091
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(130)  = 280.36  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(130)  = 144.32  Prob > chi2 =  0.184
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(War L.War L2.War Coup L.Coup)
+    Hansen test excluding group:     chi2(125)  = 142.50  Prob > chi2 =  0.135
+    Difference (null H = exogenous): chi2(5)    =   1.82  Prob > chi2 =  0.874
+  iv(1955b.Year 1960.Year 1965.Year 1970.Year 1975.Year 1980.Year 1985.Year 199
+> 0.Year 1995.Year 2000.Year 2005.Year 2010.Year 2015.Year)
+    Hansen test excluding group:     chi2(120)  = 128.49  Prob > chi2 =  0.281
+    Difference (null H = exogenous): chi2(10)   =  15.83  Prob > chi2 =  0.105
+
+(est1 stored)
+
+. ssta
+
+. estimates store m1
+
+. 
+. * Model 2: + lagged Economic Freedom -----------------
+. eststo: xtabond2 L(0/1).lnGDPpercapita EconFreeLag L(0/2).War         ///
+>         L(0/1).Coup i.Year,                                           ///
+>         gmm(lnGDPpercapita War Coup, lag(2 6))                        ///
+>         iv(L(0/2).War L(0/1).Coup)                                    ///
+>         iv(i.Year)                                                    ///
+>         iv(EconFreeLag)                                               ///
+>         noleveleq robust twostep
+Favoring speed over space. To switch, type or click on mata: mata set matafavor
+>  space, perm.
+1955b.Year dropped due to collinearity
+1960.Year dropped due to collinearity
+2015.Year dropped due to collinearity
+Warning: Number of instruments may be large relative to number of observations.
+Warning: Two-step estimated covariance matrix of moments is singular.
+  Using a generalized inverse to calculate optimal weighting matrix for two-ste
+> p estimation.
+  Difference-in-Sargan/Hansen statistics may be negative.
+
+Dynamic panel-data estimation, two-step difference GMM
+------------------------------------------------------------------------------
+Group variable: cty                             Number of obs      =       987
+Time variable : Year                            Number of groups   =       137
+Number of instruments = 147                     Obs per group: min =         0
+Wald chi2(16) =   2615.84                                      avg =      7.20
+Prob > chi2   =     0.000                                      max =        10
+------------------------------------------------------------------------------
+             |              Corrected
+lnGDPperca~a | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+lnGDPperca~a |
+         L1. |   .6660685   .0561399    11.86   0.000     .5560363    .7761006
+             |
+ EconFreeLag |   .0200732   .0077316     2.60   0.009     .0049196    .0352268
+             |
+         War |
+         --. |  -.2385981   .0459219    -5.20   0.000    -.3286033   -.1485929
+         L1. |  -.0197117   .0525133    -0.38   0.707    -.1226358    .0832124
+         L2. |  -.0123415   .0480008    -0.26   0.797    -.1064214    .0817385
+             |
+        Coup |
+         --. |  -.0757088   .0247314    -3.06   0.002    -.1241814   -.0272361
+         L1. |   .0143737   .0261366     0.55   0.582    -.0368531    .0656005
+             |
+        Year |
+       1965  |  -.2626063   .0647487    -4.06   0.000    -.3895115   -.1357012
+       1970  |  -.2000976   .0554223    -3.61   0.000    -.3087233    -.091472
+       1975  |  -.1637295   .0458253    -3.57   0.000    -.2535455   -.0739135
+       1980  |  -.1137174   .0408697    -2.78   0.005    -.1938205   -.0336143
+       1985  |  -.1655646   .0331111    -5.00   0.000    -.2304612   -.1006679
+       1990  |  -.1265364   .0374968    -3.37   0.001    -.2000287   -.0530441
+       1995  |  -.1101329   .0304156    -3.62   0.000    -.1697464   -.0505194
+       2000  |  -.0840618   .0279849    -3.00   0.003    -.1389111   -.0292125
+       2005  |  -.0353139   .0173954    -2.03   0.042    -.0694082   -.0012195
+       2010  |  -.0198248   .0140098    -1.42   0.157    -.0472835     .007634
+------------------------------------------------------------------------------
+Instruments for first differences equation
+  Standard
+    D.EconFreeLag
+    D.(1955b.Year 1960.Year 1965.Year 1970.Year 1975.Year 1980.Year 1985.Year
+    1990.Year 1995.Year 2000.Year 2005.Year 2010.Year 2015.Year)
+    D.(War L.War L2.War Coup L.Coup)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(2/6).(lnGDPpercapita War Coup)
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -4.19  Pr > z =  0.000
+Arellano-Bond test for AR(2) in first differences: z =  -0.15  Pr > z =  0.881
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(130)  = 315.06  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(130)  = 125.02  Prob > chi2 =  0.607
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(War L.War L2.War Coup L.Coup)
+    Hansen test excluding group:     chi2(125)  = 120.31  Prob > chi2 =  0.602
+    Difference (null H = exogenous): chi2(5)    =   4.72  Prob > chi2 =  0.452
+  iv(1955b.Year 1960.Year 1965.Year 1970.Year 1975.Year 1980.Year 1985.Year 199
+> 0.Year 1995.Year 2000.Year 2005.Year 2010.Year 2015.Year)
+    Hansen test excluding group:     chi2(120)  = 122.77  Prob > chi2 =  0.413
+    Difference (null H = exogenous): chi2(10)   =   2.25  Prob > chi2 =  0.994
+  iv(EconFreeLag)
+    Hansen test excluding group:     chi2(129)  = 124.45  Prob > chi2 =  0.597
+    Difference (null H = exogenous): chi2(1)    =   0.57  Prob > chi2 =  0.448
+
+(est2 stored)
+
+. ssta
+
+. estimates store m2
+
+. 
+. * Model 3: + lagged Political Freedom ----------------
+. eststo: xtabond2 L(0/1).lnGDPpercapita PolitFreeLag L(0/2).War        ///
+>         L(0/1).Coup i.Year,                                           ///
+>         gmm(lnGDPpercapita War Coup, lag(2 6))                        ///
+>         iv(L(0/2).War L(0/1).Coup)                                    ///
+>         iv(i.Year)                                                    ///
+>         iv(PolitFreeLag)                                              ///
+>         noleveleq robust twostep
+Favoring speed over space. To switch, type or click on mata: mata set matafavor
+>  space, perm.
+1955b.Year dropped due to collinearity
+1960.Year dropped due to collinearity
+1965.Year dropped due to collinearity
+1970.Year dropped due to collinearity
+2010.Year dropped due to collinearity
+Warning: Two-step estimated covariance matrix of moments is singular.
+  Using a generalized inverse to calculate optimal weighting matrix for two-ste
+> p estimation.
+  Difference-in-Sargan/Hansen statistics may be negative.
+
+Dynamic panel-data estimation, two-step difference GMM
+------------------------------------------------------------------------------
+Group variable: cty                             Number of obs      =       918
+Time variable : Year                            Number of groups   =       151
+Number of instruments = 130                     Obs per group: min =         0
+Wald chi2(14) =   1808.34                                      avg =      6.08
+Prob > chi2   =     0.000                                      max =         8
+------------------------------------------------------------------------------
+             |              Corrected
+lnGDPperca~a | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+lnGDPperca~a |
+         L1. |    .631893   .0524498    12.05   0.000     .5290933    .7346927
+             |
+PolitFreeLag |   .0002759    .000351     0.79   0.432     -.000412    .0009639
+             |
+         War |
+         --. |  -.1593212   .0368103    -4.33   0.000     -.231468   -.0871744
+         L1. |  -.0763529    .053819    -1.42   0.156    -.1818361    .0291303
+         L2. |   .0113921   .0484824     0.23   0.814    -.0836316    .1064158
+             |
+        Coup |
+         --. |  -.0951722   .0316872    -3.00   0.003    -.1572779   -.0330665
+         L1. |  -.0018327   .0262472    -0.07   0.944    -.0532763    .0496109
+             |
+        Year |
+       1975  |  -.1717179   .0408648    -4.20   0.000    -.2518115   -.0916244
+       1980  |  -.1353085    .033384    -4.05   0.000      -.20074   -.0698771
+       1985  |  -.1859607   .0263806    -7.05   0.000    -.2376657   -.1342556
+       1990  |  -.1483654   .0272167    -5.45   0.000     -.201709   -.0950217
+       1995  |   -.139652    .024633    -5.67   0.000    -.1879318   -.0913723
+       2000  |  -.0824814    .019337    -4.27   0.000    -.1203813   -.0445816
+       2005  |  -.0289773    .011535    -2.51   0.012    -.0515855   -.0063691
+       2015  |   .0239487   .0117777     2.03   0.042     .0008648    .0470326
+------------------------------------------------------------------------------
+Instruments for first differences equation
+  Standard
+    D.PolitFreeLag
+    D.(1955b.Year 1960.Year 1965.Year 1970.Year 1975.Year 1980.Year 1985.Year
+    1990.Year 1995.Year 2000.Year 2005.Year 2010.Year 2015.Year)
+    D.(War L.War L2.War Coup L.Coup)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(2/6).(lnGDPpercapita War Coup)
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -3.81  Pr > z =  0.000
+Arellano-Bond test for AR(2) in first differences: z =  -0.24  Pr > z =  0.810
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(115)  = 250.08  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(115)  = 132.38  Prob > chi2 =  0.128
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(War L.War L2.War Coup L.Coup)
+    Hansen test excluding group:     chi2(110)  = 127.38  Prob > chi2 =  0.123
+    Difference (null H = exogenous): chi2(5)    =   5.00  Prob > chi2 =  0.415
+  iv(1955b.Year 1960.Year 1965.Year 1970.Year 1975.Year 1980.Year 1985.Year 199
+> 0.Year 1995.Year 2000.Year 2005.Year 2010.Year 2015.Year)
+    Hansen test excluding group:     chi2(107)  = 123.93  Prob > chi2 =  0.126
+    Difference (null H = exogenous): chi2(8)    =   8.45  Prob > chi2 =  0.391
+  iv(PolitFreeLag)
+    Hansen test excluding group:     chi2(114)  = 131.95  Prob > chi2 =  0.120
+    Difference (null H = exogenous): chi2(1)    =   0.43  Prob > chi2 =  0.510
+
+(est3 stored)
+
+. ssta
+
+. estimates store m3
+
+. 
+. * Model 4: full specification (both institutions) ----
+. eststo: xtabond2 L(0/1).lnGDPpercapita EconFreeLag PolitFreeLag       ///
+>         L(0/2).War L(0/1).Coup i.Year,                                ///
+>         gmm(lnGDPpercapita War Coup, lag(2 6))                        ///
+>         iv(L(0/2).War L(0/1).Coup)                                    ///
+>         iv(i.Year)                                                    ///
+>         iv(EconFreeLag PolitFreeLag)                                  ///
+>         noleveleq robust twostep
+Favoring speed over space. To switch, type or click on mata: mata set matafavor
+>  space, perm.
+1955b.Year dropped due to collinearity
+1960.Year dropped due to collinearity
+1965.Year dropped due to collinearity
+1970.Year dropped due to collinearity
+1980.Year dropped due to collinearity
+Warning: Two-step estimated covariance matrix of moments is singular.
+  Using a generalized inverse to calculate optimal weighting matrix for two-ste
+> p estimation.
+  Difference-in-Sargan/Hansen statistics may be negative.
+
+Dynamic panel-data estimation, two-step difference GMM
+------------------------------------------------------------------------------
+Group variable: cty                             Number of obs      =       821
+Time variable : Year                            Number of groups   =       137
+Number of instruments = 131                     Obs per group: min =         0
+Wald chi2(15) =   1998.13                                      avg =      5.99
+Prob > chi2   =     0.000                                      max =         8
+------------------------------------------------------------------------------
+             |              Corrected
+lnGDPperca~a | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+lnGDPperca~a |
+         L1. |   .6192125   .0542553    11.41   0.000      .512874     .725551
+             |
+ EconFreeLag |   .0282808   .0085535     3.31   0.001     .0115162    .0450455
+PolitFreeLag |   .0001734    .000342     0.51   0.612    -.0004968    .0008437
+             |
+         War |
+         --. |  -.1602315    .041899    -3.82   0.000    -.2423521   -.0781109
+         L1. |  -.0110606   .0586253    -0.19   0.850     -.125964    .1038429
+         L2. |    .005423   .0529713     0.10   0.918    -.0983989    .1092449
+             |
+        Coup |
+         --. |  -.0902476   .0289706    -3.12   0.002    -.1470289   -.0334662
+         L1. |  -.0054947   .0278824    -0.20   0.844    -.0601432    .0491538
+             |
+        Year |
+       1975  |  -.0598282   .0212708    -2.81   0.005    -.1015183   -.0181381
+       1985  |  -.0584756   .0185438    -3.15   0.002    -.0948208   -.0221303
+       1990  |  -.0113368   .0195435    -0.58   0.562    -.0496413    .0269678
+       1995  |  -.0019037   .0271393    -0.07   0.944    -.0550958    .0512885
+       2000  |   .0219811   .0287636     0.76   0.445    -.0343946    .0783568
+       2005  |   .0617407   .0359388     1.72   0.086     -.008698    .1321794
+       2010  |   .0830273   .0386551     2.15   0.032     .0072647    .1587899
+       2015  |   .1118697   .0436962     2.56   0.010     .0262267    .1975128
+------------------------------------------------------------------------------
+Instruments for first differences equation
+  Standard
+    D.(EconFreeLag PolitFreeLag)
+    D.(1955b.Year 1960.Year 1965.Year 1970.Year 1975.Year 1980.Year 1985.Year
+    1990.Year 1995.Year 2000.Year 2005.Year 2010.Year 2015.Year)
+    D.(War L.War L2.War Coup L.Coup)
+  GMM-type (missing=0, separate instruments for each period unless collapsed)
+    L(2/6).(lnGDPpercapita War Coup)
+------------------------------------------------------------------------------
+Arellano-Bond test for AR(1) in first differences: z =  -3.82  Pr > z =  0.000
+Arellano-Bond test for AR(2) in first differences: z =   0.49  Pr > z =  0.625
+------------------------------------------------------------------------------
+Sargan test of overid. restrictions: chi2(115)  = 254.14  Prob > chi2 =  0.000
+  (Not robust, but not weakened by many instruments.)
+Hansen test of overid. restrictions: chi2(115)  = 128.77  Prob > chi2 =  0.179
+  (Robust, but weakened by many instruments.)
+
+Difference-in-Hansen tests of exogeneity of instrument subsets:
+  iv(War L.War L2.War Coup L.Coup)
+    Hansen test excluding group:     chi2(110)  = 123.93  Prob > chi2 =  0.172
+    Difference (null H = exogenous): chi2(5)    =   4.83  Prob > chi2 =  0.436
+  iv(1955b.Year 1960.Year 1965.Year 1970.Year 1975.Year 1980.Year 1985.Year 199
+> 0.Year 1995.Year 2000.Year 2005.Year 2010.Year 2015.Year)
+    Hansen test excluding group:     chi2(107)  = 118.09  Prob > chi2 =  0.218
+    Difference (null H = exogenous): chi2(8)    =  10.68  Prob > chi2 =  0.221
+  iv(EconFreeLag PolitFreeLag)
+    Hansen test excluding group:     chi2(113)  = 127.79  Prob > chi2 =  0.162
+    Difference (null H = exogenous): chi2(2)    =   0.97  Prob > chi2 =  0.614
+
+(est4 stored)
+
+. ssta
+
+. estimates store m4
+
+. 
+. *----------------------------------------------------
+. * Section 10: Publication-quality regression table
+. *----------------------------------------------------
+. esttab,                                                               ///
+>     lab star(* 0.1 ** 0.05 *** 0.01)                                  ///
+>     indicate(Quinquennia effects = *.Year)                            ///
+>     stat(N N_g `addss' hansen hansen_df hansenp,                      ///
+>          labels("N" "N. Countries" "Sum War coeff." "s.e. War" "t War" ///
+>                 "Sum Coup coeff." "s.e. Coup" "t Coup"                ///
+>                 "Hansen J" "J d.f." "J pvalue"))                      ///
+>     ti("Dynamic panel data estimates of log GDP per capita") nomti
+(tabulating estimates stored by eststo; specify "." to tabulate the active resu
+> lts)
+
+Dynamic panel data estimates of log GDP per capita
+-------------------------------------------------------------------------------
+> -----
+                              (1)             (2)             (3)             (
+> 4)   
+-------------------------------------------------------------------------------
+> -----
+L.lnGDPpc                   0.679***        0.666***        0.632***        0.6
+> 19***
+                          (13.21)         (11.86)         (12.05)         (11.4
+> 1)   
+
+War                        -0.219***       -0.239***       -0.159***       -0.1
+> 60***
+                          (-3.84)         (-5.20)         (-4.33)         (-3.8
+> 2)   
+
+L.War                     -0.0655         -0.0197         -0.0764         -0.01
+> 11   
+                          (-1.40)         (-0.38)         (-1.42)         (-0.1
+> 9)   
+
+L2.War                    -0.0687         -0.0123          0.0114         0.005
+> 42   
+                          (-1.46)         (-0.26)          (0.23)          (0.1
+> 0)   
+
+Coup                      -0.0908***      -0.0757***      -0.0952***      -0.09
+> 02***
+                          (-3.19)         (-3.06)         (-3.00)         (-3.1
+> 2)   
+
+L.Coup                     0.0387          0.0144        -0.00183        -0.005
+> 49   
+                           (1.33)          (0.55)         (-0.07)         (-0.2
+> 0)   
+
+L.EconFreedom                              0.0201***                       0.02
+> 83***
+                                           (2.60)                          (3.3
+> 1)   
+
+L.PolitFreedom                                           0.000276        0.0001
+> 73   
+                                                           (0.79)          (0.5
+> 1)   
+
+Quinquennia effects           Yes             Yes             Yes             Y
+> es   
+-------------------------------------------------------------------------------
+> -----
+N                            1187             987             918             8
+> 21   
+N. Countries                  155             137             151             1
+> 37   
+Sum War coeff.             -0.353          -0.271          -0.224          -0.1
+> 66   
+s.e. War                   0.0787          0.0741          0.0751          0.07
+> 59   
+t War                      -4.482          -3.650          -2.988          -2.1
+> 85   
+Sum Coup coeff.           -0.0521         -0.0613         -0.0970         -0.09
+> 57   
+s.e. Coup                  0.0356          0.0366          0.0458          0.04
+> 40   
+t Coup                     -1.463          -1.678          -2.120          -2.1
+> 74   
+Hansen J                    144.3           125.0           132.4           128
+> .8   
+J d.f.                        130             130             115             1
+> 15   
+J pvalue                    0.184           0.607           0.128           0.1
+> 79   
+-------------------------------------------------------------------------------
+> -----
+t statistics in parentheses
+* p<0.1, ** p<0.05, *** p<0.01
+
+. 
+. * Rich-text file (preserved from original code) ------
+. esttab using catoj2.rtf, replace                                      ///
+>     lab star(* 0.1 ** 0.05 *** 0.01)                                  ///
+>     indicate(Quinquennia effects = *.Year)                            ///
+>     stat(N N_g `addss' hansen hansen_df hansenp,                      ///
+>          labels("N" "N. Countries" "Sum War coeff." "s.e. War" "t War" ///
+>                 "Sum Coup coeff." "s.e. Coup" "t Coup"                ///
+>                 "Hansen J" "J d.f." "J pvalue"))                      ///
+>     ti("Dynamic panel data estimates of log GDP per capita") nomti
+(tabulating estimates stored by eststo; specify "." to tabulate the active resu
+> lts)
+(output written to catoj2.rtf)
+
+. 
+. * CSV version of the regression results --------------
+. esttab using "regression_results.csv", replace                        ///
+>     lab star(* 0.1 ** 0.05 *** 0.01)                                  ///
+>     indicate(Quinquennia effects = *.Year)                            ///
+>     stat(N N_g `addss' hansen hansen_df hansenp,                      ///
+>          labels("N" "N. Countries" "Sum War coeff." "s.e. War" "t War" ///
+>                 "Sum Coup coeff." "s.e. Coup" "t Coup"                ///
+>                 "Hansen J" "J d.f." "J pvalue"))                      ///
+>     ti("Dynamic panel data estimates of log GDP per capita") nomti
+(tabulating estimates stored by eststo; specify "." to tabulate the active resu
+> lts)
+(output written to regression_results.csv)
+
+. 
+. *----------------------------------------------------
+. * Section 11: Coefficient plot for War (across models)
+. *----------------------------------------------------
+. coefplot (m1, label("Model 1"))                                       ///
+>          (m2, label("Model 2"))                                       ///
+>          (m3, label("Model 3"))                                       ///
+>          (m4, label("Model 4")),                                      ///
+>     keep(War L.War L2.War)                                            ///
+>     xline(0, lcolor("217 119 87") lpattern(dash))                     ///
+>     xtitle("Coefficient on log GDP per capita")                       ///
+>     title("War coefficients across the four dynamic-panel models")    ///
+>     subtitle("Contemporaneous, lag-1, and lag-2 effects of War")      ///
+>     graphregion(color(white)) plotregion(color(white))                ///
+>     ciopts(lcolor("106 155 204") recast(rcap))                        ///
+>     mcolor("106 155 204")
+
+. graph export "stata_dynamic_panel_war_coef_plot.png", replace width(2400)
+file stata_dynamic_panel_war_coef_plot.png written in PNG format
+
+. 
+. *----------------------------------------------------
+. * Section 12: Long-run sum-of-coefficients plot
+. *----------------------------------------------------
+. * Build a small dataset from the stored ssta scalars.
+. preserve
+
+.     clear
+
+.     set obs 4
+Number of observations (_N) was 0, now 4.
+
+.     gen model     = _n
+
+.     gen str20 mname = ""
+(4 missing values generated)
+
+.     gen sswar     = .
+(4 missing values generated)
+
+.     gen sswar_se  = .
+(4 missing values generated)
+
+.     gen sscoup    = .
+(4 missing values generated)
+
+.     gen sscoup_se = .
+(4 missing values generated)
+
+. 
+.     forvalues i = 1/4 {
+  2.         estimates restore m`i'
+  3.         replace mname     = "Model `i'" in `i'
+  4.         replace sswar     = e(SSwar)    in `i'
+  5.         replace sswar_se  = e(SSwarSE)  in `i'
+  6.         replace sscoup    = e(SScoup)   in `i'
+  7.         replace sscoup_se = e(SScoupSE) in `i'
+  8.     }
+(results m1 are active now)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(results m2 are active now)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(results m3 are active now)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(results m4 are active now)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+
+. 
+.     gen sswar_lo  = sswar  - 1.96*sswar_se
+
+.     gen sswar_hi  = sswar  + 1.96*sswar_se
+
+.     gen sscoup_lo = sscoup - 1.96*sscoup_se
+
+.     gen sscoup_hi = sscoup + 1.96*sscoup_se
+
+. 
+.     export delimited using "longrun_effects.csv", replace
+file longrun_effects.csv saved
+
+. 
+.     twoway                                                            ///
+>         (bar sswar  model, fcolor("106 155 204%70") lcolor("106 155 204") bar
+> width(0.6)) ///
+>         (rcap sswar_lo sswar_hi model, lcolor("20 20 19")),           ///
+>         yline(0, lcolor("217 119 87") lpattern(dash))                 ///
+>         xlabel(1 "Model 1" 2 "Model 2" 3 "Model 3" 4 "Model 4")       ///
+>         ytitle("Sum of War coefficients (long-run effect)")           ///
+>         xtitle("")                                                    ///
+>         title("Long-run effect of War on log GDP per capita")         ///
+>         subtitle("Sum of contemporaneous + L1 + L2 War coefficients, 95% CI")
+>  ///
+>         legend(off)                                                   ///
+>         graphregion(color(white)) plotregion(color(white))
+
+.     graph export "stata_dynamic_panel_longrun_effects.png", replace width(240
+> 0)
+file stata_dynamic_panel_longrun_effects.png written in PNG format
+
+. restore
+
+. 
+. *----------------------------------------------------
+. * Section 13: Diagnostic test summary
+. *----------------------------------------------------
+. preserve
+
+.     clear
+
+.     set obs 4
+Number of observations (_N) was 0, now 4.
+
+.     gen model     = _n
+
+.     gen str20 mname = ""
+(4 missing values generated)
+
+.     gen ar2_p     = .
+(4 missing values generated)
+
+.     gen hansen_p  = .
+(4 missing values generated)
+
+.     gen hansen    = .
+(4 missing values generated)
+
+.     gen hansen_df = .
+(4 missing values generated)
+
+. 
+.     forvalues i = 1/4 {
+  2.         estimates restore m`i'
+  3.         replace mname     = "Model `i'" in `i'
+  4.         replace ar2_p     = e(ar2p)        in `i'
+  5.         replace hansen_p  = e(hansenp)     in `i'
+  6.         replace hansen    = e(hansen)      in `i'
+  7.         replace hansen_df = e(hansen_df)   in `i'
+  8.     }
+(results m1 are active now)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(results m2 are active now)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(results m3 are active now)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(results m4 are active now)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+(1 real change made)
+
+. 
+.     export delimited using "diagnostics.csv", replace
+file diagnostics.csv saved
+
+. 
+.     * Dodge the two bar series so AR(2) and Hansen J appear side-by-side
+.     * rather than stacked at the same x-coordinate.
+.     gen ar2_x    = model - 0.2
+
+.     gen hansen_x = model + 0.2
+
+. 
+.     twoway                                                            ///
+>         (bar ar2_p    ar2_x,    fcolor("106 155 204%70") lcolor("106 155 204"
+> ) barwidth(0.35)) ///
+>         (bar hansen_p hansen_x, fcolor("217 119 87%70")  lcolor("217 119 87")
+>   barwidth(0.35)), ///
+>         yline(0.05, lcolor("20 20 19") lpattern(dash))                ///
+>         xlabel(1 "Model 1" 2 "Model 2" 3 "Model 3" 4 "Model 4")       ///
+>         ytitle("p-value")                                             ///
+>         xtitle("")                                                    ///
+>         title("Diagnostic tests: p-values by model")                  ///
+>         subtitle("AR(2) test (blue) and Hansen J test (orange); want p > 0.05
+> ") ///
+>         legend(order(1 "AR(2) p" 2 "Hansen J p") position(6) cols(2)) ///
+>         graphregion(color(white)) plotregion(color(white))
+
+.     graph export "stata_dynamic_panel_diagnostics.png", replace width(2400)
+file stata_dynamic_panel_diagnostics.png written in PNG format
+
+. restore
+
+. 
+. *----------------------------------------------------
+. * End
+. *----------------------------------------------------
+. display _newline "=== Script completed successfully ==="
+
+=== Script completed successfully ===
+
+. log close
+      name:  <unnamed>
+       log:  /Users/carlos/GitHub/starter-academic-v501/content/post/stata_dyna
+> mic_panel/analysis.log
+  log type:  text
+ closed on:  29 Apr 2026, 10:10:35
+-------------------------------------------------------------------------------
