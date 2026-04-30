@@ -370,11 +370,11 @@ $$\text{Growth}\_i = \alpha + \beta \cdot \log(\text{GDPpc}\_i) + \varepsilon\_i
 
 If $\beta < 0$, poorer countries grow faster (convergence). If $\beta > 0$, richer countries grow faster (divergence).
 
-**Regression 2 --- Conditional convergence ($\beta^*$):** Regress growth on income *and* the correlate.
+**Regression 2 --- Conditional convergence ($\beta^{\ast}$):** Regress growth on income *and* the correlate.
 
-$$\text{Growth}\_i = \alpha + \beta^* \cdot \log(\text{GDPpc}\_i) + \lambda \cdot \text{Inst}\_i + \varepsilon\_i$$
+$$\text{Growth}\_i = \alpha + \beta^{\ast} \cdot \log(\text{GDPpc}\_i) + \lambda \cdot \text{Inst}\_i + \varepsilon\_i$$
 
-$\beta^*$ is the convergence coefficient *controlling for* institutions. The coefficient $\lambda$ captures how much the correlate predicts growth, holding income constant. In the 1990s, $\beta^*$ was typically negative (conditional convergence) even when $\beta$ was not (no unconditional convergence).
+$\beta^{\ast}$ is the convergence coefficient *controlling for* institutions. The coefficient $\lambda$ captures how much the correlate predicts growth, holding income constant. In the 1990s, $\beta^{\ast}$ was typically negative (conditional convergence) even when $\beta$ was not (no unconditional convergence).
 
 **Regression 3 --- Correlate-income slope ($\delta$):** Regress the correlate on income.
 
@@ -386,13 +386,13 @@ $\delta$ captures how strongly the correlate correlates with income. If $\delta 
 
 The OVB formula links these three regressions with an exact algebraic identity:
 
-$$\beta - \beta^* = \delta \times \lambda$$
+$$\beta - \beta^{\ast} = \delta \times \lambda$$
 
 In words, this says that the gap between unconditional and conditional convergence equals the product of two things: (1) how much richer countries have better institutions ($\delta$), and (2) how much those institutions predict growth ($\lambda$). This is not an approximation --- it is an algebraic identity that holds exactly in any linear regression.
 
 **Why this matters.** The decomposition tells us there are exactly three ways unconditional convergence can change over time:
 
-1. **Conditional convergence itself changes** ($\beta^*$ shifts) --- e.g., technology diffusion accelerates
+1. **Conditional convergence itself changes** ($\beta^{\ast}$ shifts) --- e.g., technology diffusion accelerates
 2. **Correlate-income slopes change** ($\delta$ shifts) --- e.g., rich and poor countries become equally democratic
 3. **Growth regression coefficients change** ($\lambda$ shifts) --- e.g., democracy stops predicting growth
 
@@ -446,7 +446,7 @@ COMPARISON ACROSS TIME:
   gap (1985) =    0.440 --> gap (2005) =    0.040  [CLOSED]
 ```
 
-This single example encapsulates the paper's entire argument. In 1985, unconditional $\beta$ was +0.33 (divergence), but controlling for democracy revealed conditional convergence at $\beta^* = -0.11$. The gap of 0.44 is exactly predicted by $\delta \times \lambda = 0.494 \times 0.891 = 0.44$ --- the OVB formula holds exactly because it is an algebraic identity. By 2005, $\lambda$ collapsed from 0.89 to 0.18 --- democracy went from being a powerful growth predictor (one SD higher Polity 2 associated with 0.89% faster annual growth) to a near-zero predictor. The resulting gap shrank from 0.44 to 0.04 --- a **91% reduction**. The correlate-income slope $\delta$ also fell (from 0.49 to 0.22), but the primary driver was the collapse in $\lambda$.
+This single example encapsulates the paper's entire argument. In 1985, unconditional $\beta$ was +0.33 (divergence), but controlling for democracy revealed conditional convergence at $\beta^{\ast} = -0.11$. The gap of 0.44 is exactly predicted by $\delta \times \lambda = 0.494 \times 0.891 = 0.44$ --- the OVB formula holds exactly because it is an algebraic identity. By 2005, $\lambda$ collapsed from 0.89 to 0.18 --- democracy went from being a powerful growth predictor (one SD higher Polity 2 associated with 0.89% faster annual growth) to a near-zero predictor. The resulting gap shrank from 0.44 to 0.04 --- a **91% reduction**. The correlate-income slope $\delta$ also fell (from 0.49 to 0.22), but the primary driver was the collapse in $\lambda$.
 
 Think of it like a recipe that calls for two ingredients. The gap ($\delta \times \lambda$) was large in 1985 because both ingredients were present: richer countries had much better democracy ($\delta$ large) *and* democracy strongly predicted growth ($\lambda$ large). By 2005, the second ingredient ($\lambda$) had nearly vanished --- it no longer mattered for growth predictions whether a country was democratic or not --- so the recipe produced almost nothing.
 
@@ -490,7 +490,7 @@ Crucially, this stability means that the $\delta$ component is **not** responsib
 
 ## 10. Growth regressions then vs. now: the lambda flattening
 
-In the 1990s, a massive literature ran growth regressions of the form: Growth = $\alpha + \beta^* \times$ Income $+ \lambda \times$ Correlate $+ \varepsilon$. These regressions identified which policies and institutions predict growth and formed the empirical backbone of the "Washington Consensus" --- the set of policy recommendations that international institutions gave to developing countries. The key question: **do these regressions hold up with 25 years of new data?**
+In the 1990s, a massive literature ran growth regressions of the form: Growth = $\alpha + \beta^{\ast} \times$ Income $+ \lambda \times$ Correlate $+ \varepsilon$. These regressions identified which policies and institutions predict growth and formed the empirical backbone of the "Washington Consensus" --- the set of policy recommendations that international institutions gave to developing countries. The key question: **do these regressions hold up with 25 years of new data?**
 
 For each correlate, we estimate $\lambda$ (the growth-correlate slope) in the base year (~1985) and in 2005, using a fixed sample of countries with data in both periods.
 
@@ -558,7 +558,7 @@ The OVB gap for short-run correlates has shrunk to nearly zero (fitted slope 0.0
 
 ### 11.2 The closing gap over time
 
-The definitive test uses multivariate regressions. We fix a sample of 73 countries with complete data on 10 correlates (Polity 2, FH political rights, FH civil liberties, private investment, government spending, inflation, WDI credit, credit by financial sector, Barro-Lee education, and education gender gap). For each year from 1985 to 2007, we estimate both unconditional $\beta$ (income only) and conditional $\beta^*$ (income plus all 10 correlates).
+The definitive test uses multivariate regressions. We fix a sample of 73 countries with complete data on 10 correlates (Polity 2, FH political rights, FH civil liberties, private investment, government spending, inflation, WDI credit, credit by financial sector, Barro-Lee education, and education gender gap). For each year from 1985 to 2007, we estimate both unconditional $\beta$ (income only) and conditional $\beta^{\ast}$ (income plus all 10 correlates).
 
 ```stata
 * Fix sample: 73 countries with complete data on all 10 correlates in 1985
@@ -591,7 +591,7 @@ Year  | beta_unconditional  beta_conditional  gap
 2007  |  -0.646              -1.274          0.629
 ```
 
-This is the paper's title finding. In 1985, unconditional $\beta$ was +0.42 (divergence) while conditional $\beta^*$ was -1.07 (strong convergence when controlling for institutions) --- a gap of 1.49. By 2000, unconditional $\beta$ had fallen to -0.39 while conditional $\beta^*$ was -0.54, narrowing the gap to just 0.15. The gap narrowed dramatically from 1.49 (1985) to 0.15 (2000), then widened somewhat as conditional $\beta^*$ deepened faster, but both lines are firmly negative by 2000.
+This is the paper's title finding. In 1985, unconditional $\beta$ was +0.42 (divergence) while conditional $\beta^{\ast}$ was -1.07 (strong convergence when controlling for institutions) --- a gap of 1.49. By 2000, unconditional $\beta$ had fallen to -0.39 while conditional $\beta^{\ast}$ was -0.54, narrowing the gap to just 0.15. The gap narrowed dramatically from 1.49 (1985) to 0.15 (2000), then widened somewhat as conditional $\beta^{\ast}$ deepened faster, but both lines are firmly negative by 2000.
 
 The Solow model's prediction of conditional convergence held all along --- what changed is that the real world caught up. As the OVB from excluding correlates shrank toward zero, unconditional convergence "converged to" conditional convergence.
 
@@ -607,7 +607,7 @@ R2               0.028     0.155       0.152       0.228     0.101     0.247    
 N                73        73          73          73        73        73          73          73
 ```
 
-In 1985, absolute convergence alone gives $\beta = +0.42$ (divergence, R-squared = 0.03 --- essentially no linear relationship). Adding Solow fundamentals flips the sign to $\beta^* = -0.45$, and the full model gives $\beta^* = -0.82$. In 2005, the picture changes fundamentally: absolute convergence is already strong at $\beta = -0.56$ (R-squared = 0.10). Adding short-run correlates alone barely changes the coefficient (from -0.56 to -0.56), confirming that policy variables no longer have explanatory power beyond what income already captures. Correlates still improve overall fit (R-squared rises from 0.10 to 0.35), but they no longer alter the convergence coefficient.
+In 1985, absolute convergence alone gives $\beta = +0.42$ (divergence, R-squared = 0.03 --- essentially no linear relationship). Adding Solow fundamentals flips the sign to $\beta^{\ast} = -0.45$, and the full model gives $\beta^{\ast} = -0.82$. In 2005, the picture changes fundamentally: absolute convergence is already strong at $\beta = -0.56$ (R-squared = 0.10). Adding short-run correlates alone barely changes the coefficient (from -0.56 to -0.56), confirming that policy variables no longer have explanatory power beyond what income already captures. Correlates still improve overall fit (R-squared rises from 0.10 to 0.35), but they no longer alter the convergence coefficient.
 
 ---
 
@@ -639,7 +639,7 @@ The convergence trend is robust across all averaging periods. As expected, short
 
 Let us return to the question posed in the Overview: **why did unconditional convergence emerge since 2000?**
 
-The OVB framework provides a clear and quantitative answer. The gap between unconditional convergence ($\beta$) and conditional convergence ($\beta^*$) is exactly equal to the product $\delta \times \lambda$. This gap closed because $\lambda$ --- the coefficient on growth correlates in growth regressions --- collapsed for short-run policy and institutional variables (slope = 0.19, R-squared = 0.06). Meanwhile, $\delta$ --- the relationship between income and institutions --- remained remarkably stable (slopes around 0.88 on the 45-degree line). In concrete terms: richer countries still have better institutions in the same proportions as 30 years ago, but those institutional advantages no longer translate into faster growth. As a result, unconditional convergence caught up to conditional convergence.
+The OVB framework provides a clear and quantitative answer. The gap between unconditional convergence ($\beta$) and conditional convergence ($\beta^{\ast}$) is exactly equal to the product $\delta \times \lambda$. This gap closed because $\lambda$ --- the coefficient on growth correlates in growth regressions --- collapsed for short-run policy and institutional variables (slope = 0.19, R-squared = 0.06). Meanwhile, $\delta$ --- the relationship between income and institutions --- remained remarkably stable (slopes around 0.88 on the 45-degree line). In concrete terms: richer countries still have better institutions in the same proportions as 30 years ago, but those institutional advantages no longer translate into faster growth. As a result, unconditional convergence caught up to conditional convergence.
 
 This has important implications for how we think about economic development. The 1990s "Washington Consensus" was built on the empirical finding that good policies and institutions predict faster growth. Our out-of-sample test shows that many of these relationships did not persist into the 2000s --- at least not for short-run policy variables. Solow fundamentals (investment, population growth, education) remained robust growth predictors, consistent with the Solow model's enduring relevance. But governance indices, fiscal indicators, and financial variables that were "significant" in 1990s regressions no longer predict growth. This raises questions about the stability of policy advice based on cross-country growth regressions.
 
@@ -678,7 +678,7 @@ This tutorial reproduced the key findings of Kremer, Willis, and You (2021), doc
 
 ## 15. Exercises
 
-1. **Your own worked example.** Choose a different correlate from the dataset (e.g., investment or FH political rights) and replicate the OVB worked example from Section 8.3. Compute $\beta$, $\beta^*$, $\delta$, $\lambda$, and verify the identity $\beta - \beta^* = \delta \times \lambda$ for both 1985 and 2005. Did the gap close for your chosen variable? Was the primary driver the change in $\delta$ or $\lambda$?
+1. **Your own worked example.** Choose a different correlate from the dataset (e.g., investment or FH political rights) and replicate the OVB worked example from Section 8.3. Compute $\beta$, $\beta^{\ast}$, $\delta$, $\lambda$, and verify the identity $\beta - \beta^{\ast} = \delta \times \lambda$ for both 1985 and 2005. Did the gap close for your chosen variable? Was the primary driver the change in $\delta$ or $\lambda$?
 
 2. **Balanced panel sensitivity.** Re-estimate the rolling beta-convergence trend (Section 4) using only countries that have GDP data from 1960 onward (a balanced panel of approximately 109 countries). Does the convergence trend look different when you exclude countries that enter the sample later? What does this tell you about the role of sample composition changes?
 
