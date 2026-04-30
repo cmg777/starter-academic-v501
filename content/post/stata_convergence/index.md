@@ -91,7 +91,7 @@ We use the Penn World Tables version 10.0 (Feenstra, Inklaar, and Timmer, 2015),
 
 ```stata
 * Load Penn World Tables 10.0
-use "pwt100.dta", clear
+use "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_convergence/pwt100.dta", clear
 rename countrycode ccode
 keep country ccode year pop rgdpe
 

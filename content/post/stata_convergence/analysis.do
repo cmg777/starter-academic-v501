@@ -56,7 +56,7 @@ display as text "  SECTION 0: DATA PREPARATION"
 display as text "────────────────────────────────────────────────────────────────"
 
 * ── Load PWT 10.0 ──
-use "pwt100.dta", clear
+use "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_convergence/pwt100.dta", clear
 
 * Keep only the variables we need
 rename countrycode ccode

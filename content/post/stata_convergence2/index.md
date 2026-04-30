@@ -92,7 +92,7 @@ set seed 42
 set scheme s2color
 
 * Load the main dataset
-use "main_data.dta", clear
+use "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_convergence2/main_data.dta", clear
 
 * Display panel structure
 codebook country_id, compact

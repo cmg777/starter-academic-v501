@@ -69,7 +69,7 @@ display as text "  SECTION 0: SETUP AND DATA PREPARATION"
 display as text "----------------------------------------------------------------"
 
 * ── Load the main dataset ──
-use "main_data.dta", clear
+use "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_convergence2/main_data.dta", clear
 
 * ── Describe the panel structure ──
 display as text ""
@@ -126,7 +126,7 @@ display as text "  Culture: " wordcount("`culture'") " variables"
 
 * ── Merge regional classification from WDI ──
 preserve
-import delimited "WDICountry.csv", clear varnames(1)
+import delimited "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_convergence2/WDICountry.csv", clear varnames(1)
 * The first column may have a BOM character
 capture rename ïcountrycode code
 capture rename countrycode code
@@ -1600,7 +1600,7 @@ display as text "---------------------------------------------------------------
 display as text ""
 display as text "9A: Averaging period (1, 2, 5, 10 years)"
 
-use "main_data.dta", clear
+use "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_convergence2/main_data.dta", clear
 
 local y loggdp
 
