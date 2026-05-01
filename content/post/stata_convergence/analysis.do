@@ -852,7 +852,111 @@ restore
 
 
 *═══════════════════════════════════════════════════════════════════════════════
-* SECTION 7: ROLLING BETA CONVERGENCE — OLS AND NLS
+* SECTION 7A: ROLLING WINDOW — OLS LAMBDA
+*
+*   Before computing rolling SPEED of convergence, we start with the
+*   simplest rolling window: the raw OLS coefficient lambda.
+*
+*   Method: Fix the end year at 2019. For each start year from 1960 to 2010,
+*   estimate the OLS regression and collect lambda and its 95% CI.
+*   The CI for lambda is the standard OLS confidence interval:
+*     lambda_hat ± t_{N-2, 0.025} × SE(lambda_hat)
+*
+*   This gives us a time series showing how the RAW convergence signal
+*   has evolved before any nonlinear transformation.
+*═══════════════════════════════════════════════════════════════════════════════
+
+display as text ""
+display as text "────────────────────────────────────────────────────────────────"
+display as text "  SECTION 7A: ROLLING WINDOW — OLS LAMBDA"
+display as text "────────────────────────────────────────────────────────────────"
+
+* ── Load and reshape data ──
+use "convergence_working.dta", clear
+keep ccode country year gdppc
+reshape wide gdppc, i(ccode country) j(year)
+
+local j = 1
+local lastyear = 2019
+
+forval startyear = 1960(1)2010 {
+    local s = `lastyear' - `startyear'
+
+    capture drop outcome initial_inc
+    gen outcome = (1/`s') * ln(gdppc`lastyear' / gdppc`startyear')
+    gen initial_inc = ln(gdppc`startyear')
+
+    qui reg outcome initial_inc if !missing(outcome) & !missing(initial_inc), robust
+    local lambda = _b[initial_inc]
+    local se_lambda = _se[initial_inc]
+    local n_obs = e(N)
+
+    * Standard OLS confidence interval: lambda ± t × SE
+    local lambda_lb = `lambda' - invttail(e(df_r), 0.025) * `se_lambda'
+    local lambda_ub = `lambda' + invttail(e(df_r), 0.025) * `se_lambda'
+
+    preserve
+        clear
+        set obs 1
+        tempfile lam_roll`j'
+        gen startyear = `startyear'
+        gen endyear = `lastyear'
+        gen lambda = `lambda'
+        gen se = `se_lambda'
+        gen lower = `lambda_lb'
+        gen upper = `lambda_ub'
+        gen n = `n_obs'
+        save `lam_roll`j''
+    restore
+    local ++j
+}
+
+* ── Combine rolling lambda results ──
+local j_lam = `j' - 1
+preserve
+    clear
+    forval i = 1/`j_lam' {
+        capture append using `lam_roll`i''
+    }
+
+    display as text ""
+    display as text "╔══════════════════════════════════════════════════════════════╗"
+    display as text "║  Rolling OLS Lambda: Key Findings                          ║"
+    display as text "╚══════════════════════════════════════════════════════════════╝"
+    list startyear lambda se lower upper n if inlist(startyear, 1960, 1970, 1980, 1990, 1995, 2000, 2005, 2010), noobs clean
+
+    export delimited using "convergence_rolling_lambda.csv", replace
+
+    * ── Create rolling lambda plot ──
+    #delimit ;
+    tw (rcap lower upper startyear, lcolor("217 119 87"%30))
+       (scatter lambda startyear, mcolor("217 119 87"%80) msymbol(O) msize(small)),
+       yline(0, lcolor("20 20 19") lpattern(shortdash) lwidth(medium))
+       xlabel(1960(5)2010, angle(45))
+       ylabel(, angle(horizontal) format(%6.4f))
+       ytitle("{&lambda} (OLS slope coefficient)", size(medlarge))
+       xtitle("Initial Year")
+       title("Rolling OLS Coefficient ({&lambda})", color("20 20 19"))
+       subtitle("Each point: OLS {&lambda} from initial year to 2019", ///
+                color("20 20 19") size(small))
+       legend(off)
+       plotregion(style(none) lcolor(none))
+       graphregion(fcolor(white) lcolor(white))
+       note("{&lambda} < 0: convergence. {&lambda} > 0: divergence."
+            "Bars: 95% CI ({&lambda} ± t × SE). 84-country balanced panel.", size(vsmall))
+       xsize(5) ysize(4)
+    ;
+    #delimit cr
+    graph export "stata_convergence_rolling_lambda.png", replace width(2400)
+    display as text "Figure saved: stata_convergence_rolling_lambda.png"
+restore
+
+
+*═══════════════════════════════════════════════════════════════════════════════
+* SECTION 7B: ROLLING BETA CONVERGENCE — OLS AND NLS
+*
+*   Now we convert the rolling lambda to structural beta and compare
+*   with NLS direct estimation.
 *
 *   Instead of just two snapshots, let's see the FULL MOVIE:
 *     How has the convergence coefficient evolved year by year?
@@ -1560,6 +1664,7 @@ display as text "  stata_convergence_scatter_1960_2019.png"
 display as text "  stata_convergence_scatter_two_eras.png"
 display as text "  stata_convergence_speed_ols.png"
 display as text "  stata_convergence_speed_nls.png"
+display as text "  stata_convergence_rolling_lambda.png"
 display as text "  stata_convergence_rolling_beta_ols.png"
 display as text "  stata_convergence_rolling_beta_nls.png"
 display as text "  stata_convergence_sigma_two_periods.png"

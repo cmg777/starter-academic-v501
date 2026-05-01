@@ -72,9 +72,9 @@ graph LR
     B["<b>Two Eras</b><br/>Structural Break<br/><i>Section 5</i>"]
     C["<b>Speed from OLS</b><br/>λ → β conversion<br/><i>Section 6</i>"]
     D["<b>NLS Framework</b><br/>Direct estimation<br/><i>Sections 7-9</i>"]
-    E["<b>Rolling Windows</b><br/>OLS & NLS<br/><i>Section 10</i>"]
-    F["<b>Sigma</b><br/>Convergence<br/><i>Sections 11-13</i>"]
-    G["<b>Heatmaps</b><br/>OLS & NLS<br/><i>Section 14</i>"]
+    E["<b>Rolling Windows</b><br/>λ, then β<br/><i>Sections 10-11</i>"]
+    F["<b>Sigma</b><br/>Convergence<br/><i>Sections 12-14</i>"]
+    G["<b>Heatmaps</b><br/>OLS & NLS<br/><i>Section 15</i>"]
 
     A --> B --> C --> D --> E --> F --> G
 
@@ -87,7 +87,7 @@ graph LR
     style G fill:#6a9bcc,stroke:#141413,color:#fff
 ```
 
-We start with the simplest OLS test (does initial income predict growth?), then split the sample to reveal a structural break. Next, we show how to extract the speed of convergence from OLS output using a straightforward algebraic conversion. We then introduce Nonlinear Least Squares (NLS) as a direct estimation method and compare the two approaches. Rolling windows show how convergence has evolved year by year. We then shift from beta to sigma convergence, show why one does not imply the other, and track the income distribution over time. Finally, convergence heatmaps covering every possible time window provide the most comprehensive robustness check.
+We start with the simplest OLS test (does initial income predict growth?), then split the sample to reveal a structural break. Next, we show how to extract the speed of convergence from OLS output using a straightforward algebraic conversion. We then introduce Nonlinear Least Squares (NLS) as a direct estimation method and compare the two approaches. A pedagogical introduction to rolling windows starts with the raw OLS coefficient $\lambda$ before progressing to the structural $\beta$, including a full walkthrough of how confidence intervals are constructed and transformed. We then shift from beta to sigma convergence, show why one does not imply the other, and track the income distribution over time. Finally, convergence heatmaps covering every possible time window provide the most comprehensive robustness check.
 
 ---
 
@@ -439,20 +439,135 @@ Both approaches are correct. In the rolling-window and heatmap sections that fol
 
 ---
 
-## 10. Rolling beta convergence over time
+## 10. Introduction to rolling windows
 
-Instead of just two snapshots, we can watch the "full movie" of convergence by estimating a separate regression for every possible start year from 1960 to 2010, always ending in 2019. We do this twice --- once using OLS (with the $\lambda \to \beta$ conversion) and once using NLS (direct $\beta$ estimation) --- to confirm robustness across methods.
+So far we have estimated convergence for specific time periods (1960--2019, 1960--2000, 2000--2019). But convergence is not a fixed property --- it evolves over time. A **rolling window** lets us watch this evolution by estimating a separate regression for every possible start year, always ending in 2019. Each start year produces one regression, one coefficient, and one dot on the plot.
 
-### OLS rolling window
+```mermaid
+graph TD
+    A["Start = 1960, End = 2019<br/>(59 years)"] --> R1["OLS → λ₁"]
+    B["Start = 1961, End = 2019<br/>(58 years)"] --> R2["OLS → λ₂"]
+    C["Start = 1962, End = 2019<br/>(57 years)"] --> R3["OLS → λ₃"]
+    D["..."] --> R4["..."]
+    E["Start = 2010, End = 2019<br/>(9 years)"] --> R5["OLS → λ₅₁"]
+
+    R1 --> P["Plot all 51 λ values<br/>against start year"]
+    R2 --> P
+    R3 --> P
+    R4 --> P
+    R5 --> P
+
+    style A fill:#6a9bcc,stroke:#141413,color:#fff
+    style B fill:#6a9bcc,stroke:#141413,color:#fff
+    style C fill:#6a9bcc,stroke:#141413,color:#fff
+    style E fill:#6a9bcc,stroke:#141413,color:#fff
+    style P fill:#d97757,stroke:#141413,color:#fff
+```
+
+We start with the simplest rolling window: the raw OLS slope coefficient $\lambda$. This requires nothing beyond the `reg` command we already know.
+
+### Rolling OLS lambda
+
+For each start year from 1960 to 2010, we run the same OLS regression as in Section 4 --- growth on initial income --- and collect the slope coefficient $\lambda$ along with its 95% confidence interval. The CI uses the standard OLS formula:
+
+$$\lambda \pm t\_{N-2, 0.025} \times \text{SE}(\lambda)$$
+
+where $t\_{N-2, 0.025}$ is the critical value from the t-distribution with $N-2$ degrees of freedom (82 for our 84-country sample).
+
+```stata
+* For each start year, run OLS and store lambda + CI
+forval startyear = 1960(1)2010 {
+    local s = 2019 - `startyear'
+    gen outcome = (1/`s') * ln(gdppc2019 / gdppc`startyear')
+    gen initial_inc = ln(gdppc`startyear')
+
+    reg outcome initial_inc, robust
+
+    * Store lambda and its 95% CI
+    local lambda = _b[initial_inc]
+    local se = _se[initial_inc]
+    local lambda_lb = `lambda' - invttail(e(df_r), 0.025) * `se'
+    local lambda_ub = `lambda' + invttail(e(df_r), 0.025) * `se'
+    drop outcome initial_inc
+}
+```
+
+```text
+Rolling OLS Lambda: Key Findings
+
+    startyear      lambda          se       lower       upper    n
+         1960    .0005689    .0012908   -.0019988    .0031366   84
+         1970    .0009814    .0012959   -.0015964    .0035592   84
+         1980    .0011322    .0013758   -.0016047    .0038690   84
+         1990   -.0000819    .0014043   -.0028757    .0027119   84
+         1995   -.0017827    .0014030   -.0045739    .0010085   84
+         2000   -.0035228    .0014686   -.0064442   -.0006013   84
+         2005   -.0041503    .0017255   -.0075825   -.0007181   84
+         2010   -.0030074    .0018375   -.0066619    .0006471   84
+```
+
+![Rolling OLS lambda (raw slope coefficient) from each start year (1960-2010) to 2019, with 95% confidence intervals.](stata_convergence_rolling_lambda.png)
+
+The rolling $\lambda$ tells the convergence story in its rawest form. For start years in the 1960s--1980s, $\lambda$ is positive (above the dashed zero line): richer countries grew faster, meaning divergence. Around 1990, $\lambda$ crosses zero and becomes increasingly negative: poorer countries are now growing faster. The 95% CI bars show that $\lambda$ is statistically distinguishable from zero (the entire CI is below zero) for start years from about 1998 onward. Notice that the sign convention for $\lambda$ is the **opposite** of $\beta$: negative $\lambda$ means convergence, while positive $\beta$ means convergence.
+
+### From lambda to beta: transforming the confidence interval
+
+To convert the rolling $\lambda$ to the structural speed of convergence $\beta$, we apply the formula from Section 6: $\beta = -\ln(1 + \lambda s)/s$. But what about the confidence interval? We cannot simply plug the CI formula for $\lambda$ into the $\beta$ formula, because the transformation is **nonlinear** and **monotone decreasing** --- a more negative $\lambda$ (stronger convergence) maps to a *larger* positive $\beta$. This means the bounds **flip** during transformation.
+
+Let's walk through this with the actual 2000--2019 estimates:
+
+**Step 1.** The OLS CI for $\lambda$ (from the regression output):
+
+$$\lambda = -0.00352, \quad \text{SE} = 0.00147, \quad s = 19$$
+
+$$\text{CI for } \lambda: \quad [-0.00352 - 1.989 \times 0.00147, \quad -0.00352 + 1.989 \times 0.00147] = [-0.00645, \quad -0.00060]$$
+
+**Step 2.** Transform each bound through $\beta = -\ln(1 + \lambda s)/s$:
+
+$$\text{Lower } \lambda = -0.00645 \quad \Rightarrow \quad \beta = \frac{-\ln(1 + (-0.00645)(19))}{19} = \frac{-\ln(0.8775)}{19} = \frac{0.1307}{19} = 0.00688$$
+
+$$\text{Upper } \lambda = -0.00060 \quad \Rightarrow \quad \beta = \frac{-\ln(1 + (-0.00060)(19))}{19} = \frac{-\ln(0.9886)}{19} = \frac{0.01147}{19} = 0.00060$$
+
+**Step 3.** Notice the flip: the **lower** $\lambda$ bound (-0.00645) produced the **upper** $\beta$ bound (0.00688), and the **upper** $\lambda$ bound (-0.00060) produced the **lower** $\beta$ bound (0.00060). So:
+
+$$\text{CI for } \beta: \quad [0.00060, \quad 0.00688]$$
+
+This happens because $\beta = -\ln(1 + \lambda s)/s$ is a **monotone decreasing** function of $\lambda$: as $\lambda$ decreases (becomes more negative), $\beta$ increases (stronger convergence). In the code, we handle this by simply swapping the transformed bounds:
+
+```stata
+* Transform lambda CI to beta CI (bounds flip)
+local beta_lb = -ln(1 + `lambda_ub' * `s') / `s'   // upper lambda → lower beta
+local beta_ub = -ln(1 + `lambda_lb' * `s') / `s'   // lower lambda → upper beta
+```
+
+With this understanding, we can now construct rolling windows for the structural speed $\beta$ using both OLS (with the conversion) and NLS (direct estimation).
+
+---
+
+## 11. Rolling beta convergence over time
+
+We now apply the rolling-window approach to the structural speed of convergence $\beta$, using both methods from Sections 6--9. For each start year from 1960 to 2010, with end year fixed at 2019, we estimate $\beta$ via:
+- **OLS:** estimate $\lambda$, convert to $\beta = -\ln(1+\lambda s)/s$, transform CI bounds (with the flip)
+- **NLS:** estimate $\beta$ directly, CI comes straight from the standard error
+
+### OLS rolling beta
 
 ```stata
 * For each start year, estimate OLS and convert λ → β
 forval startyear = 1960(1)2010 {
     local s = 2019 - `startyear'
-    gen outcome = (1/`s') * ln(gdppc2019 / gdppc`startyear')
-    gen initial_inc = ln(gdppc`startyear')
     reg outcome initial_inc, robust
-    local beta = -ln(1 + _b[initial_inc] * `s') / `s'
+    local lambda = _b[initial_inc]
+    local se = _se[initial_inc]
+
+    * Convert lambda to beta
+    local beta = -ln(1 + `lambda' * `s') / `s'
+
+    * Convert CI (bounds flip due to monotone decreasing transformation)
+    local lambda_lb = `lambda' - invttail(e(df_r), 0.025) * `se'
+    local lambda_ub = `lambda' + invttail(e(df_r), 0.025) * `se'
+    local beta_lb = -ln(1 + `lambda_ub' * `s') / `s'   // upper λ → lower β
+    local beta_ub = -ln(1 + `lambda_lb' * `s') / `s'   // lower λ → upper β
 }
 ```
 
@@ -472,15 +587,14 @@ Rolling OLS Beta Convergence: Key Findings
 
 ![Rolling OLS beta coefficient (converted from lambda) from each start year (1960-2010) to 2019, with 95% confidence intervals.](stata_convergence_rolling_beta_ols.png)
 
-### NLS rolling window
+### NLS rolling beta
 
 ```stata
 * For each start year, estimate NLS β directly
 forval startyear = 1960(1)2010 {
     local s = 2019 - `startyear'
-    gen outcome = (1/`s') * ln(gdppc2019 / gdppc`startyear')
-    gen initial_inc = ln(gdppc`startyear')
     nl (outcome = {b0=1} - (1 - exp(-1*{b1=0.00}*`s'))/`s' * initial_inc), vce(robust)
+    * CI comes directly: beta ± t × SE(beta)
 }
 ```
 
@@ -500,11 +614,11 @@ Rolling NLS Beta Convergence: Key Findings
 
 ![Rolling NLS beta coefficient from each start year (1960-2010) to 2019, with 95% confidence intervals.](stata_convergence_rolling_beta_nls.png)
 
-The rolling beta coefficient tells a clear story of transition, and the OLS and NLS results are identical in every row. For start years in the 1960s through mid-1980s, $\beta$ is negative --- divergence. It then climbs steadily through the 1990s, crosses zero around 1990, and peaks at 0.00441 for start year 2005 (speed = 0.44%/yr, half-life = 157 years). For the most recent start years (2009--2010), the coefficient pulls back slightly to 0.00309 (half-life = 224 years), suggesting that convergence may have moderated --- possibly reflecting effects of the 2008 financial crisis. The two figures look identical because the OLS conversion and NLS give the same point estimates; the only difference is that the NLS confidence intervals are derived directly from $\beta$'s standard error, while the OLS intervals are transformed from $\lambda$'s. With convergence dynamics established, we now turn to a different question: is the actual spread of income across countries narrowing?
+The rolling $\beta$ tells a clear story of transition, and the OLS and NLS results are identical in every row. For start years in the 1960s through mid-1980s, $\beta$ is negative --- divergence. It then climbs steadily through the 1990s, crosses zero around 1990, and peaks at 0.00441 for start year 2005 (speed = 0.44%/yr, half-life = 157 years). For the most recent start years (2009--2010), the coefficient pulls back slightly to 0.00309 (half-life = 224 years), suggesting that convergence may have moderated --- possibly reflecting effects of the 2008 financial crisis. The two figures look identical because the OLS conversion and NLS give the same point estimates; the only difference is that the NLS confidence intervals are derived directly from $\beta$'s standard error, while the OLS intervals are transformed from $\lambda$'s (with the bound-flipping described in Section 10). With convergence dynamics established, we now turn to a different question: is the actual spread of income across countries narrowing?
 
 ---
 
-## 11. Sigma convergence: is the spread narrowing?
+## 12. Sigma convergence: is the spread narrowing?
 
 Beta convergence asks whether poorer countries grow faster. **Sigma convergence** asks a different question: is the *dispersion* of income across countries getting smaller? We measure dispersion using the variance of log GDP per capita. If the variance decreases over time, incomes are bunching together (sigma convergence). If it increases, incomes are spreading apart (sigma divergence).
 
@@ -535,11 +649,17 @@ Sigma Convergence Test: 1960 vs 2019:
 
 ![Bar chart comparing the variance of log GDP per capita in 1960 versus 2019, with 95% confidence intervals. Both bars use the same 84 countries.](stata_convergence_sigma_two_periods.png)
 
+The error bars in the figure show 95% confidence intervals for the variance, computed using the **chi-squared distribution**. Stata's `ci variances` command uses the formula:
+
+$$\text{CI for } \sigma^2 = \left[\frac{(N-1) s^2}{\chi^2\_{\alpha/2, N-1}}, \quad \frac{(N-1) s^2}{\chi^2\_{1-\alpha/2, N-1}}\right]$$
+
+where $s^2$ is the sample variance, $N$ = 84 countries, and $\chi^2\_{\alpha/2, N-1}$ is the critical value from the chi-squared distribution with $N-1$ = 83 degrees of freedom. This is the standard CI for a variance under the assumption that the data (log GDP per capita) is approximately normally distributed. Unlike the symmetric OLS confidence interval ($\hat{\theta} \pm t \times \text{SE}$), the chi-squared CI is **asymmetric** --- the upper tail extends further than the lower tail, reflecting the right-skewed nature of the chi-squared distribution. This asymmetry is visible in the error bars: the upper whisker is longer than the lower one.
+
 Comparing the two endpoints, the variance of log GDP per capita *increased* by 90.8%, from 0.924 in 1960 to 1.764 in 2019. The standard deviation rose from 0.96 to 1.33. In 2019, a one-standard-deviation move along the world income distribution corresponds to a roughly 3.8-fold difference in living standards ($e^{1.33}$ = 3.78), up from a 2.6-fold difference in 1960 ($e^{0.96}$ = 2.61). This is clear evidence of sigma *divergence* over the full period: the world income distribution widened substantially, even though beta convergence exists in the recent era. How can poorer countries be growing faster *and* the income spread be widening at the same time? The next section explains this apparent paradox.
 
 ---
 
-## 12. Why beta convergence is not enough
+## 13. Why beta convergence is not enough
 
 The seeming contradiction --- beta convergence without sigma convergence --- is not a paradox but a well-known theoretical result. Young, Higgins, and Levy (2008) proved that **beta convergence is necessary but not sufficient for sigma convergence**. Think of it like a race with wind gusts: even if the runners at the back are faster on average (beta convergence), random gusts can push some runners forward and others backward, keeping the pack spread out (no sigma convergence). The catch-up tendency must be strong enough to overcome the dispersing force of random shocks before the distribution actually narrows.
 
@@ -568,7 +688,7 @@ The decade-by-decade view confirms the theory in action. The OLS $\lambda$ turns
 
 ---
 
-## 13. Sigma convergence over time
+## 14. Sigma convergence over time
 
 We now track the dispersion of income every year from 1960 to 2019. Because we use a balanced panel of 84 countries, the sample composition is constant throughout --- there is no need for a separate "fixed sample" series to control for changing coverage.
 
@@ -597,11 +717,13 @@ Sigma Convergence Over Time: Key Years
 
 ![Year-by-year variance of log GDP per capita for the 84-country balanced panel, with 95% confidence intervals. The variance peaks around 2008 and declines thereafter.](stata_convergence_sigma_evolution.png)
 
+The error bars at each year are the chi-squared confidence intervals described in Section 12. Because our balanced panel has a constant $N$ = 84, the width of the CI at each year depends only on the variance itself: years with larger variance have wider bars in absolute terms. The bars do not reflect changes in sample size (which is constant throughout).
+
 The variance series tells a two-act story. **Act one (1960--2008):** variance rose almost continuously from 0.924 to a peak of 1.918, an increase of 108% over nearly five decades. **Act two (2008--2019):** variance declined from 1.918 to 1.764, a drop of 8.1%. Sigma convergence is a genuinely recent phenomenon, emerging only after the mid-2000s. Even so, the 2019 variance (1.764) remains 91% higher than the 1960 value (0.924). The recent narrowing is real but has barely begun to undo decades of divergence. The next section provides the most comprehensive view of convergence by examining every possible time window.
 
 ---
 
-## 14. The convergence heatmap
+## 15. The convergence heatmap
 
 The heatmap is the most comprehensive visualization of convergence dynamics. For every possible start-year and end-year combination from 1960 to 2019, we estimate a separate regression --- approximately 1,770 regressions --- and color-code the result. Blue indicates convergence ($\beta > 0$) and red indicates divergence ($\beta < 0$). We produce two heatmaps: one using the OLS $\lambda \to \beta$ conversion and one using NLS direct estimation, following Patel et al. (2021) Figure 2.
 
@@ -630,7 +752,7 @@ The pattern is strikingly clear and identical across both methods. The upper-rig
 
 ---
 
-## 15. Discussion
+## 16. Discussion
 
 We set out to ask whether the world has entered a new era of unconditional convergence and how fast it is happening. The evidence is clear: **yes, unconditional convergence is real since approximately 2000, but it is very slow.**
 
@@ -642,7 +764,7 @@ A methodological contribution of this tutorial is demonstrating that the OLS $\l
 
 ---
 
-## 16. Summary and next steps
+## 17. Summary and next steps
 
 ### Key takeaways
 
@@ -668,7 +790,7 @@ A methodological contribution of this tutorial is demonstrating that the OLS $\l
 
 ---
 
-## 17. Exercises
+## 18. Exercises
 
 1. **Change the breakpoint.** Instead of splitting at the year 2000, try splitting at 1990 or 1995. Does the convergence coefficient in the recent era change? At what breakpoint does the coefficient first become significantly negative?
 
@@ -678,7 +800,7 @@ A methodological contribution of this tutorial is demonstrating that the OLS $\l
 
 ---
 
-## 18. References
+## 19. References
 
 1. [Patel, D., Sandefur, J., and Subramanian, A. (2021). The New Era of Unconditional Convergence. *Journal of Development Economics*, 152, 102687.](https://doi.org/10.1016/j.jdeveco.2021.102687)
 2. [Barro, R. J. and Sala-i-Martin, X. (1992). Convergence. *Journal of Political Economy*, 100(2), 223--251.](https://doi.org/10.1086/261816)
