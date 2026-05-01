@@ -44,17 +44,21 @@ Are poorer countries catching up to richer ones? This is one of the most fundame
 
 For decades, the empirical evidence was discouraging. From 1960 to 2000, there was no sign that poorer countries were growing faster. If anything, richer countries pulled further ahead. But Patel, Sandefur, and Subramanian (2021) documented a striking reversal: since around the year 2000, the world has entered a **new era of unconditional convergence**, with poorer countries finally growing faster than richer ones --- no controls for institutions, human capital, or policy needed.
 
-This tutorial walks through the complete convergence toolkit in Stata, from the simplest two-period regression to advanced heatmaps covering every possible time window. We use Penn World Tables 10.0 data for 124 countries and ask: **How fast is convergence happening, and is the global income distribution actually narrowing?** The answer involves two distinct concepts --- *beta convergence* (do poor countries grow faster?) and *sigma convergence* (is the income spread shrinking?) --- and the surprising finding that one does not guarantee the other.
+This tutorial walks through the complete convergence toolkit in Stata, from the simplest two-period regression to advanced heatmaps covering every possible time window. We use Penn World Tables 10.0 data for a **balanced panel of 84 countries** with data available since 1960 and ask: **How fast is convergence happening, and is the global income distribution actually narrowing?** The answer involves two distinct concepts --- *beta convergence* (do poor countries grow faster?) and *sigma convergence* (is the income spread shrinking?) --- and the surprising finding that one does not guarantee the other.
+
+A distinctive feature of this tutorial is its comparative approach to measuring convergence speed. We first show how to extract the speed of convergence from standard OLS output using a simple algebraic conversion, then introduce Nonlinear Least Squares (NLS) as a direct estimation method. Students learn that both approaches yield the same structural parameter --- building intuition before complexity.
 
 ### Learning objectives
 
 - Estimate beta convergence using OLS and interpret the sign of the slope coefficient
 - Identify the structural break between the era of divergence (1960--2000) and the era of convergence (2000--2019)
-- Compute the speed of convergence and half-life using the Barro-Sala-i-Martin (1992) nonlinear least squares (NLS) specification
+- Compute the speed of convergence and half-life from OLS output using an algebraic conversion
+- Understand what Nonlinear Least Squares (NLS) is, why it is needed, and how to estimate it in Stata
+- Compare OLS-derived and NLS-derived convergence estimates
+- Construct rolling-window visualizations for both OLS and NLS to assess robustness
 - Measure sigma convergence using the variance of log GDP per capita
 - Understand why beta convergence is necessary but not sufficient for sigma convergence
-- Construct rolling-window and heatmap visualizations to assess robustness
-- Decompose convergence by region to identify which parts of the world drive the result
+- Build convergence heatmaps to visualize every possible time window
 
 ---
 
@@ -66,12 +70,13 @@ The tutorial progresses from the simplest possible convergence test to the most 
 graph LR
     A["<b>Simple OLS</b><br/>1960-2019<br/><i>Section 4</i>"]
     B["<b>Two Eras</b><br/>Structural Break<br/><i>Section 5</i>"]
-    C["<b>NLS</b><br/>Speed & Half-Life<br/><i>Section 6</i>"]
-    D["<b>Beta vs Sigma</b><br/>Two Concepts<br/><i>Sections 7-8</i>"]
-    E["<b>Rolling Windows<br/>& Heatmap</b><br/><i>Sections 9-11</i>"]
-    F["<b>Regional</b><br/>Decomposition<br/><i>Section 12</i>"]
+    C["<b>Speed from OLS</b><br/>λ → β conversion<br/><i>Section 6</i>"]
+    D["<b>NLS Framework</b><br/>Direct estimation<br/><i>Sections 7-9</i>"]
+    E["<b>Rolling Windows</b><br/>OLS & NLS<br/><i>Section 10</i>"]
+    F["<b>Sigma</b><br/>Convergence<br/><i>Sections 11-13</i>"]
+    G["<b>Heatmaps</b><br/>OLS & NLS<br/><i>Section 14</i>"]
 
-    A --> B --> C --> D --> E --> F
+    A --> B --> C --> D --> E --> F --> G
 
     style A fill:#6a9bcc,stroke:#141413,color:#fff
     style B fill:#d97757,stroke:#141413,color:#fff
@@ -79,15 +84,16 @@ graph LR
     style D fill:#6a9bcc,stroke:#141413,color:#fff
     style E fill:#d97757,stroke:#141413,color:#fff
     style F fill:#00d4c8,stroke:#141413,color:#141413
+    style G fill:#6a9bcc,stroke:#141413,color:#fff
 ```
 
-We start with the simplest OLS test (does initial income predict growth?), then split the sample to reveal a structural break. Next, we introduce the NLS framework to measure the *speed* of convergence and the *half-life* of the income gap. We then shift from beta to sigma convergence and show why one does not imply the other. Finally, rolling windows, the convergence heatmap, and regional decomposition demonstrate the robustness and geographic drivers of the result.
+We start with the simplest OLS test (does initial income predict growth?), then split the sample to reveal a structural break. Next, we show how to extract the speed of convergence from OLS output using a straightforward algebraic conversion. We then introduce Nonlinear Least Squares (NLS) as a direct estimation method and compare the two approaches. Rolling windows show how convergence has evolved year by year. We then shift from beta to sigma convergence, show why one does not imply the other, and track the income distribution over time. Finally, convergence heatmaps covering every possible time window provide the most comprehensive robustness check.
 
 ---
 
 ## 3. Setup and data preparation
 
-We use the Penn World Tables version 10.0 (Feenstra, Inklaar, and Timmer, 2015), the standard dataset for cross-country income comparisons. It provides expenditure-side real GDP in purchasing power parity (PPP) terms, which makes incomes comparable across countries with different price levels. Following Patel et al. (2021), we exclude oil-producing countries (whose income reflects resource rents rather than productive convergence) and very small countries (population under 1 million).
+We use the Penn World Tables version 10.0 (Feenstra, Inklaar, and Timmer, 2015), the standard dataset for cross-country income comparisons. It provides expenditure-side real GDP in purchasing power parity (PPP) terms, which makes incomes comparable across countries with different price levels. Following Patel et al. (2021), we exclude oil-producing countries (whose income reflects resource rents rather than productive convergence) and very small countries (population under 1 million). We further restrict the sample to a **balanced panel of 84 countries** with GDP per capita data available since 1960, ensuring that the same set of countries is used consistently across all sections of the tutorial.
 
 ```stata
 * Load Penn World Tables 10.0
@@ -113,6 +119,11 @@ drop if pop < 1
 * Restrict to 1960 onwards
 drop if year < 1960
 
+* Restrict to balanced panel: countries with data in 1960
+bys ccode: egen has1960 = max(year == 1960 & !missing(gdppc))
+keep if has1960 == 1
+drop has1960
+
 summarize gdppc, detail
 ```
 
@@ -120,22 +131,22 @@ summarize gdppc, detail
              Real GDP per capita (PPP, 2017 US$)
 -------------------------------------------------------------
       Percentiles      Smallest
- 1%     640.1007       243.7604
- 5%     893.0397       266.7876
-10%     1148.407       286.7154       Obs               6,612
-25%     2054.573       368.2704       Sum of wgt.       6,612
+ 1%     498.6677       368.2704
+ 5%     805.8461       425.7048
+10%     1048.736       498.6677       Obs               5,040
+25%     1927.449       523.0073       Sum of wgt.       5,040
 
-50%     5236.685                      Mean           11071.58
-                        Largest       Std. dev.      13257.41
-75%     15064.45       88681.06
-90%     30859.54        89403.9       Variance       1.76e+08
-95%     40187.53       90413.35       Skewness       1.924448
-99%        55820       102937.7       Kurtosis       7.063426
+50%     4873.137                      Mean           10811.48
+                        Largest       Std. dev.       14375.5
+75%     14282.34       88681.06
+90%     30734.83        89403.9       Variance       2.07e+08
+95%       35014        90413.35       Skewness       2.158023
+99%     55579.96       102937.7       Kurtosis       8.099127
 
-Number of unique countries: 124
+Number of unique countries: 84
 ```
 
-The cleaned dataset contains 6,612 country-year observations across 124 unique countries spanning 1960--2019. GDP per capita ranges from \\$244 (the poorest country-year) to \\$102,938 (the richest), with a median of \\$5,237 and a mean of \\$11,072. The large gap between mean and median --- reinforced by a skewness of 1.92 --- reflects the heavy right tail of the world income distribution: a small number of very rich countries pull the average far above the typical country. Countries enter the sample progressively as PWT coverage expands, growing from 84 countries with 1960 data to 124 by 2019. The next step is to ask whether poorer countries within this distribution are catching up.
+The cleaned dataset contains 5,040 country-year observations across 84 unique countries spanning 1960--2019. GDP per capita ranges from \\$368 (the poorest country-year) to \\$102,938 (the richest), with a median of \\$4,873 and a mean of \\$10,811. The large gap between mean and median --- reinforced by a skewness of 2.16 --- reflects the heavy right tail of the world income distribution: a small number of very rich countries pull the average far above the typical country. Because we restrict to countries with data available since 1960, this is a balanced panel: the same 84 countries appear in every year, eliminating composition effects that would arise if the sample grew over time.
 
 ---
 
@@ -183,7 +194,7 @@ Linear regression                               Number of obs     =         84
 
 ![Beta convergence test for 1960-2019: scatter plot of annualized growth versus log initial income, showing a flat fitted line with no evidence of convergence.](stata_convergence_scatter_1960_2019.png)
 
-Over the full 1960--2019 period, the OLS coefficient on initial income is 0.00057 --- positive, tiny, and statistically insignificant (p = 0.661, t = 0.44). The R-squared is just 0.13%, meaning initial income in 1960 has essentially zero predictive power for subsequent growth. The 84 countries with data for both endpoints grew at an average rate of about 2.2% per year, but this growth was completely unrelated to starting income levels. In the scatter plot, the fitted line is essentially flat. This "null result" seems to settle the question: no convergence over six decades. But this conclusion is misleading, because it masks a dramatic structural break that the next section reveals.
+Over the full 1960--2019 period, the OLS coefficient on initial income is 0.00057 --- positive, tiny, and statistically insignificant (p = 0.661, t = 0.44). The R-squared is just 0.13%, meaning initial income in 1960 has essentially zero predictive power for subsequent growth. The 84 countries grew at an average rate of about 2.2% per year, but this growth was completely unrelated to starting income levels. In the scatter plot, the fitted line is essentially flat. This "null result" seems to settle the question: no convergence over six decades. But this conclusion is misleading, because it masks a dramatic structural break that the next section reveals.
 
 ---
 
@@ -227,63 +238,273 @@ initial_era2 |  -.0035228   .0014686    -2.40   0.019    -.0064442   -.0006013
 
 ![Side-by-side scatter plots comparing the era of divergence (1960-2000, warm orange) with the era of convergence (2000-2019, steel blue), showing the slope flip from positive to negative.](stata_convergence_scatter_two_eras.png)
 
-The results reveal a dramatic reversal. During 1960--2000, the OLS coefficient is positive and significant (0.00437, p = 0.007): richer countries grew faster, and the income gap widened. During 2000--2019, the coefficient flips to negative and significant (-0.00352, p = 0.019): poorer countries are now growing faster. The total swing of 0.0079 represents a complete reversal from divergence to convergence. This is what Patel et al. (2021) call "the new era of unconditional convergence." The break coincides with the acceleration of growth in Asia and parts of Africa and the slowdown in mature Western economies. But how fast is this convergence happening? The next section introduces a more rigorous framework for measuring speed.
+The results reveal a dramatic reversal. During 1960--2000, the OLS coefficient is positive and significant ($\lambda$ = 0.00437, p = 0.007): richer countries grew faster, and the income gap widened. During 2000--2019, the coefficient flips to negative and significant ($\lambda$ = -0.00352, p = 0.019): poorer countries are now growing faster. The total swing of 0.0079 represents a complete reversal from divergence to convergence. This is what Patel et al. (2021) call "the new era of unconditional convergence." But how fast is this convergence happening? The next section shows how to measure speed and half-life using nothing more than the OLS coefficient we already have.
 
 ---
 
-## 6. Speed of convergence and half-life
+## 6. Speed of convergence and half-life from OLS
 
-Knowing that convergence exists is only the first step. We also want to know: **how fast are poor countries catching up?** The OLS coefficient answers "is it happening?" but its magnitude depends on the length of the growth period, making it hard to compare across time windows. The Barro and Sala-i-Martin (1992) nonlinear least squares (NLS) specification solves this problem by estimating a structural parameter $\beta$ that is invariant to period length.
+Knowing that convergence exists is only the first step. We also want to know: **how fast are poor countries catching up?** The OLS coefficient $\lambda$ tells us the direction, but its magnitude depends on the length of the growth period ($s$), making it hard to compare across time windows. We need a **structural parameter** $\beta$ --- the speed of convergence --- that is invariant to period length.
 
-The NLS equation is:
+The good news: we can extract $\beta$ directly from the OLS coefficient using a simple algebraic conversion. The relationship comes from the Barro and Sala-i-Martin (1992) convergence model, which implies that the OLS coefficient $\lambda$ and the structural speed $\beta$ are related by:
 
-$$\frac{1}{s} \ln\left(\frac{y\_{i,t+s}}{y\_{i,t}}\right) = \alpha - \frac{1 - e^{-\beta s}}{s} \cdot \ln(y\_{i,t}) + \varepsilon\_i$$
+$$\lambda = -\frac{1 - e^{-\beta s}}{s}$$
 
-In words, the annualized growth rate over $s$ years is a nonlinear function of initial income. The parameter $\beta$ directly measures the **speed of convergence** --- the fraction of the income gap that closes each year. A $\beta$ of 0.02 means 2% of the gap closes annually. In the Stata code, $\beta$ corresponds to the NLS parameter `{b1}`, $s$ is the number of years between endpoints, and $\ln(y\_{i,t})$ is the variable `initial`.
+In words, the OLS slope is a nonlinear function of the speed of convergence $\beta$ and the time span $s$. We can solve this equation for $\beta$ in four steps:
 
-The **half-life** tells us how many years it takes to close half the gap to steady-state income --- like the half-life of a radioactive substance, but for income gaps instead of atoms:
+**Step 1.** Multiply both sides by $s$:
 
-$$\tau = \frac{-\ln(2)}{\ln\left(1 - \frac{1 - e^{-\beta s}}{s}\right)}$$
+$$\lambda s = -(1 - e^{-\beta s})$$
 
-The classic benchmark is $\beta \approx 0.02$ (2% per year) with a half-life of about 35 years (Barro and Sala-i-Martin, 1992; Sala-i-Martin, 1996). But that was for *conditional* convergence --- controlling for human capital, institutions, and other factors. Unconditional convergence, which requires no controls, is much slower.
+**Step 2.** Rearrange:
+
+$$e^{-\beta s} = 1 + \lambda s$$
+
+**Step 3.** Take the natural log and solve for $\beta$:
+
+$$\beta = \frac{-\ln(1 + \lambda s)}{s}$$
+
+**Step 4.** Compute the half-life --- how many years to close half the income gap:
+
+$$\tau = \frac{\ln(2)}{\beta}$$
+
+The classic benchmark from the convergence literature is $\beta \approx 0.02$ (2% per year) with a half-life of about 35 years (Barro and Sala-i-Martin, 1992; Sala-i-Martin, 1996). But that was for *conditional* convergence --- controlling for human capital, institutions, and other factors. Unconditional convergence, which requires no controls, is much slower.
 
 ```stata
-* NLS estimation for 2000-2019 (Barro-Sala-i-Martin specification)
-local s = 2019 - 2000
-nl (outcome_temp = {b0=1} - (1 - exp(-1*{b1=0.00}*`s'))/`s' * initial_temp), ///
-    vce(robust)
+* For each period: run OLS, get λ, convert to β = -ln(1+λs)/s, compute half-life
+foreach period in "1960-2019" "1960-2000" "1980-2019" "1990-2019" "1995-2019" "2000-2019" {
+    reg outcome initial_inc, robust
+    local lambda = _b[initial_inc]
 
-* Extract speed of convergence
-local speed = _b[/b1] * 100
+    * Convert OLS λ to structural β
+    local beta = -ln(1 + `lambda' * `s') / `s'
 
-* Compute half-life
-local convergence_factor = (1 - exp(-1*_b[/b1]*`s')) / `s'
-local halflife = -ln(2) / ln(1 - `convergence_factor')
+    * Half-life
+    local halflife = ln(2) / `beta'
+}
 ```
 
 ```text
-Speed of Convergence and Half-Life Across Periods:
+Speed of Convergence from OLS: λ → β → Half-Life
 
-       period     beta_nls    speed_pct    halflife     beta_ols     n
-    1960-2000   -.00402402   -.40240194           .    .00436597    84
-    1960-2019   -.00055955   -.05595547           .    .00056889    84
-    1980-2019    .00015098    .01509839   4604.0498   -.00015054   101
-    1990-2019    .00203814    .20381441   349.89038   -.00197908   121
-    1995-2019    .00298339    .29833945   240.40535   -.00287909   123
-    2000-2019    .00425083    .42508311   169.38828    -.0040837   124
+       period   lambda_ols     beta_ols   speed_ols   halflife_ols    n
+    1960-2000    .00436597   -.00402402   -.4024021              .   84
+    1960-2019    .00056889   -.00055955   -.0559547              .   84
+    1980-2019    .00113216   -.00110461    -.110461              .   84
+    1990-2019   -.00008191    .00008131    .0081305       8525.66   84
+    1995-2019   -.00178267    .00181768    .1817678      381.3365   84
+    2000-2019   -.00352278     .0036462    .3646201      190.0984   84
 
 Benchmarks (Barro & Sala-i-Martin 1992, conditional convergence):
   Speed: 2.00% per year
   Half-life: 35 years
 ```
 
-![Speed of unconditional convergence across six periods, with the 2% conditional convergence benchmark shown as a dashed line.](stata_convergence_speed_halflife.png)
+![Speed of unconditional convergence from OLS across six periods, with the 2% conditional convergence benchmark shown as a dashed line.](stata_convergence_speed_ols.png)
 
-The table reveals a clear acceleration. For 1960--2000, the NLS beta is negative (-0.00402), confirming divergence at a rate of 0.40% per year --- incomes were spreading apart, not converging. As the start year moves forward, convergence emerges and strengthens: 0.02% per year for 1980--2019, 0.20% for 1990--2019, 0.30% for 1995--2019, and 0.43% for 2000--2019. The 2000--2019 estimate of $\beta$ = 0.00425 (N = 124, p = 0.007) matches Patel et al. (2021) exactly. The corresponding half-life of 169 years means that at the current pace, the average developing country would close only half the gap to its steady-state income in nearly two centuries. This is roughly five times slower than the 35-year benchmark for conditional convergence. Unconditional convergence is statistically real, but it is extremely slow. Note that the NLS beta has the *opposite sign* from the OLS coefficient: a positive NLS beta (convergence) corresponds to a negative OLS slope, because the NLS formula includes a minus sign in front of the convergence term. With the speed measured, we now turn to a different question: is the actual spread of income across countries narrowing?
+The table reveals a clear acceleration. For 1960--2000, the structural $\beta$ is negative (-0.00402), confirming divergence at a rate of 0.40% per year --- incomes were spreading apart. As the start year moves forward, convergence emerges and strengthens: essentially zero for 1990--2019, 0.18% per year for 1995--2019, and 0.36% for 2000--2019. The 2000--2019 estimate of $\beta$ = 0.00365 with a half-life of 190 years means that at the current pace, the average developing country would close only half the gap to its steady-state income in nearly two centuries. This is roughly five times slower than the 35-year benchmark for conditional convergence. Unconditional convergence is statistically real, but it is extremely slow.
+
+We computed these results using nothing more than OLS and an algebraic formula. But there is a more direct way to estimate $\beta$ --- one that does not require any conversion. The next section introduces Nonlinear Least Squares.
 
 ---
 
-## 7. Sigma convergence: is the spread narrowing?
+## 7. What is Nonlinear Least Squares (NLS)?
+
+The OLS-to-$\beta$ conversion in Section 6 works, but it goes **backwards**: we estimate $\lambda$ first, then convert to $\beta$. Can we estimate $\beta$ **directly**? Yes --- using Nonlinear Least Squares (NLS).
+
+### Why can't OLS estimate $\beta$ directly?
+
+The Barro-Sala-i-Martin (1992) convergence equation is:
+
+$$\frac{1}{s} \ln\left(\frac{y\_{i,t+s}}{y\_{i,t}}\right) = \alpha - \frac{1 - e^{-\beta s}}{s} \cdot \ln(y\_{i,t}) + \varepsilon\_i$$
+
+The parameter $\beta$ appears **inside an exponential**: $e^{-\beta s}$. OLS requires that parameters enter the equation *linearly* --- as coefficients that multiply variables. Since $\beta$ is trapped inside $\exp()$, OLS cannot estimate it directly. Instead, OLS estimates the entire expression $-\frac{1 - e^{-\beta s}}{s}$ as a single coefficient $\lambda$, and we must back out $\beta$ algebraically.
+
+### What does NLS do?
+
+Like OLS, NLS minimizes the sum of squared residuals:
+
+$$\min\_{\alpha, \beta} \sum\_{i=1}^{N} \left[ g\_i - f(\ln y\_{i,0}; \alpha, \beta) \right]^2$$
+
+But unlike OLS, the function $f()$ can be **any nonlinear function** of the parameters. NLS uses an iterative algorithm:
+
+1. **Start** with an initial guess for $\beta$ (e.g., $\beta\_0 = 0.02$, the classic benchmark)
+2. **Compute** predicted values and residuals given the current guess
+3. **Adjust** $\beta$ in the direction that reduces the sum of squared residuals
+4. **Repeat** until the improvement is negligible (the algorithm has "converged")
+
+### How to estimate NLS in Stata
+
+Stata's `nl` command performs NLS estimation. The syntax places the entire nonlinear equation inside parentheses, with parameters in curly braces:
+
+```stata
+* NLS estimation for 2000-2019
+local s = 19
+nl (outcome = {b0=1} - (1 - exp(-1*{b1=0.02}*`s'))/`s' * initial_inc), vce(robust)
+```
+
+Reading the syntax:
+- `{b0=1}` --- the intercept $\alpha$, with initial guess = 1
+- `{b1=0.02}` --- the speed of convergence $\beta$, with initial guess = 0.02 (the 2% benchmark)
+- `*19` --- $s$ = 19 years (2000 to 2019)
+- `initial_inc` --- $\ln(y\_{2000})$, the independent variable
+- `vce(robust)` --- heteroskedasticity-robust standard errors
+
+```text
+Nonlinear regression                              Number of obs   =         84
+                                                  R-squared       =     0.0704
+                                                  Root MSE        =   .0215709
+
+------------------------------------------------------------------------------
+             |               Robust
+     outcome | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         /b0 |   .0580907    .014098     4.12   0.000     .0300452    .0861362
+         /b1 |   .0036462   .0015739     2.32   0.023     .0005152    .0067772
+------------------------------------------------------------------------------
+
+HOW TO READ THE OUTPUT:
+    /b1 = 0.00365 → This is β (speed of convergence)
+    Speed = 0.36% per year
+    Half-life = 190.1 years
+
+COMPARISON with OLS conversion:
+    OLS λ = -0.00352
+    OLS → β = -ln(1 + -0.00352 × 19) / 19 = 0.00365
+    NLS β  = 0.00365
+    Difference = 0.0000000
+```
+
+### Why use NLS?
+
+The **advantage of NLS** is that standard errors and p-values apply directly to $\beta$ itself. With OLS, the standard error applies to $\lambda$, and transforming it to $\beta$ requires the delta method --- an additional mathematical step. NLS gives you $\beta$, its standard error, and a p-value in one shot. The **advantage of OLS** is simplicity: it is faster, always converges, and gives identical point estimates after conversion.
+
+---
+
+## 8. Speed of convergence and half-life from NLS
+
+Now we estimate $\beta$ directly via NLS for the same six periods as Section 6. The results should match the OLS conversion, confirming that both methods recover the same structural parameter.
+
+```stata
+* NLS estimation for each period
+foreach period in "1960-2019" ... "2000-2019" {
+    nl (outcome = {b0=1} - (1 - exp(-1*{b1=0.00}*`s'))/`s' * initial_inc), vce(robust)
+}
+```
+
+```text
+Speed of Convergence from NLS (Direct Estimation of β):
+
+       period     beta_nls      se_nls   speed_nls   halflife_nls    n
+    1960-2000   -.00402402    .0013502   -.4024021              .   84
+    1960-2019   -.00055955    .0012508   -.0559547              .   84
+    1980-2019   -.00110461    .0013178    -.110461              .   84
+    1990-2019    .00008131    .0014044    .0081305       8525.66   84
+    1995-2019    .00181768    .0014633    .1817678      381.3365   84
+    2000-2019    .00364620    .0015739    .3646201      190.0984   84
+
+Benchmarks (Barro & Sala-i-Martin 1992, conditional convergence):
+  Speed: 2.00% per year
+  Half-life: 35 years
+```
+
+![Speed of unconditional convergence from NLS across six periods, with the 2% conditional convergence benchmark shown as a dashed line.](stata_convergence_speed_nls.png)
+
+The NLS results confirm the same pattern as the OLS conversion. For 2000--2019, NLS estimates $\beta$ = 0.00365 (SE = 0.00157, p = 0.023), identical to the OLS-derived value. The speed of 0.36% per year and half-life of 190 years are consistent across both methods. Notice that NLS provides a direct p-value for $\beta$: p = 0.023 confirms that unconditional convergence since 2000 is statistically significant at the 5% level. For 1960--2000, the NLS estimate of $\beta$ = -0.00402 (p = 0.004) confirms statistically significant *divergence*.
+
+---
+
+## 9. OLS vs NLS comparison
+
+How do the two methods compare side by side? The point estimates should be nearly identical, since both minimize the same sum of squared residuals --- the only difference is whether $\beta$ is estimated directly (NLS) or recovered algebraically from $\lambda$ (OLS).
+
+```text
+OLS vs NLS: Side-by-Side Comparison
+
+       period   lambda_ols     beta_ols     beta_nls        diff   speed_ols   speed_nls    n
+    1960-2000    .00436597   -.00402402   -.00402402   1.110e-16   -.4024021   -.4024021   84
+    1960-2019    .00056889   -.00055955   -.00055955   1.388e-17   -.0559547   -.0559547   84
+    1980-2019    .00113216   -.00110461   -.00110461   4.337e-17    -.110461    -.110461   84
+    1990-2019   -.00008191    .00008131    .00008131   1.735e-17    .0081305    .0081305   84
+    1995-2019   -.00178267    .00181768    .00181768   4.337e-17    .1817678    .1817678   84
+    2000-2019   -.00352278    .00364620    .00364620   4.337e-17    .3646201    .3646201   84
+```
+
+The differences are on the order of $10^{-17}$ --- effectively zero, confirming that the OLS conversion $\beta = -\ln(1 + \lambda s)/s$ and NLS direct estimation recover the same structural parameter. This equivalence holds because the Barro-Sala-i-Martin equation is a reparameterization of the linear model, not a fundamentally different specification. The choice between OLS and NLS is therefore about **convenience**, not correctness:
+
+- **Use OLS** when you want simplicity, speed, and guaranteed convergence of the estimation algorithm.
+- **Use NLS** when you want standard errors and p-values directly for $\beta$ without applying the delta method.
+
+Both approaches are correct. In the rolling-window and heatmap sections that follow, we present results from both methods.
+
+---
+
+## 10. Rolling beta convergence over time
+
+Instead of just two snapshots, we can watch the "full movie" of convergence by estimating a separate regression for every possible start year from 1960 to 2010, always ending in 2019. We do this twice --- once using OLS (with the $\lambda \to \beta$ conversion) and once using NLS (direct $\beta$ estimation) --- to confirm robustness across methods.
+
+### OLS rolling window
+
+```stata
+* For each start year, estimate OLS and convert λ → β
+forval startyear = 1960(1)2010 {
+    local s = 2019 - `startyear'
+    gen outcome = (1/`s') * ln(gdppc2019 / gdppc`startyear')
+    gen initial_inc = ln(gdppc`startyear')
+    reg outcome initial_inc, robust
+    local beta = -ln(1 + _b[initial_inc] * `s') / `s'
+}
+```
+
+```text
+Rolling OLS Beta Convergence: Key Findings
+
+    startyear        beta   speed_pct   halflife    n
+         1960   -.0005596   -.0559555          .   84
+         1970    -.000968   -.0967977          .   84
+         1980    -.001105   -.1104993          .   84
+         1990    .0000813    .0081259   8530.064   84
+         1995    .0018177    .1817691   381.334   84
+         2000    .0036462    .3646227   190.100   84
+         2005    .0044101    .4410113   157.172   84
+         2010    .0030897    .3089731   224.339   84
+```
+
+![Rolling OLS beta coefficient (converted from lambda) from each start year (1960-2010) to 2019, with 95% confidence intervals.](stata_convergence_rolling_beta_ols.png)
+
+### NLS rolling window
+
+```stata
+* For each start year, estimate NLS β directly
+forval startyear = 1960(1)2010 {
+    local s = 2019 - `startyear'
+    gen outcome = (1/`s') * ln(gdppc2019 / gdppc`startyear')
+    gen initial_inc = ln(gdppc`startyear')
+    nl (outcome = {b0=1} - (1 - exp(-1*{b1=0.00}*`s'))/`s' * initial_inc), vce(robust)
+}
+```
+
+```text
+Rolling NLS Beta Convergence: Key Findings
+
+    startyear        beta   speed_pct   halflife    n
+         1960   -.0005596   -.0559555          .   84
+         1970    -.000968   -.0967977          .   84
+         1980    -.001105   -.1104993          .   84
+         1990    .0000813    .0081259   8530.064   84
+         1995    .0018177    .1817691   381.334   84
+         2000    .0036462    .3646227   190.100   84
+         2005    .0044101    .4410113   157.172   84
+         2010    .0030897    .3089731   224.339   84
+```
+
+![Rolling NLS beta coefficient from each start year (1960-2010) to 2019, with 95% confidence intervals.](stata_convergence_rolling_beta_nls.png)
+
+The rolling beta coefficient tells a clear story of transition, and the OLS and NLS results are identical in every row. For start years in the 1960s through mid-1980s, $\beta$ is negative --- divergence. It then climbs steadily through the 1990s, crosses zero around 1990, and peaks at 0.00441 for start year 2005 (speed = 0.44%/yr, half-life = 157 years). For the most recent start years (2009--2010), the coefficient pulls back slightly to 0.00309 (half-life = 224 years), suggesting that convergence may have moderated --- possibly reflecting effects of the 2008 financial crisis. The two figures look identical because the OLS conversion and NLS give the same point estimates; the only difference is that the NLS confidence intervals are derived directly from $\beta$'s standard error, while the OLS intervals are transformed from $\lambda$'s. With convergence dynamics established, we now turn to a different question: is the actual spread of income across countries narrowing?
+
+---
+
+## 11. Sigma convergence: is the spread narrowing?
 
 Beta convergence asks whether poorer countries grow faster. **Sigma convergence** asks a different question: is the *dispersion* of income across countries getting smaller? We measure dispersion using the variance of log GDP per capita. If the variance decreases over time, incomes are bunching together (sigma convergence). If it increases, incomes are spreading apart (sigma divergence).
 
@@ -304,247 +525,136 @@ ci variances logy if year == 2019
 
 --- Cross-country dispersion in 2019 ---
     Variable |        Obs      Variance       [95% conf. interval]
-        logy |        124      1.483161       1.172503    1.936715
-  Std. Dev. = 1.2179
+        logy |         84      1.763502       1.329631    2.452057
+  Std. Dev. = 1.3280
 
 Sigma Convergence Test: 1960 vs 2019:
-  Change in variance: 0.5587 ( 60.4%)
+  Change in variance: 0.8391 ( 90.8%)
   Variance INCREASED: evidence of sigma-DIVERGENCE.
 ```
 
-![Bar chart comparing the variance of log GDP per capita in 1960 versus 2019, with 95% confidence intervals.](stata_convergence_sigma_two_periods.png)
+![Bar chart comparing the variance of log GDP per capita in 1960 versus 2019, with 95% confidence intervals. Both bars use the same 84 countries.](stata_convergence_sigma_two_periods.png)
 
-Comparing the two endpoints, the variance of log GDP per capita *increased* by 60.4%, from 0.924 in 1960 to 1.483 in 2019. The standard deviation rose from 0.96 to 1.22. In 2019, a one-standard-deviation move along the world income distribution corresponds to a roughly 3.4-fold difference in living standards ($e^{1.22}$ = 3.39), up from a 2.6-fold difference in 1960 ($e^{0.96}$ = 2.61). This is clear evidence of sigma *divergence* over the full period: the world income distribution widened substantially, even though beta convergence exists in the recent era. How can poorer countries be growing faster *and* the income spread be widening at the same time? The next section explains this apparent paradox.
+Comparing the two endpoints, the variance of log GDP per capita *increased* by 90.8%, from 0.924 in 1960 to 1.764 in 2019. The standard deviation rose from 0.96 to 1.33. In 2019, a one-standard-deviation move along the world income distribution corresponds to a roughly 3.8-fold difference in living standards ($e^{1.33}$ = 3.78), up from a 2.6-fold difference in 1960 ($e^{0.96}$ = 2.61). This is clear evidence of sigma *divergence* over the full period: the world income distribution widened substantially, even though beta convergence exists in the recent era. How can poorer countries be growing faster *and* the income spread be widening at the same time? The next section explains this apparent paradox.
 
 ---
 
-## 8. Why beta convergence is not enough
+## 12. Why beta convergence is not enough
 
 The seeming contradiction --- beta convergence without sigma convergence --- is not a paradox but a well-known theoretical result. Young, Higgins, and Levy (2008) proved that **beta convergence is necessary but not sufficient for sigma convergence**. Think of it like a race with wind gusts: even if the runners at the back are faster on average (beta convergence), random gusts can push some runners forward and others backward, keeping the pack spread out (no sigma convergence). The catch-up tendency must be strong enough to overcome the dispersing force of random shocks before the distribution actually narrows.
 
 ```stata
-* Decade-by-decade beta (OLS) and sigma (variance)
+* Decade-by-decade OLS λ and variance of log income
 foreach decade in 1960 1970 1980 1990 2000 2010 {
-    local ey = `decade' + 10
-    if `ey' > 2019 local ey = 2019
-    local s = `ey' - `decade'
-
-    * Beta: OLS slope of growth on initial income
-    gen g_temp = (1/`s') * ln(gdppc`ey' / gdppc`decade')
-    gen i_temp = ln(gdppc`decade')
+    * OLS slope of growth on initial income
     reg g_temp i_temp, robust
-    local b = _b[i_temp]
 
-    * Sigma: variance of log income at start of decade
-    gen logy_temp = ln(gdppc`decade')
+    * Variance of log income at start of decade
     summarize logy_temp
-    local v = r(Var)
-    drop g_temp i_temp logy_temp
 }
 ```
 
 ```text
-  Decade      | OLS beta  | sigma-sq  | Interpretation
-  1960-1970   |  0.00594  |   0.9244  | beta>=0: divergence
-  1970-1980   |  0.00527  |   1.0513  | beta>=0: divergence
-  1980-1990   |  0.00549  |   1.2440  | beta>=0: divergence
-  1990-2000   |  0.00210  |   1.3495  | beta>=0: divergence
-  2000-2010   | -0.00422  |   1.5699  | beta<0: convergence
-  2010-2019   | -0.00312  |   1.5291  | beta<0: convergence
+  Decade      | OLS λ     | σ² start  | Interpretation
+  1960-1970   |  0.00594  |   0.9244  | λ≥0: divergence
+  1970-1980   |  0.00555  |   1.0818  | λ≥0: divergence
+  1980-1990   |  0.00686  |   1.2893  | λ≥0: divergence
+  1990-2000   |  0.00882  |   1.5384  | λ≥0: divergence
+  2000-2010   | -0.00379  |   1.8937  | λ<0: convergence
+  2010-2019   | -0.00305  |   1.8262  | λ<0: convergence
 ```
 
-The decade-by-decade view confirms the theory in action. The OLS beta turns negative (convergence) in 2000--2010, but the variance of log income does not begin declining until after 2008 --- it actually peaks at 1.604 in 2008 before falling to 1.529 by 2010 and 1.483 by 2019. This creates an approximately **13-year lag**: poorer countries started growing faster around 1995--2000, but the overall income distribution only began narrowing around 2008. For over a decade, random growth shocks --- economic crises, commodity price swings, conflict --- offset the systematic catch-up tendency before the convergence force became strong enough to dominate. Now that we have established both the existence and the timing of convergence, the next sections examine its robustness across different time windows.
+The decade-by-decade view confirms the theory in action. The OLS $\lambda$ turns negative (convergence) in 2000--2010, but the variance of log income does not begin declining until after 2008 --- it peaks at 1.918 in 2008 before falling to 1.826 by 2010 and 1.764 by 2019. This creates an approximately **8-year lag**: poorer countries started growing faster around 2000, but the overall income distribution only began narrowing around 2008. For nearly a decade, random growth shocks --- economic crises, commodity price swings, conflict --- offset the systematic catch-up tendency before the convergence force became strong enough to dominate. Now that we have established both the existence and the timing of convergence, the next section tracks sigma convergence year by year.
 
 ---
 
-## 9. Rolling beta convergence over time
+## 13. Sigma convergence over time
 
-Instead of just two snapshots, we can watch the "full movie" of convergence by estimating a separate NLS regression for every possible start year from 1960 to 2010, always ending in 2019. This rolling-window approach reveals exactly when convergence emerged and how its strength has evolved year by year. It also tests whether the result is an artifact of choosing specific endpoints.
-
-```stata
-* For each start year, estimate NLS convergence to 2019
-forval startyear = 1960(1)2010 {
-    local s = 2019 - `startyear'
-
-    gen outcome = (1/`s') * ln(gdppc2019 / gdppc`startyear')
-    gen initial = ln(gdppc`startyear')
-
-    * NLS estimation
-    nl (outcome = {b0=1} - (1 - exp(-1*{b1=0.00}*`s'))/`s' * initial) ///
-        if !missing(outcome) & !missing(initial), vce(robust)
-
-    * Store beta, SE, confidence interval, speed, and half-life
-    * [results saved to dataset]
-    drop outcome initial
-}
-```
-
-```text
-Rolling Beta Convergence: Key Findings
-
-    startyear        beta   speed_pct   halflife     n
-         1960   -.0005596   -.0559555          .    84
-         1970    .0001352    .0135177   5144.336   100
-         1980     .000151    .0150984    4604.05   101
-         1990    .0020381    .2038144   349.8904   121
-         1995    .0029834    .2983395   240.4053   123
-         2000    .0042508    .4250831   169.3883   124
-         2005    .0043072    .4307223   165.4807   124
-         2010    .0031609    .3160909   222.0745   124
-```
-
-![Rolling NLS beta coefficient from each start year (1960-2010) to 2019, with 95% confidence intervals. Beta transitions from negative to positive, with the CI excluding zero from around 1994 onward.](stata_convergence_rolling_beta.png)
-
-The rolling beta coefficient tells a clear story of transition. For start years in the 1960s through mid-1980s, beta is negative or near zero --- no convergence. It then climbs steadily through the 1990s and peaks at 0.00517 for start year 2008 (speed = 0.52%/yr, half-life = 138 years), the strongest unconditional convergence rate observed in any window. For the most recent start years (2009--2010), the coefficient pulls back slightly to 0.00316 (half-life = 222 years), suggesting that convergence may have moderated in the most recent decade --- possibly reflecting the 2008 financial crisis or COVID-19 effects. Crucially, the 95% confidence intervals exclude zero from approximately 1994 onward, confirming that the convergence finding is statistically robust and not an artifact of endpoint selection. The next section applies the same rolling-window logic to sigma convergence.
-
----
-
-## 10. Sigma convergence over time
-
-We now track the dispersion of income every year from 1960 to 2019. To ensure that changes in dispersion are not driven by the changing composition of the sample (more countries enter as PWT coverage expands), we compute two series: a **full sample** (all available countries each year) and a **fixed sample** (only the 101 countries with complete data from 1980 to 2019).
+We now track the dispersion of income every year from 1960 to 2019. Because we use a balanced panel of 84 countries, the sample composition is constant throughout --- there is no need for a separate "fixed sample" series to control for changing coverage.
 
 ```stata
-* Full sample: variance of log GDP per capita each year
+* Variance of log GDP per capita each year (84-country balanced panel)
 forval yr = 1960(1)2019 {
     gen logy = ln(gdppc`yr')
     ci variances logy
-    * [store variance, CI, and N]
-    drop logy
-}
-
-* Fixed sample: countries with complete 1980-2019 data (N = 101)
-forval yr = 1980(1)2019 {
-    gen logy = ln(gdppc`yr')
-    ci variances logy
-    * [store variance, CI, and N]
     drop logy
 }
 ```
 
 ```text
-Full sample:
-    year   variance     n
-    1960   .9244376    84
-    1970   1.051313   100
-    1980   1.244039   101
-    1990   1.349519   121
-    2000   1.569856   124
-    2008   1.603955   124   (peak)
-    2010   1.529079   124
-    2019   1.483161   124
+Sigma Convergence Over Time: Key Years
 
-Fixed sample (1980-2019, N = 101):
-    year   variance     n
-    1980   1.244039   101
-    1990   1.462332   101
-    2000   1.774677   101
-    2006   1.788382   101   (peak)
-    2008   1.777381   101
-    2010   1.704768   101
-    2019   1.627619   101
+    year   variance    n
+    1960   .9244376   84
+    1970   1.081847   84
+    1980   1.289282   84
+    1990    1.53844   84
+    2000   1.893675   84
+    2008   1.918209   84   (peak)
+    2010   1.826223   84
+    2019   1.763502   84
 ```
 
-![Year-by-year variance of log GDP per capita for the full sample and fixed sample, with 95% confidence intervals. Both series peak around 2006-2008 and decline thereafter.](stata_convergence_sigma_evolution.png)
+![Year-by-year variance of log GDP per capita for the 84-country balanced panel, with 95% confidence intervals. The variance peaks around 2008 and declines thereafter.](stata_convergence_sigma_evolution.png)
 
-The variance series tells a two-act story. **Act one (1960--2008):** variance rose almost continuously from 0.924 to a peak of 1.604, an increase of 73% over nearly five decades. **Act two (2008--2019):** variance declined from 1.604 to 1.483, a drop of 7.5%. The fixed-sample series confirms this pattern is not an artifact of changing sample composition --- it shows the variance peaking at 1.788 in 2006 and declining to 1.628 by 2019, a 9.0% decline from peak. Both series agree: sigma convergence is a genuinely recent phenomenon, emerging only after the mid-2000s. Even so, the 2019 variance (1.483) remains 60% higher than the 1960 value (0.924). The recent narrowing is real but has barely begun to undo decades of divergence. The next section provides the most comprehensive view of convergence by examining every possible time window.
+The variance series tells a two-act story. **Act one (1960--2008):** variance rose almost continuously from 0.924 to a peak of 1.918, an increase of 108% over nearly five decades. **Act two (2008--2019):** variance declined from 1.918 to 1.764, a drop of 8.1%. Sigma convergence is a genuinely recent phenomenon, emerging only after the mid-2000s. Even so, the 2019 variance (1.764) remains 91% higher than the 1960 value (0.924). The recent narrowing is real but has barely begun to undo decades of divergence. The next section provides the most comprehensive view of convergence by examining every possible time window.
 
 ---
 
-## 11. The convergence heatmap
+## 14. The convergence heatmap
 
-The heatmap is the most comprehensive visualization of convergence dynamics. For every possible start-year and end-year combination from 1960 to 2019, we estimate a separate NLS regression --- approximately 1,770 regressions in total --- and color-code the result. Blue indicates convergence ($\beta > 0$) and red indicates divergence ($\beta < 0$), following Patel et al. (2021) Figure 2.
+The heatmap is the most comprehensive visualization of convergence dynamics. For every possible start-year and end-year combination from 1960 to 2019, we estimate a separate regression --- approximately 1,770 regressions --- and color-code the result. Blue indicates convergence ($\beta > 0$) and red indicates divergence ($\beta < 0$). We produce two heatmaps: one using the OLS $\lambda \to \beta$ conversion and one using NLS direct estimation, following Patel et al. (2021) Figure 2.
 
 ```stata
 * Loop over ALL start/end year combinations
 forval startyear = 1960(1)2018 {
-    local startplus1 = `startyear' + 1
-    forval outcomeyear = `startplus1'(1)2019 {
-        local s = `outcomeyear' - `startyear'
+    forval outcomeyear = `startyear'+1 (1) 2019 {
+        * OLS: estimate λ, convert to β = -ln(1+λs)/s
+        reg outcome initial_inc, robust
 
-        gen outcome = (1/`s') * ln(gdppc`outcomeyear' / gdppc`startyear')
-        gen initial = ln(gdppc`startyear')
-
-        * NLS estimation
-        nl (outcome = {b0=1} - (1 - exp(-1*{b1=0.00}*`s'))/`s' * initial) ///
-            if !missing(outcome) & !missing(initial), vce(robust)
-
-        * [store beta, SE, N for each start-end pair]
-        drop outcome initial
+        * NLS: estimate β directly
+        nl (outcome = {b0=1} - (1 - exp(-1*{b1=0.00}*`s'))/`s' * initial_inc), vce(robust)
     }
 }
 ```
 
-![Convergence heatmap: every start-year and end-year combination color-coded by NLS beta. Blue (upper-right) indicates convergence in recent periods; red (center-left) indicates divergence in earlier periods.](stata_convergence_heatmap.png)
+### OLS heatmap
 
-The pattern is strikingly clear. The upper-right triangle (periods ending in 2010--2019) is dominated by blue, while the central and lower-left regions (periods ending before 2000) are dominated by red. The deepest red ($\beta < -0.0055$) is concentrated in short windows during the 1970s--1980s, when divergence was strongest. The deepest blue ($\beta > 0.0035$) appears for windows ending in 2015--2019 and starting after 1990. The transition from red to blue occurs gradually along diagonals, with the crossover point moving from the upper right toward the center. This confirms that the convergence finding is not an artifact of choosing 2019 as the end year --- it appears robustly across many end-year choices in the 2010s. Along the diagonal (short intervals), estimates are noisier due to smaller samples and shorter periods. The heatmap faithfully reproduces the pattern from Patel et al. (2021) Figure 2. But which regions of the world are driving this global pattern? The final analytical section answers this question.
+![Convergence heatmap using OLS (lambda to beta conversion): every start-year and end-year combination color-coded by structural beta. Blue indicates convergence in recent periods; red indicates divergence in earlier periods.](stata_convergence_heatmap_ols.png)
 
----
+### NLS heatmap
 
-## 12. Regional decomposition: who drives convergence?
+![Convergence heatmap using NLS (direct estimation): every start-year and end-year combination color-coded by NLS beta. The pattern is virtually identical to the OLS heatmap.](stata_convergence_heatmap_nls.png)
 
-Global convergence could be driven by rapid catch-up in one region or broadly shared across the developing world. To find out, we drop one region at a time and re-estimate the convergence coefficient. If removing a region weakens convergence, that region was boosting the global result. If removing it strengthens convergence, that region was dragging it down.
-
-```stata
-* Assign regions using kountry
-kountry ccode, from(iso3c) geo(undet)
-gen clusters = "West" if regexm(GEO, "Europe") | regexm(GEO, "Australia") | ///
-    inlist(country, "Canada", "United States")
-replace clusters = "Africa" if regexm(GEO, "Africa")
-replace clusters = "Latin America" if inlist(GEO, "South America", ///
-    "Caribbean", "Central America")
-replace clusters = "Asia" if regexm(GEO, "Asia") | ///
-    inlist(GEO, "Melanesia", "Micronesia", "Polynesia")
-
-* For each start year, estimate OLS dropping each region
-forval startyear = 1960(1)2010 {
-    reg outcome initial, robust                                    // Full sample
-    reg outcome initial if clusters != "Africa", robust            // Minus Africa
-    reg outcome initial if clusters != "Asia", robust              // Minus Asia
-    reg outcome initial if clusters != "Latin America", robust     // Minus LatAm
-}
-```
-
-```text
-Regional distribution of countries:
-     clusters |      Freq.     Percent
-       Africa |         37       29.84
-         Asia |         31       25.00
-Latin America |         18       14.52
-         West |         38       30.65
-        Total |        124      100.00
-```
-
-![Rolling OLS beta (converted to NLS-equivalent) for the full sample and for samples that exclude Africa, Asia, or Latin America one at a time.](stata_convergence_regional_beta.png)
-
-The regional decomposition reveals the geographic engine of convergence. Dropping Asia eliminates convergence entirely for most start years --- the "World Minus Asia" line stays near zero or below throughout the 1960--2010 range. Asia's rapid catch-up growth, driven by China, India, and the East Asian economies, is the primary force behind the global convergence result. Conversely, dropping Africa *strengthens* convergence substantially, because Africa's heterogeneous growth performance --- strong growth in some countries, stagnation or decline in others --- weakens the global catch-up signal. Dropping Latin America has only a modest effect, with the coefficient remaining close to the full-sample estimate. Of the 124 countries in the 2019 sample, 37 are African, 31 Asian, 18 Latin American, and 38 Western.
+The pattern is strikingly clear and identical across both methods. The upper-right triangle (periods ending in 2010--2019) is dominated by blue, while the central and lower-left regions (periods ending before 2000) are dominated by red. The deepest red ($\beta < -0.0055$) is concentrated in short windows during the 1970s--1980s, when divergence was strongest. The deepest blue ($\beta > 0.0035$) appears for windows ending in 2015--2019 and starting after 1990. The transition from red to blue occurs gradually along diagonals, with the crossover point moving from the upper right toward the center. This confirms that the convergence finding is not an artifact of choosing specific endpoints --- it appears robustly across many time windows. Along the diagonal (short intervals), estimates are noisier due to shorter periods. The two heatmaps are virtually indistinguishable, providing a final confirmation that OLS conversion and NLS direct estimation yield the same results.
 
 ---
 
-## 13. Discussion
+## 15. Discussion
 
 We set out to ask whether the world has entered a new era of unconditional convergence and how fast it is happening. The evidence is clear: **yes, unconditional convergence is real since approximately 2000, but it is very slow.**
 
-The NLS speed of convergence for 2000--2019 is 0.43% per year ($\beta$ = 0.00425), with a half-life of 169 years. To put this in perspective, at this pace, a country currently at one-tenth of US income per capita would need nearly two centuries to close just half the gap --- not to catch up entirely, but merely to halve the distance. This is five times slower than the classic 2%/year benchmark for conditional convergence (Barro and Sala-i-Martin, 1992), which controls for human capital, institutions, and savings rates. The fact that unconditional convergence exists *at all* is remarkable, but its pace should temper optimism about automatic catch-up.
+The speed of convergence for 2000--2019 is 0.36% per year ($\beta$ = 0.00365, p = 0.023), with a half-life of 190 years --- both OLS conversion and NLS direct estimation give this identical result. To put this in perspective, at this pace, a country currently at one-tenth of US income per capita would need nearly two centuries to close just half the gap --- not to catch up entirely, but merely to halve the distance. This is roughly five times slower than the classic 2%/year benchmark for conditional convergence (Barro and Sala-i-Martin, 1992), which controls for human capital, institutions, and savings rates. The fact that unconditional convergence exists *at all* is remarkable, but its pace should temper optimism about automatic catch-up.
 
-The sigma convergence results add an important nuance. Even though poorer countries have been growing faster since around 2000, the actual spread of world incomes only began narrowing after 2008 --- a 13-year lag. And even with this recent narrowing, the 2019 income distribution is still 60% wider than in 1960. A policymaker looking at these results would conclude that convergence forces alone are far too slow to eliminate global poverty or close income gaps within any reasonable planning horizon. Active investment in education, infrastructure, institutions, and technology transfer remains essential.
+The sigma convergence results add an important nuance. Even though poorer countries have been growing faster since around 2000, the actual spread of world incomes only began narrowing after 2008 --- an 8-year lag. And even with this recent narrowing, the 2019 income distribution is still 91% wider than in 1960. A policymaker looking at these results would conclude that convergence forces alone are far too slow to eliminate global poverty or close income gaps within any reasonable planning horizon. Active investment in education, infrastructure, institutions, and technology transfer remains essential.
 
-The regional decomposition underscores that global convergence is not broadly shared: it is driven overwhelmingly by Asia. Without Asia's rapid growth, there would be no unconditional convergence at all. Africa, despite recent growth acceleration in several countries, remains heterogeneous enough to weaken the global signal. This suggests that the "new era of convergence" is still fragile and geographically concentrated.
+A methodological contribution of this tutorial is demonstrating that the OLS $\lambda \to \beta$ conversion and NLS direct estimation are algebraically equivalent, producing identical point estimates. The choice between methods is one of convenience: OLS for simplicity, NLS for direct inference on $\beta$. Students can start with the familiar OLS framework and add NLS when they need standard errors for the structural parameter.
 
 ---
 
-## 14. Summary and next steps
+## 16. Summary and next steps
 
 ### Key takeaways
 
 1. **No convergence over 1960--2019 as a whole** (OLS $\lambda$ = 0.00057, p = 0.661), but this null result conceals a dramatic structural break around the year 2000.
-2. **Unconditional convergence since 2000** at a speed of 0.43% per year ($\beta$ = 0.00425, half-life = 169 years, N = 124). This is statistically significant but five times slower than conditional convergence.
-3. **Sigma convergence lags beta convergence by ~13 years.** The income variance peaked at 1.604 in 2008 and declined 7.5% by 2019. Random growth shocks delayed the narrowing of the distribution even as poorer countries grew faster on average.
-4. **Asia drives convergence; Africa attenuates it.** Dropping Asia eliminates the convergence result entirely. Dropping Africa strengthens it. The "new era" is geographically concentrated.
-5. **The income distribution remains 60% wider than in 1960.** Despite post-2008 sigma convergence, the 2019 variance of log GDP per capita (1.483) far exceeds the 1960 value (0.924). A one-standard-deviation move in the 2019 distribution corresponds to a 3.4-fold difference in living standards.
+2. **Unconditional convergence since 2000** at a speed of 0.36% per year ($\beta$ = 0.00365, half-life = 190 years, N = 84, p = 0.023). This is statistically significant but five times slower than conditional convergence.
+3. **OLS and NLS give identical results.** The algebraic conversion $\beta = -\ln(1 + \lambda s)/s$ recovers the same structural parameter as direct NLS estimation, confirming both methods are valid.
+4. **Sigma convergence lags beta convergence by ~8 years.** The income variance peaked at 1.918 in 2008 and declined 8.1% by 2019. Random growth shocks delayed the narrowing of the distribution even as poorer countries grew faster on average.
+5. **The income distribution remains 91% wider than in 1960.** Despite post-2008 sigma convergence, the 2019 variance of log GDP per capita (1.764) far exceeds the 1960 value (0.924). A one-standard-deviation move in the 2019 distribution corresponds to a 3.8-fold difference in living standards.
 
 ### Limitations
 
-- The sample grows from 84 to 124 countries over time as PWT coverage expands, which introduces composition effects in the sigma convergence comparisons.
+- The analysis uses a balanced panel of 84 countries with data available since 1960, excluding 40 countries that entered PWT coverage after 1960. These excluded countries are disproportionately from Africa and small island states, so the results may not generalize to the full set of developing countries.
 - The convergence regressions explain very little of the cross-country growth variation (R-squared from 0.001 to 0.069). The research question is about the sign and significance of the relationship, not prediction.
 - The most recent rolling-window estimates (start years 2009--2010) show some moderation in convergence speed, but shorter growth windows also mean more noise.
 - Results depend on the choice of income measure (expenditure-side real GDP at chained PPPs) and sample restrictions (excluding oil producers and small countries).
@@ -558,7 +668,7 @@ The regional decomposition underscores that global convergence is not broadly sh
 
 ---
 
-## 15. Exercises
+## 17. Exercises
 
 1. **Change the breakpoint.** Instead of splitting at the year 2000, try splitting at 1990 or 1995. Does the convergence coefficient in the recent era change? At what breakpoint does the coefficient first become significantly negative?
 
@@ -568,7 +678,7 @@ The regional decomposition underscores that global convergence is not broadly sh
 
 ---
 
-## 16. References
+## 18. References
 
 1. [Patel, D., Sandefur, J., and Subramanian, A. (2021). The New Era of Unconditional Convergence. *Journal of Development Economics*, 152, 102687.](https://doi.org/10.1016/j.jdeveco.2021.102687)
 2. [Barro, R. J. and Sala-i-Martin, X. (1992). Convergence. *Journal of Political Economy*, 100(2), 223--251.](https://doi.org/10.1086/261816)
