@@ -1151,15 +1151,15 @@ preserve
        xlabel(1960 "1960" 2019 "2019")
        ylabel(, angle(horizontal))
        ytitle("Variance of ln(GDP per capita)")
-       title("Sigma Convergence: Cross-Country Income Dispersion", color("20 20 19"))
-       subtitle("Has the spread of income across countries narrowed?", color("20 20 19") size(small))
+       title("Sigma Convergence: Income Dispersion", color("20 20 19"))
+       subtitle("Has the spread of income narrowed?", color("20 20 19") size(small))
        legend(order(1 "1960 (N=`n_1960')" 2 "2019 (N=`n_2019')" 3 "95% CI") pos(2) ring(0)
               region(lcolor(none) fcolor(none)) size(small))
        plotregion(style(none) lcolor(none))
        graphregion(fcolor(white) lcolor(white))
        note("Data: Penn World Tables 10.0. 84-country balanced panel."
             "Variance of log GDP per capita (PPP).", size(vsmall))
-       xsize(4) ysize(4)
+       xsize(5) ysize(4)
     ;
     #delimit cr
     graph export "stata_convergence_sigma_two_periods.png", replace width(2400)
