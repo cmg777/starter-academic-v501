@@ -51,6 +51,16 @@ The stata_convergence tutorial was re-engineered to fix two problems:
 - 10 new PNGs generated (added speed_ols, speed_nls, rolling_beta_ols, rolling_beta_nls, heatmap_ols, heatmap_nls)
 - 4 old PNGs deleted (heatmap, regional_beta, rolling_beta, speed_halflife)
 
+## Follow-up: Rolling-window pedagogy and CI explanations (same day)
+
+Added a new Section 10 (Introduction to rolling windows) that builds up the concept progressively:
+- Mermaid diagram showing the rolling-window logic
+- Rolling OLS lambda figure (raw slope coefficient over time, warm orange)
+- Full CI walkthrough: OLS CI for lambda, then transformation to beta CI with bound-flipping using actual 2000-2019 numbers
+- Chi-squared CI explanation for sigma (variance) added to Sections 12 and 14
+
+Tutorial now has 19 sections (was 18) and 11 figures (was 10).
+
 ## Key numbers (84-country balanced panel)
 - 2000-2019: beta = 0.00365, speed = 0.36%/yr, half-life = 190 years, p = 0.023
 - Sigma: 0.924 (1960) to 1.764 (2019), +90.8%, peak at 1.918 in 2008
