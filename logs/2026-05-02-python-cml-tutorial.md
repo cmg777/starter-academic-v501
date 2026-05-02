@@ -51,3 +51,16 @@ The post was produced through the eight-skill data-science pipeline:
 - `content/post/python_cml/results_report_review.md` — internal `/project:review-results-report` report
 
 These are pipeline artifacts that informed development but don't belong in the published repo. Precedent: `content/post/python_dowhy/` and `content/post/python_doubleml/` carry no equivalent files.
+
+## Commits
+
+- **`2d5b203`** — Initial publication of the tutorial. 24 files, 17,267 insertions: post + notebook + infographic + featured image + script + 6 figures + 9 CSVs + results report + log entry.
+- **`83e2271`** — Front-matter polish: removed the "Methodology notes" link from `index.md`. The post header now surfaces 3 links (Google Colab, Python script, Jupyter notebook). `results_report.md` remains in the repo as a backing artifact but is no longer user-visible from the post UI.
+
+## Final post-header links
+
+| Icon | Label | URL |
+|---|---|---|
+| `open-data` (academicons) | `[Python] Google Colab` | `https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_cml/notebook.ipynb` |
+| `code` (fas) | Python script | `script.py` |
+| `book` (fas) | Jupyter notebook | `notebook.ipynb` |
