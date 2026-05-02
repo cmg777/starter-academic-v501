@@ -1,0 +1,2 @@
+method,estimate,std_error,ci_low,ci_high,true_ate,covers_truth
+"DoubleML (DoubleMLIRM, RF nuisances, 5-fold CF)",5.520249031295549,0.08139114573835295,5.360725316987926,5.679772745603172,5.628034197475965,True

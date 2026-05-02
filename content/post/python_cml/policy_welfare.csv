@@ -1,0 +1,5 @@
+rule,share_treated,avg_welfare,cost_assumption_months
+Treat none,0.0,0.0,4.0
+Treat all,1.0,1.628034197475965,4.0
+IATE rule (treat where iate_hat > cost),0.8392,1.7493674489231992,4.0
+Oracle (treat where true tau > cost),0.8376,1.7579545228447475,4.0

@@ -1,0 +1,93 @@
+======================================================================
+ Step 1 — Generate the synthetic cohort
+======================================================================
+Sample size               : 5,000
+Treatment share P(D=1)    : 0.528
+Mean outcome E[Y]         : 22.68 months employed (out of 30)
+Files written             : cml_data.csv, cml_truth.csv
+
+Ground-truth parameters (extra months of employment caused by training):
+         parameter  true_value
+               ATE       5.628
+GATE(dutch_prof=0)       7.634
+GATE(dutch_prof=1)       6.123
+GATE(dutch_prof=2)       4.612
+GATE(dutch_prof=3)       3.130
+
+======================================================================
+ Step 2 — Overlap diagnostic (do treated and untreated overlap?)
+======================================================================
+Propensity range          : [0.208, 0.810]
+P(D=1 | X) mean (treated) : 0.551
+P(D=1 | X) mean (untreat.): 0.502
+Saved figure              : cml_overlap.png
+
+======================================================================
+ Step 3 — Naive estimator: difference in means
+======================================================================
+  WARNING: with observational data this estimator IS biased.
+True ATE                  : 5.628
+Naive estimate            : 5.111 [95% CI 4.926, 5.296]
+Bias                      : -0.517 months
+
+======================================================================
+ Step 4 — ATE via Double Machine Learning
+======================================================================
+True ATE                  : 5.628
+DoubleML ATE              : 5.520 [95% CI 5.361, 5.680]
+95% CI covers truth       : True
+Bias                      : -0.108 months
+
+======================================================================
+ Step 5 — GATE by Dutch language proficiency
+======================================================================
+  Doubly robust scores from DoubleML, averaged within each stratum.
+ dutch_prof    n  gate_estimate  std_error  ci_low  ci_high  gate_true
+          0 1302          7.465      0.157   7.157    7.772      7.634
+          1 1469          6.127      0.140   5.852    6.402      6.123
+          2 1504          4.503      0.142   4.225    4.781      4.612
+          3  725          2.910      0.214   2.490    3.329      3.130
+Saved figure              : cml_gate_dutch.png
+
+======================================================================
+ Step 6 — IATE via Causal Forest DML
+======================================================================
+  Forest splits on heterogeneity; produces per-individual effects + CIs.
+True ATE                  : 5.628
+Mean of estimated IATEs   : 5.456
+MAE(IATE, truth)          : 0.397
+Corr(IATE, truth)         : 0.956
+Saved figure              : cml_iate_scatter.png
+Saved figure              : cml_iate_distribution.png
+
+======================================================================
+ Step 7 — Method comparison
+======================================================================
+                         method  estimate  ci_low  ci_high    bias
+                    Naive (DiM)     5.111   4.926    5.296  -0.517
+                 DoubleML (IRM)     5.520   5.361    5.680  -0.108
+CausalForestDML (mean of IATEs)     5.456   5.416    5.497  -0.172
+                          Truth     5.628   5.628    5.628   0.000
+Saved figure              : cml_method_comparison.png
+
+======================================================================
+ Step 8 — Simple welfare-maximising policy rule
+======================================================================
+                                   rule  share_treated  avg_welfare  cost_assumption_months
+                             Treat none          0.000        0.000                   4.000
+                              Treat all          1.000        1.628                   4.000
+IATE rule (treat where iate_hat > cost)          0.839        1.749                   4.000
+   Oracle (treat where true tau > cost)          0.838        1.758                   4.000
+Saved figure              : cml_policy_welfare.png
+
+======================================================================
+ Summary
+======================================================================
+True ATE                                : 5.628
+Naive (DiM)                             : 5.111  (bias -0.517)
+DoubleML (IRM)                          : 5.520  (bias -0.108)
+CausalForestDML (mean of IATEs)         : 5.456  (bias -0.172)
+Best policy rule (welfare)              : Oracle (treat where true tau > cost)
+README.md written                       : yes
+
+=== Script completed successfully ===
