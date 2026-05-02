@@ -27,10 +27,6 @@ links:
     icon_pack: fas
     name: "Jupyter notebook"
     url: notebook.ipynb
-  - icon: file-alt
-    icon_pack: fas
-    name: "Methodology notes"
-    url: results_report.md
 slides:
 summary: "A beginner-friendly walk-through of Causal Machine Learning — ATE, GATE, IATE, and welfare-maximising assignment — using DoubleML and EconML on a synthetic Flanders ALMP-style cohort with known true effects."
 tags:
