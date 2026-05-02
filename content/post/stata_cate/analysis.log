@@ -1,0 +1,1060 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_cate/analysis.log
+  log type:  text
+ opened on:   2 May 2026, 21:43:39
+
+. 
+. 
+. *================================================================
+. * Section 0: Stata 19 version gate
+. *================================================================
+. *
+. * The -cate- command is brand-new in Stata 19. There is NO
+. * equivalent in Stata 18 or earlier. We refuse to run on older
+. * Stata so that the user gets a clear error rather than a stream
+. * of "command cate is unrecognized" messages.
+. *----------------------------------------------------------------
+. 
+. if c(stata_version) < 19 {
+.     di as error ""
+.     di as error "============================================================
+> "
+.     di as error "  ERROR: this script requires Stata 19 or later."
+.     di as error "  Detected Stata version: " c(stata_version)
+.     di as error "  The -cate- command was introduced in Stata 19."
+.     di as error "============================================================
+> "
+.     log close
+.     exit 198
+. }
+
+. 
+. di as text "Stata version detected: " c(stata_version) "  -- OK."
+Stata version detected: 19  -- OK.
+
+. 
+. 
+. *================================================================
+. * Section 1: Setup -- globals and reproducibility
+. *================================================================
+. *
+. * Two macros control the analysis:
+. *
+. *   $catecovars: the variables for which we want to know how the
+. *                effect varies. These are the inputs to tau(x).
+. *
+. *   $controls:  variables used by the nuisance functions (the
+. *               outcome model g(x,w) and the treatment model
+. *               f(x,w)). Often the same as catecovars, but you
+. *               can pass a richer set with interactions to soak
+. *               up confounding without overcomplicating tau(x).
+. *
+. * The seed makes cross-fitting and the random-forest internals
+. * reproducible. We use the same seed throughout.
+. *----------------------------------------------------------------
+. 
+. global catecovars age educ i.incomecat i.pension i.married i.twoearn i.ira i.
+> ownhome
+
+. global controls   age educ i.incomecat i.pension i.married i.twoearn i.ira i.
+> ownhome
+
+. global rseed      12345671
+
+. 
+. 
+. *================================================================
+. * Section 2: Data loading and exploration
+. *================================================================
+. *
+. * assets3 is shipped with Stata's example data. Each row is one
+. * household. e401k = 1 if the household is eligible for a 401(k)
+. * through their employer; 0 otherwise. asset is total net
+. * financial assets in dollars.
+. *----------------------------------------------------------------
+. 
+. webuse assets3, clear
+(Excerpt from Chernozhukov and Hansen (2004))
+
+. 
+. * Quick variable description and sample size
+. describe asset e401k age educ income incomecat pension married twoearn ira ow
+> nhome
+
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-------------------------------------------------------------------------------
+assets          float   %9.0g                 Net total financial assets
+e401k           byte    %12.0g     lbe401     401(k) eligibility
+age             byte    %9.0g                 Age
+educ            byte    %9.0g                 Years of education
+income          float   %9.0g                 Household income
+incomecat       byte    %9.0g                 Income category
+pension         byte    %16.0g     lbpen      Pension benefits
+married         byte    %11.0g     lbmar      Marital status
+twoearn         byte    %9.0g      lbyes      Two-earner household
+ira             byte    %9.0g      lbyes      IRA participation
+ownhome         byte    %9.0g      lbyes      Homeowner
+
+. 
+. * Summary statistics
+. summarize asset e401k age educ income, detail
+
+                 Net total financial assets
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%       -23500        -502302
+ 5%        -9000        -409000
+10%        -4757        -336789       Obs               9,913
+25%         -500        -315701       Sum of wgt.       9,913
+
+50%         1499                      Mean           18054.17
+                        Largest       Std. dev.      63528.63
+75%        16549        1317947
+90%        54860        1324445       Variance       4.04e+09
+95%        91999        1462115       Skewness       10.63739
+99%       219948        1536798       Kurtosis       186.7368
+
+                     401(k) eligibility
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs               9,913
+25%            0              0       Sum of wgt.       9,913
+
+50%            0                      Mean           .3714315
+                        Largest       Std. dev.      .4832118
+75%            1              1
+90%            1              1       Variance       .2334937
+95%            1              1       Skewness       .5321684
+99%            1              1       Kurtosis       1.283203
+
+                             Age
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           25             25
+ 5%           26             25
+10%           28             25       Obs               9,913
+25%           32             25       Sum of wgt.       9,913
+
+50%           40                      Mean           41.05891
+                        Largest       Std. dev.       10.3446
+75%           48             64
+90%           57             64       Variance       107.0107
+95%           60             64       Skewness       .4023391
+99%           63             64       Kurtosis       2.196163
+
+                     Years of education
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            4              1
+ 5%            9              1
+10%           11              1       Obs               9,913
+25%           12              1       Sum of wgt.       9,913
+
+50%           12                      Mean           13.20629
+                        Largest       Std. dev.      2.810628
+75%           16             18
+90%           17             18       Variance       7.899629
+95%           18             18       Skewness      -.6430457
+99%           18             18       Kurtosis       4.969568
+
+                      Household income
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%         4107              0
+ 5%         8916              0
+10%        12240              0       Obs               9,913
+25%        19413             27       Sum of wgt.       9,913
+
+50%        31488                      Mean            37208.4
+                        Largest       Std. dev.      24770.73
+75%        48585         192990
+90%        69612         199041       Variance       6.14e+08
+95%        86400         200997       Skewness       1.565042
+99%       119133         242124       Kurtosis       6.898131
+
+. 
+. * Treatment-group sizes (raw counts and proportions)
+. tab e401k, missing
+
+      401(k) |
+ eligibility |      Freq.     Percent        Cum.
+-------------+-----------------------------------
+Not eligible |      6,231       62.86       62.86
+    Eligible |      3,682       37.14      100.00
+-------------+-----------------------------------
+       Total |      9,913      100.00
+
+. 
+. * Naive mean-difference (NOT a causal estimate -- groups differ
+. * in age, income, education, etc.). This is the "before doing
+. * anything sensible" benchmark.
+. tabstat asset, by(e401k) statistics(mean sd n)
+
+Summary for variables: assets
+Group variable: e401k (401(k) eligibility)
+
+       e401k |      Mean        SD         N
+-------------+------------------------------
+Not eligible |   10789.9  54527.02      6231
+    Eligible |  30347.39  74800.21      3682
+-------------+------------------------------
+       Total |  18054.17  63528.63      9913
+--------------------------------------------
+
+. 
+. * Export the raw dataset so the blog post / report skill can
+. * reference exact numbers without rerunning Stata.
+. export delimited asset e401k age educ income incomecat pension married ///
+>     twoearn ira ownhome using "assets3_raw.csv", replace
+(file assets3_raw.csv not found)
+file assets3_raw.csv saved
+
+. 
+. 
+. *================================================================
+. * Section 3: Baseline ATE -- the "single number" view
+. *================================================================
+. *
+. * Estimand:  ATE = E{y(1) - y(0)}
+. *
+. * Before estimating *heterogeneous* effects, we anchor with a
+. * good *average* effect. We use AIPW (doubly robust) so the ATE
+. * is consistent if EITHER the outcome model OR the propensity
+. * score model is correct.
+. *
+. * This is exactly the workhorse you might already know from
+. * Stata's -teffects- suite. It returns ONE number: the average
+. * effect across the whole sample.
+. *
+. * Why this isn't enough: the ATE could be $8,000 on average and
+. * still hide huge variation -- maybe high-income households gain
+. * $20,000 and low-income households gain almost nothing.
+. * Sections 4 onward open the hood.
+. *----------------------------------------------------------------
+. 
+. teffects aipw                                                                
+>   ///
+>     (asset c.age c.educ i.incomecat i.pension i.married i.twoearn i.ira i.own
+> home) ///
+>     (e401k c.age c.educ i.incomecat i.pension i.married i.twoearn i.ira i.own
+> home)
+
+Iteration 0:  EE criterion = 1.363e-21  
+Iteration 1:  EE criterion = 1.368e-23  
+
+Treatment-effects estimation                    Number of obs     =      9,913
+Estimator      : augmented IPW
+Outcome model  : linear by ML
+Treatment model: logit
+------------------------------------------------------------------------------
+             |               Robust
+      assets | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       e401k |
+  (Eligible  |
+         vs  |
+Not elig..)  |   8019.463   1152.038     6.96   0.000      5761.51    10277.42
+-------------+----------------------------------------------------------------
+POmean       |
+       e401k |
+Not eligi..  |   13930.46    817.613    17.04   0.000     12327.97    15532.96
+------------------------------------------------------------------------------
+
+. 
+. * Quick "naive" subgroup table to motivate the rest of the
+. * tutorial: do raw mean differences look uniform across income
+. * categories? (Spoiler: no.)
+. table incomecat e401k, statistic(mean asset) nformat(%10.0f)
+
+--------------------------------------------------
+                |         401(k) eligibility      
+                |  Not eligible   Eligible   Total
+----------------+---------------------------------
+Income category |                                 
+  0             |           889       5900    1562
+  1             |          4249       6015    4717
+  2             |          7944      12797    9800
+  3             |         14753      23774   19138
+  4             |         42690      63639   55040
+  Total         |         10790      30347   18054
+--------------------------------------------------
+
+. 
+. 
+. *================================================================
+. * Section 4: PO estimator on the partial-linear model
+. *================================================================
+. *
+. * Estimand: CATE  tau(x) = E{y(1) - y(0) | x = x}
+. *
+. * The partial-linear (PO = Partialing-Out) model assumes:
+. *
+. *   y = d * tau(x) + g(x,w) + epsilon
+. *   d = f(x,w) + u
+. *
+. * where g and f are flexible nuisance functions estimated by
+. * machine learning (lasso by default), and tau(x) is the object
+. * of interest.
+. *
+. * PO partials out g and f using cross-fitting (Robinson 1988;
+. * Chernozhukov et al. 2018), then fits a causal forest on the
+. * residuals. The output:
+. *   - "Average treatment effect" line (this is the ATE)
+. *   - And, behind the scenes, a function tau(x) we will probe
+. *     in the next sections.
+. *
+. * Why PO first: it is robust and uses the default settings the
+. * manual recommends. We compare with AIPW in Section 8.
+. *----------------------------------------------------------------
+. 
+. cate po (asset $catecovars) (e401k), rseed($rseed)
+
+Cross-fit fold 1 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 2 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 3 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 4 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 5 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 6 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 7 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 8 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 9 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 10 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+
+Performing random forest for IATE ...
+Estimating AIPW scores ...
+Estimating ATE ...
+
+Conditional average treatment effects     Number of observations       = 9,913
+Estimator:       Partialing out           Number of folds in cross-fit =    10
+Outcome model:   Linear lasso             Number of outcome controls   =    17
+Treatment model: Logit lasso              Number of treatment controls =    17
+CATE model:      Random forest            Number of CATE variables     =    17
+
+------------------------------------------------------------------------------
+             |               Robust
+      assets | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       e401k |
+  (Eligible  |
+         vs  |
+Not elig..)  |   7937.182   1153.017     6.88   0.000     5677.309    10197.05
+-------------+----------------------------------------------------------------
+POmean       |
+       e401k |
+Not eligi..  |   14016.38   833.4423    16.82   0.000     12382.87     15649.9
+------------------------------------------------------------------------------
+
+. 
+. * Formal test of treatment-effect homogeneity
+. *   H0: tau(x) is constant -- i.e., there is NO heterogeneity.
+. * If we reject H0, the rest of this script is justified.
+. estat heterogeneity
+
+Treatment-effects heterogeneity test
+H0: Treatment effects are homogeneous
+
+    chi2(1) =   4.11
+Prob > chi2 = 0.0427
+
+. 
+. * Linear projection: regress the (latent) tau_i on the catecovars.
+. * This gives an interpretable summary of WHICH covariates drive
+. * heterogeneity -- think of it as "an OLS view of the function
+. * tau(x)". Big positive coefficients = the variable raises the
+. * effect.
+. estat projection $catecovars
+
+Treatment-effects linear projection                  Number of obs =     9,913
+                                                     F(11, 9901)   =      4.90
+                                                     Prob > F      =    0.0000
+                                                     R-squared     =    0.0045
+                                                     Adj R-squared =    0.0034
+                                                     Root MSE      = 1.146e+05
+
+------------------------------------------------------------------------------
+             |               Robust
+             | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |   205.1206   117.9809     1.74   0.082    -26.14605    436.3873
+        educ |  -442.4583   488.4721    -0.91   0.365    -1399.963    515.0466
+             |
+   incomecat |
+          1  |  -2439.222   2013.522    -1.21   0.226    -6386.136    1507.692
+          2  |   1874.817   2295.155     0.82   0.414    -2624.154    6373.788
+          3  |   5707.689   3298.341     1.73   0.084    -757.7313    12173.11
+          4  |    18194.6   5398.391     3.37   0.001     7612.651    28776.54
+             |
+     pension |
+Receives ..  |   3817.355   2454.437     1.56   0.120    -993.8419    8628.553
+             |
+     married |
+    Married  |  -2399.333   3403.066    -0.71   0.481    -9070.035     4271.37
+             |
+     twoearn |
+        Yes  |  -1428.041   4347.025    -0.33   0.743    -9949.094    7093.013
+             |
+         ira |
+        Yes  |  -2438.404   3619.217    -0.67   0.500    -9532.807        4656
+             |
+     ownhome |
+        Yes  |   3162.649   1669.587     1.89   0.058     -110.081    6435.379
+       _cons |   232.7251   8072.023     0.03   0.977    -15590.08    16055.53
+------------------------------------------------------------------------------
+
+. 
+. * Predict the individual treatment effects (IATEs) for use in
+. * CSV export below.  -iate- is the default option; we name it
+. * explicitly so the code reads pedagogically.
+. predict double iate_po, iate
+
+. 
+. * Export IATE predictions (one row per household). Wrapped in
+. * -capture- so a missing-variable issue does not derail the rest
+. * of the script.
+. capture {
+
+. 
+. * Figure 1: distribution of individual effects (PO).
+. * A wide spread = strong heterogeneity. A spike at one value =
+. * near-homogeneity. Look for a fat right tail in this dataset.
+. categraph histogram, ///
+>     title("Distribution of individual treatment effects (PO)")  ///
+>     xtitle("Estimated tau_hat_i (dollars)")                     ///
+>     note("Source: assets3, Stata 19 cate po")
+(bin=39, start=-40204.13, width=2975.4332)
+
+. graph export "stata_cate_iate_histogram_po.png", replace width(1200)
+(file stata_cate_iate_histogram_po.png not found)
+file stata_cate_iate_histogram_po.png written in PNG format
+
+. 
+. 
+. *================================================================
+. * Section 5: How does the effect vary with one variable?
+. *================================================================
+. *
+. * IATE plots show tau(x_j) varying ONE covariate at a time, with
+. * the other covariates fixed at their reference values. This is
+. * the most intuitive way to see "where does the effect peak?".
+. *
+. * Each plot includes confidence bands (from honest random-forest
+. * inference, the bootstrap-of-little-bags procedure).
+. *----------------------------------------------------------------
+. 
+. * Figure 2: effect as a function of age
+. categraph iateplot age, ///
+>     title("Estimated CATE by age")        ///
+>     ytitle("tau_hat (dollars)") xtitle("Age (years)")
+
+Note: IATE estimated at fixed values of covariates other than age.
+
+--------------------------------------------------
+   Variable | Statistic       Value           Type
+------------+-------------------------------------
+       educ |      mean    13.20629     continuous
+  incomecat |      base           0         factor
+        ira |      base           0         factor
+    married |      base           0         factor
+    ownhome |      base           0         factor
+    pension |      base           0         factor
+    twoearn |      base           0         factor
+--------------------------------------------------
+
+. graph export "stata_cate_iateplot_age.png", replace width(1200)
+(file stata_cate_iateplot_age.png not found)
+file stata_cate_iateplot_age.png written in PNG format
+
+. 
+. * Figure 3: effect as a function of education
+. categraph iateplot educ, ///
+>     title("Estimated CATE by years of education")  ///
+>     ytitle("tau_hat (dollars)") xtitle("Education (years)")
+
+Note: IATE estimated at fixed values of covariates other than educ.
+
+--------------------------------------------------
+   Variable | Statistic       Value           Type
+------------+-------------------------------------
+        age |      mean    41.05891     continuous
+  incomecat |      base           0         factor
+        ira |      base           0         factor
+    married |      base           0         factor
+    ownhome |      base           0         factor
+    pension |      base           0         factor
+    twoearn |      base           0         factor
+--------------------------------------------------
+
+. graph export "stata_cate_iateplot_educ.png", replace width(1200)
+(file stata_cate_iateplot_educ.png not found)
+file stata_cate_iateplot_educ.png written in PNG format
+
+. 
+. 
+. *================================================================
+. * Section 6: GATE on prespecified groups
+. *================================================================
+. *
+. * Estimand: GATE  tau(g) = E{Gamma_i | G_i = g}
+. *
+. * where Gamma_i is the AIPW orthogonal score for unit i. A GATE
+. * averages the individual effect within a prespecified group --
+. * here, the 5 income categories (incomecat).
+. *
+. * The trick: -reestimate- recycles the IATE function fitted in
+. * Section 4. We do NOT refit the (slow) causal forest. We just
+. * recompute group means.
+. *----------------------------------------------------------------
+. 
+. cate, group(incomecat) reestimate
+
+Estimating GATE ...
+
+Conditional average treatment effects     Number of observations       = 9,913
+Estimator:       Partialing out           Number of folds in cross-fit =    10
+Outcome model:   Linear lasso             Number of outcome controls   =    17
+Treatment model: Logit lasso              Number of treatment controls =    17
+CATE model:      Random forest            Number of CATE variables     =    17
+
+------------------------------------------------------------------------------
+             |               Robust
+      assets | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+GATE         |
+   incomecat |
+          0  |   4087.014   987.7124     4.14   0.000     2151.133    6022.895
+          1  |   1399.398   1663.193     0.84   0.400      -1860.4    4659.196
+          2  |   5154.329   1349.842     3.82   0.000     2508.688     7799.97
+          3  |   8532.238   2287.664     3.73   0.000     4048.499    13015.98
+          4  |   20510.94   4723.741     4.34   0.000     11252.58     29769.3
+-------------+----------------------------------------------------------------
+ATE          |
+       e401k |
+  (Eligible  |
+         vs  |
+Not elig..)  |   7937.182   1153.017     6.88   0.000     5677.309    10197.05
+-------------+----------------------------------------------------------------
+POmean       |
+       e401k |
+Not eligi..  |   14016.38   833.4423    16.82   0.000     12382.87     15649.9
+------------------------------------------------------------------------------
+
+. 
+. * Joint test: are the GATEs equal across the 5 income groups?
+. * Reject H0 = effect is heterogeneous across income.
+. estat gatetest
+
+Group treatment-effects heterogeneity test
+H0: Group average treatment effects are homogeneous
+
+ ( 1)  [GATE]0bn.incomecat - [GATE]1.incomecat = 0
+ ( 2)  [GATE]0bn.incomecat - [GATE]2.incomecat = 0
+ ( 3)  [GATE]0bn.incomecat - [GATE]3.incomecat = 0
+ ( 4)  [GATE]0bn.incomecat - [GATE]4.incomecat = 0
+
+    chi2(4) =  18.44
+Prob > chi2 = 0.0010
+
+. 
+. * Figure 4: GATE bar chart with 95% CIs
+. categraph gateplot, ///
+>     title("GATE by income category")           ///
+>     ytitle("tau_hat (dollars)") xtitle("Income category (1 = low, 5 = high)")
+
+. graph export "stata_cate_gate_incomecat.png", replace width(1200)
+(file stata_cate_gate_incomecat.png not found)
+file stata_cate_gate_incomecat.png written in PNG format
+
+. 
+. * Save group-level results to CSV (estimate, SE, CI bounds).
+. * Wrapped in -capture- because the column-naming convention from
+. * r(table) is sensitive to factor levels.
+. capture noisily {
+.     matrix gate_table = r(table)'
+.     preserve
+.         clear
+.         svmat double gate_table, names(col)
+number of observations will be reset to 1
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 1.
+.         export delimited using "gate_results.csv", replace
+(file gate_results.csv not found)
+file gate_results.csv saved
+.     restore
+. }
+
+. 
+. 
+. *================================================================
+. * Section 7: GATES on data-driven quartiles
+. *================================================================
+. *
+. * GATES = "Group Average Treatment Effect Sorted". Stata sorts
+. * households by their *predicted* effect tau_hat_i and bins them
+. * into quartiles (or any quantile via group(#)). Then it reports
+. * the mean effect within each bin.
+. *
+. * This is the cleanest single picture of heterogeneity:
+. *   - Bin 1 = the top 25% of predicted effects
+. *   - Bin 4 = the bottom 25%
+. * If the bars look almost the same, there is little
+. * heterogeneity. If they fan out, there is a lot.
+. *
+. * Cross-fitting protects against p-hacking: the binning uses
+. * out-of-sample predictions, so a unit's bin is not informed by
+. * its own outcome.
+. *----------------------------------------------------------------
+. 
+. cate po (asset $catecovars) (e401k), rseed($rseed) group(4)
+
+Cross-fit fold 1 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+Estimating IATE rankings ...
+Estimating AIPW scores ...
+
+Cross-fit fold 2 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+Estimating IATE rankings ...
+Estimating AIPW scores ...
+
+Cross-fit fold 3 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+Estimating IATE rankings ...
+Estimating AIPW scores ...
+
+Cross-fit fold 4 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+Estimating IATE rankings ...
+Estimating AIPW scores ...
+
+Cross-fit fold 5 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+Estimating IATE rankings ...
+Estimating AIPW scores ...
+
+Cross-fit fold 6 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+Estimating IATE rankings ...
+Estimating AIPW scores ...
+
+Cross-fit fold 7 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+Estimating IATE rankings ...
+Estimating AIPW scores ...
+
+Cross-fit fold 8 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+Estimating IATE rankings ...
+Estimating AIPW scores ...
+
+Cross-fit fold 9 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+Estimating IATE rankings ...
+Estimating AIPW scores ...
+
+Cross-fit fold 10 of 10 ...
+Performing lasso for outcome assets ... 
+Performing lasso for treatment e401k ... 
+Estimating IATE rankings ...
+Estimating AIPW scores ...
+
+Performing random forest for IATE ...
+Estimating AIPW scores ...
+Estimating sorted GATE ...
+
+Conditional average treatment effects     Number of observations       = 9,913
+Estimator:       Partialing out           Number of folds in cross-fit =    10
+Outcome model:   Linear lasso             Number of outcome controls   =    17
+Treatment model: Logit lasso              Number of treatment controls =    17
+CATE model:      Random forest            Number of CATE variables     =    17
+
+------------------------------------------------------------------------------
+             |               Robust
+      assets | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+GATES        |
+        rank |
+          1  |   17278.94   3440.125     5.02   0.000     10536.42    24021.46
+          2  |    8121.04   1691.008     4.80   0.000     4806.725    11435.35
+          3  |   3443.834    1437.64     2.40   0.017      626.112    6261.556
+          4  |   2919.197    2110.32     1.38   0.167    -1216.955    7055.349
+-------------+----------------------------------------------------------------
+ATE          |
+       e401k |
+  (Eligible  |
+         vs  |
+Not elig..)  |   7938.209   1152.994     6.88   0.000     5678.382    10198.04
+-------------+----------------------------------------------------------------
+POmean       |
+       e401k |
+Not eligi..  |   14010.83   833.4653    16.81   0.000     12377.27    15644.39
+------------------------------------------------------------------------------
+
+. 
+. * Figure 5: GATES bar chart (Q1 vs Q4)
+. categraph gateplot, ///
+>     title("GATES by data-driven quartile of estimated effect") ///
+>     ytitle("tau_hat (dollars)") xtitle("Quartile (1 = highest tau_hat, 4 = lo
+> west)")
+
+. graph export "stata_cate_gates_quartiles.png", replace width(1200)
+(file stata_cate_gates_quartiles.png not found)
+file stata_cate_gates_quartiles.png written in PNG format
+
+. 
+. * Profile of who's in each bin: -estat classification- runs a
+. * two-sample t-test comparing the mean of ONE variable between
+. * the highest-effect and lowest-effect rank groups. Only one
+. * variable per call; we sweep three.
+. estat classification age
+
+Classification t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       1 |   2,480    45.14677    .1822933    9.078133    44.78931    45.50424
+       4 |   2,471    34.98017      .21922    10.89724     34.5503    35.41004
+---------+--------------------------------------------------------------------
+Combined |   4,951    40.07271    .1597646    11.24157     39.7595    40.38592
+---------+--------------------------------------------------------------------
+    diff |             10.1666    .2850173                9.607844    10.72536
+------------------------------------------------------------------------------
+    diff = mean(1) - mean(4)                                      t =  35.6701
+H0: diff = 0                                     Degrees of freedom =     4949
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 1.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) = 0.0000
+
+. estat classification educ
+
+Classification t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       1 |   2,480    14.02177    .0520357    2.591358    13.91974    14.12381
+       4 |   2,471    12.65439    .0518032    2.575095    12.55281    12.75597
+---------+--------------------------------------------------------------------
+Combined |   4,951    13.33933    .0379738    2.671962    13.26488    13.41377
+---------+--------------------------------------------------------------------
+    diff |            1.367383    .0734263                1.223435    1.511331
+------------------------------------------------------------------------------
+    diff = mean(1) - mean(4)                                      t =  18.6225
+H0: diff = 0                                     Degrees of freedom =     4949
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 1.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) = 0.0000
+
+. estat classification income
+
+Classification t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       1 |   2,480    62739.02     512.083    25501.53    61734.86    63743.17
+       4 |   2,471    26860.95    380.2588    18902.34    26115.29     27606.6
+---------+--------------------------------------------------------------------
+Combined |   4,951    44832.59    408.4175    28737.62    44031.91    45633.27
+---------+--------------------------------------------------------------------
+    diff |            35878.07    638.1663                34626.98    37129.16
+------------------------------------------------------------------------------
+    diff = mean(1) - mean(4)                                      t =  56.2206
+H0: diff = 0                                     Degrees of freedom =     4949
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 1.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) = 0.0000
+
+. 
+. 
+. *================================================================
+. * Section 8: AIPW estimator -- a doubly-robust contrast
+. *================================================================
+. *
+. * The fully-interactive (AIPW) model fits separate outcome models
+. * for treated and untreated:
+. *   y(1) = g_1(x,w) + epsilon_1
+. *   y(0) = g_0(x,w) + epsilon_0
+. *
+. * The CATE then comes from the AIPW score:
+. *   Gamma_i = [y_hat(1) + d*(y - y_hat(1))/f]
+. *           - [y_hat(0) + (1-d)*(y - y_hat(0))/(1-f)]
+. *
+. * This is "doubly robust": consistent if EITHER the outcome
+. * models OR the propensity score is correct. It is more
+. * efficient (narrower CIs) than PO when both are well-specified,
+. * but more sensitive to propensity scores near 0 or 1 (the
+. * "overlap" issue).
+. *
+. * If PO and AIPW give similar pictures, you can trust the
+. * heterogeneity story. If they disagree wildly, dig into
+. * overlap and model specification.
+. *----------------------------------------------------------------
+. 
+. cate aipw (asset $catecovars) (e401k), rseed($rseed)
+
+Cross-fit fold 1 of 10 ...
+Estimating lasso for outcome assets if e401k = 0 ... 
+Estimating lasso for outcome assets if e401k = 1 ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 2 of 10 ...
+Estimating lasso for outcome assets if e401k = 0 ... 
+Estimating lasso for outcome assets if e401k = 1 ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 3 of 10 ...
+Estimating lasso for outcome assets if e401k = 0 ... 
+Estimating lasso for outcome assets if e401k = 1 ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 4 of 10 ...
+Estimating lasso for outcome assets if e401k = 0 ... 
+Estimating lasso for outcome assets if e401k = 1 ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 5 of 10 ...
+Estimating lasso for outcome assets if e401k = 0 ... 
+Estimating lasso for outcome assets if e401k = 1 ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 6 of 10 ...
+Estimating lasso for outcome assets if e401k = 0 ... 
+Estimating lasso for outcome assets if e401k = 1 ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 7 of 10 ...
+Estimating lasso for outcome assets if e401k = 0 ... 
+Estimating lasso for outcome assets if e401k = 1 ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 8 of 10 ...
+Estimating lasso for outcome assets if e401k = 0 ... 
+Estimating lasso for outcome assets if e401k = 1 ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 9 of 10 ...
+Estimating lasso for outcome assets if e401k = 0 ... 
+Estimating lasso for outcome assets if e401k = 1 ... 
+Performing lasso for treatment e401k ... 
+
+Cross-fit fold 10 of 10 ...
+Estimating lasso for outcome assets if e401k = 0 ... 
+Estimating lasso for outcome assets if e401k = 1 ... 
+Performing lasso for treatment e401k ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating ATE ...
+
+Conditional average treatment effects     Number of observations       = 9,913
+Estimator:       Augmented IPW            Number of folds in cross-fit =    10
+Outcome model:   Linear lasso             Number of outcome controls   =    17
+Treatment model: Logit lasso              Number of treatment controls =    17
+CATE model:      Random forest            Number of CATE variables     =    17
+
+------------------------------------------------------------------------------
+             |               Robust
+      assets | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+       e401k |
+  (Eligible  |
+         vs  |
+Not elig..)  |   8120.264   1160.538     7.00   0.000     5845.652    10394.88
+-------------+----------------------------------------------------------------
+POmean       |
+       e401k |
+Not eligi..  |   13978.94   836.9925    16.70   0.000     12338.47    15619.42
+------------------------------------------------------------------------------
+
+. 
+. * Heterogeneity test under the AIPW spec
+. estat heterogeneity
+
+Treatment-effects heterogeneity test
+H0: Treatment effects are homogeneous
+
+    chi2(1) =   5.54
+Prob > chi2 = 0.0186
+
+. 
+. * Figure 6: IATE distribution (AIPW). Compare with Figure 1.
+. categraph histogram, ///
+>     title("Distribution of individual treatment effects (AIPW)")  ///
+>     xtitle("Estimated tau_hat_i (dollars)")                       ///
+>     note("Source: assets3, Stata 19 cate aipw")
+(bin=39, start=-196082.43, width=10162.687)
+
+. graph export "stata_cate_iate_histogram_aipw.png", replace width(1200)
+(file stata_cate_iate_histogram_aipw.png not found)
+file stata_cate_iate_histogram_aipw.png written in PNG format
+
+. 
+. * Figure 7: AIPW effect by education (compare with PO Figure 3)
+. categraph iateplot educ, ///
+>     title("Estimated CATE by education (AIPW)")  ///
+>     ytitle("tau_hat (dollars)") xtitle("Education (years)")
+
+Note: IATE estimated at fixed values of covariates other than educ.
+
+--------------------------------------------------
+   Variable | Statistic       Value           Type
+------------+-------------------------------------
+        age |      mean    41.05891     continuous
+  incomecat |      base           0         factor
+        ira |      base           0         factor
+    married |      base           0         factor
+    ownhome |      base           0         factor
+    pension |      base           0         factor
+    twoearn |      base           0         factor
+--------------------------------------------------
+
+. graph export "stata_cate_iateplot_educ_aipw.png", replace width(1200)
+(file stata_cate_iateplot_educ_aipw.png not found)
+file stata_cate_iateplot_educ_aipw.png written in PNG format
+
+. 
+. 
+. *================================================================
+. * Section 9: Nonparametric series -- a smooth view of tau(x_j)
+. *================================================================
+. *
+. * -estat series- fits a B-spline (or polynomial) of the IATE
+. * against one continuous covariate. Unlike -categraph iateplot-
+. * (which holds other covariates at reference values), this is
+. * a marginal smoother: it averages over the joint distribution
+. * of x.
+. *
+. * Practical use: tells you whether the relationship between
+. * tau(x) and x_j is monotone, U-shaped, etc. With knots(5) we
+. * let the spline have 5 internal knots -- enough flexibility for
+. * a single covariate.
+. *----------------------------------------------------------------
+. 
+. * Figure 8: nonparametric series of tau against income
+. estat series income if income <= 150000, graph knots(5)
+
+Computing approximating function
+
+
+Computing average derivatives
+
+Nonparametric series regression for IATE
+Cubic B-spline estimation                  Number of obs      =          9,884
+                                           Number of knots    =              5
+------------------------------------------------------------------------------
+             |               Robust
+             |     Effect   std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      income |   .2131162   .0502993     4.24   0.000     .1145313     .311701
+------------------------------------------------------------------------------
+Note: Effect estimates are averages of derivatives.
+
+. graph export "stata_cate_series_income.png", replace width(1200)
+(file stata_cate_series_income.png not found)
+file stata_cate_series_income.png written in PNG format
+
+. 
+. 
+. *================================================================
+. * Closing summary
+. *================================================================
+. 
+. di _newline(2)
+
+
+
+
+. di "============================================================"
+============================================================
+
+. di "  CATE analysis complete."
+  CATE analysis complete.
+
+. di ""
+
+
+. di "  Section 3: ATE estimated by AIPW (single number)."
+  Section 3: ATE estimated by AIPW (single number).
+
+. di "  Sections 4-5: PO + IATE plots reveal who responds most."
+  Sections 4-5: PO + IATE plots reveal who responds most.
+
+. di "  Sections 6-7: GATE / GATES quantify the spread."
+  Sections 6-7: GATE / GATES quantify the spread.
+
+. di "  Section 8: AIPW serves as a doubly-robust check."
+  Section 8: AIPW serves as a doubly-robust check.
+
+. di "  Section 9: nonparametric series shows how tau varies"
+  Section 9: nonparametric series shows how tau varies
+
+. di "             smoothly with income."
+             smoothly with income.
+
+. di ""
+
+
+. di "  Figures saved: 8 PNGs (stata_cate_*.png)."
+  Figures saved: 8 PNGs (stata_cate_*.png).
+
+. di "  CSVs saved:    assets3_raw.csv, iate_predictions.csv,"
+  CSVs saved:    assets3_raw.csv, iate_predictions.csv,
+
+. di "                 gate_results.csv."
+                 gate_results.csv.
+
+. di "============================================================"
+============================================================
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_cate/analysis.log
+  log type:  text
+ closed on:   2 May 2026, 21:52:28
+-------------------------------------------------------------------------------
