@@ -16,6 +16,10 @@ image:
   focal_point: Smart
   placement: 3
 links:
+- icon: google-colab
+  icon_pack: ai
+  name: "Google Colab"
+  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_doubleml_pension/notebook.ipynb
 - icon: code
   icon_pack: fas
   name: "Python script"
