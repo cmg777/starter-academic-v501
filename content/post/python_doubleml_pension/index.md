@@ -191,6 +191,8 @@ The dataset contains 9,915 U.S. households. About 37% are eligible for a 401(k) 
 | `pira` | IRA participation (1 = yes) |
 | `hown` | Home ownership (1 = owns) |
 
+The distinction between `e401` (eligibility) and `p401` (participation) is crucial for this analysis. Eligibility is determined largely by the *employer* --- whether the company offers a 401(k) plan. Participation is a *household decision* --- whether the eligible household actually enrolls. This matters because eligibility is plausibly unrelated to individual savings behavior (after controlling for income and other characteristics), while participation is a choice driven partly by unobservable traits like financial discipline and risk tolerance. We will exploit this distinction across all three models.
+
 ## Exploratory data analysis
 
 Before estimating causal effects, let us visualize the data to understand the outcome distribution and the confounding structure.
@@ -295,6 +297,12 @@ $$\hat{\Delta}\_{naive} = \bar{Y}\_{e401=1} - \bar{Y}\_{e401=0}$$
 
 In words, this says the naive estimate equals the average net financial assets of eligible households minus the average for ineligible households. This estimator lumps together the genuine causal effect with all pre-existing differences between the groups.
 
+To see why this is problematic, think of the naive estimate as a sum of two invisible components:
+
+$$\hat{\Delta}\_{naive} = \underbrace{\theta\_0}\_{\text{causal effect}} + \underbrace{\text{bias from confounders}}\_{\text{income, education, ...}}$$
+
+In words, the naive gap is the *true* causal effect plus the confounding bias. DML's entire purpose is to strip away the second component so only the causal effect remains. As we will see, the naive \\$19,559 decomposes into roughly \\$8,730 of genuine causal effect and \\$10,829 of confounding bias --- meaning more than half the raw gap is an illusion created by pre-existing differences between the groups.
+
 ```python
 naive_elig = data[data["e401"] == 1]["net_tfa"].mean() - data[data["e401"] == 0]["net_tfa"].mean()
 naive_part = data[data["p401"] == 1]["net_tfa"].mean() - data[data["p401"] == 0]["net_tfa"].mean()
@@ -361,9 +369,33 @@ In words, the first equation says that the outcome $Y$ (net financial assets) eq
 
 **Variable mapping:** $Y$ = `net_tfa`, $D$ = `e401`, $X$ = the 9 (or 13) covariates, $\theta\_0$ = the ATE we want to estimate.
 
-The key innovation of DML is **partialling out**: instead of estimating $\theta\_0$ directly, we first use ML to estimate $g\_0$ and $m\_0$, then work with the residuals. Think of it like noise-canceling headphones: the ML models learn the "noise" pattern from confounders, subtract it, and what remains is the clean causal signal.
+### How partialling out works: a three-step recipe
 
-DML also uses *cross-fitting* --- a procedure that splits the data into folds so that nuisance functions are always estimated on different data than they are evaluated on. Think of cross-fitting as a rotating judge: each fold's residuals come from a model that never saw that fold, preventing the ML models from overfitting to the same observations used for causal estimation.
+The key innovation of DML is **partialling out**: instead of estimating $\theta\_0$ directly from a single regression, we decompose the problem into three simpler steps. Think of it like noise-canceling headphones: the ML models learn the "noise" pattern from confounders, subtract it, and what remains is the clean causal signal.
+
+**Step 1 --- Predict the outcome from covariates.** Train an ML model to predict net financial assets ($Y$) using only the covariates ($X$): income, age, education, etc. --- *without* using the treatment ($D$). The prediction captures how much savings we would *expect* a household to have based on its demographics alone. The *residual* --- what the model cannot explain --- is the part of savings that is unrelated to observed covariates. We call this the "outcome residual": $\tilde{Y} = Y - \hat{g}\_0(X)$.
+
+**Step 2 --- Predict the treatment from covariates.** Train another ML model to predict eligibility ($D$) from the same covariates ($X$). This captures how much eligibility we would *expect* given a household's characteristics. The residual --- "surprise eligibility" --- is the part of treatment that is unrelated to observed covariates. We call this the "treatment residual": $\tilde{D} = D - \hat{m}\_0(X)$.
+
+**Step 3 --- Regress outcome residuals on treatment residuals.** The slope of this residual-on-residual regression is our causal estimate $\hat{\theta}\_0$. Because both residuals have been "cleaned" of confounding variation, their relationship reflects only the causal channel from treatment to outcome.
+
+Here is a concrete example. Consider two households with the same income (\\$40,000), same education (13 years), and same age (42). Based on these characteristics, the ML model predicts both should have about \\$15,000 in net financial assets and a 35% chance of being eligible. If Household A is eligible and has \\$23,000, its outcome residual is +\\$8,000 and its treatment residual is +0.65. If Household B is not eligible and has \\$14,000, its outcome residual is -\\$1,000 and its treatment residual is -0.35. The PLR estimates the causal effect by comparing these residuals across all 9,915 households simultaneously.
+
+### Why machine learning matters
+
+Traditional linear regression can also partial out confounders (this is the Frisch-Waugh-Lovell theorem). So why use ML? Because linear regression assumes straight-line relationships: every extra dollar of income increases savings by the same amount. But in reality, the relationship between income and savings is often curved --- a household earning \\$100,000 saves proportionally more than one earning \\$30,000 (a nonlinear relationship). ML learners like Random Forest and XGBoost capture these nonlinearities automatically, producing cleaner residuals and more accurate causal estimates.
+
+### Cross-fitting: preventing overfitting bias
+
+DML also uses *cross-fitting* --- a procedure that splits the data into folds so that nuisance functions are always estimated on different data than they are evaluated on. Here is how it works concretely with our data:
+
+1. Split the 9,915 households into 3 folds of roughly 3,300 each.
+2. For Fold 1: train the ML models (both $\hat{g}\_0$ and $\hat{m}\_0$) on Folds 2 + 3 (6,600 households), then predict residuals for the 3,300 households in Fold 1.
+3. Rotate: train on Folds 1 + 3, predict residuals for Fold 2.
+4. Rotate again: train on Folds 1 + 2, predict residuals for Fold 3.
+5. Combine all residuals and run the final regression.
+
+Think of cross-fitting as a rotating judge: each fold's residuals come from a model that never saw that fold. Why does this matter? Without cross-fitting, a flexible ML model could memorize individual households' quirks --- producing artificially clean residuals that make the causal estimate look better than it really is. Cross-fitting prevents this overfitting bias by ensuring the ML model always predicts on "fresh" data it has never seen.
 
 We fit the PLR model with four different ML learners to assess robustness:
 
@@ -422,7 +454,19 @@ $$\theta\_0 = E\left[g\_0(1, X) - g\_0(0, X) + \frac{D \\, (Y - g\_0(1, X))}{m\_
 
 In words, this formula first predicts what each household's outcome would be under treatment and under control using the outcome model $g\_0$, then corrects any remaining prediction errors using inverse probability weighting with the propensity score $m\_0$. The term "doubly robust" means the estimator is consistent if *either* the outcome model or the propensity score model is correctly specified --- it does not require both to be perfect. Think of it as a safety net: if one model stumbles, the other catches it.
 
-Why does this matter? If PLR and IRM agree, it means the causal estimate is robust to the choice of estimation strategy --- neither the additive structure of PLR nor the particular form of doubly robust weighting is driving the result.
+### What is a propensity score?
+
+The propensity score $m\_0(X)$ is simply the predicted probability that a household is eligible, based on its observable characteristics. For a high-income, well-educated, married household working at a large firm, the propensity score might be 0.70 (70% chance of being eligible). For a low-income, young, single household, it might be 0.15 (15% chance). The propensity score summarizes how "treatment-like" each household looks on paper.
+
+The IRM uses propensity scores to reweight observations. The intuition is that *rare controls are especially valuable*. Suppose a household has all the characteristics that predict eligibility (high income, good education) but is *not* eligible --- perhaps their employer simply does not offer a 401(k). This household is an informative natural experiment: it tells us what savings look like for "eligible-type" households that did not receive the treatment. The IRM gives such observations extra weight because they provide the cleanest comparison.
+
+### Why "doubly robust"?
+
+The doubly robust property is a key practical advantage. Imagine we have a good outcome model but a mediocre propensity score model. The outcome model $g\_0$ does most of the heavy lifting, correctly predicting savings under treatment and control. The propensity score corrections are small and somewhat noisy --- but that is fine, because they are only correcting small residual errors. Now imagine the reverse: a poor outcome model but an excellent propensity score model. The IPW correction catches the outcome model's mistakes. The estimator fails only if *both* models are badly wrong simultaneously, which is much less likely than either one failing alone.
+
+### Why run both PLR and IRM?
+
+Running both PLR and IRM is like getting a second opinion from a different doctor using a different diagnostic approach. PLR approaches the problem through residual regression (partialling out). IRM approaches it through outcome prediction combined with propensity weighting (AIPW). If both diagnoses agree --- as they do here --- you can be much more confident in the conclusion than if you had relied on either method alone.
 
 We fit the IRM model with the same four ML learners used for PLR. For IRM, the `ml_g` argument takes a regressor (for the outcome model) and `ml_m` takes a classifier (for the propensity score). The `trimming_threshold=0.01` drops observations with extreme propensity scores below 1% or above 99% to prevent unstable inverse-probability weights.
 
@@ -453,11 +497,38 @@ The IRM estimates range from \\$7,924 to \\$8,559, with a mean of \\$8,213. Thes
 
 ## Model 3: Interactive IV Model (IIVM) --- what about participation?
 
-The PLR and IRM models estimate the effect of *eligibility* (e401), which is plausibly exogenous after conditioning on covariates. But what if we want to know the effect of actually *participating* in a 401(k) plan? Participation (p401) is endogenous --- it reflects a household's choice, which is driven by unobservable factors like financial literacy and savings motivation that also affect the outcome.
+The PLR and IRM models estimate the effect of *eligibility* (e401), which is plausibly exogenous after conditioning on covariates. But what if we want to know the effect of actually *participating* in a 401(k) plan?
 
-To handle this, the IIVM model uses eligibility (e401) as an **instrumental variable** for participation (p401). An instrument must satisfy two conditions: (1) it affects the treatment (eligibility strongly predicts participation), and (2) it affects the outcome only through the treatment (after conditioning on covariates, eligibility has no direct effect on savings except through participation).
+### Why participation is endogenous
 
-The IIVM identifies the **Local Average Treatment Effect (LATE)** --- the causal effect of participation specifically on *compliers*. A complier is a household that participates *because* it is eligible but would not participate otherwise. Think of compliers in a medicine trial: the LATE measures the effect on people who take the pill only when prescribed, not on people who always take it regardless or never take it no matter what.
+Participation (p401) is endogenous --- it reflects a household's *choice*, which is driven by unobservable factors that also affect savings. Here is a concrete example: suppose two households are both eligible for a 401(k). Household A is financially savvy, reads investment blogs, and enrolls immediately. Household B lives paycheck to paycheck and never enrolls despite being eligible. If we compare their savings, any difference reflects both the 401(k) effect *and* the pre-existing difference in financial discipline. We cannot tell these apart because financial discipline is unobserved --- it does not appear in our dataset.
+
+This is the endogeneity problem: participation is a choice correlated with unobserved traits that also affect savings. Simply comparing participants to non-participants produces biased estimates, even after controlling for all observed covariates.
+
+### Instrumental variables: using eligibility as a nudge
+
+To handle this, the IIVM model uses eligibility (e401) as an **instrumental variable** for participation (p401). The idea is elegant: eligibility acts like a nudge. It does not force anyone to participate, but it opens the door. Among otherwise similar households, some happen to work at firms that offer 401(k) plans and some do not. This "quasi-random" variation in access lets us isolate the causal effect of participation.
+
+An instrument must satisfy two conditions: (1) **relevance** --- it must affect the treatment (eligibility strongly predicts participation, since you cannot participate without being eligible), and (2) **exclusion** --- it must affect the outcome *only through* the treatment (after conditioning on covariates, eligibility has no direct effect on savings except through participation).
+
+### Four types of households
+
+When we use eligibility as an instrument, households fall into four groups:
+
+| Type | Behavior | Interpretation |
+|------|----------|---------------|
+| **Always-takers** | Participate whether eligible or not | Highly motivated savers --- would find a way regardless |
+| **Never-takers** | Never participate, even when eligible | Prefer to spend or use other savings vehicles |
+| **Compliers** | Participate *because* eligible; would not otherwise | The marginal households whose behavior changes with the policy |
+| **Defiers** | Would participate if *not* eligible, but not if eligible | Assumed not to exist (monotonicity assumption) |
+
+The IIVM identifies the **Local Average Treatment Effect (LATE)** --- the causal effect of participation specifically on *compliers*. Think of compliers in a medicine trial: the LATE measures the effect on people who take the pill only when prescribed, not on people who always take it regardless (always-takers) or never take it no matter what (never-takers). The intuition is that the instrument (eligibility) only "moves" the compliers, so the estimated effect applies specifically to them.
+
+Formally, the LATE can be understood through a Wald-type ratio:
+
+$$\theta\_{LATE} = \frac{E[Y \mid Z=1] - E[Y \mid Z=0]}{E[D \mid Z=1] - E[D \mid Z=0]}$$
+
+In words, the LATE equals the effect of the instrument ($Z$ = eligibility) on the outcome ($Y$ = savings), divided by the effect of the instrument on the treatment ($D$ = participation). The numerator captures how much savings change when eligibility is "switched on." The denominator captures how many additional households actually participate when eligible. The ratio tells us: for each additional household nudged into participation by eligibility, how much did their savings increase?
 
 ```python
 # IV data: treatment = p401 (participation), instrument = e401 (eligibility)
@@ -508,6 +579,14 @@ The grand comparison figure tells a three-part story. First, the massive gap bet
 | IRM | ATE | \\$8,213 | \\$7,924 -- \\$8,559 |
 | IIVM | LATE | \\$11,746 | \\$11,215 -- \\$12,281 |
 | Naive (participation) | --- | \\$27,372 | --- |
+
+### Why is the LATE larger than the ATE?
+
+The LATE (\\$11,746) is larger than the ATE (\\$8,730), and this difference is not a contradiction --- it reflects a genuine economic insight. The ATE averages the effect across *all* households, including always-takers who would have saved in other vehicles (IRAs, taxable accounts) even without a 401(k). For these households, the 401(k) may simply *reshuffle* savings from one account to another, producing a smaller net effect on total financial assets.
+
+Compliers, by contrast, are households whose savings behavior genuinely changes with 401(k) access. They are the marginal participants --- the ones who were on the fence about saving and for whom the 401(k)'s tax advantages and employer match tipped the scales. For these households, the program creates *new* savings rather than reshuffling existing ones, which is why the effect is larger.
+
+For policymakers deciding whether to expand 401(k) eligibility to new employers, the LATE is arguably the more relevant number. Newly eligible households are compliers by definition --- their behavior changes precisely because of the new policy. The expected per-household savings increase for this target population is closer to \\$12,000 than \\$8,500.
 
 ## Discussion
 
