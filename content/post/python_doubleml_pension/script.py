@@ -686,7 +686,7 @@ legend_elements = [
     Patch(facecolor=COLOR_IRM, alpha=0.7, label="IRM (ATE)"),
     Patch(facecolor=COLOR_IIVM, alpha=0.7, label="IIVM (LATE)"),
 ]
-ax.legend(handles=legend_elements, frameon=False, loc="lower right")
+ax.legend(handles=legend_elements, frameon=False, loc="upper right")
 
 plt.tight_layout()
 plt.savefig("pension_grand_comparison.png", dpi=300, bbox_inches="tight")
