@@ -20,7 +20,7 @@ Panel 4 (bottom-left): Title "NAIVE vs DEBIASED" in steel blue small-caps. Two c
 
 Panel 5 (bottom-center): Title "COMPLIERS GAIN MORE" in steel blue small-caps. A chalk-drawn staircase with two steps: the lower step labeled "ATE" at one height, and a taller step labeled "LATE" reaching higher -- showing that compliers benefit more than the average household. Callout: "$11,746 for compliers" in large warm orange chalk. Chalk arrow to Panel 6.
 
-Panel 6 (bottom-right): Title "DEBIASED POLICY ANSWERS" in steel blue small-caps. A chalk-drawn shield with a checkmark inside, with four small arrows bouncing off it -- each arrow labeled with a different ML learner name (Lasso, RF, Tree, XGB) -- showing the results are robust across methods. Callout: "124% bias removed" in warm orange.
+Panel 6 (bottom-right): Title "DEBIASED POLICY ANSWERS" in steel blue small-caps. A chalk-drawn shield with a checkmark inside, with four small arrows bouncing off it -- each arrow labeled with a different ML learner name (Lasso, RF, Tree, XGB) -- showing the results are robust across methods. Callout: "Naive estimate: 124% inflated" in warm orange.
 
 In the bottom-right margin, outside the panel grid, a professor's handwritten-style annotation in smaller italic chalk white (#f0ece2) reads: "The naive estimate is more than double the true causal effect!" A hand-drawn chalk arrow points from the note toward Panel 4. In the bottom-left margin, a small color concept legend shows three entries: a teal (#00d4c8) dot labeled "Causal effect (ATE)", a warm orange (#e8956a) dot labeled "Bias / naive estimate", and a chalk white (#f0ece2) dot labeled "Data / method."
 
@@ -38,7 +38,7 @@ Do not include: photorealistic rendering, glossy or reflective surfaces, drop sh
 
 ## Condensed Prompt (~200 words)
 
-Chalkboard infographic, 1920x1080 landscape, navy background (#0e1545). Academic chalk-drawn sketchnote, hand-lettered text, chalk dust, faint formula textures. Six panels in 3x2 grid with steel blue (#8bb8e0) chalk borders connected by chalk arrows. Title: "DOUBLE ML: WHEN NAIVE SAVINGS ESTIMATES LIE" in steel blue small-caps, subtitle: "Does 401(k) access cause more savings, or do savers just have more 401(k) access?" in italic chalk white (#f0ece2). Colors: chalk white (#f0ece2) body, warm orange (#e8956a) key numbers, teal (#00d4c8) highlights, muted gray (#b0a89a) annotations. Panel 1 (top-left): "THE SAVINGS ILLUSION" -- magnifying glass over two groups revealing hidden income link, callout "Correlation is not causation" in orange. Panel 2 (top-center): "9,915 HOUSEHOLDS" -- tally marks split 37%/63%, orange "$19,559 naive gap." Panel 3 (top-right): "PARTIALLING OUT BIAS" -- noise-canceling headphones blocking confounding waves, orange "ML strips the noise." Panel 4 (bottom-left): "NAIVE vs DEBIASED" -- two containers at different heights (tall Naive in orange, short DML in teal), teal "$8,730 true ATE." Panel 5 (bottom-center): "COMPLIERS GAIN MORE" -- staircase with ATE step and taller LATE step, orange "$11,746 for compliers." Panel 6 (bottom-right): "DEBIASED POLICY ANSWERS" -- shield with checkmark, four arrows bouncing off, orange "124% bias removed." Professor's note bottom-right: "The naive estimate is more than double the true causal effect!" Legend bottom-left: ATE (teal), bias (orange), data (white). Faint formulas: Y = theta*D + g(X) + epsilon at 15% opacity. No photorealism, no gradients, no precise charts, no pure white.
+Chalkboard infographic, 1920x1080 landscape, navy background (#0e1545). Academic chalk-drawn sketchnote, hand-lettered text, chalk dust, faint formula textures. Six panels in 3x2 grid with steel blue (#8bb8e0) chalk borders connected by chalk arrows. Title: "DOUBLE ML: WHEN NAIVE SAVINGS ESTIMATES LIE" in steel blue small-caps, subtitle: "Does 401(k) access cause more savings, or do savers just have more 401(k) access?" in italic chalk white (#f0ece2). Colors: chalk white (#f0ece2) body, warm orange (#e8956a) key numbers, teal (#00d4c8) highlights, muted gray (#b0a89a) annotations. Panel 1 (top-left): "THE SAVINGS ILLUSION" -- magnifying glass over two groups revealing hidden income link, callout "Correlation is not causation" in orange. Panel 2 (top-center): "9,915 HOUSEHOLDS" -- tally marks split 37%/63%, orange "$19,559 naive gap." Panel 3 (top-right): "PARTIALLING OUT BIAS" -- noise-canceling headphones blocking confounding waves, orange "ML strips the noise." Panel 4 (bottom-left): "NAIVE vs DEBIASED" -- two containers at different heights (tall Naive in orange, short DML in teal), teal "$8,730 true ATE." Panel 5 (bottom-center): "COMPLIERS GAIN MORE" -- staircase with ATE step and taller LATE step, orange "$11,746 for compliers." Panel 6 (bottom-right): "DEBIASED POLICY ANSWERS" -- shield with checkmark, four arrows bouncing off, orange "Naive estimate: 124% inflated." Professor's note bottom-right: "The naive estimate is more than double the true causal effect!" Legend bottom-left: ATE (teal), bias (orange), data (white). Faint formulas: Y = theta*D + g(X) + epsilon at 15% opacity. No photorealism, no gradients, no precise charts, no pure white.
 
 ---
 
@@ -53,7 +53,7 @@ Chalkboard infographic, 1920x1080 landscape, navy background (#0e1545). Academic
 - **Key number**: N/A (conceptual panel)
 - **Central sketch**: Chalk-drawn magnifying glass over two stick-figure groups, revealing a hidden "income" link between eligibility and savings
 - **Body sentences** (for manual overlay):
-  - Eligible households have $19,559 more in savings -- but they also earn $15,368 more in income.
+  - Eligible households have $19,559 more in net financial assets -- but they also earn $15,368 more in income.
   - Income confounds the comparison, inflating the apparent benefit of 401(k) access.
 - **Transition to next**: "Let's look at the data"
 
@@ -73,7 +73,7 @@ Chalkboard infographic, 1920x1080 landscape, navy background (#0e1545). Academic
 ### Panel 3 -- Partialling Out Bias
 
 - **Position**: Row 1, Column 3 (top-right)
-- **Dramatic function**: First attempt
+- **Dramatic function**: Attempt
 - **Story beat**: "DML uses ML to cancel confounding noise"
 - **Callout**: "ML strips the noise"
 - **Key number**: N/A (method panel)
@@ -115,7 +115,7 @@ Chalkboard infographic, 1920x1080 landscape, navy background (#0e1545). Academic
 - **Position**: Row 2, Column 3 (bottom-right)
 - **Dramatic function**: Resolution
 - **Story beat**: "Results hold across four ML learners"
-- **Callout**: "124% bias removed"
+- **Callout**: "Naive estimate: 124% inflated"
 - **Key number**: 124% overstated by naive estimate
 - **Central sketch**: Chalk-drawn shield with checkmark inside, four small arrows (Lasso, RF, Tree, XGB) bouncing off, showing robustness
 - **Body sentences** (for manual overlay):
