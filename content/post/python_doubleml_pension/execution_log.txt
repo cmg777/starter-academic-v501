@@ -1,0 +1,191 @@
+============================================================
+1. DATA LOADING
+============================================================
+Dataset shape: (9915, 14)
+
+Variable descriptions:
+  net_tfa  : Net total financial assets (outcome)
+  e401     : 401(k) eligibility (treatment / instrument)
+  p401     : 401(k) participation (endogenous treatment)
+  age      : Age of household head
+  inc      : Income
+  educ     : Education level
+  fsize    : Family size
+  marr     : Marital status
+  twoearn  : Two-earner household
+  db       : Defined benefit pension
+  pira     : IRA participation
+  hown     : Home ownership
+
+Outcome summary (net_tfa):
+count       9915.00
+mean       18051.53
+std        63522.50
+min      -502302.00
+25%         -500.00
+50%         1499.00
+75%        16524.50
+max      1536798.00
+Name: net_tfa, dtype: float64
+
+Treatment rates:
+  Eligible (e401=1): 3682 / 9915 (37.1%)
+  Participating (p401=1): 2594 / 9915 (26.2%)
+
+Exported: pension_raw.csv
+
+============================================================
+2. EXPLORATORY DATA ANALYSIS
+============================================================
+Saved: pension_eda_outcome.png
+Saved: pension_eda_confounding.png
+
+Summary by eligibility status:
+                 n  mean_net_tfa  median_net_tfa  std_net_tfa   mean_income  mean_age  mean_educ
+Eligibility                                                                                     
+Not Eligible  6233  10788.040039           145.0     54518.38  31493.589844     40.81      12.88
+Eligible      3682  30347.390625          9122.5     74800.21  46861.660156     41.48      13.76
+Exported: eda_summary.csv
+
+============================================================
+3. NAIVE BASELINES (Difference-in-Means)
+============================================================
+Naive difference (eligibility): $19,559.34
+  Eligible mean:     $30,347.39
+  Not eligible mean: $10,788.05
+
+Naive difference (participation): $27,371.58
+  Participating mean:     $38,262.06
+  Not participating mean: $10,890.48
+
+Exported: naive_estimates.csv
+
+============================================================
+4. DATA PREPARATION FOR DoubleML
+============================================================
+Base specification: 9 features
+  Features: ['age', 'inc', 'educ', 'fsize', 'marr', 'twoearn', 'db', 'pira', 'hown']
+
+Flexible specification: 13 features
+  Includes quadratic terms for: ['age', 'inc', 'educ', 'fsize']
+
+IV specification: treatment=p401, instrument=e401
+
+============================================================
+5. PARTIALLY LINEAR REGRESSION (PLR)
+============================================================
+
+Estimand: Average Treatment Effect (ATE) of 401(k) eligibility
+Treatment: e401 (eligibility)
+PLR assumes: Y = theta * D + g(X) + epsilon
+where g(X) is estimated flexibly by ML, theta is the constant ATE.
+
+PLR-Lasso: coef=9,370.81, SE=1,326.47, 95% CI=[6,770.99, 11,970.64]
+PLR-Random Forest: coef=8,835.46, SE=1,309.07, 95% CI=[6,269.74, 11,401.18]
+PLR-Decision Tree: coef=7,822.51, SE=1,321.78, 95% CI=[5,231.87, 10,413.14]
+PLR-XGBoost: coef=8,892.39, SE=1,398.65, 95% CI=[6,151.09, 11,633.69]
+
+Exported: plr_results.csv
+
+============================================================
+6. INTERACTIVE REGRESSION MODEL (IRM)
+============================================================
+
+Estimand: Average Treatment Effect (ATE) of 401(k) eligibility
+Treatment: e401 (eligibility)
+IRM allows fully heterogeneous effects via propensity scores.
+Uses trimming_threshold=0.01 to handle extreme propensity scores.
+
+IRM-Lasso: coef=8,559.13, SE=1,261.16, 95% CI=[6,087.30, 11,030.97]
+IRM-Random Forest: coef=7,924.39, SE=1,138.06, 95% CI=[5,693.82, 10,154.95]
+IRM-Decision Tree: coef=7,985.58, SE=1,156.49, 95% CI=[5,718.90, 10,252.26]
+IRM-XGBoost: coef=8,381.57, SE=1,186.36, 95% CI=[6,056.34, 10,706.80]
+
+Exported: irm_results.csv
+
+============================================================
+7. INTERACTIVE IV MODEL (IIVM)
+============================================================
+
+Estimand: Local Average Treatment Effect (LATE) of 401(k) participation
+Treatment: p401 (participation) — endogenous
+Instrument: e401 (eligibility) — conditionally exogenous
+LATE applies to 'compliers': households who participate because eligible.
+
+IIVM-Lasso: coef=12,280.84, SE=1,712.63, 95% CI=[8,924.16, 15,637.53]
+IIVM-Random Forest: coef=11,471.20, SE=1,646.56, 95% CI=[8,243.99, 14,698.40]
+IIVM-Decision Tree: coef=11,215.10, SE=1,785.89, 95% CI=[7,714.82, 14,715.38]
+IIVM-XGBoost: coef=12,018.76, SE=1,648.62, 95% CI=[8,787.52, 15,250.00]
+
+Exported: iivm_results.csv
+
+============================================================
+8. GRAND COMPARISON
+============================================================
+
+All DML results:
+Model       Learner  Coefficient  Std_Error  CI_Lower  CI_Upper Estimand
+  PLR         Lasso      9370.81    1326.47   6770.99  11970.64      ATE
+  PLR Random Forest      8835.46    1309.07   6269.74  11401.18      ATE
+  PLR Decision Tree      7822.51    1321.78   5231.87  10413.14      ATE
+  PLR       XGBoost      8892.39    1398.65   6151.09  11633.69      ATE
+  IRM         Lasso      8559.13    1261.16   6087.30  11030.97      ATE
+  IRM Random Forest      7924.39    1138.06   5693.82  10154.95      ATE
+  IRM Decision Tree      7985.58    1156.49   5718.90  10252.26      ATE
+  IRM       XGBoost      8381.57    1186.36   6056.34  10706.80      ATE
+ IIVM         Lasso     12280.84    1712.63   8924.16  15637.53     LATE
+ IIVM Random Forest     11471.20    1646.56   8243.99  14698.40     LATE
+ IIVM Decision Tree     11215.10    1785.89   7714.82  14715.38     LATE
+ IIVM       XGBoost     12018.76    1648.62   8787.52  15250.00     LATE
+
+Exported: all_results.csv
+Saved: pension_plr_comparison.png
+Saved: pension_irm_comparison.png
+Saved: pension_iivm_comparison.png
+Saved: pension_grand_comparison.png
+
+============================================================
+9. SUMMARY
+============================================================
+
+============================================================
+KEY FINDINGS
+============================================================
+
+Naive difference-in-means:
+  Eligibility: $19,559.34
+  Participation: $27,371.58
+
+PLR (ATE of eligibility, 4 learners):
+  Range: $7,822.51 to $9,370.81
+  Mean:  $8,730.29
+
+IRM (ATE of eligibility, 4 learners):
+  Range: $7,924.39 to $8,559.13
+  Mean:  $8,212.67
+
+IIVM (LATE of participation, 4 learners):
+  Range: $11,215.10 to $12,280.84
+  Mean:  $11,746.48
+
+Confounding bias (naive - mean PLR ATE):
+  $10,829.05 (naive overstates by 124%)
+
+Generated PNG files:
+  pension_eda_confounding.png
+  pension_eda_outcome.png
+  pension_grand_comparison.png
+  pension_iivm_comparison.png
+  pension_irm_comparison.png
+  pension_plr_comparison.png
+
+Generated CSV files:
+  all_results.csv
+  eda_summary.csv
+  iivm_results.csv
+  irm_results.csv
+  naive_estimates.csv
+  pension_raw.csv
+  plr_results.csv
+
+=== Script completed successfully ===
