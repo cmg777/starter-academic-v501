@@ -17,42 +17,48 @@
 
 - [ ] All 4 sections present: A (full prompt), B (negative prompt), C (condensed prompt), D (panel reference data)
 - [ ] Section A is flowing prose (no bullet points or numbered lists)
-- [ ] Section B includes the standard exclusions plus topic-specific additions
-- [ ] Section C is under 400 words / 2500 characters
+- [ ] Section A is under 1,200 words
+- [ ] Section B includes standard exclusions plus "Do not render precise statistical charts"
+- [ ] Section C is under 250 words
 - [ ] Section D has structured data for all 6 panels
+- [ ] Story Spine present in Section D
 
-### 3. Prompt quality
+### 3. Prompt leanness
 
 - [ ] Section A uses flowing prose throughout (no bullets, no tables)
-- [ ] All 6 hex color codes are mentioned inline in Section A
+- [ ] All 6 hex color codes are mentioned inline in Section A (#0e1545, #f0ece2, #8bb8e0, #e8956a, #00d4c8, #b0a89a)
 - [ ] Spatial positions specified for each panel (top-left, top-center, etc.)
-- [ ] Sentences are 15-30 words each (not too long, not too short)
+- [ ] Each panel description is 40-60 words (not 150+ as in old format)
+- [ ] No body text or explanatory sentences in Section A panel descriptions
+- [ ] Two-pass rendering note present at end of Section A
 - [ ] No emojis anywhere
-- [ ] Em dashes (---) not double hyphens (--)
 
-### 4. Panel completeness
+### 4. Storyboard format
 
 For each of the 6 panels, verify:
-- [ ] Panel number and position
-- [ ] Descriptive title (not generic)
-- [ ] Icon description (concrete, specific, distinct from other panels)
-- [ ] Mini-viz description (concrete chart type with specific data values)
-- [ ] Callout (specific number or memorable phrase, rendering instructions)
-- [ ] Body text (3 bullet sentences in Section D)
-- [ ] Connector arrow from previous panel (except Panel 1) with transition phrase
+- [ ] Panel title in steel blue small-caps (3-5 words, specific to content)
+- [ ] Central sketch is a metaphorical illustration (NOT a precise chart)
+- [ ] Callout in warm orange, under 8 words
+- [ ] Exactly 3 of 6 callouts contain a BIG number
+- [ ] Connector is visual only in Section A ("chalk arrow to Panel N")
+- [ ] No extra elements (no body text, no mini-viz with data, no transition text on arrows)
+- [ ] No two panels use the same metaphor type
 
-### 5. Panel 4 comparison visual
+### 5. Panel 4 comparison sketch
 
-- [ ] Panel 4 includes a comparison visual (side-by-side bars, overlapping intervals, or table)
+- [ ] Panel 4 uses a Comparison metaphor (balance scale, containers, side-by-side objects)
 - [ ] Best method highlighted in teal (#00d4c8)
 - [ ] Others in chalk white (#f0ece2)
+- [ ] NOT a precise bar chart with exact values
 
-### 6. Pedagogical coherence
+### 6. Narrative arc coherence
 
-- [ ] The 6 panels tell a coherent story from problem to conclusion
-- [ ] Panel progression follows the template logic (problem -> data -> method -> comparison -> insight -> bottom line)
-- [ ] Connector phrases create natural transitions between panels
+- [ ] Story Spine captures the post's narrative arc in one sentence
+- [ ] Dramatic functions assigned (Hook, Stakes, Attempt, Twist, Surprise, Resolution)
+- [ ] Story beats form a beginning-middle-end arc
 - [ ] The guiding question in the title banner is answered by Panel 6
+- [ ] Transition phrases use dramatic moves (Escalation, Complication, Turn, Resolution)
+- [ ] No redundant panels
 
 ### 7. Template alignment
 
@@ -64,9 +70,9 @@ For each of the 6 panels, verify:
 
 After completing the review, suggest 2-3 improvements:
 
-1. **Alternative panel arrangement** -- would a different panel topic or ordering tell a clearer story?
+1. **Alternative story beat** -- would a different narrative beat tell a clearer story?
 2. **Better callouts** -- are there more impactful numbers or phrases from the post?
-3. **Better icons/mini-viz** -- are there more visually distinctive options?
+3. **Better central sketch** -- is there a more visually distinctive metaphor?
 
 ## Report format
 
@@ -83,6 +89,13 @@ Deliver the review inline:
 
 ## Accuracy Check
 <summary of number verification -- list each number checked>
+
+## Storyboard Check
+- Story Spine: <present/missing>
+- Section A word count: <N words>
+- Panel description lengths: <range>
+- BIG numbers: <N of 3>
+- Sketch types: <all metaphorical / issues>
 
 ## Issues Found
 

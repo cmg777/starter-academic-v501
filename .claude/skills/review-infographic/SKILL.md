@@ -1,26 +1,28 @@
 ---
 name: review-infographic
-description: Expert review of infographic instructions -- verifies accuracy against the source blog post, evaluates prompt quality and panel completeness, and suggests variant improvements. Use after write-infographic to ensure the prompt is accurate and effective. Read-only.
+description: Expert review of infographic instructions -- verifies accuracy against the source blog post, evaluates storyboard coherence and sketch quality, and suggests variant improvements. Use after write-infographic to ensure the prompt is accurate and effective. Read-only.
 argument-hint: "<post slug, e.g. python_doubleml>"
 disable-model-invocation: true
 user-invocable: true
 ---
 
-# Review Infographic: Verify Accuracy, Prompt Quality, and Panel Completeness
+# Review Infographic: Verify Accuracy, Storyboard Coherence, and Sketch Quality
 
 Single thorough review of an `infographic_instructions.md` file. Cross-checks
-every number and claim against the source blog post, evaluates prompt structure
-and quality, and suggests variant improvements. Produces an inline review
-report with a verdict.
+every number and claim against the source blog post, evaluates storyboard
+structure and prompt quality, and suggests variant improvements. Produces an
+inline review report with a verdict.
 
 **What this skill does:**
 - Cross-checks every number in the infographic prompt against `index.md`
 - Verifies all 4 sections (A, B, C, D) are present and well-formed
-- Evaluates Section A for flowing prose, spatial positions, and hex codes
-- Checks all 6 panels for completeness (icon, mini-viz, callout, body text, connector)
-- Validates Panel 4 comparison visual and teal highlight convention
-- Assesses pedagogical coherence -- do the 6 panels tell a coherent story?
+- Evaluates Section A for lean flowing prose (under 1,200 words)
+- Checks all 6 panels for storyboard format (title, central sketch, callout, connector)
+- Validates Panel 4 uses a Comparison metaphor with teal highlight
+- Assesses narrative arc coherence -- do the 6 beats tell a story?
+- Verifies Story Spine and dramatic functions in Section D
 - Verifies correct template alignment (Causal / ML / Exploratory)
+- Confirms central sketches are metaphorical (not precise charts)
 - Suggests 2-3 variant improvements
 
 **What this skill does NOT do:**
@@ -61,7 +63,7 @@ report with a verdict.
 
 5. **Read reference files** (in parallel):
    - `references/review-checklist.md` -- seven review dimensions with checklists
-   - `references/panel-templates.md` -- panel templates and element rules
+   - `references/panel-templates.md` -- narrative arc templates and element rules
 
 ---
 
@@ -73,9 +75,9 @@ Present a brief confirmation to the user:
    at `content/post/<slug>/`."
 
 2. **Scope:** "Running full review of infographic instructions against source
-   post across all 7 dimensions: accuracy, completeness, prompt quality, panel
-   completeness, Panel 4 comparison visual, pedagogical coherence, and template
-   alignment."
+   post across all 7 dimensions: accuracy, completeness, prompt leanness,
+   storyboard format, Panel 4 comparison sketch, narrative arc coherence, and
+   template alignment."
 
 **Do NOT wait for confirmation.** Proceed directly to the review. This is a
 read-only operation with no risk of modification.
@@ -113,90 +115,95 @@ Every factual claim in the infographic must trace back to the source post.
 ## Step 2 -- Dimension 2: Completeness
 
 1. **All 4 sections present:**
-   - Section A -- Full flowing-prose image generation prompt
+   - Section A -- Lean flowing-prose image generation prompt (under 1,200 words)
    - Section B -- Negative prompt
-   - Section C -- Condensed prompt (under 400 words / 2500 characters)
-   - Section D -- Panel reference data appendix
+   - Section C -- Condensed prompt (under 250 words)
+   - Section D -- Panel reference data appendix with body sentences for overlay
 
 2. **Section A is flowing prose.** No bullet points, no numbered lists, no
    tables. The entire section reads as continuous paragraphs.
 
-3. **Section B includes standard exclusions** plus topic-specific additions
-   relevant to the post content.
+3. **Section A word count.** Count the words in Section A. Flag if over 1,200
+   words -- the prompt should be lean enough for Gemini to process.
 
-4. **Section C word count.** Count the words in Section C. Flag if over 400
-   words. Count characters. Flag if over 2500 characters.
+4. **Section B includes standard exclusions** plus topic-specific additions.
+   Must include "Do not render precise statistical charts."
 
-5. **Section D has structured data** for all 6 panels. Each panel entry must
-   include: title, icon, mini-viz, callout, body text (3 bullet sentences),
-   and connector phrase.
+5. **Section C word count.** Count the words in Section C. Flag if over 250
+   words.
+
+6. **Section D has structured data** for all 6 panels. Each panel entry must
+   include: dramatic function, story beat, callout, central sketch description,
+   body sentences (2-3), and transition phrase.
+
+7. **Story Spine present** in Section D with a one-sentence narrative arc.
 
 ---
 
-## Step 3 -- Dimension 3: Prompt quality
+## Step 3 -- Dimension 3: Prompt leanness
 
-Evaluate Section A for effective AI image generation:
+Evaluate Section A for effective AI image generation with minimal text:
 
 1. **Flowing prose throughout.** No bullets, no tables, no markdown formatting
    that would confuse an image generation model.
 
-2. **All 6 hex color codes mentioned inline.** The site color palette must
-   appear in the prose: `#6a9bcc` (steel blue), `#d97757` (warm orange),
-   `#141413` (near black), `#00d4c8` (teal), `#f0ece2` (chalk white), and
-   the chalkboard background color.
+2. **All 6 hex color codes mentioned inline.** The chalkboard palette must
+   appear: `#0e1545` (navy), `#f0ece2` (chalk white), `#8bb8e0` (steel blue),
+   `#e8956a` (warm orange), `#00d4c8` (teal), `#b0a89a` (muted gray).
 
 3. **Spatial positions specified.** Each panel has a clear position description
    (top-left, top-center, top-right, bottom-left, bottom-center, bottom-right).
 
-4. **Sentence length.** Sentences should be 15-30 words each. Flag sentences
-   that are too long (over 35 words) or too short (under 8 words) -- image
-   generation models work best with medium-length, descriptive sentences.
+4. **Panel descriptions are 40-60 words each.** Flag panels that are over 80
+   words -- they contain too many elements for Gemini.
 
-5. **No emojis anywhere** in the entire file.
+5. **No body text in Section A.** Body sentences belong only in Section D.
+   Flag any explanatory sentences in panel descriptions.
 
-6. **Em dashes** (---) used for parenthetical breaks, not double hyphens (--).
+6. **Two-pass rendering note present.** Section A ends with a paragraph
+   explaining what the AI renders vs what the user overlays.
+
+7. **No emojis anywhere** in the entire file.
 
 ---
 
-## Step 4 -- Dimension 4: Panel completeness
+## Step 4 -- Dimension 4: Storyboard format
 
 For each of the 6 panels, verify the presence and quality of every required
 element:
 
-1. **Panel number and position.** Clearly stated (e.g., "top-left", "Panel 1").
+1. **Panel title.** Steel blue small-caps, 3-5 words, specific to content
+   (not generic like "Results" or "Analysis").
 
-2. **Descriptive title.** Not generic ("Results" or "Analysis") but specific
-   to the content (e.g., "The Wage Penalty Question" or "Double Robustness
-   Advantage").
+2. **Central sketch.** ONE metaphorical illustration described in 1-2
+   sentences. Must be a visual metaphor (magnifying glass, balance scale,
+   fork in road) -- NOT a precise statistical chart (bar chart with exact
+   values, scatter plot, number line with tick marks). Flag any precise
+   data visualizations.
 
-3. **Icon description.** Concrete, specific, and visually distinct from the
-   other 5 panels. Flag if two panels use similar icons.
+3. **Callout.** Warm orange, under 8 words. Exactly 3 of 6 panels must
+   contain a BIG number; the other 3 use memorable phrases. Flag if all 6
+   have numbers (too dense) or if none have numbers (too vague).
 
-4. **Mini-viz description.** Concrete chart type with specific data values
-   from the source post. Not vague ("a chart showing results") but precise
-   ("a grouped bar chart with three bars: OLS at 0.45, IV at 0.62, DML at
-   0.58"). Flag generic or numberless descriptions.
+4. **Connector arrow.** Visual only in Section A (just "chalk arrow to
+   Panel N"). Transition phrases belong in Section D only.
 
-5. **Callout.** A specific number or memorable phrase with rendering
-   instructions (font size, color, position). The number must trace back to
-   the source post.
+5. **No extra elements.** Flag if a panel description includes body
+   sentences, mini-viz with data values, multiple annotation labels, or
+   transition text on arrows.
 
-6. **Body text.** Three bullet sentences in Section D that summarize the
-   panel's message. Each sentence should be self-contained and informative.
-
-7. **Connector arrow.** From the previous panel (except Panel 1) with a
-   content-specific transition phrase -- not generic ("next" or "then") but
-   tied to the analytical flow (e.g., "But does selection bias this estimate?"
-   or "Adding controls reveals...").
+6. **Sketch diversity.** No two panels should use the same metaphor type.
+   Flag repeats (e.g., two magnifying glasses, two forks in roads).
 
 ---
 
-## Step 5 -- Dimension 5: Panel 4 comparison visual
+## Step 5 -- Dimension 5: Panel 4 comparison sketch
 
 Panel 4 typically shows a methods comparison. Verify:
 
-1. **Comparison visual present.** Panel 4 includes a side-by-side bars,
-   overlapping confidence intervals, or comparison table description.
+1. **Comparison metaphor present.** Panel 4 uses a Comparison-category
+   sketch (balance scale, side-by-side containers, objects of different
+   sizes) -- not a precise bar chart.
 
 2. **Best method highlighted in teal** (`#00d4c8`). The winning or
    recommended method should be visually distinguished.
@@ -204,34 +211,38 @@ Panel 4 typically shows a methods comparison. Verify:
 3. **Other methods in chalk white** (`#f0ece2`). Non-preferred methods use
    the neutral chalk color to create contrast.
 
-4. **Comparison is accurate.** The relative ordering and values in the
-   comparison match the source post's findings.
+4. **Comparison is accurate.** The relative ordering in the comparison
+   matches the source post's findings.
 
 If the post does not compare multiple methods, note that Panel 4 may serve
 a different purpose and evaluate accordingly based on the template.
 
 ---
 
-## Step 6 -- Dimension 6: Pedagogical coherence
+## Step 6 -- Dimension 6: Narrative arc coherence
 
 Evaluate whether the 6 panels tell a coherent story:
 
-1. **Logical progression.** The panels follow a clear arc from problem
-   statement to conclusion -- typically: problem, data, method, comparison,
-   insight, bottom line.
+1. **Story Spine present.** Section D includes a one-sentence Story Spine
+   that captures the post's narrative arc.
 
-2. **Template logic followed.** The panel purposes match the selected
-   template (Causal / ML / Exploratory) from `references/panel-templates.md`.
+2. **Dramatic functions assigned.** Each panel has a dramatic function
+   (Hook, Stakes, Attempt, Twist, Surprise, Resolution) that matches its
+   position in the narrative arc.
 
-3. **Connector phrases create transitions.** Reading just the connector
-   phrases should produce a mini-narrative that makes sense on its own.
+3. **Story beats form an arc.** Reading just the 6 story beats should
+   produce a mini-narrative with beginning (tension), middle (action), and
+   end (resolution). Flag if beats are disconnected or redundant.
 
-4. **Panel 6 answers the guiding question.** The title banner of the
-   infographic poses a question. Panel 6 should provide the answer or
-   key takeaway. Flag if Panel 6 is generic or disconnected from the
-   opening question.
+4. **Panel 6 answers the guiding question.** The title banner poses a
+   question. Panel 6 should provide the answer or key takeaway. Flag if
+   Panel 6 is generic or disconnected from the opening question.
 
-5. **No redundant panels.** Each panel contributes unique information.
+5. **Transition phrases drive narrative.** The transition phrases in
+   Section D should use dramatic moves (Escalation, Complication, Turn,
+   Resolution) -- not generic connectors ("next", "then").
+
+6. **No redundant panels.** Each panel contributes unique information.
    Flag if two panels cover essentially the same content.
 
 ---
@@ -247,8 +258,8 @@ Evaluate whether the 6 panels tell a coherent story:
      spatial analysis, descriptive statistics (ESDA, LISA, etc.)
 
 2. **Panel purposes match template specification.** Compare each panel's
-   actual purpose against the template's prescribed purpose. Flag any panel
-   that is off-topic or tangential.
+   actual purpose against the template's prescribed purpose and dramatic
+   function. Flag any panel that is off-topic or tangential.
 
 3. **No mismatched template.** If the infographic uses a Causal template but
    the post is about exploratory analysis (or vice versa), flag as HIGH.
@@ -263,8 +274,8 @@ Deliver the review **inline in the conversation** using the format below.
 
 | Level | Meaning |
 | --- | --- |
-| **HIGH** | Numbers do not match source post, missing sections (A/B/C/D), fabricated claims, wrong template. Must fix before using the prompt. |
-| **MEDIUM** | Generic descriptions, missing panel elements, vague callouts, quality issues that reduce prompt effectiveness. Should fix. |
+| **HIGH** | Numbers do not match source post, missing sections (A/B/C/D), fabricated claims, wrong template, precise charts instead of sketches. Must fix before using the prompt. |
+| **MEDIUM** | Generic descriptions, missing panel elements, vague callouts, too many text elements per panel, Section A over 1,200 words. Should fix. |
 | **LOW** | Style preferences, minor wording improvements, alternative suggestions. Nice to fix. |
 
 ### Report structure
@@ -289,6 +300,16 @@ the infographic, its location in the source post, and match status
 | # | Number | Infographic location | Source post location | Status |
 |---|--------|---------------------|---------------------|--------|
 
+## Storyboard Check
+
+- **Story Spine**: <present/missing> -- <quote if present>
+- **Dramatic functions**: <all assigned / missing for panels X>
+- **Narrative arc**: <coherent / disconnected at panel X>
+- **Section A word count**: <N words> (<within / over> 1,200 limit)
+- **Panel description lengths**: <range, e.g. "42-58 words each">
+- **BIG numbers**: <N of 3 expected> in callouts
+- **Sketch types**: <all metaphorical / panels X use precise charts>
+
 ## Issues Found
 
 | # | Dimension | Severity | Location | Issue | Suggested fix |
@@ -296,10 +317,9 @@ the infographic, its location in the source post, and match status
 
 ## Variant Suggestions
 
-1. <Alternative panel arrangement, ordering, or topic swap that would
-   tell a clearer story>
+1. <Alternative story beat or sketch metaphor that would be clearer>
 2. <Better callouts -- more impactful numbers or phrases from the post>
-3. <Better icons or mini-viz -- more visually distinctive options>
+3. <Better central sketch -- more visually distinctive metaphor>
 
 ## Positive Highlights
 
@@ -328,13 +348,19 @@ the infographic, its location in the source post, and match status
 - [ ] Read the **entire** `index.md` source post
 - [ ] Extracted and verified every number in the infographic against the source
 - [ ] Confirmed all 4 sections (A, B, C, D) are present
-- [ ] Counted Section C words (must be under 400)
+- [ ] Counted Section A words (must be under 1,200)
+- [ ] Counted Section C words (must be under 250)
 - [ ] Verified Section A is flowing prose (no bullets, no tables)
 - [ ] Checked all 6 hex codes appear in Section A
 - [ ] Verified spatial positions for all 6 panels
-- [ ] Checked each panel for all 7 elements (position, title, icon, mini-viz, callout, body text, connector)
-- [ ] Verified Panel 4 comparison visual with teal/chalk coloring
-- [ ] Assessed pedagogical coherence across all 6 panels
+- [ ] Checked each panel for storyboard format (title, central sketch, callout, connector)
+- [ ] Confirmed panel descriptions are 40-60 words each
+- [ ] Confirmed no body text in Section A
+- [ ] Verified central sketches are metaphorical (not precise charts)
+- [ ] Confirmed exactly 3 BIG numbers in callouts
+- [ ] Verified Panel 4 uses a Comparison metaphor with teal/chalk coloring
+- [ ] Checked Story Spine and dramatic functions in Section D
+- [ ] Assessed narrative arc coherence across all 6 beats
 - [ ] Verified correct template for the topic
 - [ ] Generated 2-3 variant suggestions
 - [ ] All HIGH issues have specific locations and correct values
@@ -348,6 +374,6 @@ After delivering the review, offer the user next steps:
 
 "Would you like me to:
 - Fix the issues found and update `infographic_instructions.md`?
-- Adjust specific panels (swap topics, improve callouts, change icons)?
+- Adjust specific story beats or sketch metaphors?
 - Regenerate the infographic prompt with a different template using `/project:write-infographic`?
 - Elaborate on any specific finding or suggest additional variants?"

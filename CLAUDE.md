@@ -215,20 +215,20 @@ Comprehensive review of a data science blog post. Merges deep expert review with
 
 **Location:** `.claude/skills/write-infographic/SKILL.md`
 
-Generate a chalkboard-style infographic prompt for a blog post. Produces `infographic_instructions.md` with 4 sections: (A) full flowing-prose AI image prompt, (B) negative prompt, (C) condensed ~300-word prompt, (D) panel reference data. Confirms template, title, and rendering preferences before generating.
+Generate a storyboard-first chalkboard infographic prompt for a blog post. Uses a Story Spine narrative arc and simple sketch metaphors (not precise charts) that Gemini can render well. Produces `infographic_instructions.md` with 4 sections: (A) lean flowing-prose AI image prompt (~800-1,000 words), (B) negative prompt, (C) condensed ~200-word prompt, (D) panel reference data with body text for manual overlay. Confirms Story Spine, story beats, and 3 BIG numbers before generating.
 
 **Invocation:**
 ```
 /project:write-infographic <post slug>
 ```
 
-**Reference files:** `references/panel-templates.md`, `references/static-sections.md`
+**Reference files:** `references/panel-templates.md`, `references/static-sections.md`, `references/visual-metaphor-vocabulary.md`
 
 ## review-infographic
 
 **Location:** `.claude/skills/review-infographic/SKILL.md`
 
-Expert review of infographic instructions. Cross-checks every number against the source post, evaluates prompt quality and panel completeness, and suggests variant improvements. Read-only.
+Expert review of infographic instructions. Cross-checks every number against the source post, evaluates storyboard coherence and sketch quality (metaphorical vs precise), verifies narrative arc and Story Spine, and suggests variant improvements. Read-only.
 
 **Invocation:**
 ```

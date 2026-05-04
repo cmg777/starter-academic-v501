@@ -1,23 +1,25 @@
 ---
 name: write-infographic
-description: Generate a chalkboard infographic prompt for a blog post -- use after publishing a data science post to create a visual summary. Produces a copy-pasteable AI image prompt (Gemini, DALL-E, Midjourney, Ideogram) with 6 panels, negative prompt, condensed variant, and panel reference data. Confirms template, title, and rendering preferences before generating.
+description: Generate a chalkboard infographic prompt for a blog post -- use after publishing a data science post to create a visual storyboard. Produces a copy-pasteable AI image prompt (Gemini, DALL-E, Midjourney, Ideogram) with 6 story-beat panels, negative prompt, condensed variant, and panel reference data. Confirms Story Spine, story beats, and key numbers before generating.
 argument-hint: "<post slug, e.g. python_partial_identification>"
 disable-model-invocation: true
 user-invocable: true
 ---
 
-# Write Infographic: AI Image Prompt Generator
+# Write Infographic: Storyboard-First AI Image Prompt
 
 Read an existing blog post on this site and produce an `infographic_instructions.md`
 file in the post's page bundle. The file is a **ready-to-paste AI image generation
-prompt** that creates a chalkboard-style infographic summarizing the post into 6
-panels. It contains four sections: (A) a full flowing-prose prompt with scene
-description, composition, color system, panel-by-panel visual scenes, enrichment
-elements, and text rendering guidance; (B) a negative prompt; (C) a condensed
-~300-word prompt for token-limited tools; and (D) a structured panel reference
-data appendix. The skill auto-selects a panel template (causal inference,
-ML/prediction, or exploratory/descriptive) based on the post's content, and
-asks the user to confirm key choices before generating.
+prompt** that creates a chalkboard-style infographic telling the post's story in 6
+visual beats. The skill prioritizes **clear storytelling through simple sketch
+metaphors** over precise statistical charts -- Gemini and similar tools draw
+metaphorical sketches well but cannot render precise data visualizations.
+
+The output contains four sections: (A) a lean flowing-prose prompt (~800-1,000
+words) with scene description, composition, color system, and 6 focused panel
+scenes; (B) a negative prompt; (C) a condensed ~200-word prompt for token-limited
+tools; and (D) a structured panel reference data appendix with full text for
+manual overlay.
 
 ## Example invocations
 
@@ -51,21 +53,33 @@ the reference for tone, structure, and level of detail.
    `content/post/python_partial_identification/infographic_instructions.md` to
    calibrate the scene description style and prompt structure.
 
-5. **Extract key content.** Identify:
-   - The post's core topic and method(s)
-   - The case study / dataset (name, sample size, key variables)
-   - 6-10 specific numbers (coefficients, bounds, sample sizes, percentages, p-values)
-   - The most surprising or impactful finding
-   - 2-3 topic-specific formulas for background texture
-   - 2-3 topic-specific icon ideas
+5. **Write the Story Spine.** Articulate the post's narrative arc in one sentence:
 
-6. **Select the panel template.** Choose Causal Inference, ML/Prediction, or
-   Exploratory/Descriptive based on the post's tags and content. Draft all six
-   panel headlines, key numbers, and callout phrases internally.
+   > "[Subject/method] reveals that [key insight] by showing [evidence],
+   > challenging the assumption that [conventional wisdom]."
 
-7. **Read the write-post skill.** Read `.claude/skills/write-post/SKILL.md` to
-   understand the post conventions and ensure the infographic aligns with the
-   post's structure and terminology.
+6. **Draft 6 story beats.** Write one phrase per panel that forms a
+   beginning-middle-end arc. The beats should read like a story when spoken aloud.
+
+   Example: "What if key confounders are hidden?" -- "1,000 workers, one unmeasured
+   variable" -- "Manski bounds span the full range" -- "Entropy cuts the range by
+   32%" -- "More data doesn't help at all" -- "Honest uncertainty beats false certainty"
+
+7. **Identify 3 BIG numbers.** These are the anchor points the viewer remembers --
+   rendered large in warm orange (#e8956a). Pick the most impactful: a key
+   coefficient, a percentage improvement, a sample size, a bound width.
+
+8. **Identify 3 contextual numbers.** These appear as small annotation labels on
+   sketches (e.g., "N = 1,000" next to tally marks). Less prominent but grounding.
+
+9. **Select the panel template.** Read `references/panel-templates.md`. Choose
+   Causal Inference, ML/Prediction, or Exploratory/Descriptive based on the post's
+   tags and content. Map each panel to a dramatic function (Hook, Stakes, First
+   attempt, Twist, Surprise, Resolution).
+
+10. **Select central sketches.** Read `references/visual-metaphor-vocabulary.md`.
+    For each panel, choose ONE metaphor from the suggested categories. Ensure no
+    two panels use the same metaphor. Panel 4 must use a Comparison metaphor.
 
 ---
 
@@ -74,28 +88,29 @@ the reference for tone, structure, and level of detail.
 Before generating, present the user with a confirmation summary and wait for
 their response. Display all items in a single formatted block:
 
-1. **Template selected**: "[Causal Inference / ML-Prediction / Exploratory-Descriptive] -- based on [brief reasoning]. Change?"
+1. **Story Spine**: The one-sentence narrative arc.
 
-2. **Title + guiding question**: "Proposed title: '[title]'. Guiding question: '*[question]*'. Modify?"
+2. **Template selected**: "[Causal Inference / ML-Prediction / Exploratory-Descriptive] -- based on [brief reasoning]. Change?"
 
-3. **Panel overview**: A compact 6-row summary:
+3. **Six story beats**: A compact 6-row summary:
 
    ```
-   Panel 1: [Title] -- key number: [number]
-   Panel 2: [Title] -- key number: [number]
-   ...
-   Panel 6: [Title] -- key number: [number]
+   Panel 1 (Hook):      [beat phrase] -- sketch: [metaphor]
+   Panel 2 (Stakes):    [beat phrase] -- sketch: [metaphor]
+   Panel 3 (Attempt):   [beat phrase] -- sketch: [metaphor]
+   Panel 4 (Twist):     [beat phrase] -- sketch: [comparison metaphor]
+   Panel 5 (Surprise):  [beat phrase] -- sketch: [metaphor]
+   Panel 6 (Resolution):[beat phrase] -- sketch: [metaphor]
    ```
 
-4. **Target AI tool**: "Which tool will you use? [Gemini / DALL-E 3 / Midjourney / Ideogram / Other]. This affects prompt length and text rendering approach."
+4. **3 BIG numbers**: The warm orange callouts (e.g., "32% tighter", "11.2 pp bias", "Width: 1.0").
 
-5. **Text rendering preference**:
-   - "Option A: Include all text -- title, panel titles, body sentences, key numbers, annotations (best for Gemini / Ideogram)"
-   - "Option B: Key text only -- title, panel titles, key numbers, callout phrases (best for DALL-E 3)"
-   - "Option C: Minimal text -- visual layout with numbers only, body text shown as decorative wavy chalk lines (best for Midjourney)"
+5. **Target AI tool**: "Which tool will you use? [Gemini / DALL-E 3 / Midjourney / Ideogram / Other]."
+
+6. **Two-pass note**: "Section A generates the base image (sketches + key text). Section D provides all body text for manual overlay in an image editor."
 
 **Handling responses:**
-- "Looks good" / "proceed" / no changes: continue with defaults (Option A text rendering)
+- "Looks good" / "proceed" / no changes: continue with defaults
 - Specific adjustments: incorporate them and proceed
 - Major changes requested: revise the draft and re-present the summary
 
@@ -114,9 +129,8 @@ separate them. Use `##` headers to label each section.
 ### Section A: Full Image Generation Prompt
 
 This is the main deliverable -- a flowing prose prompt the user copies into
-an AI image generation tool. Structure it as follows, using `##` for the
-section header and no sub-headers within (the AI tool receives it as
-continuous prose organized into labeled paragraphs).
+an AI image generation tool. Target: **800-1,000 words total** for Section A.
+Structure it as follows:
 
 #### A1. Opening line
 
@@ -140,14 +154,13 @@ Describe the full layout in one paragraph. Include:
 - 6 panels in a 3-column x 2-row grid below the title
 - Panel borders: chalk-drawn rounded rectangles in steel blue (#8bb8e0) with slightly uneven edges
 - Panel numbers: small circled numerals in warm orange (#e8956a), top-left corner of each panel
-- Connector arrows: chalk arrows with dust particles connecting panels in reading order (1->2->3 across top row, vertical arrow from 3 down to 4, then 4->5->6 across bottom row)
+- Connector arrows: simple chalk arrows with dust particles connecting panels in reading order (1->2->3 across top row, vertical arrow from 3 down to 4, then 4->5->6 across bottom row)
 - Generous dark space between panels -- the navy background is a design element
-- Breathing room around the entire grid for margin elements
 
 #### A3. Color system paragraph
 
 Describe all 6 colors as flowing prose (NOT a table). Each color gets its name,
-hex code, and role. Include post-specific usage examples for warm orange and teal.
+hex code, and role.
 
 The 6 colors (always the same):
 
@@ -160,19 +173,7 @@ The 6 colors (always the same):
 | Call-outs / positive emphasis | Teal | `#00d4c8` |
 | Underlines / secondary accents | Muted chalk gray | `#b0a89a` |
 
-In the output, render this as prose, e.g.:
-```
-Colors: Navy blue (#0e1545) fills the background. Chalk white (#f0ece2) is
-used for all body text and sketch outlines -- never pure white (#ffffff),
-always slightly warm and creamy. Steel blue (#8bb8e0) marks panel titles
-and borders. Warm orange (#e8956a) highlights key numbers, bold callouts,
-and cautionary findings like [cite a specific cautionary result from the
-post]. Teal (#00d4c8) marks positive results like [cite a specific positive
-result from the post]. Muted chalk gray (#b0a89a) appears on connectors,
-annotations, and de-emphasized labels.
-```
-
-The bracketed examples MUST reference actual numbers or findings from the post.
+In the output, render as prose with post-specific color usage examples.
 
 #### A4. Title banner paragraph
 
@@ -181,7 +182,6 @@ Describe the title banner positioned at the top center, above the panel grid:
 - Guiding question in smaller chalk-white italic below the title
 
 **Title rules:**
-- Do NOT use generic titles like "Infographic Instructions" or the post's full title
 - Capture the core idea in under 12 words
 - Frame it as what the reader will learn, not what the post does
 
@@ -189,38 +189,25 @@ Describe the title banner positioned at the top center, above the panel grid:
 - Must be a genuine question the reader would ask
 - Should create curiosity and motivate reading the panels
 
-**Examples:**
+#### A5. Panel descriptions (1 through 6) -- STORYBOARD FORMAT
 
-```
-The title banner reads "BOUNDING CAUSAL EFFECTS WHEN CONFOUNDERS ARE HIDDEN"
-in large steel blue (#8bb8e0) chalk small-caps, centered above the grid.
-Below it in smaller chalk-white (#f0ece2) italic: "What can we still learn
-when key variables are unmeasured?"
-```
+Each panel is described as a **focused scene** in 40-60 words. Each panel
+has exactly 3-4 elements:
 
-```
-The title banner reads "ESTIMATING CAUSAL EFFECTS WITH DOUBLE MACHINE
-LEARNING" in large steel blue (#8bb8e0) chalk small-caps, centered above
-the grid. Below it in smaller chalk-white (#f0ece2) italic: "Can machine
-learning separate causal signals from confounding noise?"
-```
+1. **Panel title** -- steel blue small-caps, 3-5 words
+2. **Central sketch** -- ONE large metaphorical illustration described in 1-2
+   sentences. Choose from `references/visual-metaphor-vocabulary.md`. This is the
+   hero visual -- large, clear, simple.
+3. **Callout** -- warm orange, under 8 words. 3 of 6 panels must contain a BIG
+   number. The other 3 use memorable phrases.
+4. **Connector arrow** -- "Chalk arrow to Panel N" (visual only, no text on arrow)
 
-#### A5. Panel descriptions (1 through 6)
-
-Each panel is described as a **flowing paragraph** -- not bullet points. Each
-paragraph weaves together all visual elements for that panel:
-
-1. **Spatial position** -- e.g., "The top-left panel (row 1, column 1)"
-2. **Border and number** -- chalk-drawn rounded rectangle, circled number in warm orange
-3. **Title text** -- in steel blue small-caps chalk lettering, with exact wording
-4. **Icon** -- a concrete chalk-drawn illustration woven into the scene (e.g., "A chalk-drawn magnifying glass hovers over a stick figure")
-5. **Mini-viz** -- a small chalk-drawn chart or diagram with specific data values (e.g., "A chalk number line spans from -0.3 to 0.7 with bracket markers at the endpoints")
-6. **Callout** -- the single most impactful phrase, described with rendering instructions: "The phrase '[text]' appears in large warm orange (#e8956a) chalk numerals with a chalk underline swoosh"
-7. **Body text** -- the remaining 1-2 sentences, described according to the user's text rendering preference:
-   - Option A: "In chalk white (#f0ece2), the text reads: '[sentence 1]' and '[sentence 2]'"
-   - Option B: skip body text, only title + callout + key number
-   - Option C: "Decorative wavy chalk lines in chalk white suggest body text"
-8. **Connector arrow** -- chalk arrow to next panel with transition phrase: "A chalk arrow connects to Panel N with the phrase '[transition]' in small muted gray (#b0a89a) chalk along the arrow"
+**What NOT to include in panel descriptions:**
+- Body sentences or explanatory text (goes in Section D)
+- Precise statistical charts with exact data values
+- Mini-viz with axis labels or tick marks
+- Transition phrases on arrows (goes in Section D)
+- More than one annotation label per sketch
 
 **Spatial position mapping (3x2 grid):**
 
@@ -229,11 +216,15 @@ Row 1: Panel 1 (top-left)    | Panel 2 (top-center)    | Panel 3 (top-right)
 Row 2: Panel 4 (bottom-left) | Panel 5 (bottom-center) | Panel 6 (bottom-right)
 ```
 
-**Panel templates and element rules** -- read `references/panel-templates.md`
-for the three templates (Causal Inference, ML/Prediction,
-Exploratory/Descriptive) and all rules for panel titles, icons, mini-viz,
-callouts, connectors, and the Panel 4 comparison visual. Select the template
-that matches the post's tags and content.
+**Example panel (new format):**
+
+```
+Panel 1 (top-left): Title "THE HIDDEN CONFOUNDER" in steel blue
+small-caps. A large chalk-drawn magnifying glass hovers over a stick
+figure, with a bold question mark where the confounder should be --
+the glass reveals nothing. Callout: "Credible uncertainty over
+incredible certainty" in warm orange. Chalk arrow to Panel 2.
+```
 
 #### A6. Margin elements paragraph
 
@@ -246,65 +237,30 @@ After all 6 panels, describe the elements outside the panel grid:
 
 **Color concept legend:**
 - Position: bottom-left margin, outside the panel grid
-- Style: small chalk text with colored dots or swatches
-- Content: 2-3 recurring concepts mapped to consistent colors across all panels
-
-Legend entries must be adapted to the post. Examples:
-- Causal posts: "Causal effect: teal dot, Bias/confounding: warm orange dot, Data: chalk white dot"
-- ML posts: "Model performance: teal dot, Overfitting/error: warm orange dot, Features: chalk white dot"
-- Exploratory posts: "Key pattern: teal dot, Outlier/anomaly: warm orange dot, Variables: chalk white dot"
+- Style: small chalk text with colored dots
+- Content: 2-3 recurring concepts mapped to consistent colors
 
 #### A7. Texture and atmosphere paragraph
 
-Describe the atmospheric details that make the chalkboard feel real:
-
+Describe the atmospheric details:
 - Chalk dust particles floating near text edges and panel borders
 - Subtle smudge marks where chalk has been partially erased
-- Faint chalk-drawn equations or formulas visible behind the panels on the navy background, at ~15-20% opacity in muted gray (#b0a89a)
+- Faint chalk-drawn equations or formulas visible behind the panels at ~15-20% opacity in muted gray (#b0a89a)
 - The specific formulas must be relevant to the post's topic
+- Topic-specific illustration fragments (stick figures, brackets, arrows) faintly in background gaps
 
-Formula examples per topic:
-- Partial identification: `Y = f(T, U) + e`, `P(Y|T) = Sum P(Y|T,U)P(U|T)`
-- Random forest: `y_hat = (1/B) Sum f_k(x)`, `MSE = (1/n) Sum(y_i - y_hat_i)^2`
-- DoWhy: `E[Y|do(T)]`, `Y _||_ T | X`
-- DML: `theta_0 = E[psi(W; theta_0, eta_0)]`, `Y - g(X) = theta(D - m(X)) + e`
+#### A8. Two-pass rendering note
 
-Illustration suggestions must also be topic-specific:
-- Partial identification: "stick figures for workers, magnifying glass for unmeasured, brackets for bounds"
-- Random forest: "decision trees, forest of trees, feature importance bars"
-- DoWhy: "DAG arrows, treatment/outcome nodes, refutation shields"
-- DML: "decision trees for ML learners, crossed-out confounders, folded data blocks for cross-fitting"
+Add a single paragraph explaining what the AI should render vs what the user
+will add manually:
 
-#### A8. Text rendering guidance paragraph
-
-Based on the user's choice in Step 0.5, add a paragraph specifying text
-rendering priorities:
-
-**Option A (all text):**
 ```
-Text rendering priorities: The title banner text and panel numbers must be
-clearly legible. Panel titles should be readable in steel blue small-caps.
-Key numbers and callout phrases must be prominent in warm orange. Body text
-sentences should be readable in chalk white. Connector phrases and annotations
-can be smaller but still legible. Background formulas should be barely
-visible at 15-20% opacity.
-```
-
-**Option B (key text only):**
-```
-Text rendering priorities: The title banner, panel numbers, panel titles,
-key numbers, and callout phrases must be clearly legible. Body text should
-be omitted or represented as faint chalk-white wavy lines suggesting
-handwriting. Background formulas at 15-20% opacity.
-```
-
-**Option C (minimal text):**
-```
-Text rendering priorities: Only the title banner and panel numbers need to
-be legible text. All other text -- panel titles, body sentences, annotations
--- should appear as decorative wavy chalk lines that suggest handwriting
-without being readable. Key numbers should be the only other legible elements,
-rendered large in warm orange. Background formulas at 10% opacity.
+This prompt generates the base image. The AI should render clearly: the
+title banner, 6 panel titles in steel blue, 6 central sketch illustrations,
+3 key numbers in large warm orange chalk, and 3 callout phrases. All other
+text -- body sentences, annotations, transition phrases -- is provided in
+the panel reference data for the user to overlay manually in an image
+editor. Keep text elements minimal and large for legibility.
 ```
 
 ---
@@ -313,18 +269,17 @@ rendered large in warm orange. Background formulas at 10% opacity.
 
 Read `references/static-sections.md` for the negative prompt template
 (mostly static, add topic-specific exclusions) and the condensed prompt
-structure (telegram-style, under 400 words, for token-limited tools like
-Midjourney and DALL-E).
+structure (telegram-style, under 250 words, for token-limited tools).
 
 ---
 
-### Section D: Panel Reference Data
+### Section D: Panel Reference Data (for manual text overlay)
 
 Separated by `---` and labeled `## Panel Reference Data`.
 
-This section is NOT part of the prompt -- it is a structured appendix the
-user can reference when iterating or adjusting the generated image. Use
-markdown formatting (headers, bullets) for readability.
+This section is NOT part of the AI prompt -- it is a structured appendix the
+user references when overlaying text on the generated image or when iterating
+on the prompt. Use markdown formatting (headers, bullets) for readability.
 
 For each panel, include:
 
@@ -332,20 +287,25 @@ For each panel, include:
 ### Panel N -- [Title]
 
 - **Position**: [row, column, spatial name]
+- **Dramatic function**: [Hook / Stakes / Attempt / Twist / Surprise / Resolution]
+- **Story beat**: "[the beat phrase from Step 0]"
 - **Callout**: "[the callout phrase]"
-- **Key number**: [the featured number with context]
-- **Body sentences**:
+- **Key number**: [the featured number with context, or N/A]
+- **Central sketch**: [description of the metaphor illustration]
+- **Body sentences** (for manual overlay):
   - [sentence 1]
   - [sentence 2]
   - [sentence 3, if applicable]
-- **Icon**: [description of the chalk-drawn icon]
-- **Mini-viz**: [description of the chalk chart/diagram with specific data]
-- **Connector to next**: "[transition phrase]"
+- **Transition to next**: "[narrative transition phrase]"
 ```
 
 Also include at the end of Section D:
 
 ```markdown
+### Story Spine
+
+> [The one-sentence Story Spine from Step 0]
+
 ### Margin Elements
 
 - **Professor's note**: "[note text]" -- positioned [location], with arrow toward Panel [N]
@@ -370,62 +330,64 @@ Also include at the end of Section D:
 After writing the file:
 
 1. **Read it back** to verify it was written correctly
-2. **Check Section A opening**: starts with "Create a 1920x1080 landscape digital chalk illustration..."
-3. **Check colors inline**: all 6 hex codes appear as flowing prose in Section A (no markdown tables)
-4. **Check spatial positions**: each panel description includes its grid position (row, column)
-5. **Check flowing prose**: each panel is a continuous paragraph (no bullet points or tagged metadata in Section A)
-6. **Check rendering instructions**: key numbers include size/color/style instructions
-7. **Check connector arrows**: chalk arrows with transition phrases described between all adjacent panels
-8. **Check specific numbers**: at least 6 panels reference a specific number from the post
-9. **Cross-check numbers**: for each number cited, verify it appears in the source post's `index.md`. Flag any that cannot be found.
+2. **Check Story Spine**: exists in Section D and captures the narrative arc
+3. **Check Section A opening**: starts with "Create a 1920x1080 landscape digital chalk illustration..."
+4. **Check Section A length**: total Section A is under 1,200 words
+5. **Check panel descriptions**: each panel is 40-60 words with exactly 3-4 elements (title, sketch, callout, connector)
+6. **Check central sketches**: all 6 are metaphorical illustrations (not precise charts), no two are the same metaphor
+7. **Check BIG numbers**: exactly 3 panels have a specific number in their warm orange callout
+8. **Check narrative arc**: panels follow Hook -> Stakes -> Attempt -> Twist -> Surprise -> Resolution
+9. **Check no body text in Section A**: body sentences appear only in Section D
 10. **Check Section B**: negative prompt section exists
-11. **Check Section C**: condensed prompt exists and is under 400 words
-12. **Check Section D**: panel reference data preserves all callouts, icons, mini-viz, body sentences
-13. **Check text rendering**: guidance paragraph matches the user's selected preference from Step 0.5
+11. **Check Section C**: condensed prompt exists and is under 250 words
+12. **Check Section D**: all panels have dramatic function, story beat, callout, body sentences, transition phrase
+13. **Cross-check numbers**: for each number cited, verify it appears in the source post's `index.md`. Flag any that cannot be found.
 14. **Check background formulas**: topic-specific formulas cited in the atmosphere paragraph
-15. **Check margin elements**: professor's note with spatial position and content; color concept legend with position and entries
+15. **Check margin elements**: professor's note with spatial position and content; color concept legend
 16. **Check title banner**: positioned above grid with guiding question in italic
-17. **Check Panel 4**: includes a comparison visual (side-by-side bars, intervals, or table)
+17. **Check Panel 4**: uses a Comparison metaphor (balance scale, side-by-side objects, etc.)
 
 ---
 
 ## Quality checklist
 
+**Storyboard structure:**
+- [ ] Story Spine sentence captures the narrative arc
+- [ ] Six story beats form a coherent beginning-middle-end arc
+- [ ] Dramatic functions assigned: Hook, Stakes, Attempt, Twist, Surprise, Resolution
+- [ ] Narrative tension builds through Panels 1-4 and resolves in 5-6
+
 **Prompt structure:**
 - [ ] Section A starts with medium + style + dimensions opening line
-- [ ] All content in Section A is flowing prose (no bullet points, no markdown tables, no tagged metadata)
+- [ ] Section A is under 1,200 words total
+- [ ] All content in Section A is flowing prose (no bullet points, no markdown tables)
 - [ ] All 6 hex color codes appear inline with their names and roles
 - [ ] Spatial positions (row, column) specified for every panel
-- [ ] Consistent terminology throughout (panel, border, chalk arrow, chalk dust)
 
-**Title & composition:**
-- [ ] Title captures core idea in under 12 words, in steel blue small-caps
-- [ ] Guiding question in italic chalk white below the title
-- [ ] Composition describes 3x2 grid with connector arrow routing
-
-**Panel descriptions:**
-- [ ] Exactly 6 panels, each as a flowing scene paragraph
-- [ ] Each panel includes: position, border, number, title, icon, mini-viz, callout, body text, connector
-- [ ] Each callout contains a specific number or memorable phrase with warm orange rendering instructions
-- [ ] Each icon is concrete and panel-specific (no repeats)
-- [ ] Each mini-viz describes a specific chart type with data values from the post (not generic)
-- [ ] Panel 4 includes a comparison visual (bars, intervals, or table)
-- [ ] Correct panel template selected (Causal / ML / Exploratory)
+**Panel descriptions (Section A):**
+- [ ] Exactly 6 panels, each 40-60 words
+- [ ] Each panel has exactly: title, central sketch, callout, connector
+- [ ] NO body text, NO mini-viz with data values, NO transition text on arrows
+- [ ] Each central sketch is a metaphorical illustration (not a precise chart)
+- [ ] No two panels use the same metaphor
+- [ ] Panel 4 uses a Comparison metaphor
+- [ ] Exactly 3 callouts contain a BIG number; 3 use memorable phrases
 
 **Enrichment elements:**
 - [ ] Professor's margin note: specific insight, spatial position, arrow toward relevant panel
 - [ ] Color concept legend: 2-3 concepts mapped to colors, spatial position
 - [ ] Background formulas: topic-specific, described at 15-20% opacity
 - [ ] Chalk dust, smudge effects, and atmosphere described
+- [ ] Two-pass rendering note included
 
 **Sections complete:**
-- [ ] Section A: full image generation prompt (flowing prose)
+- [ ] Section A: storyboard image prompt (flowing prose, under 1,200 words)
 - [ ] Section B: negative prompt
-- [ ] Section C: condensed prompt under 400 words
-- [ ] Section D: panel reference data with all structured details
+- [ ] Section C: condensed prompt under 250 words
+- [ ] Section D: panel reference data with body sentences, transitions, story beats
 
-**Content quality:**
-- [ ] At least 6 body sentences contain specific numbers from the post
+**Content quality (Section D):**
+- [ ] Each panel has 2-3 body sentences with specific numbers
 - [ ] All cited numbers verified against the source post
 - [ ] Sentences are short, punchy, and self-contained (15-30 words)
 - [ ] No emojis
@@ -440,8 +402,8 @@ After verification, offer the user next steps:
 
 "The infographic prompt is ready at `content/post/<slug>/infographic_instructions.md`.
 Would you like me to:
-- Adjust any panel content (numbers, headlines, callouts)?
-- Change the text rendering option (A/B/C)?
+- Adjust any story beat or sketch metaphor?
+- Change the 3 BIG numbers?
 - Regenerate with a different template?
 - Create a variant for a different AI tool?
 - Run `/project:review-infographic <slug>` to review the prompt quality?"
