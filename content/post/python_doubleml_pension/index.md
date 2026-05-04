@@ -60,14 +60,14 @@ The following causal diagram shows this confounding structure:
 
 ```mermaid
 graph LR
-    I["Income & Education<br/>(confounders)"] -->|"Higher income<br/>&#8594; more likely eligible"| E["e401<br/>(eligibility)"]
-    E -->|"Eligible<br/>&#8594; can participate"| P["p401<br/>(participation)"]
-    I -->|"Higher income<br/>&#8594; more savings"| Y["net_tfa<br/>(financial assets)"]
-    E -->|"ATE"| Y
-    P -->|"LATE<br/>(on compliers)"| Y
+    X["X<br/>Income, Education,<br/>Age, ..."] --> D["D<br/>401(k) Eligibility<br/>(e401)"]
+    X --> Y["Y<br/>Net Financial Assets<br/>(net_tfa)"]
+    D --> P["P<br/>401(k) Participation<br/>(p401)"]
+    D -->|"causal effect?"| Y
+    P -->|"causal effect?"| Y
 
-    style I fill:#d97757,stroke:#141413,color:#fff
-    style E fill:#6a9bcc,stroke:#141413,color:#fff
+    style X fill:#d97757,stroke:#141413,color:#fff
+    style D fill:#6a9bcc,stroke:#141413,color:#fff
     style P fill:#00d4c8,stroke:#141413,color:#fff
     style Y fill:#141413,stroke:#141413,color:#fff
 ```
@@ -85,7 +85,7 @@ graph TD
     Q["What causal question<br/>are we asking?"] --> A["Effect of <b>eligibility</b><br/>on savings?"]
     Q --> B["Effect of <b>participation</b><br/>on savings?"]
     A --> PLR["<b>PLR</b><br/>Constant treatment effect<br/>Estimand: ATE"]
-    A --> IRM["<b>IRM</b><br/>Heterogeneous effects<br/>Estimand: ATE"]
+    A --> IRM["<b>IRM</b><br/>Doubly robust (AIPW)<br/>Estimand: ATE"]
     B --> IIVM["<b>IIVM</b><br/>Instrument: eligibility<br/>Estimand: LATE"]
 
     style Q fill:#141413,stroke:#141413,color:#fff
@@ -98,8 +98,8 @@ graph TD
 
 | Model | Treatment | Estimand | Key assumption | Approach |
 |-------|-----------|----------|----------------|----------|
-| **PLR** (Partially Linear Regression) | e401 (eligibility) | ATE | Constant treatment effect | Partialling out confounders |
-| **IRM** (Interactive Regression Model) | e401 (eligibility) | ATE | Heterogeneous effects allowed | Propensity score reweighting |
+| **PLR** (Partially Linear Regression) | e401 (eligibility) | ATE | Additive treatment effect | Partialling out (FWL-style) |
+| **IRM** (Interactive Regression Model) | e401 (eligibility) | ATE | No functional form restriction | Doubly robust (AIPW) estimation |
 | **IIVM** (Interactive IV Model) | p401 (participation) | LATE | Eligibility is a valid instrument | Instrumental variables |
 
 The PLR and IRM models both estimate the **Average Treatment Effect (ATE)** --- the effect of eligibility averaged across all households. The IIVM estimates the **Local Average Treatment Effect (LATE)** --- the effect of participation specifically on *compliers*, households who participate because they are eligible but would not participate otherwise. These are different quantities with different policy implications.
@@ -412,11 +412,17 @@ After controlling for confounders, the PLR model estimates the ATE of 401(k) eli
 
 ## Model 2: Interactive Regression Model (IRM)
 
-While PLR assumes a constant treatment effect, the Interactive Regression Model (IRM) allows the effect to vary across individuals. It uses *propensity scores* --- the probability of treatment conditional on covariates --- to reweight observations. The ATE is identified by:
+The PLR and IRM models both estimate the ATE, but they take fundamentally different paths to get there. Understanding this difference is key to interpreting why their agreement is so reassuring.
 
-$$\theta\_0 = E\left[\frac{D \\, Y}{m\_0(X)} - \frac{(1-D) \\, Y}{1-m\_0(X)}\right]$$
+**PLR** uses a *partialling-out* strategy (similar to the Frisch-Waugh-Lovell theorem): it separately predicts the outcome and the treatment from covariates using ML, then regresses the outcome residuals on the treatment residuals. The causal effect emerges from this residual-on-residual regression. The key structural assumption is that treatment enters the outcome equation **additively** --- meaning the effect is the same for all households regardless of their characteristics.
 
-In words, this formula reweights each observation by the inverse of its propensity score $m\_0(X) = P(D=1 \mid X)$. If a high-income household is *not* eligible (which is rare), its outcome gets a large weight because it is an informative control --- it "looks like" the treated group but did not receive treatment. Think of it as valuing rare controls more: a household that should be eligible based on its characteristics but isn't provides especially valuable information about what would happen without treatment.
+**IRM** takes a different approach rooted in the *potential outcomes framework*. Instead of partialling out, it combines two models --- an outcome model $g\_0(D, X)$ and a *propensity score* model $m\_0(X) = P(D=1 \mid X)$ --- into a **doubly robust** (also called AIPW) estimator. The ATE is identified by:
+
+$$\theta\_0 = E\left[g\_0(1, X) - g\_0(0, X) + \frac{D \\, (Y - g\_0(1, X))}{m\_0(X)} - \frac{(1-D) \\, (Y - g\_0(0, X))}{1-m\_0(X)}\right]$$
+
+In words, this formula first predicts what each household's outcome would be under treatment and under control using the outcome model $g\_0$, then corrects any remaining prediction errors using inverse probability weighting with the propensity score $m\_0$. The term "doubly robust" means the estimator is consistent if *either* the outcome model or the propensity score model is correctly specified --- it does not require both to be perfect. Think of it as a safety net: if one model stumbles, the other catches it.
+
+Why does this matter? If PLR and IRM agree, it means the causal estimate is robust to the choice of estimation strategy --- neither the additive structure of PLR nor the particular form of doubly robust weighting is driving the result.
 
 We fit the IRM model with the same four ML learners used for PLR. For IRM, the `ml_g` argument takes a regressor (for the outcome model) and `ml_m` takes a classifier (for the propensity score). The `trimming_threshold=0.01` drops observations with extreme propensity scores below 1% or above 99% to prevent unstable inverse-probability weights.
 
@@ -443,7 +449,7 @@ IRM-XGBoost:       coef=8,381.57, SE=1,186.36, 95% CI=[6,056.34, 10,706.80]
 
 ![IRM estimates across 4 ML learners with naive baseline](pension_irm_comparison.png)
 
-The IRM estimates range from \\$7,924 to \\$8,559, with a mean of \\$8,213. These are remarkably close to the PLR estimates (\\$8,730 mean), differing by only about \\$500 on average. This convergence is reassuring: two conceptually different approaches --- one based on outcome regression (PLR) and one based on propensity score reweighting (IRM) --- agree that the ATE is in the \\$8,000--\\$9,000 range. The similarity also suggests that treatment effect heterogeneity is limited in this setting; the constant-effect assumption of PLR appears to be a reasonable approximation. The IRM standard errors are slightly smaller (averaging \\$1,185 vs. \\$1,339 for PLR), indicating that propensity score reweighting is somewhat more efficient here.
+The IRM estimates range from \\$7,924 to \\$8,559, with a mean of \\$8,213. These are remarkably close to the PLR estimates (\\$8,730 mean), differing by only about \\$500 on average. This convergence is powerful evidence for the robustness of the ATE: two fundamentally different estimation strategies --- partialling-out (PLR) and doubly robust/AIPW (IRM) --- agree that the causal effect of 401(k) eligibility is in the \\$8,000--\\$9,000 range. Since these approaches rely on different modeling assumptions and different ways of combining nuisance functions, their agreement means the result is not an artifact of any particular estimation choice. The IRM standard errors are slightly smaller (averaging \\$1,185 vs. \\$1,339 for PLR), suggesting the doubly robust estimator is somewhat more efficient in this setting.
 
 ## Model 3: Interactive IV Model (IIVM) --- what about participation?
 
