@@ -46,7 +46,7 @@ TRUE_ATE = 1.0
 TREATMENT = "work_from_home"
 OUTCOME = "productivity"
 CONFOUNDERS = ["introversion", "num_children"]
-INSTRUMENT = "company_policy"
+INSTRUMENT = "subway_disruption"
 
 # Site color palette
 STEEL_BLUE = "#6a9bcc"
@@ -77,7 +77,7 @@ def generate_wfh_data(n, seed):
     Simulate observational data on working from home and productivity.
 
     Causal structure:
-        company_policy -> work_from_home -> productivity
+        subway_disruption -> work_from_home -> productivity
         introversion -> work_from_home AND productivity (CONFOUNDER)
         num_children -> work_from_home AND productivity (CONFOUNDER)
 
@@ -91,18 +91,19 @@ def generate_wfh_data(n, seed):
     introversion = rng.normal(5, 1.5, n)          # personality trait
     num_children = rng.poisson(1.5, n)             # family size
 
-    # Instrument: company WFH policy (exogenous)
-    company_policy = rng.binomial(1, 0.4, n)
+    # Instrument: subway line closure (exogenous transportation shock)
+    # 40% of employees live near the disrupted subway line
+    subway_disruption = rng.binomial(1, 0.4, n)
 
     # Treatment assignment (OBSERVATIONAL: affected by confounders + instrument)
     # More introverted people choose WFH, more children -> more WFH,
-    # company policy enables WFH
-    logit_p = -1.5 + 0.3 * introversion + 0.2 * num_children + 1.0 * company_policy
+    # subway disruption forces affected employees to WFH
+    logit_p = -1.5 + 0.3 * introversion + 0.2 * num_children + 1.0 * subway_disruption
     prob_wfh = 1 / (1 + np.exp(-logit_p))
     work_from_home = rng.binomial(1, prob_wfh)
 
     # Outcome: productivity (affected by treatment + confounders, NOT instrument)
-    # EXCLUSION RESTRICTION: company_policy does NOT appear here
+    # EXCLUSION RESTRICTION: subway_disruption does NOT appear here
     noise = rng.normal(0, 2, n)
     productivity = (50
                     + TRUE_ATE * work_from_home    # causal effect = 1.0
@@ -115,7 +116,7 @@ def generate_wfh_data(n, seed):
         "productivity": productivity,
         "introversion": introversion,
         "num_children": num_children,
-        "company_policy": company_policy,
+        "subway_disruption": subway_disruption,
     })
 
 df = generate_wfh_data(N, RANDOM_SEED)
@@ -126,8 +127,8 @@ print(f"  introversion -> productivity:    0.8 (confounder effect on outcome)")
 print(f"  num_children -> productivity:   -0.5 (confounder effect on outcome)")
 print(f"  introversion -> WFH (logit):     0.3 (confounder effect on treatment)")
 print(f"  num_children -> WFH (logit):     0.2 (confounder effect on treatment)")
-print(f"  company_policy -> WFH (logit):   1.0 (instrument effect on treatment)")
-print(f"  company_policy -> productivity:  0.0 (EXCLUSION RESTRICTION holds)")
+print(f"  subway_disruption -> WFH (logit):   1.0 (instrument effect on treatment)")
+print(f"  subway_disruption -> productivity:  0.0 (EXCLUSION RESTRICTION holds)")
 
 print(f"\nDataset shape: {df.shape}")
 print(f"Treatment prevalence: {df[TREATMENT].mean():.1%} work from home")
@@ -223,7 +224,7 @@ Directed Acyclic Graph (DAG). This forces you to be EXPLICIT about
 what causes what.
 
 Our causal graph:
-    company_policy ──> work_from_home ──> productivity
+    subway_disruption ──> work_from_home ──> productivity
                               ^                 ^
                               |                 |
     introversion ─────────────+─────────────────+
@@ -231,7 +232,7 @@ Our causal graph:
 
 Key relationships:
   - introversion and num_children are CONFOUNDERS (affect BOTH treatment and outcome)
-  - company_policy is an INSTRUMENT (affects treatment but NOT outcome directly)
+  - subway_disruption is an INSTRUMENT (affects treatment but NOT outcome directly)
 """)
 
 # Create the CausalModel
@@ -267,7 +268,7 @@ except Exception as e:
 
     # Node positions
     nodes = {
-        "company_policy": (0.5, 2.0),
+        "subway_disruption": (0.5, 2.0),
         "work_from_home": (1.5, 2.0),
         "productivity": (3.0, 2.0),
         "introversion": (1.5, 3.2),
@@ -285,7 +286,7 @@ except Exception as e:
 
     # Draw edges (arrows)
     edges = [
-        ("company_policy", "work_from_home"),
+        ("subway_disruption", "work_from_home"),
         ("work_from_home", "productivity"),
         ("introversion", "work_from_home"),
         ("introversion", "productivity"),
@@ -468,11 +469,11 @@ print(f"Bias from true ({TRUE_ATE}): {dr_ate - TRUE_ATE:.4f}")
 
 # --- Method 4: Instrumental Variables (2SLS) with HC1 robust SE ---
 print("\n--- Method 4: Instrumental Variables (2SLS) ---")
-print("Idea: Use an instrument (company_policy) that affects treatment")
+print("Idea: Use an instrument (subway_disruption) that affects treatment")
 print("      but does NOT directly affect the outcome.")
 print("      This identifies the causal effect even if there are")
 print("      UNMEASURED confounders (unlike methods 1-3).")
-print(f"      Instrument: {INSTRUMENT} (company WFH policy)")
+print(f"      Instrument: {INSTRUMENT} (subway line closure)")
 
 # IV estimation via Wald estimator with delta-method robust SE
 # For a binary instrument Z, the Wald estimator is:
@@ -707,7 +708,7 @@ KEY TAKEAWAYS:
    Its 95% CI [{results_ci['Naive'][0]:.3f}, {results_ci['Naive'][1]:.3f}] does NOT cover the true ATE.
 2. Methods 1-3 (Regression, IPW, DR) use SELECTION ON OBSERVABLES:
    they assume we have measured ALL confounders. If true, they eliminate bias.
-3. Method 4 (IV) uses an INSTRUMENTAL VARIABLE (company policy):
+3. Method 4 (IV) uses an INSTRUMENTAL VARIABLE (subway disruption):
    valid even with unmeasured confounders, but requires the exclusion restriction.
 4. CONFIDENCE INTERVALS reveal PRECISION: backdoor methods have CI widths of ~0.24-0.29,
    while IV's CI width is ~{results_ci['IV (2SLS)'][1] - results_ci['IV (2SLS)'][0]:.2f} --- about 5x wider.

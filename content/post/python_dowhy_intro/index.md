@@ -116,7 +116,7 @@ TRUE_ATE = 1.0     # known true effect
 TREATMENT = "work_from_home"
 OUTCOME = "productivity"
 CONFOUNDERS = ["introversion", "num_children"]
-INSTRUMENT = "company_policy"
+INSTRUMENT = "subway_disruption"
 ```
 
 ## The data: simulated observational study
@@ -136,14 +136,14 @@ def generate_wfh_data(n, seed):
     num_children = rng.poisson(1.5, n)
 
     # Instrument (affects treatment ONLY)
-    company_policy = rng.binomial(1, 0.4, n)
+    subway_disruption = rng.binomial(1, 0.4, n)
 
     # Treatment: who works from home? (observational, not random!)
-    logit_p = -1.5 + 0.3*introversion + 0.2*num_children + 1.0*company_policy
+    logit_p = -1.5 + 0.3*introversion + 0.2*num_children + 1.0*subway_disruption
     prob_wfh = 1 / (1 + np.exp(-logit_p))
     work_from_home = rng.binomial(1, prob_wfh)
 
-    # Outcome: productivity (note: company_policy does NOT appear here)
+    # Outcome: productivity (note: subway_disruption does NOT appear here)
     noise = rng.normal(0, 2, n)
     productivity = (50
                     + 1.0 * work_from_home      # TRUE causal effect
@@ -156,7 +156,7 @@ def generate_wfh_data(n, seed):
         "productivity": productivity,
         "introversion": introversion,
         "num_children": num_children,
-        "company_policy": company_policy,
+        "subway_disruption": subway_disruption,
     })
 
 df = generate_wfh_data(N, RANDOM_SEED)
@@ -166,13 +166,13 @@ Notice three critical features of this DGP:
 
 1. **Treatment is NOT random.** More introverted employees and those with more children are more likely to choose WFH. This is what makes it *observational* data.
 2. **Confounders affect both treatment and outcome.** Introversion increases both the probability of WFH (logit coefficient = 0.3) and productivity directly (coefficient = 0.8).
-3. **The instrument satisfies the exclusion restriction.** `company_policy` appears in the treatment equation (coefficient = 1.0) but NOT in the outcome equation. It only affects productivity *through* WFH choice.
+3. **The instrument satisfies the exclusion restriction.** `subway_disruption` appears in the treatment equation (coefficient = 1.0) but NOT in the outcome equation. It only affects productivity *through* WFH choice.
 
 ```text
 Dataset shape: (5000, 5)
 Treatment prevalence: 66.2% work from home
 
-       work_from_home  productivity  introversion  num_children  company_policy
+       work_from_home  productivity  introversion  num_children  subway_disruption
 count         5000.00       5000.00       5000.00       5000.00         5000.00
 mean             0.66         53.88          4.97          1.50            0.42
 std              0.47          2.49          1.50          1.22            0.49
@@ -180,7 +180,7 @@ min              0.00         43.90         -0.47          0.00            0.00
 max              1.00         62.52         10.18          8.00            1.00
 ```
 
-About two-thirds of employees in our sample work from home, and 42% have a WFH-friendly company policy. Productivity scores range from about 44 to 63 with a mean of 53.88.
+About two-thirds of employees in our sample work from home, and 42% live near the disrupted subway line. Productivity scores range from about 44 to 63 with a mean of 53.88.
 
 ## Exploratory data analysis
 
@@ -231,7 +231,7 @@ graph LR
     I --> Y["Productivity<br/>(Outcome)"]
     C["Num. Children<br/>(Confounder)"] --> T
     C --> Y
-    Z["Company Policy<br/>(Instrument)"] --> T
+    Z["Subway Disruption<br/>(Instrument)"] --> T
     T --> Y
     style I fill:#999,stroke:#141413,color:#fff
     style C fill:#999,stroke:#141413,color:#fff
@@ -243,7 +243,7 @@ graph LR
 Three types of variables appear in our DAG:
 
 - **Confounders** (gray): Introversion and num_children have arrows pointing to *both* treatment and outcome. They create "backdoor paths" that confound the naive comparison.
-- **Instrument** (teal): Company policy has an arrow to treatment but *not* to outcome. It provides exogenous variation in WFH choice.
+- **Instrument** (teal): Subway disruption has an arrow to treatment but *not* to outcome. It provides exogenous variation in WFH choice --- employees near the closed subway line are forced to work from home regardless of their personality or family situation.
 - **Treatment and Outcome** (orange and blue): The arrow from treatment to outcome represents the causal effect we want to estimate.
 
 ### Creating the CausalModel
@@ -289,11 +289,11 @@ The critical assumption is **unconfoundedness**: there are no unmeasured common 
 
 $$ATE = \frac{E\left[\frac{\partial Y}{\partial Z}\right]}{E\left[\frac{\partial T}{\partial Z}\right]}$$
 
-where \\(Z\\) is `company_policy`.
+where \\(Z\\) is `subway_disruption`.
 
 In plain language: divide the effect of the instrument on the outcome (reduced form) by the effect of the instrument on the treatment (first stage). The instrument provides a "natural experiment" --- variation in WFH choice that is not driven by confounders.
 
-The critical assumption is the **exclusion restriction**: `company_policy` affects productivity *only* through its effect on WFH choice, not directly. In our simulation, this holds by construction.
+The critical assumption is the **exclusion restriction**: `subway_disruption` affects productivity *only* through its effect on WFH choice, not directly. In our simulation, this holds by construction.
 
 ## Step 3: Estimate --- Compute the causal effect
 
@@ -400,11 +400,11 @@ Methods 1--3 all rely on **selection on observables** --- the assumption that we
 
 **Instrumental Variables (IV)** offers a solution. Instead of conditioning on confounders, IV uses a variable (the **instrument**) that:
 
-1. **Affects the treatment** (relevance): company policy makes WFH more likely
-2. **Does NOT directly affect the outcome** (exclusion restriction): company policy affects productivity *only* through WFH choice
-3. **Is not caused by confounders** (independence): company policy is determined by corporate decisions, not by individual traits
+1. **Affects the treatment** (relevance): the subway closure makes commuting difficult, pushing affected employees to WFH
+2. **Does NOT directly affect the outcome** (exclusion restriction): a subway closure does not directly make you more or less productive --- it only affects productivity *through* the WFH decision
+3. **Is not caused by confounders** (independence): the subway closure is determined by infrastructure maintenance, not by employees' personality or family situation
 
-The IV estimator uses the instrument to isolate the *exogenous* variation in treatment --- the part of WFH choice that is driven by company policy rather than by personal characteristics.
+The IV estimator uses the instrument to isolate the *exogenous* variation in treatment --- the part of WFH choice that is driven by the transportation shock rather than by personal characteristics.
 
 ```python
 estimate_iv = model.estimate_effect(
@@ -416,7 +416,7 @@ estimate_iv = model.estimate_effect(
 
 ```text
 First-stage F-statistic: 293.0
-First-stage coefficient on company_policy: 0.2190 (robust SE: 0.0128)
+First-stage coefficient on subway_disruption: 0.2190 (robust SE: 0.0128)
 Reduced-form coefficient: 0.1945 (robust SE: 0.0714)
 Estimated ATE: 0.8881
 Robust SE (HC1, delta method): 0.3303
@@ -481,7 +481,7 @@ Several patterns stand out:
 
 **IPW is slightly less precise (0.0754, 1.23x)** because it *ignores* the outcome model entirely. It only uses propensity scores to reweight observations. Think of it as throwing away useful information about the outcome-covariate relationship, which costs some precision.
 
-**IV is dramatically less precise (0.3303, 5.38x)**. This is the **bias-variance tradeoff** in action. IV does not condition on confounders --- it uses only the exogenous variation provided by the instrument. Because the instrument (company policy) explains only 22% more WFH participation (first-stage coefficient = 0.219), the IV estimator must "amplify" a small signal, which amplifies noise too. The price of not needing to observe confounders is a much wider confidence interval.
+**IV is dramatically less precise (0.3303, 5.38x)**. This is the **bias-variance tradeoff** in action. IV does not condition on confounders --- it uses only the exogenous variation provided by the instrument. Because the instrument (subway disruption) explains only 22% more WFH participation (first-stage coefficient = 0.219), the IV estimator must "amplify" a small signal, which amplifies noise too. The price of not needing to observe confounders is a much wider confidence interval.
 
 **The naive SE (0.0716) is small but misleading.** The naive estimate is precise (narrow CI) but *wrong* --- its CI does not even contain the true ATE. This illustrates a critical lesson: **a small standard error does not mean a good estimate**. Precision without validity is worthless. The naive estimate is precisely estimating the wrong thing (a confounded association rather than a causal effect).
 
@@ -605,7 +605,7 @@ This tutorial introduced two fundamentally different approaches to causal identi
 
 ## Exercises
 
-1. **Break the exclusion restriction.** Modify the DGP so that `company_policy` directly affects `productivity` (e.g., add `+ 0.5 * company_policy` to the outcome equation). Re-run the IV estimate. Does it still recover the true ATE?
+1. **Break the exclusion restriction.** Modify the DGP so that `subway_disruption` directly affects `productivity` (e.g., add `+ 0.5 * subway_disruption` to the outcome equation). Re-run the IV estimate. Does it still recover the true ATE?
 
 2. **Add an unmeasured confounder.** Add a new variable `self_discipline` that affects both `work_from_home` and `productivity`, but do NOT include it in `CONFOUNDERS`. Compare how the backdoor methods (now biased) and IV (still valid) perform.
 

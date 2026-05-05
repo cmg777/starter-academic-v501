@@ -10,7 +10,7 @@
 - Treatment: `work_from_home` (binary, 66.2% treated)
 - Outcome: `productivity` (continuous, mean=53.88, SD=2.49)
 - Confounders: `introversion` (continuous, mean=4.97), `num_children` (integer, mean=1.50)
-- Instrument: `company_policy` (binary, 42% with WFH-friendly policy)
+- Instrument: `subway_disruption` (binary, 42% live near disrupted subway line)
 
 **Estimand:** Average Treatment Effect (ATE)
 
@@ -52,7 +52,7 @@ All three methods using selection on observables (backdoor criterion) closely re
 
 ## Key Finding 3: IV Estimation is Noisier but Uses a Different Identification Strategy
 
-The IV (2SLS) estimate using `company_policy` as an instrument yields **0.888** (bias = -0.112, or -11.2%).
+The IV (2SLS) estimate using `subway_disruption` as an instrument yields **0.888** (bias = -0.112, or -11.2%).
 
 This is noisier than the backdoor methods because IV estimation divides the reduced-form effect by the first-stage effect, amplifying variance. However, IV has a crucial advantage: it is valid even with **unmeasured confounders**, provided the exclusion restriction holds (the instrument affects productivity only through WFH choice).
 
@@ -90,7 +90,7 @@ The placebo test is particularly convincing: when treatment is randomly permuted
 The DoWhy framework structures causal analysis into four explicit steps:
 
 1. **Model** — Define a causal DAG with 5 variables, 6 directed edges
-2. **Identify** — DoWhy automatically finds the backdoor estimand (condition on introversion, num_children) and the IV estimand (use company_policy)
+2. **Identify** — DoWhy automatically finds the backdoor estimand (condition on introversion, num_children) and the IV estimand (use subway_disruption)
 3. **Estimate** — Four methods across two identification strategies
 4. **Refute** — Three automated robustness checks
 
