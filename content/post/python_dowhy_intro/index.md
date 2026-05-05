@@ -18,7 +18,7 @@ links:
 - icon: google
   icon_pack: fab
   name: "Google Colab"
-  url: https://colab.research.google.com/github/carlos-mendez/starter-academic-v501/blob/master/content/post/python_dowhy_intro/notebook.ipynb
+  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_dowhy_intro/notebook.ipynb
 - icon: code
   icon_pack: fas
   name: "Python script"
