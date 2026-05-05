@@ -44,6 +44,8 @@ Does working from home actually make employees more productive, or do more produ
 
 In this tutorial, we use **simulated observational data** where the true causal effect is known (ATE = 1.0) to demonstrate how **[DoWhy](https://www.pywhy.org/dowhy/v0.14/)** --- a Python library for causal inference --- helps us recover the correct answer. We walk through DoWhy's four-step framework (**Model, Identify, Estimate, Refute**) and apply four estimation methods: Linear Regression, Inverse Probability Weighting (IPW), Doubly Robust estimation (AIPW), and Instrumental Variables (2SLS).
 
+This tutorial is inspired by the [DataCamp introduction to Causal AI using DoWhy](https://www.datacamp.com/tutorial/intro-to-causal-ai-using-the-dowhy-library-in-python) and builds on a more comprehensive [DoWhy tutorial with the Lalonde dataset]({{< ref "/post/python_dowhy" >}}) that covers five estimation methods with real-world data.
+
 **Learning objectives:**
 
 - Understand why naive comparisons can be misleading when confounders are present
@@ -274,10 +276,10 @@ DoWhy automatically discovers two valid identification strategies:
 ### Strategy 1: Backdoor criterion (selection on observables)
 
 $$
-ATE = E\left[\frac{\partial}{\partial T} E[Y \mid T, X_1, X_2]\right]
+ATE = E\left[\frac{\partial}{\partial T} E[Y \mid T, X\_1, X\_2]\right]
 $$
 
-where \\(T\\) is `work_from_home`, \\(Y\\) is `productivity`, \\(X_1\\) is `introversion`, and \\(X_2\\) is `num_children`.
+where \\(T\\) is `work_from_home`, \\(Y\\) is `productivity`, \\(X\_1\\) is `introversion`, and \\(X\_2\\) is `num_children`.
 
 In plain language: if we **condition on all confounders** (introversion and num_children), the remaining association between treatment and outcome *is* the causal effect. This is called **selection on observables** because it assumes we have measured *all* variables that simultaneously affect treatment and outcome.
 
@@ -285,9 +287,7 @@ The critical assumption is **unconfoundedness**: there are no unmeasured common 
 
 ### Strategy 2: Instrumental variable
 
-$$
-ATE = \frac{E\left[\frac{\partial Y}{\partial Z}\right]}{E\left[\frac{\partial T}{\partial Z}\right]}
-$$
+$$ATE = \frac{E\left[\frac{\partial Y}{\partial Z}\right]}{E\left[\frac{\partial T}{\partial Z}\right]}$$
 
 where \\(Z\\) is `company_policy`.
 
@@ -303,11 +303,9 @@ Now we apply four estimation methods. Methods 1--3 use the backdoor criterion (s
 
 The simplest approach: include confounders as control variables in a regression.
 
-$$
-Y_i = \beta_0 + \beta_1 T_i + \beta_2 X_{1i} + \beta_3 X_{2i} + \varepsilon_i
-$$
+$$Y\_i = \beta\_0 + \beta\_1 T\_i + \beta\_2 X\_{1i} + \beta\_3 X\_{2i} + \varepsilon\_i$$
 
-The coefficient \\(\beta_1\\) is the causal effect, provided the model is correctly specified and all confounders are included.
+The coefficient \\(\beta\_1\\) is the causal effect, provided the model is correctly specified and all confounders are included.
 
 ```python
 estimate_reg = model.estimate_effect(
@@ -332,11 +330,9 @@ IPW takes a completely different approach. Instead of modeling the outcome, it m
 
 The idea: weight each observation by the inverse of the probability of receiving its actual treatment, given confounders. This creates a **pseudo-population** where treatment is independent of confounders --- mimicking what would happen in a randomized experiment.
 
-$$
-\widehat{ATE}_{IPW} = \frac{1}{N}\sum_{i=1}^{N}\left[\frac{T_i Y_i}{\hat{e}(X_i)} - \frac{(1 - T_i) Y_i}{1 - \hat{e}(X_i)}\right]
-$$
+$$\widehat{ATE}\_{IPW} = \frac{1}{N}\sum\_{i=1}^{N}\left[\frac{T\_i Y\_i}{\hat{e}(X\_i)} - \frac{(1 - T\_i) Y\_i}{1 - \hat{e}(X\_i)}\right]$$
 
-where \\(\hat{e}(X_i) = P(T_i = 1 \mid X_i)\\) is the **propensity score** --- the predicted probability of working from home given the confounders.
+where \\(\hat{e}(X\_i) = P(T\_i = 1 \mid X\_i)\\) is the **propensity score** --- the predicted probability of working from home given the confounders.
 
 ```python
 estimate_ipw = model.estimate_effect(
@@ -359,11 +355,9 @@ IPW recovers the true effect with a bias of only 2.8%. Its robust SE (0.0754) is
 
 What if we are not sure whether the outcome model or the propensity score model is correctly specified? The **doubly robust** estimator (also called Augmented IPW or AIPW) combines both models. It is consistent if *either* model is correctly specified --- hence "doubly robust."
 
-$$
-\widehat{ATE}_{DR} = \frac{1}{N}\sum_{i=1}^{N}\left[(\hat{\mu}_1(X_i) - \hat{\mu}_0(X_i)) + \frac{T_i(Y_i - \hat{\mu}_1(X_i))}{\hat{e}(X_i)} - \frac{(1-T_i)(Y_i - \hat{\mu}_0(X_i))}{1 - \hat{e}(X_i)}\right]
-$$
+$$\widehat{ATE}\_{DR} = \frac{1}{N}\sum\_{i=1}^{N}\left[(\hat{\mu}\_1(X\_i) - \hat{\mu}\_0(X\_i)) + \frac{T\_i(Y\_i - \hat{\mu}\_1(X\_i))}{\hat{e}(X\_i)} - \frac{(1-T\_i)(Y\_i - \hat{\mu}\_0(X\_i))}{1 - \hat{e}(X\_i)}\right]$$
 
-where \\(\hat{\mu}_1(X_i)\\) and \\(\hat{\mu}_0(X_i)\\) are the predicted outcomes under treatment and control, and \\(\hat{e}(X_i)\\) is the propensity score.
+where \\(\hat{\mu}\_1(X\_i)\\) and \\(\hat{\mu}\_0(X\_i)\\) are the predicted outcomes under treatment and control, and \\(\hat{e}(X\_i)\\) is the propensity score.
 
 ```python
 # Fit propensity score model

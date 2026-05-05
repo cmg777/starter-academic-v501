@@ -198,9 +198,9 @@ ax.set_xticklabels(["Introversion", "Num. Children"])
 ax.set_ylabel("Mean Value")
 ax.set_title("B. Covariate Imbalance (Confounders)")
 ax.legend()
-# Annotate the bias direction
-ax.annotate("Self-selection\nbias!", xy=(0, means_wfh.iloc[0]),
-            xytext=(0.3, means_wfh.iloc[0] + 0.3),
+# Annotate the bias direction (position below bar top to avoid title overlap)
+ax.annotate("Self-selection\nbias!", xy=(0.15, means_wfh.iloc[0]),
+            xytext=(0.45, means_wfh.iloc[0] - 1.2),
             fontsize=9, color=WARM_ORANGE, fontweight="bold",
             arrowprops=dict(arrowstyle="->", color=WARM_ORANGE))
 
