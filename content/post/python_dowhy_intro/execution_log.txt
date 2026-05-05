@@ -1,0 +1,308 @@
+============================================================
+CAUSAL INFERENCE WITH DoWhy: BEGINNER'S GUIDE
+============================================================
+
+Configuration:
+  Sample size: 5,000
+  True ATE: 1.0
+  Treatment: work_from_home (binary)
+  Outcome: productivity (continuous)
+  Confounders: introversion, num_children
+  Instrument: company_policy
+
+============================================================
+SECTION 1: DATA GENERATING PROCESS (Simulated Observational Data)
+============================================================
+
+True DGP parameters:
+  work_from_home -> productivity:  1.0 (THIS IS WHAT WE WANT TO ESTIMATE)
+  introversion -> productivity:    0.8 (confounder effect on outcome)
+  num_children -> productivity:   -0.5 (confounder effect on outcome)
+  introversion -> WFH (logit):     0.3 (confounder effect on treatment)
+  num_children -> WFH (logit):     0.2 (confounder effect on treatment)
+  company_policy -> WFH (logit):   1.0 (instrument effect on treatment)
+  company_policy -> productivity:  0.0 (EXCLUSION RESTRICTION holds)
+
+Dataset shape: (5000, 5)
+Treatment prevalence: 66.2% work from home
+
+First 5 rows:
+ work_from_home  productivity  introversion  num_children  company_policy
+              1     57.055095      5.457076             1               0
+              1     53.143762      3.440024             2               0
+              1     52.648568      6.125677             1               1
+              0     53.797917      6.410847             3               0
+              1     49.631383      2.073447             0               1
+
+Descriptive statistics:
+       work_from_home  productivity  introversion  num_children  company_policy
+count         5000.00       5000.00       5000.00       5000.00         5000.00
+mean             0.66         53.88          4.97          1.50            0.42
+std              0.47          2.49          1.50          1.22            0.49
+min              0.00         43.90         -0.47          0.00            0.00
+25%              0.00         52.24          3.96          1.00            0.00
+50%              1.00         53.87          4.99          1.00            0.00
+75%              1.00         55.57          5.95          2.00            1.00
+max              1.00         62.52         10.18          8.00            1.00
+
+Saved: wfh_simulated_data.csv
+
+============================================================
+SECTION 2: EXPLORATORY DATA ANALYSIS
+============================================================
+
+--- Naive Estimate (BIASED) ---
+Mean productivity (WFH):    54.35
+Mean productivity (Office): 52.97
+Naive ATE (difference):     1.39
+True ATE:                   1.00
+Bias (naive - true):        0.39
+
+WHY IS THE NAIVE ESTIMATE BIASED?
+Introverts self-select into WFH (introversion -> WFH)
+AND introverts are independently more productive (introversion -> productivity)
+This CONFOUNDING inflates the naive estimate upward.
+
+--- Covariate Means by Treatment Group ---
+        introversion  num_children
+Office         4.547         1.327
+WFH            5.186         1.583
+
+Note: WFH group has HIGHER introversion (self-selection!)
+
+Saved: dowhy_intro_eda.png
+
+============================================================
+SECTION 3: DoWhy STEP 1 — MODEL (Define Causal Graph)
+============================================================
+
+The FIRST step in DoWhy is to encode your causal assumptions as a
+Directed Acyclic Graph (DAG). This forces you to be EXPLICIT about
+what causes what.
+
+Our causal graph:
+    company_policy ──> work_from_home ──> productivity
+                              ^                 ^
+                              |                 |
+    introversion ─────────────+─────────────────+
+    num_children ─────────────+─────────────────+
+
+Key relationships:
+  - introversion and num_children are CONFOUNDERS (affect BOTH treatment and outcome)
+  - company_policy is an INSTRUMENT (affects treatment but NOT outcome directly)
+
+CausalModel created successfully.
+DoWhy's graphviz rendering failed: [Errno 2] "dot" not found in path.
+Creating DAG manually with matplotlib...
+Saved: dowhy_intro_dag.png (matplotlib fallback)
+
+============================================================
+SECTION 4: DoWhy STEP 2 — IDENTIFY (Find the Estimand)
+============================================================
+
+IDENTIFICATION means: Can we express the causal effect as a statistical
+quantity that we can compute from data?
+
+DoWhy uses the causal graph to find valid adjustment sets automatically.
+It checks TWO identification strategies:
+
+1. BACKDOOR CRITERION (Selection on Observables):
+   If we can measure ALL confounders, we can block all backdoor paths
+   by conditioning on them.
+   -> Used by: Regression, IPW, Doubly Robust
+
+2. INSTRUMENTAL VARIABLE:
+   If we have a variable that affects treatment but NOT outcome directly,
+   we can use it to identify the causal effect even with unmeasured confounders.
+   -> Used by: IV/2SLS estimation
+
+Estimand type: EstimandType.NONPARAMETRIC_ATE
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+        d                                                   
+─────────────────(E[productivity|num_children,introversion])
+d[work_from_home]                                           
+Estimand assumption 1, Unconfoundedness: If U→{work_from_home} and U→productivity then P(productivity|work_from_home,num_children,introversion,U) = P(productivity|work_from_home,num_children,introversion)
+
+### Estimand : 2
+Estimand name: iv
+Estimand expression:
+ ⎡                                                                     -1⎤
+ ⎢        d                       ⎛        d                          ⎞  ⎥
+E⎢─────────────────(productivity)⋅⎜─────────────────([work_from_home])⎟  ⎥
+ ⎣d[company_policy]               ⎝d[company_policy]                  ⎠  ⎦
+Estimand assumption 1, As-if-random: If U→→productivity then ¬(U →→{company_policy})
+Estimand assumption 2, Exclusion: If we remove {company_policy}→{work_from_home}, then ¬({company_policy}→productivity)
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable(s) found!
+
+
+============================================================
+SECTION 5: DoWhy STEP 3 — ESTIMATE (4 Methods)
+============================================================
+
+Note: All standard errors are ROBUST (heteroskedasticity-consistent).
+      This means CIs remain valid even if the error variance differs
+      across observations (e.g., more variable productivity for WFH workers).
+
+--- Method 1: Linear Regression (Backdoor Adjustment) ---
+Idea: Include confounders as controls in a regression.
+      Y = b0 + b1*Treatment + b2*Introversion + b3*NumChildren + error
+      b1 is the causal effect (if all confounders are controlled).
+Estimated ATE: 1.0051
+Robust SE (HC1): 0.0614
+95% CI: [0.8847, 1.1255]
+CI width: 0.2408
+Bias from true (1.0): 0.0051
+
+--- Method 2: Inverse Probability Weighting (IPW) ---
+Idea: Weight each observation by the inverse of the probability
+      of receiving its actual treatment, given confounders.
+      This creates a 'pseudo-population' where treatment is independent
+      of confounders (mimicking randomization).
+Estimated ATE: 1.0275
+Robust SE (influence function): 0.0754
+95% CI: [0.8797, 1.1754]
+CI width: 0.2956
+Bias from true (1.0): 0.0275
+
+--- Method 3: Doubly Robust (AIPW) ---
+Idea: Combine BOTH outcome modeling AND propensity score weighting.
+      Consistent if EITHER the outcome model OR the propensity score
+      model is correctly specified (hence 'doubly robust').
+Estimated ATE: 1.0115
+Robust SE (influence function): 0.0623
+95% CI: [0.8893, 1.1336]
+CI width: 0.2443
+Bias from true (1.0): 0.0115
+
+--- Method 4: Instrumental Variables (2SLS) ---
+Idea: Use an instrument (company_policy) that affects treatment
+      but does NOT directly affect the outcome.
+      This identifies the causal effect even if there are
+      UNMEASURED confounders (unlike methods 1-3).
+      Instrument: company_policy (company WFH policy)
+First-stage F-statistic: 293.0
+First-stage coefficient on company_policy: 0.2190 (robust SE: 0.0128)
+Reduced-form coefficient: 0.1945 (robust SE: 0.0714)
+Estimated ATE: 0.8881
+Robust SE (HC1): 0.3303
+95% CI: [0.2407, 1.5355]
+CI width: 1.2949
+Bias from true (1.0): -0.1119
+
+--- Comparison of Robust Standard Errors ---
+Method                     Robust SE  Relative to Reg
+-----------------------------------------------------
+Naive                         0.0716            1.17x
+Linear Regression             0.0614            1.00x
+IPW                           0.0754            1.23x
+Doubly Robust                 0.0623            1.01x
+IV (2SLS)                     0.3303            5.38x
+
+Key insight: IV's robust SE is ~5x larger than regression's.
+This reflects the BIAS-VARIANCE TRADEOFF: IV can handle unmeasured
+confounders but at the cost of much lower precision.
+
+Saved: estimation_results.csv
+
+--- Summary of Estimates with Robust SEs and 95% CIs ---
+Method                     Estimate   Rob. SE                 95% CI   Width     Bias  Covers?
+--------------------------------------------------------------------------------------------
+True ATE                     1.0000                                                           
+Naive (Diff. in Means)       1.3853    0.0716 [  1.2449,   1.5257]  0.2808  +0.3853       NO
+Linear Regression            1.0051    0.0614 [  0.8847,   1.1255]  0.2408  +0.0051      YES
+IPW                          1.0275    0.0754 [  0.8797,   1.1754]  0.2956  +0.0275      YES
+Doubly Robust                1.0115    0.0623 [  0.8893,   1.1336]  0.2443  +0.0115      YES
+IV (2SLS)                    0.8881    0.3303 [  0.2407,   1.5355]  1.2949  -0.1119      YES
+
+============================================================
+SECTION 6: DoWhy STEP 4 — REFUTE (Robustness Checks)
+============================================================
+
+DoWhy's REFUTATION step tests whether the estimate is robust.
+If our causal assumptions are correct, the estimate should:
+  1. Become ~0 when treatment is randomly permuted (placebo test)
+  2. Stay the same when a random confounder is added
+  3. Stay the same on subsets of the data
+
+--- Refutation 1: Placebo Treatment ---
+(Randomly permute treatment -> causal effect should vanish)
+Refute: Use a Placebo Treatment
+Estimated effect:1.0051068229491946
+New effect:-3.378301479330048e-05
+p value:0.96
+
+
+--- Refutation 2: Random Common Cause ---
+(Add a random variable as confounder -> estimate should be stable)
+Refute: Add a random common cause
+Estimated effect:1.0051068229491946
+New effect:1.0050545965014017
+p value:0.98
+
+
+--- Refutation 3: Data Subset (80%) ---
+(Use 80% of the data -> estimate should be stable)
+Refute: Use a subset of data
+Estimated effect:1.0051068229491946
+New effect:0.9987563993400618
+p value:0.64
+
+
+============================================================
+SECTION 7: COMPARISON VISUALIZATION
+============================================================
+
+Saved: dowhy_intro_comparison.png
+
+============================================================
+SUMMARY: Effect of Working from Home on Productivity
+============================================================
+
+Method                     Estimate  Rob. SE                 95% CI   Width  Covers? Identification      
+-------------------------------------------------------------------------------------------------------
+True ATE                     1.0000      ---                    ---     ---      --- ---                 
+Naive (Diff. in Means)       1.3853   0.0716 [ 1.2449,  1.5257]  0.2808       NO None (biased)       
+Linear Regression            1.0051   0.0614 [ 0.8847,  1.1255]  0.2408      YES Backdoor            
+IPW                          1.0275   0.0754 [ 0.8797,  1.1754]  0.2956      YES Backdoor            
+Doubly Robust (AIPW)         1.0115   0.0623 [ 0.8893,  1.1336]  0.2443      YES Backdoor            
+IV (2SLS)                    0.8881   0.3303 [ 0.2407,  1.5355]  1.2949      YES Instrument          
+
+KEY TAKEAWAYS:
+1. The naive estimate is BIASED upward (1.39 vs true 1.00) because
+   introverts self-select into WFH and are independently more productive.
+   Its 95% CI [1.245, 1.526] does NOT cover the true ATE.
+2. Methods 1-3 (Regression, IPW, DR) use SELECTION ON OBSERVABLES:
+   they assume we have measured ALL confounders. If true, they eliminate bias.
+3. Method 4 (IV) uses an INSTRUMENTAL VARIABLE (company policy):
+   valid even with unmeasured confounders, but requires the exclusion restriction.
+4. CONFIDENCE INTERVALS reveal PRECISION: backdoor methods have CI widths of ~0.24-0.29,
+   while IV's CI width is ~1.29 --- about 5x wider.
+   This is the BIAS-VARIANCE TRADEOFF: IV avoids bias from unmeasured confounders
+   but pays with much lower precision. All four CIs cover the true ATE.
+5. DOUBLY ROBUST is the most robust among backdoor methods: consistent if
+   either the outcome model or propensity score model is correctly specified.
+6. DoWhy's framework forces TRANSPARENCY: you declare assumptions (DAG),
+   check identifiability, estimate, and then test robustness.
+
+IDENTIFICATION STRATEGIES:
+- Selection on Observables (Backdoor): "Control for everything that causes
+  both treatment and outcome." Requires NO unmeasured confounders.
+- Instrumental Variables: "Find something that nudges treatment but doesn't
+  directly affect the outcome." Works even with unmeasured confounders.
+
+Generated PNG files:
+  - dowhy_intro_eda.png
+  - dowhy_intro_dag.png
+  - dowhy_intro_comparison.png
+
+Generated CSV files:
+  - wfh_simulated_data.csv
+  - estimation_results.csv
+
+=== Script completed successfully ===
