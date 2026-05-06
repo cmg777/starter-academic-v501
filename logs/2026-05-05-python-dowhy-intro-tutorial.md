@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-05
 **Post:** `content/post/python_dowhy_intro/`
-**Status:** Complete (script, post, infographic instructions)
+**Status:** Complete (script, post, infographic instructions, AI podcast)
 
 ## Summary
 
@@ -39,6 +39,7 @@ Beginner-friendly introduction to causal inference using DoWhy v0.14 with simula
 - 2 CSV exports (simulated data, estimation results)
 - `notebook.ipynb` --- Jupyter notebook version
 - `featured.webp` --- Featured image
+- AI Podcast player --- embedded audio overlay (m4a via catbox.moe)
 
 ## Pipeline Skills Applied
 
