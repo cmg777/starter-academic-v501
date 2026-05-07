@@ -1,0 +1,781 @@
+---
+title: "Tutorial: Causal Machine Learning and the Resource Curse (EconML)"
+subtitle: "Double Machine Learning Causal Forest with Simulated Data"
+author: "Based on Hodler, Lechner & Raschky (2023)"
+date: today
+jupyter: python3
+format:
+  html:
+    theme: cosmo
+    embed-resources: true
+    code-fold: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+---
+
+# Abstract {.unnumbered}
+
+This tutorial teaches the **EconML Causal Forest** (`CausalForestDML`) estimator
+through a simulated dataset that reproduces the key findings of Hodler, Lechner
+& Raschky (2023) on institutions and the resource curse. EconML (Microsoft
+Research / PyWhy) implements causal forests through the **Double Machine Learning**
+(DML) framework, where nuisance functions are estimated in a first stage and
+residualized before fitting the causal forest. Using simulated data with known
+ground-truth causal effects, we show how the method detects
+(i) positive effects of mining on development and conflict,
+(ii) non-linear mineral price effects, and
+(iii) institutional moderation of mining effects but not price effects.
+The full tutorial runs in under 5 minutes.
+
+
+# Introduction
+
+## The Resource Curse Hypothesis
+
+There is a widely held belief that natural resource wealth can be both a blessing and a curse. The seminal work of Sachs and Warner (1995) documented a negative relationship between resource abundance and economic growth. But *why* are resources sometimes harmful?
+
+Mehlum, Moene and Torvik (2006) proposed a compelling answer: **institutions determine whether resources are a blessing or a curse**. In countries with strong institutions, resource rents flow into productive investment. In countries with weak institutions, they fuel rent-seeking, corruption, and conflict. This hypothesis has been enormously influential in both academic and policy circles.
+
+## What Hodler, Lechner & Raschky (2023) Found
+
+Using data from 3,800 Sub-Saharan African districts (1996-2012), the paper applied the Modified Causal Forest estimator to reassess this hypothesis. Three key findings emerged:
+
+1. **Mining increases economic development and conflict** on average
+2. **Price effects are non-linear**: the jump from intermediate to high mineral prices matters much more than from low to intermediate
+3. **Institutions moderate mining effects but NOT price effects**: stronger institutions amplify the development benefits of mining and dampen conflict, but they do not shape the effects of price changes
+
+Finding 3 is the paper's key contribution --- it partially supports and partially challenges the conventional wisdom about institutions and the resource curse.
+
+## Why This Tutorial Uses EconML
+
+The original paper uses the `mcf` package (Modified Causal Forest by Lechner, 2019). This tutorial uses **EconML** (Chernozhukov et al., 2024), an alternative causal ML framework from Microsoft Research. Both implement causal forests, but with different architectures:
+
+| Feature | MCF (`mcf` package) | EconML (`CausalForestDML`) |
+|---------|:---:|:---:|
+| Framework | Direct forest estimation | Double Machine Learning |
+| Nuisance models | Internal | User-specified (sklearn) |
+| GATE computation | Built-in | Manual |
+| Clustered SEs | Built-in | GroupKFold only |
+| CATE interpreter | No | Yes (tree/SHAP) |
+| API style | Custom | scikit-learn compatible |
+
+::: {.callout-note}
+## Why Compare Two Frameworks?
+Using the same simulated data with known ground truth, students can compare how different estimators handle the same causal question. This builds intuition about robustness of causal ML methods.
+:::
+
+
+# The EconML Causal Forest
+
+## Double Machine Learning (DML)
+
+EconML's `CausalForestDML` follows the DML framework of Chernozhukov et al. (2018). The key idea is to **residualize** both the outcome and the treatment before estimating heterogeneous effects:
+
+1. **First stage**: Estimate nuisance functions $\hat{m}(X,W) = E[Y|X,W]$ and $\hat{e}(X,W) = E[T|X,W]$
+2. **Residualize**: Compute $\tilde{Y} = Y - \hat{m}(X,W)$ and $\tilde{T} = T - \hat{e}(X,W)$
+3. **Second stage**: Fit a causal forest on the residuals to estimate $\theta(X) = E[\tilde{Y} | \tilde{T}, X]$
+
+This two-stage approach has a key property: **Neyman orthogonality**. First-stage estimation errors have only a second-order impact on the causal estimates, enabling valid inference even when the nuisance models converge at slower-than-parametric rates. This makes DML substantially more robust than naive two-stage procedures.
+
+```{mermaid}
+%%| fig-cap: "EconML CausalForestDML pipeline"
+flowchart LR
+    A[Panel Data] --> B[First Stage: GBM]
+    B --> C[Residualize Y, T]
+    C --> D[Causal Forest]
+    D --> E[CATEs]
+    E --> F[GATEs]
+    E --> G[ATEs]
+```
+
+## Three Levels of Treatment Effects
+
+The causal forest estimates effects at three levels:
+
+| Level | Name | What it measures |
+|-------|------|-----------------|
+| **ATE** | Average Treatment Effect | Overall average effect across all units |
+| **GATE** | Group Average Treatment Effect | Average effect for a subgroup defined by a variable Z |
+| **CATE** | Conditional Average Treatment Effect | Effect conditional on individual covariates X |
+
+::: {.callout-important}
+## X vs W: Heterogeneity vs Control
+In EconML, **X** features enter the causal forest and can drive effect heterogeneity. **W** features are used only in the first-stage nuisance models as controls. Choose X based on which variables you hypothesize might moderate the treatment effect.
+:::
+
+
+# Simulating the Data
+
+## Design Principles
+
+Our simulated dataset mirrors the structure of the real data:
+
+| Feature | Real Data | Tutorial Data |
+|---------|----------|--------------|
+| Districts | 3,800 | 300 |
+| Countries | 42 | 8 |
+| Years | 17 (1996-2012) | 10 (2003-2012) |
+| Mining share | ~6% | ~15% |
+| Covariates | 60+ | 12 |
+| Observations | 60,121 | 3,000 |
+
+## The Data-Generating Process
+
+The DGP embeds the paper's three findings through the following potential outcomes:
+
+$$
+Y_i(d) = \underbrace{\beta_0 + \gamma X_i}_{\text{baseline}} +
+\underbrace{(\beta_m + \beta_{m \cdot z} \cdot Z_i) \cdot \mathbb{1}[d \geq 1]}_{\text{mining effect (varies with Z)}} +
+\underbrace{\beta_{p} \cdot \mathbb{1}[d = k]}_{\text{price premium (constant in Z)}}
+$$
+
+where $d \in \{0, 1, 2, 3\}$ indexes the treatment group (no mining, low/medium/high prices) and $Z_i$ measures institutional quality.
+
+The interaction $\beta_{m \cdot z} \cdot Z_i$ only enters the **mining effect** (comparing any mining to no mining), not the **price premium** (comparing price levels within mining districts). This is exactly what creates Finding 3.
+
+## Ground-Truth Parameters
+
+```{python}
+#| label: ground-truth
+#| code-fold: false
+
+import numpy as np
+import pandas as pd
+
+# Ground-truth parameters embedded in the DGP
+TRUE_PARAMS = {
+    'ntl_mining_base': 0.25,          # Mining effect at mean institutions
+    'ntl_mining_inst_mod': 0.15,      # Institutional moderation of mining
+    'ntl_price_med': 0.05,            # Medium price premium (small)
+    'ntl_price_high': 0.30,           # High price premium (large)
+    'ntl_noise_sd': 0.25,             # Outcome noise
+    'conflict_mining_base': 0.70,     # Mining increases conflict
+    'conflict_mining_inst_mod': -0.50, # Institutions dampen mining-conflict
+    'conflict_price_med': 0.15,
+    'conflict_price_high': 0.50,
+    'conflict_base_rate': 0.12,
+}
+
+def expected_ates():
+    """Derive ground-truth ATEs from the DGP parameters."""
+    p = TRUE_PARAMS
+    return {
+        'NTL': {
+            '1-0': p['ntl_mining_base'],
+            '2-0': p['ntl_mining_base'] + p['ntl_price_med'],
+            '3-0': p['ntl_mining_base'] + p['ntl_price_high'],
+            '2-1': p['ntl_price_med'],
+            '3-1': p['ntl_price_high'],
+            '3-2': p['ntl_price_high'] - p['ntl_price_med'],
+        }
+    }
+
+print("Ground-truth causal parameters:")
+print("-" * 50)
+for key, val in TRUE_PARAMS.items():
+    print(f"  {key:30s} = {val}")
+
+print("\nImplied ATEs for NTL:")
+print("-" * 50)
+for comp, val in expected_ates()['NTL'].items():
+    print(f"  ATE({comp}) = {val:.3f}")
+```
+
+::: {.callout-tip}
+## Reading the Parameters
+- `ntl_mining_base = 0.25`: Mining increases log NTL by 0.25 on average
+- `ntl_mining_inst_mod = 0.15`: Each unit increase in institutional quality (centered) adds 0.15 to the mining effect
+- `ntl_price_med = 0.05`: Medium prices add only 0.05 beyond the mining effect (small)
+- `ntl_price_high = 0.30`: High prices add 0.30 beyond the mining effect (large)
+:::
+
+## Load the Dataset
+
+```{python}
+#| label: load-data
+#| code-fold: false
+
+DATA_URL = ("https://github.com/quarcs-lab/data-open"
+            "/raw/master/stata19/sim_resource_curse.csv")
+
+df = pd.read_csv(DATA_URL)
+print(f"Loaded {len(df):,} observations")
+print(f"Districts: {df['district_id'].nunique()}, "
+      f"Countries: {df['country_id'].nunique()}, "
+      f"Years: {df['year'].min()}-{df['year'].max()}")
+print(f"Mining districts: {df.loc[df['mining']==1, 'district_id'].nunique()} "
+      f"({df['mining'].mean():.0%})")
+```
+
+
+# Descriptive Statistics
+
+```{python}
+#| label: descriptive-stats
+
+desc_vars = {
+    'NTL (log)': 'ntl_log', 'Conflict': 'conflict',
+    'Exec. Constraints': 'exec_constraints',
+    'Quality of Govt.': 'quality_of_govt',
+    'GDP per capita': 'gdp_pc', 'Elevation': 'elevation',
+    'Temperature': 'temperature', 'Ruggedness': 'ruggedness',
+    'Dist. to Capital': 'distance_capital',
+    'Agri. Suitability': 'agri_suitability',
+    'Population': 'population', 'Ethnic Frac.': 'ethnic_frac',
+}
+rows = []
+for label, var in desc_vars.items():
+    s = df[var]
+    rows.append({'Variable': label, 'Mean': s.mean(), 'Std': s.std(),
+                 'Min': s.min(), 'Max': s.max()})
+pd.DataFrame(rows).style.format('{:.3f}', subset=['Mean','Std','Min','Max'])
+```
+
+## Treatment Distribution
+
+```{python}
+#| label: treatment-chart
+#| fig-cap: "Treatment distribution across the four groups. The heavy imbalance (85% control vs 5% per treated group) makes the causal inference challenging."
+
+import matplotlib
+import matplotlib.pyplot as plt
+
+# Site color palette — dark theme
+STEEL_BLUE = "#6a9bcc"
+WARM_ORANGE = "#d97757"
+NEAR_BLACK = "#141413"
+TEAL = "#00d4c8"
+DARK_NAVY = "#0f1729"
+GRID_LINE = "#1f2b5e"
+LIGHT_TEXT = "#c8d0e0"
+WHITE_TEXT = "#e8ecf2"
+
+plt.rcParams.update({
+    "figure.facecolor": DARK_NAVY,
+    "axes.facecolor": DARK_NAVY,
+    "axes.edgecolor": DARK_NAVY,
+    "axes.linewidth": 0,
+    "axes.labelcolor": LIGHT_TEXT,
+    "axes.titlecolor": WHITE_TEXT,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.spines.left": False,
+    "axes.spines.bottom": False,
+    "axes.grid": True,
+    "grid.color": GRID_LINE,
+    "grid.linewidth": 0.6,
+    "grid.alpha": 0.8,
+    "xtick.color": LIGHT_TEXT,
+    "ytick.color": LIGHT_TEXT,
+    "xtick.major.size": 0,
+    "ytick.major.size": 0,
+    "text.color": WHITE_TEXT,
+    "font.size": 12,
+    "legend.frameon": False,
+    "legend.fontsize": 11,
+    "legend.labelcolor": LIGHT_TEXT,
+    "figure.edgecolor": DARK_NAVY,
+    "savefig.facecolor": DARK_NAVY,
+    "savefig.edgecolor": DARK_NAVY,
+})
+
+labels = {0: 'No mining', 1: 'Low prices', 2: 'Med prices', 3: 'High prices'}
+fig, ax = plt.subplots(figsize=(8, 3))
+fig.patch.set_linewidth(0)
+colors = [LIGHT_TEXT, STEEL_BLUE, TEAL, WARM_ORANGE]
+counts = df['treatment'].value_counts().sort_index()
+bars = ax.barh([labels[t] for t in counts.index], counts.values,
+               color=colors, edgecolor=DARK_NAVY, linewidth=0.8)
+for bar, count in zip(bars, counts.values):
+    ax.text(bar.get_width() + 20, bar.get_y() + bar.get_height()/2,
+            f'{count:,} ({count/len(df):.1%})', va='center',
+            fontsize=9, color=LIGHT_TEXT)
+ax.set_xlabel('Number of observations')
+ax.set_title('Treatment Distribution (M=4)')
+plt.tight_layout()
+plt.show()
+```
+
+## Outcomes by Treatment Group
+
+```{python}
+#| label: outcomes-by-treatment
+
+print(f"{'Treatment':<20s} {'Mean NTL':>10s} {'Conflict Rate':>15s}")
+print("-" * 47)
+for t in sorted(df['treatment'].unique()):
+    mask = df['treatment'] == t
+    m_ntl = df.loc[mask, 'ntl_log'].mean()
+    m_conf = df.loc[mask, 'conflict'].mean()
+    print(f"{t} ({labels[t]:<13s})  {m_ntl:>10.3f} {m_conf:>14.1%}")
+```
+
+## Naive Comparison: Why We Need Causal ML
+
+```{python}
+#| label: naive-comparison
+#| code-fold: false
+
+gt = expected_ates()['NTL']
+
+print("Simple difference-in-means (no confounder adjustment):")
+print(f"{'Comparison':<15s} {'Naive':>8s} {'Ground Truth':>14s} {'Bias':>8s}")
+print("-" * 47)
+
+for comp in ['1-0', '2-1', '3-1']:
+    a, b = int(comp[0]), int(comp[2])
+    mean_a = df.loc[df['treatment'] == a, 'ntl_log'].mean()
+    mean_b = df.loc[df['treatment'] == b, 'ntl_log'].mean()
+    naive = mean_a - mean_b
+    truth = gt[comp]
+    bias = naive - truth
+    print(f"{comp:<15s} {naive:>8.3f} {truth:>14.3f} {bias:>+8.3f}")
+```
+
+::: {.callout-warning}
+## Selection Bias
+The naive 1-0 estimate is biased downward because mining districts differ systematically from non-mining districts. The DML Causal Forest corrects for this by residualizing both the outcome and treatment against confounders. Within-mining comparisons (2-1, 3-1) have less bias because both groups are mining districts.
+:::
+
+
+# EconML Estimation
+
+## Configuration
+
+```{python}
+#| label: econml-config
+#| code-fold: false
+
+from econml.dml import CausalForestDML
+from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier
+import time
+
+# Heterogeneity features (X): the causal forest can split on these
+X_COLS = [
+    'exec_constraints', 'quality_of_govt', 'gdp_pc',
+    'elevation', 'temperature', 'ruggedness',
+    'distance_capital', 'agri_suitability', 'population', 'ethnic_frac',
+]
+
+# Additional controls (W): first-stage only (not in causal forest)
+W_COLS = ['country_id', 'year']
+
+# Institutional variables for GATE analysis
+Z_VARS = ['exec_constraints', 'quality_of_govt']
+
+print("EconML CausalForestDML Configuration:")
+print(f"  X features (heterogeneity): {len(X_COLS)} variables")
+print(f"  W controls (first-stage):   {len(W_COLS)} variables")
+print(f"  Treatment: 4 levels (0=no mining, 1-3=price groups)")
+```
+
+::: {.callout-warning}
+## Causal Identification Assumption
+Causal forests, like all observational methods, require the **Conditional Independence Assumption (CIA)**: treatment assignment is independent of potential outcomes conditional on observed covariates (X, W). In this simulated setting, the CIA holds by construction --- all confounders are observed. In real data, unobserved confounders (e.g., geological surveys, political connections) could bias the estimates.
+:::
+
+## Estimating NTL Effects
+
+```{python}
+#| label: estimate-ntl
+#| code-fold: false
+
+def fit_causal_forest(df, outcome, label):
+    """Fit CausalForestDML for one outcome."""
+    Y = df[outcome].values
+    T = df['treatment'].values
+    X = df[X_COLS].values
+    W = df[W_COLS].values
+
+    est = CausalForestDML(
+        model_y=GradientBoostingRegressor(
+            n_estimators=200, max_depth=4, random_state=42),
+        model_t=GradientBoostingClassifier(
+            n_estimators=200, max_depth=4, random_state=42),
+        discrete_treatment=True,
+        categories=[0, 1, 2, 3],
+        n_estimators=500,
+        min_samples_leaf=10,
+        max_depth=None,
+        # Honest trees: separate subsamples for choosing splits vs.
+        # estimating leaf values, preventing overfitting and enabling
+        # valid confidence intervals
+        honest=True,
+        inference=True,    # BLB (bootstrap of little bags) for CIs
+        cv=5,
+        n_jobs=1,
+        random_state=42,
+    )
+
+    t0 = time.time()
+    # groups: GroupKFold ensures cross-fitting does not split within
+    # districts (prevents data leakage in panel data). Note: this does
+    # NOT provide clustered standard errors.
+    est.fit(Y, T, X=X, W=W, groups=df['district_id'].values)
+    elapsed = time.time() - t0
+    print(f"  {label}: fitted in {elapsed:.0f}s")
+    return est
+
+est_ntl = fit_causal_forest(df, 'ntl_log', 'NTL')
+```
+
+## Estimating Conflict Effects
+
+```{python}
+#| label: estimate-conflict
+#| code-fold: false
+
+est_conf = fit_causal_forest(df, 'conflict', 'Conflict')
+```
+
+
+# Average Treatment Effects
+
+EconML's `ate_inference()` provides ATEs with proper confidence intervals via the Bootstrap of Little Bags (BLB) method. Unlike MCF, EconML can compute all pairwise contrasts directly.
+
+```{python}
+#| label: ate-table
+#| code-fold: false
+
+X = df[X_COLS].values
+gt = expected_ates()['NTL']
+
+comparisons = [
+    ('1-0', 0, 1), ('2-0', 0, 2), ('3-0', 0, 3),
+    ('2-1', 1, 2), ('3-1', 1, 3), ('3-2', 2, 3),
+]
+
+rows = []
+for comp_label, t0, t1 in comparisons:
+    ntl_res = est_ntl.ate_inference(X, T0=t0, T1=t1)
+    ntl_lo, ntl_hi = ntl_res.conf_int_mean(alpha=0.1)  # 90% CI
+    conf_res = est_conf.ate_inference(X, T0=t0, T1=t1)
+    rows.append({
+        'Comparison': comp_label,
+        'NTL Effect': ntl_res.mean_point,
+        'NTL SE': ntl_res.stderr_mean,
+        'NTL 90% CI': f'[{ntl_lo:.3f}, {ntl_hi:.3f}]',
+        'Ground Truth': gt.get(comp_label, np.nan),
+        'Conflict': conf_res.mean_point,
+    })
+
+ate_table = pd.DataFrame(rows)
+
+# Display with significance stars
+print(f"{'Comp':<8s} {'NTL Effect':>11s} {'NTL SE':>8s} "
+      f"{'90% CI':>20s} {'Ground Truth':>13s} {'Conflict':>10s}")
+print("-" * 72)
+for _, r in ate_table.iterrows():
+    sig = ''
+    if r['NTL SE'] > 0:
+        z = abs(r['NTL Effect'] / r['NTL SE'])
+        if z > 2.576: sig = '***'
+        elif z > 1.96: sig = '**'
+        elif z > 1.645: sig = '*'
+    print(f"{r['Comparison']:<8s} {r['NTL Effect']:>8.4f}{sig:<3s} "
+          f"{r['NTL SE']:>8.4f} {r['NTL 90% CI']:>20s} "
+          f"{r['Ground Truth']:>13.3f} {r['Conflict']:>10.4f}")
+```
+
+::: {.callout-note}
+## Reading the ATE Table
+- **Finding 1**: All mining-vs-no-mining effects (1-0, 2-0, 3-0) are positive and significant
+- **Finding 2**: ATE(2-1) is small and insignificant, while ATE(3-1) is large and significant --- confirming non-linear price effects
+- The ATEs are close to the ground truth, with some attenuation from finite-sample bias
+:::
+
+
+# Treatment Effect Heterogeneity
+
+## Computing GATEs Manually
+
+Unlike MCF, which computes GATEs automatically, EconML requires manual computation. We:
+
+1. Estimate individual-level CATEs via `est.effect(X, T0, T1)`
+2. Group observations by an institutional variable (e.g., executive constraints)
+3. Compute the mean CATE within each group = GATE
+
+```{python}
+#| label: gate-function
+#| code-fold: false
+
+def compute_gate(est, df, z_var, t0, t1):
+    """Compute GATEs by grouping individual effects.
+
+    Uses effect_inference() for proper BLB standard errors that capture
+    estimation uncertainty, not just within-group heterogeneity.
+    """
+    X = df[X_COLS].values
+    inf = est.effect_inference(X, T0=t0, T1=t1)
+    ite = inf.point_estimate
+    ite_se = inf.stderr
+
+    z_vals = sorted(df[z_var].unique())
+    gate_data = []
+    for z in z_vals:
+        mask = df[z_var].values == z
+        n = mask.sum()
+        gate_mean = ite[mask].mean()
+        # SE of group mean: propagate per-observation BLB standard errors
+        gate_se = np.sqrt(np.mean(ite_se[mask] ** 2) / n)
+        gate_data.append({
+            'z_value': z, 'gate': gate_mean, 'se': gate_se,
+            'lower': gate_mean - 1.645 * gate_se,
+            'upper': gate_mean + 1.645 * gate_se,
+            'n': n,
+        })
+    return pd.DataFrame(gate_data), ite
+```
+
+## GATEs by Executive Constraints
+
+```{python}
+#| label: gates-xconst
+#| fig-cap: "GATEs by Executive Constraints. Left panels: mining effect (1-0) should show a slope. Right panels: price effect (3-1) should be flat."
+
+fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+fig.patch.set_linewidth(0)
+
+panels = [
+    (est_ntl, 0, 1, 'NTL: Mining vs No Mining (1-0)', axes[0, 0], STEEL_BLUE),
+    (est_ntl, 1, 3, 'NTL: High vs Low Prices (3-1)', axes[0, 1], STEEL_BLUE),
+    (est_conf, 0, 1, 'Conflict: Mining vs No Mining (1-0)', axes[1, 0], TEAL),
+    (est_conf, 1, 3, 'Conflict: High vs Low Prices (3-1)', axes[1, 1], TEAL),
+]
+
+for est, t0, t1, title, ax, color in panels:
+    gate_df, ite = compute_gate(est, df, 'exec_constraints', t0, t1)
+
+    ax.fill_between(gate_df['z_value'], gate_df['lower'],
+                    gate_df['upper'], alpha=0.25, color=color)
+    ax.plot(gate_df['z_value'], gate_df['gate'], 'o-',
+            color=WHITE_TEXT, markersize=6, linewidth=1.5,
+            markeredgecolor=DARK_NAVY, markeredgewidth=0.8, zorder=3)
+    ate_val = ite.mean()
+    ax.axhline(ate_val, color=WARM_ORANGE, linewidth=1.5, linestyle='--',
+               alpha=0.8, label=f'ATE = {ate_val:.3f}')
+    ax.set_xlabel('Constraints on the Executive')
+    ax.set_ylabel('GATE')
+    ax.set_title(title)
+    ax.legend(fontsize=9)
+
+plt.suptitle('GATEs by Executive Constraints (EconML CausalForestDML)',
+             fontsize=14, fontweight='bold', color=WHITE_TEXT, y=1.02)
+plt.tight_layout()
+plt.show()
+```
+
+## GATEs by Quality of Government
+
+```{python}
+#| label: gates-qog
+#| fig-cap: "GATEs by Quality of Government. Same pattern expected: institutional moderation for mining (left), flat for prices (right)."
+
+fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+fig.patch.set_linewidth(0)
+
+panels = [
+    (est_ntl, 0, 1, 'NTL: Mining vs No Mining (1-0)', axes[0, 0], STEEL_BLUE),
+    (est_ntl, 1, 3, 'NTL: High vs Low Prices (3-1)', axes[0, 1], STEEL_BLUE),
+    (est_conf, 0, 1, 'Conflict: Mining vs No Mining (1-0)', axes[1, 0], TEAL),
+    (est_conf, 1, 3, 'Conflict: High vs Low Prices (3-1)', axes[1, 1], TEAL),
+]
+
+for est, t0, t1, title, ax, color in panels:
+    gate_df, ite = compute_gate(est, df, 'quality_of_govt', t0, t1)
+
+    ax.fill_between(gate_df['z_value'], gate_df['lower'],
+                    gate_df['upper'], alpha=0.25, color=color)
+    ax.plot(gate_df['z_value'], gate_df['gate'], 'o-',
+            color=WHITE_TEXT, markersize=4, linewidth=1.5,
+            markeredgecolor=DARK_NAVY, markeredgewidth=0.8, zorder=3)
+    ate_val = ite.mean()
+    ax.axhline(ate_val, color=WARM_ORANGE, linewidth=1.5, linestyle='--',
+               alpha=0.8, label=f'ATE = {ate_val:.3f}')
+    ax.set_xlabel('Quality of Government (ICRG)')
+    ax.set_ylabel('GATE')
+    ax.set_title(title)
+    ax.legend(fontsize=9)
+
+plt.suptitle('GATEs by Quality of Government (EconML CausalForestDML)',
+             fontsize=14, fontweight='bold', color=WHITE_TEXT, y=1.02)
+plt.tight_layout()
+plt.show()
+```
+
+## The Key Insight (Finding 3) {#sec-finding3}
+
+::: {.callout-note}
+## Institutions Moderate Mining, Not Prices
+**Left panels (1-0):** The GATE of mining vs. no mining should show an **upward slope** for NTL (better institutions -> more development from mining) and a **downward slope** for conflict (better institutions -> less conflict from mining). This supports Mehlum et al. (2006).
+
+**Right panels (3-1):** The GATE of high vs. low prices should be roughly **flat** --- institutional quality does not shape how price changes affect outcomes. This is the paper's novel finding.
+:::
+
+The intuition: whether a district starts mining is a long-term structural change that affects individual specialization decisions (productive vs. rent-seeking). Institutions shape these decisions. But mineral price fluctuations are short-term, harder to foresee, and less likely to trigger the systematic reallocation that institutions govern.
+
+## GATE Values Table
+
+```{python}
+#| label: gate-values-table
+
+print("GATE values for NTL by Executive Constraints:")
+print("=" * 65)
+
+for (t0, t1), comp_label in [((0, 1), 'Mining vs No Mining (1-0)'),
+                               ((1, 3), 'High vs Low Prices (3-1)')]:
+    gate_df, _ = compute_gate(est_ntl, df, 'exec_constraints', t0, t1)
+    print(f"\n  {t1}-{t0} ({comp_label}):")
+    print(f"  {'Exec. Constr.':<15s} {'GATE':>8s} {'90% CI':>20s} {'N':>6s}")
+    print(f"  {'-'*52}")
+    for _, row in gate_df.iterrows():
+        print(f"  {row['z_value']:>13.0f}   {row['gate']:>8.3f}   "
+              f"[{row['lower']:.3f}, {row['upper']:.3f}] {row['n']:>6.0f}")
+    rng = gate_df['gate'].max() - gate_df['gate'].min()
+    print(f"  Range: {rng:.3f}")
+
+print("\n  Interpretation:")
+print("  - 1-0: effects vary with institutional quality (range > 0)")
+print("  - 3-1: effects are FLAT across institutions (range ~ 0)")
+```
+
+
+# Variable Importance
+
+EconML computes feature importances as the normalized total heterogeneity created by each feature across all forest splits. Variables that the causal forest splits on frequently to create different treatment effects have higher importance.
+
+```{python}
+#| label: variable-importance
+#| fig-cap: "Feature importance for treatment effect heterogeneity in the NTL model."
+
+importances = est_ntl.feature_importances_
+vim_data = sorted(zip(X_COLS, importances), key=lambda x: x[1], reverse=True)
+
+print("Feature importances (heterogeneity drivers):")
+for var, imp in vim_data:
+    bar = '#' * int(imp * 100)
+    print(f"  {var:<25s} {imp:>6.3f}  {bar}")
+
+fig, ax = plt.subplots(figsize=(8, 5))
+fig.patch.set_linewidth(0)
+vars_, imps = zip(*reversed(vim_data))
+ax.barh(vars_, imps, color=STEEL_BLUE, edgecolor=DARK_NAVY,
+        linewidth=0.8, alpha=0.9)
+ax.set_xlabel('Feature Importance (heterogeneity contribution)')
+ax.set_title('Treatment Effect Heterogeneity Drivers (NTL)',
+             fontweight='bold')
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-tip}
+## Interpreting Feature Importances
+Feature importance measures which variables drive **treatment effect heterogeneity**, not outcome prediction. Geographic variables (distance to capital, ethnic fractionalization) may rank high because they have continuous variation that the forest can split on easily. Institutional variables have limited discrete values (6 levels for executive constraints), so their importance appears lower despite being the true moderators in the DGP.
+:::
+
+
+# CATE Interpreter (EconML-Specific Feature)
+
+EconML provides a `SingleTreeCateInterpreter` that fits a shallow decision tree to the estimated CATEs. This creates interpretable subgroups that summarize the heterogeneity pattern.
+
+```{python}
+#| label: cate-interpreter
+#| fig-cap: "Decision tree summarizing treatment effect heterogeneity for the mining effect (1-0). Each leaf shows the average CATE for that subgroup."
+
+from econml.cate_interpreter import SingleTreeCateInterpreter
+
+intrp = SingleTreeCateInterpreter(max_depth=2, min_samples_leaf=100)
+X = df[X_COLS].values
+intrp.interpret(est_ntl, X)
+
+fig, ax = plt.subplots(figsize=(12, 6))
+fig.patch.set_linewidth(0)
+# Tree nodes are hard to read on dark backgrounds — use a light inset
+ax.set_facecolor('#f8f9fa')
+intrp.plot(feature_names=X_COLS, ax=ax)
+plt.title('Interpretable CATE Subgroups: Mining vs No Mining (1-0)',
+          fontweight='bold', color=NEAR_BLACK)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-note}
+## What the CATE Interpreter Shows
+The tree identifies which covariates split the population into groups with different treatment effects. This is an EconML-specific feature not available in the MCF package. It provides a complementary view to the GATE plots --- the tree discovers data-driven subgroups, while GATEs test pre-specified hypotheses about institutional moderation.
+:::
+
+
+# Connection to the Paper {#sec-paper}
+
+## Mapping Tutorial Results to Paper Findings
+
+| Finding | Paper (Table 2, M=4) | Tutorial (DGP) | Pattern Match? |
+|---------|---------------------|----------------|:-:|
+| ATE(1-0) NTL | 0.195*** | 0.250 | Direction |
+| ATE(2-1) NTL | 0.053 (n.s.) | 0.050 | Small, insignificant |
+| ATE(3-1) NTL | 0.278*** | 0.300 | Large, significant |
+| GATE(1-0) varies with inst. | Yes (Figs 2-3) | Yes (by design) | Slope |
+| GATE(3-1) flat in inst. | Yes (Figs 2-3) | Yes (by design) | Flat |
+
+## What the Paper Does Differently
+
+Several aspects of the real analysis are simplified in this tutorial:
+
+- **Lead outcomes**: The paper uses treatment at time $t$ and outcome at $t+1$, strengthening causal identification. We use contemporaneous outcomes.
+- **60+ covariates**: The paper controls for 11 land-use types, 6 WGI indicators, ethnic homeland data, ports, pre-colonial polity, and more. We use 12 covariates.
+- **29 minerals**: The paper constructs a price index from 29 minerals with separate world market prices. We simulate a single price index.
+- **MCF vs DML**: The paper uses the MCF estimator (Lechner, 2019), which differs from EconML's DML-based causal forest. The MCF uses a direct forest approach without explicit residualization.
+- **Clustered SEs**: The paper clusters standard errors at the district level. EconML does not support clustered SEs natively; we use GroupKFold for cross-validation splitting by district.
+
+
+# Conclusion
+
+## Three Takeaways
+
+1. **EconML's CausalForestDML is a powerful tool for heterogeneity analysis.** The DML framework provides Neyman-orthogonal estimation (robust to first-stage errors), and the causal forest captures non-linear heterogeneous effects.
+
+2. **Institutions matter for mining, not for prices.** Stronger institutions increase the economic benefits and reduce the conflict costs of mining activities. But they do not shape the effects of mineral price changes.
+
+3. **Different causal ML frameworks yield similar conclusions.** Both the MCF and EconML recover the same qualitative patterns from the data, providing robustness evidence for the paper's findings.
+
+## Policy Implications
+
+The paper's findings suggest that policymakers should prioritize institutional reforms when countries **begin extracting** natural resources, but that such reforms may be less important when **commodity prices** rise. This nuanced message refines the broad "institutions matter" narrative.
+
+## Exercises for Students
+
+1. **Compare nuisance models**: Replace `GradientBoostingRegressor` with `RandomForestRegressor` or `LinearRegression`. How do results change?
+2. **Vary the number of trees**: Try `n_estimators=100` vs `n_estimators=1000`. How does precision change?
+3. **Test GroupKFold**: Remove `groups=df['district_id'].values` from the `fit()` call. What happens to the standard errors? Why?
+4. **Modify the GATE analysis**: Use `quality_of_govt` quartiles instead of raw values. Do the patterns become clearer?
+5. **Add a new outcome**: Create a new variable `y_new = ntl_log + 0.1 * conflict` and estimate effects on it. What happens?
+
+
+# Glossary
+
+| Term | Definition |
+|------|-----------|
+| **ATE** | Average Treatment Effect --- the mean causal effect across all observations |
+| **GATE** | Group Average Treatment Effect --- the mean effect for a subgroup defined by Z |
+| **CATE** | Conditional Average Treatment Effect --- effect conditional on covariates X |
+| **DML** | Double Machine Learning --- residualize Y and T before estimating causal effects |
+| **BLB** | Bootstrap of Little Bags --- inference method for causal forests |
+| **CIA** | Conditional Independence Assumption --- no unobserved confounders, conditional on X |
+| **DGP** | Data-Generating Process --- the statistical model that produced the data |
+| **GBM** | Gradient Boosting Machine --- first-stage nuisance model |
+
+
+# Session Info
+
+```{python}
+#| label: session-info
+
+import sys
+print(f"Python: {sys.version}")
+import econml; print(f"econml: {econml.__version__}")
+import sklearn; print(f"scikit-learn: {sklearn.__version__}")
+import pandas; print(f"pandas: {pandas.__version__}")
+import numpy; print(f"numpy: {numpy.__version__}")
+import matplotlib; print(f"matplotlib: {matplotlib.__version__}")
+```
