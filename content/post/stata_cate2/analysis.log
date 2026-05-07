@@ -1,0 +1,2083 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_cate2/analysis.log
+  log type:  text
+ opened on:   6 May 2026, 17:29:21
+
+. 
+. 
+. *================================================================
+. * Section 0: Stata 19 version gate
+. *================================================================
+. *
+. * The -cate- command is brand-new in Stata 19. There is NO
+. * equivalent in Stata 18 or earlier. We refuse to run on older
+. * Stata so that the user gets a clear error rather than a stream
+. * of "command cate is unrecognized" messages.
+. *----------------------------------------------------------------
+. 
+. if c(stata_version) < 19 {
+.     di as error ""
+.     di as error "============================================================
+> "
+.     di as error "  ERROR: this script requires Stata 19 or later."
+.     di as error "  Detected Stata version: " c(stata_version)
+.     di as error "  The -cate- command was introduced in Stata 19."
+.     di as error "============================================================
+> "
+.     log close
+.     exit 198
+. }
+
+. 
+. di as text "Stata version detected: " c(stata_version) "  -- OK."
+Stata version detected: 19.5  -- OK.
+
+. 
+. 
+. *================================================================
+. * Section 1: Data import, labeling, and globals
+. *================================================================
+. *
+. * Import the simulated resource curse dataset. 3,000 observations
+. * across 300 districts in 8 fictional countries over 10 years.
+. * The treatment has 4 levels: 0 = no mining (~85% of obs),
+. * 1/2/3 = mining at low/medium/high mineral prices (~5% each).
+. *
+. * Two macro groups control the analysis:
+. *
+. *   $catevars:  variables that may drive heterogeneity in the
+. *               treatment effect. These are the inputs to tau(x).
+. *
+. *   $controls:  additional variables for nuisance models only
+. *               (country and year fixed effects for the panel).
+. *----------------------------------------------------------------
+. 
+. * Import from local CSV (update URL when uploaded to GitHub)
+. * GitHub: import delimited using "https://github.com/quarcs-lab/data-open/raw
+> /master/stata19/sim_resource_curse.csv", clear
+. import delimited using "sim_resource_curse.csv", clear
+(encoding automatically selected: ISO-8859-1)
+(18 vars, 3,000 obs)
+
+. 
+. * Label all variables
+. label variable district_id "District ID (1-300)"
+
+. label variable country_id "Country ID (1-8)"
+
+. label variable year "Year (2003-2012)"
+
+. label variable treatment "Treatment group (0=none, 1=low, 2=med, 3=high)"
+
+. label variable mining "Mining district (binary)"
+
+. label variable price_index "Mineral price index"
+
+. label variable exec_constraints "Constraints on Executive (1-6)"
+
+. label variable quality_of_govt "Quality of Government (0.22-0.70)"
+
+. label variable gdp_pc "GDP per capita"
+
+. label variable elevation "Elevation (meters)"
+
+. label variable temperature "Mean temperature (Celsius)"
+
+. label variable ruggedness "Terrain ruggedness"
+
+. label variable distance_capital "Distance to capital (meters)"
+
+. label variable agri_suitability "Agricultural suitability (0-1)"
+
+. label variable population "Population"
+
+. label variable ethnic_frac "Ethnic fractionalization (0-1)"
+
+. label variable ntl_log "Log nighttime lights"
+
+. label variable conflict "Conflict event (binary)"
+
+. 
+. * Create integer version of exec_constraints for group()
+. gen int exec_con = round(exec_constraints)
+
+. label variable exec_con "Executive Constraints (integer 1-6)"
+
+. 
+. * Save as .dta for faster reloading
+. save "sim_resource_curse.dta", replace
+(file sim_resource_curse.dta not found)
+file sim_resource_curse.dta saved
+
+. 
+. * Report dataset dimensions
+. describe, short
+
+Contains data from sim_resource_curse.dta
+ Observations:         3,000                  
+    Variables:            19                  6 May 2026 17:29
+Sorted by: 
+
+. 
+. * Panel structure
+. codebook district_id, compact
+
+Variable      Obs Unique   Mean  Min  Max  Label
+-------------------------------------------------------------------------------
+district_id  3000    300  150.5    1  300  District ID (1-300)
+-------------------------------------------------------------------------------
+
+. codebook country_id, compact
+
+Variable     Obs Unique  Mean  Min  Max  Label
+-------------------------------------------------------------------------------
+country_id  3000      8  4.23    1    8  Country ID (1-8)
+-------------------------------------------------------------------------------
+
+. tab year, nofreq
+
+. 
+. * Define variable lists as globals
+. global catevars exec_constraints quality_of_govt gdp_pc ///
+>     elevation temperature ruggedness distance_capital ///
+>     agri_suitability population ethnic_frac
+
+. 
+. global controls i.country_id i.year
+
+. 
+. 
+. *================================================================
+. * Section 2: Descriptive statistics
+. *================================================================
+. *
+. * Summary statistics, treatment distribution, and outcomes by
+. * treatment group. The key features to note:
+. *   - Treatment is highly imbalanced (~85% control)
+. *   - Mining districts differ from non-mining districts
+. *   - Institutional variables vary by country
+. *----------------------------------------------------------------
+. 
+. * Summary statistics for all key variables
+. tabstat ntl_log conflict exec_constraints quality_of_govt gdp_pc ///
+>     elevation temperature ruggedness distance_capital ///
+>     agri_suitability population ethnic_frac, ///
+>     statistics(mean sd min max) columns(statistics) format(%9.3f)
+
+    Variable |      Mean        SD       Min       Max
+-------------+----------------------------------------
+     ntl_log |    -1.096     0.435    -2.503     0.265
+    conflict |     0.123     0.328     0.000     1.000
+exec_const~s |     3.680     1.489     1.000     6.000
+quality_of~t |     0.440     0.152     0.220     0.700
+      gdp_pc |  2198.000  1469.937   500.000  5000.000
+   elevation |   499.083   302.031     0.000  1357.232
+ temperature |    23.913     3.920    13.993    35.000
+  ruggedness |    24.423    17.803     0.000    76.953
+distance_c~l |  2.68e+05  1.44e+05 10813.747  4.97e+05
+agri_suita~y |     0.395     0.197     0.000     0.983
+  population | 82028.426 85186.961  4134.682  5.97e+05
+ ethnic_frac |     0.550     0.202     0.201     0.899
+------------------------------------------------------
+
+. 
+. * Treatment distribution
+. tab treatment, missing
+
+  Treatment |
+      group |
+   (0=none, |
+     1=low, |
+     2=med, |
+    3=high) |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      2,550       85.00       85.00
+          1 |        150        5.00       90.00
+          2 |        150        5.00       95.00
+          3 |        150        5.00      100.00
+------------+-----------------------------------
+      Total |      3,000      100.00
+
+. 
+. * Mining share
+. count if treatment > 0
+  450
+
+. local mining_n = r(N)
+
+. quietly count
+
+. display _newline "Mining share: " %5.1f 100*(`mining_n'/r(N)) "%"
+
+Mining share:  15.0%
+
+. 
+. * Outcomes by treatment group
+. table treatment, statistic(mean ntl_log) statistic(mean conflict) ///
+>     statistic(count ntl_log) nformat(%9.3f)
+
+------------------------------------------------------------------------------------------------------------------------------
+                                               |                       Mean                        Number of nonmissing values
+                                               |  Log nighttime lights   Conflict event (binary)          Log nighttime lights
+-----------------------------------------------+------------------------------------------------------------------------------
+Treatment group (0=none, 1=low, 2=med, 3=high) |                                                                              
+  0                                            |                -1.137                     0.107                      2550.000
+  1                                            |                -1.028                     0.180                       150.000
+  2                                            |                -0.930                     0.180                       150.000
+  3                                            |                -0.615                     0.280                       150.000
+  Total                                        |                -1.096                     0.123                      3000.000
+------------------------------------------------------------------------------------------------------------------------------
+
+. 
+. 
+. *================================================================
+. * Section 3: Naive comparison vs ground truth
+. *================================================================
+. *
+. * Raw difference-in-means for key contrasts. These are biased
+. * because mining districts differ systematically from non-mining
+. * districts. The ground-truth ATEs come from the data-generating
+. * process (known because the data are simulated).
+. *----------------------------------------------------------------
+. 
+. display as text _newline "=== Naive Difference-in-Means (biased) ==="
+
+=== Naive Difference-in-Means (biased) ===
+
+. display as text "Comparison" _col(20) "NTL diff" _col(35) "Ground Truth"
+Comparison         NTL diff       Ground Truth
+
+. display as text "{hline 50}"
+--------------------------------------------------
+
+. 
+. * 1-0: mining vs no mining
+. quietly summarize ntl_log if treatment == 1
+
+. local m1 = r(mean)
+
+. quietly summarize ntl_log if treatment == 0
+
+. local m0 = r(mean)
+
+. display as result "1 vs 0" _col(20) %7.4f (`m1' - `m0') _col(35) "0.25"
+1 vs 0              0.1092        0.25
+
+. 
+. * 2-0: medium mining vs no mining
+. quietly summarize ntl_log if treatment == 2
+
+. local m2 = r(mean)
+
+. display as result "2 vs 0" _col(20) %7.4f (`m2' - `m0') _col(35) "0.30"
+2 vs 0              0.2077        0.30
+
+. 
+. * 3-0: high mining vs no mining
+. quietly summarize ntl_log if treatment == 3
+
+. local m3 = r(mean)
+
+. display as result "3 vs 0" _col(20) %7.4f (`m3' - `m0') _col(35) "0.55"
+3 vs 0              0.5227        0.55
+
+. 
+. * 2-1: medium vs low prices
+. display as result "2 vs 1" _col(20) %7.4f (`m2' - `m1') _col(35) "0.05"
+2 vs 1              0.0985        0.05
+
+. 
+. * 3-1: high vs low prices
+. display as result "3 vs 1" _col(20) %7.4f (`m3' - `m1') _col(35) "0.30"
+3 vs 1              0.4135        0.30
+
+. 
+. * 3-2: high vs medium prices
+. display as result "3 vs 2" _col(20) %7.4f (`m3' - `m2') _col(35) "0.25"
+3 vs 2              0.3150        0.25
+
+. 
+. display as text "{hline 50}"
+--------------------------------------------------
+
+. 
+. 
+. *================================================================
+. * Section 4: ATE -- NTL 1 vs 0 (PO + AIPW)
+. *================================================================
+. *
+. * Mining vs No Mining on nighttime lights. This is the most
+. * important contrast for Finding 1. We show both estimators:
+. *   PO   = partialing-out (partial linear model)
+. *   AIPW = augmented inverse-probability weighting (doubly robust)
+. *
+. * Ground truth ATE: 0.25
+. *----------------------------------------------------------------
+. 
+. *--- PO estimator ---
+. preserve
+
+. keep if treatment == 1 | treatment == 0
+(300 observations deleted)
+
+. gen byte treat_1v0 = (treatment == 1)
+
+. label define treat_1v0_lbl 0 "No mining" 1 "Mining (low price)"
+
+. label values treat_1v0 treat_1v0_lbl
+
+. 
+. display _newline as text "=== NTL: Mining vs No Mining (1-0) --- PO Estimator
+>  ==="
+
+=== NTL: Mining vs No Mining (1-0) --- PO Estimator ===
+
+. display as text "N = " _N " observations"
+N = 2700 observations
+
+. 
+. cate po (ntl_log $catevars) (treat_1v0), ///
+>     controls($controls) ///
+>     rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Performing random forest for outcome ntl_log ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 2 of 5 ...
+Performing random forest for outcome ntl_log ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 3 of 5 ...
+Performing random forest for outcome ntl_log ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 4 of 5 ...
+Performing random forest for outcome ntl_log ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 5 of 5 ...
+Performing random forest for outcome ntl_log ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Performing random forest for IATE ...
+Estimating AIPW scores ...
+Estimating ATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Partialing out           Number of folds in cross-fit =     5
+Outcome model:   Random forest            Number of outcome controls   =    28
+Treatment model: Random forest            Number of treatment controls =    28
+CATE model:      Random forest            Number of CATE variables     =    10
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+(Mining ..)  |
+         vs  |
+ No mining)  |   .1936814   .0097428    19.88   0.000     .1745858     .212777
+-------------+----------------------------------------------------------------
+POmean       |
+   treat_1v0 |
+  No mining  |  -1.142413   .0079236  -144.18   0.000    -1.157943   -1.126883
+------------------------------------------------------------------------------
+
+. 
+. estimates store po_ntl_1v0
+
+. restore
+
+. 
+. *--- AIPW estimator ---
+. preserve
+
+. keep if treatment == 1 | treatment == 0
+(300 observations deleted)
+
+. gen byte treat_1v0 = (treatment == 1)
+
+. label define treat_1v0_lbl 0 "No mining" 1 "Mining (low price)"
+
+. label values treat_1v0 treat_1v0_lbl
+
+. 
+. display _newline as text "=== NTL: Mining vs No Mining (1-0) --- AIPW Estimat
+> or ==="
+
+=== NTL: Mining vs No Mining (1-0) --- AIPW Estimator ===
+
+. 
+. cate aipw (ntl_log $catevars) (treat_1v0), ///
+>     controls($controls) ///
+>     rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating ATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Augmented IPW            Number of folds in cross-fit =     5
+Outcome model:   Random forest            Number of outcome controls   =    28
+Treatment model: Random forest            Number of treatment controls =    28
+CATE model:      Random forest            Number of CATE variables     =    10
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+(Mining ..)  |
+         vs  |
+ No mining)  |   .1489842   .0105686    14.10   0.000     .1282701    .1696983
+-------------+----------------------------------------------------------------
+POmean       |
+   treat_1v0 |
+  No mining  |  -1.142416   .0079187  -144.27   0.000    -1.157936   -1.126896
+------------------------------------------------------------------------------
+
+. 
+. estimates store aipw_ntl_1v0
+
+. restore
+
+. 
+. 
+. *================================================================
+. * Section 5: ATE -- NTL 3 vs 1 (PO + AIPW)
+. *================================================================
+. *
+. * High vs Low mineral prices on NTL. Key contrast for Finding 2
+. * (non-linear price effects). Ground truth ATE: 0.30
+. *
+. * Note: this uses only mining districts (~300 obs total),
+. * so estimates will be noisier than the 1-0 comparison.
+. *----------------------------------------------------------------
+. 
+. *--- PO estimator ---
+. preserve
+
+. keep if treatment == 3 | treatment == 1
+(2,700 observations deleted)
+
+. gen byte treat_3v1 = (treatment == 3)
+
+. label define treat_3v1_lbl 0 "Low price" 1 "High price"
+
+. label values treat_3v1 treat_3v1_lbl
+
+. 
+. display _newline as text "=== NTL: High vs Low Prices (3-1) --- PO Estimator 
+> ==="
+
+=== NTL: High vs Low Prices (3-1) --- PO Estimator ===
+
+. display as text "N = " _N " observations (mining districts only)"
+N = 300 observations (mining districts only)
+
+. 
+. cate po (ntl_log $catevars) (treat_3v1), ///
+>     controls($controls) ///
+>     rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Performing random forest for outcome ntl_log ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 2 of 5 ...
+Performing random forest for outcome ntl_log ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 3 of 5 ...
+Performing random forest for outcome ntl_log ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 4 of 5 ...
+Performing random forest for outcome ntl_log ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 5 of 5 ...
+Performing random forest for outcome ntl_log ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Performing random forest for IATE ...
+Estimating AIPW scores ...
+Estimating ATE ...
+
+Conditional average treatment effects       Number of observations       = 300
+Estimator:       Partialing out             Number of folds in cross-fit =   5
+Outcome model:   Random forest              Number of outcome controls   =  28
+Treatment model: Random forest              Number of treatment controls =  28
+CATE model:      Random forest              Number of CATE variables     =  10
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_3v1 |
+(High price  |
+         vs  |
+ Low price)  |   .5945629   .0313138    18.99   0.000     .5331891    .6559368
+-------------+----------------------------------------------------------------
+POmean       |
+   treat_3v1 |
+  Low price  |   -1.12839   .0280085   -40.29   0.000    -1.183285   -1.073494
+------------------------------------------------------------------------------
+
+. 
+. estimates store po_ntl_3v1
+
+. restore
+
+. 
+. *--- AIPW estimator ---
+. preserve
+
+. keep if treatment == 3 | treatment == 1
+(2,700 observations deleted)
+
+. gen byte treat_3v1 = (treatment == 3)
+
+. label define treat_3v1_lbl 0 "Low price" 1 "High price"
+
+. label values treat_3v1 treat_3v1_lbl
+
+. 
+. display _newline as text "=== NTL: High vs Low Prices (3-1) --- AIPW Estimato
+> r ==="
+
+=== NTL: High vs Low Prices (3-1) --- AIPW Estimator ===
+
+. 
+. cate aipw (ntl_log $catevars) (treat_3v1), ///
+>     controls($controls) ///
+>     rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating ATE ...
+
+Conditional average treatment effects       Number of observations       = 300
+Estimator:       Augmented IPW              Number of folds in cross-fit =   5
+Outcome model:   Random forest              Number of outcome controls   =  28
+Treatment model: Random forest              Number of treatment controls =  28
+CATE model:      Random forest              Number of CATE variables     =  10
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_3v1 |
+(High price  |
+         vs  |
+ Low price)  |   .4052631   .0254935    15.90   0.000     .3552968    .4552293
+-------------+----------------------------------------------------------------
+POmean       |
+   treat_3v1 |
+  Low price  |  -1.029871   .0240718   -42.78   0.000    -1.077051   -.9826917
+------------------------------------------------------------------------------
+
+. 
+. estimates store aipw_ntl_3v1
+
+. restore
+
+. 
+. 
+. *================================================================
+. * Section 6: ATE -- NTL remaining comparisons (AIPW only)
+. *================================================================
+. *
+. * Four remaining NTL contrasts using AIPW with default lasso
+. * methods (faster than rforest on smaller subsamples).
+. *
+. * Ground truths: 2-0 = 0.30, 3-0 = 0.55, 2-1 = 0.05, 3-2 = 0.25
+. *----------------------------------------------------------------
+. 
+. *--- NTL: 2 vs 0 (medium mining vs no mining) ---
+. preserve
+
+. keep if treatment == 2 | treatment == 0
+(300 observations deleted)
+
+. gen byte treat_2v0 = (treatment == 2)
+
+. 
+. display _newline as text "=== NTL: Medium Mining vs No Mining (2-0) ==="
+
+=== NTL: Medium Mining vs No Mining (2-0) ===
+
+. display as text "N = " _N
+N = 2700
+
+. 
+. cate aipw (ntl_log $catevars) (treat_2v0), ///
+>     controls($controls) ///
+>     rseed(12345) xfolds(5)
+
+Cross-fit fold 1 of 5 ...
+Estimating lasso for outcome ntl_log if treat_2v0 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_2v0 = 1 ... 
+Performing lasso for treatment treat_2v0 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating lasso for outcome ntl_log if treat_2v0 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_2v0 = 1 ... 
+Performing lasso for treatment treat_2v0 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating lasso for outcome ntl_log if treat_2v0 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_2v0 = 1 ... 
+Performing lasso for treatment treat_2v0 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating lasso for outcome ntl_log if treat_2v0 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_2v0 = 1 ... 
+Performing lasso for treatment treat_2v0 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating lasso for outcome ntl_log if treat_2v0 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_2v0 = 1 ... 
+Performing lasso for treatment treat_2v0 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating ATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Augmented IPW            Number of folds in cross-fit =     5
+Outcome model:   Linear lasso             Number of outcome controls   =    28
+Treatment model: Logit lasso              Number of treatment controls =    28
+CATE model:      Random forest            Number of CATE variables     =    10
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_2v0 |
+   (1 vs 0)  |   .2891968   .0250557    11.54   0.000     .2400886    .3383049
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_2v0 |   -1.14181   .0079444  -143.73   0.000     -1.15738   -1.126239
+------------------------------------------------------------------------------
+
+. 
+. estimates store aipw_ntl_2v0
+
+. restore
+
+. 
+. *--- NTL: 3 vs 0 (high mining vs no mining) ---
+. preserve
+
+. keep if treatment == 3 | treatment == 0
+(300 observations deleted)
+
+. gen byte treat_3v0 = (treatment == 3)
+
+. 
+. display _newline as text "=== NTL: High Mining vs No Mining (3-0) ==="
+
+=== NTL: High Mining vs No Mining (3-0) ===
+
+. display as text "N = " _N
+N = 2700
+
+. 
+. cate aipw (ntl_log $catevars) (treat_3v0), ///
+>     controls($controls) ///
+>     rseed(12345) xfolds(5)
+
+Cross-fit fold 1 of 5 ...
+Estimating lasso for outcome ntl_log if treat_3v0 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_3v0 = 1 ... 
+Performing lasso for treatment treat_3v0 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating lasso for outcome ntl_log if treat_3v0 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_3v0 = 1 ... 
+Performing lasso for treatment treat_3v0 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating lasso for outcome ntl_log if treat_3v0 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_3v0 = 1 ... 
+Performing lasso for treatment treat_3v0 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating lasso for outcome ntl_log if treat_3v0 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_3v0 = 1 ... 
+Performing lasso for treatment treat_3v0 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating lasso for outcome ntl_log if treat_3v0 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_3v0 = 1 ... 
+Performing lasso for treatment treat_3v0 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating ATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Augmented IPW            Number of folds in cross-fit =     5
+Outcome model:   Linear lasso             Number of outcome controls   =    28
+Treatment model: Logit lasso              Number of treatment controls =    28
+CATE model:      Random forest            Number of CATE variables     =    10
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_3v0 |
+   (1 vs 0)  |   .6111885   .0250606    24.39   0.000     .5620707    .6603063
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_3v0 |  -1.137586   .0079516  -143.06   0.000    -1.153171   -1.122001
+------------------------------------------------------------------------------
+
+. 
+. estimates store aipw_ntl_3v0
+
+. restore
+
+. 
+. *--- NTL: 2 vs 1 (medium vs low prices) ---
+. preserve
+
+. keep if treatment == 2 | treatment == 1
+(2,700 observations deleted)
+
+. gen byte treat_2v1 = (treatment == 2)
+
+. 
+. display _newline as text "=== NTL: Medium vs Low Prices (2-1) ==="
+
+=== NTL: Medium vs Low Prices (2-1) ===
+
+. display as text "N = " _N " (within-mining comparison)"
+N = 300 (within-mining comparison)
+
+. 
+. cate aipw (ntl_log $catevars) (treat_2v1), ///
+>     controls($controls) ///
+>     rseed(12345) xfolds(5) ///
+>     pstolerance(1e-6)
+
+Cross-fit fold 1 of 5 ...
+Estimating lasso for outcome ntl_log if treat_2v1 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_2v1 = 1 ... 
+Performing lasso for treatment treat_2v1 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating lasso for outcome ntl_log if treat_2v1 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_2v1 = 1 ... 
+Performing lasso for treatment treat_2v1 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating lasso for outcome ntl_log if treat_2v1 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_2v1 = 1 ... 
+Performing lasso for treatment treat_2v1 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating lasso for outcome ntl_log if treat_2v1 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_2v1 = 1 ... 
+Performing lasso for treatment treat_2v1 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating lasso for outcome ntl_log if treat_2v1 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_2v1 = 1 ... 
+Performing lasso for treatment treat_2v1 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating ATE ...
+
+Conditional average treatment effects       Number of observations       = 300
+Estimator:       Augmented IPW              Number of folds in cross-fit =   5
+Outcome model:   Linear lasso               Number of outcome controls   =  28
+Treatment model: Logit lasso                Number of treatment controls =  28
+CATE model:      Random forest              Number of CATE variables     =  10
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_2v1 |
+   (1 vs 0)  |  -.0112177   .0883033    -0.13   0.899    -.1842889    .1618535
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_2v1 |   -1.01681   .0310857   -32.71   0.000    -1.077737   -.9558831
+------------------------------------------------------------------------------
+
+. 
+. estimates store aipw_ntl_2v1
+
+. restore
+
+. 
+. *--- NTL: 3 vs 2 (high vs medium prices) ---
+. preserve
+
+. keep if treatment == 3 | treatment == 2
+(2,700 observations deleted)
+
+. gen byte treat_3v2 = (treatment == 3)
+
+. 
+. display _newline as text "=== NTL: High vs Medium Prices (3-2) ==="
+
+=== NTL: High vs Medium Prices (3-2) ===
+
+. display as text "N = " _N " (within-mining comparison)"
+N = 300 (within-mining comparison)
+
+. 
+. cate aipw (ntl_log $catevars) (treat_3v2), ///
+>     controls($controls) ///
+>     rseed(12345) xfolds(5) ///
+>     pstolerance(1e-6)
+
+Cross-fit fold 1 of 5 ...
+Estimating lasso for outcome ntl_log if treat_3v2 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_3v2 = 1 ... 
+Performing lasso for treatment treat_3v2 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating lasso for outcome ntl_log if treat_3v2 = 0 ... 
+Estimating lasso for outcome ntl_log if treat_3v2 = 1 ... 
+Performing lasso for treatment treat_3v2 ... 
+treatment 0 has 1 propensity scores less than 1.00e-06
+    Treatment overlap assumption has been violated; use option osample() to
+    identify the overlap violators.
+r(498);
+
+end of do-file
+r(498);
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_cate2/analysis.log
+  log type:  text
+ opened on:   6 May 2026, 17:38:04
+
+. 
+. use "sim_resource_curse.dta", clear
+
+. 
+. global catevars exec_constraints quality_of_govt gdp_pc ///
+>     elevation temperature ruggedness distance_capital ///
+>     agri_suitability population ethnic_frac
+
+. global controls i.country_id i.year
+
+. 
+. *--- NTL: 3 vs 2 (PO -- AIPW fails on overlap) ---
+. preserve
+
+. keep if treatment == 3 | treatment == 2
+(2,700 observations deleted)
+
+. gen byte treat_3v2 = (treatment == 3)
+
+. display _newline as text "=== NTL: High vs Medium Prices (3-2) ==="
+
+=== NTL: High vs Medium Prices (3-2) ===
+
+. display as text "N = " _N " (within-mining comparison)"
+N = 300 (within-mining comparison)
+
+. cate po (ntl_log $catevars) (treat_3v2), ///
+>     controls($controls) rseed(12345) xfolds(5)
+
+Cross-fit fold 1 of 5 ...
+Performing lasso for outcome ntl_log ... 
+Performing lasso for treatment treat_3v2 ... 
+
+Cross-fit fold 2 of 5 ...
+Performing lasso for outcome ntl_log ... 
+Performing lasso for treatment treat_3v2 ... 
+treatment 0 has 1 propensity scores less than 1.00e-05
+    Treatment overlap assumption has been violated; use option osample() to
+    identify the overlap violators.
+r(498);
+
+end of do-file
+r(498);
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_cate2/analysis.log
+  log type:  text
+ opened on:   6 May 2026, 17:39:03
+
+. 
+. use "sim_resource_curse.dta", clear
+
+. 
+. global catevars exec_constraints quality_of_govt gdp_pc ///
+>     elevation temperature ruggedness distance_capital ///
+>     agri_suitability population ethnic_frac
+
+. global controls i.country_id i.year
+
+. 
+. *--- NTL: 3 vs 2 (PO with relaxed overlap tolerance) ---
+. preserve
+
+. keep if treatment == 3 | treatment == 2
+(2,700 observations deleted)
+
+. gen byte treat_3v2 = (treatment == 3)
+
+. display _newline as text "=== NTL: High vs Medium Prices (3-2) ==="
+
+=== NTL: High vs Medium Prices (3-2) ===
+
+. display as text "N = " _N " (within-mining comparison)"
+N = 300 (within-mining comparison)
+
+. cate po (ntl_log $catevars) (treat_3v2), ///
+>     controls($controls) rseed(12345) xfolds(5) ///
+>     pstolerance(1e-8)
+
+Cross-fit fold 1 of 5 ...
+Performing lasso for outcome ntl_log ... 
+Performing lasso for treatment treat_3v2 ... 
+
+Cross-fit fold 2 of 5 ...
+Performing lasso for outcome ntl_log ... 
+Performing lasso for treatment treat_3v2 ... 
+
+Cross-fit fold 3 of 5 ...
+Performing lasso for outcome ntl_log ... 
+Performing lasso for treatment treat_3v2 ... 
+
+Cross-fit fold 4 of 5 ...
+Performing lasso for outcome ntl_log ... 
+Performing lasso for treatment treat_3v2 ... 
+
+Cross-fit fold 5 of 5 ...
+Performing lasso for outcome ntl_log ... 
+Performing lasso for treatment treat_3v2 ... 
+
+Performing random forest for IATE ...
+Estimating AIPW scores ...
+Estimating ATE ...
+
+Conditional average treatment effects       Number of observations       = 300
+Estimator:       Partialing out             Number of folds in cross-fit =   5
+Outcome model:   Linear lasso               Number of outcome controls   =  28
+Treatment model: Logit lasso                Number of treatment controls =  28
+CATE model:      Random forest              Number of CATE variables     =  10
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_3v2 |
+   (1 vs 0)  |  -43824.93    43752.1    -1.00   0.317    -129577.5     41927.6
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_3v2 |   43824.29    43752.1     1.00   0.317    -41928.24    129576.8
+------------------------------------------------------------------------------
+
+. estimates store aipw_ntl_3v2
+
+. restore
+
+. 
+. *--- Section 7: Conflict ---
+. preserve
+
+. keep if treatment == 1 | treatment == 0
+(300 observations deleted)
+
+. gen byte treat_1v0 = (treatment == 1)
+
+. display _newline as text "=== Conflict: Mining vs No Mining (1-0) --- PO Esti
+> mator ==="
+
+=== Conflict: Mining vs No Mining (1-0) --- PO Estimator ===
+
+. cate po (conflict $catevars) (treat_1v0), ///
+>     controls($controls) rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Performing random forest for outcome conflict ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 2 of 5 ...
+Performing random forest for outcome conflict ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 3 of 5 ...
+Performing random forest for outcome conflict ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 4 of 5 ...
+Performing random forest for outcome conflict ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 5 of 5 ...
+Performing random forest for outcome conflict ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Performing random forest for IATE ...
+Estimating AIPW scores ...
+Estimating ATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Partialing out           Number of folds in cross-fit =     5
+Outcome model:   Random forest            Number of outcome controls   =    28
+Treatment model: Random forest            Number of treatment controls =    28
+CATE model:      Random forest            Number of CATE variables     =    10
+
+------------------------------------------------------------------------------
+             |               Robust
+    conflict | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+   (1 vs 0)  |   .0630853   .0130031     4.85   0.000     .0375997    .0885709
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_1v0 |   .1073193   .0060727    17.67   0.000     .0954169    .1192216
+------------------------------------------------------------------------------
+
+. estimates store po_conf_1v0
+
+. restore
+
+. 
+. preserve
+
+. keep if treatment == 1 | treatment == 0
+(300 observations deleted)
+
+. gen byte treat_1v0 = (treatment == 1)
+
+. display _newline as text "=== Conflict: Mining vs No Mining (1-0) --- AIPW Es
+> timator ==="
+
+=== Conflict: Mining vs No Mining (1-0) --- AIPW Estimator ===
+
+. cate aipw (conflict $catevars) (treat_1v0), ///
+>     controls($controls) rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Estimating random forest for outcome conflict if treat_1v0 = 0 ... 
+Estimating random forest for outcome conflict if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating random forest for outcome conflict if treat_1v0 = 0 ... 
+Estimating random forest for outcome conflict if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating random forest for outcome conflict if treat_1v0 = 0 ... 
+Estimating random forest for outcome conflict if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating random forest for outcome conflict if treat_1v0 = 0 ... 
+Estimating random forest for outcome conflict if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating random forest for outcome conflict if treat_1v0 = 0 ... 
+Estimating random forest for outcome conflict if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating ATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Augmented IPW            Number of folds in cross-fit =     5
+Outcome model:   Random forest            Number of outcome controls   =    28
+Treatment model: Random forest            Number of treatment controls =    28
+CATE model:      Random forest            Number of CATE variables     =    10
+
+------------------------------------------------------------------------------
+             |               Robust
+    conflict | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+   (1 vs 0)  |   .0659767   .0122036     5.41   0.000      .042058    .0898954
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_1v0 |   .1075852   .0060708    17.72   0.000     .0956866    .1194838
+------------------------------------------------------------------------------
+
+. estimates store aipw_conf_1v0
+
+. restore
+
+. 
+. * Conflict remaining -- use capture for overlap fallback
+. local comparisons "2_0 3_0 2_1 3_1 3_2"
+
+. foreach comp of local comparisons {
+  2.     local t_hi = substr("`comp'", 1, 1)
+  3.     local t_lo = substr("`comp'", 3, 1)
+  4.     preserve
+  5.     keep if treatment == `t_hi' | treatment == `t_lo'
+  6.     gen byte treat_bin = (treatment == `t_hi')
+  7.     display _newline as text "=== Conflict: Treatment `t_hi' vs `t_lo' ===
+> "
+  8.     display as text "N = " _N
+  9.     capture noisily {
+ 10.         quietly cate aipw (conflict $catevars) (treat_bin), ///
+>             controls($controls) rseed(12345) xfolds(5) ///
+>             pstolerance(1e-8)
+ 11.         matrix b = e(b)
+ 12.         matrix V = e(V)
+ 13.         display as result "  ATE = " %7.4f b[1,1] ///
+>             "  SE = " %7.4f sqrt(V[1,1])
+ 14.         estimates store aipw_conf_`t_hi'v`t_lo'
+ 15.     }
+ 16.     if _rc != 0 {
+ 17.         display as text "  -> Overlap violation, switching to PO estimator
+> "
+ 18.         capture noisily {
+ 19.             quietly cate po (conflict $catevars) (treat_bin), ///
+>                 controls($controls) rseed(12345) xfolds(5) ///
+>                 pstolerance(1e-8)
+ 20.             matrix b = e(b)
+ 21.             matrix V = e(V)
+ 22.             display as result "  ATE (PO) = " %7.4f b[1,1] ///
+>                 "  SE = " %7.4f sqrt(V[1,1])
+ 23.             estimates store aipw_conf_`t_hi'v`t_lo'
+ 24.         }
+ 25.         if _rc != 0 {
+ 26.             display as text "  -> Both estimators failed. Skipping."
+ 27.         }
+ 28.     }
+ 29.     restore
+ 30. }
+(300 observations deleted)
+
+=== Conflict: Treatment 2 vs 0 ===
+N = 2700
+  ATE =  0.0728  SE =  0.0330
+(300 observations deleted)
+
+=== Conflict: Treatment 3 vs 0 ===
+N = 2700
+  ATE =  0.1586  SE =  0.0380
+(2,700 observations deleted)
+
+=== Conflict: Treatment 2 vs 1 ===
+N = 300
+  ATE = -0.0677  SE =  0.0497
+(2,700 observations deleted)
+
+=== Conflict: Treatment 3 vs 1 ===
+N = 300
+  ATE =  0.1126  SE =  0.0293
+(2,700 observations deleted)
+
+=== Conflict: Treatment 3 vs 2 ===
+N = 300
+  ATE =  3.5e+04  SE =  3.5e+04
+
+. 
+. *--- Section 8: ATE summary table ---
+. display _newline as text "{hline 70}"
+
+----------------------------------------------------------------------
+
+. display as text "SUMMARY: Average Treatment Effects (NTL Outcome)"
+SUMMARY: Average Treatment Effects (NTL Outcome)
+
+. display as text "{hline 70}"
+----------------------------------------------------------------------
+
+. display as text "Contrast" _col(15) "ATE" _col(30) "SE" _col(42) "Ground Trut
+> h"
+Contrast      ATE            SE          Ground Truth
+
+. display as text "{hline 70}"
+----------------------------------------------------------------------
+
+. local comps   "1v0 2v0 3v0 2v1 3v1 3v2"
+
+. local gts     "0.25 0.30 0.55 0.05 0.30 0.25"
+
+. local i = 1
+
+. foreach comp of local comps {
+  2.     local gt : word `i' of `gts'
+  3.     capture quietly estimates restore aipw_ntl_`comp'
+  4.     if _rc == 0 {
+  5.         matrix b = e(b)
+  6.         matrix V = e(V)
+  7.         local ate = b[1,1]
+  8.         local se  = sqrt(V[1,1])
+  9.         display as result "`comp'" _col(15) %7.4f `ate' _col(30) %7.4f `se
+> ' _col(42) "`gt'"
+ 10.     }
+ 11.     else {
+ 12.         display as result "`comp'" _col(15) "(not stored)" _col(42) "`gt'"
+ 13.     }
+ 14.     local ++i
+ 15. }
+1v0           (not stored)               0.25
+2v0           (not stored)               0.30
+3v0           (not stored)               0.55
+2v1           (not stored)               0.05
+3v1           (not stored)               0.30
+3v2           -4.4e+04        4.4e+04    0.25
+
+. display as text "{hline 70}"
+----------------------------------------------------------------------
+
+. 
+. *--- Section 9: GATEs by exec_con ---
+. preserve
+
+. keep if treatment == 1 | treatment == 0
+(300 observations deleted)
+
+. gen byte treat_1v0 = (treatment == 1)
+
+. display _newline as text "=== GATEs: NTL Mining Effect (1-0) by Executive Con
+> straints ==="
+
+=== GATEs: NTL Mining Effect (1-0) by Executive Constraints ===
+
+. cate aipw (ntl_log $catevars) (treat_1v0), ///
+>     controls($controls) group(exec_con) ///
+>     rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating GATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Augmented IPW            Number of folds in cross-fit =     5
+Outcome model:   Random forest            Number of outcome controls   =    34
+Treatment model: Random forest            Number of treatment controls =    34
+CATE model:      Random forest            Number of CATE variables     =    16
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+GATE         |
+    exec_con |
+          1  |   .2748407   .0403765     6.81   0.000     .1957042    .3539772
+          2  |   .3155337   .0204714    15.41   0.000     .2754106    .3556569
+          3  |   .1674459    .020837     8.04   0.000     .1266061    .2082857
+          4  |   .1131603   .0263687     4.29   0.000     .0614785     .164842
+          5  |   .0998745   .0296118     3.37   0.001     .0418364    .1579127
+          6  |   .0508165   .0220009     2.31   0.021     .0076955    .0939374
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+   (1 vs 0)  |   .1517508   .0111077    13.66   0.000       .12998    .1735216
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_1v0 |  -1.142328   .0079175  -144.28   0.000    -1.157846    -1.12681
+------------------------------------------------------------------------------
+
+. categraph gateplot
+
+. graph export "stata_cate2_gate_ntl_1v0_exec.png", replace width(1200)
+(file stata_cate2_gate_ntl_1v0_exec.png not found)
+file stata_cate2_gate_ntl_1v0_exec.png written in PNG format
+
+. estat gatetest
+
+Group treatment-effects heterogeneity test
+H0: Group average treatment effects are homogeneous
+
+ ( 1)  [GATE]1bn.exec_con - [GATE]2.exec_con = 0
+ ( 2)  [GATE]1bn.exec_con - [GATE]3.exec_con = 0
+ ( 3)  [GATE]1bn.exec_con - [GATE]4.exec_con = 0
+ ( 4)  [GATE]1bn.exec_con - [GATE]5.exec_con = 0
+ ( 5)  [GATE]1bn.exec_con - [GATE]6.exec_con = 0
+
+    chi2(5) =  96.90
+Prob > chi2 = 0.0000
+
+. estimates store gate_ntl_1v0_exec
+
+. restore
+
+. 
+. preserve
+
+. keep if treatment == 3 | treatment == 1
+(2,700 observations deleted)
+
+. gen byte treat_3v1 = (treatment == 3)
+
+. display _newline as text "=== GATEs: NTL Price Effect (3-1) by Executive Cons
+> traints ==="
+
+=== GATEs: NTL Price Effect (3-1) by Executive Constraints ===
+
+. cate aipw (ntl_log $catevars) (treat_3v1), ///
+>     controls($controls) group(exec_con) ///
+>     rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating GATE ...
+
+Conditional average treatment effects       Number of observations       = 300
+Estimator:       Augmented IPW              Number of folds in cross-fit =   5
+Outcome model:   Random forest              Number of outcome controls   =  34
+Treatment model: Random forest              Number of treatment controls =  34
+CATE model:      Random forest              Number of CATE variables     =  16
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+GATE         |
+    exec_con |
+          1  |   .3211384   .0790347     4.06   0.000     .1662332    .4760437
+          2  |   .2868582   .0726244     3.95   0.000     .1445171    .4291993
+          3  |   .3729897   .0413647     9.02   0.000     .2919164    .4540629
+          4  |   .5891193   .0542141    10.87   0.000     .4828616    .6953771
+          5  |   .4870458   .0590345     8.25   0.000     .3713403    .6027514
+          6  |   .3400699   .0596378     5.70   0.000     .2231819    .4569579
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_3v1 |
+   (1 vs 0)  |   .4062996   .0252193    16.11   0.000     .3568707    .4557284
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_3v1 |   -1.03114   .0239875   -42.99   0.000    -1.078155   -.9841252
+------------------------------------------------------------------------------
+
+. categraph gateplot
+
+. graph export "stata_cate2_gate_ntl_3v1_exec.png", replace width(1200)
+(file stata_cate2_gate_ntl_3v1_exec.png not found)
+file stata_cate2_gate_ntl_3v1_exec.png written in PNG format
+
+. estat gatetest
+
+Group treatment-effects heterogeneity test
+H0: Group average treatment effects are homogeneous
+
+ ( 1)  [GATE]1bn.exec_con - [GATE]2.exec_con = 0
+ ( 2)  [GATE]1bn.exec_con - [GATE]3.exec_con = 0
+ ( 3)  [GATE]1bn.exec_con - [GATE]4.exec_con = 0
+ ( 4)  [GATE]1bn.exec_con - [GATE]5.exec_con = 0
+ ( 5)  [GATE]1bn.exec_con - [GATE]6.exec_con = 0
+
+    chi2(5) =  18.92
+Prob > chi2 = 0.0020
+
+. estimates store gate_ntl_3v1_exec
+
+. restore
+
+. 
+. *--- Section 10: GATEs by quality_of_govt ---
+. preserve
+
+. keep if treatment == 1 | treatment == 0
+(300 observations deleted)
+
+. gen byte treat_1v0 = (treatment == 1)
+
+. egen qog_cat = cut(quality_of_govt), group(4) label
+
+. display _newline as text "=== GATEs: NTL Mining Effect (1-0) by Quality of Go
+> vernment ==="
+
+=== GATEs: NTL Mining Effect (1-0) by Quality of Government ===
+
+. cate aipw (ntl_log $catevars) (treat_1v0), ///
+>     controls($controls) group(qog_cat) ///
+>     rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating GATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Augmented IPW            Number of folds in cross-fit =     5
+Outcome model:   Random forest            Number of outcome controls   =    32
+Treatment model: Random forest            Number of treatment controls =    32
+CATE model:      Random forest            Number of CATE variables     =    14
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+GATE         |
+     qog_cat |
+       .22-  |   .2978846   .0215258    13.84   0.000     .2556947    .3400745
+       .32-  |    .168479   .0205681     8.19   0.000     .1281663    .2087917
+       .42-  |   .1080724   .0242792     4.45   0.000      .060486    .1556589
+       .58-  |   .0728521   .0179392     4.06   0.000      .037692    .1080123
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+   (1 vs 0)  |   .1504898   .0107088    14.05   0.000     .1295009    .1714786
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_1v0 |   -1.14239    .007918  -144.28   0.000    -1.157909   -1.126871
+------------------------------------------------------------------------------
+
+. categraph gateplot
+
+. graph export "stata_cate2_gate_ntl_1v0_qog.png", replace width(1200)
+(file stata_cate2_gate_ntl_1v0_qog.png not found)
+file stata_cate2_gate_ntl_1v0_qog.png written in PNG format
+
+. estat gatetest
+
+Group treatment-effects heterogeneity test
+H0: Group average treatment effects are homogeneous
+
+ ( 1)  [GATE]0bn.qog_cat - [GATE]1.qog_cat = 0
+ ( 2)  [GATE]0bn.qog_cat - [GATE]2.qog_cat = 0
+ ( 3)  [GATE]0bn.qog_cat - [GATE]3.qog_cat = 0
+
+    chi2(3) =  69.19
+Prob > chi2 = 0.0000
+
+. estimates store gate_ntl_1v0_qog
+
+. restore
+
+. 
+. preserve
+
+. keep if treatment == 3 | treatment == 1
+(2,700 observations deleted)
+
+. gen byte treat_3v1 = (treatment == 3)
+
+. egen qog_cat = cut(quality_of_govt), group(4) label
+
+. display _newline as text "=== GATEs: NTL Price Effect (3-1) by Quality of Gov
+> ernment ==="
+
+=== GATEs: NTL Price Effect (3-1) by Quality of Government ===
+
+. cate aipw (ntl_log $catevars) (treat_3v1), ///
+>     controls($controls) group(qog_cat) ///
+>     rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating random forest for outcome ntl_log if treat_3v1 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_3v1 = 1 ... 
+Performing random forest for treatment treat_3v1 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating GATE ...
+
+Conditional average treatment effects       Number of observations       = 300
+Estimator:       Augmented IPW              Number of folds in cross-fit =   5
+Outcome model:   Random forest              Number of outcome controls   =  32
+Treatment model: Random forest              Number of treatment controls =  32
+CATE model:      Random forest              Number of CATE variables     =  14
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+GATE         |
+     qog_cat |
+       .22-  |   .3224114   .0784869     4.11   0.000     .1685799     .476243
+       .28-  |   .3510705   .0408896     8.59   0.000     .2709285    .4312126
+       .38-  |   .4843956   .0567094     8.54   0.000     .3732473    .5955438
+       .48-  |   .4447202    .039344    11.30   0.000     .3676074    .5218329
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_3v1 |
+   (1 vs 0)  |   .4057735   .0253689    15.99   0.000     .3560514    .4554957
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_3v1 |  -1.030637   .0240117   -42.92   0.000      -1.0777   -.9835753
+------------------------------------------------------------------------------
+
+. categraph gateplot
+
+. graph export "stata_cate2_gate_ntl_3v1_qog.png", replace width(1200)
+(file stata_cate2_gate_ntl_3v1_qog.png not found)
+file stata_cate2_gate_ntl_3v1_qog.png written in PNG format
+
+. estat gatetest
+
+Group treatment-effects heterogeneity test
+H0: Group average treatment effects are homogeneous
+
+ ( 1)  [GATE]0bn.qog_cat - [GATE]1.qog_cat = 0
+ ( 2)  [GATE]0bn.qog_cat - [GATE]2.qog_cat = 0
+ ( 3)  [GATE]0bn.qog_cat - [GATE]3.qog_cat = 0
+
+    chi2(3) =   5.81
+Prob > chi2 = 0.1211
+
+. estimates store gate_ntl_3v1_qog
+
+. restore
+
+. 
+. *--- Section 11: Conflict GATEs ---
+. preserve
+
+. keep if treatment == 1 | treatment == 0
+(300 observations deleted)
+
+. gen byte treat_1v0 = (treatment == 1)
+
+. display _newline as text "=== GATEs: Conflict Mining Effect (1-0) by Executiv
+> e Constraints ==="
+
+=== GATEs: Conflict Mining Effect (1-0) by Executive Constraints ===
+
+. cate aipw (conflict $catevars) (treat_1v0), ///
+>     controls($controls) group(exec_con) ///
+>     rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Estimating random forest for outcome conflict if treat_1v0 = 0 ... 
+Estimating random forest for outcome conflict if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating random forest for outcome conflict if treat_1v0 = 0 ... 
+Estimating random forest for outcome conflict if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating random forest for outcome conflict if treat_1v0 = 0 ... 
+Estimating random forest for outcome conflict if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating random forest for outcome conflict if treat_1v0 = 0 ... 
+Estimating random forest for outcome conflict if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating random forest for outcome conflict if treat_1v0 = 0 ... 
+Estimating random forest for outcome conflict if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating GATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Augmented IPW            Number of folds in cross-fit =     5
+Outcome model:   Random forest            Number of outcome controls   =    34
+Treatment model: Random forest            Number of treatment controls =    34
+CATE model:      Random forest            Number of CATE variables     =    16
+
+------------------------------------------------------------------------------
+             |               Robust
+    conflict | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+GATE         |
+    exec_con |
+          1  |   .0924768   .0440987     2.10   0.036     .0060449    .1789087
+          2  |    .032707   .0348295     0.94   0.348    -.0355576    .1009715
+          3  |   .0600398   .0292415     2.05   0.040     .0027275    .1173522
+          4  |   .0486042   .0273151     1.78   0.075    -.0049326    .1021409
+          5  |   .0643314   .0205048     3.14   0.002     .0241427    .1045202
+          6  |   .1057752    .021425     4.94   0.000     .0637831    .1477674
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+   (1 vs 0)  |   .0648653   .0122278     5.30   0.000     .0408994    .0888313
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_1v0 |   .1076284   .0060716    17.73   0.000     .0957283    .1195286
+------------------------------------------------------------------------------
+
+. categraph gateplot
+
+. graph export "stata_cate2_gate_conf_1v0_exec.png", replace width(1200)
+(file stata_cate2_gate_conf_1v0_exec.png not found)
+file stata_cate2_gate_conf_1v0_exec.png written in PNG format
+
+. estat gatetest
+
+Group treatment-effects heterogeneity test
+H0: Group average treatment effects are homogeneous
+
+ ( 1)  [GATE]1bn.exec_con - [GATE]2.exec_con = 0
+ ( 2)  [GATE]1bn.exec_con - [GATE]3.exec_con = 0
+ ( 3)  [GATE]1bn.exec_con - [GATE]4.exec_con = 0
+ ( 4)  [GATE]1bn.exec_con - [GATE]5.exec_con = 0
+ ( 5)  [GATE]1bn.exec_con - [GATE]6.exec_con = 0
+
+    chi2(5) =   5.00
+Prob > chi2 = 0.4162
+
+. estimates store gate_conf_1v0_exec
+
+. restore
+
+. 
+. *--- Section 12: IATE diagnostics ---
+. preserve
+
+. keep if treatment == 1 | treatment == 0
+(300 observations deleted)
+
+. gen byte treat_1v0 = (treatment == 1)
+
+. display _newline as text "=== Stata 19 Bonus Diagnostics: NTL Mining Effect (
+> 1-0) ==="
+
+=== Stata 19 Bonus Diagnostics: NTL Mining Effect (1-0) ===
+
+. cate aipw (ntl_log exec_constraints quality_of_govt gdp_pc ///
+>     elevation temperature ruggedness distance_capital ///
+>     agri_suitability population ethnic_frac ///
+>     i.exec_con) (treat_1v0), ///
+>     controls($controls) rseed(12345) xfolds(5) ///
+>     omethod(rforest) tmethod(rforest)
+
+Cross-fit fold 1 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 2 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 3 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 4 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Cross-fit fold 5 of 5 ...
+Estimating random forest for outcome ntl_log if treat_1v0 = 0 ... 
+Estimating random forest for outcome ntl_log if treat_1v0 = 1 ... 
+Performing random forest for treatment treat_1v0 ... 
+
+Estimating AIPW scores ...
+Estimating random forest for IATE ...
+Estimating ATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Augmented IPW            Number of folds in cross-fit =     5
+Outcome model:   Random forest            Number of outcome controls   =    34
+Treatment model: Random forest            Number of treatment controls =    34
+CATE model:      Random forest            Number of CATE variables     =    16
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+   (1 vs 0)  |   .1517508   .0111077    13.66   0.000       .12998    .1735216
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_1v0 |  -1.142328   .0079175  -144.28   0.000    -1.157846    -1.12681
+------------------------------------------------------------------------------
+
+. 
+. categraph histogram
+(bin=34, start=-.59263562, width=.07842205)
+
+. graph export "stata_cate2_iate_histogram.png", replace width(1200)
+(file stata_cate2_iate_histogram.png not found)
+file stata_cate2_iate_histogram.png written in PNG format
+
+. estat heterogeneity
+
+Treatment-effects heterogeneity test
+H0: Treatment effects are homogeneous
+
+    chi2(1) =  53.05
+Prob > chi2 = 0.0000
+
+. 
+. *--- Section 13: reestimate ---
+. cate, reestimate group(exec_con)
+
+Estimating GATE ...
+
+Conditional average treatment effects     Number of observations       = 2,700
+Estimator:       Augmented IPW            Number of folds in cross-fit =     5
+Outcome model:   Random forest            Number of outcome controls   =    34
+Treatment model: Random forest            Number of treatment controls =    34
+CATE model:      Random forest            Number of CATE variables     =    16
+
+------------------------------------------------------------------------------
+             |               Robust
+     ntl_log | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+GATE         |
+    exec_con |
+          1  |   .2748407   .0403765     6.81   0.000     .1957042    .3539772
+          2  |   .3155337   .0204714    15.41   0.000     .2754106    .3556569
+          3  |   .1674459    .020837     8.04   0.000     .1266061    .2082857
+          4  |   .1131603   .0263687     4.29   0.000     .0614785     .164842
+          5  |   .0998745   .0296118     3.37   0.001     .0418364    .1579127
+          6  |   .0508165   .0220009     2.31   0.021     .0076955    .0939374
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+   (1 vs 0)  |   .1517508   .0111077    13.66   0.000       .12998    .1735216
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_1v0 |  -1.142328   .0079175  -144.28   0.000    -1.157846    -1.12681
+------------------------------------------------------------------------------
+
+. estat gatetest
+
+Group treatment-effects heterogeneity test
+H0: Group average treatment effects are homogeneous
+
+ ( 1)  [GATE]1bn.exec_con - [GATE]2.exec_con = 0
+ ( 2)  [GATE]1bn.exec_con - [GATE]3.exec_con = 0
+ ( 3)  [GATE]1bn.exec_con - [GATE]4.exec_con = 0
+ ( 4)  [GATE]1bn.exec_con - [GATE]5.exec_con = 0
+ ( 5)  [GATE]1bn.exec_con - [GATE]6.exec_con = 0
+
+    chi2(5) =  96.90
+Prob > chi2 = 0.0000
+
+. 
+. *--- Section 14: subpopulation ATEs ---
+. estat ate if exec_constraints >= 4
+
+Estimating ATE ...
+
+Treatment-effects estimation                             Number of obs = 1,526
+
+------------------------------------------------------------------------------
+             |               Robust
+             | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+   (1 vs 0)  |   .0922992   .0156897     5.88   0.000     .0615479    .1230506
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_1v0 |  -.9377741   .0088158  -106.37   0.000    -.9550527   -.9204955
+------------------------------------------------------------------------------
+
+. estat ate if exec_constraints <= 2
+
+Estimating ATE ...
+
+Treatment-effects estimation                               Number of obs = 558
+
+------------------------------------------------------------------------------
+             |               Robust
+             | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATE          |
+   treat_1v0 |
+   (1 vs 0)  |   .2970104   .0215156    13.80   0.000     .2548407    .3391801
+-------------+----------------------------------------------------------------
+POmean       |
+ 0.treat_1v0 |  -1.529463   .0134543  -113.68   0.000    -1.555833   -1.503093
+------------------------------------------------------------------------------
+
+. 
+. *--- Section 15: linear projection ---
+. estat projection exec_constraints quality_of_govt gdp_pc elevation temperatur
+> e
+
+Treatment-effects linear projection                     Number of obs =  2,700
+                                                        F(5, 2694)    =  13.95
+                                                        Prob > F      = 0.0000
+                                                        R-squared     = 0.0235
+                                                        Adj R-squared = 0.0217
+                                                        Root MSE      = 0.5710
+
+------------------------------------------------------------------------------
+             |               Robust
+             | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+exec_const~s |   -.026133   .0470456    -0.56   0.579    -.1183822    .0661162
+quality_of~t |   -.862502   .6669174    -1.29   0.196    -2.170224    .4452196
+      gdp_pc |    .000067   .0000388     1.73   0.084    -9.06e-06     .000143
+   elevation |  -.0001258   .0000341    -3.69   0.000    -.0001928   -.0000589
+ temperature |   .0045969   .0022266     2.06   0.039     .0002309    .0089629
+       _cons |   .4351266   .1043275     4.17   0.000     .2305565    .6396967
+------------------------------------------------------------------------------
+
+. 
+. *--- Section 16: IATE function plots ---
+. categraph iateplot exec_constraints
+
+Note: IATE estimated at fixed values of covariates other than exec_constraints.
+
+--------------------------------------------------
+   Variable | Statistic       Value           Type
+------------+-------------------------------------
+ agri_sui~y |      mean    .3898838     continuous
+ distance~l |      mean    267647.1     continuous
+  elevation |      mean    499.6838     continuous
+ ethnic_f~c |      mean    .5505581     continuous
+   exec_con |      base           1         factor
+     gdp_pc |      mean    2243.333     continuous
+ population |      mean    82696.72     continuous
+ quality_~t |      mean     .444837     continuous
+ ruggedness |      mean    23.96731     continuous
+ temperat~e |      mean    23.97849     continuous
+--------------------------------------------------
+
+. graph export "stata_cate2_iateplot_exec.png", replace width(1200)
+(file stata_cate2_iateplot_exec.png not found)
+file stata_cate2_iateplot_exec.png written in PNG format
+
+. categraph iateplot quality_of_govt
+
+Note: IATE estimated at fixed values of covariates other than quality_of_govt.
+
+--------------------------------------------------
+   Variable | Statistic       Value           Type
+------------+-------------------------------------
+ agri_sui~y |      mean    .3898838     continuous
+ distance~l |      mean    267647.1     continuous
+  elevation |      mean    499.6838     continuous
+ ethnic_f~c |      mean    .5505581     continuous
+   exec_con |      base           1         factor
+ exec_con~s |      mean    3.724074     continuous
+     gdp_pc |      mean    2243.333     continuous
+ population |      mean    82696.72     continuous
+ ruggedness |      mean    23.96731     continuous
+ temperat~e |      mean    23.97849     continuous
+--------------------------------------------------
+
+. graph export "stata_cate2_iateplot_qog.png", replace width(1200)
+(file stata_cate2_iateplot_qog.png not found)
+file stata_cate2_iateplot_qog.png written in PNG format
+
+. 
+. restore
+
+. 
+. *--- Section 17: session info ---
+. di _newline(2)
+
+
+
+
+. di "============================================================"
+============================================================
+
+. di "  CATE analysis complete."
+  CATE analysis complete.
+
+. di "============================================================"
+============================================================
+
+. about
+
+StataNow/SE 19.5 for Unix (Intel 64-bit)
+Revision 18 Feb 2026
+Copyright 1985-2025 StataCorp LLC
+
+Total usable memory: 128.00 GB
+
+Stata license: Single-user , expiring 19 Oct 2026
+Serial number: 401909342834
+  Licensed to: Carlos Mendez
+               Nagoya University
+
+. display _newline "Working directory: `c(pwd)'"
+
+Working directory: /Users/carlosmendez/Documents/GitHub/starter-academic-v501/c
+> ontent/post/stata_cate2
+
+. display "Date: `c(current_date)'"
+Date:  6 May 2026
+
+. display "Stata version: `c(stata_version)'"
+Stata version: 19.5
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_cate2/analysis.log
+  log type:  text
+ closed on:   6 May 2026, 17:59:54
+-------------------------------------------------------------------------------
