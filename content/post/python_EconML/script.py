@@ -106,11 +106,10 @@ _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 RESULTS_DIR = os.path.join(_SCRIPT_DIR, 'tutorial_results')
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
-DATA_URL = ("https://github.com/quarcs-lab/data-open"
-            "/raw/master/stata19/sim_resource_curse.csv")
-# Local fallback (for running before data is uploaded to GitHub)
-_LOCAL_CSV = os.path.join(_SCRIPT_DIR, '..', '..', 'stata_cate2',
-                          'sim_resource_curse.csv')
+DATA_URL = ("https://github.com/cmg777/starter-academic-v501"
+            "/raw/master/content/post/python_EconML/sim_resource_curse.csv")
+# Local fallback
+_LOCAL_CSV = os.path.join(_SCRIPT_DIR, 'sim_resource_curse.csv')
 
 # Heterogeneity features (X): variables the causal forest can split on
 # to discover treatment effect heterogeneity

@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Python
+  - Tutorial
   - Causal Inference
   - Heterogeneous Treatment Effects
   - Machine Learning
@@ -17,14 +18,18 @@ image:
   focal_point: Smart
   placement: 3
 links:
-- icon: google
-  icon_pack: fab
-  name: "Google Colab"
-  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_EconML/references/tutorial-econml-resource-curse.ipynb
+- icon: open-data
+  icon_pack: ai
+  name: "[Python] Google Colab"
+  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_EconML/notebook.ipynb
 - icon: code
   icon_pack: fas
   name: "Python script"
-  url: references/tutorial-econml-resource-curse.py
+  url: script.py
+- icon: book
+  icon_pack: fas
+  name: "Jupyter notebook"
+  url: notebook.ipynb
 slides:
 summary: Estimate heterogeneous causal effects of mining and mineral prices on economic development using EconML's CausalForestDML with Double Machine Learning, applied to simulated resource curse data
 tags:
@@ -85,7 +90,7 @@ $$Y = T \cdot \tau(\mathbf{x}) + g\_0(\mathbf{x}, \mathbf{w}) + \varepsilon, \qq
 
 where $g\_0(\cdot)$ and $m\_0(\cdot)$ are flexible **nuisance functions** estimated by machine learning (Gradient Boosting in our case), $\tau(\mathbf{x})$ is the heterogeneous treatment effect function we want to learn, $\mathbf{x}$ are the covariates that may moderate the treatment effect, and $\mathbf{w}$ are additional controls used only in the first-stage nuisance models.
 
-The key insight of **Double Machine Learning** (Chernozhukov et al., 2018) is to **residualize** both the outcome and the treatment before fitting the causal forest. This two-step approach has a property called **Neyman orthogonality**: first-stage estimation errors have only a second-order impact on the causal estimates. This means the causal forest remains valid even when the nuisance models converge at slower-than-parametric rates.
+The key insight of **Double Machine Learning** (Chernozhukov et al., 2018) is to **residualize** both the outcome and the treatment before fitting the causal forest. Think of residualization like noise-canceling headphones: the first stage removes the "background noise" of confounders from both the outcome and treatment, so the causal forest only hears the "signal" of the treatment effect. This two-step approach has a property called **Neyman orthogonality**: first-stage estimation errors have only a second-order impact on the causal estimates. This means the causal forest remains valid even when the nuisance models converge at slower-than-parametric rates.
 
 ### Three levels of effects
 
@@ -146,8 +151,8 @@ TRUE_ATES = {
 The dataset simulates 300 districts across 8 countries observed over 10 years (2003--2012), following the structure of Hodler, Lechner & Raschky (2023). Treatment has four levels: no mining (0), mining at low prices (1), medium prices (2), and high prices (3).
 
 ```python
-DATA_URL = ("https://github.com/quarcs-lab/data-open"
-            "/raw/master/stata19/sim_resource_curse.csv")
+DATA_URL = ("https://github.com/cmg777/starter-academic-v501"
+            "/raw/master/content/post/python_EconML/sim_resource_curse.csv")
 df = pd.read_csv(DATA_URL)
 print(f"Dataset: {len(df):,} observations")
 print(f"Districts: {df['district_id'].nunique()}, "
@@ -181,6 +186,7 @@ for t, n in df['treatment'].value_counts().sort_index().items():
 ```
 
 ![Treatment distribution across the four groups](python_econml_treatment_dist.png)
+*Treatment distribution across the four groups. The 85/5/5/5 imbalance makes causal inference challenging.*
 
 The 85/5/5/5 split means the causal forest has 2,550 control observations but only 150 per treatment level. For within-mining comparisons (e.g., 3-1), only 300 observations contribute, making standard errors larger for price-effect estimates.
 
@@ -244,7 +250,12 @@ W_COLS = ['country_id', 'year']
 ### Fitting the model
 
 ```python
-est = CausalForestDML(
+Y = df['ntl_log'].values
+T = df['treatment'].values
+X = df[X_COLS].values
+W = df[W_COLS].values
+
+est_ntl = CausalForestDML(
     model_y=GradientBoostingRegressor(n_estimators=200, max_depth=4,
                                       random_state=42),
     model_t=GradientBoostingClassifier(n_estimators=200, max_depth=4,
@@ -259,15 +270,14 @@ est = CausalForestDML(
     n_jobs=1,
     random_state=42,
 )
-est.fit(Y, T, X=X, W=W, groups=df['district_id'].values)
+est_ntl.fit(Y, T, X=X, W=W, groups=df['district_id'].values)
 ```
 
 ```text
   NTL: fitted in 25s
-  Conflict: fitted in 22s
 ```
 
-Several configuration choices deserve explanation. **Honest trees** use separate subsamples for choosing splits versus estimating leaf values --- this prevents overfitting and enables valid confidence intervals. **GroupKFold** via `groups=district_id` ensures that cross-fitting does not split observations from the same district across folds, preventing data leakage in panel data. Note that this does **not** provide clustered standard errors --- it only prevents within-district information from leaking across folds.
+Several configuration choices deserve explanation. **Honest trees** use separate subsamples for choosing splits versus estimating leaf values --- like having one team write the exam questions and a different team take the exam, this prevents the tree from "memorizing" the training data and enables valid confidence intervals. **GroupKFold** via `groups=district_id` ensures that cross-fitting (splitting data into K folds, training nuisance models on K-1 folds, and predicting on the held-out fold) does not split observations from the same district across folds, preventing data leakage in panel data. Note that this does **not** provide clustered standard errors --- it only prevents within-district information from leaking across folds.
 
 ### Causal identification
 
@@ -276,9 +286,14 @@ The Causal Forest requires the **Conditional Independence Assumption** (CIA): tr
 
 ## Average Treatment Effects
 
-EconML's `ate_inference()` provides ATEs with proper confidence intervals via the **Bootstrap of Little Bags** (BLB) method. We compute all six pairwise treatment contrasts:
+EconML's `ate_inference()` provides ATEs with proper confidence intervals via the **Bootstrap of Little Bags** (BLB) method --- a computationally efficient bootstrap that resamples within subsets ("bags") of the data to estimate uncertainty without refitting the entire forest. We compute all six pairwise treatment contrasts:
 
 ```python
+comparisons = [
+    ('1-0', 0, 1), ('2-0', 0, 2), ('3-0', 0, 3),
+    ('2-1', 1, 2), ('3-1', 1, 3), ('3-2', 2, 3),
+]
+
 for comp_label, t0, t1 in comparisons:
     res = est_ntl.ate_inference(X, T0=t0, T1=t1)
     lo, hi = res.conf_int_mean(alpha=0.1)
@@ -287,14 +302,12 @@ for comp_label, t0, t1 in comparisons:
 ```
 
 ```text
-  Comp      NTL Effect   NTL SE  Ground Truth   Conflict
-  -------------------------------------------------------
-  1-0        0.2398***   0.0702         0.250     0.0623
-  2-0        0.2684***   0.0791         0.300     0.0730
-  3-0        0.4598***   0.0811         0.550     0.1429
-  2-1        0.0286      0.1008         0.050     0.0107
-  3-1        0.2200**    0.1014         0.300     0.0805
-  3-2        0.1914*     0.1092         0.250     0.0698
+  1-0: ATE=0.2398  SE=0.0702  90%CI=[0.124, 0.355]
+  2-0: ATE=0.2684  SE=0.0791  90%CI=[0.138, 0.399]
+  3-0: ATE=0.4598  SE=0.0811  90%CI=[0.327, 0.593]
+  2-1: ATE=0.0286  SE=0.1008  90%CI=[-0.137, 0.194]
+  3-1: ATE=0.2200  SE=0.1014  90%CI=[0.053, 0.387]
+  3-2: ATE=0.1914  SE=0.1092  90%CI=[0.012, 0.371]
 ```
 
 **Finding 1: Mining increases economic development and conflict.** All three mining-vs-no-mining contrasts (1-0, 2-0, 3-0) are positive and highly significant. The ATE for the basic mining effect (1-0) is **0.240**, close to the ground truth of 0.250. This represents a 24% increase in nighttime lights from mining activity, after controlling for geographic and institutional confounders.
@@ -327,8 +340,10 @@ The standard error formula `sqrt(mean(se_i^2) / n)` propagates the per-observati
 The mining effect (1-0) should vary with institutional quality, while the price effect (3-1) should be flat:
 
 ![GATEs for NTL mining effect (1-0) by Executive Constraints](python_econml_gate_ntl_1v0_exec.png)
+*GATEs for the mining effect (1-0) by executive constraints. The upward slope shows that stronger institutions amplify the economic benefits of mining.*
 
 ![GATEs for NTL price effect (3-1) by Executive Constraints](python_econml_gate_ntl_3v1_exec.png)
+*GATEs for the price effect (3-1) by executive constraints. The flat pattern confirms that institutions do not moderate price effects.*
 
 ```text
   1-0 (Mining vs No Mining):
@@ -361,8 +376,10 @@ The mining effect (1-0) should vary with institutional quality, while the price 
 The same pattern appears when we use a continuous institutional measure:
 
 ![GATEs for NTL mining effect (1-0) by Quality of Government](python_econml_gate_ntl_1v0_qog.png)
+*GATEs for the mining effect (1-0) by quality of government. The positive relationship cross-validates the executive constraints finding.*
 
 ![GATEs for NTL price effect (3-1) by Quality of Government](python_econml_gate_ntl_3v1_qog.png)
+*GATEs for the price effect (3-1) by quality of government. The flat pattern is consistent across institutional measures.*
 
 The mining effect (1-0) shows a positive relationship with quality of government, while the price effect (3-1) remains approximately flat across the institutional quality distribution. This cross-validates Finding 3 using a different institutional measure.
 
@@ -389,6 +406,7 @@ importances = est_ntl.feature_importances_
 ```
 
 ![Feature importance for treatment effect heterogeneity](python_econml_var_importance.png)
+*Feature importance for treatment effect heterogeneity. Geographic variables dominate splitting frequency, but institutional variables are the true moderators.*
 
 Geographic variables dominate the importances because they have **continuous variation** that the forest can split on finely. Institutional variables (`exec_constraints`, `quality_of_govt`) rank lower despite being the true moderators in the DGP --- they have limited discrete values (6 levels for executive constraints), so the forest cannot split on them as frequently. This illustrates an important caveat: feature importance measures **splitting frequency**, not causal importance for moderation. The GATE analysis (which directly tests moderation) is more informative than feature importance for answering the question "which variables moderate treatment effects?"
 
@@ -406,6 +424,7 @@ intrp.plot(feature_names=X_COLS)
 ```
 
 ![Decision tree summarizing CATE heterogeneity for the mining effect](python_econml_cate_tree.png)
+*Decision tree summarizing CATE heterogeneity for the mining effect (1-0). The shallow tree identifies data-driven subgroups with different treatment effects.*
 
 The interpreter tree identifies data-driven subgroups with different treatment effects using a depth-2 tree. This provides a complementary view to the GATE analysis: while GATEs test **pre-specified hypotheses** about institutional moderation, the CATE interpreter discovers subgroups that the analyst may not have considered.
 
