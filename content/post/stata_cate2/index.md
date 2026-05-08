@@ -103,6 +103,162 @@ flowchart LR
     classDef diag fill:#141413,stroke:#d97757,color:#fff
 ```
 
+### 1.3 Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "PO vs AIPW" or "honest splitting" and the term feels slippery, this is the section to re-read.
+
+**1. Potential outcomes** $Y\_i(t)$.
+The outcome unit $i$ **would** take under treatment value $t$. Each unit has one potential outcome per treatment level. We observe only one of them: the one matching the treatment actually received. The rest are *counterfactual*. They live in worlds we never see.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Take district 47 in 2008. Four potential NTL outcomes exist for it: $Y\_{47,2008}(0)$, $Y\_{47,2008}(1)$, $Y\_{47,2008}(2)$, and $Y\_{47,2008}(3)$. They correspond to no mining, low prices, medium prices, and high prices. Only one is in the dataset. It is the one matching whatever `treatment` value that district-year actually had. The other three are forever invisible.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Every life decision is a fork in the road. You took one fork. The parallel-universe versions of yourself took the other forks. Their lives are real conceptual objects. You just cannot directly observe them. Causal inference reconstructs those parallel universes. It does so by looking at people who *did* take the other forks.
+
+</details>
+</div>
+
+**2. CATE** --- Conditional Average Treatment Effect, $\tau(\mathbf{x})$.
+The average treatment effect for units with covariate profile $\mathbf{x}$. The CATE is a **function** of $\mathbf{x}$, not a single number. Where the CATE bends with $\mathbf{x}$, the treatment helps some units more than others. Stata's `cate` command estimates exactly this function.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Take a well-governed district profile in our data: `exec_constraints = 6`, `quality_of_govt = 0.7`, and so on. For that profile the CATE is $\tau(\mathbf{x}) \approx 0.26$. Mining lifts log-NTL by about 0.26 for that profile. Now move to the weakest-institutions case: `exec_constraints = 1`. The same function gives only $\tau(\mathbf{x}) \approx 0.18$. The CATE is what makes this comparison possible.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A drug's "average effect" might be a 5-point reduction in blood pressure. But a doctor cares about a specific patient. Maybe a 65-year-old male with diabetes. The CATE *is* that personalized effect. It takes a patient profile in. It returns the expected effect for someone like them.
+
+</details>
+</div>
+
+**3. GATE** --- Group Average Treatment Effect.
+The CATE averaged over a *pre-specified* subgroup. The subgroup is defined by some variable. GATEs test targeted moderation hypotheses. A typical question: "does institutional quality moderate the effect of mining?"
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Sort districts by `exec_constraints` (1--6). Average the per-observation CATEs inside each level. At level 1 we get $\widehat{\mathrm{GATE}} \approx 0.18$. The number climbs to $\approx 0.26$ at level 6. That climb is the moderation pattern §8 visualizes. It is exactly what `estat gateplot` reports after the `cate` command.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A nationwide marketing campaign might lift sales by 5% on average. Before scaling it up, the company asks a simple question: did it work better in cities than in rural towns? The GATE answers exactly that. It reports the campaign's effect *inside* each store type. It surfaces heterogeneity that the headline ATE hides.
+
+</details>
+</div>
+
+**4. ATE** --- Average Treatment Effect, $E[\tau(\mathbf{X})]$.
+The CATE averaged over the entire sample. The headline policy number. It answers a single question: if we turned the treatment on for everyone, what average effect would we see?
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Take our 3,000 district-years. The PO ATE for the 1-vs-0 mining contrast is 0.194 (SE = 0.010). AIPW gives a more conservative 0.149 (SE = 0.011). Both are reported in §7. They are two estimates of the same population-level number.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"This drug lowers cholesterol by 12 points on average." That is an ATE statement. A single number, suitable for a press release. It says nothing about whether the drug works better in some patients than others. That question belongs to GATEs and CATEs.
+
+</details>
+</div>
+
+**5. Nuisance functions** $g\_0, m\_0$.
+Two conditional means. $g\_0(\mathbf{x}, \mathbf{w}) = E[Y \mid \mathbf{X}, \mathbf{W}]$ predicts the outcome from covariates. $m\_0(\mathbf{x}, \mathbf{w}) = E[T \mid \mathbf{X}, \mathbf{W}]$ predicts the treatment from covariates. We call them *nuisance* because we do not care about their values directly. We estimate them only to strip out the part of $Y$ and $T$ that is predictable from $(\mathbf{X}, \mathbf{W})$. What remains is the variation that identifies the causal effect.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post Stata's `cate` fits both $g\_0$ and $m\_0$ as random forests behind the scenes. We never see them. We never tune them directly. They are intermediate machinery the command consumes and discards on its way to the CATE.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two surveyors map two different layers of the same terrain. One maps elevation. The other maps soil type. Neither map is the goal. The goal is to subtract them from a third map and see what is left. That residue is what we actually care about.
+
+</details>
+</div>
+
+**6. Cross-fitting and honest splitting**.
+Cross-fitting splits the sample into $K$ folds. Nuisance models are fit on $K-1$ folds and applied to the held-out fold. The roles rotate. No observation is ever scored by a model that saw it during training. Honest splitting goes one step further inside each tree. It uses one subsample to choose where to split. It uses a separate subsample to estimate the leaf values. Both tricks remove the over-fitting bias that would otherwise contaminate the CATE.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Stata's `cate` does this internally. We pass `xfolds(5)` and the rest is automatic. We never call separate train/test commands. The 5 folds rotate behind the scenes; the user sees only the final estimates.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two-pass exam grading. One TA writes the rubric without seeing your paper. A different TA applies the rubric without writing it. The separation is what makes the grade defensible. Mixing the two roles is exactly the over-fitting bias these tricks remove.
+
+</details>
+</div>
+
+**7. PO vs AIPW estimators**.
+Two ways to map nuisance estimates to a CATE. **PO** (Partialing Out) residualizes both $Y$ and $T$ against the covariates, then regresses one residual on the other. Simple, transparent, sensitive to extreme propensity scores. **AIPW** (Augmented Inverse-Probability Weighting) reweights observations by inverse propensity and adds a regression correction. More complex, but **doubly robust**: it stays consistent if either $g\_0$ or $m\_0$ is right.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post fits both. They disagree by about 0.045 on the 1-vs-0 contrast (PO 0.194, AIPW 0.149). That gap is the model-disagreement diagnostic. When PO and AIPW disagree, the overlap is suspect or one of the nuisance models is mis-specified.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two judges hear the same case. They follow slightly different reasoning paths. When their verdicts agree, you trust the case. When they disagree, you re-read the evidence. The disagreement is the signal, not noise.
+
+</details>
+</div>
+
+**8. Heterogeneity test**.
+A formal test that $\tau(\mathbf{x})$ varies with $\mathbf{x}$. The null hypothesis is constant treatment effects: every unit gets the same effect. Rejection licenses CATE and GATE interpretation. Failing to reject does not mean effects are constant. It means the test could not detect variation at this sample size.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+After `cate`, run `estat heterogeneity` in §9. It returns a $\chi^2$ statistic and a $p$-value. A small $p$-value is the green light to inspect GATEs and CATEs. A large $p$-value is a caution: the heterogeneity story may not be in the data.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A metal detector for hidden moderation. It does not tell you *where* in the field the metal is buried. It only tells you whether to keep digging.
+
+</details>
+</div>
+
 ---
 
 ## 2. The CATE framework
