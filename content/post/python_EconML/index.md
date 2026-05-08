@@ -149,7 +149,7 @@ The causal forest produces per-observation CATE estimates, which aggregate to th
 flowchart LR
     A["<b>Panel Data</b><br/>3,000 obs"]:::data
     B["<b>First Stage</b><br/>GBM nuisance<br/>models"]:::first
-    C["<b>Residualize</b><br/>Y&#771; = Y - g&#770;(X,W)<br/>T&#771; = T - m&#770;(X,W)"]:::resid
+    C["<b>Residualize</b><br/>Y - E[Y | X,W]<br/>T - E[T | X,W]"]:::resid
     D["<b>Causal Forest</b><br/>500 honest trees"]:::forest
     E["<b>CATEs</b><br/>Per-observation<br/>effects"]:::cate
 
