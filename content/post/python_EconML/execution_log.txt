@@ -1,0 +1,207 @@
+======================================================================
+TUTORIAL: CAUSAL MACHINE LEARNING AND THE RESOURCE CURSE
+EconML CausalForestDML — Replicating Hodler, Lechner & Raschky (2023)
+======================================================================
+Environment:
+  Python:       3.11.11
+  econml:       0.16.0
+  scikit-learn: 1.6.1
+  numpy:        1.26.4
+  pandas:       3.0.2
+  matplotlib:   3.10.9
+
+
+======================================================================
+STEP 1: LOADING SIMULATED DATA
+======================================================================
+  Dataset: 3,000 observations
+  Districts: 300, Countries: 8, Years: 2003-2012
+  Mining districts: 45 (15% of total)
+
+  Treatment distribution:
+    0 (No mining): 2,550 (85.0%)
+    1 (Low prices): 150 (5.0%)
+    2 (Med prices): 150 (5.0%)
+    3 (High prices): 150 (5.0%)
+
+  Outcomes:
+    NTL (log):  mean=-1.096, std=0.435
+    Conflict:   12.3% of district-years
+
+======================================================================
+STEP 2: DESCRIPTIVE STATISTICS
+======================================================================
+         Variable       Mean        Std       Min        Max
+        NTL (log)     -1.096      0.435    -2.503      0.265
+         Conflict      0.123      0.328     0.000      1.000
+Exec. Constraints      3.680      1.489     1.000      6.000
+ Quality of Govt.      0.440      0.152     0.220      0.700
+   GDP per capita   2198.000   1469.937   500.000   5000.000
+        Elevation    499.083    302.031     0.000   1357.232
+      Temperature     23.913      3.920    13.993     35.000
+       Ruggedness     24.423     17.803     0.000     76.953
+ Dist. to Capital 268100.372 144039.589 10813.747 497463.865
+Agri. Suitability      0.395      0.197     0.000      0.983
+       Population  82028.425  85186.961  4134.681 596950.272
+     Ethnic Frac.      0.550      0.202     0.201      0.899
+
+  Outcomes by treatment group:
+  Treatment              Mean NTL   Conflict Rate
+  -----------------------------------------------
+  0 (No mining    )      -1.137          10.7%
+  1 (Low prices   )      -1.028          18.0%
+  2 (Med prices   )      -0.930          18.0%
+  3 (High prices  )      -0.615          28.0%
+  Saved: python_econml_treatment_dist.png
+
+======================================================================
+STEP 2b: NAIVE COMPARISON (why we need causal ML)
+======================================================================
+
+  Simple difference-in-means (no confounder adjustment):
+  Comparison         Naive   Ground Truth     Bias
+  -----------------------------------------------
+  1-0                0.109          0.250   -0.141
+  2-1                0.098          0.050   +0.048
+  3-1                0.413          0.300   +0.113
+
+  The naive 1-0 estimate is biased because mining districts
+  differ systematically from non-mining districts (geography,
+  institutions). The Causal Forest controls for these confounders
+  via the Double Machine Learning residualization step.
+
+======================================================================
+STEP 3: CAUSAL FOREST DML — NTL
+  Outcome: ntl_log  |  Treatment: treatment (M=4)
+  Observations: 3,000  |  Trees: 500
+======================================================================
+  Configuring CausalForestDML...
+    - discrete_treatment=True (4 treatment levels)
+    - DML: GradientBoosting for both nuisance models
+    - 500 honest causal trees (separate split/estimation samples)
+    - BLB inference (bootstrap of little bags)
+    - GroupKFold CV by district_id (prevents within-district
+      data leakage in cross-fitting; does NOT cluster SEs)
+  Fitting (first-stage residualization + causal forest)...
+  Done in 0.4 minutes
+
+======================================================================
+STEP 4: AVERAGE TREATMENT EFFECTS
+======================================================================
+
+  Per-comparison inference (BLB; alpha=0.10):
+  1-0: ATE=0.2398 SE=0.0701 90%CI=[0.124, 0.355]
+  2-0: ATE=0.2684 SE=0.0791 90%CI=[0.138, 0.399]
+  3-0: ATE=0.4598 SE=0.0811 90%CI=[0.326, 0.593]
+  2-1: ATE=0.0286 SE=0.1008 90%CI=[-0.137, 0.194]
+  3-1: ATE=0.2200 SE=0.1013 90%CI=[0.053, 0.387]
+  3-2: ATE=0.1914 SE=0.1093 90%CI=[0.012, 0.371]
+
+  Summary table (compare against ground truth):
+  Comp      NTL Effect   NTL SE  Ground Truth   Sig
+  ----------------------------------------------------
+  1-0           0.2398   0.0701         0.250   ***
+  2-0           0.2684   0.0791         0.300   ***
+  3-0           0.4598   0.0811         0.550   ***
+  2-1           0.0286   0.1008         0.050      
+  3-1           0.2200   0.1013         0.300    **
+  3-2           0.1914   0.1093         0.250     *
+
+  * p<0.10, ** p<0.05, *** p<0.01 (two-sided, BLB SEs)
+
+  Key findings:
+    Finding 1: Mining increases NTL (1-0 effect = 0.240)
+    Finding 2: Non-linear prices — 2-1 = 0.029 (small) vs 3-1 = 0.220 (large)
+
+======================================================================
+STEP 5: GATEs BY INSTITUTIONAL QUALITY
+======================================================================
+  Saved: python_econml_gate_ntl_1v0_exec.png
+  Saved: python_econml_gate_ntl_3v1_exec.png
+  Saved: python_econml_gate_ntl_1v0_qog.png
+  Saved: python_econml_gate_ntl_3v1_qog.png
+
+  GATE values for NTL by Executive Constraints:
+  =================================================================
+
+    1-0 (Mining vs No Mining (1-0)):
+    Exec. Constr.       GATE               90% CI      N
+    ----------------------------------------------------
+                1      0.175   [0.168, 0.182]    300
+                2      0.255   [0.249, 0.262]    330
+                3      0.240   [0.236, 0.244]    720
+                4      0.242   [0.238, 0.246]    780
+                5      0.243   [0.237, 0.250]    420
+                6      0.264   [0.259, 0.269]    450
+    Range: 0.089
+
+    3-1 (High vs Low Prices (3-1)):
+    Exec. Constr.       GATE               90% CI      N
+    ----------------------------------------------------
+                1      0.242   [0.232, 0.252]    300
+                2      0.197   [0.187, 0.206]    330
+                3      0.217   [0.211, 0.224]    720
+                4      0.227   [0.221, 0.233]    780
+                5      0.224   [0.216, 0.231]    420
+                6      0.211   [0.204, 0.219]    450
+    Range: 0.045
+
+    Finding 3a: 1-0 effects vary with institutions
+    Finding 3b: 3-1 effects are FLAT across institutions
+
+======================================================================
+STEP 5b: VARIABLE IMPORTANCE
+======================================================================
+
+  Feature importances (heterogeneity drivers):
+    distance_capital           0.171  #################
+    ethnic_frac                0.142  ##############
+    ruggedness                 0.135  #############
+    population                 0.126  ############
+    agri_suitability           0.120  ############
+    elevation                  0.120  ###########
+    temperature                0.120  ###########
+    gdp_pc                     0.034  ###
+    quality_of_govt            0.018  #
+    exec_constraints           0.014  #
+
+  Note: These measure how much each feature contributes to
+  treatment effect HETEROGENEITY, not to outcome prediction.
+  Saved: python_econml_var_importance.png
+
+======================================================================
+STEP 5c: CATE INTERPRETER (EconML-specific feature)
+======================================================================
+
+  The SingleTreeCateInterpreter fits a shallow decision tree
+  to the estimated CATEs to find interpretable subgroups.
+  Saved: python_econml_cate_tree.png
+
+======================================================================
+SUMMARY: EconML CAUSAL FOREST vs GROUND TRUTH
+======================================================================
+
+  Expected ATEs (from DGP):
+    1-0: 0.250
+    2-0: 0.300
+    3-0: 0.550
+    2-1: 0.050
+    3-1: 0.300
+    3-2: 0.250
+
+  Three key findings to verify:
+    1. Mining -> positive NTL and conflict (all x-0 > 0)
+    2. Non-linear prices: 2-1 ~ 0, 3-1 >> 0, 3-2 >> 0
+    3. GATEs by institutions:
+       - 1-0: slope (institutions moderate mining effect)
+       - 3-1: flat (institutions don't affect price effects)
+
+  Results saved to: /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/python_EconML/tutorial_results/
+  Figures: python_econml_*.png
+  Tables:  descriptive-stats.csv, ate-table.csv
+
+  Total runtime: 1.4 minutes
+
+======================================================================
+Tutorial complete.
+======================================================================

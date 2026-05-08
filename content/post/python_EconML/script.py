@@ -17,6 +17,7 @@ Usage:
 """
 
 import os
+import sys
 import time
 
 import numpy as np
@@ -126,12 +127,22 @@ W_COLS = ['country_id', 'year']
 # Institutional variables for GATE analysis
 Z_VARS = ['exec_constraints', 'quality_of_govt']
 
+# CATE Interpreter (single-tree summary of estimated CATEs).
+# Depth 2 -> 4 leaves: communicable for the post.
+# Depth 3-4 is more diagnostic but harder to read in narrative form.
+CATE_TREE_DEPTH = 2
+CATE_TREE_MIN_LEAF = 100
+
 
 def _savefig(fig, name):
-    """Save figure with dark theme settings."""
+    """Save figure with dark theme settings to the post directory.
+
+    PNGs land alongside index.md so the post's image references resolve
+    without an extra copy step.
+    """
     fig.patch.set_linewidth(0)
     fig.savefig(
-        os.path.join(RESULTS_DIR, name),
+        os.path.join(_SCRIPT_DIR, name),
         dpi=300, bbox_inches='tight',
         facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0,
     )
@@ -329,6 +340,10 @@ def step_econml_estimation(df, outcome, label):
 
     t0 = time.time()
     print("  Fitting (first-stage residualization + causal forest)...")
+    # `groups=district_id` triggers GroupKFold for cross-fitting only — it
+    # keeps observations from the same district inside the same fold so the
+    # first-stage models do not leak within-district information across
+    # folds. It does NOT translate into clustered second-stage SEs.
     est.fit(Y, T, X=X, W=W, groups=df['district_id'].values)
 
     elapsed = time.time() - t0
@@ -340,8 +355,12 @@ def step_econml_estimation(df, outcome, label):
 # ============================================================================
 # Step 4: Extract and display ATEs
 # ============================================================================
-def step_ate_table(est_ntl, est_conf, df):
-    """Print ATEs and compare to ground truth."""
+def step_ate_table(est_ntl, df):
+    """Print ATEs (NTL outcome) with BLB inference and ground-truth comparison.
+
+    The post format mirrors what gets pasted into index.md, line by line.
+    Numbers should round-trip cleanly through .4f / .3f formatting.
+    """
     print("\n" + "=" * 70)
     print("STEP 4: AVERAGE TREATMENT EFFECTS")
     print("=" * 70)
@@ -356,27 +375,31 @@ def step_ate_table(est_ntl, est_conf, df):
     ]
 
     rows = []
+    print(f"\n  Per-comparison inference (BLB; alpha=0.10):")
     for comp_label, t0, t1 in all_comparisons:
         ntl_res = est_ntl.ate_inference(X, T0=t0, T1=t1)
         ntl_lo, ntl_hi = ntl_res.conf_int_mean(alpha=0.1)  # 90% CI
-        conf_res = est_conf.ate_inference(X, T0=t0, T1=t1)
 
         rows.append({
             'Comparison': comp_label,
             'NTL Effect': ntl_res.mean_point,
             'NTL SE': ntl_res.stderr_mean,
-            'NTL 90% CI': f'[{ntl_lo:.3f}, {ntl_hi:.3f}]',
+            'NTL 90% CI Lo': ntl_lo,
+            'NTL 90% CI Hi': ntl_hi,
             'NTL Ground Truth': gt.get(comp_label, np.nan),
-            'Conflict Effect': conf_res.mean_point,
-            'Conflict SE': conf_res.stderr_mean,
         })
+        # This print line is what index.md mirrors verbatim.
+        print(f"  {comp_label}: ATE={ntl_res.mean_point:.4f} "
+              f"SE={ntl_res.stderr_mean:.4f} "
+              f"90%CI=[{ntl_lo:.3f}, {ntl_hi:.3f}]")
 
     table = pd.DataFrame(rows)
 
-    # Print formatted table
-    print(f"\n  {'Comp':<8s} {'NTL Effect':>11s} {'NTL SE':>8s} "
-          f"{'Ground Truth':>13s} {'Conflict':>10s}")
-    print(f"  {'-'*55}")
+    # Print compact summary table for the log
+    print(f"\n  Summary table (compare against ground truth):")
+    print(f"  {'Comp':<8s} {'NTL Effect':>11s} {'NTL SE':>8s} "
+          f"{'Ground Truth':>13s} {'Sig':>5s}")
+    print(f"  {'-'*52}")
     for _, r in table.iterrows():
         sig = ''
         if r['NTL SE'] > 0:
@@ -384,19 +407,19 @@ def step_ate_table(est_ntl, est_conf, df):
             if z > 2.576: sig = '***'
             elif z > 1.96: sig = '**'
             elif z > 1.645: sig = '*'
-        print(f"  {r['Comparison']:<8s} {r['NTL Effect']:>8.4f}{sig:<3s} "
+        print(f"  {r['Comparison']:<8s} {r['NTL Effect']:>11.4f} "
               f"{r['NTL SE']:>8.4f} {r['NTL Ground Truth']:>13.3f} "
-              f"{r['Conflict Effect']:>10.4f}")
+              f"{sig:>5s}")
+    print(f"\n  * p<0.10, ** p<0.05, *** p<0.01 (two-sided, BLB SEs)")
 
-    # Interpretation
-    print("\n  Key findings:")
+    # Interpretation hooks for the post.
     eff_10 = table.loc[table['Comparison'] == '1-0', 'NTL Effect'].iloc[0]
     eff_21 = table.loc[table['Comparison'] == '2-1', 'NTL Effect'].iloc[0]
     eff_31 = table.loc[table['Comparison'] == '3-1', 'NTL Effect'].iloc[0]
+    print("\n  Key findings:")
     print(f"    Finding 1: Mining increases NTL (1-0 effect = {eff_10:.3f})")
     print(f"    Finding 2: Non-linear prices — "
           f"2-1 = {eff_21:.3f} (small) vs 3-1 = {eff_31:.3f} (large)")
-    print(f"\n    * p<0.10, ** p<0.05, *** p<0.01")
 
     table.to_csv(os.path.join(RESULTS_DIR, 'ate-table.csv'), index=False)
     return table
@@ -406,10 +429,27 @@ def step_ate_table(est_ntl, est_conf, df):
 # Step 5: GATE plots by institutional quality
 # ============================================================================
 def compute_gate(est, df, z_var, t0, t1):
-    """Compute Group Average Treatment Effects by a grouping variable.
+    """Compute Group Average Treatment Effects (GATEs) by a grouping variable.
 
-    Uses effect_inference() for proper BLB standard errors that capture
-    estimation uncertainty, not just within-group heterogeneity.
+    Uses effect_inference() for per-observation BLB standard errors and
+    propagates them to group means as follows.
+
+    Let tau_hat_i be the per-observation CATE for unit i in group g of size
+    n_g, with BLB standard error se_i. Treating the n_g CATE estimates as
+    approximately uncorrelated within g (a working assumption — EconML's
+    BLB does not return their full covariance matrix), the GATE is
+
+        GATE_g = (1/n_g) * sum_{i in g} tau_hat_i
+
+    and its variance is
+
+        Var(GATE_g) ~= (1/n_g^2) * sum_{i in g} se_i^2
+                     = (1/n_g) * mean_{i in g}(se_i^2),
+
+    so the SE used here is sqrt(mean(se_i^2) / n_g). This captures
+    estimation uncertainty in each individual CATE; it does not capture
+    sampling variability of who lands in group g, nor any within-group
+    correlation across panel observations of the same district.
     """
     X = df[X_COLS].values
     inf = est.effect_inference(X, T0=t0, T1=t1)
@@ -462,26 +502,19 @@ def _plot_single_gate(est, df, z_var, z_label, t0, t1, title, color, fname):
     return gate_df
 
 
-def step_gate_plots(est_ntl, est_conf, df):
-    """Create composite and individual GATE plots by institutional quality."""
+def step_gate_plots(est_ntl, df):
+    """Create individual NTL GATE plots by institutional quality."""
     print("\n" + "=" * 70)
     print("STEP 5: GATEs BY INSTITUTIONAL QUALITY")
     print("=" * 70)
-
-    # Panel specs: (estimator, T0, T1, short title, color)
-    panel_specs = [
-        (est_ntl, 0, 1, 'NTL: Mining vs No Mining (1-0)', STEEL_BLUE),
-        (est_ntl, 1, 3, 'NTL: High vs Low Prices (3-1)', STEEL_BLUE),
-        (est_conf, 0, 1, 'Conflict: Mining vs No Mining (1-0)', TEAL),
-        (est_conf, 1, 3, 'Conflict: High vs Low Prices (3-1)', TEAL),
-    ]
 
     z_specs = [
         ('exec_constraints', 'Constraints on the Executive', 'exec'),
         ('quality_of_govt', 'Quality of Government', 'qog'),
     ]
 
-    # Individual GATE panels for blog post
+    # Individual GATE panels embedded in the blog post.
+    # The post focuses on the NTL outcome only.
     individual_specs = [
         (est_ntl, 0, 1, 'NTL: Mining vs No Mining (1-0)', STEEL_BLUE, 'ntl_1v0'),
         (est_ntl, 1, 3, 'NTL: High vs Low Prices (3-1)', STEEL_BLUE, 'ntl_3v1'),
@@ -493,38 +526,7 @@ def step_gate_plots(est_ntl, est_conf, df):
             _plot_single_gate(est, df, z_var, z_label, t0, t1,
                               title, color, fname)
 
-    # Composite 4-panel figures
-    for z_var, z_label, z_short in z_specs:
-        fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-        fig.patch.set_linewidth(0)
-        ax_list = [axes[0, 0], axes[0, 1], axes[1, 0], axes[1, 1]]
-
-        for (est, t0, t1, title, color), ax in zip(panel_specs, ax_list):
-            gate_df, ite = compute_gate(est, df, z_var, t0, t1)
-
-            ax.fill_between(gate_df['z_value'], gate_df['lower'],
-                            gate_df['upper'], alpha=0.25, color=color)
-            ax.plot(gate_df['z_value'], gate_df['gate'], 'o-',
-                    color=WHITE_TEXT, markersize=6, linewidth=1.5,
-                    markeredgecolor=DARK_NAVY, markeredgewidth=0.8, zorder=3)
-
-            ate_val = ite.mean()
-            ax.axhline(ate_val, color=WARM_ORANGE, linewidth=1.5,
-                       linestyle='--', alpha=0.8,
-                       label=f'ATE = {ate_val:.3f}')
-
-            ax.set_xlabel(z_label)
-            ax.set_ylabel('GATE')
-            ax.set_title(title)
-            ax.legend(fontsize=9)
-
-        plt.suptitle(f'GATEs by {z_label} (EconML CausalForestDML)',
-                     fontsize=14, fontweight='bold', color=WHITE_TEXT,
-                     y=1.02)
-        plt.tight_layout()
-        _savefig(fig, f'python_econml_gate_{z_short}.png')
-
-    # GATE values walkthrough
+    # GATE values walkthrough (mirrored verbatim into index.md)
     print(f"\n  GATE values for NTL by Executive Constraints:")
     print(f"  {'='*65}")
     for (t0, t1), comp_label in [((0, 1), 'Mining vs No Mining (1-0)'),
@@ -593,7 +595,10 @@ def step_cate_interpreter(est_ntl, df):
     X = df[X_COLS].values
 
     # Interpret the 1-0 contrast (mining vs no mining)
-    intrp = SingleTreeCateInterpreter(max_depth=2, min_samples_leaf=100)
+    intrp = SingleTreeCateInterpreter(
+        max_depth=CATE_TREE_DEPTH,
+        min_samples_leaf=CATE_TREE_MIN_LEAF,
+    )
     intrp.interpret(est_ntl, X)
 
     print(f"\n  The SingleTreeCateInterpreter fits a shallow decision tree")
@@ -670,11 +675,32 @@ def step_summary():
 # ============================================================================
 # Main
 # ============================================================================
+def _print_environment():
+    """Log Python and dependency versions to make later audits possible.
+
+    Numbers in index.md are pinned to a specific stack (econml, sklearn,
+    numpy). If those drift, the post numbers drift with them. The log
+    written here is the receipt for a given run.
+    """
+    import sklearn
+    import econml
+    print("Environment:")
+    print(f"  Python:       {sys.version.split()[0]}")
+    print(f"  econml:       {econml.__version__}")
+    print(f"  scikit-learn: {sklearn.__version__}")
+    print(f"  numpy:        {np.__version__}")
+    print(f"  pandas:       {pd.__version__}")
+    print(f"  matplotlib:   {matplotlib.__version__}")
+    print()
+
+
 def main():
     print("=" * 70)
     print("TUTORIAL: CAUSAL MACHINE LEARNING AND THE RESOURCE CURSE")
     print("EconML CausalForestDML — Replicating Hodler, Lechner & Raschky (2023)")
     print("=" * 70)
+
+    _print_environment()
 
     t_start = time.time()
 
@@ -687,15 +713,16 @@ def main():
     # Step 2b: Naive comparison
     step_naive_comparison(df)
 
-    # Step 3: Causal Forest estimation (two runs: NTL and Conflict)
+    # Step 3: Causal Forest estimation (NTL outcome only).
+    # The post focuses on NTL; estimating conflict here would just slow the
+    # script down and produce numbers that no section consumes.
     est_ntl = step_econml_estimation(df, 'ntl_log', 'NTL')
-    est_conf = step_econml_estimation(df, 'conflict', 'Conflict')
 
     # Step 4: ATEs (all pairwise comparisons with BLB inference)
-    step_ate_table(est_ntl, est_conf, df)
+    step_ate_table(est_ntl, df)
 
     # Step 5: GATE plots by institutional quality
-    step_gate_plots(est_ntl, est_conf, df)
+    step_gate_plots(est_ntl, df)
 
     # Step 5b: Variable importance
     step_variable_importance(est_ntl)
@@ -713,5 +740,28 @@ def main():
     print("=" * 70)
 
 
+class _Tee:
+    """Duplicate writes across multiple text streams (e.g. stdout + file)."""
+
+    def __init__(self, *streams):
+        self._streams = streams
+
+    def write(self, data):
+        for s in self._streams:
+            s.write(data)
+
+    def flush(self):
+        for s in self._streams:
+            s.flush()
+
+
 if __name__ == '__main__':
-    main()
+    log_path = os.path.join(_SCRIPT_DIR, 'execution_log.txt')
+    real_stdout = sys.stdout
+    with open(log_path, 'w') as fh:
+        sys.stdout = _Tee(real_stdout, fh)
+        try:
+            main()
+        finally:
+            sys.stdout = real_stdout
+    print(f"\nFull log written to: {log_path}")
