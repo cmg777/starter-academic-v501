@@ -88,6 +88,162 @@ graph LR
     style F fill:#1a3a8a,stroke:#141413,color:#fff
 ```
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "latent groups" or "Nickell bias" and the term feels slippery, this is the section to re-read.
+
+**1. Slope heterogeneity** $\boldsymbol{\beta}\_i$ varies by $i$.
+The slope coefficient on a regressor differs across units. Pooled regressions impose a single slope; if the truth is heterogeneous, the pooled slope is a contaminated average. C-LASSO discovers groups that share slopes.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the savings application, `cpi` has a *negative* slope for one group of countries and a *positive* slope for another. The Static C-LASSO Group 1 coefficient on `cpi` is **-0.181** (p < 0.001) and the Group 2 coefficient is **+0.478** (p < 0.001). The pooled slope masks both signs. Slope heterogeneity is the headline phenomenon — countries differ qualitatively, not just quantitatively.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Different recipes for different countries. One country adds salt for sweetness; another adds salt for savouriness. Averaging "salt effect on taste" across both gives a misleading near-zero. Heterogeneity says: there are at least two recipes hidden inside.
+
+</details>
+</div>
+
+**2. Latent groups** $G\_k$, with $\boldsymbol{\beta}\_i = \boldsymbol{\alpha}\_k$.
+Unobserved subsets of units that share the same slope vector. Latent because the group membership is not observed in advance — the algorithm discovers it. Each unit belongs to exactly one group.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+C-LASSO with K = 2 partitions the 56 countries (840 obs over 15 years) into two groups based on their savings dynamics. Group 1 has `cpi` coefficient -0.181 (high-inflation-erodes-savings story); Group 2 has +0.478 (high-inflation-encourages-savings story). The grouping is learned from the data, not imposed.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Teams whose roster is hidden until the match starts. The coach knows there are two teams; they do not know who plays for whom. The data tells you the rosters.
+
+</details>
+</div>
+
+**3. LASSO penalty** $\lambda$ (regularization).
+A tuning parameter that shrinks coefficients toward a common value (or toward zero). In C-LASSO it shrinks individual slopes $\boldsymbol{\beta}\_i$ toward group centres $\boldsymbol{\alpha}\_k$. Forces parsimony: without the penalty, every unit would have its own unique slope.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post sweeps over a grid of $\lambda$ values and selects the one minimizing an information criterion. Higher $\lambda$ collapses more individual slopes onto fewer group centres; lower $\lambda$ allows more idiosyncratic variation across the 56 countries.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A tax on unique flavour. Each restaurant wants its own recipe. The penalty taxes deviations from the chain template. Set the tax high — every restaurant ends up using the chain's recipe. Set it low — every restaurant has its own.
+
+</details>
+</div>
+
+**4. Classifier-LASSO (C-LASSO).**
+The estimator. Jointly estimates the number of groups, the group memberships, and the group-specific slopes. Su, Shi & Phillips (2016) introduced it for panel data. Implements as a penalized least squares with a product-form penalty over groups.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post's bespoke C-LASSO code receives the candidate K's and returns the optimal partition plus group slopes. For the democracy application (98 countries × ~41 years = 4,018 obs), C-LASSO splits countries into two groups with opposite-signed `Democracy` effects on `lnPGDP` — Group 1 = +2.151 (p < 0.001), Group 2 = -0.936 (p = 0.007).
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A casting director who simultaneously picks teams *and* assigns recipes. The director does not know in advance how many teams to form or who plays for whom. C-LASSO solves both questions in one optimization.
+
+</details>
+</div>
+
+**5. Information criterion (IC).**
+A statistic balancing model fit (how well the chosen partition explains the data) against complexity (more groups = better fit but more parameters). Used to select the optimal number of groups $K$. Choose the K that minimizes IC.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post computes IC for K = 1, 2, 3, 4. **K = 2 minimizes the IC** for both the savings and democracy applications. Adding a third group does not pay for itself — the marginal fit gain is too small to offset the parameter cost.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The fit-vs-complexity referee. The referee charges you a penalty for each new group you add. If the new group fits the data well enough to overcome its penalty, keep it. Otherwise drop it.
+
+</details>
+</div>
+
+**6. Postlasso step.**
+A second-stage estimator that re-runs OLS on each estimated group *without* the penalty. Used for valid inference (standard errors, p-values, CIs). The penalized stage selects the partition; the postlasso stage delivers the inference.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+After C-LASSO assigns countries to groups, the post re-runs `xtreg, fe` on each group. The reported `cpi` coefficients (-0.181 in Group 1, +0.478 in Group 2) are postlasso estimates with proper standard errors. Both significant at p < 0.001.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Re-tasting after the casting freezes. Once the teams are set, you taste each team's dish on its own merits — no penalty for being unique within the team. The team's recipe is now its own.
+
+</details>
+</div>
+
+**7. Nickell bias.**
+The downward bias of the lagged-DV coefficient when fixed effects are applied to short panels. Within-demeaning correlates the lagged regressor with the demeaned error. C-LASSO with `lagsavings` inherits this problem and uses jackknife correction in the dynamic specification.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The dynamic savings model includes `lagsavings`. With $T \approx 15$ in the savings panel (56 countries × 15 years), plain FE on the lagged DV would underestimate persistence. The post applies a half-jackknife bias correction (Hsiao 1986; Hahn & Kuersteiner 2002) before running C-LASSO.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A watermark on dynamic panels. Every fixed-effects estimate of the lagged-DV slope carries the watermark. The correction is the digital wash that removes it.
+
+</details>
+</div>
+
+**8. Mean group estimator (MG).**
+The benchmark "fully heterogeneous" estimator. Run a separate OLS for each unit; average the coefficients across units. Gives every unit its own slope. The opposite extreme from pooled OLS.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post compares pooled OLS, MG, and C-LASSO. Pooled OLS imposes one slope (e.g. democracy effect on `lnPGDP` = +1.055, p = 0.005). MG allows 98 country-specific slopes. C-LASSO sits in the middle: K = 2 group slopes (+2.151 and -0.936). K = 2 captures most of the heterogeneity without the noise of fully unit-specific estimates.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"Let every country have its own recipe" with no group structure. MG is the fully-permissive limit. C-LASSO chooses a parsimonious alternative.
+
+</details>
+</div>
+
 ---
 
 ## 2. The Problem: Homogeneous vs Heterogeneous Slopes

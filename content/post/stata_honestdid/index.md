@@ -61,6 +61,143 @@ This tutorial teaches the method in two self-contained parts. **Part 1** starts 
 - Explain why pre-trends tests have low power and can mislead researchers
 - Apply both DeltaRM and smoothness restrictions (DeltaSD) to multi-period DiD
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "breakdown value" or "relative magnitudes" and the term feels slippery, this is the section to re-read.
+
+**1. Parallel trends assumption (PTA).**
+The identifying assumption for DiD: in the absence of treatment, treated and control would have followed identical time trends. Differences in *levels* are fine. Differences in *changes* would invalidate DiD. Fundamentally untestable --- we never observe the treated counterfactual post-treatment.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Medicaid expansion DiD assumes that absent the ACA's 2014 expansion, the treated states' `dins` would have drifted in parallel with non-expansion states. Treated pre-2014 mean = 65.45%; control pre-2014 mean = 61.90%. Different *levels*, but PTA only requires equal *changes*. Under PTA, the post estimates a 2x2 DiD ATT of 6.18 pp.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Sister cars on parallel tracks. They start at different speeds (treated states had higher coverage pre-2014). Without the policy intervention, both accelerate identically. With it, the treated track gets a boost. PTA says the tracks were parallel before the boost.
+
+</details>
+</div>
+
+**2. Pre-trends test.**
+A joint Wald test that all pre-treatment lead coefficients in an event study equal zero. Failure to reject is consistent with parallel trends --- but the test has notoriously low power. Passing pre-trends is necessary but far from sufficient.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the Medicaid event study (38 states x 8 years = 304 obs, `year` 2008--2015, treatment `D` flagging states with `yexp2 == 2014`), pre-trend leads are jointly small. A pre-trends test would fail to reject. But low power means we cannot distinguish "trends were parallel" from "trends differed but our test could not detect it."
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Looking for hairline cracks before the load test. If you see cracks, the bridge fails. If you see no cracks, the bridge *might* still fail under load --- your eyesight is finite. Pre-trends checks for visible problems but cannot prove they are absent.
+
+</details>
+</div>
+
+**3. DiD ATT.**
+The difference-in-differences estimate of the Average Treatment effect on the Treated. Identified by parallel trends. The estimand the `honestdid` framework is robustifying.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The 2x2 DiD ATT on `dins` is 6.18 pp (t = 7.24, p < 0.001). Treated states changed +12.64 pp (65.45% to 78.09%); control states changed +6.46 pp (61.90% to 68.36%). The ATT = 12.64 - 6.46 = 6.18 pp. Medicaid expansion raised insurance coverage by ~6 pp on average among expansion states.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The bump on the treated track. The control track tells us the secular drift. The treated track minus the secular drift is the policy effect on the people who got the policy.
+
+</details>
+</div>
+
+**4. Sensitivity analysis.**
+A framework that asks "how big a parallel-trends violation would it take to overturn the conclusion?" Replaces the binary "do parallel trends hold?" with a continuous "how robust is the conclusion?" Rambachan & Roth (2023) formalized this for DiD.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post applies `honestdid` to ask: how large a deviation from parallel trends would push the DiD CI across zero? The answer (the "breakdown value") quantifies robustness without claiming PTA holds exactly. The 2014 event-study coefficient (4.23 pp, t = 5.12) is the focal estimate the sensitivity bounds wrap around.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"How strong a wind would tip this bridge?" Engineers do not just ask "is the bridge fine today?" They ask: at what wind speed does it fail? Sensitivity analysis is that mindset for causal claims.
+
+</details>
+</div>
+
+**5. Relative magnitudes restriction** $\Delta^{RM}$, parameter $\bar{M}$.
+The restriction that any post-treatment violation of parallel trends is *no larger* than $\bar{M}$ times the maximum pre-treatment deviation. Sets a "no worse than what we already saw" bound. The post varies $\bar{M}$ from 0 (PTA holds exactly) upward.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With the Medicaid event-study estimates and `honestdid` under $\Delta^{RM}$, the breakdown value is approximately $\bar{M} \approx 1.5$--2. A post-2014 PTA violation would have to be 1.5--2 times the *largest pre-2014 deviation* to overturn the DiD finding. The 2014 effect (4.23 pp) and 2015 effect (6.87 pp) survive mild robustness checks.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"No worse than pre-treatment wobbles." The bridge wobbled a little while it was being built. We assume that any future wobble is no more than twice as bad. If the worst future wobble is 1.5x the worst past wobble, we accept the bound.
+
+</details>
+</div>
+
+**6. Smoothness restriction** $\Delta^{SD}$, parameter bounding *changes* in deviations.
+Bounds the *rate of change* of the trend deviation, not the deviation itself. "Trends do not lurch suddenly." Useful when a policy might have built up over time --- gradual deviations are accepted; sudden jumps are not.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post applies `honestdid` under $\Delta^{SD}$ with a smoothness parameter ~ 0.015--0.02. The constraint allows pre-existing trends in `dins` to continue smoothly into the post-period but rules out abrupt deviations. The breakdown value is similarly modest, indicating moderate robustness to gradual but not abrupt PTA violations.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"No sudden lurches in trend." The bridge can sway gently as the wind picks up; it cannot snap-jolt sideways. Smoothness restricts the second derivative, not the first.
+
+</details>
+</div>
+
+**7. Breakdown value.**
+The numerical value of the sensitivity parameter ($\bar{M}$ for $\Delta^{RM}$, smoothness param for $\Delta^{SD}$) at which the DiD confidence interval first crosses zero. The headline quantitative robustness statistic.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The Medicaid 2x2 result has a breakdown value of $\bar{M} \approx 1.5$--2 under $\Delta^{RM}$ and ~ 0.015--0.02 under $\Delta^{SD}$. Both indicate moderate robustness --- the result survives mild violations but not arbitrary ones. The DiD ATT of 6.18 pp survives parallel-trends violations up to ~2x the largest pre-trend.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The wind speed at which the bridge first wobbles. Engineers report: "this bridge handles 80 mph winds." For DiD: "this result handles parallel-trends violations up to twice the largest pre-treatment deviation." A precise, quantitative robustness number.
+
+</details>
+</div>
+
 ---
 
 ## 2. Study context --- Medicaid expansion

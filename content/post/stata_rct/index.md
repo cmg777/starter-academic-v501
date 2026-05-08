@@ -64,6 +64,162 @@ The tutorial progresses from simple to sophisticated. We start with basic balanc
 - Apply doubly robust difference-in-differences (DRDID) for modern panel data analysis
 - Separate the effect of treatment offer from treatment receipt under imperfect compliance
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "ITT" or "doubly robust" and the term feels slippery, this is the section to re-read.
+
+**1. Potential outcomes** $Y\_i(d)$, $d \in \\{0, 1\\}$.
+The outcome unit $i$ would have under treatment value $d$. Each household has two potential consumption levels: with the cash transfer, and without. We observe one. The other is *counterfactual*. RCTs solve the missing-counterfactual problem by *randomizing* who gets the treatment.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For household 7421 with `treat = 1`, we observe `y` (log monthly consumption) at endline. Their counterfactual $Y\_{7421}(0)$ — consumption without the transfer — is forever invisible. Causal inference reconstructs it from the randomly-assigned control group.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A fork in the road. Each household took one fork (treated or not). The parallel-universe version of the household took the other. Their lives are real conceptual objects; we just cannot observe them directly.
+
+</details>
+</div>
+
+**2. ATE vs ATT.**
+**ATE** = $E[Y(1) - Y(0)]$, the population average effect — what we'd see if we treated everyone. **ATT** = $E[Y(1) - Y(0) \mid D = 1]$, the average effect *among those treated*. Under perfect compliance and full randomization, ATE = ATT. Under imperfect compliance they diverge.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With 46.15% receipt vs 51.8% assignment, the actual treated subset has a slightly different composition than the population. The ATE applies to the policy "expand to everyone"; the ATT applies to "the program's effect on the people who took it up."
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"If everyone took the drug" (ATE) vs "the patients who actually took the drug" (ATT). Public-health planners care about ATE for scaling. Doctors evaluating their patients care about ATT.
+
+</details>
+</div>
+
+**3. Intent-to-Treat (ITT).**
+The effect of *being assigned* to treatment, regardless of whether the unit actually took it up. Under imperfect compliance, ITT understates the effect on compliers (because non-compliers dilute the average). The simple diff-in-means on `treat` is an ITT estimate.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The simple diff-in-means estimator (regress `y` on `treat`) returns 0.116 — the ITT effect of *being offered* the transfer. It is smaller than the per-protocol effect because some assigned households did not actually receive the transfer.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The effect of the prescription, not the pill. Doctors give 100 prescriptions; 80 patients fill them. The ITT measures the average outcome across all 100, regardless of fill rate. It is the policy-relevant number when the fill rate is part of the intervention.
+
+</details>
+</div>
+
+**4. Imperfect compliance** $\Pr(D = 1 \mid \mathrm{treat} = 1) < 1$.
+When some assigned units do not actually take up the treatment, or vice versa. Wedges open between assignment (`treat`) and receipt (`D`). Creates the gap between ITT and ATT (for compliers).
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+51.8% of households assigned to treatment, but only 46.15% received the transfer at endline. The 5.65 pp gap is non-compliance. To recover the per-protocol effect, the post uses doubly-robust IV-style estimators that distinguish offer from receipt.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Patients who don't fill their script. The doctor's intent (assignment) does not equal the medication actually consumed (receipt). The compliance rate is the conversion rate from prescription to pill.
+
+</details>
+</div>
+
+**5. Regression Adjustment (RA).**
+Estimator that fits two outcome models — one for the treated, one for the control — using covariates as predictors. Imputes both potential outcomes for every unit. The ATE is the average of the predicted differences.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The cross-sectional RA estimate of the ATE is 0.113 — close to the simple diff-in-means (0.116) because randomization made the control group already well-balanced. RA's value shows up more clearly under imbalance or in observational settings.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Predict counterfactuals from an outcome model. Train a model on the treated, predict what they would have scored without treatment using the control's relationship pattern. Train a model on the control, predict what they would have scored *with* treatment. Average the differences.
+
+</details>
+</div>
+
+**6. Inverse Probability Weighting (IPW)** weights by $1/\hat{e}(\mathbf{x})$ for treated, $1/(1 - \hat{e}(\mathbf{x}))$ for control.
+Reweights observations by inverse propensity score (probability of treatment given covariates). Uses a *treatment* model only — no outcome model. Sensitive to extreme propensities.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This RCT has 51.8% treatment share. Propensities cluster near 0.5 — comfortable for IPW. The IPW estimate of the ATE matches RA closely; convergence across methods is reassuring.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Re-weight a survey. If young voters are over-sampled, give each young respondent less weight. IPW does the same trick to recover an unbiased average treatment effect.
+
+</details>
+</div>
+
+**7. Doubly robust (AIPW).**
+Combines an outcome regression with the IPW reweight, plus a correction term. The estimator stays consistent if **either** the outcome model is correct **or** the propensity model is correct. Both right is gravy. Both wrong is the only failure mode.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+AIPW is the recommended estimator throughout the post. With randomization the propensity is known (50:50 by design); the AIPW + the outcome model are belt-and-suspenders, gaining efficiency from both.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Belt and suspenders. If the belt fails, the suspenders hold. If the suspenders fail, the belt holds. Two failures simultaneously? Time to buy new pants.
+
+</details>
+</div>
+
+**8. DiD with panel data.**
+With baseline + endline observations, take the change in `y` for treated minus change for controls. The difference of differences nets out time-invariant confounders and shared secular trends. The DiD ATT here is identified more efficiently than the cross-sectional ATT under the panel design.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The DiD ATT is 0.135 (SE 0.027). Larger than the cross-sectional ATE (0.113) because DiD uses each household as its own pre-treatment baseline, removing fixed effects. The standard error tightens because cross-household noise is differenced out.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtract everyone's secular drift. If incomes drifted up 5% across the country, that's not your transfer program. DiD subtracts the control group's drift before judging the treatment.
+
+</details>
+</div>
+
 ---
 
 ## 2. Study design

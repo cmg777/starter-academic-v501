@@ -63,6 +63,162 @@ The Columbus crime dataset contains 49 neighborhoods in Columbus, Ohio, with dat
 - Use specification tests to determine whether the SDM simplifies to SAR, SLX, or SEM
 - Compare models and identify the SDM and SDEM as preferred specifications following Elhorst (2014)
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "spatial multiplier" or "direct vs indirect effects" and the term feels slippery, this is the section to re-read.
+
+**1. Spatial weight matrix** $W$ (with elements $w\_{ij}$).
+The matrix encoding which units count as neighbours of which. Row-standardized so the spatial lag $W y$ is a *weighted average* of neighbours' $y$. Defined before the regression; never estimated. Different choices of $W$ can change every estimate downstream.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post uses Queen contiguity on Anselin's 49-tract Columbus dataset. Two tracts are neighbours if they share any boundary point — even a single corner. After row-standardization, each row sums to 1 and the diagonal is zero.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A friendship graph. Each row of $W$ is one tract's friend list, with weights summing to 1. The spatial lag asks each tract, "what's the average value among your friends?"
+
+</details>
+</div>
+
+**2. Spatial autocorrelation.**
+The tendency for nearby units to have similar values. Positive autocorrelation means clustering (high near high, low near low). Moran's I is the standard scalar measure; values near 0 mean random arrangement, values near 1 mean strong clustering.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Columbus's `CRIME` has Moran's I = 0.222 with p = 0.005. Crime rates are clustered geographically — high-crime tracts neighbour other high-crime tracts. The OLS residuals also test positive for spatial autocorrelation, motivating the spatial models.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Clustering of opinions among friends. If your friends believe what you believe, the network has high autocorrelation. Random opinions across the network give I near zero.
+
+</details>
+</div>
+
+**3. Spatial lag of $y$** ($W y$, coefficient $\rho$).
+The right-hand-side term $\rho W y$ in spatial autoregressive (SAR) models. Captures direct dependence: this unit's outcome is influenced by its neighbours' outcomes. The parameter $\rho$ measures spillover strength.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The SAR model on Columbus crime estimates ρ = 0.428 (z-stat large; p < 0.001). A 1-unit rise in average neighbour crime raises this tract's crime by 0.43 units, *on top of* what income and housing-value predict.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"What your neighbours think today" enters your equation directly. With ρ near zero, you ignore them. With ρ near one, you mirror them perfectly.
+
+</details>
+</div>
+
+**4. Spatial lag of $X$** ($W X \theta$).
+The right-hand-side term in SLX (Spatially Lagged X) models. This unit's outcome depends on its neighbours' *covariates*, not their outcomes. Easier to interpret than spatial lag of $y$ because it generates no feedback loop.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The SLX model adds neighbour-averaged `INC` and `HOVAL` to the OLS regression. The SDEM specification estimates $\theta$ on neighbour `INC` of -1.20 (p = 0.036). Tracts with richer neighbours have lower own crime — a spillover from neighbour income.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"What your neighbours have" enters your equation. Their wealth, age, education — features you absorb without their outcomes feeding back into yours.
+
+</details>
+</div>
+
+**5. Spatial error** ($\lambda W u$).
+The error-side analogue. The error in this unit is correlated with the error in its neighbours. SEM (Spatial Error Model) absorbs this without changing the structural equation. Useful when the unobservable confounder spills across borders.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The SEM estimates λ on Columbus crime — capturing whatever unobserved factors (broken-window externalities, gang networks, drug markets) link tracts beyond what `INC` and `HOVAL` measure.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"What your neighbours unobservably share." Not their wealth or behaviour — the silent shared factors that we never measured but still affect outcomes on both sides of every border.
+
+</details>
+</div>
+
+**6. Eight-model taxonomy.**
+The nested family of spatial models: OLS (no spatial), SAR ($Wy$), SEM ($Wu$), SLX ($WX$), SDM (SAR + SLX), SDEM (SLX + SEM), SAC (SAR + SEM), GNS (everything). Choose by starting at the top and testing down via Wald or LR tests.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post estimates all eight models on Columbus crime. Specification tests reject the simpler restrictions; SDM and SDEM emerge as the preferred specifications, consistent with Elhorst (2014).
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A Russian-nesting-doll set of models. The biggest doll (GNS) contains every smaller doll. Tests check whether you can drop the outer dolls without losing fit. Often you can; sometimes you cannot.
+
+</details>
+</div>
+
+**7. Direct vs indirect effects** ($\partial y\_i / \partial x\_i$ vs $\partial y\_i / \partial x\_j$).
+LeSage-Pace decomposition. The direct effect is the change in $y\_i$ from a change in $x\_i$, *including* feedback through neighbours. The indirect (spillover) effect is the change in $y\_i$ from a change in *some other* $x\_j$. The total effect is their sum.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the SDEM, a 1-unit rise in own `INC` lowers `CRIME` by some direct effect, while a 1-unit rise in *neighbour* `INC` lowers this tract's `CRIME` by another, indirect effect (-1.20 in our spec). The total marginal effect of a uniform income rise is the sum.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Your own splash makes a wave; the wall echoes it back. The direct effect counts your splash plus the bounce-back. The indirect effect counts the splash from the next pool reaching yours.
+
+</details>
+</div>
+
+**8. Spatial multiplier** $(I - \rho W)^{-1}$.
+The inverse matrix that translates structural coefficients into reduced-form impacts when $\rho \ne 0$. Each cell of the multiplier counts the full chain of feedback: I splash, you splash, my friend re-splashes, and so on — geometrically decaying when $|\rho| < 1$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With ρ = 0.428 in our SAR, the multiplier amplifies any shock by approximately $1/(1 - 0.428) \approx 1.75$ on average. The direct effect on tract $i$ is the regression coefficient *times* the multiplier diagonal — strictly larger than the bare coefficient.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The full echo chamber. One shout returns as many smaller shouts. The multiplier sums all the returning shouts and tells you the total noise the chamber produces from one initial sound.
+
+</details>
+</div>
+
 ---
 
 ## 2. The spatial model taxonomy

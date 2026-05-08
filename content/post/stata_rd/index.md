@@ -79,19 +79,142 @@ By the end of this tutorial, you will be able to:
 
 ---
 
-## 2. Key concepts
+## 2. Key concepts at a glance
 
-Before diving into the analysis, let us define the key concepts.
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "LATE" or "density test" and the term feels slippery, this is the section to re-read.
 
-**Running variable.** The variable that determines treatment assignment --- in our case, the entrance exam score. The running variable must be continuous (or at least finely graded) so that students near the cutoff are comparable.
+**1. Running variable.**
+The variable that determines treatment assignment. Must be continuous (or finely graded) so that units just above and below the cutoff are comparable. Manipulation of the running variable invalidates the design.
 
-**Cutoff.** The threshold value of the running variable that separates treated from untreated units. Here, the cutoff is 70 points.
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
 
-**Sharp vs. fuzzy design.** In a *sharp* RDD, treatment is a deterministic function of the running variable at the cutoff: everyone below gets treated, everyone above does not. In a *fuzzy* RDD, the cutoff only changes the *probability* of treatment --- some units may cross over. Our design is sharp.
+In this tutorial the running variable is `entrance_exam` (range 28.8–99.8). Students with scores below 70 received tutoring; those at or above 70 did not. The running variable is the dial that triggers the program.
 
-**Local average treatment effect (LATE).** RDD identifies the causal effect only for units at the cutoff --- those who scored exactly 70. We cannot extrapolate this effect to students who scored 30 or 95. Think of it as measuring the treatment effect through a narrow window around the threshold.
+</details>
 
-**Identifying assumption.** RDD requires that *potential outcomes* --- what a student would score on the exit exam with or without tutoring --- are smooth (continuous) through the cutoff. In plain language: absent the tutoring program, students who scored 69 and 71 would have performed similarly on the exit exam. If students could precisely manipulate their entrance exam scores to fall below 70, this assumption would fail.
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The dial that decides who gets in. Below the line, you're in. At or above, you're out. RDD only works if the dial cannot be tampered with.
+
+</details>
+</div>
+
+**2. Cutoff** $c = 70$.
+The threshold value of the running variable separating treated from untreated. Set ex-ante by the program rule, not by data analysis. The estimator extracts the causal effect from the discontinuity *at* this point.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This program's cutoff is 70 points. Students scoring 69 receive tutoring; students scoring 70 do not. The 1-point gap defines the comparison.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The velvet rope at a club. Below the line, you walk in. At or above, you stand outside. Where the rope sits is set by the bouncer, not by the line of customers.
+
+</details>
+</div>
+
+**3. Sharp vs fuzzy design.**
+*Sharp*: treatment is a deterministic function of the running variable. Everyone below the cutoff is treated, no one above is. *Fuzzy*: the cutoff changes the probability of treatment, but some units cross over. Our design is sharp.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+100% of students with `entrance_exam` below 70 are flagged for tutoring; 0% of those at or above. Compliance is perfect --- that's a sharp design. A fuzzy design would have, say, 70% take-up below and 5% above the cutoff.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"No exceptions" vs "the bouncer sometimes waves people through." Sharp is a deterministic gate. Fuzzy is a noisy gate where some people slip through against the rule.
+
+</details>
+</div>
+
+**4. Local average treatment effect (LATE)** $\tau = \lim\_{x \to c^-} E[Y \mid X = x] - \lim\_{x \to c^+} E[Y \mid X = x]$.
+The treatment effect *at* the cutoff. The discontinuity in the conditional expectation function. Cannot be extrapolated to units far from the cutoff: students at score 30 or 95 may respond differently than those at 69 or 71.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`rdrobust` returns LATE = -8.58 (CI [-12.14, -4.54]) on `exit_exam`. The naive OLS estimate of 10.80 conflates the LATE with selection --- students who would score badly *anyway* are the ones who scored below 70 on the entrance exam. The clean LATE is around the cutoff only.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The effect on the people right at the rope. The LATE tells you what the program does for borderline cases. It says nothing about students who scored very high or very low.
+
+</details>
+</div>
+
+**5. Continuity assumption.**
+Required for RDD identification. *Potential outcomes* must be smooth (continuous) through the cutoff. Equivalently: absent treatment, students just below the cutoff would perform similarly on the exit exam to students just above. Manipulation of the running variable would violate continuity.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+If students at 69 and 71 differ only because of the tutoring program, continuity holds. If students could secretly retake the entrance exam to land just below 70, that selection would break continuity. We test continuity indirectly via the McCrary density test.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The path is smooth, no cliff, at the rope. The line of customers grows continuously denser as you walk along; no sudden gap right at the velvet rope. Continuity says the *underlying behaviour* of customers does not jump at the gate --- only the gate itself enforces a discrete change.
+
+</details>
+</div>
+
+**6. Bandwidth** $h$.
+The window of running-variable values around the cutoff used for local-polynomial estimation. Smaller bandwidths reduce bias (closer to the cutoff = more comparable units) but increase variance (fewer observations). `rdrobust` selects the bandwidth via a data-driven MSE-optimal procedure.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`rdrobust` chooses an optimal bandwidth of 9.98 points on `entrance_exam`. The LATE estimator uses students with `entrance_exam` between 60.02 and 79.98 --- a window of about 20 points around the cutoff of 70. Outside that window, students are too different from cutoff students to inform the estimate.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How close you stand to the rope to measure. Standing right at the rope, you see the boundary clearly but only count a few people. Standing far away, you count everyone but mix the boundary with everything else. The bandwidth is the trade-off.
+
+</details>
+</div>
+
+**7. Density (McCrary) test.**
+A formal test for manipulation of the running variable. The test inspects the density of `entrance_exam` for a discontinuity *at* the cutoff. A significant jump (more mass just below than just above) would suggest students manipulated their scores to qualify for treatment.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This study's McCrary test returns p = 0.58. We fail to reject the null of smooth density. There is no statistical evidence that students bunched their entrance exam scores to fall below 70.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Does the line have a suspicious clump just outside the rope? If many people seem to bunch right below the cutoff, you suspect they're gaming the rule. If the crowd density is smooth across the rope, the dial is honest.
+
+</details>
+</div>
 
 ---
 
