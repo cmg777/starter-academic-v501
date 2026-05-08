@@ -59,6 +59,130 @@ The **[diff-diff](https://diff-diff.readthedocs.io/en/stable/)** Python package,
 - Recognize why Two-Way Fixed Effects fails under staggered adoption and how Callaway-Sant'Anna corrects for it
 - Assess robustness of causal conclusions using Bacon decomposition diagnostics and HonestDiD sensitivity analysis
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "forbidden comparisons" or "ATT" and the term feels slippery, this is the section to re-read.
+
+**1. Identification (DiD assumptions).** DiD identifies the ATT under two assumptions: parallel trends (treated and control would have moved in parallel without treatment) and no anticipation (no pre-treatment effect of the upcoming treatment).
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+The post simulates data where parallel trends holds by construction. The pre-trend test gives slope difference 0.1216 with p = 0.2938 — well above 5%. Identification is plausible.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+The two legs of a tripod the camera sits on. Remove either and the picture collapses.
+
+</details>
+</div>
+
+**2. ATT (average treatment effect on treated)** $E[Y(1)-Y(0)\mid D=1]$. The expected outcome under treatment minus the expected counterfactual outcome, averaged over the treated subpopulation.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post, the true ATT = 5.0 by construction. The classic 2×2 estimator recovers $\widehat{\mathrm{ATT}}$ = 5.1216 (within 2.4%). The 95% CI [4.6399, 5.6034] easily covers the truth.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+The effect on the people who actually got the treatment, not the population at large.
+
+</details>
+</div>
+
+**3. Classic 2×2 design** $(\bar Y\_{\mathrm{post}}^T - \bar Y\_{\mathrm{pre}}^T) - (\bar Y\_{\mathrm{post}}^C - \bar Y\_{\mathrm{pre}}^C)$. Two groups (treated, control), two periods (pre, post). Difference of differences.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In the simulated `treatment_period = 5` data, the pre-post change in the treated group minus the same change in the control group gives 5.1216 — the canonical DiD estimator at work.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Before-after photos for two groups, then comparing the changes side by side.
+
+</details>
+</div>
+
+**4. Pre-trends test** $H\_0$: leads = 0. Run an event-study regression and test whether all pre-treatment leads are jointly zero. Empirical proxy for parallel trends.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post, the lead at e=-2 is -0.52 (p = 0.31). Failing to reject does not prove parallel trends, but it removes the most obvious objection.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+The crash-test on the bridge before the load arrives — it can't certify safety, but it catches the obvious cracks.
+
+</details>
+</div>
+
+**5. Event study** $\mathrm{ATT}(e)$ for $e = -L,\ldots,K$. Estimate ATTs by *time since treatment*, with $e = 0$ the treatment period. Plots the dynamic response.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post, lag 0 effect = 1.97; the effect grows to 3.27 by lag 6. The dose-response shows the policy bites harder over time.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+The effect 1, 2, 3 years after the policy change, regardless of which calendar year it changed.
+
+</details>
+</div>
+
+**6. Forbidden comparisons.** Naive TWFE silently uses *already-treated* units as controls for *later-treated* units. With heterogeneous effects, this contaminates the estimate.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post's staggered-adoption section, naive TWFE = 2.18, far from the true average of 5. Bacon decomposition reveals 28.3% of the weight comes from forbidden 2×2 comparisons that drag the average down.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Using an already-injured player as a control for an injury study — the control is not really untreated.
+
+</details>
+</div>
+
+**7. Callaway-Sant'Anna doubly-robust.** Compute $\mathrm{ATT}(g, t)$ for each cohort $g$ and period $t$ using a *doubly robust* estimator (outcome model + propensity score). Aggregate with valid weights.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+Applied to the staggered data here, Callaway-Sant'Anna's overall ATT = 2.41, similar in magnitude to the contaminated TWFE estimate but constructed only from valid 2×2 comparisons.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Belt and suspenders — the outcome model and propensity model are two independent guarantees that the trousers stay up.
+
+</details>
+</div>
+
+**8. HonestDiD $\bar M$ (breakdown value).** The largest violation of parallel trends (in units of the largest pre-treatment trend) at which the treatment-effect CI still excludes zero.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post, the breakdown is $\bar M \approx 15$. The CI at $M = 0$ is [2.5324, 2.6592]; at $M = 15$ it widens to [0.3795, 4.8122] — still excludes zero. The result is exceptionally robust.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+The wind speed at which the bridge first wobbles. A higher number means a sturdier bridge.
+
+</details>
+</div>
+
 <a href="https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_did/notebook.ipynb" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
 
 ## Conceptual framework: What is Difference-in-Differences?

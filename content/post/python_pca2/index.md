@@ -56,6 +56,162 @@ The real data reveals a nuanced story: education and health improved on average 
 - Apply pooled normalization with cross-period min/max bounds
 - Contrast pooled vs per-period PCA using rank stability and direction-of-change analysis
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "pooled standardization" or "PC1 score" and the term feels slippery, this is the section to re-read.
+
+**1. Principal Component Analysis** $X = U D V^\top$.
+A linear technique that finds new axes capturing maximum variance. The first axis captures the most variance, the second the most orthogonal remainder, and so on.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post applies PCA to three SHDI components (`Education`, `Health`, `Income`) for 153 regions × 2 periods = 306 observations. The first PC captures 72.42% of total variance — most of "development" is one-dimensional.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A recipe to mix three flavours into one dominant taste.
+
+</details>
+</div>
+
+**2. Eigenvalue / eigenvector** $\Sigma v = \lambda v$.
+The eigenvector is a direction in indicator space; the eigenvalue is the variance along that direction.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The pooled covariance matrix yields eigenvalues `[2.1726, 0.5631, 0.2643]`. The PC1 eigenvector `[0.5642, 0.5448, 0.6204]` tells us `Income` has the slightly heaviest weight (0.6204), but all three components contribute almost equally.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Eigenvalue = the strength of each flavour; eigenvector = the recipe of ingredients that flavour combines.
+
+</details>
+</div>
+
+**3. Variance explained** $\lambda\_k / \sum \lambda$.
+The fraction of total variance captured by the $k$-th component. Sums to 1 across all components.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+PC1 explains 72.42%, PC2 explains 18.77%, PC3 explains 8.81% — totalling 100%. PC1 alone is enough to summarize most of the development picture across the 153 South American regions.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"How much of the meal does this flavour cover?"
+
+</details>
+</div>
+
+**4. Standardization (z-score)** $z = (x - \mu) / \sigma$.
+Rescale each variable to have mean 0 and SD 1. Required so that variables on different scales contribute comparably.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, raw `Education`, `Health`, and `Income` live in different ranges. Z-scoring forces all three onto a common scale before PCA, so no single component dominates simply because of its units.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Converting metric and imperial measures to the same unit.
+
+</details>
+</div>
+
+**5. Pooled vs per-period standardization** $\mu^{\mathrm{pool}}, \sigma^{\mathrm{pool}}$.
+Pooled: compute the mean and SD across both years and apply the same standardization to all observations. Per-period: compute year-specific means and SDs.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Venezuelan regions saw their `Income` collapse from 0.782 (2013) to 0.630 (2019), a drop of -0.152. Per-period standardization hides this collapse because the 2019 mean is also lower; pooled standardization preserves it because the yardstick stays fixed across years.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Using a fixed yardstick across years vs a stretchable one that adjusts every season.
+
+</details>
+</div>
+
+**6. PC1 score (composite index)** $s\_i = X\_i v\_1$.
+The projection of each observation onto the first eigenvector — the aggregated development index for region $i$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Pooled PC1 averages -0.0720 in 2013 and +0.0720 in 2019 — a clear regional improvement of +0.1439 in standardized units. The validation correlation with the official SHDI is r = 0.9911 (R² = 0.9823), slightly higher than the per-period R² of 0.9750.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The team's combined-skills overall rating across multiple stats.
+
+</details>
+</div>
+
+**7. Sign convention (rotation)** $v \mapsto -v$.
+Eigenvectors are unique only up to sign. Software may flip them between runs. Always force "higher = better" so scores remain interpretable.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the sign is forced so PC1 increases with all three SHDI components (`Education`, `Health`, `Income`). Without this, a Venezuelan region's score might appear higher than a Chilean region's even though the underlying development is lower.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Which compass heading we call "north" — once chosen, every map agrees.
+
+</details>
+</div>
+
+**8. Rank stability across periods** Spearman $\rho$.
+Compares region rankings between two periods or two methods. High $\rho$ means the same regions stay in similar positions.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Comparing per-period PC1 ranks with pooled PC1 ranks gives Spearman $\rho$ = 0.9818. Most regions agree on their place in the queue. But 16 of 153 regions actually disagree on the *direction* of change — a non-trivial 10.5%.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The league standings two seasons apart — most teams stay near where they were.
+
+</details>
+</div>
+
 ## 2. The pooled PCA pipeline
 
 The pooled pipeline extends the [six-step pipeline from the previous tutorial](/post/python_pca/#2-the-pca-pipeline) by adding a stacking step at the beginning and replacing per-period parameters with pooled parameters at the standardization, covariance, and normalization steps.

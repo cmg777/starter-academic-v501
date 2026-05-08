@@ -52,6 +52,162 @@ Modern implementations make this computationally painless. Rather than estimatin
 - Recover time-invariant coefficients (education, race) using the CRE/Mundlak approach
 - Apply fixed effects to event study designs with staggered treatment adoption
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "demeaning" or "Mundlak" and the term feels slippery, this is the section to re-read.
+
+**1. Fixed effects regression** $y\_{it} = \alpha\_i + X\_{it}\beta + u\_{it}$.
+Add a unit-specific intercept $\alpha\_i$ to absorb every time-invariant characteristic of unit $i$, observed or not.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the union premium drops from 0.183 (pooled OLS) to 0.078 (one-way FE) once worker-level fixed effects absorb time-invariant ability and motivation. More than half the raw premium was selection.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtract each person's own baseline before comparing them with anyone else.
+
+</details>
+</div>
+
+**2. Demeaning (within transformation)** $y\_{it} - \bar y\_i$.
+Replace each variable with its deviation from the unit's own time-average. Mathematically equivalent to including unit dummies, but vastly faster.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+PyFixest performs demeaning silently for `feols(lwage ~ exper | id, data = panel)`. The post then *manually* demeans `lwage` and `exper` by worker and shows the OLS slope on the demeaned variables exactly matches the one-way FE coefficient.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Zero out the height differences between people before measuring how high they jump.
+
+</details>
+</div>
+
+**3. One-way vs two-way FE** $\alpha\_i$ vs $\alpha\_i + \lambda\_t$.
+One-way absorbs only unit fixed effects; two-way also absorbs time fixed effects. Two-way is the standard absorber of macro shocks.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+R² progresses from 0.123 (no FE) to 0.437 (one-way) to 0.609 (two-way) on the synthetic dataset. Each absorption removes a distinct family of confounders.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtract person-average vs subtract both person-average and year-average.
+
+</details>
+</div>
+
+**4. Time-invariant covariate problem.**
+Variables that never change for a unit (e.g., race, education with no schooling change) are perfectly absorbed by unit fixed effects. Their coefficients become inestimable.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`educ` is dropped by `feols(lwage ~ educ + exper | id)` because every worker's education is constant across the 8 panel years. The coefficient simply cannot be identified within-worker.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+You cannot estimate "how tall someone is" if you only ever see how their height *changes* over time.
+
+</details>
+</div>
+
+**5. Cluster-robust standard errors** CRV1, HC1.
+Standard errors that allow within-cluster correlation. Without them, $t$-stats are inflated when errors travel together.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the wage panel, switching from HC1 to CRV1 (cluster by worker) widens the union SE from 0.016 to 0.024. The point estimate is unchanged, but inference becomes honest.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Noise that travels in packs — count packs of friends, not individual voices.
+
+</details>
+</div>
+
+**6. Mundlak / CRE recovery** augment with $\bar X\_i$.
+Add the worker-specific average $\bar X\_i$ of each time-varying covariate as an extra regressor. The remaining coefficients on $X\_{it}$ then equal one-way FE; the coefficients on time-invariant variables become identifiable.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With CRE the post recovers the education coefficient = 0.094 (SE 0.005) and the Black wage gap = -0.140 (SE 0.024) — quantities one-way FE silently dropped. Union remains 0.078, identical to FE.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A side door into the building that lets you photograph the rooms one-way FE locked.
+
+</details>
+</div>
+
+**7. Instrumental variables with FE.**
+Instruments inside `feols` use a `... | FE | endogenous ~ instruments` syntax. The 2SLS first stage absorbs FE simultaneously with the IV step.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`feols(lwage ~ exper | id | educ ~ z, data = panel)` runs 2SLS with worker FE absorbed and `educ` instrumented by `z` — combining the two identification strategies in one call.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Solve two confounding problems at once with a single unified tool.
+
+</details>
+</div>
+
+**8. Event study with staggered treatment** $\mathrm{ATT}(e)$, dynamic FE.
+Run an event-study regression with cohort-by-time interactions; period $e = -1$ is the universal baseline because the model is identified up to a normalization.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post applies an event study with PyFixest's `i(...)` syntax. Coefficients before $e = 0$ are pre-trend diagnostics; coefficients at and after $e = 0$ are dynamic ATTs.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Before-after photos, but stitched across units that change at different times.
+
+</details>
+</div>
+
 **Content outline.** Sections 2--4 set up the environment and establish an OLS baseline. Sections 5--6 introduce fixed effects --- first through PyFixest's absorption syntax, then by reproducing the same result manually via demeaning, building intuition for what FE actually does to the data. Section 7 shows how to compare multiple specifications in a single call, and Section 8 explores how standard error choices affect inference. Section 9 extends to two-way FE, and Section 10 combines FE with instrumental variables. Section 11 is the core case study: a real wage panel framed by the Mincer equation, where we decompose within and between variation, see how one-way FE absorb time-invariant variables like education, stress-test the common trends assumption with group-specific time effects, and recover education's coefficient through the CRE/Mundlak approach. Section 12 applies FE to event study designs, with a careful discussion of why period −1 serves as the universal baseline. Throughout, each section builds on the previous --- the manual demeaning in Section 6 explains why education vanishes in Section 11, and the stepwise comparison in Section 7 foreshadows the specification table in Section 11.
 
 ## 2. Setup and imports

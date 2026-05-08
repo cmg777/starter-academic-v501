@@ -60,6 +60,162 @@ This tutorial uses the [Subnational Human Development Index](https://globaldatal
 - Explore space-time dynamics of spatial clusters using directional Moran scatter plots
 - Compare country-level development trajectories within the spatial framework
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "Moran's I" or "LISA" and the term feels slippery, this is the section to re-read.
+
+**1. Spatial weights matrix** $W$, $w\_{ij}$.
+An $n \times n$ matrix encoding which units are "neighbours" of which. Queen contiguity sets $w\_{ij} = 1$ if regions $i$ and $j$ share an edge or vertex.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, `libpysal.weights.Queen.from_dataframe(gdf)` builds a Queen-contiguity weights matrix for the 153 South American regions. Most regions have 4–6 neighbours; islands have zero.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A friendship graph between regions — who shares a fence with whom.
+
+</details>
+</div>
+
+**2. Global spatial autocorrelation (Moran's I)** $I = \frac{n}{\sum w} \cdot \frac{\sum\_i \sum\_j w\_{ij}(y\_i - \bar y)(y\_j - \bar y)}{\sum (y\_i - \bar y)^2}$.
+A scalar summary of how much like-values cluster geographically. Positive $I$ = clustering; near zero = random; negative = checkerboard.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Moran's I on `SHDI` is 0.5680 in 2013 and 0.6320 in 2019. Strong positive autocorrelation in both years — and the clustering *strengthened*. Permutation $p$ = 0.0010 for both: extremely unlikely under a null of randomness.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How strongly opinions cluster among friends.
+
+</details>
+</div>
+
+**3. Local spatial autocorrelation (LISA)** $I\_i = z\_i \sum\_j w\_{ij} z\_j$.
+Decomposes the global Moran's I into a per-unit local statistic. Identifies *which* regions belong to clusters, not just whether clusters exist.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+LISA in 2019 flags 30 high-high regions, 37 low-low regions, and 6 outliers (5 HL, 1 LH). 80 are statistically not significant. The clusters cover roughly half the map.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The local cliques inside the social network — *who* gathers, not just whether anyone does.
+
+</details>
+</div>
+
+**4. Cluster typology** HH, LL, HL, LH.
+Each significant LISA observation belongs to one of four types: HH (high value, high neighbours = hot spot), LL (cold spot), HL (high value, low neighbours = high outlier), LH (low value, high neighbours = low outlier).
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post's LISA map shows HH clusters concentrated in southern Chile and southeast Brazil, LL clusters in Guyana and northern Bolivia. Outliers are rare (5 HL, 1 LH in 2019).
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Popular kids surrounded by popular kids vs the lone rebel surrounded by the in-crowd.
+
+</details>
+</div>
+
+**5. Choropleth map**.
+A map where each region is shaded by the value of a variable. Quantile and equal-interval are the two most common classification schemes.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post draws choropleths of `SHDI` for 2013 and 2019 with 5-class quantile breaks. The colour scale exposes regional inequality at a glance.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A heat-map of the country.
+
+</details>
+</div>
+
+**6. Spatial spillover**.
+The phenomenon that a region's outcome is shaped by its neighbours' outcomes (or covariates). The reason regions are not independent observations.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, regions adjacent to Venezuelan ones experienced an SHDI decline of -0.0653 on average — the crisis spilled into neighbouring economies. Bolivia, by contrast, gained +0.0333.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Your neighbours' garage band wakes you up too — your sleep is not independent of theirs.
+
+</details>
+</div>
+
+**7. Space-time dynamics**.
+Comparing LISA results at $t\_1$ vs $t\_2$ to see how clusters move, expand, or fade. The directional Moran scatter plot summarizes the transitions.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Between 2013 and 2019, 88% of Venezuelan regions moved into the LL cluster — a hot-spot collapse. The number of LL regions grew from 29 to 37; HH stayed roughly constant at 30–31.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The social network changes year to year — cliques form and dissolve.
+
+</details>
+</div>
+
+**8. Permutation inference**.
+$p$-values computed by randomly shuffling the outcome across regions thousands of times and asking how often the simulated Moran's I exceeds the observed one. No normality assumption needed.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For both 2013 and 2019, 999 random permutations of `SHDI` yield $p$ = 0.0010 (the smallest possible with 999 draws). The observed clustering is statistically extreme by any standard.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Shuffling the seating chart at random to ask whether cliques would form by chance.
+
+</details>
+</div>
+
 ## 2. The ESDA pipeline
 
 The analysis follows a natural progression from visualization to formal testing. Each step builds on the previous one, moving from "what does the data look like?" to "is the spatial pattern statistically significant?" to "where exactly are the clusters?"

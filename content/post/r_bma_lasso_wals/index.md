@@ -84,6 +84,154 @@ We use **synthetic data** throughout this tutorial. This means we *know the true
 - Run WALS as a fast frequentist model-averaging alternative and interpret its t-statistics
 - Compare results across all three methods to identify truly robust determinants via methodological triangulation
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "PIP" or "triangulation" and the term feels slippery, this is the section to re-read.
+
+1. **Variable selection**. The challenge of picking which predictors belong in a regression. Wrong choice = biased coefficients or inflated standard errors.
+
+<div class="concept-pair">
+
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post, 12 candidate regressors face the analyst, only 7 are truly nonzero. The post's whole point is: which method recovers them best?
+
+</details>
+
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Trimming a guest list --- invite too many and the party is chaos, too few and you miss the friends who matter.
+
+</details>
+
+</div>
+
+2. **Model uncertainty** $2^K$ candidate models. With $K$ candidate predictors, there are $2^K$ possible specifications. Picking one and ignoring the others is a strong implicit assumption.
+
+<div class="concept-pair">
+
+<details class="concept-card concept-example"><summary>Example</summary>
+
+With 12 candidate variables, the model space holds $2^{12} = 4{,}096$ possible regressions. BMA's MCMC explores this space; LASSO and WALS find compact summaries instead.
+
+</details>
+
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Many plausible guest lists exist. No single one is "the right" list.
+
+</details>
+
+</div>
+
+3. **Bayesian model averaging (BMA)** weighted average over $M\_j$. Weights coefficients across all candidate models by their posterior probability. Honest acknowledgement of model uncertainty.
+
+<div class="concept-pair">
+
+<details class="concept-card concept-example"><summary>Example</summary>
+
+BMA in this post (`bms()`) recovers 4 of the 7 true predictors with PIP $\geq 0.80$ --- a sensitivity of 57.1%. Three weak true predictors (urban, democracy, agriculture) fall below the threshold because their effects are too small.
+
+</details>
+
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Polling every plausible expert and weighting by track record.
+
+</details>
+
+</div>
+
+4. **Posterior inclusion probability (PIP)** $\sum\_{M\_j: x\_k \in M\_j} \Pr(M\_j \mid \mathrm{data})$. Total posterior mass on models containing variable $k$. PIP $\geq 0.80$ is the "robustness threshold" by convention (Raftery 1995).
+
+<div class="concept-pair">
+
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post, `log_gdp` has PIP = 1.000 (always selected). `trade_network` = 0.986, `fossil_fuel` = 0.948, `industry` = 0.841 --- all above 0.80. Three true predictors fall short.
+
+</details>
+
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+"What fraction of expert panels include this person?"
+
+</details>
+
+</div>
+
+5. **LASSO (L1 regularization)** $\min \\, \|y - X\beta\|^2 + \lambda \|\beta\|\_1$. Adds an L1 penalty to OLS. The penalty forces some coefficients exactly to zero, performing variable selection automatically.
+
+<div class="concept-pair">
+
+<details class="concept-card concept-example"><summary>Example</summary>
+
+With `glmnet` and 10-fold cross-validation, LASSO drops 5 noise variables and one weak true predictor. Post-LASSO refit gives `log_gdp` = 1.1646, very close to the true 1.200.
+
+</details>
+
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+A budget cap that forces you to drop low-priority guests.
+
+</details>
+
+</div>
+
+6. **WALS (Weighted Average Least Squares)**. Frequentist model averaging via a semi-orthogonal transformation and a Laplace prior. Closed-form, fast, no MCMC.
+
+<div class="concept-pair">
+
+<details class="concept-card concept-example"><summary>Example</summary>
+
+WALS gives `log_gdp` |t| = 34.62, dwarfing every other regressor; `trade_network` |t| = 4.39 is also strongly significant. Like LASSO, WALS recovers 6 of 7 true predictors (85.7%).
+
+</details>
+
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Averaging plans on a tidy spreadsheet rather than via a long Monte Carlo simulation.
+
+</details>
+
+</div>
+
+7. **Methodological triangulation**. Combining multiple methods that share assumptions but differ mechanically. Variables flagged by *all three* are unusually credible.
+
+<div class="concept-pair">
+
+<details class="concept-card concept-example"><summary>Example</summary>
+
+4 of 7 true predictors are flagged by BMA, LASSO, and WALS together --- the "triple-robust" set. These are the strongest claims the post can defend.
+
+</details>
+
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Three independent referees agreeing on the call.
+
+</details>
+
+</div>
+
+8. **Sensitivity / true-positive rate** $\\#\\{\hat\beta\_k \neq 0 : \beta\_k \neq 0\\} / \\#\\{\beta\_k \neq 0\\}$. Of the truly nonzero coefficients, what share does the method correctly flag?
+
+<div class="concept-pair">
+
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post, BMA sensitivity = 4/7 = 57.1%. LASSO and WALS each = 6/7 = 85.7%. With weak signals, frequentist shrinkage outperforms Bayesian averaging at this sample size.
+
+</details>
+
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Recall on a true-positive checklist --- how many real friends made it through the budget cap?
+
+</details>
+
+</div>
+
 **Content outline.** Section 2 sets up the R environment. Section 3 introduces the synthetic dataset and its built-in "answer key" --- 7 true predictors and 5 noise variables with realistic multicollinearity. Section 4 runs naive OLS to illustrate the spurious significance problem. Sections 5--8 cover BMA: Bayes' rule foundations, the PIP framework, a toy example, and full implementation. Sections 9--12 cover LASSO: the bias-variance tradeoff, L1/L2 geometry, cross-validated implementation, and Post-LASSO. Sections 13--16 cover WALS: frequentist model averaging, the semi-orthogonal transformation, the Laplace prior, and implementation. Section 17 brings all three methods together for a grand comparison. Section 18 summarizes key takeaways and provides further reading.
 
 
