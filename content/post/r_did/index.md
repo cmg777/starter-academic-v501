@@ -51,6 +51,162 @@ This tutorial walks through the complete modern DID workflow. We begin with the 
 - Apply doubly robust estimation with conditional parallel trends and assess robustness to base period and comparison group choices
 - Conduct HonestDiD sensitivity analysis to evaluate how robust findings are to violations of parallel trends
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "group-time ATT" or "TWFE bias" and the term feels slippery, this is the section to re-read.
+
+**1. Staggered adoption**.
+Treatment timing varies across units. Different states or counties start treatment in different years, instead of a single common treatment date.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, counties belong to four cohorts indexed by `G` $\in$ {0, 2004, 2006, 2007}. 102 counties were treated in 2004, 226 in 2006, and 1,417 are never-treated. No single common "post" period exists across the panel of 1,745 counties $\times$ 5 years.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+States change their speed limits in different years. There is no single "before" and "after" for the country as a whole — each state has its own clock.
+
+</details>
+</div>
+
+**2. TWFE bias** $\hat\beta\_{\mathrm{TWFE}}$ uses bad comparisons.
+Two-way fixed-effects regressions silently use *already-treated* units as controls for *later-treated* units. The result mixes valid and invalid comparisons.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The TWFE estimate in the post is -0.038 (SE 0.008, t=-4.49). After `twfeweights` decomposition, 64.2% of the bias is pre-treatment contamination from forbidden comparisons and 35.8% is post-treatment weighting bias. The Callaway-Sant'Anna group-time average is -0.057 — substantially larger in magnitude.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Mixing forbidden comparisons — using already-treated states as the "untreated" control by mistake, like grading a test against students who already saw the answer key.
+
+</details>
+</div>
+
+**3. Group-time ATT** $\mathrm{ATT}(g, t)$.
+The treatment effect for cohort $g$ in calendar period $t$. Decomposes the aggregate effect into a grid of (cohort $\times$ time) building blocks.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post computes `ATT(2004, 2005)`, `ATT(2006, 2007)`, and so on. The G=2004 cohort's average is -0.0888 (SE 0.0197); the G=2006 cohort's is -0.0427 (SE 0.0083). Aggregated across cohorts and periods, the overall ATT is -0.057.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The effect on California specifically in 2005, separable from the effect on Oregon in 2007 — each cell of the grid keeps its own story before you average them.
+
+</details>
+</div>
+
+**4. Event study** $\mathrm{ATT}(e)$ for $e = -L,\ldots,K$.
+The treatment effect aggregated by *time since treatment*, not calendar time. Lets you trace dynamics: dose-response, anticipation, fade-out.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the post, the on-impact effect (e=0) is -0.0235 (SE 0.0081). At e=3 the effect grows to -0.131. The dose-response widens with cumulative exposure to the higher minimum wage.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The effect *one*, *two*, *three* years after a state changes its limit, regardless of which calendar year it changed. Each county is lined up at its own "year zero."
+
+</details>
+</div>
+
+**5. Doubly robust DiD**.
+Estimator that uses *both* an outcome regression *and* a propensity-score model. Consistent if either model is correct.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The doubly robust overall ATT in the post (via `DRDID`) is -0.065 (SE 0.008), close to the Callaway-Sant'Anna estimate of -0.057. Two independent modeling routes — outcome regression and propensity score — give consistent answers.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Belt and suspenders — two independent guarantees that the trousers stay up. If one model fails, the other still holds the estimate together.
+
+</details>
+</div>
+
+**6. Pre-trends test**.
+A formal test of whether the pre-treatment leads of $\mathrm{ATT}(e)$ are jointly zero. Empirical proxy for the parallel-trends assumption.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+At e=-3 the lead is -0.0341 (SE 0.0119) — marginally significant, hinting at a small pre-trend in teen employment before the minimum-wage increase. Whether this kills identification is what HonestDiD then quantifies.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Looking for cracks in the bridge before the load arrives. A tiny crack is not necessarily fatal — but you want to know about it.
+
+</details>
+</div>
+
+**7. Never-treated vs not-yet-treated control**.
+Two valid comparison groups in staggered designs. Never-treated units are the cleanest but rarest; not-yet-treated units are abundant but become unavailable as time passes.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post has 1,417 never-treated counties (G=0). Switching to "not-yet-treated" controls — counties whose state will raise minimum wage *later* — gives ATT = -0.0649, very close to the never-treated baseline of -0.057.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Comparing to states that *never* changed their speed limit vs states that *will* change later. Both are currently "untreated"; only one stays that way forever.
+
+</details>
+</div>
+
+**8. HonestDiD breakdown value** $\bar M$ at which CI first crosses zero.
+The threshold of allowed parallel-trends violation at which the result becomes statistically indistinguishable from zero. Bigger $\bar M$ = more robust.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the post, the HonestDiD breakdown is $\bar M \approx 0.67$. The DiD estimate survives parallel-trends violations up to ~67% of the largest observed pre-trend before the confidence interval first touches zero.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The wind speed at which the bridge first wobbles. Anything below that and the structure holds; cross the threshold and the conclusion can no longer be trusted.
+
+</details>
+</div>
+
 ## 2. Setup
 
 ```r

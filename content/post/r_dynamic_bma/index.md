@@ -63,6 +63,162 @@ This tutorial introduces the [Bayesian Dynamic Systems Modeling](https://cran.r-
 
 The package also includes a smaller 3-regressor example (`small_model_space`) for practice --- see the companion R script for details.
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "PIP" or "jointness" and the term feels slippery, this is the section to re-read.
+
+**1. Dynamic panel** $y\_{it} = \alpha y\_{i,t-1} + X\_{it}\beta + u\_i + \epsilon\_{it}$.
+A panel regression where the outcome depends on its own past. Persistence and growth dynamics are explicit, not absorbed into noise.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the post, log GDP per capita (`lngdp`) in country $i$ at decade $t$ regresses on its own lag and 9 growth determinants (`ish`, `lnlex`, `pop`, `ki60`, `school`, `gov`, `lawandorder`, `tropical`, `oil`). The lag coefficient is 0.954 --- a country that is poor today stays poor next decade.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Each year's height depends on yesterday's height plus today's nutrition.
+
+</details>
+</div>
+
+**2. Lagged dependent variable** $y\_{i,t-1}$.
+The previous-period outcome, included as a regressor. Captures persistence: how much of today's level is "carried over" from before.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the best-fitting model the coefficient on lagged `lngdp` is 0.954 (SE 0.076). Only ~5% of the gap to steady state closes each decade.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Momentum in a video game.
+
+</details>
+</div>
+
+**3. Conditional convergence** $1 - \hat\alpha$ small.
+Countries growing toward their *own* steady state, not a common one. The convergence speed is $1$ minus the lagged-DV coefficient.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With lagged GDP coefficient 0.954, convergence speed is 1 - 0.954 = 0.046 per decade. Countries close their gap at less than 5% per decade --- a slow crawl.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A slow crawl toward your own steady state, which differs from your neighbour's.
+
+</details>
+</div>
+
+**4. Bayesian model averaging** weighted average over $M\_j$.
+Each candidate model gets a posterior weight (PMP). The reported coefficients are weighted averages across the entire $2^K$ model space.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With 9 growth determinants the model space holds $2^9 = 512$ models. The post averages across all 512, weighted by their posterior probabilities, rather than picking one.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Polling every plausible expert and weighting by track record.
+
+</details>
+</div>
+
+**5. Posterior inclusion probability** $\mathrm{PIP}\_k$.
+The total posterior weight on models that include regressor $k$. PIP $\geq 0.80$ is a common "robustness" threshold.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`pop` (population growth) lands at PIP = 0.990 --- it appears in essentially every model with substantial posterior weight. `lnlex` (life expectancy) at PIP = 0.864 also clears the threshold.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"What fraction of expert panels include this factor?"
+
+</details>
+</div>
+
+**6. Posterior model probability** $\mathrm{PMP}\_j$.
+The Bayesian weight on a single specific model. PMPs sum to one across the model space.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Even the *best* single model in this post captures only PMP = 0.089 (8.9% of total mass). The remaining 91% is spread across hundreds of nearby specifications. No single model is "the" model.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"How respected is this single panel?"
+
+</details>
+</div>
+
+**7. Prior on model size** $E[\mathrm{model\,size}]$.
+The prior expected number of regressors. Controls how aggressively the posterior shrinks toward parsimonious models.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+A binomial prior gives posterior expected size 6.908; binomial-beta gives 8.556. A skeptical EMS=2 prior collapses `ish` PIP from 0.773 to 0.483, showing prior sensitivity.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Telling the experts to keep their answer short or long.
+
+</details>
+</div>
+
+**8. Jointness**.
+Two regressors are *complements* if they tend to appear in models together (high jointness), *substitutes* if they tend to appear apart.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, `pop` and `lnlex` have HCGHM jointness = 0.711 --- strong complements. They tell distinct, additive growth stories.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Which experts always show up together at the conference.
+
+</details>
+</div>
+
 **Data Prep** (lag DV, demean, standardize) **&rarr; Model Space** (estimate all 2<sup>K</sup> models)
 **&rarr; BMA** (PIPs, posterior means) **&rarr; Sensitivity** (vary priors, EMS, dilution) **&rarr; Jointness** (complements vs. substitutes) **&rarr; Findings** (robust growth determinants)
 

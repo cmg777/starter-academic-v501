@@ -74,6 +74,162 @@ We use **synthetic panel data** with a known "answer key" --- we designed the da
 - Implement post-double-selection LASSO with `dsregress` and understand its four-step algorithm: LASSO on outcome, LASSO on each variable of interest, union, then OLS
 - Evaluate both methods against a known ground truth to assess their accuracy
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "PIP" or "model space" and the term feels slippery, this is the section to re-read.
+
+**1. Model uncertainty**.
+Many plausible regressions can be specified. No single "right" set of controls. Standard practice picks one model and ignores the others.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With 12 candidate controls there are $2^{12} = 4{,}096$ possible regressions on `ln_co2`. Picking just one is a strong (and often hidden) assumption.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A buffet where you do not know which dishes are real food and which are decor.
+
+</details>
+</div>
+
+**2. Model space** $2^K$.
+The full enumeration of all subsets of $K$ candidate regressors. With $K = 12$, the space holds 4,096 models.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With 12 candidate controls in the EKC analysis, the model space contains 4,096 distinct regressions. BMA samples from this space rather than visiting every model — in this post, MC³ visits 163 distinct models with sampling correlation 0.9997.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Every possible plate you could compose from the buffet.
+
+</details>
+</div>
+
+**3. Posterior model probability (PMP)** $\Pr(M\_j \mid \mathrm{data})$.
+The Bayesian weight on a single candidate model after seeing the data. Sums to one across all models in the space.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In BMA output, the top-ranked model in this post captures roughly 9% of the total posterior mass. The remaining 91% is spread across hundreds of nearby models.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How much each plate costs at the buffet, with all prices summing to your fixed budget.
+
+</details>
+</div>
+
+**4. Posterior inclusion probability (PIP)** $\sum\_{M\_j: x\_k \in M\_j} \Pr(M\_j \mid \mathrm{data})$.
+The total posterior weight on models that contain regressor $k$. A standard "robustness threshold" is $\mathrm{PIP} \geq 0.80$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`fossil_fuel` lands at PIP = 1.000 (always selected); `renewable` at 0.959 and `industry` at 0.999 also clear the bar. But `urban` and `democracy` fall below 0.80 — their true coefficients (+0.007 and -0.005) are too small to detect at this sample size.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How often a specific dish appears across all plates you'd buy.
+
+</details>
+</div>
+
+**5. Bayesian model averaging (BMA)** weighted average over $M\_j$.
+Coefficients are weighted averages over all models, with weights = PMPs. Honest uncertainty about which controls belong.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The BMA posterior mean on the cubic GDP term `ln_gdp_cb` is -0.030, *exactly* matching the true DGP value. The `fossil_fuel` posterior mean is -7.139 against a true -7.100. Pooled OLS with all 12 controls gave a noisier estimate with 5 false positives.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Paying for every plate in proportion to its appeal, then averaging the meals.
+
+</details>
+</div>
+
+**6. Double-selection LASSO (DSL)**.
+Frequentist alternative: run LASSO on the outcome to pick controls, run LASSO on each variable of interest to pick controls, take the union, then run OLS on the union.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post applies `dsregress` to recover the true GDP-CO₂ shape. DSL recovers the same five true controls (`fossil_fuel`, `renewable`, `urban`, `democracy`, `industry`) that BMA does, via a completely different selection logic.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two strict diners independently writing menus, then merging their lists.
+
+</details>
+</div>
+
+**7. Environmental Kuznets curve** inverted-N: linear + sq + cubic GDP.
+Hypothesizes that pollution rises with development at low income, falls at high income, and may rise again at very high income.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the synthetic data the true cubic-GDP coefficient is -0.030 and BMA recovers exactly -0.030 on `ln_gdp_cb`. The shape — combining `ln_gdp`, `ln_gdp_sq`, and `ln_gdp_cb` — is the substantive object the methods are trying to estimate.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A roller coaster that climbs and dips with national income.
+
+</details>
+</div>
+
+**8. Ground-truth synthetic data** known $\beta$ in DGP.
+Data generated from a known regression so the true coefficients are written down by the analyst. Lets us *grade* a method against the answer key.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+We generate `ln_co2` from a model on a 40-country × 40-year panel (1,600 obs) where `fossil_fuel`'s coefficient is +0.015 and `urban`'s is +0.007, alongside 7 noise controls (`globalization`, `services`, `trade`, `credit`, `pop_density`, `corruption`, `fdi`) with zero true effect. Whether BMA recovers these is an exam, not a guess.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A chef who tells you the real recipe so you can grade your own guess.
+
+</details>
+</div>
+
 The following diagram summarizes the methodological sequence of this tutorial. We begin with exploratory data analysis to visualize the raw income--pollution relationship, then estimate baseline fixed effects regressions to expose the model uncertainty problem. Next, we apply BMA and DSL as two alternative solutions, and finally compare both methods against the known answer key.
 
 ```mermaid

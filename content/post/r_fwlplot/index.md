@@ -59,6 +59,143 @@ This tutorial builds intuition progressively. We start with simulated data where
 - Apply `fwl_plot()` to real panel data with high-dimensional fixed effects
 - Connect FWL to omitted variable bias and Simpson's paradox
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "FWL theorem" or "Simpson's paradox" and the term feels slippery, this is the section to re-read.
+
+**1. Frisch-Waugh-Lovell theorem** $\hat\beta\_1 = \hat\beta\_1^{\mathrm{resid}}$.
+The coefficient on $X\_1$ from the full regression equals the slope from a simple regression of $\tilde Y$ on $\tilde X\_1$, where the tildes are residuals after partial-ing out the other controls. Two routes, one number.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the simulated store data, regressing `sales` on `coupons` and `income` jointly gives a coupon coefficient of +0.212. Manual FWL — residualize `coupons` against `income`, residualize `sales` against `income`, then regress one residual on the other — returns +0.212288. Same number, two paths.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two routes to the same summit. One is the direct multivariable highway; the other is the scenic residualize-then-regress trail. They end at the identical viewpoint.
+
+</details>
+</div>
+
+**2. Confounding** $X\_2$ correlated with both $Y$ and $X\_1$.
+A third variable that creates a spurious link between the regressor and the outcome. It is why a raw scatter plot can lie outright about the direction of an effect.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the n=200 store panel, high-income shoppers receive *fewer* coupons (correlation `coupons`-`income` = -0.709) and buy *more* (correlation `income`-`sales` = +0.500). Income is the confounder hiding the true positive coupon effect of +0.2.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A third character pulling on both protagonists from off-stage. The audience sees the two leads moving in opposite directions and assumes they dislike each other; really, a hidden hand is tugging them apart.
+
+</details>
+</div>
+
+**3. Residualization** $\tilde y = y - \hat y$.
+Replace each variable with the part *not* explained by the other controls. The leftover — the residual — is the variation FWL operates on.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Regress `coupons` on `income` and keep the residuals: that is the part of `coupons` that income cannot predict. Regress `sales` on `income` and keep the residuals. Plot one set of residuals against the other to reveal the controlled relationship.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Wiping a foggy window before looking through it. The fog is the variation explained by the controls; once it is gone, the actual scene snaps into focus.
+
+</details>
+</div>
+
+**4. Omitted variable bias** $\mathrm{OVB} = \gamma \cdot \delta$.
+The naive slope of $Y$ on $X\_1$ differs from the true slope by $\gamma \cdot \delta$, where $\gamma$ is the effect of the omitted $X\_2$ on $Y$ and $\delta$ is the slope of $X\_2$ on $X\_1$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In our store data, $\gamma$ = +0.3004 (income coefficient on `sales` in the full model) and $\delta$ = -0.4937 (slope of `coupons` regressed on `income`). OVB = $\gamma \cdot \delta$ = -0.1483. The naive coupon slope is -0.093 vs the controlled +0.212; the gap is +0.305, which is `-OVB` exactly. The bias was *precisely* what FWL predicted.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The exact tilt of a foggy lens. If you know how the fog distorts colors, you can subtract that distortion and recover the true hue underneath.
+
+</details>
+</div>
+
+**5. Added-variable plot** scatter of $\tilde y$ vs $\tilde x\_1$.
+Each point shows the residual variation in $Y$ against residual variation in $X\_1$. The slope of this scatter equals the FWL coefficient — it is the picture that matches the multivariable regression number.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Calling `fwl_plot(sales ~ coupons | income, data = ...)` draws this scatter automatically and overlays the +0.212 line. The raw `sales` vs `coupons` scatter, by contrast, slopes the wrong way at -0.093.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The scatter you *should* have looked at. The raw scatter is a tourist photo with strangers blocking the view; the added-variable plot is the same shot with the strangers Photoshopped out.
+
+</details>
+</div>
+
+**6. Within (FE) demeaning** $y\_{it} - \bar y\_i$.
+Subtract each unit's own mean from each variable. What remains is variation *within* the unit, scrubbed of every time-invariant unit-level confounder at once.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Writing `feols(lwage ~ exper | id, data = panel)` silently demeans `lwage` and `exper` per individual before fitting. The reported coefficient is the within-person return to experience — the slope estimated using only how each person changes over time.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtract each person's "normal" to see their deviations. Two people may have very different baselines, but the within transformation aligns everyone at zero so only their movements matter.
+
+</details>
+</div>
+
+**7. Simpson's paradox** sign reversal across subgroups.
+The aggregate slope can carry the *opposite* sign of every within-subgroup slope when subgroup means differ along the regressor. The whole and the parts disagree.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The raw `coupons`-`sales` correlation across all 200 stores is -0.166. Within any narrow income band, the correlation flips positive. The aggregate sign reversed exactly because high-income stores receive fewer coupons but spend more — a textbook Simpson reversal driven by the same confounding FWL repairs.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Looking at the shore from a moving boat. The shoreline appears to drift one way, but it is actually you moving the other. Mistaking aggregate motion for subgroup motion is the same illusion.
+
+</details>
+</div>
+
 ## 2. The Modeling Pipeline
 
 ```mermaid

@@ -57,6 +57,162 @@ This tutorial is the third in a trilogy --- see the companion [R tutorial](/post
 - Use binned scatter plots to summarize patterns in large datasets
 - Show regression parameters directly on plots with `regparameters()`
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "FWL theorem" or "omitted variable bias" and the term feels slippery, this is the section to re-read.
+
+**1. Frisch-Waugh-Lovell theorem** $\hat\beta\_1 = \hat\beta\_1^{\mathrm{resid}}$.
+The full-regression coefficient on $X\_1$ equals the simple regression of $\tilde Y$ on $\tilde X\_1$. The tildes are residuals from regressing each on the other controls. Two routes give the same number.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Regressing `sales` on `coupons` and `income` jointly gives a coupon coefficient of +0.2123. Regressing the residualized `sales` on the residualized `coupons` gives +0.2122882. Same number, two paths.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A recipe with redundant ingredients you can subtract first. Subtract the broth from the stock. Then read the seasoning.
+
+</details>
+</div>
+
+**2. Residualization (partial-out)** $\tilde y = y - \hat y$.
+Replace each variable with the part *not* explained by the other regressors. Then look only at what is left. The leftover is the new variable.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Regress `sales` on `income` to get `sales_resid`. Regress `coupons` on `income` to get `coupons_resid`. Plot one against the other to see the controlled relationship.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Wiping a foggy window before looking through it. The view becomes the part you actually care about.
+
+</details>
+</div>
+
+**3. Control variable** $X\_2$.
+A regressor included so the coefficient on $X\_1$ measures effect *holding $X\_2$ fixed*. Different from the treatment variable of interest. Often a confounder.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the store data, `income` is the control. We include it so the `coupons` slope reflects the within-income effect, not the across-income confounding.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Matching apples to apples instead of apples to oranges.
+
+</details>
+</div>
+
+**4. Omitted variable bias** $\mathrm{OVB} = \gamma \cdot \delta$.
+The naive slope of $Y$ on $X\_1$ differs from the true slope by exactly $\gamma \cdot \delta$. Here $\gamma$ is the effect of the omitted $X\_2$ on $Y$. And $\delta$ is the slope of $X\_2$ on $X\_1$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The `income` effect on `sales` is +0.3004 ($\gamma$). The `coupons`-on-`income` slope is -0.4937 ($\delta$). OVB = +0.3004 × -0.4937 = -0.1483. The naive coupon slope -0.0934 plus the bias -0.1483 reconciles with the controlled +0.2123.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A thumb on the scale you didn't notice. The reading was always wrong by the weight of that thumb.
+
+</details>
+</div>
+
+**5. Partial regression plot** scatter of $\tilde y$ vs $\tilde x\_1$.
+The picture you should have looked at. Each point shows the residual variation in $Y$ against residual variation in $X\_1$. The slope of the cloud equals the multivariate coefficient.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The `scatterfit sales coupons, controls(income)` plot shows the +0.2123 slope visually. The naive `scatterfit sales coupons` plot shows the -0.0934 slope and looks completely different.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The controlled scatter is the *real* photograph. The raw scatter was a misleading snapshot taken through a dirty lens.
+
+</details>
+</div>
+
+**6. Within transformation** $y\_{it} - \bar y\_i$.
+Subtract each unit's own time-average from its variable. What remains is variation *within* the unit. Free of all time-invariant unit characteristics.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the wage panel, demeaning `lwage` and `exper` per individual gives the within-individual return to experience: +0.1223. Pooled OLS gave only +0.1050.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtract each person's normal to compare them with themselves over time.
+
+</details>
+</div>
+
+**7. Two-way fixed effects** $\alpha\_i + \lambda\_t$.
+Demean by both unit and time. Absorbs all time-invariant unit confounders. Also absorbs all unit-invariant time shocks.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For the flights data, adding origin and destination FE moves the air-time effect on delay from -0.0050 (no FE) to -0.0324 (with origin + dest FE). Most of the cross-airport variation was confounding.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtract both the individual's average and the year's average. What's left is the surprise.
+
+</details>
+</div>
+
+**8. Binned scatter plot**.
+Split the x-axis into bins. Plot the y-mean within each bin. A smoothed visualization that survives huge sample sizes where a raw scatter is a black blob.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`binscatter dep_delay air_time` over 5,000 NYC flights replaces an unreadable cloud with about 20 readable dots.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A heat-map version of a cloud of dots. You see the trend instead of the noise.
+
+</details>
+</div>
+
 ## 2. The Modeling Pipeline
 
 ```mermaid
