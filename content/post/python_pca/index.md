@@ -53,6 +53,162 @@ This tutorial builds a simplified Health Index using only two indicators --- Lif
 - Construct a composite index by projecting standardized data onto the first principal component
 - Verify manual PCA results against scikit-learn's PCA implementation
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "polarity adjustment" or "eigen-decomposition" and the term feels slippery, this is the section to re-read.
+
+**1. Polarity adjustment** $x \mapsto -x$ for "more is bad" indicators.
+Some indicators have an inverted scale: higher values mean *worse* outcomes. Multiply such indicators by -1 so that "higher is better" everywhere before combining them.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`infant_mort` is negatively coded — fewer infant deaths means better health. The raw correlation between `life_exp` and `infant_mort` is -0.9595. After multiplying `infant_mort` by -1, the correlation flips to +0.9595, and the two now point in the same direction.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Flipping the height-of-trash indicator to the negative before adding it to the cleanliness score.
+
+</details>
+</div>
+
+**2. Standardization (z-score)** $z = (x - \mu) / \sigma$.
+Subtract the mean, divide by the standard deviation. Each variable now has mean 0 and SD 1. Variables on different scales contribute equally to subsequent steps.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, raw `life_exp` lives in years (54.9-84.7) and raw `infant_mort` lives in deaths-per-1,000 (3.5-58.7). After z-scoring, both have mean 0.000000 and SD 1.000000 — directly comparable units.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Converting Celsius and Fahrenheit to the same unit before adding them.
+
+</details>
+</div>
+
+**3. Covariance matrix** $\Sigma = \frac{1}{n-1} Z^\top Z$.
+Square symmetric matrix with variances on the diagonal and covariances off the diagonal. Captures how indicators co-move.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With two standardized variables, the covariance matrix is 2×2 with 1.0000 on the diagonal and 0.9595 on the off-diagonal — the two indicators co-move strongly after polarity adjustment.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Which dance partners always move together — the covariance is how tightly they hold hands.
+
+</details>
+</div>
+
+**4. Eigen-decomposition** $\Sigma v = \lambda v$.
+Find vectors $v$ that the matrix $\Sigma$ stretches without rotating. The stretch factor is the eigenvalue $\lambda$. Solving this for the covariance matrix gives the principal components.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The eigen-decomposition of this post's 2×2 covariance matrix produces eigenvalues 1.9595 and 0.0405 with eigenvectors [0.7071, 0.7071] and [0.7071, -0.7071] — a perfect 45° decomposition.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Finding the axes a spinning top wants to rotate around — the spin "lives" along those axes.
+
+</details>
+</div>
+
+**5. Eigenvalue / eigenvector** $\lambda$, $v$.
+Each eigenvalue is the variance along its eigenvector direction. Larger eigenvalue = more important component.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the first eigenvalue is 1.9595 — almost the entire 2.0 total variance. The first eigenvector [0.7071, 0.7071] equally weights both indicators. The second component (eigenvalue 0.0405) is essentially noise.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Eigenvalue = the strength of each spin axis; eigenvector = which way the axis points.
+
+</details>
+</div>
+
+**6. Variance explained** $\lambda\_k / \sum \lambda$.
+The fraction of total variance captured by component $k$. Sums to 1 across all components.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+PC1 explains 97.97% of variance ($1.9595 / 2.0000$); PC2 explains just 2.03%. PC1 alone is enough to summarize health.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"How much of the spin lives along this axis."
+
+</details>
+</div>
+
+**7. Component score (PC1)** $s\_i = Z\_i v\_1$.
+The projection of country $i$'s standardized data onto the first eigenvector. Each country's value on the new latent axis.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the PC1 scores range from -2.3892 (worst-performing country) to +2.3734 (best-performing). The score is a single number that captures the country's overall health.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The team's combined-skills overall rating, computed by mixing all the individual stats.
+
+</details>
+</div>
+
+**8. Min-max normalization** $(s - s\_{\min}) / (s\_{\max} - s\_{\min})$.
+Rescale scores into [0, 1]. Useful for indices that policymakers expect on a 0-to-100 (or 0-to-1) scale.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post rescales the [-2.3892, +2.3734] PC1 scores to a Health Index on [0, 1]. The mean Health Index is 0.5017 — close to 0.5, as expected by symmetry.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Stretching the scoreboard so the worst is 0 and the best is 1.
+
+</details>
+</div>
+
 ## 2. The PCA pipeline
 
 Before diving into the math, it helps to see the full pipeline at a glance. Each of the six steps builds on the previous one and cannot be skipped.

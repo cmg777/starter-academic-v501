@@ -59,6 +59,162 @@ The solution is to use standard error estimators that account for the structure 
 - Assess empirical rejection rates via Monte Carlo simulation to identify which SEs correctly control size --- that is, reject the true null hypothesis no more than 5% of the time
 - Distinguish between the bias problem (which SEs cannot fix) and the inference problem (which SEs can fix)
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "Driscoll-Kraay" or "rejection rate" and the term feels slippery, this is the section to re-read.
+
+**1. Bias vs inference problem**.
+Bias: the point estimate is wrong on average ($E[\hat\beta] \ne \beta$). Inference: the standard error misstates uncertainty. SEs cannot fix bias; they only fix the inference half.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, pooled OLS gives β̂ = 1.0318 — far above the true β = 0.5. No SE choice rescues this. Switching to fixed effects (FE β̂ = 0.4829) is the only fix; the SE choice then determines whether the *t*-statistic is honest.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+SEs fix the *spread* of the dart cluster around the bullseye but cannot move the cluster.
+
+</details>
+</div>
+
+**2. Conventional (homoskedastic) SE** $\sigma^2 (X^\top X)^{-1}$.
+The textbook SE. Assumes errors are independent, identically distributed, with constant variance. Almost never appropriate in panel data.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Pooled OLS gives a conventional SE of 0.0345 in this post. The implied 95% CI is razor-thin around the (biased) β̂ = 1.0318 — fake precision because errors correlate within firms.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A ruler that assumes every dart is thrown independently.
+
+</details>
+</div>
+
+**3. White / heteroskedasticity-robust SE** sandwich form.
+Allows variance to differ across observations (heteroskedasticity) while still assuming independence. Robust to one form of misspecification.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post does not change β̂ when switching to White SEs; it only widens the SE slightly. The bigger problem is *correlation*, not unequal variances, so White SEs barely help.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A ruler that allows uneven dart sizes but still assumes solo throwers.
+
+</details>
+</div>
+
+**4. Cluster-robust SE** sandwich with cluster dummies.
+Allows arbitrary correlation *within* a cluster (typically the entity, e.g., firm). Standard in microeconomics.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Pooled entity-clustered SE in this post is 0.0621, almost twice the conventional 0.0345. Within-firm correlation between `y` and `x` averages 0.41, so single-firm observations are far from independent.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A ruler that knows darts thrown by the same player tend to cluster.
+
+</details>
+</div>
+
+**5. Two-way clustering** clusters along entity *and* time.
+Use when errors correlate within both dimensions — within firms over time *and* across firms in the same year.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the two-way clustered SE is 0.0532 — between the entity-only (0.0621) and time-only (0.0168) versions, reflecting both kinds of correlation simultaneously.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A ruler that knows darts cluster by both player *and* round.
+
+</details>
+</div>
+
+**6. Driscoll-Kraay SE** kernel in time + cross-section averaging.
+Uses a Newey-West-style time kernel after averaging across the cross-section. Robust to spatial dependence and serial correlation. Suitable when $T$ is large.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Driscoll-Kraay SE in this post is 0.0158 — narrow because $T = 10$ is small and the kernel borrows strength across firms. With more years, DK becomes the standard for macro-panel data.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A ruler that handles both dart-on-dart and round-on-round correlations.
+
+</details>
+</div>
+
+**7. Fixed effects + clustered SE** $\alpha\_i$ absorbs ability + cluster on $i$.
+The standard "right" combination for micro panel data: FE remove the bias from time-invariant confounders; cluster-robust SEs handle within-firm error correlation.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, FE β̂ = 0.4829 (very close to true 0.5) with entity-clustered SE 0.0357. The combination delivers both an unbiased point estimate and honest inference.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Throwing out each player's average miss before measuring the spread of their darts.
+
+</details>
+</div>
+
+**8. Rejection rate / coverage** $\Pr(\mathrm{reject}\, H\_0\, \text{when true})$.
+The Monte Carlo benchmark. Across many simulated datasets where $H\_0$ is true, what share does the test reject? At $\alpha = 0.05$ this should equal 5%.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Across 500 Monte Carlo runs in this post, FE+entity-clustered rejects at 6.6% — close to the nominal 5%. FE+time-clustered rejects at 9.0%, well above 5% — over-rejection due to within-firm correlation that time-clustering doesn't see.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How often the ruler falsely flags a true bullseye as a miss.
+
+</details>
+</div>
+
 ## 2. Setup and imports
 
 Before running the analysis, install the required package if needed:

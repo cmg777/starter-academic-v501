@@ -55,6 +55,162 @@ The tutorial follows a progressive approach. We start with the simplest spatial 
 - Estimate dynamic spatial models with temporal and spatiotemporal lags
 - Decompose effects into direct, indirect, and total using `impactsSDPDm()`, distinguishing short-run from long-run effects
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "spatial autoregressive coefficient" or "indirect effect" and the term feels slippery, this is the section to re-read.
+
+**1. Spatial weight matrix** $W$, $w\_{ij}$.
+An $n \times n$ matrix encoding which states are neighbours. Queen contiguity sets $w\_{ij} = 1$ if states $i$ and $j$ share an edge.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The 46-state $W$ matrix in this post has 188 non-zero entries (8.9% sparsity), with each state averaging 4.09 neighbours. Maine has just 1 neighbour; Missouri has 8.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A friendship graph between states --- who shares a fence with whom.
+
+</details>
+</div>
+
+**2. Spatial autoregressive coefficient** $\rho$.
+The strength of the spatial spillover in $y$. If $\rho > 0$, states with high-$y$ neighbours tend to have high $y$ themselves.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the SAR ρ ranges from 0.187 (two-way FE) to 0.298 (individual FE only). Cigarette consumption clusters geographically: states near heavy-smoking states smoke more themselves.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How much your neighbours' opinions shape yours.
+
+</details>
+</div>
+
+**3. Spatial Durbin Model (SDM)** $y = \rho W y + X\beta + W X \theta + u$.
+Adds spatial lags of the regressors $W X \theta$ to the SAR model. Captures both dependent-variable spillover *and* covariate spillover.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The SDM in this post includes both $\rho W \cdot$ logc *and* $W \cdot$ logp (spatial lag of price). The Bayesian comparison gives the static SDM with individual FE a posterior probability of 99.89% --- the data overwhelmingly prefer SDM over SAR.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Not just being shaped by your neighbours' smoking, but also by the prices in their stores.
+
+</details>
+</div>
+
+**4. Lee-Yu bias correction.**
+A small-sample correction for fixed-effects estimates in spatial panels. Removes the incidental-parameter bias that appears when $T$ is small.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the post-Lee-Yu SDM coefficient on `logp` is -1.003. Without LY the coefficient would be biased toward zero. The correction matters most because the panel has only 30 time periods.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A small ruler-correction when the photograph is taken from too close.
+
+</details>
+</div>
+
+**5. Dynamic spatial panel** $y\_t = \tau y\_{t-1} + \rho W y\_t + \ldots$.
+Adds a temporal lag $y\_{t-1}$ to the SAR/SDM specification. Captures both time persistence and spatial spillover.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the temporal lag is τ = 0.866 in dynamic SAR and 0.864 in dynamic SDM. Habit dominates space: τ ≈ 0.86 is far larger than ρ ≈ 0.16. Cigarette demand is persistent.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Today's smoke depends on yesterday's smoke *and* on your neighbours' smoke today.
+
+</details>
+</div>
+
+**6. Direct effect** $\partial y\_i / \partial x\_i$.
+The full effect of a change in own-state $x$ on own-state $y$, including the feedback loops $i \to j \to i$ that flow through the spatial multiplier.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the static SDM the direct price elasticity is -1.003: a 10% rise in `logp` cuts own-state cigarette consumption by 10.03% in the long run, including all neighbour-feedback effects.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The splash from your own stone in the pond, including the wave that comes back to you.
+
+</details>
+</div>
+
+**7. Indirect (spillover) effect** $\partial y\_i / \partial x\_j$, $j \ne i$.
+The effect of a change in a *neighbour's* $x$ on your own $y$. Zero in non-spatial models.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The indirect price effect in this post (the spatial lag of price W·logp) starts at 0.091 in the static SDM but rises to 0.196 in the dynamic SDM and becomes significant. Neighbour states' price changes spill over.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The wave that hits your neighbour from your splash, *not* coming back to you.
+
+</details>
+</div>
+
+**8. Long-run vs short-run multiplier** $1 / (1 - \tau)$.
+With temporal persistence, the long-run effect equals the short-run effect amplified by $1 / (1 - \tau)$. Effects compound over time.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the long-run dynamic price elasticity is -1.928, roughly $1.003 / (1 - 0.86) \approx 7.2 \times$ short-run, or about 2× the static SDM estimate. Persistence amplifies long-run policy impacts.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The full ripple after all the echoes settle.
+
+</details>
+</div>
+
 ## 2. The Modeling Pipeline
 
 The tutorial follows a six-stage pipeline, moving from data preparation through increasingly rich spatial panel models:

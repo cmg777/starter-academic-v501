@@ -72,6 +72,162 @@ Does a job training program actually cause participants to earn more, or do peop
 - Estimate causal effects using multiple methods (regression adjustment, IPW, doubly robust, propensity score stratification, propensity score matching)
 - Assess robustness of estimates using refutation tests
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "backdoor criterion" or "refutation" and the term feels slippery, this is the section to re-read.
+
+**1. Four-step framework** Model → Identify → Estimate → Refute.
+DoWhy organizes every causal analysis into four explicit steps, each answering a distinct question. Most software jumps straight from data to estimates.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, Step 1 builds a DAG with treatment, outcome, and 8 covariates. Step 2 returns "the backdoor adjustment is identified" via the graph. Step 3 yields five separate ATE estimates (\\$1,559.47–\\$1,735.69). Step 4 perturbs the data five ways to check that the estimate survives.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Build the bridge, check it stands, drive a truck across, then earthquake-test it.
+
+</details>
+</div>
+
+**2. Causal graph (DAG)** $G$ with arrows = causal claims.
+A directed acyclic graph encoding which variables cause which. Each arrow is a falsifiable assumption.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the DAG draws arrows from `age`, `education`, `married`, `re74`, `re75` (and others) to *both* treatment and outcome. These are the confounders the framework must adjust for.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A wiring diagram of the world — which switches control which lights.
+
+</details>
+</div>
+
+**3. ATE (average treatment effect)** $E[Y(1) - Y(0)]$.
+The expected effect of moving everyone from no-treatment to treatment. The estimand the four steps target.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the Lalonde sample of 445 workers, the *naive* ATE is \\$1,794.34 (training − control raw means). The doubly robust ATE is \\$1,620.04 — slightly smaller after adjusting for confounders.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The average effect on a *random* individual moved from one arm of the trial to the other.
+
+</details>
+</div>
+
+**4. Backdoor criterion** block all backdoor paths.
+A graph rule: if you condition on a set $S$ that blocks every non-causal path from treatment to outcome, the ATE is identified by adjustment for $S$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the backdoor criterion confirms that conditioning on the 8 baseline covariates is sufficient. The graph has no unblocked paths from `treatment` to `re78` other than the direct causal one.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Closing all the unlocked doors before claiming the room is sealed.
+
+</details>
+</div>
+
+**5. Propensity score** $e(\mathbf{x}) = \Pr(D = 1 \mid \mathbf{x})$.
+The probability of receiving treatment given observed covariates. Estimated by logistic regression in this post.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+A worker with `age = 25`, `education = 12`, `married = 0` might have $\hat e \approx 0.45$. A worker with `age = 50`, `re75 =` \\$25,000 might have $\hat e \approx 0.05$. Different workers face different assignment probabilities.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The probability you'd be assigned to the treatment given who you are.
+
+</details>
+</div>
+
+**6. Inverse probability weighting (IPW)** $1 / \hat e(\mathbf{x})$.
+Re-weight each observation by the inverse of its propensity score. After weighting, treated and control distributions look balanced.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The IPW estimator in this post yields ATE = \\$1,559.47, the lowest of the five estimators tried. Treated workers with very low $\hat e$ are weighted heavily and pull the estimate down.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Re-weighting a survey to make the respondents represent the population.
+
+</details>
+</div>
+
+**7. Doubly robust estimator**.
+Combines an outcome model and a propensity-score model. Consistent if *either* model is correct — two shots at identification.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Doubly robust ATE in this post is \\$1,620.04, sitting between the IPW and PS-matching estimates. Two independent modelling pipelines (outcome regression + propensity score) agree on roughly the same estimate.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Belt and suspenders.
+
+</details>
+</div>
+
+**8. Refutation test** placebo, random common cause, subset, etc.
+Stress-tests for a claimed causal estimate. Apply the same recipe to a fake treatment, a randomly added "common cause," or a random subset; the estimate should change in predictable ways.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the placebo refutation reassigns treatment randomly. The placebo ATE drops to roughly \\$62, very close to zero — exactly what should happen if the original effect was causal rather than spurious.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Applying the same recipe to fake treatments to see whether you still find an effect.
+
+</details>
+</div>
+
 ## DoWhy's four-step framework
 
 Most statistical software lets you jump straight from data to estimates, skipping the hard work of stating assumptions and testing whether the results are trustworthy. DoWhy takes a different approach: it organizes every causal analysis into four explicit steps, each answering a distinct question.
