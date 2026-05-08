@@ -132,6 +132,7 @@ For Mode B, also extract:
 Load the following reference files from `references/`:
 
 - **Always:** `latex-escaping.md`, `figure-conventions.md`, `front-matter-templates.md`
+- **If tutorial-style** (Learning objectives present, introduces new vocabulary): `key-concepts-template.md`
 - **If causal inference topic:** `causal-inference.md`
 - **Always:** `quality-checklist.md` (needed for verification step)
 
@@ -224,6 +225,7 @@ question, and the results answer it.
 |---------|---------|----------|
 | **Overview** | 1-2 paragraphs: What question are we answering? Why does this method matter? Frame as "We want to know X. Method Y can help because Z." | Yes |
 | **Learning objectives** | 3-5 bullets with strong action verbs (Understand, Implement, Estimate, Assess, Compare). Avoid vague verbs like "explore" or "see" | Yes |
+| **Key concepts** | 5-8 vocabulary terms in toggle-card format: bold term + always-visible **Definition** paragraph (short sentences) + 2-column row with collapsible **Example** card (grounded in this post's data) and **Analogy** card (familiar-domain comparison). See `references/key-concepts-template.md` for the full HTML pattern, SCSS dependency, and copy-paste block | Encouraged for tutorials introducing new vocabulary |
 | **Setup and imports** | Imports, config variables, seed, data URLs | Yes |
 | **Data loading** | Load dataset, explain structure, print shape/stats | Yes |
 | **EDA** | At least 1 figure, connected to case study question | Yes |
@@ -383,6 +385,7 @@ Read `references/latex-escaping.md` for the complete escaping guide.
 - Letter commands (`\theta`, `\hat`, `\text`, `\frac`) need no escaping
 - Currency dollar signs: use `\\$` in `index.md` (MathJax-enabled)
 - In notebook `.ipynb`: use raw LaTeX (no Goldmark escaping), `\$` for currency
+- **Constructs to AVOID** (deployed-Hugo MathJax breakage on `\text{var\_name}`, `\big|`, `\underbrace`, `\\!`, `\\;`): see `references/latex-escaping.md` § *Constructs to avoid* for symptoms and safe replacements
 
 **Equation requirements (minimum 2 display-math equations):**
 
@@ -499,6 +502,8 @@ Run through the quality checklist from `references/quality-checklist.md`.
 | Interpretations | At least 8 paragraphs with specific numeric values |
 | Figures | At least 3 figure references (`![alt](file.png)`) |
 | LaTeX escaping | All `_` in math escaped as `\_`, all `\,` as `\\,` |
+| Math AVOID list | No `\text{var\_name}`, `\text{-}`, `\big|/\Big|/\bigg|` + subscript, `\underbrace/\overbrace`, or `\\!/\\;` in display math (see `references/latex-escaping.md`) |
+| Key concepts (if present) | 5-8 concepts; each has bold term + Definition paragraph + `<div class="concept-pair">` with `<details class="concept-card concept-example">` and `<details class="concept-card concept-analogy">`; blank line after every `<summary>...</summary>` and before every `</details>` |
 | Output blocks | Use ` ```text ` language tag (not bare ` ``` `) |
 | Front matter | Complete, `toc: true`, `image.placement: 3`, date is yesterday |
 | Links | Only reference files that exist in the page bundle |

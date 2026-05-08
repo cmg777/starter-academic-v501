@@ -65,3 +65,27 @@ quantitative method.
 3. **Notation consistency.** Use the same symbol for the same concept
    throughout the entire post. Do not switch between $Y$ and $y$, or
    $D$ and $T$, without explicit explanation.
+
+## Constructs to avoid (deployed Hugo + MathJax breakage)
+
+The patterns below render correctly on local Hugo 0.84.2 but break on the
+deployed Netlify site (Hugo 0.89.4 + MathJax v3). Fixes verified empirically
+on `content/post/python_EconML/index.md`. Do not use these in new posts.
+
+| Avoid | Why it breaks | Use instead |
+|-------|---------------|-------------|
+| `\text{var\_name}` with escaped `_` inside `\text{}` | Goldmark emphasis pairing collides with the underscore even inside `\text{}` on the deployed stack; the rendered glyphs come out wrong or with stray backslashes | Pull variable names out of math into prose `code` spans. Example: write the math as `$\tau(\mathbf{x})$` and the conditioning as prose: "for a profile with `var_name = 6` and `other_var = 0.7`" |
+| `\text{-}` for non-italic dashes inside math | Same family of escaping fragility | Move the literal text into prose: "the 1-vs-0 contrast is $\widehat{\mathrm{ATE}} = 0.240$" |
+| `\big|`, `\Big|`, `\bigg|` followed by `_{...}` | Sized evaluation bars are not consistently parsed by deployed MathJax v3 when an immediate subscript follows | Use the `\left./\right.` form: `$\left.\partial\_\eta E[\psi]\right|\_{\eta=\eta\_0} = 0$` |
+| `\underbrace{...}_{...}` and `\overbrace{...}_{...}` | Brace structures with subscripted labels render unreliably on the deployed stack | Split into multiple display equations: define the labelled quantity separately first, then state the identity that uses it. Pedagogically clearer too |
+| `\\!`, `\\;` thin/negative/thick spaces in display math | The `\\` escape survives Goldmark on Hugo 0.84.2 but loses one backslash on Hugo 0.89.4, leaving literal `;` and `!` glyphs in the rendered math | Drop the cosmetic spacing entirely. If you really need spacing, prefer `\,` (which **does** survive — verified on the partial-linear-model display equations) or `\cdot` for explicit multiplication |
+
+**Important nuance.** `\\,` (thin space) is the only `\\<punctuation>`
+command empirically confirmed to survive on the deployed stack. The
+breakage is specific to `\\!` and `\\;`. Conservative recommendation:
+prefer `\,` and `\cdot` over any other backslash-punctuation cosmetic.
+
+**Diagnostic cue.** If math on Netlify looks broken but the same source
+renders fine on local Hugo, suspect one of these five. Symptoms:
+literal `$` glyphs, stray `\\` characters, missing diacritics, unsized
+bars, or labels not under their braces.

@@ -39,6 +39,18 @@ Run through every item before delivering the post.
 - [ ] Each equation has plain-language explanation and variable mapping
 - [ ] Notation consistent throughout (same symbol = same concept)
 - [ ] Currency dollar signs use `\\$` in index.md
+- [ ] None of the five AVOID-list constructs are used: `\text{var\_name}` with escaped `_`, `\text{-}`, `\big|/\Big|/\bigg|` + subscript, `\underbrace/\overbrace`, `\\!/\\;` in display math (see `latex-escaping.md` § *Constructs to avoid*)
+
+## Key Concepts (if present)
+
+- [ ] Section appears after Learning objectives, before Setup and imports
+- [ ] 5-8 concepts, each with bold term and a short-sentences definition paragraph
+- [ ] Each concept has both an Example card and an Analogy card inside `<div class="concept-pair">`
+- [ ] Cards use exactly `class="concept-card concept-example"` and `class="concept-card concept-analogy"`
+- [ ] Examples reference real variable names and numbers from this post (not hypothetical or generic)
+- [ ] Analogies use vivid familiar-domain comparisons (medicine, courtroom, photography, sports, sailing)
+- [ ] Blank line after every `<summary>...</summary>` and before every closing `</details>` (required for Goldmark to process inner content as Markdown)
+- [ ] No fragile-math constructs (AVOID list) inside any card body
 
 ## Narrative and writing
 

@@ -208,6 +208,35 @@ If the front matter `links:` section contains a Google Colab URL:
 - [ ] Badge `<img>` uses an `https://` URL
 - [ ] Badge `<a>` includes `target="_blank"`
 
+### Key concepts toggle cards (if present)
+
+If the post contains a "Key concepts" or similarly-titled section that uses
+`<div class="concept-pair">` and `<details class="concept-card ...">` blocks
+(canonical example: `content/post/python_EconML/index.md`):
+
+- [ ] Section appears after Learning objectives, before Setup and imports
+- [ ] Each concept has bold term + always-visible definition paragraph
+- [ ] Each concept has both an Example card and an Analogy card inside the
+      same `<div class="concept-pair">` wrapper
+- [ ] Cards use exactly `class="concept-card concept-example"` and
+      `class="concept-card concept-analogy"` (typos break the SCSS styling)
+- [ ] **Blank line after every `<summary>...</summary>` and before every
+      closing `</details>`** -- without these, Goldmark renders the inner
+      content as raw text including literal `$math$` delimiters. **HIGH
+      severity** if missing
+- [ ] Example body references real variable names and numbers from this
+      post (flag generic or hypothetical examples)
+- [ ] Analogy body uses a vivid familiar-domain comparison
+- [ ] Concept count is in the 5-8 range (fewer feels token; more turns
+      the section into a glossary)
+- [ ] Definition sentences are short (median ~8 words, max ~20 — flag
+      sentences over 25 words as a readability issue)
+
+If the section is missing entirely, this is **not** a defect — many posts
+do not introduce new vocabulary and should not be padded with token concepts.
+Only flag missing Key Concepts for tutorial-style posts that introduce 5+
+new terms used repeatedly in the body.
+
 ---
 
 ### Dimension 4: Code quality
@@ -294,6 +323,18 @@ Read `references/latex-escaping.md` for full Goldmark/KaTeX escaping rules.
 - [ ] **Variable mapping:** After key equations, the post should map math
       symbols to code variables (e.g. "$Y$ corresponds to the `outcome` column").
       Flag missing mappings.
+- [ ] **No fragile constructs.** The post does not use any of the five
+      patterns that render correctly on local Hugo 0.84.2 but break on
+      Netlify (Hugo 0.89.4 + MathJax v3):
+      `\text{var\_name}` with escaped `_` inside `\text{}`,
+      `\text{-}` non-italic dashes,
+      `\big|`/`\Big|`/`\bigg|` followed by `_{...}` subscripts,
+      `\underbrace{...}_{...}` and `\overbrace{...}_{...}`,
+      and `\\!`/`\\;` thin/negative/thick spaces in display math.
+      Each occurrence is **HIGH severity**. See `references/latex-escaping.md`
+      § *Constructs to avoid* for symptoms and safe replacements
+      (`\left./\right.`, splitting underbrace into separate equations,
+      dropping `\\!`/`\\;` in favor of `\,` or no spacing).
 
 If the post contains no math, mark this dimension as N/A.
 
@@ -545,6 +586,9 @@ Each dimension is scored 1-10:
 - [ ] Checked for orphaned PNGs and image freshness
 - [ ] Checked Mermaid style colors match site palette (if diagrams present)
 - [ ] Verified site conventions (em dashes, no emojis, colors)
+- [ ] Checked Key Concepts toggle-card structure (if present): blank lines around `<summary>`, both Example and Analogy cards present, real numbers in examples
+- [ ] Scanned source for the five fragile math constructs in the AVOID list (Dimension 7)
+- [ ] Confirmed blank lines after every `<summary>` and before every `</details>` in any HTML-in-Markdown block
 - [ ] All HIGH issues have full before/after rewrites
 - [ ] All issues have specific locations and actionable suggestions
 - [ ] Priority action items ranked by impact
