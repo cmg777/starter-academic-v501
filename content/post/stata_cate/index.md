@@ -92,6 +92,162 @@ flowchart TB
 
 The two branches (PO and AIPW) make different model assumptions but produce the same kind of object: a function $\hat{\tau}(x\_i)$ that returns a predicted treatment effect for every household. Postestimation commands then summarize that function in different ways — as a distribution (histogram), a function of one covariate (`iateplot`), a test (`estat heterogeneity`), a regression summary (`estat projection`), or a group-level table (GATE / GATES). All seven postestimation views answer slightly different questions, and the last three sections of this post show why a beginner should look at all of them rather than picking one favorite.
 
+### 1.3 Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "GATE vs GATES" or "doubly robust" and the term feels slippery, this is the section to re-read.
+
+**1. Potential outcomes** $Y\_i(t)$.
+The outcome unit $i$ **would** take under treatment value $t$. Each household has two potential outcomes here: assets if eligible for a 401(k), assets if not. We observe only one. The other is *counterfactual*. It lives in a world we never see.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Take household 1234 with `e401k = 1` (eligible). We observe its `assets` under eligibility. Its potential outcome under non-eligibility, $Y\_{1234}(0)$, is forever invisible. Causal inference is the art of imputing that missing potential outcome from comparable ineligible households.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Every life decision is a fork in the road. You took one fork. The parallel-universe versions of yourself took the other. Their lives are real conceptual objects, but you cannot directly observe them.
+
+</details>
+</div>
+
+**2. CATE** --- Conditional Average Treatment Effect, $\tau(\mathbf{x})$.
+The average treatment effect for households with covariate profile $\mathbf{x}$. The CATE is a **function** of $\mathbf{x}$, not a single number. Where it bends with $\mathbf{x}$, eligibility helps some households more than others.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For a high-income household (`income` in the top quintile), the CATE is roughly \\$20,511. For a low-income household, it is closer to \\$4,087. Same `e401k = 1`, very different effects on `assets`.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A drug's "average effect" is a 5-point reduction in blood pressure. But a doctor cares about a specific patient. Maybe a 65-year-old male with diabetes. The CATE is that personalized effect.
+
+</details>
+</div>
+
+**3. ATE** --- Average Treatment Effect, $E[\tau(\mathbf{X})]$.
+The CATE averaged across the entire sample. The headline policy number. It answers a single question: if we made everyone eligible, what would the average bump in `assets` be?
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+AIPW gives an ATE of \\$8,120 (95% CI [\\$5,846, \\$10,395]) on our 9,913 households. PO gives \\$7,937 (95% CI [\\$5,677, \\$10,197]). The two estimates are within \\$200. Their joint message: eligibility raises mean assets by about \\$8,000.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"This drug lowers cholesterol by 12 points on average." Single number. Suitable for a press release. Says nothing about who responds best.
+
+</details>
+</div>
+
+**4. GATE** --- Group Average Treatment Effect.
+The CATE averaged inside a *pre-specified* subgroup. The subgroup is fixed before estimation. GATEs test moderation hypotheses you formulated in advance: "do high-income households benefit more than low-income ones?"
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Sort households by `incomecat` (lowest to highest income quintile). Average CATEs inside each level. The lowest quintile gets \\$4,087. The highest gets \\$20,511. The pattern is monotone and steep.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A nationwide marketing campaign lifts sales 5% on average. Before scaling up, you ask: did it work better in cities than rural towns? Same data, broken down by a subgroup you defined in advance.
+
+</details>
+</div>
+
+**5. GATES** --- Group Average Treatment Effects via *predicted* effect quartiles.
+A *data-driven* version of GATE. Sort households by their estimated CATE $\hat{\tau}\_i$, slice into quartiles Q1--Q4, then average the actual response in each quartile. The contrast Q4-vs-Q1 is the strongest moderation signal a beginner can find without naming the moderator.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+GATES Q1 (lowest predicted effect) = \\$17,279. GATES Q4 (highest predicted effect) = \\$2,919. The top-to-bottom ratio is 5.9×. Note that GATES is sorted by *predicted* effect, so the labels feel inverted: we let the model tell us who responds.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Letting the data sort the patients for you. You do not need to know in advance whether age, gender, or kidney function matters. You ask: "based on the model, who is in the top 25% of predicted responders?" Then you check whether they actually respond more.
+
+</details>
+</div>
+
+**6. PO vs AIPW estimators**.
+Two ways to map nuisance estimates into a CATE. **PO** (Partialing Out, partial-linear model) residualizes both `assets` and `e401k` against the covariates, then regresses one residual on the other. Simple, transparent, sensitive to extreme propensity scores. **AIPW** (Augmented Inverse-Probability Weighting) reweights by inverse propensity and adds a regression correction. More machinery, but doubly robust.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post fits both. They land within \\$200 (PO \\$7,937 vs AIPW \\$8,120). When PO and AIPW are close, the model-disagreement diagnostic is green. When they diverge, the overlap is suspect or one of the nuisance models is mis-specified.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two judges hear the same case via different reasoning. When their verdicts agree, you trust the case. When they disagree, you re-read the evidence.
+
+</details>
+</div>
+
+**7. Heterogeneity test**.
+A formal $\chi^2$ test that $\tau(\mathbf{x})$ varies with $\mathbf{x}$. The null is constant treatment effects: every household responds the same way. Rejection licenses the CATE / GATE / GATES interpretation.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+After `cate`, `estat heterogeneity` returns χ²(1) = 4.11 (p = 0.043) for PO and χ²(1) = 5.54 (p = 0.019) for AIPW. Both reject the constant-effect null at conventional levels. The post's heterogeneity story has formal backing.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A metal detector for hidden moderation. It does not tell you *where* in the field the metal is buried. It only tells you whether to keep digging.
+
+</details>
+</div>
+
+**8. Doubly robust property**.
+A property of AIPW (and other DR estimators). The estimator stays consistent for the ATE if **either** the outcome model is correctly specified **or** the propensity model is correctly specified. Both right is gravy. Only one right is enough. Both wrong is the only failure mode.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This is why AIPW (\\$8,120) is given more weight in our discussion than IPW alone would be. Even if our random forests under-fit either nuisance, AIPW still recovers the truth.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Belt and suspenders. If the belt fails, the suspenders hold. If the suspenders fail, the belt holds. Two failures simultaneously? Time to buy new pants.
+
+</details>
+</div>
+
 ---
 
 ## 2. The dataset: 401(k) eligibility and household assets

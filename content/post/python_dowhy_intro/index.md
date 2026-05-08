@@ -59,6 +59,162 @@ This tutorial is inspired by the [DataCamp introduction to Causal AI using DoWhy
 - Estimate causal effects using four methods and compare them against the known truth
 - Assess robustness of estimates using automated refutation tests
 
+## Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "backdoor criterion" or "exclusion restriction" and the term feels slippery, this is the section to re-read.
+
+**1. Confounder.**
+A variable that affects both the treatment and the outcome. Confounders create a backdoor path that biases naive comparisons. Without adjustment, we cannot distinguish the treatment's effect from the confounder's effect.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In our simulated data, `introversion` and `num_children` are the two confounders. Introverts both prefer working from home AND tend to be more productive. The naive WFH-vs-office gap is 1.39 productivity points, but the true effect is only 1.0. The 0.39 gap is confounder bias.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A pair of children who both eat ice cream and both get sunburned. The ice-cream truck did not cause the sunburn. A third lurking variable — sunny weather — caused both. The confounder is that sun.
+
+</details>
+</div>
+
+**2. Causal graph (DAG).**
+A directed acyclic graph that encodes assumptions about which variables cause which others. Nodes are variables. Arrows point from cause to effect. The DAG is DoWhy's "Step 1" (Model). It is the assumption layer the rest of the analysis stands on.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this tutorial the DAG has arrows from `introversion` and `num_children` into both `work_from_home` and `productivity`, plus a direct arrow from `work_from_home` to `productivity`. That single direct arrow is the causal effect we want.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A wiring diagram for a kitchen appliance. The diagram does not tell you whether the appliance works. It tells you which wires connect to which terminals. If you trust the diagram, you can predict what happens when a wire breaks.
+
+</details>
+</div>
+
+**3. Backdoor criterion.**
+An identification rule. If a set of variables blocks every backdoor path from treatment to outcome, conditioning on that set identifies the causal effect. The set must not include descendants of the treatment.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In our DAG, conditioning on `{introversion, num_children}` blocks every backdoor path from `work_from_home` to `productivity`. That is why linear regression with those controls recovers 1.0051 — close to the truth.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two acquaintances exchange gossip through three mutual friends. To stop the gossip from reaching one acquaintance, you do not need to interview each of them. You just need to silence one person on every route. That person is the blocking set.
+
+</details>
+</div>
+
+**4. Propensity score** $e(\mathbf{x}) = P(T=1 \mid \mathbf{X}=\mathbf{x})$.
+The conditional probability of receiving the treatment, given the covariates. The propensity score summarizes everything in $\mathbf{X}$ that affects treatment assignment. It is the engine behind IPW and AIPW. We never observe it directly. We estimate it from the data.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In our data the average propensity is about 0.66 (66.2% of employees work from home). For a high-introversion employee with two children, the propensity is much higher. For an extrovert with no children, it is much lower. IPW and AIPW both rely on this estimated function.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A casino's odds that the next card is dealt face-up. We do not see the casino's algorithm. We just observe many deals and estimate the odds. Once we have them, we can reweight outcomes to undo the dealer's bias.
+
+</details>
+</div>
+
+**5. IPW** --- Inverse Probability Weighting.
+A reweighting estimator. Each observation gets weight $1/\hat{e}(\mathbf{x})$ if treated and $1/(1-\hat{e}(\mathbf{x}))$ if control. The weighted average difference estimates the ATE. IPW is consistent if the propensity model is correct. It is sensitive to extreme propensity scores (near 0 or 1).
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+IPW gives 1.0275 (SE = 0.0754) on our data. The bias is +0.0275 — half of one percent of an employee whose true effect is 1.0 productivity point. Compare with the naive 1.39: the bulk of the bias is gone.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A national poll over-samples college students. To estimate the population mean, we re-weight each student by the reciprocal of how over-represented their group is. IPW does the same thing for treatment groups.
+
+</details>
+</div>
+
+**6. Doubly robust / AIPW** --- Augmented IPW.
+Combines an outcome regression with the IPW reweight, plus a correction term. Doubly robust means the estimator stays consistent if **either** the outcome model is correct **or** the propensity model is correct. Both being right is gravy. Both being wrong is the only failure mode.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+AIPW gives 1.0115 (SE = 0.0623) on our data. Of the four estimators (linear, IPW, AIPW, IV) it has the smallest absolute bias. The double robustness explains why: even when the outcome model leaves a little structure on the table, the IPW reweight cleans it up.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Belt and suspenders. If the belt fails, the suspenders hold. If the suspenders fail, the belt holds. Both fail simultaneously? Time to buy new pants. AIPW is two failures away from a wardrobe malfunction.
+
+</details>
+</div>
+
+**7. Instrumental variable + exclusion restriction.**
+An instrumental variable $Z$ is a source of variation in the treatment that affects the outcome only through the treatment. The exclusion restriction is the assumption that $Z$ has no direct effect on $Y$ except via $T$. IV identifies a Local Average Treatment Effect (LATE), not the ATE, when effects are heterogeneous.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`subway_disruption` is the instrument here. Subway disruptions push some employees to work from home that day. The exclusion assumption says disruptions affect productivity only by changing WFH status — not directly. The 2SLS estimate is 0.8881 (SE = 0.3303). The first-stage F is 293.0, so the instrument is strong.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A coin flip you did not ask for. Some employees got "heads" (subway broke, they had to WFH) and some got "tails". The flip is random with respect to introversion and family size. Comparing across the flip's outcome isolates the WFH effect — but only for the kind of employee whose WFH choice actually changes when a subway breaks.
+
+</details>
+</div>
+
+**8. Refutation tests.**
+DoWhy's "Step 4" (Refute). Stress tests that probe the estimate's stability. Common refuters include placebo treatment (replace the real treatment with a random one and re-estimate; expect zero), random common cause (add a fake confounder; expect the estimate not to move), and data subset (re-estimate on a random subsample; expect the estimate to stay close).
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+After estimating 1.0115 with AIPW we run all three refuters. The placebo refuter returns ~0 (good). The random-common-cause refuter returns ~1.0 (good). The data-subset refuter returns ~1.0 across multiple random subsamples (good). The estimate survives.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Stress-testing a recipe. Add a teaspoon of an irrelevant ingredient — does the dish still taste right? Use half the flour — does it still rise? A recipe that survives those small perturbations is more trustworthy than one that does not.
+
+</details>
+</div>
+
 ## The problem: confounding bias
 
 Imagine a company wants to know if its work-from-home (WFH) policy improves productivity. They collect data on 5,000 employees and compare productivity between those who work from home and those who go to the office.

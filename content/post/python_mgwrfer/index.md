@@ -71,6 +71,143 @@ graph LR
 
 The key insight is at Step 3: by subtracting each unit's time-series mean, the confounder vanishes — it contributes the same amount at every time period, so the mean subtraction cancels it exactly. What remains is pure within-unit variation, driven only by the spatially varying coefficients and noise.
 
+### 1.1 Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "within-transformation" or "bandwidth selection" and the term feels slippery, this is the section to re-read.
+
+**1. Spatially varying coefficients** $\beta\_j(u\_i, v\_i)$.
+A regression coefficient that depends on location. Each unit $i$ at coordinates $(u\_i, v\_i)$ has its own slope on covariate $j$. The coefficient surface tells you where the predictor matters more or less. It is the *signal* MGWR is built to estimate.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+True $\beta\_1$ in this simulation ranges from 1.06 to 2.00 across the 15×15 grid — the effect of `x1` on `y` is roughly twice as large in some districts as in others. True $\beta\_3 = 1.5$ everywhere (a constant). True $\beta\_4 = 0$ everywhere (a null effect we hope MGWR will *not* spuriously detect).
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A weather map of barometric sensitivity. In some valleys a 1-degree drop spawns a thunderstorm. On the plains, the same drop does nothing. The map of sensitivities, not the average sensitivity, is what tells the meteorologist where to send the warning.
+
+</details>
+</div>
+
+**2. Time-invariant confounder (fixed effect)** $\alpha\_i$.
+A unit-specific shift that contributes equally at every time period. It contaminates pooled estimators because it is correlated with the covariates. Within-unit variation is its blind spot. Cross-unit variation is its playground.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In our simulation $\alpha\_i$ ranges from 2.07 to 51.55 across the 225 units. It enters the data-generating process additively, identically, in every time period for a given unit. Pooled MGWR conflates this signal with the spatially varying coefficients.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A stain printed on the negative before each exposure. Every photograph from that camera carries the same blot. Stitching three photos together does not reveal the scene; it reveals the blot.
+
+</details>
+</div>
+
+**3. Within-transformation (demeaning)** $\tilde{y}\_{it} = y\_{it} - \bar{y}\_i$.
+Subtract each unit's time-series mean from each observation. The unit-specific shift $\alpha\_i$ vanishes by construction. What remains is within-unit variation: the part of `y` that moves over time inside one unit.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Raw `y` ranges from -4.07 to 57.41 (a span of 61). Demeaned `y` ranges from -6.88 to 6.92 (a span of 14). The bulk of the original variation was *between* units; demeaning isolates the *within*-unit signal that identifies the spatially varying coefficients.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtracting the watermark from every page of a stamped manuscript. The text underneath is what you came for. Until you remove the watermark, every page looks dominated by it.
+
+</details>
+</div>
+
+**4. Multiscale GWR (MGWR)**.
+A geographically weighted regression where each covariate gets its own optimal bandwidth. Local effects vary at different scales: some predictors smooth out over large neighbourhoods, others change house-by-house. MGWR learns those scales from the data.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post MGWR fits four covariates (`x1`-`x4`). After bandwidth selection, MGWRFER assigns bandwidths [50, 91, 116, 62] — `x1` operates on tight neighbourhoods of ~50 nearest units, `x3` on broader ~116-unit windows. The pooled (naive) MGWR assigns very different bandwidths [44, 50, 175, 223] because the confounder distorts the cross-validation criterion.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A camera with one zoom lens per channel. The red channel zooms tight on a face. The blue channel pulls back to capture sky. A single fixed zoom for all channels would smear them.
+
+</details>
+</div>
+
+**5. Bandwidth selection**.
+The hyperparameter that controls kernel smoothness around each location. Cross-validation picks the bandwidth that minimizes a corrected AICc or similar criterion. When the data contain a fixed effect, the cross-validation criterion is contaminated and picks the wrong bandwidths.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Pooled MGWR assigns `x4` (a null effect) a bandwidth of 223 — implausibly wide, yet it improves pooled fit by absorbing the confounder structure. After demeaning, MGWRFER assigns `x4` a bandwidth of 62 — much closer to local truth, with a 10.2% false-positive rate (202/225 units correctly flagged non-significant).
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A focal length on a camera lens. Auto-focus picks it from what is in the viewfinder. If a smear of mist is in the way, auto-focus locks onto the smear and the actual subject blurs out.
+
+</details>
+</div>
+
+**6. Pooled (naive) estimator**.
+Treats the 675 observations as an unstructured cross-section. Ignores that 3 of every 3 observations come from the same `unit_id`. Cannot remove $\alpha\_i$. Produces biased coefficient surfaces.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Pooled MGWR returns $\beta\_1$ RMSE = 0.3945 with a coefficient correlation of only 0.4586 against the truth. It also "detects" a spatially varying $\beta\_4$ that is actually zero everywhere. The pooled estimator is the wrong baseline because it lets the confounder masquerade as signal.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Stitching three photographs of a moving subject without aligning them first. The composite looks like a triple-exposed ghost. Each photograph individually was fine; the lack of alignment ruined the panorama.
+
+</details>
+</div>
+
+**7. MGWRFER** --- MGWR after Fixed-Effects Regression.
+The proposed estimator. Apply the within-transformation first, then run MGWR on the demeaned data. The fixed effect is purged before the spatial smoother runs, so the bandwidth search and the coefficient surface are no longer contaminated.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+MGWRFER cuts $\beta\_1$ RMSE from 0.3945 to 0.1793 (a 54.6% reduction) and $\beta\_4$ RMSE from 0.2531 to 0.1399 (44.7%). The coefficient correlation with truth jumps from 0.4586 to 0.8179 for $\beta\_1$. The R² (0.8900) is *lower* than pooled (0.9771) — but pooled was inflated by absorbing the confounder.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Aligning then stitching. Subtract the watermark first, focus the camera second, then assemble the panorama. The composite is duller than the contaminated version, because the contamination was bright. But it is correct.
+
+</details>
+</div>
+
 ## 2. Setup and imports
 
 The analysis uses a [custom fork of the mgwr package](https://github.com/GeoZhipengLi/MGWPR) that extends MGWR with panel data support (the `time` parameter) and the ability to fit without an intercept (`constant=False`). We clone the repository and import directly.
