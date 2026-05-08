@@ -1087,3 +1087,81 @@ body,
   border: 1px solid rgba(0, 212, 200, 0.3);
 }
 
+/* --- 20. Toggle-card concepts (used in tutorials' "Key concepts" sections) --- */
+.concept-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0.5rem 0 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .concept-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+details.concept-card {
+  border: 1px solid rgba(20, 20, 19, 0.12);
+  border-left: 4px solid;
+  border-radius: 0.25rem;
+  padding: 0.6rem 0.9rem;
+  background: rgba(106, 155, 204, 0.04);
+  margin: 0;
+}
+
+details.concept-card.concept-example {
+  border-left-color: #00d4c8;
+}
+
+details.concept-card.concept-analogy {
+  border-left-color: #d97757;
+}
+
+details.concept-card summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #1a3a8a;
+  list-style: none;
+  padding: 0.15rem 0;
+}
+
+details.concept-card summary::-webkit-details-marker {
+  display: none;
+}
+
+details.concept-card summary::before {
+  content: "▸ ";
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
+details.concept-card[open] summary::before {
+  content: "▾ ";
+}
+
+details.concept-card[open] {
+  background: rgba(106, 155, 204, 0.07);
+}
+
+details.concept-card > *:not(summary) {
+  margin-top: 0.5rem;
+}
+
+details.concept-card p:last-child {
+  margin-bottom: 0;
+}
+
+.dark details.concept-card {
+  background: rgba(106, 155, 204, 0.08);
+  border-color: rgba(232, 236, 242, 0.2);
+}
+
+.dark details.concept-card[open] {
+  background: rgba(106, 155, 204, 0.14);
+}
+
+.dark details.concept-card summary {
+  color: #c8d0e0;
+}
+

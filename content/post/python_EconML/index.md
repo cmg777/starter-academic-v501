@@ -73,47 +73,159 @@ By the end of this tutorial, you will be able to:
 
 ### Key concepts at a glance
 
-The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below comes in three parts. First, a tight definition. Second, a worked example using our resource-curse data. Third, an analogy meant to make the role of the concept easier to remember. If a later section mentions "honest splitting" or "Neyman orthogonality" and the term feels slippery, this is the section to re-read.
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "honest splitting" or "Neyman orthogonality" and the term feels slippery, this is the section to re-read.
 
-1. **Potential outcomes** $Y\_i(t)$
-   - *Definition.* The outcome unit $i$ **would** take under treatment value $t$. Each unit has one potential outcome per treatment level. We observe only one of them: the one matching the treatment actually received. The rest are *counterfactual*. They live in worlds we never see.
-   - *Example.* Take district 47 in 2008. Four potential NTL outcomes exist for it: $Y\_{47,2008}(0)$, $Y\_{47,2008}(1)$, $Y\_{47,2008}(2)$, and $Y\_{47,2008}(3)$. They correspond to no mining, low prices, medium prices, and high prices. Only one is in the dataset. It is the one matching whatever treatment that district-year actually had. The other three are forever invisible.
-   - *Analogy.* Every life decision is a fork in the road. You took one fork. The parallel-universe versions of yourself took the other forks. Their lives are real conceptual objects. You just cannot directly observe them. Causal inference reconstructs those parallel universes. It does so by looking at people who *did* take the other forks.
+**1. Potential outcomes** $Y\_i(t)$.
+The outcome unit $i$ **would** take under treatment value $t$. Each unit has one potential outcome per treatment level. We observe only one of them: the one matching the treatment actually received. The rest are *counterfactual*. They live in worlds we never see.
 
-2. **CATE** --- Conditional Average Treatment Effect, $\tau(\mathbf{x})$
-   - *Definition.* The average treatment effect for units with covariate profile $\mathbf{x}$. The CATE is a **function** of $\mathbf{x}$, not a single number. Where the CATE bends with $\mathbf{x}$, the treatment helps some units more than others.
-   - *Example.* Take a well-governed district in our data. There, $\tau(\text{exec\\_constraints} = 6, \text{quality\\_of\\_govt} = 0.7, \ldots) \approx 0.26$. Mining lifts log-NTL by about 0.26 for that profile. Now move to the weakest-institutions case. The same function at $\text{exec\\_constraints} = 1$ gives only $\approx 0.18$. The CATE is what makes this comparison possible.
-   - *Analogy.* A drug's "average effect" might be a 5-point reduction in blood pressure. But a doctor cares about a specific patient. Maybe a 65-year-old male with diabetes. The CATE *is* that personalized effect. It takes a patient profile in. It returns the expected effect for someone like them.
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
 
-3. **GATE** --- Group Average Treatment Effect
-   - *Definition.* The CATE averaged over a *pre-specified* subgroup. The subgroup is defined by some variable $Z$. GATEs test targeted moderation hypotheses. A typical question: "does institutional quality moderate the effect of mining?"
-   - *Example.* Sort districts by `exec_constraints` (1--6). Average the per-observation CATEs inside each level. At level 1 we get $\widehat{\mathrm{GATE}} \approx 0.18$. The number climbs to $\approx 0.26$ at level 6. That climb is the moderation pattern Finding 3 reports. It is exactly what the GATE plots in this post visualize.
-   - *Analogy.* A nationwide marketing campaign might lift sales by 5% on average. Before scaling it up, the company asks a simple question: did it work better in cities than in rural towns? The GATE answers exactly that. It reports the campaign's effect *inside* each store type. It surfaces heterogeneity that the headline ATE hides.
+Take district 47 in 2008. Four potential NTL outcomes exist for it: $Y\_{47,2008}(0)$, $Y\_{47,2008}(1)$, $Y\_{47,2008}(2)$, and $Y\_{47,2008}(3)$. They correspond to no mining, low prices, medium prices, and high prices. Only one is in the dataset. It is the one matching whatever treatment that district-year actually had. The other three are forever invisible.
 
-4. **ATE** --- Average Treatment Effect
-   - *Definition.* The CATE averaged over the entire sample, $E[\tau(\mathbf{X})]$. The headline policy number. It answers a single question: if we turned the treatment on for everyone, what average effect would we see?
-   - *Example.* Take our 3,000 district-years. $\widehat{\mathrm{ATE}}(1\text{-}0) = 0.240$. On average, going from no mining to mining-at-low-prices raises log-NTL by 0.24. In unlogged NTL, that is about a 27% bump.
-   - *Analogy.* "This drug lowers cholesterol by 12 points on average." That is an ATE statement. A single number, suitable for a press release. It says nothing about whether the drug works better in some patients than others. That question belongs to GATEs and CATEs.
+</details>
 
-5. **Nuisance functions** $g\_0, m\_0$
-   - *Definition.* These are two conditional means: $g\_0(\mathbf{x}, \mathbf{w}) = E[Y \mid \mathbf{X}, \mathbf{W}]$ and $m\_0(\mathbf{x}, \mathbf{w}) = E[T \mid \mathbf{X}, \mathbf{W}]$. We call them *nuisance* because we do not care about their values. We estimate them for one reason only. That reason is to strip out the part of $Y$ and $T$ that is predictable from $(\mathbf{X}, \mathbf{W})$. What remains is the variation that identifies the causal effect.
-   - *Example.* $\hat g\_0$ is a Gradient Boosting regressor. It predicts a district's log-NTL from elevation, ruggedness, ethnic fractionalization, country, year, and so on. It *ignores* mining status. $\hat m\_0$ is a Gradient Boosting classifier. It predicts the probability of each treatment level from the same covariates. Both predictions matter only as inputs to the residualization step.
-   - *Analogy.* Astronomers photograph faint galaxies in two steps. First, they take a "dark frame" with the lens cap on. The dark frame records sensor noise. Then they subtract it from the real exposure. Nobody hangs the dark frame on their wall. It exists only to be subtracted. $g\_0$ and $m\_0$ are dark frames for confounding. Their job is to be subtracted out. That is what lets the real causal signal show through.
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
 
-6. **Cross-fitting** (sometimes "sample-splitting" or "out-of-fold prediction")
-   - *Definition.* Estimate the nuisance functions on one fold of the data. Apply them to a held-out fold. Rotate so that every observation is residualized using nuisance models that did not see it. Without this rotation, in-sample residuals come out systematically too small. That bias propagates straight into the second stage.
-   - *Example.* Setting `cv=5` in `CausalForestDML` splits the 3,000 observations into five folds of 600. The forest fits $\hat g\_0$ and $\hat m\_0$ on folds 1--4. It then residualizes fold 5 using those fitted models. The procedure rotates four more times. The end result: each district-year is residualized by nuisance models trained on a strictly disjoint sample.
-   - *Analogy.* Suppose you give a class the same problems for practice and for the final exam. Students who memorized the practice will ace the final. The score reflects memorization, not learning. Hiding the final-exam questions until grading time fixes the problem. Cross-fitting does the same trick. It hides each observation from the very nuisance model that will eventually residualize it.
+Every life decision is a fork in the road. You took one fork. The parallel-universe versions of yourself took the other forks. Their lives are real conceptual objects. You just cannot directly observe them. Causal inference reconstructs those parallel universes. It does so by looking at people who *did* take the other forks.
 
-7. **Honest splitting** (a property of an *honest causal forest*)
-   - *Definition.* A causal tree uses one random subsample to *choose* its split structure: which variable, which threshold. It uses a *separate* random subsample to *estimate* the treatment-effect value in each leaf. The split-chooser and the leaf-estimator never share data. This separation is what licenses valid confidence intervals from the forest.
-   - *Example.* Consider a single tree inside the forest. With `honest=True`, half of its bootstrap sample picks the splits. Maybe the choice is "split first on `distance_capital`, then on `exec_constraints`". The other half computes the average CATE in each resulting leaf. Those leaf-level numbers are unbiased. The reason: the splits were chosen without seeing them.
-   - *Analogy.* A jury that hears the evidence should not also write the verdict template. If the same people pick the conclusion language *and* hear the case, the verdict reflects their pre-baked preferences. It would not reflect the evidence alone. Splitting the two roles is a basic guard against motivated reasoning. Honesty does the same job inside one tree. Split-choosers and leaf-estimators are different "people". The leaf values cannot be tailored to the splits that produced them.
+</details>
+</div>
 
-8. **Neyman orthogonality**
-   - *Definition.* A property of the DML estimating equation $\psi(W; \tau, \eta)$. Here $\eta = (g\_0, m\_0)$ collects the nuisance functions. The property is $\partial\_\eta E[\psi] \big|\_{\eta=\eta\_0} = 0$. In words: at the truth, the expected estimating equation is *flat* in the nuisance functions. Small errors in $\hat g\_0$ and $\hat m\_0$ enter the second-stage estimator only at second order.
-   - *Example.* Suppose $\hat g\_0$ misses the true $g\_0$ by 10% on average. A naive plug-in two-stage procedure inherits roughly that 10% error in the causal estimate. With Neyman orthogonality, the picture changes. The same 10% nuisance error contributes only on the order of $(0.10)^2 = 0.01$ to the causal estimate. That is one percentage point --- orders of magnitude less than the input. This is why a Gradient Boosting first stage works. It converges at a slower-than-parametric rate. Even so, the second-stage estimate of $\tau$ remains $\sqrt{n}$-consistent and asymptotically normal.
-   - *Analogy.* Picture a self-righting boat. You can lean over the rail. You can slosh the cargo. You can even slip on the deck. The hull pulls itself upright every time. Stability is built into its geometry, not into never being disturbed. Neyman orthogonality is the hull design. It lets DML stay upright when the nuisance estimates wobble.
+**2. CATE** --- Conditional Average Treatment Effect, $\tau(\mathbf{x})$.
+The average treatment effect for units with covariate profile $\mathbf{x}$. The CATE is a **function** of $\mathbf{x}$, not a single number. Where the CATE bends with $\mathbf{x}$, the treatment helps some units more than others.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Take a well-governed district profile in our data: `exec_constraints = 6`, `quality_of_govt = 0.7`, and so on. For that $\mathbf{x}$ the CATE is $\tau(\mathbf{x}) \approx 0.26$. Mining lifts log-NTL by about 0.26 for that profile. Now move to the weakest-institutions case: `exec_constraints = 1`. The same function gives only $\tau(\mathbf{x}) \approx 0.18$. The CATE is what makes this comparison possible.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A drug's "average effect" might be a 5-point reduction in blood pressure. But a doctor cares about a specific patient. Maybe a 65-year-old male with diabetes. The CATE *is* that personalized effect. It takes a patient profile in. It returns the expected effect for someone like them.
+
+</details>
+</div>
+
+**3. GATE** --- Group Average Treatment Effect.
+The CATE averaged over a *pre-specified* subgroup. The subgroup is defined by some variable $Z$. GATEs test targeted moderation hypotheses. A typical question: "does institutional quality moderate the effect of mining?"
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Sort districts by `exec_constraints` (1--6). Average the per-observation CATEs inside each level. At level 1 we get $\widehat{\mathrm{GATE}} \approx 0.18$. The number climbs to $\approx 0.26$ at level 6. That climb is the moderation pattern Finding 3 reports. It is exactly what the GATE plots in this post visualize.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A nationwide marketing campaign might lift sales by 5% on average. Before scaling it up, the company asks a simple question: did it work better in cities than in rural towns? The GATE answers exactly that. It reports the campaign's effect *inside* each store type. It surfaces heterogeneity that the headline ATE hides.
+
+</details>
+</div>
+
+**4. ATE** --- Average Treatment Effect.
+The CATE averaged over the entire sample, $E[\tau(\mathbf{X})]$. The headline policy number. It answers a single question: if we turned the treatment on for everyone, what average effect would we see?
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Take our 3,000 district-years. The estimated ATE for the 1-vs-0 contrast (mining at low prices vs. no mining) is $\widehat{\mathrm{ATE}} = 0.240$. On average, mining-at-low-prices raises log-NTL by 0.24. In unlogged NTL, that is about a 27% bump.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"This drug lowers cholesterol by 12 points on average." That is an ATE statement. A single number, suitable for a press release. It says nothing about whether the drug works better in some patients than others. That question belongs to GATEs and CATEs.
+
+</details>
+</div>
+
+**5. Nuisance functions** $g\_0, m\_0$.
+These are two conditional means: $g\_0(\mathbf{x}, \mathbf{w}) = E[Y \mid \mathbf{X}, \mathbf{W}]$ and $m\_0(\mathbf{x}, \mathbf{w}) = E[T \mid \mathbf{X}, \mathbf{W}]$. We call them *nuisance* because we do not care about their values. We estimate them for one reason only. That reason is to strip out the part of $Y$ and $T$ that is predictable from $(\mathbf{X}, \mathbf{W})$. What remains is the variation that identifies the causal effect.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+$\hat g\_0$ is a Gradient Boosting regressor. It predicts a district's log-NTL from elevation, ruggedness, ethnic fractionalization, country, year, and so on. It *ignores* mining status. $\hat m\_0$ is a Gradient Boosting classifier. It predicts the probability of each treatment level from the same covariates. Both predictions matter only as inputs to the residualization step.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Astronomers photograph faint galaxies in two steps. First, they take a "dark frame" with the lens cap on. The dark frame records sensor noise. Then they subtract it from the real exposure. Nobody hangs the dark frame on their wall. It exists only to be subtracted. $g\_0$ and $m\_0$ are dark frames for confounding. Their job is to be subtracted out. That is what lets the real causal signal show through.
+
+</details>
+</div>
+
+**6. Cross-fitting** (sometimes "sample-splitting" or "out-of-fold prediction").
+Estimate the nuisance functions on one fold of the data. Apply them to a held-out fold. Rotate so that every observation is residualized using nuisance models that did not see it. Without this rotation, in-sample residuals come out systematically too small. That bias propagates straight into the second stage.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Setting `cv=5` in `CausalForestDML` splits the 3,000 observations into five folds of 600. The forest fits $\hat g\_0$ and $\hat m\_0$ on folds 1--4. It then residualizes fold 5 using those fitted models. The procedure rotates four more times. The end result: each district-year is residualized by nuisance models trained on a strictly disjoint sample.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Suppose you give a class the same problems for practice and for the final exam. Students who memorized the practice will ace the final. The score reflects memorization, not learning. Hiding the final-exam questions until grading time fixes the problem. Cross-fitting does the same trick. It hides each observation from the very nuisance model that will eventually residualize it.
+
+</details>
+</div>
+
+**7. Honest splitting** (a property of an *honest causal forest*).
+A causal tree uses one random subsample to *choose* its split structure: which variable, which threshold. It uses a *separate* random subsample to *estimate* the treatment-effect value in each leaf. The split-chooser and the leaf-estimator never share data. This separation is what licenses valid confidence intervals from the forest.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Consider a single tree inside the forest. With `honest=True`, half of its bootstrap sample picks the splits. Maybe the choice is "split first on `distance_capital`, then on `exec_constraints`". The other half computes the average CATE in each resulting leaf. Those leaf-level numbers are unbiased. The reason: the splits were chosen without seeing them.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A jury that hears the evidence should not also write the verdict template. If the same people pick the conclusion language *and* hear the case, the verdict reflects their pre-baked preferences. It would not reflect the evidence alone. Splitting the two roles is a basic guard against motivated reasoning. Honesty does the same job inside one tree. Split-choosers and leaf-estimators are different "people". The leaf values cannot be tailored to the splits that produced them.
+
+</details>
+</div>
+
+**8. Neyman orthogonality.**
+A property of the DML estimating equation $\psi(W; \tau, \eta)$. Here $\eta = (g\_0, m\_0)$ collects the nuisance functions. The property is $\left.\partial\_\eta E[\psi]\right|\_{\eta=\eta\_0} = 0$. In words: at the truth, the expected estimating equation is *flat* in the nuisance functions. Small errors in $\hat g\_0$ and $\hat m\_0$ enter the second-stage estimator only at second order.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Suppose $\hat g\_0$ misses the true $g\_0$ by 10% on average. A naive plug-in two-stage procedure inherits roughly that 10% error in the causal estimate. With Neyman orthogonality, the picture changes. The same 10% nuisance error contributes only on the order of $(0.10)^2 = 0.01$ to the causal estimate. That is one percentage point --- orders of magnitude less than the input. This is why a Gradient Boosting first stage works. It converges at a slower-than-parametric rate. Even so, the second-stage estimate of $\tau$ remains $\sqrt{n}$-consistent and asymptotically normal.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Picture a self-righting boat. You can lean over the rail. You can slosh the cargo. You can even slip on the deck. The hull pulls itself upright every time. Stability is built into its geometry, not into never being disturbed. Neyman orthogonality is the hull design. It lets DML stay upright when the nuisance estimates wobble.
+
+</details>
+</div>
 
 
 ## The DML Causal Forest
@@ -144,9 +256,13 @@ The functions $g\_0$ and $m\_0$ are called **nuisance functions** because we do 
 
 #### Why two stages? The residualization argument
 
-Subtract $E[Y\_i \mid \mathbf{X}, \mathbf{W}] = \tau(\mathbf{X}\_i) \\, m\_0(\mathbf{X}\_i, \mathbf{W}\_i) + g\_0(\mathbf{X}\_i, \mathbf{W}\_i)$ from the outcome equation. The $g\_0$ terms cancel, and after a line of algebra,
+Subtract $E[Y\_i \mid \mathbf{X}, \mathbf{W}] = \tau(\mathbf{X}\_i) \\, m\_0(\mathbf{X}\_i, \mathbf{W}\_i) + g\_0(\mathbf{X}\_i, \mathbf{W}\_i)$ from the outcome equation. The $g\_0$ terms cancel, and after a line of algebra. Define the residualized outcome and treatment as
 
-$$\underbrace{Y\_i - E[Y\_i \mid \mathbf{X}, \mathbf{W}]}\_{\tilde Y\_i} = \tau(\mathbf{X}\_i) \cdot \underbrace{(T\_i - m\_0(\mathbf{X}\_i, \mathbf{W}\_i))}\_{\tilde T\_i} + \varepsilon\_i.$$
+$$\tilde Y\_i = Y\_i - E[Y\_i \mid \mathbf{X}, \mathbf{W}], \qquad \tilde T\_i = T\_i - m\_0(\mathbf{X}\_i, \mathbf{W}\_i).$$
+
+Plugging these residuals into the partial linear model yields:
+
+$$\tilde Y\_i = \tau(\mathbf{X}\_i) \cdot \tilde T\_i + \varepsilon\_i.$$
 
 So if we (a) estimate $g\_0$ and $m\_0$ in a *first stage* with any flexible learner, (b) residualize both $Y$ and $T$, and (c) regress $\tilde Y$ on $\tilde T$ with covariate-dependent slope, that slope at point $\mathbf{x}$ recovers $\tau(\mathbf{x})$. This is exactly the **Frisch--Waugh--Lovell** logic --- if you have not seen FWL before, the [tutorial on the Frisch--Waugh--Lovell theorem](/post/python_fwl/) walks through the linear case in detail.
 
@@ -434,7 +550,7 @@ $$\widehat{\mathrm{GATE}}\_g = \frac{1}{n\_g} \sum\_{i \in g} \widehat\tau(\math
 
 If we treat the $\widehat\tau(\mathbf{X}\_i)$ as approximately uncorrelated within the group --- a working assumption, since EconML's BLB does not return their full covariance matrix --- the variance of their average is
 
-$$\mathrm{Var}\\!\left(\widehat{\mathrm{GATE}}\_g\right) \\;\approx\\; \frac{1}{n\_g^2} \sum\_{i \in g} \mathrm{Var}\\!\left(\widehat\tau(\mathbf{X}\_i)\right) \\;=\\; \frac{1}{n\_g} \cdot \overline{\mathrm{SE}\_i^2}.$$
+$$\mathrm{Var}\left(\widehat{\mathrm{GATE}}\_g\right) \approx \frac{1}{n\_g^2} \sum\_{i \in g} \mathrm{Var}\left(\widehat\tau(\mathbf{X}\_i)\right) = \frac{1}{n\_g} \cdot \overline{\mathrm{SE}\_i^2}.$$
 
 Taking the square root gives the formula in the code: `sqrt(mean(se_i^2) / n_g)`. The CIs we report are point $\pm 1.645 \cdot \widehat{\mathrm{SE}}$ for a 90% level. Two caveats are worth flagging up front: (i) the within-group independence assumption probably understates the SE in panel data where the same district appears multiple times in the same group, and (ii) this SE captures estimation uncertainty in the CATE function only, not sampling variability of the subgroup composition. As with the ATE, the headline qualitative pattern survives at 95% intervals.
 
