@@ -87,6 +87,162 @@ flowchart TD
 
 The diagram makes the central trade-off visible. Estimators on the left side (POLS, Between, RE) lean on cross-sectional variation — they answer "how do union and non-union workers compare?" Estimators on the right (FE, FDFE, DVFE, TWFE) lean on within-worker variation — they answer "what happens when *the same worker* switches union status?" CRE/Mundlak sits in the middle and provides a single specification that recovers both. The Hausman test and the Mundlak term are formal tests for choosing between FE and RE; we will run both and they will agree.
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "within transformation" or "Hausman test" and the term feels slippery, this is the section to re-read.
+
+**1. Pooled OLS (POLS).**
+Run ordinary OLS on the entire panel as if the rows were independent observations. Ignores that some rows come from the same worker. Naive baseline. Useful as the worst-case benchmark every panel estimator should beat.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+POLS on this dataset returns a `union` coefficient of 0.0750 log points (SE 0.0231). Statistically significant, but well below the within-worker estimate. The gap is the bias from selection on time-invariant traits like `schooling` and `gender`.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Lump every observation together, ignore who's whose. Like averaging a class's grades without realising some students took the exam twice. The repeats inflate the sample and obscure the right comparison.
+
+</details>
+</div>
+
+**2. Between vs within variation.**
+Variance of any panel variable splits into a *between* part (across units) and a *within* part (over time, inside one unit). The decomposition tells you what kind of variation each estimator can leverage.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For `union` in this dataset, 93.9% of the variance is *between* workers (some are unionised, others are not) and only 9.1% is *within* workers (some workers actually change union status across the two periods). FE relies on the 9.1%.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Comparing different people vs comparing the same person to themselves. The 93.9% is "Alice vs Bob"; the 9.1% is "Alice last year vs Alice this year." Different questions; different answers.
+
+</details>
+</div>
+
+**3. Within transformation** $\tilde{y}\_{it} = y\_{it} - \bar{y}\_i$.
+Subtract each unit's time-series mean from each observation. The unit-specific intercept $\alpha\_i$ vanishes by construction. What remains is within-unit variation: the part of $y$ that moves over time inside one worker.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+After demeaning, `union` for Alice (always-union, mean 1) becomes 0 in both periods — she contributes nothing to FE. Bob (changed status) keeps signal. FE is identified entirely off workers like Bob.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtracting the watermark from every page. The text underneath is what we came for. Pre-demeaning, every page is dominated by the watermark.
+
+</details>
+</div>
+
+**4. First differences (FD/FDFE)** $\Delta y\_{it}$.
+Subtracting yesterday from today. Removes $\alpha\_i$ via differencing rather than demeaning. With $T = 2$, FD and within transformation give numerically identical estimates. With $T > 2$, they can diverge.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+FDFE on this two-period panel returns 0.2113 (SE 0.0792). FE returns 0.2103. The two are within 0.001 of each other — exactly what theory predicts when $T = 2$.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtracting yesterday from today vs subtracting your average from today. With only two days, the two operations agree. With ten days, they diverge — but the question they answer (within-unit change) is the same.
+
+</details>
+</div>
+
+**5. Fixed effects (FE).**
+The cleanest within-comparison. Estimate $\alpha\_i$ explicitly (or absorb them) and let only the within-unit variation in $x$ identify $\beta$. Equivalent to running OLS on the demeaned data.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+FE returns a `union` coefficient of 0.2103 — almost three times POLS. The within-worker effect of joining a union is ~0.21 log points (≈ 23% in level). The selection bias hidden in POLS was pulling the estimate toward zero.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Comparing Alice 2018 to Alice 2020. Same person, same `schooling`, same `gender`. The only thing that changed is whether she joined the union. That comparison is what FE buys.
+
+</details>
+</div>
+
+**6. Two-Way FE (TWFE).**
+FE that absorbs both unit effects $\alpha\_i$ and time effects $\delta\_t$. Removes calendar-year shocks (recession, policy change) along with unit-specific shifts. Standard for short panels with macro shocks.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+TWFE returns 0.2129 (SE 0.0793) — almost identical to one-way FE because the time effect is small with $T = 2$. With more periods or a stronger macro shock, TWFE can diverge from FE meaningfully.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Wiping the negative twice. First pass removes the watermark printed on every page (unit FE). Second pass removes the smudge on the entire stack from a particular printing run (time FE).
+
+</details>
+</div>
+
+**7. Random effects (RE).**
+Treats $\alpha\_i$ as a random draw uncorrelated with the regressors. Uses GLS to combine within and between variation efficiently. More efficient than FE *if* the no-correlation assumption holds; biased if it does not.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+RE returns 0.1092 (SE 0.0299). Halfway between POLS (0.0750) and FE (0.2103). The Hausman test below tests whether RE's no-correlation assumption is OK here.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Trusting that worker-specific traits are random noise. If true, you can use both kinds of variation efficiently. If false (motivation correlates with union choice), you bias the estimate by treating systematic difference as random.
+
+</details>
+</div>
+
+**8. Mundlak / CRE.**
+Add the unit-mean of every time-varying regressor as an extra control. The within coefficient on the original variable is now identified the same way FE identifies it. The unit-mean coefficient tests for correlation between $\alpha\_i$ and $x$ — the very thing the Hausman test is testing.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The CRE specification returns a within coefficient of 0.2103 (matching FE exactly). The Mundlak term `union_bar` has coefficient -0.1441 with p = 0.0717. The Hausman test (H = 1.7941, p = 0.1804) does not reject RE at the 5% level. The two tests agree.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A peace treaty between FE and RE. CRE gives you FE's robustness *and* RE's framework in one regression. The Mundlak term is the diplomatic clause — it absorbs whatever correlation between unit traits and treatment status would otherwise push the two estimators apart.
+
+</details>
+</div>
+
 ## 2. Setup and imports
 
 We use [`pyfixest`](https://pyfixest.org/) for OLS and absorbed fixed effects, [`linearmodels`](https://bashtage.github.io/linearmodels/panel/introduction.html) for the random-effects GLS estimator, and `scipy.stats.chi2` for the Hausman test critical value. The standard `pandas` / `numpy` / `matplotlib` stack handles data and figures.

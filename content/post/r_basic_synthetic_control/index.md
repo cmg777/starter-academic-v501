@@ -82,6 +82,143 @@ flowchart TD
 
 In words: the algorithm has two nested optimization problems. The inner problem finds the donor weights $W$ that best match the treated unit's pre-treatment predictors. The outer problem finds the predictor weights $V$ that, when fed back into the inner problem, produce the lowest pre-treatment outcome error. The dashed-border node represents the unobserved counterfactual --- the GDP path the Basque Country would have followed without conflict, which we estimate but never actually see. The result is a synthetic counterfactual whose pre-period fits the data tightly, so any post-period divergence is informative about the treatment.
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "donor weights" or "placebo falsification" and the term feels slippery, this is the section to re-read.
+
+**1. Synthetic control method.**
+A weighted average of donor (untreated) units, designed to reproduce the treated unit's pre-treatment characteristics. The post-treatment trajectory of the synthetic counterfactual is the missing potential outcome. Originated by Abadie and Gardeazabal (2003).
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+We construct a "Synthetic Basque" from a weighted combination of the 16 other Spanish regions. The weights are picked so that pre-1970 `gdpcap` and the 13 predictors match the real Basque Country as closely as possible. After 1970, the synthetic continues without conflict; the gap to the real Basque Country is the ATT.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Building a sock-puppet twin. We assemble a stand-in for the treated unit out of pieces of the donor units. The stand-in's pre-treatment behaviour mimics the treated unit's. After treatment, the stand-in tells us what would have happened.
+
+</details>
+</div>
+
+**2. Donor pool.**
+The set of untreated units from which the synthetic control is built. Must include units that did not experience the treatment and are otherwise comparable. Excludes the treated unit and any spillover-affected unit.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This study's donor pool is 16 Spanish regions excluding the Basque Country. The pool intentionally drops Madrid and Catalonia from some specifications to test sensitivity, but the headline analysis includes both.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The casting list for an audition. The role goes to a weighted blend of candidates. The casting director draws only from people who do not have the trait being studied --- they have to play the *counterfactual*.
+
+</details>
+</div>
+
+**3. Donor weights** $W$ (convex combination).
+Non-negative weights that sum to 1, picking how much of each donor enters the synthetic. Found by inner-loop optimization: minimize the weighted distance between the treated unit's predictor vector and the donor units' predictor vectors.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The optimal weights for Synthetic Basque are dominated by Catalonia (0.851) and Madrid (0.149). All other regions get weight zero. The synthetic is essentially "85% Catalonia + 15% Madrid."
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Recipe proportions. To bake a synthetic Basque you need 85% Catalonia flour and 15% Madrid sugar. No other ingredients matter. The proportions add to 100%.
+
+</details>
+</div>
+
+**4. Predictor weights** $V$.
+A diagonal matrix of weights on the predictor variables. Lets some predictors matter more than others when the algorithm picks $W$. Found by outer-loop optimization: minimize pre-treatment outcome error after the inner-loop $W$ is computed.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This implementation lets `Synth` pick $V$ via cross-validation on pre-1970 GDP. The result is a low pre-treatment fit value of 0.0089 --- the Synthetic Basque tracks the real Basque pre-treatment GDP almost perfectly.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Which ingredients matter. Two cooks can pick the same recipe proportions but disagree on which ingredients are critical. $V$ tells the algorithm "match the saffron exactly; the salt can be approximate."
+
+</details>
+</div>
+
+**5. Pre-treatment fit / MSPE.**
+Mean Squared Prediction Error of the synthetic on the pre-treatment outcomes. Low MSPE means the synthetic mimics the treated unit closely *before* treatment, which is necessary for the post-treatment gap to be interpreted as causal.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The Synthetic Basque has a pre-1970 MSPE of essentially zero on `gdpcap`. The Catalonia placebo has a pre-1970 MSPE of 0.006043 --- small but not perfect. The placebo gets a much larger post-1970 MSPE (0.391), which is precisely how the placebo test works.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How convincing the sock puppet is *before* the moment of divergence. If puppet and original do the same gestures pre-treatment, the audience trusts the divergence post-treatment. If the puppet is already off-model pre-treatment, the divergence proves nothing.
+
+</details>
+</div>
+
+**6. ATT (gap)** $\widehat{\mathrm{ATT}}\_t = Y\_{1t} - \hat{Y}\_{1t}^N$.
+The post-treatment difference between the treated unit's actual outcome and its synthetic counterfactual. The headline causal estimate. Reported either year-by-year or averaged over a horizon.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The 1970–1997 average ATT for the Basque Country is -0.580 thousand USD per capita. The largest single-year gap is -1.036 thousand USD in 1989. Conflict cost the Basque Country roughly \\$580 per capita per year on average over the post-treatment horizon.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The moment the puppet breaks character. Pre-treatment, puppet and original move identically. Post-treatment, the puppet keeps following the script of "no conflict" while the original veers off. The gap *is* the divergence.
+
+</details>
+</div>
+
+**7. Placebo / falsification.**
+Run the synthetic control on a unit that did *not* experience the treatment. If the placebo unit produces a post-period gap as large as the treated unit's, the original gap was probably noise. Pseudo p-values count placebos with larger gaps.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Running the algorithm on Catalonia (a never-treated donor) gives a post-1970 MSPE of 0.391 --- much smaller than the Basque Country's gap. The trimmed placebo rank places the Basque Country at 2nd of 8 in gap magnitude (pseudo p = 0.250). The result is suggestive but not extreme.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Does the trick work on people who weren't actually treated? If your "miracle drug" cures fake patients too, the cure was placebo. The synthetic placebo test runs the same algorithm on a region that never had conflict to see whether the gap appears spuriously.
+
+</details>
+</div>
+
 ## 2. Setup
 
 ```r

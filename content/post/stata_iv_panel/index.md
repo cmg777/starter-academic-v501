@@ -65,6 +65,162 @@ We will walk through the complete IV estimation workflow in Stata --- from descr
 - Compare OLS and 2SLS estimates and explain the attenuation bias from measurement error
 - Visualize first-stage relationships with binned scatter plots
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "exclusion restriction" or "Stock-Yogo" and the term feels slippery, this is the section to re-read.
+
+**1. Endogeneity.**
+A regressor is *endogenous* if it correlates with the error term. The OLS slope is then a contaminated mix of the causal effect and the bias from omitted confounders, simultaneity, or measurement error. Endogeneity is the headline reason simple regressions can mislead.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post `llnlight01` (lagged nighttime light intensity, the proxy for local economic activity) is endogenous in the conflict regression. Conflict suppresses light AND light measures activity that conflict reflects — reverse causality plus measurement error. OLS returns 0.001 (p = 0.50). The IV estimate flips sign and grows.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A contaminated thermometer. The thermometer has two sources of contamination: it is held by the patient (reverse causality) and it is corroded (measurement error). Reading off the temperature gives nonsense.
+
+</details>
+</div>
+
+**2. Instrumental variable** $Z$.
+An external variable that drives variation in the endogenous regressor without belonging in the outcome equation. Two requirements: $Z$ must predict the regressor (relevance) and $Z$ must affect $Y$ only through the regressor (exclusion).
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post uses two instruments for `llnlight01`: lagged log rainfall (`l2lnrain01`) and lagged Palmer Drought Severity Index (`l2meanpdsi`). Weather is plausibly exogenous to current conflict, but it shifts agricultural output and hence economic activity (light).
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A clean thermometer that the contamination cannot reach. The instrument lives outside the contaminated system. Its readings on the regressor are clean. We use them to back out the temperature.
+
+</details>
+</div>
+
+**3. Relevance and the first stage.**
+The first stage is the regression of the endogenous regressor on the instruments and controls. *Relevance* is the requirement that the instruments significantly predict the regressor in the first stage. The first-stage F-statistic measures instrument strength.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+First-stage F is 24.62 with rainfall alone, 40.33 with drought alone, and high in the joint specification. Both single-instrument F-stats clear the conventional weak-instrument threshold of 10 by a wide margin.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The clean thermometer has to be sensitive enough. A thermometer that barely moves is useless. The first-stage F is the calibration test: does the clean thermometer respond strongly to the underlying signal?
+
+</details>
+</div>
+
+**4. Exclusion restriction.**
+The assumption that the instrument $Z$ affects the outcome $Y$ only through the endogenous regressor. No direct effect of $Z$ on $Y$. The exclusion restriction is the most contested part of any IV design — it is fundamentally untestable when there is exactly one instrument.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For rainfall to be a valid instrument, lagged rainfall must affect conflict only through its effect on local economic activity. Direct effects (e.g. rain washing out a battlefield) would violate exclusion. The post discusses why African settings make this assumption defensible.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The clean thermometer is not also being heated by something else. If a hidden flame is warming the thermometer directly, its reading no longer maps cleanly to the patient's temperature. Exclusion is "no other heat source on the instrument."
+
+</details>
+</div>
+
+**5. Stock-Yogo weak-IV test.**
+A formal test for weak instruments. The test compares the first-stage F-statistic against a critical value chosen to bound the bias of 2SLS at, e.g., 10% of OLS bias. With one endogenous regressor and one instrument, the rule-of-thumb critical value is 16.38 for the 10% maximal IV size criterion.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post compares F = 24.62 (rainfall) and F = 40.33 (drought) against the Stock-Yogo critical value of 16.38. Both clear the bar comfortably. The instruments are not weak.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How sensitive does the thermometer have to be before its reading is trustworthy? Stock-Yogo gives the answer in numbers. Below the threshold, even a "significant" first stage produces unreliable IV estimates.
+
+</details>
+</div>
+
+**6. 2SLS** --- Two-Stage Least Squares.
+The standard IV estimator. Stage 1: regress the endogenous variable on instruments and controls; obtain fitted values. Stage 2: regress the outcome on the fitted endogenous variable and controls. The second-stage slope is the IV estimate of the causal effect.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+All four IV columns in this post use 2SLS via Stata's `xtivreg2`. The headline 2SLS estimate using both instruments is -0.296 (SE 0.076, p < 0.01). A one-unit increase in log nighttime light intensity reduces the conflict probability by ~0.30 percentage points.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Take two readings and combine. Stage 1 calibrates the clean thermometer to the contaminated one. Stage 2 reads off the patient's temperature using the calibrated mapping. Two careful steps replace one careless one.
+
+</details>
+</div>
+
+**7. Hansen J overidentification test.**
+A joint test of instrument validity when there are *more* instruments than endogenous regressors. The J-statistic checks whether the multiple instruments give consistent answers; failing the test signals at least one instrument is invalid (likely violating exclusion).
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With two instruments (rainfall, drought) and one endogenous regressor (`llnlight01`), the system is overidentified by one degree. The Hansen J p-value is 0.932 — far from rejection. The two instruments tell the same story. Joint validity is plausible.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Compare two clean thermometers. If both report the same temperature, you trust the reading more. If they disagree wildly, at least one is broken — but you don't know which. The Hansen test is "do the clean thermometers agree?"
+
+</details>
+</div>
+
+**8. Attenuation bias.**
+Classical measurement error in a regressor produces *downward* bias toward zero in OLS. The slope is shrunk by the noise-to-signal ratio. IV with a clean instrument removes the bias and typically returns a *larger* estimate (in absolute value).
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+OLS on this dataset returns 0.001 (essentially zero). 2SLS returns -0.296 to -0.303 — two orders of magnitude larger and with the opposite sign. The OLS estimate was a small, contaminated reading; the IV estimates are the clean signal.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The contaminated thermometer reads 37.0°C when the patient is at 38.5°C. The contamination shrinks the deviation toward the average. IV cleans the contamination and reveals the larger underlying difference.
+
+</details>
+</div>
+
 ---
 
 ## 2. The endogeneity problem

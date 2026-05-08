@@ -105,6 +105,162 @@ graph TD
 
 The four GMM models are nested: Model 1 contains only war and coup variables, and each subsequent model adds an institutional control (economic freedom, political freedom, or both). This nesting lets us see how the war effect is mediated by institutions --- a question Models 1 through 4 answer collectively but no single model can answer alone.
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "Nickell bias" or "internal lag instruments" and the term feels slippery, this is the section to re-read.
+
+**1. Dynamic panel data** $y\_{i,t} = \rho y\_{i,t-1} + \beta x\_{i,t} + \alpha\_i + \varepsilon\_{i,t}$.
+A panel regression with the lagged dependent variable on the right-hand side. The lag captures inertia: today's outcome depends on yesterday's. The lag also creates a hard identification problem under fixed effects.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the model regresses `lnGDPpercapita` on its own lag plus `War`, `Coup`, and institutional controls. The estimated lagged-GDP coefficient is 0.679 --- there is strong inertia in income. A war today moves income today, but yesterday's income also predicts today's.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Today's mood depends on yesterday's mood, plus whatever happened today. The lag is the part of today that is just a hangover from before. Without modeling the lag we mistake hangover for response.
+
+</details>
+</div>
+
+**2. Nickell bias.**
+The downward bias of the lagged-DV coefficient when fixed effects are applied to short panels. Within-demeaning correlates the lagged regressor with the demeaned error. The bias goes to zero only as the panel length $T$ grows.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With $T \approx 10$ in this dataset of 1,187 country-years across 155 countries, plain FE on `lnGDPpercapita` would underestimate the lag coefficient by a sizeable amount. Difference GMM is the standard fix; the post's design uses Arellano-Bond precisely because Nickell bias is a known problem at this $T$.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A watermark printed on every photo from one camera. In short panels, the within-demeaning step bakes the watermark into the regression. The longer you take pictures, the smaller the watermark gets --- but with only 10 frames it is still visible.
+
+</details>
+</div>
+
+**3. First-differencing** $\Delta y\_{i,t} = y\_{i,t} - y\_{i,t-1}$.
+Subtracting each unit's previous observation from the current one. The unit-specific fixed effect $\alpha\_i$ vanishes by construction. What remains is within-unit variation. The differenced equation is the launching pad for difference GMM.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+After differencing, the estimating equation is in changes, not levels. The country-specific shift (geography, deeply rooted institutions) drops out. Only the contemporaneous *changes* in `War`, `Coup`, and `lnGDPpercapita` remain.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtracting yesterday from today. The persistent stuff cancels. What's left is what changed.
+
+</details>
+</div>
+
+**4. Internal lag instruments.**
+After differencing, the lagged DV in differences is mechanically correlated with the differenced error. The fix is to use *deeper lags* of the level variables as instruments. In our notation, $y\_{i,t-2}, y\_{i,t-3}, \ldots$ instrument $\Delta y\_{i,t-1}$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Stata's `xtabond2` with `gmm(L.lnGDPpercapita, lag(2 6))` constructs lag-2 to lag-6 of `lnGDPpercapita` as instruments for the differenced lag. The instrument set grows quickly with $T$; the post discusses how to keep it manageable.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Using last week's weather to predict this week's. You cannot use today's weather (it's contemporaneous), but week-old weather is plausibly exogenous to today's mood and predictive of yesterday's weather.
+
+</details>
+</div>
+
+**5. Arellano-Bond difference GMM.**
+The estimator that combines first-differencing with internal lag instruments. Generalized Method of Moments fits the moment conditions $E[Z\_{i,t}' \Delta \varepsilon\_{i,t}] = 0$ where $Z$ is the matrix of lag instruments. Stata implements it as `xtabond2`.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+All four models in the post use Arellano-Bond difference GMM. The headline result is the War coefficient on `lnGDPpercapita`: **-0.219 log points** in Model 1 (95% CI [-0.330, -0.107], t = -3.84, p < 0.001), attenuated to -0.160 in Model 4 once institutional controls (`EconFreeLag`, `PolitFreeLag`) absorb part of the effect.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A belt and suspenders approach. The belt (first-differencing) removes time-invariant confounders. The suspenders (lag instruments) handle the lagged-DV endogeneity. Together they hold up where either alone would slip.
+
+</details>
+</div>
+
+**6. Long-run cumulative effect** $\sum\_{s=0}^\infty \beta\_s$.
+The total integrated impact of a permanent shock. Computed from the contemporaneous coefficient plus all the lagged coefficients, divided by $(1 - \rho)$ to account for the AR(1) decay.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The contemporaneous War effect in Model 1 is -0.219 and the lagged-GDP coefficient is 0.679, so the long-run cumulative effect is $-0.219 / (1 - 0.679) \approx -0.353$ log points. A permanent one-unit increase in `War` eventually reduces income by 35 log points (≈ 30% in level). In Model 4 the long-run effect shrinks to -0.166. The contemporaneous Coup effect in Model 1 is -0.091.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+An impulse response that does not fade. The contemporaneous reading is the first ripple; the long-run cumulative reading is the entire wake. We add up all the future ripples to get the total displacement.
+
+</details>
+</div>
+
+**7. AR(2) test.**
+A diagnostic for difference GMM. Tests whether the *differenced* errors $\Delta \varepsilon\_{i,t}$ have second-order serial correlation. By construction $\Delta \varepsilon$ has *first*-order correlation; second-order correlation would suggest the level error has lag-1 serial correlation, which would invalidate the GMM moment conditions.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post's Model 1 reports an **AR(2) p-value of 0.091**. We fail to reject the null of no second-order serial correlation at the 5% level. The instruments survive the test.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Checking the radio for static after fixing the antenna. A little static at one tone (AR(1)) is mechanical and expected. Static at the next tone (AR(2)) means the antenna is still bad.
+
+</details>
+</div>
+
+**8. Hansen J overidentification test.**
+A joint test that all instruments are orthogonal to the error term. With more moments than parameters, the system is overidentified; the J-statistic is asymptotically $\chi^2$ under the null that all instruments are valid.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Model 1's **Hansen J p-value is 0.184**. We fail to reject. The instruments collectively look orthogonal to the differenced error. A *very* high p-value (near 1) would actually be a red flag --- too many instruments can artificially inflate the test.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Asking many witnesses to corroborate the same story. If their accounts agree, the story holds. If they contradict each other, at least one is lying --- but you don't know which. The Hansen test is "do the witnesses agree?"
+
+</details>
+</div>
+
 ---
 
 ## 2. The estimand and why it is not ATE

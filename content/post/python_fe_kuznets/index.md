@@ -83,6 +83,143 @@ graph TD
 
 The pipeline progresses from exploratory analysis (blue) through baseline estimation (orange) to the core fixed effects results (teal) and determinant analysis (dark blue). Each stage builds on the previous: the visual patterns motivate the polynomial specification, the spaghetti plot motivates fixed effects, and the robust N-shape motivates the search for determinants.
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "turning points" or "within R²" and the term feels slippery, this is the section to re-read.
+
+**1. Kuznets curve.**
+The theoretical inverted-U relationship between economic development and income inequality, proposed by Simon Kuznets in 1955. Inequality should rise as countries industrialize, peak at intermediate income levels, then fall as services and welfare states emerge. The post tests whether modern panel data confirm or refute this pattern.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Plotting `gini` against `log_GDPpc` for the 880 country-period observations, the unconditional pattern is closer to N-shaped than to a clean inverted-U. The Kuznets prediction is the null the post tests against.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The textbook story. Like the Phillips curve in macroeconomics — a famous theoretical curve that the data sometimes confirm and sometimes contradict. Modern data is the audit on whether the curve still holds.
+
+</details>
+</div>
+
+**2. N-shaped relationship** $\beta\_1 + 2\beta\_2 \ln Y + 3\beta\_3 (\ln Y)^2 = 0$.
+A non-monotonic pattern with two turning points. Inequality rises with development, falls, then rises again at very high incomes. Captured by a cubic polynomial in log GDP. The N-shape is the post's headline finding once fixed effects are imposed.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The cubic TWFE estimates yield $\beta\_1 = 0.293$, $\beta\_2 = -0.032$, $\beta\_3 = 0.001$. The derivative crosses zero twice, producing two turning points at \\$2,287 and \\$77,205. Below the first and above the second turning point, inequality is rising in income.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A story with two acts. Act 1: inequality rises through industrialization. Act 2: inequality falls through welfare expansion. Modern data adds Act 3: at very high incomes, inequality rises again. The N captures all three acts.
+
+</details>
+</div>
+
+**3. Two-Way Fixed Effects (TWFE)** $\alpha\_i + \delta\_t$.
+A panel estimator that absorbs both country fixed effects $\alpha\_i$ and time-period fixed effects $\delta\_t$. Identification comes from within-country deviations from country and period means. Removes time-invariant country features and global period shocks.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post's headline cubic specification is TWFE. The estimator absorbs 180 country effects and 5 period effects, leaving only within-country, within-period variation to identify the polynomial coefficients.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Wiping the negative twice. The first wipe removes country-specific stains (geography, institutions, culture). The second wipe removes period-specific glare (a global recession, a global commodity boom). What remains is the country's *change* relative to its own typical trajectory.
+
+</details>
+</div>
+
+**4. Polynomial specification** $\beta\_1 \ln Y + \beta\_2 (\ln Y)^2 + \beta\_3 (\ln Y)^3$.
+Including powers of the regressor lets the relationship bend. Linear (just $\ln Y$) imposes monotonicity. Quadratic ($\ln Y$ and $(\ln Y)^2$) imposes a single inverted-U. Cubic adds a second turn. The post compares all three.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post fits linear, quadratic, and cubic versions of the TWFE model. The cubic is preferred on AIC and on coefficient significance: all three of $\beta\_1, \beta\_2, \beta\_3$ are significant at $p < 0.001$, $p < 0.001$, and $p = 0.001$ respectively.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Trying first-, second-, and third-order curves to fit a scatter. A line fits a straight road. A parabola fits a hill. A cubic fits a roller-coaster with two peaks. You pick the simplest curve that the data actually demand.
+
+</details>
+</div>
+
+**5. Turning points** $\partial \mathrm{Gini} / \partial \ln Y = 0$.
+Income levels where the polynomial derivative crosses zero. The slope of inequality with respect to income changes sign at each turning point. Computed by solving the quadratic $\beta\_1 + 2\beta\_2 \ln Y + 3\beta\_3 (\ln Y)^2 = 0$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With the cubic estimates, the two turning points sit at $\ln Y = 7.735$ (≈ \\$2,287) and $\ln Y = 11.254$ (≈ \\$77,205). Below \\$2,287 inequality rises with income; between \\$2,287 and \\$77,205 it falls; above \\$77,205 it rises again.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Where the rollercoaster changes direction. Two turning points means two crests-or-troughs in the ride. The N-shape says: rise, fall, rise. Each turning point is a moment where the cart momentarily stops climbing or falling.
+
+</details>
+</div>
+
+**6. Within R² vs overall R².**
+Two ways to summarize the fit of a panel regression. *Overall R²* uses both within and between variation in $y$. *Within R²* uses only the variation that survives demeaning. The within R² is what the FE model actually explains.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The cubic TWFE has overall R² = 0.975 — most of which comes from the unit and time fixed effects mechanically explaining variation in `gini`. The within R² is 0.142 — the polynomial in `log_GDPpc` explains 14% of the within-country, within-period variation. The within R² is the honest number.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How well you predict the *changes*. A great forecast of the past does not mean you understand what makes the future different. Within R² is the forecast on actual changes. Overall R² flatters the model with the easy parts.
+
+</details>
+</div>
+
+**7. Omitted variable bias (OVB).**
+Bias from leaving out a confounder that correlates with both $\ln Y$ and `gini`. Pooled OLS ignores fixed country traits that drive both. TWFE removes time-invariant country traits. The 5x jump in coefficient magnitude between POLS and TWFE is an OVB diagnostic.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Pooled OLS R² is 0.176 — most of the explanation comes from confounded between-country variation. TWFE within R² is 0.142 — almost all from within-country variation. The OVB hidden in pooled OLS is what motivates the FE specification.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A stain on the camera lens. Pooled OLS thinks the dark spot in every photo is part of the subject. TWFE recognizes it is on the lens and wipes it off. What was attributed to "low GDP per capita" was actually country-specific shadow.
+
+</details>
+</div>
+
 ## 2. Setup and imports
 
 Before running the analysis, install the required packages if needed:
