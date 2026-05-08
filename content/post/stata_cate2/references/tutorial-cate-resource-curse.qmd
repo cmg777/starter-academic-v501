@@ -1,0 +1,948 @@
+---
+title: "Tutorial: Causal Machine Learning and the Resource Curse"
+subtitle: "Conditional Average Treatment Effects with Stata 19"
+author: "Carlos Mendez"
+date: today
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    number-sections: true
+    code-fold: true
+    code-summary: "Show Stata code"
+    code-tools: true
+    embed-resources: true
+    smooth-scroll: true
+    fig-align: center
+jupyter: nbstata
+---
+
+## Abstract {.unnumbered}
+
+This tutorial demonstrates how to use **Stata 19's `cate` command** to study treatment-effect heterogeneity in the context of the natural resource curse. Based on Hodler, Lechner & Raschky (2023), we replicate three key findings using simulated data with known ground-truth causal effects: (1) mining increases nighttime lights and conflict, (2) mineral price effects are non-linear---jumping sharply at high prices, and (3) institutional quality moderates mining effects but does *not* moderate price effects. The tutorial uses both the Partialing-Out (PO) and Augmented Inverse-Probability Weighting (AIPW) estimators with generalized random forests, showcasing Stata 19's native machine learning capabilities for causal inference. Runtime is approximately 20--30 minutes on a modern machine.
+
+
+# Introduction
+
+## The Resource Curse Hypothesis
+
+The "resource curse" hypothesis---first documented by Sachs and Warner (1995)---posits that natural resource abundance can paradoxically harm economic development. Countries rich in oil, minerals, or other extractive resources often experience slower growth, weaker institutions, and more conflict than resource-poor nations.
+
+However, Mehlum, Moene, and Torvik (2006) argued that resources are not inherently a curse. Instead, **institutional quality** determines whether resource wealth becomes a blessing or a curse. Countries with strong rule of law, executive constraints, and quality governance can channel resource revenues productively, while weak institutions allow rent-seeking and conflict.
+
+## Hodler, Lechner & Raschky (2023)
+
+Hodler, Lechner & Raschky (2023) brought causal machine learning to this debate. Using a Modified Causal Forest (MCF), they studied sub-national mining districts across Sub-Saharan Africa and uncovered three key findings:
+
+1. **Mining increases development and conflict** --- Districts that begin mining experience higher nighttime lights (a proxy for economic activity) and more conflict events.
+2. **Price effects are non-linear** --- The effect of mineral prices on outcomes is small at moderate prices but jumps sharply at high prices.
+3. **Institutions moderate mining but NOT prices** --- Institutional quality amplifies the development benefits of mining (upward-sloping GATEs), but does *not* moderate the effect of price shocks (flat GATEs).
+
+## Why Stata 19?
+
+Stata 19 introduces the `cate` command suite, implementing generalized random forests (Athey, Tibshirani & Wager, 2019) and doubly robust estimation for Conditional Average Treatment Effects. This provides Stata users with native access to the same class of methods used in specialized Python packages like `mcf` and `econml`, without requiring any external dependencies or programming environment changes.
+
+This tutorial uses the same simulated dataset as the companion [MCF tutorial](../MCF/) and [EconML tutorial](../EconML/), enabling direct comparison of results across three implementations.
+
+:::{.callout-note}
+## Companion Tutorials
+This is one of three tutorials replicating the same findings:
+
+- **MCF** (Python `mcf` package): Modified Causal Forest --- direct forest estimation
+- **EconML** (Python `econml` package): CausalForestDML --- Double Machine Learning framework
+- **Stata 19** (this tutorial): `cate` command --- PO and AIPW estimators with generalized random forest
+:::
+
+
+# The CATE Framework in Stata 19
+
+## From ATE to CATE
+
+The Average Treatment Effect (ATE) summarizes causal effects as a single number for the entire population. But when effects are heterogeneous---varying across subgroups---the ATE can mask important patterns. The **Conditional Average Treatment Effect (CATE)** captures this heterogeneity:
+
+$$
+\text{CATE} \equiv \tau(\mathbf{x}) = E\{y_i(1) - y_i(0) \mid \mathbf{x}_i = \mathbf{x}\}
+$$ {#eq-cate}
+
+where $y_i(1)$ and $y_i(0)$ are potential outcomes under treatment and control, and $\mathbf{x}$ is a vector of characteristics that may moderate the treatment effect.
+
+## The Partial Linear Model
+
+Stata 19's `cate` estimates CATEs within a partial linear framework:
+
+$$
+\begin{aligned}
+y &= d \cdot \tau(\mathbf{x}) + g(\mathbf{x}, \mathbf{w}) + \epsilon \\
+d &= f(\mathbf{x}, \mathbf{w}) + u
+\end{aligned}
+$$ {#eq-plm}
+
+where $\tau(\mathbf{x})$ is the heterogeneous treatment effect function, $g(\cdot)$ and $f(\cdot)$ are nonparametric nuisance functions, $\mathbf{x}$ are CATE covariates (potential moderators), and $\mathbf{w}$ are additional controls.
+
+## Two Estimators
+
+Stata 19 provides two estimators for the CATE:
+
+**Partialing-Out (PO):** Residualizes both the outcome and treatment against $\mathbf{x}$ and $\mathbf{w}$, then estimates $\tau(\mathbf{x})$ from the residuals using a generalized random forest (Nie & Wager, 2021).
+
+**Augmented Inverse-Probability Weighting (AIPW):** Constructs doubly robust scores that combine outcome modeling and propensity score weighting. Even if one model is misspecified, the estimator remains consistent (Knaus, 2022; Kennedy, 2023).
+
+## Three Levels of Treatment Effects
+
+```{mermaid}
+%%| fig-cap: "Hierarchy of treatment effect estimates from Stata 19's `cate` command"
+flowchart LR
+    A[Panel Data] --> B[cate po/aipw]
+    B --> C[IATEs]
+    B --> D[GATEs]
+    B --> E[ATE]
+    C --> F[Per-observation effects]
+    D --> G[Group averages by Z]
+    E --> H[Overall average]
+```
+
+- **IATE** (Individualized Average Treatment Effects): One effect per observation, $\tau(\mathbf{x}_i)$
+- **GATE** (Group Average Treatment Effects): Average effect within prespecified groups, $\tau(g) = E\{\tau(\mathbf{x}) \mid G = g\}$
+- **ATE**: Overall population average, $\text{ATE} = E\{\tau(\mathbf{x})\}$
+
+
+# Data Preparation
+
+We use the same simulated dataset as the MCF and EconML tutorials: 3,000 observations (300 districts $\times$ 10 years) across 8 fictional countries.
+
+```{stata}
+#| label: data-import
+#| output: true
+
+* Import the simulated resource curse dataset
+import delimited using "data/sim_resource_curse.csv", clear
+
+* Label variables
+label variable district_id "District ID (1-300)"
+label variable country_id "Country ID (1-8)"
+label variable year "Year (2003-2012)"
+label variable treatment "Treatment group (0=none, 1=low, 2=med, 3=high)"
+label variable mining "Mining district (binary)"
+label variable price_index "Mineral price index"
+label variable exec_constraints "Constraints on Executive (1-6)"
+label variable quality_of_govt "Quality of Government (0.22-0.70)"
+label variable gdp_pc "GDP per capita"
+label variable elevation "Elevation (meters)"
+label variable temperature "Mean temperature (Celsius)"
+label variable ruggedness "Terrain ruggedness"
+label variable distance_capital "Distance to capital (meters)"
+label variable agri_suitability "Agricultural suitability (0-1)"
+label variable population "Population"
+label variable ethnic_frac "Ethnic fractionalization (0-1)"
+label variable ntl_log "Log nighttime lights"
+label variable conflict "Conflict event (binary)"
+
+* Create integer version of exec_constraints for group()
+gen int exec_con = round(exec_constraints)
+label variable exec_con "Executive Constraints (integer 1-6)"
+
+* Note: quality_of_govt has 8 distinct values (one per country: 0.22-0.70)
+* We will discretize it into quartiles for GATE analysis later
+
+* Save as .dta
+save "data/sim_resource_curse.dta", replace
+
+* Report dataset dimensions
+describe, short
+```
+
+```{stata}
+#| label: data-structure
+#| output: true
+
+* Panel structure
+codebook district_id, compact
+codebook country_id, compact
+tab year, nofreq
+```
+
+
+# Descriptive Statistics
+
+```{stata}
+#| label: descriptive-stats
+#| output: true
+
+* Summary statistics for key variables
+tabstat ntl_log conflict exec_constraints quality_of_govt gdp_pc ///
+    elevation temperature ruggedness distance_capital ///
+    agri_suitability population ethnic_frac, ///
+    statistics(mean sd min max) columns(statistics) format(%9.3f)
+```
+
+```{stata}
+#| label: treatment-distribution
+#| output: true
+
+* Treatment distribution --- note the severe imbalance
+tab treatment, missing
+
+* Mining share (treatment > 0)
+count if treatment > 0
+local mining_n = r(N)
+quietly count
+display _newline "Mining share: " %5.1f 100*(`mining_n'/r(N)) "%"
+
+* Outcomes by treatment group
+table treatment, statistic(mean ntl_log) statistic(mean conflict) ///
+    statistic(count ntl_log) nformat(%9.3f)
+```
+
+:::{.callout-important}
+## Treatment Imbalance
+The treatment distribution is highly imbalanced: ~85% of observations are in the control group (no mining), while each treated group contains only ~5% of observations. This mirrors real-world mining data where few districts have active mines. Stata's `cate` handles this via honest random forests with appropriate sample-splitting.
+:::
+
+## Naive Comparison vs Ground Truth
+
+```{stata}
+#| label: naive-comparison
+#| output: true
+
+* Naive difference-in-means (biased by confounders)
+display as text _newline "=== Naive Difference-in-Means (biased) ==="
+display as text "Comparison" _col(20) "NTL diff" _col(35) "Ground Truth"
+display as text "{hline 50}"
+
+* 1-0: mining vs no mining
+quietly summarize ntl_log if treatment == 1
+local m1 = r(mean)
+quietly summarize ntl_log if treatment == 0
+local m0 = r(mean)
+display as result "1 vs 0" _col(20) %7.4f (`m1' - `m0') _col(35) "0.25"
+
+* 3-1: high vs low prices
+quietly summarize ntl_log if treatment == 3
+local m3 = r(mean)
+quietly summarize ntl_log if treatment == 1
+local m1 = r(mean)
+display as result "3 vs 1" _col(20) %7.4f (`m3' - `m1') _col(35) "0.30"
+
+* 2-1: medium vs low prices
+quietly summarize ntl_log if treatment == 2
+local m2 = r(mean)
+display as result "2 vs 1" _col(20) %7.4f (`m2' - `m1') _col(35) "0.05"
+```
+
+The naive comparisons are biased because mining districts differ systematically from non-mining districts in geography, institutions, and economic conditions. Causal ML methods adjust for these confounders.
+
+
+# Estimation Strategy
+
+## Binary Comparison Approach
+
+Stata 19's `cate` command requires a **binary treatment variable**. Since our treatment has 4 levels (0, 1, 2, 3), we run separate estimations for each pairwise comparison, subsetting the data to the two relevant groups each time.
+
+The 6 pairwise comparisons and their interpretations:
+
+| Contrast | Comparison | Finding |
+|----------|-----------|---------|
+| 1-0 | Mining (any price) vs No mining | Finding 1: mining effect |
+| 2-0 | Mining (medium price) vs No mining | Finding 1 |
+| 3-0 | Mining (high price) vs No mining | Finding 1 |
+| 2-1 | Medium vs Low prices (within mining) | Finding 2: small effect |
+| 3-1 | High vs Low prices (within mining) | Finding 2: large effect |
+| 3-2 | High vs Medium prices (within mining) | Finding 2 |
+
+## CATE Variable Specification
+
+Following the `cate` framework, we separate variables into:
+
+- **catevarlist** ($\mathbf{x}$): Variables that may drive heterogeneity in treatment effects --- `exec_constraints quality_of_govt gdp_pc elevation temperature ruggedness distance_capital agri_suitability population ethnic_frac`
+- **controls** ($\mathbf{w}$): Additional variables for nuisance models only --- `i.country_id i.year` (panel fixed effects)
+
+```{stata}
+#| label: define-globals
+#| output: false
+
+* Define variable lists as globals for reuse
+global catevars exec_constraints quality_of_govt gdp_pc ///
+    elevation temperature ruggedness distance_capital ///
+    agri_suitability population ethnic_frac
+
+global controls i.country_id i.year
+```
+
+
+# Average Treatment Effects
+
+We estimate ATEs for all 6 pairwise comparisons across both outcomes (NTL and Conflict). For the three key comparisons (NTL 1-0, NTL 3-1, Conflict 1-0), we show both PO and AIPW estimators. Remaining comparisons use AIPW only.
+
+:::{.callout-tip}
+## Runtime Note
+Each `cate` estimation takes approximately 60--90 seconds on subsets of 300--1,500 observations with 5-fold cross-fitting. The full section runs in approximately 15--20 minutes.
+:::
+
+:::{.callout-warning}
+## Small Sample Sizes in Within-Mining Comparisons
+The mining-vs-no-mining comparisons (1-0, 2-0, 3-0) use ~2,700 observations, which is adequate. However, the **within-mining** price comparisons (2-1, 3-1, 3-2) use only ~300 observations (two treated groups of ~150 each). With `xfolds(5)`, each fold contains only ~60 observations. This can produce noisy estimates with wide confidence intervals. Results for these comparisons should be interpreted with appropriate caution.
+:::
+
+**Cross-fitting** divides the data into $K$ folds. For each fold, the nuisance models ($g$ and $f$) are estimated on the remaining $K-1$ folds and used to predict on the held-out fold. This prevents overfitting of the nuisance estimates from biasing the CATE estimates. We use `xfolds(5)` rather than the default 10 to ensure adequate sample sizes per fold.
+
+## NTL Outcome: Mining Effect (1-0) --- PO vs AIPW
+
+```{stata}
+#| label: ntl-1v0-po
+#| output: true
+
+* --- NTL: Comparison 1 vs 0 (PO estimator) ---
+preserve
+keep if treatment == 1 | treatment == 0
+gen byte treat_1v0 = (treatment == 1)
+label define treat_1v0_lbl 0 "No mining" 1 "Mining (low price)"
+label values treat_1v0 treat_1v0_lbl
+
+display _newline as text "=== NTL: Mining vs No Mining (1-0) --- PO Estimator ==="
+display as text "N = " _N " observations"
+
+cate po (ntl_log $catevars) (treat_1v0), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+estimates store po_ntl_1v0
+restore
+```
+
+```{stata}
+#| label: ntl-1v0-aipw
+#| output: true
+
+* --- NTL: Comparison 1 vs 0 (AIPW estimator) ---
+preserve
+keep if treatment == 1 | treatment == 0
+gen byte treat_1v0 = (treatment == 1)
+label define treat_1v0_lbl 0 "No mining" 1 "Mining (low price)"
+label values treat_1v0 treat_1v0_lbl
+
+display _newline as text "=== NTL: Mining vs No Mining (1-0) --- AIPW Estimator ==="
+
+cate aipw (ntl_log $catevars) (treat_1v0), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+estimates store aipw_ntl_1v0
+restore
+```
+
+## NTL Outcome: High vs Low Prices (3-1) --- PO vs AIPW
+
+```{stata}
+#| label: ntl-3v1-po
+#| output: true
+
+* --- NTL: Comparison 3 vs 1 (PO estimator) ---
+preserve
+keep if treatment == 3 | treatment == 1
+gen byte treat_3v1 = (treatment == 3)
+label define treat_3v1_lbl 0 "Low price" 1 "High price"
+label values treat_3v1 treat_3v1_lbl
+
+display _newline as text "=== NTL: High vs Low Prices (3-1) --- PO Estimator ==="
+display as text "N = " _N " observations (mining districts only)"
+
+cate po (ntl_log $catevars) (treat_3v1), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+estimates store po_ntl_3v1
+restore
+```
+
+```{stata}
+#| label: ntl-3v1-aipw
+#| output: true
+
+* --- NTL: Comparison 3 vs 1 (AIPW estimator) ---
+preserve
+keep if treatment == 3 | treatment == 1
+gen byte treat_3v1 = (treatment == 3)
+label define treat_3v1_lbl 0 "Low price" 1 "High price"
+label values treat_3v1 treat_3v1_lbl
+
+display _newline as text "=== NTL: High vs Low Prices (3-1) --- AIPW Estimator ==="
+
+cate aipw (ntl_log $catevars) (treat_3v1), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+estimates store aipw_ntl_3v1
+restore
+```
+
+## NTL Outcome: Remaining Comparisons (AIPW)
+
+```{stata}
+#| label: ntl-2v0
+#| output: true
+
+* --- NTL: Comparison 2 vs 0 ---
+preserve
+keep if treatment == 2 | treatment == 0
+gen byte treat_2v0 = (treatment == 2)
+
+display _newline as text "=== NTL: Medium Mining vs No Mining (2-0) ==="
+display as text "N = " _N
+
+cate aipw (ntl_log $catevars) (treat_2v0), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5)
+
+estimates store aipw_ntl_2v0
+restore
+```
+
+```{stata}
+#| label: ntl-3v0
+#| output: true
+
+* --- NTL: Comparison 3 vs 0 ---
+preserve
+keep if treatment == 3 | treatment == 0
+gen byte treat_3v0 = (treatment == 3)
+
+display _newline as text "=== NTL: High Mining vs No Mining (3-0) ==="
+display as text "N = " _N
+
+cate aipw (ntl_log $catevars) (treat_3v0), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5)
+
+estimates store aipw_ntl_3v0
+restore
+```
+
+```{stata}
+#| label: ntl-2v1
+#| output: true
+
+* --- NTL: Comparison 2 vs 1 ---
+preserve
+keep if treatment == 2 | treatment == 1
+gen byte treat_2v1 = (treatment == 2)
+
+display _newline as text "=== NTL: Medium vs Low Prices (2-1) ==="
+display as text "N = " _N " (within-mining comparison)"
+
+cate aipw (ntl_log $catevars) (treat_2v1), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5)
+
+estimates store aipw_ntl_2v1
+restore
+```
+
+```{stata}
+#| label: ntl-3v2
+#| output: true
+
+* --- NTL: Comparison 3 vs 2 ---
+preserve
+keep if treatment == 3 | treatment == 2
+gen byte treat_3v2 = (treatment == 3)
+
+display _newline as text "=== NTL: High vs Medium Prices (3-2) ==="
+display as text "N = " _N " (within-mining comparison)"
+
+cate aipw (ntl_log $catevars) (treat_3v2), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5)
+
+estimates store aipw_ntl_3v2
+restore
+```
+
+## Conflict Outcome: Key Comparison (1-0) --- PO vs AIPW
+
+```{stata}
+#| label: conflict-1v0-po
+#| output: true
+
+* --- Conflict: Comparison 1 vs 0 (PO estimator) ---
+preserve
+keep if treatment == 1 | treatment == 0
+gen byte treat_1v0 = (treatment == 1)
+
+display _newline as text "=== Conflict: Mining vs No Mining (1-0) --- PO Estimator ==="
+
+cate po (conflict $catevars) (treat_1v0), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+estimates store po_conf_1v0
+restore
+```
+
+```{stata}
+#| label: conflict-1v0-aipw
+#| output: true
+
+* --- Conflict: Comparison 1 vs 0 (AIPW estimator) ---
+preserve
+keep if treatment == 1 | treatment == 0
+gen byte treat_1v0 = (treatment == 1)
+
+display _newline as text "=== Conflict: Mining vs No Mining (1-0) --- AIPW Estimator ==="
+
+cate aipw (conflict $catevars) (treat_1v0), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+estimates store aipw_conf_1v0
+restore
+```
+
+## Conflict Outcome: Remaining Comparisons (AIPW)
+
+```{stata}
+#| label: conflict-remaining
+#| output: true
+
+* --- Conflict: All remaining comparisons ---
+local comparisons "2_0 3_0 2_1 3_1 3_2"
+
+foreach comp of local comparisons {
+    local t_hi = substr("`comp'", 1, 1)
+    local t_lo = substr("`comp'", 3, 1)
+
+    preserve
+    keep if treatment == `t_hi' | treatment == `t_lo'
+    gen byte treat_bin = (treatment == `t_hi')
+
+    display _newline as text "=== Conflict: Treatment `t_hi' vs `t_lo' ==="
+    display as text "N = " _N
+
+    quietly cate aipw (conflict $catevars) (treat_bin), ///
+        controls($controls) ///
+        rseed(12345) xfolds(5)
+
+    * Display ATE (extract from coefficient matrix)
+    matrix b = e(b)
+    matrix V = e(V)
+    display as result "  ATE = " %7.4f b[1,1] ///
+        "  SE = " %7.4f sqrt(V[1,1])
+
+    estimates store aipw_conf_`t_hi'v`t_lo'
+    restore
+}
+```
+
+## ATE Summary Table
+
+```{stata}
+#| label: ate-summary
+#| output: true
+
+* Compile ATE results into a summary table
+display _newline as text "{hline 70}"
+display as text "SUMMARY: Average Treatment Effects (NTL Outcome)"
+display as text "{hline 70}"
+display as text "Contrast" _col(15) "AIPW ATE" _col(30) "SE" _col(42) "Ground Truth"
+display as text "{hline 70}"
+
+* NTL ATEs from stored estimates
+* Note: After cate, the ATE is in the first element of e(b)
+local comps   "1v0 2v0 3v0 2v1 3v1 3v2"
+local gts     "0.25 0.30 0.55 0.05 0.30 0.25"
+
+local i = 1
+foreach comp of local comps {
+    local gt : word `i' of `gts'
+    quietly estimates restore aipw_ntl_`comp'
+    * Extract ATE from the coefficient vector (first element)
+    matrix b = e(b)
+    matrix V = e(V)
+    local ate = b[1,1]
+    local se  = sqrt(V[1,1])
+    display as result "`comp'" _col(15) %7.4f `ate' _col(30) %7.4f `se' _col(42) "`gt'"
+    local ++i
+}
+display as text "{hline 70}"
+```
+
+:::{.callout-note}
+## Interpreting the ATEs
+- **Finding 1**: All mining-vs-no-mining comparisons (1-0, 2-0, 3-0) should show positive effects, with increasing magnitudes.
+- **Finding 2**: The within-mining price comparison 2-1 should be small (~0.05), while 3-1 should be large (~0.30). This non-linearity means price effects "jump" at high prices.
+:::
+
+
+# Treatment Effect Heterogeneity (GATEs)
+
+The key innovation of causal machine learning is detecting **how** treatment effects vary across subgroups. We compute GATEs (Group Average Treatment Effects) by institutional variables to test Finding 3: institutions moderate mining effects but NOT price effects.
+
+## GATEs by Executive Constraints: Mining Effect (1-0)
+
+```{stata}
+#| label: gate-ntl-1v0-exec
+#| output: true
+#| fig-cap: "GATEs for NTL mining effect (1-0) by Executive Constraints. An upward slope indicates that stronger institutions amplify the development benefits of mining (Finding 3)."
+
+* Full GATE analysis: NTL 1-0 by Executive Constraints
+preserve
+keep if treatment == 1 | treatment == 0
+gen byte treat_1v0 = (treatment == 1)
+
+display _newline as text "=== GATEs: NTL Mining Effect (1-0) by Executive Constraints ==="
+
+cate aipw (ntl_log $catevars) (treat_1v0), ///
+    controls($controls) ///
+    group(exec_con) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+* Visualize GATEs
+categraph gateplot
+
+* Formal test of GATE equality
+estat gatetest
+
+estimates store gate_ntl_1v0_exec
+restore
+```
+
+## GATEs by Executive Constraints: Price Effect (3-1)
+
+```{stata}
+#| label: gate-ntl-3v1-exec
+#| output: true
+#| fig-cap: "GATEs for NTL price effect (3-1) by Executive Constraints. A flat pattern indicates that institutions do NOT moderate price effects (Finding 3)."
+
+* Full GATE analysis: NTL 3-1 by Executive Constraints
+preserve
+keep if treatment == 3 | treatment == 1
+gen byte treat_3v1 = (treatment == 3)
+
+display _newline as text "=== GATEs: NTL Price Effect (3-1) by Executive Constraints ==="
+
+cate aipw (ntl_log $catevars) (treat_3v1), ///
+    controls($controls) ///
+    group(exec_con) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+* Visualize GATEs
+categraph gateplot
+
+* Formal test of GATE equality
+estat gatetest
+
+estimates store gate_ntl_3v1_exec
+restore
+```
+
+:::{.callout-important}
+## Finding 3: The Key Asymmetry
+Compare the two GATE plots above:
+
+- **Mining effect (1-0)**: Should show an **upward slope** --- GATEs increase with executive constraints, meaning better institutions amplify mining benefits.
+- **Price effect (3-1)**: Should be **flat** --- GATEs are roughly constant across institutional quality levels, meaning institutions do *not* moderate price shocks.
+
+This asymmetry is the paper's novel contribution: institutions determine whether mining is a blessing or curse, but cannot buffer against global commodity price fluctuations.
+:::
+
+## GATEs by Quality of Government: Mining Effect (1-0)
+
+```{stata}
+#| label: gate-ntl-1v0-qog
+#| output: true
+#| fig-cap: "GATEs for NTL mining effect (1-0) by Quality of Government quartiles. Confirms Finding 3: institutional moderation of mining effects."
+
+* GATE analysis: NTL 1-0 by Quality of Government
+preserve
+keep if treatment == 1 | treatment == 0
+gen byte treat_1v0 = (treatment == 1)
+
+* Discretize quality_of_govt into groups for GATE analysis
+egen qog_cat = cut(quality_of_govt), group(4) label
+
+display _newline as text "=== GATEs: NTL Mining Effect (1-0) by Quality of Government ==="
+
+cate aipw (ntl_log $catevars) (treat_1v0), ///
+    controls($controls) ///
+    group(qog_cat) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+* Visualize GATEs
+categraph gateplot
+
+* Formal test
+estat gatetest
+
+estimates store gate_ntl_1v0_qog
+restore
+```
+
+## GATEs by Quality of Government: Price Effect (3-1)
+
+```{stata}
+#| label: gate-ntl-3v1-qog
+#| output: true
+#| fig-cap: "GATEs for NTL price effect (3-1) by Quality of Government quartiles. Flat pattern confirms Finding 3: no institutional moderation of prices."
+
+* GATE analysis: NTL 3-1 by Quality of Government
+preserve
+keep if treatment == 3 | treatment == 1
+gen byte treat_3v1 = (treatment == 3)
+egen qog_cat = cut(quality_of_govt), group(4) label
+
+display _newline as text "=== GATEs: NTL Price Effect (3-1) by Quality of Government ==="
+
+cate aipw (ntl_log $catevars) (treat_3v1), ///
+    controls($controls) ///
+    group(qog_cat) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+* Visualize GATEs
+categraph gateplot
+
+* Formal test
+estat gatetest
+
+estimates store gate_ntl_3v1_qog
+restore
+```
+
+## GATEs for Conflict: Mining Effect (1-0)
+
+```{stata}
+#| label: gate-conf-1v0-exec
+#| output: true
+#| fig-cap: "GATEs for Conflict mining effect (1-0) by Executive Constraints. Institutions should dampen conflict from mining (downward slope or U-shape)."
+
+* GATE analysis: Conflict 1-0 by Executive Constraints
+preserve
+keep if treatment == 1 | treatment == 0
+gen byte treat_1v0 = (treatment == 1)
+
+display _newline as text "=== GATEs: Conflict Mining Effect (1-0) by Executive Constraints ==="
+
+cate aipw (conflict $catevars) (treat_1v0), ///
+    controls($controls) ///
+    group(exec_con) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+* Visualize GATEs
+categraph gateplot
+
+* Formal test
+estat gatetest
+
+estimates store gate_conf_1v0_exec
+restore
+```
+
+
+# Stata 19 Bonus: Advanced Diagnostics
+
+Stata 19's `cate` suite provides several postestimation tools that go beyond what the MCF and EconML tutorials offer. This section demonstrates these capabilities.
+
+## IATE Distribution and Heterogeneity Tests
+
+The histogram of Individualized Average Treatment Effects shows the full distribution of estimated effects across observations. We also run formal hypothesis tests for heterogeneity.
+
+```{stata}
+#| label: bonus-all-diagnostics
+#| output: true
+#| fig-cap: "Distribution of IATE predictions and IATE function plots for the NTL mining effect (1-0)."
+
+* Re-estimate for postestimation diagnostics
+* Include i.exec_con in catevarlist to enable reestimate group() later
+preserve
+keep if treatment == 1 | treatment == 0
+gen byte treat_1v0 = (treatment == 1)
+
+display _newline as text "=== Stata 19 Bonus Diagnostics: NTL Mining Effect (1-0) ==="
+
+cate aipw (ntl_log exec_constraints quality_of_govt gdp_pc ///
+    elevation temperature ruggedness distance_capital ///
+    agri_suitability population ethnic_frac ///
+    i.exec_con) (treat_1v0), ///
+    controls($controls) ///
+    rseed(12345) xfolds(5) ///
+    omethod(rforest) tmethod(rforest)
+
+* --- IATE histogram ---
+display _newline as text "--- IATE Histogram ---"
+categraph histogram
+```
+
+:::{.callout-note}
+## Interpreting the Heterogeneity Test
+The `estat heterogeneity` test uses the method of Chernozhukov et al. (2006). A significant result (p < 0.05) provides statistical evidence that treatment effects vary across observations---they are not constant. This justifies the use of CATE methods rather than a simple ATE.
+:::
+
+```{stata}
+#| label: bonus-heterogeneity
+#| output: true
+
+* --- Formal test: Are treatment effects heterogeneous? ---
+display _newline as text "--- Test of Treatment-Effect Heterogeneity ---"
+estat heterogeneity
+```
+
+## GATE Equality Test with Reestimate
+
+```{stata}
+#| label: bonus-gatetest
+#| output: true
+
+* Re-estimate with group for gatetest (using reestimate for speed)
+display _newline as text "--- GATEs by Executive Constraints (reestimate) ---"
+cate, reestimate group(exec_con)
+
+* Test H0: GATEs are equal across executive constraint levels
+estat gatetest
+```
+
+## ATE for Subpopulations
+
+```{stata}
+#| label: bonus-ate-subpop
+#| output: true
+
+* Estimate ATE for the subpopulation with strong institutions
+display _newline as text "--- ATE for districts with exec_constraints >= 4 ---"
+estat ate if exec_constraints >= 4
+
+display _newline as text "--- ATE for districts with exec_constraints <= 2 ---"
+estat ate if exec_constraints <= 2
+```
+
+## Linear Projection of IATEs
+
+```{stata}
+#| label: bonus-projection
+#| output: true
+
+* Project IATEs onto covariates to understand drivers of heterogeneity
+estat projection exec_constraints quality_of_govt gdp_pc elevation temperature
+```
+
+## IATE Function Plots
+
+```{stata}
+#| label: bonus-iateplot-exec
+#| output: true
+#| fig-cap: "IATE function for NTL mining effect (1-0) as a function of executive constraints, holding other variables at their means."
+
+* Plot IATE function varying exec_constraints
+categraph iateplot exec_constraints
+```
+
+```{stata}
+#| label: bonus-iateplot-qog
+#| output: true
+#| fig-cap: "IATE function for NTL mining effect (1-0) as a function of quality of government."
+
+* Plot IATE function varying quality_of_govt
+categraph iateplot quality_of_govt
+
+restore
+```
+
+
+# Connection to Paper and Conclusion
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **ATE** | Average Treatment Effect --- the mean effect across the entire population |
+| **CATE** | Conditional Average Treatment Effect --- the ATE conditional on characteristics $\mathbf{x}$ |
+| **IATE** | Individualized ATE --- one effect per observation, $\tau(\mathbf{x}_i)$ |
+| **GATE** | Group ATE --- average effect within prespecified groups |
+| **GATES** | Sorted Group ATE --- groups formed by quantiles of IATE estimates (data-driven) |
+| **PO** | Partialing-Out estimator --- residualizes outcome and treatment, then estimates $\tau(\mathbf{x})$ via GRF |
+| **AIPW** | Augmented IPW --- doubly robust estimator combining outcome model and propensity score |
+| **GRF** | Generalized Random Forest --- the nonparametric method underlying Stata's `cate` (Athey et al., 2019) |
+| **Cross-fitting** | Sample-splitting procedure to prevent overfitting of nuisance models |
+| **Honest tree** | Tree that uses separate subsamples for splitting and leaf estimation (enables valid inference) |
+| **catevarlist** | Variables in Stata's `cate` that drive treatment-effect heterogeneity ($\mathbf{x}$) |
+| **controls()** | Additional variables for nuisance models only ($\mathbf{w}$), not for heterogeneity |
+
+## Mapping Tutorial Results to Paper Findings
+
+| Finding | Paper Result | Tutorial Evidence | Stata Command |
+|---------|-------------|-------------------|---------------|
+| 1. Mining increases NTL | Positive ATEs (1-0, 2-0, 3-0) | ATE estimates from `cate` | `cate aipw ... (treat_1v0)` |
+| 2. Non-linear prices | ATE(2-1) << ATE(3-1) | Compare stored estimates | `estimates restore` |
+| 3. Institutions moderate mining | Upward GATE slope for 1-0 | `categraph gateplot` | `cate ... group(exec_con)` |
+| 3. NOT prices | Flat GATE for 3-1 | `categraph gateplot` | `cate ... group(exec_con)` |
+
+## Three Tutorials Compared
+
+| Feature | MCF (Python) | EconML (Python) | Stata 19 (this) |
+|---------|:---:|:---:|:---:|
+| Framework | Modified Causal Forest | Double Machine Learning | PO + AIPW |
+| CATE method | Direct forest | Causal forest on residuals | Generalized random forest |
+| Treatment type | Multi-valued (native) | Multi-valued (native) | Binary (pairwise) |
+| GATE computation | Built-in | Manual | Built-in (`group()`) |
+| Formal tests | No | No | `estat heterogeneity`, `estat gatetest` |
+| IATE visualization | No | CATE interpreter tree | `categraph iateplot` |
+| Clustered SEs | Built-in | GroupKFold | Cross-fitting |
+| Software requirement | Python + mcf | Python + econml | Stata 19 (no add-ons) |
+| Runtime | ~3-5 min | ~1-3 min | ~20-30 min |
+
+:::{.callout-tip}
+## Key Advantages of Stata 19's `cate`
+1. **No external packages** --- everything is built into Stata 19
+2. **Formal hypothesis tests** --- `estat heterogeneity` and `estat gatetest` provide rigorous inference
+3. **Publication-ready visualization** --- `categraph` produces polished plots
+4. **Integrated workflow** --- seamlessly combines with Stata's ecosystem (margins, contrast, estimates)
+5. **Doubly robust** --- AIPW estimator is consistent even if one nuisance model is wrong
+:::
+
+## What Differs from the Full Paper
+
+| Aspect | Tutorial | Full Paper |
+|--------|----------|-----------|
+| Data | 3,000 simulated obs | 60,121 real obs |
+| Districts | 300 | 3,800 |
+| Countries | 8 (fictional) | 42 (SSA) |
+| Covariates | 10 | 60+ |
+| Treatment | 4-level, simulated | 29 minerals, real prices |
+| Bootstraps | 5-fold CV | 1,000 bootstrap |
+| Outcomes | 2 (NTL, Conflict) | 2 (same) |
+| Method | Stata `cate` (GRF) | MCF (Lechner 2019) |
+
+## Exercises for Students
+
+1. **Change the estimator**: Re-run the key comparisons using `omethod(lasso) tmethod(lasso)` instead of random forest. Do the results change substantially?
+2. **Vary cross-fitting folds**: Try `xfolds(10)` instead of 5. Is there a precision gain?
+3. **Policy evaluation**: Use `estat policyeval` to evaluate a hypothetical policy that only allows mining in districts with exec_constraints >= 4.
+4. **Data-driven groups**: Replace `group(exec_con)` with `group(4)` to let the data discover heterogeneity groups via IATE quantiles.
+5. **Additional heterogeneity**: Investigate whether GDP per capita moderates treatment effects using `categraph iateplot gdp_pc`.
+
+
+# Session Information
+
+```{stata}
+#| label: session-info
+#| output: true
+
+* Session information
+about
+display _newline "Working directory: `c(pwd)'"
+display "Date: `c(current_date)'"
+display "Time: `c(current_time)'"
+display "Stata version: `c(stata_version)'"
+display "Machine: `c(machine_type)'"
+display "OS: `c(os)'"
+```
