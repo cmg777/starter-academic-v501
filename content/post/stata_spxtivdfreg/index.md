@@ -66,6 +66,162 @@ This tutorial replicates the empirical application from Kripfganz and Sarafidis 
 - Compute and interpret short-run and long-run direct, indirect, and total effects using `estat impact`
 - Estimate heterogeneous slope models with the mean-group (MG) estimator to assess cross-bank parameter heterogeneity
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "common factors" or "defactored IV" and the term feels slippery, this is the section to re-read.
+
+**1. Spatial autoregressive parameter** $\psi$.
+The strength of cross-unit spillovers in the dependent variable. The model lets a bank's NPL today depend on its neighbours' NPL today via a weighted average — that weighted average is the *spatial lag*, and $\psi$ is its coefficient. Positive $\psi$ means trouble at one bank spreads to its neighbours.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post estimates $\psi = 0.3943$ (z = 4.65, p < 0.001). A 1-percentage-point rise in the average neighbour's `NPL` raises this bank's `NPL` by about 0.39 percentage points contemporaneously. Across 350 banks and 36 quarters, spatial spillovers are non-trivial.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Ripples between connected ponds. A stone in one pond sends ripples through the connecting channels. $\psi$ is how thick those channels are. With $\psi$ near zero the ponds are isolated; with $\psi$ near one they are nearly identical.
+
+</details>
+</div>
+
+**2. Temporal autoregressive parameter** $\rho$.
+The persistence of the outcome from one period to the next. A bank's `NPL` today depends on its own `NPL` last quarter. $\rho$ near zero means quick decay; $\rho$ near one means long memory. Standard panel-AR(1) parameter.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post estimates $\rho = 0.2899$ (z = 5.33, p < 0.001). About 29% of last quarter's `NPL` persists to this quarter. Combined with the spatial lag, today's `NPL` has both a "self-yesterday" channel and a "neighbour-today" channel.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Today's `NPL` carries yesterday's hangover. $\rho$ is how long the hangover lasts. A high-$\rho$ bank cannot shake last quarter's losses; a low-$\rho$ bank starts fresh.
+
+</details>
+</div>
+
+**3. Spatial weight matrix** $W$ (with elements $w\_{ij}$).
+The matrix encoding which banks count as "neighbours" of which. Row-standardized so each row sums to 1. The spatial lag of $y$ is $W y$ — a weighted average of others' $y$. The choice of $W$ is the central modelling decision in spatial econometrics.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post uses a row-standardized geographic-distance matrix as $W$. Two banks closer than a threshold count as neighbours; further apart, no link. The matrix is sparse — most $w\_{ij}$ entries are zero across the 350 banks.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The wiring diagram. Pretend the banks are bulbs in a circuit. $W$ tells you which bulbs are wired to which. Wired bulbs share current; unwired bulbs do not.
+
+</details>
+</div>
+
+**4. Common factors** $\lambda\_i' f\_t$.
+Latent macro shocks that affect every unit but with unit-specific intensities. $f\_t$ is the (unobserved) factor at time $t$; $\lambda\_i$ is bank $i$'s factor loading. A global recession is a factor; some banks are more exposed than others. Pesaran (2006) introduced them into panel econometrics.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post extracts 2 factors in the regressors and 1 factor in the errors. Together they explain 33.5% of the residual variance ($\rho\_{factor} = 0.335$). Without modelling the factors, the spatial estimates would conflate "neighbours move together" with "the global rainstorm hits everyone."
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A global rainstorm hitting every pond at once. All ponds rise together — but not because the ponds are connected. They are reacting to the same outside force. Common factors model that force.
+
+</details>
+</div>
+
+**5. Endogenous regressors.**
+Regressors correlated with the error term. Causes OLS to be inconsistent. Sources include reverse causality, measurement error, and omitted confounders. The fix is instrumental variables: find a $Z$ that drives the regressor without entering the error term.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`INEFF` (bank inefficiency) is endogenous in the `NPL` equation. High `NPL` lowers measured efficiency (reverse causality), and unobserved management quality drives both. The post uses `INTEREST` (interest rates) as an instrument.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A contaminated thermometer. The thermometer touches the patient; the patient is feverish; the thermometer's reading is a mix of the patient's true temperature and contamination from the touch. We need a clean thermometer the contamination cannot reach.
+
+</details>
+</div>
+
+**6. Defactored IV estimation.**
+The estimator's two-step structure. **Step 1**: extract latent common factors from the data and remove them. **Step 2**: run IV on the defactored data. Removes the cross-sectional dependence created by the factors *before* the IV step, so standard 2SLS asymptotics hold.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`spxtivdfreg` performs both steps internally. Without defactoring, 2SLS on this panel of 12,250 observations would be biased by the unmodelled factors. With defactoring, the spatial coefficient $\psi = 0.3943$ and temporal coefficient $\rho = 0.2899$ are consistent.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Remove the rainstorm before reading each pond. Once you have subtracted the global rain from every pond, the remaining variation is the local circuitry — exactly what the spatial/temporal model is trying to learn.
+
+</details>
+</div>
+
+**7. Hansen J overidentification test.**
+A joint test of instrument validity when the system has more moments than parameters. Asymptotically $\chi^2$ under the null that all instruments are orthogonal to the error. Failure to reject is consistent with valid instruments; rejection signals at least one is invalid.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post's Hansen J is $\chi^2(19) = 18.825$ with $p = 0.468$. We fail to reject the null. The instrument set survives the overidentification test.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"Do the witnesses agree?" Many instruments tell the same causal story. If their stories are consistent, you trust them. If they contradict, at least one is lying — but you don't know which.
+
+</details>
+</div>
+
+**8. Short-run vs long-run effects** $\frac{\beta}{1 - \rho - \psi}$.
+The contemporaneous coefficient ($\beta$) measures the immediate impact of a permanent shock. The long-run total effect divides by $(1 - \rho - \psi)$ to account for both temporal persistence ($\rho$) and spatial multiplier ($\psi$). The long-run can be much larger than the short-run.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`LIQUIDITY` has a short-run coefficient of 2.452 (z = 9.09, p < 0.001). The long-run total effect is **7.765** — over three times larger. A permanent liquidity shock to the banking sector eventually has a much bigger impact than the contemporaneous reading suggests, because the shock propagates over time AND across banks.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The integrated impulse response. The first ripple is the contemporaneous reading. The wake is the entire integral over time and space. The long-run is "wake," not "first ripple."
+
+</details>
+</div>
+
 ---
 
 ## 2. The modeling framework

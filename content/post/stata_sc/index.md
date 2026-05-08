@@ -92,6 +92,162 @@ graph TD
 
 The baseline SCM (orange) produces the core treatment effect estimate. The three inference tools (teal) each test the estimate's credibility from a different angle: the in-space placebo asks "is this effect unusual compared to other states?", the in-time placebo asks "does a fake treatment produce similar results?", and the leave-one-out analysis asks "does any single donor state drive the results?"
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "in-space placebo" or "MSPE ratio" and the term feels slippery, this is the section to re-read.
+
+**1. Synthetic Control Method (SCM).**
+A weighted average of donor (untreated) units, designed to reproduce the treated unit's pre-treatment trajectory. The post-treatment trajectory of the synthetic counterfactual is the missing potential outcome for the treated unit. Originated by Abadie and Gardeazabal (2003).
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+We construct a "Synthetic California" from a weighted combination of the 39 other US states. The weights are picked so that pre-1989 `cigsale` and the predictors (`lnincome`, `age15to24`, `retprice`, `beer`) match the real California as closely as possible. After 1989 (Proposition 99), the synthetic continues without the tax; the gap is the ATT.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Building a sock-puppet twin. We assemble a stand-in for the treated unit out of pieces of donor units. The stand-in's pre-treatment behaviour mimics the treated unit's. After treatment, the stand-in tells us what would have happened.
+
+</details>
+</div>
+
+**2. Donor pool.**
+The set of untreated units from which the synthetic control is built. Must include units that did not experience the treatment and are otherwise comparable. The pool here excludes states that adopted similar tobacco-control measures during the study window.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This study's donor pool is 39 US states excluding California and three states with their own tax events. The pool intentionally drops contaminated states so that the synthetic California is built only from clean controls. The `state` and `year` identifiers index the panel.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The casting list for an audition. The role goes to a weighted blend of candidates. The casting director draws only from people who do not have the trait being studied — they have to play the *counterfactual*.
+
+</details>
+</div>
+
+**3. Predictor balance / pre-treatment fit** $\mathrm{RMSE}\_{pre}$.
+How closely the synthetic mimics the treated unit on covariates AND on the pre-treatment outcome. Low pre-treatment RMSE means high credibility for the post-treatment gap. Predictor balance tables show the side-by-side comparison.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Synthetic California achieves $R^2 = 0.9743$ on pre-1989 `cigsale` and an RMSE of 1.76 packs/capita. The synthetic's pre-treatment trajectory tracks the real California's almost perfectly — the post-1989 gap is therefore informative.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How convincing the sock puppet is *before* the moment of divergence. If puppet and original do the same gestures pre-treatment, the audience trusts the divergence post-treatment. If the puppet is already off-model pre-treatment, divergence proves nothing.
+
+</details>
+</div>
+
+**4. ATT (treatment effect)** $\widehat{\mathrm{ATT}}\_t = Y\_{1t} - \hat{Y}\_{1t}^N$.
+The post-treatment difference between the treated unit's actual outcome and its synthetic counterfactual. The headline causal estimate. Reported either year-by-year or averaged over a horizon.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The 1989–2000 average ATT for California is **-19.0 packs/capita**. The effect grows from -7.6 packs in 1989 to -26.4 packs in 1999. By 2000, real California sells 41.6 packs vs synthetic California's 67.4 — a 25.8-pack gap, or 38% reduction in `cigsale`.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The moment the puppet breaks character. Pre-treatment, puppet and original move identically. Post-treatment, the puppet keeps following the script of "no policy" while the original veers off. The gap *is* the treatment effect.
+
+</details>
+</div>
+
+**5. In-space placebo test.**
+Run the synthetic-control algorithm on every donor state as if it had been treated. Most placebo gaps should be small. The treated unit's gap should stand out. The fraction of placebos with larger gaps is a pseudo p-value.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Running SCM on each of the 39 donor states gives a distribution of post-1989 placebo gaps. California's gap sits in the extreme tail; only one donor produces a larger gap. The pseudo p-value is **0.026** — significant at the 5% level.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Does the trick work on people who weren't actually treated? If your "miracle drug" cures fake patients too, the cure is placebo. The in-space placebo runs the same algorithm on never-treated states to see whether a gap appears spuriously.
+
+</details>
+</div>
+
+**6. In-time placebo test.**
+Pretend the treatment happened earlier than it actually did and re-run the algorithm. The synthetic should track the real treated unit through the *fake* treatment date and *only* diverge at the *real* treatment date. A pre-real-treatment gap signals concern.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+We re-run SCM pretending Proposition 99 took effect in 1980. Real California and synthetic California still track each other through 1988 and only diverge after 1989. The in-time placebo gives the design clean credibility.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Pretending the treatment happened earlier. If your patient's symptoms started improving *before* you gave the drug, the drug isn't doing the work. The in-time placebo checks for prophetic improvement.
+
+</details>
+</div>
+
+**7. MSPE ratio.**
+Mean Squared Prediction Error post-treatment divided by MSPE pre-treatment. A high ratio means the post-treatment error is much larger than the pre-treatment error — the treatment effect dominates noise. The ratio is the more conservative inference statistic.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+California's MSPE ratio is well above the donor-state distribution. The signal-to-noise interpretation: California's post-1989 gap is large *relative to* its (already small) pre-1989 fit error of RMSE 1.76 packs.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Signal-to-noise score. A radio that hisses through music has low signal-to-noise. A radio that plays cleanly has a high ratio. MSPE-ratio is the same idea: how much louder is the treatment signal than the pre-treatment static?
+
+</details>
+</div>
+
+**8. Leave-one-out (LOO).**
+Repeat the SCM dropping each donor state in turn. If the estimate is stable across all leave-one-out specifications, no single donor is driving the result. If dropping one donor changes the headline materially, the result is fragile.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+LOO across the 39 donors gives 2000 effect estimates ranging from -28.4 to -23.5 packs/capita. The 4.9-pack spread is small relative to the headline -25.8-pack gap. Utah carries the largest single donor weight (0.3340, or 33.4%) but dropping it does not break the result.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Does any single ingredient carry the dish? Pull the saffron, taste again. Pull the salt, taste again. If the dish still tastes right after every removal, the recipe is robust.
+
+</details>
+</div>
+
 ---
 
 ## 2. Study design

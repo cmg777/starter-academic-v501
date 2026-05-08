@@ -107,6 +107,162 @@ graph LR
 
 The study uses panel data: the same 35 schools are observed at two time points (pre- and post-program), giving us 70 school-period observations. For the event study extension, we use an expanded dataset with 8 time periods (280 observations), allowing us to test for parallel pre-trends and examine dynamic treatment effects.
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "parallel trends" or "event study" and the term feels slippery, this is the section to re-read.
+
+**1. Difference-in-Differences (DiD).**
+The 2×2 estimator. Take the post-treatment difference between treated and control. Take the pre-treatment difference between treated and control. Subtract one from the other. The result is the causal effect under parallel trends.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Pre-difference (treated − control) = -11.05 GPA points (treated schools start *lower*). Post-difference = +14.27 (treated schools end *higher*). DiD ATT = 14.27 − (−11.05) = **25.315 GPA points**. The change in the gap is the program's effect.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtract everyone's secular drift before judging the treatment. If the whole district drifted up 11 points, that's not your tutoring program. DiD subtracts the drift first.
+
+</details>
+</div>
+
+**2. Parallel trends assumption.**
+The identifying assumption: in the absence of treatment, treated and control would have moved together. Differences in starting *levels* are fine. Differences in *changes* (slopes) would break the design.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The 8-period event-study returns a `lead-1` coefficient of 0.34 (p = 0.40). The treated schools' `gpa` was not drifting differently from the control schools' `gpa` before the program. Pre-trends pass; the assumption is plausible here.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Sister cars on parallel tracks. They started at different speeds (pre-difference) but accelerate identically (parallel trends). Without treatment, both stay parallel.
+
+</details>
+</div>
+
+**3. ATT** $E[Y\_{i}(1) - Y\_{i}(0) \mid D\_i = 1]$.
+Average Treatment effect on the Treated. The mean causal effect *for the units that received treatment*. DiD identifies the ATT under parallel trends. Different from the ATE: ATT does not extrapolate to non-treated schools.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post estimates the ATT two ways. The `diff` command returns 25.315 (SE 0.627). The `didregress` command with school-clustered SEs returns 25.3149 (SE 0.834, 95% CI [23.62, 27.01]). Both are estimates of the *same* parameter — the ATT for the 10 treated schools.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The bump on the treated track. The control track tells us what "no engine" gets you. The treated track tells us what "engine" gets you. The 25.3-point bump is what the engine adds for the cars that turned it on.
+
+</details>
+</div>
+
+**4. Counterfactual.**
+The hypothetical post-period outcome the treated would have had *without* the treatment. Never observed. DiD constructs it as "treated pre-level + control's pre-to-post change."
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Treated schools' pre-period mean is 60.17. The control's pre-to-post change is $82.10 - 71.22 = 10.88$. The DiD counterfactual for the treated post-period is $60.17 + 10.88 = 71.05$. The actual post-period mean is 96.37. The gap (25.32) is the ATT.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The path the treated track *would* have taken. We never observe the parallel-universe treated schools without the program. We reconstruct that path from "their start + the control's drift."
+
+</details>
+</div>
+
+**5. Two-Way Fixed Effects (TWFE).**
+The regression implementation of DiD with `xtreg, fe` plus a time dummy, or `reghdfe` with two absorbs. Includes a fixed effect for each school and a fixed effect for each period. The coefficient on the treatment-period interaction (`txp`) is the DiD ATT.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The `xtreg, fe` specification with `txp` returns 25.315 with within R² = 0.9946 — almost all the variation in `gpa` is explained once we absorb school and time fixed effects. TWFE recovers the same point estimate as the manual `diff` command.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Wiping the negative twice. First wipe removes school-specific stains. Second wipe removes period-specific glare. What remains is the change attributable to the program.
+
+</details>
+</div>
+
+**6. Event study.**
+A dynamic specification with a separate coefficient for each period relative to the treatment date. Pre-treatment coefficients (leads) test parallel trends; post-treatment coefficients (lags) trace dynamic effects. Stata: interact `treated` with period dummies (omitting the base period).
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The 8-period event-study returns near-zero leads (pre-treatment) and growing lags (post-treatment). The visualization plots all coefficients with confidence bands. The pre-treatment band straddles zero; the post-treatment band is solidly above.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Recording the radio signal frame-by-frame. Pre-treatment frames should be silent. Post-treatment frames trace out the unfolding signal as the program's effect accumulates.
+
+</details>
+</div>
+
+**7. Pre-trends test.**
+The formal version of "do the leads look zero?". Test the joint null that all pre-treatment lead coefficients equal zero. Failure to reject is *consistent with* parallel trends — but does not prove it. Rejection means the design is in trouble.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The `lead-1` coefficient is 0.34 with p = 0.40. The joint Wald test on all leads also fails to reject the null. The pre-trends test does not falsify the parallel-trends assumption here.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Looking for hairline cracks before the load test. If you see cracks, the bridge fails. If you see no cracks, the bridge *might* still fail under load. Pre-trends checks for visible problems but cannot guarantee none.
+
+</details>
+</div>
+
+**8. Interrupted Time Series (ITS).**
+The single-group before-after estimator. No control group. Equates secular drift with treatment effect. Works only if you can rule out *all* confounding shocks during the post-treatment window.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+ITS on treated schools alone gives $96.37 - 60.17 = 36.20$ — far above the DiD ATT of 25.32. The 10.88-point gap is the secular drift ITS cannot subtract. The post explicitly contrasts ITS with DiD to show the cost of skipping a control group.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Blaming the rooster for the sunrise. The rooster crows; the sun rises. But the rooster is not causing the sunrise. ITS has no control rooster-free village to compare with.
+
+</details>
+</div>
+
 ---
 
 <style>

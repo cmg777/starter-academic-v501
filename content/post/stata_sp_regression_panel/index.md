@@ -61,6 +61,162 @@ All estimation is performed using the `xsmle` package in Stata, which implements
 - Use Wald tests to evaluate whether the SDM simplifies to SAR, SLX, or SEM
 - Estimate dynamic spatial panel models with temporal and spatiotemporal lags to capture habit persistence
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "spillover effect" or "Spatial Durbin Model" and the term feels slippery, this is the section to re-read.
+
+**1. Spatial Durbin Model (SDM).**
+A spatial panel specification that includes spatial lags of *both* the dependent variable and the regressors. $y\_{it} = \rho \sum\_j w\_{ij} y\_{jt} + x\_{it}\beta + \sum\_j w\_{ij} x\_{jt}\theta + \mu\_i + \lambda\_t + \varepsilon\_{it}$. The most general spatial model — nests SAR, SLX, and SEM as special cases.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post fits the full SDM on cigarette consumption. The estimates show $\rho = 0.265$ (cross-state Y spillovers) and significant $\theta$ coefficients on the spatial lags of `logp` and `logy` (cross-state X spillovers). Wald tests reject the simpler SAR/SLX/SEM restrictions.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Full network model with neighbour effects on both Y and X. SAR captures only Y spillovers; SLX captures only X spillovers; SEM captures only error spillovers. SDM lets all three operate, then lets data tell you which matter.
+
+</details>
+</div>
+
+**2. Spatial autoregressive parameter** $\rho$.
+The coefficient on the spatial lag of the dependent variable, $W y$. Measures how strongly each unit's outcome moves with its neighbours' outcomes. Positive $\rho$ means cross-unit reinforcement; the size determines whether spillovers amplify or damp shocks.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post estimates $\rho = 0.265$ (z = 8.08, p < 0.001). A 1% increase in average neighbour-state consumption raises this state's consumption by 0.27%. Cigarette consumption is a strongly spatially-clustered behaviour.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Strength of the gossip network. With ρ near zero, news travels poorly between states. With ρ near one, every state knows every neighbour's news immediately. ρ measures how loud the cross-state telephone is.
+
+</details>
+</div>
+
+**3. Spatial weight matrix** $W$ (row-standardized).
+The matrix encoding which states count as neighbours. Row-standardized so each row sums to 1; the spatial lag $W y$ is then a *weighted average* of neighbours' $y$, not a sum. Common choices: contiguity (share a border) or inverse distance.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post uses a contiguity-based $W$: two states are neighbours if they share a border. After row-standardization, $W y$ for California averages Nevada, Oregon, and Arizona's `logc`. The diagonal is zero (no self-loop).
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The friendship graph. Each row of W is one state's friend list, with weights summing to 1. The spatial lag asks each state, "what's the average opinion of your friends?"
+
+</details>
+</div>
+
+**4. Direct effect** $\partial y\_i / \partial x\_i$.
+The marginal impact of a state's own regressor on its own outcome, after the spatial multiplier has played out. *Different* from the regression coefficient $\beta$ in the SDM — feedback through neighbours and back means the direct effect includes the multiplier on own changes.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The SDM estimates a direct price effect of -0.313 on `logc` for California. A 1% rise in California's `logp` reduces California's own `logc` by 0.31% — accounting for the fact that the change ripples to neighbours and partially echoes back.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How a price hike hits California Californians. The hike makes Californians cut consumption directly. Because Nevada and Oregon also feel the spatial echo, some of *their* response loops back to California. The direct effect captures the full self-impact, including the bounce.
+
+</details>
+</div>
+
+**5. Indirect / spillover effect** $\partial y\_i / \partial x\_j, \, j \ne i$.
+The marginal impact of one state's regressor on a *different* state's outcome. The spillover from one's own decisions onto neighbours. Equal to the average over all neighbour pairs in a global SDM.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The SDM estimates an indirect price effect of -0.314. A 1% rise in California's `logp` reduces neighbour-states' `logc` by 0.31% on average. Almost as large as the direct effect — spillovers are the same size as own-effects in this model.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How a California price hike echoes into Nevada. California's tax raises California's prices; Nevada's smokers cross the border less; some Nevada residents may also adjust on observing California's behaviour. The spillover captures all those cross-state channels.
+
+</details>
+</div>
+
+**6. Total effect** = direct + indirect.
+The full marginal response of the system to a one-unit change in $x$ — including both own-state and cross-state channels. Reported by `lrtest` or `estat impact` in `xsmle`.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The SDM total price effect is $-0.313 + (-0.314) = -0.627$. A 1% rise in price reduces consumption by 0.63% nationally, once spillovers are summed. Roughly twice the OLS price elasticity (-0.386), since OLS misses the indirect channel entirely.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The full ripple after both your splash and the echo. The first wave is the direct effect. The reflection from the wall is the indirect effect. Total = your splash plus the reflection coming back.
+
+</details>
+</div>
+
+**7. Habit persistence (dynamic)** $\tau y\_{i,t-1}$.
+A lagged dependent variable in the panel model, capturing inertia in the outcome. Cigarette consumption today reflects yesterday's habit. $\tau$ measures how much of last year's consumption persists. Standard for any addictive or routine-driven behaviour.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The dynamic SDM adds $\tau \cdot y\_{i,t-1}$ and estimates $\tau = 0.654$ (z = 33.33, p < 0.001). About 65% of last year's per-capita consumption persists to this year. Cigarettes are highly habit-forming, even at the state-aggregate level.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Today's smoking is yesterday's habit. The smoker's lungs do not reset every December 31. Whatever they smoked last year shapes how much they smoke this year. τ is how strong that shaping is.
+
+</details>
+</div>
+
+**8. Wald test for SDM simplification.**
+A joint Wald test on the spatial-lag-of-X coefficients (or on $\rho$) to decide whether the SDM reduces to a simpler model. SAR ($\theta = 0$, only Y spillovers), SLX ($\rho = 0$, only X spillovers), or SEM ($\rho + W\theta = 0$ via a parameter restriction). If all tests reject, keep the full SDM.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post runs three Wald tests. SAR is rejected (some $\theta \ne 0$). SLX is rejected ($\rho \ne 0$). The implied SEM restriction is rejected. The SDM is the right specification — all three channels are operative in cigarette consumption.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"Do we really need all this machinery?" If a simpler model fits, use it. If every test rejects the simplification, keep the full SDM. The Wald test is the parsimony check.
+
+</details>
+</div>
+
 ---
 
 ## 2. The modeling pipeline
