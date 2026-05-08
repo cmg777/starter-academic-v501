@@ -56,6 +56,162 @@ A naive comparison shows that 401(k)-eligible households have \\$19,559 more in 
 - Interpret the gap between naive and DML estimates as evidence of confounding bias
 - Use instrumental variables within the DML framework to handle endogenous treatment
 
+## Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "orthogonal score" or "LATE vs ATE" and the term feels slippery, this is the section to re-read.
+
+**1. Confounder.**
+A variable that affects both the treatment and the outcome. Confounders open backdoor paths that contaminate naive comparisons. Without adjustment we cannot tell the treatment effect from the confounder effect.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the 401(k) data, `inc` is the dominant confounder. Higher-income households are both more likely to have `e401 = 1` AND have higher `net_tfa` for reasons unrelated to eligibility. The naive gap of \\$19,559 is more than twice the real PLR estimate of \\$8,730. The gap is confounding.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two people who both eat ice cream and both get sunburned. The ice cream did not cause the sunburn. A lurking common ancestor — the sun — caused both. The confounder is the sun.
+
+</details>
+</div>
+
+**2. Cross-fitting** (K-fold sample-splitting).
+Split the data into $K$ folds. Fit nuisance models on $K-1$ folds. Apply them to the held-out fold. Rotate. No observation is ever scored by a model that saw it during training. Cross-fitting is the DoubleML guard against overfitting bias.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This tutorial uses 5 folds throughout. The PLR, IRM, and IIVM estimators all run cross-fitting internally. We never call separate train/test commands. The library handles the rotation behind the scenes.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two-pass exam grading. One TA writes the rubric without seeing your paper. A different TA applies the rubric without writing it. The separation is what makes the grade defensible. Mixing the roles re-introduces the over-fitting bias DoubleML was built to remove.
+
+</details>
+</div>
+
+**3. Nuisance functions** $g\_0(\mathbf{x}), m\_0(\mathbf{x})$.
+Two conditional means. $g\_0(\mathbf{x}) = E[Y \mid \mathbf{X}=\mathbf{x}]$ predicts the outcome from covariates. $m\_0(\mathbf{x}) = E[D \mid \mathbf{X}=\mathbf{x}]$ predicts the treatment from covariates. We call them *nuisance* because we do not interpret their values. We estimate them only to strip the predictable parts of $Y$ and $D$ out of the residuals.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+PLR fits both as random forests on the 9 covariates (`age`, `inc`, `educ`, `fsize`, `marr`, `twoearn`, `db`, `pira`, `hown`). The orthogonalized residuals are then regressed on each other to recover $\theta\_0$.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two surveyors map two layers of the same terrain. One maps elevation. The other maps soil type. Neither map is the goal. The goal is the third map you get when you subtract them.
+
+</details>
+</div>
+
+**4. Partial Linear Regression (PLR)** $Y = \theta\_0 D + g\_0(\mathbf{X}) + U$.
+The simplest DoubleML model. Assumes a constant treatment effect $\theta\_0$ across the population. Lets the controls enter $g\_0$ flexibly, but pins the treatment-outcome relationship to a single number.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+PLR returns an ATE of \\$8,730 across our 9,915 households. The constant-effect assumption is restrictive — IRM and IIVM relax it — but the number is in the right ballpark.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A clean residualization. Subtract what the covariates predict from $Y$. Subtract what the covariates predict from $D$. Regress one residual on the other. The slope is the causal effect.
+
+</details>
+</div>
+
+**5. Interactive Regression Model (IRM).**
+Drops the constant-effect assumption. Fits separate outcome models for treated and untreated units. The ATE is then the average of the predicted differences. Allows the effect to vary across covariates.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+IRM gives an ATE of \\$8,213 — \\$517 below PLR. The gap is one piece of evidence that effects are not perfectly constant. IRM is the recommended estimator when heterogeneity is plausible.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Separate models for treated and untreated. Like running two parallel experiments, one for the treated arm and one for the control arm. PLR pools them; IRM lets each speak.
+
+</details>
+</div>
+
+**6. Interactive IV Model (IIVM).**
+DoubleML adapted for binary instruments. Targets the LATE — the effect on *compliers*: units whose treatment status flips when the instrument flips. Uses cross-fitting and orthogonal scores like PLR/IRM, but pivots around the instrument $Z$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+IIVM in this tutorial uses participation in a defined-benefit plan as an instrument for `e401`. The LATE is \\$11,746. The gap to the IRM ATE (\\$8,213) is the LATE-vs-ATE difference: compliers respond more strongly than the average household.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A coin flip you did not ask for. Some employees got "heads" (instrument pushed them into eligibility) and some got "tails". Comparing across the flip's outcome isolates the effect — but only for the kind of employee whose decision actually flipped.
+
+</details>
+</div>
+
+**7. Orthogonal / doubly-robust score.**
+The estimating equation DoubleML uses. Constructed so its derivative with respect to small nuisance errors is zero at the true value. Sometimes called the *Neyman orthogonal* score. The orthogonality is what makes ML-based nuisance estimation harmless.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+All three DoubleML estimators in this post (PLR, IRM, IIVM) plug different nuisance estimators (linear, lasso, random forest) into the same orthogonal score. Estimates barely move across learners — the cross-fitted scores are doing their job.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Belt and suspenders. If the belt fails, the suspenders hold. If the suspenders fail, the belt holds. Both fail at once is the only failure mode. Orthogonal scores buy you that double-failure margin.
+
+</details>
+</div>
+
+**8. ATE vs LATE.**
+The ATE is the average causal effect across *everyone*. The LATE is the average effect among *compliers* — units whose treatment status responds to the instrument. They differ when treatment effects are heterogeneous in ways correlated with compliance.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Our IRM ATE is \\$8,213. Our IIVM LATE is \\$11,746. The gap (\\$3,533) is large. Compliers — households whose 401(k) eligibility flipped because of the instrument — have stronger savings responses than the average household.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A press-release statistic vs. a focus-group result. The press release reports the average for everybody. The focus group reports the average for the people who actually changed their behaviour. They are different audiences.
+
+</details>
+</div>
+
 ## The causal challenge: why naive comparisons fail
 
 Comparing outcomes between treated and untreated groups is the simplest approach, but it produces misleading results when *confounders* --- variables that influence both the treatment and the outcome --- are present. In the 401(k) setting, income is the most important confounder. Higher-income households are more likely to have employer-sponsored 401(k) plans *and* more likely to have higher savings. This creates a spurious association between 401(k) eligibility and wealth that has nothing to do with the causal effect of the plan itself.

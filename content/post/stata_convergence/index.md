@@ -60,6 +60,162 @@ A distinctive feature of this tutorial is its comparative approach to measuring 
 - Understand why beta convergence is necessary but not sufficient for sigma convergence
 - Build convergence heatmaps to visualize every possible time window
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "structural break" or "half-life" and the term feels slippery, this is the section to re-read.
+
+**1. Beta convergence** $\lambda$.
+The OLS slope coefficient when annualized growth is regressed on log initial income. A *negative* $\lambda$ means poorer countries grew faster than richer ones — they "caught up". A *positive* $\lambda$ means the opposite: divergence.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Over 2000–2019, $\lambda = -0.00352$ (p = 0.019). Convergence has emerged. Over 1960–2000, $\lambda = +0.00437$ (p = 0.007) — divergence. The full-period (1960–2019) coefficient is essentially zero (0.00057, p = 0.661). The two regimes cancel.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A catching-up race. If the runner who started at the back is moving faster, the gap to the leader is closing. Beta convergence asks whether poor countries are running faster than rich ones — does the rear runner have more horsepower?
+
+</details>
+</div>
+
+**2. Sigma convergence** $\sigma\_t^2$.
+The variance (or standard deviation) of log GDP per capita across countries at time $t$. Convergence in the sigma sense means $\sigma\_t$ is *falling* over time — the cross-country distribution of incomes is narrowing.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In our 84-country sample, the variance of log `gdppc` rose from 0.924 in 1960 to 1.918 in 2008 (peak), then eased to 1.764 by 2019. The world *did not* sigma-converge over 1960–2019. Beta convergence after 2000 is a necessary precondition for future sigma convergence, not a guarantee.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A flock of birds. Sigma convergence asks whether the flock is tightening — are the laggards catching the leaders? The flock can briefly tighten even when individual birds are accelerating away from each other.
+
+</details>
+</div>
+
+**3. Speed of convergence** $\beta$.
+The structural parameter from the Barro–Sala-i-Martin model. Different from the OLS $\lambda$. Computed via $\beta = -\ln(1 + \lambda T)/T$, where $T$ is the period length. Bigger $\beta$ means a faster catch-up engine.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Plugging $\lambda = -0.00352$ and $T = 19$ years into the conversion gives $\beta = 0.00365$. Less than half a percent per year. The catching-up engine, once it turned on after 2000, runs at idle.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Horsepower of the catch-up engine. The OLS slope $\lambda$ is the speedometer reading. The structural $\beta$ is what the engine can actually deliver — the underlying capacity to close gaps.
+
+</details>
+</div>
+
+**4. Half-life** $\tau = \ln(2)/\beta$.
+The number of years required to close half of the existing income gap at the current convergence speed. A natural reading of $\beta$ on a human time scale.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With $\beta = 0.00365$, the half-life is **190 years**. Half of the world's current income gap will close in 190 years if convergence continues at this pace. Compare to the canonical 70-year half-life from cross-country growth regressions of the 1990s; the modern world converges much more slowly.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Radioactive decay's half-life. After one half-life, half the atoms are gone; after two, three-quarters; and so on. Income-gap half-life works the same way — but at 190 years, even a generation makes only a small dent.
+
+</details>
+</div>
+
+**5. Structural break.**
+A point in time where the convergence coefficient changes its sign or magnitude. Identified by Chow tests, by visual inspection of rolling estimates, or by direct interaction with a year dummy.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This dataset shows a clear break around 2000. Before: $\lambda = +0.00437$ (divergence). After: $\lambda = -0.00352$ (convergence). The full-period $\lambda$ averages the two regimes and looks like nothing happened — a textbook example of why pooled estimates can mislead.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A thermostat flipping. Before the flip, the heater is on and the room is warming. After, the cooler is on and the room is cooling. Averaging the two periods reads as "no temperature change" — the flip is the story.
+
+</details>
+</div>
+
+**6. Nonlinear Least Squares (NLS).**
+A direct estimator of the structural $\beta$ when it appears inside an exponential. Avoids the OLS-to-$\beta$ algebraic conversion. Stata's `nl` command fits the nonlinear regression $g\_i = (1 - e^{-\beta T})/T \cdot \ln(y\_{i,0}) + \varepsilon\_i$ in one shot.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+NLS on the 2000–2019 sample returns $\beta = 0.00365$ — the same as the OLS conversion. When the relationship is well-behaved, both routes coincide; the gap is a useful sanity check.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Direct measurement vs proxy measurement. OLS-then-convert is the proxy: measure something simple ($\lambda$), then compute the structural quantity. NLS is the direct route: measure $\beta$ in one step.
+
+</details>
+</div>
+
+**7. Rolling window.**
+Re-estimate the regression over every possible start year, holding the end year fixed. Each window produces one estimate. The sequence of estimates traces out how convergence has evolved.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post's rolling window for $\lambda$ slides the start year from 1960 to 2000 with end year fixed at 2019. The line crosses zero around 1995, becomes solidly negative after 2000, and stabilizes near $-0.0035$ for the most recent windows.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A sliding microscope across a slide. At each position you take a snapshot. The full sequence of snapshots is the rolling estimate — it shows how the local picture changes as you move along.
+
+</details>
+</div>
+
+**8. Cross-country dispersion** $\sigma\_t$.
+The standard deviation of log GDP per capita across countries at time $t$. The "$\sigma$" in $\sigma$-convergence. Tracks the *width* of the world income distribution year by year.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The variance of log `gdppc` rose 90.8% from 0.924 in 1960 to 1.764 in 2019, with a peak of 1.918 in 2008. The dispersion narrative is the opposite of the post-2000 beta-convergence narrative: the rear runner is now faster, but the flock has not yet tightened.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Standard deviation of incomes in a class. If everyone earns roughly the same, $\sigma$ is small. If a few earn very much and many earn very little, $\sigma$ is large. Sigma convergence asks whether $\sigma$ is shrinking over time.
+
+</details>
+</div>
+
 ---
 
 ## 2. Analytical roadmap

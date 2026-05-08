@@ -76,6 +76,162 @@ The arrows are not just decorative. Each step *builds* on the previous one: a cr
 - **Estimate** group effects via doubly-robust pseudo-outcomes and individual effects via `CausalForestDML`.
 - **Translate** the individual-level effect estimates into a welfare-maximising training-assignment rule and benchmark it against treat-all and an oracle.
 
+## Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "IATE" or "welfare-maximising rule" and the term feels slippery, this is the section to re-read.
+
+**1. Potential outcomes** $Y\_i(d)$.
+The outcome unit $i$ would have under treatment value $d \in \\{0, 1\\}$. Each unit has two potential outcomes. We observe only one. The other is *counterfactual*. It belongs to a world we never see.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For unemployed worker 7421 with `D = 1` (received training), we observe `Y` = 22 months employed. Their counterfactual $Y\_{7421}(0)$ — the months they would have worked without training — is forever invisible. Causal inference reconstructs it from comparable untrained workers.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Every life decision is a fork in the road. You took one fork. The parallel-universe versions of you took the other. Their lives are real conceptual objects you cannot directly observe.
+
+</details>
+</div>
+
+**2. ATE** --- Average Treatment Effect, $E[Y(1) - Y(0)]$.
+The mean causal effect across everyone in the population. Headline policy number. It answers a single question: if we trained everyone, what would the average bump in employment be?
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The naive ATE is 5.111 months. The DoubleML estimate is 5.520. The simulation's ground truth is 5.628. DoubleML closes 92% of the bias the naive estimator carries. The true ATE is the target; DoubleML is the engine.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"This drug lowers cholesterol by 12 points on average." Single number, suitable for a press release. Says nothing about who responds best.
+
+</details>
+</div>
+
+**3. GATE** --- Group Average Treatment Effect, $E[Y(1) - Y(0) \mid Z = z]$.
+The CATE averaged over a *pre-specified* subgroup defined by $Z$. GATEs surface heterogeneity along axes you name in advance.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Sort workers by `dutch_prof` (1=lowest, 4=highest). The GATEs are 7.47, 6.13, 4.50, 2.91 months. Workers with the weakest Dutch benefit most. The training compensates for a labour-market handicap.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A nationwide marketing campaign lifts sales 5% on average. Before scaling up, you ask: did it work better in cities than in rural towns? GATE answers exactly that.
+
+</details>
+</div>
+
+**4. IATE** --- Individual Average Treatment Effect, $\tau(\mathbf{x})$.
+The treatment effect *as a function* of the full covariate vector. One per unit. Estimated by Causal Forest DML in this post. The IATE is the input to a personalized assignment rule.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The Causal Forest produces 4,000 IATEs, one per worker. Mean `\hat\tau` = 5.456 months. Mean absolute error against truth = 0.40 months. The IATEs feed Step 5's welfare rule.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A drug's "average effect" is a 5-point reduction in blood pressure. But a doctor cares about a specific patient — maybe a 65-year-old male with diabetes. The IATE is that personalized effect.
+
+</details>
+</div>
+
+**5. Propensity score and overlap** $\pi(\mathbf{x})$.
+The probability of treatment given covariates. *Overlap* requires that $\pi(\mathbf{x})$ is bounded away from 0 and 1 for the kinds of units we want to compare. Without overlap there is no counterfactual to estimate from.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Step 1 of the tutorial plots $\hat\pi$ for treated and untreated workers. Densities overlap across most of the support but thin out at the tails. The overlap diagnostic is the *first* check before any DR estimator runs.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Casino's odds for the next card. We never see the casino's algorithm directly; we estimate it from many deals. Overlap is the rule that the deck must contain enough cards of every relevant kind.
+
+</details>
+</div>
+
+**6. Cross-fitting** (K-fold sample-splitting).
+Split the data into $K$ folds. Train nuisances on $K-1$ folds; predict on the held-out fold; rotate. The DoubleML library uses 5 folds by default and rotates internally.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`DoubleMLIRM` in Step 3 runs 5-fold cross-fitting on random-forest nuisances. We never invoke train/test splits ourselves; the library wraps the rotation. The orthogonal score is computed on out-of-fold residuals.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two-pass exam grading. One TA writes the rubric, a different TA applies it. The separation is what makes the grade defensible.
+
+</details>
+</div>
+
+**7. Causal forest.**
+A random forest adapted for causal estimation. Built honestly: one subsample chooses splits, a different subsample estimates leaf values. Each leaf approximates a local CATE. Aggregating across trees gives the IATE function.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Step 5 uses `CausalForestDML` from EconML with 1,000 honest trees. The IATE function it returns is what powers Step 6's assignment rule. Variable importance flags `dutch_prof` and `prior_emp_months` as the strongest moderators.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A panel of judges, each on a slightly different jury. Each judge votes a verdict for the case in front of them. Average the verdicts to get the panel's call. Honesty ensures no judge writes the rubric they then enforce.
+
+</details>
+</div>
+
+**8. Welfare-maximising assignment rule.**
+A policy that treats units with $\hat\tau\_i > 0$ and skips those with $\hat\tau\_i \le 0$. Maximises predicted welfare given the IATE estimates. Benchmarked against *treat-all* and an *oracle* rule.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Step 6 evaluates three rules on a held-out sample. Treating everyone yields 5.520 months/person. The IATE rule yields 1.749 — much lower because most workers have positive but small effects. The oracle (using true $\tau$) yields a similar number, suggesting the IATE rule is near-optimal under the simulation's structure.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Giving training tickets only to people who would actually use them. Treat-all sends tickets to everyone. The IATE rule keeps tickets for the responders. The oracle is the rule a perfect-information planner would use.
+
+</details>
+</div>
+
 ## Setup and imports
 
 Before running anything, install the two CML libraries this tutorial depends on. `doubleml` provides the cross-fitted, orthogonal-score machinery for averages; `econml` provides the causal forest for individual effects.

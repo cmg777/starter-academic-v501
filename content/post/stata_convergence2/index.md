@@ -79,6 +79,162 @@ graph LR
 
 We start by documenting the emergence of convergence (scatter plots, rolling coefficients, sigma-convergence, quartile decompositions). Then we show that growth correlates have themselves converged. Finally, the OVB framework links these two facts, revealing that the gap between unconditional and conditional convergence closed because growth regression coefficients for policy variables collapsed.
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "OVB decomposition" or "lambda flattening" and the term feels slippery, this is the section to re-read.
+
+**1. Beta convergence: unconditional vs conditional** $\beta$ vs $\beta^*$.
+The unconditional $\beta$ is the slope of growth on log initial income with no controls. The conditional $\beta^*$ is the same slope after controlling for growth correlates. Both negative means poorer countries are catching up — even those with similar institutions.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For the `polity2` sample in 2005, the unconditional $\beta = -0.767$ and the conditional $\beta^* = -0.807$. The two are within 0.04 of each other. Twenty years earlier (1985), the gap was 0.44 — institutions explained most of the apparent divergence.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"Catching up overall" vs "catching up given the same institutions". Imagine two race tracks: one mixes all runners, the other separates them by training regimen. If both show poor runners gaining, the catching-up is real.
+
+</details>
+</div>
+
+**2. Sigma convergence** $\sigma\_t$.
+The cross-country standard deviation of log GDP per capita at year $t$. Tracks the *width* of the world income distribution. A narrowing distribution is sigma convergence.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+$\sigma$ rose from 0.947 in 1960 to 1.217 in 2000 (peak), then eased to 1.173 by 2017. Income dispersion is no longer widening but has not yet narrowed substantially. Beta convergence has just begun the work that sigma convergence will eventually reflect.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A flock of birds. Sigma asks whether the flock is tightening. Beta tells you which birds are flying faster. They are related but not the same: the laggard birds can accelerate without the flock yet looking tighter.
+
+</details>
+</div>
+
+**3. OVB decomposition** $\beta - \beta^* = \delta \cdot \lambda$.
+The omitted-variable-bias identity. The gap between unconditional and conditional convergence equals the product of two slopes: $\delta$ (correlate-on-income) and $\lambda$ (correlate-on-growth). When the gap closes, at least one of $\delta$ or $\lambda$ must have shrunk.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For the `polity2` example, the gap closed from 0.440 (1985) to 0.040 (2005). The product $\delta \cdot \lambda$ went from $0.440$ to $0.040$. Inspecting the components: $\lambda$ collapsed from 0.891 to 0.183 — the growth regression coefficient flattened.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Double-entry bookkeeping. The total bias on the convergence books equals the sum of two ledger entries. If the total drops, one of the ledger entries must have dropped — and the OVB identity tells you which one.
+
+</details>
+</div>
+
+**4. Growth correlates.**
+The policy and institutional variables economists used to put on the right-hand side of growth regressions in the 1990s: inflation, investment, schooling, openness, political rights, rule of law, and so on. Each is meant to capture a "fundamental" of long-run growth.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post tracks `polity2`, `FH_political_rights`, `investment`, `inflation`, and `barrolee2060` (schooling) as the headline correlates. Each has a story in the post: `investment` shows the strongest cross-country correlation with income; political rights show the most pronounced correlate-income flattening.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Ingredients in a recipe. Some recipes call for many ingredients (high-inflation, low-savings, weak-rights), others for few. Growth correlates are the ingredients we suspect explain why some economies cook up more output than others.
+
+</details>
+</div>
+
+**5. Correlate–income slope** $\delta$.
+The regression of a correlate on log income. How much richer countries have *more* of the correlate. A large positive $\delta$ for `polity2` means richer countries are more democratic.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For `polity2`, $\delta$ has stayed around 0.5–0.6 over decades. Richer countries have always tended to be more democratic. The correlate-income slope is *not* what flattened in the 1990s–2000s; it is the other half of the OVB product.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How well-stocked the kitchen is. A wealthy kitchen has more ingredients on hand. The correlate-income slope $\delta$ measures the kitchen-stocking gradient: as a country gets richer, how much better-stocked does its kitchen become?
+
+</details>
+</div>
+
+**6. Growth-regression slope** $\lambda$.
+The coefficient on a correlate when growth is regressed on the correlate (controlling for log income). How much each correlate contributes to growth, holding initial income fixed. A large $\lambda$ means the correlate matters; a small $\lambda$ means it does not.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For `polity2` in 1985, $\lambda = 0.891$. By 2005, $\lambda = 0.183$. The growth payoff to good political institutions has flattened dramatically over two decades.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How much each ingredient matters in the recipe. A pinch of saffron used to be transformative. Now everyone uses it; the marginal effect is much smaller. Lambda is "marginal effect of the ingredient"; not "amount of ingredient on hand".
+
+</details>
+</div>
+
+**7. Lambda flattening.**
+The empirical observation that growth-regression coefficients $\lambda$ on short-run correlates have collapsed since the 1990s. The collapse is the *real* story: it is what made unconditional convergence emerge.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Across the post's correlate set, $\lambda$ for several short-run policy variables fell from 0.5–1.0 (1985) to 0.1–0.3 (2005). The longer-run correlates (like schooling) are stickier. The lambda flattening shrinks the OVB product and brings $\beta$ and $\beta^*$ into alignment.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Ingredients losing their punch as kitchens equalize. When every kitchen has good knives and a working oven, the kitchens with the *best* knives no longer dominate. Lambda flattening is that universal-baseline effect.
+
+</details>
+</div>
+
+**8. Quartile and regional decomposition.**
+A descriptive break-down of beta convergence by initial-income quartile or by region. Asks: which subgroup is doing the catching-up? A few quartiles or regions usually do most of the work.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post's regional decomposition (Sub-Saharan Africa, East Asia, Latin America, OECD, etc.) attributes most of the post-2000 catch-up to East Asia and parts of South Asia. Within-quartile, the bottom two quartiles drive the recent convergence; the top two have stayed flat.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Breaking the average down by income tier. The class average improved; was it because everyone improved, or because the bottom of the class caught up? Quartile decomposition answers exactly that question.
+
+</details>
+</div>
+
 ---
 
 ## 2. Setup and data loading

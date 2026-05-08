@@ -70,6 +70,162 @@ By the end of this tutorial you will be able to:
 
 The companion `analysis.do` file linked at the top of this page runs every estimator in this tutorial end-to-end. Open it side-by-side as you read.
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "ATE vs ATT" or "doubly robust" and the term feels slippery, this is the section to re-read.
+
+**1. Potential outcomes** $Y\_i(d)$.
+The birth weight unit $i$ would have had under treatment $d \in \\{0, 1\\}$. Each mother has two potential birth weights: one if she smoked, one if she did not. We observe one. The other is *counterfactual*.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+For mother 2418 with `mbsmoke = 1`, we observe `bweight` = 3,210 g. Her counterfactual $Y\_{2418}(0)$ — the baby's weight if she had not smoked — is forever invisible. Every estimator in this tutorial is a different way of imputing that missing potential outcome from comparable non-smokers.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Every life decision is a fork in the road. The mother took one fork (smoking, or not). The parallel-universe version of her took the other. Causal inference reconstructs that universe.
+
+</details>
+</div>
+
+**2. ATE vs ATT.**
+The ATE is the average effect across *everyone* in the sample: $E[Y(1) - Y(0)]$. The ATT is the average effect only on the *treated*: $E[Y(1) - Y(0) \mid D = 1]$. They coincide when the effect is constant across mothers; they diverge when smokers respond differently than non-smokers would have.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+NNM reports both. ATE = -210.1 g; ATT = -238.5 g. The gap of 28 g says smokers' babies lose more weight from smoking than the average mother's would. The selection into smoking is non-random in a way that matters for interpretation.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"If everyone smoked" vs "the smokers' counterfactual." The first is a hypothetical for the whole population. The second is a hypothetical only for the women who actually smoked. Public health uses ATT; policy simulations use ATE.
+
+</details>
+</div>
+
+**3. Conditional independence (CIA)** $\\{Y(0), Y(1)\\} \perp D \mid \mathbf{X}$.
+The identifying assumption that, after conditioning on observed covariates, treatment is independent of the potential outcomes. There are no *unobserved* confounders driving smoking that also drive birth weight.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post controls for `mage`, `medu`, `prenatal1`, `fbaby`, `mmarried`, `fage`. CIA assumes that within a stratum of these six variables, smoking is "as good as random" with respect to the babies' counterfactual weights. The assumption is bold; the limitations section discusses what could break it.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+No hidden confounder once the controls are added. CIA is the statement that the visible covariates absorb all the selection bias. If a hidden variable (say, stress, which we did not measure) drove both smoking and weight, CIA fails.
+
+</details>
+</div>
+
+**4. Regression Adjustment (RA).**
+Fit one outcome model for the treated and another for the untreated. Predict each unit's potential outcomes under both models. Average the difference. Outcome model only — no treatment model.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+RA on our six covariates yields ATE = -239.6 g. The estimator stands or falls on the outcome model being correct. If the model misses an important nonlinearity, the estimate is biased.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Predicting birth weight under each treatment, then plugging in the counterfactual. Like asking a doctor "what would this baby weigh if the mother had not smoked?" The doctor's predictive model is the only thing standing between the data and the answer.
+
+</details>
+</div>
+
+**5. Propensity score and overlap** $e(\mathbf{x}) = P(D = 1 \mid \mathbf{X} = \mathbf{x})$.
+The conditional probability of treatment given covariates. *Overlap* requires that $e(\mathbf{x})$ is bounded away from 0 and 1 across the kinds of mothers we want to compare. Without overlap, no comparable counterfactual exists.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The propensity-score density plots compare smokers and non-smokers. There is good overlap across most of the support; thin tails near 0 and 1 are flagged. `teffects overlap` formalizes the diagnostic.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Casino's odds for the next card. We never see the casino's algorithm directly; we estimate the probability from many deals. Overlap is the rule that the deck must contain enough cards of every relevant kind.
+
+</details>
+</div>
+
+**6. Inverse Probability Weighting (IPW).**
+Reweight observations by $1/\hat{e}(\mathbf{x})$ for treated and $1/(1 - \hat{e}(\mathbf{x}))$ for control. The reweighted average difference estimates the ATE. Treatment model only — no outcome model.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+IPW on our six covariates yields ATE = -230.9 g. The estimator stands or falls on the treatment model being correct. Extreme propensities near 0 or 1 produce huge weights and inflate variance.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Re-weighting a national poll. If young voters are over-sampled, give each young respondent less weight to recover the population mean. IPW does the same trick to recover the population's treatment effect.
+
+</details>
+</div>
+
+**7. Doubly robust** (IPWRA, AIPW).
+Combine an outcome model with an IPW reweight. The estimator stays consistent if **either** model is correct. Belt-and-suspenders. Both being right is gravy. Only one being right is enough.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+IPWRA returns -231.9 g. AIPW returns -232.5 g. Within \\$3 of each other. They are within 1.6 g of IPW (-230.9) and 7.7 g of RA (-239.6). The agreement across robust estimators is a soft sanity check that the bias correction is doing its job.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Belt and suspenders. If the belt fails, the suspenders hold. If the suspenders fail, the belt holds. Two failures simultaneously is the only failure mode. Doubly robust estimators buy you that double-failure margin.
+
+</details>
+</div>
+
+**8. Matching** (NNM and PSM).
+Find statistical *twins* in covariate space. **NNM** matches each treated unit to its $k$ closest controls in covariate space (Mahalanobis distance). **PSM** matches on the single propensity score $\hat{e}(\mathbf{x})$. Average the matched-pair differences.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+NNM gives ATE = -210.1 g, the lowest absolute estimate in the post. PSM gives -229.4 g. The gap reflects the dimensionality reduction PSM performs (matching on one score) vs the full-covariate matching NNM does. Both are non-parametric — neither fits an outcome regression.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Picking statistical twins from the comparison group. For every smoker, find the non-smoker who looks most like her on the visible covariates. Compare their babies' birth weights. Average across all matched pairs. NNM matches on the full feature vector; PSM matches on a single summary score.
+
+</details>
+</div>
+
 ## 2. The case study: maternal smoking and birth weight
 
 We work with `cattaneo2.dta`, a dataset of 4,642 singleton births popularized by Cattaneo (2010). The outcome of interest is `bweight` (infant birth weight, measured in grams) and the treatment is `mbsmoke` (1 if the mother smoked during pregnancy, 0 otherwise). The remaining variables are pre-treatment characteristics that plausibly affect both the smoking decision and the eventual birth weight.
