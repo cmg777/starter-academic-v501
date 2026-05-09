@@ -23,6 +23,10 @@ links:
   icon_pack: fas
   name: "Execution log"
   url: execution_log.txt
+- icon: open-data
+  icon_pack: ai
+  name: "[Python] Google Colab"
+  url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_iv/notebook.ipynb
 slides:
 summary: "Replicate Acemoglu, Johnson and Robinson (2001) in Python with pyfixest and linearmodels: instrument modern institutions with settler mortality across 64 ex-colonies and learn how IV recovers a causal effect that OLS understates by 80 percent."
 tags:
