@@ -63,10 +63,9 @@ This tutorial is inspired by [Courthoud (2022)](https://towardsdatascience.com/t
 
 The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "partialling-out" or "DML bridge" and the term feels slippery, this is the section to re-read.
 
-<div class="concept-pair">
-
 **1. Frisch-Waugh-Lovell theorem** $\hat\beta\_1$ from full reg = $\hat\beta\_1$ from residual reg. The full-regression coefficient on $X\_1$ equals the simple regression of $\tilde Y$ on $\tilde X\_1$, where the tildes are residuals from regressing on the other controls.
 
+<div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
@@ -83,10 +82,9 @@ Two routes to the same summit.
 
 </div>
 
-<div class="concept-pair">
-
 **2. Confounding** $X\_2$ correlated with both $Y$ and $X\_1$. A third variable creates a spurious link between regressor and outcome.
 
+<div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
@@ -103,10 +101,9 @@ A third character pulling on both protagonists.
 
 </div>
 
-<div class="concept-pair">
-
 **3. Partialling-out / residualization** $\tilde y = y - \hat y$. Replace each variable with the part *not* explained by the controls. The leftover is what FWL operates on.
 
+<div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
@@ -123,10 +120,9 @@ Wiping a foggy window before looking through it.
 
 </div>
 
-<div class="concept-pair">
-
 **4. Omitted variable bias** $\mathrm{OVB} = \gamma \cdot \delta$. The naive slope of $Y$ on $X\_1$ differs from the true slope by exactly $\gamma \cdot \delta$, where $\gamma$ is the omitted variable's effect on $Y$ and $\delta$ is the slope of the omitted variable on $X\_1$.
 
+<div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
@@ -143,10 +139,9 @@ The exact tilt of the foggy lens.
 
 </div>
 
-<div class="concept-pair">
-
 **5. Conditional vs marginal effect** $E[Y \mid X\_1, X\_2]$ vs $E[Y \mid X\_1]$. The conditional effect holds other variables fixed. The marginal effect averages over them. The two are equal only when no relevant variable is omitted.
 
+<div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
@@ -163,10 +158,9 @@ In this post the *marginal* (raw) `coupons → sales` correlation is misleadingl
 
 </div>
 
-<div class="concept-pair">
-
 **6. Backdoor path** non-causal path through confounder. In the DAG `coupons ← income → sales`, the backdoor path is the route from coupons back through income to sales. Blocking it (by including `income`) identifies the causal effect.
 
+<div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
@@ -183,10 +177,9 @@ The unlocked side door letting noise into the room.
 
 </div>
 
-<div class="concept-pair">
-
 **7. DML bridge — FWL → Double Machine Learning** residualize $Y$ and $D$ with ML, then regress. FWL is the linear-OLS prototype of DML. Replace the OLS partial-out with a flexible ML model and you obtain a debiased causal estimate even with high-dimensional or non-linear controls.
 
+<div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 

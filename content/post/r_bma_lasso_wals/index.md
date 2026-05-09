@@ -88,7 +88,7 @@ We use **synthetic data** throughout this tutorial. This means we *know the true
 
 The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "PIP" or "triangulation" and the term feels slippery, this is the section to re-read.
 
-1. **Variable selection**. The challenge of picking which predictors belong in a regression. Wrong choice = biased coefficients or inflated standard errors.
+**1. Variable selection**. The challenge of picking which predictors belong in a regression. Wrong choice = biased coefficients or inflated standard errors.
 
 <div class="concept-pair">
 
@@ -106,7 +106,7 @@ Trimming a guest list --- invite too many and the party is chaos, too few and yo
 
 </div>
 
-2. **Model uncertainty** $2^K$ candidate models. With $K$ candidate predictors, there are $2^K$ possible specifications. Picking one and ignoring the others is a strong implicit assumption.
+**2. Model uncertainty** $2^K$ candidate models. With $K$ candidate predictors, there are $2^K$ possible specifications. Picking one and ignoring the others is a strong implicit assumption.
 
 <div class="concept-pair">
 
@@ -124,7 +124,7 @@ Many plausible guest lists exist. No single one is "the right" list.
 
 </div>
 
-3. **Bayesian model averaging (BMA)** weighted average over $M\_j$. Weights coefficients across all candidate models by their posterior probability. Honest acknowledgement of model uncertainty.
+**3. Bayesian model averaging (BMA)** weighted average over $M\_j$. Weights coefficients across all candidate models by their posterior probability. Honest acknowledgement of model uncertainty.
 
 <div class="concept-pair">
 
@@ -142,7 +142,7 @@ Polling every plausible expert and weighting by track record.
 
 </div>
 
-4. **Posterior inclusion probability (PIP)** $\sum\_{M\_j: x\_k \in M\_j} \Pr(M\_j \mid \mathrm{data})$. Total posterior mass on models containing variable $k$. PIP $\geq 0.80$ is the "robustness threshold" by convention (Raftery 1995).
+**4. Posterior inclusion probability (PIP)** $\sum\_{M\_j: x\_k \in M\_j} \Pr(M\_j \mid \mathrm{data})$. Total posterior mass on models containing variable $k$. PIP $\geq 0.80$ is the "robustness threshold" by convention (Raftery 1995).
 
 <div class="concept-pair">
 
@@ -160,7 +160,7 @@ In this post, `log_gdp` has PIP = 1.000 (always selected). `trade_network` = 0.9
 
 </div>
 
-5. **LASSO (L1 regularization)** $\min \\, \|y - X\beta\|^2 + \lambda \|\beta\|\_1$. Adds an L1 penalty to OLS. The penalty forces some coefficients exactly to zero, performing variable selection automatically.
+**5. LASSO (L1 regularization)** $\min \\, \|y - X\beta\|^2 + \lambda \|\beta\|\_1$. Adds an L1 penalty to OLS. The penalty forces some coefficients exactly to zero, performing variable selection automatically.
 
 <div class="concept-pair">
 
@@ -178,7 +178,7 @@ A budget cap that forces you to drop low-priority guests.
 
 </div>
 
-6. **WALS (Weighted Average Least Squares)**. Frequentist model averaging via a semi-orthogonal transformation and a Laplace prior. Closed-form, fast, no MCMC.
+**6. WALS (Weighted Average Least Squares)**. Frequentist model averaging via a semi-orthogonal transformation and a Laplace prior. Closed-form, fast, no MCMC.
 
 <div class="concept-pair">
 
@@ -196,7 +196,7 @@ Averaging plans on a tidy spreadsheet rather than via a long Monte Carlo simulat
 
 </div>
 
-7. **Methodological triangulation**. Combining multiple methods that share assumptions but differ mechanically. Variables flagged by *all three* are unusually credible.
+**7. Methodological triangulation**. Combining multiple methods that share assumptions but differ mechanically. Variables flagged by *all three* are unusually credible.
 
 <div class="concept-pair">
 
@@ -214,7 +214,7 @@ Three independent referees agreeing on the call.
 
 </div>
 
-8. **Sensitivity / true-positive rate** $\\#\\{\hat\beta\_k \neq 0 : \beta\_k \neq 0\\} / \\#\\{\beta\_k \neq 0\\}$. Of the truly nonzero coefficients, what share does the method correctly flag?
+**8. Sensitivity / true-positive rate** $\\#\\{\hat\beta\_k \neq 0 : \beta\_k \neq 0\\} / \\#\\{\beta\_k \neq 0\\}$. Of the truly nonzero coefficients, what share does the method correctly flag?
 
 <div class="concept-pair">
 

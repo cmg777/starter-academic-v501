@@ -74,7 +74,7 @@ A panel regression where the outcome depends on its own past. Persistence and gr
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-In the post, log GDP per capita (`lngdp`) in country $i$ at decade $t$ regresses on its own lag and 9 growth determinants (`ish`, `lnlex`, `pop`, `ki60`, `school`, `gov`, `lawandorder`, `tropical`, `oil`). The lag coefficient is 0.954 --- a country that is poor today stays poor next decade.
+In the post, log GDP per capita (`lngdp`) in country $i$ at decade $t$ regresses on its own lag and 9 growth determinants (`ish`, `sed`, `pgrw`, `pop`, `ipr`, `opem`, `gsh`, `lnlex`, `polity`). The lag coefficient is 0.954 --- a country that is poor today stays poor next decade.
 
 </details>
 

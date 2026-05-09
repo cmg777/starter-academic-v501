@@ -63,10 +63,9 @@ In this tutorial we simulate an observational study where an unmeasured confound
 
 The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "Manski bounds" or "PNS" and the term feels slippery, this is the section to re-read.
 
+**1. Point identification** $\theta = $ a single value. Classical assumptions (e.g., random assignment, no unmeasured confounders) deliver a single number for the causal effect.
+
 <div class="concept-pair">
-
-**Point identification** $\theta = $ a single value. Classical assumptions (e.g., random assignment, no unmeasured confounders) deliver a single number for the causal effect.
-
 <details class="concept-card concept-example"><summary>Example</summary>
 
 A randomized controlled trial would point-identify the ATE for the training program. But this post's DGP has an unmeasured confounder (`U`), so point identification fails — only bounds are honest.
@@ -81,10 +80,9 @@ A randomized controlled trial would point-identify the ATE for the training prog
 
 </div>
 
+**2. Partial identification** $\theta \in [L, U]$. With weaker assumptions, the data identify a *range* — a lower bound $L$ and an upper bound $U$ — but not a single number. The width $U - L$ measures how much the data, plus assumptions, leave undetermined.
+
 <div class="concept-pair">
-
-**Partial identification** $\theta \in [L, U]$. With weaker assumptions, the data identify a *range* — a lower bound $L$ and an upper bound $U$ — but not a single number. The width $U - L$ measures how much the data, plus assumptions, leave undetermined.
-
 <details class="concept-card concept-example"><summary>Example</summary>
 
 In this post the data alone (no extra assumptions) tell us only that the true ATE lies somewhere in [-0.2980, +0.7020]. The point estimate is hidden inside this range.
@@ -99,10 +97,9 @@ In this post the data alone (no extra assumptions) tell us only that the true AT
 
 </div>
 
+**3. Manski no-assumption bounds** width $\le 1$. The widest honest bounds, computed from observed quantities alone with no extra assumptions. By construction the width equals 1 for binary outcomes.
+
 <div class="concept-pair">
-
-**Manski no-assumption bounds** width $\le 1$. The widest honest bounds, computed from observed quantities alone with no extra assumptions. By construction the width equals 1 for binary outcomes.
-
 <details class="concept-card concept-example"><summary>Example</summary>
 
 Manski bounds in this post are [-0.2980, +0.7020], width exactly 1.0000 by construction. They include the true ATE (0.27) but are too wide for decisions: they cannot rule out either a positive or a negative effect.
@@ -117,10 +114,9 @@ The largest line-up that's guaranteed honest.
 
 </div>
 
+**4. Monotone treatment response** $Y(1) \ge Y(0)$ pointwise. An assumption that treatment never *hurts* anyone. Adds direction. Tightens bounds.
+
 <div class="concept-pair">
-
-**Monotone treatment response** $Y(1) \ge Y(0)$ pointwise. An assumption that treatment never *hurts* anyone. Adds direction. Tightens bounds.
-
 <details class="concept-card concept-example"><summary>Example</summary>
 
 Training is unlikely to *reduce* an individual's employment chances, so monotone treatment response is plausible. With this assumption (and entropy regularization at θ=0.1), the bounds tighten to [-0.2279, +0.4540], width 0.6819 — much sharper.
@@ -135,10 +131,9 @@ Training is unlikely to *reduce* an individual's employment chances, so monotone
 
 </div>
 
+**5. Tian-Pearl bounds**. Sharper bounds for probability-of-causation quantities (PN, PS, PNS) that exploit the joint structure of treatment and outcome more aggressively than Manski.
+
 <div class="concept-pair">
-
-**Tian-Pearl bounds**. Sharper bounds for probability-of-causation quantities (PN, PS, PNS) that exploit the joint structure of treatment and outcome more aggressively than Manski.
-
 <details class="concept-card concept-example"><summary>Example</summary>
 
 Applied to the same dataset, Tian-Pearl PNS bounds give [0.0000, +0.7020]. The lower bound is exactly zero — consistent with "training need not have helped anyone" — but the upper bound is the same as Manski's, capping the share of true switchers.
@@ -153,10 +148,9 @@ A sharper detective who can rule more suspects out using the same evidence.
 
 </div>
 
+**6. Probability of necessity and sufficiency (PNS)** $\Pr(Y(1)=1, Y(0)=0)$. The probability that treatment *both* would succeed *and* needed treatment to succeed. The fraction of workers for whom training is the active cause of employment.
+
 <div class="concept-pair">
-
-**Probability of necessity and sufficiency (PNS)** $\Pr(Y(1)=1, Y(0)=0)$. The probability that treatment *both* would succeed *and* needed treatment to succeed. The fraction of workers for whom training is the active cause of employment.
-
 <details class="concept-card concept-example"><summary>Example</summary>
 
 Tian-Pearl bounds in this post tell us PNS lies in [0.000, 0.702]. So at most 70.2% of workers are "true switchers" whose employment outcome flipped because of training; the rest would have succeeded (or failed) regardless.
@@ -171,10 +165,9 @@ Probability the suspect *had* to do it *and* could have done it.
 
 </div>
 
+**7. Bound width / informativeness** $U - L$. The narrower the bounds, the more decision-relevant they are. Width 1.0 is uninformative for binary outcomes; width 0.2 might be enough to act on.
+
 <div class="concept-pair">
-
-**Bound width / informativeness** $U - L$. The narrower the bounds, the more decision-relevant they are. Width 1.0 is uninformative for binary outcomes; width 0.2 might be enough to act on.
-
 <details class="concept-card concept-example"><summary>Example</summary>
 
 In this post the Manski bounds (width 1.000) are useless for policy. The entropy-regularized bounds (width 0.6819) start to rule out small positive effects but still cannot tell a manager whether to scale up the program.
@@ -189,10 +182,9 @@ How short the line-up is — the shorter, the more useful.
 
 </div>
 
+**8. Coverage / validation** $\Pr(\theta \in [\hat L, \hat U]) \ge 1 - \alpha$. Across many simulated datasets, do the estimated bounds *contain* the true parameter at the rate they advertise?
+
 <div class="concept-pair">
-
-**Coverage / validation** $\Pr(\theta \in [\hat L, \hat U]) \ge 1 - \alpha$. Across many simulated datasets, do the estimated bounds *contain* the true parameter at the rate they advertise?
-
 <details class="concept-card concept-example"><summary>Example</summary>
 
 Across 100 simulated runs in this post, every method's bounds contained the true ATE (0.27) — coverage = 100%. The bounds are valid in the formal sense, even though they are sometimes wide.

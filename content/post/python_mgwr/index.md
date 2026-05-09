@@ -55,10 +55,9 @@ This tutorial applies MGWR to **514 Indonesian districts** to answer: **does eco
 
 The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "bandwidth" or "spatial heterogeneity" and the term feels slippery, this is the section to re-read.
 
-<div class="concept-pair">
-
 **1. Local regression** $\hat\beta(s)$ varies by location. One regression per location $s$, weighted by spatial proximity. Coefficients become functions of geographic position rather than fixed numbers.
 
+<div class="concept-pair">
 <details class="concept-card concept-example"><summary>Example</summary>
 
 In this post the convergence coefficient $\hat\beta$ on `ln_gdppc2010` varies across the 514 Indonesian districts — from -1.74 (strong catching-up) to +0.42 (divergence).
@@ -73,10 +72,9 @@ Drawing a different best-fit line at each map dot, not one global line for the w
 
 </div>
 
-<div class="concept-pair">
-
 **2. Bandwidth (kernel)** $h$. The number of nearest neighbours each local regression uses. Smaller $h$ = more localized, noisier estimates; larger $h$ = smoother but flatter.
 
+<div class="concept-pair">
 <details class="concept-card concept-example"><summary>Example</summary>
 
 This post selects an optimal bandwidth of 44 districts (out of 514) for both regressors. Each local regression at a given district uses its 44 nearest neighbours.
@@ -91,10 +89,9 @@ The radius of the circle of friends a local model listens to before deciding.
 
 </div>
 
-<div class="concept-pair">
-
 **3. Spatial heterogeneity** $\beta\_i \neq \beta\_j$. Coefficients differ across space. The relationship between predictors and outcome is not constant geographically.
 
+<div class="concept-pair">
 <details class="concept-card concept-example"><summary>Example</summary>
 
 In this post catching-up is *strong* in 149 of 514 districts (29% with significant negative β) but *insignificant or positive* in the other 365 districts. Convergence is not a single Indonesia-wide story.
@@ -109,10 +106,9 @@ Different family recipes in different villages — not the same dish everywhere.
 
 </div>
 
-<div class="concept-pair">
-
 **4. GWR vs MGWR** one $h$ vs $h$ per regressor. GWR uses a single bandwidth for *all* coefficients. MGWR allows each coefficient to have its own bandwidth, capturing the fact that different processes operate at different spatial scales.
 
+<div class="concept-pair">
 <details class="concept-card concept-example"><summary>Example</summary>
 
 In this post both `ln_gdppc2010` and the intercept happen to share bandwidth = 44, but in general MGWR could have e.g. bandwidth 30 for one variable and 200 for another. The constraint relaxation is the methodological advance.
@@ -127,10 +123,9 @@ One volume knob for everyone vs each instrument with its own knob.
 
 </div>
 
-<div class="concept-pair">
-
 **5. Local R²** $R^2\_i$. The R² of the local regression at district $i$. Maps to a colour scale to show *where* the model fits well and *where* it struggles.
 
+<div class="concept-pair">
 <details class="concept-card concept-example"><summary>Example</summary>
 
 This post maps local R² across Indonesia. Fits are strong in dense Java districts and weaker in sparse, remote eastern islands where the 44 nearest neighbours span huge geographic distances.
@@ -145,10 +140,9 @@ This post maps local R² across Indonesia. Fits are strong in dense Java distric
 
 </div>
 
-<div class="concept-pair">
-
 **6. AICc model selection** lower AICc = better. The corrected Akaike Information Criterion penalizes model complexity. The standard MGWR-vs-OLS comparison.
 
+<div class="concept-pair">
 <details class="concept-card concept-example"><summary>Example</summary>
 
 In this post global OLS has AICc = 1341.25 while MGWR has AICc = 838.41 — a difference of more than 500 strongly favours the spatially varying model.
@@ -163,10 +157,9 @@ The picky food critic comparing the two restaurants and giving a definitive verd
 
 </div>
 
-<div class="concept-pair">
-
 **7. β-convergence** $g\_i = \alpha + \beta \ln Y\_{i,0} + \varepsilon\_i$. The classic growth-economics test: poor regions catching up with rich ones leads to a *negative* β coefficient on initial income.
 
+<div class="concept-pair">
 <details class="concept-card concept-example"><summary>Example</summary>
 
 This post's global β = -0.1948 (mild catching-up overall). MGWR reveals β ranges from -1.74 (strong local convergence) to +0.42 (local divergence). The story is heterogeneous and the global average hides this.
@@ -181,10 +174,9 @@ Poor districts catching up with rich ones. A negative slope means the gap shrink
 
 </div>
 
-<div class="concept-pair">
-
 **8. Effective number of parameters** trace of hat matrix. MGWR has more flexibility than OLS but less than fitting one regression per district. The "effective" parameter count quantifies this middle ground.
 
+<div class="concept-pair">
 <details class="concept-card concept-example"><summary>Example</summary>
 
 This post's MGWR uses 52.076 effective parameters — far more than OLS's 2 but far less than 514×2 = 1,028 (one regression per district). MGWR finds the right level of model complexity automatically.
