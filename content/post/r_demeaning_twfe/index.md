@@ -69,6 +69,162 @@ We use a balanced panel of 150 countries observed over 8 time periods from the B
 - Interpret why naive standard errors from `lm()` on demeaned data are incorrect and how `fixest` corrects them
 - Visualize the demeaning transformation to build intuition about within-variation identification
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "demeaning" or "FWL theorem" and the term feels slippery, this is the section to re-read.
+
+**1. Two-way fixed effects (TWFE)** $y\_{it} = \alpha\_i + \lambda\_t + \beta x\_{it} + u\_{it}$.
+A panel regression with both unit fixed effects $\alpha\_i$ and time fixed effects $\lambda\_t$. Each unit gets its own intercept. Each period gets its own intercept. Together they absorb every time-invariant unit characteristic and every unit-invariant time shock.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the TWFE regression of `growth` on `ln_y_initial` over 150 countries × 8 periods adds 150 country fixed effects and 8 period fixed effects. The convergence coefficient is -0.055286 (within R² = 0.1768).
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Subtract each player's career-average score *and* each season's league-average score before measuring how a single match performance compares.
+
+</details>
+</div>
+
+**2. Demeaning (within transformation)** $\tilde y\_{it} = y\_{it} - \bar y\_i - \bar y\_t + \bar{\bar y}$.
+Subtract the unit's time-average, subtract the time period's cross-section average, then add back the grand mean. The grand-mean correction prevents double-subtraction. What remains is variation *within* each unit *and* within each period.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the Barro panel, demeaning `growth` for Brazil in 1965 means: subtract Brazil's 8-period average growth, subtract 1965's 150-country average growth, then add back the grand mean over all 1,200 observations. Repeat for every variable in the regression.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Photographers call it "white-balance correction." Subtract the room's tint, subtract the camera's tint, then add back the average tint so colours stay calibrated.
+
+</details>
+</div>
+
+**3. Frisch-Waugh-Lovell (FWL) theorem** $\hat\beta\_{\mathrm{full}} = \hat\beta\_{\mathrm{residualized}}$.
+The coefficient on $X$ in a multivariate regression equals the slope from a simple regression of *residualized* $Y$ on *residualized* $X$, where the residuals are taken from regressing each variable on the other controls. TWFE is the special case where the "other controls" are the unit and time dummies.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post FWL predicts that running plain OLS on the demeaned `growth` and demeaned `ln_y_initial` columns must give the *same* coefficient as `feols()` with two-way fixed effects. The post verifies this: both routes give -0.055286.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two paths to the same summit. Either climb with all the ropes attached at once, or strip the ropes one by one and climb the bare rock — you arrive at the same height.
+
+</details>
+</div>
+
+**4. Grand mean adjustment** $+ \bar{\bar y}$.
+The "+grand-mean" term in two-way demeaning. Without it you subtract the mean *twice* — once via the unit average and once via the time average — leaving the data biased. Adding the grand mean back exactly cancels the double-subtraction.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In the post, omitting the grand-mean term shifts every demeaned `growth` value downward by the global average growth rate. The OLS slope on the still-balanced design is unchanged, but the intercept and predicted levels are wrong. The post explicitly walks through the fix.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Refunding a sale: if both the manufacturer and the store gave you a discount that overlapped, you would owe a small surcharge back so the total discount is correct.
+
+</details>
+</div>
+
+**5. β-convergence** negative slope on initial income.
+The classic Barro test: poor units catching up with rich ones produces a *negative* slope of growth on log initial income. The TWFE-with-fixed-effects version is the conditional version of this test.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the TWFE coefficient on `ln_y_initial` is -0.055286: a country one log-point poorer at the start of a period grows about 5.5 percentage points faster on average, conditional on country and period fixed effects.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Slower runners closing the gap on faster ones. A negative slope on the head start means the back of the pack is gaining ground on average.
+
+</details>
+</div>
+
+**6. Within R²** $R^2\_{\mathrm{within}}$.
+The fraction of *within-unit* variation in $y$ explained by the regressors after the fixed effects are partialled out. Always smaller than the total R² of a TWFE regression because the fixed effects already explain a lot.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the TWFE within R² is 0.1768 — `ln_y_initial` explains about 18% of the variation in growth that remains *after* country and period fixed effects soak up persistent differences. The total adjusted R² is 0.755 because the fixed effects do most of the absorbing.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+After equalising for player skill and match-day weather, how much of the remaining variation in performance does the tactic of the day explain?
+
+</details>
+</div>
+
+**7. Numerical equivalence** $\hat\beta\_{\mathrm{TWFE}} = \hat\beta\_{\mathrm{OLS\,on\,demeaned}}$.
+Up to numerical precision, the TWFE point estimate from `feols()` equals the OLS point estimate from `lm()` on the demeaned columns. This is the post's empirical proof of FWL applied to TWFE.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, `feols()` gives -0.055286 and `lm()` on demeaned columns gives -5.529e-02. The maximum coefficient difference across all regressors is -4.16e-17 — pure floating-point noise. The two routes are *the same calculation* in two notations.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Adding a column of numbers in two different orders. Same total, different order of operations.
+
+</details>
+</div>
+
+**8. Standard error caveat** $\mathrm{df}$ adjustment.
+While the *coefficients* match exactly, the *standard errors* from `lm()` on demeaned data are wrong. The naive `lm()` does not subtract degrees of freedom for the implicit fixed effects, so its SEs are too small. `fixest::feols()` corrects this automatically.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the `feols()` SE accounts for the 150 country FE plus 8 period FE that were absorbed; the `lm()` SE on demeaned data does not. The point estimate is identical (-0.055286), but only `feols()` reports honest inference.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two judges agree on the verdict but disagree on the sentence. Same conclusion, different precision because they account for different prior cases.
+
+</details>
+</div>
+
 ## 2. The Frisch-Waugh-Lovell Theorem
 
 Before diving into code, let us build the conceptual foundation. The FWL theorem answers a simple question: if you want to estimate the effect of $X$ on $Y$ while controlling for a set of variables $Z$, do you need to include everything in one big regression?
