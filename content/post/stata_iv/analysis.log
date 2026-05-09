@@ -3,7 +3,7 @@
        log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
 > /post/stata_iv/analysis.log
   log type:  text
- opened on:   9 May 2026, 13:55:03
+ opened on:   9 May 2026, 16:22:43
 
 . 
 . di _newline(2)
@@ -51,7 +51,7 @@
 . //                           repo (replicability for any reader).
 . // USE_GITHUB = 0          : load from current folder (offline / dev).
 . //───────────────────────────────────────────────────────────────────
-. global USE_GITHUB 0
+. global USE_GITHUB 1
 
 . 
 . if $USE_GITHUB {
@@ -64,7 +64,8 @@
 . }
 
 . di "Data source: ${DATA_URL}"
-Data source: .
+Data source: https://raw.githubusercontent.com/cmg777/starter-academic-v501/mas
+> ter/content/post/stata_iv
 
 . 
 . global Y   logpgp95
@@ -10827,5 +10828,5 @@ file stata_iv_ols_vs_iv.png written in PNG format
        log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
 > /post/stata_iv/analysis.log
   log type:  text
- closed on:   9 May 2026, 13:55:45
+ closed on:   9 May 2026, 16:23:26
 -------------------------------------------------------------------------------
