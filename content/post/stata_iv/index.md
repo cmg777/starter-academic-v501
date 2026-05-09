@@ -665,3 +665,6 @@ For policymakers and practitioners, the practical implication is sharper than th
 8. [`ivreg2` — Stata SSC archive.](http://fmwww.bc.edu/RePEc/bocode/i/ivreg2.html)
 9. [`coefplot` (Jann) — Stata SSC archive.](http://repec.sowi.unibe.ch/stata/coefplot/)
 10. [AJR (2001) replication package — `maketable1.dta` through `maketable8.dta` are mirrored at the post root and loaded by `analysis.do` from this site's GitHub raw URL for one-click replicability.](https://economics.mit.edu/people/faculty/daron-acemoglu/data-archive)
+11. [Duke Mod·U "Causal Inference Bootcamp" — *Introduction to Regression Analysis*. YouTube video.](https://youtu.be/ROLeLaR-17U)
+12. [Duke Mod·U "Causal Inference Bootcamp" — *Basic Elements of a Regression Table*. YouTube video.](https://youtu.be/vCkrWeJG5cs)
+13. [Duke Mod·U "Causal Inference Bootcamp" — *The Relationship Between Economic Development and Property Rights*. YouTube video.](https://youtu.be/fDCgagw2CAI)
