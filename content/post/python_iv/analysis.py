@@ -361,7 +361,7 @@ fs_slope = res4.first_stage.individual["avexpr"].params["logem4"]
 fs_intercept = res4.first_stage.individual["avexpr"].params["const"]
 ax1.plot(xfit, fs_intercept + fs_slope * xfit, color=WARM_ORANGE, linewidth=2.2)
 ax1.set_title("Figure 1. First stage: settler mortality predicts institutions",
-              fontsize=13, color=WHITE_TEXT, pad=12)
+              fontsize=13, color=WHITE_TEXT, pad=22)
 ax1.text(0.5, 1.02, "Base sample of 64 ex-colonies (AJR 2001 Table 4)",
          transform=ax1.transAxes, ha="center", fontsize=10, color=LIGHT_TEXT)
 ax1.set_xlabel("Log settler mortality (logem4)")
@@ -382,7 +382,7 @@ ax2.scatter(base["logem4"], base["logpgp95"], color=STEEL_BLUE, s=28, alpha=0.85
 annotate_scatter(ax2, base["logem4"], base["logpgp95"], base["shortnam"])
 ax2.plot(xfit, rf_intercept + rf_slope * xfit, color=WARM_ORANGE, linewidth=2.2)
 ax2.set_title("Figure 2. Reduced form: settler mortality predicts log GDP",
-              fontsize=13, color=WHITE_TEXT, pad=12)
+              fontsize=13, color=WHITE_TEXT, pad=22)
 ax2.text(0.5, 1.02, "Base sample of 64 ex-colonies (AJR 2001 Table 4)",
          transform=ax2.transAxes, ha="center", fontsize=10, color=LIGHT_TEXT)
 ax2.set_xlabel("Log settler mortality (logem4)")
@@ -920,7 +920,7 @@ ax3.axvline(0, color=LIGHT_TEXT, linestyle="--", linewidth=0.8, alpha=0.6)
 ax3.set_yticks(ypos)
 ax3.set_yticklabels(labels, color=LIGHT_TEXT, fontsize=9)
 ax3.set_xlabel("Coefficient on avexpr (institutions)")
-ax3.set_title("Effect of institutions on log GDP: OLS vs IV", fontsize=13, color=WHITE_TEXT, pad=12)
+ax3.set_title("Effect of institutions on log GDP: OLS vs IV", fontsize=13, color=WHITE_TEXT, pad=22)
 ax3.text(0.5, 1.02, "Six representative specs, 95% CI, AJR (2001) base sample",
          transform=ax3.transAxes, ha="center", fontsize=10, color=LIGHT_TEXT)
 plt.tight_layout()
