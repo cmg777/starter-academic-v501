@@ -59,6 +59,161 @@ In this tutorial, we apply the SCPI framework to a classic question in political
 - Compare alternative weight constraint methods (simplex, lasso, ridge, OLS) and assess their trade-offs
 - Evaluate robustness through sensitivity analysis across confidence levels
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "donor pool" or "prediction interval" and the term feels slippery, this is the section to re-read.
+
+**1. Synthetic control method** $\hat{Y}\_T = \sum\_j w\_j Y\_{j}$.
+Construct a weighted average of donor units that mimics the treated unit before treatment. Use the same weights to forecast the counterfactual after treatment.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post builds a synthetic West Germany from 16 OECD donor countries using only their pre-1990 GDP per capita. After 1990, the synthetic continues following the donor weighted-average — that is the counterfactual.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A custom-built body double for an actor. Same height, same hair, same gestures *before* the dangerous scene.
+
+</details>
+</div>
+
+**2. Donor pool** $\\{j : j \neq T\\}$.
+The set of untreated units used to construct the synthetic. Larger and more diverse pools support more credible counterfactuals.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post's donor pool has 16 OECD countries (Austria, USA, France, Japan, etc.). Reunification did not affect them, so they can plausibly proxy what West Germany would have looked like.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The casting candidates for the body double. The bigger the casting list, the better the match.
+
+</details>
+</div>
+
+**3. Weight constraints (simplex)** $w\_j \ge 0$, $\sum w\_j = 1$.
+The simplex restricts weights to be non-negative and to sum to 1. Avoids extrapolation and guarantees the synthetic is a convex combination of real data.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the simplex selects 6 of 16 donors with non-zero weight. Austria's weight is `0.291` and the USA's is `0.273`. The remaining 10 donors get weight 0.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"No negative casting" — every actor weighs in non-negatively, and the casting fractions add to 1.
+
+</details>
+</div>
+
+**4. Pre-treatment fit (RMSE)** $\sqrt{\frac{1}{T\_0}\sum\_t (Y\_t - \hat Y\_t)^2}$.
+The root mean squared error of the synthetic relative to the treated unit, computed only on the *pre-treatment* period. Low RMSE = the synthetic is a good match.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The simplex synthetic in this post has pre-treatment `RMSE = 0.072` — about 0.6% of West Germany's pre-1990 GDP. The body double looks essentially identical before the scene.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+How well the body double mimics the actor *before* the scene starts.
+
+</details>
+</div>
+
+**5. Treatment gap** $Y\_T - \hat Y\_T$.
+The difference between the treated unit's actual outcome and its synthetic counterfactual after treatment. The point estimate of the impact.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In 1991 the gap is `+0.502` (West Germany slightly outpaces synthetic immediately post-reunification). By 2003 the gap is `-3.465` thousand USD — a roughly 11% GDP reduction relative to counterfactual. Average gap over 1991-2003 is `-1.668`.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The costume difference *after* the scene — what the actor wears that the body double does not.
+
+</details>
+</div>
+
+**6. Prediction interval** $[\hat Y\_T - q, \hat Y\_T + q]$.
+A range that covers the counterfactual with stated probability. Wider intervals reflect more uncertainty about the true gap.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the average 95% PI width is `2.842` thousand USD. By 2003, the *actual* GDP falls below the 99% PI in 7 of the 13 post-treatment years — strong evidence that the gap is real and not noise.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The range the body double could plausibly stand in.
+
+</details>
+</div>
+
+**7. In-sample vs out-of-sample uncertainty** $\sigma^2\_{\mathrm{in}}$, $\sigma^2\_{\mathrm{out}}$.
+Two distinct error sources: imperfect pre-treatment fit (in-sample) and forecasting noise after treatment (out-of-sample). Both contribute to the prediction interval.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Even though the simplex achieves pre-treatment `RMSE = 0.072` (very low in-sample uncertainty), the out-of-sample uncertainty grows over time and dominates the 2003 PI width.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Stage-rehearsal noise (predictable) vs opening-night noise (unpredictable). The longer the show, the more opening-night noise accumulates.
+
+</details>
+</div>
+
+**8. Sensitivity / robustness analysis**.
+Re-run under alternative rules (different weight constraints, different confidence levels, different donor pools) to check whether the answer survives.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The post compares simplex, ridge, lasso, and OLS weighting and finds the qualitative picture (post-1990 negative gap) is robust. Sensitivity also varies the confidence level from 90% to 99% — significance survives.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Checking the body double scene with two or three different doubles and seeing the same effect.
+
+</details>
+</div>
 
 ## 2. The Synthetic Control Idea
 

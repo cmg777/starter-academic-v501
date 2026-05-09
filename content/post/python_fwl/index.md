@@ -59,6 +59,150 @@ This tutorial is inspired by [Courthoud (2022)](https://towardsdatascience.com/t
 - Compare naive and conditional estimates to see how omitted variable bias distorts results
 - Connect FWL to modern applications such as Double Machine Learning
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "partialling-out" or "DML bridge" and the term feels slippery, this is the section to re-read.
+
+<div class="concept-pair">
+
+**1. Frisch-Waugh-Lovell theorem** $\hat\beta\_1$ from full reg = $\hat\beta\_1$ from residual reg. The full-regression coefficient on $X\_1$ equals the simple regression of $\tilde Y$ on $\tilde X\_1$, where the tildes are residuals from regressing on the other controls.
+
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post regressing `sales` on `coupons` and `income` jointly gives a coupon coefficient of +0.2673. Manual FWL — residualize each on `income` and re-regress — gives the same +0.2673 to the rounding the post uses.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Two routes to the same summit.
+
+</details>
+
+</div>
+
+<div class="concept-pair">
+
+**2. Confounding** $X\_2$ correlated with both $Y$ and $X\_1$. A third variable creates a spurious link between regressor and outcome.
+
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post `income` confounds `coupons → sales`. High-income stores receive fewer coupons but buy more, so the raw coupon-on-sales slope is *negative* (-0.1059, p = 0.365) — flipping the *true* positive direction.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A third character pulling on both protagonists.
+
+</details>
+
+</div>
+
+<div class="concept-pair">
+
+**3. Partialling-out / residualization** $\tilde y = y - \hat y$. Replace each variable with the part *not* explained by the controls. The leftover is what FWL operates on.
+
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Regress `coupons` on `income` and keep the residuals. Regress `sales` on `income` and keep the residuals. Plot one against the other to see the +0.2673 controlled slope visually.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Wiping a foggy window before looking through it.
+
+</details>
+
+</div>
+
+<div class="concept-pair">
+
+**4. Omitted variable bias** $\mathrm{OVB} = \gamma \cdot \delta$. The naive slope of $Y$ on $X\_1$ differs from the true slope by exactly $\gamma \cdot \delta$, where $\gamma$ is the omitted variable's effect on $Y$ and $\delta$ is the slope of the omitted variable on $X\_1$.
+
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the income coefficient $\gamma$ = +0.3836 and the slope of `coupons` regressed on `income` is negative. The product is the bias: it pulls the naive coupon slope from the true +0.200 down to -0.1059 — a sign reversal.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The exact tilt of the foggy lens.
+
+</details>
+
+</div>
+
+<div class="concept-pair">
+
+**5. Conditional vs marginal effect** $E[Y \mid X\_1, X\_2]$ vs $E[Y \mid X\_1]$. The conditional effect holds other variables fixed. The marginal effect averages over them. The two are equal only when no relevant variable is omitted.
+
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post the *marginal* (raw) `coupons → sales` correlation is misleadingly negative; the *conditional* (income-fixed) effect is +0.2673 — close to the true +0.200. Conditioning is what makes the regression honest.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+"What if everything else is held fixed?" vs "what does this look like on average?"
+
+</details>
+
+</div>
+
+<div class="concept-pair">
+
+**6. Backdoor path** non-causal path through confounder. In the DAG `coupons ← income → sales`, the backdoor path is the route from coupons back through income to sales. Blocking it (by including `income`) identifies the causal effect.
+
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post draws a DAG with `income` arrowing into both `coupons` and `sales`. Including `income` in the regression closes the backdoor — the +0.2673 slope is the causal effect.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+The unlocked side door letting noise into the room.
+
+</details>
+
+</div>
+
+<div class="concept-pair">
+
+**7. DML bridge — FWL → Double Machine Learning** residualize $Y$ and $D$ with ML, then regress. FWL is the linear-OLS prototype of DML. Replace the OLS partial-out with a flexible ML model and you obtain a debiased causal estimate even with high-dimensional or non-linear controls.
+
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post explicitly draws the bridge — the same residualize-then-regress logic that recovers +0.2673 here is what `doubleml` does at scale with hundreds of controls and a Random Forest plug-in.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+FWL with a smarter mop. Replace the linear partial-out with a flexible ML model and the same logic carries through.
+
+</details>
+
+</div>
+
 ## The causal structure
 
 Before looking at data, it helps to understand the causal relationships among the variables. A **Directed Acyclic Graph (DAG)** --- a diagram where arrows indicate direct causal effects --- makes these assumptions explicit.

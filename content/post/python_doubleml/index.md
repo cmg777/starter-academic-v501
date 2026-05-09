@@ -59,6 +59,130 @@ Does a cash bonus actually cause unemployed workers to find jobs faster, or do t
 - Interpret causal effect estimates, standard errors, and confidence intervals
 - Assess robustness by comparing results across different ML learners
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "partial-linear model" or "Neyman orthogonality" and the term feels slippery, this is the section to re-read.
+
+**1. Partial-linear model (PLR)** $Y = \theta D + g(X) + \epsilon$. Outcome equals a linear-in-treatment term plus a flexible (possibly non-linear) function of covariates plus noise. Linearity is imposed *only* on $D$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post $Y$ is `inuidur1` (log unemployment duration), $D$ is `tg` (bonus offer), and $X$ contains demographics. PLR captures any non-linearity in covariates while keeping the bonus effect a single number.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+A sandwich with a fixed slice of treatment between flexible bread layers.
+
+</details>
+</div>
+
+**2. Nuisance functions** $g(X)$, $m(X)$. The flexible parts: $g(X)$ predicts $Y$ from $X$, and $m(X)$ predicts $D$ from $X$. ML learners fit both. They are "nuisance" because we don't care about them for inference.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post a Random Forest with 500 trees and max\_depth = 5 fits both $g$ and $m$. The RCT means $m(X)$ is roughly constant (the assignment probability), but $g(X)$ still absorbs predictive variation in `inuidur1`.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+The auto-pilot that handles everything except the steering wheel.
+
+</details>
+</div>
+
+**3. Treatment effect** $\theta$. The single number we care about: the average effect of the treatment on the outcome, holding covariates fixed via the nuisance functions.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+DML-RF in this post yields $\hat\theta = -0.0736$ (SE 0.0354, p = 0.0378). Receiving the bonus *offer* shortens log unemployment duration by 7.4% — a precision-driven significant effect.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+The steering-wheel tilt — the only knob the analyst directly cares about.
+
+</details>
+</div>
+
+**4. Cross-fitting** sample-split + swap. Split the data into folds. Estimate nuisance functions on one fold, the treatment effect on the other, then swap and average. Removes overfitting bias.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+This post uses 5-fold cross-fitting. Each fold's $\hat\theta$ is computed using nuisance functions trained on the *other* four folds, then averaged across folds for the final estimate.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Swap who tastes the soup with who cooks it.
+
+</details>
+</div>
+
+**5. Neyman orthogonality** $E[\partial\_\eta \psi] = 0$. The score function $\psi$ has zero expected gradient with respect to the nuisance parameters $\eta$ at the truth. Means small ML errors in $\hat\eta$ do not bias $\hat\theta$.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+The PLR's residualised score `(Y - g(X))(D - m(X))` is Neyman-orthogonal. So even if the Random Forest's $\hat g$ is slightly off, the DML-RF estimate $\hat\theta = -0.0736$ stays consistent.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+A lever balanced so a small wobble at the fulcrum does not tip the load.
+
+</details>
+</div>
+
+**6. ML learner choice** RF, LASSO, gradient boosting. Plug-in flexibility: any sufficiently fast ML algorithm can serve as the nuisance learner. Different algorithms make different bias-variance trade-offs.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+This post tries Random Forest (500 trees) and LASSO. RF gives -0.0736, LASSO gives -0.0712 — within one decimal of each other.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Picking which auto-pilot model to install.
+
+</details>
+</div>
+
+**7. Sensitivity to learner**. Compare point estimates and SEs across learners. If the answer depends heavily on the choice, the result is fragile.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this post DML-RF (-0.0736) and DML-LASSO (-0.0712) agree to within 0.0024, both significant at 5%. The bonus effect survives the learner swap — strong robustness signal.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Checking the steering wheel reads the same with two different auto-pilots.
+
+</details>
+</div>
+
+**8. RCT + covariate adjustment**. In a randomised experiment, treatment is exogenous by design — DML adjustment cannot "fix bias" because there is none. But it can *reduce variance* by absorbing predictive covariates.
+
+<div class="concept-pair">
+<details class="concept-card concept-example"><summary>Example</summary>
+
+In this Pennsylvania RCT, naive OLS gives -0.0855 (no covariates) vs DML-RF -0.0736 (with covariates). The point estimates are similar; what changes is precision — the SE shrinks because covariates explain part of `inuidur1`.
+
+</details>
+<details class="concept-card concept-analogy"><summary>Analogy</summary>
+
+Sharpening a focus knob even after the lens is already centred.
+
+</details>
+</div>
+
 ## Setup and imports
 
 Before running the analysis, install the required package if needed:

@@ -53,6 +53,162 @@ The Random Forest algorithm is a natural starting point for this kind of tabular
 - Analyze feature importance and partial dependence plots
 - Build intuition for when ML adds value over simpler approaches
 
+### Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan. If a later section mentions "Random Forest" or "feature importance" and the term feels slippery, this is the section to re-read.
+
+**1. Decision tree** recursive binary splits.
+A tree of yes/no questions on features. Each internal node tests one feature against a threshold; each leaf gives a prediction.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+A single tree in this post might split first on satellite-embedding dimension 12 ("urban-built signal"), then on dimension 41 ("vegetation index"), and finally output an IMDS prediction at each leaf.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A flowchart of yes/no questions ending in a verdict.
+
+</details>
+</div>
+
+**2. Bagging (bootstrap aggregating)** $\hat f = \frac{1}{B}\sum\_b \hat f\_b$.
+Train $B$ trees, each on a bootstrap resample of the training data, and average their predictions. Reduces variance.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+With `n_estimators = 500`, this post grows 500 trees on 500 different bootstrap samples of the 271 training municipalities. The final IMDS prediction is the average across all 500 trees.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Polling many slightly different juries and averaging their verdicts.
+
+</details>
+</div>
+
+**3. Random Forest** bagging + random feature subsets.
+At each split, only a random subset of features is considered. Decorrelates trees and further reduces variance.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Each split in this post's forest considers only `sqrt(64) = 8` of the 64 embedding dimensions. Different trees see different subsets — they make different mistakes, and the average is stronger than the parts.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Bagging plus also blindfolding each juror to a random subset of evidence.
+
+</details>
+</div>
+
+**4. Train/test split** $D = D\_{\mathrm{train}} \cup D\_{\mathrm{test}}$.
+Hold out a portion of data for honest evaluation. The model is fit only on the training portion; performance is reported on the test portion.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+This post sets `test_size = 0.2`, splitting 339 municipalities into 271 train / 68 test. The test R² of 0.2297 is the *honest* generalization score.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Practising on yesterday's exam and getting graded on tomorrow's.
+
+</details>
+</div>
+
+**5. Cross-validation** $K$-fold CV.
+Split the *training* set into $K$ folds. Train on $K-1$ folds and validate on the held-out fold; rotate. Provides a more stable estimate of model performance and prevents test-set leakage during tuning.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+The baseline R² of 0.2526 in this post is a 5-fold CV mean computed on the 271 training observations. The test set (68 obs) was never touched during tuning.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Taking five mock exams instead of one — averaging the scores gives a steadier read.
+
+</details>
+</div>
+
+**6. Hyperparameter tuning** grid / randomized search.
+Search over a grid of model settings (number of trees, depth, minimum samples per leaf) and pick the combination with best CV score.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+In this post, randomized search lands on `n_estimators = 500` and `max_depth = 30`, producing best CV R² = 0.2721 — a small bump over baseline.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Adjusting the oven knobs (temperature, time, rack) before baking the real cake.
+
+</details>
+</div>
+
+**7. Feature importance** mean impurity decrease.
+Sums up how much each feature contributes to reducing prediction error across all splits in the forest. Higher importance = more useful feature.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Feature-importance scores in this post identify a handful of the 64 embedding dimensions as dominant predictors of IMDS — the rest contribute marginally. The forest is effectively low-dimensional.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Which ingredient mattered most for the cake's flavour.
+
+</details>
+</div>
+
+**8. Partial dependence plot** $\bar f(x\_k) = E\_{X\_{-k}}[\hat f(x\_k, X\_{-k})]$.
+Average prediction as one feature varies, with all other features held at their observed distribution. Shows the marginal shape of the relationship.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+A partial dependence plot in this post for the most important embedding dimension shows IMDS rising sharply at low values, then plateauing — a non-linear pattern OLS would have missed entirely.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+Sliding the salt dial up and down with everything else fixed and tasting after each step.
+
+</details>
+</div>
+
 ```python
 import sys
 if "google.colab" in sys.modules:
