@@ -1,0 +1,9 @@
+Spec,avexpr_b,avexpr_se,avexpr_p,N,R2
+Col 1: whole world,0.532,0.029,0.0,111,0.611
+Col 2: base sample,0.522,0.05,0.0,64,0.54
+Col 3: + latitude,0.463,0.052,0.0,111,0.623
+Col 4: + lat + continents,0.39,0.051,0.0,111,0.715
+Col 5: base + latitude,0.468,0.063,0.0,64,0.574
+Col 6: base + lat + cont.,0.401,0.064,0.0,64,0.714
+"Col 7: loghjypl, world",0.446,0.029,0.0,108,0.554
+"Col 8: loghjypl, base",0.457,0.05,0.0,61,0.486

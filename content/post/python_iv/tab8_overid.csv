@@ -1,0 +1,31 @@
+Panel,Spec,avexpr_b,avexpr_se,avexpr_p,first_stage_F,hansen_J,hansen_p,N
+A/B,a.c1: euro1900,0.87,0.136,0.0,44.03,,,63
+A/B,a.c2: euro1900 + lat,0.917,0.172,0.0,22.88,,,63
+A/B,a.c3: cons00a,0.706,0.123,0.0,11.94,,,60
+A/B,a.c4: cons00a + lat,0.677,0.184,0.0002,9.81,,,60
+A/B,a.c5: democ00a,0.719,0.099,0.0,17.14,,,59
+A/B,a.c6: democ00a + lat,0.69,0.146,0.0,11.91,,,59
+A/B,a.c7: cons1 (+ indtime),0.595,0.146,0.0,7.61,,,60
+A/B,a.c8: cons1 (+ indtime) + lat,0.611,0.169,0.0003,7.36,,,60
+A/B,a.c9: democ1 (+ indtime),0.549,0.133,0.0,13.07,,,59
+A/B,a.c10: democ1 (+ indtime) + lat,0.555,0.152,0.0003,11.74,,,59
+C (overid),c.c1: euro1900 + logem4,0.893,0.137,0.0,52.16,0.15,0.703,63
+C (overid),c.c2: euro1900 + logem4 + lat,0.946,0.168,0.0,29.52,0.07,0.791,63
+C (overid),c.c3: cons00a + logem4,0.808,0.136,0.0,19.71,1.32,0.251,60
+C (overid),c.c4: cons00a + logem4 + lat,0.833,0.178,0.0,13.4,1.21,0.271,60
+C (overid),c.c5: democ00a + logem4,0.799,0.124,0.0,26.95,1.18,0.278,59
+C (overid),c.c6: democ00a + logem4 + lat,0.82,0.16,0.0,17.36,1.09,0.297,59
+C (overid),c.c7: cons1+logem4 (+ indtime),0.67,0.106,0.0,17.97,0.57,0.45,60
+C (overid),c.c8: cons1+logem4 (+ indtime) + lat,0.705,0.121,0.0,14.21,0.65,0.419,60
+C (overid),c.c9: democ1+logem4 (+ indtime),0.633,0.098,0.0,23.46,1.67,0.197,59
+C (overid),c.c10: democ1+logem4 (+ indtime) + lat,0.654,0.109,0.0,19.5,1.78,0.182,59
+D (logem4 control),d.c1: euro1900,0.814,0.226,0.0003,12.54,,,63
+D (logem4 control),d.c2: euro1900 + lat,0.879,0.26,0.0007,11.23,,,63
+D (logem4 control),d.c3: cons00a,0.454,0.278,0.1021,3.84,,,60
+D (logem4 control),d.c4: cons00a + lat,0.416,0.382,0.2766,3.19,,,60
+D (logem4 control),d.c5: democ00a,0.515,0.174,0.0031,5.24,,,59
+D (logem4 control),d.c6: democ00a + lat,0.481,0.248,0.0523,4.43,,,59
+D (logem4 control),d.c7: cons1 (+ indtime),0.485,0.274,0.0764,2.89,,,60
+D (logem4 control),d.c8: cons1 (+ indtime) + lat,0.494,0.289,0.0871,3.01,,,60
+D (logem4 control),d.c9: democ1 (+ indtime),0.402,0.222,0.0703,5.15,,,59
+D (logem4 control),d.c10: democ1 (+ indtime) + lat,0.407,0.231,0.0784,5.24,,,59

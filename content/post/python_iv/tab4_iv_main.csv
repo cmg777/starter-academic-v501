@@ -1,0 +1,19 @@
+Panel,Spec,dep,avexpr_b,avexpr_se,avexpr_p,first_stage_F,N,R2
+B (IV),c1: base,logpgp95,0.944,0.176,0.0,16.85,64,
+B (IV),c2: + lat,logpgp95,0.996,0.24,0.0001,9.99,64,
+B (IV),c3: -Neo-Europes,logpgp95,1.281,0.402,0.0027,7.09,60,
+B (IV),c4: -Neo-Europes + lat,logpgp95,1.212,0.392,0.0039,5.94,60,
+B (IV),c5: -Africa,logpgp95,0.578,0.082,0.0,38.29,37,
+B (IV),c6: -Africa + lat,logpgp95,0.576,0.091,0.0,29.95,37,
+B (IV),c7: + continents,logpgp95,0.982,0.331,0.006,5.52,64,
+B (IV),c8: + continents + lat,logpgp95,1.107,0.503,0.0405,3.28,64,
+B (IV),c9: loghjypl,loghjypl,0.981,0.196,0.0,17.94,61,
+C (OLS),c10: base,logpgp95,0.522,0.05,0.0,,64,0.54
+C (OLS),c11: + lat,logpgp95,0.468,0.063,0.0,,64,0.574
+C (OLS),c12: -NeoEur,logpgp95,0.487,0.074,0.0,,60,0.414
+C (OLS),c13: -NeoEur + lat,logpgp95,0.471,0.08,0.0,,60,0.456
+C (OLS),c14: -Africa,logpgp95,0.482,0.052,0.0,,37,0.611
+C (OLS),c15: -Africa + lat,logpgp95,0.466,0.067,0.0,,37,0.616
+C (OLS),c16: + continents,logpgp95,0.424,0.055,0.0,,64,0.704
+C (OLS),c17: + cont + lat,logpgp95,0.401,0.064,0.0,,64,0.714
+C (OLS),c18: loghjypl,loghjypl,0.457,0.05,0.0,,61,0.486

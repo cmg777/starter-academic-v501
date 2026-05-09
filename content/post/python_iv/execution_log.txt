@@ -1,0 +1,287 @@
+Data source: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_iv
+
+
+
+================================================================
+  AJR (2001) IV Tutorial — Colonial Origins of Development
+================================================================
+  Estimand: LATE (compliers) under heterogeneous effects.
+  Three IV conditions: relevance, exclusion, exogeneity.
+
+
+
+================================================================
+  TABLE 1 — Summary Statistics
+================================================================
+df1 (whole world): (376, 11)
+
+*** Column 1: whole world ***
+            count    mean     std     min      max
+logpgp95 162.0000  8.3040  1.0710  6.1090  10.2890
+loghjypl 127.0000 -1.7090  1.0770 -3.5400   0.0000
+avexpr   129.0000  6.9890  1.8320  1.6360  10.0000
+cons00a   96.0000  1.8540  1.7890  1.0000   7.0000
+cons1     92.0000  3.6300  2.3940  1.0000   7.0000
+democ00a  90.0000  1.1220  2.5390  0.0000  10.0000
+euro1900 166.0000 30.1020 41.8640  0.0000 100.0000
+
+*** Column 2: AJR base sample (baseco==1) ***
+           count    mean     std     min     max
+logpgp95 64.0000  8.0620  1.0430  6.1090 10.2160
+loghjypl 61.0000 -1.9340  0.9810 -3.5400  0.0000
+avexpr   64.0000  6.5160  1.4690  3.5000 10.0000
+cons00a  60.0000  2.2500  2.1120  1.0000  7.0000
+cons1    60.0000  3.4000  2.3950  1.0000  7.0000
+democ00a 59.0000  1.6440  3.0040  0.0000 10.0000
+euro1900 63.0000 16.1810 25.5330  0.0000 99.0000
+logem4   64.0000  4.6570  1.2580  2.1460  7.9860
+→ wrote tab1_summary.csv
+
+*** Columns 3-6: quartiles of settler mortality ***
+   logpgp95  avexpr  logem4
+q                          
+1    8.9120  7.6950  3.0390
+2    8.4340  6.3970  4.3180
+3    7.9030  6.2680  4.9660
+4    7.1100  5.6180  6.1170
+
+
+================================================================
+  TABLE 2 — OLS Regressions of log GDP per capita
+================================================================
+df2 (whole world + base): (163, 9)
+  Col 1: whole world              avexpr =   0.532***  (SE 0.029)  N=111
+  Col 2: base sample              avexpr =   0.522***  (SE 0.050)  N=64
+  Col 3: + latitude               avexpr =   0.463***  (SE 0.052)  N=111
+  Col 4: + lat + continents       avexpr =   0.390***  (SE 0.051)  N=111
+  Col 5: base + latitude          avexpr =   0.468***  (SE 0.063)  N=64
+  Col 6: base + lat + cont.       avexpr =   0.401***  (SE 0.064)  N=64
+  Col 7: loghjypl, world          avexpr =   0.446***  (SE 0.029)  N=108
+  Col 8: loghjypl, base           avexpr =   0.457***  (SE 0.050)  N=61
+→ wrote tab2_ols.csv
+
+
+================================================================
+  TABLE 3 — Determinants of Institutions
+================================================================
+
+*** Panel A: DV = current expropriation protection (avexpr) ***
+  A.c1    cons00a      =   0.318***  (SE 0.094)  N=60
+  A.c2    cons00a      =   0.255***  (SE 0.084)  N=60
+  A.c3    democ00a     =   0.242***  (SE 0.059)  N=59
+  A.c4    democ00a     =   0.203***  (SE 0.060)  N=59
+  A.c5    cons1        =   0.249***  (SE 0.093)  N=60
+  A.c6    cons1        =    0.220**  (SE 0.084)  N=60
+  A.c7    euro1900     =   3.162***  (SE 0.484)  N=63
+  A.c8    euro1900     =   2.923***  (SE 0.626)  N=63
+  A.c9    logem4       =  -0.607***  (SE 0.150)  N=64
+  A.c10   logem4       =  -0.510***  (SE 0.165)  N=64
+→ wrote tab3a_inst.csv
+
+*** Panel B: DV = early institutions (cons00a/democ00a/euro1900) ***
+  B.c1    euro1900     =   5.491***  (SE 0.645)  N=70
+  B.c2    euro1900     =   5.385***  (SE 0.945)  N=70
+  B.c3    logem4       =  -0.841***  (SE 0.202)  N=71
+  B.c4    logem4       =  -0.660***  (SE 0.193)  N=71
+  B.c5    euro1900     =   8.566***  (SE 0.931)  N=67
+  B.c6    euro1900     =   8.056***  (SE 1.349)  N=67
+  B.c7    logem4       =  -1.221***  (SE 0.324)  N=68
+  B.c8    logem4       =  -0.877***  (SE 0.260)  N=68
+  B.c9    logem4       =  -0.112***  (SE 0.030)  N=73
+  B.c10   logem4       =  -0.071***  (SE 0.021)  N=73
+→ wrote tab3b_inst.csv
+
+
+================================================================
+  FIGURES 1 & 2 — First-stage and reduced-form scatters
+================================================================
+
+*** First-stage robust F (linearmodels): 16.85  (p = 4.05e-05)
+*** Stock-Yogo (2005) 10% maximal IV size critical value: 16.38 (IID)
+*** Staiger-Stock (1997) weak-IV rule of thumb: F > 10
+*** Endogeneity test (Wu-Hausman) F=24.220, p = 0.0000
+*** (small p -> reject OLS exogeneity -> IV warranted)
+→ wrote python_iv_first_stage.png
+→ wrote python_iv_reduced_form.png
+
+First-stage slope (logem4 -> avexpr):   -0.607
+Reduced-form slope (logem4 -> logpgp95): -0.573
+Implied 2SLS β = RF / FS = -0.573 / -0.607 = 0.944
+
+
+================================================================
+  TABLE 4 — IV Regressions of log GDP per capita (main result)
+================================================================
+
+*** Panel B: 2SLS (IV with logem4) ***
+
+  IV c1: base                       pyfixest β=0.944 (SE 0.179)  LM β=0.944 (SE 0.176)  KP-F=16.85  N=64
+  IV c2: + lat                      pyfixest β=0.996 (SE 0.246)  LM β=0.996 (SE 0.240)  KP-F=9.99  N=64
+  IV c3: -Neo-Europes               pyfixest β=1.281 (SE 0.409)  LM β=1.281 (SE 0.402)  KP-F=7.09  N=60
+  IV c4: -Neo-Europes + lat         pyfixest β=1.212 (SE 0.402)  LM β=1.212 (SE 0.392)  KP-F=5.94  N=60
+  IV c5: -Africa                    pyfixest β=0.578 (SE 0.084)  LM β=0.578 (SE 0.082)  KP-F=38.29  N=37
+  IV c6: -Africa + lat              pyfixest β=0.576 (SE 0.095)  LM β=0.576 (SE 0.091)  KP-F=29.95  N=37
+  IV c7: + continents               pyfixest β=0.982 (SE 0.345)  LM β=0.982 (SE 0.331)  KP-F=5.52  N=64
+  IV c8: + continents + lat         pyfixest β=1.107 (SE 0.528)  LM β=1.107 (SE 0.503)  KP-F=3.28  N=64
+  IV c9: loghjypl                   pyfixest β=0.981 (SE 0.200)  LM β=0.981 (SE 0.196)  KP-F=17.94  N=61
+
+*** Tab 4 Col 1 — full diagnostics ***
+  IV β = 0.9443  (SE 0.1761)
+  CI 95% = [0.599, 1.289]
+  First-stage robust F (≈KP-F): 16.847
+  Wu-Hausman endogeneity F = 24.220, p = 0.0000
+  Anderson-Rubin Wald F    = nan, p = nan
+  (small endogeneity p -> OLS biased -> IV warranted)
+
+*** Panel C: OLS comparisons ***
+
+  OLS c10: base                      β=0.522 (SE 0.050)  N=64
+  OLS c11: + lat                     β=0.468 (SE 0.063)  N=64
+  OLS c12: -NeoEur                   β=0.487 (SE 0.074)  N=60
+  OLS c13: -NeoEur + lat             β=0.471 (SE 0.080)  N=60
+  OLS c14: -Africa                   β=0.482 (SE 0.052)  N=37
+  OLS c15: -Africa + lat             β=0.466 (SE 0.067)  N=37
+  OLS c16: + continents              β=0.424 (SE 0.055)  N=64
+  OLS c17: + cont + lat              β=0.401 (SE 0.064)  N=64
+  OLS c18: loghjypl                  β=0.457 (SE 0.050)  N=61
+→ wrote tab4_iv_main.csv
+
+
+================================================================
+  TABLE 5 — IV with colonial, legal, and religious controls
+================================================================
+
+  IV c1: + Brit/French                β=1.078 (SE 0.240)  KP-F=12.51  N=64
+  IV c2: + Brit/French + lat          β=1.155 (SE 0.352)  KP-F=6.56  N=64
+  IV c3: British only                 β=1.066 (SE 0.258)  KP-F=8.56  N=25
+  IV c4: British only + lat           β=1.339 (SE 0.535)  KP-F=3.30  N=25
+  IV c5: + French legal               β=1.080 (SE 0.202)  KP-F=16.73  N=64
+  IV c6: + French legal + lat         β=1.181 (SE 0.301)  KP-F=9.34  N=64
+  IV c7: + religion                   β=0.917 (SE 0.156)  KP-F=18.18  N=64
+  IV c8: + religion + lat             β=1.006 (SE 0.257)  KP-F=7.28  N=64
+  IV c9: kitchen sink                 β=1.212 (SE 0.395)  KP-F=4.92  N=64
+→ wrote tab5_iv_controls.csv
+
+
+================================================================
+  TABLE 6 — IV with geography and climate controls
+================================================================
+
+  IV c1: temp+humid               β=0.837 (SE 0.165)  KP-F=21.50  N=64
+  IV c2: temp+humid+lat           β=0.835 (SE 0.179)  KP-F=16.90  N=64
+  IV c3: edes1975                 β=0.960 (SE 0.294)  KP-F=6.58  N=64
+  IV c4: edes1975+lat             β=0.991 (SE 0.323)  KP-F=5.61  N=64
+  IV c5: soil/resources           β=1.259 (SE 0.543)  KP-F=3.63  N=64
+  IV c6: soil/resources+lat       β=1.358 (SE 0.733)  KP-F=2.27  N=64
+  IV c7: avelf                    β=0.738 (SE 0.140)  KP-F=15.73  N=64
+  IV c8: avelf+lat                β=0.787 (SE 0.177)  KP-F=11.01  N=64
+  IV c9: all                      β=0.713 (SE 0.147)  KP-F=9.34  N=64
+→ wrote tab6_iv_geo.csv
+
+
+================================================================
+  TABLE 7 — Health-channel IV (Cols 7-9 with overidentification)
+================================================================
+
+  IV c1: + malfal94               β=0.687 (SE 0.265)  KP-F=3.98  N=62
+  IV c2: + malfal94 + lat         β=0.721 (SE 0.314)  KP-F=3.39  N=62
+  IV c3: + leb95                  β=0.629 (SE 0.295)  KP-F=4.23  N=60
+  IV c4: + leb95 + lat            β=0.677 (SE 0.357)  KP-F=3.14  N=60
+  IV c5: + imr95                  β=0.551 (SE 0.260)  KP-F=5.12  N=60
+  IV c6: + imr95 + lat            β=0.562 (SE 0.338)  KP-F=3.15  N=60
+
+*** Cols 7-9: 2 endogenous regressors, 4 instruments => Hansen J meaningful ***
+
+  IV c7: avexpr + malfal94 endog      avexpr β=0.689 (SE 0.244)  Hansen J=1.02 (p=0.600)  fs-F=54.01  N=60
+  IV c8: avexpr + leb95 endog         avexpr β=0.737 (SE 0.224)  Hansen J=0.80 (p=0.671)  fs-F=51.30  N=59
+  IV c9: avexpr + imr95 endog         avexpr β=0.675 (SE 0.197)  Hansen J=0.45 (p=0.798)  fs-F=51.30  N=59
+
+*** Cols 10-11: yellow-fever instrument ***
+
+  IV c10: yellow                      β=0.914 (SE 0.239)  KP-F=9.73  N=64
+  IV c11: yellow + continents         β=0.899 (SE 0.289)  KP-F=7.44  N=64
+→ wrote tab7_iv_health.csv
+
+
+================================================================
+  TABLE 8 — Alternative instruments + Hansen J overidentification
+================================================================
+
+*** Panels A/B: each alternative instrument alone ***
+
+  Panel A/B  a.c1: euro1900                     β=0.870 (SE 0.136)  KP-F=44.03  N=63
+  Panel A/B  a.c2: euro1900 + lat               β=0.917 (SE 0.172)  KP-F=22.88  N=63
+  Panel A/B  a.c3: cons00a                      β=0.706 (SE 0.123)  KP-F=11.94  N=60
+  Panel A/B  a.c4: cons00a + lat                β=0.677 (SE 0.184)  KP-F=9.81  N=60
+  Panel A/B  a.c5: democ00a                     β=0.719 (SE 0.099)  KP-F=17.14  N=59
+  Panel A/B  a.c6: democ00a + lat               β=0.690 (SE 0.146)  KP-F=11.91  N=59
+  Panel A/B  a.c7: cons1 (+ indtime)            β=0.595 (SE 0.146)  KP-F=7.61  N=60
+  Panel A/B  a.c8: cons1 (+ indtime) + lat      β=0.611 (SE 0.169)  KP-F=7.36  N=60
+  Panel A/B  a.c9: democ1 (+ indtime)           β=0.549 (SE 0.133)  KP-F=13.07  N=59
+  Panel A/B  a.c10: democ1 (+ indtime) + lat    β=0.555 (SE 0.152)  KP-F=11.74  N=59
+
+*** Panel C: alt instrument + logem4 => Hansen J overid test ***
+
+  Panel C   c.c1: euro1900 + logem4              β=0.893 (SE 0.137)  Hansen J=0.15 (p=0.703)  fs-F=52.16  N=63
+  Panel C   c.c2: euro1900 + logem4 + lat        β=0.946 (SE 0.168)  Hansen J=0.07 (p=0.791)  fs-F=29.52  N=63
+  Panel C   c.c3: cons00a + logem4               β=0.808 (SE 0.136)  Hansen J=1.32 (p=0.251)  fs-F=19.71  N=60
+  Panel C   c.c4: cons00a + logem4 + lat         β=0.833 (SE 0.178)  Hansen J=1.21 (p=0.271)  fs-F=13.40  N=60
+  Panel C   c.c5: democ00a + logem4              β=0.799 (SE 0.124)  Hansen J=1.18 (p=0.278)  fs-F=26.95  N=59
+  Panel C   c.c6: democ00a + logem4 + lat        β=0.820 (SE 0.160)  Hansen J=1.09 (p=0.297)  fs-F=17.36  N=59
+  Panel C   c.c7: cons1+logem4 (+ indtime)       β=0.670 (SE 0.106)  Hansen J=0.57 (p=0.450)  fs-F=17.97  N=60
+  Panel C   c.c8: cons1+logem4 (+ indtime) + lat β=0.705 (SE 0.121)  Hansen J=0.65 (p=0.419)  fs-F=14.21  N=60
+  Panel C   c.c9: democ1+logem4 (+ indtime)      β=0.633 (SE 0.098)  Hansen J=1.67 (p=0.197)  fs-F=23.46  N=59
+  Panel C   c.c10: democ1+logem4 (+ indtime) + lat β=0.654 (SE 0.109)  Hansen J=1.78 (p=0.182)  fs-F=19.50  N=59
+
+*** Panel D: logem4 as exogenous control (relaxes exclusion) ***
+
+  Panel D   d.c1: euro1900                     β=0.814 (SE 0.226)  KP-F=12.54  N=63
+  Panel D   d.c2: euro1900 + lat               β=0.879 (SE 0.260)  KP-F=11.23  N=63
+  Panel D   d.c3: cons00a                      β=0.454 (SE 0.278)  KP-F=3.84  N=60
+  Panel D   d.c4: cons00a + lat                β=0.416 (SE 0.382)  KP-F=3.19  N=60
+  Panel D   d.c5: democ00a                     β=0.515 (SE 0.174)  KP-F=5.24  N=59
+  Panel D   d.c6: democ00a + lat               β=0.481 (SE 0.248)  KP-F=4.43  N=59
+  Panel D   d.c7: cons1 (+ indtime)            β=0.485 (SE 0.274)  KP-F=2.89  N=60
+  Panel D   d.c8: cons1 (+ indtime) + lat      β=0.494 (SE 0.289)  KP-F=3.01  N=60
+  Panel D   d.c9: democ1 (+ indtime)           β=0.402 (SE 0.222)  KP-F=5.15  N=59
+  Panel D   d.c10: democ1 (+ indtime) + lat    β=0.407 (SE 0.231)  KP-F=5.24  N=59
+→ wrote tab8_overid.csv
+
+*** Albouy (2012) caveat: ~36% of mortality observations are
+*** imputed or repeats; Hansen J non-rejection here does not
+*** rule out shared imputation bias across instruments.
+
+
+================================================================
+  FIGURE 3 — OLS vs IV coefficient comparison
+================================================================
+→ wrote python_iv_ols_vs_iv.png
+
+
+================================================================
+  Analysis complete
+================================================================
+
+  Key takeaways:
+    - OLS coefficient on avexpr (Tab 2 Col 1):       ~0.52
+    - IV  coefficient on avexpr (Tab 4 Col 1):       ~0.94
+    - First-stage robust F (linearmodels, ≈KP-F):    > 16
+    - Stock-Yogo 10% maximal IV size threshold:      16.38
+    - Hansen J p-values (Tab 8 Panel C):             > 0.10
+
+  Estimand: 2SLS identifies the LATE for compliers (Imbens-
+  Angrist 1994) -- not the ATE. Under constant treatment
+  effects, LATE = ATE.
+
+  Library strategy:
+    pyfixest.feols     -> 2SLS β/SE/CI/p, OLS comparisons
+    linearmodels.IV2SLS-> KP-F, Hansen J, Wu-Hausman, multi-endog
+
+  Outputs:
+    - 3 PNG figures: python_iv_first_stage / _reduced_form /
+      _ols_vs_iv
+    - 9 result tables: tab1_summary, tab2_ols, tab3a_inst,
+      tab3b_inst, tab4_iv_main, tab5_iv_controls, tab6_iv_geo,
+      tab7_iv_health, tab8_overid
+
+=== Script completed successfully ===

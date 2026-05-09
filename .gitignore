@@ -17,3 +17,6 @@ content/post/stata_iv/references/
 
 # Stata batch-mode auto-log artifact (the real log is analysis.log)
 content/post/stata_iv/stata.log
+
+# Python venv for python_iv post (build artifact, not source)
+content/post/python_iv/.venv/

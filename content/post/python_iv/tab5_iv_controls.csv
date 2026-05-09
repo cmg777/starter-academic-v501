@@ -1,0 +1,10 @@
+Spec,avexpr_b,avexpr_se,avexpr_p,first_stage_F,N,R2
+c1: + Brit/French,1.078,0.24,0.0,12.51,64,
+c2: + Brit/French + lat,1.155,0.352,0.001,6.56,64,
+c3: British only,1.066,0.258,0.0,8.56,25,
+c4: British only + lat,1.339,0.535,0.0123,3.3,25,
+c5: + French legal,1.08,0.202,0.0,16.73,64,
+c6: + French legal + lat,1.181,0.301,0.0001,9.34,64,
+c7: + religion,0.917,0.156,0.0,18.18,64,
+c8: + religion + lat,1.006,0.257,0.0001,7.28,64,
+c9: kitchen sink,1.212,0.395,0.0022,4.92,64,
