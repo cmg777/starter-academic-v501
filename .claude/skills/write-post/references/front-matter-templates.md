@@ -151,3 +151,4 @@ diagram: true
 - **links:** Only include links to files that exist in the page bundle. Remove notebook/Colab links if no notebook was created. The final **MD version** entry is always included — it points to the post's own `index.md` on GitHub raw and lets readers view or save the source.
 - **icon_pack values:** `fas` (Font Awesome solid), `fab` (Font Awesome brands), `ai` (Academicons)
 - **No emojis** in any front matter field
+- **YAML list indentation:** Every item inside a YAML list (especially `links:`, `tags:`, `categories:`) must share the same indentation as its siblings. The templates above use 2-space-indented list items (`  - icon:`). When adding entries to an *existing* post, first read its `links:` block and copy the exact indentation of the existing `- icon:` lines — never assume column 0. Mixed-indentation lists are invalid YAML and will abort the Hugo build (see commit 153470a for an incident that took the site down).

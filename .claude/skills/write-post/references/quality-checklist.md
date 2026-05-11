@@ -16,6 +16,7 @@ Run through every item before delivering the post.
 - [ ] No emojis in post content
 - [ ] `links:` only reference files that exist in the page bundle
 - [ ] `links:` ends with the **MD version** entry pointing to `https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/<slug>/index.md`
+- [ ] All `links:` entries share the same indentation (no mixing column-0 and column-2 list items within the same list)
 
 ## Sandwich pattern and interpretations
 
