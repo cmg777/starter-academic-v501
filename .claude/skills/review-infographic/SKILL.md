@@ -16,10 +16,11 @@ inline review report with a verdict.
 **What this skill does:**
 - Cross-checks every number in the infographic prompt against `index.md`
 - Verifies all 4 sections (A, B, C, D) are present and well-formed
-- Evaluates Section A for lean flowing prose (under 1,200 words)
-- Checks all 6 panels for storyboard format (title, central sketch, callout, connector)
+- Evaluates Section A for lean flowing prose (≤1,200 words simple; ≤1,300 content-dense)
+- Checks all 6 panels for storyboard format (title, central sketch, callout, connector + optional sub-elements)
 - Validates Panel 4 uses a Comparison metaphor with teal highlight
 - Assesses narrative arc coherence -- do the 6 beats tell a story?
+- **Evaluates message coverage** -- does the infographic carry the post's main messages, or is it oversimplified?
 - Verifies Story Spine and dramatic functions in Section D
 - Verifies correct template alignment (Causal / ML / Exploratory)
 - Confirms central sketches are metaphorical (not precise charts)
@@ -75,9 +76,9 @@ Present a brief confirmation to the user:
    at `content/post/<slug>/`."
 
 2. **Scope:** "Running full review of infographic instructions against source
-   post across all 7 dimensions: accuracy, completeness, prompt leanness,
-   storyboard format, Panel 4 comparison sketch, narrative arc coherence, and
-   template alignment."
+   post across all 8 dimensions: accuracy, completeness, prompt leanness,
+   storyboard format, Panel 4 comparison sketch, narrative arc coherence,
+   template alignment, and message coverage."
 
 **Do NOT wait for confirmation.** Proceed directly to the review. This is a
 read-only operation with no risk of modification.
@@ -115,16 +116,17 @@ Every factual claim in the infographic must trace back to the source post.
 ## Step 2 -- Dimension 2: Completeness
 
 1. **All 4 sections present:**
-   - Section A -- Lean flowing-prose image generation prompt (under 1,200 words)
+   - Section A -- Lean flowing-prose image generation prompt (≤1,200 words simple posts; ≤1,300 content-dense posts)
    - Section B -- Negative prompt
-   - Section C -- Condensed prompt (under 250 words)
+   - Section C -- Condensed prompt (≤250 words)
    - Section D -- Panel reference data appendix with body sentences for overlay
 
 2. **Section A is flowing prose.** No bullet points, no numbered lists, no
    tables. The entire section reads as continuous paragraphs.
 
-3. **Section A word count.** Count the words in Section A. Flag if over 1,200
-   words -- the prompt should be lean enough for Gemini to process.
+3. **Section A word count.** Count the words in Section A. Flag if over the
+   density-appropriate cap: 1,200 for simple posts (≤5 ON-IMAGE messages) or
+   1,300 for content-dense posts (≥6 ON-IMAGE messages).
 
 4. **Section B includes standard exclusions** plus topic-specific additions.
    Must include "Do not render precise statistical charts."
@@ -133,10 +135,18 @@ Every factual claim in the infographic must trace back to the source post.
    words.
 
 6. **Section D has structured data** for all 6 panels. Each panel entry must
-   include: dramatic function, story beat, callout, central sketch description,
-   body sentences (2-3), and transition phrase.
+   include: dramatic function, story beat, callout, central sketch description
+   (with sub-elements if the panel is layered), body sentences (2-3 for simple
+   posts, 4-6 for content-dense posts), and transition phrase. For
+   content-dense posts, each panel should cite at least one specific
+   source-paper section, equation, table, or figure number.
 
 7. **Story Spine present** in Section D with a one-sentence narrative arc.
+
+8. **Optional Reference Subsections** (Tracked Models, Three Concepts, Key
+   Equations on Screen) at the end of Section D are valid for content-dense
+   posts that track multiple named entities. Verify each subsection maps to
+   at least one panel and does not duplicate body-sentence content.
 
 ---
 
@@ -154,11 +164,15 @@ Evaluate Section A for effective AI image generation with minimal text:
 3. **Spatial positions specified.** Each panel has a clear position description
    (top-left, top-center, top-right, bottom-left, bottom-center, bottom-right).
 
-4. **Panel descriptions are 40-60 words each.** Flag panels that are over 80
-   words -- they contain too many elements for Gemini.
+4. **Panel descriptions are 40-90 words each** (40-60 for simple panels, 60-90
+   for layered panels). Flag panels over 110 words as too dense for the AI to
+   render reliably; flag panels under 35 words as too thin to carry their
+   message. If panels exceed 60 words, confirm the post is content-dense
+   (≥6 ON-IMAGE messages per the writer's inventory).
 
 5. **No body text in Section A.** Body sentences belong only in Section D.
-   Flag any explanatory sentences in panel descriptions.
+   Flag any explanatory sentences or full-paragraph narratives in panel
+   descriptions.
 
 6. **Two-pass rendering note present.** Section A ends with a paragraph
    explaining what the AI renders vs what the user overlays.
@@ -175,25 +189,41 @@ element:
 1. **Panel title.** Steel blue small-caps, 3-5 words, specific to content
    (not generic like "Results" or "Analysis").
 
-2. **Central sketch.** ONE metaphorical illustration described in 1-2
-   sentences. Must be a visual metaphor (magnifying glass, balance scale,
+2. **Central sketch.** ONE *primary* metaphorical illustration described in
+   1-2 sentences. Must be a visual metaphor (magnifying glass, balance scale,
    fork in road) -- NOT a precise statistical chart (bar chart with exact
-   values, scatter plot, number line with tick marks). Flag any precise
-   data visualizations.
+   numeric axis ticks, scatter plot, number line with gridlines). Flag any
+   precise data visualisations. Chalk-tally, stripe-hatching, and uneven
+   hand-drawn grids are acceptable substitutes when the post needs to show
+   data shape.
 
-3. **Callout.** Warm orange, under 8 words. Exactly 3 of 6 panels must
+3. **Optional sub-elements (layered panels only).** A panel may carry up to
+   3 supporting sub-elements: a sub-sketch (e.g., split-scene composition,
+   chalk-tally next to the metaphor), a sub-equation in chalk inside the
+   panel border (e.g., `β̂_k = β_k + δ_k`), a sub-tag above the panel
+   ("STAGE 1" / "STAGE 2"), or 2-3 annotation labels naming specific
+   quantities. These are *allowed* only when the writer's message inventory
+   justifies them (≥6 ON-IMAGE messages). Flag layered panels on
+   simple-message posts as over-engineered.
+
+4. **Callout.** Warm orange, under 8 words. Exactly 3 of 6 panels must
    contain a BIG number; the other 3 use memorable phrases. Flag if all 6
    have numbers (too dense) or if none have numbers (too vague).
 
-4. **Connector arrow.** Visual only in Section A (just "chalk arrow to
+5. **Connector arrow.** Visual only in Section A (just "chalk arrow to
    Panel N"). Transition phrases belong in Section D only.
 
-5. **No extra elements.** Flag if a panel description includes body
-   sentences, mini-viz with data values, multiple annotation labels, or
-   transition text on arrows.
+6. **No extra elements beyond the layered-panel allowances.** Flag full
+   body sentences (they belong in Section D). Allow up to 3 sub-elements
+   and 2-3 annotation labels per sketch when justified by the message
+   inventory. Mini-viz with exact numeric axis ticks remain forbidden.
 
-6. **Sketch diversity.** No two panels should use the same metaphor type.
-   Flag repeats (e.g., two magnifying glasses, two forks in roads).
+7. **Sketch diversity.** No two panels should use the same *primary*
+   metaphor type. Flag repeats (e.g., two magnifying glasses, two forks
+   in roads). Sub-sketches may overlap thematically across panels (e.g.,
+   a small tree fragment as a sub-sketch in one panel and as the primary
+   metaphor in another — flag only if the sub-sketch and primary metaphor
+   share the same panel).
 
 ---
 
@@ -266,7 +296,54 @@ Evaluate whether the 6 panels tell a coherent story:
 
 ---
 
-## Step 8 -- Produce review report
+## Step 8 -- Dimension 8: Message coverage
+
+This is the most important dimension when source posts are content-dense.
+The previous seven dimensions can all pass while the infographic still
+fails to carry the post's substance — that produces an "oversimplified"
+storyboard. This dimension catches it.
+
+1. **Extract main messages from the source post.** Read `index.md` and
+   list 4-10 single-sentence claims the post wants readers to walk away
+   with. Look for: numbered key takeaways, paper-section replications,
+   named typologies or frameworks, headline figures with specific
+   findings, and the central conceptual contribution.
+
+2. **Map each main message to the infographic.** For each message,
+   locate where (if anywhere) it appears:
+   - Panel scene in Section A (most prominent placement).
+   - Margin element (professor's note, sidebar) in Section A.
+   - Background formula at 15-20% opacity.
+   - Body sentence in Section D.
+   - Reference Subsection in Section D (Tracked Models, Three Concepts,
+     Key Equations).
+   - **Missing** entirely from the infographic.
+
+3. **Score message coverage:**
+   - **FULL** — every headline message has at least a Section D
+     mention; the central conceptual contribution is on-image (panel
+     or margin).
+   - **PARTIAL** — 1-2 headline messages missing entirely. Treat as a
+     MEDIUM issue.
+   - **OVERSIMPLIFIED** — 3+ headline messages missing, or the post's
+     central conceptual contribution is absent from the infographic.
+     Treat as a HIGH issue.
+
+4. **Flag oversimplification on content-dense posts.** If the source
+   post has ≥6 main messages (a content-dense post) and the
+   infographic uses only simple panels (≤60 words each) with a thin
+   Section D (only 2-3 body sentences per panel), flag as MEDIUM
+   under this dimension even if every present number is accurate
+   and every other dimension passes.
+
+5. **Check writer's message-inventory documentation.** If Section D
+   includes a message inventory (ON-IMAGE / MARGIN / REFERENCE tags),
+   compare what the writer promised vs delivered. Flag any
+   ON-IMAGE-tagged messages that did not actually make it onto a panel.
+
+---
+
+## Step 9 -- Produce review report
 
 Deliver the review **inline in the conversation** using the format below.
 
@@ -274,9 +351,9 @@ Deliver the review **inline in the conversation** using the format below.
 
 | Level | Meaning |
 | --- | --- |
-| **HIGH** | Numbers do not match source post, missing sections (A/B/C/D), fabricated claims, wrong template, precise charts instead of sketches. Must fix before using the prompt. |
-| **MEDIUM** | Generic descriptions, missing panel elements, vague callouts, too many text elements per panel, Section A over 1,200 words. Should fix. |
-| **LOW** | Style preferences, minor wording improvements, alternative suggestions. Nice to fix. |
+| **HIGH** | Numbers do not match source post, missing sections (A/B/C/D), fabricated claims, wrong template, precise charts instead of sketches, **post's central conceptual contribution is missing from the infographic**, or 3+ headline messages missing. Must fix before using the prompt. |
+| **MEDIUM** | Generic descriptions, missing panel elements, vague callouts, too many text elements per panel, Section A over the density-appropriate cap, 1-2 headline messages missing, **or content-dense post (≥6 main messages) uses only simple panels producing an oversimplified storyboard**. Should fix. |
+| **LOW** | Style preferences, minor wording improvements, alternative suggestions, layered-panel sub-elements on a simple post. Nice to fix. |
 
 ### Report structure
 
@@ -305,10 +382,27 @@ the infographic, its location in the source post, and match status
 - **Story Spine**: <present/missing> -- <quote if present>
 - **Dramatic functions**: <all assigned / missing for panels X>
 - **Narrative arc**: <coherent / disconnected at panel X>
-- **Section A word count**: <N words> (<within / over> 1,200 limit)
-- **Panel description lengths**: <range, e.g. "42-58 words each">
+- **Density mode**: <simple / layered> (<N ON-IMAGE messages per the writer's inventory>)
+- **Section A word count**: <N words> (<within / over> the <1,200 simple / 1,300 content-dense> cap)
+- **Panel description lengths**: <range, e.g. "42-58 words each" or "86-101 words each">
 - **BIG numbers**: <N of 3 expected> in callouts
 - **Sketch types**: <all metaphorical / panels X use precise charts>
+- **Sub-elements** (layered posts): <N sub-sketches, M sub-equations, K sub-tags / none>
+- **Margin elements**: <N professor notes / M-entry colour legend / sidebar present?>
+- **Reference Subsections** (content-dense posts only): <Tracked Models / Three Concepts / Key Equations / none>
+
+## Message Coverage
+
+Source post main messages (extracted from `index.md`):
+
+1. <message 1> -- represented in: <Panel N / margin / background / Section D body / Reference Subsection / **missing**>
+2. <message 2> -- ...
+3. <message 3> -- ...
+... (continue for every headline message identified)
+
+Coverage verdict: **<FULL / PARTIAL / OVERSIMPLIFIED>**
+
+<one-sentence justification of the coverage verdict>
 
 ## Issues Found
 
@@ -348,27 +442,34 @@ the infographic, its location in the source post, and match status
 - [ ] Read the **entire** `index.md` source post
 - [ ] Extracted and verified every number in the infographic against the source
 - [ ] Confirmed all 4 sections (A, B, C, D) are present
-- [ ] Counted Section A words (must be under 1,200)
-- [ ] Counted Section C words (must be under 250)
+- [ ] Determined density mode (simple vs content-dense) from the writer's message inventory or message count in the post
+- [ ] Counted Section A words (≤1,200 simple, ≤1,300 content-dense)
+- [ ] Counted Section C words (≤250)
 - [ ] Verified Section A is flowing prose (no bullets, no tables)
 - [ ] Checked all 6 hex codes appear in Section A
 - [ ] Verified spatial positions for all 6 panels
-- [ ] Checked each panel for storyboard format (title, central sketch, callout, connector)
-- [ ] Confirmed panel descriptions are 40-60 words each
+- [ ] Checked each panel for storyboard format (title, central sketch, callout, connector + optional sub-elements)
+- [ ] Confirmed panel descriptions are 40-90 words each (40-60 simple, 60-90 layered)
+- [ ] Confirmed sub-elements (sub-sketch, sub-equation, sub-tag, multi-label) appear only when message inventory justifies them
 - [ ] Confirmed no body text in Section A
 - [ ] Verified central sketches are metaphorical (not precise charts)
 - [ ] Confirmed exactly 3 BIG numbers in callouts
 - [ ] Verified Panel 4 uses a Comparison metaphor with teal/chalk coloring
+- [ ] Verified margin elements: 1-2 professor's notes; 2-4-entry colour legend; right-margin sidebar present only for tracked-entity posts
+- [ ] Verified Section D body sentences scale with density (2-3 simple, 4-6 content-dense)
+- [ ] Verified Reference Subsections (if present) map to panels without duplication
 - [ ] Checked Story Spine and dramatic functions in Section D
 - [ ] Assessed narrative arc coherence across all 6 beats
 - [ ] Verified correct template for the topic
+- [ ] **Extracted main messages from the source post and mapped each to the infographic (Dimension 8)**
+- [ ] **Scored message coverage as FULL / PARTIAL / OVERSIMPLIFIED**
 - [ ] Generated 2-3 variant suggestions
 - [ ] All HIGH issues have specific locations and correct values
 - [ ] Priority action items ranked by impact
 
 ---
 
-## Step 9 -- Follow-up
+## Step 10 -- Follow-up
 
 After delivering the review, offer the user next steps:
 

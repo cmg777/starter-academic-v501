@@ -3,6 +3,31 @@
 > This file is part of the `write-infographic` skill. Read after template
 > selection in the confirm scope step.
 
+## Content density: simple vs layered panels
+
+Before choosing a template, decide the **panel density mode** based on
+the message inventory from Step 0.6 of the skill:
+
+- **Simple panels (40-60 words each, 3-4 elements)** — use when the
+  message inventory has ≤5 ON-IMAGE messages. Each panel carries one
+  primary metaphor, one callout, and the connector arrow. Calibration
+  example: `content/post/python_partial_identification/infographic_instructions.md`.
+- **Layered panels (60-90 words each, 3-4 baseline elements PLUS up to
+  3 sub-elements)** — use when the message inventory has ≥6 ON-IMAGE
+  messages. Each panel can carry a sub-sketch (e.g., a chalk-tally
+  next to the metaphor, or a split-scene composition), an in-panel
+  sub-equation at ~80% opacity, a steel-blue sub-tag above the panel
+  border (e.g., "STAGE 1" / "STAGE 2"), and 2-3 annotation labels.
+  Calibration example: `content/post/python_mgwrfer/infographic_instructions.md`.
+
+Whichever mode you choose, the templates below (Causal Inference, ML /
+Prediction, Exploratory / Descriptive) still apply: the dramatic
+function of each panel (Hook, Stakes, Attempt, Twist, Surprise,
+Resolution) is independent of how many sub-elements the panel carries.
+A layered panel just packs the function with more on-image content.
+
+---
+
 ## Story Spine
 
 Before designing panels, write a one-sentence Story Spine that captures
