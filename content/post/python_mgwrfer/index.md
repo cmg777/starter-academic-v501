@@ -5,6 +5,7 @@ categories:
   - Python
   - Tutorial
   - MGWR
+  - GWR and MGWR
   - Causal Inference
   - Spatial Analysis
   - Panel Data
