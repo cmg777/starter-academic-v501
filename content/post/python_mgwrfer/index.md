@@ -4,6 +4,7 @@ authors:
 categories:
   - Python
   - Tutorial
+  - MGWR
   - Causal Inference
   - Spatial Analysis
   - Panel Data
