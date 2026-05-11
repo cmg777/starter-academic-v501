@@ -22,6 +22,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_convergence2/index.md
 slides:
 summary: Reproduce the key findings of Kremer, Willis, and You (2021) to understand why unconditional convergence emerged since 2000 and how the convergence of growth correlates explains this shift
 tags:

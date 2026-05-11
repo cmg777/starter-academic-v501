@@ -24,6 +24,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_fwl/index.md
 slides:
 summary: A hands-on guide to the scatterfit package in Stata --- from understanding the Frisch-Waugh-Lovell theorem through simulated confounding to visualizing fixed effects in real panel data --- showing what "controlling for" looks like as a scatter plot.
 tags:

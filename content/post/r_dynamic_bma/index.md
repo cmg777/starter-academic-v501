@@ -25,6 +25,10 @@ links:
   icon_pack: fas
   name: "Quarto notebook"
   url: tutorial.qmd
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_dynamic_bma/index.md
 slides:
 summary: Dynamic panel Bayesian Model Averaging with the Bayesian Dynamic Systems Modeling (BDSM) R package, applied to cross-country economic growth determinants --- handling reverse causality through lagged dependent variables, fixed effects, and weak exogeneity.
 tags:

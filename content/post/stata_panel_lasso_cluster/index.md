@@ -33,6 +33,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_panel_lasso_cluster/index.md
 slides:
 summary: Identify latent group structures in panel data using the Classifier-LASSO method (Su, Shi, Phillips 2016), revealing that the pooled democracy-growth effect of +1.055 masks a +2.151 effect in 57 countries and a -0.936 effect in 41 countries.
 tags:

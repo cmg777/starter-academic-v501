@@ -36,6 +36,10 @@ links:
   icon_pack: fas
   name: "Source data"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_demeaning_twfe/referenceMaterials/barro_convergence_panel.csv
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_demeaning_twfe/index.md
 slides:
 summary: Manual demeaning vs two-way fixed effects --- showing that TWFE is just OLS on demeaned data through the Frisch-Waugh-Lovell theorem, with a hands-on proof using a Barro convergence panel of 150 countries.
 tags:

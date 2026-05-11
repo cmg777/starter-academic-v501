@@ -31,6 +31,10 @@ links:
   icon_pack: fas
   name: "Dataset (.dta)"
   url: https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_spxtivdfreg/references/v113i06.dta
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_spxtivdfreg/index.md
 slides:
 summary: Estimate spatial dynamic panel models with unobserved common factors using the spxtivdfreg package in Stata --- an IV approach that handles spatial lags, temporal persistence, endogenous regressors, and latent factors simultaneously
 tags:

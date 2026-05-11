@@ -26,6 +26,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_honestdid/index.md
 slides:
 summary: Assess how robust difference-in-differences results are to violations of parallel trends using the honestdid package in Stata, progressing from a simple 2x2 DiD to multi-period event studies with relative magnitudes and smoothness restrictions
 tags:

@@ -24,6 +24,10 @@ links:
   icon_pack: fas
   name: "Datasets (CSV)"
   url: store_data.csv
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_fwlplot/index.md
 slides:
 summary: A hands-on guide to the fwlplot package in R --- from understanding the Frisch-Waugh-Lovell theorem through simulated confounding to visualizing fixed effects in real panel data --- showing what "controlling for" looks like as a scatter plot.
 tags:

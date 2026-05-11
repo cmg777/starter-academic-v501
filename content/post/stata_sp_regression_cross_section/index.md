@@ -27,6 +27,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_sp_regression_cross_section/index.md
 slides:
 summary: Explore the full taxonomy of cross-sectional spatial models --- OLS, SAR, SEM, SLX, SDM, SDEM, SAC, and GNS --- using the Columbus crime dataset in Stata, following Elhorst (2014)
 tags:

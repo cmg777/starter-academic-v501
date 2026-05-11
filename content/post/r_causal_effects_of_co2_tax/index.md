@@ -25,6 +25,10 @@ links:
   icon_pack: ai
   name: Notes
   url: https://posit.cloud/content/6187403
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_causal_effects_of_co2_tax/index.md
 slides: 
 summary: Theresa Graefe (Ulm University) has created a very nice RTutor that allows you to replicate the main results of a recent AEJ paper on the causal effects of a CO2 tax in Sweden using the syntetic control method. 
 tags:

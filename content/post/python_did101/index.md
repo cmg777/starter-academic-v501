@@ -39,6 +39,10 @@ links:
   icon_pack: fab
   name: AI Video
   url: "/post/python_did101/#video-player"
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_did101/index.md
 summary: "Learn Difference-in-Differences (DiD) in Python using PyFixest and Great Tables. Covers the 2x2 design, TWFE regression, inference comparison, publication-quality tables, event studies, and parallel trends testing based on Corral and Yang (2024)."
 tags:
 - python

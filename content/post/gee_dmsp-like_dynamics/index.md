@@ -17,6 +17,10 @@ links:
   icon_pack: ai
   name: "[GEE] Google Earth Engine App"
   url: https://carlos-mendez.projects.earthengine.app/view/dynamics-dmsp-like
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/gee_dmsp-like_dynamics/index.md
 slides:
 summary: "An interactive exploration of the space-time dynamics of mean luminosity using the DMSP-like data over the 1992-2019 period."
 tags:

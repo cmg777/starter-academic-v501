@@ -27,6 +27,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_sp_regression_panel/index.md
 slides:
 summary: Model spatial spillovers in panel data using the Spatial Durbin Model (SDM), Wald specification tests, and dynamic extensions with the xsmle package in Stata
 tags:

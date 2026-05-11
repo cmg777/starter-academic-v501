@@ -19,6 +19,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pyfixest/index.md
 slides:
 summary: Estimating regression models with high-dimensional fixed effects using PyFixest, from simple OLS through two-way FE, instrumental variables, panel data, and event studies
 tags:

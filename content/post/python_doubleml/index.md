@@ -30,6 +30,10 @@ links:
   icon_pack: fas
   name: "Jupyter notebook"
   url: notebook.ipynb
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_doubleml/index.md
 slides:
 summary: Estimating the causal effect of a cash bonus on unemployment duration using Double Machine Learning with the Pennsylvania Bonus Experiment
 tags:

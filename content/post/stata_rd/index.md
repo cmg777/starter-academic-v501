@@ -26,6 +26,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_rd/index.md
 slides:
 summary: Evaluate the causal effect of a school tutoring program on student exit exam scores using sharp regression discontinuity design with parametric OLS and nonparametric rdrobust estimation in Stata
 tags:

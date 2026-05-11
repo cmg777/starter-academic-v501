@@ -17,6 +17,10 @@ links:
   icon_pack: ai
   name: "[R] Google Colab"
   url: https://colab.research.google.com/drive/1GjO43UJIhtqX39qja5yUl4j9suwKIpMl?usp=sharing
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_convergence_clubs/index.md
 slides: 
 summary: The book provides a succinct review of the recent club convergence literature, a comparative view of developed and developing countries, and a tutorial on how to implement the club convergence framework in Stata and R.
 tags:

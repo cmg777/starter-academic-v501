@@ -20,6 +20,10 @@ links:
   icon_pack: fas
   name: "R script"
   url: analysis.R
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_SDPDmod/index.md
 slides:
 summary: A hands-on guide to spatial panel data modeling using the SDPDmod package in R --- from Bayesian model comparison through static and dynamic SAR/SDM estimation with Lee-Yu bias correction to direct, indirect, and total effect decomposition --- applied to cigarette demand across 46 US states (1963--1992).
 tags:

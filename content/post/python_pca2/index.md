@@ -23,6 +23,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca2/index.md
 slides:
 summary: Building a comparable Human Development Index across two time periods using pooled PCA with real sub-national data for 153 South American regions, and contrasting with per-period PCA to show why pooled standardization is essential for temporal comparisons
 tags:

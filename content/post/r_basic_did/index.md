@@ -22,6 +22,10 @@ links:
   name: "[R] Posit cloud"
   url: https://posit.cloud/content/6182152
 
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_basic_did/index.md
 slides: 
 summary: An introduction to the basic differences in differences method using the classical incenerator example of Kiel and McClain (1995)
 tags:

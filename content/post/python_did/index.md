@@ -27,6 +27,10 @@ links:
   icon_pack: fas
   name: "Jupyter notebook"
   url: notebook.ipynb
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_did/index.md
 slides:
 summary: Estimating causal treatment effects using Difference-in-Differences with the diff-diff package, from the classic 2x2 design through staggered adoption with Callaway-Sant'Anna and HonestDiD sensitivity analysis
 tags:

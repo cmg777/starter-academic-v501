@@ -19,6 +19,10 @@ links:
   icon_pack: ai
   name: Deepnote
   url: https://deepnote.com/@carlos-mendez/PYTHON-Spatial-data-science-4dda4dc4-af8c-48fd-9bdf-7b18a5efef8e
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_intro_spatial_data_science/index.md
 slides: 
 summary: Measuring the evolution of spatial dependence and spatial inequality
 tags:

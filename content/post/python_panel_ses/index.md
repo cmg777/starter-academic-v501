@@ -27,6 +27,10 @@ links:
   icon_pack: fas
   name: "Jupyter notebook"
   url: notebook.ipynb
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_panel_ses/index.md
 slides:
 summary: Comparing standard error estimators in panel data regressions using Python and linearmodels --- from conventional to clustered, Driscoll-Kraay, and fixed effects
 tags:

@@ -15,6 +15,10 @@ links:
   icon_pack: ai
   name: Deepnote
   url: https://deepnote.com/@carlos-mendez/R-Our-World-in-Data-d51a4b4a-53c6-423a-ae3f-3049f57d67c2
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_our_world_in_data/index.md
 slides: 
 summary: What is the relation between internet usage and democracy?
 tags:

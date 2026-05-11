@@ -20,6 +20,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_mgwr/index.md
 slides:
 summary: Applying Multiscale Geographically Weighted Regression (MGWR) to reveal how economic catching-up varies across Indonesia's 514 districts, with each variable operating at its own spatial scale
 tags:

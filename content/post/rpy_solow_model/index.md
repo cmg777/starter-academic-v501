@@ -26,6 +26,10 @@ links:
   icon_pack: ai
   name: "[Stata] Script"
   url: https://gist.github.com/cmg777/a1181c89de80e5eb5e8c8be2383342d1
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/rpy_solow_model/index.md
 slides: 
 summary: An introduction to the Solow growth model and its convergence prediction
 tags:

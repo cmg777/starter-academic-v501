@@ -27,6 +27,10 @@ links:
   icon_pack: ai
   name: "R note"
   url: https://carlos-mendez.quarto.pub/r-synthetic-control-tutorial/
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_basic_synthetic_control/index.md
 slides:
 summary: A beginner-friendly tutorial on the synthetic control method in R, using the Basque Country case study to estimate the economic cost of conflict on regional GDP per capita from 1970 to 1997.
 tags:

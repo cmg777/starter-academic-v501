@@ -24,6 +24,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_ml_random_forest/index.md
 slides:
 summary: Predicting municipal development in Bolivia using Random Forest regression on satellite image embeddings
 tags:

@@ -23,6 +23,10 @@ links:
   icon_pack: ai
   name: "Streamlit web app"
   url: https://esda101-bolivia339.streamlit.app/
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_esda/index.md
 slides:
 summary: An interactive geocomputational notebook to study spatial clusters and outliers
 tags:

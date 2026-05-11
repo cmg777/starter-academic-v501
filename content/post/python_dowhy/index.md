@@ -39,6 +39,10 @@ links:
   icon_pack: fab
   name: "Podcast"
   url: https://open.spotify.com/episode/7h6S9YzEroATdQabvJxi1W?si=wpvmHsCARQqP8LohogGRFg
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dowhy/index.md
 slides:
 summary: Estimating the causal effect of a job training program on earnings using DoWhy's four-step causal inference framework with the Lalonde dataset
 tags:

@@ -28,6 +28,10 @@ links:
   icon_pack: fas
   name: "Jupyter notebook"
   url: notebook.ipynb
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_fwl/index.md
 slides:
 summary: Understanding the Frisch-Waugh-Lovell theorem to isolate causal relationships by partialling-out confounders in a simulated retail store dataset
 tags:

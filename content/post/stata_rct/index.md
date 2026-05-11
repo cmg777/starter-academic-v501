@@ -29,6 +29,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_rct/index.md
 slides:
 summary: Evaluate the causal effect of a cash transfer program on household consumption using regression adjustment, inverse probability weighting, doubly robust, and difference-in-differences methods in Stata
 tags:

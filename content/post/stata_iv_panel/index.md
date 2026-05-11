@@ -27,6 +27,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_iv_panel/index.md
 slides:
 summary: Replicate Hodler and Raschky (2014) to estimate the causal effect of economic shocks on civil conflict using 2SLS instrumental variables with panel data from 5,689 African regions
 tags:

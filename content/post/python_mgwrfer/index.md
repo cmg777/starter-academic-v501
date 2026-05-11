@@ -20,6 +20,10 @@ links:
     icon_pack: fas
     name: "Python script"
     url: script.py
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_mgwrfer/index.md
 slides:
 summary: Using within-transformation to remove time-invariant spatial confounders from Multiscale GWR, recovering unbiased spatially varying coefficients from simulated panel data (225 units x 3 periods)
 tags:

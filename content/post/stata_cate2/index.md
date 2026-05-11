@@ -29,6 +29,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_cate2/index.md
 slides:
 summary: Estimate heterogeneous causal effects of mining and mineral prices on economic development using Stata 19's cate command with multi-valued treatment via pairwise binary comparisons, applied to a simulated resource curse panel dataset
 tags:

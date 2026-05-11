@@ -17,6 +17,10 @@ links:
   icon_pack: ai
   name: GoogleColab
   url: https://colab.research.google.com/github/quarcs-lab/project2021o-notebook/blob/main/notebookColab.ipynb
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_monitor_regional_development/index.md
 slides: 
 summary: A geocomputational notebook to monitor regional development in Bolivia using Python. Besides exploratory data analysis, the notebook introduces geospatial mapping, spatial dependence, spatial inequality, and spatial heterogeneity.
 tags:

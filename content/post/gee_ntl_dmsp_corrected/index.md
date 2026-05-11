@@ -17,6 +17,10 @@ links:
   icon_pack: ai
   name: "[GEE] Google Earth Engine App"
   url: https://carlosmendez777.users.earthengine.app/view/world-dmsp-corrected
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/gee_ntl_dmsp_corrected/index.md
 slides:
 summary: "An interactive exploration of the space-time dynamics of nighttime lights using DMSP-corrected data."
 tags:

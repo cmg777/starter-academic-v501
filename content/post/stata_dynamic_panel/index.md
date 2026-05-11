@@ -28,6 +28,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_dynamic_panel/index.md
 slides:
 summary: Estimate the within-country dynamic effect of war on log GDP per capita using Arellano-Bond GMM in Stata, reproducing Thies and Baum (2020) on a 1955-2015 panel of 160 countries.
 tags:

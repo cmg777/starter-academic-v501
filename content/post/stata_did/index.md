@@ -39,6 +39,10 @@ links:
   icon_pack: fab
   name: AI Video
   url: "/post/stata_did/#video-player"
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_did/index.md
 summary: "Learn Difference-in-Differences (DiD) in Stata using a case study of an after-school tutoring program. Covers the 2x2 design, TWFE regression, event studies, and parallel trends testing based on Corral and Yang (2024)."
 tags:
 - stata

@@ -24,6 +24,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_doubleml_pension/index.md
 slides:
 summary: Estimating the causal effect of 401(k) eligibility and participation on net financial assets using three DoubleML models (PLR, IRM, IIVM) with the 1991 SIPP pension dataset
 tags:

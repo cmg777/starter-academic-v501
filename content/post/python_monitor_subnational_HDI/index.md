@@ -37,6 +37,10 @@ links:
   icon_pack: ai
   name: DMSPcc
   url: https://colab.research.google.com/drive/1vw3D3XyVZlseSoEBvvhYGJnbRUw5qXp9?usp=sharing
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_monitor_subnational_HDI/index.md
 slides:
 summary: A geocomputational notebook to monitor subnational human development using Python. Besides exploratory data analysis, the notebook introduces geospatial mapping, spatial dependence, and spatial inequality.
 tags:

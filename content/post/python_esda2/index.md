@@ -25,6 +25,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_esda2/index.md
 slides:
 summary: An introduction to exploratory spatial data analysis using PySAL, covering choropleth maps, spatial weights, Moran's I, LISA clusters, space-time dynamics, and a Venezuela-Bolivia comparative analysis for 153 South American regions
 tags:

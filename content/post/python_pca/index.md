@@ -23,6 +23,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_pca/index.md
 slides:
 summary: Building a composite Health Index from Life Expectancy and Infant Mortality using manual PCA with simulated data for 50 countries, then verifying against scikit-learn
 tags:

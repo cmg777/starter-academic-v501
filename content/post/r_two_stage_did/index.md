@@ -18,6 +18,10 @@ links:
   icon_pack: ai
   name: "[R] Google Colab"
   url: https://colab.research.google.com/drive/1A5zxj9SU8phTTCHBkt1fQkFX1xhFbycI?usp=sharing
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_two_stage_did/index.md
 slides: 
 summary: An introduction to heterogeneous treatment effects using the two-stage DID estimator of Gardner (2021)
 tags:

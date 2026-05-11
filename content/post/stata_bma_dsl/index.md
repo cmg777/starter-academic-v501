@@ -34,6 +34,10 @@ links:
   icon_pack: fas
   name: "Data generator"
   url: generate_data.do
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_bma_dsl/index.md
 slides:
 summary: Bayesian Model Averaging and Double-Selection LASSO applied to the Environmental Kuznets Curve using synthetic panel data with a known answer key, demonstrating how both methods recover the true predictors of CO2 emissions.
 tags:

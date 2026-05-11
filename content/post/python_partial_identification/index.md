@@ -28,6 +28,10 @@ links:
   icon_pack: fas
   name: "Jupyter notebook"
   url: notebook.ipynb
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_partial_identification/index.md
 slides:
 summary: Computing causal bounds under unmeasured confounding using Manski and Tian-Pearl bounds with the CausalBoundingEngine package in Python
 tags:

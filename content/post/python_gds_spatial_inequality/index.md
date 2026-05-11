@@ -19,6 +19,10 @@ links:
   icon_pack: ai
   name: GoogleColab
   url: https://colab.research.google.com/gist/cmg777/e913cf0b2c12755e1072097ab9416b45/09_spatial_inequality.ipynb
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_gds_spatial_inequality/index.md
 slides: 
 summary: A geocomputational notebook to monitor spatial inequality dynamics.
 tags:

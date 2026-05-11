@@ -27,6 +27,10 @@ links:
   icon_pack: ai
   name: "[Python] Google Colab"
   url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_fe_kuznets/notebook.ipynb
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_fe_kuznets/index.md
 slides:
 summary: Replicating the N-shaped Kuznets curve with panel data fixed effects in Python using PyFixest, from pooled OLS through two-way FE, turning point analysis, and determinants of regional inequality across 180 countries
 tags:

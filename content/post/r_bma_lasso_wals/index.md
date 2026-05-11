@@ -26,6 +26,10 @@ links:
   icon_pack: fas
   name: "R script"
   url: script.R
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_bma_lasso_wals/index.md
 slides:
 summary: Three principled approaches to variable selection---BMA, LASSO, and WALS---applied to synthetic cross-country CO2 emissions data with known ground truth, demonstrating methodological triangulation for robust inference.
 tags:

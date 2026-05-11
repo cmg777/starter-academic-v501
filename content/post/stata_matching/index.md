@@ -28,6 +28,10 @@ links:
   icon_pack: fas
   name: "Stata log"
   url: analysis.log
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_matching/index.md
 slides:
 summary: A beginner-friendly walk-through of six treatment-effects estimators in Stata --- regression adjustment, IPW, IPWRA, AIPW, nearest-neighbor matching, and propensity-score matching --- applied to the classic maternal-smoking and birth-weight case study.
 tags:
