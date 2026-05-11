@@ -3,6 +3,17 @@ html {
   scroll-padding-top: 90px;
 }
 
+/* --- 0a. Declare native dark color-scheme so theme-injecting extensions
+   (Dark Reader, Stylus dark themes, etc.) recognize that the site already
+   handles its own theming and skip their auto-darkening filter, which
+   otherwise rewrites text fills as semi-transparent and makes the white
+   hero title look see-through. */
+:root,
+html,
+body {
+  color-scheme: dark light;
+}
+
 /* --- 1. HOMEPAGE FIX (Specific to Hero 2) --- */
 #hero2 {
   .container {
@@ -1163,5 +1174,334 @@ details.concept-card p:last-child {
 
 .dark details.concept-card summary {
   color: #c8d0e0;
+}
+
+/* ==========================================================================
+   21. Native hero panels (hero2 widget) — full enhancement pass
+   Translucent navy panels with brand-color left accents, word-by-word title
+   reveal, gradient brand underline + pulsing teal dot, Cormorant Garamond
+   italic subtitle, Ken Burns background, cursor parallax (via inline JS),
+   view-timeline scroll fade-out, and a brand-teal scroll indicator.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap");
+
+/* --- Section background: Ken Burns + edge masks ---
+   Scoped to `#hero2-new` (the parked redesigned hero, currently
+   `active: false`). When `hero2-new.md` is re-activated, this fires.
+   The live `#hero2` (the old Canva-JPG hero) is unaffected. */
+#hero2-new {
+  position: relative;
+  overflow: hidden;
+}
+
+#hero2-new::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/media/websiteCover5.webp");
+  background-size: cover;
+  background-position: center;
+  animation: kenBurns 32s ease-in-out infinite alternate;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#hero2-new > * {
+  position: relative;
+  z-index: 1;
+}
+
+#hero2-new::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(to bottom, #0e1545 0%, transparent 6%),
+    linear-gradient(to top,    #0e1545 0%, transparent 6%);
+}
+
+@keyframes kenBurns {
+  from { transform: scale(1)    translate(0%,  0%); }
+  to   { transform: scale(1.06) translate(-1%, 1%); }
+}
+
+/* --- Hero container --- */
+.hero-native {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 6rem 1.25rem 4rem;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  z-index: 3;
+}
+
+/* --- Panels ---
+   `transform` carries the entrance (translateY 18px → 0). The modern CSS
+   `translate` property carries cursor-reactive parallax (CSS vars updated
+   by inline JS). The two compose without conflict. */
+.hero-glass-card {
+  --px: 0px;
+  --py: 0px;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto 1.4rem;
+  padding: 1.7rem 2.5rem;
+  border-radius: 4px;
+  background: rgba(18, 32, 75, 0.85);
+  opacity: 0;
+  transform: translateY(18px);
+  translate: var(--px) var(--py);
+  animation: heroFadeUp 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  transition: translate 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+              transform 0.35s ease,
+              background 0.3s ease;
+}
+
+.hero-glass-card:hover {
+  background: rgba(18, 32, 75, 0.90);
+  translate: var(--px) calc(var(--py) - 2px);
+}
+
+.hero-glass-card--title   { border-left: 3px solid #00d4c8; }
+.hero-glass-card--tagline { border-left: 3px solid #d97757; }
+.hero-glass-card--author {
+  border-left: 3px solid #6a9bcc;
+  max-width: 580px;
+  padding: 1.3rem 2rem;
+}
+
+.hero-glass-card--delay-1 { animation-delay: 0.15s; }
+.hero-glass-card--delay-2 { animation-delay: 0.40s; }
+.hero-glass-card--delay-3 { animation-delay: 0.65s; }
+
+/* --- Title — same treatment as the tagline, just at title size. --- */
+.hero-title {
+  font-family: "Cinzel", "Trajan Pro", Georgia, serif;
+  font-size: clamp(1.9rem, 4.4vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.05;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* --- Title underline + pulsing teal dot --- */
+.hero-title-underline {
+  position: relative;
+  width: 90px;
+  height: 1px;
+  margin: 0.9rem auto 0.8rem;
+  background: linear-gradient(90deg,
+    transparent,
+    #00d4c8 30%,
+    #d97757 70%,
+    transparent);
+  opacity: 0;
+  animation: fadeIn 0.6s ease forwards;
+  animation-delay: 0.95s;
+}
+
+.hero-title-underline::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00d4c8;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(0, 212, 200, 0.6);
+  animation: pulseDot 2.4s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+
+@keyframes fadeIn { to { opacity: 1; } }
+
+@keyframes pulseDot {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);   opacity: 0.95; }
+  50%      { transform: translate(-50%, -50%) scale(1.6); opacity: 0.35; }
+}
+
+/* --- Subtitle (italic serif) --- */
+.hero-subtitle {
+  font-family: "Cormorant Garamond", Garamond, Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.5;
+  margin: 0 auto;
+  max-width: 800px;
+  letter-spacing: 0.01em;
+}
+
+/* --- Tagline --- */
+.hero-tagline {
+  font-family: "Cinzel", "Trajan Pro", Georgia, serif;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1.35;
+  margin: 0;
+}
+
+/* --- Author block --- */
+.hero-author-name {
+  font-family: "Cinzel", "Trajan Pro", Georgia, serif;
+  font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fff;
+  margin: 0 0 0.55rem;
+}
+
+.hero-social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1.1rem;
+  margin: 0 0 0.7rem;
+  font-size: 1.15rem;
+}
+
+.hero-social-icons a {
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.hero-social-icons a:hover,
+.hero-social-icons a:focus-visible {
+  color: #00d4c8;
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.hero-author-affiliation {
+  font-size: clamp(0.82rem, 1.05vw, 0.95rem);
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* --- Scroll indicator --- */
+.hero-scroll-indicator {
+  position: absolute;
+  bottom: 1.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-decoration: none;
+  opacity: 0;
+  animation: fadeIn 0.6s ease forwards;
+  animation-delay: 1.8s;
+}
+
+.hero-scroll-indicator:hover,
+.hero-scroll-indicator:focus-visible {
+  text-decoration: none;
+}
+
+.hero-scroll-indicator:hover .hero-scroll-chevron {
+  color: #d97757;
+}
+
+.hero-scroll-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.hero-scroll-chevron {
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #00d4c8;
+  animation: scrollBounce 2s ease-in-out infinite;
+  transition: color 0.2s ease;
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0);    opacity: 0.9; }
+  50%      { transform: translateY(6px);  opacity: 0.5; }
+}
+
+/* --- Panel entrance keyframes --- */
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Scroll-driven fade-out (Chrome/Safari; Firefox falls back) --- */
+@supports (animation-timeline: view()) {
+  .hero-glass-card {
+    animation:
+      heroFadeUp 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards,
+      heroFadeOut linear both;
+    animation-timeline: auto, view();
+    animation-range: auto, exit 0% exit 70%;
+  }
+  @keyframes heroFadeOut {
+    to { opacity: 0; transform: translateY(-30px); }
+  }
+}
+
+/* --- Mobile --- */
+@media (max-width: 600px) {
+  .hero-native {
+    padding: 5rem 0.75rem 4rem;
+  }
+  .hero-glass-card {
+    padding: 1.2rem 1.1rem;
+    margin-bottom: 1rem;
+    border-radius: 3px;
+  }
+  .hero-glass-card--author {
+    padding: 1rem 1rem;
+  }
+  .hero-scroll-indicator {
+    bottom: 1.2rem;
+  }
+}
+
+@media (max-height: 600px) {
+  .hero-scroll-indicator { display: none; }
+}
+
+/* --- Honor reduced-motion --- */
+@media (prefers-reduced-motion: reduce) {
+  #hero2-new::before { animation: none; }
+  .hero-glass-card {
+    opacity: 1;
+    transform: none;
+    translate: none;
+    animation: none;
+    transition: none;
+  }
+  .hero-title-underline {
+    opacity: 1;
+    animation: none;
+  }
+  .hero-title-underline::after { animation: none; }
+  .hero-scroll-chevron { animation: none; }
+  .hero-scroll-indicator {
+    opacity: 1;
+    animation: none;
+  }
 }
 
