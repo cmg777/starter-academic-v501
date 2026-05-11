@@ -11,7 +11,7 @@ interests:
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "Master student 2024-2026"
+role: "Master in International Development 2026"
 social:
 - icon: address-card
   icon_pack: fa
@@ -34,6 +34,6 @@ title: Kanyama Yuna (Japan)
 # Organizational groups that you belong to (for People widget)
 #   Set this to `[]` or comment out if you are not using People widget.
 user_groups:
-- Master students
+- Alumni master graduates
 ---
 
