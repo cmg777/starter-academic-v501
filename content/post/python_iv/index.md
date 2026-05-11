@@ -27,6 +27,10 @@ links:
   icon_pack: ai
   name: "[Python] Google Colab"
   url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_iv/notebook.ipynb
+- icon: markdown
+  icon_pack: fab
+  name: "MD version"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_iv/index.md
 slides:
 summary: "Replicate Acemoglu, Johnson and Robinson (2001) in Python with pyfixest and linearmodels: instrument modern institutions with settler mortality across 64 ex-colonies and learn how IV recovers a causal effect that OLS understates by 80 percent."
 tags:
