@@ -20,14 +20,14 @@ links:
     icon_pack: fas
     name: "Python script"
     url: script.py
+  - icon: open-data
+    icon_pack: ai
+    name: "[Python] Google Colab"
+    url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_mgwrfer/notebook.ipynb
   - icon: markdown
     icon_pack: fab
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_mgwrfer/index.md
-  - icon: doi
-    icon_pack: ai
-    name: "Source paper (Li & Fotheringham 2026)"
-    url: https://doi.org/10.1080/24694452.2026.2654481
   - icon: podcast
     icon_pack: fas
     name: AI Podcast
