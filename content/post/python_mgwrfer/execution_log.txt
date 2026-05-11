@@ -1,6 +1,4 @@
-/Users/carlosmendez/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
-  warnings.warn(
-MGWPR repository already exists at: /Users/carlosmendez/Documents/Github/starter-academic-v501/content/post/python_mgwrfer/mgwpr_repo
+MGWPR repository already exists at: /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/python_mgwrfer/mgwpr_repo
 Custom mgwr package imported successfully
   GWR: <class 'mgwr.gwr.GWR'>
   MGWR: <class 'mgwr.gwr.MGWR'>
@@ -19,21 +17,59 @@ Total observations: 675
   beta_2 (linear):    [1.067, 2.000], mean=1.533
   beta_3 (constant):  [1.500, 1.500], mean=1.500
   beta_4 (null):      [0.000, 0.000], mean=0.000
-  alpha (FE):         [2.068, 51.548], mean=23.286
+  sc / alpha (FE):    [2.068, 51.548], mean=23.286
+
+── Indirect contextual effect strength (paper's bias source) ──
+  Cor(x1, sc) = 0.840
+  Cor(x2, sc) = 0.840
+  Cor(x3, sc) = 0.832
+  Cor(x4, sc) = 0.840
+  Cor(x4, y)  = 0.840 (non-causal correlation via sc)
 
 Panel data shape: (675, 14)
              y       x1       x2       x3       x4
 count  675.000  675.000  675.000  675.000  675.000
-mean    23.069   -0.038   -0.014   -0.110    0.027
-std     15.489    0.982    1.009    1.010    1.017
-min     -4.073   -2.965   -3.648   -3.048   -3.064
-25%      9.717   -0.702   -0.675   -0.771   -0.647
-50%     20.862   -0.049    0.012   -0.089    0.052
-75%     35.123    0.580    0.636    0.554    0.683
-max     57.411    2.914    3.179    2.914    2.857
+mean    28.549    1.145    1.157    1.109    1.178
+std     18.778    0.904    0.929    0.909    0.935
+min     -0.577   -1.024   -1.610   -1.034   -1.198
+25%     11.901    0.453    0.491    0.399    0.506
+50%     26.204    1.079    1.090    1.055    1.121
+75%     43.963    1.779    1.821    1.803    1.854
+max     66.158    3.449    3.982    3.772    3.698
 
 Exported: simulated_panel_data.csv
 Exported: true_coefficients.csv
+
+============================================================
+GLOBAL MODEL BASELINES (paper Table 2 replication)
+============================================================
+
+(a) Cross-sectional OLS (period 0, 225 obs)
+    intercept =    3.179   p = 6.66e-08
+    beta_1   =    5.476   p = 1.31e-17
+    beta_2   =    5.691   p = 3.39e-20
+    beta_3   =    6.087   p = 2.57e-20
+    beta_4   =    4.823   p = 5.57e-14
+    R^2 = 0.9319
+
+(b) Pooled OLS (all 675 obs)
+    intercept =    2.850   p = 3.07e-18
+    beta_1   =    6.144   p = 8.44e-63
+    beta_2   =    6.345   p = 1.22e-71
+    beta_3   =    5.788   p = 1.02e-58
+    beta_4   =    4.160   p = 7.55e-34
+    R^2 = 0.9361
+
+(c) Individual FE (within estimator, 675 obs)
+    beta_1   =    1.565   p = 7.6e-171
+    beta_2   =    1.537   p = 4.17e-163
+    beta_3   =    1.553   p = 1.28e-178
+    beta_4   =    0.017   p = 0.664
+    R^2 (within) = 0.8622
+    mean(alpha_hat) = 23.234 (true mean = 23.286)
+    alpha_hat range = [1.380, 51.583] (true range = [2.068, 51.548])
+
+Exported: global_models_comparison.csv
 
 ── Plotting true coefficient surfaces ──
 Saved: mgwrfer_true_coefficients.png
@@ -44,55 +80,303 @@ POOLED MGWR (NAIVE — ignoring fixed effects)
 Selecting bandwidths for pooled MGWR...
   N observations: 675
   N covariates: 4
-Backfitting:   0%|          | 0/200 [00:00<?, ?it/s]Backfitting:   0%|          | 1/200 [01:33<5:09:51, 93.42s/it]Backfitting:   1%|          | 2/200 [03:34<6:01:09, 109.44s/it]Backfitting:   2%|▏         | 3/200 [05:28<6:06:37, 111.66s/it]Backfitting:   2%|▏         | 3/200 [07:14<7:54:59, 144.67s/it]
+Backfitting:   0%|          | 0/200 [00:00<?, ?it/s]Backfitting:   0%|          | 1/200 [00:01<05:03,  1.53s/it]Backfitting:   1%|          | 2/200 [00:03<05:00,  1.52s/it]Backfitting:   2%|▏         | 3/200 [00:04<05:04,  1.55s/it]Backfitting:   2%|▏         | 4/200 [00:06<04:56,  1.51s/it]Backfitting:   2%|▎         | 5/200 [00:07<04:54,  1.51s/it]Backfitting:   3%|▎         | 6/200 [00:09<04:50,  1.50s/it]Backfitting:   4%|▎         | 7/200 [00:10<04:52,  1.52s/it]Backfitting:   4%|▍         | 8/200 [00:12<04:51,  1.52s/it]Backfitting:   4%|▍         | 9/200 [00:12<03:27,  1.09s/it]Backfitting:   5%|▌         | 10/200 [00:12<02:31,  1.25it/s]Backfitting:   6%|▌         | 11/200 [00:12<01:53,  1.67it/s]Backfitting:   6%|▌         | 12/200 [00:12<01:26,  2.17it/s]Backfitting:   6%|▋         | 13/200 [00:12<01:08,  2.74it/s]Backfitting:   7%|▋         | 14/200 [00:13<00:55,  3.35it/s]Backfitting:   8%|▊         | 15/200 [00:13<00:46,  3.98it/s]Backfitting:   8%|▊         | 16/200 [00:13<00:40,  4.57it/s]Backfitting:   8%|▊         | 17/200 [00:13<00:35,  5.13it/s]Backfitting:   9%|▉         | 18/200 [00:13<00:32,  5.57it/s]Backfitting:  10%|▉         | 19/200 [00:13<00:30,  5.91it/s]Backfitting:  10%|█         | 20/200 [00:13<00:29,  6.21it/s]Backfitting:  10%|█         | 21/200 [00:14<00:27,  6.40it/s]Backfitting:  11%|█         | 22/200 [00:14<00:27,  6.47it/s]Backfitting:  11%|█         | 22/200 [00:14<01:55,  1.54it/s]
 Bandwidth of Covariate 1 : 44.0
-Bandwidth of Covariate 2 : 50.0
-Bandwidth of Covariate 3 : 139.0
-Bandwidth of Covariate 4 : 223.0
-Bandwidth of Covariate 5 : 223.0
+Bandwidth of Covariate 2 : 44.0
+Bandwidth of Covariate 3 : 75.0
+Bandwidth of Covariate 4 : 48.0
+Bandwidth of Covariate 5 : 46.0
 Bandwidth of Covariate 1 : 44.0
-Bandwidth of Covariate 2 : 50.0
-Bandwidth of Covariate 3 : 175.0
-Bandwidth of Covariate 4 : 223.0
-Bandwidth of Covariate 5 : 223.0
+Bandwidth of Covariate 2 : 44.0
+Bandwidth of Covariate 3 : 75.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
 Bandwidth of Covariate 1 : 44.0
-Bandwidth of Covariate 2 : 50.0
-Bandwidth of Covariate 3 : 175.0
-Bandwidth of Covariate 4 : 223.0
-Bandwidth of Covariate 5 : 223.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
 Bandwidth of Covariate 1 : 44.0
-Bandwidth of Covariate 2 : 50.0
-Bandwidth of Covariate 3 : 175.0
-Bandwidth of Covariate 4 : 223.0
-Bandwidth of Covariate 5 : 223.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 46.0
+Bandwidth of Covariate 3 : 50.0
+Bandwidth of Covariate 4 : 50.0
+Bandwidth of Covariate 5 : 46.0
 
-Pooled MGWR bandwidths: [ 44.  50. 175. 223. 223.]
+Pooled MGWR bandwidths: [44. 46. 50. 50. 46.]
 Fitting pooled MGWR model...
-Inference:   0%|          | 0/1 [00:00<?, ?it/s]Inference: 100%|██████████| 1/1 [00:00<00:00,  2.22it/s]Inference: 100%|██████████| 1/1 [00:00<00:00,  2.22it/s]
-Pooled MGWR R-squared: 0.9771
-Pooled MGWR Adj. R-squared: 0.9759
-Pooled MGWR AICc: -561.77
+Inference:   0%|          | 0/1 [00:00<?, ?it/s]Inference: 100%|██████████| 1/1 [00:05<00:00,  5.48s/it]Inference: 100%|██████████| 1/1 [00:05<00:00,  5.48s/it]
+Pooled MGWR R-squared: 0.9886
+Pooled MGWR Adj. R-squared: 0.9877
+Pooled MGWR AICc: -998.18
 Number of parameter columns: 5
 
 Exported: pooled_mgwr_params.csv
-  beta1_pooled: RMSE=0.3945, Corr=0.4586
-  beta2_pooled: RMSE=0.0888, Corr=0.9504
-  beta3_pooled: RMSE=0.0578, Corr=nan
-  beta4_pooled: RMSE=0.2531, Corr=nan
+  beta1_pooled: RMSE=2.3003, Corr=-0.4575
+  beta2_pooled: RMSE=1.9489, Corr=0.2163
+  beta3_pooled: RMSE=1.7485, Corr=nan
+  beta4_pooled: RMSE=1.8612, Corr=nan
 
 ============================================================
-MGWRFER (Two-Stage: Within-Transformation + MGWR)
+CROSS-SECTIONAL MGWR (single period, ignoring panel)
+============================================================
+Selecting bandwidths for cross-sectional MGWR...
+Backfitting:   0%|          | 0/200 [00:00<?, ?it/s]Backfitting:   0%|          | 1/200 [00:01<03:49,  1.15s/it]Backfitting:   1%|          | 2/200 [00:02<03:40,  1.11s/it]Backfitting:   2%|▏         | 3/200 [00:03<03:40,  1.12s/it]Backfitting:   2%|▏         | 4/200 [00:04<03:47,  1.16s/it]Backfitting:   2%|▎         | 5/200 [00:05<03:46,  1.16s/it]Backfitting:   3%|▎         | 6/200 [00:06<03:43,  1.15s/it]Backfitting:   4%|▎         | 7/200 [00:08<03:41,  1.15s/it]Backfitting:   4%|▍         | 8/200 [00:09<03:37,  1.13s/it]Backfitting:   4%|▍         | 9/200 [00:10<03:33,  1.12s/it]Backfitting:   5%|▌         | 10/200 [00:11<03:29,  1.10s/it]Backfitting:   6%|▌         | 11/200 [00:12<03:27,  1.10s/it]Backfitting:   6%|▌         | 12/200 [00:13<03:24,  1.09s/it]Backfitting:   6%|▋         | 13/200 [00:14<03:21,  1.08s/it]Backfitting:   7%|▋         | 14/200 [00:15<03:20,  1.08s/it]Backfitting:   8%|▊         | 15/200 [00:16<03:18,  1.07s/it]Backfitting:   8%|▊         | 16/200 [00:16<02:24,  1.28it/s]Backfitting:   8%|▊         | 17/200 [00:16<01:46,  1.73it/s]Backfitting:   9%|▉         | 18/200 [00:16<01:19,  2.29it/s]Backfitting:  10%|▉         | 19/200 [00:17<01:01,  2.95it/s]Backfitting:  10%|█         | 20/200 [00:17<00:48,  3.72it/s]Backfitting:  10%|█         | 21/200 [00:17<00:39,  4.54it/s]Backfitting:  11%|█         | 22/200 [00:17<00:33,  5.36it/s]Backfitting:  12%|█▏        | 23/200 [00:17<00:28,  6.22it/s]Backfitting:  12%|█▏        | 24/200 [00:17<00:25,  6.92it/s]Backfitting:  12%|█▏        | 24/200 [00:17<02:09,  1.36it/s]
+Bandwidth of Covariate 1 : 44.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 88.0
+Bandwidth of Covariate 4 : 97.0
+Bandwidth of Covariate 5 : 69.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 83.0
+Bandwidth of Covariate 4 : 97.0
+Bandwidth of Covariate 5 : 69.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 83.0
+Bandwidth of Covariate 4 : 94.0
+Bandwidth of Covariate 5 : 62.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 83.0
+Bandwidth of Covariate 4 : 94.0
+Bandwidth of Covariate 5 : 60.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 83.0
+Bandwidth of Covariate 4 : 94.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 83.0
+Bandwidth of Covariate 4 : 94.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 83.0
+Bandwidth of Covariate 4 : 94.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 92.0
+Bandwidth of Covariate 4 : 94.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 94.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+Bandwidth of Covariate 1 : 48.0
+Bandwidth of Covariate 2 : 48.0
+Bandwidth of Covariate 3 : 91.0
+Bandwidth of Covariate 4 : 98.0
+Bandwidth of Covariate 5 : 52.0
+
+Cross-sectional MGWR bandwidths: [48. 48. 91. 98. 52.]
+Fitting cross-sectional MGWR model...
+Inference:   0%|          | 0/1 [00:00<?, ?it/s]Inference: 100%|██████████| 1/1 [00:01<00:00,  1.20s/it]Inference: 100%|██████████| 1/1 [00:01<00:00,  1.20s/it]
+Cross-sectional MGWR R-squared: 0.9887
+Cross-sectional MGWR AICc: -277.51
+
+Exported: mgwr_cs_params.csv
+  beta1_mgwr_cs: RMSE=2.1573, Corr=-0.3857
+  beta2_mgwr_cs: RMSE=1.7977, Corr=-0.2085
+  beta3_mgwr_cs: RMSE=1.9838, Corr=nan
+  beta4_mgwr_cs: RMSE=2.3768, Corr=nan
+
+  MGWR_cs intercept (= intrinsic contextual effect proxy):
+    range = [2.420, 21.843]
+    vs true range [2.068, 51.548]
+    Corr with true sc = 0.8387, RMSE = 14.1820
+
+  PMGWR intercept (= intrinsic contextual effect proxy):
+    range = [-11.266, 10.043]
+    vs true range [2.068, 51.548]
+    Corr with true sc = 0.9780, RMSE = 25.6184
+
+============================================================
+MGWFER Stage 1 (Within-Transformation + MGWR)
 ============================================================
 
-Stage 1: Within-transformation (removing fixed effects)...
-  y_within range: [-6.877, 6.923]
+  Within-transformation (removing fixed effects)...
+  y_within range: [-3.439, 3.462]
   Fixed effects removed (mean of y_within per unit ≈ 0)
-  Max unit mean after demeaning: 7.11e-15 (should be ~0)
+  Max unit mean after demeaning: 9.47e-15 (should be ~0)
 
-Stage 2: MGWR on within-transformed data...
+  MGWR on within-transformed data...
   Standardized Y range: [-3.008, 3.028]
   Selecting bandwidths...
-Backfitting:   0%|          | 0/200 [00:00<?, ?it/s]Backfitting:   0%|          | 1/200 [01:13<4:03:11, 73.32s/it]Backfitting:   1%|          | 2/200 [02:10<3:31:33, 64.11s/it]Backfitting:   1%|          | 2/200 [03:12<5:17:29, 96.21s/it]
+Backfitting:   0%|          | 0/200 [00:00<?, ?it/s]Backfitting:   0%|          | 1/200 [00:01<03:58,  1.20s/it]Backfitting:   1%|          | 2/200 [00:02<03:51,  1.17s/it]Backfitting:   1%|          | 2/200 [00:03<05:43,  1.74s/it]
 Bandwidth of Covariate 1 : 50.0
 Bandwidth of Covariate 2 : 91.0
 Bandwidth of Covariate 3 : 116.0
@@ -106,20 +390,32 @@ Bandwidth of Covariate 2 : 91.0
 Bandwidth of Covariate 3 : 116.0
 Bandwidth of Covariate 4 : 62.0
 
-  MGWRFER bandwidths: [ 50.  91. 116.  62.]
-  Fitting MGWRFER model...
-Inference:   0%|          | 0/1 [00:00<?, ?it/s]Inference: 100%|██████████| 1/1 [00:00<00:00,  3.86it/s]Inference: 100%|██████████| 1/1 [00:00<00:00,  3.85it/s]
+  MGWFER bandwidths: [ 50.  91. 116.  62.]
+  Fitting MGWFER model...
+Inference:   0%|          | 0/1 [00:00<?, ?it/s]Inference: 100%|██████████| 1/1 [00:00<00:00,  1.46it/s]Inference: 100%|██████████| 1/1 [00:00<00:00,  1.45it/s]
 
-  MGWRFER R-squared: 0.8900
-  MGWRFER Adj. R-squared: 0.8844
-  MGWRFER AICc: 496.09
+  MGWFER R-squared: 0.8900
+  MGWFER Adj. R-squared: 0.8844
+  MGWFER AICc: 496.09
   Number of parameter columns: 4
 
 Exported: mgwrfer_params.csv
-  beta1_mgwrfer: RMSE=0.1793, Corr=0.8179
-  beta2_mgwrfer: RMSE=0.1050, Corr=0.9407
-  beta3_mgwrfer: RMSE=0.0724, Corr=nan
-  beta4_mgwrfer: RMSE=0.1399, Corr=nan
+  beta1_mgwfer: RMSE=0.1793, Corr=0.8179
+  beta2_mgwfer: RMSE=0.1050, Corr=0.9407
+  beta3_mgwfer: RMSE=0.0724, Corr=nan
+  beta4_mgwfer: RMSE=0.1399, Corr=nan
+
+============================================================
+MGWFER Stage 2 (Recover Individual Fixed Effects alpha_i)
+============================================================
+  alpha_hat range: [1.445, 51.622], mean=23.060
+  True alpha range: [2.068, 51.548], mean=23.286
+  alpha_hat recovery: RMSE=0.5398, Corr=0.9996
+  Significant at 5%: 225/225 units (100.0%)
+  df for t-test: 446
+Exported: mgwrfer_alpha_recovery.csv
+Saved: mgwrfer_alpha_map.png (2x2 comparison, paper Fig. 5 replication)
+Saved: mgwrfer_beta4_bias.png (paper Fig. 9 replication)
 
 ============================================================
 COEFFICIENT RECOVERY COMPARISON
@@ -128,23 +424,39 @@ Saved: mgwrfer_bias_pooled.png
 Saved: mgwrfer_recovery_fe.png
 
 ── Model Comparison ──
-Metric                       Pooled MGWR        MGWRFER
+Metric                             PMGWR         MGWFER
 ------------------------- -------------- --------------
-RMSE (beta_1)                     0.3945         0.1793
-RMSE (beta_2)                     0.0888         0.1050
-RMSE (beta_3)                     0.0578         0.0724
-RMSE (beta_4)                     0.2531         0.1399
-Corr (beta_1)                     0.4586         0.8179
-Corr (beta_2)                     0.9504         0.9407
+RMSE (beta_1)                     2.3003         0.1793
+RMSE (beta_2)                     1.9489         0.1050
+RMSE (beta_3)                     1.7485         0.0724
+RMSE (beta_4)                     1.8612         0.1399
+Corr (beta_1)                    -0.4575         0.8179
+Corr (beta_2)                     0.2163         0.9407
 Corr (beta_3)                        nan            nan
 Corr (beta_4)                        nan            nan
-R-squared *                       0.9771         0.8900
+R-squared *                       0.9886         0.8900
   * R-squared not directly comparable (different dependent variables)
-AICc                             -561.77         496.09
+AICc                             -998.18         496.09
 
-Exported: model_comparison.csv
+Exported: model_comparison.csv (three local models)
 
-── Plotting coefficient maps (true vs MGWRFER) ──
+── Local model comparison (MGWR_cs / PMGWR / MGWFER) ──
+Metric                    MGWR_cs      PMGWR     MGWFER
+---------------------- ---------- ---------- ----------
+RMSE_beta_1                2.1573     2.3003     0.1793
+Corr_beta_1               -0.3857    -0.4575     0.8179
+RMSE_beta_2                1.7977     1.9489     0.1050
+Corr_beta_2               -0.2085     0.2163     0.9407
+RMSE_beta_3                1.9838     1.7485     0.0724
+Corr_beta_3                   nan        nan        nan
+RMSE_beta_4                2.3768     1.8612     0.1399
+Corr_beta_4                   nan        nan        nan
+R_squared                  0.9887     0.9886     0.8900
+AICc                    -277.5140  -998.1798   496.0922
+RMSE_alpha                14.1820    25.6184     0.5398
+Corr_alpha                 0.8387     0.9780     0.9996
+
+── Plotting coefficient maps (true vs MGWFER) ──
 Saved: mgwrfer_coefficient_maps.png
 
 ── Statistical significance analysis ──
@@ -158,31 +470,46 @@ Saved: mgwrfer_significance_maps.png
   $\beta_4$ (null): positive=23, not_sig=202, negative=0
 
 ── Bandwidth comparison ──
-  Pooled MGWR bws (x1-x4): [50, 175, 223, 223]
-  MGWRFER bws (x1-x4):     [50, 91, 116, 62]
-Saved: mgwrfer_bandwidth_comparison.png
+  MGWR_cs bws (x1-x4): [48, 91, 98, 52]
+  PMGWR bws   (x1-x4): [46, 50, 50, 46]
+  MGWFER bws  (x1-x4): [50, 91, 116, 62]
+Saved: mgwrfer_bandwidth_comparison.png (3 models)
 
 ============================================================
 FINAL SUMMARY
 ============================================================
 
-── Key Findings ──
-  beta_1: RMSE reduced by 54.6% (0.3945 → 0.1793)
-  beta_2: RMSE reduced by -18.2% (0.0888 → 0.1050)
-  beta_3: RMSE reduced by -25.2% (0.0578 → 0.0724)
-  beta_4: RMSE reduced by 44.7% (0.2531 → 0.1399)
+── Key Findings (paper Table 2 / 3 / Figs 5, 9 replication) ──
+  Global models (paper Table 2):
+    OLS_cs    : beta_1 = 5.48 (true = 1.50; expected: severely biased upward)
+    OLS_pool  : beta_1 = 6.14 (similarly biased)
+    FE        : beta_1 = 1.57, beta_4 = 0.02 (p=0.664) -- expected: near 1.5 / 0
 
-  R-squared: 0.9771 (pooled) vs 0.8900 (MGWRFER)
+  Local models: RMSE on each beta
+    beta_1: MGWR_cs=2.1573, PMGWR=2.3003, MGWFER=0.1793
+    beta_2: MGWR_cs=1.7977, PMGWR=1.9489, MGWFER=0.1050
+    beta_3: MGWR_cs=1.9838, PMGWR=1.7485, MGWFER=0.0724
+    beta_4: MGWR_cs=2.3768, PMGWR=1.8612, MGWFER=0.1399
+
+  Intrinsic contextual effects recovery (paper Fig. 5):
+    True sc range:    [2.07, 51.55]
+    MGWFER alpha_hat: [1.45, 51.62]  Corr=1.000, RMSE=0.54
+    MGWR_cs intercept: [2.42, 21.84]  Corr=0.839, RMSE=14.18
+    PMGWR intercept:   [-11.27, 10.04]  Corr=0.978, RMSE=25.62
+
+  Stage 2 t-test: alpha_hat significant at 5% in 225/225 (100%) units
 
 ── Interpretation ──
-  MGWRFER removes bias from time-invariant spatial confounders via
-  within-transformation. Where pooled MGWR was heavily biased (beta_1,
-  beta_4), MGWRFER yields large RMSE improvements (55%, 45%).
-  Where pooled MGWR was already near-unbiased (beta_2, beta_3), MGWRFER
-  shows slightly higher RMSE — a bias-variance tradeoff: demeaning reduces
-  effective sample size, increasing estimation variance.
-  Smaller bandwidths in MGWRFER indicate more localized coefficient
-  surfaces once confounding from fixed effects is removed.
+  This run uses the paper's DGP exactly: covariates carry a 0.05*sc term,
+  so the indirect contextual effect channel (sc -> x_k) is active.
+  Expected pattern of findings:
+  - Global OLS / pooled OLS heavily overestimate beta_1..3 and spuriously
+    detect beta_4; FE corrects all four.
+  - Cross-sectional MGWR and PMGWR cannot remove sc, so their local
+    intercepts dramatically UNDERestimate the true sc range, and their
+    beta_4 surfaces show a column-aligned vertical-stripe bias pattern.
+  - MGWFER recovers all true beta surfaces, the full sc range, and
+    correctly nullifies beta_4 -- replicating the paper's headline.
 
 Generated: README.md
 
