@@ -22,10 +22,10 @@ links:
     icon_pack: fas
     name: "Stata log"
     url: analysis.log
-- icon: markdown
-  icon_pack: fab
-  name: "MD version"
-  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_convergence/index.md
+  - icon: markdown
+    icon_pack: fab
+    name: "MD version"
+    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_convergence/index.md
 slides:
 summary: Test whether poorer countries are catching up to richer ones using beta and sigma convergence analysis with Penn World Tables 10.0 data in Stata
 tags:

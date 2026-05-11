@@ -27,10 +27,10 @@ links:
     icon_pack: fas
     name: "Jupyter notebook"
     url: notebook.ipynb
-- icon: markdown
-  icon_pack: fab
-  name: "MD version"
-  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_cml/index.md
+  - icon: markdown
+    icon_pack: fab
+    name: "MD version"
+    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_cml/index.md
 slides:
 summary: "A beginner-friendly walk-through of Causal Machine Learning — ATE, GATE, IATE, and welfare-maximising assignment — using DoubleML and EconML on a synthetic Flanders ALMP-style cohort with known true effects."
 tags:
