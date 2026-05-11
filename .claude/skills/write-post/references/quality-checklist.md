@@ -15,6 +15,7 @@ Run through every item before delivering the post.
 - [ ] Date set to yesterday's date
 - [ ] No emojis in post content
 - [ ] `links:` only reference files that exist in the page bundle
+- [ ] `links:` ends with the **MD version** entry pointing to `https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/<slug>/index.md`
 
 ## Sandwich pattern and interpretations
 
