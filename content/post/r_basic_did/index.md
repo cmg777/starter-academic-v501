@@ -3,7 +3,6 @@ authors:
   - admin
 categories:
   - R
-  - Causal Inference
   - Difference-in-Differences (DiD)
 draft: false
 featured: false

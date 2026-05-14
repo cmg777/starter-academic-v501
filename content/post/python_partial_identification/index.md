@@ -3,9 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Tutorial
-  - Causal Inference
-  - Cross-sectional Data
   - Partial Identification
 draft: false
 featured: false
@@ -38,6 +35,7 @@ tags:
   - python
   - causal
   - causal inference
+  - cross-sectional data
 title: "Introduction to Partial Identification: Bounding Causal Effects Under Unmeasured Confounding"
 url_code: ""
 url_pdf: ""

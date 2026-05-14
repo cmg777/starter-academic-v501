@@ -3,9 +3,8 @@ authors:
   - admin
 categories:
   - Python
-  - Econometrics
-  - Panel Data
   - Fixed Effects and TWFE
+  - Spatial inequality
 date: "2026-04-27T00:00:00Z"
 draft: false
 featured: false
@@ -37,6 +36,7 @@ tags:
   - python
   - econometrics
   - regional inequality
+  - panel data
 title: "Regional Inequality and the Kuznets Curve: Panel Fixed Effects in Python"
 url_code: ""
 url_pdf: ""

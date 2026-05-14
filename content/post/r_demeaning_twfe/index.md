@@ -3,9 +3,6 @@ authors:
   - admin
 categories:
   - R
-  - Tutorial
-  - Econometrics
-  - Panel Data
   - Fixed Effects and TWFE
 draft: false
 featured: false
@@ -48,6 +45,7 @@ tags:
   - panel
   - twfe
   - fixed-effects
+  - panel data
 title: "What Does TWFE Actually Do? Manual Demeaning and the FWL Theorem"
 url_code: ""
 url_pdf: ""

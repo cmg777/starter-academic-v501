@@ -3,7 +3,6 @@ authors:
   - admin
 categories:
   - Stata
-  - Causal Inference
   - Regression Discontinuity (RDD)
 draft: false
 featured: false

@@ -3,10 +3,7 @@ authors:
   - admin
 categories:
   - Stata
-  - Causal Inference
-  - Heterogeneous Treatment Effects
-  - Machine Learning
-  - Conditional Average Treatment Effects (CATE)
+  - Heterogeneous Treatment Effects (CATE)
   - Resource Curse
 draft: false
 featured: false

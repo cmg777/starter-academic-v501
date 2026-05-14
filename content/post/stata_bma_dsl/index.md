@@ -3,12 +3,7 @@ authors:
   - admin
 categories:
   - Stata
-  - Tutorial
-  - Econometrics
-  - Cross-sectional Data
-  - Variable Selection
   - Bayesian Model Averaging (BMA)
-  - LASSO
 draft: false
 featured: false
 date: "2026-03-29T00:00:00Z"
@@ -45,6 +40,7 @@ tags:
   - panel
   - econometrics
   - world
+  - cross-sectional data
 title: "Taming Model Uncertainty in the Environmental Kuznets Curve: BMA and Double-Selection LASSO with Panel Data"
 url_code: ""
 url_pdf: ""

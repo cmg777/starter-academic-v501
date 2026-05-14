@@ -3,11 +3,7 @@ authors:
   - admin
 categories:
   - Python
-  - Tutorial
   - GWR and MGWR
-  - Causal Inference
-  - Spatial Analysis
-  - Panel Data
 date: "2026-05-03T00:00:00Z"
 draft: false
 featured: false

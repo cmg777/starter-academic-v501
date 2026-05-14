@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Stata
-  - Spatial Analysis
-  - Panel Data
   - Spatial Regression (SAR, SEM, SDM)
 draft: false
 featured: false
@@ -39,6 +37,7 @@ tags:
 - regional
 - spatial spillovers
 - panel
+- panel data
 title: "Spatial Panel Regression in Stata: Cigarette Demand Across US States"
 url_code: ""
 url_pdf: ""

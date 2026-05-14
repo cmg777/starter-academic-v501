@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Stata
-  - Spatial Analysis
-  - Panel Data
   - Spatial Regression (SAR, SEM, SDM)
 draft: false
 featured: false
@@ -44,6 +42,7 @@ tags:
 - spatial spillovers
 - banking
 - causal
+- panel data
 title: "Spatial Dynamic Panels with Common Factors in Stata: Credit Risk in US Banking"
 url_code: ""
 url_pdf: ""

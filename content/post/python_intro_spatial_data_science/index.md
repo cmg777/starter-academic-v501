@@ -3,10 +3,8 @@ authors:
   - admin
 categories:
   - Python
-  - Exploratory Data Analysis
-  - Spatial Analysis
-  - Cross-sectional Data
   - Spatial Autocorrelation (ESDA)
+  - Spatial inequality
 draft: false
 featured: false
 date: "2019-04-01T00:00:00Z"
@@ -29,6 +27,7 @@ tags:
 - spatial
 - python
 - exploratory data analysis
+- cross-sectional data
 title: Introduction to spatial data science
 url_code: ""
 url_pdf: ""

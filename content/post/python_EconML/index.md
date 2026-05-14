@@ -3,11 +3,7 @@ authors:
   - admin
 categories:
   - Python
-  - Tutorial
-  - Causal Inference
-  - Heterogeneous Treatment Effects
-  - Machine Learning
-  - Double Machine Learning
+  - Heterogeneous Treatment Effects (CATE)
   - Resource Curse
 draft: false
 featured: false

@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Tutorial
-  - Cross-sectional Data
   - Principal Component Analysis (PCA)
 draft: false
 featured: false
@@ -32,6 +30,7 @@ summary: Building a composite Health Index from Life Expectancy and Infant Morta
 tags:
 - python
 - world
+- cross-sectional data
 title: "Introduction to PCA Analysis for Building Development Indicators"
 url_code: ""
 url_pdf: ""

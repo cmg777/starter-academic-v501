@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Causal Inference
-  - Cross-sectional Data
   - IPW and Doubly Robust
 draft: false
 featured: false
@@ -49,6 +47,7 @@ tags:
 - python
 - causal
 - causal inference
+- cross-sectional data
 title: "Introduction to Causal Inference: The DoWhy Approach with the Lalonde Dataset"
 url_code: ""
 url_pdf: ""

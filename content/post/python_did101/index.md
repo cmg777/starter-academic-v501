@@ -2,10 +2,8 @@
 authors:
 - admin
 categories:
-- Python
-- Causal Inference
-- Panel Data
-- DiD
+  - Python
+  - Difference-in-Differences (DiD)
 date: "2026-04-27T00:00:00Z"
 draft: false
 featured: false
@@ -51,6 +49,7 @@ tags:
 - panel
 - education
 - pyfixest
+- panel data
 title: "Introduction to Difference-in-Differences (DiD) in Python"
 toc: true
 diagram: true

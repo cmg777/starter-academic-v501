@@ -3,9 +3,6 @@ authors:
   - admin
 categories:
   - R
-  - Econometrics
-  - Tutorial
-  - Cross-sectional Data
   - FWL Theorem
 draft: false
 featured: false
@@ -35,6 +32,7 @@ tags:
   - causal
   - causal inference
   - panel
+  - cross-sectional data
 title: "Visualizing Regression with the FWL Theorem in R"
 url_code: ""
 url_pdf: ""

@@ -3,9 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Econometrics
-  - Tutorial
-  - Panel Data
 draft: false
 featured: false
 date: "2026-03-31T00:00:00Z"
@@ -37,6 +34,7 @@ tags:
   - python
   - econometrics
   - panel
+  - panel data
 title: "Standard Errors in Panel Data: A Beginner's Guide in Python"
 url_code: ""
 url_pdf: ""

@@ -3,8 +3,7 @@ authors:
   - admin
 categories:
   - Python
-  - Causal Inference
-  - Instrumental Variables
+  - Instrumental Variables (IV)
   - Development Economics
 date: "2026-05-09T00:00:00Z"
 draft: false

@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - R
-  - Causal Inference
-  - Panel Data
   - Difference-in-Differences (DiD)
 draft: false
 featured: false
@@ -29,6 +27,7 @@ tags:
 - r
 - causal
 - causal inference
+- panel data
 title: Heterogeneous treatment effects via two-stage DID 
 url_code: ""
 url_pdf: ""

@@ -3,12 +3,7 @@ authors:
   - admin
 categories:
   - Python
-  - Causal Inference
-  - Machine Learning
-  - Cross-sectional Data
   - Double Machine Learning
-  - Random Forest
-  - LASSO
 draft: false
 featured: false
 date: "2026-03-10T00:00:00Z"
@@ -41,6 +36,7 @@ tags:
   - causal
   - causal inference
   - machine learning
+  - cross-sectional data
 title: "Introduction to Causal Inference: Double Machine Learning"
 url_code: ""
 url_pdf: ""

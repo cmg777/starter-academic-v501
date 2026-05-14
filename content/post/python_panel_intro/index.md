@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Econometrics
-  - Panel Data
 date: "2026-04-27T00:00:00Z"
 draft: false
 featured: false
@@ -39,6 +37,7 @@ tags:
   - fixed-effects
   - random-effects
   - mundlak
+  - panel data
 title: "Introduction to Panel Data Methods in Python"
 url_code: ""
 url_pdf: ""

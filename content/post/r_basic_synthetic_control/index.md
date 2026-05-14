@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - R
-  - Causal Inference
-  - Tutorial
   - Synthetic Control
 draft: false
 featured: false

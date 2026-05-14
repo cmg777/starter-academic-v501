@@ -3,10 +3,6 @@ authors:
   - admin
 categories:
   - Stata
-  - Tutorial
-  - Econometrics
-  - Panel Data
-  - Variable Selection
   - LASSO
 draft: false
 featured: false
@@ -44,6 +40,7 @@ tags:
   - panel
   - econometrics
   - world
+  - panel data
 title: "Identifying Latent Group Structures in Panel Data: The classifylasso Command in Stata"
 url_code: ""
 url_pdf: ""

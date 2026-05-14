@@ -3,7 +3,6 @@ authors:
   - admin
 categories:
   - Stata
-  - Causal Inference
   - Difference-in-Differences (DiD)
 draft: false
 featured: false

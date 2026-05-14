@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Spatial Analysis
-  - Cross-sectional Data
   - GWR and MGWR
 draft: false
 featured: false
@@ -33,6 +31,7 @@ tags:
 - python
 - regional
 - spatial heterogeneity
+- cross-sectional data
 title: Studying spatial heterogeneity
 url_code: ""
 url_pdf: ""

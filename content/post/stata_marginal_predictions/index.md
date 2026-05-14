@@ -3,7 +3,6 @@ authors:
   - admin
 categories:
   - Stata
-  - Cross-sectional Data
 draft: false
 featured: false
 date: "2019-04-01T00:00:00Z"
@@ -24,6 +23,7 @@ slides:
 summary: Fitting and interpreting linear and logistic regression models 
 tags:
 - stata
+- cross-sectional data
 title: Use marginal predictions
 url_code: ""
 url_pdf: ""

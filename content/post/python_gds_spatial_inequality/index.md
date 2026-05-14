@@ -3,10 +3,8 @@ authors:
   - admin
 categories:
   - Python
-  - Exploratory Data Analysis
-  - Spatial Analysis
-  - Cross-sectional Data
   - Spatial Autocorrelation (ESDA)
+  - Spatial inequality
 draft: false
 featured: false
 date: "2023-08-27T00:00:00Z"
@@ -30,6 +28,7 @@ tags:
 - python
 - regional
 - exploratory data analysis
+- cross-sectional data
 title: Spatial inequality dynamics
 url_code: ""
 url_pdf: ""

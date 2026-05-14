@@ -3,10 +3,8 @@ authors:
   - admin
 categories:
   - Python
-  - Tutorial
-  - Spatial Analysis
-  - Cross-sectional Data
   - GWR and MGWR
+  - Spatial inequality
 draft: false
 featured: false
 date: "2026-03-22T00:00:00Z"
@@ -30,6 +28,7 @@ tags:
 - python
 - spatial
 - regional
+- cross-sectional data
 title: "Multiscale Geographically Weighted Regression: Spatially Varying Economic Convergence in Indonesia"
 url_code: ""
 url_pdf: ""

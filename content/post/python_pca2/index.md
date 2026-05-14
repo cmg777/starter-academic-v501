@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Tutorial
-  - Cross-sectional Data
   - Principal Component Analysis (PCA)
 draft: false
 featured: false
@@ -33,6 +31,7 @@ tags:
 - python
 - world
 - regional
+- cross-sectional data
 title: "Pooled PCA for Building Development Indicators Across Time"
 url_code: ""
 url_pdf: ""

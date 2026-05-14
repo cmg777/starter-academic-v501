@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Causal Inference
-  - Panel Data
   - Difference-in-Differences (DiD)
 draft: false
 featured: false
@@ -37,6 +35,7 @@ tags:
 - python
 - causal
 - causal inference
+- panel data
 title: "Introduction to Difference-in-Differences in Python"
 url_code: ""
 url_pdf: ""

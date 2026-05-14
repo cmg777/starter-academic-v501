@@ -3,9 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Tutorial
-  - Machine Learning
-  - Cross-sectional Data
   - Random Forest
 draft: false
 featured: false
@@ -35,6 +32,7 @@ tags:
 - spatial
 - regional
 - machine learning
+- cross-sectional data
 title: "Introduction to Machine Learning: Random Forest Regression"
 url_code: ""
 url_pdf: ""

@@ -3,9 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Tutorial
-  - Causal Inference
-  - Cross-sectional Data
   - FWL Theorem
 draft: false
 featured: false
@@ -38,6 +35,7 @@ tags:
   - python
   - causal
   - causal inference
+  - cross-sectional data
 title: "The FWL Theorem: Making Multivariate Regressions Intuitive"
 url_code: ""
 url_pdf: ""

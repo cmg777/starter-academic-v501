@@ -3,10 +3,6 @@ authors:
   - admin
 categories:
   - Stata
-  - Causal Inference
-  - Panel Data
-  - Difference-in-Differences (DiD)
-  - IPW and Doubly Robust
   - Randomized Controlled Trial (RCT)
 draft: false
 featured: false
@@ -41,6 +37,7 @@ tags:
   - causal inference
   - rct
   - panel
+  - panel data
 title: "Evaluating a Cash Transfer Program (RCT) with Panel Data in Stata"
 url_code: ""
 url_pdf: ""

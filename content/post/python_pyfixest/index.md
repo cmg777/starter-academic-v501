@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Econometrics
-  - Panel Data
   - Fixed Effects and TWFE
 draft: false
 featured: false
@@ -28,6 +26,7 @@ summary: Estimating regression models with high-dimensional fixed effects using 
 tags:
   - python
   - econometrics
+  - panel data
 title: "High-Dimensional Fixed Effects Regression: An Introduction in Python"
 url_code: ""
 url_pdf: ""

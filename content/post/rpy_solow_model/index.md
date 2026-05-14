@@ -4,8 +4,9 @@ authors:
 categories:
   - R
   - Python
-  - Growth
-  - Solow Growth Model
+  - Economic Growth
+  - Convergence
+  - Spatial inequality
 draft: false
 featured: false
 date: "2023-07-29T00:00:00Z"

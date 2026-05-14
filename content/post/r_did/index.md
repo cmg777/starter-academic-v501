@@ -3,9 +3,6 @@ authors:
   - admin
 categories:
   - R
-  - Causal Inference
-  - Tutorial
-  - Panel Data
   - Difference-in-Differences (DiD)
 draft: false
 featured: false
@@ -30,6 +27,7 @@ tags:
   - r
   - causal
   - causal inference
+  - panel data
 title: "Difference-in-Differences for Policy Evaluation: A Tutorial using R"
 url_code: ""
 url_pdf: ""

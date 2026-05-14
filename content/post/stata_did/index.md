@@ -2,10 +2,8 @@
 authors:
 - admin
 categories:
-- Stata
-- Causal Inference
-- Panel Data
-- DiD
+  - Stata
+  - Difference-in-Differences (DiD)
 date: "2026-04-25T00:00:00Z"
 draft: false
 featured: false
@@ -50,6 +48,7 @@ tags:
 - did
 - panel
 - education
+- panel data
 title: "Introduction to Difference-in-Differences (DiD) in Stata"
 toc: true
 diagram: true

@@ -3,10 +3,6 @@ authors:
   - admin
 categories:
   - R
-  - Tutorial
-  - Econometrics
-  - Panel Data
-  - Variable Selection
   - Bayesian Model Averaging (BMA)
 draft: false
 featured: false
@@ -36,6 +32,7 @@ tags:
   - econometrics
   - panel
   - world
+  - panel data
 title: "Dynamic Panel BMA: Which Factors Truly Drive Economic Growth?"
 url_code: ""
 url_pdf: ""

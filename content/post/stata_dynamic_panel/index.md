@@ -3,10 +3,7 @@ authors:
   - admin
 categories:
   - Stata
-  - Causal Inference
-  - Panel Data
   - Dynamic Panel
-  - GMM
 draft: false
 featured: false
 date: "2026-04-28T00:00:00Z"
@@ -41,6 +38,7 @@ tags:
   - panel
   - dynamic panel
   - gmm
+  - panel data
 title: "Dynamic Panel Data with Arellano-Bond GMM in Stata: The Effect of War on Economic Growth"
 url_code: ""
 url_pdf: ""

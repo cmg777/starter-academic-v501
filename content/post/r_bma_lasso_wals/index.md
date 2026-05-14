@@ -3,12 +3,7 @@ authors:
   - admin
 categories:
   - R
-  - Tutorial
-  - Econometrics
-  - Cross-sectional Data
-  - Variable Selection
   - Bayesian Model Averaging (BMA)
-  - LASSO
 draft: false
 featured: false
 date: "2026-03-23T00:00:00Z"
@@ -36,6 +31,7 @@ tags:
   - r
   - econometrics
   - world
+  - cross-sectional data
 title: "Three Methods for Robust Variable Selection: BMA, LASSO, and WALS"
 url_code: ""
 url_pdf: ""

@@ -3,11 +3,8 @@ authors:
   - admin
 categories:
   - Python
-  - Tutorial
-  - Exploratory Data Analysis
-  - Spatial Analysis
-  - Cross-sectional Data
   - Spatial Autocorrelation (ESDA)
+  - Spatial inequality
 draft: false
 featured: false
 date: "2026-03-22T00:00:00Z"
@@ -37,6 +34,7 @@ tags:
 - regional
 - exploratory data analysis
 - spatial spillovers
+- cross-sectional data
 title: "Exploratory Spatial Data Analysis: Spatial Clusters and Dynamics of Human Development in South America"
 url_code: ""
 url_pdf: ""

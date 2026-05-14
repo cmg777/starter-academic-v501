@@ -3,9 +3,6 @@ authors:
   - admin
 categories:
   - R
-  - Spatial Analysis
-  - Tutorial
-  - Panel Data
   - Spatial Regression (SAR, SEM, SDM)
 draft: false
 featured: false
@@ -32,6 +29,7 @@ tags:
   - regional
   - spatial spillovers
   - panel
+  - panel data
 title: "Spatial Dynamic Panel Data Modeling in R: Cigarette Demand Across US States"
 url_code: ""
 url_pdf: ""

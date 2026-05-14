@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Spatial Analysis
-  - Cross-sectional Data
 draft: false
 featured: false
 date: "2023-12-02T00:00:00Z"
@@ -32,6 +30,7 @@ tags:
 - regional
 - python
 - spatial spillovers
+- cross-sectional data
 title: Construct and export spatial connectivity structures (W)
 url_code: ""
 url_pdf: ""

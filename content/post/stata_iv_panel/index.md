@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Stata
-  - Causal Inference
-  - Panel Data
   - Instrumental Variables (IV)
 draft: false
 featured: false
@@ -40,6 +38,7 @@ tags:
   - instrumental variables
   - panel
   - conflict
+  - panel data
 title: "IV Estimation with Panel Data: Economic Shocks and Civil Conflict"
 url_code: ""
 url_pdf: ""

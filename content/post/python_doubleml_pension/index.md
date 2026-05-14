@@ -3,9 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Tutorial
-  - Causal Inference
-  - Machine Learning
   - Double Machine Learning
 draft: false
 featured: false

@@ -3,7 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Causal Inference
   - Synthetic Control
 draft: false
 featured: false

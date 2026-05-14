@@ -3,10 +3,7 @@ authors:
   - admin
 categories:
   - Stata
-  - Causal Inference
-  - Treatment Effects
-  - Matching
-  - Propensity Score
+  - Matching and Propensity Score
 draft: false
 featured: false
 date: "2026-04-29T00:00:00Z"

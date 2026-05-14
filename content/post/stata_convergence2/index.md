@@ -3,8 +3,10 @@ authors:
   - admin
 categories:
   - Stata
+  - Economic Growth
+  - Convergence
   - Development Economics
-  - Cross-Country Analysis
+  - Spatial inequality
 date: "2026-04-29T00:00:00Z"
 draft: false
 featured: false

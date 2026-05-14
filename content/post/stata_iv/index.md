@@ -3,8 +3,7 @@ authors:
   - admin
 categories:
   - Stata
-  - Causal Inference
-  - Instrumental Variables
+  - Instrumental Variables (IV)
   - Development Economics
 date: "2026-05-08T00:00:00Z"
 draft: false

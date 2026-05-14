@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Python
-  - Causal Inference
-  - Cross-sectional Data
   - IPW and Doubly Robust
 draft: false
 featured: false
@@ -37,6 +35,7 @@ tags:
 - python
 - causal
 - causal inference
+- cross-sectional data
 title: "A Beginner's Guide to Causal Inference with DoWhy in Python"
 url_code: ""
 url_pdf: ""

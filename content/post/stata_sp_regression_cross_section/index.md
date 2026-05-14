@@ -3,8 +3,6 @@ authors:
   - admin
 categories:
   - Stata
-  - Spatial Analysis
-  - Cross-sectional Data
   - Spatial Regression (SAR, SEM, SDM)
 draft: false
 featured: false
@@ -38,6 +36,7 @@ tags:
 - spatial
 - regional
 - spatial spillovers
+- cross-sectional data
 title: "Cross-Sectional Spatial Regression in Stata: Crime in Columbus Neighborhoods"
 url_code: ""
 url_pdf: ""

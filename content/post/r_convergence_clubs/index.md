@@ -3,8 +3,8 @@ authors:
   - admin
 categories:
   - R
-  - Growth
-  - Convergence Clubs
+  - Convergence
+  - Spatial inequality
 draft: false
 featured: false
 date: "2023-09-03T00:00:00Z"

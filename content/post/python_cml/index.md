@@ -3,9 +3,7 @@ authors:
   - admin
 categories:
   - Python
-  - Causal Inference
-  - Causal Machine Learning
-  - Policy Evaluation
+  - Double Machine Learning
 date: "2026-05-01T00:00:00Z"
 draft: false
 featured: false

@@ -3,7 +3,6 @@ authors:
   - admin
 categories:
   - Stata
-  - Causal Inference
   - Synthetic Control
 date: "2026-04-26T00:00:00Z"
 draft: false
