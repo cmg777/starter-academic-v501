@@ -1,7 +1,7 @@
 # Method-based category reorganization
 
 **Date:** 2026-05-15
-**Commit:** _(filled after commit)_
+**Commit:** beb5ffe
 **Files changed:** 66 post index.md files
 
 ## What changed
