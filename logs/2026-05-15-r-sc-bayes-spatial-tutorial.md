@@ -1,7 +1,7 @@
 # Bayesian Spatial Synthetic Control tutorial (`r_sc_bayes_spatial`)
 
 **Date:** 2026-05-15
-**Commit:** _(filled after commit)_
+**Commit:** 58118b0
 
 ## Motivation
 
