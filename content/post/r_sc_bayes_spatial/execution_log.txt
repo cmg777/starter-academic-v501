@@ -1,0 +1,77 @@
+=============================================================
+  Bayesian Spatial SC — California tobacco replication
+Seed: 20251022  |  MCMC: 5000 iter / 2500 burn
+--- Section 1: Source replication-package helpers ---
+[OK] R helpers sourced and C++ kernels compiled.
+
+--- Section 2: Load california_smoking.rda ---
+Panel: 1209 rows | 39 states | years 1970-2000
+Treated: California | Donors: 38 | Pre-period: 1970-1987 | Post-period: 1988-2000
+--- Section 3: Stage 1 — Classical SCM (tidysynth) ---
+Stage 1 ATT (Classical SCM): -18.46 packs per capita, 95% boot CI [-22.21, -14.45]
+Top-5 donor weights (classical):
+# A tibble: 5 × 2
+  state        weight
+  <chr>         <dbl>
+1 Utah        0.327  
+2 Nevada      0.255  
+3 Montana     0.245  
+4 Connecticut 0.148  
+5 Idaho       0.00501
+[OK] Saved r_sc_bayes_spatial_01_classical_paths.png
+--- Section 4: Stage 2 — Bayesian SCM with horseshoe priors ---
+Stage 2 ATT (Bayesian HS): -15.84 packs per capita, 95% CrI [-21.76, -9.48]
+Active donors (mean α > 0.01): 23 of 38
+Top-5 donor weights (Bayesian HS):
+# A tibble: 5 × 4
+  state          mean    lo95  hi95
+  <chr>         <dbl>   <dbl> <dbl>
+1 Connecticut   0.218 -0.0355 0.566
+2 Nevada        0.198  0.0810 0.266
+3 West Virginia 0.128 -0.0205 0.310
+4 Montana       0.121 -0.0294 0.423
+5 Illinois      0.109 -0.0310 0.374
+[OK] Saved r_sc_bayes_spatial_02_horseshoe_weights.png
+[OK] Saved r_sc_bayes_spatial_05_stage2_paths.png
+[NOTE] Tutorial MCMC = 5k iter; paper uses 100k. For inference-grade ESS, increase iterations.
+
+--- Section 5: Stage 3 — Bayesian Spatial SCM (SAR) ---
+Posterior mean ρ (spatial autocorrelation): 0.223 | ESS = 3
+[WARN] ESS(ρ) < 200 — tutorial-scale MCMC; increase to 100k for paper-grade.
+Stage 3 ATT (Bayesian Spatial SAR): -16.59 packs per capita, 95% CrI [-16.78, -16.39]
+Top-8 spillover-receiving donor states (post-period mean effect):
+# A tibble: 8 × 3
+  state        avg_spillover abs_eff
+  <chr>                <dbl>   <dbl>
+1 Nevada            -3.75    3.75   
+2 Idaho             -0.228   0.228  
+3 Utah              -0.228   0.228  
+4 Wyoming           -0.0187  0.0187 
+5 Montana           -0.0145  0.0145 
+6 Colorado          -0.00967 0.00967
+7 South Dakota      -0.00141 0.00141
+8 North Dakota      -0.00126 0.00126
+[OK] Saved r_sc_bayes_spatial_03_spillover_effects.png
+[OK] Saved r_sc_bayes_spatial_06_stage3_paths.png
+--- Prior predictive check (Stage 2/3 prior compatibility) ---
+[OK] Saved r_sc_bayes_spatial_04_prior_predictive.png
+--- Section 6: Cross-stage ATT comparison ---
+ATT comparison across the three stages:
+# A tibble: 3 × 7
+  stage                           att  lo95   hi95 active_donors_n ess_rho notes
+  <chr>                         <dbl> <dbl>  <dbl>           <int>   <dbl> <chr>
+1 Classical SCM (tidysynth)     -18.5 -22.2 -14.4                4      NA Quad…
+2 Bayesian HS (no spillovers)   -15.8 -21.8  -9.48              23      NA Hors…
+3 Bayesian Spatial SAR (with s… -16.6 -16.8 -16.4               27       3 SAR …
+
+--- Section 7: Summary ---
+HEADLINE (California Prop 99, ATT on per-capita cigarette sales):
+  Classical SCM       : -18.46 [-22.21, -14.45]
+  Bayesian Horseshoe  : -15.84 [-21.76, -9.48]
+  Bayesian Spatial SAR: -16.59 [-16.78, -16.39]  ESS(ρ) = 3
+Spatial autocorrelation: ρ̂ = 0.223 (95% CrI [0.168, 0.272])
+
+[CAVEAT] This run used 5,000 MCMC iterations (2,500 burn-in) for tutorial speed.
+The published paper uses 100,000 iterations. Posterior credible intervals from this script should be interpreted as illustrative; rerun with M=100000, burn=50000 for inference-grade reproducibility.
+
+=== Script completed successfully ===

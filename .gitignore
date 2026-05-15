@@ -23,3 +23,8 @@ content/post/python_iv/.venv/
 
 # Third-party MGWR fork cloned by the python_mgwrfer script (~18 MB; not source)
 content/post/python_mgwrfer/mgwpr_repo/
+
+# Sakaguchi & Tagawa replication package for r_sc_bayes_spatial (~148 MB,
+# includes a 129 MB raw CSV that exceeds GitHub's per-file limit). The 11
+# files analysis.R actually needs are copied into helpers/.
+content/post/r_sc_bayes_spatial/replication-package/

@@ -1,0 +1,4 @@
+stage,att,lo95,hi95,active_donors_n,ess_rho,notes
+Classical SCM (tidysynth),-18.462366671445103,-22.208290572598035,-14.453106342280316,4,NA,Quadratic programming on simplex (Abadie 2010)
+Bayesian HS (no spillovers),-15.835914791778174,-21.760499548977357,-9.476109094349635,23,NA,Horseshoe shrinkage; SUTVA imposed
+Bayesian Spatial SAR (with spillovers),-16.589950043799575,-16.777347263776427,-16.393491739090184,27,3,SAR ρ=0.223; SUTVA relaxed; CrI artificially narrow because ESS(ρ)=3

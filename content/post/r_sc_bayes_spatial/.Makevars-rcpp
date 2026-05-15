@@ -1,0 +1,5 @@
+# Local Makevars override for sourceCpp() — used by this post only.
+# R's default Makeconf expects CRAN's macOS gfortran at /opt/gfortran/ with
+# emutls_w/heapt_w libs. This machine has Homebrew gcc 11.3.0 instead.
+# Override FLIBS to use the Homebrew gfortran without the missing libs.
+FLIBS = -L/usr/local/Cellar/gcc/11.3.0/lib/gcc/11 -lgfortran -lquadmath
