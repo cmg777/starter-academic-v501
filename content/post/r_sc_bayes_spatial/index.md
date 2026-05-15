@@ -18,10 +18,6 @@ links:
     icon_pack: fas
     name: "R script"
     url: analysis.R
-  - icon: file-alt
-    icon_pack: fas
-    name: "Results report"
-    url: results_report.md
   - icon: markdown
     icon_pack: fab
     name: "MD version"
@@ -243,8 +239,11 @@ The replication package exposes three pieces we will use directly: `hs_alpha_gib
 The dataset bundled with the package — `california_smoking.rda` — is a balanced panel of **39 US states from 1970 to 2000**, with per-capita cigarette sales (`cigsale`) and real retail price (`retprice`). The treatment dummy switches on for California in 1988 (the package convention; Prop 99 was approved in November 1988 and took effect in January 1989). The donor pool is the 38 other states. We load it and inspect the panel.
 
 ```r
-rda_con <- url(file.path(REPL_URL, "california_smoking.rda"))
-load(rda_con); close(rda_con)
+# .rda is gzipped binary; download to a tempfile in binary mode, then load.
+rda_path <- tempfile(fileext = ".rda")
+download.file(file.path(REPL_URL, "california_smoking.rda"), rda_path,
+              mode = "wb", quiet = TRUE)
+load(rda_path)
 panel_df <- california_smoking$panel_df %>%
   mutate(treatment = if_else(state == "California" & year >= TREAT_YEAR, 1L, 0L))
 ```

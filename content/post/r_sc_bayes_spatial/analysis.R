@@ -118,8 +118,12 @@ cat("[OK] R helpers fetched and C++ kernels compiled.\n\n")
 # ── 2. Load California panel + spatial weights ───────────────────────────────
 cat("--- Section 2: Load california_smoking.rda ---\n")
 
-rda_con <- url(file.path(REPL_URL, "california_smoking.rda"))
-load(rda_con); close(rda_con)
+# .rda files are gzipped binary; load(url(...)) opens text-mode and fails on
+# the magic-number check. Download to a tempfile in binary mode, then load.
+rda_path <- tempfile(fileext = ".rda")
+download.file(file.path(REPL_URL, "california_smoking.rda"), rda_path,
+              mode = "wb", quiet = TRUE)
+load(rda_path)
 panel_df <- california_smoking$panel_df %>%
   mutate(treatment = if_else(state == "California" & year >= TREAT_YEAR, 1L, 0L))
 
