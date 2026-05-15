@@ -74,6 +74,13 @@ theme_dark_site <- function(base_size = 12) {
 }
 
 save_fig <- function(plot, name, w = 9, h = 6) {
+  # patchwork composites need an outer plot.background override; otherwise
+  # the wrapper renders a thin light frame around the assembled figure.
+  if (inherits(plot, "patchwork")) {
+    plot <- plot + plot_annotation(
+      theme = theme(plot.background = element_rect(fill = BG, colour = NA))
+    )
+  }
   ggsave(glue("{SLUG}_{name}.png"), plot, width = w, height = h, dpi = 300,
          bg = BG)
 }
