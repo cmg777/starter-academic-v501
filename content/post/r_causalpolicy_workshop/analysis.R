@@ -443,6 +443,30 @@ sc_balance <- grab_balance_table(prop99_syn)
 cat("\nPredictor balance:\n"); print(sc_balance)
 write_csv(sc_balance, "table_sc_balance.csv")
 
+# Predictor weights (V matrix) — how much importance the optimiser placed on
+# each predictor when matching California
+sc_predw <- grab_predictor_weights(prop99_syn)
+cat("\nPredictor weights (V matrix):\n"); print(sc_predw)
+write_csv(sc_predw, "table_sc_predictor_weights.csv")
+
+# Pre-period loss (MSPE) for treated unit and donors
+sc_loss <- grab_loss(prop99_syn)
+cat("\nPre-period loss (RMSPE), treated + placebos:\n")
+print(head(sc_loss, 10))
+write_csv(sc_loss, "table_sc_loss.csv")
+
+# Fisher exact p-value via MSPE ratio (Abadie et al. 2010)
+sc_sig <- grab_significance(prop99_syn)
+cat("\nFisher-style significance table (top 5 MSPE ratios):\n")
+print(sc_sig |> arrange(desc(mspe_ratio)) |> head(5))
+write_csv(sc_sig, "table_sc_significance.csv")
+
+ca_sig <- sc_sig |> filter(unit_name == TREATED_STATE)
+sc_pvalue <- as.numeric(ca_sig$fishers_exact_pvalue)
+sc_mspe_ratio <- as.numeric(ca_sig$mspe_ratio)
+sc_rank   <- as.integer(ca_sig$rank)
+cat(glue("\nCalifornia MSPE ratio: {round(sc_mspe_ratio, 1)}, rank {sc_rank}, Fisher exact p = {round(sc_pvalue, 4)}\n"))
+
 # Placebo distribution of average causal effects
 ce_data <- prop99_syn |>
   grab_synthetic_control(placebo = TRUE) |>
@@ -513,6 +537,30 @@ p7 <- ggplot(ce_data |> filter(.placebo == 1),
        y = "Density") +
   theme_site()
 save_png(p7, "fig7_sc_placebos.png")
+
+# Figure 10: MSPE-ratio plot (Abadie-style Fisher rank visualisation)
+mspe_df <- sc_sig |>
+  mutate(is_treated = unit_name == TREATED_STATE,
+         unit_name  = fct_reorder(unit_name, mspe_ratio)) |>
+  arrange(desc(mspe_ratio)) |>
+  slice_head(n = 20)
+
+p10 <- ggplot(mspe_df,
+              aes(x = unit_name, y = mspe_ratio, fill = is_treated)) +
+  geom_col() +
+  geom_text(data = mspe_df |> filter(is_treated),
+            aes(label = sprintf("ratio = %.1f\nrank %d\np = %.3f",
+                                mspe_ratio, sc_rank, sc_pvalue)),
+            hjust = -0.05, color = LIGHTER_TEXT, size = 3.2, lineheight = 0.95) +
+  coord_flip() +
+  expand_limits(y = max(mspe_df$mspe_ratio) * 1.30) +
+  scale_fill_manual(values = c(`FALSE` = STEEL_BLUE, `TRUE` = WARM_ORANGE),
+                    guide = "none") +
+  labs(title = "MSPE ratio: post/pre fit error, treated vs placebos",
+       subtitle = "California sits at the top of the ranking — its post-period gap is unusually large relative to its pre-period fit",
+       x = NULL, y = "MSPE ratio (post / pre)") +
+  theme_site()
+save_png(p10, "fig10_sc_mspe_ratio.png", height = 7)
 
 # ============================================================
 # --- 9. Method 6: CausalImpact -------------------------------
@@ -718,6 +766,16 @@ save_png(p9, "fig9_cross_method_forest.png", height = 6)
 # ============================================================
 cat("\n========== 11. README ==========\n")
 
+# Detect which downstream pipeline stages have produced their artifacts so
+# README's checklist stays in sync with reality on re-runs.
+tick <- function(path) if (file.exists(path)) "[x]" else "[ ]"
+stage_progress <- glue::glue(
+  "- {tick('analysis.R')} Stage 1: write-script (analysis.R)\n",
+  "- {tick('results_report.md')} Stage 2: write-results-report (results_report.md)\n",
+  "- {tick('index.md')} Stage 3: write-post (index.md)\n",
+  "- {tick('infographic_instructions.md')} Stage 4: write-infographic (infographic_instructions.md)"
+)
+
 readme <- glue::glue("
 # r_causalpolicy_workshop -- Artifact Inventory
 
@@ -725,10 +783,7 @@ Replication of the causalpolicy.nl workshop (DiD, ITS, RDD, Synthetic Control,
 CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 
 ## Pipeline progress
-- [x] Stage 1: write-script (analysis.R)
-- [ ] Stage 2: write-results-report (results_report.md)
-- [ ] Stage 3: write-post (index.md)
-- [ ] Stage 4: write-infographic (infographic_instructions.md)
+{stage_progress}
 
 ## Figures
 | File | Description |
@@ -742,6 +797,7 @@ CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 | fig7_sc_placebos.png | Placebo distribution of average causal effects |
 | fig8_causalimpact.png | CausalImpact pointwise + cumulative |
 | fig9_cross_method_forest.png | Forest plot of all six estimators |
+| fig10_sc_mspe_ratio.png | MSPE-ratio bar chart (Abadie Fisher rank visualisation) |
 
 ## CSV tables
 | File | Description |
@@ -753,6 +809,9 @@ CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 | table_eda_california_prepost.csv | Pre/post descriptives for California |
 | table_sc_unit_weights.csv | Synthetic Control unit weights |
 | table_sc_balance.csv | Synthetic Control predictor balance |
+| table_sc_predictor_weights.csv | Synthetic Control V matrix (predictor weights) |
+| table_sc_loss.csv | Pre-period MSPE for treated unit + all placebos |
+| table_sc_significance.csv | Fisher exact p-value via MSPE ratios |
 | table_sc_placebo_aces.csv | Placebo average causal effects |
 | table_causalimpact_series.csv | CausalImpact pointwise / cumulative series |
 | table_cross_method.csv | Six-method comparison table |

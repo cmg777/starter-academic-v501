@@ -21,6 +21,7 @@ CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 | fig7_sc_placebos.png | Placebo distribution of average causal effects |
 | fig8_causalimpact.png | CausalImpact pointwise + cumulative |
 | fig9_cross_method_forest.png | Forest plot of all six estimators |
+| fig10_sc_mspe_ratio.png | MSPE-ratio bar chart (Abadie Fisher rank visualisation) |
 
 ## CSV tables
 | File | Description |
@@ -32,6 +33,9 @@ CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 | table_eda_california_prepost.csv | Pre/post descriptives for California |
 | table_sc_unit_weights.csv | Synthetic Control unit weights |
 | table_sc_balance.csv | Synthetic Control predictor balance |
+| table_sc_predictor_weights.csv | Synthetic Control V matrix (predictor weights) |
+| table_sc_loss.csv | Pre-period MSPE for treated unit + all placebos |
+| table_sc_significance.csv | Fisher exact p-value via MSPE ratios |
 | table_sc_placebo_aces.csv | Placebo average causal effects |
 | table_causalimpact_series.csv | CausalImpact pointwise / cumulative series |
 | table_cross_method.csv | Six-method comparison table |
