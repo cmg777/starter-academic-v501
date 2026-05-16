@@ -21,6 +21,10 @@ links:
   icon_pack: fab
   name: "Google Colab"
   url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/r_causalpolicy_workshop/notebook.ipynb
+- icon: file-code
+  icon_pack: fas
+  name: "Quarto (.qmd)"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_causalpolicy_workshop/tutorial.qmd
 - icon: podcast
   icon_pack: fas
   name: AI Podcast
