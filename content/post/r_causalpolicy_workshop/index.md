@@ -448,6 +448,7 @@ pacman::p_load(
   tidysynth,    # synthetic control (tidy API)
   fpp3,         # forecasting (tsibble, fable, ARIMA)
   mice,         # multiple imputation
+  ranger,       # backend for mice method = "rf"
   CausalImpact, # Bayesian structural time series
   broom,        # tidy model output
   glue          # string interpolation
@@ -1188,18 +1189,22 @@ prop99_syn
 The 11 columns capture, in order: unit name, placebo indicator, type, the outcome series, the predictor matrix, the synthetic-control series, the donor weights, the predictor weights, the raw input data, run metadata, and the optimiser loss. Each list-column can be flattened with `tidyr::unnest()` for custom downstream work.
 
 ```r
-# Flatten .outcome to a long table: one row per (unit, year).
-prop99_syn |> tidyr::unnest(cols = c(.outcome))
+# Flatten .outcome into a long table: one row per (unit, year).
+# Drop the remaining list-columns so head() displays cleanly in IRkernel.
+prop99_syn |>
+  tidyr::unnest(cols = c(.outcome)) |>
+  dplyr::select(.id, .placebo, .type, time_unit, real_y, synth_y) |>
+  head(8)
 ```
 
 ```text
-# A tibble: 1,482 × 14
-   .id        .placebo .type     time_unit real_y synth_y .predictors ...
-   <fct>         <dbl> <chr>         <int>  <dbl>   <dbl> <list>
- 1 California        0 treated        1970  123.    122.  <tibble>
- 2 California        0 treated        1971  121.    121.  <tibble>
- 3 California        0 treated        1972  124.    124.  <tibble>
- ...
+# A tibble: 8 × 6
+  .id        .placebo .type   time_unit real_y synth_y
+  <fct>         <dbl> <chr>       <int>  <dbl>   <dbl>
+1 California        0 treated      1970  123.    122.
+2 California        0 treated      1971  121.    121.
+3 California        0 treated      1972  124.    124.
+...
 ```
 
 This is the whole point of the nested-tibble design: every step of the optimisation is *introspectable from R*, with no need to dig into S4 slots or `attr()` blobs. The full long table is exported as `table_sc_outcomes_long.csv` in this post's bundle.
