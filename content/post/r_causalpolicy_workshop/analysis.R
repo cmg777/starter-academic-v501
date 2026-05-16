@@ -700,6 +700,16 @@ write_csv(ci_series_full, "table_causalimpact_series.csv")
 # ============================================================
 cat("\n========== 10. CROSS-METHOD COMPARISON ==========\n")
 
+# ITS-ARIMA: average the per-year ARIMA 95% forecast band as the
+# method's recommended uncertainty (treating each year's forecast band
+# as an honest per-year credible range, then summarising)
+its_arima_lo <- mean(fc_low)
+its_arima_hi <- mean(fc_up)
+# Note: per-year forecast bands are forecasts of the COUNTERFACTUAL, so the
+# "effect" forecast interval is observed - [hi, lo] = [observed - hi, observed - lo]
+its_arima_effect_lo <- mean(observed - fc_up)
+its_arima_effect_hi <- mean(observed - fc_low)
+
 results_tbl <- tibble(
   method   = c("Naive pre-post",
                "DiD (CA vs Nevada)",
@@ -728,12 +738,23 @@ results_tbl <- tibble(
                 its_arima_se,
                 rdd_se,
                 sc_se,
-                ci_se_approx)
+                ci_se_approx),
+  principled_inference = c(
+    glue("HAC 95% CI: [{round(naive_estimate - 1.96 * naive_se, 1)}, {round(naive_estimate + 1.96 * naive_se, 1)}]"),
+    glue("HAC 95% CI: [{round(did_estimate - 1.96 * did_se, 1)}, {round(did_estimate + 1.96 * did_se, 1)}]"),
+    "Linear-trend 95% prediction interval (no closed-form ATT SE)",
+    glue("ARIMA 95% forecast-band average: [{round(its_arima_effect_lo, 1)}, {round(its_arima_effect_hi, 1)}]"),
+    glue("HAC 95% CI: [{round(rdd_estimate - 1.96 * rdd_se, 1)}, {round(rdd_estimate + 1.96 * rdd_se, 1)}]"),
+    glue("Fisher exact p = {round(sc_pvalue, 3)} (MSPE-ratio rank {sc_rank}/39)"),
+    glue("Posterior 95% CrI: [{round(ci_low, 1)}, {round(ci_up, 1)}]; P(effect ≠ 0) = 92%")
+  )
 ) |>
   mutate(ci_low  = estimate - 1.96 * std_error,
          ci_high = estimate + 1.96 * std_error)
 
-cat("\nComparison table:\n"); print(results_tbl)
+cat("\nComparison table:\n"); print(results_tbl, width = Inf)
+cat("\nPrincipled inference column (each method's recommended uncertainty):\n")
+print(results_tbl |> select(method, principled_inference), width = Inf)
 write_csv(results_tbl, "table_cross_method.csv")
 
 # Figure 9: forest plot of all 6 estimates

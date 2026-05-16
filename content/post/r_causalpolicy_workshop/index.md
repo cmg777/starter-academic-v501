@@ -17,6 +17,10 @@ links:
   icon_pack: fas
   name: "R script"
   url: analysis.R
+- icon: podcast
+  icon_pack: fas
+  name: AI Podcast
+  url: "/post/r_causalpolicy_workshop/#podcast-player"
 - icon: markdown
   icon_pack: fab
   name: "MD version"
@@ -113,6 +117,38 @@ flowchart LR
 
 Read the diagram from left to right. The orange box (California observed) is fixed — every method sees the same data. The blue box (counterfactual) is the *construction*, and the six dashed arrows feeding it show how each method differs in its source of information. The teal box on the right is the universal output: a number measuring the gap. The whole rest of this tutorial is a guided tour of those six dashed arrows.
 
+### Which method when?
+
+The six methods are not interchangeable. Each one is appropriate for a different data situation. The decision tree below walks through three diagnostic questions and steers you to the matching family. Apply it whenever you face a new policy-evaluation problem.
+
+```mermaid
+flowchart TB
+    Q1{"Do you have a credible<br/>donor pool of untreated units?<br/>(roughly 10+ similar units<br/>followed over the same window)"}
+    Q1 -->|Yes| Q2{"Do you want frequentist<br/>placebo inference,<br/>or Bayesian credible<br/>intervals?"}
+    Q1 -->|No, only one good control| DiD["Difference-in-Differences<br/>(this tutorial: §5)<br/><br/>Cost: parallel-trends assumption<br/>on a single comparison unit"]
+    Q1 -->|No, only the treated unit| Q3{"Is the policy date the<br/>only structural break<br/>in the series?"}
+
+    Q2 -->|Frequentist + tidy code| SCM["Synthetic Control<br/>(this tutorial: §9)<br/><br/>Cost: convex-combination<br/>of donors must match the<br/>treated pre-period"]
+    Q2 -->|Bayesian + uncertainty bands| CI["CausalImpact<br/>(this tutorial: §10)<br/><br/>Cost: state-space prior;<br/>covariate-set choice<br/>affects the estimate"]
+
+    Q3 -->|Yes, sharp jump at threshold| RDD["Regression Discontinuity on time<br/>(this tutorial: §8)<br/><br/>Cost: assumes no other shock<br/>coincides with the threshold"]
+    Q3 -->|No, model the smooth pre-trend| ITS["Interrupted Time Series<br/>(this tutorial: §6 and §7)<br/><br/>Cost: pre-trend extrapolation<br/>must be specified correctly"]
+
+    NAIVE["Naive pre-post<br/>(this tutorial: §4)<br/><br/>Use only as a baseline.<br/>Never as a causal estimate."] -.->|"baseline for everyone"| Q1
+
+    style Q1 fill:#1f2b5e,stroke:#141413,color:#fff
+    style Q2 fill:#1f2b5e,stroke:#141413,color:#fff
+    style Q3 fill:#1f2b5e,stroke:#141413,color:#fff
+    style DiD fill:#6a9bcc,stroke:#141413,color:#fff
+    style SCM fill:#d97757,stroke:#141413,color:#fff
+    style CI fill:#d97757,stroke:#141413,color:#fff
+    style RDD fill:#6a9bcc,stroke:#141413,color:#fff
+    style ITS fill:#6a9bcc,stroke:#141413,color:#fff
+    style NAIVE fill:#7a8395,stroke:#141413,color:#fff
+```
+
+The orange terminal nodes (Synthetic Control, CausalImpact) are the most defensible families when a donor pool exists — and they happen to be the methods that produce the consensus estimate later in this tutorial. The blue nodes are valid choices in their respective data situations but carry stronger identifying assumptions. The grey naive-pre-post node is the universal baseline that *everyone* should compute first — never as the final answer, always as the bias yardstick.
+
 ### Key concepts at a glance
 
 This post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible. The **example** and **analogy** sit behind clickable cards: open them when you need them, leave them collapsed for a quick scan.
@@ -174,7 +210,7 @@ Predicting tomorrow's weather purely from this week's pattern. If the trend is "
 </details>
 </div>
 
-**4. RDD on time.**
+**4. Regression Discontinuity on time.**
 A regression discontinuity design where the *running variable* is the calendar year and the *threshold* is the policy adoption date. Practically, it is a piecewise linear regression of the form `cigsale ~ year + post + year:post` that allows both a level jump and a slope change at the threshold.
 
 <div class="concept-pair">
@@ -227,6 +263,82 @@ CausalImpact's full-covariate model reports an average effect of $-13$ packs wit
 <summary>Analogy</summary>
 
 A weather forecast that says "70% chance of rain". You do not need 100 parallel universes; the 70% is a direct probability statement about the world, not about a sampling distribution.
+
+</details>
+</div>
+
+**7. Average Treatment effect on the Treated (ATT) versus Average Treatment Effect (ATE).**
+The **ATT** is the effect of the policy *on the units that actually received it*. The **ATE** is the effect averaged over *every unit in the population*, treated or not. These two quantities are equal only when treatment effects are constant across units.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+Every causal method in this tutorial targets the ATT on California. We never ask "what would Proposition 99 do to the average state if rolled out nationwide?" — that is the ATE, and we have no policy variation to identify it. Synthetic Control, DiD, and CausalImpact all report ATT estimates of $-13$ to $-20$ packs/capita.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A new running shoe is tested on 100 marathoners (the ATT measures how much faster *they* became). The ATE would estimate how much faster the *average person* would run if forced to wear the same shoe — a very different question.
+
+</details>
+</div>
+
+**8. Root Mean Squared Prediction Error and its post/pre ratio.**
+The Root Mean Squared Prediction Error (RMSPE) is the typical size of the gap between observed and predicted outcomes in a given period. Synthetic Control reports it separately for the pre-period (fit quality) and post-period (effect size). The **post/pre ratio** (the MSPE ratio) is a unitless measure of how much the post-period gap exceeds the pre-period gap.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+California's pre-period MSPE is 3.21 (the synthetic almost perfectly tracks California through 1988). Its post-period MSPE is 387 (a large gap opens after Proposition 99). The ratio is 387 / 3.21 = 120.5, the highest of any state in the panel.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A student who scored 99% on practice tests and 30% on the real exam has a huge "test/practice ratio". That ratio flags an unusual event between the two periods — exactly what we are looking for after a policy change.
+
+</details>
+</div>
+
+**9. Placebo Fisher exact p-value.**
+A non-parametric p-value built by ranking the treated unit against a distribution of placebo "treatments" — each computed by pretending an untreated unit had been treated instead. The p-value is the treated unit's rank divided by the total number of units. Requires at least 20 donor units to get below the conventional 0.05 threshold.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`tidysynth` refits the Synthetic Control model 38 times — once for each donor state pretending to be treated — and computes each unit's MSPE ratio. California ranks 1st out of 39 units. The Fisher exact p-value is 1 / 39 ≈ 0.026.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A class of 39 students sits an exam. If your child gets the highest score, the "by-chance" probability of that ranking under a null of no real talent gap is 1 / 39. Same logic, applied to states instead of students.
+
+</details>
+</div>
+
+**10. Bayesian Structural Time Series (BSTS).**
+A Bayesian model that decomposes a time series into interpretable additive components: a local-level trend, a regression on external predictors, and a noise term. After fitting on the pre-period, the model is projected forward and the posterior distribution over observed-minus-predicted gives the policy effect with a credible interval.
+
+<div class="concept-pair">
+<details class="concept-card concept-example">
+<summary>Example</summary>
+
+`CausalImpact` writes California's cigarette sales as $y\_{1t} = \mu\_t + \beta^\top x\_t + \varepsilon\_t$. The trend $\mu\_t$ absorbs unexplained dynamics; the regression $\beta^\top x\_t$ borrows information from other states' cigarette sales (and optionally covariates). The model is fit on 1970–1988 and projected to 2000.
+
+</details>
+
+<details class="concept-card concept-analogy">
+<summary>Analogy</summary>
+
+A Kalman filter for stock prices that decomposes the daily close into a slow trend, a regression on related stocks, and noise. Once trained on the pre-event history, it forecasts the "no-event" counterfactual price and compares it to what actually happened.
 
 </details>
 </div>
@@ -310,6 +422,8 @@ prop99_cali |>
 
 California's average per-capita cigarette sales fell from 116.0 packs (1970--1988) to 60.4 packs (1989--2000) --- a within-state drop of 55.6 packs, or 47.9% of the pre-period mean. That is the *raw* before/after change. The rest of the tutorial is about how much of that 55.6-pack drop we can credibly attribute to Proposition 99 rather than to the broader American secular decline in smoking.
 
+> **About Proposition 99.** California voters passed Proposition 99 — formally the Tobacco Tax and Health Protection Act — on the November 1988 ballot with 58% of the vote. It raised the state cigarette tax by 25 cents per pack starting January 1, 1989, and earmarked the revenue for anti-smoking education, health services, and tobacco-related research. The initiative was championed by the American Cancer Society, the American Lung Association, and the American Medical Association, against opposition financed by the tobacco industry. The case became the canonical Synthetic Control application after Abadie, Diamond, and Hainmueller (2010) used it to introduce the method — which is why we revisit it here with six estimators rather than just one.
+
 Before doing any modelling, it helps to see all 39 series at once.
 
 ```r
@@ -356,9 +470,11 @@ prepostPost -27.0200     5.2951 -5.1029 0.0009266 ***
 
 **The estimand here is purely descriptive.** This is a within-state difference of means, *not* a causal estimate. Any nationwide secular decline in smoking gets silently bundled into the $-27.02$. That bundling is exactly what the next five methods try to undo.
 
+**Common pitfall.** Confusing the within-state pre-post difference with a causal effect. Anything that shifted the entire country between the two windows — anti-smoking campaigns, federal tobacco settlements, rising health awareness — gets attributed entirely to Proposition 99.
+
 **Recap.** Naive pre-post says $-27.0$ packs, but it has no counterfactual at all — only California's own past. Hold that number in mind; it will set the upper bound for what every other method estimates.
 
-## 5. Method 2 --- Difference-in-Differences (CA vs Nevada)
+## 5. Method 2 --- Difference-in-Differences (California vs Nevada)
 
 **The idea.** Pick one control state (Nevada). Compute its pre-to-post change. Subtract that from California's pre-to-post change. Whatever is left over is "what the policy did".
 
@@ -423,9 +539,11 @@ The picture below makes the problem obvious.
 
 This is the textbook DiD pitfall. A single control unit that itself is shifting in the same direction makes the contrast collapse. Nevada is geographically and culturally adjacent to California. It inherits many of the same secular forces: rising health awareness, federal tobacco settlements, retail-price spillovers. So it is a poor "what would California have done?" control.
 
+**Common pitfall.** Picking the *one* "most similar" control by hand. If your single control is subject to the same secular forces as the treated unit — geographic neighbours, policy spillovers, regional macro shocks — the contrast collapses and DiD silently reports zero.
+
 **Recap.** DiD vs Nevada says $-5.7$ packs and we cannot reject zero. The lesson is *not* that DiD is broken — it is that DiD with a single similar control unit is fragile. Synthetic Control in §9 is the principled response: instead of one control state, blend many states into a weighted "synthetic California".
 
-## 6. Method 3a --- ITS via pre-period growth curve
+## 6. Method 3a --- Interrupted Time Series via pre-period growth curve
 
 **The idea.** Stop borrowing from a comparison unit. Instead, build the counterfactual from California's *own* pre-period dynamics. Fit a model on 1970--1988, extrapolate it into 1989--2000, and call the gap between the extrapolation and the observed data the effect.
 
@@ -468,9 +586,11 @@ its_growth_estimate
 
 The coincidence is suggestive but not reassuring. Both methods can be biased the same way if California's pre-trend was *understating* the speed of the secular decline.
 
+**Common pitfall.** Assuming the linear pre-trend is the right *shape*. If the true secular decline is accelerating or saturating, a linear extrapolation either understates or overstates what would have happened — and the policy effect inherits the bias.
+
 **Recap.** ITS-growth says $-28.3$ packs. Adding a linear pre-trend changed almost nothing relative to the naive baseline, because the trend was modest. The next ITS variant uses a more flexible time-series model — and we will see why "more flexible" can backfire.
 
-## 7. Method 3b --- ITS via AICc-selected ARIMA forecast
+## 7. Method 3b --- Interrupted Time Series via auto-selected ARIMA forecast
 
 **The idea.** Replace the straight line with a flexible time-series model. Let the data decide the model's complexity through an information criterion (AICc). Forecast forward as the counterfactual.
 
@@ -514,9 +634,11 @@ The dashed blue line is the ARIMA counterfactual. It sits *below* the observed o
 
 **The pitfall in one sentence.** AICc minimises *in-sample* fit, but in-sample fit can come from features (here, second-order momentum) that do not persist *out-of-sample*.
 
+**Common pitfall.** Trusting an information-criterion-selected model on a short pre-period. AICc rewards in-sample fit. With 19 pre-period observations, it can latch onto late-pre-period momentum that does not persist out-of-sample, producing a counterfactual that bends through (or past) the observed post-period values.
+
 **Recap.** ITS-ARIMA says $+4.55$ packs and is the headline-grabbing outlier. The lesson is not "ARIMA is bad" — it is that **single-model ITS is fragile**. Always pair an ITS estimate against a comparison-unit method (Synthetic Control, CausalImpact, or a credibly-matched DiD) before drawing conclusions.
 
-## 8. Method 4 --- RDD on time (segmented regression)
+## 8. Method 4 --- Regression Discontinuity on time (segmented regression)
 
 **The idea.** Use *calendar time* as the running variable. Fit a piecewise linear regression that allows two breaks at 1989: a level jump and a slope change. The level jump is the immediate "policy shock"; the slope change is how the trajectory bends afterwards.
 
@@ -552,7 +674,9 @@ The blue pre-1988 line and the orange post-1989 line both fit California's point
 
 **Caveat.** RDD on time inherits the same pre-trend mis-specification risk as ITS. If California's *underlying* trajectory was already changing curvature in the late 1980s for non-policy reasons — say, the 1988 Surgeon General's report on nicotine addiction — the level break attributed to Proposition 99 will absorb that change too.
 
-**Recap.** RDD on time reports a $-20.1$ pack level break with a tight standard error. It is the first of three methods to land in the credible $-13$ to $-20$ "consensus" range, alongside Synthetic Control and CausalImpact.
+**Common pitfall.** Mistaking a coincident shock at the threshold for the policy effect. With time as the running variable, *any* event that happens to land in the same year as the policy — a related federal regulation, a recession, a media campaign — is absorbed into the level break.
+
+**Recap.** Regression Discontinuity on time reports a $-20.1$ pack level break with a tight standard error. It is the first of three methods to land in the credible $-13$ to $-20$ "consensus" range, alongside Synthetic Control and CausalImpact.
 
 ## 9. Method 5 --- Synthetic Control
 
@@ -604,7 +728,7 @@ prop99_syn <- prop99 |>
 
 **Predictor choices.** Seven predictors are passed in. Three are pre-period covariate averages over the full pre-period (`lnincome`, `retprice`, `age15to24` over 1980--1988). One uses a narrower window where data is densest (`beer` over 1984--1988). Three are *lagged outcomes* — cigarette sales themselves at 1975, 1980, and 1988. The lagged outcomes are the most important trick: anchoring the synthetic control on the treated unit's own pre-period *outcome levels* at multiple time points forces the synthetic series to track California's pre-1988 trajectory closely.
 
-### 9.2 The donor weights (W) and the predictor weights (V)
+### 9.2 The donor weights and the predictor weights
 
 The optimisation produces two weight vectors that drive the entire fit. Both are extractable as tidy tables.
 
@@ -700,7 +824,7 @@ ce_data <- prop99_syn |>
 
 The grey density is the distribution of average causal effects across all 38 placebo "treatments". California's vertical orange line sits in the *left tail*. Only a handful of placebos produced an effect as extreme as $-18.7$ in either direction.
 
-### 9.6 The MSPE ratio and a Fisher exact p-value
+### 9.6 The Mean Squared Prediction Error ratio and a Fisher exact p-value
 
 A sharper version of the same test is the **MSPE ratio** — the ratio of post-period to pre-period mean squared prediction error. If a unit has a tight pre-period fit *and* a large post-period gap, the ratio is large. California's number is striking:
 
@@ -727,7 +851,9 @@ plot_mspe_ratio(prop99_syn)
 
 The orange bar at the top is California; every blue bar below it is a placebo donor. The gap between California and Georgia (the second-place state) is enormous. That gap is the visual signature of "a real treatment effect that the donor pool does not naturally replicate".
 
-**Recap.** Synthetic Control reports $-18.7$ packs/capita with a Fisher exact $p$-value of 0.026. The estimate rests on a five-state synthetic California built mostly from western and sunbelt states with cigarette consumption levels close to California's. The placebo and MSPE-ratio diagnostics both confirm that California's post-1989 trajectory is unusual relative to what other states experienced in the same window. This is the workshop's headline causal estimate.
+**Common pitfall.** Treating the predictor weight matrix as a causal ranking. The V matrix is a *pre-period predictor-importance* ranking — it tells you which variables best matched the treated unit's pre-period, not which variables *cause* the outcome. A predictor can have zero V-weight and still be substantively important.
+
+**Recap.** Synthetic Control reports $-18.7$ packs/capita with a Fisher exact $p$-value of 0.026. The estimate rests on a five-state synthetic California built mostly from western and sunbelt states with cigarette consumption levels close to California's. The placebo and Mean Squared Prediction Error ratio diagnostics both confirm that California's post-1989 trajectory is unusual relative to what other states experienced in the same window. This is the workshop's headline causal estimate.
 
 ## 10. Method 6 --- CausalImpact
 
@@ -811,11 +937,13 @@ If we drop the covariates and use only other states' cigarette sales as controls
 
 The top panel shows the pointwise picture: observed California (orange) opens a steady gap below the Bayesian counterfactual (blue) starting in 1989, with a 95% credible band that widens as we forecast further from the training window. The bottom panel cumulates that gap over time. By 2000 the cumulative effect is roughly $-150$ packs/capita with a credible interval that includes zero only at the very upper edge.
 
+**Common pitfall.** Imputing missing covariates without thinking about the imputation model. The random-forest fill we use here is a single-imputation shortcut for tutorial speed. With multiple imputation ($m > 1$) or a different model, the estimate can move by 1--3 packs — and worse, an imputation that uses California itself to fill donor covariates would build an artificial post-period correlation that biases the result toward zero.
+
 **Recap.** CausalImpact lands at $-13$ to $-21$ packs depending on whether covariates are included, with a 92--97% posterior probability of a non-zero effect. It is the only method here that delivers a *credible* interval (a direct probability statement about the parameter), not a frequentist confidence band.
 
 ## 11. Cross-method comparison
 
-We collect every method's point estimate, an approximate standard error, and an implied 95% interval into one tibble for the final visual.
+We collect every method's point estimate, an approximate ±1.96·SE interval for visual comparison, *and* a `principled_inference` string that records each method's recommended uncertainty quantification. The two columns differ for Synthetic Control (where the right inference is a Fisher exact p-value, not a confidence interval) and for CausalImpact (where the right interval is Bayesian, not frequentist).
 
 ```r
 results_tbl <- tibble(
@@ -826,26 +954,41 @@ results_tbl <- tibble(
                "Level jump at 1989", "ATT (CA, 1989-2000)",
                "ATT (CA, 1989-2000)"),
   estimate  = c(-27.02, -5.68, -28.28, 4.55, -20.06, -18.72, -12.82),
-  std_error = c(5.30, 5.39, 1.72, 2.34, 5.59, 1.82, 9.60)
+  std_error = c(5.30, 5.39, 1.72, 2.34, 5.59, 1.82, 9.60),
+  principled_inference = c(
+    "HAC 95% CI: [-37.4, -16.6]",
+    "HAC 95% CI: [-16.3, +4.9]",
+    "Linear-trend 95% prediction interval (no closed-form ATT SE)",
+    "ARIMA 95% forecast-band average: [-29.1, +38.2]",
+    "HAC 95% CI: [-31.0, -9.1]",
+    "Fisher exact p = 0.026 (MSPE-ratio rank 1/39)",
+    "Posterior 95% CrI: [-31.9, +5.7]; P(effect != 0) = 92%"
+  )
 ) |>
   mutate(ci_low  = estimate - 1.96 * std_error,
          ci_high = estimate + 1.96 * std_error)
 results_tbl
 ```
 
-```text
-# A tibble: 7 × 6
-  method             estimand             estimate std_error   ci_low ci_high
-1 Naive pre-post     Descriptive (biased)   -27.0       5.30 -37.4     -16.6
-2 DiD (CA vs Nevada) ATT (CA, 1989-1993)     -5.68      5.39 -16.3       4.89
-3 ITS (growth curve) Mean post-period gap   -28.3       1.72 -31.7     -24.9
-4 ITS (ARIMA)        Mean post-period gap     4.55      2.34  -0.0451    9.14
-5 RDD on time        Level jump at 1989     -20.1       5.59 -31.0      -9.11
-6 Synthetic Control  ATT (CA, 1989-2000)    -18.7       1.82 -22.3     -15.2
-7 CausalImpact       ATT (CA, 1989-2000)    -12.8       9.60 -31.6       5.99
-```
+The forest plot below uses the back-of-envelope `±1.96·SE` interval to fit every method onto a shared visual scale. The table that follows it is the more honest summary: it records each method's *recommended* uncertainty quantification, which differs in kind from method to method.
 
-![Forest plot of all seven estimators with 95% intervals for the effect on per-capita cigarette sales](fig9_cross_method_forest.png)
+![Forest plot of all seven estimators with back-of-envelope 95% intervals for the effect on per-capita cigarette sales](fig9_cross_method_forest.png)
+
+| Method | Estimand | Point estimate | Back-of-envelope ±1.96·SE | Principled inference |
+|---|---|---:|---|---|
+| Naive pre-post | Descriptive (biased) | $-27.0$ | [$-37.4$, $-16.6$] | HAC 95% CI: [$-37.4$, $-16.6$] |
+| Difference-in-Differences (vs Nevada) | ATT on California, 1989--1993 | $-5.7$ | [$-16.3$, $+4.9$] | HAC 95% CI: [$-16.3$, $+4.9$] |
+| Interrupted Time Series (growth curve) | Mean post-period gap | $-28.3$ | [$-31.7$, $-24.9$] | Linear-trend 95% prediction interval (no closed-form ATT standard error) |
+| Interrupted Time Series (ARIMA) | Mean post-period gap | $+4.5$ | [$-0.0$, $+9.1$] | ARIMA 95% forecast-band average: [$-29.1$, $+38.2$] |
+| Regression Discontinuity on time | Level jump at 1989 | $-20.1$ | [$-31.0$, $-9.1$] | HAC 95% CI: [$-31.0$, $-9.1$] |
+| Synthetic Control | ATT on California, 1989--2000 | $-18.7$ | [$-22.3$, $-15.2$] | Fisher exact $p = 0.026$ (Mean Squared Prediction Error ratio rank 1 of 39) |
+| CausalImpact | ATT on California, 1989--2000 | $-12.8$ | [$-31.6$, $+6.0$] | Posterior 95% credible interval: [$-31.9$, $+5.7$]; $P(\text{effect} \neq 0) = 92\%$ |
+
+Three things are now visible that the forest plot alone cannot show:
+
+1. For four of the seven rows (Naive, Difference-in-Differences, the linear-trend Interrupted Time Series, and Regression Discontinuity) the back-of-envelope interval and the principled interval are the same — those are the methods where heteroskedasticity-and-autocorrelation-consistent standard errors are the natural inference.
+2. **ARIMA's principled forecast band ($[-29.1, +38.2]$) is enormous** — much wider than the back-of-envelope ±1.96·SE bar in the forest plot. The point estimate of $+4.5$ packs sits in the middle of an interval that easily crosses both $-29$ and $+38$, which is the *honest* way to report ARIMA-based Interrupted Time Series under model uncertainty.
+3. **Synthetic Control's principled inference is not a confidence interval at all** — it is a rank-based Fisher exact $p$-value of 0.026. Anyone reporting Synthetic Control should cite that $p$-value, not the back-of-envelope $\pm 1.96 \cdot \tfrac{\mathrm{SD}}{\sqrt{N}}$ band.
 
 Three groupings jump off the page.
 
@@ -920,7 +1063,7 @@ That headline survives every causally-defensible specification (RDD, Synthetic C
 
 2. [Abadie, A. (2021). Using synthetic controls: Feasibility, data requirements, and methodological aspects. *Journal of Economic Literature*, 59(2), 391--425.](https://www.aeaweb.org/articles?id=10.1257/jel.20191450)
 
-3. [Brodersen, K. H., Gallusser, F., Koehler, J., Remy, N., & Scott, S. L. (2015). Inferring causal impact using Bayesian structural time-series models. *The Annals of Applied Statistics*, 9(1), 247--274.](https://research.google.com/pubs/pub41854.html)
+3. [Brodersen, K. H., Gallusser, F., Koehler, J., Remy, N., & Scott, S. L. (2015). Inferring causal impact using Bayesian structural time-series models. *Annals of Applied Statistics*, 9, 247--274.](https://research.google.com/pubs/pub41854.html)
 
 4. [Bernal, J. L., Cummins, S., & Gasparrini, A. (2017). Interrupted time series regression for the evaluation of public health interventions: A tutorial. *International Journal of Epidemiology*, 46(1), 348--355.](https://academic.oup.com/ije/article/46/1/348/2622842)
 
@@ -933,3 +1076,436 @@ That headline survives every causally-defensible specification (RDD, Synthetic C
 8. [`CausalImpact` --- An R package for causal inference using Bayesian structural time-series models.](https://google.github.io/CausalImpact/)
 
 9. [`fpp3` --- Forecasting: Principles and Practice (3rd edition) data and R package.](https://cran.r-project.org/package=fpp3)
+
+10. [Brodersen, K. H. *Inferring the effect of an event using CausalImpact*. YouTube talk.](https://youtu.be/GTgZfCltMm8) — a 50-minute walk-through of the CausalImpact intuition, motivating examples, and the Bayesian structural time-series model from the package's lead author.
+
+---
+
+<style>
+.podcast-overlay {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  animation: podSlideUp 0.35s ease-out;
+}
+@keyframes podSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.podcast-overlay.pod-closing {
+  animation: podSlideDown 0.3s ease-in forwards;
+}
+@keyframes podSlideDown {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+.podcast-container {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 18px 24px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 -4px 32px rgba(0,0,0,0.5);
+  border-top: 1px solid rgba(106,155,204,0.2);
+}
+.podcast-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.podcast-top-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.podcast-icon {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #d97757, #e8956a);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.podcast-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: #fff;
+}
+.podcast-title-block {
+  flex: 1;
+  min-width: 0;
+}
+.podcast-title-block h4 {
+  margin: 0 0 1px 0;
+  color: #f0ece2;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.podcast-title-block span {
+  color: #8b9dc3;
+  font-size: 11px;
+}
+.podcast-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.podcast-close-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+.podcast-close-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: #8b9dc3;
+}
+.podcast-progress-wrap {
+  margin-bottom: 12px;
+}
+.podcast-time-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #8b9dc3;
+  margin-bottom: 5px;
+  font-variant-numeric: tabular-nums;
+}
+.podcast-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: height 0.15s;
+}
+.podcast-bar-buffered {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(106,155,204,0.25);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+.podcast-bar-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #6a9bcc, #00d4c8);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+.podcast-bar-bg:hover {
+  height: 10px;
+  margin-top: -2px;
+}
+.podcast-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.podcast-transport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.podcast-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+.podcast-btn svg {
+  fill: #c8d0e0;
+  transition: fill 0.2s;
+}
+.podcast-btn:hover svg {
+  fill: #f0ece2;
+}
+.podcast-btn-skip {
+  position: relative;
+}
+.podcast-btn-skip span {
+  position: absolute;
+  font-size: 7px;
+  font-weight: 700;
+  color: #c8d0e0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  margin-top: 1px;
+}
+.podcast-btn-play {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #d97757, #e8956a);
+  border-radius: 50%;
+  box-shadow: 0 3px 12px rgba(217,119,87,0.4);
+  transition: all 0.2s;
+}
+.podcast-btn-play:hover {
+  transform: scale(1.08);
+  box-shadow: 0 5px 20px rgba(217,119,87,0.5);
+}
+.podcast-btn-play svg {
+  fill: #fff;
+  width: 22px;
+  height: 22px;
+}
+.podcast-extras {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.podcast-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.podcast-volume-wrap svg {
+  fill: #8b9dc3;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.podcast-volume-wrap svg:hover {
+  fill: #c8d0e0;
+}
+.podcast-volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 60px;
+  height: 4px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.podcast-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #6a9bcc;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.podcast-speed-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #c8d0e0;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  min-width: 40px;
+  text-align: center;
+}
+.podcast-speed-btn:hover {
+  background: rgba(106,155,204,0.2);
+  border-color: #6a9bcc;
+  color: #f0ece2;
+}
+.podcast-download-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #8b9dc3;
+  font-size: 11px;
+  font-family: inherit;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.podcast-download-btn:hover {
+  border-color: #6a9bcc;
+  color: #f0ece2;
+  background: rgba(106,155,204,0.1);
+}
+.podcast-download-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+@media (max-width: 600px) {
+  .podcast-container { padding: 14px 16px 16px; }
+  .podcast-volume-wrap { display: none; }
+  .podcast-title-block h4 { font-size: 13px; }
+  .podcast-extras { gap: 8px; }
+}
+</style>
+
+<div class="podcast-overlay" id="podOverlay">
+<div class="podcast-container">
+<div class="podcast-inner">
+  <audio id="podAudio" preload="none" src="https://files.catbox.moe/j9acyw.m4a"></audio>
+
+  <div class="podcast-top-row">
+    <div class="podcast-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v4a5 5 0 0 0 10 0V6a5 5 0 0 0-5-5zm0 16a7 7 0 0 1-7-7H3a9 9 0 0 0 8 8.94V22h2v-3.06A9 9 0 0 0 21 10h-2a7 7 0 0 1-7 7z"/></svg>
+    </div>
+    <div class="podcast-title-block">
+      <h4>AI Podcast: Six Ways to Evaluate a Policy</h4>
+      <span id="podDurationLabel">Click play to load</span>
+    </div>
+    <button class="podcast-close-btn" onclick="podClose()" title="Close player">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+  </div>
+
+  <div class="podcast-progress-wrap">
+    <div class="podcast-time-row">
+      <span id="podCurrent">0:00</span>
+      <span id="podDuration">0:00</span>
+    </div>
+    <div class="podcast-bar-bg" id="podBarBg" onclick="podSeek(event)">
+      <div class="podcast-bar-buffered" id="podBuffered"></div>
+      <div class="podcast-bar-progress" id="podProgress"></div>
+    </div>
+  </div>
+
+  <div class="podcast-controls-row">
+    <div class="podcast-transport">
+      <button class="podcast-btn podcast-btn-skip" onclick="podSkip(-15)" title="Back 15s">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+        <span>15</span>
+      </button>
+      <button class="podcast-btn podcast-btn-play" id="podPlayBtn" onclick="podToggle()" title="Play">
+        <svg id="podIconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="podIconPause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <button class="podcast-btn podcast-btn-skip" onclick="podSkip(15)" title="Forward 15s">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
+        <span>15</span>
+      </button>
+    </div>
+    <div class="podcast-extras">
+      <div class="podcast-volume-wrap">
+        <svg id="podVolIcon" onclick="podMute()" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.47 4.47 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>
+        <input type="range" class="podcast-volume-slider" id="podVolume" min="0" max="1" step="0.05" value="0.8">
+      </div>
+      <button class="podcast-speed-btn" id="podSpeedBtn" onclick="podCycleSpeed()" title="Playback speed">1x</button>
+      <a class="podcast-download-btn" href="https://files.catbox.moe/j9acyw.m4a" target="_blank" rel="noopener" title="Stream">
+        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+(function(){
+  var overlay = document.getElementById('podOverlay');
+  var a = document.getElementById('podAudio');
+  var speeds = [0.75, 1, 1.25, 1.5, 2];
+  var si = 1;
+  var opened = false;
+  function fmt(s){
+    if(isNaN(s)) return '0:00';
+    var m=Math.floor(s/60), sec=Math.floor(s%60);
+    return m+':'+(sec<10?'0':'')+sec;
+  }
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('a.btn-page-header');
+    if(!link) return;
+    var text = link.textContent.trim();
+    if(text.indexOf('AI Podcast') === -1) return;
+    e.preventDefault();
+    e.stopPropagation();
+    overlay.style.display = 'block';
+    overlay.classList.remove('pod-closing');
+    if(!opened){
+      a.preload = 'metadata';
+      a.load();
+      opened = true;
+    }
+  });
+  a.volume = 0.8;
+  a.addEventListener('loadedmetadata', function(){
+    document.getElementById('podDuration').textContent = fmt(a.duration);
+    document.getElementById('podDurationLabel').textContent = fmt(a.duration) + ' minutes';
+  });
+  a.addEventListener('timeupdate', function(){
+    document.getElementById('podCurrent').textContent = fmt(a.currentTime);
+    var pct = a.duration ? (a.currentTime/a.duration)*100 : 0;
+    document.getElementById('podProgress').style.width = pct+'%';
+  });
+  a.addEventListener('progress', function(){
+    if(a.buffered.length>0){
+      var pct = (a.buffered.end(a.buffered.length-1)/a.duration)*100;
+      document.getElementById('podBuffered').style.width = pct+'%';
+    }
+  });
+  a.addEventListener('ended', function(){
+    document.getElementById('podIconPlay').style.display='';
+    document.getElementById('podIconPause').style.display='none';
+  });
+  window.podToggle = function(){
+    if(a.paused){a.play();document.getElementById('podIconPlay').style.display='none';document.getElementById('podIconPause').style.display='';}
+    else{a.pause();document.getElementById('podIconPlay').style.display='';document.getElementById('podIconPause').style.display='none';}
+  };
+  window.podSkip = function(s){a.currentTime = Math.max(0,Math.min(a.duration||0,a.currentTime+s));};
+  window.podSeek = function(e){
+    var rect = document.getElementById('podBarBg').getBoundingClientRect();
+    var pct = (e.clientX - rect.left)/rect.width;
+    a.currentTime = pct * (a.duration||0);
+  };
+  window.podMute = function(){
+    a.muted = !a.muted;
+    document.getElementById('podVolume').value = a.muted ? 0 : a.volume;
+  };
+  window.podCycleSpeed = function(){
+    si = (si+1) % speeds.length;
+    a.playbackRate = speeds[si];
+    document.getElementById('podSpeedBtn').textContent = speeds[si]+'x';
+  };
+  window.podClose = function(){
+    overlay.classList.add('pod-closing');
+    setTimeout(function(){ overlay.style.display='none'; }, 300);
+    a.pause();
+    document.getElementById('podIconPlay').style.display='';
+    document.getElementById('podIconPause').style.display='none';
+  };
+  document.getElementById('podVolume').addEventListener('input', function(){
+    a.volume = this.value;
+    a.muted = false;
+  });
+  if(window.location.hash === '#podcast-player'){
+    overlay.style.display = 'block';
+    a.preload = 'metadata';
+    a.load();
+    opened = true;
+  }
+})();
+</script>

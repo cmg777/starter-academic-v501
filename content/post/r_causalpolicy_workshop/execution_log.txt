@@ -326,16 +326,46 @@ CausalImpact (full covariates) ATT: -12.82 [95% CI: -31.95, 5.67]  saved: fig8_c
 ========== 10. CROSS-METHOD COMPARISON ==========
 
 Comparison table:
-# A tibble: 7 × 6
-  method             estimand             estimate std_error   ci_low ci_high
-  <chr>              <chr>                   <dbl>     <dbl>    <dbl>   <dbl>
-1 Naive pre-post     Descriptive (biased)   -27.0       5.30 -37.4     -16.6 
-2 DiD (CA vs Nevada) ATT (CA, 1989-1993)     -5.68      5.39 -16.3       4.89
-3 ITS (growth curve) Mean post-period gap   -28.3       1.72 -31.7     -24.9 
-4 ITS (ARIMA)        Mean post-period gap     4.55      2.34  -0.0451    9.14
-5 RDD on time        Level jump at 1989     -20.1       5.59 -31.0      -9.11
-6 Synthetic Control  ATT (CA, 1989-2000)    -18.7       1.82 -22.3     -15.2 
-7 CausalImpact       ATT (CA, 1989-2000)    -12.8       9.60 -31.6       5.99
+# A tibble: 7 × 7
+  method             estimand             estimate std_error
+  <chr>              <chr>                   <dbl>     <dbl>
+1 Naive pre-post     Descriptive (biased)   -27.0       5.30
+2 DiD (CA vs Nevada) ATT (CA, 1989-1993)     -5.68      5.39
+3 ITS (growth curve) Mean post-period gap   -28.3       1.72
+4 ITS (ARIMA)        Mean post-period gap     4.55      2.34
+5 RDD on time        Level jump at 1989     -20.1       5.59
+6 Synthetic Control  ATT (CA, 1989-2000)    -18.7       1.82
+7 CausalImpact       ATT (CA, 1989-2000)    -12.8       9.60
+  principled_inference                                           ci_low ci_high
+  <chr>                                                           <dbl>   <dbl>
+1 HAC 95% CI: [-37.4, -16.6]                                   -37.4     -16.6 
+2 HAC 95% CI: [-16.3, 4.9]                                     -16.3       4.89
+3 Linear-trend 95% prediction interval (no closed-form ATT SE) -31.7     -24.9 
+4 ARIMA 95% forecast-band average: [-29.1, 38.2]                -0.0451    9.14
+5 HAC 95% CI: [-31, -9.1]                                      -31.0      -9.11
+6 Fisher exact p = 0.026 (MSPE-ratio rank 1/39)                -22.3     -15.2 
+7 Posterior 95% CrI: [-31.9, 5.7]; P(effect ≠ 0) = 92%         -31.6       5.99
+
+Principled inference column (each method's recommended uncertainty):
+# A tibble: 7 × 2
+  method            
+  <chr>             
+1 Naive pre-post    
+2 DiD (CA vs Nevada)
+3 ITS (growth curve)
+4 ITS (ARIMA)       
+5 RDD on time       
+6 Synthetic Control 
+7 CausalImpact      
+  principled_inference                                        
+  <chr>                                                       
+1 HAC 95% CI: [-37.4, -16.6]                                  
+2 HAC 95% CI: [-16.3, 4.9]                                    
+3 Linear-trend 95% prediction interval (no closed-form ATT SE)
+4 ARIMA 95% forecast-band average: [-29.1, 38.2]              
+5 HAC 95% CI: [-31, -9.1]                                     
+6 Fisher exact p = 0.026 (MSPE-ratio rank 1/39)               
+7 Posterior 95% CrI: [-31.9, 5.7]; P(effect ≠ 0) = 92%        
   saved: fig9_cross_method_forest.png 
 
 ========== 11. README ==========
