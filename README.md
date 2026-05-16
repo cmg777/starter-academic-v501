@@ -242,7 +242,7 @@ Add a new `<details>` block to `content/projects/dashboards/index.md` following 
 
 ### Skill Architecture
 
-Eight Claude Code skills organized as Write/Review pairs across four artifact stages. Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
+Nine Claude Code skills: eight organized as Write/Review pairs across four artifact stages, plus the standalone `write-quarto-notebook` skill that produces an executable companion Quarto notebook from an existing post. Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
 
 | Stage | Write skill | Review skill |
 |-------|-------------|--------------|
@@ -250,6 +250,7 @@ Eight Claude Code skills organized as Write/Review pairs across four artifact st
 | Results report | `write-results-report` | `review-results-report` |
 | Blog post | `write-post` | `review-post` |
 | Infographic | `write-infographic` | `review-infographic` |
+| Quarto notebook (executable companion) | `write-quarto-notebook` | — |
 
 ### Write Data Science Script
 
@@ -306,6 +307,15 @@ Generate a chalkboard-style infographic prompt with 4 sections (full prompt, neg
 **Location:** `.claude/skills/review-infographic/SKILL.md`
 
 Cross-check infographic accuracy against source post, evaluate quality, suggest variant improvements. Read-only.
+
+### Write Quarto Notebook (executable companion)
+
+**Skill:** `/project:write-quarto-notebook <post slug> [--no-render] [--no-link]`
+**Location:** `.claude/skills/write-quarto-notebook/SKILL.md`
+
+Generate a self-contained Quarto notebook (`tutorial.qmd`) from an existing R / Python / Stata post + companion script so readers can render the tutorial locally in Positron or RStudio. Pins exact package versions probed from the developer's machine for reproducibility (R: `pak::pkg_install("pkg@x.y.z")`, Python: `pip install pkg==version`, Stata: not supported by SSC). Renders locally to verify, retries up to 3× with an auto-fix catalog. Adds a "Quarto (.qmd)" link button to the post's front matter on success.
+
+Output paths follow language convention: R → `tutorial.qmd` next to `index.md`; Python and Stata → `references/tutorial.qmd`.
 
 ### Full Pipeline Example
 

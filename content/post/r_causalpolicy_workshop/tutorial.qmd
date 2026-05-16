@@ -226,32 +226,41 @@ The two big design choices that distinguish good causal methods from bad ones ar
 
 ## 3. Setup and packages
 
-We use `pacman::p_load()` to install (if needed) and load every package in a single line. The chunk below is safe to re-run on a fresh R installation: if `pacman` itself is missing, it is installed from CRAN first. A global `set.seed(42)` fixes the random-forest imputation and the CausalImpact MCMC sampler so the numbers in this document are bit-reproducible.
+We use `pak::pkg_install()` to install the **exact** versions of every package that was used when this post was published. Pinning versions is the project's reproducibility hook: a reader who renders this notebook on a fresh machine months from now should get the same numbers, even if upstream packages have changed default behaviour or deprecated functions. A global `set.seed(42)` then fixes the random-forest imputation and the CausalImpact MCMC sampler so MCMC draws are bit-reproducible too.
 
 ```{r}
 #| label: setup-packages
 
-# pacman is a tiny meta-package that auto-installs missing CRAN packages.
-# Bootstrap it first so the rest of the tutorial can run on a fresh machine.
-if (!requireNamespace("pacman", quietly = TRUE)) {
-  install.packages("pacman", repos = "https://cloud.r-project.org")
+# pak is the only bootstrap dependency. Everything else gets installed
+# at a specific version, so the notebook is reproducible on a fresh
+# machine.
+if (!requireNamespace("pak", quietly = TRUE)) {
+  install.packages("pak", repos = "https://cloud.r-project.org")
 }
 
-# p_load() installs (if missing) and attaches every package this tutorial
-# needs --- one line instead of one library() call per package.
-pacman::p_load(
-  tidyverse,    # data manipulation + ggplot2
-  sandwich,     # HAC variance estimator
-  lmtest,       # coeftest
-  tidysynth,    # synthetic control (tidy API)
-  fpp3,         # forecasting (tsibble, fable, ARIMA)
-  mice,         # multiple imputation
-  ranger,       # backend for mice method = "rf"
-  CausalImpact, # Bayesian structural time series
-  broom,        # tidy model output
-  glue,         # string interpolation
-  forcats       # factor reordering (used in §10.2 V-matrix chart)
-)
+# Install the EXACT versions used when this post was published.
+# On a warm machine where the right versions are already installed,
+# pak::pkg_install short-circuits and this call returns in under a
+# second.
+pak::pkg_install(c(
+  "tidyverse@2.0.0",      # data manipulation + ggplot2
+  "sandwich@3.1.1",       # HAC variance estimator
+  "lmtest@0.9.40",        # coeftest
+  "tidysynth@0.2.1",      # synthetic control (tidy API)
+  "fpp3@1.0.3",           # forecasting (tsibble, fable, ARIMA)
+  "mice@3.17.0",          # multiple imputation
+  "ranger@0.17.0",        # backend for mice method = "rf"
+  "CausalImpact@1.3.0",   # Bayesian structural time series
+  "broom@1.0.8",          # tidy model output
+  "glue@1.8.0",           # string interpolation
+  "forcats@1.0.0"         # factor reordering (used in §10.2 V-matrix chart)
+))
+
+# Attach the packages we use directly.
+library(tidyverse); library(sandwich); library(lmtest)
+library(tidysynth); library(fpp3);     library(mice)
+library(ranger);    library(CausalImpact)
+library(broom);     library(glue);     library(forcats)
 
 # Fix the global random seed so every run reproduces the same MICE
 # imputation and the same CausalImpact MCMC sample.
@@ -998,10 +1007,12 @@ The orange/highlighted bar at the top is California; every other bar is a placeb
 # Show the first five rows so the list-column structure is visible.
 print(prop99_syn, n = 5)
 
-# Flatten .outcome into a long table: one row per (unit, year).
+# Use grab_synthetic_control(placebo = TRUE) for a tidy long table with
+# observed (real_y) and synthetic (synth_y) outcomes side-by-side for
+# every unit and year. This is the canonical way to flatten the nested
+# tibble for downstream summaries.
 prop99_syn |>
-  tidyr::unnest(cols = c(.outcome)) |>
-  dplyr::select(.id, .placebo, .type, time_unit, real_y, synth_y) |>
+  grab_synthetic_control(placebo = TRUE) |>
   head(8)
 ```
 

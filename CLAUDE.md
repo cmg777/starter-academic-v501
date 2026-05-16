@@ -111,7 +111,7 @@ An embedded audio player overlay for AI-generated podcast summaries of blog post
 
 # Claude Code Skills
 
-Eight skills organized as Write/Review pairs across four artifact stages. Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
+Nine skills: eight organized as Write/Review pairs across four artifact stages, plus the standalone `write-quarto-notebook` skill that produces an executable companion notebook from an existing post. Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
 
 ## Pipeline overview
 
@@ -121,6 +121,7 @@ Eight skills organized as Write/Review pairs across four artifact stages. Each s
 | Results report | `/project:write-results-report` | `/project:review-results-report` |
 | Blog post | `/project:write-post` | `/project:review-post` |
 | Infographic | `/project:write-infographic` | `/project:review-infographic` |
+| Quarto notebook (executable companion) | `/project:write-quarto-notebook` | — |
 
 ## Shared conventions
 
@@ -261,6 +262,31 @@ Expert review of infographic instructions. Cross-checks every number against the
 ```
 
 **Reference files:** `references/review-checklist.md`, `references/panel-templates.md`
+
+## write-quarto-notebook
+
+**Location:** `.claude/skills/write-quarto-notebook/SKILL.md`
+
+Generate a self-contained Quarto notebook (`tutorial.qmd`) from an existing R / Python / Stata post + companion script so readers can render the tutorial locally in Positron or RStudio. Pins exact package versions probed from the developer's machine for reproducibility (R: `pak::pkg_install("pkg@x.y.z")`, Python: `pip install pkg==version`, Stata: not supported by SSC). Renders locally to verify, retries up to 3× with an auto-fix catalog on common errors. Adds a "Quarto (.qmd)" link button to the post's front matter on success.
+
+**Invocation:**
+```
+/project:write-quarto-notebook <post slug> [--no-render] [--no-link]
+```
+
+**Examples:**
+```
+/project:write-quarto-notebook r_causalpolicy_workshop
+/project:write-quarto-notebook python_doubleml
+/project:write-quarto-notebook stata_cate2 --no-render
+```
+
+**Output paths (language-specific):**
+- R → `content/post/<slug>/tutorial.qmd` (theme: darkly)
+- Python → `content/post/<slug>/references/tutorial.qmd` (theme: cosmo, `jupyter: python3`)
+- Stata → `content/post/<slug>/references/tutorial.qmd` (theme: cosmo, `jupyter: nbstata`)
+
+**Reference files:** `references/language-conventions.md`, `references/transformations.md`, `references/render-and-fix.md`, `references/verification-checklist.md`
 
 # Hugo Version Constraints
 
