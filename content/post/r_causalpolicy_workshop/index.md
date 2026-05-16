@@ -942,11 +942,20 @@ prop99_syn <- prop99 |>
   generate_predictor(time_window = 1975, cigsale_1975 = cigsale) |>
   generate_predictor(time_window = 1980, cigsale_1980 = cigsale) |>
   generate_predictor(time_window = 1988, cigsale_1988 = cigsale) |>
-  # 3. Solve the constrained QP for donor weights w*.
-  generate_weights(optimization_window = 1970:1988) |>
+  # 3. Solve the constrained QP for donor weights w*. The three IPOP
+  #    parameters are tuning knobs for the interior-point optimiser:
+  #    margin_ipop (convergence margin), sigf_ipop (significant figures),
+  #    bound_ipop (numerical bound). These values match the tidysynth
+  #    README example; defaults are usually fine.
+  generate_weights(optimization_window = 1970:1988,
+                   margin_ipop = .02,
+                   sigf_ipop   = 7,
+                   bound_ipop  = 6) |>
   # 4. Compute the synthetic California series from w* and donor outcomes.
   generate_control()
 ```
+
+**On the `*_ipop` parameters.** They tune the [IPOP](https://cran.r-project.org/package=kernlab) interior-point optimiser that `tidysynth` calls under the hood. Most users can leave them at defaults; we expose them here because the canonical tidysynth README example sets them explicitly, and we want this notebook to be bit-comparable to that reference.
 
 **Predictor choices.** Seven predictors are passed in. Three are pre-period covariate averages over the full pre-period (`lnincome`, `retprice`, `age15to24` over 1980--1988). One uses a narrower window where data is densest (`beer` over 1984--1988). Three are *lagged outcomes* — cigarette sales themselves at 1975, 1980, and 1988. The lagged outcomes are the most important trick: anchoring the synthetic control on the treated unit's own pre-period *outcome levels* at multiple time points forces the synthetic series to track California's pre-1988 trajectory closely.
 
@@ -962,30 +971,39 @@ grab_predictor_weights(prop99_syn) # matching variables (V)
 ```text
 # Donor weights — top 5 only (rest are < 0.001)
 unit          weight
-Utah        0.343
-Nevada      0.236
-Montana     0.182
-Colorado    0.175
+Utah        0.342
+Nevada      0.238
+Montana     0.209
+Colorado    0.149
 Connecticut 0.062
 
 # Predictor weights (V matrix)
 variable       weight
-cigsale_1975   0.493
-cigsale_1980   0.392
-cigsale_1988   0.068
-retprice       0.031
-beer           0.012
-age15to24      0.003
-lnincome       0.001
+cigsale_1975   0.468
+cigsale_1980   0.412
+retprice       0.055
+cigsale_1988   0.037
+beer           0.020
+age15to24      0.007
+lnincome       0.000
 ```
 
 Two things to notice.
 
-1. **Five states absorb 99.8% of the donor weight.** Utah, Nevada, Montana, Colorado and Connecticut. Every other state gets effectively zero. California is matched mostly to other Western/sunbelt states with similar age structure and cigarette price levels, plus Connecticut as a smoking-rate counterweight from the east.
+1. **Five states absorb essentially 100% of the donor weight.** Utah (34.2 %), Nevada (23.8 %), Montana (20.9 %), Colorado (14.9 %), Connecticut (6.2 %). Every other state gets effectively zero. California is matched mostly to other Western/sunbelt states with similar age structure and cigarette price levels, plus Connecticut as a smoking-rate counterweight from the east.
 
-![Top 10 donor-state weights from the synthetic control optimisation, with Utah, Nevada, Montana, Colorado, and Connecticut dominating](fig6_sc_weights.png)
+2. **The two earliest cigsale levels dominate the V matrix.** `cigsale_1975` and `cigsale_1980` together get 88 % of the predictor weight. The four behavioural and demographic covariates get less than 9 % combined. The optimiser has effectively decided: "the best way to predict California's cigarette sales is using *other states' cigarette sales*."
 
-2. **The two pre-1980 cigsale levels dominate the V matrix.** `cigsale_1975` and `cigsale_1980` together get 88.5% of the predictor weight. The four behavioural and demographic covariates get less than 5% combined. The optimiser has effectively decided: "the best way to predict California's cigarette sales is using *other states' cigarette sales*."
+For a one-line visual of both weight vectors, tidysynth ships a `plot_weights()` helper. The same fitted object is passed in and we get a faceted ggplot showing donor unit weights on the left and predictor (V matrix) weights on the right.
+
+```r
+# tidysynth's built-in helper -- one ggplot with two facets.
+plot_weights(prop99_syn)
+```
+
+![tidysynth plot_weights output: faceted bar chart with donor unit weights on the left and predictor V-matrix weights on the right](fig6_sc_weights.png)
+
+The left facet recovers the five-state recipe from the table above; the right facet shows the heavy concentration on the two lagged-outcome predictors. Both panels are produced by the same one-line call to `plot_weights(prop99_syn)`.
 
 ### 10.3 The estimate
 
@@ -1002,10 +1020,10 @@ mean(sc_post$dif)
 ```
 
 ```text
-[1] -18.72
+[1] -18.85
 ```
 
-The Synthetic Control ATT is **$-18.72$ packs/capita** averaged over 1989--2000. This is the workshop's primary causal estimate and within rounding of the canonical Abadie et al. (2010) result.
+The Synthetic Control ATT is **$-18.85$ packs/capita** averaged over 1989--2000. This is the workshop's primary causal estimate and within rounding of the canonical Abadie et al. (2010) result.
 
 ```r
 plot_trends(prop99_syn)   # built-in helper from tidysynth
@@ -1022,40 +1040,56 @@ The pre-period fit is excellent — the synthetic and observed series are nearly
 ```text
 variable     California synthetic_California donor_sample
 age15to24         0.174                0.174        0.173
-lnincome         10.131                9.860        9.830
-retprice         89.422               89.305       87.349
-beer             24.275               24.092       23.683
-cigsale_1975    127.100              126.978      136.937
-cigsale_1980    120.200              120.020      138.081
-cigsale_1988     90.100               91.378      114.234
+lnincome         10.131                9.852        9.830
+retprice         89.422               89.354       87.349
+beer             24.275               24.165       23.683
+cigsale_1975    127.100              127.044      136.937
+cigsale_1980    120.200              120.157      138.081
+cigsale_1988     90.100               91.366      114.234
 ```
 
 Read the rightmost two columns against the leftmost. On every variable, *synthetic California* (column 3) is far closer to California (column 2) than the unweighted donor average (column 4) is. The most dramatic improvement is on the lagged outcomes: `cigsale_1988` is 90.1 for California vs 91.4 for the synthetic — a near-perfect match — while the unweighted donor average is 114.2. That gap of 24 packs is exactly the bias the naive pre-post method silently absorbed.
 
-### 10.5 Inference via placebo permutation
+### 10.5 Visualising the post-period gap with `plot_differences()`
+
+`plot_trends()` showed *both* observed and synthetic California on one canvas. The companion helper `plot_differences()` plots just the *gap*: $Y\_{1t} - \widehat{Y\_{1t}(0)}$, year by year. This isolates the treatment-effect curve in its cleanest form.
+
+```r
+plot_differences(prop99_syn)
+```
+
+![tidysynth plot_differences: per-year gap between observed California and synthetic California, isolating the treatment-effect curve](fig11_sc_differences.png)
+
+Read the line as the *effect of Proposition 99 on California in year $t$*. The pre-period values hover near zero (the matching worked), the line drops sharply after 1989, and it stays negative — steadily widening — throughout the post-period. The 1989--2000 mean of this series is exactly the $-18.85$ packs ATT reported above.
+
+### 10.6 Inference via placebo permutation
 
 A "standard error" computed as cross-year SD divided by $\sqrt{N}$ is *not* a real sampling-distribution-based standard error. The proper Synthetic Control uncertainty quantification is a permutation test.
 
-**The recipe.** Refit the synthetic-control model treating *each donor state* as if *it* had been the treated unit. Compute the post-period gap for each placebo. Compare California's effect size to that placebo distribution. If California's effect is extreme relative to the placebos, the policy probably did something.
+**The recipe.** Refit the synthetic-control model treating *each donor state* as if *it* had been the treated unit. Compute the post-period gap for each placebo. Compare California's gap trajectory to those placebo trajectories. If California's gap is extreme relative to the placebos, the policy probably did something.
 
 ```r
-# placebo = TRUE pulls real_y and synth_y for the treated unit AND for
-# every donor refit as if treated. .placebo == 0 marks California; 1
-# marks the donor placebos.
-ce_data <- prop99_syn |>
-  grab_synthetic_control(placebo = TRUE) |>
-  filter(time_unit > 1988) |>
-  mutate(dif = real_y - synth_y) |>
-  # Collapse to one average causal effect per (placebo) unit.
-  group_by(.id, .placebo) |>
-  summarize(average_causal_effect = mean(dif), .groups = "drop")
+# tidysynth's built-in one-liner. Returns a ggplot showing the gap
+# series for California (highlighted) on top of the gap series for
+# every donor refit as if treated.
+plot_placebos(prop99_syn)
 ```
 
-![Placebo distribution of average causal effects with California highlighted](fig7_sc_placebos.png)
+![tidysynth plot_placebos: gap series for California in warm orange, overlaid on grey gap series for each donor state refit as if treated. Donors with poor pre-period fit are pruned by default.](fig7_sc_placebos.png)
 
-The grey density is the distribution of average causal effects across all 38 placebo "treatments". California's vertical orange line sits in the *left tail*. Only a handful of placebos produced an effect as extreme as $-18.7$ in either direction.
+The orange line is California; the grey lines are the donor placebos. By default, `plot_placebos()` *prunes* placebos whose pre-period mean squared prediction error (MSPE) exceeds twice California's — those donors fit their own pre-period so badly that comparing their post-period gap to California's would be misleading. After pruning, California's post-period gap sits visibly below every retained placebo, which is the visual signature of a "real" treatment effect.
 
-### 10.6 The Mean Squared Prediction Error ratio and a Fisher exact p-value
+The unpruned variant keeps every donor for full transparency:
+
+```r
+plot_placebos(prop99_syn, prune = FALSE)
+```
+
+![Same plot as above but with every donor retained — including badly pre-fit ones — to show the full pool of placebo trajectories](fig12_sc_placebos_unpruned.png)
+
+With pruning off, the grey cloud is messier and a few badly-fit donors swing wildly — but California's post-period descent still ends up at the bottom of the bundle. The qualitative conclusion does not depend on the pruning rule.
+
+### 10.7 The Mean Squared Prediction Error ratio and a Fisher exact p-value
 
 A sharper version of the same test is the **MSPE ratio** — the ratio of post-period to pre-period mean squared prediction error. If a unit has a tight pre-period fit *and* a large post-period gap, the ratio is large. California's number is striking:
 
@@ -1068,14 +1102,14 @@ grab_significance(prop99_syn) |> arrange(desc(mspe_ratio)) |> head(5)
 
 ```text
 unit_name     type     pre_mspe post_mspe mspe_ratio  rank fishers_exact_pvalue
-California    Treated      3.21      387.      120.5     1               0.0256
-Georgia       Donor        3.60      164.       45.5     2               0.0513
-Indiana       Donor       22.9       766.       33.4     3               0.0769
-West Virginia Donor        9.72      291.       29.9     4               0.103
-Wisconsin     Donor       10.7       253.       23.6     5               0.128
+California    Treated      3.17      392.      123.9     1               0.0256
+Georgia       Donor        3.79      179.       47.2     2               0.0513
+Indiana       Donor       25.2       770.       30.6     3               0.0769
+West Virginia Donor        9.52      284.       29.8     4               0.103
+Wisconsin     Donor       11.1       268.       24.1     5               0.128
 ```
 
-California's MSPE ratio is **120.5** — almost three times higher than the next-highest unit (Georgia at 45.5). California ranks **1st out of 39 units**. The Fisher exact $p$-value is rank divided by total units, so $1/39 \approx 0.026$. Under the null hypothesis that Proposition 99 had no effect, the probability of seeing a unit this extreme purely by chance is about 2.6%.
+California's MSPE ratio is **123.9** — more than two and a half times higher than the next-highest unit (Georgia at 47.2). California ranks **1st out of 39 units**. The Fisher exact $p$-value is rank divided by total units, so $1/39 \approx 0.026$. Under the null hypothesis that Proposition 99 had no effect, the probability of seeing a unit this extreme purely by chance is about 2.6 %.
 
 ```r
 plot_mspe_ratio(prop99_syn)
@@ -1087,7 +1121,48 @@ The orange bar at the top is California; every blue bar below it is a placebo do
 
 **Common pitfall.** Treating the predictor weight matrix as a causal ranking. The V matrix is a *pre-period predictor-importance* ranking — it tells you which variables best matched the treated unit's pre-period, not which variables *cause* the outcome. A predictor can have zero V-weight and still be substantively important.
 
-**Recap.** Synthetic Control reports $-18.7$ packs/capita with a Fisher exact $p$-value of 0.026. The estimate rests on a five-state synthetic California built mostly from western and sunbelt states with cigarette consumption levels close to California's. The placebo and Mean Squared Prediction Error ratio diagnostics both confirm that California's post-1989 trajectory is unusual relative to what other states experienced in the same window. This is the workshop's headline causal estimate.
+### 10.8 Inspecting the nested tidysynth object
+
+`prop99_syn` is not a plain data frame — it is a *nested tibble* with one row per unit (treated unit + every donor refit as a placebo) and list-columns that hold every intermediate output of the optimisation. Printing the object directly shows the structure.
+
+```r
+prop99_syn
+```
+
+```text
+# A tibble: 78 × 11
+   .id        .placebo .type     .outcome     .predictors .synthetic_control
+   <fct>         <dbl> <chr>     <list>       <list>      <list>
+ 1 California        0 treated   <tibble>     <tibble>    <tibble>
+ 2 California        0 controls  <tibble>     <tibble>    <NULL>
+ 3 Rhode Isl…        1 treated   <tibble>     <tibble>    <tibble>
+ 4 Rhode Isl…        1 controls  <tibble>     <tibble>    <NULL>
+ 5 Tennessee         1 treated   <tibble>     <tibble>    <tibble>
+ ...
+# i 5 more variables: .unit_weights <list>, .predictor_weights <list>,
+#   .original_data <list>, .meta <list>, .loss <list>
+```
+
+The 11 columns capture, in order: unit name, placebo indicator, type, the outcome series, the predictor matrix, the synthetic-control series, the donor weights, the predictor weights, the raw input data, run metadata, and the optimiser loss. Each list-column can be flattened with `tidyr::unnest()` for custom downstream work.
+
+```r
+# Flatten .outcome to a long table: one row per (unit, year).
+prop99_syn |> tidyr::unnest(cols = c(.outcome))
+```
+
+```text
+# A tibble: 1,482 × 14
+   .id        .placebo .type     time_unit real_y synth_y .predictors ...
+   <fct>         <dbl> <chr>         <int>  <dbl>   <dbl> <list>
+ 1 California        0 treated        1970  123.    122.  <tibble>
+ 2 California        0 treated        1971  121.    121.  <tibble>
+ 3 California        0 treated        1972  124.    124.  <tibble>
+ ...
+```
+
+This is the whole point of the nested-tibble design: every step of the optimisation is *introspectable from R*, with no need to dig into S4 slots or `attr()` blobs. The full long table is exported as `table_sc_outcomes_long.csv` in this post's bundle.
+
+**Recap.** Synthetic Control reports $-18.85$ packs/capita with a Fisher exact $p$-value of 0.026. The estimate rests on a five-state synthetic California built mostly from western and sunbelt states with cigarette consumption levels close to California's. The placebo and Mean Squared Prediction Error ratio diagnostics both confirm that California's post-1989 trajectory is unusual relative to what other states experienced in the same window. This is the workshop's headline causal estimate.
 
 ## 11. Method 6 --- CausalImpact
 
@@ -1207,8 +1282,8 @@ results_tbl <- tibble(
                "Mean post-period gap", "Mean post-period gap",
                "Level jump at 1989", "ATT (CA, 1989-2000)",
                "ATT (CA, 1989-2000)"),
-  estimate  = c(-27.02, -5.68, -28.28, 4.55, -20.06, -18.72, -12.82),
-  std_error = c(5.30, 5.39, 1.72, 2.34, 5.59, 1.82, 9.60),
+  estimate  = c(-27.02, -5.68, -28.28, 4.55, -20.06, -18.85, -12.82),
+  std_error = c(5.30, 5.39, 1.72, 2.34, 5.59, 1.84, 9.60),
   principled_inference = c(
     "HAC 95% CI: [-37.4, -16.6]",
     "HAC 95% CI: [-16.3, +4.9]",
@@ -1236,7 +1311,7 @@ The forest plot below uses the back-of-envelope `±1.96·SE` interval to fit eve
 | Interrupted Time Series (growth curve) | Mean post-period gap | $-28.3$ | [$-31.7$, $-24.9$] | Linear-trend 95% prediction interval (no closed-form ATT standard error) |
 | Interrupted Time Series (ARIMA) | Mean post-period gap | $+4.5$ | [$-0.0$, $+9.1$] | ARIMA 95% forecast-band average: [$-29.1$, $+38.2$] |
 | Regression Discontinuity on time | Level jump at 1989 | $-20.1$ | [$-31.0$, $-9.1$] | HAC 95% CI: [$-31.0$, $-9.1$] |
-| Synthetic Control | ATT on California, 1989--2000 | $-18.7$ | [$-22.3$, $-15.2$] | Fisher exact $p = 0.026$ (Mean Squared Prediction Error ratio rank 1 of 39) |
+| Synthetic Control | ATT on California, 1989--2000 | $-18.9$ | [$-22.5$, $-15.2$] | Fisher exact $p = 0.026$ (Mean Squared Prediction Error ratio rank 1 of 39) |
 | CausalImpact | ATT on California, 1989--2000 | $-12.8$ | [$-31.6$, $+6.0$] | Posterior 95% credible interval: [$-31.9$, $+5.7$]; $P(\text{effect} \neq 0) = 92\%$ |
 
 Three things are now visible that the forest plot alone cannot show:
@@ -1247,7 +1322,7 @@ Three things are now visible that the forest plot alone cannot show:
 
 Three groupings jump off the page.
 
-**Cluster 1 — the causal consensus ($-13$ to $-20$ packs).** RDD on time ($-20.1$), Synthetic Control ($-18.7$), and CausalImpact full-covariate ($-12.8$) sit close together with overlapping intervals. All three build counterfactuals from principled donor-information machinery: a piecewise time model, a weighted donor blend, and a Bayesian structural time series. This is the headline range.
+**Cluster 1 — the causal consensus ($-13$ to $-20$ packs).** RDD on time ($-20.1$), Synthetic Control ($-18.9$), and CausalImpact full-covariate ($-12.8$) sit close together with overlapping intervals. All three build counterfactuals from principled donor-information machinery: a piecewise time model, a weighted donor blend, and a Bayesian structural time series. This is the headline range.
 
 **Cluster 2 — pre-trend extrapolation only (overshoots by ~50%).** Naive pre-post ($-27.0$) and ITS-growth-curve ($-28.3$) report roughly 50% larger effects. They use only within-California information. With no comparison unit to absorb the nationwide secular decline, the entire California drop gets attributed to Proposition 99.
 
@@ -1268,7 +1343,7 @@ Each method's counterfactual is a one-sentence assumption. Lining them up makes 
 | ITS growth-curve | California's straight-line pre-trend continues | $-28.3$ |
 | ITS ARIMA | California's pre-trend continues via best-AICc model | $+4.5$ |
 | RDD on time | California's pre-period piecewise fit continues | $-20.1$ |
-| Synthetic Control | A weighted blend of donor states tracks California | $-18.7$ |
+| Synthetic Control | A weighted blend of donor states tracks California | $-18.9$ |
 | CausalImpact | A Bayesian time-series model fit on donors projects forward | $-12.8$ |
 
 ### Three lessons
@@ -1277,7 +1352,7 @@ Each method's counterfactual is a one-sentence assumption. Lining them up makes 
 Every method computes effect $=$ observed $-$ counterfactual. The gap from $-5.7$ (DiD vs Nevada) to $-28.3$ (ITS-growth) is the *price* of making the wrong assumption about the missing counterfactual. The data are the same; the assumptions differ.
 
 **2. Single comparisons are fragile; weighted combinations are robust.**
-DiD against one neighbouring state collapses when that state is itself shifting. Synthetic Control's data-driven blending — Utah 34%, Nevada 24%, Montana 18%, Colorado 18%, Connecticut 6%, everyone else 0% — produces a stable, interpretable estimate. CausalImpact does the same job through a Bayesian regression on all donors and lands in the same neighbourhood.
+DiD against one neighbouring state collapses when that state is itself shifting. Synthetic Control's data-driven blending — Utah 34 %, Nevada 24 %, Montana 21 %, Colorado 15 %, Connecticut 6 %, everyone else ~0 % — produces a stable, interpretable estimate. CausalImpact does the same job through a Bayesian regression on all donors and lands in the same neighbourhood.
 
 **3. Automated model selection is not your friend in ITS.**
 AICc picked ARIMA(1, 2, 0) on California's 19-year pre-period. The implied counterfactual is *worse than the observed post-period*. No diagnostic statistic flagged the problem. Always pair a single-model ITS estimate against a comparison-unit method before drawing conclusions.
@@ -1310,7 +1385,7 @@ That headline survives every causally-defensible specification (RDD, Synthetic C
 
 3. **Different intervention year.** Pretend the intervention happened in 1985 instead of 1989 (a placebo). Re-run Synthetic Control with `i_time = 1984`. The post-period gap should be near zero if the method is working --- is it? What does a non-zero "placebo effect" tell you about the method's identification assumptions?
 
-4. **Probe the V matrix.** Print `grab_predictor_weights(prop99_syn)` for the fitted model. Two predictors (`cigsale_1975` and `cigsale_1980`) together get 88.5% of the weight. Re-fit *without* the three lagged outcomes (drop the three `generate_predictor(time_window = 19xx, cigsale_19xx = cigsale)` calls). Does the synthetic California still match the pre-period as well? What does that tell you about the role of lagged outcomes in Synthetic Control?
+4. **Probe the V matrix.** Print `grab_predictor_weights(prop99_syn)` for the fitted model. Two predictors (`cigsale_1975` and `cigsale_1980`) together get 88 % of the weight. Re-fit *without* the three lagged outcomes (drop the three `generate_predictor(time_window = 19xx, cigsale_19xx = cigsale)` calls). Does the synthetic California still match the pre-period as well? What does that tell you about the role of lagged outcomes in Synthetic Control?
 
 ## 16. References
 

@@ -22,6 +22,8 @@ CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 | fig8_causalimpact.png | CausalImpact pointwise + cumulative |
 | fig9_cross_method_forest.png | Forest plot of all six estimators |
 | fig10_sc_mspe_ratio.png | MSPE-ratio bar chart (Abadie Fisher rank visualisation) |
+| fig11_sc_differences.png | tidysynth::plot_differences() -- California's per-year gap |
+| fig12_sc_placebos_unpruned.png | plot_placebos(prune = FALSE) -- every donor's placebo gap |
 
 ## CSV tables
 | File | Description |
@@ -37,6 +39,7 @@ CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 | table_sc_loss.csv | Pre-period MSPE for treated unit + all placebos |
 | table_sc_significance.csv | Fisher exact p-value via MSPE ratios |
 | table_sc_placebo_aces.csv | Placebo average causal effects |
+| table_sc_outcomes_long.csv | Unnested .outcome list-column from prop99_syn |
 | table_causalimpact_series.csv | CausalImpact pointwise / cumulative series |
 | table_cross_method.csv | Six-method comparison table |
 

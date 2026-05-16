@@ -430,7 +430,14 @@ prop99_syn <- prop99 |>
   generate_predictor(time_window = 1975, cigsale_1975 = cigsale) |>
   generate_predictor(time_window = 1980, cigsale_1980 = cigsale) |>
   generate_predictor(time_window = 1988, cigsale_1988 = cigsale) |>
-  generate_weights(optimization_window = 1970:1988) |>
+  # IPOP solver tuning parameters from the tidysynth README example:
+  #   margin_ipop = convergence margin
+  #   sigf_ipop   = significant figures
+  #   bound_ipop  = numerical bound
+  generate_weights(optimization_window = 1970:1988,
+                   margin_ipop = .02,
+                   sigf_ipop   = 7,
+                   bound_ipop  = 6) |>
   generate_control()
 
 # Effect series
@@ -511,42 +518,34 @@ p5 <- ggplot(sc_trends_df,
   guides(linewidth = "none")
 save_png(p5, "fig5_sc_trends.png")
 
-# Figure 6: SCM weights (top 10 donors by weight)
-top_w <- sc_weights |> arrange(desc(weight)) |> slice_head(n = 10) |>
-  mutate(unit = fct_reorder(unit, weight))
-
-p6 <- ggplot(top_w, aes(x = unit, y = weight)) +
-  geom_col(fill = STEEL_BLUE) +
-  geom_text(aes(label = sprintf("%.3f", weight)),
-            hjust = -0.1, color = LIGHTER_TEXT, size = 3.2) +
-  coord_flip() +
-  expand_limits(y = max(top_w$weight) * 1.18) +
-  labs(title = "Synthetic Control donor weights (top 10)",
-       subtitle = "Most of the weight concentrates on a handful of donors",
-       x = NULL, y = "Weight in synthetic California") +
+# Figure 6: built-in plot_weights() -- shows donor unit weights AND
+# predictor (V matrix) weights side-by-side in one faceted ggplot.
+p6 <- plot_weights(prop99_syn) +
+  labs(title = "tidysynth::plot_weights(): donor + predictor weights") +
   theme_site()
-save_png(p6, "fig6_sc_weights.png")
+save_png(p6, "fig6_sc_weights.png", height = 6)
 
-# Figure 7: SCM placebo distribution
-ce_treated_only <- ce_data |> filter(.placebo == 0)
-p7 <- ggplot(ce_data |> filter(.placebo == 1),
-             aes(x = average_causal_effect)) +
-  geom_density(fill = STEEL_BLUE, color = STEEL_BLUE, alpha = 0.45) +
-  geom_rug(color = LIGHT_TEXT, alpha = 0.6) +
-  geom_vline(data = ce_treated_only,
-             aes(xintercept = average_causal_effect),
-             color = WARM_ORANGE, linewidth = 1.0) +
-  annotate("text",
-           x = ce_treated_only$average_causal_effect + 1,
-           y = 0.005,
-           label = glue("California: {round(ce_treated_only$average_causal_effect, 1)}"),
-           hjust = 0, color = WARM_ORANGE, fontface = "bold", size = 3.6) +
-  labs(title = "Placebo test: Where does California fall?",
-       subtitle = "Average causal effect on California vs each placebo (other state) treated unit",
-       x = "Average causal effect (post-1988 mean of real - synthetic)",
-       y = "Density") +
+# Figure 7: built-in plot_placebos() -- overlays each placebo donor's
+# (real - synthetic) trajectory on California's, with automatic pruning
+# of poor pre-fit placebos (those with pre-period MSPE > 2x California).
+p7 <- plot_placebos(prop99_syn) +
+  labs(title = "tidysynth::plot_placebos(): California vs pruned placebos") +
   theme_site()
 save_png(p7, "fig7_sc_placebos.png")
+
+# Figure 11: built-in plot_differences() -- the per-year gap series for
+# California specifically (real_y - synth_y over time).
+p11 <- plot_differences(prop99_syn) +
+  labs(title = "tidysynth::plot_differences(): California's gap year-by-year") +
+  theme_site()
+save_png(p11, "fig11_sc_differences.png")
+
+# Figure 12: plot_placebos() with prune = FALSE -- keeps every donor
+# placebo, including poor pre-fit ones, for a full-pool comparison.
+p12 <- plot_placebos(prop99_syn, prune = FALSE) +
+  labs(title = "plot_placebos(prune = FALSE): every donor's placebo gap") +
+  theme_site()
+save_png(p12, "fig12_sc_placebos_unpruned.png")
 
 # Figure 10: MSPE-ratio plot (Abadie-style Fisher rank visualisation)
 mspe_df <- sc_sig |>
@@ -571,6 +570,21 @@ p10 <- ggplot(mspe_df,
        x = NULL, y = "MSPE ratio (post / pre)") +
   theme_site()
 save_png(p10, "fig10_sc_mspe_ratio.png", height = 7)
+
+# ---- Inspecting the nested tidysynth object ---------------------------
+# prop99_syn is a nested tibble: one row per (unit, placebo status), with
+# list-columns for outcome / predictors / weights / synthetic control /
+# loss / metadata. tidyr::unnest() flattens any list-column to a long
+# table -- useful for custom downstream summaries.
+cat("\nNested tidysynth object (first 5 rows, list-columns visible):\n")
+print(prop99_syn, n = 5)
+
+cat("\nFlattening .outcome into a long table:\n")
+sc_outcomes_long <- prop99_syn |> tidyr::unnest(cols = c(.outcome))
+print(head(sc_outcomes_long, 6))
+cat("Rows in unnested outcome table:", nrow(sc_outcomes_long),
+    " (78 SCM rows x ~19 years)\n")
+write_csv(sc_outcomes_long, "table_sc_outcomes_long.csv")
 
 # ============================================================
 # --- 9. Method 6: CausalImpact -------------------------------
@@ -829,6 +843,8 @@ CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 | fig8_causalimpact.png | CausalImpact pointwise + cumulative |
 | fig9_cross_method_forest.png | Forest plot of all six estimators |
 | fig10_sc_mspe_ratio.png | MSPE-ratio bar chart (Abadie Fisher rank visualisation) |
+| fig11_sc_differences.png | tidysynth::plot_differences() -- California's per-year gap |
+| fig12_sc_placebos_unpruned.png | plot_placebos(prune = FALSE) -- every donor's placebo gap |
 
 ## CSV tables
 | File | Description |
@@ -844,6 +860,7 @@ CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 | table_sc_loss.csv | Pre-period MSPE for treated unit + all placebos |
 | table_sc_significance.csv | Fisher exact p-value via MSPE ratios |
 | table_sc_placebo_aces.csv | Placebo average causal effects |
+| table_sc_outcomes_long.csv | Unnested .outcome list-column from prop99_syn |
 | table_causalimpact_series.csv | CausalImpact pointwise / cumulative series |
 | table_cross_method.csv | Six-method comparison table |
 
