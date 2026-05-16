@@ -65,20 +65,20 @@ This post is **inspired by** the [RTutor problem set "Carbon Taxes and CO2 Emiss
 ### A roadmap of the analysis
 
 ```mermaid
-flowchart TD
-    A[OECD panel 1960-2005<br/>15 countries, transport CO2] --> B[Naive Sweden time-difference<br/>+0.55 t/cap — confounded]
-    A --> C[DiD vs Denmark<br/>-0.140 t/cap]
-    A --> D[DiD vs OECD pool<br/>-0.214 t/cap, p=0.02]
-    A --> E[Synthetic Sweden<br/>pysyncon.Synth]
-    E --> F[Path & gap plots<br/>-11.3% avg 1990-2005]
-    E --> G[In-time placebo<br/>backdate to 1980]
-    E --> H[In-space placebos<br/>p=0.067]
-    E --> I[Leave-one-out<br/>range 8.8%-13%]
-    A --> J[Synthetic GDP<br/>no growth penalty]
-    K[Tax-incidence + OLS/IV<br/>regression_data.Rds] --> L[Pass-through ~1.0]
-    K --> M[OLS4: beta_price=-0.060<br/>beta_tax=-0.186]
-    K --> N[IV oil: beta_tax=-0.186<br/>tax response ~3x price response]
-    O[disentangling_data.dta] --> P[Carbon-tax-only<br/>contribution]
+graph TD
+    A["OECD panel 1960-2005<br/>15 countries, transport CO2"] --> B["Naive Sweden time-difference<br/>+0.55 t/cap — confounded"]
+    A --> C["DiD vs Denmark<br/>-0.140 t/cap"]
+    A --> D["DiD vs OECD pool<br/>-0.214 t/cap, p=0.02"]
+    A --> E["Synthetic Sweden<br/>pysyncon.Synth"]
+    E --> F["Path &amp; gap plots<br/>-11.3% avg 1990-2005"]
+    E --> G["In-time placebo<br/>backdate to 1980"]
+    E --> H["In-space placebos<br/>p=0.067"]
+    E --> I["Leave-one-out<br/>range 8.8%-13%"]
+    A --> J["Synthetic GDP<br/>no growth penalty"]
+    K["Tax-incidence + OLS/IV<br/>regression_data.Rds"] --> L["Pass-through ~1.0"]
+    K --> M["OLS4: beta_price=-0.060<br/>beta_tax=-0.186"]
+    K --> N["IV oil: beta_tax=-0.186<br/>tax response ~3x price response"]
+    O["disentangling_data.dta"] --> P["Carbon-tax-only<br/>contribution"]
     style E fill:#6a9bcc,stroke:#141413,color:#fff
     style H fill:#d97757,stroke:#141413,color:#fff
     style N fill:#00d4c8,stroke:#141413,color:#000
