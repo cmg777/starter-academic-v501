@@ -283,6 +283,7 @@ Ignoring unknown labels:
 • linetype : ""
   saved: fig11_sc_differences.png 
   saved: fig12_sc_placebos_unpruned.png 
+  saved: fig13_sc_predictor_weights.png 
   saved: fig10_sc_mspe_ratio.png 
 
 Nested tidysynth object (first 5 rows, list-columns visible):

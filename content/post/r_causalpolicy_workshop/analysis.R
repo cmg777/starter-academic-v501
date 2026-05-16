@@ -518,34 +518,65 @@ p5 <- ggplot(sc_trends_df,
   guides(linewidth = "none")
 save_png(p5, "fig5_sc_trends.png")
 
+# tidysynth's plot helpers ship with default titles AND draw their
+# reference hline / vline in dark grey -- both invisible on the dark
+# navy background. Null the titles and post-process the returned ggplot
+# to re-paint those reference layers with site-palette colours.
+strip_titles <- list(labs(title = NULL, subtitle = NULL))
+
+recolor_refs <- function(p,
+                         hline_col = LIGHT_TEXT,
+                         vline_col = WARM_ORANGE) {
+  for (i in seq_along(p$layers)) {
+    g <- p$layers[[i]]$geom
+    if (inherits(g, "GeomHline")) {
+      p$layers[[i]]$aes_params$colour <- hline_col
+      p$layers[[i]]$aes_params$alpha  <- 0.65
+    }
+    if (inherits(g, "GeomVline")) {
+      p$layers[[i]]$aes_params$colour <- vline_col
+      p$layers[[i]]$aes_params$linewidth <- 0.8
+    }
+  }
+  p
+}
+
 # Figure 6: built-in plot_weights() -- shows donor unit weights AND
 # predictor (V matrix) weights side-by-side in one faceted ggplot.
-p6 <- plot_weights(prop99_syn) +
-  labs(title = "tidysynth::plot_weights(): donor + predictor weights") +
-  theme_site()
+p6 <- (plot_weights(prop99_syn) + strip_titles + theme_site()) |>
+        recolor_refs()
 save_png(p6, "fig6_sc_weights.png", height = 6)
 
 # Figure 7: built-in plot_placebos() -- overlays each placebo donor's
 # (real - synthetic) trajectory on California's, with automatic pruning
 # of poor pre-fit placebos (those with pre-period MSPE > 2x California).
-p7 <- plot_placebos(prop99_syn) +
-  labs(title = "tidysynth::plot_placebos(): California vs pruned placebos") +
-  theme_site()
+p7 <- (plot_placebos(prop99_syn) + strip_titles + theme_site()) |>
+        recolor_refs()
 save_png(p7, "fig7_sc_placebos.png")
 
 # Figure 11: built-in plot_differences() -- the per-year gap series for
 # California specifically (real_y - synth_y over time).
-p11 <- plot_differences(prop99_syn) +
-  labs(title = "tidysynth::plot_differences(): California's gap year-by-year") +
-  theme_site()
+p11 <- (plot_differences(prop99_syn) + strip_titles + theme_site()) |>
+        recolor_refs()
 save_png(p11, "fig11_sc_differences.png")
 
 # Figure 12: plot_placebos() with prune = FALSE -- keeps every donor
 # placebo, including poor pre-fit ones, for a full-pool comparison.
-p12 <- plot_placebos(prop99_syn, prune = FALSE) +
-  labs(title = "plot_placebos(prune = FALSE): every donor's placebo gap") +
-  theme_site()
+p12 <- (plot_placebos(prop99_syn, prune = FALSE) + strip_titles + theme_site()) |>
+        recolor_refs()
 save_png(p12, "fig12_sc_placebos_unpruned.png")
+
+# Figure 13: stand-alone V-matrix (predictor-weights) bar chart -- a
+# dedicated view of which pre-period predictors did the matching work.
+predw_df <- sc_predw |> mutate(variable = fct_reorder(variable, weight))
+p13 <- ggplot(predw_df, aes(x = weight, y = variable)) +
+  geom_col(fill = STEEL_BLUE) +
+  geom_text(aes(label = sprintf("%.3f", weight)),
+            hjust = -0.12, color = LIGHTER_TEXT, size = 3.4) +
+  expand_limits(x = max(predw_df$weight) * 1.20) +
+  labs(x = "V-matrix weight (predictor importance)", y = NULL) +
+  theme_site()
+save_png(p13, "fig13_sc_predictor_weights.png", height = 5)
 
 # Figure 10: MSPE-ratio plot (Abadie-style Fisher rank visualisation)
 mspe_df <- sc_sig |>
@@ -845,6 +876,7 @@ CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 | fig10_sc_mspe_ratio.png | MSPE-ratio bar chart (Abadie Fisher rank visualisation) |
 | fig11_sc_differences.png | tidysynth::plot_differences() -- California's per-year gap |
 | fig12_sc_placebos_unpruned.png | plot_placebos(prune = FALSE) -- every donor's placebo gap |
+| fig13_sc_predictor_weights.png | Stand-alone V-matrix bar chart (predictor importance) |
 
 ## CSV tables
 | File | Description |

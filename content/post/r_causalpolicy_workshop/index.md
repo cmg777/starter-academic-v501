@@ -876,25 +876,27 @@ The blue pre-1988 line and the orange post-1989 line both fit California's point
 
 **R tooling.** [`tidysynth`](https://cran.r-project.org/package=tidysynth) by Eric Dunford ([GitHub](https://github.com/edunford/tidysynth)) wraps the original Abadie--Diamond--Hainmueller optimisation in a tidyverse-friendly pipeline. The older [`Synth`](https://cran.r-project.org/package=Synth) package by Hainmueller is the historical reference. For Bayesian and spatial extensions see the [r_sc_bayes_spatial tutorial](/post/r_sc_bayes_spatial/).
 
-**The equation.** Let $X\_1 \in \mathbb{R}^k$ be the $k$ pre-period predictors for the treated unit (California), and $X\_0 \in \mathbb{R}^{k \times J}$ be the matching matrix for the $J = 38$ donor states. The Synthetic Control estimator chooses donor weights $w \in \mathbb{R}^J$ to minimise the (weighted) discrepancy between treated and synthetic on the predictors:
+**The equation, in plain English first.** The optimisation picks a *recipe* — a convex combination of donor states — that mimics California's pre-1988 trajectory on a chosen set of predictors. That recipe is then frozen and used to project the no-policy counterfactual into the post-period. Two simple constraints make the result interpretable: every donor weight is non-negative, and the weights sum to 1. So the synthetic series cannot extrapolate outside the range of the donors — it is always a "blend", never an "extension".
+
+Formally, let $X\_1$ be the vector of $k$ pre-period predictors for the treated unit (California), and let $X\_0$ be the $k \times J$ matrix holding the same predictors for the $J = 38$ donor states. The Synthetic Control estimator chooses donor weights $w$ to minimise the (V-weighted) discrepancy between treated and synthetic on the predictors:
 
 $$w^\* \\, = \\, \arg\min\_{w \in \mathcal{W}} \\, \big(X\_1 - X\_0 w\big)^\top V \big(X\_1 - X\_0 w\big),$$
 
-subject to the convexity constraints
+subject to
 
 $$\mathcal{W} = \big\\{w \in \mathbb{R}^J \\,:\\, w\_j \ge 0 \\,\\, \forall j, \\,\\, \textstyle\sum\_{j=1}^J w\_j = 1\big\\}.$$
 
-The diagonal matrix $V$ holds the *predictor* weights (the V matrix in §10.2) — they let the optimiser care more about pre-period lagged outcomes than about, say, beer consumption. Once $w^\*$ is solved, the synthetic California outcome at any time $t$ is a fixed convex combination of the donor outcomes:
+In words: find the donor weights $w$ that make synthetic California's predictor profile as close as possible to real California's, where "close" is measured by the V-weighted quadratic distance. The diagonal matrix $V$ holds the *predictor* importance weights — the optimiser can care more about pre-period cigarette sales than about, say, beer consumption (we will inspect $V$ in §10.2).
 
-$$\widehat{Y\_{1t}(0)} = \sum\_{j=1}^J w\_j^\* \\, Y\_{jt}.$$
+Once $w^\*$ is solved, the synthetic California outcome at any year $t$ is
 
-And the average treatment effect on the treated, post-1988, is
+$$\widehat{Y\_{1t}(0)} = \sum\_{j=1}^J w\_j^\* \\, Y\_{jt},$$
+
+and the average treatment effect on the treated over 1989--2000 is just the mean post-period gap between observed California and that synthetic counterfactual:
 
 $$\widehat{\text{ATT}}\_{\text{SCM}} = \frac{1}{T\_{\text{post}}} \sum\_{t > t^\*} \Big[Y\_{1t} - \sum\_{j=1}^J w\_j^\* \\, Y\_{jt}\Big].$$
 
-In words: the optimisation picks a recipe — "34% Utah, 24% Nevada, 18% Montana, 18% Colorado, 6% Connecticut" — that, *combined into a weighted average*, best mimics California's pre-1988 trajectory on a set of predictors. That recipe is then frozen and used to project California's no-policy counterfactual into the post-period. The non-negativity and sum-to-one constraints on $w$ are what make Synthetic Control *interpretable* — the synthetic series stays inside the convex hull of the donor outcomes, so it cannot extrapolate.
-
-**Why it works where Difference-in-Differences failed.** Difference-in-Differences against Nevada needed parallel pre-trends with one neighbour. Synthetic Control needs parallel pre-trends with a *data-driven blend* of many neighbours. The optimisation does the matching, so the analyst no longer has to pick "the right" control state by hand.
+**Why it works where Difference-in-Differences failed.** Difference-in-Differences against Nevada needed parallel pre-trends with *one* neighbour. Synthetic Control needs parallel pre-trends with a *data-driven blend* of many neighbours. The optimisation does the matching, so the analyst no longer has to pick "the right" control state by hand.
 
 **The pipeline.** The `tidysynth` package by Eric Dunford wraps the Abadie--Diamond--Hainmueller optimisation into a tidyverse-style pipeline with four explicit stages.
 
@@ -912,7 +914,24 @@ flowchart LR
     style E fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
-Stages 1--4 produce the estimate. Stage 5 is a battery of inspection helpers — `plot_trends()`, `plot_weights()`, `plot_placebos()`, `plot_mspe_ratio()`, `grab_unit_weights()`, `grab_predictor_weights()`, `grab_balance_table()`, `grab_significance()` — that turn the fitted object into figures and tables for diagnostics and inference. We use all of them below.
+Stages 1--4 produce the estimate. Stage 5 is a battery of inspection helpers — `plot_trends()`, `plot_differences()`, `plot_weights()`, `plot_placebos()`, `plot_mspe_ratio()`, `grab_unit_weights()`, `grab_predictor_weights()`, `grab_balance_table()`, `grab_significance()` — that turn the fitted object into figures and tables for diagnostics and inference. We use all of them below.
+
+### A roadmap for this section
+
+Synthetic Control is the deepest method in this tutorial, so this section is the longest. To keep you oriented, here is what each subsection does:
+
+| Subsection | What you will see | Why it matters |
+|---|---|---|
+| 10.1 | Build `prop99_syn` with the four-stage pipeline | Defines the treated unit, the donor pool, and the predictors |
+| 10.2 | Donor weights (W) and predictor weights (V) | Tells you *which donors* and *which predictors* did the matching work |
+| 10.3 | The point estimate and the trends plot | The headline ATT and the visual comparison observed vs synthetic |
+| 10.4 | Predictor balance table | Confirms the matching worked — California vs synthetic California vs donor average |
+| 10.5 | `plot_differences()` | Isolates the year-by-year treatment-effect curve |
+| 10.6 | Placebo permutation test | Inference: where does California fall vs every "what if a donor had been treated?" simulation |
+| 10.7 | Mean Squared Prediction Error ratio and Fisher exact $p$-value | A sharper one-number inference statistic |
+| 10.8 | Inspecting the nested tidysynth object | The whole optimisation is introspectable from R |
+
+Read top to bottom for the full walk-through, or jump to a subsection if you only need one diagnostic.
 
 ### 10.1 Fit the synthetic-control pipeline
 
@@ -1004,6 +1023,31 @@ plot_weights(prop99_syn)
 ![tidysynth plot_weights output: faceted bar chart with donor unit weights on the left and predictor V-matrix weights on the right](fig6_sc_weights.png)
 
 The left facet recovers the five-state recipe from the table above; the right facet shows the heavy concentration on the two lagged-outcome predictors. Both panels are produced by the same one-line call to `plot_weights(prop99_syn)`.
+
+#### A closer look at the V matrix
+
+The combined `plot_weights()` view is convenient, but the V matrix deserves a stand-alone chart because it answers a different question than the donor weights. Donor weights say *which states* mimic California; the V matrix says *which variables* the optimiser used to decide what "mimics" means.
+
+```r
+# Build a stand-alone bar chart of the V matrix from the tidy
+# grab_predictor_weights() output.
+predw_df <- grab_predictor_weights(prop99_syn) |>
+  mutate(variable = forcats::fct_reorder(variable, weight))
+
+ggplot(predw_df, aes(x = weight, y = variable)) +
+  geom_col(fill = "#6a9bcc") +
+  geom_text(aes(label = sprintf("%.3f", weight)), hjust = -0.12) +
+  labs(x = "V-matrix weight (predictor importance)", y = NULL)
+```
+
+![Stand-alone bar chart of the V matrix: cigsale_1975 and cigsale_1980 dominate, while behavioural covariates lnincome, age15to24 and beer get nearly zero weight](fig13_sc_predictor_weights.png)
+
+Two readings of the same picture, one practical and one cautionary.
+
+- *Practical reading.* Two lagged outcomes (`cigsale_1975` at 0.468 and `cigsale_1980` at 0.412) carry 88 % of the matching information. The remaining 12 % is split mostly between retail cigarette price (0.055) and the third lagged outcome (0.037). The optimiser has decided that California's pre-period cigarette sales — *at multiple time points* — are the best fingerprint to match.
+- *Cautionary reading.* The V matrix is **not a causal ranking**. It tells you which variables were *useful for matching the treated unit's pre-period*, not which variables *cause* the outcome. A predictor can have zero V-weight here and still be substantively important for cigarette consumption — it just was not the most efficient lever for getting the pre-period RMSPE small.
+
+**Common pitfall.** Treating the V matrix as a list of causal drivers. It is a list of *good pre-period predictors for one specific unit*, not a structural model of smoking. The right place to look for *causal* importance is the post-period gap series in §10.5, not the V matrix.
 
 ### 10.3 The estimate
 
@@ -1119,8 +1163,6 @@ plot_mspe_ratio(prop99_syn)
 
 The orange bar at the top is California; every blue bar below it is a placebo donor. The gap between California and Georgia (the second-place state) is enormous. That gap is the visual signature of "a real treatment effect that the donor pool does not naturally replicate".
 
-**Common pitfall.** Treating the predictor weight matrix as a causal ranking. The V matrix is a *pre-period predictor-importance* ranking — it tells you which variables best matched the treated unit's pre-period, not which variables *cause* the outcome. A predictor can have zero V-weight and still be substantively important.
-
 ### 10.8 Inspecting the nested tidysynth object
 
 `prop99_syn` is not a plain data frame — it is a *nested tibble* with one row per unit (treated unit + every donor refit as a placebo) and list-columns that hold every intermediate output of the optimisation. Printing the object directly shows the structure.
@@ -1162,7 +1204,21 @@ prop99_syn |> tidyr::unnest(cols = c(.outcome))
 
 This is the whole point of the nested-tibble design: every step of the optimisation is *introspectable from R*, with no need to dig into S4 slots or `attr()` blobs. The full long table is exported as `table_sc_outcomes_long.csv` in this post's bundle.
 
-**Recap.** Synthetic Control reports $-18.85$ packs/capita with a Fisher exact $p$-value of 0.026. The estimate rests on a five-state synthetic California built mostly from western and sunbelt states with cigarette consumption levels close to California's. The placebo and Mean Squared Prediction Error ratio diagnostics both confirm that California's post-1989 trajectory is unusual relative to what other states experienced in the same window. This is the workshop's headline causal estimate.
+### Recap of section 10
+
+After eight subsections it helps to gather everything in one place.
+
+| Question | Answer |
+|---|---|
+| What does Synthetic Control estimate? | The ATT on California, 1989--2000 |
+| What is the point estimate? | **$-18.85$ packs/capita per year** |
+| What is "synthetic California"? | A convex combination of five states: Utah 34.2 %, Nevada 23.8 %, Montana 20.9 %, Colorado 14.9 %, Connecticut 6.2 % |
+| What predictors did the matching? | Mostly two lagged outcomes — `cigsale_1975` (V-weight 0.468) and `cigsale_1980` (V-weight 0.412) |
+| How is the matching quality? | Excellent — `cigsale_1988` is 90.1 (California) vs 91.4 (synthetic), against an unweighted donor average of 114.2 |
+| What is the inference statistic? | Fisher exact $p = 0.026$ (California ranks 1st out of 39 on the MSPE ratio of 123.9) |
+| What is the design-time pitfall? | Don't read the V matrix as a list of causal drivers — it is a list of *good pre-period predictors* |
+
+Synthetic Control is the workshop's headline causal estimate, and the placebo/MSPE-ratio diagnostics in §10.6--§10.7 both confirm that California's post-1989 trajectory is unusual relative to what other states experienced in the same window. In §11 (CausalImpact) we hand the same donor information to a Bayesian model and ask whether a *credible interval* (a direct probability statement about the effect) tells the same story.
 
 ## 11. Method 6 --- CausalImpact
 

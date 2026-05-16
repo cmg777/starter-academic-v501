@@ -24,6 +24,7 @@ CausalImpact) using California's 1988 Proposition 99 cigarette tax.
 | fig10_sc_mspe_ratio.png | MSPE-ratio bar chart (Abadie Fisher rank visualisation) |
 | fig11_sc_differences.png | tidysynth::plot_differences() -- California's per-year gap |
 | fig12_sc_placebos_unpruned.png | plot_placebos(prune = FALSE) -- every donor's placebo gap |
+| fig13_sc_predictor_weights.png | Stand-alone V-matrix bar chart (predictor importance) |
 
 ## CSV tables
 | File | Description |
