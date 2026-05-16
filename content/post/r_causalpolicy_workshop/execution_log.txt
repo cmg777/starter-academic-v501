@@ -1,0 +1,305 @@
+
+========== 1. DATA DOWNLOAD ==========
+Using cached proposition99.rds 
+Rows: 1209  Cols: 7 
+Columns: state, year, cigsale, lnincome, beer, age15to24, retprice 
+States: 39  Years: 1970 - 2000 
+
+Head:
+# A tibble: 6 × 7
+  state         year cigsale lnincome  beer age15to24 retprice
+  <fct>        <int>   <dbl>    <dbl> <dbl>     <dbl>    <dbl>
+1 Rhode Island  1970   124.        NA    NA     0.183     39.3
+2 Tennessee     1970    99.8       NA    NA     0.178     39.9
+3 Indiana       1970   135.        NA    NA     0.177     30.6
+4 Nevada        1970   190.        NA    NA     0.162     38.9
+5 Louisiana     1970   116.        NA    NA     0.185     34.3
+6 Oklahoma      1970   108.        NA    NA     0.175     38.4
+
+Missingness per column:
+# A tibble: 7 × 2
+  variable  n_missing
+  <chr>         <int>
+1 state             0
+2 year              0
+3 cigsale           0
+4 lnincome        195
+5 beer            663
+6 age15to24       390
+7 retprice          0
+
+========== 2. DATA PREPARATION ==========
+California observations: 31  (Pre/Post split: 19 / 12 )
+
+Running mice random-forest imputation (m=1) for missing covariates...
+Imputed rows: 1209  Remaining NAs: 0 
+
+========== 3. EDA ==========
+  saved: fig1_raw_series.png 
+California pre vs post:
+# A tibble: 2 × 4
+  prepost     n mean_cigsale sd_cigsale
+  <fct>   <int>        <dbl>      <dbl>
+1 Pre        19        116.        11.7
+2 Post       12         60.4       12.1
+
+========== 4. METHOD 1: NAIVE PRE-POST ==========
+Estimand: descriptive Post - Pre mean difference (NOT a causal estimand).
+OLS summary:
+
+Call:
+lm(formula = cigsale ~ prepost, data = filter(prop99_cali, year > 
+    1983, year < 1994))
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+ -8.88  -4.16  -0.38   5.32  10.44 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   98.980      3.070  32.244 9.32e-10 ***
+prepostPost  -27.020      4.341  -6.224 0.000253 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 6.864 on 8 degrees of freedom
+Multiple R-squared:  0.8288,	Adjusted R-squared:  0.8074 
+F-statistic: 38.74 on 1 and 8 DF,  p-value: 0.0002527
+
+
+HAC standard errors:
+
+t test of coefficients:
+
+            Estimate Std. Error t value  Pr(>|t|)    
+(Intercept)  98.9800     2.4999 39.5941 1.821e-10 ***
+prepostPost -27.0200     5.2951 -5.1029 0.0009266 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+========== 5. METHOD 2: DIFFERENCE-IN-DIFFERENCES ==========
+Estimand: ATT on California (1989-1993 vs Nevada control).
+Specification: cigsale ~ state * prepost on 1984-1993 window.
+
+OLS summary:
+
+Call:
+lm(formula = cigsale ~ state * prepost, data = prop99_did)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-13.660  -6.320  -0.850   4.905  16.140 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                  143.100      4.064  35.215  < 2e-16 ***
+stateCalifornia              -44.120      5.747  -7.677 9.42e-07 ***
+prepostPost                  -21.340      5.747  -3.713  0.00189 ** 
+stateCalifornia:prepostPost   -5.680      8.127  -0.699  0.49466    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 9.087 on 16 degrees of freedom
+Multiple R-squared:  0.9137,	Adjusted R-squared:  0.8975 
+F-statistic: 56.48 on 3 and 16 DF,  p-value: 9.853e-09
+
+
+HAC standard errors:
+
+t test of coefficients:
+
+                            Estimate Std. Error  t value  Pr(>|t|)    
+(Intercept)                 143.1000     1.0918 131.0701 < 2.2e-16 ***
+stateCalifornia             -44.1200     3.8796 -11.3722 4.464e-09 ***
+prepostPost                 -21.3400     7.6870  -2.7761   0.01349 *  
+stateCalifornia:prepostPost  -5.6800     5.3929  -1.0532   0.30788    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+  saved: fig2_did_parallel_trends.png 
+
+========== 6a. METHOD 3a: ITS GROWTH CURVE ==========
+Fit linear trend on PRE-period, extrapolate forward, average gap.
+
+Pre-period trend fit:
+
+Call:
+lm(formula = cigsale ~ year, data = filter(prop99_ts, prepost == 
+    "Pre"))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-10.095  -4.264   1.592   5.729   8.110 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 3637.7889   513.3284   7.087 1.82e-06 ***
+year          -1.7795     0.2594  -6.860 2.77e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 6.193 on 17 degrees of freedom
+Multiple R-squared:  0.7346,	Adjusted R-squared:  0.719 
+F-statistic: 47.06 on 1 and 17 DF,  p-value: 2.767e-06
+
+ITS (growth curve) ATT estimate: -28.28 packs/capitaNaive SE across post-period years: 1.72
+========== 6b. METHOD 3b: ITS ARIMA FORECAST ==========
+Fit AICc-selected ARIMA on PRE-period, forecast post horizon, average gap.
+
+Selected ARIMA model:
+Series: cigsale 
+Model: ARIMA(1,2,0) 
+
+Coefficients:
+          ar1
+      -0.6255
+s.e.   0.2427
+
+sigma^2 estimated as 4.953:  log likelihood=-37.45
+AIC=78.9   AICc=79.76   BIC=80.57
+# A mable: 1 x 1
+      timeseries
+         <model>
+1 <ARIMA(1,2,0)>
+ITS (ARIMA) ATT estimate: 4.55 packs/capitaNaive SE across post-period years: 2.34  saved: fig3_its_arima.png 
+
+========== 7. METHOD 4: RDD ON TIME ==========
+Workshop's 'RDD': cigsale ~ year0 + prepost + year0:prepost on California series.
+Coefficient on prepostPost = jump in level at the policy threshold.
+
+OLS summary:
+
+Call:
+lm(formula = cigsale ~ year0 + prepost + year0:prepost, data = as_tibble(prop99_ts))
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-10.0953  -2.9216  -0.7423   3.9069   8.1100 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        98.4158     2.4746  39.770  < 2e-16 ***
+year0              -1.7795     0.2170  -8.199 8.36e-09 ***
+prepostPost       -20.0581     3.7471  -5.353 1.18e-05 ***
+year0:prepostPost  -1.4947     0.4846  -3.084  0.00467 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 5.182 on 27 degrees of freedom
+Multiple R-squared:  0.9732,	Adjusted R-squared:  0.9702 
+F-statistic: 326.4 on 3 and 27 DF,  p-value: < 2.2e-16
+
+
+HAC standard errors:
+
+t test of coefficients:
+
+                   Estimate Std. Error t value  Pr(>|t|)    
+(Intercept)        98.41579    4.96750 19.8119 < 2.2e-16 ***
+year0              -1.77947    0.45909 -3.8761 0.0006137 ***
+prepostPost       -20.05810    5.58538 -3.5912 0.0012911 ** 
+year0:prepostPost  -1.49465    0.40140 -3.7236 0.0009151 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+  saved: fig4_rdd_segmented.png 
+
+========== 8. METHOD 5: SYNTHETIC CONTROL ==========
+Estimand: ATT on California vs weighted synthetic California.
+SCM ATT (mean of real - synthetic, 1989-2000): -18.72 packs/capitaNaive SE across post-period years: 1.82
+Top 8 donor weights:
+# A tibble: 8 × 2
+  unit          weight
+  <chr>          <dbl>
+1 Utah        0.343   
+2 Nevada      0.236   
+3 Montana     0.182   
+4 Colorado    0.175   
+5 Connecticut 0.0624  
+6 Idaho       0.000520
+7 New Mexico  0.000336
+8 Minnesota   0.000331
+
+Predictor balance:
+# A tibble: 7 × 4
+  variable     California synthetic_California donor_sample
+  <chr>             <dbl>                <dbl>        <dbl>
+1 age15to24         0.174                0.174        0.173
+2 lnincome         10.1                  9.86         9.83 
+3 retprice         89.4                 89.3         87.3  
+4 beer             24.3                 24.1         23.7  
+5 cigsale_1975    127.                 127.         137.   
+6 cigsale_1980    120.                 120.         138.   
+7 cigsale_1988     90.1                 91.4        114.   
+  saved: fig5_sc_trends.png 
+  saved: fig6_sc_weights.png 
+  saved: fig7_sc_placebos.png 
+
+========== 9. METHOD 6: CAUSALIMPACT ==========
+Estimand: posterior mean ATT on California with 95% credible interval.
+Pre period rows: 1 - 19   ( 1970 - 1988 )
+Post period rows: 20 - 31   ( 1989 - 2000 )
+
+[CausalImpact: cigarette-only controls]
+Posterior inference {CausalImpact}
+
+                         Average        Cumulative  
+Actual                   60             724         
+Prediction (s.d.)        82 (10)        982 (122)   
+95% CI                   [58, 100]      [696, 1203] 
+                                                    
+Absolute effect (s.d.)   -21 (10)       -258 (122)  
+95% CI                   [-40, 2.4]     [-479, 28.6]
+                                                    
+Relative effect (s.d.)   -25% (11%)     -25% (11%)  
+95% CI                   [-40%, 4.1%]   [-40%, 4.1%]
+
+Posterior tail-area probability p:   0.0321
+Posterior prob. of a causal effect:  96.79%
+
+For more details, type: summary(impact, "report")
+
+NULL
+
+[CausalImpact: cigarette + covariate controls]
+Posterior inference {CausalImpact}
+
+                         Average       Cumulative  
+Actual                   60            724         
+Prediction (s.d.)        73 (11)       878 (129)   
+95% CI                   [55, 92]      [656, 1108] 
+                                                   
+Absolute effect (s.d.)   -13 (11)      -154 (129)  
+95% CI                   [-32, 5.7]    [-383, 68.1]
+                                                   
+Relative effect (s.d.)   -16% (12%)    -16% (12%)  
+95% CI                   [-35%, 10%]   [-35%, 10%] 
+
+Posterior tail-area probability p:   0.08233
+Posterior prob. of a causal effect:  92%
+
+For more details, type: summary(impact, "report")
+
+NULL
+CausalImpact (full covariates) ATT: -12.82 [95% CI: -31.95, 5.67]  saved: fig8_causalimpact.png 
+
+========== 10. CROSS-METHOD COMPARISON ==========
+
+Comparison table:
+# A tibble: 7 × 6
+  method             estimand             estimate std_error   ci_low ci_high
+  <chr>              <chr>                   <dbl>     <dbl>    <dbl>   <dbl>
+1 Naive pre-post     Descriptive (biased)   -27.0       5.30 -37.4     -16.6 
+2 DiD (CA vs Nevada) ATT (CA, 1989-1993)     -5.68      5.39 -16.3       4.89
+3 ITS (growth curve) Mean post-period gap   -28.3       1.72 -31.7     -24.9 
+4 ITS (ARIMA)        Mean post-period gap     4.55      2.34  -0.0451    9.14
+5 RDD on time        Level jump at 1989     -20.1       5.59 -31.0      -9.11
+6 Synthetic Control  ATT (CA, 1989-2000)    -18.7       1.82 -22.3     -15.2 
+7 CausalImpact       ATT (CA, 1989-2000)    -12.8       9.60 -31.6       5.99
+  saved: fig9_cross_method_forest.png 
+
+========== 11. README ==========
+README.md written.
+
+=== Script completed successfully ===
