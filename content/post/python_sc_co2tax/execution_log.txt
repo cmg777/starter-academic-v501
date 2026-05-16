@@ -1,0 +1,286 @@
+
+========================================================================
+Loading data
+========================================================================
+panel (carbontax_data.dta): (690, 9), countries=15, years=1960-2005
+descr_Sweden.Rds:          (46, 14)
+GDP_data.Rds:              (468, 8), countries=13
+regression_data.Rds:       (46, 17), years=1970-2015
+disentangling_data.dta:    (46, 6)
+leave_one_out_data.dta:    (46, 9)
+
+========================================================================
+Exercise 1.1: Gasoline price components
+========================================================================
+ year  VAT   en_tax  CO2_tax  pw_real  total_tax
+ 1960  0.0 4.128581      0.0 7.451586   4.128581
+ 1961  0.0 4.125493      0.0 7.170499   4.125493
+ 1962  0.0 3.955619      0.0 7.440332   3.955619
+ 1963  0.0 3.842602      0.0 6.953279   3.842602
+ 1964  0.0 3.715223      0.0 6.634326   3.715223
+
+========================================================================
+Exercise 1.2: CO2 emissions & gasoline consumption
+========================================================================
+
+========================================================================
+Exercise 2.0-2.1: Time differences and DiD
+========================================================================
+
+Sweden time-difference regression:
+             Estimate  Std. Error  t value  Pr(>|t|)    2.5%   97.5%
+Coefficient                                                         
+Intercept      1.7937      0.0766  23.4181       0.0  1.6393  1.9481
+delta          0.5522      0.0790   6.9908       0.0  0.3930  0.7114
+
+DiD: Sweden vs Denmark (HC1):
+             Estimate  Std. Error  t value  Pr(>|t|)    2.5%   97.5%
+Coefficient                                                         
+Intercept      1.5350      0.0797  19.2488    0.0000  1.3765  1.6935
+treated        0.2587      0.1106   2.3395    0.0216  0.0389  0.4784
+post           0.6921      0.0845   8.1924    0.0000  0.5242  0.8600
+Sweden_post   -0.1399      0.1157  -1.2095    0.2297 -0.3697  0.0900
+
+DiD: Sweden vs full OECD donor pool (cluster by country):
+             Estimate  Std. Error  t value  Pr(>|t|)    2.5%   97.5%
+Coefficient                                                         
+Intercept      1.8100      0.3520   5.1424    0.0001  1.0551  2.5650
+treated       -0.0164      0.3520  -0.0465    0.9636 -0.7713  0.7386
+post           0.7659      0.0825   9.2842    0.0000  0.5890  0.9429
+Sweden_post   -0.2137      0.0825  -2.5907    0.0214 -0.3907 -0.0368
+
+========================================================================
+Exercise 2.3: Synthetic Control — Synthetic Sweden
+========================================================================
+
+Donor weights for Synthetic Sweden (top 8):
+Denmark          0.289
+Belgium          0.269
+New Zealand      0.146
+Greece           0.114
+United States    0.101
+Switzerland      0.079
+Portugal         0.002
+France           0.000
+Name: weights, dtype: float64
+
+Weights sum to 1.000000
+V (predictor) weights:
+GDP_per_capita                0.0965
+vehicles_capita               0.1273
+gas_cons_capita               0.0000
+urban_pop                     0.2932
+CO2_transport_capita(1989)    0.1573
+CO2_transport_capita(1980)    0.2871
+CO2_transport_capita(1970)    0.0386
+dtype: float64
+Loss V (MSPE pre): 0.001345
+Loss W:           -7.744537
+
+Sweden 2005: 2.4907 t/capita
+Synth Sweden 2005: 2.8533 t/capita
+Gap 2005: -0.3626 t/capita (-12.71% vs synth)
+Average post-treatment gap (1990-2005): -0.3033 t/capita (-11.32%)
+
+========================================================================
+Exercise 2.4: Placebo tests
+========================================================================
+
+Running in-space placebos for each donor country (this takes a moment)...
+Kept 11 placebos after MSPE-limit filter (limit = 0.0986).
+
+Post/Pre MSPE ratio per unit:
+      country  ratio
+       Sweden 25.411
+        Spain 15.696
+       Poland  5.146
+      Iceland  3.551
+     Portugal  1.969
+       France  1.849
+        Japan  1.598
+  New Zealand  1.517
+United States  1.260
+  Switzerland  0.720
+      Denmark  0.700
+       Greece  0.551
+       Canada  0.421
+    Australia  0.408
+      Belgium  0.388
+
+Permutation p-value for Sweden = 0.0667
+
+========================================================================
+Exercise 3.1: GDP and CO2 levels & gaps
+========================================================================
+
+========================================================================
+Exercise 3.2: Synthetic GDP for Sweden
+========================================================================
+
+Synthetic-GDP donor weights (non-zero):
+New Zealand    0.376
+Finland        0.198
+Denmark        0.180
+Switzerland    0.146
+Japan          0.073
+France         0.027
+Name: weights, dtype: float64
+GDP 2005 — Sweden actual: $43,603 vs Synthetic: $41,836
+
+========================================================================
+Exercise 4 (intro): Tax incidence — pass-through to consumers
+========================================================================
+
+Tax-incidence regression (HC1):
+             Estimate  Std. Error  t value  Pr(>|t|)    2.5%   97.5%
+Coefficient                                                         
+Intercept      0.0993      0.0426   2.3294    0.0247  0.0133  0.1854
+delta_oil_p    0.0062      0.0006  11.0030    0.0000  0.0051  0.0074
+delta_tax      1.1473      0.1513   7.5823    0.0000  0.8419  1.4527
+
+========================================================================
+Exercise 4.1: OLS gasoline-consumption regressions
+========================================================================
+
+OLS1 (HC1):
+                  Estimate  Std. Error  t value  Pr(>|t|)
+Coefficient                                              
+Intercept           6.2277      0.1004  62.0518    0.0000
+p_real_vat         -0.0575      0.0154  -3.7263    0.0006
+real_CO2_tax_vat   -0.2598      0.0321  -8.0952    0.0000
+d_CO2_tax           0.1087      0.0376   2.8937    0.0063
+t                   0.0207      0.0021   9.9258    0.0000
+
+OLS2 (HC1):
+                  Estimate  Std. Error  t value  Pr(>|t|)
+Coefficient                                              
+Intercept           6.4066      0.1903  33.6672    0.0000
+p_real_vat         -0.0598      0.0152  -3.9347    0.0004
+real_CO2_tax_vat   -0.2322      0.0439  -5.2931    0.0000
+d_CO2_tax           0.0604      0.0652   0.9265    0.3604
+t                   0.0253      0.0046   5.4524    0.0000
+gdp_cap            -0.0011      0.0009  -1.1783    0.2464
+
+OLS3 (HC1):
+                  Estimate  Std. Error  t value  Pr(>|t|)
+Coefficient                                              
+Intercept           5.3724      3.3645   1.5968    0.1193
+p_real_vat         -0.0612      0.0147  -4.1705    0.0002
+real_CO2_tax_vat   -0.2335      0.0453  -5.1568    0.0000
+d_CO2_tax           0.0633      0.0660   0.9598    0.3437
+t                   0.0244      0.0050   4.8998    0.0000
+gdp_cap            -0.0010      0.0009  -1.1251    0.2682
+urban_pop           0.0127      0.0408   0.3111    0.7576
+
+OLS4 (HC1):
+                  Estimate  Std. Error  t value  Pr(>|t|)
+Coefficient                                              
+Intercept           4.4068      3.1071   1.4183    0.1652
+p_real_vat         -0.0603      0.0135  -4.4568    0.0001
+real_CO2_tax_vat   -0.1856      0.0450  -4.1217    0.0002
+d_CO2_tax           0.0999      0.0580   1.7228    0.0940
+t                   0.0341      0.0066   5.1548    0.0000
+gdp_cap            -0.0037      0.0015  -2.4882    0.0179
+urban_pop           0.0301      0.0382   0.7858    0.4374
+unempl             -0.0242      0.0072  -3.3651    0.0019
+
+Newey-West HAC(16) results — OLS4:
+                    coef  se_nw16        t       p
+const             4.4068   4.9000   0.8994  0.3685
+p_real_vat       -0.0603   0.0106  -5.7160  0.0000
+real_CO2_tax_vat -0.1856   0.0383  -4.8520  0.0000
+d_CO2_tax         0.0999   0.0598   1.6705  0.0948
+t                 0.0341   0.0028  12.1262  0.0000
+gdp_cap          -0.0037   0.0010  -3.7440  0.0002
+urban_pop         0.0301   0.0606   0.4958  0.6200
+unempl           -0.0242   0.0052  -4.6455  0.0000
+
+========================================================================
+Exercise 4.2: IV / 2SLS
+========================================================================
+
+IV: oil_p_real instrument (HC1):
+                  Estimate  Std. Error  t value  Pr(>|t|)    2.5%    97.5%
+Coefficient                                                               
+Intercept           4.1982      3.1034   1.3528    0.1851 -2.1087  10.5050
+real_CO2_tax_vat   -0.1857      0.0450  -4.1315    0.0002 -0.2771  -0.0944
+d_CO2_tax           0.0949      0.0619   1.5335    0.1344 -0.0309   0.2207
+t                   0.0344      0.0069   5.0162    0.0000  0.0205   0.0484
+gdp_cap            -0.0037      0.0015  -2.4498    0.0196 -0.0067  -0.0006
+urban_pop           0.0329      0.0385   0.8542    0.3990 -0.0454   0.1112
+unempl             -0.0242      0.0072  -3.3604    0.0019 -0.0388  -0.0095
+p_real_vat         -0.0641      0.0169  -3.7891    0.0006 -0.0984  -0.0297
+
+IV: real_en_tax_vat instrument (HC1):
+                  Estimate  Std. Error  t value  Pr(>|t|)    2.5%    97.5%
+Coefficient                                                               
+Intercept           4.3131      3.9414   1.0943    0.2815 -3.6966  12.3229
+real_CO2_tax_vat   -0.1857      0.0453  -4.0983    0.0002 -0.2777  -0.0936
+d_CO2_tax           0.0977      0.0783   1.2470    0.2209 -0.0615   0.2568
+t                   0.0342      0.0055   6.2371    0.0000  0.0231   0.0454
+gdp_cap            -0.0037      0.0013  -2.7544    0.0094 -0.0064  -0.0010
+urban_pop           0.0313      0.0492   0.6376    0.5280 -0.0686   0.1312
+unempl             -0.0242      0.0076  -3.1966    0.0030 -0.0396  -0.0088
+p_real_vat         -0.0620      0.0348  -1.7815    0.0838 -0.1327   0.0087
+
+IV: both instruments (HC1):
+                  Estimate  Std. Error  t value  Pr(>|t|)    2.5%    97.5%
+Coefficient                                                               
+Intercept           4.2154      3.1051   1.3576    0.1835 -2.0949  10.5256
+real_CO2_tax_vat   -0.1857      0.0450  -4.1271    0.0002 -0.2772  -0.0943
+d_CO2_tax           0.0953      0.0606   1.5724    0.1251 -0.0279   0.2185
+t                   0.0344      0.0065   5.2913    0.0000  0.0212   0.0476
+gdp_cap            -0.0037      0.0015  -2.4979    0.0175 -0.0067  -0.0007
+urban_pop           0.0327      0.0382   0.8551    0.3985 -0.0450   0.1104
+unempl             -0.0242      0.0072  -3.3370    0.0021 -0.0389  -0.0094
+p_real_vat         -0.0638      0.0122  -5.2132    0.0000 -0.0886  -0.0389
+
+First-stage regression (HC1):
+                  Estimate  Std. Error  t value  Pr(>|t|)    2.5%    97.5%
+Coefficient                                                               
+Intercept          21.7134     14.1291   1.5368    0.1339 -7.0325  50.4592
+real_CO2_tax_vat   -0.2525      0.2264  -1.1154    0.2727 -0.7130   0.2080
+d_CO2_tax           0.3362      0.3309   1.0162    0.3169 -0.3370   1.0094
+t                   0.0812      0.0310   2.6171    0.0133  0.0181   0.1443
+gdp_cap            -0.0024      0.0064  -0.3726    0.7118 -0.0154   0.0107
+urban_pop          -0.2448      0.1740  -1.4068    0.1688 -0.5989   0.1092
+unempl             -0.0341      0.0540  -0.6321    0.5317 -0.1439   0.0757
+oil_p_real          0.0068      0.0005  13.1667    0.0000  0.0057   0.0078
+real_en_tax_vat     0.9049      0.1572   5.7572    0.0000  0.5851   1.2247
+
+OLS vs IV comparison:
+          model  beta_p_real_vat  beta_real_CO2_tax_vat
+           OLS4          -0.0603                -0.1856
+IV (energy tax)          -0.0620                -0.1857
+ IV (oil price)          -0.0641                -0.1857
+      IV (both)          -0.0638                -0.1857
+
+========================================================================
+Exercise 4.3: Disentangling carbon tax from VAT
+========================================================================
+ year  CO2_reductions_simulation  CO2_reductions_synth  CarbonTaxandVAT  NoCarbonTaxWithVAT  NoCarbonTaxNoVAT
+ 2000                    -0.3653               -0.3101           2.3986              2.5747            2.7640
+ 2001                    -0.5108               -0.3320           2.4039              2.7259            2.9148
+ 2002                    -0.5967               -0.3320           2.4043              2.8175            3.0010
+ 2003                    -0.6964               -0.3816           2.3893              2.9078            3.0857
+ 2004                    -0.7852               -0.3829           2.3129              2.9219            3.0980
+ 2005                    -0.7571               -0.3546           2.2923              2.8601            3.0495
+
+Mean post-1990 carbon-tax-attributable reduction (rel. to no-carbon-tax-with-VAT scenario): 9.50%
+
+========================================================================
+Headline summary
+========================================================================
+                                                         value
+DiD (Sweden vs Denmark) on Sweden_post                 -0.1399
+DiD (Sweden vs OECD, cluster SE) on Sweden_post        -0.2137
+Synthetic Sweden — 2005 gap (t CO2/cap)                -0.3626
+Synthetic Sweden — average post-treatment % reduction -11.3199
+Permutation placebo p-value (post/pre MSPE ratio)       0.0667
+OLS4 — price semi-elasticity (beta1)                   -0.0603
+OLS4 — tax semi-elasticity (beta2)                     -0.1856
+IV (oil) — price semi-elasticity                       -0.0641
+IV (oil) — tax semi-elasticity                         -0.1857
+Disentangling — mean carbon-tax-only reduction (%)      9.5037
+
+=== Script completed successfully ===

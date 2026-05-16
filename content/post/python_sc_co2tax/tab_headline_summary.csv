@@ -1,0 +1,11 @@
+,value
+DiD (Sweden vs Denmark) on Sweden_post,-0.1399
+"DiD (Sweden vs OECD, cluster SE) on Sweden_post",-0.2137
+Synthetic Sweden — 2005 gap (t CO2/cap),-0.3626
+Synthetic Sweden — average post-treatment % reduction,-11.3199
+Permutation placebo p-value (post/pre MSPE ratio),0.0667
+OLS4 — price semi-elasticity (beta1),-0.0603
+OLS4 — tax semi-elasticity (beta2),-0.1856
+IV (oil) — price semi-elasticity,-0.0641
+IV (oil) — tax semi-elasticity,-0.1857
+Disentangling — mean carbon-tax-only reduction (%),9.5037

@@ -1,0 +1,5 @@
+model,beta_p_real_vat,beta_real_CO2_tax_vat
+OLS4,-0.0603,-0.1856
+IV (energy tax),-0.062,-0.1857
+IV (oil price),-0.0641,-0.1857
+IV (both),-0.0638,-0.1857
