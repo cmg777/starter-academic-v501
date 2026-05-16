@@ -351,13 +351,12 @@ Before diving into estimators, we need a vocabulary for what they are estimating
 
 For each unit $i$ at time $t$, imagine two *potential* outcomes:
 
-$$Y\_{it}(1) = \text{cigarette sales in state } i \text{ at year } t \text{ \textit{with} Proposition 99}.$$
-
-$$Y\_{it}(0) = \text{cigarette sales in state } i \text{ at year } t \text{ \textit{without} Proposition 99}.$$
+- $Y\_{it}(1)$ — cigarette sales in state $i$ at year $t$ **with** Proposition 99 in force.
+- $Y\_{it}(0)$ — cigarette sales in state $i$ at year $t$ **without** Proposition 99 in force.
 
 Let $D\_{it} \in \\{0, 1\\}$ be the treatment indicator. Here $D\_{it} = 1$ for California from 1989 onward, and $D\_{it} = 0$ everywhere else (every other state, plus California up to and including 1988). The outcome we *observe* is one of the two potential outcomes, never both:
 
-$$Y\_{it} = D\_{it}\\, Y\_{it}(1) + (1 - D\_{it})\\, Y\_{it}(0).$$
+$$Y\_{it} \\,=\\, D\_{it}\\, Y\_{it}(1) \\,+\\, (1 - D\_{it})\\, Y\_{it}(0).$$
 
 In words: if California in 1995 was treated, we observe $Y\_{1995}(1)$ — *not* the counterfactual $Y\_{1995}(0)$, which is what California's smoking *would have been* in 1995 had Proposition 99 never passed. That counterfactual is the missing data.
 
@@ -879,7 +878,7 @@ $$w^\* \\, = \\, \arg\min\_{w \in \mathcal{W}} \\, \big(X\_1 - X\_0 w\big)^\top 
 
 subject to the convexity constraints
 
-$$\mathcal{W} = \big\\{w \in \mathbb{R}^J \\,:\\, w\_j \ge 0 \\;\\; \forall j, \\;\\; \textstyle\sum\_{j=1}^J w\_j = 1\big\\}.$$
+$$\mathcal{W} = \big\\{w \in \mathbb{R}^J \\,:\\, w\_j \ge 0 \\,\\, \forall j, \\,\\, \textstyle\sum\_{j=1}^J w\_j = 1\big\\}.$$
 
 The diagonal matrix $V$ holds the *predictor* weights (the V matrix in §10.2) — they let the optimiser care more about pre-period lagged outcomes than about, say, beer consumption. Once $w^\*$ is solved, the synthetic California outcome at any time $t$ is a fixed convex combination of the donor outcomes:
 
