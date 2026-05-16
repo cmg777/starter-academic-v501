@@ -747,7 +747,7 @@ ax.set_xticklabels(x_lbl)
 ax.axhline(0, color=LIGHT_TEXT, lw=0.6)
 ax.set_ylabel("Coefficient (log gasoline consumption per SEK / litre)")
 ax.set_title("Price and tax semi-elasticities — OLS4 vs IV")
-ax.legend(loc="lower right")
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.18), ncol=4)
 savefig("iv_vs_ols_coefs")
 
 
