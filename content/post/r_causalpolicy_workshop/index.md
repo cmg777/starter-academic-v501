@@ -89,7 +89,7 @@ Each method section follows the same four-part rhythm:
 3. **The output.** The numbers printed by the model.
 4. **What it means.** A plain-language interpretation that ties back to the case-study question.
 
-If you are short on time, **read the bold one-liners** in each method section for a fast tour. Read the full prose when you need the details. The Cross-method comparison (§11) and Discussion (§12) put all seven estimates side-by-side and explain the pattern.
+If you are short on time, **read the bold one-liners** in each method section for a fast tour. Read the full prose when you need the details. The Cross-method comparison (§12) and Discussion (§13) put all seven estimates side-by-side and explain the pattern.
 
 ### The shared logic of every method
 
@@ -125,16 +125,16 @@ The six methods are not interchangeable. Each one is appropriate for a different
 flowchart TB
     Q1{"Do you have a credible<br/>donor pool of untreated units?<br/>(roughly 10+ similar units<br/>followed over the same window)"}
     Q1 -->|Yes| Q2{"Do you want frequentist<br/>placebo inference,<br/>or Bayesian credible<br/>intervals?"}
-    Q1 -->|No, only one good control| DiD["Difference-in-Differences<br/>(this tutorial: §5)<br/><br/>Cost: parallel-trends assumption<br/>on a single comparison unit"]
+    Q1 -->|No, only one good control| DiD["Difference-in-Differences<br/>(this tutorial: §6)<br/><br/>Cost: parallel-trends assumption<br/>on a single comparison unit"]
     Q1 -->|No, only the treated unit| Q3{"Is the policy date the<br/>only structural break<br/>in the series?"}
 
-    Q2 -->|Frequentist + tidy code| SCM["Synthetic Control<br/>(this tutorial: §9)<br/><br/>Cost: convex-combination<br/>of donors must match the<br/>treated pre-period"]
-    Q2 -->|Bayesian + uncertainty bands| CI["CausalImpact<br/>(this tutorial: §10)<br/><br/>Cost: state-space prior;<br/>covariate-set choice<br/>affects the estimate"]
+    Q2 -->|Frequentist + tidy code| SCM["Synthetic Control<br/>(this tutorial: §10)<br/><br/>Cost: convex-combination<br/>of donors must match the<br/>treated pre-period"]
+    Q2 -->|Bayesian + uncertainty bands| CI["CausalImpact<br/>(this tutorial: §11)<br/><br/>Cost: state-space prior;<br/>covariate-set choice<br/>affects the estimate"]
 
-    Q3 -->|Yes, sharp jump at threshold| RDD["Regression Discontinuity on time<br/>(this tutorial: §8)<br/><br/>Cost: assumes no other shock<br/>coincides with the threshold"]
-    Q3 -->|No, model the smooth pre-trend| ITS["Interrupted Time Series<br/>(this tutorial: §6 and §7)<br/><br/>Cost: pre-trend extrapolation<br/>must be specified correctly"]
+    Q3 -->|Yes, sharp jump at threshold| RDD["Regression Discontinuity on time<br/>(this tutorial: §9)<br/><br/>Cost: assumes no other shock<br/>coincides with the threshold"]
+    Q3 -->|No, model the smooth pre-trend| ITS["Interrupted Time Series<br/>(this tutorial: §7 and §8)<br/><br/>Cost: pre-trend extrapolation<br/>must be specified correctly"]
 
-    NAIVE["Naive pre-post<br/>(this tutorial: §4)<br/><br/>Use only as a baseline.<br/>Never as a causal estimate."] -.->|"baseline for everyone"| Q1
+    NAIVE["Naive pre-post<br/>(this tutorial: §5)<br/><br/>Use only as a baseline.<br/>Never as a causal estimate."] -.->|"baseline for everyone"| Q1
 
     style Q1 fill:#1f2b5e,stroke:#141413,color:#fff
     style Q2 fill:#1f2b5e,stroke:#141413,color:#fff
@@ -343,14 +343,101 @@ A Kalman filter for stock prices that decomposes the daily close into a slow tre
 </details>
 </div>
 
-## 2. Setup and packages
+## 2. The potential outcomes framework: causal inference as a missing-data problem
+
+Before diving into estimators, we need a vocabulary for what they are estimating. The cleanest one is the **potential outcomes framework**, due to Neyman (1923) and Rubin (1974). Its central insight is that *causal inference is a missing-data problem*. The data we wish we had is rarely the data we observe.
+
+### 2.1 Two outcomes per unit, one observed
+
+For each unit $i$ at time $t$, imagine two *potential* outcomes:
+
+$$Y\_{it}(1) = \text{cigarette sales in state } i \text{ at year } t \text{ \textit{with} Proposition 99}.$$
+
+$$Y\_{it}(0) = \text{cigarette sales in state } i \text{ at year } t \text{ \textit{without} Proposition 99}.$$
+
+Let $D\_{it} \in \\{0, 1\\}$ be the treatment indicator. Here $D\_{it} = 1$ for California from 1989 onward, and $D\_{it} = 0$ everywhere else (every other state, plus California up to and including 1988). The outcome we *observe* is one of the two potential outcomes, never both:
+
+$$Y\_{it} = D\_{it}\\, Y\_{it}(1) + (1 - D\_{it})\\, Y\_{it}(0).$$
+
+In words: if California in 1995 was treated, we observe $Y\_{1995}(1)$ — *not* the counterfactual $Y\_{1995}(0)$, which is what California's smoking *would have been* in 1995 had Proposition 99 never passed. That counterfactual is the missing data.
+
+### 2.2 The fundamental problem of causal inference
+
+Make the missing data concrete. The table below shows what is observed (✓), what is undefined because the state was never treated (—), and what is missing-and-must-be-imputed (**?**) for a handful of rows.
+
+| State | Year | $D\_{it}$ | $Y\_{it}(0)$ | $Y\_{it}(1)$ | Observed |
+|---|---:|---:|---:|---:|---:|
+| California | 1988 | 0 | 90.1 ✓ | ? | 90.1 |
+| California | 1989 | 1 | **?** | 82.4 ✓ | 82.4 |
+| California | 1995 | 1 | **?** | 64.4 ✓ | 64.4 |
+| California | 2000 | 1 | **?** | 41.6 ✓ | 41.6 |
+| Nevada | 1988 | 0 | 134.4 ✓ | — | 134.4 |
+| Nevada | 1995 | 0 | 113.0 ✓ | — | 113.0 |
+| Utah | 1988 | 0 | 64.7 ✓ | — | 64.7 |
+| Utah | 1995 | 0 | 55.0 ✓ | — | 55.0 |
+
+This is what Holland (1986) called the **fundamental problem of causal inference**: for any treated unit at any time, we observe at most one of the two potential outcomes, and the other one is missing. For California after 1989 the missing column is $Y\_{it}(0)$ — every "**?**" in the third column of the table. *Every method in this tutorial is a way to fill in those question marks.*
+
+### 2.3 Three estimands: ITE, ATE, ATT
+
+With both potential outcomes defined, the natural causal contrasts follow.
+
+**Individual treatment effect (ITE)** for unit $i$ at time $t$:
+
+$$\tau\_{it} = Y\_{it}(1) - Y\_{it}(0).$$
+
+In words: how much $i$'s outcome at $t$ would shift *because of* the policy. The ITE is the gold standard, but it is *never* directly observable for any single $(i, t)$. We only ever see one of the two potential outcomes.
+
+**Average treatment effect (ATE)** over a population:
+
+$$\text{ATE} = \mathbb{E}\big[Y\_{it}(1) - Y\_{it}(0)\big].$$
+
+In words: how much smoking *would have changed in the average state-year* if all states had been treated. The ATE is identified by a randomised experiment — but Proposition 99 was not randomised, and most states would never adopt it. The ATE is *not* what we are after here.
+
+**Average treatment effect on the treated (ATT)**, restricted to units that actually received the treatment:
+
+$$\text{ATT} = \mathbb{E}\big[Y\_{it}(1) - Y\_{it}(0) \\,\big|\\, D\_{it} = 1\big].$$
+
+In words: how much smoking changed *in California, in the post-1989 years* because of Proposition 99. This is what every causal method in this tutorial targets. It is the right question to ask when only one unit is treated and the policy is essentially a one-shot event.
+
+For Proposition 99, the ATT averaged over 1989--2000 expands to:
+
+$$\text{ATT}\_{\text{CA, post}} = \frac{1}{T\_{\text{post}}} \sum\_{t > t^\*} \Big[Y\_{1t}(1) - Y\_{1t}(0)\Big],$$
+
+where unit $i = 1$ denotes California, $t^* = 1988$ is the last pre-period year, and $T\_{\text{post}} = 12$ is the number of post-period years (1989--2000). The first term inside the brackets — $Y\_{1t}(1)$ — is *observed*. The second term — $Y\_{1t}(0)$ — is *missing*. The whole tutorial is a tour of methods that estimate the missing term using different data sources.
+
+### 2.4 Each method is a way to impute the missing $Y(0)$
+
+The shared logic Mermaid diagram in §1 already showed this graphically. Here is the same idea in equation form, one row per method.
+
+| Method | Estimator of the missing $Y\_{1t}(0)$ |
+|---|---|
+| Naive pre-post | $\widehat{Y\_{1t}(0)} = \overline{Y}\_{1, \text{pre}}$ — California's own pre-period mean. |
+| Difference-in-Differences | $\widehat{Y\_{1t}(0)} = \overline{Y}\_{1, \text{pre}} + \big(\overline{Y}\_{0, \text{post}} - \overline{Y}\_{0, \text{pre}}\big)$ — add Nevada's pre-to-post change. |
+| Interrupted Time Series (growth) | $\widehat{Y\_{1t}(0)} = \hat\alpha + \hat\beta\\, t$ — extrapolate California's own pre-period linear fit. |
+| Interrupted Time Series (ARIMA) | $\widehat{Y\_{1t}(0)} = $ forecast from an ARIMA model fitted on 1970--1988. |
+| Regression Discontinuity on time | $\widehat{Y\_{1t}(0)} = \hat\alpha + \hat\beta\\, (t - t^\*)$ — extrapolate California's pre-period piecewise fit. |
+| Synthetic Control | $\widehat{Y\_{1t}(0)} = \sum\_{i \in \text{donors}} w\_i^\* Y\_{it}$ — weighted blend of donor states. |
+| CausalImpact | $\widehat{Y\_{1t}(0)} = \mu\_t + \beta^\top x\_t$ — Bayesian structural time-series fit on donor data. |
+
+Read this table as the syllabus for the rest of the tutorial. Each subsequent section takes one row and shows the R code that builds the corresponding $\widehat{Y\_{1t}(0)}$, then subtracts it from the observed California series to recover the ATT.
+
+The two big design choices that distinguish good causal methods from bad ones are visible right here: **(a)** *what data does the method use to build $\widehat{Y\_{1t}(0)}$* (California's own past, one neighbouring state, a weighted blend of many states, or a Bayesian model on the whole donor pool), and **(b)** *what identifying assumption does that data source require* (no national trend, parallel trends with the neighbour, correctly-specified pre-trend, or convexity-of-donor-combinations). The cross-method comparison at the end of the tutorial is fundamentally a comparison of how robust each $\widehat{Y\_{1t}(0)}$ construction is to that source's identifying assumption being violated.
+
+## 3. Setup and packages
 
 We use `pacman::p_load()` to install (if needed) and load every package in a single line. The script is fully reproducible: a global `set.seed(42)` fixes the random-forest imputation and the CausalImpact MCMC sampler.
 
 ```r
+# pacman is a tiny meta-package that auto-installs missing CRAN packages.
+# Bootstrap it first so the rest of the script can run on a fresh machine.
 if (!require("pacman", quietly = TRUE)) {
   install.packages("pacman", repos = "https://cloud.r-project.org")
 }
+
+# p_load() installs (if missing) and attaches all six families of packages
+# we will need throughout the tutorial -- one line instead of one library()
+# call per package.
 pacman::p_load(
   tidyverse,    # data manipulation + ggplot2
   sandwich,     # HAC variance estimator
@@ -362,21 +449,30 @@ pacman::p_load(
   broom,        # tidy model output
   glue          # string interpolation
 )
+
+# Fix the global random seed so every run reproduces the same MICE
+# imputation and the same CausalImpact MCMC sample.
 set.seed(42)
 ```
 
 The dark-navy ggplot theme used in every figure of this post is defined in `analysis.R` as a helper called `theme_site()`. It sets the plot background to `#0f1729`, the panel grid to `#1f2b5e`, and the text to `#e8ecf2`, matching the site's other dark-themed posts.
 
-## 3. Data: download and inspect
+## 4. Data: download and inspect
 
-Like the workshop, we download a pre-prepared `proposition99.rds` file directly from `causalpolicy.nl`. The script caches the download so it only fetches once.
+We download a pre-prepared `proposition99.rds` straight from this project's GitHub repository so the script is self-contained on a fresh machine. The script caches the file locally so it only fetches once.
 
 ```r
-DATA_URL  <- "https://causalpolicy.nl/data/proposition99.rds"
+# Pull the prepared dataset from this project's GitHub raw URL.
+# The script caches it locally so re-runs do not re-download.
+DATA_URL  <- "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_causalpolicy_workshop/proposition99.rds"
 CACHE_RDS <- "proposition99.rds"
+
 if (!file.exists(CACHE_RDS)) {
+  # First run: pull the file from GitHub and write to disk
   download.file(DATA_URL, destfile = CACHE_RDS, mode = "wb")
 }
+
+# Load the RDS file and coerce to a tibble for nicer printing downstream
 prop99 <- read_rds(CACHE_RDS) |> as_tibble()
 ```
 
@@ -396,18 +492,20 @@ States: 39  Years: 1970 - 2000
 6 Oklahoma      1970   108.        NA    NA     0.175     38.4
 ```
 
-The panel is 39 states $\times$ 31 years for 1,209 observations in total. The treated unit is California, the intervention year is January 1989 (so the last full pre-period year is 1988), and the outcome is `cigsale` --- per-capita cigarette pack sales. Of the four covariates, `cigsale` and `retprice` (the retail price) are fully observed, while `lnincome` is missing 195 rows (16.1%), `age15to24` is missing 390 (32.3%), and `beer` is missing 663 (54.8%). The covariate gaps matter for CausalImpact (§10), where we will fill them with random-forest imputation; the other five methods either ignore covariates entirely or do not need them.
+The panel is 39 states $\times$ 31 years for 1,209 observations in total. The treated unit is California, the intervention year is January 1989 (so the last full pre-period year is 1988), and the outcome is `cigsale` --- per-capita cigarette pack sales. Of the four covariates, `cigsale` and `retprice` (the retail price) are fully observed, while `lnincome` is missing 195 rows (16.1%), `age15to24` is missing 390 (32.3%), and `beer` is missing 663 (54.8%). The covariate gaps matter for CausalImpact (§11), where we will fill them with random-forest imputation; the other five methods either ignore covariates entirely or do not need them.
 
 A quick descriptive comparison of California's pre vs post means confirms the puzzle that motivates the rest of the tutorial.
 
 ```r
+# Subset to California and add a Pre/Post factor based on the policy date.
 prop99_cali <- prop99 |>
   filter(state == "California") |>
   mutate(prepost = factor(year > 1988, labels = c("Pre", "Post")))
 
+# Group-level descriptives: count, mean, and SD of cigsale per period.
 prop99_cali |>
   group_by(prepost) |>
-  summarize(n = n(),
+  summarize(n            = n(),
             mean_cigsale = mean(cigsale),
             sd_cigsale   = sd(cigsale),
             .groups = "drop")
@@ -427,9 +525,13 @@ California's average per-capita cigarette sales fell from 116.0 packs (1970--198
 Before doing any modelling, it helps to see all 39 series at once.
 
 ```r
+# Flag each row as either the treated unit or one of the 38 donor states.
 eda_data <- prop99 |>
   mutate(unit_type = if_else(state == "California",
                              "California (treated)", "Donor state"))
+
+# One line per state-year, with California highlighted in warm orange and
+# a dashed vertical line at the 1989 policy threshold.
 ggplot(eda_data, aes(x = year, y = cigsale, group = state,
                      color = unit_type,
                      linewidth = unit_type, alpha = unit_type)) +
@@ -444,17 +546,30 @@ ggplot(eda_data, aes(x = year, y = cigsale, group = state,
 
 California (orange) sits inside the donor cloud throughout the 1970s and 1980s, then visibly separates downward after the dashed Proposition 99 line. The pre-1988 trajectory is already slightly below the donor median, but it is not anomalous; the sharp post-1988 separation is. Visually, this is the signal every causal estimator is trying to quantify.
 
-## 4. Method 1 --- Naive pre-post comparison
+## 5. Method 1 --- Naive pre-post comparison
 
 **The idea.** Compare California's mean cigarette sales before 1989 with its mean after 1989. Call the difference the "effect".
 
-**Why we still bother showing it.** The implicit counterfactual is "California's pre-period level continues unchanged". That is almost certainly wrong, because smoking was declining nationwide. But the estimate is so cheap to compute that it makes a useful baseline. The five later methods will each try to fix what is broken here.
+**R tooling.** Base R `lm()` for the OLS; [`sandwich::vcovHAC()`](https://cran.r-project.org/package=sandwich) for the heteroskedasticity-and-autocorrelation-consistent variance estimator; [`lmtest::coeftest()`](https://cran.r-project.org/package=lmtest) to retest the coefficients with that variance matrix.
+
+**The equation.**
+
+$$\hat\tau\_{\text{naive}} = \overline{Y}\_{1, \text{post}} - \overline{Y}\_{1, \text{pre}}.$$
+
+In words: the naive estimate is the difference between California's observed post-period mean and California's observed pre-period mean. Mapping to the potential-outcomes framework from §2, this corresponds to imputing $\widehat{Y\_{1t}(0)} = \overline{Y}\_{1, \text{pre}}$ — i.e., assuming California's counterfactual smoking would have been frozen at the pre-period average.
+
+**Why this is wrong but still useful.** The implicit counterfactual "California's pre-period level continues unchanged" is almost certainly wrong, because smoking was declining nationwide. But the estimate is so cheap to compute that it makes a useful baseline. The five later methods will each try to fix what is broken here.
 
 We follow the workshop's narrow 1984--1993 window for direct comparability with the rest of the workshop. Using a longer window (e.g., 1970--2000) would change the numbers but not the qualitative point.
 
 ```r
+# OLS of California's cigsale on a Pre/Post dummy, restricted to the
+# workshop's 1984-1993 window.
 fit_prepost <- lm(cigsale ~ prepost,
                   data = prop99_cali |> filter(year > 1983, year < 1994))
+
+# Replace the default OLS standard errors with HAC (heteroskedasticity-
+# and-autocorrelation-consistent) errors, which short time series need.
 coeftest(fit_prepost, vcov. = vcovHAC)
 ```
 
@@ -474,9 +589,11 @@ prepostPost -27.0200     5.2951 -5.1029 0.0009266 ***
 
 **Recap.** Naive pre-post says $-27.0$ packs, but it has no counterfactual at all — only California's own past. Hold that number in mind; it will set the upper bound for what every other method estimates.
 
-## 5. Method 2 --- Difference-in-Differences (California vs Nevada)
+## 6. Method 2 --- Difference-in-Differences (California vs Nevada)
 
 **The idea.** Pick one control state (Nevada). Compute its pre-to-post change. Subtract that from California's pre-to-post change. Whatever is left over is "what the policy did".
+
+**R tooling.** Base R `lm()` with a `state * prepost` interaction; [`sandwich`](https://cran.r-project.org/package=sandwich) + [`lmtest`](https://cran.r-project.org/package=lmtest) for HAC-robust standard errors. For modern multi-period Difference-in-Differences with staggered adoption see the [`did`](https://cran.r-project.org/package=did) and [`fixest`](https://cran.r-project.org/package=fixest) packages, covered in the companion [r_did tutorial](/post/r_did/).
 
 **The identifying assumption.** California and Nevada would have moved on *parallel paths* without the policy. Differences in levels are fine; differences in trends are not. The estimand becomes a proper **Average Treatment effect on the Treated** (ATT) for California.
 
@@ -511,13 +628,20 @@ flowchart TB
 The arithmetic is literally what the regression below computes. In `cigsale ~ state * prepost`, the interaction coefficient `stateCalifornia:prepostPost` *is* the DiD estimate.
 
 ```r
+# Keep only California and Nevada in the 1984-1993 window and add the
+# Pre/Post factor. Make Nevada the reference level so that the
+# stateCalifornia interaction lands on California's extra change.
 prop99_did <- prop99 |>
   filter(state %in% c("California", "Nevada"),
          year > 1983, year < 1994) |>
   mutate(prepost = factor(year > 1988, labels = c("Pre", "Post")),
          state   = factor(state, levels = c("Nevada", "California")))
 
+# Two-way interacted regression: state main effect + Pre/Post main effect
+# + (state x Pre/Post) interaction. The interaction is the DiD estimate.
 fit_did <- lm(cigsale ~ state * prepost, data = prop99_did)
+
+# HAC-robust standard errors for the four coefficients.
 coeftest(fit_did, vcov. = vcovHAC)
 ```
 
@@ -541,17 +665,34 @@ This is the textbook DiD pitfall. A single control unit that itself is shifting 
 
 **Common pitfall.** Picking the *one* "most similar" control by hand. If your single control is subject to the same secular forces as the treated unit — geographic neighbours, policy spillovers, regional macro shocks — the contrast collapses and DiD silently reports zero.
 
-**Recap.** DiD vs Nevada says $-5.7$ packs and we cannot reject zero. The lesson is *not* that DiD is broken — it is that DiD with a single similar control unit is fragile. Synthetic Control in §9 is the principled response: instead of one control state, blend many states into a weighted "synthetic California".
+**Recap.** DiD vs Nevada says $-5.7$ packs and we cannot reject zero. The lesson is *not* that DiD is broken — it is that DiD with a single similar control unit is fragile. Synthetic Control in §10 is the principled response: instead of one control state, blend many states into a weighted "synthetic California".
 
-## 6. Method 3a --- Interrupted Time Series via pre-period growth curve
+## 7. Method 3a --- Interrupted Time Series via pre-period growth curve
 
 **The idea.** Stop borrowing from a comparison unit. Instead, build the counterfactual from California's *own* pre-period dynamics. Fit a model on 1970--1988, extrapolate it into 1989--2000, and call the gap between the extrapolation and the observed data the effect.
 
+**R tooling.** Base R `lm()` for the pre-period linear fit; `predict()` for the post-period extrapolation. No specialised package needed for the simplest growth-curve variant. The [`tsibble`](https://cran.r-project.org/package=tsibble) class (loaded via [`fpp3`](https://fpp3.otexts.com/)) provides a tidy panel index that the next ITS variant relies on.
+
+**The equation.** Fit a linear trend on the pre-period only:
+
+$$Y\_{1t} = \alpha + \beta\\, t + \varepsilon\_t, \qquad t \le t^\* = 1988.$$
+
+Then *extrapolate* the fitted line into the post-period as the counterfactual:
+
+$$\widehat{Y\_{1t}(0)} = \hat\alpha + \hat\beta\\, t, \qquad t > t^\*.$$
+
+Finally, average the gap between observed and counterfactual over the post-period:
+
+$$\widehat{\text{ATT}}\_{\text{ITS-growth}} = \frac{1}{T\_{\text{post}}} \sum\_{t > t^\*} \Big[Y\_{1t} - (\hat\alpha + \hat\beta\\, t)\Big].$$
+
+In words: a single straight line, fit on 1970--1988 cigarette sales in California, becomes the counterfactual for 1989--2000. The policy effect is the *average* of the per-year residuals between what was actually observed and what the extrapolated line predicted. The slope $\hat\beta$ captures whatever secular trend California was already on; only deviations *from* that trend after 1989 are attributed to Proposition 99.
+
 **Why it differs from naive pre-post.** Naive pre-post assumes "no change". ITS allows a non-zero pre-trend. If California was already declining, the ITS counterfactual continues that decline; only the *extra* drop after 1989 gets attributed to the policy.
 
-The simplest ITS model is a linear time trend.
-
 ```r
+# California-only time series with a Pre/Post factor and a centred year
+# index (year0 = 0 at the first post-period year). The tsibble class is
+# required by the fpp3 forecasting tools used later.
 prop99_ts <- prop99 |>
   filter(state == "California") |>
   select(year, cigsale) |>
@@ -559,7 +700,10 @@ prop99_ts <- prop99 |>
   as_tsibble(index = year) |>
   mutate(year0 = year - 1989)
 
+# Fit a linear pre-period trend (cigsale on year, 1970-1988 only).
 fit_growth <- lm(cigsale ~ year, data = prop99_ts |> filter(prepost == "Pre"))
+
+# Print the intercept and slope with their standard errors.
 summary(fit_growth)$coefficients
 ```
 
@@ -572,8 +716,11 @@ year          -1.7795     0.2594 -6.860  2.767e-06 ***
 The pre-period (1970--1988) linear trend is $-1.78$ packs/year ($p < 10^{-5}$, $R^2 = 0.735$) --- so smoking was already declining about 1.8 packs per capita per year in California well before Proposition 99. To estimate the policy effect we extrapolate that line forward to 2000 and average the gap between observed and predicted:
 
 ```r
+# Subset to the 1989-2000 rows and extrapolate the fitted line forward.
 post_df <- prop99_ts |> filter(prepost == "Post")
 pred_growth <- predict(fit_growth, newdata = as_tibble(post_df))
+
+# ATT estimate = average per-year gap between observed and extrapolation.
 its_growth_estimate <- mean(post_df$cigsale - pred_growth)
 its_growth_estimate
 ```
@@ -590,16 +737,34 @@ The coincidence is suggestive but not reassuring. Both methods can be biased the
 
 **Recap.** ITS-growth says $-28.3$ packs. Adding a linear pre-trend changed almost nothing relative to the naive baseline, because the trend was modest. The next ITS variant uses a more flexible time-series model — and we will see why "more flexible" can backfire.
 
-## 7. Method 3b --- Interrupted Time Series via auto-selected ARIMA forecast
+## 8. Method 3b --- Interrupted Time Series via auto-selected ARIMA forecast
 
 **The idea.** Replace the straight line with a flexible time-series model. Let the data decide the model's complexity through an information criterion (AICc). Forecast forward as the counterfactual.
+
+**R tooling.** The [`fpp3`](https://fpp3.otexts.com/) meta-package (Hyndman & Athanasopoulos 2021) loads [`fable::ARIMA()`](https://fable.tidyverts.org/reference/ARIMA.html) for the model fit, `forecast()` for the post-period projection, and `report()` for the diagnostic printout. Companion textbook *Forecasting: Principles and Practice* is the canonical reference.
+
+**The equation.** A general ARIMA$(p, d, q)$ model writes the $d$-th differenced series as an autoregressive-moving-average process. Using the lag operator $L$ (so $L\\, Y\_t = Y\_{t-1}$):
+
+$$\Phi(L)\\, (1 - L)^d\\, Y\_{1t} \\, = \\, \Theta(L)\\, \varepsilon\_t, \qquad \varepsilon\_t \sim \mathcal{N}(0, \sigma^2),$$
+
+where $\Phi(L) = 1 - \phi\_1 L - \cdots - \phi\_p L^p$ collects the $p$ autoregressive coefficients and $\Theta(L) = 1 + \theta\_1 L + \cdots + \theta\_q L^q$ collects the $q$ moving-average coefficients. The `fpp3::ARIMA(..., ic = "aicc")` call searches over $(p, d, q)$ and picks the combination that minimises the corrected Akaike Information Criterion on the pre-period. For California's 1970--1988 series, AICc picks $(p, d, q) = (1, 2, 0)$: one autoregressive lag and *two* rounds of differencing (which is what bends the counterfactual so aggressively in the figure below).
+
+Once the model is fit, the post-period counterfactual is the model's $h$-step forecast and the ATT is the average gap, just as in §7:
+
+$$\widehat{Y\_{1t}(0)} = \hat Y\_{1t \mid t^\*}, \qquad \widehat{\text{ATT}}\_{\text{ITS-ARIMA}} = \frac{1}{T\_{\text{post}}} \sum\_{t > t^\*} \Big[Y\_{1t} - \hat Y\_{1t \mid t^\*}\Big].$$
+
+In words: same recipe as the growth-curve version — fit on pre-period, project forward, average the gap — but the "fit on pre-period" step now uses an autoregressive-integrated-moving-average model instead of a straight line. The values $p$, $d$, $q$ control how flexible the model is allowed to be.
 
 **What ARIMA(p, d, q) means in plain English.** `p` is the number of past values the model uses (autoregression). `d` is the number of times the series is differenced before fitting (to handle trends). `q` is the number of past forecast errors used (moving average). Lower AICc = "better fit traded off against complexity".
 
 ```r
+# Fit an ARIMA model on the 1970-1988 California series. ic = "aicc"
+# tells fable to search over (p, d, q) and pick the AICc minimiser.
 fit_arima <- prop99_ts |>
   filter(prepost == "Pre") |>
   model(timeseries = ARIMA(cigsale, ic = "aicc"))
+
+# Print the chosen orders, coefficients, and information criteria.
 report(fit_arima)
 ```
 
@@ -617,7 +782,10 @@ AIC = 78.9   AICc = 79.76   BIC = 80.57
 `ARIMA(1, 2, 0)` was selected: one autoregressive lag and *two* rounds of differencing. The double-differencing means the model is tracking the *acceleration* of California's late-1980s drop, not just its level or slope. We then forecast 12 years out and average the gap.
 
 ```r
+# Project the fitted ARIMA 12 years forward as the post-period counterfactual.
 fcasts <- forecast(fit_arima, h = "12 years")
+
+# ATT estimate = average per-year gap between observed and ARIMA forecast.
 ce_arima <- post_df$cigsale - fcasts$.mean
 mean(ce_arima)
 ```
@@ -638,15 +806,36 @@ The dashed blue line is the ARIMA counterfactual. It sits *below* the observed o
 
 **Recap.** ITS-ARIMA says $+4.55$ packs and is the headline-grabbing outlier. The lesson is not "ARIMA is bad" — it is that **single-model ITS is fragile**. Always pair an ITS estimate against a comparison-unit method (Synthetic Control, CausalImpact, or a credibly-matched DiD) before drawing conclusions.
 
-## 8. Method 4 --- Regression Discontinuity on time (segmented regression)
+## 9. Method 4 --- Regression Discontinuity on time (segmented regression)
 
 **The idea.** Use *calendar time* as the running variable. Fit a piecewise linear regression that allows two breaks at 1989: a level jump and a slope change. The level jump is the immediate "policy shock"; the slope change is how the trajectory bends afterwards.
+
+**R tooling.** Base R `lm()` with a piecewise specification; [`sandwich`](https://cran.r-project.org/package=sandwich) + [`lmtest`](https://cran.r-project.org/package=lmtest) for HAC-robust standard errors. For classical sharp RDD on a continuous running variable (e.g. test scores, income), use [`rdrobust`](https://cran.r-project.org/package=rdrobust) (Calonico, Cattaneo & Titiunik) instead.
+
+**The equation.** Re-centre time at the threshold by defining $\tilde t = t - t^\* - 1$ (so $\tilde t = 0$ for the first post-period year). Then fit the segmented regression
+
+$$Y\_{1t} = \beta\_0 + \beta\_1\\, \tilde t + \beta\_2\\, \mathbf{1}[\tilde t \ge 0] + \beta\_3\\, \tilde t \cdot \mathbf{1}[\tilde t \ge 0] + \varepsilon\_t.$$
+
+Each coefficient has a precise causal reading.
+
+- $\beta\_0$ is the pre-period intercept at $\tilde t = 0$ (California's fitted level just before the threshold).
+- $\beta\_1$ is the *pre-period* slope.
+- $\beta\_2$ is the **level break** at the threshold — the immediate jump in cigarette sales at $\tilde t = 0$. This is the headline RDD effect.
+- $\beta\_3$ is the **change in slope** after the threshold (the post-period slope is $\beta\_1 + \beta\_3$).
+
+The piecewise counterfactual continues the pre-period line ($\beta\_0 + \beta\_1\\, \tilde t$) into the post-period, so the total deviation of observed from counterfactual at time $\tilde t > 0$ is $\beta\_2 + \beta\_3\\, \tilde t$. In other words, the policy shifts the series *down* by $\beta\_2$ packs immediately, then the gap widens (or narrows) at rate $\beta\_3$ per year.
+
+In words: the calendar year is recentred so that the threshold sits at zero, then we fit two straight lines — one for $\tilde t < 0$, one for $\tilde t \ge 0$ — that are allowed to differ in both intercept and slope. The intercept gap $\beta\_2$ is the "discontinuity" you can see at the dashed orange line in Figure 4.
 
 **A naming heads-up.** The workshop labels this specification "RDD". It is RDD with time as the running variable, not the classical sharp RDD you would use for a means-tested benefit at an income cutoff. With time as the running variable, the math reduces to *segmented regression*.
 
 ```r
+# Piecewise OLS: pre-period slope, level break at threshold, slope change
+# after threshold. year0 = year - 1989 (already constructed earlier).
 fit_rdd <- lm(cigsale ~ year0 + prepost + year0:prepost,
               data = as_tibble(prop99_ts))
+
+# HAC-robust standard errors for the four coefficients.
 coeftest(fit_rdd, vcov. = vcovHAC)
 ```
 
@@ -678,11 +867,31 @@ The blue pre-1988 line and the orange post-1989 line both fit California's point
 
 **Recap.** Regression Discontinuity on time reports a $-20.1$ pack level break with a tight standard error. It is the first of three methods to land in the credible $-13$ to $-20$ "consensus" range, alongside Synthetic Control and CausalImpact.
 
-## 9. Method 5 --- Synthetic Control
+## 10. Method 5 --- Synthetic Control
 
 **The idea.** Stop using one control state. Instead, build a *weighted combination* of donor states that matches California's pre-period as closely as possible on a set of predictors. The weighted combination is "synthetic California". The gap between observed California and synthetic California is the estimated effect.
 
-**Why it works where DiD failed.** DiD against Nevada needed parallel pre-trends with one neighbour. Synthetic Control needs parallel pre-trends with a *data-driven blend* of many neighbours. The optimisation does the matching, so the analyst no longer has to pick "the right" control state by hand.
+**R tooling.** [`tidysynth`](https://cran.r-project.org/package=tidysynth) by Eric Dunford ([GitHub](https://github.com/edunford/tidysynth)) wraps the original Abadie--Diamond--Hainmueller optimisation in a tidyverse-friendly pipeline. The older [`Synth`](https://cran.r-project.org/package=Synth) package by Hainmueller is the historical reference. For Bayesian and spatial extensions see the [r_sc_bayes_spatial tutorial](/post/r_sc_bayes_spatial/).
+
+**The equation.** Let $X\_1 \in \mathbb{R}^k$ be the $k$ pre-period predictors for the treated unit (California), and $X\_0 \in \mathbb{R}^{k \times J}$ be the matching matrix for the $J = 38$ donor states. The Synthetic Control estimator chooses donor weights $w \in \mathbb{R}^J$ to minimise the (weighted) discrepancy between treated and synthetic on the predictors:
+
+$$w^\* \\, = \\, \arg\min\_{w \in \mathcal{W}} \\, \big(X\_1 - X\_0 w\big)^\top V \big(X\_1 - X\_0 w\big),$$
+
+subject to the convexity constraints
+
+$$\mathcal{W} = \big\\{w \in \mathbb{R}^J \\,:\\, w\_j \ge 0 \\;\\; \forall j, \\;\\; \textstyle\sum\_{j=1}^J w\_j = 1\big\\}.$$
+
+The diagonal matrix $V$ holds the *predictor* weights (the V matrix in §10.2) — they let the optimiser care more about pre-period lagged outcomes than about, say, beer consumption. Once $w^\*$ is solved, the synthetic California outcome at any time $t$ is a fixed convex combination of the donor outcomes:
+
+$$\widehat{Y\_{1t}(0)} = \sum\_{j=1}^J w\_j^\* \\, Y\_{jt}.$$
+
+And the average treatment effect on the treated, post-1988, is
+
+$$\widehat{\text{ATT}}\_{\text{SCM}} = \frac{1}{T\_{\text{post}}} \sum\_{t > t^\*} \Big[Y\_{1t} - \sum\_{j=1}^J w\_j^\* \\, Y\_{jt}\Big].$$
+
+In words: the optimisation picks a recipe — "34% Utah, 24% Nevada, 18% Montana, 18% Colorado, 6% Connecticut" — that, *combined into a weighted average*, best mimics California's pre-1988 trajectory on a set of predictors. That recipe is then frozen and used to project California's no-policy counterfactual into the post-period. The non-negativity and sum-to-one constraints on $w$ are what make Synthetic Control *interpretable* — the synthetic series stays inside the convex hull of the donor outcomes, so it cannot extrapolate.
+
+**Why it works where Difference-in-Differences failed.** Difference-in-Differences against Nevada needed parallel pre-trends with one neighbour. Synthetic Control needs parallel pre-trends with a *data-driven blend* of many neighbours. The optimisation does the matching, so the analyst no longer has to pick "the right" control state by hand.
 
 **The pipeline.** The `tidysynth` package by Eric Dunford wraps the Abadie--Diamond--Hainmueller optimisation into a tidyverse-style pipeline with four explicit stages.
 
@@ -702,33 +911,43 @@ flowchart LR
 
 Stages 1--4 produce the estimate. Stage 5 is a battery of inspection helpers — `plot_trends()`, `plot_weights()`, `plot_placebos()`, `plot_mspe_ratio()`, `grab_unit_weights()`, `grab_predictor_weights()`, `grab_balance_table()`, `grab_significance()` — that turn the fitted object into figures and tables for diagnostics and inference. We use all of them below.
 
-### 9.1 Fit the synthetic-control pipeline
+### 10.1 Fit the synthetic-control pipeline
 
 ```r
 prop99_syn <- prop99 |>
+  # 1. Declare the panel structure: outcome, unit, time, treated unit
+  #    ("California"), and the last full pre-period year (1988).
+  #    generate_placebos = TRUE also fits the model treating each donor
+  #    state as treated, for the permutation test in 10.5.
   synthetic_control(
     outcome  = cigsale, unit = state, time = year,
     i_unit   = "California", i_time = 1988,
     generate_placebos = TRUE
   ) |>
+  # 2. Predictors averaged over the full pre-period (1980-1988).
   generate_predictor(
     time_window = 1980:1988,
     lnincome    = mean(lnincome, na.rm = TRUE),
     retprice    = mean(retprice, na.rm = TRUE),
     age15to24   = mean(age15to24, na.rm = TRUE)
   ) |>
+  # 2b. beer is sparser, so use a narrower window where data is densest.
   generate_predictor(time_window = 1984:1988,
                      beer = mean(beer, na.rm = TRUE)) |>
+  # 2c. Three "lagged outcomes" - cigsale at three pre-period dates.
+  #     These pin synthetic California's pre-period trajectory.
   generate_predictor(time_window = 1975, cigsale_1975 = cigsale) |>
   generate_predictor(time_window = 1980, cigsale_1980 = cigsale) |>
   generate_predictor(time_window = 1988, cigsale_1988 = cigsale) |>
+  # 3. Solve the constrained QP for donor weights w*.
   generate_weights(optimization_window = 1970:1988) |>
+  # 4. Compute the synthetic California series from w* and donor outcomes.
   generate_control()
 ```
 
 **Predictor choices.** Seven predictors are passed in. Three are pre-period covariate averages over the full pre-period (`lnincome`, `retprice`, `age15to24` over 1980--1988). One uses a narrower window where data is densest (`beer` over 1984--1988). Three are *lagged outcomes* — cigarette sales themselves at 1975, 1980, and 1988. The lagged outcomes are the most important trick: anchoring the synthetic control on the treated unit's own pre-period *outcome levels* at multiple time points forces the synthetic series to track California's pre-1988 trajectory closely.
 
-### 9.2 The donor weights and the predictor weights
+### 10.2 The donor weights and the predictor weights
 
 The optimisation produces two weight vectors that drive the entire fit. Both are extractable as tidy tables.
 
@@ -765,12 +984,17 @@ Two things to notice.
 
 2. **The two pre-1980 cigsale levels dominate the V matrix.** `cigsale_1975` and `cigsale_1980` together get 88.5% of the predictor weight. The four behavioural and demographic covariates get less than 5% combined. The optimiser has effectively decided: "the best way to predict California's cigarette sales is using *other states' cigarette sales*."
 
-### 9.3 The estimate
+### 10.3 The estimate
 
 ```r
+# grab_synthetic_control() returns a tidy tibble with observed (real_y)
+# and synthetic (synth_y) cigsale for every year. We restrict to the
+# post-period and compute the per-year gap.
 sc_post <- grab_synthetic_control(prop99_syn) |>
   filter(time_unit > 1988) |>
   mutate(dif = real_y - synth_y)
+
+# Average the per-year gap to recover the ATT.
 mean(sc_post$dif)
 ```
 
@@ -788,7 +1012,7 @@ plot_trends(prop99_syn)   # built-in helper from tidysynth
 
 The pre-period fit is excellent — the synthetic and observed series are nearly indistinguishable through 1988. A substantial gap opens immediately after 1989, widening to roughly 30 packs by 2000.
 
-### 9.4 Predictor balance: did the matching work?
+### 10.4 Predictor balance: did the matching work?
 
 `grab_balance_table()` shows California, synthetic California, and the unweighted donor average side-by-side on every predictor.
 
@@ -805,17 +1029,21 @@ cigsale_1988     90.100               91.378      114.234
 
 Read the rightmost two columns against the leftmost. On every variable, *synthetic California* (column 3) is far closer to California (column 2) than the unweighted donor average (column 4) is. The most dramatic improvement is on the lagged outcomes: `cigsale_1988` is 90.1 for California vs 91.4 for the synthetic — a near-perfect match — while the unweighted donor average is 114.2. That gap of 24 packs is exactly the bias the naive pre-post method silently absorbed.
 
-### 9.5 Inference via placebo permutation
+### 10.5 Inference via placebo permutation
 
 A "standard error" computed as cross-year SD divided by $\sqrt{N}$ is *not* a real sampling-distribution-based standard error. The proper Synthetic Control uncertainty quantification is a permutation test.
 
 **The recipe.** Refit the synthetic-control model treating *each donor state* as if *it* had been the treated unit. Compute the post-period gap for each placebo. Compare California's effect size to that placebo distribution. If California's effect is extreme relative to the placebos, the policy probably did something.
 
 ```r
+# placebo = TRUE pulls real_y and synth_y for the treated unit AND for
+# every donor refit as if treated. .placebo == 0 marks California; 1
+# marks the donor placebos.
 ce_data <- prop99_syn |>
   grab_synthetic_control(placebo = TRUE) |>
   filter(time_unit > 1988) |>
   mutate(dif = real_y - synth_y) |>
+  # Collapse to one average causal effect per (placebo) unit.
   group_by(.id, .placebo) |>
   summarize(average_causal_effect = mean(dif), .groups = "drop")
 ```
@@ -824,11 +1052,14 @@ ce_data <- prop99_syn |>
 
 The grey density is the distribution of average causal effects across all 38 placebo "treatments". California's vertical orange line sits in the *left tail*. Only a handful of placebos produced an effect as extreme as $-18.7$ in either direction.
 
-### 9.6 The Mean Squared Prediction Error ratio and a Fisher exact p-value
+### 10.6 The Mean Squared Prediction Error ratio and a Fisher exact p-value
 
 A sharper version of the same test is the **MSPE ratio** — the ratio of post-period to pre-period mean squared prediction error. If a unit has a tight pre-period fit *and* a large post-period gap, the ratio is large. California's number is striking:
 
 ```r
+# grab_significance() returns one row per unit (treated + every placebo)
+# with pre_mspe, post_mspe, the post/pre ratio, the unit's rank in that
+# ratio, and the Fisher-style p-value (rank / n_units).
 grab_significance(prop99_syn) |> arrange(desc(mspe_ratio)) |> head(5)
 ```
 
@@ -855,9 +1086,11 @@ The orange bar at the top is California; every blue bar below it is a placebo do
 
 **Recap.** Synthetic Control reports $-18.7$ packs/capita with a Fisher exact $p$-value of 0.026. The estimate rests on a five-state synthetic California built mostly from western and sunbelt states with cigarette consumption levels close to California's. The placebo and Mean Squared Prediction Error ratio diagnostics both confirm that California's post-1989 trajectory is unusual relative to what other states experienced in the same window. This is the workshop's headline causal estimate.
 
-## 10. Method 6 --- CausalImpact
+## 11. Method 6 --- CausalImpact
 
 **The idea.** Fit a **Bayesian structural time-series (BSTS)** model on the pre-period. Use *other states' cigarette sales* (and optionally covariates) as predictors. Project the fitted model forward as the counterfactual. The posterior over (observed − projected) gives a credible interval for the policy effect.
+
+**R tooling.** [`CausalImpact`](https://google.github.io/CausalImpact/) by Brodersen et al. (Google), built on top of [`bsts`](https://cran.r-project.org/package=bsts) (Bayesian Structural Time Series). Missing-covariate imputation here uses [`mice`](https://cran.r-project.org/package=mice) with random-forest backend.
 
 **The model in two pieces.** The BSTS counterfactual is
 
@@ -891,20 +1124,33 @@ The trend $\mu\_t$ absorbs the dynamics that no control series can explain; the 
 **Input format.** CausalImpact wants a *wide* dataset with the treated outcome in column 1 and every control series in the remaining columns. The covariate columns have missing values, so we fill them with random-forest multiple imputation from `mice`.
 
 ```r
+# Fill in missing covariate values with one round of random-forest
+# multiple imputation (m = 1, method = "rf"). printFlag suppresses
+# console chatter.
 prop99_imputed <- prop99 |>
   mice(m = 1, method = "rf", printFlag = FALSE) |>
   complete() |> as_tibble()
 
+# Pivot the long panel to wide format: one column per (variable, state)
+# pair. CausalImpact requires the treated outcome in column 1, hence
+# relocate(cigsale_California) and drop the year index.
 prop99_wide <- prop99_imputed |>
   pivot_wider(names_from  = state,
               values_from = c(cigsale, lnincome, beer, age15to24, retprice)) |>
   relocate(cigsale_California) |>
   select(-year)
 
-pre_idx  <- c(1, 19)   # 1970-1988
-post_idx <- c(20, 31)  # 1989-2000
+# CausalImpact takes integer row indices, not years.
+# Row 1 = 1970, row 19 = 1988 (last pre-period year).
+# Row 20 = 1989, row 31 = 2000 (last observed year).
+pre_idx  <- c(1, 19)
+post_idx <- c(20, 31)
 
+# Reset the seed so the BSTS MCMC draws are reproducible.
 set.seed(42)
+
+# Fit the Bayesian structural time-series model and print the summary
+# (average + cumulative effect with credible intervals).
 impact_full <- CausalImpact(prop99_wide, pre.period = pre_idx, post.period = post_idx)
 summary(impact_full)
 ```
@@ -941,11 +1187,16 @@ The top panel shows the pointwise picture: observed California (orange) opens a 
 
 **Recap.** CausalImpact lands at $-13$ to $-21$ packs depending on whether covariates are included, with a 92--97% posterior probability of a non-zero effect. It is the only method here that delivers a *credible* interval (a direct probability statement about the parameter), not a frequentist confidence band.
 
-## 11. Cross-method comparison
+## 12. Cross-method comparison
 
 We collect every method's point estimate, an approximate ±1.96·SE interval for visual comparison, *and* a `principled_inference` string that records each method's recommended uncertainty quantification. The two columns differ for Synthetic Control (where the right inference is a Fisher exact p-value, not a confidence interval) and for CausalImpact (where the right interval is Bayesian, not frequentist).
 
 ```r
+# Build a tidy tibble that holds, for each estimator, its name, the
+# estimand it targets, the point estimate, an approximate standard error
+# (for the back-of-envelope forest plot), and a text string describing
+# the method's PRINCIPLED uncertainty quantification (used in the table
+# that follows the forest plot).
 results_tbl <- tibble(
   method = c("Naive pre-post", "DiD (CA vs Nevada)", "ITS (growth curve)",
              "ITS (ARIMA)", "RDD on time", "Synthetic Control", "CausalImpact"),
@@ -965,6 +1216,7 @@ results_tbl <- tibble(
     "Posterior 95% CrI: [-31.9, +5.7]; P(effect != 0) = 92%"
   )
 ) |>
+  # Add the back-of-envelope 95% interval used in the forest plot.
   mutate(ci_low  = estimate - 1.96 * std_error,
          ci_high = estimate + 1.96 * std_error)
 results_tbl
@@ -998,7 +1250,7 @@ Three groupings jump off the page.
 
 **Cluster 3 — the broken outliers in opposite directions.** DiD vs Nevada ($-5.7$, $p = 0.31$) collapses to noise because Nevada was falling in parallel. ITS-ARIMA ($+4.55$) flips sign because AICc picks a model that extrapolates short-run momentum out of sample. Each illustrates a textbook failure mode worth remembering.
 
-## 12. Discussion
+## 13. Discussion
 
 The point of running six estimators on the same data is not to find "the right answer". It is to learn *where* each estimator fails and *how* to read disagreement.
 
@@ -1035,7 +1287,7 @@ If a state legislator asks "what did Proposition 99 do for California's smoking 
 
 That headline survives every causally-defensible specification (RDD, Synthetic Control, both CausalImpact variants). It can be plugged directly into a back-of-envelope mortality or tax-revenue calculation.
 
-## 13. Summary and next steps
+## 14. Summary and next steps
 
 **Method takeaway.** Five of the six causal estimators agree on a $-13$ to $-20$ pack reduction. The synthetic-control class (SCM, CausalImpact, RDD-on-time) clusters around $-18$ packs. The naive and single-unit methods either overshoot ($-27$ to $-28$) or collapse ($-5.7$, $+4.5$).
 
@@ -1047,7 +1299,7 @@ That headline survives every causally-defensible specification (RDD, Synthetic C
 
 **Next steps.** For a deeper modern DiD treatment with staggered adoption, group-time ATTs, and HonestDiD sensitivity analysis, see [Difference-in-Differences for Policy Evaluation: A Tutorial using R](/post/r_did/). For a Bayesian extension that lets the donor weights vary across space — also fit on this same Proposition 99 dataset — see [Bayesian Spatial Synthetic Control: California's Proposition 99 in R](/post/r_sc_bayes_spatial/). For the original workshop with PDF lecture slides, see [causalpolicy.nl](https://causalpolicy.nl/).
 
-## 14. Exercises
+## 15. Exercises
 
 1. **Sensitivity to the comparison window.** Re-run the DiD and naive pre-post estimates on the full 1970--2000 window instead of the workshop's 1984--1993 window. Do the estimates get closer to the synthetic-control consensus, or further away? Why?
 
@@ -1057,7 +1309,7 @@ That headline survives every causally-defensible specification (RDD, Synthetic C
 
 4. **Probe the V matrix.** Print `grab_predictor_weights(prop99_syn)` for the fitted model. Two predictors (`cigsale_1975` and `cigsale_1980`) together get 88.5% of the weight. Re-fit *without* the three lagged outcomes (drop the three `generate_predictor(time_window = 19xx, cigsale_19xx = cigsale)` calls). Does the synthetic California still match the pre-period as well? What does that tell you about the role of lagged outcomes in Synthetic Control?
 
-## 15. References
+## 16. References
 
 1. [Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic control methods for comparative case studies: Estimating the effect of California's Tobacco Control Program. *Journal of the American Statistical Association*, 105(490), 493--505.](https://www.aeaweb.org/articles?id=10.1257/jasa.2010.ap08746)
 

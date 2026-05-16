@@ -94,13 +94,23 @@ save_png <- function(plot, file, width = 8, height = 5) {
 # ============================================================
 cat("\n========== 1. DATA DOWNLOAD ==========\n")
 
-DATA_URL  <- "https://causalpolicy.nl/data/proposition99.rds"
+# Primary URL: this project's GitHub raw, so the script is self-contained.
+# Fallback URL: the upstream workshop site, used only if GitHub is unreachable.
+DATA_URL  <- "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_causalpolicy_workshop/proposition99.rds"
+DATA_URL_FALLBACK <- "https://causalpolicy.nl/data/proposition99.rds"
 CACHE_RDS <- "proposition99.rds"
 CACHE_CSV <- "proposition99.csv"
 
 if (!file.exists(CACHE_RDS)) {
   cat("Downloading from", DATA_URL, "\n")
-  download.file(DATA_URL, destfile = CACHE_RDS, mode = "wb")
+  ok <- tryCatch({
+    download.file(DATA_URL, destfile = CACHE_RDS, mode = "wb", quiet = TRUE)
+    TRUE
+  }, error = function(e) {
+    cat("Primary URL failed (", conditionMessage(e), "), trying fallback...\n", sep = "")
+    download.file(DATA_URL_FALLBACK, destfile = CACHE_RDS, mode = "wb", quiet = TRUE)
+    TRUE
+  })
 } else {
   cat("Using cached", CACHE_RDS, "\n")
 }
