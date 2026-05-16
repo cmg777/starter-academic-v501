@@ -3,7 +3,7 @@ authors:
   - admin
 categories:
   - R
-  - Policy Evaluation
+  - Synthetic Control
 draft: false
 featured: false
 date: "2026-05-15T00:00:00Z"
@@ -38,7 +38,7 @@ tags:
   - synthetic control
   - causalimpact
   - panel data
-title: "Six Ways to Evaluate a Policy in R: A Workshop Replication with Proposition 99"
+title: "Six Ways to Evaluate a Policy using R: Comparative Case Studies of Proposition 99"
 url_code: ""
 url_pdf: ""
 url_slides: ""
@@ -53,7 +53,7 @@ How do you measure the causal effect of a policy when you cannot randomize who g
 
 > **How much of California's drop was caused by Proposition 99, and how much would have happened anyway?**
 
-This tutorial is a faithful R replication of the one-day workshop at [causalpolicy.nl](https://causalpolicy.nl/) by the ODISSEI Social Data Science team. We run **six method families on the same dataset** and place every estimate on a single forest plot. The disagreements are then visible at a glance. ITS appears in two flavours, so the forest plot ends up with seven rows.
+This tutorial is inspired by the workshop [causalpolicy.nl](https://causalpolicy.nl/) by the ODISSEI Social Data Science team. We run **six method families on the same dataset** and place every estimate on a single forest plot. The disagreements are then visible at a glance. 
 
 | # | Method family | One-line idea |
 |---|---|---|
