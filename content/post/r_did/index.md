@@ -17,6 +17,10 @@ links:
   icon_pack: fas
   name: "R script"
   url: analysis.R
+- icon: file-code
+  icon_pack: fas
+  name: "Quarto (.qmd)"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_did/tutorial.qmd
 - icon: markdown
   icon_pack: fab
   name: "MD version"

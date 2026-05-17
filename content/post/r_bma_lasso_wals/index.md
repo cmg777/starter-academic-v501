@@ -17,6 +17,10 @@ links:
   icon_pack: ai
   name: "[R] Google Colab"
   url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/r_bma_lasso_wals/notebook.ipynb
+- icon: file-code
+  icon_pack: fas
+  name: "Quarto (.qmd)"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_bma_lasso_wals/tutorial.qmd
 - icon: code
   icon_pack: fas
   name: "R script"

@@ -21,6 +21,10 @@ links:
   icon_pack: ai
   name: "[R] Google Colab"
   url: https://colab.research.google.com/drive/11LC9x24l4nczS_zR81SJ2LgCkpVALk1E?usp=sharing
+- icon: file-code
+  icon_pack: fas
+  name: "Quarto (.qmd)"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_basic_synthetic_control/tutorial.qmd
 - icon: open-data
   icon_pack: ai
   name: "R note"

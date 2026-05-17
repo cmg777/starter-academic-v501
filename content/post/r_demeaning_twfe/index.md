@@ -27,8 +27,8 @@ links:
   url: notebook.ipynb
 - icon: file-code
   icon_pack: fas
-  name: "Quarto notebook"
-  url: tutorial.qmd
+  name: "Quarto (.qmd)"
+  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_demeaning_twfe/tutorial.qmd
 - icon: database
   icon_pack: fas
   name: "Source data"

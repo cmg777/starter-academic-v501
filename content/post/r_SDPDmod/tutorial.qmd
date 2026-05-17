@@ -1,0 +1,783 @@
+---
+title: "Spatial Dynamic Panel Data Modeling in R: Cigarette Demand Across US States"
+subtitle: "Bayesian model comparison, static/dynamic SAR & SDM with Lee-Yu correction, and impact decomposition via SDPDmod"
+author: "Carlos Mendez"
+date: "2026-03-27"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    theme: darkly
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 300
+execute:
+  warning: false
+  message: false
+---
+
+## 1. Overview
+
+When a state raises its cigarette tax, smokers near the border may simply drive to a neighboring state with lower prices. This cross-border shopping effect means that cigarette consumption in one state depends not only on its own prices and income but also on the prices and consumption patterns of its neighbors. Ignoring these **spatial spillovers** leads to biased estimates of how prices and income affect cigarette demand --- a problem that standard panel data methods cannot address.
+
+The [SDPDmod](https://cran.r-project.org/package=SDPDmod) R package (Simonovska, 2025) provides an integrated workflow for spatial panel data modeling. It offers three core capabilities: (1) **Bayesian model comparison** across six spatial specifications using log-marginal posterior probabilities, (2) **maximum likelihood estimation** of spatial autoregressive (SAR) and spatial Durbin (SDM) models with optional Lee-Yu bias correction for fixed effects, and (3) **impact decomposition** into direct, indirect (spillover), and total effects --- including short-run and long-run effects for dynamic models. This tutorial applies all three capabilities to the classic Cigar dataset: cigarette consumption across 46 US states from 1963 to 1992.
+
+The tutorial follows a progressive approach. We start with the simplest spatial model (SAR) and build toward the most general specification (dynamic SDM with Lee-Yu correction). At each step, we interpret the results in terms of the cigarette market and compare them to simpler models. By the end, you will see how spatial spillovers and habit persistence jointly shape cigarette demand --- and why models that ignore either one can produce misleading policy conclusions.
+
+**Learning objectives:**
+
+- Load and row-normalize the `usa46` binary contiguity matrix from SDPDmod
+- Prepare the Cigar panel dataset with log-transformed real prices and income
+- Use `blmpSDPD()` for Bayesian model comparison across OLS, SAR, SDM, SEM, SDEM, and SLX specifications
+- Estimate static SAR and SDM models using `SDPDm()` with individual and two-way fixed effects
+- Apply the Lee-Yu transformation to correct incidental parameter bias in spatial panels
+- Estimate dynamic spatial models with temporal and spatiotemporal lags
+- Decompose effects into direct, indirect, and total using `impactsSDPDm()`, distinguishing short-run from long-run effects
+
+## 2. The Modeling Pipeline
+
+The tutorial follows a six-stage pipeline, moving from data preparation through increasingly rich spatial panel models:
+
+```{mermaid}
+graph LR
+    A["Data & W<br/>(Section 3-4)"] --> B["Bayesian<br/>Comparison<br/>(Section 5)"]
+    B --> B2["Non-Spatial<br/>Baseline<br/>(Section 6)"]
+    B2 --> C["Static SAR<br/>(Section 7)"]
+    C --> D["Static SDM<br/>(Section 8)"]
+    D --> E["Dynamic SDM<br/>(Section 9)"]
+    E --> F["Impact<br/>Decomposition<br/>(Section 10)"]
+
+    style A fill:#6a9bcc,stroke:#141413,color:#fff
+    style B fill:#d97757,stroke:#141413,color:#fff
+    style B2 fill:#141413,stroke:#141413,color:#fff
+    style C fill:#6a9bcc,stroke:#141413,color:#fff
+    style D fill:#6a9bcc,stroke:#141413,color:#fff
+    style E fill:#d97757,stroke:#141413,color:#fff
+    style F fill:#00d4c8,stroke:#141413,color:#fff
+```
+
+Each stage builds on the previous one. The Bayesian comparison tells us *which* model family fits the data best. The static models establish baseline spatial effects. The dynamic models add habit persistence and separate short-run from long-run responses. The impact decomposition translates all of this into policy-relevant direct and spillover effects.
+
+## 3. Setup and Data Preparation
+
+### 3.1 Install and load packages
+
+We pin the **exact versions** of every top-level package used by the original analysis so that re-rendering this notebook on any machine, any future date, yields the same numbers as the published post. The setup chunk uses the modern `pak` installer; packages already at the target version are skipped.
+
+```{r}
+#| label: setup-packages
+
+# Install pak (the fast modern installer) if missing. pak is the only
+# bootstrap dependency; everything else gets pinned-version installs.
+if (!requireNamespace("pak", quietly = TRUE)) {
+  install.packages("pak", repos = "https://cloud.r-project.org")
+}
+
+# Pinned versions used when this post was published (probed 2026-05-17).
+# Installing the EXACT versions fosters replicability.
+PINNED <- c(
+  SDPDmod  = "0.0.7",
+  plm      = "2.6.7",
+  ggplot2  = "4.0.3",
+  reshape2 = "1.4.5",
+  dplyr    = "1.2.1"
+)
+
+needs_install <- vapply(names(PINNED), function(p) {
+  if (!requireNamespace(p, quietly = TRUE)) return(TRUE)
+  as.character(packageVersion(p)) != PINNED[[p]]
+}, logical(1))
+
+if (any(needs_install)) {
+  specs <- paste0(names(PINNED)[needs_install], "@", PINNED[needs_install])
+  pak::pkg_install(specs)
+}
+
+library(SDPDmod)
+library(plm)
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+
+# Site color palette
+steel_blue   <- "#6a9bcc"
+warm_orange  <- "#d97757"
+near_black   <- "#141413"
+teal         <- "#00d4c8"
+heading_blue <- "#1a3a8a"
+
+set.seed(42)
+```
+
+### 3.2 Load and prepare the Cigar dataset
+
+The [Cigar dataset](https://cran.r-project.org/web/packages/plm/vignettes/A_plmPackage.html) (Baltagi, 1992) contains panel data on cigarette consumption in 46 US states from 1963 to 1992. The key variables are `sales` (packs per capita), `price` (average price per pack in cents), `ndi` (per capita disposable income), `pimin` (minimum price in adjoining states), and `cpi` (consumer price index). We create log-transformed real values to work with **elasticities** --- in a log-log model, each coefficient represents the percentage change in consumption for a one-percent change in the corresponding variable.
+
+```{r}
+#| label: data-load
+
+# Load Cigar dataset
+data("Cigar", package = "plm")
+data1 <- Cigar
+
+# Create log-transformed variables
+data1$logc <- log(data1$sales)              # log cigarette packs per capita
+data1$logp <- log(data1$price / data1$cpi)  # log real price
+data1$logy <- log(data1$ndi / data1$cpi)    # log real per capita income
+data1$lpm  <- log(data1$pimin / data1$cpi)  # log real minimum price in adjoining states
+
+# Inspect panel structure
+cat("States:", length(unique(data1$state)), "\n")
+cat("Years:", length(unique(data1$year)), "\n")
+cat("Observations:", nrow(data1), "\n\n")
+
+head(data1[, c("state", "year", "sales", "price", "ndi", "logc", "logp", "logy")])
+summary(data1[, c("logc", "logp", "logy")])
+```
+
+The panel is balanced with 46 states observed over 30 years (1,380 total observations). Log cigarette consumption (`logc`) has a mean of 4.793, corresponding to about 121 packs per capita per year. Real prices (`logp`) average -0.106 in log terms, and real per capita income (`logy`) averages 4.545. The variation across states and over time in both prices and income is what allows us to identify price and income elasticities --- and the spatial structure across neighboring states is what motivates the spatial models.
+
+The dataset also includes `pimin`, the minimum cigarette price in adjoining states. This variable is inherently spatial --- it measures price competition from neighbors. We do not include `pimin` directly in our models because the SDM's spatially lagged price term `W*logp` captures the same channel more flexibly. To see why, note that `log(pimin/cpi)` and the spatial lag of `logp` have a correlation of 0.92 --- they measure essentially the same thing, but the spatial lag uses the full contiguity structure rather than just the cheapest neighbor.
+
+### 3.3 Load the spatial weight matrix and compute the spatial lag of price
+
+```{r}
+#| label: data-w-and-state-abbr
+
+# Load W early so we can compute spatial lags for EDA
+data("usa46", package = "SDPDmod")
+
+# State abbreviation mapping (alphabetical order matching usa46)
+state_abbr <- c("AL","AZ","AR","CA","CO","CT","DE","FL","GA","ID",
+                "IL","IN","IA","KS","KY","LA","ME","MD","MA","MI",
+                "MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY",
+                "NC","ND","OH","OK","OR","PA","RI","SC","SD","TN",
+                "TX","UT","VT","VA","WA","WI")
+
+W <- rownor(usa46)
+
+# Compute spatial lag of logp for each state-year
+years <- sort(unique(data1$year))
+data1$Wlogp <- NA
+for (yr in years) {
+  idx <- data1$year == yr
+  logp_vec <- data1$logp[idx]
+  data1$Wlogp[idx] <- as.numeric(W %*% logp_vec)
+}
+
+cat("Correlation(lpm, Wlogp):",
+    round(cor(data1$lpm, data1$Wlogp, use = "complete.obs"), 4), "\n")
+```
+
+### 3.4 Exploratory visualization
+
+Before building models, the spaghetti plot below shows cigarette sales per capita for all 46 states over time, with five states highlighted for comparison.
+
+```{r}
+#| label: fig-eda-spaghetti
+#| fig-cap: "Cigarette sales per capita across 46 US states from 1963 to 1992, with five states highlighted."
+
+data1$state_abbr <- state_abbr[data1$state]
+highlight_states <- c("CA", "NY", "NC", "KY", "UT")
+data1$highlight <- ifelse(data1$state_abbr %in% highlight_states,
+                          data1$state_abbr, "Other")
+data1$highlight <- factor(data1$highlight,
+                          levels = c(highlight_states, "Other"))
+
+ggplot(data1, aes(x = year + 1900, y = sales, group = state_abbr)) +
+  geom_line(data = subset(data1, highlight == "Other"),
+            color = "gray80", linewidth = 0.3, alpha = 0.7) +
+  geom_line(data = subset(data1, highlight != "Other"),
+            aes(color = highlight), linewidth = 1) +
+  scale_color_manual(values = c("CA" = steel_blue, "NY" = warm_orange,
+                                 "NC" = teal, "KY" = heading_blue,
+                                 "UT" = near_black)) +
+  labs(title = "Cigarette Sales per Capita Across 46 US States (1963-1992)",
+       subtitle = "Each line is one state; five states highlighted for comparison",
+       x = "Year", y = "Packs per Capita", color = "State") +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(color = heading_blue, face = "bold", size = 14),
+    plot.subtitle = element_text(color = "gray40", size = 11),
+    legend.position = c(0.85, 0.85),
+    legend.background = element_rect(fill = "white", color = "gray90")
+  )
+```
+
+Two patterns jump out. First, **temporal persistence is striking**: states that consumed heavily in the 1960s (like Kentucky, a major tobacco-producing state with over 150 packs per capita) remained high consumers throughout the period, while low-consumption states like Utah stayed low. This visual persistence foreshadows the dominant role of the lagged dependent variable ($\tau \approx 0.86$) in the dynamic models. Second, there is a **general downward trend** after the late 1970s, visible across nearly all states, reflecting the cumulative effect of anti-smoking campaigns, health awareness, and rising taxes. Time fixed effects in our panel models will absorb this common trend, isolating the within-state, within-year variation that identifies price and income elasticities.
+
+### 3.5 Row-normalize the spatial weight matrix
+
+A spatial weight matrix $W$ encodes which states are neighbors. The `usa46` matrix included in SDPDmod is a binary contiguity matrix: $w_{ij} = 1$ if states $i$ and $j$ share a border, and $w_{ij} = 0$ otherwise. Row-normalization converts these binary entries into weights that sum to one for each row, so the spatial lag $Wy$ equals the *weighted average* of neighboring states' values.
+
+```{r}
+#| label: w-inspect
+
+cat("Dimensions:", dim(usa46), "\n")
+cat("Non-zero entries:", sum(usa46 != 0), "\n")
+cat("Average neighbors per state:", round(mean(rowSums(usa46)), 2), "\n")
+cat("Row-normalized:", isrownor(W), "\n")
+```
+
+The matrix has 188 non-zero entries out of 2,116 possible pairs (8.9% density), meaning the average state shares a border with about 4 neighbors. After row-normalization, the spatial lag of any variable equals the simple average of that variable across a state's contiguous neighbors.
+
+## 4. Visualizing the Spatial Weight Matrix
+
+Before estimating spatial models, it helps to visualize the neighborhood structure.
+
+```{r}
+#| label: fig-weight-matrix
+#| fig-cap: "Binary contiguity matrix of 46 US states. Each colored cell indicates a pair of neighboring states (8.9% of pairs)."
+#| fig-width: 8
+#| fig-height: 8
+
+# Use state abbreviations for axes
+rownames(usa46) <- state_abbr
+colnames(usa46) <- state_abbr
+usa46_df <- melt(usa46)
+colnames(usa46_df) <- c("State_i", "State_j", "Connection")
+usa46_df$Connection <- factor(usa46_df$Connection, levels = c(0, 1),
+                              labels = c("Not neighbors", "Neighbors"))
+usa46_df$State_i <- factor(usa46_df$State_i, levels = rev(state_abbr))
+usa46_df$State_j <- factor(usa46_df$State_j, levels = state_abbr)
+
+ggplot(usa46_df, aes(x = State_j, y = State_i, fill = Connection)) +
+  geom_tile(color = "white", linewidth = 0.1) +
+  scale_fill_manual(values = c("Not neighbors" = "gray95",
+                                "Neighbors" = steel_blue)) +
+  labs(title = "Binary Contiguity Matrix of 46 US States",
+       subtitle = "Spatial neighbors share a common border",
+       x = "State j", y = "State i", fill = "") +
+  theme_minimal(base_size = 10) +
+  theme(
+    plot.title = element_text(color = heading_blue, face = "bold", size = 15),
+    plot.subtitle = element_text(color = "gray40", size = 11),
+    legend.position = "bottom",
+    panel.grid = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 7),
+    axis.text.y = element_text(size = 7),
+    aspect.ratio = 1
+  )
+```
+
+The sparse pattern confirms that most state pairs are *not* neighbors --- only 8.9% of cells are colored. With state abbreviations on the axes, you can verify specific neighborhood relationships: California (CA) neighbors Arizona (AZ), Nevada (NV), and Oregon (OR); Missouri (MO) has the most neighbors at 8. The sparsity is typical of contiguity-based weight matrices.
+
+### 4.2 Alternative weight matrices
+
+The SDPDmod package provides several functions for constructing weight matrices from scratch: `mOrdNbr()` for higher-order contiguity from shapefiles, `mNearestN()` for k-nearest neighbors, `InvDistMat()` for inverse distance, and `DistWMat()` as a unified wrapper. Since our results may depend on the choice of $W$, we construct a **2nd-order contiguity matrix** as a robustness check.
+
+```{r}
+#| label: w-alternative
+
+# Reload original binary matrix (before abbreviation renaming)
+data("usa46", package = "SDPDmod")
+
+# 2nd-order neighbors: states that share a neighbor (friends-of-friends)
+W2_raw <- (usa46 %*% usa46) > 0
+W2_raw <- W2_raw * 1
+diag(W2_raw) <- 0
+W2_only <- W2_raw - usa46
+W2_only[W2_only < 0] <- 0
+W2_combined <- (W2_raw > 0) * 1
+diag(W2_combined) <- 0
+W2 <- rownor(W2_combined)
+
+cat("Original W non-zero:", sum(usa46 != 0), "\n")
+cat("2nd-order W non-zero:", sum(W2_combined != 0), "\n")
+cat("Avg neighbors (original):", round(mean(rowSums(usa46)), 2), "\n")
+cat("Avg neighbors (2nd-order):", round(mean(rowSums(W2_combined)), 2), "\n")
+```
+
+The 2nd-order matrix is much denser: 486 non-zero entries versus 188, with an average of 10.6 neighbors per state. We will use this alternative $W$ for a robustness check.
+
+```{r}
+#| label: robustness-sdm-w2
+
+mod_sdm_w2 <- SDPDm(formula = logc ~ logp + logy, data = data1, W = W2,
+                    index = c("state", "year"),
+                    model = "sdm",
+                    effect = "twoways",
+                    LYtrans = TRUE)
+summary(mod_sdm_w2)
+```
+
+## 5. Bayesian Model Comparison with `blmpSDPD()`
+
+### 5.1 The spatial model family
+
+Before estimating any single model, we use Bayesian model comparison to let the data tell us which spatial specification fits best. The SDPDmod package supports six models that differ in *where* spatial dependence enters the equation. The general spatial panel model takes the form:
+
+$$y_t = \rho W y_t + X_t \beta + W X_t \theta + u_t, \quad u_t = \lambda W u_t + \epsilon_t$$
+
+In words, the outcome $y_t$ can depend on neighbors' outcomes (through $\rho$), on spatially lagged covariates (through $\theta$), and spatial correlation can appear in the error term (through $\lambda$). Different restrictions yield different models:
+
+```{mermaid}
+graph TD
+    GNS["General Nesting<br/>ρ, θ, λ"] -->|"λ = 0"| SDM["SDM<br/>ρ, θ"]
+    GNS -->|"θ = 0"| SAC["SAC<br/>ρ, λ"]
+    GNS -->|"ρ = 0"| SDEM["SDEM<br/>θ, λ"]
+    SDM -->|"θ = 0"| SAR["SAR<br/>ρ"]
+    SDM -->|"ρ = 0"| SLX["SLX<br/>θ"]
+    SAC -->|"λ = 0"| SAR
+    SDEM -->|"ρ = 0"| SEM["SEM<br/>λ"]
+    SDEM -->|"λ = 0"| SLX
+    SAR -->|"ρ = 0"| OLS["OLS<br/>No spatial"]
+    SEM -->|"λ = 0"| OLS
+    SLX -->|"θ = 0"| OLS
+
+    style SDM fill:#d97757,stroke:#141413,color:#fff
+    style SAR fill:#6a9bcc,stroke:#141413,color:#fff
+    style SEM fill:#6a9bcc,stroke:#141413,color:#fff
+    style SDEM fill:#6a9bcc,stroke:#141413,color:#fff
+    style SLX fill:#6a9bcc,stroke:#141413,color:#fff
+    style OLS fill:#141413,stroke:#141413,color:#fff
+    style GNS fill:#00d4c8,stroke:#141413,color:#fff
+    style SAC fill:#00d4c8,stroke:#141413,color:#fff
+```
+
+| Model | Equation | Key Parameters | Interpretation |
+|-------|----------|----------------|----------------|
+| OLS | $y_t = X_t \beta + \epsilon_t$ | None spatial | No spatial dependence |
+| SAR | $y_t = \rho W y_t + X_t \beta + \epsilon_t$ | $\rho$ | Neighbors' outcomes affect own outcome |
+| SEM | $y_t = X_t \beta + u_t$, $u_t = \lambda W u_t + \epsilon_t$ | $\lambda$ | Spatial correlation in unobservables |
+| SLX | $y_t = X_t \beta + W X_t \theta + \epsilon_t$ | $\theta$ | Neighbors' covariates affect own outcome |
+| SDM | $y_t = \rho W y_t + X_t \beta + W X_t \theta + \epsilon_t$ | $\rho, \theta$ | Both neighbors' outcomes and covariates matter |
+| SDEM | $y_t = X_t \beta + W X_t \theta + u_t$, $u_t = \lambda W u_t + \epsilon_t$ | $\theta, \lambda$ | Spatially lagged X plus spatial errors |
+
+### 5.2 Static comparison with individual fixed effects
+
+```{r}
+#| label: fit-blmp-ind
+
+res_ind <- blmpSDPD(formula = logc ~ logp + logy, data = data1, W = W,
+                    index = c("state", "year"),
+                    model = list("ols", "sar", "sdm", "sem", "sdem", "slx"),
+                    effect = "individual")
+cat("Log-marginal posteriors:\n")
+print(res_ind$lmarginal)
+cat("\nModel probabilities:\n")
+print(round(res_ind$probs, 4))
+```
+
+With individual fixed effects, the SDM receives a posterior probability of 99.89%, dominating all other specifications. The SDEM gets only 0.11%, and the remaining models receive essentially zero probability. This overwhelming support for the SDM indicates that both the spatial lag of the dependent variable ($\rho W y$) and the spatial lags of covariates ($W X \theta$) are important for explaining cigarette consumption.
+
+### 5.3 Static comparison with two-way fixed effects
+
+```{r}
+#| label: fit-blmp-tw
+
+res_tw <- blmpSDPD(formula = logc ~ logp + logy, data = data1, W = W,
+                   index = c("state", "year"),
+                   model = list("ols", "sar", "sdm", "sem", "sdem", "slx"),
+                   effect = "twoways",
+                   prior = "beta")
+cat("Log-marginal posteriors:\n")
+print(res_tw$lmarginal)
+cat("\nModel probabilities:\n")
+print(round(res_tw$probs, 4))
+```
+
+With two-way fixed effects and a beta prior, the race tightens. The SDM still leads with 45.92% probability, but the SDEM is close behind at 41.31%. The SEM receives 12.37%, while the SAR drops to just 0.4%.
+
+### 5.4 Dynamic comparison with two-way fixed effects
+
+```{r}
+#| label: fit-blmp-dyn
+
+res_dyn <- blmpSDPD(formula = logc ~ logp + logy, data = data1, W = W,
+                    index = c("state", "year"),
+                    model = list("sar", "sdm", "sem", "sdem", "slx"),
+                    effect = "twoways",
+                    ldet = "mc",
+                    dynamic = TRUE,
+                    prior = "uniform")
+cat("Log-marginal posteriors:\n")
+print(res_dyn$lmarginal)
+cat("\nModel probabilities:\n")
+print(round(res_dyn$probs, 4))
+```
+
+The dynamic comparison produces a dramatically different picture: all five models receive similar probabilities, with the SEM slightly ahead at 29.84%, followed by SAR at 25.73% and SLX at 19.79%. The log-marginal posteriors are nearly identical (within 1 unit), reflecting the fact that once temporal dynamics are included, the remaining spatial signal is much weaker.
+
+### 5.5 Summary of model comparison
+
+```{r}
+#| label: fig-model-comparison
+#| fig-cap: "Bayesian model probabilities across three specifications: static individual FE, static two-way FE, and dynamic two-way FE."
+#| fig-width: 8
+#| fig-height: 10
+
+probs_ind <- data.frame(Model = names(res_ind$probs),
+                        Probability = as.numeric(res_ind$probs),
+                        Specification = "Static: Individual FE")
+probs_tw <- data.frame(Model = names(res_tw$probs),
+                       Probability = as.numeric(res_tw$probs),
+                       Specification = "Static: Two-way FE")
+probs_dyn <- data.frame(Model = names(res_dyn$probs),
+                        Probability = as.numeric(res_dyn$probs),
+                        Specification = "Dynamic: Two-way FE")
+
+probs_all <- rbind(probs_ind, probs_tw, probs_dyn)
+probs_all$Specification <- factor(probs_all$Specification,
+                                  levels = c("Static: Individual FE",
+                                             "Static: Two-way FE",
+                                             "Dynamic: Two-way FE"))
+
+ggplot(probs_all, aes(x = Model, y = Probability, fill = Model)) +
+  geom_col(width = 0.7) +
+  facet_wrap(~ Specification, ncol = 1, scales = "free_y") +
+  scale_fill_manual(values = c("ols"  = "gray70", "sar"  = steel_blue,
+                                "sdm"  = warm_orange, "sem"  = teal,
+                                "sdem" = heading_blue, "slx"  = near_black)) +
+  labs(title = "Bayesian Model Probabilities Across Specifications",
+       subtitle = "Posterior probabilities from blmpSDPD()",
+       x = "", y = "Posterior Probability") +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(color = heading_blue, face = "bold", size = 15),
+    plot.subtitle = element_text(color = "gray40", size = 11),
+    legend.position = "none",
+    strip.text = element_text(face = "bold", size = 12),
+    panel.grid.major.x = element_blank()
+  ) +
+  geom_text(aes(label = ifelse(Probability > 0.01,
+                                sprintf("%.1f%%", Probability * 100), "")),
+            vjust = -0.3, size = 3.5)
+```
+
+| Specification | Top Model | Probability | Runner-up | Probability |
+|---------------|-----------|-------------|-----------|-------------|
+| Static, Individual FE | SDM | 99.89% | SDEM | 0.11% |
+| Static, Two-way FE | SDM | 45.92% | SDEM | 41.31% |
+| Dynamic, Two-way FE | SEM | 29.84% | SAR | 25.73% |
+
+The Bayesian comparison reveals three key insights. First, spatial dependence is unambiguously present --- OLS and SLX never win. Second, the SDM is the preferred static model. Third, adding dynamics substantially weakens the ability to discriminate among spatial specifications. Given that the SDM leads in two of three comparisons and nests the SAR as a special case, we will estimate both the SAR and SDM in the sections that follow, with and without dynamics.
+
+## 6. Non-Spatial Baseline
+
+Before introducing spatial models, we establish a benchmark using a standard **two-way fixed effects** panel regression with no spatial terms.
+
+```{r}
+#| label: fit-fe-baseline
+
+pdata <- pdata.frame(data1, index = c("state", "year"))
+mod_fe <- plm(logc ~ logp + logy, data = pdata, model = "within",
+              effect = "twoways")
+print(summary(mod_fe)$coefficients)
+cat("R-squared:", round(summary(mod_fe)$r.squared["rsq"], 4), "\n")
+```
+
+The non-spatial two-way FE model estimates a price elasticity of -1.035 and an income elasticity of 0.529, both highly significant. These estimates serve as the benchmark against which we measure the value added by spatial models. As we will see, the SAR and SDM models produce similar *direct* price effects (around -1.00) but reveal substantial *indirect* (spillover) effects that the non-spatial model entirely misses.
+
+## 7. Static SAR Model Estimation
+
+### 7.1 SAR with individual fixed effects
+
+The Spatial Autoregressive (SAR) model adds a single spatial parameter $\rho$ that captures how much a state's cigarette consumption depends on the weighted average of its neighbors' consumption. The model is:
+
+$$y_t = \rho W y_t + X_t \beta + \mu_i + \epsilon_t$$
+
+The `SDPDm()` function estimates this model by maximum likelihood.
+
+```{r}
+#| label: fit-sar-ind
+
+mod_sar_ind <- SDPDm(formula = logc ~ logp + logy, data = data1, W = W,
+                     index = c("state", "year"),
+                     model = "sar",
+                     effect = "individual")
+summary(mod_sar_ind)
+cat("R-squared:", round(mod_sar_ind$rsqr, 4), "\n")
+cat("Sigma:", round(mod_sar_ind$sige, 6), "\n")
+```
+
+The spatial autoregressive coefficient $\rho = 0.298$ is highly significant ($t = 10.46$), confirming strong spatial dependence. The price elasticity is -0.532. However, the income coefficient is essentially zero with only state fixed effects.
+
+### 7.2 SAR with two-way fixed effects
+
+```{r}
+#| label: fit-sar-tw
+
+mod_sar_tw <- SDPDm(formula = logc ~ logp + logy, data = data1, W = W,
+                    index = c("state", "year"),
+                    model = "sar",
+                    effect = "twoways")
+summary(mod_sar_tw)
+cat("Sigma:", round(mod_sar_tw$sige, 6), "\n")
+```
+
+With two-way fixed effects, three things change. First, the spatial coefficient drops from 0.298 to 0.187 --- still highly significant but weaker. Second, the price elasticity nearly doubles from -0.53 to -0.99, suggesting that the individual-FE-only model was biased by confounding time trends with prices. Third, income becomes strongly significant (0.464): once common time trends are removed, higher real income is associated with *more* cigarette consumption.
+
+### 7.3 Impact decomposition for static SAR
+
+The `impactsSDPDm()` function decomposes the total effect into a **direct effect** (impact on own state) and an **indirect effect** (spillover to and from neighbors).
+
+```{r}
+#| label: imp-sar-tw
+
+imp_sar_tw <- impactsSDPDm(mod_sar_tw)
+summary(imp_sar_tw)
+```
+
+The impact decomposition reveals that a 1% increase in a state's own real price reduces its consumption by 1.00% directly, plus an additional 0.22% through spatial feedback --- for a total price elasticity of -1.22. The indirect effects are about 18% of the total effect, indicating economically meaningful spatial spillovers.
+
+## 8. Static SDM with Lee-Yu Correction
+
+### 8.1 SDM with two-way fixed effects
+
+The Spatial Durbin Model (SDM) extends the SAR by adding spatially lagged covariates $W X$:
+
+$$y_t = \rho W y_t + X_t \beta + W X_t \theta + \mu_i + \gamma_t + \epsilon_t$$
+
+```{r}
+#| label: fit-sdm-tw
+
+mod_sdm_tw <- SDPDm(formula = logc ~ logp + logy, data = data1, W = W,
+                    index = c("state", "year"),
+                    model = "sdm",
+                    effect = "twoways")
+summary(mod_sdm_tw)
+cat("Sigma:", round(mod_sdm_tw$sige, 6), "\n")
+```
+
+The SDM reveals an interesting asymmetry. The spatial lag of price (`W*logp = 0.049`) is not significant, while the spatial lag of income (`W*logy = -0.293`) is highly significant: when neighboring states become richer, own-state consumption *decreases*.
+
+### 8.2 SDM with Lee-Yu bias correction
+
+Fixed effects in spatial panels create an **incidental parameter problem**. The Lee-Yu transformation (Lee and Yu, 2010) corrects this bias.
+
+```{r}
+#| label: fit-sdm-ly
+
+mod_sdm_ly <- SDPDm(formula = logc ~ logp + logy, data = data1, W = W,
+                    index = c("state", "year"),
+                    model = "sdm",
+                    effect = "twoways",
+                    LYtrans = TRUE)
+summary(mod_sdm_ly)
+cat("Sigma:", round(mod_sdm_ly$sige, 6), "\n")
+```
+
+The Lee-Yu correction increases $\rho$ from 0.223 to 0.262 --- a 17% upward correction. We will use the Lee-Yu corrected version as our preferred static SDM.
+
+### 8.3 Comparison: SAR vs. SDM
+
+| Parameter | FE (no spatial) | SAR (Ind FE) | SAR (TW FE) | SDM (TW FE) | SDM (TW FE, LY) |
+|-----------|----------------|-------------|-------------|-------------|-----------------|
+| $\rho$ | --- | 0.298 | 0.187 | 0.223 | 0.262 |
+| logp | -1.035 | -0.532 | -0.995 | -1.003 | -1.001 |
+| logy | 0.529 | -0.001 | 0.464 | 0.601 | 0.603 |
+| W*logp | --- | --- | --- | 0.049 | 0.091 |
+| W*logy | --- | --- | --- | -0.293 | -0.313 |
+| $\hat{\sigma}^2$ | --- | 0.0067 | 0.0051 | 0.0050 | 0.0052 |
+
+### 8.4 Impact decomposition for static SDM
+
+```{r}
+#| label: imp-sdm-ly
+
+imp_sdm_ly <- impactsSDPDm(mod_sdm_ly)
+summary(imp_sdm_ly)
+```
+
+The SDM impact decomposition tells a richer story than the SAR. For price, the results are similar: a direct effect of -1.01 and an indirect (spillover) effect of -0.22, summing to a total price elasticity of -1.23. However, for income, the SDM flips the sign of the indirect effect: it is now *negative* (-0.20) instead of positive (0.10 in the SAR). The total income elasticity in the SDM (0.39) is therefore lower than in the SAR (0.57). This sign reversal of the income spillover is an important finding that the SAR cannot detect.
+
+## 9. Dynamic Spatial Panel Models
+
+### 9.1 Why dynamics? Habit persistence in cigarette consumption
+
+Cigarette consumption is strongly habit-forming. Dynamic models explicitly include the lagged dependent variable $y_{t-1}$ (with coefficient $\tau$, capturing **habit persistence**) and optionally its spatial lag $W y_{t-1}$:
+
+$$y_t = \rho W y_t + \tau y_{t-1} + \eta W y_{t-1} + X_t \beta + W X_t \theta + \mu_i + \gamma_t + \epsilon_t$$
+
+### 9.2 Dynamic SAR with temporal lag only
+
+```{r}
+#| label: fit-dsar-tl
+
+mod_dsar_tl <- SDPDm(formula = logc ~ logp + logy, data = data1, W = W,
+                     index = c("state", "year"),
+                     model = "sar", effect = "twoways",
+                     LYtrans = TRUE, dynamic = TRUE,
+                     tlaginfo = list(ind = NULL, tl = TRUE, stl = FALSE))
+summary(mod_dsar_tl)
+cat("Sigma:", round(mod_dsar_tl$sige, 6), "\n")
+```
+
+This result is striking. The temporal lag coefficient $\tau = 0.866$ is enormous ($t = 67.75$), confirming that cigarette consumption is extremely persistent. More remarkably, the spatial autoregressive coefficient $\rho$ collapses from 0.262 (static SDM) to just 0.010 and becomes *non-significant*. This suggests that what appeared to be contemporaneous spatial dependence in the static model was largely a proxy for temporal persistence.
+
+### 9.3 Dynamic SAR with temporal and spatiotemporal lags
+
+```{r}
+#| label: fit-dsar-full
+
+mod_dsar_full <- SDPDm(formula = logc ~ logp + logy, data = data1, W = W,
+                       index = c("state", "year"),
+                       model = "sar", effect = "twoways",
+                       LYtrans = TRUE, dynamic = TRUE,
+                       tlaginfo = list(ind = NULL, tl = TRUE, stl = TRUE))
+summary(mod_dsar_full)
+cat("Sigma:", round(mod_dsar_full$sige, 6), "\n")
+```
+
+Adding the spatiotemporal lag dramatically changes the picture. The large $\rho$ combined with the nearly equal-and-opposite $\eta$ suggests a complex dynamic pattern. However, the near-cancellation of $\rho$ and $\eta$ may also indicate multicollinearity, making the individual coefficients hard to interpret reliably.
+
+### 9.4 Dynamic SDM with both lags and Lee-Yu correction
+
+```{r}
+#| label: fit-dsdm
+
+mod_dsdm <- SDPDm(formula = logc ~ logp + logy, data = data1, W = W,
+                  index = c("state", "year"),
+                  model = "sdm", effect = "twoways",
+                  LYtrans = TRUE, dynamic = TRUE,
+                  tlaginfo = list(ind = NULL, tl = TRUE, stl = TRUE))
+summary(mod_dsdm)
+cat("Sigma:", round(mod_dsdm$sige, 6), "\n")
+```
+
+The dynamic SDM produces the most nuanced picture. Habit persistence remains dominant ($\tau = 0.864$). The spatial coefficient $\rho = 0.162$ is significant but much smaller than in the static model. Notably, the spatial lag of price (`W*logp = 0.196`) is now *positive* and significant ($t = 4.46$), a reversal from the static SDM. This positive coefficient means that when neighboring states' prices rise, own-state consumption *increases* --- precisely the cross-border shopping effect we hypothesized.
+
+### 9.5 Impact decomposition: short-run and long-run effects
+
+```{r}
+#| label: imp-dsdm
+
+imp_dsdm <- impactsSDPDm(mod_dsdm)
+summary(imp_dsdm)
+```
+
+The gap between short-run and long-run effects is dramatic. The **short-run direct price elasticity** is only -0.26, meaning that a 1% price increase immediately reduces consumption by just 0.26%. But the **long-run direct price elasticity** is -1.93 --- more than seven times larger --- because the habit persistence mechanism ($\tau = 0.864$) amplifies the initial shock over time.
+
+The short-run indirect (spillover) effect of price is *positive* (0.179): when a state raises its prices, neighboring states' consumption increases in the short run, consistent with cross-border shopping. Note that the long-run effects assume the system reaches a stable equilibrium, which requires the stationarity condition $|\tau + \rho \eta| < 1$ to hold.
+
+### 9.6 Comparison of dynamic specifications
+
+| Parameter | Static SDM (LY) | Dyn SAR (tl) | Dyn SAR (tl+stl) | Dyn SDM (LY) |
+|-----------|-----------------|-------------|------------------|--------------|
+| $\rho$ | 0.262 | 0.010 | 0.703 | 0.162 |
+| $\tau$ (logc_{t-1}) | --- | 0.866 | 0.882 | 0.864 |
+| $\eta$ (W*logc_{t-1}) | --- | --- | -0.727 | -0.096 |
+| logp | -1.001 | -0.255 | -0.244 | -0.271 |
+| logy | 0.603 | 0.084 | 0.056 | 0.104 |
+| W*logp | 0.091 | --- | --- | 0.196 |
+| W*logy | -0.313 | --- | --- | -0.032 |
+| $\hat{\sigma}^2$ | 0.0052 | 0.0012 | 0.0012 | 0.0012 |
+
+The table reveals that temporal dynamics fundamentally reshape the spatial story. The temporal lag coefficient ($\tau \approx 0.86$) is remarkably stable across all dynamic specifications, confirming that habit persistence is the dominant force.
+
+## 10. Effect Decomposition Summary
+
+```{r}
+#| label: fig-impact-decomposition
+#| fig-cap: "Effect decomposition comparing direct, indirect, and total effects for price and income across the static SDM and the dynamic SDM (short-run and long-run)."
+#| fig-width: 10
+#| fig-height: 7
+
+# Static SDM (Lee-Yu) impacts
+static_dir     <- imp_sdm_ly$DIRECT.tab[, "Estimate"]
+static_ind     <- imp_sdm_ly$INDIRECT.tab[, "Estimate"]
+static_tot     <- imp_sdm_ly$TOTAL.tab[, "Estimate"]
+static_dir_se  <- imp_sdm_ly$DIRECT.tab[, "Std. Error"]
+static_ind_se  <- imp_sdm_ly$INDIRECT.tab[, "Std. Error"]
+static_tot_se  <- imp_sdm_ly$TOTAL.tab[, "Std. Error"]
+
+# Dynamic SDM: short-term impacts
+dyn_st_dir     <- imp_dsdm$DIRECTst.tab[, "Estimate"]
+dyn_st_ind     <- imp_dsdm$INDIRECTst.tab[, "Estimate"]
+dyn_st_tot     <- imp_dsdm$TOTALst.tab[, "Estimate"]
+dyn_st_dir_se  <- imp_dsdm$DIRECTst.tab[, "Std. Error"]
+dyn_st_ind_se  <- imp_dsdm$INDIRECTst.tab[, "Std. Error"]
+dyn_st_tot_se  <- imp_dsdm$TOTALst.tab[, "Std. Error"]
+
+# Dynamic SDM: long-term impacts
+dyn_lt_dir     <- imp_dsdm$DIRECTlt.tab[, "Estimate"]
+dyn_lt_ind     <- imp_dsdm$INDIRECTlt.tab[, "Estimate"]
+dyn_lt_tot     <- imp_dsdm$TOTALlt.tab[, "Estimate"]
+dyn_lt_dir_se  <- imp_dsdm$DIRECTlt.tab[, "Std. Error"]
+dyn_lt_ind_se  <- imp_dsdm$INDIRECTlt.tab[, "Std. Error"]
+dyn_lt_tot_se  <- imp_dsdm$TOTALlt.tab[, "Std. Error"]
+
+impact_df <- data.frame(
+  Variable = rep(c("logp", "logy"), 9),
+  Effect = rep(rep(c("Direct", "Indirect", "Total"), each = 2), 3),
+  Model = rep(c("Static SDM", "Dynamic SDM\n(Short-run)", "Dynamic SDM\n(Long-run)"), each = 6),
+  Estimate = c(static_dir, static_ind, static_tot,
+               dyn_st_dir, dyn_st_ind, dyn_st_tot,
+               dyn_lt_dir, dyn_lt_ind, dyn_lt_tot),
+  SE = c(static_dir_se, static_ind_se, static_tot_se,
+         dyn_st_dir_se, dyn_st_ind_se, dyn_st_tot_se,
+         dyn_lt_dir_se, dyn_lt_ind_se, dyn_lt_tot_se)
+)
+
+impact_df$Model <- factor(impact_df$Model,
+                          levels = c("Static SDM", "Dynamic SDM\n(Short-run)", "Dynamic SDM\n(Long-run)"))
+impact_df$Effect <- factor(impact_df$Effect, levels = c("Direct", "Indirect", "Total"))
+
+ggplot(impact_df, aes(x = Effect, y = Estimate, color = Effect)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_pointrange(aes(ymin = Estimate - 1.96 * SE, ymax = Estimate + 1.96 * SE),
+                  size = 0.7, linewidth = 0.8) +
+  facet_grid(Variable ~ Model, scales = "free_y",
+             labeller = labeller(Variable = c("logp" = "Price (logp)",
+                                               "logy" = "Income (logy)"))) +
+  scale_color_manual(values = c("Direct" = steel_blue,
+                                 "Indirect" = warm_orange,
+                                 "Total" = near_black)) +
+  labs(title = "Effect Decomposition: Static vs. Dynamic SDM",
+       subtitle = "Point estimates with 95% confidence intervals",
+       x = "", y = "Estimated Effect") +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(color = heading_blue, face = "bold", size = 15),
+    plot.subtitle = element_text(color = "gray40", size = 11),
+    legend.position = "none",
+    strip.text = element_text(face = "bold", size = 11),
+    panel.grid.major.x = element_blank()
+  )
+```
+
+Four patterns stand out from this comparison. First, the **static SDM overstates the short-run response** to price changes: its direct price effect (-1.01) is nearly four times larger than the dynamic short-run direct effect (-0.26). Second, **spatial spillovers change sign between static and dynamic models**. In the static SDM, the indirect price effect is negative (-0.22); in the dynamic SDM's short run, it is *positive* (0.18), consistent with cross-border shopping. Third, **long-run effects are much larger but imprecisely estimated**: the long-run direct price elasticity (-1.93) is the largest estimate in the analysis. Fourth, **income effects are more robust**: positive and significant in all specifications.
+
+## 11. Discussion
+
+This tutorial demonstrates three key findings about spatial dynamics in cigarette demand. First, **spatial dependence is real and economically meaningful**, but its magnitude depends critically on the model specification. Second, **habit persistence dominates the dynamic structure**: the temporal lag coefficient ($\tau \approx 0.86$) is by far the largest and most precisely estimated parameter in every dynamic model. Third, **the dynamic SDM uncovers a cross-border shopping effect** that the static model misses: the positive and significant `W*logp` coefficient (0.196) means that when neighboring states raise prices, own-state consumption *increases* in the short run.
+
+A fourth finding relates to **robustness to the weight matrix**. Re-estimating the static SDM with a 2nd-order contiguity matrix yields a stronger spatial coefficient and a significant `W*logp` coefficient that was not significant with the 1st-order matrix. This suggests that cross-border shopping effects may extend beyond immediately adjacent states.
+
+From a software perspective, the SDPDmod package provides a streamlined R workflow that covers the complete spatial panel modeling pipeline --- from Bayesian model selection through estimation to impact decomposition --- in a coherent framework.
+
+## 12. Summary and Next Steps
+
+- **Spatial models matter for tobacco policy:** the total price elasticity (-1.23 in the static SDM) is 22% larger than the direct effect alone, meaning unilateral state tax increases generate spillovers to neighboring states that standard panel models miss.
+- **Bayesian model comparison provides principled model selection:** the SDM is overwhelmingly preferred in static specifications (99.89% probability with individual FE).
+- **Habit persistence is the dominant dynamic force:** the temporal lag coefficient $\tau \approx 0.86$ dwarfs the contemporaneous spatial effect ($\rho = 0.16$), and static models conflate short-run and long-run responses.
+- **Cross-border shopping emerges in the dynamic SDM:** the positive spatial lag of price (`W*logp = 0.20`) means that neighboring states' price increases boost own consumption in the short run.
+
+For further study, see the companion [Stata spatial panel tutorial](https://carlos-mendez.org/post/stata_sp_regression_panel/) that applies `xsmle` to the same dataset, and the [Stata cross-sectional spatial tutorial](https://carlos-mendez.org/post/stata_sp_regression_cross_section/).
+
+## 13. Exercises
+
+1. **Build your own W.** Re-run `blmpSDPD()` with `W2` instead of `W`. Does the Bayesian model comparison still favor the SDM?
+2. **Include pimin directly.** Add `lpm = log(pimin/cpi)` as an additional covariate in the SAR model: `logc ~ logp + logy + lpm`. Does `lpm` remain significant alongside the spatial lag of the dependent variable?
+3. **SAR vs. SDM indirect effects.** The indirect income effect *reverses sign* between the static SAR and SDM. Write a paragraph explaining this reversal in terms of the cross-border shopping mechanism.
+4. **Subsample analysis.** Split the data into two periods (1963--1977 and 1978--1992). Re-estimate the dynamic SDM for each period. Does $\tau$ change over time? Has $\rho$ strengthened or weakened?
+
+---
+
+## Source files
+
+- Companion script: [`analysis.R`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_SDPDmod/analysis.R)
+- Published post: <https://carlos-mendez.org/post/r_SDPDmod/>
+- GitHub repo: <https://github.com/cmg777/starter-academic-v501>
+
+## 14. References
+
+1. [Simonovska, R. (2025). SDPDmod: An R Package for Spatial Dynamic Panel Data Modeling. *Computational Economics*.](https://doi.org/10.1007/s10614-025-11056-2)
+2. [Baltagi, B. H. & Levin, D. (1992). Cigarette Taxation: Raising Revenues and Reducing Consumption. *Structural Change and Economic Dynamics*, 3(2), 321--335.](https://doi.org/10.1016/0954-349X(92)90010-4)
+3. [Lee, L.-F. & Yu, J. (2010). Estimation of Spatial Autoregressive Panel Data Models with Fixed Effects. *Journal of Econometrics*, 154(2), 165--185.](https://doi.org/10.1016/j.jeconom.2009.08.001)
+4. [LeSage, J. P. (2014). Spatial Econometric Panel Data Model Specification: A Bayesian Approach. *Spatial Statistics*, 9, 122--145.](https://doi.org/10.1016/j.spasta.2014.02.002)
+5. [Elhorst, J. P. (2014). *Spatial Econometrics: From Cross-Sectional Data to Spatial Panels.* Springer.](https://doi.org/10.1007/978-3-642-40340-8)
+6. [LeSage, J. P. & Pace, R. K. (2009). *Introduction to Spatial Econometrics.* Chapman & Hall/CRC.](https://doi.org/10.1201/9781420064254)

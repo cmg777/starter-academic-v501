@@ -1,0 +1,829 @@
+---
+title: "Bayesian Spatial Synthetic Control: California's Proposition 99 in R"
+subtitle: "Three estimators (classical SCM, Bayesian horseshoe, Bayesian SAR) on one panel"
+author: "Carlos Mendez"
+date: "2026-05-14"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    theme: darkly
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 300
+execute:
+  warning: false
+  message: false
+---
+
+## 1. Overview
+
+When California passed **Proposition 99** in November 1988, raising the cigarette tax by 25 cents per pack and earmarking the revenue for tobacco-control programs, it launched what would become the most studied state-level public health policy in econometrics. The standard analysis --- Abadie, Diamond, and Hainmueller's celebrated **synthetic control method (SCM)** --- builds a counterfactual California from a weighted average of donor states that did not change their tobacco policy, and reads the treatment effect off the gap between observed and synthetic sales. That estimate has been quoted for two decades: California's per-capita cigarette consumption fell by roughly 25--30 packs per year below what it would have been without Prop 99.
+
+But the classical SCM rests on two assumptions that recent work has questioned. First, the donor weights live on the **simplex** (non-negative, summing to one) and are chosen by a quadratic optimizer that often produces a *sparse* solution --- four or five donors carry essentially all the weight. Whether that sparsity reflects the data or the constraint is unclear. Second, the method assumes **SUTVA** (the stable unit treatment value assumption): the donor states' outcomes are unaffected by California's policy. If Californians drive to Nevada to buy cheaper cigarettes --- a phenomenon well documented in the cross-border-shopping literature --- that assumption is wrong, and the counterfactual itself is contaminated.
+
+This tutorial is **inspired by** Sakaguchi & Tagawa (2026), *Identification and Bayesian Inference for Synthetic Control Methods with Spillover Effects* ([The Econometrics Journal](https://doi.org/10.1093/ectj/utag006)), and replicates their California case study using the accompanying `scspill` replication package in R. We answer one case-study question: **what is the average treatment effect on the treated (ATT) of Proposition 99 on California's per-capita cigarette sales, and how does the estimate (and our reading of it) change as we (a) replace the simplex with a Bayesian horseshoe prior on donor weights and (b) explicitly model cross-state spillovers via a spatial autoregressive (SAR) layer?** The post progresses from the classical Abadie SCM through Bayesian horseshoe shrinkage to the full Bayesian spatial model, comparing all three on the same panel.
+
+**Learning objectives:**
+
+- **Understand** the SUTVA assumption built into classical synthetic control and why cross-state cigarette flows make it suspect for the California tobacco case.
+- **Implement** three nested estimators (classical SCM via `tidysynth`, Bayesian SCM with a horseshoe prior, and Bayesian Spatial SCM with a SAR layer) on the same 39-state US panel.
+- **Estimate** the ATT and posterior credible intervals under each specification, and read off the spillover effects on neighbouring donor states.
+- **Compare** the three approaches on point estimate, donor-pool sparsity, and uncertainty propagation, then judge which differences are substantive and which are artifacts of the prior structure.
+- **Interpret** the spatial autocorrelation parameter $\rho$ and the per-state spillover effects as evidence that SUTVA is empirically false for this case study.
+
+### Key concepts at a glance
+
+The rest of the tutorial leans on a small vocabulary. Each concept below has a definition, an example, and an analogy.
+
+**1. Average Treatment Effect on the Treated (ATT)** $\mathrm{ATT} = E[Y_i(1) - Y_i(0) \mid D_i = 1]$. The causal effect averaged over the units that actually received the treatment, not the whole population.
+
+**Example.** In this post the ATT is California's per-capita cigarette sales 1988--2000 minus a synthetic California's. Classical SCM gives $\widehat{\mathrm{ATT}} = -18.46$ packs/capita/year. Each method targets the same ATT, but constructs the synthetic California differently.
+
+**Analogy.** A patient took a new drug; we never see the same patient untreated, so we average across similar untreated patients to imagine what the treated patient *would* have done. The ATT is the treated patient's actual outcome minus that imagined twin's.
+
+**2. Synthetic control method (SCM)** $\widehat{Y}_{1,t}^{(0)} = \sum_j \alpha_j Y_{j,t}$. A counterfactual outcome for the one treated unit is built as a convex combination of donor units. Classical SCM constrains the weights to the simplex (non-negative, summing to 1) and chooses them to match pre-treatment outcomes.
+
+**Example.** In this post classical SCM concentrates 99% of weight on four donors --- Utah 0.327, Nevada 0.255, Montana 0.245, and Connecticut 0.148. The synthetic California is a weighted blend of those four states.
+
+**Analogy.** A perfumer mixes a few base scents to imitate one signature fragrance. The recipe (the weights) is chosen so the imitation matches the original on every pre-treatment day.
+
+**3. Donor pool.** The set of units eligible to build the synthetic counterfactual. They must be untreated throughout the study window and similar enough to the treated unit on pre-treatment characteristics.
+
+**Example.** In this post the donor pool is the 38 US states other than California that did not change their tobacco taxes around 1988. The treated unit is California; donors include Utah, Nevada, Connecticut, Illinois, and 34 others.
+
+**Analogy.** A casting call: 38 actors audition to play the role of "California without Prop 99". The director picks a weighted blend rather than one body double.
+
+**4. Horseshoe prior** $\alpha_j \sim \mathcal{N}(0, \tau^2 \lambda_j^2)$ with $\tau, \lambda_j \sim \mathrm{HalfCauchy}(0, 1)$. A heavy-tailed prior on donor weights that simultaneously favours sparsity (most weights near zero) and allows a handful of large weights to escape the shrinkage.
+
+**Example.** In this post the horseshoe spreads non-trivial posterior mass across 23 of 38 donors (vs only 4 under the classical simplex). Connecticut leads with mean weight 0.218, but only Nevada's 95% credible interval [0.081, 0.266] excludes zero.
+
+**Analogy.** A juror who starts every defendant near "not guilty" but is willing to convict the very few against whom the evidence is overwhelming. Most weights stay near zero; a few break free.
+
+**5. SUTVA.** The stable unit treatment value assumption. A donor's outcome under the no-treatment scenario does not depend on whether other units were treated. SUTVA fails if California's policy changes Nevada's cigarette sales.
+
+**Example.** In this post we have direct evidence SUTVA fails: the SAR-estimated post-treatment spillover on Nevada is -3.75 packs/capita/year, an order of magnitude larger than on any other donor. Classical SCM treats this as part of the donor signal rather than a contamination.
+
+**Analogy.** Two adjacent restaurants. The new health code at restaurant A drives away customers, and some of them walk into restaurant B. Measuring restaurant A's revenue change while treating restaurant B as an unaffected "control" understates the policy's true reach.
+
+**6. Spatial autoregressive (SAR) model** $y = \rho W y + X \beta + \varepsilon$. The dependent variable is regressed on a spatially weighted average of itself (the spatial lag $W y$). The scalar $\rho$ measures how strongly each unit's outcome co-moves with its neighbours after controlling for covariates.
+
+**Example.** In this post the posterior mean is $\hat\rho = 0.223$ (95% credible interval [0.168, 0.272]). A 1-unit change in the row-normalized neighbour average of cigarette sales is associated with a 0.223-unit change in a state's own sales --- modest but clearly non-zero.
+
+**Analogy.** How loudly your neighbours' music sets the volume of yours, holding your taste fixed. If $\rho = 0$, you ignore them; if $\rho \to 1$, your stereo basically copies theirs.
+
+**7. Spillover effect.** The effect on a donor unit of the treatment imposed on the treated unit. Under classical SCM (SUTVA) spillovers are assumed zero; under the SAR layer they emerge as a derived quantity once $\rho$ and the W matrix are estimated.
+
+**Example.** In this post Nevada absorbs the largest negative spillover: -3.75 packs/capita averaged over 1988--2000. Idaho and Utah each receive ~ -0.23. The remaining 35 donor states have spillover magnitudes below 0.02 --- geographic adjacency dominates.
+
+**Analogy.** A neighbour's leaky pipe. Most of the room stays dry, but the one wall sharing plumbing with the neighbour soaks through. Spillover effects measure that soak-through.
+
+### The three-stage modelling pipeline
+
+The analysis follows a natural progression: start from the simplest synthetic control (classical Abadie), relax the simplex constraint with a Bayesian prior, then drop SUTVA via a SAR layer. Each stage estimates the same ATT on California but under progressively weaker assumptions.
+
+```{mermaid}
+graph LR
+    A["<b>Stage 1</b><br/>Classical SCM<br/>simplex weights"] --> B["<b>Stage 2</b><br/>Bayesian SCM<br/>horseshoe prior"]
+    B --> C["<b>Stage 3</b><br/>Bayesian Spatial SCM<br/>SAR + horseshoe"]
+    C --> D["<b>Diagnostics</b><br/>prior predictive<br/>spillovers"]
+    D --> E["<b>Cross-stage</b><br/>ATT comparison<br/>4 → 23 → 27 donors"]
+
+    style A fill:#6a9bcc,stroke:#141413,color:#fff
+    style B fill:#d97757,stroke:#141413,color:#fff
+    style C fill:#00d4c8,stroke:#141413,color:#fff
+    style D fill:#1a3a8a,stroke:#141413,color:#fff
+    style E fill:#141413,stroke:#6a9bcc,color:#fff
+```
+
+Read the arrows as "relaxing assumptions". Stage 1 imposes a simplex and SUTVA; Stage 2 relaxes the simplex to a heavy-tailed prior but keeps SUTVA; Stage 3 also relaxes SUTVA. The diagnostics box confirms that the prior used in Stages 2 and 3 is compatible with the data, and the cross-stage panel surfaces how the active-donor count grows from 4 → 23 → 27 as the prior structure relaxes.
+
+## 2. Setup and imports
+
+The analysis uses [tidysynth](https://github.com/edunford/tidysynth) for the classical SCM baseline and the authors' replication helpers (bundled in `helpers/`, fetched at runtime from this repo's GitHub raw URLs) for the Bayesian Gibbs samplers. The C++ MCMC kernels are sourced via [Rcpp](https://www.rcpp.org/) and [RcppArmadillo](https://dirk.eddelbuettel.com/code/rcpp.armadillo.html); diagnostics use [coda](https://cran.r-project.org/web/packages/coda/index.html).
+
+The setup chunk pins exact package versions used when this notebook was authored, so a reader who renders this `.qmd` months from now gets identical numerical output.
+
+```{r}
+#| label: setup-packages
+
+# Install pak (the fast modern installer) if missing. pak is the only
+# bootstrap dependency; everything else gets pinned-version installs.
+if (!requireNamespace("pak", quietly = TRUE)) {
+  install.packages("pak", repos = "https://cloud.r-project.org")
+}
+
+# Pinned versions used when this post was published. Pinning fosters
+# replicability: a reader who renders this notebook on any machine, any
+# future date, gets the same numbers as the original. The check below
+# skips the pak install when the right version is already present (saves
+# time on warm machines AND avoids spurious source rebuilds of packages
+# like RcppArmadillo when the local toolchain lacks gfortran/openmp).
+PINNED <- c(
+  tidyverse     = "2.0.0",
+  tidysynth     = "0.2.1",
+  Rcpp          = "1.1.1-1.1",
+  RcppArmadillo = "15.2.3-1",
+  Matrix        = "1.7-4",
+  glue          = "1.8.1",
+  scales        = "1.4.0",
+  patchwork     = "1.3.2",
+  coda          = "0.19-4.1"
+)
+
+needs_install <- character()
+for (pkg in names(PINNED)) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    needs_install <- c(needs_install, paste0(pkg, "@", PINNED[[pkg]]))
+  } else {
+    have <- as.character(packageVersion(pkg))
+    # Normalize CRAN-style version strings (e.g. "15.2.3-1" vs "15.2.3.1")
+    if (gsub("-", ".", have) != gsub("-", ".", PINNED[[pkg]])) {
+      needs_install <- c(needs_install, paste0(pkg, "@", PINNED[[pkg]]))
+    }
+  }
+}
+if (length(needs_install) > 0) {
+  pak::pkg_install(needs_install)
+}
+
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(tidysynth)
+  library(Rcpp)
+  library(RcppArmadillo)
+  library(Matrix)
+  library(glue)
+  library(scales)
+  library(patchwork)
+  library(coda)
+})
+
+SEED <- 20251022L
+set.seed(SEED)
+
+MCMC_ITER <- 5000L
+MCMC_BURN <- 2500L
+TREAT_YEAR <- 1988L  # package convention: year >= 1988 is post-treatment
+
+SLUG <- "r_sc_bayes_spatial"
+
+# Dark-theme palette (matches the published post figures)
+BG     <- "#0f1729"
+GRID   <- "#1f2b5e"
+TEXT   <- "#c8d0e0"
+WHITE  <- "#e8ecf2"
+STEEL  <- "#6a9bcc"
+ORANGE <- "#d97757"
+TEAL   <- "#00d4c8"
+
+theme_dark_site <- function(base_size = 12) {
+  theme_minimal(base_size = base_size) +
+    theme(
+      plot.background  = element_rect(fill = BG, colour = NA),
+      panel.background = element_rect(fill = BG, colour = NA),
+      panel.grid.major = element_line(colour = GRID, linewidth = 0.3),
+      panel.grid.minor = element_line(colour = GRID, linewidth = 0.15),
+      axis.text        = element_text(colour = TEXT),
+      axis.title       = element_text(colour = TEXT),
+      plot.title       = element_text(colour = WHITE, face = "bold"),
+      plot.subtitle    = element_text(colour = TEXT),
+      plot.caption     = element_text(colour = TEXT, size = 8),
+      legend.background = element_rect(fill = BG, colour = NA),
+      legend.text       = element_text(colour = TEXT),
+      legend.title      = element_text(colour = TEXT),
+      strip.background  = element_rect(fill = GRID, colour = NA),
+      strip.text        = element_text(colour = WHITE, face = "bold")
+    )
+}
+
+say <- function(...) cat(glue(..., .sep = ""), "\n", sep = "")
+```
+
+We pin the seed to `20251022` (matching the replication package) and use a tutorial-scale MCMC budget of 5,000 iterations with 2,500 burn-in. The paper itself runs 100,000 iterations; we will surface the consequences of the smaller budget when we read the effective sample size for $\rho$ in Stage 3.
+
+The figures use a dark-navy palette (`#0f1729` background, steel-blue and warm-orange accents). On macOS systems where the CRAN gfortran toolchain is not installed at `/opt/gfortran/`, `Rcpp::sourceCpp` will fail unless `R_MAKEVARS_USER` points to a `Makevars` file with the local gfortran path; the post bundle ships a `.Makevars-rcpp` example.
+
+### Fetching the helpers and compiling C++
+
+```{r}
+#| label: fetch-helpers
+
+# Helper files (R utils, C++ MCMC kernels, california_smoking.rda) are fetched
+# at runtime from this repo's GitHub raw URLs so the notebook is self-contained.
+REPL_URL <- "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_sc_bayes_spatial/helpers"
+
+r_helpers <- c("01_utils.R", "02_utils_data_prep.R", "03_utils_plot.R",
+               "04_utils_diagnostics.R", "10_sc_spillover.R",
+               "21_mcmc_alpha.R", "22_mcmc_sar.R", "41_robustness_check.R")
+for (h in r_helpers) source(file.path(REPL_URL, h), local = FALSE)
+
+# Rcpp::sourceCpp() needs a local file path, so download each .cpp to a tmpdir
+# and compile from there.
+cpp_dir <- tempfile("rscbs_cpp_"); dir.create(cpp_dir)
+
+# On macOS systems without CRAN's gfortran at /opt/gfortran/, the R default
+# Makeconf's FLIBS line references missing emutls_w/heapt_w libs and the
+# link step fails. Override FLIBS via a temporary Makevars file picked up
+# by R_MAKEVARS_USER. Adjust the gcc path below to your local install.
+if (Sys.info()[["sysname"]] == "Darwin" && !dir.exists("/opt/gfortran")) {
+  homebrew_gcc <- Sys.glob("/usr/local/Cellar/gcc/*/lib/gcc/*")
+  if (length(homebrew_gcc) > 0) {
+    mvars <- file.path(cpp_dir, "Makevars")
+    writeLines(
+      sprintf("FLIBS = -L%s -lgfortran -lquadmath", homebrew_gcc[[1]]),
+      mvars
+    )
+    Sys.setenv(R_MAKEVARS_USER = mvars)
+    cat("[OK] Wrote temp Makevars with FLIBS pointing at", homebrew_gcc[[1]], "\n")
+  }
+}
+
+for (cpp in c("20_mcmc.cpp", "40_geweke_latest.cpp")) {
+  local_path <- file.path(cpp_dir, cpp)
+  download.file(file.path(REPL_URL, cpp), local_path,
+                mode = "wb", quiet = TRUE)
+  Rcpp::sourceCpp(local_path)
+}
+cat("[OK] R helpers fetched and C++ kernels compiled.\n")
+```
+
+The replication package exposes three pieces we will use directly: `hs_alpha_gibbs_cpp` (the C++ horseshoe Gibbs sampler), `sc_spillover` (the unified Bayesian + SAR pipeline), and `prior_predictive` (the diagnostic for prior--data compatibility).
+
+## 3. Data overview
+
+The dataset bundled with the package --- `california_smoking.rda` --- is a balanced panel of **39 US states from 1970 to 2000**, with per-capita cigarette sales (`cigsale`) and real retail price (`retprice`). The treatment dummy switches on for California in 1988 (the package convention; Prop 99 was approved in November 1988 and took effect in January 1989). The donor pool is the 38 other states.
+
+```{r}
+#| label: data-download
+
+# .rda is gzipped binary; download to a tempfile in binary mode, then load.
+rda_path <- tempfile(fileext = ".rda")
+download.file(file.path(REPL_URL, "california_smoking.rda"), rda_path,
+              mode = "wb", quiet = TRUE)
+load(rda_path)
+panel_df <- california_smoking$panel_df %>%
+  mutate(treatment = if_else(state == "California" & year >= TREAT_YEAR, 1L, 0L))
+
+# Control-only spatial structures: w (38-vec) and W (38x38 binary adjacency)
+w_vec <- california_smoking$w
+W_mat <- california_smoking$W
+w <- as.matrix(w_vec[, 2])
+W <- as.matrix(W_mat[, -1])
+rownames(W) <- W_mat$state
+colnames(W) <- W_mat$state
+
+state_order <- sort(unique(panel_df$state))
+donors <- setdiff(state_order, "California")
+
+say("Panel: {nrow(panel_df)} rows | {length(state_order)} states | ",
+    "years {min(panel_df$year)}-{max(panel_df$year)}")
+say("Treated: California | Donors: {length(donors)} | ",
+    "Pre-period: {min(panel_df$year)}-{TREAT_YEAR-1} | ",
+    "Post-period: {TREAT_YEAR}-{max(panel_df$year)}")
+```
+
+The panel has **1,209 observations** (39 states $\times$ 31 years), with **18 pre-treatment years** (1970--1987) and **13 post-treatment years** (1988--2000). The shipped data carries only `cigsale` and `retprice` --- narrower than the predictor set Abadie (2010) used, which also included log income, the share of population aged 15--24, and beer sales. This narrower predictor set is the dominant reason our classical ATT (around -18) is smaller in magnitude than Abadie's published headline (around -27); the methodological pipeline below is identical, but the inputs differ.
+
+The package also bundles two spatial structures: a 38-vector `w` giving California's contiguity weights over the donor states (Arizona, Nevada, and Oregon are non-zero) and a 38 $\times$ 38 binary contiguity matrix `W` among the donors. Both are row-normalized internally by `sc_spillover()` before they enter the SAR likelihood.
+
+## 4. Stage 1 --- Classical synthetic control (Abadie 2010 baseline)
+
+The classical synthetic control method solves a constrained quadratic program: pick donor weights on the simplex that minimize the pre-treatment fit error between California and the synthetic. Formally,
+
+$$\widehat\alpha = \arg\min_\alpha \big\| Y_{1,\text{pre}} - Y_{c,\text{pre}} \, \alpha \big\|^2 \quad \text{s.t.} \quad \alpha_j \geq 0, \, \sum_j \alpha_j = 1$$
+
+In words, this equation says: line up California's pre-treatment cigarette sales next to the donor states' pre-treatment sales, and choose non-negative weights summing to one that make the weighted donor average track California as closely as possible over 1970--1987.
+
+We use the `tidysynth` package to fit this model with a small set of pre-treatment predictors (mean `cigsale` and `retprice` over 1970--1987, plus three single-year lags at 1975, 1980, and 1987).
+
+```{r}
+#| label: fit-classical-scm
+
+sc_classic <- panel_df %>%
+  synthetic_control(
+    outcome     = cigsale,
+    unit        = state,
+    time        = year,
+    i_unit      = "California",
+    i_time      = TREAT_YEAR,
+    generate_placebos = FALSE
+  ) %>%
+  generate_predictor(time_window = 1970:(TREAT_YEAR - 1),
+                     cigsale_avg_pre = mean(cigsale, na.rm = TRUE),
+                     retprice_avg    = mean(retprice, na.rm = TRUE)) %>%
+  generate_predictor(time_window = 1975, cigsale_1975 = cigsale) %>%
+  generate_predictor(time_window = 1980, cigsale_1980 = cigsale) %>%
+  generate_predictor(time_window = TREAT_YEAR - 1, cigsale_pre = cigsale) %>%
+  generate_weights(optimization_window = 1970:(TREAT_YEAR - 1)) %>%
+  generate_control()
+
+w_classic <- grab_unit_weights(sc_classic) %>%
+  rename(state = unit) %>%
+  arrange(desc(weight))
+
+traj_classic <- grab_synthetic_control(sc_classic) %>%
+  rename(year = time_unit, observed = real_y, synthetic = synth_y) %>%
+  mutate(gap = observed - synthetic,
+         period = if_else(year < TREAT_YEAR, "pre", "post"))
+
+att_classic <- mean(traj_classic$gap[traj_classic$period == "post"])
+
+set.seed(SEED)
+boot_classic <- replicate(
+  2000,
+  mean(sample(traj_classic$gap[traj_classic$period == "post"], replace = TRUE))
+)
+att_classic_ci <- quantile(boot_classic, c(0.025, 0.975), names = FALSE)
+
+say("Stage 1 ATT (Classical SCM): {round(att_classic, 2)} ",
+    "packs per capita, 95% boot CI [{round(att_classic_ci[1], 2)}, ",
+    "{round(att_classic_ci[2], 2)}]")
+cat("\nTop-5 donor weights (classical):\n")
+print(head(w_classic, 5))
+```
+
+```{r}
+#| label: fig-classical-paths
+#| fig-cap: "Classical SCM trajectory. Pre-1988 the two paths are visually indistinguishable; post-1988 California falls sharply below synthetic, with the gap widening through 2000."
+#| fig-height: 8
+
+p1a <- ggplot(traj_classic, aes(x = year)) +
+  geom_line(aes(y = observed, colour = "California (observed)"),
+            linewidth = 1.1) +
+  geom_line(aes(y = synthetic, colour = "Synthetic California"),
+            linewidth = 1.1, linetype = "dashed") +
+  geom_vline(xintercept = TREAT_YEAR - 0.5, colour = ORANGE,
+             linetype = "dotted", linewidth = 0.6) +
+  annotate("text", x = TREAT_YEAR, y = 130, label = "Prop 99",
+           colour = ORANGE, hjust = 0, size = 3.5) +
+  scale_colour_manual(values = c("California (observed)" = STEEL,
+                                 "Synthetic California"  = TEAL)) +
+  labs(title = "Stage 1 - Classical SCM",
+       subtitle = "Per-capita cigarette sales, California vs. synthetic counterfactual",
+       x = NULL, y = "Cigarette sales per capita",
+       colour = NULL) +
+  theme_dark_site() +
+  theme(legend.position = "top")
+
+p1b <- ggplot(traj_classic, aes(x = year, y = gap)) +
+  geom_hline(yintercept = 0, colour = TEXT, linewidth = 0.4) +
+  geom_vline(xintercept = TREAT_YEAR - 0.5, colour = ORANGE,
+             linetype = "dotted", linewidth = 0.6) +
+  geom_line(colour = STEEL, linewidth = 1.1) +
+  labs(title = "Treatment gap (observed - synthetic)",
+       x = "Year", y = "Gap (packs per capita)") +
+  theme_dark_site()
+
+(p1a / p1b) + plot_annotation(
+  theme = theme(plot.background = element_rect(fill = BG, colour = NA))
+)
+```
+
+The classical synthetic California is a near-pure mixture of four donors: **Utah, Nevada, Montana, and Connecticut**, which together carry 97.5% of the weight. The remaining 34 donors are essentially zero. The recovered ATT of **-18.46 packs per capita** (95% bootstrap CI [-22.21, -14.45]) means California's cigarette consumption fell, on average, 18.46 packs per person per year below the synthetic counterfactual over 1988--2000, and the interval never crosses zero. The point estimate is smaller in magnitude than Abadie's original ~ -27 for two compounding reasons: `tidysynth`'s optimizer differs slightly from Abadie's `Synth`, and --- more importantly --- our predictor set is limited to `cigsale` and `retprice` because the shipped data does not include log income, youth share, or beer sales. We will see in Stages 2 and 3 that even with this leaner predictor set the qualitative finding (large negative effect; no zero crossing) is robust.
+
+Two questions remain. First, is the four-donor sparsity a feature of the data or an artifact of the simplex constraint? Second, is the synthetic California contaminated by spillovers from California to Nevada --- the most heavily weighted donor and a state literally next door? Stages 2 and 3 attack these questions one at a time.
+
+## 5. Stage 2 --- Bayesian synthetic control with a horseshoe prior
+
+The simplex constraint of classical SCM serves a useful purpose (interpretability) but also forces the optimizer toward sparse, deterministic solutions. The **horseshoe prior** of Carvalho, Polson, and Scott (2010) provides an alternative regularizer that retains a strong preference for zero but allows individual weights to escape the shrinkage when the data demand it. The hierarchy is
+
+$$\alpha_j \mid \tau, \lambda_j \sim \mathcal{N}\big(0, \, \tau^2 \lambda_j^2\big), \quad \lambda_j \sim \mathcal{C}^+(0, 1), \quad \tau \sim \mathcal{C}^+(0, 1)$$
+
+In words, each donor weight $\alpha_j$ is drawn from a normal centered at zero, but its scale is the product of a global shrinkage parameter $\tau$ (which pulls everything toward zero) and a *local* scale $\lambda_j$ (which lets individual donors break free). The half-Cauchy priors on $\tau$ and $\lambda_j$ have the heavy tails that give the horseshoe its name --- they make zero overwhelmingly likely a priori but never rule out large weights. The data, not the constraint, decide which donors get non-zero posterior mass.
+
+The package implements the Gibbs sampler in C++ as `hs_alpha_gibbs_cpp`. We construct the pre-treatment matrices and call it directly (no SAR layer in this stage):
+
+```{r}
+#| label: stage2-build-matrices
+
+years_all  <- sort(unique(panel_df$year))
+years_pre  <- years_all[years_all <  TREAT_YEAR]
+years_post <- years_all[years_all >= TREAT_YEAR]
+
+Y0_pre <- panel_df %>% filter(state == "California", year < TREAT_YEAR) %>%
+  arrange(year) %>% pull(cigsale)
+
+Y0_post <- panel_df %>% filter(state == "California", year >= TREAT_YEAR) %>%
+  arrange(year) %>% pull(cigsale)
+
+Yc_pre <- panel_df %>% filter(state != "California", year < TREAT_YEAR) %>%
+  pivot_wider(id_cols = year, names_from = state, values_from = cigsale) %>%
+  select(-year) %>%
+  select(all_of(donors)) %>%
+  as.matrix()
+
+Yc_post <- panel_df %>% filter(state != "California", year >= TREAT_YEAR) %>%
+  pivot_wider(id_cols = year, names_from = state, values_from = cigsale) %>%
+  select(-year) %>%
+  select(all_of(donors)) %>%
+  as.matrix()
+```
+
+```{r}
+#| label: fit-bayesian-hs
+
+set.seed(SEED)
+alpha_draws_hs <- hs_alpha_gibbs_cpp(
+  Y0_pre, Yc_pre, iteration = MCMC_ITER, burn = MCMC_BURN, verbose = FALSE
+)
+colnames(alpha_draws_hs) <- donors
+
+alpha_hs_summary <- tibble(
+  state = donors,
+  mean  = colMeans(alpha_draws_hs),
+  lo95  = apply(alpha_draws_hs, 2, quantile, probs = 0.025, names = FALSE),
+  hi95  = apply(alpha_draws_hs, 2, quantile, probs = 0.975, names = FALSE)
+) %>% arrange(desc(mean))
+
+alpha_hat_hs   <- colMeans(alpha_draws_hs)
+synth_hs_pre   <- as.numeric(Yc_pre  %*% alpha_hat_hs)
+synth_hs_post  <- as.numeric(Yc_post %*% alpha_hat_hs)
+gap_hs_pre     <- Y0_pre  - synth_hs_pre
+gap_hs_post    <- Y0_post - synth_hs_post
+
+gap_pre_draws  <- Y0_pre  - Yc_pre  %*% t(alpha_draws_hs)
+gap_post_draws <- Y0_post - Yc_post %*% t(alpha_draws_hs)
+gap_hs_lo_pre  <- apply(gap_pre_draws,  1, quantile, 0.025, names = FALSE)
+gap_hs_hi_pre  <- apply(gap_pre_draws,  1, quantile, 0.975, names = FALSE)
+gap_hs_lo_post <- apply(gap_post_draws, 1, quantile, 0.025, names = FALSE)
+gap_hs_hi_post <- apply(gap_post_draws, 1, quantile, 0.975, names = FALSE)
+
+att_hs_draws <- colMeans(gap_post_draws)
+att_hs       <- mean(att_hs_draws)
+att_hs_ci    <- quantile(att_hs_draws, c(0.025, 0.975), names = FALSE)
+
+say("Stage 2 ATT (Bayesian HS): {round(att_hs, 2)} packs per capita, ",
+    "95% CrI [{round(att_hs_ci[1], 2)}, {round(att_hs_ci[2], 2)}]")
+say("Active donors (mean alpha > 0.01): ",
+    "{sum(alpha_hs_summary$mean > 0.01)} of 38")
+cat("\nTop-5 donor weights (Bayesian HS):\n")
+print(head(alpha_hs_summary, 5))
+```
+
+```{r}
+#| label: fig-horseshoe-weights
+#| fig-cap: "Horseshoe posterior on donor weights. Most donors' posterior means hug zero, but Connecticut, Nevada, West Virginia, Montana, and Illinois carry visible mass; only Nevada's 95% credible interval excludes zero."
+#| fig-height: 9
+#| fig-width: 8
+
+alpha_hs_summary %>%
+  mutate(state = factor(state, levels = rev(state))) %>%
+  ggplot(aes(x = mean, y = state)) +
+  geom_segment(aes(x = 0, xend = mean, yend = state), colour = TEAL, alpha = 0.6) +
+  geom_point(colour = TEAL, size = 2) +
+  geom_errorbar(aes(xmin = lo95, xmax = hi95), orientation = "y",
+                colour = STEEL, width = 0, alpha = 0.7) +
+  geom_vline(xintercept = 0, colour = TEXT, linetype = "dashed", linewidth = 0.3) +
+  labs(title = "Stage 2 - Horseshoe posterior on donor weights",
+       subtitle = "Posterior mean and 95% credible intervals - most donors shrink toward zero",
+       x = expression(paste("Posterior weight ", alpha[j])),
+       y = NULL,
+       caption = glue("MCMC: {MCMC_ITER} iter, {MCMC_BURN} burn-in (tutorial scale).")) +
+  theme_dark_site() +
+  theme(axis.text.y = element_text(size = 8))
+```
+
+The donor pool **broadens dramatically** under the horseshoe: 23 of 38 donors carry posterior mean weight above 0.01 (versus 4 under the classical simplex), and the top five --- Connecticut, Nevada, West Virginia, Montana, and Illinois --- together hold less than 80% of the mass. Crucially, only **Nevada's 95% credible interval** [0.081, 0.266] excludes zero; every other top-five donor is statistically consistent with no contribution. The teaching point is that classical SCM's "sparsity" is partly a constraint artifact: when we admit posterior uncertainty over weights, the data do not strongly insist on a four-donor synthetic.
+
+The ATT also moves: from -18.46 (classical) to **-15.84 packs/capita** with a 95% credible interval of [-21.76, -9.48]. The interval is wider than Stage 1's bootstrap CI by design --- the horseshoe propagates donor-weight uncertainty into the gap series rather than treating the weights as fixed at the optimizer's best guess. The interval still never reaches zero, so the negative-effect finding is robust to the simplex relaxation.
+
+```{r}
+#| label: fig-stage2-paths
+#| fig-cap: "Bayesian SCM trajectory with propagated uncertainty. Pre-1988 fit is excellent; post-1988 the credible band widens to roughly +/- 10 packs/capita by 1995, and the central gap reaches ~ -25 packs/capita by 2000."
+#| fig-height: 8
+
+stage2_gap_tbl <- tibble(
+  year     = c(years_pre, years_post),
+  observed = c(Y0_pre, Y0_post),
+  synthetic= c(synth_hs_pre, synth_hs_post),
+  gap      = c(gap_hs_pre, gap_hs_post),
+  gap_lo95 = c(gap_hs_lo_pre, gap_hs_lo_post),
+  gap_hi95 = c(gap_hs_hi_pre, gap_hs_hi_post),
+  period   = c(rep("pre", length(years_pre)), rep("post", length(years_post)))
+)
+
+p5a <- ggplot(stage2_gap_tbl, aes(x = year)) +
+  geom_line(aes(y = observed, colour = "California (observed)"),
+            linewidth = 1.1) +
+  geom_line(aes(y = synthetic, colour = "Synthetic (HS posterior mean)"),
+            linewidth = 1.1, linetype = "dashed") +
+  geom_vline(xintercept = TREAT_YEAR - 0.5, colour = ORANGE,
+             linetype = "dotted", linewidth = 0.6) +
+  scale_colour_manual(values = c("California (observed)" = STEEL,
+                                 "Synthetic (HS posterior mean)" = TEAL)) +
+  labs(title = "Stage 2 - Bayesian SCM with horseshoe priors",
+       subtitle = "Per-capita cigarette sales, observed vs. posterior-mean synthetic",
+       x = NULL, y = "Cigarette sales per capita", colour = NULL) +
+  theme_dark_site() +
+  theme(legend.position = "top")
+
+p5b <- ggplot(stage2_gap_tbl, aes(x = year, y = gap)) +
+  geom_hline(yintercept = 0, colour = TEXT, linewidth = 0.4) +
+  geom_ribbon(aes(ymin = gap_lo95, ymax = gap_hi95),
+              fill = STEEL, alpha = 0.25) +
+  geom_line(colour = STEEL, linewidth = 1.1) +
+  geom_vline(xintercept = TREAT_YEAR - 0.5, colour = ORANGE,
+             linetype = "dotted", linewidth = 0.6) +
+  labs(title = "Gap (observed - synthetic) with 95% credible band",
+       x = "Year", y = "Gap") +
+  theme_dark_site()
+
+(p5a / p5b) + plot_annotation(
+  theme = theme(plot.background = element_rect(fill = BG, colour = NA))
+)
+```
+
+The figure makes the propagated uncertainty visible: the pre-treatment fit is excellent (the synthetic tracks California closely from 1970--1987 with a narrow credible band) and the post-treatment band widens to roughly $\pm$ 10 packs/capita by 1995. The central gap reaches about -25 packs/capita by 2000, larger in magnitude than the post-period mean of -15.84 because the gap grows monotonically over time.
+
+## 6. Stage 3 --- Bayesian spatial synthetic control with SAR spillovers
+
+The horseshoe prior in Stage 2 relaxed the simplex but kept SUTVA --- donors' outcomes are still treated as unaffected by California's policy. For tobacco this assumption is empirically questionable: California raised its retail prices in 1989, and there is a long literature documenting cross-border cigarette flows when adjacent states have differential taxes. If Californians drove to Nevada to buy cigarettes and that flow shrank as Prop 99 changed Californian behavior on both sides of the border, then **Nevada's cigarette sales after 1988 are part of the treatment effect, not the counterfactual**.
+
+The Sakaguchi & Tagawa framework drops SUTVA by adding a **spatial autoregressive (SAR) layer** to the donor data-generating process:
+
+$$Y_{c,t} = \rho \, W \, Y_{c,t} + X_{c,t}\beta + Y_c^\text{lag} \alpha + \varepsilon_t$$
+
+In words, each donor state's cigarette sales at time $t$ depend on a row-normalized average of its neighbours' sales (the spatial lag $W Y_{c,t}$, weighted by the autocorrelation parameter $\rho$), on covariates $X$ (here just `retprice`), on the donor-side outcomes via the horseshoe weights $\alpha$ (the synthetic-control role), and on idiosyncratic noise $\varepsilon$. The matrix $W$ is the 38 $\times$ 38 row-normalized contiguity matrix among the donor states, and the scalar $\rho \in (-1, 1)$ captures the strength of spatial dependence.
+
+The package's `sc_spillover()` function runs both MCMCs (horseshoe $\alpha$ and SAR $\rho$) and post-processes the per-state spillover effects in one call:
+
+```{r}
+#| label: fit-sar
+
+fit_sar <- sc_spillover(
+  data            = panel_df,
+  treated_unit    = "California",
+  w               = w,
+  W               = W,
+  treatment_dummy = "treatment",
+  y               = "cigsale",
+  X               = c("retprice"),
+  p_factors       = 1,
+  M               = MCMC_ITER,
+  burn            = MCMC_BURN,
+  seed            = SEED,
+  step_rho        = 0.01,
+  unit_col        = "state",
+  time_col        = "year",
+  verbose         = FALSE
+)
+
+rho_draws <- fit_sar$rho_draws
+rho_hat   <- fit_sar$rho_hat
+ess_rho   <- coda::effectiveSize(coda::as.mcmc(rho_draws))[[1]]
+
+att_sar       <- fit_sar$effects$ate_point
+att_sar_ci    <- fit_sar$effects$ate_ci95
+te_sar_series <- fit_sar$effects$te_point
+
+say("Posterior mean rho (spatial autocorrelation): {round(rho_hat, 3)} | ",
+    "ESS = {round(ess_rho, 0)}")
+say("Stage 3 ATT (Bayesian Spatial SAR): {round(att_sar, 2)} packs per capita, ",
+    "95% CrI [{round(att_sar_ci[1], 2)}, {round(att_sar_ci[2], 2)}]")
+```
+
+The posterior mean **$\hat\rho \approx 0.22$** is bounded well within the stability region and bounded away from zero --- moderate spatial autocorrelation, exactly as the cross-border-flow intuition predicts. In the SAR equation a 1-unit change in the neighbour-averaged $W Y_c$ is associated with a 0.22-unit change in own $Y_c$, controlling for the horseshoe-weighted role and `retprice`. The Stage 3 ATT comes in around **-16.6 packs/capita**, between the classical (-18.46) and the Bayesian horseshoe (-15.84) --- adding the SAR layer reattributes a small portion of the gap from California's direct response to neighbour spillovers.
+
+The printed 95% credible interval is suspiciously narrow. That is the inferential cost of tutorial-scale MCMC: the effective sample size for $\rho$ is far below the rule-of-thumb 200, so posterior quantiles are based on just a few effectively independent draws. The point estimate is recoverable because it is a posterior mean (low bias even at low ESS), but the interval should be read as illustrative; the published paper achieves usable ESS by running 100,000 iterations rather than 5,000.
+
+```{r}
+#| label: fig-stage3-paths
+#| fig-cap: "Bayesian Spatial SCM trajectory and treatment-effect-over-time. Effect on California widens roughly linearly from ~ -5 packs/capita in 1988 to ~ -27 by 2000."
+#| fig-height: 8
+
+ycf_post <- Y0_post - te_sar_series
+
+stage3_full <- bind_rows(
+    tibble(year = years_pre, observed = Y0_pre,
+           synthetic = as.numeric(Yc_pre %*% fit_sar$alpha_hat)),
+    tibble(year = years_post, observed = Y0_post,
+           synthetic = as.numeric(ycf_post))
+  )
+
+stage3_gap_tbl <- tibble(
+  year      = years_post,
+  observed  = Y0_post,
+  synthetic = as.numeric(ycf_post),
+  gap       = as.numeric(te_sar_series)
+)
+
+p6a <- ggplot(stage3_full, aes(x = year)) +
+  geom_line(aes(y = observed, colour = "California (observed)"),
+            linewidth = 1.1) +
+  geom_line(aes(y = synthetic, colour = "Synthetic (SAR + horseshoe)"),
+            linewidth = 1.1, linetype = "dashed") +
+  geom_vline(xintercept = TREAT_YEAR - 0.5, colour = ORANGE,
+             linetype = "dotted", linewidth = 0.6) +
+  scale_colour_manual(values = c("California (observed)" = STEEL,
+                                 "Synthetic (SAR + horseshoe)" = TEAL)) +
+  labs(title = "Stage 3 - Bayesian Spatial Synthetic Control",
+       subtitle = "Per-capita cigarette sales, observed vs. SAR-spillover-corrected synthetic",
+       x = NULL, y = "Cigarette sales per capita", colour = NULL) +
+  theme_dark_site() +
+  theme(legend.position = "top")
+
+p6b <- ggplot(stage3_gap_tbl, aes(x = year, y = gap)) +
+  geom_hline(yintercept = 0, colour = TEXT, linewidth = 0.4) +
+  geom_line(colour = STEEL, linewidth = 1.1) +
+  geom_vline(xintercept = TREAT_YEAR - 0.5, colour = ORANGE,
+             linetype = "dotted", linewidth = 0.6) +
+  labs(title = glue("Treatment effect over time (ATT = {round(att_sar, 2)})"),
+       x = "Year", y = "Treatment effect (packs per capita)") +
+  theme_dark_site()
+
+(p6a / p6b) + plot_annotation(
+  theme = theme(plot.background = element_rect(fill = BG, colour = NA))
+)
+```
+
+The Stage 3 trajectory shows a treatment effect that **widens roughly linearly** from about -5 packs/capita in 1988 to about -27 by 2000. That is a steeper slope than the cumulative effect implies, balanced by smaller early-period magnitudes --- the SAR layer attributes part of the early-post-period gap to spillover diffusion rather than to California's own response.
+
+### Spillover effects on donor states
+
+The most interesting output of the SAR layer is the per-donor spillover. The framework computes the average post-treatment effect on each control state by forward-simulating the SAR data-generating process with and without California's treatment, integrating over the posterior draws of $\rho$.
+
+```{r}
+#| label: spillover-top8
+
+spill_mat   <- fit_sar$effects$spill
+times_all   <- as.numeric(rownames(spill_mat))
+post_idx    <- which(times_all >= TREAT_YEAR)
+spill_post  <- spill_mat[post_idx, , drop = FALSE]
+spill_state <- colnames(spill_mat)
+spill_avg   <- colMeans(spill_post)
+spill_df    <- tibble(state = spill_state, avg_spillover = spill_avg) %>%
+               arrange(avg_spillover)
+
+top8 <- spill_df %>%
+  mutate(abs_eff = abs(avg_spillover)) %>%
+  slice_max(abs_eff, n = 8) %>%
+  arrange(avg_spillover)
+cat("Top-8 spillover-receiving donor states (post-period mean effect):\n")
+print(top8)
+```
+
+```{r}
+#| label: fig-spillover-effects
+#| fig-cap: "Spillover effects on donor states. Nevada's -3.75 packs/capita is more than 16x the next state - geographic adjacency to California dominates."
+
+top8 %>%
+  mutate(state = factor(state, levels = state),
+         sign  = if_else(avg_spillover >= 0, "positive", "negative")) %>%
+  ggplot(aes(x = avg_spillover, y = state, fill = sign)) +
+  geom_col(width = 0.65, alpha = 0.95) +
+  geom_vline(xintercept = 0, colour = TEXT, linewidth = 0.4) +
+  scale_fill_manual(values = c(positive = TEAL, negative = ORANGE), guide = "none") +
+  labs(title = "Stage 3 - Top spillover effects on donor states (SAR posterior)",
+       subtitle = glue("Post-treatment mean effect ({TREAT_YEAR}-{max(years_all)}). ",
+                       "Teal = positive (consumption rose), orange = negative (consumption fell)."),
+       x = "Average post-treatment spillover (packs per capita)",
+       y = NULL,
+       caption = glue("rho posterior mean = {round(rho_hat, 3)}.")) +
+  theme_dark_site()
+```
+
+**Nevada is the dominant spillover-receiver by an order of magnitude.** Its average post-treatment effect is on the order of **-3.75 packs/capita** --- many times larger than the next state (Idaho, -0.228) and orders of magnitude larger than the smallest non-zero spillover. This is the empirical signature of SUTVA failure: Nevada is California's eastern neighbour, the only donor with a substantial contiguity link to California, and the diffusion through the row-normalized $W$ matrix concentrates almost all of the spillover mass there. The story the SAR layer tells is consistent with cross-border tobacco flows reshaping consumption on both sides of the California-Nevada line; the remaining 35 donors are essentially untouched.
+
+## 7. Prior predictive diagnostic
+
+Before reading the Stages 2 and 3 results as posteriors, we want to confirm that the prior specification ($a_0 = 3$, $b_0 = 1$, $\rho \in [-0.99, 0.99]$) is *compatible* with what the data actually look like. The replication package implements this via `prior_predictive()`, which draws $R = 1{,}000$ joint prior samples, forward-simulates a synthetic donor panel under each draw, computes a battery of summary statistics, and compares them to the observed statistics from the real donor panel.
+
+```{r}
+#| label: prior-predictive
+#| fig-cap: "Prior predictive check. All four observed orange lines land inside the simulated prior cloud --- the prior is compatible with the data, not overwhelming it."
+#| fig-width: 9
+#| fig-height: 7
+
+Xc_pre_arr <- panel_df %>%
+  filter(state != "California", year < TREAT_YEAR) %>%
+  pivot_wider(id_cols = year, names_from = state, values_from = retprice) %>%
+  select(-year) %>% select(all_of(donors)) %>% as.matrix()
+dim(Xc_pre_arr) <- c(nrow(Xc_pre_arr), ncol(Xc_pre_arr), 1)
+
+alpha_hat_for_ppc <- colMeans(fit_sar$alpha_draws)
+
+ppc <- prior_predictive(
+  Y0_pre           = as.matrix(Y0_pre),
+  Yc_obs           = Yc_pre,
+  W_raw            = W,
+  w_raw            = w,
+  alpha_hat_scaled = alpha_hat_for_ppc,
+  Xc_pre           = Xc_pre_arr,
+  p                = 0L,
+  a0               = 3,
+  b0               = 1,
+  rho_support      = c(-0.99, 0.99),
+  R                = 1000L,
+  seed             = SEED
+)
+
+keep_stats <- c("yc_mean", "spatial_quadratic", "ac1", "pve_pc1")
+clean_names <- function(x) gsub("\\\\", "", x)
+sim_long <- ppc$stat %>%
+  as_tibble(.name_repair = "minimal") %>%
+  rename_with(clean_names) %>%
+  select(all_of(keep_stats)) %>%
+  pivot_longer(everything(), names_to = "statistic", values_to = "value")
+
+obs_vec <- ppc$observed
+names(obs_vec) <- clean_names(names(obs_vec))
+obs_long <- tibble(statistic = names(obs_vec), value = as.numeric(obs_vec)) %>%
+  filter(statistic %in% keep_stats)
+
+stat_labels <- c(yc_mean = "Mean of donor outcomes",
+                 spatial_quadratic = "Spatial quadratic form",
+                 ac1 = "Lag-1 autocorrelation",
+                 pve_pc1 = "PVE of PC1")
+
+ggplot(sim_long, aes(x = value)) +
+  geom_histogram(bins = 40, fill = STEEL, colour = NA, alpha = 0.75) +
+  geom_vline(data = obs_long, aes(xintercept = value),
+             colour = ORANGE, linewidth = 1) +
+  facet_wrap(~ statistic, scales = "free", ncol = 2,
+             labeller = labeller(statistic = stat_labels)) +
+  labs(title = "Stage 2/3 - Prior predictive check",
+       subtitle = "Simulated statistics under the prior (blue) vs. observed value (orange)",
+       x = "Statistic value", y = "Frequency",
+       caption = glue("R = 1000 prior draws. Observed value should sit within the prior cloud.")) +
+  theme_dark_site() +
+  theme(strip.text = element_text(size = 10))
+```
+
+The four facets show simulated-vs-observed for the donor mean (`yc_mean`), the spatial quadratic form $y' W y$ that captures spatial clustering, the lag-1 temporal autocorrelation (`ac1`), and the variance share captured by the first principal component (`pve_pc1`). **All four observed orange lines land inside the simulated prior cloud rather than in the tails** --- the prior is compatible with the data, not overwhelming it. This is exactly the picture we want before reading the posterior estimates as data-driven.
+
+## 8. Cross-stage comparison
+
+Stacking the three estimators in one table makes the pedagogical arc visible.
+
+```{r}
+#| label: cross-stage-comparison
+
+n_active_classic <- sum(w_classic$weight > 0.01)
+n_active_hs      <- sum(alpha_hs_summary$mean > 0.01)
+n_active_sar     <- sum(abs(fit_sar$alpha_hat) > 0.01)
+
+sar_note <- paste0("SAR rho=", round(rho_hat, 3),
+                   "; SUTVA relaxed; CrI artificially narrow ",
+                   "because ESS(rho)=", round(ess_rho, 0))
+
+att_table <- tibble(
+  stage              = c("Classical SCM (tidysynth)",
+                         "Bayesian HS (no spillovers)",
+                         "Bayesian Spatial SAR (with spillovers)"),
+  att                = c(att_classic, att_hs, att_sar),
+  lo95               = c(att_classic_ci[1], att_hs_ci[1], att_sar_ci[1]),
+  hi95               = c(att_classic_ci[2], att_hs_ci[2], att_sar_ci[2]),
+  active_donors_n    = c(n_active_classic, n_active_hs, n_active_sar),
+  ess_rho            = c(NA_real_, NA_real_, round(ess_rho, 0)),
+  notes              = c("Quadratic programming on simplex (Abadie 2010)",
+                         "Horseshoe shrinkage; SUTVA imposed",
+                         sar_note)
+)
+
+print(att_table %>%
+        mutate(across(c(att, lo95, hi95), ~ round(.x, 2))))
+```
+
+Three observations. First, the **sign and order of magnitude agree**: all three estimators put the ATT between -15 and -19 packs/capita/year and none of the intervals reaches zero. Whatever you believe about the simplex constraint or SUTVA, Prop 99 reduced California cigarette consumption. Second, the **active-donor count rises monotonically** as the prior structure relaxes; this is mechanical (heavier-tailed priors admit more donors with non-trivial mass) but it has a useful epistemic consequence --- the sparse four-donor synthetic of Stage 1 looks like one of many plausible counterfactuals rather than the right one. Third, the Stage 3 credible interval is the narrowest of the three but the least trustworthy, because the SAR $\rho$ posterior has not mixed at tutorial scale; downstream prose should treat that interval as illustrative.
+
+## 9. Discussion
+
+Returning to the case-study question --- *what is the ATT of Proposition 99 on California's per-capita cigarette sales, and how does the estimate shift as we relax the simplex and SUTVA?* --- three answers emerge.
+
+The **headline ATT is robust** to the prior structure. Whether we impose the simplex (Stage 1: -18.46), relax to a horseshoe (Stage 2: -15.84), or also drop SUTVA (Stage 3: ~-16.6), California's per-capita cigarette consumption fell by 15 to 19 packs per person per year over 1988--2000 below what the synthetic counterfactual implies, and the negative-effect finding is not at risk of disappearing under any of the three intervals. This is the policy-relevant takeaway for any reader who lands on the post asking "did Prop 99 work?"
+
+The **donor pool's shape is not robust**. Classical SCM puts 99% of the weight on four donors; the horseshoe spreads non-trivial posterior mass across 23 of 38. None of the top-five posterior weights in Stages 2 and 3 (except Nevada) has a credible interval that excludes zero. The teaching implication is that "which states make up the synthetic California" is a much weaker statement than "what is the gap" --- the classical sparsity is partly a constraint artifact.
+
+**SUTVA is empirically false for this case study.** The SAR posterior puts $\hat\rho \approx 0.22$ bounded clearly away from zero, and the per-state spillover decomposition concentrates almost all of the cross-state effect on Nevada. That is the spatial-causal-inference takeaway: when you have border-crossing economic behavior and a treated unit with one or two highly-exposed neighbours, the classical "treat donors as unaffected" assumption can be tested and rejected. For the policymaker reading this post, the implication is that **Prop 99's policy effect is wider than just California's own cigarette consumption** --- it reshapes consumption patterns on both sides of the California-Nevada border, and reporting only the California effect understates the policy's geographic reach.
+
+## 10. Takeaways
+
+- **Method insight (3-stage agreement on sign).** Across classical SCM, Bayesian horseshoe, and Bayesian Spatial SAR, the ATT lands between -15.84 and -18.46 packs/capita/year; none of the three 95% intervals crosses zero. The robustness across prior structures is the strongest evidence that Prop 99 reduced California consumption.
+- **Data insight (Nevada spillover dominates).** The SAR layer attributes ~-3.75 packs/capita of spillover to Nevada --- many times larger than the next-largest spillover. Geographic adjacency dominates economic distance in this binary-contiguity setup.
+- **Inferential insight ($\rho \approx 0.22$ justifies relaxing SUTVA).** With a posterior mean clearly above zero, the SAR autocorrelation parameter implies the simplest version of SUTVA --- "donors' outcomes are unaffected" --- is rejected by the data for this case study.
+- **Limitation (tutorial-scale ESS).** At 5,000 MCMC iterations the effective sample size for $\rho$ is very small, well below the rule-of-thumb 200. Posterior point estimates are recoverable but credible-interval quantiles should be read as illustrative.
+- **Next step (100k iter for paper-grade inference).** Set `MCMC_ITER <- 100000L` and `MCMC_BURN <- 50000L` at the top of the setup chunk to match the paper's run; expect 30--90 minutes wall-clock.
+
+## 11. Exercises
+
+1. **Inference at paper scale.** Re-run the notebook with `MCMC_ITER <- 100000L` and `MCMC_BURN <- 50000L` and recompute the cross-stage comparison. By how much does the Stage 3 95% credible interval widen? What is $\text{ESS}(\rho)$ at the larger budget?
+2. **Different spatial weights.** Swap the binary contiguity `W` for a row-normalized economic-distance matrix (e.g., inverse trade share between donor pairs, or an inverse-distance kernel on state capital coordinates). Does Nevada still dominate the spillover ranking? Which states gain rank?
+3. **Sudan secession case study.** The same replication package ships `sudan_secession.rda` and a `02_sudan_main.R` script. Adapt this tutorial's three-stage pipeline to the 2011 South Sudan independence and GDP-per-capita outcome. Which donors carry weight, what is the SAR $\rho$, and which African countries absorb the largest spillovers?
+
+## 12. References
+
+1. [Sakaguchi, S. & Tagawa, H. (2026) --- Identification and Bayesian Inference for Synthetic Control Methods with Spillover Effects. *The Econometrics Journal*.](https://doi.org/10.1093/ectj/utag006) Replication package: [Zenodo record 19066186](https://zenodo.org/records/19066186).
+2. [Abadie, A., Diamond, A. & Hainmueller, J. (2010) --- Synthetic control methods for comparative case studies: Estimating the effect of California's tobacco control program. *Journal of the American Statistical Association* 105 (490): 493--505.](https://doi.org/10.1198/jasa.2009.ap08746)
+3. [Carvalho, C. M., Polson, N. G. & Scott, J. G. (2010) --- The horseshoe estimator for sparse signals. *Biometrika* 97 (2): 465--480.](https://doi.org/10.1093/biomet/asq017)
+4. [LeSage, J. & Pace, R. K. (2009) --- *Introduction to Spatial Econometrics*. Chapman & Hall/CRC.](https://www.routledge.com/Introduction-to-Spatial-Econometrics/LeSage-Pace/p/book/9781420064247)
+5. [Dunford, E. --- tidysynth: A tidy implementation of the synthetic control method (R package).](https://github.com/edunford/tidysynth)
+6. [Eddelbuettel, D. & Sanderson, C. --- RcppArmadillo: Accelerating R with high-performance C++ linear algebra (R package).](https://dirk.eddelbuettel.com/code/rcpp.armadillo.html)
+
+## Source files
+
+- Companion script: [`analysis.R`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_sc_bayes_spatial/analysis.R)
+- Published post: <https://carlos-mendez.org/post/r_sc_bayes_spatial/>
+- GitHub repo: <https://github.com/cmg777/starter-academic-v501>
