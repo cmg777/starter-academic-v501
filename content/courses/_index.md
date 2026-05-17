@@ -27,6 +27,7 @@ I currently teach the following graduate-level courses:
   <div class="course-icon"><i class="fas fa-chart-line"></i></div>
   <h3>Applied Econometrics</h3>
   <p>Website: <a href="https://cmg777.github.io/intro2causal/">Mastering Causal Metrics</a></p>
+  <p>Website: <a href="https://quarcs-lab.github.io/ccm/">Comparative Causal Metrics</a></p>
   <p>Posts about <a href="https://carlos-mendez.org/#posts">causal inference, machine learning, and bayesian econometrics</a></p>
 </div>
 
