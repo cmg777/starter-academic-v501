@@ -17,10 +17,6 @@ links:
   icon_pack: fas
   name: "R script"
   url: analysis.R
-- icon: file-alt
-  icon_pack: fas
-  name: "Results report"
-  url: results_report.md
 - icon: markdown
   icon_pack: fab
   name: "MD version"
