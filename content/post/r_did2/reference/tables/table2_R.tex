@@ -1,0 +1,30 @@
+\begin{table}[!h]
+\centering
+\caption{\label{tab:two_by_two_ex}Simple 2 $\times$ 2 DiD}
+\centering
+\fontsize{12}{14}\selectfont
+\begin{threeparttable}
+\begin{tabular}[t]{>{}c>{}c>{}c>{}c>{}c>{}c>{}c}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{3}{c}{Unweighted Averages} & \multicolumn{3}{c}{Weighted Averages} \\
+\cmidrule(l{3pt}r{3pt}){2-4} \cmidrule(l{3pt}r{3pt}){5-7}
+ & Expansion & No Expansion & Gap/DiD & Expansion & No Expansion & Gap/DiD\\
+\midrule
+\textcolor{black}{2013} & \textcolor{black}{419.2} & \textcolor{black}{474.0} & \em{-54.8} & \textcolor{black}{322.7} & \textcolor{black}{376.4} & \em{-53.7}\\
+\textcolor{black}{2014} & \textcolor{black}{428.5} & \textcolor{black}{483.1} & \em{-54.7} & \textcolor{black}{326.5} & \textcolor{black}{382.7} & \em{-56.2}\\
+\em{\textcolor{black}{Trend/DiD}} & \em{\textcolor{black}{9.3}} & \em{\textcolor{black}{9.1}} & \em{\em{\textcolor{BrickRed}{0.1}}} & \em{\textcolor{black}{3.7}} & \em{\textcolor{black}{6.3}} & \em{\em{\textcolor{BrickRed}{-2.6}}}\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para]
+\item \vspace{-4ex} \singlespacing \footnotesize{This table reports average county-level 
+                  mortality rates (deaths among adults aged 20-64 per 100,000 adults) in 2013 (row 1) and 2014 (row 2) 
+                  in states that expanded adult Medicaid eligibility in 2014 (columns 1 and 4) and states that have not expanded 
+                  by 2019 (columns 2 and 5). The first three columns present unweighted averages and the second three columns 
+                  present population-weighted averages. Columns 1, 2, 4, and 5 in the third row show time trends in mortality 
+                  between 2013 and 2014 for each group of states. The first two rows of columns 3 and 6 show the cross-sectional 
+                  gap in mortality between expansion and non-expansion states in 2013 and 2014. The entries in bold red text in 
+                  row 3 show the simple 2 $\times$ 2 difference-in-differences estimates without weights (column 3) and with them 
+                  (column 6)}
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

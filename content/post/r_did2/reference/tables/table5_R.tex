@@ -1,0 +1,34 @@
+
+\begin{table}[H]
+   \centering
+   \begin{adjustbox}{width = 0.8\textwidth, center}
+      \begin{threeparttable}[b]
+         \caption{\label{tab:regdid_2x2_covs} Regression 2 $\times$ 2 DiD with Covariates}
+         \bigskip
+         \renewcommand*{\arraystretch}{0.8}
+         \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcccccc}
+            \toprule
+             & \multicolumn{3}{c}{Unweighted} & \multicolumn{3}{c}{Weighted} \\ \cmidrule(lr){2-4} \cmidrule(lr){5-7}
+             & No Covs & $X_{i, t = 2013}$ & $X_{i, t}$ & No Covs & $X_{i, t = 2013}$ & $X_{i, t}$ \\ \cmidrule(lr){2-2} \cmidrule(lr){3-3} \cmidrule(lr){4-4} \cmidrule(lr){5-5} \cmidrule(lr){6-6} \cmidrule(lr){7-7}
+                               & (1)    & (2)    & (3)    & (4)    & (5)    & (6)\\  
+            \midrule 
+            Medicaid Expansion & 0.12   & -2.35  & -0.49  & -2.56  & -2.56  & -1.37\\   
+                               & (3.75) & (4.29) & (3.83) & (1.49) & (1.78) & (1.62)\\   
+            \bottomrule
+         \end{tabular*}
+         
+         \begin{tablenotes}
+            \item This table reports the 
+                              regression 2 $\times$ 2 DiD estimate comparing counties that expand Medicaid in 2014 to counties that do 
+                              not expand Medicaid, adjusting for the inclusion of covariates (percent female, percent white, percent hispanic,
+                              the unemployment rate, the poverty rate, and median household income). Columns 1-3 report unweighted regression 
+                              results, while columns 4-6 weight by county population aged 20-64 in 2013. Columns 1 and 4 report results for 
+                              expansion states without covariates, columns 2 and 5 adjust for the baseline levels of the covariates in 2013, 
+                              and columns 3 and 6 control for the time-varying covariate values in 2014 and 2013. 
+                   Robust standard errors (in parentheses) are clustered at the county level.
+         \end{tablenotes}
+      \end{threeparttable}
+   \end{adjustbox}
+\end{table}
+
+

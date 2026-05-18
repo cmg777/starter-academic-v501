@@ -1,0 +1,20 @@
+\begin{table}[htbp]\centering
+\caption{DiD Estimates with Covariates}
+\label{tab:2x2_csdid_sc}
+\begin{threeparttable}
+\begin{tabular}{l*{6}{c}}
+\toprule
+ & \multicolumn{3}{c}{Unweighted} & \multicolumn{3}{c}{Weighted} \\\\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+ & Regression & IPW & Doubly Robust & Regression & IPW & Doubly Robust \\\\
+\midrule
+Medicaid Expansion &  -1.62 &  -0.86 &  -1.23 &  -3.46 &  -3.84 &  -3.76 \\\\
+ & (  4.68) & (  4.58) & (  4.92) & (  2.41) & (  3.33) & (  3.18) \\\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para]
+\footnotesize \singlespacing
+\item This table reports the 2 $\\times$ 2 DiD estimate comparing counties that expand Medicaid in 2014 to counties that do not expand Medicaid, adjusting for the inclusion of 2013 covariates using the methodologies from \citet{SantAnna2020} and \citet{Callaway2021}. Each panel reports regression adjustment (Column 1), inverse probability weighting (Column 2), and doubly robust estimators (Column 3). Standard errors in parentheses are clustered at the county level.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

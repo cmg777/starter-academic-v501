@@ -1,0 +1,161 @@
+Loading required package: pacman
+
+=== r_did2: DiD for regional data (R 4.5.2) ===
+Loaded 31843 rows x 22 cols from county_mortality_data.csv
+After cleaning: 2604 counties x 11 years = 28644 county-year rows
+Treatment cohorts (treat_year):
+# A tibble: 5 × 2
+  treat_year n_counties
+       <dbl>      <int>
+1          0       1222
+2       2014        978
+3       2015        171
+4       2016         93
+5       2019        140
+
+Adoption cohorts (2013 baseline):
+# A tibble: 5 × 6
+  treat_year n_counties n_states pop_adult share_counties share_pop
+       <dbl>      <int>    <int>     <dbl> <chr>          <chr>    
+1          0       1222       17  65171521 46.9%          38.2%    
+2       2014        978       22  84421489 37.6%          49.5%    
+3       2015        171        3  11906556 6.6%           7.0%     
+4       2016         93        2   3329529 3.6%           2.0%     
+5       2019        140        2   5811224 5.4%           3.4%     
+Unweighted 2x2 ATT(2014) = 0.122
+Weighted   2x2 ATT(2014) = -2.563
+2x2 TWFE estimates:
+# A tibble: 6 × 6
+  spec                weighting              est    se  lo95  hi95
+  <chr>               <chr>                <dbl> <dbl> <dbl> <dbl>
+1 Levels (D:Post)     Unweighted           0.122  3.75 -7.23 7.47 
+2 Two-way FE (D:Post) Unweighted           0.122  3.75 -7.22 7.47 
+3 Long difference     Unweighted           0.122  3.75 -7.22 7.47 
+4 Levels (D:Post)     Population-weighted -2.56   1.49 -5.48 0.358
+5 Two-way FE (D:Post) Population-weighted -2.56   1.49 -5.48 0.357
+6 Long difference     Population-weighted -2.56   1.49 -5.48 0.357
+Covariate balance (2013):
+# A tibble: 12 × 5
+   weighting           variable      mean_C mean_T norm_diff
+   <chr>               <chr>          <dbl>  <dbl>     <dbl>
+ 1 Unweighted          median_income  43.0   48.0     0.427 
+ 2 Unweighted          perc_female    49.4   49.3    -0.0338
+ 3 Unweighted          perc_hispanic   9.64   8.23   -0.105 
+ 4 Unweighted          perc_white     81.6   90.5     0.586 
+ 5 Unweighted          poverty_rate   19.3   16.5    -0.423 
+ 6 Unweighted          unemp_rate      7.61   8.01    0.157 
+ 7 Population-weighted median_income  49.3   57.9     0.685 
+ 8 Population-weighted perc_female    50.5   50.1    -0.238 
+ 9 Population-weighted perc_hispanic  17.0   18.9     0.107 
+10 Population-weighted perc_white     77.9   79.5     0.115 
+11 Population-weighted poverty_rate   17.2   15.3    -0.375 
+12 Population-weighted unemp_rate      7.00   8.01    0.503 
+Propensity-score logits:
+# A tibble: 14 × 6
+   weighting           term          estimate std.error statistic  p.value
+   <chr>               <chr>            <dbl>     <dbl>     <dbl>    <dbl>
+ 1 Unweighted          (Intercept)   -10.0      1.34        -7.46 8.68e-14
+ 2 Unweighted          perc_female    -0.0409   0.0162      -2.52 1.16e- 2
+ 3 Unweighted          perc_white      0.0588   0.00539     10.9  9.59e-28
+ 4 Unweighted          perc_hispanic  -0.0159   0.00386     -4.12 3.74e- 5
+ 5 Unweighted          unemp_rate      0.320    0.0262      12.2  2.18e-34
+ 6 Unweighted          poverty_rate    0.0348   0.0187       1.86 6.27e- 2
+ 7 Unweighted          median_income   0.0824   0.00960      8.58 9.78e-18
+ 8 Population-weighted (Intercept)    -8.17     4.39        -1.86 6.27e- 2
+ 9 Population-weighted perc_female    -0.188    0.0568      -3.31 9.39e- 4
+10 Population-weighted perc_white      0.0401   0.0118       3.40 6.76e- 4
+11 Population-weighted perc_hispanic  -0.0185   0.00855     -2.16 3.05e- 2
+12 Population-weighted unemp_rate      0.680    0.0850       8.00 1.23e-15
+13 Population-weighted poverty_rate    0.107    0.0477       2.24 2.49e- 2
+14 Population-weighted median_income   0.155    0.0249       6.22 4.88e-10
+No pre-treatment periods to test
+No pre-treatment periods to test
+No pre-treatment periods to test
+No pre-treatment periods to test
+No pre-treatment periods to test
+No pre-treatment periods to test
+2x2 covariate-adjusted estimates:
+# A tibble: 6 × 7
+  method weighting              est    se method_label                lo95  hi95
+  <chr>  <chr>                <dbl> <dbl> <chr>                      <dbl> <dbl>
+1 reg    Unweighted          -1.62   4.66 Outcome regression (OR)   -10.7   7.51
+2 reg    Population-weighted -3.46   2.29 Outcome regression (OR)    -7.95  1.03
+3 ipw    Unweighted          -0.859  4.84 Inverse propensity weigh… -10.3   8.62
+4 ipw    Population-weighted -3.84   3.19 Inverse propensity weigh… -10.1   2.42
+5 dr     Unweighted          -1.23   5.05 Doubly robust (DRDID)     -11.1   8.68
+6 dr     Population-weighted -3.76   3.29 Doubly robust (DRDID)     -10.2   2.69
+2xT event study (ATT(e)):
+# A tibble: 22 × 6
+       e   est    se weighting      lo95  hi95
+   <dbl> <dbl> <dbl> <fct>         <dbl> <dbl>
+ 1    -5  8.48  4.35 Unweighted  -0.0363 17.0 
+ 2    -4  1.69  4.18 Unweighted  -6.51    9.88
+ 3    -3  3.84  4.30 Unweighted  -4.59   12.3 
+ 4    -2  7.33  5.32 Unweighted  -3.10   17.8 
+ 5    -1  0    NA    Unweighted  NA      NA   
+ 6     0 -1.23  5.00 Unweighted -11.0     8.58
+ 7     1  5.36  4.90 Unweighted  -4.24   15.0 
+ 8     2 12.2   4.76 Unweighted   2.90   21.6 
+ 9     3 13.5   5.19 Unweighted   3.38   23.7 
+10     4  9.69  5.65 Unweighted  -1.38   20.8 
+# ℹ 12 more rows
+Group-specific ATT(g) (averaged over post periods):
+# A tibble: 8 × 6
+  group     est    se weighting             lo95   hi95
+  <dbl>   <dbl> <dbl> <fct>                <dbl>  <dbl>
+1  2014   9.43   3.84 Unweighted            1.90 17.0  
+2  2015   4.94   5.90 Unweighted           -6.61 16.5  
+3  2016 -17.3   11.0  Unweighted          -38.9   4.24 
+4  2019   3.48   8.85 Unweighted          -13.9  20.8  
+5  2014  -0.684  3.78 Population-weighted  -8.09  6.73 
+6  2015  10.0    2.92 Population-weighted   4.31 15.8  
+7  2016 -12.6    6.18 Population-weighted -24.7  -0.451
+8  2019   3.31   4.46 Population-weighted  -5.44 12.1  
+GxT dynamic event study:
+# A tibble: 32 × 6
+       e     est    se weighting     lo95  hi95
+   <dbl>   <dbl> <dbl> <fct>        <dbl> <dbl>
+ 1   -10 -23.5   10.1  Unweighted -43.4   -3.65
+ 2    -9 -25.1    9.47 Unweighted -43.7   -6.55
+ 3    -8 -12.8   10.6  Unweighted -33.5    7.92
+ 4    -7  -0.341  8.25 Unweighted -16.5   15.8 
+ 5    -6  -1.27   7.96 Unweighted -16.9   14.3 
+ 6    -5   6.13   3.56 Unweighted  -0.836 13.1 
+ 7    -4   2.01   3.27 Unweighted  -4.39   8.41
+ 8    -3   4.04   3.34 Unweighted  -2.51  10.6 
+ 9    -2   5.62   3.84 Unweighted  -1.91  13.1 
+10    -1   0     NA    Unweighted  NA     NA   
+# ℹ 22 more rows
+There were 22 warnings (use warnings() to see them)
+There were 11 warnings (use warnings() to see them)
+HonestDiD relative-magnitudes sensitivity:
+# A tibble: 16 × 6
+       lb    ub method   Delta    Mbar weighting          
+    <dbl> <dbl> <chr>    <chr>   <dbl> <fct>              
+ 1   2.01 14.1  C-LF     DeltaRM  0    Unweighted         
+ 2 -16.8  32.9  C-LF     DeltaRM  0.25 Unweighted         
+ 3 -40.9  57.0  C-LF     DeltaRM  0.5  Unweighted         
+ 4 -63.7  66.4  C-LF     DeltaRM  0.75 Unweighted         
+ 5 -66.4  66.4  C-LF     DeltaRM  1    Unweighted         
+ 6 -66.4  66.4  C-LF     DeltaRM  1.5  Unweighted         
+ 7 -66.4  66.4  C-LF     DeltaRM  2    Unweighted         
+ 8  -6.07  6.07 C-LF     DeltaRM  0    Population-weighted
+ 9 -22.2  22.2  C-LF     DeltaRM  0.25 Population-weighted
+10 -42.5  43.8  C-LF     DeltaRM  0.5  Population-weighted
+11 -64.0  64.0  C-LF     DeltaRM  0.75 Population-weighted
+12 -66.7  66.7  C-LF     DeltaRM  1    Population-weighted
+13 -66.7  66.7  C-LF     DeltaRM  1.5  Population-weighted
+14 -66.7  66.7  C-LF     DeltaRM  2    Population-weighted
+15   1.41 14.4  Original <NA>    NA    Unweighted         
+16  -6.27  6.80 Original <NA>    NA    Population-weighted
+Summary of headline estimates (deaths per 100,000):
+# A tibble: 5 × 3
+  stage                           unweighted weighted
+  <chr>                                <dbl>    <dbl>
+1 2x2 cell-means ATT(2014)             0.122   -2.56 
+2 2x2 TWFE long-difference             0.122   -2.56 
+3 2x2 DRDID (Callaway-Sant'Anna)      -1.23    -3.76 
+4 2xT dynamic ATT (avg over e>=0)      9.43    -0.684
+5 GxT dynamic ATT (avg over e>=0)      7.92     0.266
+
+=== Script completed successfully ===

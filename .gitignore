@@ -28,3 +28,12 @@ content/post/python_mgwrfer/mgwpr_repo/
 # includes a 129 MB raw CSV that exceeds GitHub's per-file limit). The 11
 # files analysis.R actually needs are copied into helpers/.
 content/post/r_sc_bayes_spatial/replication-package/
+
+# Baker et al. (2025) DiD practitioner's guide source manuscript for r_did2
+# (~220 KB LaTeX; third-party reference material, not source for this post).
+content/post/r_did2/reference/manuscript.tex
+
+# Quarto render artefacts in any post directory (tutorial.qmd is the source;
+# readers render their own HTML locally).
+content/post/*/tutorial.html
+content/post/*/tutorial_files/

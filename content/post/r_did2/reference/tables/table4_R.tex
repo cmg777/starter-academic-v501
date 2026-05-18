@@ -1,0 +1,41 @@
+\begin{table}[!h]
+\centering
+\caption{\label{tab:cov_balance}Covariate Balance Statistics}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lcccccc}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{3}{c}{Unweighted} & \multicolumn{3}{c}{Weighted} \\
+\cmidrule(l{3pt}r{3pt}){2-4} \cmidrule(l{3pt}r{3pt}){5-7}
+Variable & Non-Adopt & Adopt & Norm. Diff. & Non-Adopt & Adopt & Norm. Diff.\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{7}{l}{\textbf{2013 Covariate Levels}}\\
+\hspace{1em}\% Female & 49.43 & 49.33 & -0.03 & 50.48 & 50.07 & -0.24\\
+\hspace{1em}\% White & 81.64 & 90.48 & 0.59 & 77.91 & 79.54 & 0.11\\
+\hspace{1em}\% Hispanic & 9.64 & 8.23 & -0.10 & 17.01 & 18.86 & 0.11\\
+\hspace{1em}Unemployment Rate & 7.61 & 8.01 & 0.16 & 7.00 & 8.01 & 0.50\\
+\hspace{1em}Poverty Rate & 19.28 & 16.53 & -0.42 & 17.24 & 15.29 & -0.37\\
+\hspace{1em}Median Income & 43.04 & 47.97 & 0.43 & 49.31 & 57.86 & 0.68\\
+\addlinespace[0.3em]
+\multicolumn{7}{l}{\textbf{2014 - 2013 Covariate Differences}}\\
+\hspace{1em}\% Female & -0.02 & -0.02 & 0.00 & 0.02 & 0.01 & -0.09\\
+\hspace{1em}\% White & -0.21 & -0.21 & 0.01 & -0.32 & -0.33 & -0.04\\
+\hspace{1em}\% Hispanic & 0.20 & 0.21 & 0.04 & 0.25 & 0.33 & 0.29\\
+\hspace{1em}Unemployment Rate & -1.16 & -1.30 & -0.21 & -1.08 & -1.36 & -0.55\\
+\hspace{1em}Poverty Rate & -0.55 & -0.28 & 0.14 & -0.41 & -0.35 & 0.05\\
+\hspace{1em}Median Income & 0.98 & 1.11 & 0.06 & 1.10 & 1.74 & 0.32\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para]
+\item \vspace{-4ex} \singlespacing \footnotesize{This table reports the 
+                  covariate balance between adopting and non-adopting states.  In the top panel, we report the averages 
+                  and standardized differences of each variable, measured in 2013, by adoption status. All variables are measured in 
+                  percentage values, except for median household income, which is measured in thousands of U.S. dollars. In the bottom panel
+                  we report the average and standardized differences of the county-level long differences between 2014 and 
+                  2013 of each variable. We report both weighted and unweighted measures of the averages to correspond to the different
+                  estimation methods of including covariates in a 2 $\times$ 2 setting.}
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}

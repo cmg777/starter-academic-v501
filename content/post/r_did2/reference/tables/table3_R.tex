@@ -1,0 +1,43 @@
+
+\begin{table}[!h]
+   \centering
+   \begin{adjustbox}{width = 0.8\textwidth, center}
+      \begin{threeparttable}[b]
+         \caption{\label{tab:regdid_2x2} Regression 2 $\times$ 2 DiD}
+         \bigskip
+         \renewcommand*{\arraystretch}{0.8}
+         \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcccccc}
+            \toprule
+             & \multicolumn{3}{c}{Unweighted} & \multicolumn{3}{c}{Weighted} \\ \cmidrule(lr){2-4} \cmidrule(lr){5-7}
+             & \multicolumn{2}{c}{Crude Mortality Rate} & $\Delta$ & \multicolumn{2}{c}{Crude Mortality Rate} & $\Delta$ \\ \cmidrule(lr){2-3} \cmidrule(lr){4-4} \cmidrule(lr){5-6} \cmidrule(lr){7-7}
+                                              & (1)   & (2)   & (3)   & (4)    & (5)   & (6)\\  
+            \midrule 
+            Constant                          & 474.0 &       & 9.1   & 376.4  &       & 6.3\\   
+                                              & (4.3) &       & (2.6) & (7.6)  &       & (1.1)\\   
+            Medicaid Expansion                & -54.8 &       &       & -53.7  &       &   \\   
+                                              & (6.3) &       &       & (11.5) &       &   \\   
+            Post                              & 9.1   &       &       & 6.3    &       &   \\   
+                                              & (2.6) &       &       & (1.1)  &       &   \\   
+            Medicaid Expansion $\times$ Post  & 0.1   & 0.1   & 0.1   & -2.6   & -2.6  & -2.6\\   
+                                              & (3.7) & (3.7) & (3.7) & (1.5)  & (1.5) & (1.5)\\   
+            \midrule 
+            County fixed effects              & No    & Yes   & No    & No     & Yes   & No\\  
+            Year fixed effects                & No    & Yes   & No    & No     & Yes   & No\\  
+            \bottomrule
+         \end{tabular*}
+         
+         \begin{tablenotes}
+            \item This table reports the 
+                              regression 2 $\times$ 2 DiD estimate comparing counties that expand Medicaid in 2014 to counties that do 
+                              not expand Medicaid by 2019, using only data for the years 2013 and 2014. Columns 1-3 report unweighted regression 
+                              results, while columns 4-6 weight by county population aged 20-64 in 2013. Columns 1 and 4 report results from 
+                              regressing the crude mortality rate for adults ages 20-64 on indicators for expansion states (Treat) and post-expansion year (Post), 
+                              with the DiD estimate being the coefficient on the interaction term. Columns 2 and 5 report the corresponding 
+                              results for the interaction term using county and year fixed effects. Finally, Columns 3 and 6 report the results
+                              of the long difference in county mortality rates on a treatment indicator. Robust standard errors (in parentheses) are clustered at the county level.
+         \end{tablenotes}
+      \end{threeparttable}
+   \end{adjustbox}
+\end{table}
+
+

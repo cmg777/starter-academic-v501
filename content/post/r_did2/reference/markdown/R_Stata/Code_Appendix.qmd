@@ -1,0 +1,3176 @@
+---
+title: "Code for Replication in R and Stata"
+format: 
+  html:
+    page-layout: article
+    code-fold: show
+    code-tools: true
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+    toc-expand: 3
+    self-contained: true
+    theme: zephyr
+    grid:
+      margin-width: 100px
+      body-width: 1200px
+---
+
+# Introduction
+
+In this appendix we provide the code to replicate the tables and figures in the article. By pressing the $\triangleright$ code button you can see the R code that creates the relevant figure or table, with a description of the steps involved in computing the analyses.
+
+# Table 1: Medicaid Expansion Adoption
+
+The following code block produces **Table 1**, which shows the roll-out of Medicaid Expansion under the Affordable Care Act (ACA) across states.
+
+```{r, include = FALSE}
+# we need the package that integrates stata before we can run it
+library(Statamarkdown)
+library(readxl)
+library(knitr)
+library(readr)
+library(purrr)
+knitr::opts_chunk$set(engine.opts = list(cleanup = TRUE))
+
+```
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE, results = 'asis'}
+## Install packages from Github if needed
+# load packages
+library(tidyverse)
+library(kableExtra)
+library(modelsummary)
+library(gt)
+library(did)
+library(ggthemes)
+library(fixest)
+library(latex2exp)
+library(HonestDiD)
+
+# omit NA from tables
+options(knitr.kable.NA = '')
+
+# set baseline output for modelsummary
+options(modelsummary_factory_default = 'kableExtra')
+
+# set ggplot theme
+theme_set(
+  theme_clean() + 
+    theme(plot.background = element_blank(),
+          legend.background = element_rect(color = "white"),
+          strip.background = element_rect(color = "black"))
+)
+
+# load cleaned data
+mydata <- read_csv(here::here("data", "county_mortality_data.csv")) %>% 
+  # make state the abbreviation
+  mutate(state = str_sub(county, nchar(county) - 1, nchar(county))) %>%
+  # drop District of Columbia from the data
+  filter(state != "DC") %>% 
+  # make a second adoption variable for the table
+  mutate(adopt = case_when(
+    # missing is non-expansion
+    is.na(yaca) ~ "Non-Expansion",
+    # fix a couple pre-2014 adoptions from Miller, Johnson and Wherry
+    state %in% c("DE", "MA", "NY", "VT") ~ "Pre-2014", 
+    TRUE ~ as.character(yaca)
+  ))
+  
+# get adoption year by state
+adopts <- mydata %>% 
+  select(state, adopt) %>% 
+  distinct() %>% 
+  arrange(state)
+
+# first get the share of states, share of counties, and share of adults in 2013 by adoption category
+# first the states and share of states
+states <- adopts %>% 
+  group_by(adopt) %>% 
+  summarize(states = paste0(state, collapse = ", "),
+            state_share = length(state) / 50)
+
+# next get the county share and the population share
+counties_pop <- mydata %>% 
+  # just for year 2013
+  filter(year == 2013) %>% 
+  # get county and population totals
+  mutate(total_counties = n(),
+         total_pop = sum(population_20_64, na.rm = TRUE)) %>% 
+  group_by(adopt) %>% 
+  # make into shares
+  summarize(county_share = n() / mean(total_counties),
+            pop_share = sum(population_20_64, na.rm = TRUE) / mean(total_pop))
+  
+# make a table and export
+states %>% 
+  left_join(counties_pop, by = "adopt") %>% 
+  slice(9, 1:8) %>% 
+  # format the numbers to two digits
+  mutate(across(state_share:pop_share, ~ scales::number(., accuracy = 0.01))) %>%
+  # format the table
+  kable(
+    col.names = c("Expansion \n Year", "States", "Share of States", "Share of Counties", 
+                  "Share of Adults (2013)"),
+    booktabs = T, caption = "Medicaid Expansion Under the Affordable Care Act",
+    label = "adoptions",
+    align = c("c"),
+    escape = FALSE,
+    linesep = ""
+  ) %>% 
+  kable_styling(latex_options = c("scale_down", "HOLD_position")) %>% 
+  column_spec(2, width = "20em")
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+clear
+capture log close
+
+******************************************************************************
+* 1. Load original data 
+******************************************************************************
+	cd "../../data"
+  insheet using "county_mortality_data.csv", clear
+
+	keep state county_code county year yaca population_20_64
+	
+	*Define treatment timing
+	gen treat_year = real(yaca)
+	replace treat_year = 0 if missing(treat_year)
+	tostring treat_year, gen(treat_str)
+	destring yaca, replace force
+
+	destring population_20_64, replace force
+	
+	* Drop DC as in JEL Table 1
+	drop if state == "District of Columbia"
+
+****************************************************
+* 2. Create adoption category                      *
+****************************************************
+	gen adopt = ""
+	replace adopt = "Pre-2014" if inlist(state, "Delaware", "Massachusetts", "New York", "Vermont")
+	replace adopt = string(yaca) if !missing(yaca) & adopt == ""
+	replace adopt = "Non-Expansion" if missing(yaca)
+
+****************************************************
+* 3. Get number of states and state share          *
+****************************************************
+preserve
+gen st_abr = substr(county, max(1, strlen(county)-1), 2)
+keep st_abr adopt
+duplicates drop
+sort adopt st_abr
+
+by adopt: gen strL state_list = st_abr
+by adopt: replace state_list = state_list[_n-1] + ", " + st_abr if adopt[_n-1] == adopt[_n]
+
+bysort adopt: gen state_count=_N
+
+gen state_share = state_count / 50
+
+gen len= strlen(state_list)
+bysort adopt: egen max=max(len)
+keep if len==max 
+
+keep adopt state_list state_share
+tempfile state_summary
+save `state_summary', replace
+restore
+****************************************************
+* 4. Get county & adult pop share (year = 2013)    *
+****************************************************
+	preserve
+	keep if year == 2013
+
+	* Total county count and total 20–64 pop in 2013
+	su population_20_64
+	scalar total_pop = r(sum)
+
+	su county_code
+	scalar total_counties = r(N)
+
+	collapse (count) county_count=county_code (sum) pop=population_20_64, by(adopt)
+
+	gen county_share = county_count / total_counties
+	gen pop_share = pop / total_pop
+
+	tempfile county_summary
+	save `county_summary'
+	restore
+
+****************************************************
+* 5. Merge and order categories for display        *
+****************************************************
+	use `state_summary', clear
+	merge 1:1 adopt using `county_summary', nogen
+
+	* Order like JEL Table 1
+	gen order = .
+	replace order = 1 if adopt == "Pre-2014"
+	replace order = 2 if adopt == "2014"
+	replace order = 3 if adopt == "2015"
+	replace order = 4 if adopt == "2016"
+	replace order = 5 if adopt == "2019"
+	replace order = 6 if adopt == "2020"
+	replace order = 7 if adopt == "2021"
+	replace order = 8 if adopt == "2023"
+	replace order = 9 if adopt == "Non-Expansion"
+	sort order
+
+	* Round to match JEL formatting
+	gen state_share_fmt = string(state_share, "%4.2f")
+	gen county_share_fmt = string(county_share, "%4.2f")
+	gen pop_share_fmt = string(pop_share, "%4.2f")
+
+****************************************************
+* 6. Export table                                 *
+****************************************************
+
+export excel adopt state_list state_share_fmt county_share_fmt pop_share_fmt ///
+    using "../data/adoptions_table.xlsx", firstrow(variables) replace
+restore 
+```
+:::
+
+# $2\times2$ DiD setups
+
+The following tables and figures show our analyses within the $2\times2$ section of the paper.
+
+## Table 2: Simple $2\times2$ DiD
+
+**Table 2** shows how we can calculate the simple $2\times2$ DiD comparing the change in the crude mortality rates between states that chose to expand Medicaid in 2014 and those that had not yet expanded by 2019.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+# set seed for reproducibility
+set.seed(20240924)
+
+# set filepath locations for tables and figures
+file.loc.tab <- here::here("tables/")
+file.loc.fig <- here::here("figures/")
+
+# load cleaned data
+mydata <- read_csv(here::here("data", "county_mortality_data.csv")) %>% 
+  # make state the abbreviation
+  mutate(state = str_sub(county, nchar(county) - 1, nchar(county))) %>%
+  # drop DC and pre-2014 adoption states
+  filter(!(state %in% c("DC", "DE", "MA", "NY", "VT"))) %>% 
+  # drop states that adopt between 2014 and 2019
+  filter(yaca == 2014 | is.na(yaca) | yaca > 2019)
+
+# set the covariates that we're going to use.
+covs <- c("perc_female","perc_white", "perc_hispanic", "unemp_rate", "poverty_rate", "median_income")
+
+## Clean data and add in covariates
+mydata <- mydata %>% 
+  # make variables
+  mutate(perc_white = population_20_64_white / population_20_64 * 100,
+         perc_hispanic = population_20_64_hispanic / population_20_64 * 100,
+         perc_female = population_20_64_female/ population_20_64 * 100,
+         unemp_rate = unemp_rate * 100,
+         median_income = median_income / 1000) %>% 
+  # keep just subset of variables that we will use later
+  select(state, county, county_code, year, population_20_64, yaca,
+         starts_with("perc_"), crude_rate_20_64, all_of(covs))
+
+# keep only counties with full observations for outcome and covariates in 2013 and 2014
+mydata <- mydata %>%
+  # allow the aca expansion variable to be missing
+  drop_na(!yaca) %>%
+  group_by(county_code) %>% 
+  # need full covariates for 2013 and 2014
+  filter(length(which(year == 2013 | year == 2014)) == 2) %>% 
+  ungroup()
+
+# finally, keep only counties with full mortality data for 2009 to 2019
+mydata <- mydata %>% 
+  group_by(county_code) %>% 
+  drop_na(crude_rate_20_64) %>% 
+  filter(n() == 11)
+
+# make a smaller dataset with only years 2013 and 2014
+short_data <- mydata %>% 
+  # make a binary variable that identifies ACA expansion and post-years
+  mutate(Treat = if_else(yaca == 2014 & !is.na(yaca), 1, 0),
+         Post = if_else(year == 2014, 1, 0)) %>% 
+  # filter years for just 2013 and 2014
+  filter(year %in% c(2013, 2014)) %>% 
+  # make a variable with population weight in 2013
+  group_by(county_code) %>% 
+  mutate(set_wt = population_20_64[which(year == 2013)]) %>% 
+  ungroup()
+  
+# get group means for Table 2
+# unweighted expansion pre-reform
+T_pre <- short_data %>% 
+  filter(Treat == 1 & year == 2013) %>% 
+  summarize(mean = mean(crude_rate_20_64)) %>% 
+  pull(mean)
+
+# unweighted non-expansion pre-form 
+C_pre <- short_data %>% 
+  filter(Treat == 0 & year == 2013) %>% 
+  summarize(mean = mean(crude_rate_20_64)) %>% 
+  pull(mean)
+
+# unweighted expansion post-reform
+T_Post <- short_data %>% 
+  filter(Treat == 1 & year == 2014) %>% 
+  summarize(mean = mean(crude_rate_20_64)) %>% 
+  pull(mean)
+
+# unweighted non-expansion post-reform
+C_Post <- short_data %>% 
+  filter(Treat == 0 & year == 2014) %>% 
+  summarize(mean = mean(crude_rate_20_64)) %>% 
+  pull(mean)
+
+# get the same group means but this time weighted
+T_pre_weight <- short_data %>% 
+  filter(Treat == 1 & year == 2013) %>% 
+  summarize(mean = weighted.mean(crude_rate_20_64, w = set_wt)) %>% 
+  pull(mean)
+
+C_pre_weight <- short_data %>% 
+  filter(Treat == 0 & year == 2013) %>% 
+  summarize(mean = weighted.mean(crude_rate_20_64, w = set_wt)) %>% 
+  pull(mean)
+
+T_Post_weight <- short_data %>% 
+  filter(Treat == 1 & year == 2014) %>% 
+  summarize(mean = weighted.mean(crude_rate_20_64, w = set_wt)) %>% 
+  pull(mean)
+
+C_Post_weight <- short_data %>% 
+  filter(Treat == 0 & year == 2014) %>% 
+  summarize(mean = weighted.mean(crude_rate_20_64, w = set_wt)) %>% 
+  pull(mean)
+
+# function to do a reasonable rounding
+g_round <- function(x, k) {format(round(x, k), nsmall = k)}
+
+# make table and export
+tribble(
+  ~"", ~"Expansion", ~ "No Expansion", ~"Gap/DiD", ~"Expansion", ~"No Expansion", ~"Gap/DiD",
+  "2013", as.character(g_round(T_pre, 1)), as.character(g_round(C_pre, 1)), as.character(g_round(T_pre - C_pre, 1)), 
+  as.character(g_round(T_pre_weight, 1)), as.character(g_round(C_pre_weight, 1)), as.character(g_round(T_pre_weight - C_pre_weight, 1)),
+  "2014", as.character(g_round(T_Post, 1)), as.character(g_round(C_Post, 1)), as.character(g_round(T_Post - C_Post, 1)), 
+  as.character(g_round(T_Post_weight, 1)), as.character(g_round(C_Post_weight, 1)), as.character(g_round(T_Post_weight - C_Post_weight, 1)),
+  "Trend/DiD", as.character(g_round(T_Post - T_pre, 1)), as.character(g_round(C_Post-C_pre, 1)), 
+  as.character(g_round((T_Post - T_pre) - (C_Post-C_pre), 1)),
+    as.character(g_round(T_Post_weight - T_pre_weight, 1)), as.character(g_round(C_Post_weight-C_pre_weight, 1)), 
+  as.character(g_round((T_Post_weight - T_pre_weight) - (C_Post_weight-C_pre_weight), 1))
+) %>% 
+  # format table
+  kable(align = 'c',
+        booktabs = T, 
+        escape = F,
+        caption = "Simple 2 X 2 DiD") %>% 
+  kable_styling() %>% 
+  row_spec(3, color = "BrickRed") %>% 
+  column_spec(c(1:3, 5:6), color = "black") %>% 
+  row_spec(3, italic = TRUE) %>% 
+  column_spec(c(4, 7), italic = TRUE) %>% 
+  add_header_above(c(" " = 1, "Unweighted Averages" = 3, "Weighted Averages" = 3))
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+********************************
+* 1. Load and prepare data
+********************************
+	clear all
+	set more off
+	capture log close
+
+	insheet using "county_mortality_data.csv", clear
+
+********************************
+* 2. Prepare timing groups
+********************************
+	*Drop early and mid adopters
+	drop if inlist(state, "District of Columbia", "Delaware", "Massachusetts", "New York", "Vermont")
+
+	*Define treatment timing
+	gen treat_year = real(yaca)
+	replace treat_year = 0 if missing(treat_year)
+	tostring treat_year, gen(treat_str)
+	destring yaca, replace force
+
+********************************
+* 3. Prepare covariates
+********************************
+	*destring covariates
+	destring deaths population_20_64 crude_rate_20_64 population_total population_20_64_hispanic population_20_64_female population_20_64_white unemployed labor_force unemp_rate poverty_rate median_income, replace force
+	ren population_total total_population
+
+	*Drop counties with missing covariates
+	gen perc_white    = population_20_64_white   / population_20_64 * 100
+	gen perc_hispanic = population_20_64_hispanic/ population_20_64 * 100
+	gen perc_female   = population_20_64_female  / population_20_64 * 100
+	gen unemp_rate_pc = unemp_rate * 100
+	gen median_income_k = median_income/1000
+	drop if missing(crude_rate_20_64, population_20_64, ///
+					perc_white, perc_hispanic, perc_female, ///
+					unemp_rate_pc, poverty_rate, median_income_k)
+
+********************************
+* 4. Sample construction
+********************************				
+	*Keep counties with full 11-year panel
+	bys county_code (year): gen panel_n = _N
+	bys county_code: keep if panel_n == 11
+	drop panel_n 
+	replace treat_year=0 if treat_year>2019
+
+********************************
+* 5. Construct population weight
+********************************
+	bys county_code: egen set_wt = max(cond(year==2013, population_20_64, .))
+
+********************************
+* 6. Label variables
+********************************
+	label variable crude_rate_20_64 "Crude Mortality Rate"
+
+	
+	
+save "did_jel_aca_replication_data", replace
+
+***************************************************************
+*1. Table 2: weighted and unweighted averages for the simple 2x2 DiD
+***************************************************************
+	*Read in data, keep 2013–2014 and 2014 expansion vs "non expansion" states
+	use "did_jel_aca_replication_data", clear
+	keep if inlist(year, 2013, 2014) & inlist(yaca,2014,2020,2021,2023,.)
+	gen Treat = (yaca==2014)		// 1 = ACA in 2014
+	gen Post = (year == 2014)     	// 1 = post-expansion year
+
+	*Means
+	*unweighted
+	sum crude_rate if Treat==1 & year==2014
+	global u12014 = r(mean)
+	sum crude_rate if Treat==1 & year==2013
+	global u12013 = r(mean)
+	sum crude_rate if Treat==0 & year==2014
+	global u02014 = r(mean)
+	sum crude_rate if Treat==0 & year==2013
+	global u02013 = r(mean)
+
+	*weighted
+	sum crude_rate if Treat==1 & year==2014 [aw=set_wt]
+	global w12014 = r(mean)
+	sum crude_rate if Treat==1 & year==2013  [aw=set_wt]
+	global w12013 = r(mean)
+	sum crude_rate if Treat==0 & year==2014  [aw=set_wt]
+	global w02014 = r(mean)
+	sum crude_rate if Treat==0 & year==2013 [aw=set_wt]
+	global w02013 = r(mean)
+	
+
+
+	*Gaps, trends, DiDs 
+	* Unweighted
+	global Gap13_u = ($u12013 - $u02013)
+	global Gap14_u = ($u12014 - $u02014)
+	global DiD_u   = ( ($u12014 - $u12013) - ($u02014 - $u02013) )
+	global Trend_T_u = ($u12014 - $u12013)
+	global Trend_C_u = ($u02014 - $u02013)
+
+	* Weighted
+	global Gap13_w = ($w12013 - $w02013)
+	global Gap14_w = ($w12014 - $w02014)
+	global DiD_w   = ( $w12014 - $w12013 ) - ( $w02014 - $w02013 )
+	global Trend_T_w = ($w12014 - $w12013)
+	global Trend_C_w = ($w02014 - $w02013)
+
+
+
+	*Rounding for the table
+	foreach nm in u12013 u02013 u12014 u02014 ///
+				 w12013 w02013 w12014 w02014 ///
+				 Gap13_u Gap14_u DiD_u Trend_T_u Trend_C_u ///
+				 Gap13_w Gap14_w DiD_w Trend_T_w Trend_C_w {
+		local `nm' : display %6.1f ${`nm'}
+		display("`nm'")
+	}
+
+	display("`u12013'")
+	display "$u12013"
+	* Brick-red DiD cells
+	local DiD_u_cell "\em{\em{\textcolor{BrickRed}{`DiD_u'}}}"
+	local DiD_w_cell "\em{\em{\textcolor{BrickRed}{`DiD_w'}}}"
+
+	
+	
+	
+/*--------------------------------------------------------------------
+  8. Export Excel Table for Rendering
+--------------------------------------------------------------------*/
+clear
+set obs 3
+
+// row labels
+gen str10 row = ""
+replace row = "2013"      in 1
+replace row = "2014"      in 2
+replace row = "Trend/DiD" in 3
+
+// columns (numeric); convert locals like `u12013' to numbers with real()
+gen double Expansion_unw   = .
+gen double NoExpansion_unw = .
+gen double Gap_DiD_unw     = .
+gen double Expansion_wt    = .
+gen double NoExpansion_wt  = .
+gen double Gap_DiD_wt      = .
+
+replace Expansion_unw   = real("`u12013'")    in 1
+replace Expansion_unw   = real("`u12014'")    in 2
+replace Expansion_unw   = real("`Trend_T_u'") in 3
+
+replace NoExpansion_unw = real("`u02013'")    in 1
+replace NoExpansion_unw = real("`u02014'")    in 2
+replace NoExpansion_unw = real("`Trend_C_u'") in 3
+
+replace Gap_DiD_unw     = real("`Gap13_u'")   in 1
+replace Gap_DiD_unw     = real("`Gap14_u'")   in 2
+replace Gap_DiD_unw     = real("`DiD_u'")     in 3
+
+replace Expansion_wt    = real("`w12013'")    in 1
+replace Expansion_wt    = real("`w12014'")    in 2
+replace Expansion_wt    = real("`Trend_T_w'") in 3
+
+replace NoExpansion_wt  = real("`w02013'")    in 1
+replace NoExpansion_wt  = real("`w02014'")    in 2
+replace NoExpansion_wt  = real("`Trend_C_w'") in 3
+
+replace Gap_DiD_wt      = real("`Gap13_w'")   in 1
+replace Gap_DiD_wt      = real("`Gap14_w'")   in 2
+replace Gap_DiD_wt      = real("`DiD_w'")     in 3
+
+format Expansion_unw NoExpansion_unw Gap_DiD_unw ///
+       Expansion_wt  NoExpansion_wt  Gap_DiD_wt %9.1f
+
+export excel using "../data/two_by_two_table.xlsx", firstrow(variables) replace
+
+```
+:::
+
+## Table 3: Regression DiD
+
+**Table 3** shows how we can recover the same $2\times2$ estimate using one of three regression specifications:
+
+1\) Regressing the crude mortality rate on indicators for treatment (Medicaid expansion states), post-treatment periods (2014), and the interaction of the two.
+
+2\) Regressing the crude mortality rate on the interaction of indicators for Medicaid expansion and post-expansion periods, as well as county and year fixed effects.
+
+3\) Regressing the difference between 2014 and 2013 county-level crude mortality rates on an indicator for whether the county is in a state that expanded Medicaid.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+# show that you can get the same estimates with regression
+# make a different short data with long differences in mortality by county and treatment indicators
+short_data2 <- short_data %>% 
+  group_by(county_code) %>% 
+  summarize(state = state[1],
+            set_wt = mean(set_wt),
+            # long difference between 2014 and 2013 rates
+            diff = crude_rate_20_64[which(year == 2014)] - crude_rate_20_64[which(year == 2013)],
+            Treat = mean(Treat),
+            Post = 1)
+
+# estimate three models without weights. These are Treat*Post with no fixed effects,
+# fixed effects + Treat:Post, and then the long difference model with no fixed effects.
+mod1 <- feols(crude_rate_20_64 ~ Treat*Post, data = short_data, cluster = ~county_code)
+mod2 <- feols(crude_rate_20_64 ~ Treat:Post | county_code + year, data = short_data, cluster = ~county_code)
+mod3 <- feols(diff ~ Treat:Post, data = short_data2, cluster = ~county_code)
+
+# estimate the same three three models with weights
+mod4 <- feols(crude_rate_20_64 ~ Treat*Post, data = short_data, weights = ~set_wt, cluster = ~county_code)
+mod5 <- feols(crude_rate_20_64 ~ Treat:Post | county_code + year, data = short_data, 
+              weights = ~set_wt, cluster = ~county_code)
+mod6 <- feols(diff ~ Treat:Post, data = short_data2, weights = ~set_wt, cluster = ~county_code)
+
+
+# this dictionary maps names to labels for the table
+dict <- c("(Intercept)" = "Constant",
+          "Treat" = "Medicaid Expansion",
+          "Post" = "Post",
+          "Treat:Post" = "Medicaid Expansion X Post")
+
+# rows to add to table
+rows = tribble(
+  ~x1, ~x2, ~x3, ~x4, ~x5, ~x6, ~x7,
+  "County fixed effects", "No", "Yes", "No", "No", "Yes", "No",
+  "Year fixed effects", "No", "Yes", "No", "No", "Yes", "No"
+)
+
+# export table 3
+modelsummary(list("(1)" = mod1, "(2)" = mod2, "(3)" = mod3, 
+                  "(4)" = mod4, "(5)" = mod5, "(6)" = mod6),
+             coef_map = dict, escape = FALSE, gof_map = NA,
+             fmt = 1, stars = FALSE,
+             estimate = "{estimate}", add_rows = rows,
+             title = "Regression 2 X 2 DiD") %>%
+  add_header_above(c(" " = 1, "Crude Morality Rate" = 2, "\\(\\Delta\\)" = 1, 
+                     "Crude Mortality Rate" = 2, "\\(\\Delta\\)" = 1), escape = FALSE)
+
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+***************************************************************
+*2. Table 3: regression 2x2 DiD with balanced panel, no controls
+***************************************************************
+	*Read in data, keep 2013–2014 and 2014 expansion vs "non expansion" states
+	use "did_jel_aca_replication_data", clear
+	keep if inlist(year, 2013, 2014) & inlist(yaca,2014,2020,2021,2023,.)
+	gen Treat = (yaca==2014)		// 1 = ACA in 2014
+	gen Post = (year == 2014)     	// 1 = post-expansion year
+
+	*Panel declaration (once)
+	xtset county_code year
+
+	*UNWEIGHTED regressions
+	eststo clear
+	* (1) Treat × Post, no FE
+	reg crude_rate_20_64 c.Treat##c.Post, vce(cluster county_code)
+	eststo m1
+	estadd local countyfe "No"
+	estadd local yearfe   "No"
+
+	* (2) Treat × Post with county & year FE  (xtreg, fe → no constant)
+	xtreg crude_rate_20_64 c.Treat#c.Post i.year, fe vce(cluster county_code)
+	eststo m2
+	estadd local countyfe "Yes"
+	estadd local yearfe   "Yes"
+
+* (3) Long-difference, unweighted
+preserve
+    keep county_code year crude_rate_20_64 Treat
+    reshape wide crude_rate_20_64, i(county_code) j(year)
+    gen diff = crude_rate_20_642014 - crude_rate_20_642013
+    label variable diff "\$\\Delta\$"
+    reg diff Treat, vce(cluster county_code)
+
+    // rename Treat -> c.Treat#c.Post and re-post BEFORE eststo
+    tempname b V
+    matrix `b' = e(b)
+    matrix `V' = e(V)
+    local N  = e(N)
+    local df = e(df_r)
+    tempvar touse
+    gen byte `touse' = e(sample)
+    local cn : colnames `b'
+    local newcn
+    foreach nm of local cn {
+        if ("`nm'" == "Treat") local newcn `newcn' c.Treat#c.Post
+        else                   local newcn `newcn' `nm'
+    }
+    matrix colnames `b' = `newcn'
+    matrix colnames `V' = `newcn'
+    matrix rownames `V' = `newcn'
+    ereturn post `b' `V', depname(diff) esample(`touse') obs(`N') dof(`df')
+
+    eststo m3
+    estadd local countyfe "No"
+    estadd local yearfe   "No"
+restore
+
+	*WEIGHTED regressions
+	* (4) Weighted, no FE
+	reg crude_rate_20_64 c.Treat##c.Post [aw=set_wt], vce(cluster county_code)
+	eststo m4
+	estadd local countyfe "No"
+	estadd local yearfe   "No"
+
+	* (5) Weighted, county & year FE  (areg keeps _cons; we'll hide it)
+	xtreg crude_rate_20_64 c.Treat#c.Post i.year [aw=set_wt], ///
+		fe vce(cluster county_code)
+	eststo m5
+	estadd local countyfe "Yes"
+	estadd local yearfe   "Yes"
+
+
+* (6) Weighted long-difference
+preserve
+    keep county_code year crude_rate_20_64 Treat set_wt
+    reshape wide crude_rate_20_64, i(county_code) j(year)
+    gen diff = crude_rate_20_642014 - crude_rate_20_642013
+    reg diff Treat [aw=set_wt], vce(cluster county_code)
+
+    // rename Treat -> c.Treat#c.Post and re-post BEFORE eststo
+    tempname b V
+    matrix `b' = e(b)
+    matrix `V' = e(V)
+    local N  = e(N)
+    local df = e(df_r)
+    tempvar touse
+    gen byte `touse' = e(sample)
+    local cn : colnames `b'
+    local newcn
+    foreach nm of local cn {
+        if ("`nm'" == "Treat") local newcn `newcn' c.Treat#c.Post
+        else                   local newcn `newcn' `nm'
+    }
+    matrix colnames `b' = `newcn'
+    matrix colnames `V' = `newcn'
+    matrix rownames `V' = `newcn'
+    ereturn post `b' `V', depname(diff) esample(`touse') obs(`N') dof(`df')
+
+    eststo m6
+    estadd local countyfe "No"
+    estadd local yearfe   "No"
+restore
+	
+
+	*Build the LaTeX table
+	local labels ///
+		_cons            "Constant" ///
+		Treat            "Medicaid Expansion" ///
+		Post             "Post" ///
+		c.Treat#c.Post   "Medicaid Expansion × Post"
+
+	* Add Treat as the interaction label in long-diff specs (m3 and m6)
+	estimates restore m3
+	estadd local intlabel "Medicaid Expansion × Post"
+	estimates restore m6
+	estadd local intlabel "Medicaid Expansion × Post"
+
+esttab m1 m2 m3 m4 m5 m6 using "../data/regdid_2x2.csv", replace keep(_cons Treat Post c.Treat#c.Post)   order(_cons Treat Post c.Treat#c.Post)  varlabels(_cons "Constant" Treat "Medicaid Expansion" Post  "Post"  c.Treat#c.Post "Medicaid Expansion × Post") cells(b(fmt(%9.1f) ) se(fmt(%9.1f) )) collabels(none) stats( countyfe yearfe, fmt(%9.0g %9s %9s) labels("County fixed effects" "Year fixed effects")) nomtitles nonotes noobs numbers  plain csv    
+
+
+```
+:::
+
+## Table 4: Covariate Balance
+
+In **Table 4** we show how to check for covariate balance across the covariates, using both 2013 levels and the changes between 2014 and 2013. We include a measure of the normalized difference as well as the (unweighted and weighted) sample means.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+# Now, make the covariate balance table (Table 4).
+# unweighted - pre
+unweighted <- short_data %>% 
+  filter(year == 2013) %>% 
+  select(Treat, all_of(covs)) %>% 
+  group_by(Treat) %>% 
+  # get mean and standard deviation
+  summarize_all(list(mean, var)) %>%
+  # pivot the data longer
+  pivot_longer(cols = !Treat, 
+               names_to = "variable", 
+               values_to = "value") %>% 
+  # now make separate columns for treated and untreated
+  pivot_wider(names_from = "Treat", 
+              values_from = "value",
+              names_prefix = "group") %>% 
+  # separate mean and standard deviations
+  extract(variable, into = c("variable", "fx"), "(.*)_(.*)") %>% 
+  pivot_wider(id_cols = variable,
+              names_from = fx,
+              values_from = c(group0, group1)) %>% 
+  # make normalized difference
+  mutate(norm_diff = (group1_fn1 - group0_fn1)/sqrt((group1_fn2 + group0_fn2)/2)) %>% 
+  select(variable, group0_fn1, group1_fn1, norm_diff)
+
+# make a weighted variance function
+wtd.var <- function (x, weights = NULL, normwt = FALSE, na.rm = TRUE, 
+                     method = c("unbiased", "ML")) 
+{
+  method <- match.arg(method)
+  if (!length(weights)) {
+    if (na.rm) 
+      x <- x[!is.na(x)]
+    return(var(x))
+  }
+  if (na.rm) {
+    s <- !is.na(x + weights)
+    x <- x[s]
+    weights <- weights[s]
+  }
+  if (normwt) 
+    weights <- weights * length(x)/sum(weights)
+  if (normwt || method == "ML") 
+    return(as.numeric(stats::cov.wt(cbind(x), weights, method = method)$cov))
+  sw <- sum(weights)
+  if (sw <= 1) 
+    warning("only one effective observation; variance estimate undefined")
+  xbar <- sum(weights * x)/sw
+  sum(weights * ((x - xbar)^2))/(sw - 1)
+}
+
+# weighted  - pre
+weighted <- short_data %>% 
+  filter(year == 2013) %>% 
+  select(Treat, all_of(covs), set_wt) %>% 
+  group_by(Treat) %>% 
+  # get mean and standard deviation
+  summarize(across(all_of(covs), 
+                   list(
+                     ~weighted.mean(x = ., w = set_wt),
+                     ~wtd.var(x = ., weights = set_wt, normwt = TRUE)))) %>%
+  # pivot the data longer
+  pivot_longer(cols = !Treat, 
+               names_to = "variable", 
+               values_to = "value") %>% 
+  # now make separate columns for treated and untreated
+  pivot_wider(names_from = "Treat", 
+              values_from = "value",
+              names_prefix = "group") %>% 
+  # separate mean and standard deviations
+  extract(variable, into = c("variable", "fx"), "(.*)_(.*)") %>% 
+  pivot_wider(id_cols = variable,
+              names_from = fx,
+              values_from = c(group0, group1)) %>% 
+  # make normalized difference
+  mutate(norm_diff = (group1_1 - group0_1)/sqrt((group1_2 + group0_2)/2)) %>% 
+  select(variable, group0_1, group1_1, norm_diff)
+
+# make the top panel (weighted and unweighted Pre)
+top_panel <- bind_cols(unweighted, weighted %>% select(-variable))
+
+# make the bottom panel, which is the same thing but with the difference in X between 2014 and 2013.
+# unweighted
+unweighted <- short_data %>% 
+  select(county_code, year, Treat, all_of(covs)) %>% 
+  arrange(county_code, year) %>% 
+  group_by(county_code, Treat) %>% 
+  summarize(
+    across(all_of(covs), function(x) x[2] - x[1])
+  ) %>% 
+  ungroup() %>% 
+  select(-county_code) %>% 
+  group_by(Treat) %>% 
+  # get mean and standard deviation
+  summarize_all(list(mean, var)) %>%
+  # pivot the data longer
+  pivot_longer(cols = !Treat, 
+               names_to = "variable", 
+               values_to = "value") %>% 
+  # now make separate columns for treated and untreated
+  pivot_wider(names_from = "Treat", 
+              values_from = "value",
+              names_prefix = "group") %>% 
+  # separate mean and standard deviations
+  extract(variable, into = c("variable", "fx"), "(.*)_(.*)") %>% 
+  pivot_wider(id_cols = variable,
+              names_from = fx,
+              values_from = c(group0, group1)) %>% 
+  # make normalized difference
+  mutate(norm_diff = (group1_fn1 - group0_fn1)/sqrt((group1_fn2 + group0_fn2)/2)) %>% 
+  select(variable, group0_fn1, group1_fn1, norm_diff)
+
+# weighted
+weighted <- short_data %>% 
+  select(county_code, year, Treat, all_of(covs)) %>% 
+  arrange(county_code, year) %>% 
+  group_by(county_code, Treat) %>% 
+  summarize(
+    across(all_of(covs), function(x) x[2] - x[1])
+  ) %>% 
+  ungroup() %>% 
+  left_join(short_data %>% filter(year == 2013) %>% select(county_code, set_wt),
+            join_by(county_code)) %>% 
+  select(-county_code) %>% 
+  group_by(Treat) %>%
+  # get mean and standard deviation
+  summarize(across(all_of(covs), 
+                   list(
+                     ~weighted.mean(x = ., w = set_wt),
+                     ~wtd.var(x = ., weights = set_wt, normwt = TRUE)))) %>%
+  # pivot the data longer
+  pivot_longer(cols = !Treat, 
+               names_to = "variable", 
+               values_to = "value") %>% 
+  # now make separate columns for treated and untreated
+  pivot_wider(names_from = "Treat", 
+              values_from = "value",
+              names_prefix = "group") %>% 
+  # separate mean and standard deviations
+  extract(variable, into = c("variable", "fx"), "(.*)_(.*)") %>% 
+  pivot_wider(id_cols = variable,
+              names_from = fx,
+              values_from = c(group0, group1)) %>% 
+  # make normalized difference
+  mutate(norm_diff = (group1_1 - group0_1)/sqrt((group1_2 + group0_2)/2)) %>% 
+  select(variable, group0_1, group1_1, norm_diff)
+
+# make the bottom panel
+bottom_panel <- bind_cols(unweighted, weighted %>% select(-variable))
+
+# bind the two panels
+table <- bind_rows(top_panel, bottom_panel) %>% 
+  # reformat all columns to two digits
+  mutate(across(-variable, \(x) scales::comma(x, accuracy = 0.01)))
+
+# format Table 4 and export
+table %>% 
+  # change column names
+  mutate(variable = 
+           case_match(variable,
+                      "perc_female" ~ "% Female",
+                      "perc_white" ~ "% White",
+                      "perc_hispanic" ~ "% Hispanic",
+                      "unemp_rate" ~ "Unemployment Rate",
+                      "poverty_rate" ~ "Poverty Rate",
+                      "median_income" ~ "Median Income")) %>% 
+  # format latex table
+  kable(col.names = c("Variable", "Non-Adopt", "Adopt", "Norm. Diff.", "Non-Adopt", "Adopt", "Norm. Diff."),
+        align = 'lcccccc',
+        escape = T,
+        booktabs = T,
+        label = "cov_balance",
+        caption = "Covariate Balance Statistics",
+        linesep = "") %>% 
+  kable_styling(latex_options = c("scale_down", "hold_position")) %>% 
+  pack_rows("2013 Covariate Levels", 1, 6) %>% 
+  pack_rows("2014 - 2013 Covariate Differences", 7, 12) %>% 
+  add_header_above(c(" " = 1, "Unweighted" = 3, "Weighted" = 3))
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+***************************************************************
+*3. Table 4: Covariate-balance table
+*			 NB:the table construction is a lot of lines here...
+***************************************************************
+	*Read in data, keep 2013–2014 and 2014 expansion vs "non expansion" states
+	use "did_jel_aca_replication_data", clear
+	keep if inlist(year, 2013, 2014) & inlist(yaca,2014,2020,2021,2023,.)
+	gen Treat = (yaca==2014)		// 1 = ACA in 2014
+	gen Post = (year == 2014)     	// 1 = post-expansion year
+
+	*local with covariate names
+	local covs perc_female perc_white perc_hispanic ///
+			   unemp_rate_pc poverty_rate median_income_k
+
+	*2013 levels — unweighted means, SDs, and normalized diff
+	preserve
+		keep if year == 2013
+
+		*---- means and SDs in a single collapse -----------------------
+		collapse (mean)  m_perc_female  			= perc_female       ///
+						 m_perc_white   			= perc_white		///
+						 m_perc_hispanic   			= perc_hispanic		///
+						 m_unemp_rate_pc	  	 	= unemp_rate_pc 	///
+						 m_poverty_rate 	     	= poverty_rate		///
+						 m_median_income_k		 	= median_income_k 	///
+				 (sd)    sd_perc_female  			= perc_female       ///
+						 sd_perc_white   			= perc_white		///
+						 sd_perc_hispanic  			= perc_hispanic		///
+						 sd_unemp_rate_pc		   	= unemp_rate_pc 	///
+						 sd_poverty_rate 	    	= poverty_rate		///
+						 sd_median_income_k		 	= median_income_k, 	///
+				 by(Treat)
+
+		generate byte id = 1          // same value for both rows (Treat 0/1)
+
+		*---- reshape into one wide row -------------------------------------
+		reshape wide m* sd_*, i(id) j(Treat)
+		drop id                       // no longer needed
+
+		*---- normalized differences ----------------------------------
+		foreach x in `covs'{
+			gen nd_`x' = (m_`x'1 - m_`x'0) / ///
+						 sqrt( (sd_`x'1^2 + sd_`x'0^2) / 2 )
+		}
+
+			keep m* nd_*                    // single-row dataset
+			tempfile unwt_pre
+			save `unwt_pre'
+			list
+	restore
+
+
+
+	*2013 levels — weighted means, SDs, and normalized diff
+	preserve
+		keep if year == 2013
+
+		*---- means and SDs in a single collapse -----------------------
+		collapse (mean)  wm_perc_female  			= perc_female       ///
+						 wm_perc_white   			= perc_white		///
+						 wm_perc_hispanic   		= perc_hispanic		///
+						 wm_unemp_rate_pc	  	 	= unemp_rate_pc 	///
+						 wm_poverty_rate 	     	= poverty_rate		///
+						 wm_median_income_k		 	= median_income_k 	///
+				 (sd)    sd_perc_female  			= perc_female       ///
+						 sd_perc_white   			= perc_white		///
+						 sd_perc_hispanic  			= perc_hispanic		///
+						 sd_unemp_rate_pc		   	= unemp_rate_pc 	///
+						 sd_poverty_rate 	    	= poverty_rate		///
+						 sd_median_income_k		 	= median_income_k 	///
+						 [aw = set_wt], ///
+				 by(Treat)
+
+		generate byte id = 1          // same value for both rows (Treat 0/1)
+
+		*---- reshape into one wide row -------------------------------------
+		reshape wide wm* sd_*, i(id) j(Treat)
+		drop id                       // no longer needed
+
+		*---- normalized differences ----------------------------------
+		foreach x in `covs'{
+			gen wnd_`x' = (wm_`x'1 - wm_`x'0) / ///
+						 sqrt( (sd_`x'1^2 + sd_`x'0^2) / 2 )
+		}
+
+			keep wm* wnd_*                    // single-row dataset
+			tempfile wt_pre
+			save `wt_pre'
+			list
+	restore
+
+
+	* Differences - unweighted means, SDs, and normalized diff 
+	preserve
+		*create differences
+		for var `covs': egen bX = total(X*(year==2013)), by(county_code)
+		for var `covs': gen d_X = X-bX
+    
+	  keep if year == 2014 
+
+		*---- means and SDs in a single collapse -----------------------
+		collapse (mean)  m_d_perc_female  			= d_perc_female         ///
+						 m_d_perc_white   			= d_perc_white			///
+						 m_d_perc_hispanic   		= d_perc_hispanic		///
+						 m_d_unemp_rate_pc	  	 	= d_unemp_rate_pc 		///
+						 m_d_poverty_rate 	     	= d_poverty_rate		///
+						 m_d_median_income_k	 	= d_median_income_k 	///
+				 (sd)    sd_perc_female  			= d_perc_female         ///
+						 sd_perc_white   			= d_perc_white			///
+						 sd_perc_hispanic  			= d_perc_hispanic		///
+						 sd_unemp_rate_pc	   		= d_unemp_rate_pc 		///
+						 sd_poverty_rate 	    	= d_poverty_rate		///
+						 sd_median_income_k		 	= d_median_income_k, 	///
+				 by(Treat)
+
+		generate byte id = 1          // same value for both rows (Treat 0/1)
+
+		*---- reshape into one wide row -------------------------------------
+		reshape wide m* sd_*, i(id) j(Treat)
+		drop id                       // no longer needed
+
+		*---- normalized differences ----------------------------------
+		foreach x in `covs'{
+			gen nd_d_`x' = (m_d_`x'1 - m_d_`x'0) / ///
+						 sqrt( (sd_`x'1^2 + sd_`x'0^2) / 2 )
+		}
+
+		keep m_d* nd_d*                    // single-row dataset
+		tempfile unwt_diff
+		save `unwt_diff'
+		list	
+	restore
+
+	* Differences - weighted means, SDs, and normalized diff 
+	preserve
+		*create differences
+		for var `covs': egen bX = total(X*(year==2013)), by(county_code)
+		for var `covs': gen d_X = X-bX
+    keep if year == 2014 
+
+		*---- means and SDs in a single collapse -----------------------
+		collapse (mean)  wm_d_perc_female  			= d_perc_female         ///
+						 wm_d_perc_white   			= d_perc_white			///
+						 wm_d_perc_hispanic   		= d_perc_hispanic		///
+						 wm_d_unemp_rate_pc	  	 	= d_unemp_rate_pc 		///
+						 wm_d_poverty_rate 	     	= d_poverty_rate		///
+						 wm_d_median_income_k	 	= d_median_income_k 	///
+				 (sd)    sd_perc_female  			= d_perc_female         ///
+						 sd_perc_white   			= d_perc_white			///
+						 sd_perc_hispanic  			= d_perc_hispanic		///
+						 sd_unemp_rate_pc	   		= d_unemp_rate_pc 		///
+						 sd_poverty_rate 	    	= d_poverty_rate		///
+						 sd_median_income_k		 	= d_median_income_k 	///
+						 [aw = set_wt], ///
+				 by(Treat)
+
+		generate byte id = 1          // same value for both rows (Treat 0/1)
+
+		*---- reshape into one wide row -------------------------------------
+		reshape wide wm* sd_*, i(id) j(Treat)
+		drop id                       // no longer needed
+
+		*---- normalized differences ----------------------------------
+		foreach x in `covs'{
+			gen wnd_d_`x' = (wm_d_`x'1 - wm_d_`x'0) / ///
+						 sqrt( (sd_`x'1^2 + sd_`x'0^2) / 2 )
+		}
+
+		keep wm* wnd_*                    // single-row dataset
+		tempfile wt_diff
+		save `wt_diff'
+		list	
+	restore
+
+	**table creation
+	*Assemble the four blocks into one matrix
+	use `unwt_pre',     clear
+	merge 1:1 _n using `wt_pre',   nogen   // adds mw*  sw*  wnd_*
+	merge 1:1 _n using `unwt_diff', nogen   // adds md*  nd_d*
+	merge 1:1 _n using `wt_diff',  nogen   // adds mwd* swd* wnd_d_*
+
+	de,f
+
+		   
+	* ---- row labels ----------------------------------------------------
+	local rowlbl  "% Female" "% White" "% Hispanic" ///
+				  "Unemployment Rate" "Poverty Rate" "Median Income"
+	local outrows
+	local i = 1
+	foreach v in `covs' {
+		local outrows `"`outrows' `"`:word `i' of `rowlbl''"'"'
+		local ++i
+	}
+
+	/* ---- build the 12 × 6 matrix ----------------------------------- */
+	matrix T = J(12,6,.)
+	local r 0
+	foreach v of local covs {
+		local ++r
+		* rows 1–6 : 2013 levels
+		matrix T[`r',1] = m_`v'0[1]         // un-wtd mean, Non-adopt
+		matrix T[`r',2] = m_`v'1[1]         // un-wtd mean, Adopt
+		matrix T[`r',3] = nd_`v'[1]         // un-wtd norm-diff
+		matrix T[`r',4] = wm_`v'0[1]        // wtd mean,  Non-adopt
+		matrix T[`r',5] = wm_`v'1[1]        // wtd mean,  Adopt
+		matrix T[`r',6] = wnd_`v'[1]        // wtd norm-diff
+	}
+
+	foreach v of local covs {
+		local ++r
+		* rows 7–12 : 2014–2013 long-differences
+		matrix T[`r',1] = m_d_`v'0[1]        // un-wtd ∆, Non-adopt
+		matrix T[`r',2] = m_d_`v'1[1]        // un-wtd ∆, Adopt
+		matrix T[`r',3] = nd_d_`v'[1]        // un-wtd norm-diff
+		matrix T[`r',4] = wm_d_`v'0[1]       // **underscore added**
+		matrix T[`r',5] = wm_d_`v'1[1]       // **underscore added**
+		matrix T[`r',6] = wnd_d_`v'[1]       // wtd norm-diff
+	}
+
+	matrix rownames T = `outrows' `outrows'
+	matrix colnames T = "Non-Adopt" "Adopt" "Norm. Diff." ///
+						"Non-Adopt" "Adopt" "Norm. Diff."
+						
+
+				
+*--------------------------------------------------------------------
+* 5.  Export to CSV instead of LaTeX
+*--------------------------------------------------------------------
+
+* Convert matrix T to a dataset
+clear
+svmat T
+
+* Reorder so variable names come first
+
+* Rename columns to something clear
+rename T1 NonAdopt_unwt
+rename T2 Adopt_unwt
+rename T3 NormDiff_unwt
+rename T4 NonAdopt_wt
+rename T5 Adopt_wt
+rename T6 NormDiff_wt
+
+* After svmat/renames
+foreach v of varlist NonAdopt_unwt Adopt_unwt NormDiff_unwt ///
+                     NonAdopt_wt  Adopt_wt  NormDiff_wt {
+    replace `v' = round(`v', .01)
+	  tostring `v', replace format(%9.2f) force
+                     }
+
+
+* Save as CSV
+export delimited using "../data/cov_balance.csv", replace
+
+					
+```
+:::
+
+## Table 5: Regression 2 $\times$ 2 DiD with Covariates
+
+In **Table 5** we show how the 2 $\times$ 2 DiD estimates change with the inclusion of covariates using linear regression. You can do this in two ways - either controlling for the 2013 levels of the covariates, or the change in the covariates between 2014 and 2013. Even in this simple setting the results differ considerably.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+# make a table that includes the model 1) without covariates, 2) long regression with 
+# 2013 covariates values, 3) long regression with *difference* in covariate values.
+reg_data_2013 <- short_data %>% 
+  # make long diff in y
+  group_by(county_code) %>% 
+  summarize(long_y = crude_rate_20_64[which(year == 2014)] - crude_rate_20_64[which(year == 2013)]) %>% 
+  # merge in 2013 covariates
+  left_join(short_data %>% filter(year == 2013) %>% select(county_code, state, Treat, set_wt, all_of(covs)), 
+            by = "county_code")
+
+# this dataset has the change in X between 2014 and 2013 as controls
+reg_data_change <- short_data %>% 
+  # make long diff in y
+  group_by(county_code) %>% 
+  summarize(long_y = crude_rate_20_64[which(year == 2014)] - crude_rate_20_64[which(year == 2013)]) %>% 
+  # merge in change in covariate values
+  left_join(short_data %>% 
+              group_by(county_code) %>% 
+              mutate(set_wt = set_wt[which(year == 2013)]) %>% 
+              group_by(county_code, state, Treat, set_wt) %>% 
+              summarize(
+                across(all_of(covs), function(x) x[which(year == 2014)] - x[which(year == 2013)])
+              ), by = "county_code")
+
+# run the six models
+# first unweighted - long diff no covs, 2013 covs, then change in covs
+mod1 <- feols(long_y ~ Treat, data = reg_data_2013, cluster = ~county_code)
+mod2 <- feols(long_y ~ Treat + .[covs], data = reg_data_2013, cluster = ~county_code)
+mod3 <- feols(long_y ~ Treat + .[covs], data = reg_data_change, cluster = ~county_code)
+
+# same thing but weighted
+mod4 <- feols(long_y ~ Treat, data = reg_data_2013, weights = ~set_wt, cluster = ~county_code)
+mod5 <- feols(long_y ~ Treat + .[covs], data = reg_data_2013, weights = ~set_wt, cluster = ~county_code)
+mod6 <- feols(long_y ~ Treat + .[covs], data = reg_data_change, weights = ~set_wt, cluster = ~county_code)
+
+# export table 3
+modelsummary(list("(1)" = mod1, "(2)" = mod2, "(3)" = mod3, 
+                  "(4)" = mod4, "(5)" = mod5, "(6)" = mod6),
+             coef_map = dict, coef_omit = "(Intercept)", escape = FALSE, gof_map = NA,
+             fmt = 2, estimate = "{estimate}",
+             title = "Regression 2 X 2 DiD with Covariates") %>%
+  add_header_above(c(" " = 1, "No Covs" = 1, "$$X_{i, t = 2013}$$" = 1, "$$X_{i, t}$$" = 1,
+                                    "No Covs" = 1, "$$X_{i, t = 2013}$$" = 1, "$$X_{i, t}$$" = 1), 
+                   escape = FALSE, extra_css = 'vertical-align: middle !important;', line = F) %>% 
+  add_header_above(c(" " = 1, "Unweighted" = 3, "Weighted" = 3), escape = FALSE)
+  
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+***************************************************************
+*4. Table 5: Regression 2 x 2 DiD with Covariates 
+***************************************************************
+		*read data in again and restrict to 2013/2014
+		use "did_jel_aca_replication_data", clear
+		keep if inlist(year, 2013, 2014) & inlist(yaca,2014,2020,2021,2023,.)
+		gen Treat = (yaca==2014)		// 1 = ACA in 2014
+		gen Post = (year == 2014)     	// 1 = post-expansion year
+
+		*local with covariate names
+		local covs perc_female perc_white perc_hispanic ///
+			   unemp_rate_pc poverty_rate median_income_k
+
+		* Keep only relevant variables
+		keep county_code year Treat set_wt crude_rate_20_64 `covs'
+
+		* Reshape everything (outcome + covariates) at once
+		reshape wide crude_rate_20_64 `covs', i(county_code) j(year)
+
+		* Generate change in covariates
+		foreach v of local covs {
+			gen d_`v' = `v'2014 - `v'2013
+		}
+
+		* Generate outcome: change in crude mortality
+		gen long_y = crude_rate_20_642014 - crude_rate_20_642013
+
+		* Drop missing outcome
+		drop if missing(long_y)
+
+
+	eststo clear
+
+	* (1) Unweighted: No covariates
+	reg long_y Treat, vce(cluster county_code)
+	eststo m1
+
+	* (2) Unweighted: 2013 covariates
+	reg long_y Treat ///
+		perc_female2013 perc_white2013 perc_hispanic2013 ///
+		unemp_rate_pc2013 poverty_rate2013 median_income_k2013, ///
+		vce(cluster county_code)
+	eststo m2
+
+	* (3) Unweighted: Changes in covariates
+	reg long_y Treat ///
+		d_perc_female d_perc_white d_perc_hispanic ///
+		d_unemp_rate_pc d_poverty_rate d_median_income_k, ///
+		vce(cluster county_code)
+	eststo m3
+
+	* (4) Weighted: No covariates
+	reg long_y Treat [aw=set_wt], vce(cluster county_code)
+	eststo m4
+
+	* (5) Weighted: 2013 covariates
+	reg long_y Treat ///
+		perc_female2013 perc_white2013 perc_hispanic2013 ///
+		unemp_rate_pc2013 poverty_rate2013 median_income_k2013 ///
+		[aw=set_wt], vce(cluster county_code)
+	eststo m5
+
+	* (6) Weighted: Changes in covariates
+	reg long_y Treat ///
+		d_perc_female d_perc_white d_perc_hispanic ///
+		d_unemp_rate_pc d_poverty_rate d_median_income_k ///
+		[aw=set_wt], vce(cluster county_code)
+	eststo m6
+
+esttab m1 m2 m3 m4 m5 m6 using "../data/regdid_2x2_covs.csv", replace keep(Treat) b(%6.2f) se(%6.2f) nostar fragment plain csv label nomtitles alignment(c) collabels(none) 
+				 
+
+```
+:::
+
+## Table 6: Outcome Regression and Propensity Score Models
+
+We next show how to adjust for covariates in the 2 $\times$ 2 setting in a disciplined manner. **Table 6** reports the outcome regression and propensity score model results that feed into the doubly-robust estimator from Callaway and Sant'Anna (2021).
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+## Next we make Table 6 which shows the pscore and outcome models that feed into CS.
+# These are done by regressing long y on the covariates for the untreated units (the outcome model)
+# and regressing the expansion indicator on the covariates for 2013 data (the propensity model) 
+# We do it with and without weights
+mod1 <- feols(long_y ~ .[covs], data = reg_data_2013 %>% filter(Treat == 0), cluster = ~county_code)
+mod2 <- feglm(Treat ~ .[covs], data = short_data %>% filter(year == 2013), family = "binomial", vcov = "hetero")
+mod3 <- feols(long_y ~ .[covs], data = reg_data_2013 %>% filter(Treat == 0), cluster = ~county_code, weights = ~set_wt)
+mod4 <- feglm(Treat ~ .[covs], data = short_data %>% filter(year == 2013), family = "binomial", vcov = "hetero", weights = ~set_wt)
+
+# This is the dictionary to map variables to data labels for the table
+dict <- c("(Intercept)" = "Constant", 
+          "perc_female" = "% Female",
+          "perc_white" = "% White",
+          "perc_hispanic" = "% Hispanic",
+          "crude_rate_20_64" = "Crude Mortality Rate",
+          "unemp_rate" = "Unemployment Rate",
+          "poverty_rate" = "Poverty Rate",
+          "median_income" = "Median Income")
+
+# export table 3
+modelsummary(list("(1)" = mod1, "(2)" = mod2, "(3)" = mod3, "(4)" = mod4),
+             coef_map = dict, escape = FALSE, gof_map = NA,
+             fmt = 2, estimate = "{estimate}",
+             title = "Outcome Regression and Propensity Score Models") %>%
+  add_header_above(c(" " = 1, "Regression" = 1, "Propensity Score" = 1, 
+                     "Regression" = 1, "Propensity Score" = 1), 
+                   escape = FALSE, extra_css = 'vertical-align: middle !important;', line = F) %>% 
+  add_header_above(c(" " = 1, "Unweighted" = 2, "Weighted" = 2), escape = FALSE)
+
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+		 
+***************************************************************
+* Table 6: Outcome Regressions + Propensity Score Models
+***************************************************************
+	*read data in again and restrict to 2013/2014
+	use "did_jel_aca_replication_data", clear
+	keep if inlist(year, 2013, 2014) & inlist(yaca,2014,2020,2021,2023,.)
+	gen Treat = (yaca==2014)		// 1 = ACA in 2014
+	gen Post = (year == 2014)     	// 1 = post-expansion year
+
+	*local with covariate names
+	local covs perc_female perc_white perc_hispanic ///
+		   unemp_rate_pc poverty_rate median_income_k
+
+	* Keep only relevant variables
+	keep county_code year Treat set_wt crude_rate_20_64 `covs'
+
+	* Reshape everything (outcome + covariates) at once
+	reshape wide crude_rate_20_64 `covs', i(county_code) j(year)
+
+	* Generate change in covariates
+	foreach v of local covs {
+		gen d_`v' = `v'2014 - `v'2013
+	}
+
+	* Generate outcome: change in crude mortality
+	gen long_y = crude_rate_20_642014 - crude_rate_20_642013
+
+	* Drop missing outcome
+	drop if missing(long_y)
+	
+	eststo clear
+
+	** (1) Outcome Regression — Unweighted, Untreated Only
+	reg long_y ///
+		perc_female2013 perc_white2013 perc_hispanic2013 ///
+		unemp_rate_pc2013 poverty_rate2013 median_income_k2013 if Treat==0, ///
+		vce(cluster county_code)
+	eststo or1
+
+	** (2) Propensity Score Model — Unweighted Logit
+	logit Treat ///
+		perc_female2013 perc_white2013 perc_hispanic2013 ///
+		unemp_rate_pc2013 poverty_rate2013 median_income_k2013, ///
+		vce(cluster county_code)
+	eststo ps1
+
+	** (3) Outcome Regression — Weighted, Untreated Only
+	reg long_y ///
+		perc_female2013 perc_white2013 perc_hispanic2013 ///
+		unemp_rate_pc2013 poverty_rate2013 median_income_k2013 if Treat==0 ///
+		[aw = set_wt], vce(cluster county_code)
+	eststo or2
+
+	** (4) Propensity Score — Weighted Logit
+	logit Treat ///
+		perc_female2013 perc_white2013 perc_hispanic2013 ///
+		unemp_rate_pc2013 poverty_rate2013 median_income_k2013 ///
+		[iw = set_wt], vce(cluster county_code)
+	eststo ps2
+
+	esttab or1 ps1 or2 ps2 using "../data/reg_pscore.csv", replace /// 
+    cells(b(fmt(%9.2f) ) se(fmt(%9.2f) )) nostar collabels(none)  ///
+    fragment label alignment(c) order(_cons ) nomtitles nonotes noobs numbers  plain csv
+
+```
+:::
+
+## Table 7: Sant'Anna and Zhao (2020) DiD
+
+**Table 7** shows how to calculate the DiD estimate using the estimators in Sant'Anna and Zhao (2020). The paper describes three different estimation methods: outcome regression, inverse-probability weighted (IPW), and doubly robust models.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+# finally, get the same estimates using Sant'Anna and Zhao (2020) and Callaway and Sant'Anna (2021) using the 
+# three adjustment methods
+# You need to reformat the group variable (untreated = 0) and the unit ID variable needs to be numeric
+data_cs <- short_data %>% 
+  mutate(treat_year = if_else(yaca == 2014 & !is.na(yaca), 2014, 0),
+         county_code = as.numeric(county_code))
+
+# create a function to run the CS estimator allowing the 
+# estimation method to differ
+run_cs <- function(method, wt) {
+  
+  # estimate the att_gt
+  atts <- att_gt(
+    yname = "crude_rate_20_64",
+    tname = "year",
+    idname = "county_code",
+    gname = "treat_year",
+    xformla =  as.formula(paste("~", paste(covs, collapse = "+"))),
+    data = data_cs,
+    panel = TRUE,
+    control_group = "nevertreated",
+    bstrap = TRUE,
+    cband = TRUE,
+    est_method = method,
+    weightsname = wt,
+    # faster_mode = TRUE,
+    base_period = "universal",
+    biters = 25000
+  )
+  
+  # aggregate estimates 
+  aggte(atts, na.rm = TRUE, biters = 25000) %>% 
+    broom::tidy() %>% 
+    filter(group == 2014) %>% 
+    mutate(type = method)
+  
+}
+
+# run it three ways - regression adjustment, IPW, and doubly robust
+# these are unweighted
+ests <- map_dfr(c("reg", "ipw", "dr"), run_cs, wt = NULL)
+
+# make a table - Panel A is with unweighted models
+tablea <- ests %>% 
+  # reformat the data
+  select(type, estimate, std.error) %>% 
+  # format the estimate and std error
+  mutate(estimate = scales::number(estimate, accuracy = 0.01),
+         std.error = paste0("(", scales::number(std.error, accuracy = 0.01), ")")) %>% 
+  # reshape the data
+  pivot_longer(cols = -type,
+               names_to = "statistic",
+               values_to = "value") %>% 
+  pivot_wider(id_cols = "statistic",
+              names_from = "type",
+              values_from = "value") %>% 
+  mutate(statistic = if_else(statistic == "estimate", "Medicaid Expansion", " "))
+
+# make weighted results for the three CS models.
+ests_w <-  map_dfr(c("reg", "ipw", "dr"), run_cs, wt = "set_wt")
+
+# Panel B is the same thing but with weighted results
+tableb <- ests_w %>% 
+  select(type, estimate, std.error) %>% 
+  mutate(estimate = scales::number(estimate, accuracy = 0.01),
+         std.error = paste0("(", scales::number(std.error, accuracy = 0.01), ")")) %>% 
+  pivot_longer(cols = -type,
+               names_to = "statistic",
+               values_to = "value") %>% 
+  pivot_wider(id_cols = "statistic",
+              names_from = "type",
+              values_from = "value") %>% 
+  select(reg, ipw, dr)
+
+# Combine Panels A and B together and format the table
+bind_cols(tablea, tableb) %>% 
+  kable(col.names = c(" ", "Regression", "IPW", "Doubly Robust",
+                      "Regression", "IPW", "Doubly Robust"),
+        align = 'lcccccc',
+        escape = F,
+        booktabs = T,
+        label = "2x2_csdid",
+        caption = "Callaway and Sant'Anna (2021) DiD",
+        linesep = "") %>% 
+  kable_styling(latex_options = c("hold_position")) %>% 
+  add_header_above(c(" " = 1, "Unweighted" = 3, "Weighted" = 3))
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+		 
+***************************************************************
+* Table 7: 2x2 DiD with covariates (Sant'Anna and Zhao 2020)
+***************************************************************
+	*read data in again and restrict to 2013/2014
+	use "did_jel_aca_replication_data", clear
+	keep if inlist(year, 2013, 2014) & inlist(yaca,2014,2020,2021,2023,.)
+	gen Treat = (yaca==2014)		// 1 = ACA in 2014
+	gen Post = (year == 2014)     	// 1 = post-expansion year
+
+	*local with covariate names
+	local covs perc_female perc_white perc_hispanic ///
+		   unemp_rate_pc poverty_rate median_income_k
+
+	*create baseline covariates (drdid would do this but we do it explicitly here)
+	*drop the time-varying version of the covariate; not used here
+	foreach x in `covs'{
+		egen `x'2013 =total(`x'*(year==2013)),by(county_code)
+		drop `x'
+	}
+	* rename the baseline covariates just created 
+	rename (perc_female2013 perc_white2013 perc_hispanic2013 ///
+			unemp_rate_pc2013 poverty_rate2013 median_income_k2013) ///
+		   (perc_female perc_white perc_hispanic ///
+			unemp_rate_pc poverty_rate median_income_k)
+
+	* Set panel
+	xtset county_code year
+
+	* Unweighted DRDID Estimation
+	*request all estimators in one shot (we only use reg, stdipw, and dripw)
+	drdid crude_rate_20_64 `covs', ///
+		  ivar(county_code) time(year) tr(Treat) ///
+		  all ///
+		  pscoretrim(0.995) ///
+		  wboot(reps(25000) rseed(20240924) wbtype(rademacher)) ///
+		  cluster(county_code) 
+
+	* Extract point estimates
+	scalar reg     = e(b)[1,3]
+	scalar ipw     = e(b)[1,5]
+	scalar dripw   = e(b)[1,1]
+
+	* Extract standard errors
+	scalar se_reg   = sqrt(e(V)[3,3])
+	scalar se_ipw   = sqrt(e(V)[5,5])
+	scalar se_dripw = sqrt(e(V)[1,1])
+
+	* Format for LaTeX export
+	local reg_str     : display %6.2f reg
+	local ipw_str     : display %6.2f ipw
+	local dripw_str   : display %6.2f dripw
+
+	local se_reg_str     : display %6.2f se_reg
+	local se_ipw_str     : display %6.2f se_ipw
+	local se_dripw_str   : display %6.2f se_dripw
+
+
+	* Weighted DRDID Estimation
+	*request all estimators in one shot (we only use reg, stdipw, and dripw)
+	drdid crude_rate_20_64 `covs' [iweight = set_wt], ///
+		  ivar(county_code) time(year) tr(Treat) ///
+		  all ///
+		  pscoretrim(0.995) ///
+		  wboot(reps(25000) rseed(20240924) wbtype(rademacher)) ///
+		  cluster(county_code) 
+	
+		
+* Extract point estimates
+scalar reg_w     = e(b)[1,3]
+scalar ipw_w     = e(b)[1,5]
+scalar dripw_w   = e(b)[1,1]
+
+* Extract standard errors
+scalar se_reg_w   = sqrt(e(V)[3,3])
+scalar se_ipw_w   = sqrt(e(V)[5,5])
+scalar se_dripw_w = sqrt(e(V)[1,1])
+
+*Make matrix of the results of interest 
+matrix results_wide = ( ///
+    reg    , ipw    , dripw    , reg_w    , ipw_w    , dripw_w   \ ///
+    se_reg , se_ipw , se_dripw , se_reg_w , se_ipw_w , se_dripw_w )
+
+matrix rownames results_wide = b se
+matrix colnames results_wide = Unw_REG Unw_IPW Unw_DRIPW W_REG W_IPW W_DRIPW
+
+matrix list results_wide
+clear
+svmat results_wide, names(col)
+
+* add row labels b/se
+gen stat = ""
+replace stat = "Medicaid Expansion"  in 1
+replace stat = "" in 2
+
+order stat Unw_REG Unw_IPW Unw_DRIPW W_REG W_IPW W_DRIPW
+export delimited using "../data/reg_t7.csv", replace
+
+
+
+
+```
+:::
+
+## Figure 1: Distribution of Propensity Scores
+
+**Figure 1** plots the distribution of the propensity scores from the underlying propensity model for the unweighted and weighted models.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+#| fig.align: 'center'
+#| fig.width: 10
+# Finally, we make Figure 1 which reports the distribution of the propensity scores between 
+# expansion and non-expansion counties.
+# first add in propensity scores to the data
+plot_data <- bind_rows(
+  short_data %>% 
+    filter(year == 2013) %>% 
+    mutate(propensity = predict(mod2, ., type = "response"),
+           mod = "Unweighted",
+           wt = 1),
+  short_data %>% 
+    filter(year == 2013) %>% 
+    mutate(propensity = predict(mod4, ., type = "response"),
+           mod = "Weighted", 
+           wt = set_wt)
+  )
+
+# plot the propensity score distributions by group
+plot_data %>% 
+  mutate(expand = if_else(Treat == 1, "Expansion Counties", "Non-Expansion Counties")) %>% 
+  ggplot(aes(x = propensity, y = after_stat(density), group = expand, color = expand, weight = wt)) + 
+  geom_histogram(fill = "white", position = "identity", linewidth = 1, alpha = 0.5) + 
+  facet_wrap(~mod) + 
+  scale_color_brewer(palette = 'Set1') + 
+  labs(x = "Propensity Score", y = "Density") + 
+  theme(legend.position = 'bottom',
+        axis.title.y = element_text(hjust = 0.5, vjust = 0.5, angle = 360),
+        strip.text = element_text(size = 14),
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+        legend.title = element_blank(),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+*************************************************
+** Figure 1: Distribution of Propensity Scores
+*************************************************
+	*read data in again and restrict to 2013/2014
+	use "did_jel_aca_replication_data", clear
+	keep if inlist(year, 2013, 2014) & inlist(yaca,2014,2020,2021,2023,.)
+	gen Treat = (yaca==2014)		// 1 = ACA in 2014
+	gen Post = (year == 2014)     	// 1 = post-expansion year
+
+	*local with covariate names
+	local covs perc_female perc_white perc_hispanic ///
+		   unemp_rate_pc poverty_rate median_income_k
+
+	* Keep only relevant variables
+	keep county_code year Treat set_wt crude_rate_20_64 `covs'
+
+	* Reshape everything (outcome + covariates) at once
+	reshape wide crude_rate_20_64 `covs', i(county_code) j(year)
+
+	* Generate change in covariates
+	foreach v of local covs {
+		gen d_`v' = `v'2014 - `v'2013
+	}
+
+	* Generate outcome: change in crude mortality
+	gen long_y = crude_rate_20_642014 - crude_rate_20_642013
+
+	* Drop missing outcome
+	drop if missing(long_y)
+	
+	
+	*Unweighted p-score distributions
+	eststo ps1: logit Treat ///
+		perc_female2013 perc_white2013 perc_hispanic2013 ///
+		unemp_rate_pc2013 poverty_rate2013 median_income_k2013, ///
+		vce(cluster county_code)
+	
+	
+	*estimates use ps1
+	predict pscore_unw
+
+	* Expansion counties
+	summ pscore_unw if inlist(Treat,0,1)
+	local min = r(min)
+	local max = r(max)
+	local w   = (`max' - `min')/30
+	local s   = floor(`min'/`w')*`w'   // align start to a bin edge
+	di `w'
+	di `s'
+	
+	twoway 	histogram pscore_unw if Treat == 1 , width(`w') start(`s') fcolor(none) lcolor(red) || ///
+			histogram pscore_unw if Treat == 0 , width(`w') start(`s') fcolor(none) lcolor(blue) ///
+			ytitle("Density",angle(horizontal)) xtitle("") title("Unweighted") legend(off) ylabel(0(1)4.5) xlabel(,nogrid)
+			
+	graph save "pscore_uw.gph", replace
+	
+
+	*Weighted p-score distributions
+	eststo ps2: logit Treat ///
+		perc_female2013 perc_white2013 perc_hispanic2013 ///
+		unemp_rate_pc2013 poverty_rate2013 median_income_k2013, ///
+		[iw = set_wt], vce(cluster county_code)
+	
+	
+	*estimates use ps2
+	predict pscore_w
+
+	* Define group for legend
+	gen group = cond(Treat == 1, "Expansion", "Non-Expansion")
+
+	* Expansion counties
+	summ pscore_w if inlist(Treat,0,1)
+	local min = r(min)
+	local max = r(max)
+	local w   = (`max' - `min')/30
+	local s   = floor(`min'/`w')*`w'   // align start to a bin edge
+
+	twoway 	histogram pscore_w if Treat == 1 [fw=set_wt], width(`w') start(`s') fcolor(none) lcolor(red) || ///
+			histogram pscore_w if Treat == 0 [fw=set_wt], width(`w') start(`s') fcolor(none) lcolor(blue) ///
+			ytitle("") xtitle("Propensity Score") title("Weighted") legend( rows(1)) ylabel(0(1)4.5) xlabel(, nogrid)
+
+	graph save "pscore_w.gph", replace
+
+	*combine graphs and use only one legend and y-axis title
+	**NB: differences between the Stata and R histograms are purely down to 
+	*some arcane disagreement between histogram and ggplot; as can be seen from 
+	*the actual p-score model estimates, the pscores themselves are identical
+	grc1leg2 pscore_uw.gph pscore_w.gph, ///
+		title("") xtob1title xtitlefrom("pscore_w.gph") ///
+		legendfrom(pscore_w.gph) position(6) ring(2) ///
+		cols(2) imargin(4 4 4 4)
+	graph display, xsize(10) ysize(5)
+
+
+
+
+```
+
+:::
+
+# 2 $\times$ T DiD setups
+
+In the next section we show how to estimate DiD when you have more than two time periods, what we call the 2 $\times$ T setting.
+
+## Figure 2: County Mortality Trends by Expansion Decision
+
+In **Figure 2** we plot the weighted average county mortality rates over our sample period (2009-2019) for our two groups: those who expand in 2014 and those who have not expanded by 2019.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+#| fig.align: 'center'
+#| fig.width: 10
+# set seed for reproducibility
+set.seed(20240924)
+
+# load cleaned data
+mydata <- read_csv(here::here("data", "county_mortality_data.csv")) %>% 
+  # make state the abbreviation
+  mutate(state = str_sub(county, nchar(county) - 1, nchar(county))) %>% 
+  # drop DC and pre-2014 adoption states
+  filter(!(state %in% c("DC", "DE", "MA", "NY", "VT"))) %>% 
+  # drop states that adopt between 2014 and 2019
+  filter(yaca == 2014 | is.na(yaca) | yaca > 2019)
+
+# set the covariates that we're going to use.
+covs <- c("perc_female","perc_white", "perc_hispanic", 
+          "unemp_rate", "poverty_rate", "median_income")
+
+## Clean data and add in covariates
+mydata <- mydata %>% 
+  # make variables
+  mutate(perc_white = population_20_64_white / population_20_64 * 100,
+         perc_hispanic = population_20_64_hispanic / population_20_64 * 100,
+         perc_female = population_20_64_female/ population_20_64 * 100,
+         unemp_rate = unemp_rate * 100,
+         median_income = median_income / 1000) %>% 
+  # keep just subset of variables that we will use later
+  select(state, county, county_code, year, population_20_64, yaca,
+         starts_with("perc_"), crude_rate_20_64, all_of(covs))
+
+# keep only counties with full observations for outcome and covariates in 2013 and 2014
+mydata <- mydata %>%
+  # allow the aca expansion variable to be missing
+  drop_na(!yaca) %>%
+  group_by(county_code) %>% 
+  # need full covariates for 2013 and 2014
+  filter(length(which(year == 2013 | year == 2014)) == 2) %>% 
+  ungroup()
+
+# finally, keep only counties with full mortality data for 2009 to 2019
+mydata <- mydata %>% 
+  group_by(county_code) %>% 
+  drop_na(crude_rate_20_64) %>% 
+  filter(n() == 11)
+
+# make ACA and post variables, as well as the weighting variable which is the relevant county 
+# population in 2013
+mydata <- mydata %>% 
+  mutate(Treat = if_else(yaca == 2014 & !is.na(yaca), 1, 0),
+         Post = if_else(year >= 2014, 1, 0)) %>% 
+  group_by(county_code) %>% 
+  # make a variable with population weight in 2013
+  mutate(set_wt = population_20_64[which(year == 2013)]) %>% 
+  ungroup()
+
+# make time series plot
+mydata %>% 
+  mutate(expand = if_else(Treat == 1, "Expansion Counties", "Non-Expansion Counties")) %>% 
+  # get the weighted averages by expansion type and year
+  group_by(expand, year) %>% 
+  summarize(mortality = weighted.mean(crude_rate_20_64, set_wt)) %>% 
+  # plot
+  ggplot(aes(x = year, y = mortality, group = expand, color = expand)) + 
+  geom_point(size = 2) + geom_line(linewidth = 1) + 
+  geom_vline(xintercept = 2014, linetype = "dashed") + 
+  scale_color_brewer(palette = 'Set1') + 
+  scale_x_continuous(breaks = 2009:2019) + 
+  labs(x = "", y = "Mortality (20-64) \n Per 100,000") + 
+  theme(legend.position = 'bottom',
+        axis.title.y = element_text(hjust = 0.5, vjust = 0.5, angle = 360),
+        strip.text = element_text(size = 14),
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+        legend.title = element_blank(),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+***************************************************************
+*1. Figure 2: 2014 versus non-expansion mortality trends
+***************************************************************	
+	*read data in again and restrict to 2013/2014
+	use "did_jel_aca_replication_data", clear
+	keep if inlist(yaca,2014,2020,2021,2023,.)
+	gen Treat = (yaca==2014)		// 1 = ACA in 2014
+
+	*Collapse to means by group × year
+	gen expand = cond(Treat==1, "Expansion Counties", "Non-Expansion Counties")
+
+	collapse (mean) crude_rate_20_64 [iw=set_wt], by(expand year)
+	rename crude_rate_20_64 mortality
+
+	* Create the plot
+	twoway ///
+	  (line mortality year if expand == "Expansion Counties",      lcolor(red)  lpattern(solid) lwidth(medium)) ///
+	  (line mortality year if expand == "Non-Expansion Counties",  lcolor(blue) lpattern(solid)  lwidth(medium)) ///
+	  (scatter mortality year if expand == "Expansion Counties",   msymbol(O)   mcolor(red)) ///
+	  (scatter mortality year if expand == "Non-Expansion Counties", msymbol(Oh) mcolor(blue))  , ///
+	  legend(order(1 "Expansion Counties" 2 "Non-Expansion Counties") ///
+			 pos(6) ring(2) cols(2)) ///
+	  xtitle("") ///
+	  ytitle("Mortality (20–64)" "Per 100,000", orientation(horizontal)) ///
+	  ysize(5) xsize(10) ///
+	  xline(2013) ///
+	  xlabel(2009(1)2019, nogrid) ///
+	  graphregion(color(white)) ///
+	  plotregion(style(none))
+
+
+
+
+
+```
+
+:::
+
+## Figure 3: 2 $\times$ T Event Study
+
+In **Figure 3** we report the $2 \times T$ event study without covariates.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+#| fig.align: 'center'
+#| fig.width: 10
+# Make event study plots
+# first add in the variables needed to run the CS model - timing group variable (treat_year)
+# and county code needs to be numeric
+mydata <- mydata %>% 
+  mutate(treat_year = if_else(yaca == 2014 & !is.na(yaca), 2014, 0),
+         county_code = as.numeric(county_code),
+         time_to_treat = if_else(Treat == 1, year - treat_year, 0))
+
+# estimate CS models
+
+# get the individual ATT(g,t) estimates
+mod <- did::att_gt(
+  yname = "crude_rate_20_64",
+  tname = "year",
+  idname = "county_code",
+  gname = "treat_year",
+  xformla =  NULL,
+  data = mydata,
+  panel = TRUE,
+  control_group = "nevertreated",
+  bstrap = TRUE,
+  cband = TRUE,
+  est_method = "reg",
+  weightsname = "set_wt",
+  # faster_mode = TRUE,
+  base_period = "universal",
+  biters = 25000
+)
+
+# confirm you get the same with OLS (standard errors differ because of bootstrap only)
+cs_out <- mod
+
+ols_out <- feols(crude_rate_20_64 ~ i(time_to_treat, Treat, ref = -1) | county_code + year, 
+      data = mydata, 
+      cluster = ~county_code, 
+      weights = ~set_wt)
+
+# get the Rambachan/Roth confidence interval
+# first save our aggregate event study estimates
+es <- did::aggte(
+  mod,
+  type = "dynamic",
+  min_e = -5,
+  max_e = 0,
+  bstrap = TRUE,
+  biters = 25000
+)
+
+# source the honest_did code made to fit our estimates
+source(here::here('scripts/R/5_honestdid.R'))
+
+# get robust CI
+robust_ci <- honest_did(es = es, type = "relative_magnitude")$robust_ci
+
+# get the aggregate value for e = 0:5
+agg <- mod %>% 
+  aggte(type = "dynamic", min_e = 0, max_e = 5,
+        bstrap = TRUE, biters = 25000)
+
+# make labels for the estimate, std error, and confidence intervals
+label1 <-  paste0("Estimate~(e %in% '{0, 5}')~'='~'", scales::number(agg$overall.att, accuracy = 0.01), "'")
+
+label2 <- paste0("Std. Error = ", scales::number(agg$overall.se, 0.01), " \n",
+                 "Conf. Int = [", scales::number(agg$overall.att - 1.96*agg$overall.se, 0.01), ", ", 
+                 scales::number(agg$overall.att + 1.96*agg$overall.se, 0.01), "]")
+
+# make event study plot for Figure 3
+mod %>% 
+  # Aggregate in event time ("dynamic")
+  aggte(type = "dynamic", biters = 25000) %>% 
+  # get the two confidence intervals
+  broom::tidy(conf.int = TRUE) %>% 
+  # plot
+  ggplot(aes(x = event.time, y = estimate)) + 
+  geom_linerange(aes(ymin = conf.low, ymax = conf.high), color = "darkred") + 
+  geom_linerange(aes(ymin = point.conf.low, ymax = point.conf.high)) + 
+  geom_point() + 
+  geom_vline(xintercept = -1, linetype = "dashed") + 
+  geom_hline(yintercept = 0, linetype = "dashed") + 
+  scale_x_continuous(breaks = -5:5) + 
+  annotate("text", x = 3, y = 11, label = label1, parse = TRUE) + 
+  annotate("text", x = 3, y = 9, label = label2) + 
+  labs(x = "Event Time", y = "Treatment Effect \n Mortality Per 100,000") + 
+  theme(axis.title.y = element_text(hjust = 0.5, vjust = 0.5, angle = 360),
+        strip.text = element_text(size = 14),
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+        legend.title = element_blank(),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+
+
+***************************************************************
+*2. Figure 3: 2xT event-study with no covariates
+***************************************************************	
+	*read data in again and restrict to 2013/2014
+	use "did_jel_aca_replication_data", clear
+	keep if inlist(yaca,2014,2020,2021,2023,.)
+
+	*Use csdid for simple ES estimation (uniform and non-uniform CIs); use long2!!
+	csdid crude_rate_20_64 [iw=set_wt], ///
+		ivar(county_code) time(year) gvar(treat_year) ///
+		long2 ///
+		wboot(reps(25000) rseed(20240924) wbtype(rademacher)) ///
+		agg(event)
+		
+	*you do actually have to grab the uniform CIs from the posted output
+	preserve
+		clear
+		matrix T  = r(table)
+		local cn : colnames T
+		matrix llu = T[5,1..colsof(T)]
+		matrix ulu = T[6,1..colsof(T)]
+		matrix uci = (llu', ulu')
+		matrix colnames uci = uci_lower uci_upper
+		svmat uci, names(col)
+		gen var = ""
+		local i = 0
+		foreach r of local cn{
+			local ++i
+			replace var = "`r'" in `i'
+		}
+		save "testo", replace
+	restore
+
+	*save the posted output to a dataset and merge back on the uniform CIs
+	regsave, ci
+	merge 1:1 var using "testo"
+	keep if _merge==3
+	drop _merge
+	
+	*get average post coefficient, standard error, and CI
+	qui sum coef if var=="Post_avg"
+	local postcoef : display %03.2f r(mean)
+	qui sum stderr if var=="Post_avg"
+	local postse : display %03.2f r(mean)
+	local postlci : display %03.2f `postcoef'-1.96*`postse'
+	local postuci : display %03.2f `postcoef'+1.96*`postse'
+	
+	*now only keep the event-study estimates
+	keep if substr(var,1,1)=="T"
+	keep coef ci* uci* var
+	
+	*extract timing components from event aggregation notation in csdid
+	gen pre = substr(var,2,1)=="m"
+	gen post = substr(var,2,1)=="p"
+	gen e = real(substr(var,3,.))
+	replace e = -e if pre
+	
+	*add omitted period
+	local obs = _N+1
+	set obs `obs'
+	replace coef = 0 in `obs'
+	replace e = -1 in `obs'
+
+
+	*plot the ATT(g,t) for g=2014
+	twoway ///
+		(rcap uci_lower uci_upper e, ///
+		lcolor(red*1.2) msize(0)) ///
+		(rcap ci_lower ci_upper e, ///
+		lcolor(black) msize(0)) ///
+		(scatter coef e, ///
+		msym(O) mcolor(black) 	///
+		), ///
+		legend(off) ///
+		xlabel(-5(1)5, nogrid) ///
+		ylabel(-5(5)10) ///	
+		yline(0, lpattern(dash)) ///
+		xline(-1, lpattern(dash)) ///
+		xtitle("Event-Time") ///
+		ytitle("Treatment Effect" "Mortality Per 100,000", orientation(horizontal) size(small)) ///
+		text(10.5 3 "Estimate e ∈ {0,5}=`postcoef'", size(small)) ///
+		text(9 3 "Std. Error = `postse'" "Conf. Int = [`postlci',`postuci']", size(small))	///
+		xsize(10) ysize(5)
+	
+
+
+
+```
+
+:::
+
+## Rambachan & Roth (2023) Sensitivity Analysis
+
+In the text surrounding the $2 \times T$ event study, we also discuss how you can use the analysis developed in Rambachan and Roth (2023) to test the sensitivity of the ATT estimates to violations of the parallel trends assumption. In particular, we focus on their "relative magnitude" analysis, wherein we assume that any parallel trends violations in the post-period are no larger than the largest violation in the pre-period. In the code below we show how to estimate the credible interval under this bounding approach for $ATT(2014)$ - or the treatment effect in the first year of treatment for those counties that adopted Medicaid expansion.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+#| fig.align: 'center'
+#| fig.width: 10
+
+# get robust CI
+robust_ci %>% 
+  # keep just relative magnitude = 1
+  filter(Mbar == 1) %>%
+  # drop extraneous variables
+  select(lb, ub, Mbar) %>% 
+  # round
+  mutate_at(c("lb", "ub"), scales::number, accuracy = 0.01) %>% 
+  # make table
+  kable(col.names = c("lower_bound", "upper_bound", "relative_magnitude"),
+       align = 'c', booktabs = T) %>% 
+  kable_styling()
+
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+************************************************
+*1. read data in again and restrict to 2013/2014
+************************************************
+	use "did_jel_aca_replication_data", clear
+	keep if inlist(yaca,2014,2020,2021,2023,.)
+	
+************************************************
+*Estimate unconditional csdid version 1.81 (Oct 2025)
+************************************************
+	csdid crude_rate_20_64 [iw=set_wt], ///
+		ivar(county_code) time(year) gvar(treat_year) ///
+		long2 ///
+		never ///
+		wboot(reps(25000) rseed(20240924) wbtype(rademacher)) ///
+		agg(event)
+
+	estat event, window(-5,0) post
+	
+************************************************
+*Honest DiD, relative magnitude only using M=1 for e=0
+************************************************	
+honestdid, type(relative_magnitude) pre(3/6) post(7) mvec(1)
+
+exit
+
+```
+:::
+
+## Figure 4: $2 \times T$ Event Study With Covariates
+
+In **Figure 4** we show the $2 \times T$ event studies with covariates using the Callaway and Sant'Anna (2021) estimators - i.e. using outcome regression, IPW, and doubly-robust estimators.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+#| fig.align: 'center'
+#| fig.width: 10
+# Estimate the CS Model 3 ways with the three estimation types
+# make a function to run CS, varying the estimation type
+run_cs <- function(method) {
+  
+  # get the ATT(g, t) estimates
+  att_gt(
+    yname = "crude_rate_20_64",
+    tname = "year",
+    idname = "county_code",
+    gname = "treat_year",
+    xformla =  as.formula(paste("~", paste(covs, collapse = "+"))),
+    data = mydata,
+    panel = TRUE,
+    control_group = "nevertreated",
+    bstrap = TRUE,
+    cband = TRUE,
+    est_method = method,
+    weightsname = "set_wt",
+    # faster_mode = TRUE,
+    base_period = "universal", 
+    biters = 25000
+  ) %>% 
+    # aggregate to event time (dynamic)
+    aggte(type = "dynamic", na.rm = TRUE, biters = 25000) %>% 
+    broom::tidy(conf.int = TRUE) %>% 
+    mutate(type = method)
+}
+
+# estimate it for 3 methods 
+out <- map_dfr(c("reg", "ipw", "dr"), run_cs)
+
+# make plot for Figure 4 - 2XT Event Study with Covariates
+out %>% 
+  # refactor labels for plot
+  mutate(type = case_match(type,
+                           "reg" ~ "Regression",
+                           "ipw" ~ "IPW",
+                           "dr" ~ "Doubly Robust")) %>% 
+  mutate(type = factor(type, levels = c("Regression", "IPW", "Doubly Robust"))) %>% 
+  # plot the esti mates and confidence intervals
+  ggplot(aes(x = event.time, y = estimate)) + 
+  geom_linerange(aes(ymin = conf.low, ymax = conf.high), color = "darkred") + 
+  geom_linerange(aes(ymin = point.conf.low, ymax = point.conf.high)) + 
+  geom_point() + 
+  geom_vline(xintercept = -1, linetype = "dashed") + 
+  geom_hline(yintercept = 0, linetype = "dashed") + 
+  facet_wrap(~type) + 
+  scale_x_continuous(breaks = -5:5) + 
+  labs(x = "Event Time", y = "Treatment Effect \n Mortality Per 100,000") + 
+  theme(axis.title.y = element_text(hjust = 0.5, vjust = 0.5, angle = 360),
+        strip.text = element_text(size = 14),
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+        legend.title = element_blank(),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+
+***************************************************************
+*3. Figure 4: 2xT event-study with covariates
+***************************************************************	
+	*read data in again and restrict to 2013/2014
+	use "did_jel_aca_replication_data", clear
+	keep if inlist(yaca,2014,2020,2021,2023,.)
+	
+	*local with covariate names
+	local covs perc_female perc_white perc_hispanic ///
+		   unemp_rate_pc poverty_rate median_income_k
+
+	*Estimate RA, IPW, and DR using csdid version 1.81 (Oct 2025)
+	local reg_title "Regression"
+	local stdipw_title "IPW"
+	local dripw_title "Doubly Robust"
+	foreach m in reg stdipw dripw{
+		csdid crude_rate_20_64 `covs' [iw=set_wt], ///
+			ivar(county_code) time(year) gvar(treat_year) ///
+			method(`m') ///
+			long2 ///
+			never ///
+			wboot(reps(25000) rseed(20240924) wbtype(rademacher)) ///
+			pscoretrim(0.995) agg(event)
+
+		*you do actually have to grab the uniform CIs from the posted output
+		preserve
+			clear
+			matrix T  = r(table)
+			local cn : colnames T
+			matrix llu = T[5,1..colsof(T)]
+			matrix ulu = T[6,1..colsof(T)]
+			matrix uci = (llu', ulu')
+			matrix colnames uci = uci_lower uci_upper
+			svmat uci, names(col)
+			gen var = ""
+			local i = 0
+			foreach r of local cn{
+				local ++i
+				replace var = "`r'" in `i'
+			}
+			save "testo", replace
+		restore
+
+		*save the posted output to a dataset and merge back on the uniform CIs
+		preserve
+			regsave, ci
+			merge 1:1 var using "testo"
+			keep if _merge==3
+			drop _merge
+			
+			*get average post coefficient, standard error, and CI
+			qui sum coef if var=="Post_avg"
+			local postcoef : display %03.2f r(mean)
+			qui sum stderr if var=="Post_avg"
+			local postse : display %03.2f r(mean)
+			local postlci : display %03.2f `postcoef'-1.96*`postse'
+			local postuci : display %03.2f `postcoef'+1.96*`postse'
+			
+			*now only keep the event-study estimates
+			keep if substr(var,1,1)=="T"
+			keep coef ci* uci* var
+			
+			*extract timing components from event aggregation notation in csdid
+			gen pre = substr(var,2,1)=="m"
+			gen post = substr(var,2,1)=="p"
+			gen e = real(substr(var,3,.))
+			replace e = -e if pre
+			
+			*add omitted period
+			local obs = _N+1
+			set obs `obs'
+			replace coef = 0 in `obs'
+			replace e = -1 in `obs'
+
+
+			*plot the ATT(g,t) for g=2014
+			twoway ///
+				(rcap uci_lower uci_upper e, ///
+				lcolor(red*1.2) msize(0)) ///
+				(rcap ci_lower ci_upper e, ///
+				lcolor(black) msize(0)) ///
+				(scatter coef e, ///
+				msym(O) mcolor(black) 	///
+				), ///
+				legend(off) ///
+				xlabel(-5(1)5, nogrid) ///
+				ylabel(-20(10)20) ///	
+				xline(-1, lpattern(dash)) ///
+				yline(0, lpattern(dash)) ///
+				xtitle("Event-Time") ///
+				ytitle("") ///
+				title("``m'_title'") ///
+				xsize(10) ysize(5)
+				
+				graph save "`m'.gph", replace
+		restore
+	}
+
+	*combine graphs and use only one legend and y-axis title
+	**NB: differences between the Stata and R come from the bootstrap uncertainty
+	**analytic standard errors are identical
+	grc1leg2 reg.gph stdipw.gph dripw.gph, ///
+		title("") xtob1title xtitlefrom("reg.gph") ///
+		l1title("Treatment Effect" "Mortality Per 100,000", size(small) orientation(horizontal)) ///
+		loff ///
+		ycommon ///
+		position(6) ring(2) ///
+		cols(3) imargin(4 4 4 4)
+
+	graph display, xsize(12) ysize(5)
+
+
+
+
+exit
+
+
+
+
+
+
+```
+
+:::
+
+# G $\times$ T DiD setups
+
+We end the paper with the staggered adoption setting, with $G$ treatment groups and $T > 2$ time periods.
+
+## Figure 5: Mortality Trends by Expansion Decision with Staggered Timing
+
+In **Figure 5** we plot the trends in weighted-average county mortality rates by treatment timing groups from 2009 to 2019.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+#| fig.align: 'center'
+#| fig.width: 10
+
+# set seed for reproducibility
+set.seed(20240924)
+
+# load cleaned data
+mydata <- read_csv(here::here("data", "county_mortality_data.csv")) %>% 
+  # make state the abbreviation
+  mutate(state = str_sub(county, nchar(county) - 1, nchar(county))) %>% 
+  # drop DC and pre-2014 adoption states
+  filter(!(state %in% c("DC", "DE", "MA", "NY", "VT"))) 
+
+# set the covariates that we're going to use.
+covs <- c("perc_female","perc_white", "perc_hispanic", "unemp_rate", "poverty_rate", "median_income")
+
+## Clean data and add in covariates
+mydata <- mydata %>% 
+  # make variables
+  mutate(perc_white = population_20_64_white / population_20_64 * 100,
+         perc_hispanic = population_20_64_hispanic / population_20_64 * 100,
+         perc_female = population_20_64_female/ population_20_64 * 100,
+         unemp_rate = unemp_rate * 100,
+         median_income = median_income / 1000) %>% 
+  # keep just subset of variables that we will use later
+  select(state, county, county_code, year, population_20_64, yaca,
+         starts_with("perc_"), crude_rate_20_64, all_of(covs))
+
+# keep only counties with full observations for outcome and covariates in 2013 and 2014
+mydata <- mydata %>%
+  # allow the aca expansion variable to be missing
+  drop_na(!yaca) %>%
+  group_by(county_code) %>% 
+  # need full covariates for 2013 and 2014
+  filter(length(which(year == 2013 | year == 2014)) == 2) %>% 
+  ungroup()
+
+# finally, keep only counties with full mortality data for 2009 to 2019
+mydata <- mydata %>% 
+  group_by(county_code) %>% 
+  drop_na(crude_rate_20_64) %>% 
+  filter(n() == 11)
+
+# make smaller dataset
+mydata <- mydata %>% 
+  mutate(Treat = if_else(!is.na(yaca) & yaca <= 2019, 1, 0),
+         treat_year = if_else(!is.na(yaca) & yaca <= 2019, yaca, 0),
+         Post = if_else(year >= 2014, 1, 0)) %>% 
+  group_by(county_code) %>% 
+  # make a variable with population weight in 2013
+  mutate(set_wt = population_20_64[which(year == 2013)]) %>% 
+  ungroup()
+
+# make time series plot by timing group (Figure 5)
+mydata %>% 
+  # identify the groups
+  mutate(treat_year = if_else(treat_year == 0, "Non-Expansion Counties", as.character(treat_year))) %>% 
+  # get weighted average mortality by gtiming-group and year
+  group_by(treat_year, year) %>% 
+  summarize(mortality = weighted.mean(crude_rate_20_64, set_wt)) %>% 
+  ggplot(aes(x = year, y = mortality, group = as.factor(treat_year), color = as.factor(treat_year))) + 
+  geom_point(size = 2) + geom_line(linewidth = 1) + 
+  scale_color_manual(values = c("#7C7189", "#D04E59", "#BC8E7D", "#2F3D70", "#CABEE9")) + 
+  scale_x_continuous(breaks = 2009:2019) + 
+  labs(x = "", y = "Mortality (20-64) \n Per 100,000") + 
+  theme(legend.position = 'bottom',
+        axis.title.y = element_text(hjust = 0.5, vjust = 0.5, angle = 360),
+        strip.text = element_text(size = 14),
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+        legend.title = element_blank(),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+**************************************************************************
+*1. Figure 5: Mortality Trends by Timing Group
+**************************************************************************
+	*read data in again and relabel treatment groups, specifically the "non-expansion" group
+	use "did_jel_aca_replication_data", clear
+	
+	*Define treatment timing labels
+	replace treat_str = "Non-Expansion Counties" if inlist(treat_str, "0", "2020", "2021", "2022", "2023")
+
+	collapse (mean) crude_rate [aw = set_wt], by(treat_str year)
+
+	* Plot trends by Timing Group
+	twoway ///
+		(connected crude_rate year if treat_str == "Non-Expansion Counties", ///
+			lcolor(purple*0.35) lwidth(medthick) mcolor(purple*0.35) msymbol(O)) ///
+		(connected crude_rate year if treat_str == "2014", ///
+			lcolor(gray*1.2) lwidth(medthick) mcolor(gray*1.2) msymbol(O)) ///
+		(connected crude_rate year if treat_str == "2015", ///
+			lcolor(red) lwidth(medthick) mcolor(red*1.5) msymbol(O)) ///
+		(connected crude_rate year if treat_str == "2016", ///
+			lcolor(brown) lwidth(medthick) mcolor(brown) msymbol(O)) ///
+		(connected crude_rate year if treat_str == "2019", ///
+			lcolor(navy) lwidth(medthick) mcolor(navy) msymbol(O)), ///
+		///
+		legend(order(2 "2014" 3 "2015" 4 "2016" 5 "2019" 1 "Non-Expansion Counties") ///
+				pos(6) ring(2) rows(1) region(lcolor(none)) size(small)) ///
+		ytitle("Mortality (20–64)" "per 100,000", size(small) orientation(horizontal)) ///
+		ylabel(350 400 450, angle(0) labsize(small) nogrid) ///
+		xtitle("") xlabel(2009(1)2019, labsize(small)) ///
+		graphregion(color(white)) ///
+		name(fig5, replace)
+
+		graph display, xsize(10) ysize(5)
+
+
+
+
+```
+
+:::
+
+## Figure 6: ATT(g, t)s for Each Expansion Group
+
+With the estimator from Callaway & Sant'Anna (2021) we can estimate the group-time average treatment effects - what we call ATT(g, t) - for each group and time period. We plot these cohort-specific treatment effects in **Figure 6**.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+#| fig.align: 'center'
+#| fig.width: 10
+# reclassify the county code as numeric for Callaway/Sant'Anna
+mydata <- mydata %>% 
+  mutate(county_code = as.numeric(county_code))
+
+# get the ATT(g,t)'s
+mod_no_x <- att_gt(
+  yname = "crude_rate_20_64",
+  tname = "year",
+  idname = "county_code",
+  gname = "treat_year",
+  xformla =  NULL,
+  data = mydata,
+  panel = TRUE,
+  control_group = "notyettreated",
+  bstrap = TRUE,
+  biters = 25000,
+  cband = TRUE,
+  weightsname = "set_wt",
+  # faster_mode = TRUE,
+  base_period = "universal"
+)
+
+# make plots in calendar time by timing group
+mod_no_x %>% 
+  # get the estimates and confidence intervals
+  broom::tidy(conf.int = TRUE) %>% 
+  mutate(group = as.character(group)) %>% 
+  # plot the estimates and CIs
+  ggplot(aes(x = time, y = estimate, color = group)) + 
+  geom_point(size = 2) + geom_line(linewidth = 1) + 
+  geom_linerange(aes(ymin = conf.low, ymax = conf.high)) + 
+  scale_x_continuous(breaks = seq(2009, 2019, by = 2),
+                     labels = seq(2009, 2019, by = 2)) + 
+  scale_color_manual(values = c("#7C7189", "#D04E59", "#BC8E7D", "#2F3D70")) + 
+  geom_vline(aes(xintercept = as.numeric(group) - 1), linetype = "dashed", linewidth = 1) + 
+  labs(x = "", y = "Treatment Effect \n Mortality Per 100,000") + 
+  facet_wrap(~group) + 
+  theme(legend.position = 'bottom',
+        axis.title.y = element_text(hjust = 0.5, vjust = 0.5, angle = 360),
+        strip.text = element_text(size = 14),
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+        legend.title = element_blank(),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+**************************************************************************
+*2.   Figure 6: ATT(g,t) by Calendar Time
+**************************************************************************
+	*read data in 
+	use "did_jel_aca_replication_data", clear
+
+	*Estimate group × time effects
+	csdid crude_rate [iw=set_wt], ///
+		ivar(county_code) ///
+		time(year) ///
+		gvar(treat_year) ///
+		long2 ///
+		notyet ///
+		wboot(reps(25000) rseed(20240924) wbtype(rademacher)) 
+	
+	*adding the omitted category to every g is very annoying ni the matrix style, so do the graphs using regsave	
+	regsave
+	
+	*extract timing components from csdid
+	gen g = real(substr(var,2,4))
+	gen t1 = real(substr(var,9,4))	
+	gen t2 = real(substr(var,14,4))	
+	gen t = (t1)*(t2==g-1) + (t2)*(t1==g-1)
+	
+	*add omitted period 
+	preserve
+		keep g
+		duplicates drop
+		gen t = g-1
+		gen coef = 0
+		save testo, replace
+	restore
+	append using testo
+	
+	*make CIs
+	gen lci = coef - 1.96*stderr
+	gen uci = coef + 1.96*stderr	
+	keep coef lci uci g t
+	sort g t
+	
+	*plot the ATT(g,t) for g=2014
+	twoway ///
+		(rcap lci uci t if g==2014, ///
+		lcolor(gray*1.2) msize(0)) ///
+		(scatter coef t if g==2014, ///
+		msym(O) mcolor(gray*1.2) 	///
+		c(l) lcolor(gray*1.2) 		///
+		), ///
+		legend(off) ///
+		xlabel(2009(2)2019, nogrid) ///
+		ylabel(-40(20)20) ///	
+		xline(2013, lpattern(dash)) ///
+		title("2014") ///
+		xtitle("") ///
+		ytitle("", orientation(horizontal)) ///
+		xsize(10) ysize(5)
+		
+		graph save g2014.gph, replace
+
+	*plot the ATT(g,t) for g=2015
+	twoway ///
+		(rcap lci uci t if g==2015, ///
+		lcolor(red*1.5) msize(0)) ///
+		(scatter coef t if g==2015, ///
+		msym(O) mcolor(red*1.5) 	///
+		c(l) lcolor(red*1.5) 		///
+		), ///
+		legend(off) ///
+		xlabel(2009(2)2019, nogrid) ///
+		ylabel(-40(20)20) ///	
+		xline(2014, lpattern(dash)) ///
+		title("2015") ///
+		xtitle("") ///
+		ytitle("", orientation(horizontal)) ///
+		xsize(10) ysize(5)
+		
+		graph save g2015.gph, replace
+
+	*plot the ATT(g,t) for g=2016
+	twoway ///
+		(rcap lci uci t if g==2016, ///
+		lcolor(brown) msize(0)) ///
+		(scatter coef t if g==2016, ///
+		msym(O) mcolor(brown) 	///
+		c(l) lcolor(brown) 		///
+		), ///
+		legend(off) ///
+		xlabel(2009(2)2019, nogrid) ///
+		ylabel(-40(20)20) ///	
+		xline(2015, lpattern(dash)) ///
+		title("2016") ///
+		xtitle("") ///
+		ytitle("", orientation(horizontal)) ///
+		xsize(10) ysize(5)		
+		
+		graph save g2016.gph, replace
+		
+	*plot the ATT(g,t) for g=2019
+	twoway ///
+		(rcap lci uci t if g==2019, ///
+		lcolor(navy) msize(0)) ///
+		(scatter coef t if g==2019, ///
+		msym(O) mcolor(navy) 	///
+		c(l) lcolor(navy) 		///
+		), ///
+		legend(off) ///
+		xlabel(2009(2)2019, nogrid) ///
+		ylabel(-40(20)20) ///	
+		xline(2018, lpattern(dash)) ///
+		title("2019") ///
+		xtitle("") ///
+		ytitle() ///
+		xsize(10) ysize(5)		
+		
+		graph save g2019.gph, replace
+				
+	graph combine g2014.gph g2015.gph g2016.gph g2019.gph, ///
+		title("Treatment Effect" "Mortality per 100,000", size(small) orientation(horizontal) pos(9) ring(2))  ///
+		cols(2) imargin(4 4 4 4)  
+		
+	graph display, xsize(10) ysize(5)
+
+		
+
+
+```
+
+:::
+
+## Figure 7: ATT(g, t) in Event Time
+
+We show how you can stack these group-time average treatment effects in relative, or event, time in **Figure 7**.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE}
+#| fig.align: 'center'
+#| fig.width: 10
+
+# Make a different plot that reports the ATT(g,t)s in relative time
+mod_no_x %>% 
+  # get the estimates and CIs
+  broom::tidy() %>% 
+  # define relative time for each group
+  mutate(rel_time = time - group) %>% 
+  # plot
+  ggplot(aes(x = rel_time, y = estimate, group = as.factor(group), color = as.factor(group))) + 
+  geom_point(size = 2) + geom_line(linewidth = 1) + 
+  geom_vline(xintercept = -1, linetype = "dashed", linewidth = 1) + 
+  scale_color_manual(values = c("#7C7189", "#D04E59", "#BC8E7D", "#2F3D70")) + 
+  scale_x_continuous(breaks = -10:5) + 
+  labs(x = "", y = "Treatment Effect \n Mortality Per 100,000") + 
+  theme(legend.position = 'bottom',
+        axis.title.y = element_text(hjust = 0.5, vjust = 0.5, angle = 360),
+        strip.text = element_text(size = 14),
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+        legend.title = element_blank(),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+
+**************************************************************************
+*3.   Figure 7: ATT(g,t) in event-time
+**************************************************************************
+		*read data in 
+	use "did_jel_aca_replication_data", clear
+
+	*Estimate group × time effects
+	csdid crude_rate [iw=set_wt], ///
+		ivar(county_code) ///
+		time(year) ///
+		gvar(treat_year) ///
+		long2 ///
+		notyet ///
+		wboot(reps(25000) rseed(20240924) wbtype(rademacher)) 
+	
+	*adding the omitted category to every g is very annoying ni the matrix style, so do the graphs using regsave	
+	regsave
+	
+	*extract timing components from csdid
+	gen g = real(substr(var,2,4))
+	gen t1 = real(substr(var,9,4))	
+	gen t2 = real(substr(var,14,4))	
+	gen t = (t1)*(t2==g-1) + (t2)*(t1==g-1)
+	
+	*add omitted period 
+	preserve
+		keep g
+		duplicates drop
+		gen t = g-1
+		gen coef = 0
+		save testo, replace
+	restore
+	append using testo
+	
+	*make CIs
+	gen lci = coef - 1.96*stderr
+	gen uci = coef + 1.96*stderr	
+	keep coef lci uci g t
+	sort g t
+  
+  gen e = t-g
+	keep g e coef
+	keep if g<.
+	reshape wide coef, i(e) j(g)
+	twoway ///
+		scatter coef2014 coef2015 coef2016 coef2019 e, ///
+		msym(o o o o) mcolor(gray*1.2 red*1.5 brown navy) ///
+		c(l l l l) lcolor(gray*1.2 red*1.5 brown navy) lwidth(medthick medthick medthick medthick) ///
+		legend(order(1 "2014" 2 "2015" 3 "2016" 4 "2019") rows(1) pos(6) ring(2) size(small)) ///
+		xlabel(-10(1)5, nogrid) ///
+		ylabel(-20(10)20) ///	
+		xline(-1, lpattern(dash)) ///
+		title("") ///
+		xtitle("") ///
+		ytitle() ///
+		xsize(10) ysize(5)	
+	
+
+
+
+```
+
+:::
+
+## Figure 8: G $\times$ T Event Study Without Covariates
+
+Finally, we demonstrate how to estimate DiD in the $G \times T$ setting by leverage treatment timing and not-yet-treated groups for identification using the doubly-robust method from Callaway and Sant'Anna (2021). First, in **Figure 8** we show the DiD event study estimates without covariates.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE, collectcode=TRUE}
+#| fig.align: 'center'
+#| fig.width: 10
+# Make a full -5 to + 5 event study plot for no covariates 
+# using Callaway/Sant'Anna with not-yet-treated
+
+# get the aggregate value for e = 0:5
+agg <- mod_no_x %>% 
+  aggte(type = "dynamic", min_e = 0, max_e = 5,
+        bstrap = TRUE, biters = 25000)
+
+# make labels for the estimate, std error, and confidence intervals
+label1 <-  paste0("Estimate~(e %in% '{0, 5}')~'='~'", scales::number(agg$overall.att, accuracy = 0.01), "'")
+
+label2 <- paste0("Std. Error = ", scales::number(agg$overall.se, 0.01), " \n",
+                 "Conf. Int = [", scales::number(agg$overall.att - 1.96*agg$overall.se, 0.01), ", ", 
+                 scales::number(agg$overall.att + 1.96*agg$overall.se, 0.01), "]")
+
+# make G*T event study plot without covariates
+mod_no_x %>% 
+  # aggregate into relative time (dynamic)
+  aggte(type = "dynamic") %>% 
+  broom::tidy(conf.int = TRUE) %>% 
+  # keep just -5 to + 5
+  filter(event.time %>% between(-5, 5)) %>% 
+  # plot
+  ggplot(aes(x = event.time, y = estimate)) + 
+  geom_linerange(aes(ymin = conf.low, ymax = conf.high), color = "darkred") + 
+  geom_linerange(aes(ymin = point.conf.low, ymax = point.conf.high)) + 
+  geom_point() + 
+  geom_vline(xintercept = -1, linetype = "dashed") + 
+  geom_hline(yintercept = 0, linetype = "dashed") + 
+  scale_x_continuous(breaks = -5:5) + 
+  annotate("text", x = 3, y = 11, label = label1, parse = TRUE) + 
+  annotate("text", x = 3, y = 9, label = label2) + 
+  labs(x = "Event Time", y = "Treatment Effect \n Mortality Per 100,000") + 
+  theme(axis.title.y = element_text(hjust = 0.5, vjust = 0.5, angle = 360),
+        strip.text = element_text(size = 14),
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+        legend.title = element_blank(),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+
+/**************************************************************************
+4. Figure 8: Event study without covariates
+**************************************************************************/
+	*read data in 
+	use "did_jel_aca_replication_data", clear
+
+	*Use csdid for simple ES estimation (uniform and non-uniform CIs); use long2!!
+	csdid crude_rate_20_64 [iw=set_wt], ///
+		ivar(county_code) time(year) gvar(treat_year) ///
+		long2 ///
+		notyet ///
+		wboot(reps(25000) rseed(20240924) wbtype(rademacher)) ///
+		agg(event)
+
+	*you do actually have to grab the uniform CIs from the posted output
+	preserve
+		clear
+		matrix T  = r(table)
+		local cn : colnames T
+		matrix llu = T[5,1..colsof(T)]
+		matrix ulu = T[6,1..colsof(T)]
+		matrix uci = (llu', ulu')
+		matrix colnames uci = uci_lower uci_upper
+		svmat uci, names(col)
+		gen var = ""
+		local i = 0
+		foreach r of local cn{
+			local ++i
+			replace var = "`r'" in `i'
+		}
+		save "testo", replace
+	restore
+
+	*save the posted output to a dataset and merge back on the uniform CIs
+	regsave, ci
+	merge 1:1 var using "testo"
+	keep if _merge==3
+	drop _merge
+	
+	*get average post coefficient, standard error, and CI
+	qui sum coef if var=="Post_avg"
+	local postcoef : display %03.2f r(mean)
+	qui sum stderr if var=="Post_avg"
+	local postse : display %03.2f r(mean)
+	local postlci : display %03.2f `postcoef'-1.96*`postse'
+	local postuci : display %03.2f `postcoef'+1.96*`postse'
+	
+	*now only keep the event-study estimates
+	keep if substr(var,1,1)=="T"
+	keep coef ci* uci* var
+	
+	*extract timing components from event aggregation notation in csdid
+	gen pre = substr(var,2,1)=="m"
+	gen post = substr(var,2,1)=="p"
+	gen e = real(substr(var,3,.))
+	replace e = -e if pre
+	
+	*add omitted period
+	local obs = _N+1
+	set obs `obs'
+	replace coef = 0 in `obs'
+	replace e = -1 in `obs'
+
+	*plot only -5 to 5
+	keep if inrange(e,-5,5)
+
+	*plot the ATT(g,t) for g=2014
+	twoway ///
+		(rcap uci_lower uci_upper e, ///
+		lcolor(red*1.2) msize(0)) ///
+		(rcap ci_lower ci_upper e, ///
+		lcolor(black) msize(0)) ///
+		(scatter coef e, ///
+		msym(O) mcolor(black) 	///
+		), ///
+		legend(off) ///
+		xlabel(-5(1)5, nogrid) ///
+		ylabel(-20(10)20) ///	
+		yline(0, lpattern(dash)) ///
+		xline(-1, lpattern(dash)) ///
+		xtitle("Event-Time") ///
+		ytitle("Treatment Effect" "Mortality Per 100,000", orientation(horizontal) size(small)) ///
+		text(18.5 3 "Estimate e ∈ {0,5}=`postcoef'", size(small)) ///
+		text(15.5 3 "Std. Error = `postse'" "Conf. Int = [`postlci',`postuci']", size(small))	///
+		xsize(10) ysize(5)
+
+
+
+
+
+```
+
+:::
+
+## Figure 9: G $\times$ T Event Study With Covariates
+
+**Figure 9** presents the event study results adjusting for the covariates using the doubly-robust method.
+
+::: panel-tabset
+### R
+
+```{r, message = FALSE, warning = FALSE, error = FALSE, collectcode=TRUE}
+#| fig.align: 'center'
+#| fig.width: 10
+# Now re-estimate and plot the same GXT estimates with covariates
+# set.seed(20240924)
+mod_with_x <- att_gt(
+  yname = "crude_rate_20_64",
+  tname = "year",
+  idname = "county_code",
+  gname = "treat_year",
+  xformla =  as.formula(paste("~", paste(covs, collapse = "+"))),
+  data = mydata,
+  panel = TRUE,
+  control_group = "notyettreated",
+  bstrap = TRUE,
+  biters = 25000,
+  cband = TRUE,
+  est_method = "dr",
+  weightsname = "set_wt",
+  # faster_mode = TRUE,
+  base_period = "universal"
+
+)
+
+# get the aggregate value for e = 0:5
+agg <- mod_with_x %>% 
+  aggte(type = "dynamic", min_e = 0, max_e = 5,
+        bstrap = TRUE, biters = 25000)
+
+# make labels for the estimate, std error, and confidence intervals
+label1 <-  paste0("Estimate~(e %in% '{0, 5}')~'='~'", scales::number(agg$overall.att, accuracy = 0.01), "'")
+
+label2 <- paste0("Std. Error = ", scales::number(agg$overall.se, 0.01), " \n",
+                 "Conf. Int = [", scales::number(agg$overall.att - 1.96*agg$overall.se, 0.01), ", ", 
+                 scales::number(agg$overall.att + 1.96*agg$overall.se, 0.01), "]")
+
+# make event study plot for GXT with covariates
+mod_with_x %>% 
+  # aggregate to event time (dynamic)
+  aggte(type = "dynamic") %>% 
+  broom::tidy(conf.int = TRUE) %>% 
+  # filter years
+  filter(event.time %>% between(-5, 5)) %>% 
+  # plot
+  ggplot(aes(x = event.time, y = estimate)) + 
+  geom_linerange(aes(ymin = conf.low, ymax = conf.high), color = "darkred") + 
+  geom_linerange(aes(ymin = point.conf.low, ymax = point.conf.high)) + 
+  geom_point() + 
+  geom_vline(xintercept = -1, linetype = "dashed") + 
+  geom_hline(yintercept = 0, linetype = "dashed") + 
+  scale_x_continuous(breaks = -5:5) + 
+  annotate("text", x = 3, y = 18, label = label1, parse = TRUE) + 
+  annotate("text", x = 3, y = 15, label = label2) + 
+  labs(x = "Event Time", y = "Treatment Effect \n Mortality Per 100,000") + 
+  theme(axis.title.y = element_text(hjust = 0.5, vjust = 0.5, angle = 360),
+        strip.text = element_text(size = 14),
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+        legend.title = element_blank(),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 10))
+
+```
+
+### Stata
+
+```{stata, eval = FALSE}
+
+
+/**************************************************************************
+5. Figure 9: Event study with covariates
+**************************************************************************/
+	*read data in 
+	use "did_jel_aca_replication_data", clear
+
+	*local with covariate names
+	local covs perc_female perc_white perc_hispanic ///
+		   unemp_rate_pc poverty_rate median_income_k
+	
+	*Use csdid for simple ES estimation (uniform and non-uniform CIs); use long2!!
+	csdid crude_rate_20_64 `covs' [iw=set_wt], ///
+		ivar(county_code) time(year) gvar(treat_year) ///
+		method(dripw) ///
+		long2 ///
+		notyet ///
+		pscoretrim(0.995) ///
+		wboot(reps(25000) rseed(20240924) wbtype(rademacher)) 	///
+		agg(event)
+
+	*you do actually have to grab the uniform CIs from the posted output
+	preserve
+		clear
+		matrix T  = r(table)
+		local cn : colnames T
+		matrix llu = T[5,1..colsof(T)]
+		matrix ulu = T[6,1..colsof(T)]
+		matrix uci = (llu', ulu')
+		matrix colnames uci = uci_lower uci_upper
+		svmat uci, names(col)
+		gen var = ""
+		local i = 0
+		foreach r of local cn{
+			local ++i
+			replace var = "`r'" in `i'
+		}
+		save "testo", replace
+	restore
+
+	*save the posted output to a dataset and merge back on the uniform CIs
+	regsave, ci
+	merge 1:1 var using "testo"
+	keep if _merge==3
+	drop _merge
+	
+	*get average post coefficient, standard error, and CI
+	qui sum coef if var=="Post_avg"
+	local postcoef : display %03.2f r(mean)
+	qui sum stderr if var=="Post_avg"
+	local postse : display %03.2f r(mean)
+	local postlci : display %03.2f `postcoef'-1.96*`postse'
+	local postuci : display %03.2f `postcoef'+1.96*`postse'
+	
+	*now only keep the event-study estimates
+	keep if substr(var,1,1)=="T"
+	keep coef ci* uci* var
+	
+	*extract timing components from event aggregation notation in csdid
+	gen pre = substr(var,2,1)=="m"
+	gen post = substr(var,2,1)=="p"
+	gen e = real(substr(var,3,.))
+	replace e = -e if pre
+	
+	*add omitted period
+	local obs = _N+1
+	set obs `obs'
+	replace coef = 0 in `obs'
+	replace e = -1 in `obs'
+
+	*plot only -5 to 5
+	keep if inrange(e,-5,5)
+
+	*plot the ATT(g,t) for g=2014
+	twoway ///
+		(rcap uci_lower uci_upper e, ///
+		lcolor(red*1.2) msize(0)) ///
+		(rcap ci_lower ci_upper e, ///
+		lcolor(black) msize(0)) ///
+		(scatter coef e, ///
+		msym(O) mcolor(black) 	///
+		), ///
+		legend(off) ///
+		xlabel(-5(1)5, nogrid) ///
+		ylabel(-20(10)20) ///	
+		yline(0, lpattern(dash)) ///
+		xline(-1, lpattern(dash)) ///
+		xtitle("Event-Time") ///
+		ytitle("Treatment Effect" "Mortality Per 100,000", orientation(horizontal) size(small)) ///
+		text(19.4 3 "Estimate e ∈ {0,5}=`postcoef'", size(small)) ///
+		text(15.5 3 "Std. Error = `postse'" "Conf. Int = [`postlci',`postuci']", size(small))	///
+		xsize(10) ysize(5)
+
+
+
+```
+
+:::
+
+```{stata, include = FALSE}
+*delete all the extra stata files created 
+*erase "../data/reg_data_2013.dta"
+*erase "../data/reg_data_change.dta"
+*erase "../data/csdid_input.dta"
+*erase "../data/county_mortality_data_cl.dta"
+*erase "../data/data_fig_4.dta"
+*erase "../data/figure8.dta"
+*erase "../data/precollapse.dta"
+*erase "../data/fig6_combined.gph"
+*erase "../data/grp2014.gph"
+*erase "../data/grp2015.gph"
+*erase "../data/grp2016.gph"
+*erase "../data/grp2019.gph"
+*erase "../data/fig4_dripw.gph"
+*erase "../data/fig4_stdipw.gph"
+*erase "../data/fig4_reg.gph"
+
+```
+
+```{r, include = FALSE}
+#delete all the extra R files we created 
+# unlink(xlsx_path)
+# unlink(xlsx_path2)
+# unlink(xlsx_path3)
+# unlink(xlsx_path4)
+# unlink(xlsx_path5)
+# unlink(xlsx_path6)
+# unlink(xlsx_path7)
+
+#unlink(fig_path1)
+#unlink(fig_path2)
+#unlink(fig_path3)
+#unlink(fig_path4)
+#unlink(fig_path5)
+#unlink(fig_path6)
+#unlink(fig_path7)
+#unlink(fig_path8)
+#unlink(fig_path9)
+```
