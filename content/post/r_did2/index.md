@@ -1105,7 +1105,7 @@ The script reproduces faithfully and the post's headline numbers carry through t
 
 ## 15. References
 
-1. [Baker, A., Callaway, B., Cunningham, S., Goodman-Bacon, A., and Sant'Anna, P. H. (2025). Difference-in-Differences Designs: A Practitioner's Guide. *arXiv preprint* arXiv:2503.13323.](https://arxiv.org/abs/2503.13323) Source document for this tutorial; a copy is included in the post bundle at `reference/manuscript.tex`. See the running Medicaid example (lines 120--137), the 2x2 identification result (lines 206--236), the staggered design (lines 599--690), and HonestDiD (lines 540--560).
+1. [Baker, A., Callaway, B., Cunningham, S., Goodman-Bacon, A., and Sant'Anna, P. H. (2025). Difference-in-Differences Designs: A Practitioner's Guide. *arXiv preprint* arXiv:2503.13323.](https://arxiv.org/abs/2503.13323)
 2. [Callaway, B. and Sant'Anna, P. H. C. (2021). Difference-in-Differences with multiple time periods. *Journal of Econometrics*, 225(2), 200--230.](https://doi.org/10.1016/j.jeconom.2020.12.001)
 3. [Rambachan, A. and Roth, J. (2023). A More Credible Approach to Parallel Trends. *Review of Economic Studies*, 90(5), 2555--2591.](https://doi.org/10.1093/restud/rdad018)
 4. [Sant'Anna, P. H. C. and Zhao, J. (2020). Doubly robust difference-in-differences estimators. *Journal of Econometrics*, 219(1), 101--122.](https://doi.org/10.1016/j.jeconom.2020.06.003)
