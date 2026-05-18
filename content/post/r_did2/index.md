@@ -265,8 +265,8 @@ The source data are CDC county-level mortality counts (deaths per 100,000 adults
 covs <- c("perc_female", "perc_white", "perc_hispanic",
           "unemp_rate", "poverty_rate", "median_income")
 
-df_raw <- read_csv("reference/data/county_mortality_data.csv",
-                   show_col_types = FALSE, na = c("", "NA"))
+DATA_URL <- "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_did2/reference/data/county_mortality_data.csv"
+df_raw <- read_csv(DATA_URL, show_col_types = FALSE, na = c("", "NA"))
 
 df_prep <- df_raw %>%
   mutate(

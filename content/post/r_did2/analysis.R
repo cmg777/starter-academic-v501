@@ -131,11 +131,10 @@ cat("\n=== r_did2: DiD for regional data (R ",
 # WATCH  Console shows the row x column count of the raw panel.
 # ============================================================================
 
-DATA_SRC <- here::here("content", "post", "r_did2", "reference", "data",
-                       "county_mortality_data.csv")
-df_raw <- read_csv(DATA_SRC, show_col_types = FALSE, na = c("", "NA"))
+DATA_URL <- "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_did2/reference/data/county_mortality_data.csv"
+df_raw <- read_csv(DATA_URL, show_col_types = FALSE, na = c("", "NA"))
 cat(sprintf("Loaded %d rows x %d cols from %s\n",
-            nrow(df_raw), ncol(df_raw), basename(DATA_SRC)))
+            nrow(df_raw), ncol(df_raw), basename(DATA_URL)))
 write_csv(df_raw, "raw_data.csv")
 
 
