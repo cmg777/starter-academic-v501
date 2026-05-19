@@ -20,8 +20,8 @@ links:
     url: analysis.R
   - icon: file-code
     icon_pack: fas
-    name: "Quarto (.qmd)"
-    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_sc_bayes_spatial/tutorial.qmd
+    name: "Quarto project (.zip)"
+    url: r_sc_bayes_spatial.zip
   - icon: markdown
     icon_pack: fab
     name: "MD version"
