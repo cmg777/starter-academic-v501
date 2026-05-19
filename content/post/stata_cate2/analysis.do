@@ -91,8 +91,8 @@ di as text "Stata version detected: " c(stata_version) "  -- OK."
 *               (country and year fixed effects for the panel).
 *----------------------------------------------------------------
 
-* Import from local CSV (update URL when uploaded to GitHub)
-* GitHub: import delimited using "https://github.com/quarcs-lab/data-open/raw/master/stata19/sim_resource_curse.csv", clear
+* Import from local CSV (or GitHub raw URL below)
+* GitHub: import delimited using "https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_cate2/sim_resource_curse.csv", clear
 import delimited using "sim_resource_curse.csv", clear
 
 * Label all variables

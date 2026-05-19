@@ -21,7 +21,7 @@ links:
 - icon: database
   icon_pack: fas
   name: "Dataset (.csv)"
-  url: https://github.com/quarcs-lab/data-open/raw/master/stata19/sim_resource_curse.csv
+  url: https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_cate2/sim_resource_curse.csv
 - icon: file-alt
   icon_pack: fas
   name: "Stata log"
