@@ -35,6 +35,8 @@ Subsequent renders are instant — you only run step 2 once per machine.
 
 - **Windows:** if `python3` is not on PATH, use `python setup_env.py` instead.
 - **Kernel not found:** if Render reports `Jupyter kernel 'pyfixest-tutorial' not found`, you skipped step 2 — run `python3 setup_env.py` in a terminal and try again.
+- **"This tutorial needs Python 3.10, 3.11, 3.12, or 3.13":** your `python3` is outside the supported range. The pinned `numba` and `llvmlite` releases only ship wheels for cp310–cp313. Install a working Python (miniforge, python.org, or Homebrew `python@3.13`) and re-run.
+- **`ImportError: ... pyexpat.cpython-3XX-darwin.so`:** your Python's `pyexpat` stdlib binding is broken — most often Homebrew `python@3.14` on macOS, whose `pyexpat.so` is linked against a newer `libexpat` than the system ships. Fix by switching to a different Python (`~/miniforge3/envs/<env>/bin/python3 setup_env.py`), installing from python.org, or `brew uninstall python@3.14 && brew install python@3.13`.
 
 ## Source
 

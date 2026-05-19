@@ -134,7 +134,56 @@ def ensure_outer_jupyter() -> None:
     )
 
 
+SUPPORTED_PY = {(3, 10), (3, 11), (3, 12), (3, 13)}
+
+
+def preflight() -> None:
+    suffix = (
+        "\nOnce you have a working Python 3.10-3.13, re-run:\n"
+        "  python3 setup_env.py    (or use the absolute path to that Python)\n"
+    )
+
+    if sys.version_info[:2] not in SUPPORTED_PY:
+        ver = ".".join(map(str, sys.version_info[:3]))
+        print(
+            f"ERROR: this tutorial needs Python 3.10, 3.11, 3.12, or 3.13.\n"
+            f"You ran setup_env.py with Python {ver} at {sys.executable}.\n\n"
+            f"The pinned `numba==0.62.1` and `llvmlite==0.45.0` wheels cover\n"
+            f"cp310-cp313 only. Python 3.14 has no prebuilt numba wheels yet,\n"
+            f"and Python <=3.9 is below pyfixest's minimum.\n\n"
+            f"Install a supported Python (any one):\n"
+            f"  - miniforge:  brew install miniforge && conda create -n pyfx python=3.11 -y\n"
+            f"  - python.org: https://www.python.org/downloads/release/python-3119/\n"
+            f"  - Homebrew:   brew install python@3.13"
+            f"{suffix}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    try:
+        from xml.parsers import expat  # noqa: F401
+    except ImportError as e:
+        print(
+            f"ERROR: this Python cannot load `xml.parsers.expat`. Details:\n\n"
+            f"  {e}\n\n"
+            f"pip imports `xmlrpc.client` -> `xml.parsers.expat`, so no pip\n"
+            f"command will work on this Python. This is most commonly the\n"
+            f"Homebrew `python@3.14` formula on macOS: its `pyexpat.so` is\n"
+            f"linked against a newer `libexpat` than the system ships at\n"
+            f"`/usr/lib/libexpat.1.dylib`.\n\n"
+            f"Fix (any one):\n"
+            f"  - Use a different Python: e.g. `~/miniforge3/envs/<env>/bin/python3 setup_env.py`\n"
+            f"  - Install Python via python.org: https://www.python.org/downloads/\n"
+            f"  - Reinstall via Homebrew at a working version:\n"
+            f"      brew uninstall python@3.14 && brew install python@3.13 && /usr/local/bin/python3.13 setup_env.py"
+            f"{suffix}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+
 def main() -> None:
+    preflight()
     print("Setting up PyFixest tutorial environment...")
     ensure_venv()
     ensure_pip_in_venv()
