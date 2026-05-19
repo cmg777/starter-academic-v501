@@ -19,8 +19,8 @@ links:
     url: analysis.R
   - icon: file-code
     icon_pack: fas
-    name: "Quarto (.qmd)"
-    url: tutorial.qmd
+    name: "Quarto project (.zip)"
+    url: r_did_ring.zip
   - icon: markdown
     icon_pack: fab
     name: "MD version"
