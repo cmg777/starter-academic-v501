@@ -17,10 +17,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
-- icon: file-code
+- icon: file-zipper
   icon_pack: fas
-  name: "Quarto (.qmd)"
-  url: references/tutorial.qmd
+  name: "Tutorial bundle (.zip)"
+  url: /uploads/python_pyfixest_tutorial.zip
 - icon: markdown
   icon_pack: fab
   name: "MD version"

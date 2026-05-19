@@ -109,6 +109,12 @@ An embedded audio player overlay for AI-generated podcast summaries of blog post
 
 **Player features:** play/pause, skip ±15s, progress bar with buffering, time display, volume slider, playback speed (0.75x–2x), stream/download button. Dark gradient UI using site colors (`#d97757` orange accent, `#6a9bcc`/`#00d4c8` progress gradient). Slides up from bottom on click, auto-opens if URL hash is `#podcast-player`.
 
+## Tutorial bundles (`.zip`)
+
+Some Quarto tutorials need companion files (e.g. `setup_env.py`, `_quarto.yml`) alongside the `.qmd` to render locally. For these we ship a single ZIP via the post's "Tutorial bundle (.zip)" link, served from `static/uploads/`.
+
+Currently this applies only to `content/post/python_pyfixest/`. Whenever `tutorial.qmd`, `setup_env.py`, `_quarto.yml`, `script.py`, or the bundle `README.md` changes, run `bash content/post/python_pyfixest/build_bundle.sh` and commit the regenerated `static/uploads/python_pyfixest_tutorial.zip` in the same commit.
+
 # Claude Code Skills
 
 Nine skills: eight organized as Write/Review pairs across four artifact stages, plus the standalone `write-quarto-notebook` skill that produces an executable companion notebook from an existing post. Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
