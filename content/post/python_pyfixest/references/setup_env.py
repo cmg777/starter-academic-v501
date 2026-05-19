@@ -17,10 +17,11 @@ from __future__ import annotations
 
 import importlib.util
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import urllib.request
-import venv
 from pathlib import Path
 
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
@@ -52,16 +53,44 @@ def venv_python(venv_dir: Path) -> Path:
     return venv_dir / "bin" / "python"
 
 
+def _venv_matches_outer(py: Path) -> bool:
+    """True iff the venv's Python is healthy and has the same major.minor as ours."""
+    try:
+        result = subprocess.run(
+            [str(py), "-c",
+             "import sys; print(sys.version_info.major, sys.version_info.minor)"],
+            capture_output=True, text=True, timeout=5,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    if result.returncode != 0:
+        return False
+    try:
+        major, minor = map(int, result.stdout.split())
+    except ValueError:
+        return False
+    return (major, minor) == sys.version_info[:2]
+
+
 def ensure_venv() -> None:
     py = venv_python(VENV_DIR)
-    if py.exists():
+    if py.exists() and _venv_matches_outer(py):
         return
-    print(f"  creating venv at {VENV_DIR}")
-    # with_pip=False bypasses ensurepip (which is missing or broken on some
-    # Python builds: e.g., uv-managed standalone distributions, or Pythons
-    # that ship a buggy bundled pip wheel). ensure_pip_in_venv() then
-    # installs pip via the canonical get-pip.py bootstrap.
-    venv.EnvBuilder(with_pip=False, upgrade_deps=False).create(VENV_DIR)
+    if VENV_DIR.exists():
+        print(f"  rebuilding stale venv at {VENV_DIR}")
+        shutil.rmtree(VENV_DIR)
+    else:
+        print(f"  creating venv at {VENV_DIR}")
+    # Subprocess CLI `python -m venv` (not the EnvBuilder API): on uv-managed
+    # standalone CPython, the API path produces a venv whose child python errors
+    # with `Library not loaded: @rpath/libpython3.X.dylib`, while the CLI path
+    # works. --without-pip bypasses ensurepip; --copies makes the venv self-
+    # contained (vs the CLI's default --symlinks), so that the verification
+    # chunk in tutorial.qmd, which does Path(sys.executable).resolve(), sees a
+    # path inside .venv/ rather than the resolved-through symlink target.
+    subprocess.check_call(
+        [sys.executable, "-m", "venv", "--without-pip", "--copies", str(VENV_DIR)]
+    )
 
 
 def ensure_pip_in_venv() -> None:
@@ -136,6 +165,111 @@ def ensure_outer_jupyter() -> None:
 
 SUPPORTED_PY = {(3, 10), (3, 11), (3, 12), (3, 13)}
 
+_PROBE_SCRIPT = (
+    "import sys; from xml.parsers import expat; "
+    "assert sys.version_info[:2] in {(3,10),(3,11),(3,12),(3,13)}"
+)
+
+
+def _probe_candidate(path: str) -> bool:
+    # Cheap check: version + pyexpat. Most rejects fail here in <1s.
+    try:
+        result = subprocess.run(
+            [path, "-c", _PROBE_SCRIPT],
+            capture_output=True, timeout=5,
+        )
+        if result.returncode != 0:
+            return False
+    except (FileNotFoundError, subprocess.TimeoutExpired, OSError):
+        return False
+
+    # Expensive check: can this Python be the base for a working stdlib venv?
+    # Some Pythons pass the cheap check but produce broken venvs (notably
+    # uv-managed standalone CPython, where a --copies venv's child python
+    # errors with `Library not loaded: @rpath/libpython3.X.dylib`). We mirror
+    # `ensure_venv()` exactly: create a --copies --without-pip test venv and
+    # run a subprocess from the new python (so the rpath failure is exposed).
+    try:
+        with tempfile.TemporaryDirectory() as tmp:
+            test_venv = Path(tmp) / "v"
+            create = subprocess.run(
+                [path, "-m", "venv", "--without-pip", "--copies", str(test_venv)],
+                capture_output=True, timeout=30,
+            )
+            if create.returncode != 0:
+                return False
+            test_py = test_venv / (
+                "Scripts/python.exe" if os.name == "nt" else "bin/python"
+            )
+            # Exercise an inner subprocess too: that pattern is what eventually
+            # SIGABRTs on uv-standalone venvs even when a plain -c "print(...)"
+            # would succeed.
+            run = subprocess.run(
+                [str(test_py), "-c",
+                 "import subprocess, sys; "
+                 "r = subprocess.run([sys.executable, '-c', \"print('ok')\"], "
+                 "capture_output=True, text=True, timeout=5); "
+                 "assert r.returncode == 0 and r.stdout.strip() == 'ok'"],
+                capture_output=True, timeout=10,
+            )
+            return run.returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+
+
+def find_compatible_python() -> str | None:
+    """Scan common Python install locations for a 3.10-3.13 with intact pyexpat."""
+    home = Path.home()
+    seen: set[str] = set()
+    candidates: list[str] = []
+
+    # PATH-resolved version-specific shims (most likely to be on the user's PATH).
+    for v in ("3.13", "3.12", "3.11", "3.10"):
+        found = shutil.which(f"python{v}")
+        if found:
+            candidates.append(found)
+
+    # Homebrew Intel and Apple Silicon prefixes.
+    for prefix in ("/usr/local", "/opt/homebrew"):
+        for v in ("3.13", "3.12", "3.11", "3.10"):
+            candidates.append(f"{prefix}/opt/python@{v}/bin/python{v}")
+            candidates.append(f"{prefix}/bin/python{v}")
+
+    # python.org installer layout.
+    for v in ("3.13", "3.12", "3.11", "3.10"):
+        candidates.append(
+            f"/Library/Frameworks/Python.framework/Versions/{v}/bin/python3"
+        )
+
+    # Conda/miniforge/anaconda base + envs.
+    conda_bases = [
+        home / "miniforge3", home / "miniconda3",
+        home / "anaconda3", home / "opt" / "anaconda3",
+    ]
+    for base in conda_bases:
+        if not base.exists():
+            continue
+        candidates.append(str(base / "bin" / "python3"))
+        envs_dir = base / "envs"
+        if envs_dir.exists():
+            for env in sorted(envs_dir.iterdir()):
+                py = env / "bin" / "python3"
+                if py.exists():
+                    candidates.append(str(py))
+
+    # Skip the current executable to avoid an infinite re-launch loop.
+    here = os.path.realpath(sys.executable)
+    for cand in candidates:
+        if not cand or cand in seen:
+            continue
+        seen.add(cand)
+        real = os.path.realpath(cand) if os.path.exists(cand) else ""
+        if not real or real == here:
+            continue
+        if _probe_candidate(cand):
+            return cand
+    return None
+
 
 def preflight() -> None:
     suffix = (
@@ -143,7 +277,34 @@ def preflight() -> None:
         "  python3 setup_env.py    (or use the absolute path to that Python)\n"
     )
 
-    if sys.version_info[:2] not in SUPPORTED_PY:
+    version_unsupported = sys.version_info[:2] not in SUPPORTED_PY
+    pyexpat_error: ImportError | None = None
+    if not version_unsupported:
+        try:
+            from xml.parsers import expat  # noqa: F401
+        except ImportError as e:
+            pyexpat_error = e
+
+    if not version_unsupported and pyexpat_error is None:
+        return
+
+    # Outer Python is unfit. Try to relaunch with a working one before erroring.
+    alt = find_compatible_python()
+    if alt:
+        ver = ".".join(map(str, sys.version_info[:3]))
+        print(
+            f"Note: outer Python {ver} at {sys.executable} is unsupported.\n"
+            f"Found compatible Python: {alt}\n"
+            f"Relaunching setup_env.py with it...\n",
+            file=sys.stderr,
+        )
+        result = subprocess.run(
+            [alt, str(Path(__file__).resolve()), *sys.argv[1:]]
+        )
+        sys.exit(result.returncode)
+
+    # No alternative — fall through to the detailed iteration-5 errors.
+    if version_unsupported:
         ver = ".".join(map(str, sys.version_info[:3]))
         print(
             f"ERROR: this tutorial needs Python 3.10, 3.11, 3.12, or 3.13.\n"
@@ -158,14 +319,11 @@ def preflight() -> None:
             f"{suffix}",
             file=sys.stderr,
         )
-        sys.exit(1)
-
-    try:
-        from xml.parsers import expat  # noqa: F401
-    except ImportError as e:
+    else:
+        assert pyexpat_error is not None
         print(
             f"ERROR: this Python cannot load `xml.parsers.expat`. Details:\n\n"
-            f"  {e}\n\n"
+            f"  {pyexpat_error}\n\n"
             f"pip imports `xmlrpc.client` -> `xml.parsers.expat`, so no pip\n"
             f"command will work on this Python. This is most commonly the\n"
             f"Homebrew `python@3.14` formula on macOS: its `pyexpat.so` is\n"
@@ -179,7 +337,7 @@ def preflight() -> None:
             f"{suffix}",
             file=sys.stderr,
         )
-        sys.exit(1)
+    sys.exit(1)
 
 
 def main() -> None:

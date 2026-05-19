@@ -33,6 +33,7 @@ Subsequent renders are instant — you only run step 2 once per machine.
 
 ## Troubleshooting
 
+- **Auto-relaunch:** if `python3` on your PATH is unsupported (e.g., Python 3.14 with no `numba` wheels, or 3.9 below pyfixest's minimum), `setup_env.py` scans your machine for a compatible Python 3.10–3.13 and relaunches itself with it. You'll see a `Note: ... Relaunching setup_env.py with it...` line — that's expected.
 - **Windows:** if `python3` is not on PATH, use `python setup_env.py` instead.
 - **Kernel not found:** if Render reports `Jupyter kernel 'pyfixest-tutorial' not found`, you skipped step 2 — run `python3 setup_env.py` in a terminal and try again.
 - **"This tutorial needs Python 3.10, 3.11, 3.12, or 3.13":** your `python3` is outside the supported range. The pinned `numba` and `llvmlite` releases only ship wheels for cp310–cp313. Install a working Python (miniforge, python.org, or Homebrew `python@3.13`) and re-run.
