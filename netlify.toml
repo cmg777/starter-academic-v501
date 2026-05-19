@@ -40,6 +40,12 @@
   [headers.values]
     Cache-Control = "public, max-age=2592000"
 
+[[headers]]
+  for = "*.qmd"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Content-Disposition = "attachment"
+
 [[plugins]]
   package = "netlify-plugin-hugo-cache-resources"
   [plugins.inputs]
