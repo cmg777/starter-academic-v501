@@ -19,8 +19,8 @@ links:
   url: analysis.R
 - icon: file-code
   icon_pack: fas
-  name: "Quarto (.qmd)"
-  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_fwlplot/tutorial.qmd
+  name: "Quarto project (.zip)"
+  url: r_fwlplot.zip
 - icon: database
   icon_pack: fas
   name: "Datasets (CSV)"
