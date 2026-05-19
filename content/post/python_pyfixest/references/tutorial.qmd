@@ -3,7 +3,7 @@ title: "High-Dimensional Fixed Effects Regression: An Introduction in Python"
 subtitle: "Estimating regression models with high-dimensional fixed effects using PyFixest"
 author: "Carlos Mendez"
 date: "2026-03-20"
-jupyter: python3
+jupyter: pyfixest-tutorial
 format:
   html:
     theme: cosmo
@@ -20,31 +20,14 @@ execute:
   message: false
 ---
 
-::: {.callout-warning}
-## First-time setup for Positron (read this before clicking **Render**)
+::: {.callout-tip}
+## First render: ~2 minutes (one-time setup)
 
-The package-installation chunk further down (`setup-packages`) runs *inside* the Jupyter kernel, so Jupyter must already exist in your Python before Quarto can start the render. Hitting **Render** on a fresh machine without doing the steps below will fail with `ModuleNotFoundError: No module named 'yaml'` or `Jupyter is not available in this Python installation`.
+The first time you click **Render**, Quarto runs `setup_env.py` (see `_quarto.yml`) which creates a hermetic `.venv/` next to this notebook and pip-installs pinned packages (`numpy`, `pandas`, `matplotlib`, `pyfixest`, `jupyter`, `ipykernel`). It then registers a Jupyter kernel named `pyfixest-tutorial` pointing at that `.venv/`. Subsequent renders skip the install and run in seconds.
 
-You only need to do this once.
+**Prerequisites:** Python 3.10+ and a working `quarto` install. That's it. No manual `conda install`, no `Python: Select Interpreter` step.
 
-**1. Install [Miniconda](https://docs.conda.io/projects/miniconda/) or Anaconda** if you do not already have a `conda` Python on your machine.
-
-**2. Install Jupyter into your conda environment.** Open a terminal:
-
-- **macOS:** in Positron, `Terminal → New Terminal`, or use the system Terminal app.
-- **Windows:** open `Anaconda Prompt` from the Start menu (not regular `cmd`).
-
-Then run:
-
-```bash
-conda install -y -c conda-forge jupyter
-```
-
-**3. Point Positron at the right Python.** In Positron, open the command palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Windows) → `Python: Select Interpreter` → choose the conda Python from step 1 (its path contains `miniconda3` or `anaconda3`). The status bar at the bottom of Positron should then display that interpreter.
-
-**4. Click Render.** The `setup-packages` chunk will install `numpy`, `pandas`, `matplotlib`, and `pyfixest` at the exact versions used to build this tutorial. First render takes ~2 minutes; subsequent renders are nearly instant.
-
-**Still stuck?** Run `import sys; print(sys.executable)` in any Python chunk. The path should contain `miniconda3` or `anaconda3`. If it instead says `/Library/Developer/CommandLineTools/usr/bin/python3` (macOS) or `C:\Python3X\python.exe` (Windows), step 3 was not applied — re-run *Python: Select Interpreter* and restart Positron if necessary.
+**Troubleshooting.** If the first render aborts with `python3: command not found` (some Windows installs lack the `python3` shim), open `_quarto.yml` and replace `python3` with `python`, then click Render again.
 :::
 
 ## 1. Overview
@@ -122,16 +105,17 @@ Run an event-study regression with cohort-by-time interactions; period $e = -1$ 
 
 ## 2. Setup and imports
 
-The first chunk pins the exact package versions that produced the published numbers so the notebook is bit-reproducible when re-rendered later. Versions are pinned to whatever was installed on the developer's machine when this notebook was written.
+The first chunk verifies that the kernel is running inside the `.venv/` that `setup_env.py` created and that pinned package versions match — the actual install happens in the pre-render step (see `_quarto.yml`), so this chunk is fast on every render.
 
 ```{python}
 #| label: setup-packages
 
-import subprocess, sys, importlib.metadata
+import sys, importlib.metadata
+from pathlib import Path
 
-# {PyPI name: pinned version} — exact versions used when this notebook was written.
-# Pinning fosters replicability: a reader who renders this notebook on any
-# machine, any future date, should get the same numbers as the original.
+# Pinned versions used to produce the published numbers. The .venv/ next
+# to this notebook was created by setup_env.py via Quarto's pre-render
+# hook. Here we confirm the kernel is the venv kernel and versions match.
 PINNED = {
     "numpy":      "1.26.4",
     "pandas":     "2.2.2",
@@ -139,15 +123,17 @@ PINNED = {
     "pyfixest":   "0.50.1",
 }
 
+py = Path(sys.executable).resolve()
+assert ".venv" in py.parts, (
+    f"Kernel is running outside the tutorial .venv (sys.executable={py}). "
+    "Re-render so the pre-render hook activates the venv kernel."
+)
+print(f"Python: {py}")
+
 for pkg, want in PINNED.items():
-    try:
-        have = importlib.metadata.version(pkg)
-        if have != want:
-            subprocess.check_call(
-                [sys.executable, "-m", "pip", "install", f"{pkg}=={want}"])
-    except importlib.metadata.PackageNotFoundError:
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", f"{pkg}=={want}"])
+    have = importlib.metadata.version(pkg)
+    status = "OK" if have == want else f"MISMATCH (want {want})"
+    print(f"  {pkg:12s} {have:10s}  [{status}]")
 ```
 
 PyFixest provides [feols()](https://pyfixest.org/reference/estimation.feols.html) as its main estimation function, which accepts R-style formulas with a pipe `|` separator for fixed effects. Below we attach the standard libraries and seed for reproducibility.
