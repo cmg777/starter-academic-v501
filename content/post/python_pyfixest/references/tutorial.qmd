@@ -20,6 +20,33 @@ execute:
   message: false
 ---
 
+::: {.callout-warning}
+## First-time setup for Positron (read this before clicking **Render**)
+
+The package-installation chunk further down (`setup-packages`) runs *inside* the Jupyter kernel, so Jupyter must already exist in your Python before Quarto can start the render. Hitting **Render** on a fresh machine without doing the steps below will fail with `ModuleNotFoundError: No module named 'yaml'` or `Jupyter is not available in this Python installation`.
+
+You only need to do this once.
+
+**1. Install [Miniconda](https://docs.conda.io/projects/miniconda/) or Anaconda** if you do not already have a `conda` Python on your machine.
+
+**2. Install Jupyter into your conda environment.** Open a terminal:
+
+- **macOS:** in Positron, `Terminal → New Terminal`, or use the system Terminal app.
+- **Windows:** open `Anaconda Prompt` from the Start menu (not regular `cmd`).
+
+Then run:
+
+```bash
+conda install -y -c conda-forge jupyter
+```
+
+**3. Point Positron at the right Python.** In Positron, open the command palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Windows) → `Python: Select Interpreter` → choose the conda Python from step 1 (its path contains `miniconda3` or `anaconda3`). The status bar at the bottom of Positron should then display that interpreter.
+
+**4. Click Render.** The `setup-packages` chunk will install `numpy`, `pandas`, `matplotlib`, and `pyfixest` at the exact versions used to build this tutorial. First render takes ~2 minutes; subsequent renders are nearly instant.
+
+**Still stuck?** Run `import sys; print(sys.executable)` in any Python chunk. The path should contain `miniconda3` or `anaconda3`. If it instead says `/Library/Developer/CommandLineTools/usr/bin/python3` (macOS) or `C:\Python3X\python.exe` (Windows), step 3 was not applied — re-run *Python: Select Interpreter* and restart Positron if necessary.
+:::
+
 ## 1. Overview
 
 Imagine you want to know whether union membership raises wages. You run a regression and find a strong positive association: union workers earn 18% more. But wait --- what if the workers who join unions are also more motivated, more experienced, or work in industries that pay well regardless? That 18% could be mostly *selection*, not a genuine union effect. This is one of the most pervasive problems in empirical research: **omitted variable bias**. Any time your data is grouped --- by individual, firm, country, or time period --- unobserved characteristics that differ across groups can contaminate your estimates, leading to conclusions that look solid but are fundamentally misleading.
