@@ -19,8 +19,8 @@ links:
   url: analysis.R
 - icon: file-code
   icon_pack: fas
-  name: "Quarto (.qmd)"
-  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_dynamic_bma/tutorial.qmd
+  name: "Quarto project (.zip)"
+  url: r_dynamic_bma.zip
 - icon: markdown
   icon_pack: fab
   name: "MD version"
