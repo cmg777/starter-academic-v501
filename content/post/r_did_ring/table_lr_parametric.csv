@@ -1,0 +1,2 @@
+estimator,inner,outer,att_log,att_pct,se,ci_lower,ci_upper,n
+parametric_ring_default,"[0, 0.1]","(0.1, 0.3]",-0.0595388956906034,-5.780111459782711,0.022508196060979885,-0.10365495997012397,-0.015422831411082825,9029

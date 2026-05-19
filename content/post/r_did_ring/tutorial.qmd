@@ -1,0 +1,907 @@
+---
+title: "Difference-in-Differences with Geocoded Microdata: When Distance Defines Treatment"
+subtitle: "Parametric and nonparametric ring DiD, simulated and real-data, with Butts (2023) reconciliation"
+author: "Carlos Mendez"
+date: "2026-05-18"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    theme: darkly
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 300
+execute:
+  warning: false
+  message: false
+---
+
+## 1. Overview
+
+What happens to home prices when a registered sex offender moves into a neighborhood --- and, just as important, how do we *know* we measured it right? In a famous 2008 paper, Linden and Rockoff used a clever idea: compare homes very close to the offender's address with homes a little farther away, before and after arrival. They concluded that prices inside one tenth of a mile dropped by **about 7.5 %**. But that conclusion rested on a single research design choice --- the radius of the "treated" ring --- and changing that radius changed the answer.
+
+This tutorial reproduces and extends their analysis using two estimators in increasing order of flexibility. The first is the **parametric ring DiD**: collapse the data into "inner ring" (treated) and "outer ring" (control), first-difference the outcome, and fit a one-line regression. The second is the **nonparametric ring DiD** of [Butts (2023)](https://doi.org/10.1016/j.jue.2022.103493), which uses the partitioning-based binscatter of [Cattaneo, Crump, Farrell, and Feng](https://doi.org/10.1257/aer.20221254) to estimate a whole **treatment-effect curve over distance** instead of a single number. We will see that on the Linden-Rockoff data, the parametric ring DiD returns a price drop of **−5.78 %** at the canonical 0.1-mile cutoff. The nonparametric estimator, by contrast, says homes inside the first 300 feet drop by **−20.6 %**, and the effect fades to noise beyond ~0.094 mile. Both numbers are correct; they answer slightly different questions.
+
+The post follows the methodology of Butts (2023) and reuses the cleaned Linden-Rockoff data from his replication archive. Where the paper is research-grade and compact, we trade some compactness for pedagogy --- the same methods, the same data, but rearranged so a reader who has only seen the textbook 2 × 2 DiD can follow the argument step by step.
+
+**Learning objectives.** After working through this tutorial you will be able to:
+
+- **Understand** why a point in space can serve as a natural experiment and what the "ring" approach is doing in plain language.
+- **Implement** the parametric ring DiD in R as a one-line `feols()` regression on first-differenced outcomes.
+- **Estimate** a treatment-effect curve nonparametrically with `binsreg`, without committing to a ring cutoff up front.
+- **Assess** the fragility of the parametric ring estimator when the inner-ring choice changes, on both simulated and real data.
+- **Compare** the parametric headline number with its nonparametric counterpart and articulate why the two can differ by a factor of two.
+
+### Key concepts at a glance
+
+**1. Ring DiD.** A difference-in-differences design where the "treated" and "control" groups are defined by distance to a treatment point, not by policy assignment.
+
+**2. Parametric ring estimator.** A one-line regression of the *first-differenced* outcome on a "treated ring" indicator. Returns a single number: the average treatment effect inside the chosen inner ring.
+
+**3. Nonparametric ring estimator (`binsreg`).** Partitions distance into a sequence of data-driven, quantile-spaced bins and reports a separate $\hat{\tau}$ in each bin. The output is a step function over distance.
+
+**4. ATT and the ring choice.** The parameter estimated by the ring DiD is the average treatment effect among the treated, $E[\tau(d) \mid d \le \bar{d}]$. Change the inner-ring cutoff and you have changed the *estimand*, not just the precision.
+
+**5. Local parallel trends.** The identifying assumption: absent treatment, the average change in outcomes would have been the same in the inner and outer ring. Formally (Butts 2023, Assumption 2), $E[\Delta Y\_{i}(0) \mid d \le \bar{d}] = E[\Delta Y\_{i}(0) \mid d > \bar{d}]$.
+
+**6. Sample-weighted ATT.** When summarizing a step function into a single inner-ring scalar, average $\hat{\tau}(d)$ weighted by the number of observations in each bin, not by the number of bins.
+
+### Methodological flow
+
+```{mermaid}
+flowchart TD
+  A["Step 1<br/>Toy ring geometry"] --> B["Step 2<br/>2×2 DiD recap"]
+  B --> C["Step 3<br/>Simulated DGP<br/>true τ-curve known"]
+  C --> D["Step 4<br/>Parametric ring DiD<br/>one number per ring"]
+  C --> E["Step 5<br/>Ring-choice fragility<br/>same data, 3 answers"]
+  C --> F["Step 6<br/>Nonparametric ring DiD<br/>whole TE curve"]
+  D --> G["Step 7<br/>Linden-Rockoff data<br/>9,092 home sales"]
+  E --> G
+  F --> G
+  G --> H["Steps 8–10<br/>Bandwidth, parametric,<br/>nonparametric on real data"]
+  H --> I["Result<br/>−5.78% parametric<br/>−20.6% nonparametric (bin 1)"]
+  style A fill:#6a9bcc,stroke:#141413,color:#fff
+  style B fill:#6a9bcc,stroke:#141413,color:#fff
+  style C fill:#d97757,stroke:#141413,color:#fff
+  style D fill:#6a9bcc,stroke:#141413,color:#fff
+  style E fill:#d97757,stroke:#141413,color:#fff
+  style F fill:#00d4c8,stroke:#141413,color:#141413
+  style G fill:#d97757,stroke:#141413,color:#fff
+  style H fill:#6a9bcc,stroke:#141413,color:#fff
+  style I fill:#00d4c8,stroke:#141413,color:#141413
+```
+
+## 2. Setup and packages
+
+This first chunk pins the exact versions of every top-level package to the versions installed on the developer's machine at the time the post was written. Re-rendering this notebook on a fresh machine therefore reproduces the same numbers as the published post (`pak` is the only bootstrap dependency).
+
+```{r}
+#| label: setup-packages
+
+if (!requireNamespace("pak", quietly = TRUE)) {
+  install.packages("pak", repos = "https://cloud.r-project.org")
+}
+
+pak::pkg_install(c(
+  "tidyverse@2.0.0",
+  "fixest@0.14.0",
+  "haven@2.5.5",
+  "data.table@1.18.0",
+  "binsreg@2.0",
+  "KernSmooth@2.23.26",
+  "lpridge@1.1.1",
+  "ggplot2@4.0.1",
+  "patchwork@1.3.2",
+  "sf@1.1.1",
+  "glue@1.8.0",
+  "scales@1.4.0",
+  "broom@1.0.8"
+))
+
+library(tidyverse); library(fixest);  library(haven); library(data.table)
+library(binsreg);  library(KernSmooth); library(lpridge); library(ggplot2)
+library(patchwork); library(sf);      library(glue);    library(scales)
+library(broom)
+
+# Site palette --- reused throughout the figure chunks.
+BLUE   <- "#6a9bcc"  # primary series
+ORANGE <- "#d97757"  # secondary / treated
+TEAL   <- "#00d4c8"  # highlights
+BLACK  <- "#141413"  # near-black
+GREY   <- "#7d8597"  # reference lines
+
+set.seed(42)
+```
+
+### Helper functions (lifted verbatim from `analysis.R`)
+
+The two estimators below are inlined here so the notebook is self-contained. They are the same `parametric_ring_panel()` and `nonparametric_ring_cs()` that live in `analysis.R` --- the canonical reference. The first runs the parametric ring DiD with a chosen set of ring boundaries; the second runs the nonparametric `binsreg`-based estimator and returns a step function over distance.
+
+```{r}
+#| label: helpers
+
+parametric_ring_panel <- function(y, dist, rings) {
+  # y     : first-differenced outcome
+  # dist  : distance to treatment point
+  # rings : ring boundaries, e.g. c(0, 0.1, 0.3)
+  #         -> treated = (0, 0.1], control = (0.1, 0.3]
+  df <- data.table::data.table(y = y, dist = dist)
+  df <- df[dist <= max(rings) & dist >= min(rings), ]
+  df[, rings := as.character(cut(dist, breaks = rings))]
+  last_ring <- as.character(glue::glue(
+    "({rings[length(rings)-1]},{rings[length(rings)]}]"
+  ))
+  est <- fixest::feols(y ~ i(rings, ref = last_ring), df)
+
+  coefs <- coef(est, keep = "rings::.*")
+  sdes  <- se(est,   keep = "rings::.*")
+
+  results <- purrr::map_df(seq_along(coefs), function(i) {
+    interval <- stringr::str_match(
+      names(coefs)[i], r"(rings::\((.*?),(.*?)\].*)"
+    )
+    data.table::data.table(
+      bin = i,
+      x   = as.numeric(c(interval[2:3], interval[3])),
+      tau = c(coefs[i], coefs[i], NA),
+      se  = c(sdes[i],  sdes[i],  sdes[i])
+    )
+  })
+  results <- rbind(results, data.table::data.table(
+    bin = length(rings) - 1,
+    x   = c(rings[length(rings) - 1], rings[length(rings)],
+            rings[length(rings)]),
+    tau = c(0, 0, NA),
+    se  = c(0, 0, 0)
+  ))
+  results[, `:=`(
+    ci_lower = tau - 1.96 * se,
+    ci_upper = tau + 1.96 * se
+  )]
+  results
+}
+
+nonparametric_ring_cs <- function(y, dist, post) {
+  # y    : outcome (cross-section, e.g. log_price)
+  # dist : distance to treatment
+  # post : logical, TRUE = post-treatment observation
+  pdf(NULL)  # capture binsreg's default plot to a null device
+  est <- binsreg::binsreg(
+    y = y, x = dist, by = as.logical(post),
+    samebinsby = TRUE, line = c(0, 0), ci = c(0, 0)
+  )
+  dev.off()
+
+  post_line <- data.table::as.data.table(est$data.plot$`Group TRUE`$data.line)
+  post_line <- post_line[, .(x, bin, post_fit = fit)]
+  pre_line  <- data.table::as.data.table(est$data.plot$`Group FALSE`$data.line)
+  pre_line  <- pre_line[, .(x, bin, pre_fit = fit)]
+
+  post_se <- data.table::as.data.table(est$data.plot$`Group TRUE`$data.ci)
+  post_se <- post_se[, post_se := (ci.r - ci.l) / 2 / 1.96][, .(bin, post_se)]
+  pre_se  <- data.table::as.data.table(est$data.plot$`Group FALSE`$data.ci)
+  pre_se  <- pre_se[,  pre_se  := (ci.r - ci.l) / 2 / 1.96][, .(bin, pre_se)]
+
+  post_line <- merge(post_line, post_se, by = "bin")
+  pre_line  <- merge(pre_line,  pre_se,  by = "bin")
+  line      <- merge(pre_line, post_line, by = c("x", "bin"))
+
+  line[, `:=`(
+    tau = post_fit - pre_fit,
+    se  = sqrt(pre_se^2 + post_se^2)
+  )][, `:=`(
+    ci_lower = tau - 1.96 * se,
+    ci_upper = tau + 1.96 * se
+  )]
+
+  # Right-most bin is the implicit counterfactual baseline.
+  count_trend <- line[bin == max(bin) & !is.na(tau)][1, ]$tau
+  line[, `:=`(
+    tau      = tau      - count_trend,
+    ci_lower = ci_lower - count_trend,
+    ci_upper = ci_upper - count_trend
+  )]
+  line[bin == max(bin), `:=`(se = 0, ci_lower = 0, ci_upper = 0)]
+
+  line <- rbind(
+    line[, .(bin, x, tau, se, ci_lower, ci_upper)],
+    data.table::data.table(
+      bin = max(line$bin), x = max(line$x),
+      tau = NA_real_, se = 0, ci_lower = NA_real_, ci_upper = NA_real_
+    )
+  )
+  line <- line[, .SD[c(1, .N - 1, .N), ], by = bin]
+  line[]
+}
+```
+
+## 3. Step 1 --- Picturing the design
+
+Before any regression, it helps to see the design on paper. We scatter 2,000 random "homes" inside a 1.5 × 1.5 unit square, drop a treatment point at the center, and color homes by their ring membership.
+
+```{r}
+#| label: fig-01-ring-geometry
+#| fig-cap: "Toy ring geometry: 126 treated, 566 control, 1,308 dropped out of 2,000 random points."
+
+set.seed(2021)
+
+rectangle <- st_sf(
+  id = 1,
+  geometry = st_sfc(st_polygon(list(
+    rbind(c(0, 0), c(1.5, 0), c(1.5, 1.5), c(0, 1.5), c(0, 0))
+  )))
+)
+treat        <- st_sf(id = 1, geometry = st_sfc(st_point(c(0.75, 0.75))))
+treat_ring   <- st_buffer(treat, dist = 0.2)
+control_ring <- st_difference(st_buffer(treat, dist = 0.5), treat_ring)
+
+pts <- st_sf(id = 1:2000, geometry = st_sample(rectangle, 2000)) %>%
+  mutate(group = case_when(
+    st_within(., treat_ring,   sparse = FALSE) ~ "Treated (inner ring)",
+    st_within(., control_ring, sparse = FALSE) ~ "Control (outer ring)",
+    TRUE ~ "Not used"
+  ))
+
+print(table(pts$group))
+
+ggplot() +
+  geom_sf(data = rectangle,    fill = NA, color = GREY, linewidth = 0.4) +
+  geom_sf(data = control_ring, fill = ORANGE, alpha = 0.10,
+          color = ORANGE, linewidth = 0.6) +
+  geom_sf(data = treat_ring,   fill = BLUE,   alpha = 0.15,
+          color = BLUE,   linewidth = 0.6) +
+  geom_sf(data = pts, aes(color = group, shape = group),
+          size = 1.1, alpha = 0.85) +
+  geom_sf(data = treat, color = TEAL, size = 4, shape = 17) +
+  coord_sf(datum = NULL) +
+  scale_color_manual(values = c(
+    "Treated (inner ring)" = BLUE,
+    "Control (outer ring)" = ORANGE,
+    "Not used"             = GREY
+  )) +
+  scale_shape_manual(values = c(
+    "Treated (inner ring)" = 19,
+    "Control (outer ring)" = 17,
+    "Not used"             = 4
+  )) +
+  labs(
+    title    = "The ring approach: groups are defined by distance",
+    subtitle = "Treatment is a point in space; comparison is near vs. far",
+    color    = NULL, shape = NULL
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+Out of 2,000 random homes, only **126 (6.3 %)** fall inside the treated ring and **566 (28.3 %)** fall inside the outer control ring; the remaining **1,308 (65.4 %)** are too far away to enter the analysis. This 6 / 28 / 65 split is the price of the ring approach: identification rests on a small treated group, a moderate control group, and a large number of "irrelevant" observations whose only role here is to remind us that distance, not policy assignment, defines who is in and who is out.
+
+## 4. Step 2 --- A quick refresher: the 2 × 2 DiD in 4 cells
+
+Every ring DiD is built on the same 2 × 2 DiD logic. The estimand is the average treatment effect among the treated:
+
+$$\tau = E[\Delta Y \mid \text{treated}] - E[\Delta Y \mid \text{control}].$$
+
+In words: the average change in outcome for the treated group, minus the average change in outcome for the control group --- a *difference of differences*. There are two algebraically equivalent ways to estimate $\tau$:
+
+$$Y_{it} = \alpha_i + \gamma_t + \tau \cdot D_i \cdot P_t + \varepsilon_{it}.$$
+
+This two-way fixed-effects (TWFE) form says: each unit $i$ has its own price level $\alpha_i$, each period $t$ has its own trend $\gamma_t$, and $\tau$ captures the *extra* movement experienced by treated units in the post period. The TWFE coefficient on the interaction $D_i \cdot P_t$ is the same number you would get by regressing $\Delta Y$ on $D$ alone on a first-differenced panel.
+
+```{r}
+#| label: recap-2x2-panel
+
+set.seed(42)
+n_2x2       <- 500
+true_te_2x2 <- 0.30
+
+df_2x2 <- tibble(
+  id    = rep(1:n_2x2, each = 2),
+  t     = rep(c(0, 1), times = n_2x2),
+  treat = rep(rbinom(n_2x2, 1, 0.5), each = 2)
+) %>%
+  group_by(id) %>%
+  mutate(
+    alpha = rnorm(1, 0, 0.5),
+    eps   = rnorm(2, 0, 0.2),
+    trend = 0.10 * t,
+    y     = 1 + alpha + trend + true_te_2x2 * treat * t + eps
+  ) %>% ungroup()
+
+df_2x2_fd <- df_2x2 %>%
+  arrange(id, t) %>%
+  group_by(id) %>%
+  summarise(delta_y = y[t == 1] - y[t == 0],
+            treat   = first(treat), .groups = "drop")
+
+did_fd   <- feols(delta_y ~ treat, data = df_2x2_fd)
+df_2x2   <- df_2x2 %>% mutate(post_treat = treat * t)
+did_twfe <- feols(y ~ post_treat | id + t, data = df_2x2)
+
+tibble(
+  estimator = c("first_differences", "two_way_FE"),
+  estimate  = c(coef(did_fd)["treat"], coef(did_twfe)["post_treat"]),
+  se        = c(se(did_fd)["treat"],   se(did_twfe)["post_treat"]),
+  true_te   = true_te_2x2
+)
+```
+
+The two estimators return **numerically identical** point estimates (0.3097 to four decimals) and SEs (0.0258), both within one SE of the true 0.30. The equivalence is algebraic, not approximate, and it is the reason the ring DiD can be written as a one-line regression on first-differenced outcomes.
+
+## 5. Step 3 --- A simulated world where we know the right answer
+
+We build a 10,000-unit cross-section with each unit's distance uniform on $[0, 1.5]$ mi and a smooth treatment-effect curve that vanishes exactly at 0.75 mi:
+
+$$\tau(d) = 1.5 \cdot \exp(-2.3 \cdot d) \cdot \mathbf{1}\{d \le 0.75\}.$$
+
+The average true effect across the affected region $[0, 0.75]$ is **0.726** (its precise integral). That number is the benchmark every estimator below has to recover.
+
+```{r}
+#| label: data-dgp
+
+set.seed(20210708)
+n_sim <- 10000
+
+df_sim <- tibble(id = 1:n_sim) %>%
+  mutate(
+    dist    = runif(n(), 0, 1.5),
+    te      = 1.5 * exp(-2.3 * dist) * (dist <= 0.75),
+    counter = 0,
+    eps     = rnorm(n(), 0, 0.05),
+    delta_y = te + counter + eps
+  )
+
+cat("Average true TE among d <= 0.75 mi:",
+    round(mean(df_sim$te[df_sim$dist <= 0.75]), 3), "\n")
+```
+
+```{r}
+#| label: fig-02-dgp-curve
+#| fig-cap: "True treatment-effect curve τ(d) = 1.5 · exp(−2.3 d), zero past 0.75 mile; mean over the affected region equals 0.726."
+
+df_truth <- df_sim %>%
+  select(dist, `Treatment Effect` = te,
+         `Counterfactual Trend` = counter) %>%
+  pivot_longer(-dist) %>%
+  bind_rows(tibble(dist = 0.75,
+                   name = "Treatment Effect",
+                   value = NA_real_)) %>%
+  arrange(name, dist)
+
+ggplot(df_truth, aes(x = dist, y = value, color = name)) +
+  geom_line(linewidth = 1.5) +
+  scale_color_manual(values = c(
+    "Counterfactual Trend" = GREY,
+    "Treatment Effect"     = ORANGE
+  )) +
+  labs(
+    title    = "The data-generating process we will try to recover",
+    subtitle = "Treatment effect decays smoothly with distance; vanishes at 0.75 mi",
+    x = "Distance from treatment", y = "Change in outcome", color = NULL
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+## 6. Step 4 --- Parametric ring estimator on simulated data
+
+Given a *correct* inner-ring choice --- inner $= (0, 0.75]$, outer $= (0.75, 1.5]$ --- the parametric estimator should average the true $\tau(d)$ across the inner ring and return 0.726.
+
+```{r}
+#| label: fit-parametric-sim
+
+line_correct <- parametric_ring_panel(
+  y     = df_sim$delta_y,
+  dist  = df_sim$dist,
+  rings = c(0, 0.75, 1.5)
+)
+
+cat("tau_hat =", round(line_correct$tau[1], 3),
+    " SE =",   round(line_correct$se[1], 3),
+    " truth =", round(mean(df_sim$te[df_sim$dist <= 0.75]), 3), "\n")
+```
+
+```{r}
+#| label: fig-03-parametric-sim
+#| fig-cap: "Parametric ring DiD at the correct cutoff recovers the truth: τ̂ = 0.726, 95% CI [0.716, 0.736]."
+
+parametric_sim_estimate <- line_correct$tau[1]
+
+ggplot() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = GREY) +
+  geom_ribbon(data = line_correct,
+              aes(x = x, ymin = ci_lower, ymax = ci_upper),
+              fill = BLUE, alpha = 0.25) +
+  geom_line(data = line_correct,
+            aes(x = x, y = tau), color = BLUE, linewidth = 1.2) +
+  geom_line(data = df_truth %>% filter(name == "Treatment Effect"),
+            aes(x = dist, y = value), color = ORANGE,
+            linewidth = 1.0, linetype = "longdash") +
+  annotate("text", x = 0.55, y = 1.0, label = "true TE",
+           color = ORANGE, hjust = 0) +
+  annotate("text", x = 0.40, y = parametric_sim_estimate + 0.05,
+           label = "estimated tau (constant within ring)",
+           color = BLUE, hjust = 0) +
+  labs(
+    title    = "Parametric ring DiD recovers a single number",
+    subtitle = "Inner ring (0, 0.75] gets one tau; outer ring anchors the counterfactual",
+    x = "Distance from treatment", y = "Estimated TE"
+  ) +
+  theme_minimal()
+```
+
+Given the correct ring choice, the parametric estimator recovers the true average treatment effect to **three decimal places**: $\hat{\tau} = 0.726$, $\mathrm{SE} = 0.005$. The catch is that we know 0.75 only because we wrote the DGP ourselves. In a real application, $d_t$ is the very thing we are trying to learn.
+
+## 7. Step 5 --- Why ring choice is part of the question
+
+Hold the data, the seed, and the regression fixed, and re-run the same parametric estimator with three different inner-ring cutoffs: $\bar{d} = 0.30$ (too narrow), $\bar{d} = 0.75$ (correct), and $\bar{d} = 1.20$ (too wide).
+
+```{r}
+#| label: fit-ringchoice-sim
+
+ring_choices <- list(
+  "Correct: (0, 0.75]"    = c(0, 0.75, 1.5),
+  "Too narrow: (0, 0.30]" = c(0, 0.30, 1.5),
+  "Too wide:   (0, 1.20]" = c(0, 1.20, 1.5)
+)
+
+ringchoice_summary <- imap_dfr(ring_choices, function(rings, label) {
+  est_line <- parametric_ring_panel(df_sim$delta_y, df_sim$dist, rings)
+  tibble(
+    choice   = label,
+    tau_hat  = est_line$tau[1],
+    se       = est_line$se[1],
+    ci_lower = est_line$ci_lower[1],
+    ci_upper = est_line$ci_upper[1]
+  )
+})
+
+ringchoice_summary
+```
+
+```{r}
+#| label: fig-04-ringchoice-sim
+#| fig-cap: "Same data, three ring choices: 0.913 (too narrow), 0.726 (correct), 0.456 (too wide). All three 95% CIs exclude the truth in the bad cases."
+
+ring_panels <- imap(ring_choices, function(rings, label) {
+  est_line <- parametric_ring_panel(df_sim$delta_y, df_sim$dist, rings)
+  tau_hat  <- est_line$tau[1]
+  ggplot() +
+    geom_hline(yintercept = 0, linetype = "dashed", color = GREY) +
+    geom_ribbon(data = est_line,
+                aes(x = x, ymin = ci_lower, ymax = ci_upper),
+                fill = BLUE, alpha = 0.25) +
+    geom_line(data = est_line,
+              aes(x = x, y = tau), color = BLUE, linewidth = 1.2) +
+    geom_line(data = df_truth %>% filter(name == "Treatment Effect"),
+              aes(x = dist, y = value), color = ORANGE,
+              linewidth = 0.9, linetype = "longdash") +
+    coord_cartesian(xlim = c(0, 1.5), ylim = c(-0.1, 1.7)) +
+    labs(
+      title    = label,
+      subtitle = paste0("tau_hat = ", sprintf("%.3f", tau_hat)),
+      x = "Distance from treatment", y = "Estimated TE"
+    ) +
+    theme_minimal()
+})
+
+wrap_plots(ring_panels, nrow = 1) +
+  plot_annotation(
+    title    = "The headline number wobbles with the ring choice",
+    subtitle = "Same data, three ring boundaries -- three different answers"
+  )
+```
+
+Same data, three answers. With a too-narrow inner ring the estimator returns **0.913** --- a **+25.7 %** upward bias. With a too-wide inner ring the estimator returns **0.456** --- a **−37.1 %** attenuation. Neither number is sampling noise: both 95 % CIs strictly exclude the truth (0.726). **Ring choice is part of the estimand**, not just a precision lever.
+
+## 8. Step 6 --- Letting the data choose: the nonparametric estimator
+
+Where the parametric estimator gives one number, Butts's nonparametric estimator gives a whole step function. We hand `binsreg` the first-differenced outcome and distance, and let the algorithm decide how to partition the support.
+
+```{r}
+#| label: fit-nonparametric-sim
+
+set.seed(123)
+df_sim_cs <- bind_rows(
+  df_sim %>% mutate(post = FALSE,
+                    y_obs = 1 + counter + rnorm(n(), 0, 0.05)),
+  df_sim %>% mutate(post = TRUE,
+                    y_obs = 1 + counter + te + rnorm(n(), 0, 0.05))
+)
+
+line_np_sim <- nonparametric_ring_cs(
+  y    = df_sim_cs$y_obs,
+  dist = df_sim_cs$dist,
+  post = df_sim_cs$post
+)
+
+cat("Number of distance bins:",
+    length(unique(line_np_sim$bin)), "\n")
+cat("TE estimate in left-most bin:",
+    round(line_np_sim$tau[1], 3), "\n")
+```
+
+```{r}
+#| label: fig-05-nonparametric-sim
+#| fig-cap: "The nonparametric estimator recovers the whole TE curve from data alone --- 53 quantile-spaced bins, no cutoff committed up front; left-most bin τ̂ = 1.461 vs truth 1.5."
+
+ggplot() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = GREY) +
+  geom_ribbon(data = line_np_sim,
+              aes(x = x, ymin = ci_lower, ymax = ci_upper),
+              fill = TEAL, alpha = 0.25) +
+  geom_line(data = line_np_sim,
+            aes(x = x, y = tau), color = TEAL, linewidth = 1.2) +
+  geom_line(data = df_truth %>% filter(name == "Treatment Effect"),
+            aes(x = dist, y = value), color = ORANGE,
+            linewidth = 1.0, linetype = "longdash") +
+  annotate("text", x = 0.55, y = 1.05, label = "true TE",
+           color = ORANGE, hjust = 0) +
+  annotate("text", x = 0.55, y = -0.25,
+           label = "estimated TE curve (data-driven binning)",
+           color = TEAL, hjust = 0) +
+  labs(
+    title    = "Nonparametric ring DiD recovers the WHOLE curve",
+    subtitle = "Step function: one estimate per data-driven bin",
+    x = "Distance from treatment", y = "Estimated TE"
+  ) +
+  theme_minimal()
+```
+
+On the simulated DGP with $n = 10{,}000$ units, `binsreg` chooses **53 quantile-spaced bins**. The left-most bin (about $[0, 0.025]$ mi) returns $\hat{\tau} = 1.461$ --- within one SE of the truth at $d = 0$, which is 1.5. The step function recovers the *shape* of the TE curve, not just its average.
+
+## 9. Step 7 --- Linden and Rockoff: a real neighborhood, a real arrival
+
+We now leave the safe world of simulation and walk the same estimators onto Linden and Rockoff's data: 170,239 home transactions in North Carolina, geocoded relative to the eventual addresses of registered sex offenders.
+
+```{r}
+#| label: data-lr
+
+DATA_URL <- paste0(
+  "https://raw.githubusercontent.com/cmg777/starter-academic-v501/",
+  "master/content/post/r_did_ring/linden_rockoff.dta"
+)
+LOCAL_DATA <- "linden_rockoff.dta"
+
+raw <- tryCatch(
+  haven::read_dta(DATA_URL),
+  error = function(e) {
+    message("URL load failed; falling back to local file: ", LOCAL_DATA)
+    haven::read_dta(LOCAL_DATA)
+  }
+)
+
+df <- raw %>%
+  filter(offender == 1) %>%
+  mutate(
+    distance     = distance / 3,
+    dist_post    = distance * 10 * close_post_move,
+    post         = ifelse(post_move == 1, "Post", "Pre"),
+    srn_year     = paste(srn, sale_year, sep = "-"),
+    offdays      = as.numeric(sale_date - offender_address_date)
+  )
+
+cells <- df %>%
+  mutate(
+    ring   = ifelse(distance <= 0.1, "Inner (<=0.1 mi)",
+                                     "Outer (0.1-0.3 mi)"),
+    period = ifelse(post_move == 1, "Post-arrival", "Pre-arrival")
+  ) %>%
+  count(ring, period) %>%
+  pivot_wider(names_from = period, values_from = n, values_fill = 0)
+
+cat("Analysis sample (offender == 1):", nrow(df), "\n")
+cat("Mean log price:", round(mean(df$log_price, na.rm = TRUE), 3), "\n")
+cells
+```
+
+```{r}
+#| label: fig-06-lr-gradient
+#| fig-cap: "Linden-Rockoff raw price gradient: a $20–25K gap inside 0.1 mile, closing monotonically with distance."
+
+window  <- df %>% filter(abs(offdays) <= 365)
+bw_main <- 0.075
+
+pre_curve  <- with(window %>% filter(offdays <  0),
+                   KernSmooth::locpoly(distance, amt_Price, bandwidth = bw_main))
+post_curve <- with(window %>% filter(offdays >= 0),
+                   KernSmooth::locpoly(distance, amt_Price, bandwidth = bw_main))
+
+gradient_df <- bind_rows(
+  tibble(x = pre_curve$x,  y = pre_curve$y,  period = "Pre-arrival sales"),
+  tibble(x = post_curve$x, y = post_curve$y, period = "Post-arrival sales")
+) %>% filter(x <= 0.5)
+
+ggplot(gradient_df, aes(x = x, y = y / 1000,
+                        color = period, linetype = period)) +
+  geom_vline(xintercept = 0.1, linetype = "dotted", color = TEAL) +
+  geom_line(linewidth = 1.3) +
+  scale_color_manual(values = c(
+    "Pre-arrival sales"  = BLUE,
+    "Post-arrival sales" = ORANGE
+  )) +
+  scale_linetype_manual(values = c(
+    "Pre-arrival sales"  = "solid",
+    "Post-arrival sales" = "longdash"
+  )) +
+  scale_y_continuous(
+    breaks = seq(120, 160, by = 10),
+    labels = function(z) paste0("$", z, "K")
+  ) +
+  coord_cartesian(ylim = c(120, 160)) +
+  annotate("text", x = 0.105, y = 158,
+           label = "treated ring boundary (0.1 mi)",
+           color = TEAL, hjust = 0) +
+  labs(
+    title    = "Home prices dip near the offender AFTER the arrival",
+    subtitle = "Local-polynomial smoother (Epanechnikov, bw = 0.075)",
+    x = "Distance from offender (miles)",
+    y = "Average sale price (thousands)",
+    color = NULL, linetype = NULL
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+The pre-arrival kernel-smoothed average home price stays near **\$145–\$150K** out to the treated-ring boundary. The post-arrival smoother dips to roughly **\$122K at $d \approx 0.01$ mi** and climbs back to about **\$140K by 0.1 mile**, a visible gap of **\$20–25K** at the offender's address that closes monotonically with distance.
+
+## 10. Step 8 --- Bandwidth fragility on the real data
+
+```{r}
+#| label: fig-07-lr-bandwidth
+#| fig-cap: "Same data, three smoothing bandwidths --- implied treated radius shifts from ~0.10 mi (bw 0.025) to ~0.20 mi (bw 0.125)."
+
+plot_bw <- function(bw) {
+  pre_smooth  <- with(window %>% filter(offdays <  0),
+                      lpridge::lpepa(distance, amt_Price, bandwidth = bw))
+  post_smooth <- with(window %>% filter(offdays >= 0),
+                      lpridge::lpepa(distance, amt_Price, bandwidth = bw))
+  df_smooth <- bind_rows(
+    tibble(x = pre_smooth$x.out,  y = pre_smooth$est,  period = "Pre"),
+    tibble(x = post_smooth$x.out, y = post_smooth$est, period = "Post")
+  ) %>% filter(x <= 0.5)
+
+  ggplot(df_smooth, aes(x = x, y = y / 1000,
+                        color = period, linetype = period)) +
+    geom_vline(xintercept = 0.1, linetype = "dotted", color = TEAL) +
+    geom_line(linewidth = 1.2) +
+    scale_color_manual(values = c("Pre" = BLUE, "Post" = ORANGE)) +
+    scale_linetype_manual(values = c("Pre" = "solid",
+                                     "Post" = "longdash")) +
+    scale_y_continuous(
+      breaks = seq(120, 160, by = 10),
+      labels = function(z) paste0("$", z, "K")
+    ) +
+    coord_cartesian(ylim = c(120, 160)) +
+    labs(title = paste0("Bandwidth = ", bw),
+         x = "Distance (miles)", y = NULL,
+         color = NULL, linetype = NULL) +
+    theme_minimal()
+}
+
+strip_y <- theme(axis.text.y = element_blank(),
+                 axis.ticks.y = element_blank(),
+                 axis.title.y = element_blank())
+
+(plot_bw(0.025) + labs(y = "Average price ($K)")) +
+  (plot_bw(0.075) + strip_y) +
+  (plot_bw(0.125) + strip_y) +
+  plot_layout(guides = "collect") +
+  plot_annotation(
+    title    = "What you SEE depends on how much you smooth",
+    subtitle = "Same data, three bandwidths -- the implied treated radius shifts"
+  ) &
+  theme(legend.position = "bottom")
+```
+
+Same data, three smoothers, three different visual answers about *how far* the treatment effect extends. This is the bandwidth-version of the ring-choice fragility lesson, now staring at us in real-world data.
+
+## 11. Step 9 --- Parametric ring DiD on Linden-Rockoff (and the ring-choice wobble)
+
+```{r}
+#| label: fit-lr-parametric
+
+did_lr <- feols(
+  log_price ~ close_offender + post_move + close_post_move | srn_year,
+  data    = df,
+  cluster = "neighborhood"
+)
+
+coef_lr <- coef(did_lr)[["close_post_move"]]
+se_lr   <- se(did_lr)[["close_post_move"]]
+
+cat("close_post_move coefficient:", round(coef_lr, 4),
+    " SE =", round(se_lr, 4), "\n")
+cat("Interpreted as percent change:",
+    round((exp(coef_lr) - 1) * 100, 2), "%\n")
+```
+
+```{r}
+#| label: fig-08-lr-parametric
+#| fig-cap: "Parametric ring DiD on Linden-Rockoff at the canonical 0.1 mi: ATT = −5.78 %, 95% CI [−10.4%, −1.5%], n = 9,029."
+
+step_lr <- tibble(
+  x        = c(0, 0.1, 0.1, 0.1, 0.3),
+  diff     = c(coef_lr, coef_lr, NA, 0, 0),
+  ci_lower = c(coef_lr - 1.96 * se_lr, coef_lr - 1.96 * se_lr, NA, 0, 0),
+  ci_upper = c(coef_lr + 1.96 * se_lr, coef_lr + 1.96 * se_lr, NA, 0, 0)
+)
+
+ggplot(step_lr) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = GREY) +
+  geom_ribbon(aes(x = x, ymin = ci_lower, ymax = ci_upper),
+              fill = BLUE, alpha = 0.25) +
+  geom_line(aes(x = x, y = diff), color = BLUE, linewidth = 1.3) +
+  geom_vline(xintercept = 0.1, linetype = "dotted", color = TEAL) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    title    = "Parametric ring DiD: one number for the whole inner ring",
+    subtitle = paste0("tau_hat = ", sprintf("%.3f", coef_lr),
+                      " (", sprintf("%.1f%%", (exp(coef_lr) - 1) * 100),
+                      ")   SE = ", sprintf("%.3f", se_lr)),
+    x = "Distance from offender (miles)",
+    y = "Change in log(price) (relative to outer ring)"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+#| label: fit-lr-ringchoice
+
+run_one_ring <- function(cut_inner) {
+  df_v <- df %>%
+    mutate(
+      close_offender_v  = as.numeric(distance <= cut_inner),
+      close_post_move_v = close_offender_v * post_move
+    )
+  est <- feols(
+    log_price ~ close_offender_v + post_move + close_post_move_v | srn_year,
+    data    = df_v %>% filter(distance <= 0.3),
+    cluster = "neighborhood"
+  )
+  coef_v <- coef(est)[["close_post_move_v"]]
+  se_v   <- se(est)[["close_post_move_v"]]
+  tibble(
+    cut_inner = cut_inner,
+    att_log   = coef_v,
+    att_pct   = (exp(coef_v) - 1) * 100,
+    se        = se_v,
+    ci_lower  = coef_v - 1.96 * se_v,
+    ci_upper  = coef_v + 1.96 * se_v,
+    n         = nobs(est)
+  )
+}
+
+ringchoice_lr <- map_dfr(c(0.05, 0.10, 0.15), run_one_ring)
+ringchoice_lr
+```
+
+```{r}
+#| label: fig-09-lr-ringchoice
+#| fig-cap: "Three inner-ring cutoffs on the same data: ATT moves from −6.40% (0.05 mi) to −4.21% (0.15 mi) --- a 52% relative spread driven entirely by the cutoff choice."
+
+plot_one_ring <- function(row) {
+  step <- tibble(
+    x        = c(0, row$cut_inner, row$cut_inner, row$cut_inner, 0.3),
+    diff     = c(row$att_log, row$att_log, NA, 0, 0),
+    ci_lower = c(row$ci_lower, row$ci_lower, NA, 0, 0),
+    ci_upper = c(row$ci_upper, row$ci_upper, NA, 0, 0)
+  )
+  ggplot(step) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = GREY) +
+    geom_ribbon(aes(x = x, ymin = ci_lower, ymax = ci_upper),
+                fill = BLUE, alpha = 0.25) +
+    geom_line(aes(x = x, y = diff), color = BLUE, linewidth = 1.3) +
+    geom_vline(xintercept = row$cut_inner, linetype = "dotted",
+               color = TEAL) +
+    coord_cartesian(xlim = c(0, 0.3), ylim = c(-0.30, 0.10)) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    labs(
+      title    = paste0("Inner ring = (0, ", row$cut_inner, "]"),
+      subtitle = paste0("tau = ", sprintf("%.3f", row$att_log),
+                        "  (", sprintf("%.1f%%", row$att_pct), ")",
+                        "  SE = ", sprintf("%.3f", row$se)),
+      x = "Distance from offender (miles)", y = NULL
+    ) +
+    theme_minimal()
+}
+
+rings_plots <- map(seq_len(nrow(ringchoice_lr)),
+                   ~ plot_one_ring(ringchoice_lr[.x, ]))
+rings_plots[[1]] <- rings_plots[[1]] + labs(y = "Change in log(price)")
+rings_plots[[2]] <- rings_plots[[2]] + strip_y
+rings_plots[[3]] <- rings_plots[[3]] + strip_y
+
+wrap_plots(rings_plots, nrow = 1) +
+  plot_annotation(
+    title    = "Same data, three ring choices --- three different answers",
+    subtitle = "Real Linden-Rockoff sample; outer ring fixed at 0.30 mi"
+  )
+```
+
+The headline number wobbles from **−4.21 %** (cutoff 0.15) to **−6.40 %** (cutoff 0.05) --- a relative spread of about **52 %** of the central estimate. The sign is stable across choices; the magnitude is not. As Butts (2023, p. 5) puts it: *"the choice of 0.1 miles is an untestable assumption."*
+
+## 12. Step 10 --- The nonparametric estimator on Linden-Rockoff
+
+```{r}
+#| label: fit-lr-nonparametric
+
+df_short <- df %>% filter(distance <= 0.3)
+
+line_np_lr <- nonparametric_ring_cs(
+  y    = df_short$log_price,
+  dist = df_short$distance,
+  post = (df_short$post_move == 1)
+)
+
+bin_summary <- as_tibble(line_np_lr) %>%
+  filter(!is.na(tau)) %>%
+  group_by(bin) %>%
+  summarise(
+    x_left  = min(x),
+    x_right = max(x),
+    tau     = first(tau),
+    .groups = "drop"
+  ) %>% arrange(x_left)
+
+inner_np <- df_short %>%
+  filter(distance <= 0.1) %>%
+  mutate(bin_idx = findInterval(distance, bin_summary$x_left,
+                                all.inside = TRUE)) %>%
+  left_join(bin_summary %>% mutate(bin_idx = row_number()) %>%
+              select(bin_idx, tau_bin = tau),
+            by = "bin_idx") %>%
+  summarise(att_log = mean(tau_bin, na.rm = TRUE)) %>%
+  pull(att_log)
+
+cat("Number of distance bins:",
+    length(unique(line_np_lr$bin)), "\n")
+cat("Estimated TE averaged inside d <= 0.1 mi:",
+    round(inner_np, 3),
+    " (", round((exp(inner_np) - 1) * 100, 1), "%)\n", sep = "")
+```
+
+```{r}
+#| label: fig-10-lr-nonparametric
+#| fig-cap: "Nonparametric ring DiD on Linden-Rockoff: 23 bins, two closest bins at −20.6% and −15.2%; curve crosses zero at d ≈ 0.094 mi."
+
+ggplot() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = GREY) +
+  geom_ribbon(data = line_np_lr,
+              aes(x = x, ymin = ci_lower, ymax = ci_upper),
+              fill = TEAL, alpha = 0.25) +
+  geom_line(data = line_np_lr,
+            aes(x = x, y = tau), color = TEAL, linewidth = 1.3) +
+  geom_vline(xintercept = 0.1, linetype = "dotted", color = ORANGE) +
+  annotate("text", x = 0.105, y = 0.25,
+           label = "default treated-ring boundary",
+           color = ORANGE, hjust = 0) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  coord_cartesian(ylim = c(-0.35, 0.30)) +
+  labs(
+    title    = "Nonparametric ring DiD recovers a whole curve",
+    subtitle = paste0("Step function across data-driven bins. ",
+                      "Avg TE inside 0.1 mi = ",
+                      sprintf("%.1f%%", (exp(inner_np) - 1) * 100)),
+    x = "Distance from offender (miles)",
+    y = "Change in log(price)"
+  ) +
+  theme_minimal()
+```
+
+`binsreg` partitions the Linden-Rockoff inner sample into **23 quantile-spaced bins**. The two closest bins --- homes within roughly the first **300 feet** of the offender's address --- show steep price declines: bin 1 at **−20.6 %** and bin 2 at **−15.2 %**. Averaged across observations inside 0.1 mile (sample-weighted), the nonparametric ATT is about **−12.4 %** --- roughly **2.1×** the parametric estimate of −5.78 % at the same boundary. The curve crosses zero between bins 3 and 4 (at $d \approx 0.094$ mi), strikingly close to Linden and Rockoff's eyeballed cutoff.
+
+Butts (2023, p. 6) describes this exact pattern: *"homes in the two closest rings i.e. within a few hundred feet, are most affected by sex-offender arrival with an estimated decline of home value of around 20 %."* Our **−20.6 %** lands on his claim almost exactly. He also notes: *"After 0.1 miles, the estimated treatment effect curve becomes centered at zero consistently."* That is exactly what the figure above shows.
+
+## 13. Discussion
+
+So: *what happens to home prices when a registered sex offender moves into a neighborhood, and how do we know we measured it right?* The substantive answer is that **homes within a few hundred feet of the offender's eventual address drop by about 20 %** after arrival, and **the effect fades to noise beyond roughly 0.1 mile**. A reader who is told only the parametric ring DiD gets a correct but *attenuated* picture (−5.78 %); a reader who is told only the leftmost nonparametric bin gets a correct but *localized* picture (−20.6 %). Both numbers belong in the conversation.
+
+The methodological lesson is that **the parametric ring estimator's headline number is conditional on the ring choice**. The nonparametric estimator avoids the choice by letting `binsreg` partition the data, and it has the further advantage of revealing the *shape* of the treatment-effect curve. Two identification caveats: the design rests on **local parallel trends** (untestable in cross-section), and **no anticipation** (also untestable). Both are present in Butts (2023) and Linden-Rockoff (2008).
+
+## 14. Source files
+
+- Companion script: [`analysis.R`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_did_ring/analysis.R)
+- Published post: <https://carlos-mendez.org/post/r_did_ring/>
+- GitHub repo: <https://github.com/cmg777/starter-academic-v501>
