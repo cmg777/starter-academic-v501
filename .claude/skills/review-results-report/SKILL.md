@@ -65,12 +65,27 @@ interpretation quality. Produces an inline review report with a verdict.
    this limitation prominently in the verdict.
 
 5. **Read reference files** (in parallel):
-   - `references/review-checklist.md` -- six review dimensions with checklists
+   - `references/review-checklist.md` -- seven review dimensions with checklists
+     (dimension 7 covers the new gates from `write-results-report` v2)
    - `references/scoring-and-criteria.md` -- severity definitions, verdict
-     criteria, and reviewer guidelines
+     criteria, and reviewer guidelines (includes the new-gates failure tiers)
 
-6. **List PNG files** in the post directory to compare against the figure
-   inventory in the report.
+6. **List PNG files AND CSV files** in the post directory. PNGs feed
+   dimension 4 (figure descriptions) and dimension 7 (inline embeds). The
+   CSV inventory feeds dimension 7 (parallel CSV tables + CSV pull-through
+   spot-checks).
+
+7. **Check for a source paper.** Look for `references/latex/`, `*.tex`, or
+   `*.pdf` files in the post folder. If a source paper exists, dimension 7
+   requires the report to include a Reproduction Audit appendix; if not,
+   the appendix is "not applicable" and not flagged.
+
+8. **Read the write-results-report exemplars** (in parallel) to calibrate
+   your sense of the new quality bar:
+   - `content/post/r_did_ring/results_report.md` (332 lines, the newer
+     exemplar)
+   - `content/post/r_did2/results_report.md` (455 lines, the longer
+     exemplar)
 
 ---
 
@@ -134,11 +149,14 @@ the actual script output.
    - Every entry in the table must correspond to an actual file
    - Flag orphaned PNGs or phantom entries
 
-3. **Minimum key findings.** Count the key findings. Must be at least 5.
-   Each must include specific numbers.
+3. **Minimum key findings.** Count the key findings. Must be at least **8**
+   (raised from 5 in `write-results-report` v2). Each must include specific
+   numbers. A report with 5–7 findings is a MEDIUM dimension-2 issue, not
+   a fail; below 5 is HIGH.
 
-4. **Surprises and Caveats section.** Must be present, even if it states
-   "No unexpected results."
+4. **Surprises and Caveats section.** Must be present and walk every category
+   from `interpretation-guide.md` § Surprises checklist (see dimension 7).
+   "No unexpected results" alone is no longer sufficient.
 
 5. **Method Results coverage.** One subsection per major analysis step
    in the script. Flag any step that produced output but has no
@@ -148,7 +166,7 @@ the actual script output.
 
 ## Step 3 -- Dimension 3: Interpretation quality
 
-Evaluate each interpretation paragraph against six criteria:
+Evaluate each interpretation paragraph against seven criteria:
 
 1. **Quotes specific numbers** -- not vague ("the result was significant")
 2. **Explains in plain language** -- accessible to a non-specialist
@@ -156,11 +174,15 @@ Evaluate each interpretation paragraph against six criteria:
 4. **Connects to the research question** -- advances understanding
 5. **Is a single continuous paragraph** -- 2-4 sentences, no bullet points
 6. **Flags uncertainty** -- confidence intervals, caveats, limitations
+7. **Anchors to a domain quantity** -- dollars, percent, count of observations,
+   deaths per 100k. Log-coefficients and hazard ratios MUST be translated.
 
-### Minimum counts
+### Minimum counts (raised in write-results-report v2)
 
-- At least **5 interpretation paragraphs** across all sections
-- Each interpretation must meet at least 4 of 6 criteria to pass
+- At least **10 interpretation paragraphs** across all sections (raised
+  from 5). A report with 5–9 interpretations is a MEDIUM dimension-3 issue;
+  below 5 is HIGH.
+- Each interpretation must meet at least **5 of 7** criteria to pass.
 
 ### Common interpretation weaknesses to flag
 
@@ -226,6 +248,50 @@ Flag findings that are:
 
 ---
 
+## Step 6.5 -- Dimension 7: New-gates compliance (write-results-report v2)
+
+The `write-results-report` skill was updated to enforce five additional
+quality gates. Every report should clear all five. For each, record PASS,
+PARTIAL, or FAIL with a one-line justification in the review report.
+
+1. **Inline figure embeds per method subsection.** Every method subsection
+   should open with `![alt](file.png)` for its figure AND every PNG should
+   also appear in the Figure Inventory table. Verify by counting `^!\[`
+   occurrences vs the inventory rows.
+
+2. **Per-section inline tables.** Method subsections whose result is
+   structured (regression output, sensitivity table, step function) should
+   include a markdown table alongside the raw output block, sourced from
+   the corresponding CSV. Target: ≥ 1 per structured section, ≥ 4 across the
+   report.
+
+3. **≥ 8 Key Findings.** Hard count; below 8 is at least PARTIAL.
+
+4. **Reproduction Audit appendix (conditional).** If the post folder
+   contains a source paper (`references/latex/`, `*.tex`, or `*.pdf`), the
+   report must include an `Appendix — Reproduction Audit` section with at
+   least one row per reproduced claim, each row citing a specific line
+   number / section / figure label in the paper. If no source paper exists,
+   this gate is "not applicable" — not a fail.
+
+5. **Surprises walks 7 categories explicitly.** The Surprises and Caveats
+   section must walk each of the 7 categories from
+   `interpretation-guide.md` (estimator non-determinism; sample reductions;
+   weighting / aggregation; effect concentration; cosmetic warnings;
+   identification assumptions; pedagogical framing). For each, the report
+   either writes a substantive bullet OR explicitly states "not applicable".
+   Implicit coverage (a category is addressed but not labeled) is PARTIAL.
+
+### Severity mapping for dimension 7
+
+- ≥ 3 sub-bullets FAIL → MAJOR REVISION recommendation regardless of
+  dimensions 1–6.
+- 1–2 sub-bullets FAIL → MINOR REVISION recommendation.
+- All PASS or only PARTIAL → no escalation; flag individual PARTIALs as LOW
+  items in the Issues table.
+
+---
+
 ## Step 7 -- Produce and save review report
 
 Deliver the review inline using the format from `references/review-checklist.md`,
@@ -262,6 +328,16 @@ how many matched, and list any mismatches with the correct values.>
 | # | Dimension | Severity | Location | Issue | Suggested fix |
 |---|-----------|----------|----------|-------|---------------|
 
+## New-gates compliance (dimension 7)
+
+| # | Gate | Status | Notes |
+|---|------|--------|-------|
+| 1 | Inline figure embeds per method subsection | PASS / PARTIAL / FAIL | <one-line justification> |
+| 2 | Per-section inline tables (≥ 4) | PASS / PARTIAL / FAIL | <...> |
+| 3 | ≥ 8 Key Findings | PASS / PARTIAL / FAIL | <...> |
+| 4 | Reproduction Audit appendix (when source paper exists) | PASS / PARTIAL / FAIL / N/A | <...> |
+| 5 | Surprises walks 7 categories explicitly | PASS / PARTIAL / FAIL | <...> |
+
 ## Positive Highlights
 - <what the report does well -- be specific>
 
@@ -275,9 +351,9 @@ how many matched, and list any mismatches with the correct values.>
 
 | Verdict | Criteria |
 | --- | --- |
-| **ACCEPT** | No HIGH issues, at most 2 MEDIUM issues. Report accurately captures script results with good interpretations. |
-| **MINOR REVISION** | No HIGH issues but 3+ MEDIUM, or 1 HIGH that is easy to fix. Needs targeted improvements. |
-| **MAJOR REVISION** | 2+ HIGH issues, or fundamental accuracy problems. Report cannot be trusted as a source for the blog post. |
+| **ACCEPT** | No HIGH issues, at most 2 MEDIUM issues, and dimension-7 gates show no FAILs (PARTIALs become LOW items). Report accurately captures script results with good interpretations and clears the new-gates bar. |
+| **MINOR REVISION** | No HIGH issues but 3+ MEDIUM, or 1 HIGH that is easy to fix, OR 1–2 dimension-7 sub-bullets FAIL. Needs targeted improvements. |
+| **MAJOR REVISION** | 2+ HIGH issues, OR ≥ 3 dimension-7 sub-bullets FAIL, OR fundamental accuracy problems. Report cannot be trusted as a source for the blog post. |
 
 ### Save the review
 
