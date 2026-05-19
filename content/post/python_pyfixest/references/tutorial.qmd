@@ -21,19 +21,20 @@ execute:
 ---
 
 ::: {.callout-important}
-## First-time setup (run once per machine)
+## How to render this tutorial
 
-**Before clicking Render**, open a terminal *in this folder* and run:
+**Easiest (one click).** From the [tutorial bundle](https://carlos-mendez.org/uploads/python_pyfixest_tutorial.zip), double-click `render.command` (macOS) or `render.bat` (Windows). The wrapper runs setup and then `quarto render`, opening the result in your browser.
+
+**Manual.** From a terminal in the bundle folder:
 
 ```bash
-python3 setup_env.py
+python3 setup_env.py            # one-time: builds .venv/, registers kernel
+quarto render tutorial.qmd      # or click "Render" in Positron
 ```
 
-This creates a hermetic `.venv/` next to this notebook, pip-installs pinned packages (`numpy`, `pandas`, `matplotlib`, `pyfixest`, `numba`, `llvmlite`, `jupyter`, `ipykernel`), and registers a Jupyter kernel named `pyfixest-tutorial`. First run takes ~2 minutes; the script is idempotent — re-running it later is a fast no-op.
+`setup_env.py` is idempotent — re-running it later is a fast no-op. Subsequent renders are instant.
 
-After it finishes, open this folder in Positron and click **Render**. Subsequent renders are instant.
-
-**Prerequisites:** Python 3.10+ and a working `quarto` install.
+**Prerequisites:** Python 3.10–3.13 and a working `quarto` install.
 
 **Windows note:** if `python3` is not on PATH, use `python setup_env.py` instead.
 :::

@@ -4,6 +4,7 @@ A self-contained Quarto tutorial on high-dimensional fixed-effects regression in
 
 ## What's inside
 
+- `render.command` / `render.bat` — one-click wrapper (macOS / Windows). Runs setup and Quarto in order.
 - `tutorial.qmd` — the executable Quarto notebook.
 - `setup_env.py` — bootstraps a local `.venv/` with pinned packages on first render.
 - `_quarto.yml` — wires `setup_env.py` to Quarto's pre-render hook.
@@ -18,6 +19,15 @@ A self-contained Quarto tutorial on high-dimensional fixed-effects regression in
 
 ## How to use
 
+### One-click (recommended)
+
+1. Extract this ZIP anywhere on your machine.
+2. **macOS:** double-click `render.command` in Finder. **Windows:** double-click `render.bat` in Explorer.
+
+The wrapper runs `setup_env.py` (creates a hermetic `.venv/`, installs pinned packages, registers the Jupyter kernel) and then `quarto render tutorial.qmd`, finally opening `tutorial.html` in your default browser. First run takes ~2 minutes; subsequent runs are instant.
+
+### Manual (terminal users)
+
 1. Extract this ZIP anywhere on your machine.
 2. Open a terminal *in the extracted `python_pyfixest_tutorial/` folder* and run:
 
@@ -25,14 +35,15 @@ A self-contained Quarto tutorial on high-dimensional fixed-effects regression in
    python3 setup_env.py
    ```
 
-   This creates a hermetic `.venv/` next to the notebook, pip-installs pinned packages, and registers a Jupyter kernel named `pyfixest-tutorial`. First run takes ~2 minutes; the script is idempotent on re-runs.
+   This creates the `.venv/`, installs pinned packages, and registers a Jupyter kernel named `pyfixest-tutorial`. The script is idempotent on re-runs.
 3. Open the same folder in Positron (`File → Open Folder...`).
-4. Open `tutorial.qmd` and click **Render**.
+4. Open `tutorial.qmd` and click **Render**. (Or, equivalently: `quarto render tutorial.qmd` from the same shell.)
 
-Subsequent renders are instant — you only run step 2 once per machine.
+Subsequent renders are instant — step 2 is only needed once per machine.
 
 ## Troubleshooting
 
+- **Wrapper refuses to open on macOS (Gatekeeper):** the `render.command` is unsigned, so the first time you double-click it macOS may block it. Right-click → **Open** → confirm in the dialog. After that, double-clicking works normally. As a fallback, run `bash render.command` from a terminal.
 - **Auto-relaunch:** if `python3` on your PATH is unsupported (e.g., Python 3.14 with no `numba` wheels, or 3.9 below pyfixest's minimum), `setup_env.py` scans your machine for a compatible Python 3.10–3.13 and relaunches itself with it. You'll see a `Note: ... Relaunching setup_env.py with it...` line — that's expected.
 - **Windows:** if `python3` is not on PATH, use `python setup_env.py` instead.
 - **Kernel not found:** if Render reports `Jupyter kernel 'pyfixest-tutorial' not found`, you skipped step 2 — run `python3 setup_env.py` in a terminal and try again.
