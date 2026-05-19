@@ -20,14 +20,22 @@ execute:
   message: false
 ---
 
-::: {.callout-tip}
-## First render: ~2 minutes (one-time setup)
+::: {.callout-important}
+## First-time setup (run once per machine)
 
-The first time you click **Render**, Quarto runs `setup_env.py` (see `_quarto.yml`) which creates a hermetic `.venv/` next to this notebook and pip-installs pinned packages (`numpy`, `pandas`, `matplotlib`, `pyfixest`, `jupyter`, `ipykernel`). It then registers a Jupyter kernel named `pyfixest-tutorial` pointing at that `.venv/`. Subsequent renders skip the install and run in seconds.
+**Before clicking Render**, open a terminal *in this folder* and run:
 
-**Prerequisites:** Python 3.10+ and a working `quarto` install. That's it. No manual `conda install`, no `Python: Select Interpreter` step.
+```bash
+python3 setup_env.py
+```
 
-**Troubleshooting.** If the first render aborts with `python3: command not found` (some Windows installs lack the `python3` shim), open `_quarto.yml` and replace `python3` with `python`, then click Render again.
+This creates a hermetic `.venv/` next to this notebook, pip-installs pinned packages (`numpy`, `pandas`, `matplotlib`, `pyfixest`, `numba`, `llvmlite`, `jupyter`, `ipykernel`), and registers a Jupyter kernel named `pyfixest-tutorial`. First run takes ~2 minutes; the script is idempotent — re-running it later is a fast no-op.
+
+After it finishes, open this folder in Positron and click **Render**. Subsequent renders are instant.
+
+**Prerequisites:** Python 3.10+ and a working `quarto` install.
+
+**Windows note:** if `python3` is not on PATH, use `python setup_env.py` instead.
 :::
 
 ## 1. Overview

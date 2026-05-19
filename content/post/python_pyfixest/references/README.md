@@ -19,14 +19,22 @@ A self-contained Quarto tutorial on high-dimensional fixed-effects regression in
 ## How to use
 
 1. Extract this ZIP anywhere on your machine.
-2. Open the extracted `python_pyfixest_tutorial/` folder in Positron (`File → Open Folder...`).
-3. Open `tutorial.qmd` and click **Render**.
+2. Open a terminal *in the extracted `python_pyfixest_tutorial/` folder* and run:
 
-The first render takes ~2 minutes while `setup_env.py` creates a hermetic `.venv/` next to the notebook and pip-installs the pinned packages. Subsequent renders are nearly instant.
+   ```bash
+   python3 setup_env.py
+   ```
+
+   This creates a hermetic `.venv/` next to the notebook, pip-installs pinned packages, and registers a Jupyter kernel named `pyfixest-tutorial`. First run takes ~2 minutes; the script is idempotent on re-runs.
+3. Open the same folder in Positron (`File → Open Folder...`).
+4. Open `tutorial.qmd` and click **Render**.
+
+Subsequent renders are instant — you only run step 2 once per machine.
 
 ## Troubleshooting
 
-If the first render aborts with `python3: command not found` (some Windows installs lack the `python3` shim), open `_quarto.yml` and replace `python3` with `python`, then click Render again.
+- **Windows:** if `python3` is not on PATH, use `python setup_env.py` instead.
+- **Kernel not found:** if Render reports `Jupyter kernel 'pyfixest-tutorial' not found`, you skipped step 2 — run `python3 setup_env.py` in a terminal and try again.
 
 ## Source
 
