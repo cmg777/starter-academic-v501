@@ -14,7 +14,12 @@ format:
     code-summary: "Show code"
     fig-width: 9
     fig-height: 5.5
-    fig-dpi: 300
+    fig-dpi: 150
+    include-in-header:
+      text: |
+        <style>
+          img, .cell-output-display img { max-width: 100%; height: auto; }
+        </style>
 execute:
   warning: false
   message: false
