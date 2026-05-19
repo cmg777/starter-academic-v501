@@ -250,3 +250,34 @@ of the `.qmd`:
 
 This helps the reader pivot back to the official rendered version of the
 post and to the source repository if anything in the `.qmd` is unclear.
+
+---
+
+## 12. `_quarto.yml` handling (Phase 4.5 prep)
+
+The Phase-4.5 ZIP bundle needs a `_quarto.yml` inside the `<slug>/`
+folder so Positron / RStudio open it as a Quarto project. The skill
+follows a **preserve-if-present** rule:
+
+- **If the post bundle already contains a `_quarto.yml`** (sibling
+  of `tutorial.qmd` — root for R, `references/` for Python and
+  Stata), copy it into the ZIP working dir verbatim. Do **not**
+  modify the file in the bundle. This preserves any
+  `pre-render:` hooks the author added by hand (example:
+  `python_pyfixest/references/_quarto.yml` runs
+  `python3 setup_env.py` before each render).
+
+- **If no `_quarto.yml` exists in the bundle**, generate the
+  minimal 2-line stub in the ZIP working dir only — do **not**
+  write it into the bundle:
+
+  ```yaml
+  project:
+    type: default
+  ```
+
+Either way, the bundle's `_quarto.yml` (or its absence) is left
+unchanged after the skill runs. The ZIP is the user-facing
+deliverable; the bundle stays minimal.
+
+See `references/zip-bundle.md` for the full recipe.

@@ -1,6 +1,6 @@
 ---
 name: write-quarto-notebook
-description: Generate a self-contained Quarto notebook (.qmd) from an existing R / Python / Stata blog post + companion script on carlos-mendez.org. Renders the notebook locally to verify it works, then adds a "Quarto (.qmd)" link button to the post's front matter. Confirms scope before writing.
+description: Generate a self-contained Quarto notebook (.qmd) from an existing R / Python / Stata blog post + companion script on carlos-mendez.org. Renders the notebook locally to verify it works, packages it with the canonical script + a minimal _quarto.yml + a README.md into a `<slug>.zip` project bundle, then adds a "Quarto project (.zip)" link button to the post's front matter. Confirms scope before writing.
 argument-hint: "<post slug> [--no-render] [--no-link]"
 disable-model-invocation: true
 user-invocable: true
@@ -83,9 +83,12 @@ These conventions are pinned to existing precedents:
 - Python: `content/post/python_EconML/references/tutorial-econml-resource-curse.qmd`
 - Stata: `content/post/stata_cate2/references/tutorial-cate-resource-curse.qmd`
 
-On success the skill also modifies `content/post/<slug>/index.md`: a new
-`links:` entry with `icon: file-code`, `name: "Quarto (.qmd)"`, pointing at
-the GitHub raw URL of the new file. See **Phase 5** for the placement rule.
+On success the skill also writes `content/post/<slug>/<slug>.zip` (the
+downloadable Quarto-project bundle produced in Phase 4.5) and modifies
+`content/post/<slug>/index.md` with a new `links:` entry: `icon:
+file-code`, `name: "Quarto project (.zip)"`, `url: <slug>.zip`. See
+**Phase 4.5** for the bundle recipe and **Phase 5** for the link
+placement rule.
 
 ---
 
@@ -121,11 +124,15 @@ Parse `$ARGUMENTS` into:
 
 - **Slug** --- the first positional token (e.g. `r_causalpolicy_workshop`).
   Mandatory.
-- **`--no-render`** --- skip Phase 4 (render-and-fix). Default: render is
-  mandatory; the skill is not considered successful until `quarto render`
-  exits 0.
-- **`--no-link`** --- skip Phase 5 (add link entry to `index.md`). Default:
-  the link entry is added after a successful render.
+- **`--no-render`** --- skip Phase 4 (render-and-fix). Implies
+  **`--no-zip`** (Phase 4.5) and **`--no-link`** (Phase 5) — no point
+  packaging or linking a notebook that hasn't been verified. Default:
+  render is mandatory; the skill is not considered successful until
+  `quarto render` exits 0.
+- **`--no-link`** --- skip Phase 5 only (add link entry to `index.md`).
+  Phase 4.5 still runs — the ZIP is built and left in the bundle for
+  manual review. Default: the link entry is added after a successful
+  ZIP build.
 
 Reject any other argument or flag with a clear error.
 
@@ -539,24 +546,102 @@ After 3 failed attempts (or any unrecognised error) stop and report. **Do
 not** silently leave a broken `.qmd` behind --- but also do not delete it
 (the user will want to inspect).
 
+→ If render exits 0, continue to **Phase 4.5** to build the
+downloadable project ZIP.
+
+---
+
+## Phase 4.5: Build the `<slug>.zip` project bundle (default: yes)
+
+Skip this phase if `--no-render` was given (no point bundling code
+that hasn't been verified to render).
+
+The reader-facing Quarto deliverable on this site is a **ZIP archive
+that unzips to a folder named `<slug>/`** containing the executable
+tutorial plus everything needed to render it offline. A bare
+`tutorial.qmd` download forces Positron / RStudio to prompt for a
+project directory on first open; the unzipped folder is itself a
+recognised Quarto project (thanks to a minimal `_quarto.yml`), so
+there's no prompt.
+
+The pattern was validated on `content/post/r_did_ring/` in
+2026-05-19; codified in
+[`references/zip-bundle.md`](references/zip-bundle.md).
+
+### 4.5.1 Files that go in the ZIP
+
+| Path inside `<slug>.zip` | Source | Notes |
+|---|---|---|
+| `<slug>/tutorial.qmd` | Copy from the bundle (R: root, Python/Stata: `references/`) | The Phase-3 artefact |
+| `<slug>/<canonical-script>` | Copy from the bundle | R: `analysis.R` at root; Python: `script.py` at root; Stata: `analysis.do` at root |
+| `<slug>/_quarto.yml` | **Preserve** the bundle's existing `_quarto.yml` if present, else generate the 2-line stub `project:\n  type: default\n` | Preserves `pre-render` hooks (e.g. `python_pyfixest`'s `setup_env.py`) |
+| `<slug>/README.md` | Generate from the language-appropriate template in `references/zip-bundle.md` | Substitute `<TITLE>`, `<SLUG>`, `<SCRIPT-NAME>`, `<DATA-NAME>`, `<METHOD-CITATION>`, `<DATA-CITATION>` |
+
+**Not included.** Data files (use `tryCatch` / probe-then-pull
+from GitHub raw in `tutorial.qmd`), render outputs
+(`tutorial.html` / `tutorial_files/`), CSV outputs, PNGs, the
+results report, the infographic, `featured.{png,webp}`.
+
+### 4.5.2 Recipe
+
+Use the per-language bash recipe in `references/zip-bundle.md` §
+Recipe. The shape is:
+
+```bash
+SLUG="<slug>"
+WORK=$(mktemp -d)
+mkdir -p "$WORK/$SLUG"
+cp <bundle>/tutorial.qmd "$WORK/$SLUG/"
+cp <bundle>/<canonical-script> "$WORK/$SLUG/"
+# _quarto.yml: preserve if present, else generate stub
+# README.md: from template
+( cd "$WORK" && zip -r "$SLUG.zip" "$SLUG/" )
+mv "$WORK/$SLUG.zip" "content/post/$SLUG/$SLUG.zip"
+rm -rf "$WORK"
+```
+
+### 4.5.3 Post-build verification
+
+Run `unzip -l content/post/<slug>/<slug>.zip` and confirm:
+
+- Exactly **4 entries inside `<slug>/`**:
+  `_quarto.yml`, `tutorial.qmd`, `<canonical-script>`, `README.md`
+  (plus the bare `<slug>/` directory entry).
+- **No `__MACOSX/`** entries (use `mktemp` staging, never zip a
+  real working directory).
+- **No `.DS_Store`** entries.
+- README starts with `# <slug> — Quarto project`.
+- ZIP size in the expected range (R 25–40 KB; Python 30–60 KB;
+  Stata 25–40 KB).
+
+If the ZIP is malformed, surface as `[✗]` in Phase 6 and abort
+Phase 5 (no link entry without a valid ZIP to point to).
+
 ---
 
 ## Phase 5: Add the link to index.md (default: yes)
 
-Skip this phase if `--no-link` was given OR Phase 4 did not succeed.
+Skip this phase if `--no-link` was given OR Phase 4 did not succeed
+OR Phase 4.5 produced a malformed ZIP.
 
-Insert a `links:` entry into `index.md`'s YAML front matter. Use this
-exact template, substituting `<slug>` and `<output-path-relative-to-slug>`:
+Insert a `links:` entry into `index.md`'s YAML front matter. The link
+points at the ZIP produced in Phase 4.5, not at the bare `tutorial.qmd`
+— this lets Positron / RStudio open the unzipped folder as a recognised
+Quarto project on first try. Use this exact template, substituting
+`<slug>`:
 
 ```yaml
 - icon: file-code
   icon_pack: fas
-  name: "Quarto (.qmd)"
-  url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/<slug>/<output-path-relative-to-slug>
+  name: "Quarto project (.zip)"
+  url: <slug>.zip
 ```
 
-For R the URL ends in `/tutorial.qmd`; for Python and Stata it ends in
-`/references/tutorial.qmd`.
+The URL is **bundle-relative and language-agnostic** — always just
+`<slug>.zip` at the post-bundle root, regardless of whether
+`tutorial.qmd` lives at root (R) or in `references/` (Python / Stata).
+Hugo resolves the relative path at build time so the click routes
+through Netlify (browsers always download `.zip` natively).
 
 **Placement rule.** Scan the existing `links:` block in this order:
 
@@ -567,8 +652,11 @@ For R the URL ends in `/tutorial.qmd`; for Python and Stata it ends in
    insert immediately after it.
 4. Else insert as the first entry of `links:`.
 
-If a "Quarto (.qmd)" entry already exists, update its URL in place and do
-not duplicate.
+**Idempotency / upgrade rule.** If a previous-version entry already
+exists (older runs of this skill produced
+`name: "Quarto (.qmd)"` with a `raw.githubusercontent.com/...tutorial.qmd`
+URL), rewrite both the `name:` and `url:` fields in place to the new
+ZIP form. Do not duplicate, do not leave the stale entry behind.
 
 ---
 
@@ -582,7 +670,8 @@ Verification
 [✓] tutorial.qmd written to <path>             (<N> lines)
 [✓] quarto render succeeded                    (<elapsed>s)
 [✓] tutorial.html produced                     (<K> figures inline)
-[✓] index.md links: entry inserted             (between <prev> and <next>)
+[✓] <slug>.zip written to <path>               (<size> KB, 4 files in <slug>/)
+[✓] index.md links: entry inserted             ("Quarto project (.zip)" → <slug>.zip)
 [~] All pinned versions installed cleanly      (or list any pkg that
                                                 fell back to latest)
 ```
@@ -629,6 +718,12 @@ Detailed YAML templates, chunk-fence syntax, engine-specific gotchas: see
 Detailed transformation rules with examples: see
 [`references/transformations.md`](references/transformations.md).
 
+## ZIP project bundle (Phase 4.5)
+
+Detailed bash recipe (per language), `_quarto.yml` preserve-rule, and
+README.md templates: see
+[`references/zip-bundle.md`](references/zip-bundle.md).
+
 ## Verification checklist
 
 Detailed go/no-go items (used by Phase 6 to decide success/fail) and
@@ -661,4 +756,17 @@ Run after editing this `SKILL.md` to confirm the contract still works.
    not exist).
 5. **`--no-render` flag.** `/project:write-quarto-notebook <slug> --no-render`
    writes the `.qmd`, prints `[✗] render: skipped (--no-render)` in the
-   verification report, and does **not** modify `index.md`.
+   verification report, and does **not** modify `index.md`. The ZIP
+   bundle (Phase 4.5) is also skipped because `--no-render` implies
+   `--no-zip` — no point packaging unverified code.
+
+6. **ZIP project bundle round-trip.** Invoke the skill on an R post
+   without a pre-existing `_quarto.yml` in the bundle.
+   `content/post/<slug>/<slug>.zip` must exist after Phase 4.5. Run
+   `unzip -l` and confirm exactly 4 entries inside the `<slug>/`
+   folder: `tutorial.qmd`, `analysis.R`, `_quarto.yml` (the 2-line
+   stub), and `README.md`. The Phase-5 link entry must read
+   `name: "Quarto project (.zip)"` with `url: <slug>.zip`. If the
+   bundle already had `_quarto.yml` (e.g. `python_pyfixest`), the
+   skill must copy the existing file verbatim, **not** overwrite it
+   with the stub.

@@ -48,10 +48,42 @@ is either `[✓]`, `[✗]`, or `[~]` (skipped).
   If wildly outside (e.g. 30 min), surface as an ambiguity in the
   report but do not fail the check.
 
+### ZIP project bundle (only if Phase 4.5 ran)
+
+- [ ] **`<slug>.zip` exists** at `content/post/<slug>/<slug>.zip`.
+
+- [ ] **`unzip -l` returns exactly 4 file entries inside `<slug>/`**:
+  `_quarto.yml`, `tutorial.qmd`, the canonical script (`analysis.R` /
+  `script.py` / `analysis.do`), and `README.md`.
+
+- [ ] **No `__MACOSX/`, no `.DS_Store`** entries (would indicate the
+  zip ran against a real working directory instead of a `mktemp`
+  staging area).
+
+- [ ] **No render outputs in the ZIP** — `tutorial.html` and
+  `tutorial_files/` must not appear.
+
+- [ ] **`_quarto.yml` content is correct**: the minimal 2-line stub
+  `project:\n  type: default\n`, OR (if the bundle already had a
+  `_quarto.yml`) byte-identical to the bundle's pre-existing
+  version.
+
+- [ ] **`README.md` header matches** `# <slug> — Quarto project`
+  (first line).
+
+- [ ] **ZIP file size in expected range**:
+  - R: 25–40 KB
+  - Python: 30–60 KB (varies with `script.py` length)
+  - Stata: 25–40 KB
+
 ### Index.md (only if Phase 5 ran)
 
-- [ ] **`links:` block contains a `Quarto (.qmd)` entry** with the
-  expected URL.
+- [ ] **`links:` block contains a `Quarto project (.zip)` entry**
+  pointing to `<slug>.zip` (bundle-relative, no `https://` prefix).
+
+- [ ] **No stale `Quarto (.qmd)` entry** left behind from a previous
+  run of the skill (the upgrade rule renames the old entry in place
+  rather than duplicating).
 
 - [ ] **Existing entries are unchanged** (Colab, R script, AI Podcast,
   MD version --- whatever was there before --- must still be present
@@ -92,7 +124,8 @@ Verification
 [✓] Data-download chunk present
 [✓] quarto render exited 0                     (<elapsed>s, attempt <K>/3)
 [✓] tutorial.html produced                     (<F> figures inline)
-[✓] index.md links: entry inserted             (between <prev> and <next>)
+[✓] <slug>.zip written to <path>               (<size> KB, 4 files in <slug>/)
+[✓] index.md links: entry inserted             ("Quarto project (.zip)" → <slug>.zip)
 
 Soft checks:
 [~] <any warnings>
@@ -152,6 +185,7 @@ Follow-ups
 
 2. Commit and push (Netlify auto-deploys):
      git add content/post/<slug>/<output-path> \
+             content/post/<slug>/<slug>.zip \
              content/post/<slug>/index.md \
              logs/<YYYY-MM-DD>-<slug>-quarto.md
      git commit -m "<slug>: add Quarto tutorial for local execution"
