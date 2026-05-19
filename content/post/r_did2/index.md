@@ -23,8 +23,8 @@ links:
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_did2/index.md
 - icon: file-code
   icon_pack: fas
-  name: "Quarto (.qmd)"
-  url: tutorial.qmd
+  name: "Quarto project (.zip)"
+  url: r_did2.zip
 - icon: podcast
   icon_pack: fas
   name: AI Podcast
