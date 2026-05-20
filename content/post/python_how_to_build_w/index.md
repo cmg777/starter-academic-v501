@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Python
+  - Spatial Autocorrelation (ESDA)
 draft: false
 featured: false
 date: "2023-12-02T00:00:00Z"

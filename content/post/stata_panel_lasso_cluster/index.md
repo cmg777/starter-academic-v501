@@ -4,6 +4,7 @@ authors:
 categories:
   - Stata
   - LASSO
+  - Panel Data
 draft: false
 featured: false
 date: "2026-04-04T00:00:00Z"

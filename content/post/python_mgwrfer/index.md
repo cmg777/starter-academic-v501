@@ -4,6 +4,7 @@ authors:
 categories:
   - Python
   - GWR and MGWR
+  - Fixed Effects and TWFE
 date: "2026-05-03T00:00:00Z"
 draft: false
 featured: false

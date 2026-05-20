@@ -5,6 +5,7 @@ categories:
   - Python
   - Heterogeneous Treatment Effects (CATE)
   - Resource Curse
+  - Causal Inference
 draft: false
 featured: false
 date: "2026-05-07T00:00:00Z"

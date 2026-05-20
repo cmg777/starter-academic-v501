@@ -1,8 +1,9 @@
 # Tutorial gallery topic taxonomy
 # Source of truth for /post/ gallery grouping and the homepage Posts & Tutorials widget.
-# A post is routed to the first topic whose `category_matches` overlaps its categories: list.
-# Unmatched tutorial posts (slug starts with python_, r_, stata_, gee_, rpy_) fall to `foundations`.
-# Posts with `Announcement` category are routed to the announcements strip instead.
+# Multi-bucket: a post appears in EVERY topic whose `category_matches` overlaps
+# its categories: list. The `foundations` topic is a residual catch-all —
+# only tutorials (slug starts python_/r_/stata_/gee_/rpy_) that match NO other
+# topic land there. Posts with `Announcement` are routed to the bottom strip.
 
 topics:
   - id: did
@@ -12,6 +13,16 @@ topics:
     category_matches:
       - Difference-in-Differences (DiD)
 
+  - id: causal-foundations
+    label: Causal Inference (Foundations)
+    accent: "#b07a3e"
+    icon: project-diagram
+    category_matches:
+      - Causal Inference
+      - IPW and Doubly Robust
+      - Partial Identification
+      - Randomized Controlled Trial (RCT)
+
   - id: causal-ml
     label: Causal Machine Learning
     accent: "#6a9bcc"
@@ -19,18 +30,7 @@ topics:
     category_matches:
       - Double Machine Learning
       - Heterogeneous Treatment Effects (CATE)
-      - Causal Inference
       - Causal Machine Learning
-
-  - id: panel-fe
-    label: Panel Data & Fixed Effects
-    accent: "#00d4c8"
-    icon: layer-group
-    category_matches:
-      - Fixed Effects and TWFE
-      - FWL Theorem
-      - Bayesian Model Averaging (BMA)
-      - Panel Data
 
   - id: synthetic-control
     label: Synthetic Control
@@ -46,6 +46,27 @@ topics:
     category_matches:
       - Instrumental Variables (IV)
 
+  - id: rdd-matching
+    label: RDD & Matching
+    accent: "#c0506b"
+    icon: cut
+    category_matches:
+      - Regression Discontinuity (RDD)
+      - Matching and Propensity Score
+      - Regression Discontinuity
+      - Matching
+
+  - id: panel-fe
+    label: Panel Data & Fixed Effects
+    accent: "#00d4c8"
+    icon: layer-group
+    category_matches:
+      - Fixed Effects and TWFE
+      - FWL Theorem
+      - Bayesian Model Averaging (BMA)
+      - Panel Data
+      - Dynamic Panel
+
   - id: spatial
     label: Spatial Econometrics
     accent: "#3f9b6e"
@@ -57,15 +78,20 @@ topics:
       - Spatial inequality
       - Convergence
 
-  - id: rdd-matching
-    label: RDD & Matching
-    accent: "#c0506b"
-    icon: cut
+  - id: ml-basics
+    label: Machine Learning & Dimensionality Reduction
+    accent: "#8a4fbf"
+    icon: sitemap
     category_matches:
-      - Regression Discontinuity (RDD)
-      - Matching and Propensity Score
-      - Regression Discontinuity
-      - Matching
+      - Random Forest
+      - Principal Component Analysis (PCA)
+      - Machine Learning
+
+  - id: foundations
+    label: Other Methods
+    accent: "#6c757d"
+    icon: book
+    category_matches: []   # residual catch-all (handled in template)
 
   - id: gis-rs
     label: GIS & Remote Sensing
@@ -75,12 +101,6 @@ topics:
       - Remote Sensing
       - GEE
       - Interactive Dashboard
-
-  - id: foundations
-    label: Foundations & Other Methods
-    accent: "#6c757d"
-    icon: book
-    category_matches: []   # fallback bucket
 
 # Language palette for the language chip on each card.
 languages:

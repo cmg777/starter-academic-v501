@@ -3,6 +3,7 @@ authors:
   - admin
 categories:
   - Python
+  - Panel Data
 date: "2026-04-27T00:00:00Z"
 draft: false
 featured: false

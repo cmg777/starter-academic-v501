@@ -4,6 +4,7 @@ authors:
 categories:
   - Python
   - Double Machine Learning
+  - Causal Inference
 draft: false
 featured: false
 date: "2026-05-03T00:00:00Z"

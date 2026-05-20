@@ -2,6 +2,10 @@
   Section template: Posts & Tutorials gallery.
   Renders topic-grouped horizontal scroll strips of 16:9 image-first cards.
   Topic taxonomy lives in data/tutorial_topics.yaml.
+
+  Multi-bucket: a post appears in EVERY topic whose category_matches overlaps
+  its categories: list. `foundations` is a residual catch-all — only tutorials
+  matching no other topic land there. Announcements go to the bottom strip.
 */}}
 {{ define "main" }}
 
@@ -16,21 +20,12 @@
 {{ $topics := index $.Site.Data.tutorial_topics "topics" }}
 {{ $languages := index $.Site.Data.tutorial_topics "languages" }}
 
-{{/* --- Pre-compute per-page topic + language using each page's Scratch --- */}}
+{{/* --- Pre-compute per-page facts (language, announcement, tutorial-ness,
+     and whether the post matches any non-foundations topic). Cached on each
+     page's Scratch and consumed by the bucketing loop below. --- */}}
 {{ range $p := $allPages }}
   {{ $cats := default (slice) $p.Params.categories }}
   {{ $isAnn := in $cats "Announcement" }}
-  {{ $tid := "" }}
-  {{ if not $isAnn }}
-    {{ range $t := $topics }}
-      {{ if not $tid }}
-        {{ range $cm := $t.category_matches }}
-          {{ if in $cats $cm }}{{ $tid = $t.id }}{{ end }}
-        {{ end }}
-      {{ end }}
-    {{ end }}
-    {{ if not $tid }}{{ $tid = "foundations" }}{{ end }}
-  {{ end }}
 
   {{ $slug := "" }}
   {{ with $p.File }}{{ $slug = path.Base .Dir }}{{ end }}
@@ -41,10 +36,23 @@
   {{ else if hasPrefix $slug "rpy_" }}{{ $lang = "rpy" }}
   {{ else if hasPrefix $slug "r_" }}{{ $lang = "r" }}
   {{ end }}
+  {{ $isTutorial := or (hasPrefix $slug "python_") (hasPrefix $slug "r_") (hasPrefix $slug "stata_") (hasPrefix $slug "gee_") (hasPrefix $slug "rpy_") }}
 
-  {{ $p.Scratch.Set "tg_topic" $tid }}
+  {{ $matchedAny := false }}
+  {{ if not $isAnn }}
+    {{ range $t := $topics }}
+      {{ if ne $t.id "foundations" }}
+        {{ range $cm := $t.category_matches }}
+          {{ if in $cats $cm }}{{ $matchedAny = true }}{{ end }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+
   {{ $p.Scratch.Set "tg_lang" $lang }}
   {{ $p.Scratch.Set "tg_is_announcement" $isAnn }}
+  {{ $p.Scratch.Set "tg_is_tutorial" $isTutorial }}
+  {{ $p.Scratch.Set "tg_matched_any" $matchedAny }}
 {{ end }}
 
 {{/* --- Sticky control bar --- */}}
@@ -82,25 +90,36 @@
   </div>
 </nav>
 
-{{/* --- Per-topic horizontal strips --- */}}
+{{/* --- Per-topic horizontal strips (multi-bucket) --- */}}
 <div class="universal-wrapper tutorial-gallery">
 
   {{ range $t := $topics }}
     {{ $cards := slice }}
     {{ range $p := $allPages }}
-      {{ if and (not ($p.Scratch.Get "tg_is_announcement")) (eq ($p.Scratch.Get "tg_topic") $t.id) }}
-        {{ $lang := $p.Scratch.Get "tg_lang" }}
-        {{ $langData := index $languages $lang }}
-        {{ if not $langData }}{{ $langData = dict "label" "—" "color" "#6c757d" }}{{ end }}
-        {{ $cards = $cards | append (dict
-              "page" $p
-              "topicId" $t.id
-              "topicLabel" $t.label
-              "topicAccent" $t.accent
-              "topicIcon" $t.icon
-              "languageKey" $lang
-              "languageLabel" $langData.label
-              "languageColor" $langData.color) }}
+      {{ if not ($p.Scratch.Get "tg_is_announcement") }}
+        {{ $cats := default (slice) $p.Params.categories }}
+        {{ $isMatch := false }}
+        {{ range $cm := $t.category_matches }}
+          {{ if in $cats $cm }}{{ $isMatch = true }}{{ end }}
+        {{ end }}
+        {{/* Foundations: residual catch-all for tutorials that match no other topic */}}
+        {{ if and (eq $t.id "foundations") (not $isMatch) ($p.Scratch.Get "tg_is_tutorial") (not ($p.Scratch.Get "tg_matched_any")) }}
+          {{ $isMatch = true }}
+        {{ end }}
+        {{ if $isMatch }}
+          {{ $lang := $p.Scratch.Get "tg_lang" }}
+          {{ $langData := index $languages $lang }}
+          {{ if not $langData }}{{ $langData = dict "label" "—" "color" "#6c757d" }}{{ end }}
+          {{ $cards = $cards | append (dict
+                "page" $p
+                "topicId" $t.id
+                "topicLabel" $t.label
+                "topicAccent" $t.accent
+                "topicIcon" $t.icon
+                "languageKey" $lang
+                "languageLabel" $langData.label
+                "languageColor" $langData.color) }}
+        {{ end }}
       {{ end }}
     {{ end }}
     {{ if $cards }}
