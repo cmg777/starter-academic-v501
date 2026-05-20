@@ -1,0 +1,50 @@
+# YAML header template for tutorial.qmd. Substitute <TITLE>, <SUBTITLE>,
+# <DATE>, <KERNEL_NAME>. Lower fig-dpi to 150 (not 300) so embedded base64
+# PNGs are ~half the size; the include-in-header CSS rule keeps figures
+# from overflowing the article container on narrow viewports.
+
+---
+title: "<TITLE>"
+subtitle: "<SUBTITLE>"
+author: "Carlos Mendez"
+date: "<DATE>"
+jupyter: <KERNEL_NAME>
+format:
+  html:
+    theme: cosmo
+    embed-resources: true
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 150
+    include-in-header:
+      text: |
+        <style>
+          img, .cell-output-display img { max-width: 100%; height: auto; }
+        </style>
+execute:
+  warning: false
+  message: false
+---
+
+::: {.callout-important}
+## How to render this tutorial
+
+**Easiest (one click).** From the bundle ZIP, double-click `render.command` (macOS) or `render.bat` (Windows). The wrapper runs setup and then `quarto render`, opening the result in your browser.
+
+**Manual.** From a terminal in the bundle folder:
+
+```bash
+python3 setup_env.py            # one-time: builds .venv/, registers kernel
+quarto render tutorial.qmd      # or click "Render" in Positron
+```
+
+`setup_env.py` is idempotent — re-running it later is a fast no-op. Subsequent renders are instant.
+
+**Prerequisites:** Python 3.10–3.13 and a working `quarto` install.
+
+**Windows note:** if `python3` is not on PATH, use `python setup_env.py` instead.
+:::

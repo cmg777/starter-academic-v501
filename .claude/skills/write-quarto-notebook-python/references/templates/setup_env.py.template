@@ -2,7 +2,7 @@
 
 Invoked by Quarto's pre-render hook (see _quarto.yml). Creates a hermetic
 .venv/ next to this script, installs pinned packages plus jupyter + ipykernel
-into it, registers a named Jupyter kernel (`pyfixest-tutorial`) that points at
+into it, registers a named Jupyter kernel (`<KERNEL_NAME>`) that points at
 the venv's Python, and ensures the outer Python that Quarto invoked has the
 minimal jupyter packages it needs to discover the kernel.
 
@@ -26,22 +26,14 @@ from pathlib import Path
 
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
 
-PINNED: dict[str, str] = {
-    "numpy":      "1.26.4",
-    "pandas":     "2.2.2",
-    "matplotlib": "3.9.2",
-    # Last numba+llvmlite releases that ship macOS Intel wheels. pyfixest
-    # only requires numba>=0.58.0, so this satisfies its constraint while
-    # avoiding the source build on macOS Intel that newer numba would force.
-    "llvmlite":   "0.45.0",
-    "numba":      "0.62.1",
-    "pyfixest":   "0.50.1",
-    "jupyter":    "1.1.1",
-    "ipykernel":  "6.29.5",
-}
+# Substitute the dict produced in Phase 1 (probed versions + Intel overrides
+# + bootstrap entries jupyter/ipykernel). Order: direct imports first
+# (alphabetised), then Intel-override transitive pins (llvmlite, numba),
+# then bootstrap (jupyter, ipykernel) last.
+PINNED: dict[str, str] = <PINNED_DICT>
 
-KERNEL_NAME = "pyfixest-tutorial"
-KERNEL_DISPLAY = "PyFixest Tutorial"
+KERNEL_NAME = "<KERNEL_NAME>"
+KERNEL_DISPLAY = "<KERNEL_DISPLAY>"
 
 THIS_DIR = Path(__file__).resolve().parent
 VENV_DIR = THIS_DIR / ".venv"
@@ -336,12 +328,13 @@ def preflight() -> None:
         print(
             f"ERROR: this tutorial needs Python 3.10, 3.11, 3.12, or 3.13.\n"
             f"You ran setup_env.py with Python {ver} at {sys.executable}.\n\n"
-            f"The pinned `numba==0.62.1` and `llvmlite==0.45.0` wheels cover\n"
+            f"The pinned `numba`/`llvmlite` wheels (when present) cover\n"
             f"cp310-cp313 only. Python 3.14 has no prebuilt numba wheels yet,\n"
-            f"and Python <=3.9 is below pyfixest's minimum.\n\n"
+            f"and Python <=3.9 is below the minimum for modern data-science\n"
+            f"packages.\n\n"
             f"Install a supported Python (any one):\n"
-            f"  - miniforge:  brew install miniforge && conda create -n pyfx python=3.11 -y\n"
-            f"  - python.org: https://www.python.org/downloads/release/python-3119/\n"
+            f"  - miniforge:  brew install miniforge && conda create -n tut python=3.11 -y\n"
+            f"  - python.org: https://www.python.org/downloads/\n"
             f"  - Homebrew:   brew install python@3.13"
             f"{suffix}",
             file=sys.stderr,
@@ -369,7 +362,7 @@ def preflight() -> None:
 
 def main() -> None:
     preflight()
-    print("Setting up PyFixest tutorial environment...")
+    print(f"Setting up tutorial environment for '{KERNEL_NAME}'...")
     ensure_venv()
     ensure_pip_in_venv()
     ensure_packages_in_venv()

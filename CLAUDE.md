@@ -117,7 +117,7 @@ Currently this applies only to `content/post/python_pyfixest/`. Whenever `tutori
 
 # Claude Code Skills
 
-Nine skills: eight organized as Write/Review pairs across four artifact stages, plus the standalone `write-quarto-notebook` skill that produces an executable companion notebook from an existing post. Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
+Ten skills: eight organized as Write/Review pairs across four artifact stages, plus two standalone Quarto-companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, and `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
 
 ## Pipeline overview
 
@@ -127,7 +127,8 @@ Nine skills: eight organized as Write/Review pairs across four artifact stages, 
 | Results report | `/project:write-results-report` | `/project:review-results-report` |
 | Blog post | `/project:write-post` | `/project:review-post` |
 | Infographic | `/project:write-infographic` | `/project:review-infographic` |
-| Quarto notebook (executable companion) | `/project:write-quarto-notebook` | — |
+| Quarto notebook (R/Python/Stata, lighter) | `/project:write-quarto-notebook` | — |
+| Quarto notebook (Python, friction-free bundle) | `/project:write-quarto-notebook-python` | — |
 
 ## Shared conventions
 
@@ -293,6 +294,30 @@ Generate a self-contained Quarto notebook (`tutorial.qmd`) from an existing R / 
 - Stata → `content/post/<slug>/references/tutorial.qmd` (theme: cosmo, `jupyter: nbstata`)
 
 **Reference files:** `references/language-conventions.md`, `references/transformations.md`, `references/render-and-fix.md`, `references/verification-checklist.md`
+
+## write-quarto-notebook-python
+
+**Location:** `.claude/skills/write-quarto-notebook-python/SKILL.md`
+
+Generate a **friction-free Quarto bundle** for an existing Python tutorial post. Beyond `tutorial.qmd`, the bundle ships a hermetic `.venv` bootstrap (`setup_env.py` with preflight + auto-relaunch + kernel registration), responsive-figure CSS, one-click render wrappers (`render.command` for macOS + `render.bat` for Windows), a bundle `README.md`, a `build_bundle.sh` packager, and a downloadable `<slug>.zip`. Probes pinned versions from the dev machine; applies macOS Intel wheel-availability overrides (e.g. `numba==0.62.1` + `llvmlite==0.45.0`) when the script triggers them.
+
+Runs **parallel** to `write-quarto-notebook` — keep the lighter chunk-time-install pattern (`write-quarto-notebook`) for posts where it suffices; use this skill when you want students to download a ZIP, double-click `render.command`, and have it work with no Python-environment debugging.
+
+**Invocation:**
+```
+/project:write-quarto-notebook-python <post slug> [--no-render] [--no-link]
+```
+
+**Examples:**
+```
+/project:write-quarto-notebook-python python_pyfixest
+/project:write-quarto-notebook-python python_pca
+/project:write-quarto-notebook-python python_doubleml --no-render
+```
+
+**Deliverables (always):** `references/tutorial.qmd`, `references/setup_env.py`, `references/_quarto.yml`, `references/render.command`, `references/render.bat`, `references/README.md`, `build_bundle.sh`, `<slug>.zip`, plus the `index.md` link update ("Quarto project (.zip)").
+
+**Reference files:** `references/templates/` (canonical templates for each bundle file), `references/intel-wheel-catalog.md` (last Intel-wheel versions for known problem packages), `references/transformations.md`, `references/render-and-fix.md`, `references/verification-checklist.md`
 
 # Hugo Version Constraints
 

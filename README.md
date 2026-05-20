@@ -242,7 +242,7 @@ Add a new `<details>` block to `content/projects/dashboards/index.md` following 
 
 ### Skill Architecture
 
-Nine Claude Code skills: eight organized as Write/Review pairs across four artifact stages, plus the standalone `write-quarto-notebook` skill that produces an executable companion Quarto notebook from an existing post. Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
+Ten Claude Code skills: eight organized as Write/Review pairs across four artifact stages, plus two standalone Quarto-companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, and `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
 
 | Stage | Write skill | Review skill |
 |-------|-------------|--------------|
@@ -250,7 +250,8 @@ Nine Claude Code skills: eight organized as Write/Review pairs across four artif
 | Results report | `write-results-report` | `review-results-report` |
 | Blog post | `write-post` | `review-post` |
 | Infographic | `write-infographic` | `review-infographic` |
-| Quarto notebook (executable companion) | `write-quarto-notebook` | — |
+| Quarto notebook (R/Python/Stata, lighter) | `write-quarto-notebook` | — |
+| Quarto notebook (Python, friction-free bundle) | `write-quarto-notebook-python` | — |
 
 ### Write Data Science Script
 
@@ -313,9 +314,20 @@ Cross-check infographic accuracy against source post, evaluate quality, suggest 
 **Skill:** `/project:write-quarto-notebook <post slug> [--no-render] [--no-link]`
 **Location:** `.claude/skills/write-quarto-notebook/SKILL.md`
 
-Generate a self-contained Quarto notebook (`tutorial.qmd`) from an existing R / Python / Stata post + companion script so readers can render the tutorial locally in Positron or RStudio. Pins exact package versions probed from the developer's machine for reproducibility (R: `pak::pkg_install("pkg@x.y.z")`, Python: `pip install pkg==version`, Stata: not supported by SSC). Renders locally to verify, retries up to 3× with an auto-fix catalog. Adds a "Quarto (.qmd)" link button to the post's front matter on success.
+Generate a self-contained Quarto notebook (`tutorial.qmd`) from an existing R / Python / Stata post + companion script so readers can render the tutorial locally in Positron or RStudio. Pins exact package versions probed from the developer's machine for reproducibility (R: `pak::pkg_install("pkg@x.y.z")`, Python: `pip install pkg==version` inside the kernel chunk, Stata: not supported by SSC). Renders locally to verify, retries up to 3× with an auto-fix catalog. Adds a "Quarto project (.zip)" link button to the post's front matter on success.
 
 Output paths follow language convention: R → `tutorial.qmd` next to `index.md`; Python and Stata → `references/tutorial.qmd`.
+
+### Write Quarto Notebook (Python, friction-free bundle)
+
+**Skill:** `/project:write-quarto-notebook-python <post slug> [--no-render] [--no-link]`
+**Location:** `.claude/skills/write-quarto-notebook-python/SKILL.md`
+
+Parallel to `write-quarto-notebook` but Python-only and bundle-rich. Ships a hermetic `.venv` bootstrap (`setup_env.py` with preflight + auto-relaunch on unfit Python + kernel registration), responsive-figure CSS in `tutorial.qmd`, one-click `render.command` (macOS) + `render.bat` (Windows) wrappers, a bundle `README.md`, and a `build_bundle.sh` packager. Produces a `<slug>.zip` that a student can extract and double-click to render — no Python-environment debugging.
+
+Probes pinned versions from the dev machine; applies a macOS Intel wheel-availability catalog so that scripts using e.g. `pyfixest` get `numba==0.62.1` + `llvmlite==0.45.0` automatically (the last Intel-wheel releases). Renders end-to-end in a tempdir (extracts the ZIP and runs the wrapper) to verify the bundle works as a student would experience it.
+
+Codified from the 8-iteration `python_pyfixest` validation in May 2026.
 
 ### Full Pipeline Example
 
