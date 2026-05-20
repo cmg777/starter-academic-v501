@@ -76,12 +76,6 @@ topics:
       - Principal Component Analysis (PCA)
       - Machine Learning
 
-  - id: foundations
-    label: Other Methods
-    accent: "#6c757d"
-    icon: book
-    category_matches: []   # residual catch-all (handled in template)
-
   - id: spatial
     label: Spatial Econometrics
     accent: "#3f9b6e"
@@ -101,6 +95,12 @@ topics:
       - Remote Sensing
       - GEE
       - Interactive Dashboard
+
+  - id: foundations
+    label: Other Methods
+    accent: "#6c757d"
+    icon: book
+    category_matches: []   # residual catch-all (handled in template)
 
 # Language palette for the language chip on each card.
 languages:
