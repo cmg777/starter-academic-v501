@@ -5,7 +5,7 @@
 
 title: Carlos Mendez # Website name
 baseurl: 'https://carlos-mendez.org/' # Website URL
-copyright: '© 2018–{year} Carlos Mendez' # Footer text — {year} is auto-substituted with current year
+copyright: '© 2018–{year} Carlos Mendez. All rights reserved.' # Footer text — {year} is auto-substituted with current year
 
 ############################
 ## LANGUAGE
