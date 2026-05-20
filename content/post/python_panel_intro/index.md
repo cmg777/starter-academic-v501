@@ -16,6 +16,10 @@ links:
     icon_pack: fas
     name: "Python script"
     url: script.py
+  - icon: file-code
+    icon_pack: fas
+    name: "Quarto project (.zip)"
+    url: python_panel_intro.zip
   - icon: book
     icon_pack: fas
     name: "Jupyter notebook"

@@ -1,92 +1,59 @@
-# EconML Tutorial: Causal Machine Learning and the Resource Curse
+# python_EconML — Quarto project
 
-Pedagogical tutorial replicating the main findings of [Hodler, Lechner & Raschky (2023)](https://doi.org/10.1371/journal.pone.0284968) "Institutions and the resource curse: New insights from causal machine learning" (*PLoS ONE*) using the **EconML** library.
+Executable companion to the blog post:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_EconML/references/tutorial-econml-resource-curse.ipynb)
+> **Causal Machine Learning and the Resource Curse with Python EconML**
+> <https://carlos-mendez.org/post/python_EconML/>
 
-## Overview
+## What's inside
 
-This tutorial uses **EconML's `CausalForestDML`** (Microsoft Research / PyWhy) to replicate the paper's three key findings using simulated data with known ground-truth causal effects. It runs in **under 5 minutes** and is fully self-contained --- data is loaded directly from GitHub.
+- `render.command` / `render.bat` — one-click wrapper (macOS / Windows). Runs setup and Quarto in order.
+- `tutorial.qmd` — the executable Quarto notebook.
+- `setup_env.py` — bootstraps a local `.venv/` with pinned packages on first render.
+- `_quarto.yml` — wires `setup_env.py` to Quarto's pre-render hook.
+- `script.py` — the canonical companion script, kept for reference.
+- `README.md` — this file.
 
-## Three Key Findings Reproduced
+## Prerequisites
 
-| # | Finding | How It Appears |
-|---|---------|---------------|
-| 1 | Mining increases nighttime lights (NTL) and conflict | Positive ATEs for all mining-vs-no-mining comparisons |
-| 2 | Mineral price effects are non-linear | ATE(2-1) ~ 0.05 (small, n.s.) vs ATE(3-1) ~ 0.30 (large, sig.) |
-| 3 | Institutions moderate mining effects but NOT price effects | GATE(1-0) slopes with institutions; GATE(3-1) is flat |
+- Python 3.10–3.13 (any standard install: python.org, Homebrew, miniconda, miniforge).
+- A working [Quarto](https://quarto.org/) install.
+- [Positron](https://positron.posit.co/) is recommended; any terminal with `quarto` on PATH also works.
 
-## Tutorial Formats
+## How to use
 
-| Format | File | Best For |
-|--------|------|----------|
-| **Google Colab** | [`tutorial-econml-resource-curse.ipynb`](tutorial-econml-resource-curse.ipynb) | Cloud execution, no local setup |
-| **Quarto Notebook** | [`tutorial-econml-resource-curse.qmd`](tutorial-econml-resource-curse.qmd) | Local rendering to HTML |
-| **Python Script** | [`tutorial-econml-resource-curse.py`](tutorial-econml-resource-curse.py) | Command-line execution |
+### One-click (recommended)
 
-## EconML Configuration
+1. Extract this ZIP anywhere on your machine.
+2. **macOS:** double-click `render.command` in Finder. **Windows:** double-click `render.bat` in Explorer.
 
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| `n_estimators` | 500 | Good balance of precision and speed |
-| `discrete_treatment` | True | 4 treatment levels |
-| `model_y` | GBM(200 trees) | Flexible nuisance model for outcome |
-| `model_t` | GBM(200 trees) | Flexible nuisance model for propensity |
-| `honest` | True | Honesty for valid inference |
-| `inference` | True | BLB confidence intervals |
-| `cv` | 5 | 5-fold cross-fitting |
-| `min_samples_leaf` | 10 | Prevent overfitting |
-| `groups` | district_id | GroupKFold respects panel structure |
+The wrapper runs `setup_env.py` (creates a hermetic `.venv/`, installs pinned packages, registers the Jupyter kernel `python_EconML-tutorial`) and then `quarto render tutorial.qmd`, finally opening `tutorial.html` in your default browser. First run takes ~2 minutes; subsequent runs are instant.
 
-## How to Run
+### Manual (terminal users)
 
-### Google Colab (recommended)
+1. Extract this ZIP anywhere on your machine.
+2. Open a terminal *in the extracted `python_EconML/` folder* and run:
 
-Click the "Open in Colab" badge above. The notebook installs all dependencies and downloads the data automatically.
+   ```bash
+   python3 setup_env.py
+   ```
 
-### Local
+   This creates the `.venv/`, installs pinned packages, and registers a Jupyter kernel named `python_EconML-tutorial`. The script is idempotent on re-runs.
+3. Open the same folder in Positron (`File → Open Folder...`).
+4. Open `tutorial.qmd` and click **Render**. (Or, equivalently: `quarto render tutorial.qmd` from the same shell.)
 
-```bash
-# Run the tutorial script (~3-8 minutes)
-python tutorial-econml-resource-curse.py
+Subsequent renders are instant — step 2 is only needed once per machine.
 
-# Or render the Quarto notebook
-quarto render tutorial-econml-resource-curse.qmd
-```
+## Troubleshooting
 
-### Requirements
+- **Wrapper refuses to open on macOS (Gatekeeper):** the `render.command` is unsigned, so the first time you double-click it macOS may block it. Right-click → **Open** → confirm in the dialog. After that, double-clicking works normally. As a fallback, run `bash render.command` from a terminal.
+- **Auto-relaunch:** if `python3` on your PATH is unsupported (e.g., Python 3.14 with no `numba` wheels, or 3.9 below the package minimum), `setup_env.py` scans your machine for a compatible Python 3.10–3.13 and relaunches itself with it. You'll see a `Note: ... Relaunching setup_env.py with it...` line — that's expected.
+- **Windows:** if `python3` is not on PATH, use `python setup_env.py` instead.
+- **Kernel not found:** if Render reports `Jupyter kernel 'python_EconML-tutorial' not found`, you skipped the manual step — run `python3 setup_env.py` in a terminal and try again. The one-click wrapper avoids this entirely.
+- **"This tutorial needs Python 3.10, 3.11, 3.12, or 3.13":** your `python3` is outside the supported range. Install a working Python (miniforge, python.org, or Homebrew `python@3.13`) and re-run.
+- **`ImportError: ... pyexpat.cpython-3XX-darwin.so`:** your Python's `pyexpat` stdlib binding is broken — most often Homebrew `python@3.14` on macOS, whose `pyexpat.so` is linked against a newer `libexpat` than the system ships. Fix by switching to a different Python (`~/miniforge3/envs/<env>/bin/python3 setup_env.py`), installing from python.org, or `brew uninstall python@3.14 && brew install python@3.13`.
 
-- Python 3.11+
-- `econml` (v0.15+)
-- `scikit-learn`, `pandas`, `numpy`, `matplotlib`
+## Source
 
-## Data
-
-The simulated dataset (3,000 observations = 300 districts x 10 years) is loaded directly from GitHub:
-
-```
-https://github.com/quarcs-lab/data-open/raw/master/stata19/sim_resource_curse.csv
-```
-
-Ground-truth causal parameters are defined inline in each tutorial format --- no external dependencies required.
-
-## Directory Structure
-
-```text
-references/
-├── README.md                              # This file
-├── tutorial-econml-resource-curse.ipynb    # Colab notebook
-├── tutorial-econml-resource-curse.qmd     # Quarto notebook
-├── tutorial-econml-resource-curse.py      # Standalone script
-└── tutorial_results/                      # Output from script
-    ├── ate-table.csv
-    ├── descriptive-stats.csv
-    └── python_econml_*.png                # Dark-themed figures
-```
-
-## References
-
-- Hodler, R., Lechner, M., & Raschky, P.A. (2023). Institutions and the resource curse. *PLoS ONE*, 18(6), e0284968.
-- Chernozhukov, V., et al. (2018). Double/Debiased Machine Learning. *Econometrica*, 86(1), 258-298.
-- Athey, S. & Imbens, G. (2019). Machine Learning Methods That Economists Should Know About. *Annual Review of Economics*, 11, 685-725.
-- EconML documentation: [pywhy.org/EconML](https://www.pywhy.org/EconML/)
+Online tutorial and full post: <https://carlos-mendez.org/post/python_EconML/>
+GitHub repo: <https://github.com/cmg777/starter-academic-v501>

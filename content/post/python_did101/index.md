@@ -17,6 +17,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: file-code
+  icon_pack: fas
+  name: "Quarto project (.zip)"
+  url: python_did101.zip
 - icon: database
   icon_pack: fas
   name: "Dataset (2x2)"

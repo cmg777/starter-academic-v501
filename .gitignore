@@ -34,6 +34,11 @@ content/post/r_sc_bayes_spatial/replication-package/
 content/post/r_did2/reference/manuscript.tex
 
 # Quarto render artefacts in any post directory (tutorial.qmd is the source;
-# readers render their own HTML locally).
+# readers render their own HTML locally). Python bundles place tutorial.qmd
+# under references/, so render artefacts land there too.
 content/post/*/tutorial.html
 content/post/*/tutorial_files/
+content/post/*/references/tutorial.html
+content/post/*/references/tutorial_files/
+content/post/*/references/.venv/
+content/post/*/references/.quarto/

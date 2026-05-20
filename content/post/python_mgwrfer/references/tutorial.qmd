@@ -1,0 +1,1191 @@
+---
+title: "MGWFER: Causal Spatially Varying Coefficients via Panel Fixed Effects"
+subtitle: "A faithful Python tutorial on Li & Fotheringham (2026) — removing time-invariant spatial confounders from Multiscale GWR"
+author: "Carlos Mendez"
+date: "2026-05-03"
+jupyter: python_mgwrfer-tutorial
+format:
+  html:
+    theme: cosmo
+    embed-resources: true
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 150
+    include-in-header:
+      text: |
+        <style>
+          img, .cell-output-display img { max-width: 100%; height: auto; }
+        </style>
+execute:
+  warning: false
+  message: false
+---
+
+::: {.callout-important}
+## How to render this tutorial
+
+**Easiest (one click).** From the bundle ZIP, double-click `render.command` (macOS) or `render.bat` (Windows). The wrapper runs setup and then `quarto render`, opening the result in your browser.
+
+**Manual.** From a terminal in the bundle folder:
+
+```bash
+python3 setup_env.py            # one-time: builds .venv/, registers kernel
+quarto render tutorial.qmd      # or click "Render" in Positron
+```
+
+`setup_env.py` is idempotent — re-running it later is a fast no-op. Subsequent renders are instant.
+
+**Prerequisites:** Python 3.10–3.13 and a working `quarto` install.
+
+**Windows note:** if `python3` is not on PATH, use `python setup_env.py` instead.
+:::
+
+## 1. Overview
+
+When we estimate how relationships vary across space — say, the effect of education on income in different neighborhoods — a hidden danger lurks. If some unobserved attribute of place (geographic amenities, historical institutions, persistent social norms) affects both the outcome and the covariates, our spatially varying coefficients absorb that contamination. The result: coefficients that look like local effects but actually reflect omitted variable bias.
+
+This post is a Python tutorial faithful to [Li & Fotheringham (2026)](https://doi.org/10.1080/24694452.2026.2654481), *"Spatial Context as a Time-Invariant Confounder: A Fixed-Effects Extension of MGWR,"* *Annals of the American Association of Geographers*. The paper introduces **Multiscale Geographically Weighted Fixed Effects Regression (MGWFER)**, a local panel framework that combines two powerful ideas: (1) a *within-transformation* that removes all time-invariant confounders from panel data, and (2) *Multiscale GWR* that estimates location-specific coefficients at variable-optimal spatial scales. Think of it as giving each location its own regression while simultaneously controlling for everything about that location that does not change over time.
+
+This tutorial asks: **can we recover the true spatially varying coefficients — and the intrinsic contextual effects themselves — when an unobserved spatial context drives both the outcome and the covariate levels?** We simulate a panel of 225 spatial units observed over 3 time periods using the paper's DGP verbatim (the indirect channel `sc → x_k` is active, with `Cor(x_k, sc) ≈ 0.84`), and compare six estimators across the full lineup the paper considers: cross-sectional OLS, pooled OLS, individual FE, cross-sectional MGWR, pooled MGWR (PMGWR), and MGWFER. The answer is yes on both counts: MGWFER cuts the most-biased local coefficient's error by ~92% (β₁ RMSE 2.30 → 0.18, with the sign of the correlation against truth flipping from −0.46 to +0.82), and **Stage 2** recovers the unit-level fixed effects with Pearson correlation **≈1.000** (0.9996) against the true confounder surface.
+
+**Learning objectives:**
+
+- Distinguish the **three kinds of contextual effects** (intrinsic, behavioral, indirect) that the paper formalises.
+- See, via a causal DAG and a one-page Wooldridge derivation, *why* an unobserved spatial context produces omitted-variable bias in MGWR.
+- Implement the **two-stage MGWFER algorithm**: Stage 1 (within-transform + standardise + MGWR + back-transform) and Stage 2 (recover individual fixed effects with per-unit t-tests).
+- Compare PMGWR and MGWFER on RMSE, correlation, bandwidths, significance maps, and the recovered fixed-effects surface.
+- Audit the **four identification assumptions** under which MGWFER yields a causal interpretation, and the limitations that survive.
+
+The analysis follows the paper's progression: simulate known truth, fit the naive PMGWR, apply the within-transform, fit MGWFER, recover the fixed effects, then compare.
+
+```{mermaid}
+graph LR
+    A["<b>Step 1</b><br/>Simulate<br/>Panel DGP"] --> G["<b>Step 2</b><br/>Global baselines<br/>OLS / FE"]
+    G --> B["<b>Step 3</b><br/>MGWR_cs &amp;<br/>PMGWR"]
+    B --> C["<b>Step 4</b><br/>Within-<br/>Transform"]
+    C --> D["<b>Step 5</b><br/>Stage 1:<br/>MGWFER slopes"]
+    D --> F["<b>Step 6</b><br/>Stage 2:<br/>Recover &alpha;<sub>i</sub>"]
+    F --> E["<b>Step 7</b><br/>Compare<br/>all six"]
+
+    style A fill:#141413,stroke:#6a9bcc,color:#fff
+    style G fill:#6a9bcc,stroke:#141413,color:#fff
+    style B fill:#d97757,stroke:#141413,color:#fff
+    style C fill:#6a9bcc,stroke:#141413,color:#fff
+    style D fill:#00d4c8,stroke:#141413,color:#fff
+    style F fill:#00d4c8,stroke:#141413,color:#fff
+    style E fill:#1a3a8a,stroke:#141413,color:#fff
+```
+
+The key insight is at Step 3: by subtracting each unit's time-series mean, the confounder vanishes — it contributes the same amount at every time period, so the mean subtraction cancels it exactly. What remains is pure within-unit variation, driven only by the spatially varying coefficients and noise. Stage 2 then walks the algorithm backwards: once we have the slopes, we recover the fixed effects $\alpha_i$ themselves as a substantive quantity of interest.
+
+## 2. Setup and verification
+
+```{python}
+#| label: setup-packages
+
+import sys, importlib.metadata
+from pathlib import Path
+
+# Pinned versions used to produce the published numbers. The notebook's
+# .venv/ was created and populated by `setup_env.py` (see _quarto.yml
+# pre-render hook). This chunk verifies that the kernel is running inside
+# that .venv/ and that the installed versions match.
+
+PINNED = {
+    "numpy":       "1.26.4",
+    "pandas":      "2.2.1",
+    "matplotlib":  "3.8.3",
+    "scipy":       "1.12.0",
+    "statsmodels": "0.14.1",
+    "mgwr":        "2.2.1",
+}
+
+py = Path(sys.executable).resolve()
+assert ".venv" in py.parts, (
+    f"Kernel is running outside the tutorial .venv (sys.executable={py}). "
+    "Re-render from Positron so the pre-render hook activates the venv kernel."
+)
+print(f"Python: {py}")
+
+for pkg, want in PINNED.items():
+    have = importlib.metadata.version(pkg)
+    status = "OK" if have == want else f"MISMATCH (want {want})"
+    print(f"  {pkg:14s} {have:14s}  [{status}]")
+```
+
+The analysis uses a [custom fork of the mgwr package](https://github.com/GeoZhipengLi/MGWPR) that extends MGWR with panel data support (the `time` parameter) and the ability to fit without an intercept (`constant=False`). We clone the repository at render-time and prepend it to `sys.path` so it takes precedence over any pip-installed `mgwr`.
+
+```{python}
+#| label: imports
+
+import os
+import sys
+import subprocess
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+from matplotlib.patches import Patch
+from scipy import stats
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+# Clone the custom MGWR package (panel data support, constant=False)
+REPO_DIR = os.path.join(os.getcwd(), "mgwpr_repo")
+if not os.path.exists(REPO_DIR):
+    subprocess.run(
+        ["git", "clone", "https://github.com/GeoZhipengLi/MGWPR.git", REPO_DIR],
+        check=True, capture_output=True
+    )
+sys.path.insert(0, REPO_DIR)
+
+from mgwr.gwr import GWR, MGWR
+from mgwr.sel_bw import Sel_BW
+
+# Configuration
+RANDOM_SEED = 42
+np.random.seed(RANDOM_SEED)
+N_GRID = 15
+N_UNITS = N_GRID * N_GRID   # 225
+N_TIME = 3
+N_OBS = N_UNITS * N_TIME    # 675
+
+# DGP parameters (paper Eqs. 40-44)
+SIGMA_X = 0.5
+SC_COUPLING = 0.05
+SIGMA_EPS = 0.5
+
+# Site color palette
+STEEL_BLUE = "#6a9bcc"
+WARM_ORANGE = "#d97757"
+NEAR_BLACK = "#141413"
+TEAL = "#00d4c8"
+
+# Dark theme palette
+DARK_NAVY = "#0f1729"
+GRID_LINE = "#1f2b5e"
+LIGHT_TEXT = "#c8d0e0"
+WHITE_TEXT = "#e8ecf2"
+
+plt.rcParams.update({
+    "figure.facecolor": DARK_NAVY,
+    "axes.facecolor": DARK_NAVY,
+    "axes.edgecolor": DARK_NAVY,
+    "axes.linewidth": 0,
+    "axes.labelcolor": LIGHT_TEXT,
+    "axes.titlecolor": WHITE_TEXT,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.spines.left": False,
+    "axes.spines.bottom": False,
+    "axes.grid": True,
+    "grid.color": GRID_LINE,
+    "grid.linewidth": 0.6,
+    "grid.alpha": 0.8,
+    "xtick.color": LIGHT_TEXT,
+    "ytick.color": LIGHT_TEXT,
+    "text.color": WHITE_TEXT,
+    "font.size": 12,
+    "legend.frameon": False,
+    "savefig.facecolor": DARK_NAVY,
+    "savefig.edgecolor": DARK_NAVY,
+})
+```
+
+## 3. Three kinds of contextual effects
+
+Li & Fotheringham (2026) reorganise how *place* can shape behaviour by splitting "contextual effects" into three categories. Two were already in the MGWR vocabulary; the third is the paper's headline contribution and the reason MGWFER exists.
+
+1. **Intrinsic contextual effects.** Unmeasured attributes of place (traditions, local norms, persistent geographic conditions) that *directly* shift the outcome. In MGWR these are captured by the **local intercept** $\alpha_{bw0}(u_i, v_i)$. In MGWFER they are captured by the **individual fixed effect** $\alpha_i$.
+
+2. **Behavioral contextual effects.** How place *modulates the slopes* — i.e., the elasticities between $y$ and each covariate $x_k$. In MGWR these are the spatially varying coefficients $\beta_{bwk}(u_i, v_i)$, allowed to operate at covariate-specific bandwidths.
+
+3. **Indirect contextual effects** *(the paper's key addition).* How place shapes the *levels of the covariates themselves*. Wealthy regions tend to invest more in transit; coastal regions have more tourism; old-industrial regions have higher unemployment. The covariates are not exogenous — they have a backdoor link through spatial context. Standard MGWR's exogeneity assumption denies this channel.
+
+It is the third channel that contaminates MGWR estimates: because spatial context can both raise the levels of the $x_k$'s and shift $y$ directly, ignoring it creates a spurious correlation between covariates and outcomes that looks like a "local effect." MGWFER's within-transformation severs that backdoor path by removing every time-invariant component of place from both sides of the regression.
+
+> "Spatial context, as part of unmeasured factors, however, probably exerts a profound and widespread influence on a wide range of socioeconomic factors. Under these conditions, MGWR would suffer from endogeneity and potentially support misleading correlations between covariates and the response variable." — Li & Fotheringham (2026)
+
+## 4. Spatial context as a confounder: a causal-diagram view
+
+The intuition is cleanest in the language of directed acyclic graphs (DAGs; Pearl 2009). Two graphs are at issue.
+
+```{mermaid}
+graph LR
+    subgraph "Figure 2A — MGWR's implicit assumption"
+        X1["X (covariates)"] -->|"β"| Y1["Y (outcome)"]
+        SC1((SC)):::hidden -.->|"only direct"| Y1
+    end
+
+    subgraph "Figure 2B — what really happens (Li &amp; Fotheringham 2026)"
+        SC2((SC)):::hidden -->|"δ (indirect)"| X2["X (covariates)"]
+        SC2 -->|"intrinsic"| Y2["Y (outcome)"]
+        X2 -->|"β (behavioral)"| Y2
+    end
+
+    classDef hidden fill:#0f1729,stroke:#d97757,color:#fff,stroke-dasharray: 4 3
+    style X1 fill:#6a9bcc,stroke:#141413,color:#fff
+    style Y1 fill:#00d4c8,stroke:#141413,color:#fff
+    style X2 fill:#6a9bcc,stroke:#141413,color:#fff
+    style Y2 fill:#00d4c8,stroke:#141413,color:#fff
+```
+
+In **Figure 2A**, spatial context only touches $Y$ directly — there is no backdoor path from $X$ to $Y$ through $SC$, and MGWR's coefficient estimates can be read causally (under the usual exogeneity assumption). In **Figure 2B** — the realistic structure — $SC$ is a parent of *both* $X$ and $Y$. There is now a non-causal backdoor path $X \leftarrow SC \rightarrow Y$ that opens whenever $SC$ is left unconditioned-upon. That open path is what biases the MGWR estimates.
+
+The formal demonstration, adapted from Wooldridge (2010, 65-67) and equations 4-8 in the paper, takes one paragraph. Write the true model with spatial context $sc$ entering linearly:
+
+$$y = \beta_0 + x_1 \beta_1 + \cdots + x_K \beta_K + sc + \varepsilon, \quad E[\varepsilon \mid x, sc] = 0.$$
+
+Since $sc$ is unobservable, it is absorbed into the error term $\mu = sc + \varepsilon$. If $sc$ has a linear projection on the covariates,
+
+$$sc = \delta_0 + x_1 \delta_1 + \cdots + x_K \delta_K + \eta,$$
+
+then substituting and rearranging yields:
+
+$$y = (\beta_0 + \delta_0) + x_1 (\beta_1 + \delta_1) + \cdots + x_K (\beta_K + \delta_K) + (\varepsilon + \eta).$$
+
+OLS (or MGWR) recovers $\hat\beta_k = \beta_k + \delta_k$, not $\beta_k$. The bias term $\delta_k$ is exactly the indirect contextual effect — the strength of the link from $SC$ to $x_k$. When that link is non-trivial, the estimates are systematically wrong, and *the magnitude of the bias is the magnitude of the indirect contextual effect.* MGWFER's within-transformation eliminates the time-invariant component of $sc$ (which, by the paper's assumption, is *all* of $sc$), neutralising $\delta_k$ and restoring identification of $\beta_k$.
+
+### 4.1 Key concepts at a glance
+
+The post leans on a small vocabulary repeatedly. The rest of the tutorial assumes you can move between these terms quickly.
+
+**1. Spatially varying coefficients** $\beta_j(u_i, v_i)$. A regression coefficient that depends on location. Each unit $i$ at coordinates $(u_i, v_i)$ has its own slope on covariate $j$. The coefficient surface tells you where the predictor matters more or less. It is the *signal* MGWR is built to estimate.
+
+**2. Time-invariant confounder (fixed effect)** $\alpha_i$. A unit-specific shift that contributes equally at every time period. It contaminates pooled estimators because it is correlated with the covariates. In the paper's framing, $\alpha_i$ is the **statistical operationalisation of spatial context** — the unmeasurable place-based factors that the within-transformation will eliminate.
+
+**3. Within-transformation (demeaning)** $\tilde{y}_{it} = y_{it} - \bar{y}_i$. Subtract each unit's time-series mean from each observation. The unit-specific shift $\alpha_i$ vanishes by construction. What remains is within-unit variation: the part of `y` that moves over time inside one unit.
+
+**4. Multiscale GWR (MGWR).** A geographically weighted regression where each covariate gets its own optimal bandwidth. Local effects vary at different scales: some predictors smooth out over large neighbourhoods, others change house-by-house. MGWR learns those scales from the data.
+
+**5. Bandwidth selection.** The hyperparameter that controls kernel smoothness around each location. Cross-validation picks the bandwidth that minimizes a corrected AICc or similar criterion. When the data contain a fixed effect, the cross-validation criterion is contaminated and picks the wrong bandwidths.
+
+**6. Pooled MGWR (PMGWR).** The naive baseline. Treats the 675 observations as an unstructured cross-section. Ignores that 3 of every 3 observations come from the same `unit_id`. Cannot remove $\alpha_i$. Produces biased coefficient surfaces.
+
+**7. MGWFER** — Multiscale Geographically Weighted **F**ixed **E**ffects **R**egression. The proposed estimator (Li & Fotheringham 2026). A *two-stage* algorithm: **Stage 1** within-transforms the data, standardises, fits MGWR on the demeaned panel, and back-transforms coefficients to the original scale. **Stage 2** then recovers the individual fixed effects $\alpha_i$ themselves (Eq. 30 of the paper), with t-tests at the unit level.
+
+**8. Indirect contextual effects** $\delta_k$. The bias channel that motivates MGWFER. If unobserved spatial context $sc$ affects the *levels* of covariate $x_k$, then OLS / MGWR recovers $\beta_k + \delta_k$ instead of $\beta_k$. The within-transformation severs the $sc \to x_k$ link by removing the time-invariant component of $sc$ from both sides of the regression.
+
+## 5. Simulating panel data with a spatial confounder
+
+To evaluate whether MGWFER works, we need **ground truth** — known coefficient surfaces that we can compare against estimates. We follow the paper's DGP (Eqs. 39–45) verbatim, scaled to a 15×15 grid (225 units) observed over 3 time periods, giving 675 total observations. The paper uses a 30×30 grid; we keep a smaller grid so the bandwidth search completes in minutes rather than hours, while still exercising every step of the two-stage algorithm and every result the paper reports.
+
+The crucial design choice is that **each covariate is generated as a function of spatial context**: `x_kt = N(0, 0.5) + 0.05·sc_i` for `k=1..4`. This is the **indirect contextual effect channel** the paper is built to address — `sc` drives *both* the outcome (directly) *and* the covariate levels (indirectly). When the script runs, it prints the resulting `Cor(x_k, sc) ≈ 0.84` for all `k`, confirming that the indirect channel is strong. The reduced-form consequence: `Cor(x_4, y) = 0.84` even though `β_4 = 0` by construction — a textbook spurious correlation that any model failing to condition on `sc` will misinterpret as a real effect.
+
+The data generating process (DGP) has two parts. **The outcome equation** combines three causally-active covariates with known spatially varying slopes plus a time-invariant fixed effect (paper Eq. 45):
+
+$$y_{it} = sc_i + \beta_1(u_i, v_i) \cdot x_{1,it} + \beta_2(u_i, v_i) \cdot x_{2,it} + \beta_3(u_i, v_i) \cdot x_{3,it} + \varepsilon_{it}$$
+
+Note that `x_4` does *not* appear here — by construction `β_4 ≡ 0`, so `x_4` has no causal effect on `y`. **The covariate equation** is the part that activates the indirect contextual channel (paper Eqs. 40–43):
+
+$$x_{k,it} = 0.05 \cdot sc_i + \nu_{k,it}, \quad \nu_{k,it} \sim N(0, 0.5), \quad k = 1, 2, 3, 4.$$
+
+In words, every covariate is a noisy linear function of spatial context. Wealthy regions invest more in transit; coastal regions have more tourism; persistent-poverty regions have low education. Even `x_4`, which has no causal effect on `y`, shares the common parent `sc` with `y`, so `Cor(x_4, y) ≈ 0.84` — a spurious correlation that any non-FE model will pick up as a "real" effect.
+
+**Variable mapping:**
+
+- $sc_i$ = `alpha_true` — paper Eq. 39: `30·(exp(j/15) − 1)`, range 2.07 to 51.55 (mean 23.29).
+- $\beta_1$ = `beta_1_true` — a quadratic dome peaking at the grid center (range 1.06 to 2.00).
+- $\beta_2$ = `beta_2_true` — a linear gradient increasing from lower-left to upper-right (range 1.07 to 2.00).
+- $\beta_3$ = `beta_3_true` — constant at 1.5 everywhere (tests spatial homogeneity).
+- $\beta_4$ = `beta_4_true` — identically zero everywhere (tests false-positive detection).
+- $\varepsilon_{it} \sim N(0, 0.5)$ — independent random noise (paper Eq. 44).
+
+```{python}
+#| label: data-simulate
+
+rng = np.random.default_rng(RANDOM_SEED)
+
+# Spatial grid coordinates
+grid_i = np.repeat(np.arange(1, N_GRID + 1), N_GRID)
+grid_j = np.tile(np.arange(1, N_GRID + 1), N_GRID)
+
+# True spatially varying coefficients
+q = np.ceil(N_GRID / 4)
+beta_1_true = 1 + ((q**2 - (q - grid_i/2)**2) * (q**2 - (q - grid_j/2)**2)) / q**4
+beta_2_true = 1 + (grid_i + grid_j) / (2 * N_GRID)
+beta_3_true = np.full(N_UNITS, 1.5)
+beta_4_true = np.zeros(N_UNITS)
+
+# Time-invariant spatial context (paper Eq. 39)
+alpha_true = 30 * (np.exp(grid_j / N_GRID) - 1)
+
+# Panel coordinates
+unit_ids = np.repeat(np.arange(N_UNITS), N_TIME)
+time_ids = np.tile(np.arange(N_TIME), N_UNITS)
+coords_i = np.repeat(grid_i, N_TIME)
+coords_j = np.repeat(grid_j, N_TIME)
+sc_repeat = np.repeat(alpha_true, N_TIME)
+
+# Paper Eqs. 40-43: covariates depend on sc (indirect contextual channel)
+x1 = SIGMA_X * rng.standard_normal(N_OBS) + SC_COUPLING * sc_repeat
+x2 = SIGMA_X * rng.standard_normal(N_OBS) + SC_COUPLING * sc_repeat
+x3 = SIGMA_X * rng.standard_normal(N_OBS) + SC_COUPLING * sc_repeat
+x4 = SIGMA_X * rng.standard_normal(N_OBS) + SC_COUPLING * sc_repeat  # null effect
+
+# Paper Eqs. 44-45: epsilon and y (note: beta_4 * x_4 omitted from y)
+b1 = np.repeat(beta_1_true, N_TIME)
+b2 = np.repeat(beta_2_true, N_TIME)
+b3 = np.repeat(beta_3_true, N_TIME)
+b4 = np.repeat(beta_4_true, N_TIME)
+alpha_panel = np.repeat(alpha_true, N_TIME)
+epsilon = SIGMA_EPS * rng.standard_normal(N_OBS)
+y = alpha_panel + b1*x1 + b2*x2 + b3*x3 + epsilon
+
+# Assemble panel
+panel_df = pd.DataFrame({
+    "unit_id": unit_ids, "time_id": time_ids,
+    "coord_i": coords_i, "coord_j": coords_j,
+    "y": y, "x1": x1, "x2": x2, "x3": x3, "x4": x4,
+    "alpha_true": alpha_panel,
+    "beta1_true": b1, "beta2_true": b2, "beta3_true": b3, "beta4_true": b4,
+})
+
+print(f"Cor(x1, sc) = {np.corrcoef(x1, sc_repeat)[0,1]:.3f}")
+print(f"Cor(x2, sc) = {np.corrcoef(x2, sc_repeat)[0,1]:.3f}")
+print(f"Cor(x3, sc) = {np.corrcoef(x3, sc_repeat)[0,1]:.3f}")
+print(f"Cor(x4, sc) = {np.corrcoef(x4, sc_repeat)[0,1]:.3f}")
+print(f"Cor(x4, y)  = {np.corrcoef(x4, y)[0,1]:.3f}   (spurious — beta_4 is zero)")
+print(f"Panel shape: {panel_df.shape}")
+```
+
+The numbers are blunt. Each covariate is 84% correlated with spatial context, and *because of that*, `x_4` is 84% correlated with `y` even though it has zero causal effect. A regression that fails to condition on `sc` will gladly assign `x_4` a large, significant slope — that is the indirect contextual effects bias mechanism, made concrete.
+
+The figure below shows the true coefficient surfaces and the confounder pattern on the 15×15 grid.
+
+```{python}
+#| label: fig-true-coefficients
+#| fig-cap: "True DGP coefficient surfaces: beta_1 shows a quadratic dome, beta_2 a linear gradient, beta_3 is constant at 1.5, and alpha_i is an exponential confounder dominating the cross-sectional variation."
+
+fig, axes = plt.subplots(2, 2, figsize=(12, 11))
+fig.patch.set_facecolor(DARK_NAVY)
+fig.suptitle("True Data Generating Process: Spatially Varying Coefficients",
+             fontsize=14, color=WHITE_TEXT, y=0.98)
+
+surfaces = [
+    (beta_1_true, r"$\beta_1$ (quadratic dome)", "coolwarm"),
+    (beta_2_true, r"$\beta_2$ (linear gradient)", "coolwarm"),
+    (beta_3_true, r"$\beta_3$ (constant = 1.5)", "coolwarm"),
+    (alpha_true,  r"$\alpha_i$ (fixed effect / confounder)", "viridis"),
+]
+
+for ax, (vals, title, cmap) in zip(axes.flat, surfaces):
+    img = ax.imshow(vals.reshape(N_GRID, N_GRID), cmap=cmap,
+                    origin="lower", aspect="equal")
+    ax.set_title(title, fontsize=12, color=WHITE_TEXT, pad=8)
+    ax.set_xlabel("j (column)", fontsize=10)
+    ax.set_ylabel("i (row)", fontsize=10)
+    cbar = plt.colorbar(img, ax=ax, fraction=0.046, pad=0.04)
+    cbar.outline.set_edgecolor(GRID_LINE)
+    for label in cbar.ax.get_yticklabels():
+        label.set_color(LIGHT_TEXT)
+
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.show()
+```
+
+The contrast is stark: $\alpha_i$ (lower-right panel) has a range of nearly 50 units, while the coefficients $\beta_1$ through $\beta_3$ vary by at most 1 unit. Any cross-sectional model that cannot separate $\alpha_i$ from the slopes will produce severely biased estimates — the exponential fixed-effect pattern will "leak" into the coefficient surfaces, distorting their true shapes.
+
+## 6. Global model baselines: replicating paper Table 2
+
+Before fitting any local model, we run three *global* benchmarks that mirror the paper's Table 2: cross-sectional OLS (period 0 only), pooled OLS (all 675 obs), and the individual fixed-effects (FE) estimator via the within-transformation. These models do not know about location at all — they return a single number per coefficient — but they show, in the simplest possible form, that the indirect contextual effect bites hard and that the FE within-transformation fixes it.
+
+```{python}
+#| label: fit-global
+
+# (a) Cross-sectional OLS on period 0
+mask_t0 = panel_df["time_id"].values == 0
+y_cs = panel_df.loc[mask_t0, "y"].values
+X_cs_raw = panel_df.loc[mask_t0, ["x1","x2","x3","x4"]].values
+ols_cs = sm.OLS(y_cs, sm.add_constant(X_cs_raw)).fit()
+
+# (b) Pooled OLS on all 675 obs
+X_p_raw = panel_df[["x1","x2","x3","x4"]].values
+ols_pool = sm.OLS(panel_df["y"].values, sm.add_constant(X_p_raw)).fit()
+
+# (c) Individual FE via within-transformation
+um = panel_df.groupby("unit_id")[["y","x1","x2","x3","x4"]].transform("mean")
+y_w = panel_df["y"].values - um["y"].values
+X_w = panel_df[["x1","x2","x3","x4"]].values - um[["x1","x2","x3","x4"]].values
+fe_global = sm.OLS(y_w, X_w).fit()
+
+# Recover alpha_i: alpha_hat_i = y_bar_i - x_bar_i @ beta_hat
+y_bar_i = panel_df.groupby("unit_id")["y"].mean().reindex(np.arange(N_UNITS)).values
+x_bar_i = (panel_df.groupby("unit_id")[["x1","x2","x3","x4"]]
+           .mean().reindex(np.arange(N_UNITS)).values)
+alpha_fe_global = y_bar_i - x_bar_i @ fe_global.params
+
+print("(a) Cross-sectional OLS (period 0)")
+for k in range(4):
+    print(f"    beta_{k+1} = {ols_cs.params[k+1]:>7.3f}   p = {ols_cs.pvalues[k+1]:.3g}")
+
+print("\n(b) Pooled OLS (all 675 obs)")
+for k in range(4):
+    print(f"    beta_{k+1} = {ols_pool.params[k+1]:>7.3f}   p = {ols_pool.pvalues[k+1]:.3g}")
+
+print("\n(c) Individual FE (within estimator)")
+for k in range(4):
+    print(f"    beta_{k+1} = {fe_global.params[k]:>7.3f}   p = {fe_global.pvalues[k]:.3g}")
+print(f"    mean(alpha_hat) = {alpha_fe_global.mean():.3f}  (true mean = {alpha_true.mean():.3f})")
+```
+
+The pattern is the paper's headline result on a single screen:
+
+- **OLS and pooled OLS** estimate every coefficient ~4× too high (paper reports the same — 6.05, 5.93, 6.15 for the first three; 4.59 for the fourth). They spuriously declare `x_4` significant at p < 1e-13 even though `β_4 = 0`. The model has nowhere to put the influence of `sc` except into the slopes — exactly Wooldridge's Eq. 8 from Section 4, where $\hat\beta_k = \beta_k + \delta_k$.
+- **Individual FE** recovers all three true slopes (≈ 1.5), correctly returns `β_4 ≈ 0` (not significant), and reconstructs the mean of `α_i` close to the truth. The within-transformation neutralises `δ_k` and identification is restored.
+
+What FE *cannot* do is tell us where each effect varies across space — it returns one number per coefficient. That is exactly the gap MGWR, PMGWR, and MGWFER are designed to fill. Among them, only MGWFER inherits the FE estimator's clean identification while delivering location-specific surfaces.
+
+## 7. Pooled MGWR (PMGWR): the naive baseline
+
+The simplest approach ignores the panel structure entirely, treating all 675 observations as independent cross-sectional data and fitting MGWR with an intercept. This is what a researcher might do if they stacked multiple time periods without accounting for unit-specific effects.
+
+The custom `mgwr` package requires variables to be **standardized** before multiscale bandwidth selection. The `time=N_TIME` parameter tells the algorithm that observations are grouped in panels of 3 time periods per unit, which affects the kernel weighting.
+
+```{python}
+#| label: fit-pmgwr
+
+Y_raw = panel_df["y"].values.reshape(-1, 1)
+X_raw = panel_df[["x1","x2","x3","x4"]].values
+coords_panel = list(zip(panel_df["coord_i"].values.astype(float),
+                        panel_df["coord_j"].values.astype(float)))
+
+# Standardize
+Y_std_pooled = (Y_raw - Y_raw.mean()) / Y_raw.std()
+X_std_pooled = (X_raw - X_raw.mean(axis=0)) / X_raw.std(axis=0)
+y_std_pooled = Y_raw.std()
+x_stds_pooled = X_raw.std(axis=0)
+
+# Bandwidth selection + fit
+pooled_selector = Sel_BW(coords_panel, Y_std_pooled, X_std_pooled,
+                        multi=True, constant=True, time=N_TIME)
+pooled_bw = pooled_selector.search()
+pooled_model = MGWR(coords_panel, Y_std_pooled, X_std_pooled,
+                    pooled_selector, constant=True, time=N_TIME).fit()
+
+print(f"Pooled MGWR bandwidths: {pooled_bw}")
+print(f"R-squared: {pooled_model.R2:.4f}")
+print(f"AICc: {pooled_model.aicc:.2f}")
+```
+
+After back-transforming the standardized coefficients to the original scale, we compute recovery metrics against the known truth.
+
+```{python}
+#| label: back-transform-pmgwr
+
+n_params_pooled = pooled_model.params.shape[1]
+pooled_params_orig = np.zeros_like(pooled_model.params)
+pooled_params_orig[:, 0] = pooled_model.params[:, 0] * y_std_pooled  # intercept (zero-centred)
+for k in range(4):
+    pooled_params_orig[:, k+1] = (pooled_model.params[:, k+1] *
+                                  y_std_pooled / x_stds_pooled[k])
+
+# Average per unit across time
+pooled_params_by_unit = np.zeros((N_UNITS, n_params_pooled))
+for i in range(N_UNITS):
+    mask = panel_df["unit_id"].values == i
+    pooled_params_by_unit[i] = pooled_params_orig[mask].mean(axis=0)
+
+pooled_df = pd.DataFrame(pooled_params_by_unit,
+    columns=["intercept", "beta1_pooled", "beta2_pooled",
+             "beta3_pooled", "beta4_pooled"])
+pooled_df["unit_id"] = np.arange(N_UNITS)
+
+rmse_pooled = {}
+for k, (col, true_vals) in enumerate(zip(
+    ["beta1_pooled","beta2_pooled","beta3_pooled","beta4_pooled"],
+    [beta_1_true, beta_2_true, beta_3_true, beta_4_true]
+)):
+    rmse = np.sqrt(np.mean((pooled_df[col].values - true_vals)**2))
+    corr = np.corrcoef(pooled_df[col].values, true_vals)[0, 1]
+    rmse_pooled[f"beta_{k+1}"] = {"rmse": rmse, "corr": corr}
+    print(f"  {col}: RMSE={rmse:.4f}, Corr={corr:.4f}")
+```
+
+The R-squared looks impressive, but it is misleading on three counts. **First**, the local intercept absorbs most of the spatial variation from `sc_i`, inflating the apparent model fit even as the slope coefficients are catastrophically wrong. **Second**, $\beta_1$'s correlation with truth is *negative* — the estimated $\beta_1$ surface is *anti-correlated* with the real signal, a result much worse than a constant guess would produce. **Third**, $\beta_4$ — which is truly zero — picks up a large RMSE because PMGWR has no way to separate `sc`'s direct effect on `y` from `sc`'s effect on `x_4`. The `nan` correlations for $\beta_3$ and $\beta_4$ are mathematically expected: the true values have zero variance, making Pearson correlation undefined.
+
+Compare this with the global FE results we just saw: the *global* FE estimator nails $\beta_1 \approx 1.5$ — but it gives a single number, not a surface. PMGWR offers surfaces but corrupts them. MGWFER will give us both.
+
+## 8. Cross-sectional MGWR baseline
+
+A second naive baseline fits MGWR on a single time period only — no panel structure to exploit. The paper benchmarks both PMGWR and cross-sectional MGWR against MGWFER. The custom MGWPR fork requires passing `time=1` to indicate a pure cross-section.
+
+```{python}
+#| label: fit-mgwr-cs
+
+mask_t0_full = panel_df["time_id"].values == 0
+coords_cs = list(zip(panel_df.loc[mask_t0_full, "coord_i"].values.astype(float),
+                     panel_df.loc[mask_t0_full, "coord_j"].values.astype(float)))
+Y_cs_raw = panel_df.loc[mask_t0_full, "y"].values.reshape(-1, 1)
+X_cs_raw_mat = panel_df.loc[mask_t0_full, ["x1","x2","x3","x4"]].values
+
+Y_cs_std = (Y_cs_raw - Y_cs_raw.mean()) / Y_cs_raw.std()
+X_cs_std = (X_cs_raw_mat - X_cs_raw_mat.mean(axis=0)) / X_cs_raw_mat.std(axis=0)
+y_std_cs_val = float(Y_cs_raw.std())
+x_stds_cs = X_cs_raw_mat.std(axis=0)
+y_mean_cs_val = float(Y_cs_raw.mean())
+x_means_cs = X_cs_raw_mat.mean(axis=0)
+
+mgwr_cs_sel = Sel_BW(coords_cs, Y_cs_std, X_cs_std,
+                     multi=True, constant=True, time=1)
+mgwr_cs_bw = mgwr_cs_sel.search()
+mgwr_cs_model = MGWR(coords_cs, Y_cs_std, X_cs_std,
+                     mgwr_cs_sel, constant=True, time=1).fit()
+
+# Back-transform
+mgwr_cs_params_orig = np.zeros_like(mgwr_cs_model.params)
+mgwr_cs_params_orig[:, 0] = mgwr_cs_model.params[:, 0] * y_std_cs_val
+for k in range(4):
+    mgwr_cs_params_orig[:, k+1] = (mgwr_cs_model.params[:, k+1] *
+                                   y_std_cs_val / x_stds_cs[k])
+mgwr_cs_params_orig[:, 0] = (mgwr_cs_params_orig[:, 0] + y_mean_cs_val
+                             - mgwr_cs_params_orig[:, 1:5] @ x_means_cs)
+
+mgwr_cs_df = pd.DataFrame(mgwr_cs_params_orig,
+    columns=["intercept_mgwr_cs", "beta1_mgwr_cs", "beta2_mgwr_cs",
+             "beta3_mgwr_cs", "beta4_mgwr_cs"])
+mgwr_cs_df["unit_id"] = np.arange(N_UNITS)
+
+rmse_mgwr_cs = {}
+for k, (col, true_vals) in enumerate(zip(
+    ["beta1_mgwr_cs","beta2_mgwr_cs","beta3_mgwr_cs","beta4_mgwr_cs"],
+    [beta_1_true, beta_2_true, beta_3_true, beta_4_true]
+)):
+    rmse = np.sqrt(np.mean((mgwr_cs_df[col].values - true_vals)**2))
+    corr = np.corrcoef(mgwr_cs_df[col].values, true_vals)[0, 1]
+    rmse_mgwr_cs[f"beta_{k+1}"] = {"rmse": rmse, "corr": corr}
+
+alpha_mgwr_cs = mgwr_cs_df["intercept_mgwr_cs"].values
+rmse_alpha_mgwr_cs = float(np.sqrt(np.mean((alpha_mgwr_cs - alpha_true)**2)))
+corr_alpha_mgwr_cs = float(np.corrcoef(alpha_mgwr_cs, alpha_true)[0,1])
+
+alpha_pmgwr = pooled_df["intercept"].values
+rmse_alpha_pmgwr = float(np.sqrt(np.mean((alpha_pmgwr - alpha_true)**2)))
+corr_alpha_pmgwr = float(np.corrcoef(alpha_pmgwr, alpha_true)[0,1])
+
+print(f"MGWR_cs bandwidths: {mgwr_cs_bw}")
+print(f"MGWR_cs alpha (intercept): range [{alpha_mgwr_cs.min():.2f}, {alpha_mgwr_cs.max():.2f}]  Corr={corr_alpha_mgwr_cs:.3f}")
+print(f"PMGWR   alpha (intercept): range [{alpha_pmgwr.min():.2f}, {alpha_pmgwr.max():.2f}]  Corr={corr_alpha_pmgwr:.3f}")
+```
+
+Both cross-sectional MGWR and PMGWR fail to separate $\alpha_i$ from the slopes. Their *local intercepts* end up trying to absorb $\alpha_i$ alongside the slope estimates — and as we'll see in Section 11, both compress the true range by 2.5× or invert it altogether. The within-transformation is what unsticks them.
+
+## 9. MGWFER Stage 1: removing the confounder
+
+Algorithm 1 of Li & Fotheringham (2026) has two stages. **Stage 1** estimates the spatially varying slopes after removing the fixed effect. **Stage 2** (Section 10 below) reconstructs the fixed effect itself from the unit means.
+
+### 9.1 The within-transformation
+
+The fix is elegant. If the confounder $\alpha_i$ does not change over time, we can eliminate it by subtracting each unit's temporal mean from all its observations. This is the *within-transformation* — the workhorse of panel data econometrics. Think of it like zeroing a kitchen scale: you subtract the weight of the container (the fixed effect) so that only the contents (the covariate effects) remain.
+
+Formally, for each unit $i$:
+
+$$\tilde{y}_{it} = y_{it} - \bar{y}_i = \beta_1(u_i, v_i)(x_{1,it} - \bar{x}_{1,i}) + \cdots + \beta_4(u_i, v_i)(x_{4,it} - \bar{x}_{4,i}) + (\varepsilon_{it} - \bar{\varepsilon}_i)$$
+
+In words, this says: after subtracting the unit mean $\bar{y}_i$, the fixed effect $\alpha_i$ vanishes completely (since $\alpha_i - \alpha_i = 0$). What remains are the within-unit deviations of the covariates multiplied by their true spatially varying coefficients, plus demeaned noise. The key **causal assumption** is that no *time-varying* confounders exist — strict exogeneity conditional on the fixed effects.
+
+```{python}
+#| label: within-transform
+
+# Within-transformation: subtract unit means
+unit_means = panel_df.groupby("unit_id")[["y","x1","x2","x3","x4"]].transform("mean")
+y_within = (panel_df["y"].values - unit_means["y"].values).reshape(-1, 1)
+x1_within = panel_df["x1"].values - unit_means["x1"].values
+x2_within = panel_df["x2"].values - unit_means["x2"].values
+x3_within = panel_df["x3"].values - unit_means["x3"].values
+x4_within = panel_df["x4"].values - unit_means["x4"].values
+X_within = np.column_stack([x1_within, x2_within, x3_within, x4_within])
+
+unit_check = pd.DataFrame({"unit_id": panel_df["unit_id"].values,
+                           "y_w": y_within.ravel()})
+max_unit_mean = unit_check.groupby("unit_id")["y_w"].mean().abs().max()
+print(f"y_within range: [{y_within.min():.3f}, {y_within.max():.3f}]")
+print(f"Max unit mean after demeaning: {max_unit_mean:.2e} (should be ~0)")
+```
+
+The demeaned outcome spans only a fraction of the raw `y` range. The confounder, which ranged from 2.07 to 51.55, has been completely removed. The maximum unit mean after demeaning is effectively machine-zero — confirming that the transformation is numerically exact. With $\alpha_i$ gone, any variation in the demeaned outcome is attributable solely to the covariates' spatially varying effects and noise.
+
+### 9.2 MGWR on demeaned data
+
+Now we fit MGWR on the within-transformed data. Two critical settings distinguish this from the pooled model:
+
+1. **`constant=False`** — since demeaning removes the intercept (the unit-level mean is already gone), we fit slopes only.
+2. **Standardization** — we standardize the demeaned variables before bandwidth selection, then back-transform the coefficients to the original scale.
+
+```{python}
+#| label: fit-mgwfer
+
+# Standardize demeaned data
+Y_std_fe = (y_within - y_within.mean()) / y_within.std()
+X_std_fe = (X_within - X_within.mean(axis=0)) / X_within.std(axis=0)
+y_std_fe_val = y_within.std()
+x_stds_fe = X_within.std(axis=0)
+
+# Bandwidth selection (no intercept)
+fe_selector = Sel_BW(coords_panel, Y_std_fe, X_std_fe,
+                     multi=True, constant=False, time=N_TIME)
+fe_bw = fe_selector.search()
+
+# Fit MGWFER (Stage 1)
+fe_model = MGWR(coords_panel, Y_std_fe, X_std_fe,
+                fe_selector, constant=False, time=N_TIME).fit()
+
+print(f"MGWFER bandwidths: {fe_bw}")
+print(f"R-squared: {fe_model.R2:.4f}")
+print(f"AICc: {fe_model.aicc:.2f}")
+```
+
+The R-squared reflects explanatory power over the *demeaned* outcome — it is not directly comparable to PMGWR's number, which operates on raw $y$ dominated by the confounder. A fairer interpretation: most of the within-unit temporal variation is explained by the spatially varying slopes.
+
+Back-transforming the standardised coefficients to the original scale uses the rescaling factor from the paper's Equation 29: $\hat\beta_{bwk}(u_i, v_i) = \hat\beta_{bwk}^S(u_i, v_i) \cdot \sigma_{\ddot Y} / \sigma_{\ddot X_k}$. We then average per unit across time periods to get one slope per location.
+
+```{python}
+#| label: back-transform-mgwfer
+
+n_params_fe = fe_model.params.shape[1]
+fe_params_orig = np.zeros_like(fe_model.params)
+for k in range(4):
+    fe_params_orig[:, k] = (fe_model.params[:, k] * y_std_fe_val / x_stds_fe[k])
+
+fe_params_by_unit = np.zeros((N_UNITS, 4))
+for i in range(N_UNITS):
+    mask = panel_df["unit_id"].values == i
+    fe_params_by_unit[i] = fe_params_orig[mask].mean(axis=0)
+
+fe_df = pd.DataFrame(fe_params_by_unit,
+    columns=["beta1_mgwfer","beta2_mgwfer","beta3_mgwfer","beta4_mgwfer"])
+fe_df["unit_id"] = np.arange(N_UNITS)
+
+rmse_fe = {}
+for k, (col, true_vals) in enumerate(zip(
+    ["beta1_mgwfer","beta2_mgwfer","beta3_mgwfer","beta4_mgwfer"],
+    [beta_1_true, beta_2_true, beta_3_true, beta_4_true]
+)):
+    rmse = np.sqrt(np.mean((fe_df[col].values - true_vals)**2))
+    corr = np.corrcoef(fe_df[col].values, true_vals)[0,1]
+    rmse_fe[f"beta_{k+1}"] = {"rmse": rmse, "corr": corr}
+    print(f"  {col}: RMSE={rmse:.4f}, Corr={corr:.4f}")
+```
+
+The improvement is across-the-board. RMSE drops by ~92–96% for every coefficient compared to PMGWR, and the correlation of $\hat\beta_1$ with truth **flips sign** — MGWFER has gone from an estimator that gets the dome pattern *backwards* to one that aligns with truth. The null coefficient $\beta_4$ drops dramatically — no more false-positive contamination from the indirect channel. Even $\beta_3$ (truly constant at 1.5) drops sharply, because the same demeaning that protects $\beta_1$ also protects every other slope.
+
+## 10. MGWFER Stage 2: recovering the fixed effects $\hat\alpha_i$
+
+Stage 1 gave us the slopes. Stage 2 of Algorithm 1 hands us back the fixed effects $\alpha_i$ themselves — the **intrinsic contextual effects** in the paper's typology. In standard panel econometrics these are nuisance parameters; in geography they are exactly the quantity that captures "the role of place." Equation 30 of the paper does the arithmetic in one line:
+
+$$\hat\alpha_i = \bar y_i - \sum_{k=1}^{K} \hat\beta_{bwk}(u_i, v_i) \cdot \bar x_{ik}.$$
+
+In words: take each unit's mean outcome, subtract the contribution of the unit's mean covariates evaluated at the local slopes. What's left is whatever cannot be explained by the observed covariates at this location — i.e., the unmeasured place effect.
+
+```{python}
+#| label: stage2-alpha
+
+unit_y_mean = panel_df.groupby("unit_id")["y"].mean().reindex(np.arange(N_UNITS)).values
+unit_x_means = (panel_df.groupby("unit_id")[["x1","x2","x3","x4"]]
+                .mean().reindex(np.arange(N_UNITS)).values)
+beta_unit = fe_params_by_unit
+
+# Eq. 30
+alpha_hat = unit_y_mean - np.sum(beta_unit * unit_x_means, axis=1)
+
+# Variance (Eqs. 32-37)
+resid_std = fe_model.resid_response.ravel()
+trS = fe_model.tr_S if hasattr(fe_model, "tr_S") else np.nan
+sigma_s_sq = (float(np.sum(resid_std**2) / (N_OBS - trS)) if not np.isnan(trS)
+              else float(np.var(resid_std, ddof=4)))
+sigma_sq = (N_TIME / (N_TIME - 1)) * (y_std_fe_val**2) * sigma_s_sq
+
+CCT = fe_model.CCT
+CCT_by_unit = np.zeros((N_UNITS, CCT.shape[1]))
+for i in range(N_UNITS):
+    mask = panel_df["unit_id"].values == i
+    CCT_by_unit[i] = CCT[mask].mean(axis=0)
+S_beta = y_std_fe_val / x_stds_fe
+var_beta_unit = (CCT_by_unit * sigma_s_sq) * (S_beta**2)
+var_alpha = (sigma_sq / N_TIME) + np.sum(unit_x_means**2 * var_beta_unit, axis=1)
+se_alpha = np.sqrt(np.clip(var_alpha, a_min=1e-12, a_max=None))
+
+t_alpha = alpha_hat / se_alpha
+df_alpha = N_OBS - 4 - N_UNITS  # 675 - 4 - 225 = 446
+p_alpha = 2 * (1 - stats.t.cdf(np.abs(t_alpha), df=df_alpha))
+sig5 = p_alpha < 0.05
+
+rmse_alpha = float(np.sqrt(np.mean((alpha_hat - alpha_true)**2)))
+corr_alpha = float(np.corrcoef(alpha_hat, alpha_true)[0,1])
+
+print(f"alpha_hat range: [{alpha_hat.min():.3f}, {alpha_hat.max():.3f}], mean={alpha_hat.mean():.3f}")
+print(f"True alpha range: [{alpha_true.min():.3f}, {alpha_true.max():.3f}], mean={alpha_true.mean():.3f}")
+print(f"alpha_hat recovery: RMSE={rmse_alpha:.4f}, Corr={corr_alpha:.4f}")
+print(f"Significant at 5%: {int(sig5.sum())}/{N_UNITS} units ({100*sig5.mean():.1f}%)")
+print(f"df for t-test: {df_alpha}")
+```
+
+Stage 2's recovery is exceptional. The estimated fixed-effects surface tracks the true spatial-context surface with a **Pearson correlation of ≈1.000** (raw value 0.9996) — and an **RMSE of 0.54** against a range that spans 50 units. The estimated range is near-identical to the true range, with a small undershoot at the low end. Where MGWR_cs's intercept compressed the range and PMGWR's intercept inverted it, MGWFER pulls the truth out cleanly.
+
+**Inference for $\hat\alpha_i$.** The paper develops a per-unit t-test by combining MGWR's variance machinery with the within-transformation's degrees-of-freedom adjustment. The three formulas (Eqs. 32, 33, 36 of the paper) are:
+
+$$\hat\sigma^2 = \frac{T}{T-1} \cdot \sigma_{\ddot Y}^2 \cdot \hat\sigma_s^2, \quad \operatorname{Var}[\hat\alpha_i] = \frac{\hat\sigma^2}{T} + \bar x_i^\top \operatorname{Var}[\hat\beta_i] \bar x_i, \quad t_i = \frac{\hat\alpha_i}{\sqrt{\operatorname{Var}[\hat\alpha_i]}}.$$
+
+The first equation rescales MGWR's residual variance back to the original (un-standardised) scale; the second propagates that uncertainty through Equation 30; the third yields the t-statistic. Degrees of freedom are $NT - K - N = 675 - 4 - 225 = 446$.
+
+```{python}
+#| label: fig-alpha-map
+#| fig-cap: "Four-panel comparison on a 15x15 grid showing the spatial-context surface as estimated by each model: top-left is the true sc_i exponential gradient, top-right is MGWFER's recovered alpha_hat tracking the truth almost exactly, bottom-left is cross-sectional MGWR's local intercept, and bottom-right is PMGWR's local intercept."
+
+fig, axes = plt.subplots(2, 2, figsize=(13, 11))
+fig.patch.set_facecolor(DARK_NAVY)
+fig.suptitle(r"Spatial context surface — recovered by each model (true $sc_i$ vs $\hat{\alpha}_i$)",
+             fontsize=14, color=WHITE_TEXT, y=0.99)
+
+vmin = float(alpha_true.min())
+vmax = float(alpha_true.max())
+
+alpha_panels = [
+    (alpha_true,     r"True $sc_i$ (DGP)", None, None),
+    (alpha_hat,      r"MGWFER $\hat{\alpha}_i$ (Stage 2, Eq. 30)", rmse_alpha, corr_alpha),
+    (alpha_mgwr_cs,  r"MGWR (cross-sectional) — local intercept", rmse_alpha_mgwr_cs, corr_alpha_mgwr_cs),
+    (alpha_pmgwr,    r"PMGWR (pooled) — local intercept", rmse_alpha_pmgwr, corr_alpha_pmgwr),
+]
+for ax, (vals, title, rmse_v, corr_v) in zip(axes.flat, alpha_panels):
+    img = ax.imshow(vals.reshape(N_GRID, N_GRID), cmap="viridis",
+                    origin="lower", aspect="equal", vmin=vmin, vmax=vmax)
+    ax.set_title(title, fontsize=12, color=WHITE_TEXT, pad=8)
+    cbar = plt.colorbar(img, ax=ax, fraction=0.046, pad=0.04)
+    cbar.outline.set_edgecolor(GRID_LINE)
+    for label in cbar.ax.get_yticklabels():
+        label.set_color(LIGHT_TEXT)
+    range_str = f"range: [{vals.min():.1f}, {vals.max():.1f}]"
+    ann = (f"{range_str}\nRMSE = {rmse_v:.2f}\nCorr = {corr_v:.3f}"
+           if rmse_v is not None else range_str)
+    ax.text(0.02, 0.98, ann,
+            transform=ax.transAxes, fontsize=9, verticalalignment="top",
+            bbox=dict(facecolor="#1a1a2e", edgecolor=LIGHT_TEXT, alpha=0.9),
+            color=WHITE_TEXT)
+
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.show()
+```
+
+The four panels tell the paper's story in one image:
+
+- **True `sc_i` (top-left)**: smooth exponential gradient from ~2 at column 1 to ~52 at column 15.
+- **MGWFER `α̂_i` (top-right)**: visually indistinguishable from the truth at this resolution.
+- **MGWR_cs intercept (bottom-left)**: compressed range — captures the *shape* of the gradient but underestimates magnitude by 2.5×.
+- **PMGWR intercept (bottom-right)**: *inverted and shifted negative*. PMGWR has 3× more observations than MGWR_cs, but no panel structure to exploit, so the indirect channel hits it harder.
+
+The paper concludes: *"traditional local modelling techniques might substantially underestimate the influence of spatial context."* Our simulation reproduces that conclusion verbatim.
+
+## 11. Comparing coefficient recovery
+
+The scatter plots below compare true vs estimated coefficients for PMGWR and MGWFER. In a perfect model, all points would lie on the 45-degree reference line.
+
+```{python}
+#| label: fig-bias-pooled
+#| fig-cap: "True vs PMGWR scatter plots for three coefficients. Beta_1 shows severe scatter away from the identity line and is anti-correlated with truth. Beta_2 and beta_3 are also far from the identity line, with PMGWR estimates clustered well above the true values."
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+fig.patch.set_facecolor(DARK_NAVY)
+fig.suptitle("Pooled MGWR (PMGWR): Biased Estimates (ignoring fixed effects)",
+             fontsize=13, color=WHITE_TEXT, y=1.02)
+
+true_arrays = [beta_1_true, beta_2_true, beta_3_true]
+pooled_arrays = [pooled_df["beta1_pooled"].values,
+                 pooled_df["beta2_pooled"].values,
+                 pooled_df["beta3_pooled"].values]
+labels = [r"$\beta_1$ (quadratic)", r"$\beta_2$ (linear)", r"$\beta_3$ (constant)"]
+
+for ax, true_vals, est_vals, label in zip(axes, true_arrays, pooled_arrays, labels):
+    ax.scatter(true_vals, est_vals, color=STEEL_BLUE, alpha=0.4, s=15, zorder=3)
+    lims = [min(true_vals.min(), est_vals.min()) - 0.2,
+            max(true_vals.max(), est_vals.max()) + 0.2]
+    ax.plot(lims, lims, color=WARM_ORANGE, linewidth=2, linestyle="--", zorder=2)
+    rmse = np.sqrt(np.mean((est_vals - true_vals)**2))
+    corr = np.corrcoef(true_vals, est_vals)[0, 1]
+    ax.text(0.05, 0.95, f"RMSE = {rmse:.3f}\nCorr = {corr:.3f}",
+            transform=ax.transAxes, fontsize=10, verticalalignment="top",
+            bbox=dict(facecolor="#1a1a2e", edgecolor=LIGHT_TEXT, alpha=0.9),
+            color=WHITE_TEXT)
+    ax.set_xlabel("True coefficient", fontsize=10)
+    ax.set_ylabel("Pooled MGWR estimate", fontsize=10)
+    ax.set_title(label, fontsize=11, color=WHITE_TEXT)
+    ax.set_xlim(lims); ax.set_ylim(lims)
+
+plt.tight_layout()
+plt.show()
+```
+
+The PMGWR scatter reveals the damage: $\beta_1$ points are widely dispersed and **anti-correlated** with the 45-degree line. The quadratic dome shape is not just smoothed away — it is *inverted*. $\beta_2$ and $\beta_3$ likewise sit far above the reference line; PMGWR systematically overestimates them because `sc`'s contribution to `y` has nowhere to go but into the slopes.
+
+```{python}
+#| label: fig-recovery-fe
+#| fig-cap: "True vs MGWFER scatter plots. Beta_1 is now tightly clustered around the identity line, showing successful recovery of the quadratic dome pattern. Beta_2 and beta_3 are also centered on the identity line with low scatter."
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+fig.patch.set_facecolor(DARK_NAVY)
+fig.suptitle("MGWFER: Bias-Corrected Estimates (fixed effects removed)",
+             fontsize=13, color=WHITE_TEXT, y=1.02)
+
+fe_arrays = [fe_df["beta1_mgwfer"].values,
+             fe_df["beta2_mgwfer"].values,
+             fe_df["beta3_mgwfer"].values]
+
+for ax, true_vals, est_vals, label in zip(axes, true_arrays, fe_arrays, labels):
+    ax.scatter(true_vals, est_vals, color=TEAL, alpha=0.4, s=15, zorder=3)
+    lims = [min(true_vals.min(), est_vals.min()) - 0.2,
+            max(true_vals.max(), est_vals.max()) + 0.2]
+    ax.plot(lims, lims, color=WARM_ORANGE, linewidth=2, linestyle="--", zorder=2)
+    rmse = np.sqrt(np.mean((est_vals - true_vals)**2))
+    corr = np.corrcoef(true_vals, est_vals)[0, 1]
+    ax.text(0.05, 0.95, f"RMSE = {rmse:.3f}\nCorr = {corr:.3f}",
+            transform=ax.transAxes, fontsize=10, verticalalignment="top",
+            bbox=dict(facecolor="#1a1a2e", edgecolor=LIGHT_TEXT, alpha=0.9),
+            color=WHITE_TEXT)
+    ax.set_xlabel("True coefficient", fontsize=10)
+    ax.set_ylabel("MGWFER estimate", fontsize=10)
+    ax.set_title(label, fontsize=11, color=WHITE_TEXT)
+    ax.set_xlim(lims); ax.set_ylim(lims)
+
+plt.tight_layout()
+plt.show()
+```
+
+After fixed-effects correction, the $\beta_1$ scatter tightens dramatically — the correlation **flips sign**, and the quadratic dome structure is clearly visible as a tight band along the reference line. $\beta_2$ and $\beta_3$ also collapse onto the 45-degree line. The within-transformation has done exactly the job it is designed to do: turn the anti-correlated mess into clean local estimates.
+
+## 12. Model comparison
+
+| Metric | MGWR_cs | PMGWR | **MGWFER** | MGWFER vs PMGWR |
+|--------|---------|-------|------------|-----------------|
+| RMSE ($\beta_1$) | 2.1573 | 2.3003 | **0.1793** | −92.2% |
+| RMSE ($\beta_2$) | 1.7977 | 1.9489 | **0.1050** | −94.6% |
+| RMSE ($\beta_3$) | 1.9838 | 1.7485 | **0.0724** | −95.9% |
+| RMSE ($\beta_4$) | 2.3768 | 1.8612 | **0.1399** | −92.5% |
+| Corr ($\beta_1$) | −0.3857 | **−0.4575** | **+0.8179** | sign flip |
+| Corr ($\beta_2$) | −0.2085 | 0.2163 | 0.9407 | — |
+| R² | 0.989 | 0.989 | 0.890 | (different DV) |
+| RMSE ($\alpha_i$) | 14.18 | 25.62 | **0.5398** | −97.9% |
+| Corr ($\alpha_i$) | 0.839 | 0.978 | **1.000** | — |
+
+MGWFER reduces RMSE by **92–96%** for every coefficient, *and* recovers the intrinsic contextual effect with a Pearson correlation of essentially 1. PMGWR and cross-sectional MGWR not only fail to estimate $\beta_1$ correctly — they are anti-correlated with truth. The R² differences are misleading (PMGWR's 0.989 is fit to raw `y` dominated by `sc`; MGWFER's 0.890 is fit to demeaned `y_within`) and should be ignored when reading this table.
+
+## 13. Bandwidth comparison
+
+The bandwidths reveal *how* each estimator reads the spatial structure of the data.
+
+```{python}
+#| label: fig-bandwidth-comparison
+#| fig-cap: "Grouped bar chart comparing MGWR_cs vs PMGWR vs MGWFER bandwidths for each covariate. PMGWR collapses every bandwidth into the 44-50 range; MGWFER and MGWR_cs preserve more variation across covariates."
+
+mgwr_cs_bw_list = list(mgwr_cs_bw) if hasattr(mgwr_cs_bw, '__len__') else [mgwr_cs_bw]
+pooled_bw_list = list(pooled_bw) if hasattr(pooled_bw, '__len__') else [pooled_bw]
+fe_bw_list = list(fe_bw) if hasattr(fe_bw, '__len__') else [fe_bw]
+
+mgwr_cs_var_bw = mgwr_cs_bw_list[1:5] if len(mgwr_cs_bw_list) >= 5 else mgwr_cs_bw_list
+pooled_var_bw = pooled_bw_list[1:5] if len(pooled_bw_list) >= 5 else pooled_bw_list
+fe_var_bw = fe_bw_list[:4]
+
+print(f"MGWR_cs bws (x1-x4): {[int(b) for b in mgwr_cs_var_bw]}")
+print(f"PMGWR bws   (x1-x4): {[int(b) for b in pooled_var_bw]}")
+print(f"MGWFER bws  (x1-x4): {[int(b) for b in fe_var_bw]}")
+
+fig, ax = plt.subplots(figsize=(11, 6))
+fig.patch.set_facecolor(DARK_NAVY)
+
+x_pos = np.arange(4)
+width = 0.27
+bars0 = ax.bar(x_pos - width, mgwr_cs_var_bw, width,
+               color=STEEL_BLUE, alpha=0.85, label="MGWR (cross-section)")
+bars1 = ax.bar(x_pos, pooled_var_bw, width,
+               color=WARM_ORANGE, alpha=0.85, label="PMGWR (pooled)")
+bars2 = ax.bar(x_pos + width, fe_var_bw, width,
+               color=TEAL, alpha=0.85, label="MGWFER")
+
+for bars, color in [(bars0, STEEL_BLUE), (bars1, WARM_ORANGE), (bars2, TEAL)]:
+    for bar in bars:
+        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 3,
+                f"{int(bar.get_height())}", ha="center", fontsize=9, color=color)
+
+ax.set_xlabel("Covariate", fontsize=11)
+ax.set_ylabel("Bandwidth (nearest neighbors)", fontsize=11)
+ax.set_title("Bandwidth Comparison: MGWR_cs vs PMGWR vs MGWFER", fontsize=13)
+ax.set_xticks(x_pos)
+ax.set_xticklabels([r"$x_1$ (quadratic)", r"$x_2$ (linear)",
+                    r"$x_3$ (constant)", r"$x_4$ (null)"])
+ax.legend(loc="upper right")
+plt.tight_layout()
+plt.show()
+```
+
+The pattern is paper-faithful: **PMGWR collapses every bandwidth to 44–50** because, under the indirect contextual channel, every covariate looks like a slightly noisy proxy for `sc` — so the model picks the same small bandwidth for all of them. **MGWFER** alone returns bandwidths that match the *true* process scales: small for the local quadratic dome ($\beta_1$, bw=50), large for the spatially-constant $\beta_3$ (bw=116), medium for the linear gradient $\beta_2$ (bw=91). Only MGWFER recovers the true scale of process variability, because only MGWFER removes the confounder before the bandwidth search runs.
+
+## 14. Spatial coefficient maps
+
+The most convincing evidence comes from mapping the estimated surfaces alongside the known truth.
+
+```{python}
+#| label: fig-coefficient-maps
+#| fig-cap: "Six-panel spatial map comparing true coefficients (top row) with MGWFER estimates (bottom row) for beta_1, beta_2, and beta_3. The quadratic dome and linear gradient are visually recovered."
+
+fig, axes = plt.subplots(2, 3, figsize=(16, 10))
+fig.patch.set_facecolor(DARK_NAVY)
+fig.suptitle("Spatial Coefficient Recovery: True (top) vs MGWFER (bottom)",
+             fontsize=14, color=WHITE_TEXT, y=0.99)
+
+for col_idx, (vals, title) in enumerate(zip(
+    true_arrays, [r"True $\beta_1$", r"True $\beta_2$", r"True $\beta_3$"]
+)):
+    ax = axes[0, col_idx]
+    img = ax.imshow(vals.reshape(N_GRID, N_GRID), cmap="coolwarm",
+                    origin="lower", aspect="equal")
+    ax.set_title(title, fontsize=11, color=WHITE_TEXT, pad=6)
+    ax.set_xticks([]); ax.set_yticks([])
+    cbar = plt.colorbar(img, ax=ax, fraction=0.046, pad=0.04)
+    cbar.outline.set_edgecolor(GRID_LINE)
+    for label in cbar.ax.get_yticklabels():
+        label.set_color(LIGHT_TEXT)
+
+bw_labels = fe_bw if hasattr(fe_bw, '__len__') else [fe_bw] * 3
+for col_idx, (vals, title, bw) in enumerate(zip(
+    fe_arrays,
+    [r"MGWFER $\hat{\beta}_1$", r"MGWFER $\hat{\beta}_2$", r"MGWFER $\hat{\beta}_3$"],
+    bw_labels[:3]
+)):
+    ax = axes[1, col_idx]
+    vmin_t = true_arrays[col_idx].min()
+    vmax_t = true_arrays[col_idx].max()
+    img = ax.imshow(vals.reshape(N_GRID, N_GRID), cmap="coolwarm",
+                    origin="lower", aspect="equal", vmin=vmin_t, vmax=vmax_t)
+    bw_val = int(bw) if not np.isnan(bw) else "?"
+    ax.set_title(f"{title} (bw={bw_val})", fontsize=11, color=WHITE_TEXT, pad=6)
+    ax.set_xticks([]); ax.set_yticks([])
+    cbar = plt.colorbar(img, ax=ax, fraction=0.046, pad=0.04)
+    cbar.outline.set_edgecolor(GRID_LINE)
+    for label in cbar.ax.get_yticklabels():
+        label.set_color(LIGHT_TEXT)
+
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.show()
+```
+
+The MGWFER-estimated $\beta_1$ map recovers the concentric dome pattern of the true coefficient, though with some smoothing at the edges. The $\beta_2$ linear gradient matches the true gradient with high fidelity. The $\beta_3$ map shows mild spurious spatial variation around the true constant of 1.5 — this illustrates the variance cost of within-transformation for spatially homogeneous effects.
+
+## 15. Statistical significance
+
+A key diagnostic for MGWFER is whether it correctly identifies which coefficients are significant at each location. The significance maps below use filtered t-values (corrected for multiple testing across the 225 spatial units, following da Silva and Fotheringham 2016).
+
+```{python}
+#| label: fig-significance-maps
+#| fig-cap: "Significance maps for all four coefficients. Beta_1 through beta_3 are unanimously significant positive. Beta_4 correctly shows most units as not significant, with a small false-positive cluster."
+
+fe_tvalues = fe_model.filter_tvals()
+
+fig, axes = plt.subplots(2, 2, figsize=(12, 11))
+fig.patch.set_facecolor(DARK_NAVY)
+fig.suptitle("MGWFER: Statistical Significance of Spatially Varying Coefficients",
+             fontsize=14, color=WHITE_TEXT, y=0.98)
+
+sig_summary = {}
+coef_names = [r"$\beta_1$ (quadratic)", r"$\beta_2$ (linear)",
+              r"$\beta_3$ (constant)", r"$\beta_4$ (null)"]
+
+orange_rgb = np.array([int(WARM_ORANGE[1:3], 16), int(WARM_ORANGE[3:5], 16),
+                       int(WARM_ORANGE[5:7], 16)]) / 255
+blue_rgb = np.array([int(STEEL_BLUE[1:3], 16), int(STEEL_BLUE[3:5], 16),
+                     int(STEEL_BLUE[5:7], 16)]) / 255
+grid_rgb = np.array([int(GRID_LINE[1:3], 16), int(GRID_LINE[3:5], 16),
+                     int(GRID_LINE[5:7], 16)]) / 255
+
+for col_idx, (ax, name) in enumerate(zip(axes.flat, coef_names)):
+    t_col = fe_tvalues[:, col_idx]
+    t_by_unit = np.zeros(N_UNITS)
+    for i in range(N_UNITS):
+        mask = panel_df["unit_id"].values == i
+        t_by_unit[i] = t_col[mask].mean()
+
+    sig_pos = t_by_unit > 0
+    sig_neg = t_by_unit < 0
+    not_sig = t_by_unit == 0
+    n_pos = int(sig_pos.sum()); n_neg = int(sig_neg.sum()); n_ns = int(not_sig.sum())
+    sig_summary[name] = {"positive": n_pos, "negative": n_neg, "not_sig": n_ns}
+
+    color_grid = np.zeros((N_UNITS, 3))
+    color_grid[sig_pos] = orange_rgb
+    color_grid[sig_neg] = blue_rgb
+    color_grid[not_sig] = grid_rgb
+    ax.imshow(color_grid.reshape(N_GRID, N_GRID, 3), origin="lower", aspect="equal")
+    ax.set_title(f"{name}", fontsize=11, color=WHITE_TEXT, pad=6)
+    ax.set_xticks([]); ax.set_yticks([])
+
+    handles = [
+        Patch(facecolor=WARM_ORANGE, label=f"Sig. positive (n={n_pos})"),
+        Patch(facecolor=GRID_LINE, label=f"Not significant (n={n_ns})"),
+        Patch(facecolor=STEEL_BLUE, label=f"Sig. negative (n={n_neg})"),
+    ]
+    leg = ax.legend(handles=handles, loc="lower left", fontsize=9)
+    leg.get_frame().set_facecolor("#1a1a2e")
+    leg.get_frame().set_edgecolor(LIGHT_TEXT)
+    leg.get_frame().set_alpha(0.9)
+    for text in leg.get_texts():
+        text.set_color(WHITE_TEXT)
+
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.show()
+
+for name, counts in sig_summary.items():
+    print(f"  {name}: positive={counts['positive']}, "
+          f"not_sig={counts['not_sig']}, negative={counts['negative']}")
+```
+
+All 225 spatial units show statistically significant positive effects for $\beta_1$, $\beta_2$, and $\beta_3$ — consistent with the true DGP where all three are strictly positive everywhere. The critical test is $\beta_4$ (truly zero): the vast majority of units are correctly classified as not significant. A small false-positive cluster remains — better than what PMGWR would produce, and the false positives are spatially concentrated, suggesting boundary effects or local multicollinearity rather than systematic bias.
+
+## 16. Spurious $\beta_4$ bias: paper Figure 9
+
+The paper's most striking visualisation is the spurious $\beta_4$ surface across the three local models. True $\beta_4 \equiv 0$ everywhere, but MGWR_cs and PMGWR show a column-aligned vertical-stripe pattern that tracks the horizontal gradient of `sc`.
+
+```{python}
+#| label: fig-beta4-bias
+#| fig-cap: "Three side-by-side maps of the estimated beta_4 surface (true value zero everywhere): cross-sectional MGWR (left), PMGWR (middle), MGWFER (right). MGWR_cs and PMGWR show a column-aligned vertical-stripe bias pattern. MGWFER is near-zero everywhere."
+
+fig, axes_b4 = plt.subplots(1, 3, figsize=(15, 5.5))
+fig.patch.set_facecolor(DARK_NAVY)
+fig.suptitle(r"Spurious $\hat{\beta}_4$ surface — true $\beta_4 \equiv 0$ (paper Fig. 9 replication)",
+             fontsize=14, color=WHITE_TEXT, y=1.02)
+
+b4_panels = [
+    (mgwr_cs_df["beta4_mgwr_cs"].values,  "MGWR (cross-sectional)"),
+    (pooled_df["beta4_pooled"].values,    "PMGWR (pooled)"),
+    (fe_df["beta4_mgwfer"].values,        "MGWFER (within + MGWR)"),
+]
+b4_lim = max(max(abs(v.min()), abs(v.max())) for v, _ in b4_panels)
+
+for ax, (vals, title) in zip(axes_b4, b4_panels):
+    img = ax.imshow(vals.reshape(N_GRID, N_GRID), cmap="coolwarm",
+                    origin="lower", aspect="equal",
+                    vmin=-b4_lim, vmax=b4_lim)
+    ax.set_title(title, fontsize=12, color=WHITE_TEXT, pad=8)
+    ax.set_xticks([]); ax.set_yticks([])
+    cbar = plt.colorbar(img, ax=ax, fraction=0.046, pad=0.04)
+    cbar.outline.set_edgecolor(GRID_LINE)
+    for label in cbar.ax.get_yticklabels():
+        label.set_color(LIGHT_TEXT)
+    rmse_b4 = float(np.sqrt(np.mean(vals**2)))
+    ax.text(0.02, 0.98,
+            f"range: [{vals.min():.2f}, {vals.max():.2f}]\nRMSE vs 0 = {rmse_b4:.3f}",
+            transform=ax.transAxes, fontsize=9, verticalalignment="top",
+            bbox=dict(facecolor="#1a1a2e", edgecolor=LIGHT_TEXT, alpha=0.9),
+            color=WHITE_TEXT)
+
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.show()
+```
+
+The two left panels are a textbook illustration of how the indirect contextual channel manifests in a local model: `sc` varies horizontally (by column `j`), so `x_4`'s spurious "effect" on `y` also varies horizontally. The bandwidth search picks this up and produces a column-aligned stripe pattern that *looks* like a real spatial process. It is not — it is `β_4 ≡ 0` being misread through the lens of `δ_4`. The right panel (MGWFER) is essentially flat.
+
+## 17. From simulation to real data: the Georgia case study
+
+The simulation makes the mechanics legible. Li & Fotheringham (2026) make the stakes clear with a case study on **educational attainment in the 159 counties of Georgia**, using the 2016–2020 American Community Survey 5-year panel. Six covariates are included: log of population density, percent foreign-born, percent African American, percent rural, average household income, and percent in poverty. The outcome is the percentage of residents with a bachelor's degree.
+
+The headline numbers from the paper:
+
+| Statistic | MGWR | PMGWR | **MGWFER** |
+|---|---|---|---|
+| $R^2$ | 0.880 | 0.889 | **0.986** |
+| Intrinsic contextual effect range | $\pm$0.3 (≈ $\pm$1.5%) | $\pm$0.3 | **$\pm$4 (≈ $\pm$20%)** |
+| POVERTY sign at significant counties | positive | positive | **negative** |
+| Population density coefficient | weak | weak | **strong positive** |
+
+Two findings deserve emphasis:
+
+1. **Intrinsic contextual effects are an order of magnitude larger under MGWFER.** Where MGWR and PMGWR estimate local intercepts in the $\pm$0.3 range, MGWFER recovers fixed effects in the $\pm$4 range. The "role of place" that local modelling used to detect was, on this data, more than ten times stronger than the conventional method suggested.
+
+2. **Conventional MGWR can flip the sign of policy-relevant coefficients.** Both MGWR and PMGWR find a *positive* significant relationship between poverty and educational attainment in many Georgia counties — a result with no defensible causal reading. MGWFER reverses this to a *significantly negative* relationship, in line with prior literature.
+
+In the paper's own framing: *traditional local modelling techniques might substantially underestimate the influence of spatial context on human behavior, while at the same time producing misleading sign and magnitude estimates for measured covariates.* The bias is not academic — it changes the policy story.
+
+## 18. Discussion: assumptions, limitations, and what causal claims survive
+
+Returning to our original question: **can we recover the true spatially varying coefficients — and the intrinsic contextual effects themselves — when a strong, unobserved spatial confounder contaminates the data?** The answer is a qualified yes.
+
+MGWFER successfully eliminates the confounder's influence on slope estimation (Stage 1) *and* recovers the confounder surface itself with near-perfect fidelity (Stage 2). The most contaminated coefficient ($\beta_1$) goes from poorly recovered to well-recovered. The null coefficient ($\beta_4$) goes from showing substantial false-positive bias to being correctly identified as non-significant in 90% of locations. And $\hat\alpha_i$ tracks the true confounder at $r = 0.999$. These improvements are not marginal — they represent the difference between misleading and informative inference.
+
+### 18.1 The four identification assumptions
+
+A causal reading of MGWFER coefficients depends on four assumptions (Li & Fotheringham 2026, "Model Formulations" section):
+
+1. **Time-invariant spatial context.** $\alpha_i$ does not change over the study period. This is what allows the within-transformation to remove it cleanly. Long-run cultural, geographic, and institutional attributes typically satisfy this; rapidly evolving local conditions do not.
+
+2. **Strict exogeneity given the fixed effects.** Conditional on $\alpha_i$ and the observed $X_{it}$'s, the error term $\varepsilon_{it}$ is uncorrelated with the covariates in *all* time periods. This rules out feedback from past outcomes into current covariates.
+
+3. **No time-varying unobserved confounders.** Any unobserved factor that *changes over time* and is correlated with both the covariates and the outcome still biases MGWFER. The within-transformation is a one-trick pony: it deals with time-invariant confounding only.
+
+4. **Parameter stability over time.** The slopes $\beta_{bwk}(u_i, v_i)$ are assumed constant across the $T$ periods. Allowing time-varying slopes is outside the scope of the paper (and of MGWFER as currently implemented).
+
+If any one of these fails, the causal interpretation slides back toward correlation. Researchers should justify all four explicitly when applying the method.
+
+### 18.2 Limitations
+
+The paper is candid about what MGWFER cannot do:
+
+- **No effect estimates for time-invariant *measurable* covariates.** The within-transformation sweeps them out alongside $\alpha_i$. If you care about, say, "distance to nearest highway" (a time-invariant variable), MGWFER will not give you a coefficient for it; that effect lands inside $\hat\alpha_i$ and is no longer separable. This is a structural property of FE estimators, not specific to MGWFER.
+- **No bandwidth for the spatial-context scale.** MGWFER has bandwidths for the *slopes*, but not for $\hat\alpha_i$ itself — the paper flags this as a limitation of the current calibration algorithm and a target for future work.
+- **Reverse causality survives.** If the covariates are themselves caused by the outcome, MGWFER offers no remedy.
+- **Computational cost.** Bandwidth search scales poorly with $N$, which is why we used a 15×15 grid rather than the paper's 30×30 grid.
+- **Only 3 time periods here.** More periods would tighten the within-estimator and reduce the false-positive rate for $\beta_4$.
+
+The bias from ignoring fixed effects is *systematic* (it pushes estimates in the wrong direction); the variance increase from the within-transformation is *random* (it widens confidence intervals without introducing directional error). For most empirical settings — where unobserved spatial confounders are plausible but unmeasurable — this is a trade worth taking.
+
+## 19. Summary and next steps
+
+**Key takeaways:**
+
+1. **Global Table 2 (paper) replicates exactly.** Cross-sectional OLS and pooled OLS overstate $\beta_1$–$\beta_3$ by ~4× and spuriously detect $\beta_4 \approx 4$–5 at p < 10⁻¹³. The individual FE estimator returns all four slopes near truth (1.5, 1.5, 1.5, 0) and mean($\hat\alpha_i$) within 0.06 of truth. The within-transformation neutralises the indirect channel at the global level.
+
+2. **Local Table 3 (paper) replicates exactly.** MGWFER reduces RMSE by **92–96%** for every slope coefficient relative to PMGWR (e.g., $\beta_1$: 2.30 → 0.18), and crucially **flips the sign of Corr($\hat\beta_1$, true) from −0.46 to +0.82**. Cross-sectional MGWR is no better than PMGWR — both produce $\hat\beta_1$ surfaces anti-correlated with truth.
+
+3. **Spatial-context surface (paper Figure 5) replicates exactly.** MGWFER's $\hat\alpha_i$ tracks the true `sc_i` at Pearson correlation **≈1.000 (0.9996)**. Cross-sectional MGWR's local intercept compresses to a smaller range; PMGWR's intercept inverts and shifts negative. Only MGWFER reaches the right magnitudes.
+
+4. **$\beta_4$ vertical-stripe bias (paper Figure 9) replicates exactly.** MGWR_cs and PMGWR show a column-aligned spurious-effect pattern in `x_4` that tracks `sc`'s horizontal gradient; MGWFER produces a near-zero, structureless $\hat\beta_4$.
+
+5. **The mechanism is the within-transformation.** Demeaning removes the time-invariant part of `sc` from both `y` and the `x_k`'s, severing the `sc → x_k` backdoor path. Everything else in the algorithm — standardisation, bandwidth search, t-tests — is downstream of this single move.
+
+6. **The empirical stakes are real.** Li & Fotheringham's Georgia case study shows MGWFER reversing the sign of poverty's effect on educational attainment and inflating intrinsic contextual effects by an order of magnitude — both findings that change the policy interpretation.
+
+**Next steps:**
+
+- Apply MGWFER to real panel data (e.g., regional economic growth, housing prices, environmental exposure).
+- Compare with alternative spatial panel methods (spatial lag/error with fixed effects, MGWIVR).
+- Explore the relationship between $T$ and the bias-variance tradeoff.
+- Develop a bandwidth definition for $\hat\alpha_i$ itself (the paper's open problem).
+- Extend to spatially *and* temporally varying coefficients (a hypothetical GT-MGWFER).
+
+## 20. Exercises
+
+1. **Increase time periods.** Modify the DGP to use `N_TIME = 10` instead of 3. How does the bias-variance tradeoff change? Does $\beta_2$'s RMSE drop further under MGWFER as the effective sample size grows? Bonus: how does the Stage 2 t-test power change as $T$ grows?
+
+2. **Tune down the indirect channel.** Replace `0.05 * sc_i` in the covariate equations with `0.02 * sc_i` (a weaker link). Quantify how much PMGWR's bias shrinks. Find the coupling strength below which PMGWR becomes "good enough" — that frontier is interesting in its own right.
+
+3. **Add a time-varying confounder.** Create a variable $\gamma_t$ that changes over time and is correlated with $x_1$. Add it to the DGP as $y_{it} = sc_i + \gamma_t \cdot x_{1,it} + \ldots$. Does MGWFER still recover the true coefficients, or does Assumption 3 break visibly?
+
+4. **Real-world application.** Download a panel dataset of regional economic indicators (e.g., from the World Bank or PySAL sample data). Apply MGWFER, present both Stage 1 slopes and Stage 2 fixed-effects maps, and compare against MGWR_cs and PMGWR. What spatial patterns emerge in the intrinsic-contextual-effects map that the pooled model misses?
+
+## References
+
+1. [Li, Z. & Fotheringham, A.S. (2026). Spatial Context as a Time-Invariant Confounder: A Fixed-Effects Extension of MGWR. *Annals of the American Association of Geographers*.](https://doi.org/10.1080/24694452.2026.2654481) — the source paper for this tutorial.
+2. [Fotheringham, A.S., Oshan, T., & Li, Z. (2023). *Multiscale Geographically Weighted Regression: Theory and Practice*. Boca Raton: CRC Press.](https://www.routledge.com/Multiscale-Geographically-Weighted-Regression-Theory-and-Practice/Fotheringham-Oshan-Li/p/book/9781032463711) — comprehensive MGWR reference.
+3. [Fotheringham, A.S., & Li, Z. (2023). Measuring the unmeasurable: Models of geographical context. *Annals of the American Association of Geographers*, 113(10), 2269-2286.](https://doi.org/10.1080/24694452.2023.2227690) — origin of the intrinsic/behavioural contextual-effects distinction.
+4. [Fotheringham, A.S., Yang, W., & Kang, W. (2017). Multiscale Geographically Weighted Regression (MGWR). *Annals of the American Association of Geographers*, 107(6), 1247-1265.](https://doi.org/10.1080/24694452.2017.1352480)
+5. [Oshan, T., Li, Z., Kang, W., Wolf, L.J., & Fotheringham, A.S. (2019). mgwr: A Python Implementation of Multiscale Geographically Weighted Regression. *Journal of Open Source Software*, 4(42), 1823.](https://doi.org/10.21105/joss.01823)
+6. Wooldridge, J.M. (2010). *Econometric Analysis of Cross Section and Panel Data*, 2nd ed. Cambridge, MA: MIT Press. — Source of the omitted-variable-bias derivation in Section 4.
+7. Pearl, J. (2009). *Causality*, 2nd ed. Cambridge University Press. — DAG framing of confounding.
+8. [da Silva, A.R., & Fotheringham, A.S. (2016). The multiple testing issue in geographically weighted regression. *Geographical Analysis*, 48(3), 233-247.](https://doi.org/10.1111/gean.12084) — filtered t-values used in Section 15.
+9. [GeoZhipengLi/MGWPR — Custom mgwr Package with Panel Data Support (GitHub)](https://github.com/GeoZhipengLi/MGWPR) — the implementation used in this tutorial.
+
+## Source files
+
+- Companion script: [`script.py`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_mgwrfer/script.py)
+- Published post: <https://carlos-mendez.org/post/python_mgwrfer/>
+- GitHub repo: <https://github.com/cmg777/starter-academic-v501>
