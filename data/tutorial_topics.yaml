@@ -6,23 +6,6 @@
 # topic land there. Posts with `Announcement` are routed to the bottom strip.
 
 topics:
-  - id: did
-    label: Difference-in-Differences
-    accent: "#d97757"
-    icon: chart-line
-    category_matches:
-      - Difference-in-Differences (DiD)
-
-  - id: causal-foundations
-    label: Causal Inference (Foundations)
-    accent: "#b07a3e"
-    icon: project-diagram
-    category_matches:
-      - Causal Inference
-      - IPW and Doubly Robust
-      - Partial Identification
-      - Randomized Controlled Trial (RCT)
-
   - id: causal-ml
     label: Causal Machine Learning
     accent: "#6a9bcc"
@@ -31,6 +14,13 @@ topics:
       - Double Machine Learning
       - Heterogeneous Treatment Effects (CATE)
       - Causal Machine Learning
+
+  - id: did
+    label: Difference-in-Differences
+    accent: "#d97757"
+    icon: chart-line
+    category_matches:
+      - Difference-in-Differences (DiD)
 
   - id: synthetic-control
     label: Synthetic Control
@@ -67,16 +57,15 @@ topics:
       - Panel Data
       - Dynamic Panel
 
-  - id: spatial
-    label: Spatial Econometrics
-    accent: "#3f9b6e"
-    icon: globe-americas
+  - id: causal-foundations
+    label: Causal Inference (Foundations)
+    accent: "#b07a3e"
+    icon: project-diagram
     category_matches:
-      - Spatial Regression (SAR, SEM, SDM)
-      - Spatial Autocorrelation (ESDA)
-      - GWR and MGWR
-      - Spatial inequality
-      - Convergence
+      - Causal Inference
+      - IPW and Doubly Robust
+      - Partial Identification
+      - Randomized Controlled Trial (RCT)
 
   - id: ml-basics
     label: Machine Learning & Dimensionality Reduction
@@ -92,6 +81,17 @@ topics:
     accent: "#6c757d"
     icon: book
     category_matches: []   # residual catch-all (handled in template)
+
+  - id: spatial
+    label: Spatial Econometrics
+    accent: "#3f9b6e"
+    icon: globe-americas
+    category_matches:
+      - Spatial Regression (SAR, SEM, SDM)
+      - Spatial Autocorrelation (ESDA)
+      - GWR and MGWR
+      - Spatial inequality
+      - Convergence
 
   - id: gis-rs
     label: GIS & Remote Sensing
