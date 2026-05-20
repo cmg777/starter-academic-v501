@@ -15,6 +15,11 @@ node_modules/
 # AJR (2001) reference materials — third-party; not committed
 content/post/stata_iv/references/
 
+# Fitzgerald et al. (2026) replication archive for r_double_lasso (~510 MB);
+# Matlab .mat files + R source from the JAE Journal Data Archive. The CSVs
+# extracted by prepare_data.R live in data/ and ARE committed.
+content/post/r_double_lasso/references/
+
 # Stata batch-mode auto-log artifact (the real log is analysis.log)
 content/post/stata_iv/stata.log
 
