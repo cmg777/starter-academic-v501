@@ -117,7 +117,6 @@ Some Quarto tutorials ship companion files (`setup_env.py`, `_quarto.yml`, `rend
 
 Tutorials currently shipping a `<slug>.zip` bundle at the post root:
 
-- `content/post/python_pca/` (2026-03-21)
 - `content/post/python_sc_co2tax/` (2026-05-15)
 - `content/post/python_iv/` (2026-05-09)
 - `content/post/python_EconML/` (2026-05-07)
@@ -128,6 +127,20 @@ Tutorials currently shipping a `<slug>.zip` bundle at the post root:
 - `content/post/python_panel_intro/` (2026-04-27)
 - `content/post/python_fe_kuznets/` (2026-04-27)
 - `content/post/python_did101/` (2026-04-27)
+- `content/post/python_panel_ses/` (2026-03-31)
+- `content/post/python_scpi/` (2026-03-22)
+- `content/post/python_mgwr/` (2026-03-22)
+- `content/post/python_esda2/` (2026-03-22)
+- `content/post/python_pca2/` (2026-03-21)
+- `content/post/python_pca/` (2026-03-21)
+- `content/post/python_did/` (2026-03-19)
+- `content/post/python_fwl/` (2026-03-14)
+- `content/post/python_partial_identification/` (2026-03-13)
+- `content/post/python_dowhy/` (2026-03-12)
+- `content/post/python_ml_random_forest/` (2026-03-10)
+- `content/post/python_doubleml/` (2026-03-10)
+
+Older Python posts (pre-2025) were evaluated for bundling and **skipped**: they are landing pages linking to external Google Colab notebooks with no executable Python in `index.md` (e.g. `python_esda`, `python_gwr_mgwr`, `python_how_to_build_w`, `python_monitor_*`, `python_gds_spatial_inequality`, `python_intro_spatial_data_science`). To bundle these, port the upstream Colab notebooks into the post body as fenced Python blocks first, then re-run the skill.
 
 **Legacy convention (`static/uploads/` location)**: `content/post/python_pyfixest/` predates the new convention. Its bundle ships as `static/uploads/python_pyfixest_tutorial.zip` and is linked as "Tutorial bundle (.zip)". Whenever `tutorial.qmd`, `setup_env.py`, `_quarto.yml`, `script.py`, or the bundle `README.md` changes, run `bash content/post/python_pyfixest/build_bundle.sh` and commit the regenerated `static/uploads/python_pyfixest_tutorial.zip` in the same commit. This bundle can be migrated to the post-root convention as a separate cleanup task.
 

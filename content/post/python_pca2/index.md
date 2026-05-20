@@ -17,6 +17,10 @@ links:
   icon_pack: ai
   name: "Google Colab"
   url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_pca2/notebook.ipynb
+- icon: file-code
+  icon_pack: fas
+  name: "Quarto project (.zip)"
+  url: python_pca2.zip
 - icon: code
   icon_pack: fas
   name: "Python script"

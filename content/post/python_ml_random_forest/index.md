@@ -17,6 +17,10 @@ links:
   icon_pack: ai
   name: "[Python] Google Colab"
   url: https://colab.research.google.com/github/cmg777/claude4data/blob/master/notebooks/notebook-04.ipynb
+- icon: file-code
+  icon_pack: fas
+  name: "Quarto project (.zip)"
+  url: python_ml_random_forest.zip
 - icon: code
   icon_pack: fas
   name: "Python script"
