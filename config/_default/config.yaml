@@ -5,7 +5,7 @@
 
 title: Carlos Mendez # Website name
 baseurl: 'https://carlos-mendez.org/' # Website URL
-copyright: 'Carlos Mendez' # Footer text, e.g. '© {year} Me'
+copyright: '© 2018–{year} Carlos Mendez' # Footer text — {year} is auto-substituted with current year
 
 ############################
 ## LANGUAGE
@@ -35,7 +35,7 @@ paginate: 10
 enableEmoji: true
 enableRobotsTXT: true
 footnotereturnlinkcontents: <sup>^</sup>
-ignoreFiles: [\.ipynb$, .ipynb_checkpoints$, \.Rmd$, \.Rmarkdown$, _cache$]
+ignoreFiles: [\.ipynb$, .ipynb_checkpoints$, \.Rmd$, \.Rmarkdown$, _cache$, /\.venv/, /\.quarto/, /tutorial_files/]
 permalinks:
   event: '/talk/:slug/'
   tags: '/tag/:slug/'

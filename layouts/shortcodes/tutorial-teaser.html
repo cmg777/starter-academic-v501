@@ -1,0 +1,31 @@
+{{/*
+  tutorial-teaser shortcode — used on the homepage Posts & Tutorials widget.
+  Renders the N most recent non-announcement posts as a horizontal strip
+  of tutorial cards, then a "Browse all" link.
+  Args:
+    count (optional, default 6)
+*/}}
+{{ $count := int (.Get "count" | default 6) }}
+
+{{ $posts := where site.RegularPages "Section" "post" }}
+{{ $posts = $posts.ByDate.Reverse }}
+{{ $teaser := slice }}
+{{ range $posts }}
+  {{ $cats := default (slice) .Params.categories }}
+  {{ if not (in $cats "Announcement") }}
+    {{ if lt (len $teaser) $count }}
+      {{ $teaser = $teaser | append . }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+<div class="tg-teaser">
+  <div class="tg-teaser-strip">
+    {{ range $teaser }}
+      {{ partial "tutorial_card_auto.html" . }}
+    {{ end }}
+  </div>
+  <div class="tg-teaser-link-row">
+    <a class="tg-teaser-link" href="/post/">Browse all tutorials &rarr;</a>
+  </div>
+</div>

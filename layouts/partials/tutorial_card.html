@@ -1,0 +1,52 @@
+{{/*
+  tutorial_card.html — 16:9 image-first card for the tutorial gallery.
+  Context (dict):
+    .page         Page object (must have RelPermalink, Title, Date, Params.summary)
+    .topicId      string  (e.g. "did") — used in data-topic for filtering
+    .topicLabel   string  (e.g. "Difference-in-Differences")
+    .topicAccent  string  (#hex) — used for the topic chip background + placeholder gradient
+    .topicIcon    string  (Font Awesome name, e.g. "chart-line")
+    .languageKey  string  (python|r|stata|gee|rpy)
+    .languageLabel string
+    .languageColor string  (#hex)
+*/}}
+{{ $p := .page }}
+{{ $img := $p.Resources.GetMatch "featured*" }}
+<a class="tg-card"
+   href="{{ $p.RelPermalink }}"
+   data-topic="{{ .topicId }}"
+   data-language="{{ .languageKey }}"
+   data-title="{{ lower $p.Title }}"
+   data-summary="{{ with $p.Params.summary }}{{ lower (. | plainify) }}{{ end }}"
+   data-date="{{ $p.Date.Format "2006-01-02" }}"
+   style="--topic-accent: {{ .topicAccent }};"
+   aria-label="{{ $p.Title }}">
+  <div class="tg-card-media">
+    {{ if $img }}
+      {{ $thumb := $img.Fill "800x450 Center" }}
+      <img class="tg-card-image"
+           src="{{ $thumb.RelPermalink }}"
+           alt="{{ $p.Title }}"
+           loading="lazy"
+           decoding="async"
+           width="800" height="450">
+    {{ else }}
+      {{ partial "tutorial_placeholder.html" (dict
+            "topicAccent" .topicAccent
+            "topicIcon" .topicIcon
+            "languageLabel" .languageLabel) }}
+    {{ end }}
+    <div class="tg-card-overlay"></div>
+  </div>
+  <div class="tg-card-body">
+    <div class="tg-card-chips">
+      <span class="tg-chip-lang" style="background:{{ .languageColor }};">{{ .languageLabel }}</span>
+      <span class="tg-chip-topic" style="background:{{ .topicAccent }};">{{ .topicLabel }}</span>
+    </div>
+    <h3 class="tg-card-title">{{ $p.Title }}</h3>
+    {{ with $p.Params.summary }}
+      <p class="tg-card-summary">{{ . | plainify | truncate 140 }}</p>
+    {{ end }}
+    <div class="tg-card-date">{{ dateFormat "Jan 2006" $p.Date }}</div>
+  </div>
+</a>

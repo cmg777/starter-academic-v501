@@ -1,0 +1,101 @@
+# Tutorial gallery topic taxonomy
+# Source of truth for /post/ gallery grouping and the homepage Posts & Tutorials widget.
+# A post is routed to the first topic whose `category_matches` overlaps its categories: list.
+# Unmatched tutorial posts (slug starts with python_, r_, stata_, gee_, rpy_) fall to `foundations`.
+# Posts with `Announcement` category are routed to the announcements strip instead.
+
+topics:
+  - id: did
+    label: Difference-in-Differences
+    accent: "#d97757"
+    icon: chart-line
+    category_matches:
+      - Difference-in-Differences (DiD)
+
+  - id: causal-ml
+    label: Causal Machine Learning
+    accent: "#6a9bcc"
+    icon: brain
+    category_matches:
+      - Double Machine Learning
+      - Heterogeneous Treatment Effects (CATE)
+      - Causal Inference
+      - Causal Machine Learning
+
+  - id: panel-fe
+    label: Panel Data & Fixed Effects
+    accent: "#00d4c8"
+    icon: layer-group
+    category_matches:
+      - Fixed Effects and TWFE
+      - FWL Theorem
+      - Bayesian Model Averaging (BMA)
+      - Panel Data
+
+  - id: synthetic-control
+    label: Synthetic Control
+    accent: "#7a5cba"
+    icon: vials
+    category_matches:
+      - Synthetic Control
+
+  - id: iv
+    label: Instrumental Variables
+    accent: "#e0b94c"
+    icon: random
+    category_matches:
+      - Instrumental Variables (IV)
+
+  - id: spatial
+    label: Spatial Econometrics
+    accent: "#3f9b6e"
+    icon: globe-americas
+    category_matches:
+      - Spatial Regression (SAR, SEM, SDM)
+      - Spatial Autocorrelation (ESDA)
+      - GWR and MGWR
+      - Spatial inequality
+      - Convergence
+
+  - id: rdd-matching
+    label: RDD & Matching
+    accent: "#c0506b"
+    icon: cut
+    category_matches:
+      - Regression Discontinuity (RDD)
+      - Matching and Propensity Score
+      - Regression Discontinuity
+      - Matching
+
+  - id: gis-rs
+    label: GIS & Remote Sensing
+    accent: "#1f6f8b"
+    icon: satellite
+    category_matches:
+      - Remote Sensing
+      - GEE
+      - Interactive Dashboard
+
+  - id: foundations
+    label: Foundations & Other Methods
+    accent: "#6c757d"
+    icon: book
+    category_matches: []   # fallback bucket
+
+# Language palette for the language chip on each card.
+languages:
+  python:
+    label: Python
+    color: "#3776ab"
+  r:
+    label: R
+    color: "#276dc3"
+  stata:
+    label: Stata
+    color: "#1a5490"
+  gee:
+    label: GEE
+    color: "#34a853"
+  rpy:
+    label: Python + R
+    color: "#5a4fbe"

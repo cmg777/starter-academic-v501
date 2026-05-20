@@ -1,0 +1,21 @@
+{{/*
+  tutorial_topic_row.html — one labeled topic section with a horizontal scroll strip.
+  Context (dict):
+    .topic    map from data/tutorial_topics.yaml topics[]
+    .cards    slice of dicts ready for tutorial_card.html (one per page in this topic)
+*/}}
+<section class="tg-topic-row" id="topic-{{ .topic.id }}" data-topic-id="{{ .topic.id }}">
+  <header class="tg-topic-header" style="--topic-accent: {{ .topic.accent }};">
+    <h2 class="tg-topic-label">
+      <i class="fas fa-{{ .topic.icon }} tg-topic-glyph" aria-hidden="true"></i>
+      {{ .topic.label }}
+    </h2>
+    <span class="tg-topic-count">{{ len .cards }} tutorial{{ if ne (len .cards) 1 }}s{{ end }}</span>
+    <span class="tg-topic-hint" aria-hidden="true">scroll &rarr;</span>
+  </header>
+  <div class="tg-topic-strip" tabindex="0" aria-label="{{ .topic.label }} tutorials, scroll horizontally">
+    {{ range .cards }}
+      {{ partial "tutorial_card.html" . }}
+    {{ end }}
+  </div>
+</section>

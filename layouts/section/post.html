@@ -1,253 +1,145 @@
-{{/* Custom section template for Posts & Tutorials listing page */}}
-{{/* Adds Isotope.js search + filter UI matching the publication page pattern */}}
+{{/*
+  Section template: Posts & Tutorials gallery.
+  Renders topic-grouped horizontal scroll strips of 16:9 image-first cards.
+  Topic taxonomy lives in data/tutorial_topics.yaml.
+*/}}
 {{ define "main" }}
 
 <div class="universal-wrapper pt-3">
-  <h1>{{ .Title }}</h1>
+  <h1 class="tg-page-title">{{ .Title }}</h1>
+  <p class="tg-page-lead">
+    Hands-on econometric tutorials grouped by method — search, filter by language, or jump to a topic.
+  </p>
 </div>
 
-<div class="universal-wrapper">
-  <div class="row">
-    <div class="col-lg-12">
+{{ $allPages := .Pages.ByDate.Reverse }}
+{{ $topics := index $.Site.Data.tutorial_topics "topics" }}
+{{ $languages := index $.Site.Data.tutorial_topics "languages" }}
 
-      {{/* --- Build category and year maps from all posts --- */}}
-      {{ $catMap := dict }}
-      {{ $catIndex := 1 }}
-      {{ $yearMap := dict }}
-      {{ range .Pages }}
-        {{ range .Params.categories }}
-          {{ if not (index $catMap .) }}
-            {{ $catMap = merge $catMap (dict . $catIndex) }}
-            {{ $catIndex = add $catIndex 1 }}
-          {{ end }}
-        {{ end }}
-        {{ $year := (string .Date.Year) }}
-        {{ if not (index $yearMap $year) }}
-          {{ $yearMap = merge $yearMap (dict $year true) }}
+{{/* --- Pre-compute per-page topic + language using each page's Scratch --- */}}
+{{ range $p := $allPages }}
+  {{ $cats := default (slice) $p.Params.categories }}
+  {{ $isAnn := in $cats "Announcement" }}
+  {{ $tid := "" }}
+  {{ if not $isAnn }}
+    {{ range $t := $topics }}
+      {{ if not $tid }}
+        {{ range $cm := $t.category_matches }}
+          {{ if in $cats $cm }}{{ $tid = $t.id }}{{ end }}
         {{ end }}
       {{ end }}
+    {{ end }}
+    {{ if not $tid }}{{ $tid = "foundations" }}{{ end }}
+  {{ end }}
 
-      {{/* --- Sort categories alphabetically, years descending --- */}}
-      {{ $catKeys := slice }}
-      {{ range $k, $v := $catMap }}
-        {{ $catKeys = $catKeys | append $k }}
-      {{ end }}
-      {{ $catKeys = sort $catKeys }}
+  {{ $slug := "" }}
+  {{ with $p.File }}{{ $slug = path.Base .Dir }}{{ end }}
+  {{ $lang := "" }}
+  {{ if hasPrefix $slug "python_" }}{{ $lang = "python" }}
+  {{ else if hasPrefix $slug "stata_" }}{{ $lang = "stata" }}
+  {{ else if hasPrefix $slug "gee_" }}{{ $lang = "gee" }}
+  {{ else if hasPrefix $slug "rpy_" }}{{ $lang = "rpy" }}
+  {{ else if hasPrefix $slug "r_" }}{{ $lang = "r" }}
+  {{ end }}
 
-      {{ $yearKeys := slice }}
-      {{ range $k, $v := $yearMap }}
-        {{ $yearKeys = $yearKeys | append $k }}
-      {{ end }}
-      {{ $yearKeys = sort $yearKeys "value" "desc" }}
+  {{ $p.Scratch.Set "tg_topic" $tid }}
+  {{ $p.Scratch.Set "tg_lang" $lang }}
+  {{ $p.Scratch.Set "tg_is_announcement" $isAnn }}
+{{ end }}
 
-      {{/* --- Reassign stable indices after sorting --- */}}
-      {{ $catMapSorted := dict }}
-      {{ $idx := 1 }}
-      {{ range $catKeys }}
-        {{ $catMapSorted = merge $catMapSorted (dict . $idx) }}
-        {{ $idx = add $idx 1 }}
-      {{ end }}
-
-      {{/* --- Filter UI --- */}}
-      <div class="form-row mb-4">
-        <div class="col-auto">
-          <input type="search" class="filter-search" placeholder="Search..." autocapitalize="off"
-          autocomplete="off" autocorrect="off" role="textbox" spellcheck="false">
-        </div>
-        {{ if gt (len $catKeys) 1 }}
-        <div class="col-auto">
-          <select class="pub-filters pubtype-select form-control form-control-sm" data-filter-group="pubtype">
-            <option value="*">Category</option>
-            {{ range $catKeys }}
-              <option value=".pubtype-{{ index $catMapSorted . }}">
-                {{ . }}
-              </option>
-            {{ end }}
-          </select>
-        </div>
-        {{ end }}
-        <div class="col-auto">
-          <select class="pub-filters form-control form-control-sm" data-filter-group="year">
-            <option value="*">Date</option>
-            {{ range $yearKeys }}
-              <option value=".year-{{ . }}">
-                {{ . }}
-              </option>
-            {{ end }}
-          </select>
-        </div>
+{{/* --- Sticky control bar --- */}}
+<nav class="tutorial-gallery-nav" aria-label="Tutorial gallery controls">
+  <div class="universal-wrapper tg-nav-inner">
+    <div class="tg-nav-row tg-nav-controls">
+      <div class="tg-search-wrap">
+        <i class="fas fa-search tg-search-icon" aria-hidden="true"></i>
+        <input id="tg-search" class="tg-search" type="search"
+               placeholder="Search tutorials…"
+               autocomplete="off" autocorrect="off" spellcheck="false"
+               aria-label="Search tutorials">
       </div>
-
-      {{/* --- Isotope container with all items --- */}}
-      <div id="container-publications">
-        {{ range .Pages.ByDate.Reverse }}
-          {{/* Build class string: isotope-item + category classes + year class */}}
-          {{ $classes := "isotope-item" }}
-          {{ range .Params.categories }}
-            {{ $ci := index $catMapSorted . }}
-            {{ if $ci }}
-              {{ $classes = printf "%s pubtype-%d" $classes $ci }}
-            {{ end }}
-          {{ end }}
-          {{ $classes = printf "%s year-%d" $classes .Date.Year }}
-
-          <div class="grid-sizer col-lg-12 {{ $classes }}">
-            <div class="media stream-item">
-              {{ $image := .Resources.GetMatch "featured*" }}
-              {{ if $image }}
-              <div class="mr-3">
-                {{ $thumb := $image.Fill "700x460 Center" }}
-                {{ $full := $image.Fit "1920x1920" }}
-                <img src="{{ $thumb.RelPermalink }}" data-full="{{ $full.RelPermalink }}"
-                     alt="{{ .Title }}" loading="lazy"
-                     class="post-listing-thumb"
-                     style="cursor:zoom-in; width:700px; border-radius:6px;">
-              </div>
-              {{ end }}
-              <div class="media-body">
-                <div class="section-subheading article-title mb-0 mt-0">
-                  <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-                </div>
-                {{ with .Params.summary }}
-                <a href="{{ $.RelPermalink }}" class="summary-link">
-                  <div class="article-style">
-                    {{ . | plainify | truncate 200 }}
-                  </div>
-                </a>
-                {{ end }}
-                <div class="stream-meta article-metadata">
-                  <div class="article-metadata">
-                    <span class="article-date">
-                      {{ dateFormat "Jan 2, 2006" .Date }}
-                    </span>
-                    {{ with .Params.categories }}
-                      {{ range . }}
-                        &middot; <span class="badge badge-light">{{ . }}</span>
-                      {{ end }}
-                    {{ end }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        {{ end }}
+      <div class="tg-chips" role="group" aria-label="Filter by language">
+        <button type="button" class="tg-chip active" data-language="*">All</button>
+        <button type="button" class="tg-chip" data-language="python">Python</button>
+        <button type="button" class="tg-chip" data-language="r">R</button>
+        <button type="button" class="tg-chip" data-language="stata">Stata</button>
+        <button type="button" class="tg-chip" data-language="gee">GEE</button>
       </div>
-
+      <label class="tg-sort-wrap" for="tg-sort">
+        <span class="sr-only">Sort</span>
+        <select id="tg-sort" class="tg-sort">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="az">A–Z</option>
+        </select>
+      </label>
+    </div>
+    <div class="tg-nav-row tg-topic-nav" role="navigation" aria-label="Jump to topic">
+      {{ range $topics }}
+        <a href="#topic-{{ .id }}" data-topic-link="{{ .id }}">{{ .label }}</a>
+      {{ end }}
     </div>
   </div>
+</nav>
+
+{{/* --- Per-topic horizontal strips --- */}}
+<div class="universal-wrapper tutorial-gallery">
+
+  {{ range $t := $topics }}
+    {{ $cards := slice }}
+    {{ range $p := $allPages }}
+      {{ if and (not ($p.Scratch.Get "tg_is_announcement")) (eq ($p.Scratch.Get "tg_topic") $t.id) }}
+        {{ $lang := $p.Scratch.Get "tg_lang" }}
+        {{ $langData := index $languages $lang }}
+        {{ if not $langData }}{{ $langData = dict "label" "—" "color" "#6c757d" }}{{ end }}
+        {{ $cards = $cards | append (dict
+              "page" $p
+              "topicId" $t.id
+              "topicLabel" $t.label
+              "topicAccent" $t.accent
+              "topicIcon" $t.icon
+              "languageKey" $lang
+              "languageLabel" $langData.label
+              "languageColor" $langData.color) }}
+      {{ end }}
+    {{ end }}
+    {{ if $cards }}
+      {{ partial "tutorial_topic_row.html" (dict "topic" $t "cards" $cards) }}
+    {{ end }}
+  {{ end }}
+
+  {{/* Empty-state message shown by JS when filters hide everything */}}
+  <div id="tg-empty-state" class="tg-empty-state" hidden>
+    <p>No tutorials match your filters. <button type="button" id="tg-reset" class="tg-reset-link">Clear filters</button></p>
+  </div>
+
+  {{/* --- Announcements strip --- */}}
+  {{ $announcements := slice }}
+  {{ range $p := $allPages }}
+    {{ if $p.Scratch.Get "tg_is_announcement" }}
+      {{ $announcements = $announcements | append $p }}
+    {{ end }}
+  {{ end }}
+  {{ if $announcements }}
+    <section class="tg-announcements" aria-label="News and announcements">
+      <header class="tg-announcements-header">
+        <h2><i class="fas fa-bullhorn" aria-hidden="true"></i> News &amp; Announcements</h2>
+      </header>
+      <ul class="tg-announcements-list">
+        {{ range $announcements }}
+          <li>
+            <a href="{{ .RelPermalink }}">
+              <span class="tg-announcement-date">{{ dateFormat "Jan 2, 2006" .Date }}</span>
+              <span class="tg-announcement-title">{{ .Title }}</span>
+            </a>
+          </li>
+        {{ end }}
+      </ul>
+    </section>
+  {{ end }}
+
 </div>
 
-{{/* Lightbox for post listing thumbnails */}}
-<script>
-(function() {
-  if (window.__postListingLightboxInit) return;
-  window.__postListingLightboxInit = true;
+<script src="{{ "js/tutorial-gallery.js" | relURL }}" defer></script>
 
-  document.addEventListener('DOMContentLoaded', function() {
-    var imgs = document.querySelectorAll('.post-listing-thumb');
-    if (!imgs.length) return;
-
-    var overlay = document.createElement('div');
-    overlay.className = 'image-lightbox-overlay';
-    overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-label', 'Enlarged image viewer');
-    overlay.setAttribute('aria-modal', 'true');
-
-    var closeBtn = document.createElement('button');
-    closeBtn.className = 'image-lightbox-close';
-    closeBtn.setAttribute('aria-label', 'Close image viewer');
-    closeBtn.type = 'button';
-
-    var prevBtn = document.createElement('button');
-    prevBtn.className = 'image-lightbox-nav image-lightbox-prev';
-    prevBtn.setAttribute('aria-label', 'Previous image');
-    prevBtn.type = 'button';
-
-    var nextBtn = document.createElement('button');
-    nextBtn.className = 'image-lightbox-nav image-lightbox-next';
-    nextBtn.setAttribute('aria-label', 'Next image');
-    nextBtn.type = 'button';
-
-    var lightboxImg = document.createElement('img');
-    lightboxImg.alt = '';
-
-    var caption = document.createElement('div');
-    caption.className = 'image-lightbox-caption';
-
-    overlay.appendChild(closeBtn);
-    overlay.appendChild(prevBtn);
-    overlay.appendChild(nextBtn);
-    overlay.appendChild(lightboxImg);
-    overlay.appendChild(caption);
-    document.body.appendChild(overlay);
-
-    var lightboxImages = [];
-    var currentIndex = -1;
-
-    for (var i = 0; i < imgs.length; i++) {
-      (function(img, idx) {
-        lightboxImages.push({ src: img.dataset.full || img.src, alt: img.alt });
-        img.addEventListener('click', function(e) {
-          e.preventDefault();
-          currentIndex = idx;
-          openLightbox(lightboxImages[idx].src, lightboxImages[idx].alt);
-        });
-      })(imgs[i], i);
-    }
-
-    function updateNavButtons() {
-      prevBtn.disabled = (currentIndex <= 0);
-      nextBtn.disabled = (currentIndex >= lightboxImages.length - 1);
-      prevBtn.style.display = lightboxImages.length <= 1 ? 'none' : '';
-      nextBtn.style.display = lightboxImages.length <= 1 ? 'none' : '';
-    }
-
-    function navigateTo(index) {
-      if (index < 0 || index >= lightboxImages.length) return;
-      currentIndex = index;
-      lightboxImg.src = lightboxImages[currentIndex].src;
-      lightboxImg.alt = lightboxImages[currentIndex].alt || '';
-      caption.textContent = lightboxImages[currentIndex].alt || '';
-      caption.style.display = lightboxImages[currentIndex].alt ? 'block' : 'none';
-      updateNavButtons();
-    }
-
-    function openLightbox(src, altText) {
-      lightboxImg.src = src;
-      lightboxImg.alt = altText || '';
-      caption.textContent = altText || '';
-      caption.style.display = altText ? 'block' : 'none';
-      overlay.classList.remove('closing');
-      overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-      updateNavButtons();
-      closeBtn.focus();
-    }
-
-    function closeLightbox() {
-      if (!overlay.classList.contains('active')) return;
-      overlay.classList.add('closing');
-      overlay.addEventListener('transitionend', function handler(e) {
-        if (e.propertyName !== 'opacity') return;
-        overlay.removeEventListener('transitionend', handler);
-        overlay.classList.remove('active', 'closing');
-        lightboxImg.src = '';
-        document.body.style.overflow = '';
-      });
-    }
-
-    prevBtn.addEventListener('click', function(e) { e.stopPropagation(); navigateTo(currentIndex - 1); });
-    nextBtn.addEventListener('click', function(e) { e.stopPropagation(); navigateTo(currentIndex + 1); });
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeLightbox(); });
-    closeBtn.addEventListener('click', function(e) { e.stopPropagation(); closeLightbox(); });
-    lightboxImg.addEventListener('click', function(e) { e.stopPropagation(); closeLightbox(); });
-    document.addEventListener('keydown', function(e) {
-      if (!overlay.classList.contains('active')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') navigateTo(currentIndex - 1);
-      if (e.key === 'ArrowRight') navigateTo(currentIndex + 1);
-    });
-  });
-})();
-</script>
 {{ end }}

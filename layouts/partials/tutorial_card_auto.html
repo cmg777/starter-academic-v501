@@ -1,0 +1,46 @@
+{{/*
+  tutorial_card_auto.html — given a Page, resolve its topic + language
+  from data/tutorial_topics.yaml and render the card via tutorial_card.html.
+  Use this when you don't already have the topic dict in scope.
+*/}}
+{{ $p := . }}
+{{ $topics := index $.Site.Data.tutorial_topics "topics" }}
+{{ $languages := index $.Site.Data.tutorial_topics "languages" }}
+
+{{ $cats := default (slice) $p.Params.categories }}
+{{ $tid := "" }}
+{{ range $t := $topics }}
+  {{ if not $tid }}
+    {{ range $cm := $t.category_matches }}
+      {{ if in $cats $cm }}{{ $tid = $t.id }}{{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ if not $tid }}{{ $tid = "foundations" }}{{ end }}
+
+{{ $topic := dict }}
+{{ range $t := $topics }}
+  {{ if eq $t.id $tid }}{{ $topic = $t }}{{ end }}
+{{ end }}
+
+{{ $slug := "" }}
+{{ with $p.File }}{{ $slug = path.Base .Dir }}{{ end }}
+{{ $lang := "" }}
+{{ if hasPrefix $slug "python_" }}{{ $lang = "python" }}
+{{ else if hasPrefix $slug "stata_" }}{{ $lang = "stata" }}
+{{ else if hasPrefix $slug "gee_" }}{{ $lang = "gee" }}
+{{ else if hasPrefix $slug "rpy_" }}{{ $lang = "rpy" }}
+{{ else if hasPrefix $slug "r_" }}{{ $lang = "r" }}
+{{ end }}
+{{ $langData := index $languages $lang }}
+{{ if not $langData }}{{ $langData = dict "label" "—" "color" "#6c757d" }}{{ end }}
+
+{{ partial "tutorial_card.html" (dict
+    "page" $p
+    "topicId" $topic.id
+    "topicLabel" $topic.label
+    "topicAccent" $topic.accent
+    "topicIcon" $topic.icon
+    "languageKey" $lang
+    "languageLabel" $langData.label
+    "languageColor" $langData.color) }}

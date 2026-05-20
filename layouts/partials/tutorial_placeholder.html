@@ -1,0 +1,11 @@
+{{/*
+  tutorial_placeholder.html
+  Renders an on-brand 16:9 placeholder for a tutorial card lacking featured.png.
+  Context (dict):
+    .topicAccent (string hex), .topicIcon (FA name), .languageLabel (string)
+*/}}
+<div class="tg-placeholder" style="background:linear-gradient(135deg, {{ .topicAccent }} 0%, #141413 100%);">
+  <div class="tg-placeholder-pattern"></div>
+  <i class="fas fa-{{ .topicIcon }} tg-placeholder-icon" aria-hidden="true"></i>
+  <span class="tg-placeholder-lang">{{ .languageLabel }}</span>
+</div>
