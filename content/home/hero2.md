@@ -29,6 +29,12 @@ design:
 #  css_class: mine
 ---
 
+<!-- Previous hero image (JPG). Uncomment to restore.
 <a href="https://www.canva.com/design/DAGEuHInTDc/WvxFY0tDZc6oEuWjkCBUBQ/view" target="_blank" rel="noopener">
   <img src="/media/canva-hero.jpg" alt="On the Geography of Development — Insights from Geospatial Big Data, Development Economics, and Spatial Econometrics" style="width: 100%; border-radius: 8px; margin-top: 1.6em; margin-bottom: 0.9em;">
+</a>
+-->
+
+<a href="https://www.canva.com/design/DAGEuHInTDc/WvxFY0tDZc6oEuWjkCBUBQ/view" target="_blank" rel="noopener">
+  <img src="/media/hero.gif" alt="On the Geography of Development — Insights from Geospatial Big Data, Development Economics, and Spatial Econometrics" style="width: 100%; border-radius: 8px; margin-top: 1.6em; margin-bottom: 0.9em;">
 </a>
