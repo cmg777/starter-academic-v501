@@ -20,6 +20,23 @@
 # regression. This script reproduces the headline numbers in their
 # Table 2 from a clean, from-scratch implementation.
 #
+# WHY DOUBLE LASSO? In one paragraph:
+#
+#   With n = 576 observations and p = 284 candidate controls, plain OLS
+#   technically runs (p < n) but its standard errors blow up because so
+#   many controls are nearly collinear. A natural fix is LASSO — shrink
+#   most controls to zero, keep the few that matter — but using ONE
+#   LASSO on (d, X) -> y is dangerous: LASSO can drop a control that is
+#   strongly correlated with the treatment d but only weakly with the
+#   outcome y, because keeping it does not improve prediction. Dropping
+#   such a control leaves omitted-variable bias in the estimate of α.
+#   Belloni, Chernozhukov & Hansen (2014) solve this by running TWO
+#   LASSOs — one that predicts y from x, one that predicts d from x —
+#   then estimating α by plain OLS of y on d and the UNION of controls
+#   selected by either equation. LASSO is used here for variable
+#   selection only; the final estimate of α comes from unshrunk OLS.
+#   That is the Double LASSO procedure this script implements.
+#
 # Methods compared (all with state-clustered standard errors):
 #
 #   1. First-difference OLS  — Donohue–Levitt's original spec (d only)
@@ -110,8 +127,11 @@ theme_site <- function(base_size = 13) {
 # ── 1. Data loading (from GitHub raw URLs) ───────────────────────
 
 cat("\n========================================\n")
-cat("1. DATA LOADING\n")
+cat("STEP 1 — DATA LOADING (from GitHub raw URLs)\n")
 cat("========================================\n")
+cat("Pulling six CSVs over HTTPS. These were extracted from the JAE\n")
+cat("replication archive's .mat files by the companion prepare_data.R;\n")
+cat("you do not need any Matlab files locally to run this script.\n\n")
 
 BASE_URL <- "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_double_lasso/data/"
 
@@ -180,12 +200,16 @@ outcomes <- list(
 # ── 3. Helper: state-clustered standard errors ───────────────────
 
 # Cluster-robust variance estimator with the HC1-style small-sample
-# adjustment used by the Fitzgerald et al. replication code:
+# adjustment used by the Fitzgerald et al. replication code. The formula
+# is the textbook "sandwich" estimator (see Cameron & Miller 2015,
+# J. Hum. Resour.):
 #
-#   V_cluster = (n-1)/(n-k) × G/(G-1) × (X'X)^{-1} S (X'X)^{-1}
+#   V_cluster = (n-1)/(n-k) × G/(G-1) × (X'X)^{-1} · S · (X'X)^{-1}
+#                ^small-sample adjust       ^bread     ^meat   ^bread
 #
-# where S = sum_g (X_g' e_g)(X_g' e_g)' is the cluster-summed score and
-# G is the number of clusters. The state-level grouping has G = 48.
+# where S = sum_g (X_g' e_g)(X_g' e_g)' is the "meat" (the cluster-
+# summed outer product of scores) and (X'X)^{-1} is the "bread". The
+# state-level grouping has G = 48 clusters of 12 observations each.
 cluster_se <- function(X, e, group) {
   X <- as.matrix(X)
   n <- length(e)
@@ -231,15 +255,38 @@ ols_fit <- function(y, d, X, group) {
 
 # ── 4. Estimator A — First-difference OLS (Donohue–Levitt baseline) ──
 
+# ESTIMAND. Across all five estimators below, the parameter of interest
+# is α, the average partial effect of the (first-differenced) effective
+# abortion rate on the (first-differenced) state crime rate. This is an
+# observational study, so α is identified under two assumptions:
+#
+#   (1) Conditional independence given X: once we control for the 284
+#       partialled covariates (lagged demographics, within-state means,
+#       time-trend interactions of the original Donohue–Levitt controls,
+#       etc.), the remaining variation in the abortion rate is
+#       independent of any unobserved confounders.
+#   (2) Parallel trends in levels: state fixed effects, if any, are
+#       absorbed by first-differencing the data; year fixed effects are
+#       absorbed by the partialling step (FWL projection) done in
+#       prepare_data.R.
+#
+# Neither assumption is innocuous — Fitzgerald et al. (2026) sec. 3.5
+# discusses the bias-amplification and collider threats — but they are
+# the framework the paper operates under, and we follow it.
+
 cat("\n========================================\n")
-cat("4. FIRST-DIFFERENCE OLS (Donohue–Levitt baseline)\n")
+cat("STEP 4 — FIRST-DIFFERENCE OLS (the original Donohue–Levitt 1993 spec)\n")
 cat("========================================\n")
-cat("Model: Dy_st = alpha * Dd_st + eps_st\n")
-cat("(no controls beyond the constant absorbed by first-differencing)\n\n")
+cat("Regress differenced crime on differenced abortion with NO controls.\n")
+cat("This is the no-controls baseline — the LASSO methods below add\n")
+cat("hundreds of candidate controls and select among them.\n")
+cat("Model: Dy_st = alpha * Dd_st + eps_st\n\n")
 
 first_diff <- list()
 for (nm in names(outcomes)) {
   o    <- outcomes[[nm]]
+  # lm.fit is the low-level form that takes a design matrix directly,
+  # bypassing lm()'s formula parser. Slightly faster; same residuals.
   fit  <- lm.fit(cbind(o$d_raw), o$y_raw)
   e    <- as.numeric(fit$residuals)
   se   <- cluster_se(cbind(o$d_raw), e, state)
@@ -252,11 +299,12 @@ for (nm in names(outcomes)) {
 # ── 5. Estimator B — OLS with all 284 controls ───────────────────
 
 cat("\n========================================\n")
-cat("5. OLS WITH ALL ~284 CONTROLS\n")
+cat("STEP 5 — OLS WITH ALL ~284 CONTROLS (the kitchen-sink approach)\n")
 cat("========================================\n")
-cat("Feasible because p = 284 < n = 576. The fit is unstable because\n")
-cat("many controls are near-collinear; the headline coefficient is\n")
-cat("usually fine but its SE balloons. This is what motivates LASSO.\n\n")
+cat("Feasible because p = 284 < n = 576: OLS technically inverts. But\n")
+cat("many controls are near-collinear, so the standard errors balloon —\n")
+cat("watch the SE on murder explode. This is what motivates LASSO:\n")
+cat("we want to KEEP the controls that matter, DROP the rest.\n\n")
 
 ols_all <- list()
 for (nm in names(outcomes)) {
@@ -270,24 +318,38 @@ for (nm in names(outcomes)) {
 
 # ── 6. Estimator C — Post-Structural LASSO (PSL) ────────────────
 
-# PSL ("the new benchmark" in Fitzgerald et al.) is the simplest LASSO-
-# based selection: run ONE LASSO on (d, X) -> y while forcing d to stay
-# in (via penalty.factor = 0 on the d coefficient), keep the variables
-# selected on top of d, then refit with OLS.
+# PSL = "Post-Structural LASSO", Fitzgerald et al.'s suggested benchmark.
+# It uses ONE LASSO (not two like Double LASSO) but forces the treatment
+# to stay in, and then refits with plain OLS on the selected controls.
 #
-# Step 1 — cv.glmnet on cbind(d, X), penalising X but not d.
-# Step 2 — refit y ~ d + X[, selected] with state-clustered SEs.
+#   Step 1 — Run cv.glmnet on (d, X) -> y, but with `penalty.factor` set
+#            so that d gets a ZERO penalty multiplier. glmnet's penalty
+#            on each coefficient is lambda × penalty.factor[j]; a 0
+#            entry means d enters with no shrinkage and so survives
+#            every value of lambda. The remaining 284 columns of X are
+#            penalised normally and most get shrunk to zero.
+#   Step 2 — Refit y ~ d + X[, selected] by plain OLS, then compute
+#            state-clustered SEs.
+#
+# WHY POST-OLS, not LASSO coefficients? LASSO shrinks the coefficients
+# of the variables it keeps toward zero — that introduces bias in α.
+# Refitting with plain OLS on the variables LASSO selected removes the
+# shrinkage. Throughout this script, LASSO is used for SELECTION only;
+# the actual α estimate always comes from a final OLS.
 
 cat("\n========================================\n")
-cat("6. POST-STRUCTURAL LASSO (PSL)\n")
+cat("STEP 6 — POST-STRUCTURAL LASSO (PSL), the one-LASSO benchmark\n")
 cat("========================================\n")
-cat("One CV-LASSO on cbind(d, X) -> y, with d forced in (penalty.factor=0),\n")
-cat("then post-OLS on d + selected controls.\n\n")
+cat("One CV-LASSO on cbind(d, X) -> y with d forced in (penalty.factor=0),\n")
+cat("then plain OLS on d + the controls LASSO selected.\n\n")
 
 psl_fit <- function(y, d, X, group, nfolds = 3) {
   # 3 folds matches Fitzgerald et al. (2026) footnote 2.
   M <- cbind(d, X)
-  pf <- c(0, rep(1, ncol(X)))                  # do not penalise d
+  # penalty.factor multiplies each coefficient's penalty by 0 or 1.
+  # Putting 0 in the d slot effectively pins d into the model: LASSO
+  # cannot shrink it away no matter how aggressive lambda is.
+  pf <- c(0, rep(1, ncol(X)))
   cv <- cv.glmnet(M, y, alpha = 1, intercept = TRUE,
                   penalty.factor = pf, nfolds = nfolds)
   coefs <- as.numeric(coef(cv, s = "lambda.min"))[-1]   # drop intercept
@@ -314,19 +376,41 @@ for (nm in names(outcomes)) {
 # ── 7. Estimator D — Double LASSO, rigorous penalty (hdm) ───────
 
 # Belloni–Chernozhukov–Hansen Double LASSO with the rigorous penalty.
+# The procedure is motivated by writing the model as two reduced-form
+# equations (Belloni et al. 2014, eqs 3–4):
+#
+#   y_i = x_i' π   + r_{c,i} + ε_i      (outcome on controls only)
+#   d_i = x_i' θ_d + r_{d,i} + v_i      (treatment on controls only)
+#
+# Either equation alone is just a prediction problem. The Frisch–Waugh–
+# Lovell theorem says that to estimate α in y_i = α d_i + x_i' θ_g + ζ_i
+# we can residualise y and d against the same set of controls and
+# regress the residuals. Double LASSO does this approximately: take the
+# UNION of the controls each prediction problem selects, then run OLS.
+#
 # Three steps (all explicit so the reader can see what changes vs PSL):
 #
-#   1. rlasso(y ~ X)            -> set I_y of nonzero indices
-#   2. rlasso(d ~ X)            -> set I_d of nonzero indices
-#   3. lm(y ~ d + X[, I_y U I_d])  with state-clustered SEs
+#   1. rlasso(y ~ X)            -> I_y = indices LASSO keeps when
+#                                  predicting the outcome from controls
+#                                  only (no d on the right-hand side).
+#   2. rlasso(d ~ X)            -> I_d = indices LASSO keeps when
+#                                  predicting the treatment from
+#                                  controls only.
+#   3. lm(y ~ d + X[, I_y U I_d])  with state-clustered SEs. The union
+#                                  is the safety net: a control that is
+#                                  strongly correlated with d will be
+#                                  caught by Step 2 even if Step 1 drops
+#                                  it for not predicting y well.
 #
 # rlasso() picks lambda by a data-driven, theory-based rule (Belloni,
 # Chen, Chernozhukov & Hansen 2012) so that the estimation error is
 # dominated by noise. It is more parsimonious than CV.
 
 cat("\n========================================\n")
-cat("7. DOUBLE LASSO — rigorous penalty (hdm::rlasso)\n")
+cat("STEP 7 — DOUBLE LASSO, RIGOROUS PENALTY (hdm::rlasso)\n")
 cat("========================================\n")
+cat("Two LASSOs (y on X, d on X), union of selected controls, then OLS.\n")
+cat("'Rigorous' = lambda chosen by Belloni et al.'s theory, not CV.\n")
 cat("Step 1: LASSO of y on X   -> selected indices I_y\n")
 cat("Step 2: LASSO of d on X   -> selected indices I_d\n")
 cat("Step 3: OLS y ~ d + X[, union(I_y, I_d)]  with clustered SEs\n\n")
@@ -371,13 +455,23 @@ for (nm in names(outcomes)) {
 
 # ── 8. Estimator E — Double LASSO, CV penalty (glmnet) ──────────
 
-# Same three steps as section 7, but each LASSO is tuned by 10-fold CV
-# (lambda chosen to minimise out-of-sample MSE). CV typically selects
-# MORE variables than the rigorous penalty, so the union is larger.
+# Same three steps as section 7, but each LASSO is tuned by 3-fold
+# cross-validation (per Fitzgerald et al. footnote 2) and lambda is
+# picked to minimise out-of-sample MSE (`lambda.min`). The alternative
+# `lambda.1se` (simplest model within one SE of the CV minimum) is more
+# parsimonious; the paper uses `lambda.min` so we follow.
+#
+# CV typically keeps MORE variables than the rigorous penalty, so the
+# union from this section is much larger than the union from section 7.
+# The trade-off: CV may select noise variables; the rigorous penalty is
+# tighter but can miss true predictors when n is small.
 
 cat("\n========================================\n")
-cat("8. DOUBLE LASSO — CV penalty (glmnet::cv.glmnet)\n")
+cat("STEP 8 — DOUBLE LASSO, CV PENALTY (glmnet::cv.glmnet)\n")
 cat("========================================\n")
+cat("Same recipe as Step 7 (two LASSOs, union, post-OLS) but lambda is\n")
+cat("now chosen by 3-fold CV instead of Belloni et al.'s theory rule.\n")
+cat("Watch the variable counts jump: CV is much more permissive.\n\n")
 
 selected_from_glmnet <- function(cv) {
   cf <- as.numeric(coef(cv, s = "lambda.min"))[-1]   # drop intercept
@@ -386,6 +480,10 @@ selected_from_glmnet <- function(cv) {
 
 dl_cv_fit <- function(y, d, X, group, nfolds = 3) {
   # 3 folds matches Fitzgerald et al. (2026) footnote 2.
+  # intercept = TRUE is glmnet's default and is harmless on partialled
+  # (mean ≈ 0) data — the fitted intercept will be ≈ 0. By contrast,
+  # rlasso's theory-driven penalty in section 7 is sensitive to the
+  # intercept choice, which is why we pass intercept = FALSE there.
   cv_y <- cv.glmnet(X, y, alpha = 1, intercept = TRUE, nfolds = nfolds)
   cv_d <- cv.glmnet(X, d, alpha = 1, intercept = TRUE, nfolds = nfolds)
   Iy <- selected_from_glmnet(cv_y)
@@ -423,8 +521,10 @@ for (nm in names(outcomes)) {
 # ── 9. Build the replication of paper Table 2 ────────────────────
 
 cat("\n========================================\n")
-cat("9. REPLICATION OF PAPER TABLE 2\n")
+cat("STEP 9 — REPLICATION OF PAPER TABLE 2\n")
 cat("========================================\n")
+cat("Stack all five estimators x three outcomes into one tidy table\n")
+cat("and save it to disk for downstream use (figures, blog post, etc.).\n\n")
 
 estimate_row <- function(method, outcome_name, fit, n_selected = NA) {
   data.frame(
@@ -476,8 +576,11 @@ cat("Wrote selection_diagnostic.csv\n")
 # ── 10. Figures (dark theme) ─────────────────────────────────────
 
 cat("\n========================================\n")
-cat("10. FIGURES\n")
+cat("STEP 10 — FIGURES (4 dark-theme PNGs)\n")
 cat("========================================\n")
+cat("Forest plot of all five methods, variable-selection bar chart,\n")
+cat("LASSO coefficient paths for the d-equation, and a rigorous-vs-CV\n")
+cat("head-to-head. All use the site's dark palette.\n\n")
 
 # Order methods so plots read top-to-bottom from naive to most selective.
 method_levels <- c("First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)")
@@ -641,7 +744,7 @@ cat("Wrote r_double_lasso_methods_compare.png\n")
 # ── 11. Summary & comparison to paper headline numbers ──────────
 
 cat("\n========================================\n")
-cat("11. SUMMARY\n")
+cat("STEP 11 — SUMMARY: comparing our numbers to the paper's Table 2\n")
 cat("========================================\n")
 
 paper_viol <- data.frame(

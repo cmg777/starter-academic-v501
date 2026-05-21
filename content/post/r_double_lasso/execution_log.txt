@@ -1,7 +1,11 @@
 
 ========================================
-1. DATA LOADING
+STEP 1 — DATA LOADING (from GitHub raw URLs)
 ========================================
+Pulling six CSVs over HTTPS. These were extracted from the JAE
+replication archive's .mat files by the companion prepare_data.R;
+you do not need any Matlab files locally to run this script.
+
 levitt_state.csv          576 observations (cluster ids 1..48)
 levitt_linear.csv         576 rows x 7 cols (raw first differences)
 levitt_partialled.csv     576 rows x 7 cols (after partialling time dummies)
@@ -10,39 +14,44 @@ levitt_controls_prop.csv  576 rows x 284 cols  (Zp)
 levitt_controls_murd.csv  576 rows x 284 cols  (Zm)
 
 ========================================
-4. FIRST-DIFFERENCE OLS (Donohue–Levitt baseline)
+STEP 4 — FIRST-DIFFERENCE OLS (the original Donohue–Levitt 1993 spec)
 ========================================
+Regress differenced crime on differenced abortion with NO controls.
+This is the no-controls baseline — the LASSO methods below add
+hundreds of candidate controls and select among them.
 Model: Dy_st = alpha * Dd_st + eps_st
-(no controls beyond the constant absorbed by first-differencing)
 
   Violent crime   alpha_hat = -0.1521  (SE = 0.0337)
   Property crime  alpha_hat = -0.1084  (SE = 0.0219)
   Murder          alpha_hat = -0.2039  (SE = 0.0667)
 
 ========================================
-5. OLS WITH ALL ~284 CONTROLS
+STEP 5 — OLS WITH ALL ~284 CONTROLS (the kitchen-sink approach)
 ========================================
-Feasible because p = 284 < n = 576. The fit is unstable because
-many controls are near-collinear; the headline coefficient is
-usually fine but its SE balloons. This is what motivates LASSO.
+Feasible because p = 284 < n = 576: OLS technically inverts. But
+many controls are near-collinear, so the standard errors balloon —
+watch the SE on murder explode. This is what motivates LASSO:
+we want to KEEP the controls that matter, DROP the rest.
 
   Violent crime   alpha_hat = +0.0135  (SE = 0.0911)  using 281 controls
   Property crime  alpha_hat = -0.1950  (SE = 0.0472)  using 281 controls
   Murder          alpha_hat = +2.3426  (SE = 0.3114)  using 281 controls
 
 ========================================
-6. POST-STRUCTURAL LASSO (PSL)
+STEP 6 — POST-STRUCTURAL LASSO (PSL), the one-LASSO benchmark
 ========================================
-One CV-LASSO on cbind(d, X) -> y, with d forced in (penalty.factor=0),
-then post-OLS on d + selected controls.
+One CV-LASSO on cbind(d, X) -> y with d forced in (penalty.factor=0),
+then plain OLS on d + the controls LASSO selected.
 
   Violent crime   alpha_hat = -0.1567  (SE = 0.0342)  | 3 controls selected
   Property crime  alpha_hat = -0.0683  (SE = 0.0319)  | 12 controls selected
   Murder          alpha_hat = -0.2061  (SE = 0.0514)  | 0 controls selected
 
 ========================================
-7. DOUBLE LASSO — rigorous penalty (hdm::rlasso)
+STEP 7 — DOUBLE LASSO, RIGOROUS PENALTY (hdm::rlasso)
 ========================================
+Two LASSOs (y on X, d on X), union of selected controls, then OLS.
+'Rigorous' = lambda chosen by Belloni et al.'s theory, not CV.
 Step 1: LASSO of y on X   -> selected indices I_y
 Step 2: LASSO of d on X   -> selected indices I_d
 Step 3: OLS y ~ d + X[, union(I_y, I_d)]  with clustered SEs
@@ -55,8 +64,12 @@ Step 3: OLS y ~ d + X[, union(I_y, I_d)]  with clustered SEs
                   alpha_hat = -0.1662  (SE = 0.0790)
 
 ========================================
-8. DOUBLE LASSO — CV penalty (glmnet::cv.glmnet)
+STEP 8 — DOUBLE LASSO, CV PENALTY (glmnet::cv.glmnet)
 ========================================
+Same recipe as Step 7 (two LASSOs, union, post-OLS) but lambda is
+now chosen by 3-fold CV instead of Belloni et al.'s theory rule.
+Watch the variable counts jump: CV is much more permissive.
+
   Violent crime   |I_y|= 11  |I_d|=143  |I_y u I_d|=150
                   alpha_hat = +0.0193  (SE = 0.0978)
   Property crime  |I_y|=  7  |I_d|=103  |I_y u I_d|=109
@@ -65,8 +78,11 @@ Step 3: OLS y ~ d + X[, union(I_y, I_d)]  with clustered SEs
                   alpha_hat = -1.1128  (SE = 0.3897)
 
 ========================================
-9. REPLICATION OF PAPER TABLE 2
+STEP 9 — REPLICATION OF PAPER TABLE 2
 ========================================
+Stack all five estimators x three outcomes into one tidy table
+and save it to disk for downstream use (figures, blog post, etc.).
+
         method        outcome estimate std_error n_selected    ci_lo     ci_hi
     First diff  Violent crime -0.15210   0.03368         NA -0.21810 -0.086092
     OLS (full)  Violent crime  0.01352   0.09105        284 -0.16495  0.191985
@@ -88,15 +104,19 @@ Wrote results_table2.csv
 Wrote selection_diagnostic.csv
 
 ========================================
-10. FIGURES
+STEP 10 — FIGURES (4 dark-theme PNGs)
 ========================================
+Forest plot of all five methods, variable-selection bar chart,
+LASSO coefficient paths for the d-equation, and a rigorous-vs-CV
+head-to-head. All use the site's dark palette.
+
 Wrote r_double_lasso_estimates.png
 Wrote r_double_lasso_selection.png
 Wrote r_double_lasso_paths.png
 Wrote r_double_lasso_methods_compare.png
 
 ========================================
-11. SUMMARY
+STEP 11 — SUMMARY: comparing our numbers to the paper's Table 2
 ========================================
 Replication check (violent crime):
         method estimate_paper std_error_paper estimate_ours std_error_ours
