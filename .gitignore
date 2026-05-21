@@ -43,7 +43,9 @@ content/post/r_did2/reference/manuscript.tex
 # under references/, so render artefacts land there too.
 content/post/*/tutorial.html
 content/post/*/tutorial_files/
+content/post/*/tutorial-render.log
 content/post/*/references/tutorial.html
 content/post/*/references/tutorial_files/
+content/post/*/references/tutorial-render.log
 content/post/*/references/.venv/
 content/post/*/references/.quarto/

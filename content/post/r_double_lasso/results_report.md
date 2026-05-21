@@ -50,7 +50,7 @@ levitt_controls_murd.csv  576 rows x 284 cols  (Zm)
 | `levitt_controls_prop.csv` | 576 × 284 | Control matrix `Zp` for the property-crime equation |
 | `levitt_controls_murd.csv` | 576 × 284 | Control matrix `Zm` for the murder equation |
 
-**Interpretation:** The sample is exactly the one Belloni et al. (2014) used: **48 states × 13 years (1985–1997), giving 576 observations after first-differencing.** The Donohue–Levitt 1993 specification absorbs state fixed effects by first-differencing; year fixed effects are absorbed by partialling each variable against the year dummies (Frisch–Waugh–Lovell, executed in the upstream `prepare_data.R`). This pre-processing is invisible to the analysis script — by the time the data arrives, the year fixed effects are already gone, which is why the LASSO equations include no time dummies and the rigorous penalty `intercept = FALSE` is correct. The control set `Z*` is 284-wide because the original 8 Donohue–Levitt controls are expanded into squares, two-way interactions, time interactions, lagged levels, within-state means, and initial-value × time-trend interactions, then screened for multicollinearity. This 284-dimension panel with n = 576 is the textbook regime where Double LASSO is supposed to help: high-dimensional, but not so wide that OLS is technically infeasible.
+**Interpretation:** The sample is exactly the one Belloni et al. (2014) used: **48 states × 12 years (1986–1997) after first-differencing the raw 13-year 1985–1997 panel, giving 576 observations.** The Donohue–Levitt 1993 specification absorbs state fixed effects by first-differencing; year fixed effects are absorbed by partialling each variable against the year dummies (Frisch–Waugh–Lovell, executed in the upstream `prepare_data.R`). This pre-processing is invisible to the analysis script — by the time the data arrives, the year fixed effects are already gone, which is why the LASSO equations include no time dummies and the rigorous penalty `intercept = FALSE` is correct. The control set `Z*` is 284-wide because the original 8 Donohue–Levitt controls are expanded into squares, two-way interactions, time interactions, lagged levels, within-state means, and initial-value × time-trend interactions, then screened for multicollinearity. This 284-dimension panel with n = 576 is the textbook regime where Double LASSO is supposed to help: high-dimensional, but not so wide that OLS is technically infeasible.
 
 ---
 
@@ -146,8 +146,6 @@ then plain OLS on d + the controls LASSO selected.
 
 ### 4.4  Estimator D — Double LASSO with rigorous (theory-based) penalty
 
-![LASSO coefficient paths for the abortion-rate prediction equation, violent-crime panel: 143 of 284 candidate controls survive at the CV-chosen lambda.min.](r_double_lasso_paths.png)
-
 **Raw output:**
 
 ```text
@@ -181,6 +179,8 @@ Step 3: OLS y ~ d + X[, union(I_y, I_d)]  with clustered SEs
 ---
 
 ### 4.5  Estimator E — Double LASSO with cross-validated penalty
+
+![CV-LASSO coefficient paths for the d-equation (predicting the abortion rate from the 284 partialled controls), violent-crime panel: 143 of 284 controls survive at the CV-chosen lambda.min — illustrating the over-selection that motivates the rigorous penalty in §4.4.](r_double_lasso_paths.png)
 
 ![Rigorous-penalty vs. CV-penalty Double LASSO, side by side across the three outcomes: CV's permissive selection moves coefficients dramatically.](r_double_lasso_methods_compare.png)
 
@@ -230,7 +230,7 @@ Watch the variable counts jump: CV is much more permissive.
 |---|---|---|---|
 | 1 | `r_double_lasso_estimates.png` | Forest plot of α̂ ± 95 % CI for all five estimators (First diff, OLS-full, PSL, DL-rigorous, DL-CV) facetted by outcome (Violent / Property / Murder). | LASSO methods sit between the no-controls baseline and the kitchen-sink OLS; DL-rigorous and PSL land near the original Donohue–Levitt result for all three crimes. |
 | 2 | `r_double_lasso_selection.png` | Variable-selection bar chart: `\|I_y\|`, `\|I_d\|`, intersection, and union for DL-rigorous vs. DL-CV, facetted by outcome. | CV LASSO keeps roughly twenty times more controls than rigorous LASSO; the chart makes the parsimony trade-off visible at a glance. |
-| 3 | `r_double_lasso_paths.png` | LASSO coefficient paths for the d-equation (predicting the abortion rate from the 284 partialled controls), violent-crime panel. Teal lines are variables nonzero at `lambda.min`; the dashed orange line marks `log(lambda.min)`. | The CV-optimal lambda is so small that 143 of 284 controls survive — illustrating the over-selection that CV does even in the d-equation. |
+| 3 | `r_double_lasso_paths.png` | **CV-LASSO** coefficient paths for the d-equation (predicting the abortion rate from the 284 partialled controls), violent-crime panel. Teal lines are variables nonzero at `lambda.min`; the dashed orange line marks `log(lambda.min)`. | The CV-optimal lambda is so small that 143 of 284 controls survive — illustrating the over-selection that CV does even in the d-equation. |
 | 4 | `r_double_lasso_methods_compare.png` | Head-to-head: DL-rigorous vs. DL-CV α̂ ± 95 % CI for each outcome. | The two flavours of Double LASSO can disagree dramatically: violent crime goes from −0.10 (rigorous) to +0.02 (CV); murder from −0.17 to −1.11. |
 
 ---
@@ -294,7 +294,7 @@ Every row below cites a specific manuscript location in `references/Fitzgerald S
 | Murder | First diff | **−0.2039** | 0.0667 | −0.204 | 0.068 | 223 | Exact to 3 decimals on point estimate and SE. |
 | Murder | OLS (full) | **+2.3426** | 0.3114 | +2.343 | (cut off in markdown rendering) | 226 | Point exact to 4 decimals; paper SE not directly readable in this rendering but is large. |
 | Murder | PSL | **−0.2061** | 0.0514 | −0.206 | 0.051 | 225 | Exact to 3 decimals. |
-| Murder | DL (rigorous) | **−0.1662** | 0.0790 | −0.125 | 0.162 | 224 | Within 0.04 on point estimate. Selection counts \|I_y\|=0, \|I_d\|=9 match exactly. Larger gap on murder than on violent or property — consistent with the paper's note (line 224) that DL on murder has very few selected controls and the post-OLS is unstable. |
+| Murder | DL (rigorous) | **−0.1662** | 0.0790 | −0.125 | 0.162 | 224 | Within 0.04 on point estimate. Selection counts \|I_y\|=0, \|I_d\|=9 match exactly. Larger gap on murder than on violent or property — consistent with the paper's discussion that DL on murder has very few selected controls (only the d-step finds any), making the post-OLS estimate sensitive to which specific covariates get selected. |
 | Murder | DL (CV) | **−1.1128** | 0.3897 | — | — | (not in paper Table 2) | — |
 
 **Verdict:** Reproduction is faithful at every numerically verifiable point. All First-difference and PSL coefficients match the paper's Table 2 to within 0.001 on point estimates and exactly on standard errors; DL (rigorous) coefficients match within 0.04 with variable-selection counts matching *exactly*; OLS-full point estimates match the paper exactly but the paper's reported SEs are larger because of a `matlib::inv` rescaling step on near-singular `X'X` that this script intentionally does not adopt (the script's `script-review.md` discusses this choice in detail). The paper does not tabulate the CV-penalty Double LASSO; this report adds it as the second layer of the headline.
