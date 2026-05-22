@@ -284,7 +284,7 @@ button.action[disabled] { opacity: 0.5; cursor: not-allowed; }
 .tag.cv       { background: rgba(217, 119, 87, 0.20); color: var(--orange); }
 .tag.first    { background: rgba(106, 155, 204, 0.18); color: var(--steel); }
 .tag.ols      { background: rgba(232, 236, 242, 0.12); color: var(--muted); }
-.tag.psl      { background: rgba(155, 220, 195, 0.18); color: #9bdcc3; }
+.tag.psl      { background: rgba(0, 212, 200, 0.12); color: color-mix(in srgb, var(--teal) 60%, white); }
 
 details.gloss {
   margin: 8px 0;

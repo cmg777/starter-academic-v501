@@ -233,7 +233,7 @@
     const colorMap = {
       "First diff":    C.steel,
       "OLS (full)":    C.muted,
-      "PSL":           "#9bdcc3",
+      "PSL":           "#66e5de",
       "DL (rigorous)": C.teal,
       "DL (CV)":       C.orange,
     };

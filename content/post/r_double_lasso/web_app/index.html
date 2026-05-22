@@ -281,6 +281,15 @@
     the number of controls the estimator used.
   </p>
 
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Toggle "Murder" off</strong> and watch the Kitchen-sink OLS bar disappear — its +2.34 estimate compresses the x-axis for everyone else. The story of why &#124;X'X&#124;⁻¹ blows up becomes visible.</li>
+      <li><strong>Hover any point</strong> to see its SE, 95% CI, and the exact number of controls that estimator used. The gap between DL (rigorous) and DL (CV) is most dramatic on Murder (9 controls vs 161).</li>
+      <li><strong>Compare the lower bar chart</strong>: the orange "DL (CV)" bars dwarf the teal "DL (rigorous)" bars across all three outcomes — 109 vs 12 for property crime, 150 vs 8 for violent crime. That is the §10 over-selection story made visible at a glance.</li>
+    </ul>
+  </div>
+
   <div class="card">
     <h3>Outcomes</h3>
     <div class="outcome-toggle" id="fp-outcomes">
