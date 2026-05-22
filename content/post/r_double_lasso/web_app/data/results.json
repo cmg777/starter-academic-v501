@@ -1,0 +1,29 @@
+{
+  "estimates": [
+    { "method": "First diff",    "outcome": "Violent crime",  "estimate": -0.1521, "se": 0.0337, "ci_lo": -0.2181, "ci_hi": -0.0861, "n_selected": null },
+    { "method": "OLS (full)",    "outcome": "Violent crime",  "estimate":  0.0135, "se": 0.0911, "ci_lo": -0.1649, "ci_hi":  0.1920, "n_selected": 284  },
+    { "method": "PSL",           "outcome": "Violent crime",  "estimate": -0.1567, "se": 0.0342, "ci_lo": -0.2237, "ci_hi": -0.0897, "n_selected": 3    },
+    { "method": "DL (rigorous)", "outcome": "Violent crime",  "estimate": -0.0964, "se": 0.0514, "ci_lo": -0.1972, "ci_hi":  0.0045, "n_selected": 8    },
+    { "method": "DL (CV)",       "outcome": "Violent crime",  "estimate":  0.0193, "se": 0.0978, "ci_lo": -0.1724, "ci_hi":  0.2110, "n_selected": 150  },
+
+    { "method": "First diff",    "outcome": "Property crime", "estimate": -0.1084, "se": 0.0219, "ci_lo": -0.1514, "ci_hi": -0.0654, "n_selected": null },
+    { "method": "OLS (full)",    "outcome": "Property crime", "estimate": -0.1950, "se": 0.0472, "ci_lo": -0.2874, "ci_hi": -0.1025, "n_selected": 284  },
+    { "method": "PSL",           "outcome": "Property crime", "estimate": -0.0683, "se": 0.0319, "ci_lo": -0.1309, "ci_hi": -0.0058, "n_selected": 12   },
+    { "method": "DL (rigorous)", "outcome": "Property crime", "estimate": -0.0314, "se": 0.0227, "ci_lo": -0.0759, "ci_hi":  0.0132, "n_selected": 12   },
+    { "method": "DL (CV)",       "outcome": "Property crime", "estimate": -0.1784, "se": 0.0653, "ci_lo": -0.3064, "ci_hi": -0.0505, "n_selected": 109  },
+
+    { "method": "First diff",    "outcome": "Murder",         "estimate": -0.2039, "se": 0.0667, "ci_lo": -0.3347, "ci_hi": -0.0731, "n_selected": null },
+    { "method": "OLS (full)",    "outcome": "Murder",         "estimate":  2.3426, "se": 0.3114, "ci_lo":  1.7323, "ci_hi":  2.9530, "n_selected": 284  },
+    { "method": "PSL",           "outcome": "Murder",         "estimate": -0.2061, "se": 0.0514, "ci_lo": -0.3068, "ci_hi": -0.1054, "n_selected": 0    },
+    { "method": "DL (rigorous)", "outcome": "Murder",         "estimate": -0.1662, "se": 0.0790, "ci_lo": -0.3211, "ci_hi": -0.0113, "n_selected": 9    },
+    { "method": "DL (CV)",       "outcome": "Murder",         "estimate": -1.1128, "se": 0.3897, "ci_lo": -1.8766, "ci_hi": -0.3489, "n_selected": 161  }
+  ],
+  "selection": [
+    { "outcome": "Violent crime",  "method": "DL (rigorous)", "n_Iy": 0,  "n_Id": 8,   "n_intersection": 0, "n_union": 8   },
+    { "outcome": "Violent crime",  "method": "DL (CV)",       "n_Iy": 11, "n_Id": 143, "n_intersection": 4, "n_union": 150 },
+    { "outcome": "Property crime", "method": "DL (rigorous)", "n_Iy": 3,  "n_Id": 9,   "n_intersection": 0, "n_union": 12  },
+    { "outcome": "Property crime", "method": "DL (CV)",       "n_Iy": 7,  "n_Id": 103, "n_intersection": 1, "n_union": 109 },
+    { "outcome": "Murder",         "method": "DL (rigorous)", "n_Iy": 0,  "n_Id": 9,   "n_intersection": 0, "n_union": 9   },
+    { "outcome": "Murder",         "method": "DL (CV)",       "n_Iy": 0,  "n_Id": 161, "n_intersection": 0, "n_union": 161 }
+  ]
+}

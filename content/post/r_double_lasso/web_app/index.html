@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Double LASSO Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Double LASSO for Causal Inference: Does Abortion Reduce Crime?'. A pedagogical web app with sliders to explore LASSO selection, the rigorous-vs-CV penalty contrast, and the post's forest plot.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Double LASSO — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Double LASSO for Causal Inference: Does Abortion Reduce Crime?</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"      class="tab"        data-pane="pane-lab"      role="tab" aria-selected="false">2 · LASSO Lab</button>
+  <button id="tab-showdown" class="tab"        data-pane="pane-showdown" role="tab" aria-selected="false">3 · Penalty Showdown</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why LASSO? Why <em>Double</em> LASSO?</h2>
+  <p class="lede">
+    Suppose you want to estimate a causal effect — say, does the abortion rate
+    affect the crime rate — and you have 284 candidate control variables to
+    choose from. You cannot use all of them (the estimate explodes), you
+    cannot drop them all (you risk omitted-variable bias), and picking by hand
+    feels arbitrary. <strong>Double LASSO</strong> automates the choice in a way
+    that is honest about causal inference, not just about prediction.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. In four tabs you will:
+    sweep the LASSO penalty <span class="kbd">λ</span> and watch coefficients
+    snap to zero in real time; reproduce the post's headline sign-flip when
+    cross-validation replaces the theory-driven penalty; and explore the actual
+    Fitzgerald-et-al. (2026) forest plot.
+  </p>
+
+  <div class="card">
+    <h3>L1 (LASSO) vs. L2 (Ridge) — why LASSO selects, Ridge does not</h3>
+    <p>
+      Both methods shrink coefficients. Only LASSO drives them <strong>exactly
+      to zero</strong>. The animation below shows the same coefficient under
+      the two penalties as λ grows: the orange L1 estimate hits zero abruptly,
+      the steel-blue L2 estimate asymptotes but never reaches zero. This is
+      why LASSO doubles as a variable-selection device.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>LASSO Lab</h4>
+      <p>Slide λ and watch which controls survive. Compare the raw LASSO estimate to the post-LASSO OLS refit.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Penalty Showdown</h4>
+      <p>Same data, two penalties. Reproduce the sign-flip Fitzgerald et al. flag in §10. Run 100 simulations to see the bias-variance picture.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>The post's headline figure, interactively. Toggle outcomes and methods. Hover for SEs, CIs, and the number of controls each estimator used.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>LASSO</summary>
+        <div class="gloss-body">L1-penalised least squares. The absolute-value penalty produces <em>exactly-zero</em> coefficients — variable selection comes for free.</div>
+      </details>
+      <details class="gloss"><summary>Penalty λ</summary>
+        <div class="gloss-body">The knob controlling shrinkage. Larger λ pins more coefficients to zero. <em>This is the main slider in Tab 2.</em></div>
+      </details>
+      <details class="gloss"><summary>Selection set I_y, I_d</summary>
+        <div class="gloss-body">The indices of controls each LASSO step keeps. <em>Their union is the support of the post-OLS regression.</em></div>
+      </details>
+      <details class="gloss"><summary>Double LASSO (DL)</summary>
+        <div class="gloss-body">Two LASSOs — one for y, one for d — then OLS on the union. The causal-inference-safe variant.</div>
+      </details>
+      <details class="gloss"><summary>Rigorous penalty</summary>
+        <div class="gloss-body">A theory-driven choice of λ from Belloni et al. (2012). Tuned to keep <em>selection error small relative to estimation noise</em>, not to minimise prediction MSE.</div>
+      </details>
+      <details class="gloss"><summary>CV penalty (λ.min)</summary>
+        <div class="gloss-body">A data-driven choice of λ that minimises out-of-fold prediction MSE. <em>Different objective, can flip the sign of α̂.</em></div>
+      </details>
+      <details class="gloss"><summary>Post-OLS step</summary>
+        <div class="gloss-body">After LASSO selects a support, refit by plain OLS. LASSO is used <em>only for selection</em>; the final α̂ is unshrunk.</div>
+      </details>
+      <details class="gloss"><summary>p / n ratio</summary>
+        <div class="gloss-body">Number of candidate controls divided by sample size. In the post, 284 / 576 ≈ 0.5 — the regime where DL was designed to help.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: LASSO LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>LASSO Lab — turn the penalty knob yourself</h2>
+  <p class="lede">
+    The simulated data has one treatment variable and many candidate controls.
+    The true treatment coefficient is α = 0.5 (orange curve below). The
+    LASSO chooses how many controls to keep based on a single penalty
+    parameter λ. <strong>Drag the λ slider and watch the coefficients shrink to
+    exactly zero, one at a time.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">200</span></label>
+      <input type="range" id="lab-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">More data ⇒ each control's coefficient is estimated more precisely.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="lab-p-val">40</span></label>
+      <input type="range" id="lab-p" min="5" max="100" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">About 15% of these have a true nonzero effect; the rest are noise.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="lab-s-val">0.60</span></label>
+      <input type="range" id="lab-s" min="0.1" max="1.5" step="0.05" value="0.60" aria-label="signal strength">
+      <div class="hint">Magnitude of the truly-relevant coefficients relative to noise.</div>
+    </div>
+    <div class="control">
+      <label>Penalty <span class="value" id="lab-l-val">—</span></label>
+      <input type="range" id="lab-l" min="0" max="79" step="1" value="40" aria-label="penalty index">
+      <div class="hint">Slide left for less shrinkage (more controls survive); right for more.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-path"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">controls kept (|I|)</div>
+      <div class="stat-value teal" id="lab-stat-nz">—</div>
+      <div class="stat-sub">out of <span id="lab-stat-p">—</span> candidates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from raw LASSO</div>
+      <div class="stat-value orange" id="lab-stat-alpha-l">—</div>
+      <div class="stat-sub">shrunk toward zero</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from post-OLS</div>
+      <div class="stat-value orange" id="lab-stat-alpha-o">—</div>
+      <div class="stat-sub">refit on selected support</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true α</div>
+      <div class="stat-value" id="lab-stat-alpha-t">0.50</div>
+      <div class="stat-sub">held fixed for comparison</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Sparsity grows with λ.</strong> Slide right: more controls are pinned to zero. Slide left: more re-enter. At λ ≈ 0 you recover OLS.</li>
+      <li><strong>The post-OLS α̂ tracks the true α more closely than the raw LASSO α̂.</strong> This is the §10 message — LASSO shrinks <em>everything</em> toward zero, including the treatment. Refit on the selected support to undo it.</li>
+      <li><strong>Each orange-curve coefficient (the treatment) is forced to stay in.</strong> Try a large p and a large λ: controls disappear, but the orange line keeps a meaningful value.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="lab-reseed">Reseed random draws</button>
+      <button class="action secondary" id="lab-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: PENALTY SHOWDOWN ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>Penalty Showdown — rigorous vs. cross-validated</h2>
+  <p class="lede">
+    Same simulated data. Same Double LASSO recipe. The only difference: how λ
+    is chosen. <strong>Rigorous</strong> uses Belloni et al.'s theory-driven
+    formula; <strong>CV</strong> uses 3-fold cross-validation to minimise
+    prediction MSE. The two objectives are <em>not the same</em>, and the
+    headline finding in §10 of the post is that they can move the coefficient
+    in opposite directions.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Capped at 300 so the "Run 100 sims" button finishes quickly.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">Capped at 50 for the 100-sim run.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Common scale for both π and θ.</div>
+    </div>
+    <div class="control">
+      <label>Asymmetry <span class="value" id="sh-a-val">0.80</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.80" aria-label="asymmetry">
+      <div class="hint">0 = controls predict y and d equally · 1 = controls predict d well, y barely. The §9 fingerprint.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Rigorous</span> Double LASSO</h3>
+      <p class="note" style="margin:0 0 10px;">λ from Belloni et al. (2012): <code>2 · 1.1 · σ̂ / √n · Φ⁻¹(1 − 0.05/(2p))</code></p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-rig-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-rig-lam">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">CV</span> Double LASSO</h3>
+      <p class="note" style="margin:0 0 10px;">λ from 3-fold cross-validation (lambda.min)</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-cv-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-cv-lam">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>Why does this happen?</h4>
+    <ul>
+      <li><strong>CV optimises prediction MSE</strong> — out-of-sample loss on y alone, or on d alone. That is not the same as estimating the causal α correctly.</li>
+      <li><strong>CV's λ.min over-selects.</strong> Many marginally predictive controls survive. Each soaks up a little bit of the treatment variation, leaving less variation for the post-OLS to identify α.</li>
+      <li><strong>The rigorous penalty is deliberately conservative.</strong> Its Φ⁻¹(1−γ/(2p)) factor is a Bonferroni-style correction across the p candidate variables — designed to keep selection error small relative to estimation noise.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different ε and v) to see whether the CV bias is systematic.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">CV mean α̂</div><div class="stat-value orange" id="sh-cv-mean">—</div><div class="stat-sub">bias toward zero or sign-flip</div></div>
+      <div class="stat"><div class="stat-label">CV sd(α̂)</div><div class="stat-value" id="sh-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Rigorous mean α̂</div><div class="stat-value teal" id="sh-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">Rigorous sd(α̂)</div><div class="stat-value" id="sh-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's forest plot — interactively</h2>
+  <p class="lede">
+    These numbers come straight from <code>results_table2.csv</code> in the
+    post's folder — the same data used to produce Figure 1. Toggle outcomes
+    and methods to compare. Hover a point to see its standard error, CI, and
+    the number of controls the estimator used.
+  </p>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Violent crime" checked> Violent crime</label>
+      <label><input type="checkbox" value="Property crime" checked> Property crime</label>
+      <label><input type="checkbox" value="Murder" checked> Murder</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="First diff" checked> First diff</label>
+      <label><input type="checkbox" value="OLS (full)" checked> OLS (full)</label>
+      <label><input type="checkbox" value="PSL" checked> PSL</label>
+      <label><input type="checkbox" value="DL (rigorous)" checked> DL (rigorous)</label>
+      <label><input type="checkbox" value="DL (CV)" checked> DL (CV)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+  <div class="chart-area" id="fp-bars"></div>
+
+  <div class="card">
+    <h3>Why does Kitchen-sink OLS explode for Murder?</h3>
+    <p>
+      With 284 controls and 576 observations, the design matrix
+      <code>X</code> is nearly collinear. OLS computes
+      <code>β̂ = (X'X)⁻¹ X'y</code>, and when the smallest eigenvalues of
+      <code>X'X</code> are close to zero, its inverse blows up. The result is
+      the implausible α̂ = +2.34 (a 234% increase in the murder rate per unit
+      increase in the abortion rate). LASSO's contribution is to choose a
+      smaller, well-conditioned submatrix automatically — the orange and teal
+      bars in the chart above show how few controls actually need to stay in.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The DL-rigorous vs DL-CV comparison you just experimented with on
+      simulated data is exactly what happens on the real abortion-crime panel:
+    </p>
+    <ul>
+      <li><strong>Violent crime:</strong> rigorous gives α̂ = −0.096; CV's λ.min flips the sign to +0.019.</li>
+      <li><strong>Murder:</strong> rigorous gives α̂ = −0.166; CV's λ.min inflates it to −1.11.</li>
+      <li><strong>Selection counts:</strong> rigorous keeps 8–12 controls; CV keeps 109–161.</li>
+    </ul>
+    <p>
+      The takeaway from the post (§10) is therefore visible <em>twice</em>:
+      once on a controlled simulation where you set the truth, and once on the
+      original 576 × 284 panel that motivates the whole exercise.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Double LASSO for Causal Inference: Does Abortion Reduce Crime?</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
