@@ -242,7 +242,7 @@ Add a new `<details>` block to `content/projects/dashboards/index.md` following 
 
 ### Skill Architecture
 
-Ten Claude Code skills: eight organized as Write/Review pairs across four artifact stages, plus two standalone Quarto-companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, and `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
+Twelve Claude Code skills: ten organized as Write/Review pairs across five artifact stages, plus two standalone Quarto-companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, and `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
 
 | Stage | Write skill | Review skill |
 |-------|-------------|--------------|
@@ -250,6 +250,7 @@ Ten Claude Code skills: eight organized as Write/Review pairs across four artifa
 | Results report | `write-results-report` | `review-results-report` |
 | Blog post | `write-post` | `review-post` |
 | Infographic | `write-infographic` | `review-infographic` |
+| Interactive web app (static HTML/CSS/JS, D3) | `write-app` | `review-app` |
 | Quarto notebook (R/Python/Stata, lighter) | `write-quarto-notebook` | — |
 | Quarto notebook (Python, friction-free bundle) | `write-quarto-notebook-python` | — |
 
@@ -329,6 +330,28 @@ Probes pinned versions from the dev machine; applies a macOS Intel wheel-availab
 
 Codified from the 8-iteration `python_pyfixest` validation in May 2026.
 
+### Write Interactive Web App
+
+**Skill:** `/project:write-app <post slug> [--no-link] [--no-verify]`
+**Location:** `.claude/skills/write-app/SKILL.md`
+
+Generate a 4-tab interactive web app for an existing post. The signature behaviour is the **interactive interview**: the skill reads the post's `index.md`, results CSVs, and `data/` folder, then uses `AskUserQuestion` to confirm key takeaways, tab structure, data source, and performance caps before writing any file. Output is a static HTML/CSS/JS bundle (D3.js v7 from CDN) at `content/post/<slug>/web_app/` that opens from a YAML `Web app` button in a new tab. Runs entirely client-side — no backend, no build step. Validated against `content/post/r_double_lasso/web_app/` (the reference implementation).
+
+The widget catalog ships 10 archetypes — 4 READY (concept-animation, penalty-slider, forest-plot, dgp-simulator) and 6 STUB (DiD event-study, feature-importance, Moran's I scatter, train/test split, sensitivity heatmap, Bayesian posterior). The skill picks 3–4 per post based on topic detection (causal-inference / ml / spatial / panel / bayesian / time-series / mixed) and confirms in the interview.
+
+Verification: Hugo dev server + Node `vm.runInThisContext` smoke test on `dgp.js` + `lasso.js` with 7 sanity assertions (qnorm precision, λ_max bound, OLS recovery, performance < 300 ms, results.json schema).
+
+### Review Interactive Web App
+
+**Skill:** `/project:review-app <post slug> [focus: pedagogy | code | accessibility | data | hugo | visual] [--no-browser]`
+**Location:** `.claude/skills/review-app/SKILL.md`
+
+Comprehensive audit of a generated web app across 10 non-overlapping dimensions: file completeness, HTML structure, JS correctness, data contract, accessibility, performance, pedagogy, Hugo integration, visual design, and mobile responsiveness. Reuses `write-app`'s `smoke-test.js` under Node `vm`, starts a Hugo dev server for HTTP-200 checks, then drives a headless Chromium via Playwright across all four tabs at desktop (1280×800) and mobile (375×667) viewports. Includes a post↔app **pedagogical alignment** check (n-gram overlap between the post's top 3 takeaways and the app's Tab-1 lede + tab headings). Read-only.
+
+Produces a verdict (ACCEPT / MINOR REVISION / MAJOR REVISION) plus a 1–10 score per dimension and an issues table written to `content/post/<slug>/web_app/REVIEW.md`. Verdict-changing rules cover: missing required files, smoke-test failure, the Hugo trailing-slash YAML bug, 0/3 takeaway alignment, and all-STUB tab sets. First-run Playwright bootstrap auto-downloads Chromium (~200 MB, ~2 min); subsequent runs reuse the cache.
+
+Focus modes for targeted re-reviews: `pedagogy`, `code` (Dim 3+4), `accessibility`, `data`, `hugo`, `visual` (Dim 9+10). Combine with `and`/`,`. `--no-browser` skips the Playwright pass (Dims 9+10 become "not audited").
+
 ### Full Pipeline Example
 
 ```
@@ -340,6 +363,8 @@ Codified from the 8-iteration `python_pyfixest` validation in May 2026.
 /project:review-post python_doubleml
 /project:write-infographic python_doubleml
 /project:review-infographic python_doubleml
+/project:write-app python_doubleml
+/project:review-app python_doubleml
 ```
 
 ### New Author

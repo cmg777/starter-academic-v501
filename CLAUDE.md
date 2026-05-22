@@ -146,7 +146,7 @@ Older Python posts (pre-2025) were evaluated for bundling and **skipped**: they 
 
 # Claude Code Skills
 
-Ten skills: eight organized as Write/Review pairs across four artifact stages, plus two standalone Quarto-companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, and `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
+Twelve skills: ten organized as Write/Review pairs across five artifact stages, plus two standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, and `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
 
 ## Pipeline overview
 
@@ -156,6 +156,7 @@ Ten skills: eight organized as Write/Review pairs across four artifact stages, p
 | Results report | `/project:write-results-report` | `/project:review-results-report` |
 | Blog post | `/project:write-post` | `/project:review-post` |
 | Infographic | `/project:write-infographic` | `/project:review-infographic` |
+| Interactive web app (static HTML/CSS/JS, D3) | `/project:write-app` | `/project:review-app` |
 | Quarto notebook (R/Python/Stata, lighter) | `/project:write-quarto-notebook` | — |
 | Quarto notebook (Python, friction-free bundle) | `/project:write-quarto-notebook-python` | — |
 
@@ -347,6 +348,51 @@ Runs **parallel** to `write-quarto-notebook` — keep the lighter chunk-time-ins
 **Deliverables (always):** `references/tutorial.qmd`, `references/setup_env.py`, `references/_quarto.yml`, `references/render.command`, `references/render.bat`, `references/README.md`, `build_bundle.sh`, `<slug>.zip`, plus the `index.md` link update ("Quarto project (.zip)").
 
 **Reference files:** `references/templates/` (canonical templates for each bundle file), `references/intel-wheel-catalog.md` (last Intel-wheel versions for known problem packages), `references/transformations.md`, `references/render-and-fix.md`, `references/verification-checklist.md`
+
+## write-app
+
+**Location:** `.claude/skills/write-app/SKILL.md`
+
+Generate an interactive, pedagogical web app for an existing post. The skill's signature behaviour is the **interactive interview**: after reading the post's content, data, and main results, it uses `AskUserQuestion` to confirm key takeaways, tab structure, data approach, and performance caps before writing any file. Output is a 4-tab single-page app (HTML + CSS + JS + D3) that ships as `content/post/<slug>/web_app/`, opens from a YAML `Web app` button, and runs entirely client-side on GitHub Pages / Netlify. Validated against `r_double_lasso` (the reference implementation).
+
+**Invocation:**
+```
+/project:write-app <post slug> [--no-link] [--no-verify]
+```
+
+**Examples:**
+```
+/project:write-app r_double_lasso
+/project:write-app python_doubleml
+/project:write-app r_did --no-verify
+```
+
+**Widget archetypes (10):** concept-animation, penalty-slider, forest-plot, dgp-simulator (4 READY); did-event-study, feature-importance, moran-scatter, train-test-split, sensitivity-heatmap, bayesian-posterior (6 STUB). The skill picks 3–4 per post based on topic detection, then confirms in the Phase-2 interview.
+
+**Reference files:** `references/widget-catalog.md`, `references/interview-questions.md`, `references/topic-detection.md`, `references/data-handling.md`, `references/pedagogy-conventions.md`, `references/verification-checklist.md`, `references/render-and-fix.md`, `references/test-cases.md`, `references/templates/` (verbatim JS modules + index.html.tmpl + widgets/).
+
+## review-app
+
+**Location:** `.claude/skills/review-app/SKILL.md`
+
+Comprehensive audit of a generated interactive web app at `content/post/<slug>/web_app/`. Inspects 10 non-overlapping dimensions (file completeness, HTML structure, JS correctness, data contract, accessibility, performance, pedagogy, Hugo integration, visual design, mobile responsiveness). Reuses `write-app`'s `smoke-test.js` under Node `vm`, spins up a Hugo dev server for HTTP-200 checks, then drives a headless Chromium via Playwright across all four tabs in both desktop (1280×800) and mobile (375×667) viewports. Includes a post↔app **pedagogical alignment** check (n-gram overlap between the post's top 3 takeaways and the app's Tab-1 lede + tab headings). Produces a verdict (ACCEPT / MINOR REVISION / MAJOR REVISION), 1–10 score per dimension, and an issues table written to `content/post/<slug>/web_app/REVIEW.md`. Read-only.
+
+**Invocation:**
+```
+/project:review-app <post slug> [focus: pedagogy | code | accessibility | data | hugo | visual] [--no-browser]
+```
+
+**Examples:**
+```
+/project:review-app r_double_lasso
+/project:review-app r_double_lasso focus: pedagogy
+/project:review-app python_doubleml focus: code and accessibility
+/project:review-app r_did --no-browser
+```
+
+**Focus modes:** `pedagogy` (Dim 7), `code` (3+4), `accessibility` (5), `data` (4), `hugo` (8), `visual` (9+10). Combine with `and`/`,`. Omitted ⇒ all 10.
+
+**Reference files:** `references/review-checklist.md` (10 dimensions × per-check severity), `references/scoring-and-criteria.md` (1–10 rubric, verdict-changing rules), `references/report-template.md` (canonical REVIEW.md skeleton), `references/pedagogical-alignment.md` (n-gram overlap algorithm), `references/headless-browser.md` (Playwright bootstrap + audit script), `references/focus-modes.md`, `references/test-cases.md` (10 self-validation tests including 5 deliberate sabotage scenarios).
 
 # Hugo Version Constraints
 

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>{{TITLE}} — Interactive Lab</title>
+<meta name="description" content="Interactive companion to '{{TITLE}}'. A pedagogical web app with sliders, simulators, and a forest plot to help build intuition for the post's main takeaways.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>{{TITLE}} — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>{{TITLE}}</em>
+    <a class="post-link" href="{{POST_PATH}}" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+{{TAB_BUTTONS}}
+</nav>
+
+<main>
+
+{{TAB_PANES}}
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>{{TITLE}}</em> · D3.js v7 · no backend, no tracking · <a href="{{POST_PATH}}" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

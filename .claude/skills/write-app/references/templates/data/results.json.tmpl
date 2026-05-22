@@ -1,0 +1,35 @@
+{
+  "_comment": "Schema reference for write-app forest-plot and selection-bars widgets. See data-handling.md. Replace with the post's actual estimates parsed from results_table*.csv. Pattern B and C posts ship an empty stub: {\"estimates\": [], \"selection\": []}.",
+
+  "estimates": [
+    {
+      "method":     "First diff",
+      "outcome":    "Violent crime",
+      "estimate":   -0.1521,
+      "se":         0.0337,
+      "ci_lo":      -0.2181,
+      "ci_hi":      -0.0861,
+      "n_selected": null
+    },
+    {
+      "method":     "DL (rigorous)",
+      "outcome":    "Violent crime",
+      "estimate":   -0.0964,
+      "se":         0.0514,
+      "ci_lo":      -0.1972,
+      "ci_hi":      0.0045,
+      "n_selected": 8
+    }
+  ],
+
+  "selection": [
+    {
+      "outcome":        "Violent crime",
+      "method":         "DL (rigorous)",
+      "n_Iy":           0,
+      "n_Id":           8,
+      "n_intersection": 0,
+      "n_union":        8
+    }
+  ]
+}
