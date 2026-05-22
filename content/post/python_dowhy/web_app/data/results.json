@@ -1,0 +1,93 @@
+{
+  "_comment": "ATE estimates from python_dowhy post (Lalonde NSW dataset, n=445, outcome=re78). All five DoWhy methods estimate the average treatment effect of the NSW job training program on 1978 earnings (USD).",
+
+  "estimates": [
+    {
+      "method":     "Naive",
+      "outcome":    "1978 earnings",
+      "estimate":   1794.34,
+      "se":         631.0,
+      "ci_lo":      557.0,
+      "ci_hi":      3031.0,
+      "n_selected": null
+    },
+    {
+      "method":     "Regression Adjustment",
+      "outcome":    "1978 earnings",
+      "estimate":   1676.34,
+      "se":         625.0,
+      "ci_lo":      451.0,
+      "ci_hi":      2901.0,
+      "n_selected": 8
+    },
+    {
+      "method":     "IPW",
+      "outcome":    "1978 earnings",
+      "estimate":   1559.47,
+      "se":         640.0,
+      "ci_lo":      305.0,
+      "ci_hi":      2814.0,
+      "n_selected": 8
+    },
+    {
+      "method":     "Doubly Robust (AIPW)",
+      "outcome":    "1978 earnings",
+      "estimate":   1620.04,
+      "se":         620.0,
+      "ci_lo":      404.0,
+      "ci_hi":      2836.0,
+      "n_selected": 8
+    },
+    {
+      "method":     "PS Stratification",
+      "outcome":    "1978 earnings",
+      "estimate":   1617.07,
+      "se":         635.0,
+      "ci_lo":      372.0,
+      "ci_hi":      2862.0,
+      "n_selected": 8
+    },
+    {
+      "method":     "PS Matching",
+      "outcome":    "1978 earnings",
+      "estimate":   1735.69,
+      "se":         700.0,
+      "ci_lo":      363.0,
+      "ci_hi":      3108.0,
+      "n_selected": 8
+    }
+  ],
+
+  "refutation": [
+    {
+      "test":            "Placebo Treatment",
+      "original_effect": 1676.34,
+      "new_effect":      61.82,
+      "p_value":         0.92,
+      "interpretation":  "Effect vanishes with fake treatment — strong evidence the original effect is causal, not a statistical artifact."
+    },
+    {
+      "test":            "Random Common Cause",
+      "original_effect": 1676.34,
+      "new_effect":      1675.61,
+      "p_value":         0.90,
+      "interpretation":  "Estimate is stable when an irrelevant confounder is added — model is not overly sensitive to the specific covariate set."
+    },
+    {
+      "test":            "Data Subset (80%)",
+      "original_effect": 1676.34,
+      "new_effect":      1727.58,
+      "p_value":         0.80,
+      "interpretation":  "Estimate is stable across random 80% subsamples — does not depend on a handful of influential observations."
+    }
+  ],
+
+  "sample": {
+    "n_total":   445,
+    "n_treated": 185,
+    "n_control": 260,
+    "mean_treated_re78": 6349.14,
+    "mean_control_re78": 4554.80,
+    "covariates": ["age", "educ", "black", "hisp", "married", "nodegr", "re74", "re75"]
+  }
+}

@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>ESDA Interactive Lab — Spatial Clusters and Dynamics</title>
+<meta name="description" content="Interactive companion to 'Exploratory Spatial Data Analysis: Spatial Clusters and Dynamics of Human Development in South America'. Sliders and simulators for Moran's I and LISA.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>ESDA — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Exploratory Spatial Data Analysis: Spatial Clusters and Dynamics of Human Development in South America</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"  class="tab active" data-pane="pane-intro"  role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"    class="tab"        data-pane="pane-lab"    role="tab" aria-selected="false">2 · Moran's I Lab</button>
+  <button id="tab-lisa"   class="tab"        data-pane="pane-lisa"   role="tab" aria-selected="false">3 · LISA Explorer</button>
+  <button id="tab-forest" class="tab"        data-pane="pane-forest" role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ============================ TAB 1: INTRO ============================ -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why spatial autocorrelation? Why LISA?</h2>
+  <p class="lede">
+    Look at a map of human development across South America and one thing
+    jumps out: prosperous regions tend to sit next to other prosperous
+    regions, and lagging regions next to lagging regions. But is that
+    clustering real, or could it arise by chance? <strong>Exploratory
+    Spatial Data Analysis (ESDA)</strong> gives you the tools to answer.
+  </p>
+  <p class="lede">
+    This app turns the dials yourself. In four tabs you will:
+    watch random data become a spatial cluster as you push the
+    autocorrelation knob; reproduce a Moran scatter plot and see how its
+    slope <em>is</em> Moran's I; identify HH, LL, HL, and LH regions like
+    LISA does in the post; and finally compare the post's reported Moran's
+    I values across outcomes and years on a forest plot.
+  </p>
+
+  <div class="card">
+    <h3>From random to clustered — what positive spatial autocorrelation looks like</h3>
+    <p>
+      The left grid below is <strong>random</strong> (Moran's I near zero).
+      The right grid morphs from random to <strong>clustered</strong> and
+      back — the same idea behind the post's South-America choropleths,
+      where prosperity and deprivation form contiguous bands rather than
+      being scattered.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <div class="chart-caption">Animation cycles ~8 s. The right grid keeps the same cells; only the autocorrelation strength changes.</div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Moran's I Lab</h4>
+      <p>Slide the autocorrelation strength on a simulated lattice and watch the Moran scatter plot rotate. The slope <em>is</em> I.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-lisa">
+      <div class="cta-tag">Tab 3</div>
+      <h4>LISA Explorer</h4>
+      <p>Per-region HH / LL / HL / LH counts as you turn the knob. Run 100 simulations to see the sampling distribution of I.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest plot</h4>
+      <p>The post's Moran's I across outcomes and years on one chart. Toggle outcomes and methods; hover for SE and CI.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Spatial weights W</summary>
+        <div class="gloss-body">An n × n matrix encoding which regions are neighbours. <em>Queen contiguity: share an edge or a corner. Row-standardised so each row sums to 1.</em></div>
+      </details>
+      <details class="gloss"><summary>Moran's I</summary>
+        <div class="gloss-body">A scalar summary of global spatial autocorrelation. Slope of the regression of W·z on z. <em>Positive I means like-values cluster geographically.</em></div>
+      </details>
+      <details class="gloss"><summary>Spatial lag W·z</summary>
+        <div class="gloss-body">The weighted average of a region's neighbours' standardised values. <em>"What do my neighbours look like, on average?"</em></div>
+      </details>
+      <details class="gloss"><summary>LISA</summary>
+        <div class="gloss-body">Local Indicators of Spatial Association. Decomposes Moran's I into one statistic per region. <em>Identifies <em>where</em> the clusters are, not just whether they exist.</em></div>
+      </details>
+      <details class="gloss"><summary>HH cluster</summary>
+        <div class="gloss-body">High value surrounded by high neighbours — a hot spot. <em>In the post: Southern Cone prosperity core in 2019 (30 regions).</em></div>
+      </details>
+      <details class="gloss"><summary>LL cluster</summary>
+        <div class="gloss-body">Low value surrounded by low neighbours — a cold spot. <em>In the post: Amazon / Guyana deprivation cluster in 2019 (37 regions).</em></div>
+      </details>
+      <details class="gloss"><summary>HL / LH outliers</summary>
+        <div class="gloss-body">Regions whose value diverges sharply from their neighbours. <em>HL = high value among low neighbours; LH = low value among high neighbours.</em></div>
+      </details>
+      <details class="gloss"><summary>Permutation test</summary>
+        <div class="gloss-body">Re-shuffle region values across the map thousands of times to build a null distribution. <em>The post uses 999 permutations and gets p = 0.001 for both 2013 and 2019.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============================ TAB 2: LAB ============================ -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>Moran's I Lab</h2>
+  <p class="lede">
+    Pull the <strong>ρ</strong> slider rightward and watch the cloud of
+    points on the Moran scatter plot rotate from a circular blob (random)
+    into a tilted ellipse (clustered). The orange regression line's slope
+    <em>is</em> Moran's I. In the post, this slope went from 0.568 in 2013
+    to 0.632 in 2019 — try setting ρ to those values and see what the
+    scatter looks like at those levels.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Autocorrelation strength ρ <span class="value" id="lab-rho-val">0.60</span></label>
+      <input type="range" id="lab-rho" min="0" max="0.95" step="0.01" value="0.60" aria-label="Autocorrelation strength rho">
+      <div class="hint">0 = random; near 1 = strongly clustered.</div>
+    </div>
+    <div class="control">
+      <label>Grid size (regions) <span class="value" id="lab-side-val">144</span></label>
+      <input type="range" id="lab-side" min="6" max="14" step="1" value="12" aria-label="Lattice side length (number of regions = side squared)">
+      <div class="hint">side × side regions arranged on a square lattice.</div>
+    </div>
+    <div class="control">
+      <label>Random seed <span class="value" id="lab-seed-val">7</span></label>
+      <button class="action secondary" id="lab-seed">Resample</button>
+      <div class="hint">Generates a new realisation at the same ρ.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-main-side">
+    <div class="chart-area" id="lab-scatter"></div>
+    <div>
+      <div class="card">
+        <h3>Diagnostics</h3>
+        <div class="method-row"><span class="label">Moran's I</span><span class="val" id="lab-moran-val">—</span></div>
+        <div class="method-row"><span class="label">HH regions</span><span class="val" id="lab-stat-hh">—</span></div>
+        <div class="method-row"><span class="label">LL regions</span><span class="val" id="lab-stat-ll">—</span></div>
+        <div class="method-row"><span class="label">Outliers (HL+LH)</span><span class="val" id="lab-stat-out">—</span></div>
+        <div class="method-row"><span class="label">n regions</span><span class="val" id="lab-stat-n">—</span></div>
+      </div>
+      <div class="pedagogy">
+        <h4>What to look for</h4>
+        <ul>
+          <li><strong>Push ρ from 0 to 0.95</strong> — the orange line rotates from flat (no slope) to steep (slope ≈ ρ).</li>
+          <li>The post's <strong>I = 0.632 (2019)</strong> sits near ρ ≈ 0.6 on the slider. Try it.</li>
+          <li>At low ρ, points spread evenly across all four quadrants. At high ρ, they pile up in <strong>HH (top-right)</strong> and <strong>LL (bottom-left)</strong>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ============================ TAB 3: LISA ============================ -->
+<section id="pane-lisa" class="tab-pane" role="tabpanel" aria-labelledby="tab-lisa">
+
+  <h2>LISA Explorer</h2>
+  <p class="lede">
+    Global Moran's I gives you one number for the whole map. LISA
+    decomposes it region-by-region so you can see <em>where</em> the
+    clusters are. Slide ρ and watch the HH/LL/HL/LH bars move; press
+    <em>Run 100 simulations</em> to see the sampling distribution.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Autocorrelation strength ρ <span class="value" id="lisa-rho-val">0.70</span></label>
+      <input type="range" id="lisa-rho" min="0" max="0.95" step="0.01" value="0.70" aria-label="Autocorrelation strength rho">
+    </div>
+    <div class="control">
+      <label>Grid size (regions) <span class="value" id="lisa-side-val">196</span></label>
+      <input type="range" id="lisa-side" min="6" max="14" step="1" value="14" aria-label="Grid side">
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>LISA counts</h3>
+      <div class="method-row"><span class="label">HH (hot spot)</span><span class="val" id="lisa-hh" style="color:#d7191c">—</span></div>
+      <div class="method-row"><span class="label">LL (cold spot)</span><span class="val" id="lisa-ll" style="color:#2c7bb6">—</span></div>
+      <div class="method-row"><span class="label">HL outlier</span><span class="val" id="lisa-hl" style="color:#fdae61">—</span></div>
+      <div class="method-row"><span class="label">LH outlier</span><span class="val" id="lisa-lh" style="color:#89cff0">—</span></div>
+      <div class="method-row"><span class="label">Not significant</span><span class="val" id="lisa-ns">—</span></div>
+      <div class="method-row"><span class="label">Moran's I</span><span class="val" id="lisa-moran-val">—</span></div>
+    </div>
+    <div class="card">
+      <h3>Post's 2019 LISA counts (for reference)</h3>
+      <div class="method-row"><span class="label">HH</span><span class="val" style="color:#d7191c">30</span></div>
+      <div class="method-row"><span class="label">LL</span><span class="val" style="color:#2c7bb6">37</span></div>
+      <div class="method-row"><span class="label">HL</span><span class="val" style="color:#fdae61">5</span></div>
+      <div class="method-row"><span class="label">LH</span><span class="val" style="color:#89cff0">1</span></div>
+      <div class="method-row"><span class="label">Not significant</span><span class="val">80</span></div>
+      <div class="method-row"><span class="label">Moran's I</span><span class="val">0.632</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lisa-bars"></div>
+  <div class="chart-area" id="lisa-scatter"></div>
+
+  <div class="card">
+    <h3>Sampling distribution of Moran's I</h3>
+    <p>How variable is I across resampled lattices at the current ρ? Each click runs 100 fresh draws.</p>
+    <button class="action" id="lisa-run100">Run 100 simulations</button>
+    <div class="progress-bar" id="lisa-progress"><div></div></div>
+    <div class="chart-area" id="lisa-hist" style="display:none; margin-top: 14px;"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li>At ρ ≈ 0, the LISA counts are roughly balanced across all four quadrants — <strong>nothing clusters</strong>.</li>
+      <li>At ρ ≈ 0.7 (the LISA Explorer default), HH and LL dominate while outliers shrink — matching the post's <strong>30 HH + 37 LL + 6 outliers</strong> picture.</li>
+      <li>The 100-simulation histogram shows how Moran's I itself is a <strong>random variable</strong>. The post's I = 0.632 is a single draw from a distribution that depends on ρ and the spatial structure.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ============================ TAB 4: FOREST ============================ -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>Moran's I across outcomes — forest plot</h2>
+  <p class="lede">
+    The post computes Moran's I for the SHDI and its three component
+    indices (Health, Education, Income) in 2013 and 2019. The numbers come
+    from the post's permutation tests with 999 random reshufflings; the
+    95% CI is computed from the permutation null. Toggle outcomes and
+    methods to compare.
+  </p>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="SHDI" checked> SHDI</label>
+      <label><input type="checkbox" value="Health" checked> Health</label>
+      <label><input type="checkbox" value="Education" checked> Education</label>
+      <label><input type="checkbox" value="Income" checked> Income</label>
+      <label><input type="checkbox" value="SHDI change (2019-2013)" checked> SHDI change</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Moran's I 2013" checked> Moran's I 2013</label>
+      <label><input type="checkbox" value="Moran's I 2019" checked> Moran's I 2019</label>
+      <label><input type="checkbox" value="Moran's I (change)" checked> Moran's I (change)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li>For SHDI, <strong>I rose from 0.568 to 0.632</strong> between 2013 and 2019 — the spatial divide deepened.</li>
+      <li>All level indices show <strong>strong positive autocorrelation</strong>; the change variable shows much weaker (and possibly insignificant) clustering, reflecting that most regions improved by similar small amounts.</li>
+      <li>The error bars overlap heavily for adjacent years but never cross zero — every estimate is statistically far from the null of no clustering.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Exploratory Spatial Data Analysis: Spatial Clusters and Dynamics of Human Development in South America</em>
+  · D3.js v7 · no backend, no tracking ·
+  <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Cross-Sectional Spatial Regression — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Cross-Sectional Spatial Regression in Stata: Crime in Columbus Neighborhoods'. A pedagogical web app with a spatial-weights animation, a SAR / SEM / SDM simulator, and the post's direct/indirect/total effects across the eight-model taxonomy.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Cross-Sectional Spatial Regression — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Cross-Sectional Spatial Regression in Stata: Crime in Columbus Neighborhoods</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-spillover" class="tab"       data-pane="pane-spillover" role="tab" aria-selected="false">2 · Spillover Animation</button>
+  <button id="tab-dgp"      class="tab"        data-pane="pane-dgp"      role="tab" aria-selected="false">3 · SAR / SEM / SDM Simulator</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Direct / Indirect / Total Effects</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why spatial models? Crime does not stop at the border.</h2>
+  <p class="lede">
+    A neighborhood's crime rate depends not only on its own income and housing
+    values but also on conditions in <em>adjacent</em> neighborhoods — through
+    displacement (criminals move next door), diffusion (networks span borders),
+    and shared exposure to risk factors. Ordinary least squares treats each
+    neighborhood as independent and misses these <strong>spatial spillovers</strong>.
+  </p>
+  <p class="lede">
+    The Columbus crime data has Moran's I = <strong>0.222</strong> (p = 0.005),
+    confirming that OLS residuals cluster geographically. This app lets you turn
+    the dials yourself. Sweep ρ and λ in a SAR / SEM / SDM simulator, watch a
+    shock ripple through the spatial multiplier <code>(I − ρW)<sup>−1</sup></code>,
+    and compare direct/indirect/total effects across the full eight-model
+    taxonomy on the post's actual estimates.
+  </p>
+
+  <div class="card">
+    <h3>The shrinkage analogy — why ρ matters</h3>
+    <p>
+      Both ρ (spatial lag) and λ (spatial error) shrink the "extra" effect of a
+      shock as it propagates through neighbours. The animation below sweeps a
+      penalty knob (here, the spatial parameter) from zero to one. The
+      <span style="color:#d97757;">orange</span> curve mimics the SAR-type
+      multiplier <code>1 / (1 − ρ)</code> behaviour (amplifies); the
+      <span style="color:#6a9bcc;">steel</span> dashed curve shows the
+      complementary direction (compression).
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-spillover">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Spillover Animation</h4>
+      <p>Drop a shock on one cell of a 7×7 lattice. Watch the spatial multiplier <code>(I − ρW)<sup>−1</sup></code> propagate it. Vary ρ — see how a 0.43 vs 0.80 world differ.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-dgp">
+      <div class="cta-tag">Tab 3</div>
+      <h4>SAR / SEM / SDM Simulator</h4>
+      <p>Generate fake Columbus-like crime data with known ρ, λ, and θ. Estimate ρ̂ and λ̂ back from the sample. See how SAR and SEM compete on the same data.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Direct / Indirect / Total Effects</h4>
+      <p>The post's headline table, as a forest plot. Toggle the eight models and the two regressors. See why SDM and SDEM win — and why SAR forces the wrong sign on HOVAL spillovers.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The three key takeaways this app is built around</h3>
+    <ol class="learning-objectives">
+      <li><strong>Spatial autocorrelation is real and substantively important.</strong> Moran's I = 0.222 (p = 0.005); ignoring it produces a misspecified OLS. The post's LM tests favour the <em>error</em> form (LM = 5.33 vs 3.40), but the full taxonomy is needed to disentangle local from global spillovers.</li>
+      <li><strong>SDM and SDEM are the preferred specifications.</strong> Both allow the indirect-to-direct ratio to differ across regressors. The SAR forces a constant ratio (≈ 0.75), which the data does not support for HOVAL. SDEM gives a significant negative spillover of neighbour income on local crime (θ̂<sub>W·INC</sub> = −1.20, p = 0.036).</li>
+      <li><strong>The total income effect is 40–55% larger than OLS.</strong> OLS estimates a coefficient of −1.60 per \$1,000. SDM and SDEM give total effects of −2.26 to −2.52 — meaning OLS understates the income–crime relationship by ignoring the substantial spillover from neighbouring tracts' wealth.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Spatial weight matrix W</summary>
+        <div class="gloss-body">A row-standardised matrix encoding which units are neighbours. For Columbus, Queen contiguity: tracts that share any boundary point. Each row sums to 1; the diagonal is zero.</div>
+      </details>
+      <details class="gloss"><summary>Spatial autocorrelation</summary>
+        <div class="gloss-body">The tendency for nearby units to take similar values. Moran's I is the standard scalar measure: near 0 means random, near 1 means strong clustering.</div>
+      </details>
+      <details class="gloss"><summary>ρ (rho) — spatial lag of y</summary>
+        <div class="gloss-body">The coefficient on <code>Wy</code> in SAR. Measures global feedback: a shock to one tract propagates through the network and partially returns to itself. Estimated as 0.428 in the Columbus SAR.</div>
+      </details>
+      <details class="gloss"><summary>θ (theta) — spatial lag of X</summary>
+        <div class="gloss-body">The coefficient on <code>WX</code> in SLX / SDM / SDEM. A <em>local</em> spillover: neighbour income or housing affects this tract directly, without feedback. SDEM gives θ̂<sub>INC</sub> = −1.20 (p = 0.036).</div>
+      </details>
+      <details class="gloss"><summary>λ (lambda) — spatial error</summary>
+        <div class="gloss-body">The coefficient on <code>Wu</code> in SEM / SAC / GNS. Captures spatially correlated <em>unobservables</em>. Substantive at 0.562 in SEM; weakens to 0.166 in SAC when ρ is also fitted.</div>
+      </details>
+      <details class="gloss"><summary>Spatial multiplier (I − ρW)<sup>−1</sup></summary>
+        <div class="gloss-body">The inverse matrix that propagates a shock through the network when ρ ≠ 0. Diagonal entries amplify own effects; off-diagonals carry the spillover. For ρ = 0.428, average amplification ≈ 1.75.</div>
+      </details>
+      <details class="gloss"><summary>Direct effect</summary>
+        <div class="gloss-body">∂y<sub>i</sub>/∂x<sub>i</sub>: the change in tract i's crime from a change in tract i's own income, <em>including</em> feedback through neighbours via (I − ρW)<sup>−1</sup>.</div>
+      </details>
+      <details class="gloss"><summary>Indirect (spillover) effect</summary>
+        <div class="gloss-body">∂y<sub>i</sub>/∂x<sub>j</sub>: how tract i's crime responds when a <em>different</em> tract j changes its income. Zero in OLS and SEM by construction; substantial in SLX, SDM, SDEM.</div>
+      </details>
+      <details class="gloss"><summary>SAR vs SEM</summary>
+        <div class="gloss-body">SAR: spillovers in the outcome (substantive). SEM: spillovers in the error (nuisance). LM tests prefer SEM here (5.33 vs 3.40); SDM/SDEM tests cannot reject either restriction.</div>
+      </details>
+      <details class="gloss"><summary>SDM vs SDEM</summary>
+        <div class="gloss-body">Both are flexible models nesting SLX. SDM has ρ (global feedback) plus WX. SDEM has λ (correlated errors) plus WX. Non-nested; both fit Columbus well, with comparable spillover estimates.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: SPILLOVER ANIMATION ====================== -->
+<section id="pane-spillover" class="tab-pane" role="tabpanel" aria-labelledby="tab-spillover">
+
+  <h2>Spillover Animation — watch the multiplier propagate</h2>
+  <p class="lede">
+    A 7×7 lattice of "tracts" (49 cells, matching the Columbus n). Click any
+    cell to drop a unit shock on it. The animation iteratively spreads it
+    through a row-standardised rook spatial weight matrix at rate
+    <strong>ρ</strong>. After many steps, the system stabilises at
+    <code>(I − ρW)<sup>−1</sup></code> times the initial shock. Slide ρ to see
+    the difference between a weak (ρ = 0.2) and strong (ρ = 0.8) spatial world.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Spatial parameter ρ <span class="value" id="sp-rho-val">0.43</span></label>
+      <input type="range" id="sp-rho" min="0" max="0.95" step="0.01" value="0.43" aria-label="spatial parameter rho">
+      <div class="hint">The SAR estimate from Columbus is ρ̂ = 0.428. Try 0 (no spillover) to 0.9 (very strong) to feel the regime.</div>
+    </div>
+    <div class="control">
+      <label>Iterations <span class="value" id="sp-iter-val">15</span></label>
+      <input type="range" id="sp-iter" min="0" max="40" step="1" value="15" aria-label="iterations">
+      <div class="hint">Each step propagates the shock by ρ·W to immediate neighbours. ~15 steps suffice for ρ ≤ 0.6.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Click any cell to drop a unit shock there</h3>
+    <p class="note" style="margin-bottom:8px;">Heat colour shows the steady-state response of crime in each tract. Brighter = stronger spillover received from the shocked cell.</p>
+    <div class="chart-area" id="sp-grid"></div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">multiplier amplification</div>
+      <div class="stat-value teal" id="sp-amp">—</div>
+      <div class="stat-sub">≈ 1 / (1 − ρ)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">cells with response &gt; 5% of initial shock</div>
+      <div class="stat-value orange" id="sp-reach">—</div>
+      <div class="stat-sub">out of 49 tracts</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">max response in any cell</div>
+      <div class="stat-value" id="sp-max">—</div>
+      <div class="stat-sub">always on the shocked cell itself</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>At ρ = 0,</strong> the shock stays in the originating cell. No spillover. This is OLS.</li>
+      <li><strong>At ρ = 0.43</strong> (the Columbus SAR estimate), the shock visibly bleeds into the 4 immediate neighbours, then their neighbours, decaying geometrically. The diagonal of (I − ρW)<sup>−1</sup> is about 1.13 — the own-tract amplification.</li>
+      <li><strong>At ρ = 0.8 or above,</strong> the entire 7×7 grid lights up. Every tract is meaningfully affected by every other tract's shock. This is the regime where spatial models <em>must</em> be used.</li>
+      <li><strong>The multiplier amplification</strong> ≈ <code>1 / (1 − ρ)</code> tells you the average diagonal of (I − ρW)<sup>−1</sup>. At ρ = 0.43, this is ≈ 1.75. The post's §5.1 estimat impact reports this for INC: direct effect = −1.10, bare coefficient = −1.03, so the diagonal is about 1.07.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sp-clear">Clear shocks</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: DGP SIMULATOR ====================== -->
+<section id="pane-dgp" class="tab-pane" role="tabpanel" aria-labelledby="tab-dgp">
+
+  <h2>SAR / SEM / SDM Simulator — generate data, estimate it back</h2>
+  <p class="lede">
+    Below, we simulate fake Columbus-like data on a 7×7 lattice (n = 49) with
+    known true parameters ρ (SAR-style feedback), λ (SEM-style error correlation),
+    and θ (SLX-style covariate spillover). We then estimate ρ̂ and λ̂ back from the
+    simulated sample to see what we recover. <strong>Slide ρ, λ, or θ and watch
+    Moran's I shift — and watch the estimated parameters track (or fail to track)
+    the truth.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>true ρ (spatial lag) <span class="value" id="dgp-rho-val">0.40</span></label>
+      <input type="range" id="dgp-rho" min="-0.50" max="0.90" step="0.05" value="0.40" aria-label="true rho">
+      <div class="hint">Set 0 for OLS data, 0.40 for SDM-like, 0.80 for strong global feedback.</div>
+    </div>
+    <div class="control">
+      <label>true λ (spatial error) <span class="value" id="dgp-lam-val">0.00</span></label>
+      <input type="range" id="dgp-lam" min="-0.50" max="0.90" step="0.05" value="0.00" aria-label="true lambda">
+      <div class="hint">SEM-style nuisance. The post's SEM estimates λ̂ = 0.56; try 0.5.</div>
+    </div>
+    <div class="control">
+      <label>true θ on W·INC <span class="value" id="dgp-th-val">-1.20</span></label>
+      <input type="range" id="dgp-th" min="-2.5" max="0.5" step="0.05" value="-1.20" aria-label="true theta">
+      <div class="hint">The post's SDEM estimates θ̂<sub>W·INC</sub> = −1.20. SLX-channel: local spillover, no feedback.</div>
+    </div>
+    <div class="control">
+      <label>sample noise σ <span class="value" id="dgp-s-val">5.00</span></label>
+      <input type="range" id="dgp-s" min="0.5" max="15" step="0.5" value="5.00" aria-label="noise sigma">
+      <div class="hint">Larger σ = more noise. The Columbus regression Root MSE ≈ 10.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Truth</span> what we simulated</h3>
+      <div class="method-row"><span class="label">true ρ</span><span class="val" id="tr-rho">—</span></div>
+      <div class="method-row"><span class="label">true λ</span><span class="val" id="tr-lam">—</span></div>
+      <div class="method-row"><span class="label">true θ<sub>W·INC</sub></span><span class="val" id="tr-th">—</span></div>
+      <div class="method-row"><span class="label">Moran's I of y</span><span class="val" id="tr-mi">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Estimates</span> what we recovered</h3>
+      <p class="note" style="margin:0 0 10px;">ρ̂ from a quick concentrated likelihood on a grid; λ̂ from the residual Moran-statistic mapping. Pedagogical, not as accurate as Stata's <code>spregress, ml</code>.</p>
+      <div class="method-row"><span class="label">ρ̂ (SAR-like)</span><span class="val" id="es-rho">—</span></div>
+      <div class="method-row"><span class="label">λ̂ (SEM-like)</span><span class="val" id="es-lam">—</span></div>
+      <div class="method-row"><span class="label">OLS β̂<sub>INC</sub></span><span class="val" id="es-binc">—</span></div>
+      <div class="method-row"><span class="label">SDM β̂<sub>INC</sub></span><span class="val" id="es-sdmbinc">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="dgp-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set ρ = 0 and λ = 0:</strong> Moran's I should hover near zero. OLS is correct. No spatial model needed.</li>
+      <li><strong>Set ρ = 0.6, λ = 0:</strong> Strong SAR data. ρ̂ should track ρ. OLS β̂<sub>INC</sub> looks biased compared to the SDM β̂<sub>INC</sub>.</li>
+      <li><strong>Set ρ = 0, λ = 0.6:</strong> Strong SEM data. ρ̂ from a misspecified SAR will be biased (it will catch some of λ). This is exactly the LM-test motivation in §4.3 of the post.</li>
+      <li><strong>Set ρ = 0.4, λ = 0.4 simultaneously:</strong> The GNS regime. Both parameters become very hard to identify (large standard errors), reproducing the post's overparameterization warning in §8.3.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="dgp-reseed">Reseed random draws</button>
+      <button class="action secondary" id="dgp-reset">Reset to Columbus defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST / DIRECT-INDIRECT-TOTAL ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's headline numbers — interactively</h2>
+  <p class="lede">
+    These estimates come straight from the post — §5 (SAR, SEM), §6 (SLX, SDM),
+    §8 (SDEM, SAC, GNS), and the §9.2 comparison table. The y-axis lists the
+    eight spatial models. The facets are the three impact components: direct,
+    indirect (spillover), and total. <strong>Toggle which models and which
+    regressor (INC or HOVAL) to display.</strong>
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Toggle OLS only:</strong> watch the indirect-effect facet collapse to zero. OLS has no spillover channel by construction. SEM is similar: zero indirect by construction (the error structure does not propagate to outcomes).</li>
+      <li><strong>Toggle SLX, SDM, SDEM together:</strong> for INC, all three give large negative indirect effects (−1.20 to −1.50). For HOVAL, all three give small positive insignificant indirect effects. This agreement across non-nested models is the §9.1 robustness argument.</li>
+      <li><strong>Switch the regressor to HOVAL:</strong> notice that SAR forces a <em>negative</em> indirect effect (−0.20), proportional to its direct effect. The SLX, SDM, and SDEM give <em>positive</em> indirect effects. The SAR's proportional-ratio constraint is doing harm here.</li>
+      <li><strong>Compare total effects:</strong> for INC, OLS gives −1.60. SDM/SDEM give −2.26 to −2.52. That is the 40–55% understatement the post highlights as the headline finding.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Regressor</h3>
+    <div class="outcome-toggle" id="fp-regressor">
+      <label><input type="radio" name="regressor" value="INC" checked> INC (household income)</label>
+      <label><input type="radio" name="regressor" value="HOVAL"> HOVAL (housing value)</label>
+    </div>
+    <h3 style="margin-top:16px;">Models to display</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="OLS" checked> OLS</label>
+      <label><input type="checkbox" value="SAR" checked> SAR</label>
+      <label><input type="checkbox" value="SEM" checked> SEM</label>
+      <label><input type="checkbox" value="SLX" checked> SLX</label>
+      <label><input type="checkbox" value="SDM" checked> SDM</label>
+      <label><input type="checkbox" value="SDEM" checked> SDEM</label>
+      <label><input type="checkbox" value="SAC" checked> SAC</label>
+      <label><input type="checkbox" value="GNS" checked> GNS</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why does SAR force a constant indirect/direct ratio?</h3>
+    <p>
+      In SAR, all spillovers come from the spatial multiplier <code>(I − ρW)<sup>−1</sup></code>.
+      That matrix is the <em>same</em> for every regressor — so the ratio of off-diagonal
+      to diagonal terms is identical across INC and HOVAL. The bare coefficient
+      multiplies through both. In Columbus, this forces HOVAL's indirect effect
+      to be ≈ 0.69 × HOVAL's direct effect, with the same sign (negative). But
+      the SLX, SDM, and SDEM all estimate the HOVAL indirect freely — and find
+      it small and positive. The data prefers the unrestricted ratio.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The DGP simulator in Tab 3 generates data with known ρ, λ, θ. When you set
+      θ ≠ 0, an OLS estimator hides the spillover entirely. When you set ρ ≠ 0,
+      a SAR <em>recovers</em> the spillover but forces it to be proportional across
+      regressors. The forest plot above is the real-data counterpart: every row
+      shows what each estimator finds when the truth is unknown but spatial.
+    </p>
+    <ul>
+      <li><strong>INC total effect:</strong> OLS = −1.60; SAR = −1.86; SDM = −2.52; SDEM = −2.26. Spread of 0.92 across models.</li>
+      <li><strong>INC direct effect:</strong> all spatial models cluster between −0.94 and −1.10. The direct effect is <em>robust</em> to specification choice.</li>
+      <li><strong>INC indirect effect:</strong> 0 (OLS, SEM), −0.76 (SAR), −1.20 to −1.50 (SLX, SDM, SDEM). Identifying the indirect effect is the value-added of spatial econometrics.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Cross-Sectional Spatial Regression in Stata: Crime in Columbus Neighborhoods</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

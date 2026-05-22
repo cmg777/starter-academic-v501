@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>RDD Interactive Lab — Tutoring &amp; Exit Exams</title>
+<meta name="description" content="Interactive companion to 'Regression Discontinuity Design (RDD) in Stata: Evaluating a Tutoring Program'. A pedagogical web app with a cutoff-jump animation, a live RD simulator, bandwidth and polynomial controls, and the post's robustness forest plot.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>RDD Interactive Lab — Tutoring &amp; Exit Exams</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Regression Discontinuity Design (RDD) in Stata: Evaluating a Tutoring Program</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"     class="tab active" data-pane="pane-intro"     role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-simulator" class="tab"        data-pane="pane-simulator" role="tab" aria-selected="false">2 · RD Simulator</button>
+  <button id="tab-bandwidth" class="tab"        data-pane="pane-bandwidth" role="tab" aria-selected="false">3 · Bandwidth Lab</button>
+  <button id="tab-forest"    class="tab"        data-pane="pane-forest"    role="tab" aria-selected="false">4 · Robustness Forest</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>What is regression discontinuity?</h2>
+  <p class="lede">
+    A school district gave every student a standardised entrance exam. Anyone
+    who scored <strong>70 or below</strong> was automatically enrolled in a free
+    tutoring program; anyone above was not. The post asks the central question:
+    <strong>did the tutoring program improve exit exam scores?</strong> Because
+    assignment is a sharp, rule-based jump at score 70, students just below the
+    cutoff are nearly identical to those just above — and the discontinuity at
+    the cutoff identifies the causal effect.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. In four tabs you will: watch the
+    discontinuity appear as the treatment effect grows; simulate the entire
+    RD pipeline with your own sample size, noise, polynomial order and bandwidth;
+    sweep the bandwidth from very tight to very wide and watch the LATE move
+    just a tiny bit; and explore the post's robustness forest — bandwidths,
+    kernels, parametric vs nonparametric, and the placebo cutoffs.
+  </p>
+
+  <div class="card">
+    <h3>The jump at the cutoff</h3>
+    <p>
+      The animation below shows two regression lines — blue for tutored students
+      (left of the cutoff), orange for non-tutored students (right). As the
+      treatment effect <span class="kbd">τ</span> grows, the blue line rises and
+      the <strong>gap at the cutoff</strong> opens up. RDD reads off τ from
+      exactly that gap. When τ = 0 the two lines align: no program effect. When
+      τ ≈ 8.6 (the post's <em>rdrobust</em> estimate) the gap is meaningfully large.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-simulator">
+      <div class="cta-tag">Tab 2</div>
+      <h4>RD Simulator</h4>
+      <p>Draw new data with your chosen sample size, noise, polynomial order and bandwidth. Watch τ̂ move and see the local-linear fits on each side.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-bandwidth">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Bandwidth Lab</h4>
+      <p>Sweep the bandwidth on the post's actual numbers. The estimate barely moves between h = 5 and h = 20 — that's the robustness story.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Robustness Forest</h4>
+      <p>The post's headline robustness check, interactively. Toggle parametric vs nonparametric, bandwidths, kernels and placebo cutoffs.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Three key takeaways from the post</h3>
+    <div class="grid grid-2">
+      <details class="gloss" open><summary>1. Tutoring works: τ̂ ≈ 9–11 points</summary>
+        <div class="gloss-body">Parametric OLS gives +10.80 (95% CI 9.22 to 12.38); nonparametric <em>rdrobust</em> gives 8.58 (95% CI 4.54 to 12.14). Both are highly significant (p &lt; 0.001) and represent a <em>13–16% improvement</em> over the mean exit score of 66.2.</div>
+      </details>
+      <details class="gloss" open><summary>2. The design is credible</summary>
+        <div class="gloss-body">100% compliance at the cutoff (perfectly sharp). McCrary density test <em>p = 0.58</em> rules out manipulation. Placebo cutoffs at 50, 55, 60, 65, 75, 80, 85, 90 all fail to reject the null — the discontinuity is unique to the true cutoff at 70.</div>
+      </details>
+      <details class="gloss" open><summary>3. The estimate is robust</summary>
+        <div class="gloss-body">Across bandwidths 5 → 20, τ̂ ranges from -8.20 to -9.16 — a spread of less than 1 point. Triangular, Uniform and Epanechnikov kernels all yield estimates between -8.20 and -8.58. Linear, slope-flexible and quadratic parametric specs all land between 9.2 and 10.8.</div>
+      </details>
+      <details class="gloss"><summary>Running variable</summary>
+        <div class="gloss-body">The continuous score that determines treatment. Here it is <code>entrance_exam</code> (range 28.8–99.8). Must be continuous-ish for nearby units to be comparable.</div>
+      </details>
+      <details class="gloss"><summary>Cutoff (c = 70)</summary>
+        <div class="gloss-body">The threshold value. Below or equal: tutoring. Above: no tutoring. Set by program rule, not by the analyst.</div>
+      </details>
+      <details class="gloss"><summary>Sharp vs fuzzy</summary>
+        <div class="gloss-body"><em>Sharp:</em> 100% of students below the cutoff get treatment, 0% above (this study). <em>Fuzzy:</em> probability of treatment jumps but not from 0 to 1; would require IV.</div>
+      </details>
+      <details class="gloss"><summary>LATE — τ</summary>
+        <div class="gloss-body">The Local Average Treatment Effect — the jump in E[Y | X = x] at x = c. The effect for students <em>at</em> the cutoff. Cannot be extrapolated to students at score 30 or 95.</div>
+      </details>
+      <details class="gloss"><summary>Bandwidth — h</summary>
+        <div class="gloss-body">The window around the cutoff used for local-polynomial estimation. Tighter h = less bias, more variance. <em>rdrobust</em> picks h = 9.98 here via MSE optimisation.</div>
+      </details>
+      <details class="gloss"><summary>Continuity assumption</summary>
+        <div class="gloss-body">Potential outcomes must be smooth through the cutoff. Equivalently, absent the program, students just below 70 would score similarly on the exit exam to students just above 70. The McCrary test gives indirect evidence.</div>
+      </details>
+      <details class="gloss"><summary>McCrary density test</summary>
+        <div class="gloss-body">A formal test for manipulation. Asks: is the density of the running variable continuous at the cutoff? Here T = -0.55, <em>p = 0.58</em> — no evidence of bunching.</div>
+      </details>
+      <details class="gloss"><summary>Placebo cutoffs</summary>
+        <div class="gloss-body">Run the RDD estimator at non-true cutoff values. If the design is credible, only the true cutoff should show a significant jump. Here only c = 70 has p &lt; 0.001; all others have p &gt; 0.05.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: RD SIMULATOR ====================== -->
+<section id="pane-simulator" class="tab-pane" role="tabpanel" aria-labelledby="tab-simulator">
+
+  <h2>RD Simulator — turn the dials yourself</h2>
+  <p class="lede">
+    This panel draws a fresh dataset every time you move a slider. The true
+    treatment effect is fixed at <strong>τ = 8.6</strong> (the post's nonparametric
+    estimate). The simulator fits a local polynomial on each side of the
+    cutoff using only observations inside the bandwidth window. <strong>Try
+    making the noise large or the bandwidth tiny — watch τ̂ wobble.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sim-n-val">800</span></label>
+      <input type="range" id="sim-n" min="100" max="2000" step="50" value="800" aria-label="sample size">
+      <div class="hint">More observations = tighter local-linear fits, smaller SE.</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="sim-s-val">5.0</span></label>
+      <input type="range" id="sim-s" min="1" max="12" step="0.5" value="5.0" aria-label="noise level">
+      <div class="hint">Idiosyncratic variation in exit scores. Larger σ = harder to see τ.</div>
+    </div>
+    <div class="control">
+      <label>Bandwidth h <span class="value" id="sim-h-val">10.0</span></label>
+      <input type="range" id="sim-h" min="3" max="25" step="0.5" value="10.0" aria-label="bandwidth">
+      <div class="hint">Window of X around c = 70 used for local-poly fitting. Outside h, points fade out.</div>
+    </div>
+    <div class="control">
+      <label>Polynomial order p <span class="value" id="sim-p-val">1</span></label>
+      <input type="range" id="sim-p" min="1" max="3" step="1" value="1" aria-label="polynomial order">
+      <div class="hint">1 = local linear (rdrobust default); 2 = local quadratic; 3 = local cubic.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-scatter"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">τ̂ (estimated LATE)</div>
+      <div class="stat-value teal" id="sim-stat-tau">—</div>
+      <div class="stat-sub">true τ = <span id="sim-stat-true">8.60</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">SE(τ̂)</div>
+      <div class="stat-value" id="sim-stat-se">—</div>
+      <div class="stat-sub">heteroskedasticity-robust</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">obs in bandwidth</div>
+      <div class="stat-value orange" id="sim-stat-nb">—</div>
+      <div class="stat-sub">of <span id="sim-stat-n">800</span> total</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">95% CI for τ̂</div>
+      <div class="stat-value" id="sim-stat-ci" style="font-size:15px;">—</div>
+      <div class="stat-sub">τ̂ ± 1.96 · SE</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Bias–variance trade-off.</strong> Slide the bandwidth from 3 to 25. Tight h → fewer points → bigger SE but smaller bias (closer to the cutoff = more comparable). Wide h → smaller SE but the fits start mixing in students far from the cutoff.</li>
+      <li><strong>Polynomial order does not save you.</strong> A higher-order polynomial can over-fit local noise. Try p = 3 with a tight h — you will see the fitted lines bend wildly near the cutoff. <em>rdrobust</em> recommends p = 1 (local linear) for a reason.</li>
+      <li><strong>Faded points are outside the bandwidth.</strong> The cutoff line is the velvet rope. The local-poly fit only sees the bright points inside h.</li>
+      <li><strong>Reseed to feel the noise.</strong> τ̂ should hover near 8.6 — that's the unbiased target. The wobble around 8.6 is the variance.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: BANDWIDTH LAB ====================== -->
+<section id="pane-bandwidth" class="tab-pane" role="tabpanel" aria-labelledby="tab-bandwidth">
+
+  <h2>Bandwidth Lab — how sensitive is τ̂ to <em>h</em>?</h2>
+  <p class="lede">
+    The most common concern about RDD is: "What if the bandwidth I pick changes
+    the answer?" The post answers that on the real data with a sweep from
+    h = 5 to h = 20. The curve below is τ̂(h) on the actual tutoring dataset.
+    <strong>Drag the orange dot</strong> to see how the point estimate and CI
+    move as you change h.
+  </p>
+
+  <div class="controls">
+    <div class="control" style="grid-column: 1 / -1;">
+      <label>Bandwidth h <span class="value" id="bw-h-val">10.0</span></label>
+      <input type="range" id="bw-h" min="5" max="20" step="0.1" value="10.0" aria-label="bandwidth">
+      <div class="hint">Linearly interpolated from the post's 6 anchor bandwidths (5, 7, 10, 12, 15, 20).</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="bw-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">τ̂ at this bandwidth</div>
+      <div class="stat-value teal" id="bw-stat-tau">—</div>
+      <div class="stat-sub">positive in post's convention<br>(=  jump from treated to untreated side)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">95% CI</div>
+      <div class="stat-value" id="bw-stat-ci" style="font-size:15px;">—</div>
+      <div class="stat-sub">CL — CR</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">SE(τ̂)</div>
+      <div class="stat-value" id="bw-stat-se">—</div>
+      <div class="stat-sub">narrower h → larger SE</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">MSE-optimal h</div>
+      <div class="stat-value orange">9.98</div>
+      <div class="stat-sub">what <em>rdrobust</em> picks automatically</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The curve is nearly flat.</strong> τ̂ moves by less than 1 point across a 4× range of bandwidths. That is the gold-standard robustness story: the answer does not depend on analyst discretion.</li>
+      <li><strong>The teal CI band fans out at low h.</strong> Tight bandwidths use few observations — the standard error grows. Wide bandwidths trade a little bit of bias for a lot of precision.</li>
+      <li><strong>The MSE-optimal point (h = 9.98) lives near the middle.</strong> <em>rdrobust</em> picks this h automatically to balance squared bias and variance — it is <em>not</em> the bandwidth that minimises SE.</li>
+      <li><strong>All CIs exclude zero.</strong> Even at h = 5 (the noisiest end), the upper end of the CI is -3.62, well below zero. The effect is detected regardless of bandwidth.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: ROBUSTNESS FOREST ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's robustness forest, interactively</h2>
+  <p class="lede">
+    These numbers come straight from the post's <em>analysis.do</em> Stata
+    pipeline — parametric OLS, nonparametric <em>rdrobust</em>, bandwidth sweep,
+    kernel comparison and the 9-cutoff placebo. Toggle outcomes and methods.
+    Hover any point to see its SE, CI and observation count.
+  </p>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Parametric (full sample)" checked> Parametric (full sample)</label>
+      <label><input type="checkbox" value="Bandwidth sensitivity"    checked> Bandwidth sensitivity</label>
+      <label><input type="checkbox" value="Kernel comparison"        checked> Kernel comparison</label>
+      <label><input type="checkbox" value="Placebo cutoffs"          checked> Placebo cutoffs</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods (filter rows within each outcome)</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Linear (same slope)"   checked> Linear (same slope)</label>
+      <label><input type="checkbox" value="Linear (diff slopes)"  checked> Linear (diff slopes)</label>
+      <label><input type="checkbox" value="Quadratic"             checked> Quadratic</label>
+      <label><input type="checkbox" value="rdrobust (triangular)" checked> rdrobust (triangular)</label>
+      <label><input type="checkbox" value="BW = 5"                checked> BW = 5</label>
+      <label><input type="checkbox" value="BW = 7"                checked> BW = 7</label>
+      <label><input type="checkbox" value="BW = 10 (MSE optimal)" checked> BW = 10 (MSE optimal)</label>
+      <label><input type="checkbox" value="BW = 12"               checked> BW = 12</label>
+      <label><input type="checkbox" value="BW = 15"               checked> BW = 15</label>
+      <label><input type="checkbox" value="BW = 20"               checked> BW = 20</label>
+      <label><input type="checkbox" value="Triangular"            checked> Triangular</label>
+      <label><input type="checkbox" value="Uniform"               checked> Uniform</label>
+      <label><input type="checkbox" value="Epanechnikov"          checked> Epanechnikov</label>
+      <label><input type="checkbox" value="Cutoff = 50"           checked> Cutoff = 50</label>
+      <label><input type="checkbox" value="Cutoff = 55"           checked> Cutoff = 55</label>
+      <label><input type="checkbox" value="Cutoff = 60"           checked> Cutoff = 60</label>
+      <label><input type="checkbox" value="Cutoff = 65"           checked> Cutoff = 65</label>
+      <label><input type="checkbox" value="Cutoff = 70 (TRUE)"    checked> Cutoff = 70 (TRUE)</label>
+      <label><input type="checkbox" value="Cutoff = 75"           checked> Cutoff = 75</label>
+      <label><input type="checkbox" value="Cutoff = 80"           checked> Cutoff = 80</label>
+      <label><input type="checkbox" value="Cutoff = 85"           checked> Cutoff = 85</label>
+      <label><input type="checkbox" value="Cutoff = 90"           checked> Cutoff = 90</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>What the forest tells us</h3>
+    <ul>
+      <li><strong>Sign conventions.</strong> The parametric panel reports the coefficient on <code>treat</code> (positive: tutoring helps). The bandwidth, kernel and placebo panels use <em>rdrobust</em>'s left-to-right convention (negative: jumping down from the treated to the untreated side). Both encode the same underlying causal claim.</li>
+      <li><strong>Placebos straddle zero.</strong> Toggle off everything except the placebo cutoff panel: only the orange point at cutoff 70 has a CI that excludes zero. The eight placebo cutoffs (CIs in grey) all cross the dashed zero line.</li>
+      <li><strong>The four headline estimates cluster.</strong> Toggle just the top panel: linear (10.80), slope-flexible linear (10.80), quadratic (9.22), and <em>rdrobust</em> (8.58) all land between roughly 8.5 and 11. The story is invariant to specification.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to the post</h3>
+    <p>
+      Three messages live in this single plot, one per panel:
+    </p>
+    <ul>
+      <li><strong>Top panel (parametric):</strong> see Sections 7 and 8 of the post. Four specifications, same conclusion. The treatment effect is roughly 9–11 points.</li>
+      <li><strong>Middle two panels (BW + kernel):</strong> Section 9.1 of the post. Robustness to analyst discretion.</li>
+      <li><strong>Bottom panel (placebos):</strong> Section 9.3. The discontinuity is unique to the actual program threshold.</li>
+    </ul>
+    <p>
+      Combined with the McCrary test (<em>p = 0.58</em>, see Section 9.2) and the
+      perfectly sharp design (Section 5), the four robustness panels here
+      are the formal back-up for the "tutoring works, the design is credible"
+      conclusion in Section 10.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Regression Discontinuity Design (RDD) in Stata: Evaluating a Tutoring Program</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

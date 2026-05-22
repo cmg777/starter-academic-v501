@@ -1,0 +1,78 @@
+{
+  "_comment": "Estimates from estimation_results.csv (5000-obs simulated WFH dataset, true ATE = 1.0). All standard errors are robust (HC1 for regression and IV, influence-function for IPW and DR, Welch for naive). CIs computed from CSV CI_Lower/CI_Upper columns.",
+
+  "true_ate": 1.0,
+  "n": 5000,
+
+  "estimates": [
+    {
+      "method":     "Naive",
+      "outcome":    "WFH on productivity",
+      "estimate":   1.3853,
+      "se":         0.0716,
+      "ci_lo":      1.2449,
+      "ci_hi":      1.5257,
+      "n_selected": null,
+      "identification": "None (biased)",
+      "bias":       0.3853,
+      "covers_truth": false
+    },
+    {
+      "method":     "Linear Regression",
+      "outcome":    "WFH on productivity",
+      "estimate":   1.0051,
+      "se":         0.0614,
+      "ci_lo":      0.8847,
+      "ci_hi":      1.1255,
+      "n_selected": 2,
+      "identification": "Backdoor",
+      "bias":       0.0051,
+      "covers_truth": true
+    },
+    {
+      "method":     "IPW",
+      "outcome":    "WFH on productivity",
+      "estimate":   1.0275,
+      "se":         0.0754,
+      "ci_lo":      0.8797,
+      "ci_hi":      1.1754,
+      "n_selected": 2,
+      "identification": "Backdoor",
+      "bias":       0.0275,
+      "covers_truth": true
+    },
+    {
+      "method":     "Doubly Robust",
+      "outcome":    "WFH on productivity",
+      "estimate":   1.0115,
+      "se":         0.0623,
+      "ci_lo":      0.8893,
+      "ci_hi":      1.1336,
+      "n_selected": 2,
+      "identification": "Backdoor",
+      "bias":       0.0115,
+      "covers_truth": true
+    },
+    {
+      "method":     "IV (2SLS)",
+      "outcome":    "WFH on productivity",
+      "estimate":   0.8881,
+      "se":         0.3303,
+      "ci_lo":      0.2407,
+      "ci_hi":      1.5355,
+      "n_selected": 1,
+      "identification": "Instrument",
+      "bias":       -0.1119,
+      "covers_truth": true
+    }
+  ],
+
+  "refutation": [
+    {"test": "Placebo Treatment",   "original": 1.0051, "new_effect": -0.00003, "p_value": 0.96, "pass": true,
+     "interp": "Fake (permuted) treatment yields essentially zero effect — original estimate is not an artifact."},
+    {"test": "Random Common Cause", "original": 1.0051, "new_effect":  1.0051,  "p_value": 0.98, "pass": true,
+     "interp": "Adding an irrelevant fake confounder does not move the estimate — it is not fragile."},
+    {"test": "Data Subset (80%)",   "original": 1.0051, "new_effect":  0.9988,  "p_value": 0.64, "pass": true,
+     "interp": "Re-estimating on a random 80% subsample stays close to the full-sample value — the estimate is stable."}
+  ]
+}

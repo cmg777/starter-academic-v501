@@ -1,0 +1,32 @@
+{
+  "estimates": [
+    { "method": "Naive pre-post",     "outcome": "California Proposition 99", "estimate": -27.0200, "se": 5.2951, "ci_lo": -37.3983, "ci_hi": -16.6417, "n_selected": null,  "estimand": "Descriptive (biased)" },
+    { "method": "DiD (vs Nevada)",    "outcome": "California Proposition 99", "estimate":  -5.6800, "se": 5.3929, "ci_lo": -16.2500, "ci_hi":   4.8901, "n_selected": 1,     "estimand": "ATT (CA, 1989-1993)" },
+    { "method": "ITS (growth curve)", "outcome": "California Proposition 99", "estimate": -28.2787, "se": 1.7243, "ci_lo": -31.6582, "ci_hi": -24.8991, "n_selected": null,  "estimand": "Mean post-period gap" },
+    { "method": "ITS (ARIMA)",        "outcome": "California Proposition 99", "estimate":   4.5489, "se": 2.3439, "ci_lo":  -0.0451, "ci_hi":   9.1429, "n_selected": null,  "estimand": "Mean post-period gap" },
+    { "method": "RDD on time",        "outcome": "California Proposition 99", "estimate": -20.0581, "se": 5.5854, "ci_lo": -31.0054, "ci_hi":  -9.1108, "n_selected": null,  "estimand": "Level jump at 1989" },
+    { "method": "Synthetic Control",  "outcome": "California Proposition 99", "estimate": -18.8456, "se": 1.8350, "ci_lo": -22.4423, "ci_hi": -15.2490, "n_selected": 5,     "estimand": "ATT (CA, 1989-2000)" },
+    { "method": "CausalImpact",       "outcome": "California Proposition 99", "estimate": -12.8228, "se": 9.5973, "ci_lo": -31.6335, "ci_hi":   5.9879, "n_selected": null,  "estimand": "ATT (CA, 1989-2000)" }
+  ],
+  "selection": [
+    { "method": "Synthetic Control", "donor": "Utah",        "weight": 0.3430 },
+    { "method": "Synthetic Control", "donor": "Nevada",      "weight": 0.2360 },
+    { "method": "Synthetic Control", "donor": "Montana",     "weight": 0.1820 },
+    { "method": "Synthetic Control", "donor": "Colorado",    "weight": 0.1750 },
+    { "method": "Synthetic Control", "donor": "Connecticut", "weight": 0.0624 },
+    { "method": "Synthetic Control", "donor": "Idaho",       "weight": 0.0005 },
+    { "method": "Synthetic Control", "donor": "New Mexico",  "weight": 0.0003 },
+    { "method": "Synthetic Control", "donor": "Minnesota",   "weight": 0.0003 }
+  ],
+  "consensus": {
+    "min": -28.3,
+    "max": -12.8,
+    "label": "Five methods agree on a 13 to 28 packs/capita reduction"
+  },
+  "raw_decline": {
+    "pre_mean": 116.0,
+    "post_mean": 60.4,
+    "drop_total": 55.6,
+    "drop_pct": 47.9
+  }
+}

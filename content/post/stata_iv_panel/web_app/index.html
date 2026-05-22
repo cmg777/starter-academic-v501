@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>IV with Panel Data — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'IV Estimation with Panel Data: Economic Shocks and Civil Conflict' (Hodler & Raschky, 2014 replication). Sliders, simulators, and a forest plot to build intuition for instrument strength, attenuation bias, and 2SLS identification.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>IV with Panel Data — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>IV Estimation with Panel Data: Economic Shocks and Civil Conflict</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"      class="tab active" data-pane="pane-intro"      role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-firststage" class="tab"        data-pane="pane-firststage" role="tab" aria-selected="false">2 · First-Stage Lab</button>
+  <button id="tab-showdown"   class="tab"        data-pane="pane-showdown"   role="tab" aria-selected="false">3 · OLS vs 2SLS Showdown</button>
+  <button id="tab-forest"     class="tab"        data-pane="pane-forest"     role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why instrumental variables?</h2>
+  <p class="lede">
+    Does poverty cause violence? The correlation is real, but correlation is not
+    causation. Conflict <em>destroys</em> economic activity (reverse causality),
+    and the nighttime lights we use to measure activity are a <em>noisy proxy</em>
+    (measurement error). Both contaminate ordinary least squares.
+    <strong>Instrumental variables</strong> — using <em>lagged rainfall and drought</em>
+    as a clean source of variation — slice through both problems.
+  </p>
+  <p class="lede">
+    In this lab you can turn the knobs yourself. Three tabs let you:
+    explore the first-stage relationship between weather and economic activity;
+    watch OLS and 2SLS recover (or fail to recover) a true causal effect
+    you set; and inspect the post's actual estimates with confidence intervals
+    and first-stage F-statistics.
+  </p>
+
+  <div class="card">
+    <h3>The IV identification path</h3>
+    <p>
+      The instrument <span class="kbd">Z</span> (weather, two years ago) shifts
+      the endogenous regressor <span class="kbd">D</span> (lagged economic
+      activity), which in turn shifts the outcome <span class="kbd">Y</span>
+      (conflict today). Confounders <span class="kbd">U</span> and measurement
+      error <span class="kbd">ME</span> contaminate D, but they cannot reach Z
+      — that is the exclusion restriction. The animated dot traces the clean
+      IV path Z → D → Y.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-firststage">
+      <div class="cta-tag">Tab 2</div>
+      <h4>First-Stage Lab</h4>
+      <p>Slide instrument strength π and watch the first-stage F-statistic cross the Stock-Yogo threshold. See what a "strong" vs "weak" instrument looks like.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>OLS vs 2SLS Showdown</h4>
+      <p>You set the true effect. Slide measurement-error and confounding to bias OLS. Watch 2SLS recover the truth. Run 100 simulations to see the bias-variance picture.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>The post's headline estimates, interactively. Hover any point to see the SE, 95% CI, and the first-stage F. Toggle outcomes and methods.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Three takeaways from the post</h3>
+    <ol>
+      <li><strong>Economic shocks cause civil conflict.</strong> A 10% decline in nighttime light intensity raises the probability of conflict (1+ deaths) by about 3 percentage points — a 66% jump above the 4.6% baseline.</li>
+      <li><strong>OLS massively underestimates the effect.</strong> OLS returns 0.001; 2SLS returns about -0.30. A 300-fold difference, driven by attenuation bias from measurement error and omitted-variable bias from unobserved confounders.</li>
+      <li><strong>The instruments are strong and valid.</strong> First-stage F-statistics (24.6 to 40.3) clear the Stock-Yogo 10% threshold of 16.38. Hansen J p-value of 0.93 says rainfall and drought tell the same story.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Endogeneity</summary>
+        <div class="gloss-body">When a regressor correlates with the error term. OLS is contaminated by omitted variables, reverse causality, or measurement error.</div>
+      </details>
+      <details class="gloss"><summary>Instrument Z</summary>
+        <div class="gloss-body">An external variable that drives variation in the regressor without belonging in the outcome equation. Here: lagged rainfall and drought.</div>
+      </details>
+      <details class="gloss"><summary>First-stage F</summary>
+        <div class="gloss-body">The F-statistic from regressing the endogenous regressor on the instrument(s). Measures instrument strength.</div>
+      </details>
+      <details class="gloss"><summary>Stock-Yogo critical value</summary>
+        <div class="gloss-body">A formal threshold for "weak instruments." 16.38 with one instrument keeps 2SLS bias below 10% of OLS bias.</div>
+      </details>
+      <details class="gloss"><summary>Exclusion restriction</summary>
+        <div class="gloss-body">Z affects Y <em>only</em> through D. Untestable in just-identified models. This is the most contested part of any IV design.</div>
+      </details>
+      <details class="gloss"><summary>2SLS</summary>
+        <div class="gloss-body">Two-Stage Least Squares. Stage 1: regress D on Z. Stage 2: regress Y on fitted D. The slope is the IV estimate.</div>
+      </details>
+      <details class="gloss"><summary>Attenuation bias</summary>
+        <div class="gloss-body">Classical measurement error in a regressor shrinks the OLS slope toward zero. IV with a clean instrument removes the shrinkage.</div>
+      </details>
+      <details class="gloss"><summary>Hansen J test</summary>
+        <div class="gloss-body">A joint test of instrument validity when you have more instruments than endogenous regressors. Failure to reject (high p) supports validity.</div>
+      </details>
+      <details class="gloss"><summary>LATE</summary>
+        <div class="gloss-body">Local Average Treatment Effect. The IV estimand: the causal effect for the subpopulation whose D responds to Z (compliers).</div>
+      </details>
+      <details class="gloss"><summary>Reduced form</summary>
+        <div class="gloss-body">The regression of Y directly on Z. Its sign tells you whether the instrument predicts the outcome. The IV estimate = reduced form / first stage.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: FIRST-STAGE LAB ====================== -->
+<section id="pane-firststage" class="tab-pane" role="tabpanel" aria-labelledby="tab-firststage">
+
+  <h2>First-Stage Lab — what does instrument strength look like?</h2>
+  <p class="lede">
+    The first stage regresses the endogenous regressor D on the instrument Z.
+    The F-statistic on Z measures instrument strength: above the
+    <strong>Stock-Yogo (10%) critical value of 16.38</strong>, the instrument
+    is "strong"; below 10, it is dangerously weak. <strong>Drag the instrument
+    strength slider</strong> and watch the binned scatter, the slope, and the
+    F-statistic respond in real time.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Instrument strength π <span class="value" id="fs-pi-val">0.40</span></label>
+      <input type="range" id="fs-pi" min="0.00" max="1.20" step="0.05" value="0.40" aria-label="instrument strength">
+      <div class="hint">Larger π ⇒ Z explains more of D. In the post, π_rain ≈ 0.036, π_drought ≈ 0.006 — both small but the F-stats are large because n = 96,591.</div>
+    </div>
+    <div class="control">
+      <label>Sample size n <span class="value" id="fs-n-val">300</span></label>
+      <input type="range" id="fs-n" min="50" max="500" step="10" value="300" aria-label="sample size">
+      <div class="hint">More observations ⇒ tighter estimates ⇒ higher F-stat for the same π.</div>
+    </div>
+    <div class="control">
+      <label>Confounding ρ <span class="value" id="fs-rho-val">0.60</span></label>
+      <input type="range" id="fs-rho" min="0.00" max="1.50" step="0.05" value="0.60" aria-label="confounding strength">
+      <div class="hint">How much an unobserved variable also drives D. Does not change the first stage on its own.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fs-scatter"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">first-stage slope (π̂)</div>
+      <div class="stat-value teal" id="fs-stat-slope">—</div>
+      <div class="stat-sub">how Z moves D</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">first-stage F</div>
+      <div class="stat-value orange" id="fs-stat-F">—</div>
+      <div class="stat-sub">vs Stock-Yogo 16.38</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">verdict</div>
+      <div class="stat-value" id="fs-stat-verdict">—</div>
+      <div class="stat-sub">strong / borderline / weak</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">sample size n</div>
+      <div class="stat-value" id="fs-stat-n">300</div>
+      <div class="stat-sub">observations</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Slide π toward zero.</strong> The orange binned dots flatten, the teal regression line goes horizontal, and the F-stat crashes. Below 10, the verdict turns red — the instrument is weak.</li>
+      <li><strong>Now boost n.</strong> Even a tiny π becomes "strong" once n is large enough. This is why the post's tiny coefficients (0.036, 0.006) still produce F = 24.6 and F = 40.3 — there are 96,591 observations.</li>
+      <li><strong>Confounding ρ does not affect the first stage.</strong> Slide it and watch: the F-stat is unchanged. Confounding contaminates OLS, not the Z-D relationship. (You will see ρ's effect in Tab 3.)</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="fs-reseed">Reseed random draws</button>
+      <button class="action secondary" id="fs-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: OLS vs 2SLS SHOWDOWN ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>OLS vs 2SLS Showdown — recover a causal effect you set</h2>
+  <p class="lede">
+    You set the <strong>true</strong> causal effect δ. The simulator contaminates
+    the observed regressor with measurement error and/or correlates it with an
+    unobserved confounder. Watch OLS bend toward zero (attenuation) or away from
+    truth (omitted-variable bias), while 2SLS using the clean instrument Z
+    stays on target. The headline pattern of the post — OLS ≈ 0, 2SLS ≈ -0.30 —
+    is reproducible in seconds.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>True effect δ <span class="value" id="sh-delta-val">-0.30</span></label>
+      <input type="range" id="sh-delta" min="-0.60" max="0.20" step="0.02" value="-0.30" aria-label="true effect">
+      <div class="hint">The causal slope of D on Y. Set it to match the post (-0.30) or any value you like.</div>
+    </div>
+    <div class="control">
+      <label>Measurement error σ_ME <span class="value" id="sh-me-val">1.00</span></label>
+      <input type="range" id="sh-me" min="0.00" max="2.50" step="0.05" value="1.00" aria-label="measurement error">
+      <div class="hint">Noise added to the observed D. Larger ⇒ stronger attenuation bias in OLS.</div>
+    </div>
+    <div class="control">
+      <label>Confounding ρ <span class="value" id="sh-rho-val">0.60</span></label>
+      <input type="range" id="sh-rho" min="0.00" max="1.50" step="0.05" value="0.60" aria-label="confounding">
+      <div class="hint">How much an unobserved variable drives D. Combined with τ ≠ 0, this creates omitted-variable bias.</div>
+    </div>
+    <div class="control">
+      <label>τ (confounder → Y) <span class="value" id="sh-tau-val">0.40</span></label>
+      <input type="range" id="sh-tau" min="-1.00" max="1.00" step="0.05" value="0.40" aria-label="confounder direct effect">
+      <div class="hint">Direct effect of the confounder on Y. With ρ × τ ≠ 0, OLS is biased; 2SLS is not.</div>
+    </div>
+    <div class="control">
+      <label>Instrument strength π <span class="value" id="sh-pi-val">0.50</span></label>
+      <input type="range" id="sh-pi" min="0.10" max="1.20" step="0.05" value="0.50" aria-label="instrument strength">
+      <div class="hint">Same as Tab 2. Weak instruments make 2SLS imprecise; strong ones make it reliable.</div>
+    </div>
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">300</span></label>
+      <input type="range" id="sh-n" min="50" max="500" step="10" value="300" aria-label="sample size">
+      <div class="hint">Capped at 500 so the "Run 100 sims" button finishes quickly.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">OLS</span></h3>
+      <p class="note" style="margin:0 0 10px;">slope of Y on observed D — contaminated by ME &amp; confounding</p>
+      <div class="method-row"><span class="label">δ̂</span><span class="val" id="sh-ols-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(δ̂)</span><span class="val" id="sh-ols-se">—</span></div>
+      <div class="method-row"><span class="label">bias</span><span class="val" id="sh-ols-bias">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">2SLS</span></h3>
+      <p class="note" style="margin:0 0 10px;">slope of Y on D, instrumented by Z — clean</p>
+      <div class="method-row"><span class="label">δ̂</span><span class="val" id="sh-iv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(δ̂)</span><span class="val" id="sh-iv-se">—</span></div>
+      <div class="method-row"><span class="label">first-stage F</span><span class="val" id="sh-iv-F">—</span></div>
+      <div class="method-row"><span class="label">bias</span><span class="val" id="sh-iv-bias">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>Why this happens</h4>
+    <ul>
+      <li><strong>Measurement error attenuates OLS.</strong> Slide σ_ME up. The OLS bar shrinks toward zero. 2SLS holds steady because Z is uncorrelated with the measurement noise in D.</li>
+      <li><strong>Confounding biases OLS in either direction.</strong> Slide ρ and τ around. The OLS bar swings; 2SLS does not, because the instrument is uncorrelated with the confounder.</li>
+      <li><strong>Weak instruments hurt 2SLS too.</strong> Push π toward zero. The first-stage F drops, and 2SLS becomes wildly variable across reseeds. Strong instruments are not optional — they are the precondition for trustworthy IV.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs variance over 100 simulations</h3>
+    <p>Single runs are noisy. Run the same DGP 100 times with fresh draws (same parameters, different noise) to see whether the OLS bias is systematic and how dispersed the 2SLS estimates are.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">OLS mean δ̂</div><div class="stat-value orange" id="sh-ols-mean">—</div><div class="stat-sub">attenuation toward zero</div></div>
+      <div class="stat"><div class="stat-label">OLS sd(δ̂)</div><div class="stat-value" id="sh-ols-sd">—</div></div>
+      <div class="stat"><div class="stat-label">2SLS mean δ̂</div><div class="stat-value teal" id="sh-iv-mean">—</div></div>
+      <div class="stat"><div class="stat-label">2SLS sd(δ̂)</div><div class="stat-value" id="sh-iv-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's forest plot — interactively</h2>
+  <p class="lede">
+    These numbers come straight from <code>coef_comparison_conflict01.csv</code>
+    and Tables 2–3 in the post folder — the same estimates used to produce
+    Figure: "OLS vs 2SLS coefficient comparison". Toggle outcomes and methods
+    to compare. Hover any point to see its SE, 95% CI, and the first-stage F.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>OLS is glued to zero.</strong> Both conflict outcomes show δ̂_OLS ≈ 0.001 with tight standard errors. A classic attenuation signature.</li>
+      <li><strong>All three 2SLS rows cluster around δ̂ = -0.30</strong> for Conflict 1+ and around -0.09 for Conflict 25+. Three different instrument specifications give the same answer — strong evidence the IV strategy is identifying a real causal effect.</li>
+      <li><strong>The "Both" specification is the tightest.</strong> Standard errors shrink from 0.111 (Rain) and 0.085 (Drought) to 0.076 (Both). Adding more instruments improves efficiency without sacrificing consistency, as long as they all satisfy exclusion.</li>
+      <li><strong>Hover the 2SLS dots</strong> to see the first-stage F. All three specifications clear the Stock-Yogo 10% threshold of 16.38. The instruments are not weak.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Conflict 1+" checked> Conflict 1+ deaths</label>
+      <label><input type="checkbox" value="Conflict 25+" checked> Conflict 25+ deaths</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="OLS" checked> OLS</label>
+      <label><input type="checkbox" value="2SLS: Rain" checked> 2SLS: Rain</label>
+      <label><input type="checkbox" value="2SLS: Drought" checked> 2SLS: Drought</label>
+      <label><input type="checkbox" value="2SLS: Both" checked> 2SLS: Both</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>IV diagnostics from the post</h3>
+    <p>Three checks support the IV strategy:</p>
+    <ul>
+      <li><strong>First-stage F (Rain alone):</strong> 24.62 — above the Stock-Yogo (10%) critical value of 16.38. Strong.</li>
+      <li><strong>First-stage F (Drought alone):</strong> 40.33 — well above 16.38. Strong.</li>
+      <li><strong>Hansen J overidentification test (Both):</strong> J = 0.007, p = 0.932. We fail to reject instrument validity by a wide margin — rainfall and drought tell the same story.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The OLS vs 2SLS gap you simulated in Tab 3 is exactly what shows up in the real
+      Hodler-Raschky (2014) panel of 5,689 African regions over 1994–2010:
+    </p>
+    <ul>
+      <li><strong>OLS:</strong> 0.0008 — essentially zero. The attenuation bias from measuring nighttime lights swamps the true effect.</li>
+      <li><strong>2SLS (Both instruments):</strong> -0.296. A 10% drop in economic activity raises the probability of conflict by ~3 percentage points.</li>
+      <li><strong>Ratio:</strong> roughly 300-to-1 in absolute value. The measurement-error story is quantitatively enormous.</li>
+    </ul>
+    <p>
+      The simulator in Tab 3 lets you reproduce a gap of any size you like — turn σ_ME and ρ up,
+      and the OLS bar collapses toward zero while the 2SLS bar stays on the truth.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>IV Estimation with Panel Data: Economic Shocks and Civil Conflict</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

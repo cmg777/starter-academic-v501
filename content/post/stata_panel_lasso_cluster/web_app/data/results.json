@@ -1,0 +1,44 @@
+{
+  "estimates": [
+    { "method": "Pooled FE",  "outcome": "Democracy → lnPGDP",        "estimate":  1.0550, "se": 0.3700, "ci_lo":  0.3298, "ci_hi":  1.7802, "n_selected": 98 },
+    { "method": "C-LASSO G1", "outcome": "Democracy → lnPGDP",        "estimate":  2.1514, "se": 0.5460, "ci_lo":  1.0813, "ci_hi":  3.2215, "n_selected": 57 },
+    { "method": "C-LASSO G2", "outcome": "Democracy → lnPGDP",        "estimate": -0.9356, "se": 0.3480, "ci_lo": -1.6176, "ci_hi": -0.2536, "n_selected": 41 },
+
+    { "method": "Pooled FE",  "outcome": "CPI → Savings (static)",    "estimate":  0.0301, "se": 0.0350, "ci_lo": -0.0385, "ci_hi":  0.0987, "n_selected": 56 },
+    { "method": "C-LASSO G1", "outcome": "CPI → Savings (static)",    "estimate": -0.1813, "se": 0.0423, "ci_lo": -0.2641, "ci_hi": -0.0985, "n_selected": 34 },
+    { "method": "C-LASSO G2", "outcome": "CPI → Savings (static)",    "estimate":  0.4781, "se": 0.0525, "ci_lo":  0.3752, "ci_hi":  0.5810, "n_selected": 22 },
+
+    { "method": "Pooled FE",  "outcome": "CPI → Savings (dynamic)",   "estimate":  0.0301, "se": 0.0350, "ci_lo": -0.0385, "ci_hi":  0.0987, "n_selected": 56 },
+    { "method": "C-LASSO G1", "outcome": "CPI → Savings (dynamic)",   "estimate": -0.1602, "se": 0.0392, "ci_lo": -0.2370, "ci_hi": -0.0834, "n_selected": 31 },
+    { "method": "C-LASSO G2", "outcome": "CPI → Savings (dynamic)",   "estimate":  0.1967, "se": 0.0399, "ci_lo":  0.1185, "ci_hi":  0.2749, "n_selected": 25 },
+
+    { "method": "Pooled FE",  "outcome": "Interest → Savings (static)","estimate":  0.0059, "se": 0.0350, "ci_lo": -0.0627, "ci_hi":  0.0745, "n_selected": 56 },
+    { "method": "C-LASSO G1", "outcome": "Interest → Savings (static)","estimate": -0.1966, "se": 0.0424, "ci_lo": -0.2797, "ci_hi": -0.1135, "n_selected": 34 },
+    { "method": "C-LASSO G2", "outcome": "Interest → Savings (static)","estimate":  0.2631, "se": 0.0525, "ci_lo":  0.1602, "ci_hi":  0.3660, "n_selected": 22 }
+  ],
+  "selection": [
+    { "outcome": "Democracy → lnPGDP",         "method": "C-LASSO G1", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 57 },
+    { "outcome": "Democracy → lnPGDP",         "method": "C-LASSO G2", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 41 },
+    { "outcome": "CPI → Savings (static)",     "method": "C-LASSO G1", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 34 },
+    { "outcome": "CPI → Savings (static)",     "method": "C-LASSO G2", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 22 },
+    { "outcome": "CPI → Savings (dynamic)",    "method": "C-LASSO G1", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 31 },
+    { "outcome": "CPI → Savings (dynamic)",    "method": "C-LASSO G2", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 25 },
+    { "outcome": "Interest → Savings (static)","method": "C-LASSO G1", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 34 },
+    { "outcome": "Interest → Savings (static)","method": "C-LASSO G2", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 22 }
+  ],
+  "ic_table_savings_static": [
+    { "K": 1, "IC":  0.054 },
+    { "K": 2, "IC": -0.028 },
+    { "K": 3, "IC":  0.059 },
+    { "K": 4, "IC":  0.131 },
+    { "K": 5, "IC":  0.213 }
+  ],
+  "groups_savings": {
+    "G1": { "countries": 34, "obs": 510, "within_r2": 0.2019, "cpi": -0.1813, "interest": -0.1966, "gdp":  0.3346 },
+    "G2": { "countries": 22, "obs": 330, "within_r2": 0.2369, "cpi":  0.4781, "interest":  0.2631, "gdp":  0.1117 }
+  },
+  "groups_democracy": {
+    "G1": { "countries": 57, "obs": 2280, "within_r2": 0.9609, "democracy":  2.1514, "ly1": 1.0328 },
+    "G2": { "countries": 41, "obs": 1640, "within_r2": 0.9538, "democracy": -0.9356, "ly1": 0.9793 }
+  }
+}

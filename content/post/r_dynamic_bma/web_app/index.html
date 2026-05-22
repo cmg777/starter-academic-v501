@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Dynamic Panel BMA — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Dynamic Panel BMA: Which Factors Truly Drive Economic Growth?'. A pedagogical web app with a model-space animation, PIP forest plot across priors, a sensitivity slider, and a jointness heatmap.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Dynamic Panel BMA — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Dynamic Panel BMA: Which Factors Truly Drive Economic Growth?</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"   role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-forest"  class="tab"        data-pane="pane-forest"  role="tab" aria-selected="false">2 · PIP Forest</button>
+  <button id="tab-sim"     class="tab"        data-pane="pane-sim"     role="tab" aria-selected="false">3 · Prior Lab</button>
+  <button id="tab-joint"   class="tab"        data-pane="pane-joint"   role="tab" aria-selected="false">4 · Jointness</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Which growth determinants survive when we average over every model?</h2>
+  <p class="lede">
+    With 9 candidate drivers of economic growth, there are
+    <span class="kbd">2<sup>9</sup> = 512</span> possible regression
+    specifications. Standard practice picks one of them — and crosses
+    its fingers. <strong>Bayesian Model Averaging (BMA)</strong> instead
+    weights every model by how well it fits the data, then asks the same
+    question of all 512 at once: <em>for each variable, what fraction
+    of the well-fitting models include it?</em> That fraction is the
+    Posterior Inclusion Probability (PIP).
+  </p>
+  <p class="lede">
+    This lab lets you watch the BMA machinery from four angles. You will
+    see how the data concentrates posterior mass on a handful of
+    specifications, compare PIPs across four different priors, run a
+    skeptical-vs-generous prior sensitivity stress test, and trace which
+    growth determinants tend to appear together in the best-fitting models.
+  </p>
+
+  <div class="card">
+    <h3>From flat prior to concentrated posterior — 512 models at once</h3>
+    <p>
+      Each tile below represents one of the 512 possible models. The
+      <strong>prior</strong> is uniform: every tile is equally bright. The
+      data favours a few models heavily — model #1 alone gets 8.9% of
+      the posterior probability mass. Watch the orange spots emerge as
+      the animation switches from prior to posterior and back.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <p class="note" style="margin-top:8px;">
+      <strong>What to look for:</strong> in the prior frame, every cell
+      has the same colour. In the posterior frame, a few cells glow
+      orange — those are the models that fit the data best, and they
+      carry most of the posterior weight.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 2</div>
+      <h4>PIP Forest</h4>
+      <p>The post's headline result: 9 variables × up to 4 priors. Hover to read PM, PSD, and Raftery's evidence tier.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Prior Sensitivity Lab</h4>
+      <p>Slide the prior model size from skeptical (2) to generous (8). Watch the variable hierarchy reshuffle in real time.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-joint">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Jointness Heatmap</h4>
+      <p>Which growth determinants are complements (always appear together) vs. substitutes? The HCGHM measure visualised.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>BMA (Bayesian Model Averaging)</summary>
+        <div class="gloss-body">Weighted average over all <em>2<sup>K</sup></em> regression models, where each weight is proportional to how well that model fits the data.</div>
+      </details>
+      <details class="gloss"><summary>PIP (Posterior Inclusion Probability)</summary>
+        <div class="gloss-body">For each variable, the total posterior weight on models that include it. PIP ≥ 0.80 is a common "robustness" threshold.</div>
+      </details>
+      <details class="gloss"><summary>PMP (Posterior Model Probability)</summary>
+        <div class="gloss-body">The Bayesian weight on a single specific model. PMPs sum to 1 across all 512 models.</div>
+      </details>
+      <details class="gloss"><summary>Dynamic panel</summary>
+        <div class="gloss-body">A panel regression that includes a <em>lagged dependent variable</em>. Lets GDP today depend on GDP yesterday — captures persistence and resolves reverse causality.</div>
+      </details>
+      <details class="gloss"><summary>EMS (Expected Model Size)</summary>
+        <div class="gloss-body">The prior expected number of regressors. EMS = K/2 (= 4.5 here) is the default; EMS = 2 is skeptical; EMS = 8 is generous.</div>
+      </details>
+      <details class="gloss"><summary>Weak exogeneity</summary>
+        <div class="gloss-body">Current regressors may be correlated with <em>past</em> shocks but not with the <em>current</em> idiosyncratic shock. Weaker than strict exogeneity — fits growth data.</div>
+      </details>
+      <details class="gloss"><summary>Jointness (HCGHM)</summary>
+        <div class="gloss-body">Hofmarcher et al.'s measure. Values near +1 = perfect complements (appear together); near 0 = independent; near −1 = substitutes.</div>
+      </details>
+      <details class="gloss"><summary>Dilution prior</summary>
+        <div class="gloss-body">George (2010). Down-weights models whose regressors are highly correlated, preventing PIP inflation from near-duplicate variables.</div>
+      </details>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>The three takeaways this lab is built around</h4>
+    <ul>
+      <li><strong>BMA replaces a binary pick with a probability scale.</strong> A kitchen-sink regression labels each variable "significant" or not. BMA scores each one on a continuous PIP scale from 0 to 1, integrating across all 512 specifications.</li>
+      <li><strong>Only <em>population</em> and <em>life expectancy</em> are robust.</strong> Across all four priors tested here, these two variables clear the PIP &gt; 0.50 threshold. Even under a sharply skeptical EMS = 2 prior, population stays at PIP = 0.964.</li>
+      <li><strong>Prior choice matters more than people admit.</strong> Investment share and democracy each move from PIP &gt; 0.7 (default prior) to PIP &lt; 0.5 (skeptical prior). The same data, three different priors, three different stories.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: PIP FOREST ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's headline result — interactively</h2>
+  <p class="lede">
+    The numbers below come straight from the post's BMA tables — same
+    9 variables, same 4 prior specifications. Each row is one growth
+    determinant; each panel is one prior. Toggle rows or priors to
+    declutter, hover any point to see the posterior mean, the posterior
+    standard deviation, and Raftery's evidence tier.
+  </p>
+
+  <div class="card">
+    <h3>Priors</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Binomial" checked> Binomial (EMS = 4.5)</label>
+      <label><input type="checkbox" value="Binomial-Beta" checked> Binomial-Beta</label>
+      <label><input type="checkbox" value="Skeptical EMS2" checked> Skeptical (EMS = 2)</label>
+      <label><input type="checkbox" value="Dilution" checked> Dilution</label>
+    </div>
+    <h3 style="margin-top:16px;">Variables</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Population" checked> Population</label>
+      <label><input type="checkbox" value="Life expectancy" checked> Life expectancy</label>
+      <label><input type="checkbox" value="Investment share" checked> Investment share</label>
+      <label><input type="checkbox" value="Trade openness" checked> Trade openness</label>
+      <label><input type="checkbox" value="Government share" checked> Government share</label>
+      <label><input type="checkbox" value="Education" checked> Education</label>
+      <label><input type="checkbox" value="Population growth" checked> Population growth</label>
+      <label><input type="checkbox" value="Democracy" checked> Democracy</label>
+      <label><input type="checkbox" value="Investment price" checked> Investment price</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Population sits at the right edge of every panel.</strong> PIP = 0.990 (Binomial), 0.998 (Binomial-Beta), 0.964 (Skeptical), 0.989 (Dilution). It is the only variable that clears 0.95 in <em>all</em> priors — the gold standard for robustness.</li>
+      <li><strong>The Binomial-Beta panel is much further right than the Skeptical panel.</strong> The Binomial-Beta prior lets the data say "I want big models" and pushes <em>every</em> variable above PIP = 0.92. The Skeptical EMS=2 prior pulls every variable below 0.65 except population.</li>
+      <li><strong>Watch life expectancy.</strong> It hovers near PIP = 0.86 under the default prior but drops to 0.637 under the skeptical prior. Still "robust" by Raftery's classification, but visibly less stable than population.</li>
+      <li><strong>The bottom four (population growth, democracy, education, investment price) are mostly noise.</strong> Their PIPs swing from 0.34 to 0.94 across priors — the data is ambiguous about whether they belong.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Reading the chart</h3>
+    <ul>
+      <li>Filled circle = posterior inclusion probability (PIP).</li>
+      <li>Solid teal line at <strong>0.95</strong> = "strong evidence" (Raftery 1995).</li>
+      <li>Dashed line at <strong>0.75</strong> = "positive evidence" threshold.</li>
+      <li>Dotted line at <strong>0.50</strong> = "weak evidence" floor.</li>
+      <li>Hover a circle for posterior mean, PSD, and evidence tier.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: PRIOR LAB ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Prior Sensitivity Lab — stress-test the rankings</h2>
+  <p class="lede">
+    The post's §12 shows that PIPs change when you change the prior.
+    This tab lets you turn that experiment into a slider. Move
+    <strong>Expected Model Size (EMS)</strong> from skeptical (2 of 9
+    regressors expected to matter) to generous (8 of 9), with or without
+    the dilution penalty. The bars below recompute every time you move
+    the slider. <strong>Watch which variables survive even when the
+    prior expects only 2 of them to matter.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Expected Model Size (EMS) <span class="value" id="sim-ems-val">4.5</span></label>
+      <input type="range" id="sim-ems" min="1.5" max="8" step="0.1" value="4.5" aria-label="expected model size">
+      <div class="hint">Move left → skeptical prior (fewer regressors expected). Move right → generous (more regressors expected).</div>
+    </div>
+    <div class="control">
+      <label>Dilution penalty ω <span class="value" id="sim-dil-val">0.0</span></label>
+      <input type="range" id="sim-dil" min="0" max="1" step="0.05" value="0" aria-label="dilution penalty">
+      <div class="hint">0 = no dilution; 1 = strong penalty for correlated regressors (George 2010).</div>
+    </div>
+    <div class="control">
+      <label>Robustness threshold <span class="value" id="sim-thr-val">0.75</span></label>
+      <input type="range" id="sim-thr" min="0.50" max="0.99" step="0.01" value="0.75" aria-label="robustness threshold">
+      <div class="hint">A variable is "robust" if its simulated PIP clears this threshold under the chosen prior.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-bars"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">variables above threshold</div>
+      <div class="stat-value teal" id="sim-stat-survive">—</div>
+      <div class="stat-sub">out of 9 candidates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">average PIP</div>
+      <div class="stat-value orange" id="sim-stat-avg">—</div>
+      <div class="stat-sub">across all 9 variables</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">implied posterior EMS</div>
+      <div class="stat-value" id="sim-stat-post-ems">—</div>
+      <div class="stat-sub">sum of PIPs</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">top variable</div>
+      <div class="stat-value" id="sim-stat-top">—</div>
+      <div class="stat-sub">always Population in the post</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Drag EMS down to 2.</strong> The post reports PIP(<code>pop</code>) = 0.964 and PIP(<code>lnlex</code>) = 0.637 at this setting. Watch the rest of the variables fall below 0.5 — the survivor count drops from 9 to 2.</li>
+      <li><strong>Drag EMS up to 8.</strong> All bars push to the right; every variable clears 0.90. This is the "generous prior" finding — when the prior is open to large models, the data is happy to include almost everything.</li>
+      <li><strong>Toggle dilution from 0 to 1.</strong> Variables that are correlated with Population (the highest-PIP regressor) lose a few percentage points because the dilution penalty discounts redundant overlap.</li>
+      <li><strong>Population is rock-solid.</strong> Its bar stays above 0.95 across the entire EMS range. That is what robustness looks like.</li>
+    </ul>
+    <p class="note">
+      The simulated PIPs in this tab are a stylised approximation of the
+      Moral-Benito posterior calibrated to match the four prior anchors
+      in <code>data/results.json</code>. They reproduce the qualitative
+      ranking and order of magnitude — not the exact numbers from
+      <code>bdsm::bma()</code>.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: JOINTNESS ====================== -->
+<section id="pane-joint" class="tab-pane" role="tabpanel" aria-labelledby="tab-joint">
+
+  <h2>Jointness Heatmap — which growth determinants travel together?</h2>
+  <p class="lede">
+    PIPs tell us which variables matter <em>on their own</em>. Jointness
+    tells us which variables matter <em>in combination</em>. Two
+    regressors are <strong>complements</strong> if they tend to appear in
+    the same models (high jointness), <strong>substitutes</strong> if
+    they tend to appear apart. The HCGHM measure (Hofmarcher et al.)
+    ranges from −1 (perfect substitutes) to +1 (perfect complements).
+  </p>
+
+  <div class="card">
+    <h3>HCGHM jointness — all 36 pairs of the 9 regressors</h3>
+    <div class="chart-area" id="joint-heat"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Every cell is positive.</strong> In this post, no two regressors act as substitutes. Every pair is a complement — each variable adds something the others do not capture.</li>
+      <li><strong>The hottest cell is <code>pop × lnlex</code> at 0.711.</strong> Population and life expectancy are the strongest complements. They are also the only two variables that survive across <em>all</em> priors. The two facts go together: robust variables anchor the best-fitting models, and they are typically anchored together.</li>
+      <li><strong>The <code>pop</code> row and column are uniformly hot.</strong> Population co-appears with everything — it is the connective tissue of the top models. Investment price (<code>ipr</code>) is the coldest row, consistent with its lowest PIP (0.656).</li>
+      <li><strong>Three pairs clear 0.50:</strong> <code>pop × lnlex</code> (0.71), <code>pop × ish</code> (0.53), <code>pop × opem</code> (0.52). These are the post's most reliable two-variable building blocks.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Variable codes</h3>
+    <div class="grid grid-2">
+      <div><code>ish</code> Investment share &middot; <code>sed</code> Education &middot; <code>pgrw</code> Population growth</div>
+      <div><code>pop</code> Population &middot; <code>ipr</code> Investment price &middot; <code>opem</code> Trade openness</div>
+      <div><code>gsh</code> Government share &middot; <code>lnlex</code> Life expectancy &middot; <code>polity</code> Democracy</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to the other tabs</h3>
+    <p>
+      The hottest jointness cell is also the most robust PIP pair. The
+      same two variables (<code>pop</code> and <code>lnlex</code>) that
+      survive the Skeptical EMS = 2 prior in Tab 3 are also the only pair
+      with HCGHM &gt; 0.7 here. The economic story is consistent across
+      every angle of the BMA machinery: population size and public
+      health (life expectancy) are the structural anchors of long-run
+      growth in this 73-country, 4-decade panel.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Dynamic Panel BMA: Which Factors Truly Drive Economic Growth?</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

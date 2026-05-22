@@ -1,0 +1,93 @@
+{
+  "_comment": "Direct / Indirect / Total effects of logp (log real price) and logy (log real income) on logc (log per-capita cigarette consumption) across the spatial panel taxonomy. Numbers parsed from §6.1 (SDM standard), §6.2 (SDM Lee-Yu), and §8 (dynamic SDM variants) of the Cigarette demand tutorial. The 'method' column doubles as model name; 'outcome' encodes which effect (Direct, Indirect, Total) and which regressor (logp, logy). SEs reconstructed from xsmle output where direct/indirect/total are reported; for non-spatial benchmarks (Pooled OLS, 2-way FE), the indirect effect is set to zero by construction and the direct equals the regression coefficient. ci_lo and ci_hi computed as estimate +/- 1.96 * se. n_selected column repurposed: number of structural spatial parameters (rho + tau + psi + Wx).",
+
+  "estimates": [
+    { "method": "Pooled OLS",     "outcome": "logp Direct",   "estimate": -0.3857, "se": 0.0310, "ci_lo": -0.4464, "ci_hi": -0.3250, "n_selected": 0 },
+    { "method": "Region FE",      "outcome": "logp Direct",   "estimate": -0.2307, "se": 0.0276, "ci_lo": -0.2849, "ci_hi": -0.1765, "n_selected": 0 },
+    { "method": "Time FE",        "outcome": "logp Direct",   "estimate": -0.8613, "se": 0.0390, "ci_lo": -0.9377, "ci_hi": -0.7849, "n_selected": 0 },
+    { "method": "Two-way FE",     "outcome": "logp Direct",   "estimate": -0.4020, "se": 0.0273, "ci_lo": -0.4555, "ci_hi": -0.3485, "n_selected": 0 },
+    { "method": "SDM",            "outcome": "logp Direct",   "estimate": -0.3131, "se": 0.0286, "ci_lo": -0.3691, "ci_hi": -0.2572, "n_selected": 3 },
+    { "method": "SDM (Lee-Yu)",   "outcome": "logp Direct",   "estimate": -0.3104, "se": 0.0288, "ci_lo": -0.3668, "ci_hi": -0.2540, "n_selected": 3 },
+    { "method": "Dyn SDM (tau)",  "outcome": "logp Direct",   "estimate": -0.1516, "se": 0.0227, "ci_lo": -0.1961, "ci_hi": -0.1072, "n_selected": 4 },
+    { "method": "Dyn SDM (full)", "outcome": "logp Direct",   "estimate": -0.1499, "se": 0.0227, "ci_lo": -0.1943, "ci_hi": -0.1055, "n_selected": 5 },
+
+    { "method": "Pooled OLS",     "outcome": "logp Indirect", "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 0 },
+    { "method": "Region FE",      "outcome": "logp Indirect", "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 0 },
+    { "method": "Time FE",        "outcome": "logp Indirect", "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 0 },
+    { "method": "Two-way FE",     "outcome": "logp Indirect", "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 0 },
+    { "method": "SDM",            "outcome": "logp Indirect", "estimate": -0.3138, "se": 0.0812, "ci_lo": -0.4730, "ci_hi": -0.1546, "n_selected": 3 },
+    { "method": "SDM (Lee-Yu)",   "outcome": "logp Indirect", "estimate": -0.3123, "se": 0.0826, "ci_lo": -0.4741, "ci_hi": -0.1504, "n_selected": 3 },
+    { "method": "Dyn SDM (tau)",  "outcome": "logp Indirect", "estimate": -0.0820, "se": 0.0580, "ci_lo": -0.1957, "ci_hi":  0.0317, "n_selected": 4 },
+    { "method": "Dyn SDM (full)", "outcome": "logp Indirect", "estimate": -0.0720, "se": 0.0590, "ci_lo": -0.1876, "ci_hi":  0.0436, "n_selected": 5 },
+
+    { "method": "Pooled OLS",     "outcome": "logp Total",    "estimate": -0.3857, "se": 0.0310, "ci_lo": -0.4464, "ci_hi": -0.3250, "n_selected": 0 },
+    { "method": "Region FE",      "outcome": "logp Total",    "estimate": -0.2307, "se": 0.0276, "ci_lo": -0.2849, "ci_hi": -0.1765, "n_selected": 0 },
+    { "method": "Time FE",        "outcome": "logp Total",    "estimate": -0.8613, "se": 0.0390, "ci_lo": -0.9377, "ci_hi": -0.7849, "n_selected": 0 },
+    { "method": "Two-way FE",     "outcome": "logp Total",    "estimate": -0.4020, "se": 0.0273, "ci_lo": -0.4555, "ci_hi": -0.3485, "n_selected": 0 },
+    { "method": "SDM",            "outcome": "logp Total",    "estimate": -0.6270, "se": 0.0867, "ci_lo": -0.7968, "ci_hi": -0.4571, "n_selected": 3 },
+    { "method": "SDM (Lee-Yu)",   "outcome": "logp Total",    "estimate": -0.6227, "se": 0.0878, "ci_lo": -0.7949, "ci_hi": -0.4505, "n_selected": 3 },
+    { "method": "Dyn SDM (tau)",  "outcome": "logp Total",    "estimate": -0.2336, "se": 0.0623, "ci_lo": -0.3557, "ci_hi": -0.1115, "n_selected": 4 },
+    { "method": "Dyn SDM (full)", "outcome": "logp Total",    "estimate": -0.2219, "se": 0.0631, "ci_lo": -0.3456, "ci_hi": -0.0982, "n_selected": 5 },
+
+    { "method": "Pooled OLS",     "outcome": "logy Direct",   "estimate":  0.3724, "se": 0.0265, "ci_lo":  0.3205, "ci_hi":  0.4244, "n_selected": 0 },
+    { "method": "Region FE",      "outcome": "logy Direct",   "estimate": -0.0145, "se": 0.0390, "ci_lo": -0.0910, "ci_hi":  0.0619, "n_selected": 0 },
+    { "method": "Time FE",        "outcome": "logy Direct",   "estimate":  0.8045, "se": 0.0466, "ci_lo":  0.7131, "ci_hi":  0.8959, "n_selected": 0 },
+    { "method": "Two-way FE",     "outcome": "logy Direct",   "estimate":  0.1193, "se": 0.0478, "ci_lo":  0.0255, "ci_hi":  0.2132, "n_selected": 0 },
+    { "method": "SDM",            "outcome": "logy Direct",   "estimate":  0.0941, "se": 0.0489, "ci_lo": -0.0017, "ci_hi":  0.1899, "n_selected": 3 },
+    { "method": "SDM (Lee-Yu)",   "outcome": "logy Direct",   "estimate":  0.0935, "se": 0.0495, "ci_lo": -0.0034, "ci_hi":  0.1905, "n_selected": 3 },
+    { "method": "Dyn SDM (tau)",  "outcome": "logy Direct",   "estimate":  0.0320, "se": 0.0387, "ci_lo": -0.0438, "ci_hi":  0.1078, "n_selected": 4 },
+    { "method": "Dyn SDM (full)", "outcome": "logy Direct",   "estimate":  0.0300, "se": 0.0388, "ci_lo": -0.0460, "ci_hi":  0.1060, "n_selected": 5 },
+
+    { "method": "Pooled OLS",     "outcome": "logy Indirect", "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 0 },
+    { "method": "Region FE",      "outcome": "logy Indirect", "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 0 },
+    { "method": "Time FE",        "outcome": "logy Indirect", "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 0 },
+    { "method": "Two-way FE",     "outcome": "logy Indirect", "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 0 },
+    { "method": "SDM",            "outcome": "logy Indirect", "estimate":  0.2683, "se": 0.1100, "ci_lo":  0.0528, "ci_hi":  0.4839, "n_selected": 3 },
+    { "method": "SDM (Lee-Yu)",   "outcome": "logy Indirect", "estimate":  0.2739, "se": 0.1115, "ci_lo":  0.0553, "ci_hi":  0.4925, "n_selected": 3 },
+    { "method": "Dyn SDM (tau)",  "outcome": "logy Indirect", "estimate":  0.0750, "se": 0.0810, "ci_lo": -0.0838, "ci_hi":  0.2338, "n_selected": 4 },
+    { "method": "Dyn SDM (full)", "outcome": "logy Indirect", "estimate":  0.0580, "se": 0.0820, "ci_lo": -0.1027, "ci_hi":  0.2187, "n_selected": 5 },
+
+    { "method": "Pooled OLS",     "outcome": "logy Total",    "estimate":  0.3724, "se": 0.0265, "ci_lo":  0.3205, "ci_hi":  0.4244, "n_selected": 0 },
+    { "method": "Region FE",      "outcome": "logy Total",    "estimate": -0.0145, "se": 0.0390, "ci_lo": -0.0910, "ci_hi":  0.0619, "n_selected": 0 },
+    { "method": "Time FE",        "outcome": "logy Total",    "estimate":  0.8045, "se": 0.0466, "ci_lo":  0.7131, "ci_hi":  0.8959, "n_selected": 0 },
+    { "method": "Two-way FE",     "outcome": "logy Total",    "estimate":  0.1193, "se": 0.0478, "ci_lo":  0.0255, "ci_hi":  0.2132, "n_selected": 0 },
+    { "method": "SDM",            "outcome": "logy Total",    "estimate":  0.3625, "se": 0.1217, "ci_lo":  0.1240, "ci_hi":  0.6009, "n_selected": 3 },
+    { "method": "SDM (Lee-Yu)",   "outcome": "logy Total",    "estimate":  0.3675, "se": 0.1236, "ci_lo":  0.1253, "ci_hi":  0.6096, "n_selected": 3 },
+    { "method": "Dyn SDM (tau)",  "outcome": "logy Total",    "estimate":  0.1070, "se": 0.0860, "ci_lo": -0.0616, "ci_hi":  0.2756, "n_selected": 4 },
+    { "method": "Dyn SDM (full)", "outcome": "logy Total",    "estimate":  0.0880, "se": 0.0875, "ci_lo": -0.0835, "ci_hi":  0.2595, "n_selected": 5 }
+  ],
+
+  "model_summary": [
+    { "model": "Pooled OLS",     "loglik": null,    "rho": null,   "tau": null,   "psi": null,   "theta_logp": null,   "theta_logy": null,  "r2": 0.224 },
+    { "model": "Region FE",      "loglik": null,    "rho": null,   "tau": null,   "psi": null,   "theta_logp": null,   "theta_logy": null,  "r2": 0.406 },
+    { "model": "Time FE",        "loglik": null,    "rho": null,   "tau": null,   "psi": null,   "theta_logp": null,   "theta_logy": null,  "r2": 0.507 },
+    { "model": "Two-way FE",     "loglik": null,    "rho": null,   "tau": null,   "psi": null,   "theta_logp": null,   "theta_logy": null,  "r2": 0.789 },
+    { "model": "SDM",            "loglik": 1971.52, "rho": 0.265,  "tau": null,   "psi": null,   "theta_logp": -0.206, "theta_logy": 0.180, "r2": null },
+    { "model": "SDM (Lee-Yu)",   "loglik": 1932.47, "rho": 0.260,  "tau": null,   "psi": null,   "theta_logp": -0.208, "theta_logy": 0.187, "r2": null },
+    { "model": "Dyn SDM (tau)",  "loglik": null,    "rho": 0.102,  "tau": 0.654,  "psi": null,   "theta_logp": -0.071, "theta_logy": 0.059, "r2": null },
+    { "model": "Dyn SDM (psi)",  "loglik": null,    "rho": 0.152,  "tau": null,   "psi": 0.271,  "theta_logp": -0.143, "theta_logy": 0.132, "r2": null },
+    { "model": "Dyn SDM (full)", "loglik": null,    "rho": 0.080,  "tau": 0.639,  "psi": 0.049,  "theta_logp": -0.064, "theta_logy": 0.047, "r2": null }
+  ],
+
+  "wald_tests": {
+    "SAR_restriction":  { "label": "SDM -> SAR (theta = 0)",        "chi2":  12.87, "df": 2, "p_value": 0.0016, "rejected": true },
+    "SLX_restriction":  { "label": "SDM -> SLX (rho = 0)",          "chi2":  61.04, "df": 1, "p_value": 0.0000, "rejected": true },
+    "SEM_restriction":  { "label": "SDM -> SEM (theta + rho*beta = 0)", "chi2": 8.49, "df": 2, "p_value": 0.0143, "rejected": true }
+  },
+
+  "diagnostics": {
+    "n_states": 46,
+    "n_years": 30,
+    "n_obs": 1380,
+    "year_range": "1963-1992",
+    "logc_mean": 4.626,
+    "logc_sd_between": 0.225,
+    "logc_sd_within": 0.125,
+    "logp_mean": 3.648,
+    "logp_sd_between": 0.193,
+    "logp_sd_within": 0.280,
+    "logy_mean": 1.616,
+    "logy_sd_between": 0.136,
+    "logy_sd_within": 0.210
+  }
+}

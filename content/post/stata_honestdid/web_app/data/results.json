@@ -1,0 +1,70 @@
+{
+  "estimates": [
+    { "method": "Original",   "outcome": "2x2 DiD (1 pre)",   "M": null,   "estimate": 0.0425, "se": 0.0084, "ci_lo":  0.0260, "ci_hi": 0.0590, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "2x2 DiD (1 pre)",   "M": 0.0,    "estimate": 0.0425, "se": null,   "ci_lo":  0.0260, "ci_hi": 0.0590, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "2x2 DiD (1 pre)",   "M": 0.5,    "estimate": 0.0410, "se": null,   "ci_lo":  0.0220, "ci_hi": 0.0600, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "2x2 DiD (1 pre)",   "M": 1.0,    "estimate": 0.0405, "se": null,   "ci_lo":  0.0170, "ci_hi": 0.0640, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "2x2 DiD (1 pre)",   "M": 1.5,    "estimate": 0.0395, "se": null,   "ci_lo":  0.0100, "ci_hi": 0.0690, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "2x2 DiD (1 pre)",   "M": 2.0,    "estimate": 0.0395, "se": null,   "ci_lo":  0.0030, "ci_hi": 0.0760, "n_selected": null },
+
+    { "method": "Original",   "outcome": "Full panel (5 pre)", "M": null,  "estimate": 0.0425, "se": 0.0083, "ci_lo":  0.0260, "ci_hi": 0.0590, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Full panel (5 pre)", "M": 0.0,   "estimate": 0.0425, "se": null,   "ci_lo":  0.0270, "ci_hi": 0.0580, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Full panel (5 pre)", "M": 0.5,   "estimate": 0.0420, "se": null,   "ci_lo":  0.0210, "ci_hi": 0.0630, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Full panel (5 pre)", "M": 1.0,   "estimate": 0.0420, "se": null,   "ci_lo":  0.0130, "ci_hi": 0.0710, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Full panel (5 pre)", "M": 1.5,   "estimate": 0.0420, "se": null,   "ci_lo":  0.0030, "ci_hi": 0.0810, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Full panel (5 pre)", "M": 2.0,   "estimate": 0.0420, "se": null,   "ci_lo": -0.0070, "ci_hi": 0.0910, "n_selected": null },
+
+    { "method": "Original",   "outcome": "Average 2014-2015", "M": null,   "estimate": 0.0555, "se": 0.0083, "ci_lo":  0.0390, "ci_hi": 0.0720, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Average 2014-2015", "M": 0.0,    "estimate": 0.0555, "se": null,   "ci_lo":  0.0390, "ci_hi": 0.0720, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Average 2014-2015", "M": 0.5,    "estimate": 0.0540, "se": null,   "ci_lo":  0.0290, "ci_hi": 0.0790, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Average 2014-2015", "M": 1.0,    "estimate": 0.0530, "se": null,   "ci_lo":  0.0140, "ci_hi": 0.0920, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Average 2014-2015", "M": 1.5,    "estimate": 0.0525, "se": null,   "ci_lo": -0.0020, "ci_hi": 0.1070, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Average 2014-2015", "M": 2.0,    "estimate": 0.0520, "se": null,   "ci_lo": -0.0190, "ci_hi": 0.1230, "n_selected": null },
+
+    { "method": "Original",   "outcome": "Staggered (csdid)", "M": null,   "estimate": 0.0425, "se": 0.0080, "ci_lo":  0.0270, "ci_hi": 0.0580, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Staggered (csdid)", "M": 0.0,    "estimate": 0.0425, "se": null,   "ci_lo":  0.0270, "ci_hi": 0.0580, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Staggered (csdid)", "M": 0.5,    "estimate": 0.0420, "se": null,   "ci_lo":  0.0220, "ci_hi": 0.0620, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Staggered (csdid)", "M": 1.0,    "estimate": 0.0425, "se": null,   "ci_lo":  0.0140, "ci_hi": 0.0710, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Staggered (csdid)", "M": 1.5,    "estimate": 0.0420, "se": null,   "ci_lo":  0.0040, "ci_hi": 0.0800, "n_selected": null },
+    { "method": "DeltaRM",    "outcome": "Staggered (csdid)", "M": 2.0,    "estimate": 0.0415, "se": null,   "ci_lo": -0.0070, "ci_hi": 0.0900, "n_selected": null },
+
+    { "method": "Original",   "outcome": "Smoothness (SD)",   "M": null,   "estimate": 0.0425, "se": 0.0083, "ci_lo":  0.0260, "ci_hi": 0.0590, "n_selected": null },
+    { "method": "DeltaSD",    "outcome": "Smoothness (SD)",   "M": 0.000,  "estimate": 0.0420, "se": null,   "ci_lo":  0.0260, "ci_hi": 0.0580, "n_selected": null },
+    { "method": "DeltaSD",    "outcome": "Smoothness (SD)",   "M": 0.005,  "estimate": 0.0370, "se": null,   "ci_lo":  0.0130, "ci_hi": 0.0610, "n_selected": null },
+    { "method": "DeltaSD",    "outcome": "Smoothness (SD)",   "M": 0.010,  "estimate": 0.0360, "se": null,   "ci_lo":  0.0070, "ci_hi": 0.0650, "n_selected": null },
+    { "method": "DeltaSD",    "outcome": "Smoothness (SD)",   "M": 0.015,  "estimate": 0.0360, "se": null,   "ci_lo":  0.0020, "ci_hi": 0.0700, "n_selected": null },
+    { "method": "DeltaSD",    "outcome": "Smoothness (SD)",   "M": 0.020,  "estimate": 0.0360, "se": null,   "ci_lo": -0.0030, "ci_hi": 0.0750, "n_selected": null },
+    { "method": "DeltaSD",    "outcome": "Smoothness (SD)",   "M": 0.025,  "estimate": 0.0360, "se": null,   "ci_lo": -0.0080, "ci_hi": 0.0800, "n_selected": null },
+    { "method": "DeltaSD",    "outcome": "Smoothness (SD)",   "M": 0.030,  "estimate": 0.0360, "se": null,   "ci_lo": -0.0130, "ci_hi": 0.0850, "n_selected": null },
+    { "method": "DeltaSD",    "outcome": "Smoothness (SD)",   "M": 0.035,  "estimate": 0.0360, "se": null,   "ci_lo": -0.0180, "ci_hi": 0.0900, "n_selected": null },
+    { "method": "DeltaSD",    "outcome": "Smoothness (SD)",   "M": 0.040,  "estimate": 0.0360, "se": null,   "ci_lo": -0.0230, "ci_hi": 0.0950, "n_selected": null }
+  ],
+  "event_study": [
+    { "year": 2008, "event_time": -6, "coef": -0.0096, "se": 0.0077, "ci_lo": -0.0252, "ci_hi":  0.0060 },
+    { "year": 2009, "event_time": -5, "coef": -0.0133, "se": 0.0074, "ci_lo": -0.0282, "ci_hi":  0.0016 },
+    { "year": 2010, "event_time": -4, "coef": -0.0019, "se": 0.0068, "ci_lo": -0.0156, "ci_hi":  0.0118 },
+    { "year": 2011, "event_time": -3, "coef": -0.0064, "se": 0.0070, "ci_lo": -0.0207, "ci_hi":  0.0079 },
+    { "year": 2012, "event_time": -2, "coef": -0.0063, "se": 0.0059, "ci_lo": -0.0183, "ci_hi":  0.0058 },
+    { "year": 2013, "event_time": -1, "coef":  0.0000, "se": 0.0000, "ci_lo":  0.0000, "ci_hi":  0.0000 },
+    { "year": 2014, "event_time":  0, "coef":  0.0423, "se": 0.0083, "ci_lo":  0.0255, "ci_hi":  0.0592 },
+    { "year": 2015, "event_time":  1, "coef":  0.0687, "se": 0.0109, "ci_lo":  0.0467, "ci_hi":  0.0907 }
+  ],
+  "two_by_two": {
+    "treated_pre":  0.6545,
+    "treated_post": 0.7809,
+    "control_pre":  0.6190,
+    "control_post": 0.6836,
+    "att":          0.0618,
+    "se":           0.0085,
+    "ci_lo":        0.0445,
+    "ci_hi":        0.0791,
+    "t_stat":       7.24
+  },
+  "breakdown_values": [
+    { "analysis": "2x2 DiD (1 pre)",     "restriction": "DeltaRM", "breakdown": 2.20, "robustness": "Very robust"          },
+    { "analysis": "Full panel (5 pre)",  "restriction": "DeltaRM", "breakdown": 1.55, "robustness": "Robust"               },
+    { "analysis": "Average 2014-2015",   "restriction": "DeltaRM", "breakdown": 1.40, "robustness": "Moderately robust"    },
+    { "analysis": "Staggered (csdid)",   "restriction": "DeltaRM", "breakdown": 1.65, "robustness": "Robust"               },
+    { "analysis": "Smoothness (SD)",     "restriction": "DeltaSD", "breakdown": 0.018, "robustness": "Moderately robust"    }
+  ]
+}

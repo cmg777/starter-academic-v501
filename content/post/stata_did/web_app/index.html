@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>DiD in Stata — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Introduction to Difference-in-Differences (DiD) in Stata'. Build intuition for parallel trends, the 2×2 DiD calculation, why the naive ITS overstates the effect by 43%, and the equivalence of five Stata estimators.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>DiD in Stata — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Introduction to Difference-in-Differences (DiD) in Stata</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"     class="tab active" data-pane="pane-intro"     role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-trends"    class="tab"        data-pane="pane-trends"    role="tab" aria-selected="false">2 · Parallel Trends</button>
+  <button id="tab-showdown"  class="tab"        data-pane="pane-showdown"  role="tab" aria-selected="false">3 · DiD vs ITS Sim</button>
+  <button id="tab-forest"    class="tab"        data-pane="pane-forest"    role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why DiD? Why not just compare before to after?</h2>
+  <p class="lede">
+    A government implements an after-school tutoring program in 10 of 35 high
+    schools. Did the program improve student GPA? A naive before-after look at
+    the treated schools shows a jump of <strong>36.20 GPA points</strong> — but
+    that estimate absorbs whatever time-trend was already lifting <em>every</em>
+    school in the district. The 25 untreated comparison schools rose
+    <strong>10.88 points</strong> on their own. The <strong>Difference-in-Differences</strong>
+    estimator subtracts that drift first, recovering an ATT of
+    <strong>25.32 points</strong> — about <strong>30%</strong> smaller than the
+    naive number.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. In four tabs you will (1)
+    slide a parallel-trends violation knob and watch the DiD estimate move;
+    (2) compare DiD against the naive ITS across 100 simulated panels; and
+    (3) explore the post's five-estimator agreement on the real
+    Corral-Yang (2024) case study — all converging on the same
+    25.32-point ATT.
+  </p>
+
+  <div class="card">
+    <h3>Parallel trends — the assumption that does all the work</h3>
+    <p>
+      DiD is identified by one assumption: in the absence of treatment, the
+      treated group's GPA would have moved in parallel with the comparison
+      group's. The orange line is what we actually observe; the dashed grey
+      line is the <em>unobserved counterfactual</em>. The vertical gap at
+      <span class="kbd">t+1</span> is the DiD effect.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <p class="caption">
+      Adjust the violation slider in Tab 2 to see how the estimated DiD effect
+      moves with the assumed deviation from parallel trends.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-trends">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Parallel Trends Lab</h4>
+      <p>Slide the violation knob and the true treatment effect. Watch the counterfactual move and the 2×2 DiD bias appear in real time.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>DiD vs ITS Simulator</h4>
+      <p>Two estimators on the same synthetic panel: DiD vs the naive ITS that ignores the comparison group. Run 100 sims and watch ITS systematically inflate the effect.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Five-Estimator Forest Plot</h4>
+      <p>The post's headline finding: <code>diff</code>, <code>reg</code>, <code>didregress</code>, <code>xtreg</code>, and <code>reghdfe</code> all return the same 25.32 ATT — only the SEs differ.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>2×2 DiD</summary>
+        <div class="gloss-body">Take the post-period treated-minus-control gap, subtract the pre-period treated-minus-control gap. The double difference is the ATT under parallel trends.</div>
+      </details>
+      <details class="gloss"><summary>Parallel trends assumption</summary>
+        <div class="gloss-body">Absent treatment, treated and control would have moved in lockstep. <em>The single identifying assumption</em> of DiD. Starting-level differences are fine; differences in slopes break the design.</div>
+      </details>
+      <details class="gloss"><summary>ATT</summary>
+        <div class="gloss-body">Average Treatment effect on the Treated: <code>E[Y(1) − Y(0) | D=1]</code>. The causal effect for the 10 schools that received the program. <em>Not</em> the ATE — does not extrapolate to non-treated schools.</div>
+      </details>
+      <details class="gloss"><summary>Counterfactual</summary>
+        <div class="gloss-body">The post-period outcome treated schools would have had <em>without</em> treatment. Never observed. DiD constructs it as <em>treated pre-level + control's pre-to-post change</em>: 60.17 + 10.88 = 71.05.</div>
+      </details>
+      <details class="gloss"><summary>TWFE (two-way fixed effects)</summary>
+        <div class="gloss-body">Regression DiD: <code>Y_it = γ_i + θ_t + β · txp_it + ε_it</code>. The coefficient on the treatment-period interaction <code>txp</code> is the DiD ATT.</div>
+      </details>
+      <details class="gloss"><summary>Event study</summary>
+        <div class="gloss-body">A dynamic specification with one coefficient per period relative to treatment. Leads test parallel pre-trends; lags trace dynamic effects. The post uses Stata's <code>eventdd</code>.</div>
+      </details>
+      <details class="gloss"><summary>Interrupted Time Series (ITS)</summary>
+        <div class="gloss-body">Single-group before-after. No control. Equates secular drift with treatment effect. In the post, ITS = 36.20 (vs DiD = 25.32) because it absorbs the 10.88-point district-wide trend.</div>
+      </details>
+      <details class="gloss"><summary>Clustered standard errors</summary>
+        <div class="gloss-body">SEs that allow within-school correlation. The post's <code>didregress</code> auto-clusters at the school level, lifting the SE from 0.61 to 0.83. Different SE, same point estimate.</div>
+      </details>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The three takeaways this app reruns in code</h3>
+    <ol class="takeaways">
+      <li>
+        <strong>The naive ITS overstates the effect by 43%.</strong>
+        ITS reports 36.20 GPA points; DiD reports 25.32. The
+        <strong>10.88-point</strong> gap is district-wide drift that ITS
+        cannot subtract — the price of skipping a comparison group.
+      </li>
+      <li>
+        <strong>Five Stata estimators converge on the same ATT.</strong>
+        <code>diff</code>, <code>reg</code>, <code>didregress</code>,
+        <code>xtreg</code>, and <code>reghdfe</code> all return
+        <strong>25.31–25.33</strong>. They differ only in how standard
+        errors are computed (clustering and robust corrections).
+      </li>
+      <li>
+        <strong>The event study supports parallel trends.</strong>
+        Pre-treatment leads are 0.34, −0.32, 0.59 — all
+        <em>statistically insignificant</em>. Post-treatment lags are
+        24.71–25.70 with no fade-out, suggesting a sustained effect.
+      </li>
+    </ol>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: PARALLEL TRENDS LAB ====================== -->
+<section id="pane-trends" class="tab-pane" role="tabpanel" aria-labelledby="tab-trends">
+
+  <h2>Parallel-trends lab</h2>
+  <p class="lede">
+    The single identifying assumption: <em>without treatment</em>, treated
+    schools' GPA would move in parallel with comparison schools'. Slide the
+    <span class="kbd">divergence δ</span> to add a per-period violation on top
+    of that, and watch what the standard 2×2 DiD estimator returns.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Per-period treatment effect δ&nbsp;<span class="value" id="pt-d-val">25.000</span></label>
+      <input type="range" id="pt-d" min="0" max="40" step="1" value="25">
+      <p class="caption">Magnitude of the true ATT. Set to 25 to match the post; slide to see what would happen for different program sizes.</p>
+    </div>
+    <div class="control">
+      <label>Pre-trend slope (violation)&nbsp;<span class="value" id="pt-pre-val">0.000</span></label>
+      <input type="range" id="pt-pre" min="-10" max="10" step="0.5" value="0">
+      <p class="caption">Tilts the counterfactual relative to the control. A pre-trend &gt; 0 means treated schools were drifting upward faster than comparison schools — a parallel-trends <em>violation</em>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What the lines show</h3>
+    <div class="chart-area" id="pt-chart"></div>
+    <p class="caption">
+      <span style="color:#6a9bcc;">Blue</span> = comparison group mean.
+      <span style="color:#8b9dc3;">Dashed grey</span> = counterfactual treated (what we would see if parallel trends held).
+      <span style="color:#d97757;">Orange</span> = observed treated.
+      The DiD effect at t+1 is annotated top-right.
+    </p>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Simple 2×2 DiD estimator</h3>
+      <div class="method-row"><span class="label">α̂_DiD (t+1 vs. t-2)</span><span class="val" id="pt-att">—</span></div>
+      <div class="method-row"><span class="label">True effect δ</span><span class="val" id="pt-true">—</span></div>
+      <div class="method-row"><span class="label">Bias (α̂ − truth)</span><span class="val" id="pt-bias">—</span></div>
+    </div>
+    <div class="card">
+      <h3>What to look for</h3>
+      <ul class="bullets">
+        <li>With pre-trend = 0, DiD is <em>unbiased</em> for the true ATT — bias is essentially zero.</li>
+        <li>With a positive pre-trend (treated drifting up faster), DiD <em>over-states</em> a positive program effect.</li>
+        <li>With a negative pre-trend, DiD <em>under-states</em> it.</li>
+        <li>In the post, the event-study leads are 0.34, −0.32, 0.59 (all p &gt; 0.10) — close enough to zero that the parallel-trends assumption is plausible.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 3: DID VS ITS SHOWDOWN ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>DiD vs ITS — head-to-head on simulated panels</h2>
+  <p class="lede">
+    Two estimators on the same data. <strong>DiD</strong> uses the comparison
+    group to subtract the secular trend; <strong>ITS</strong> (Interrupted
+    Time Series) looks only at the treated group's before-after change. When
+    the secular trend is nonzero, ITS systematically over-estimates the
+    program effect. The post's data shows this exactly: ITS = 36.20,
+    DiD = 25.32, gap = 10.88 (the district-wide drift).
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Schools per group <span class="value" id="sh-n-val">35</span></label>
+      <input type="range" id="sh-n" min="10" max="100" step="5" value="35">
+      <p class="caption">10 treated + n−10 comparison schools per simulated panel.</p>
+    </div>
+    <div class="control">
+      <label>True ATT δ <span class="value" id="sh-d-val">25.000</span></label>
+      <input type="range" id="sh-d" min="0" max="40" step="1" value="25">
+      <p class="caption">The true program effect, in GPA points. Matched to the post's 25.32.</p>
+    </div>
+    <div class="control">
+      <label>Secular trend (per period) <span class="value" id="sh-g-val">10.880</span></label>
+      <input type="range" id="sh-g" min="0" max="20" step="0.5" value="10.88">
+      <p class="caption">District-wide drift that affects both groups equally. ITS absorbs this; DiD removes it.</p>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="sh-s-val">3.00</span></label>
+      <input type="range" id="sh-s" min="0.5" max="10" step="0.5" value="3">
+      <p class="caption">School-level noise in GPA points.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">DiD (2×2)</span></h3>
+      <div class="method-row"><span class="label">α̂ (DiD)</span><span class="val" id="sh-cs-alpha">—</span></div>
+      <div class="method-row"><span class="label">true ATT</span><span class="val" id="sh-cs-true">—</span></div>
+      <div class="method-row"><span class="label">bias</span><span class="val" id="sh-cs-bias">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">ITS (naive)</span></h3>
+      <div class="method-row"><span class="label">α̂ (ITS)</span><span class="val" id="sh-tw-alpha">—</span></div>
+      <div class="method-row"><span class="label">true ATT</span><span class="val" id="sh-tw-true">—</span></div>
+      <div class="method-row"><span class="label">bias</span><span class="val" id="sh-tw-bias">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="card">
+    <h3>Distribution across 100 simulated panels</h3>
+    <p>
+      Each draw re-randomises school-level noise (same DGP, same seed family).
+      With a nonzero secular trend, ITS's histogram sits to the right of the
+      truth (bias ≈ the secular trend) while DiD's histogram stays centred.
+      This is the §3 message of the post: ITS confuses drift with effect; DiD
+      separates them.
+    </p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="display:none;"></div>
+  </div>
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT + EVENT STUDY ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's headline results, interactively</h2>
+  <p class="lede">
+    Every estimator the post computes, plotted on one axis. The
+    <code>diff</code>, <code>reg</code>, <code>didregress</code>,
+    <code>xtreg</code>, and <code>reghdfe</code> commands all converge on
+    <strong>25.31–25.33 GPA points</strong>. The naive ITS estimator
+    (36.20) is included so you can <em>see</em> the 10.88-point inflation
+    against the others. Toggle methods on/off; hover for SEs and CIs.
+  </p>
+
+  <div class="card">
+    <h3>Methods to display</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="diff (manual)" checked> diff (manual)</label>
+      <label><input type="checkbox" value="reg (OLS interaction)" checked> reg (OLS interaction)</label>
+      <label><input type="checkbox" value="didregress (Stata 17+)" checked> didregress (Stata 17+)</label>
+      <label><input type="checkbox" value="xtreg (TWFE)" checked> xtreg (TWFE)</label>
+      <label><input type="checkbox" value="reghdfe (HD-TWFE)" checked> reghdfe (HD-TWFE)</label>
+      <label><input type="checkbox" value="reghdfe + covariate" checked> reghdfe + covariate</label>
+      <label><input type="checkbox" value="ITS (naive before-after)"> ITS (naive — adds 10.88 inflation)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Event study — dynamic treatment effects from <code>eventdd</code></h3>
+    <p>
+      The dynamic specification replaces the single <code>txp</code>
+      interaction with one coefficient per period relative to treatment onset.
+      The pre-treatment leads (event time −4 to −2) should be near zero if
+      parallel trends hold; the post-treatment lags (event time 0 to 3) trace
+      the dynamic effect path.
+    </p>
+    <div class="method-toggle" id="es-methods">
+      <label><input type="checkbox" value="eventdd" checked> eventdd (HD-TWFE)</label>
+    </div>
+    <div class="chart-area" id="es-chart"></div>
+    <p class="caption">
+      <strong>Reading the plot:</strong> pre-treatment coefficients (0.34, −0.32, 0.59)
+      hover around zero with insignificant p-values — parallel pre-trends look fine.
+      Post-treatment coefficients (25.03, 24.71, 24.77, 25.70) snap up immediately and
+      stay flat — no fade-out, no ramp-up. The program delivered its full benefit
+      from period 0 and sustained it.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>The 2×2 means table (Table 1 of the post)</h3>
+    <table class="means-table">
+      <thead>
+        <tr><th></th><th>Pre</th><th>Post</th><th>Change</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Comparison (25 schools)</td><td>71.22</td><td>82.10</td><td>+10.88</td></tr>
+        <tr><td>Treated (10 schools)</td><td>60.17</td><td>96.37</td><td>+36.20</td></tr>
+        <tr><td><strong>DiD ATT</strong></td><td></td><td></td><td><strong>+25.32</strong></td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:14px;">
+      The DiD estimator is the difference of the two row-wise changes:
+      <code>36.20 − 10.88 = 25.32</code>. Equivalently, it is the
+      difference of the two column-wise gaps:
+      <code>(96.37 − 82.10) − (60.17 − 71.22) = 14.27 − (−11.05) = 25.32</code>.
+      Same number, two routes — that is the "double difference."
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Why so many ways to compute the same number?</h3>
+    <p>
+      The point-estimate column above is identical (to the third decimal) across
+      five Stata commands. So why include all of them? The differences live in
+      the <em>standard error</em> column:
+    </p>
+    <ul>
+      <li><code>reg</code> with <code>robust</code> SE: <strong>0.615</strong> — heteroskedasticity-robust, but no clustering.</li>
+      <li><code>didregress</code> (Stata 17+): <strong>0.834</strong> — auto-clusters at school level. Wider CI but more honest under within-school error correlation.</li>
+      <li><code>xtreg, fe</code> with cluster: <strong>0.585</strong> — the smallest SE because within-school variation is the only variation used.</li>
+      <li><code>reghdfe</code>: <strong>0.585</strong> — identical to <code>xtreg</code> but scales to many fixed effects.</li>
+      <li><code>reghdfe + female_share</code>: <strong>0.605</strong> — adding an unrelated covariate doesn't change the estimate but mildly inflates the SE.</li>
+    </ul>
+    <p>
+      The lesson from the post: <em>research design</em> (DiD + parallel trends)
+      drives the answer; SE choice fine-tunes inference but does not move the
+      point estimate.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Introduction to Difference-in-Differences (DiD) in Stata</em> ·
+  D3.js v7 · no backend, no tracking ·
+  <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

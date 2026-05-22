@@ -1,0 +1,25 @@
+{
+  "true_effect": 0.12,
+  "estimates": [
+    { "method": "Simple regression",     "outcome": "Offer (ITT)",         "estimand": "ATE", "estimate": 0.1157, "se": 0.0194, "ci_lo": 0.0776, "ci_hi": 0.1539, "data": "Endline" },
+    { "method": "Regression Adjustment", "outcome": "Offer (ITT)",         "estimand": "ATE", "estimate": 0.1125, "se": 0.0191, "ci_lo": 0.0751, "ci_hi": 0.1500, "data": "Endline" },
+    { "method": "Regression Adjustment", "outcome": "Offer (ITT)",         "estimand": "ATT", "estimate": 0.1133, "se": 0.0191, "ci_lo": 0.0757, "ci_hi": 0.1508, "data": "Endline" },
+    { "method": "Inverse Prob. Weighting", "outcome": "Offer (ITT)",       "estimand": "ATE", "estimate": 0.1127, "se": 0.0191, "ci_lo": 0.0753, "ci_hi": 0.1501, "data": "Endline" },
+    { "method": "Inverse Prob. Weighting", "outcome": "Offer (ITT)",       "estimand": "ATT", "estimate": 0.1134, "se": 0.0191, "ci_lo": 0.0759, "ci_hi": 0.1509, "data": "Endline" },
+    { "method": "IPWRA (Doubly Robust)",  "outcome": "Offer (ITT)",        "estimand": "ATE", "estimate": 0.1126, "se": 0.0191, "ci_lo": 0.0752, "ci_hi": 0.1501, "data": "Endline" },
+    { "method": "IPWRA (Doubly Robust)",  "outcome": "Offer (ITT)",        "estimand": "ATT", "estimate": 0.1133, "se": 0.0191, "ci_lo": 0.0758, "ci_hi": 0.1508, "data": "Endline" },
+    { "method": "Basic DiD",              "outcome": "Offer (ITT)",        "estimand": "ATT", "estimate": 0.1347, "se": 0.0273, "ci_lo": 0.0812, "ci_hi": 0.1882, "data": "Panel" },
+    { "method": "DR-DiD (drdid)",         "outcome": "Offer (ITT)",        "estimand": "ATT", "estimate": 0.1375, "se": 0.0274, "ci_lo": 0.0838, "ci_hi": 0.1912, "data": "Panel" },
+    { "method": "DR-DiD (xthdidregress)", "outcome": "Offer (ITT)",        "estimand": "ATT", "estimate": 0.1375, "se": 0.0274, "ci_lo": 0.0838, "ci_hi": 0.1912, "data": "Panel" },
+    { "method": "Endogenous (etregress)", "outcome": "Receipt (per-recipient)", "estimand": "ATE", "estimate": 0.1471, "se": 0.0247, "ci_lo": 0.0987, "ci_hi": 0.1955, "data": "Endline" },
+    { "method": "DR receipt (ipwra)",     "outcome": "Receipt (per-recipient)", "estimand": "ATE", "estimate": 0.1173, "se": 0.0322, "ci_lo": 0.0541, "ci_hi": 0.1805, "data": "Endline" }
+  ],
+  "selection": [],
+  "balance": [
+    { "variable": "y (log consumption)", "control": 10.025, "treatment": 10.006, "diff": 0.019,  "smd": 0.044, "pvalue": 0.330 },
+    { "variable": "age",                 "control": 35.335, "treatment": 34.931, "diff": 0.404,  "smd": 0.042, "pvalue": 0.350 },
+    { "variable": "edu",                 "control": 11.974, "treatment": 12.077, "diff": -0.103, "smd": 0.052, "pvalue": 0.247 },
+    { "variable": "female",              "control": 0.484,  "treatment": 0.531,  "diff": -0.046, "smd": 0.093, "pvalue": 0.038 },
+    { "variable": "poverty",             "control": 0.307,  "treatment": 0.318,  "diff": -0.011, "smd": 0.023, "pvalue": 0.612 }
+  ]
+}

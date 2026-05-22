@@ -1,0 +1,69 @@
+{
+  "_comment": "Estimates parsed from analysis.log (spxtivdfreg replication of Kripfganz & Sarafidis 2025, JSS 113:6). NPL = non-performing loans / total loans (%). 350 US commercial banks, 2006Q1-2014Q4 (N=12,250). Forest plot uses 'method' = model variant and 'outcome' = the coefficient row.",
+
+  "estimates": [
+    {"method": "Full model",     "outcome": "psi (W*NPL)",     "estimate":  0.3943, "se": 0.0849, "ci_lo":  0.2279, "ci_hi":  0.5607, "n_selected": 28},
+    {"method": "No factors",     "outcome": "psi (W*NPL)",     "estimate":  0.2881, "se": 0.0380, "ci_lo":  0.2136, "ci_hi":  0.3626, "n_selected": 28},
+    {"method": "No spatial lag", "outcome": "psi (W*NPL)",     "estimate":  0.0000, "se": 0.0000, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 28},
+    {"method": "Heterogeneous",  "outcome": "psi (W*NPL)",     "estimate":  0.0320, "se": 0.0510, "ci_lo": -0.0680, "ci_hi":  0.1320, "n_selected": 28},
+
+    {"method": "Full model",     "outcome": "rho (L1.NPL)",    "estimate":  0.2899, "se": 0.0544, "ci_lo":  0.1833, "ci_hi":  0.3964, "n_selected": 28},
+    {"method": "No factors",     "outcome": "rho (L1.NPL)",    "estimate":  0.5938, "se": 0.0337, "ci_lo":  0.5278, "ci_hi":  0.6598, "n_selected": 28},
+    {"method": "No spatial lag", "outcome": "rho (L1.NPL)",    "estimate":  0.3225, "se": 0.0548, "ci_lo":  0.2151, "ci_hi":  0.4299, "n_selected": 28},
+    {"method": "Heterogeneous",  "outcome": "rho (L1.NPL)",    "estimate":  0.3014, "se": 0.0148, "ci_lo":  0.2724, "ci_hi":  0.3304, "n_selected": 28},
+
+    {"method": "Full model",     "outcome": "INEFF",           "estimate":  0.4474, "se": 0.1046, "ci_lo":  0.2424, "ci_hi":  0.6523, "n_selected": 28},
+    {"method": "No factors",     "outcome": "INEFF",           "estimate":  0.3661, "se": 0.1072, "ci_lo":  0.1559, "ci_hi":  0.5763, "n_selected": 28},
+    {"method": "No spatial lag", "outcome": "INEFF",           "estimate":  0.6378, "se": 0.1163, "ci_lo":  0.4098, "ci_hi":  0.8657, "n_selected": 28},
+    {"method": "Heterogeneous",  "outcome": "INEFF",           "estimate":  0.7592, "se": 0.1583, "ci_lo":  0.4490, "ci_hi":  1.0694, "n_selected": 28},
+
+    {"method": "Full model",     "outcome": "SIZE",            "estimate":  0.2226, "se": 0.0942, "ci_lo":  0.0380, "ci_hi":  0.4072, "n_selected": 28},
+    {"method": "No factors",     "outcome": "SIZE",            "estimate":  0.0890, "se": 0.0612, "ci_lo": -0.0309, "ci_hi":  0.2089, "n_selected": 28},
+    {"method": "No spatial lag", "outcome": "SIZE",            "estimate":  0.3458, "se": 0.0957, "ci_lo":  0.1583, "ci_hi":  0.5333, "n_selected": 28},
+    {"method": "Heterogeneous",  "outcome": "SIZE",            "estimate":  2.0040, "se": 0.3393, "ci_lo":  1.3390, "ci_hi":  2.6690, "n_selected": 28},
+
+    {"method": "Full model",     "outcome": "BUFFER",          "estimate": -0.0545, "se": 0.0119, "ci_lo": -0.0778, "ci_hi": -0.0312, "n_selected": 28},
+    {"method": "No factors",     "outcome": "BUFFER",          "estimate": -0.0248, "se": 0.0100, "ci_lo": -0.0444, "ci_hi": -0.0052, "n_selected": 28},
+    {"method": "No spatial lag", "outcome": "BUFFER",          "estimate": -0.0445, "se": 0.0158, "ci_lo": -0.0755, "ci_hi": -0.0135, "n_selected": 28},
+    {"method": "Heterogeneous",  "outcome": "BUFFER",          "estimate": -0.3760, "se": 0.0420, "ci_lo": -0.4583, "ci_hi": -0.2937, "n_selected": 28},
+
+    {"method": "Full model",     "outcome": "LIQUIDITY",       "estimate":  2.4524, "se": 0.2696, "ci_lo":  1.9239, "ci_hi":  2.9809, "n_selected": 28},
+    {"method": "No factors",     "outcome": "LIQUIDITY",       "estimate":  0.8430, "se": 0.1800, "ci_lo":  0.4902, "ci_hi":  1.1958, "n_selected": 28},
+    {"method": "No spatial lag", "outcome": "LIQUIDITY",       "estimate":  2.5340, "se": 0.3110, "ci_lo":  1.9244, "ci_hi":  3.1436, "n_selected": 28},
+    {"method": "Heterogeneous",  "outcome": "LIQUIDITY",       "estimate":  6.3300, "se": 0.5060, "ci_lo":  5.3382, "ci_hi":  7.3218, "n_selected": 28},
+
+    {"method": "Full model",     "outcome": "QUALITY",         "estimate":  0.1830, "se": 0.0308, "ci_lo":  0.1227, "ci_hi":  0.2433, "n_selected": 28},
+    {"method": "No factors",     "outcome": "QUALITY",         "estimate":  0.2830, "se": 0.0290, "ci_lo":  0.2262, "ci_hi":  0.3398, "n_selected": 28},
+    {"method": "No spatial lag", "outcome": "QUALITY",         "estimate":  0.1830, "se": 0.0360, "ci_lo":  0.1124, "ci_hi":  0.2536, "n_selected": 28},
+    {"method": "Heterogeneous",  "outcome": "QUALITY",         "estimate":  0.2870, "se": 0.1390, "ci_lo":  0.0146, "ci_hi":  0.5594, "n_selected": 28}
+  ],
+
+  "diagnostics": [
+    {"method": "Full model",     "j_stat": 18.825, "j_df": 19, "j_p": 0.4681, "n_factors_x": 2, "n_factors_u": 1, "rho_factor": 0.3351, "sigma_f": 0.6416, "sigma_e": 0.9038, "n_obs": 12250, "n_groups": 350},
+    {"method": "No factors",     "j_stat": 48.151, "j_df": 19, "j_p": 0.0002, "n_factors_x": 0, "n_factors_u": 0, "rho_factor": 0.0000, "sigma_f": 0.0000, "sigma_e": 1.1100, "n_obs": 12250, "n_groups": 350},
+    {"method": "No spatial lag", "j_stat":  8.174, "j_df":  6, "j_p": 0.2260, "n_factors_x": 2, "n_factors_u": 1, "rho_factor": 0.3360, "sigma_f": 0.6420, "sigma_e": 0.9050, "n_obs": 12250, "n_groups": 350},
+    {"method": "Heterogeneous",  "j_stat":  null, "j_df": null, "j_p": null,   "n_factors_x": 2, "n_factors_u": 1, "rho_factor": null,   "sigma_f": null,   "sigma_e": null,   "n_obs": 12250, "n_groups": 350}
+  ],
+
+  "longrun": [
+    {"variable": "LIQUIDITY", "direct": 3.547,  "direct_se": 0.445, "indirect": 4.218,  "indirect_se": 1.742, "total": 7.765,  "total_se": 1.904, "sr_total": 4.090},
+    {"variable": "INEFF",     "direct": 0.647,  "direct_se": 0.159, "indirect": 0.769,  "indirect_se": 0.335, "total": 1.417,  "total_se": 0.427, "sr_total": 0.746},
+    {"variable": "QUALITY",   "direct": 0.265,  "direct_se": 0.047, "indirect": 0.315,  "indirect_se": 0.141, "total": 0.580,  "total_se": 0.167, "sr_total": 0.305},
+    {"variable": "SIZE",      "direct": 0.322,  "direct_se": 0.142, "indirect": 0.383,  "indirect_se": 0.198, "total": 0.705,  "total_se": 0.310, "sr_total": 0.371},
+    {"variable": "CAR",       "direct": 0.044,  "direct_se": 0.009, "indirect": 0.052,  "indirect_se": 0.024, "total": 0.097,  "total_se": 0.029, "sr_total": 0.051},
+    {"variable": "BUFFER",    "direct":-0.079,  "direct_se": 0.018, "indirect":-0.094,  "indirect_se": 0.043, "total":-0.173,  "total_se": 0.054, "sr_total":-0.091},
+    {"variable": "PROFIT",    "direct":-0.008,  "direct_se": 0.002, "indirect":-0.009,  "indirect_se": 0.005, "total":-0.017,  "total_se": 0.006, "sr_total":-0.009}
+  ],
+
+  "longrun_nofactors": [
+    {"variable": "LIQUIDITY", "total": 7.176, "total_se": 2.660},
+    {"variable": "INEFF",     "total": 3.117, "total_se": 1.350},
+    {"variable": "QUALITY",   "total": 2.407, "total_se": 0.480},
+    {"variable": "SIZE",      "total": 0.756, "total_se": 0.520},
+    {"variable": "CAR",       "total": 0.145, "total_se": 0.060},
+    {"variable": "BUFFER",    "total":-0.212, "total_se": 0.110},
+    {"variable": "PROFIT",    "total":-0.053, "total_se": 0.013}
+  ],
+
+  "selection": []
+}

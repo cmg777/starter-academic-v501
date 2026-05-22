@@ -1,0 +1,50 @@
+{
+  "estimates": [
+    { "method": "Pooled OLS",  "outcome": "log GDP (linear)",   "estimate":  0.2405, "se": 0.1300, "ci_lo": -0.0143, "ci_hi":  0.4954, "n_selected": 879 },
+    { "method": "TWFE",        "outcome": "log GDP (linear)",   "estimate":  0.2931, "se": 0.0780, "ci_lo":  0.1402, "ci_hi":  0.4460, "n_selected": 879 },
+    { "method": "+ Resources", "outcome": "log GDP (linear)",   "estimate":  0.3498, "se": 0.0754, "ci_lo":  0.2020, "ci_hi":  0.4976, "n_selected": 857 },
+    { "method": "+ Trade",     "outcome": "log GDP (linear)",   "estimate":  0.2054, "se": 0.0806, "ci_lo":  0.0474, "ci_hi":  0.3634, "n_selected": 817 },
+    { "method": "+ Mobility",  "outcome": "log GDP (linear)",   "estimate":  0.1711, "se": 0.0781, "ci_lo":  0.0180, "ci_hi":  0.3242, "n_selected": 672 },
+    { "method": "+ Aid/Educ",  "outcome": "log GDP (linear)",   "estimate":  0.2264, "se": 0.1100, "ci_lo":  0.0108, "ci_hi":  0.4420, "n_selected": 585 },
+    { "method": "+ Ethnicity", "outcome": "log GDP (linear)",   "estimate":  0.1492, "se": 0.0589, "ci_lo":  0.0338, "ci_hi":  0.2646, "n_selected": 844 },
+
+    { "method": "Pooled OLS",  "outcome": "log GDP squared",    "estimate": -0.0279, "se": 0.0153, "ci_lo": -0.0579, "ci_hi":  0.0021, "n_selected": 879 },
+    { "method": "TWFE",        "outcome": "log GDP squared",    "estimate": -0.0320, "se": 0.0090, "ci_lo": -0.0495, "ci_hi": -0.0144, "n_selected": 879 },
+    { "method": "+ Resources", "outcome": "log GDP squared",    "estimate": -0.0380, "se": 0.0087, "ci_lo": -0.0550, "ci_hi": -0.0210, "n_selected": 857 },
+    { "method": "+ Trade",     "outcome": "log GDP squared",    "estimate": -0.0222, "se": 0.0093, "ci_lo": -0.0404, "ci_hi": -0.0040, "n_selected": 817 },
+    { "method": "+ Mobility",  "outcome": "log GDP squared",    "estimate": -0.0186, "se": 0.0088, "ci_lo": -0.0359, "ci_hi": -0.0014, "n_selected": 672 },
+    { "method": "+ Aid/Educ",  "outcome": "log GDP squared",    "estimate": -0.0232, "se": 0.0135, "ci_lo": -0.0497, "ci_hi":  0.0033, "n_selected": 585 },
+    { "method": "+ Ethnicity", "outcome": "log GDP squared",    "estimate": -0.0153, "se": 0.0069, "ci_lo": -0.0287, "ci_hi": -0.0018, "n_selected": 844 },
+
+    { "method": "Pooled OLS",  "outcome": "log GDP cubed",      "estimate":  0.0010, "se": 0.0006, "ci_lo": -0.0001, "ci_hi":  0.0022, "n_selected": 879 },
+    { "method": "TWFE",        "outcome": "log GDP cubed",      "estimate":  0.0011, "se": 0.0003, "ci_lo":  0.0005, "ci_hi":  0.0018, "n_selected": 879 },
+    { "method": "+ Resources", "outcome": "log GDP cubed",      "estimate":  0.0013, "se": 0.0003, "ci_lo":  0.0007, "ci_hi":  0.0020, "n_selected": 857 },
+    { "method": "+ Trade",     "outcome": "log GDP cubed",      "estimate":  0.0008, "se": 0.0004, "ci_lo":  0.0001, "ci_hi":  0.0015, "n_selected": 817 },
+    { "method": "+ Mobility",  "outcome": "log GDP cubed",      "estimate":  0.0007, "se": 0.0003, "ci_lo":  0.0000, "ci_hi":  0.0013, "n_selected": 672 },
+    { "method": "+ Aid/Educ",  "outcome": "log GDP cubed",      "estimate":  0.0007, "se": 0.0006, "ci_lo": -0.0004, "ci_hi":  0.0018, "n_selected": 585 },
+    { "method": "+ Ethnicity", "outcome": "log GDP cubed",      "estimate":  0.0005, "se": 0.0003, "ci_lo":  0.0000, "ci_hi":  0.0010, "n_selected": 844 }
+  ],
+  "determinants": [
+    { "name": "Ethnic Gini",      "coefficient":  0.0709, "significant": true,  "direction": "Increases inequality" },
+    { "name": "Arable land",      "coefficient": -0.0529, "significant": true,  "direction": "Decreases inequality" },
+    { "name": "Resource rents",   "coefficient":  0.0183, "significant": true,  "direction": "Increases inequality" },
+    { "name": "Foreign aid",      "coefficient":  0.0152, "significant": true,  "direction": "Increases inequality" },
+    { "name": "School enrollment","coefficient": -0.0141, "significant": true,  "direction": "Decreases inequality" },
+    { "name": "FDI",              "coefficient":  0.0094, "significant": false, "direction": "Increases inequality" },
+    { "name": "Area x Gasoline",  "coefficient":  0.0060, "significant": true,  "direction": "Increases inequality" },
+    { "name": "Trade openness",   "coefficient":  0.0051, "significant": true,  "direction": "Increases inequality" },
+    { "name": "Gasoline price",   "coefficient":  0.0006, "significant": false, "direction": "Increases inequality" }
+  ],
+  "kuznets_coefficients": {
+    "b1": 0.2931,
+    "b2": -0.0320,
+    "b3": 0.0011,
+    "turning_point_low_log": 7.735,
+    "turning_point_high_log": 11.254,
+    "turning_point_low_usd": 2287,
+    "turning_point_high_usd": 77205,
+    "log_gdp_min": 5.25,
+    "log_gdp_max": 11.67
+  },
+  "selection": []
+}

@@ -1,0 +1,48 @@
+{
+  "description": "Synthetic control estimates for West German reunification (1990), from python_scpi/index.md. 'estimate' is the post-treatment gap (actual minus synthetic) in thousand USD per capita for the listed year. CI uses the 95% prediction interval from scpi() with simplex constraints; ci_lo = treated - pi_upper and ci_hi = treated - pi_lower so that bands containing zero mean 'not statistically distinguishable from zero'.",
+  "donor_weights": [
+    { "country": "Austria",     "weight": 0.2911 },
+    { "country": "USA",         "weight": 0.2728 },
+    { "country": "Italy",       "weight": 0.1914 },
+    { "country": "Netherlands", "weight": 0.1330 },
+    { "country": "Switzerland", "weight": 0.0814 },
+    { "country": "France",      "weight": 0.0303 }
+  ],
+  "trajectory": [
+    { "year": 1991, "actual": 21.602, "synthetic": 21.100, "pi_lo": 19.93, "pi_hi": 22.21 },
+    { "year": 1992, "actual": 22.154, "synthetic": 21.829, "pi_lo": 21.30, "pi_hi": 22.37 },
+    { "year": 1993, "actual": 21.878, "synthetic": 22.318, "pi_lo": 21.72, "pi_hi": 22.91 },
+    { "year": 1994, "actual": 22.371, "synthetic": 23.276, "pi_lo": 22.57, "pi_hi": 23.94 },
+    { "year": 1995, "actual": 23.035, "synthetic": 24.144, "pi_lo": 22.98, "pi_hi": 25.28 },
+    { "year": 1996, "actual": 23.742, "synthetic": 25.058, "pi_lo": 23.88, "pi_hi": 25.94 },
+    { "year": 1997, "actual": 24.156, "synthetic": 26.004, "pi_lo": 24.75, "pi_hi": 27.08 },
+    { "year": 1998, "actual": 24.931, "synthetic": 27.050, "pi_lo": 25.69, "pi_hi": 28.37 },
+    { "year": 1999, "actual": 25.755, "synthetic": 28.069, "pi_lo": 26.70, "pi_hi": 29.24 },
+    { "year": 2000, "actual": 26.943, "synthetic": 29.700, "pi_lo": 26.73, "pi_hi": 31.53 },
+    { "year": 2001, "actual": 27.449, "synthetic": 30.525, "pi_lo": 26.55, "pi_hi": 32.98 },
+    { "year": 2002, "actual": 28.348, "synthetic": 31.515, "pi_lo": 29.26, "pi_hi": 33.20 },
+    { "year": 2003, "actual": 28.855, "synthetic": 32.320, "pi_lo": 30.04, "pi_hi": 33.99 }
+  ],
+  "estimates": [
+    { "method": "Simplex", "outcome": "Gap 2003",     "estimate": -3.465, "se": 1.011, "ci_lo": -5.135, "ci_hi": -1.185, "n_selected": 6 },
+    { "method": "Simplex", "outcome": "Avg gap",      "estimate": -1.668, "se": 0.500, "ci_lo": -2.650, "ci_hi": -0.685, "n_selected": 6 },
+    { "method": "Lasso",   "outcome": "Gap 2003",     "estimate": -3.426, "se": 1.000, "ci_lo": -5.080, "ci_hi": -1.180, "n_selected": 6 },
+    { "method": "Lasso",   "outcome": "Avg gap",      "estimate": -1.618, "se": 0.490, "ci_lo": -2.570, "ci_hi": -0.665, "n_selected": 6 },
+    { "method": "Ridge",   "outcome": "Gap 2003",     "estimate": -2.719, "se": 0.840, "ci_lo": -4.180, "ci_hi": -1.020, "n_selected": 16 },
+    { "method": "Ridge",   "outcome": "Avg gap",      "estimate": -1.415, "se": 0.430, "ci_lo": -2.260, "ci_hi": -0.570, "n_selected": 16 },
+    { "method": "OLS",     "outcome": "Gap 2003",     "estimate": -2.380, "se": 0.760, "ci_lo": -3.850, "ci_hi": -0.890, "n_selected": 16 },
+    { "method": "OLS",     "outcome": "Avg gap",      "estimate": -1.323, "se": 0.410, "ci_lo": -2.130, "ci_hi": -0.520, "n_selected": 16 }
+  ],
+  "sensitivity": [
+    { "confidence": "99%", "alpha": 0.01, "avg_pi_width": 3.298, "years_outside_band": 7 },
+    { "confidence": "95%", "alpha": 0.05, "avg_pi_width": 2.842, "years_outside_band": 7 },
+    { "confidence": "90%", "alpha": 0.10, "avg_pi_width": 2.583, "years_outside_band": 9 },
+    { "confidence": "80%", "alpha": 0.20, "avg_pi_width": 2.304, "years_outside_band": 9 }
+  ],
+  "method_comparison": [
+    { "method": "Simplex", "pre_rmse": 0.072, "gap_2003": -3.465, "avg_gap": -1.668 },
+    { "method": "Lasso",   "pre_rmse": 0.071, "gap_2003": -3.426, "avg_gap": -1.618 },
+    { "method": "Ridge",   "pre_rmse": 0.040, "gap_2003": -2.719, "avg_gap": -1.415 },
+    { "method": "OLS",     "pre_rmse": 0.040, "gap_2003": -2.380, "avg_gap": -1.323 }
+  ]
+}

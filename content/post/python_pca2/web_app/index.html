@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Pooled PCA — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Pooled PCA for Building Development Indicators Across Time'. A pedagogical web app with sliders, a 2-period PCA simulator, a weight-comparison forest plot, and validation against the official SHDI.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Pooled PCA — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Pooled PCA for Building Development Indicators Across Time</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"   role="tab" aria-selected="true">1 · Why Pooled?</button>
+  <button id="tab-sim"     class="tab"        data-pane="pane-sim"     role="tab" aria-selected="false">2 · PCA Simulator</button>
+  <button id="tab-weights" class="tab"        data-pane="pane-weights" role="tab" aria-selected="false">3 · Weight Comparison</button>
+  <button id="tab-valid"   class="tab"        data-pane="pane-valid"   role="tab" aria-selected="false">4 · SHDI Validation</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: WHY POOLED ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why pooled PCA? The yardstick problem.</h2>
+  <p class="lede">
+    You want a single development index that tracks 153 South American regions
+    in both 2013 and 2019. The naive recipe — run PCA separately for each year —
+    silently re-centres the data every period, so a region's improvement can
+    appear as a decline. <strong>Pooled PCA</strong> fixes the yardstick: it
+    standardises and computes eigenvector weights from the stacked panel
+    (all 306 observations), producing one set of weights that applies to both
+    periods.
+  </p>
+  <p class="lede">
+    This app walks you through the choice in four tabs. You'll see the
+    animation of a "shifting" vs "fixed" yardstick, slide the parameters of a
+    two-period simulation to watch per-period weights wobble while pooled
+    weights stay still, compare real PC1 weights from the post side-by-side
+    with confidence intervals, and reproduce the validation against the
+    official Subnational HDI.
+  </p>
+
+  <div class="card">
+    <h3>Shifting yardstick (per-period) vs fixed yardstick (pooled)</h3>
+    <p>
+      The animation below shows the same coefficient under two regimes as the
+      "penalty knob" sweeps — read it as <em>how much the standardisation
+      baseline can move between periods</em>. The orange line is the
+      per-period regime: the baseline shifts, so a region's measured value can
+      hit zero or even flip sign. The steel-blue line is the pooled regime:
+      the baseline stays fixed and the value decays smoothly. Pooled keeps
+      genuine improvements visible; per-period can hide them.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>PCA Simulator</h4>
+      <p>Slide the income-shock and education-gain to control a 2-period DGP. Compare pooled and per-period PC1 weights live, and watch the per-period weights drift while pooled weights stay fixed.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-weights">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Weight Comparison</h4>
+      <p>The real numbers from the post: PC1 weights for Education, Health, and Income under pooled vs per-period 2013 vs per-period 2019, with 95% intervals.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-valid">
+      <div class="cta-tag">Tab 4</div>
+      <h4>SHDI Validation</h4>
+      <p>Which method better tracks the official Subnational HDI? Compare R² for levels (0.9823 vs 0.9750) and changes (0.9964 vs 0.9913) at a glance.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>PCA (Principal Component Analysis)</summary>
+        <div class="gloss-body">A linear technique that finds new axes capturing maximum variance. PC1 is the direction along which the data spreads the most. Used here to compress Education, Health, and Income into a single composite development index.</div>
+      </details>
+      <details class="gloss"><summary>Pooled standardisation</summary>
+        <div class="gloss-body">Compute the mean and SD using <em>all periods stacked</em>, then apply the same transformation to every observation. The yardstick stays fixed across years.</div>
+      </details>
+      <details class="gloss"><summary>Per-period standardisation</summary>
+        <div class="gloss-body">Compute the mean and SD separately for each period. The 2019 mean replaces the 2013 mean, so the yardstick shifts — a region's z-score can appear better simply because the cohort got worse.</div>
+      </details>
+      <details class="gloss"><summary>PC1 weight</summary>
+        <div class="gloss-body">The entries of the first eigenvector, e.g. <code>[0.5642, 0.5448, 0.6204]</code> for Education, Health, Income in this post. PCA's data-driven recipe for combining indicators into one score.</div>
+      </details>
+      <details class="gloss"><summary>Variance explained</summary>
+        <div class="gloss-body">Fraction of total variance captured by each principal component. In this post: PC1 = 72.4%, PC2 = 18.8%, PC3 = 8.8%.</div>
+      </details>
+      <details class="gloss"><summary>Sign convention</summary>
+        <div class="gloss-body">Eigenvectors are unique only up to sign. We force the leading entry positive so PC1 increases with Education, Health, and Income — "higher = better".</div>
+      </details>
+      <details class="gloss"><summary>Spearman rank correlation</summary>
+        <div class="gloss-body">A correlation computed on ranks instead of raw values. Robust to outliers. Used to compare how two methods order the same regions.</div>
+      </details>
+      <details class="gloss"><summary>Subnational HDI (SHDI)</summary>
+        <div class="gloss-body">A sub-national Human Development Index from the Global Data Lab, built as a geometric mean of Education, Health, and Income. The official benchmark our PCA-based index is validated against.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: PCA SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>PCA Simulator — two periods, two recipes</h2>
+  <p class="lede">
+    The simulator generates two periods of synthetic development data with
+    three indicators (mimicking Education / Health / Income). You set
+    parameters; the app fits both pooled PCA and per-period PCA on the
+    simulated data and shows the resulting PC1 weights, variance explained,
+    and the period-to-period drift in per-period weights. <strong>The pooled
+    weights should stay nearly identical when you re-seed. The per-period
+    weights should wobble — that's the bug pooled PCA fixes.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size per period <span class="value" id="sim-n-val">150</span></label>
+      <input type="range" id="sim-n" min="30" max="300" step="10" value="150" aria-label="sample size per period">
+      <div class="hint">Number of regions in each year. Total observations = 2 × n.</div>
+    </div>
+    <div class="control">
+      <label>Income shock (period 2) <span class="value" id="sim-ish-val">-0.20</span></label>
+      <input type="range" id="sim-ish" min="-0.40" max="0.20" step="0.02" value="-0.20" aria-label="income shock">
+      <div class="hint">Shift applied to Income mean in period 2. Negative = decline (mimics South America 2013→2019).</div>
+    </div>
+    <div class="control">
+      <label>Education gain (period 2) <span class="value" id="sim-eg-val">0.15</span></label>
+      <input type="range" id="sim-eg" min="-0.10" max="0.30" step="0.02" value="0.15" aria-label="education gain">
+      <div class="hint">Shift applied to Education mean in period 2. Positive = improvement.</div>
+    </div>
+    <div class="control">
+      <label>Noise level <span class="value" id="sim-noise-val">0.30</span></label>
+      <input type="range" id="sim-noise" min="0.1" max="0.6" step="0.05" value="0.30" aria-label="noise level">
+      <div class="hint">Idiosyncratic variation across regions. More noise = lower variance explained by PC1.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Pooled PCA</span></h3>
+      <p class="note" style="margin:0 0 10px;">Standardise on stacked data (300 obs), one set of weights.</p>
+      <div class="method-row"><span class="label">w(Education)</span><span class="val" id="sim-pool-edu">—</span></div>
+      <div class="method-row"><span class="label">w(Health)</span><span class="val" id="sim-pool-hea">—</span></div>
+      <div class="method-row"><span class="label">w(Income)</span><span class="val" id="sim-pool-inc">—</span></div>
+      <div class="method-row"><span class="label">PC1 variance explained</span><span class="val" id="sim-pool-var">—</span></div>
+      <div class="method-row"><span class="label">PC1 mean shift (P2 − P1)</span><span class="val" id="sim-pool-shift">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Per-period PCA</span></h3>
+      <p class="note" style="margin:0 0 10px;">Standardise on each period separately, two sets of weights.</p>
+      <div class="method-row"><span class="label">w(Edu)  &nbsp; P1 → P2</span><span class="val" id="sim-pp-edu">—</span></div>
+      <div class="method-row"><span class="label">w(Hea)  &nbsp; P1 → P2</span><span class="val" id="sim-pp-hea">—</span></div>
+      <div class="method-row"><span class="label">w(Inc)  &nbsp; P1 → P2</span><span class="val" id="sim-pp-inc">—</span></div>
+      <div class="method-row"><span class="label">Avg weight drift |Δw|</span><span class="val" id="sim-pp-drift">—</span></div>
+      <div class="method-row"><span class="label">PC1 mean shift (P2 − P1)</span><span class="val" id="sim-pp-shift">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-weights-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Pooled weights are stable</strong> across re-seeds and across parameter changes. Try sliding the income shock from −0.40 to +0.20: pooled weights barely move.</li>
+      <li><strong>Per-period weights drift</strong> between P1 and P2. The bigger the level shift in any indicator, the more its per-period weight wobbles.</li>
+      <li><strong>PC1 mean shift is informative under pooled</strong> (positive for improvement, negative for decline) but is exactly zero under per-period by construction. That's how per-period hides real changes.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs variance over many simulations</h3>
+    <p>Single runs are noisy. Run the full DGP 100 times with fresh seeds to see whether the per-period weight drift is systematic.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sim-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Per-period mean drift</div><div class="stat-value orange" id="sim-pp-meandrift">—</div><div class="stat-sub">average |Δw| across 100 sims</div></div>
+      <div class="stat"><div class="stat-label">Per-period sd drift</div><div class="stat-value" id="sim-pp-sddrift">—</div></div>
+      <div class="stat"><div class="stat-label">Pooled mean drift</div><div class="stat-value teal" id="sim-pool-meandrift">—</div><div class="stat-sub">should be ≈ 0 by construction</div></div>
+      <div class="stat"><div class="stat-label">Pooled sd drift</div><div class="stat-value" id="sim-pool-sddrift">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: WEIGHT COMPARISON ====================== -->
+<section id="pane-weights" class="tab-pane" role="tabpanel" aria-labelledby="tab-weights">
+
+  <h2>Real PC1 weights — pooled vs per-period 2013 vs per-period 2019</h2>
+  <p class="lede">
+    These weights come straight from the post's <code>script.py</code> run on
+    the 153-region South American panel. Each weight tells you how much PC1
+    weighs that indicator. <strong>Toggle methods and indicators</strong> to see
+    how the per-period weights shift between 2013 and 2019 while the pooled
+    weights sit in between as a fixed compromise. Confidence intervals are
+    approximate (±1.96 × bootstrap SE).
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Education's weight drops</strong> from 0.583 (2013) to 0.541 (2019) under per-period — a real shift of −0.043. The pooled weight (0.564) sits between them.</li>
+      <li><strong>Health's weight rises</strong> from 0.510 (2013) to 0.566 (2019) — a jump of +0.056. Pooled gives 0.545, again the compromise.</li>
+      <li><strong>Income's weight is the most stable</strong> across methods (0.620–0.633): all three approaches agree Income carries the heaviest weight.</li>
+      <li><strong>The forest plot makes the recipe-instability of per-period PCA visible at a glance.</strong> Pooled PCA fixes one recipe across both years.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Indicators</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Education weight" checked> Education</label>
+      <label><input type="checkbox" value="Health weight" checked> Health</label>
+      <label><input type="checkbox" value="Income weight" checked> Income</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Pooled PCA" checked> Pooled PCA</label>
+      <label><input type="checkbox" value="Per-period 2013" checked> Per-period 2013</label>
+      <label><input type="checkbox" value="Per-period 2019" checked> Per-period 2019</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+  <div class="chart-area" id="fp-bars"></div>
+
+  <div class="card">
+    <h3>Why does Income carry the heaviest weight?</h3>
+    <p>
+      In the South American panel the three indicators are positively but
+      unequally correlated: Education–Income r = 0.68, Health–Income r = 0.63,
+      Education–Health r = 0.44. Income sits between the other two, so it
+      shares more <em>common</em> variance with both. PCA's first eigenvector
+      loads more on the variable that participates in the most pairwise
+      correlations — hence w(Income) = 0.620 &gt; w(Education) = 0.564 &gt;
+      w(Health) = 0.545.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 2</h3>
+    <p>
+      The per-period weight drift you slid in Tab 2 is exactly what shows up
+      here on real data:
+    </p>
+    <ul>
+      <li><strong>Education weight:</strong> 0.583 (2013) → 0.541 (2019), drift = −0.043</li>
+      <li><strong>Health weight:</strong> 0.510 (2013) → 0.566 (2019), drift = +0.056</li>
+      <li><strong>Pooled holds the recipe fixed at</strong> [0.564, 0.545, 0.620] across both years.</li>
+    </ul>
+    <p>
+      The post's message becomes visible <em>twice</em>: once on synthetic data
+      you control, and once on the original 306 region-period panel.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: SHDI VALIDATION ====================== -->
+<section id="pane-valid" class="tab-pane" role="tabpanel" aria-labelledby="tab-valid">
+
+  <h2>Validation — which PCA tracks the official SHDI better?</h2>
+  <p class="lede">
+    The Global Data Lab publishes an official Subnational HDI (SHDI) using a
+    geometric mean methodology similar to the UNDP's. Both pooled and
+    per-period PCA correlate strongly with it — but pooled PCA wins on
+    <em>both</em> the level fit and the change fit. <strong>The differences
+    are small in absolute terms (≈ 0.5–0.7 percentage points of R²) but
+    consistent and policy-relevant: per-period PCA disagrees with pooled PCA
+    on the direction of change for 16 of 153 regions (10.5%).</strong>
+  </p>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Cross-sectional fit (levels)</h3>
+      <p class="note" style="margin:0 0 12px;">Correlation between PCA-based HDI and official SHDI across all 306 region-period observations.</p>
+      <div class="method-row"><span class="label">Pooled PCA — R²</span><span class="val teal" id="val-pool-r2">0.9823</span></div>
+      <div class="method-row"><span class="label">Per-period PCA — R²</span><span class="val orange" id="val-pp-r2">0.9750</span></div>
+      <div class="method-row"><span class="label">Pooled advantage</span><span class="val" id="val-r2-diff">+0.0073</span></div>
+    </div>
+    <div class="card">
+      <h3>Dynamic fit (changes)</h3>
+      <p class="note" style="margin:0 0 12px;">Correlation between PCA-based HDI change (2019 − 2013) and official SHDI change.</p>
+      <div class="method-row"><span class="label">Pooled PCA — R²</span><span class="val teal" id="val-poolc-r2">0.9964</span></div>
+      <div class="method-row"><span class="label">Per-period PCA — R²</span><span class="val orange" id="val-ppc-r2">0.9913</span></div>
+      <div class="method-row"><span class="label">Pooled advantage</span><span class="val" id="val-rc2-diff">+0.0051</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="val-bars-chart"></div>
+
+  <div class="card">
+    <h3>Direction-of-change disagreement</h3>
+    <p>
+      Even when the methods agree on average (Spearman ρ for HDI change ranks
+      = 0.9818), they disagree on the sign of the change for a non-trivial
+      slice of the sample:
+    </p>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-label">Direction disagreements</div>
+        <div class="stat-value orange" id="val-disagree">16 / 153</div>
+        <div class="stat-sub">10.5% of regions — per-period says down, pooled says up</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Spearman ρ (change ranks)</div>
+        <div class="stat-value teal" id="val-rho">0.9818</div>
+        <div class="stat-sub">methods agree on rank, disagree on sign</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">City of Buenos Aires</div>
+        <div class="stat-value" id="val-ba">+0.019 vs −0.040</div>
+        <div class="stat-sub">pooled vs per-period HDI change</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Buenos Aires — the running example</h3>
+    <p>
+      Argentina's capital improved in Education (0.926 → 0.946) and Health
+      (0.858 → 0.872), with a modest Income decline (0.850 → 0.832).
+      <strong>Pooled PCA correctly reports a modest improvement of +0.019.
+      Per-period PCA reports a decline of −0.040.</strong> The shifting
+      yardstick of per-period standardisation is what flips the sign.
+    </p>
+    <p>
+      A policymaker using per-period PCA might conclude that Buenos Aires
+      "fell behind". A policymaker using pooled PCA sees that it improved
+      modestly while being overtaken by Chilean regions that improved faster.
+      Both narratives are useful — but the data should drive the narrative,
+      not the choice of standardisation.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Pooled PCA for Building Development Indicators Across Time</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

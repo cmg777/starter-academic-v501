@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Spatial Panel Regression — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Spatial Panel Regression in Stata: Cigarette Demand Across US States'. A pedagogical web app with a spatial-multiplier animation, a dynamic SDM simulator that lets you trade τ against ρ, and the post's direct/indirect/total effects across the SDM and dynamic SDM specifications.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Spatial Panel Regression — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Spatial Panel Regression in Stata: Cigarette Demand Across US States</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"      class="tab active" data-pane="pane-intro"      role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-spillover"  class="tab"        data-pane="pane-spillover"  role="tab" aria-selected="false">2 · Cross-Border Spillover</button>
+  <button id="tab-dynamic"    class="tab"        data-pane="pane-dynamic"    role="tab" aria-selected="false">3 · Dynamic SDM Simulator</button>
+  <button id="tab-forest"     class="tab"        data-pane="pane-forest"     role="tab" aria-selected="false">4 · Direct / Indirect / Total Effects</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why spatial <em>panel</em> models? Cigarettes do not stop at state lines.</h2>
+  <p class="lede">
+    When a state raises its cigarette tax, consumers near state borders may
+    simply drive across to buy cheaper cigarettes next door. Cross-border
+    shopping makes each state's consumption depend not only on its own prices
+    and income but also on those of its <em>neighbours</em>. Ordinary panel
+    models — pooled OLS, region FE, two-way FE — treat each state as
+    independent and miss this <strong>spatial spillover</strong>.
+  </p>
+  <p class="lede">
+    The Baltagi cigarette panel covers 46 US states across 1963–1992 (n = 1,380).
+    The post estimates a Spatial Durbin Model (SDM) with ρ̂ = <strong>0.265</strong>
+    and an indirect price effect (−0.314) almost as large as the direct one
+    (−0.313). This app lets you turn the dials yourself. Watch a price shock
+    propagate through a spatial multiplier; trade habit persistence (τ) against
+    spatial dependence (ρ) in a dynamic SDM; and explore the post's full
+    direct/indirect/total table interactively.
+  </p>
+
+  <div class="card">
+    <h3>The spatial-multiplier intuition</h3>
+    <p>
+      Both ρ (spatial lag of y) and τ (temporal lag) <em>amplify</em> a shock
+      relative to its bare coefficient. The animation below sweeps a penalty
+      knob (here, the spatial autoregressive parameter) from zero to one. The
+      <span style="color:#d97757;">orange</span> curve mimics the SDM-type
+      multiplier <code>1 / (1 − ρ)</code> behaviour (amplifies);
+      the <span style="color:#6a9bcc;">steel</span> dashed curve shows the
+      complementary direction (compression as the penalty grows).
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-spillover">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Cross-Border Spillover</h4>
+      <p>Drop a price hike on a 7×7 lattice of "states". Watch the spatial multiplier <code>(I − ρW)<sup>−1</sup></code> propagate it to neighbours and neighbours' neighbours. Vary ρ — see the 0.27 SDM world versus a near-unit world.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-dynamic">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Dynamic SDM Simulator</h4>
+      <p>Trade habit persistence τ against spatial dependence ρ. Generate fake panel data on a 7×7 lattice with known τ, ρ, and θ. See why adding τ ≈ 0.65 collapses ρ̂ from 0.27 to 0.08.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Direct / Indirect / Total Effects</h4>
+      <p>The post's headline numbers as a forest plot. Toggle models (Pooled OLS, FE, SDM, dynamic SDM) and regressors (logp, logy). See why non-spatial models understate price sensitivity by 57%.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The three key takeaways this app is built around</h3>
+    <ol class="learning-objectives">
+      <li><strong>Non-spatial models understate price sensitivity.</strong> Two-way FE gives a price elasticity of −0.402; SDM total effect is −0.627 — a 57% increase. The difference is the cross-border spillover ignored by standard panel models. The OLS-vs-SDM gap is the cross-border-shopping channel made visible.</li>
+      <li><strong>The SDM cannot be simplified.</strong> All three Wald tests reject the simpler models: SAR (χ² = 12.87, p = 0.002), SLX (χ² = 61.04, p &lt; 0.001), SEM (χ² = 8.49, p = 0.014). Cigarette consumption spills across borders through <em>three</em> channels at once: neighbours' consumption (ρ), neighbours' prices (θ<sub>logp</sub>), and neighbours' income (θ<sub>logy</sub>).</li>
+      <li><strong>Habit persistence dominates dynamics.</strong> Adding the temporal lag τ collapses ρ̂ from 0.265 to 0.080 and produces τ̂ = <strong>0.654</strong> — about 65% of last year's smoking persists. The static SDM <em>conflates</em> temporal and spatial dynamics. Short-run elasticity drops to −0.15; long-run is approximately −0.42 = −0.15 / (1 − 0.64).</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Spatial Durbin Model (SDM)</summary>
+        <div class="gloss-body">The most general spatial specification: y = ρWy + Xβ + WXθ + μ + λ + ε. Includes spatial lags of <em>both</em> the dependent variable and the regressors. Nests SAR (θ = 0), SLX (ρ = 0), and SEM (common factor restriction).</div>
+      </details>
+      <details class="gloss"><summary>ρ (rho) — spatial autoregressive</summary>
+        <div class="gloss-body">Coefficient on Wy. Measures how strongly a state's consumption moves with its neighbours'. In the post, ρ̂ = 0.265 in the static SDM; collapses to 0.080 once habit persistence is controlled for.</div>
+      </details>
+      <details class="gloss"><summary>τ (tau) — temporal lag</summary>
+        <div class="gloss-body">Coefficient on y<sub>i,t−1</sub>. Measures own habit persistence. Cigarettes are addictive — last year's consumption is the strongest single predictor of this year's. τ̂ ≈ 0.65 in the full dynamic SDM.</div>
+      </details>
+      <details class="gloss"><summary>ψ (psi) — spatiotemporal lag</summary>
+        <div class="gloss-body">Coefficient on W·y<sub>t−1</sub>: neighbours' <em>past</em> consumption. Significant alone (ψ̂ = 0.27) but loses significance once own habit persistence τ is included.</div>
+      </details>
+      <details class="gloss"><summary>W — spatial weight matrix</summary>
+        <div class="gloss-body">Binary contiguity (states share a border = 1, else 0), row-standardised so each row sums to 1. The spatial lag Wy is then a <em>weighted average</em> of neighbours' values, not a sum.</div>
+      </details>
+      <details class="gloss"><summary>Direct effect</summary>
+        <div class="gloss-body">∂y<sub>i</sub>/∂x<sub>i</sub>: marginal impact of a state's own regressor on its own outcome, <em>including</em> spatial feedback through neighbours and back. In the SDM, the diagonal of (I − ρW)<sup>−1</sup> amplifies the bare β by ~1.07.</div>
+      </details>
+      <details class="gloss"><summary>Indirect (spillover) effect</summary>
+        <div class="gloss-body">∂y<sub>i</sub>/∂x<sub>j</sub>: marginal impact of state j's regressor on state i's outcome. Zero in OLS and FE by construction. Substantial in SDM: −0.314 for price (almost equal to direct).</div>
+      </details>
+      <details class="gloss"><summary>Total effect = direct + indirect</summary>
+        <div class="gloss-body">The full system response to a one-unit change in x. SDM total price effect is −0.627 = −0.313 (direct) + −0.314 (indirect) — 57% larger in magnitude than two-way FE.</div>
+      </details>
+      <details class="gloss"><summary>Lee-Yu bias correction</summary>
+        <div class="gloss-body">An adjustment for the incidental parameters bias in spatial ML with fixed effects. Uses N×(T−1) = 1,334 obs. In this panel with T = 30, the correction barely moves estimates (ρ̂ from 0.265 to 0.260) — bias is small for long panels.</div>
+      </details>
+      <details class="gloss"><summary>Wald tests for SDM restrictions</summary>
+        <div class="gloss-body">Three joint tests on the SDM parameters. SAR test: θ = 0. SLX test: ρ = 0. SEM test: θ + ρβ = 0 (common factor). All rejected here, so the full SDM is the right specification.</div>
+      </details>
+      <details class="gloss"><summary>Short-run vs long-run elasticity</summary>
+        <div class="gloss-body">In a dynamic model, β is the contemporaneous (short-run) impact. Long-run is β / (1 − τ). With β = −0.15 and τ = 0.64, the long-run elasticity is −0.42 — close to the static SDM's −0.40.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: CROSS-BORDER SPILLOVER ====================== -->
+<section id="pane-spillover" class="tab-pane" role="tabpanel" aria-labelledby="tab-spillover">
+
+  <h2>Cross-Border Spillover — watch the price hike propagate</h2>
+  <p class="lede">
+    A 7×7 lattice of "states" (49 cells, in the same spirit as the 46-state
+    US panel). Click any cell to drop a unit price hike on it. The animation
+    spreads it through a row-standardised rook spatial weight matrix at rate
+    <strong>ρ</strong>. After many iterations, the system stabilises at
+    <code>(I − ρW)<sup>−1</sup></code> times the initial shock. Slide ρ to
+    feel the gap between the SDM's ρ̂ = 0.27 and a near-unit-root world.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Spatial parameter ρ <span class="value" id="sp-rho-val">0.27</span></label>
+      <input type="range" id="sp-rho" min="0" max="0.95" step="0.01" value="0.27" aria-label="spatial parameter rho">
+      <div class="hint">The static SDM gives ρ̂ = 0.265. The dynamic SDM with τ = 0.65 gives ρ̂ = 0.080. Try both regimes.</div>
+    </div>
+    <div class="control">
+      <label>Iterations <span class="value" id="sp-iter-val">15</span></label>
+      <input type="range" id="sp-iter" min="0" max="40" step="1" value="15" aria-label="iterations">
+      <div class="hint">Each step propagates the shock by ρ·W to immediate neighbours. ~15 steps suffice for ρ ≤ 0.6.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Click any cell to drop a unit price-hike shock</h3>
+    <p class="note" style="margin-bottom:8px;">Heat colour shows the steady-state change in consumption per state. Brighter = stronger spillover received from the shocked state.</p>
+    <div class="chart-area" id="sp-grid"></div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">multiplier amplification</div>
+      <div class="stat-value teal" id="sp-amp">—</div>
+      <div class="stat-sub">≈ 1 / (1 − ρ)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">states with response &gt; 5% of initial shock</div>
+      <div class="stat-value orange" id="sp-reach">—</div>
+      <div class="stat-sub">out of 49 cells</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">max response in any cell</div>
+      <div class="stat-value" id="sp-max">—</div>
+      <div class="stat-sub">always on the shocked cell itself</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>At ρ = 0,</strong> the price hike stays in the originating state. No cross-border response. This is the world non-spatial FE assumes.</li>
+      <li><strong>At ρ = 0.27</strong> (the static SDM estimate), the shock bleeds visibly into the 4 contiguous neighbours, then decays geometrically. The amplification <code>1 / (1 − ρ) ≈ 1.37</code> matches the SDM's direct/own-coefficient gap (−0.313 / −0.307 ≈ 1.02 once spatial lags of X are accounted for).</li>
+      <li><strong>At ρ = 0.08</strong> (the dynamic SDM estimate), the spatial map is much darker. Spillovers are real but small once habit persistence is controlled for. The static model overstates them by absorbing temporal autocorrelation.</li>
+      <li><strong>At ρ ≥ 0.8,</strong> every cell lights up. The entire panel becomes a single interconnected system. The cigarette panel is decisively <em>not</em> in this regime.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sp-clear">Clear shocks</button>
+      <button class="action secondary" id="sp-sdm">Set ρ = 0.27 (static SDM)</button>
+      <button class="action secondary" id="sp-dyn">Set ρ = 0.08 (dynamic SDM)</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: DYNAMIC SDM SIMULATOR ====================== -->
+<section id="pane-dynamic" class="tab-pane" role="tabpanel" aria-labelledby="tab-dynamic">
+
+  <h2>Dynamic SDM Simulator — trade τ against ρ</h2>
+  <p class="lede">
+    Simulate panel data on a 7×7 lattice (n = 49 "states", T = 30 years) with
+    known true habit persistence τ, spatial autoregression ρ, and a price-lag
+    spillover θ. Then estimate ρ̂ back from a misspecified <em>static</em> SDM
+    that ignores τ. <strong>Watch ρ̂ inflate as the true τ grows — the static
+    SDM's bias absorbs habit persistence into the spatial parameter.</strong>
+    This is the §8 finding of the post made visible.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>true τ (habit persistence) <span class="value" id="dy-tau-val">0.65</span></label>
+      <input type="range" id="dy-tau" min="0" max="0.90" step="0.05" value="0.65" aria-label="true tau">
+      <div class="hint">Cigarettes are addictive: the post estimates τ̂ ≈ 0.65. Try 0 (no habit) to 0.85 (very persistent).</div>
+    </div>
+    <div class="control">
+      <label>true ρ (spatial lag of y) <span class="value" id="dy-rho-val">0.08</span></label>
+      <input type="range" id="dy-rho" min="0" max="0.50" step="0.01" value="0.08" aria-label="true rho">
+      <div class="hint">The dynamic SDM finds ρ̂ = 0.080 (small spatial spillover once habit is controlled). Static SDM finds 0.265.</div>
+    </div>
+    <div class="control">
+      <label>true θ (spatial lag of price) <span class="value" id="dy-th-val">-0.21</span></label>
+      <input type="range" id="dy-th" min="-0.50" max="0.20" step="0.01" value="-0.21" aria-label="true theta">
+      <div class="hint">The post's SDM gives θ̂<sub>logp</sub> = −0.206 (neighbour-price spillover). Cross-border-shopping channel.</div>
+    </div>
+    <div class="control">
+      <label>noise σ <span class="value" id="dy-s-val">0.06</span></label>
+      <input type="range" id="dy-s" min="0.01" max="0.20" step="0.01" value="0.06" aria-label="noise sigma">
+      <div class="hint">The SDM's σ̂² = 0.0028 ⇒ σ̂ ≈ 0.053. Larger σ = noisier estimates.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Truth</span> what we simulated</h3>
+      <div class="method-row"><span class="label">true τ (habit)</span><span class="val" id="tr-tau">—</span></div>
+      <div class="method-row"><span class="label">true ρ (spatial)</span><span class="val" id="tr-rho">—</span></div>
+      <div class="method-row"><span class="label">true θ<sub>logp</sub></span><span class="val" id="tr-th">—</span></div>
+      <div class="method-row"><span class="label">noise σ</span><span class="val" id="tr-s">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Estimates</span> what each model recovers</h3>
+      <p class="note" style="margin:0 0 10px;">Pedagogical estimators on simulated data — concentrated profile likelihood for ρ on a grid. Not as accurate as Stata's <code>xsmle</code>, but the bias pattern is the same.</p>
+      <div class="method-row"><span class="label">ρ̂ from <em>static</em> SDM (ignores τ)</span><span class="val" id="es-rho-static">—</span></div>
+      <div class="method-row"><span class="label">ρ̂ from dynamic SDM (with τ)</span><span class="val" id="es-rho-dyn">—</span></div>
+      <div class="method-row"><span class="label">τ̂ from dynamic SDM</span><span class="val" id="es-tau">—</span></div>
+      <div class="method-row"><span class="label">bias gap |ρ̂<sub>static</sub> − ρ̂<sub>dyn</sub>|</span><span class="val" id="es-gap">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="dy-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set τ = 0 and ρ = 0.27:</strong> data is purely cross-sectional in dynamics. Both static and dynamic SDM recover ρ ≈ 0.27. No bias from omitting the temporal lag.</li>
+      <li><strong>Set τ = 0.65 and ρ = 0.08:</strong> the post's regime. The static SDM should now estimate ρ̂ inflated toward ~0.25 — it absorbs the τ-driven inertia into the spatial parameter. The dynamic SDM separates them correctly.</li>
+      <li><strong>Set τ = 0.85 and ρ = 0:</strong> a purely habit-driven world with no genuine spatial spillover. The static SDM will <em>still</em> produce a large ρ̂ — it has nowhere else to put the temporal correlation. This is the §8 false-positive trap.</li>
+      <li><strong>Read the gap stat:</strong> the larger the gap between static and dynamic ρ̂, the worse the static model misspecifies the dynamics. In the cigarette panel, the gap is about 0.18 (0.265 − 0.080).</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="dy-reseed">Reseed random draws</button>
+      <button class="action secondary" id="dy-reset">Reset to post values (τ=0.65, ρ=0.08, θ=−0.21)</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST / DIRECT-INDIRECT-TOTAL ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's headline numbers — interactively</h2>
+  <p class="lede">
+    These estimates come straight from the post — §4 (Pooled OLS, Region FE,
+    Time FE, Two-way FE), §6 (SDM standard and SDM with Lee-Yu bias correction),
+    and §8 (Dynamic SDM with τ alone and with both τ + ψ). The y-axis lists the
+    eight models. The facets are the three impact components: direct, indirect
+    (spillover), and total. <strong>Toggle which models and which regressor (logp
+    or logy) to display.</strong>
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Toggle non-spatial models (Pooled OLS, Region FE, Time FE, Two-way FE):</strong> notice that the indirect-effect facet is uniformly zero. These models have no cross-border channel by construction. The Total facet then equals the Direct facet for every non-spatial row.</li>
+      <li><strong>Compare Two-way FE and SDM on logp:</strong> two-way FE gives −0.402 (direct = total); SDM gives total = −0.627. The 57% understatement is the cross-border-shopping channel ignored by FE. This is the headline finding of §6 and §9.</li>
+      <li><strong>SDM vs SDM (Lee-Yu):</strong> nearly identical (ρ: 0.265 vs 0.260; total logp: −0.627 vs −0.623). With T = 30 the incidental-parameter bias is small. The Lee-Yu correction is a robustness check rather than a substantive correction here.</li>
+      <li><strong>Static SDM vs dynamic SDM on logp:</strong> static SDM direct = −0.313; dynamic SDM (with τ) direct = −0.152 — half the size. Dynamic indirect drops from −0.314 to −0.082 (and loses significance). The static SDM's spillover estimates partly capture omitted temporal dynamics.</li>
+      <li><strong>For logy (income):</strong> non-spatial Region FE estimates a tiny insignificant 0.013; SDM total = +0.36; dynamic SDM total = +0.11. Once habit persistence is controlled, the income elasticity nearly halves.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Regressor</h3>
+    <div class="outcome-toggle" id="fp-regressor">
+      <label><input type="radio" name="regressor" value="logp" checked> logp (log real price)</label>
+      <label><input type="radio" name="regressor" value="logy"> logy (log real income)</label>
+    </div>
+    <h3 style="margin-top:16px;">Models to display</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Pooled OLS" checked> Pooled OLS</label>
+      <label><input type="checkbox" value="Region FE" checked> Region FE</label>
+      <label><input type="checkbox" value="Time FE" checked> Time FE</label>
+      <label><input type="checkbox" value="Two-way FE" checked> Two-way FE</label>
+      <label><input type="checkbox" value="SDM" checked> SDM</label>
+      <label><input type="checkbox" value="SDM (Lee-Yu)" checked> SDM (Lee-Yu)</label>
+      <label><input type="checkbox" value="Dyn SDM (tau)" checked> Dyn SDM (τ)</label>
+      <label><input type="checkbox" value="Dyn SDM (full)" checked> Dyn SDM (full)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why does the SDM amplify the price effect but the dynamic SDM shrink it?</h3>
+    <p>
+      In the static SDM, a price hike in state i propagates to neighbours through
+      (I − ρW)<sup>−1</sup> and partly echoes back. The direct effect (−0.313)
+      includes the echo, and the indirect effect (−0.314) captures the cross-border
+      response. Total = −0.627, much larger than two-way FE's −0.402 because the
+      FE model has no spatial channel.
+    </p>
+    <p>
+      In the dynamic SDM, much of what looked like spatial dependence is actually
+      <em>habit persistence</em> — τ̂ ≈ 0.65 — that happens to cluster temporally
+      and spatially because neighbour states are autocorrelated <em>within</em>.
+      Once τ enters the model, ρ̂ collapses from 0.265 to 0.080. The short-run
+      direct effect halves (−0.152), and the long-run effect (β / (1 − τ) =
+      −0.152 / 0.36 ≈ −0.42) matches the static SDM's number from a completely
+      different mechanism: contemporaneous spatial spillover vs. own habit
+      persistence over time.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>The Wald-test verdict (post §7)</h3>
+    <p>Three tests, three rejections — the SDM cannot be simplified:</p>
+    <ul>
+      <li><strong>SAR restriction (θ = 0):</strong> χ²(2) = 12.87, p = 0.002. Neighbours' prices and incomes have direct effects beyond their influence through Wy.</li>
+      <li><strong>SLX restriction (ρ = 0):</strong> χ²(1) = 61.04, p &lt; 0.001. The spatial autoregressive feedback is overwhelmingly significant.</li>
+      <li><strong>SEM common-factor restriction (θ + ρβ = 0):</strong> χ²(2) = 8.49, p = 0.014. Spatial dependence is substantive, not just nuisance error.</li>
+    </ul>
+    <p>
+      Three independent statistical tests all reject the simpler model. The full
+      SDM is the appropriate specification — cigarette demand spills across borders
+      through <em>multiple</em> channels simultaneously.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Spatial Panel Regression in Stata: Cigarette Demand Across US States</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

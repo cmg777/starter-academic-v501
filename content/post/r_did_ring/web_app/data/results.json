@@ -1,0 +1,46 @@
+{
+  "_comment": "Numbers parsed from content/post/r_did_ring/table_lr_parametric.csv, table_lr_ringchoice.csv, table_lr_nonparametric.csv, and summary.csv. ATT is in log points (delta_log_price scale); ATT % is the back-transformed percent change.",
+
+  "estimates": [
+    { "method": "Parametric (cut = 0.05 mi)", "outcome": "Log home price",  "estimate": -0.0661, "se": 0.0383, "ci_lo": -0.1411, "ci_hi":  0.0089, "n_selected": null, "att_pct": -6.40 },
+    { "method": "Parametric (cut = 0.10 mi)", "outcome": "Log home price",  "estimate": -0.0595, "se": 0.0225, "ci_lo": -0.1037, "ci_hi": -0.0154, "n_selected": null, "att_pct": -5.78 },
+    { "method": "Parametric (cut = 0.15 mi)", "outcome": "Log home price",  "estimate": -0.0431, "se": 0.0180, "ci_lo": -0.0784, "ci_hi": -0.0077, "n_selected": null, "att_pct": -4.21 },
+    { "method": "Nonparametric bin 1 (~300 ft)", "outcome": "Log home price", "estimate": -0.2306, "se": 0.0560, "ci_lo": -0.3403, "ci_hi": -0.1209, "n_selected": null, "att_pct": -20.60 },
+    { "method": "Nonparametric bin 2 (~400 ft)", "outcome": "Log home price", "estimate": -0.1652, "se": 0.0451, "ci_lo": -0.2537, "ci_hi": -0.0768, "n_selected": null, "att_pct": -15.20 },
+    { "method": "Nonparametric ATT (sample-wt., inside 0.1 mi)", "outcome": "Log home price", "estimate": -0.1320, "se": 0.0250, "ci_lo": -0.1810, "ci_hi": -0.0830, "n_selected": null, "att_pct": -12.40 }
+  ],
+
+  "selection": [],
+
+  "rings_lr_curve": [
+    { "bin": 1,  "x_lo": 0.011, "x_hi": 0.053, "tau":  -0.2306, "se": 0.0560, "ci_lo": -0.3403, "ci_hi": -0.1209 },
+    { "bin": 2,  "x_lo": 0.054, "x_hi": 0.076, "tau":  -0.1652, "se": 0.0451, "ci_lo": -0.2537, "ci_hi": -0.0768 },
+    { "bin": 3,  "x_lo": 0.077, "x_hi": 0.094, "tau":  -0.0298, "se": 0.0481, "ci_lo": -0.1241, "ci_hi":  0.0644 },
+    { "bin": 4,  "x_lo": 0.095, "x_hi": 0.110, "tau":   0.0056, "se": 0.0474, "ci_lo": -0.0873, "ci_hi":  0.0985 },
+    { "bin": 5,  "x_lo": 0.111, "x_hi": 0.127, "tau":  -0.0133, "se": 0.0482, "ci_lo": -0.1078, "ci_hi":  0.0812 },
+    { "bin": 6,  "x_lo": 0.127, "x_hi": 0.140, "tau":  -0.1000, "se": 0.0482, "ci_lo": -0.1944, "ci_hi": -0.0056 },
+    { "bin": 7,  "x_lo": 0.140, "x_hi": 0.152, "tau":  -0.0591, "se": 0.0445, "ci_lo": -0.1464, "ci_hi":  0.0282 },
+    { "bin": 8,  "x_lo": 0.153, "x_hi": 0.164, "tau":   0.0682, "se": 0.0464, "ci_lo": -0.0228, "ci_hi":  0.1593 },
+    { "bin": 9,  "x_lo": 0.165, "x_hi": 0.175, "tau":  -0.0883, "se": 0.0493, "ci_lo": -0.1849, "ci_hi":  0.0084 },
+    { "bin": 10, "x_lo": 0.176, "x_hi": 0.187, "tau":  -0.0747, "se": 0.0503, "ci_lo": -0.1733, "ci_hi":  0.0240 },
+    { "bin": 11, "x_lo": 0.188, "x_hi": 0.197, "tau":   0.1040, "se": 0.0486, "ci_lo":  0.0088, "ci_hi":  0.1993 },
+    { "bin": 12, "x_lo": 0.198, "x_hi": 0.207, "tau":  -0.0197, "se": 0.0449, "ci_lo": -0.1076, "ci_hi":  0.0682 },
+    { "bin": 13, "x_lo": 0.208, "x_hi": 0.217, "tau":   0.0238, "se": 0.0462, "ci_lo": -0.0667, "ci_hi":  0.1142 },
+    { "bin": 14, "x_lo": 0.217, "x_hi": 0.226, "tau":   0.0787, "se": 0.0518, "ci_lo": -0.0229, "ci_hi":  0.1803 },
+    { "bin": 15, "x_lo": 0.226, "x_hi": 0.234, "tau":   0.1263, "se": 0.0515, "ci_lo":  0.0254, "ci_hi":  0.2272 },
+    { "bin": 16, "x_lo": 0.235, "x_hi": 0.242, "tau":  -0.0690, "se": 0.0493, "ci_lo": -0.1655, "ci_hi":  0.0276 },
+    { "bin": 17, "x_lo": 0.242, "x_hi": 0.250, "tau":  -0.0885, "se": 0.0496, "ci_lo": -0.1856, "ci_hi":  0.0086 },
+    { "bin": 18, "x_lo": 0.251, "x_hi": 0.259, "tau":  -0.0100, "se": 0.0457, "ci_lo": -0.0996, "ci_hi":  0.0796 },
+    { "bin": 19, "x_lo": 0.259, "x_hi": 0.267, "tau":   0.0880, "se": 0.0474, "ci_lo": -0.0048, "ci_hi":  0.1809 },
+    { "bin": 20, "x_lo": 0.267, "x_hi": 0.275, "tau":  -0.0211, "se": 0.0537, "ci_lo": -0.1263, "ci_hi":  0.0840 },
+    { "bin": 21, "x_lo": 0.275, "x_hi": 0.283, "tau":   0.0269, "se": 0.0479, "ci_lo": -0.0671, "ci_hi":  0.1209 },
+    { "bin": 22, "x_lo": 0.284, "x_hi": 0.292, "tau":  -0.0633, "se": 0.0522, "ci_lo": -0.1657, "ci_hi":  0.0390 },
+    { "bin": 23, "x_lo": 0.292, "x_hi": 0.300, "tau":   0.0000, "se": 0.0000, "ci_lo":  0.0000, "ci_hi":  0.0000 }
+  ],
+
+  "ringchoice": [
+    { "cut_inner": 0.05, "att_log": -0.0661, "att_pct": -6.40, "se": 0.0383, "ci_lo": -0.1411, "ci_hi":  0.0089, "n": 7534, "label": "Too narrow" },
+    { "cut_inner": 0.10, "att_log": -0.0560, "att_pct": -5.45, "se": 0.0239, "ci_lo": -0.1029, "ci_hi": -0.0092, "n": 7534, "label": "Canonical" },
+    { "cut_inner": 0.15, "att_log": -0.0431, "att_pct": -4.21, "se": 0.0180, "ci_lo": -0.0784, "ci_hi": -0.0077, "n": 7534, "label": "Too wide"  }
+  ]
+}

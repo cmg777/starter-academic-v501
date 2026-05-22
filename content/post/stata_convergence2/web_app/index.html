@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Converging to Convergence — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Converging to Convergence' (Kremer, Willis & You, 2021 replication). A pedagogical web app with rolling-beta visualisations, an OVB decomposition simulator, and a forest plot of decade-by-decade convergence.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Converging to Convergence — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Converging to Convergence: Understanding the Main Ideas of the Convergence Literature</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"   role="tab" aria-selected="true">1 · Why convergence?</button>
+  <button id="tab-trend"   class="tab"        data-pane="pane-trend"   role="tab" aria-selected="false">2 · β &amp; σ Explorer</button>
+  <button id="tab-ovb"     class="tab"        data-pane="pane-ovb"     role="tab" aria-selected="false">3 · OVB Simulator</button>
+  <button id="tab-forest"  class="tab"        data-pane="pane-forest"  role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Has the world been converging?</h2>
+  <p class="lede">
+    For decades, poor countries grew <em>slower</em> than rich ones — a pattern
+    called divergence. Then, around the year 2000, this flipped:
+    <strong>unconditional convergence</strong> emerged. The
+    <span class="kbd">β</span> coefficient of 10-year forward growth on initial
+    log income shifted from <strong>+0.53 in the 1960s</strong> to
+    <strong>−0.76 by 2007</strong>. This app lets you see, slide, and
+    decompose that flip yourself.
+  </p>
+  <p class="lede">
+    Across four tabs you will: watch the rolling β curve cross zero in real
+    time; toggle between β (catch-up) and σ (dispersion) to see why beta
+    convergence leads sigma convergence by a decade; pull the
+    <span class="kbd">δ × λ</span> levers to reproduce the omitted-variable-bias
+    identity from the post's §8; and explore the actual Kremer–Willis–You (2021)
+    decade-by-decade forest plot.
+  </p>
+
+  <div class="card">
+    <h3>The headline animation — β crosses zero around the year 2000</h3>
+    <p>
+      Each year the world ran a regression of 10-year forward growth on log
+      GDP per capita. The slope coefficient — β — is the
+      <em>convergence coefficient</em>. The animation below traces it from
+      1960 to 2008. Watch it stay positive through the 1980s (richer countries
+      growing faster — divergence) and then plunge below zero after the late
+      1990s (catch-up — convergence). The dashed orange line is the
+      no-catch-up reference.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-trend">
+      <div class="cta-tag">Tab 2</div>
+      <h4>β &amp; σ Explorer</h4>
+      <p>Drag a year slider and watch the rolling β coefficient and the income-dispersion σ move together. Compare growth across the four income quartiles.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-ovb">
+      <div class="cta-tag">Tab 3</div>
+      <h4>OVB Simulator</h4>
+      <p>Pull the δ (income–correlate) and λ (growth–correlate) sliders. Watch the predicted gap δ·λ shrink to match the post's headline 91% reduction (0.44 → 0.04).</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>The decade-by-decade β coefficient with 95% CIs, plus the absolute-vs-conditional gap. Hover any point for SEs, sample sizes, and CIs.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>β-convergence (unconditional)</summary>
+        <div class="gloss-body">The slope of 10-year forward growth on log initial income, with no controls. Negative ⇒ poorer countries catch up. <em>This is the rolling line in Tab 2.</em></div>
+      </details>
+      <details class="gloss"><summary>β* (conditional convergence)</summary>
+        <div class="gloss-body">Same regression but with growth correlates included. Often negative even when β is not. The gap β − β* is the OVB. <em>See Tab 4's twin lines.</em></div>
+      </details>
+      <details class="gloss"><summary>σ-convergence</summary>
+        <div class="gloss-body">The cross-country standard deviation of log GDP per capita at year t. Tracks the <em>width</em> of the world income distribution, not the slope.</div>
+      </details>
+      <details class="gloss"><summary>OVB identity</summary>
+        <div class="gloss-body">β − β* = δ × λ. The gap between unconditional and conditional convergence is exactly the product of two slopes. <em>Tab 3 is built around this identity.</em></div>
+      </details>
+      <details class="gloss"><summary>δ — correlate-on-income slope</summary>
+        <div class="gloss-body">How much richer countries have more of the correlate (e.g. democracy). Stable across decades — the paper's finding.</div>
+      </details>
+      <details class="gloss"><summary>λ — growth-on-correlate slope</summary>
+        <div class="gloss-body">How much the correlate predicts growth (controlling for income). Has <em>collapsed</em> for short-run policy variables since the 1990s — the paper's central result.</div>
+      </details>
+      <details class="gloss"><summary>Lambda flattening</summary>
+        <div class="gloss-body">The empirical fact that λ for short-run policy variables (democracy, inflation, fiscal policy) fell by ~80% from 1985 to 2005. The 1990s Washington-Consensus growth regressions failed their out-of-sample test.</div>
+      </details>
+      <details class="gloss"><summary>Growth correlates</summary>
+        <div class="gloss-body">Right-hand-side variables in 1990s growth regressions: inflation, investment, schooling, openness, democracy, rule of law. The 1985–2015 trend is convergence in <em>each one of them</em>.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: β & σ EXPLORER ====================== -->
+<section id="pane-trend" class="tab-pane" role="tabpanel" aria-labelledby="tab-trend">
+
+  <h2>The rolling β coefficient with 95% CI band</h2>
+  <p class="lede">
+    The chart below plots β_t, the convergence coefficient estimated <em>each
+    year</em> from a year-interacted panel regression. The dashed orange line
+    is β = 0 (no catch-up). Drag the year slider to scrub a vertical cursor
+    across decades; the numeric β estimate updates live. Below it, σ
+    (income dispersion) and the four income-quartile growth lines tell the
+    complementary story.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Year cursor <span class="value" id="trend-year-val">2000</span></label>
+      <input type="range" id="trend-year" min="1960" max="2008" step="1" value="2000" aria-label="year">
+      <div class="hint">Slide to inspect β in any specific year — the dot follows the line.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="trend-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">β at cursor year</div>
+      <div class="stat-value teal" id="trend-stat-beta">—</div>
+      <div class="stat-sub">slope of 10-yr growth on log income</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Sign</div>
+      <div class="stat-value orange" id="trend-stat-sign">—</div>
+      <div class="stat-sub">+ ⇒ divergence, − ⇒ convergence</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">β trend slope per year</div>
+      <div class="stat-value">−0.025</div>
+      <div class="stat-sub">post-§4 estimate (p &lt; 0.01)</div>
+    </div>
+  </div>
+
+  <h3>σ-convergence — has income dispersion narrowed?</h3>
+  <p>
+    σ is the cross-country standard deviation of log GDP per capita each year.
+    It rose steadily from 0.95 (1960) to a peak of <strong>1.22 in 2000</strong>,
+    then eased to 1.13 by 2015. Beta convergence (poorer countries growing
+    faster) is <em>necessary but not sufficient</em> for sigma convergence —
+    catch-up has to overcome random shocks that push countries apart.
+  </p>
+  <div class="chart-area" id="sigma-chart"></div>
+
+  <h3>Who drives convergence? Growth by income quartile</h3>
+  <p>
+    Convergence since 2000 is driven by <em>both</em> ends of the income
+    distribution. In the 1960s, Q4 (richest) grew fastest at 3.49% per year and
+    Q1 (poorest) at only 2.46%. By 2007 the ordering had completely reversed:
+    Q1 at 3.02%, Q4 at <strong>0.31%</strong>. The marathon's leaders slowed
+    and the back-of-pack accelerated — the pack compressed from both ends.
+  </p>
+  <div class="chart-area" id="quartile-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>β crosses zero around 1999–2000.</strong> Drag the year slider to 1985 (β ≈ +0.32) then to 2005 (β ≈ −0.74) — the sign-flip is the whole story.</li>
+      <li><strong>σ peaks ~10 years after β crosses zero.</strong> Beta convergence leads sigma convergence. Catch-up growth has to overcome the random shocks that push countries apart.</li>
+      <li><strong>Q4 (richest) growth collapses</strong> from 3.5% to 0.3%. The rich didn't just slow; they nearly stopped growing.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: OVB SIMULATOR ====================== -->
+<section id="pane-ovb" class="tab-pane" role="tabpanel" aria-labelledby="tab-ovb">
+
+  <h2>OVB simulator — pull the δ and λ levers</h2>
+  <p class="lede">
+    The omitted-variable-bias identity is the analytical engine of the post's
+    §8: <span class="kbd">β − β* = δ × λ</span>. The gap between unconditional
+    and conditional convergence equals the product of (a) how much richer
+    countries have more of the correlate (δ), and (b) how much the correlate
+    predicts growth (λ). Pull either lever and watch the predicted gap update.
+    The default values are the Polity-2 worked example from §8.3.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>δ — income–correlate slope <span class="value" id="ovb-d-val">0.49</span></label>
+      <input type="range" id="ovb-d" min="-0.5" max="1.0" step="0.01" value="0.49" aria-label="delta">
+      <div class="hint">1985 Polity-2: δ = 0.494. 2005: 0.216. The paper finds δ is stable across decades.</div>
+    </div>
+    <div class="control">
+      <label>λ — growth–correlate slope <span class="value" id="ovb-l-val">0.89</span></label>
+      <input type="range" id="ovb-l" min="-0.5" max="1.5" step="0.01" value="0.89" aria-label="lambda">
+      <div class="hint">1985 Polity-2: λ = 0.891. 2005: 0.183. The paper finds λ <em>flattened</em> by 80%.</div>
+    </div>
+    <div class="control">
+      <label>β* — conditional slope <span class="value" id="ovb-bc-val">-0.11</span></label>
+      <input type="range" id="ovb-bc" min="-1.3" max="0.2" step="0.01" value="-0.11" aria-label="beta star">
+      <div class="hint">1985 Polity-2: β* = −0.111. 2005: −0.807. β* is the convergence rate <em>after</em> controlling for the correlate.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Predicted gap</span> δ × λ</h3>
+      <div class="method-row"><span class="label">δ × λ (gap)</span><span class="val" id="ovb-gap">—</span></div>
+      <div class="method-row"><span class="label">δ (slope)</span><span class="val" id="ovb-d-show">—</span></div>
+      <div class="method-row"><span class="label">λ (slope)</span><span class="val" id="ovb-l-show">—</span></div>
+      <div class="method-row"><span class="label">β = β* + δλ</span><span class="val" id="ovb-bu-show">—</span></div>
+      <p class="note">The OVB formula β − β* = δ × λ is an algebraic identity — it holds <em>exactly</em> in any linear regression.</p>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Two periods at a glance</span></h3>
+      <div class="method-row"><span class="label">1985 actual gap</span><span class="val">0.440</span></div>
+      <div class="method-row"><span class="label">2005 actual gap</span><span class="val">0.040</span></div>
+      <div class="method-row"><span class="label">% reduction</span><span class="val" style="color:var(--teal);">91%</span></div>
+      <div class="method-row"><span class="label">δ 1985 → 2005</span><span class="val">0.494 → 0.216</span></div>
+      <div class="method-row"><span class="label">λ 1985 → 2005</span><span class="val">0.891 → 0.183</span></div>
+      <p class="note">The collapse comes mostly from λ flattening — δ is comparatively stable.</p>
+    </div>
+  </div>
+
+  <div class="chart-area" id="ovb-bars"></div>
+
+  <h3>What β looks like when you turn the levers</h3>
+  <p>
+    With β = β* + δλ, the OVB identity tells you the unconditional β directly:
+    fix the conditional slope β* and the two component slopes, and you have
+    the headline number. Move the sliders to reproduce 1985 (β = +0.33) and
+    2005 (β = −0.77).
+  </p>
+  <div class="chart-area" id="ovb-compare"></div>
+
+  <div class="pedagogy">
+    <h4>Three preset narratives</h4>
+    <ul>
+      <li><strong>1985 (preset):</strong> δ = 0.49, λ = 0.89, β* = −0.11. Gap = 0.44. β ≈ +0.33 (divergence).</li>
+      <li><strong>2005 (preset):</strong> δ = 0.22, λ = 0.18, β* = −0.81. Gap = 0.04. β ≈ −0.77 (convergence).</li>
+      <li><strong>What if λ stayed at 1985 level?</strong> Keep λ = 0.89, set δ to its 2005 value 0.22. Gap = 0.20. β ≈ −0.61. Even with stable λ the world would still have converged — but mostly because δ shrank by half.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action" id="ovb-preset-1985">Load 1985 preset</button>
+      <button class="action secondary" id="ovb-preset-2005">Load 2005 preset</button>
+      <button class="action secondary" id="ovb-preset-counter">Counterfactual: stable λ</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Monte Carlo: 100 random (δ, λ) draws</h3>
+    <p>
+      To see how much of the gap is driven by δ versus by λ, run 100 random draws
+      where both vary uniformly over the post's empirical range. The histogram
+      shows how the implied gap δ·λ is distributed. The orange marker is the
+      actual 1985 gap of 0.44 — your draws should cluster well below it.
+    </p>
+    <button class="action" id="ovb-run">Run 100 simulations</button>
+    <span id="ovb-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="ovb-progress"><div></div></div>
+    <div class="chart-area" id="ovb-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="ovb-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">mean gap</div><div class="stat-value teal" id="ovb-mean">—</div></div>
+      <div class="stat"><div class="stat-label">sd gap</div><div class="stat-value" id="ovb-sd">—</div></div>
+      <div class="stat"><div class="stat-label">share &gt; 0.44</div><div class="stat-value orange" id="ovb-share">—</div><div class="stat-sub">share of draws that exceed the 1985 gap</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's headline figures — interactively</h2>
+  <p class="lede">
+    These numbers come straight from <code>convergence2_beta_by_decade.csv</code>
+    and the Polity-2 OVB worked example in <code>results_report.md</code>.
+    Toggle decades and outcome panels to compare. Hover any point to see its
+    SE, 95% CI, and sample size. The dashed line is the no-catch-up reference (β = 0).
+  </p>
+
+  <div class="card">
+    <h3>Panels</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Beta-convergence" checked> β by decade</label>
+      <label><input type="checkbox" value="OVB: beta - beta*" checked> OVB gap (β − β*)</label>
+      <label><input type="checkbox" value="lambda (growth slope)" checked> λ (1985 vs 2005)</label>
+      <label><input type="checkbox" value="delta (income slope)" checked> δ (1985 vs 2005)</label>
+      <label><input type="checkbox" value="Correlate convergence (1985-2015)"> Correlate β (1985–2015)</label>
+    </div>
+    <h3 style="margin-top:16px;">Rows</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="1960s (Decade)" checked> 1960s</label>
+      <label><input type="checkbox" value="1970s (Decade)" checked> 1970s</label>
+      <label><input type="checkbox" value="1980s (Decade)" checked> 1980s</label>
+      <label><input type="checkbox" value="1990s (Decade)" checked> 1990s</label>
+      <label><input type="checkbox" value="2000s (Decade)" checked> 2000s</label>
+      <label><input type="checkbox" value="2007 (Decade)" checked> 2007</label>
+      <label><input type="checkbox" value="1985 (Polity2)" checked> Polity2 1985</label>
+      <label><input type="checkbox" value="2005 (Polity2)" checked> Polity2 2005</label>
+      <label><input type="checkbox" value="Investment" checked> Investment</label>
+      <label><input type="checkbox" value="Polity2" checked> Polity2</label>
+      <label><input type="checkbox" value="Pop. growth" checked> Pop. growth</label>
+      <label><input type="checkbox" value="Inflation" checked> Inflation</label>
+      <label><input type="checkbox" value="Gov. spending" checked> Gov. spending</label>
+      <label><input type="checkbox" value="FH polit. rights" checked> FH polit. rights</label>
+      <label><input type="checkbox" value="Barro-Lee edu." checked> Barro-Lee edu.</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <h3>Absolute vs conditional convergence over time</h3>
+  <p>
+    From <code>convergence2_conditional_convergence.csv</code>: in 1985 the
+    unconditional β was <strong>+0.42</strong> (divergence) while the conditional
+    β* was <strong>−1.07</strong> (strong catch-up given institutions) — a gap of
+    1.49. By 2000 the gap had narrowed to 0.15. The two lines below
+    <em>converge to convergence</em>: the unconditional β finally catches up
+    with what was always true conditionally.
+  </p>
+  <div class="chart-area" id="fp-twin"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Untoggle the 2000s and 2007 decades</strong> on the β-by-decade panel. The remaining four decades cluster around zero. Convergence really is a post-2000 phenomenon.</li>
+      <li><strong>Hover the OVB panel's Polity2 1985 row.</strong> The estimate is 0.440. Now hover Polity2 2005 — it falls to 0.040, a 91% reduction. That is the punchline of §11 in one number.</li>
+      <li><strong>Compare the λ panel to the δ panel.</strong> δ shrank by 56% (0.494 → 0.216). λ shrank by 79% (0.891 → 0.183). The flattening of λ is the dominant driver.</li>
+      <li><strong>Turn on the Correlate convergence panel.</strong> Every short-run policy variable converged: inflation (−3.07), investment (−2.98), Polity2 (−2.03). The exception is Barro-Lee education (−0.16), which is not significant.</li>
+      <li><strong>The twin-line chart's blue line (β*) stays firmly negative throughout.</strong> Conditional convergence held all along; what changed was the world catching up to the model.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Converging to Convergence</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

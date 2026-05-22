@@ -1,0 +1,90 @@
+{
+  "_comment": "Baked from method_comparison.csv, gate_by_dutch.csv, policy_welfare.csv in the post folder.",
+
+  "estimates": [
+    {
+      "method":     "Naive (DiM)",
+      "outcome":    "ATE (months employed)",
+      "estimate":   5.1112,
+      "se":         0.0943,
+      "ci_lo":      4.9265,
+      "ci_hi":      5.2959,
+      "n_selected": null
+    },
+    {
+      "method":     "DoubleML (IRM)",
+      "outcome":    "ATE (months employed)",
+      "estimate":   5.5202,
+      "se":         0.0814,
+      "ci_lo":      5.3607,
+      "ci_hi":      5.6798,
+      "n_selected": null
+    },
+    {
+      "method":     "CausalForestDML",
+      "outcome":    "ATE (months employed)",
+      "estimate":   5.4563,
+      "se":         0.0208,
+      "ci_lo":      5.4156,
+      "ci_hi":      5.4971,
+      "n_selected": null
+    },
+    {
+      "method":     "Truth",
+      "outcome":    "ATE (months employed)",
+      "estimate":   5.6280,
+      "se":         0.0000,
+      "ci_lo":      5.6280,
+      "ci_hi":      5.6280,
+      "n_selected": null
+    }
+  ],
+
+  "gate": [
+    {
+      "group":      "Dutch 0 (no)",
+      "n":          1302,
+      "estimated":  7.4645,
+      "std_error":  0.1567,
+      "ci_lo":      7.1574,
+      "ci_hi":      7.7717,
+      "truth":      7.6337
+    },
+    {
+      "group":      "Dutch 1 (low)",
+      "n":          1469,
+      "estimated":  6.1271,
+      "std_error":  0.1403,
+      "ci_lo":      5.8521,
+      "ci_hi":      6.4021,
+      "truth":      6.1231
+    },
+    {
+      "group":      "Dutch 2 (mid)",
+      "n":          1504,
+      "estimated":  4.5028,
+      "std_error":  0.1420,
+      "ci_lo":      4.2246,
+      "ci_hi":      4.7811,
+      "truth":      4.6123
+    },
+    {
+      "group":      "Dutch 3 (native)",
+      "n":          725,
+      "estimated":  2.9097,
+      "std_error":  0.2140,
+      "ci_lo":      2.4903,
+      "ci_hi":      3.3290,
+      "truth":      3.1300
+    }
+  ],
+
+  "welfare": [
+    { "rule": "Treat none",  "share_treated": 0.0000, "avg_welfare": 0.0000 },
+    { "rule": "Treat all",   "share_treated": 1.0000, "avg_welfare": 1.6280 },
+    { "rule": "IATE rule",   "share_treated": 0.8392, "avg_welfare": 1.7494 },
+    { "rule": "Oracle",      "share_treated": 0.8376, "avg_welfare": 1.7580 }
+  ],
+
+  "selection": []
+}

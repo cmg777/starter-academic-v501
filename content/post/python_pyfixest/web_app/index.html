@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>High-Dimensional Fixed Effects (PyFixest) — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'High-Dimensional Fixed Effects Regression: An Introduction in Python'. Sliders, simulators, and a forest plot to build intuition for the within transformation, panel FE, clustered SEs, and the Mincer wage panel.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>PyFixest — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>High-Dimensional Fixed Effects Regression: An Introduction in Python</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Within Transformation</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">2 · Panel FE Simulator</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">3 · Mincer Forest Plot</button>
+  <button id="tab-se"       class="tab"        data-pane="pane-se"       role="tab" aria-selected="false">4 · Clustered SE Showdown</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: WITHIN TRANSFORMATION ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>How fixed effects rewrite the data — and the union premium</h2>
+  <p class="lede">
+    Pooled OLS on the Vella–Verbeek wage panel says joining a union raises
+    wages by <strong>18.3%</strong>. One-way fixed effects on the same data
+    says <strong>7.8%</strong>. <strong>Over half of the apparent union
+    premium reflects worker selection</strong>, not the within-worker effect
+    of being in a union. PyFixest computes this correction with a one-line
+    formula (<code>lwage ~ union | nr</code>) — but the mechanics deserve a
+    closer look.
+  </p>
+  <p class="lede">
+    This app turns the post's central ideas into knobs you can move.
+    Watch the <span class="kbd">within transformation</span> demean three
+    workers in real time. Simulate a panel with unit fixed effects and slide
+    the selection knob to see <span class="kbd">pooled OLS</span> drift away
+    from the truth while <span class="kbd">FE</span> stays close. Toggle the
+    five Mincer-equation estimators in the forest plot. And drive a
+    cluster-robust SE multiplier yourself to see how t-statistics shrink when
+    you cluster honestly.
+  </p>
+
+  <div class="card">
+    <h3>The within transformation, animated</h3>
+    <p>
+      Three workers, two periods each. <strong>Alice</strong> (steel) earns
+      low wages and never joins a union. <strong>Bob</strong> (teal) switches
+      from non-union to union between periods. <strong>Carla</strong> (orange)
+      earns high wages and is always in a union. The dashed grey line is the
+      <em>pooled OLS</em> fit — steep, because high-wage workers happen to be
+      in unions and low-wage workers are not (positive selection). Wait a few
+      seconds: the points slide as each worker's two-period mean is
+      subtracted. After demeaning, <em>only Bob moves</em> — and the FE slope
+      (orange) is much flatter than pooled OLS suggested.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <p class="note">
+      The animation cycles between raw and demeaned coordinates on a 10-second
+      loop. Demeaning kills two of three workers (Alice and Carla collapse to
+      the origin) because they never switched union status. <strong>Only
+      switchers identify the FE coefficient</strong> — that is why the
+      pyfixest post calls out the 484 / 545 workers who change occupation
+      and the 24% of person-years that are union-covered: those are the
+      "movers" the within estimator actually uses.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Between vs within: how much variation does FE have to work with?</h3>
+    <p>
+      For each variable in the Mincer wage panel (N = 545 workers; T = 8
+      years), we decompose the standard deviation into a <em>between</em>
+      part (across workers) and a <em>within</em> part (across years inside a
+      worker). One-way FE only uses the within slice.
+    </p>
+    <div class="chart-area" id="intro-var"></div>
+    <p class="note">
+      Education has <strong>zero within-variation</strong> in this sample —
+      every worker's education is constant across the eight years, so
+      one-way FE mechanically drops it. Union and married have substantial
+      within shares (45% and 48%), so the within estimator has plenty of
+      "switcher" variation to identify the union and marriage premia. Log
+      wage's within share (48%) is what drives the R² jump from 0.175 (pooled
+      OLS) to 0.605 (one-way FE) the post reports in §11.4.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Panel FE Simulator</h4>
+      <p>Simulate a panel with unit fixed effects and a treatment correlated with the unobserved worker effect. Slide the selection ρ and watch pooled OLS drift away from the truth while FE stays put. Run 100 simulations for a bias-variance picture.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Mincer Forest Plot</h4>
+      <p>The post's headline figure, interactively. Toggle variables and methods. POLS says union = +18%; FE/TWFE/CRE all say +7.5%. CRE recovers education (+9.4%) — the variable one-way FE silently dropped.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-se">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Clustered SE Showdown</h4>
+      <p>Watch t-statistics shrink as you switch from iid to HC1 to CRV1 (cluster-robust). For the synthetic dataset, the SE on X1 grows by 50% — for weaker effects this would flip significance.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Fixed effects (FE)</summary>
+        <div class="gloss-body">A unit-specific intercept (one per worker / firm / country) absorbed via demeaning. Identifies β from within-unit changes only. Drops time-invariant regressors like education or race.</div>
+      </details>
+      <details class="gloss"><summary>Within transformation</summary>
+        <div class="gloss-body">Subtract each unit's time-average from every observation: ÿ<sub>it</sub> = y<sub>it</sub> − ȳ<sub>i</sub>. Algebraically equivalent to including N unit dummies, but vastly faster.</div>
+      </details>
+      <details class="gloss"><summary>Two-way FE (TWFE)</summary>
+        <div class="gloss-body">Absorb both unit effects (worker) and time effects (year). The post's R² climbs from 0.175 (pooled) → 0.605 (one-way) → 0.631 (TWFE) on the Mincer panel.</div>
+      </details>
+      <details class="gloss"><summary>Three-way FE</summary>
+        <div class="gloss-body">Add a third absorbed dimension (e.g., occupation). PyFixest handles this with <code>| nr + year + C(occupation)</code>. R² barely moves (0.631 → 0.632) once worker FE is in.</div>
+      </details>
+      <details class="gloss"><summary>Time-invariant variables</summary>
+        <div class="gloss-body">Variables that never change within a unit (education, race). Their within-transformed values are exactly zero, so they are perfectly collinear with the entity dummies and dropped.</div>
+      </details>
+      <details class="gloss"><summary>Cluster-robust SE (CRV1)</summary>
+        <div class="gloss-body">Standard errors that allow within-cluster correlation. Default in panel work because errors travel together within a worker / state / firm. Often 30–50% larger than iid SEs.</div>
+      </details>
+      <details class="gloss"><summary>CRE / Mundlak</summary>
+        <div class="gloss-body">Augment a pooled regression with each unit's mean of the time-varying regressors. The time-varying coefficients equal FE; the time-invariant coefficients (education, race) become identifiable.</div>
+      </details>
+      <details class="gloss"><summary>Event study</summary>
+        <div class="gloss-body">Drop dummies for each relative-time period around a treatment date, ref = −1. Pre-treatment coefficients diagnose parallel trends; post-treatment coefficients trace the dynamic ATT.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: PANEL FE SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Panel FE Simulator — pooled OLS vs FE on simulated data</h2>
+  <p class="lede">
+    Simulate a panel with N workers observed over T periods. Each worker has
+    their own intercept α<sub>i</sub> (unobserved ability) and a treatment
+    x<sub>it</sub> that is <em>correlated</em> with that intercept — so pooled
+    OLS will be biased. The true treatment coefficient is β = 0.10 (a 10%
+    wage effect, in the spirit of the Mincer panel's union premium).
+    <strong>Slide selection ρ up and watch pooled OLS drift while FE stays
+    close to 0.10.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Workers N <span class="value" id="sim-n-val">200</span></label>
+      <input type="range" id="sim-n" min="50" max="500" step="10" value="200" aria-label="number of workers N">
+      <div class="hint">More workers ⇒ tighter estimates. Post sample: 545.</div>
+    </div>
+    <div class="control">
+      <label>Periods T <span class="value" id="sim-t-val">4</span></label>
+      <input type="range" id="sim-t" min="2" max="8" step="1" value="4" aria-label="number of periods T">
+      <div class="hint">Post uses T = 8. More T ⇒ richer within-worker variation.</div>
+    </div>
+    <div class="control">
+      <label>Unit heterogeneity <span class="value" id="sim-h-val">1.00</span></label>
+      <input type="range" id="sim-h" min="0" max="2" step="0.05" value="1.00" aria-label="unit FE heterogeneity">
+      <div class="hint">Spread of worker intercepts. 0 = identical workers (pooled OLS unbiased), 2 = wildly heterogeneous (pooled OLS very biased).</div>
+    </div>
+    <div class="control">
+      <label>Selection ρ <span class="value" id="sim-r-val">0.70</span></label>
+      <input type="range" id="sim-r" min="0" max="0.95" step="0.05" value="0.70" aria-label="selection correlation">
+      <div class="hint">Correlation between unit FE and treatment x. The omitted-variable bias driver — the reason the union premium drops from 18% to 8% in the post.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Pooled OLS</span></h3>
+      <p class="note" style="margin:0 0 10px;">Ignores panel structure. Each row treated as independent.</p>
+      <div class="method-row"><span class="label">β̂</span><span class="val" id="sim-ols-b">—</span></div>
+      <div class="method-row"><span class="label">bias (vs true 0.10)</span><span class="val" id="sim-ols-bias">—</span></div>
+      <div class="method-row"><span class="label">R²</span><span class="val" id="sim-ols-r2">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">One-way FE</span></h3>
+      <p class="note" style="margin:0 0 10px;">Worker demeaning. Within-only variation.</p>
+      <div class="method-row"><span class="label">β̂</span><span class="val" id="sim-fe-b">—</span></div>
+      <div class="method-row"><span class="label">bias (vs true 0.10)</span><span class="val" id="sim-fe-bias">—</span></div>
+      <div class="method-row"><span class="label">within R²</span><span class="val" id="sim-fe-r2">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-scatter"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Slide selection ρ to 0</strong>. Pooled OLS becomes unbiased — pooled OLS and FE agree. This is the RE assumption: no correlation between α<sub>i</sub> and x<sub>it</sub>.</li>
+      <li><strong>Slide selection ρ to 0.9</strong>. Pooled OLS shoots above 0.30 because high-α workers also have high x. The bias is precisely the §11.4 union-selection story made visible: workers who join unions more often are systematically different.</li>
+      <li><strong>Slide T from 2 to 8</strong>. FE's within R² rises; the FE estimate's variance shrinks. With T = 8 (the post's choice), FE has plenty of "switchers" to identify β.</li>
+      <li><strong>True coefficient</strong> 0.10 is the dashed grey line. Pooled OLS scatters above the truth; FE clusters near it. This is the canonical fingerprint of positive selection on unobservables.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs variance across 100 simulations</h3>
+    <p>One draw is noisy. Run the panel simulation 100 times with the current sliders to see whether pooled OLS bias is systematic and how variance compares to FE.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sim-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Pooled OLS mean β̂</div><div class="stat-value orange" id="sim-ols-mean">—</div><div class="stat-sub">true = 0.10</div></div>
+      <div class="stat"><div class="stat-label">Pooled OLS SD β̂</div><div class="stat-value" id="sim-ols-sd">—</div></div>
+      <div class="stat"><div class="stat-label">FE mean β̂</div><div class="stat-value teal" id="sim-fe-mean">—</div></div>
+      <div class="stat"><div class="stat-label">FE SD β̂</div><div class="stat-value" id="sim-fe-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: MINCER FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The Mincer wage panel — every estimator on one plot</h2>
+  <p class="lede">
+    These numbers come straight from §11 of the post — the Vella–Verbeek wage
+    panel of 545 young men observed for 8 years (1980–1987). Five
+    estimators on each of the seven Mincer regressors (union, married,
+    expersq, hours, educ, black, hisp). Toggle to compare.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The union premium drops by more than half</strong>. Pooled OLS says 0.183. One-way FE (clustered) says 0.078. TWFE: 0.073. Three-way FE: 0.075. The §11.4 selection story is visible at a glance.</li>
+      <li><strong>One-way FE silently drops education, black, and hisp</strong>. No bars appear for these methods on those rows — the within transformation gives identically-zero columns for any worker-constant variable.</li>
+      <li><strong>CRE recovers what one-way FE lost</strong>. The teal CRE bar gives education = 0.094 (a 9.4% return per year), black = −0.140 (14% Black wage gap), and the time-varying coefficients still match one-way FE. This is the §11.7 punchline.</li>
+      <li><strong>Marriage premium is more robust to FE than union</strong>. Pooled 0.141 → FE 0.115 — only an 18% drop, vs the union's 57% drop. Marriage is less correlated with unobserved ability.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Variables</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="union"   checked> union</label>
+      <label><input type="checkbox" value="married" checked> married</label>
+      <label><input type="checkbox" value="expersq" checked> expersq (×100)</label>
+      <label><input type="checkbox" value="hours"   checked> hours (×1000)</label>
+      <label><input type="checkbox" value="educ"    checked> education</label>
+      <label><input type="checkbox" value="black"   checked> black</label>
+      <label><input type="checkbox" value="hisp"    checked> hispanic</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Pooled OLS"     checked> Pooled OLS</label>
+      <label><input type="checkbox" value="One-Way FE"     checked> One-Way FE</label>
+      <label><input type="checkbox" value="Two-Way FE"     checked> Two-Way FE</label>
+      <label><input type="checkbox" value="Three-Way FE"   checked> Three-Way FE</label>
+      <label><input type="checkbox" value="CRE"            checked> CRE / Mundlak</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why does the union premium drop, but the marriage premium barely move?</h3>
+    <p>
+      The drop in a coefficient when you go from pooled OLS to one-way FE
+      measures how correlated the regressor is with unobserved worker
+      heterogeneity (ability, motivation, industry tenure). For
+      <strong>union</strong> the drop is large (0.183 → 0.078) — union
+      members are systematically higher-paid <em>independent</em> of being in
+      a union, perhaps because the kind of person who joins a union also
+      tends to be employed in higher-wage industries. For
+      <strong>married</strong> the drop is small (0.141 → 0.115) — the
+      marriage premium is mostly a within-worker effect.
+    </p>
+    <p>
+      The CRE row makes this concrete. The Mundlak correction term on
+      <code>union_mean</code> is +0.179 (highly significant, §11.7) — that
+      is the cross-sectional selection effect that pooled OLS folds into the
+      within effect, producing the inflated 0.183. The CRE
+      <code>married_mean</code> coefficient is small and insignificant, so
+      the marriage premium is barely affected by selection.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: CLUSTERED SE SHOWDOWN ====================== -->
+<section id="pane-se" class="tab-pane" role="tabpanel" aria-labelledby="tab-se">
+
+  <h2>Clustered SE Showdown — same coefficient, different t-statistic</h2>
+  <p class="lede">
+    Point estimates do not care about the SE method; <em>inference</em> does.
+    Five SE assumptions on the same model (§8 of the post). When you cluster
+    by group, the SE inflates because within-group errors travel together —
+    repeated observations of the same worker are not independent observations.
+    <strong>The t-statistic on X1 falls from 12.2 (HC1) to 8.2 (CRV3) — a
+    33% reduction, with no change in the point estimate.</strong>
+  </p>
+
+  <div class="card">
+    <h3>Pyfixest reports (from §8)</h3>
+    <p class="note">Hover any row to see the SE inflation factor relative to iid.</p>
+    <div id="se-table"></div>
+  </div>
+
+  <div class="chart-area" id="se-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>iid → HC1 barely moves the SE</strong> (0.0858 → 0.0833). Heteroskedasticity is not a major concern in the synthetic dataset; HC1 occasionally <em>shrinks</em> the SE.</li>
+      <li><strong>CRV1 (group_id) jumps the SE 40%</strong> (0.0833 → 0.1172). The big shift comes from accounting for within-group correlation — observations in the same group share unobserved shocks.</li>
+      <li><strong>Multi-way CRV1 (group_id + f2) inflates further</strong> (0.1207). The two-way cluster correction adds protection against correlation in both dimensions simultaneously.</li>
+      <li><strong>CRV3 is the most conservative</strong> (0.1247). Its finite-sample bias correction is preferred when the number of clusters is small.</li>
+    </ul>
+  </div>
+
+  <div class="controls">
+    <div class="control">
+      <label>Coefficient β̂ <span class="value" id="cl-b-val">−1.019</span></label>
+      <input type="range" id="cl-b" min="-2.5" max="0" step="0.005" value="-1.019" aria-label="coefficient">
+      <div class="hint">Post estimate: −1.019. Vary to see how t-statistics behave for stronger/weaker effects.</div>
+    </div>
+    <div class="control">
+      <label>iid SE <span class="value" id="cl-iid-val">0.0858</span></label>
+      <input type="range" id="cl-iid" min="0.01" max="0.30" step="0.0005" value="0.0858" aria-label="iid SE">
+      <div class="hint">Baseline (assumes independence). Post: 0.0858.</div>
+    </div>
+    <div class="control">
+      <label>Cluster inflation factor <span class="value" id="cl-mult-val">1.40</span></label>
+      <input type="range" id="cl-mult" min="1.0" max="2.5" step="0.01" value="1.40" aria-label="cluster inflation">
+      <div class="hint">Multiplier applied to iid SE to get clustered SE. Post CRV1: 1.40 (= 0.1172 / 0.0833).</div>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">iid t-stat</div>
+      <div class="stat-value" id="cl-iid-t">—</div>
+      <div class="stat-sub">|β̂| / iid SE</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Clustered t-stat</div>
+      <div class="stat-value orange" id="cl-clust-t">—</div>
+      <div class="stat-sub">|β̂| / (mult × iid SE)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">iid significant at 5%?</div>
+      <div class="stat-value teal" id="cl-iid-sig">—</div>
+      <div class="stat-sub">|t| &gt; 1.96</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Clustered significant at 5%?</div>
+      <div class="stat-value teal" id="cl-clust-sig">—</div>
+      <div class="stat-sub">|t| &gt; 1.96</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why clustering inflates SEs</h3>
+    <p>
+      If a worker's residuals are correlated across years (motivation
+      persists), then ten years of one worker is not ten independent
+      observations — it is closer to one or two effective observations. The
+      iid formula counts ten observations; CRV1 corrects this by treating
+      each cluster (worker) as the sampling unit. Cameron and Miller (2015,
+      §2) gives the closed-form derivation; the post applies it in §8 and
+      §11.4 with worker-level clustering (<code>vcov={"CRV1": "nr"}</code>).
+    </p>
+    <p>
+      The <strong>practical rule</strong> is to cluster at the level where
+      treatment is assigned. For the Mincer panel that is the worker; for a
+      DiD with state-level adoption it would be the state. Failing to cluster
+      almost always understates SEs and falsely declares effects significant
+      — a major source of replication failures in applied economics.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 2</h3>
+    <p>
+      The Tab 2 simulator estimates panel FE coefficients without computing
+      SEs — but they would behave exactly like the slider here. If you ran
+      Tab 2 with T = 8 and clustered SEs by worker, you would find the
+      clustered SE is roughly 1.4× the iid SE. The cluster correction is
+      mechanical: it depends on the intra-cluster correlation of the
+      residuals, not on the point estimate. <strong>Inflate the iid SE by
+      the cluster-effective sample-size shrinkage factor and you have
+      CRV1.</strong>
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>High-Dimensional Fixed Effects Regression: An Introduction in Python</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

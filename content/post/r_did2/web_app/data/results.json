@@ -1,0 +1,54 @@
+{
+  "estimates": [
+    {"method": "2x2 cell-means",        "outcome": "ATT(2014)",  "weighting": "Unweighted",          "estimate":  0.1216, "se": 3.7507, "ci_lo": -7.2298, "ci_hi":  7.4730, "n_selected": null},
+    {"method": "2x2 cell-means",        "outcome": "ATT(2014)",  "weighting": "Population-weighted", "estimate": -2.5629, "se": 1.4901, "ci_lo": -5.4835, "ci_hi":  0.3577, "n_selected": null},
+    {"method": "2x2 TWFE long-diff",    "outcome": "ATT(2014)",  "weighting": "Unweighted",          "estimate":  0.1216, "se": 3.7501, "ci_lo": -7.2286, "ci_hi":  7.4719, "n_selected": null},
+    {"method": "2x2 TWFE long-diff",    "outcome": "ATT(2014)",  "weighting": "Population-weighted", "estimate": -2.5629, "se": 1.4900, "ci_lo": -5.4833, "ci_hi":  0.3575, "n_selected": null},
+    {"method": "Outcome regression",    "outcome": "ATT(2014)",  "weighting": "Unweighted",          "estimate": -1.6154, "se": 4.6569, "ci_lo": -10.7430, "ci_hi":  7.5121, "n_selected": null},
+    {"method": "Outcome regression",    "outcome": "ATT(2014)",  "weighting": "Population-weighted", "estimate": -3.4592, "se": 2.2914, "ci_lo":  -7.9503, "ci_hi":  1.0319, "n_selected": null},
+    {"method": "IPW",                   "outcome": "ATT(2014)",  "weighting": "Unweighted",          "estimate": -0.8586, "se": 4.8364, "ci_lo": -10.3379, "ci_hi":  8.6208, "n_selected": null},
+    {"method": "IPW",                   "outcome": "ATT(2014)",  "weighting": "Population-weighted", "estimate": -3.8417, "se": 3.1936, "ci_lo": -10.1011, "ci_hi":  2.4178, "n_selected": null},
+    {"method": "DRDID",                 "outcome": "ATT(2014)",  "weighting": "Unweighted",          "estimate": -1.2256, "se": 5.0518, "ci_lo": -11.1271, "ci_hi":  8.6758, "n_selected": null},
+    {"method": "DRDID",                 "outcome": "ATT(2014)",  "weighting": "Population-weighted", "estimate": -3.7561, "se": 3.2888, "ci_lo": -10.2021, "ci_hi":  2.6899, "n_selected": null},
+    {"method": "2xT dynamic (avg e>=0)","outcome": "Dynamic ATT","weighting": "Unweighted",          "estimate":  9.4278, "se": 3.8429, "ci_lo":   1.8958, "ci_hi": 16.9599, "n_selected": null},
+    {"method": "2xT dynamic (avg e>=0)","outcome": "Dynamic ATT","weighting": "Population-weighted", "estimate": -0.6845, "se": 3.7808, "ci_lo":  -8.0948, "ci_hi":  6.7259, "n_selected": null},
+    {"method": "GxT dynamic (avg e>=0)","outcome": "Dynamic ATT","weighting": "Unweighted",          "estimate":  7.9171, "se": 3.5000, "ci_lo":   1.0571, "ci_hi": 14.7771, "n_selected": null},
+    {"method": "GxT dynamic (avg e>=0)","outcome": "Dynamic ATT","weighting": "Population-weighted", "estimate":  0.2657, "se": 3.5000, "ci_lo":  -6.5943, "ci_hi":  7.1257, "n_selected": null}
+  ],
+  "event_study": [
+    {"e": -10, "est_unw": -23.5433, "se_unw": 10.1498, "est_wt": -15.3503, "se_wt": 8.2795},
+    {"e":  -9, "est_unw": -25.1138, "se_unw":  9.4718, "est_wt": -25.7918, "se_wt": 8.1858},
+    {"e":  -8, "est_unw": -12.8110, "se_unw": 10.5770, "est_wt": -17.2584, "se_wt": 8.3281},
+    {"e":  -7, "est_unw":  -0.3410, "se_unw":  8.2467, "est_wt":  -3.5994, "se_wt": 6.7766},
+    {"e":  -6, "est_unw":  -1.2683, "se_unw":  7.9563, "est_wt":   2.8695, "se_wt": 7.3441},
+    {"e":  -5, "est_unw":   6.1323, "se_unw":  3.5555, "est_wt":   0.7503, "se_wt": 2.9336},
+    {"e":  -4, "est_unw":   2.0069, "se_unw":  3.2652, "est_wt":   1.0052, "se_wt": 2.7354},
+    {"e":  -3, "est_unw":   4.0392, "se_unw":  3.3433, "est_wt":   2.8192, "se_wt": 2.5201},
+    {"e":  -2, "est_unw":   5.6208, "se_unw":  3.8413, "est_wt":   1.9211, "se_wt": 3.7327},
+    {"e":  -1, "est_unw":   0.0000, "se_unw":  0.0000, "est_wt":   0.0000, "se_wt": 0.0000},
+    {"e":   0, "est_unw":  -0.4511, "se_unw":  3.7211, "est_wt":  -2.6548, "se_wt": 2.6171},
+    {"e":   1, "est_unw":   3.9122, "se_unw":  3.9697, "est_wt":   0.2287, "se_wt": 3.8852},
+    {"e":   2, "est_unw":   8.6047, "se_unw":  3.8488, "est_wt":   4.4868, "se_wt": 3.6770},
+    {"e":   3, "est_unw":   9.2021, "se_unw":  4.1983, "est_wt":  -3.7372, "se_wt": 4.7528},
+    {"e":   4, "est_unw":   9.2768, "se_unw":  4.8853, "est_wt":   0.7932, "se_wt": 4.7019},
+    {"e":   5, "est_unw":  16.9577, "se_unw":  5.3114, "est_wt":   2.4772, "se_wt": 5.8769}
+  ],
+  "by_cohort": [
+    {"cohort": 2014, "est_unw":   9.4278, "se_unw": 3.8429, "est_wt":  -0.6845, "se_wt": 3.7808},
+    {"cohort": 2015, "est_unw":   4.9406, "se_unw": 5.8955, "est_wt":  10.0427, "se_wt": 2.9244},
+    {"cohort": 2016, "est_unw": -17.3071, "se_unw": 10.9927, "est_wt": -12.5657, "se_wt": 6.1811},
+    {"cohort": 2019, "est_unw":   3.4765, "se_unw": 8.8533, "est_wt":   3.3090, "se_wt": 4.4643}
+  ],
+  "honestdid": [
+    {"Mbar": 0.00, "weighting": "Unweighted",          "lb":   2.0126, "ub":  14.0884},
+    {"Mbar": 0.25, "weighting": "Unweighted",          "lb": -16.7719, "ub":  32.8729},
+    {"Mbar": 0.50, "weighting": "Unweighted",          "lb": -40.9234, "ub":  57.0244},
+    {"Mbar": 0.75, "weighting": "Unweighted",          "lb": -63.7332, "ub":  66.4167},
+    {"Mbar": 1.00, "weighting": "Unweighted",          "lb": -66.4167, "ub":  66.4167},
+    {"Mbar": 0.00, "weighting": "Population-weighted", "lb":  -6.0653, "ub":   6.0653},
+    {"Mbar": 0.25, "weighting": "Population-weighted", "lb": -22.2395, "ub":  22.2395},
+    {"Mbar": 0.50, "weighting": "Population-weighted", "lb": -42.4572, "ub":  43.8051},
+    {"Mbar": 0.75, "weighting": "Population-weighted", "lb": -64.0228, "ub":  64.0228},
+    {"Mbar": 1.00, "weighting": "Population-weighted", "lb": -66.7185, "ub":  66.7185}
+  ]
+}

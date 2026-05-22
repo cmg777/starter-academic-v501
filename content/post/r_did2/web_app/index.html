@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>DiD for Regional Data — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Difference-in-Differences for Regional Data: Did Medicaid Expansion Reduce Mortality?'. Explore the parallel-trends assumption, the unweighted-vs-weighted sign reversal, the estimator forest plot, and the GxT event study.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>DiD for Regional Data — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Difference-in-Differences for Regional Data: Did Medicaid Expansion Reduce Mortality?</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"  class="tab active" data-pane="pane-intro"  role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-dgp"    class="tab"        data-pane="pane-dgp"    role="tab" aria-selected="false">2 · Weighting Simulator</button>
+  <button id="tab-forest" class="tab"        data-pane="pane-forest" role="tab" aria-selected="false">3 · Forest Plot</button>
+  <button id="tab-event"  class="tab"        data-pane="pane-event"  role="tab" aria-selected="false">4 · Event Study</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why does DiD give two different answers?</h2>
+  <p class="lede">
+    Did the Affordable Care Act's Medicaid expansion reduce adult mortality?
+    The simplest 2&times;2 difference-in-differences (DiD) on 2,604 U.S.
+    counties gives <strong>two opposite answers</strong>: an unweighted ATT
+    of <span class="kbd">+0.12</span> deaths per 100,000 (no effect, or a
+    tiny increase) and a population-weighted ATT of <span class="kbd">−2.56</span>
+    (a meaningful reduction).
+  </p>
+  <p class="lede">
+    Same data. Same arithmetic. Same identifying assumption. The only
+    difference is how you average across counties of very different size.
+    <strong>Weighting silently changes the target parameter</strong> — not
+    the precision, the parameter itself. The unweighted answer is the
+    effect on the typical treated <em>county</em>; the weighted answer is
+    the effect on the typical treated <em>adult</em>. They answer
+    different questions.
+  </p>
+
+  <div class="card">
+    <h3>The parallel-trends assumption, animated</h3>
+    <p>
+      DiD assumes that absent treatment, the treated group would have moved
+      in parallel with the control group. The dashed orange line below shows
+      that counterfactual trend; the solid orange line shows the treated
+      group's actual trajectory after the policy kicks in. The vertical teal
+      bar at the right edge is the ATT — exactly the gap parallel trends
+      <em>creates room for</em>.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-dgp">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Weighting Simulator</h4>
+      <p>Drag the heterogeneity slider and watch the unweighted and population-weighted means diverge — even though every county satisfies parallel trends.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Forest Plot</h4>
+      <p>The post's headline numbers — seven estimators (2&times;2 means, TWFE, OR, IPW, DRDID, 2&times;T dynamic, G&times;T dynamic), unweighted vs population-weighted.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-event">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Event Study</h4>
+      <p>The full G&times;T dynamic ATT(e) trajectory from the post, e = −10 to +5, with shaded 95% confidence bands.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The three key takeaways</h3>
+    <div class="pedagogy" style="margin-top:0;">
+      <ul>
+        <li><strong>The 2&times;2 sign reversal is real and structural.</strong> Unweighted ATT(2014) = +0.12; weighted ATT(2014) = −2.56. The pre-period gap is identical in both regimes (−54.77 vs −53.68) — the reversal is driven entirely by which counties dominate the averages.</li>
+        <li><strong>Weighting choice dominates methodology.</strong> Within either weighting, the four 2&times;2 estimators (cell means, TWFE, OR, IPW, DRDID) agree to within 1.7 deaths per 100,000. Across weightings, the gap is 2.5–10 deaths per 100,000. The estimator menu matters less than the weighting button.</li>
+        <li><strong>Power is the binding constraint.</strong> None of the six 2&times;2 covariate-adjusted 95% CIs excludes zero. Only the unweighted G&times;T event study at e = 5 escapes — at +16.96 deaths per 100,000, in the opposite-of-expected direction.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>DiD (Difference-in-Differences)</summary>
+        <div class="gloss-body">Treated group's change minus control group's change. <em>Two groups, two periods, four means — no regression required.</em></div>
+      </details>
+      <details class="gloss"><summary>ATT (Average Treatment effect on the Treated)</summary>
+        <div class="gloss-body">The effect of the policy on the units that actually received it. <em>Not the effect on a random unit — the effect on the treated subpopulation.</em></div>
+      </details>
+      <details class="gloss"><summary>Parallel-trends assumption</summary>
+        <div class="gloss-body">Counterfactually, treated and control groups would have moved together. <em>The only identifying restriction for the 2&times;2 DiD.</em></div>
+      </details>
+      <details class="gloss"><summary>Unweighted vs population-weighted</summary>
+        <div class="gloss-body">Equal weights → effect on the typical <em>treated county</em>. Population weights → effect on the typical <em>treated adult</em>. <em>Different target parameters, not better/worse precision.</em></div>
+      </details>
+      <details class="gloss"><summary>TWFE (Two-way fixed effects)</summary>
+        <div class="gloss-body">A regression with unit and time fixed effects that recovers the same DiD coefficient as cell means on a balanced 2&times;2 panel.</div>
+      </details>
+      <details class="gloss"><summary>DRDID (doubly-robust DiD)</summary>
+        <div class="gloss-body">Combines an outcome regression (OR) and inverse-propensity weighting (IPW). <em>Consistent if either model is correctly specified.</em></div>
+      </details>
+      <details class="gloss"><summary>Callaway-Sant'Anna ATT(g,t)</summary>
+        <div class="gloss-body">A group-time estimator for staggered adoption. <em>One ATT per cohort × calendar year cell; aggregate later.</em></div>
+      </details>
+      <details class="gloss"><summary>HonestDiD M̄</summary>
+        <div class="gloss-body">Rambachan-Roth sensitivity parameter. <em>Allows post-period parallel-trends violations up to M̄ times the worst pre-period violation.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: WEIGHTING SIMULATOR ====================== -->
+<section id="pane-dgp" class="tab-pane" role="tabpanel" aria-labelledby="tab-dgp">
+
+  <h2>Weighting Simulator — why the sign can flip</h2>
+  <p class="lede">
+    Two cohorts: a small group of <em>large urban</em> counties and a large
+    group of <em>small rural</em> counties. Both share parallel trends.
+    The treatment effect is different in each cohort. Drag the
+    <strong>effect heterogeneity</strong> slider and watch the unweighted
+    mean (blue) and population-weighted mean (orange) diverge — exactly
+    the mechanism that flips the sign on the real Medicaid data.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Large-urban treatment effect <span class="value" id="dgp-eff-urban-val">−6.0</span></label>
+      <input type="range" id="dgp-eff-urban" min="-12" max="6" step="0.5" value="-6" aria-label="urban effect">
+      <div class="hint">Effect on big counties (high pop weight). Negative = mortality reduction.</div>
+    </div>
+    <div class="control">
+      <label>Small-rural treatment effect <span class="value" id="dgp-eff-rural-val">+2.0</span></label>
+      <input type="range" id="dgp-eff-rural" min="-6" max="12" step="0.5" value="2" aria-label="rural effect">
+      <div class="hint">Effect on small counties (low pop weight). Set both equal to suppress the reversal.</div>
+    </div>
+    <div class="control">
+      <label>Urban share of counties <span class="value" id="dgp-share-val">0.30</span></label>
+      <input type="range" id="dgp-share" min="0.05" max="0.95" step="0.05" value="0.30" aria-label="urban share">
+      <div class="hint">Fraction of counties that are large-urban. Population shares are computed from population sizes.</div>
+    </div>
+    <div class="control">
+      <label>Population ratio (urban / rural) <span class="value" id="dgp-popratio-val">15</span></label>
+      <input type="range" id="dgp-popratio" min="1" max="60" step="1" value="15" aria-label="population ratio">
+      <div class="hint">How much bigger a typical urban county is than a typical rural one.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="dgp-trajectories"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Unweighted ATT</div>
+      <div class="stat-value" id="dgp-att-unw" style="color:#6a9bcc;">—</div>
+      <div class="stat-sub">treated county average</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Pop-weighted ATT</div>
+      <div class="stat-value orange" id="dgp-att-wt">—</div>
+      <div class="stat-sub">treated adult average</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Weighting gap</div>
+      <div class="stat-value teal" id="dgp-gap">—</div>
+      <div class="stat-sub">|unw − wt|</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Sign flip?</div>
+      <div class="stat-value" id="dgp-flip">—</div>
+      <div class="stat-sub">do the two ATTs disagree on sign?</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set both effects to the same value.</strong> The unweighted and weighted ATTs collapse to the same number. Heterogeneity is required for the reversal.</li>
+      <li><strong>Increase the population ratio.</strong> A bigger urban / rural population gap amplifies the divergence — the population-weighted ATT migrates toward the urban effect, the unweighted ATT toward the rural one.</li>
+      <li><strong>Reproduce the post's headline.</strong> Urban effect = −6, rural = +2, urban share = 0.3, ratio = 15 gives weighted ≈ −3, unweighted ≈ +0.4 — the same sign reversal the manuscript reports on the actual Medicaid data.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Where does the post's asymmetry come from?</h3>
+    <p>
+      The real Medicaid panel has the same structure: the never-expansion cohort is
+      <strong>46.9%</strong> of counties but only <strong>38.2%</strong> of adults; the
+      2014-expansion cohort is <strong>37.6%</strong> of counties but
+      <strong>49.5%</strong> of adults. Switching to population weights shifts
+      11 percentage points of mass between the two largest cohorts — exactly the
+      mechanism this simulator illustrates.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's estimator forest plot</h2>
+  <p class="lede">
+    Every number on this plot comes from the post's own results CSVs.
+    Each method-by-weighting cell is one estimate with a 95% confidence
+    interval. <strong>The dominant fact is colour</strong>: every blue dot
+    (unweighted) sits to the right of its orange counterpart
+    (population-weighted), and that 2.5–10 death gap is wider than the
+    spread <em>within</em> a weighting across estimators.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Toggle off the dynamic methods.</strong> The 2&times;2-only view (cell-means, TWFE, OR, IPW, DRDID) shows the within-weighting estimator agreement: at most 1.7 deaths per 100,000 between the orange dots, 1.7 between the blue ones.</li>
+      <li><strong>Toggle on the dynamic methods.</strong> The 2&times;T row is the post's most dramatic divergence: +9.43 unweighted vs −0.68 weighted. Pooling across the 2014, 2015, 2016, and 2019 cohorts (the G&times;T row) shrinks the gap to 7.7 but does not close it.</li>
+      <li><strong>Hover any dot.</strong> See the exact estimate, SE, and CI. Notice that no weighted CI excludes zero by a comfortable margin and no unweighted CI excludes zero at all — except the G&times;T dynamic.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="2x2 cell-means"        checked> 2&times;2 cell-means</label>
+      <label><input type="checkbox" value="2x2 TWFE long-diff"    checked> 2&times;2 TWFE long-diff</label>
+      <label><input type="checkbox" value="Outcome regression"    checked> OR</label>
+      <label><input type="checkbox" value="IPW"                   checked> IPW</label>
+      <label><input type="checkbox" value="DRDID"                 checked> DRDID</label>
+      <label><input type="checkbox" value="2xT dynamic (avg e>=0)" checked> 2&times;T dynamic</label>
+      <label><input type="checkbox" value="GxT dynamic (avg e>=0)" checked> G&times;T dynamic</label>
+    </div>
+    <h3 style="margin-top:16px;">Weightings</h3>
+    <div class="outcome-toggle" id="fp-weights">
+      <label><input type="checkbox" value="Unweighted"          checked> Unweighted (per county)</label>
+      <label><input type="checkbox" value="Population-weighted" checked> Pop-weighted (per adult)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>The unweighted-vs-weighted gap, by stage</h3>
+    <p>The post's Section 11 headline table shows how the gap grows when staggered cohort heterogeneity enters the design:</p>
+    <ul>
+      <li><strong>2&times;2 cell-means:</strong> gap = 2.69 (only one cohort)</li>
+      <li><strong>2&times;2 DRDID:</strong> gap = 2.53 (covariate-adjusted)</li>
+      <li><strong>2&times;T dynamic:</strong> gap = <span class="kbd">10.11</span> (one cohort, eleven periods — the widest gap)</li>
+      <li><strong>G&times;T dynamic:</strong> gap = 7.65 (all four cohorts pooled)</li>
+    </ul>
+    <p>
+      The gap is <em>largest</em> when staggered cohort heterogeneity is in play (2&times;T and G&times;T)
+      and <em>smallest</em> when the four-cell 2&times;2 design forces a single ATT(2014). That's the manuscript's
+      core lesson made visible at a glance: methodology and target parameter are orthogonal axes of choice,
+      and the second dominates the first.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: EVENT STUDY ====================== -->
+<section id="pane-event" class="tab-pane" role="tabpanel" aria-labelledby="tab-event">
+
+  <h2>G&times;T event study — ATT(e) across cohorts</h2>
+  <p class="lede">
+    The Callaway-Sant'Anna group-time framework produces an ATT for every
+    cohort × calendar-year cell. Aggregated across cohorts at fixed event
+    time <span class="kbd">e</span>, you get a single ATT(e) per relative
+    year. Below: e = −10 to +5, both weightings, shaded 95% confidence
+    bands. The orange dashed line at e = −0.5 separates leads (placebo
+    test for parallel trends) from lags (causal effect).
+  </p>
+
+  <div class="card">
+    <h3>Show</h3>
+    <div class="outcome-toggle" id="ev-toggle">
+      <label><input type="checkbox" value="unweighted" checked> Unweighted ATT(e)</label>
+      <label><input type="checkbox" value="weighted"   checked> Population-weighted ATT(e)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="ev-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Pre-period leads at e = −10, −9, −8</strong> are sharply negative under both weightings (around −15 to −26 deaths per 100,000, CIs excluding zero). These are driven entirely by the small 2019 cohort — the only cohort with a pre-history that long.</li>
+      <li><strong>From e = −7 onward, leads settle near zero.</strong> Approximate parallel trends holds across the bulk of the comparison window, even though the assumption is technically violated at long pre-horizons.</li>
+      <li><strong>Post-treatment divergence.</strong> Unweighted ATT(e) climbs from −0.45 at e = 0 to +16.96 at e = 5 (CI [+6.83, +27.09], excludes zero). Weighted ATT(e) oscillates within [−3.74, +4.49] — every weighted CI overlaps zero.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>What does this mean for the policy question?</h3>
+    <p>
+      The dynamic-aggregated ATT averaged over e ≥ 0 is <strong>+7.92 unweighted</strong>
+      versus <strong>+0.27 population-weighted</strong>. For the <em>typical treated adult</em>
+      (the policy-relevant target parameter), there is no statistically credible mortality
+      effect in either direction. For the <em>typical treated county-as-a-unit</em>, the
+      unweighted G&times;T design gives a positive sign — opposite of what one might
+      expect for an insurance-expansion policy.
+    </p>
+    <p>
+      The manuscript flags this case as <em>pedagogical</em> rather than as the
+      best-possible estimate of Medicaid's mortality effect. HonestDiD's sensitivity
+      analysis underscores why: at M̄ = 0 the unweighted bound is entirely positive
+      [+2.01, +14.09], but by M̄ = 0.25 it crosses zero — the slightest
+      parallel-trends violation overturns the sign conclusion. The weighted bound
+      already straddles zero at M̄ = 0.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Difference-in-Differences for Regional Data: Did Medicaid Expansion Reduce Mortality?</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

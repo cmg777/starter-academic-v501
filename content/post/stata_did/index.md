@@ -13,6 +13,10 @@ image:
   placement: 3
   preview_only: false
 links:
+- icon: laptop-code
+  icon_pack: fas
+  name: "Web app"
+  url: web_app/index.html
 - icon: file-code
   icon_pack: fas
   name: Stata do-file

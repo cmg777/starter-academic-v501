@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Introduction to Difference-in-Differences in Python — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Introduction to Difference-in-Differences in Python'. A pedagogical web app with parallel-trends animation, a DGP simulator with ground truth, a forest plot of DiD estimators, and an HonestDiD sensitivity explorer.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Difference-in-Differences — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Introduction to Difference-in-Differences in Python</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">2 · DiD Simulator</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">3 · Forest Plot</button>
+  <button id="tab-honest"   class="tab"        data-pane="pane-honest"   role="tab" aria-selected="false">4 · HonestDiD</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Did the policy actually do something?</h2>
+  <p class="lede">
+    Suppose an education ministry rolls out AI tutoring bots in some cities but
+    not others. Did the AI tools actually improve learning, or were those cities
+    already on an upward trajectory? <strong>Difference-in-Differences (DiD)</strong>
+    answers this by comparing the change in outcomes over time between a treated
+    group and a control group — using the control group as a mirror for what
+    would have happened without treatment.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. Three takeaways from the post,
+    each foregrounded in its own tab: <strong>(1)</strong> the classic 2×2 DiD
+    recovers the true ATT of 5.0 with estimate 5.12; <strong>(2)</strong> naive
+    Two-Way Fixed Effects (TWFE) breaks under staggered adoption — 28.3% of its
+    weight falls on "forbidden comparisons" that drag the estimate down to 2.18
+    versus the Callaway–Sant'Anna 2.41; and <strong>(3)</strong> HonestDiD
+    sensitivity analysis shows the conclusion survives parallel-trends violations
+    more than 15× the worst pre-treatment deviation.
+  </p>
+
+  <div class="card">
+    <h3>The DiD intuition — exactly-zero shrinkage isn't the story here</h3>
+    <p>
+      The animation below shows the schematic logic of any DiD. Two outcomes
+      drift upward over time at the same rate (parallel trends). At the dashed
+      line, a policy kicks in and the orange (treated) curve jumps. The gap
+      between the orange curve and the dashed teal counterfactual is the
+      <strong>ATT</strong> — what the policy did to the people it reached.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <div class="chart-caption">
+      The orange line shows L1 (LASSO-style) shrinkage and the dashed steel line
+      shows L2 (Ridge-style) — they are stand-in shapes for "treatment shifts a
+      level" and "the counterfactual stays smooth". DiD does not use any
+      shrinkage — but the visual logic of "two curves diverge after a cut-point"
+      is the same.
+    </div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>DiD Simulator</h4>
+      <p>Slide the true ATT, parallel-trend slope, and sample size. Watch the 2×2 estimator converge (or not) to the truth across 100 simulations.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Forest Plot</h4>
+      <p>Five estimators across three settings — 2×2 ATT, staggered TWFE vs Callaway–Sant'Anna, and HonestDiD's robust CI at five M values.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-honest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>HonestDiD</h4>
+      <p>Drag a sensitivity-parameter slider and watch the robust 95% CI widen. Find the breakdown value where the effect first includes zero.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>ATT (Average Treatment Effect on the Treated)</summary>
+        <div class="gloss-body">The expected outcome under treatment minus the expected counterfactual, averaged over treated units. <em>The post's true ATT = 5.0 by construction; the classic 2×2 estimator recovers 5.12.</em></div>
+      </details>
+      <details class="gloss"><summary>Parallel trends</summary>
+        <div class="gloss-body">The identifying assumption: absent treatment, treated and control groups would have followed the same trajectory. <em>Fundamentally untestable for the post-treatment period — only its pre-treatment counterpart can be checked.</em></div>
+      </details>
+      <details class="gloss"><summary>Classic 2×2 design</summary>
+        <div class="gloss-body">Two groups (treated, control) × two periods (pre, post). The DiD estimator is the change in treated minus the change in control. <em>The transparent, easiest case to understand.</em></div>
+      </details>
+      <details class="gloss"><summary>Event study</summary>
+        <div class="gloss-body">Separate ATT for each period relative to treatment. <em>Reveals dynamics: in the post, effects grow from 1.97 immediately after treatment to 3.27 six periods later.</em></div>
+      </details>
+      <details class="gloss"><summary>TWFE (Two-Way Fixed Effects)</summary>
+        <div class="gloss-body">A single regression with unit + time fixed effects and a treatment dummy. <em>Works with one treatment time; breaks under staggered adoption when effects vary across cohorts.</em></div>
+      </details>
+      <details class="gloss"><summary>Forbidden comparisons</summary>
+        <div class="gloss-body">TWFE silently uses already-treated units as controls for later-treated units. With time-varying effects this pulls the estimate downward. <em>28.3% of TWFE's weight in the staggered example.</em></div>
+      </details>
+      <details class="gloss"><summary>Callaway–Sant'Anna (CS)</summary>
+        <div class="gloss-body">A staggered-adoption estimator that computes ATT(g, t) for each cohort × period using only valid 2×2 comparisons, then aggregates with explicit weights. <em>Doubly robust — outcome model and propensity score.</em></div>
+      </details>
+      <details class="gloss"><summary>Bacon decomposition</summary>
+        <div class="gloss-body">Goodman-Bacon's diagnostic that decomposes TWFE into its underlying 2×2 comparisons by type (clean, valid timing, forbidden). <em>Tells you what fraction of TWFE comes from comparisons you should not trust.</em></div>
+      </details>
+      <details class="gloss"><summary>HonestDiD breakdown value M̄</summary>
+        <div class="gloss-body">The largest violation of parallel trends (in units of the worst pre-treatment deviation) at which the CI still excludes zero. <em>The post's M̄ ≳ 15 — exceptionally robust.</em></div>
+      </details>
+      <details class="gloss"><summary>Pre-trend test</summary>
+        <div class="gloss-body">Run a regression and test whether pre-treatment leads are jointly zero. <em>The post's test gives slope difference 0.12 with p = 0.29 — fails to reject, so parallel trends look plausible.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: DID SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>DiD Simulator — when does the estimator work?</h2>
+  <p class="lede">
+    Imagine the post's classic 2×2 setup: half the units are treated, half are
+    not, with one pre-period and one post-period. The true ATT and the
+    parallel-trends slope are knobs you control. <strong>Drag the sliders and
+    watch how the 2×2 estimator recovers (or misses) the truth across 100
+    simulated draws.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sim-n-val">200</span></label>
+      <input type="range" id="sim-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Total observations (half treated, half control). Larger n ⇒ tighter sampling distribution.</div>
+    </div>
+    <div class="control">
+      <label>True ATT <span class="value" id="sim-att-val">5.00</span></label>
+      <input type="range" id="sim-att" min="-3" max="8" step="0.25" value="5.00" aria-label="true ATT">
+      <div class="hint">The known causal effect we want to recover. Try ATT = 0 to see a null result; try negative for sign-flip.</div>
+    </div>
+    <div class="control">
+      <label>Pre-trend gap <span class="value" id="sim-pt-val">0.00</span></label>
+      <input type="range" id="sim-pt" min="-1.5" max="1.5" step="0.05" value="0.00" aria-label="pre-trend gap">
+      <div class="hint">Violation of parallel trends, measured per period. 0 = perfect parallel trends. Larger |value| = larger bias.</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="sim-s-val">1.00</span></label>
+      <input type="range" id="sim-s" min="0.2" max="3.0" step="0.1" value="1.00" aria-label="noise sigma">
+      <div class="hint">Standard deviation of the idiosyncratic shock.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">2×2 DiD estimate</span></h3>
+      <div class="method-row"><span class="label">ATT̂</span><span class="val" id="sim-att-hat">—</span></div>
+      <div class="method-row"><span class="label">SE(ATT̂)</span><span class="val" id="sim-att-se">—</span></div>
+      <div class="method-row"><span class="label">t-stat</span><span class="val" id="sim-t">—</span></div>
+      <div class="method-row"><span class="label">95% CI lower</span><span class="val" id="sim-ci-lo">—</span></div>
+      <div class="method-row"><span class="label">95% CI upper</span><span class="val" id="sim-ci-hi">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Ground truth</span></h3>
+      <div class="method-row"><span class="label">True ATT</span><span class="val" id="sim-true-att">—</span></div>
+      <div class="method-row"><span class="label">Bias (ATT̂ − ATT)</span><span class="val" id="sim-bias">—</span></div>
+      <div class="method-row"><span class="label">Bias source</span><span class="val" id="sim-bias-src">parallel trends</span></div>
+      <div class="method-row"><span class="label">CI covers truth</span><span class="val" id="sim-covers">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-compare"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set pre-trend gap to 0.</strong> The 2×2 estimate hovers around the true ATT. Some draws are noisy, but the bias is zero on average — this is what "DiD works" looks like.</li>
+      <li><strong>Crank up the pre-trend gap.</strong> The estimate now systematically misses the truth. The bias scales linearly with the gap — this is exactly the parallel-trends bias from §5 of the post.</li>
+      <li><strong>Try ATT = 0 with a non-zero pre-trend.</strong> The estimator now finds a "treatment effect" where none exists. This is why pre-trend tests matter — and why HonestDiD (Tab 4) bounds rather than tests.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over many simulations</h3>
+    <p>Single runs are noisy. Run the 2×2 design 100 times with fresh draws (same parameters, different ε) to see how the estimate spreads around the true ATT.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sim-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">mean ATT̂</div><div class="stat-value teal" id="sim-mean">—</div><div class="stat-sub">vs true ATT shown as vertical line</div></div>
+      <div class="stat"><div class="stat-label">sd(ATT̂)</div><div class="stat-value" id="sim-sd">—</div></div>
+      <div class="stat"><div class="stat-label">empirical bias</div><div class="stat-value orange" id="sim-emp-bias">—</div></div>
+      <div class="stat"><div class="stat-label">coverage of 95% CI</div><div class="stat-value" id="sim-cov">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>DiD estimators side by side — the post's headline numbers</h2>
+  <p class="lede">
+    These numbers come straight from the post's three case studies: the classic
+    2×2 with true ATT = 5; the staggered-adoption comparison of TWFE versus
+    Callaway–Sant'Anna; and HonestDiD's robust CI at five M values. Toggle
+    outcomes and methods to compare. Hover any point to see the SE, CI, and
+    diagnostic context.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Toggle the "Staggered" row.</strong> Naive TWFE returns 2.18; Callaway–Sant'Anna returns 2.41. The 10% upward correction is the 28.3% weight on forbidden comparisons being removed.</li>
+      <li><strong>Look at the HonestDiD row.</strong> As M climbs from 0 to 15, the CI widens dramatically (from [2.53, 2.66] to [0.38, 4.81]) but the lower bound stays above zero. That is what "exceptionally robust" looks like.</li>
+      <li><strong>Compare the classic 2×2 to its event-study average.</strong> Both recover the true ATT of 5 within sampling error (5.12 and 4.80), confirming that the basic estimator works when treatment timing is shared.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes (settings)</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="2x2 (true ATT=5)" checked> 2x2 (true ATT=5)</label>
+      <label><input type="checkbox" value="Staggered (true avg=2.5)" checked> Staggered (true avg≈2.5)</label>
+      <label><input type="checkbox" value="HonestDiD CI (ATT)" checked> HonestDiD CI (ATT)</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Classic 2x2" checked> Classic 2x2</label>
+      <label><input type="checkbox" value="Event study avg" checked> Event study avg</label>
+      <label><input type="checkbox" value="Naive TWFE" checked> Naive TWFE</label>
+      <label><input type="checkbox" value="Callaway-SantAnna" checked> Callaway-SantAnna</label>
+      <label><input type="checkbox" value="HonestDiD M=0" checked> HonestDiD M=0</label>
+      <label><input type="checkbox" value="HonestDiD M=1" checked> HonestDiD M=1</label>
+      <label><input type="checkbox" value="HonestDiD M=5" checked> HonestDiD M=5</label>
+      <label><input type="checkbox" value="HonestDiD M=10" checked> HonestDiD M=10</label>
+      <label><input type="checkbox" value="HonestDiD M=15" checked> HonestDiD M=15</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why does TWFE underestimate in the staggered setting?</h3>
+    <p>
+      With three cohorts (treated at periods 3, 5, 7) and a never-treated group,
+      TWFE pools all of them into a single regression. Because treatment effects
+      grow over time, an already-treated cohort 3 unit at period 5 has an
+      elevated outcome. When TWFE uses that unit as a "control" for cohort 5,
+      the comparison underestimates cohort 5's true effect. Bacon decomposition
+      reveals 28.3% of TWFE's weight comes from these forbidden comparisons,
+      pulling the average down to 2.18 versus the cleaner Callaway–Sant'Anna
+      estimate of 2.41.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 2</h3>
+    <p>
+      The 2×2 DiD simulator on the previous tab is exactly the building block of
+      every method shown here — Callaway–Sant'Anna in particular is just a
+      careful weighted average of <em>valid</em> 2×2 comparisons. The
+      forbidden-comparison problem only appears when the 2×2 building block uses
+      an already-treated unit as a "control".
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: HONESTDID ====================== -->
+<section id="pane-honest" class="tab-pane" role="tabpanel" aria-labelledby="tab-honest">
+
+  <h2>HonestDiD — how robust is the conclusion?</h2>
+  <p class="lede">
+    Parallel trends is untestable for the post-treatment period — we never
+    observe the counterfactual. Instead of assuming the violation is exactly
+    zero, HonestDiD <strong>bounds</strong> it. The parameter M says: "the worst
+    post-treatment violation could be up to M times the worst pre-treatment
+    deviation". <strong>Drag the M slider and watch the robust CI widen — the
+    point at which it first includes zero is the breakdown value.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sensitivity parameter M <span class="value" id="h-m-val">1.0</span></label>
+      <input type="range" id="h-m" min="0" max="15" step="0.5" value="1.0" aria-label="sensitivity parameter M">
+      <div class="hint">M = 0 assumes parallel trends hold exactly. M = 15 allows 15× worse post-treatment violations than anything observed pre-treatment.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Robust CI at this M</span></h3>
+      <div class="method-row"><span class="label">Overall ATT</span><span class="val" id="h-att">2.5958</span></div>
+      <div class="method-row"><span class="label">Lower bound</span><span class="val" id="h-ci-lo">—</span></div>
+      <div class="method-row"><span class="label">Upper bound</span><span class="val" id="h-ci-hi">—</span></div>
+      <div class="method-row"><span class="label">CI width</span><span class="val" id="h-width">—</span></div>
+      <div class="method-row"><span class="label">Excludes zero?</span><span class="val" id="h-sig">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Reading the result</span></h3>
+      <p style="margin:0;font-size:13px;color:var(--muted);">
+        At <strong>M = 0</strong> the CI is the standard Callaway–Sant'Anna interval
+        [2.53, 2.66] — narrow and decisive. As M grows the CI widens symmetrically.
+        The <strong>breakdown value</strong> is where the CI first includes zero.
+        In this post, the breakdown exceeds M = 15 — meaning the treatment
+        conclusion holds even if post-treatment violations are more than 15 times
+        worse than anything observed pre-treatment. By convention, a breakdown
+        above M = 3 is considered <strong>strong</strong> evidence.
+      </p>
+    </div>
+  </div>
+
+  <div class="chart-area" id="h-sens"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Slide M to 0.</strong> The robust CI collapses to the standard CS CI [2.53, 2.66] — no allowance for parallel-trends violations.</li>
+      <li><strong>Slide M to 3.</strong> The CI is [2.10, 3.09] — still comfortably above zero. The conventional "robust" threshold is passed easily.</li>
+      <li><strong>Slide M to 15.</strong> The CI is [0.38, 4.81] — the lower bound barely stays positive. The breakdown lies just beyond this slider's range; the post estimates M̄ ≳ 15.</li>
+      <li><strong>Compare CI widths.</strong> Width at M = 0 is 0.13; width at M = 15 is 4.43 — 34× wider. This is the price you pay for honesty about untestable assumptions.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Why bound rather than test?</h3>
+    <p>
+      A pre-trend test (the post's p = 0.29) only <em>fails to reject</em>
+      parallel trends — it cannot confirm them. Roth (2022) showed that
+      conditioning on passing a pre-test can distort subsequent inference.
+      HonestDiD takes a different stance: it accepts that parallel trends might
+      fail, asks how badly, and reports the answer that survives every "how
+      badly" up to your tolerance.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Introduction to Difference-in-Differences in Python</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

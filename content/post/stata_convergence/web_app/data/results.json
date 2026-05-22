@@ -1,0 +1,1611 @@
+{
+ "rolling_ols": [
+  {
+   "startyear": 1960,
+   "endyear": 2019,
+   "beta": -0.00056,
+   "lower": -0.00288,
+   "upper": 0.00213,
+   "speed_pct": -0.056,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1961,
+   "endyear": 2019,
+   "beta": -0.00049,
+   "lower": -0.00279,
+   "upper": 0.00215,
+   "speed_pct": -0.0493,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1962,
+   "endyear": 2019,
+   "beta": -0.00054,
+   "lower": -0.00286,
+   "upper": 0.00215,
+   "speed_pct": -0.0536,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1963,
+   "endyear": 2019,
+   "beta": -0.00058,
+   "lower": -0.00287,
+   "upper": 0.00206,
+   "speed_pct": -0.0576,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1964,
+   "endyear": 2019,
+   "beta": -0.00052,
+   "lower": -0.00281,
+   "upper": 0.00209,
+   "speed_pct": -0.0524,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1965,
+   "endyear": 2019,
+   "beta": -0.00054,
+   "lower": -0.00284,
+   "upper": 0.00208,
+   "speed_pct": -0.0544,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1966,
+   "endyear": 2019,
+   "beta": -0.0005,
+   "lower": -0.00281,
+   "upper": 0.00214,
+   "speed_pct": -0.0496,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1967,
+   "endyear": 2019,
+   "beta": -0.00064,
+   "lower": -0.00298,
+   "upper": 0.00202,
+   "speed_pct": -0.0642,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1968,
+   "endyear": 2019,
+   "beta": -0.00066,
+   "lower": -0.00299,
+   "upper": 0.00198,
+   "speed_pct": -0.0659,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1969,
+   "endyear": 2019,
+   "beta": -0.00061,
+   "lower": -0.00296,
+   "upper": 0.00204,
+   "speed_pct": -0.0614,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1970,
+   "endyear": 2019,
+   "beta": -0.00097,
+   "lower": -0.00329,
+   "upper": 0.00165,
+   "speed_pct": -0.0968,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1971,
+   "endyear": 2019,
+   "beta": -0.00103,
+   "lower": -0.00334,
+   "upper": 0.00157,
+   "speed_pct": -0.103,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1972,
+   "endyear": 2019,
+   "beta": -0.00098,
+   "lower": -0.00332,
+   "upper": 0.00165,
+   "speed_pct": -0.0982,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1973,
+   "endyear": 2019,
+   "beta": -0.00084,
+   "lower": -0.00317,
+   "upper": 0.00177,
+   "speed_pct": -0.0838,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1974,
+   "endyear": 2019,
+   "beta": -0.00099,
+   "lower": -0.00337,
+   "upper": 0.00169,
+   "speed_pct": -0.0988,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1975,
+   "endyear": 2019,
+   "beta": -0.00127,
+   "lower": -0.00361,
+   "upper": 0.00135,
+   "speed_pct": -0.1265,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1976,
+   "endyear": 2019,
+   "beta": -0.00148,
+   "lower": -0.00387,
+   "upper": 0.00118,
+   "speed_pct": -0.1485,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1977,
+   "endyear": 2019,
+   "beta": -0.00174,
+   "lower": -0.00415,
+   "upper": 0.00095,
+   "speed_pct": -0.1739,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1978,
+   "endyear": 2019,
+   "beta": -0.0016,
+   "lower": -0.00402,
+   "upper": 0.00108,
+   "speed_pct": -0.1602,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1979,
+   "endyear": 2019,
+   "beta": -0.00153,
+   "lower": -0.00397,
+   "upper": 0.00117,
+   "speed_pct": -0.153,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1980,
+   "endyear": 2019,
+   "beta": -0.0011,
+   "lower": -0.00361,
+   "upper": 0.00167,
+   "speed_pct": -0.1105,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1981,
+   "endyear": 2019,
+   "beta": -0.00142,
+   "lower": -0.00399,
+   "upper": 0.00142,
+   "speed_pct": -0.1422,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1982,
+   "endyear": 2019,
+   "beta": -0.0016,
+   "lower": -0.00418,
+   "upper": 0.00125,
+   "speed_pct": -0.1599,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1983,
+   "endyear": 2019,
+   "beta": -0.00166,
+   "lower": -0.00423,
+   "upper": 0.00117,
+   "speed_pct": -0.1658,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1984,
+   "endyear": 2019,
+   "beta": -0.00175,
+   "lower": -0.00433,
+   "upper": 0.00109,
+   "speed_pct": -0.1748,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1985,
+   "endyear": 2019,
+   "beta": -0.00202,
+   "lower": -0.00468,
+   "upper": 0.00089,
+   "speed_pct": -0.2024,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1986,
+   "endyear": 2019,
+   "beta": -0.00164,
+   "lower": -0.00427,
+   "upper": 0.00124,
+   "speed_pct": -0.1642,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1987,
+   "endyear": 2019,
+   "beta": -0.00097,
+   "lower": -0.00357,
+   "upper": 0.00187,
+   "speed_pct": -0.097,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1988,
+   "endyear": 2019,
+   "beta": -0.00067,
+   "lower": -0.00332,
+   "upper": 0.00222,
+   "speed_pct": -0.067,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1989,
+   "endyear": 2019,
+   "beta": -0.0002,
+   "lower": -0.00287,
+   "upper": 0.00269,
+   "speed_pct": -0.0205,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1990,
+   "endyear": 2019,
+   "beta": 0.00008,
+   "lower": -0.00259,
+   "upper": 0.00298,
+   "speed_pct": 0.0081,
+   "halflife": 8530.1,
+   "n": 84
+  },
+  {
+   "startyear": 1991,
+   "endyear": 2019,
+   "beta": 0.00026,
+   "lower": -0.00243,
+   "upper": 0.00317,
+   "speed_pct": 0.0257,
+   "halflife": 2694.6,
+   "n": 84
+  },
+  {
+   "startyear": 1992,
+   "endyear": 2019,
+   "beta": 0.00075,
+   "lower": -0.00198,
+   "upper": 0.0037,
+   "speed_pct": 0.0755,
+   "halflife": 918.5,
+   "n": 84
+  },
+  {
+   "startyear": 1993,
+   "endyear": 2019,
+   "beta": 0.00094,
+   "lower": -0.00173,
+   "upper": 0.00381,
+   "speed_pct": 0.0942,
+   "halflife": 735.8,
+   "n": 84
+  },
+  {
+   "startyear": 1994,
+   "endyear": 2019,
+   "beta": 0.00197,
+   "lower": -0.00091,
+   "upper": 0.00507,
+   "speed_pct": 0.1969,
+   "halflife": 352,
+   "n": 84
+  },
+  {
+   "startyear": 1995,
+   "endyear": 2019,
+   "beta": 0.00182,
+   "lower": -0.00099,
+   "upper": 0.00482,
+   "speed_pct": 0.1818,
+   "halflife": 381.3,
+   "n": 84
+  },
+  {
+   "startyear": 1996,
+   "endyear": 2019,
+   "beta": 0.00208,
+   "lower": -0.00074,
+   "upper": 0.0051,
+   "speed_pct": 0.2082,
+   "halflife": 333,
+   "n": 84
+  },
+  {
+   "startyear": 1997,
+   "endyear": 2019,
+   "beta": 0.00217,
+   "lower": -0.00064,
+   "upper": 0.00516,
+   "speed_pct": 0.2168,
+   "halflife": 319.7,
+   "n": 84
+  },
+  {
+   "startyear": 1998,
+   "endyear": 2019,
+   "beta": 0.00263,
+   "lower": -0.0003,
+   "upper": 0.00576,
+   "speed_pct": 0.2632,
+   "halflife": 263.4,
+   "n": 84
+  },
+  {
+   "startyear": 1999,
+   "endyear": 2019,
+   "beta": 0.00299,
+   "lower": -0.00008,
+   "upper": 0.00625,
+   "speed_pct": 0.2988,
+   "halflife": 232,
+   "n": 84
+  },
+  {
+   "startyear": 2000,
+   "endyear": 2019,
+   "beta": 0.00365,
+   "lower": 0.0006,
+   "upper": 0.00687,
+   "speed_pct": 0.3646,
+   "halflife": 190.1,
+   "n": 84
+  },
+  {
+   "startyear": 2001,
+   "endyear": 2019,
+   "beta": 0.00348,
+   "lower": 0.00042,
+   "upper": 0.00673,
+   "speed_pct": 0.3484,
+   "halflife": 198.9,
+   "n": 84
+  },
+  {
+   "startyear": 2002,
+   "endyear": 2019,
+   "beta": 0.00342,
+   "lower": 0.00007,
+   "upper": 0.00697,
+   "speed_pct": 0.3421,
+   "halflife": 202.6,
+   "n": 84
+  },
+  {
+   "startyear": 2003,
+   "endyear": 2019,
+   "beta": 0.00339,
+   "lower": -0.00015,
+   "upper": 0.00713,
+   "speed_pct": 0.3386,
+   "halflife": 204.7,
+   "n": 84
+  },
+  {
+   "startyear": 2004,
+   "endyear": 2019,
+   "beta": 0.00366,
+   "lower": 0.0002,
+   "upper": 0.00732,
+   "speed_pct": 0.3665,
+   "halflife": 189.1,
+   "n": 84
+  },
+  {
+   "startyear": 2005,
+   "endyear": 2019,
+   "beta": 0.00441,
+   "lower": 0.00093,
+   "upper": 0.00807,
+   "speed_pct": 0.441,
+   "halflife": 157.2,
+   "n": 84
+  },
+  {
+   "startyear": 2006,
+   "endyear": 2019,
+   "beta": 0.00479,
+   "lower": 0.00115,
+   "upper": 0.00861,
+   "speed_pct": 0.4789,
+   "halflife": 144.7,
+   "n": 84
+  },
+  {
+   "startyear": 2007,
+   "endyear": 2019,
+   "beta": 0.00496,
+   "lower": 0.00127,
+   "upper": 0.00882,
+   "speed_pct": 0.4957,
+   "halflife": 139.8,
+   "n": 84
+  },
+  {
+   "startyear": 2008,
+   "endyear": 2019,
+   "beta": 0.00525,
+   "lower": 0.00111,
+   "upper": 0.00959,
+   "speed_pct": 0.5247,
+   "halflife": 132.1,
+   "n": 84
+  },
+  {
+   "startyear": 2009,
+   "endyear": 2019,
+   "beta": 0.0032,
+   "lower": -0.0008,
+   "upper": 0.00736,
+   "speed_pct": 0.3195,
+   "halflife": 216.9,
+   "n": 84
+  },
+  {
+   "startyear": 2010,
+   "endyear": 2019,
+   "beta": 0.00309,
+   "lower": -0.00097,
+   "upper": 0.0073,
+   "speed_pct": 0.309,
+   "halflife": 224.3,
+   "n": 84
+  }
+ ],
+ "rolling_nls": [
+  {
+   "startyear": 1960,
+   "endyear": 2019,
+   "beta": -0.00056,
+   "lower": -0.00304,
+   "upper": 0.00192,
+   "speed_pct": -0.056,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1961,
+   "endyear": 2019,
+   "beta": -0.00049,
+   "lower": -0.00295,
+   "upper": 0.00196,
+   "speed_pct": -0.0493,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1962,
+   "endyear": 2019,
+   "beta": -0.00054,
+   "lower": -0.00302,
+   "upper": 0.00195,
+   "speed_pct": -0.0536,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1963,
+   "endyear": 2019,
+   "beta": -0.00058,
+   "lower": -0.00302,
+   "upper": 0.00187,
+   "speed_pct": -0.0576,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1964,
+   "endyear": 2019,
+   "beta": -0.00052,
+   "lower": -0.00296,
+   "upper": 0.00191,
+   "speed_pct": -0.0524,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1965,
+   "endyear": 2019,
+   "beta": -0.00054,
+   "lower": -0.00299,
+   "upper": 0.0019,
+   "speed_pct": -0.0544,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1966,
+   "endyear": 2019,
+   "beta": -0.0005,
+   "lower": -0.00296,
+   "upper": 0.00197,
+   "speed_pct": -0.0496,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1967,
+   "endyear": 2019,
+   "beta": -0.00064,
+   "lower": -0.00312,
+   "upper": 0.00184,
+   "speed_pct": -0.0642,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1968,
+   "endyear": 2019,
+   "beta": -0.00066,
+   "lower": -0.00313,
+   "upper": 0.00181,
+   "speed_pct": -0.0659,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1969,
+   "endyear": 2019,
+   "beta": -0.00061,
+   "lower": -0.0031,
+   "upper": 0.00187,
+   "speed_pct": -0.0614,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1970,
+   "endyear": 2019,
+   "beta": -0.00097,
+   "lower": -0.00343,
+   "upper": 0.00149,
+   "speed_pct": -0.0968,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1971,
+   "endyear": 2019,
+   "beta": -0.00103,
+   "lower": -0.00348,
+   "upper": 0.00142,
+   "speed_pct": -0.103,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1972,
+   "endyear": 2019,
+   "beta": -0.00098,
+   "lower": -0.00345,
+   "upper": 0.00149,
+   "speed_pct": -0.0982,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1973,
+   "endyear": 2019,
+   "beta": -0.00084,
+   "lower": -0.0033,
+   "upper": 0.00162,
+   "speed_pct": -0.0838,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1974,
+   "endyear": 2019,
+   "beta": -0.00099,
+   "lower": -0.00351,
+   "upper": 0.00153,
+   "speed_pct": -0.0988,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1975,
+   "endyear": 2019,
+   "beta": -0.00127,
+   "lower": -0.00374,
+   "upper": 0.00121,
+   "speed_pct": -0.1265,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1976,
+   "endyear": 2019,
+   "beta": -0.00148,
+   "lower": -0.004,
+   "upper": 0.00103,
+   "speed_pct": -0.1485,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1977,
+   "endyear": 2019,
+   "beta": -0.00174,
+   "lower": -0.00428,
+   "upper": 0.0008,
+   "speed_pct": -0.1739,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1978,
+   "endyear": 2019,
+   "beta": -0.0016,
+   "lower": -0.00414,
+   "upper": 0.00094,
+   "speed_pct": -0.1602,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1979,
+   "endyear": 2019,
+   "beta": -0.00153,
+   "lower": -0.00409,
+   "upper": 0.00103,
+   "speed_pct": -0.153,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1980,
+   "endyear": 2019,
+   "beta": -0.0011,
+   "lower": -0.00373,
+   "upper": 0.00152,
+   "speed_pct": -0.1105,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1981,
+   "endyear": 2019,
+   "beta": -0.00142,
+   "lower": -0.00412,
+   "upper": 0.00127,
+   "speed_pct": -0.1422,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1982,
+   "endyear": 2019,
+   "beta": -0.0016,
+   "lower": -0.00431,
+   "upper": 0.00111,
+   "speed_pct": -0.1599,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1983,
+   "endyear": 2019,
+   "beta": -0.00166,
+   "lower": -0.00435,
+   "upper": 0.00103,
+   "speed_pct": -0.1658,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1984,
+   "endyear": 2019,
+   "beta": -0.00175,
+   "lower": -0.00445,
+   "upper": 0.00095,
+   "speed_pct": -0.1748,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1985,
+   "endyear": 2019,
+   "beta": -0.00202,
+   "lower": -0.0048,
+   "upper": 0.00075,
+   "speed_pct": -0.2024,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1986,
+   "endyear": 2019,
+   "beta": -0.00164,
+   "lower": -0.00439,
+   "upper": 0.0011,
+   "speed_pct": -0.1642,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1987,
+   "endyear": 2019,
+   "beta": -0.00097,
+   "lower": -0.00368,
+   "upper": 0.00174,
+   "speed_pct": -0.097,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1988,
+   "endyear": 2019,
+   "beta": -0.00067,
+   "lower": -0.00343,
+   "upper": 0.00209,
+   "speed_pct": -0.067,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1989,
+   "endyear": 2019,
+   "beta": -0.0002,
+   "lower": -0.00298,
+   "upper": 0.00257,
+   "speed_pct": -0.0205,
+   "halflife": null,
+   "n": 84
+  },
+  {
+   "startyear": 1990,
+   "endyear": 2019,
+   "beta": 0.00008,
+   "lower": -0.0027,
+   "upper": 0.00286,
+   "speed_pct": 0.0081,
+   "halflife": 8530.1,
+   "n": 84
+  },
+  {
+   "startyear": 1991,
+   "endyear": 2019,
+   "beta": 0.00026,
+   "lower": -0.00254,
+   "upper": 0.00305,
+   "speed_pct": 0.0257,
+   "halflife": 2694.6,
+   "n": 84
+  },
+  {
+   "startyear": 1992,
+   "endyear": 2019,
+   "beta": 0.00075,
+   "lower": -0.00208,
+   "upper": 0.00359,
+   "speed_pct": 0.0755,
+   "halflife": 918.5,
+   "n": 84
+  },
+  {
+   "startyear": 1993,
+   "endyear": 2019,
+   "beta": 0.00094,
+   "lower": -0.00182,
+   "upper": 0.00371,
+   "speed_pct": 0.0942,
+   "halflife": 735.8,
+   "n": 84
+  },
+  {
+   "startyear": 1994,
+   "endyear": 2019,
+   "beta": 0.00197,
+   "lower": -0.00101,
+   "upper": 0.00495,
+   "speed_pct": 0.1969,
+   "halflife": 352,
+   "n": 84
+  },
+  {
+   "startyear": 1995,
+   "endyear": 2019,
+   "beta": 0.00182,
+   "lower": -0.00108,
+   "upper": 0.00472,
+   "speed_pct": 0.1818,
+   "halflife": 381.3,
+   "n": 84
+  },
+  {
+   "startyear": 1996,
+   "endyear": 2019,
+   "beta": 0.00208,
+   "lower": -0.00084,
+   "upper": 0.005,
+   "speed_pct": 0.2082,
+   "halflife": 333,
+   "n": 84
+  },
+  {
+   "startyear": 1997,
+   "endyear": 2019,
+   "beta": 0.00217,
+   "lower": -0.00073,
+   "upper": 0.00506,
+   "speed_pct": 0.2168,
+   "halflife": 319.7,
+   "n": 84
+  },
+  {
+   "startyear": 1998,
+   "endyear": 2019,
+   "beta": 0.00263,
+   "lower": -0.0004,
+   "upper": 0.00566,
+   "speed_pct": 0.2632,
+   "halflife": 263.4,
+   "n": 84
+  },
+  {
+   "startyear": 1999,
+   "endyear": 2019,
+   "beta": 0.00299,
+   "lower": -0.00017,
+   "upper": 0.00615,
+   "speed_pct": 0.2988,
+   "halflife": 232,
+   "n": 84
+  },
+  {
+   "startyear": 2000,
+   "endyear": 2019,
+   "beta": 0.00365,
+   "lower": 0.00052,
+   "upper": 0.00678,
+   "speed_pct": 0.3646,
+   "halflife": 190.1,
+   "n": 84
+  },
+  {
+   "startyear": 2001,
+   "endyear": 2019,
+   "beta": 0.00348,
+   "lower": 0.00034,
+   "upper": 0.00663,
+   "speed_pct": 0.3484,
+   "halflife": 198.9,
+   "n": 84
+  },
+  {
+   "startyear": 2002,
+   "endyear": 2019,
+   "beta": 0.00342,
+   "lower": -0.00003,
+   "upper": 0.00687,
+   "speed_pct": 0.3421,
+   "halflife": 202.6,
+   "n": 84
+  },
+  {
+   "startyear": 2003,
+   "endyear": 2019,
+   "beta": 0.00339,
+   "lower": -0.00025,
+   "upper": 0.00702,
+   "speed_pct": 0.3386,
+   "halflife": 204.7,
+   "n": 84
+  },
+  {
+   "startyear": 2004,
+   "endyear": 2019,
+   "beta": 0.00366,
+   "lower": 0.0001,
+   "upper": 0.00723,
+   "speed_pct": 0.3665,
+   "halflife": 189.1,
+   "n": 84
+  },
+  {
+   "startyear": 2005,
+   "endyear": 2019,
+   "beta": 0.00441,
+   "lower": 0.00084,
+   "upper": 0.00798,
+   "speed_pct": 0.441,
+   "halflife": 157.2,
+   "n": 84
+  },
+  {
+   "startyear": 2006,
+   "endyear": 2019,
+   "beta": 0.00479,
+   "lower": 0.00106,
+   "upper": 0.00852,
+   "speed_pct": 0.4789,
+   "halflife": 144.7,
+   "n": 84
+  },
+  {
+   "startyear": 2007,
+   "endyear": 2019,
+   "beta": 0.00496,
+   "lower": 0.00119,
+   "upper": 0.00873,
+   "speed_pct": 0.4957,
+   "halflife": 139.8,
+   "n": 84
+  },
+  {
+   "startyear": 2008,
+   "endyear": 2019,
+   "beta": 0.00525,
+   "lower": 0.00101,
+   "upper": 0.00948,
+   "speed_pct": 0.5247,
+   "halflife": 132.1,
+   "n": 84
+  },
+  {
+   "startyear": 2009,
+   "endyear": 2019,
+   "beta": 0.0032,
+   "lower": -0.00088,
+   "upper": 0.00727,
+   "speed_pct": 0.3195,
+   "halflife": 216.9,
+   "n": 84
+  },
+  {
+   "startyear": 2010,
+   "endyear": 2019,
+   "beta": 0.00309,
+   "lower": -0.00104,
+   "upper": 0.00722,
+   "speed_pct": 0.309,
+   "halflife": 224.3,
+   "n": 84
+  }
+ ],
+ "sigma": [
+  {
+   "year": 1960,
+   "variance": 0.9244,
+   "var_lb": 0.697,
+   "var_ub": 1.2854,
+   "n": 84
+  },
+  {
+   "year": 1961,
+   "variance": 0.9605,
+   "var_lb": 0.7241,
+   "var_ub": 1.3355,
+   "n": 84
+  },
+  {
+   "year": 1962,
+   "variance": 0.9624,
+   "var_lb": 0.7255,
+   "var_ub": 1.3381,
+   "n": 84
+  },
+  {
+   "year": 1963,
+   "variance": 0.9835,
+   "var_lb": 0.7415,
+   "var_ub": 1.3676,
+   "n": 84
+  },
+  {
+   "year": 1964,
+   "variance": 1.0054,
+   "var_lb": 0.758,
+   "var_ub": 1.3979,
+   "n": 84
+  },
+  {
+   "year": 1965,
+   "variance": 1.0196,
+   "var_lb": 0.7687,
+   "var_ub": 1.4178,
+   "n": 84
+  },
+  {
+   "year": 1966,
+   "variance": 1.0359,
+   "var_lb": 0.781,
+   "var_ub": 1.4404,
+   "n": 84
+  },
+  {
+   "year": 1967,
+   "variance": 1.0478,
+   "var_lb": 0.79,
+   "var_ub": 1.457,
+   "n": 84
+  },
+  {
+   "year": 1968,
+   "variance": 1.0611,
+   "var_lb": 0.8,
+   "var_ub": 1.4754,
+   "n": 84
+  },
+  {
+   "year": 1969,
+   "variance": 1.0864,
+   "var_lb": 0.8191,
+   "var_ub": 1.5106,
+   "n": 84
+  },
+  {
+   "year": 1970,
+   "variance": 1.0818,
+   "var_lb": 0.8156,
+   "var_ub": 1.5043,
+   "n": 84
+  },
+  {
+   "year": 1971,
+   "variance": 1.111,
+   "var_lb": 0.8376,
+   "var_ub": 1.5448,
+   "n": 84
+  },
+  {
+   "year": 1972,
+   "variance": 1.145,
+   "var_lb": 0.8633,
+   "var_ub": 1.5921,
+   "n": 84
+  },
+  {
+   "year": 1973,
+   "variance": 1.1878,
+   "var_lb": 0.8955,
+   "var_ub": 1.6516,
+   "n": 84
+  },
+  {
+   "year": 1974,
+   "variance": 1.1725,
+   "var_lb": 0.884,
+   "var_ub": 1.6303,
+   "n": 84
+  },
+  {
+   "year": 1975,
+   "variance": 1.1853,
+   "var_lb": 0.8936,
+   "var_ub": 1.6481,
+   "n": 84
+  },
+  {
+   "year": 1976,
+   "variance": 1.1849,
+   "var_lb": 0.8934,
+   "var_ub": 1.6476,
+   "n": 84
+  },
+  {
+   "year": 1977,
+   "variance": 1.1798,
+   "var_lb": 0.8895,
+   "var_ub": 1.6404,
+   "n": 84
+  },
+  {
+   "year": 1978,
+   "variance": 1.2173,
+   "var_lb": 0.9178,
+   "var_ub": 1.6927,
+   "n": 84
+  },
+  {
+   "year": 1979,
+   "variance": 1.2423,
+   "var_lb": 0.9366,
+   "var_ub": 1.7273,
+   "n": 84
+  },
+  {
+   "year": 1980,
+   "variance": 1.2893,
+   "var_lb": 0.972,
+   "var_ub": 1.7927,
+   "n": 84
+  },
+  {
+   "year": 1981,
+   "variance": 1.275,
+   "var_lb": 0.9613,
+   "var_ub": 1.7729,
+   "n": 84
+  },
+  {
+   "year": 1982,
+   "variance": 1.2736,
+   "var_lb": 0.9602,
+   "var_ub": 1.7709,
+   "n": 84
+  },
+  {
+   "year": 1983,
+   "variance": 1.2826,
+   "var_lb": 0.967,
+   "var_ub": 1.7835,
+   "n": 84
+  },
+  {
+   "year": 1984,
+   "variance": 1.2885,
+   "var_lb": 0.9714,
+   "var_ub": 1.7917,
+   "n": 84
+  },
+  {
+   "year": 1985,
+   "variance": 1.269,
+   "var_lb": 0.9568,
+   "var_ub": 1.7646,
+   "n": 84
+  },
+  {
+   "year": 1986,
+   "variance": 1.3241,
+   "var_lb": 0.9982,
+   "var_ub": 1.8411,
+   "n": 84
+  },
+  {
+   "year": 1987,
+   "variance": 1.4057,
+   "var_lb": 1.0598,
+   "var_ub": 1.9546,
+   "n": 84
+  },
+  {
+   "year": 1988,
+   "variance": 1.4418,
+   "var_lb": 1.087,
+   "var_ub": 2.0048,
+   "n": 84
+  },
+  {
+   "year": 1989,
+   "variance": 1.4938,
+   "var_lb": 1.1262,
+   "var_ub": 2.0771,
+   "n": 84
+  },
+  {
+   "year": 1990,
+   "variance": 1.5384,
+   "var_lb": 1.1599,
+   "var_ub": 2.1392,
+   "n": 84
+  },
+  {
+   "year": 1991,
+   "variance": 1.5675,
+   "var_lb": 1.1818,
+   "var_ub": 2.1796,
+   "n": 84
+  },
+  {
+   "year": 1992,
+   "variance": 1.6255,
+   "var_lb": 1.2255,
+   "var_ub": 2.2602,
+   "n": 84
+  },
+  {
+   "year": 1993,
+   "variance": 1.6651,
+   "var_lb": 1.2553,
+   "var_ub": 2.3153,
+   "n": 84
+  },
+  {
+   "year": 1994,
+   "variance": 1.7479,
+   "var_lb": 1.3178,
+   "var_ub": 2.4304,
+   "n": 84
+  },
+  {
+   "year": 1995,
+   "variance": 1.7485,
+   "var_lb": 1.3183,
+   "var_ub": 2.4313,
+   "n": 84
+  },
+  {
+   "year": 1996,
+   "variance": 1.7685,
+   "var_lb": 1.3333,
+   "var_ub": 2.459,
+   "n": 84
+  },
+  {
+   "year": 1997,
+   "variance": 1.7869,
+   "var_lb": 1.3472,
+   "var_ub": 2.4846,
+   "n": 84
+  },
+  {
+   "year": 1998,
+   "variance": 1.8223,
+   "var_lb": 1.3739,
+   "var_ub": 2.5339,
+   "n": 84
+  },
+  {
+   "year": 1999,
+   "variance": 1.8435,
+   "var_lb": 1.3898,
+   "var_ub": 2.5633,
+   "n": 84
+  },
+  {
+   "year": 2000,
+   "variance": 1.8937,
+   "var_lb": 1.4277,
+   "var_ub": 2.6331,
+   "n": 84
+  },
+  {
+   "year": 2001,
+   "variance": 1.8785,
+   "var_lb": 1.4163,
+   "var_ub": 2.612,
+   "n": 84
+  },
+  {
+   "year": 2002,
+   "variance": 1.8708,
+   "var_lb": 1.4104,
+   "var_ub": 2.6013,
+   "n": 84
+  },
+  {
+   "year": 2003,
+   "variance": 1.8685,
+   "var_lb": 1.4087,
+   "var_ub": 2.5981,
+   "n": 84
+  },
+  {
+   "year": 2004,
+   "variance": 1.8831,
+   "var_lb": 1.4197,
+   "var_ub": 2.6185,
+   "n": 84
+  },
+  {
+   "year": 2005,
+   "variance": 1.913,
+   "var_lb": 1.4423,
+   "var_ub": 2.66,
+   "n": 84
+  },
+  {
+   "year": 2006,
+   "variance": 1.9271,
+   "var_lb": 1.4529,
+   "var_ub": 2.6796,
+   "n": 84
+  },
+  {
+   "year": 2007,
+   "variance": 1.9218,
+   "var_lb": 1.4489,
+   "var_ub": 2.6722,
+   "n": 84
+  },
+  {
+   "year": 2008,
+   "variance": 1.9182,
+   "var_lb": 1.4462,
+   "var_ub": 2.6672,
+   "n": 84
+  },
+  {
+   "year": 2009,
+   "variance": 1.8345,
+   "var_lb": 1.3831,
+   "var_ub": 2.5508,
+   "n": 84
+  },
+  {
+   "year": 2010,
+   "variance": 1.8262,
+   "var_lb": 1.3768,
+   "var_ub": 2.5393,
+   "n": 84
+  },
+  {
+   "year": 2011,
+   "variance": 1.803,
+   "var_lb": 1.3594,
+   "var_ub": 2.5071,
+   "n": 84
+  },
+  {
+   "year": 2012,
+   "variance": 1.784,
+   "var_lb": 1.345,
+   "var_ub": 2.4806,
+   "n": 84
+  },
+  {
+   "year": 2013,
+   "variance": 1.7947,
+   "var_lb": 1.353,
+   "var_ub": 2.4954,
+   "n": 84
+  },
+  {
+   "year": 2014,
+   "variance": 1.7662,
+   "var_lb": 1.3316,
+   "var_ub": 2.4559,
+   "n": 84
+  },
+  {
+   "year": 2015,
+   "variance": 1.7606,
+   "var_lb": 1.3274,
+   "var_ub": 2.4481,
+   "n": 84
+  },
+  {
+   "year": 2016,
+   "variance": 1.7543,
+   "var_lb": 1.3226,
+   "var_ub": 2.4393,
+   "n": 84
+  },
+  {
+   "year": 2017,
+   "variance": 1.7704,
+   "var_lb": 1.3348,
+   "var_ub": 2.4617,
+   "n": 84
+  },
+  {
+   "year": 2018,
+   "variance": 1.7788,
+   "var_lb": 1.3411,
+   "var_ub": 2.4734,
+   "n": 84
+  },
+  {
+   "year": 2019,
+   "variance": 1.7635,
+   "var_lb": 1.3296,
+   "var_ub": 2.4521,
+   "n": 84
+  }
+ ],
+ "speed_periods_ols": [
+  {
+   "period": 1960,
+   "lambda_ols": 0.00437,
+   "beta_ols": -0.00402,
+   "speed_ols": -0.4024,
+   "halflife_ols": null,
+   "n": 84
+  },
+  {
+   "period": 1960,
+   "lambda_ols": 0.00057,
+   "beta_ols": -0.00056,
+   "speed_ols": -0.056,
+   "halflife_ols": null,
+   "n": 84
+  },
+  {
+   "period": 1980,
+   "lambda_ols": 0.00113,
+   "beta_ols": -0.0011,
+   "speed_ols": -0.1105,
+   "halflife_ols": null,
+   "n": 84
+  },
+  {
+   "period": 1990,
+   "lambda_ols": -0.00008,
+   "beta_ols": 0.00008,
+   "speed_ols": 0.0081,
+   "halflife_ols": 8530.1,
+   "n": 84
+  },
+  {
+   "period": 1995,
+   "lambda_ols": -0.00178,
+   "beta_ols": 0.00182,
+   "speed_ols": 0.1818,
+   "halflife_ols": 381.3,
+   "n": 84
+  },
+  {
+   "period": 2000,
+   "lambda_ols": -0.00352,
+   "beta_ols": 0.00365,
+   "speed_ols": 0.3646,
+   "halflife_ols": 190.1,
+   "n": 84
+  }
+ ],
+ "speed_periods_nls": [
+  {
+   "period": 1960,
+   "beta_nls": -0.00402,
+   "se_nls": 0.00135,
+   "speed_nls": -0.4024,
+   "halflife_nls": null,
+   "pvalue_nls": 0.00375,
+   "n": 84
+  },
+  {
+   "period": 1960,
+   "beta_nls": -0.00056,
+   "se_nls": 0.00125,
+   "speed_nls": -0.056,
+   "halflife_nls": null,
+   "pvalue_nls": 0.65529,
+   "n": 84
+  },
+  {
+   "period": 1980,
+   "beta_nls": -0.0011,
+   "se_nls": 0.00132,
+   "speed_nls": -0.1105,
+   "halflife_nls": null,
+   "pvalue_nls": 0.40544,
+   "n": 84
+  },
+  {
+   "period": 1990,
+   "beta_nls": 0.00008,
+   "se_nls": 0.0014,
+   "speed_nls": 0.0081,
+   "halflife_nls": 8530.1,
+   "pvalue_nls": 0.95381,
+   "n": 84
+  },
+  {
+   "period": 1995,
+   "beta_nls": 0.00182,
+   "se_nls": 0.00146,
+   "speed_nls": 0.1818,
+   "halflife_nls": 381.3,
+   "pvalue_nls": 0.21604,
+   "n": 84
+  },
+  {
+   "period": 2000,
+   "beta_nls": 0.00365,
+   "se_nls": 0.00157,
+   "speed_nls": 0.3646,
+   "halflife_nls": 190.1,
+   "pvalue_nls": 0.02302,
+   "n": 84
+  }
+ ],
+ "estimates": [
+  {
+   "method": "OLS (β)",
+   "outcome": "2000-2019",
+   "estimate": 0.00365,
+   "se": 0.00157,
+   "ci_lo": 0.0006,
+   "ci_hi": 0.00688,
+   "n_selected": 84
+  },
+  {
+   "method": "NLS (β)",
+   "outcome": "2000-2019",
+   "estimate": 0.00365,
+   "se": 0.00157,
+   "ci_lo": 0.0006,
+   "ci_hi": 0.00688,
+   "n_selected": 84
+  },
+  {
+   "method": "OLS (β)",
+   "outcome": "1960-2000",
+   "estimate": -0.00402,
+   "se": 0.00135,
+   "ci_lo": -0.00671,
+   "ci_hi": -0.00133,
+   "n_selected": 84
+  },
+  {
+   "method": "NLS (β)",
+   "outcome": "1960-2000",
+   "estimate": -0.00402,
+   "se": 0.00135,
+   "ci_lo": -0.00671,
+   "ci_hi": -0.00133,
+   "n_selected": 84
+  },
+  {
+   "method": "OLS (β)",
+   "outcome": "1960-2019",
+   "estimate": -0.00056,
+   "se": 0.00125,
+   "ci_lo": -0.00304,
+   "ci_hi": 0.00192,
+   "n_selected": 84
+  },
+  {
+   "method": "NLS (β)",
+   "outcome": "1960-2019",
+   "estimate": -0.00056,
+   "se": 0.00125,
+   "ci_lo": -0.00304,
+   "ci_hi": 0.00192,
+   "n_selected": 84
+  }
+ ],
+ "selection": []
+}

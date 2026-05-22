@@ -1,0 +1,88 @@
+{
+  "_comment": "stata_cate2 — Stata 19 cate command, NTL & Conflict outcomes. Estimates baked from §7 (ATEs) and §8 (GATEs) of content/post/stata_cate2/index.md. CIs computed as estimate ± 1.96*se.",
+
+  "estimates": [
+    { "method": "Naive diff",     "outcome": "NTL 1v0 (Mining)",   "estimate":  0.1092, "se": 0.0200, "ci_lo": -0.1300, "ci_hi":  0.4880, "n_selected": null },
+    { "method": "PO",             "outcome": "NTL 1v0 (Mining)",   "estimate":  0.1937, "se": 0.0097, "ci_lo":  0.1746, "ci_hi":  0.2128, "n_selected": 10   },
+    { "method": "AIPW",           "outcome": "NTL 1v0 (Mining)",   "estimate":  0.1490, "se": 0.0106, "ci_lo":  0.1283, "ci_hi":  0.1697, "n_selected": 10   },
+    { "method": "Ground truth",   "outcome": "NTL 1v0 (Mining)",   "estimate":  0.2500, "se": 0.0001, "ci_lo":  0.2498, "ci_hi":  0.2502, "n_selected": null },
+
+    { "method": "Naive diff",     "outcome": "NTL 2v0",            "estimate":  0.2077, "se": 0.0250, "ci_lo":  0.1587, "ci_hi":  0.2567, "n_selected": null },
+    { "method": "AIPW",           "outcome": "NTL 2v0",            "estimate":  0.2892, "se": 0.0251, "ci_lo":  0.2401, "ci_hi":  0.3383, "n_selected": 10   },
+    { "method": "Ground truth",   "outcome": "NTL 2v0",            "estimate":  0.3000, "se": 0.0001, "ci_lo":  0.2998, "ci_hi":  0.3002, "n_selected": null },
+
+    { "method": "Naive diff",     "outcome": "NTL 3v0",            "estimate":  0.5227, "se": 0.0300, "ci_lo":  0.4639, "ci_hi":  0.5815, "n_selected": null },
+    { "method": "AIPW",           "outcome": "NTL 3v0",            "estimate":  0.6112, "se": 0.0251, "ci_lo":  0.5621, "ci_hi":  0.6603, "n_selected": 10   },
+    { "method": "Ground truth",   "outcome": "NTL 3v0",            "estimate":  0.5500, "se": 0.0001, "ci_lo":  0.5498, "ci_hi":  0.5502, "n_selected": null },
+
+    { "method": "Naive diff",     "outcome": "NTL 2v1 (Price-)",   "estimate":  0.0985, "se": 0.0500, "ci_lo":  0.0005, "ci_hi":  0.1965, "n_selected": null },
+    { "method": "AIPW",           "outcome": "NTL 2v1 (Price-)",   "estimate": -0.0112, "se": 0.0883, "ci_lo": -0.1843, "ci_hi":  0.1619, "n_selected": 10   },
+    { "method": "Ground truth",   "outcome": "NTL 2v1 (Price-)",   "estimate":  0.0500, "se": 0.0001, "ci_lo":  0.0498, "ci_hi":  0.0502, "n_selected": null },
+
+    { "method": "Naive diff",     "outcome": "NTL 3v1 (Price+)",   "estimate":  0.4135, "se": 0.0400, "ci_lo":  0.3351, "ci_hi":  0.4919, "n_selected": null },
+    { "method": "PO",             "outcome": "NTL 3v1 (Price+)",   "estimate":  0.5946, "se": 0.0313, "ci_lo":  0.5332, "ci_hi":  0.6559, "n_selected": 10   },
+    { "method": "AIPW",           "outcome": "NTL 3v1 (Price+)",   "estimate":  0.4053, "se": 0.0255, "ci_lo":  0.3553, "ci_hi":  0.4552, "n_selected": 10   },
+    { "method": "Ground truth",   "outcome": "NTL 3v1 (Price+)",   "estimate":  0.3000, "se": 0.0001, "ci_lo":  0.2998, "ci_hi":  0.3002, "n_selected": null },
+
+    { "method": "Naive diff",     "outcome": "Conflict 1v0",       "estimate":  0.0730, "se": 0.0200, "ci_lo":  0.0338, "ci_hi":  0.1122, "n_selected": null },
+    { "method": "PO",             "outcome": "Conflict 1v0",       "estimate":  0.0631, "se": 0.0130, "ci_lo":  0.0376, "ci_hi":  0.0886, "n_selected": 10   },
+    { "method": "AIPW",           "outcome": "Conflict 1v0",       "estimate":  0.0660, "se": 0.0122, "ci_lo":  0.0421, "ci_hi":  0.0899, "n_selected": 10   },
+
+    { "method": "AIPW",           "outcome": "Conflict 3v0",       "estimate":  0.1586, "se": 0.0380, "ci_lo":  0.0841, "ci_hi":  0.2331, "n_selected": 10   },
+    { "method": "AIPW",           "outcome": "Conflict 3v1",       "estimate":  0.1126, "se": 0.0293, "ci_lo":  0.0552, "ci_hi":  0.1700, "n_selected": 10   }
+  ],
+
+  "gates_exec_ntl_1v0": [
+    { "exec_con": 1, "gate":  0.2748, "se": 0.0404, "ci_lo": 0.1957, "ci_hi": 0.3540 },
+    { "exec_con": 2, "gate":  0.3155, "se": 0.0205, "ci_lo": 0.2754, "ci_hi": 0.3557 },
+    { "exec_con": 3, "gate":  0.1674, "se": 0.0208, "ci_lo": 0.1266, "ci_hi": 0.2083 },
+    { "exec_con": 4, "gate":  0.1132, "se": 0.0264, "ci_lo": 0.0615, "ci_hi": 0.1648 },
+    { "exec_con": 5, "gate":  0.0999, "se": 0.0296, "ci_lo": 0.0418, "ci_hi": 0.1579 },
+    { "exec_con": 6, "gate":  0.0508, "se": 0.0220, "ci_lo": 0.0077, "ci_hi": 0.0939 }
+  ],
+  "gates_exec_ntl_3v1": [
+    { "exec_con": 1, "gate":  0.3211, "se": 0.0790, "ci_lo": 0.1662, "ci_hi": 0.4760 },
+    { "exec_con": 2, "gate":  0.2869, "se": 0.0726, "ci_lo": 0.1445, "ci_hi": 0.4292 },
+    { "exec_con": 3, "gate":  0.3730, "se": 0.0414, "ci_lo": 0.2919, "ci_hi": 0.4541 },
+    { "exec_con": 4, "gate":  0.5891, "se": 0.0542, "ci_lo": 0.4829, "ci_hi": 0.6954 },
+    { "exec_con": 5, "gate":  0.4870, "se": 0.0590, "ci_lo": 0.3713, "ci_hi": 0.6028 },
+    { "exec_con": 6, "gate":  0.3401, "se": 0.0596, "ci_lo": 0.2232, "ci_hi": 0.4570 }
+  ],
+  "gates_qog_ntl_1v0": [
+    { "qog_q": "Q1 (0.22-0.32)", "gate":  0.2979, "se": 0.0215, "ci_lo": 0.2557, "ci_hi": 0.3401 },
+    { "qog_q": "Q2 (0.32-0.42)", "gate":  0.1685, "se": 0.0206, "ci_lo": 0.1282, "ci_hi": 0.2088 },
+    { "qog_q": "Q3 (0.42-0.58)", "gate":  0.1081, "se": 0.0243, "ci_lo": 0.0605, "ci_hi": 0.1557 },
+    { "qog_q": "Q4 (0.58-0.70)", "gate":  0.0729, "se": 0.0179, "ci_lo": 0.0377, "ci_hi": 0.1080 }
+  ],
+  "gates_qog_ntl_3v1": [
+    { "qog_q": "Q1 (0.22-0.28)", "gate":  0.3224, "se": 0.0785, "ci_lo": 0.1686, "ci_hi": 0.4762 },
+    { "qog_q": "Q2 (0.28-0.38)", "gate":  0.3511, "se": 0.0409, "ci_lo": 0.2709, "ci_hi": 0.4312 },
+    { "qog_q": "Q3 (0.38-0.48)", "gate":  0.4844, "se": 0.0567, "ci_lo": 0.3732, "ci_hi": 0.5955 },
+    { "qog_q": "Q4 (0.48-0.70)", "gate":  0.4447, "se": 0.0393, "ci_lo": 0.3676, "ci_hi": 0.5218 }
+  ],
+  "gates_exec_conf_1v0": [
+    { "exec_con": 1, "gate":  0.0925, "se": 0.0441, "ci_lo": 0.0060, "ci_hi": 0.1789 },
+    { "exec_con": 2, "gate":  0.0327, "se": 0.0348, "ci_lo":-0.0356, "ci_hi": 0.1010 },
+    { "exec_con": 3, "gate":  0.0600, "se": 0.0292, "ci_lo": 0.0027, "ci_hi": 0.1174 },
+    { "exec_con": 4, "gate":  0.0486, "se": 0.0273, "ci_lo":-0.0049, "ci_hi": 0.1021 },
+    { "exec_con": 5, "gate":  0.0643, "se": 0.0205, "ci_lo": 0.0241, "ci_hi": 0.1045 },
+    { "exec_con": 6, "gate":  0.1058, "se": 0.0214, "ci_lo": 0.0638, "ci_hi": 0.1478 }
+  ],
+
+  "heterogeneity_tests": [
+    { "label": "NTL 1v0 — by exec_con",     "chi2":  96.90, "df": 5, "p": 0.0000, "verdict": "strong moderation"     },
+    { "label": "NTL 3v1 — by exec_con",     "chi2":  18.92, "df": 5, "p": 0.0020, "verdict": "weak / non-monotone"   },
+    { "label": "NTL 1v0 — by qog_cat",      "chi2":  69.19, "df": 3, "p": 0.0000, "verdict": "strong moderation"     },
+    { "label": "NTL 3v1 — by qog_cat",      "chi2":   5.81, "df": 3, "p": 0.1211, "verdict": "no moderation"         },
+    { "label": "Conflict 1v0 — by exec_con","chi2":   5.00, "df": 5, "p": 0.4162, "verdict": "no moderation"         },
+    { "label": "estat heterogeneity (1v0)", "chi2":  53.05, "df": 1, "p": 0.0000, "verdict": "effects heterogeneous" }
+  ],
+
+  "subpopulation_ate": [
+    { "label": "Weak institutions (exec_con ≤ 2)",   "n": 558,  "ate": 0.2970, "se": 0.0215, "ci_lo": 0.2548, "ci_hi": 0.3392 },
+    { "label": "Strong institutions (exec_con ≥ 4)", "n": 1526, "ate": 0.0923, "se": 0.0157, "ci_lo": 0.0615, "ci_hi": 0.1231 },
+    { "label": "Full sample",                        "n": 2700, "ate": 0.1518, "se": 0.0111, "ci_lo": 0.1300, "ci_hi": 0.1735 }
+  ],
+
+  "selection": []
+}

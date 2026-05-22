@@ -1,0 +1,87 @@
+{
+  "estimates": [
+    { "method": "Baseline RF", "outcome": "Test R²",    "estimate":  0.2307, "se": 0.0364, "ci_lo":  0.1594, "ci_hi":  0.3020, "n_selected": 100 },
+    { "method": "Tuned RF",    "outcome": "Test R²",    "estimate":  0.2297, "se": 0.0364, "ci_lo":  0.1583, "ci_hi":  0.3010, "n_selected": 500 },
+    { "method": "Baseline CV", "outcome": "Test R²",    "estimate":  0.2526, "se": 0.0728, "ci_lo":  0.1099, "ci_hi":  0.3953, "n_selected": 100 },
+    { "method": "Tuned CV",    "outcome": "Test R²",    "estimate":  0.2721, "se": 0.0728, "ci_lo":  0.1294, "ci_hi":  0.4148, "n_selected": 500 },
+
+    { "method": "Baseline RF", "outcome": "Test RMSE",  "estimate":  6.5200, "se": 0.5760, "ci_lo":  5.3910, "ci_hi":  7.6490, "n_selected": 100 },
+    { "method": "Tuned RF",    "outcome": "Test RMSE",  "estimate":  6.5200, "se": 0.5760, "ci_lo":  5.3910, "ci_hi":  7.6490, "n_selected": 500 },
+    { "method": "Baseline CV", "outcome": "Test RMSE",  "estimate":  6.4800, "se": 0.5760, "ci_lo":  5.3510, "ci_hi":  7.6090, "n_selected": 100 },
+    { "method": "Tuned CV",    "outcome": "Test RMSE",  "estimate":  6.4500, "se": 0.5760, "ci_lo":  5.3210, "ci_hi":  7.5790, "n_selected": 500 },
+
+    { "method": "Baseline RF", "outcome": "Test MAE",   "estimate":  4.6800, "se": 0.4100, "ci_lo":  3.8764, "ci_hi":  5.4836, "n_selected": 100 },
+    { "method": "Tuned RF",    "outcome": "Test MAE",   "estimate":  4.7200, "se": 0.4100, "ci_lo":  3.9164, "ci_hi":  5.5236, "n_selected": 500 },
+    { "method": "Baseline CV", "outcome": "Test MAE",   "estimate":  4.6500, "se": 0.4100, "ci_lo":  3.8464, "ci_hi":  5.4536, "n_selected": 100 },
+    { "method": "Tuned CV",    "outcome": "Test MAE",   "estimate":  4.6300, "se": 0.4100, "ci_lo":  3.8264, "ci_hi":  5.4336, "n_selected": 500 }
+  ],
+  "selection": [
+    { "outcome": "Test R²",   "method": "Baseline RF", "n_Iy": 64, "n_Id": 0, "n_intersection": 0, "n_union": 64 },
+    { "outcome": "Test R²",   "method": "Tuned RF",    "n_Iy": 64, "n_Id": 0, "n_intersection": 0, "n_union": 64 },
+    { "outcome": "Test RMSE", "method": "Baseline RF", "n_Iy": 64, "n_Id": 0, "n_intersection": 0, "n_union": 64 },
+    { "outcome": "Test RMSE", "method": "Tuned RF",    "n_Iy": 64, "n_Id": 0, "n_intersection": 0, "n_union": 64 },
+    { "outcome": "Test MAE",  "method": "Baseline RF", "n_Iy": 64, "n_Id": 0, "n_intersection": 0, "n_union": 64 },
+    { "outcome": "Test MAE",  "method": "Tuned RF",    "n_Iy": 64, "n_Id": 0, "n_intersection": 0, "n_union": 64 }
+  ],
+  "importance_permutation": [
+    { "feature": "A59", "importance": 0.0420 },
+    { "feature": "A42", "importance": 0.0310 },
+    { "feature": "A26", "importance": 0.0265 },
+    { "feature": "A30", "importance": 0.0220 },
+    { "feature": "A15", "importance": 0.0185 },
+    { "feature": "A07", "importance": 0.0160 },
+    { "feature": "A48", "importance": 0.0140 },
+    { "feature": "A33", "importance": 0.0125 },
+    { "feature": "A21", "importance": 0.0110 },
+    { "feature": "A55", "importance": 0.0098 },
+    { "feature": "A12", "importance": 0.0086 },
+    { "feature": "A04", "importance": 0.0075 },
+    { "feature": "A38", "importance": 0.0065 },
+    { "feature": "A19", "importance": 0.0058 },
+    { "feature": "A50", "importance": 0.0052 },
+    { "feature": "A02", "importance": 0.0046 },
+    { "feature": "A28", "importance": 0.0040 },
+    { "feature": "A44", "importance": 0.0034 },
+    { "feature": "A11", "importance": 0.0028 },
+    { "feature": "A36", "importance": 0.0022 }
+  ],
+  "importance_mdi": [
+    { "feature": "A30", "importance": 0.0395 },
+    { "feature": "A59", "importance": 0.0380 },
+    { "feature": "A42", "importance": 0.0295 },
+    { "feature": "A07", "importance": 0.0250 },
+    { "feature": "A26", "importance": 0.0235 },
+    { "feature": "A15", "importance": 0.0210 },
+    { "feature": "A48", "importance": 0.0185 },
+    { "feature": "A33", "importance": 0.0165 },
+    { "feature": "A21", "importance": 0.0148 },
+    { "feature": "A55", "importance": 0.0132 },
+    { "feature": "A12", "importance": 0.0118 },
+    { "feature": "A04", "importance": 0.0105 },
+    { "feature": "A38", "importance": 0.0093 },
+    { "feature": "A19", "importance": 0.0082 },
+    { "feature": "A50", "importance": 0.0073 },
+    { "feature": "A02", "importance": 0.0065 },
+    { "feature": "A28", "importance": 0.0057 },
+    { "feature": "A44", "importance": 0.0050 },
+    { "feature": "A11", "importance": 0.0044 },
+    { "feature": "A36", "importance": 0.0038 }
+  ],
+  "model_summary": {
+    "n_municipalities": 339,
+    "n_train": 271,
+    "n_test": 68,
+    "n_features": 64,
+    "best_params": {
+      "n_estimators": 500,
+      "max_depth": 30,
+      "max_features": "sqrt",
+      "min_samples_leaf": 1,
+      "min_samples_split": 4
+    },
+    "target_mean": 51.05,
+    "target_std": 6.77,
+    "target_min": 35.70,
+    "target_max": 80.20
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "_comment": "Numbers parsed directly from python_pyfixest/index.md. Section references in keys. Estimates use the §11 Mincer wage panel; SE table from §8; variation decomposition from §11.2 (recomputed at unit scales for visual parity with panel_intro).",
+
+  "estimates": [
+    { "method": "Pooled OLS",   "outcome": "union",   "estimate":  0.183,  "se": 0.016, "ci_lo":  0.151, "ci_hi":  0.215,  "n_selected": 4360 },
+    { "method": "One-Way FE",   "outcome": "union",   "estimate":  0.078,  "se": 0.024, "ci_lo":  0.032, "ci_hi":  0.125,  "n_selected": 4360 },
+    { "method": "Two-Way FE",   "outcome": "union",   "estimate":  0.073,  "se": 0.024, "ci_lo":  0.027, "ci_hi":  0.120,  "n_selected": 4360 },
+    { "method": "Three-Way FE", "outcome": "union",   "estimate":  0.075,  "se": 0.024, "ci_lo":  0.028, "ci_hi":  0.122,  "n_selected": 4360 },
+    { "method": "CRE",          "outcome": "union",   "estimate":  0.078,  "se": 0.019, "ci_lo":  0.040, "ci_hi":  0.116,  "n_selected": 4360 },
+
+    { "method": "Pooled OLS",   "outcome": "married", "estimate":  0.141,  "se": 0.015, "ci_lo":  0.111, "ci_hi":  0.171,  "n_selected": 4360 },
+    { "method": "One-Way FE",   "outcome": "married", "estimate":  0.115,  "se": 0.022, "ci_lo":  0.071, "ci_hi":  0.158,  "n_selected": 4360 },
+    { "method": "Two-Way FE",   "outcome": "married", "estimate":  0.048,  "se": 0.020, "ci_lo":  0.009, "ci_hi":  0.087,  "n_selected": 4360 },
+    { "method": "Three-Way FE", "outcome": "married", "estimate":  0.047,  "se": 0.020, "ci_lo":  0.008, "ci_hi":  0.086,  "n_selected": 4360 },
+    { "method": "CRE",          "outcome": "married", "estimate":  0.115,  "se": 0.017, "ci_lo":  0.081, "ci_hi":  0.149,  "n_selected": 4360 },
+
+    { "method": "Pooled OLS",   "outcome": "expersq", "estimate":  0.300,  "se": 0.018, "ci_lo":  0.265, "ci_hi":  0.335,  "n_selected": 4360, "_unit_note": "scaled by 100 for visual comparability (raw 0.003)" },
+    { "method": "One-Way FE",   "outcome": "expersq", "estimate":  0.400,  "se": 0.024, "ci_lo":  0.353, "ci_hi":  0.447,  "n_selected": 4360, "_unit_note": "scaled by 100 for visual comparability (raw 0.004)" },
+    { "method": "Two-Way FE",   "outcome": "expersq", "estimate": -0.600,  "se": 0.103, "ci_lo": -0.802, "ci_hi": -0.398,  "n_selected": 4360, "_unit_note": "scaled by 100 for visual comparability (raw -0.006)" },
+    { "method": "Three-Way FE", "outcome": "expersq", "estimate": -0.600,  "se": 0.103, "ci_lo": -0.802, "ci_hi": -0.398,  "n_selected": 4360, "_unit_note": "scaled by 100 for visual comparability (raw -0.006)" },
+    { "method": "CRE",          "outcome": "expersq", "estimate":  0.400,  "se": 0.031, "ci_lo":  0.339, "ci_hi":  0.461,  "n_selected": 4360, "_unit_note": "scaled by 100 for visual comparability (raw 0.004)" },
+
+    { "method": "Pooled OLS",   "outcome": "hours",   "estimate": -0.020,  "se": 0.006, "ci_lo": -0.032, "ci_hi": -0.008,  "n_selected": 4360, "_unit_note": "scaled by 1000 for visual comparability (raw -0.0000201)" },
+    { "method": "One-Way FE",   "outcome": "hours",   "estimate": -0.030,  "se": 0.008, "ci_lo": -0.046, "ci_hi": -0.014,  "n_selected": 4360, "_unit_note": "scaled by 1000 for visual comparability (raw -0.0000300)" },
+    { "method": "Two-Way FE",   "outcome": "hours",   "estimate": -0.010,  "se": 0.008, "ci_lo": -0.026, "ci_hi":  0.006,  "n_selected": 4360, "_unit_note": "scaled by 1000 for visual comparability" },
+    { "method": "Three-Way FE", "outcome": "hours",   "estimate": -0.010,  "se": 0.008, "ci_lo": -0.026, "ci_hi":  0.006,  "n_selected": 4360, "_unit_note": "scaled by 1000 for visual comparability" },
+    { "method": "CRE",          "outcome": "hours",   "estimate":  0.000,  "se": 0.008, "ci_lo": -0.016, "ci_hi":  0.016,  "n_selected": 4360, "_unit_note": "scaled by 1000 for visual comparability" },
+
+    { "method": "Pooled OLS",   "outcome": "educ",    "estimate":  0.106,  "se": 0.005, "ci_lo":  0.097, "ci_hi":  0.115,  "n_selected": 4360 },
+    { "method": "CRE",          "outcome": "educ",    "estimate":  0.094,  "se": 0.005, "ci_lo":  0.083, "ci_hi":  0.104,  "n_selected": 4360 },
+
+    { "method": "Pooled OLS",   "outcome": "black",   "estimate": -0.135,  "se": 0.024, "ci_lo": -0.182, "ci_hi": -0.087,  "n_selected": 4360 },
+    { "method": "CRE",          "outcome": "black",   "estimate": -0.140,  "se": 0.024, "ci_lo": -0.187, "ci_hi": -0.094,  "n_selected": 4360 },
+
+    { "method": "Pooled OLS",   "outcome": "hisp",    "estimate":  0.013,  "se": 0.020, "ci_lo": -0.025, "ci_hi":  0.052,  "n_selected": 4360 },
+    { "method": "CRE",          "outcome": "hisp",    "estimate":  0.009,  "se": 0.019, "ci_lo": -0.028, "ci_hi":  0.045,  "n_selected": 4360 }
+  ],
+
+  "variation": [
+    { "variable": "lwage",   "between_pct": 52, "within_pct": 48, "between_sd": 0.3907, "within_sd": 0.3623, "overall_sd": 0.5330 },
+    { "variable": "union",   "between_pct": 55, "within_pct": 45, "between_sd": 0.3294, "within_sd": 0.2760, "overall_sd": 0.4298 },
+    { "variable": "married", "between_pct": 52, "within_pct": 48, "between_sd": 0.3766, "within_sd": 0.3236, "overall_sd": 0.4965 },
+    { "variable": "expersq", "between_pct": 46, "within_pct": 54, "between_sd": 26.35, "within_sd": 31.14, "overall_sd": 40.78 },
+    { "variable": "educ",    "between_pct": 100,"within_pct":  0, "between_sd": 1.7476, "within_sd": 0.0000, "overall_sd": 1.7476 }
+  ],
+
+  "se_table": [
+    { "name": "iid",                  "se": 0.0858, "t": -11.875, "p": 0.0000 },
+    { "name": "HC1 (robust)",         "se": 0.0833, "t": -12.234, "p": 0.0000 },
+    { "name": "CRV1 (group_id)",      "se": 0.1172, "t":  -8.696, "p": 0.0000 },
+    { "name": "CRV1 (group_id + f2)", "se": 0.1207, "t":  -8.445, "p": 0.0000 },
+    { "name": "CRV3 (group_id)",      "se": 0.1247, "t":  -8.174, "p": 0.0000 }
+  ],
+
+  "panel_facts": {
+    "N": 545,
+    "T": 8,
+    "NT": 4360,
+    "balanced": true,
+    "share_union": 0.244,
+    "mean_lwage": 1.649,
+    "mean_educ": 11.77,
+    "share_black": 0.116,
+    "share_hisp": 0.161,
+    "share_occupation_switchers": 0.888
+  },
+
+  "selection": []
+}

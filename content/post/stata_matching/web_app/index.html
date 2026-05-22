@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Treatment Effects in Stata — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Treatment Effects in Stata: A Beginner's Tour of Six Estimators'. Sliders and simulators that build intuition for naive comparison, regression adjustment, IPW, doubly robust estimators, and matching.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Treatment Effects in Stata — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Treatment Effects in Stata: A Beginner's Tour of Six Estimators</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"     class="tab active" data-pane="pane-intro"     role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-overlap"   class="tab"        data-pane="pane-overlap"   role="tab" aria-selected="false">2 · Confounding Lab</button>
+  <button id="tab-sim"       class="tab"        data-pane="pane-sim"       role="tab" aria-selected="false">3 · Estimator Simulator</button>
+  <button id="tab-forest"    class="tab"        data-pane="pane-forest"    role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Six routes to the same causal question</h2>
+  <p class="lede">
+    Does maternal smoking during pregnancy <em>cause</em> lower birth weight,
+    or do smokers and non-smokers simply differ on other characteristics that
+    happen to predict birth weight? The naive gap is <strong>−275 g</strong>.
+    Adjust for observable confounders and the gap shrinks to about
+    <strong>−230 g</strong>. That 45-gram correction is exactly what
+    causal-inference machinery buys us.
+  </p>
+  <p class="lede">
+    This app lets you watch the six estimators in the post in action. Slide a
+    confounder strength, regenerate data, and see how regression adjustment,
+    IPW, doubly robust estimators, and matching all converge on a similar
+    answer when the identification assumptions hold — and how they pull apart
+    when they don't.
+  </p>
+
+  <div class="card">
+    <h3>The shrinking penalty — L1 vs. L2 (a useful analogy)</h3>
+    <p>
+      Adjusted estimators all <em>shrink</em> the naive estimate toward zero
+      by accounting for confounders. The animation below shows two ways of
+      shrinking a coefficient: <strong>L1 (LASSO)</strong> kills it abruptly,
+      while <strong>L2 (Ridge)</strong> only decays it. The same intuition
+      applies to causal adjustment: each method pulls the naive estimate
+      toward the truth — by a different amount, through a different route.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-overlap">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Confounding Lab</h4>
+      <p>See how a back-door confounder distorts a naive comparison, and how propensity-score overlap diagnoses the damage.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Estimator Simulator</h4>
+      <p>Slide confounder strength and watch Naive, RA, IPW, and AIPW converge — or diverge — on the true effect.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>The post's headline figure, interactive. Toggle ATE vs ATT, drop NNM, hover for SEs, CIs, and covariate counts.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Potential outcomes Y(0), Y(1)</summary>
+        <div class="gloss-body">For every mother, the two parallel-universe birth weights — one if she smoked, one if she didn't. We observe one; the other is counterfactual and must be estimated.</div>
+      </details>
+      <details class="gloss"><summary>ATE vs ATT</summary>
+        <div class="gloss-body">ATE = average effect over <em>everyone</em>. ATT = average effect on the <em>treated</em>. They diverge when smokers' covariate profile differs from the population average.</div>
+      </details>
+      <details class="gloss"><summary>Conditional independence (CIA)</summary>
+        <div class="gloss-body">After conditioning on observed X, treatment D is "as good as random" with respect to the potential outcomes. The strong, untestable identifying assumption.</div>
+      </details>
+      <details class="gloss"><summary>Overlap (positivity)</summary>
+        <div class="gloss-body">For every X-profile, both treated and control units exist. Diagnosed visually with <code>teffects overlap</code>. Without overlap, no comparable counterfactual exists.</div>
+      </details>
+      <details class="gloss"><summary>Propensity score e(X)</summary>
+        <div class="gloss-body">P(D=1|X) — the conditional probability of treatment given covariates. Rosenbaum & Rubin (1983): matching on the scalar e(X) balances every X that entered the model.</div>
+      </details>
+      <details class="gloss"><summary>Regression Adjustment (RA)</summary>
+        <div class="gloss-body">Fit an outcome model for treated and another for control. Predict both potential outcomes for every unit. Average the gap. Models the outcome only.</div>
+      </details>
+      <details class="gloss"><summary>Inverse-Probability Weighting (IPW)</summary>
+        <div class="gloss-body">Reweight by 1/ê(X) for treated, 1/(1−ê(X)) for control. Recovers a pseudo-randomized sample. Models the treatment only.</div>
+      </details>
+      <details class="gloss"><summary>Doubly robust (IPWRA, AIPW)</summary>
+        <div class="gloss-body">Combine outcome and treatment models. Consistent if <em>either</em> is right. AIPW also attains the semiparametric efficiency bound. Belt and suspenders.</div>
+      </details>
+      <details class="gloss"><summary>Nearest-Neighbor Matching (NNM)</summary>
+        <div class="gloss-body">Find each treated unit's statistical twin in covariate space (Mahalanobis distance). No parametric model. Most assumption-light, but trades precision.</div>
+      </details>
+      <details class="gloss"><summary>Propensity-Score Matching (PSM)</summary>
+        <div class="gloss-body">Same matching idea as NNM, but match on the scalar propensity ê(X). One-dimensional matching distance. Still needs the propensity model to be right.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: CONFOUNDING LAB ====================== -->
+<section id="pane-overlap" class="tab-pane" role="tabpanel" aria-labelledby="tab-overlap">
+
+  <h2>Confounding Lab — see the back-door path</h2>
+  <p class="lede">
+    A confounder X drives <em>both</em> the treatment decision D and the
+    outcome Y. In the post, X is maternal age / education / marital status,
+    D is smoking, Y is birth weight. <strong>Slide the confounder strength
+    and watch the naive comparison drift further from the true effect.</strong>
+    The overlap histogram below shows whether smokers and non-smokers occupy
+    similar regions of X-space — the prerequisite for any adjustment to work.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="ov-n-val">500</span></label>
+      <input type="range" id="ov-n" min="100" max="500" step="50" value="500" aria-label="sample size n">
+      <div class="hint">Larger n shrinks confidence intervals but does not remove bias.</div>
+    </div>
+    <div class="control">
+      <label>Confounder strength γ <span class="value" id="ov-g-val">1.50</span></label>
+      <input type="range" id="ov-g" min="0" max="3" step="0.1" value="1.5" aria-label="confounder strength">
+      <div class="hint">How strongly X drives D. γ = 0 ⇒ random treatment (no confounding). γ large ⇒ severe selection bias.</div>
+    </div>
+    <div class="control">
+      <label>Outcome confounding δ <span class="value" id="ov-d-val">120</span></label>
+      <input type="range" id="ov-d" min="0" max="200" step="10" value="120" aria-label="outcome confounding">
+      <div class="hint">How much X affects Y (independent of D). The back-door pathway from X to Y.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="ov-overlap"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">true ATE (set by us)</div>
+      <div class="stat-value teal" id="ov-stat-true">−200</div>
+      <div class="stat-sub">grams (the answer we're trying to recover)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">naive gap Ȳ₁ − Ȳ₀</div>
+      <div class="stat-value orange" id="ov-stat-naive">—</div>
+      <div class="stat-sub">what an unadjusted study would report</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">selection bias</div>
+      <div class="stat-value" id="ov-stat-bias">—</div>
+      <div class="stat-sub">naive − true. The gap adjustment must close.</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">% smokers in sample</div>
+      <div class="stat-value" id="ov-stat-pct">—</div>
+      <div class="stat-sub">at γ = 0 this hovers near 50%; large γ skews it.</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set γ = 0.</strong> The two propensity-score densities collapse onto each other. Treatment is unconfounded and the naive gap recovers the true effect.</li>
+      <li><strong>Crank γ up.</strong> The two densities pull apart. Smokers' propensity-score density shifts right, non-smokers' left. The naive gap grows in magnitude — pure selection bias.</li>
+      <li><strong>Watch the bias counter.</strong> At γ = 1.5, δ = 120, the bias is on the order of 50–100 g of <em>fake</em> effect contributed by the confounder. That is the gap RA, IPW, and matching are designed to close.</li>
+      <li><strong>If the two densities barely overlap</strong>, no adjustment will save you. That is what the post calls a <em>violation of the overlap assumption</em>.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="ov-reseed">Reseed random draws</button>
+      <button class="action secondary" id="ov-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: ESTIMATOR SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Estimator Simulator — four routes, one truth</h2>
+  <p class="lede">
+    Generate confounded data with a known true ATE (so you can grade each
+    estimator). Compute four methods live: <strong>Naive</strong> (no
+    adjustment), <strong>RA</strong> (outcome model), <strong>IPW</strong>
+    (propensity reweight), and <strong>AIPW</strong> (doubly robust). When
+    confounding is strong, the three adjusted estimators should cluster near
+    the truth and the naive estimate should drift away.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sim-n-val">400</span></label>
+      <input type="range" id="sim-n" min="100" max="500" step="50" value="400" aria-label="sample size n">
+      <div class="hint">Capped at 500 so the "Run 100 sims" button finishes in &lt; 300 ms.</div>
+    </div>
+    <div class="control">
+      <label>Confounder strength γ <span class="value" id="sim-g-val">1.50</span></label>
+      <input type="range" id="sim-g" min="0" max="3" step="0.1" value="1.5" aria-label="confounder strength">
+      <div class="hint">Higher γ ⇒ stronger selection bias for naive, more work for adjusted estimators.</div>
+    </div>
+    <div class="control">
+      <label>Outcome confounding δ <span class="value" id="sim-d-val">120</span></label>
+      <input type="range" id="sim-d" min="0" max="200" step="10" value="120" aria-label="outcome confounding">
+      <div class="hint">How much X affects Y. Drives the bias term Cov(X,D)·δ.</div>
+    </div>
+    <div class="control">
+      <label>True ATE τ <span class="value" id="sim-t-val">−200</span></label>
+      <input type="range" id="sim-t" min="-300" max="0" step="10" value="-200" aria-label="true ATE">
+      <div class="hint">The number every adjusted estimator should recover.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Adjusted</span> Estimators</h3>
+      <p class="note" style="margin:0 0 10px;">Each conditions on X. The doubly robust ones (AIPW) are consistent if <em>either</em> model is right.</p>
+      <div class="method-row"><span class="label">RA (outcome model)</span><span class="val" id="sim-ra">—</span></div>
+      <div class="method-row"><span class="label">IPW (propensity)</span><span class="val" id="sim-ipw">—</span></div>
+      <div class="method-row"><span class="label">AIPW (doubly robust)</span><span class="val" id="sim-aipw">—</span></div>
+      <div class="method-row"><span class="label">true τ</span><span class="val" id="sim-true">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Naive</span> Comparison</h3>
+      <p class="note" style="margin:0 0 10px;">Difference of group means. Biased whenever X drives both D and Y.</p>
+      <div class="method-row"><span class="label">Ȳ smokers</span><span class="val" id="sim-ym1">—</span></div>
+      <div class="method-row"><span class="label">Ȳ non-smokers</span><span class="val" id="sim-ym0">—</span></div>
+      <div class="method-row"><span class="label">naive gap</span><span class="val" id="sim-naive">—</span></div>
+      <div class="method-row"><span class="label">bias (naive − true)</span><span class="val" id="sim-bias">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-compare"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set γ = 0.</strong> All four estimates collapse onto each other and onto the true τ. There is nothing to adjust for, so the methods agree by construction.</li>
+      <li><strong>Raise γ.</strong> The naive bar pulls away from the truth. RA, IPW, AIPW stay close to τ — that's the post's headline lesson, on simulated data this time.</li>
+      <li><strong>Compare RA and IPW.</strong> They model entirely different sides of the data — outcome vs. treatment — and yet land within sampling noise of each other. The agreement is the §11 "convergence at −230 g" story in miniature.</li>
+      <li><strong>AIPW sits between RA and IPW.</strong> By construction it borrows strength from both. If one model is misspecified, AIPW is rescued by the other.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over many simulations</h3>
+    <p>Single runs are noisy. Run the pipeline 100 times with fresh draws (same parameters, different ε) to see whether the naive bias is systematic — and how tight the adjusted estimators are around the truth.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sim-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Naive mean τ̂</div><div class="stat-value orange" id="sim-naive-mean">—</div><div class="stat-sub">systematic bias</div></div>
+      <div class="stat"><div class="stat-label">Naive sd(τ̂)</div><div class="stat-value" id="sim-naive-sd">—</div></div>
+      <div class="stat"><div class="stat-label">AIPW mean τ̂</div><div class="stat-value teal" id="sim-aipw-mean">—</div><div class="stat-sub">should match true τ</div></div>
+      <div class="stat"><div class="stat-label">AIPW sd(τ̂)</div><div class="stat-value" id="sim-aipw-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's forest plot — interactively</h2>
+  <p class="lede">
+    These numbers come straight from <code>ate_estimates.csv</code> in the
+    post folder — the same numbers used to produce Figure 9 (the post's
+    headline comparison). Toggle ATE vs ATT, drop NNM to focus on the tight
+    cluster, hover any point for SE, CI, and number of covariates used.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The naive bar is the outlier.</strong> At −275 g it sits well below every adjusted estimator. Selection bias of ~45 g is the gap that motivates the whole exercise.</li>
+      <li><strong>Five adjusted estimators cluster between −229 and −240 g.</strong> RA, IPW, IPWRA, AIPW, PSM. They use different functional forms and different identification arguments and they still land within ±10 g of each other.</li>
+      <li><strong>NNM is the only outlier among adjusted methods.</strong> Its ATE (−210 g) is a touch closer to zero, its CI a touch wider — the non-parametric tradeoff. But its CI overlaps every other estimator's.</li>
+      <li><strong>Toggle to ATT.</strong> Four of the five matching/IPW methods give ATTs slightly <em>closer</em> to zero than their ATE. NNM reverses the pattern — its ATT (−238 g) is larger in magnitude than its ATE (−210 g).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Estimand</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="ATE" checked> ATE (whole population)</label>
+      <label><input type="checkbox" value="ATT"> ATT (on the treated)</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive" checked> Naive</label>
+      <label><input type="checkbox" value="RA" checked> RA</label>
+      <label><input type="checkbox" value="IPW" checked> IPW</label>
+      <label><input type="checkbox" value="IPWRA" checked> IPWRA</label>
+      <label><input type="checkbox" value="AIPW" checked> AIPW</label>
+      <label><input type="checkbox" value="NNM" checked> NNM</label>
+      <label><input type="checkbox" value="PSM" checked> PSM</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why does the naive estimate overshoot?</h3>
+    <p>
+      Smokers in the Cattaneo sample are younger, less educated, less likely
+      to be married, and less likely to have first-trimester prenatal care
+      than non-smokers. Each of those covariates <em>independently</em>
+      predicts lower birth weight. The naive gap therefore mixes the genuine
+      effect of smoking with the contribution of every X-difference between
+      groups. The six adjusted methods all block the back-door path
+      <code>X → D</code> in some way — and they all land in the <strong>−230 g
+      neighborhood</strong>, ±10 g.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Why does NNM disagree slightly?</h3>
+    <p>
+      NNM matches each smoker to her closest non-smoker by Mahalanobis
+      distance over the full covariate vector. It is the only method that
+      fits <em>no</em> parametric model — neither an outcome equation nor a
+      propensity score. That non-parametric freedom buys it robustness to
+      functional-form errors but costs it precision: a wider CI and a point
+      estimate (−210 g) that sits a few standard errors away from the
+      parametric cluster. The CI overlaps every other estimator's, so the
+      disagreement is well within sampling noise. NNM's reversed ATE/ATT
+      pattern (ATT &gt; ATE in magnitude) is a real feature: matching
+      around the treated mothers weights the data toward the covariate
+      region where smoking does more damage.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      In Tab 3 you watched RA, IPW, and AIPW converge toward a known true
+      effect on simulated data while the naive estimate drifted away. The
+      forest plot above is the same story, but with real data and the truth
+      unknown. The convergence of five methods near <strong>−230 g</strong>
+      is our strongest evidence that we have correctly closed the back-door
+      pathway from X. The remaining uncertainty — and what the post calls
+      out in §15 — is everything that <em>isn't</em> in X.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Treatment Effects in Stata: A Beginner's Tour of Six Estimators</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

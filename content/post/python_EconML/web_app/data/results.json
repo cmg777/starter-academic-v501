@@ -1,0 +1,63 @@
+{
+  "_comment": "Baked from execution_log.txt and tutorial_results/ate-table.csv for content/post/python_EconML. Method labels reuse the forest_plot color palette: 'First diff' (steel) = Naive difference-in-means; 'DL (rigorous)' (teal) = DML Causal Forest; 'DL (CV)' (orange) = Ground Truth from the DGP. CIs are 90% (alpha=0.1) for the DML estimates, matching the post's reporting convention; naive and truth rows have no CI (CI = point). n_selected = number of X-features used by the causal forest (10 always for DML; null for naive/truth).",
+
+  "estimates": [
+    {"method": "First diff",    "outcome": "1-0 (Mining vs none)",       "estimate": 0.1090,  "se": 0.0000, "ci_lo": 0.1090,  "ci_hi": 0.1090,  "n_selected": null},
+    {"method": "DL (rigorous)", "outcome": "1-0 (Mining vs none)",       "estimate": 0.2398,  "se": 0.0701, "ci_lo": 0.1244,  "ci_hi": 0.3552,  "n_selected": 10},
+    {"method": "DL (CV)",       "outcome": "1-0 (Mining vs none)",       "estimate": 0.2500,  "se": 0.0000, "ci_lo": 0.2500,  "ci_hi": 0.2500,  "n_selected": null},
+
+    {"method": "First diff",    "outcome": "2-0 (Med price vs none)",    "estimate": 0.2070,  "se": 0.0000, "ci_lo": 0.2070,  "ci_hi": 0.2070,  "n_selected": null},
+    {"method": "DL (rigorous)", "outcome": "2-0 (Med price vs none)",    "estimate": 0.2684,  "se": 0.0791, "ci_lo": 0.1383,  "ci_hi": 0.3985,  "n_selected": 10},
+    {"method": "DL (CV)",       "outcome": "2-0 (Med price vs none)",    "estimate": 0.3000,  "se": 0.0000, "ci_lo": 0.3000,  "ci_hi": 0.3000,  "n_selected": null},
+
+    {"method": "First diff",    "outcome": "3-0 (High price vs none)",   "estimate": 0.5220,  "se": 0.0000, "ci_lo": 0.5220,  "ci_hi": 0.5220,  "n_selected": null},
+    {"method": "DL (rigorous)", "outcome": "3-0 (High price vs none)",   "estimate": 0.4598,  "se": 0.0811, "ci_lo": 0.3264,  "ci_hi": 0.5932,  "n_selected": 10},
+    {"method": "DL (CV)",       "outcome": "3-0 (High price vs none)",   "estimate": 0.5500,  "se": 0.0000, "ci_lo": 0.5500,  "ci_hi": 0.5500,  "n_selected": null},
+
+    {"method": "First diff",    "outcome": "2-1 (Med vs Low price)",     "estimate": 0.0980,  "se": 0.0000, "ci_lo": 0.0980,  "ci_hi": 0.0980,  "n_selected": null},
+    {"method": "DL (rigorous)", "outcome": "2-1 (Med vs Low price)",     "estimate": 0.0286,  "se": 0.1008, "ci_lo": -0.1371, "ci_hi": 0.1944,  "n_selected": 10},
+    {"method": "DL (CV)",       "outcome": "2-1 (Med vs Low price)",     "estimate": 0.0500,  "se": 0.0000, "ci_lo": 0.0500,  "ci_hi": 0.0500,  "n_selected": null},
+
+    {"method": "First diff",    "outcome": "3-1 (High vs Low price)",    "estimate": 0.4130,  "se": 0.0000, "ci_lo": 0.4130,  "ci_hi": 0.4130,  "n_selected": null},
+    {"method": "DL (rigorous)", "outcome": "3-1 (High vs Low price)",    "estimate": 0.2200,  "se": 0.1013, "ci_lo": 0.0533,  "ci_hi": 0.3867,  "n_selected": 10},
+    {"method": "DL (CV)",       "outcome": "3-1 (High vs Low price)",    "estimate": 0.3000,  "se": 0.0000, "ci_lo": 0.3000,  "ci_hi": 0.3000,  "n_selected": null},
+
+    {"method": "First diff",    "outcome": "3-2 (High vs Med price)",    "estimate": 0.3150,  "se": 0.0000, "ci_lo": 0.3150,  "ci_hi": 0.3150,  "n_selected": null},
+    {"method": "DL (rigorous)", "outcome": "3-2 (High vs Med price)",    "estimate": 0.1914,  "se": 0.1093, "ci_lo": 0.0117,  "ci_hi": 0.3711,  "n_selected": 10},
+    {"method": "DL (CV)",       "outcome": "3-2 (High vs Med price)",    "estimate": 0.2500,  "se": 0.0000, "ci_lo": 0.2500,  "ci_hi": 0.2500,  "n_selected": null}
+  ],
+
+  "selection": [],
+
+  "gate_by_exec": {
+    "1-0": [
+      {"exec_constraints": 1, "gate": 0.175, "ci_lo": 0.168, "ci_hi": 0.182, "n": 300},
+      {"exec_constraints": 2, "gate": 0.255, "ci_lo": 0.249, "ci_hi": 0.262, "n": 330},
+      {"exec_constraints": 3, "gate": 0.240, "ci_lo": 0.236, "ci_hi": 0.244, "n": 720},
+      {"exec_constraints": 4, "gate": 0.242, "ci_lo": 0.238, "ci_hi": 0.246, "n": 780},
+      {"exec_constraints": 5, "gate": 0.243, "ci_lo": 0.237, "ci_hi": 0.250, "n": 420},
+      {"exec_constraints": 6, "gate": 0.264, "ci_lo": 0.259, "ci_hi": 0.269, "n": 450}
+    ],
+    "3-1": [
+      {"exec_constraints": 1, "gate": 0.242, "ci_lo": 0.232, "ci_hi": 0.252, "n": 300},
+      {"exec_constraints": 2, "gate": 0.197, "ci_lo": 0.187, "ci_hi": 0.206, "n": 330},
+      {"exec_constraints": 3, "gate": 0.217, "ci_lo": 0.211, "ci_hi": 0.224, "n": 720},
+      {"exec_constraints": 4, "gate": 0.227, "ci_lo": 0.221, "ci_hi": 0.233, "n": 780},
+      {"exec_constraints": 5, "gate": 0.224, "ci_lo": 0.216, "ci_hi": 0.231, "n": 420},
+      {"exec_constraints": 6, "gate": 0.211, "ci_lo": 0.204, "ci_hi": 0.219, "n": 450}
+    ]
+  },
+
+  "feature_importance": [
+    {"name": "distance_capital",  "value": 0.171},
+    {"name": "ethnic_frac",       "value": 0.142},
+    {"name": "ruggedness",        "value": 0.135},
+    {"name": "population",        "value": 0.126},
+    {"name": "agri_suitability",  "value": 0.120},
+    {"name": "elevation",         "value": 0.120},
+    {"name": "temperature",       "value": 0.120},
+    {"name": "gdp_pc",            "value": 0.034},
+    {"name": "quality_of_govt",   "value": 0.018},
+    {"name": "exec_constraints",  "value": 0.014}
+  ]
+}

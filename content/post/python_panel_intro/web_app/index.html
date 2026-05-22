@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Introduction to Panel Data Methods in Python — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Introduction to Panel Data Methods in Python'. Sliders, simulators, and a forest plot for the seven canonical panel estimators — POLS, Between, FDFE, FE, TWFE, RE, and CRE/Mundlak.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Panel Data Methods — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Introduction to Panel Data Methods in Python</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Within Transformation</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">2 · Panel DGP Simulator</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">3 · Seven-Method Forest Plot</button>
+  <button id="tab-hausman"  class="tab"        data-pane="pane-hausman"  role="tab" aria-selected="false">4 · Hausman vs Mundlak</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: WITHIN TRANSFORMATION ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>What does panel data buy you?</h2>
+  <p class="lede">
+    Pooled OLS on a worker wage panel says joining a union raises wages by
+    roughly 7%. The within (fixed-effects) estimator on the very same data
+    says about 21% — almost three times larger.
+    <strong>That factor-of-three gap is the empirical signature of selection
+    on unobservables</strong>, and panel methods exist to peel it apart.
+  </p>
+  <p class="lede">
+    This app turns the post's three central ideas into knobs you can move.
+    Watch the <span class="kbd">within transformation</span> demean three
+    workers in real time. Sweep panel sample size and unit heterogeneity to
+    see how <span class="kbd">pooled OLS</span> drifts from the truth while
+    <span class="kbd">fixed effects</span> stays close. Toggle the seven
+    canonical estimators in the forest plot. And drive the Hausman statistic
+    yourself by changing the FE/RE coefficient gap.
+  </p>
+
+  <div class="card">
+    <h3>The within transformation, animated</h3>
+    <p>
+      Three workers, two periods each. <strong>Alice</strong> (steel) earns
+      high wages and never joins the union. <strong>Bob</strong> (teal)
+      switches into the union between periods. <strong>Carla</strong> (orange)
+      earns low wages and is always in the union. The dashed grey line is the
+      <em>pooled OLS</em> fit — shallow, because between-worker differences
+      dominate. Wait a few seconds: the points slide as each worker's two-year
+      mean is subtracted. After demeaning, <em>only Bob moves</em> — and the
+      FE slope (orange) is much steeper.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <p class="note">
+      The animation cycles between raw and demeaned coordinates on a 10-second
+      loop. Demeaning kills two of three workers (Alice and Carla collapse to
+      the origin) because they never switched. Only switchers identify the FE
+      coefficient — that is the post's central asymmetry.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Between vs within: how much variation does FE have to work with?</h3>
+    <p>
+      For each variable in the post's wage panel (N = 2,199 workers; T = 2),
+      we decompose total variance into a <em>between</em> part (variation
+      across workers) and a <em>within</em> part (variation over time inside a
+      worker). FE only uses the within slice.
+    </p>
+    <div class="chart-area" id="intro-var"></div>
+    <p class="note">
+      Schooling has <strong>zero within-variation</strong> in this two-period
+      sample — no worker's education changes between 2010 and 2012, so FE
+      mechanically drops schooling. Union has only 6% within-variation: that
+      thin slice is what FE uses to identify the union premium. Less data,
+      different (and arguably cleaner) parameter.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Panel DGP Simulator</h4>
+      <p>Simulate a panel with unit fixed effects. Slide unit heterogeneity up and watch POLS drift away from the truth while FE stays put. Run 100 simulations for a bias-variance picture.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Seven-Method Forest Plot</h4>
+      <p>The post's headline figure, interactively. Toggle outcomes and methods. POLS/Between/RE land at 7-11%; FDFE/FE/TWFE/CRE land at 21%. Three-fold gap, one dataset.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-hausman">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Hausman vs Mundlak</h4>
+      <p>Drive the Hausman chi-square yourself by changing the FE/RE coefficient gap and the standard errors. See why the test has low power when within-variation is thin.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Within transformation</summary>
+        <div class="gloss-body">Subtract each unit's time-series mean from each observation: \(\tilde y_{it} = y_{it} - \bar y_i\). The unit-specific intercept vanishes — only over-time variation remains.</div>
+      </details>
+      <details class="gloss"><summary>Between estimator</summary>
+        <div class="gloss-body">Collapse each unit to its mean over time, then OLS across units. Uses cross-sectional variation only. The mirror image of FE.</div>
+      </details>
+      <details class="gloss"><summary>Fixed effects (FE)</summary>
+        <div class="gloss-body">OLS on the demeaned data. Identifies beta from within-unit changes only. Drops time-invariant regressors (schooling, gender) mechanically.</div>
+      </details>
+      <details class="gloss"><summary>First differences (FDFE)</summary>
+        <div class="gloss-body">Regress &Delta;y on &Delta;x. With T = 2 it gives the same coefficient as FE. With T &gt; 2 the two diverge under serially correlated errors.</div>
+      </details>
+      <details class="gloss"><summary>Two-way FE (TWFE)</summary>
+        <div class="gloss-body">Absorb both unit effects and time effects. Standard for short panels with macro shocks. Closes the FD-FE gap induced by aggregate trends.</div>
+      </details>
+      <details class="gloss"><summary>Random effects (RE)</summary>
+        <div class="gloss-body">Treats the unit effect as a random draw uncorrelated with regressors. GLS-weighted combination of between and within. Efficient if assumption holds; biased if not.</div>
+      </details>
+      <details class="gloss"><summary>Mundlak / CRE</summary>
+        <div class="gloss-body">Add each unit's mean of every time-varying regressor as an extra control, then run RE. The within coefficient on the original variable equals FE. The Mundlak term tests the RE assumption.</div>
+      </details>
+      <details class="gloss"><summary>Hausman test</summary>
+        <div class="gloss-body">Compares FE and RE: H = (&beta;_FE &minus; &beta;_RE)' (V_FE &minus; V_RE)&#8315;&sup1; (&beta;_FE &minus; &beta;_RE) ~ chi-square(k). Large H rejects RE.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: PANEL DGP SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Panel DGP Simulator — POLS vs FE on simulated data</h2>
+  <p class="lede">
+    Simulate a panel with N workers observed over T periods. Each worker has
+    their own intercept (the unit fixed effect alpha_i) and a treatment x_it
+    that is <em>correlated</em> with that intercept — so POLS will be biased.
+    The true treatment coefficient is beta = 0.21 (matching the post's FE
+    estimate). <strong>Slide unit heterogeneity up and watch POLS drift away
+    from 0.21 while FE stays close.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Workers N <span class="value" id="sim-n-val">200</span></label>
+      <input type="range" id="sim-n" min="50" max="500" step="10" value="200" aria-label="number of workers N">
+      <div class="hint">More workers ⇒ tighter estimates. Post sample: 2199.</div>
+    </div>
+    <div class="control">
+      <label>Periods T <span class="value" id="sim-t-val">2</span></label>
+      <input type="range" id="sim-t" min="2" max="8" step="1" value="2" aria-label="number of periods T">
+      <div class="hint">Post uses T = 2. More T ⇒ richer within-worker variation.</div>
+    </div>
+    <div class="control">
+      <label>Unit heterogeneity <span class="value" id="sim-h-val">1.00</span></label>
+      <input type="range" id="sim-h" min="0" max="2" step="0.05" value="1.00" aria-label="unit FE heterogeneity">
+      <div class="hint">Spread of worker intercepts. 0 = identical workers (POLS unbiased), 2 = wildly heterogeneous (POLS very biased).</div>
+    </div>
+    <div class="control">
+      <label>Selection &rho; <span class="value" id="sim-r-val">0.70</span></label>
+      <input type="range" id="sim-r" min="0" max="0.95" step="0.05" value="0.70" aria-label="selection correlation">
+      <div class="hint">Correlation between unit FE and treatment x. The omitted-variable bias driver.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Pooled OLS</span></h3>
+      <p class="note" style="margin:0 0 10px;">Ignores panel structure. Each row is treated as independent.</p>
+      <div class="method-row"><span class="label">beta-hat</span><span class="val" id="sim-ols-b">—</span></div>
+      <div class="method-row"><span class="label">bias (vs true 0.21)</span><span class="val" id="sim-ols-bias">—</span></div>
+      <div class="method-row"><span class="label">R squared</span><span class="val" id="sim-ols-r2">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Fixed Effects</span></h3>
+      <p class="note" style="margin:0 0 10px;">Unit demeaning. Within-only variation.</p>
+      <div class="method-row"><span class="label">beta-hat</span><span class="val" id="sim-fe-b">—</span></div>
+      <div class="method-row"><span class="label">bias (vs true 0.21)</span><span class="val" id="sim-fe-bias">—</span></div>
+      <div class="method-row"><span class="label">within R squared</span><span class="val" id="sim-fe-r2">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-scatter"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Slide unit heterogeneity to 2.0</strong>. POLS drifts above 0.30 because high-FE workers cluster at high x; the bias is the post's omitted-variable bias made visible.</li>
+      <li><strong>Slide selection &rho; to 0</strong>. POLS becomes unbiased — the two methods agree. This is the RE assumption: no correlation between alpha_i and x.</li>
+      <li><strong>Slide T to 8</strong>. FE's within R squared rises sharply; the FE estimate's confidence shrinks. With T = 2 (the post's choice), FE is consistent but high-variance.</li>
+      <li><strong>True coefficient</strong> 0.21 is the dashed grey line. POLS scatters above the truth; FE clusters near it.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs variance across 100 simulations</h3>
+    <p>One draw is noisy. Run the panel simulation 100 times with the current sliders to see whether POLS bias is systematic and how variance compares to FE.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sim-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">POLS mean beta</div><div class="stat-value orange" id="sim-ols-mean">—</div><div class="stat-sub">true = 0.21</div></div>
+      <div class="stat"><div class="stat-label">POLS SD beta</div><div class="stat-value" id="sim-ols-sd">—</div></div>
+      <div class="stat"><div class="stat-label">FE mean beta</div><div class="stat-value teal" id="sim-fe-mean">—</div></div>
+      <div class="stat"><div class="stat-label">FE SD beta</div><div class="stat-value" id="sim-fe-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: SEVEN-METHOD FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's seven-method forest plot — interactively</h2>
+  <p class="lede">
+    These numbers come straight from <code>basic_models_comparison.csv</code>
+    and <code>extended_models_comparison.csv</code> in the post's folder.
+    Six methods on the basic model (union as the lone regressor) and four
+    methods with controls (age, schooling, female, year dummies). Toggle
+    outcomes and methods to compare. Hover any point for SE, 95% CI, and
+    sample size.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Two clear camps on "union (basic)"</strong>. POLS/Between/RE land at 6–11%; FDFE/FE/CRE land at 21%. That factor-of-three gap is the empirical signature of selection on unobservables.</li>
+      <li><strong>CRE equals FE exactly</strong> (0.2103 to four decimals). Mundlak's algebra is exact: add the unit means and RE recovers the within coefficient on the original variable.</li>
+      <li><strong>Schooling is absorbed under TWFE</strong>. No row appears for TWFE on schooling because schooling has zero within-variation. The other three methods recover 0.111.</li>
+      <li><strong>The age coefficient flips sign under TWFE</strong> (+0.021 in POLS/RE, &minus;0.058 in TWFE). With T = 2 and every worker aging by 2 years, age within an individual is collinear with the year dummy — a methodological artifact, not a real effect.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="union (basic)"    checked> union (basic, no controls)</label>
+      <label><input type="checkbox" value="union (controls)" checked> union (with controls)</label>
+      <label><input type="checkbox" value="age"              checked> age</label>
+      <label><input type="checkbox" value="schooling"        checked> schooling</label>
+      <label><input type="checkbox" value="female"           checked> female</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="POLS"    checked> POLS</label>
+      <label><input type="checkbox" value="Between" checked> Between</label>
+      <label><input type="checkbox" value="FDFE"    checked> FDFE</label>
+      <label><input type="checkbox" value="FE"      checked> FE</label>
+      <label><input type="checkbox" value="TWFE"    checked> TWFE</label>
+      <label><input type="checkbox" value="RE"      checked> RE</label>
+      <label><input type="checkbox" value="CRE"     checked> CRE / Mundlak</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why does the union premium triple?</h3>
+    <p>
+      POLS asks: "how do union and non-union workers compare?" Their answer
+      (7%) is biased if union members are systematically different from
+      non-members on unobservables (ability, motivation, industry).
+    </p>
+    <p>
+      FE asks a sharper question: "what happens when <em>the same worker</em>
+      switches union status?" Only the workers who actually changed union
+      status between 2010 and 2012 contribute. The answer (21%) is what we
+      would report if we trusted that nothing else changes for a worker over
+      those two years.
+    </p>
+    <p>
+      The triple is consistent with <em>negative selection</em> into unions:
+      higher-ability workers are less likely to be in unions in this sample,
+      so cross-sectional comparisons understate the within-worker payoff to
+      joining a union.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: HAUSMAN vs MUNDLAK ====================== -->
+<section id="pane-hausman" class="tab-pane" role="tabpanel" aria-labelledby="tab-hausman">
+
+  <h2>Hausman vs Mundlak — when should you trust RE?</h2>
+  <p class="lede">
+    The Hausman statistic compares the FE and RE coefficient estimates,
+    weighted by the difference in their variances:
+    <code>H = (beta_FE &minus; beta_RE)&sup2; / (V_FE &minus; V_RE)</code>.
+    Large H ⇒ FE and RE disagree ⇒ reject RE. <strong>The catch: when
+    within-variation is thin, V_FE is large and the test becomes mechanically
+    underpowered.</strong> The Mundlak alternative escapes this trap.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>FE coefficient β̂_FE <span class="value" id="hs-bfe-val">0.2103</span></label>
+      <input type="range" id="hs-bfe" min="0.00" max="0.40" step="0.005" value="0.2103" aria-label="FE coefficient">
+      <div class="hint">Post estimate: 0.2103.</div>
+    </div>
+    <div class="control">
+      <label>RE coefficient β̂_RE <span class="value" id="hs-bre-val">0.1092</span></label>
+      <input type="range" id="hs-bre" min="0.00" max="0.40" step="0.005" value="0.1092" aria-label="RE coefficient">
+      <div class="hint">Post estimate: 0.1092.</div>
+    </div>
+    <div class="control">
+      <label>FE standard error <span class="value" id="hs-sfe-val">0.0812</span></label>
+      <input type="range" id="hs-sfe" min="0.005" max="0.20" step="0.001" value="0.0812" aria-label="FE standard error">
+      <div class="hint">Post estimate: 0.0812. Slide down to see the test pick up power.</div>
+    </div>
+    <div class="control">
+      <label>RE standard error <span class="value" id="hs-sre-val">0.0299</span></label>
+      <input type="range" id="hs-sre" min="0.005" max="0.10" step="0.001" value="0.0299" aria-label="RE standard error">
+      <div class="hint">Post estimate: 0.0299. RE is always more efficient.</div>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">β̂_FE − β̂_RE</div>
+      <div class="stat-value orange" id="hs-diff">—</div>
+      <div class="stat-sub">point-estimate gap</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Hausman H</div>
+      <div class="stat-value" id="hs-H">—</div>
+      <div class="stat-sub">χ²(1) under H₀: RE consistent</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">p-value</div>
+      <div class="stat-value" id="hs-p">—</div>
+      <div class="stat-sub">small p ⇒ reject RE</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Verdict at α = 0.05</div>
+      <div class="stat-value teal" id="hs-verdict">—</div>
+      <div class="stat-sub">compare to 3.84</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="hs-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Snap to post values</strong> (β̂_FE = 0.2103, β̂_RE = 0.1092, SE_FE = 0.0812, SE_RE = 0.0299). H = 1.79, p = 0.18. The test fails to reject RE — but only because SE_FE is huge.</li>
+      <li><strong>Halve SE_FE to 0.04.</strong> Same coefficient gap, but now H jumps above 50 and p collapses to essentially zero. The "fail to reject" verdict was a power problem, not a signal that RE is correct.</li>
+      <li><strong>Set β̂_FE = β̂_RE.</strong> H drops to 0 and p = 1. When the two estimators agree, there is no evidence against RE — which is exactly the test's logic.</li>
+      <li><strong>The Mundlak alternative</strong> (post §13) reaches p = 0.072 on the same data, telling a more nuanced story than Hausman's 0.18 because it does not pay the same noise penalty.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="hs-snap">Snap to post estimates</button>
+      <button class="action secondary" id="hs-clear">No difference (β̂_FE = β̂_RE)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why does Mundlak beat Hausman in low-power settings?</h3>
+    <p>
+      Mundlak's specification adds <code>x_bar</code> (the unit mean of the
+      time-varying regressor) to an RE regression. The coefficient on
+      <code>x_bar</code> is a direct test of correlation between the unit
+      effect and the regressor — the very assumption RE relies on. Crucially,
+      Mundlak's standard error does not contain the <code>V_FE − V_RE</code>
+      term that makes Hausman noisy in thin-within-variation panels.
+    </p>
+    <p>
+      In the post's data, Hausman gives p = 0.18 (fail to reject); Mundlak's
+      t-stat on <code>union_bar</code> gives p = 0.072 (borderline reject).
+      Same data, same direction of effect — different precision.
+      <strong>For a practitioner, CRE/Mundlak is usually the right
+      specification to lead with</strong>: you get the FE coefficient on
+      time-varying treatments, the RE structure for keeping schooling and
+      gender, and a built-in spec test that beats Hausman.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 2</h3>
+    <p>
+      The Tab 2 simulator lets you drive the FE-vs-POLS bias through the
+      <em>selection ρ</em> slider. The Hausman test on that simulated data
+      would reject RE if ρ is large enough — but only if you also have enough
+      within-variation (high T) to make SE_FE small. Cranking ρ up while
+      keeping T = 2 reproduces exactly the post's "Hausman fails to reject
+      but the FE-RE gap is huge" situation.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Introduction to Panel Data Methods in Python</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "_comment": "Bounds from the post 'Introduction to Partial Identification' (N=1000 simulated workers, true ATE = 0.27). Numbers transcribed from index.md result blocks. CI columns reused as lower/upper bound; SE set to 0 (bounds are identification, not sampling, intervals).",
+
+  "true_ate":   0.27,
+  "naive_ate":  0.3822,
+  "n":          1000,
+  "theta":      0.1,
+
+  "estimates": [
+    { "method": "Manski",                  "outcome": "ATE", "estimate": 0.2020, "se": 0.0000, "ci_lo": -0.2980, "ci_hi": 0.7020, "n_selected": null, "width": 1.0000, "covers_truth": true,  "note": "No assumptions; width = 1 by construction for binary outcomes." },
+    { "method": "Autobound (LP)",          "outcome": "ATE", "estimate": 0.2020, "se": 0.0000, "ci_lo": -0.2980, "ci_hi": 0.7020, "n_selected": null, "width": 1.0000, "covers_truth": true,  "note": "Linear programming — confirms Manski is already sharp." },
+    { "method": "Entropy (theta = 0.1)",   "outcome": "ATE", "estimate": 0.1131, "se": 0.0000, "ci_lo": -0.2279, "ci_hi": 0.4540, "n_selected": null, "width": 0.6819, "covers_truth": true,  "note": "Adds H(U | X, Y) <= theta — 32% narrower than Manski." },
+
+    { "method": "Tian-Pearl (Closed Form)","outcome": "PNS", "estimate": 0.3510, "se": 0.0000, "ci_lo":  0.0000, "ci_hi": 0.7020, "n_selected": null, "width": 0.7020, "covers_truth": null,  "note": "Sharp closed-form bounds for the probability of necessity and sufficiency." },
+    { "method": "Autobound (LP)",          "outcome": "PNS", "estimate": 0.3510, "se": 0.0000, "ci_lo":  0.0000, "ci_hi": 0.7020, "n_selected": null, "width": 0.7020, "covers_truth": null,  "note": "LP confirms Tian-Pearl is sharp on this DGP." },
+    { "method": "Entropy (theta = 0.1)",   "outcome": "PNS", "estimate": 0.4197, "se": 0.0000, "ci_lo":  0.0000, "ci_hi": 0.8394, "n_selected": null, "width": 0.8394, "covers_truth": null,  "note": "Entropy constraint is less effective for counterfactual PNS." }
+  ],
+
+  "coverage": [
+    { "method": "Manski",                "n_sims": 100, "n_covered": 100, "rate": 1.00 },
+    { "method": "Autobound (LP)",        "n_sims": 100, "n_covered": 100, "rate": 1.00 },
+    { "method": "Entropy (theta = 0.1)", "n_sims": 100, "n_covered": 100, "rate": 1.00 }
+  ],
+
+  "sample_size_grid": [
+    { "n":  100, "manski_width": 1.0000, "manski_sd": 0.0000, "entropy_width": 0.6733, "entropy_sd": 0.0139 },
+    { "n":  250, "manski_width": 1.0000, "manski_sd": 0.0000, "entropy_width": 0.6733, "entropy_sd": 0.0100 },
+    { "n":  500, "manski_width": 1.0000, "manski_sd": 0.0000, "entropy_width": 0.6753, "entropy_sd": 0.0084 },
+    { "n": 1000, "manski_width": 1.0000, "manski_sd": 0.0000, "entropy_width": 0.6772, "entropy_sd": 0.0055 },
+    { "n": 2500, "manski_width": 1.0000, "manski_sd": 0.0000, "entropy_width": 0.6751, "entropy_sd": 0.0032 },
+    { "n": 5000, "manski_width": 1.0000, "manski_sd": 0.0000, "entropy_width": 0.6753, "entropy_sd": 0.0027 }
+  ],
+
+  "observed_probs": {
+    "P_Y1_X1": 0.6359,
+    "P_Y1_X0": 0.2538,
+    "P_X1":    0.4010,
+    "P_X0":    0.5990,
+    "naive_gap": 0.3822
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "estimates": [
+    { "method": "OLS",                      "outcome": "Base spec",     "estimate":  0.5220, "se": 0.0500, "ci_lo":  0.4240, "ci_hi":  0.6200, "n_selected": null, "firstF": null  },
+    { "method": "IV: settler mortality",    "outcome": "Base spec",     "estimate":  0.9440, "se": 0.1760, "ci_lo":  0.5991, "ci_hi":  1.2890, "n_selected": null, "firstF": 16.32 },
+    { "method": "IV + colonial dummies",    "outcome": "+ controls",    "estimate":  1.0780, "se": 0.2400, "ci_lo":  0.6076, "ci_hi":  1.5484, "n_selected": null, "firstF": 11.73 },
+    { "method": "IV + legal origin",        "outcome": "+ controls",    "estimate":  1.0800, "se": 0.2020, "ci_lo":  0.6841, "ci_hi":  1.4759, "n_selected": null, "firstF": 15.94 },
+    { "method": "IV + religion",            "outcome": "+ controls",    "estimate":  0.9170, "se": 0.1560, "ci_lo":  0.6112, "ci_hi":  1.2228, "n_selected": null, "firstF": 16.76 },
+    { "method": "IV + climate/humidity",    "outcome": "+ geography",   "estimate":  0.8370, "se": 0.1650, "ci_lo":  0.5136, "ci_hi":  1.1604, "n_selected": null, "firstF": 17.80 },
+    { "method": "IV + resources",           "outcome": "+ geography",   "estimate":  1.2590, "se": 0.5430, "ci_lo":  0.1947, "ci_hi":  2.3233, "n_selected": null, "firstF":  2.83 },
+    { "method": "IV + ethnic frac.",        "outcome": "+ geography",   "estimate":  0.7380, "se": 0.1400, "ci_lo":  0.4636, "ci_hi":  1.0124, "n_selected": null, "firstF": 14.99 },
+    { "method": "IV + malaria",             "outcome": "+ health",      "estimate":  0.6870, "se": 0.2650, "ci_lo":  0.1676, "ci_hi":  1.2064, "n_selected": null, "firstF":  3.79 },
+    { "method": "IV + life expectancy",     "outcome": "+ health",      "estimate":  0.6290, "se": 0.2950, "ci_lo":  0.0508, "ci_hi":  1.2072, "n_selected": null, "firstF":  4.02 },
+    { "method": "IV + infant mortality",    "outcome": "+ health",      "estimate":  0.5510, "se": 0.2600, "ci_lo":  0.0414, "ci_hi":  1.0606, "n_selected": null, "firstF":  4.86 },
+    { "method": "IV: euro1900 (alt instr)", "outcome": "alt instrument","estimate":  0.8800, "se": 0.2200, "ci_lo":  0.4488, "ci_hi":  1.3112, "n_selected": null, "firstF": 12.50 }
+  ],
+  "selection": [],
+  "key_numbers": {
+    "ols_base": 0.522,
+    "iv_main": 0.944,
+    "iv_minus_ols_pct": 81,
+    "first_stage_slope": -0.607,
+    "reduced_form_slope": -0.573,
+    "ratio_check": 0.944,
+    "kp_F": 16.32,
+    "stock_yogo_10pct": 16.38,
+    "anderson_rubin_F": 61.66,
+    "dwh_chi2": 9.085,
+    "dwh_p": 0.0026,
+    "n_obs": 64,
+    "logem4_min": 2.146,
+    "logem4_max": 7.986,
+    "avexpr_min": 3.5,
+    "avexpr_max": 10.0,
+    "logpgp95_min": 6.109,
+    "logpgp95_max": 10.216
+  }
+}

@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>CATE with Stata 19 — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Conditional Average Treatment Effects (CATE) with Stata 19'. A pedagogical web app with a heterogeneity animation, a CATE simulator with a known τ(x), the post's GATE / GATES bar charts, and an IATE explorer on 9,913 households.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>CATE with Stata 19 — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Conditional Average Treatment Effects (CATE) with Stata 19</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"   role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-sim"     class="tab"        data-pane="pane-sim"     role="tab" aria-selected="false">2 · CATE Simulator</button>
+  <button id="tab-gate"    class="tab"        data-pane="pane-gate"    role="tab" aria-selected="false">3 · GATE / GATES</button>
+  <button id="tab-iate"    class="tab"        data-pane="pane-iate"    role="tab" aria-selected="false">4 · IATE Explorer</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>The ATE is one number. The CATE is a <em>function</em>.</h2>
+  <p class="lede">
+    The textbook causal-inference workflow ends with a single number — the
+    <strong>Average Treatment Effect</strong>. But policy makers, doctors, and
+    managers rarely care only about the average. They want to know <em>for whom</em>
+    the program works best, and <em>for whom</em> it does little. This question
+    — how the treatment effect varies across the covariates — is captured by
+    the <strong>Conditional Average Treatment Effect (CATE)</strong>,
+    τ(x) = E[Y(1) − Y(0) | X = x].
+  </p>
+  <p class="lede">
+    Stata 19's new <code>cate</code> command estimates τ(x) with cross-fit
+    lasso + a causal forest, and seven postestimation tools turn the resulting
+    function into pictures. This app lets you turn the dials yourself. In four
+    tabs you will: see why an ATE can hide an enormous fan of effects; simulate
+    a small CATE problem with a known truth and watch τ̂(x) recover it; explore
+    the post's GATE-by-income and GATES-by-quartile bars interactively; and dig
+    into the actual histogram of household-level effects across the 9,913
+    households in the assets3 dataset.
+  </p>
+
+  <div class="card">
+    <h3>Why "the average hides the variation" — animation</h3>
+    <p>
+      The orange dashed line is the ATE: a single number (about \$8k for 401(k)
+      eligibility on net assets). The teal curve is the true CATE: it dips,
+      climbs, and jumps with income. The marker bouncing along the curve
+      illustrates the problem — different households face very different
+      treatment effects, but the ATE flattens it all into one headline.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>CATE Simulator</h4>
+      <p>Set the true τ(x) function yourself (linear, U-shape, or sigmoid). Slide n, noise, and heterogeneity. Watch how a "regression on x" estimator chases the truth as the data piles in.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-gate">
+      <div class="cta-tag">Tab 3</div>
+      <h4>GATE / GATES Bars</h4>
+      <p>The post's two headline figures, interactively. Toggle between prespecified income groups (GATE) and data-driven quartiles (GATES). Hover for SE, CI, and p-value.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-iate">
+      <div class="cta-tag">Tab 4</div>
+      <h4>IATE Explorer</h4>
+      <p>Histogram + scatter of the 9,913 household-level effects exported from Stata. Switch the x-axis between age, education, and income to see the post's IATE plots reconstructed in D3.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>ATE — Average Treatment Effect</summary>
+        <div class="gloss-body">E[Y(1) − Y(0)]. A <em>single number</em>. The headline policy effect. Estimated by the four ATE rows in Tab 3.</div>
+      </details>
+      <details class="gloss"><summary>CATE — Conditional ATE</summary>
+        <div class="gloss-body">τ(x) = E[Y(1) − Y(0) | X = x]. A <em>function</em> of covariates. The ATE is its average. When CATE varies, the ATE is hiding something.</div>
+      </details>
+      <details class="gloss"><summary>IATE — Individual ATE</summary>
+        <div class="gloss-body">τ̂ᵢ = τ̂(xᵢ). The CATE evaluated at one household's covariate profile. Visible in the Tab 4 histogram.</div>
+      </details>
+      <details class="gloss"><summary>GATE — Group ATE</summary>
+        <div class="gloss-body">Average of τ(x) inside a <em>prespecified</em> group (e.g., income category). Tests subgroup hypotheses you wrote down in advance.</div>
+      </details>
+      <details class="gloss"><summary>GATES — Sorted GATE</summary>
+        <div class="gloss-body">Average of τ(x) inside <em>data-driven</em> quartiles of predicted τ̂. The strongest moderation signal a beginner can read without naming the moderator.</div>
+      </details>
+      <details class="gloss"><summary>PO — Partialing Out</summary>
+        <div class="gloss-body">Residualises Y and D on covariates with cross-fit lasso, then fits a causal forest on residuals. Robust to extreme propensity scores.</div>
+      </details>
+      <details class="gloss"><summary>AIPW — Augmented IPW</summary>
+        <div class="gloss-body">Doubly-robust score combining outcome models and propensity weights. More efficient than PO when both nuisance models are well specified.</div>
+      </details>
+      <details class="gloss"><summary>Heterogeneity test</summary>
+        <div class="gloss-body">χ²(1) test that τ(x) is constant. Stata 19's <code>estat heterogeneity</code>. Rejection licenses the CATE / GATE / GATES interpretation.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: CATE SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>CATE Simulator — set the truth, watch the estimator chase it</h2>
+  <p class="lede">
+    Most causal inference courses skip this step. They teach you the estimator
+    without showing what it is trying to recover. Here you set the true
+    τ(x) function (the blue curve), drag sliders for sample size and noise,
+    and watch the per-household estimates τ̂ᵢ (teal dots) scatter around the
+    truth. The flat orange line is the ATE — the average of τ over the
+    covariate distribution. When the blue curve is steep and the orange line
+    is flat, that is the gap CATE was invented to detect.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sm-n-val">300</span></label>
+      <input type="range" id="sm-n" min="50" max="500" step="10" value="300" aria-label="sample size n">
+      <div class="hint">More data ⇒ τ̂ᵢ tightens around the true τ(x).</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="sm-sigma-val">1.50</span></label>
+      <input type="range" id="sm-sigma" min="0.2" max="3.0" step="0.1" value="1.5" aria-label="noise sigma">
+      <div class="hint">Outcome noise. Bigger σ ⇒ noisier τ̂ᵢ.</div>
+    </div>
+    <div class="control">
+      <label>Heterogeneity strength β <span class="value" id="sm-beta-val">1.00</span></label>
+      <input type="range" id="sm-beta" min="0.0" max="2.0" step="0.05" value="1.0" aria-label="beta heterogeneity">
+      <div class="hint">0 = constant τ (ATE = CATE) · 2 = strong heterogeneity (steep curve).</div>
+    </div>
+    <div class="control">
+      <label>τ(x) shape</label>
+      <select id="sm-shape" style="background:#0f1729;color:var(--text);border:1px solid var(--line);padding:6px 10px;border-radius:6px;font:inherit;width:100%;">
+        <option value="linear" selected>Linear (income gradient — matches post)</option>
+        <option value="ushape">U-shape (drug works best at extremes)</option>
+        <option value="sigmoid">Sigmoid (threshold effect)</option>
+        <option value="constant">Constant (no heterogeneity)</option>
+      </select>
+      <div class="hint">Pick the functional form for τ(x). The estimator does not know which.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sm-curve"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">true ATE = E[τ(x)]</div>
+      <div class="stat-value teal" id="sm-stat-ate-true">—</div>
+      <div class="stat-sub">average of the true CATE function</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">estimated ATE</div>
+      <div class="stat-value orange" id="sm-stat-ate-hat">—</div>
+      <div class="stat-sub">mean of τ̂ᵢ across households</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">τ̂ range</div>
+      <div class="stat-value" id="sm-stat-range">—</div>
+      <div class="stat-sub">min and max estimated effects</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">heterogeneity test (toy)</div>
+      <div class="stat-value" id="sm-stat-het">—</div>
+      <div class="stat-sub">F-stat on a linear projection of τ̂ on x</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set heterogeneity β = 0.</strong> The blue curve flattens onto the orange ATE line; the heterogeneity F-test should drop close to zero. This is the regime where the ATE is enough.</li>
+      <li><strong>Set β = 1.5 and σ = 0.5.</strong> The teal dots track the blue curve precisely — high signal, low noise. This is the easy heterogeneity-detection regime.</li>
+      <li><strong>Set σ = 3.0 with n = 100.</strong> The teal dots scatter wildly even though the truth is smooth. Cross-fitting and forests help here, but no method beats data: more n is the cleanest fix.</li>
+      <li><strong>Switch the τ(x) shape to "U-shape".</strong> A linear-projection summary (like <code>estat projection</code>) would miss the curvature. This is why the post's R² of 0.0045 is not a problem — most heterogeneity is genuinely nonlinear.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sm-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sm-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: GATE / GATES ====================== -->
+<section id="pane-gate" class="tab-pane" role="tabpanel" aria-labelledby="tab-gate">
+
+  <h2>Group-level effects — interactive bars from the post</h2>
+  <p class="lede">
+    These bars come straight from the post's PO model on the 9,913-household
+    assets3 sample. Switch between the two views:
+    <strong>GATE</strong> sorts households into the <em>prespecified</em>
+    Stata <code>incomecat</code> bins and averages the doubly-robust score in
+    each. <strong>GATES</strong> lets the data sort households into
+    <em>data-driven</em> quartiles of predicted τ̂ — the strongest moderation
+    signal a beginner can read without naming the moderator. The fourth panel
+    is a forest plot of three different ATE estimators on the same data.
+  </p>
+
+  <div class="card">
+    <h3>Pick a view</h3>
+    <div class="method-toggle" id="gate-view">
+      <label><input type="radio" name="gateview" value="gate"   checked> GATE by prespecified income category</label>
+      <label><input type="radio" name="gateview" value="gates">          GATES by data-driven quartile of τ̂</label>
+      <label><input type="radio" name="gateview" value="forest">         Forest plot of ATE estimators</label>
+    </div>
+    <p class="note" style="margin-top:8px;" id="gate-note"></p>
+  </div>
+
+  <div class="chart-area" id="gate-chart"></div>
+
+  <div class="stat-row" id="gate-stats">
+    <div class="stat">
+      <div class="stat-label">Joint heterogeneity test</div>
+      <div class="stat-value teal" id="gate-stat-chi2">—</div>
+      <div class="stat-sub" id="gate-stat-chi2-sub">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Highest group / quartile</div>
+      <div class="stat-value orange" id="gate-stat-hi">—</div>
+      <div class="stat-sub">most-responsive subgroup</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Lowest group / quartile</div>
+      <div class="stat-value" id="gate-stat-lo">—</div>
+      <div class="stat-sub">least-responsive subgroup</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Top-to-bottom ratio</div>
+      <div class="stat-value" id="gate-stat-ratio">—</div>
+      <div class="stat-sub">how much the average hides</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>GATE view:</strong> the lowest-income category gains \$4,087 (significant) but income category 1 drops to \$1,399 (n.s.) — a non-monotone wrinkle the post flags as a real finding. The top income category gains \$20,511 — over five times the average.</li>
+      <li><strong>GATES view:</strong> the data-driven ladder is clean and monotone — \$17,279 → \$8,121 → \$3,444 → \$2,919. The bottom quartile is not statistically distinguishable from zero (orange dot). About a quarter of households appear to gain little or nothing from eligibility.</li>
+      <li><strong>Forest plot view:</strong> three independent ATE estimators (parametric AIPW, PO ML, AIPW ML) all bracket each other within a \$200 spread. The naive raw difference (\$19,557) is inflated by 2.4× — about 60% of it was selection, not causation.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Why GATES is more trustworthy than ad-hoc subgroups</h3>
+    <p>
+      A common temptation is to slice the data by every covariate and report
+      the most extreme subgroup. That is p-hacking. GATES avoids it by using
+      out-of-sample cross-fit predictions to assign each household to its
+      quartile — each unit's bin is determined by data it did not contribute
+      to. The resulting bins are honest in the same way a held-out test set
+      is honest. The 5.9× spread in the GATES view is therefore a defensible
+      number, not a fishing-expedition artefact.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: IATE EXPLORER ====================== -->
+<section id="pane-iate" class="tab-pane" role="tabpanel" aria-labelledby="tab-iate">
+
+  <h2>The shape of individual effects — the real τ̂ᵢ from Stata</h2>
+  <p class="lede">
+    Stata wrote one predicted treatment effect for each of the 9,913
+    households in <code>iate_predictions.csv</code>. The histogram below shows
+    their distribution; the steel-blue and dashed lines mark the ATE
+    (~\$7,937) and the median (~\$5,815). Then switch the x-axis below to see
+    how τ̂ᵢ varies with age, education, and income — the same picture as
+    Stata's <code>categraph iateplot</code> figures, rebuilt in D3.
+  </p>
+
+  <div class="card">
+    <h3>Histogram of household-level treatment effects τ̂ᵢ (n = 9,913)</h3>
+    <div class="chart-area" id="iate-hist"></div>
+    <p class="note">Each bar is a count of households whose estimated effect falls in that dollar bin. Orange bars sit below zero — a small minority of households are estimated to gain little or nothing.</p>
+  </div>
+
+  <div class="card">
+    <h3>How τ̂ᵢ varies with one covariate</h3>
+    <div class="method-toggle" id="iate-cov">
+      <label><input type="radio" name="iatecov" value="age"    checked> τ̂ vs Age</label>
+      <label><input type="radio" name="iatecov" value="educ">           τ̂ vs Education</label>
+      <label><input type="radio" name="iatecov" value="income">         τ̂ vs Income</label>
+    </div>
+    <p class="note" id="iate-cov-note">Steel-blue dots: 800 randomly sampled households. Teal line + band: bin mean ± 1.96 SE.</p>
+    <div class="chart-area" id="iate-cov-chart"></div>
+  </div>
+
+  <div class="card">
+    <h3>Top-vs-bottom-quartile profile (estat classification)</h3>
+    <p>
+      Stata's <code>estat classification</code> compares the mean of each
+      covariate in the top-effect quartile against the bottom-effect quartile.
+      The three covariates below all differ by a large margin (t-statistics in
+      the 19–56 range). Income is the dominant moderator.
+    </p>
+    <table style="width:100%;color:var(--text);border-collapse:collapse;margin-top:10px;font-size:13px;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--line);text-align:left;">
+          <th style="padding:8px 6px;color:var(--steel);">Variable</th>
+          <th style="padding:8px 6px;color:var(--steel);text-align:right;">Top quartile</th>
+          <th style="padding:8px 6px;color:var(--steel);text-align:right;">Bottom quartile</th>
+          <th style="padding:8px 6px;color:var(--steel);text-align:right;">Difference</th>
+          <th style="padding:8px 6px;color:var(--steel);text-align:right;">t</th>
+        </tr>
+      </thead>
+      <tbody id="iate-classification-body">
+        <!-- filled by app.js -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Formal heterogeneity tests</h3>
+    <p>
+      The CATE story rests on the formal rejection of "no heterogeneity".
+      Stata's <code>estat heterogeneity</code> tests the null that τ(x) is
+      constant against the alternative that it varies. Both PO and AIPW reject
+      at the 5% level, and the joint GATE test rejects at p = 0.001.
+    </p>
+    <table style="width:100%;color:var(--text);border-collapse:collapse;margin-top:10px;font-size:13px;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--line);text-align:left;">
+          <th style="padding:8px 6px;color:var(--steel);">Test</th>
+          <th style="padding:8px 6px;color:var(--steel);text-align:right;">χ²</th>
+          <th style="padding:8px 6px;color:var(--steel);text-align:right;">df</th>
+          <th style="padding:8px 6px;color:var(--steel);text-align:right;">p-value</th>
+          <th style="padding:8px 6px;color:var(--steel);text-align:left;">Verdict</th>
+        </tr>
+      </thead>
+      <tbody id="iate-tests-body">
+        <!-- filled by app.js -->
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Conditional Average Treatment Effects (CATE) with Stata 19</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

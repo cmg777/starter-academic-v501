@@ -1,0 +1,32 @@
+{
+  "estimates": [
+    { "method": "Naive",          "outcome": "ATE",  "estimate": -275.2519, "se": 21.2150, "ci_lo": -316.8333, "ci_hi": -233.6705, "n_selected": 0 },
+    { "method": "RA",             "outcome": "ATE",  "estimate": -239.6392, "se": 23.8240, "ci_lo": -286.3343, "ci_hi": -192.9441, "n_selected": 4 },
+    { "method": "IPW",            "outcome": "ATE",  "estimate": -230.9060, "se": 24.3099, "ci_lo": -278.5533, "ci_hi": -183.2586, "n_selected": 4 },
+    { "method": "IPWRA",          "outcome": "ATE",  "estimate": -231.8723, "se": 25.1541, "ci_lo": -281.1744, "ci_hi": -182.5703, "n_selected": 4 },
+    { "method": "AIPW",           "outcome": "ATE",  "estimate": -232.4759, "se": 24.8341, "ci_lo": -281.1506, "ci_hi": -183.8011, "n_selected": 4 },
+    { "method": "NNM",            "outcome": "ATE",  "estimate": -210.0558, "se": 29.3280, "ci_lo": -267.5387, "ci_hi": -152.5728, "n_selected": 6 },
+    { "method": "PSM",            "outcome": "ATE",  "estimate": -229.4492, "se": 25.8875, "ci_lo": -280.1886, "ci_hi": -178.7098, "n_selected": 5 },
+
+    { "method": "RA",             "outcome": "ATT",  "estimate": -223.3017, "se": 22.7422, "ci_lo": -267.8755, "ci_hi": -178.7278, "n_selected": 4 },
+    { "method": "IPW",            "outcome": "ATT",  "estimate": -219.6338, "se": 23.3846, "ci_lo": -265.4667, "ci_hi": -173.8009, "n_selected": 4 },
+    { "method": "IPWRA",          "outcome": "ATT",  "estimate": -220.6476, "se": 23.3727, "ci_lo": -266.4572, "ci_hi": -174.8380, "n_selected": 4 },
+    { "method": "NNM",            "outcome": "ATT",  "estimate": -238.5204, "se": 30.4166, "ci_lo": -298.1359, "ci_hi": -178.9050, "n_selected": 6 },
+    { "method": "PSM",            "outcome": "ATT",  "estimate": -224.5927, "se": 30.5515, "ci_lo": -284.4725, "ci_hi": -164.7129, "n_selected": 5 }
+  ],
+  "selection": [
+    { "outcome": "ATE", "method": "Naive",   "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 0 },
+    { "outcome": "ATE", "method": "RA",      "n_Iy": 4, "n_Id": 0, "n_intersection": 0, "n_union": 4 },
+    { "outcome": "ATE", "method": "IPW",     "n_Iy": 0, "n_Id": 4, "n_intersection": 0, "n_union": 4 },
+    { "outcome": "ATE", "method": "IPWRA",   "n_Iy": 4, "n_Id": 4, "n_intersection": 4, "n_union": 4 },
+    { "outcome": "ATE", "method": "AIPW",    "n_Iy": 4, "n_Id": 4, "n_intersection": 4, "n_union": 4 },
+    { "outcome": "ATE", "method": "NNM",     "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 6 },
+    { "outcome": "ATE", "method": "PSM",     "n_Iy": 0, "n_Id": 5, "n_intersection": 0, "n_union": 5 }
+  ],
+  "naive_gap": -275.2519,
+  "sample_size": 4642,
+  "n_treated": 864,
+  "n_control": 3778,
+  "raw_mean_smoker": 3137.66,
+  "raw_mean_nonsmoker": 3412.91
+}

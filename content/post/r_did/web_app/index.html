@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Difference-in-Differences Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Difference-in-Differences for Policy Evaluation'. Explore parallel trends, staggered TWFE bias, the Callaway-Sant'Anna estimator, and the post's headline forest plot through sliders and live simulations.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Difference-in-Differences — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Difference-in-Differences for Policy Evaluation: A Tutorial using R</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"     class="tab active" data-pane="pane-intro"     role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-trends"    class="tab"        data-pane="pane-trends"    role="tab" aria-selected="false">2 · Parallel Trends</button>
+  <button id="tab-showdown"  class="tab"        data-pane="pane-showdown"  role="tab" aria-selected="false">3 · TWFE vs CS</button>
+  <button id="tab-forest"    class="tab"        data-pane="pane-forest"    role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why <em>modern</em> Difference-in-Differences?</h2>
+  <p class="lede">
+    For decades, the workhorse for evaluating policy interventions has been the
+    <strong>two-way fixed-effects (TWFE)</strong> regression. With <em>staggered</em>
+    treatment adoption and <em>heterogeneous</em> treatment effects, however,
+    TWFE silently mixes valid and invalid comparisons — already-treated units sneak
+    in as the "control" for later-treated units — and the resulting coefficient
+    can be biased toward zero, or even take the wrong sign.
+  </p>
+  <p class="lede">
+    This app lets you reproduce the post's headline finding interactively. In four
+    tabs you will (1) slide the <span class="kbd">parallel-trends violation</span>
+    knob and watch the DiD effect appear; (2) compare TWFE to the
+    <strong>Callaway-Sant'Anna</strong> group-time ATT across thousands of synthetic
+    panels; and (3) explore the actual minimum-wage results: TWFE = −0.038,
+    Doubly robust = −0.065, breakdown <span class="kbd">M̄</span> ≈ 0.67.
+  </p>
+
+  <div class="card">
+    <h3>Parallel trends — the assumption that does all the work</h3>
+    <p>
+      DiD is identified by one assumption: in the absence of treatment, the
+      treated group's outcome would have moved in parallel with the control's.
+      The orange line is what we actually observe; the dashed grey line is the
+      <em>unobserved counterfactual</em>. Their gap at <span class="kbd">t+3</span>
+      is the DiD effect.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <p class="caption">
+      Adjust the divergence slider in Tab 2 to see how the estimated DiD effect
+      moves with the assumed deviation from parallel trends.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-trends">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Parallel Trends</h4>
+      <p>Slide the violation knob. Toggle pre-trends. See how the dashed counterfactual moves and what the DiD effect estimates as a result.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>TWFE vs CS Showdown</h4>
+      <p>Simulate staggered panels with cohort-specific dynamics. Run 100 sims and watch the TWFE distribution drift away from the truth while CS stays centred.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot + Event Study</h4>
+      <p>The post's full menu: TWFE, CS overall, doubly robust, IPW, not-yet-treated, anticipation, lagged outcomes. Hover for SEs and CIs.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Parallel trends</summary>
+        <div class="gloss-body">Absent treatment, treated and control would move in lockstep. <em>The single identifying assumption</em> of DiD.</div>
+      </details>
+      <details class="gloss"><summary>Staggered adoption</summary>
+        <div class="gloss-body">Different units enter treatment at different dates. The post has cohorts G ∈ {0, 2004, 2006}.</div>
+      </details>
+      <details class="gloss"><summary>TWFE regression</summary>
+        <div class="gloss-body">Two-way fixed effects: <span class="kbd">Y_it = θ_t + η_i + α D_it + v_it</span>. Equivalent to 2×2 DiD when there's only one treatment date — but biased with staggered timing under heterogeneity.</div>
+      </details>
+      <details class="gloss"><summary>Group-time ATT — ATT(g, t)</summary>
+        <div class="gloss-body">The treatment effect for cohort g at calendar time t. The Callaway-Sant'Anna building block; aggregated into overall ATT or event study.</div>
+      </details>
+      <details class="gloss"><summary>Forbidden comparisons</summary>
+        <div class="gloss-body">When TWFE uses <em>already-treated</em> units as the "control" for later-treated units. The source of the negative-weight problem.</div>
+      </details>
+      <details class="gloss"><summary>Doubly robust DiD</summary>
+        <div class="gloss-body">Combines an outcome regression and a propensity-score model. Consistent if <em>either</em> model is correct — belt and suspenders.</div>
+      </details>
+      <details class="gloss"><summary>Event study ATT(e)</summary>
+        <div class="gloss-body">ATT aggregated by <em>event time</em> e = t − g, not calendar time. Lines up each cohort at its own "year zero."</div>
+      </details>
+      <details class="gloss"><summary>HonestDiD breakdown M̄</summary>
+        <div class="gloss-body">The threshold of allowed parallel-trends violation at which the CI first crosses zero. Bigger M̄ = more robust. The post reports M̄ ≈ 0.67.</div>
+      </details>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The three takeaways the app re-runs in code</h3>
+    <ol class="takeaways">
+      <li>
+        <strong>TWFE understates the effect by ~33%.</strong>
+        The minimum-wage TWFE estimate is −0.038 vs. the proper overall ATT of −0.057;
+        64% of the bias is pre-treatment contamination, 36% is improper post-treatment weighting.
+      </li>
+      <li>
+        <strong>The doubly robust ATT (−0.065) is stable.</strong>
+        Across estimation methods (regression, IPW, DR), comparison groups (never-treated, not-yet-treated),
+        and base periods (universal, varying), the estimate moves only by 0.001.
+      </li>
+      <li>
+        <strong>HonestDiD breakdown M̄ ≈ 0.67.</strong>
+        The on-impact effect survives parallel-trends violations up to ~67% of the largest observed
+        pre-trend deviation before the CI first crosses zero.
+      </li>
+    </ol>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: PARALLEL TRENDS LAB ====================== -->
+<section id="pane-trends" class="tab-pane" role="tabpanel" aria-labelledby="tab-trends">
+
+  <h2>Parallel-trends lab</h2>
+  <p class="lede">
+    The single identifying assumption: <em>without treatment</em>, the treated
+    group's outcome would move in parallel with the control's. Slide the
+    <span class="kbd">divergence δ</span> to add a per-period violation on top of
+    that, and watch what the standard 2×2 DiD estimator returns.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Per-period treatment effect δ&nbsp;<span class="value" id="pt-d-val">-0.030</span></label>
+      <input type="range" id="pt-d" min="-0.08" max="0.04" step="0.005" value="-0.030">
+      <p class="caption">When δ &lt; 0, the treated path bends downward each period after treatment. Reflects a true causal effect.</p>
+    </div>
+    <div class="control">
+      <label>Pre-trend slope (violation)&nbsp;<span class="value" id="pt-pre-val">0.000</span></label>
+      <input type="range" id="pt-pre" min="-0.04" max="0.04" step="0.005" value="0.000">
+      <p class="caption">Tilts the counterfactual relative to the control. A pre-trend &gt; 0 is a parallel-trends <em>violation</em>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What the lines show</h3>
+    <div class="chart-area" id="pt-chart"></div>
+    <p class="caption">
+      <span style="color:#6a9bcc;">Blue</span> = control mean.
+      <span style="color:#8b9dc3;">Dashed grey</span> = counterfactual treated (what we would see if parallel trends held).
+      <span style="color:#d97757;">Orange</span> = observed treated.
+      The DiD effect at t+3 is annotated top-right.
+    </p>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Simple 2×2 DiD estimator</h3>
+      <div class="method-row"><span class="label">α̂_DiD (t+3 vs. t-2)</span><span class="val" id="pt-att">—</span></div>
+      <div class="method-row"><span class="label">True effect at t+3</span><span class="val" id="pt-true">—</span></div>
+      <div class="method-row"><span class="label">Bias (α̂ − truth)</span><span class="val" id="pt-bias">—</span></div>
+    </div>
+    <div class="card">
+      <h3>What to look for</h3>
+      <ul class="bullets">
+        <li>With pre-trend = 0, DiD is <em>unbiased</em> for the true effect.</li>
+        <li>With a small positive pre-trend (say 0.01), the DiD estimator <em>under-states</em> a negative effect.</li>
+        <li>This is the failure mode <strong>HonestDiD</strong> formalises — the post's M̄ ≈ 0.67 says: a pre-trend up to 67% of the observed worst case is still tolerable for significance.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 3: SHOWDOWN ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>TWFE vs Callaway-Sant'Anna — a head-to-head</h2>
+  <p class="lede">
+    With <em>one</em> treatment date, TWFE = 2×2 DiD = CS. With <em>staggered</em>
+    treatment and <em>heterogeneous</em> dynamics, TWFE silently uses already-treated
+    units as controls. The damage shows up as bias toward zero. Crank the dials and
+    confirm.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Number of units per cohort <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="500" step="10" value="200">
+    </div>
+    <div class="control">
+      <label>Treatment dynamics δ_growth (per period) <span class="value" id="sh-d-val">-0.020</span></label>
+      <input type="range" id="sh-d" min="-0.05" max="0.02" step="0.005" value="-0.020">
+      <p class="caption">Strongly time-varying effects worsen TWFE's negative-weight problem.</p>
+    </div>
+    <div class="control">
+      <label>Cohort gap (years between G=A and G=B) <span class="value" id="sh-g-val">2</span></label>
+      <input type="range" id="sh-g" min="1" max="3" step="1" value="2">
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="sh-s-val">0.10</span></label>
+      <input type="range" id="sh-s" min="0.02" max="0.30" step="0.01" value="0.10">
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Callaway-Sant'Anna</span></h3>
+      <div class="method-row"><span class="label">α̂ (overall ATT)</span><span class="val" id="sh-cs-alpha">—</span></div>
+      <div class="method-row"><span class="label">true ATT</span><span class="val" id="sh-cs-true">—</span></div>
+      <div class="method-row"><span class="label">bias</span><span class="val" id="sh-cs-bias">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">TWFE</span></h3>
+      <div class="method-row"><span class="label">α̂ (single coef)</span><span class="val" id="sh-tw-alpha">—</span></div>
+      <div class="method-row"><span class="label">true ATT</span><span class="val" id="sh-tw-true">—</span></div>
+      <div class="method-row"><span class="label">bias</span><span class="val" id="sh-tw-bias">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="card">
+    <h3>Distribution across 100 simulated panels</h3>
+    <p>
+      Each draw re-randomises noise (same DGP, same seed family). With staggered
+      timing and heterogeneous dynamics, TWFE's histogram drifts to the right of
+      the true value while CS-style remains centred.
+    </p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="display:none;"></div>
+  </div>
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT + EVENT STUDY ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's headline results, interactively</h2>
+  <p class="lede">
+    Every estimator the post computes, plotted on one axis. The post's overall
+    ATT is <strong>−0.057</strong> (CS unconditional) or <strong>−0.065</strong>
+    (doubly robust with covariates). Toggle methods on/off; hover for SEs and
+    confidence intervals.
+  </p>
+
+  <div class="card">
+    <h3>Methods to display</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="TWFE" checked> TWFE</label>
+      <label><input type="checkbox" value="CS Overall (unconditional)" checked> CS Overall (unconditional)</label>
+      <label><input type="checkbox" value="Regression adj." checked> Regression adj.</label>
+      <label><input type="checkbox" value="IPW" checked> IPW</label>
+      <label><input type="checkbox" value="Doubly robust" checked> Doubly robust</label>
+      <label><input type="checkbox" value="DR (varying base)" checked> DR (varying base)</label>
+      <label><input type="checkbox" value="DR (not-yet-treated)" checked> DR (not-yet-treated)</label>
+      <label><input type="checkbox" value="DR (1-period anticip.)" checked> DR (1-period anticip.)</label>
+      <label><input type="checkbox" value="Lagged outcomes (pte)" checked> Lagged outcomes (pte)</label>
+      <label><input type="checkbox" value="ATT per dollar (CS)"> ATT per dollar (CS, different scale)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Event study — ATT(e) by event time</h3>
+    <p>
+      Three estimators stacked on the same axis. <em>TWFE (Sun-Abraham)</em> and
+      <em>Callaway-Sant'Anna</em> use no covariates; <em>Doubly robust</em>
+      conditions on log population and log average pay.
+    </p>
+    <div class="method-toggle" id="es-methods">
+      <label><input type="checkbox" value="twfe_sa" checked> TWFE (Sun-Abraham)</label>
+      <label><input type="checkbox" value="cs" checked> Callaway-Sant'Anna</label>
+      <label><input type="checkbox" value="dr" checked> Doubly robust (CS+X)</label>
+    </div>
+    <div class="chart-area" id="es-chart"></div>
+  </div>
+
+  <div class="card">
+    <h3>HonestDiD sensitivity — when does the result break?</h3>
+    <p>
+      The dashed orange line marks the <strong>breakdown M̄ ≈ 0.67</strong>: post-treatment
+      parallel-trends violations up to ~67% of the largest pre-treatment deviation still
+      leave the on-impact effect statistically below zero. Beyond that, the CI crosses zero.
+    </p>
+    <div class="chart-area" id="hd-chart"></div>
+  </div>
+
+  <div class="card">
+    <h3>TWFE weight decomposition (post §5.3)</h3>
+    <div class="method-row"><span class="label">TWFE estimate</span><span class="val">−0.0381</span></div>
+    <div class="method-row"><span class="label">Proper overall ATT</span><span class="val">−0.0571</span></div>
+    <div class="method-row"><span class="label">Total TWFE bias</span><span class="val">0.0190</span></div>
+    <div class="method-row"><span class="label">… from pre-treatment contamination</span><span class="val">64.2%</span></div>
+    <div class="method-row"><span class="label">… from post-treatment weighting</span><span class="val">35.8%</span></div>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Difference-in-Differences for Policy Evaluation: A Tutorial using R</em> ·
+  D3.js v7 · no backend, no tracking ·
+  <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

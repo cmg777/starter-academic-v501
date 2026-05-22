@@ -1,0 +1,65 @@
+{
+  "estimates": [
+    { "method": "TWFE",                   "outcome": "Teen employment (log)", "estimate": -0.0381, "se": 0.0085, "ci_lo": -0.0548, "ci_hi": -0.0215, "n_selected": null },
+    { "method": "CS Overall (unconditional)", "outcome": "Teen employment (log)", "estimate": -0.0571, "se": 0.0080, "ci_lo": -0.0727, "ci_hi": -0.0415, "n_selected": null },
+    { "method": "Regression adj.",        "outcome": "Teen employment (log)", "estimate": -0.0640, "se": 0.0080, "ci_lo": -0.0797, "ci_hi": -0.0483, "n_selected": null },
+    { "method": "IPW",                    "outcome": "Teen employment (log)", "estimate": -0.0650, "se": 0.0080, "ci_lo": -0.0807, "ci_hi": -0.0493, "n_selected": null },
+    { "method": "Doubly robust",          "outcome": "Teen employment (log)", "estimate": -0.0650, "se": 0.0080, "ci_lo": -0.0807, "ci_hi": -0.0493, "n_selected": null },
+    { "method": "DR (varying base)",      "outcome": "Teen employment (log)", "estimate": -0.0646, "se": 0.0081, "ci_lo": -0.0805, "ci_hi": -0.0487, "n_selected": null },
+    { "method": "DR (not-yet-treated)",   "outcome": "Teen employment (log)", "estimate": -0.0649, "se": 0.0080, "ci_lo": -0.0806, "ci_hi": -0.0492, "n_selected": null },
+    { "method": "DR (1-period anticip.)", "outcome": "Teen employment (log)", "estimate": -0.0396, "se": 0.0098, "ci_lo": -0.0588, "ci_hi": -0.0204, "n_selected": null },
+    { "method": "Lagged outcomes (pte)",  "outcome": "Teen employment (log)", "estimate": -0.0610, "se": 0.0080, "ci_lo": -0.0767, "ci_hi": -0.0453, "n_selected": null },
+    { "method": "ATT per dollar (CS)",    "outcome": "Per \\$1 of minimum wage", "estimate": -0.0297, "se": 0.0155, "ci_lo": -0.0601, "ci_hi":  0.0007, "n_selected": null }
+  ],
+  "event_study": {
+    "twfe_sa": [
+      { "event_time": -3, "estimate": -0.0341, "se": 0.0119 },
+      { "event_time": -2, "estimate": -0.0167, "se": 0.0076 },
+      { "event_time": -1, "estimate":  0.0000, "se": null },
+      { "event_time":  0, "estimate": -0.0235, "se": 0.0081 },
+      { "event_time":  1, "estimate": -0.0668, "se": 0.0086 },
+      { "event_time":  2, "estimate": -0.1234, "se": 0.0203 },
+      { "event_time":  3, "estimate": -0.1311, "se": 0.0230 }
+    ],
+    "cs": [
+      { "event_time": -3, "estimate": -0.0341, "se": 0.0119 },
+      { "event_time": -2, "estimate": -0.0167, "se": 0.0076 },
+      { "event_time": -1, "estimate":  0.0000, "se": null },
+      { "event_time":  0, "estimate": -0.0235, "se": 0.0081 },
+      { "event_time":  1, "estimate": -0.0668, "se": 0.0086 },
+      { "event_time":  2, "estimate": -0.1234, "se": 0.0203 },
+      { "event_time":  3, "estimate": -0.1311, "se": 0.0230 }
+    ],
+    "dr": [
+      { "event_time": -3, "estimate": -0.0218, "se": 0.0120 },
+      { "event_time": -2, "estimate": -0.0144, "se": 0.0076 },
+      { "event_time": -1, "estimate":  0.0000, "se": null },
+      { "event_time":  0, "estimate": -0.0270, "se": 0.0081 },
+      { "event_time":  1, "estimate": -0.0770, "se": 0.0090 },
+      { "event_time":  2, "estimate": -0.1350, "se": 0.0205 },
+      { "event_time":  3, "estimate": -0.1470, "se": 0.0235 }
+    ]
+  },
+  "honestdid": [
+    { "Mbar": 0.000, "lb": -0.0401, "ub": -0.00871 },
+    { "Mbar": 0.222, "lb": -0.0435, "ub": -0.00523 },
+    { "Mbar": 0.444, "lb": -0.0470, "ub": -0.00174 },
+    { "Mbar": 0.667, "lb": -0.0505, "ub":  0.00523 },
+    { "Mbar": 0.889, "lb": -0.0575, "ub":  0.01220 },
+    { "Mbar": 1.111, "lb": -0.0644, "ub":  0.01920 }
+  ],
+  "twfe_decomposition": {
+    "twfe_estimate": -0.0381,
+    "att_overall":   -0.0571,
+    "twfe_post_component": -0.0503,
+    "pre_treatment_contamination": 0.0122,
+    "total_bias": 0.019,
+    "frac_pre": 0.6422,
+    "frac_post_weights": 0.3578
+  },
+  "group_atts": [
+    { "group": "G=2004 (102 counties)", "estimate": -0.0888, "se": 0.0197, "ci_lo": -0.1309, "ci_hi": -0.0468 },
+    { "group": "G=2006 (226 counties)", "estimate": -0.0427, "se": 0.0083, "ci_lo": -0.0604, "ci_hi": -0.0251 }
+  ],
+  "selection": []
+}

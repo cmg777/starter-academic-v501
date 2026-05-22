@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Ring DiD with Geocoded Microdata — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Difference-in-Differences with Geocoded Microdata: When Distance Defines Treatment'. Slide the ring cutoff, simulate a known DGP, and explore the Linden-Rockoff treatment-effect curve.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Ring DiD with Geocoded Microdata — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Difference-in-Differences with Geocoded Microdata: When Distance Defines Treatment</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-ringchoice" class="tab"      data-pane="pane-ringchoice" role="tab" aria-selected="false">2 · Ring-Choice Lab</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">3 · Simulator</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>When the "treatment" is a point in space</h2>
+  <p class="lede">
+    What happens to home prices when a registered sex offender moves into a
+    neighborhood — and how do we <em>know</em> we measured it right?
+    Linden and Rockoff (2008) compared homes inside one tenth of a mile to
+    homes a little farther away and found a roughly 7.5&nbsp;% drop. The catch:
+    the answer depends on where you draw the ring. Change the cutoff and the
+    number changes.
+  </p>
+  <p class="lede">
+    This lab lets you turn the dial yourself. In four tabs you will: slide the
+    inner-ring cutoff and watch the headline ATT wobble; run a simulated DGP
+    where the truth is known and watch the parametric estimator bias itself;
+    and compare the parametric headline to the data-driven nonparametric
+    treatment-effect curve.
+  </p>
+
+  <div class="card">
+    <h3>Three answers, same dataset</h3>
+    <p>
+      On the same 9,092 Linden-Rockoff home sales, three estimators answer
+      slightly different questions:
+    </p>
+    <div class="chart-area" id="intro-three-numbers"></div>
+    <p class="note">
+      The orange bar (parametric, 0.1&nbsp;mi cutoff) is the textbook headline.
+      The teal bar (sample-weighted nonparametric ATT inside 0.1&nbsp;mi) lets
+      the curve flex and recovers <strong>≈ 2.1× the magnitude</strong>. The
+      steel bar (closest bin, ~300&nbsp;ft) shows where the effect concentrates.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-ringchoice">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Ring-Choice Lab</h4>
+      <p>Slide the inner-ring cutoff on the real Linden-Rockoff data. Watch the ATT move from −6.4&nbsp;% to −4.2&nbsp;% — a 52&nbsp;% relative spread driven by a single researcher choice.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Simulator</h4>
+      <p>Build a known DGP with a smooth exponential τ(d). Set the true decay and the true treated radius, then watch the parametric ring DiD bias itself when the cutoff is wrong.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>Six estimates from the post, side by side with 95&nbsp;% CIs: three parametric cutoffs, two leftmost nonparametric bins, and the sample-weighted ATT.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Ring DiD</summary>
+        <div class="gloss-body">A difference-in-differences design where treated and control are defined by <em>distance</em> to a treatment point, not by policy assignment. Inner ring = treated; outer donut = control.</div>
+      </details>
+      <details class="gloss"><summary>Parametric ring estimator</summary>
+        <div class="gloss-body">A one-line regression of the first-differenced outcome on a "treated ring" indicator. Returns one ATT for the chosen inner ring. <em>One number, lots of ring-choice sensitivity.</em></div>
+      </details>
+      <details class="gloss"><summary>Nonparametric ring (binsreg)</summary>
+        <div class="gloss-body">Partitions distance into quantile-spaced bins and reports a separate τ̂ in each. Output is a <em>step function</em> over distance — the shape of the effect, not just its average.</div>
+      </details>
+      <details class="gloss"><summary>Ring choice as estimand</summary>
+        <div class="gloss-body">The parameter is the ATT conditional on d ≤ d̄. Change d̄ and you change the <em>question</em>, not just precision. That's why the headline wobbles.</div>
+      </details>
+      <details class="gloss"><summary>Local parallel trends</summary>
+        <div class="gloss-body">Identifying assumption: absent treatment, the average change in inner-ring outcomes would have matched the average change in outer-ring outcomes.</div>
+      </details>
+      <details class="gloss"><summary>ATT</summary>
+        <div class="gloss-body">Average treatment effect on the treated — E[τ(d) | d ≤ d̄]. Depends on d̄, both because of which units are "treated" and which counterfactual trend they're being compared to.</div>
+      </details>
+      <details class="gloss"><summary>Sample-weighted ATT</summary>
+        <div class="gloss-body">When summarising a step function into a scalar, weight by <em>number of observations</em> in each bin. The headline −12.4 % is sample-weighted; bin-equal weight would give −11.4 %.</div>
+      </details>
+      <details class="gloss"><summary>d<sub>t</sub> (treated radius)</summary>
+        <div class="gloss-body">The maximum distance at which treatment effects are felt. In the simulator we set it; in the real world we don't know it — and pretending we do is the source of the parametric estimator's fragility.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: RING-CHOICE LAB ====================== -->
+<section id="pane-ringchoice" class="tab-pane" role="tabpanel" aria-labelledby="tab-ringchoice">
+
+  <h2>Ring-Choice Lab — slide the cutoff on real data</h2>
+  <p class="lede">
+    These numbers come from the Linden-Rockoff sample (9,092 home sales
+    within 1/3 mile of an offender's address). The y-axis is the average
+    price change in log points; we report it as an ATT&nbsp;% on the right.
+    <strong>Slide the inner-ring cutoff between 0.05 and 0.15 mile</strong>
+    and watch the headline wobble.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Inner-ring cutoff (miles) <span class="value" id="rc-cut-val">0.10</span></label>
+      <input type="range" id="rc-cut" min="0.05" max="0.15" step="0.01" value="0.10" aria-label="inner-ring cutoff in miles">
+      <div class="hint">Move left for a narrower treated ring (smaller treated sample, more local effect); right for a wider ring.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="rc-curve"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">ATT (log points)</div>
+      <div class="stat-value orange" id="rc-att-log">—</div>
+      <div class="stat-sub">at current cutoff</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ATT (% change)</div>
+      <div class="stat-value orange" id="rc-att-pct">—</div>
+      <div class="stat-sub">back-transformed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">95 % CI</div>
+      <div class="stat-value" id="rc-ci">—</div>
+      <div class="stat-sub">cluster-robust SE</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Sample N</div>
+      <div class="stat-value teal" id="rc-n">7,534</div>
+      <div class="stat-sub">transactions (outer&nbsp;ring fixed)</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The headline moves by 52&nbsp;%.</strong> At cutoff 0.05 the ATT is −6.4&nbsp;%; at 0.15 it is −4.2&nbsp;%. Same data, different estimate, no sampling noise involved.</li>
+      <li><strong>The sign is robust.</strong> All three cutoffs return a negative coefficient that is (borderline) significant. What changes is the <em>magnitude</em> a reader would walk away with.</li>
+      <li><strong>The standard error shrinks as the cutoff widens.</strong> More units in the inner ring → more precision, but you are now averaging over an effect that is concentrated in the closest few hundred feet.</li>
+    </ul>
+    <p class="note" style="margin-top:8px;">
+      As Butts (2023) puts it: <em>"the choice of 0.1 miles is an untestable
+      assumption."</em> Tab 4 shows what the nonparametric estimator does about it.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Simulator — build a known DGP, then bias the estimator</h2>
+  <p class="lede">
+    To judge the estimator fairly, we need a world where the truth is known.
+    Below you build a smooth exponential treatment-effect curve
+    <strong>τ(d) = A · exp(−k · d) · 𝟙{d ≤ d<sub>t</sub>}</strong>
+    and then run a parametric ring DiD at a chosen inner-ring cutoff. The
+    closer your cutoff is to the true treated radius d<sub>t</sub>, the
+    closer the estimate sits to the truth.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>True peak effect A (at d = 0) <span class="value" id="sm-a-val">1.50</span></label>
+      <input type="range" id="sm-a" min="0.5" max="3.0" step="0.1" value="1.50" aria-label="peak treatment effect">
+      <div class="hint">How big is the effect right at the offender's address?</div>
+    </div>
+    <div class="control">
+      <label>Decay rate k <span class="value" id="sm-k-val">2.30</span></label>
+      <input type="range" id="sm-k" min="0.5" max="6.0" step="0.1" value="2.30" aria-label="decay rate">
+      <div class="hint">Higher k = effect fades faster with distance.</div>
+    </div>
+    <div class="control">
+      <label>True treated radius d<sub>t</sub> (miles) <span class="value" id="sm-dt-val">0.75</span></label>
+      <input type="range" id="sm-dt" min="0.20" max="1.40" step="0.05" value="0.75" aria-label="true treated radius">
+      <div class="hint">Beyond d<sub>t</sub>, τ(d) is exactly zero. This is what you would love to know in real life.</div>
+    </div>
+    <div class="control">
+      <label>Chosen cutoff d̄ (miles) <span class="value" id="sm-cut-val">0.75</span></label>
+      <input type="range" id="sm-cut" min="0.15" max="1.40" step="0.05" value="0.75" aria-label="researcher cutoff">
+      <div class="hint">Your guess for d<sub>t</sub>. When d̄ = d<sub>t</sub>, the parametric estimator is unbiased.</div>
+    </div>
+    <div class="control">
+      <label>Sample size n <span class="value" id="sm-n-val">300</span></label>
+      <input type="range" id="sm-n" min="100" max="500" step="50" value="300" aria-label="sample size">
+      <div class="hint">More data = tighter SEs but does not fix the cutoff bias.</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="sm-sig-val">0.20</span></label>
+      <input type="range" id="sm-sig" min="0.05" max="1.0" step="0.05" value="0.20" aria-label="noise sigma">
+      <div class="hint">Per-unit sampling noise on the first-differenced outcome.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sm-curve"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">True average τ in [0, d<sub>t</sub>]</div>
+      <div class="stat-value teal" id="sm-truth">—</div>
+      <div class="stat-sub">benchmark for the inner ring</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">τ̂ (your chosen cutoff)</div>
+      <div class="stat-value orange" id="sm-tauhat">—</div>
+      <div class="stat-sub">parametric ring DiD</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">SE(τ̂)</div>
+      <div class="stat-value" id="sm-se">—</div>
+      <div class="stat-sub">conventional, IID</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Bias (τ̂ − truth)</div>
+      <div class="stat-value" id="sm-bias">—</div>
+      <div class="stat-sub">positive = too narrow; negative = too wide</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bias-variance over 100 simulations</h3>
+    <p>Single draws are noisy. Run 100 fresh samples at the current settings to see whether the cutoff bias is systematic.</p>
+    <button class="action" id="sm-run">Run 100 simulations</button>
+    <span id="sm-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sm-progress"><div></div></div>
+    <div class="chart-area" id="sm-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sm-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">mean τ̂ across 100 sims</div><div class="stat-value orange" id="sm-mean">—</div><div class="stat-sub">bias direction</div></div>
+      <div class="stat"><div class="stat-label">sd(τ̂)</div><div class="stat-value" id="sm-sd">—</div></div>
+      <div class="stat"><div class="stat-label">True average τ in [0, d<sub>t</sub>]</div><div class="stat-value teal" id="sm-hist-truth">—</div></div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set d̄ = d<sub>t</sub>.</strong> The estimator should land on the true average τ inside the affected region (bias ≈ 0).</li>
+      <li><strong>Push d̄ below d<sub>t</sub>.</strong> The estimate gets <em>bigger</em> (in magnitude) — you are averaging only the steepest part of the τ(d) curve.</li>
+      <li><strong>Push d̄ above d<sub>t</sub>.</strong> The estimate <em>attenuates toward zero</em> — you are absorbing units with zero treatment effect into the "treated" group.</li>
+      <li><strong>Run 100 sims:</strong> the histogram should center on a biased number, not on the truth, whenever d̄ ≠ d<sub>t</sub>. That bias is what the nonparametric estimator (Tab 4) is built to avoid.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>Forest plot — the six estimates side by side</h2>
+  <p class="lede">
+    These numbers come straight from the post's tables
+    (<code>table_lr_parametric.csv</code>, <code>table_lr_ringchoice.csv</code>,
+    <code>table_lr_nonparametric.csv</code>). Three parametric estimates at
+    different cutoffs, two of the nonparametric bins, and the sample-weighted
+    nonparametric ATT inside 0.1 mile. Hover any point for SE and CI.
+  </p>
+
+  <div class="card">
+    <h3>Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Parametric (cut = 0.05 mi)" checked> Parametric (0.05 mi)</label>
+      <label><input type="checkbox" value="Parametric (cut = 0.10 mi)" checked> Parametric (0.10 mi)</label>
+      <label><input type="checkbox" value="Parametric (cut = 0.15 mi)" checked> Parametric (0.15 mi)</label>
+      <label><input type="checkbox" value="Nonparametric bin 1 (~300 ft)" checked> NP bin 1 (~300 ft)</label>
+      <label><input type="checkbox" value="Nonparametric bin 2 (~400 ft)" checked> NP bin 2 (~400 ft)</label>
+      <label><input type="checkbox" value="Nonparametric ATT (sample-wt., inside 0.1 mi)" checked> NP ATT (≤ 0.1 mi)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>The whole nonparametric curve</h3>
+    <p class="note" style="margin-top:0;">
+      All 23 quantile-spaced bins from binsreg on the Linden-Rockoff data, with
+      95&nbsp;% CIs. The orange vertical line marks the canonical 0.1-mile
+      cutoff; the curve <strong>crosses zero at ≈ 0.094 mile</strong>, validating
+      Linden &amp; Rockoff's eyeballed choice as an <em>output</em> of the analysis.
+    </p>
+    <div class="chart-area" id="fp-bins"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Parametric estimates are tightly bunched at −4 to −6 %.</strong> The headline number "wobbles" but stays in the same neighborhood — all three CIs overlap heavily.</li>
+      <li><strong>Nonparametric bin 1 (−20.6 %) sits 3× below the parametric headline.</strong> The post's central methodological point made visible: the parametric estimator averages a steep close-in effect with a near-zero outer-ring effect.</li>
+      <li><strong>The sample-weighted ATT (−12.4 %) sits in between</strong> — the most honest summary, because it averages bin estimates by how many transactions live in each bin.</li>
+      <li><strong>In the lower curve, watch where the line crosses zero.</strong> It happens between bin 3 and bin 4, around d ≈ 0.094 mi — strikingly close to the 0.1 mi cutoff researchers historically picked by inspection.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Why does the parametric estimator under-state the magnitude?</h3>
+    <p>
+      The parametric ring DiD forces a single coefficient across the entire
+      inner ring (0, 0.1] mile. That single coefficient is the
+      <em>sample-weighted average</em> of all the bin-level effects inside the
+      ring — and the bin-level effects span <strong>−20.6 %</strong> right at
+      the offender to <strong>+0.6 %</strong> at the ring's outer edge.
+      Averaging that range pulls the headline closer to zero. The
+      nonparametric estimator avoids the averaging and exposes the
+      <em>concentration</em> of the effect in the closest few hundred feet.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Difference-in-Differences with Geocoded Microdata: When Distance Defines Treatment</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

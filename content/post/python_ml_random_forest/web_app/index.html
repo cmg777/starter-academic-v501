@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Random Forest Regression — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Introduction to Machine Learning: Random Forest Regression'. A pedagogical web app with a tree-split / bagging animation, a non-linear-vs-linear simulator, and a feature-importance forest plot drawn from the post's Bolivia IMDS results.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Random Forest Regression — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Introduction to Machine Learning: Random Forest Regression</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"      class="tab"        data-pane="pane-lab"      role="tab" aria-selected="false">2 · Sparsity Lab</button>
+  <button id="tab-showdown" class="tab"        data-pane="pane-showdown" role="tab" aria-selected="false">3 · RF vs Linear Showdown</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Feature Importance</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Random Forest: many trees, one prediction</h2>
+  <p class="lede">
+    Can satellite imagery predict how well a Bolivian municipality is
+    developing? The post trains a <strong>Random Forest regressor</strong>
+    on 64-dimensional satellite-image embeddings to predict the Municipal
+    Sustainable Development Index (IMDS). The headline result: the model
+    explains about <strong>23% of IMDS variance</strong> (R² = 0.23,
+    RMSE = 6.52, MAE = 4.72 on the held-out test set). That is meaningful
+    signal — and a hard ceiling. Tuning hyperparameters barely moves the
+    needle: the baseline (R² = 0.2307) and the tuned forest
+    (R² = 0.2297) are statistically indistinguishable on the test set.
+  </p>
+  <p class="lede">
+    This app turns the post's three central ideas into knobs you can
+    move. Sweep sparsity and signal to see why <strong>averaging many
+    shallow learners</strong> wins on tabular data. Compare a flexible
+    Random Forest-style fit against a linear OLS baseline on a known
+    non-linear DGP. And explore the post's real feature-importance
+    ranking from 339 Bolivian municipalities — where <span class="kbd">A59</span>,
+    <span class="kbd">A42</span>, and <span class="kbd">A26</span> emerge
+    as the top embedding dimensions under permutation importance.
+  </p>
+
+  <div class="card">
+    <h3>Why averaging tames variance — L1 vs L2 as a sketch</h3>
+    <p>
+      A single decision tree is high-variance: nudge the training data and
+      the tree's split locations jump. A <em>forest</em> of B trees,
+      each trained on a bootstrap resample, averages those jumps away.
+      The same arithmetic principle drives the animation below: heavy
+      penalisation (L1, orange) zeroes coefficients hard; lighter
+      shrinkage (L2, steel-blue) compresses them smoothly. The bagging
+      analogy is similar — many slightly biased trees averaged into a
+      lower-variance prediction. <em>Average noisy juries; their verdicts
+      cancel.</em>
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <p class="note">
+      The animation uses LASSO/Ridge as a sketch metaphor for "many
+      small averagings tame variance". A Random Forest with
+      <code>n_estimators = 500</code> grows 500 different trees on 500
+      bootstrap samples of the 271 training municipalities and averages
+      their predictions. Sliding the penalty up here is loosely
+      analogous to deepening a tree's regularisation.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Sparsity Lab</h4>
+      <p>Slide n, p, and signal. Watch how a flexible forest-style fit handles many candidate features when only a few truly matter — the same regime the satellite embeddings sit in (64 features, 271 training rows).</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>RF vs Linear Showdown</h4>
+      <p>Same data, two models. See when a flexible non-linear fit beats a linear baseline — and when the gain vanishes. Run 100 simulations to see the bias-variance picture.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Feature Importance</h4>
+      <p>The post's Bolivia results, interactively. Toggle outcomes (R², RMSE, MAE) and methods (Baseline vs Tuned RF) to compare. Hover for SEs, CIs, and the number of estimators used.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Random Forest</summary>
+        <div class="gloss-body">An ensemble of decorrelated decision trees. Bagging + random feature subsets at each split. <em>Prediction is the average of all B trees.</em></div>
+      </details>
+      <details class="gloss"><summary>Decision tree</summary>
+        <div class="gloss-body">Recursive binary splits on features. Each leaf gives a prediction. <em>High-variance individually; that is what averaging is for.</em></div>
+      </details>
+      <details class="gloss"><summary>Bagging</summary>
+        <div class="gloss-body">Bootstrap aggregating. Train B models on B resamples of the data; average their predictions. <em>Reduces variance without inflating bias.</em></div>
+      </details>
+      <details class="gloss"><summary>Train/test split</summary>
+        <div class="gloss-body">Hold out a portion of data for honest evaluation. <em>In the post: 271 train, 68 test out of 339 municipalities.</em></div>
+      </details>
+      <details class="gloss"><summary>Cross-validation</summary>
+        <div class="gloss-body">K-fold rotating exam on the training set. Provides a stable estimate of model performance. <em>5-fold CV R² in the post: 0.2526 (+/- 0.0728).</em></div>
+      </details>
+      <details class="gloss"><summary>R², RMSE, MAE</summary>
+        <div class="gloss-body">R² is fraction-of-variance-explained; RMSE penalises large errors; MAE is average absolute error in target units. <em>Post: 0.23, 6.52, 4.72.</em></div>
+      </details>
+      <details class="gloss"><summary>Feature importance (MDI)</summary>
+        <div class="gloss-body">Mean Decrease in Impurity — how much each feature reduces error across all splits. <em>Fast, but biased toward continuous features.</em></div>
+      </details>
+      <details class="gloss"><summary>Permutation importance</summary>
+        <div class="gloss-body">Shuffle one feature, measure drop in R². <em>Less biased than MDI; computed on the test set. A59 wins in the post.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: SPARSITY LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>Sparsity Lab — when only a few features matter</h2>
+  <p class="lede">
+    The post's setup has 64 candidate features (satellite embeddings)
+    and only 339 observations. Most of the predictive signal is
+    concentrated in a handful of dimensions — the rest are weakly
+    informative or noise. <strong>Drag the penalty slider and watch
+    coefficients shrink to exactly zero, one at a time.</strong> The
+    surviving features mimic the role of "important features" in a
+    Random Forest: those whose impurity contribution exceeds a
+    threshold.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">200</span></label>
+      <input type="range" id="lab-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">In the post, training n = 271 municipalities.</div>
+    </div>
+    <div class="control">
+      <label>Number of features p <span class="value" id="lab-p-val">40</span></label>
+      <input type="range" id="lab-p" min="5" max="100" step="1" value="40" aria-label="number of features p">
+      <div class="hint">The post has p = 64 satellite-embedding dimensions. About 15% have a true nonzero effect; the rest are noise.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="lab-s-val">0.60</span></label>
+      <input type="range" id="lab-s" min="0.1" max="1.5" step="0.05" value="0.60" aria-label="signal strength">
+      <div class="hint">Magnitude of the truly-relevant coefficients relative to noise.</div>
+    </div>
+    <div class="control">
+      <label>Penalty <span class="value" id="lab-l-val">—</span></label>
+      <input type="range" id="lab-l" min="0" max="79" step="1" value="40" aria-label="penalty index">
+      <div class="hint">Slide left for less shrinkage (more features survive); right for more.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-path"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">features kept (|I|)</div>
+      <div class="stat-value teal" id="lab-stat-nz">—</div>
+      <div class="stat-sub">out of <span id="lab-stat-p">—</span> candidates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from raw LASSO</div>
+      <div class="stat-value orange" id="lab-stat-alpha-l">—</div>
+      <div class="stat-sub">shrunk toward zero</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from post-OLS</div>
+      <div class="stat-value orange" id="lab-stat-alpha-o">—</div>
+      <div class="stat-sub">refit on selected support</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true α</div>
+      <div class="stat-value" id="lab-stat-alpha-t">0.50</div>
+      <div class="stat-sub">held fixed for comparison</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Sparsity grows with the penalty.</strong> Slide right: more features are pinned to zero. Slide left: more re-enter. This mirrors how a Random Forest's MDI importance gives a long-tailed ranking — only a handful of features dominate.</li>
+      <li><strong>The post's permutation-importance plot</strong> shows the same shape: A59, A42, A26 carry most of the predictive load; the remaining 50+ dimensions contribute marginally. <em>The forest, like LASSO, finds a low-dimensional core.</em></li>
+      <li><strong>With p ≈ n / 5 (the post's regime)</strong>, both LASSO and Random Forest behave well. With p approaching n, even the forest struggles — a warning for tabular data with many weak features.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="lab-reseed">Reseed random draws</button>
+      <button class="action secondary" id="lab-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: RF vs LINEAR SHOWDOWN ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>RF vs Linear Showdown — flexible vs. structured</h2>
+  <p class="lede">
+    Same simulated data. The post's partial-dependence plots reveal
+    threshold effects — IMDS rises sharply at low values of an
+    embedding dimension then plateaus. Random Forests capture these
+    non-linearities; OLS does not. Here the
+    <strong>"Rigorous" (theory-driven) penalty</strong> stands in for
+    a conservative, structured fit and the
+    <strong>"CV" (data-driven) penalty</strong> for a more flexible
+    one. The two answers can diverge — the same way an RF and an OLS
+    can disagree when the truth is non-linear.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Capped at 300 so the "Run 100 sims" button finishes quickly.</div>
+    </div>
+    <div class="control">
+      <label>Number of features p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of features p">
+      <div class="hint">Capped at 50 for the 100-sim run.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Magnitude of the truly relevant coefficients.</div>
+    </div>
+    <div class="control">
+      <label>Asymmetry <span class="value" id="sh-a-val">0.80</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.80" aria-label="asymmetry">
+      <div class="hint">0 = symmetric features · 1 = treatment dominates. Stand-in for non-linearity.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Structured (Linear / OLS-like)</span></h3>
+      <p class="note" style="margin:0 0 10px;">Theory-driven penalty (Belloni et al. 2012)</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-rig-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-rig-lam">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Flexible (RF-like)</span></h3>
+      <p class="note" style="margin:0 0 10px;">Cross-validated penalty (lambda.min)</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-cv-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-cv-lam">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>When the truth is linear</strong> (low asymmetry, low signal), both fits agree. The structured / OLS-like answer wins on standard error. Random Forest provides no advantage on truly linear DGPs.</li>
+      <li><strong>When the truth is non-linear or sparse</strong> (high signal, high asymmetry), the flexible fit can drift. Random Forests pay for flexibility with variance — exactly what bagging is designed to control.</li>
+      <li><strong>The post's lesson:</strong> on the Bolivia data, the tuned RF gained almost nothing over the baseline (test R² 0.2297 vs 0.2307). The performance ceiling came from the <em>features</em>, not from model flexibility.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different randomness) to see whether the bias is systematic.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Flexible mean α̂</div><div class="stat-value orange" id="sh-cv-mean">—</div><div class="stat-sub">bias toward zero or beyond</div></div>
+      <div class="stat"><div class="stat-label">Flexible sd(α̂)</div><div class="stat-value" id="sh-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Structured mean α̂</div><div class="stat-value teal" id="sh-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">Structured sd(α̂)</div><div class="stat-value" id="sh-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FEATURE IMPORTANCE ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's results — interactively</h2>
+  <p class="lede">
+    These numbers come from <code>ml_rf_results.csv</code> in the post's
+    folder — the baseline vs tuned comparison across three metrics
+    (R², RMSE, MAE). Toggle outcomes and methods to compare. The bar
+    chart underneath ranks the top-20 embedding dimensions by
+    permutation importance — A59, A42, A26 lead, but importance is
+    spread broadly across dimensions, exactly as the post notes.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Baseline and Tuned RF are essentially tied on the test set.</strong> R² is 0.2307 vs 0.2297; RMSE is identical at 6.52; MAE differs by 0.04. The tuning helped on cross-validation (0.2526 → 0.2721) but the gain didn't transfer to the specific 68-municipality test set.</li>
+      <li><strong>Toggle CV vs test outcomes.</strong> The CV bars (gold/teal) sit a bit higher than the test bars (steel) — the test set is small (68 obs) and noisy, and a single 20% holdout is exactly the regime where CV gives the steadier read.</li>
+      <li><strong>The bottom selection bars</strong> show all 64 features in play for both methods — Random Forest does not zero features out the way LASSO does. The "importance" ranking does the analogous job: a soft, post-hoc ordering.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Test R²"    checked> Test R²</label>
+      <label><input type="checkbox" value="Test RMSE"  checked> Test RMSE</label>
+      <label><input type="checkbox" value="Test MAE"   checked> Test MAE</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Baseline RF" checked> Baseline RF</label>
+      <label><input type="checkbox" value="Tuned RF"    checked> Tuned RF</label>
+      <label><input type="checkbox" value="Baseline CV" checked> Baseline CV</label>
+      <label><input type="checkbox" value="Tuned CV"    checked> Tuned CV</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+  <div class="chart-area" id="fp-bars"></div>
+
+  <div class="card">
+    <h3>Why does tuning gain so little?</h3>
+    <p>
+      RandomizedSearchCV improved the CV R² from 0.2526 to 0.2721 — a
+      modest 2-point bump. But on the held-out test set the gain
+      disappears (0.2307 → 0.2297). This is a common pattern with
+      small datasets (n = 271 train, 68 test). The tuner explores a
+      hyperparameter grid that, by chance, happens to fit the
+      training-fold idiosyncrasies. On a different random 20% holdout,
+      the gains would look different again. The ceiling here is
+      structural: <strong>satellite embeddings only carry so much
+      development-related signal</strong>, and no amount of forest
+      tuning can manufacture more.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 2</h3>
+    <p>
+      The Sparsity Lab showed a long-tailed coefficient ranking: a
+      handful of features dominate, the rest contribute marginally.
+      The post's permutation-importance plot shows the same shape on
+      real data:
+    </p>
+    <ul>
+      <li><strong>Permutation top 3:</strong> A59, A42, A26 (consistent across both importance methods).</li>
+      <li><strong>MDI top 3:</strong> A30, A59, A42 — A30 ranks higher under MDI but drops considerably under permutation importance. <em>That's the classic MDI bias toward high-cardinality / continuous features the post warns about.</em></li>
+      <li><strong>Combined effective dimensionality:</strong> 6–8 features explain most of the model's predictive power; the remaining 56+ contribute marginally.</li>
+    </ul>
+    <p>
+      The takeaway from the post (§ Feature Importance) is therefore
+      visible <em>twice</em>: once on a controlled simulation where
+      sparsity is a parameter you set, and once on the original
+      339-municipality panel where it is the empirical pattern.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Introduction to Machine Learning: Random Forest Regression</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

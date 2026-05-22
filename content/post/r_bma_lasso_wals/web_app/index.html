@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>BMA · LASSO · WALS Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Three Methods for Robust Variable Selection: BMA, LASSO, and WALS'. Live LASSO path, sensitivity simulator, and a 12-variable × 3-method method-agreement explorer.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>BMA · LASSO · WALS — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Three Methods for Robust Variable Selection: BMA, LASSO, and WALS</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"      class="tab"        data-pane="pane-lab"      role="tab" aria-selected="false">2 · LASSO Lab</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">3 · Sensitivity Simulator</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Method Agreement</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Three Methods, One Question: Which Variables Truly Matter?</h2>
+  <p class="lede">
+    Imagine 12 candidate drivers of CO<sub>2</sub> emissions and only 120 countries. There are
+    2<sup>12</sup> = 4,096 possible models you could fit. Pick one, and you implicitly
+    declare the other 4,095 wrong. <strong>BMA, LASSO, and WALS</strong> each take a
+    principled approach to this <em>variable selection problem</em>, but they encode different
+    statistical philosophies — Bayesian averaging, frequentist shrinkage, and frequentist
+    averaging.
+  </p>
+  <p class="lede">
+    This lab lets you experience the three methods hands-on. In four tabs you will:
+    watch the L1 (LASSO) penalty force coefficients to <em>exactly</em> zero while L2 (Ridge)
+    only shrinks them; turn the LASSO penalty knob yourself on simulated data;
+    explore how each method's sensitivity depends on signal strength; and inspect the post's
+    actual 12-variable × 3-method agreement map.
+  </p>
+
+  <div class="card">
+    <h3>L1 (LASSO) vs. L2 (Ridge) — why LASSO selects, Ridge does not</h3>
+    <p>
+      Both methods shrink coefficients. Only LASSO drives them <strong>exactly
+      to zero</strong>. The animation below shows the same coefficient under
+      the two penalties as λ grows: the orange L1 estimate hits zero abruptly,
+      the steel-blue L2 estimate asymptotes but never reaches zero. This is why
+      LASSO doubles as a variable-selection device — and why the Laplace prior
+      underlying WALS encodes the same skeptical-but-open-minded prior belief.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>LASSO Lab</h4>
+      <p>Slide λ and watch coefficients snap to zero, one by one. Compare raw LASSO to post-LASSO OLS.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Sensitivity Simulator</h4>
+      <p>Run 100 simulations to see how each method's true-positive rate depends on signal strength and sample size.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Method Agreement</h4>
+      <p>The post's 12 variables × 3 methods, interactively. Filter by variable type and method to see who agrees on what.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Three takeaways the lab is designed to make obvious</h3>
+    <ul>
+      <li><strong>Convergence is information.</strong> Four variables (log_gdp, trade_network, fossil_fuel, industry) are <em>triple-robust</em> — flagged by BMA, LASSO, and WALS. Triangulation across paradigms is the strongest claim you can make about variable importance.</li>
+      <li><strong>BMA is conservative; LASSO and WALS are sensitive.</strong> BMA recovers 4/7 true predictors (57.1% sensitivity); LASSO and WALS recover 6/7 each (85.7%). The two methods missed by BMA — urban_pop and democracy — sit in BMA's borderline PIP zone (0.60–0.65).</li>
+      <li><strong>All three keep specificity at 100%.</strong> None of the methods falsely flags a noise variable as robust. The cost of conservativism is missed true positives, not false alarms.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>BMA</summary>
+        <div class="gloss-body">Bayesian Model Averaging. Averages over all 2<sup>K</sup> = 4,096 candidate regression models, weighting each by its posterior probability. Output: PIPs and posterior coefficient means.</div>
+      </details>
+      <details class="gloss"><summary>PIP (Posterior Inclusion Probability)</summary>
+        <div class="gloss-body">For variable j, the sum of posterior probabilities of all models that include j. PIP ≥ 0.80 is the convention for "robust" (Raftery 1995).</div>
+      </details>
+      <details class="gloss"><summary>LASSO</summary>
+        <div class="gloss-body">L1-penalised least squares. The absolute-value penalty produces <em>exactly-zero</em> coefficients — variable selection comes for free.</div>
+      </details>
+      <details class="gloss"><summary>Penalty λ</summary>
+        <div class="gloss-body">The LASSO shrinkage knob. Larger λ pins more coefficients to zero. <em>This is the main slider in Tab 2.</em></div>
+      </details>
+      <details class="gloss"><summary>Post-LASSO</summary>
+        <div class="gloss-body">After LASSO selects a support, refit by plain OLS. Recovers unbiased magnitudes; LASSO is used only for selection.</div>
+      </details>
+      <details class="gloss"><summary>WALS</summary>
+        <div class="gloss-body">Weighted Average Least Squares. Frequentist model averaging via a semi-orthogonal transformation and a Laplace prior. Closed-form, no MCMC, produces t-statistics.</div>
+      </details>
+      <details class="gloss"><summary>|t| ≥ 2 threshold</summary>
+        <div class="gloss-body">WALS' analog of PIP ≥ 0.80. A variable with |t| ≥ 2 is classified as robust.</div>
+      </details>
+      <details class="gloss"><summary>Methodological triangulation</summary>
+        <div class="gloss-body">Combining methods that share assumptions but differ mechanically. Variables flagged by <em>all three</em> are unusually credible.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: LASSO LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>LASSO Lab — turn the penalty knob yourself</h2>
+  <p class="lede">
+    Simulated data with one variable of interest and many candidate controls. The true
+    coefficient of the highlighted (orange) variable is α = 0.5. LASSO chooses how many
+    candidates to keep based on a single penalty parameter λ. <strong>Drag the λ slider
+    and watch the coefficients shrink to exactly zero, one at a time.</strong>
+    This is the geometric trick from §10 of the post made interactive.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">200</span></label>
+      <input type="range" id="lab-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">More data ⇒ each coefficient estimated more precisely. The post uses n = 120.</div>
+    </div>
+    <div class="control">
+      <label>Number of candidates p <span class="value" id="lab-p-val">40</span></label>
+      <input type="range" id="lab-p" min="5" max="100" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">About 15% of these have a true nonzero effect; the rest are noise (analog of the post's 5 noise variables).</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="lab-s-val">0.60</span></label>
+      <input type="range" id="lab-s" min="0.1" max="1.5" step="0.05" value="0.60" aria-label="signal strength">
+      <div class="hint">Magnitude of the truly-relevant coefficients relative to noise. Small signal = post's "agriculture" case.</div>
+    </div>
+    <div class="control">
+      <label>Penalty λ <span class="value" id="lab-l-val">—</span></label>
+      <input type="range" id="lab-l" min="0" max="79" step="1" value="40" aria-label="penalty index">
+      <div class="hint">Slide left for less shrinkage (more variables survive); right for more (sparser model).</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-path"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">selected (|I|)</div>
+      <div class="stat-value teal" id="lab-stat-nz">—</div>
+      <div class="stat-sub">out of <span id="lab-stat-p">—</span> candidates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ raw LASSO</div>
+      <div class="stat-value orange" id="lab-stat-alpha-l">—</div>
+      <div class="stat-sub">shrunk toward zero (biased)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ post-LASSO OLS</div>
+      <div class="stat-value orange" id="lab-stat-alpha-o">—</div>
+      <div class="stat-sub">refit on selected support (unbiased)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true α</div>
+      <div class="stat-value" id="lab-stat-alpha-t">0.50</div>
+      <div class="stat-sub">held fixed for comparison</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Sparsity grows with λ.</strong> Slide right and noise variables snap to <em>exactly</em> zero. This is the L1-corner geometry from §10 of the post — Ridge (L2) would never zero them out.</li>
+      <li><strong>The post-OLS α̂ tracks the true α more closely than raw LASSO α̂.</strong> This is exactly the Post-LASSO step (Belloni &amp; Chernozhukov 2013) from §12 — LASSO shrinks the magnitude on purpose, so refit by OLS to undo the bias.</li>
+      <li><strong>True predictors persist longer.</strong> Crank λ up: noise variables are pinned to zero first; the true predictors (with larger coefficients) survive longer. This is why LASSO works as a selection device.</li>
+      <li><strong>Try p &gt; n.</strong> Set p = 100, n = 50. OLS is undefined, but LASSO still runs — that's the high-dimensional regime where shrinkage methods are designed to shine.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="lab-reseed">Reseed random draws</button>
+      <button class="action secondary" id="lab-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: SENSITIVITY SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Sensitivity Simulator — when do the methods agree?</h2>
+  <p class="lede">
+    The post's headline finding is that <strong>LASSO and WALS recover 6 of 7 true predictors
+    (85.7%) while BMA recovers only 4 (57.1%)</strong>. That gap is not an accident: it depends
+    on signal strength, sample size, and how strongly noise variables are correlated with true
+    predictors. Use the sliders to explore the boundary where methods start to disagree.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sim-n-val">120</span></label>
+      <input type="range" id="sim-n" min="50" max="300" step="10" value="120" aria-label="sample size n">
+      <div class="hint">The post uses n = 120 (cross-section of countries).</div>
+    </div>
+    <div class="control">
+      <label>Number of candidates p <span class="value" id="sim-p-val">12</span></label>
+      <input type="range" id="sim-p" min="6" max="50" step="1" value="12" aria-label="number of candidates p">
+      <div class="hint">The post uses p = 12 (7 true + 5 noise).</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sim-s-val">0.50</span></label>
+      <input type="range" id="sim-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Effect size of true predictors. Small = post's borderline-PIP case (urban_pop, democracy).</div>
+    </div>
+    <div class="control">
+      <label>Asymmetry (controls→treatment) <span class="value" id="sim-a-val">0.50</span></label>
+      <input type="range" id="sim-a" min="0" max="1" step="0.05" value="0.50" aria-label="asymmetry">
+      <div class="hint">How much candidates are correlated with the focal variable. Higher = harder selection problem.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Rigorous</span> LASSO (theory-driven λ)</h3>
+      <p class="note" style="margin:0 0 10px;">λ from Belloni et al.: <code>2 · 1.1 · σ̂ / √n · Φ⁻¹(1 − 0.05/(2p))</code>. Analogue of WALS conservatism.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sim-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sim-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sim-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sim-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sim-rig-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sim-rig-lam">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">CV</span> LASSO (data-driven λ)</h3>
+      <p class="note" style="margin:0 0 10px;">λ from 3-fold cross-validation (lambda.min). Analogue of LASSO+CV from §11 of the post.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sim-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sim-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sim-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sim-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sim-cv-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sim-cv-lam">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-compare"></div>
+
+  <div class="pedagogy">
+    <h4>How this maps onto the post's three methods</h4>
+    <ul>
+      <li><strong>Rigorous λ ≈ BMA + WALS</strong>: conservative, Bonferroni-style threshold. Misses small true effects but keeps specificity perfect.</li>
+      <li><strong>CV λ ≈ LASSO+CV</strong>: data-driven and more liberal. Higher sensitivity but can over-select when noise variables predict the outcome marginally well.</li>
+      <li><strong>Small signal × large p</strong>: this is the regime where BMA and the rigorous penalty are most conservative. The post's urban_pop (true β = 0.010) and democracy (β = 0.004) sit here.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different random shocks) to see whether one estimator is systematically more biased.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sim-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">CV mean α̂</div><div class="stat-value orange" id="sim-cv-mean">—</div><div class="stat-sub">tendency over 100 runs</div></div>
+      <div class="stat"><div class="stat-label">CV sd(α̂)</div><div class="stat-value" id="sim-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Rigorous mean α̂</div><div class="stat-value teal" id="sim-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">Rigorous sd(α̂)</div><div class="stat-value" id="sim-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: METHOD AGREEMENT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>Method Agreement — the post's 12 variables, three methods</h2>
+  <p class="lede">
+    These numbers come straight from the post's grand comparison table (§17). The top
+    panel shows each variable's coefficient estimate under BMA, LASSO, Post-LASSO, and
+    WALS. The bottom panel summarises confusion-matrix counts for each method
+    (true positives / false positives / true negatives / false negatives). Toggle
+    variable groups and methods to see who agrees on what.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Triple-robust core.</strong> Keep all four methods checked and look at the top four variables (log_gdp, trade_network, fossil_fuel, industry). The estimates land in the same neighborhood under every method — these are the strongest claims the post can defend.</li>
+      <li><strong>Borderline cases.</strong> urban_pop and democracy show clear method splits: LASSO and WALS keep them; BMA's PIP falls below the 0.80 threshold (n_methods = 2 in the data column). The disagreement is itself informative.</li>
+      <li><strong>The noise variables (bottom 5).</strong> LASSO sets them to exact zero; BMA gives them PIPs &lt; 0.15; WALS gives |t| &lt; 1.5. All three methods correctly exclude them.</li>
+      <li><strong>The missed true predictor: agriculture (β = 0.005).</strong> Its true effect is below the noise floor at n = 120. No method recovers it — an honest signal that small effects need larger samples, not better algorithms.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Variable groups</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="log_gdp" checked> log_gdp <span class="muted">(true)</span></label>
+      <label><input type="checkbox" value="trade_network" checked> trade_network <span class="muted">(true)</span></label>
+      <label><input type="checkbox" value="fossil_fuel" checked> fossil_fuel <span class="muted">(true)</span></label>
+      <label><input type="checkbox" value="industry" checked> industry <span class="muted">(true)</span></label>
+      <label><input type="checkbox" value="urban_pop" checked> urban_pop <span class="muted">(true)</span></label>
+      <label><input type="checkbox" value="democracy" checked> democracy <span class="muted">(true)</span></label>
+      <label><input type="checkbox" value="agriculture" checked> agriculture <span class="muted">(true, weak)</span></label>
+      <label><input type="checkbox" value="log_tourism" checked> log_tourism <span class="muted">(noise)</span></label>
+      <label><input type="checkbox" value="log_credit" checked> log_credit <span class="muted">(noise)</span></label>
+      <label><input type="checkbox" value="log_trade" checked> log_trade <span class="muted">(noise)</span></label>
+      <label><input type="checkbox" value="corruption" checked> corruption <span class="muted">(noise)</span></label>
+      <label><input type="checkbox" value="fdi" checked> fdi <span class="muted">(noise)</span></label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="BMA" checked> BMA (posterior mean)</label>
+      <label><input type="checkbox" value="LASSO" checked> LASSO (raw, shrunk)</label>
+      <label><input type="checkbox" value="Post-LASSO" checked> Post-LASSO (refit OLS)</label>
+      <label><input type="checkbox" value="WALS" checked> WALS (Laplace prior)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Method-level performance</h3>
+    <p>How well does each method classify the 7 true predictors vs. 5 noise variables?</p>
+    <div class="grid grid-2">
+      <div>
+        <div class="method-row"><span class="label"><span class="tag rigorous">BMA</span></span><span class="val"></span></div>
+        <div class="method-row"><span class="label">sensitivity</span><span class="val">0.571 (4/7)</span></div>
+        <div class="method-row"><span class="label">specificity</span><span class="val">1.000 (5/5)</span></div>
+        <div class="method-row"><span class="label">accuracy</span><span class="val">0.750 (9/12)</span></div>
+      </div>
+      <div>
+        <div class="method-row"><span class="label"><span class="tag cv">LASSO</span></span><span class="val"></span></div>
+        <div class="method-row"><span class="label">sensitivity</span><span class="val">0.857 (6/7)</span></div>
+        <div class="method-row"><span class="label">specificity</span><span class="val">1.000 (5/5)</span></div>
+        <div class="method-row"><span class="label">accuracy</span><span class="val">0.917 (11/12)</span></div>
+      </div>
+      <div>
+        <div class="method-row"><span class="label"><span class="tag psl">WALS</span></span><span class="val"></span></div>
+        <div class="method-row"><span class="label">sensitivity</span><span class="val">0.857 (6/7)</span></div>
+        <div class="method-row"><span class="label">specificity</span><span class="val">1.000 (5/5)</span></div>
+        <div class="method-row"><span class="label">accuracy</span><span class="val">0.917 (11/12)</span></div>
+      </div>
+      <div>
+        <div class="method-row"><span class="label">Triple-robust</span><span class="val">4 of 7 true predictors</span></div>
+        <div class="method-row"><span class="label">Double-robust</span><span class="val">6 of 7 (adds urban_pop, democracy)</span></div>
+        <div class="method-row"><span class="label">All-method-agreed</span><span class="val">5 noise correctly excluded</span></div>
+        <div class="method-row"><span class="label">Universally missed</span><span class="val">agriculture (β = 0.005)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why do BMA, LASSO, and WALS disagree on urban_pop and democracy?</h3>
+    <p>
+      All three methods encode skepticism that "most coefficients are probably zero,"
+      but they execute that skepticism differently. <strong>BMA</strong> hedges by averaging
+      over <em>every</em> model — if the variable doesn't earn a place in most of the 4,096
+      models, its PIP stays below 0.80. <strong>LASSO</strong> with cross-validated λ
+      lets the data choose how aggressive to be; with n = 120 and a moderate signal, it
+      keeps a wider net than BMA. <strong>WALS</strong> uses the same Laplace prior as LASSO
+      but for averaging instead of selection — and the |t| ≥ 2 threshold is more permissive
+      than BMA's PIP ≥ 0.80. The disagreement on urban_pop and democracy is the genuine
+      methodological story: real but moderate effects sit in a "fragile" zone that
+      different paradigms classify differently.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 2 and Tab 3</h3>
+    <p>
+      The bias-variance gap you saw in Tab 2 (raw LASSO vs Post-LASSO) and the
+      conservativism gap in Tab 3 (rigorous λ vs CV λ) are the same forces that
+      produced the BMA-vs-LASSO disagreement you see here. <em>Raw LASSO</em> shrinks the
+      magnitude → use <em>Post-LASSO</em> for interpretation. <em>Conservative λ</em>
+      misses small true effects → use <em>multiple methods</em> for triangulation.
+      Whether to be conservative or sensitive is a domain judgment, not a statistical one.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Three Methods for Robust Variable Selection: BMA, LASSO, and WALS</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>EconML CausalForestDML — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Causal Machine Learning and the Resource Curse with Python EconML'. A pedagogical web app with sliders, simulators, and a forest plot for the six pairwise treatment contrasts.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>EconML Causal Forest — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Causal Machine Learning and the Resource Curse with Python EconML</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"      class="tab"        data-pane="pane-lab"      role="tab" aria-selected="false">2 · Shrinkage Lab</button>
+  <button id="tab-showdown" class="tab"        data-pane="pane-showdown" role="tab" aria-selected="false">3 · Bias Contest</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why <em>Causal</em> Machine Learning?</h2>
+  <p class="lede">
+    The post asks a sharp empirical question: <strong>can mining and mineral
+    prices raise economic activity, and do local institutions decide which way
+    it goes?</strong> The naive answer — comparing mining districts to
+    non-mining districts directly — is biased downward by 56% for the basic
+    mining effect (0.109 observed vs. 0.250 true). EconML's
+    <code>CausalForestDML</code> closes that gap by residualizing both the
+    outcome and the treatment against confounders before estimating the effect.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. In four tabs you will: see how
+    LASSO-style shrinkage selects controls one at a time; watch a
+    Monte-Carlo contest pit Naive against DML over 100 simulations; and
+    explore the post's six pairwise contrasts alongside their ground-truth
+    values.
+  </p>
+
+  <div class="card">
+    <h3>The selection idea behind the Causal Forest</h3>
+    <p>
+      Inside <code>CausalForestDML</code>, each honest tree decides which
+      controls to <strong>keep</strong> and which to <strong>drop</strong>
+      when estimating local treatment effects. The same shrink-or-keep
+      principle is easiest to see in the LASSO's L1 penalty: as the penalty
+      grows, coefficients <em>snap</em> to zero one at a time. Ridge
+      regression's L2 penalty only shrinks them toward zero — never exactly to
+      zero. That snapping behaviour is what makes LASSO a selector, and the
+      causal forest inherits the same logic at every split.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Shrinkage Lab</h4>
+      <p>Slide the penalty knob λ and watch which controls survive. See how a few well-chosen covariates can recover a causal coefficient that overfit OLS cannot.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Bias Contest</h4>
+      <p>Naive difference-in-means vs. DML residualization, head-to-head. Run 100 simulations to see the bias-variance pattern that motivates the whole tutorial.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>The post's six pairwise treatment contrasts. Compare the Naive raw-mean estimate, the DML Causal Forest estimate, and the known Ground Truth on the same x-axis. Toggle outcomes and methods.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>CATE — τ(x)</summary>
+        <div class="gloss-body">Conditional Average Treatment Effect — the average effect for units with covariate profile <em>x</em>. The CATE is a <em>function</em>, not a single number.</div>
+      </details>
+      <details class="gloss"><summary>ATE — E[τ(X)]</summary>
+        <div class="gloss-body">Average Treatment Effect, the CATE averaged over the whole sample. <em>The headline policy number.</em></div>
+      </details>
+      <details class="gloss"><summary>GATE</summary>
+        <div class="gloss-body">Group Average Treatment Effect — the CATE averaged over a pre-specified subgroup (here, executive-constraint level). <em>How you test "do institutions moderate the effect?"</em></div>
+      </details>
+      <details class="gloss"><summary>Nuisance functions g₀, m₀</summary>
+        <div class="gloss-body">Two conditional means: g₀ = E[Y|X,W] and m₀ = E[T|X,W]. <em>You don't care about their values; you only need them to be subtracted out.</em></div>
+      </details>
+      <details class="gloss"><summary>Cross-fitting</summary>
+        <div class="gloss-body">Fit the nuisance models on one fold; apply them to a held-out fold. Rotate. <em>Hides each observation from the model that will residualize it.</em></div>
+      </details>
+      <details class="gloss"><summary>Honest splitting</summary>
+        <div class="gloss-body">Half of each tree's subsample picks the splits; the other half estimates the leaf treatment effects. <em>What licenses valid CIs from the forest.</em></div>
+      </details>
+      <details class="gloss"><summary>Neyman orthogonality</summary>
+        <div class="gloss-body">A property of the DML estimating equation: at the truth, it is <em>flat</em> in the nuisance functions. <em>Why slow first-stage learners still give √n-consistent causal estimates.</em></div>
+      </details>
+      <details class="gloss"><summary>BLB SEs</summary>
+        <div class="gloss-body">Bootstrap of Little Bags — a sub-bootstrap variance estimator for forests. <em>What EconML reports when you pass inference=True.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: SHRINKAGE LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>Shrinkage Lab — turn the penalty knob</h2>
+  <p class="lede">
+    The simulated data has one treatment variable and many candidate controls.
+    The true treatment coefficient is α = 0.5 (orange curve below). LASSO
+    chooses how many controls to keep based on a single penalty λ.
+    <strong>Drag the λ slider and watch the coefficients shrink to exactly
+    zero, one at a time.</strong> This is the same selection logic
+    <code>CausalForestDML</code> applies inside every honest tree when it
+    decides which X-features drive heterogeneity.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">200</span></label>
+      <input type="range" id="lab-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">More data ⇒ each control's coefficient is estimated more precisely.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="lab-p-val">40</span></label>
+      <input type="range" id="lab-p" min="5" max="100" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">About 15% of these have a true nonzero effect; the rest are noise.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="lab-s-val">0.60</span></label>
+      <input type="range" id="lab-s" min="0.1" max="1.5" step="0.05" value="0.60" aria-label="signal strength">
+      <div class="hint">Magnitude of the truly-relevant coefficients relative to noise.</div>
+    </div>
+    <div class="control">
+      <label>Penalty <span class="value" id="lab-l-val">—</span></label>
+      <input type="range" id="lab-l" min="0" max="79" step="1" value="40" aria-label="penalty index">
+      <div class="hint">Slide left for less shrinkage (more controls survive); right for more.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-path"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">controls kept (|I|)</div>
+      <div class="stat-value teal" id="lab-stat-nz">—</div>
+      <div class="stat-sub">out of p candidates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from raw LASSO</div>
+      <div class="stat-value orange" id="lab-stat-alpha-l">—</div>
+      <div class="stat-sub">shrunk toward zero</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from post-OLS</div>
+      <div class="stat-value orange" id="lab-stat-alpha-o">—</div>
+      <div class="stat-sub">refit on selected support</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true α</div>
+      <div class="stat-value" id="lab-stat-alpha-t">0.50</div>
+      <div class="stat-sub">held fixed for comparison</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Sparsity grows with λ.</strong> Slide right: more controls are pinned to zero. Slide left: more re-enter. At λ ≈ 0 you recover OLS.</li>
+      <li><strong>The post-OLS α̂ tracks the true α better than the raw LASSO α̂.</strong> The raw LASSO shrinks <em>everything</em> toward zero, including the treatment. Refit on the selected support to undo that.</li>
+      <li><strong>The treatment column is forced to stay in.</strong> Even at very large λ, the orange curve keeps a meaningful value — exactly the role <code>CausalForestDML</code> reserves for the treatment T in its second stage.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: BIAS CONTEST ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>Bias Contest — Naive vs. residualized estimation</h2>
+  <p class="lede">
+    Same simulated data. The only difference is how the treatment effect is
+    estimated. The <strong>Naive</strong> approach uses a noisy single-step
+    LASSO (akin to running OLS on all controls). The <strong>residualized
+    Double LASSO</strong> follows the same two-stage logic that
+    <code>CausalForestDML</code> applies internally: subtract off the
+    confounding signal first, then estimate α from what is left. The contest
+    measures how close each method gets to the known true α — over a single
+    run, and over 100 Monte-Carlo replications.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Capped at 300 so the 100-sim run finishes quickly.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">Capped at 50 for the 100-sim run.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Common scale for both the outcome and the treatment confounders.</div>
+    </div>
+    <div class="control">
+      <label>Confound asymmetry <span class="value" id="sh-a-val">0.80</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.80" aria-label="confound asymmetry">
+      <div class="hint">0 = controls predict y and d equally · 1 = controls predict d well, y barely. The harder case for naive methods.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Residualized DML</span></h3>
+      <p class="note" style="margin:0 0 10px;">Two LASSOs (one for y, one for d) on the union of selected controls — the residualization step from Tutorial Eq. (3).</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-rig-un">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Naive (CV-tuned)</span></h3>
+      <p class="note" style="margin:0 0 10px;">Single CV-tuned LASSO on (y, X) — the same model fit prediction-style, not causality-style.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-cv-un">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>Why does residualization win?</h4>
+    <ul>
+      <li><strong>Naive prediction-style estimation</strong> optimises out-of-sample MSE on y alone. That objective is <em>not</em> the same as estimating the causal α correctly — and it routinely over-selects controls that soak up treatment variation.</li>
+      <li><strong>Residualization is Neyman-orthogonal.</strong> Errors in the first-stage nuisance estimates enter the causal estimate only at second order. This is exactly the property <code>CausalForestDML</code> exploits with its Gradient Boosting first stage.</li>
+      <li><strong>Run 100 simulations</strong> to see the average bias and spread. The residualized method centers on α̂ ≈ 0.5 — the true value the DGP used. The naive method centers below it.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different ε and v) to see whether the bias is systematic — the same diagnostic the post uses to defend the DML methodology.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's six pairwise contrasts — interactively</h2>
+  <p class="lede">
+    These numbers come straight from the post's <code>tutorial_results/ate-table.csv</code>
+    and execution log. Each row is one of the six pairwise treatment
+    contrasts: 1-0 (mining vs. none), 2-0, 3-0, and the within-mining
+    comparisons 2-1, 3-1, 3-2. <strong>First diff</strong> is the raw
+    difference of means (the naive estimator). <strong>DL (rigorous)</strong>
+    is the EconML <code>CausalForestDML</code> point estimate with its 90%
+    BLB confidence interval. <strong>DL (CV)</strong> here is repurposed to
+    show the <em>known Ground Truth</em> from the DGP — the bullseye each
+    estimator is trying to hit.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Compare First diff and DL (rigorous) on 1-0.</strong> The naive estimator gives 0.109; the DML forest gives 0.240 — almost exactly the true 0.250. That 0.13 gap <em>is</em> the confounding bias the residualization argument removes.</li>
+      <li><strong>Notice the price-effect contrasts (2-1, 3-1, 3-2).</strong> Hover the DML rows: 2-1 = 0.029 with a 90% CI that spans zero, while 3-1 = 0.220 is significant. The forest has recovered the non-linear price gradient (flat at low-to-medium, jumping at high) without being told to look for it.</li>
+      <li><strong>Where Naive over-estimates.</strong> For 3-1, the raw means give 0.413, almost double the true 0.300. Mining-at-high-prices districts are positively selected — better institutions, better geography. The DML pulls that bias out.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes (treatment contrasts)</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="1-0 (Mining vs none)" checked> 1-0 (Mining vs none)</label>
+      <label><input type="checkbox" value="2-0 (Med price vs none)" checked> 2-0 (Med price vs none)</label>
+      <label><input type="checkbox" value="3-0 (High price vs none)" checked> 3-0 (High price vs none)</label>
+      <label><input type="checkbox" value="2-1 (Med vs Low price)" checked> 2-1 (Med vs Low price)</label>
+      <label><input type="checkbox" value="3-1 (High vs Low price)" checked> 3-1 (High vs Low price)</label>
+      <label><input type="checkbox" value="3-2 (High vs Med price)" checked> 3-2 (High vs Med price)</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="First diff" checked> First diff (Naive)</label>
+      <label><input type="checkbox" value="DL (rigorous)" checked> DL (rigorous) — DML Causal Forest</label>
+      <label><input type="checkbox" value="DL (CV)" checked> DL (CV) — Ground Truth</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>GATE by Executive Constraints (Finding 3)</h3>
+    <p>
+      The headline heterogeneity result: institutions <em>moderate the mining
+      margin</em> (1-0 climbs from 0.175 at exec_constraints = 1 to 0.264 at
+      exec_constraints = 6, a 0.089 span) but <em>not the price margin</em>
+      (3-1 stays roughly flat across the same axis, a 0.045 span with no
+      monotone pattern). The asymmetry is the structural prediction of
+      Mehlum-Moene-Torvik (2006) and the empirical finding of
+      Hodler-Lechner-Raschky (2023).
+    </p>
+    <div class="chart-area" id="fp-gate"></div>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tabs 2 and 3</h3>
+    <p>
+      The Naive-vs-DML gap you just saw on the real EconML run is the same
+      gap the simulation in Tab 3 documents. Both confirm the post's
+      central methodological claim:
+    </p>
+    <ul>
+      <li><strong>Naive (1-0):</strong> 0.109 — 56% below the true 0.250.</li>
+      <li><strong>DML Causal Forest (1-0):</strong> 0.240 — within 4% of the true 0.250.</li>
+      <li><strong>Selection bias does not disappear with more data alone.</strong> The 0.13 gap is structural; it requires residualization to remove. That's why <code>CausalForestDML</code>'s two-stage architecture matters.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Causal Machine Learning and the Resource Curse with Python EconML</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

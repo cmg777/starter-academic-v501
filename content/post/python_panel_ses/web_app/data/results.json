@@ -1,0 +1,21 @@
+{
+  "alpha_true": 0.5,
+  "estimates": [
+    {"method": "Pooled OLS (conventional)",  "outcome": "Coefficient on x", "estimate": 1.0318, "se": 0.0345, "ci_lo": 0.9642, "ci_hi": 1.0994, "t": 29.92},
+    {"method": "Pooled OLS (White/HC)",      "outcome": "Coefficient on x", "estimate": 1.0318, "se": 0.0361, "ci_lo": 0.9610, "ci_hi": 1.1026, "t": 28.59},
+    {"method": "Pooled OLS (cluster: entity)","outcome": "Coefficient on x", "estimate": 1.0318, "se": 0.0621, "ci_lo": 0.9101, "ci_hi": 1.1535, "t": 16.62},
+    {"method": "Pooled OLS (cluster: time)", "outcome": "Coefficient on x", "estimate": 1.0318, "se": 0.0168, "ci_lo": 0.9989, "ci_hi": 1.0647, "t": 61.28},
+    {"method": "Pooled OLS (cluster: both)", "outcome": "Coefficient on x", "estimate": 1.0318, "se": 0.0532, "ci_lo": 0.9275, "ci_hi": 1.1361, "t": 19.38},
+    {"method": "Pooled OLS (Driscoll-Kraay)","outcome": "Coefficient on x", "estimate": 1.0318, "se": 0.0158, "ci_lo": 1.0008, "ci_hi": 1.0628, "t": 65.41},
+    {"method": "Entity FE (cluster: entity)","outcome": "Coefficient on x", "estimate": 0.4829, "se": 0.0357, "ci_lo": 0.4129, "ci_hi": 0.5529, "t": 13.53},
+    {"method": "Two-way FE (cluster: entity)","outcome": "Coefficient on x", "estimate": 0.4796, "se": 0.0376, "ci_lo": 0.4059, "ci_hi": 0.5533, "t": 12.74}
+  ],
+  "rejection_rates": [
+    {"model": "FE + conventional",        "rate": 0.060, "rejects": 30, "sims": 500, "verdict": "~correct"},
+    {"model": "FE + White (HC)",          "rate": 0.064, "rejects": 32, "sims": 500, "verdict": "~correct"},
+    {"model": "FE + cluster: entity",     "rate": 0.066, "rejects": 33, "sims": 500, "verdict": "~correct"},
+    {"model": "FE + cluster: time",       "rate": 0.090, "rejects": 45, "sims": 500, "verdict": "over-rejects"},
+    {"model": "FE + cluster: both",       "rate": 0.078, "rejects": 39, "sims": 500, "verdict": "~correct"},
+    {"model": "TWFE + cluster: entity",   "rate": 0.032, "rejects": 16, "sims": 500, "verdict": "conservative"}
+  ]
+}

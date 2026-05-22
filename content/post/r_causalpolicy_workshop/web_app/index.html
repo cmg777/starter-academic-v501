@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Six Ways to Evaluate a Policy — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Six Ways to Evaluate a Policy using R: Comparative Case Studies of Proposition 99'. A pedagogical web app with a counterfactual animation, a one-control-vs-many-control DiD simulator, the post's seven-method forest plot, and a parameter explorer.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Six Ways to Evaluate a Policy — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Six Ways to Evaluate a Policy using R: Comparative Case Studies of Proposition 99</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"     class="tab active" data-pane="pane-intro"     role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-sim"       class="tab"        data-pane="pane-sim"       role="tab" aria-selected="false">2 · Counterfactual Simulator</button>
+  <button id="tab-forest"    class="tab"        data-pane="pane-forest"    role="tab" aria-selected="false">3 · Seven-Method Forest Plot</button>
+  <button id="tab-explorer"  class="tab"        data-pane="pane-explorer"  role="tab" aria-selected="false">4 · Bias & Variance Lab</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Six ways to fill in the missing counterfactual</h2>
+  <p class="lede">
+    In January 1989 California raised its cigarette tax by 25 cents per pack
+    (<strong>Proposition 99</strong>). Per-capita cigarette sales then dropped
+    from 116 packs in 1988 to 60 packs in 2000 — a 48% fall. But smoking
+    was declining nationwide too. The whole post is built around one question:
+    <strong>how much of that drop was caused by the tax, and how much would have
+    happened anyway?</strong>
+  </p>
+  <p class="lede">
+    Every causal estimator on offer answers that question the same way:
+    construct a <em>counterfactual</em> — what California's sales would have
+    looked like <em>without</em> Proposition 99 — and report the gap between
+    observed and counterfactual as the policy effect. What changes from method
+    to method is <strong>how</strong> the counterfactual is built. This app
+    lets you see all six constructions side-by-side, simulate the easy and the
+    hard cases, and reproduce the post's headline forest plot.
+  </p>
+
+  <div class="card">
+    <h3>One observed series, six constructed counterfactuals</h3>
+    <p>
+      The orange curve is California's actual smoking history (1970–2000). The
+      vertical dashed line is the 1989 policy threshold. Click any method
+      button below to overlay <em>that method's</em> estimate of the
+      no-Proposition-99 counterfactual. The shaded gap between the orange
+      observed curve and the chosen dashed counterfactual is the policy
+      effect <em>that method</em> reports.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <div class="method-toggle" id="intro-methods" style="justify-content:center; margin-top: 6px;">
+      <label><input type="radio" name="intro-method" value="naive" checked> Naive pre-post</label>
+      <label><input type="radio" name="intro-method" value="did"> DiD (Nevada)</label>
+      <label><input type="radio" name="intro-method" value="its_growth"> ITS (growth)</label>
+      <label><input type="radio" name="intro-method" value="its_arima"> ITS (ARIMA)</label>
+      <label><input type="radio" name="intro-method" value="rdd"> RDD on time</label>
+      <label><input type="radio" name="intro-method" value="scm"> Synthetic Control</label>
+      <label><input type="radio" name="intro-method" value="bsts"> CausalImpact</label>
+    </div>
+    <p class="note" id="intro-method-note" style="text-align:center; margin-top: 10px;">—</p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Counterfactual Simulator</h4>
+      <p>Generate a stylised policy panel. Set the control state's secular trend, then watch DiD-with-one-control collapse to noise while a multi-donor blend recovers the true effect.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Seven-Method Forest Plot</h4>
+      <p>The post's headline figure. Toggle methods to compare the 13 to 20 pack consensus against the DiD-vs-Nevada and ITS-ARIMA outliers.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-explorer">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Bias & Variance Lab</h4>
+      <p>Run 100 simulations with a true effect you set. Watch which methods are biased, which are noisy, and how the donor pool size changes Synthetic Control's variance.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Counterfactual</summary>
+        <div class="gloss-body">What the treated unit's outcome <em>would have been</em> in the absence of the treatment. The unobservable column the whole tutorial is trying to estimate.</div>
+      </details>
+      <details class="gloss"><summary>ATT — Average Treatment effect on the Treated</summary>
+        <div class="gloss-body">The effect averaged over <em>only the units that received the policy</em>. Every causal method here targets California's ATT, not a population-wide ATE.</div>
+      </details>
+      <details class="gloss"><summary>Parallel trends</summary>
+        <div class="gloss-body">The DiD assumption: treated and control would have moved in <em>parallel</em> without the policy. Differences in <em>levels</em> are allowed; differences in <em>trends</em> are not.</div>
+      </details>
+      <details class="gloss"><summary>Donor pool</summary>
+        <div class="gloss-body">Synthetic Control's set of untreated states. Weights are chosen <em>data-driven</em> to mimic the treated unit's pre-period — instead of picking one neighbour by hand.</div>
+      </details>
+      <details class="gloss"><summary>RMSPE ratio</summary>
+        <div class="gloss-body">Synthetic Control's main fit/effect statistic. The pre-period RMSPE measures fit quality; the <em>post/pre ratio</em> measures effect size in unitless terms. California's ratio is 120.5 — the highest in the panel.</div>
+      </details>
+      <details class="gloss"><summary>Fisher exact p-value</summary>
+        <div class="gloss-body">Refit Synthetic Control 38 times, once for each donor state pretending to be treated. The treated unit's rank ÷ total units is the p-value. California's is 1/39 ≈ 0.026.</div>
+      </details>
+      <details class="gloss"><summary>BSTS — Bayesian Structural Time Series</summary>
+        <div class="gloss-body">CausalImpact's model: <em>y<sub>t</sub> = μ<sub>t</sub> + β'x<sub>t</sub> + ε<sub>t</sub></em>. Fit on pre-period, project the no-policy counterfactual forward as a posterior distribution with a credible interval.</div>
+      </details>
+      <details class="gloss"><summary>Posterior credible interval</summary>
+        <div class="gloss-body">A Bayesian interval that has a 95% probability of containing the true parameter <em>given the data</em>. Different from a frequentist CI — natural probability statement.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: COUNTERFACTUAL SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Counterfactual Simulator — why one control is fragile, and many is robust</h2>
+  <p class="lede">
+    Simulate a stylised state-year panel where California is treated in year 0
+    and there are <span class="kbd">J</span> donor states. You set the
+    <strong>true ATT</strong>, the noise level, and the <strong>control-trend
+    asymmetry</strong> — how strongly the single chosen control state drifts in
+    the same direction as California's secular trend. Then watch the gap
+    between (a) DiD against one neighbour and (b) a synthetic-control style
+    weighted blend.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Number of donor states J <span class="value" id="sim-j-val">20</span></label>
+      <input type="range" id="sim-j" min="5" max="50" step="1" value="20" aria-label="number of donor states">
+      <div class="hint">A bigger donor pool lets the blend match the treated unit's pre-period more precisely.</div>
+    </div>
+    <div class="control">
+      <label>True ATT (packs) <span class="value" id="sim-att-val">-15</span></label>
+      <input type="range" id="sim-att" min="-30" max="0" step="1" value="-15" aria-label="true treatment effect">
+      <div class="hint">The known causal effect. We will see which method recovers it.</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="sim-sd-val">3.0</span></label>
+      <input type="range" id="sim-sd" min="0.5" max="8" step="0.5" value="3.0" aria-label="noise standard deviation">
+      <div class="hint">Year-to-year sales noise. Bigger σ ⇒ less precise estimates.</div>
+    </div>
+    <div class="control">
+      <label>Control-trend asymmetry <span class="value" id="sim-asym-val">0.30</span></label>
+      <input type="range" id="sim-asym" min="0" max="1" step="0.05" value="0.30" aria-label="control trend asymmetry">
+      <div class="hint">0 = chosen control follows California's secular trend perfectly · 1 = control drifts in the <em>opposite</em> direction. This is the Nevada-vs-many-states fingerprint from §6.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-series"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">True ATT</div>
+      <div class="stat-value" id="sim-stat-true">—</div>
+      <div class="stat-sub">held fixed for comparison</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Naive pre-post α̂</div>
+      <div class="stat-value orange" id="sim-stat-naive">—</div>
+      <div class="stat-sub">no counterfactual at all</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">DiD α̂ (one control)</div>
+      <div class="stat-value orange" id="sim-stat-did">—</div>
+      <div class="stat-sub">subtract single neighbour's change</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">SCM-style α̂ (blend)</div>
+      <div class="stat-value teal" id="sim-stat-scm">—</div>
+      <div class="stat-sub">weighted average of all J donors</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Push asymmetry to 0.</strong> The single control mirrors California's secular trend and DiD collapses to roughly zero (or to the true ATT only if you also lower the secular trend) — Nevada's fingerprint in §6.</li>
+      <li><strong>Push asymmetry to 1.</strong> The control state's trend flips against California's secular drift. DiD now <em>overstates</em> the effect because it subtracts a positive change instead of a negative one.</li>
+      <li><strong>Watch the teal SCM-style estimate.</strong> Even as the asymmetry slider whips back and forth, the blended estimate stays close to the true ATT, because averaging J donors washes out any single donor's idiosyncratic trend.</li>
+      <li><strong>Drop J to 5.</strong> The SCM-style blend gets noisier and starts to track the single-DiD estimate. This is why Synthetic Control papers ask for at least 20 donors.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's seven-method forest plot — interactively</h2>
+  <p class="lede">
+    These numbers come straight from <code>table_cross_method.csv</code> in the
+    post's folder — the same data used to produce <code>fig9_cross_method_forest.png</code>.
+    Toggle methods to compare. Five of the seven estimators agree on a
+    <strong>13 to 28 packs/capita reduction</strong>. DiD-vs-Nevada
+    (<span class="kbd">−5.7</span>, CI crosses zero) and ITS-ARIMA
+    (<span class="kbd">+4.5</span>) are the outliers — for completely different
+    reasons.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Toggle the two outliers off</strong> (DiD vs Nevada and ITS-ARIMA) and watch the remaining five methods cluster tightly between −12 and −28 packs/capita.</li>
+      <li><strong>Compare Synthetic Control (teal, −18.8) and CausalImpact (steel, −12.8).</strong> Both build their counterfactual from many donor states. Their intervals overlap. They are the workshop's most defensible answers.</li>
+      <li><strong>RDD on time</strong> (−20.1) lands in the middle of the consensus group, but inherits all the pre-trend mis-specification risk from ITS — its tight CI is conditional on the segmented-regression model being right.</li>
+      <li><strong>Naive pre-post and ITS (growth curve)</strong> are nearly identical (≈ −27 vs −28). Both use only within-California information, so they cannot separate the policy effect from the nationwide secular decline.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive pre-post" checked> Naive pre-post</label>
+      <label><input type="checkbox" value="DiD (vs Nevada)" checked> DiD (vs Nevada)</label>
+      <label><input type="checkbox" value="ITS (growth curve)" checked> ITS (growth)</label>
+      <label><input type="checkbox" value="ITS (ARIMA)" checked> ITS (ARIMA)</label>
+      <label><input type="checkbox" value="RDD on time" checked> RDD on time</label>
+      <label><input type="checkbox" value="Synthetic Control" checked> Synthetic Control</label>
+      <label><input type="checkbox" value="CausalImpact" checked> CausalImpact</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Synthetic California's donor recipe</h3>
+    <p>
+      <code>tidysynth</code> chose convex weights that minimise pre-1988 RMSE on
+      the lagged outcomes and four covariates. The optimal mix turns out to be
+      a five-state cocktail — Utah, Nevada, Montana, Colorado, Connecticut —
+      absorbing 99.8% of the weight. Read this as "the synthetic California
+      that best matches the real California's 1970–1988 trajectory is built
+      from these five states in these proportions".
+    </p>
+    <div class="chart-area" id="fp-donors"></div>
+  </div>
+
+  <div class="card">
+    <h3>Why does DiD vs Nevada collapse?</h3>
+    <p>
+      Nevada is geographically and culturally adjacent to California. Its own
+      cigarette sales fell by 21.3 packs over 1984–1993 — almost as much as
+      California's 27.0 pack drop. When DiD subtracts that Nevada change from
+      California's change, almost all of California's drop is absorbed.
+      Synthetic Control's response is to <em>blend</em> 38 donor states using
+      data-driven weights, so no single similar-trending control can dominate.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Why does ITS-ARIMA flip sign?</h3>
+    <p>
+      The AICc-selected ARIMA(1, 2, 0) model double-differences California's
+      pre-period series. That picks up the <em>acceleration</em> of the late
+      1980s downward trend and extrapolates that acceleration aggressively.
+      The model's counterfactual lands <em>below</em> California's observed
+      post-period sales, implying the policy "raised" smoking by ≈ 4.5
+      packs. This is the textbook warning against single-best-AIC ITS without a
+      comparison-unit reality check.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: BIAS & VARIANCE LAB ====================== -->
+<section id="pane-explorer" class="tab-pane" role="tabpanel" aria-labelledby="tab-explorer">
+
+  <h2>Bias & Variance Lab — run the methods 100 times</h2>
+  <p class="lede">
+    Single runs are noisy. Run the simulator from Tab 2 one hundred times with
+    fresh random draws (same parameters) to see whether DiD-with-one-control
+    is <em>systematically</em> biased — and whether the multi-donor blend's
+    variance is small enough to be useful. Each simulation regenerates J donor
+    states from scratch and applies all three estimators.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Number of donor states J <span class="value" id="bv-j-val">20</span></label>
+      <input type="range" id="bv-j" min="5" max="40" step="1" value="20" aria-label="donor pool size">
+      <div class="hint">Capped at 40 so 100 simulations finish quickly.</div>
+    </div>
+    <div class="control">
+      <label>True ATT (packs) <span class="value" id="bv-att-val">-15</span></label>
+      <input type="range" id="bv-att" min="-30" max="0" step="1" value="-15" aria-label="true ATT">
+      <div class="hint">The known causal effect. The orange vertical line on the histogram.</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="bv-sd-val">3.0</span></label>
+      <input type="range" id="bv-sd" min="0.5" max="6" step="0.5" value="3.0" aria-label="noise sigma">
+      <div class="hint">Year-to-year sales noise.</div>
+    </div>
+    <div class="control">
+      <label>Control-trend asymmetry <span class="value" id="bv-asym-val">0.30</span></label>
+      <input type="range" id="bv-asym" min="0" max="1" step="0.05" value="0.30" aria-label="asymmetry">
+      <div class="hint">Same as Tab 2 — controls how badly the single DiD control mismatches.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Run the simulation</h3>
+    <p>Each click runs 100 fresh draws and tallies the three estimators' answers.</p>
+    <button class="action" id="bv-run">Run 100 simulations</button>
+    <span id="bv-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="bv-progress"><div></div></div>
+    <div class="chart-area" id="bv-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="bv-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Naive mean α̂</div><div class="stat-value orange" id="bv-naive-mean">—</div><div class="stat-sub">sd in parentheses</div></div>
+      <div class="stat"><div class="stat-label">DiD mean α̂</div><div class="stat-value orange" id="bv-did-mean">—</div></div>
+      <div class="stat"><div class="stat-label">SCM-style mean α̂</div><div class="stat-value teal" id="bv-scm-mean">—</div></div>
+      <div class="stat"><div class="stat-label">True α</div><div class="stat-value" id="bv-true-mean">—</div></div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>Connecting back to the post</h4>
+    <ul>
+      <li><strong>The orange Naive-pre-post histogram is centred near zero or far from the true α</strong> depending on whether the secular trend is included in the simulator. This is why the post calls Naive pre-post "descriptive, not causal".</li>
+      <li><strong>The orange DiD histogram is wide</strong> — its variance comes from picking a single noisy control unit. Bigger σ ⇒ wider DiD histogram. The post's Nevada DiD has the same fragility.</li>
+      <li><strong>The teal SCM-style histogram is tight and centred on the true α</strong> at J = 20+. Its variance is √J times smaller than DiD's because averaging J donors washes out idiosyncratic donor noise. This is the principled justification for Synthetic Control over hand-picked DiD.</li>
+      <li><strong>Drop J to 5</strong>, run again. The teal histogram widens. At J = 5 the blend is still better than single-DiD, but the gain over DiD is small. This is the empirical justification for the "at least 20 donors" rule of thumb.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Six Ways to Evaluate a Policy using R: Comparative Case Studies of Proposition 99</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

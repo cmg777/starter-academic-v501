@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Synthetic Control in Stata — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'The Synthetic Control Method in Stata: Did California's Tobacco Tax Cut Smoking?'. Build the synthetic California, watch the cigarette-sales gap unfold, and rank the placebo distribution.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Synthetic Control in Stata — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>The Synthetic Control Method in Stata: Did California's Tobacco Tax Cut Smoking?</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"   role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-donors"  class="tab"        data-pane="pane-donors"  role="tab" aria-selected="false">2 · Donor Recipe</button>
+  <button id="tab-gap"     class="tab"        data-pane="pane-gap"     role="tab" aria-selected="false">3 · The Gap</button>
+  <button id="tab-placebo" class="tab"        data-pane="pane-placebo" role="tab" aria-selected="false">4 · Placebo Ranking</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Did Proposition 99 cut California's cigarette consumption?</h2>
+  <p class="lede">
+    In January 1989, California's Proposition 99 raised the state cigarette tax
+    by 25 cents per pack and funded a comprehensive anti-smoking education
+    campaign. The honest counterfactual question — <em>what would California's
+    cigarette sales have been without the policy?</em> — cannot be answered by
+    rewinding history. The <strong>synthetic control method (SCM)</strong>
+    sidesteps this by building a weighted recipe of other US states whose
+    pre-1989 smoking trajectories looked indistinguishable from California's,
+    and using that synthetic stand-in as the missing counterfactual.
+  </p>
+  <p class="lede">
+    This app reproduces the post's three headline findings interactively.
+    In four tabs you will see how a sparse five-donor recipe (Utah, Nevada,
+    Montana, Colorado, Connecticut) is built, watch the actual–synthetic gap
+    open after 1989 and peak at <strong>−26.4 packs per capita in 1999</strong>,
+    and rank California against placebo runs on the other 38 states.
+  </p>
+
+  <div class="card">
+    <h3>The headline finding in one picture</h3>
+    <p>
+      The synthetic California is built almost entirely from <strong>five of
+      thirty-eight</strong> donor states. The remaining 33 states receive
+      exactly zero weight. This is what "sparse, convex combination" looks
+      like when you plot the weights.
+    </p>
+    <div class="chart-area" id="intro-donor-anim"></div>
+    <p class="note" style="margin-top: 10px;">
+      Utah, Nevada, Montana, Colorado, and Connecticut are the five states
+      whose pre-1989 smoking trajectories and demographics most closely
+      matched California's. A reader new to US tobacco-control history gets a
+      one-line summary: <em>Synthetic California ≈ 33% Utah + 24% Nevada +
+      20% Montana + 16% Colorado + 7% Connecticut.</em>
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-donors">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Donor Recipe</h4>
+      <p>The full 38-state donor pool. See which states were considered, and which got non-zero weight. Compare predictor balance side-by-side and inspect the V-weights.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-gap">
+      <div class="cta-tag">Tab 3</div>
+      <h4>The Gap</h4>
+      <p>Actual vs synthetic California, 1970–2000. Toggle the gap-only view to isolate the post-1989 divergence from the levels.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-placebo">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Placebo Ranking</h4>
+      <p>The full in-space placebo distribution. Trim by pre-treatment fit and see California rank 1 of 20 (pseudo p = 0.05).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Synthetic control method (SCM)</summary>
+        <div class="gloss-body">A weighted average of donor (untreated) units designed to reproduce the treated unit's pre-treatment trajectory. The post-treatment path of the synthetic is the missing potential outcome. Originated by Abadie &amp; Gardeazabal (2003), Abadie, Diamond &amp; Hainmueller (2010).</div>
+      </details>
+      <details class="gloss"><summary>Donor pool</summary>
+        <div class="gloss-body">The set of untreated units from which the synthetic is built. Here: 38 US states, excluding California and any states with their own contemporaneous tobacco-control measures.</div>
+      </details>
+      <details class="gloss"><summary>Unit weights W</summary>
+        <div class="gloss-body">Non-negative weights summing to 1. Picked by the inner optimization to minimise the distance between treated and synthetic predictor vectors. The California solution gives 33.4% to Utah, 23.5% to Nevada, 20.2% to Montana, 16.1% to Colorado, 6.8% to Connecticut, and 0 to all 33 others.</div>
+      </details>
+      <details class="gloss"><summary>Predictor weights V</summary>
+        <div class="gloss-body">A diagonal matrix that tells the inner problem how much each predictor matters. Found by the outer loop, which minimises pre-treatment outcome MSPE. Here: age 15–24 dominates (V = 0.546), with cigsale(1975) close behind (V = 0.422).</div>
+      </details>
+      <details class="gloss"><summary>Pre-treatment fit (RMSE, R²)</summary>
+        <div class="gloss-body">How closely the synthetic mimics the treated unit on the pre-treatment outcome. Synthetic California achieves RMSE = 1.76 packs and R² = 0.974 on pre-1989 cigsale — that's what justifies interpreting the post-1989 gap as causal.</div>
+      </details>
+      <details class="gloss"><summary>ATT (treatment effect)</summary>
+        <div class="gloss-body">The post-treatment difference between actual and synthetic outcomes. Headline estimate here is <strong>−19.0 packs per capita</strong> averaged over 1989–2000, growing from −7.6 packs in 1989 to −26.4 packs by 1999.</div>
+      </details>
+      <details class="gloss"><summary>In-space placebo</summary>
+        <div class="gloss-body">Run the algorithm pretending each donor state was the treated unit. Compare its post/pre MSPE ratio to California's. The California ratio of 123.5 ranks 1 of 39 (full) or 1 of 20 (trimmed by pre-fit comparability).</div>
+      </details>
+      <details class="gloss"><summary>MSPE ratio (post / pre)</summary>
+        <div class="gloss-body">A normalised statistic that lets placebo states with different fit qualities be compared. Larger ratio = larger relative gap. California: 123.5. Next-highest: Georgia 80.0, Virginia 79.0, Missouri 70.9.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: DONOR RECIPE ====================== -->
+<section id="pane-donors" class="tab-pane" role="tabpanel" aria-labelledby="tab-donors">
+
+  <h2>The donor recipe — who builds synthetic California?</h2>
+  <p class="lede">
+    The optimization searches the 38-state donor pool for the convex
+    combination whose pre-treatment predictors look most like California. The
+    result is a <strong>sparse five-state solution</strong>. Below: the
+    optimised weights for all 38 donor states (sorted), plus the predictor
+    balance that explains <em>why</em> these five were picked.
+  </p>
+
+  <div class="card">
+    <h3>Optimal donor weights</h3>
+    <p>
+      Steel blue = dominant donor (Utah). Orange = secondary donors (Nevada,
+      Montana, Colorado, Connecticut). All other 33 states are dimmed because
+      their optimised weights are exactly zero.
+    </p>
+    <div class="chart-area" id="donor-bars"></div>
+  </div>
+
+  <div class="card">
+    <h3>Predictor balance — why these five states win</h3>
+    <p>
+      For each of the 7 matched predictors, this table compares the treated
+      California value, the synthetic California value (from the optimised W),
+      and the simple average across the full donor pool.
+    </p>
+    <div class="balance-table" id="balance-table"></div>
+    <p class="note" style="margin-top: 10px;">
+      Look at <code>cigsale(1988)</code>: treated 90.1 vs synthetic 91.7
+      (sample mean: 113.8). California's pre-policy cigarette sales were
+      already well below the national average — synthetic California reproduces
+      that with only 1.7% bias, while the simple donor-pool average is off by
+      26.3%. Look at <code>cigsale(1975)</code>: treated 127.1 vs synthetic
+      127.1 (sample mean: 136.9). The match on a key pre-treatment outcome
+      year is essentially perfect — that is why the post-1989 divergence is
+      informative.
+    </p>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The five-donor sparsity is a feature, not a bug.</strong> When only a few donors closely resemble the treated unit, the optimiser correctly concentrates weight on them. The other 33 get exactly zero — no contribution. This is structurally different from a difference-in-differences design that gives equal weight to every control.</li>
+      <li><strong>The match is excellent on outcome-relevant predictors</strong> (all seven predictor biases ≤ 2.2%, five of them ≤ 0.3%). Compare this to the simple donor-pool average, which shows bias of 26.3% on cigsale(1988) and 14.9% on cigsale(1980).</li>
+      <li><strong>The V-weights tell you which predictors matter.</strong> Age 15–24 (V = 0.546) and cigsale(1975) (V = 0.422) together carry 97% of the predictor-weight mass. Log income receives essentially zero weight — the outer loop discovered that lnincome was not informative for distinguishing California from the donor pool on the outcome.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: THE GAP ====================== -->
+<section id="pane-gap" class="tab-pane" role="tabpanel" aria-labelledby="tab-gap">
+
+  <h2>Actual California vs synthetic California, 1970–2000</h2>
+  <p class="lede">
+    These are the real numbers from the post's <code>analysis.do</code> run.
+    Pre-1989 (grey shaded), the two paths should be indistinguishable — that
+    is the point of the construction. Post-1989, any divergence is the
+    estimated causal effect of Proposition 99, expressed in packs per capita.
+  </p>
+
+  <div class="card">
+    <h3>View</h3>
+    <div class="outcome-toggle" id="gap-view-toggle">
+      <label><input type="radio" name="gap-view" value="paths" checked> Both paths (actual + synthetic)</label>
+      <label><input type="radio" name="gap-view" value="actual-only"> Actual only</label>
+      <label><input type="radio" name="gap-view" value="synthetic-only"> Synthetic only</label>
+      <label><input type="radio" name="gap-view" value="gap"> Gap = actual − synthetic</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="gap-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Average ATT (1989–2000)</div>
+      <div class="stat-value orange" id="stat-att-avg">−19.00</div>
+      <div class="stat-sub">packs per capita per year</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Peak gap (1999)</div>
+      <div class="stat-value orange" id="stat-att-peak">−26.37</div>
+      <div class="stat-sub">single-year maximum deficit</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">End-of-window gap (2000)</div>
+      <div class="stat-value teal" id="stat-att-end">−25.76</div>
+      <div class="stat-sub">−38% vs synthetic counterfactual</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Pre-1989 fit RMSE</div>
+      <div class="stat-value teal" id="stat-prefit">1.76</div>
+      <div class="stat-sub">R² = 0.974</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Pre-1989 the two lines are nearly indistinguishable.</strong> Both fall from about 123 to 90 packs across the 19 pre-treatment years. RMSE = 1.76 packs and R² = 0.974 — the synthetic is doing what it was constructed to do.</li>
+      <li><strong>Starting at 1989 the lines diverge.</strong> The gap opens at −7.6 packs in 1989 and deepens monotonically through the 1990s. By 1999 the deficit reaches its largest single-year value of <strong>−26.4 packs per capita</strong>. This corresponds to roughly a <strong>38% reduction</strong> in cigarette sales relative to the no-policy counterfactual.</li>
+      <li><strong>The effect compounds rather than fades.</strong> Unlike short-run shocks, the divergence widens over the entire post-period — consistent with cumulative behavioural change, anti-smoking campaigns reinforcing each year, and declining social acceptability of smoking.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: PLACEBO RANKING ====================== -->
+<section id="pane-placebo" class="tab-pane" role="tabpanel" aria-labelledby="tab-placebo">
+
+  <h2>In-space placebo distribution — is California's gap unusual?</h2>
+  <p class="lede">
+    The same algorithm is re-run with each of the other 38 states as the
+    "treated" unit. If Proposition 99 had no causal effect, then California's
+    post/pre MSPE ratio should be unremarkable in this distribution. The chart
+    below shows where it actually sits.
+  </p>
+
+  <div class="card">
+    <h3>Filter</h3>
+    <div class="outcome-toggle" id="placebo-toggle">
+      <label><input type="radio" name="placebo-view" value="trimmed" checked> Trimmed (pre-MSPE within ×2 of California's, 20 states)</label>
+      <label><input type="radio" name="placebo-view" value="full"> Full (all 39 states, including incomparable-fit ones)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="placebo-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">California ratio (post / pre MSPE)</div>
+      <div class="stat-value orange">123.5</div>
+      <div class="stat-sub">pre-MSPE 3.17, post-MSPE 391.3</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Rank (trimmed)</div>
+      <div class="stat-value orange">1 of 20</div>
+      <div class="stat-sub">pseudo p = 0.050</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Rank (full, untrimmed)</div>
+      <div class="stat-value teal">1 of 39</div>
+      <div class="stat-sub">pseudo p = 0.026</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Next-highest ratio (Georgia)</div>
+      <div class="stat-value teal">80.0</div>
+      <div class="stat-sub">California exceeds it by 43.5 units</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>How to read this</h4>
+    <ul>
+      <li><strong>Toggle to "Full" view</strong> to see the entire 39-state distribution. California's MSPE ratio of 123.5 is the highest of any state — its post/pre ratio is 54% larger than Georgia (80.0), the runner-up. The probability of obtaining a ratio this extreme by chance, drawing one state from the full pool, is 1/39 ≈ 0.026.</li>
+      <li><strong>Switch back to "Trimmed."</strong> The <code>cut(2)</code> filter excludes 19 states whose pre-treatment MSPE is more than twice California's. This removes states like Maine and New Hampshire, where high pre-fit error means even a small post-period gap divides into a large ratio (mechanical, not informative). Among the 20 states with comparable pre-fit, California again ranks 1st, giving pseudo p = 1/20 = 0.050.</li>
+      <li><strong>The honest takeaway from this tab:</strong> the two p-values (0.026 unfiltered, 0.050 trimmed) bracket the conventional 5% threshold. The unfiltered p is below 5%; the trimmed p sits exactly at it. Both, together with the visual evidence in Tab 3, support the conclusion that Proposition 99 had a real, statistically detectable causal effect on California's cigarette consumption.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to the previous tabs</h3>
+    <p>
+      The placebo evidence (Tab 4) and the donor-weight structure (Tab 2)
+      should be read together. The five states that compose synthetic
+      California (Utah, Nevada, Montana, Colorado, Connecticut) are
+      <em>not</em> the placebos that rank near the top — Georgia, Virginia,
+      Missouri, Texas, and Oklahoma are. Those high-ranking placebos are
+      states whose own synthetic-control fits happen to have large post-1988
+      gaps for reasons unrelated to tobacco policy (cross-border shopping,
+      smuggling, demographic shifts). California's gap stands out
+      <em>relative to</em> this null distribution — which is exactly the
+      hypothesis test the in-space placebo is designed to run.
+    </p>
+    <p>
+      The post also runs an <strong>in-time placebo</strong> (fake treatment
+      at 1985) and <strong>leave-one-out robustness</strong> (excluding each
+      weighted donor one at a time). Both confirm the baseline: the in-time
+      placebo finds small effects of −3 to −9 packs in the fake-treatment
+      window 1985–1988, growing sharply to −14 to −26 packs only after the
+      real 1989 onset; the LOO analysis shows the year-2000 effect ranges
+      from −23.5 to −28.4 packs across the five LOO specifications, never
+      approaching zero.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>The Synthetic Control Method in Stata: Did California's Tobacco Tax Cut Smoking?</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

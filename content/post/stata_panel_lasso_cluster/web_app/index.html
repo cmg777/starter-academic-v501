@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>C-LASSO Latent Groups — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Identifying Latent Group Structures in Panel Data: The classifylasso Command in Stata'. Build intuition for Classifier-LASSO, latent groups, and how pooled estimates can hide opposite-signed effects.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>C-LASSO Latent Groups — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Identifying Latent Group Structures in Panel Data: The classifylasso Command in Stata</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"      class="tab"        data-pane="pane-lab"      role="tab" aria-selected="false">2 · Penalty Lab</button>
+  <button id="tab-showdown" class="tab"        data-pane="pane-showdown" role="tab" aria-selected="false">3 · Pooled vs Group</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why search for latent groups in a panel?</h2>
+  <p class="lede">
+    Most panel-data models assume every country shares the same slope on
+    every regressor. That is a strong assumption — and often a wrong one.
+    The post you are reading shows that the pooled democracy-growth
+    coefficient of <strong>+1.055</strong> for 98 countries hides a sharp split:
+    <strong>+2.151</strong> in 57 countries and
+    <strong>−0.936</strong> in 41 countries. Pooling averaged a positive and
+    a negative effect into a single misleading number.
+  </p>
+  <p class="lede">
+    The <strong>Classifier-LASSO</strong> (C-LASSO) of Su, Shi &amp; Phillips
+    (2016) discovers these latent groups directly from the data. This app lets
+    you turn the dials yourself: sweep the LASSO penalty and watch coefficients
+    snap to zero, simulate panels with two hidden groups and see when pooled
+    OLS misleads, and explore the post's group-specific results in a forest plot.
+  </p>
+
+  <div class="card">
+    <h3>LASSO (L1) vs Ridge (L2) — why LASSO selects, Ridge does not</h3>
+    <p>
+      Both methods shrink coefficients toward zero, but only LASSO drives them
+      <strong>exactly to zero</strong>. The animation below shows the same
+      coefficient under the two penalties as the penalty λ grows: the orange
+      L1 estimate hits zero abruptly, the steel-blue L2 estimate asymptotes
+      but never reaches zero. C-LASSO uses the same selection mechanic to
+      collapse country-specific slopes onto a small number of group centres.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Penalty Lab</h4>
+      <p>Slide λ and watch which controls survive. The same penalty mechanic that selects predictors here is what C-LASSO uses to sort countries into groups.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Pooled vs Group</h4>
+      <p>Simulate a panel with two hidden groups whose slopes have opposite signs. Watch pooled OLS shrink to near zero while two-group estimates recover the truth.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>The post's headline numbers, interactively. Compare pooled fixed effects against C-LASSO Group 1 and Group 2 for both savings and democracy.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Slope heterogeneity</summary>
+        <div class="gloss-body">When the same regressor has a <em>different</em> coefficient across units. A pooled regression imposes one slope; if reality is heterogeneous, the pooled slope is a contaminated average.</div>
+      </details>
+      <details class="gloss"><summary>Latent groups</summary>
+        <div class="gloss-body">Unobserved subsets of units sharing the same slope vector. <em>Latent</em> because membership is not known in advance — the algorithm discovers it.</div>
+      </details>
+      <details class="gloss"><summary>Penalty λ</summary>
+        <div class="gloss-body">The knob controlling shrinkage. In C-LASSO, larger λ pulls more country-specific slopes toward a common group centre. <em>This is the main slider in Tab 2.</em></div>
+      </details>
+      <details class="gloss"><summary>Classifier-LASSO (C-LASSO)</summary>
+        <div class="gloss-body">A penalized panel estimator (Su, Shi &amp; Phillips 2016) that <em>jointly</em> estimates the number of groups, group memberships, and group-specific slopes — in one optimization.</div>
+      </details>
+      <details class="gloss"><summary>Information criterion (IC)</summary>
+        <div class="gloss-body">Balances fit against complexity to pick the optimal K. In both applications, IC selects K = 2 groups (savings IC: 0.054 → −0.028 → 0.059 → 0.131 → 0.213 for K = 1…5).</div>
+      </details>
+      <details class="gloss"><summary>Postlasso step</summary>
+        <div class="gloss-body">Once C-LASSO assigns countries to groups, plain OLS is re-run within each group. The selection stage uses the penalty; the inference stage does not.</div>
+      </details>
+      <details class="gloss"><summary>Simpson's paradox</summary>
+        <div class="gloss-body">When an aggregate trend reverses inside subgroups. The pooled democracy coefficient (+1.055) sits between the C-LASSO group estimates (+2.151 and −0.936) — it describes <em>neither group accurately</em>.</div>
+      </details>
+      <details class="gloss"><summary>Nickell bias</summary>
+        <div class="gloss-body">The downward bias of the lagged-DV coefficient when fixed effects are applied to short panels. Within-demeaning correlates the lagged regressor with the demeaned error. C-LASSO's <code>dynamic</code> option uses a half-panel jackknife to remove it.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: PENALTY LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>Penalty Lab — turn the LASSO knob yourself</h2>
+  <p class="lede">
+    The simulated data has one focal regressor and many candidates. The
+    focal coefficient α = 0.5 (orange curve below). Drag the λ slider and
+    watch coefficients shrink to <em>exactly zero</em>, one at a time. The
+    same shrinkage mechanic is what C-LASSO uses to pull country-specific
+    slopes toward a small number of group centres in the post.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">200</span></label>
+      <input type="range" id="lab-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">More data ⇒ each coefficient is estimated more precisely.</div>
+    </div>
+    <div class="control">
+      <label>Number of regressors p <span class="value" id="lab-p-val">40</span></label>
+      <input type="range" id="lab-p" min="5" max="100" step="1" value="40" aria-label="number of regressors p">
+      <div class="hint">About 15% have a true nonzero effect; the rest are noise — mirroring the unit-by-unit C-LASSO first stage.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="lab-s-val">0.60</span></label>
+      <input type="range" id="lab-s" min="0.1" max="1.5" step="0.05" value="0.60" aria-label="signal strength">
+      <div class="hint">Magnitude of the truly-relevant coefficients relative to noise.</div>
+    </div>
+    <div class="control">
+      <label>Penalty <span class="value" id="lab-l-val">—</span></label>
+      <input type="range" id="lab-l" min="0" max="79" step="1" value="40" aria-label="penalty index">
+      <div class="hint">Slide left for less shrinkage (more coefficients survive); right for more.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-path"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">coefficients kept</div>
+      <div class="stat-value teal" id="lab-stat-nz">—</div>
+      <div class="stat-sub">out of <span id="lab-stat-p">—</span> candidates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from raw LASSO</div>
+      <div class="stat-value orange" id="lab-stat-alpha-l">—</div>
+      <div class="stat-sub">shrunk toward zero</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from post-OLS</div>
+      <div class="stat-value orange" id="lab-stat-alpha-o">—</div>
+      <div class="stat-sub">refit on selected support</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true α</div>
+      <div class="stat-value" id="lab-stat-alpha-t">0.50</div>
+      <div class="stat-sub">held fixed for comparison</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Sparsity grows with λ.</strong> Slide right: more coefficients are pinned to zero. Slide left: more re-enter. At λ ≈ 0 you recover OLS. <em>In C-LASSO, this same dial controls how many distinct group centres survive.</em></li>
+      <li><strong>The post-OLS α̂ tracks the true α more closely than the raw LASSO α̂.</strong> LASSO biases <em>all</em> coefficients toward zero. The postlasso refit removes that bias on the selected support — which is exactly why the post reports postlasso group coefficients.</li>
+      <li><strong>The orange focal coefficient stays in.</strong> Try a large p and large λ: most predictors disappear, but the focal effect remains visible. C-LASSO does the analogous thing — it does not zero out group slopes, only the differences <em>between</em> units within a group.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="lab-reseed">Reseed random draws</button>
+      <button class="action secondary" id="lab-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: POOLED vs GROUP ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>Pooled vs Group — when averaging cancels the truth</h2>
+  <p class="lede">
+    The post's headline finding is Simpson's paradox in panel data: the pooled
+    democracy coefficient (+1.055) sits between +2.151 (Group 1, 57 countries)
+    and −0.936 (Group 2, 41 countries). It describes <em>neither group</em>.
+    Below, we simulate a panel where the focal coefficient is
+    <strong>positive in one half of the units and negative in the other half</strong>.
+    Watch what pooled OLS does to the average — and how recovering the two
+    groups uncovers the truth.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Capped at 300 so the "Run 100 sims" button finishes quickly.</div>
+    </div>
+    <div class="control">
+      <label>Number of regressors p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of regressors p">
+      <div class="hint">Capped at 50 for the 100-sim run.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Common scale for both groups.</div>
+    </div>
+    <div class="control">
+      <label>Group asymmetry <span class="value" id="sh-a-val">0.80</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.80" aria-label="asymmetry">
+      <div class="hint">0 = both groups share the same slope · 1 = groups have strongly opposite slopes (the post's setting).</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Pooled FE</span> single slope for everyone</h3>
+      <p class="note" style="margin:0 0 10px;">Assumes all units share <code>β_i = β</code> — averages opposite signs together.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-rig-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-rig-lam">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">C-LASSO-style</span> select-then-refit on groups</h3>
+      <p class="note" style="margin:0 0 10px;">A data-driven selection step finds the right support; postlasso OLS refits without shrinkage — the procedure the post uses for inference.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-cv-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-cv-lam">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Crank up the asymmetry slider.</strong> When groups disagree strongly (asymmetry → 1), the pooled estimate collapses toward zero even though the truth is far from zero in each group. This is exactly the savings model: pooled CPI = +0.030 hides −0.181 and +0.478.</li>
+      <li><strong>Reduce asymmetry to 0.</strong> Both groups now share the same slope. The pooled estimate is now <em>unbiased</em> — there is no latent structure to discover. C-LASSO would correctly pick K = 1 here.</li>
+      <li><strong>Variance vs bias.</strong> The pooled estimate has lower variance (it uses all N units) but is badly biased under heterogeneity. C-LASSO trades a little variance for a lot of bias reduction — when the data supports a multi-group structure.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different random shocks) to see whether the pooled bias is systematic.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Pooled mean α̂</div><div class="stat-value orange" id="sh-cv-mean">—</div><div class="stat-sub">bias toward zero under heterogeneity</div></div>
+      <div class="stat"><div class="stat-label">Pooled sd(α̂)</div><div class="stat-value" id="sh-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Group-refit mean α̂</div><div class="stat-value teal" id="sh-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">Group-refit sd(α̂)</div><div class="stat-value" id="sh-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's headline numbers — interactively</h2>
+  <p class="lede">
+    These coefficients come straight from the post's Stata C-LASSO output for
+    the savings and democracy applications. Toggle outcomes and methods to
+    compare. Hover a point to see its standard error, 95% CI, and the number
+    of countries each estimate is built on.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The democracy split is the most dramatic.</strong> Pooled FE gives +1.055. C-LASSO Group 1 (57 countries) gives +2.151. Group 2 (41 countries) gives <em>−0.936</em>. The confidence bands of G1 and G2 do not overlap.</li>
+      <li><strong>The CPI sign reversal survives the dynamic specification.</strong> Toggle between "CPI → Savings (static)" and "CPI → Savings (dynamic)". Group 1 stays negative (−0.181 → −0.160); Group 2 stays positive (+0.478 → +0.197). The groups are robust.</li>
+      <li><strong>Pooled FE bars hug zero or sit between the groups.</strong> For both CPI and Interest, the pooled estimate is small and indistinguishable from zero — averaging opposite-signed effects cancels them out.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Democracy → lnPGDP" checked> Democracy → lnPGDP</label>
+      <label><input type="checkbox" value="CPI → Savings (static)" checked> CPI → Savings (static)</label>
+      <label><input type="checkbox" value="CPI → Savings (dynamic)" checked> CPI → Savings (dynamic)</label>
+      <label><input type="checkbox" value="Interest → Savings (static)"> Interest → Savings (static)</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Pooled FE" checked> Pooled FE</label>
+      <label><input type="checkbox" value="C-LASSO G1" checked> C-LASSO G1 (positive group)</label>
+      <label><input type="checkbox" value="C-LASSO G2" checked> C-LASSO G2 (negative group)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+  <div class="chart-area" id="fp-bars"></div>
+
+  <div class="card">
+    <h3>Why does C-LASSO matter here?</h3>
+    <p>
+      The pooled democracy coefficient of <code>+1.055</code> sits between
+      <code>+2.151</code> and <code>−0.936</code> — it describes <em>neither</em>
+      group. A policymaker reading the pooled result would conclude democracy
+      universally promotes growth. They would miss that for 41 countries
+      (42% of the sample), the conditional association runs in the opposite
+      direction. The same logic flips an "insignificant" pooled CPI coefficient
+      (+0.030) into two highly significant group-specific effects of opposite
+      sign (−0.181 and +0.478). C-LASSO does not invent these patterns — it
+      reveals them.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The pooled-versus-group simulation in Tab 3 is what happens here on the
+      real data:
+    </p>
+    <ul>
+      <li><strong>Democracy:</strong> pooled gives +1.055; group split is +2.151 vs −0.936 — sign reversal across 42% of countries.</li>
+      <li><strong>CPI on savings (static):</strong> pooled gives +0.030 (insignificant); group split is −0.181 vs +0.478 — both highly significant, opposite signs.</li>
+      <li><strong>CPI on savings (dynamic):</strong> pooled is still small; group split survives at −0.160 vs +0.197 — robustness across specifications.</li>
+    </ul>
+    <p>
+      The lesson from §10 of the post is therefore visible <em>twice</em>:
+      once on a simulation where you set the truth, and once on the original
+      panels of 56 countries (savings) and 98 countries (democracy).
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Identifying Latent Group Structures in Panel Data: The classifylasso Command in Stata</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

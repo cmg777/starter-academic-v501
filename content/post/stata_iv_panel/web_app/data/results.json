@@ -1,0 +1,39 @@
+{
+  "estimates": [
+    { "method": "OLS",          "outcome": "Conflict 1+",  "estimate":  0.0008, "se": 0.0012, "ci_lo": -0.0015, "ci_hi":  0.0030, "n_selected": null, "first_stage_F": null },
+    { "method": "2SLS: Rain",   "outcome": "Conflict 1+",  "estimate": -0.3033, "se": 0.1108, "ci_lo": -0.5205, "ci_hi": -0.0862, "n_selected": 1,    "first_stage_F": 24.62 },
+    { "method": "2SLS: Drought","outcome": "Conflict 1+",  "estimate": -0.2931, "se": 0.0848, "ci_lo": -0.4594, "ci_hi": -0.1269, "n_selected": 1,    "first_stage_F": 40.33 },
+    { "method": "2SLS: Both",   "outcome": "Conflict 1+",  "estimate": -0.2963, "se": 0.0756, "ci_lo": -0.4444, "ci_hi": -0.1482, "n_selected": 2,    "first_stage_F": 25.32 },
+
+    { "method": "OLS",          "outcome": "Conflict 25+", "estimate":  0.0009, "se": 0.0008, "ci_lo": -0.0007, "ci_hi":  0.0025, "n_selected": null, "first_stage_F": null },
+    { "method": "2SLS: Rain",   "outcome": "Conflict 25+", "estimate": -0.0916, "se": 0.0575, "ci_lo": -0.2043, "ci_hi":  0.0211, "n_selected": 1,    "first_stage_F": 24.62 },
+    { "method": "2SLS: Drought","outcome": "Conflict 25+", "estimate": -0.0932, "se": 0.0461, "ci_lo": -0.1835, "ci_hi": -0.0028, "n_selected": 1,    "first_stage_F": 40.33 },
+    { "method": "2SLS: Both",   "outcome": "Conflict 25+", "estimate": -0.0927, "se": 0.0400, "ci_lo": -0.1711, "ci_hi": -0.0142, "n_selected": 2,    "first_stage_F": 25.32 }
+  ],
+  "reduced_form": [
+    { "instrument": "Rain(t-2)",    "outcome": "Conflict 1+",  "estimate": -0.0109, "se": 0.0034, "ci_lo": -0.0175, "ci_hi": -0.0043 },
+    { "instrument": "Drought(t-2)", "outcome": "Conflict 1+",  "estimate": -0.0016, "se": 0.0004, "ci_lo": -0.0024, "ci_hi": -0.0009 },
+    { "instrument": "Rain(t-2)",    "outcome": "Conflict 25+", "estimate": -0.0033, "se": 0.0020, "ci_lo": -0.0072, "ci_hi":  0.0006 },
+    { "instrument": "Drought(t-2)", "outcome": "Conflict 25+", "estimate": -0.0005, "se": 0.0002, "ci_lo": -0.0010, "ci_hi": -0.0000 }
+  ],
+  "first_stage": [
+    { "instrument": "Rain(t-2)",    "coef": 0.0361, "se": 0.0073, "F": 24.62, "stock_yogo_10pct": 16.38, "verdict": "Strong" },
+    { "instrument": "Drought(t-2)", "coef": 0.0055, "se": 0.0009, "F": 40.33, "stock_yogo_10pct": 16.38, "verdict": "Strong" },
+    { "instrument": "Both",         "coef": null,   "se": null,   "F": 25.32, "stock_yogo_10pct": 16.38, "verdict": "Strong" }
+  ],
+  "hansen_j": {
+    "statistic": 0.007,
+    "p_value": 0.932,
+    "df": 1,
+    "verdict": "Fail to reject (instruments appear valid)"
+  },
+  "data_meta": {
+    "n_obs": 96591,
+    "n_regions": 5689,
+    "year_min": 1994,
+    "year_max": 2010,
+    "n_countries": 53,
+    "conflict01_baseline": 0.0455,
+    "conflict25_baseline": 0.0145
+  }
+}

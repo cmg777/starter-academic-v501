@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Dynamic Panel GMM — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Dynamic Panel Data with Arellano-Bond GMM in Stata: The Effect of War on Economic Growth'. Sliders, simulators and a forest plot to build intuition for Nickell bias, internal lag instruments, and the war effect on GDP.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Dynamic Panel GMM — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Dynamic Panel Data with Arellano-Bond GMM in Stata: The Effect of War on Economic Growth</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-nickell" class="tab"        data-pane="pane-nickell"  role="tab" aria-selected="false">2 · Nickell Bias Simulator</button>
+  <button id="tab-forest"  class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">3 · Forest Plot</button>
+  <button id="tab-diag"    class="tab"        data-pane="pane-diag"     role="tab" aria-selected="false">4 · Diagnostics &amp; Mediation</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Does war really hurt GDP? And why use Arellano-Bond GMM?</h2>
+  <p class="lede">
+    The naive cross-country regression of GDP growth on war indicators often
+    returns a small or insignificant coefficient. The case-study record paints
+    a much darker picture. The mismatch is statistical, not substantive:
+    countries that fight wars are not a random subsample of the world, and the
+    dependent variable is highly persistent. <strong>Dynamic panel GMM</strong>
+    fixes both problems by first-differencing (removing fixed effects) and
+    using deeper lags of the level variable as <em>internal instruments</em>
+    for the differenced lagged dependent variable.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. Across four tabs you will:
+    visualise <strong>Nickell bias</strong> as the demeaning-induced
+    correlation that shrinks with panel length T; simulate an AR(1) panel and
+    compare static FE to Arellano-Bond GMM as T grows; explore the post's
+    actual coefficient forest for the four nested models; and inspect AR(2)
+    and Hansen J diagnostics alongside the institutional-mediation pattern.
+  </p>
+
+  <div class="card">
+    <h3>The Nickell-bias intuition (animation)</h3>
+    <p>
+      Two estimators of the lagged-DV coefficient <span class="kbd">ρ</span>
+      are tracked as the panel length <em>T</em> grows. The
+      <strong style="color:#d97757;">orange</strong> curve is static fixed
+      effects: it <em>asymptotes</em> to the true ρ from below, with bias of
+      order <em>−1/T</em>. The <strong style="color:#00d4c8;">teal</strong>
+      curve is Arellano-Bond difference GMM: it hits the true ρ almost
+      immediately and stays there. At short T, the gap between the two curves
+      is the Nickell-bias penalty you pay for using `xtreg, fe` on a dynamic
+      model.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-nickell">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Nickell Bias Simulator</h4>
+      <p>Set T, ρ, and noise. Draw a fresh AR(1) panel. Watch fixed-effects ρ̂ pull toward zero as T shrinks, and watch Arellano-Bond ρ̂ stay close to the truth.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Forest Plot</h4>
+      <p>Every coefficient from the post's four nested xtabond2 models with 95% CIs. Toggle which coefficients and which models to see; hover for SE and 95% CI.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-diag">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Diagnostics &amp; Mediation</h4>
+      <p>AR(2) and Hansen J p-values for every model, plus the institutional-mediation pattern: the long-run War effect shrinks from −0.35 (Model 1) to −0.17 (Model 4) as controls enter.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Dynamic panel</summary>
+        <div class="gloss-body">A panel regression with the <em>lagged dependent variable</em> on the right-hand side: <code>y[i,t] = ρ y[i,t-1] + β x[i,t] + αᵢ + εᵢₜ</code>. Captures inertia, but creates an identification problem under fixed effects.</div>
+      </details>
+      <details class="gloss"><summary>Nickell bias</summary>
+        <div class="gloss-body">The downward bias of the lagged-DV coefficient when fixed effects are applied to short panels. Order <em>−1/T</em>. With T ≈ 13, this is too large to ignore.</div>
+      </details>
+      <details class="gloss"><summary>First-differencing</summary>
+        <div class="gloss-body"><code>Δy[i,t] = y[i,t] − y[i,t−1]</code>. The country-specific fixed effect αᵢ vanishes by construction. The launching pad for difference GMM.</div>
+      </details>
+      <details class="gloss"><summary>Internal lag instruments</summary>
+        <div class="gloss-body">After differencing, the differenced lag is correlated with Δε. Fix: instrument with deeper lags of the level variable. In Stata: <code>gmm(L.y, lag(2 6))</code>.</div>
+      </details>
+      <details class="gloss"><summary>Arellano-Bond GMM</summary>
+        <div class="gloss-body">Combines first-differencing with internal-lag instruments. Fits the moment conditions <code>E[Z' Δε] = 0</code>. Implemented in Stata as <code>xtabond2 ... noleveleq</code>.</div>
+      </details>
+      <details class="gloss"><summary>Long-run cumulative effect</summary>
+        <div class="gloss-body">The total integrated impact of a permanent shock. Equals <em>β₀ + β₁ + β₂</em> for the War coefficients here. Computed by Stata's <code>nlcom</code> using the delta method.</div>
+      </details>
+      <details class="gloss"><summary>AR(2) test</summary>
+        <div class="gloss-body">Diagnostic for difference GMM. Tests second-order serial correlation in <em>differenced</em> errors. AR(1) is mechanical; AR(2) would invalidate lag-2 instruments. Null: no AR(2).</div>
+      </details>
+      <details class="gloss"><summary>Hansen J test</summary>
+        <div class="gloss-body">Joint test of instrument exogeneity. χ² under the null that all instruments are orthogonal to the error. <em>Both</em> too-low and very-near-1 p-values are red flags.</div>
+      </details>
+      <details class="gloss"><summary>Estimand framing</summary>
+        <div class="gloss-body">War is a continuous magnitude (0-1), not a binary treatment, so the recovered effect is <em>not</em> an ATE or ATT. It is the within-country dynamic effect of a one-unit change in war intensity on log GDP per capita.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: NICKELL BIAS SIMULATOR ====================== -->
+<section id="pane-nickell" class="tab-pane" role="tabpanel" aria-labelledby="tab-nickell">
+
+  <h2>Nickell Bias Simulator — fixed effects vs Arellano-Bond on AR(1) panels</h2>
+  <p class="lede">
+    The data-generating process is a simple AR(1) panel with country fixed
+    effects: <code>y[i,t] = ρ y[i,t-1] + αᵢ + εᵢₜ</code>. Slide the panel
+    length <em>T</em>, the true persistence <em>ρ</em>, and the noise level,
+    then click the bar chart cells to redraw. The grey bar is OLS on the
+    pooled data (biased upward by α). The orange bar is within-FE (biased
+    downward — the Nickell bias). The teal bar is Arellano-Bond difference
+    GMM with internal lag instruments. <strong>Watch how the bias gap closes
+    only as T grows.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Panel length T <span class="value" id="nb-T-val">10</span></label>
+      <input type="range" id="nb-T" min="4" max="30" step="1" value="10" aria-label="panel length T">
+      <div class="hint">Number of time periods per country. Nickell bias is of order −1/T, so it is severe at T = 4 and small at T = 30. The post uses T ≈ 13.</div>
+    </div>
+    <div class="control">
+      <label>True ρ <span class="value" id="nb-rho-val">0.70</span></label>
+      <input type="range" id="nb-rho" min="0.1" max="0.95" step="0.05" value="0.70" aria-label="true rho">
+      <div class="hint">Persistence of the AR(1) process. The post's estimate is ρ ≈ 0.68.</div>
+    </div>
+    <div class="control">
+      <label>Number of countries N <span class="value" id="nb-N-val">100</span></label>
+      <input type="range" id="nb-N" min="30" max="200" step="10" value="100" aria-label="N countries">
+      <div class="hint">Cross-sectional units. The post has N = 155 in Model 1.</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="nb-sig-val">1.00</span></label>
+      <input type="range" id="nb-sig" min="0.3" max="2.0" step="0.1" value="1.00" aria-label="noise sigma">
+      <div class="hint">Idiosyncratic shock standard deviation.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="nb-bar"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">true ρ</div>
+      <div class="stat-value" id="nb-stat-true">0.70</div>
+      <div class="stat-sub">target the estimators are chasing</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">OLS ρ̂ (pooled)</div>
+      <div class="stat-value" id="nb-stat-ols" style="color:#8b9dc3;">—</div>
+      <div class="stat-sub">biased upward by αᵢ</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">FE ρ̂ (within)</div>
+      <div class="stat-value orange" id="nb-stat-fe">—</div>
+      <div class="stat-sub">Nickell bias ≈ −(1+ρ)/T</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Arellano-Bond ρ̂</div>
+      <div class="stat-value teal" id="nb-stat-ab">—</div>
+      <div class="stat-sub">internal lag instruments fix it</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Drag T to 4 or 5.</strong> The orange FE bar drifts well below the true ρ. This is Nickell bias. At T = 13 (the post's panel length) FE underestimates ρ by roughly (1+ρ)/T ≈ 0.13 — far from negligible.</li>
+      <li><strong>Drag T up toward 30.</strong> The orange bar climbs toward the teal Arellano-Bond bar. Nickell bias is a <em>short-panel</em> problem; in long panels FE is fine.</li>
+      <li><strong>Set ρ ≈ 0.9.</strong> Even at T = 13 the FE bar undershoots noticeably. High persistence amplifies the bias.</li>
+      <li><strong>OLS (grey)</strong> sits well <em>above</em> the truth, regardless of T. The country fixed effects αᵢ are correlated with the lag, so pooled OLS is biased <em>upward</em>.</li>
+      <li><strong>Click "Reseed"</strong> to redraw with a new RNG seed. Arellano-Bond should stay close to the truth; FE should keep its short-panel bias.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="nb-reseed">Reseed random draws</button>
+      <button class="action secondary" id="nb-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's coefficient forest — interactively</h2>
+  <p class="lede">
+    These numbers come straight from the production Stata run captured in
+    <code>regression_results.csv</code> and <code>longrun_effects.csv</code>.
+    Toggle outcomes (coefficient rows) and methods (which of the four nested
+    models) to compare. Hover a point to see its standard error, 95% CI, and
+    the number of GMM-style instruments the model used.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The contemporaneous War row is the headline.</strong> All four models have point estimates between −0.16 and −0.24, all significantly below zero (t = −3.82 to −5.20). A Magnitude-7 war is a 16-24% hit to log GDP within the same five-year window.</li>
+      <li><strong>L1.War and L2.War cross zero in every model.</strong> War's damage is <em>contemporaneous</em>, not delayed. Toggle off "War (contemporaneous)" and "Long-run sum War" to see only the lagged Wars, then realise none of them is individually significant.</li>
+      <li><strong>The Long-run sum War row is the substantive headline.</strong> All four CIs exclude zero; the point estimate shrinks monotonically from −0.35 (Model 1, no controls) to −0.17 (Model 4, with both Economic and Political Freedom). Roughly half the long-run war penalty is mediated by institutions.</li>
+      <li><strong>Coup contemporaneously hurts too.</strong> Coup (contemporaneous) is robustly negative and significant in every model. But the <em>cumulative</em> Coup effect only crosses t = 2 once Political Freedom is included (Models 3 and 4).</li>
+      <li><strong>L.lnGDPpercapita ≈ 0.62-0.68.</strong> GDP per capita is highly persistent. That high ρ is exactly what makes the Nickell bias on a static-FE estimator severe and Arellano-Bond essential.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Coefficient rows</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="War (contemporaneous)" checked> War (contemporaneous)</label>
+      <label><input type="checkbox" value="L1.War" checked> L1.War</label>
+      <label><input type="checkbox" value="L2.War" checked> L2.War</label>
+      <label><input type="checkbox" value="Long-run sum War" checked> Long-run sum War</label>
+      <label><input type="checkbox" value="Coup (contemporaneous)" checked> Coup (contemporaneous)</label>
+      <label><input type="checkbox" value="Long-run sum Coup"> Long-run sum Coup</label>
+      <label><input type="checkbox" value="L.lnGDPpercapita"> L.lnGDPpercapita</label>
+    </div>
+    <h3 style="margin-top:16px;">Models</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Model 1" checked> Model 1: War + Coup</label>
+      <label><input type="checkbox" value="Model 2" checked> + Economic Freedom</label>
+      <label><input type="checkbox" value="Model 3" checked> + Political Freedom</label>
+      <label><input type="checkbox" value="Model 4" checked> + Both</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why is the long-run War effect different from the contemporaneous one?</h3>
+    <p>
+      The long-run cumulative effect is the sum <em>β₀ + β₁ + β₂</em> of the
+      contemporaneous and two lagged War coefficients. Individually the lagged
+      coefficients are tiny and statistically zero; the <strong>sum</strong>
+      pools them with the contemporaneous coefficient. Because the lag-1 and
+      lag-2 coefficients are slightly negative on average, the sum is more
+      negative than the contemporaneous coefficient alone. Stata's
+      <code>nlcom</code> uses the delta method to get the SE of this sum
+      correctly, accounting for correlations between the three War
+      coefficients.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 2</h3>
+    <p>
+      The lagged-GDP coefficient L.lnGDPpercapita ≈ 0.68 you see above is the
+      empirical counterpart of the slider you played with in Tab 2. The
+      simulated AR(1) panel with ρ = 0.7 is essentially a stylised version of
+      this real data. The reason the analysis uses Arellano-Bond and not plain
+      fixed effects is exactly the bias gap you watched open and close as T
+      moved.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: DIAGNOSTICS & MEDIATION ====================== -->
+<section id="pane-diag" class="tab-pane" role="tabpanel" aria-labelledby="tab-diag">
+
+  <h2>Diagnostics &amp; the institutional-mediation pattern</h2>
+  <p class="lede">
+    Two diagnostic tests validate Arellano-Bond GMM in every model: the AR(2)
+    test (null: no second-order serial correlation in <em>differenced</em>
+    residuals) and the Hansen J test (null: instruments are orthogonal to the
+    error). Below, the left chart plots both p-values across the four models
+    with a 0.05 reference line; the right chart shows how the long-run War
+    effect shrinks as institutional controls enter, which is the article's
+    main mediation finding.
+  </p>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>AR(2) &amp; Hansen J p-values</h3>
+      <p class="note" style="margin:0 0 10px;">Every bar should sit <em>above</em> the dashed 0.05 line for the specification to pass.</p>
+      <div class="chart-area" id="diag-bars"></div>
+    </div>
+    <div class="card">
+      <h3>Long-run War coefficient by model</h3>
+      <p class="note" style="margin:0 0 10px;">Sum of contemporaneous + L1 + L2 War coefficients, with 95% CIs.</p>
+      <div class="chart-area" id="diag-longrun"></div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Model 1's AR(2) p = 0.091.</strong> Borderline — above 0.05 but below 0.10. Models 2-4 are all p > 0.6, comfortable.</li>
+      <li><strong>All four Hansen J p-values are in [0.13, 0.61].</strong> None too low; none suspiciously near 1. The instrument set is plausibly orthogonal to the error in every model.</li>
+      <li><strong>The right-hand bars shrink monotonically from −0.35 to −0.17.</strong> That is the institutional-mediation pattern: each added control absorbs part of the war penalty. The shrinkage between Model 1 and Model 4 is 53% — roughly half the long-run penalty is mediated through institutions.</li>
+      <li><strong>Economic Freedom does the heavy lifting.</strong> Compare Model 2 (only Economic) to Model 3 (only Political): Model 2's long-run War shrinks more (−0.27) than Model 3's (−0.22). The Political Freedom coefficient itself is not significant in any model.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Why Hansen J near 1 is a red flag</h3>
+    <p>
+      Counter-intuitively, a Hansen J p-value very close to 1 is <em>worse</em>
+      than a moderate one. Roodman (2009) documents this: when the instrument
+      count is too large relative to N, the matrix of overidentifying
+      restrictions becomes near-singular, the test loses power, and the
+      p-value artifactually approaches 1. The post's choice of
+      <code>lag(2 6)</code> deliberately keeps the lag depth bounded, which is
+      why the J p-values stay in the moderate 0.13-0.61 range rather than
+      drifting up to 1.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Dynamic Panel Data with Arellano-Bond GMM in Stata</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

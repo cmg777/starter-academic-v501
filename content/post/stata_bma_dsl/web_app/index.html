@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>BMA and Double-Selection LASSO — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Taming Model Uncertainty in the Environmental Kuznets Curve: BMA and Double-Selection LASSO with Panel Data'. Pedagogical web app with a LASSO animation, a model-uncertainty simulator, a comparison forest plot of 6 estimators, and the PIP chart from the post's Stata BMA output.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>BMA + Double-Selection LASSO — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Taming Model Uncertainty in the EKC: BMA and Double-Selection LASSO with Panel Data</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"     class="tab active" data-pane="pane-intro"     role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-sim"       class="tab"        data-pane="pane-sim"       role="tab" aria-selected="false">2 · BMA vs DSL Simulator</button>
+  <button id="tab-forest"    class="tab"        data-pane="pane-forest"    role="tab" aria-selected="false">3 · Forest Plot (EKC)</button>
+  <button id="tab-pip"       class="tab"        data-pane="pane-pip"       role="tab" aria-selected="false">4 · PIP Chart</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Two ways to tame model uncertainty</h2>
+  <p class="lede">
+    Suppose you have 12 candidate controls. That is $2^{12} = 4{,}096$ possible
+    regressions. Which one should you trust? The post answers this with two
+    complementary methods: <strong>Bayesian Model Averaging (BMA)</strong>
+    — which averages across the whole model space, weighting each model by how
+    well it fits — and <strong>Double-Selection LASSO (DSL)</strong> — which
+    uses an L1 penalty to pick a parsimonious set of controls, twice, then runs
+    a clean OLS on the union.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials. In four tabs you will: see <em>why</em>
+    LASSO is a variable selector (L1 vs L2); simulate a small EKC-style DGP
+    and watch how BMA's posterior mean compares to DSL's selected-then-OLS
+    estimate as you change sample size and noise; explore the post's forest
+    plot comparing six estimators against the true DGP value; and inspect the
+    Posterior Inclusion Probabilities from the post's BMA run.
+  </p>
+
+  <div class="card">
+    <h3>L1 (LASSO) vs. L2 (Ridge) — why LASSO selects, Ridge does not</h3>
+    <p>
+      Both methods shrink coefficients toward zero. Only LASSO drives them
+      <strong>exactly to zero</strong>. The animation below shows the same
+      coefficient under the two penalties as λ grows: the orange L1 estimate
+      hits zero abruptly, the steel-blue L2 estimate decays but never
+      reaches zero. This is the reason DSL uses LASSO (and not Ridge) for
+      its two selection steps.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>BMA vs DSL Simulator</h4>
+      <p>Generate a small EKC-style panel with a known truth. Slide sample size, noise, and signal asymmetry; compare how each method estimates the treatment α.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Forest Plot</h4>
+      <p>The post's headline comparison. Six estimators × three GDP coefficients. Toggle outcomes and methods. Hover for SEs, CIs, and number of controls selected.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-pip">
+      <div class="cta-tag">Tab 4</div>
+      <h4>PIP Chart</h4>
+      <p>Posterior Inclusion Probabilities for all 15 variables in the BMA run. Switch between the fixed-effects and pooled specifications to see how fixed effects collapse the false-positive rate from 5 to 0.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Model uncertainty</summary>
+        <div class="gloss-body">Many plausible regressions can be specified. With 12 controls there are 4,096 possible models. Standard practice picks one and ignores the rest; BMA and DSL refuse to.</div>
+      </details>
+      <details class="gloss"><summary>BMA (Bayesian Model Averaging)</summary>
+        <div class="gloss-body">Averages coefficients across all candidate models, weighted by their posterior probabilities. Honest about which controls belong.</div>
+      </details>
+      <details class="gloss"><summary>PIP (Posterior Inclusion Probability)</summary>
+        <div class="gloss-body">Total posterior weight on models that contain a given variable. PIP ≥ 0.80 = "strong evidence" by Raftery (1995).</div>
+      </details>
+      <details class="gloss"><summary>PMP (Posterior Model Probability)</summary>
+        <div class="gloss-body">Bayesian weight on a single candidate model. Sums to 1 across all models in the space.</div>
+      </details>
+      <details class="gloss"><summary>DSL (Double-Selection LASSO)</summary>
+        <div class="gloss-body">Belloni-Chernozhukov-Hansen (2014). LASSO on the outcome, LASSO on each variable of interest, take the union, then OLS. Valid inference on the treatment α.</div>
+      </details>
+      <details class="gloss"><summary>LASSO penalty λ</summary>
+        <div class="gloss-body">Knob controlling shrinkage. Larger λ pins more coefficients to zero. At λ = 0, LASSO is just OLS.</div>
+      </details>
+      <details class="gloss"><summary>EKC (Environmental Kuznets Curve)</summary>
+        <div class="gloss-body">Hypothesizes that pollution rises with development at low income, falls at high income, and may rise again at very high income (inverted-N).</div>
+      </details>
+      <details class="gloss"><summary>Answer key (synthetic data)</summary>
+        <div class="gloss-body">Data generated from a known regression so the true coefficients are written down. In the post: 5 true predictors and 7 noise variables. Lets us <em>grade</em> each method.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: BMA vs DSL SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>BMA vs DSL — explore the bias-variance trade-off</h2>
+  <p class="lede">
+    The simulator generates a small EKC-flavoured DGP with one treatment (α
+    = 0.5) and many candidate controls. <strong>BMA-style</strong> here is a
+    rigorous (theory-driven) Double LASSO that mimics BMA's conservative
+    selection. <strong>DSL (CV)</strong> uses cross-validated λ. Both produce
+    an estimate of α; both are graded against the truth. The headline finding
+    from the post applies here too: <em>method agreement is reassuring only
+    when the model is correctly specified</em>.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">More data ⇒ each control's coefficient is estimated more precisely.</div>
+    </div>
+    <div class="control">
+      <label>Number of candidate controls p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">Like the post's 12 candidate controls — about 15% have a true nonzero effect.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Magnitude of the truly-relevant control coefficients. Small signals are hard for any method.</div>
+    </div>
+    <div class="control">
+      <label>Confounding asymmetry <span class="value" id="sh-a-val">0.80</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.80" aria-label="asymmetry">
+      <div class="hint">0 = controls predict outcome and treatment equally · 1 = controls predict treatment well, outcome barely (the hardest case for single-step selection).</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">BMA-style</span> (rigorous λ)</h3>
+      <p class="note" style="margin:0 0 10px;">Theory-driven penalty: conservative, robust to model uncertainty — mimics BMA's "decisive evidence" threshold.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-rig-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-rig-lam">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">DSL (CV)</span></h3>
+      <p class="note" style="margin:0 0 10px;">Cross-validated penalty: minimises prediction MSE — often over-selects controls.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-cv-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-cv-lam">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Asymmetry = 0.8 (default) is the hardest case.</strong> Controls predict the treatment but barely the outcome — a single-step selection that only looks at y will miss them and bias α. Watch DSL's union grow as you push asymmetry up.</li>
+      <li><strong>Increase n.</strong> Both estimators converge to the true α = 0.5 as n grows. The BMA-style rigorous penalty shrinks variance faster because it admits fewer noisy controls.</li>
+      <li><strong>Decrease signal.</strong> Small true effects are hard to detect — exactly why urban (true coef = 0.007) and democracy (true coef = -0.005) get PIPs below 0.80 in the post.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over 100 simulations</h3>
+    <p>A single run is noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different ε) to see whether the CV-style over-selection produces systematic bias.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">DSL (CV) mean α̂</div><div class="stat-value orange" id="sh-cv-mean">—</div><div class="stat-sub">bias toward zero / over-selection</div></div>
+      <div class="stat"><div class="stat-label">DSL (CV) sd(α̂)</div><div class="stat-value" id="sh-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">BMA-style mean α̂</div><div class="stat-value teal" id="sh-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">BMA-style sd(α̂)</div><div class="stat-value" id="sh-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>EKC coefficients — six estimators side by side</h2>
+  <p class="lede">
+    The estimates below come directly from the post's Stata output. Six
+    estimators × three GDP coefficients (linear, squared, cubic). The <em>True
+    DGP</em> row is the answer key: that is what the methods are trying to
+    recover. Toggle methods and outcomes; hover for SE, 95% CI, and the number
+    of controls each estimator selected.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Toggle "BMA (pooled)" and "DSL (pooled)" off.</strong> The pooled estimates are 2-3× the true value because they omit country fixed effects. Once you hide them, the four FE-based estimators all cluster tightly around the true DGP.</li>
+      <li><strong>BMA (FE) is closest to the truth on β₁ (−7.139 vs true −7.100)</strong> — within 1%. Kitchen-Sink FE is a close second (−7.131).</li>
+      <li><strong>The pooled methods agree with each other on the wrong answer.</strong> BMA (pooled) gives β₁ = −21.26, DSL (pooled) gives −22.03. Method agreement is <em>not</em> a substitute for correct model specification.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes (GDP polynomial coefficient)</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="beta1 (GDP)"   checked> β₁ (GDP)</label>
+      <label><input type="checkbox" value="beta2 (GDP^2)" checked> β₂ (GDP²)</label>
+      <label><input type="checkbox" value="beta3 (GDP^3)" checked> β₃ (GDP³)</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Sparse FE"       checked> Sparse FE</label>
+      <label><input type="checkbox" value="Kitchen-Sink FE" checked> Kitchen-Sink FE</label>
+      <label><input type="checkbox" value="BMA (FE)"        checked> BMA (FE)</label>
+      <label><input type="checkbox" value="DSL (FE)"        checked> DSL (FE)</label>
+      <label><input type="checkbox" value="BMA (pooled)"    checked> BMA (pooled)</label>
+      <label><input type="checkbox" value="DSL (pooled)"    checked> DSL (pooled)</label>
+      <label><input type="checkbox" value="True DGP"        checked> True DGP</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+  <div class="chart-area" id="fp-bars"></div>
+
+  <div class="card">
+    <h3>Why do pooled estimates blow up?</h3>
+    <p>
+      Without country fixed effects, the GDP polynomial absorbs persistent
+      cross-country differences in emissions levels that have nothing to do with
+      income. The β̂₁ pooled estimates (−21.26 from BMA, −22.03 from DSL) are
+      inflated by a factor of 3 relative to the true −7.10. <strong>And both
+      methods are confidently wrong</strong> — their 95% intervals fail to
+      cover the truth for any of the three GDP coefficients. The lesson: BMA
+      and DSL are powerful, but they cannot fix a misspecified model.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Turning points: where does the EKC bend?</h3>
+    <p>
+      The cubic polynomial implies two turning points — where emissions stop
+      rising (minimum) and where they start falling again (maximum). The true
+      DGP values are $1,895 and $34,647 GDP per capita. The four FE methods
+      cluster around $2,400 and $27,000 — close in spirit (right ballpark, same
+      sign pattern) but compounded by small coefficient errors. The pooled
+      methods land far from the truth at both ends.
+    </p>
+    <ul>
+      <li>FE-based methods: minimum at $2,411–2,478 · maximum at $25,656–27,694</li>
+      <li>Pooled methods: minimum at $5,581–5,752 · maximum at $23,298–24,532</li>
+      <li>True DGP: minimum at $1,895 · maximum at $34,647</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: PIP CHART ====================== -->
+<section id="pane-pip" class="tab-pane" role="tabpanel" aria-labelledby="tab-pip">
+
+  <h2>BMA's signature output: Posterior Inclusion Probabilities</h2>
+  <p class="lede">
+    For each of the 15 variables in the post's BMA run, the PIP is the
+    fraction of posterior probability mass on models that include it. The
+    horizontal threshold (orange dashed line) is 0.80 — Raftery's "strong
+    evidence" cutoff. <strong>Switch between FE and pooled</strong> to see how
+    fixed effects collapse the false-positive rate from 5 noise variables down
+    to zero.
+  </p>
+
+  <div class="card">
+    <h3>Specification</h3>
+    <div class="method-toggle" id="pip-spec">
+      <label><input type="radio" name="pipspec" value="fe"     checked> BMA with fixed effects</label>
+      <label><input type="radio" name="pipspec" value="pooled">         BMA pooled (no FE)</label>
+    </div>
+    <p class="note" style="margin-top:8px;">FE: 6 variables clear 0.80, 0 false positives, 2 false negatives (urban, democracy). Pooled: 12 of 15 variables clear 0.80, including 5 noise variables — fixed effects are not optional.</p>
+  </div>
+
+  <div class="chart-area" id="pip-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">True positives (PIP ≥ 0.80)</div>
+      <div class="stat-value teal" id="pip-tp">—</div>
+      <div class="stat-sub">true predictors correctly identified</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">False positives</div>
+      <div class="stat-value orange" id="pip-fp">—</div>
+      <div class="stat-sub">noise variables incorrectly flagged</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">False negatives</div>
+      <div class="stat-value" id="pip-fn">—</div>
+      <div class="stat-sub">weak true predictors missed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">True negatives</div>
+      <div class="stat-value" id="pip-tn">—</div>
+      <div class="stat-sub">noise correctly rejected</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>With FE</strong>: fossil fuel, GDP terms, industry, and renewable energy cleanly clear the 0.80 line. All 7 noise variables sit near zero. Urban (true coef = +0.007) and democracy (true coef = −0.005) are too weak to detect.</li>
+      <li><strong>Without FE</strong>: services, pop_density, credit, and trade all jump above 0.80 — they piggyback on omitted country heterogeneity. This is what the post calls "false precision from a misspecified model".</li>
+      <li><strong>The signal-strength limit.</strong> Even BMA cannot find effects smaller than the sampling noise. The 2 false negatives are not a method failure — they are an honest accounting of evidence.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The four FE-based estimators in the forest plot agree on the GDP
+      coefficients precisely because they all use the same FE structure that
+      keeps the PIP false-positive rate at zero. The pooled estimators agree
+      with <em>each other</em> on a biased answer because they share the same
+      misspecification. <strong>PIPs and confidence intervals are only
+      trustworthy when the model class is right.</strong>
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Taming Model Uncertainty in the EKC: BMA and Double-Selection LASSO with Panel Data</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

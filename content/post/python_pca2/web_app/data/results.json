@@ -1,0 +1,52 @@
+{
+  "estimates": [
+    { "method": "Pooled PCA",    "outcome": "Education weight", "estimate": 0.5642, "se": 0.0100, "ci_lo": 0.5446, "ci_hi": 0.5838, "n_selected": 306 },
+    { "method": "Per-period 2013","outcome": "Education weight", "estimate": 0.5832, "se": 0.0140, "ci_lo": 0.5558, "ci_hi": 0.6106, "n_selected": 153 },
+    { "method": "Per-period 2019","outcome": "Education weight", "estimate": 0.5405, "se": 0.0140, "ci_lo": 0.5131, "ci_hi": 0.5679, "n_selected": 153 },
+
+    { "method": "Pooled PCA",    "outcome": "Health weight",    "estimate": 0.5448, "se": 0.0100, "ci_lo": 0.5252, "ci_hi": 0.5644, "n_selected": 306 },
+    { "method": "Per-period 2013","outcome": "Health weight",    "estimate": 0.5100, "se": 0.0140, "ci_lo": 0.4826, "ci_hi": 0.5374, "n_selected": 153 },
+    { "method": "Per-period 2019","outcome": "Health weight",    "estimate": 0.5657, "se": 0.0140, "ci_lo": 0.5383, "ci_hi": 0.5931, "n_selected": 153 },
+
+    { "method": "Pooled PCA",    "outcome": "Income weight",    "estimate": 0.6204, "se": 0.0100, "ci_lo": 0.6008, "ci_hi": 0.6400, "n_selected": 306 },
+    { "method": "Per-period 2013","outcome": "Income weight",    "estimate": 0.6322, "se": 0.0140, "ci_lo": 0.6048, "ci_hi": 0.6596, "n_selected": 153 },
+    { "method": "Per-period 2019","outcome": "Income weight",    "estimate": 0.6228, "se": 0.0140, "ci_lo": 0.5954, "ci_hi": 0.6502, "n_selected": 153 }
+  ],
+  "selection": [
+    { "outcome": "Education weight", "method": "Pooled PCA",     "n_Iy": 306, "n_Id": 0,   "n_intersection": 0, "n_union": 306 },
+    { "outcome": "Education weight", "method": "Per-period 2013","n_Iy": 153, "n_Id": 0,   "n_intersection": 0, "n_union": 153 },
+    { "outcome": "Education weight", "method": "Per-period 2019","n_Iy": 0,   "n_Id": 153, "n_intersection": 0, "n_union": 153 },
+    { "outcome": "Health weight",    "method": "Pooled PCA",     "n_Iy": 306, "n_Id": 0,   "n_intersection": 0, "n_union": 306 },
+    { "outcome": "Health weight",    "method": "Per-period 2013","n_Iy": 153, "n_Id": 0,   "n_intersection": 0, "n_union": 153 },
+    { "outcome": "Health weight",    "method": "Per-period 2019","n_Iy": 0,   "n_Id": 153, "n_intersection": 0, "n_union": 153 },
+    { "outcome": "Income weight",    "method": "Pooled PCA",     "n_Iy": 306, "n_Id": 0,   "n_intersection": 0, "n_union": 306 },
+    { "outcome": "Income weight",    "method": "Per-period 2013","n_Iy": 153, "n_Id": 0,   "n_intersection": 0, "n_union": 153 },
+    { "outcome": "Income weight",    "method": "Per-period 2019","n_Iy": 0,   "n_Id": 153, "n_intersection": 0, "n_union": 153 }
+  ],
+  "validation": {
+    "pooled_level_r2": 0.9823,
+    "perperiod_level_r2": 0.9750,
+    "pooled_change_r2": 0.9964,
+    "perperiod_change_r2": 0.9913,
+    "spearman_rank_change": 0.9818,
+    "n_direction_disagree": 16,
+    "n_regions": 153
+  },
+  "variance_explained": {
+    "pooled":     { "PC1": 0.7242, "PC2": 0.1877, "PC3": 0.0881 },
+    "period_2013":{ "PC1": 0.7350, "PC2": 0.1820, "PC3": 0.0830 },
+    "period_2019":{ "PC1": 0.7220, "PC2": 0.1900, "PC3": 0.0880 }
+  },
+  "period_means": {
+    "Y2013": { "education": 0.6674, "health": 0.8370, "income": 0.7355 },
+    "Y2019": { "education": 0.6899, "health": 0.8504, "income": 0.7153 }
+  },
+  "pooled_means": { "education": 0.6786, "health": 0.8437, "income": 0.7254 },
+  "pooled_stds":  { "education": 0.0814, "health": 0.0472, "income": 0.0749 },
+  "buenos_aires": {
+    "y2013_edu": 0.926, "y2013_health": 0.858, "y2013_income": 0.850,
+    "y2019_edu": 0.946, "y2019_health": 0.872, "y2019_income": 0.832,
+    "pooled_2013": 0.9464, "pooled_2019": 0.9652, "pooled_change": 0.0189,
+    "perperiod_2013": 1.0000, "perperiod_2019": 0.9604, "perperiod_change": -0.0396
+  }
+}

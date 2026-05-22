@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>MGWFER — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'MGWFER: Causal Spatially Varying Coefficients via Panel Fixed Effects'. A pedagogical web app with sliders to explore spatial confounding, the within-transformation, and MGWFER recovery vs PMGWR / cross-sectional MGWR.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>MGWFER — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>MGWFER: Causal Spatially Varying Coefficients via Panel Fixed Effects</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"      class="tab"        data-pane="pane-lab"      role="tab" aria-selected="false">2 · Confounder Lab</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">3 · Within vs Pooled</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Recovery Forest</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why MGWFER? Why fixed effects in a spatial model?</h2>
+  <p class="lede">
+    Suppose you want to estimate how the relationship between covariates and an
+    outcome varies across space — say, how education's effect on income changes
+    from neighbourhood to neighbourhood. If some <strong>unobserved attribute of
+    place</strong> (geographic amenities, persistent institutions, social
+    norms) drives both the outcome and the covariate levels, your spatially
+    varying coefficients absorb that contamination. The result: coefficient
+    surfaces that look like local effects but are actually <em>omitted variable
+    bias</em>.
+  </p>
+  <p class="lede">
+    <strong>MGWFER</strong> (Multiscale Geographically Weighted Fixed Effects
+    Regression; Li &amp; Fotheringham 2026) combines two ideas: a panel
+    <em>within-transformation</em> that removes every time-invariant
+    confounder, and <em>Multiscale GWR</em> that lets each covariate have its
+    own bandwidth. In this lab you turn the dials yourself: slide a confounder
+    coupling and watch a pooled estimator's coefficients explode; flip on the
+    within-transformation and watch them snap back to truth; compare three
+    local estimators on the post's own recovery metrics.
+  </p>
+
+  <div class="card">
+    <h3>The backdoor path: spatial context as a hidden confounder</h3>
+    <p>
+      A standard regression assumes covariates are exogenous — they only act
+      <em>on</em> the outcome. The paper's headline observation is that, in
+      geography, this is rarely true. Wealthy regions invest more in transit;
+      coastal regions have more tourism; old-industrial regions have higher
+      unemployment. <strong>Place causes the covariate levels</strong>, and
+      place also acts on the outcome. The animation below shrinks two
+      coefficients as a penalty grows — a stand-in for the <em>within
+      transformation</em>, which "shrinks" the influence of all time-invariant
+      place attributes to exactly zero, but only in the L1 (LASSO-like) sense:
+      it discards them completely, not asymptotically.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <p class="note" style="margin-top:8px;">
+      Read the orange L1 line as MGWFER and the blue L2 line as PMGWR's
+      intercept absorption: PMGWR shrinks but never eliminates the confounder,
+      MGWFER eliminates it cleanly. The vertical axis is "remaining bias" in a
+      stylised sense.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Confounder Lab</h4>
+      <p>Crank up the spatial-context coupling strength and watch the indirect-channel bias appear in real time. The post's δ_k parameter, as a slider.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Within vs Pooled</h4>
+      <p>Same simulation, two estimators. Watch the within-transformation flip the sign of α̂ back to the truth. Run 100 sims for the bias-variance picture.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Recovery Forest</h4>
+      <p>The post's own RMSE numbers, interactively. MGWR_cs / PMGWR / MGWFER across β₁, β₂, β₃, β₄, and the spatial-context surface α.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Spatial context (SC)</summary>
+        <div class="gloss-body">The bundle of <em>time-invariant</em> place attributes that affect both outcomes and covariate levels. In the simulation it is a smooth exponential surface; in real data it is everything you cannot measure about a county.</div>
+      </details>
+      <details class="gloss"><summary>Indirect contextual effect (δ_k)</summary>
+        <div class="gloss-body">The strength of the link <em>SC → x_k</em>. When this is non-zero, OLS / MGWR recovers β_k + δ_k, not β_k. <em>This is the slider in Tab 2.</em></div>
+      </details>
+      <details class="gloss"><summary>Within transformation</summary>
+        <div class="gloss-body">Subtract each unit's time-series mean from each observation. The time-invariant confounder α_i vanishes. The MGWFER algorithm runs MGWR on this demeaned panel.</div>
+      </details>
+      <details class="gloss"><summary>MGWR</summary>
+        <div class="gloss-body">Multiscale Geographically Weighted Regression: each covariate gets its own optimal bandwidth. Local effects can vary at different spatial scales.</div>
+      </details>
+      <details class="gloss"><summary>PMGWR (pooled MGWR)</summary>
+        <div class="gloss-body">Naïve panel baseline. Stacks all NT observations and runs MGWR with an intercept. Cannot remove α_i. Produces β̂_1 surfaces <em>anti-correlated</em> with truth.</div>
+      </details>
+      <details class="gloss"><summary>MGWFER (this paper)</summary>
+        <div class="gloss-body">Stage 1: within-transform + standardise + MGWR + back-transform. Stage 2: recover α_i with per-unit t-tests. The proposed estimator.</div>
+      </details>
+      <details class="gloss"><summary>Intrinsic contextual effect</summary>
+        <div class="gloss-body">The unit-level α̂_i — the part of the outcome that the covariates cannot explain at this location. Stage 2 of MGWFER hands it back as a substantive surface, not a nuisance term.</div>
+      </details>
+      <details class="gloss"><summary>Bandwidth</summary>
+        <div class="gloss-body">The kernel smoothness parameter. Cross-validation picks it. <em>When data contain a fixed effect, the CV criterion is contaminated and picks the wrong bandwidth</em> — see Tab 4.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: CONFOUNDER LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>Confounder Lab — turn the SC coupling knob yourself</h2>
+  <p class="lede">
+    The paper's data generating process is
+    <code>x_k = δ · sc + ν</code>: each covariate is a noisy linear function
+    of the unobserved spatial context. The coupling strength <code>δ</code>
+    governs how badly a naïve estimator will be biased. The paper's default is
+    δ = 0.05, which produces <code>Cor(x_k, sc) ≈ 0.84</code>. <strong>Slide δ
+    below to see the bias smoothly grow with the coupling.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">200</span></label>
+      <input type="range" id="lab-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">More observations ⇒ tighter estimates, but does not reduce the systematic bias from omitted SC.</div>
+    </div>
+    <div class="control">
+      <label>Number of covariates p <span class="value" id="lab-p-val">40</span></label>
+      <input type="range" id="lab-p" min="5" max="100" step="1" value="40" aria-label="number of covariates p">
+      <div class="hint">All covariates share the same hidden confounder.</div>
+    </div>
+    <div class="control">
+      <label>SC coupling δ <span class="value" id="lab-s-val">0.60</span></label>
+      <input type="range" id="lab-s" min="0.0" max="1.5" step="0.05" value="0.60" aria-label="SC coupling">
+      <div class="hint">0 ⇒ no confounding (covariates are exogenous). Larger ⇒ indirect-channel bias dominates. The paper's setting maps to ~0.6 here.</div>
+    </div>
+    <div class="control">
+      <label>Penalty (within-strength) <span class="value" id="lab-l-val">—</span></label>
+      <input type="range" id="lab-l" min="0" max="79" step="1" value="40" aria-label="penalty">
+      <div class="hint">Slide left for pooled (no within-transform); right for full within-transform (MGWFER).</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-path"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">covariates retained</div>
+      <div class="stat-value teal" id="lab-stat-nz">—</div>
+      <div class="stat-sub">out of <span id="lab-stat-p">—</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">β̂ (pooled / shrunk)</div>
+      <div class="stat-value orange" id="lab-stat-alpha-l">—</div>
+      <div class="stat-sub">contaminated by SC</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">β̂ (after within / post-OLS)</div>
+      <div class="stat-value orange" id="lab-stat-alpha-o">—</div>
+      <div class="stat-sub">refit on retained set</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true β</div>
+      <div class="stat-value" id="lab-stat-alpha-t">0.50</div>
+      <div class="stat-sub">held fixed</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>At δ = 0, the bias vanishes.</strong> No SC → no indirect channel → no need for the within-transformation. Both estimators recover the truth.</li>
+      <li><strong>As δ grows, pooled β̂ drifts away from the true β.</strong> This is paper Eq. 8 in motion: β̂_k = β_k + δ_k. The drift is monotone.</li>
+      <li><strong>After the within-transformation, post-OLS tracks truth closely.</strong> This is the MGWFER mechanism made visible on simulated 1-D data.</li>
+      <li><strong>Try n = 50, δ = 1.5.</strong> Even with lots of data, large coupling makes the naïve estimator hopelessly biased. The within-transformation rescues it.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="lab-reseed">Reseed random draws</button>
+      <button class="action secondary" id="lab-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: WITHIN VS POOLED ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Within vs Pooled — the sign-flip on α̂</h2>
+  <p class="lede">
+    Same simulated DGP. The only difference: whether the within-transformation
+    is applied before estimation. <strong>Pooled OLS</strong> stacks the panel
+    and absorbs the confounder into the slopes;
+    <strong>FE / within</strong> demeans first and recovers the truth. The
+    paper's headline finding in Section 6 (Table 2) is that this single move
+    flips β̂_1 from ≈ 6.1 (pooled) to ≈ 1.57 (FE) — a 4× reduction toward the
+    true 1.5.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Capped at 300 so the "Run 100 sims" button finishes quickly.</div>
+    </div>
+    <div class="control">
+      <label>Number of covariates p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of covariates p">
+      <div class="hint">Capped at 50 for the 100-sim run.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">True β magnitude (held the same for pooled and within).</div>
+    </div>
+    <div class="control">
+      <label>SC coupling asymmetry <span class="value" id="sh-a-val">0.80</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.80" aria-label="asymmetry">
+      <div class="hint">0 = SC affects only y · 1 = SC affects only the covariates · &gt; 0.5 = the regime the paper is built for.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Within / FE</span> estimator</h3>
+      <p class="note" style="margin:0 0 10px;">Demeans by unit · removes time-invariant SC · MGWFER's Stage 1 mechanism</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union</span><span class="val" id="sh-rig-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-rig-lam">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Pooled</span> estimator</h3>
+      <p class="note" style="margin:0 0 10px;">Stacks all NT obs · cannot remove α_i · the PMGWR / pooled-OLS baseline</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union</span><span class="val" id="sh-cv-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-cv-lam">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>Why does this happen?</h4>
+    <ul>
+      <li><strong>The pooled estimator has nowhere to put SC's influence except into the slopes.</strong> When SC drives the covariate levels (Eqs. 40–43 of the paper), every coefficient absorbs a piece of δ_k.</li>
+      <li><strong>The within-transformation removes the time-invariant part of SC entirely.</strong> Since SC is assumed time-invariant (the paper's Assumption 1), it vanishes <em>by construction</em> — no residual bias.</li>
+      <li><strong>The variance penalty for using within is small.</strong> You lose one degree of freedom per unit; you gain identification.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs variance over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different ε and ν) to see whether the pooled bias is systematic — and whether the within estimator's noise is centred on truth.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Pooled mean α̂</div><div class="stat-value orange" id="sh-cv-mean">—</div><div class="stat-sub">should drift away from truth</div></div>
+      <div class="stat"><div class="stat-label">Pooled sd(α̂)</div><div class="stat-value" id="sh-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Within mean α̂</div><div class="stat-value teal" id="sh-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">Within sd(α̂)</div><div class="stat-value" id="sh-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: RECOVERY FOREST ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>Recovery forest — the post's own RMSE numbers</h2>
+  <p class="lede">
+    These numbers come straight from <code>model_comparison.csv</code> in the
+    post's folder — the recovery RMSE (lower is better) of three local
+    estimators against the known true coefficient surfaces. Toggle outcomes
+    and methods to compare. Hover a point to see the bandwidth the estimator
+    picked.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Untoggle "alpha (sc)"</strong> first — its RMSE values (up to 25.6) dominate the axis. Once it is hidden, the β coefficient gap becomes visible: every MGWFER RMSE is at least an order of magnitude smaller than its PMGWR / MGWR_cs counterpart.</li>
+      <li><strong>Hover the bandwidth bar chart</strong> below to see why PMGWR fails: every bandwidth collapses into 44–50, because under SC coupling every covariate looks like the same noisy proxy. MGWFER spreads to [50, 91, 116, 62] — recovering true process scales.</li>
+      <li><strong>Look at β_4 (null effect).</strong> Truth is zero. PMGWR's RMSE is 1.86; MGWFER's is 0.14. That difference is exactly the indirect-channel bias mechanism.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes (coefficient or surface)</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="beta_1 (dome)" checked> β₁ (quadratic dome)</label>
+      <label><input type="checkbox" value="beta_2 (gradient)" checked> β₂ (linear gradient)</label>
+      <label><input type="checkbox" value="beta_3 (constant)" checked> β₃ (constant 1.5)</label>
+      <label><input type="checkbox" value="beta_4 (null)" checked> β₄ (true zero)</label>
+      <label><input type="checkbox" value="alpha (sc)"> α (spatial context)</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="MGWR_cs" checked> MGWR (cross-section)</label>
+      <label><input type="checkbox" value="PMGWR" checked> PMGWR (pooled)</label>
+      <label><input type="checkbox" value="MGWFER" checked> MGWFER (within)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+  <div class="chart-area" id="fp-bars"></div>
+
+  <div class="card">
+    <h3>Why does PMGWR's α̂ surface invert?</h3>
+    <p>
+      The local intercept of PMGWR has to absorb whatever residual variation in
+      <code>y</code> the slopes do not capture. With the indirect channel
+      active, the slopes are systematically inflated to absorb SC's
+      contribution to y. The intercept then receives a <em>negative shift</em>
+      to balance the books. Result: PMGWR's intercept ranges over
+      [-11.27, 10.04] when the truth is [2.07, 51.55]. The Pearson correlation
+      with truth is 0.98 — the <em>shape</em> is right — but the magnitudes are
+      wildly wrong.
+    </p>
+    <p>
+      MGWFER's Stage 2 reconstructs α̂_i directly from the unit means and the
+      Stage 1 slopes (paper Eq. 30):
+      <code>α̂_i = ȳ_i − Σ_k β̂_bwk(u_i, v_i) · x̄_{ik}</code>. The result is
+      a near-perfect recovery: Corr ≈ 1.000, range [1.45, 51.62].
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The Pooled-vs-Within contrast you just experimented with on a simulated
+      panel is exactly the gap between PMGWR and MGWFER on the post's spatial
+      simulation:
+    </p>
+    <ul>
+      <li><strong>β₁ (the quadratic dome):</strong> PMGWR RMSE 2.30, MGWFER RMSE 0.18. PMGWR's correlation with truth is <strong>−0.46</strong> — anti-correlated. MGWFER's is +0.82.</li>
+      <li><strong>β₄ (the null):</strong> PMGWR RMSE 1.86 (against a true 0), MGWFER RMSE 0.14. PMGWR detects spurious spatial structure aligned with SC's column gradient.</li>
+      <li><strong>α (spatial context):</strong> PMGWR RMSE 25.6, MGWFER RMSE 0.54. A 47-fold reduction. The post's Figure 5 is this number, mapped.</li>
+    </ul>
+    <p>
+      The takeaway from §8–§11 of the post is therefore visible <em>twice</em>:
+      once on a controlled 1-D simulation where you set the truth (Tab 3), and
+      once on the 225-unit × 3-period spatial panel that motivates the whole
+      exercise.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>MGWFER: Causal Spatially Varying Coefficients via Panel Fixed Effects</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Synthetic Control with Prediction Intervals — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Synthetic Control with Prediction Intervals: Quantifying Uncertainty in Germany's Reunification Impact'. A pedagogical web app with donor-pool animation, PI band explorer, gap simulator, and method-comparison forest plot.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Synthetic Control with Prediction Intervals — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Synthetic Control with Prediction Intervals: Quantifying Uncertainty in Germany's Reunification Impact</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-donors"   class="tab"        data-pane="pane-donors"   role="tab" aria-selected="false">2 · Donor Pool</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">3 · PI Simulator</button>
+  <button id="tab-methods"  class="tab"        data-pane="pane-methods"  role="tab" aria-selected="false">4 · Method Forest</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>How do you measure uncertainty when there is only one treated unit?</h2>
+  <p class="lede">
+    West Germany was reunified once, in 1990. There is no untreated twin to compare it against. The <strong>synthetic control method</strong> builds an artificial twin from a weighted blend of donor countries, then reads off the post-1990 gap. The <strong>SCPI framework</strong> of Cattaneo, Feng &amp; Titiunik (2021) extends this with <em>prediction intervals</em>: a formal way to ask whether that gap is real or just noise.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials. In four tabs you will:
+    watch a synthetic West Germany self-assemble from 6 donor countries; widen or shrink the prediction-interval band and see how the &ldquo;outside the band&rdquo; years change; explore a simulated gap with an adjustable PI; and finally compare four weight-constraint methods on the actual reunification data.
+  </p>
+
+  <div class="card">
+    <h3>The donor blend — animated</h3>
+    <p>
+      The simplex synthetic West Germany is a weighted average of <strong>6 of the 16 donor countries</strong>. The bars below animate the weights filling in (highlighted bar = Austria, the largest contributor). Notice how concentrated the blend is — just two donors (Austria and the USA) account for 56% of the weight.
+    </p>
+    <div class="chart-area" id="intro-donor-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-donors">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Donor Pool</h4>
+      <p>Plot the actual West Germany alongside its synthetic counterfactual and a 95% prediction-interval band. Drag the slider to widen the band and watch how many years remain &ldquo;outside&rdquo;.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 3</div>
+      <h4>PI Simulator</h4>
+      <p>The treatment gap on its own, with a symmetric PI band around zero. Toggle the &ldquo;PI width multiplier&rdquo; to see why even 99% intervals fail to cover the late-1990s gap.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-methods">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Method Forest</h4>
+      <p>The four weighting methods from §9 (Simplex, Lasso, Ridge, OLS) as a forest plot. Hover any point for the SE and CI; compare pre-RMSE versus the gap each method estimates.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Three takeaways the app is built around</h3>
+    <ul>
+      <li><strong>The gap is large and growing.</strong> By 2003 West Germany's GDP per capita was about <span class="kbd">−$3,465</span> below the synthetic counterfactual — roughly 11% lower than what the simulator predicts in the absence of reunification.</li>
+      <li><strong>The gap is statistically significant.</strong> From 1997 onward, actual GDP falls below the lower bound of the 95% prediction interval. Even at the 99% confidence level, the actual GDP falls outside the band for 7 of 13 post-treatment years.</li>
+      <li><strong>The synthetic is sparse and interpretable.</strong> Only 6 of 16 donors get non-zero weight: Austria 0.291, USA 0.273, Italy 0.191, Netherlands 0.133, Switzerland 0.081, France 0.030.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Synthetic control</summary>
+        <div class="gloss-body">A weighted average of donor units chosen to match the treated unit during the pre-treatment period. After treatment, the same weights produce the counterfactual.</div>
+      </details>
+      <details class="gloss"><summary>Donor pool</summary>
+        <div class="gloss-body">The untreated units used to build the synthetic. Here, 16 OECD countries that did <em>not</em> experience reunification in 1990.</div>
+      </details>
+      <details class="gloss"><summary>Simplex constraint</summary>
+        <div class="gloss-body">Weights are non-negative and sum to one. Guarantees a convex blend of real donors — no extrapolation.</div>
+      </details>
+      <details class="gloss"><summary>Pre-treatment RMSE</summary>
+        <div class="gloss-body">Root-mean-square error of the synthetic vs the treated unit, computed on the pre-treatment window only. Low RMSE = credible counterfactual.</div>
+      </details>
+      <details class="gloss"><summary>Treatment gap</summary>
+        <div class="gloss-body">Actual outcome minus synthetic outcome in the post-treatment period. The point estimate of the causal effect.</div>
+      </details>
+      <details class="gloss"><summary>Prediction interval (PI)</summary>
+        <div class="gloss-body">A range that covers the counterfactual with stated probability (e.g., 95%). When actual GDP falls outside the band, the gap is statistically distinguishable from zero.</div>
+      </details>
+      <details class="gloss"><summary>In-sample uncertainty</summary>
+        <div class="gloss-body">Imperfect pre-treatment fit. With only 31 years to estimate 16 weights, the weights themselves carry sampling noise.</div>
+      </details>
+      <details class="gloss"><summary>Out-of-sample uncertainty</summary>
+        <div class="gloss-body">Post-treatment shocks the model could not have predicted from pre-treatment data alone. Dominates the PI width in later years.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: DONOR POOL + TRAJECTORY ====================== -->
+<section id="pane-donors" class="tab-pane" role="tabpanel" aria-labelledby="tab-donors">
+
+  <h2>Actual vs Synthetic West Germany — with a prediction interval band</h2>
+  <p class="lede">
+    The orange line is West Germany's actual GDP per capita; the dashed steel line is the synthetic counterfactual built from the 6 donor weights. The shaded band is the prediction interval. <strong>Drag the slider to widen or shrink the band</strong> — orange-highlighted dots mark years where the actual line falls outside the band (i.e., a statistically significant gap).
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>PI band multiplier <span class="value" id="dn-mult-val">1.00</span></label>
+      <input type="range" id="dn-mult" min="0.5" max="2.5" step="0.1" value="1.0" aria-label="PI band multiplier">
+      <div class="hint">1.0 = baseline 95% PI from <code>scpi()</code> (simplex, HC1, gaussian). Drag right to mimic a higher confidence level; drag left to see when years start falling outside the band.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="dn-trajectory"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Years outside PI</div>
+      <div class="stat-value teal" id="dn-stat-outside">—</div>
+      <div class="stat-sub">out of 13 post-treatment</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Avg PI half-width</div>
+      <div class="stat-value" id="dn-stat-width">—</div>
+      <div class="stat-sub">thousand USD</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">2003 gap</div>
+      <div class="stat-value orange">−3.465</div>
+      <div class="stat-sub">thousand USD per capita</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Avg gap 1991–2003</div>
+      <div class="stat-value orange">−1.668</div>
+      <div class="stat-sub">thousand USD per capita</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The two lines coincide before 1991.</strong> That is not a coincidence — the simplex weights were chosen to minimise pre-treatment RMSE (= 0.072 thousand USD, about 0.3% of West Germany's pre-1990 GDP).</li>
+      <li><strong>At <span class="kbd">1.0</span> the band starts catching the actual line from 1997 onward.</strong> Earlier years sit inside the PI — the effect is emerging, but the in-sample uncertainty is large enough to absorb it. Late years sit clearly outside.</li>
+      <li><strong>Shrink the band to <span class="kbd">0.5</span>.</strong> Almost every post-1992 year becomes &ldquo;significant&rdquo;. Stretch to <span class="kbd">2.0</span> and only the deepest 1999–2003 years stay outside.</li>
+      <li><strong>The band widens over time even at <span class="kbd">1.0</span>.</strong> That is the out-of-sample component: forecasting noise compounds with the distance from the pre-treatment window.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: PI SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>The treatment gap, isolated</h2>
+  <p class="lede">
+    Subtracting the synthetic line from the actual line gives the year-by-year gap — the SCPI point estimate of the causal effect. The band shows the prediction interval translated to the gap scale: any year where the gap crosses outside the shaded region is statistically distinguishable from zero. Move the multiplier to mimic different confidence levels.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>PI band multiplier <span class="value" id="sm-mult-val">1.00</span></label>
+      <input type="range" id="sm-mult" min="0.4" max="2.5" step="0.1" value="1.0" aria-label="PI band multiplier">
+      <div class="hint">≈ 1.30 widens the 95% band to roughly 99% coverage. ≈ 0.80 narrows it toward 90%.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sm-gap"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Years outside band</div>
+      <div class="stat-value teal" id="sm-stat-outside">—</div>
+      <div class="stat-sub">significant gap, out of 13</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Largest gap (year)</div>
+      <div class="stat-value orange" id="sm-stat-maxgap">—</div>
+      <div class="stat-sub">most negative effect</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Avg post-treatment gap</div>
+      <div class="stat-value orange">−1.668</div>
+      <div class="stat-sub">≈ 5.5% of pre-1990 GDP</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>Why the late years matter most</h4>
+    <ul>
+      <li><strong>The gap is monotone after 1992.</strong> A short-lived disturbance would generate a transient gap. A persistent gap with the same sign across thirteen years is the signature of a structural effect.</li>
+      <li><strong>The PI band is widest where the gap is largest.</strong> Out-of-sample uncertainty accumulates over time — yet even with that increasing width, the gap still falls outside at the end. That is the §10 sensitivity result made visible.</li>
+      <li><strong>Try multiplier = 1.30.</strong> Roughly the 99% PI in the post (avg width 3.30 vs 2.84 for 95%). You should still see 7 of 13 years outside the band.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Sensitivity table (from §10 of the post)</h3>
+    <table>
+      <thead>
+        <tr><th>Confidence</th><th>α (per side)</th><th>Avg PI width</th><th>Years outside</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>99%</td><td>0.01</td><td>3.298</td><td>7 / 13</td></tr>
+        <tr><td>95%</td><td>0.05</td><td>2.842</td><td>7 / 13</td></tr>
+        <tr><td>90%</td><td>0.10</td><td>2.583</td><td>9 / 13</td></tr>
+        <tr><td>80%</td><td>0.20</td><td>2.304</td><td>9 / 13</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: METHOD FOREST ====================== -->
+<section id="pane-methods" class="tab-pane" role="tabpanel" aria-labelledby="tab-methods">
+
+  <h2>Robustness across weight constraints</h2>
+  <p class="lede">
+    Section 9 of the post compares four weighting methods — Simplex, Lasso, Ridge, and OLS. The forest plot below shows the estimated gap in 2003 and the average post-treatment gap under each method, with approximate 95% confidence intervals. <strong>All four methods agree</strong> that the gap is negative; they differ only in magnitude.
+  </p>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="mf-outcomes">
+      <label><input type="checkbox" value="Gap 2003" checked> Gap 2003</label>
+      <label><input type="checkbox" value="Avg gap" checked> Avg gap 1991–2003</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="mf-methods">
+      <label><input type="checkbox" value="Simplex" checked> Simplex</label>
+      <label><input type="checkbox" value="Lasso" checked> Lasso</label>
+      <label><input type="checkbox" value="Ridge" checked> Ridge</label>
+      <label><input type="checkbox" value="OLS" checked> OLS</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="mf-forest"></div>
+  <div class="chart-area" id="mf-bars"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Simplex and Lasso are nearly identical</strong> (gap 2003: −3.465 vs −3.426). Lasso is a relaxation of Simplex; on this data the relaxation barely kicks in.</li>
+      <li><strong>Ridge and OLS estimate a smaller gap</strong> (−2.72 and −2.38). Their pre-RMSE is lower (0.04 vs 0.07) — they fit the pre-treatment period better, but at the cost of using <em>all 16</em> donors with possibly negative weights. Over-fitting the pre-period compresses the post-treatment divergence.</li>
+      <li><strong>None of the 95% CIs cross zero</strong>, on either outcome. The qualitative conclusion (reunification reduced West German GDP) is robust to the choice of constraint.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 2</h3>
+    <p>
+      The PI band you played with on Tab 2 used the <strong>simplex</strong> constraint (the leftmost bar in the forest plot above). Ridge and OLS would shrink the gap by about 20–30%, but their pre-fit is also tighter — so their PI bands would be narrower too. Whether you read the gap as &ldquo;about −$3,500&rdquo; (Simplex/Lasso) or &ldquo;about −$2,500&rdquo; (Ridge/OLS), it is in the same order of magnitude and survives uncertainty quantification.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Synthetic Control with Prediction Intervals: Quantifying Uncertainty in Germany's Reunification Impact</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

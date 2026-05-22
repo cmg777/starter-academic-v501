@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Panel Standard Errors — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Standard Errors in Panel Data'. Compare six SE estimators on a known DGP, explore Monte Carlo rejection rates, and build intuition for the bias-versus-inference distinction.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Panel Standard Errors — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Standard Errors in Panel Data: A Beginner's Guide in Python</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">2 · SE Forest Plot</button>
+  <button id="tab-reject"   class="tab"        data-pane="pane-reject"   role="tab" aria-selected="false">3 · Rejection Rates</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">4 · Bias vs Variance Lab</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Standard errors, fixed effects, and the bias–inference split</h2>
+  <p class="lede">
+    A regression's headline number is its <em>point estimate</em>. Whether
+    that number is meaningful depends on the <em>standard error</em> beside
+    it. In panel data — the same firm observed year after year — the
+    textbook standard-error formula is almost always wrong. This app lets
+    you see the wrongness in three different ways:
+    a <strong>forest plot</strong> of eight SE estimators on the same
+    coefficient, a <strong>Monte Carlo</strong> bar chart of empirical
+    rejection rates, and a <strong>simulation lab</strong> that builds
+    intuition for sampling distributions across many draws.
+  </p>
+  <p class="lede">
+    The headline takeaway has two parts. <strong>First</strong>, no SE choice
+    can rescue a biased point estimate — pooled OLS gives β̂ = 1.03 against
+    a true β = 0.5, and tweaking the standard error never moves the
+    coefficient. <strong>Second</strong>, once fixed effects fix the bias
+    (β̂ = 0.48), the SE choice determines whether your 95% CI actually has
+    95% coverage. Entity-clustering on 100 firms behaves; time-clustering
+    on 10 years over-rejects.
+  </p>
+
+  <div class="card">
+    <h3>Why does panel data break the textbook standard error?</h3>
+    <p>
+      Conventional standard errors assume every observation is an
+      independent draw. In a panel, two observations from the same firm —
+      say firm 1 in 2015 and firm 1 in 2016 — share the firm's
+      idiosyncrasies and so are <em>not</em> independent. The animation
+      below shows the difference between two pull-toward-zero forces: an
+      L1 (LASSO) penalty drives coefficients to <em>exactly</em> zero,
+      while an L2 (Ridge) penalty only asymptotes. Use it as a visual
+      reminder that two formulas, applied to the same data, can give
+      qualitatively different answers — the same lesson the SE choice
+      teaches in panel regressions.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 2</div>
+      <h4>SE Forest Plot</h4>
+      <p>The post's eight estimator rows as a forest plot. The teal dashed line marks the truth β = 0.5. Pooled OLS bars never touch it; fixed-effects bars do.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-reject">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Rejection Rates</h4>
+      <p>Monte Carlo (N = 500) empirical rejection rates for six FE + SE combinations. The dashed line at 5% is the nominal target. Time-clustered SEs land at 9.0%.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Bias vs Variance Lab</h4>
+      <p>A simulation sandbox: see how 100 fresh draws from the same DGP produce a sampling distribution. The width of that distribution is what an honest SE should reflect.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Bias vs inference</summary>
+        <div class="gloss-body">Bias: point estimate is wrong on average. Inference: standard error misstates uncertainty. SEs cannot fix bias; only the right <em>estimator</em> (e.g., fixed effects) can.</div>
+      </details>
+      <details class="gloss"><summary>Conventional SE</summary>
+        <div class="gloss-body">σ² (X'X)⁻¹. Assumes errors are i.i.d. Almost never appropriate in panel data because of within-cluster correlation.</div>
+      </details>
+      <details class="gloss"><summary>White / HC SE</summary>
+        <div class="gloss-body">Allows heteroskedasticity (variance differs across observations) but still assumes independence. Doesn't help when the issue is correlation.</div>
+      </details>
+      <details class="gloss"><summary>Cluster-robust SE</summary>
+        <div class="gloss-body">Allows arbitrary correlation <em>within</em> a cluster (e.g., firm). Standard in microeconomics. Requires "enough" clusters (rule of thumb: 40–50+).</div>
+      </details>
+      <details class="gloss"><summary>Two-way clustering</summary>
+        <div class="gloss-body">Clusters along entity <em>and</em> time. Insurance when both dimensions plausibly correlate (Cameron, Gelbach & Miller 2011).</div>
+      </details>
+      <details class="gloss"><summary>Driscoll–Kraay SE</summary>
+        <div class="gloss-body">Newey-West-style time kernel applied to cross-sectional averages. Robust to spatial dependence; best when T is large.</div>
+      </details>
+      <details class="gloss"><summary>Fixed effects (FE)</summary>
+        <div class="gloss-body">Subtract each entity's own mean from its observations. Removes any time-invariant confounder (firm ability) and so removes a major source of omitted-variable bias.</div>
+      </details>
+      <details class="gloss"><summary>Rejection rate (size)</summary>
+        <div class="gloss-body">Pr(reject H₀ | H₀ true). At α = 0.05, this should equal 5%. Over-rejection = false positives in too many simulations. Under-rejection = wider intervals than needed (conservative).</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>Eight estimators, one coefficient — a forest plot</h2>
+  <p class="lede">
+    All eight rows below estimate the same parameter — the effect of R&amp;D
+    intensity (x) on firm performance (y) — using the same simulated panel
+    (100 firms × 10 years). What differs is the <strong>model</strong>
+    (pooled OLS vs. entity FE vs. two-way FE) and the
+    <strong>SE estimator</strong> (six varieties, from conventional through
+    Driscoll-Kraay). The teal dashed line marks the truth, β = 0.5.
+    Toggle a method off to focus the view.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>All pooled OLS bars miss the truth.</strong> Five SE choices, none of them rescue the biased β̂ = 1.03. This is the §13.1 lesson visualised: standard errors address precision, not accuracy.</li>
+      <li><strong>The two FE bars (β̂ ≈ 0.48) cover the truth.</strong> Demeaning the firm-level confounder is what moves the point estimate to where it belongs.</li>
+      <li><strong>Hover any row</strong> for the t-statistic and full 95% CI. The most striking row is "Pooled OLS (Driscoll-Kraay)" with t = 65.4 — an impressively significant result for a coefficient that is more than double the truth.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Pooled OLS (conventional)" checked> Pooled OLS (conventional)</label>
+      <label><input type="checkbox" value="Pooled OLS (White/HC)" checked> Pooled OLS (White/HC)</label>
+      <label><input type="checkbox" value="Pooled OLS (cluster: entity)" checked> Pooled OLS (cluster: entity)</label>
+      <label><input type="checkbox" value="Pooled OLS (cluster: time)" checked> Pooled OLS (cluster: time)</label>
+      <label><input type="checkbox" value="Pooled OLS (cluster: both)" checked> Pooled OLS (cluster: both)</label>
+      <label><input type="checkbox" value="Pooled OLS (Driscoll-Kraay)" checked> Pooled OLS (Driscoll-Kraay)</label>
+      <label><input type="checkbox" value="Entity FE (cluster: entity)" checked> Entity FE (cluster: entity)</label>
+      <label><input type="checkbox" value="Two-way FE (cluster: entity)" checked> Two-way FE (cluster: entity)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why does Driscoll-Kraay look so confident?</h3>
+    <p>
+      Driscoll-Kraay (β̂ = 1.03, SE = 0.0158, t = 65.4) is the narrowest CI
+      of the eight rows. The estimator is robust to cross-sectional
+      dependence, but the simulated DGP has very weak cross-sectional
+      dependence — firms are conditionally independent given firm
+      ability. Driscoll-Kraay's bandwidth-3 kernel borrows strength across
+      firms aggressively, producing an SE that is technically valid but
+      smaller than entity-clustering. In a panel with strong common
+      shocks (e.g., banks during the 2008 crisis), the same estimator
+      would give a much wider interval. <em>The narrow CI here reflects
+      the DGP, not a universal property of DK.</em>
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: REJECTION RATES ====================== -->
+<section id="pane-reject" class="tab-pane" role="tabpanel" aria-labelledby="tab-reject">
+
+  <h2>Monte Carlo rejection rates — does the test land at 5%?</h2>
+  <p class="lede">
+    For each combination of FE model + SE estimator, we simulate 500
+    independent datasets from the same DGP and ask: across those 500
+    runs, how often does the 95% CI <em>miss</em> the true β = 0.5? An
+    honest test should reject at 5% — anything materially above 5% is
+    over-rejection (false positives); anything materially below is
+    conservative.
+  </p>
+
+  <div class="chart-area" id="rej-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What the bars are telling you</h4>
+    <ul>
+      <li><strong>Five combinations land near 5%.</strong> FE + conventional (6.0%), FE + White (6.4%), FE + entity-cluster (6.6%), FE + both-cluster (7.8%) all fall within simulation noise of the nominal target. After demeaning, the within-firm residuals are reasonably well-behaved.</li>
+      <li><strong>FE + time-cluster over-rejects badly (9.0%).</strong> With only 10 year-clusters, the asymptotic theory behind cluster-robust SEs simply does not hold. The standard error is too small; the t-statistic too large; false positives nearly double the nominal rate.</li>
+      <li><strong>TWFE + entity-cluster under-rejects (3.2%).</strong> Absorbing time effects costs degrees of freedom and slightly inflates the SE — wider intervals than needed, but conservative is much safer than over-confident.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Rule of thumb</h3>
+    <p>
+      Cluster on the dimension with the larger number of groups. In this
+      DGP that's <em>firms</em> (100) not <em>years</em> (10). With fewer
+      than ~30–40 clusters the cluster-robust SE breaks down, and you
+      need a small-sample correction (e.g., wild cluster bootstrap, CR2).
+      The post's §13.2 decision framework is the takeaway: <em>always</em>
+      start with the right model (FE), then pick the SE estimator with
+      enough clusters along the chosen dimension.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: BIAS-VARIANCE LAB ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Bias vs variance sandbox</h2>
+  <p class="lede">
+    A single regression gives you one number. To understand what a
+    standard error <em>should</em> reflect, you need to imagine running
+    the same regression many times on fresh data and looking at the
+    distribution of point estimates. This tab simulates that thought
+    experiment. Each "Run 100 simulations" press generates 100 fresh
+    datasets and recomputes two estimators; the resulting histogram is
+    the empirical sampling distribution — exactly the object an honest
+    SE is trying to summarise.
+  </p>
+
+  <div class="card">
+    <h3>How to read this lab</h3>
+    <p>
+      The simulator below uses a Double-LASSO setup because the JavaScript
+      machinery for it is built in. Read the
+      <strong style="color:#00d4c8;">teal</strong> estimator
+      ("Rigorous") as a stand-in for a <em>well-sized</em> estimator —
+      tight, centred — and the
+      <strong style="color:#d97757;">orange</strong> estimator ("CV") as
+      a stand-in for a <em>mis-sized</em> estimator — wider, possibly
+      biased. The pedagogical message is the same as the panel-SE post:
+      two reasonable-looking choices can produce very different sampling
+      distributions on identical data.
+    </p>
+  </div>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Capped at 300 so the "Run 100 sims" button finishes quickly.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">Capped at 50 for the 100-sim run.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Strength of the true relationship between covariates and outcomes.</div>
+    </div>
+    <div class="control">
+      <label>Asymmetry <span class="value" id="sh-a-val">0.80</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.80" aria-label="asymmetry">
+      <div class="hint">0 = controls predict y and treatment equally · 1 = controls predict treatment well, y barely.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Well-sized (Rigorous)</span></h3>
+      <p class="note" style="margin:0 0 10px;">Theory-driven λ, comparable to a correctly-sized SE.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-rig-un">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Mis-sized (CV)</span></h3>
+      <p class="note" style="margin:0 0 10px;">Data-driven λ, comparable to an over-confident SE.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-cv-un">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="card">
+    <h3>Bias vs variance over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws to see the sampling distribution. The width of each histogram is what an honest SE should approximate.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Mis-sized mean α̂</div><div class="stat-value orange" id="sh-cv-mean">—</div><div class="stat-sub">bias from naive choice</div></div>
+      <div class="stat"><div class="stat-label">Mis-sized sd(α̂)</div><div class="stat-value" id="sh-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Well-sized mean α̂</div><div class="stat-value teal" id="sh-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">Well-sized sd(α̂)</div><div class="stat-value" id="sh-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Standard Errors in Panel Data</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+{
+  "estimates": [
+    {
+      "method": "Naive OLS",
+      "outcome": "Log unemployment duration",
+      "estimate": -0.0855,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_selected": 0
+    },
+    {
+      "method": "OLS + Covariates",
+      "outcome": "Log unemployment duration",
+      "estimate": -0.0717,
+      "se": null,
+      "ci_lo": null,
+      "ci_hi": null,
+      "n_selected": 15
+    },
+    {
+      "method": "DoubleML (RF)",
+      "outcome": "Log unemployment duration",
+      "estimate": -0.0736,
+      "se": 0.0354,
+      "ci_lo": -0.1430,
+      "ci_hi": -0.0041,
+      "n_selected": 15
+    },
+    {
+      "method": "DoubleML (Lasso)",
+      "outcome": "Log unemployment duration",
+      "estimate": -0.0712,
+      "se": 0.0354,
+      "ci_lo": -0.1406,
+      "ci_hi": -0.0018,
+      "n_selected": 15
+    }
+  ],
+  "selection": [
+    {
+      "outcome": "Log unemployment duration",
+      "method": "Naive OLS",
+      "n_Iy": 0,
+      "n_Id": 0,
+      "n_intersection": 0,
+      "n_union": 0
+    },
+    {
+      "outcome": "Log unemployment duration",
+      "method": "OLS + Covariates",
+      "n_Iy": 15,
+      "n_Id": 0,
+      "n_intersection": 0,
+      "n_union": 15
+    },
+    {
+      "outcome": "Log unemployment duration",
+      "method": "DoubleML (RF)",
+      "n_Iy": 15,
+      "n_Id": 15,
+      "n_intersection": 15,
+      "n_union": 15
+    },
+    {
+      "outcome": "Log unemployment duration",
+      "method": "DoubleML (Lasso)",
+      "n_Iy": 15,
+      "n_Id": 15,
+      "n_intersection": 15,
+      "n_union": 15
+    }
+  ],
+  "meta": {
+    "source": "content/post/python_doubleml/index.md (Summary table § + sensitivity comparison)",
+    "n_obs": 5099,
+    "n_covariates": 15,
+    "outcome_label": "inuidur1 (log unemployment duration)",
+    "treatment_label": "tg (bonus offer)",
+    "dataset": "Pennsylvania Bonus Experiment (RCT, 5,099 claimants)",
+    "notes": "DoubleML SEs / CIs reflect 5-fold cross-fitting with the doubleml package. Naive OLS and OLS+Covariates as reported in the post do not include SEs computed with the doubleml infrastructure."
+  }
+}

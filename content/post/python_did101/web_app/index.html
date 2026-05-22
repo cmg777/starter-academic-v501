@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>DiD-101 Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Introduction to Difference-in-Differences (DiD) in Python'. A pedagogical web app with a parallel-trends animation, a 2x2 DiD simulator, a forest plot of the post's estimates, and an event-study explorer.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>DiD-101 — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Introduction to Difference-in-Differences (DiD) in Python</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">2 · DiD Simulator</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">3 · Forest Plot</button>
+  <button id="tab-event"    class="tab"        data-pane="pane-event"    role="tab" aria-selected="false">4 · Event Study</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why <em>Difference-in-Differences</em>?</h2>
+  <p class="lede">
+    A school district rolls out an after-school tutoring program in 10 of its
+    35 high schools. After one year, average GPA in tutored schools jumps from
+    <strong>60.17 to 96.37</strong> — a 36.20-point increase. Case closed?
+    Not quite. Over the same period, GPA also rose in the 25 untreated schools
+    from <strong>71.22 to 82.10</strong>. <strong>Difference-in-Differences</strong>
+    strips away that common trend and reveals the program's true causal effect:
+    an <strong>ATT of 25.32 GPA points</strong>.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. In four tabs you will:
+    watch parallel trends collide with a treatment shock; simulate your own
+    2×2 design and compare the naive before-after estimate to the DiD ATT;
+    explore the post's actual estimates across specifications and SE types;
+    and inspect the event-study coefficients that test the parallel-trends
+    assumption.
+  </p>
+
+  <div class="card">
+    <h3>Parallel trends — the identifying assumption</h3>
+    <p>
+      DiD works <em>only if</em> treated and control units would have moved on
+      parallel paths in the absence of the treatment. The animation below sweeps
+      a "treatment" knob: when it is zero, both lines move in lockstep. When you
+      flip it on, the treated line jumps. The vertical gap at the end is the
+      ATT — exactly what DiD recovers.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>DiD Simulator</h4>
+      <p>Slide the parallel-trends slope, the true ATT, and noise. Watch the naive before-after estimate diverge from the DiD ATT as the secular trend grows. Run 100 simulations to see the bias picture.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Forest Plot</h4>
+      <p>The post's actual estimates, interactively. Toggle between the 2×2 specification comparison and the inference-method (iid/HC1/CRV1/CRV3) comparison. Hover for SEs and CIs.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-event">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Event Study</h4>
+      <p>The post's event-study coefficients with 95% CIs across 7 periods relative to treatment. Pre-treatment leads near zero validate parallel trends; post-treatment lags trace the dynamic effect.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (click a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Difference-in-Differences (DiD)</summary>
+        <div class="gloss-body">Compare the change in outcomes for the treated group to the change for an untreated control group. The difference of those two differences is the causal estimate. <em>Nets out time-invariant level differences AND shared time trends.</em></div>
+      </details>
+      <details class="gloss"><summary>Parallel trends</summary>
+        <div class="gloss-body">In the absence of treatment, treated and control would have followed the same trajectory. <em>Differences in levels are fine; differences in slopes invalidate DiD.</em></div>
+      </details>
+      <details class="gloss"><summary>ATT</summary>
+        <div class="gloss-body">Average Treatment effect on the Treated, E[Y(1)−Y(0) | D=1]. The mean causal effect for units that actually got treatment. <em>DiD identifies the ATT (not the ATE) under parallel trends.</em></div>
+      </details>
+      <details class="gloss"><summary>Counterfactual</summary>
+        <div class="gloss-body">The hypothetical outcome the treated would have had without treatment. Never observed. <em>DiD constructs it as: treated pre-level + control's secular change.</em></div>
+      </details>
+      <details class="gloss"><summary>Two-Way Fixed Effects (TWFE)</summary>
+        <div class="gloss-body">The regression implementation of DiD. Includes a fixed effect per unit and per period. <em>The coefficient on the treatment-period interaction is the DiD estimate.</em></div>
+      </details>
+      <details class="gloss"><summary>Naive before-after</summary>
+        <div class="gloss-body">The biased estimator: treated group's pre-vs-post change, ignoring the control group. <em>Conflates the treatment effect with secular drift.</em></div>
+      </details>
+      <details class="gloss"><summary>Event study</summary>
+        <div class="gloss-body">A dynamic DiD specification that estimates a separate treatment effect for each period relative to treatment. <em>Pre-treatment leads test parallel trends; post-treatment lags trace dynamic effects.</em></div>
+      </details>
+      <details class="gloss"><summary>SUTVA</summary>
+        <div class="gloss-body">Stable Unit Treatment Value Assumption: no spillovers between units, and a single version of the treatment. <em>Required for the potential-outcomes framework to make sense.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: DiD SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>DiD Simulator — see why DiD beats the naive comparison</h2>
+  <p class="lede">
+    We simulate a 2×2 panel: a treated group and a control group, each observed
+    in a pre and post period. You set the <strong>true ATT</strong>, the
+    <strong>secular trend</strong> (the common change that happens to both
+    groups), and noise. The app then estimates the program's effect three ways:
+    <em>naive before-after</em>, <em>manual DiD</em>, and <em>TWFE regression</em>.
+    <strong>Watch the naive estimate inflate by exactly the secular trend
+    while the DiD ATT stays unbiased.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>True ATT <span class="value" id="sim-att-val">25.00</span></label>
+      <input type="range" id="sim-att" min="-10" max="40" step="0.5" value="25" aria-label="true ATT">
+      <div class="hint">The ground-truth effect of the program. DiD should recover this.</div>
+    </div>
+    <div class="control">
+      <label>Secular trend <span class="value" id="sim-trend-val">10.00</span></label>
+      <input type="range" id="sim-trend" min="-15" max="30" step="0.5" value="10" aria-label="secular trend">
+      <div class="hint">Common change in GPA over time (would have happened anyway). The naive estimator wrongly counts this as part of the effect.</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="sim-noise-val">2.00</span></label>
+      <input type="range" id="sim-noise" min="0.1" max="8" step="0.1" value="2" aria-label="noise std dev">
+      <div class="hint">Idiosyncratic shock to each school-period observation.</div>
+    </div>
+    <div class="control">
+      <label>Sample size per group <span class="value" id="sim-n-val">35</span></label>
+      <input type="range" id="sim-n" min="10" max="200" step="5" value="35" aria-label="sample size per group">
+      <div class="hint">Number of schools in each group. Larger = tighter estimates.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag cv">Naive Before-After</span></h3>
+      <p class="note" style="margin:0 0 10px;">Treated group's post-mean minus pre-mean — ignores the control group.</p>
+      <div class="method-row"><span class="label">Estimate</span><span class="val" id="sim-naive-est">—</span></div>
+      <div class="method-row"><span class="label">SE</span><span class="val" id="sim-naive-se">—</span></div>
+      <div class="method-row"><span class="label">Bias (vs true ATT)</span><span class="val" id="sim-naive-bias">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag rigorous">DiD (manual 2×2)</span></h3>
+      <p class="note" style="margin:0 0 10px;">Treated change minus control change — strips out the secular trend.</p>
+      <div class="method-row"><span class="label">Estimate</span><span class="val" id="sim-did-est">—</span></div>
+      <div class="method-row"><span class="label">SE</span><span class="val" id="sim-did-se">—</span></div>
+      <div class="method-row"><span class="label">Bias (vs true ATT)</span><span class="val" id="sim-did-bias">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-compare"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set the secular trend to 0.</strong> The naive estimator and DiD agree — there is no common drift to confuse them.</li>
+      <li><strong>Crank the secular trend up.</strong> The naive estimate inflates by exactly the trend amount. The DiD estimate stays anchored at the true ATT.</li>
+      <li><strong>Set the true ATT to 0 with a positive secular trend.</strong> Naive says the program "worked" when it did nothing. DiD correctly reports zero. <em>This is the §4–5 message of the post: the comparison group is the rescue.</em></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over many simulations</h3>
+    <p>Single runs are noisy. Run the pipeline 100 times with fresh draws (same parameters, different noise) to see whether the naive bias is systematic.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sim-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Naive mean estimate</div><div class="stat-value orange" id="sim-naive-mean">—</div><div class="stat-sub">bias = mean − true ATT</div></div>
+      <div class="stat"><div class="stat-label">Naive sd</div><div class="stat-value" id="sim-naive-sd">—</div></div>
+      <div class="stat"><div class="stat-label">DiD mean estimate</div><div class="stat-value teal" id="sim-did-mean">—</div></div>
+      <div class="stat"><div class="stat-label">DiD sd</div><div class="stat-value" id="sim-did-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's estimates — interactively</h2>
+  <p class="lede">
+    These numbers come straight from the post's regressions on the
+    Corral &amp; Yang (2024) tutoring panel. Toggle between the two outcome
+    groups — the 2×2 specification comparison and the SE-type comparison —
+    and toggle individual methods to see how the point estimate and CI move.
+    Hover any point for its SE and 95% CI.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>In "DiD estimate (2×2)"</strong>, watch the Naive Before-After bar sit ~11 points above the others. That gap (36.20 − 25.32 = 10.88) is exactly the secular trend. DiD is what removes it.</li>
+      <li><strong>Toggle to "TWFE under 4 SE types"</strong>: all four point estimates collapse to 25.315. Only the CIs differ. <em>Inference choice matters less than research design when the signal is this strong.</em></li>
+      <li><strong>CRV3 widens the CI most</strong> (Bell-McCaffrey small-sample correction). With only 35 clusters, it is the safer default — but the conclusion is unchanged.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcome groups</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="DiD estimate (2x2)" checked> DiD estimate (2x2)</label>
+      <label><input type="checkbox" value="TWFE under 4 SE types"> TWFE under 4 SE types</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive Before-After" checked> Naive Before-After</label>
+      <label><input type="checkbox" value="OLS / HC1" checked> OLS / HC1</label>
+      <label><input type="checkbox" value="TWFE / CRV1" checked> TWFE / CRV1</label>
+      <label><input type="checkbox" value="TWFE+Cov / CRV1" checked> TWFE+Cov / CRV1</label>
+      <label><input type="checkbox" value="TWFE / iid" checked> TWFE / iid</label>
+      <label><input type="checkbox" value="TWFE / HC1" checked> TWFE / HC1</label>
+      <label><input type="checkbox" value="TWFE / CRV3" checked> TWFE / CRV3</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why does the Naive estimator inflate so much?</h3>
+    <p>
+      The treated group's GPA rose by 36.20 points over the same period that
+      control schools rose by 10.88 points. The naive before-after attributes
+      <em>all</em> of the 36.20 to the program. DiD attributes only the
+      <strong>extra</strong> 25.32 — the part that exceeds what would have
+      happened anyway. That is a 43% overstatement avoided by adding a single
+      comparison group.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 2</h3>
+    <p>
+      The naive-vs-DiD gap you just explored on simulated data is exactly the
+      gap that shows up on the real Corral &amp; Yang panel:
+    </p>
+    <ul>
+      <li><strong>Treated change:</strong> 36.20 GPA points (60.17 → 96.37).</li>
+      <li><strong>Control change (= secular trend):</strong> 10.88 GPA points (71.22 → 82.10).</li>
+      <li><strong>DiD ATT:</strong> 36.20 − 10.88 = 25.32 GPA points.</li>
+    </ul>
+    <p>
+      The simulator lets you set the trend yourself; the forest plot lets you
+      verify that the post's actual numbers obey the same logic.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: EVENT STUDY ====================== -->
+<section id="pane-event" class="tab-pane" role="tabpanel" aria-labelledby="tab-event">
+
+  <h2>Event Study — testing parallel trends and tracing dynamics</h2>
+  <p class="lede">
+    The 2×2 design tells you <em>whether</em> the program worked. The event
+    study tells you <em>when</em> the effect kicked in and whether it grew or
+    faded. We estimate a separate treatment effect for each period
+    <em>relative to treatment</em>, with t = −1 as the omitted reference.
+    <strong>Pre-treatment coefficients near zero validate parallel trends;
+    post-treatment coefficients trace the dynamic effect.</strong>
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Pre-treatment leads (t = −4, −3, −2) hover around zero</strong> with CIs that comfortably include zero (p = 0.40, 0.47, 0.17). Treated and control schools were on parallel trajectories before the program.</li>
+      <li><strong>Post-treatment lags (t = 0, 1, 2, 3) jump to ≈25</strong> immediately at t = 0 and stay there. <em>No fade-out, no delayed onset.</em> The program's effect is both immediate and sustained.</li>
+      <li><strong>The omitted reference is t = −1</strong> (normalised to zero by construction). All other coefficients are differences from that baseline.</li>
+    </ul>
+  </div>
+
+  <div class="chart-area" id="ev-chart"></div>
+
+  <div class="card">
+    <h3>Why is t = −1 missing?</h3>
+    <p>
+      Event-study designs always omit one period to avoid perfect collinearity
+      with the unit fixed effects. The convention is to drop t = −1 (the period
+      just before treatment) and read every other coefficient as a difference
+      from that baseline. In the chart above, t = −1 is fixed at 0 with no CI;
+      it is the anchor.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Parallel-trends sanity check</h3>
+    <p>
+      Strong evidence against parallel trends would look like steadily rising
+      (or falling) pre-treatment coefficients — a "smoking gun" pretrend.
+      Here, the three pre-treatment leads bounce around zero (0.342, −0.322,
+      0.593) with no monotone pattern. The <em>magnitudes</em> are also tiny
+      relative to the post-treatment jumps (≈25), so even if a small pretrend
+      existed, it could not explain the 25-point gap.
+    </p>
+    <p>
+      In real applications, you should also <em>look at the trajectories
+      themselves</em> (not just the regression coefficients): plot treated
+      and control means by period and check that the lines really do run
+      parallel before treatment. The regression is a test; the plot is the
+      sanity check.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Introduction to Difference-in-Differences (DiD) in Python</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

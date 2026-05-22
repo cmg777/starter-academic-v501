@@ -1,0 +1,52 @@
+{
+  "_comment": "DiD estimator comparisons from python_did. Three outcomes correspond to three datasets: '2x2 (true ATT=5)' uses the simple two-period data; 'Staggered (true avg≈2.5)' uses the staggered adoption data; 'HonestDiD CI' shows the robust CI bounds. n_selected encodes the number of cohorts (for staggered) or null otherwise.",
+
+  "estimates": [
+    {"method": "Classic 2x2",       "outcome": "2x2 (true ATT=5)",         "estimate": 5.1216, "se": 0.2455, "ci_lo": 4.6399, "ci_hi": 5.6034, "n_selected": null},
+    {"method": "Event study avg",   "outcome": "2x2 (true ATT=5)",         "estimate": 4.7967, "se": 0.3923, "ci_lo": 4.0269, "ci_hi": 5.5665, "n_selected": null},
+
+    {"method": "Naive TWFE",        "outcome": "Staggered (true avg=2.5)", "estimate": 2.1822, "se": 0.1500, "ci_lo": 1.8882, "ci_hi": 2.4762, "n_selected": 3},
+    {"method": "Callaway-SantAnna", "outcome": "Staggered (true avg=2.5)", "estimate": 2.4136, "se": 0.0552, "ci_lo": 2.3055, "ci_hi": 2.5217, "n_selected": 3},
+
+    {"method": "HonestDiD M=0",     "outcome": "HonestDiD CI (ATT)",       "estimate": 2.5958, "se": 0.0323, "ci_lo": 2.5324, "ci_hi": 2.6592, "n_selected": null},
+    {"method": "HonestDiD M=1",     "outcome": "HonestDiD CI (ATT)",       "estimate": 2.5958, "se": 0.1056, "ci_lo": 2.3889, "ci_hi": 2.8028, "n_selected": null},
+    {"method": "HonestDiD M=5",     "outcome": "HonestDiD CI (ATT)",       "estimate": 2.5958, "se": 0.3985, "ci_lo": 1.8148, "ci_hi": 3.3769, "n_selected": null},
+    {"method": "HonestDiD M=10",    "outcome": "HonestDiD CI (ATT)",       "estimate": 2.5958, "se": 0.7647, "ci_lo": 1.0971, "ci_hi": 4.0945, "n_selected": null},
+    {"method": "HonestDiD M=15",    "outcome": "HonestDiD CI (ATT)",       "estimate": 2.5958, "se": 1.1308, "ci_lo": 0.3795, "ci_hi": 4.8122, "n_selected": null}
+  ],
+
+  "selection": [
+    {"outcome": "Staggered (true avg=2.5)", "method": "Naive TWFE",        "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 28},
+    {"outcome": "Staggered (true avg=2.5)", "method": "Callaway-SantAnna", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 0}
+  ],
+
+  "event_study": [
+    {"lag": -5, "estimate": -0.1435, "se": 0.0813, "ci_lo": -0.3028, "ci_hi": 0.0158},
+    {"lag": -4, "estimate": -0.0091, "se": 0.0744, "ci_lo": -0.1549, "ci_hi": 0.1367},
+    {"lag": -3, "estimate": -0.0697, "se": 0.0560, "ci_lo": -0.1795, "ci_hi": 0.0401},
+    {"lag": -2, "estimate": -0.0709, "se": 0.0631, "ci_lo": -0.1946, "ci_hi": 0.0528},
+    {"lag": -1, "estimate":  0.0000, "se": 0.0000, "ci_lo":  0.0000, "ci_hi": 0.0000},
+    {"lag":  0, "estimate":  1.9713, "se": 0.0645, "ci_lo":  1.8449, "ci_hi": 2.0977},
+    {"lag":  1, "estimate":  2.1416, "se": 0.0577, "ci_lo":  2.0285, "ci_hi": 2.2547},
+    {"lag":  2, "estimate":  2.2969, "se": 0.0644, "ci_lo":  2.1707, "ci_hi": 2.4231},
+    {"lag":  3, "estimate":  2.6763, "se": 0.0796, "ci_lo":  2.5203, "ci_hi": 2.8323},
+    {"lag":  4, "estimate":  2.7925, "se": 0.0800, "ci_lo":  2.6357, "ci_hi": 2.9493},
+    {"lag":  5, "estimate":  3.0259, "se": 0.1227, "ci_lo":  2.7854, "ci_hi": 3.2664},
+    {"lag":  6, "estimate":  3.2663, "se": 0.1090, "ci_lo":  3.0527, "ci_hi": 3.4799}
+  ],
+
+  "honest_did": [
+    {"M":  0.0, "ci_lo": 2.5324, "ci_hi": 2.6592, "significant": true},
+    {"M":  0.5, "ci_lo": 2.4606, "ci_hi": 2.7310, "significant": true},
+    {"M":  1.0, "ci_lo": 2.3889, "ci_hi": 2.8028, "significant": true},
+    {"M":  1.5, "ci_lo": 2.3171, "ci_hi": 2.8745, "significant": true},
+    {"M":  2.0, "ci_lo": 2.2453, "ci_hi": 2.9463, "significant": true},
+    {"M":  3.0, "ci_lo": 2.1018, "ci_hi": 3.0898, "significant": true},
+    {"M":  4.0, "ci_lo": 1.9583, "ci_hi": 3.2334, "significant": true},
+    {"M":  5.0, "ci_lo": 1.8148, "ci_hi": 3.3769, "significant": true},
+    {"M":  7.0, "ci_lo": 1.5277, "ci_hi": 3.6639, "significant": true},
+    {"M": 10.0, "ci_lo": 1.0971, "ci_hi": 4.0945, "significant": true},
+    {"M": 12.0, "ci_lo": 0.8101, "ci_hi": 4.3816, "significant": true},
+    {"M": 15.0, "ci_lo": 0.3795, "ci_hi": 4.8122, "significant": true}
+  ]
+}

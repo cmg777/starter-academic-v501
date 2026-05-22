@@ -1,0 +1,76 @@
+{
+  "estimates": [
+    { "method": "Sparse FE",       "outcome": "beta1 (GDP)",  "estimate": -7.4980, "se": 1.6240, "ci_lo": -10.7305, "ci_hi": -4.2656, "n_selected": 0 },
+    { "method": "Kitchen-Sink FE", "outcome": "beta1 (GDP)",  "estimate": -7.1307, "se": 1.5626, "ci_lo": -10.2409, "ci_hi": -4.0205, "n_selected": 12 },
+    { "method": "BMA (FE)",        "outcome": "beta1 (GDP)",  "estimate": -7.1390, "se": 1.8111, "ci_lo": -10.7613, "ci_hi": -3.5168, "n_selected": 3 },
+    { "method": "DSL (FE)",        "outcome": "beta1 (GDP)",  "estimate": -7.4333, "se": 1.6283, "ci_lo": -10.6248, "ci_hi": -4.2419, "n_selected": 102 },
+    { "method": "BMA (pooled)",    "outcome": "beta1 (GDP)",  "estimate": -21.2581, "se": 1.6417, "ci_lo": -24.5414, "ci_hi": -17.9747, "n_selected": 12 },
+    { "method": "DSL (pooled)",    "outcome": "beta1 (GDP)",  "estimate": -22.0330, "se": 5.2773, "ci_lo": -32.3763, "ci_hi": -11.6897, "n_selected": 7 },
+    { "method": "True DGP",        "outcome": "beta1 (GDP)",  "estimate": -7.1000, "se": 0.0000, "ci_lo": -7.1000, "ci_hi": -7.1000, "n_selected": 5 },
+
+    { "method": "Sparse FE",       "outcome": "beta2 (GDP^2)", "estimate": 0.8490, "se": 0.1705, "ci_lo": 0.5097, "ci_hi": 1.1882, "n_selected": 0 },
+    { "method": "Kitchen-Sink FE", "outcome": "beta2 (GDP^2)", "estimate": 0.8060, "se": 0.1648, "ci_lo": 0.4780, "ci_hi": 1.1340, "n_selected": 12 },
+    { "method": "BMA (FE)",        "outcome": "beta2 (GDP^2)", "estimate": 0.8078, "se": 0.1892, "ci_lo": 0.4294, "ci_hi": 1.1863, "n_selected": 3 },
+    { "method": "DSL (FE)",        "outcome": "beta2 (GDP^2)", "estimate": 0.8402, "se": 0.1714, "ci_lo": 0.5043, "ci_hi": 1.1760, "n_selected": 102 },
+    { "method": "BMA (pooled)",    "outcome": "beta2 (GDP^2)", "estimate": 2.2847, "se": 0.1749, "ci_lo": 1.9350, "ci_hi": 2.6346, "n_selected": 12 },
+    { "method": "DSL (pooled)",    "outcome": "beta2 (GDP^2)", "estimate": 2.3669, "se": 0.5652, "ci_lo": 1.2591, "ci_hi": 3.4747, "n_selected": 7 },
+    { "method": "True DGP",        "outcome": "beta2 (GDP^2)", "estimate": 0.8100, "se": 0.0000, "ci_lo": 0.8100, "ci_hi": 0.8100, "n_selected": 5 },
+
+    { "method": "Sparse FE",       "outcome": "beta3 (GDP^3)", "estimate": -0.0315, "se": 0.0059, "ci_lo": -0.0433, "ci_hi": -0.0197, "n_selected": 0 },
+    { "method": "Kitchen-Sink FE", "outcome": "beta3 (GDP^3)", "estimate": -0.0298, "se": 0.0057, "ci_lo": -0.0412, "ci_hi": -0.0184, "n_selected": 12 },
+    { "method": "BMA (FE)",        "outcome": "beta3 (GDP^3)", "estimate": -0.0299, "se": 0.0065, "ci_lo": -0.0429, "ci_hi": -0.0169, "n_selected": 3 },
+    { "method": "DSL (FE)",        "outcome": "beta3 (GDP^3)", "estimate": -0.0311, "se": 0.0060, "ci_lo": -0.0427, "ci_hi": -0.0194, "n_selected": 102 },
+    { "method": "BMA (pooled)",    "outcome": "beta3 (GDP^3)", "estimate": -0.0814, "se": 0.0061, "ci_lo": -0.0935, "ci_hi": -0.0692, "n_selected": 12 },
+    { "method": "DSL (pooled)",    "outcome": "beta3 (GDP^3)", "estimate": -0.0842, "se": 0.0199, "ci_lo": -0.1232, "ci_hi": -0.0452, "n_selected": 7 },
+    { "method": "True DGP",        "outcome": "beta3 (GDP^3)", "estimate": -0.0300, "se": 0.0000, "ci_lo": -0.0300, "ci_hi": -0.0300, "n_selected": 5 }
+  ],
+  "selection": [
+    { "outcome": "BMA (FE)",      "method": "above 0.80 PIP", "n_Iy": 6, "n_Id": 0, "n_intersection": 0, "n_union": 6 },
+    { "outcome": "BMA (pooled)",  "method": "above 0.80 PIP", "n_Iy": 12, "n_Id": 0, "n_intersection": 0, "n_union": 12 },
+    { "outcome": "DSL (FE)",      "method": "selected", "n_Iy": 102, "n_Id": 100, "n_intersection": 99, "n_union": 102 },
+    { "outcome": "DSL (pooled)",  "method": "selected", "n_Iy": 5, "n_Id": 7, "n_intersection": 5, "n_union": 7 }
+  ],
+  "pips_fe": [
+    { "variable": "fossil_fuel",  "label": "fossil fuel share",  "pip": 1.000, "is_true": true,  "true_coef":  0.015, "bma_mean":  0.0138 },
+    { "variable": "ln_gdp_sq",    "label": "GDP squared (log)",   "pip": 1.000, "is_true": true,  "true_coef":  0.810, "bma_mean":  0.8078 },
+    { "variable": "ln_gdp_cb",    "label": "GDP cubed (log)",     "pip": 1.000, "is_true": true,  "true_coef": -0.030, "bma_mean": -0.0299 },
+    { "variable": "industry",     "label": "industry VA",         "pip": 0.999, "is_true": true,  "true_coef":  0.010, "bma_mean":  0.0086 },
+    { "variable": "ln_gdp",       "label": "GDP linear (log)",    "pip": 0.994, "is_true": true,  "true_coef": -7.100, "bma_mean": -7.1390 },
+    { "variable": "renewable",    "label": "renewable energy",    "pip": 0.959, "is_true": true,  "true_coef": -0.010, "bma_mean": -0.0068 },
+    { "variable": "urban",        "label": "urbanization",        "pip": 0.268, "is_true": true,  "true_coef":  0.007, "bma_mean":  0.0021 },
+    { "variable": "democracy",    "label": "democracy index",     "pip": 0.023, "is_true": true,  "true_coef": -0.005, "bma_mean": -0.0001 },
+    { "variable": "globalization","label": "globalization",       "pip": 0.045, "is_true": false, "true_coef":  0.000, "bma_mean":  0.0001 },
+    { "variable": "pop_density",  "label": "population density",  "pip": 0.038, "is_true": false, "true_coef":  0.000, "bma_mean":  0.0000 },
+    { "variable": "corruption",   "label": "corruption index",    "pip": 0.052, "is_true": false, "true_coef":  0.000, "bma_mean":  0.0001 },
+    { "variable": "services",     "label": "services VA",         "pip": 0.041, "is_true": false, "true_coef":  0.000, "bma_mean":  0.0000 },
+    { "variable": "trade",        "label": "trade openness",      "pip": 0.067, "is_true": false, "true_coef":  0.000, "bma_mean":  0.0000 },
+    { "variable": "fdi",          "label": "foreign direct inv.", "pip": 0.044, "is_true": false, "true_coef":  0.000, "bma_mean":  0.0000 },
+    { "variable": "credit",       "label": "credit (% GDP)",      "pip": 0.155, "is_true": false, "true_coef":  0.000, "bma_mean": -0.0002 }
+  ],
+  "pips_pooled": [
+    { "variable": "ln_gdp",       "label": "GDP linear (log)",    "pip": 1.000, "is_true": true,  "false_positive": false },
+    { "variable": "ln_gdp_sq",    "label": "GDP squared (log)",   "pip": 1.000, "is_true": true,  "false_positive": false },
+    { "variable": "ln_gdp_cb",    "label": "GDP cubed (log)",     "pip": 1.000, "is_true": true,  "false_positive": false },
+    { "variable": "fossil_fuel",  "label": "fossil fuel share",   "pip": 1.000, "is_true": true,  "false_positive": false },
+    { "variable": "renewable",    "label": "renewable energy",    "pip": 1.000, "is_true": true,  "false_positive": false },
+    { "variable": "urban",        "label": "urbanization",        "pip": 1.000, "is_true": true,  "false_positive": false },
+    { "variable": "industry",     "label": "industry VA",         "pip": 1.000, "is_true": true,  "false_positive": false },
+    { "variable": "services",     "label": "services VA",         "pip": 1.000, "is_true": false, "false_positive": true },
+    { "variable": "pop_density",  "label": "population density",  "pip": 1.000, "is_true": false, "false_positive": true },
+    { "variable": "credit",       "label": "credit (% GDP)",      "pip": 1.000, "is_true": false, "false_positive": true },
+    { "variable": "trade",        "label": "trade openness",      "pip": 0.860, "is_true": false, "false_positive": true },
+    { "variable": "democracy",    "label": "democracy index",     "pip": 0.841, "is_true": true,  "false_positive": false },
+    { "variable": "globalization","label": "globalization",       "pip": 0.450, "is_true": false, "false_positive": false },
+    { "variable": "corruption",   "label": "corruption index",    "pip": 0.350, "is_true": false, "false_positive": false },
+    { "variable": "fdi",          "label": "foreign direct inv.", "pip": 0.300, "is_true": false, "false_positive": false }
+  ],
+  "turning_points": [
+    { "method": "Sparse FE",       "min_tp":  2478, "max_tp": 25656, "covers_true": false },
+    { "method": "Kitchen-Sink FE", "min_tp":  2426, "max_tp": 27694, "covers_true": false },
+    { "method": "BMA (FE)",        "min_tp":  2411, "max_tp": 27269, "covers_true": false },
+    { "method": "DSL (FE)",        "min_tp":  2429, "max_tp": 27672, "covers_true": false },
+    { "method": "BMA (pooled)",    "min_tp":  5752, "max_tp": 23298, "covers_true": false },
+    { "method": "DSL (pooled)",    "min_tp":  5581, "max_tp": 24532, "covers_true": false },
+    { "method": "True DGP",        "min_tp":  1895, "max_tp": 34647, "covers_true": true }
+  ]
+}

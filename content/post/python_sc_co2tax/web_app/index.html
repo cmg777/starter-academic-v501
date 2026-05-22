@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Carbon Tax &amp; CO2 — Synthetic Control Lab</title>
+<meta name="description" content="Interactive companion to 'Carbon Taxes and CO2 Emissions: A Synthetic-Control Analysis in Python'. Explore Sweden vs Synthetic Sweden, donor weights, placebo tests, and method comparison.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Carbon Tax &amp; CO2 — Synthetic Control Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Carbon Taxes and CO2 Emissions: A Synthetic-Control Analysis in Python</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"     class="tab active" data-pane="pane-intro"     role="tab" aria-selected="true">1 · Why Synthetic Control?</button>
+  <button id="tab-synth"     class="tab"        data-pane="pane-synth"     role="tab" aria-selected="false">2 · Synthetic Sweden</button>
+  <button id="tab-placebos"  class="tab"        data-pane="pane-placebos"  role="tab" aria-selected="false">3 · Placebo Distribution</button>
+  <button id="tab-methods"   class="tab"        data-pane="pane-methods"   role="tab" aria-selected="false">4 · Method Comparison</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Did Sweden's 1991 carbon tax cut transport CO2?</h2>
+  <p class="lede">
+    In 1991, Sweden became one of the first countries to put a price on carbon
+    dioxide. Three decades later, two questions matter for policy:
+    <strong>(1)</strong> did the carbon tax actually reduce CO2 emissions from
+    transport, and <strong>(2)</strong> did it cost Sweden any economic growth?
+    The post answers both using synthetic control. This app lets you walk
+    through the evidence yourself.
+  </p>
+  <p class="lede">
+    In four tabs you will: <strong>see</strong> Sweden plateau while its
+    counterfactual keeps climbing; <strong>inspect</strong> the six donor
+    countries the optimiser picks; <strong>play with</strong> a placebo
+    distribution to feel where the permutation p-value of 0.067 comes from;
+    and <strong>compare</strong> the naive pre/post, DiD, synthetic-control,
+    OLS, and IV estimates on a single forest plot.
+  </p>
+
+  <div class="card">
+    <h3>The central picture: actual vs synthetic Sweden</h3>
+    <p>
+      The animation below sketches the post's headline visual. Before 1990 the
+      two curves overlap — the synthetic version of Sweden matches the real one
+      tightly. After 1990 they peel apart. <strong>Sweden plateaus; Synthetic
+      Sweden keeps climbing.</strong> The shaded wedge is the treatment effect
+      that the analysis below estimates at roughly &minus;11.3% per year.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <p class="note" style="margin-top:8px;">
+      Stylised illustration of the central SCM idea. The actual numbers from
+      the post — the 6-donor weights, the 46-year path, the placebo
+      distribution — appear in tabs 2 and 3.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-synth">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Synthetic Sweden</h4>
+      <p>The 46-year path plot and the six donor weights. Toggle the gap subplot to see the &minus;11.3% headline number form across 1990&ndash;2005.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-placebos">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Placebo Distribution</h4>
+      <p>The post/pre MSPE ratios for all 15 countries and the in-space placebo gap "spaghetti" plot. Where does p = 0.067 come from?</p>
+    </div>
+    <div class="cta-card" data-goto="pane-methods">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Method Comparison</h4>
+      <p>Five estimators on one chart: naive pre/post, DiD vs Denmark, DiD vs OECD pool, Synthetic Sweden, plus OLS and IV elasticities. Plus the carbon-tax-vs-VAT decomposition.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Headline numbers from the post</h3>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-label">Synthetic Sweden — avg gap</div>
+        <div class="stat-value orange">&minus;11.3%</div>
+        <div class="stat-sub">per year, 1990&ndash;2005</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Permutation p-value</div>
+        <div class="stat-value orange">0.067</div>
+        <div class="stat-sub">1 in 15 placebos as extreme as Sweden</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Leave-one-out range</div>
+        <div class="stat-value teal">8.8 to 13%</div>
+        <div class="stat-sub">drop any high-weight donor</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Tax vs price asymmetry</div>
+        <div class="stat-value teal">3&times;</div>
+        <div class="stat-sub">consumers respond 3&times; harder to taxes</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Counterfactual</summary>
+        <div class="gloss-body">What <em>would have happened</em> without the policy. Never observed; always estimated.</div>
+      </details>
+      <details class="gloss"><summary>Donor pool</summary>
+        <div class="gloss-body">The set of untreated countries used to build the counterfactual. Sweden's pool: 14 OECD economies.</div>
+      </details>
+      <details class="gloss"><summary>Synthetic control</summary>
+        <div class="gloss-body">A weighted blend of donor countries chosen to mimic the treated unit <em>before</em> treatment. Weights are non-negative and sum to one.</div>
+      </details>
+      <details class="gloss"><summary>Parallel trends (DiD)</summary>
+        <div class="gloss-body">The DiD assumption that treated and control units would have moved in step without treatment. SCM relaxes this by data-driven weighting.</div>
+      </details>
+      <details class="gloss"><summary>Pre-treatment MSPE</summary>
+        <div class="gloss-body">Mean squared prediction error of the outcome <em>before</em> the policy. Small values mean the synthetic fits Sweden tightly.</div>
+      </details>
+      <details class="gloss"><summary>Post/Pre MSPE ratio</summary>
+        <div class="gloss-body">The placebo-test statistic. Numerator: how big is the post-period gap. Denominator: how badly did the SCM fit the pre-period. Sweden's ratio is the highest of all 15 countries.</div>
+      </details>
+      <details class="gloss"><summary>Permutation p-value</summary>
+        <div class="gloss-body">Fraction of placebo units (treating each donor as if it were treated) with a ratio at least as large as Sweden's. Here: 1 / 15 = 0.067.</div>
+      </details>
+      <details class="gloss"><summary>Leave-one-out</summary>
+        <div class="gloss-body">Re-fit Synthetic Sweden after dropping one high-weight donor at a time. If the gap survives all drops, it is not driven by any single donor.</div>
+      </details>
+      <details class="gloss"><summary>Semi-elasticity</summary>
+        <div class="gloss-body">In a log-level model, the percent change in <em>y</em> when <em>x</em> rises by one unit. The OLS/IV section reports semi-elasticities to tax and price.</div>
+      </details>
+      <details class="gloss"><summary>Instrumental variable (IV)</summary>
+        <div class="gloss-body">A variable that shifts the endogenous regressor (here, price) but does not affect the outcome directly. Andersson uses crude-oil price and energy tax.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: SYNTHETIC SWEDEN ====================== -->
+<section id="pane-synth" class="tab-pane" role="tabpanel" aria-labelledby="tab-synth">
+
+  <h2>Synthetic Sweden &mdash; the path and the gap</h2>
+  <p class="lede">
+    Synthetic Sweden is a weighted blend of donor countries chosen so the blend
+    <strong>matches Sweden as closely as possible <em>before</em> the carbon
+    tax</strong>. <code>pysyncon</code> picks Denmark (29%), Belgium (27%), New
+    Zealand (15%), Greece (11%), the United States (10%), and Switzerland (8%).
+    These six donors carry 100% of the weight; the other eight donors are
+    essentially zero. The chart below plots Sweden against this synthetic
+    counterfactual across all 46 years of the panel.
+  </p>
+
+  <div class="card">
+    <h3>Path plot: Sweden vs Synthetic Sweden (1960&ndash;2005)</h3>
+    <p>
+      <strong>What to look for:</strong> the two curves overlap almost perfectly
+      from 1960 to 1989 (good pre-treatment fit), then diverge after 1990.
+      Sweden plateaus around 2.3 t/capita; Synthetic Sweden keeps climbing
+      toward 2.85. Hover any orange point to see the year-by-year gap.
+    </p>
+    <div class="chart-area" id="synth-path"></div>
+  </div>
+
+  <div class="card">
+    <h3>Gap plot: Sweden &minus; Synthetic Sweden</h3>
+    <p>
+      Same numbers, different axis. The gap hovers near zero before 1990 (the
+      counterfactual fits) and widens to roughly &minus;0.36 t/capita by 2005.
+      The shaded post-treatment region is the SCM estimate of the treatment
+      effect — about <strong>&minus;11.3% per year, sustained for 16 years</strong>.
+    </p>
+    <div class="chart-area" id="synth-gap"></div>
+  </div>
+
+  <div class="card">
+    <h3>Donor weights: which countries make up Synthetic Sweden?</h3>
+    <p>
+      The optimiser chose six donors to sum to 100% of the weight. Denmark and
+      Belgium dominate (about 56% of the weight together) — both are small,
+      advanced European economies with similar income and energy mix. The
+      remaining four (New Zealand, Greece, US, Switzerland) fill in the rest.
+      The nine donors not shown received weight &lt; 0.5%.
+    </p>
+    <div class="chart-area" id="synth-weights"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Pre-treatment fit is excellent.</strong> A tight pre-period fit is the price of admission for SCM. If the synthetic and the actual already diverged before 1990, the post-1990 gap would not be credible.</li>
+      <li><strong>The post-1990 gap grows monotonically.</strong> It is &minus;0.10 in 1990, &minus;0.16 in 1991, and &minus;0.36 by 2005. A growing gap is consistent with a real, persistent policy effect.</li>
+      <li><strong>Concentrated weights are reassuring.</strong> If the optimiser had spread weight across 14 donors equally, it would be a sign that no good counterfactual exists in the pool. Six dominant donors means we have a strong match.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: PLACEBO DISTRIBUTION ====================== -->
+<section id="pane-placebos" class="tab-pane" role="tabpanel" aria-labelledby="tab-placebos">
+
+  <h2>Placebo Distribution &mdash; where does p = 0.067 come from?</h2>
+  <p class="lede">
+    Sweden's gap looks dramatic on the path plot. But the synthetic-control
+    optimiser is <em>designed</em> to make Sweden look unique in the
+    post-period. To test whether the gap is just noise, we re-run the SCM
+    <strong>15 times</strong> &mdash; once for each country, pretending it was
+    treated in 1990. If Sweden's gap is unusual compared to these placebos, the
+    effect is unlikely to be an artefact of the method.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Pre-treatment fit threshold <span class="value" id="prefit-val">All countries</span></label>
+      <input type="range" id="prefit" min="0" max="10" step="1" value="10" aria-label="pre-fit threshold">
+      <div class="hint">Drag left to exclude placebos with bad pre-treatment fit (large pre-MSPE). Andersson recommends keeping only countries whose synthetic version fits well in the pre-period.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Gap "spaghetti" plot: Sweden vs 14 placebo donors</h3>
+    <p>
+      Each grey line is the gap series for one placebo country (where that
+      country is pretended to be treated in 1990). <strong>Sweden's gap
+      (orange) sits clearly outside the cloud</strong> after 1990. That is the
+      visual basis for the permutation p-value.
+    </p>
+    <div class="chart-area" id="placebo-dist"></div>
+  </div>
+
+  <div class="card">
+    <h3>Post/Pre MSPE ratios across all 15 countries</h3>
+    <p>
+      To compare gaps fairly, each country's <em>post-treatment</em> MSPE is
+      divided by its <em>pre-treatment</em> MSPE. A high ratio means "the
+      post-period gap is big <strong>relative to how well the SCM fits the
+      pre-period</strong>". Sweden has the highest ratio of all 15 countries.
+    </p>
+    <div class="chart-area" id="placebo-ratios"></div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Sweden's MSPE ratio</div>
+      <div class="stat-value orange">25.41</div>
+      <div class="stat-sub">highest of any unit</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Next-highest (Spain)</div>
+      <div class="stat-value">15.70</div>
+      <div class="stat-sub">about 62% of Sweden's</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Permutation p-value</div>
+      <div class="stat-value orange">0.067</div>
+      <div class="stat-sub">= 1 / 15 (Sweden ranks first)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Donor-pool floor</div>
+      <div class="stat-value teal">1 / 15</div>
+      <div class="stat-sub">smallest possible permutation p with this pool size</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Sweden's gap escapes the placebo cloud after 1990.</strong> In the years before treatment, Sweden's gap (orange) sits inside the grey envelope. After 1990 it visibly leaves the bundle &mdash; that is the visual signal underneath the formal p-value.</li>
+      <li><strong>The post/pre ratio penalises bad pre-fit.</strong> Spain's raw post-period gap is huge, but its pre-period fit was so poor that the ratio is still below Sweden's. The metric correctly rewards units the SCM could match in the pre-period.</li>
+      <li><strong>Slide the pre-fit threshold left.</strong> Removing placebos with poor pre-fit (large pre-MSPE) thins the grey cloud and makes Sweden's gap stand out even more clearly. The p-value would not change here (Sweden is still rank 1), but the visual evidence sharpens.</li>
+      <li><strong>1 / 15 = 0.067 is the floor.</strong> With only 15 countries, the smallest non-trivial permutation p-value is 1/15. Andersson notes this explicitly: the donor pool size caps statistical power, not the magnitude of the effect.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: METHOD COMPARISON ====================== -->
+<section id="pane-methods" class="tab-pane" role="tabpanel" aria-labelledby="tab-methods">
+
+  <h2>Method Comparison &mdash; six estimators on the same data</h2>
+  <p class="lede">
+    The post estimates the carbon tax effect six different ways. Three target
+    the aggregate emissions effect (naive, DiD, synthetic control). Three
+    target the consumer-demand semi-elasticities (OLS4, IV with oil price, IV
+    with energy tax). The forest plot below lays them out side by side so the
+    ranking, sign, and uncertainty are visible at a glance.
+  </p>
+
+  <div class="card">
+    <h3>Forest plot of all estimates</h3>
+    <p>
+      Each row is a method; each panel is an outcome. Bars are 95% confidence
+      intervals; dots are point estimates. Hover any point to see the standard
+      error and the number of donors / controls used.
+    </p>
+    <p class="note" style="margin-top:8px;">
+      Toggle outcomes and methods below to compare subsets. The
+      <strong>Transport CO2 (t/cap)</strong> column compares the aggregate
+      methods — naive (+0.55, confounded) flips sign through DiD (&minus;0.14
+      to &minus;0.21) to Synthetic Sweden (&minus;0.27 to &minus;0.36).
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Transport CO2 (t/cap)" checked> Transport CO2 (t/cap)</label>
+      <label><input type="checkbox" value="ln(gas) — price (β₁)" checked> ln(gas) — price (β₁)</label>
+      <label><input type="checkbox" value="ln(gas) — tax (β₂)" checked> ln(gas) — tax (β₂)</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive (Sweden pre/post)" checked> Naive pre/post</label>
+      <label><input type="checkbox" value="DiD (vs Denmark)" checked> DiD vs Denmark</label>
+      <label><input type="checkbox" value="DiD (vs OECD pool)" checked> DiD vs OECD pool</label>
+      <label><input type="checkbox" value="Synthetic Sweden (avg)" checked> Synthetic Sweden (avg)</label>
+      <label><input type="checkbox" value="Synthetic Sweden (2005)" checked> Synthetic Sweden (2005)</label>
+      <label><input type="checkbox" value="OLS4 (Newey–West)" checked> OLS4 (Newey–West)</label>
+      <label><input type="checkbox" value="IV (energy tax)" checked> IV (energy tax)</label>
+      <label><input type="checkbox" value="IV (oil price)" checked> IV (oil price)</label>
+      <label><input type="checkbox" value="IV (both)" checked> IV (both)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why the naive estimate flips sign</h3>
+    <p>
+      The single-country pre/post comparison reports <strong>+0.55 t/capita</strong>
+      &mdash; it claims Sweden emitted <em>more</em> after 1990, not less. This
+      is correct as arithmetic but useless as causal evidence. It treats every
+      other thing that changed in Sweden (population growth, EU integration,
+      vehicle stock) as if it were part of the carbon tax's effect.
+    </p>
+    <p>
+      Once we introduce a control, the sign flips. DiD vs Denmark gives
+      &minus;0.14 (the right sign, but underpowered with one donor). DiD vs the
+      14-country OECD pool tightens to &minus;0.21 (p = 0.02). Synthetic
+      Sweden's 2005 estimate is &minus;0.36 — the largest signed estimate
+      because it weights the most-similar donors rather than averaging
+      everyone.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Disentangling the bundle: carbon tax vs VAT</h3>
+    <p>
+      The 1990/91 reform was a <strong>bundle</strong> &mdash; a new carbon tax,
+      a new VAT on transport fuel, and a small reduction in the pre-existing
+      energy tax. The synthetic-control number above measures the <em>total</em>
+      effect. The chart below uses Andersson's tax-incidence model to switch
+      the carbon tax and VAT on and off separately. The orange wedge is the
+      <strong>carbon-tax-only</strong> contribution.
+    </p>
+    <div class="chart-area" id="disent-chart"></div>
+    <p class="note" style="margin-top:6px;">
+      Average post-1990 carbon-tax-only contribution:
+      <strong>&minus;9.5%</strong> of the no-carbon-tax-with-VAT baseline. By
+      2005 the wedge widens to <strong>&minus;0.57 t/capita</strong> — about
+      75% of the total reform effect that year.
+    </p>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The naive estimate is the outlier.</strong> It points the wrong way (positive). Every estimator with a control unit (DiD, SCM) points negative. The lesson: a counterfactual matters more than the choice between DiD and SCM.</li>
+      <li><strong>OLS4 and the three IVs agree on the tax coefficient.</strong> &beta;<sub>2</sub> = &minus;0.186 in all four (to four decimal places). When OLS and IV agree, the price regressor was likely exogenous all along.</li>
+      <li><strong>Tax response &asymp; 3&times; price response.</strong> &beta;<sub>2</sub> = &minus;0.186 vs &beta;<sub>1</sub> = &minus;0.060. Same SEK/litre, three times the behavioural impact. Salience and permanence are the leading explanations.</li>
+      <li><strong>The carbon tax does most of the work after 2000.</strong> The orange wedge widens sharply when the carbon tax rate is ratcheted up in the 2000s — consistent with Sweden's actual policy timetable.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to the post</h3>
+    <p>
+      Five claims emerge from the analysis, each built on a different piece of
+      evidence in this app:
+    </p>
+    <ul>
+      <li><strong>The carbon tax cut Swedish transport CO2.</strong> The synthetic-control point estimate is an 11.3% average annual reduction over 1990&ndash;2005 (Tab 2).</li>
+      <li><strong>The result is robust.</strong> Three independent placebo tests support it (Tab 3).</li>
+      <li><strong>No growth penalty.</strong> A separately built Synthetic-Sweden(GDP) tracks Sweden's actual GDP within $233 per capita by 2005.</li>
+      <li><strong>Pass-through was complete.</strong> The retail price absorbed the entire tax change (&beta; &asymp; 1.15).</li>
+      <li><strong>Consumers responded ~3&times; more strongly to taxes than to prices</strong> of the same magnitude (Tab 4).</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Carbon Taxes and CO2 Emissions: A Synthetic-Control Analysis in Python</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

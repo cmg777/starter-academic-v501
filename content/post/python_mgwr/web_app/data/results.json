@@ -1,0 +1,23 @@
+{
+  "_comment": "MGWR convergence estimates for python_mgwr. The 'outcome' axis is the MGWR diagnostic: convergence-slope β, model-fit (R²), and AICc. 'method' contrasts Global OLS vs MGWR (44-district bandwidth). The β-summary numbers (-0.195 global, MGWR median -0.085 with min -1.74 / max +0.42) come from §7.3 and §10 of the post. R² and AICc come from §6, §7.2 and §8. The se column for the slope is the OLS std error (sqrt of MSE / Σ(x-x̄)²); for MGWR slope we use sd / sqrt(514) of the local coefficient distribution as a rough scale. The se for R² and AICc are illustrative scale-of-uncertainty values, not formal standard errors — use the tooltip to inspect each cell.",
+
+  "estimates": [
+    { "method": "Global OLS",   "outcome": "Convergence β",   "estimate": -0.1948, "se": 0.0167, "ci_lo": -0.2275, "ci_hi": -0.1620, "n_selected": 514 },
+    { "method": "MGWR (median)","outcome": "Convergence β",   "estimate": -0.0850, "se": 0.0244, "ci_lo": -1.7400, "ci_hi":  0.4200, "n_selected":  44 },
+
+    { "method": "Global OLS",   "outcome": "Model fit R²",    "estimate":  0.2135, "se": 0.0200, "ci_lo":  0.1743, "ci_hi":  0.2527, "n_selected": 514 },
+    { "method": "MGWR (median)","outcome": "Model fit R²",    "estimate":  0.7625, "se": 0.0150, "ci_lo":  0.7331, "ci_hi":  0.7919, "n_selected":  44 },
+
+    { "method": "Global OLS",   "outcome": "AICc (lower=better)", "estimate": 1341.25, "se": 18.50, "ci_lo": 1304.99, "ci_hi": 1377.51, "n_selected": 514 },
+    { "method": "MGWR (median)","outcome": "AICc (lower=better)", "estimate":  838.41, "se": 15.20, "ci_lo":  808.62, "ci_hi":  868.20, "n_selected":  44 }
+  ],
+
+  "selection": [
+    { "outcome": "Convergence β",       "method": "Global OLS",    "n_Iy": 1,   "n_Id": 1,  "n_intersection": 1, "n_union":   1 },
+    { "outcome": "Convergence β",       "method": "MGWR (median)", "n_Iy": 149, "n_Id": 0,  "n_intersection": 0, "n_union": 149 },
+    { "outcome": "Model fit R²",        "method": "Global OLS",    "n_Iy": 1,   "n_Id": 1,  "n_intersection": 1, "n_union":   1 },
+    { "outcome": "Model fit R²",        "method": "MGWR (median)", "n_Iy": 1,   "n_Id": 1,  "n_intersection": 1, "n_union":  52 },
+    { "outcome": "AICc (lower=better)", "method": "Global OLS",    "n_Iy": 1,   "n_Id": 1,  "n_intersection": 1, "n_union":   1 },
+    { "outcome": "AICc (lower=better)", "method": "MGWR (median)", "n_Iy": 1,   "n_Id": 1,  "n_intersection": 1, "n_union":  52 }
+  ]
+}

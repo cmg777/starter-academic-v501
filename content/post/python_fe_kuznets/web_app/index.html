@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Regional Inequality and the Kuznets Curve — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Regional Inequality and the Kuznets Curve: Panel Fixed Effects in Python'. A pedagogical web app with a within-transformation animation, a panel FE simulator, a Kuznets turning-point explorer, and the coefficient-stability forest plot.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Regional Inequality and the Kuznets Curve — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Regional Inequality and the Kuznets Curve: Panel Fixed Effects in Python</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">2 · Panel FE Simulator</button>
+  <button id="tab-turning"  class="tab"        data-pane="pane-turning"  role="tab" aria-selected="false">3 · Turning Points</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Coefficient Stability</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why fixed effects? Why the N-shape?</h2>
+  <p class="lede">
+    Does economic growth reduce regional inequality? Simon Kuznets predicted an
+    inverted-U: inequality rises with early industrialisation, then falls.
+    Lessmann and Seidel (2017) used satellite nighttime-light data from
+    180 countries (1992-2012) and found something different:
+    <strong>the relationship is N-shaped.</strong> Inequality rises, falls, then
+    rises again at very high incomes.
+  </p>
+  <p class="lede">
+    This app turns the post's three central ideas into knobs you can move.
+    Sweep panel sample size and country heterogeneity to see how
+    <span class="kbd">pooled OLS</span> drifts away from the truth while
+    <span class="kbd">TWFE</span> stays close. Adjust the three cubic
+    coefficients yourself and watch where the curve bends. Toggle
+    determinants to see which controls move the headline Kuznets coefficients
+    — and which leave them alone.
+  </p>
+
+  <div class="card">
+    <h3>Pooled vs within: the same data, two stories</h3>
+    <p>
+      The animation below shows 6 countries (coloured lines) moving through
+      time on a development-inequality plot. The grey dashed curve is what
+      <em>pooled OLS</em> sees — the cross-sectional pattern across all
+      countries. Notice how each individual country's trajectory has its own
+      level. Pooled OLS confounds <em>between-country</em> heterogeneity with
+      the <em>within-country</em> Kuznets relationship. Two-way fixed effects
+      strips the country-specific levels away.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <p class="note">
+      Each coloured line follows one country over 5 periods. The dashed grey
+      curve is the pooled OLS fit through every country-period dot.
+      Within-country slopes (the colored segments) differ from the pooled
+      slope — that gap is omitted-variable bias.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Panel FE Simulator</h4>
+      <p>Simulate a panel with country fixed effects. Compare pooled OLS to TWFE estimates as you change sample size, heterogeneity, and signal. Run 100 simulations to see the bias-variance picture.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-turning">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Turning Points</h4>
+      <p>Adjust the three cubic coefficients $\beta_1, \beta_2, \beta_3$ and watch the N-shaped curve bend. Find the two turning points yourself — and see how the post's coefficients put them at \$2,287 and \$77,205.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Coefficient Stability</h4>
+      <p>The post's robustness check, interactively. Toggle the 7 specifications and 3 polynomial terms to see when the N-shape holds — and watch the linear term drop from 0.293 to 0.149 once ethnic Gini is included.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Kuznets curve</summary>
+        <div class="gloss-body">The theoretical inverted-U relationship between development and inequality. Inequality rises with industrialisation, then falls. <em>The null this post tests.</em></div>
+      </details>
+      <details class="gloss"><summary>N-shaped relationship</summary>
+        <div class="gloss-body">A non-monotonic pattern with two turning points: rise, fall, rise. <em>Captured by a cubic polynomial in log GDP.</em></div>
+      </details>
+      <details class="gloss"><summary>Two-way fixed effects (TWFE)</summary>
+        <div class="gloss-body">A panel estimator that absorbs both country and period intercepts. <em>Identification uses only within-country, within-period variation.</em></div>
+      </details>
+      <details class="gloss"><summary>Pooled OLS</summary>
+        <div class="gloss-body">Treats every country-period observation as an independent draw, ignoring the panel structure. <em>Confounds between-country and within-country variation.</em></div>
+      </details>
+      <details class="gloss"><summary>Turning points</summary>
+        <div class="gloss-body">Income levels where ∂Gini/∂lnY = 0 — the slope of inequality with respect to income changes sign. <em>Solve 3β₃x² + 2β₂x + β₁ = 0.</em></div>
+      </details>
+      <details class="gloss"><summary>Within R²</summary>
+        <div class="gloss-body">The share of within-country, within-period variation in Gini that the polynomial explains. <em>The honest fit number; overall R² is inflated by mechanical FE absorption.</em></div>
+      </details>
+      <details class="gloss"><summary>Omitted variable bias (OVB)</summary>
+        <div class="gloss-body">Bias from a confounder that affects both lnY and inequality. <em>Pooled OLS suffers; TWFE removes any time-invariant confounder.</em></div>
+      </details>
+      <details class="gloss"><summary>Clustered standard errors</summary>
+        <div class="gloss-body">Standard errors that allow within-country correlation across periods. <em>Implemented in PyFixest as vcov={"CRV1": "id"}.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: PANEL FE SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Panel FE Simulator — pooled OLS vs TWFE</h2>
+  <p class="lede">
+    Simulate a panel with $N$ countries observed over $T$ periods. Each country
+    has its own intercept (a country fixed effect), and the true relationship
+    between log GDP and Gini is the post's cubic with $\beta_1 = 0.293$,
+    $\beta_2 = -0.032$, $\beta_3 = 0.001$. <strong>Slide country heterogeneity
+    up and watch pooled OLS drift away from the truth while TWFE stays put.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Countries N <span class="value" id="sim-n-val">60</span></label>
+      <input type="range" id="sim-n" min="20" max="120" step="5" value="60" aria-label="number of countries N">
+      <div class="hint">More countries ⇒ more cross-sectional variation; sharper estimates.</div>
+    </div>
+    <div class="control">
+      <label>Periods T <span class="value" id="sim-t-val">5</span></label>
+      <input type="range" id="sim-t" min="3" max="10" step="1" value="5" aria-label="number of periods T">
+      <div class="hint">Post uses 5 periods (1990-2013). More T ⇒ richer within-country variation.</div>
+    </div>
+    <div class="control">
+      <label>Country heterogeneity <span class="value" id="sim-h-val">0.80</span></label>
+      <input type="range" id="sim-h" min="0" max="1.5" step="0.05" value="0.80" aria-label="country FE heterogeneity">
+      <div class="hint">Spread of country intercepts. 0 = identical countries, 1.5 = wildly different baselines.</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="sim-s-val">0.025</span></label>
+      <input type="range" id="sim-s" min="0.005" max="0.080" step="0.005" value="0.025" aria-label="error standard deviation">
+      <div class="hint">Idiosyncratic noise on Gini. Post's residual SD ≈ 0.025.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag ols">Pooled OLS</span></h3>
+      <p class="note" style="margin:0 0 10px;">Ignores country structure. Each row is an independent observation.</p>
+      <div class="method-row"><span class="label">β̂₁ (log GDP)</span><span class="val" id="sim-ols-b1">—</span></div>
+      <div class="method-row"><span class="label">β̂₂ (log GDP²)</span><span class="val" id="sim-ols-b2">—</span></div>
+      <div class="method-row"><span class="label">β̂₃ (log GDP³)</span><span class="val" id="sim-ols-b3">—</span></div>
+      <div class="method-row"><span class="label">R²</span><span class="val" id="sim-ols-r2">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag rigorous">TWFE</span></h3>
+      <p class="note" style="margin:0 0 10px;">Country + period demeaning. Within-only variation.</p>
+      <div class="method-row"><span class="label">β̂₁ (log GDP)</span><span class="val" id="sim-fe-b1">—</span></div>
+      <div class="method-row"><span class="label">β̂₂ (log GDP²)</span><span class="val" id="sim-fe-b2">—</span></div>
+      <div class="method-row"><span class="label">β̂₃ (log GDP³)</span><span class="val" id="sim-fe-b3">—</span></div>
+      <div class="method-row"><span class="label">Within R²</span><span class="val" id="sim-fe-r2">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-scatter"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Slide country heterogeneity up.</strong> Pooled OLS coefficients drift away from the true (0.293, -0.032, 0.001) while TWFE estimates stay close. That gap is omitted variable bias.</li>
+      <li><strong>Slide periods T down to 3.</strong> TWFE within-R² collapses because there is less within-country variation to identify the cubic. More T ⇒ better identification.</li>
+      <li><strong>True coefficients</strong> are shown as dashed lines in the chart. Pooled OLS scatters around the wrong values; TWFE clusters near the truth.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs variance across 100 simulations</h3>
+    <p>One draw is noisy. Run the full panel simulation 100 times (same parameters, fresh shocks) to see whether pooled OLS bias is systematic and how variance compares.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sim-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Pooled mean β̂₁</div><div class="stat-value" id="sim-ols-mean">—</div><div class="stat-sub">true β₁ = 0.293</div></div>
+      <div class="stat"><div class="stat-label">Pooled SD β̂₁</div><div class="stat-value" id="sim-ols-sd">—</div></div>
+      <div class="stat"><div class="stat-label">TWFE mean β̂₁</div><div class="stat-value teal" id="sim-fe-mean">—</div></div>
+      <div class="stat"><div class="stat-label">TWFE SD β̂₁</div><div class="stat-value" id="sim-fe-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: TURNING POINTS ====================== -->
+<section id="pane-turning" class="tab-pane" role="tabpanel" aria-labelledby="tab-turning">
+
+  <h2>Turning Points — bend the cubic yourself</h2>
+  <p class="lede">
+    The Kuznets curve's shape depends on three coefficients. Linear $\beta_1$
+    controls overall slope. Quadratic $\beta_2$ adds one bend (an inverted-U
+    if negative). Cubic $\beta_3$ adds a second bend (an N if positive).
+    <strong>Slide each coefficient and find the two income levels where the
+    curve switches direction.</strong> The post's estimates put them at
+    \$2,287 and \$77,205.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>β₁ (log GDP) <span class="value" id="tp-b1-val">0.293</span></label>
+      <input type="range" id="tp-b1" min="-0.20" max="0.60" step="0.005" value="0.293" aria-label="beta1 linear coefficient">
+      <div class="hint">Post estimate: 0.293. Larger ⇒ steeper initial rise.</div>
+    </div>
+    <div class="control">
+      <label>β₂ (log GDP²) <span class="value" id="tp-b2-val">-0.0320</span></label>
+      <input type="range" id="tp-b2" min="-0.080" max="0.020" step="0.001" value="-0.032" aria-label="beta2 quadratic coefficient">
+      <div class="hint">Post estimate: -0.0320. Negative ⇒ curve bends down.</div>
+    </div>
+    <div class="control">
+      <label>β₃ (log GDP³) <span class="value" id="tp-b3-val">0.00112</span></label>
+      <input type="range" id="tp-b3" min="-0.001" max="0.003" step="0.0001" value="0.00112" aria-label="beta3 cubic coefficient">
+      <div class="hint">Post estimate: 0.00112. Positive ⇒ second upturn at high incomes.</div>
+    </div>
+    <div class="control">
+      <label>Intercept (level) <span class="value" id="tp-b0-val">0.060</span></label>
+      <input type="range" id="tp-b0" min="-2.0" max="2.0" step="0.05" value="0.060" aria-label="intercept">
+      <div class="hint">Vertical position of the curve. Cosmetic — does not affect turning points.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="tp-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Turning point 1 (peak)</div>
+      <div class="stat-value orange" id="tp-low-usd">—</div>
+      <div class="stat-sub">log GDP = <span id="tp-low-log">—</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Turning point 2 (trough)</div>
+      <div class="stat-value teal" id="tp-high-usd">—</div>
+      <div class="stat-sub">log GDP = <span id="tp-high-log">—</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Curve shape</div>
+      <div class="stat-value" id="tp-shape">—</div>
+      <div class="stat-sub">based on discriminant</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Post estimates</div>
+      <div class="stat-value" style="font-size:14px;">\$2,287 / \$77,205</div>
+      <div class="stat-sub">target you can hit</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set β₃ = 0.</strong> The cubic term disappears. The curve becomes a quadratic with at most one turn — the classic Kuznets inverted-U. Only one turning point survives.</li>
+      <li><strong>Slide β₂ toward zero.</strong> The two turning points spread apart and may move outside the data range (log GDP between 5.25 and 11.67). The N-shape becomes weaker.</li>
+      <li><strong>Hit the post's targets.</strong> With β₁ ≈ 0.293, β₂ ≈ -0.032, β₃ ≈ 0.0011 the turning points sit at \$2,287 and \$77,205 — the values in §8 of the post.</li>
+      <li><strong>Discriminant matters.</strong> When (2β₂)² − 12β₁β₃ &lt; 0, the cubic has no real turning points — it is monotonic. The N requires the discriminant to be positive.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="tp-snap">Snap to post estimates</button>
+      <button class="action secondary" id="tp-quad">Quadratic only (β₃ = 0)</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: COEFFICIENT STABILITY FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>Coefficient stability across specifications</h2>
+  <p class="lede">
+    Does the N-shape survive when we add controls? The post estimates seven
+    TWFE specifications: the baseline Kuznets cubic, the pooled OLS version,
+    and five determinant models adding resources, trade, mobility,
+    aid/education, or ethnicity. <strong>Toggle the specifications and
+    polynomial terms to see when the N-shape holds — and watch the linear
+    coefficient halve from 0.293 to 0.149 once ethnic Gini enters.</strong>
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Toggle off "+ Ethnicity"</strong> and the remaining six specifications cluster between 0.17 and 0.35 for β₁. Switch it back on and the linear coefficient drops to 0.149 — ethnic Gini absorbs almost half the apparent Kuznets effect.</li>
+      <li><strong>Hover the cubic-term row.</strong> The "+ Aid/Educ" specification loses significance (95% CI crosses zero) because the sample drops to N = 585 from the missing-data cull.</li>
+      <li><strong>Sign pattern (+, -, +)</strong> is preserved across all six TWFE rows. The N-shape is robust — only the magnitude moves with controls.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Polynomial terms</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="log GDP (linear)"  checked> β₁ (log GDP)</label>
+      <label><input type="checkbox" value="log GDP squared"   checked> β₂ (log GDP²)</label>
+      <label><input type="checkbox" value="log GDP cubed"     checked> β₃ (log GDP³)</label>
+    </div>
+    <h3 style="margin-top:16px;">Specifications</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Pooled OLS"   checked> Pooled OLS</label>
+      <label><input type="checkbox" value="TWFE"         checked> TWFE baseline</label>
+      <label><input type="checkbox" value="+ Resources"  checked> + Resources</label>
+      <label><input type="checkbox" value="+ Trade"      checked> + Trade</label>
+      <label><input type="checkbox" value="+ Mobility"   checked> + Mobility</label>
+      <label><input type="checkbox" value="+ Aid/Educ"   checked> + Aid/Educ</label>
+      <label><input type="checkbox" value="+ Ethnicity"  checked> + Ethnicity</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Determinant effects (Table 4)</h3>
+    <p>
+      Nine candidate determinants of regional inequality, each estimated in a
+      TWFE specification that controls for the Kuznets cubic. Ethnic Gini is
+      the single strongest driver — 3.9 times larger than the next biggest
+      positive effect (resource rents). Solid bars are significant at p &lt; 0.10;
+      faded bars are not.
+    </p>
+    <div class="chart-area" id="fp-det-bars"></div>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The headline N-shape in Tab 3 came from $\beta_1 = 0.293$,
+      $\beta_2 = -0.032$, $\beta_3 = 0.001$ — the TWFE baseline row in the
+      forest plot above. The "+ Ethnicity" row gives a flatter N with
+      $\beta_1 = 0.149$, so its turning points sit further apart. The
+      <em>shape</em> survives — but the <em>magnitude</em> of the apparent
+      development-inequality link depends on which confounders you control.
+    </p>
+    <p>
+      The §11 takeaway in the post is therefore visible here twice: once as
+      the sign-stability across all six TWFE rows (the N is robust), and once
+      as the magnitude attenuation when ethnic Gini enters (development is
+      partly proxying for ethnic income gaps).
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Regional Inequality and the Kuznets Curve: Panel Fixed Effects in Python</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

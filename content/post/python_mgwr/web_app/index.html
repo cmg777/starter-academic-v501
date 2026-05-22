@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>MGWR Interactive Lab — Spatially Varying Convergence in Indonesia</title>
+<meta name="description" content="Interactive companion to 'Multiscale Geographically Weighted Regression: Spatially Varying Economic Convergence in Indonesia'. Sliders for bandwidth and spatial heterogeneity, and a forest plot comparing Global OLS to MGWR.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>MGWR — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Multiscale Geographically Weighted Regression: Spatially Varying Economic Convergence in Indonesia</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"      class="tab"        data-pane="pane-lab"      role="tab" aria-selected="false">2 · Bandwidth Lab</button>
+  <button id="tab-showdown" class="tab"        data-pane="pane-showdown" role="tab" aria-selected="false">3 · Global vs Local</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why MGWR? Why allow each variable its own bandwidth?</h2>
+  <p class="lede">
+    A single regression line for all 514 Indonesian districts says
+    poorer regions catch up at rate β = −0.195. But what if that average
+    hides huge geographic variation — strong catching-up in Sumatra,
+    none at all in Papua, divergence in a handful of mining districts?
+    <strong>Multiscale Geographically Weighted Regression (MGWR)</strong>
+    fits one regression at every location, with each variable allowed
+    to operate at its own spatial scale.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. In four tabs you will:
+    watch a smoothing parameter sweep from "very local" to "essentially
+    global" and see the bias-variance trade-off in real time; see how
+    spatial heterogeneity in the data-generating process turns one
+    global coefficient into a whole map of local ones; and explore the
+    headline contrast between Global OLS (R² = 0.21) and MGWR
+    (R² = 0.76) from the Indonesia analysis.
+  </p>
+
+  <div class="card">
+    <h3>Hard vs soft selection — and why bandwidth is the analogue of a penalty knob</h3>
+    <p>
+      The animation below shows two ways of "borrowing strength" from
+      data: a <strong>hard threshold</strong> (orange — coefficient
+      goes to zero abruptly, like LASSO selection) and a
+      <strong>soft shrinkage</strong> (steel blue — coefficient decays
+      smoothly, like a Gaussian kernel). The same idea sits inside
+      GWR: a tight bandwidth keeps very few neighbours (local, noisy);
+      a wide bandwidth keeps many (smooth, but it averages out the
+      heterogeneity MGWR exists to find).
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Bandwidth Lab</h4>
+      <p>Sweep a kernel-bandwidth analogue and watch how many "neighbours" each local model uses. Smaller bandwidth = noisier, more local; larger = smoother, more global.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Global vs Local</h4>
+      <p>Same data, two estimators. The asymmetry slider turns spatial heterogeneity on and off. Run 100 simulations to see when a single coefficient is misleading.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>The Indonesia headline numbers from §6–§8 of the post — Global OLS vs MGWR on three diagnostics (β, R², AICc). Hover for SE, CI, and effective parameters.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Local regression β̂(s)</summary>
+        <div class="gloss-body">One regression per location s, weighted by spatial proximity. Coefficients become functions of geographic position. <em>In the post: the slope on ln_gdppc2010 varies from −1.74 to +0.42 across 514 districts.</em></div>
+      </details>
+      <details class="gloss"><summary>Bandwidth h</summary>
+        <div class="gloss-body">The number of nearest neighbours each local regression uses. <em>The post selects h = 44 districts (about 8.6% of the sample) for both regressors.</em></div>
+      </details>
+      <details class="gloss"><summary>Adaptive bisquare kernel</summary>
+        <div class="gloss-body">The weighting scheme: include the nearest h districts, weight them by a bisquare function of distance, ignore the rest. "Adaptive" means h is a count not a fixed radius — handy when district sizes vary.</div>
+      </details>
+      <details class="gloss"><summary>GWR vs MGWR</summary>
+        <div class="gloss-body">GWR uses <em>one</em> bandwidth for all coefficients. MGWR allows each coefficient its own bandwidth. <em>The methodological advance: different processes can operate at different spatial scales.</em></div>
+      </details>
+      <details class="gloss"><summary>Spatial heterogeneity</summary>
+        <div class="gloss-body">β<sub>i</sub> ≠ β<sub>j</sub>. The relationship between predictors and outcome is not constant geographically. <em>The reason a single regression misleads in 365 of 514 districts.</em></div>
+      </details>
+      <details class="gloss"><summary>Effective number of parameters</summary>
+        <div class="gloss-body">Trace of the hat matrix. <em>The post's MGWR uses 52 — far more than OLS's 2 but far less than 514×2 = 1028 (one regression per district).</em></div>
+      </details>
+      <details class="gloss"><summary>AICc</summary>
+        <div class="gloss-body">Corrected Akaike Information Criterion — lower is better. <em>Global OLS: 1341.25 · MGWR: 838.41. A difference of 500+ strongly favours MGWR.</em></div>
+      </details>
+      <details class="gloss"><summary>β-convergence</summary>
+        <div class="gloss-body">The classic growth test: poor regions catching up with rich ones gives a <em>negative</em> coefficient on initial income. <em>The Indonesia global β = −0.195 hides that only 29% of districts show this catching-up.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: BANDWIDTH LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>Bandwidth Lab — turn the kernel knob yourself</h2>
+  <p class="lede">
+    A penalty parameter in LASSO does the same job that a bandwidth
+    parameter does in MGWR: it controls how much information is borrowed
+    across observations. In a stylised model with one "treatment-like"
+    variable and many control-like covariates, the slider sweeps a
+    smoothing knob from "very local" (left, few neighbours, noisy) to
+    "very global" (right, many neighbours, all coefficients shrink
+    toward zero). <strong>Watch the orange treatment coefficient: that
+    is the spatially varying β we care about in MGWR.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">200</span></label>
+      <input type="range" id="lab-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Larger n is more like Indonesia's 514 districts — each local estimate is steadier.</div>
+    </div>
+    <div class="control">
+      <label>Number of covariates p <span class="value" id="lab-p-val">40</span></label>
+      <input type="range" id="lab-p" min="5" max="100" step="1" value="40" aria-label="number of covariates p">
+      <div class="hint">About 15% of these covariates have a true nonzero effect; the rest are noise.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="lab-s-val">0.60</span></label>
+      <input type="range" id="lab-s" min="0.1" max="1.5" step="0.05" value="0.60" aria-label="signal strength">
+      <div class="hint">Magnitude of true coefficients relative to noise — analogue of how strongly initial income predicts growth.</div>
+    </div>
+    <div class="control">
+      <label>Bandwidth knob (small = local) <span class="value" id="lab-l-val">—</span></label>
+      <input type="range" id="lab-l" min="0" max="79" step="1" value="40" aria-label="bandwidth knob">
+      <div class="hint">Left = highly local (few neighbours kept); right = highly global (all averaged together).</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-path"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">covariates kept</div>
+      <div class="stat-value teal" id="lab-stat-nz">—</div>
+      <div class="stat-sub">analogue of effective parameters (post: 52)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">β̂ (shrunk)</div>
+      <div class="stat-value orange" id="lab-stat-alpha-l">—</div>
+      <div class="stat-sub">"global-style" smoothed estimate</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">β̂ (refit on support)</div>
+      <div class="stat-value orange" id="lab-stat-alpha-o">—</div>
+      <div class="stat-sub">"local-style" unshrunk estimate</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true β</div>
+      <div class="stat-value" id="lab-stat-alpha-t">0.50</div>
+      <div class="stat-sub">held fixed for comparison</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Small bandwidth = many "effective parameters".</strong> Slide left: more coefficients are kept, each estimated from a narrow window. That is what MGWR's bandwidth-of-44 looks like in spirit: a model that respects local structure.</li>
+      <li><strong>Large bandwidth = a single, smooth, global story.</strong> Slide right: most coefficients shrink to zero. You recover something like the global OLS regression — one line for the whole country.</li>
+      <li><strong>The treatment-like coefficient (orange) is what MGWR maps.</strong> In Indonesia, it ranges from −1.74 (strong local catching-up) to +0.42 (local divergence) — even though the global average is just −0.195.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="lab-reseed">Reseed random draws</button>
+      <button class="action secondary" id="lab-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: GLOBAL VS LOCAL ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>Global vs Local — when one number misleads</h2>
+  <p class="lede">
+    Same simulated dataset. Two estimators of the convergence-like
+    coefficient β: a <strong>Global-style</strong> estimator (one
+    coefficient for the whole sample, the analogue of Indonesia's
+    β = −0.195) and a <strong>Local-style</strong> estimator (each
+    region gets its own coefficient, the analogue of MGWR's
+    location-specific β). <strong>The asymmetry slider turns spatial
+    heterogeneity on and off:</strong> at 0, the truth is the same
+    everywhere and global is fine; at 1, the truth varies enormously
+    and only the local estimator recovers it.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Capped at 300 so the "Run 100 sims" button finishes quickly.</div>
+    </div>
+    <div class="control">
+      <label>Number of covariates p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of covariates p">
+      <div class="hint">Capped at 50 for the 100-sim run.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Common scale for both nuisance and treatment-like coefficients.</div>
+    </div>
+    <div class="control">
+      <label>Spatial heterogeneity <span class="value" id="sh-a-val">0.80</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.80" aria-label="spatial heterogeneity">
+      <div class="hint">0 = β is constant in space (global is fine) · 1 = β varies sharply across regions (only MGWR-style local estimators work).</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Local (MGWR-style)</span></h3>
+      <p class="note" style="margin:0 0 10px;">Allows β to vary across regions — analogue of MGWR's location-specific β̂(s).</p>
+      <div class="method-row"><span class="label">β̂</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(β̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union</span><span class="val" id="sh-rig-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-rig-lam">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Global (OLS-style)</span></h3>
+      <p class="note" style="margin:0 0 10px;">A single coefficient for the whole sample — analogue of Indonesia's β = −0.195.</p>
+      <div class="method-row"><span class="label">β̂</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(β̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union</span><span class="val" id="sh-cv-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-cv-lam">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>Why does this happen?</h4>
+    <ul>
+      <li><strong>Global averages out heterogeneity.</strong> If β is +1 in some regions and −1 in others, the global estimator returns ≈ 0 — and may declare "no effect" when in fact there are two strong, opposite effects.</li>
+      <li><strong>Local estimators recover the variation</strong> at the cost of more parameters. In Indonesia, MGWR uses 52 effective parameters vs OLS's 2 — but R² jumps from 0.21 to 0.76 because the gain in fit dwarfs the parameter cost.</li>
+      <li><strong>When the asymmetry slider is near 0, global is fine.</strong> If reality is genuinely homogeneous (β is the same everywhere), the simpler model is the right one. MGWR pays off precisely when the world is heterogeneous — and the Indonesia AICc drop from 1341 to 838 is the diagnostic that says it does.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs variance over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different errors) to see whether the global estimator is systematically biased when β varies in space.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Global mean β̂</div><div class="stat-value orange" id="sh-cv-mean">—</div><div class="stat-sub">bias when truth varies in space</div></div>
+      <div class="stat"><div class="stat-label">Global sd(β̂)</div><div class="stat-value" id="sh-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Local mean β̂</div><div class="stat-value teal" id="sh-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">Local sd(β̂)</div><div class="stat-value" id="sh-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>Indonesia headline numbers — Global OLS vs MGWR</h2>
+  <p class="lede">
+    These numbers come straight from §6–§8 of the post — the same diagnostics
+    used to declare MGWR a clear winner. Toggle outcomes (β, R², AICc) and
+    methods (Global OLS, MGWR) to compare. Hover a point to see its standard
+    error, 95% CI, and the effective bandwidth or sample-size analogue.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The convergence coefficient β collapses from −0.195 (global) to a median of −0.085 (MGWR)</strong> with a range from −1.74 to +0.42. The CI on the MGWR row in the forest plot reflects the full district-level spread, not a sampling-error band.</li>
+      <li><strong>R² triples</strong>: 0.21 → 0.76. This is the single most striking number in the post and the main reason MGWR is preferred for Indonesia's archipelago.</li>
+      <li><strong>AICc drops by 503 points</strong>: 1341 → 838. AICc penalises complexity, so the win is not free-flexibility-only — MGWR's gain in fit dwarfs the cost of estimating 52 effective parameters.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Convergence β" checked> Convergence β</label>
+      <label><input type="checkbox" value="Model fit R²" checked> Model fit R²</label>
+      <label><input type="checkbox" value="AICc (lower=better)" checked> AICc (lower=better)</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Global OLS" checked> Global OLS</label>
+      <label><input type="checkbox" value="MGWR (median)" checked> MGWR (median)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why MGWR's "CI" looks different from OLS's</h3>
+    <p>
+      For Global OLS, the CI on the slope is a standard
+      <code>β̂ ± 1.96 · SE</code> band: a sampling-error statement
+      about uncertainty in the single coefficient. For MGWR, the
+      "CI" shown here is the empirical range of the 514 local
+      coefficients — what economists sometimes call the
+      <em>cross-sectional dispersion</em> of the location-specific β̂(s).
+      The two intervals answer different questions: the first says
+      "how precisely we estimate the global average", the second
+      says "how much the relationship actually varies in space".
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The Global-vs-Local contrast you just simulated on Tab 3 maps directly to the Indonesia panel:
+    </p>
+    <ul>
+      <li><strong>Convergence β:</strong> Global says −0.195; MGWR's local median is −0.085 with a range from −1.74 to +0.42.</li>
+      <li><strong>R²:</strong> Global 0.21; MGWR 0.76 — a 3.5× improvement.</li>
+      <li><strong>AICc:</strong> Global 1341.25; MGWR 838.41 — a 503-point drop confirming the gain is genuine, not free flexibility.</li>
+    </ul>
+    <p>
+      The takeaway from the post (§7–§10) is therefore visible <em>twice</em>:
+      once on a controlled simulation where you set the truth (Tab 3),
+      and once on the actual 514-district Indonesia panel (this tab).
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Multiscale Geographically Weighted Regression: Spatially Varying Economic Convergence in Indonesia</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

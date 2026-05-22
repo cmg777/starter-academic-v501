@@ -1,0 +1,68 @@
+{
+  "_comment": "Estimates parsed verbatim from python_fwl/index.md's Summary of results table. The outcome is daily sales (thousands USD); the treatment is coupon usage (percent). The true DGP value of alpha is +0.20. n_obs = 50 stores. p-values reproduced from the post's regression tables.",
+  "alpha_true": 0.20,
+  "n_obs": 50,
+  "estimates": [
+    {
+      "method":    "Naive OLS (no controls)",
+      "outcome":   "Daily sales",
+      "estimate": -0.1059,
+      "se":        0.116,
+      "ci_lo":    -0.339,
+      "ci_hi":     0.127,
+      "p":         0.365,
+      "n_controls": 0
+    },
+    {
+      "method":    "Full OLS (+ income)",
+      "outcome":   "Daily sales",
+      "estimate":  0.2673,
+      "se":        0.120,
+      "ci_lo":     0.025,
+      "ci_hi":     0.509,
+      "p":         0.031,
+      "n_controls": 1
+    },
+    {
+      "method":    "FWL Step 1 (residualise X)",
+      "outcome":   "Daily sales",
+      "estimate":  0.2673,
+      "se":        1.271,
+      "ci_lo":    -2.288,
+      "ci_hi":     2.822,
+      "p":         0.834,
+      "n_controls": 1
+    },
+    {
+      "method":    "FWL Step 2 (residualise both)",
+      "outcome":   "Daily sales",
+      "estimate":  0.2673,
+      "se":        0.118,
+      "ci_lo":     0.031,
+      "ci_hi":     0.504,
+      "p":         0.028,
+      "n_controls": 1
+    },
+    {
+      "method":    "Full OLS (+ income + day)",
+      "outcome":   "Daily sales",
+      "estimate":  0.2706,
+      "se":        0.119,
+      "ci_lo":     0.030,
+      "ci_hi":     0.511,
+      "p":         0.028,
+      "n_controls": 2
+    },
+    {
+      "method":    "FWL (+ income + day)",
+      "outcome":   "Daily sales",
+      "estimate":  0.2706,
+      "se":        0.116,
+      "ci_lo":     0.038,
+      "ci_hi":     0.503,
+      "p":         0.023,
+      "n_controls": 2
+    }
+  ],
+  "selection": []
+}

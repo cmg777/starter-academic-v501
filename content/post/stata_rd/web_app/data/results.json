@@ -1,0 +1,48 @@
+{
+  "estimates": [
+    { "method": "Linear (same slope)",      "outcome": "Parametric (full sample)", "estimate":  10.8004, "se": 0.8063, "ci_lo":  9.2182, "ci_hi": 12.3827, "n_selected": 1000 },
+    { "method": "Linear (diff slopes)",     "outcome": "Parametric (full sample)", "estimate":  10.7970, "se": 0.8160, "ci_lo":  9.1976, "ci_hi": 12.3964, "n_selected": 1000 },
+    { "method": "Quadratic",                "outcome": "Parametric (full sample)", "estimate":   9.2230, "se": 1.1980, "ci_lo":  6.8749, "ci_hi": 11.5711, "n_selected": 1000 },
+    { "method": "rdrobust (triangular)",    "outcome": "Parametric (full sample)", "estimate":   8.5793, "se": 1.6151, "ci_lo":  5.4137, "ci_hi": 11.7449, "n_selected": 400  },
+
+    { "method": "BW = 5",                   "outcome": "Bandwidth sensitivity",    "estimate":  -8.2020, "se": 2.3370, "ci_lo":-12.7825, "ci_hi": -3.6215, "n_selected": null },
+    { "method": "BW = 7",                   "outcome": "Bandwidth sensitivity",    "estimate":  -8.2370, "se": 1.9190, "ci_lo":-11.9982, "ci_hi": -4.4758, "n_selected": null },
+    { "method": "BW = 10 (MSE optimal)",    "outcome": "Bandwidth sensitivity",    "estimate":  -8.5810, "se": 1.6150, "ci_lo":-11.7464, "ci_hi": -5.4156, "n_selected": 400  },
+    { "method": "BW = 12",                  "outcome": "Bandwidth sensitivity",    "estimate":  -8.6750, "se": 1.4860, "ci_lo":-11.5876, "ci_hi": -5.7624, "n_selected": null },
+    { "method": "BW = 15",                  "outcome": "Bandwidth sensitivity",    "estimate":  -8.8420, "se": 1.3120, "ci_lo":-11.4135, "ci_hi": -6.2705, "n_selected": null },
+    { "method": "BW = 20",                  "outcome": "Bandwidth sensitivity",    "estimate":  -9.1570, "se": 1.1310, "ci_lo":-11.3738, "ci_hi": -6.9402, "n_selected": null },
+
+    { "method": "Triangular",               "outcome": "Kernel comparison",        "estimate":  -8.5790, "se": 1.6151, "ci_lo":-12.1420, "ci_hi": -4.5430, "n_selected": 400  },
+    { "method": "Uniform",                  "outcome": "Kernel comparison",        "estimate":  -8.2000, "se": 1.9709, "ci_lo":-11.7750, "ci_hi": -4.0490, "n_selected": null },
+    { "method": "Epanechnikov",             "outcome": "Kernel comparison",        "estimate":  -8.3880, "se": 2.0352, "ci_lo":-12.1750, "ci_hi": -4.1970, "n_selected": null },
+
+    { "method": "Cutoff = 50",              "outcome": "Placebo cutoffs",          "estimate":  12.7280, "se": 21.3020, "ci_lo":-29.0239, "ci_hi": 54.4799, "n_selected": null },
+    { "method": "Cutoff = 55",              "outcome": "Placebo cutoffs",          "estimate":   0.5570, "se":  3.0520, "ci_lo": -5.4248, "ci_hi":  6.5388, "n_selected": null },
+    { "method": "Cutoff = 60",              "outcome": "Placebo cutoffs",          "estimate":   0.5690, "se":  3.1930, "ci_lo": -5.6892, "ci_hi":  6.8272, "n_selected": null },
+    { "method": "Cutoff = 65",              "outcome": "Placebo cutoffs",          "estimate":   3.2960, "se":  1.7420, "ci_lo": -0.1182, "ci_hi":  6.7102, "n_selected": null },
+    { "method": "Cutoff = 70 (TRUE)",       "outcome": "Placebo cutoffs",          "estimate":  -8.5790, "se":  1.6170, "ci_lo":-11.7483, "ci_hi": -5.4097, "n_selected": null },
+    { "method": "Cutoff = 75",              "outcome": "Placebo cutoffs",          "estimate":  -1.5480, "se":  1.6910, "ci_lo": -4.8623, "ci_hi":  1.7663, "n_selected": null },
+    { "method": "Cutoff = 80",              "outcome": "Placebo cutoffs",          "estimate":  -1.0950, "se":  1.4720, "ci_lo": -3.9801, "ci_hi":  1.7901, "n_selected": null },
+    { "method": "Cutoff = 85",              "outcome": "Placebo cutoffs",          "estimate":   0.8170, "se":  1.6050, "ci_lo": -2.3288, "ci_hi":  3.9628, "n_selected": null },
+    { "method": "Cutoff = 90",              "outcome": "Placebo cutoffs",          "estimate":  -0.5400, "se":  1.9000, "ci_lo": -4.2640, "ci_hi":  3.1840, "n_selected": null }
+  ],
+  "selection": [
+    { "outcome": "Bandwidth sensitivity", "method": "BW = 5",                "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 5  },
+    { "outcome": "Bandwidth sensitivity", "method": "BW = 10 (MSE optimal)", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 10 },
+    { "outcome": "Bandwidth sensitivity", "method": "BW = 20",               "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 20 }
+  ],
+  "meta": {
+    "post": "stata_rd",
+    "n_obs": 1000,
+    "n_treated": 241,
+    "n_untreated": 759,
+    "cutoff": 70,
+    "outcome_mean": 66.2,
+    "mccrary_p": 0.5809,
+    "mccrary_T": -0.5521,
+    "running_var_mean": 78.1427,
+    "running_var_sd": 12.7265,
+    "exit_mean": 66.1646,
+    "exit_sd": 7.6259
+  }
+}

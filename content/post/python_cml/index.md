@@ -14,6 +14,10 @@ image:
   focal_point: Smart
   placement: 3
 links:
+  - icon: laptop-code
+    icon_pack: fas
+    name: Web app
+    url: web_app/index.html
   - icon: open-data
     icon_pack: ai
     name: "[Python] Google Colab"

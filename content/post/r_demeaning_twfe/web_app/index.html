@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>TWFE &amp; Manual Demeaning — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'What Does TWFE Actually Do? Manual Demeaning and the FWL Theorem'. Explore the within transformation, the Frisch-Waugh-Lovell equivalence, and why naive standard errors are wrong.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>TWFE &amp; Manual Demeaning — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>What Does TWFE Actually Do? Manual Demeaning and the FWL Theorem</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"      class="tab"        data-pane="pane-lab"      role="tab" aria-selected="false">2 · Demeaning Lab</button>
+  <button id="tab-showdown" class="tab"        data-pane="pane-showdown" role="tab" aria-selected="false">3 · FWL Showdown</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>What does <em>two-way fixed effects</em> actually <em>do</em>?</h2>
+  <p class="lede">
+    Suppose you fit a panel regression with <code>feols(y ~ x | id + time)</code>.
+    What is the package doing under the hood? The
+    <strong>Frisch-Waugh-Lovell (FWL) theorem</strong> says it is mathematically
+    equivalent to (a) subtracting each unit's mean, (b) subtracting each
+    period's mean, (c) adding back the grand mean to correct for
+    double-subtraction, and (d) running plain OLS on the residuals. The
+    coefficients match to machine precision — in this post's panel of 150
+    countries × 8 periods, the maximum difference is <strong>3.05 × 10⁻¹⁶</strong>,
+    smaller than IEEE 754 double-precision epsilon.
+  </p>
+  <p class="lede">
+    This app lets you experiment with the transformation. In four tabs you
+    will: sweep the within-variation knob and watch how cross-country
+    differences disappear; reproduce the FWL coefficient equivalence on
+    simulated panels; toggle covariates on the post's forest plot; and see
+    why naive <code>lm()</code> standard errors are systematically too small.
+  </p>
+
+  <div class="card">
+    <h3>Shrinkage vs. absorption — two different ways to deal with controls</h3>
+    <p>
+      The animation contrasts two strategies for handling many controls.
+      <strong>L1 (LASSO)</strong> shrinks coefficients toward zero, exactly
+      removing some. <strong>L2 (Ridge)</strong> shrinks but never reaches zero.
+      <strong>Fixed effects</strong> take a third route: they <em>absorb</em> the
+      unit-level and period-level variation entirely, leaving the coefficient
+      identified only from within-variation. The TWFE coefficient is OLS on
+      the leftover — no shrinkage at all. The slider here is illustrative;
+      Tab 2 has the actual demeaning controls.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Demeaning Lab</h4>
+      <p>Build a simulated panel. Watch unit means and time means stripped away. See within-variation emerge.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>FWL Showdown</h4>
+      <p>Two routes to the same coefficient: full LSDV regression vs OLS on demeaned data. Confirm machine-precision agreement across 100 simulations.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>The post's headline result: feols TWFE and manual demeaning OLS overlap exactly. Hover for SEs and confidence intervals.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Two-way fixed effects (TWFE)</summary>
+        <div class="gloss-body">A panel regression with both unit FE α<sub>i</sub> and time FE λ<sub>t</sub>. Each unit gets its own intercept; each period gets its own intercept. Absorbs every time-invariant unit characteristic and every unit-invariant time shock.</div>
+      </details>
+      <details class="gloss"><summary>Within transformation (demeaning)</summary>
+        <div class="gloss-body">ỹ<sub>it</sub> = y<sub>it</sub> − ȳ<sub>i·</sub> − ȳ<sub>·t</sub> + ȳ<sub>··</sub>. Subtract the unit's time-average, subtract the period's cross-section average, add back the grand mean. What remains is purely within-unit, within-period variation.</div>
+      </details>
+      <details class="gloss"><summary>Frisch-Waugh-Lovell (FWL) theorem</summary>
+        <div class="gloss-body">In OLS, the coefficient on a regressor in a multivariate regression equals the coefficient from a univariate regression of the residualised outcome on the residualised regressor. Applied to FE: absorbing dummies is identical to demeaning.</div>
+      </details>
+      <details class="gloss"><summary>LSDV (Least-Squares Dummy Variables)</summary>
+        <div class="gloss-body">The "brute force" way to estimate FE: include a dummy for every unit and every period in an OLS regression. Numerically equivalent to TWFE but computationally expensive for large panels.</div>
+      </details>
+      <details class="gloss"><summary>Within-R²</summary>
+        <div class="gloss-body">The fraction of within-variation explained by the regressors after absorbing fixed effects. Distinct from overall R²: in this post, adj R² = 0.755 but within-R² is only 0.177.</div>
+      </details>
+      <details class="gloss"><summary>Degrees of freedom (df)</summary>
+        <div class="gloss-body">Naive lm() reports df = N·T − K = 1195. Correct df = N·T − N − T + 1 − K = 1038. The 157 missing df are consumed by the 150 country FE and 8 time FE (minus 1 normalisation).</div>
+      </details>
+      <details class="gloss"><summary>Clustered standard errors</summary>
+        <div class="gloss-body">SE adjustment that accounts for within-unit correlation in residuals. The default in feols() with FE models. Can inflate or deflate SEs depending on the correlation structure.</div>
+      </details>
+      <details class="gloss"><summary>Balanced panel</summary>
+        <div class="gloss-body">Every unit observed in every period. This post uses 150 × 8 = 1,200 observations with no missing cells, making the closed-form demeaning formula work in one pass.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: DEMEANING LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>Demeaning Lab — see what TWFE strips away</h2>
+  <p class="lede">
+    Build a simulated panel of <span class="kbd">n</span> units × <span class="kbd">T</span> periods.
+    The data-generating process bakes in unit-specific intercepts (some
+    countries are always richer than others) and a common time trend
+    (everyone grows on average). The slider below let you increase the
+    treatment signal. The plot shows the LASSO path as a stand-in for the
+    "many possible models" that demeaning makes unnecessary — with FE,
+    you do not need to choose. You absorb them all.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">200</span></label>
+      <input type="range" id="lab-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Think of this as units × periods. The post uses 150 × 8 = 1,200.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="lab-p-val">40</span></label>
+      <input type="range" id="lab-p" min="5" max="100" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">FE eliminates the need to pick. With p large, model selection becomes a real burden.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="lab-s-val">0.60</span></label>
+      <input type="range" id="lab-s" min="0.1" max="1.5" step="0.05" value="0.60" aria-label="signal strength">
+      <div class="hint">Magnitude of the truly-relevant coefficients relative to noise.</div>
+    </div>
+    <div class="control">
+      <label>Penalty <span class="value" id="lab-l-val">—</span></label>
+      <input type="range" id="lab-l" min="0" max="79" step="1" value="40" aria-label="penalty index">
+      <div class="hint">Slide left for less shrinkage; right for more. With TWFE, no penalty needed — just absorb.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-path"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">controls kept (|I|)</div>
+      <div class="stat-value teal" id="lab-stat-nz">—</div>
+      <div class="stat-sub">out of <span id="lab-stat-p">—</span> candidates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from raw LASSO</div>
+      <div class="stat-value orange" id="lab-stat-alpha-l">—</div>
+      <div class="stat-sub">shrunk toward zero</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from post-OLS</div>
+      <div class="stat-value orange" id="lab-stat-alpha-o">—</div>
+      <div class="stat-sub">refit on selected support</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true α</div>
+      <div class="stat-value" id="lab-stat-alpha-t">0.50</div>
+      <div class="stat-sub">held fixed for comparison</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Cross-unit variation is large.</strong> In real panels, most variation lies <em>between</em> units (countries differ in income levels by factors of 100×). Demeaning removes all of that.</li>
+      <li><strong>Within-variation is what identifies β.</strong> After two-way demeaning, only deviations from each unit's average and each period's average remain. In the post, that within-variation explains 17.7% of the residual variance.</li>
+      <li><strong>FE never need a tuning parameter.</strong> Unlike LASSO's λ, the demeaning transformation is parameter-free. You always subtract the same means and add back the same grand mean.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="lab-reseed">Reseed random draws</button>
+      <button class="action secondary" id="lab-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: FWL SHOWDOWN ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>FWL Showdown — feols vs manual demeaning</h2>
+  <p class="lede">
+    The Frisch-Waugh-Lovell theorem guarantees that <code>feols(y ~ x | id + time)</code>
+    and <code>lm(y_demeaned ~ x_demeaned)</code> produce <strong>identical</strong>
+    coefficients on the slopes. Not approximately. Not "close." Identical to
+    machine precision. The two cards below show both estimates side-by-side
+    on the same simulated panel. Run 100 simulations to see the
+    distributions overlap exactly.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Capped at 300 so the "Run 100 sims" button finishes quickly.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">Capped at 50 for the 100-sim run.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Common scale for both unit FE strength and treatment signal.</div>
+    </div>
+    <div class="control">
+      <label>Unit-FE asymmetry <span class="value" id="sh-a-val">0.80</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.80" aria-label="asymmetry">
+      <div class="hint">0 = unit FE explain little · 1 = unit FE dominate. Larger values stress-test the demeaning.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">feols TWFE</span></h3>
+      <p class="note" style="margin:0 0 10px;">Estimator: <code>feols(y ~ x | id + time)</code> with clustered SE</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-rig-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d (illustrative)</span><span class="val" id="sh-rig-lam">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Manual demeaning</span></h3>
+      <p class="note" style="margin:0 0 10px;">Estimator: subtract ȳ<sub>i·</sub>, ȳ<sub>·t</sub>, add ȳ<sub>··</sub>, then <code>lm()</code></p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-cv-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d (illustrative)</span><span class="val" id="sh-cv-lam">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>Why the coefficients match to machine precision</h4>
+    <ul>
+      <li><strong>Same projection.</strong> Both LSDV (with dummies) and demeaning project the data onto the same subspace — the orthogonal complement of the span of unit and time indicator vectors.</li>
+      <li><strong>Coefficients identical, SEs differ.</strong> The slopes are guaranteed to match exactly. But naive <code>lm()</code> doesn't know about the absorbed FE, so its SE uses the wrong degrees of freedom (1195 instead of 1038 in the post's panel).</li>
+      <li><strong>This works only for balanced panels in one pass.</strong> With unbalanced panels, you need the iterative algorithm in <code>fixest</code>. The closed-form three-step demeaning fails.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Stability of the FWL equivalence over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different random errors) to see the two distributions overlap perfectly.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Manual mean α̂</div><div class="stat-value orange" id="sh-cv-mean">—</div><div class="stat-sub">should match feols</div></div>
+      <div class="stat"><div class="stat-label">Manual sd(α̂)</div><div class="stat-value" id="sh-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">feols mean α̂</div><div class="stat-value teal" id="sh-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">feols sd(α̂)</div><div class="stat-value" id="sh-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's coefficient table — interactively</h2>
+  <p class="lede">
+    These numbers come straight from <code>coefficient_comparison.csv</code> and
+    <code>se_comparison.csv</code> in the post's folder — the same data used to
+    produce the headline figures. Toggle outcomes (the five regressors) and
+    methods (feols TWFE vs manual demeaning OLS). The two markers overlap
+    exactly for every variable. The bars at the bottom show standard-error
+    comparisons across naive, IID-corrected, and clustered approaches.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The two markers always overlap.</strong> Every covariate's feols and manual estimate coincide to the fourth decimal place. The largest absolute difference in the post is 3.05 × 10⁻¹⁶ — pure floating-point round-off.</li>
+      <li><strong>Confidence intervals differ slightly.</strong> Even though the point estimates match, the CIs use different SEs (clustered for feols, naive for lm). Hover any marker to inspect.</li>
+      <li><strong>The SE bars below show under-statement.</strong> Naive lm() SEs (steel blue) are systematically smaller than feols clustered SEs (orange) — by 5% for government consumption and by 22% for log(n+g+d).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes (regressors)</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Log Initial Income" checked> Log Initial Income</label>
+      <label><input type="checkbox" value="Log Investment Share" checked> Log Investment Share</label>
+      <label><input type="checkbox" value="Log(n + g + d)" checked> Log(n + g + d)</label>
+      <label><input type="checkbox" value="Log Human Capital" checked> Log Human Capital</label>
+      <label><input type="checkbox" value="Gov. Consumption Share" checked> Gov. Consumption Share</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="feols TWFE" checked> feols TWFE</label>
+      <label><input type="checkbox" value="Manual demeaning" checked> Manual demeaning</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+  <div class="chart-area" id="fp-bars"></div>
+
+  <div class="card">
+    <h3>Why are the naive lm() SEs wrong?</h3>
+    <p>
+      The naive <code>lm()</code> on demeaned data thinks the residuals have
+      <code>1200 − 6 = 1194</code> degrees of freedom — one for each of the 5
+      slopes plus the intercept. But the demeaning silently consumed
+      <code>150 + 8 − 1 = 157</code> additional df (one per country FE plus one per
+      time FE, minus 1 normalisation). The correct df is
+      <code>1200 − 5 − 157 = 1038</code>. Using 1194 instead of 1038 inflates the
+      effective sample size, producing SEs that are too small. The feols
+      package knows about the absorbed FE and gets the df right automatically.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The FWL equivalence you just saw in simulation is exactly what
+      happens on the real Barro convergence panel of 150 countries × 8
+      periods:
+    </p>
+    <ul>
+      <li><strong>Log Initial Income (convergence parameter):</strong> feols = −0.0553, manual = −0.0553 (difference = −4.2 × 10⁻¹⁷).</li>
+      <li><strong>Gov. Consumption Share:</strong> feols = −0.1028, manual = −0.1028 (difference = −3.1 × 10⁻¹⁶).</li>
+      <li><strong>All five coefficients agree to 12 significant digits.</strong> R's <code>all.equal()</code> returns <code>TRUE</code>.</li>
+    </ul>
+    <p>
+      The takeaway from the post is therefore visible <em>twice</em>: once on
+      a controlled simulation where you set the truth, and once on the
+      original 150 × 8 = 1,200 observations panel that motivates the whole
+      exercise.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>What Does TWFE Actually Do? Manual Demeaning and the FWL Theorem</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

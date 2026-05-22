@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Double Machine Learning — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Introduction to Causal Inference: Double Machine Learning'. Sliders, a partialling-out simulator, and the post's four-method forest plot for the Pennsylvania Bonus Experiment.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Double Machine Learning — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Introduction to Causal Inference: Double Machine Learning</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-penalty"  class="tab"        data-pane="pane-penalty"  role="tab" aria-selected="false">2 · Nuisance LASSO</button>
+  <button id="tab-dgp"      class="tab"        data-pane="pane-dgp"      role="tab" aria-selected="false">3 · DML vs OLS</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why <em>Double</em> Machine Learning?</h2>
+  <p class="lede">
+    Does a cash bonus actually shorten unemployment, or do the people who
+    get the offer simply differ from those who do not? Standard regression
+    can adjust for measured differences, but only if the relationship
+    between covariates and the outcome is roughly linear.
+    <strong>Double Machine Learning (DML)</strong> uses flexible ML models
+    to partial out covariates, then estimates the treatment effect on the
+    cleaned residuals — buying valid standard errors without imposing
+    linearity on the nuisance functions.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials. In four tabs you will:
+    watch L1 shrinkage drive coefficients to zero (the engine inside one of
+    the post's nuisance learners); simulate confounded data and see DML's
+    partialling-out beat naive OLS; and reproduce the post's headline
+    forest plot — <strong>Naive OLS, OLS+Covariates, DML (Random Forest),
+    DML (LASSO)</strong> — on the Pennsylvania Bonus Experiment.
+  </p>
+
+  <div class="card">
+    <h3>L1 (LASSO) vs. L2 (Ridge) — why the LASSO nuisance learner selects</h3>
+    <p>
+      Both penalties shrink coefficients. Only L1 drives them
+      <strong>exactly to zero</strong>. The animation below shows the same
+      coefficient under the two penalties as λ grows: the orange L1
+      estimate snaps to zero abruptly, the steel-blue L2 estimate
+      asymptotes but never gets there. This is why a LASSO-based ML
+      learner in DML doubles as a variable-selection device — useful when
+      $g(X)$ and $m(X)$ depend on only a handful of covariates.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-penalty">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Nuisance LASSO</h4>
+      <p>Slide λ on the outcome-regression nuisance step. Watch which controls survive and how the post-OLS refit recovers the unshrunk coefficient on the treatment.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-dgp">
+      <div class="cta-tag">Tab 3</div>
+      <h4>DML vs OLS Simulator</h4>
+      <p>Generate confounded data, then estimate the treatment effect two ways. See how DML's residualization tracks the true α even when naive OLS drifts.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot — Bonus Experiment</h4>
+      <p>The post's four estimates on a single axis, with 95% CIs for the two DML rows. Hover for SE, CI, and number of controls used.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Partial-linear model (PLR)</summary>
+        <div class="gloss-body"><strong>$Y = \theta D + g(X) + \varepsilon$.</strong> Outcome equals a linear-in-treatment term plus a flexible (possibly non-linear) function of covariates plus noise. <em>Linearity is imposed only on $D$ — the covariates can enter $g$ however ML wants.</em></div>
+      </details>
+      <details class="gloss"><summary>Nuisance functions $g, m$</summary>
+        <div class="gloss-body">The flexible parts. $g(X) = E[Y \mid X]$ predicts the outcome from covariates, $m(X) = E[D \mid X]$ predicts the treatment from covariates. <em>"Nuisance" because we don't care about them for inference — only for cleaning the residuals.</em></div>
+      </details>
+      <details class="gloss"><summary>Treatment effect $\theta$</summary>
+        <div class="gloss-body">The single number we care about: the average effect of the treatment on the outcome, holding covariates fixed via $g$ and $m$. <em>In this post, $\hat\theta = -0.074$ (DML-RF) — bonus shortens log unemployment duration by about 7.4%.</em></div>
+      </details>
+      <details class="gloss"><summary>Cross-fitting</summary>
+        <div class="gloss-body">Sample-split + swap. Estimate $g, m$ on one fold, the treatment effect on the other, then rotate and average across all folds. <em>Removes the overfitting bias that contaminates plug-in estimators.</em></div>
+      </details>
+      <details class="gloss"><summary>Neyman orthogonality</summary>
+        <div class="gloss-body">The score function has zero expected gradient w.r.t. the nuisance parameters at the truth. <em>Small ML errors in $\hat g, \hat m$ don't bias $\hat\theta$ — the lever is balanced at the fulcrum.</em></div>
+      </details>
+      <details class="gloss"><summary>Partialling-out</summary>
+        <div class="gloss-body">Regress $Y$ on $X$, regress $D$ on $X$, take the residuals $\tilde Y, \tilde D$, then regress $\tilde Y$ on $\tilde D$ to get $\hat\theta$. <em>Frisch-Waugh-Lovell with ML in the first stage.</em></div>
+      </details>
+      <details class="gloss"><summary>Learner-agnosticism</summary>
+        <div class="gloss-body">Any sufficiently flexible ML algorithm can serve as the nuisance learner. <em>In the post, swapping Random Forest for LASSO moves $\hat\theta$ from -0.0736 to -0.0712 — within 7% of one SE.</em></div>
+      </details>
+      <details class="gloss"><summary>RCT precision boost</summary>
+        <div class="gloss-body">In a randomised experiment, covariates can't fix bias (there is none) but they can absorb residual variance in $Y$. <em>This is why DML's $\hat\theta$ is close to OLS's here — the gain is precision, not bias removal.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: NUISANCE LASSO ====================== -->
+<section id="pane-penalty" class="tab-pane" role="tabpanel" aria-labelledby="tab-penalty">
+
+  <h2>Nuisance LASSO — the engine inside DML-LASSO</h2>
+  <p class="lede">
+    DML needs to fit two nuisance functions: $\hat g(X)$ predicts $Y$ from
+    covariates, $\hat m(X)$ predicts $D$ from covariates. When the post
+    swaps Random Forest for <code>LassoCV</code>, this slider is the knob
+    that's being tuned automatically.
+    <strong>Drag the λ slider and watch covariates shrink to exactly zero</strong>
+    — and see how the unshrunk post-OLS estimate of α survives.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">200</span></label>
+      <input type="range" id="lab-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">More data $\Rightarrow$ each control's coefficient is estimated more precisely.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="lab-p-val">40</span></label>
+      <input type="range" id="lab-p" min="5" max="100" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">About 15% of these have a true nonzero effect; the rest are noise.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="lab-s-val">0.60</span></label>
+      <input type="range" id="lab-s" min="0.1" max="1.5" step="0.05" value="0.60" aria-label="signal strength">
+      <div class="hint">Magnitude of the truly-relevant coefficients relative to noise.</div>
+    </div>
+    <div class="control">
+      <label>Penalty <span class="value" id="lab-l-val">—</span></label>
+      <input type="range" id="lab-l" min="0" max="79" step="1" value="40" aria-label="penalty index">
+      <div class="hint">Slide left for less shrinkage (more covariates survive); right for more.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-path"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">covariates kept (|I|)</div>
+      <div class="stat-value teal" id="lab-stat-nz">—</div>
+      <div class="stat-sub">out of <span id="lab-stat-p">—</span> candidates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from raw LASSO</div>
+      <div class="stat-value orange" id="lab-stat-alpha-l">—</div>
+      <div class="stat-sub">shrunk toward zero</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from post-OLS</div>
+      <div class="stat-value orange" id="lab-stat-alpha-o">—</div>
+      <div class="stat-sub">refit on selected support</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true α</div>
+      <div class="stat-value" id="lab-stat-alpha-t">0.50</div>
+      <div class="stat-sub">held fixed for comparison</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Sparsity grows with λ.</strong> Slide right — more controls pin to zero. Slide left — they re-enter. At λ ≈ 0 the LASSO collapses to OLS; at λ ≈ λ_max everything is zero.</li>
+      <li><strong>Raw LASSO α̂ is shrunk; post-OLS α̂ is not.</strong> This is why DoubleML uses LASSO <em>only for selection</em> (in $\hat g, \hat m$) and refits the final causal step without the penalty.</li>
+      <li><strong>The treatment column (orange) stays in by construction.</strong> Try a large p and large λ — controls drop out, but the orange line remains the focus of inference.</li>
+      <li><strong>This is what <code>LassoCV()</code> does internally in the post.</strong> In Tab 3 of the post, $\hat\theta = -0.0712$ comes from running this engine inside a 5-fold cross-fitting loop.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="lab-reseed">Reseed random draws</button>
+      <button class="action secondary" id="lab-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: DML vs OLS SIMULATOR ====================== -->
+<section id="pane-dgp" class="tab-pane" role="tabpanel" aria-labelledby="tab-dgp">
+
+  <h2>DML vs OLS — when does partialling-out matter?</h2>
+  <p class="lede">
+    The Pennsylvania Bonus Experiment is an RCT, so OLS and DML give
+    similar estimates (the difference is precision, not bias). In this
+    simulator we move into the territory where DML <em>shines</em>:
+    <strong>observational data with covariates that drive both Y and D</strong>.
+    The asymmetry slider controls how strongly the covariates influence
+    treatment assignment. Crank it up and watch naive OLS drift away from
+    the true α while DML's residualized estimator stays close.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Capped at 300 so the "Run 100 sims" button finishes quickly.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">Capped at 50 for the 100-sim run.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Common scale for both the outcome model and treatment model.</div>
+    </div>
+    <div class="control">
+      <label>Confounding asymmetry <span class="value" id="sh-a-val">0.80</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.80" aria-label="asymmetry">
+      <div class="hint">0 = no confounding (RCT-like) · 1 = covariates strongly predict D, weakly predict Y. <em>Higher = more reward for DML's partialling-out.</em></div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">DML (rigorous λ)</span></h3>
+      <p class="note" style="margin:0 0 10px;">Partialling-out with theory-driven LASSO nuisance, then OLS on the residuals.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y| (in $\hat g$)</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d| (in $\hat m$)</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-rig-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-rig-lam">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">DML (CV-tuned λ)</span></h3>
+      <p class="note" style="margin:0 0 10px;">λ from 3-fold cross-validation on the nuisance regressions — closer to the post's <code>LassoCV()</code>.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y| (in $\hat g$)</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d| (in $\hat m$)</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-cv-un">—</span></div>
+      <div class="method-row"><span class="label">λ_y, λ_d</span><span class="val" id="sh-cv-lam">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Both DML estimators bracket the true α.</strong> The vertical line is the truth — both cards' α̂ stay close, even at high asymmetry.</li>
+      <li><strong>CV over-selects when covariates predict D.</strong> Many marginally predictive controls leak into $\hat m$, eating into the variation in D that identifies α. This is the over-selection story the post warns about when comparing learners.</li>
+      <li><strong>The rigorous penalty is deliberately conservative.</strong> Its Bonferroni-style factor $\Phi^{-1}(1-\gamma/(2p))$ keeps selection error small relative to estimation noise — a different objective than minimising prediction MSE.</li>
+      <li><strong>In the post's RCT setting, this difference is muted.</strong> The treatment is randomised, so $m(X)$ is roughly constant and CV vs rigorous nearly coincide. Move the asymmetry slider to 0 to see the RCT-like regime; crank it to 1 for the observational regime.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs variance over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different ε and v) to see whether the CV bias is systematic.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">CV mean α̂</div><div class="stat-value orange" id="sh-cv-mean">—</div><div class="stat-sub">drift from truth</div></div>
+      <div class="stat"><div class="stat-label">CV sd(α̂)</div><div class="stat-value" id="sh-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Rigorous mean α̂</div><div class="stat-value teal" id="sh-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">Rigorous sd(α̂)</div><div class="stat-value" id="sh-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's headline estimates — interactively</h2>
+  <p class="lede">
+    These numbers come straight from the post's Summary table for the
+    Pennsylvania Bonus Experiment (n = 5,099). All four methods estimate
+    the same quantity: the effect of the bonus offer (<code>tg</code>) on
+    log unemployment duration (<code>inuidur1</code>). Toggle methods to
+    compare. Hover a point for the SE, 95% CI, and number of controls.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>All four estimates agree on the direction.</strong> Every method gives a negative coefficient — the bonus shortens unemployment duration. The disagreement is at the second decimal place, not the sign.</li>
+      <li><strong>Naive OLS is the largest in absolute value (-0.0855).</strong> Adding covariates linearly (-0.0717), or via flexible ML (-0.0736 RF / -0.0712 LASSO), all <em>shrink</em> the estimate. In an RCT this shift is precision improvement, not bias removal.</li>
+      <li><strong>DML-RF and DML-LASSO are within 0.0024 of each other</strong> — less than 7% of one SE. Learner-agnosticism is the post's robustness signal.</li>
+      <li><strong>Only the two DML rows show CI bars.</strong> The OLS rows in the post are reported without DoubleML's cross-fitted standard errors — the post uses them as benchmarks, not as the primary inference target.</li>
+      <li><strong>Both DML CIs exclude zero — but just barely.</strong> Upper bounds are -0.0041 and -0.0018. The bonus effect is statistically significant at 5%, but the true magnitude could plausibly be anywhere from a 14% reduction to almost nothing.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Log unemployment duration" checked> Log unemployment duration</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive OLS" checked> Naive OLS</label>
+      <label><input type="checkbox" value="OLS + Covariates" checked> OLS + Covariates</label>
+      <label><input type="checkbox" value="DoubleML (RF)" checked> DoubleML (RF)</label>
+      <label><input type="checkbox" value="DoubleML (Lasso)" checked> DoubleML (Lasso)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The DML-rigorous vs DML-CV comparison you experimented with on
+      simulated data is the same machinery the post applies to the
+      Pennsylvania experiment — just with two different ML learners
+      (RF and LASSO) instead of two different λ-selection rules:
+    </p>
+    <ul>
+      <li><strong>DML (RF):</strong> α̂ = -0.0736, SE = 0.0354, 95% CI = [-0.143, -0.004]</li>
+      <li><strong>DML (LASSO):</strong> α̂ = -0.0712, SE = 0.0354, 95% CI = [-0.141, -0.002]</li>
+      <li><strong>Naive OLS:</strong> α̂ = -0.0855 — biggest in absolute value, but no cross-fitted SE</li>
+    </ul>
+    <p>
+      The takeaway: <em>in this RCT, all roads lead to roughly -0.07</em>.
+      DML's contribution is not a different point estimate but valid
+      inference machinery that would still work if treatment were
+      <em>not</em> randomised. The simulator in Tab 3 makes that
+      hypothetical concrete.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Why no CI bars on the OLS rows?</h3>
+    <p>
+      The post reports the two OLS coefficients as reference points and
+      computes formal inference only for the DML estimates (where the
+      cross-fitted standard errors are available out of the box from the
+      <code>doubleml</code> package). Standard OLS SEs are available too
+      and would be slightly narrower than DML's — but they assume the
+      linear specification is correct and lose validity if $g(X)$ is
+      truly non-linear. <em>Showing only the DML CIs is honest about
+      which inference machinery the post relies on for the headline
+      claim.</em>
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Introduction to Causal Inference: Double Machine Learning</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Basic Synthetic Control — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Basic Synthetic Control with R: The Basque Country Case Study'. Build the synthetic Basque, watch the GDP gap unfold, and rank the placebo distribution.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Basic Synthetic Control — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Basic Synthetic Control with R: The Basque Country Case Study</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"   role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-donors"  class="tab"        data-pane="pane-donors"  role="tab" aria-selected="false">2 · Donor Recipe</button>
+  <button id="tab-gap"     class="tab"        data-pane="pane-gap"     role="tab" aria-selected="false">3 · The Gap</button>
+  <button id="tab-placebo" class="tab"        data-pane="pane-placebo" role="tab" aria-selected="false">4 · Placebo Ranking</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>What was the economic cost of conflict in the Basque Country?</h2>
+  <p class="lede">
+    The Basque Country experienced sustained terrorist activity starting in 1970.
+    The honest counterfactual question — <em>what would Basque GDP have been
+    without the conflict?</em> — cannot be answered by re-running history. The
+    <strong>synthetic control method</strong> sidesteps this by building a
+    weighted recipe of other Spanish regions whose pre-1970 economy looked
+    indistinguishable from Basque, and using that synthetic stand-in as the
+    missing counterfactual.
+  </p>
+  <p class="lede">
+    This app reproduces the post's three headline findings interactively.
+    In four tabs you will see how a sparse two-donor recipe (85% Catalonia +
+    15% Madrid) is built, watch the actual–synthetic GDP gap open after 1970
+    and peak at <strong>−1.04 thousand USD per capita in 1989</strong>, and
+    rank the Basque trace against placebo runs on the other 16 regions.
+  </p>
+
+  <div class="card">
+    <h3>The headline finding in one picture</h3>
+    <p>
+      The synthetic Basque is built almost entirely from <strong>two of sixteen</strong>
+      donor regions — Catalonia (85.1%) and Madrid (14.9%). This is what
+      "sparse, convex combination" looks like when you plot the weights.
+    </p>
+    <div class="chart-area" id="intro-donor-anim"></div>
+    <p class="note" style="margin-top: 10px;">
+      Catalonia and Madrid are the only two Spanish regions whose pre-1970
+      economies were comparably industrial, urban, and wealthy. A reader new
+      to Spanish regional economics gets a one-line summary: <em>Basque ≈
+      85% Catalonia + 15% Madrid.</em>
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-donors">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Donor Recipe</h4>
+      <p>The full 16-region donor pool. See which regions were considered, and which got non-zero weight. Compare predictor balance side-by-side.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-gap">
+      <div class="cta-tag">Tab 3</div>
+      <h4>The Gap</h4>
+      <p>Actual vs synthetic Basque, 1955–1997. Toggle the gap-only view to see the post-1970 divergence isolated from the levels.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-placebo">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Placebo Ranking</h4>
+      <p>The full in-space placebo distribution. Trim by pre-treatment fit and see Basque rank 2 of 8 (pseudo p ≈ 0.25).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Synthetic control</summary>
+        <div class="gloss-body">A weighted average of donor (untreated) units designed to reproduce the treated unit's pre-treatment characteristics. The post-treatment path of the synthetic is the missing potential outcome.</div>
+      </details>
+      <details class="gloss"><summary>Donor pool</summary>
+        <div class="gloss-body">The set of untreated units from which the synthetic is built. Here: 16 Spanish autonomous communities, excluding the Basque Country and the national aggregate.</div>
+      </details>
+      <details class="gloss"><summary>Donor weights W</summary>
+        <div class="gloss-body">Non-negative weights summing to 1. Picked by the inner optimization to minimise the distance between treated and synthetic predictor vectors. The Basque solution gives 85.1% to Catalonia, 14.9% to Madrid, 0 to all others.</div>
+      </details>
+      <details class="gloss"><summary>Predictor weights V</summary>
+        <div class="gloss-body">A diagonal matrix that tells the inner problem how much each predictor matters. Found by the outer loop, which minimises pre-treatment outcome MSPE.</div>
+      </details>
+      <details class="gloss"><summary>Pre-treatment fit (MSPE)</summary>
+        <div class="gloss-body">Mean Squared Prediction Error of the synthetic on the pre-treatment outcome (gdpcap). Low MSPE pre-treatment is what justifies interpreting the post-treatment gap as causal.</div>
+      </details>
+      <details class="gloss"><summary>ATT (gap)</summary>
+        <div class="gloss-body">The post-treatment difference between actual and synthetic outcomes. Headline estimate here is −0.58 thousand 1986 USD per capita averaged over 1970–1997.</div>
+      </details>
+      <details class="gloss"><summary>In-space placebo</summary>
+        <div class="gloss-body">Run the algorithm pretending each donor region was the treated unit. Compare its post/pre MSPE ratio to Basque's. The Basque ratio of 60.1 ranks 7 of 17 (full) or 2 of 8 (trimmed by pre-fit comparability).</div>
+      </details>
+      <details class="gloss"><summary>MSPE ratio (post / pre)</summary>
+        <div class="gloss-body">A normalised statistic that lets placebo regions with different fit qualities be compared. Larger ratio = larger relative gap. Basque: 60.1. Catalonia: 64.7.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: DONOR RECIPE ====================== -->
+<section id="pane-donors" class="tab-pane" role="tabpanel" aria-labelledby="tab-donors">
+
+  <h2>The donor recipe — who builds the synthetic Basque?</h2>
+  <p class="lede">
+    The optimization searches the 16-region donor pool for the convex
+    combination whose pre-treatment predictors look most like Basque. The
+    result is a <strong>sparse two-donor solution</strong>. Below: the
+    optimised weights for all 16 donor regions (sorted), plus the predictor
+    balance that explains <em>why</em> these two were picked.
+  </p>
+
+  <div class="card">
+    <h3>Optimal donor weights</h3>
+    <p>
+      Steel blue = dominant donor (Catalonia). Orange = secondary donor (Madrid).
+      All other regions are dimmed because their optimised weights are exactly zero.
+    </p>
+    <div class="chart-area" id="donor-bars"></div>
+  </div>
+
+  <div class="card">
+    <h3>Predictor balance — why Catalonia + Madrid wins</h3>
+    <p>
+      For each of the 13 matched predictors, this table compares the treated
+      Basque value, the synthetic Basque value (from the optimised W), and the
+      simple average across the full donor pool. Click a row to highlight.
+    </p>
+    <div class="balance-table" id="balance-table"></div>
+    <p class="note" style="margin-top: 10px;">
+      Look at <code>special.gdpcap.1960.1969</code>: treated 5.285 vs synthetic
+      5.271 (sample mean: 3.581). The match on pre-1970 GDP is essentially
+      perfect — that is why the post-1970 divergence is informative. Look at
+      <code>special.sec.industry.1961.1969</code>: treated 45.1% industry share
+      vs synthetic 37.6% vs sample mean only 22.4%. The optimiser correctly
+      identified Basque as <em>highly industrial</em> and shifted weight onto
+      donors that share that profile.
+    </p>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The two-donor sparsity is a feature, not a bug.</strong> When only a few donors closely resemble the treated unit, the optimiser correctly concentrates weight on them. The other 14 get exactly zero — no contribution.</li>
+      <li><strong>The match is excellent on outcome-relevant predictors</strong> (pre-1970 gdpcap, education shares within 1–4 points of each other) and acceptable on industrial structure. The residual gap on population density (treated 247 vs synthetic 196) is the largest — but density is a static control rather than a year-to-year outcome predictor.</li>
+      <li><strong>Reproducible recipe.</strong> The same weights drop out of the BFGS optimiser every time you run the post's <code>analysis.R</code> — there is no stochastic step here.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: THE GAP ====================== -->
+<section id="pane-gap" class="tab-pane" role="tabpanel" aria-labelledby="tab-gap">
+
+  <h2>Actual Basque vs synthetic Basque, 1955–1997</h2>
+  <p class="lede">
+    These are the real numbers from the post's <code>gap_series.csv</code>.
+    Pre-1970 (grey shaded), the two paths should be indistinguishable — that
+    is the point of the construction. Post-1970, any divergence is the
+    estimated economic cost of conflict, expressed in thousand 1986 USD per
+    capita.
+  </p>
+
+  <div class="card">
+    <h3>View</h3>
+    <div class="outcome-toggle" id="gap-view-toggle">
+      <label><input type="radio" name="gap-view" value="paths" checked> Both paths (actual + synthetic)</label>
+      <label><input type="radio" name="gap-view" value="actual-only"> Actual only</label>
+      <label><input type="radio" name="gap-view" value="synthetic-only"> Synthetic only</label>
+      <label><input type="radio" name="gap-view" value="gap"> Gap = actual − synthetic</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="gap-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Average ATT (1970–1997)</div>
+      <div class="stat-value orange" id="stat-att-avg">−0.580</div>
+      <div class="stat-sub">thousand 1986 USD per capita</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Peak gap (1989)</div>
+      <div class="stat-value orange" id="stat-att-peak">−1.036</div>
+      <div class="stat-sub">single-year maximum deficit</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">End-of-window gap (1997)</div>
+      <div class="stat-value teal" id="stat-att-end">−0.828</div>
+      <div class="stat-sub">deficit at last observation</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Pre-1970 fit MSPE</div>
+      <div class="stat-value teal" id="stat-prefit">0.0082</div>
+      <div class="stat-sub">near-perfect match before treatment</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Pre-1970 the two lines are nearly indistinguishable.</strong> Both rise from about 3.8 to 6.2 thousand 1986 USD across the 15 pre-treatment years. The MSPE is 0.0082 — the synthetic is doing what it was constructed to do.</li>
+      <li><strong>Starting around 1972 the lines diverge.</strong> By 1989 the gap reaches its largest single-year deficit of −1.04 thousand USD per capita. This corresponds to roughly an <strong>8% income shortfall</strong> against the no-conflict counterfactual.</li>
+      <li><strong>The recovery is partial.</strong> After 1989 the gap narrows somewhat (the synthetic also moderates) but stays around −0.8 thousand USD all the way to 1997. There is no return to the pre-treatment pattern of overlapping paths.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: PLACEBO RANKING ====================== -->
+<section id="pane-placebo" class="tab-pane" role="tabpanel" aria-labelledby="tab-placebo">
+
+  <h2>In-space placebo distribution — is the Basque gap unusual?</h2>
+  <p class="lede">
+    The same algorithm is re-run with each of the other 16 regions as the
+    "treated" unit. If terrorism had no causal effect on Basque GDP, then the
+    Basque post/pre MSPE ratio should be unremarkable in this distribution.
+    The chart below shows where it actually sits.
+  </p>
+
+  <div class="card">
+    <h3>Filter</h3>
+    <div class="outcome-toggle" id="placebo-toggle">
+      <label><input type="radio" name="placebo-view" value="trimmed" checked> Trimmed (pre-MSPE within ×5 of Basque's, 8 regions)</label>
+      <label><input type="radio" name="placebo-view" value="full"> Full (all 17 regions, including incomparable-fit ones)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="placebo-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Basque ratio (post / pre MSPE)</div>
+      <div class="stat-value orange">60.1</div>
+      <div class="stat-sub">pre-MSPE 0.0082, post-MSPE 0.493</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Rank (trimmed)</div>
+      <div class="stat-value orange">2 of 8</div>
+      <div class="stat-sub">pseudo p ≈ 0.250</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Rank (full, untrimmed)</div>
+      <div class="stat-value teal">7 of 17</div>
+      <div class="stat-sub">pseudo p ≈ 0.412</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Catalonia ratio (top placebo)</div>
+      <div class="stat-value teal">64.7</div>
+      <div class="stat-sub">the donor that builds 85% of Basque</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>How to read this</h4>
+    <ul>
+      <li><strong>Toggle to "Full" view</strong> to see why trimming matters. Andalucia, Asturias, and Navarra all have astronomical ratios (904, 549, 388) — not because they had real shocks, but because their pre-1970 fit was so good that even a moderate post-period gap divides into a huge ratio. They are not comparable to Basque.</li>
+      <li><strong>Switch back to "Trimmed."</strong> Among the 8 regions whose pre-MSPE is within a factor of 5 of Basque's, Basque ranks 2 of 8 (pseudo p = 1/4 = 0.250). The first-place region is Catalonia, which contributes 85% of the synthetic Basque recipe — when a treated unit is built mostly from one donor, that donor is structurally a likely placebo because its own synthetic struggles to find a substitute.</li>
+      <li><strong>The honest takeaway from this tab:</strong> the visual signal in Tab 3 is suggestive of a real economic cost, but the formal inference is hampered by the small donor pool (smallest pseudo p possible in the trimmed set = 1/8 ≈ 0.125, so even the maximum-rank placebo would not clear conventional significance thresholds).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to the previous tabs</h3>
+    <p>
+      The placebo evidence and the donor-weight structure (Tab 2) should be
+      read together, not separately. The same Catalonia that builds 85% of
+      synthetic Basque also produces the largest single-region placebo gap.
+      That is not a coincidence — it is a structural feature of the method
+      when only a few donors closely resemble the treated unit. The Basque
+      finding survives this scrutiny but is not bulletproof; the post's
+      recommendation is to consult <code>scpi</code> (Cattaneo, Feng &amp;
+      Titiunik 2021) for prediction intervals when frequentist inference is
+      essential.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Basic Synthetic Control with R: The Basque Country Case Study</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

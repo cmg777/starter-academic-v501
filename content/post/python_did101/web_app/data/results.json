@@ -1,0 +1,140 @@
+{
+  "estimates": [
+    {
+      "method": "Naive Before-After",
+      "outcome": "DiD estimate (2x2)",
+      "estimate": 36.20,
+      "se": 4.27,
+      "ci_lo": 27.83,
+      "ci_hi": 44.57,
+      "n_selected": null
+    },
+    {
+      "method": "OLS / HC1",
+      "outcome": "DiD estimate (2x2)",
+      "estimate": 25.315,
+      "se": 0.615,
+      "ci_lo": 24.087,
+      "ci_hi": 26.543,
+      "n_selected": null
+    },
+    {
+      "method": "TWFE / CRV1",
+      "outcome": "DiD estimate (2x2)",
+      "estimate": 25.315,
+      "se": 0.585,
+      "ci_lo": 24.126,
+      "ci_hi": 26.504,
+      "n_selected": null
+    },
+    {
+      "method": "TWFE+Cov / CRV1",
+      "outcome": "DiD estimate (2x2)",
+      "estimate": 25.328,
+      "se": 0.605,
+      "ci_lo": 24.099,
+      "ci_hi": 26.557,
+      "n_selected": null
+    },
+    {
+      "method": "TWFE / iid",
+      "outcome": "TWFE under 4 SE types",
+      "estimate": 25.315,
+      "se": 0.6071,
+      "ci_lo": 24.124,
+      "ci_hi": 26.506,
+      "n_selected": null
+    },
+    {
+      "method": "TWFE / HC1",
+      "outcome": "TWFE under 4 SE types",
+      "estimate": 25.315,
+      "se": 0.5852,
+      "ci_lo": 24.168,
+      "ci_hi": 26.462,
+      "n_selected": null
+    },
+    {
+      "method": "TWFE / CRV1",
+      "outcome": "TWFE under 4 SE types",
+      "estimate": 25.315,
+      "se": 0.5851,
+      "ci_lo": 24.168,
+      "ci_hi": 26.462,
+      "n_selected": null
+    },
+    {
+      "method": "TWFE / CRV3",
+      "outcome": "TWFE under 4 SE types",
+      "estimate": 25.315,
+      "se": 0.6373,
+      "ci_lo": 24.066,
+      "ci_hi": 26.564,
+      "n_selected": null
+    },
+    {
+      "method": "Event-Study t=-4",
+      "outcome": "Event-Study coefficients",
+      "estimate": 0.342,
+      "se": 0.401,
+      "ci_lo": -0.474,
+      "ci_hi": 1.157,
+      "n_selected": null
+    },
+    {
+      "method": "Event-Study t=-3",
+      "outcome": "Event-Study coefficients",
+      "estimate": -0.322,
+      "se": 0.441,
+      "ci_lo": -1.219,
+      "ci_hi": 0.575,
+      "n_selected": null
+    },
+    {
+      "method": "Event-Study t=-2",
+      "outcome": "Event-Study coefficients",
+      "estimate": 0.593,
+      "se": 0.423,
+      "ci_lo": -0.267,
+      "ci_hi": 1.454,
+      "n_selected": null
+    },
+    {
+      "method": "Event-Study t=0",
+      "outcome": "Event-Study coefficients",
+      "estimate": 25.028,
+      "se": 0.445,
+      "ci_lo": 24.123,
+      "ci_hi": 25.932,
+      "n_selected": null
+    },
+    {
+      "method": "Event-Study t=1",
+      "outcome": "Event-Study coefficients",
+      "estimate": 24.705,
+      "se": 0.559,
+      "ci_lo": 23.569,
+      "ci_hi": 25.842,
+      "n_selected": null
+    },
+    {
+      "method": "Event-Study t=2",
+      "outcome": "Event-Study coefficients",
+      "estimate": 24.768,
+      "se": 0.739,
+      "ci_lo": 23.267,
+      "ci_hi": 26.270,
+      "n_selected": null
+    },
+    {
+      "method": "Event-Study t=3",
+      "outcome": "Event-Study coefficients",
+      "estimate": 25.701,
+      "se": 0.797,
+      "ci_lo": 24.083,
+      "ci_hi": 27.320,
+      "n_selected": null
+    }
+  ],
+  "selection": []
+}

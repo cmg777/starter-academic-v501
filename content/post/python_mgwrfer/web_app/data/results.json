@@ -1,0 +1,72 @@
+{
+  "_comment": "MGWFER recovery metrics from content/post/python_mgwrfer/model_comparison.csv and global_models_comparison.csv. The 'estimates' array holds RMSE values rendered as a forest plot (lower = better recovery). The 'selection' array holds bandwidths each model picked per covariate (paper Table 3).",
+
+  "estimates": [
+    { "method": "MGWR_cs",  "outcome": "beta_1 (dome)",     "estimate": 2.1573, "se": 0.0, "ci_lo": 2.1573, "ci_hi": 2.1573, "n_selected": 48 },
+    { "method": "PMGWR",    "outcome": "beta_1 (dome)",     "estimate": 2.3003, "se": 0.0, "ci_lo": 2.3003, "ci_hi": 2.3003, "n_selected": 46 },
+    { "method": "MGWFER",   "outcome": "beta_1 (dome)",     "estimate": 0.1793, "se": 0.0, "ci_lo": 0.1793, "ci_hi": 0.1793, "n_selected": 50 },
+
+    { "method": "MGWR_cs",  "outcome": "beta_2 (gradient)", "estimate": 1.7977, "se": 0.0, "ci_lo": 1.7977, "ci_hi": 1.7977, "n_selected": 91 },
+    { "method": "PMGWR",    "outcome": "beta_2 (gradient)", "estimate": 1.9489, "se": 0.0, "ci_lo": 1.9489, "ci_hi": 1.9489, "n_selected": 50 },
+    { "method": "MGWFER",   "outcome": "beta_2 (gradient)", "estimate": 0.1050, "se": 0.0, "ci_lo": 0.1050, "ci_hi": 0.1050, "n_selected": 91 },
+
+    { "method": "MGWR_cs",  "outcome": "beta_3 (constant)", "estimate": 1.9838, "se": 0.0, "ci_lo": 1.9838, "ci_hi": 1.9838, "n_selected": 98 },
+    { "method": "PMGWR",    "outcome": "beta_3 (constant)", "estimate": 1.7485, "se": 0.0, "ci_lo": 1.7485, "ci_hi": 1.7485, "n_selected": 50 },
+    { "method": "MGWFER",   "outcome": "beta_3 (constant)", "estimate": 0.0724, "se": 0.0, "ci_lo": 0.0724, "ci_hi": 0.0724, "n_selected": 116 },
+
+    { "method": "MGWR_cs",  "outcome": "beta_4 (null)",     "estimate": 2.3768, "se": 0.0, "ci_lo": 2.3768, "ci_hi": 2.3768, "n_selected": 52 },
+    { "method": "PMGWR",    "outcome": "beta_4 (null)",     "estimate": 1.8612, "se": 0.0, "ci_lo": 1.8612, "ci_hi": 1.8612, "n_selected": 50 },
+    { "method": "MGWFER",   "outcome": "beta_4 (null)",     "estimate": 0.1399, "se": 0.0, "ci_lo": 0.1399, "ci_hi": 0.1399, "n_selected": 62 },
+
+    { "method": "MGWR_cs",  "outcome": "alpha (sc)",        "estimate": 14.1820, "se": 0.0, "ci_lo": 14.1820, "ci_hi": 14.1820, "n_selected": null },
+    { "method": "PMGWR",    "outcome": "alpha (sc)",        "estimate": 25.6184, "se": 0.0, "ci_lo": 25.6184, "ci_hi": 25.6184, "n_selected": null },
+    { "method": "MGWFER",   "outcome": "alpha (sc)",        "estimate": 0.5398,  "se": 0.0, "ci_lo": 0.5398,  "ci_hi": 0.5398,  "n_selected": null }
+  ],
+
+  "correlations": [
+    { "method": "MGWR_cs", "coefficient": "beta_1", "corr": -0.3857 },
+    { "method": "PMGWR",   "coefficient": "beta_1", "corr": -0.4575 },
+    { "method": "MGWFER",  "coefficient": "beta_1", "corr":  0.8179 },
+    { "method": "MGWR_cs", "coefficient": "beta_2", "corr": -0.2085 },
+    { "method": "PMGWR",   "coefficient": "beta_2", "corr":  0.2163 },
+    { "method": "MGWFER",  "coefficient": "beta_2", "corr":  0.9407 },
+    { "method": "MGWR_cs", "coefficient": "alpha",  "corr":  0.8387 },
+    { "method": "PMGWR",   "coefficient": "alpha",  "corr":  0.9780 },
+    { "method": "MGWFER",  "coefficient": "alpha",  "corr":  0.9996 }
+  ],
+
+  "global_table": [
+    { "model": "OLS_cs",   "beta_1": 5.4763, "beta_2": 5.6911, "beta_3": 6.0866, "beta_4": 4.8228, "alpha_mean": 3.1792 },
+    { "model": "OLS_pool", "beta_1": 6.1438, "beta_2": 6.3448, "beta_3": 5.7879, "beta_4": 4.1596, "alpha_mean": 2.8496 },
+    { "model": "FE",       "beta_1": 1.5653, "beta_2": 1.5365, "beta_3": 1.5531, "beta_4": 0.0172, "alpha_mean": 23.2344 },
+    { "model": "TRUE",     "beta_1": 1.5017, "beta_2": 1.5333, "beta_3": 1.5000, "beta_4": 0.0000, "alpha_mean": 23.2858 }
+  ],
+
+  "bandwidths": [
+    { "model": "MGWR_cs", "bw_x1": 48, "bw_x2": 91, "bw_x3": 98,  "bw_x4": 52 },
+    { "model": "PMGWR",   "bw_x1": 44, "bw_x2": 46, "bw_x3": 50,  "bw_x4": 50 },
+    { "model": "MGWFER",  "bw_x1": 50, "bw_x2": 91, "bw_x3": 116, "bw_x4": 62 }
+  ],
+
+  "alpha_ranges": [
+    { "model": "TRUE",    "min":  2.07, "max":  51.55, "corr_with_true": 1.0000 },
+    { "model": "MGWR_cs", "min":  2.42, "max":  21.84, "corr_with_true": 0.8387 },
+    { "model": "PMGWR",   "min": -11.27, "max": 10.04, "corr_with_true": 0.9780 },
+    { "model": "MGWFER",  "min":  1.45, "max":  51.62, "corr_with_true": 0.9996 }
+  ],
+
+  "selection": [
+    { "outcome": "beta_1 (dome)",     "method": "MGWFER", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 50 },
+    { "outcome": "beta_1 (dome)",     "method": "PMGWR",  "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 46 },
+    { "outcome": "beta_1 (dome)",     "method": "MGWR_cs","n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 48 },
+    { "outcome": "beta_2 (gradient)", "method": "MGWFER", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 91 },
+    { "outcome": "beta_2 (gradient)", "method": "PMGWR",  "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 50 },
+    { "outcome": "beta_2 (gradient)", "method": "MGWR_cs","n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 91 },
+    { "outcome": "beta_3 (constant)", "method": "MGWFER", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 116 },
+    { "outcome": "beta_3 (constant)", "method": "PMGWR",  "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 50 },
+    { "outcome": "beta_3 (constant)", "method": "MGWR_cs","n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 98 },
+    { "outcome": "beta_4 (null)",     "method": "MGWFER", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 62 },
+    { "outcome": "beta_4 (null)",     "method": "PMGWR",  "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 50 },
+    { "outcome": "beta_4 (null)",     "method": "MGWR_cs","n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 52 }
+  ]
+}

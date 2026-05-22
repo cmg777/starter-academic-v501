@@ -1,0 +1,35 @@
+{
+  "estimates": [
+    { "method": "Naive (mean diff)", "outcome": "Eligibility (ATE)", "estimate": 19559.34, "se": 0,       "ci_lo": 19559.34, "ci_hi": 19559.34, "n_selected": 0 },
+    { "method": "PLR-Lasso",         "outcome": "Eligibility (ATE)", "estimate": 9370.81,  "se": 1326.47, "ci_lo": 6770.99,  "ci_hi": 11970.64, "n_selected": 13 },
+    { "method": "PLR-Random Forest", "outcome": "Eligibility (ATE)", "estimate": 8835.46,  "se": 1309.07, "ci_lo": 6269.74,  "ci_hi": 11401.18, "n_selected": 9  },
+    { "method": "PLR-Decision Tree", "outcome": "Eligibility (ATE)", "estimate": 7822.51,  "se": 1321.78, "ci_lo": 5231.87,  "ci_hi": 10413.14, "n_selected": 9  },
+    { "method": "PLR-XGBoost",       "outcome": "Eligibility (ATE)", "estimate": 8892.39,  "se": 1398.65, "ci_lo": 6151.09,  "ci_hi": 11633.69, "n_selected": 9  },
+    { "method": "IRM-Lasso",         "outcome": "Eligibility (ATE)", "estimate": 8559.13,  "se": 1261.16, "ci_lo": 6087.30,  "ci_hi": 11030.97, "n_selected": 13 },
+    { "method": "IRM-Random Forest", "outcome": "Eligibility (ATE)", "estimate": 7924.39,  "se": 1138.06, "ci_lo": 5693.82,  "ci_hi": 10154.95, "n_selected": 9  },
+    { "method": "IRM-Decision Tree", "outcome": "Eligibility (ATE)", "estimate": 7985.58,  "se": 1156.49, "ci_lo": 5718.90,  "ci_hi": 10252.26, "n_selected": 9  },
+    { "method": "IRM-XGBoost",       "outcome": "Eligibility (ATE)", "estimate": 8381.57,  "se": 1186.36, "ci_lo": 6056.34,  "ci_hi": 10706.80, "n_selected": 9  },
+
+    { "method": "Naive (mean diff)",  "outcome": "Participation (LATE)", "estimate": 27371.58, "se": 0,       "ci_lo": 27371.58, "ci_hi": 27371.58, "n_selected": 0 },
+    { "method": "IIVM-Lasso",         "outcome": "Participation (LATE)", "estimate": 12280.84, "se": 1712.63, "ci_lo": 8924.16,  "ci_hi": 15637.53, "n_selected": 13 },
+    { "method": "IIVM-Random Forest", "outcome": "Participation (LATE)", "estimate": 11471.20, "se": 1646.56, "ci_lo": 8243.99,  "ci_hi": 14698.40, "n_selected": 9  },
+    { "method": "IIVM-Decision Tree", "outcome": "Participation (LATE)", "estimate": 11215.10, "se": 1785.89, "ci_lo": 7714.82,  "ci_hi": 14715.38, "n_selected": 9  },
+    { "method": "IIVM-XGBoost",       "outcome": "Participation (LATE)", "estimate": 12018.76, "se": 1648.62, "ci_lo": 8787.52,  "ci_hi": 15250.00, "n_selected": 9  }
+  ],
+  "selection": [
+    { "outcome": "Eligibility (ATE)",    "method": "PLR",  "n_Iy": 9, "n_Id": 9, "n_intersection": 9, "n_union": 9 },
+    { "outcome": "Eligibility (ATE)",    "method": "IRM",  "n_Iy": 9, "n_Id": 9, "n_intersection": 9, "n_union": 9 },
+    { "outcome": "Participation (LATE)", "method": "IIVM", "n_Iy": 9, "n_Id": 9, "n_intersection": 9, "n_union": 9 }
+  ],
+  "summary": {
+    "naive_elig": 19559.34,
+    "naive_part": 27371.58,
+    "plr_mean": 8730.29,
+    "irm_mean": 8212.67,
+    "iivm_mean": 11746.48,
+    "n_obs": 9915,
+    "n_eligible": 3682,
+    "n_participating": 2594,
+    "income_gap": 15368
+  }
+}

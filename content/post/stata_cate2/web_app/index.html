@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>CATE & the Resource Curse — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Causal Machine Learning and the Resource Curse with Stata 19'. Explore CATE, GATEs, and the institutional-moderation story via sliders, a heterogeneity simulator, and a forest plot of Stata 19 cate estimates.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>CATE &amp; the Resource Curse — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Causal Machine Learning and the Resource Curse with Stata 19</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"   role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-gates"   class="tab"        data-pane="pane-gates"   role="tab" aria-selected="false">2 · GATE Explorer</button>
+  <button id="tab-sim"     class="tab"        data-pane="pane-sim"     role="tab" aria-selected="false">3 · Heterogeneity Simulator</button>
+  <button id="tab-forest"  class="tab"        data-pane="pane-forest"  role="tab" aria-selected="false">4 · ATE Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>From ATE to CATE — and why heterogeneity matters</h2>
+  <p class="lede">
+    Does mining help or hurt local development? The headline answer is an <strong>ATE</strong>
+    — a single number, averaged over every district in the sample. But the post's central
+    claim is sharper: the effect of mining on nighttime lights is <em>not</em> the same
+    everywhere. It depends on <strong>institutional quality</strong>. Stata 19's
+    <code>cate</code> command lets us trace this dependence as a function
+    <span class="kbd">τ(x)</span> — the Conditional Average Treatment Effect.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. In four tabs you will:
+    visualise the ATE → GATE → CATE → IATE hierarchy with a small animation;
+    explore the actual GATE estimates from the post's six binary contrasts;
+    simulate how institutional moderation can flip findings depending on the DGP;
+    and audit the §7 ATE table against the known ground truth.
+  </p>
+
+  <div class="card">
+    <h3>One ATE, many CATEs — a chalkboard view</h3>
+    <p>
+      The animation below contrasts a <em>constant treatment effect</em> (steel-blue line,
+      every unit gets the same lift) with a <em>conditional treatment effect</em>
+      (orange curve, τ varies with institutional quality x). When the orange curve is flat,
+      ATE = CATE = GATE for every group. When it slopes, the post's institutional-moderation
+      finding becomes visible.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-gates">
+      <div class="cta-tag">Tab 2</div>
+      <h4>GATE Explorer</h4>
+      <p>Six GATE estimates from the post. Pick a contrast (NTL 1v0, NTL 3v1, Conflict 1v0…) and a grouping variable (executive constraints or quality of government quartiles). Reproduce the post's §8 plots.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Heterogeneity Simulator</h4>
+      <p>Slide the moderation strength θ and watch the GATE curve tilt. Run 100 small panels to see how often the heterogeneity test rejects homogeneity. Stress-test the §8 chi-squared.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>ATE Forest Plot</h4>
+      <p>The §7 ATE table, interactively. Toggle the NTL contrasts and the Conflict outcomes, compare PO / AIPW / Naive against the known ground truth, and see how close cross-fit estimates land.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>ATE</summary>
+        <div class="gloss-body">Average Treatment Effect — the single number you would report in a press release. Headline result, but hides every subgroup pattern.</div>
+      </details>
+      <details class="gloss"><summary>CATE — τ(x)</summary>
+        <div class="gloss-body">Conditional Average Treatment Effect. A <em>function</em> of covariates x, not a number. Where τ(x) bends with x, treatment helps some units more than others.</div>
+      </details>
+      <details class="gloss"><summary>GATE</summary>
+        <div class="gloss-body">Group Average Treatment Effect. The CATE averaged over a pre-specified subgroup (e.g. each level of exec_constraints). Tested with <code>estat gatetest</code>.</div>
+      </details>
+      <details class="gloss"><summary>IATE</summary>
+        <div class="gloss-body">Individualised ATE — one effect per observation, τ(x_i). Visualised with <code>categraph histogram</code> and <code>categraph iateplot</code>.</div>
+      </details>
+      <details class="gloss"><summary>PO estimator</summary>
+        <div class="gloss-body">Partialing-Out. Residualises y and d against (x, w), then regresses one residual on the other. Robust to extreme propensities.</div>
+      </details>
+      <details class="gloss"><summary>AIPW estimator</summary>
+        <div class="gloss-body">Augmented Inverse-Propensity Weighting. <em>Doubly robust</em>: stays consistent if either the outcome model or the propensity model is right.</div>
+      </details>
+      <details class="gloss"><summary>Cross-fitting</summary>
+        <div class="gloss-body">Sample-splitting that prevents nuisance-model overfitting. <code>xfolds(5)</code> in the post means each fold's nuisance predictions come from a model trained on the other four.</div>
+      </details>
+      <details class="gloss"><summary>Heterogeneity test</summary>
+        <div class="gloss-body">A formal χ² test of <em>constant</em> treatment effects (Chernozhukov et al. 2006). Rejection licenses CATE / GATE interpretation. The post's NTL 1v0 test gives χ²(1) = 53.05.</div>
+      </details>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Three findings the app helps you see</h3>
+    <ul>
+      <li><strong>Finding 1 — Mining lifts nighttime lights.</strong> §7 reports five well-identified ATEs spanning 0.149 to 0.611 log-NTL. Forest-plot tab (4) shows them next to the ground-truth column.</li>
+      <li><strong>Finding 2 — Price effects are non-linear.</strong> NTL 2v1 (medium vs low prices) is essentially zero (−0.011, p = 0.90); NTL 3v1 (high vs low) is large and significant (0.405). The step from low to medium does nothing; the step to high does a lot.</li>
+      <li><strong>Finding 3 — Institutions moderate <em>mining</em>, not <em>prices</em>.</strong> The mining-effect GATEs slope clearly with executive constraints (χ²(5) = 96.90); the price-effect GATEs by QoG are flat (χ²(3) = 5.81, p = 0.121). Tab 2 lets you switch between them.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: GATE EXPLORER ====================== -->
+<section id="pane-gates" class="tab-pane" role="tabpanel" aria-labelledby="tab-gates">
+
+  <h2>GATE Explorer — heterogeneity by institutions</h2>
+  <p class="lede">
+    The post estimates six GATE patterns. Pick one and see the per-group estimates,
+    their 95% CIs, and the formal χ² heterogeneity test. The contrast between
+    the <strong>NTL 1v0 by exec_con</strong> panel (steep, χ² = 96.9) and the
+    <strong>NTL 3v1 by qog_cat</strong> panel (flat, χ² = 5.8) is the picture
+    behind Finding 3.
+  </p>
+
+  <div class="card">
+    <h3>Pick a GATE panel</h3>
+    <div class="controls">
+      <div class="control">
+        <label>Contrast / outcome</label>
+        <select id="gate-key" aria-label="GATE panel">
+          <option value="gates_exec_ntl_1v0" selected>NTL 1v0 (Mining) — by exec_con</option>
+          <option value="gates_exec_ntl_3v1">NTL 3v1 (Price+) — by exec_con</option>
+          <option value="gates_qog_ntl_1v0">NTL 1v0 (Mining) — by QoG quartile</option>
+          <option value="gates_qog_ntl_3v1">NTL 3v1 (Price+) — by QoG quartile</option>
+          <option value="gates_exec_conf_1v0">Conflict 1v0 — by exec_con</option>
+        </select>
+        <div class="hint">Each option reproduces one of the §8 GATE plots — using the actual point estimates and SEs from the post's Stata output.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="gate-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">heterogeneity χ²</div>
+      <div class="stat-value teal" id="gate-chi2">—</div>
+      <div class="stat-sub">df = <span id="gate-df">—</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">p-value</div>
+      <div class="stat-value orange" id="gate-p">—</div>
+      <div class="stat-sub">estat gatetest</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">verdict</div>
+      <div class="stat-value" id="gate-verdict">—</div>
+      <div class="stat-sub">at α = 0.05</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">groups</div>
+      <div class="stat-value" id="gate-ngroups">—</div>
+      <div class="stat-sub">prespecified</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Slope direction.</strong> NTL 1v0 by exec_con drops monotonically from 0.275 (group 1) to 0.051 (group 6) — the mining effect <em>shrinks</em> as institutions strengthen. In the simulated DGP, weaker governance leaves more room for mining-led growth.</li>
+      <li><strong>Flat vs sloped.</strong> Compare NTL 3v1 by QoG quartile (flat, χ²(3) = 5.81, p = 0.12) against NTL 1v0 by QoG quartile (steep, χ²(3) = 69.19, p &lt; 0.001). Institutions systematically moderate the mining effect, not the price premium.</li>
+      <li><strong>Conflict 1v0 panel.</strong> Range 0.033–0.106 across exec_con levels, χ²(5) = 5.00, p = 0.42. The test <em>cannot</em> reject homogeneity — mining raises conflict, but not differentially by institutions.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: HETEROGENEITY SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Heterogeneity Simulator — DGP with tunable moderation</h2>
+  <p class="lede">
+    Simulate a small resource-curse panel with a known data-generating process.
+    Pick the ATE baseline τ₀ and the institutional-moderation slope θ. When θ ≠ 0,
+    units with stronger institutions get a systematically different treatment effect,
+    so the heterogeneity test should reject. When θ = 0, every unit gets τ₀ and
+    rejection is a false positive. Run 100 simulations to see how often that
+    happens.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sim-n-val">300</span></label>
+      <input type="range" id="sim-n" min="100" max="500" step="20" value="300" aria-label="sample size">
+      <div class="hint">Each fictional panel has n district-years. The post uses 2,700 for the 1v0 contrast.</div>
+    </div>
+    <div class="control">
+      <label>Baseline ATE τ₀ <span class="value" id="sim-t-val">0.25</span></label>
+      <input type="range" id="sim-t" min="-0.20" max="0.80" step="0.05" value="0.25" aria-label="baseline ATE">
+      <div class="hint">The post's NTL 1v0 ground truth is 0.25. The Stata 19 cross-fit estimate (AIPW) is 0.149.</div>
+    </div>
+    <div class="control">
+      <label>Moderation slope θ <span class="value" id="sim-th-val">-0.04</span></label>
+      <input type="range" id="sim-th" min="-0.10" max="0.10" step="0.005" value="-0.04" aria-label="moderation slope">
+      <div class="hint">τ(x) = τ₀ + θ · (institutions − 3.5). Negative θ ⇒ stronger institutions, smaller mining effect (the post's §8 pattern).</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="sim-s-val">0.30</span></label>
+      <input type="range" id="sim-s" min="0.05" max="0.80" step="0.05" value="0.30" aria-label="noise sigma">
+      <div class="hint">Idiosyncratic noise on log-NTL. Larger σ ⇒ noisier estimates ⇒ harder to detect heterogeneity.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">Truth</span> Implied GATE by exec_con</h3>
+      <p class="note" style="margin:0 0 10px;">τ(x) at each of the 6 institutional levels (analytic, no estimation noise)</p>
+      <div class="method-row"><span class="label">τ(1)</span><span class="val" id="sim-t1">—</span></div>
+      <div class="method-row"><span class="label">τ(2)</span><span class="val" id="sim-t2">—</span></div>
+      <div class="method-row"><span class="label">τ(3)</span><span class="val" id="sim-t3">—</span></div>
+      <div class="method-row"><span class="label">τ(4)</span><span class="val" id="sim-t4">—</span></div>
+      <div class="method-row"><span class="label">τ(5)</span><span class="val" id="sim-t5">—</span></div>
+      <div class="method-row"><span class="label">τ(6)</span><span class="val" id="sim-t6">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">Estimate</span> Cross-fit GATE (one panel)</h3>
+      <p class="note" style="margin:0 0 10px;">Sample mean of y(1) − y(0) within each exec_con cell, after randomising treatment 50/50</p>
+      <div class="method-row"><span class="label">GATE(1)</span><span class="val" id="sim-g1">—</span></div>
+      <div class="method-row"><span class="label">GATE(2)</span><span class="val" id="sim-g2">—</span></div>
+      <div class="method-row"><span class="label">GATE(3)</span><span class="val" id="sim-g3">—</span></div>
+      <div class="method-row"><span class="label">GATE(4)</span><span class="val" id="sim-g4">—</span></div>
+      <div class="method-row"><span class="label">GATE(5)</span><span class="val" id="sim-g5">—</span></div>
+      <div class="method-row"><span class="label">GATE(6)</span><span class="val" id="sim-g6">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">heterogeneity χ²</div>
+      <div class="stat-value teal" id="sim-chi2">—</div>
+      <div class="stat-sub">df = 5</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">p-value</div>
+      <div class="stat-value orange" id="sim-p">—</div>
+      <div class="stat-sub">single panel</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ATE estimate</div>
+      <div class="stat-value" id="sim-ate">—</div>
+      <div class="stat-sub">truth = τ₀</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">reject H₀ (homog.)?</div>
+      <div class="stat-value" id="sim-reject">—</div>
+      <div class="stat-sub">at α = 0.05</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>θ = 0 ⇒ flat curve.</strong> The cross-fit GATE bars should look noisy around τ₀. The χ² test should rarely exceed the 95% critical value (≈ 11.07 for df = 5). Anything more is sample-size dependent noise.</li>
+      <li><strong>θ &lt; 0 ⇒ downward slope.</strong> The §8 finding. Lower exec_con groups have larger GATEs; the heterogeneity test should reject for most random seeds.</li>
+      <li><strong>Noise σ matters.</strong> Crank σ up: even strong moderation (θ = ±0.10) becomes hard to detect when n = 100. This is the small-sample warning the post gives for the within-mining price comparisons.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Sampling distribution over 100 panels</h3>
+    <p>Single runs are noisy. Re-simulate the same parameters 100 times to see the bias-variance picture and the empirical rejection rate of the χ² test.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="stat-row" id="sim-mc-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">mean ATE</div><div class="stat-value teal" id="sim-mc-mean">—</div><div class="stat-sub">truth = τ₀</div></div>
+      <div class="stat"><div class="stat-label">sd(ATE)</div><div class="stat-value" id="sim-mc-sd">—</div></div>
+      <div class="stat"><div class="stat-label">% reject H₀</div><div class="stat-value orange" id="sim-mc-rej">—</div><div class="stat-sub">power if θ ≠ 0; size if θ = 0</div></div>
+      <div class="stat"><div class="stat-label">mean χ²</div><div class="stat-value" id="sim-mc-chi">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>ATE Forest Plot — §7 estimates vs ground truth</h2>
+  <p class="lede">
+    These numbers come straight from §7 of the post — the same Stata 19
+    <code>cate po</code> / <code>cate aipw</code> output. Each estimator is plotted
+    with its 95% CI for every NTL and Conflict contrast. The dashed orange
+    column on the right shows the known ground-truth ATE from the DGP, so you
+    can audit how close cross-fit Stata estimates land.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Toggle Conflict outcomes off</strong> to focus on the NTL contrasts. PO and AIPW agree on direction for every contrast and overlap on most. The largest gap is NTL 3v1 (PO 0.595 vs AIPW 0.405), where the within-mining n = 300 limits precision.</li>
+      <li><strong>Hover any point</strong> for SE, 95% CI, and the number of CATE variables the estimator used (always 10 — the catevarlist in §6.2).</li>
+      <li><strong>Compare against ground truth.</strong> NTL 1v0 truth = 0.25, AIPW estimate = 0.149 (under-shoot). NTL 3v0 truth = 0.55, AIPW = 0.611 (slight over-shoot). Both are within a few SEs of the truth — random forests + 5-fold cross-fitting are not perfect on n = 2,700.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="NTL 1v0 (Mining)" checked> NTL 1v0 (Mining)</label>
+      <label><input type="checkbox" value="NTL 2v0" checked> NTL 2v0</label>
+      <label><input type="checkbox" value="NTL 3v0" checked> NTL 3v0</label>
+      <label><input type="checkbox" value="NTL 2v1 (Price-)" checked> NTL 2v1 (Price-)</label>
+      <label><input type="checkbox" value="NTL 3v1 (Price+)" checked> NTL 3v1 (Price+)</label>
+      <label><input type="checkbox" value="Conflict 1v0"> Conflict 1v0</label>
+      <label><input type="checkbox" value="Conflict 3v0"> Conflict 3v0</label>
+      <label><input type="checkbox" value="Conflict 3v1"> Conflict 3v1</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive diff" checked> Naive diff</label>
+      <label><input type="checkbox" value="PO" checked> PO</label>
+      <label><input type="checkbox" value="AIPW" checked> AIPW</label>
+      <label><input type="checkbox" value="Ground truth" checked> Ground truth</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Subpopulation ATEs (estat ate)</h3>
+    <p>
+      The post's §9.3 splits the sample by exec_constraints to ask:
+      <em>"what is the average mining effect specifically in weakly-governed districts?"</em>
+      The answer is striking — three times larger than in strongly-governed districts.
+    </p>
+    <div class="grid grid-2">
+      <div class="card">
+        <h4>Weak institutions (exec_con ≤ 2)</h4>
+        <div class="method-row"><span class="label">n</span><span class="val">558</span></div>
+        <div class="method-row"><span class="label">ATE</span><span class="val">0.297</span></div>
+        <div class="method-row"><span class="label">SE</span><span class="val">0.022</span></div>
+        <div class="method-row"><span class="label">95% CI</span><span class="val">[0.255, 0.339]</span></div>
+      </div>
+      <div class="card">
+        <h4>Strong institutions (exec_con ≥ 4)</h4>
+        <div class="method-row"><span class="label">n</span><span class="val">1,526</span></div>
+        <div class="method-row"><span class="label">ATE</span><span class="val">0.092</span></div>
+        <div class="method-row"><span class="label">SE</span><span class="val">0.016</span></div>
+        <div class="method-row"><span class="label">95% CI</span><span class="val">[0.062, 0.123]</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Connecting the four tabs</h3>
+    <ul>
+      <li><strong>Tab 1's animation</strong> showed the abstract picture: τ(x) constant vs τ(x) sloped.</li>
+      <li><strong>Tab 2's GATE explorer</strong> made that picture concrete using the post's six §8 panels — and showed which contrasts have monotone slopes and which do not.</li>
+      <li><strong>Tab 3's simulator</strong> stress-tested the heterogeneity test on a known DGP — confirming that the §8 χ² = 96.9 is well above what θ = 0 produces, even on a small n = 300 panel.</li>
+      <li><strong>This forest plot</strong> closes the loop: every binary contrast in §7, all estimators, against the known ground truth. Together they reproduce the post's three findings without rerunning Stata.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Causal Machine Learning and the Resource Curse with Stata 19</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

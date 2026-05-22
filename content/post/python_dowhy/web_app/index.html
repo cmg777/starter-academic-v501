@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>DoWhy — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Introduction to Causal Inference: The DoWhy Approach with the Lalonde Dataset'. Explore the four-step framework, simulate confounding, compare five estimators, and stress-test results with refutation tests.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>DoWhy — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Introduction to Causal Inference: The DoWhy Approach with the Lalonde Dataset</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab-btn active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-confound" class="tab-btn"        data-pane="pane-confound" role="tab" aria-selected="false">2 · Confounder Lab</button>
+  <button id="tab-forest"   class="tab-btn"        data-pane="pane-forest"   role="tab" aria-selected="false">3 · Estimator Comparison</button>
+  <button id="tab-refute"   class="tab-btn"        data-pane="pane-refute"   role="tab" aria-selected="false">4 · Refutation Tests</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why a four-step framework for causal inference?</h2>
+  <p class="lede">
+    Did a job training program actually <em>cause</em> participants to earn more, or did people who signed up
+    just differ from those who did not? A simple difference in means gives $1,794, but is that the program's effect or
+    a mirage created by confounders like age, education, and prior earnings?
+    <strong>DoWhy</strong> answers this with four explicit steps: <em>Model, Identify, Estimate, Refute</em>.
+  </p>
+  <p class="lede">
+    This app lets you walk the four steps yourself. You'll see how confounders create spurious effects,
+    compare five different ATE estimators on the actual Lalonde data, and stress-test the result with
+    placebo and stability tests — the same refutation tests DoWhy runs in Step 4.
+  </p>
+
+  <div class="card">
+    <h3>The causal graph — confounders create backdoor paths</h3>
+    <p>
+      The animation below shows the three actors in every causal inference problem: confounders
+      (<strong style="color:#00d4c8">C</strong>), treatment (<strong style="color:#6a9bcc">T</strong>),
+      and outcome (<strong style="color:#d97757">Y</strong>). The orange pulse traces the
+      <em>backdoor path</em> C → T → Y that confounders open — the spurious channel adjustment must close.
+      The steel pulse then shows the only path left after adjustment: the genuine causal effect.
+    </p>
+    <div class="chart-area" id="intro-dag"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-confound">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Confounder Lab</h4>
+      <p>Slide the confounding strength yourself. Watch how the naive estimate drifts away from the true ATE — and how backdoor adjustment pulls it back.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Estimator Comparison</h4>
+      <p>The post's headline figure, interactively. Compare five DoWhy estimators on the Lalonde data. Toggle methods and hover for SEs and CIs.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-refute">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Refutation Tests</h4>
+      <p>Stress-test the estimate. Placebo, random common cause, data subset — see why the placebo test is the most convincing of the three.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>ATE — Average Treatment Effect</summary>
+        <div class="gloss-body">E[Y(1) − Y(0)]. The expected effect if a random person in the population received treatment. <em>The estimand of interest in this post.</em></div>
+      </details>
+      <details class="gloss"><summary>ATT — Effect on the Treated</summary>
+        <div class="gloss-body">E[Y(1) − Y(0) | T=1]. The effect among people who actually received treatment. <em>PS matching estimates this, not the ATE.</em></div>
+      </details>
+      <details class="gloss"><summary>Confounder</summary>
+        <div class="gloss-body">A variable that causes both treatment and outcome. <em>You must adjust for confounders to isolate the causal effect.</em></div>
+      </details>
+      <details class="gloss"><summary>Backdoor criterion</summary>
+        <div class="gloss-body">A graph rule for choosing which variables to adjust for. <em>Conditioning on a set that blocks all backdoor paths identifies the ATE.</em></div>
+      </details>
+      <details class="gloss"><summary>Propensity score e(X)</summary>
+        <div class="gloss-body">P(T = 1 | X). The probability of receiving treatment given covariates, usually estimated by logistic regression. <em>IPW reweights by 1/e(X).</em></div>
+      </details>
+      <details class="gloss"><summary>IPW — Inverse Probability Weighting</summary>
+        <div class="gloss-body">Re-weight each unit by the inverse of its propensity score. <em>Creates a pseudo-population where treatment looks randomly assigned.</em></div>
+      </details>
+      <details class="gloss"><summary>Doubly Robust (AIPW)</summary>
+        <div class="gloss-body">Combines an outcome model with a propensity score model. <em>Consistent if either model is correct — two shots at identification.</em></div>
+      </details>
+      <details class="gloss"><summary>Refutation test</summary>
+        <div class="gloss-body">A perturbation of the data (fake treatment, added random confounder, subsample) used to stress-test a causal estimate. <em>The estimate should change in predictable ways.</em></div>
+      </details>
+      <details class="gloss"><summary>Placebo test</summary>
+        <div class="gloss-body">Replace the real treatment with a random one. <em>If the estimate stays large, the original effect was probably an artifact.</em></div>
+      </details>
+      <details class="gloss"><summary>Identification</summary>
+        <div class="gloss-body">Whether the causal effect can be computed from observable data alone. <em>Step 2 of DoWhy answers this before any estimation runs.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: CONFOUNDER LAB ====================== -->
+<section id="pane-confound" class="tab-pane" role="tabpanel" aria-labelledby="tab-confound">
+
+  <h2>Confounder Lab — feel how confounding biases the naive estimate</h2>
+  <p class="lede">
+    The simulated data has one treatment <em>d</em> and many covariates that influence both
+    <em>d</em> and outcome <em>y</em>. The true ATE is fixed at α = 0.5 (steel line in the chart).
+    <strong>Slide the confounding strength</strong> and watch the orange "naive" bar drift away
+    from the truth — then watch the teal "adjusted" bar (using the backdoor criterion) snap back to α.
+    The bigger the gap, the more adjustment matters.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="cf-n-val">200</span></label>
+      <input type="range" id="cf-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">More data ⇒ tighter estimates; bias from confounding does not shrink with n.</div>
+    </div>
+    <div class="control">
+      <label>Number of covariates p <span class="value" id="cf-p-val">20</span></label>
+      <input type="range" id="cf-p" min="5" max="60" step="1" value="20" aria-label="number of covariates p">
+      <div class="hint">All of them are confounders here (affect both d and y).</div>
+    </div>
+    <div class="control">
+      <label>Confounding strength <span class="value" id="cf-s-val">0.70</span></label>
+      <input type="range" id="cf-s" min="0.1" max="1.5" step="0.05" value="0.70" aria-label="confounding strength">
+      <div class="hint">How strongly covariates push both d and y. Stronger ⇒ larger naive bias.</div>
+    </div>
+    <div class="control">
+      <label>Asymmetry <span class="value" id="cf-a-val">0.30</span></label>
+      <input type="range" id="cf-a" min="0" max="1" step="0.05" value="0.30" aria-label="asymmetry">
+      <div class="hint">0 = covariates push d and y equally · 1 = covariates push d much more than y.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag cv">Naive estimate</span></h3>
+      <p class="note" style="margin:0 0 10px;">α̂ from a simple OLS of y on d alone — no adjustment.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="cf-naive-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="cf-naive-se">—</span></div>
+      <div class="method-row"><span class="label">bias from truth</span><span class="val" id="cf-naive-bias">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag rigorous">Backdoor-adjusted</span></h3>
+      <p class="note" style="margin:0 0 10px;">α̂ from OLS of y on d <em>and</em> all p covariates — the backdoor criterion.</p>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="cf-adj-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="cf-adj-se">—</span></div>
+      <div class="method-row"><span class="label">bias from truth</span><span class="val" id="cf-adj-bias">—</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="cf-compare"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Slide confounding strength right.</strong> The orange "naive" bar drifts far from the true α; the teal "adjusted" bar stays close to it. This is the bias confounders create when ignored.</li>
+      <li><strong>Slide asymmetry right.</strong> When covariates predict treatment but barely predict the outcome, the gap between naive and adjusted shrinks — confounding only bites when covariates affect <em>both</em> sides.</li>
+      <li><strong>Add more sample size.</strong> Both bars get tighter, but the naive bar's <em>bias</em> does not shrink. More data does not fix confounding — adjustment does.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over many simulations</h3>
+    <p>Single runs are noisy. Run the pipeline 100 times with fresh draws (same parameters, different ε) to see whether the naive bias is systematic.</p>
+    <button class="action" id="cf-run">Run 100 simulations</button>
+    <span id="cf-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="cf-progress"><div></div></div>
+    <div class="chart-area" id="cf-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="cf-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Naive mean α̂</div><div class="stat-value orange" id="cf-naive-mean">—</div><div class="stat-sub">should drift from true α</div></div>
+      <div class="stat"><div class="stat-label">Naive sd(α̂)</div><div class="stat-value" id="cf-naive-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Adjusted mean α̂</div><div class="stat-value teal" id="cf-adj-mean">—</div><div class="stat-sub">should hover around true α</div></div>
+      <div class="stat"><div class="stat-label">Adjusted sd(α̂)</div><div class="stat-value" id="cf-adj-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>Five estimators on the Lalonde data — the post's headline figure</h2>
+  <p class="lede">
+    These numbers come straight from the post's analysis of the National Supported Work demonstration
+    (n = 445, 185 treated, 260 controls). Six estimators of the ATE of job training on 1978 earnings:
+    a naive baseline, three propensity-score methods (IPW, stratification, matching), regression adjustment,
+    and the doubly-robust AIPW estimator. <strong>Toggle methods and hover for SEs and CIs.</strong>
+  </p>
+
+  <div class="card">
+    <h3>Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive" checked> Naive (diff in means)</label>
+      <label><input type="checkbox" value="Regression Adjustment" checked> Regression Adjustment</label>
+      <label><input type="checkbox" value="IPW" checked> IPW</label>
+      <label><input type="checkbox" value="Doubly Robust (AIPW)" checked> Doubly Robust (AIPW)</label>
+      <label><input type="checkbox" value="PS Stratification" checked> PS Stratification</label>
+      <label><input type="checkbox" value="PS Matching" checked> PS Matching</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>All six estimates are positive</strong>, between $1,559 and $1,794. The training program raised 1978 earnings — the question is by how much.</li>
+      <li><strong>The five adjusted methods cluster tightly</strong> in $1,559–$1,736, while the naive estimate is highest at $1,794. The $58–$235 gap reflects bias from finite-sample covariate imbalances that adjustment removes.</li>
+      <li><strong>Doubly Robust (AIPW)</strong> (teal, $1,620) is the most credible single estimate — consistent whether the outcome model or the propensity model is the one correctly specified. The dashed teal line marks its value across all bars.</li>
+      <li><strong>PS Matching</strong> ($1,736) is the highest adjusted method because it discards unmatched controls, shifting the estimand from ATE toward ATT.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Why do five methods agree?</h3>
+    <p>
+      Three different paradigms — outcome modeling (regression adjustment), treatment modeling
+      (IPW, stratification, matching), and doubly robust (AIPW) — converge on roughly the same answer.
+      That convergence is the strongest evidence the effect is real. If only one paradigm worked,
+      we could blame model misspecification. When all three agree, no single model can be the
+      reason the estimate is positive.
+    </p>
+    <p class="note">
+      The Lalonde dataset comes from an actual randomized experiment (the NSW), so confounding
+      should already be small — covariate adjustment mostly improves <em>precision</em>, not bias.
+      In observational data the same methods would diverge more, and the doubly robust estimator
+      would be even more valuable.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: REFUTATION ====================== -->
+<section id="pane-refute" class="tab-pane" role="tabpanel" aria-labelledby="tab-refute">
+
+  <h2>Refutation tests — does the effect survive sabotage?</h2>
+  <p class="lede">
+    Step 4 of DoWhy's workflow is the most overlooked. It applies the same estimator to a deliberately
+    perturbed dataset and asks: <em>does the estimate change the way it should?</em>
+    <strong>Hover any bar</strong> to see the test's logic, the p-value, and what it does or does not prove.
+  </p>
+
+  <div class="card">
+    <h3>Three perturbations of the Lalonde estimate</h3>
+    <p>
+      The original ATE from Regression Adjustment is <strong>$1,676</strong>. Each test below
+      perturbs the data and re-estimates. The orange bar is the original; the teal bar is the perturbed estimate.
+    </p>
+    <div class="chart-area" id="ref-chart"></div>
+  </div>
+
+  <div class="grid grid-3">
+    <div class="card">
+      <h3 style="color:#00d4c8;">Placebo Treatment</h3>
+      <p>Replace <em>d</em> with a random permutation. If the effect was causal, the estimate should collapse to ≈ 0.</p>
+      <div class="method-row"><span class="label">original</span><span class="val">$1,676</span></div>
+      <div class="method-row"><span class="label">placebo</span><span class="val" style="color:#00d4c8;">$62</span></div>
+      <div class="method-row"><span class="label">p-value</span><span class="val">0.92</span></div>
+      <p class="note">Effect dropped 96% — strongest evidence in this panel. The estimator does not "make up" effects from random noise.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#6a9bcc;">Random Common Cause</h3>
+      <p>Add a randomly-generated extra confounder. If the original adjustment set was adequate, adding noise should barely move the estimate.</p>
+      <div class="method-row"><span class="label">original</span><span class="val">$1,676</span></div>
+      <div class="method-row"><span class="label">with random</span><span class="val" style="color:#6a9bcc;">$1,676</span></div>
+      <div class="method-row"><span class="label">p-value</span><span class="val">0.90</span></div>
+      <p class="note">Difference: less than $1. Model is not overly sensitive to which covariates are included.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#d97757;">Data Subset (80%)</h3>
+      <p>Re-estimate on random 80% subsamples. A stable population effect should fluctuate only a little.</p>
+      <div class="method-row"><span class="label">original</span><span class="val">$1,676</span></div>
+      <div class="method-row"><span class="label">subset mean</span><span class="val" style="color:#d97757;">$1,728</span></div>
+      <div class="method-row"><span class="label">p-value</span><span class="val">0.80</span></div>
+      <p class="note">Slight upward drift is normal sampling variation. No single observation is driving the result.</p>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Compare the three teal bars in the chart.</strong> The Placebo bar (≈ $62) sits next to zero; the other two sit on top of the original. That contrast <em>is</em> the refutation argument.</li>
+      <li><strong>Hover Placebo Treatment.</strong> A 96% collapse is the smoking gun: the estimator only "finds" the effect when the real treatment is in the data. With a random treatment it finds nothing.</li>
+      <li><strong>Note the p-values.</strong> All three are large (0.80–0.92). For refutation tests, <em>large</em> p-values mean the test "passes" — the perturbed estimate is in the range we'd expect under the null of "the original is causal".</li>
+      <li><strong>Caveat:</strong> passing all three tests does not <em>prove</em> causation — they only rule out specific failure modes. Failing any of them, however, would be a strong signal that something is wrong.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to the four steps</h3>
+    <p>
+      <strong>Model</strong> declared the eight covariates as common causes.
+      <strong>Identify</strong> confirmed the backdoor criterion applies and produced the adjustment formula.
+      <strong>Estimate</strong> produced five point estimates that agree.
+      <strong>Refute</strong> just showed that the estimate has the failure signatures of a genuine effect — collapses under a placebo, stable under added noise, stable across subsamples.
+      Each step is independent. None alone is sufficient. The combination is what makes the conclusion credible.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Introduction to Causal Inference: The DoWhy Approach with the Lalonde Dataset</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

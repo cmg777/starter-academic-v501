@@ -1,0 +1,39 @@
+{
+  "estimates": [
+    { "method": "diff (manual)",          "outcome": "GPA (0-100 scale)", "estimate": 25.315,  "se": 0.627, "ci_lo": 24.084, "ci_hi": 26.546, "n_selected": null },
+    { "method": "reg (OLS interaction)",  "outcome": "GPA (0-100 scale)", "estimate": 25.3149, "se": 0.615, "ci_lo": 24.087, "ci_hi": 26.543, "n_selected": null },
+    { "method": "didregress (Stata 17+)", "outcome": "GPA (0-100 scale)", "estimate": 25.3149, "se": 0.834, "ci_lo": 23.621, "ci_hi": 27.009, "n_selected": null },
+    { "method": "xtreg (TWFE)",           "outcome": "GPA (0-100 scale)", "estimate": 25.3149, "se": 0.585, "ci_lo": 24.126, "ci_hi": 26.504, "n_selected": null },
+    { "method": "reghdfe (HD-TWFE)",      "outcome": "GPA (0-100 scale)", "estimate": 25.3149, "se": 0.585, "ci_lo": 24.126, "ci_hi": 26.504, "n_selected": null },
+    { "method": "reghdfe + covariate",    "outcome": "GPA (0-100 scale)", "estimate": 25.328,  "se": 0.605, "ci_lo": 24.099, "ci_hi": 26.557, "n_selected": null },
+    { "method": "ITS (naive before-after)", "outcome": "GPA (0-100 scale)", "estimate": 36.200,  "se": 0.443, "ci_lo": 35.331, "ci_hi": 37.069, "n_selected": null }
+  ],
+  "event_study": {
+    "eventdd": [
+      { "event_time": -4, "estimate":  0.342, "se": 0.401 },
+      { "event_time": -3, "estimate": -0.322, "se": 0.441 },
+      { "event_time": -2, "estimate":  0.593, "se": 0.423 },
+      { "event_time": -1, "estimate":  0.000, "se": null  },
+      { "event_time":  0, "estimate": 25.028, "se": 0.445 },
+      { "event_time":  1, "estimate": 24.705, "se": 0.559 },
+      { "event_time":  2, "estimate": 24.768, "se": 0.739 },
+      { "event_time":  3, "estimate": 25.701, "se": 0.797 }
+    ]
+  },
+  "means_2x2": {
+    "control_pre": 71.22,
+    "control_post": 82.10,
+    "treated_pre": 60.17,
+    "treated_post": 96.37,
+    "counterfactual_post": 71.05,
+    "control_change": 10.88,
+    "treated_change": 36.20,
+    "did_att": 25.32
+  },
+  "table2": [
+    { "spec": "(1) Baseline TWFE",        "estimate": 25.31, "se": 0.607, "controls": "No",  "clustered": "No"  },
+    { "spec": "(2) + Covariate",          "estimate": 25.33, "se": 0.615, "controls": "Yes", "clustered": "No"  },
+    { "spec": "(3) + Clustered SE",       "estimate": 25.31, "se": 0.585, "controls": "No",  "clustered": "Yes" }
+  ],
+  "selection": []
+}

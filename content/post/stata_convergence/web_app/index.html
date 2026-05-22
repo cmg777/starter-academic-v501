@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Beta and Sigma Convergence — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Beta and Sigma Convergence Across Countries: A Stata Tutorial'. A pedagogical web app to explore Solow-style cross-country convergence, the post-2000 rolling-beta story, and the lag between beta and sigma convergence.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Beta and Sigma Convergence — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Beta and Sigma Convergence Across Countries: A Stata Tutorial</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"   role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-solow"   class="tab"        data-pane="pane-solow"   role="tab" aria-selected="false">2 · Solow Simulator</button>
+  <button id="tab-rolling" class="tab"        data-pane="pane-rolling" role="tab" aria-selected="false">3 · Rolling β</button>
+  <button id="tab-sigma"   class="tab"        data-pane="pane-sigma"   role="tab" aria-selected="false">4 · σ Evolution</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Are poorer countries catching up?</h2>
+  <p class="lede">
+    For decades the answer was <em>no</em>. From 1960 to 2000 richer countries
+    grew faster, and the world's income gaps widened. After about the year
+    2000 the sign flipped — poorer countries finally grew faster on average.
+    <strong>This is the "new era of unconditional convergence"</strong> documented
+    by Patel, Sandefur, and Subramanian (2021). But convergence is real, slow,
+    and counter-intuitive: even after the 2000 sign flip, the actual spread of
+    world incomes kept growing until 2008.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. Across four tabs you will
+    simulate a Solow-style cross-section and watch β-convergence emerge from
+    the speed parameter; explore the post's actual rolling-β estimates as the
+    start year slides from 1960 to 2010; and step through the year-by-year
+    income variance to see the 8-year lag between β-convergence and
+    σ-convergence in the data.
+  </p>
+
+  <div class="card">
+    <h3>β vs σ — two views of the same race</h3>
+    <p>
+      Both views ask "is the gap closing?" but measure it differently.
+      <strong>β-convergence</strong> watches whether the country that started
+      behind is now running faster. <strong>σ-convergence</strong> watches the
+      <em>width of the pack</em>. The animation below contrasts the two: the
+      blue runner (rich) and the orange runner (poor) close on each other
+      (β-convergence), while the dashed bar in the middle tracks the variance
+      of log income across a small set of countries — the variance can stay
+      flat or even rise while individual runners are converging, because
+      random shocks redistribute incomes even as the catch-up force operates.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-solow">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Solow Simulator</h4>
+      <p>Set the convergence speed β and the noise level. Watch a fresh cross-section of 84 simulated countries grow over 19 years. See the OLS scatter and the implied half-life update live.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-rolling">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Rolling β</h4>
+      <p>The post's actual rolling-β estimates — slide the start year from 1960 to 2010 and watch the coefficient cross zero around 1990 and stabilise near +0.0036 for the recent windows.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sigma">
+      <div class="cta-tag">Tab 4</div>
+      <h4>σ Evolution</h4>
+      <p>Sixty years of cross-country income variance from the post's balanced 84-country panel. The peak is in 2008, eight years after β-convergence begins — the lag is visible at a glance.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>β-convergence</summary>
+        <div class="gloss-body">Poorer countries grow faster than richer ones. Tested by regressing annualised growth on log initial income; a <em>negative slope λ</em> (or a <em>positive structural β</em>) is convergence.</div>
+      </details>
+      <details class="gloss"><summary>σ-convergence</summary>
+        <div class="gloss-body">The variance of log income across countries shrinks over time. <em>The actual gap is narrowing.</em></div>
+      </details>
+      <details class="gloss"><summary>Slope λ vs. speed β</summary>
+        <div class="gloss-body">λ is the raw OLS slope (depends on period length s). β is the structural speed: <em>β = −ln(1 + λs)/s</em>. Different sign convention — negative λ corresponds to positive β.</div>
+      </details>
+      <details class="gloss"><summary>Half-life τ</summary>
+        <div class="gloss-body">Years to close half the existing income gap: <em>τ = ln(2) / β</em>. For 2000–2019, β = 0.00365 gives τ = 190 years.</div>
+      </details>
+      <details class="gloss"><summary>Structural break</summary>
+        <div class="gloss-body">A point in time where the convergence coefficient changes sign or magnitude. <em>In this data the break sits around 2000.</em></div>
+      </details>
+      <details class="gloss"><summary>Rolling window</summary>
+        <div class="gloss-body">Re-estimate the regression for every possible start year (end year fixed at 2019). The sequence of estimates traces out how convergence has evolved.</div>
+      </details>
+      <details class="gloss"><summary>NLS</summary>
+        <div class="gloss-body">Nonlinear Least Squares. Estimates β directly without going through λ. <em>Gives identical point estimates to OLS conversion in this setting.</em></div>
+      </details>
+      <details class="gloss"><summary>Why β alone is not enough</summary>
+        <div class="gloss-body">Young, Higgins, and Levy (2008) showed β-convergence is <em>necessary but not sufficient</em> for σ-convergence. Random growth shocks can widen the distribution even as poor countries grow faster on average.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: SOLOW SIMULATOR ====================== -->
+<section id="pane-solow" class="tab-pane" role="tabpanel" aria-labelledby="tab-solow">
+
+  <h2>Solow Simulator — generate a cross-section and watch β-convergence emerge</h2>
+  <p class="lede">
+    Each "country" is drawn with a random initial log-income and a true
+    steady-state. Growth over the next <span class="kbd">T</span> years is governed by the Barro–Sala-i-Martin
+    convergence equation:
+  </p>
+  <p class="lede" style="font-family:ui-monospace, 'SF Mono', Menlo, monospace; font-size:14px;">
+    g<sub>i</sub> = α − [(1 − e<sup>−βT</sup>)/T] · ln(y<sub>i,0</sub>) + ε<sub>i</sub>
+  </p>
+  <p class="lede">
+    <strong>Drag β (the true convergence speed) and σ (the noise) and watch the
+    OLS fit on the simulated data update live.</strong> Compare the recovered λ̂ and
+    half-life to the values you set.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Number of countries N <span class="value" id="solow-n-val">84</span></label>
+      <input type="range" id="solow-n" min="40" max="200" step="4" value="84" aria-label="number of countries N">
+      <div class="hint">Default 84 matches the post's balanced panel.</div>
+    </div>
+    <div class="control">
+      <label>Period length T (years) <span class="value" id="solow-T-val">19</span></label>
+      <input type="range" id="solow-T" min="5" max="60" step="1" value="19" aria-label="period length T">
+      <div class="hint">Default 19 matches the 2000–2019 window from the post.</div>
+    </div>
+    <div class="control">
+      <label>True speed β <span class="value" id="solow-b-val">0.0040</span></label>
+      <input type="range" id="solow-b" min="-0.005" max="0.025" step="0.0005" value="0.0040" aria-label="true convergence speed beta">
+      <div class="hint">0.0036 ≈ post's 2000–2019 estimate. 0.020 ≈ classic conditional benchmark. Negative ⇒ divergence.</div>
+    </div>
+    <div class="control">
+      <label>Noise σ <span class="value" id="solow-s-val">0.015</span></label>
+      <input type="range" id="solow-s" min="0.005" max="0.04" step="0.001" value="0.015" aria-label="noise sigma">
+      <div class="hint">Standard deviation of the annualised growth shock. Larger ⇒ noisier scatter.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="solow-scatter"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Recovered OLS λ̂</div>
+      <div class="stat-value teal" id="solow-stat-lambda">—</div>
+      <div class="stat-sub">slope of growth on log initial</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Implied β̂</div>
+      <div class="stat-value orange" id="solow-stat-beta">—</div>
+      <div class="stat-sub">−ln(1 + λ̂T)/T</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">True β (you set)</div>
+      <div class="stat-value" id="solow-stat-btrue">0.0040</div>
+      <div class="stat-sub">target speed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Implied half-life</div>
+      <div class="stat-value" id="solow-stat-halflife">—</div>
+      <div class="stat-sub">τ = ln(2)/β̂ (years)</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Pull β positive</strong> and watch the fitted line tilt downward in the scatter: <em>poorer countries grow faster</em>. Pull β negative and the line tilts upward — the divergence regime of 1960–2000.</li>
+      <li><strong>Notice the recovered β̂ is noisy.</strong> Even when the true β is the 2%/year benchmark, a single 19-year cross-section recovers it imprecisely. This is the §6 lesson: unconditional convergence is real but statistical power is limited.</li>
+      <li><strong>Shrink the noise σ</strong> and the OLS line snaps to its true slope. Real cross-country growth has σ ≈ 0.015 — the deck is stacked against detecting convergence from one window alone.</li>
+      <li><strong>Press the reseed button</strong> to draw a fresh sample with the same parameters. The variation across draws is the standard error you see in the post's regression tables.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="solow-reseed">Reseed random draws</button>
+      <button class="action secondary" id="solow-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: ROLLING BETA ====================== -->
+<section id="pane-rolling" class="tab-pane" role="tabpanel" aria-labelledby="tab-rolling">
+
+  <h2>The post's rolling-β plot — interactively</h2>
+  <p class="lede">
+    These 51 estimates come straight from <code>convergence_rolling_beta_ols.csv</code>
+    in the post's folder — the same data behind Figure 6. Each dot is one OLS
+    regression of annualised growth on log initial income, with start year on
+    the x-axis and end year fixed at 2019. Use the highlight slider to read
+    out a single window; toggle the convergence-benchmark line to compare to
+    the 2% conditional-convergence baseline.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Highlight start year <span class="value" id="rb-y-val">2000</span></label>
+      <input type="range" id="rb-y" min="1960" max="2010" step="1" value="2000" aria-label="highlighted start year">
+      <div class="hint">Slide to read out one rolling window. The window covers <code>start → 2019</code>.</div>
+    </div>
+    <div class="control">
+      <label>Show 2% benchmark <span class="value" id="rb-bench-val">on</span></label>
+      <input type="checkbox" id="rb-bench" checked style="width:auto;margin-top:6px;">
+      <div class="hint">The classic Barro–Sala-i-Martin (1992) conditional-convergence rate.</div>
+    </div>
+    <div class="control">
+      <label>Show 95% CI <span class="value" id="rb-ci-val">on</span></label>
+      <input type="checkbox" id="rb-ci" checked style="width:auto;margin-top:6px;">
+      <div class="hint">The width of the CI shrinks as the sample grows but stays wide at every start year.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="rb-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">β at selected start year</div>
+      <div class="stat-value teal" id="rb-stat-beta">—</div>
+      <div class="stat-sub">structural speed (per year)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Speed (% per year)</div>
+      <div class="stat-value orange" id="rb-stat-speed">—</div>
+      <div class="stat-sub">100 × β</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Half-life</div>
+      <div class="stat-value" id="rb-stat-half">—</div>
+      <div class="stat-sub">years (ln 2 / β)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">95% CI</div>
+      <div class="stat-value" id="rb-stat-ci">—</div>
+      <div class="stat-sub">[lower, upper]</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Slide the highlight to 1960:</strong> β = −0.00056. The post's headline "no convergence over 1960–2019" sits right there. The estimate is statistically indistinguishable from zero.</li>
+      <li><strong>Slide to 1990:</strong> β crosses zero. This is the moment the new era of unconditional convergence becomes visible in the rolling plot.</li>
+      <li><strong>Slide to 2000:</strong> β = +0.00365, half-life = 190 years. Statistically significant (CI excludes zero) — the post's headline result.</li>
+      <li><strong>Slide to 2008:</strong> β peaks at +0.00525, the strongest convergence in the data. After this the post-financial-crisis estimates moderate.</li>
+      <li><strong>Compare every window to the 2% benchmark:</strong> the dashed teal line shows where Barro–Sala-i-Martin's 1992 conditional-convergence rate sits. Unconditional convergence is real but five-to-six times slower.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: SIGMA EVOLUTION ====================== -->
+<section id="pane-sigma" class="tab-pane" role="tabpanel" aria-labelledby="tab-sigma">
+
+  <h2>σ evolution — when does the actual gap start closing?</h2>
+  <p class="lede">
+    The year-by-year variance of log GDP per capita across the post's 84-country
+    balanced panel (<code>convergence_sigma_evolution.csv</code>). β-convergence
+    began around 2000; σ-convergence did not start until 2008. This 8-year lag
+    is the §13 message of the post made visible at a glance.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Highlight year <span class="value" id="sg-y-val">2008</span></label>
+      <input type="range" id="sg-y" min="1960" max="2019" step="1" value="2008" aria-label="highlighted year">
+      <div class="hint">Slide to read out one year's variance and 95% CI.</div>
+    </div>
+    <div class="control">
+      <label>Mark 2000 (β-flip) <span class="value" id="sg-m1-val">on</span></label>
+      <input type="checkbox" id="sg-m1" checked style="width:auto;margin-top:6px;">
+      <div class="hint">Vertical line marking the year β-convergence begins.</div>
+    </div>
+    <div class="control">
+      <label>Mark 2008 (σ peak) <span class="value" id="sg-m2-val">on</span></label>
+      <input type="checkbox" id="sg-m2" checked style="width:auto;margin-top:6px;">
+      <div class="hint">Vertical line marking the variance peak.</div>
+    </div>
+    <div class="control">
+      <label>Show 95% CI <span class="value" id="sg-ci-val">on</span></label>
+      <input type="checkbox" id="sg-ci" checked style="width:auto;margin-top:6px;">
+      <div class="hint">Chi-squared CI for a variance under N = 84.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sg-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Variance at selected year</div>
+      <div class="stat-value teal" id="sg-stat-var">—</div>
+      <div class="stat-sub">var(ln y) across 84 countries</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Standard deviation</div>
+      <div class="stat-value orange" id="sg-stat-sd">—</div>
+      <div class="stat-sub">√variance</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">% above 1960</div>
+      <div class="stat-value" id="sg-stat-pct">—</div>
+      <div class="stat-sub">vs. base 0.924</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">95% CI for variance</div>
+      <div class="stat-value" id="sg-stat-ci">—</div>
+      <div class="stat-sub">chi-squared, N = 84</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>From 1960 to 2008</strong> the variance rises almost monotonically: 0.924 → 1.918, a 108% widening. The world income distribution was getting wider, not narrower.</li>
+      <li><strong>The variance peaks in 2008</strong> at 1.918, then declines. This is when σ-convergence finally begins — eight years after β-convergence.</li>
+      <li><strong>By 2019</strong> the variance is 1.764 — still 91% above the 1960 level. Sigma-convergence since 2008 has only undone a small fraction of the prior divergence.</li>
+      <li><strong>Toggle the 2000 and 2008 markers off</strong> to see the smooth shape of the curve. Toggle them on to spot the lag visually.</li>
+      <li><strong>Connect back to Tab 3:</strong> in the rolling-β plot the coefficient turns positive around 1990; in the σ plot the variance does not turn down until 2008. Both pictures together show why §13 calls β necessary but not sufficient.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Beta and Sigma Convergence Across Countries: A Stata Tutorial</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+{
+  "_comment": "Health Index built from PCA of Life Expectancy + Infant Mortality (polarity-adjusted) for 50 simulated countries. Source: pc1_index_results.csv produced by script.py.",
+  "meta": {
+    "n_countries": 50,
+    "eigenvector_pc1": [
+      0.7071,
+      0.7071
+    ],
+    "eigenvector_pc2": [
+      0.7071,
+      -0.7071
+    ],
+    "eigenvalue_pc1": 1.9595,
+    "eigenvalue_pc2": 0.0405,
+    "variance_explained_pc1": 0.9797,
+    "variance_explained_pc2": 0.0203,
+    "pc1_min": -2.3892,
+    "pc1_max": 2.3734,
+    "correlation_raw": -0.9595,
+    "correlation_polarity_adjusted": 0.9595
+  },
+  "countries": [
+    {
+      "country": "Country_01",
+      "life_exp": 79.6,
+      "infant_mort": 18.6,
+      "pc1": 1.272,
+      "health_index": 0.7687
+    },
+    {
+      "country": "Country_02",
+      "life_exp": 68.3,
+      "infant_mort": 33.1,
+      "pc1": -0.3294,
+      "health_index": 0.4325
+    },
+    {
+      "country": "Country_03",
+      "life_exp": 81.3,
+      "infant_mort": 11.6,
+      "pc1": 1.7339,
+      "health_index": 0.8657
+    },
+    {
+      "country": "Country_04",
+      "life_exp": 77.2,
+      "infant_mort": 25.5,
+      "pc1": 0.7567,
+      "health_index": 0.6605
+    },
+    {
+      "country": "Country_05",
+      "life_exp": 54.9,
+      "infant_mort": 53.8,
+      "pc1": -2.3892,
+      "health_index": 0.0
+    },
+    {
+      "country": "Country_06",
+      "life_exp": 83.6,
+      "infant_mort": 8.6,
+      "pc1": 2.0621,
+      "health_index": 0.9346
+    },
+    {
+      "country": "Country_07",
+      "life_exp": 76.9,
+      "infant_mort": 15.3,
+      "pc1": 1.1996,
+      "health_index": 0.7535
+    },
+    {
+      "country": "Country_08",
+      "life_exp": 77.3,
+      "infant_mort": 16.2,
+      "pc1": 1.1915,
+      "health_index": 0.7518
+    },
+    {
+      "country": "Country_09",
+      "life_exp": 58.3,
+      "infant_mort": 50.1,
+      "pc1": -1.9377,
+      "health_index": 0.0948
+    },
+    {
+      "country": "Country_10",
+      "life_exp": 71.5,
+      "infant_mort": 34.2,
+      "pc1": -0.1147,
+      "health_index": 0.4776
+    },
+    {
+      "country": "Country_11",
+      "life_exp": 64.4,
+      "infant_mort": 42.1,
+      "pc1": -1.0653,
+      "health_index": 0.278
+    },
+    {
+      "country": "Country_12",
+      "life_exp": 84.7,
+      "infant_mort": 3.8,
+      "pc1": 2.3734,
+      "health_index": 1.0
+    },
+    {
+      "country": "Country_13",
+      "life_exp": 71.0,
+      "infant_mort": 25.9,
+      "pc1": 0.2246,
+      "health_index": 0.5488
+    },
+    {
+      "country": "Country_14",
+      "life_exp": 79.0,
+      "infant_mort": 15.5,
+      "pc1": 1.3645,
+      "health_index": 0.7882
+    },
+    {
+      "country": "Country_15",
+      "life_exp": 68.6,
+      "infant_mort": 33.8,
+      "pc1": -0.3366,
+      "health_index": 0.431
+    },
+    {
+      "country": "Country_16",
+      "life_exp": 63.0,
+      "infant_mort": 43.2,
+      "pc1": -1.2318,
+      "health_index": 0.243
+    },
+    {
+      "country": "Country_17",
+      "life_exp": 73.1,
+      "infant_mort": 29.7,
+      "pc1": 0.2243,
+      "health_index": 0.5488
+    },
+    {
+      "country": "Country_18",
+      "life_exp": 58.5,
+      "infant_mort": 54.9,
+      "pc1": -2.1413,
+      "health_index": 0.052
+    },
+    {
+      "country": "Country_19",
+      "life_exp": 79.1,
+      "infant_mort": 15.2,
+      "pc1": 1.3865,
+      "health_index": 0.7928
+    },
+    {
+      "country": "Country_20",
+      "life_exp": 73.0,
+      "infant_mort": 25.3,
+      "pc1": 0.4178,
+      "health_index": 0.5894
+    },
+    {
+      "country": "Country_21",
+      "life_exp": 79.5,
+      "infant_mort": 23.1,
+      "pc1": 1.0574,
+      "health_index": 0.7237
+    },
+    {
+      "country": "Country_22",
+      "life_exp": 65.3,
+      "infant_mort": 39.8,
+      "pc1": -0.8853,
+      "health_index": 0.3158
+    },
+    {
+      "country": "Country_23",
+      "life_exp": 81.6,
+      "infant_mort": 3.5,
+      "pc1": 2.1303,
+      "health_index": 0.9489
+    },
+    {
+      "country": "Country_24",
+      "life_exp": 79.5,
+      "infant_mort": 11.4,
+      "pc1": 1.594,
+      "health_index": 0.8363
+    },
+    {
+      "country": "Country_25",
+      "life_exp": 76.5,
+      "infant_mort": 17.8,
+      "pc1": 1.0518,
+      "health_index": 0.7225
+    },
+    {
+      "country": "Country_26",
+      "life_exp": 61.8,
+      "infant_mort": 53.4,
+      "pc1": -1.799,
+      "health_index": 0.1239
+    },
+    {
+      "country": "Country_27",
+      "life_exp": 69.3,
+      "infant_mort": 36.8,
+      "pc1": -0.4162,
+      "health_index": 0.4143
+    },
+    {
+      "country": "Country_28",
+      "life_exp": 57.7,
+      "infant_mort": 58.7,
+      "pc1": -2.3819,
+      "health_index": 0.0015
+    },
+    {
+      "country": "Country_29",
+      "life_exp": 58.8,
+      "infant_mort": 55.9,
+      "pc1": -2.1623,
+      "health_index": 0.0476
+    },
+    {
+      "country": "Country_30",
+      "life_exp": 75.8,
+      "infant_mort": 18.9,
+      "pc1": 0.9434,
+      "health_index": 0.6997
+    },
+    {
+      "country": "Country_31",
+      "life_exp": 78.6,
+      "infant_mort": 17.1,
+      "pc1": 1.258,
+      "health_index": 0.7658
+    },
+    {
+      "country": "Country_32",
+      "life_exp": 83.4,
+      "infant_mort": 4.0,
+      "pc1": 2.2565,
+      "health_index": 0.9755
+    },
+    {
+      "country": "Country_33",
+      "life_exp": 65.7,
+      "infant_mort": 40.9,
+      "pc1": -0.9026,
+      "health_index": 0.3121
+    },
+    {
+      "country": "Country_34",
+      "life_exp": 64.8,
+      "infant_mort": 35.5,
+      "pc1": -0.7295,
+      "health_index": 0.3485
+    },
+    {
+      "country": "Country_35",
+      "life_exp": 68.4,
+      "infant_mort": 36.1,
+      "pc1": -0.4587,
+      "health_index": 0.4053
+    },
+    {
+      "country": "Country_36",
+      "life_exp": 59.9,
+      "infant_mort": 48.9,
+      "pc1": -1.7501,
+      "health_index": 0.1342
+    },
+    {
+      "country": "Country_37",
+      "life_exp": 56.5,
+      "infant_mort": 48.4,
+      "pc1": -2.0089,
+      "health_index": 0.0798
+    },
+    {
+      "country": "Country_38",
+      "life_exp": 70.2,
+      "infant_mort": 30.8,
+      "pc1": -0.0664,
+      "health_index": 0.4877
+    },
+    {
+      "country": "Country_39",
+      "life_exp": 60.9,
+      "infant_mort": 48.5,
+      "pc1": -1.6489,
+      "health_index": 0.1554
+    },
+    {
+      "country": "Country_40",
+      "life_exp": 75.1,
+      "infant_mort": 25.7,
+      "pc1": 0.5735,
+      "health_index": 0.6221
+    },
+    {
+      "country": "Country_41",
+      "life_exp": 69.1,
+      "infant_mort": 41.9,
+      "pc1": -0.6667,
+      "health_index": 0.3617
+    },
+    {
+      "country": "Country_42",
+      "life_exp": 80.9,
+      "infant_mort": 22.9,
+      "pc1": 1.1825,
+      "health_index": 0.75
+    },
+    {
+      "country": "Country_43",
+      "life_exp": 77.3,
+      "infant_mort": 22.7,
+      "pc1": 0.8934,
+      "health_index": 0.6892
+    },
+    {
+      "country": "Country_44",
+      "life_exp": 64.2,
+      "infant_mort": 39.9,
+      "pc1": -0.981,
+      "health_index": 0.2957
+    },
+    {
+      "country": "Country_45",
+      "life_exp": 79.1,
+      "infant_mort": 7.8,
+      "pc1": 1.7259,
+      "health_index": 0.864
+    },
+    {
+      "country": "Country_46",
+      "life_exp": 79.0,
+      "infant_mort": 16.5,
+      "pc1": 1.3186,
+      "health_index": 0.7785
+    },
+    {
+      "country": "Country_47",
+      "life_exp": 63.2,
+      "infant_mort": 36.2,
+      "pc1": -0.8942,
+      "health_index": 0.3139
+    },
+    {
+      "country": "Country_48",
+      "life_exp": 60.8,
+      "infant_mort": 42.9,
+      "pc1": -1.4003,
+      "health_index": 0.2076
+    },
+    {
+      "country": "Country_49",
+      "life_exp": 72.8,
+      "infant_mort": 20.6,
+      "pc1": 0.6168,
+      "health_index": 0.6312
+    },
+    {
+      "country": "Country_50",
+      "life_exp": 57.2,
+      "infant_mort": 51.9,
+      "pc1": -2.1114,
+      "health_index": 0.0583
+    }
+  ],
+  "estimates": [],
+  "selection": []
+}

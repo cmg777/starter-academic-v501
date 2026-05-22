@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>FWL Theorem — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Visualizing Regression with the FWL Theorem in R'. A pedagogical web app where you slide confounding knobs and watch the naive vs FWL coefficient flip in real time.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>FWL Theorem — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Visualizing Regression with the FWL Theorem in R</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"     class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-sim"       class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">2 · Confounding Lab</button>
+  <button id="tab-forest"    class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">3 · Forest Plot</button>
+  <button id="tab-panel"     class="tab"        data-pane="pane-panel"    role="tab" aria-selected="false">4 · Panel FE</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>What does it mean to <em>control for</em> a variable?</h2>
+  <p class="lede">
+    The <strong>Frisch–Waugh–Lovell theorem</strong> says the coefficient on a
+    variable in a multiple regression equals the slope you would get from a
+    simple bivariate regression — <em>after</em> first removing every other
+    control from both the outcome and that variable. This is the picture: the
+    raw scatter (orange, left) gives a misleading slope; once income is
+    partialled out (teal, right), the true positive coupon effect emerges.
+  </p>
+
+  <div class="card">
+    <h3>The fog lifts — watch confounding disappear</h3>
+    <p>
+      The same 150 simulated stores, plotted two ways. The left panel is the
+      raw sales-vs-coupons scatter — slope is wrong-signed because high-income
+      neighborhoods get fewer coupons but spend more. The right panel morphs
+      from raw to the FWL residualized version: as income is partialled out,
+      the cloud reshapes and the slope flips to its true positive value.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Confounding Lab</h4>
+      <p>Slide the true causal effect, the income effect, and the confounding link. Watch the naive and FWL slopes diverge — or coincide, when there is no confounder to remove.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Forest Plot</h4>
+      <p>The post's headline coefficients — store, flights, and wages — side by side. Toggle outcomes and methods. Hover any point for SE, CI, and FE count.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-panel">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Panel FE</h4>
+      <p>Within-person residualization in action. Click the toggle to demean a panel by individual and see the slope jump from 0.03 (pooled) to 0.12 (within-person).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary — open a card if a term is unfamiliar</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>FWL theorem</summary>
+        <div class="gloss-body">Coefficient on X<sub>1</sub> in the multivariable regression equals the simple slope of <em>residual Y on residual X<sub>1</sub></em>, where both residuals come from regressing on the other controls. Two routes, one number.</div>
+      </details>
+      <details class="gloss"><summary>Confounder</summary>
+        <div class="gloss-body">A third variable correlated with <em>both</em> the treatment and the outcome. It distorts the raw slope. In the store DGP, <em>income is the confounder</em> linking coupons and sales.</div>
+      </details>
+      <details class="gloss"><summary>Residualization</summary>
+        <div class="gloss-body">Replace each variable with the part <em>not</em> explained by the controls — the OLS residual. Wipe the fog off the window before looking through it.</div>
+      </details>
+      <details class="gloss"><summary>Omitted-variable bias (OVB)</summary>
+        <div class="gloss-body">If the confounder is omitted, the naive slope deviates from the truth by <em>γ × δ</em> — the confounder's effect on Y times its slope on the treatment. The bias is <em>predictable</em>.</div>
+      </details>
+      <details class="gloss"><summary>Added-variable plot</summary>
+        <div class="gloss-body">Scatter of residualized Y vs residualized X<sub>1</sub>. The slope of this scatter <em>equals</em> the FWL coefficient. It is the picture the regression number describes.</div>
+      </details>
+      <details class="gloss"><summary>Within (FE) demeaning</summary>
+        <div class="gloss-body">Subtract each unit's own mean from every variable. What remains is <em>within-unit</em> variation — every time-invariant trait of that unit is scrubbed away in one stroke.</div>
+      </details>
+      <details class="gloss"><summary>Simpson's paradox</summary>
+        <div class="gloss-body">The aggregate slope reverses sign across subgroups when subgroup means differ along the regressor. Confounding rewritten as a paradox.</div>
+      </details>
+      <details class="gloss"><summary>fwl_plot()</summary>
+        <div class="gloss-body">One-liner from the <em>fwlplot</em> R package that residualizes both axes and draws the scatter automatically — turning the FWL identity into a picture.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: CONFOUNDING LAB ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Confounding Lab — when does the naive slope mislead?</h2>
+  <p class="lede">
+    The post simulates a store DGP with <code>true β = +0.2</code> for coupons
+    and an income confounder (γ = +0.3 on sales, δ = −0.5 on coupons). Slide
+    those three knobs and watch the naive slope (orange) drift away from the
+    truth while the FWL slope (teal) stays anchored. When the confounding link
+    δ = 0, the naive and FWL slopes coincide — that's the regime where
+    "controlling for" does nothing.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sim-n-val">200</span></label>
+      <input type="range" id="sim-n" min="50" max="500" step="10" value="200">
+      <div class="hint">More stores = tighter cloud, less sampling noise around the truth.</div>
+    </div>
+    <div class="control">
+      <label>True effect β (coupons → sales) <span class="value" id="sim-b-val">0.20</span></label>
+      <input type="range" id="sim-b" min="-0.4" max="0.6" step="0.02" value="0.20">
+      <div class="hint">The causal coefficient the FWL slope should recover.</div>
+    </div>
+    <div class="control">
+      <label>γ (income → sales) <span class="value" id="sim-g-val">0.30</span></label>
+      <input type="range" id="sim-g" min="-0.5" max="0.8" step="0.05" value="0.30">
+      <div class="hint">How strongly the confounder raises sales directly.</div>
+    </div>
+    <div class="control">
+      <label>δ (income → coupons) <span class="value" id="sim-d-val">-0.50</span></label>
+      <input type="range" id="sim-d" min="-1.0" max="1.0" step="0.05" value="-0.50">
+      <div class="hint">Slope of coupons on income. The confounding link. Set δ = 0 to switch off confounding entirely.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-pair"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">naive slope (β̂)</div>
+      <div class="stat-value orange" id="sim-stat-naive">—</div>
+      <div class="stat-sub">raw OLS of sales on coupons</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">FWL slope (β̂)</div>
+      <div class="stat-value teal" id="sim-stat-fwl">—</div>
+      <div class="stat-sub">after partialling out income</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">OVB = γ × δ</div>
+      <div class="stat-value" id="sim-stat-ovb">—</div>
+      <div class="stat-sub">predicted bias</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true β</div>
+      <div class="stat-value" id="sim-stat-true">0.200</div>
+      <div class="stat-sub">held by the slider above</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-compare"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Move δ to zero.</strong> The naive and FWL slopes converge — when the confounder does not predict the treatment, there is no bias to remove.</li>
+      <li><strong>Crank γ up.</strong> A stronger income effect on sales amplifies the OVB (γ × δ). The naive slope drifts further from truth; the FWL slope stays put.</li>
+      <li><strong>Flip the sign of β.</strong> Set β = -0.1, leave γ = 0.3 and δ = -0.5. The naive slope can still appear <em>positive</em> while the truth is negative — Simpson's paradox in action.</li>
+      <li><strong>OVB column.</strong> The predicted bias γ × δ matches the gap (naive − true) up to sampling noise. The mismatch shrinks as n grows.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to post defaults</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs variance over many simulations</h3>
+    <p>Single draws are noisy. Run the pipeline 100 times with fresh random draws (same parameters) to see whether the bias is systematic.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sim-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Naive mean β̂</div><div class="stat-value orange" id="sim-naive-mean">—</div></div>
+      <div class="stat"><div class="stat-label">Naive sd(β̂)</div><div class="stat-value" id="sim-naive-sd">—</div></div>
+      <div class="stat"><div class="stat-label">FWL mean β̂</div><div class="stat-value teal" id="sim-fwl-mean">—</div></div>
+      <div class="stat"><div class="stat-label">FWL sd(β̂)</div><div class="stat-value" id="sim-fwl-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's three FWL stories — at a glance</h2>
+  <p class="lede">
+    The numbers below come from <em>r_fwlplot/index.md</em> §4, §6, §7. Each
+    column is one empirical setting in the post; each row is a progressive
+    "control" step. Watch the coefficient march from the naive value to the
+    fully-controlled estimate — that march is FWL in action.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Store DGP (left).</strong> Naive β̂ = −0.093 (wrong sign!), + Income β̂ = +0.212 (close to truth +0.2), + Inc + Day β̂ = +0.222. The sign flip is the headline confounding result.</li>
+      <li><strong>Flights (center).</strong> Naive β̂ = −0.003 doubles to −0.006 once origin FE absorb airport-level delay levels. With 103 destinations partialled out as well, the SE balloons (CI now includes zero) — every cross-route comparison has been removed.</li>
+      <li><strong>Wages (right).</strong> Pooled exper effect is +0.105; with individual FE the within-person return jumps to +0.122. Ability-confounded pooled view <em>underestimates</em> the true return.</li>
+      <li><strong>Hover any point</strong> for the SE, the 95% CI, and the number of controls/FE that estimator used.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Store: coupons -> sales" checked> Store: coupons → sales</label>
+      <label><input type="checkbox" value="Flights: air_time -> delay" checked> Flights: air_time → delay</label>
+      <label><input type="checkbox" value="Wages: exper -> log(wage)" checked> Wages: exper → log(wage)</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods (control steps)</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive" checked> Naive</label>
+      <label><input type="checkbox" value="+ Income" checked> + Income</label>
+      <label><input type="checkbox" value="+ Inc + Day" checked> + Inc + Day</label>
+      <label><input type="checkbox" value="+ Origin FE" checked> + Origin FE</label>
+      <label><input type="checkbox" value="+ Orig+Dest" checked> + Orig + Dest</label>
+      <label><input type="checkbox" value="+ Individual FE" checked> + Individual FE</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Why does the Flights CI widen with destination FE?</h3>
+    <p>
+      Adding 103 destination dummies absorbs every <em>cross-route</em>
+      comparison. The remaining variation is purely within-route: for flights
+      on the same route, does longer-than-usual air time predict
+      longer-than-usual delay? With so little variation left, the answer is
+      noisy — the point estimate moves slightly (−0.006 → −0.007) but the SE
+      jumps from 0.0005 to 0.0034. FE absorb confounding <em>and</em>
+      identifying variation; the trade-off is always there.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Why does the Wages slope grow with individual FE?</h3>
+    <p>
+      Higher-ability workers earn more <em>and</em> tend to accumulate
+      experience in higher-paying jobs. The raw cross-section confounds these
+      two effects, and the resulting pooled slope (+0.105) is an attenuated
+      blend. Within-person FE strip away ability and force the slope to
+      identify off the same individual at two different points in their
+      career — recovering the true return to experience (+0.122).
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: PANEL FE ====================== -->
+<section id="pane-panel" class="tab-pane" role="tabpanel" aria-labelledby="tab-panel">
+
+  <h2>Panel FE — within-person residualization in pictures</h2>
+  <p class="lede">
+    A synthetic 60 × 8 wage panel (60 individuals, 8 years each) with strong
+    unobserved ability and a homogeneous true within-person return to
+    experience. Click the toggle to demean each individual's exper and lwage
+    by their own mean — that is FWL applied to individual dummies. The
+    pooled slope is shallow (≈ 0.03); the within slope is roughly
+    <strong>4×</strong> steeper (≈ 0.12), matching the post's §7.3 finding.
+  </p>
+
+  <div class="controls">
+    <div class="control" style="grid-column: 1 / -1;">
+      <label>View mode</label>
+      <div class="method-toggle" id="panel-mode">
+        <label><input type="radio" name="panel-mode" value="raw" checked> Pooled raw (no FE)</label>
+        <label><input type="radio" name="panel-mode" value="within"> Individual FE (within-person residualization)</label>
+      </div>
+      <div class="hint">Same data, two viewing modes. Points are colored by individual id in the raw view.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="panel-scatter"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">current slope</div>
+      <div class="stat-value teal" id="panel-stat-slope">—</div>
+      <div class="stat-sub">OLS on (modified) (exper, lwage)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">target (raw)</div>
+      <div class="stat-value" style="color: #d97757;">≈ 0.03</div>
+      <div class="stat-sub">pooled exper coefficient</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">target (within)</div>
+      <div class="stat-value" style="color: #00d4c8;">≈ 0.12</div>
+      <div class="stat-sub">individual-FE exper coefficient</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">N × T</div>
+      <div class="stat-value">60 × 8</div>
+      <div class="stat-sub">synthetic panel</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Raw mode.</strong> A wide fan of points — same experience level, very different wages. Each color is a person; ability differences spread them apart vertically.</li>
+      <li><strong>Within mode.</strong> Subtract every person's mean from both axes. The cloud collapses around zero; what's left is each person's <em>deviation</em> from their own typical career. The slope steepens.</li>
+      <li><strong>Why steeper?</strong> Higher-ability people earn more <em>and</em> happen to occupy more experienced positions on average. Pooled OLS confounds these. Demeaning removes the ability component, leaving only the within-person increment.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 1</h3>
+    <p>
+      The morphing animation in Tab 1 and the toggle here do the same thing:
+      they show the data <em>before</em> and <em>after</em> partialling-out.
+      In Tab 1 it was a continuous confounder (income); here it is a
+      categorical confounder (each individual's identity). Both are special
+      cases of the same FWL recipe — and both produce the same picture: the
+      raw slope is confounded; the residualized slope is the truth the
+      regression table reports.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Visualizing Regression with the FWL Theorem in R</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

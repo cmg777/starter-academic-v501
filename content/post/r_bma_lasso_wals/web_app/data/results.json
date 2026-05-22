@@ -1,0 +1,96 @@
+{
+  "estimates": [
+    { "method": "BMA",        "outcome": "log_gdp",       "estimate":  1.1854, "se": 0.0500, "ci_lo":  1.0854, "ci_hi":  1.2854, "n_selected": 1.000 },
+    { "method": "LASSO",      "outcome": "log_gdp",       "estimate":  1.1899, "se": 0.0500, "ci_lo":  1.0899, "ci_hi":  1.2899, "n_selected": 1     },
+    { "method": "Post-LASSO", "outcome": "log_gdp",       "estimate":  1.1646, "se": 0.0327, "ci_lo":  1.1005, "ci_hi":  1.2287, "n_selected": 1     },
+    { "method": "WALS",       "outcome": "log_gdp",       "estimate":  1.1333, "se": 0.0327, "ci_lo":  1.0692, "ci_hi":  1.1974, "n_selected": 34.62 },
+
+    { "method": "BMA",        "outcome": "trade_network", "estimate":  0.8727, "se": 0.1500, "ci_lo":  0.5787, "ci_hi":  1.1667, "n_selected": 0.986 },
+    { "method": "LASSO",      "outcome": "trade_network", "estimate":  0.6309, "se": 0.2000, "ci_lo":  0.2389, "ci_hi":  1.0229, "n_selected": 1     },
+    { "method": "Post-LASSO", "outcome": "trade_network", "estimate":  0.8978, "se": 0.2037, "ci_lo":  0.4985, "ci_hi":  1.2971, "n_selected": 1     },
+    { "method": "WALS",       "outcome": "trade_network", "estimate":  0.8458, "se": 0.1927, "ci_lo":  0.4681, "ci_hi":  1.2235, "n_selected": 4.39  },
+
+    { "method": "BMA",        "outcome": "fossil_fuel",   "estimate":  0.0117, "se": 0.0033, "ci_lo":  0.0052, "ci_hi":  0.0182, "n_selected": 0.948 },
+    { "method": "LASSO",      "outcome": "fossil_fuel",   "estimate":  0.0072, "se": 0.0033, "ci_lo":  0.0007, "ci_hi":  0.0137, "n_selected": 1     },
+    { "method": "Post-LASSO", "outcome": "fossil_fuel",   "estimate":  0.0118, "se": 0.0032, "ci_lo":  0.0055, "ci_hi":  0.0181, "n_selected": 1     },
+    { "method": "WALS",       "outcome": "fossil_fuel",   "estimate":  0.0099, "se": 0.0030, "ci_lo":  0.0040, "ci_hi":  0.0158, "n_selected": 3.26  },
+
+    { "method": "BMA",        "outcome": "industry",      "estimate":  0.0142, "se": 0.0050, "ci_lo":  0.0044, "ci_hi":  0.0240, "n_selected": 0.841 },
+    { "method": "LASSO",      "outcome": "industry",      "estimate":  0.0090, "se": 0.0050, "ci_lo": -0.0008, "ci_hi":  0.0188, "n_selected": 1     },
+    { "method": "Post-LASSO", "outcome": "industry",      "estimate":  0.0176, "se": 0.0050, "ci_lo":  0.0078, "ci_hi":  0.0274, "n_selected": 1     },
+    { "method": "WALS",       "outcome": "industry",      "estimate":  0.0187, "se": 0.0047, "ci_lo":  0.0095, "ci_hi":  0.0279, "n_selected": 4.01  },
+
+    { "method": "BMA",        "outcome": "urban_pop",     "estimate":  0.0049, "se": 0.0027, "ci_lo": -0.0004, "ci_hi":  0.0102, "n_selected": 0.648 },
+    { "method": "LASSO",      "outcome": "urban_pop",     "estimate":  0.0041, "se": 0.0027, "ci_lo": -0.0012, "ci_hi":  0.0094, "n_selected": 1     },
+    { "method": "Post-LASSO", "outcome": "urban_pop",     "estimate":  0.0078, "se": 0.0027, "ci_lo":  0.0025, "ci_hi":  0.0131, "n_selected": 1     },
+    { "method": "WALS",       "outcome": "urban_pop",     "estimate":  0.0082, "se": 0.0026, "ci_lo":  0.0031, "ci_hi":  0.0133, "n_selected": 3.11  },
+
+    { "method": "BMA",        "outcome": "democracy",     "estimate":  0.0066, "se": 0.0040, "ci_lo": -0.0012, "ci_hi":  0.0144, "n_selected": 0.607 },
+    { "method": "LASSO",      "outcome": "democracy",     "estimate":  0.0046, "se": 0.0040, "ci_lo": -0.0032, "ci_hi":  0.0124, "n_selected": 1     },
+    { "method": "Post-LASSO", "outcome": "democracy",     "estimate":  0.0113, "se": 0.0040, "ci_lo":  0.0035, "ci_hi":  0.0191, "n_selected": 1     },
+    { "method": "WALS",       "outcome": "democracy",     "estimate":  0.0097, "se": 0.0038, "ci_lo":  0.0023, "ci_hi":  0.0171, "n_selected": 2.58  },
+
+    { "method": "BMA",        "outcome": "agriculture",   "estimate": -0.0002, "se": 0.0042, "ci_lo": -0.0084, "ci_hi":  0.0080, "n_selected": 0.087 },
+    { "method": "LASSO",      "outcome": "agriculture",   "estimate":  0.0000, "se": 0.0042, "ci_lo": -0.0082, "ci_hi":  0.0082, "n_selected": 0     },
+    { "method": "Post-LASSO", "outcome": "agriculture",   "estimate":  null,   "se": null,   "ci_lo": null,    "ci_hi": null,    "n_selected": 0     },
+    { "method": "WALS",       "outcome": "agriculture",   "estimate": -0.0046, "se": 0.0041, "ci_lo": -0.0126, "ci_hi":  0.0034, "n_selected": 1.13  },
+
+    { "method": "BMA",        "outcome": "log_tourism",   "estimate": -0.0039, "se": 0.0244, "ci_lo": -0.0517, "ci_hi":  0.0439, "n_selected": 0.130 },
+    { "method": "LASSO",      "outcome": "log_tourism",   "estimate":  0.0000, "se": 0.0244, "ci_lo": -0.0478, "ci_hi":  0.0478, "n_selected": 0     },
+    { "method": "Post-LASSO", "outcome": "log_tourism",   "estimate":  null,   "se": null,   "ci_lo": null,    "ci_hi": null,    "n_selected": 0     },
+    { "method": "WALS",       "outcome": "log_tourism",   "estimate": -0.0148, "se": 0.0231, "ci_lo": -0.0601, "ci_hi":  0.0305, "n_selected": 0.64  },
+
+    { "method": "BMA",        "outcome": "log_credit",    "estimate":  0.0051, "se": 0.0497, "ci_lo": -0.0923, "ci_hi":  0.1025, "n_selected": 0.104 },
+    { "method": "LASSO",      "outcome": "log_credit",    "estimate":  0.0000, "se": 0.0497, "ci_lo": -0.0974, "ci_hi":  0.0974, "n_selected": 0     },
+    { "method": "Post-LASSO", "outcome": "log_credit",    "estimate":  null,   "se": null,   "ci_lo": null,    "ci_hi": null,    "n_selected": 0     },
+    { "method": "WALS",       "outcome": "log_credit",    "estimate":  0.0659, "se": 0.0461, "ci_lo": -0.0245, "ci_hi":  0.1563, "n_selected": 1.43  },
+
+    { "method": "BMA",        "outcome": "log_trade",     "estimate": -0.0037, "se": 0.0648, "ci_lo": -0.1307, "ci_hi":  0.1233, "n_selected": 0.084 },
+    { "method": "LASSO",      "outcome": "log_trade",     "estimate":  0.0000, "se": 0.0648, "ci_lo": -0.1270, "ci_hi":  0.1270, "n_selected": 0     },
+    { "method": "Post-LASSO", "outcome": "log_trade",     "estimate":  null,   "se": null,   "ci_lo": null,    "ci_hi": null,    "n_selected": 0     },
+    { "method": "WALS",       "outcome": "log_trade",     "estimate":  0.0196, "se": 0.0632, "ci_lo": -0.1043, "ci_hi":  0.1435, "n_selected": 0.31  },
+
+    { "method": "BMA",        "outcome": "corruption",    "estimate":  0.0026, "se": 0.2020, "ci_lo": -0.3933, "ci_hi":  0.3985, "n_selected": 0.078 },
+    { "method": "LASSO",      "outcome": "corruption",    "estimate":  0.0000, "se": 0.2020, "ci_lo": -0.3959, "ci_hi":  0.3959, "n_selected": 0     },
+    { "method": "Post-LASSO", "outcome": "corruption",    "estimate":  null,   "se": null,   "ci_lo": null,    "ci_hi": null,    "n_selected": 0     },
+    { "method": "WALS",       "outcome": "corruption",    "estimate": -0.0165, "se": 0.1833, "ci_lo": -0.3758, "ci_hi":  0.3428, "n_selected": 0.09  },
+
+    { "method": "BMA",        "outcome": "fdi",           "estimate":  0.0000, "se": 0.0070, "ci_lo": -0.0137, "ci_hi":  0.0137, "n_selected": 0.077 },
+    { "method": "LASSO",      "outcome": "fdi",           "estimate":  0.0000, "se": 0.0070, "ci_lo": -0.0137, "ci_hi":  0.0137, "n_selected": 0     },
+    { "method": "Post-LASSO", "outcome": "fdi",           "estimate":  null,   "se": null,   "ci_lo": null,    "ci_hi": null,    "n_selected": 0     },
+    { "method": "WALS",       "outcome": "fdi",           "estimate": -0.0011, "se": 0.0065, "ci_lo": -0.0138, "ci_hi":  0.0116, "n_selected": 0.17  }
+  ],
+  "selection": [
+    { "outcome": "BMA",   "method": "True positives",  "n_Iy": 4, "n_Id": 0, "n_intersection": 0, "n_union": 4 },
+    { "outcome": "BMA",   "method": "False positives", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 0 },
+    { "outcome": "BMA",   "method": "False negatives", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 3 },
+    { "outcome": "BMA",   "method": "True negatives",  "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 5 },
+    { "outcome": "LASSO", "method": "True positives",  "n_Iy": 6, "n_Id": 0, "n_intersection": 0, "n_union": 6 },
+    { "outcome": "LASSO", "method": "False positives", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 0 },
+    { "outcome": "LASSO", "method": "False negatives", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 1 },
+    { "outcome": "LASSO", "method": "True negatives",  "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 5 },
+    { "outcome": "WALS",  "method": "True positives",  "n_Iy": 6, "n_Id": 0, "n_intersection": 0, "n_union": 6 },
+    { "outcome": "WALS",  "method": "False positives", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 0 },
+    { "outcome": "WALS",  "method": "False negatives", "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 1 },
+    { "outcome": "WALS",  "method": "True negatives",  "n_Iy": 0, "n_Id": 0, "n_intersection": 0, "n_union": 5 }
+  ],
+  "variables": [
+    { "name": "log_gdp",       "true_beta": 1.200, "true_nonzero": true,  "bma_pip": 1.000, "bma_robust": true,  "lasso_selected": true,  "wals_t": 34.62, "wals_robust": true,  "n_methods": 3 },
+    { "name": "trade_network", "true_beta": 0.500, "true_nonzero": true,  "bma_pip": 0.986, "bma_robust": true,  "lasso_selected": true,  "wals_t": 4.39,  "wals_robust": true,  "n_methods": 3 },
+    { "name": "fossil_fuel",   "true_beta": 0.012, "true_nonzero": true,  "bma_pip": 0.948, "bma_robust": true,  "lasso_selected": true,  "wals_t": 3.26,  "wals_robust": true,  "n_methods": 3 },
+    { "name": "industry",      "true_beta": 0.008, "true_nonzero": true,  "bma_pip": 0.841, "bma_robust": true,  "lasso_selected": true,  "wals_t": 4.01,  "wals_robust": true,  "n_methods": 3 },
+    { "name": "urban_pop",     "true_beta": 0.010, "true_nonzero": true,  "bma_pip": 0.648, "bma_robust": false, "lasso_selected": true,  "wals_t": 3.11,  "wals_robust": true,  "n_methods": 2 },
+    { "name": "democracy",     "true_beta": 0.004, "true_nonzero": true,  "bma_pip": 0.607, "bma_robust": false, "lasso_selected": true,  "wals_t": 2.58,  "wals_robust": true,  "n_methods": 2 },
+    { "name": "log_tourism",   "true_beta": 0.000, "true_nonzero": false, "bma_pip": 0.130, "bma_robust": false, "lasso_selected": false, "wals_t": -0.64, "wals_robust": false, "n_methods": 0 },
+    { "name": "log_credit",    "true_beta": 0.000, "true_nonzero": false, "bma_pip": 0.104, "bma_robust": false, "lasso_selected": false, "wals_t": 1.43,  "wals_robust": false, "n_methods": 0 },
+    { "name": "agriculture",   "true_beta": 0.005, "true_nonzero": true,  "bma_pip": 0.087, "bma_robust": false, "lasso_selected": false, "wals_t": -1.13, "wals_robust": false, "n_methods": 0 },
+    { "name": "log_trade",     "true_beta": 0.000, "true_nonzero": false, "bma_pip": 0.084, "bma_robust": false, "lasso_selected": false, "wals_t": 0.31,  "wals_robust": false, "n_methods": 0 },
+    { "name": "corruption",    "true_beta": 0.000, "true_nonzero": false, "bma_pip": 0.078, "bma_robust": false, "lasso_selected": false, "wals_t": -0.09, "wals_robust": false, "n_methods": 0 },
+    { "name": "fdi",           "true_beta": 0.000, "true_nonzero": false, "bma_pip": 0.077, "bma_robust": false, "lasso_selected": false, "wals_t": -0.17, "wals_robust": false, "n_methods": 0 }
+  ],
+  "performance": [
+    { "method": "BMA",   "true_pos": 4, "false_pos": 0, "false_neg": 3, "true_neg": 5, "sensitivity": 0.571, "specificity": 1.000, "accuracy": 0.750 },
+    { "method": "LASSO", "true_pos": 6, "false_pos": 0, "false_neg": 1, "true_neg": 5, "sensitivity": 0.857, "specificity": 1.000, "accuracy": 0.917 },
+    { "method": "WALS",  "true_pos": 6, "false_pos": 0, "false_neg": 1, "true_neg": 5, "sensitivity": 0.857, "specificity": 1.000, "accuracy": 0.917 }
+  ]
+}

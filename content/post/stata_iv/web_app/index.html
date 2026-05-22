@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>IV in Stata — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Do Institutions Cause Prosperity? An IV Tutorial in Stata'. Drag instrument-strength sliders, run 100 OLS-vs-IV simulations, and tour the post's forest plot of 12 specifications.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>IV in Stata — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Do Institutions Cause Prosperity? An IV Tutorial in Stata</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro &amp; DAG</button>
+  <button id="tab-firststage" class="tab"      data-pane="pane-firststage" role="tab" aria-selected="false">2 · First-Stage Lab</button>
+  <button id="tab-showdown" class="tab"        data-pane="pane-showdown" role="tab" aria-selected="false">3 · OLS vs IV Showdown</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why IV? Why <em>settler mortality</em>?</h2>
+  <p class="lede">
+    A simple regression of log GDP on a country's institutional quality says
+    that <strong>better institutions are associated with higher income</strong>
+    — but it cannot tell you which way the arrow points. Maybe rich countries
+    can afford better courts. Maybe geography or culture drives both. The
+    naive slope is correlation, not causation.
+  </p>
+  <p class="lede">
+    Acemoglu, Johnson and Robinson (2001) solve the problem with an
+    <strong>instrumental variable</strong>: the mortality rate of European
+    settlers during 1500–1900. Their argument: places where Europeans died
+    en masse became <em>extractive</em> colonies; places where they survived
+    became <em>settler</em> colonies with property-rights protections that
+    persist today. Mortality 300 years ago cannot directly determine 1995
+    GDP — but it can determine 1995 <em>institutions</em>, which determine
+    GDP. That is the IV story in one sentence.
+  </p>
+
+  <div class="card">
+    <h3>The IV causal diagram</h3>
+    <p>
+      <strong>Z</strong> is the instrument (settler mortality, <code>logem4</code>).
+      <strong>X</strong> is the endogenous regressor (modern institutions, <code>avexpr</code>).
+      <strong>Y</strong> is the outcome (log GDP, <code>logpgp95</code>).
+      <strong>U</strong> is the bundle of unobserved confounders (geography,
+      culture, human capital). The dashed red arrow is the
+      <em>exclusion restriction</em>: it is the assumption — not a tested
+      fact — that the instrument affects the outcome only through the
+      endogenous regressor.
+    </p>
+    <div class="chart-area" id="intro-dag"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-firststage">
+      <div class="cta-tag">Tab 2</div>
+      <h4>First-Stage Lab</h4>
+      <p>Drag instrument-strength and sample-size sliders. Watch the scatter, the first-stage F-statistic, and the IV confidence interval tighten or explode in real time.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>OLS vs IV Showdown</h4>
+      <p>Same data, two estimators. Run 100 simulations to see whether OLS recovers the truth, whether IV does, and how the gap depends on instrument strength.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>Twelve specifications from the post — OLS plus eleven IV variants. Toggle which families to show. Hover any point for SE, CI, and first-stage F.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Three takeaways the app foregrounds</h3>
+    <div class="grid grid-3">
+      <div>
+        <h4 style="color: var(--orange); margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;">1. IV &gt; OLS by 81%</h4>
+        <p style="color: var(--muted); font-size: 13px; margin: 0;">The 2SLS coefficient (0.944) is 81% larger than the OLS estimate (0.522). Classical measurement error in the institutional index attenuates OLS toward zero; IV de-noises it and reveals a steeper causal slope.</p>
+      </div>
+      <div>
+        <h4 style="color: var(--steel); margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;">2. Weak instruments &nbsp;break IV</h4>
+        <p style="color: var(--muted); font-size: 13px; margin: 0;">The first-stage F = 16.32 is borderline. Drop it below 10 (e.g. by adding geography controls) and confidence intervals balloon while point estimates wander. Strong instruments are the single most important diagnostic.</p>
+      </div>
+      <div>
+        <h4 style="color: var(--teal); margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;">3. 2SLS = RF &divide; FS</h4>
+        <p style="color: var(--muted); font-size: 13px; margin: 0;">The whole IV machinery is one division: reduced-form slope (−0.573) divided by first-stage slope (−0.607) gives 0.944 — exactly the 2SLS estimate. IV is just this ratio under the hood.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Endogenous regressor</summary>
+        <div class="gloss-body">A right-hand-side variable that is correlated with the error term. <em>OLS gives the wrong coefficient on it</em>, even with infinite data. Here: <code>avexpr</code>.</div>
+      </details>
+      <details class="gloss"><summary>Instrument (Z)</summary>
+        <div class="gloss-body">A variable that affects Y <em>only</em> through X. Three conditions: relevance (Z moves X), exclusion (no direct arrow Z → Y), exogeneity (Z ⊥ U). Here: <code>logem4</code>.</div>
+      </details>
+      <details class="gloss"><summary>First stage</summary>
+        <div class="gloss-body">Regression of X on Z (and controls). Its slope tells you whether Z is <em>relevant</em>. Its F-statistic tells you whether Z is <em>strong</em>.</div>
+      </details>
+      <details class="gloss"><summary>Reduced form</summary>
+        <div class="gloss-body">Regression of Y on Z directly. Its slope is the <em>total</em> effect of the instrument on the outcome. <em>2SLS = reduced form ÷ first stage</em>.</div>
+      </details>
+      <details class="gloss"><summary>2SLS</summary>
+        <div class="gloss-body">Two-Stage Least Squares. Stage 1: predict X from Z. Stage 2: regress Y on the predicted X. Stata's <code>ivreg2</code> does both.</div>
+      </details>
+      <details class="gloss"><summary>Weak instrument</summary>
+        <div class="gloss-body">Z is only weakly correlated with X. Even with infinite n, weak IV gives huge SEs and biased estimates. Rule of thumb: first-stage F &gt; 10.</div>
+      </details>
+      <details class="gloss"><summary>Exclusion restriction</summary>
+        <div class="gloss-body">The untestable assumption that Z does not appear in the outcome equation. <em>It is the heart of every IV paper</em> and has to be defended substantively, not statistically.</div>
+      </details>
+      <details class="gloss"><summary>LATE vs ATE</summary>
+        <div class="gloss-body">Under heterogeneous effects, 2SLS identifies the <em>Local</em> Average Treatment Effect — the effect for <em>compliers</em>, not for everyone. Imbens-Angrist (1994).</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: FIRST-STAGE LAB ====================== -->
+<section id="pane-firststage" class="tab-pane" role="tabpanel" aria-labelledby="tab-firststage">
+
+  <h2>First-Stage Lab — how strong is the instrument?</h2>
+  <p class="lede">
+    Generate a fresh IV dataset under <strong>your</strong> chosen
+    parameters. The left chart is the first stage (X on Z); the right is the
+    reduced form (Y on Z). The bigger the first-stage slope, the stronger
+    the instrument; the closer the ratio of slopes to the true effect, the
+    better IV is doing.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="fs-n-val">64</span></label>
+      <input type="range" id="fs-n" min="30" max="500" step="2" value="64" aria-label="sample size n">
+      <div class="hint">The AJR sample is 64 ex-colonies. Slide up to see how more data tightens both regressions.</div>
+    </div>
+    <div class="control">
+      <label>Instrument strength π <span class="value" id="fs-pi-val">-0.60</span></label>
+      <input type="range" id="fs-pi" min="-1.5" max="0" step="0.05" value="-0.60" aria-label="instrument strength">
+      <div class="hint">First-stage slope of X on Z. AJR's π̂ = −0.607. Slide toward 0 and the instrument becomes weak.</div>
+    </div>
+    <div class="control">
+      <label>True causal effect β <span class="value" id="fs-beta-val">0.94</span></label>
+      <input type="range" id="fs-beta" min="0" max="1.5" step="0.05" value="0.94" aria-label="true causal effect">
+      <div class="hint">The effect we are trying to recover. AJR's 2SLS estimate is 0.944. Slide to compare.</div>
+    </div>
+    <div class="control">
+      <label>Confounding γ <span class="value" id="fs-gamma-val">0.50</span></label>
+      <input type="range" id="fs-gamma" min="0" max="1.5" step="0.05" value="0.50" aria-label="confounding strength">
+      <div class="hint">Strength of the unobserved confounder U. Larger γ = more OLS bias. IV is supposed to be immune.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="chart-area" id="fs-firststage"></div>
+    <div class="chart-area" id="fs-reducedform"></div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">First-stage slope π̂</div>
+      <div class="stat-value teal" id="fs-stat-pi">—</div>
+      <div class="stat-sub">vs true π</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">First-stage F</div>
+      <div class="stat-value orange" id="fs-stat-f">—</div>
+      <div class="stat-sub">rule of thumb: F &gt; 10</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Reduced-form slope</div>
+      <div class="stat-value" id="fs-stat-rf">—</div>
+      <div class="stat-sub">Y on Z directly</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">2SLS β̂ = RF / FS</div>
+      <div class="stat-value teal" id="fs-stat-iv">—</div>
+      <div class="stat-sub">vs true β</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">OLS β̂</div>
+      <div class="stat-value orange" id="fs-stat-ols">—</div>
+      <div class="stat-sub">biased by U</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Slide π toward 0</strong>: the left scatter flattens, F drops, and the 2SLS β̂ goes wild — the ratio RF/FS is unstable when the denominator is near zero.</li>
+      <li><strong>Slide γ up</strong>: the orange OLS estimate drifts away from the true β, while the teal IV estimate stays roughly on track. <em>That is the whole point of IV</em>.</li>
+      <li><strong>n = 64</strong> (AJR's sample) produces F ≈ 10–20 for π = −0.6 — exactly the borderline-strong regime the post discusses. Try n = 200 and the F becomes comfortable.</li>
+      <li><strong>The 2SLS = RF/FS identity</strong>: divide the two right-hand statistics; you get the same number as IV β̂. The IV estimator is one division.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="fs-reseed">Reseed random draws</button>
+      <button class="action secondary" id="fs-reset">Reset to AJR defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: SHOWDOWN ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>OLS vs IV Showdown — 100 simulations</h2>
+  <p class="lede">
+    A single dataset is noisy. To see whether OLS is <em>systematically</em>
+    biased and IV is <em>systematically</em> unbiased, we need to repeat the
+    experiment. Below, pick parameters and click <em>Run 100 simulations</em>:
+    each simulation draws a fresh dataset under the same DGP, estimates both
+    OLS and IV, and stacks the histograms.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">64</span></label>
+      <input type="range" id="sh-n" min="30" max="300" step="2" value="64" aria-label="sample size n">
+      <div class="hint">Capped at 300 so 100 sims finish in &lt; 300 ms.</div>
+    </div>
+    <div class="control">
+      <label>Instrument strength π <span class="value" id="sh-pi-val">-0.60</span></label>
+      <input type="range" id="sh-pi" min="-1.5" max="-0.05" step="0.05" value="-0.60" aria-label="instrument strength">
+      <div class="hint">Stronger = more reliable IV. The AJR baseline is π = −0.607.</div>
+    </div>
+    <div class="control">
+      <label>True causal effect β <span class="value" id="sh-beta-val">0.94</span></label>
+      <input type="range" id="sh-beta" min="0" max="1.5" step="0.05" value="0.94" aria-label="true causal effect">
+      <div class="hint">Held fixed across the 100 simulations.</div>
+    </div>
+    <div class="control">
+      <label>Confounding γ <span class="value" id="sh-gamma-val">0.50</span></label>
+      <input type="range" id="sh-gamma" min="0" max="1.5" step="0.05" value="0.50" aria-label="confounding strength">
+      <div class="hint">Larger γ widens the gap between OLS and IV.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag ols">OLS</span> on the same data</h3>
+      <div class="method-row"><span class="label">mean β̂</span><span class="val" id="sh-ols-mean">—</span></div>
+      <div class="method-row"><span class="label">bias (mean − true)</span><span class="val" id="sh-ols-bias">—</span></div>
+      <div class="method-row"><span class="label">sd(β̂)</span><span class="val" id="sh-ols-sd">—</span></div>
+      <div class="method-row"><span class="label">RMSE</span><span class="val" id="sh-ols-rmse">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag rigorous">IV (2SLS)</span> on the same data</h3>
+      <div class="method-row"><span class="label">mean β̂</span><span class="val" id="sh-iv-mean">—</span></div>
+      <div class="method-row"><span class="label">bias (mean − true)</span><span class="val" id="sh-iv-bias">—</span></div>
+      <div class="method-row"><span class="label">sd(β̂)</span><span class="val" id="sh-iv-sd">—</span></div>
+      <div class="method-row"><span class="label">RMSE</span><span class="val" id="sh-iv-rmse">—</span></div>
+      <div class="method-row"><span class="label">mean first-stage F</span><span class="val" id="sh-iv-meanf">—</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Distribution of β̂ across 100 simulated datasets</h3>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>Why does this happen?</h4>
+    <ul>
+      <li><strong>OLS is biased by U.</strong> The orange histogram drifts away from the true β by an amount that scales with γ. Even after 100 datasets, OLS averages to the wrong number.</li>
+      <li><strong>IV is unbiased <em>on average</em>.</strong> The teal histogram centres on β. Its mean is correct even though any single estimate can be far off.</li>
+      <li><strong>IV pays for unbiasedness with variance.</strong> The teal histogram is <em>wider</em> than the orange one. That is the IV bargain: trade bias for variance. When the instrument is strong (large |π|), the trade-off is favourable; when it is weak, IV's variance explodes.</li>
+      <li><strong>Slide π toward 0</strong> and rerun: the teal histogram becomes huge and skewed — the classic weak-instrument pathology that Tables 6–7 of the post warn about.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's forest plot — interactively</h2>
+  <p class="lede">
+    These twelve estimates come from the post's tables 2–8. Each is the
+    coefficient on <code>avexpr</code> from one regression spec; the orange
+    bar at the top is OLS and the eleven below are IV variants. Toggle which
+    families to show; hover any point for SE, CI, and the first-stage F.
+  </p>
+
+  <div class="card">
+    <h3>Spec families</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Base spec" checked> Base spec (Tabs 2 &amp; 4)</label>
+      <label><input type="checkbox" value="+ controls" checked> + colonial / legal / religion (Tab 5)</label>
+      <label><input type="checkbox" value="+ geography" checked> + geography (Tab 6)</label>
+      <label><input type="checkbox" value="+ health" checked> + health (Tab 7)</label>
+      <label><input type="checkbox" value="alt instrument" checked> alt instrument (Tab 8)</label>
+    </div>
+    <h3 style="margin-top:16px;">Estimators</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="OLS" checked> OLS</label>
+      <label><input type="checkbox" value="IV: settler mortality" checked> IV main</label>
+      <label><input type="checkbox" value="IV + colonial dummies" checked> IV + colonial</label>
+      <label><input type="checkbox" value="IV + legal origin" checked> IV + legal</label>
+      <label><input type="checkbox" value="IV + religion" checked> IV + religion</label>
+      <label><input type="checkbox" value="IV + climate/humidity" checked> IV + climate</label>
+      <label><input type="checkbox" value="IV + resources" checked> IV + resources</label>
+      <label><input type="checkbox" value="IV + ethnic frac." checked> IV + ethnic frac.</label>
+      <label><input type="checkbox" value="IV + malaria" checked> IV + malaria</label>
+      <label><input type="checkbox" value="IV + life expectancy" checked> IV + life exp.</label>
+      <label><input type="checkbox" value="IV + infant mortality" checked> IV + infant mort.</label>
+      <label><input type="checkbox" value="IV: euro1900 (alt instr)" checked> IV: euro1900</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The orange OLS bar sits at 0.522</strong> with the tightest CI in the chart. Every IV variant has a wider CI but a larger point estimate — the post's headline that IV &gt; OLS by 81% is visible in one glance.</li>
+      <li><strong>Health-control specs collapse toward OLS</strong> (0.55–0.69). The post (§9) flags this as the most uncomfortable robustness check: bad control or genuine exclusion violation? The data can't tell you, but the visual shrinkage is real.</li>
+      <li><strong>Hover any bar</strong> for the first-stage F. Notice that "+ resources" and "+ malaria" have F &lt; 5 — their wide CIs are not a coincidence, they are weak-instrument pathology.</li>
+      <li><strong>Toggle "+ geography" off</strong> and the remaining IV variants all sit in the 0.55–1.08 range with F &gt; 11 — the cleaner, more defensible estimates.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The OLS-vs-IV gap you watched <em>grow with γ</em> in the simulation is
+      exactly the gap you see here on real data:
+    </p>
+    <ul>
+      <li><strong>OLS (orange):</strong> β̂ = 0.522, CI = [0.424, 0.620] — tight but biased.</li>
+      <li><strong>IV main (steel):</strong> β̂ = 0.944, CI = [0.599, 1.289] — wider but unbiased <em>under AJR's exclusion restriction</em>.</li>
+      <li><strong>The gap is 0.422 in log-GDP units</strong> — a country at <code>avexpr</code> = 8 is predicted to earn 33% more under IV than under OLS, for the same institutional gap.</li>
+    </ul>
+    <p>
+      That is the post's punchline: institutional reform is roughly twice as
+      valuable as naive cross-country regressions suggest — provided you trust
+      the exclusion restriction.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Do Institutions Cause Prosperity? An IV Tutorial in Stata</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+{
+  "estimates": [
+    {
+      "method": "OLS (full)",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.5320,
+      "se": 0.0290,
+      "ci_lo": 0.4752,
+      "ci_hi": 0.5888,
+      "n_selected": 0
+    },
+    {
+      "method": "OLS (base)",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.5220,
+      "se": 0.0500,
+      "ci_lo": 0.4240,
+      "ci_hi": 0.6200,
+      "n_selected": 0
+    },
+    {
+      "method": "OLS + continents",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.3900,
+      "se": 0.0510,
+      "ci_lo": 0.2900,
+      "ci_hi": 0.4900,
+      "n_selected": 3
+    },
+    {
+      "method": "IV (main, logem4)",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.9440,
+      "se": 0.1760,
+      "ci_lo": 0.5990,
+      "ci_hi": 1.2890,
+      "n_selected": 1,
+      "first_stage_F": 16.85
+    },
+    {
+      "method": "IV + lat",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.9960,
+      "se": 0.2400,
+      "ci_lo": 0.5256,
+      "ci_hi": 1.4664,
+      "n_selected": 1,
+      "first_stage_F": 9.99
+    },
+    {
+      "method": "IV + colonial",
+      "outcome": "Log GDP per capita",
+      "estimate": 1.0780,
+      "se": 0.2400,
+      "ci_lo": 0.6076,
+      "ci_hi": 1.5484,
+      "n_selected": 1,
+      "first_stage_F": 12.51
+    },
+    {
+      "method": "IV + religion",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.9170,
+      "se": 0.1560,
+      "ci_lo": 0.6112,
+      "ci_hi": 1.2228,
+      "n_selected": 1,
+      "first_stage_F": 18.18
+    },
+    {
+      "method": "IV + climate",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.8370,
+      "se": 0.1650,
+      "ci_lo": 0.5136,
+      "ci_hi": 1.1604,
+      "n_selected": 1,
+      "first_stage_F": 21.50
+    },
+    {
+      "method": "IV + ethnic frag",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.7380,
+      "se": 0.1400,
+      "ci_lo": 0.4636,
+      "ci_hi": 1.0124,
+      "n_selected": 1,
+      "first_stage_F": 15.73
+    },
+    {
+      "method": "IV + malaria",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.6870,
+      "se": 0.2650,
+      "ci_lo": 0.1676,
+      "ci_hi": 1.2064,
+      "n_selected": 1,
+      "first_stage_F": 3.98
+    },
+    {
+      "method": "IV + life exp.",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.6290,
+      "se": 0.2950,
+      "ci_lo": 0.0508,
+      "ci_hi": 1.2072,
+      "n_selected": 1,
+      "first_stage_F": 4.23
+    },
+    {
+      "method": "IV: euro1900",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.8700,
+      "se": 0.1360,
+      "ci_lo": 0.6034,
+      "ci_hi": 1.1366,
+      "n_selected": 1,
+      "first_stage_F": 44.03
+    },
+    {
+      "method": "IV: cons00a",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.7060,
+      "se": 0.1230,
+      "ci_lo": 0.4649,
+      "ci_hi": 0.9471,
+      "n_selected": 1,
+      "first_stage_F": 11.94
+    },
+    {
+      "method": "IV: democ00a",
+      "outcome": "Log GDP per capita",
+      "estimate": 0.7190,
+      "se": 0.0990,
+      "ci_lo": 0.5250,
+      "ci_hi": 0.9130,
+      "n_selected": 1,
+      "first_stage_F": 17.14
+    }
+  ],
+  "selection": [
+    {
+      "outcome": "Log GDP per capita",
+      "method": "OLS (base)",
+      "n_Iy": 0,
+      "n_Id": 0,
+      "n_intersection": 0,
+      "n_union": 0
+    },
+    {
+      "outcome": "Log GDP per capita",
+      "method": "IV (main, logem4)",
+      "n_Iy": 0,
+      "n_Id": 1,
+      "n_intersection": 0,
+      "n_union": 1
+    },
+    {
+      "outcome": "Log GDP per capita",
+      "method": "IV: euro1900",
+      "n_Iy": 0,
+      "n_Id": 1,
+      "n_intersection": 0,
+      "n_union": 1
+    }
+  ],
+  "meta": {
+    "source": "content/post/python_iv/ (tab2_ols.csv, tab4_iv_main.csv, tab5_iv_controls.csv, tab6_iv_geo.csv, tab7_iv_health.csv, tab8_overid.csv)",
+    "n_obs": 64,
+    "outcome_label": "logpgp95 (log GDP per capita, 1995, PPP)",
+    "treatment_label": "avexpr (average protection from expropriation)",
+    "main_instrument": "logem4 (log settler mortality)",
+    "alpha_OLS_base": 0.522,
+    "alpha_IV_main": 0.944,
+    "iv_over_ols_pct": 81,
+    "first_stage_F_main": 16.85,
+    "stock_yogo_10pct": 16.38,
+    "wu_hausman_F": 24.22,
+    "wu_hausman_p": 0.0000,
+    "dataset": "Acemoglu, Johnson, Robinson (2001) — 64 ex-colonies",
+    "notes": "All IV first-stage F values are linearmodels HC-robust partial F (≈ Kleibergen-Paap). OLS+continents has n_selected=3 = three continent dummies. IV rows show n_selected=1 = one instrument. F<10 marks weak-IV territory (IV+malaria, IV+life exp.)."
+  }
+}

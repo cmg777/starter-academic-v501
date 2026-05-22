@@ -1,0 +1,53 @@
+{
+  "estimates": [
+    { "method": "feols TWFE",         "outcome": "Log Initial Income",     "estimate": -0.0553, "se": 0.0037, "ci_lo": -0.0626, "ci_hi": -0.0480, "n_selected": 5 },
+    { "method": "Manual demeaning",   "outcome": "Log Initial Income",     "estimate": -0.0553, "se": 0.0036, "ci_lo": -0.0624, "ci_hi": -0.0482, "n_selected": 5 },
+
+    { "method": "feols TWFE",         "outcome": "Log Investment Share",   "estimate":  0.0197, "se": 0.0076, "ci_lo":  0.0049, "ci_hi":  0.0346, "n_selected": 5 },
+    { "method": "Manual demeaning",   "outcome": "Log Investment Share",   "estimate":  0.0197, "se": 0.0068, "ci_lo":  0.0064, "ci_hi":  0.0331, "n_selected": 5 },
+
+    { "method": "feols TWFE",         "outcome": "Log(n + g + d)",         "estimate": -0.0496, "se": 0.0222, "ci_lo": -0.0931, "ci_hi": -0.0062, "n_selected": 5 },
+    { "method": "Manual demeaning",   "outcome": "Log(n + g + d)",         "estimate": -0.0496, "se": 0.0182, "ci_lo": -0.0853, "ci_hi": -0.0140, "n_selected": 5 },
+
+    { "method": "feols TWFE",         "outcome": "Log Human Capital",      "estimate":  0.0091, "se": 0.0146, "ci_lo": -0.0195, "ci_hi":  0.0376, "n_selected": 5 },
+    { "method": "Manual demeaning",   "outcome": "Log Human Capital",      "estimate":  0.0091, "se": 0.0137, "ci_lo": -0.0178, "ci_hi":  0.0359, "n_selected": 5 },
+
+    { "method": "feols TWFE",         "outcome": "Gov. Consumption Share", "estimate": -0.1028, "se": 0.0464, "ci_lo": -0.1937, "ci_hi": -0.0119, "n_selected": 5 },
+    { "method": "Manual demeaning",   "outcome": "Gov. Consumption Share", "estimate": -0.1028, "se": 0.0441, "ci_lo": -0.1892, "ci_hi": -0.0164, "n_selected": 5 }
+  ],
+  "selection": [
+    { "outcome": "Log Initial Income",     "method": "Naive lm SE",      "n_Iy": 36, "n_Id": 36, "n_intersection": 36, "n_union": 36 },
+    { "outcome": "Log Initial Income",     "method": "feols IID SE",     "n_Iy": 39, "n_Id": 39, "n_intersection": 39, "n_union": 39 },
+    { "outcome": "Log Initial Income",     "method": "feols cluster SE", "n_Iy": 37, "n_Id": 37, "n_intersection": 37, "n_union": 37 },
+
+    { "outcome": "Log Investment Share",   "method": "Naive lm SE",      "n_Iy": 68, "n_Id": 68, "n_intersection": 68, "n_union": 68 },
+    { "outcome": "Log Investment Share",   "method": "feols IID SE",     "n_Iy": 73, "n_Id": 73, "n_intersection": 73, "n_union": 73 },
+    { "outcome": "Log Investment Share",   "method": "feols cluster SE", "n_Iy": 76, "n_Id": 76, "n_intersection": 76, "n_union": 76 },
+
+    { "outcome": "Log(n + g + d)",         "method": "Naive lm SE",      "n_Iy": 182, "n_Id": 182, "n_intersection": 182, "n_union": 182 },
+    { "outcome": "Log(n + g + d)",         "method": "feols IID SE",     "n_Iy": 195, "n_Id": 195, "n_intersection": 195, "n_union": 195 },
+    { "outcome": "Log(n + g + d)",         "method": "feols cluster SE", "n_Iy": 222, "n_Id": 222, "n_intersection": 222, "n_union": 222 },
+
+    { "outcome": "Log Human Capital",      "method": "Naive lm SE",      "n_Iy": 137, "n_Id": 137, "n_intersection": 137, "n_union": 137 },
+    { "outcome": "Log Human Capital",      "method": "feols IID SE",     "n_Iy": 147, "n_Id": 147, "n_intersection": 147, "n_union": 147 },
+    { "outcome": "Log Human Capital",      "method": "feols cluster SE", "n_Iy": 146, "n_Id": 146, "n_intersection": 146, "n_union": 146 },
+
+    { "outcome": "Gov. Consumption Share", "method": "Naive lm SE",      "n_Iy": 441, "n_Id": 441, "n_intersection": 441, "n_union": 441 },
+    { "outcome": "Gov. Consumption Share", "method": "feols IID SE",     "n_Iy": 473, "n_Id": 473, "n_intersection": 473, "n_union": 473 },
+    { "outcome": "Gov. Consumption Share", "method": "feols cluster SE", "n_Iy": 464, "n_Id": 464, "n_intersection": 464, "n_union": 464 }
+  ],
+  "twfe_summary": {
+    "n_countries": 150,
+    "n_periods": 8,
+    "n_obs": 1200,
+    "balanced": true,
+    "grand_mean_growth": -0.1244,
+    "max_coef_diff": 3.05e-16,
+    "all_equal": true,
+    "naive_df": 1195,
+    "correct_df": 1038,
+    "df_consumed_by_fe": 157,
+    "within_r2": 0.1768,
+    "adj_r2": 0.7551
+  }
+}

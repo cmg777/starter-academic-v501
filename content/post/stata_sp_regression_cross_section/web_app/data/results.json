@@ -1,0 +1,85 @@
+{
+  "_comment": "Direct / Indirect / Total effects of INC and HOVAL on CRIME across the eight-model spatial taxonomy. Numbers parsed from §9.2 (Direct and indirect effects comparison) of the Columbus crime tutorial. The 'method' column doubles as model name; 'outcome' encodes which effect (Direct, Indirect, Total) and which regressor (INC, HOVAL). SEs and 95% CIs reconstructed from |t|-stars in the post where the raw SEs were given (SAR, SEM, SDM, SDEM, SAC, GNS in their estat impact blocks); for SLX and OLS, SEs are derived from the regression std. errors in §4.1 and §6.1. ci_lo and ci_hi computed as estimate +/- 1.96 * se. n_selected column repurposed: number of structural parameters in the model (extra parameters beyond OLS).",
+
+  "estimates": [
+    { "method": "OLS",  "outcome": "INC Direct",     "estimate": -1.5970, "se": 0.3340, "ci_lo": -2.2517, "ci_hi": -0.9423, "n_selected": 0 },
+    { "method": "SAR",  "outcome": "INC Direct",     "estimate": -1.1024, "se": 0.3486, "ci_lo": -1.7857, "ci_hi": -0.4191, "n_selected": 1 },
+    { "method": "SEM",  "outcome": "INC Direct",     "estimate": -0.9376, "se": 0.3393, "ci_lo": -1.6027, "ci_hi": -0.2726, "n_selected": 1 },
+    { "method": "SLX",  "outcome": "INC Direct",     "estimate": -1.0974, "se": 0.3738, "ci_lo": -1.8300, "ci_hi": -0.3648, "n_selected": 2 },
+    { "method": "SDM",  "outcome": "INC Direct",     "estimate": -1.0250, "se": 0.3350, "ci_lo": -1.6817, "ci_hi": -0.3683, "n_selected": 3 },
+    { "method": "SDEM", "outcome": "INC Direct",     "estimate": -1.0523, "se": 0.3213, "ci_lo": -1.6821, "ci_hi": -0.4225, "n_selected": 3 },
+    { "method": "SAC",  "outcome": "INC Direct",     "estimate": -1.0630, "se": 0.3250, "ci_lo": -1.7000, "ci_hi": -0.4260, "n_selected": 2 },
+    { "method": "GNS",  "outcome": "INC Direct",     "estimate": -1.0300, "se": 0.3500, "ci_lo": -1.7160, "ci_hi": -0.3440, "n_selected": 4 },
+
+    { "method": "OLS",  "outcome": "INC Indirect",   "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 0 },
+    { "method": "SAR",  "outcome": "INC Indirect",   "estimate": -0.7594, "se": 0.3712, "ci_lo": -1.4870, "ci_hi": -0.0318, "n_selected": 1 },
+    { "method": "SEM",  "outcome": "INC Indirect",   "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 1 },
+    { "method": "SLX",  "outcome": "INC Indirect",   "estimate": -1.3987, "se": 0.5601, "ci_lo": -2.4965, "ci_hi": -0.3009, "n_selected": 2 },
+    { "method": "SDM",  "outcome": "INC Indirect",   "estimate": -1.4959, "se": 0.8060, "ci_lo": -3.0757, "ci_hi":  0.0839, "n_selected": 3 },
+    { "method": "SDEM", "outcome": "INC Indirect",   "estimate": -1.2049, "se": 0.5736, "ci_lo": -2.3292, "ci_hi": -0.0806, "n_selected": 3 },
+    { "method": "SAC",  "outcome": "INC Indirect",   "estimate": -0.5600, "se": 0.3390, "ci_lo": -1.2244, "ci_hi":  0.1044, "n_selected": 2 },
+    { "method": "GNS",  "outcome": "INC Indirect",   "estimate": -1.3700, "se": 1.6896, "ci_lo": -4.6816, "ci_hi":  1.9416, "n_selected": 4 },
+
+    { "method": "OLS",  "outcome": "INC Total",      "estimate": -1.5970, "se": 0.3340, "ci_lo": -2.2517, "ci_hi": -0.9423, "n_selected": 0 },
+    { "method": "SAR",  "outcome": "INC Total",      "estimate": -1.8618, "se": 0.5803, "ci_lo": -2.9992, "ci_hi": -0.7244, "n_selected": 1 },
+    { "method": "SEM",  "outcome": "INC Total",      "estimate": -0.9376, "se": 0.3393, "ci_lo": -1.6027, "ci_hi": -0.2726, "n_selected": 1 },
+    { "method": "SLX",  "outcome": "INC Total",      "estimate": -2.4961, "se": 0.6701, "ci_lo": -3.8094, "ci_hi": -1.1827, "n_selected": 2 },
+    { "method": "SDM",  "outcome": "INC Total",      "estimate": -2.5209, "se": 0.8820, "ci_lo": -4.2496, "ci_hi": -0.7922, "n_selected": 3 },
+    { "method": "SDEM", "outcome": "INC Total",      "estimate": -2.2571, "se": 0.6595, "ci_lo": -3.5497, "ci_hi": -0.9645, "n_selected": 3 },
+    { "method": "SAC",  "outcome": "INC Total",      "estimate": -1.6230, "se": 0.5500, "ci_lo": -2.7010, "ci_hi": -0.5450, "n_selected": 2 },
+    { "method": "GNS",  "outcome": "INC Total",      "estimate": -2.4000, "se": 1.7400, "ci_lo": -5.8104, "ci_hi":  1.0104, "n_selected": 4 },
+
+    { "method": "OLS",  "outcome": "HOVAL Direct",   "estimate": -0.2739, "se": 0.1032, "ci_lo": -0.4762, "ci_hi": -0.0716, "n_selected": 0 },
+    { "method": "SAR",  "outcome": "HOVAL Direct",   "estimate": -0.2838, "se": 0.0983, "ci_lo": -0.4765, "ci_hi": -0.0911, "n_selected": 1 },
+    { "method": "SEM",  "outcome": "HOVAL Direct",   "estimate": -0.3023, "se": 0.0909, "ci_lo": -0.4805, "ci_hi": -0.1241, "n_selected": 1 },
+    { "method": "SLX",  "outcome": "HOVAL Direct",   "estimate": -0.2944, "se": 0.1017, "ci_lo": -0.4937, "ci_hi": -0.0951, "n_selected": 2 },
+    { "method": "SDM",  "outcome": "HOVAL Direct",   "estimate": -0.2820, "se": 0.0900, "ci_lo": -0.4584, "ci_hi": -0.1056, "n_selected": 3 },
+    { "method": "SDEM", "outcome": "HOVAL Direct",   "estimate": -0.2782, "se": 0.0911, "ci_lo": -0.4568, "ci_hi": -0.0996, "n_selected": 3 },
+    { "method": "SAC",  "outcome": "HOVAL Direct",   "estimate": -0.2920, "se": 0.0910, "ci_lo": -0.4704, "ci_hi": -0.1136, "n_selected": 2 },
+    { "method": "GNS",  "outcome": "HOVAL Direct",   "estimate": -0.2860, "se": 0.0997, "ci_lo": -0.4814, "ci_hi": -0.0906, "n_selected": 4 },
+
+    { "method": "OLS",  "outcome": "HOVAL Indirect", "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 0 },
+    { "method": "SAR",  "outcome": "HOVAL Indirect", "estimate": -0.1954, "se": 0.1123, "ci_lo": -0.4155, "ci_hi":  0.0247, "n_selected": 1 },
+    { "method": "SEM",  "outcome": "HOVAL Indirect", "estimate":  0.0000, "se": 0.0001, "ci_lo":  0.0000, "ci_hi":  0.0000, "n_selected": 1 },
+    { "method": "SLX",  "outcome": "HOVAL Indirect", "estimate":  0.2148, "se": 0.2079, "ci_lo": -0.1927, "ci_hi":  0.6223, "n_selected": 2 },
+    { "method": "SDM",  "outcome": "HOVAL Indirect", "estimate":  0.2158, "se": 0.2990, "ci_lo": -0.3702, "ci_hi":  0.8018, "n_selected": 3 },
+    { "method": "SDEM", "outcome": "HOVAL Indirect", "estimate":  0.1312, "se": 0.2072, "ci_lo": -0.2749, "ci_hi":  0.5374, "n_selected": 3 },
+    { "method": "SAC",  "outcome": "HOVAL Indirect", "estimate": -0.1540, "se": 0.0980, "ci_lo": -0.3461, "ci_hi":  0.0381, "n_selected": 2 },
+    { "method": "GNS",  "outcome": "HOVAL Indirect", "estimate":  0.1600, "se": 0.2849, "ci_lo": -0.3984, "ci_hi":  0.7184, "n_selected": 4 },
+
+    { "method": "OLS",  "outcome": "HOVAL Total",    "estimate": -0.2739, "se": 0.1032, "ci_lo": -0.4762, "ci_hi": -0.0716, "n_selected": 0 },
+    { "method": "SAR",  "outcome": "HOVAL Total",    "estimate": -0.4792, "se": 0.1722, "ci_lo": -0.8167, "ci_hi": -0.1417, "n_selected": 1 },
+    { "method": "SEM",  "outcome": "HOVAL Total",    "estimate": -0.3023, "se": 0.0909, "ci_lo": -0.4805, "ci_hi": -0.1241, "n_selected": 1 },
+    { "method": "SLX",  "outcome": "HOVAL Total",    "estimate": -0.0796, "se": 0.2316, "ci_lo": -0.5335, "ci_hi":  0.3744, "n_selected": 2 },
+    { "method": "SDM",  "outcome": "HOVAL Total",    "estimate": -0.0661, "se": 0.3050, "ci_lo": -0.6639, "ci_hi":  0.5317, "n_selected": 3 },
+    { "method": "SDEM", "outcome": "HOVAL Total",    "estimate": -0.1470, "se": 0.2263, "ci_lo": -0.5906, "ci_hi":  0.2966, "n_selected": 3 },
+    { "method": "SAC",  "outcome": "HOVAL Total",    "estimate": -0.4460, "se": 0.1580, "ci_lo": -0.7557, "ci_hi": -0.1363, "n_selected": 2 },
+    { "method": "GNS",  "outcome": "HOVAL Total",    "estimate": -0.1100, "se": 0.3022, "ci_lo": -0.7023, "ci_hi":  0.4823, "n_selected": 4 }
+  ],
+
+  "model_summary": [
+    { "model": "OLS",  "loglik": -187.38, "rho": null,   "lambda": null,   "theta_inc": null,   "theta_hoval": null,   "aic": 380.76 },
+    { "model": "SAR",  "loglik": -184.93, "rho": 0.428,  "lambda": null,   "theta_inc": null,   "theta_hoval": null,   "aic": 377.85 },
+    { "model": "SEM",  "loglik": -184.38, "rho": null,   "lambda": 0.562,  "theta_inc": null,   "theta_hoval": null,   "aic": 376.76 },
+    { "model": "SLX",  "loglik": -184.00, "rho": null,   "lambda": null,   "theta_inc": -1.399, "theta_hoval":  0.215, "aic": 378.00 },
+    { "model": "SDM",  "loglik": -181.64, "rho": 0.404,  "lambda": null,   "theta_inc": -0.584, "theta_hoval":  0.258, "aic": 375.28 },
+    { "model": "SDEM", "loglik": -181.78, "rho": null,   "lambda": 0.404,  "theta_inc": -1.205, "theta_hoval":  0.131, "aic": 375.56 },
+    { "model": "SAC",  "loglik": -182.58, "rho": 0.478,  "lambda": 0.166,  "theta_inc": null,   "theta_hoval": null,   "aic": 375.16 },
+    { "model": "GNS",  "loglik": -179.69, "rho": 0.315,  "lambda": 0.154,  "theta_inc": -0.693, "theta_hoval":  0.208, "aic": 375.38 }
+  ],
+
+  "diagnostics": {
+    "moran_i": 0.222,
+    "moran_p": 0.005,
+    "lm_error": 5.33,
+    "lm_error_p": 0.021,
+    "lm_lag": 3.40,
+    "lm_lag_p": 0.065,
+    "robust_lm_error": 2.19,
+    "robust_lm_error_p": 0.139,
+    "robust_lm_lag": 0.26,
+    "robust_lm_lag_p": 0.612,
+    "n": 49,
+    "p_controls": 2
+  }
+}

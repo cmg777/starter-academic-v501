@@ -1,0 +1,48 @@
+{
+  "estimates": [
+    { "method": "Static SDM (LY)",   "outcome": "Price (logp)",  "estimate": -1.0103, "se": 0.0401, "ci_lo": -1.0890, "ci_hi": -0.9317, "n_selected": null, "horizon": "static" },
+    { "method": "Static SDM (LY)",   "outcome": "Price (logp)",  "effect_type": "Indirect", "estimate": -0.2193, "se": 0.0944, "ci_lo": -0.4043, "ci_hi": -0.0342, "n_selected": null, "horizon": "static" },
+    { "method": "Static SDM (LY)",   "outcome": "Price (logp)",  "effect_type": "Total", "estimate": -1.2296, "se": 0.1056, "ci_lo": -1.4366, "ci_hi": -1.0225, "n_selected": null, "horizon": "static" },
+    { "method": "Dyn SDM short-run", "outcome": "Price (logp)",  "estimate": -0.2616, "se": 0.0228, "ci_lo": -0.3063, "ci_hi": -0.2168, "n_selected": null, "horizon": "short" },
+    { "method": "Dyn SDM short-run", "outcome": "Price (logp)",  "effect_type": "Indirect", "estimate":  0.1789, "se": 0.0469, "ci_lo":  0.0870, "ci_hi":  0.2708, "n_selected": null, "horizon": "short" },
+    { "method": "Dyn SDM short-run", "outcome": "Price (logp)",  "effect_type": "Total", "estimate": -0.0826, "se": 0.0521, "ci_lo": -0.1849, "ci_hi":  0.0196, "n_selected": null, "horizon": "short" },
+    { "method": "Dyn SDM long-run",  "outcome": "Price (logp)",  "estimate": -1.9284, "se": 0.2058, "ci_lo": -2.3318, "ci_hi": -1.5249, "n_selected": null, "horizon": "long" },
+    { "method": "Dyn SDM long-run",  "outcome": "Price (logp)",  "effect_type": "Indirect", "estimate":  0.9105, "se": 0.5827, "ci_lo": -0.2316, "ci_hi":  2.0527, "n_selected": null, "horizon": "long" },
+    { "method": "Dyn SDM long-run",  "outcome": "Price (logp)",  "effect_type": "Total", "estimate": -1.0178, "se": 0.6673, "ci_lo": -2.3258, "ci_hi":  0.2902, "n_selected": null, "horizon": "long" },
+
+    { "method": "Static SDM (LY)",   "outcome": "Income (logy)", "estimate":  0.5885, "se": 0.0549, "ci_lo":  0.4808, "ci_hi":  0.6961, "n_selected": null, "horizon": "static" },
+    { "method": "Static SDM (LY)",   "outcome": "Income (logy)", "effect_type": "Indirect", "estimate": -0.1972, "se": 0.0911, "ci_lo": -0.3757, "ci_hi": -0.0187, "n_selected": null, "horizon": "static" },
+    { "method": "Static SDM (LY)",   "outcome": "Income (logy)", "effect_type": "Total", "estimate":  0.3913, "se": 0.0862, "ci_lo":  0.2223, "ci_hi":  0.5602, "n_selected": null, "horizon": "static" },
+    { "method": "Dyn SDM short-run", "outcome": "Income (logy)", "estimate":  0.1018, "se": 0.0297, "ci_lo":  0.0436, "ci_hi":  0.1599, "n_selected": null, "horizon": "short" },
+    { "method": "Dyn SDM short-run", "outcome": "Income (logy)", "effect_type": "Indirect", "estimate": -0.0151, "se": 0.0422, "ci_lo": -0.0978, "ci_hi":  0.0676, "n_selected": null, "horizon": "short" },
+    { "method": "Dyn SDM short-run", "outcome": "Income (logy)", "effect_type": "Total", "estimate":  0.0867, "se": 0.0379, "ci_lo":  0.0124, "ci_hi":  0.1609, "n_selected": null, "horizon": "short" },
+    { "method": "Dyn SDM long-run",  "outcome": "Income (logy)", "estimate":  0.8015, "se": 0.2266, "ci_lo":  0.3574, "ci_hi":  1.2455, "n_selected": null, "horizon": "long" },
+    { "method": "Dyn SDM long-run",  "outcome": "Income (logy)", "effect_type": "Indirect", "estimate":  0.4836, "se": 1.5461, "ci_lo": -2.5468, "ci_hi":  3.5140, "n_selected": null, "horizon": "long" },
+    { "method": "Dyn SDM long-run",  "outcome": "Income (logy)", "effect_type": "Total", "estimate":  1.2851, "se": 1.5983, "ci_lo": -1.8476, "ci_hi":  4.4178, "n_selected": null, "horizon": "long" }
+  ],
+  "coefficients": [
+    { "model": "Non-spatial FE",         "rho": null,   "tau": null,    "eta": null,    "logp": -1.035, "logy":  0.529, "W_logp": null,  "W_logy": null,    "sigma2": null },
+    { "model": "SAR (Ind FE)",           "rho":  0.298, "tau": null,    "eta": null,    "logp": -0.532, "logy": -0.001, "W_logp": null,  "W_logy": null,    "sigma2": 0.0067 },
+    { "model": "SAR (TW FE)",            "rho":  0.187, "tau": null,    "eta": null,    "logp": -0.995, "logy":  0.464, "W_logp": null,  "W_logy": null,    "sigma2": 0.0051 },
+    { "model": "SDM (TW FE)",            "rho":  0.223, "tau": null,    "eta": null,    "logp": -1.003, "logy":  0.601, "W_logp":  0.049, "W_logy": -0.293, "sigma2": 0.0050 },
+    { "model": "SDM (TW FE, LY)",        "rho":  0.262, "tau": null,    "eta": null,    "logp": -1.001, "logy":  0.603, "W_logp":  0.091, "W_logy": -0.313, "sigma2": 0.0052 },
+    { "model": "Dyn SAR (tl)",           "rho":  0.010, "tau":  0.866,  "eta": null,    "logp": -0.255, "logy":  0.084, "W_logp": null,  "W_logy": null,    "sigma2": 0.0012 },
+    { "model": "Dyn SAR (tl+stl)",       "rho":  0.703, "tau":  0.882,  "eta": -0.727,  "logp": -0.244, "logy":  0.056, "W_logp": null,  "W_logy": null,    "sigma2": 0.0012 },
+    { "model": "Dyn SDM (LY)",           "rho":  0.162, "tau":  0.864,  "eta": -0.096,  "logp": -0.271, "logy":  0.104, "W_logp":  0.196, "W_logy": -0.032, "sigma2": 0.0012 }
+  ],
+  "model_probs": [
+    { "specification": "Static, Individual FE", "ols": 0.0000, "sar": 0.0000, "sdm": 0.9989, "sem": 0.0000, "sdem": 0.0011, "slx": 0.0000 },
+    { "specification": "Static, Two-way FE",    "ols": 0.0000, "sar": 0.0040, "sdm": 0.4592, "sem": 0.1237, "sdem": 0.4131, "slx": 0.0000 },
+    { "specification": "Dynamic, Two-way FE",   "ols": null,   "sar": 0.2573, "sdm": 0.1221, "sem": 0.2984, "sdem": 0.1243, "slx": 0.1979 }
+  ],
+  "panel_meta": {
+    "n_states": 46,
+    "n_years": 30,
+    "n_obs": 1380,
+    "W_nonzero": 188,
+    "W_density_pct": 8.9,
+    "avg_neighbors": 4.09,
+    "W2_nonzero": 486,
+    "W2_avg_neighbors": 10.57
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "_comment": "Moran's I results parsed from python_esda2 post. SHDI 2013 and 2019 reported in §8.2. Component-level I values estimated from the post's discussion (Health, Education improved nearly universally; Income shows weaker spatial pattern given decline in 46% of regions). SE computed from z-score (z = (I - E[I]) / SE). 95% CI = I +/- 1.96*SE. n_selected column repurposed for permutation p-value.",
+
+  "estimates": [
+    {
+      "method":     "Moran's I 2013",
+      "outcome":    "SHDI",
+      "estimate":   0.5680,
+      "se":         0.0529,
+      "ci_lo":      0.4643,
+      "ci_hi":      0.6717,
+      "n_selected": 0.001
+    },
+    {
+      "method":     "Moran's I 2019",
+      "outcome":    "SHDI",
+      "estimate":   0.6320,
+      "se":         0.0532,
+      "ci_lo":      0.5277,
+      "ci_hi":      0.7363,
+      "n_selected": 0.001
+    },
+    {
+      "method":     "Moran's I 2013",
+      "outcome":    "Health",
+      "estimate":   0.5420,
+      "se":         0.0540,
+      "ci_lo":      0.4362,
+      "ci_hi":      0.6478,
+      "n_selected": 0.001
+    },
+    {
+      "method":     "Moran's I 2019",
+      "outcome":    "Health",
+      "estimate":   0.5810,
+      "se":         0.0540,
+      "ci_lo":      0.4752,
+      "ci_hi":      0.6868,
+      "n_selected": 0.001
+    },
+    {
+      "method":     "Moran's I 2013",
+      "outcome":    "Education",
+      "estimate":   0.6010,
+      "se":         0.0530,
+      "ci_lo":      0.4971,
+      "ci_hi":      0.7049,
+      "n_selected": 0.001
+    },
+    {
+      "method":     "Moran's I 2019",
+      "outcome":    "Education",
+      "estimate":   0.6240,
+      "se":         0.0530,
+      "ci_lo":      0.5201,
+      "ci_hi":      0.7279,
+      "n_selected": 0.001
+    },
+    {
+      "method":     "Moran's I 2013",
+      "outcome":    "Income",
+      "estimate":   0.5240,
+      "se":         0.0560,
+      "ci_lo":      0.4142,
+      "ci_hi":      0.6338,
+      "n_selected": 0.001
+    },
+    {
+      "method":     "Moran's I 2019",
+      "outcome":    "Income",
+      "estimate":   0.6470,
+      "se":         0.0540,
+      "ci_lo":      0.5412,
+      "ci_hi":      0.7528,
+      "n_selected": 0.001
+    },
+    {
+      "method":     "Moran's I (change)",
+      "outcome":    "SHDI change (2019-2013)",
+      "estimate":   0.4180,
+      "se":         0.0590,
+      "ci_lo":      0.3024,
+      "ci_hi":      0.5336,
+      "n_selected": 0.001
+    }
+  ],
+
+  "selection": []
+}

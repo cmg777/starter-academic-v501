@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Bayesian Spatial Synthetic Control — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Bayesian Spatial Synthetic Control: California's Proposition 99 in R'. Explore the three-stage pipeline (classical SCM → horseshoe → SAR), the Nevada spillover, and the cross-stage ATT forest plot.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Bayesian Spatial Synthetic Control — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Bayesian Spatial Synthetic Control: California's Proposition 99 in R</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"     class="tab active" data-pane="pane-intro"     role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-donors"    class="tab"        data-pane="pane-donors"    role="tab" aria-selected="false">2 · Donor Weights</button>
+  <button id="tab-spillover" class="tab"        data-pane="pane-spillover" role="tab" aria-selected="false">3 · Spillover & ρ</button>
+  <button id="tab-forest"    class="tab"        data-pane="pane-forest"    role="tab" aria-selected="false">4 · Cross-stage ATT</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>What does it take to estimate California's Prop 99 effect honestly?</h2>
+  <p class="lede">
+    Three estimators target the same number — California's average treatment effect on per-capita cigarette
+    sales after Proposition 99 — under progressively weaker assumptions. <strong>Classical SCM</strong>
+    forces donor weights onto the simplex; <strong>Bayesian horseshoe</strong> shrinks but does not constrain;
+    <strong>Bayesian Spatial SAR</strong> additionally drops the SUTVA assumption that donors are unaffected
+    by the treatment. This app lets you see the three approaches side by side and decide which differences
+    are substantive and which are artifacts of the prior structure.
+  </p>
+  <p class="lede">
+    The three takeaways from the post, made interactive in the tabs below: the <strong>ATT is robust</strong>
+    in sign across all three methods (−15 to −19 packs per person per year); the <strong>donor pool's
+    shape is not</strong> robust (4 active donors → 23 → 27 as the prior relaxes); and <strong>SUTVA is
+    empirically false</strong> for this case study (Nevada absorbs a −3.75 spillover, 16× the next state).
+  </p>
+
+  <div class="card">
+    <h3>Simplex vs. horseshoe — why "four donors" is partly a constraint artifact</h3>
+    <p>
+      The classical synthetic control method concentrates 99% of the donor weight on
+      <strong>Utah, Nevada, Montana, and Connecticut</strong>. The horseshoe prior, fit on the same data,
+      spreads non-trivial posterior mass across <strong>23 of 38 donors</strong>. The animation below cycles
+      between the two pictures — the sparsity of Stage 1 is not entirely the data's fault; the optimizer
+      is pushed there by the constraint.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-donors">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Donor Weights</h4>
+      <p>Toggle between the three stages' donor allocations. See which states carry mass under the simplex vs. the horseshoe vs. the SAR-corrected horseshoe.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-spillover">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Spillover & ρ</h4>
+      <p>The SUTVA-failure evidence. See the Nevada spillover (−3.75 packs/capita, 16× larger than next) and dial ρ to feel what spatial autocorrelation does to the gap.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Cross-stage ATT</h4>
+      <p>The post's headline comparison. A forest plot of the three ATT estimates with intervals. Hover any point for the standard error, interval bounds, and active-donor count.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>ATT</summary>
+        <div class="gloss-body">Average treatment effect on the treated. The causal effect averaged over <em>units that received the treatment</em>, not the whole population. Here: California 1988–2000.</div>
+      </details>
+      <details class="gloss"><summary>Donor pool</summary>
+        <div class="gloss-body">The 38 US states that did not change their tobacco taxes around 1988. Each is a candidate component of a synthetic California.</div>
+      </details>
+      <details class="gloss"><summary>Simplex constraint</summary>
+        <div class="gloss-body">Donor weights are non-negative and sum to one. Interpretable, but acts as a heavy regulariser that pushes most weights to <em>exactly zero</em>.</div>
+      </details>
+      <details class="gloss"><summary>Horseshoe prior</summary>
+        <div class="gloss-body">Heavy-tailed prior on donor weights. Most are shrunk toward zero, but a few can escape — sparsity by preference, not by constraint.</div>
+      </details>
+      <details class="gloss"><summary>SUTVA</summary>
+        <div class="gloss-body">Stable unit treatment value assumption: a donor's outcome is unaffected by whether other units were treated. <em>Fails</em> if Californians drive to Nevada for cigarettes.</div>
+      </details>
+      <details class="gloss"><summary>SAR (ρ)</summary>
+        <div class="gloss-body">Spatial autoregressive layer. Each unit's outcome depends on a weighted average of its neighbours' outcomes. Posterior mean <em>ρ̂ = 0.223</em> here.</div>
+      </details>
+      <details class="gloss"><summary>Spillover effect</summary>
+        <div class="gloss-body">Treatment effect on a <em>donor</em> unit. Assumed zero under classical SCM; emerges as a derived quantity in the SAR layer.</div>
+      </details>
+      <details class="gloss"><summary>ESS</summary>
+        <div class="gloss-body">Effective sample size. Counts effectively independent MCMC draws. Rule of thumb: ESS &gt; 200 for trustworthy interval estimates. <em>Here ESS(ρ) = 3</em> at tutorial scale — intervals are illustrative.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: DONOR WEIGHTS ====================== -->
+<section id="pane-donors" class="tab-pane" role="tabpanel" aria-labelledby="tab-donors">
+
+  <h2>Donor weights across the three stages</h2>
+  <p class="lede">
+    Three pictures of "which states make up the synthetic California". Toggle between them and watch the
+    donor count grow from 4 → 23 → 27. None of this changes the sign of the ATT — but it shows how much
+    of the classical "four donors" story is the simplex talking, not the data.
+  </p>
+
+  <div class="card">
+    <h3>Stage</h3>
+    <div class="method-toggle" id="dw-stages">
+      <label><input type="radio" name="dw-stage" value="stage1" checked> Stage 1 — Classical simplex (top-8 by weight)</label>
+      <label><input type="radio" name="dw-stage" value="stage2"> Stage 2 — Bayesian horseshoe (top-12 with 95% CrI)</label>
+    </div>
+    <p class="note" id="dw-caption" style="margin-top:8px;">
+      Stage 1: 99.8% of the mass on Utah, Nevada, Montana, Connecticut. The remaining 34 donors are essentially zero.
+    </p>
+  </div>
+
+  <div class="chart-area" id="dw-bars"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Active donors (α &gt; 0.01)</div>
+      <div class="stat-value teal" id="dw-stat-active">4</div>
+      <div class="stat-sub">out of 38</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Top weight</div>
+      <div class="stat-value orange" id="dw-stat-top">0.327 (Utah)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Top-4 share</div>
+      <div class="stat-value" id="dw-stat-top4">97.5%</div>
+      <div class="stat-sub">how concentrated is the recipe?</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ATT under this stage</div>
+      <div class="stat-value orange" id="dw-stat-att">−18.46</div>
+      <div class="stat-sub">packs/capita/year</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The simplex picture is sparse.</strong> Four bars dominate; everything else is essentially zero. The optimiser has no choice — non-negative weights summing to one are pushed to a corner of the simplex.</li>
+      <li><strong>The horseshoe picture is broad.</strong> Twenty-three donors carry mean posterior weight above 0.01. But <em>only Nevada's 95% credible interval excludes zero</em>; every other top donor is statistically consistent with no contribution.</li>
+      <li><strong>The ATT barely moves.</strong> −18.46 → −15.84. Whether your synthetic uses 4 donors or 23, the gap California → counterfactual stays large and negative.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: SPILLOVER & RHO ====================== -->
+<section id="pane-spillover" class="tab-pane" role="tabpanel" aria-labelledby="tab-spillover">
+
+  <h2>Spillover effects on donor states — SUTVA fails for tobacco</h2>
+  <p class="lede">
+    The most novel result of the SAR layer is the per-donor spillover. The Sakaguchi–Tagawa pipeline computes
+    each donor's average post-treatment effect by forward-simulating the SAR data-generating process with and
+    without California's treatment, integrating over the posterior draws of ρ. The top-8 ranking is below.
+  </p>
+
+  <div class="card">
+    <h3>Spillover ranking (top-8 donor states by absolute effect)</h3>
+    <div class="chart-area" id="sp-bars" style="margin-top:8px;"></div>
+    <p class="note">
+      Orange bars denote negative spillovers (per-capita cigarette sales pushed <em>down</em>). Nevada
+      receives <strong>−3.75 packs/capita/year</strong> — 16× larger than the next state, more than 2,900×
+      larger than the smallest non-zero spillover.
+    </p>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Posterior mean ρ</div>
+      <div class="stat-value teal" id="sp-rho-mean">0.223</div>
+      <div class="stat-sub">spatial autocorrelation</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">95% credible interval</div>
+      <div class="stat-value" id="sp-rho-ci">[0.168, 0.272]</div>
+      <div class="stat-sub">bounded away from zero</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ESS(ρ)</div>
+      <div class="stat-value orange" id="sp-rho-ess">3</div>
+      <div class="stat-sub">tutorial budget; paper uses 100k iter</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Nevada spillover</div>
+      <div class="stat-value orange" id="sp-nv">−3.75</div>
+      <div class="stat-sub">16× the next state</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What if ρ were larger? Smaller? — Stage 3 gap explorer</h3>
+    <p>
+      Slide ρ from 0 (no spatial dependence, recovering Stage 2) to 0.6 (strong neighbour co-movement) and
+      see how the SAR-corrected gap on California shifts. The default ρ = 0.223 corresponds to the post's
+      posterior mean. The grey band is the Stage 2 (no SAR) credible band for reference.
+    </p>
+    <div class="controls">
+      <div class="control">
+        <label>Spatial parameter ρ <span class="value" id="sp-rho-val">0.22</span></label>
+        <input type="range" id="sp-rho-slider" min="0" max="0.6" step="0.01" value="0.22" aria-label="rho slider">
+        <div class="hint">ρ = 0 ⇒ donor outcomes unaffected by neighbours (Stage-2 world). ρ ≈ 0.22 ⇒ posterior mean. Larger ⇒ more neighbour co-movement.</div>
+      </div>
+      <div class="control">
+        <label>Effective Nevada exposure <span class="value" id="sp-nev-exp-val">−3.75</span></label>
+        <input type="range" id="sp-nev-exp" min="-6" max="0" step="0.05" value="-3.75" aria-label="nevada exposure">
+        <div class="hint">Set Nevada's post-treatment exposure manually. The dashed orange band marks the Stage-3 gap that follows from this exposure.</div>
+      </div>
+    </div>
+    <div class="chart-area" id="sp-traj"></div>
+    <p class="note">
+      The animation re-attributes a fraction of the synthetic counterfactual to neighbour-driven dynamics
+      controlled by ρ. At ρ = 0 the curve matches Stage 2; at ρ = 0.6 the synthetic is dragged sharply by
+      the surrounding donor signal. The closer ρ gets to 1, the less of the observed gap is "California's
+      own response" and the more is "neighbours moving together".
+    </p>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Nevada is the dominant spillover-receiver by an order of magnitude.</strong> This is the empirical signature of SUTVA failure: the only donor with a heavy contiguity link to California absorbs almost all of the spillover mass.</li>
+      <li><strong>ρ ≈ 0.22 is modest but bounded away from zero.</strong> 95% CrI [0.168, 0.272]. A 1-unit change in the neighbour-averaged outcome moves a state's own outcome by 0.22 units. The simplest SUTVA story — "donors are unaffected" — is rejected.</li>
+      <li><strong>The Stage 3 ATT (−16.59) is between Stages 1 and 2.</strong> Adding the SAR layer attributes a small portion of the gap to spillover diffusion, leaving slightly less for California's direct response.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: CROSS-STAGE FOREST ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The cross-stage ATT comparison — robust in sign, not in interval</h2>
+  <p class="lede">
+    These three estimates come straight from <code>r_sc_bayes_spatial_att_comparison.csv</code> in the post's
+    folder — the headline cross-stage table (§8) made interactive. Toggle methods to compare. Hover any point
+    for SE, interval bounds, and the number of active donors each estimator used.
+  </p>
+
+  <div class="card">
+    <h3>Methods to display</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Classical SCM" checked> Classical SCM</label>
+      <label><input type="checkbox" value="Bayesian HS" checked> Bayesian HS</label>
+      <label><input type="checkbox" value="Bayesian Spatial SAR" checked> Bayesian Spatial SAR</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>All three intervals lie below zero.</strong> Whatever you believe about the simplex or about SUTVA, Prop 99 reduced California consumption. The sign is robust to the prior structure.</li>
+      <li><strong>The order of intervals tells a story.</strong> Classical is widest at the lower end, Bayesian HS is widest overall (the horseshoe propagates donor-weight uncertainty), Bayesian Spatial SAR looks <em>suspiciously narrow</em>.</li>
+      <li><strong>Read the SAR interval cautiously.</strong> ESS(ρ) = 3 at tutorial scale. The interval [−16.78, −16.39] is based on too few effectively independent draws. The published paper achieves usable ESS by running 100,000 iterations.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Stage 1 trajectory — the classical Abadie 2010 baseline</h3>
+    <p>
+      For completeness, the underlying classical trajectory: California's actual per-capita cigarette sales
+      (steel blue) vs. the tidysynth-built synthetic California (dashed teal). The two are visually
+      indistinguishable until 1988, then California falls sharply below synthetic.
+    </p>
+    <div class="chart-area" id="fp-traj"></div>
+  </div>
+
+  <div class="card">
+    <h3>Connecting the three takeaways</h3>
+    <ul>
+      <li><strong>Sign robustness (this tab).</strong> Three intervals, three priors, none crosses zero.</li>
+      <li><strong>Donor shape non-robustness (Tab 2).</strong> 4 → 23 → 27 active donors as the prior relaxes.</li>
+      <li><strong>SUTVA failure (Tab 3).</strong> ρ = 0.223 with Nevada absorbing 16× the next state's spillover.</li>
+    </ul>
+    <p>
+      The pedagogical arc of the post is that <em>which</em> states make up the synthetic California is a much weaker
+      statement than <em>what</em> the gap is. The reader who lands on this post asking "did Prop 99 work?" gets a robust
+      yes. The reader who asks "what does that synthetic look like?" gets a much more nuanced answer that depends on
+      the prior.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Bayesian Spatial Synthetic Control: California's Proposition 99 in R</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

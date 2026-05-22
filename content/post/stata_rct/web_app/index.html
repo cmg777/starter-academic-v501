@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>RCT Interactive Lab — Cash Transfer Program</title>
+<meta name="description" content="Interactive companion to 'Evaluating a Cash Transfer Program (RCT) with Panel Data in Stata'. A pedagogical web app with sliders, simulators, and a forest plot to explore randomization, variance reduction, and the RA/IPW/DR/DiD/DRDID family of estimators.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>RCT Interactive Lab — Cash Transfer Program</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Evaluating a Cash Transfer Program (RCT) with Panel Data in Stata</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Randomization</button>
+  <button id="tab-variance" class="tab"        data-pane="pane-variance" role="tab" aria-selected="false">2 · Precision &amp; Covariates</button>
+  <button id="tab-dgp"      class="tab"        data-pane="pane-dgp"      role="tab" aria-selected="false">3 · RA / IPW / DR Simulator</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · All Methods Forest Plot</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: RANDOMIZATION ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>What does randomization actually do?</h2>
+  <p class="lede">
+    A randomized controlled trial assigns each household to <em>treatment</em>
+    (offered the cash transfer) or <em>control</em> by a coin flip — here
+    stratified by poverty status. The key promise is that, on average, treated
+    and control groups look identical on every characteristic (observed or
+    unobserved) <strong>except</strong> for the program. The animation
+    below redraws the assignment every few seconds: notice how each new draw
+    gives a fresh split, yet the totals stay close to 50/50 in every stratum.
+  </p>
+  <p class="lede">
+    This is what makes a simple difference in means an <em>unbiased</em>
+    estimate of the treatment effect: each side of the comparison is a random
+    sample from the same underlying population. The post estimates an
+    <strong>11.6% increase in log monthly consumption</strong> from the simple
+    diff-in-means — close to the true effect of <strong>12%</strong>.
+  </p>
+
+  <div class="card">
+    <h3>Stratified random assignment</h3>
+    <p>
+      Each circle is one household. Orange = offered the transfer; steel = control.
+      The two rows correspond to the two poverty strata (block randomization
+      keeps the treated share near 50% within each).
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="card">
+    <h3>Did randomization actually balance the groups?</h3>
+    <p>
+      Even with randomization, finite samples produce <em>chance imbalances</em>.
+      The Standardized Mean Difference (SMD) puts every covariate on a common
+      scale: |SMD| &lt; 0.10 is the standard rule of thumb. In this dataset
+      the only variable that flirts with the threshold is <code>female</code>
+      (SMD ≈ 0.093) — close to but still below 10%.
+    </p>
+    <div class="chart-area" id="intro-balance"></div>
+    <p class="note" style="margin-top:10px;">
+      These are the actual baseline numbers from the post (Section 5). The
+      <code>female</code> imbalance is why every covariate-adjusted estimator
+      in Tabs 3 and 4 controls for gender.
+    </p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-variance">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Precision &amp; covariates</h4>
+      <p>If randomization already makes the comparison unbiased, why bother
+      adjusting for covariates? See the variance-reduction story interactively.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-dgp">
+      <div class="cta-tag">Tab 3</div>
+      <h4>RA / IPW / DR simulator</h4>
+      <p>Generate a fresh RCT, then compare the three modern estimators side by
+      side. Run 100 simulations to see the bias-variance picture.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>All methods forest plot</h4>
+      <p>The post's headline result — 12 estimators stacked against the true
+      effect. Toggle methods to compare. Hover for SEs and CIs.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (click a card to expand)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>RCT (Randomized Controlled Trial)</summary>
+        <div class="gloss-body">Treatment is assigned by a known random mechanism (here, stratified Bernoulli). Independence between assignment and potential outcomes is built in by design.</div>
+      </details>
+      <details class="gloss"><summary>ATE vs ATT</summary>
+        <div class="gloss-body">ATE = average effect on the whole population. ATT = average effect on the treated. Under homogeneous effects and full randomization, ATE = ATT. DiD inherently estimates the ATT only.</div>
+      </details>
+      <details class="gloss"><summary>ITT (Intent-to-Treat)</summary>
+        <div class="gloss-body">The effect of <em>being assigned</em> to treatment, regardless of actual receipt. Section 10 of the post separates offer (ITT) from receipt.</div>
+      </details>
+      <details class="gloss"><summary>Regression Adjustment (RA)</summary>
+        <div class="gloss-body">Fits two outcome models (one per arm). Predicts both potential outcomes for every household, then averages the differences. Vulnerable to outcome-model misspecification.</div>
+      </details>
+      <details class="gloss"><summary>Inverse Probability Weighting (IPW)</summary>
+        <div class="gloss-body">Models the <em>propensity</em> Pr(treat=1 | X). Reweights observations by 1/p̂ (treated) or 1/(1−p̂) (control). Vulnerable to extreme weights.</div>
+      </details>
+      <details class="gloss"><summary>Doubly Robust (AIPW / IPWRA)</summary>
+        <div class="gloss-body">Combines outcome and propensity models. <em>Consistent if either one is correct.</em> Standard recommendation in modern causal inference.</div>
+      </details>
+      <details class="gloss"><summary>Difference-in-Differences (DiD)</summary>
+        <div class="gloss-body">Compares each household's change over time (treated minus control change). Removes time-invariant unobservables. Identifies ATT.</div>
+      </details>
+      <details class="gloss"><summary>DR-DiD (Sant'Anna &amp; Zhao, 2020)</summary>
+        <div class="gloss-body">Extends doubly robust logic to panel data. Consistent if either the outcome model for ΔY or the propensity score is correctly specified.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: VARIANCE REDUCTION ====================== -->
+<section id="pane-variance" class="tab-pane" role="tabpanel" aria-labelledby="tab-variance">
+
+  <h2>Why adjust for covariates in an RCT?</h2>
+  <p class="lede">
+    Randomization already makes the comparison <em>unbiased</em>. So why bother
+    with regression adjustment, IPW, or doubly robust estimators? The answer is
+    <strong>precision</strong>. When household-level outcome variation can be
+    partly explained by age, education, gender, and poverty, adjusting for those
+    covariates removes that variation from the residual — shrinking the
+    standard error of the treatment-effect estimate.
+  </p>
+  <p class="lede">
+    Slide the controls below to add more or stronger covariates. The orange
+    curve is the sampling distribution of α̂ without controls; the steel curve
+    shows what happens once covariates absorb part of the noise. Both are
+    centered near the truth — but the steel curve is tighter.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Covariate explanatory power R² <span class="value" id="var-r-val">0.30</span></label>
+      <input type="range" id="var-r" min="0.00" max="0.70" step="0.01" value="0.30" aria-label="R-squared">
+      <div class="hint">How much of consumption variance the covariates explain. 0 = useless controls; 0.7 = very informative controls.</div>
+    </div>
+    <div class="control">
+      <label>Sample size n <span class="value" id="var-n-val">2000</span></label>
+      <input type="range" id="var-n" min="200" max="3000" step="100" value="2000" aria-label="sample size">
+      <div class="hint">Bigger n shrinks both SEs proportionally to 1/√n.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="var-pdf"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">SE (no controls)</div>
+      <div class="stat-value orange" id="var-se-simple">—</div>
+      <div class="stat-sub">simple diff-in-means</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">SE (with controls)</div>
+      <div class="stat-value steel" id="var-se-adj">—</div>
+      <div class="stat-sub">RA / IPW / DR</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Precision gain</div>
+      <div class="stat-value teal" id="var-gain">—</div>
+      <div class="stat-sub">SE reduction</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Equivalent n-boost</div>
+      <div class="stat-value" id="var-nboost">—</div>
+      <div class="stat-sub">free sample size</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>At R² = 0</strong> the two curves overlap exactly — useless controls cannot reduce variance.</li>
+      <li><strong>As R² grows</strong> the steel curve tightens. The precision gain at R² ≈ 0.3 is around 16% — roughly equivalent to doubling your sample size for free.</li>
+      <li><strong>Both curves stay centered near 0.12</strong>. Randomization makes the simple estimator unbiased; covariates do not <em>remove</em> bias (there was none), they remove <em>noise</em>.</li>
+      <li>This is why the post uses the phrase <em>"precision improvement, not bias removal"</em> — covariate adjustment in an RCT is fundamentally different from covariate adjustment in an observational study.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>What the post's numbers say</h3>
+    <p>
+      In the actual data, the simple diff-in-means gave α̂ = <strong>0.1157</strong>
+      (SE = 0.0194). Adding covariates (age, edu, female, poverty) via regression
+      adjustment gave α̂ = <strong>0.1125</strong> (SE = 0.0191) — a 1.5% SE
+      reduction. The gain is modest here because the covariates only explain a
+      small slice of consumption variance and the existing imbalance is small.
+      In real RCTs with stronger pre-treatment predictors (e.g. baseline
+      consumption itself), the gain can be much larger.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: RA / IPW / DR SIMULATOR ====================== -->
+<section id="pane-dgp" class="tab-pane" role="tabpanel" aria-labelledby="tab-dgp">
+
+  <h2>The three modern estimators side by side</h2>
+  <p class="lede">
+    The post fits Regression Adjustment, Inverse Probability Weighting, and the
+    Doubly Robust IPWRA estimator on the same endline data. In a well-designed
+    RCT they all give nearly identical answers (~0.113). But what if
+    randomization were imperfect — if treated households had systematically
+    different covariates? The simulator below introduces a tunable amount of
+    <strong>covariate imbalance</strong> so you can see when the three methods
+    diverge.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="dgp-n-val">500</span></label>
+      <input type="range" id="dgp-n" min="100" max="1000" step="50" value="500" aria-label="sample size">
+      <div class="hint">Capped at 1000 so the 100-sim run finishes in &lt;300 ms.</div>
+    </div>
+    <div class="control">
+      <label>True treatment effect α <span class="value" id="dgp-alpha-val">0.12</span></label>
+      <input type="range" id="dgp-alpha" min="0.00" max="0.40" step="0.01" value="0.12" aria-label="true alpha">
+      <div class="hint">Held fixed across all 100 sims for comparison.</div>
+    </div>
+    <div class="control">
+      <label>Covariate strength γ <span class="value" id="dgp-gamma-val">0.50</span></label>
+      <input type="range" id="dgp-gamma" min="0.00" max="1.00" step="0.05" value="0.50" aria-label="covariate strength">
+      <div class="hint">How strongly covariates predict the outcome. Larger γ ⇒ adjusted SE shrinks more.</div>
+    </div>
+    <div class="control">
+      <label>Confounding strength δ <span class="value" id="dgp-delta-val">0.30</span></label>
+      <input type="range" id="dgp-delta" min="0.00" max="1.00" step="0.05" value="0.30" aria-label="confounding strength">
+      <div class="hint">0 = perfect randomization · 1 = treatment heavily depends on X (think observational). The post is δ ≈ 0 territory.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="dgp-compare"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>δ = 0 (full randomization).</strong> All four estimators (simple, RA, IPW, DR) cluster near the true α. This is the post's regime.</li>
+      <li><strong>Increase δ.</strong> The simple estimator drifts away from the truth — confounding biases it. RA, IPW, and DR all still recover the truth, demonstrating the value of covariate adjustment in observational settings.</li>
+      <li><strong>Increase γ.</strong> The confidence intervals shrink — covariates that strongly predict the outcome reduce residual variance.</li>
+      <li><strong>RA, IPW, and DR usually agree closely</strong> when both their models are roughly correct. The post emphasises that doubly robust is the safest default because it only needs <em>one</em> of the two models to be right.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="dgp-reseed">Reseed draws</button>
+      <button class="action secondary" id="dgp-reset">Reset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs variance across many simulated RCTs</h3>
+    <p>Single draws are noisy. Run the whole experiment 100 times (same parameters, fresh ε) to see whether the simple estimator's bias under confounding is systematic.</p>
+    <button class="action" id="dgp-run">Run 100 simulations</button>
+    <span id="dgp-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="dgp-progress"><div></div></div>
+    <div class="chart-area" id="dgp-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="dgp-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Simple mean α̂</div><div class="stat-value" id="dgp-simple-mean">—</div><div class="stat-sub">bias under confounding</div></div>
+      <div class="stat"><div class="stat-label">Simple sd(α̂)</div><div class="stat-value" id="dgp-simple-sd">—</div></div>
+      <div class="stat"><div class="stat-label">DR mean α̂</div><div class="stat-value teal" id="dgp-dr-mean">—</div><div class="stat-sub">recovers truth</div></div>
+      <div class="stat"><div class="stat-label">DR sd(α̂)</div><div class="stat-value" id="dgp-dr-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>All 12 estimators in one picture</h2>
+  <p class="lede">
+    These numbers come straight from the post's Section 11 comparison table —
+    the full pipeline of estimators applied to the same simulated RCT data.
+    Hover any point to see its SE, CI, and the dataset it used. Toggle methods
+    on and off to compare specific contrasts.
+  </p>
+
+  <div class="card">
+    <h3>Method toggle</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Simple regression" checked> Simple regression</label>
+      <label><input type="checkbox" value="Regression Adjustment" checked> Regression Adjustment</label>
+      <label><input type="checkbox" value="Inverse Prob. Weighting" checked> Inverse Prob. Weighting</label>
+      <label><input type="checkbox" value="IPWRA (Doubly Robust)" checked> IPWRA (Doubly Robust)</label>
+      <label><input type="checkbox" value="Basic DiD" checked> Basic DiD</label>
+      <label><input type="checkbox" value="DR-DiD (drdid)" checked> DR-DiD (drdid)</label>
+      <label><input type="checkbox" value="DR-DiD (xthdidregress)" checked> DR-DiD (xthdidregress)</label>
+      <label><input type="checkbox" value="Endogenous (etregress)" checked> Endogenous (etregress)</label>
+      <label><input type="checkbox" value="DR receipt (ipwra)" checked> DR receipt (ipwra)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Every confidence interval contains the true α = 0.12.</strong> Every method gets the right answer. The differences are in precision and what they estimate (ATE vs ATT, offer vs receipt).</li>
+      <li><strong>The cross-sectional methods cluster tightly</strong> (~0.113, SE 0.019). RA, IPW, and IPWRA agree to three decimal places — the convergence the post emphasizes for well-designed RCTs.</li>
+      <li><strong>DiD estimates are higher</strong> (~0.135–0.137, SE 0.027). Wider SEs because differencing within households absorbs more variance; higher point estimates because they target the ATT, not the ATE.</li>
+      <li><strong>Endogenous (etregress) jumps to 0.147.</strong> That's the effect of <em>receiving</em> the transfer, not <em>being offered</em> it — naturally larger because only ~85% of treated households complied.</li>
+      <li><strong>DR-receipt comes back down to 0.117</strong>. The doubly-robust receipt estimator with baseline y₀ as a control gives the answer closest to the truth.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Color key</h3>
+    <ul>
+      <li><span style="display:inline-block;width:12px;height:12px;background:#6a9bcc;border-radius:50%;vertical-align:middle;margin-right:6px;"></span> <strong>Steel:</strong> cross-sectional offer effect (ATE/ATT using endline only)</li>
+      <li><span style="display:inline-block;width:12px;height:12px;background:#00d4c8;border-radius:50%;vertical-align:middle;margin-right:6px;"></span> <strong>Teal:</strong> panel DiD methods (uses both baseline and endline)</li>
+      <li><span style="display:inline-block;width:12px;height:12px;background:#d97757;border-radius:50%;vertical-align:middle;margin-right:6px;"></span> <strong>Orange:</strong> receipt effect (per-recipient, accounts for compliance)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to the post</h3>
+    <p>
+      The post's Section 12 summary states: <em>"The cash transfer program
+      increased household consumption by approximately 11–14% across all
+      estimation methods, close to the true effect of 12%. Every confidence
+      interval contained the true value."</em> This forest plot makes that
+      claim visible at a glance — and lets you see which methods land where
+      relative to the dashed teal line at α = 0.12.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Evaluating a Cash Transfer Program (RCT) with Panel Data in Stata</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

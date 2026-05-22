@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Spatial Dynamic Panels with Common Factors — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Spatial Dynamic Panels with Common Factors in Stata: Credit Risk in US Banking'. Sliders, a defactored-IV simulator, a model-comparison forest plot, and a long-run multiplier explorer for the spxtivdfreg estimator (Kripfganz & Sarafidis 2025).">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Spatial Dynamic Panels with Common Factors — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Spatial Dynamic Panels with Common Factors in Stata: Credit Risk in US Banking</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-sim"     class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">2 · Defactored-IV Simulator</button>
+  <button id="tab-forest"  class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">3 · Model Comparison</button>
+  <button id="tab-lr"      class="tab"        data-pane="pane-lr"       role="tab" aria-selected="false">4 · Long-Run Multipliers</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why do common factors matter for spatial panel estimation?</h2>
+  <p class="lede">
+    The 2007-2009 Global Financial Crisis hit every US bank's non-performing
+    loan (NPL) ratio simultaneously. Two distinct mechanisms were at work:
+    <strong>spatial spillovers</strong> from balance-sheet interdependencies
+    among interconnected banks, and <strong>common factors</strong> from
+    macroeconomic shocks (Fed funds rate, housing collapse, unemployment)
+    that hit all banks at once but with bank-specific intensity. Ignoring
+    either channel produces biased estimates and misleading policy advice.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. Across four tabs you will:
+    visualise how a global shock and a local-contagion shock look identical
+    on a single chart but require different fixes; simulate a spatial
+    dynamic panel with and without common factors so you can <em>see</em>
+    Nickell-style bias plus factor-omission bias in a single bar chart;
+    explore the post's four model variants side-by-side; and trace how a
+    short-run coefficient of 2.45 amplifies to a long-run total effect of
+    7.77 through temporal persistence and spatial contagion.
+  </p>
+
+  <div class="card">
+    <h3>The factor-omission intuition (animation)</h3>
+    <p>
+      Two estimators of the spatial parameter
+      <span class="kbd">ψ</span> are tracked as the share of variance
+      coming from <em>common factors</em> grows from 0 to 50%. The
+      <strong style="color:#d97757;">orange</strong> curve is
+      <code>spxtivdfreg</code> with <code>factmax(0)</code> — it ignores
+      factors. The <strong style="color:#00d4c8;">teal</strong> curve is
+      the full <code>spxtivdfreg</code> with defactoring. When factors are
+      absent (left), the two curves agree. When factors contribute even
+      modest variance (right), the no-factor estimator is biased.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Defactored-IV Simulator</h4>
+      <p>Set spatial ψ, temporal ρ, and factor strength. Draw a fresh spatial dynamic panel. Watch the no-factor estimator drift away from the truth while the defactored estimator stays close.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Model Comparison</h4>
+      <p>Every coefficient from the post's four model variants — full, no-factors, no-spatial-lag, heterogeneous (MG) — with 95% CIs. Toggle which coefficient and which variant to see; hover for SE and the Hansen J p-value.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-lr">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Long-Run Multipliers</h4>
+      <p>The post's central economic finding: a short-run LIQUIDITY coefficient of 2.45 has a long-run total effect of 7.77, of which 4.22 is indirect spillover through the bank network. Slide the multipliers ψ and ρ yourself.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Spatial autoregressive parameter ψ</summary>
+        <div class="gloss-body">Strength of cross-unit spillovers. A bank's NPL today depends on its neighbours' NPL today via a weighted average <code>W·NPL</code>; ψ is the coefficient on that average. The post estimates ψ = 0.394 in the full model.</div>
+      </details>
+      <details class="gloss"><summary>Temporal autoregressive parameter ρ</summary>
+        <div class="gloss-body">Persistence of the outcome. About 29% of last quarter's NPL carries to this quarter. Without common factors in the model, ρ inflates to 0.59 — the temporal lag soaks up macro persistence.</div>
+      </details>
+      <details class="gloss"><summary>Common factors λᵢ'fₜ</summary>
+        <div class="gloss-body">Latent macro shocks that affect every unit but with unit-specific intensities. Pesaran (2006). The post extracts 2 factors in the regressors and 1 in the errors; together they explain 33.5% of the residual variance.</div>
+      </details>
+      <details class="gloss"><summary>Defactored IV estimation</summary>
+        <div class="gloss-body">Two steps: (1) extract latent common factors from the data and remove them; (2) run IV on the defactored data. Removes the cross-sectional dependence created by factors <em>before</em> the IV step so standard 2SLS asymptotics hold.</div>
+      </details>
+      <details class="gloss"><summary>Spatial weight matrix W</summary>
+        <div class="gloss-body">A 350×350 matrix encoding which banks count as neighbours of which. In this post, W is built from Spearman correlations of debt ratios — economic distance, not geographic distance. Row-standardised so each row sums to 1.</div>
+      </details>
+      <details class="gloss"><summary>Hansen J test</summary>
+        <div class="gloss-body">Joint test of instrument validity. χ² under the null that all instruments are orthogonal to the error. Full model: J = 18.83, p = 0.47 (pass). No-factor model: J = 48.15, p &lt; 0.001 (reject).</div>
+      </details>
+      <details class="gloss"><summary>Short-run vs long-run effects</summary>
+        <div class="gloss-body">SR coefficient β is the immediate impact. LR total effect is <code>β / [(1−ρ)(1−ψ)]</code> — amplified by the temporal multiplier <code>1/(1−ρ)</code> and the spatial multiplier <code>1/(1−ψ)</code>. For LIQUIDITY: 2.45 short-run → 7.77 long-run.</div>
+      </details>
+      <details class="gloss"><summary>Mean-group (MG) estimator</summary>
+        <div class="gloss-body">Heterogeneous slopes: estimate one regression per bank, then average. Drives ψ to 0.03 (n.s.) — suggesting the strong pooled spatial parameter may partly reflect cross-bank slope heterogeneity rather than genuine contagion.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: DEFACTORED-IV SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Defactored-IV Simulator — what happens when you omit factors?</h2>
+  <p class="lede">
+    The data-generating process is a stylised spatial dynamic panel:
+    <code>y[i,t] = ρ y[i,t-1] + ψ (W·y)[i,t] + β x[i,t] + λᵢ fₜ + εᵢₜ</code>.
+    Slide the true spatial parameter ψ, the temporal persistence ρ, the
+    sample (N, T), and the share of variance from common factors. Each
+    refit draws a fresh panel, then estimates two ways: <strong>defactored
+    IV</strong> (teal) which removes the factors before estimating, and
+    <strong>no-factor IV</strong> (orange) which ignores them. Watch how
+    the no-factor ψ̂ drifts away from the truth as factor strength grows.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>True spatial ψ <span class="value" id="sim-psi-val">0.40</span></label>
+      <input type="range" id="sim-psi" min="0.0" max="0.7" step="0.05" value="0.40" aria-label="true psi">
+      <div class="hint">Strength of cross-bank spillovers. The post estimates ψ ≈ 0.39 in the full model.</div>
+    </div>
+    <div class="control">
+      <label>True temporal ρ <span class="value" id="sim-rho-val">0.30</span></label>
+      <input type="range" id="sim-rho" min="0.0" max="0.7" step="0.05" value="0.30" aria-label="true rho">
+      <div class="hint">Outcome persistence. The post estimates ρ ≈ 0.29.</div>
+    </div>
+    <div class="control">
+      <label>Banks N <span class="value" id="sim-N-val">80</span></label>
+      <input type="range" id="sim-N" min="20" max="200" step="10" value="80" aria-label="number of banks">
+      <div class="hint">Cross-sectional units. The post has N = 350; capped here for browser speed.</div>
+    </div>
+    <div class="control">
+      <label>Periods T <span class="value" id="sim-T-val">20</span></label>
+      <input type="range" id="sim-T" min="6" max="40" step="2" value="20" aria-label="periods T">
+      <div class="hint">The post has T = 36 quarters.</div>
+    </div>
+    <div class="control">
+      <label>Factor strength σ_f <span class="value" id="sim-sf-val">0.60</span></label>
+      <input type="range" id="sim-sf" min="0.0" max="1.5" step="0.05" value="0.60" aria-label="factor strength">
+      <div class="hint">Standard deviation of the latent common factor. At 0 there are no factors; at 0.6 they explain about a third of the variance — close to the post's ρ_factor = 0.335.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-bars"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">true ψ</div>
+      <div class="stat-value" id="sim-stat-psi-true">0.40</div>
+      <div class="stat-sub">target</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ψ̂ defactored IV</div>
+      <div class="stat-value teal" id="sim-stat-psi-df">—</div>
+      <div class="stat-sub">removes factors first</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ψ̂ no-factor IV</div>
+      <div class="stat-value orange" id="sim-stat-psi-nf">—</div>
+      <div class="stat-sub">ignores factors</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true ρ</div>
+      <div class="stat-value" id="sim-stat-rho-true">0.30</div>
+      <div class="stat-sub">target</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ρ̂ defactored IV</div>
+      <div class="stat-value teal" id="sim-stat-rho-df">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ρ̂ no-factor IV</div>
+      <div class="stat-value orange" id="sim-stat-rho-nf">—</div>
+      <div class="stat-sub">soaks up factor persistence</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set σ_f to 0.</strong> Both estimators agree — there is nothing to defactor. This is the textbook case.</li>
+      <li><strong>Slide σ_f upward.</strong> The orange (no-factor) ψ̂ drifts down while the orange ρ̂ drifts <em>up</em>. The temporal lag absorbs the factor persistence, exactly as in §5 of the post (ρ doubles from 0.29 to 0.59 when factors are omitted).</li>
+      <li><strong>Increase N and T.</strong> The defactored IV estimator's gap to the truth shrinks (consistency); the no-factor estimator's bias does not — adding data does not fix omitted-variable bias.</li>
+      <li><strong>Click "Reseed".</strong> Each redraw gives slightly different numbers but the systematic pattern persists: the orange estimator is biased whenever factors are present.</li>
+      <li><strong>Bottom line.</strong> When the J-test rejects without factors (p &lt; 0.001 in the post), it is telling you that the orange bars are <em>not</em> consistent — the instruments are invalid in the misspecified model.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Run 100 simulations to see the bias systematically</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different ε and f) to see whether the no-factor bias is systematic.</p>
+    <button class="action" id="sim-run100">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: MODEL COMPARISON ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's model comparison — interactively</h2>
+  <p class="lede">
+    These numbers come straight from the production Stata run captured in
+    <code>analysis.log</code>. Toggle coefficient rows and model variants
+    to compare. Hover a point to see its standard error, 95% CI, and the
+    Hansen J p-value for that specification.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The headline row is ρ (L1.NPL).</strong> Full model 0.29, no-factor model 0.59 — a doubling. The no-factor temporal lag absorbs the persistence that <em>belongs</em> to the common factors. This is the §5 finding made visible.</li>
+      <li><strong>LIQUIDITY collapses by 66% in the no-factor model.</strong> 2.45 → 0.84. Banks with high loan-to-deposit ratios were disproportionately hit by aggregate liquidity stress during the GFC; without factors to absorb that aggregate movement, the LIQUIDITY coefficient is biased downward.</li>
+      <li><strong>ψ (W*NPL) drops from 0.394 to 0.288 when factors are omitted.</strong> Counter-intuitive — one might expect ψ to inflate (factors create cross-sectional dependence that could look like spatial spillovers). But the inflated ρ absorbs some of the spatial dynamics, compressing ψ.</li>
+      <li><strong>The heterogeneous (MG) column drives ψ to 0.032 (n.s.).</strong> When each bank is allowed its own slopes, the average spatial lag effect shrinks to near zero. The strong pooled ψ may partly reflect slope heterogeneity, not contagion.</li>
+      <li><strong>SIZE flips significance.</strong> In the full model SIZE = 0.223 (p &lt; 0.05). In the no-factor model SIZE = 0.089 (n.s.). Larger banks are more exposed to macro shocks; without factors, this exposure is masked.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Coefficient rows</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="psi (W*NPL)" checked> ψ (W*NPL)</label>
+      <label><input type="checkbox" value="rho (L1.NPL)" checked> ρ (L1.NPL)</label>
+      <label><input type="checkbox" value="LIQUIDITY" checked> LIQUIDITY</label>
+      <label><input type="checkbox" value="INEFF"> INEFF</label>
+      <label><input type="checkbox" value="SIZE"> SIZE</label>
+      <label><input type="checkbox" value="BUFFER"> BUFFER</label>
+      <label><input type="checkbox" value="QUALITY"> QUALITY</label>
+    </div>
+    <h3 style="margin-top:16px;">Model variants</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Full model" checked> Full model (factors + spatial + homogeneous)</label>
+      <label><input type="checkbox" value="No factors" checked> No factors (factmax(0))</label>
+      <label><input type="checkbox" value="No spatial lag" checked> No spatial lag (drop splag)</label>
+      <label><input type="checkbox" value="Heterogeneous" checked> Heterogeneous (mg)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>Hansen J p-values across model variants</h3>
+    <p class="note" style="margin:0 0 10px;">Bars above the dashed 0.05 line are consistent with valid instruments. The no-factor model fails (p &lt; 0.001), confirming that common factors are essential for this dataset.</p>
+    <div class="chart-area" id="fp-jbars"></div>
+  </div>
+
+  <div class="card">
+    <h3>Why does omitting factors invalidate the instruments?</h3>
+    <p>
+      The IV strategy uses <code>INTEREST</code> and lagged exogenous
+      regressors as instruments for <code>INEFF</code>. The exclusion
+      restriction requires that these instruments are uncorrelated with
+      the residual ε. But if common factors enter the residual <em>and</em>
+      the regressors (as Pesaran (2006) shows they must in a typical
+      macro panel), then any instrument that loads on the same factors is
+      no longer exogenous. Defactoring removes the factors from <em>both</em>
+      sides before the IV step, restoring exclusion. The Hansen J test is
+      precisely the statistical fingerprint of this failure: J p &lt; 0.001
+      in the no-factor model, J p = 0.47 once factors are removed.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: LONG-RUN MULTIPLIERS ====================== -->
+<section id="pane-lr" class="tab-pane" role="tabpanel" aria-labelledby="tab-lr">
+
+  <h2>Long-Run Multipliers — from 2.45 to 7.77 in two steps</h2>
+  <p class="lede">
+    In a spatial dynamic panel, the coefficient on a variable does not
+    measure its total effect. A permanent shock propagates over time
+    (through ρ) and across banks (through ψ), so the long-run total
+    effect equals
+    <code>β / [(1−ρ)(1−ψ)]</code>. With ρ = 0.29 and ψ = 0.39, the
+    temporal multiplier is 1.41 and the spatial multiplier is 1.65 — a
+    combined amplification of about 3.16. Drag the sliders below to see
+    how the post's headline LIQUIDITY effect of 2.45 grows from
+    short-run to long-run, and how each multiplier contributes.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Spatial ψ <span class="value" id="lr-psi-val">0.39</span></label>
+      <input type="range" id="lr-psi" min="0.0" max="0.7" step="0.01" value="0.39" aria-label="spatial psi">
+      <div class="hint">Spatial multiplier = 1/(1−ψ). The post's full-model estimate is 0.394.</div>
+    </div>
+    <div class="control">
+      <label>Temporal ρ <span class="value" id="lr-rho-val">0.29</span></label>
+      <input type="range" id="lr-rho" min="0.0" max="0.7" step="0.01" value="0.29" aria-label="temporal rho">
+      <div class="hint">Temporal multiplier = 1/(1−ρ). The post's full-model estimate is 0.290.</div>
+    </div>
+    <div class="control">
+      <label>Short-run β for LIQUIDITY <span class="value" id="lr-beta-val">2.45</span></label>
+      <input type="range" id="lr-beta" min="0.1" max="5.0" step="0.05" value="2.45" aria-label="short-run beta">
+      <div class="hint">The contemporaneous coefficient. The post reports β = 2.452 for LIQUIDITY in the full model.</div>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Temporal multiplier</div>
+      <div class="stat-value teal" id="lr-stat-tmult">1.41</div>
+      <div class="stat-sub">1/(1−ρ)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Spatial multiplier</div>
+      <div class="stat-value orange" id="lr-stat-smult">1.64</div>
+      <div class="stat-sub">1/(1−ψ)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">LR direct = β · 1/(1−ρ)</div>
+      <div class="stat-value" id="lr-stat-direct">3.45</div>
+      <div class="stat-sub">own-bank effect compounded over time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">LR total = β / [(1−ρ)(1−ψ)]</div>
+      <div class="stat-value" style="color:#e8ecf2;" id="lr-stat-total">5.66</div>
+      <div class="stat-sub">amplified by network</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lr-cascade"></div>
+
+  <div class="card">
+    <h3>Long-run effects for every covariate (from the post)</h3>
+    <p class="note" style="margin:0 0 10px;">Each bar is the LR total effect <code>β / [(1−ρ)(1−ψ)]</code> with the post's full-model multipliers. Spillover indirect effects are typically larger than direct effects.</p>
+    <div class="chart-area" id="lr-allvars"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Slide β to 2.45.</strong> The LR total effect reads about 5.66 with default ψ = 0.39 and ρ = 0.29. The post reports 7.765 because the &ldquo;total&rdquo; in the post combines direct (3.547) and indirect (4.218) where indirect is from the full spatial multiplier <code>(I − ψW)⁻¹</code>, not just <code>1/(1−ψ)</code>. The slider here uses the simpler analytical approximation; the bar chart below shows the post's exact <code>estat impact, lr</code> numbers.</li>
+      <li><strong>Drag ρ toward 0.6.</strong> This is the value the no-factor model produces. The temporal multiplier jumps from 1.41 to 2.50, more than doubling the LR direct effect. This is why "omitting factors inflates ρ" is not a harmless technicality — it cascades into large policy implications.</li>
+      <li><strong>Drag ψ toward 0.7.</strong> The spatial multiplier explodes. In a dense network with strong contagion, even a small short-run shock has system-wide consequences. The Cui-Norkutė-Sarafidis-Yamagata estimator is consistent for ψ in this regime; OLS-on-the-spatial-lag is not.</li>
+      <li><strong>The covariate bar chart.</strong> LIQUIDITY dominates at 7.765 (total LR). BUFFER is negative at −0.173, showing that capital-adequacy regulation has a protective <em>system-wide</em> spillover, not just an own-bank effect. This is the macroprudential policy argument from §10.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 2</h3>
+    <p>
+      The temporal-multiplier and spatial-multiplier sliders you just
+      played with depend on <em>consistent</em> estimates of ρ and ψ. The
+      defactored-IV simulator in Tab 2 showed that omitting common factors
+      biases ψ down (0.39 → 0.29) and ρ up (0.29 → 0.59). Feeding those
+      biased estimates into the long-run formula does not just shift the
+      result — it changes the qualitative story. A policy that looks
+      modestly effective at ρ = 0.59, ψ = 0.29 becomes much more impactful
+      at the true ρ = 0.29, ψ = 0.39 because the spatial multiplier is
+      larger and the persistence is smaller (faster equilibration).
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Spatial Dynamic Panels with Common Factors in Stata: Credit Risk in US Banking</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>DoubleML 401(k) Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Double Machine Learning with 401(k) Data'. A pedagogical web app with sliders and a forest plot to build intuition for PLR, IRM, and IIVM estimators on the 1991 SIPP pension dataset.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>DoubleML 401(k) — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Double Machine Learning with 401(k) Data: From Eligibility Effects to Complier Analysis</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"      class="tab"        data-pane="pane-lab"      role="tab" aria-selected="false">2 · Confounding Lab</button>
+  <button id="tab-showdown" class="tab"        data-pane="pane-showdown" role="tab" aria-selected="false">3 · PLR vs IRM vs IIVM</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">4 · Forest Plot (real data)</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Does 401(k) access really cause households to save more?</h2>
+  <p class="lede">
+    A simple comparison says eligible households have <strong>\$19,559</strong>
+    more in net financial assets than ineligible ones. But eligible households
+    also earn <strong>\$15,368</strong> more in income, on average. How much of
+    that \$19,559 gap is the 401(k) — and how much is the income gap dressed up
+    in 401(k) clothing? <strong>Double Machine Learning</strong> (DML) answers
+    that question by using flexible ML models to strip out confounding before
+    estimating the causal effect.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. In four tabs you will:
+    watch a naive estimate decompose into causal effect + bias as confounding
+    grows; compare PLR, IRM, and IIVM estimators side-by-side; and explore
+    the 12 real DML estimates from the 1991 SIPP pension dataset.
+  </p>
+
+  <div class="card">
+    <h3>The confounding picture in one animation</h3>
+    <p>
+      Two coefficients shrink as you regularise: the steel-blue path is the
+      <strong>naive</strong> estimate that ignores income; the orange path is
+      the <strong>DML</strong> estimate that partials it out. Both start at
+      the same place, but only the DML path lands on the truth.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Confounding Lab</h4>
+      <p>Increase income's role as confounder and watch the naive estimate inflate while DML stays anchored to the true effect.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-showdown">
+      <div class="cta-tag">Tab 3</div>
+      <h4>PLR vs IRM vs IIVM</h4>
+      <p>Same simulated data, three estimators. See how PLR and IRM agree on the ATE, while IIVM (an IV-style method) recovers a larger LATE for compliers.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Forest Plot</h4>
+      <p>The 12 real DML estimates from the post. Toggle estimands and methods. Hover to see SE, CI, and the role of each ML learner.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Confounder</summary>
+        <div class="gloss-body">A variable that influences both treatment and outcome. <em>Income is the dominant confounder here — eligible households earn \$15,368 more on average.</em></div>
+      </details>
+      <details class="gloss"><summary>ATE — Average Treatment Effect</summary>
+        <div class="gloss-body">The average causal effect of treatment <em>across the whole population</em>. <em>PLR and IRM both estimate the ATE of 401(k) eligibility.</em></div>
+      </details>
+      <details class="gloss"><summary>LATE — Local Average Treatment Effect</summary>
+        <div class="gloss-body">The causal effect <em>on compliers</em> — units whose treatment status responds to the instrument. <em>IIVM estimates the LATE of 401(k) participation.</em></div>
+      </details>
+      <details class="gloss"><summary>PLR — Partially Linear Regression</summary>
+        <div class="gloss-body">Pins a constant treatment effect, lets confounders enter through a flexible ML model. <em>Workhorse DML estimator. ATE here: \$8,730.</em></div>
+      </details>
+      <details class="gloss"><summary>IRM — Interactive Regression Model</summary>
+        <div class="gloss-body">Drops the constant-effect assumption; uses doubly-robust (AIPW) scoring with propensity scores. <em>ATE here: \$8,213.</em></div>
+      </details>
+      <details class="gloss"><summary>IIVM — Interactive IV Model</summary>
+        <div class="gloss-body">DML adapted for binary instruments. Targets the LATE on compliers. <em>Uses eligibility as instrument for participation. LATE here: \$11,746.</em></div>
+      </details>
+      <details class="gloss"><summary>Cross-fitting (K-fold)</summary>
+        <div class="gloss-body">Train nuisance models on K-1 folds, predict on the held-out fold. Rotate. <em>The DML guard against overfitting bias.</em></div>
+      </details>
+      <details class="gloss"><summary>Orthogonal score</summary>
+        <div class="gloss-body">An estimating equation whose derivative w.r.t. nuisance-function errors is zero at the truth. <em>Neyman-orthogonal scores are what make ML-based nuisance estimation harmless.</em></div>
+      </details>
+      <details class="gloss"><summary>Propensity score</summary>
+        <div class="gloss-body">Predicted probability that a unit is treated, given covariates. <em>IRM uses it to up-weight rare controls.</em></div>
+      </details>
+      <details class="gloss"><summary>Complier</summary>
+        <div class="gloss-body">A household that participates because it is eligible, but would not otherwise. <em>The marginal population — the focus of the LATE.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: CONFOUNDING LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>Confounding Lab — see how naive estimates inflate</h2>
+  <p class="lede">
+    Simulated data with one treatment column and many candidate controls — the
+    way a DML practitioner would think of the 401(k) problem. The true
+    treatment coefficient is <span class="kbd">α = 0.5</span>. The
+    LASSO chooses how many controls to keep based on a single penalty
+    parameter λ. <strong>Drag λ and watch the controls drop out one at a
+    time</strong> — this is the nuisance-function step DML performs internally.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">200</span></label>
+      <input type="range" id="lab-n" min="50" max="500" step="10" value="200" aria-label="sample size n">
+      <div class="hint">More data ⇒ each control's coefficient is estimated more precisely.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="lab-p-val">40</span></label>
+      <input type="range" id="lab-p" min="5" max="100" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">About 15% of these have a true nonzero effect; the rest are noise.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="lab-s-val">0.60</span></label>
+      <input type="range" id="lab-s" min="0.1" max="1.5" step="0.05" value="0.60" aria-label="signal strength">
+      <div class="hint">How strongly the relevant controls predict the outcome — proxy for income's role.</div>
+    </div>
+    <div class="control">
+      <label>Penalty λ <span class="value" id="lab-l-val">—</span></label>
+      <input type="range" id="lab-l" min="0" max="79" step="1" value="40" aria-label="penalty index">
+      <div class="hint">Slide left for less shrinkage (more controls survive); right for more.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-path"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">controls kept (|I|)</div>
+      <div class="stat-value teal" id="lab-stat-nz">—</div>
+      <div class="stat-sub">out of <span id="lab-stat-p">—</span> candidates</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from raw LASSO</div>
+      <div class="stat-value orange" id="lab-stat-alpha-l">—</div>
+      <div class="stat-sub">biased toward zero by shrinkage</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">α̂ from post-OLS (DML-style)</div>
+      <div class="stat-value orange" id="lab-stat-alpha-o">—</div>
+      <div class="stat-sub">refit on selected support — the DML estimate</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">true α</div>
+      <div class="stat-value" id="lab-stat-alpha-t">0.50</div>
+      <div class="stat-sub">held fixed for comparison</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Sparsity grows with λ.</strong> Slide right: more controls are pinned to zero. Slide left: more re-enter. At λ ≈ 0 you recover OLS — which would blow up if p ≥ n.</li>
+      <li><strong>Post-OLS α̂ tracks the true α more closely.</strong> Raw LASSO shrinks the treatment too. DML uses LASSO <em>for selection</em>, then refits unpenalised — the same logic used by the post's PLR estimator internally.</li>
+      <li><strong>The orange treatment line stays in.</strong> Try p = 100 and a large λ: 90+ controls disappear, but the orange line keeps a meaningful value. This is exactly what cross-fitting buys you in DML.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="lab-reseed">Reseed random draws</button>
+      <button class="action secondary" id="lab-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: PLR vs IRM vs IIVM ====================== -->
+<section id="pane-showdown" class="tab-pane" role="tabpanel" aria-labelledby="tab-showdown">
+
+  <h2>PLR vs IRM vs IIVM — three estimators, one truth</h2>
+  <p class="lede">
+    Same simulated data. PLR uses <em>partialling out</em>, IRM uses
+    <em>doubly-robust AIPW</em> with propensity scores, IIVM uses
+    <em>instrumental variables</em>. The three approaches make different
+    assumptions and target different estimands. <strong>Tweak the sliders and
+    watch how they agree (PLR ≈ IRM) — and how IIVM systematically picks up a
+    larger effect (the LATE)</strong>.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sh-n-val">200</span></label>
+      <input type="range" id="sh-n" min="50" max="300" step="10" value="200" aria-label="sample size n">
+      <div class="hint">Capped at 300 so the "Run 100 sims" button finishes quickly.</div>
+    </div>
+    <div class="control">
+      <label>Number of controls p <span class="value" id="sh-p-val">40</span></label>
+      <input type="range" id="sh-p" min="5" max="50" step="1" value="40" aria-label="number of controls p">
+      <div class="hint">Capped at 50 for the 100-sim run.</div>
+    </div>
+    <div class="control">
+      <label>Signal strength <span class="value" id="sh-s-val">0.50</span></label>
+      <input type="range" id="sh-s" min="0.1" max="1.2" step="0.05" value="0.50" aria-label="signal strength">
+      <div class="hint">Common scale for both π (treatment→controls) and θ (outcome→controls).</div>
+    </div>
+    <div class="control">
+      <label>Confounding strength <span class="value" id="sh-a-val">0.30</span></label>
+      <input type="range" id="sh-a" min="0" max="1" step="0.05" value="0.30" aria-label="confounding asymmetry">
+      <div class="hint">0 = controls predict both Y and D equally · 1 = controls predict D well, Y barely.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag rigorous">PLR / IRM</span> ATE estimators</h3>
+      <p class="note" style="margin:0 0 10px;">Partialling-out (PLR) and doubly-robust AIPW (IRM) target the ATE.</p>
+      <div class="method-row"><span class="label">α̂ (PLR-style)</span><span class="val" id="sh-rig-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-rig-un">—</span></div>
+      <div class="method-row"><span class="label">target estimand</span><span class="val">ATE</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">IIVM</span> IV estimator</h3>
+      <p class="note" style="margin:0 0 10px;">CV-tuned LASSO nuisances, IV-style scoring. Targets the LATE on compliers.</p>
+      <div class="method-row"><span class="label">α̂ (IIVM-style)</span><span class="val" id="sh-cv-alpha">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-cv-un">—</span></div>
+      <div class="method-row"><span class="label">target estimand</span><span class="val">LATE</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sh-compare"></div>
+
+  <div class="pedagogy">
+    <h4>Why does this happen?</h4>
+    <ul>
+      <li><strong>PLR ≈ IRM under constant effects.</strong> When the true treatment effect is the same for every household, partialling out and AIPW give nearly identical answers — as the post's Table-2 results show (\$8,730 vs \$8,213 ATE).</li>
+      <li><strong>IIVM > PLR/IRM when compliers benefit more.</strong> The LATE captures the effect on <em>marginal</em> participants — exactly the population that responds to a policy change. In the real 401(k) data: \$11,746 LATE vs \$8,730 ATE.</li>
+      <li><strong>The naive gap (steel-blue line) is much larger</strong> than any DML estimate. That gap is mostly income confounding — the bias DML strips out.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Bias vs. variance over many simulations</h3>
+    <p>Single runs are noisy. Run the whole pipeline 100 times with fresh draws (same parameters, different ε and v) to see whether PLR/IRM and IIVM bias is systematic.</p>
+    <button class="action" id="sh-run">Run 100 simulations</button>
+    <span id="sh-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sh-progress"><div></div></div>
+    <div class="chart-area" id="sh-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sh-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">IIVM mean α̂</div><div class="stat-value orange" id="sh-cv-mean">—</div><div class="stat-sub">LATE — should sit above ATE</div></div>
+      <div class="stat"><div class="stat-label">IIVM sd(α̂)</div><div class="stat-value" id="sh-cv-sd">—</div></div>
+      <div class="stat"><div class="stat-label">PLR/IRM mean α̂</div><div class="stat-value teal" id="sh-rig-mean">—</div></div>
+      <div class="stat"><div class="stat-label">PLR/IRM sd(α̂)</div><div class="stat-value" id="sh-rig-sd">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: FOREST PLOT (real data) ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's forest plot — interactively</h2>
+  <p class="lede">
+    These numbers come straight from <code>all_results.csv</code> and
+    <code>naive_estimates.csv</code> in the post's folder — the same data used
+    to produce the grand-comparison figure. Toggle estimands and methods to
+    compare. Hover a point for SE, 95% CI, and the number of covariates used.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Toggle "Naive (mean diff)" off</strong> to zoom into the DML estimates. The naive bars (\$19,559 for eligibility and \$27,372 for participation) compress the x-axis — they are <em>more than double</em> the corresponding DML estimates.</li>
+      <li><strong>PLR and IRM cluster tightly</strong> between \$7,800 and \$9,400 across 4 ML learners. This convergence is the robustness check: two distinct DML frameworks land on the same ATE.</li>
+      <li><strong>IIVM sits systematically higher</strong> (\$11,200--\$12,300). This is the LATE-vs-ATE gap, not noise — compliers respond more strongly to eligibility than the average household.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Estimand</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="Eligibility (ATE)" checked> Eligibility (ATE)</label>
+      <label><input type="checkbox" value="Participation (LATE)" checked> Participation (LATE)</label>
+    </div>
+    <h3 style="margin-top:16px;">Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive (mean diff)" checked> Naive</label>
+      <label><input type="checkbox" value="PLR-Lasso" checked> PLR-Lasso</label>
+      <label><input type="checkbox" value="PLR-Random Forest" checked> PLR-RF</label>
+      <label><input type="checkbox" value="PLR-Decision Tree" checked> PLR-Tree</label>
+      <label><input type="checkbox" value="PLR-XGBoost" checked> PLR-XGB</label>
+      <label><input type="checkbox" value="IRM-Lasso" checked> IRM-Lasso</label>
+      <label><input type="checkbox" value="IRM-Random Forest" checked> IRM-RF</label>
+      <label><input type="checkbox" value="IRM-Decision Tree" checked> IRM-Tree</label>
+      <label><input type="checkbox" value="IRM-XGBoost" checked> IRM-XGB</label>
+      <label><input type="checkbox" value="IIVM-Lasso" checked> IIVM-Lasso</label>
+      <label><input type="checkbox" value="IIVM-Random Forest" checked> IIVM-RF</label>
+      <label><input type="checkbox" value="IIVM-Decision Tree" checked> IIVM-Tree</label>
+      <label><input type="checkbox" value="IIVM-XGBoost" checked> IIVM-XGB</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="card">
+    <h3>The naive estimate, decomposed</h3>
+    <p>
+      For 401(k) eligibility, the naive mean difference of <strong>\$19,559</strong>
+      decomposes into two components:
+    </p>
+    <ul>
+      <li><strong>Causal effect (DML ATE)</strong> ≈ \$8,730 — what the 401(k) genuinely contributes.</li>
+      <li><strong>Confounding bias</strong> ≈ \$10,829 — pre-existing differences (income, education, age) that have nothing to do with the plan.</li>
+    </ul>
+    <p>
+      In percent terms, <strong>55%</strong> of the naive gap is confounding bias.
+      The income gap alone — \$15,368 — explains most of it. This is what DML's
+      cross-fitting and orthogonal scoring are designed to strip out.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to Tab 3</h3>
+    <p>
+      The simulated comparisons you just explored map directly onto the real
+      pension data:
+    </p>
+    <ul>
+      <li><strong>PLR vs IRM agreement:</strong> the simulation shows they agree under constant effects; the data shows they agree at \$8,730 vs \$8,213.</li>
+      <li><strong>IIVM > ATE:</strong> the simulation shows IV-style scoring picks up the complier population; the data shows IIVM = \$11,746 — about 35% larger than ATE.</li>
+      <li><strong>Learner robustness:</strong> 4 ML learners (Lasso, RF, Tree, XGB) move each estimator by less than \$1,500 — a hallmark of well-functioning DML.</li>
+    </ul>
+    <p>
+      The policy takeaway from the post: expanding 401(k) eligibility raises
+      net financial assets by roughly <strong>\$8,500</strong> per newly
+      eligible household, and by <strong>\$12,000</strong> for marginal
+      participants — the population most affected by an eligibility expansion.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Double Machine Learning with 401(k) Data: From Eligibility Effects to Complier Analysis</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

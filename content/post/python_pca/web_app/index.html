@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>PCA Interactive Lab — Building a Health Index</title>
+<meta name="description" content="Interactive companion to 'Introduction to PCA Analysis for Building Development Indicators'. Visualise how PCA finds the direction of maximum variance, vary the correlation between indicators, and rank 50 simulated countries by composite Health Index.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>PCA Interactive Lab — Building a Health Index</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Introduction to PCA Analysis for Building Development Indicators</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">2 · PCA Simulator</button>
+  <button id="tab-rank"     class="tab"        data-pane="pane-rank"     role="tab" aria-selected="false">3 · Country Rankings</button>
+  <button id="tab-loadings" class="tab"        data-pane="pane-loadings" role="tab" aria-selected="false">4 · Loadings & Variance</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why PCA? Why a Health Index?</h2>
+  <p class="lede">
+    In development economics, no single number captures progress. To rank countries
+    on health, you might consider life expectancy, infant mortality, hospital beds,
+    and disease prevalence — variables in different units that you cannot simply
+    add together. <strong>Principal Component Analysis (PCA)</strong> compresses
+    many correlated indicators into one elegant index by finding the direction in
+    which countries differ most. That direction <em>is</em> the composite indicator.
+  </p>
+  <p class="lede">
+    This app lets you turn the dials yourself. In four tabs you will: watch a
+    rotating cloud of countries until PCA aligns its arrow with the long axis of the
+    data; vary the correlation between two health indicators and see what fraction
+    of variance PC1 absorbs; rank 50 simulated countries by their actual Health
+    Index from the post; and compare the eigenvector loadings against scikit-learn.
+  </p>
+
+  <div class="card">
+    <h3>PC1 finds the long axis of the country cloud</h3>
+    <p>
+      The animation below sweeps a candidate direction (orange arrow) around the
+      origin while a steel-blue gauge tracks the variance projected onto that
+      direction. The variance peaks at the diagonal — exactly where PCA places
+      PC1. The teal arrow is the perpendicular PC2, which always captures the
+      leftover variance.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 2</div>
+      <h4>PCA Simulator</h4>
+      <p>Vary the correlation between life expectancy and infant survival. Watch PC1's variance explained slide from 50% (no correlation) toward 100% (perfect alignment).</p>
+    </div>
+    <div class="cta-card" data-goto="pane-rank">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Country Rankings</h4>
+      <p>The post's actual 50-country leaderboard. Sort, hover, and see how raw indicators translate into a single 0-to-1 Health Index.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-loadings">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Loadings & Variance</h4>
+      <p>The closed-form result for two standardised variables: PC1 loadings are always [0.7071, 0.7071] regardless of correlation. See why, and how scikit-learn agrees.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Polarity adjustment</summary>
+        <div class="gloss-body">Flipping the sign of "more is bad" indicators (multiply by −1) so all variables point in the same direction. <em>Infant mortality → infant survival.</em></div>
+      </details>
+      <details class="gloss"><summary>Standardisation (z-score)</summary>
+        <div class="gloss-body">Subtract the mean, divide by the standard deviation. Each variable now has mean 0 and SD 1. <em>Makes years and rates directly comparable.</em></div>
+      </details>
+      <details class="gloss"><summary>Covariance matrix Σ</summary>
+        <div class="gloss-body">A square symmetric matrix with variances on the diagonal and covariances off it. <em>For standardised data, the off-diagonal is the correlation r.</em></div>
+      </details>
+      <details class="gloss"><summary>Eigenvector v</summary>
+        <div class="gloss-body">A direction in data space that Σ stretches without rotating. <em>The first eigenvector is the PC1 loading — the recipe for combining variables.</em></div>
+      </details>
+      <details class="gloss"><summary>Eigenvalue λ</summary>
+        <div class="gloss-body">The stretch factor along an eigenvector. <em>Equals the variance of the data projected onto that direction.</em></div>
+      </details>
+      <details class="gloss"><summary>Variance explained</summary>
+        <div class="gloss-body">λ_k divided by the sum of all eigenvalues. <em>PC1 explained ≈ 98% in the post's two-variable example.</em></div>
+      </details>
+      <details class="gloss"><summary>Component score</summary>
+        <div class="gloss-body">Z @ v — the projection of standardised data onto PC1. <em>One number per country, ready to rank.</em></div>
+      </details>
+      <details class="gloss"><summary>Min-max normalisation</summary>
+        <div class="gloss-body">(score − min) / (max − min). <em>Rescales PC1 scores into the [0, 1] Health Index that policymakers expect.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: PCA SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>PCA Simulator — how correlation drives compression</h2>
+  <p class="lede">
+    Generate simulated countries with two indicators. The latent health factor
+    <code>base_health</code> drives both, but you control how strongly. <strong>Slide
+    the correlation knob</strong> from 0 (independent indicators — PCA cannot
+    compress) toward ±1 (perfectly redundant — PCA squeezes everything into PC1).
+    The post's setting is r ≈ 0.96, where PC1 absorbs 98% of variance.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sim-n-val">50</span></label>
+      <input type="range" id="sim-n" min="20" max="500" step="10" value="50" aria-label="sample size n">
+      <div class="hint">More countries make the eigenvectors more stable.</div>
+    </div>
+    <div class="control">
+      <label>Correlation r <span class="value" id="sim-r-val">0.96</span></label>
+      <input type="range" id="sim-r" min="-0.99" max="0.99" step="0.01" value="0.96" aria-label="correlation r">
+      <div class="hint">Strength of relationship between life expectancy and infant survival.</div>
+    </div>
+    <div class="control">
+      <label>Noise level <span class="value" id="sim-noise-val">1.0</span></label>
+      <input type="range" id="sim-noise" min="0.2" max="3" step="0.1" value="1.0" aria-label="noise level">
+      <div class="hint">Idiosyncratic variation around the latent health factor.</div>
+    </div>
+    <div class="control">
+      <label>Random seed <span class="value" id="sim-seed-val">42</span></label>
+      <input type="range" id="sim-seed" min="1" max="999" step="1" value="42" aria-label="random seed">
+      <div class="hint">Slide to draw a fresh sample with the same parameters.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-scatter"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Sample correlation</div>
+      <div class="stat-value teal" id="sim-stat-r">—</div>
+      <div class="stat-sub">after polarity adjustment</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">λ₁ (PC1 eigenvalue)</div>
+      <div class="stat-value orange" id="sim-stat-l1">—</div>
+      <div class="stat-sub">closed form: 1 + |r|</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">λ₂ (PC2 eigenvalue)</div>
+      <div class="stat-value" id="sim-stat-l2">—</div>
+      <div class="stat-sub">closed form: 1 − |r|</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">PC1 variance explained</div>
+      <div class="stat-value teal" id="sim-stat-vex">—</div>
+      <div class="stat-sub">λ₁ / (λ₁ + λ₂)</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>At r ≈ 0</strong>, the cloud is a fuzzy ball and PC1 explains only 50% — PCA offers no compression. The two indicators carry independent information.</li>
+      <li><strong>At |r| ≈ 0.5</strong>, PC1 explains 75% — useful but you would still need PC2 to summarise countries faithfully.</li>
+      <li><strong>At r ≈ ±0.96</strong> (the post's setting), PC1 absorbs ≈ 98%. The cloud is a thin diagonal cigar — one number captures almost everything.</li>
+      <li><strong>The closed form λ₁ = 1 + |r|, λ₂ = 1 − |r|</strong> only holds for two <em>standardised</em> variables. With 3+ variables the eigenvalues are not so clean — PCA earns its keep.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Monte-Carlo stability test</h3>
+    <p>How much does the variance-explained estimate move from sample to sample? Run 100 fresh simulations at the current settings and watch the histogram.</p>
+    <button class="action" id="sim-run">Run 100 simulations</button>
+    <span id="sim-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="sim-progress"><div></div></div>
+    <div class="chart-area" id="sim-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="sim-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Mean var-explained</div><div class="stat-value teal" id="sim-mean-vex">—</div></div>
+      <div class="stat"><div class="stat-label">SD across sims</div><div class="stat-value" id="sim-sd-vex">—</div></div>
+      <div class="stat"><div class="stat-label">Min observed</div><div class="stat-value orange" id="sim-min-vex">—</div></div>
+      <div class="stat"><div class="stat-label">Max observed</div><div class="stat-value teal" id="sim-max-vex">—</div></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: COUNTRY RANKINGS ====================== -->
+<section id="pane-rank" class="tab-pane" role="tabpanel" aria-labelledby="tab-rank">
+
+  <h2>The post's 50-country Health Index — interactively</h2>
+  <p class="lede">
+    These numbers come straight from <code>health_index_results.csv</code> in the
+    post's folder — the same PC1 scores and Health Index used in §10 and §11.
+    Toggle the indicator filter to see how countries with low life expectancy
+    cluster at the bottom, and how the rank order is almost identical between
+    raw PC1 and the 0-to-1 Health Index.
+  </p>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The top 10</strong> (Health Index &gt; 0.78) all combine high life expectancy (≥ 79 years) with low infant mortality (≤ 17 per 1,000) — no country reaches the top by excelling on only one indicator.</li>
+      <li><strong>Country_05</strong> has Health Index = 0.00 by construction — it is the worst performer, and min-max normalisation pins the minimum to zero.</li>
+      <li><strong>Country_28</strong> has Health Index ≈ 0.0015 — its bar is invisible at this scale, not missing data. Life expectancy 57.7 years and infant mortality 58.7 per 1,000 place it almost as low as the floor.</li>
+      <li><strong>Hover any bar</strong> to read the raw indicators and PC1 score for that country.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Sort by</h3>
+    <div class="method-toggle" id="rank-sort">
+      <label><input type="radio" name="sort" value="health_index" checked> Health Index (0-1)</label>
+      <label><input type="radio" name="sort" value="pc1"> PC1 score</label>
+      <label><input type="radio" name="sort" value="life_exp"> Life expectancy</label>
+      <label><input type="radio" name="sort" value="infant_mort"> Infant mortality</label>
+    </div>
+    <h3 style="margin-top:16px;">Filter (life expectancy)</h3>
+    <div class="controls" style="margin-top:0;">
+      <div class="control">
+        <label>Minimum life expectancy <span class="value" id="rank-le-val">0</span> yrs</label>
+        <input type="range" id="rank-le" min="50" max="85" step="1" value="50" aria-label="minimum life expectancy">
+        <div class="hint">Hide countries below this threshold.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="rank-chart"></div>
+
+  <div class="card">
+    <h3>How the Health Index is built — six steps in one line</h3>
+    <ol style="margin:0; padding-left:20px; color: var(--text); font-size: 14px;">
+      <li><strong>Polarity:</strong> flip infant mortality → infant survival (multiply by −1).</li>
+      <li><strong>Standardise:</strong> z-score both indicators (mean 0, SD 1).</li>
+      <li><strong>Covariance:</strong> compute the 2×2 matrix (off-diagonal = r = 0.9595).</li>
+      <li><strong>Eigen-decompose:</strong> recover eigenvectors [0.7071, 0.7071] and [0.7071, −0.7071] with eigenvalues 1.9595 and 0.0405.</li>
+      <li><strong>Project:</strong> PC1 score = 0.7071·z<sub>LE</sub> + 0.7071·z<sub>IS</sub>. Range [−2.39, +2.37].</li>
+      <li><strong>Normalise:</strong> (PC1 − min) / (max − min) → Health Index in [0, 1].</li>
+    </ol>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: LOADINGS & VARIANCE ====================== -->
+<section id="pane-loadings" class="tab-pane" role="tabpanel" aria-labelledby="tab-loadings">
+
+  <h2>Loadings & Variance — a verification dashboard</h2>
+  <p class="lede">
+    The eigenvector entries — called <strong>loadings</strong> — are the weights
+    PCA multiplies each standardised variable by to compute PC1. For two
+    standardised variables, both loadings are always exactly 1/√2 ≈ 0.7071,
+    regardless of correlation. This is a mathematical certainty. The variance
+    proportions, however, depend strongly on r — and that is what makes PCA
+    useful.
+  </p>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>PC1 loadings (this post)</h3>
+      <div class="method-row"><span class="label">Life expectancy</span><span class="val">0.7071</span></div>
+      <div class="method-row"><span class="label">Infant survival</span><span class="val">0.7071</span></div>
+      <div class="method-row"><span class="label">‖ v₁ ‖</span><span class="val">1.0000</span></div>
+      <p class="note" style="margin-top:10px;">Both indicators contribute equally — PC1 is essentially a scaled average of the two z-scores.</p>
+    </div>
+    <div class="card">
+      <h3>PC2 loadings (this post)</h3>
+      <div class="method-row"><span class="label">Life expectancy</span><span class="val">+0.7071</span></div>
+      <div class="method-row"><span class="label">Infant survival</span><span class="val">−0.7071</span></div>
+      <div class="method-row"><span class="label">‖ v₂ ‖</span><span class="val">1.0000</span></div>
+      <p class="note" style="margin-top:10px;">Perpendicular to PC1. Captures countries where the two indicators disagree — only 2% of variance.</p>
+    </div>
+  </div>
+
+  <div class="chart-area" id="loadings-bars"></div>
+
+  <div class="card">
+    <h3>Variance explained by component</h3>
+    <p>PC1 captures 97.97% of all variation in the standardised data — the entire purpose of PCA. PC2 captures the leftover 2.03%, almost all of it noise from the data-generating process.</p>
+    <div class="chart-area" id="loadings-scree"></div>
+  </div>
+
+  <div class="card">
+    <h3>Manual vs. scikit-learn — perfect agreement</h3>
+    <p>
+      The post computes PC1 in two ways: by hand (six explicit steps:
+      polarity → standardise → covariance → eigen-decompose → project →
+      normalise) and via scikit-learn's <code>PCA(n_components=1)</code>. The
+      maximum absolute difference between the two PC1-score vectors is
+      <code>1.33 × 10⁻¹⁵</code> — machine precision. The correlation is
+      exactly <code>1.000000</code>. Same eigenvectors, same scores, same
+      Health Index rankings.
+    </p>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-label">Max |PC1<sub>manual</sub> − PC1<sub>sklearn</sub>|</div>
+        <div class="stat-value teal">1.33 × 10⁻¹⁵</div>
+        <div class="stat-sub">essentially zero</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Correlation</div>
+        <div class="stat-value teal">1.000000</div>
+        <div class="stat-sub">all 50 points on the 45° line</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total variance</div>
+        <div class="stat-value">2.0000</div>
+        <div class="stat-sub">= λ₁ + λ₂ = #variables</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>Connecting back to Tabs 2 and 3</h4>
+    <ul>
+      <li><strong>Tab 2's simulator</strong> proves the closed form λ₁ = 1 + |r|, λ₂ = 1 − |r| by varying r and reading the eigenvalues live.</li>
+      <li><strong>Tab 3's rankings</strong> are computed from the very loadings shown above: 0.7071 × z<sub>LE</sub> + 0.7071 × z<sub>IS</sub>, then min-max normalised.</li>
+      <li><strong>The equal-loading result is a quirk of 2 variables.</strong> With 3+ indicators the loadings differ, giving more weight to indicators that contribute unique information — and that is where PCA truly earns its keep.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Introduction to PCA Analysis for Building Development Indicators</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

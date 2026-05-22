@@ -1,0 +1,36 @@
+{
+  "_comment": "Numbers parsed from stata_fwl/index.md. Three estimand groups: (1) coupon-effect comparison across naive/+income/+income+day in the simulated store DGP; (2) air-time effect across FE-progression on the 5,000-flight NYC sample (Stata sample uses reghdfe); (3) experience effect across pooled OLS / individual FE / two-way FE in the wage panel. CIs computed as estimate +/- 1.96 * SE.",
+
+  "estimates": [
+    { "method": "Naive",          "outcome": "Store: coupons -> sales",   "estimate": -0.0934, "se": 0.0393, "ci_lo": -0.1704, "ci_hi": -0.0164, "n_selected": 0  },
+    { "method": "+ Income",       "outcome": "Store: coupons -> sales",   "estimate":  0.2123, "se": 0.0467, "ci_lo":  0.1208, "ci_hi":  0.3038, "n_selected": 1  },
+    { "method": "+ Inc + Day",    "outcome": "Store: coupons -> sales",   "estimate":  0.2219, "se": 0.0454, "ci_lo":  0.1329, "ci_hi":  0.3109, "n_selected": 2  },
+
+    { "method": "Naive",          "outcome": "Flights: air_time -> delay","estimate": -0.0050, "se": 0.0035, "ci_lo": -0.0119, "ci_hi":  0.0019, "n_selected": 0   },
+    { "method": "+ Origin FE",    "outcome": "Flights: air_time -> delay","estimate": -0.0079, "se": 0.0034, "ci_lo": -0.0146, "ci_hi": -0.0012, "n_selected": 3   },
+    { "method": "+ Orig+Dest",    "outcome": "Flights: air_time -> delay","estimate": -0.0324, "se": 0.0265, "ci_lo": -0.0843, "ci_hi":  0.0195, "n_selected": 106 },
+
+    { "method": "Naive",          "outcome": "Wages: exper -> log(wage)", "estimate":  0.1050, "se": 0.0102, "ci_lo":  0.0850, "ci_hi":  0.1250, "n_selected": 1   },
+    { "method": "+ Individual FE","outcome": "Wages: exper -> log(wage)", "estimate":  0.1223, "se": 0.0082, "ci_lo":  0.1062, "ci_hi":  0.1384, "n_selected": 545 }
+  ],
+
+  "selection": [
+    { "outcome": "Store: coupons -> sales",   "method": "+ Income",          "n_Iy": 1,   "n_Id": 0, "n_intersection": 0, "n_union": 1   },
+    { "outcome": "Store: coupons -> sales",   "method": "+ Inc + Day",       "n_Iy": 2,   "n_Id": 0, "n_intersection": 0, "n_union": 2   },
+    { "outcome": "Flights: air_time -> delay","method": "+ Origin FE",       "n_Iy": 3,   "n_Id": 0, "n_intersection": 0, "n_union": 3   },
+    { "outcome": "Flights: air_time -> delay","method": "+ Orig+Dest",       "n_Iy": 106, "n_Id": 0, "n_intersection": 0, "n_union": 106 },
+    { "outcome": "Wages: exper -> log(wage)", "method": "+ Individual FE",   "n_Iy": 545, "n_Id": 0, "n_intersection": 0, "n_union": 545 }
+  ],
+
+  "store_data": {
+    "true_alpha": 0.2,
+    "gamma_hat": 0.3004,
+    "delta_hat": -0.4937,
+    "ovb": -0.1483,
+    "cor_sales_coupons": -0.166,
+    "cor_sales_income": 0.500,
+    "cor_coupons_income": -0.709,
+    "fwl_manual_coef": 0.212288,
+    "reghdfe_coef": 0.212288
+  }
+}

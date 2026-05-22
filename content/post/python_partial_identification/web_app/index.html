@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Partial Identification — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Introduction to Partial Identification: Bounding Causal Effects Under Unmeasured Confounding'. Explore Manski, Tian-Pearl, and entropy bounds through a four-tab pedagogical web app.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Partial Identification — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Introduction to Partial Identification: Bounding Causal Effects Under Unmeasured Confounding</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"   class="tab active" data-pane="pane-intro"   role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-bounds"  class="tab"        data-pane="pane-bounds"  role="tab" aria-selected="false">2 · Bounds Showdown</button>
+  <button id="tab-sim"     class="tab"        data-pane="pane-sim"     role="tab" aria-selected="false">3 · Confounding Simulator</button>
+  <button id="tab-sens"    class="tab"        data-pane="pane-sens"    role="tab" aria-selected="false">4 · Sample-size Sensitivity</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why bounds, not a single number?</h2>
+  <p class="lede">
+    A job-training program may help workers find jobs, or it may not — and an
+    <em>unmeasured</em> confounder (prior work experience) makes a single
+    estimate impossible to trust. <strong>Partial identification</strong>
+    answers the next-best question: what range of values is the true effect
+    <em>consistent</em> with, given only the data and minimal assumptions?
+    The honest answer in this post is a wide interval
+    <strong>[-0.298, +0.702]</strong> — Manski's no-assumption bounds — that
+    contains the true ATE of <strong>0.27</strong> but is too wide to settle
+    the question.
+  </p>
+  <p class="lede">
+    The animation below shows the three layers of certainty.
+    A <span style="color:#d97757;font-weight:600">naive point estimate</span>
+    pretends the confounder is gone. The
+    <span style="color:#6a9bcc;font-weight:600">Manski bounds</span> never
+    move — they reflect <em>fundamental</em> uncertainty. The
+    <span style="color:#00d4c8;font-weight:600">entropy bounds</span> shrink as
+    you add an information-theoretic assumption, all the way to a point if you
+    are willing to assume <em>everything</em>. Different tabs let you turn
+    those dials yourself.
+  </p>
+
+  <div class="card">
+    <h3>Three layers of certainty about the ATE</h3>
+    <p>
+      The orange dot only appears when assumptions are strong enough to collapse
+      the bound to a single point — a fantasy in this post since the confounder
+      is real. Notice how the
+      <span style="color:#6a9bcc;font-weight:600">steel-blue Manski bar</span>
+      never budges: more assumptions, not more data, is what narrows bounds.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <div class="chart-caption">Manski (steel) stays fixed. Entropy (teal) shrinks as you tighten the assumption. The point estimate (orange) requires the strongest assumption: no confounding at all.</div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-bounds">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Bounds Showdown</h4>
+      <p>The real numbers from the post. Toggle Manski, Autobound, Tian-Pearl, and entropy. Hover for width, lower/upper, and whether the bound covers the true ATE.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Confounding Simulator</h4>
+      <p>Tune confounder prevalence, treatment effect, and confounder strength. Watch the naive estimate drift while the Manski bounds bracket the truth every time.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sens">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Sample-size Sensitivity</h4>
+      <p>The headline misconception: bigger N does <em>not</em> narrow identification bounds. See the Manski width stay flat at 1.0 from N = 100 to N = 5,000.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Point identification</summary>
+        <div class="gloss-body">Under strong assumptions (e.g. random assignment, no unmeasured confounders), the data pin the causal effect to a <em>single</em> number.</div>
+      </details>
+      <details class="gloss"><summary>Partial identification</summary>
+        <div class="gloss-body">When assumptions fail, the data alone deliver a <em>range</em> [L, U] consistent with everything you can observe. The narrower, the more informative.</div>
+      </details>
+      <details class="gloss"><summary>Manski bounds</summary>
+        <div class="gloss-body">No-assumption bounds. Plug observed conditional probabilities into the law of total probability and use the worst case for unobservables. <em>Width = 1 for binary outcomes by construction.</em></div>
+      </details>
+      <details class="gloss"><summary>Autobound (LP)</summary>
+        <div class="gloss-body">Linear-programming bounds that find the tightest interval consistent with every probability constraint. <em>For binary confounded scenarios, equal to Manski — confirming Manski is already sharp.</em></div>
+      </details>
+      <details class="gloss"><summary>Entropy bounds</summary>
+        <div class="gloss-body">Add the constraint H(U | X, Y) ≤ θ. Smaller θ = the hidden confounder can only redistribute mass a little = tighter bounds.</div>
+      </details>
+      <details class="gloss"><summary>Tian-Pearl bounds</summary>
+        <div class="gloss-body">Sharp closed-form bounds for counterfactual quantities like PNS (probability of necessity and sufficiency). Use the joint structure more aggressively than Manski.</div>
+      </details>
+      <details class="gloss"><summary>PNS</summary>
+        <div class="gloss-body">P(Y(1)=1 ∩ Y(0)=0). The probability that treatment <em>both</em> would succeed <em>and</em> needed to happen for success — individual-level causation.</div>
+      </details>
+      <details class="gloss"><summary>Bound width</summary>
+        <div class="gloss-body">U − L. Width 1.0 is useless for binary outcomes; width 0.2 might be enough to act on. Smaller is more decision-relevant.</div>
+      </details>
+      <details class="gloss"><summary>Coverage</summary>
+        <div class="gloss-body">Across many simulated datasets, does the bound contain the true parameter at the advertised rate? In this post all three methods reach 100% coverage over 100 sims.</div>
+      </details>
+      <details class="gloss"><summary>ATE</summary>
+        <div class="gloss-body">Average Treatment Effect. E[Y(1)] − E[Y(0)]. True ATE in this post's DGP = 0.27.</div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: BOUNDS SHOWDOWN ====================== -->
+<section id="pane-bounds" class="tab-pane" role="tabpanel" aria-labelledby="tab-bounds">
+
+  <h2>Bounds Showdown — the post's real numbers</h2>
+  <p class="lede">
+    These are the exact bounds computed in the post on the same N = 1,000
+    confounded dataset (true ATE = 0.27). Toggle the outcome (ATE vs.
+    PNS) to switch between the average effect and the probability of
+    necessity-and-sufficiency. Hover a bar for the upper/lower endpoints,
+    width, and whether the bound contains the true ATE.
+  </p>
+
+  <div class="card">
+    <h3>Outcomes</h3>
+    <div class="outcome-toggle" id="fp-outcomes">
+      <label><input type="checkbox" value="ATE" checked> ATE</label>
+      <label><input type="checkbox" value="PNS" checked> PNS</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">true ATE</div>
+      <div class="stat-value teal" id="fp-true">—</div>
+      <div class="stat-sub">from known DGP</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">naive estimate</div>
+      <div class="stat-value orange" id="fp-naive">—</div>
+      <div class="stat-sub">upward biased by confounding</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">sample size N</div>
+      <div class="stat-value" id="fp-n">—</div>
+      <div class="stat-sub">simulated workers</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">coverage @ 100 sims</div>
+      <div class="stat-value" id="fp-cov">—</div>
+      <div class="stat-sub">all three methods</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Manski and Autobound coincide on the ATE.</strong> The blue and orange bars overlap exactly at [-0.298, 0.702] — linear programming confirms Manski is already <em>sharp</em>. No clever LP trick can do better without extra assumptions.</li>
+      <li><strong>Entropy buys a 32% width reduction.</strong> Adding H(U | X, Y) ≤ 0.1 narrows the ATE band to [-0.228, 0.454] (width 0.68). It still crosses zero — the data, even with the entropy assumption, cannot confidently sign the effect.</li>
+      <li><strong>Switch to PNS.</strong> Tian-Pearl gives [0, 0.702] — the lower bound pinning at zero means we cannot rule out that training is <em>never</em> individually necessary-and-sufficient. Interestingly, the entropy constraint is <em>less</em> effective for counterfactual PNS than for ATE.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: CONFOUNDING SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Confounding Simulator — turn the dials yourself</h2>
+  <p class="lede">
+    Generate fresh binary data with confounding. The Manski bounds are
+    computed in closed form from the observed contingency table. Slide the
+    confounder strength up and watch the naive estimate drift, while the
+    Manski bounds stay anchored around the truth.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size N <span class="value" id="sim-n-val">1000</span></label>
+      <input type="range" id="sim-n" min="100" max="5000" step="100" value="1000" aria-label="sample size">
+      <div class="hint">More data sharpens observed probabilities but does <em>not</em> shrink identification bounds.</div>
+    </div>
+    <div class="control">
+      <label>P(U = 1) — confounder prevalence <span class="value" id="sim-pu-val">0.30</span></label>
+      <input type="range" id="sim-pu" min="0.10" max="0.70" step="0.05" value="0.30" aria-label="confounder prevalence">
+      <div class="hint">Share of "experienced" workers in the population.</div>
+    </div>
+    <div class="control">
+      <label>True treatment effect β_X <span class="value" id="sim-bx-val">0.30</span></label>
+      <input type="range" id="sim-bx" min="-0.20" max="0.60" step="0.05" value="0.30" aria-label="true effect">
+      <div class="hint">Direct effect of training on the probability of a job.</div>
+    </div>
+    <div class="control">
+      <label>Confounder strength β_U <span class="value" id="sim-bu-val">0.40</span></label>
+      <input type="range" id="sim-bu" min="0" max="0.60" step="0.05" value="0.40" aria-label="confounder strength">
+      <div class="hint">Effect of prior experience on getting a job. Larger ⇒ larger naive bias.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">true ATE</div>
+      <div class="stat-value teal" id="sim-true">—</div>
+      <div class="stat-sub">from your slider settings</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">naive ATE</div>
+      <div class="stat-value orange" id="sim-naive">—</div>
+      <div class="stat-sub">difference in observed means</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">bias (naive − true)</div>
+      <div class="stat-value" id="sim-bias">—</div>
+      <div class="stat-sub">grows with β_U</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Manski width</div>
+      <div class="stat-value" id="sim-width">—</div>
+      <div class="stat-sub">stays ≈ 1.0</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Raise the confounder strength β_U.</strong> The orange "naive" line drifts away from the teal "true" line. The Manski bound never loses the truth.</li>
+      <li><strong>Drop β_U to 0.</strong> The naive estimate snaps to the truth — there is no confounding. The Manski bound is still width ≈ 1 because the <em>data</em> cannot prove that no confounder exists.</li>
+      <li><strong>Change N from 100 to 5,000.</strong> The bars barely move. Identification bounds, unlike confidence intervals, do not shrink with sample size.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: SAMPLE-SIZE SENSITIVITY ====================== -->
+<section id="pane-sens" class="tab-pane" role="tabpanel" aria-labelledby="tab-sens">
+
+  <h2>Sample-size Sensitivity — what more data buys you</h2>
+  <p class="lede">
+    A common misconception: collecting more data narrows partial-identification
+    bounds. This is generally <strong>not</strong> true. Identification bounds
+    reflect what is <em>fundamentally</em> unknowable without observing the
+    confounder. Below: Manski width vs. N from the post's experiment (30 reps
+    per grid point). The Manski band sits flat at 1.0 across two orders of
+    magnitude of N; entropy bounds also stabilise around 0.68.
+  </p>
+
+  <div class="chart-area" id="sens-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Manski width @ N = 100</div>
+      <div class="stat-value" id="sens-m100">—</div>
+      <div class="stat-sub">no assumptions</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Manski width @ N = 5,000</div>
+      <div class="stat-value" id="sens-m5k">—</div>
+      <div class="stat-sub">50× more data, same width</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Entropy width @ N = 100</div>
+      <div class="stat-value teal" id="sens-e100">—</div>
+      <div class="stat-sub">θ = 0.1</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Entropy width @ N = 5,000</div>
+      <div class="stat-value teal" id="sens-e5k">—</div>
+      <div class="stat-sub">variance shrinks, mean does not</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Both bands are flat in N.</strong> The mean Manski width is exactly 1.0 from N = 100 to N = 5,000. Mean entropy width is ≈ 0.68. Only the <em>variance</em> around those means shrinks with N.</li>
+      <li><strong>Identification ≠ statistical estimation.</strong> Confidence intervals shrink at rate 1/√N. Identification bounds do not move at all with N — they encode "what the data could ever tell us, even with infinite samples."</li>
+      <li><strong>To narrow bounds you need structure, not size.</strong> Options listed in the post: an instrument (BinaryIV), monotone treatment response, or direct measurement of U. The Tab 3 simulator shows the data-size lever; nothing you do with it narrows the bound.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Why does this surprise people?</h3>
+    <p>
+      Most empirical work uses 95% confidence intervals, which behave like
+      <code>[β̂ − 1.96 SE, β̂ + 1.96 SE]</code> and shrink as N grows. Identification
+      bounds answer a different question: <em>what is the set of effects
+      consistent with the data and the assumed structure, even in the limit
+      of infinite data?</em> When the assumed structure is weak (Manski),
+      that set is wide and stays wide. The path to narrower bounds runs
+      through assumptions — not through bigger samples.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Introduction to Partial Identification</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

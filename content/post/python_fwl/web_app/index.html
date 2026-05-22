@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>FWL Theorem — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'The FWL Theorem: Making Multivariate Regressions Intuitive'. A pedagogical web app with a residualisation animation, a confounding simulator, the post's summary forest plot, and a Monte Carlo experiment.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>FWL Theorem — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>The FWL Theorem: Making Multivariate Regressions Intuitive</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"  class="tab active" data-pane="pane-intro"  role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-lab"    class="tab"        data-pane="pane-lab"    role="tab" aria-selected="false">2 · Confounding Lab</button>
+  <button id="tab-forest" class="tab"        data-pane="pane-forest" role="tab" aria-selected="false">3 · Forest Plot</button>
+  <button id="tab-mc"     class="tab"        data-pane="pane-mc"     role="tab" aria-selected="false">4 · Monte Carlo</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>What does it really mean to "control for" a variable?</h2>
+  <p class="lede">
+    A multivariate regression returns a coefficient, but a multivariate scatter plot does not exist.
+    The <strong>Frisch–Waugh–Lovell theorem</strong> resolves the tension. It says any coefficient
+    from a multi-variable regression can be recovered from a simple two-variable regression — after
+    you <strong>partial out</strong> all the other variables. The animation below shows the trick in
+    motion.
+  </p>
+  <p class="lede">
+    In the post's retail example, ignoring neighbourhood income produces a coupon-on-sales slope of
+    <span class="kbd">−0.106</span> (wrong sign). After residualising both variables on income, the
+    slope flips to <span class="kbd">+0.267</span> — very close to the true DGP value of
+    <span class="kbd">+0.20</span>. <strong>Drag the slider in Tab 2</strong> to see why.
+  </p>
+
+  <div class="card">
+    <h3>Partialling out — what the regression is doing under the hood</h3>
+    <p>
+      The loop below alternates between two views. The first shows raw coupons against income with
+      a regression line and the residuals (dashed) — that line's slope is income's effect on
+      coupons. The second view discards everything explained by income and re-scatters the
+      <em>residuals</em>. The slope of the second scatter is the FWL slope.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <div class="chart-caption">
+      Left view: raw scatter with residuals shown as dashed lines (the part of coupons income cannot explain).
+      Right view: residualised scatter — the conditional effect emerges as a positive slope.
+    </div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-lab">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Confounding Lab</h4>
+      <p>Set the strength of the confounder yourself. Watch the naive estimate flip sign as you crank up the income–coupons link.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Forest Plot</h4>
+      <p>The post's summary table as a horizontal forest plot. Six estimators, one true effect, hover for SEs and p-values.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-mc">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Monte Carlo</h4>
+      <p>Run the whole simulation 100 times. See the naive estimator's bias and the FWL estimator's centering on the truth.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>FWL theorem</summary>
+        <div class="gloss-body">The OLS coefficient on x₁ from the full regression equals the OLS slope of ỹ on x̃₁, where the tildes are residuals from regressing on the other controls. <em>An algebraic identity, not an approximation.</em></div>
+      </details>
+      <details class="gloss"><summary>Partialling out</summary>
+        <div class="gloss-body">Replace each variable with the part not explained by the controls. <em>Wiping a foggy window before looking through it.</em></div>
+      </details>
+      <details class="gloss"><summary>Confounder</summary>
+        <div class="gloss-body">A variable that affects both the treatment and the outcome. <em>In the post, income confounds coupons → sales.</em></div>
+      </details>
+      <details class="gloss"><summary>Omitted variable bias</summary>
+        <div class="gloss-body">OVB = γ · δ — the omitted variable's effect on y times its slope on the treatment. <em>The exact tilt of the foggy lens.</em></div>
+      </details>
+      <details class="gloss"><summary>Conditional vs marginal effect</summary>
+        <div class="gloss-body">Conditional holds other variables fixed; marginal averages over them. <em>They agree only when no relevant variable is omitted.</em></div>
+      </details>
+      <details class="gloss"><summary>Backdoor path</summary>
+        <div class="gloss-body">A non-causal route from treatment to outcome through a confounder. <em>Including the confounder closes the door.</em></div>
+      </details>
+      <details class="gloss"><summary>Simpson's paradox</summary>
+        <div class="gloss-body">A trend in aggregate data that reverses inside subgroups. <em>The coupons → sales sign flip in the post is the canonical retail example.</em></div>
+      </details>
+      <details class="gloss"><summary>DML bridge</summary>
+        <div class="gloss-body">Double Machine Learning replaces the OLS residualisation with a flexible ML model. <em>FWL with a smarter mop.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: CONFOUNDING LAB ====================== -->
+<section id="pane-lab" class="tab-pane" role="tabpanel" aria-labelledby="tab-lab">
+
+  <h2>Confounding Lab — make the sign flip yourself</h2>
+  <p class="lede">
+    The simulator below mirrors the post's DGP: income drives coupons (negatively) and sales
+    (positively); coupons drive sales (positively). The true causal effect of coupons on sales is
+    fixed at α = 0.20. Adjust the three sliders and compare the naive coupons-on-sales slope to the
+    FWL slope.
+    <strong>Find a setting where the naive slope flips negative — that is when ignoring income
+    misleads the analyst.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="lab-n-val">50</span></label>
+      <input type="range" id="lab-n" min="20" max="500" step="10" value="50" aria-label="sample size n">
+      <div class="hint">More stores ⇒ each estimate is sharper. The post uses 50.</div>
+    </div>
+    <div class="control">
+      <label>γ — income → sales (the OVB engine) <span class="value" id="lab-g-val">0.30</span></label>
+      <input type="range" id="lab-g" min="-0.5" max="1.0" step="0.05" value="0.30" aria-label="gamma">
+      <div class="hint">How much income raises sales. Set close to zero to disable the confounding.</div>
+    </div>
+    <div class="control">
+      <label>δ — income → coupons (the backdoor) <span class="value" id="lab-d-val">-0.50</span></label>
+      <input type="range" id="lab-d" min="-1.0" max="1.0" step="0.05" value="-0.50" aria-label="delta">
+      <div class="hint">Negative ⇒ wealthy stores use fewer coupons. Bias = γ · δ.</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="tag cv">Naive OLS</span>  sales ~ coupons</h3>
+      <div class="method-row"><span class="label">α̂ (slope)</span><span class="val" id="lab-naive-b">—</span></div>
+      <div class="method-row"><span class="label">SE</span><span class="val" id="lab-naive-se">—</span></div>
+      <div class="method-row"><span class="label">bias vs truth</span><span class="val" id="lab-naive-bias">—</span></div>
+      <div class="method-row"><span class="label">γ · δ (predicted OVB)</span><span class="val" id="lab-ovb">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag rigorous">FWL / Full OLS</span>  controlling for income</h3>
+      <div class="method-row"><span class="label">α̂ (FWL slope)</span><span class="val" id="lab-fwl-b">—</span></div>
+      <div class="method-row"><span class="label">SE</span><span class="val" id="lab-fwl-se">—</span></div>
+      <div class="method-row"><span class="label">bias vs truth</span><span class="val" id="lab-fwl-bias">—</span></div>
+      <div class="method-row"><span class="label">true α</span><span class="val">0.20</span></div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lab-bars"></div>
+  <div class="chart-caption">
+    Horizontal bars: naive (orange) vs FWL (teal). The vertical steel line marks the true causal effect α = 0.20.
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Sign flip.</strong> With the default γ = 0.30 and δ = −0.50, the naive slope sits well below zero while the FWL slope hugs the true 0.20. That is Simpson's paradox in one slider.</li>
+      <li><strong>OVB formula.</strong> The "γ · δ" stat predicts the bias as the product of the two backdoor coefficients. Verify by comparing it to <code>(naive α̂) − (true α)</code>: they should agree to within sampling noise.</li>
+      <li><strong>Turn off the confounding.</strong> Drag γ to 0. The naive and FWL slopes collapse to nearly identical values — without a relevant omitted variable, the two strategies agree.</li>
+      <li><strong>Sample size.</strong> Drag n up to 500. Both standard errors shrink, but the naive estimate stays biased — sampling more data does not fix a misspecified model.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="lab-reseed">Reseed random draws</button>
+      <button class="action secondary" id="lab-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: FOREST PLOT ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>The post's summary table — interactively</h2>
+  <p class="lede">
+    These six numbers come straight from the <em>Summary of results</em> table at the end of the
+    post. Every FWL variant produces a coefficient identical to the corresponding full regression —
+    that is the algebraic guarantee of the theorem. The vertical steel line marks the true DGP
+    value α = 0.20. Toggle methods to declutter.
+  </p>
+
+  <div class="card">
+    <h3>Methods</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive OLS (no controls)" checked> Naive OLS (no controls)</label>
+      <label><input type="checkbox" value="Full OLS (+ income)" checked> Full OLS (+ income)</label>
+      <label><input type="checkbox" value="FWL Step 1 (residualise X)" checked> FWL Step 1 (residualise X)</label>
+      <label><input type="checkbox" value="FWL Step 2 (residualise both)" checked> FWL Step 2 (residualise both)</label>
+      <label><input type="checkbox" value="Full OLS (+ income + day)" checked> Full OLS (+ income + day)</label>
+      <label><input type="checkbox" value="FWL (+ income + day)" checked> FWL (+ income + day)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Naive OLS sits on the wrong side of zero.</strong> Its 95% CI is the only one that crosses both signs — confounding by income flips the apparent direction.</li>
+      <li><strong>Full OLS and FWL Step 2 are visually indistinguishable.</strong> Their estimates coincide at 0.267 down to four decimal places. <em>That is the FWL identity made visible.</em></li>
+      <li><strong>FWL Step 1's CI is enormous.</strong> Hover the row: SE = 1.271. Residualising only the treatment (not the outcome) leaves income-driven sales variation in the residuals, inflating uncertainty.</li>
+      <li><strong>Adding day-of-week (last two rows) barely moves the coupon coefficient</strong> but tightens the SE — extra non-confounding controls help precision without changing the point estimate.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Why are the FWL and full-OLS estimates exactly equal?</h3>
+    <p>
+      The FWL theorem is an algebraic identity, not a statistical approximation. The OLS coefficient
+      on coupons in a regression of sales on coupons and income equals the OLS slope from
+      regressing the residual of sales on the residual of coupons — both purged of income. The
+      identity holds for any number of additional controls. The only thing the two procedures
+      disagree on is the standard error, because residualising eats degrees of freedom that the
+      one-shot regression books explicitly.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: MONTE CARLO ====================== -->
+<section id="pane-mc" class="tab-pane" role="tabpanel" aria-labelledby="tab-mc">
+
+  <h2>Monte Carlo — bias vs variance over many draws</h2>
+  <p class="lede">
+    A single sample is noisy: maybe the naive estimate was off because the random draw happened to
+    be unfair. To find out, run the whole simulation 100 times with fresh random draws and look at
+    the <em>distribution</em> of estimates. <strong>If naive OLS were merely noisy, the orange
+    histogram would centre on α = 0.20.</strong> If it is biased, it centres somewhere else.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="mc-n-val">100</span></label>
+      <input type="range" id="mc-n" min="30" max="500" step="10" value="100" aria-label="sample size n">
+      <div class="hint">Each Monte Carlo draw simulates this many stores.</div>
+    </div>
+    <div class="control">
+      <label>γ — income → sales <span class="value" id="mc-g-val">0.30</span></label>
+      <input type="range" id="mc-g" min="-0.5" max="1.0" step="0.05" value="0.30" aria-label="gamma">
+      <div class="hint">Set close to zero to make the naive estimator unbiased.</div>
+    </div>
+    <div class="control">
+      <label>δ — income → coupons <span class="value" id="mc-d-val">-0.50</span></label>
+      <input type="range" id="mc-d" min="-1.0" max="1.0" step="0.05" value="-0.50" aria-label="delta">
+      <div class="hint">Negative δ + positive γ ⇒ negative bias on the naive slope.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <button class="action" id="mc-run">Run 100 simulations</button>
+    <span id="mc-progress-label" class="note" style="margin-left:12px;"></span>
+    <div class="progress-bar" id="mc-progress"><div></div></div>
+    <div class="chart-area" id="mc-hist" style="margin-top:14px; display:none;"></div>
+    <div class="stat-row" id="mc-hist-stats" style="display:none;">
+      <div class="stat"><div class="stat-label">Naive mean α̂</div><div class="stat-value orange" id="mc-naive-mean">—</div><div class="stat-sub">bias if ≠ 0.20</div></div>
+      <div class="stat"><div class="stat-label">Naive sd(α̂)</div><div class="stat-value" id="mc-naive-sd">—</div></div>
+      <div class="stat"><div class="stat-label">FWL mean α̂</div><div class="stat-value teal" id="mc-fwl-mean">—</div></div>
+      <div class="stat"><div class="stat-label">FWL sd(α̂)</div><div class="stat-value" id="mc-fwl-sd">—</div></div>
+      <div class="stat"><div class="stat-label">Naive sign-flip rate</div><div class="stat-value orange" id="mc-naive-flip">—</div><div class="stat-sub">share of runs with α̂ &lt; 0</div></div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Two distributions, not one.</strong> The teal histogram (FWL) centres near 0.20 (true α). The orange histogram (naive) centres somewhere else — often even on the wrong side of zero.</li>
+      <li><strong>Variance vs bias.</strong> Crank n up to 500. The teal cluster tightens around 0.20 (consistent estimator). The orange cluster tightens too — but around the <em>wrong</em> value. Larger samples cannot rescue an omitted-variables model.</li>
+      <li><strong>Disable the bias.</strong> Set γ to 0 (or δ to 0). The two histograms collapse on top of each other — both centred on 0.20. The naive sign-flip rate drops to roughly its noise floor.</li>
+      <li><strong>The sign-flip stat is the headline of the post.</strong> With the default settings it is typically 40–80%: in almost half (or more) of imagined retail studies, a naive analyst would conclude coupons hurt sales.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>The FWL Theorem: Making Multivariate Regressions Intuitive</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>DoWhy Causal Inference — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'A Beginner's Guide to Causal Inference with DoWhy in Python'. Explore confounding, the back-door criterion, instrumental variables, and refutation tests through a four-tab pedagogical web app.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>DoWhy Causal Inference — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>A Beginner's Guide to Causal Inference with DoWhy in Python</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · Intro</button>
+  <button id="tab-forest"   class="tab"        data-pane="pane-forest"   role="tab" aria-selected="false">2 · Methods Showdown</button>
+  <button id="tab-sim"      class="tab"        data-pane="pane-sim"      role="tab" aria-selected="false">3 · Confounding Simulator</button>
+  <button id="tab-refute"   class="tab"        data-pane="pane-refute"   role="tab" aria-selected="false">4 · Refutation Lab</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+
+  <h2>Why are naive comparisons misleading?</h2>
+  <p class="lede">
+    Suppose a company wants to know whether working from home (WFH) improves
+    productivity. They compute the difference in average productivity between
+    WFH and office employees, get <strong>+1.39</strong> productivity points,
+    and call it a day. The catch: the true causal effect is only
+    <strong>+1.00</strong>. The naive comparison is off by 39% because
+    <em>introverts</em> both self-select into WFH and are independently more
+    productive. This app lets you build intuition for the four DoWhy steps
+    — Model, Identify, Estimate, Refute — that recover the true answer.
+  </p>
+  <p class="lede">
+    In four tabs you will: watch confounders flow along backdoor paths in the
+    DAG below, compare five estimators against a known truth (the post's
+    headline figure), tune confounder strength and see the naive estimate
+    drift while backdoor and IV estimates stay anchored, and run the same
+    three refutation tests DoWhy uses to stress-test a causal claim.
+  </p>
+
+  <div class="card">
+    <h3>The causal graph — where confounding lives</h3>
+    <p>
+      Five nodes, six arrows. Two confounders (introversion, num. children)
+      open <em>backdoor paths</em> from WFH to productivity by pointing at
+      both. The instrument (subway disruption) is special: it touches WFH
+      but not productivity. The single orange arrow is the causal effect we
+      want to estimate. Particles flow along each path so you can see the
+      bias channels in motion.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <div class="chart-caption">Backdoor paths (gray, dashed) bias the naive comparison. The instrument path (teal) bypasses them. Only the orange arrow is the true causal effect.</div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-forest">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Methods Showdown</h4>
+      <p>Five estimators on the post's real (simulated) data with the true ATE marked. Toggle methods to see which CIs cover the truth.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-sim">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Confounding Simulator</h4>
+      <p>Tune confounder strength and sample size live. Watch the naive bar drift while the backdoor and IV bars stay near 1.0.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-refute">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Refutation Lab</h4>
+      <p>Re-run DoWhy's three robustness tests — placebo, random common cause, data subset — and see why the original estimate survives.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Confounder</summary>
+        <div class="gloss-body">A variable that affects both treatment and outcome, opening a "backdoor" that biases naive comparisons. <em>Here: introversion and num. children.</em></div>
+      </details>
+      <details class="gloss"><summary>Causal graph (DAG)</summary>
+        <div class="gloss-body">A directed acyclic graph encoding which variables cause which. <em>DoWhy's "Step 1 — Model" is drawing this diagram.</em></div>
+      </details>
+      <details class="gloss"><summary>Backdoor criterion</summary>
+        <div class="gloss-body">If a set of variables blocks every backdoor path, conditioning on it identifies the causal effect. <em>Here: <code>{introversion, num_children}</code>.</em></div>
+      </details>
+      <details class="gloss"><summary>Propensity score e(x)</summary>
+        <div class="gloss-body">The conditional probability of treatment given the covariates: <em>P(T = 1 | X = x)</em>. The engine behind IPW and AIPW.</div>
+      </details>
+      <details class="gloss"><summary>IPW</summary>
+        <div class="gloss-body">Inverse-probability weighting. Reweights observations by 1/e(x) (treated) or 1/(1−e(x)) (control) to mimic a randomised experiment.</div>
+      </details>
+      <details class="gloss"><summary>Doubly Robust (AIPW)</summary>
+        <div class="gloss-body">Combines an outcome regression with the IPW reweight plus a correction. <em>Stays consistent if either the outcome or the propensity model is correct.</em></div>
+      </details>
+      <details class="gloss"><summary>Instrumental variable (IV)</summary>
+        <div class="gloss-body">A source of variation in treatment that affects the outcome only through treatment. <em>Here: subway disruption.</em> Valid even with unmeasured confounders, but noisier.</div>
+      </details>
+      <details class="gloss"><summary>Exclusion restriction</summary>
+        <div class="gloss-body">The IV assumption: the instrument has no direct effect on the outcome except through treatment. Cannot be tested from data — it is a domain claim.</div>
+      </details>
+      <details class="gloss"><summary>Refutation test</summary>
+        <div class="gloss-body">DoWhy's "Step 4". Stress-tests — placebo treatment, random common cause, data subset — that probe the estimate's stability.</div>
+      </details>
+      <details class="gloss"><summary>ATE</summary>
+        <div class="gloss-body">Average Treatment Effect. The expected difference in potential outcomes if everyone were treated vs. everyone untreated. <em>True ATE = 1.0 in our simulated DGP.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: METHODS SHOWDOWN ====================== -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+
+  <h2>Methods Showdown — five estimators, one truth</h2>
+  <p class="lede">
+    These numbers come straight from <code>estimation_results.csv</code> in
+    the post's folder — the same data behind Figure 3. The vertical blue
+    line is the <strong>true ATE = 1.0</strong>. Click checkboxes to toggle
+    methods on and off. Hover any point for the standard error, CI, bias,
+    and whether the CI covers the truth.
+  </p>
+
+  <div class="card">
+    <h3>Toggle estimators</h3>
+    <div class="method-toggle" id="fp-methods">
+      <label><input type="checkbox" value="Naive" checked> Naive (Diff. in Means)</label>
+      <label><input type="checkbox" value="Linear Regression" checked> Linear Regression</label>
+      <label><input type="checkbox" value="IPW" checked> IPW</label>
+      <label><input type="checkbox" value="Doubly Robust" checked> Doubly Robust (AIPW)</label>
+      <label><input type="checkbox" value="IV (2SLS)" checked> IV (2SLS)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="fp-chart"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">True ATE</div>
+      <div class="stat-value" id="fp-true">1.00</div>
+      <div class="stat-sub">simulated; known by construction</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">N (sample size)</div>
+      <div class="stat-value" id="fp-n">5,000</div>
+      <div class="stat-sub">simulated WFH dataset</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Methods covering truth</div>
+      <div class="stat-value teal" id="fp-cover">—</div>
+      <div class="stat-sub">out of <span id="fp-total">—</span> shown</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The Naive CI [1.245, 1.526] does not contain the true ATE.</strong> It is <em>precisely wrong</em> — a small SE around the wrong target.</li>
+      <li><strong>Three backdoor methods sit on top of the truth.</strong> Linear regression (1.0051), IPW (1.0275), and Doubly Robust (1.0115) all recover the true effect within 3%, with narrow CIs (width 0.24–0.30).</li>
+      <li><strong>IV is centered near truth but far less precise.</strong> Its CI is 1.30 wide — more than 5x the backdoor methods. Robustness to unmeasured confounders comes at the cost of variance.</li>
+      <li><strong>Hover Doubly Robust:</strong> its SE (0.0623) is nearly identical to regression's (0.0614). When both models are correct, DR achieves the semiparametric efficiency bound.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Why does the naive estimate overshoot?</h3>
+    <p>
+      In the WFH group, mean introversion is 5.19 versus 4.55 in the office
+      group, and mean num. children is 1.58 versus 1.33. Both confounders
+      push the WFH group toward higher productivity for reasons that have
+      <em>nothing to do</em> with working from home. The naive comparison
+      attributes the entire 1.39-point gap to WFH; the truth is that 0.39 of
+      it is a confounder fingerprint. Backdoor adjustment removes the
+      fingerprint by conditioning on the confounders directly. IV removes it
+      by relying only on subway-disruption-induced variation in WFH, which
+      is independent of personality and family size by construction.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: CONFOUNDING SIMULATOR ====================== -->
+<section id="pane-sim" class="tab-pane" role="tabpanel" aria-labelledby="tab-sim">
+
+  <h2>Confounding Simulator — tune the bias yourself</h2>
+  <p class="lede">
+    The post's data has confounder effects β<sub>introversion</sub> = 0.8 on
+    productivity and 0.3 on the WFH log-odds. <strong>Drag the confounder
+    sliders</strong> and watch three estimators in real time: <span class="tag ols">Naive</span>
+    drifts away from the truth as confounding grows; <span class="tag rigorous">Backdoor</span>
+    (linear regression adjusted) and <span class="tag cv">IV</span> stay
+    anchored. Each estimate ships with a 95% CI so you can also see the
+    bias-variance trade-off.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Sample size n <span class="value" id="sim-n-val">2000</span></label>
+      <input type="range" id="sim-n" min="200" max="5000" step="100" value="2000" aria-label="sample size">
+      <div class="hint">More data shrinks every CI proportionally, but the naive bias does not go away.</div>
+    </div>
+    <div class="control">
+      <label>Confounder → outcome β <span class="value" id="sim-by-val">0.80</span></label>
+      <input type="range" id="sim-by" min="0" max="2" step="0.05" value="0.80" aria-label="confounder effect on outcome">
+      <div class="hint">Direct effect of introversion on productivity. Larger ⇒ more confounding bias.</div>
+    </div>
+    <div class="control">
+      <label>Confounder → treatment β <span class="value" id="sim-bt-val">0.30</span></label>
+      <input type="range" id="sim-bt" min="0" max="1" step="0.05" value="0.30" aria-label="confounder effect on treatment">
+      <div class="hint">Log-odds coefficient: how much introversion pushes people toward WFH.</div>
+    </div>
+    <div class="control">
+      <label>Instrument strength <span class="value" id="sim-iv-val">1.00</span></label>
+      <input type="range" id="sim-iv" min="0.1" max="2" step="0.05" value="1.00" aria-label="instrument strength">
+      <div class="hint">Log-odds coefficient: how forcefully subway disruption pushes people to WFH. Below ~0.3 the IV becomes weak.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="sim-chart"></div>
+
+  <div class="grid grid-3">
+    <div class="card">
+      <h3><span class="tag ols">Naive</span></h3>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sim-naive-est">—</span></div>
+      <div class="method-row"><span class="label">SE</span><span class="val" id="sim-naive-se">—</span></div>
+      <div class="method-row"><span class="label">bias</span><span class="val" id="sim-naive-bias">—</span></div>
+      <div class="method-row"><span class="label">covers truth?</span><span class="val" id="sim-naive-cov">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag rigorous">Backdoor</span></h3>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sim-bd-est">—</span></div>
+      <div class="method-row"><span class="label">SE</span><span class="val" id="sim-bd-se">—</span></div>
+      <div class="method-row"><span class="label">bias</span><span class="val" id="sim-bd-bias">—</span></div>
+      <div class="method-row"><span class="label">covers truth?</span><span class="val" id="sim-bd-cov">—</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="tag cv">IV (2SLS)</span></h3>
+      <div class="method-row"><span class="label">α̂</span><span class="val" id="sim-iv-est">—</span></div>
+      <div class="method-row"><span class="label">SE</span><span class="val" id="sim-iv-se">—</span></div>
+      <div class="method-row"><span class="label">bias</span><span class="val" id="sim-iv-bias">—</span></div>
+      <div class="method-row"><span class="label">first-stage F</span><span class="val" id="sim-iv-f">—</span></div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Set "Confounder → outcome β" to 0.</strong> The Naive bar snaps to the truth — no confounding means no bias.</li>
+      <li><strong>Crank "Confounder → outcome β" up to 2.</strong> The Naive estimate climbs past 2; Backdoor stays near 1.0 with a tight CI; IV stays near 1.0 with a wide CI.</li>
+      <li><strong>Drop "Instrument strength" below 0.3.</strong> The first-stage F collapses and the IV CI explodes — a textbook weak-instrument failure mode.</li>
+      <li><strong>Sample size only shrinks CIs.</strong> No amount of n fixes the naive bias — confounding is identification failure, not noise.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="sim-reseed">Reseed random draws</button>
+      <button class="action secondary" id="sim-reset">Reset to post's defaults</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: REFUTATION LAB ====================== -->
+<section id="pane-refute" class="tab-pane" role="tabpanel" aria-labelledby="tab-refute">
+
+  <h2>Refutation Lab — does the estimate survive a stress test?</h2>
+  <p class="lede">
+    DoWhy's "Step 4 — Refute" runs automated stress tests. <strong>Placebo
+    treatment</strong> permutes the treatment label and re-estimates (a good
+    estimator should now return zero). <strong>Random common cause</strong>
+    adds an irrelevant fake confounder (the estimate should not move).
+    <strong>Data subset</strong> drops 20% of the data at random (the estimate
+    should stay close). All three results below are from the post's actual
+    refutation run on the linear-regression estimate of 1.005.
+  </p>
+
+  <div class="chart-area" id="refute-chart"></div>
+
+  <div class="grid grid-3">
+    <div class="card">
+      <h3>1 · Placebo Treatment</h3>
+      <p class="note" style="margin:0 0 10px;">Permute the treatment column 100 times and re-estimate. A real causal effect should collapse to zero.</p>
+      <div class="method-row"><span class="label">original α̂</span><span class="val">1.0051</span></div>
+      <div class="method-row"><span class="label">new effect</span><span class="val" style="color:var(--teal)">−0.00003</span></div>
+      <div class="method-row"><span class="label">p-value</span><span class="val">0.96</span></div>
+      <div class="method-row"><span class="label">verdict</span><span class="val" style="color:var(--teal)">PASS</span></div>
+    </div>
+    <div class="card">
+      <h3>2 · Random Common Cause</h3>
+      <p class="note" style="margin:0 0 10px;">Add a randomly generated extra confounder. A robust estimate should not move.</p>
+      <div class="method-row"><span class="label">original α̂</span><span class="val">1.0051</span></div>
+      <div class="method-row"><span class="label">new effect</span><span class="val" style="color:var(--teal)">1.0051</span></div>
+      <div class="method-row"><span class="label">p-value</span><span class="val">0.98</span></div>
+      <div class="method-row"><span class="label">verdict</span><span class="val" style="color:var(--teal)">PASS</span></div>
+    </div>
+    <div class="card">
+      <h3>3 · Data Subset (80%)</h3>
+      <p class="note" style="margin:0 0 10px;">Re-estimate on a random 80% subsample, 100 times. A stable estimate should not drift.</p>
+      <div class="method-row"><span class="label">original α̂</span><span class="val">1.0051</span></div>
+      <div class="method-row"><span class="label">new effect</span><span class="val" style="color:var(--teal)">0.9988</span></div>
+      <div class="method-row"><span class="label">p-value</span><span class="val">0.64</span></div>
+      <div class="method-row"><span class="label">verdict</span><span class="val" style="color:var(--teal)">PASS</span></div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>How to read these tests</h4>
+    <ul>
+      <li><strong>Placebo collapses to zero</strong> (−0.00003). If a method "found" an effect on a randomly permuted treatment, you would not trust it on the real one. Ours did not.</li>
+      <li><strong>Random common cause leaves the estimate unchanged.</strong> A fragile estimate would bounce when extra variables enter the regression; ours is anchored.</li>
+      <li><strong>Data subset is essentially the same number.</strong> A sample-driven artefact would shift under resampling; ours does not.</li>
+      <li><strong>Refutation is necessary but not sufficient.</strong> Tests can fail to detect violation of the exclusion restriction or omitted-confounder bias. Pair them with domain judgment.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Connecting back to the post</h3>
+    <p>
+      The four DoWhy steps map to the four tabs:
+      <strong>Model</strong> (Tab 1's DAG) →
+      <strong>Identify</strong> (Tab 2 — backdoor for the first three methods, IV for the fourth) →
+      <strong>Estimate</strong> (Tab 2's point estimates; Tab 3's tunable version) →
+      <strong>Refute</strong> (Tab 4). Each step constrains the next: a wrong DAG breaks identification; a missed confounder breaks the backdoor estimate; a violated exclusion restriction breaks IV; a brittle estimate fails refutation. The transparency is the contribution.
+    </p>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>A Beginner's Guide to Causal Inference with DoWhy in Python</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
