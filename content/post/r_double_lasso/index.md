@@ -18,6 +18,10 @@ links:
   icon_pack: fas
   name: "Web app"
   url: web_app/index.html
+- icon: comments
+  icon_pack: fas
+  name: "Chat with AI"
+  url: "https://www.perplexity.ai/?q=Please%20read%20this%20blog%20post%20and%20help%20me%20discuss%20its%20content%3A%20https%3A%2F%2Fcarlos-mendez.org%2Fpost%2Fr_double_lasso%2F"
 - icon: code
   icon_pack: fas
   name: "R script"
