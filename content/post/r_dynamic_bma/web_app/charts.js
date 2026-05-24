@@ -633,7 +633,10 @@
   // ------------------------------------------------------------------
   function pip_forest(container) {
     const W = 880;
-    const margin = { top: 36, right: 20, bottom: 44, left: 140 };
+    // Bigger top margin so the global title doesn't collide with the per-panel
+    // prior headers, and bigger bottom margin so the threshold legend below the
+    // axis has room.
+    const margin = { top: 64, right: 20, bottom: 64, left: 140 };
     const facetGap = 26;
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 460`)
@@ -693,6 +696,24 @@
           .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
         facet.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
+        // On the leftmost facet only, annotate each threshold line with a
+        // tier label below the axis so users can identify dashed/solid lines
+        // without consulting the "Reading the chart" card.
+        if (oi === 0) {
+          [
+            { thr: 0.5,  txt: "0.50",  color: C.muted },
+            { thr: 0.75, txt: "0.75",  color: C.muted },
+            { thr: 0.95, txt: "0.95",  color: C.teal  },
+          ].forEach(t => {
+            facet.append("text")
+              .attr("x", x(t.thr)).attr("y", facetH + 30)
+              .attr("text-anchor", "middle")
+              .attr("fill", t.color).attr("font-size", 9)
+              .attr("font-style", "italic")
+              .text(t.txt);
+          });
+        }
+
         if (oi === 0) {
           outcomes.forEach(name => {
             svg.append("text").attr("class", "facet")
@@ -743,8 +764,10 @@
   //   under the user's chosen prior. Coloured by evidence tier.
   // ------------------------------------------------------------------
   function pip_bars(container) {
-    const W = 820, H = 360;
-    const margin = { top: 36, right: 28, bottom: 56, left: 130 };
+    // Right margin big enough to fit "0.990  (+)" labels past the longest bar;
+    // top margin big enough for threshold tier labels above the plot area.
+    const W = 880, H = 400;
+    const margin = { top: 56, right: 90, bottom: 56, left: 140 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -764,7 +787,9 @@
           .attr("stroke", k === 2 ? C.teal : C.faint)
           .attr("stroke-width", k === 2 ? 1.5 : 1)
           .attr("stroke-dasharray", k === 0 ? "2 4" : (k === 1 ? "4 4" : null));
-        g.append("text").attr("x", x(thr)).attr("y", -8)
+        // Threshold tier label — sits well above the plot to avoid colliding
+        // with the topmost bar.
+        g.append("text").attr("x", x(thr)).attr("y", -16)
           .attr("text-anchor", "middle")
           .attr("fill", k === 2 ? C.teal : C.muted)
           .attr("font-size", 10)
@@ -780,8 +805,11 @@
           .attr("x", 0).attr("y", y(r.label))
           .attr("width", x(r.pip)).attr("height", y.bandwidth())
           .attr("fill", color).attr("opacity", 0.85).attr("rx", 3);
+        // PIP value + sign labels: clamp so the longest "0.998  (+)" stays
+        // inside the right margin. Width budget ≈ 60px past the bar's end.
+        const lblX = Math.min(x(r.pip) + 6, w + 6);
         g.append("text")
-          .attr("x", x(r.pip) + 6).attr("y", y(r.label) + y.bandwidth() / 2 + 4)
+          .attr("x", lblX).attr("y", y(r.label) + y.bandwidth() / 2 + 4)
           .attr("fill", C.text).attr("font-size", 11)
           .text(r.pip.toFixed(3) + (r.sign ? "  (" + r.sign + ")" : ""));
         g.append("text")
@@ -824,8 +852,11 @@
       const y = d3.scaleBand().domain(vars).range([0, cell * vars.length]).padding(0.02);
 
       const vmax = d3.max(pairs, d => d.value) || 1;
+      // Palette-consistent ramp: dark navy -> steel blue -> teal -> warm orange
+      // (site warm-accent), so we stay on-brand without introducing a pale
+      // yellow that clashes with the dark theme tokens.
       const color = d3.scaleSequential(d3.interpolateRgbBasis([
-        C.bg, C.steel, C.teal, "#fff8c8",
+        C.bg, C.steel, C.teal, C.orange,
       ])).domain([0, Math.max(0.5, vmax)]);
 
       const lookup = new Map();
