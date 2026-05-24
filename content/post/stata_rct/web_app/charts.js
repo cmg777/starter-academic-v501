@@ -680,7 +680,10 @@
     g.append("line").attr("class", "truth").attr("x1", x(0.12)).attr("x2", x(0.12))
       .attr("y1", 0).attr("y2", h)
       .attr("stroke", C.teal).attr("stroke-width", 2).attr("stroke-dasharray", "5 4");
-    g.append("text").attr("class", "truth-lbl").attr("x", x(0.12) + 4).attr("y", 12)
+    // Anchor the truth label LEFT of the line so it never collides with the
+    // top-right legend box.
+    g.append("text").attr("class", "truth-lbl").attr("x", x(0.12) - 5).attr("y", 12)
+      .attr("text-anchor", "end")
       .attr("fill", C.teal).attr("font-size", 11).text("true α = 0.12");
 
     function pdf(mean, sd) {
