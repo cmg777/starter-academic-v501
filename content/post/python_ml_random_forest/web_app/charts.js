@@ -35,8 +35,8 @@
   //   sweeps from 0 to a large value. L1 hits zero abruptly; L2 only decays.
   // ------------------------------------------------------------------
   function l1_vs_l2_animation(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    const W = 720, H = 340;
+    const margin = { top: 48, right: 28, bottom: 44, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -79,13 +79,13 @@
     g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
     g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-l2");
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
+    // Legend — placed in the top margin (outside the plot area) to avoid
+    // overlapping the L1/L2 curves at small λ.
+    const lg = svg.append("g").attr("transform", `translate(${margin.left + 4},${4})`);
+    lg.append("circle").attr("cx", 8).attr("cy", 12).attr("r", 5).attr("fill", C.orange);
+    lg.append("text").attr("x", 20).attr("y", 16).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
+    lg.append("circle").attr("cx", 220).attr("cy", 12).attr("r", 5).attr("fill", C.steel);
+    lg.append("text").attr("x", 232).attr("y", 16).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
 
     const moving_l1 = g.select("#anim-l1");
     const moving_l2 = g.select("#anim-l2");
@@ -231,6 +231,12 @@
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
     const colorMap = {
+      // Random Forest methods (current data).
+      "Baseline RF": C.steel,
+      "Tuned RF":    C.orange,
+      "Baseline CV": "#9bdcc3",
+      "Tuned CV":    C.teal,
+      // Back-compat with the double-LASSO template.
       "First diff":    C.steel,
       "OLS (full)":    C.muted,
       "PSL":           "#9bdcc3",
@@ -241,8 +247,8 @@
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
     function update(data, activeMethods, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const methods = activeMethods.length ? activeMethods : ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : ["Test R²", "Test RMSE", "Test MAE"];
+      const methods = activeMethods.length ? activeMethods : ["Baseline RF", "Tuned RF", "Baseline CV", "Tuned CV"];
 
       // Filter data.
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
@@ -323,11 +329,11 @@
           g.on("mousemove", function (ev) {
             const rect = container.getBoundingClientRect();
             tooltip.html(
-              `<div><strong style="color:${colorMap[d.method]}">${d.method}</strong></div>` +
-              `<div><span class='tooltip-key'>α̂ =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
+              `<div><strong style="color:${colorMap[d.method] || C.text}">${d.method}</strong> · ${d.outcome}</div>` +
+              `<div><span class='tooltip-key'>estimate =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>SE =</span> <span class='tooltip-val'>${d.se.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>95% CI =</span> <span class='tooltip-val'>[${d.ci_lo.toFixed(3)}, ${d.ci_hi.toFixed(3)}]</span></div>` +
-              `<div><span class='tooltip-key'>controls used =</span> <span class='tooltip-val'>${d.n_selected === null ? "0 (no controls)" : d.n_selected}</span></div>`
+              `<div><span class='tooltip-key'>n_estimators =</span> <span class='tooltip-val'>${d.n_selected === null ? "—" : d.n_selected}</span></div>`
             )
             .classed("show", true)
             .style("left", (ev.clientX - rect.left + 12) + "px")
@@ -352,8 +358,22 @@
       .attr("preserveAspectRatio", "xMidYMid meet");
 
     function update(data, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : ["Test R²", "Test RMSE", "Test MAE"];
       const subset = data.filter(d => outcomes.includes(d.outcome));
+      // Discover methods from the data (data-driven) rather than hardcoding.
+      const methodSet = new Set(subset.map(d => d.method));
+      const methods = Array.from(methodSet);
+      // Total candidate features (post: 64 satellite-embedding dimensions).
+      const totalFeatures = d3.max(subset, d => d.n_union) || 64;
+      const colorByMethod = {
+        "Baseline RF": C.steel,
+        "Tuned RF":    C.orange,
+        "Baseline CV": "#9bdcc3",
+        "Tuned CV":    C.teal,
+        "DL (CV)":     C.orange,
+        "DL (rigorous)": C.teal,
+      };
+
       const nFacets = outcomes.length;
       const facetGap = 24;
       const facetW = (W - margin.left - margin.right - (nFacets - 1) * facetGap) / nFacets;
@@ -368,8 +388,8 @@
           .attr("transform", `translate(${margin.left + oi * (facetW + facetGap)},${margin.top})`);
         const sub = subset.filter(d => d.outcome === outcome);
         const max = d3.max(sub, d => d.n_union) || 1;
-        const x = d3.scaleBand().domain(["DL (rigorous)", "DL (CV)"]).range([0, facetW]).padding(0.45);
-        const y = d3.scaleLinear().domain([0, max * 1.1]).range([facetH, 0]);
+        const x = d3.scaleBand().domain(methods).range([0, facetW]).padding(0.35);
+        const y = d3.scaleLinear().domain([0, Math.max(max * 1.15, 1)]).range([facetH, 0]);
 
         facet.append("text").attr("x", facetW / 2).attr("y", -8)
           .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13)
@@ -384,17 +404,18 @@
           facet.append("text")
             .attr("transform", `rotate(-90) translate(${-facetH / 2},${-44})`)
             .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 11)
-            .text("Controls selected (out of 284)");
+            .text(`Features in play (out of ${totalFeatures})`);
         }
         facet.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
         sub.forEach(d => {
           const xc = x(d.method);
+          if (xc === undefined) return;
           const w  = x.bandwidth();
           facet.append("rect")
             .attr("x", xc).attr("y", y(d.n_union))
             .attr("width", w).attr("height", facetH - y(d.n_union))
-            .attr("fill", d.method === "DL (CV)" ? C.orange : C.teal)
+            .attr("fill", colorByMethod[d.method] || C.steel)
             .attr("opacity", 0.85);
           facet.append("text")
             .attr("x", xc + w / 2).attr("y", y(d.n_union) - 4)
