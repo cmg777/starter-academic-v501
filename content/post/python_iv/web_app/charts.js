@@ -587,14 +587,22 @@
     arrow({ x: X.x + 28, y: X.y }, { x: Y.x - 28, y: Y.y }, C.teal, null, "arrow-teal", 2.5);
     arrow({ x: U.x - 30, y: U.y + 18 }, { x: X.x + 8, y: X.y - 32 }, C.muted, "4 4", "arrow-muted", 1.8);
     arrow({ x: U.x + 30, y: U.y + 18 }, { x: Y.x - 8, y: Y.y - 32 }, C.muted, "4 4", "arrow-muted", 1.8);
-    svg.append("line")
-      .attr("x1", Z.x + 18).attr("y1", Z.y - 16)
-      .attr("x2", Y.x - 18).attr("y2", Y.y - 16)
+    // Forbidden Z -> Y arrow: arc above the nodes (curved up) so it never
+    // crosses the X node circle (centre y=200, radius 28 -> top edge y=172).
+    // Apex of the arc sits well above the X circle, with the label even
+    // higher so neither the text nor the line overlap any node.
+    const arcStart = { x: Z.x + 18, y: Z.y - 22 };
+    const arcEnd   = { x: Y.x - 18, y: Y.y - 22 };
+    const arcApexY = 130; // safely above X-node top edge (172)
+    const arcPath = `M ${arcStart.x},${arcStart.y} Q ${X.x},${arcApexY} ${arcEnd.x},${arcEnd.y}`;
+    svg.append("path")
+      .attr("d", arcPath)
+      .attr("fill", "none")
       .attr("stroke", "#e76b6b").attr("stroke-width", 2)
       .attr("stroke-dasharray", "6 6")
       .attr("marker-end", "url(#arrow-red)");
     svg.append("text")
-      .attr("x", (Z.x + Y.x) / 2).attr("y", Z.y - 22)
+      .attr("x", X.x).attr("y", arcApexY - 8)
       .attr("text-anchor", "middle").attr("fill", "#e76b6b").attr("font-size", 11)
       .attr("font-style", "italic")
       .text("exclusion restriction: this arrow MUST NOT exist");
@@ -612,10 +620,12 @@
     }
     node(Z); node(X); node(Y); node(U);
 
-    svg.append("text").attr("x", (Z.x + X.x) / 2).attr("y", X.y - 10)
+    // Edge labels sit BELOW the horizontal arrows (clear of the curved red
+    // arc above and the node circles), so neither overlaps the data lines.
+    svg.append("text").attr("x", (Z.x + X.x) / 2).attr("y", X.y + 18)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 11)
       .text("first stage (relevance ✓)");
-    svg.append("text").attr("x", (X.x + Y.x) / 2).attr("y", Y.y - 10)
+    svg.append("text").attr("x", (X.x + Y.x) / 2).attr("y", Y.y + 18)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 11)
       .text("causal effect β");
 
@@ -645,8 +655,11 @@
   // OLS vs IV scatter+lines (Tab 2 instrument-strength slider).
   // ------------------------------------------------------------------
   function ols_vs_iv_chart(container) {
-    const W = 720, H = 360;
-    const margin = { top: 18, right: 24, bottom: 44, left: 56 };
+    // Extra bottom margin reserves room for a legend strip BELOW the x-axis
+    // label, so the per-line slope readouts never overlap the regression
+    // lines themselves (esp. when IV slope is near-vertical under weak π).
+    const W = 720, H = 400;
+    const margin = { top: 18, right: 24, bottom: 84, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -656,6 +669,7 @@
     const yAxisG = g.append("g");
     const pointsG = g.append("g").attr("class", "pts");
     const linesG  = g.append("g").attr("class", "lines");
+    const legendG = g.append("g").attr("class", "legend");
 
     g.append("text").attr("x", w / 2).attr("y", h + 36)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
@@ -691,21 +705,45 @@
 
       linesG.selectAll("*").remove();
       const xMin = xExt[0] - xPad, xMax = xExt[1] + xPad;
-      function drawLine(slope, intercept, color, width, dash, label, labelY) {
+      function drawLine(slope, intercept, color, width, dash) {
         linesG.append("line")
           .attr("x1", x(xMin)).attr("x2", x(xMax))
           .attr("y1", y(intercept + slope * xMin)).attr("y2", y(intercept + slope * xMax))
           .attr("stroke", color).attr("stroke-width", width)
           .attr("stroke-dasharray", dash || null);
-        linesG.append("text").attr("x", w - 6).attr("y", labelY)
-          .attr("text-anchor", "end").attr("fill", color).attr("font-size", 12)
-          .attr("font-weight", 600).text(label);
       }
       const meanX = d3.mean(xVals), meanY = d3.mean(yVals);
       const trueInt = meanY - beta_true * meanX;
-      drawLine(beta_true, trueInt, C.muted, 2, "4 4", `true β = ${beta_true.toFixed(2)}`, 14);
-      drawLine(ols_slope, ols_int, C.orange, 2.5, null, `OLS β̂ = ${ols_slope.toFixed(3)}`, 30);
-      drawLine(iv_slope,  iv_int,  C.teal,   2.5, null, `IV β̂ = ${iv_slope.toFixed(3)}`,  46);
+      drawLine(beta_true, trueInt, C.muted, 2, "4 4");
+      drawLine(ols_slope, ols_int, C.orange, 2.5, null);
+      drawLine(iv_slope,  iv_int,  C.teal,   2.5, null);
+
+      // ----- Legend strip OUTSIDE the plot area (below x-axis label) -----
+      legendG.selectAll("*").remove();
+      const entries = [
+        { color: C.muted,  dash: "4 4", text: `true β = ${beta_true.toFixed(2)}` },
+        { color: C.orange, dash: null,  text: `OLS β̂ = ${ols_slope.toFixed(3)}` },
+        { color: C.teal,   dash: null,  text: `IV β̂ = ${iv_slope.toFixed(3)}`   },
+      ];
+      const legendY = h + 56; // sits below the "X (endogenous…)" axis label at y=h+36
+      const swatchW = 22, gapAfterSwatch = 6, gapBetween = 22;
+      // Estimate per-entry pixel widths (approximate by char count).
+      const charW = 6.8;
+      const widths = entries.map(e => swatchW + gapAfterSwatch + e.text.length * charW);
+      const totalW = widths.reduce((a, b) => a + b, 0) + gapBetween * (entries.length - 1);
+      let cursor = (w - totalW) / 2;
+      entries.forEach((e, i) => {
+        legendG.append("line")
+          .attr("x1", cursor).attr("x2", cursor + swatchW)
+          .attr("y1", legendY).attr("y2", legendY)
+          .attr("stroke", e.color).attr("stroke-width", 2.5)
+          .attr("stroke-dasharray", e.dash || null);
+        legendG.append("text")
+          .attr("x", cursor + swatchW + gapAfterSwatch).attr("y", legendY + 4)
+          .attr("fill", e.color).attr("font-size", 12).attr("font-weight", 600)
+          .text(e.text);
+        cursor += widths[i] + gapBetween;
+      });
     }
     return { update };
   }
@@ -749,7 +787,10 @@
 
       g.append("line").attr("x1", x(data.beta_true)).attr("x2", x(data.beta_true))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.beta_true) + 4).attr("y", 12)
+      // Lift label OUTSIDE the plot area (negative y, into the top margin)
+      // so it never overlaps histogram bars or the y-axis "0" tick.
+      g.append("text").attr("x", x(data.beta_true)).attr("y", -6)
+        .attr("text-anchor", "middle")
         .attr("fill", C.steel).attr("font-size", 11)
         .text(`true β = ${data.beta_true.toFixed(2)}`);
 
