@@ -231,18 +231,15 @@
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
     const colorMap = {
-      "First diff":    C.steel,
-      "OLS (full)":    C.muted,
-      "PSL":           "#9bdcc3",
-      "DL (rigorous)": C.teal,
-      "DL (CV)":       C.orange,
+      "Global OLS":     C.orange,
+      "MGWR (median)":  C.teal,
     };
 
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
     function update(data, activeMethods, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const methods = activeMethods.length ? activeMethods : ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : ["Convergence β", "Model fit R²", "AICc (lower=better)"];
+      const methods = activeMethods.length ? activeMethods : ["Global OLS", "MGWR (median)"];
 
       // Filter data.
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
@@ -322,12 +319,18 @@
 
           g.on("mousemove", function (ev) {
             const rect = container.getBoundingClientRect();
+            const ciLabel = d.method === "MGWR (median)"
+              ? "local range ="
+              : "95% CI =";
+            const nLabel = d.method === "MGWR (median)"
+              ? "effective bandwidth ="
+              : "districts (n) =";
             tooltip.html(
-              `<div><strong style="color:${colorMap[d.method]}">${d.method}</strong></div>` +
-              `<div><span class='tooltip-key'>α̂ =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
+              `<div><strong style="color:${colorMap[d.method] || C.text}">${d.method}</strong></div>` +
+              `<div><span class='tooltip-key'>estimate =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>SE =</span> <span class='tooltip-val'>${d.se.toFixed(4)}</span></div>` +
-              `<div><span class='tooltip-key'>95% CI =</span> <span class='tooltip-val'>[${d.ci_lo.toFixed(3)}, ${d.ci_hi.toFixed(3)}]</span></div>` +
-              `<div><span class='tooltip-key'>controls used =</span> <span class='tooltip-val'>${d.n_selected === null ? "0 (no controls)" : d.n_selected}</span></div>`
+              `<div><span class='tooltip-key'>${ciLabel}</span> <span class='tooltip-val'>[${d.ci_lo.toFixed(3)}, ${d.ci_hi.toFixed(3)}]</span></div>` +
+              `<div><span class='tooltip-key'>${nLabel}</span> <span class='tooltip-val'>${d.n_selected}</span></div>`
             )
             .classed("show", true)
             .style("left", (ev.clientX - rect.left + 12) + "px")
@@ -422,8 +425,8 @@
     function update(data) {
       g.selectAll("*").remove();
       const labels = [
-        { name: "DL (CV)",       v: data.cv,       color: C.orange },
-        { name: "DL (rigorous)", v: data.rigorous, color: C.teal   },
+        { name: "Global (OLS-style)", v: data.cv,       color: C.orange },
+        { name: "Local (MGWR-style)", v: data.rigorous, color: C.teal   },
       ];
       const allVals = labels.map(d => d.v).concat([data.alpha_true, 0]);
       const ext = d3.extent(allVals);
@@ -435,13 +438,15 @@
       // Zero line.
       g.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", h)
         .attr("stroke", C.faint).attr("stroke-dasharray", "3 4");
-      // True alpha line.
+      // True β line + clamped, centred label so it never spills off the edges.
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", -8)
+      const trueX = Math.min(Math.max(x(data.alpha_true), 50), w - 50);
+      g.append("text").attr("x", trueX).attr("y", -8)
+        .attr("text-anchor", "middle")
         .attr("fill", C.steel).attr("font-size", 11)
-        .text(`true α = ${data.alpha_true.toFixed(2)}`);
+        .text(`true β = ${data.alpha_true.toFixed(2)}`);
 
       // Axes.
       g.append("g").attr("transform", `translate(0,${h})`)
@@ -479,8 +484,10 @@
   //   alpha_true: number
   // ------------------------------------------------------------------
   function alpha_histograms(container) {
-    const W = 720, H = 260;
-    const margin = { top: 18, right: 24, bottom: 38, left: 50 };
+    const W = 720, H = 280;
+    // Larger top margin reserves space for the "true β" label so it cannot
+    // overlap with tall histogram bars in the upper-left of the plot.
+    const margin = { top: 38, right: 24, bottom: 38, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -512,10 +519,17 @@
       drawBars(binsC, C.orange, 0.65);
       drawBars(binsR, C.teal,   0.85);
 
+      // True-β reference line + label placed ABOVE the plot area so it
+      // cannot overlap histogram bars.
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", 10)
-        .attr("fill", C.steel).attr("font-size", 11).text(`true α = ${data.alpha_true.toFixed(2)}`);
+      const trueX = Math.min(Math.max(x(data.alpha_true), 60), w - 60);
+      g.append("text")
+        .attr("x", trueX)
+        .attr("y", -10)
+        .attr("text-anchor", "middle")
+        .attr("fill", C.steel).attr("font-size", 11)
+        .text(`true β = ${data.alpha_true.toFixed(2)}`);
 
       g.append("g").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format(".2f")))
@@ -525,7 +539,30 @@
       g.selectAll(".domain, .tick line").attr("stroke", C.muted);
       g.append("text").attr("transform", `translate(${w / 2},${h + 32})`)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
-        .text("Estimated α̂ across 100 simulated datasets");
+        .text("Estimated β̂ across 100 simulated datasets");
+
+      // Legend — placed inside the plot in the top-right corner on a
+      // translucent dark-blue rect so it never visually mixes with bars.
+      const legW = 168, legH = 44;
+      const legX = w - legW - 4;
+      const legY = 4;
+      const lg = g.append("g").attr("transform", `translate(${legX},${legY})`);
+      lg.append("rect")
+        .attr("width", legW).attr("height", legH)
+        .attr("fill", "rgba(15,23,41,0.78)")
+        .attr("stroke", C.line).attr("rx", 6);
+      // Local (teal)
+      lg.append("rect").attr("x", 10).attr("y", 8).attr("width", 14).attr("height", 10)
+        .attr("fill", C.teal).attr("opacity", 0.85);
+      lg.append("text").attr("x", 30).attr("y", 17)
+        .attr("fill", C.text).attr("font-size", 11)
+        .text("Local (MGWR-style) β̂");
+      // Global (orange)
+      lg.append("rect").attr("x", 10).attr("y", 26).attr("width", 14).attr("height", 10)
+        .attr("fill", C.orange).attr("opacity", 0.65);
+      lg.append("text").attr("x", 30).attr("y", 35)
+        .attr("fill", C.text).attr("font-size", 11)
+        .text("Global (OLS-style) β̂");
     }
     return { update };
   }

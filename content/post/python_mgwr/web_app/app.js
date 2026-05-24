@@ -58,7 +58,6 @@
     let nz = 0;
     for (let j = 0; j < beta.length; j++) if (Math.abs(beta[j]) > 1e-9) nz++;
     document.getElementById("lab-stat-nz").textContent = nz;
-    document.getElementById("lab-stat-p").textContent = lab.p;
     document.getElementById("lab-stat-alpha-l").textContent = beta[0].toFixed(3);
 
     // Post-OLS on selected support (including treatment column 0 always).
