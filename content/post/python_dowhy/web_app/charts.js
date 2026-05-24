@@ -865,7 +865,10 @@
   // ------------------------------------------------------------------
   function refutation_bars(container) {
     const W = 800;
-    const margin = { top: 30, right: 36, bottom: 40, left: 180 };
+    // margin.right enlarged from 36 to 140 so that numeric labels placed
+    // beyond the end of the longest bar (e.g. "refuted = $1,728") fit
+    // entirely inside the viewBox instead of being clipped.
+    const margin = { top: 30, right: 140, bottom: 40, left: 180 };
     const facetH = 60;
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 380`)
@@ -902,6 +905,15 @@
         .attr("y1", margin.top).attr("y2", margin.top + facetH * tests.length)
         .attr("stroke", C.faint).attr("stroke-dasharray", "3 4");
 
+      // Label-collision threshold in pixels — if the two annotations would
+      // sit within this distance of each other on the x-axis, render a
+      // single combined "original ≈ refuted" label instead of two
+      // overlapping ones.
+      const COLLISION_PX = 80;
+      // Pad annotation labels by 10 px (was 6) so small-value bars like
+      // the placebo "$62" don't sit flush against the bar end.
+      const LABEL_PAD = 10;
+
       tests.forEach((d, i) => {
         const yTop = margin.top + i * facetH;
         const row = svg.append("g").attr("class", "row");
@@ -918,32 +930,56 @@
         // Bars: original (orange, top), new (teal, bottom).
         const barH = 16;
         const x0 = x(0);
+        const xOrig = x(d.original_effect);
+        const xNew = x(d.new_effect);
+        const overlap = Math.abs(xOrig - xNew) < COLLISION_PX;
 
         // Original
-        const xOrig = x(d.original_effect);
         const origRect = row.append("rect")
           .attr("x", Math.min(x0, xOrig)).attr("y", yTop + 8)
           .attr("width", Math.abs(xOrig - x0)).attr("height", barH)
           .attr("fill", C.orange).attr("opacity", 0.85)
           .style("cursor", "pointer");
-        row.append("text").attr("x", xOrig + (xOrig >= x0 ? 6 : -6))
-          .attr("y", yTop + 8 + barH / 2 + 4)
-          .attr("text-anchor", xOrig >= x0 ? "start" : "end")
-          .attr("fill", C.text).attr("font-size", 11)
-          .text(`original = $${d3.format(",.0f")(d.original_effect)}`);
+        // When the two estimates collide, show a single combined label
+        // centred between the bar pair (suppress the individual labels).
+        // Otherwise place each label at the end of its bar with padding.
+        if (!overlap) {
+          row.append("text").attr("x", xOrig + (xOrig >= x0 ? LABEL_PAD : -LABEL_PAD))
+            .attr("y", yTop + 8 + barH / 2 + 4)
+            .attr("text-anchor", xOrig >= x0 ? "start" : "end")
+            .attr("fill", C.text).attr("font-size", 11)
+            .text(`original = $${d3.format(",.0f")(d.original_effect)}`);
+        }
 
         // New
-        const xNew = x(d.new_effect);
         const newRect = row.append("rect")
           .attr("x", Math.min(x0, xNew)).attr("y", yTop + 8 + barH + 4)
           .attr("width", Math.abs(xNew - x0)).attr("height", barH)
           .attr("fill", C.teal).attr("opacity", 0.85)
           .style("cursor", "pointer");
-        row.append("text").attr("x", xNew + (xNew >= x0 ? 6 : -6))
-          .attr("y", yTop + 8 + barH + 4 + barH / 2 + 4)
-          .attr("text-anchor", xNew >= x0 ? "start" : "end")
-          .attr("fill", C.text).attr("font-size", 11)
-          .text(`refuted = $${d3.format(",.0f")(d.new_effect)}`);
+        if (!overlap) {
+          row.append("text").attr("x", xNew + (xNew >= x0 ? LABEL_PAD : -LABEL_PAD))
+            .attr("y", yTop + 8 + barH + 4 + barH / 2 + 4)
+            .attr("text-anchor", xNew >= x0 ? "start" : "end")
+            .attr("fill", C.text).attr("font-size", 11)
+            .text(`refuted = $${d3.format(",.0f")(d.new_effect)}`);
+        } else {
+          // Combined label, vertically centred between the two bars. If
+          // the two values round to the same integer we use "≈"; if they
+          // differ at the dollar level we render "$A → $B" so the
+          // direction of the perturbation is preserved.
+          const xCombined = Math.max(xOrig, xNew);
+          const origRound = d3.format(",.0f")(d.original_effect);
+          const newRound  = d3.format(",.0f")(d.new_effect);
+          const labelText = (origRound === newRound)
+            ? `original ≈ refuted = $${origRound}`
+            : `original $${origRound} → refuted $${newRound}`;
+          row.append("text").attr("x", xCombined + LABEL_PAD)
+            .attr("y", yTop + 8 + barH + 2)
+            .attr("text-anchor", "start")
+            .attr("fill", C.text).attr("font-size", 11)
+            .text(labelText);
+        }
 
         // Tooltip on hover (either bar).
         [origRect, newRect].forEach(r => {
