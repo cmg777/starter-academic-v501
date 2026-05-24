@@ -35,8 +35,10 @@
   //   sweeps from 0 to a large value. L1 hits zero abruptly; L2 only decays.
   // ------------------------------------------------------------------
   function l1_vs_l2_animation(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    // Extra bottom margin reserved for the legend, placed BELOW the x-axis
+    // so neither the L1 nor L2 curves can overlap it.
+    const W = 720, H = 360;
+    const margin = { top: 28, right: 28, bottom: 88, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -79,13 +81,18 @@
     g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
     g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-l2");
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
+    // Legend — placed BELOW the x-axis label, outside the plot area.
+    // Centered horizontally so it cannot overlap either curve.
+    const lgW = 460, lgH = 26;
+    const lg = g.append("g")
+      .attr("transform", `translate(${(w - lgW) / 2},${h + 52})`);
+    lg.append("rect")
+      .attr("width", lgW).attr("height", lgH)
+      .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+    lg.append("circle").attr("cx", 14).attr("cy", lgH / 2).attr("r", 5).attr("fill", C.orange);
+    lg.append("text").attr("x", 26).attr("y", lgH / 2 + 4).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
+    lg.append("circle").attr("cx", 234).attr("cy", lgH / 2).attr("r", 5).attr("fill", C.steel);
+    lg.append("text").attr("x", 246).attr("y", lgH / 2 + 4).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
 
     const moving_l1 = g.select("#anim-l1");
     const moving_l2 = g.select("#anim-l2");
@@ -514,8 +521,11 @@
 
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", 10)
-        .attr("fill", C.steel).attr("font-size", 11).text(`true α = ${data.alpha_true.toFixed(2)}`);
+      // Label placed ABOVE the plot top so it never overlaps any bar.
+      g.append("text").attr("x", x(data.alpha_true)).attr("y", -6)
+        .attr("text-anchor", "middle")
+        .attr("fill", C.steel).attr("font-size", 11).attr("font-weight", 600)
+        .text(`true α = ${data.alpha_true.toFixed(2)}`);
 
       g.append("g").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format(".2f")))

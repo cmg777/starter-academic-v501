@@ -46,7 +46,9 @@
     const container = document.getElementById("fp-chart");
     container.innerHTML = "";
     const W = 880;
-    const margin = { top: 28, right: 32, bottom: 44, left: 240 };
+    // bottom margin reserves room for x-axis ticks + x-axis label + legend,
+    // each on its own vertical band so they cannot overlap.
+    const margin = { top: 28, right: 32, bottom: 96, left: 240 };
     const rows = estimates.filter(d => activeMethods.includes(d.method));
     const rowH = 34;
     const H = margin.top + margin.bottom + rowH * Math.max(rows.length, 1);
@@ -100,10 +102,11 @@
       .selectAll("text").attr("fill", "#8b9dc3").attr("font-size", 11);
     svg.selectAll(".domain, .tick line").attr("stroke", "#4a5780");
 
-    // x label.
+    // x label — placed between the tick band and the legend so neither overlaps.
+    const xLabelY = margin.top + rowH * rows.length + 32;
     svg.append("text")
       .attr("x", (margin.left + W - margin.right) / 2)
-      .attr("y", H - 8)
+      .attr("y", xLabelY)
       .attr("text-anchor", "middle").attr("fill", "#e8ecf2").attr("font-size", 12)
       .text("Coefficient on x (true β = 0.5)");
 
@@ -152,22 +155,36 @@
       }).on("mouseleave", function () { tooltip.classed("show", false); });
     });
 
-    // Legend.
-    const legend = svg.append("g").attr("transform", `translate(${margin.left},${H - 22})`);
-    legend.append("circle").attr("cx", 0).attr("cy", 0).attr("r", 5).attr("fill", "#6a9bcc");
-    legend.append("text").attr("x", 10).attr("y", 4).attr("fill", "#e8ecf2").attr("font-size", 11)
-      .text("Pooled OLS (biased)");
-    legend.append("circle").attr("cx", 170).attr("cy", 0).attr("r", 5).attr("fill", "#d97757");
-    legend.append("text").attr("x", 180).attr("y", 4).attr("fill", "#e8ecf2").attr("font-size", 11)
-      .text("Fixed effects (unbiased)");
+    // Legend — placed BELOW the x-axis label, centered, well outside the rows
+    // and the tick labels. Background ensures it never appears to touch any mark.
+    const legendY = H - 18;
+    const legendItems = [
+      { col: "#6a9bcc", txt: "Pooled OLS (biased)" },
+      { col: "#d97757", txt: "Fixed effects (unbiased)" },
+    ];
+    const legendCx = (margin.left + W - margin.right) / 2;
+    const legend = svg.append("g").attr("transform", `translate(${legendCx - 175},${legendY})`);
+    legend.append("rect")
+      .attr("x", -8).attr("y", -12)
+      .attr("width", 360).attr("height", 22)
+      .attr("fill", "rgba(15,23,41,0.65)").attr("stroke", "rgba(232,236,242,0.18)").attr("rx", 5);
+    legend.append("circle").attr("cx", 4).attr("cy", 0).attr("r", 5).attr("fill", legendItems[0].col);
+    legend.append("text").attr("x", 14).attr("y", 4).attr("fill", "#e8ecf2").attr("font-size", 11)
+      .text(legendItems[0].txt);
+    legend.append("circle").attr("cx", 174).attr("cy", 0).attr("r", 5).attr("fill", legendItems[1].col);
+    legend.append("text").attr("x", 184).attr("y", 4).attr("fill", "#e8ecf2").attr("font-size", 11)
+      .text(legendItems[1].txt);
   }
 
   function renderRejection(rates) {
     const container = document.getElementById("rej-chart");
     container.innerHTML = "";
     const W = 880;
-    const margin = { top: 28, right: 28, bottom: 88, left: 60 };
-    const H = 360;
+    // Extra top margin reserves a band ABOVE the plot for the legend, so it
+    // cannot overlap any bar or bar-value label. Extra bottom margin is for
+    // the rotated x-axis tick labels.
+    const margin = { top: 60, right: 28, bottom: 88, left: 60 };
+    const H = 400;
 
     const svg = d3.select(container).append("svg")
       .attr("viewBox", `0 0 ${W} ${H}`)
@@ -254,16 +271,25 @@
       }).on("mouseleave", function () { tooltip.classed("show", false); });
     });
 
-    // Legend.
-    const legend = svg.append("g").attr("transform", `translate(${margin.left + 4},${margin.top + 2})`);
+    // Legend — placed ABOVE the plot area in the reserved top margin band,
+    // never overlapping bars or bar-value labels.
     const items = [
       { col: "#00d4c8",  txt: "~correct (close to 5%)" },
       { col: "#d97757",  txt: "over-rejects (false positives)" },
       { col: "#9bdcc3",  txt: "conservative (wider than needed)" },
     ];
+    const itemW = 220;
+    const legendW = items.length * itemW;
+    const legendX = (margin.left + W - margin.right - legendW) / 2;
+    const legendY = 14; // top of SVG, inside top margin band
+    const legend = svg.append("g").attr("transform", `translate(${legendX},${legendY})`);
+    legend.append("rect")
+      .attr("x", -8).attr("y", -4)
+      .attr("width", legendW + 12).attr("height", 22)
+      .attr("fill", "rgba(15,23,41,0.65)").attr("stroke", "rgba(232,236,242,0.18)").attr("rx", 5);
     items.forEach((it, i) => {
-      legend.append("rect").attr("x", i * 220).attr("y", 0).attr("width", 12).attr("height", 12).attr("fill", it.col);
-      legend.append("text").attr("x", i * 220 + 18).attr("y", 10).attr("fill", "#e8ecf2").attr("font-size", 11).text(it.txt);
+      legend.append("rect").attr("x", i * itemW).attr("y", 1).attr("width", 12).attr("height", 12).attr("fill", it.col);
+      legend.append("text").attr("x", i * itemW + 18).attr("y", 11).attr("fill", "#e8ecf2").attr("font-size", 11).text(it.txt);
     });
   }
 
