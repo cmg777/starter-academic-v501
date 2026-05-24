@@ -145,9 +145,10 @@
   // ------------------------------------------------------------------
   // TAB 3 — GATE / GATES / Forest plot (real data).
   // ------------------------------------------------------------------
+  // Both views share the same container; recreate the chart per view so the
+  // active builder owns the live SVG (avoids stale DOM references when the
+  // alternate builder calls innerHTML="").
   const gateState = {
-    chart: CHARTS.gate_bars(document.getElementById("gate-chart")),
-    forest: CHARTS.forest_plot(document.getElementById("gate-chart")),
     view: "gate",
     data: null,
   };
@@ -164,13 +165,16 @@
     const stats = document.getElementById("gate-stats");
     note.textContent = VIEW_NOTES[gateState.view];
 
+    const container = document.getElementById("gate-chart");
+
     if (gateState.view === "forest") {
       stats.style.display = "none";
-      // Render forest plot via the existing CHARTS.forest_plot
+      // Recreate the forest plot fresh so it owns the container's SVG.
+      const forest = CHARTS.forest_plot(container);
       const rows = gateState.data.estimates;
       const outcomes = ["ATE on assets"];
       const methods = rows.map(r => r.method);
-      gateState.forest.update(rows, methods, outcomes);
+      forest.update(rows, methods, outcomes);
       return;
     }
 
@@ -186,7 +190,9 @@
       chi2 = 5.54; df = 1; pval = 0.019;
       chi2_label = "estat heterogeneity (AIPW)";
     }
-    gateState.chart.update(rows, {
+    // Recreate the gate bars chart fresh so it owns the container's SVG.
+    const chart = CHARTS.gate_bars(container);
+    chart.update(rows, {
       title: gateState.view === "gate" ? "GATE by income category (PO ML, 95% CI)" : "GATES by data-driven quartile (PO ML, 95% CI)",
       ate: 7937,
     });

@@ -231,11 +231,17 @@
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
     const colorMap = {
+      // r_double_lasso (kept for shared template)
       "First diff":    C.steel,
       "OLS (full)":    C.muted,
       "PSL":           "#9bdcc3",
       "DL (rigorous)": C.teal,
       "DL (CV)":       C.orange,
+      // stata_cate methods
+      "Naive raw difference":        C.muted,
+      "teffects aipw (parametric)":  C.steel,
+      "cate po (PO ML)":             C.teal,
+      "cate aipw (AIPW ML)":         C.orange,
     };
 
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
@@ -600,7 +606,7 @@
     const xs = d3.range(0, 100.1, 1);
     const catePts = xs.map(v => {
       // Smooth ramp roughly matching the post's pattern: dip near 20%, climb steeply > 70%
-      const dip = 4 - 3 * Math.exp(-((v - 20)/8)**2);
+      const dip = 4 - 3 * Math.exp(-(Math.pow((v - 20)/8, 2)));
       const climb = 0.05 * Math.pow(Math.max(0, v - 40), 1.6) / 8;
       const jump = 14 / (1 + Math.exp(-(v - 80) / 4));
       return [v, Math.max(0.5, dip + climb + jump * 0.5)];

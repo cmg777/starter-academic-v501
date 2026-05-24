@@ -80,7 +80,8 @@
       .attr("y1", y(0)).attr("y2", y(0))
       .attr("stroke", C.orange).attr("stroke-dasharray", "4 4").attr("stroke-width", 1.5);
     g.append("text")
-      .attr("x", w - 60).attr("y", y(0) - 6)
+      .attr("x", w - 4).attr("y", y(0) - 6)
+      .attr("text-anchor", "end")
       .attr("fill", C.orange).attr("font-size", 11)
       .text("β = 0 (no catch-up)");
 
@@ -104,9 +105,12 @@
       .attr("fill", C.teal).attr("font-size", 12).attr("font-weight", 600)
       .attr("text-anchor", "middle");
 
-    // Legend.
-    const lg = g.append("g").attr("transform", `translate(${w - 270},${10})`);
-    lg.append("rect").attr("width", 270).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+    // Legend (bottom-left corner of the plot area, where the line stays
+    // far above zero throughout the divergence era — no overlap with the
+    // rolling-β trajectory).
+    const lgW = 270, lgH = 50;
+    const lg = g.append("g").attr("transform", `translate(${4},${h - lgH - 6})`);
+    lg.append("rect").attr("width", lgW).attr("height", lgH).attr("fill", "rgba(15,23,41,0.78)").attr("stroke", C.line).attr("rx", 6);
     lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.steel);
     lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("Rolling β (divergence → convergence)");
     lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.orange);
@@ -125,7 +129,10 @@
       const yr = years[k - 1];
       const v  = truth[k - 1];
       dot.attr("cx", x(yr)).attr("cy", y(v));
-      dotLabel.attr("x", x(yr)).attr("y", y(v) - 12).text(`${yr}: β = ${v.toFixed(2)}`);
+      // Anchor the label below the dot when it's high in the chart so it
+      // never collides with the title row; above the dot otherwise.
+      const labelDy = v > 0.25 ? 20 : -12;
+      dotLabel.attr("x", x(yr)).attr("y", y(v) + labelDy).text(`${yr}: β = ${v.toFixed(2)}`);
       requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
@@ -311,7 +318,7 @@
   // ------------------------------------------------------------------
   function ovb_bars(container) {
     const W = 720, H = 260;
-    const margin = { top: 28, right: 28, bottom: 36, left: 120 };
+    const margin = { top: 28, right: 60, bottom: 36, left: 200 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -367,7 +374,7 @@
   // ------------------------------------------------------------------
   function beta_compare(container) {
     const W = 720, H = 180;
-    const margin = { top: 22, right: 28, bottom: 32, left: 120 };
+    const margin = { top: 22, right: 60, bottom: 32, left: 160 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -468,9 +475,13 @@
   //   are convergence rows (decade β with CI).
   // ------------------------------------------------------------------
   function forest_plot(container) {
-    const W = 880;
-    const margin = { top: 28, right: 24, bottom: 36, left: 160 };
-    const facetGap = 24;
+    // Wider canvas so each facet can carry its own row labels (methods
+    // differ per facet in this app — e.g. decades for β, Polity2 years
+    // for OVB — so a single leftmost label column would mis-align).
+    const W = 1180;
+    const margin = { top: 28, right: 24, bottom: 36, left: 24 };
+    const facetGap = 16;
+    const labelGutter = 110; // px of label space at the left of each facet
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 380`)
       .attr("preserveAspectRatio", "xMidYMid meet");
@@ -512,15 +523,17 @@
           .attr("class", "facet")
           .attr("transform", `translate(${margin.left + oi * (facetW + facetGap)},${margin.top})`);
 
+        // Plot area sits to the right of this facet's own label gutter.
+        const plotW = Math.max(40, facetW - labelGutter);
         const ext = d3.extent(subset.flatMap(d => [d.ci_lo, d.ci_hi]));
         const xMin = Math.min(0, ext[0] || 0);
         const xMax = Math.max(0, ext[1] || 0);
         const pad = Math.max(0.1, (xMax - xMin) * 0.08);
-        const x = d3.scaleLinear().domain([xMin - pad, xMax + pad]).range([0, facetW]);
+        const x = d3.scaleLinear().domain([xMin - pad, xMax + pad]).range([labelGutter, facetW]);
         const y = d3.scaleBand().domain(facetMethods).range([0, facetH]).padding(0.35);
 
-        // Title.
-        facet.append("text").attr("x", facetW / 2).attr("y", -10)
+        // Title — centred over the plot area, not the whole facet.
+        facet.append("text").attr("x", labelGutter + plotW / 2).attr("y", -10)
           .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13)
           .attr("font-weight", 600).text(outcome);
 
@@ -530,24 +543,24 @@
           .attr("y1", 0).attr("y2", facetH)
           .attr("stroke", C.faint).attr("stroke-width", 1).attr("stroke-dasharray", "3 4");
 
-        // x axis.
+        // x axis (covers only the plot area, not the gutter).
         facet.append("g").attr("transform", `translate(0,${facetH})`)
           .call(d3.axisBottom(x).ticks(4).tickFormat(d3.format(".2f")))
           .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
         facet.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
-        // Method labels (leftmost facet).
-        if (oi === 0) {
-          facetMethods.forEach(m => {
-            svg.append("text")
-              .attr("class", "facet")
-              .attr("x", margin.left - 10)
-              .attr("y", margin.top + y(m) + y.bandwidth() / 2 + 4)
-              .attr("text-anchor", "end")
-              .attr("fill", C.text).attr("font-size", 12)
-              .text(m);
-          });
-        }
+        // Per-facet row labels in the gutter — methods differ across facets
+        // (decade IDs for β, Polity2 years for OVB/λ/δ, correlate names for
+        // the correlate-convergence facet), so a single leftmost column would
+        // mis-align rows in non-leftmost facets.
+        facetMethods.forEach(m => {
+          facet.append("text")
+            .attr("x", labelGutter - 8)
+            .attr("y", y(m) + y.bandwidth() / 2 + 4)
+            .attr("text-anchor", "end")
+            .attr("fill", C.text).attr("font-size", 11)
+            .text(m);
+        });
 
         subset.forEach(d => {
           const yc = y(d.method) + y.bandwidth() / 2;
