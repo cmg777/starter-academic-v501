@@ -546,7 +546,9 @@
   // ------------------------------------------------------------------
   function panel_animation(container) {
     const W = 720, H = 360;
-    const margin = { top: 28, right: 28, bottom: 48, left: 60 };
+    // Right margin extended to host the legend OUTSIDE the plot area so
+    // it never overlaps the right-most country trajectory (e.g. Qatar).
+    const margin = { top: 28, right: 150, bottom: 48, left: 60 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -619,11 +621,12 @@
         .attr("stroke", "#0f1729").attr("stroke-width", 1.5),
     }));
 
-    // Legend
-    const lgY = 6;
-    const lg = g.append("g").attr("transform", `translate(${w - 130},${lgY})`);
-    lg.append("rect").attr("width", 130).attr("height", 100)
-      .attr("fill", "rgba(15,23,41,0.7)").attr("stroke", C.line).attr("rx", 6);
+    // Legend — placed OUTSIDE the plot area (right margin) so it never
+    // overlaps country trajectories. The outer 'g' translates by margin.left,
+    // so x = w + 8 sits just to the right of the plot.
+    const lg = g.append("g").attr("transform", `translate(${w + 8},${0})`);
+    lg.append("rect").attr("width", 136).attr("height", 110)
+      .attr("fill", "rgba(15,23,41,0.85)").attr("stroke", C.line).attr("rx", 6);
     lg.append("text").attr("x", 8).attr("y", 14)
       .attr("fill", C.muted).attr("font-size", 10).text("pooled cubic ⟶ dashed");
     countries.slice(0, 6).forEach((c, i) => {
@@ -661,7 +664,9 @@
   // ------------------------------------------------------------------
   function panel_scatter(container) {
     const W = 720, H = 360;
-    const margin = { top: 20, right: 24, bottom: 44, left: 60 };
+    // Right margin enlarged so the legend sits OUTSIDE the data area,
+    // preventing overlap with curves or scatter points.
+    const margin = { top: 20, right: 150, bottom: 44, left: 60 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -704,20 +709,37 @@
       const grid = d3.range(data.lxRange[0], data.lxRange[1] + 1e-6, (data.lxRange[1]-data.lxRange[0])/120);
       const lineGen = d3.line().x(d => x(d[0])).y(d => y(d[1])).curve(d3.curveMonotoneX);
 
+      // Track legend entries so they can be drawn outside the plot.
+      const legendEntries = [];
       function drawCurve(fn, color, dash, label, lwidth) {
         const pts = grid.map(lx => [lx, fn(lx)]);
         root.append("path")
           .attr("d", lineGen(pts))
           .attr("fill", "none").attr("stroke", color).attr("stroke-width", lwidth || 2)
           .attr("stroke-dasharray", dash || null).attr("opacity", 0.95);
-        root.append("text")
-          .attr("x", x(grid[grid.length - 1])).attr("y", y(pts[pts.length - 1][1]) - 4)
-          .attr("fill", color).attr("font-size", 11).attr("text-anchor", "end")
-          .text(label);
+        legendEntries.push({ label, color, dash });
       }
       drawCurve(data.truth,  C.muted,  "5 4", "true cubic", 1.8);
       drawCurve(data.olsFit, C.orange, null,  "pooled OLS", 2.2);
       drawCurve(data.feFit,  C.teal,   null,  "TWFE (within)", 2.2);
+
+      // Legend OUTSIDE the plot, in the right margin band. No overlap
+      // with the scatter or the fitted curves.
+      const lg = root.append("g").attr("transform", `translate(${w + 8},${4})`);
+      lg.append("rect").attr("width", 138).attr("height", 26 + legendEntries.length * 18)
+        .attr("fill", "rgba(15,23,41,0.85)").attr("stroke", C.line).attr("rx", 6);
+      lg.append("text").attr("x", 8).attr("y", 14)
+        .attr("fill", C.muted).attr("font-size", 10).text("fitted curves");
+      legendEntries.forEach((e, i) => {
+        const yRow = 30 + i * 18;
+        lg.append("line")
+          .attr("x1", 8).attr("x2", 30)
+          .attr("y1", yRow).attr("y2", yRow)
+          .attr("stroke", e.color).attr("stroke-width", 2.5)
+          .attr("stroke-dasharray", e.dash || null);
+        lg.append("text").attr("x", 36).attr("y", yRow + 4)
+          .attr("fill", C.text).attr("font-size", 11).text(e.label);
+      });
     }
     return { update };
   }
@@ -887,12 +909,23 @@
           .text(`TP${i + 1}: \$${Math.round(Math.exp(r)).toLocaleString()}`);
       });
 
-      // Data range bracket annotations
+      // Data range bracket — sits immediately below the x-axis with short
+      // end caps. Label is placed in the LEFT margin (outside the data area)
+      // so it never collides with USD ticks below the axis.
       g.append("line").attr("x1", x(5.25)).attr("x2", x(11.67))
         .attr("y1", h + 4).attr("y2", h + 4)
         .attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(5.25)).attr("y", h + 16)
-        .attr("fill", C.steel).attr("font-size", 10).attr("text-anchor", "start")
+      g.append("line").attr("x1", x(5.25)).attr("x2", x(5.25))
+        .attr("y1", h + 1).attr("y2", h + 7)
+        .attr("stroke", C.steel).attr("stroke-width", 2);
+      g.append("line").attr("x1", x(11.67)).attr("x2", x(11.67))
+        .attr("y1", h + 1).attr("y2", h + 7)
+        .attr("stroke", C.steel).attr("stroke-width", 2);
+      // Label placed to the LEFT of the bracket, in the axis margin gap,
+      // anchored to the right edge so it sits flush against the bracket
+      // and does not overlap any axis tick or USD label.
+      g.append("text").attr("x", x(5.25) - 6).attr("y", h + 8)
+        .attr("fill", C.steel).attr("font-size", 10).attr("text-anchor", "end")
         .text("data range");
     }
     return { update };
