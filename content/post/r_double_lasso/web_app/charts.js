@@ -479,8 +479,10 @@
   //   alpha_true: number
   // ------------------------------------------------------------------
   function alpha_histograms(container) {
-    const W = 720, H = 260;
-    const margin = { top: 18, right: 24, bottom: 38, left: 50 };
+    // Top margin enlarged so the "true α" label and series legend sit above
+    // the plot area, never on top of the tallest histogram bar.
+    const W = 720, H = 280;
+    const margin = { top: 38, right: 24, bottom: 38, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -514,8 +516,23 @@
 
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", 10)
-        .attr("fill", C.steel).attr("font-size", 11).text(`true α = ${data.alpha_true.toFixed(2)}`);
+      // True-α label moved into the top margin (y = -8) so it never
+      // overlaps with the tallest histogram bar.
+      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", -8)
+        .attr("fill", C.steel).attr("font-size", 11)
+        .text(`true α = ${data.alpha_true.toFixed(2)}`);
+
+      // Series legend sits in the top-right margin, above the plot area,
+      // distinguishing DL (CV, orange) from DL (rigorous, teal).
+      const lg = g.append("g").attr("transform", `translate(${w - 200},${-26})`);
+      lg.append("rect").attr("x", 0).attr("y", 0).attr("width", 12).attr("height", 10)
+        .attr("fill", C.orange).attr("opacity", 0.65);
+      lg.append("text").attr("x", 18).attr("y", 9)
+        .attr("fill", C.text).attr("font-size", 11).text("DL (CV)");
+      lg.append("rect").attr("x", 90).attr("y", 0).attr("width", 12).attr("height", 10)
+        .attr("fill", C.teal).attr("opacity", 0.85);
+      lg.append("text").attr("x", 108).attr("y", 9)
+        .attr("fill", C.text).attr("font-size", 11).text("DL (rigorous)");
 
       g.append("g").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format(".2f")))
