@@ -172,8 +172,8 @@
   (function initIntroAnim() {
     const container = document.getElementById("intro-anim");
     if (!container) return;
-    const W = 760, H = 320;
-    const margin = { top: 28, right: 24, bottom: 44, left: 56 };
+    const W = 760, H = 360;
+    const margin = { top: 28, right: 24, bottom: 96, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -228,9 +228,14 @@
       .attr("y1", yScale(trueRho)).attr("y2", yScale(trueRho))
       .attr("stroke", C.steel).attr("stroke-width", 1.5)
       .attr("stroke-dasharray", "5 5");
-    g.append("text")
-      .attr("x", w - 6).attr("y", yScale(trueRho) - 6)
-      .attr("text-anchor", "end").attr("fill", C.steel).attr("font-size", 11)
+    // Small backdrop so the label stays legible if a curve runs through 0.70.
+    const trLabelG = g.append("g").attr("transform", `translate(4,${yScale(trueRho) - 18})`);
+    trLabelG.append("rect")
+      .attr("width", 86).attr("height", 14)
+      .attr("fill", "rgba(15,23,41,0.75)").attr("rx", 3);
+    trLabelG.append("text")
+      .attr("x", 4).attr("y", 10)
+      .attr("fill", C.steel).attr("font-size", 11)
       .text("true ρ = 0.70");
 
     const lineGen = d3.line().x(d => xScale(d[0])).y(d => yScale(d[1])).curve(d3.curveMonotoneX);
@@ -239,15 +244,17 @@
     g.append("path").attr("d", lineGen(abCurve)).attr("fill", "none")
       .attr("stroke", C.teal).attr("stroke-width", 2.5);
 
-    // Legend.
-    const lg = g.append("g").attr("transform", `translate(${w - 240},${10})`);
-    lg.append("rect").attr("width", 240).attr("height", 50)
+    // Legend placed BELOW the plot area to avoid overlapping the curves.
+    const legendW = 460;
+    const legendX = (w - legendW) / 2;
+    const lg = g.append("g").attr("transform", `translate(${legendX},${h + 56})`);
+    lg.append("rect").attr("width", legendW).attr("height", 28)
       .attr("fill", "rgba(15,23,41,0.7)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12)
+    lg.append("circle").attr("cx", 14).attr("cy", 14).attr("r", 5).attr("fill", C.orange);
+    lg.append("text").attr("x", 26).attr("y", 18).attr("fill", C.text).attr("font-size", 12)
       .text("Fixed effects (Nickell bias)");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.teal);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12)
+    lg.append("circle").attr("cx", 240).attr("cy", 14).attr("r", 5).attr("fill", C.teal);
+    lg.append("text").attr("x", 252).attr("y", 18).attr("fill", C.text).attr("font-size", 12)
       .text("Arellano-Bond GMM");
 
     // Cycling cursor.
@@ -557,9 +564,18 @@
         .attr("y1", y(0.05)).attr("y2", y(0.05))
         .attr("stroke", C.orange).attr("stroke-width", 1.5)
         .attr("stroke-dasharray", "4 4");
-      g.append("text").attr("x", w - 4).attr("y", y(0.05) - 4)
-        .attr("text-anchor", "end").attr("fill", C.orange).attr("font-size", 10)
-        .text("0.05 cutoff");
+      // Label placed at top-left of the plot (above the highest bar area) with a
+      // tiny semi-transparent backdrop so it cannot be overlapped by bar labels.
+      const cutoffG = g.append("g").attr("transform", `translate(2,2)`);
+      cutoffG.append("rect")
+        .attr("width", 78).attr("height", 14)
+        .attr("fill", "rgba(15,23,41,0.75)").attr("rx", 3);
+      cutoffG.append("line")
+        .attr("x1", 4).attr("x2", 16).attr("y1", 7).attr("y2", 7)
+        .attr("stroke", C.orange).attr("stroke-width", 1.5)
+        .attr("stroke-dasharray", "3 3");
+      cutoffG.append("text").attr("x", 20).attr("y", 10)
+        .attr("fill", C.orange).attr("font-size", 10).text("0.05 cutoff");
 
       diagnostics.forEach(d => {
         const cx = x0(d.method);
