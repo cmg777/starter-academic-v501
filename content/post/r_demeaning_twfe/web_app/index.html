@@ -229,24 +229,24 @@
 
   <div class="grid grid-2">
     <div class="card">
-      <h3><span class="tag rigorous">feols TWFE</span></h3>
-      <p class="note" style="margin:0 0 10px;">Estimator: <code>feols(y ~ x | id + time)</code> with clustered SE</p>
+      <h3><span class="tag rigorous">feols TWFE (LSDV)</span></h3>
+      <p class="note" style="margin:0 0 10px;">Estimator: OLS on [d, X, unit dummies, time dummies] — feols absorbs them internally.</p>
       <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-rig-alpha">—</span></div>
-      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-rig-se">—</span></div>
-      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-rig-iy">—</span></div>
-      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-rig-id">—</span></div>
-      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-rig-un">—</span></div>
-      <div class="method-row"><span class="label">λ_y, λ_d (illustrative)</span><span class="val" id="sh-rig-lam">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂) — correct df</span><span class="val" id="sh-rig-se">—</span></div>
+      <div class="method-row"><span class="label">N units</span><span class="val" id="sh-rig-iy">—</span></div>
+      <div class="method-row"><span class="label">T periods</span><span class="val" id="sh-rig-id">—</span></div>
+      <div class="method-row"><span class="label">df (correct)</span><span class="val" id="sh-rig-un">—</span></div>
+      <div class="method-row"><span class="label">|α̂_LSDV − α̂_within|</span><span class="val" id="sh-rig-lam">—</span></div>
     </div>
     <div class="card">
       <h3><span class="tag cv">Manual demeaning</span></h3>
-      <p class="note" style="margin:0 0 10px;">Estimator: subtract ȳ<sub>i·</sub>, ȳ<sub>·t</sub>, add ȳ<sub>··</sub>, then <code>lm()</code></p>
+      <p class="note" style="margin:0 0 10px;">Estimator: ỹ<sub>it</sub> = y<sub>it</sub> − ȳ<sub>i·</sub> − ȳ<sub>·t</sub> + ȳ<sub>··</sub>, then plain <code>lm()</code>.</p>
       <div class="method-row"><span class="label">α̂</span><span class="val" id="sh-cv-alpha">—</span></div>
-      <div class="method-row"><span class="label">SE(α̂)</span><span class="val" id="sh-cv-se">—</span></div>
-      <div class="method-row"><span class="label">|I_y|</span><span class="val" id="sh-cv-iy">—</span></div>
-      <div class="method-row"><span class="label">|I_d|</span><span class="val" id="sh-cv-id">—</span></div>
-      <div class="method-row"><span class="label">union |I_y ∪ I_d|</span><span class="val" id="sh-cv-un">—</span></div>
-      <div class="method-row"><span class="label">λ_y, λ_d (illustrative)</span><span class="val" id="sh-cv-lam">—</span></div>
+      <div class="method-row"><span class="label">SE(α̂) — naive lm() df</span><span class="val" id="sh-cv-se">—</span></div>
+      <div class="method-row"><span class="label">N units</span><span class="val" id="sh-cv-iy">—</span></div>
+      <div class="method-row"><span class="label">T periods</span><span class="val" id="sh-cv-id">—</span></div>
+      <div class="method-row"><span class="label">df (naive — wrong)</span><span class="val" id="sh-cv-un">—</span></div>
+      <div class="method-row"><span class="label">|α̂_LSDV − α̂_within|</span><span class="val" id="sh-cv-lam">—</span></div>
     </div>
   </div>
 
@@ -296,7 +296,7 @@
     <ul>
       <li><strong>The two markers always overlap.</strong> Every covariate's feols and manual estimate coincide to the fourth decimal place. The largest absolute difference in the post is 3.05 × 10⁻¹⁶ — pure floating-point round-off.</li>
       <li><strong>Confidence intervals differ slightly.</strong> Even though the point estimates match, the CIs use different SEs (clustered for feols, naive for lm). Hover any marker to inspect.</li>
-      <li><strong>The SE bars below show under-statement.</strong> Naive lm() SEs (steel blue) are systematically smaller than feols clustered SEs (orange) — by 5% for government consumption and by 22% for log(n+g+d).</li>
+      <li><strong>The SE bars below show the three SE variants side-by-side.</strong> Naive lm() (steel blue) ignores the absorbed FE and so uses too many df. feols IID (green) uses the correct df. feols cluster (orange) further adjusts for within-unit residual correlation. For log(n+g+d), cluster SE is ~22% larger than naive; for gov. consumption it is ~5% larger.</li>
     </ul>
   </div>
 

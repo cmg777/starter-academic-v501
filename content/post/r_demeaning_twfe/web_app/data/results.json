@@ -15,6 +15,13 @@
     { "method": "feols TWFE",         "outcome": "Gov. Consumption Share", "estimate": -0.1028, "se": 0.0464, "ci_lo": -0.1937, "ci_hi": -0.0119, "n_selected": 5 },
     { "method": "Manual demeaning",   "outcome": "Gov. Consumption Share", "estimate": -0.1028, "se": 0.0441, "ci_lo": -0.1892, "ci_hi": -0.0164, "n_selected": 5 }
   ],
+  "se_comparison": [
+    { "outcome": "Log Initial Income",     "se_naive_lm": 0.003618, "se_feols_iid": 0.003880, "se_feols_cluster": 0.003744 },
+    { "outcome": "Log Investment Share",   "se_naive_lm": 0.006846, "se_feols_iid": 0.007342, "se_feols_cluster": 0.007583 },
+    { "outcome": "Log(n + g + d)",         "se_naive_lm": 0.018201, "se_feols_iid": 0.019521, "se_feols_cluster": 0.022168 },
+    { "outcome": "Log Human Capital",      "se_naive_lm": 0.013699, "se_feols_iid": 0.014692, "se_feols_cluster": 0.014564 },
+    { "outcome": "Gov. Consumption Share", "se_naive_lm": 0.044108, "se_feols_iid": 0.047307, "se_feols_cluster": 0.046398 }
+  ],
   "selection": [
     { "outcome": "Log Initial Income",     "method": "Naive lm SE",      "n_Iy": 36, "n_Id": 36, "n_intersection": 36, "n_union": 36 },
     { "outcome": "Log Initial Income",     "method": "feols IID SE",     "n_Iy": 39, "n_Id": 39, "n_intersection": 39, "n_union": 39 },

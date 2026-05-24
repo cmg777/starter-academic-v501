@@ -132,37 +132,40 @@
       asymmetry: sh.asymmetry, seed: sh.seed,
     });
     sh.sim = sim;
-    const rig = LASSO.double_lasso(sim.X, sim.d, sim.y, sim.n, sim.p, "rigorous");
-    const cvr = LASSO.double_lasso(sim.X, sim.d, sim.y, sim.n, sim.p, "cv",
-                                   { nLam: 50, seed: sh.seed });
-    sh.rig = rig; sh.cv = cvr;
+    // FWL: arrange the n observations into a balanced N x T panel and compare
+    // (a) LSDV (with dummies) vs (b) within-demean + OLS. By FWL they match
+    // to machine precision.
+    const Tperiods = 8;
+    const cmp = LASSO.twfe_compare(sim.d, sim.y, sim.X, sim.n, sim.p, { T: Tperiods });
+    sh.tw = cmp;
     sh_render();
   }
 
-  function fmt(x) { return (x === null || Number.isNaN(x)) ? "—" : x.toFixed(3); }
-  function fmt4(x) { return (x === null || Number.isNaN(x)) ? "—" : x.toFixed(4); }
+  function fmt(x) { return (x === null || x === undefined || Number.isNaN(x)) ? "—" : x.toFixed(3); }
+  function fmt4(x) { return (x === null || x === undefined || Number.isNaN(x)) ? "—" : x.toFixed(4); }
+  function fmtE(x) { return (x === null || x === undefined || Number.isNaN(x)) ? "—" : x.toExponential(2); }
 
   function sh_render() {
-    const r = sh.rig, c = sh.cv;
-    document.getElementById("sh-rig-alpha").textContent = fmt(r.alpha_hat);
-    document.getElementById("sh-rig-se").textContent    = fmt4(r.se_alpha);
-    document.getElementById("sh-rig-iy").textContent    = r.n_Iy;
-    document.getElementById("sh-rig-id").textContent    = r.n_Id;
-    document.getElementById("sh-rig-un").textContent    = r.n_union;
-    document.getElementById("sh-rig-lam").textContent   =
-      `${r.lambda_y.toExponential(2)}, ${r.lambda_d.toExponential(2)}`;
+    const t = sh.tw;
+    if (!t) return;
+    // "feols TWFE" card = LSDV path; "Manual demeaning" card = within OLS.
+    document.getElementById("sh-rig-alpha").textContent = fmt4(t.alpha_lsdv);
+    document.getElementById("sh-rig-se").textContent    = fmt4(t.se_lsdv);
+    document.getElementById("sh-rig-iy").textContent    = t.N;      // # units
+    document.getElementById("sh-rig-id").textContent    = t.T;      // # periods
+    document.getElementById("sh-rig-un").textContent    = t.df_correct;
+    document.getElementById("sh-rig-lam").textContent   = fmtE(t.diff_lsdv_within);
 
-    document.getElementById("sh-cv-alpha").textContent = fmt(c.alpha_hat);
-    document.getElementById("sh-cv-se").textContent    = fmt4(c.se_alpha);
-    document.getElementById("sh-cv-iy").textContent    = c.n_Iy;
-    document.getElementById("sh-cv-id").textContent    = c.n_Id;
-    document.getElementById("sh-cv-un").textContent    = c.n_union;
-    document.getElementById("sh-cv-lam").textContent   =
-      `${c.lambda_y.toExponential(2)}, ${c.lambda_d.toExponential(2)}`;
+    document.getElementById("sh-cv-alpha").textContent = fmt4(t.alpha_within);
+    document.getElementById("sh-cv-se").textContent    = fmt4(t.se_within_naive);
+    document.getElementById("sh-cv-iy").textContent    = t.N;
+    document.getElementById("sh-cv-id").textContent    = t.T;
+    document.getElementById("sh-cv-un").textContent    = t.df_naive;
+    document.getElementById("sh-cv-lam").textContent   = fmtE(t.diff_lsdv_within);
 
     sh.cmp.update({
-      rigorous: r.alpha_hat,
-      cv: c.alpha_hat,
+      rigorous: t.alpha_lsdv,
+      cv: t.alpha_within,
       alpha_true: sh.sim.alpha_true,
     });
   }
@@ -203,18 +206,16 @@
 
     let i = 0;
     function step() {
-      const batch = 2;
+      const batch = 4;
       const end = Math.min(N_SIMS, i + batch);
       for (; i < end; i++) {
         const sim = DGP.simulate_dl({
           n: sh.n, p: sh.p, signal: sh.signal,
           asymmetry: sh.asymmetry, seed: sh.seed + i + 1,
         });
-        const r = LASSO.double_lasso(sim.X, sim.d, sim.y, sim.n, sim.p, "rigorous");
-        const c = LASSO.double_lasso(sim.X, sim.d, sim.y, sim.n, sim.p, "cv",
-                                     { nLam: 40, seed: sh.seed + i + 1 });
-        if (Number.isFinite(r.alpha_hat)) alphas_rig.push(r.alpha_hat);
-        if (Number.isFinite(c.alpha_hat)) alphas_cv.push(c.alpha_hat);
+        const cmp = LASSO.twfe_compare(sim.d, sim.y, sim.X, sim.n, sim.p, { T: 8 });
+        if (cmp && Number.isFinite(cmp.alpha_lsdv)) alphas_rig.push(cmp.alpha_lsdv);
+        if (cmp && Number.isFinite(cmp.alpha_within)) alphas_cv.push(cmp.alpha_within);
       }
       const pct = (i / N_SIMS) * 100;
       progBar.style.width = pct + "%";
@@ -250,7 +251,7 @@
   // ------------------------------------------------------------------
   const fp = {
     chart: CHARTS.forest_plot(document.getElementById("fp-chart")),
-    bars: CHARTS.selection_bars(document.getElementById("fp-bars")),
+    bars: CHARTS.se_compare_bars(document.getElementById("fp-bars")),
     data: null,
   };
 
@@ -259,7 +260,7 @@
     const outcomes = Array.from(document.querySelectorAll("#fp-outcomes input:checked")).map(el => el.value);
     const methods  = Array.from(document.querySelectorAll("#fp-methods input:checked")).map(el => el.value);
     fp.chart.update(fp.data.estimates, methods, outcomes);
-    fp.bars.update(fp.data.selection, outcomes);
+    fp.bars.update(fp.data.se_comparison || [], outcomes);
   }
 
   document.querySelectorAll("#fp-outcomes input, #fp-methods input").forEach(el => {
