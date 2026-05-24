@@ -39,7 +39,10 @@
   // ------------------------------------------------------------------
   function within_animation(container) {
     const W = 720, H = 380;
-    const margin = { top: 36, right: 28, bottom: 60, left: 64 };
+    // Right margin enlarged so worker-name labels and the POLS/FE slope
+    // labels at the right edge of the chart do not stack on top of each
+    // other or on top of the rightmost data marks.
+    const margin = { top: 36, right: 130, bottom: 60, left: 64 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -116,12 +119,21 @@
     const polsLine = g.append("line")
       .attr("stroke", C.muted).attr("stroke-width", 2.5)
       .attr("stroke-dasharray", "6 4").attr("opacity", 0.9);
-    const polsLabel = g.append("text").attr("fill", C.muted)
-      .attr("font-size", 11).attr("font-weight", 600);
 
     // FE / within slope through demeaned points (~0.21) — steeper.
     const feLine = g.append("line")
       .attr("stroke", C.orange).attr("stroke-width", 2.5).attr("opacity", 0.9);
+
+    // Slope labels live in a fixed right-margin "legend column" so they
+    // never collide with worker labels at the line endpoints.
+    const legendX = w + 10;
+    const polsLabel = g.append("text").attr("fill", C.muted)
+      .attr("font-size", 11).attr("font-weight", 600)
+      .attr("x", legendX).attr("y", 12).attr("text-anchor", "start");
+    const feLabel = g.append("text").attr("fill", C.orange)
+      .attr("font-size", 11).attr("font-weight", 600)
+      .attr("x", legendX).attr("y", 28).attr("text-anchor", "start")
+      .text("FE slope = 0.21");
 
     // Animation loop: interpolate between raw and demeaned across a 10s cycle.
     let t0 = null;
@@ -173,7 +185,6 @@
         .attr("x1", x(-1.0)).attr("y1", y(polsB + polsA * -1.0))
         .attr("x2", x(1.5)).attr("y2", y(polsB + polsA * 1.5));
       polsLabel.attr("opacity", polsAlpha)
-        .attr("x", x(1.4)).attr("y", y(polsB + polsA * 1.4) - 6)
         .text("POLS slope = 0.07");
 
       // FE line: through origin in demeaned coords with slope 0.21. Visible when u~1.
@@ -182,6 +193,7 @@
       feLine.attr("opacity", 0.85 * feAlpha)
         .attr("x1", x(-0.6)).attr("y1", y(feA * -0.6))
         .attr("x2", x(0.6)).attr("y2", y(feA * 0.6));
+      feLabel.attr("opacity", feAlpha);
 
       requestAnimationFrame(step);
     }
@@ -194,8 +206,10 @@
   // visible.
   // ------------------------------------------------------------------
   function variation_bars(container) {
-    const W = 720, H = 240;
-    const margin = { top: 18, right: 28, bottom: 38, left: 110 };
+    const W = 720, H = 260;
+    // Top margin enlarged so the legend can sit fully above the bars
+    // without ever colliding with the topmost bar's inside labels.
+    const margin = { top: 42, right: 28, bottom: 38, left: 110 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -250,12 +264,14 @@
           .text(`${d.between_pct.toFixed(1)}% between`);
       });
 
-      // Legend
-      g.append("rect").attr("x", w - 220).attr("y", -14).attr("width", 10).attr("height", 10).attr("fill", C.steel);
-      g.append("text").attr("x", w - 206).attr("y", -5).attr("fill", C.text).attr("font-size", 11)
+      // Legend — placed in the enlarged top margin, well above the bars
+      // so it never overlaps with the inside-bar percentage labels.
+      const legendY = -24;
+      g.append("rect").attr("x", w - 240).attr("y", legendY).attr("width", 10).attr("height", 10).attr("fill", C.steel);
+      g.append("text").attr("x", w - 226).attr("y", legendY + 9).attr("fill", C.text).attr("font-size", 11)
         .text("between (across workers)");
-      g.append("rect").attr("x", w - 90).attr("y", -14).attr("width", 10).attr("height", 10).attr("fill", C.orange);
-      g.append("text").attr("x", w - 76).attr("y", -5).attr("fill", C.text).attr("font-size", 11)
+      g.append("rect").attr("x", w - 100).attr("y", legendY).attr("width", 10).attr("height", 10).attr("fill", C.orange);
+      g.append("text").attr("x", w - 86).attr("y", legendY + 9).attr("fill", C.text).attr("font-size", 11)
         .text("within (over time)");
     }
     return { update };
@@ -268,7 +284,11 @@
   // ------------------------------------------------------------------
   function panel_scatter(container) {
     const W = 720, H = 380;
-    const margin = { top: 20, right: 24, bottom: 50, left: 60 };
+    // Right margin enlarged to host a dedicated 3-row legend column for the
+    // truth / POLS / FE slope labels. Previously these labels were placed at
+    // the right end of each fitted line and stacked on top of one another
+    // (and the data) whenever the three slopes were similar.
+    const margin = { top: 20, right: 140, bottom: 50, left: 60 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -321,19 +341,34 @@
         (data.xRange[1] - data.xRange[0]) / 80);
       const lineGen = d3.line().x(d => x(d[0])).y(d => y(d[1])).curve(d3.curveLinear);
 
+      // Fixed legend column in the right margin — three rows, one per line,
+      // so the labels never stack on each other (the three slopes can be
+      // very close numerically) and never sit on top of data points.
+      const legendX = w + 12;
+      let legendRow = 0;
       function drawCurve(intercept, slope, color, dash, label, lwidth) {
         const pts = grid.map(xv => [xv, intercept + slope * xv]);
         root.append("path")
           .attr("d", lineGen(pts))
           .attr("fill", "none").attr("stroke", color).attr("stroke-width", lwidth || 2)
           .attr("stroke-dasharray", dash || null).attr("opacity", 0.95);
+        const ly = 14 + legendRow * 18;
+        // Color swatch
+        root.append("line")
+          .attr("x1", legendX).attr("x2", legendX + 16)
+          .attr("y1", ly - 4).attr("y2", ly - 4)
+          .attr("stroke", color).attr("stroke-width", lwidth || 2)
+          .attr("stroke-dasharray", dash || null);
+        // Label text
         root.append("text")
-          .attr("x", x(grid[grid.length - 1])).attr("y", y(pts[pts.length - 1][1]) - 6)
-          .attr("fill", color).attr("font-size", 11).attr("text-anchor", "end")
+          .attr("x", legendX + 20).attr("y", ly)
+          .attr("fill", color).attr("font-size", 11).attr("text-anchor", "start")
+          .attr("font-weight", 600)
           .text(label);
+        legendRow++;
       }
       drawCurve(data.truth_intercept, data.truth_slope,
-                C.muted, "6 4", `true beta = ${data.truth_slope.toFixed(2)}`, 1.8);
+                C.muted, "6 4", `true β = ${data.truth_slope.toFixed(2)}`, 1.8);
       drawCurve(data.pols_intercept, data.pols_slope,
                 C.orange, null, `POLS = ${data.pols_slope.toFixed(3)}`, 2.2);
       drawCurve(data.fe_intercept, data.fe_slope,
@@ -347,8 +382,10 @@
   // with truth line. POLS = orange, FE = teal.
   // ------------------------------------------------------------------
   function beta_histograms(container) {
-    const W = 720, H = 260;
-    const margin = { top: 18, right: 24, bottom: 38, left: 50 };
+    const W = 720, H = 280;
+    // Top margin enlarged to host the "true beta" annotation and a legend
+    // row outside the plot so they never sit on top of the histogram bars.
+    const margin = { top: 40, right: 24, bottom: 38, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -382,9 +419,23 @@
 
       g.append("line").attr("x1", x(data.beta_true)).attr("x2", x(data.beta_true))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.beta_true) + 4).attr("y", 12)
-        .attr("fill", C.steel).attr("font-size", 11)
+      // "true beta" label lives in the enlarged top margin so it never
+      // sits on top of the histogram bars (which peak right near beta_true).
+      g.append("text").attr("x", x(data.beta_true) + 4).attr("y", -8)
+        .attr("fill", C.steel).attr("font-size", 11).attr("font-weight", 600)
         .text(`true beta = ${data.beta_true.toFixed(2)}`);
+
+      // Legend swatches (POLS orange, FE teal) also live in the top margin
+      // so they replace the in-axis-caption inline legend and never overlap
+      // with bars.
+      g.append("rect").attr("x", w - 180).attr("y", -22)
+        .attr("width", 10).attr("height", 10).attr("fill", C.orange).attr("opacity", 0.65);
+      g.append("text").attr("x", w - 166).attr("y", -13)
+        .attr("fill", C.text).attr("font-size", 11).text("POLS");
+      g.append("rect").attr("x", w - 110).attr("y", -22)
+        .attr("width", 10).attr("height", 10).attr("fill", C.teal).attr("opacity", 0.85);
+      g.append("text").attr("x", w - 96).attr("y", -13)
+        .attr("fill", C.text).attr("font-size", 11).text("FE");
 
       g.append("g").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format(".2f")))
@@ -394,7 +445,7 @@
       g.selectAll(".domain, .tick line").attr("stroke", C.muted);
       g.append("text").attr("transform", `translate(${w / 2},${h + 32})`)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
-        .text("Estimated beta across 100 simulated panels  ·  orange = POLS, teal = FE");
+        .text("Estimated beta across 100 simulated panels");
     }
     return { update };
   }
@@ -505,8 +556,12 @@
   // beta_RE, V_FE, V_RE) drive the H computation.
   // ------------------------------------------------------------------
   function hausman_explorer(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 50, left: 56 };
+    const W = 720, H = 340;
+    // Top margin enlarged to host the "H = ...  ·  p = ..." annotation
+    // in a dedicated band above the chi-square density so the label never
+    // collides with the curve peak (which lies near the y-axis where the
+    // label used to sit).
+    const margin = { top: 48, right: 28, bottom: 50, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -557,8 +612,14 @@
         .attr("x1", x(Hclip)).attr("x2", x(Hclip))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.orange).attr("stroke-width", 2);
-      g.append("text").attr("x", x(Hclip) + 6).attr("y", 12)
+      // H/p annotation lives in the enlarged top margin (y = -28) so it
+      // never overlaps with the chi-square curve peak near (x=0, y=0).
+      // Anchor horizontally by H so it tracks the orange line, but clamp
+      // into the plot's horizontal bounds so the text never gets cut off.
+      const hLabelX = Math.max(70, Math.min(w - 70, x(Hclip)));
+      g.append("text").attr("x", hLabelX).attr("y", -22)
         .attr("fill", C.orange).attr("font-size", 12).attr("font-weight", 600)
+        .attr("text-anchor", "middle")
         .text(`H = ${state.H.toFixed(3)}  ·  p = ${state.p.toFixed(4)}`);
 
       const crit = 3.841;
@@ -566,7 +627,10 @@
         .attr("x1", x(crit)).attr("x2", x(crit))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.muted).attr("stroke-width", 1).attr("stroke-dasharray", "4 4");
-      g.append("text").attr("x", x(crit) + 4).attr("y", h - 10)
+      // Place the critical-value label near the TOP of the plot (just below
+      // the H/p annotation band) instead of near the bottom, where it used
+      // to overlap with the x-axis tick labels.
+      g.append("text").attr("x", x(crit) + 4).attr("y", 14)
         .attr("fill", C.muted).attr("font-size", 11)
         .text("5% critical (3.84)");
     }
