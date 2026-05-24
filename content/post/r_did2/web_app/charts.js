@@ -538,8 +538,8 @@
   //   assumption would imply for the treated group.
   // ------------------------------------------------------------------
   function parallel_trends_animation(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    const W = 720, H = 380;
+    const margin = { top: 28, right: 28, bottom: 100, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -613,16 +613,22 @@
       requestAnimationFrame(frame);
     }
 
-    const lg = g.append("g").attr("transform", `translate(${w - 260},${10})`);
-    lg.append("rect").attr("width", 260).attr("height", 68)
+    // Legend placed BELOW the chart (outside plot area) to avoid overlapping data lines.
+    const lg = g.append("g").attr("transform", `translate(0,${h + 54})`);
+    lg.append("rect").attr("x", 0).attr("y", 0).attr("width", w).attr("height", 36)
       .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("Treated (actual)");
-    lg.append("line").attr("x1", 9).attr("y1", 35).attr("x2", 19).attr("y2", 35)
-      .attr("stroke", C.orange).attr("stroke-width", 1.5).attr("stroke-dasharray", "3 4");
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("Treated (counterfactual)");
-    lg.append("circle").attr("cx", 14).attr("cy", 55).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 59).attr("fill", C.text).attr("font-size", 12).text("Control");
+    // Entry 1: Treated (actual)
+    lg.append("circle").attr("cx", 14).attr("cy", 18).attr("r", 5).attr("fill", C.orange);
+    lg.append("text").attr("x", 26).attr("y", 22).attr("fill", C.text).attr("font-size", 12).text("Treated (actual)");
+    // Entry 2: Treated (counterfactual) — dashed marker
+    const x2 = Math.round(w * 0.33);
+    lg.append("line").attr("x1", x2 + 4).attr("y1", 18).attr("x2", x2 + 24).attr("y2", 18)
+      .attr("stroke", C.orange).attr("stroke-width", 2).attr("stroke-dasharray", "3 4");
+    lg.append("text").attr("x", x2 + 30).attr("y", 22).attr("fill", C.text).attr("font-size", 12).text("Treated (counterfactual)");
+    // Entry 3: Control
+    const x3 = Math.round(w * 0.72);
+    lg.append("circle").attr("cx", x3 + 14).attr("cy", 18).attr("r", 5).attr("fill", C.steel);
+    lg.append("text").attr("x", x3 + 26).attr("y", 22).attr("fill", C.text).attr("font-size", 12).text("Control");
 
     requestAnimationFrame(frame);
   }
@@ -633,8 +639,8 @@
   // data: { years: [-5..5], treat_unw, ctrl_unw, treat_wt, ctrl_wt }
   // ------------------------------------------------------------------
   function did_dgp_chart(container) {
-    const W = 760, H = 360;
-    const margin = { top: 26, right: 24, bottom: 44, left: 56 };
+    const W = 760, H = 410;
+    const margin = { top: 26, right: 24, bottom: 96, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -653,17 +659,23 @@
     const t0Line = g.append("line")
       .attr("stroke", C.orange).attr("stroke-dasharray", "4 4").attr("stroke-width", 1);
 
-    const lg = g.append("g").attr("transform", `translate(${w - 270},${6})`);
-    lg.append("rect").attr("width", 270).attr("height", 92)
+    // Legend placed BELOW the chart (outside plot area) to avoid overlapping data lines.
+    const lg = g.append("g").attr("transform", `translate(0,${h + 54})`);
+    lg.append("rect").attr("x", 0).attr("y", 0).attr("width", w).attr("height", 36)
       .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 16).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 20).attr("fill", C.text).attr("font-size", 11).text("Treated · Unweighted");
-    lg.append("circle").attr("cx", 14).attr("cy", 34).attr("r", 5).attr("fill", C.steel).attr("opacity", 0.5);
-    lg.append("text").attr("x", 26).attr("y", 38).attr("fill", C.text).attr("font-size", 11).text("Control  · Unweighted");
-    lg.append("circle").attr("cx", 14).attr("cy", 56).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 60).attr("fill", C.text).attr("font-size", 11).text("Treated · Pop-weighted");
-    lg.append("circle").attr("cx", 14).attr("cy", 74).attr("r", 5).attr("fill", C.orange).attr("opacity", 0.5);
-    lg.append("text").attr("x", 26).attr("y", 78).attr("fill", C.text).attr("font-size", 11).text("Control  · Pop-weighted");
+    // 4 entries laid out horizontally
+    const entries = [
+      { cx: 14,            color: C.steel,  op: 1.0, label: "Treated · Unweighted" },
+      { cx: w * 0.25 + 14, color: C.steel,  op: 0.5, label: "Control · Unweighted" },
+      { cx: w * 0.50 + 14, color: C.orange, op: 1.0, label: "Treated · Pop-weighted" },
+      { cx: w * 0.75 + 14, color: C.orange, op: 0.5, label: "Control · Pop-weighted" },
+    ];
+    entries.forEach(e => {
+      lg.append("circle").attr("cx", e.cx).attr("cy", 18).attr("r", 5)
+        .attr("fill", e.color).attr("opacity", e.op);
+      lg.append("text").attr("x", e.cx + 10).attr("y", 22)
+        .attr("fill", C.text).attr("font-size", 11).text(e.label);
+    });
 
     function update(data) {
       const yrs = data.years;
@@ -723,8 +735,8 @@
   // data: [{ e, est_unw, se_unw, est_wt, se_wt }]
   // ------------------------------------------------------------------
   function event_study_chart(container) {
-    const W = 800, H = 360;
-    const margin = { top: 28, right: 24, bottom: 44, left: 60 };
+    const W = 800, H = 410;
+    const margin = { top: 28, right: 24, bottom: 96, left: 60 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -783,18 +795,20 @@
       if (showUnw) drawSeries("est_unw", "se_unw", C.steel,  1.0);
       if (showWt)  drawSeries("est_wt",  "se_wt",  C.orange, 1.0);
 
-      const lg = g.append("g").attr("transform", `translate(${w - 220},${4})`);
-      lg.append("rect").attr("width", 220).attr("height", 50)
+      // Legend placed BELOW the chart (outside plot area) to avoid overlapping data lines.
+      const lg = g.append("g").attr("transform", `translate(0,${h + 54})`);
+      lg.append("rect").attr("x", 0).attr("y", 0).attr("width", w).attr("height", 36)
         .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
       if (showUnw) {
-        lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.steel);
-        lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 11)
-          .text("Unweighted ATT(e)");
+        lg.append("circle").attr("cx", 14).attr("cy", 18).attr("r", 5).attr("fill", C.steel);
+        lg.append("text").attr("x", 26).attr("y", 22).attr("fill", C.text).attr("font-size", 11)
+          .text("Unweighted ATT(e) — effect on the typical treated county");
       }
       if (showWt) {
-        lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.orange);
-        lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 11)
-          .text("Population-weighted ATT(e)");
+        const xOff = showUnw ? w * 0.5 : 0;
+        lg.append("circle").attr("cx", xOff + 14).attr("cy", 18).attr("r", 5).attr("fill", C.orange);
+        lg.append("text").attr("x", xOff + 26).attr("y", 22).attr("fill", C.text).attr("font-size", 11)
+          .text("Pop-weighted ATT(e) — effect on the typical treated adult");
       }
     }
 
@@ -808,7 +822,7 @@
   // ------------------------------------------------------------------
   function did_forest(container) {
     const W = 880;
-    const margin = { top: 28, right: 24, bottom: 36, left: 230 };
+    const margin = { top: 28, right: 24, bottom: 92, left: 230 };
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
@@ -825,6 +839,7 @@
       const totalH = margin.top + facetH + margin.bottom;
       svg.attr("viewBox", `0 0 ${W} ${totalH}`);
       svg.selectAll("g.facet").remove();
+      svg.selectAll("g.legend").remove();
       svg.selectAll("text.label").remove();
 
       const facet = svg.append("g").attr("class", "facet")
@@ -891,14 +906,17 @@
         }).on("mouseleave", function () { tooltip.classed("show", false); });
       });
 
-      const lg = svg.append("g").attr("class", "facet")
-        .attr("transform", `translate(${W - margin.right - 220},${10})`);
-      lg.append("rect").attr("width", 220).attr("height", 40)
+      // Legend placed BELOW the chart (outside plot area) to avoid overlap with CI bars.
+      const legendY = margin.top + facetH + 44;
+      const lg = svg.append("g").attr("class", "legend")
+        .attr("transform", `translate(${margin.left},${legendY})`);
+      const legendW = facetW;
+      lg.append("rect").attr("x", 0).attr("y", 0).attr("width", legendW).attr("height", 36)
         .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-      lg.append("circle").attr("cx", 14).attr("cy", 14).attr("r", 5).attr("fill", C.steel);
-      lg.append("text").attr("x", 26).attr("y", 18).attr("fill", C.text).attr("font-size", 11).text("Unweighted (per county)");
-      lg.append("circle").attr("cx", 14).attr("cy", 30).attr("r", 5).attr("fill", C.orange);
-      lg.append("text").attr("x", 26).attr("y", 34).attr("fill", C.text).attr("font-size", 11).text("Pop-weighted (per adult)");
+      lg.append("circle").attr("cx", 14).attr("cy", 18).attr("r", 5).attr("fill", C.steel);
+      lg.append("text").attr("x", 26).attr("y", 22).attr("fill", C.text).attr("font-size", 11).text("Unweighted (per county)");
+      lg.append("circle").attr("cx", Math.round(legendW * 0.5) + 14).attr("cy", 18).attr("r", 5).attr("fill", C.orange);
+      lg.append("text").attr("x", Math.round(legendW * 0.5) + 26).attr("y", 22).attr("fill", C.text).attr("font-size", 11).text("Pop-weighted (per adult)");
     }
 
     return { update };
