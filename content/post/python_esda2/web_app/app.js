@@ -284,8 +284,10 @@
         // Show histogram inside the lisa-hist container.
         const hist = document.getElementById("lisa-hist");
         hist.style.display = "block";
-        const W = 720, H = 200;
-        const margin = { top: 16, right: 16, bottom: 36, left: 36 };
+        // Enlarged top margin so the "mean I = ..." annotation sits ABOVE
+        // the plot area and never overlaps with histogram bars near the mean.
+        const W = 720, H = 230;
+        const margin = { top: 40, right: 16, bottom: 36, left: 36 };
         const w = W - margin.left - margin.right;
         const h = H - margin.top - margin.bottom;
         d3.select(hist).html("");
@@ -309,9 +311,19 @@
         // Mean line.
         const mean = d3.mean(samples);
         g.append("line").attr("x1", x(mean)).attr("x2", x(mean)).attr("y1", 0).attr("y2", h).attr("stroke", "#d97757").attr("stroke-width", 2);
-        g.append("text").attr("x", x(mean) + 6).attr("y", 12).attr("fill", "#d97757").attr("font-size", 12)
+        // Mean annotation placed in the SVG top margin (above the plot area)
+        // so it can never be hidden behind histogram bars near the mean.
+        svg.append("text")
+          .attr("x", margin.left).attr("y", 18)
+          .attr("text-anchor", "start")
+          .attr("fill", "#e8ecf2").attr("font-size", 12).attr("font-weight", 600)
+          .text(`Sampling distribution of Moran's I — N = ${N}, ρ = ${lisa.rho.toFixed(2)}`);
+        svg.append("text")
+          .attr("x", W - margin.right).attr("y", 18)
+          .attr("text-anchor", "end")
+          .attr("fill", "#d97757").attr("font-size", 12).attr("font-weight", 600)
           .text(`mean I = ${mean.toFixed(3)}`);
-        g.append("text").attr("transform", `translate(${w / 2},${h + 28})`).attr("text-anchor", "middle").attr("fill", "#e8ecf2").attr("font-size", 12).text(`Moran's I across ${N} simulated lattices (ρ = ${lisa.rho.toFixed(2)})`);
+        g.append("text").attr("transform", `translate(${w / 2},${h + 28})`).attr("text-anchor", "middle").attr("fill", "#e8ecf2").attr("font-size", 12).text("Moran's I from each simulated lattice");
         btn.disabled = false;
         btn.textContent = "Run 100 simulations";
       }

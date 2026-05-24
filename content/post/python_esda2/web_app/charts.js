@@ -164,8 +164,10 @@
   //   data: { z: Float64Array, wz: Float64Array, moranI: number, quadrants: Int8Array (1=HH,2=LH,3=LL,4=HL) }
   // ------------------------------------------------------------------
   function moran_scatter(container) {
-    const W = 720, H = 420;
-    const margin = { top: 28, right: 24, bottom: 48, left: 56 };
+    // Increased top margin to host the Moran's I annotation OUTSIDE the
+    // plot area (was overlapping with the regression line and HH label).
+    const W = 720, H = 440;
+    const margin = { top: 50, right: 28, bottom: 48, left: 60 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -175,6 +177,7 @@
 
     function update(data) {
       g.selectAll("*").remove();
+      svg.selectAll(".moran-annot").remove();
       const { z, wz, moranI, quadrants } = data;
       const n = z.length;
       if (n === 0) return;
@@ -197,28 +200,41 @@
       g.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", h).attr("stroke", C.muted).attr("stroke-dasharray", "3 4").attr("opacity", 0.6);
       g.append("line").attr("x1", 0).attr("x2", w).attr("y1", y(0)).attr("y2", y(0)).attr("stroke", C.muted).attr("stroke-dasharray", "3 4").attr("opacity", 0.6);
 
-      // Quadrant labels.
-      const pad = 14;
-      g.append("text").attr("x", w - pad).attr("y", pad + 4).attr("text-anchor", "end").attr("fill", C.hh).attr("font-size", 14).attr("font-weight", 700).text("HH");
-      g.append("text").attr("x", pad).attr("y", pad + 4).attr("text-anchor", "start").attr("fill", C.lh).attr("font-size", 14).attr("font-weight", 700).text("LH");
-      g.append("text").attr("x", pad).attr("y", h - pad).attr("text-anchor", "start").attr("fill", C.ll).attr("font-size", 14).attr("font-weight", 700).text("LL");
-      g.append("text").attr("x", w - pad).attr("y", h - pad).attr("text-anchor", "end").attr("fill", C.hl).attr("font-size", 14).attr("font-weight", 700).text("HL");
+      // Quadrant labels. Placed just OUTSIDE the data area (in the margin)
+      // so they never collide with points or the regression line. The line
+      // travels through (0,0) with slope I, so its endpoints sit at the
+      // top-right and bottom-left corners of the plot — exactly where the
+      // HH and LL labels used to be.
+      g.append("text").attr("x", w - 4).attr("y", -8).attr("text-anchor", "end").attr("fill", C.hh).attr("font-size", 13).attr("font-weight", 700).text("HH (hot spot)");
+      g.append("text").attr("x", 4).attr("y", -8).attr("text-anchor", "start").attr("fill", C.lh).attr("font-size", 13).attr("font-weight", 700).text("LH (outlier)");
+      g.append("text").attr("x", 4).attr("y", h + 14).attr("text-anchor", "start").attr("dominant-baseline", "hanging").attr("fill", C.ll).attr("font-size", 13).attr("font-weight", 700).text("LL (cold spot)");
+      g.append("text").attr("x", w - 4).attr("y", h + 14).attr("text-anchor", "end").attr("dominant-baseline", "hanging").attr("fill", C.hl).attr("font-size", 13).attr("font-weight", 700).text("HL (outlier)");
 
       // Axes.
       g.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(x).ticks(6).tickFormat(d3.format(".1f"))).selectAll("text").attr("fill", C.muted);
       g.append("g").call(d3.axisLeft(y).ticks(6).tickFormat(d3.format(".1f"))).selectAll("text").attr("fill", C.muted);
       g.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
-      g.append("text").attr("transform", `translate(${w / 2},${h + 36})`).attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12).text("z_i  (standardized region value)");
-      g.append("text").attr("transform", `rotate(-90) translate(${-h / 2},${-42})`).attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12).text("W·z_i  (spatial lag of neighbours)");
+      g.append("text").attr("transform", `translate(${w / 2},${h + 40})`).attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12).text("z_i  (standardized region value)");
+      g.append("text").attr("transform", `rotate(-90) translate(${-h / 2},${-46})`).attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12).text("W·z_i  (spatial lag of neighbours)");
 
       // Regression line through origin with slope = moranI.
       const xR0 = -ext, xR1 = ext;
       g.append("line").attr("x1", x(xR0)).attr("y1", y(moranI * xR0)).attr("x2", x(xR1)).attr("y2", y(moranI * xR1))
         .attr("stroke", C.orange).attr("stroke-width", 2);
-      g.append("text").attr("x", w - 8).attr("y", y(moranI * xR1) - 8).attr("text-anchor", "end")
-        .attr("fill", C.orange).attr("font-size", 12).attr("font-weight", 600)
+
+      // Moran's I annotation: placed in the SVG top margin (above the plot)
+      // with a swatch, so it never overlaps with the regression line or the
+      // top-right HH region. Centered so it reads as a chart title.
+      const annot = svg.append("g").attr("class", "moran-annot")
+        .attr("transform", `translate(${margin.left + w / 2},${margin.top - 28})`);
+      annot.append("rect").attr("x", -86).attr("y", -2).attr("width", 18).attr("height", 4).attr("fill", C.orange);
+      annot.append("text").attr("x", -64).attr("y", 4).attr("text-anchor", "start")
+        .attr("fill", C.orange).attr("font-size", 13).attr("font-weight", 700)
         .text(`Moran's I = ${moranI.toFixed(3)}`);
+      annot.append("text").attr("x", 78).attr("y", 4).attr("text-anchor", "start")
+        .attr("fill", C.muted).attr("font-size", 11)
+        .text("(slope of orange line)");
 
       // Points.
       for (let i = 0; i < n; i++) {
@@ -239,8 +255,11 @@
   //   2013 and 2019 as horizontal reference markers.
   // ------------------------------------------------------------------
   function lisa_bars(container) {
-    const W = 720, H = 280;
-    const margin = { top: 28, right: 16, bottom: 36, left: 50 };
+    // Larger top margin so the "n_regions / rho" annotation sits ABOVE the
+    // plot area and never collides with bar-value labels (which sit just
+    // above each bar at y(v) - 6).
+    const W = 720, H = 300;
+    const margin = { top: 44, right: 16, bottom: 36, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -248,6 +267,7 @@
 
     function update(data) {
       g.selectAll("*").remove();
+      svg.selectAll(".lisa-annot").remove();
       const cats = ["HH", "LL", "HL", "LH", "ns"];
       const sim = data.sim;       // {HH, LL, HL, LH, ns}
       const colorMap = { HH: C.hh, LL: C.ll, HL: C.hl, LH: C.lh, ns: C.ns };
@@ -278,9 +298,17 @@
           .text(v);
       });
 
-      // Legend.
-      const legend = g.append("g").attr("transform", `translate(${w - 200},${4})`);
-      legend.append("text").attr("fill", C.muted).attr("font-size", 11).attr("x", 0).attr("y", 0).text(`n_regions = ${data.n} · ρ = ${data.rho.toFixed(2)}`);
+      // Caption (lives in the SVG top margin, outside the plot area).
+      svg.append("text").attr("class", "lisa-annot")
+        .attr("x", margin.left).attr("y", 18)
+        .attr("text-anchor", "start")
+        .attr("fill", C.text).attr("font-size", 12).attr("font-weight", 600)
+        .text("LISA region counts");
+      svg.append("text").attr("class", "lisa-annot")
+        .attr("x", W - margin.right).attr("y", 18)
+        .attr("text-anchor", "end")
+        .attr("fill", C.muted).attr("font-size", 11)
+        .text(`n_regions = ${data.n} · ρ = ${data.rho.toFixed(2)}`);
     }
     return { update };
   }
@@ -295,7 +323,10 @@
   // ------------------------------------------------------------------
   function forest_plot(container) {
     const W = 880;
-    const margin = { top: 28, right: 24, bottom: 36, left: 200 };
+    // Extra top margin (was 28) to host a method-color legend above the
+    // plot area. The legend used to be absent, so users could not decode
+    // bar colors without reading each row label.
+    const margin = { top: 56, right: 24, bottom: 36, left: 200 };
     const colorMap = {
       "Moran's I 2013":      C.steel,
       "Moran's I 2019":      C.orange,
@@ -325,6 +356,23 @@
       const totalH = margin.top + rows.length * rowH + margin.bottom + 20;
       svg.attr("viewBox", `0 0 ${W} ${totalH}`);
       svg.selectAll("*").remove();
+
+      // Method-color legend placed ABOVE the plot area (in the top margin)
+      // so it never overlaps with CI bars, dots, or row labels. Only
+      // methods actually present in the active selection appear.
+      const presentMethods = Array.from(new Set(rows.map(d => d.method)));
+      const legendG = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top - 32})`);
+      let lx = 0;
+      presentMethods.forEach(m => {
+        const col = colorMap[m] || C.steel;
+        legendG.append("line").attr("x1", lx).attr("x2", lx + 18).attr("y1", 0).attr("y2", 0).attr("stroke", col).attr("stroke-width", 3);
+        legendG.append("circle").attr("cx", lx + 9).attr("cy", 0).attr("r", 4).attr("fill", col).attr("stroke", "#fff").attr("stroke-width", 1);
+        const label = legendG.append("text").attr("x", lx + 24).attr("y", 4)
+          .attr("fill", C.text).attr("font-size", 12).text(m);
+        // Advance lx by approximate label width + padding.
+        lx += 24 + (m.length * 6.6) + 18;
+      });
 
       const xExt = d3.extent(rows.flatMap(d => [d.ci_lo, d.ci_hi]));
       const xMin = Math.min(0, xExt[0]);
