@@ -112,8 +112,11 @@
 
   <h2>Donor weights across the three stages</h2>
   <p class="lede">
-    Three pictures of "which states make up the synthetic California". Toggle between them and watch the
-    donor count grow from 4 → 23 → 27. None of this changes the sign of the ATT — but it shows how much
+    Two pictures of "which states make up the synthetic California". Toggle between the classical simplex
+    and the Bayesian horseshoe and watch the active-donor count grow from 4 to 23. The SAR-corrected
+    Stage 3 inherits the horseshoe weights but adds a spatial diffusion layer (covered in Tab 3); its
+    headline metric is the same expanded donor pool — 27 donors with non-negligible posterior mass after
+    the SAR layer integrates over ρ. None of this changes the sign of the ATT — but it shows how much
     of the classical "four donors" story is the simplex talking, not the data.
   </p>
 
@@ -125,6 +128,9 @@
     </div>
     <p class="note" id="dw-caption" style="margin-top:8px;">
       Stage 1: 99.8% of the mass on Utah, Nevada, Montana, Connecticut. The remaining 34 donors are essentially zero.
+    </p>
+    <p class="note" style="margin-top:6px;font-style:italic;">
+      Stage 3 (Bayesian Spatial SAR) reuses the horseshoe donor weights from Stage 2; see <a href="#" class="ts-link" data-goto="pane-spillover">Tab 3 · Spillover &amp; ρ</a> for the SAR diffusion view.
     </p>
   </div>
 

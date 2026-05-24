@@ -23,6 +23,12 @@
   document.querySelectorAll(".cta-card[data-goto]").forEach(card => {
     card.addEventListener("click", () => activateTab(card.dataset.goto));
   });
+  document.querySelectorAll("a.ts-link[data-goto]").forEach(a => {
+    a.addEventListener("click", ev => {
+      ev.preventDefault();
+      activateTab(a.dataset.goto);
+    });
+  });
 
   function debounce(fn, ms) {
     let h = null;

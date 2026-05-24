@@ -536,8 +536,10 @@
   //           treatYear: 1988, title, hasBand }
   // ------------------------------------------------------------------
   function trajectory(container) {
-    const W = 780, H = 380;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    const W = 780, H = 420;
+    // Extra bottom margin holds the legend OUTSIDE the plot area so it never
+    // overlaps the data lines or the "Prop 99 (year)" treatment label.
+    const margin = { top: 28, right: 28, bottom: 90, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -621,22 +623,34 @@
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Per-capita cigarette sales (packs)");
 
-      // legend
-      const lg = g.append("g").attr("transform", `translate(${w - 230},${0})`);
-      lg.append("rect").attr("width", 230).attr("height", 48)
+      // legend (placed BELOW the plot, horizontally centred, to avoid any
+      // overlap with the data lines or the "Prop 99 (year)" label).
+      const legendY = h + 56;
+      const legendItems = [
+        { label: "California (observed)",     color: C.steel, dash: null    },
+        { label: "Synthetic (counterfactual)", color: C.teal,  dash: "5 3"   },
+      ];
+      // Estimate width: ~12 swatch + ~190 text + 24 gap per item
+      const itemW = 220;
+      const totalW = itemW * legendItems.length;
+      const lg = g.append("g")
+        .attr("transform", `translate(${(w - totalW) / 2},${legendY})`);
+      lg.append("rect")
+        .attr("x", -10).attr("y", -16)
+        .attr("width", totalW + 20).attr("height", 28)
         .attr("fill", "rgba(15,23,41,0.6)")
         .attr("stroke", C.line).attr("rx", 6);
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 16).attr("y2", 16)
-        .attr("stroke", C.steel).attr("stroke-width", 2.5);
-      lg.append("text").attr("x", 40).attr("y", 20)
-        .attr("fill", C.text).attr("font-size", 12)
-        .text("California (observed)");
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 36).attr("y2", 36)
-        .attr("stroke", C.teal).attr("stroke-width", 2.5)
-        .attr("stroke-dasharray", "5 3");
-      lg.append("text").attr("x", 40).attr("y", 40)
-        .attr("fill", C.text).attr("font-size", 12)
-        .text("Synthetic (counterfactual)");
+      legendItems.forEach((item, i) => {
+        const ox = i * itemW;
+        const ln = lg.append("line")
+          .attr("x1", ox).attr("x2", ox + 22)
+          .attr("y1", 0).attr("y2", 0)
+          .attr("stroke", item.color).attr("stroke-width", 2.5);
+        if (item.dash) ln.attr("stroke-dasharray", item.dash);
+        lg.append("text").attr("x", ox + 30).attr("y", 4)
+          .attr("fill", C.text).attr("font-size", 12)
+          .text(item.label);
+      });
     }
 
     return { update };
