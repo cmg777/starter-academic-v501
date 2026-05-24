@@ -82,8 +82,11 @@
   //   data: { points: [{cut_inner, att_pct, ci_lo_pct, ci_hi_pct}], current_cut: number }
   // ------------------------------------------------------------------
   function ringchoice_curve(container) {
-    const W = 720, H = 360;
-    const margin = { top: 30, right: 28, bottom: 50, left: 64 };
+    // Bottom margin enlarged to host the legend below the x-axis label,
+    // and top margin enlarged so the slider readout sits above the plot
+    // area (not on top of the legend).
+    const W = 720, H = 420;
+    const margin = { top: 46, right: 28, bottom: 110, left: 64 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -169,13 +172,17 @@
       sliderText.attr("x", x(state.current_cut)).attr("y", -10).text(`d̄ = ${state.current_cut.toFixed(2)} mi · ATT = ${curAtt.toFixed(2)} %`);
     }
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 48).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 16).attr("r", 4).attr("fill", C.teal);
-    lg.append("text").attr("x", 26).attr("y", 20).attr("fill", C.text).attr("font-size", 11).text("Post estimates (0.05, 0.10, 0.15 mi)");
-    lg.append("rect").attr("x", 8).attr("y", 30).attr("width", 12).attr("height", 8).attr("fill", C.steel).attr("opacity", 0.4);
-    lg.append("text").attr("x", 26).attr("y", 38).attr("fill", C.text).attr("font-size", 11).text("Interpolated 95 % CI band");
+    // Legend — placed below the x-axis label (outside the plot region) to
+    // avoid overlapping the CI band, curve, and slider readout.
+    const legendY = h + 56;
+    const lg = g.append("g").attr("transform", `translate(0,${legendY})`);
+    lg.append("rect").attr("width", w).attr("height", 38).attr("fill", "rgba(15,23,41,0.5)").attr("stroke", C.line).attr("rx", 6);
+    lg.append("circle").attr("cx", 16).attr("cy", 14).attr("r", 4).attr("fill", C.teal);
+    lg.append("text").attr("x", 28).attr("y", 18).attr("fill", C.text).attr("font-size", 11).text("Post estimates (0.05, 0.10, 0.15 mi)");
+    lg.append("rect").attr("x", 230).attr("y", 9).attr("width", 12).attr("height", 8).attr("fill", C.steel).attr("opacity", 0.4);
+    lg.append("text").attr("x", 248).attr("y", 18).attr("fill", C.text).attr("font-size", 11).text("Interpolated 95 % CI band");
+    lg.append("circle").attr("cx", 16).attr("cy", 30).attr("r", 5).attr("fill", C.orange).attr("stroke", "#fff").attr("stroke-width", 1);
+    lg.append("text").attr("x", 28).attr("y", 33).attr("fill", C.text).attr("font-size", 11).text("Your current cutoff");
 
     return { update };
   }
@@ -185,8 +192,11 @@
   //   state: { A, k, dt, cut, truth_avg, tauhat, n, sigma }
   // ------------------------------------------------------------------
   function simulator_curve(container) {
-    const W = 720, H = 360;
-    const margin = { top: 30, right: 28, bottom: 50, left: 64 };
+    // Bottom margin enlarged to host the legend below the x-axis label,
+    // and top margin enlarged so the cut/dt labels do not collide with
+    // the chart heading.
+    const W = 720, H = 420;
+    const margin = { top: 46, right: 28, bottom: 110, left: 64 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -242,21 +252,35 @@
         .attr("height", 4);
 
       cutLine.attr("x1", x(state.cut)).attr("x2", x(state.cut));
-      cutLabel.attr("x", x(state.cut)).attr("y", -10).text(`d̄ = ${state.cut.toFixed(2)}`);
       dtLine.attr("x1", x(state.dt)).attr("x2", x(state.dt));
-      dtLabel.attr("x", x(state.dt)).attr("y", -10 - (Math.abs(state.cut - state.dt) < 0.04 ? 16 : 0))
-        .text(`d_t = ${state.dt.toFixed(2)}`);
 
-      // Legend
+      // When cut and dt are close, separate them vertically AND horizontally
+      // so labels don't collide. Otherwise centre them above each line.
+      const closeXY = Math.abs(state.cut - state.dt) < 0.06;
+      if (closeXY) {
+        cutLabel.attr("x", x(state.cut) + 22).attr("y", -22).attr("text-anchor", "start").text(`d̄ = ${state.cut.toFixed(2)}`);
+        dtLabel.attr("x", x(state.dt) - 22).attr("y", -22).attr("text-anchor", "end").text(`d_t = ${state.dt.toFixed(2)}`);
+      } else {
+        cutLabel.attr("x", x(state.cut)).attr("y", -10).attr("text-anchor", "middle").text(`d̄ = ${state.cut.toFixed(2)}`);
+        dtLabel.attr("x", x(state.dt)).attr("y", -10).attr("text-anchor", "middle").text(`d_t = ${state.dt.toFixed(2)}`);
+      }
+
+      // Legend — placed below the x-axis label (outside the plot region)
+      // so it never overlaps the true τ(d) curve.
       g.selectAll(".sim-legend").remove();
-      const lg = g.append("g").attr("class", "sim-legend").attr("transform", `translate(${w - 200},${10})`);
-      lg.append("rect").attr("width", 200).attr("height", 60).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-      lg.append("line").attr("x1", 10).attr("x2", 30).attr("y1", 18).attr("y2", 18).attr("stroke", C.teal).attr("stroke-width", 3);
-      lg.append("text").attr("x", 38).attr("y", 22).attr("fill", C.text).attr("font-size", 11).text("True τ(d)");
-      lg.append("rect").attr("x", 10).attr("y", 32).attr("width", 20).attr("height", 4).attr("fill", C.orange);
-      lg.append("text").attr("x", 38).attr("y", 38).attr("fill", C.text).attr("font-size", 11).text(`τ̂ = ${state.tauhat.toFixed(3)}`);
-      lg.append("rect").attr("x", 10).attr("y", 46).attr("width", 20).attr("height", 8).attr("fill", C.teal).attr("opacity", 0.18);
-      lg.append("text").attr("x", 38).attr("y", 53).attr("fill", C.text).attr("font-size", 11).text(`truth-avg = ${state.truth_avg.toFixed(3)}`);
+      const legendY = h + 56;
+      const lg = g.append("g").attr("class", "sim-legend").attr("transform", `translate(0,${legendY})`);
+      lg.append("rect").attr("width", w).attr("height", 38).attr("fill", "rgba(15,23,41,0.5)").attr("stroke", C.line).attr("rx", 6);
+      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 14).attr("y2", 14).attr("stroke", C.teal).attr("stroke-width", 3);
+      lg.append("text").attr("x", 40).attr("y", 18).attr("fill", C.text).attr("font-size", 11).text("True τ(d)");
+      lg.append("rect").attr("x", 130).attr("y", 10).attr("width", 20).attr("height", 4).attr("fill", C.orange);
+      lg.append("text").attr("x", 158).attr("y", 18).attr("fill", C.text).attr("font-size", 11).text(`τ̂ = ${state.tauhat.toFixed(3)}`);
+      lg.append("rect").attr("x", 12).attr("y", 26).attr("width", 20).attr("height", 8).attr("fill", C.teal).attr("opacity", 0.18);
+      lg.append("text").attr("x", 40).attr("y", 33).attr("fill", C.text).attr("font-size", 11).text(`truth-avg in [0, d̄] = ${state.truth_avg.toFixed(3)}`);
+      lg.append("line").attr("x1", 290).attr("x2", 310).attr("y1", 14).attr("y2", 14).attr("stroke", C.orange).attr("stroke-width", 2);
+      lg.append("text").attr("x", 318).attr("y", 18).attr("fill", C.text).attr("font-size", 11).text("d̄ (your cutoff)");
+      lg.append("line").attr("x1", 290).attr("x2", 310).attr("y1", 30).attr("y2", 30).attr("stroke", C.steel).attr("stroke-width", 1.5).attr("stroke-dasharray", "4 4");
+      lg.append("text").attr("x", 318).attr("y", 33).attr("fill", C.text).attr("font-size", 11).text("d_t (true radius)");
     }
     return { update };
   }
