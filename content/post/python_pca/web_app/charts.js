@@ -38,8 +38,10 @@
   //   teal PC2 perpendicular when the orange aligns with PC1.
   // ------------------------------------------------------------------
   function pca_rotation_animation(container) {
-    const W = 720, H = 360;
-    const margin = { top: 24, right: 200, bottom: 44, left: 60 };
+    const W = 720, H = 400;
+    // Bottom margin enlarged so the legend can sit BELOW the plot
+    // (it used to overlap scatter points at the bottom-left of the cloud).
+    const margin = { top: 24, right: 200, bottom: 84, left: 60 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -86,10 +88,13 @@
     g.append("line").attr("x1", w/2).attr("x2", w/2).attr("y1", 0).attr("y2", h)
       .attr("stroke", C.grid);
 
-    g.append("text").attr("x", w).attr("y", h/2 - 6).attr("fill", C.muted)
-      .attr("font-size", 11).attr("text-anchor", "end").text("z₁ (Life expectancy)");
-    g.append("text").attr("x", w/2 + 6).attr("y", 12).attr("fill", C.muted)
-      .attr("font-size", 11).text("z₂ (Infant survival)");
+    // Axis titles inside the right margin (small font, muted) — placed
+    // close to the axis lines but outside the scatter cloud so they do
+    // not collide with the rotating arrows or the projected points.
+    g.append("text").attr("x", w + 4).attr("y", h/2 - 6).attr("fill", C.muted)
+      .attr("font-size", 10).text("z₁ (LE)");
+    g.append("text").attr("x", w/2 + 6).attr("y", -8).attr("fill", C.muted)
+      .attr("font-size", 10).text("z₂ (IS)");
 
     // Scatter points
     g.selectAll("circle.country").data(d3.range(n)).enter()
@@ -140,17 +145,20 @@
     g.append("text").attr("x", gaugeX + gaugeW + 8).attr("y", gaugeH/2)
       .attr("fill", C.muted).attr("font-size", 10).text("max ≈ 2.0");
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(8, ${h - 56})`);
-    lg.append("rect").attr("width", 200).attr("height", 50)
-      .attr("fill", "rgba(15,23,41,0.65)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 4).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 11)
+    // Legend — placed BELOW the plot (one horizontal row) so it never
+    // overlaps the scatter cloud or the candidate-direction arrow.
+    const lg = g.append("g").attr("transform", `translate(0, ${h + 36})`);
+    lg.append("circle").attr("cx", 6).attr("cy", 6).attr("r", 4).attr("fill", C.steel);
+    lg.append("text").attr("x", 16).attr("y", 10).attr("fill", C.text).attr("font-size", 11)
       .text("Country (z-scored)");
-    lg.append("line").attr("x1", 8).attr("x2", 24).attr("y1", 35).attr("y2", 35)
+    lg.append("line").attr("x1", 160).attr("x2", 184).attr("y1", 6).attr("y2", 6)
       .attr("stroke", C.orange).attr("stroke-width", 2.5);
-    lg.append("text").attr("x", 30).attr("y", 39).attr("fill", C.text).attr("font-size", 11)
+    lg.append("text").attr("x", 190).attr("y", 10).attr("fill", C.text).attr("font-size", 11)
       .text("Candidate direction (PC1 search)");
+    lg.append("line").attr("x1", 380).attr("x2", 404).attr("y1", 6).attr("y2", 6)
+      .attr("stroke", C.teal).attr("stroke-width", 1.8).attr("stroke-dasharray", "4 3");
+    lg.append("text").attr("x", 410).attr("y", 10).attr("fill", C.text).attr("font-size", 11)
+      .text("PC2 (perpendicular to PC1)");
 
     let t0 = null;
     function step(ts) {
@@ -204,8 +212,11 @@
   // Tab 2: PCA simulator scatter — z-scored cloud + PC1/PC2 arrows.
   // ------------------------------------------------------------------
   function pca_scatter(container) {
-    const W = 760, H = 420;
-    const margin = { top: 24, right: 200, bottom: 40, left: 56 };
+    const W = 760, H = 440;
+    // Extra bottom margin reserves room for the x-axis title BELOW the
+    // plot; left margin reserves room for the y-axis title to the LEFT.
+    // Right margin stays 200 for the eigenvalue side panel.
+    const margin = { top: 28, right: 200, bottom: 56, left: 64 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -224,10 +235,13 @@
     g.append("line").attr("x1", 0).attr("x2", w).attr("y1", h/2).attr("y2", h/2).attr("stroke", C.grid);
     g.append("line").attr("x1", w/2).attr("x2", w/2).attr("y1", 0).attr("y2", h).attr("stroke", C.grid);
 
-    g.append("text").attr("x", w - 8).attr("y", h/2 - 6).attr("fill", C.muted)
-      .attr("font-size", 11).attr("text-anchor", "end").text("z (Life expectancy)");
-    g.append("text").attr("x", w/2 + 6).attr("y", 12).attr("fill", C.muted)
-      .attr("font-size", 11).text("z (Infant survival)");
+    // Axis titles OUTSIDE the plot area so they never collide with the
+    // PC arrows, cross-hair, or scatter cloud.
+    g.append("text").attr("x", w / 2).attr("y", h + 38).attr("fill", C.text)
+      .attr("font-size", 12).attr("text-anchor", "middle").text("z (Life expectancy)");
+    g.append("text").attr("x", -h / 2).attr("y", -46)
+      .attr("transform", "rotate(-90)").attr("text-anchor", "middle")
+      .attr("fill", C.text).attr("font-size", 12).text("z (Infant survival)");
 
     const pts = g.append("g");
     const pc1Line = g.append("line").attr("stroke", C.orange).attr("stroke-width", 3);
@@ -368,6 +382,22 @@
         infant_mort: "Infant mortality (per 1,000)",
       };
 
+      // Guard against empty filter results — otherwise d3.extent returns
+      // [undefined, undefined] and every NaN propagates into <line>/<rect>
+      // attributes, producing console errors.
+      if (!rows || rows.length === 0) {
+        container.innerHTML = "";
+        const W = 760, H = 120;
+        const svg = d3.select(container).append("svg")
+          .attr("viewBox", `0 0 ${W} ${H}`)
+          .attr("preserveAspectRatio", "xMidYMid meet");
+        svg.append("text").attr("x", W / 2).attr("y", H / 2)
+          .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
+          .attr("fill", C.muted).attr("font-size", 14)
+          .text("No countries match the current filter — lower the threshold.");
+        return;
+      }
+
       const W = 760, rowH = 14, headerH = 30, footerH = 30;
       const H = headerH + rowH * rows.length + footerH;
       const margin = { top: headerH, right: 80, bottom: footerH, left: 90 };
@@ -381,8 +411,12 @@
       const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
       const ext = d3.extent(rows, r => r[metric]);
-      const lo = Math.min(0, ext[0]);
-      const hi = Math.max(0, ext[1]);
+      // Defensive fallback for empty extents (shouldn't reach here after the
+      // early return, but keep numeric scales safe).
+      const e0 = Number.isFinite(ext[0]) ? ext[0] : 0;
+      const e1 = Number.isFinite(ext[1]) ? ext[1] : 1;
+      const lo = Math.min(0, e0);
+      const hi = Math.max(0, e1);
       const x = d3.scaleLinear().domain([lo, hi]).range([0, w]).nice();
 
       g.append("g").attr("transform", `translate(0,${-4})`)
@@ -449,8 +483,10 @@
   // Tab 4: Loadings bar chart — PC1 vs PC2 weights for each indicator.
   // ------------------------------------------------------------------
   function loadings_bars(container) {
-    const W = 720, H = 240;
-    const margin = { top: 24, right: 28, bottom: 50, left: 56 };
+    const W = 720, H = 260;
+    // Reserve extra top margin so the legend can sit OUTSIDE the plot
+    // area (it used to overlap the "0.7071" bar value labels).
+    const margin = { top: 48, right: 28, bottom: 50, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -493,16 +529,18 @@
       });
     });
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 160}, -8)`);
-    lg.append("rect").attr("x", 0).attr("y", 0).attr("width", 12).attr("height", 12)
-      .attr("fill", C.orange);
-    lg.append("text").attr("x", 18).attr("y", 10).attr("fill", C.text)
-      .attr("font-size", 11).text("PC1 (98% variance)");
-    lg.append("rect").attr("x", 0).attr("y", 18).attr("width", 12).attr("height", 12)
-      .attr("fill", C.teal);
-    lg.append("text").attr("x", 18).attr("y", 28).attr("fill", C.text)
-      .attr("font-size", 11).text("PC2 (2% variance)");
+    // Legend — placed ABOVE the plot in the reserved top margin so it
+    // does not overlap the bar value labels ("0.7071") at the top of
+    // the bars. Single horizontal row.
+    const lg = g.append("g").attr("transform", `translate(0, ${-32})`);
+    lg.append("rect").attr("x", 0).attr("y", 0).attr("width", 14).attr("height", 14)
+      .attr("fill", C.orange).attr("rx", 2);
+    lg.append("text").attr("x", 20).attr("y", 11).attr("fill", C.text)
+      .attr("font-size", 12).text("PC1 (98% variance)");
+    lg.append("rect").attr("x", 170).attr("y", 0).attr("width", 14).attr("height", 14)
+      .attr("fill", C.teal).attr("rx", 2);
+    lg.append("text").attr("x", 190).attr("y", 11).attr("fill", C.text)
+      .attr("font-size", 12).text("PC2 (2% variance)");
 
     return { update: () => {} };
   }
