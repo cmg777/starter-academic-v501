@@ -51,8 +51,8 @@
   (function initParallelTrends() {
     const c = document.getElementById("pt-chart");
     if (!c) return;
-    const W = 720, H = 360;
-    const m = { top: 30, right: 24, bottom: 50, left: 60 };
+    const W = 720, H = 400;
+    const m = { top: 30, right: 24, bottom: 90, left: 60 };
     const w = W - m.left - m.right, hh = H - m.top - m.bottom;
     c.innerHTML = "";
     const svg = d3.select(c).append("svg")
@@ -63,7 +63,8 @@
     // Two-period DiD: t=-2 is pre, t=+1 is post. Treatment at t=0.
     const periods = [-2, +1];
     const x = d3.scaleLinear().domain([-2.5, 1.5]).range([0, w]);
-    const y = d3.scaleLinear().domain([40, 110]).range([hh, 0]);
+    // Y-domain accommodates max possible tPost: cfPost(=82.10+pre[max=10]) + delta[max=40] ≈ 132.
+    const y = d3.scaleLinear().domain([40, 135]).range([hh, 0]);
 
     g.append("g").attr("transform", `translate(0,${hh})`)
       .call(d3.axisBottom(x).tickValues(periods).tickFormat(d => d < 0 ? "Pre" : "Post"))
@@ -77,7 +78,7 @@
       .text("Time period");
     g.append("text").attr("transform", `rotate(-90) translate(${-hh / 2},${-46})`)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
-      .text("GPA (0–100 scale)");
+      .text("GPA (0–100+ scale)");
 
     // Treatment dividing line halfway between pre and post
     g.append("line").attr("x1", x(-0.5)).attr("x2", x(-0.5)).attr("y1", 0).attr("y2", hh)
@@ -98,23 +99,36 @@
     const mObs = g.selectAll(".m-o").data(periods).enter().append("circle")
       .attr("class", "m-o").attr("r", 5).attr("fill", C.orange);
 
-    // Legend
-    const legend = svg.append("g").attr("transform", `translate(${W - 260},${8})`);
-    [["Comparison (control)", C.steel, false],
-     ["Counterfactual treated", C.muted, true],
-     ["Observed treated", C.orange, false]].forEach((d, i) => {
-      const yy = i * 16;
-      legend.append("line").attr("x1", 0).attr("x2", 22)
-        .attr("y1", yy + 6).attr("y2", yy + 6)
+    // Legend — placed BELOW the x-axis label, centred. Sits outside the
+    // plotting area so it can never overlap the rising orange (treated) line.
+    const legendItems = [
+      ["Comparison (control)", C.steel, false],
+      ["Counterfactual treated", C.muted, true],
+      ["Observed treated", C.orange, false],
+    ];
+    const itemW = 200;
+    const legendW = itemW * legendItems.length;
+    const legend = svg.append("g")
+      .attr("transform", `translate(${(W - legendW) / 2},${H - 28})`);
+    legend.append("rect")
+      .attr("x", -10).attr("y", -14).attr("width", legendW + 20).attr("height", 24)
+      .attr("fill", "rgba(15,23,41,0.55)").attr("stroke", "rgba(232,236,242,0.18)").attr("rx", 6);
+    legendItems.forEach((d, i) => {
+      const xx = i * itemW;
+      legend.append("line").attr("x1", xx).attr("x2", xx + 22)
+        .attr("y1", 0).attr("y2", 0)
         .attr("stroke", d[1]).attr("stroke-width", 2.4)
         .attr("stroke-dasharray", d[2] ? "5 4" : "0");
-      legend.append("text").attr("x", 28).attr("y", yy + 10)
+      legend.append("text").attr("x", xx + 28).attr("y", 4)
         .attr("fill", C.text).attr("font-size", 11).text(d[0]);
     });
 
+    // ATT label — placed top-LEFT so it sits over the pre-period region
+    // (where the lines are low and clustered around GPA ~60-71), not over
+    // the rising orange line at the post period.
     const attLabel = g.append("text").attr("fill", C.teal)
-      .attr("font-size", 13).attr("font-weight", 600).attr("text-anchor", "end")
-      .attr("x", w - 6).attr("y", 18);
+      .attr("font-size", 13).attr("font-weight", 600).attr("text-anchor", "start")
+      .attr("x", 6).attr("y", 18);
 
     // Anchor values from the post:
     //   control_pre = 71.22, control_post = 82.10  (drift = 10.88)

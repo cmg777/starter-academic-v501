@@ -561,17 +561,18 @@
   //   Shows treated vs. control mean outcomes over 6 periods. A slider
   //   moves a divergence parameter `delta`; the counterfactual stays parallel
   //   to control, while the observed treated path bends at the treatment date.
+  //   Legend moved below x-axis to avoid overlap with rising orange line.
   // ----------------------------------------------------------------
   function parallel_trends_animation(container) {
-    const W = 720, H = 340;
-    const m = { top: 30, right: 24, bottom: 48, left: 56 };
+    const W = 720, H = 380;
+    const m = { top: 30, right: 24, bottom: 90, left: 56 };
     const w = W - m.left - m.right, h = H - m.top - m.bottom;
     const svg = ensureSVG(container, W, H);
     const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
 
     const periods = [-2, -1, 0, 1, 2, 3];
     const x = d3.scaleLinear().domain([-2.2, 3.2]).range([0, w]);
-    const y = d3.scaleLinear().domain([4.5, 6.2]).range([h, 0]);
+    const y = d3.scaleLinear().domain([4.5, 6.4]).range([h, 0]);
 
     g.append("g").attr("transform", `translate(0,${h})`)
       .call(d3.axisBottom(x).tickValues(periods).tickFormat(d => (d <= 0 ? "t" + d : "t+" + d)))
@@ -585,7 +586,7 @@
       .text("Time relative to treatment");
     g.append("text").attr("transform", `rotate(-90) translate(${-h / 2},${-40})`)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
-      .text("Log teen employment (mean)");
+      .text("Outcome (mean, illustrative units)");
 
     // Treatment line
     g.append("line").attr("x1", x(-0.5)).attr("x2", x(-0.5)).attr("y1", 0).attr("y2", h)
@@ -618,24 +619,34 @@
     const pObs = g.append("path").attr("fill", "none")
       .attr("stroke", C.orange).attr("stroke-width", 2.8);
 
-    // Legend
-    const legend = svg.append("g").attr("transform", `translate(${W - 240},${10})`);
-    [["Control (untreated)", C.steel, false],
-     ["Counterfactual treated", C.muted, true],
-     ["Observed treated", C.orange, false]].forEach((d, i) => {
-      const yy = i * 16;
-      legend.append("line").attr("x1", 0).attr("x2", 22)
-        .attr("y1", yy + 6).attr("y2", yy + 6)
+    // Legend — placed below the x-axis label so it never overlaps the lines.
+    // Centred horizontally; three items laid out in a row.
+    const legendItems = [
+      ["Control (untreated)", C.steel, false],
+      ["Counterfactual treated", C.muted, true],
+      ["Observed treated", C.orange, false],
+    ];
+    const itemW = 200;
+    const legendW = itemW * legendItems.length;
+    const legend = svg.append("g")
+      .attr("transform", `translate(${(W - legendW) / 2},${H - 28})`);
+    legend.append("rect")
+      .attr("x", -10).attr("y", -14).attr("width", legendW + 20).attr("height", 24)
+      .attr("fill", "rgba(15,23,41,0.55)").attr("stroke", C.line).attr("rx", 6);
+    legendItems.forEach((d, i) => {
+      const xx = i * itemW;
+      legend.append("line").attr("x1", xx).attr("x2", xx + 22)
+        .attr("y1", 0).attr("y2", 0)
         .attr("stroke", d[1]).attr("stroke-width", 2.4)
         .attr("stroke-dasharray", d[2] ? "5 4" : "0");
-      legend.append("text").attr("x", 28).attr("y", yy + 10)
+      legend.append("text").attr("x", xx + 28).attr("y", 4)
         .attr("fill", C.text).attr("font-size", 11).text(d[0]);
     });
 
-    // ATT annotation at t=3
+    // ATT annotation — placed top-left of plot, away from rising orange line
     const attLabel = g.append("text").attr("fill", C.teal)
-      .attr("font-size", 12).attr("text-anchor", "end")
-      .attr("x", w - 6).attr("y", 16);
+      .attr("font-size", 12).attr("font-weight", 600).attr("text-anchor", "start")
+      .attr("x", 6).attr("y", 16);
 
     function update({ delta }) {
       const { controlPath, cfPath, obsPath } = buildPaths(delta);
@@ -667,10 +678,10 @@
 
     g.append("text").attr("transform", `translate(${w / 2},${h + 36})`)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
-      .text("Event time (years relative to treatment)");
+      .text("Event time (periods relative to treatment)");
     g.append("text").attr("transform", `rotate(-90) translate(${-h / 2},${-42})`)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
-      .text("ATT(e):  Log teen-employment effect");
+      .text("ATT(e):  GPA-point effect");
 
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
@@ -741,14 +752,24 @@
           }).on("mouseleave", function () { tooltip.classed("show", false); });
       });
 
-      // Legend
-      const legend = g.append("g").attr("transform", `translate(${w - 220},${4})`);
+      // Legend — placed at top-LEFT of plot so it sits over the small
+      // pre-treatment leads (near zero) instead of the large post-treatment
+      // jump to ~25. Includes a semi-transparent background to keep text
+      // readable even if a line happens to cross.
+      const legendRowH = 16;
+      const legendW = 230;
+      const legendH = active.length * legendRowH + 8;
+      const legend = g.append("g").attr("transform", `translate(8,4)`);
+      legend.append("rect")
+        .attr("x", -4).attr("y", -2).attr("width", legendW).attr("height", legendH)
+        .attr("fill", "rgba(15,23,41,0.7)").attr("stroke", "rgba(232,236,242,0.18)")
+        .attr("rx", 5);
       active.forEach((k, i) => {
-        const yy = i * 16;
-        legend.append("line").attr("x1", 0).attr("x2", 22)
-          .attr("y1", yy + 6).attr("y2", yy + 6)
+        const yy = i * legendRowH;
+        legend.append("line").attr("x1", 4).attr("x2", 26)
+          .attr("y1", yy + 8).attr("y2", yy + 8)
           .attr("stroke", colorMap[k]).attr("stroke-width", 2.4);
-        legend.append("text").attr("x", 28).attr("y", yy + 10)
+        legend.append("text").attr("x", 32).attr("y", yy + 12)
           .attr("fill", C.text).attr("font-size", 11).text(labelMap[k]);
       });
     }
@@ -917,14 +938,15 @@
   //   data: { twfe: [..], cs: [..], true_att }
   // ----------------------------------------------------------------
   function did_sim_histograms(container) {
-    const W = 760, H = 340;
-    const m = { top: 28, right: 24, bottom: 44, left: 56 };
+    const W = 760, H = 380;
+    const m = { top: 28, right: 24, bottom: 80, left: 56 };
     const w = W - m.left - m.right, h = H - m.top - m.bottom;
     const svg = ensureSVG(container, W, H);
     const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
 
     function update({ twfe, cs, true_att }) {
       g.selectAll("*").remove();
+      svg.selectAll("g.legend").remove();
       const all = (twfe || []).concat(cs || []);
       if (!all.length) return;
       const ext = d3.extent(all.concat([true_att]));
@@ -958,20 +980,33 @@
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel)
         .attr("stroke-width", 2).attr("stroke-dasharray", "4 4");
 
-      g.append("text").attr("x", x(true_att) + 6).attr("y", 12)
-        .attr("fill", C.steel).attr("font-size", 11)
+      // True-ATT label placed ABOVE the plot area (in the top margin) with a
+      // leader so it never overlaps the bars.
+      const labelX = Math.min(Math.max(x(true_att), 60), w - 60);
+      g.append("text").attr("x", labelX).attr("y", -10)
+        .attr("text-anchor", "middle")
+        .attr("fill", C.steel).attr("font-size", 11).attr("font-weight", 600)
         .text("True ATT = " + true_att.toFixed(3));
 
       g.append("text").attr("transform", `translate(${w / 2},${h + 36})`)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Estimated ATT across " + (twfe.length || cs.length) + " simulated panels");
 
-      // Mini legend
-      const lg = g.append("g").attr("transform", `translate(${w - 160},${0})`);
-      [["TWFE", C.orange], ["CS-style", C.teal]].forEach((d, i) => {
-        const yy = i * 16;
-        lg.append("rect").attr("x", 0).attr("y", yy).attr("width", 14).attr("height", 10).attr("fill", d[1]).attr("opacity", 0.6);
-        lg.append("text").attr("x", 20).attr("y", yy + 9).attr("fill", C.text).attr("font-size", 11).text(d[0]);
+      // Legend — placed BELOW the x-axis label, centred, so it cannot
+      // overlap the histogram bars.
+      const legendItems = [["ITS (naive)", C.orange], ["DiD", C.teal]];
+      const itemW = 110;
+      const legendW = itemW * legendItems.length;
+      const lg = svg.append("g").attr("class", "legend")
+        .attr("transform", `translate(${(W - legendW) / 2},${H - 18})`);
+      lg.append("rect").attr("x", -10).attr("y", -12).attr("width", legendW + 20).attr("height", 22)
+        .attr("fill", "rgba(15,23,41,0.55)").attr("stroke", C.line).attr("rx", 5);
+      legendItems.forEach((d, i) => {
+        const xx = i * itemW;
+        lg.append("rect").attr("x", xx).attr("y", -5).attr("width", 14).attr("height", 10)
+          .attr("fill", d[1]).attr("opacity", 0.6);
+        lg.append("text").attr("x", xx + 20).attr("y", 4)
+          .attr("fill", C.text).attr("font-size", 11).text(d[0]);
       });
     }
 
