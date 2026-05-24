@@ -641,8 +641,8 @@
   //   options: { showActual, showSynthetic, showGap, treatmentYear }
   // ------------------------------------------------------------------
   function paths_chart(container) {
-    const W = 760, H = 380;
-    const margin = { top: 24, right: 30, bottom: 44, left: 56 };
+    const W = 760, H = 420;
+    const margin = { top: 24, right: 30, bottom: 84, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -765,29 +765,36 @@
         }
       });
 
-      // Legend
-      const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-      lg.append("rect").attr("width", 220).attr("height", opts.showGap ? 36 : 56)
-        .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+      // Legend — placed below the x-axis label, horizontal layout, outside the
+      // plot area so it never overlaps the data lines.
+      const legendY = h + 56;
+      const lg = g.append("g").attr("class", "paths-legend")
+        .attr("transform", `translate(0,${legendY})`);
+      const items = [];
       if (opts.showGap) {
-        lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 18).attr("y2", 18)
-          .attr("stroke", C.teal).attr("stroke-width", 2.6);
-        lg.append("text").attr("x", 40).attr("y", 22).attr("fill", C.text).attr("font-size", 12)
-          .text("Gap (actual − synthetic)");
+        items.push({ label: "Gap (actual − synthetic)", color: C.teal, dashed: false });
       } else {
-        if (opts.showActual) {
-          lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 18).attr("y2", 18)
-            .attr("stroke", C.orange).attr("stroke-width", 2.6);
-          lg.append("text").attr("x", 40).attr("y", 22).attr("fill", C.text).attr("font-size", 12)
-            .text("Actual California (observed)");
-        }
-        if (opts.showSynthetic) {
-          lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 38).attr("y2", 38)
-            .attr("stroke", C.steel).attr("stroke-width", 2.4).attr("stroke-dasharray", "6 4");
-          lg.append("text").attr("x", 40).attr("y", 42).attr("fill", C.text).attr("font-size", 12)
-            .text("Synthetic California (counterfactual)");
-        }
+        if (opts.showActual)    items.push({ label: "Actual California (observed)",       color: C.orange, dashed: false });
+        if (opts.showSynthetic) items.push({ label: "Synthetic California (counterfactual)", color: C.steel,  dashed: true  });
       }
+      // Approximate text width: ~6.6 px per char at 12 px font.
+      const itemSpacing = 18;
+      const swatchW = 22;
+      const widths = items.map(it => swatchW + 6 + it.label.length * 6.6);
+      const totalW = widths.reduce((a, b) => a + b, 0) + (items.length - 1) * itemSpacing;
+      let cursorX = Math.max(0, (w - totalW) / 2);
+      items.forEach((it, i) => {
+        const line = lg.append("line")
+          .attr("x1", cursorX).attr("x2", cursorX + swatchW)
+          .attr("y1", 6).attr("y2", 6)
+          .attr("stroke", it.color).attr("stroke-width", 2.6);
+        if (it.dashed) line.attr("stroke-dasharray", "6 4");
+        lg.append("text")
+          .attr("x", cursorX + swatchW + 6).attr("y", 10)
+          .attr("fill", C.text).attr("font-size", 12)
+          .text(it.label);
+        cursorX += widths[i] + itemSpacing;
+      });
     }
     return { update };
   }
