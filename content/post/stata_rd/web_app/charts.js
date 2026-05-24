@@ -97,6 +97,9 @@
       .attr("x1", xScale(cutoff) + 1).attr("x2", xScale(cutoff) + 1)
       .attr("stroke", C.teal).attr("stroke-width", 2.5)
       .attr("marker-end", "url(#arrowUp)").attr("marker-start", "url(#arrowDown)");
+    // Background rect for the tau label so the regression lines don't crowd it.
+    const tauLabelBg = g.append("rect")
+      .attr("fill", "rgba(31, 43, 94, 0.85)").attr("rx", 3);
     const tauLabel = g.append("text")
       .attr("x", xScale(cutoff) + 8).attr("fill", C.teal)
       .attr("font-size", 12).attr("font-weight", 600);
@@ -139,7 +142,16 @@
       const yLo = yScale(ry0);
       const yHi = yScale(ly1);
       tauLine.attr("y1", yLo).attr("y2", yHi);
-      tauLabel.attr("y", (yLo + yHi) / 2 + 4).text(`τ = ${tau.toFixed(1)}`);
+      const labelY = (yLo + yHi) / 2 + 4;
+      tauLabel.attr("y", labelY).text(`τ = ${tau.toFixed(1)}`);
+      // Size the background rect to cover the text so the orange right-side line
+      // does not visually cross the τ readout.
+      try {
+        const bb = tauLabel.node().getBBox();
+        tauLabelBg
+          .attr("x", bb.x - 3).attr("y", bb.y - 1)
+          .attr("width", bb.width + 6).attr("height", bb.height + 2);
+      } catch (_) { /* ignore if not in DOM yet */ }
     }
 
     let t0 = null;
@@ -252,10 +264,20 @@
           .attr("x1", x(cutoff) + 4).attr("x2", x(cutoff) + 4)
           .attr("y1", yLo).attr("y2", yHi)
           .attr("stroke", C.teal).attr("stroke-width", 2.5);
-        cutoffG.append("text")
+        // Background rect placed BEFORE the label so it masks the orange right-side
+        // fit line behind the readout.
+        const labelBg = cutoffG.append("rect")
+          .attr("fill", "rgba(31, 43, 94, 0.85)").attr("rx", 3);
+        const tauText = cutoffG.append("text")
           .attr("x", x(cutoff) + 10).attr("y", (yLo + yHi) / 2 + 4)
           .attr("fill", C.teal).attr("font-size", 12).attr("font-weight", 600)
           .text(`τ̂ = ${tau_hat.toFixed(2)}`);
+        try {
+          const bb = tauText.node().getBBox();
+          labelBg
+            .attr("x", bb.x - 3).attr("y", bb.y - 1)
+            .attr("width", bb.width + 6).attr("height", bb.height + 2);
+        } catch (_) { /* no-op */ }
       }
     }
 
@@ -480,10 +502,26 @@
           .attr("cx", x(currentBw)).attr("cy", y(currentTau))
           .attr("r", 6).attr("fill", C.orange)
           .attr("stroke", "#fff").attr("stroke-width", 1.5);
-        cursorG.append("text")
-          .attr("x", x(currentBw) + 8).attr("y", y(currentTau) - 10)
+        // Background rect for the cursor readout so the teal τ̂(h) line and CI band
+        // don't crowd the text when the cursor is mid-curve.
+        const cursorLabelBg = cursorG.append("rect")
+          .attr("fill", "rgba(31, 43, 94, 0.85)").attr("rx", 3);
+        // If the cursor is near the right edge, anchor the label to the left of the
+        // dot so it stays inside the plotting area.
+        const nearRight = x(currentBw) > w - 130;
+        const lx = nearRight ? x(currentBw) - 8 : x(currentBw) + 8;
+        const ly = y(currentTau) - 10;
+        const cursorText = cursorG.append("text")
+          .attr("x", lx).attr("y", ly)
+          .attr("text-anchor", nearRight ? "end" : "start")
           .attr("fill", C.orange).attr("font-size", 11).attr("font-weight", 600)
           .text(`h = ${currentBw.toFixed(1)}, τ̂ = ${currentTau.toFixed(2)}`);
+        try {
+          const bb = cursorText.node().getBBox();
+          cursorLabelBg
+            .attr("x", bb.x - 3).attr("y", bb.y - 1)
+            .attr("width", bb.width + 6).attr("height", bb.height + 2);
+        } catch (_) { /* no-op */ }
       }
     }
     return { update };
