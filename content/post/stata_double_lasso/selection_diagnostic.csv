@@ -1,0 +1,7 @@
+outcome,method,n_Iy,n_Id,n_union
+Violent crime,DL (rigorous),0,8,8
+Violent crime,DL (CV),0,0,0
+Property crime,DL (rigorous),3,14,17
+Property crime,DL (CV),0,0,0
+Murder,DL (rigorous),1,12,13
+Murder,DL (CV),0,0,0
