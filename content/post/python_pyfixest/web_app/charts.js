@@ -120,12 +120,27 @@
     const polsLine = g.append("line")
       .attr("stroke", C.muted).attr("stroke-width", 2.5)
       .attr("stroke-dasharray", "6 4").attr("opacity", 0.9);
-    const polsLabel = g.append("text").attr("fill", C.muted)
-      .attr("font-size", 11).attr("font-weight", 600);
+    // Legend block in upper-left corner with a small swatch so the
+    // line label never overlaps the data points (was overlapping Carla).
+    const polsLegend = g.append("g").attr("class", "anim-legend");
+    polsLegend.append("line")
+      .attr("x1", 4).attr("x2", 28).attr("y1", 10).attr("y2", 10)
+      .attr("stroke", C.muted).attr("stroke-width", 2.5)
+      .attr("stroke-dasharray", "6 4");
+    const polsLabel = polsLegend.append("text")
+      .attr("x", 34).attr("y", 14)
+      .attr("fill", C.muted).attr("font-size", 11).attr("font-weight", 600);
 
     // FE / within slope through demeaned points (~0.21) — steeper.
     const feLine = g.append("line")
       .attr("stroke", C.orange).attr("stroke-width", 2.5).attr("opacity", 0.9);
+    const feLegend = g.append("g").attr("class", "anim-legend");
+    feLegend.append("line")
+      .attr("x1", 4).attr("x2", 28).attr("y1", 28).attr("y2", 28)
+      .attr("stroke", C.orange).attr("stroke-width", 2.5);
+    const feLabel = feLegend.append("text")
+      .attr("x", 34).attr("y", 32)
+      .attr("fill", C.orange).attr("font-size", 11).attr("font-weight", 600);
 
     // Animation loop: interpolate between raw and demeaned across a 10s cycle.
     let t0 = null;
@@ -177,9 +192,7 @@
       polsLine.attr("opacity", 0.75 * polsAlpha)
         .attr("x1", x(-0.2)).attr("y1", y(polsB + polsA * -0.2))
         .attr("x2", x(1.2)).attr("y2", y(polsB + polsA * 1.2));
-      polsLabel.attr("opacity", polsAlpha)
-        .attr("x", x(1.1)).attr("y", y(polsB + polsA * 1.1) - 6)
-        .text("Pooled OLS slope = 0.183");
+      polsLabel.attr("opacity", polsAlpha).text("Pooled OLS slope = 0.183");
 
       // FE line: through origin in demeaned coords with slope 0.078. Visible when u~1.
       const feA = 0.078;
@@ -187,6 +200,7 @@
       feLine.attr("opacity", 0.85 * feAlpha)
         .attr("x1", x(-0.6)).attr("y1", y(feA * -0.6))
         .attr("x2", x(0.6)).attr("y2", y(feA * 0.6));
+      feLabel.attr("opacity", feAlpha).text("FE slope = 0.078");
 
       requestAnimationFrame(step);
     }
@@ -199,8 +213,12 @@
   // visible.
   // ------------------------------------------------------------------
   function variation_bars(container) {
-    const W = 720, H = 240;
-    const margin = { top: 18, right: 28, bottom: 38, left: 110 };
+    const W = 720, H = 260;
+    // Increased top margin to give the legend a full row of breathing
+    // room above the bars (was clipping the topmost bar). Increased
+    // right margin so within-pct callouts (e.g. educ "0.0% within")
+    // never escape the chart edge.
+    const margin = { top: 36, right: 90, bottom: 38, left: 110 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -255,12 +273,12 @@
           .text(`${d.between_pct.toFixed(1)}% between`);
       });
 
-      // Legend
-      g.append("rect").attr("x", w - 220).attr("y", -14).attr("width", 10).attr("height", 10).attr("fill", C.steel);
-      g.append("text").attr("x", w - 206).attr("y", -5).attr("fill", C.text).attr("font-size", 11)
+      // Legend — pushed up into the expanded top margin (was -14, cramped).
+      g.append("rect").attr("x", w - 240).attr("y", -28).attr("width", 10).attr("height", 10).attr("fill", C.steel);
+      g.append("text").attr("x", w - 226).attr("y", -19).attr("fill", C.text).attr("font-size", 11)
         .text("between (across workers)");
-      g.append("rect").attr("x", w - 90).attr("y", -14).attr("width", 10).attr("height", 10).attr("fill", C.orange);
-      g.append("text").attr("x", w - 76).attr("y", -5).attr("fill", C.text).attr("font-size", 11)
+      g.append("rect").attr("x", w - 100).attr("y", -28).attr("width", 10).attr("height", 10).attr("fill", C.orange);
+      g.append("text").attr("x", w - 86).attr("y", -19).attr("fill", C.text).attr("font-size", 11)
         .text("within (over time)");
     }
     return { update };
@@ -272,8 +290,10 @@
   // (teal). True beta is dashed grey.
   // ------------------------------------------------------------------
   function panel_scatter(container) {
-    const W = 720, H = 380;
-    const margin = { top: 20, right: 24, bottom: 50, left: 60 };
+    const W = 720, H = 400;
+    // Extra top space for the 3-row legend so line labels never sit
+    // on top of the line endpoints (was happening at the right edge).
+    const margin = { top: 70, right: 24, bottom: 50, left: 60 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -326,23 +346,43 @@
         (data.xRange[1] - data.xRange[0]) / 80);
       const lineGen = d3.line().x(d => x(d[0])).y(d => y(d[1])).curve(d3.curveLinear);
 
-      function drawCurve(intercept, slope, color, dash, label, lwidth) {
+      function drawCurve(intercept, slope, color, dash, lwidth) {
         const pts = grid.map(xv => [xv, intercept + slope * xv]);
         root.append("path")
           .attr("d", lineGen(pts))
           .attr("fill", "none").attr("stroke", color).attr("stroke-width", lwidth || 2)
           .attr("stroke-dasharray", dash || null).attr("opacity", 0.95);
-        root.append("text")
-          .attr("x", x(grid[grid.length - 1])).attr("y", y(pts[pts.length - 1][1]) - 6)
-          .attr("fill", color).attr("font-size", 11).attr("text-anchor", "end")
-          .text(label);
       }
-      drawCurve(data.truth_intercept, data.truth_slope,
-                C.muted, "6 4", `true beta = ${data.truth_slope.toFixed(2)}`, 1.8);
-      drawCurve(data.pols_intercept, data.pols_slope,
-                C.orange, null, `POLS = ${data.pols_slope.toFixed(3)}`, 2.2);
-      drawCurve(data.fe_intercept, data.fe_slope,
-                C.teal, null, `FE = ${data.fe_slope.toFixed(3)}`, 2.2);
+      drawCurve(data.truth_intercept, data.truth_slope, C.muted, "6 4", 1.8);
+      drawCurve(data.pols_intercept,  data.pols_slope,  C.orange, null, 2.2);
+      drawCurve(data.fe_intercept,    data.fe_slope,    C.teal,   null, 2.2);
+
+      // Top-of-plot legend — three swatches in one row, well clear of
+      // the data marks and lines themselves. Replaces inline right-edge
+      // labels that overlapped each other when slopes were close.
+      const legend = root.append("g")
+        .attr("class", "scatter-legend")
+        .attr("transform", `translate(0, ${-margin.top + 14})`);
+      const items = [
+        { color: C.muted,  dash: "6 4", label: `true beta = ${data.truth_slope.toFixed(2)}` },
+        { color: C.orange, dash: null,  label: `POLS = ${data.pols_slope.toFixed(3)}` },
+        { color: C.teal,   dash: null,  label: `FE = ${data.fe_slope.toFixed(3)}` },
+      ];
+      // Approximate per-item width: 24px swatch + 6px gap + label glyphs (~7px each) + 18px gap.
+      let cx = 0;
+      items.forEach(it => {
+        const grp = legend.append("g").attr("transform", `translate(${cx}, 0)`);
+        grp.append("line")
+          .attr("x1", 0).attr("x2", 24).attr("y1", 6).attr("y2", 6)
+          .attr("stroke", it.color).attr("stroke-width", 2.4)
+          .attr("stroke-dasharray", it.dash);
+        grp.append("text")
+          .attr("x", 30).attr("y", 10)
+          .attr("fill", it.color).attr("font-size", 12).attr("font-weight", 600)
+          .text(it.label);
+        // Roughly 30 + (label length * 7.2) + 22 padding.
+        cx += 30 + it.label.length * 7.2 + 22;
+      });
     }
     return { update };
   }
@@ -410,19 +450,23 @@
   // ------------------------------------------------------------------
   function forest_plot(container) {
     const W = 720;
-    const margin = { top: 30, right: 60, bottom: 36, left: 140 };
+    // Bumped top margin to hold a method-color legend so readers can
+    // tell Pooled OLS / FE variants / CRE apart at a glance.
+    const margin = { top: 56, right: 60, bottom: 36, left: 140 };
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 360`)
       .attr("preserveAspectRatio", "xMidYMid meet");
 
+    // Keys must match the `method` field in data/results.json exactly
+    // (see §11 Mincer table in the post). Earlier draft used short labels
+    // (POLS/FE/TWFE/RE/CRE) — those don't match the data, so every bar
+    // fell back to C.steel.
     const METHOD_COLOR = {
-      "POLS":    C.muted,
-      "Between": C.steel,
-      "FDFE":    "#c4623d",
-      "FE":      C.orange,
-      "TWFE":    "#e8956a",
-      "RE":      C.teal,
-      "CRE":     "#66e8df",
+      "Pooled OLS":   C.muted,
+      "One-Way FE":   C.orange,
+      "Two-Way FE":   "#e8956a",
+      "Three-Way FE": "#c4623d",
+      "CRE":          C.teal,
     };
 
     function update(estimates, activeMethods, activeOutcomes) {
@@ -437,6 +481,7 @@
         return;
       }
       svg.selectAll("text.empty").remove();
+      svg.selectAll("g.method-legend").remove();
       const outcomes = activeOutcomes.filter(o => filtered.some(d => d.outcome === o));
       const rowH = 26;
       const facetGap = 36;
@@ -458,6 +503,23 @@
       const xPad = span * 0.10;
       const xDomain = [xExt[0] - xPad, xExt[1] + xPad];
       const x = d3.scaleLinear().domain(xDomain).range([0, w]);
+
+      // Method-color legend, anchored in the top margin above the facets.
+      const legendMethods = activeMethods.filter(m => filtered.some(d => d.method === m));
+      const legend = svg.append("g").attr("class", "method-legend")
+        .attr("transform", `translate(${margin.left}, 22)`);
+      let lx = 0;
+      legendMethods.forEach(m => {
+        const color = METHOD_COLOR[m] || C.steel;
+        const grp = legend.append("g").attr("transform", `translate(${lx}, 0)`);
+        grp.append("rect").attr("x", 0).attr("y", -8)
+          .attr("width", 12).attr("height", 12)
+          .attr("fill", color).attr("opacity", 0.9);
+        grp.append("text").attr("x", 18).attr("y", 2)
+          .attr("fill", C.text).attr("font-size", 11).attr("font-weight", 600)
+          .text(m);
+        lx += 30 + m.length * 6.6;
+      });
 
       facetMeta.forEach(meta => {
         const g = svg.append("g").attr("class", "facet")
