@@ -30,62 +30,80 @@
   }
 
   // ------------------------------------------------------------------
-  // L1 vs L2 shrinkage animation (Tab 1).
-  //   Shows two coefficients beta_1 (L1) and beta_2 (L2) as the penalty knob
-  //   sweeps from 0 to a large value. L1 hits zero abruptly; L2 only decays.
+  // Concept animation (Tab 1).
+  //   Reframed for stata_cate2: constant τ vs conditional τ(x).
+  //   - "Constant τ" (steel, dashed) stays flat at 0.25 across the x-axis.
+  //   - "Conditional τ(x)" (orange) slopes downward in institutional quality,
+  //     matching the §8 mining-effect-by-exec_con pattern.
   // ------------------------------------------------------------------
   function l1_vs_l2_animation(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    const W = 720, H = 340;
+    // Increased right margin so the legend can live outside the plot area
+    // (avoids overlapping the curves).
+    const margin = { top: 28, right: 200, bottom: 60, left: 64 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const x = d3.scaleLinear().domain([0, 5]).range([0, w]);
-    const y = d3.scaleLinear().domain([-0.05, 1.05]).range([h, 0]);
+    // x = institutional quality 1..6 (matches exec_con levels in the post).
+    // y = treatment effect τ on log-NTL units.
+    const x = d3.scaleLinear().domain([1, 6]).range([0, w]);
+    const y = d3.scaleLinear().domain([-0.05, 0.40]).range([h, 0]);
 
     g.append("g").attr("transform", `translate(0,${h})`)
       .call(d3.axisBottom(x).ticks(6))
       .selectAll("text").attr("fill", C.muted);
-    g.append("g").call(d3.axisLeft(y).ticks(5))
+    g.append("g").call(d3.axisLeft(y).ticks(5).tickFormat(d3.format(".2f")))
       .selectAll("text").attr("fill", C.muted);
     g.selectAll(".domain, line").attr("stroke", C.muted);
 
     g.append("text")
-      .attr("transform", `translate(${w / 2},${h + 36})`)
+      .attr("transform", `translate(${w / 2},${h + 40})`)
       .attr("text-anchor", "middle")
       .attr("fill", C.text)
       .attr("font-size", 12)
-      .text("Penalty strength  λ");
+      .text("Institutional quality x  (1 = weakest, 6 = strongest)");
     g.append("text")
-      .attr("transform", `rotate(-90) translate(${-h / 2},${-40})`)
+      .attr("transform", `rotate(-90) translate(${-h / 2},${-46})`)
       .attr("text-anchor", "middle")
       .attr("fill", C.text)
       .attr("font-size", 12)
-      .text("Estimated coefficient  β̂");
+      .text("Treatment effect τ  (log-NTL)");
 
-    // True coefficient = 1 for both. As lambda grows:
-    //   L1 (LASSO):  β̂ = max(1 - lambda, 0)   — hits zero at λ = 1
-    //   L2 (Ridge):  β̂ = 1 / (1 + lambda)     — never hits zero
-    const lamArr = d3.range(0, 5.01, 0.05);
-    const l1Path = lamArr.map(l => [l, Math.max(1 - l, 0)]);
-    const l2Path = lamArr.map(l => [l, 1 / (1 + l)]);
+    // Two curves:
+    //   Constant τ: τ(x) = 0.25 for all x  (steel dashed).
+    //   Conditional τ(x): τ(x) = 0.25 − 0.04 · (x − 3.5)  (orange solid)
+    //     — matches the moderation slope in the §8 mining-by-exec_con panel.
+    const xArr = d3.range(1, 6.01, 0.1);
+    const constPath = xArr.map(xx => [xx, 0.25]);
+    const condPath  = xArr.map(xx => [xx, 0.25 - 0.04 * (xx - 3.5)]);
     const line = d3.line().x(d => x(d[0])).y(d => y(d[1])).curve(d3.curveMonotoneX);
 
-    g.append("path").attr("fill", "none").attr("stroke", C.orange).attr("stroke-width", 2.5).attr("d", line(l1Path));
-    g.append("path").attr("fill", "none").attr("stroke", C.steel).attr("stroke-width", 2.5).attr("stroke-dasharray", "4 4").attr("d", line(l2Path));
+    g.append("path").attr("fill", "none").attr("stroke", C.steel)
+      .attr("stroke-width", 2.5).attr("stroke-dasharray", "5 4").attr("d", line(constPath));
+    g.append("path").attr("fill", "none").attr("stroke", C.orange)
+      .attr("stroke-width", 2.8).attr("d", line(condPath));
 
-    g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
     g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-l2");
+    g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
+    // Legend — placed OUTSIDE the plot in the right margin so it cannot
+    // overlap the curves.
+    const lg = svg.append("g")
+      .attr("transform", `translate(${margin.left + w + 14}, ${margin.top + 8})`);
+    lg.append("rect").attr("width", 178).attr("height", 80)
+      .attr("fill", "rgba(15,23,41,0.85)").attr("stroke", C.line).attr("rx", 6);
+    lg.append("circle").attr("cx", 14).attr("cy", 18).attr("r", 5).attr("fill", C.orange);
+    lg.append("text").attr("x", 26).attr("y", 22).attr("fill", C.text)
+      .attr("font-size", 12).text("Conditional τ(x)");
+    lg.append("text").attr("x", 26).attr("y", 38).attr("fill", C.muted)
+      .attr("font-size", 10).text("slopes with institutions");
+    lg.append("circle").attr("cx", 14).attr("cy", 56).attr("r", 5).attr("fill", C.steel);
+    lg.append("text").attr("x", 26).attr("y", 60).attr("fill", C.text)
+      .attr("font-size", 12).text("Constant τ (= ATE)");
+    lg.append("text").attr("x", 26).attr("y", 75).attr("fill", C.muted)
+      .attr("font-size", 10).text("same for every unit");
 
     const moving_l1 = g.select("#anim-l1");
     const moving_l2 = g.select("#anim-l2");
@@ -95,11 +113,11 @@
       if (t0 === null) t0 = ts;
       const elapsed = (ts - t0) / 1000;
       const cycle = (Math.sin(elapsed * 0.6) + 1) / 2; // [0, 1]
-      const lam = cycle * 4.5;
-      const b1 = Math.max(1 - lam, 0);
-      const b2 = 1 / (1 + lam);
-      moving_l1.attr("cx", x(lam)).attr("cy", y(b1));
-      moving_l2.attr("cx", x(lam)).attr("cy", y(b2));
+      const xx = 1 + cycle * 5;          // sweep x from 1 → 6
+      const yConst = 0.25;
+      const yCond  = 0.25 - 0.04 * (xx - 3.5);
+      moving_l1.attr("cx", x(xx)).attr("cy", y(yCond));
+      moving_l2.attr("cx", x(xx)).attr("cy", y(yConst));
       requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
@@ -230,19 +248,22 @@
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
+    // Method palette for the stata_cate2 §7 ATE table.
     const colorMap = {
-      "First diff":    C.steel,
-      "OLS (full)":    C.muted,
-      "PSL":           "#9bdcc3",
-      "DL (rigorous)": C.teal,
-      "DL (CV)":       C.orange,
+      "Naive diff":   C.steel,
+      "PO":           C.teal,
+      "AIPW":         C.orange,
+      "Ground truth": "#9bdcc3",
     };
 
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
     function update(data, activeMethods, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const methods = activeMethods.length ? activeMethods : ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : [
+        "NTL 1v0 (Mining)", "NTL 2v0", "NTL 3v0",
+        "NTL 2v1 (Price-)", "NTL 3v1 (Price+)",
+      ];
+      const methods = activeMethods.length ? activeMethods : ["Naive diff", "PO", "AIPW", "Ground truth"];
 
       // Filter data.
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
@@ -323,11 +344,11 @@
           g.on("mousemove", function (ev) {
             const rect = container.getBoundingClientRect();
             tooltip.html(
-              `<div><strong style="color:${colorMap[d.method]}">${d.method}</strong></div>` +
-              `<div><span class='tooltip-key'>α̂ =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
+              `<div><strong style="color:${colorMap[d.method] || C.text}">${d.method}</strong></div>` +
+              `<div><span class='tooltip-key'>ATE =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>SE =</span> <span class='tooltip-val'>${d.se.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>95% CI =</span> <span class='tooltip-val'>[${d.ci_lo.toFixed(3)}, ${d.ci_hi.toFixed(3)}]</span></div>` +
-              `<div><span class='tooltip-key'>controls used =</span> <span class='tooltip-val'>${d.n_selected === null ? "0 (no controls)" : d.n_selected}</span></div>`
+              `<div><span class='tooltip-key'>CATE vars =</span> <span class='tooltip-val'>${d.n_selected === null ? "n/a" : d.n_selected}</span></div>`
             )
             .classed("show", true)
             .style("left", (ev.clientX - rect.left + 12) + "px")
