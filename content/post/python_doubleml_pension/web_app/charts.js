@@ -35,8 +35,10 @@
   //   sweeps from 0 to a large value. L1 hits zero abruptly; L2 only decays.
   // ------------------------------------------------------------------
   function l1_vs_l2_animation(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    // Bottom margin enlarged to host the legend below the x-axis label,
+    // outside the data plotting region — prevents legend↔line overlap.
+    const W = 720, H = 360;
+    const margin = { top: 28, right: 28, bottom: 84, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -79,13 +81,23 @@
     g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
     g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-l2");
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
+    // Legend placed BELOW the x-axis label so it never overlaps the
+    // animated data lines/dots inside the plotting region.
+    const legW = 440, legH = 22;
+    const legY = h + 56; // below the "Penalty strength λ" label (which sits at h + 36)
+    const legX = (w - legW) / 2;
+    const lg = g.append("g").attr("transform", `translate(${legX},${legY})`);
+    lg.append("rect").attr("width", legW).attr("height", legH).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+    // First entry: L1 (LASSO) — orange solid swatch.
+    lg.append("line").attr("x1", 12).attr("x2", 30).attr("y1", legH / 2).attr("y2", legH / 2)
+      .attr("stroke", C.orange).attr("stroke-width", 2.5);
+    lg.append("circle").attr("cx", 21).attr("cy", legH / 2).attr("r", 4).attr("fill", C.orange);
+    lg.append("text").attr("x", 36).attr("y", legH / 2 + 4).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
+    // Second entry: L2 (Ridge) — steel dashed swatch.
+    lg.append("line").attr("x1", 232).attr("x2", 250).attr("y1", legH / 2).attr("y2", legH / 2)
+      .attr("stroke", C.steel).attr("stroke-width", 2.5).attr("stroke-dasharray", "4 4");
+    lg.append("circle").attr("cx", 241).attr("cy", legH / 2).attr("r", 4).attr("fill", C.steel);
+    lg.append("text").attr("x", 256).attr("y", legH / 2 + 4).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
 
     const moving_l1 = g.select("#anim-l1");
     const moving_l2 = g.select("#anim-l2");
@@ -517,8 +529,10 @@
   //   alpha_true: number
   // ------------------------------------------------------------------
   function alpha_histograms(container) {
-    const W = 720, H = 260;
-    const margin = { top: 18, right: 24, bottom: 38, left: 50 };
+    // Top margin enlarged so the legend can live above the plotting
+    // region without overlapping bars or the "true α" label.
+    const W = 720, H = 290;
+    const margin = { top: 48, right: 24, bottom: 38, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -552,8 +566,26 @@
 
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", 10)
+      // "true α" label placed ABOVE the plotting region in the top margin
+      // so it never overlaps the tallest bar.
+      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", -6)
         .attr("fill", C.steel).attr("font-size", 11).text(`true α = ${data.alpha_true.toFixed(2)}`);
+
+      // Legend above the plot region — outside the data area, so the two
+      // overlapping histograms (IIVM orange vs PLR/IRM teal) can be told
+      // apart at a glance.
+      const legW = 320, legH = 22;
+      const lg = g.append("g").attr("transform", `translate(${(w - legW) / 2},${-36})`);
+      lg.append("rect").attr("width", legW).attr("height", legH)
+        .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+      lg.append("rect").attr("x", 10).attr("y", legH / 2 - 5).attr("width", 14).attr("height", 10)
+        .attr("fill", C.teal).attr("opacity", 0.85);
+      lg.append("text").attr("x", 30).attr("y", legH / 2 + 4)
+        .attr("fill", C.text).attr("font-size", 12).text("PLR / IRM (ATE)");
+      lg.append("rect").attr("x", 170).attr("y", legH / 2 - 5).attr("width", 14).attr("height", 10)
+        .attr("fill", C.orange).attr("opacity", 0.65);
+      lg.append("text").attr("x", 190).attr("y", legH / 2 + 4)
+        .attr("fill", C.text).attr("font-size", 12).text("IIVM (LATE)");
 
       g.append("g").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format(".2f")))
