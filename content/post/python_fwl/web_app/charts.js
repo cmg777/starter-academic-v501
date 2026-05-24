@@ -38,8 +38,10 @@
   //   No user input — the loop pulses between "raw view" and "residual view".
   // ------------------------------------------------------------------
   function fwl_residualisation_animation(container) {
-    const W = 720, H = 360;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    const W = 720, H = 380;
+    // Extra top margin keeps both the title (titleLabel) and the live slope
+    // annotation (slopeNote) ABOVE the plot area, so neither overlaps points.
+    const margin = { top: 48, right: 28, bottom: 44, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -93,7 +95,7 @@
       .attr("transform", `rotate(-90) translate(${-h / 2},${-40})`)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12);
     const titleLabel = g.append("text")
-      .attr("x", w / 2).attr("y", -8)
+      .attr("x", w / 2).attr("y", -28)
       .attr("text-anchor", "middle").attr("fill", C.teal)
       .attr("font-size", 13).attr("font-weight", 600);
 
@@ -101,8 +103,10 @@
     const fitLine = g.append("line")
       .attr("stroke", C.orange).attr("stroke-width", 2.5).style("display", "none");
     const resLines = g.append("g").attr("class", "reslines");
+    // Live slope annotation lives ABOVE the plot area (negative y in the top
+    // margin) so it cannot overlap the scatter points or fit line.
     const slopeNote = g.append("text")
-      .attr("x", w - 8).attr("y", 14)
+      .attr("x", w - 8).attr("y", -10)
       .attr("text-anchor", "end").attr("fill", C.muted).attr("font-size", 11);
 
     function drawRaw(progress) {
@@ -204,8 +208,10 @@
   //   line at the true causal effect.
   // ------------------------------------------------------------------
   function naive_vs_fwl_bars(container) {
-    const W = 720, H = 220;
-    const margin = { top: 24, right: 24, bottom: 36, left: 130 };
+    const W = 720, H = 240;
+    // Extra top margin reserves space for the "true α" annotation ABOVE the
+    // plot so it cannot overlap any bar value label inside the chart.
+    const margin = { top: 44, right: 48, bottom: 36, left: 130 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -227,12 +233,14 @@
       // Zero line.
       g.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", h)
         .attr("stroke", C.faint).attr("stroke-dasharray", "3 4");
-      // True alpha line.
+      // True alpha line. Label lives in the top margin (y=-18) so it cannot
+      // collide with any in-plot bar value text.
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", -8)
-        .attr("fill", C.steel).attr("font-size", 11)
+      g.append("text").attr("x", x(data.alpha_true)).attr("y", -18)
+        .attr("text-anchor", "middle")
+        .attr("fill", C.steel).attr("font-size", 11).attr("font-weight", 600)
         .text(`true α = ${data.alpha_true.toFixed(2)}`);
 
       g.append("g").attr("transform", `translate(0,${h})`)
@@ -268,8 +276,10 @@
   //   data: { naive: number[], fwl: number[], alpha_true: number }
   // ------------------------------------------------------------------
   function naive_vs_fwl_histograms(container) {
-    const W = 720, H = 280;
-    const margin = { top: 22, right: 24, bottom: 40, left: 50 };
+    const W = 720, H = 320;
+    // Extra top margin reserves space for the legend ABOVE the plot area
+    // so it never overlaps the histogram bars.
+    const margin = { top: 56, right: 24, bottom: 40, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -306,11 +316,12 @@
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.faint).attr("stroke-dasharray", "3 4");
 
-      // True alpha line.
+      // True alpha line. Label is rendered ABOVE the plot area (in the top
+      // margin) so it cannot overlap any histogram bar.
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", 10)
+      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", -6)
         .attr("fill", C.steel).attr("font-size", 11)
         .text(`true α = ${data.alpha_true.toFixed(2)}`);
 
@@ -324,17 +335,21 @@
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Estimated α̂ across simulated datasets");
 
-      // Legend.
-      const lg = g.append("g").attr("transform", `translate(${w - 180},${4})`);
-      lg.append("rect").attr("width", 180).attr("height", 44)
-        .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-      lg.append("rect").attr("x", 10).attr("y", 8).attr("width", 14).attr("height", 10)
+      // Legend — placed ABOVE the plot area (in the top margin) as an inline
+      // horizontal strip so it never overlaps histogram bars. Anchored to the
+      // top-left of the plot region, with two swatch+label groups separated by
+      // a small gap.
+      const lg = g.append("g").attr("transform", `translate(0,${-28})`);
+      // Swatch 1: Naive
+      lg.append("rect").attr("x", 0).attr("y", 0).attr("width", 14).attr("height", 10)
         .attr("fill", C.orange).attr("opacity", 0.65);
-      lg.append("text").attr("x", 30).attr("y", 17).attr("fill", C.text).attr("font-size", 11)
+      lg.append("text").attr("x", 20).attr("y", 9).attr("fill", C.text).attr("font-size", 11)
         .text("Naive OLS (omits income)");
-      lg.append("rect").attr("x", 10).attr("y", 26).attr("width", 14).attr("height", 10)
+      // Swatch 2: FWL — positioned to the right with a gap.
+      const naiveLabelWidth = 175; // approximate width including swatch
+      lg.append("rect").attr("x", naiveLabelWidth).attr("y", 0).attr("width", 14).attr("height", 10)
         .attr("fill", C.teal).attr("opacity", 0.85);
-      lg.append("text").attr("x", 30).attr("y", 35).attr("fill", C.text).attr("font-size", 11)
+      lg.append("text").attr("x", naiveLabelWidth + 20).attr("y", 9).attr("fill", C.text).attr("font-size", 11)
         .text("FWL (controls for income)");
     }
     return { update };
