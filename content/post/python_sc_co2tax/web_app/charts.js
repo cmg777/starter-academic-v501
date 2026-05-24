@@ -230,19 +230,32 @@
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
+    // Color map keyed to the sc_co2tax methods. Naive is the outlier
+    // (steel); the two DiD variants share muted blue; the two Synthetic
+    // Sweden estimates use orange (headline); OLS/IV share teal family.
     const colorMap = {
-      "First diff":    C.steel,
-      "OLS (full)":    C.muted,
-      "PSL":           "#9bdcc3",
-      "DL (rigorous)": C.teal,
-      "DL (CV)":       C.orange,
+      "Naive (Sweden pre/post)":  C.steel,
+      "DiD (vs Denmark)":         C.muted,
+      "DiD (vs OECD pool)":       "#9bb5d5",
+      "Synthetic Sweden (avg)":   C.orange,
+      "Synthetic Sweden (2005)":  "#f0a07a",
+      "OLS4 (Newey–West)":        C.teal,
+      "IV (energy tax)":          "#5fb8b0",
+      "IV (oil price)":           "#9bdcc3",
+      "IV (both)":                "#3a8a82",
     };
 
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
     function update(data, activeMethods, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const methods = activeMethods.length ? activeMethods : ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : [
+        "Transport CO2 (t/cap)", "ln(gas) — price (β₁)", "ln(gas) — tax (β₂)",
+      ];
+      const methods = activeMethods.length ? activeMethods : [
+        "Naive (Sweden pre/post)", "DiD (vs Denmark)", "DiD (vs OECD pool)",
+        "Synthetic Sweden (avg)", "Synthetic Sweden (2005)",
+        "OLS4 (Newey–West)", "IV (energy tax)", "IV (oil price)", "IV (both)",
+      ];
 
       // Filter data.
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
@@ -542,8 +555,8 @@
   //   is the visualised treatment effect.
   // ------------------------------------------------------------------
   function sc_parallel_paths_animation(container) {
-    const W = 760, H = 320;
-    const margin = { top: 26, right: 28, bottom: 44, left: 56 };
+    const W = 760, H = 360;
+    const margin = { top: 26, right: 28, bottom: 78, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -614,13 +627,13 @@
     const dotA = g.append("circle").attr("r", 6).attr("fill", C.orange);
     const dotS = g.append("circle").attr("r", 6).attr("fill", C.steel);
 
-    // Legend.
-    const lg = g.append("g").attr("transform", `translate(${w - 240},${10})`);
-    lg.append("rect").attr("width", 230).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("Sweden (actual)");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("Synthetic Sweden");
+    // Legend — placed below the x-axis, centred, outside the plot area
+    // so it never overlaps the data lines.
+    const lg = g.append("g").attr("transform", `translate(0,${h + 56})`);
+    lg.append("circle").attr("cx", 8).attr("cy", -4).attr("r", 5).attr("fill", C.orange);
+    lg.append("text").attr("x", 20).attr("y", 0).attr("fill", C.text).attr("font-size", 12).text("Sweden (actual)");
+    lg.append("circle").attr("cx", 168).attr("cy", -4).attr("r", 5).attr("fill", C.steel);
+    lg.append("text").attr("x", 180).attr("y", 0).attr("fill", C.text).attr("font-size", 12).text("Synthetic Sweden");
 
     let t0 = null;
     function step(ts) {
@@ -641,8 +654,8 @@
   //   data: array of { year, sweden, synth, gap }
   // ------------------------------------------------------------------
   function sc_path_plot(container) {
-    const W = 800, H = 360;
-    const margin = { top: 24, right: 28, bottom: 44, left: 64 };
+    const W = 800, H = 400;
+    const margin = { top: 24, right: 28, bottom: 78, left: 64 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -717,13 +730,13 @@
           .on("mouseleave", function () { tooltip.classed("show", false); });
       });
 
-      // Legend.
-      const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-      lg.append("rect").attr("width", 210).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 15).attr("y2", 15).attr("stroke", C.orange).attr("stroke-width", 2.5);
-      lg.append("text").attr("x", 38).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("Sweden (actual)");
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 35).attr("y2", 35).attr("stroke", C.steel).attr("stroke-width", 2.5).attr("stroke-dasharray", "5 4");
-      lg.append("text").attr("x", 38).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("Synthetic Sweden");
+      // Legend — placed below the x-axis, outside the plot area,
+      // so it never overlaps the climbing data lines.
+      const lg = g.append("g").attr("transform", `translate(0,${h + 56})`);
+      lg.append("line").attr("x1", 0).attr("x2", 20).attr("y1", -4).attr("y2", -4).attr("stroke", C.orange).attr("stroke-width", 2.5);
+      lg.append("text").attr("x", 26).attr("y", 0).attr("fill", C.text).attr("font-size", 12).text("Sweden (actual)");
+      lg.append("line").attr("x1", 168).attr("x2", 188).attr("y1", -4).attr("y2", -4).attr("stroke", C.steel).attr("stroke-width", 2.5).attr("stroke-dasharray", "5 4");
+      lg.append("text").attr("x", 194).attr("y", 0).attr("fill", C.text).attr("font-size", 12).text("Synthetic Sweden");
     }
     return { update };
   }
@@ -885,8 +898,8 @@
   // data: array of { year, actual, no_carbon_with_vat, no_carbon_no_vat }
   // ------------------------------------------------------------------
   function sc_disentangling(container) {
-    const W = 800, H = 340;
-    const margin = { top: 24, right: 28, bottom: 44, left: 64 };
+    const W = 800, H = 400;
+    const margin = { top: 24, right: 28, bottom: 96, left: 64 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -935,15 +948,16 @@
         .attr("stroke", C.orange).attr("stroke-width", 2.8)
         .attr("d", line.y(d => y(d.actual)));
 
-      // Legend.
-      const lg = g.append("g").attr("transform", `translate(${w - 270},${10})`);
-      lg.append("rect").attr("width", 260).attr("height", 70).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 15).attr("y2", 15).attr("stroke", C.orange).attr("stroke-width", 2.5);
-      lg.append("text").attr("x", 38).attr("y", 19).attr("fill", C.text).attr("font-size", 11).text("Carbon tax + VAT (actual)");
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 35).attr("y2", 35).attr("stroke", C.steel).attr("stroke-width", 2.5).attr("stroke-dasharray", "5 4");
-      lg.append("text").attr("x", 38).attr("y", 39).attr("fill", C.text).attr("font-size", 11).text("No carbon tax, with VAT");
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 55).attr("y2", 55).attr("stroke", C.teal).attr("stroke-width", 2.2).attr("stroke-dasharray", "2 4");
-      lg.append("text").attr("x", 38).attr("y", 59).attr("fill", C.text).attr("font-size", 11).text("No carbon tax, no VAT");
+      // Legend — placed below the x-axis, outside the plot area,
+      // arranged in two rows to avoid overlapping the climbing 2000-2005
+      // segments of all three series.
+      const lg = g.append("g").attr("transform", `translate(0,${h + 56})`);
+      lg.append("line").attr("x1", 0).attr("x2", 20).attr("y1", -4).attr("y2", -4).attr("stroke", C.orange).attr("stroke-width", 2.5);
+      lg.append("text").attr("x", 26).attr("y", 0).attr("fill", C.text).attr("font-size", 11).text("Carbon tax + VAT (actual)");
+      lg.append("line").attr("x1", 200).attr("x2", 220).attr("y1", -4).attr("y2", -4).attr("stroke", C.steel).attr("stroke-width", 2.5).attr("stroke-dasharray", "5 4");
+      lg.append("text").attr("x", 226).attr("y", 0).attr("fill", C.text).attr("font-size", 11).text("No carbon tax, with VAT");
+      lg.append("line").attr("x1", 400).attr("x2", 420).attr("y1", -4).attr("y2", -4).attr("stroke", C.teal).attr("stroke-width", 2.2).attr("stroke-dasharray", "2 4");
+      lg.append("text").attr("x", 426).attr("y", 0).attr("fill", C.text).attr("font-size", 11).text("No carbon tax, no VAT");
     }
     return { update };
   }
@@ -955,8 +969,8 @@
   // data: { sweden_gap: [{year, gap}], placebos: [[{year, gap}], ...] }
   // ------------------------------------------------------------------
   function sc_placebo_distribution(container) {
-    const W = 800, H = 340;
-    const margin = { top: 22, right: 28, bottom: 44, left: 64 };
+    const W = 800, H = 400;
+    const margin = { top: 22, right: 28, bottom: 78, left: 64 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -969,7 +983,7 @@
       const xExt = d3.extent(data.sweden_gap, r => r.year);
       // Filter placebos by pre-fit quality.
       const placebos = data.placebos.filter(p => p.preMspe <= prefitThreshold);
-      const allGaps = placebos.flatMap(p => p.gap).concat(data.sweden_gap.map(r => r.gap));
+      const allGaps = placebos.flatMap(p => p.gap.map(d => d.gap)).concat(data.sweden_gap.map(r => r.gap));
       const yExt = d3.extent(allGaps);
       const yPad = (yExt[1] - yExt[0]) * 0.08 + 0.05;
       const x = d3.scaleLinear().domain(xExt).range([0, w]);
@@ -1010,13 +1024,13 @@
         .attr("stroke", C.orange).attr("stroke-width", 2.8)
         .attr("d", line);
 
-      // Legend.
-      const lg = g.append("g").attr("transform", `translate(${w - 230},${10})`);
-      lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 15).attr("y2", 15).attr("stroke", C.orange).attr("stroke-width", 2.5);
-      lg.append("text").attr("x", 38).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("Sweden (treated)");
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 35).attr("y2", 35).attr("stroke", C.muted).attr("stroke-width", 1.5);
-      lg.append("text").attr("x", 38).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text(`${placebos.length} placebo runs`);
+      // Legend — placed below the x-axis, outside the plot area,
+      // so it never overlaps the placebo "spaghetti" lines.
+      const lg = g.append("g").attr("transform", `translate(0,${h + 56})`);
+      lg.append("line").attr("x1", 0).attr("x2", 20).attr("y1", -4).attr("y2", -4).attr("stroke", C.orange).attr("stroke-width", 2.5);
+      lg.append("text").attr("x", 26).attr("y", 0).attr("fill", C.text).attr("font-size", 12).text("Sweden (treated)");
+      lg.append("line").attr("x1", 168).attr("x2", 188).attr("y1", -4).attr("y2", -4).attr("stroke", C.muted).attr("stroke-width", 1.5);
+      lg.append("text").attr("x", 194).attr("y", 0).attr("fill", C.text).attr("font-size", 12).text(`${placebos.length} placebo runs`);
     }
     return { update };
   }
