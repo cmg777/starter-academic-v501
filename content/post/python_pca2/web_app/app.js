@@ -296,8 +296,16 @@
       g.append("text").attr("transform", `translate(${w / 2},${h + 32})`)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Average |Δw| across 100 simulations");
-      // Legend.
-      const lg = g.append("g").attr("transform", `translate(${w - 200},${10})`);
+      // Legend: placed inside the plot but with a semi-opaque background so
+      // it never visually merges with histogram bars on the right.
+      const lgX = w - 200, lgY = 4;
+      const lgBg = g.append("rect")
+        .attr("x", lgX - 6).attr("y", lgY - 4)
+        .attr("width", 200).attr("height", 38)
+        .attr("rx", 4)
+        .attr("fill", "rgba(15,23,41,0.78)")
+        .attr("stroke", C.faint).attr("stroke-width", 1);
+      const lg = g.append("g").attr("transform", `translate(${lgX},${lgY})`);
       lg.append("rect").attr("x", 0).attr("y", 0).attr("width", 12).attr("height", 12).attr("fill", C.orange).attr("opacity", 0.7);
       lg.append("text").attr("x", 16).attr("y", 10).attr("fill", C.text).attr("font-size", 11).text("Per-period drift");
       lg.append("rect").attr("x", 0).attr("y", 18).attr("width", 12).attr("height", 12).attr("fill", C.teal);

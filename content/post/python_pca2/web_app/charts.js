@@ -230,19 +230,19 @@
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
+    // colorMap covers PCA methods used by python_pca2 results.json.
+    // Falls back to C.text for any unrecognised method (defensive).
     const colorMap = {
-      "First diff":    C.steel,
-      "OLS (full)":    C.muted,
-      "PSL":           "#9bdcc3",
-      "DL (rigorous)": C.teal,
-      "DL (CV)":       C.orange,
+      "Pooled PCA":      C.teal,
+      "Per-period 2013": C.steel,
+      "Per-period 2019": C.orange,
     };
 
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
     function update(data, activeMethods, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const methods = activeMethods.length ? activeMethods : ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : ["Education weight", "Health weight", "Income weight"];
+      const methods = activeMethods.length ? activeMethods : ["Pooled PCA", "Per-period 2013", "Per-period 2019"];
 
       // Filter data.
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
@@ -283,7 +283,9 @@
           .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
         facet.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
-        // Method labels (only on the leftmost facet).
+        // Method labels (only on the leftmost facet). Colour them to match
+        // the row's data marks so the method↔colour mapping is obvious
+        // without needing a separate legend.
         if (oi === 0) {
           methods.forEach(m => {
             svg.append("text")
@@ -291,7 +293,8 @@
               .attr("x", margin.left - 10)
               .attr("y", margin.top + y(m) + y.bandwidth() / 2 + 4)
               .attr("text-anchor", "end")
-              .attr("fill", C.text)
+              .attr("fill", colorMap[m] || C.text)
+              .attr("font-weight", 600)
               .attr("font-size", 12)
               .text(m);
           });
@@ -323,11 +326,11 @@
           g.on("mousemove", function (ev) {
             const rect = container.getBoundingClientRect();
             tooltip.html(
-              `<div><strong style="color:${colorMap[d.method]}">${d.method}</strong></div>` +
-              `<div><span class='tooltip-key'>α̂ =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
+              `<div><strong style="color:${colorMap[d.method] || C.text}">${d.method}</strong></div>` +
+              `<div><span class='tooltip-key'>weight =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>SE =</span> <span class='tooltip-val'>${d.se.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>95% CI =</span> <span class='tooltip-val'>[${d.ci_lo.toFixed(3)}, ${d.ci_hi.toFixed(3)}]</span></div>` +
-              `<div><span class='tooltip-key'>controls used =</span> <span class='tooltip-val'>${d.n_selected === null ? "0 (no controls)" : d.n_selected}</span></div>`
+              `<div><span class='tooltip-key'>n observations =</span> <span class='tooltip-val'>${d.n_selected === null ? "—" : d.n_selected}</span></div>`
             )
             .classed("show", true)
             .style("left", (ev.clientX - rect.left + 12) + "px")
@@ -351,14 +354,30 @@
       .attr("viewBox", `0 0 ${W} 220`)
       .attr("preserveAspectRatio", "xMidYMid meet");
 
+    // selection_bars repurposed for python_pca2: shows the number of
+    // observations each method uses to compute its PC1 weight
+    // (pooled = 306 region-period obs; per-period = 153 each).
+    // Method colour map mirrors forest_plot.
+    const SB_COLORS = {
+      "Pooled PCA":      C.teal,
+      "Per-period 2013": C.steel,
+      "Per-period 2019": C.orange,
+    };
+
     function update(data, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : ["Education weight", "Health weight", "Income weight"];
       const subset = data.filter(d => outcomes.includes(d.outcome));
+      // Discover methods present in the data (defensive — fall back to PCA set).
+      const seen = Array.from(new Set(subset.map(d => d.method)));
+      const methodOrder = ["Pooled PCA", "Per-period 2013", "Per-period 2019"];
+      const methods = methodOrder.filter(m => seen.includes(m)).concat(seen.filter(m => !methodOrder.includes(m)));
       const nFacets = outcomes.length;
       const facetGap = 24;
+      // Extra bottom margin so rotated method labels do not overlap the axis line.
+      const localMarginBottom = 56;
       const facetW = (W - margin.left - margin.right - (nFacets - 1) * facetGap) / nFacets;
-      const facetH = 130;
-      const totalH = margin.top + facetH + margin.bottom;
+      const facetH = 150;
+      const totalH = margin.top + facetH + localMarginBottom;
       svg.attr("viewBox", `0 0 ${W} ${totalH}`);
       svg.selectAll("g.facet").remove();
 
@@ -368,33 +387,38 @@
           .attr("transform", `translate(${margin.left + oi * (facetW + facetGap)},${margin.top})`);
         const sub = subset.filter(d => d.outcome === outcome);
         const max = d3.max(sub, d => d.n_union) || 1;
-        const x = d3.scaleBand().domain(["DL (rigorous)", "DL (CV)"]).range([0, facetW]).padding(0.45);
-        const y = d3.scaleLinear().domain([0, max * 1.1]).range([facetH, 0]);
+        const x = d3.scaleBand().domain(methods).range([0, facetW]).padding(0.35);
+        const y = d3.scaleLinear().domain([0, max * 1.15]).range([facetH, 0]);
 
         facet.append("text").attr("x", facetW / 2).attr("y", -8)
           .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13)
           .attr("font-weight", 600).text(outcome);
 
-        facet.append("g").attr("transform", `translate(0,${facetH})`)
-          .call(d3.axisBottom(x).tickSize(0))
-          .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
+        // Axis with rotated labels so all three method names fit.
+        const xAxis = facet.append("g").attr("transform", `translate(0,${facetH})`)
+          .call(d3.axisBottom(x).tickSize(0));
+        xAxis.selectAll("text")
+          .attr("fill", C.muted).attr("font-size", 10)
+          .attr("text-anchor", "end")
+          .attr("transform", "rotate(-30) translate(-4,-2)");
         if (oi === 0) {
           facet.append("g").call(d3.axisLeft(y).ticks(4))
             .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
           facet.append("text")
             .attr("transform", `rotate(-90) translate(${-facetH / 2},${-44})`)
             .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 11)
-            .text("Controls selected (out of 284)");
+            .text("Observations used");
         }
         facet.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
         sub.forEach(d => {
           const xc = x(d.method);
+          if (xc === undefined) return; // skip unknown methods defensively
           const w  = x.bandwidth();
           facet.append("rect")
             .attr("x", xc).attr("y", y(d.n_union))
             .attr("width", w).attr("height", facetH - y(d.n_union))
-            .attr("fill", d.method === "DL (CV)" ? C.orange : C.teal)
+            .attr("fill", SB_COLORS[d.method] || C.muted)
             .attr("opacity", 0.85);
           facet.append("text")
             .attr("x", xc + w / 2).attr("y", y(d.n_union) - 4)
