@@ -230,19 +230,21 @@
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
+    // NOTE: This generic forest_plot is unused by the SCPI app (which uses
+    // scpi_forest_plot below). Kept for compatibility with the shared
+    // charts.js bundle; method names below are placeholders.
     const colorMap = {
-      "First diff":    C.steel,
-      "OLS (full)":    C.muted,
-      "PSL":           "#9bdcc3",
-      "DL (rigorous)": C.teal,
-      "DL (CV)":       C.orange,
+      "Simplex": C.teal,
+      "Lasso":   "#66e5de",
+      "Ridge":   C.steel,
+      "OLS":     C.orange,
     };
 
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
     function update(data, activeMethods, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const methods = activeMethods.length ? activeMethods : ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : ["Gap 2003", "Avg gap"];
+      const methods = activeMethods.length ? activeMethods : ["Simplex", "Lasso", "Ridge", "OLS"];
 
       // Filter data.
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
@@ -352,7 +354,8 @@
       .attr("preserveAspectRatio", "xMidYMid meet");
 
     function update(data, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
+      // NOTE: unused by SCPI app; placeholder defaults.
+      const outcomes = activeOutcomes.length ? activeOutcomes : ["Gap 2003", "Avg gap"];
       const subset = data.filter(d => outcomes.includes(d.outcome));
       const nFacets = outcomes.length;
       const facetGap = 24;
@@ -597,8 +600,10 @@
   //   data: { trajectory: [{year, actual, synthetic, pi_lo, pi_hi}], piMult: number }
   // ------------------------------------------------------------------
   function scpi_trajectory(container) {
-    const W = 720, H = 360;
-    const margin = { top: 24, right: 24, bottom: 44, left: 56 };
+    // Extra top margin reserved for a horizontal legend ABOVE the plot
+    // (prevents overlap with the upward-sloping actual/synthetic lines).
+    const W = 720, H = 380;
+    const margin = { top: 60, right: 24, bottom: 44, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -622,22 +627,29 @@
     const yAxisG = g.append("g");
     const dotsG = g.append("g");
 
-    // Legend.
-    const lg = g.append("g").attr("transform", `translate(${w - 240},${10})`);
-    lg.append("rect").attr("width", 240).attr("height", 70).attr("fill", "rgba(15,23,41,0.6)")
-      .attr("stroke", C.line).attr("rx", 6);
-    lg.append("line").attr("x1", 14).attr("x2", 30).attr("y1", 18).attr("y2", 18)
+    // Horizontal legend placed above the plot area (in reserved top margin)
+    // so it never overlaps the data lines, regardless of slope.
+    const lg = g.append("g").attr("transform", `translate(0,${-44})`);
+    // Item 1: actual
+    lg.append("line").attr("x1", 0).attr("x2", 18).attr("y1", 8).attr("y2", 8)
       .attr("stroke", C.orange).attr("stroke-width", 2.5);
-    lg.append("text").attr("x", 36).attr("y", 22).attr("fill", C.text).attr("font-size", 11)
+    lg.append("text").attr("x", 24).attr("y", 12).attr("fill", C.text).attr("font-size", 11)
       .text("West Germany (actual)");
-    lg.append("line").attr("x1", 14).attr("x2", 30).attr("y1", 38).attr("y2", 38)
+    // Item 2: synthetic
+    lg.append("line").attr("x1", 170).attr("x2", 188).attr("y1", 8).attr("y2", 8)
       .attr("stroke", C.steel).attr("stroke-width", 2.2).attr("stroke-dasharray", "5 4");
-    lg.append("text").attr("x", 36).attr("y", 42).attr("fill", C.text).attr("font-size", 11)
+    lg.append("text").attr("x", 194).attr("y", 12).attr("fill", C.text).attr("font-size", 11)
       .text("Synthetic counterfactual");
-    lg.append("rect").attr("x", 14).attr("y", 53).attr("width", 16).attr("height", 10)
+    // Item 3: PI band swatch
+    lg.append("rect").attr("x", 360).attr("y", 2).attr("width", 18).attr("height", 12)
       .attr("fill", C.steel).attr("opacity", 0.25);
-    lg.append("text").attr("x", 36).attr("y", 62).attr("fill", C.text).attr("font-size", 11)
+    lg.append("text").attr("x", 384).attr("y", 12).attr("fill", C.text).attr("font-size", 11)
       .text("Prediction interval band");
+    // Item 4: outside-PI dot
+    lg.append("circle").attr("cx", 545).attr("cy", 8).attr("r", 5)
+      .attr("fill", C.orange).attr("stroke", "#fff").attr("stroke-width", 1);
+    lg.append("text").attr("x", 554).attr("y", 12).attr("fill", C.text).attr("font-size", 11)
+      .text("Actual outside PI");
 
     function update(data) {
       const tr = data.trajectory;
