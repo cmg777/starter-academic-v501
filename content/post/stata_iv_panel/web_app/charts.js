@@ -537,15 +537,16 @@
   //   that "leaks" into the OLS arrow but cannot reach the IV arrow.
   // ------------------------------------------------------------------
   function iv_path_animation(container) {
-    const W = 720, H = 320;
+    const W = 720, H = 380;
     const svg = ensureSVG(container, W, H);
 
-    // Coordinates.
-    const Zx = 90,  Zy = 160;   // instrument
-    const Dx = 360, Dy = 160;   // endogenous regressor (light intensity)
-    const Yx = 630, Yy = 160;   // outcome (conflict)
-    const Ux = 360, Uy = 60;    // unobserved confounders
-    const Mx = 360, My = 260;   // measurement error
+    // Coordinates. Y, U, ME laid out so node labels and the exclusion arc
+    // never overlap each other.
+    const Zx = 90,  Zy = 180;   // instrument
+    const Dx = 360, Dy = 180;   // endogenous regressor (light intensity)
+    const Yx = 630, Yy = 180;   // outcome (conflict)
+    const Ux = 360, Uy = 70;    // unobserved confounders
+    const Mx = 360, My = 290;   // measurement error
 
     // Nodes.
     function node(cx, cy, fill, label1, label2, sub) {
@@ -608,14 +609,17 @@
     arrow(Ux, Uy, Yx, Yy, C.muted,  "omitted bias",   true);
     arrow(Mx, My, Dx, Dy, C.muted,  "attenuation",    true);
 
-    // Exclusion restriction (Z should NOT directly affect Y).
+    // Exclusion restriction (Z should NOT directly affect Y). The arc is
+    // routed below the ME node and its sub-label so the curve and the text
+    // "excluded (no direct effect of Z on Y)" never sit on top of any node.
+    const arcY = H - 22;  // arc apex sits inside the bottom margin
     const ex_g = svg.append("g");
     ex_g.append("path")
-      .attr("d", `M ${Zx + 10} ${Zy + 45} Q ${(Zx + Yx) / 2} ${Yy + 100} ${Yx - 10} ${Yy + 45}`)
+      .attr("d", `M ${Zx - 30} ${Zy + 38} Q ${(Zx + Yx) / 2} ${arcY} ${Yx + 30} ${Yy + 38}`)
       .attr("fill", "none").attr("stroke", C.faint).attr("stroke-width", 1.5)
       .attr("stroke-dasharray", "3 4");
     ex_g.append("text")
-      .attr("x", (Zx + Yx) / 2).attr("y", Yy + 105)
+      .attr("x", (Zx + Yx) / 2).attr("y", arcY - 4)
       .attr("text-anchor", "middle").attr("fill", C.muted).attr("font-size", 11)
       .text("excluded (no direct effect of Z on Y)");
 
@@ -651,8 +655,8 @@
   //   data: { points: [{z, d}, ...], binned: [{zbar, dbar}, ...], slope, intercept, F }
   // ------------------------------------------------------------------
   function first_stage_scatter(container) {
-    const W = 720, H = 320;
-    const margin = { top: 22, right: 24, bottom: 44, left: 56 };
+    const W = 720, H = 360;
+    const margin = { top: 60, right: 24, bottom: 44, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -707,17 +711,30 @@
         .attr("x2", x(fitX2)).attr("y2", y(fitY2))
         .attr("stroke", C.teal).attr("stroke-width", 2.2);
 
-      const lbl = g.append("g").attr("transform", `translate(${w - 180},${10})`);
-      lbl.append("rect").attr("width", 180).attr("height", 60)
-        .attr("fill", "rgba(15,23,41,0.7)").attr("stroke", C.line).attr("rx", 6);
-      lbl.append("text").attr("x", 12).attr("y", 18).attr("fill", C.text).attr("font-size", 11)
+      // Stats panel placed ABOVE the plot area (in the top margin) so it
+      // never overlaps the regression line, binned dots, or raw scatter.
+      const lbl = g.append("g").attr("transform", `translate(0,${-50})`);
+      lbl.append("rect").attr("width", w).attr("height", 42)
+        .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+      lbl.append("text").attr("x", 14).attr("y", 18).attr("fill", C.text).attr("font-size", 11)
         .text(`slope = ${slope.toFixed(3)}`);
-      lbl.append("text").attr("x", 12).attr("y", 35).attr("fill", C.text).attr("font-size", 11)
+      lbl.append("text").attr("x", 14).attr("y", 34).attr("fill", C.text).attr("font-size", 11)
         .text(`First-stage F = ${data.F.toFixed(2)}`);
       const verdict = data.F > 16.38 ? "Strong" : (data.F > 10 ? "Borderline" : "WEAK");
       const verdColor = data.F > 16.38 ? C.teal : (data.F > 10 ? C.orange : "#ff6b6b");
-      lbl.append("text").attr("x", 12).attr("y", 53).attr("fill", verdColor).attr("font-size", 11).attr("font-weight", 700)
+      lbl.append("text").attr("x", w - 14).attr("y", 18)
+        .attr("text-anchor", "end")
+        .attr("fill", verdColor).attr("font-size", 11).attr("font-weight", 700)
         .text(`Stock-Yogo (10%): ${verdict}`);
+      // Trend-line / dot legend tucked into the same banner (right half).
+      lbl.append("circle").attr("cx", w - 220).attr("cy", 31).attr("r", 4)
+        .attr("fill", C.orange).attr("stroke", "#fff").attr("stroke-width", 0.8);
+      lbl.append("text").attr("x", w - 212).attr("y", 35)
+        .attr("fill", C.muted).attr("font-size", 10).text("binned means");
+      lbl.append("line").attr("x1", w - 118).attr("x2", w - 100).attr("y1", 31).attr("y2", 31)
+        .attr("stroke", C.teal).attr("stroke-width", 2.2);
+      lbl.append("text").attr("x", w - 96).attr("y", 35)
+        .attr("fill", C.muted).attr("font-size", 10).text("OLS fit of D on Z");
     }
     return { update };
   }
@@ -788,8 +805,8 @@
   // IV histogram (Tab 3): 100 simulations of OLS vs 2SLS estimates.
   // ------------------------------------------------------------------
   function ols_iv_histograms(container) {
-    const W = 720, H = 260;
-    const margin = { top: 18, right: 24, bottom: 38, left: 50 };
+    const W = 720, H = 290;
+    const margin = { top: 44, right: 24, bottom: 38, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -823,7 +840,10 @@
 
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", 12)
+      // Place the "true δ" label ABOVE the plot area, in the top margin —
+      // never colliding with the tallest histogram bar.
+      g.append("text").attr("x", x(data.alpha_true)).attr("y", -8)
+        .attr("text-anchor", "middle")
         .attr("fill", C.steel).attr("font-size", 11).text(`true δ = ${data.alpha_true.toFixed(2)}`);
 
       g.append("g").attr("transform", `translate(0,${h})`)
@@ -836,15 +856,17 @@
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Estimated δ̂ across 100 simulated datasets");
 
-      const lg = g.append("g").attr("transform", `translate(${w - 130},6)`);
-      lg.append("rect").attr("width", 130).attr("height", 38)
-        .attr("fill", "rgba(15,23,41,0.7)").attr("stroke", C.line).attr("rx", 6);
-      lg.append("rect").attr("x", 8).attr("y", 8).attr("width", 12).attr("height", 8)
+      // Legend lives in the top margin (above plot), pinned to the right
+      // so it never sits on top of histogram bars.
+      const lg = g.append("g").attr("transform", `translate(${w - 140},${-34})`);
+      lg.append("rect").attr("width", 140).attr("height", 22)
+        .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+      lg.append("rect").attr("x", 8).attr("y", 7).attr("width", 12).attr("height", 8)
         .attr("fill", C.orange).attr("opacity", 0.65);
-      lg.append("text").attr("x", 26).attr("y", 16).attr("fill", C.text).attr("font-size", 11).text("OLS");
-      lg.append("rect").attr("x", 8).attr("y", 22).attr("width", 12).attr("height", 8)
+      lg.append("text").attr("x", 26).attr("y", 15).attr("fill", C.text).attr("font-size", 11).text("OLS");
+      lg.append("rect").attr("x", 64).attr("y", 7).attr("width", 12).attr("height", 8)
         .attr("fill", C.teal).attr("opacity", 0.85);
-      lg.append("text").attr("x", 26).attr("y", 30).attr("fill", C.text).attr("font-size", 11).text("2SLS");
+      lg.append("text").attr("x", 82).attr("y", 15).attr("fill", C.text).attr("font-size", 11).text("2SLS");
     }
     return { update };
   }
