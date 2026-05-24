@@ -1,4 +1,4 @@
-// charts.js — D3 chart builders for the Double LASSO web app.
+// charts.js — D3 chart builders for the BMA · LASSO · WALS web app.
 //
 // Each builder takes a DOM container and a data object, draws an SVG, and
 // returns an object with an `update(...)` method so subsequent slider changes
@@ -35,8 +35,10 @@
   //   sweeps from 0 to a large value. L1 hits zero abruptly; L2 only decays.
   // ------------------------------------------------------------------
   function l1_vs_l2_animation(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    const W = 720, H = 360;
+    // Extra bottom margin keeps the legend BELOW the x-axis title so it
+    // never overlaps the L1/L2 curves.
+    const margin = { top: 28, right: 28, bottom: 78, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -79,13 +81,14 @@
     g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
     g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-l2");
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
+    // Legend — placed BELOW the x-axis title so it cannot overlap the
+    // L1 or L2 curves at any value of lambda.
+    const legendY = h + 56;
+    const lg = g.append("g").attr("transform", `translate(0,${legendY})`);
+    lg.append("circle").attr("cx", 10).attr("cy", 0).attr("r", 5).attr("fill", C.orange);
+    lg.append("text").attr("x", 22).attr("y", 4).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
+    lg.append("circle").attr("cx", 240).attr("cy", 0).attr("r", 5).attr("fill", C.steel);
+    lg.append("text").attr("x", 252).attr("y", 4).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
 
     const moving_l1 = g.select("#anim-l1");
     const moving_l2 = g.select("#anim-l2");
@@ -225,115 +228,176 @@
   // ------------------------------------------------------------------
   function forest_plot(container) {
     const W = 880;
-    const margin = { top: 28, right: 24, bottom: 36, left: 130 };
-    const facetGap = 24;
+    const margin = { top: 56, right: 24, bottom: 24, left: 24 };
+    const colorMap = {
+      "BMA":        C.steel,
+      "LASSO":      C.orange,
+      "Post-LASSO": "#9bdcc3",
+      "WALS":       C.teal,
+    };
+    // 12 variables (true predictors then noise), order from the post's §17 table.
+    const ALL_OUTCOMES = [
+      "log_gdp", "trade_network", "fossil_fuel", "industry",
+      "urban_pop", "democracy", "agriculture",
+      "log_tourism", "log_credit", "log_trade", "corruption", "fdi",
+    ];
+    const ALL_METHODS = ["BMA", "LASSO", "Post-LASSO", "WALS"];
+    // "True" vs "noise" flag used to subtle-style the facet title.
+    const TRUE_VARS = new Set([
+      "log_gdp", "trade_network", "fossil_fuel", "industry",
+      "urban_pop", "democracy", "agriculture",
+    ]);
+
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
-    const colorMap = {
-      "First diff":    C.steel,
-      "OLS (full)":    C.muted,
-      "PSL":           "#9bdcc3",
-      "DL (rigorous)": C.teal,
-      "DL (CV)":       C.orange,
-    };
-
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
     function update(data, activeMethods, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const methods = activeMethods.length ? activeMethods : ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"];
-
-      // Filter data.
+      const outcomes = activeOutcomes.length ? activeOutcomes : ALL_OUTCOMES;
+      const methods = activeMethods.length ? activeMethods : ALL_METHODS;
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
+
+      // Grid layout: 4 columns × ⌈n/4⌉ rows so 12 variables fit cleanly.
       const nFacets = outcomes.length;
-      const facetW = (W - margin.left - margin.right - (nFacets - 1) * facetGap) / nFacets;
-      const facetH = 28 * methods.length + 24;
-      const totalH = margin.top + facetH + margin.bottom;
+      const cols = Math.min(4, Math.max(1, nFacets));
+      const rowsCount = Math.ceil(nFacets / cols);
+      const gapX = 28;
+      const gapY = 28;
+      const facetW = (W - margin.left - margin.right - (cols - 1) * gapX) / cols;
+      const facetH = 22 * methods.length + 28;
+      const legendH = 26;
+      const totalH = margin.top + rowsCount * facetH + (rowsCount - 1) * gapY + margin.bottom;
       svg.attr("viewBox", `0 0 ${W} ${totalH}`);
-      svg.selectAll("g.facet").remove();
+      svg.selectAll("g.facet, g.legend").remove();
+
+      // Top legend: method swatches placed OUTSIDE every plot so they
+      // cannot overlap data marks.
+      const legend = svg.append("g").attr("class", "legend")
+        .attr("transform", `translate(${margin.left},20)`);
+      let lx = 0;
+      methods.forEach(m => {
+        const grp = legend.append("g").attr("transform", `translate(${lx},0)`);
+        grp.append("rect")
+          .attr("x", 0).attr("y", -10).attr("width", 14).attr("height", 14)
+          .attr("rx", 2).attr("fill", colorMap[m] || C.text);
+        grp.append("text")
+          .attr("x", 20).attr("y", 2)
+          .attr("fill", C.text).attr("font-size", 12).text(m);
+        lx += 22 + (m.length * 7);
+      });
 
       outcomes.forEach((outcome, oi) => {
+        const row = Math.floor(oi / cols);
+        const col = oi % cols;
         const facet = svg.append("g")
           .attr("class", "facet")
-          .attr("transform", `translate(${margin.left + oi * (facetW + facetGap)},${margin.top})`);
+          .attr("transform",
+            `translate(${margin.left + col * (facetW + gapX)},${margin.top + row * (facetH + gapY)})`);
 
         const subset = rows.filter(d => d.outcome === outcome);
         const ext = d3.extent(subset.flatMap(d => [d.ci_lo, d.ci_hi]));
         const xMin = Math.min(0, ext[0] || 0);
         const xMax = Math.max(0, ext[1] || 0);
-        const pad = Math.max(0.1, (xMax - xMin) * 0.08);
-        const x = d3.scaleLinear().domain([xMin - pad, xMax + pad]).range([0, facetW]);
-        const y = d3.scaleBand().domain(methods).range([0, facetH]).padding(0.35);
+        const pad = Math.max(0.05, (xMax - xMin) * 0.1);
+        const x = d3.scaleLinear().domain([xMin - pad, xMax + pad]).range([8, facetW - 8]);
+        const y = d3.scaleBand().domain(methods).range([0, facetH - 22]).padding(0.3);
 
-        // Title.
-        facet.append("text").attr("x", facetW / 2).attr("y", -10)
-          .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13)
-          .attr("font-weight", 600).text(outcome);
+        // Facet panel background (subtle separation) — drawn first.
+        facet.append("rect")
+          .attr("x", 0).attr("y", -18)
+          .attr("width", facetW).attr("height", facetH - 2)
+          .attr("fill", C.panel).attr("opacity", 0.45)
+          .attr("rx", 6);
+
+        // Title (variable name + true/noise tag).
+        const isTrue = TRUE_VARS.has(outcome);
+        facet.append("text").attr("x", 6).attr("y", -4)
+          .attr("fill", C.text).attr("font-size", 12).attr("font-weight", 600)
+          .text(outcome);
+        facet.append("text").attr("x", facetW - 6).attr("y", -4)
+          .attr("text-anchor", "end")
+          .attr("fill", isTrue ? C.teal : C.muted)
+          .attr("font-size", 10)
+          .text(isTrue ? "true" : "noise");
 
         // Zero line.
         facet.append("line")
           .attr("x1", x(0)).attr("x2", x(0))
-          .attr("y1", 0).attr("y2", facetH)
+          .attr("y1", 0).attr("y2", facetH - 22)
           .attr("stroke", C.faint).attr("stroke-width", 1).attr("stroke-dasharray", "3 4");
 
-        // x axis.
-        facet.append("g").attr("transform", `translate(0,${facetH})`)
-          .call(d3.axisBottom(x).ticks(4).tickFormat(d3.format(".2f")))
-          .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
+        // x axis at bottom of facet.
+        facet.append("g").attr("transform", `translate(0,${facetH - 22})`)
+          .call(d3.axisBottom(x).ticks(3).tickFormat(d3.format(".2g")))
+          .selectAll("text").attr("fill", C.muted).attr("font-size", 9);
         facet.selectAll(".domain, .tick line").attr("stroke", C.muted);
-
-        // Method labels (only on the leftmost facet).
-        if (oi === 0) {
-          methods.forEach(m => {
-            svg.append("text")
-              .attr("class", "facet")
-              .attr("x", margin.left - 10)
-              .attr("y", margin.top + y(m) + y.bandwidth() / 2 + 4)
-              .attr("text-anchor", "end")
-              .attr("fill", C.text)
-              .attr("font-size", 12)
-              .text(m);
-          });
-        }
 
         // Error bars + points.
         subset.forEach(d => {
           const yc = y(d.method) + y.bandwidth() / 2;
-          const g = facet.append("g").attr("class", "row")
-            .style("cursor", "pointer");
+          const color = colorMap[d.method] || C.text;
+          const g = facet.append("g").attr("class", "row").style("cursor", "pointer");
           g.append("line")
             .attr("x1", x(d.ci_lo)).attr("x2", x(d.ci_hi))
             .attr("y1", yc).attr("y2", yc)
-            .attr("stroke", colorMap[d.method] || C.text)
-            .attr("stroke-width", 2);
+            .attr("stroke", color).attr("stroke-width", 2);
           g.append("line")
             .attr("x1", x(d.ci_lo)).attr("x2", x(d.ci_lo))
-            .attr("y1", yc - 4).attr("y2", yc + 4)
-            .attr("stroke", colorMap[d.method] || C.text).attr("stroke-width", 2);
+            .attr("y1", yc - 3).attr("y2", yc + 3)
+            .attr("stroke", color).attr("stroke-width", 2);
           g.append("line")
             .attr("x1", x(d.ci_hi)).attr("x2", x(d.ci_hi))
-            .attr("y1", yc - 4).attr("y2", yc + 4)
-            .attr("stroke", colorMap[d.method] || C.text).attr("stroke-width", 2);
+            .attr("y1", yc - 3).attr("y2", yc + 3)
+            .attr("stroke", color).attr("stroke-width", 2);
           g.append("circle")
-            .attr("cx", x(d.estimate)).attr("cy", yc).attr("r", 5)
-            .attr("fill", colorMap[d.method] || C.text)
-            .attr("stroke", "#fff").attr("stroke-width", 1);
+            .attr("cx", x(d.estimate)).attr("cy", yc).attr("r", 4)
+            .attr("fill", color)
+            .attr("stroke", C.bg).attr("stroke-width", 1);
 
           g.on("mousemove", function (ev) {
             const rect = container.getBoundingClientRect();
+            // n_selected is encoded per-method: BMA = PIP, LASSO/Post-LASSO = 0/1 indicator,
+            // WALS = |t| statistic. Label accordingly.
+            let evidenceLabel = "evidence", evidenceVal = "—";
+            if (d.method === "BMA") {
+              evidenceLabel = "PIP";
+              evidenceVal = (d.n_selected !== null && d.n_selected !== undefined)
+                ? Number(d.n_selected).toFixed(3) : "—";
+            } else if (d.method === "WALS") {
+              evidenceLabel = "|t|";
+              evidenceVal = (d.n_selected !== null && d.n_selected !== undefined)
+                ? Number(d.n_selected).toFixed(2) : "—";
+            } else {
+              evidenceLabel = "selected";
+              evidenceVal = (d.n_selected === 1) ? "yes" : (d.n_selected === 0 ? "no" : "—");
+            }
             tooltip.html(
-              `<div><strong style="color:${colorMap[d.method]}">${d.method}</strong></div>` +
-              `<div><span class='tooltip-key'>α̂ =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
+              `<div><strong style="color:${color}">${d.method}</strong> · <span class="tooltip-key">${outcome}</span></div>` +
+              `<div><span class='tooltip-key'>β̂ =</span> <span class='tooltip-val'>${d.estimate.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>SE =</span> <span class='tooltip-val'>${d.se.toFixed(4)}</span></div>` +
               `<div><span class='tooltip-key'>95% CI =</span> <span class='tooltip-val'>[${d.ci_lo.toFixed(3)}, ${d.ci_hi.toFixed(3)}]</span></div>` +
-              `<div><span class='tooltip-key'>controls used =</span> <span class='tooltip-val'>${d.n_selected === null ? "0 (no controls)" : d.n_selected}</span></div>`
+              `<div><span class='tooltip-key'>${evidenceLabel} =</span> <span class='tooltip-val'>${evidenceVal}</span></div>`
             )
             .classed("show", true)
             .style("left", (ev.clientX - rect.left + 12) + "px")
             .style("top",  (ev.clientY - rect.top  + 12) + "px");
           }).on("mouseleave", function () { tooltip.classed("show", false); });
         });
+
+        // Method labels inside each facet on the left edge (small, semi-transparent),
+        // positioned at very-left of facet so they don't overlap data lines that
+        // emanate from x=0 zero-reference; we draw them only when bandwidth is
+        // large enough to be readable.
+        if (y.bandwidth() >= 12) {
+          methods.forEach(m => {
+            const yc = y(m) + y.bandwidth() / 2;
+            facet.append("text")
+              .attr("x", 4).attr("y", yc + 3)
+              .attr("fill", C.muted).attr("font-size", 9)
+              .text(m);
+          });
+        }
       });
     }
 
@@ -352,7 +416,8 @@
       .attr("preserveAspectRatio", "xMidYMid meet");
 
     function update(data, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
+      const outcomes = activeOutcomes.length ? activeOutcomes
+        : ["BMA", "LASSO", "WALS"];
       const subset = data.filter(d => outcomes.includes(d.outcome));
       const nFacets = outcomes.length;
       const facetGap = 24;
@@ -368,7 +433,7 @@
           .attr("transform", `translate(${margin.left + oi * (facetW + facetGap)},${margin.top})`);
         const sub = subset.filter(d => d.outcome === outcome);
         const max = d3.max(sub, d => d.n_union) || 1;
-        const x = d3.scaleBand().domain(["DL (rigorous)", "DL (CV)"]).range([0, facetW]).padding(0.45);
+        const x = d3.scaleBand().domain(["Rigorous λ", "CV λ"]).range([0, facetW]).padding(0.45);
         const y = d3.scaleLinear().domain([0, max * 1.1]).range([facetH, 0]);
 
         facet.append("text").attr("x", facetW / 2).attr("y", -8)
@@ -394,7 +459,7 @@
           facet.append("rect")
             .attr("x", xc).attr("y", y(d.n_union))
             .attr("width", w).attr("height", facetH - y(d.n_union))
-            .attr("fill", d.method === "DL (CV)" ? C.orange : C.teal)
+            .attr("fill", d.method === "CV λ" ? C.orange : C.teal)
             .attr("opacity", 0.85);
           facet.append("text")
             .attr("x", xc + w / 2).attr("y", y(d.n_union) - 4)
@@ -422,8 +487,8 @@
     function update(data) {
       g.selectAll("*").remove();
       const labels = [
-        { name: "DL (CV)",       v: data.cv,       color: C.orange },
-        { name: "DL (rigorous)", v: data.rigorous, color: C.teal   },
+        { name: "CV λ",       v: data.cv,       color: C.orange },
+        { name: "Rigorous λ", v: data.rigorous, color: C.teal   },
       ];
       const allVals = labels.map(d => d.v).concat([data.alpha_true, 0]);
       const ext = d3.extent(allVals);

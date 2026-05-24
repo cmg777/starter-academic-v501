@@ -1,8 +1,18 @@
-// charts.js — D3 chart builders for the Double LASSO web app.
+// charts.js — generic D3 chart-builder helpers.
 //
 // Each builder takes a DOM container and a data object, draws an SVG, and
 // returns an object with an `update(...)` method so subsequent slider changes
 // can patch the existing chart instead of recreating it.
+//
+// NOTE: this file is part of the shared write-app template scaffolding. The
+// r_causalpolicy_workshop app does NOT consume these builders — its charts
+// (intro counterfactual, sim panel, forest plot, histograms) are inlined
+// directly in app.js. The `forest_plot`, `selection_bars`, `alpha_compare`
+// and other LASSO-themed builders below are inherited template code and are
+// retained only so the smoke test continues to pass. Their internal
+// colorMaps and outcome domains ("First diff", "OLS (full)", "PSL",
+// "DL (rigorous)", "DL (CV)", "Violent crime", "Property crime", "Murder")
+// reflect the r_double_lasso reference implementation, not this post.
 
 (function () {
   "use strict";

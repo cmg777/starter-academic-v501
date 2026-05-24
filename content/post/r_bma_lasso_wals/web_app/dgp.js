@@ -132,14 +132,15 @@
   }
 
   // ------------------------------------------------------------------
-  // Tab 3 DGP: Double LASSO problem.
+  // Tab 3 DGP: Sensitivity Simulator — focal-coefficient + nuisance controls.
   //   d = X * pi + v
   //   y = alpha * d + X * theta + epsilon
   //   asymmetry in [0, 1]:
   //     0  — symmetric: pi and theta have same support size and magnitudes
   //     1  — extreme: |support(theta)| ≈ 1 (outcome nearly unpredictable from X),
   //                   |support(pi)|   ≈ round(0.2 * p) (treatment well-predicted)
-  //   This recreates the |I_y| = 0, |I_d| = 8 fingerprint described in §9 of the post.
+  //   Used to compare rigorous (theory-driven) vs CV (data-driven) λ choice,
+  //   analogues of WALS-like conservatism vs LASSO+CV liberalism in the post.
   // ------------------------------------------------------------------
   function simulate_dl(opts) {
     const n = Math.max(20, opts.n | 0);

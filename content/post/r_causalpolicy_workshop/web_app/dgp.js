@@ -1,16 +1,15 @@
-// dgp.js — seeded RNG and simulated data-generating processes for the LASSO app.
+// dgp.js — seeded RNG + helper distributions exported as window.DGP.
 //
-// Two DGPs:
-//   simulate_lasso({n, p, signal, seed})        used in Tab 2 (LASSO Lab)
-//     y = X * theta + epsilon, theta has the first k_signal entries nonzero.
-//     The first column of X is the "treatment" (true coefficient = ALPHA_TRUE).
+// The r_causalpolicy_workshop app uses only mulberry32 (seeded RNG) and
+// makeNormal (Box-Muller standard normal draws) — see app.js
+// `simulatePanel` for the actual data-generating process used in
+// Tabs 2 and 4 (a stylised J+1 state, T-year policy panel).
 //
-//   simulate_dl({n, p, signal, asymmetry, seed}) used in Tab 3 (Penalty Showdown)
-//     y = alpha * d + X * theta + epsilon
-//     d = X * pi + v
-//     "asymmetry" controls how much controls predict d vs y.
-//
-// All helpers are exported as window.DGP.{rng, randn, simulate_lasso, simulate_dl}.
+// The simulate_lasso / simulate_dl helpers below are inherited from the
+// write-app reference implementation (r_double_lasso). They are not invoked
+// by this app but are kept so the cross-app smoke test continues to pass.
+// All helpers are exported as window.DGP.{mulberry32, makeNormal,
+// simulate_lasso, simulate_dl}.
 
 (function () {
   "use strict";

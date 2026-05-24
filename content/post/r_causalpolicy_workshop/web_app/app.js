@@ -127,8 +127,10 @@
   };
 
   function makeIntroChart(container) {
-    const W = 880, H = 360;
-    const m = { top: 20, right: 24, bottom: 40, left: 50 };
+    // Reserve a top band (top margin = 56) for the legend + ATT text so they
+    // never overlap the data marks. Reserve a bottom band for the x-axis label.
+    const W = 880, H = 380;
+    const m = { top: 56, right: 24, bottom: 50, left: 50 };
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} ${H}`)
       .attr("preserveAspectRatio", "xMidYMid meet");
@@ -146,14 +148,15 @@
     svg.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
     // Axis labels
-    svg.append("text").attr("x", W / 2).attr("y", H - 6)
+    svg.append("text").attr("x", W / 2).attr("y", H - 10)
       .attr("text-anchor", "middle").attr("fill", C.muted).attr("font-size", 11).text("year");
     svg.append("text")
       .attr("transform", `translate(12,${(H - m.bottom + m.top) / 2}) rotate(-90)`)
       .attr("text-anchor", "middle").attr("fill", C.muted).attr("font-size", 11)
       .text("per-capita cigarette sales (packs)");
 
-    // Policy threshold
+    // Policy threshold — label kept inside the plot but below the y-axis top
+    // so it sits in white space, not on top of the data.
     svg.append("line").attr("x1", x(POLICY_YR - 0.5)).attr("x2", x(POLICY_YR - 0.5))
       .attr("y1", m.top).attr("y2", H - m.bottom)
       .attr("stroke", C.orange).attr("stroke-dasharray", "4 3").attr("stroke-width", 1);
@@ -181,21 +184,21 @@
     // Counterfactual line + shaded gap
     const cfLayer = svg.append("g").attr("class", "cf-layer");
 
-    // Legend
-    const legend = svg.append("g").attr("transform", `translate(${m.left + 12},${m.top + 8})`);
-    legend.append("rect").attr("x", -8).attr("y", -10).attr("width", 230).attr("height", 36)
-      .attr("fill", "rgba(15,23,41,0.7)").attr("stroke", C.faint).attr("rx", 4);
+    // Legend — placed in the reserved top band, well above the plot area so it
+    // never overlaps the orange observed line or the teal counterfactual.
+    const legendY = 16;
+    const legend = svg.append("g").attr("transform", `translate(${m.left},${legendY})`);
     legend.append("line").attr("x1", 0).attr("x2", 22).attr("y1", 0).attr("y2", 0)
       .attr("stroke", C.orange).attr("stroke-width", 2.5);
-    legend.append("text").attr("x", 28).attr("y", 4).attr("fill", C.text).attr("font-size", 11)
+    legend.append("text").attr("x", 28).attr("y", 4).attr("fill", C.text).attr("font-size", 12)
       .text("California observed");
-    legend.append("line").attr("x1", 0).attr("x2", 22).attr("y1", 18).attr("y2", 18)
+    legend.append("line").attr("x1", 200).attr("x2", 222).attr("y1", 0).attr("y2", 0)
       .attr("stroke", C.teal).attr("stroke-width", 2.2).attr("stroke-dasharray", "5 3");
-    legend.append("text").attr("x", 28).attr("y", 22).attr("fill", C.text).attr("font-size", 11)
+    legend.append("text").attr("x", 228).attr("y", 4).attr("fill", C.text).attr("font-size", 12)
       .text("Counterfactual (selected method)");
 
-    // ATT text
-    const attText = svg.append("text").attr("x", W - m.right - 6).attr("y", m.top + 14)
+    // ATT text — placed in the reserved top band, right-aligned, above the plot.
+    const attText = svg.append("text").attr("x", W - m.right).attr("y", legendY + 4)
       .attr("text-anchor", "end").attr("fill", C.teal).attr("font-size", 13)
       .attr("font-weight", 600).text("");
 
@@ -320,8 +323,10 @@
   }
 
   function makeSimChart(container) {
-    const W = 880, H = 320;
-    const m = { top: 14, right: 24, bottom: 36, left: 50 };
+    // Reserve a 30 px top band for an inline legend so series labels never
+    // overlap the line endpoints at the right edge.
+    const W = 880, H = 360;
+    const m = { top: 38, right: 24, bottom: 50, left: 50 };
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} ${H}`)
       .attr("preserveAspectRatio", "xMidYMid meet");
@@ -331,10 +336,28 @@
     const yAxis = svg.append("g").attr("transform", `translate(${m.left},0)`);
     const policyLine = svg.append("line").attr("stroke", C.orange)
       .attr("stroke-dasharray", "4 3").attr("stroke-width", 1);
-    svg.append("text").attr("x", W / 2).attr("y", H - 6)
+    svg.append("text").attr("x", W / 2).attr("y", H - 10)
       .attr("text-anchor", "middle").attr("fill", C.muted).attr("font-size", 11).text("year (centred at policy)");
     svg.append("text").attr("transform", `translate(12,${(H - m.bottom + m.top) / 2}) rotate(-90)`)
       .attr("text-anchor", "middle").attr("fill", C.muted).attr("font-size", 11).text("outcome (packs)");
+
+    // Top-band legend (replaces the previous right-anchored inline series labels
+    // that overlapped line endpoints, especially on mobile).
+    const legendY = 16;
+    const legend = svg.append("g").attr("transform", `translate(${m.left},${legendY})`);
+    legend.append("line").attr("x1", 0).attr("x2", 22).attr("y1", 0).attr("y2", 0)
+      .attr("stroke", C.orange).attr("stroke-width", 2.5);
+    legend.append("text").attr("x", 28).attr("y", 4).attr("fill", C.text).attr("font-size", 12)
+      .text("treated (California)");
+    legend.append("line").attr("x1", 180).attr("x2", 202).attr("y1", 0).attr("y2", 0)
+      .attr("stroke", C.teal).attr("stroke-width", 2);
+    legend.append("text").attr("x", 208).attr("y", 4).attr("fill", C.text).attr("font-size", 12)
+      .text("single control (DiD)");
+    legend.append("line").attr("x1", 350).attr("x2", 372).attr("y1", 0).attr("y2", 0)
+      .attr("stroke", C.steel).attr("stroke-opacity", 0.5).attr("stroke-width", 1.5);
+    legend.append("text").attr("x", 378).attr("y", 4).attr("fill", C.text).attr("font-size", 12)
+      .text("donor states");
+
     const donorsLayer = svg.append("g").attr("class", "donors-layer");
     const caLayer = svg.append("g").attr("class", "ca-layer");
     const controlLayer = svg.append("g").attr("class", "control-layer");
@@ -367,15 +390,13 @@
       controlLayer.append("path")
         .attr("fill", "none").attr("stroke", C.teal).attr("stroke-width", 2)
         .attr("d", line(states[1].y));
-      controlLayer.append("text").attr("x", W - m.right - 4).attr("y", y(states[1].y[T - 1]) - 4)
-        .attr("text-anchor", "end").attr("fill", C.teal).attr("font-size", 11).text("single control");
+      // Inline series label removed — see top-band legend above.
 
       caLayer.selectAll("*").remove();
       caLayer.append("path")
         .attr("fill", "none").attr("stroke", C.orange).attr("stroke-width", 2.5)
         .attr("d", line(states[0].y));
-      caLayer.append("text").attr("x", W - m.right - 4).attr("y", y(states[0].y[T - 1]) + 14)
-        .attr("text-anchor", "end").attr("fill", C.orange).attr("font-size", 11).text("treated (California)");
+      // Inline series label removed — see top-band legend above.
     }
 
     return { update };
@@ -599,8 +620,11 @@
   bvBind("bv-asym", "asym", 2);
 
   function makeHistChart(container) {
-    const W = 880, H = 280;
-    const m = { top: 28, right: 24, bottom: 40, left: 50 };
+    // Reserve top band (m.top = 40) for the "true α" label and bottom band
+    // (m.bottom = 70) for the axis label + a horizontal legend strip so it
+    // never overlaps the histogram bars.
+    const W = 880, H = 320;
+    const m = { top: 40, right: 24, bottom: 70, left: 50 };
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} ${H}`).attr("preserveAspectRatio", "xMidYMid meet");
     function update(data, attTrue) {
@@ -618,7 +642,8 @@
       svg.append("g").attr("transform", `translate(${m.left},0)`).call(d3.axisLeft(y).ticks(5))
         .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
       svg.selectAll(".domain, .tick line").attr("stroke", C.muted);
-      svg.append("text").attr("x", W / 2).attr("y", H - 6)
+      // x-axis title — sits just below the tick labels, above the legend strip.
+      svg.append("text").attr("x", W / 2).attr("y", H - m.bottom + 32)
         .attr("text-anchor", "middle").attr("fill", C.muted).attr("font-size", 11).text("estimated α̂ (packs)");
       svg.append("text").attr("transform", `translate(12,${(H - m.bottom + m.top) / 2}) rotate(-90)`)
         .attr("text-anchor", "middle").attr("fill", C.muted).attr("font-size", 11).text("count over 100 sims");
@@ -638,18 +663,25 @@
       svg.append("line").attr("x1", x(attTrue)).attr("x2", x(attTrue))
         .attr("y1", m.top).attr("y2", H - m.bottom)
         .attr("stroke", "#fff").attr("stroke-width", 2).attr("stroke-dasharray", "4 4");
-      svg.append("text").attr("x", x(attTrue)).attr("y", m.top - 6)
-        .attr("text-anchor", "middle").attr("fill", "#fff").attr("font-size", 11)
+      svg.append("text").attr("x", x(attTrue)).attr("y", m.top - 10)
+        .attr("text-anchor", "middle").attr("fill", "#fff").attr("font-size", 12)
         .attr("font-weight", 600).text(`true α = ${attTrue}`);
 
-      // Legend
-      const legend = svg.append("g").attr("transform", `translate(${W - m.right - 180},${m.top - 6})`);
-      legend.append("rect").attr("width", 16).attr("height", 8).attr("fill", C.muted).attr("opacity", 0.5);
-      legend.append("text").attr("x", 22).attr("y", 8).attr("fill", C.text).attr("font-size", 11).text("Naive");
-      legend.append("rect").attr("x", 60).attr("width", 16).attr("height", 8).attr("fill", C.orange).attr("opacity", 0.55);
-      legend.append("text").attr("x", 80).attr("y", 8).attr("fill", C.text).attr("font-size", 11).text("DiD");
-      legend.append("rect").attr("x", 118).attr("width", 16).attr("height", 8).attr("fill", C.teal).attr("opacity", 0.65);
-      legend.append("text").attr("x", 138).attr("y", 8).attr("fill", C.text).attr("font-size", 11).text("SCM-style");
+      // Bottom-band legend — horizontal strip below the x-axis title, with
+      // a translucent backdrop so no histogram bar can show through.
+      const legendY = H - 14;
+      const lg = svg.append("g").attr("transform", `translate(${W / 2 - 180},${legendY})`);
+      lg.append("rect").attr("x", -10).attr("y", -10).attr("width", 380).attr("height", 18)
+        .attr("fill", "rgba(15,23,41,0.85)").attr("rx", 4);
+      lg.append("rect").attr("x", 0).attr("y", -4).attr("width", 16).attr("height", 8)
+        .attr("fill", C.muted).attr("opacity", 0.6);
+      lg.append("text").attr("x", 22).attr("y", 4).attr("fill", C.text).attr("font-size", 11).text("Naive");
+      lg.append("rect").attr("x", 80).attr("y", -4).attr("width", 16).attr("height", 8)
+        .attr("fill", C.orange).attr("opacity", 0.7);
+      lg.append("text").attr("x", 102).attr("y", 4).attr("fill", C.text).attr("font-size", 11).text("DiD (one control)");
+      lg.append("rect").attr("x", 218).attr("y", -4).attr("width", 16).attr("height", 8)
+        .attr("fill", C.teal).attr("opacity", 0.8);
+      lg.append("text").attr("x", 240).attr("y", 4).attr("fill", C.text).attr("font-size", 11).text("SCM-style (many donors)");
     }
     return { update };
   }
