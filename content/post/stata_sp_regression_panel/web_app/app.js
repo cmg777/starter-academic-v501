@@ -413,8 +413,8 @@
   function renderDynamicChart(rhoStatic, rhoDyn, rhoTrue) {
     const container = document.getElementById("dy-chart");
     container.innerHTML = "";
-    const W = 720, H = 280;
-    const margin = { top: 30, right: 40, bottom: 60, left: 80 };
+    const W = 720, H = 300;
+    const margin = { top: 44, right: 70, bottom: 64, left: 170 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = d3.select(container).append("svg")
@@ -422,13 +422,13 @@
       .attr("preserveAspectRatio", "xMidYMid meet");
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    g.append("text").attr("x", w / 2).attr("y", -10)
+    g.append("text").attr("x", w / 2).attr("y", -28)
       .attr("text-anchor", "middle").attr("fill", "#e8ecf2")
       .attr("font-size", 14).attr("font-weight", 600)
       .text("Estimated ρ̂ across specifications");
 
     const xMin = Math.min(-0.05, rhoStatic, rhoDyn, rhoTrue) - 0.05;
-    const xMax = Math.max(0.6, rhoStatic, rhoDyn, rhoTrue) + 0.05;
+    const xMax = Math.max(0.6, rhoStatic, rhoDyn, rhoTrue) + 0.10;
     const x = d3.scaleLinear().domain([xMin, xMax]).range([0, w]);
     const y = d3.scaleBand().domain(["Static SDM (ignores τ)", "Dynamic SDM (with τ)"])
       .range([0, h]).padding(0.45);
@@ -446,13 +446,20 @@
         .text(lab);
     });
 
-    // Truth line (vertical).
+    // Truth line (vertical). Place the label BELOW the chart (above the
+    // x-axis label slot) so it cannot collide with the chart title at the top.
     g.append("line")
       .attr("x1", x(rhoTrue)).attr("x2", x(rhoTrue))
       .attr("y1", 0).attr("y2", h)
       .attr("stroke", "#00d4c8").attr("stroke-width", 2).attr("stroke-dasharray", "4 3");
-    g.append("text").attr("x", x(rhoTrue)).attr("y", -2)
-      .attr("text-anchor", "middle").attr("fill", "#00d4c8").attr("font-size", 11)
+    // Anchor the truth label so it stays inside the plotting area.
+    const trueX = x(rhoTrue);
+    const trueAnchor = trueX < 30 ? "start" : (trueX > w - 30 ? "end" : "middle");
+    g.append("text")
+      .attr("x", trueX)
+      .attr("y", -10)
+      .attr("text-anchor", trueAnchor)
+      .attr("fill", "#00d4c8").attr("font-size", 11).attr("font-weight", 600)
       .text(`true ρ = ${rhoTrue.toFixed(2)}`);
 
     // Static bar.
@@ -462,9 +469,15 @@
       .attr("width", Math.abs(x(rhoStatic) - x(0)))
       .attr("height", y.bandwidth())
       .attr("fill", "#d97757");
+    // Value label: position inside the chart bounds; flip alignment when the
+    // bar tip is too close to the right edge so the number is not clipped.
+    const sX = x(rhoStatic);
+    const sFlip = sX > w - 50;
     g.append("text")
-      .attr("x", x(rhoStatic) + 6).attr("y", y("Static SDM (ignores τ)") + y.bandwidth() / 2 + 4)
-      .attr("fill", "#d97757").attr("font-size", 12).attr("font-weight", 600)
+      .attr("x", sX + (sFlip ? -6 : 6))
+      .attr("y", y("Static SDM (ignores τ)") + y.bandwidth() / 2 + 4)
+      .attr("text-anchor", sFlip ? "end" : "start")
+      .attr("fill", "#e8ecf2").attr("font-size", 12).attr("font-weight", 600)
       .text(rhoStatic.toFixed(3));
 
     // Dynamic bar.
@@ -474,12 +487,16 @@
       .attr("width", Math.abs(x(rhoDyn) - x(0)))
       .attr("height", y.bandwidth())
       .attr("fill", "#6a9bcc");
+    const dX = x(rhoDyn);
+    const dFlip = dX > w - 50;
     g.append("text")
-      .attr("x", x(rhoDyn) + 6).attr("y", y("Dynamic SDM (with τ)") + y.bandwidth() / 2 + 4)
-      .attr("fill", "#6a9bcc").attr("font-size", 12).attr("font-weight", 600)
+      .attr("x", dX + (dFlip ? -6 : 6))
+      .attr("y", y("Dynamic SDM (with τ)") + y.bandwidth() / 2 + 4)
+      .attr("text-anchor", dFlip ? "end" : "start")
+      .attr("fill", "#e8ecf2").attr("font-size", 12).attr("font-weight", 600)
       .text(rhoDyn.toFixed(3));
 
-    g.append("text").attr("x", w / 2).attr("y", h + 40)
+    g.append("text").attr("x", w / 2).attr("y", h + 44)
       .attr("text-anchor", "middle").attr("fill", "#8b9dc3").attr("font-size", 11)
       .text("ρ̂ (estimated spatial autoregressive parameter)");
   }
@@ -555,10 +572,10 @@
     });
 
     const W = 880;
-    const margin = { top: 30, right: 24, bottom: 40, left: 130 };
+    const margin = { top: 44, right: 28, bottom: 44, left: 140 };
     const facetGap = 28;
     const facetW = (W - margin.left - margin.right - (effects.length - 1) * facetGap) / effects.length;
-    const facetH = 30 * activeMethods.length + 30;
+    const facetH = 34 * activeMethods.length + 30;
     const totalH = margin.top + facetH + margin.bottom;
     const svg = d3.select(container).append("svg")
       .attr("viewBox", `0 0 ${W} ${totalH}`)
@@ -586,7 +603,7 @@
       const x = d3.scaleLinear().domain([ext[0] - pad, ext[1] + pad]).range([0, facetW]);
       const y = d3.scaleBand().domain(activeMethods).range([0, facetH]).padding(0.35);
 
-      facet.append("text").attr("x", facetW / 2).attr("y", -12)
+      facet.append("text").attr("x", facetW / 2).attr("y", -22)
         .attr("text-anchor", "middle").attr("fill", "#e8ecf2").attr("font-size", 14)
         .attr("font-weight", 600).text(`${regressor} — ${effect} effect`);
 
@@ -629,9 +646,12 @@
           .attr("cx", x(d.estimate)).attr("cy", yc).attr("r", 5)
           .attr("fill", colorMap[d.method] || "#e8ecf2")
           .attr("stroke", "#fff").attr("stroke-width", 1);
+        // Value label above each dot, clamped inside the facet width so the
+        // number cannot overflow into the next facet or off the SVG edge.
+        const labelX = Math.max(12, Math.min(facetW - 12, x(d.estimate)));
         grp.append("text")
-          .attr("x", x(d.estimate))
-          .attr("y", yc - 9)
+          .attr("x", labelX)
+          .attr("y", yc - 10)
           .attr("text-anchor", "middle")
           .attr("fill", colorMap[d.method] || "#e8ecf2")
           .attr("font-size", 10)
