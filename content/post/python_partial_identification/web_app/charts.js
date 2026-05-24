@@ -542,8 +542,10 @@
   //   and "strongest assumption" (= collapses to true ATE).
   // ------------------------------------------------------------------
   function bounds_widening_animation(container) {
-    const W = 720, H = 280;
-    const margin = { top: 40, right: 36, bottom: 56, left: 36 };
+    const W = 720, H = 300;
+    // Top margin enlarged so the "true ATE" annotation sits clearly above the
+    // bars and never overlaps the entropy bar's mid-bar label.
+    const margin = { top: 56, right: 36, bottom: 56, left: 36 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -567,7 +569,9 @@
     const trueATE = 0.27;
     g.append("line").attr("x1", x(trueATE)).attr("x2", x(trueATE)).attr("y1", 0).attr("y2", h)
       .attr("stroke", C.text).attr("stroke-width", 1.5).attr("stroke-dasharray", "4 4");
-    g.append("text").attr("x", x(trueATE)).attr("y", -18)
+    // Annotation lifted further above the plot so it never collides with the
+    // entropy bar's mid-bar label.
+    g.append("text").attr("x", x(trueATE)).attr("y", -36)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 11)
       .text(`true ATE = ${trueATE.toFixed(2)}`);
 
@@ -585,6 +589,8 @@
     const pointEl    = g.append("circle").attr("r", 7).attr("fill", C.orange).attr("stroke", "#fff").attr("stroke-width", 1.5);
     const pointLab   = g.append("text").attr("fill", C.text).attr("font-size", 10).attr("text-anchor", "middle");
     const entropyEl  = g.append("rect").attr("fill", C.teal).attr("opacity", 0.55).attr("rx", 4);
+    // Entropy and Manski labels rendered ABOVE their bars (not inside) so they
+    // never overlap the bars or the true-ATE marker text.
     const entropyLab = g.append("text").attr("fill", C.text).attr("font-size", 10).attr("text-anchor", "middle");
     const manskiEl   = g.append("rect").attr("fill", C.steel).attr("opacity", 0.55).attr("rx", 4);
     const manskiLab  = g.append("text").attr("fill", C.text).attr("font-size", 10).attr("text-anchor", "middle");
@@ -592,7 +598,7 @@
     const manskiLo = -0.2980, manskiHi = 0.7020;
     manskiEl.attr("x", x(manskiLo)).attr("width", x(manskiHi) - x(manskiLo))
       .attr("y", rows[2].y).attr("height", barH);
-    manskiLab.attr("x", x((manskiLo + manskiHi) / 2)).attr("y", rows[2].y + barH / 2 + 4)
+    manskiLab.attr("x", x((manskiLo + manskiHi) / 2)).attr("y", rows[2].y - 4)
       .text(`[${manskiLo.toFixed(2)}, ${manskiHi.toFixed(2)}]   width = 1.00`);
 
     let t0 = null;
@@ -607,14 +613,20 @@
 
       pointEl.attr("cx", x(0.3822)).attr("cy", rows[0].y + barH / 2)
         .attr("opacity", pointAlpha);
-      pointLab.attr("x", x(0.3822)).attr("y", rows[0].y + barH / 2 + 4)
+      pointLab.attr("x", x(0.3822)).attr("y", rows[0].y - 4)
         .attr("opacity", pointAlpha === 0 ? 0 : 0.85)
         .text(pointAlpha > 0.5 ? "naive = 0.38 (biased)" : "");
 
       entropyEl.attr("x", x(entLo))
         .attr("width", Math.max(2, x(entHi) - x(entLo)))
         .attr("y", rows[1].y).attr("height", barH);
-      entropyLab.attr("x", x((entLo + entHi) / 2)).attr("y", rows[1].y + barH / 2 + 4)
+      // Hide the entropy mid-bar label when the bar is so narrow that the text
+      // would extend well beyond its endpoints (avoids overlap with true-ATE).
+      const entWidthPx = Math.max(2, x(entHi) - x(entLo));
+      const showEntLab = entWidthPx > 80;
+      entropyLab.attr("x", x((entLo + entHi) / 2))
+        .attr("y", rows[1].y - 4)
+        .attr("opacity", showEntLab ? 1 : 0)
         .text(`[${entLo.toFixed(2)}, ${entHi.toFixed(2)}]   width = ${(entHi - entLo).toFixed(2)}`);
 
       requestAnimationFrame(step);
@@ -628,7 +640,9 @@
   // ------------------------------------------------------------------
   function bounds_forest(container) {
     const W = 880;
-    const margin = { top: 28, right: 36, bottom: 36, left: 200 };
+    // Top margin widened so the facet title and the "true ATE" annotation can
+    // stack without overlapping each other.
+    const margin = { top: 48, right: 60, bottom: 36, left: 200 };
     const facetGap = 28;
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 320`)
@@ -671,7 +685,8 @@
         const methods = methodsByOutcome[outcome];
         const y = d3.scaleBand().domain(methods).range([0, facetH]).padding(0.35);
 
-        facet.append("text").attr("x", facetW / 2).attr("y", -10)
+        // Facet title sits at the very top of the expanded margin.
+        facet.append("text").attr("x", facetW / 2).attr("y", -30)
           .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13)
           .attr("font-weight", 600).text(outcome === "ATE" ? "Bounds on the ATE" : "Bounds on the PNS");
 
@@ -684,7 +699,9 @@
             .attr("x1", x(trueATE)).attr("x2", x(trueATE))
             .attr("y1", 0).attr("y2", facetH)
             .attr("stroke", C.text).attr("stroke-width", 1.5).attr("stroke-dasharray", "4 4");
-          facet.append("text").attr("x", x(trueATE)).attr("y", -2)
+          // True-ATE annotation now sits between the facet title and the bars,
+          // not crammed into the same row as the title.
+          facet.append("text").attr("x", x(trueATE)).attr("y", -10)
             .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 10)
             .text(`true ATE = ${trueATE.toFixed(2)}`);
         }
@@ -753,8 +770,10 @@
   //   data: { manski: {lo, hi}, entropy: {lo, hi}, naive, true_ate }
   // ------------------------------------------------------------------
   function live_bounds_bar(container) {
-    const W = 720, H = 240;
-    const margin = { top: 30, right: 30, bottom: 50, left: 150 };
+    const W = 720, H = 250;
+    // Top margin expanded so two stacked annotations (naive + true ATE) can sit
+    // above the chart without colliding with each other or the bars.
+    const margin = { top: 42, right: 30, bottom: 50, left: 150 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -773,22 +792,32 @@
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.faint).attr("stroke-dasharray", "3 4");
 
-      if (Number.isFinite(data.naive)) {
-        g.append("line").attr("x1", x(data.naive)).attr("x2", x(data.naive))
-          .attr("y1", 0).attr("y2", h)
-          .attr("stroke", C.orange).attr("stroke-width", 1.5).attr("stroke-dasharray", "5 3");
-        g.append("text").attr("x", x(data.naive)).attr("y", -14)
-          .attr("text-anchor", "middle").attr("fill", C.orange).attr("font-size", 10)
-          .text(`naive = ${data.naive.toFixed(3)}`);
-      }
+      // Detect when naive and true_ATE are close enough to collide; if so,
+      // stagger the labels vertically (true ATE above, naive a bit lower).
+      const naiveFinite = Number.isFinite(data.naive);
+      const trueFinite  = Number.isFinite(data.true_ate);
+      const collide = naiveFinite && trueFinite
+        && Math.abs(x(data.naive) - x(data.true_ate)) < 90;
 
-      if (Number.isFinite(data.true_ate)) {
+      if (trueFinite) {
         g.append("line").attr("x1", x(data.true_ate)).attr("x2", x(data.true_ate))
           .attr("y1", 0).attr("y2", h)
           .attr("stroke", C.text).attr("stroke-width", 1.5).attr("stroke-dasharray", "4 4");
-        g.append("text").attr("x", x(data.true_ate)).attr("y", -2)
+        g.append("text").attr("x", x(data.true_ate)).attr("y", -26)
           .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 10)
           .text(`true ATE = ${data.true_ate.toFixed(3)}`);
+      }
+
+      if (naiveFinite) {
+        g.append("line").attr("x1", x(data.naive)).attr("x2", x(data.naive))
+          .attr("y1", 0).attr("y2", h)
+          .attr("stroke", C.orange).attr("stroke-width", 1.5).attr("stroke-dasharray", "5 3");
+        // When close to true ATE, drop naive label to the second row so they
+        // never overlap.
+        const naiveY = collide ? -10 : -10;
+        g.append("text").attr("x", x(data.naive)).attr("y", naiveY)
+          .attr("text-anchor", "middle").attr("fill", C.orange).attr("font-size", 10)
+          .text(`naive = ${data.naive.toFixed(3)}`);
       }
 
       rows.forEach(r => {
@@ -830,8 +859,10 @@
   //   rows: array of { n, manski_width, manski_sd, entropy_width, entropy_sd }
   // ------------------------------------------------------------------
   function width_vs_n(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 24, bottom: 48, left: 56 };
+    const W = 720, H = 360;
+    // Top margin enlarged so the legend can sit ABOVE the plot area instead of
+    // overlapping the Manski line at the right edge.
+    const margin = { top: 64, right: 24, bottom: 48, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -890,14 +921,16 @@
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Bound width (Upper − Lower)");
 
-      const lg = g.append("g").attr("transform", `translate(${w - 220},${8})`);
-      lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)")
-        .attr("stroke", C.line).attr("rx", 6);
-      lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.steel);
-      lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 11)
+      // Legend placed ABOVE the plot area (in the expanded top margin) so it
+      // never overlaps the Manski or Entropy line marks at the right edge.
+      const lg = g.append("g").attr("transform", `translate(0,${-44})`);
+      // Manski legend entry
+      lg.append("circle").attr("cx", 8).attr("cy", 8).attr("r", 5).attr("fill", C.steel);
+      lg.append("text").attr("x", 20).attr("y", 12).attr("fill", C.text).attr("font-size", 11)
         .text("Manski (no assumptions)");
-      lg.append("rect").attr("x", 10).attr("y", 30).attr("width", 8).attr("height", 8).attr("fill", C.teal);
-      lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 11)
+      // Entropy legend entry — placed inline to the right
+      lg.append("rect").attr("x", 196).attr("y", 4).attr("width", 8).attr("height", 8).attr("fill", C.teal);
+      lg.append("text").attr("x", 208).attr("y", 12).attr("fill", C.text).attr("font-size", 11)
         .text("Entropy (θ = 0.1)");
     }
     return { update };
