@@ -230,19 +230,23 @@
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
+    // Colour palette keyed to the six EKC estimators plus the True DGP row.
     const colorMap = {
-      "First diff":    C.steel,
-      "OLS (full)":    C.muted,
-      "PSL":           "#9bdcc3",
-      "DL (rigorous)": C.teal,
-      "DL (CV)":       C.orange,
+      "Sparse FE":       C.steel,
+      "Kitchen-Sink FE": C.muted,
+      "BMA (FE)":        C.teal,
+      "DSL (FE)":        "#9bdcc3",
+      "BMA (pooled)":    C.orange,
+      "DSL (pooled)":    "#f5b896",
+      "True DGP":        "#ffffff",
     };
 
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
     function update(data, activeMethods, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const methods = activeMethods.length ? activeMethods : ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : ["beta1 (GDP)", "beta2 (GDP^2)", "beta3 (GDP^3)"];
+      const methods = activeMethods.length ? activeMethods :
+        ["Sparse FE", "Kitchen-Sink FE", "BMA (FE)", "DSL (FE)", "BMA (pooled)", "DSL (pooled)", "True DGP"];
 
       // Filter data.
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
@@ -341,67 +345,74 @@
   }
 
   // ------------------------------------------------------------------
-  // Variable-selection bar chart (Tab 4).
+  // Variable-selection bar chart (Tab 3 — companion to the forest plot).
   // data: precomputed selection records { outcome, method, n_Iy, n_Id, n_union }
+  //   where `outcome` is the BMA/DSL specification label (e.g. "BMA (FE)")
+  //   and `method` describes the selection criterion (e.g. "above 0.80 PIP").
+  // Renders one bar per specification, height = n_union.
   // ------------------------------------------------------------------
   function selection_bars(container) {
     const W = 880;
-    const margin = { top: 24, right: 20, bottom: 36, left: 130 };
+    const margin = { top: 28, right: 24, bottom: 56, left: 64 };
     const svg = d3.select(container).html("").append("svg")
-      .attr("viewBox", `0 0 ${W} 220`)
+      .attr("viewBox", `0 0 ${W} 260`)
       .attr("preserveAspectRatio", "xMidYMid meet");
 
-    function update(data, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const subset = data.filter(d => outcomes.includes(d.outcome));
-      const nFacets = outcomes.length;
-      const facetGap = 24;
-      const facetW = (W - margin.left - margin.right - (nFacets - 1) * facetGap) / nFacets;
-      const facetH = 130;
-      const totalH = margin.top + facetH + margin.bottom;
+    function update(data /*, activeOutcomes — unused */) {
+      const subset = data.slice();
+      const innerW = W - margin.left - margin.right;
+      const innerH = 260 - margin.top - margin.bottom;
+      const totalH = margin.top + innerH + margin.bottom;
       svg.attr("viewBox", `0 0 ${W} ${totalH}`);
       svg.selectAll("g.facet").remove();
 
-      outcomes.forEach((outcome, oi) => {
-        const facet = svg.append("g")
-          .attr("class", "facet")
-          .attr("transform", `translate(${margin.left + oi * (facetW + facetGap)},${margin.top})`);
-        const sub = subset.filter(d => d.outcome === outcome);
-        const max = d3.max(sub, d => d.n_union) || 1;
-        const x = d3.scaleBand().domain(["DL (rigorous)", "DL (CV)"]).range([0, facetW]).padding(0.45);
-        const y = d3.scaleLinear().domain([0, max * 1.1]).range([facetH, 0]);
+      const g = svg.append("g")
+        .attr("class", "facet")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
 
-        facet.append("text").attr("x", facetW / 2).attr("y", -8)
-          .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13)
-          .attr("font-weight", 600).text(outcome);
+      const max = d3.max(subset, d => d.n_union) || 1;
+      const x = d3.scaleBand().domain(subset.map(d => d.outcome)).range([0, innerW]).padding(0.35);
+      const y = d3.scaleLinear().domain([0, max * 1.15]).range([innerH, 0]);
 
-        facet.append("g").attr("transform", `translate(0,${facetH})`)
-          .call(d3.axisBottom(x).tickSize(0))
-          .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
-        if (oi === 0) {
-          facet.append("g").call(d3.axisLeft(y).ticks(4))
-            .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
-          facet.append("text")
-            .attr("transform", `rotate(-90) translate(${-facetH / 2},${-44})`)
-            .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 11)
-            .text("Controls selected (out of 284)");
-        }
-        facet.selectAll(".domain, .tick line").attr("stroke", C.muted);
+      g.append("text").attr("x", innerW / 2).attr("y", -10)
+        .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13)
+        .attr("font-weight", 600).text("Variables selected by specification");
 
-        sub.forEach(d => {
-          const xc = x(d.method);
-          const w  = x.bandwidth();
-          facet.append("rect")
-            .attr("x", xc).attr("y", y(d.n_union))
-            .attr("width", w).attr("height", facetH - y(d.n_union))
-            .attr("fill", d.method === "DL (CV)" ? C.orange : C.teal)
-            .attr("opacity", 0.85);
-          facet.append("text")
-            .attr("x", xc + w / 2).attr("y", y(d.n_union) - 4)
-            .attr("text-anchor", "middle")
-            .attr("fill", C.text).attr("font-size", 12).attr("font-weight", 600)
-            .text(d.n_union);
-        });
+      g.append("g").attr("transform", `translate(0,${innerH})`)
+        .call(d3.axisBottom(x).tickSize(0))
+        .selectAll("text").attr("fill", C.muted).attr("font-size", 11);
+      g.append("g").call(d3.axisLeft(y).ticks(5))
+        .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
+      g.selectAll(".domain, .tick line").attr("stroke", C.muted);
+
+      g.append("text")
+        .attr("transform", `rotate(-90) translate(${-innerH / 2},${-46})`)
+        .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 11)
+        .text("Variables in the model (PIP > 0.80 for BMA, |union| for DSL)");
+
+      subset.forEach(d => {
+        const xc = x(d.outcome);
+        const w  = x.bandwidth();
+        const isBMA = d.outcome.indexOf("BMA") === 0;
+        const isPooled = d.outcome.indexOf("(pooled)") >= 0;
+        const fill = isBMA ? (isPooled ? C.orange : C.teal)
+                           : (isPooled ? "#f5b896" : "#9bdcc3");
+        g.append("rect")
+          .attr("x", xc).attr("y", y(d.n_union))
+          .attr("width", w).attr("height", innerH - y(d.n_union))
+          .attr("fill", fill)
+          .attr("opacity", 0.88);
+        g.append("text")
+          .attr("x", xc + w / 2).attr("y", y(d.n_union) - 6)
+          .attr("text-anchor", "middle")
+          .attr("fill", C.text).attr("font-size", 12).attr("font-weight", 600)
+          .text(d.n_union);
+        // criterion sublabel (small text just below the bar baseline label)
+        g.append("text")
+          .attr("x", xc + w / 2).attr("y", innerH + 30)
+          .attr("text-anchor", "middle")
+          .attr("fill", C.muted).attr("font-size", 9)
+          .text(d.method);
       });
     }
     return { update };
@@ -553,7 +564,10 @@
 
   function pip_chart(container) {
     const W = 880;
-    const margin = { top: 28, right: 60, bottom: 44, left: 170 };
+    // top margin grows to seat the legend above the plot (avoids the previous
+    // overlap with the x-axis label at the bottom). Bottom margin keeps room
+    // for the axis ticks + label only.
+    const margin = { top: 76, right: 60, bottom: 48, left: 170 };
 
     function update(rows, threshold) {
       threshold = (typeof threshold === "number") ? threshold : 0.80;
@@ -658,15 +672,24 @@
         .attr("fill", C.orange).attr("font-size", 11)
         .text(`PIP = ${threshold.toFixed(2)} (Raftery threshold)`);
 
-      // Legend
-      const lg = svg.append("g").attr("transform", `translate(${margin.left},${H - 18})`);
-      lg.append("rect").attr("x", 0).attr("y", -10).attr("width", 12).attr("height", 12).attr("fill", C.steel);
-      lg.append("text").attr("x", 18).attr("y", 0).attr("fill", C.text).attr("font-size", 11).text("true predictor");
-      lg.append("rect").attr("x", 130).attr("y", -10).attr("width", 12).attr("height", 12).attr("fill", C.muted);
-      lg.append("text").attr("x", 148).attr("y", 0).attr("fill", C.text).attr("font-size", 11).text("noise variable");
-      lg.append("rect").attr("x", 260).attr("y", -10).attr("width", 12).attr("height", 12)
+      // Legend — placed ABOVE the chart so it never overlaps the x-axis label
+      // ("Posterior Inclusion Probability (PIP)") which used to sit too close
+      // to the bottom-of-SVG legend. Translucent dark backdrop for legibility.
+      const lg = svg.append("g").attr("transform", `translate(${margin.left},24)`);
+      lg.append("rect")
+        .attr("x", -6).attr("y", -14)
+        .attr("width", Math.min(innerW + 12, 460))
+        .attr("height", 24).attr("rx", 5)
+        .attr("fill", "rgba(15,23,41,0.6)")
+        .attr("stroke", "rgba(232,236,242,0.15)");
+      lg.append("rect").attr("x", 4).attr("y", -8).attr("width", 12).attr("height", 12).attr("fill", C.steel);
+      lg.append("text").attr("x", 22).attr("y", 2).attr("fill", C.text).attr("font-size", 11).text("true predictor");
+      lg.append("rect").attr("x", 134).attr("y", -8).attr("width", 12).attr("height", 12).attr("fill", C.muted);
+      lg.append("text").attr("x", 152).attr("y", 2).attr("fill", C.text).attr("font-size", 11).text("noise variable");
+      lg.append("rect").attr("x", 264).attr("y", -8).attr("width", 12).attr("height", 12)
         .attr("fill", "none").attr("stroke", C.orange).attr("stroke-width", 1.5);
-      lg.append("text").attr("x", 278).attr("y", 0).attr("fill", C.text).attr("font-size", 11).text("false positive (noise above threshold)");
+      lg.append("text").attr("x", 282).attr("y", 2).attr("fill", C.text).attr("font-size", 11)
+        .text("false positive (noise ≥ threshold)");
     }
 
     return { update };
