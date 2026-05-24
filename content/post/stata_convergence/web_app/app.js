@@ -59,8 +59,8 @@
   (function initIntroAnim() {
     const container = document.getElementById("intro-anim");
     if (!container) return;
-    const W = 760, H = 320;
-    const margin = { top: 28, right: 120, bottom: 44, left: 56 };
+    const W = 760, H = 360;
+    const margin = { top: 28, right: 120, bottom: 80, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -153,13 +153,16 @@
       return s / (arr.length - 1);
     }
 
-    // Legend.
-    const lg = svg.append("g").attr("transform", `translate(${margin.left + 12}, ${margin.top + 8})`);
-    lg.append("rect").attr("width", 200).attr("height", 50).attr("fill", "rgba(15,23,41,0.55)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("Poor country — fast catch-up");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("Rich country — slow growth");
+    // Legend — placed below the x-axis label so it never overlaps the
+    // poor/rich trajectories or the variance tracker.
+    const lg = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top + h + 56})`);
+    lg.append("circle").attr("cx", 8).attr("cy", 8).attr("r", 5).attr("fill", C.orange);
+    lg.append("text").attr("x", 20).attr("y", 12).attr("fill", C.text).attr("font-size", 12).text("Poor country — fast catch-up");
+    lg.append("circle").attr("cx", 220).attr("cy", 8).attr("r", 5).attr("fill", C.steel);
+    lg.append("text").attr("x", 232).attr("y", 12).attr("fill", C.text).attr("font-size", 12).text("Rich country — slow growth");
+    lg.append("line").attr("x1", 420).attr("x2", 440).attr("y1", 8).attr("y2", 8)
+      .attr("stroke", C.faint).attr("stroke-width", 1.2);
+    lg.append("text").attr("x", 446).attr("y", 12).attr("fill", C.muted).attr("font-size", 12).text("Other countries");
 
     let t0 = null;
     function step(ts) {
@@ -399,13 +402,15 @@
       zeroLine.attr("x1", 0).attr("x2", w)
         .attr("y1", yScale(0)).attr("y2", yScale(0));
 
-      // 2% benchmark.
+      // 2% benchmark — label right-anchored, just under the line so it
+      // sits above the data path but never crosses the line itself.
       if (opts.showBench && yScale.domain()[1] >= 0.02) {
         benchLine.attr("x1", 0).attr("x2", w)
           .attr("y1", yScale(0.02)).attr("y2", yScale(0.02))
           .style("display", null);
         benchLabel
-          .attr("x", w - 132).attr("y", yScale(0.02) - 5)
+          .attr("x", w - 4).attr("y", yScale(0.02) - 6)
+          .attr("text-anchor", "end")
           .text("Conditional benchmark β = 0.02")
           .style("display", null);
       } else {
@@ -563,11 +568,15 @@
         .curve(d3.curveMonotoneX);
       linePath.attr("d", lineGen(rows));
 
-      // Markers.
+      // Markers — labels placed near the bottom of the plot (where the
+      // variance line is far above) and right-anchored when near the
+      // right edge to avoid clipping or overlapping the line itself.
       if (opts.show2000) {
         mark2000.attr("x1", xScale(2000)).attr("x2", xScale(2000))
           .attr("y1", 0).attr("y2", h).style("display", null);
-        mark2000lbl.attr("x", xScale(2000) + 4).attr("y", 12).text("2000: β-flip").style("display", null);
+        mark2000lbl.attr("x", xScale(2000) - 4).attr("y", h - 24)
+          .attr("text-anchor", "end")
+          .text("2000: β-flip").style("display", null);
       } else {
         mark2000.style("display", "none");
         mark2000lbl.style("display", "none");
@@ -575,7 +584,9 @@
       if (opts.show2008) {
         mark2008.attr("x1", xScale(2008)).attr("x2", xScale(2008))
           .attr("y1", 0).attr("y2", h).style("display", null);
-        mark2008lbl.attr("x", xScale(2008) + 4).attr("y", 26).text("2008: σ peak").style("display", null);
+        mark2008lbl.attr("x", xScale(2008) + 4).attr("y", h - 8)
+          .attr("text-anchor", "start")
+          .text("2008: σ peak").style("display", null);
       } else {
         mark2008.style("display", "none");
         mark2008lbl.style("display", "none");
