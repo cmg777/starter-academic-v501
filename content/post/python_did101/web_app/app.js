@@ -23,6 +23,13 @@
   });
   document.querySelectorAll(".cta-card").forEach(card => {
     card.addEventListener("click", () => activateTab(card.dataset.goto));
+    // Keyboard activation for role="button" cards
+    card.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter" || ev.key === " ") {
+        ev.preventDefault();
+        activateTab(card.dataset.goto);
+      }
+    });
   });
 
   function debounce(fn, ms) {
@@ -156,8 +163,10 @@
       orange: "#d97757", teal: "#00d4c8", text: "#e8ecf2",
       muted: "#8b9dc3", grid: "rgba(232, 236, 242, 0.10)",
     };
+    // Increased right margin so the legend can sit OUTSIDE the plot area
+    // (avoids the legend rectangle overlapping the histogram bars).
     const W = 720, H = 320;
-    const margin = { top: 24, right: 24, bottom: 50, left: 50 };
+    const margin = { top: 24, right: 170, bottom: 50, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     container.innerHTML = "";
@@ -232,14 +241,13 @@
           .attr("fill", C.text).attr("font-size", 11)
           .text(`true ATT = ${att_true.toFixed(2)}`);
 
-        // Legend
-        const lg = g.append("g").attr("transform", `translate(${w - 200},${10})`);
-        lg.append("rect").attr("width", 200).attr("height", 50)
-          .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", "rgba(232,236,242,0.18)").attr("rx", 6);
-        lg.append("rect").attr("x", 10).attr("y", 10).attr("width", 14).attr("height", 10).attr("fill", C.orange).attr("opacity", 0.55);
-        lg.append("text").attr("x", 30).attr("y", 19).attr("fill", C.text).attr("font-size", 11).text("Naive Before-After");
-        lg.append("rect").attr("x", 10).attr("y", 28).attr("width", 14).attr("height", 10).attr("fill", C.teal).attr("opacity", 0.55);
-        lg.append("text").attr("x", 30).attr("y", 37).attr("fill", C.text).attr("font-size", 11).text("DiD (manual)");
+        // Legend — placed OUTSIDE the plot area (in the right margin) so it
+        // never overlaps the histogram bars.
+        const lg = g.append("g").attr("transform", `translate(${w + 14},${10})`);
+        lg.append("rect").attr("x", 0).attr("y", 8).attr("width", 14).attr("height", 10).attr("fill", C.orange).attr("opacity", 0.65);
+        lg.append("text").attr("x", 20).attr("y", 17).attr("fill", C.text).attr("font-size", 11).text("Naive Before-After");
+        lg.append("rect").attr("x", 0).attr("y", 28).attr("width", 14).attr("height", 10).attr("fill", C.teal).attr("opacity", 0.85);
+        lg.append("text").attr("x", 20).attr("y", 37).attr("fill", C.text).attr("font-size", 11).text("DiD (manual)");
       }
     };
   }
@@ -407,8 +415,8 @@
       text: "#e8ecf2", muted: "#8b9dc3",
       grid: "rgba(232, 236, 242, 0.10)",
     };
-    const W = 760, H = 380;
-    const margin = { top: 30, right: 30, bottom: 56, left: 56 };
+    const W = 760, H = 400;
+    const margin = { top: 30, right: 30, bottom: 76, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     container.innerHTML = "";
@@ -449,7 +457,7 @@
         g.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
         g.append("text")
-          .attr("transform", `translate(${w / 2},${h + 42})`)
+          .attr("transform", `translate(${w / 2},${h + 56})`)
           .attr("text-anchor", "middle")
           .attr("fill", C.text)
           .attr("font-size", 12)
@@ -480,10 +488,14 @@
           .attr("x1", x(-0.5)).attr("x2", x(-0.5))
           .attr("y1", 0).attr("y2", h)
           .attr("stroke", C.orange).attr("stroke-width", 1.5).attr("stroke-dasharray", "5 4");
+        // Place "treatment" annotation BELOW the x-axis (in the bottom margin,
+        // between the axis tick labels and the axis title) so it never overlaps
+        // the post-treatment data labels or CI tops at the top of the plot.
         g.append("text")
-          .attr("x", x(-0.5)).attr("y", 12)
+          .attr("x", x(-0.5)).attr("y", h + 34)
           .attr("text-anchor", "middle")
           .attr("fill", C.orange).attr("font-size", 11)
+          .attr("font-weight", 600)
           .text("treatment");
 
         // CI error bars

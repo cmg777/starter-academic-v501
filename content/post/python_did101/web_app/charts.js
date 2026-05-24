@@ -79,9 +79,10 @@
     g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
     g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-l2");
 
-    // Legend
+    // Legend — use a fully opaque background so the L1/L2 curves passing
+    // beneath the legend area are cleanly hidden (no muddy line-through-text).
     const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.95)").attr("stroke", C.line).attr("rx", 6);
     lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
     lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
     lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
