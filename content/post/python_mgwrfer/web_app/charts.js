@@ -114,8 +114,9 @@
   //     coefficients are highlighted teal.
   // ------------------------------------------------------------------
   function coefficient_path(container) {
-    const W = 720, H = 360;
-    const margin = { top: 20, right: 24, bottom: 44, left: 56 };
+    const W = 720, H = 380;
+    // Generous top margin keeps the cursor label + legend OUT of the data area.
+    const margin = { top: 44, right: 24, bottom: 44, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -139,9 +140,35 @@
       .attr("stroke", C.orange).attr("stroke-width", 1.5)
       .attr("stroke-dasharray", "4 4")
       .style("display", "none");
+    // Cursor label is parked in the top margin (y=-22), well above the plotting area.
     const cursorLabel = root.append("text")
-      .attr("y", -6).attr("fill", C.orange).attr("font-size", 11)
-      .attr("text-anchor", "middle");
+      .attr("y", -22).attr("fill", C.orange).attr("font-size", 11)
+      .attr("text-anchor", "middle").attr("font-weight", 600);
+
+    // Inset legend in the top-left margin so it never sits on top of the lines.
+    const legend = root.append("g").attr("class", "cp-legend")
+      .attr("transform", `translate(0,${-margin.top + 6})`);
+    legend.append("rect")
+      .attr("width", 360).attr("height", 22)
+      .attr("fill", "rgba(15,23,41,0.75)")
+      .attr("stroke", C.line).attr("rx", 4);
+    const items = [
+      { color: C.orange, label: "treatment (β̂_0)" },
+      { color: C.teal,   label: "nonzero at current λ" },
+      { color: C.faint,  label: "shrunk to zero" },
+    ];
+    let lx = 10;
+    items.forEach(it => {
+      legend.append("line")
+        .attr("x1", lx).attr("x2", lx + 14)
+        .attr("y1", 11).attr("y2", 11)
+        .attr("stroke", it.color).attr("stroke-width", 2.5);
+      const t = legend.append("text")
+        .attr("x", lx + 18).attr("y", 15)
+        .attr("fill", C.text).attr("font-size", 11)
+        .text(it.label);
+      lx += 18 + (it.label.length * 6.4) + 12;
+    });
 
     let xScale, yScale, dataCached;
 
@@ -231,6 +258,11 @@
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
     const colorMap = {
+      // MGWFER post: three methods compared against true coefficients.
+      "MGWR_cs":       C.steel,
+      "PMGWR":         C.orange,
+      "MGWFER":        C.teal,
+      // Legacy aliases (kept so other posts reusing this chart still colour-match).
       "First diff":    C.steel,
       "OLS (full)":    C.muted,
       "PSL":           "#9bdcc3",
@@ -241,8 +273,10 @@
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
     function update(data, activeMethods, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const methods = activeMethods.length ? activeMethods : ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"];
+      const outcomes = activeOutcomes.length ? activeOutcomes
+        : ["beta_1 (dome)", "beta_2 (gradient)", "beta_3 (constant)", "beta_4 (null)"];
+      const methods = activeMethods.length ? activeMethods
+        : ["MGWR_cs", "PMGWR", "MGWFER"];
 
       // Filter data.
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
@@ -251,7 +285,8 @@
       const facetH = 28 * methods.length + 24;
       const totalH = margin.top + facetH + margin.bottom;
       svg.attr("viewBox", `0 0 ${W} ${totalH}`);
-      svg.selectAll("g.facet").remove();
+      // Remove the entire prior render — facet groups AND orphan facet text labels.
+      svg.selectAll("g.facet, text.facet").remove();
 
       outcomes.forEach((outcome, oi) => {
         const facet = svg.append("g")
@@ -351,16 +386,31 @@
       .attr("viewBox", `0 0 ${W} 220`)
       .attr("preserveAspectRatio", "xMidYMid meet");
 
+    // Per-method colors — MGWFER post + legacy double-LASSO posts.
+    const barColor = {
+      "MGWR_cs":       C.steel,
+      "PMGWR":         C.orange,
+      "MGWFER":        C.teal,
+      "DL (rigorous)": C.teal,
+      "DL (CV)":       C.orange,
+    };
+
     function update(data, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
+      const outcomes = activeOutcomes.length ? activeOutcomes
+        : ["beta_1 (dome)", "beta_2 (gradient)", "beta_3 (constant)", "beta_4 (null)"];
       const subset = data.filter(d => outcomes.includes(d.outcome));
+      // Derive the method domain from the data itself, so the bars actually render.
+      const methodSet = new Set(subset.map(d => d.method));
+      const methods = (subset.length > 0)
+        ? Array.from(methodSet)
+        : ["MGWR_cs", "PMGWR", "MGWFER"];
       const nFacets = outcomes.length;
       const facetGap = 24;
       const facetW = (W - margin.left - margin.right - (nFacets - 1) * facetGap) / nFacets;
       const facetH = 130;
-      const totalH = margin.top + facetH + margin.bottom;
+      const totalH = margin.top + facetH + margin.bottom + 22;  // +22 for legend row
       svg.attr("viewBox", `0 0 ${W} ${totalH}`);
-      svg.selectAll("g.facet").remove();
+      svg.selectAll("g.facet, text.facet, g.barLegend").remove();
 
       outcomes.forEach((outcome, oi) => {
         const facet = svg.append("g")
@@ -368,8 +418,8 @@
           .attr("transform", `translate(${margin.left + oi * (facetW + facetGap)},${margin.top})`);
         const sub = subset.filter(d => d.outcome === outcome);
         const max = d3.max(sub, d => d.n_union) || 1;
-        const x = d3.scaleBand().domain(["DL (rigorous)", "DL (CV)"]).range([0, facetW]).padding(0.45);
-        const y = d3.scaleLinear().domain([0, max * 1.1]).range([facetH, 0]);
+        const x = d3.scaleBand().domain(methods).range([0, facetW]).padding(0.25);
+        const y = d3.scaleLinear().domain([0, max * 1.15]).range([facetH, 0]);
 
         facet.append("text").attr("x", facetW / 2).attr("y", -8)
           .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13)
@@ -384,17 +434,18 @@
           facet.append("text")
             .attr("transform", `rotate(-90) translate(${-facetH / 2},${-44})`)
             .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 11)
-            .text("Controls selected (out of 284)");
+            .text("Bandwidth (n units)");
         }
         facet.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
         sub.forEach(d => {
           const xc = x(d.method);
+          if (xc === undefined) return;  // defensive: skip unknown methods
           const w  = x.bandwidth();
           facet.append("rect")
             .attr("x", xc).attr("y", y(d.n_union))
             .attr("width", w).attr("height", facetH - y(d.n_union))
-            .attr("fill", d.method === "DL (CV)" ? C.orange : C.teal)
+            .attr("fill", barColor[d.method] || C.muted)
             .attr("opacity", 0.85);
           facet.append("text")
             .attr("x", xc + w / 2).attr("y", y(d.n_union) - 4)
@@ -402,6 +453,20 @@
             .attr("fill", C.text).attr("font-size", 12).attr("font-weight", 600)
             .text(d.n_union);
         });
+      });
+
+      // Color legend below the facets (outside the plotting area to avoid overlap).
+      const legendG = svg.append("g").attr("class", "barLegend")
+        .attr("transform", `translate(${margin.left},${margin.top + facetH + margin.bottom - 4})`);
+      let xCursor = 0;
+      methods.forEach(m => {
+        const g = legendG.append("g").attr("transform", `translate(${xCursor},0)`);
+        g.append("rect").attr("width", 12).attr("height", 12).attr("y", -10)
+          .attr("fill", barColor[m] || C.muted).attr("opacity", 0.85);
+        const t = g.append("text").attr("x", 18).attr("y", 0)
+          .attr("fill", C.text).attr("font-size", 11).text(m);
+        // approximate text width: 7px/char is enough for these labels
+        xCursor += 18 + (m.length * 7) + 18;
       });
     }
     return { update };
