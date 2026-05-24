@@ -50,8 +50,10 @@
   //   bias; the "DML" gap stays close to the true ATE.
   // ------------------------------------------------------------------
   function ate_bias_animation(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    const W = 720, H = 360;
+    // Top margin enlarged so the legend can sit ABOVE the plot area
+    // rather than overlapping the animated dots and the true-ATE line.
+    const margin = { top: 60, right: 28, bottom: 44, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -95,13 +97,22 @@
     const naiveBar = g.append("line").attr("stroke", C.muted).attr("stroke-width", 2);
     const dmlBar   = g.append("line").attr("stroke", C.steel).attr("stroke-width", 2);
 
-    // Legend.
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.muted);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("Naive — biased toward zero");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("DoubleML — covers truth");
+    // Legend — placed in the enlarged top margin (above the plot) so the
+    // animated naive/DML dots and the true-ATE line never sit underneath it.
+    const lg = g.append("g").attr("transform", `translate(0,${-36})`);
+    const e1Label = "Naive — biased toward zero";
+    const e2Label = "DoubleML — covers truth";
+    const e1W = 18 + e1Label.length * 6.5;
+    const e2W = 18 + e2Label.length * 6.5;
+    const gap = 24;
+    const total = e1W + gap + e2W;
+    const x0 = (w - total) / 2;
+    lg.append("rect").attr("x", x0 - 8).attr("y", 0).attr("width", total + 16).attr("height", 22)
+      .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+    lg.append("circle").attr("cx", x0 + 6).attr("cy", 11).attr("r", 5).attr("fill", C.muted);
+    lg.append("text").attr("x", x0 + 18).attr("y", 15).attr("fill", C.text).attr("font-size", 12).text(e1Label);
+    lg.append("circle").attr("cx", x0 + e1W + gap + 6).attr("cy", 11).attr("r", 5).attr("fill", C.steel);
+    lg.append("text").attr("x", x0 + e1W + gap + 18).attr("y", 15).attr("fill", C.text).attr("font-size", 12).text(e2Label);
 
     let t0 = null;
     function step(ts) {
@@ -256,8 +267,9 @@
   //   data: array of { group, estimated, ci_lo, ci_hi, truth, n }
   // ------------------------------------------------------------------
   function gate_bars(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 24, bottom: 60, left: 60 };
+    const W = 720, H = 360;
+    // Top margin enlarged to host the legend ABOVE the plot area (was 28).
+    const margin = { top: 60, right: 24, bottom: 60, left: 60 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -333,13 +345,23 @@
           .text(d.truth.toFixed(2));
       });
 
-      // Legend.
-      const lg = g.append("g").attr("transform", `translate(${w - 200},${0})`);
-      lg.append("rect").attr("width", 200).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-      lg.append("rect").attr("x", 10).attr("y", 10).attr("width", 14).attr("height", 10).attr("fill", C.steel);
-      lg.append("text").attr("x", 30).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("Estimated GATE (DR)");
-      lg.append("rect").attr("x", 10).attr("y", 28).attr("width", 14).attr("height", 10).attr("fill", C.orange);
-      lg.append("text").attr("x", 30).attr("y", 37).attr("fill", C.text).attr("font-size", 12).text("True GATE");
+      // Legend — placed ABOVE the plot area (in the enlarged top margin) so
+      // it never overlaps bars. Horizontal layout, centred.
+      const lg = g.append("g").attr("transform", `translate(0,${-36})`);
+      // Swatch + label pair widths (computed to keep entries centred).
+      const e1Label = "Estimated GATE (DR)";
+      const e2Label = "True GATE";
+      const e1W = 14 + 6 + e1Label.length * 6.5;
+      const e2W = 14 + 6 + e2Label.length * 6.5;
+      const gap = 24;
+      const total = e1W + gap + e2W;
+      const x0 = (w - total) / 2;
+      lg.append("rect").attr("x", x0 - 8).attr("y", 0).attr("width", total + 16).attr("height", 22)
+        .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+      lg.append("rect").attr("x", x0).attr("y", 6).attr("width", 14).attr("height", 10).attr("fill", C.steel);
+      lg.append("text").attr("x", x0 + 20).attr("y", 15).attr("fill", C.text).attr("font-size", 12).text(e1Label);
+      lg.append("rect").attr("x", x0 + e1W + gap).attr("y", 6).attr("width", 14).attr("height", 10).attr("fill", C.orange);
+      lg.append("text").attr("x", x0 + e1W + gap + 20).attr("y", 15).attr("fill", C.text).attr("font-size", 12).text(e2Label);
     }
 
     return { update };
@@ -413,8 +435,9 @@
   // Histograms reused from the canonical template (used by DGP simulator).
   // ------------------------------------------------------------------
   function alpha_histograms(container) {
-    const W = 720, H = 260;
-    const margin = { top: 18, right: 24, bottom: 38, left: 50 };
+    const W = 720, H = 300;
+    // Top margin enlarged to host the legend ABOVE the histogram (was 18).
+    const margin = { top: 56, right: 24, bottom: 38, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -448,8 +471,17 @@
 
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.orange).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", 10)
-        .attr("fill", C.orange).attr("font-size", 11).text(`true ATE = ${data.alpha_true.toFixed(2)}`);
+      // true-ATE label placed just above the top of the plot area (in the
+      // enlarged top margin), with anchor flipped if the line is near the right edge
+      // so the label never extends off-svg or overlaps the bars below.
+      const lblX = x(data.alpha_true);
+      const labelText = `true ATE = ${data.alpha_true.toFixed(2)}`;
+      const nearRight = lblX > w - 70;
+      g.append("text")
+        .attr("x", lblX + (nearRight ? -4 : 4))
+        .attr("y", -6)
+        .attr("text-anchor", nearRight ? "end" : "start")
+        .attr("fill", C.orange).attr("font-size", 11).text(labelText);
 
       g.append("g").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format(".2f")))
@@ -461,13 +493,22 @@
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Estimated ATE across 100 simulated datasets");
 
-      // Legend.
-      const lg = g.append("g").attr("transform", `translate(${w - 210},${20})`);
-      lg.append("rect").attr("width", 200).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-      lg.append("rect").attr("x", 10).attr("y", 12).attr("width", 14).attr("height", 10).attr("fill", C.muted);
-      lg.append("text").attr("x", 30).attr("y", 21).attr("fill", C.text).attr("font-size", 12).text("Naive estimator");
-      lg.append("rect").attr("x", 10).attr("y", 30).attr("width", 14).attr("height", 10).attr("fill", C.steel);
-      lg.append("text").attr("x", 30).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("Adjusted (regression)");
+      // Legend — placed ABOVE the histogram bars (in the enlarged top margin)
+      // so it never sits on top of high-count bins.
+      const lg = g.append("g").attr("transform", `translate(0,${-32})`);
+      const e1Label = "Naive estimator";
+      const e2Label = "Adjusted (regression)";
+      const e1W = 14 + 6 + e1Label.length * 6.5;
+      const e2W = 14 + 6 + e2Label.length * 6.5;
+      const gap = 24;
+      const total = e1W + gap + e2W;
+      const x0 = (w - total) / 2;
+      lg.append("rect").attr("x", x0 - 8).attr("y", 0).attr("width", total + 16).attr("height", 22)
+        .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+      lg.append("rect").attr("x", x0).attr("y", 6).attr("width", 14).attr("height", 10).attr("fill", C.muted);
+      lg.append("text").attr("x", x0 + 20).attr("y", 15).attr("fill", C.text).attr("font-size", 12).text(e1Label);
+      lg.append("rect").attr("x", x0 + e1W + gap).attr("y", 6).attr("width", 14).attr("height", 10).attr("fill", C.steel);
+      lg.append("text").attr("x", x0 + e1W + gap + 20).attr("y", 15).attr("fill", C.text).attr("font-size", 12).text(e2Label);
     }
     return { update };
   }
