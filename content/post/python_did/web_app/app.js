@@ -323,8 +323,10 @@
     // ATT line.
     g.append("line").attr("x1", 0).attr("x2", w).attr("y1", y(att)).attr("y2", y(att))
       .attr("stroke", "#00d4c8").attr("stroke-dasharray", "4 4").attr("stroke-width", 1.5);
-    g.append("text").attr("x", w - 6).attr("y", y(att) - 6)
-      .attr("text-anchor", "end").attr("fill", "#00d4c8").attr("font-size", 11)
+    // ATT annotation — anchor LEFT (just inside left axis) so it can never
+    // collide with the right-side M cursor label.
+    g.append("text").attr("x", 6).attr("y", y(att) - 6)
+      .attr("text-anchor", "start").attr("fill", "#00d4c8").attr("font-size", 11)
       .text(`ATT = ${att.toFixed(2)}`);
 
     // Current-M cursor.
@@ -335,7 +337,14 @@
       .attr("r", 5).attr("fill", "#d97757");
     g.append("circle").attr("cx", x(M_target)).attr("cy", y(ci_hi))
       .attr("r", 5).attr("fill", "#d97757");
-    g.append("text").attr("x", x(M_target) + 6).attr("y", 14)
+    // M cursor label: auto-flip its anchor near the right edge so it stays
+    // inside the plot, and pin it to the bottom of the plot area (well clear
+    // of the ATT annotation at the top).
+    const mLabelX = x(M_target);
+    const mAnchor = (mLabelX > w - 60) ? "end" : "start";
+    const mOffset = (mAnchor === "end") ? -6 : 6;
+    g.append("text").attr("x", mLabelX + mOffset).attr("y", h - 6)
+      .attr("text-anchor", mAnchor)
       .attr("fill", "#d97757").attr("font-size", 11)
       .text(`M = ${M_target.toFixed(1)}`);
   }

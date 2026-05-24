@@ -35,8 +35,10 @@
   //   sweeps from 0 to a large value. L1 hits zero abruptly; L2 only decays.
   // ------------------------------------------------------------------
   function l1_vs_l2_animation(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    // Bottom margin is enlarged to host the legend OUTSIDE the plot area
+    // (below the x-axis label) so the moving L2 dot can't overlap legend text.
+    const W = 720, H = 360;
+    const margin = { top: 28, right: 28, bottom: 84, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -79,13 +81,14 @@
     g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
     g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-l2");
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
+    // Legend — rendered BELOW the x-axis (outside plot area) as a single
+    // horizontal strip so the moving L1/L2 dots can never overlap legend text.
+    const lgY = h + 56;  // safely below the x-axis title at h + 36
+    const lg = g.append("g").attr("transform", `translate(0,${lgY})`);
+    lg.append("circle").attr("cx", 8).attr("cy", 0).attr("r", 5).attr("fill", C.orange);
+    lg.append("text").attr("x", 20).attr("y", 4).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
+    lg.append("circle").attr("cx", 220).attr("cy", 0).attr("r", 5).attr("fill", C.steel);
+    lg.append("text").attr("x", 232).attr("y", 4).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
 
     const moving_l1 = g.select("#anim-l1");
     const moving_l2 = g.select("#anim-l2");
