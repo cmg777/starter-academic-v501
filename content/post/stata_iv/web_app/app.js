@@ -367,8 +367,8 @@
 
   // Histogram chart builder for OLS vs IV distributions.
   function dual_histogram(container) {
-    const W = 720, H = 320;
-    const margin = { top: 30, right: 24, bottom: 50, left: 50 };
+    const W = 720, H = 340;
+    const margin = { top: 44, right: 24, bottom: 50, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     container.innerHTML = "";
@@ -416,11 +416,12 @@
       drawBars(binsO, C.orange, 0.62);
       drawBars(binsI, C.teal,   0.80);
 
-      // True β line.
+      // True β line. Label is placed *above* the plot area (negative y) so it
+      // does not collide with the histogram bars near the top of the chart.
       g.append("line").attr("x1", x(trueB)).attr("x2", x(trueB))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(trueB) + 4).attr("y", 10)
+      g.append("text").attr("x", x(trueB) + 4).attr("y", -6)
         .attr("fill", C.steel).attr("font-size", 11)
         .text(`true β = ${trueB.toFixed(2)}`);
 
@@ -519,8 +520,8 @@
   // TAB 4 — Forest plot from data/results.json.
   // ------------------------------------------------------------------
   function forest_iv(container) {
-    const W = 760, H = 460;
-    const margin = { top: 30, right: 200, bottom: 50, left: 220 };
+    const W = 760, H = 470;
+    const margin = { top: 40, right: 200, bottom: 50, left: 220 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     container.innerHTML = "";
@@ -544,20 +545,23 @@
       g.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", h)
         .attr("stroke", C.muted).attr("stroke-dasharray", "3 3").attr("stroke-width", 1);
 
-      // OLS reference line at 0.522.
+      // OLS reference line at 0.522. Label staggered above the chart, anchored to the
+      // line position with end-alignment so it does not collide with the IV-main label
+      // when the two coefficients are close on the x-axis.
       g.append("line").attr("x1", x(0.522)).attr("x2", x(0.522)).attr("y1", 0).attr("y2", h)
         .attr("stroke", C.orange).attr("stroke-dasharray", "5 4").attr("stroke-width", 1.5)
         .attr("opacity", 0.55);
-      g.append("text").attr("x", x(0.522)).attr("y", -8)
-        .attr("text-anchor", "middle").attr("fill", C.orange).attr("font-size", 10)
-        .text("OLS baseline 0.52");
+      g.append("text").attr("x", x(0.522) - 4).attr("y", -18)
+        .attr("text-anchor", "end").attr("fill", C.orange).attr("font-size", 10)
+        .text("OLS 0.52");
 
-      // IV main reference line.
+      // IV main reference line at 0.944. Label staggered on the lower row (-8) and
+      // anchored on the start so the two reference labels never overlap.
       g.append("line").attr("x1", x(0.944)).attr("x2", x(0.944)).attr("y1", 0).attr("y2", h)
         .attr("stroke", C.teal).attr("stroke-dasharray", "5 4").attr("stroke-width", 1.5)
         .attr("opacity", 0.55);
-      g.append("text").attr("x", x(0.944)).attr("y", -8)
-        .attr("text-anchor", "middle").attr("fill", C.teal).attr("font-size", 10)
+      g.append("text").attr("x", x(0.944) + 4).attr("y", -6)
+        .attr("text-anchor", "start").attr("fill", C.teal).attr("font-size", 10)
         .text("IV main 0.94");
 
       // Rows.
