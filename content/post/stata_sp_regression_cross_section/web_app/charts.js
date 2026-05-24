@@ -30,9 +30,11 @@
   }
 
   // ------------------------------------------------------------------
-  // L1 vs L2 shrinkage animation (Tab 1).
-  //   Shows two coefficients beta_1 (L1) and beta_2 (L2) as the penalty knob
-  //   sweeps from 0 to a large value. L1 hits zero abruptly; L2 only decays.
+  // Spatial shrinkage / amplification animation (Tab 1).
+  //   Shows two functions of the spatial parameter ρ:
+  //     - Orange (solid):  SAR amplification  1 / (1 − ρ)  — diverges as ρ → 1
+  //     - Steel (dashed):  Residual shock     1 − ρ        — vanishes as ρ → 1
+  //   A moving dot on each curve sweeps ρ from 0 to 0.9 and back.
   // ------------------------------------------------------------------
   function l1_vs_l2_animation(container) {
     const W = 720, H = 320;
@@ -42,64 +44,77 @@
     const svg = ensureSVG(container, W, H);
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const x = d3.scaleLinear().domain([0, 5]).range([0, w]);
-    const y = d3.scaleLinear().domain([-0.05, 1.05]).range([h, 0]);
+    const RHO_MAX = 0.9;        // animation sweeps up to here
+    const Y_MAX   = 6;          // cap amplification at 6 so 1/(1-ρ) stays on chart
+    const x = d3.scaleLinear().domain([0, RHO_MAX]).range([0, w]);
+    const y = d3.scaleLinear().domain([0, Y_MAX]).range([h, 0]);
 
     g.append("g").attr("transform", `translate(0,${h})`)
-      .call(d3.axisBottom(x).ticks(6))
+      .call(d3.axisBottom(x).ticks(6).tickFormat(d3.format(".1f")))
       .selectAll("text").attr("fill", C.muted);
-    g.append("g").call(d3.axisLeft(y).ticks(5))
+    g.append("g").call(d3.axisLeft(y).ticks(6))
       .selectAll("text").attr("fill", C.muted);
     g.selectAll(".domain, line").attr("stroke", C.muted);
+
+    // Reference line at y = 1 (own-shock baseline, before any spillover).
+    g.append("line")
+      .attr("x1", 0).attr("x2", w)
+      .attr("y1", y(1)).attr("y2", y(1))
+      .attr("stroke", C.faint).attr("stroke-dasharray", "2 4");
+    g.append("text")
+      .attr("x", 6).attr("y", y(1) - 4)
+      .attr("text-anchor", "start")
+      .attr("fill", C.muted).attr("font-size", 11)
+      .text("baseline = 1");
 
     g.append("text")
       .attr("transform", `translate(${w / 2},${h + 36})`)
       .attr("text-anchor", "middle")
       .attr("fill", C.text)
       .attr("font-size", 12)
-      .text("Penalty strength  λ");
+      .text("ρ  (spatial parameter)");
     g.append("text")
       .attr("transform", `rotate(-90) translate(${-h / 2},${-40})`)
       .attr("text-anchor", "middle")
       .attr("fill", C.text)
       .attr("font-size", 12)
-      .text("Estimated coefficient  β̂");
+      .text("Amplification / shrinkage factor");
 
-    // True coefficient = 1 for both. As lambda grows:
-    //   L1 (LASSO):  β̂ = max(1 - lambda, 0)   — hits zero at λ = 1
-    //   L2 (Ridge):  β̂ = 1 / (1 + lambda)     — never hits zero
-    const lamArr = d3.range(0, 5.01, 0.05);
-    const l1Path = lamArr.map(l => [l, Math.max(1 - l, 0)]);
-    const l2Path = lamArr.map(l => [l, 1 / (1 + l)]);
+    // Spatial amplification & residual-shock curves.
+    //   Amp(ρ)      = 1 / (1 - ρ)         capped at Y_MAX
+    //   Residual(ρ) = 1 - ρ
+    const rhoArr = d3.range(0, RHO_MAX + 0.001, 0.01);
+    const ampPath = rhoArr.map(r => [r, Math.min(Y_MAX, 1 / Math.max(1e-3, 1 - r))]);
+    const resPath = rhoArr.map(r => [r, 1 - r]);
     const line = d3.line().x(d => x(d[0])).y(d => y(d[1])).curve(d3.curveMonotoneX);
 
-    g.append("path").attr("fill", "none").attr("stroke", C.orange).attr("stroke-width", 2.5).attr("d", line(l1Path));
-    g.append("path").attr("fill", "none").attr("stroke", C.steel).attr("stroke-width", 2.5).attr("stroke-dasharray", "4 4").attr("d", line(l2Path));
+    g.append("path").attr("fill", "none").attr("stroke", C.orange).attr("stroke-width", 2.5).attr("d", line(ampPath));
+    g.append("path").attr("fill", "none").attr("stroke", C.steel).attr("stroke-width", 2.5).attr("stroke-dasharray", "4 4").attr("d", line(resPath));
 
-    g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
-    g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-l2");
+    g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-amp");
+    g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-res");
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+    // Legend (bottom-right, below the diverging amplification curve to avoid overlap).
+    const lg = g.append("g").attr("transform", `translate(${w - 270},${h - 60})`);
+    lg.append("rect").attr("width", 264).attr("height", 50).attr("fill", "rgba(15,23,41,0.85)").attr("stroke", C.line).attr("rx", 6);
     lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
+    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("SAR multiplier 1 / (1 − ρ) — amplifies");
     lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
+    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("Residual shock 1 − ρ — compresses");
 
-    const moving_l1 = g.select("#anim-l1");
-    const moving_l2 = g.select("#anim-l2");
+    const moving_amp = g.select("#anim-amp");
+    const moving_res = g.select("#anim-res");
 
     let t0 = null;
     function step(ts) {
       if (t0 === null) t0 = ts;
       const elapsed = (ts - t0) / 1000;
       const cycle = (Math.sin(elapsed * 0.6) + 1) / 2; // [0, 1]
-      const lam = cycle * 4.5;
-      const b1 = Math.max(1 - lam, 0);
-      const b2 = 1 / (1 + lam);
-      moving_l1.attr("cx", x(lam)).attr("cy", y(b1));
-      moving_l2.attr("cx", x(lam)).attr("cy", y(b2));
+      const rho = cycle * RHO_MAX;
+      const amp = Math.min(Y_MAX, 1 / Math.max(1e-3, 1 - rho));
+      const res = 1 - rho;
+      moving_amp.attr("cx", x(rho)).attr("cy", y(amp));
+      moving_res.attr("cx", x(rho)).attr("cy", y(res));
       requestAnimationFrame(step);
     }
     requestAnimationFrame(step);

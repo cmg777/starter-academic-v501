@@ -47,15 +47,19 @@
   </p>
 
   <div class="card">
-    <h3>The shrinkage analogy — why ρ matters</h3>
+    <h3>The spatial multiplier at a glance — why ρ matters</h3>
     <p>
-      Both ρ (spatial lag) and λ (spatial error) shrink the "extra" effect of a
-      shock as it propagates through neighbours. The animation below sweeps a
-      penalty knob (here, the spatial parameter) from zero to one. The
-      <span style="color:#d97757;">orange</span> curve mimics the SAR-type
-      multiplier <code>1 / (1 − ρ)</code> behaviour (amplifies); the
-      <span style="color:#6a9bcc;">steel</span> dashed curve shows the
-      complementary direction (compression).
+      Sweep the spatial parameter <strong>ρ</strong> from 0 to 0.9. The
+      <span style="color:#d97757;">orange</span> curve is the SAR amplification
+      factor <code>1 / (1 − ρ)</code> — a shock to one tract reverberates
+      through neighbours and partially returns, so its full impact is
+      <em>larger</em> than the bare regression coefficient. The
+      <span style="color:#6a9bcc;">steel</span> dashed curve is the residual
+      <code>1 − ρ</code>: the share of any signal that has <em>not</em> been
+      amplified by spillovers. At ρ = 0 both equal 1 (no spatial structure).
+      At ρ = 0.43 (the Columbus SAR estimate) the multiplier is already
+      ≈ 1.75. As ρ → 1, amplification diverges — Tab 2 lets you watch this
+      on a 7×7 lattice.
     </p>
     <div class="chart-area" id="intro-anim"></div>
   </div>
