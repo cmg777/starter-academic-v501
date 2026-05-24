@@ -538,17 +538,24 @@
   //   in motion.
   // ------------------------------------------------------------------
   function confounder_dag_animation(container) {
-    const W = 720, H = 360;
+    // Widened SVG + extra top padding so external labels never clip or
+    // overlap the legend / edges. Each node carries a short label INSIDE
+    // the circle (acronym) and the full name OUTSIDE, off the data marks.
+    const W = 820, H = 440;
     const svg = ensureSVG(container, W, H);
     const g = svg.append("g");
 
-    // Node positions.
+    // Node positions. labelPos = "above" | "below" | "left" | "right"
+    // controls where the full-name label sits relative to the circle so
+    // it does NOT overlap edges or other nodes. Left-column nodes use
+    // "above" / "below" rather than "left" because the longest label
+    // ("Subway disruption", ~140px) would otherwise clip the SVG edge.
     const nodes = {
-      I:  { x: 110, y: 80,  label: "Introversion",     sub: "Confounder",  fill: C.muted },
-      Cc: { x: 110, y: 200, label: "Num. Children",    sub: "Confounder",  fill: C.muted },
-      Z:  { x: 110, y: 320, label: "Subway disruption", sub: "Instrument", fill: C.teal  },
-      T:  { x: 380, y: 200, label: "Work from home",   sub: "Treatment",   fill: C.orange },
-      Y:  { x: 620, y: 200, label: "Productivity",     sub: "Outcome",     fill: C.steel },
+      I:  { x: 170, y: 90,  short: "I",  label: "Introversion",      sub: "Confounder",  fill: C.muted,  labelPos: "above" },
+      Cc: { x: 170, y: 230, short: "C",  label: "Num. Children",     sub: "Confounder",  fill: C.muted,  labelPos: "left"  },
+      Z:  { x: 170, y: 360, short: "Z",  label: "Subway disruption", sub: "Instrument",  fill: C.teal,   labelPos: "below" },
+      T:  { x: 450, y: 230, short: "T",  label: "Work from home",    sub: "Treatment",   fill: C.orange, labelPos: "below" },
+      Y:  { x: 690, y: 230, short: "Y",  label: "Productivity",      sub: "Outcome",     fill: C.steel,  labelPos: "above" },
     };
     const edges = [
       { from: "I",  to: "T",  kind: "confound" },
@@ -580,7 +587,7 @@
       const dx = b.x - a.x, dy = b.y - a.y;
       const len = Math.sqrt(dx * dx + dy * dy);
       const ux = dx / len, uy = dy / len;
-      const r1 = 38, r2 = 38;
+      const r1 = 36, r2 = 36;
       const x1 = a.x + ux * r1, y1 = a.y + uy * r1;
       const x2 = b.x - ux * r2, y2 = b.y - uy * r2;
       const color = e.kind === "instrument" ? C.teal : (e.kind === "causal" ? C.orange : C.muted);
@@ -602,22 +609,42 @@
         .datum({ a, b, x1, y1, x2, y2, kind: e.kind });
     });
 
-    // Nodes.
+    // Nodes. Short label INSIDE the circle (no overflow); full label and
+    // role-tag rendered OUTSIDE the circle in the direction `labelPos`
+    // dictates so neither text nor circle overlaps any edge.
+    const R = 36; // circle radius
     Object.entries(nodes).forEach(([key, n]) => {
       const node = g.append("g").attr("transform", `translate(${n.x},${n.y})`);
-      node.append("circle").attr("r", 38).attr("fill", n.fill).attr("stroke", C.text).attr("stroke-width", 1.5).attr("opacity", 0.92);
+      node.append("circle").attr("r", R).attr("fill", n.fill).attr("stroke", C.text).attr("stroke-width", 1.5).attr("opacity", 0.95);
+      // Short tag INSIDE the circle (single letter — never overflows).
       node.append("text")
-        .attr("text-anchor", "middle").attr("y", -2)
-        .attr("fill", "#fff").attr("font-size", 11).attr("font-weight", 700)
+        .attr("text-anchor", "middle").attr("y", 6)
+        .attr("fill", "#fff").attr("font-size", 18).attr("font-weight", 700)
+        .text(n.short);
+
+      // Full name + role OUTSIDE the circle, positioned to avoid edges.
+      const offset = R + 8;
+      let lx = 0, ly = 0, anchor = "middle";
+      if (n.labelPos === "above") { lx = 0;        ly = -offset;        anchor = "middle"; }
+      else if (n.labelPos === "below") { lx = 0;   ly =  offset + 12;   anchor = "middle"; }
+      else if (n.labelPos === "left")  { lx = -offset; ly = 4;          anchor = "end";    }
+      else /* right */                  { lx =  offset; ly = 4;          anchor = "start";  }
+
+      const labelGroup = node.append("g").attr("transform", `translate(${lx},${ly})`);
+      labelGroup.append("text")
+        .attr("text-anchor", anchor)
+        .attr("y", n.labelPos === "below" ? -12 : -6)
+        .attr("fill", C.text).attr("font-size", 12).attr("font-weight", 700)
         .text(n.label);
-      node.append("text")
-        .attr("text-anchor", "middle").attr("y", 14)
-        .attr("fill", "#fff").attr("font-size", 9).attr("opacity", 0.9)
+      labelGroup.append("text")
+        .attr("text-anchor", anchor)
+        .attr("y", n.labelPos === "below" ? 2 : 8)
+        .attr("fill", C.muted).attr("font-size", 10).attr("font-style", "italic")
         .text(n.sub);
     });
 
-    // Legend.
-    const lg = g.append("g").attr("transform", `translate(${W - 220},${20})`);
+    // Legend — moved to top so it never overlaps any node label or arrow.
+    const lg = g.append("g").attr("transform", `translate(${W - 230},${10})`);
     lg.append("rect").attr("width", 210).attr("height", 64).attr("fill", "rgba(15,23,41,0.7)").attr("stroke", C.line).attr("rx", 6);
     [
       { y: 18, label: "Backdoor path (bias)",   color: C.muted,  dash: "3 3" },
@@ -767,8 +794,13 @@
   //           true_ate }
   // ------------------------------------------------------------------
   function confounding_chart(container) {
-    const W = 720, H = 220;
-    const margin = { top: 24, right: 24, bottom: 40, left: 130 };
+    // Wider right margin so value labels never collide with the SVG edge;
+    // taller top margin so the "true ATE" annotation lives ABOVE the plot
+    // (not crossing row labels). Value labels flip to the left of the
+    // marker when too close to the right edge or the true-ATE vertical
+    // line, eliminating the most common label-on-line overlap.
+    const W = 760, H = 260;
+    const margin = { top: 44, right: 70, bottom: 44, left: 130 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -795,21 +827,31 @@
       g.append("line").attr("x1", x(data.true_ate)).attr("x2", x(data.true_ate))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.true_ate) + 4).attr("y", -8)
+      // True ATE annotation sits ABOVE the plot, anchored to keep it on canvas.
+      const trueX = x(data.true_ate);
+      const trueAnchor = trueX > w - 80 ? "end" : (trueX < 80 ? "start" : "middle");
+      const trueDx = trueAnchor === "end" ? -4 : (trueAnchor === "start" ? 4 : 0);
+      g.append("text").attr("x", trueX + trueDx).attr("y", -18)
+        .attr("text-anchor", trueAnchor)
         .attr("fill", C.steel).attr("font-size", 11).attr("font-weight", 600)
         .text(`true ATE = ${data.true_ate.toFixed(2)}`);
+      // Small downward tick connecting annotation to line.
+      g.append("line").attr("x1", trueX).attr("x2", trueX)
+        .attr("y1", -14).attr("y2", -2)
+        .attr("stroke", C.steel).attr("stroke-width", 1).attr("stroke-dasharray", "2 2");
 
       // x axis.
       g.append("g").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).ticks(6).tickFormat(d3.format(".2f")))
         .selectAll("text").attr("fill", C.muted);
       g.selectAll(".domain, .tick line").attr("stroke", C.muted);
-      g.append("text").attr("transform", `translate(${w / 2},${h + 32})`)
+      g.append("text").attr("transform", `translate(${w / 2},${h + 34})`)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Estimated effect of WFH on productivity");
 
       rows.forEach(r => {
         const yc = y(r.name) + y.bandwidth() / 2;
+        // Row label.
         g.append("text").attr("x", -10).attr("y", yc + 4)
           .attr("text-anchor", "end").attr("fill", C.text).attr("font-size", 12)
           .text(r.name);
@@ -831,11 +873,27 @@
           .attr("cx", x(r.v.est)).attr("cy", yc).attr("r", 6)
           .attr("fill", r.color)
           .attr("stroke", "#fff").attr("stroke-width", 1.5);
-        // Value label.
+        // Value label — flip to the LEFT of the marker if the marker is
+        // near the right edge of the plot, so the text never overflows.
+        const xEst = x(r.v.est);
+        const flipLeft = xEst > w - 46;
+        const lx = flipLeft ? xEst - 10 : xEst + 10;
+        const lAnchor = flipLeft ? "end" : "start";
+        // Semi-transparent background rect to keep the value readable
+        // when it sits over the true-ATE line or CI bar.
+        const txt = r.v.est.toFixed(3);
+        const labelWidth = txt.length * 6.6 + 4;
+        const labelX = flipLeft ? lx - labelWidth : lx - 2;
+        g.append("rect")
+          .attr("x", labelX).attr("y", yc - 8)
+          .attr("width", labelWidth).attr("height", 14)
+          .attr("rx", 3)
+          .attr("fill", C.panel).attr("opacity", 0.7);
         g.append("text")
-          .attr("x", x(r.v.est) + 10).attr("y", yc + 4)
+          .attr("x", lx).attr("y", yc + 4)
+          .attr("text-anchor", lAnchor)
           .attr("fill", C.text).attr("font-size", 11).attr("font-weight", 600)
-          .text(r.v.est.toFixed(3));
+          .text(txt);
       });
     }
     return { update };
@@ -849,8 +907,13 @@
   //           tests: [{name, value, pass}] }
   // ------------------------------------------------------------------
   function refutation_chart(container) {
-    const W = 720, H = 240;
-    const margin = { top: 30, right: 30, bottom: 50, left: 160 };
+    // Extra top margin so reference-line annotations sit ABOVE the plot
+    // (out of the data marks). Wider right margin so PASS/FAIL badges
+    // never overlap value labels. Value labels flip side and gain a
+    // semi-transparent background whenever they would cross the
+    // "original α̂" vertical line.
+    const W = 780, H = 280;
+    const margin = { top: 56, right: 80, bottom: 50, left: 170 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -866,24 +929,45 @@
       const rows = data.tests;
       const y = d3.scaleBand().domain(rows.map(r => r.name)).range([0, h]).padding(0.45);
 
-      // Zero line.
+      // ---- Reference vertical lines ----
+      // Zero
       g.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", h)
         .attr("stroke", C.faint).attr("stroke-dasharray", "3 4");
-      g.append("text").attr("x", x(0) + 3).attr("y", -8)
-        .attr("fill", C.muted).attr("font-size", 11).text("0");
-
-      // Original estimate.
+      // Original estimate
       g.append("line").attr("x1", x(data.original)).attr("x2", x(data.original))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.teal).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.original) + 4).attr("y", -8)
-        .attr("fill", C.teal).attr("font-size", 11).attr("font-weight", 600)
-        .text(`original α̂ = ${data.original.toFixed(3)}`);
-
-      // True ATE.
+      // True ATE
       g.append("line").attr("x1", x(data.true_ate)).attr("x2", x(data.true_ate))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.steel).attr("stroke-width", 1.5).attr("stroke-dasharray", "4 4");
+
+      // ---- Reference-line annotations LIVE ABOVE the plot ----
+      // Two-row layout so labels never collide with each other or with
+      // data points: row 1 (y = -36) and row 2 (y = -18) stagger so
+      // even when "0", "original", "true" sit close on the x-axis they
+      // do not pile up.
+      const annotations = [
+        { x: x(0),            label: "0",                                       color: C.muted, row: 0 },
+        { x: x(data.original), label: `original α̂ = ${data.original.toFixed(3)}`, color: C.teal,  row: 1 },
+        { x: x(data.true_ate), label: `true ATE = ${data.true_ate.toFixed(2)}`,   color: C.steel, row: 0 },
+      ].sort((a, b) => a.x - b.x);
+      // Stagger annotations horizontally if two would overlap: anchor by
+      // position so they all stay on canvas.
+      annotations.forEach(a => {
+        const yPos = a.row === 0 ? -36 : -18;
+        // Anchor at boundary if too close to edge.
+        const anchor = a.x > w - 50 ? "end" : (a.x < 50 ? "start" : "middle");
+        const dx = anchor === "end" ? -2 : (anchor === "start" ? 2 : 0);
+        g.append("text").attr("x", a.x + dx).attr("y", yPos)
+          .attr("text-anchor", anchor)
+          .attr("fill", a.color).attr("font-size", 11).attr("font-weight", 600)
+          .text(a.label);
+        // Small connector tick from annotation to plot top
+        g.append("line").attr("x1", a.x).attr("x2", a.x)
+          .attr("y1", yPos + 4).attr("y2", -2)
+          .attr("stroke", a.color).attr("stroke-width", 0.8).attr("stroke-dasharray", "2 2").attr("opacity", 0.6);
+      });
 
       // X axis.
       g.append("g").attr("transform", `translate(0,${h})`)
@@ -911,12 +995,32 @@
         g.append("circle")
           .attr("cx", x(r.value)).attr("cy", yc).attr("r", 7)
           .attr("fill", color).attr("stroke", "#fff").attr("stroke-width", 1.6);
-        // Value.
-        g.append("text").attr("x", x(r.value) + 12).attr("y", yc + 4)
+
+        // Smart value-label placement: flip to the LEFT of the marker
+        // when the marker is close to (or sits on top of) the original-α̂
+        // vertical line, so the label does not overlap the line. Add a
+        // background rect for readability over the data lines.
+        const xVal = x(r.value);
+        const xOrig = x(data.original);
+        const flipLeft = (Math.abs(xVal - xOrig) < 40 && xVal >= xOrig - 1) || xVal > w - 60;
+        const lx = flipLeft ? xVal - 14 : xVal + 12;
+        const lAnchor = flipLeft ? "end" : "start";
+        const txt = r.value.toFixed(4);
+        const labelWidth = txt.length * 6.6 + 6;
+        const labelX = flipLeft ? lx - labelWidth + 3 : lx - 3;
+        g.append("rect")
+          .attr("x", labelX).attr("y", yc - 8)
+          .attr("width", labelWidth).attr("height", 14)
+          .attr("rx", 3)
+          .attr("fill", C.panel).attr("opacity", 0.75);
+        g.append("text").attr("x", lx).attr("y", yc + 4)
+          .attr("text-anchor", lAnchor)
           .attr("fill", C.text).attr("font-size", 11).attr("font-weight", 600)
-          .text(r.value.toFixed(4));
-        // Pass / fail badge.
-        g.append("text").attr("x", w + 4).attr("y", yc + 4)
+          .text(txt);
+
+        // Pass / fail badge — sits in the right margin, well outside the
+        // data area so it never overlaps value labels.
+        g.append("text").attr("x", w + 12).attr("y", yc + 4)
           .attr("fill", color).attr("font-size", 11).attr("font-weight", 700)
           .text(r.pass ? "PASS" : "FAIL");
       });
