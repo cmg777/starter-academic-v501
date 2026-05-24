@@ -214,8 +214,8 @@
   function ov_make_chart() {
     const container = document.getElementById("ov-overlap");
     container.innerHTML = "";
-    const W = 880, H = 320;
-    const margin = { top: 30, right: 24, bottom: 44, left: 50 };
+    const W = 880, H = 360;
+    const margin = { top: 70, right: 24, bottom: 44, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = d3.select(container).append("svg")
@@ -282,14 +282,16 @@
       .attr("text-anchor", "middle").attr("fill", COL.text).attr("font-size", 12)
       .text("Count");
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},0)`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.55)")
+    // Legend — placed ABOVE the plot area so it never overlaps histogram bars.
+    ovChart.svg.selectAll("g.legend-host").remove();
+    const lg = ovChart.svg.append("g").attr("class", "legend-host")
+      .attr("transform", `translate(${50},10)`);
+    lg.append("rect").attr("width", 360).attr("height", 30).attr("fill", "rgba(15,23,41,0.55)")
       .attr("stroke", COL.line).attr("rx", 6);
-    lg.append("rect").attr("x", 10).attr("y", 9).attr("width", 14).attr("height", 10).attr("fill", COL.orange).attr("opacity", 0.8);
-    lg.append("text").attr("x", 30).attr("y", 19).attr("fill", COL.text).attr("font-size", 11).text("Treated (smokers)");
-    lg.append("rect").attr("x", 10).attr("y", 29).attr("width", 14).attr("height", 10).attr("fill", COL.steel).attr("opacity", 0.65);
-    lg.append("text").attr("x", 30).attr("y", 39).attr("fill", COL.text).attr("font-size", 11).text("Control (non-smokers)");
+    lg.append("rect").attr("x", 12).attr("y", 10).attr("width", 14).attr("height", 10).attr("fill", COL.orange).attr("opacity", 0.8);
+    lg.append("text").attr("x", 32).attr("y", 20).attr("fill", COL.text).attr("font-size", 11).text("Treated (smokers)");
+    lg.append("rect").attr("x", 180).attr("y", 10).attr("width", 14).attr("height", 10).attr("fill", COL.steel).attr("opacity", 0.65);
+    lg.append("text").attr("x", 200).attr("y", 20).attr("fill", COL.text).attr("font-size", 11).text("Control (non-smokers)");
   }
 
   const ov_debounced = debounce(ov_render, 80);
