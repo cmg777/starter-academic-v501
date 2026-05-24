@@ -35,11 +35,48 @@
   //   sweeps from 0 to a large value. L1 hits zero abruptly; L2 only decays.
   // ------------------------------------------------------------------
   function l1_vs_l2_animation(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    // Taller canvas + larger top margin so the legend lives ABOVE the plot
+    // area (outside the data region) and never overlaps the L1 / L2 curves.
+    const W = 720, H = 360;
+    const margin = { top: 64, right: 28, bottom: 44, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
+
+    // Legend placed on the SVG root, inside the top margin band — outside
+    // the plot rect so curves cannot bleed through. Opaque panel fill.
+    const legendY = 14;
+    const legendW = 440;
+    const legendH = 36;
+    const legendX = (W - legendW) / 2;
+    const lg = svg.append("g")
+      .attr("class", "legend")
+      .attr("transform", `translate(${legendX},${legendY})`);
+    lg.append("rect")
+      .attr("width", legendW).attr("height", legendH)
+      .attr("fill", C.panel).attr("stroke", C.line).attr("rx", 6);
+    // L1 swatch + label
+    lg.append("line")
+      .attr("x1", 14).attr("x2", 40).attr("y1", legendH / 2).attr("y2", legendH / 2)
+      .attr("stroke", C.orange).attr("stroke-width", 3);
+    lg.append("circle")
+      .attr("cx", 27).attr("cy", legendH / 2).attr("r", 4).attr("fill", C.orange);
+    lg.append("text")
+      .attr("x", 50).attr("y", legendH / 2 + 4)
+      .attr("fill", C.text).attr("font-size", 12)
+      .text("L1 (LASSO) — exactly zero");
+    // L2 swatch + label
+    const l2x = 240;
+    lg.append("line")
+      .attr("x1", l2x).attr("x2", l2x + 26).attr("y1", legendH / 2).attr("y2", legendH / 2)
+      .attr("stroke", C.steel).attr("stroke-width", 3).attr("stroke-dasharray", "4 4");
+    lg.append("circle")
+      .attr("cx", l2x + 13).attr("cy", legendH / 2).attr("r", 4).attr("fill", C.steel);
+    lg.append("text")
+      .attr("x", l2x + 36).attr("y", legendH / 2 + 4)
+      .attr("fill", C.text).attr("font-size", 12)
+      .text("L2 (Ridge) — never zero");
+
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
     const x = d3.scaleLinear().domain([0, 5]).range([0, w]);
@@ -78,14 +115,6 @@
 
     g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
     g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-l2");
-
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
 
     const moving_l1 = g.select("#anim-l1");
     const moving_l2 = g.select("#anim-l2");
