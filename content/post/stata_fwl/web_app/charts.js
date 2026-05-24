@@ -126,8 +126,8 @@
   // A "time slider" t in [0, 1] mixes raw and residualized coordinates.
   // ------------------------------------------------------------------
   function fwl_animation(container) {
-    const W = 760, H = 320;
-    const margin = { top: 28, right: 16, bottom: 44, left: 50 };
+    const W = 760, H = 340;
+    const margin = { top: 48, right: 16, bottom: 44, left: 50 };
     const gap = 28;
     const panelW = (W - margin.left - margin.right - gap) / 2;
     const h = H - margin.top - margin.bottom;
@@ -168,7 +168,7 @@
       .selectAll("text").attr("fill", C.muted);
     gL.append("g").call(d3.axisLeft(yL).ticks(5)).selectAll("text").attr("fill", C.muted);
     gL.selectAll(".domain, .tick line").attr("stroke", C.muted);
-    gL.append("text").attr("x", panelW / 2).attr("y", -10)
+    gL.append("text").attr("x", panelW / 2).attr("y", -28)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13).attr("font-weight", 600)
       .text("Raw: sales vs coupons");
     gL.append("text").attr("x", panelW / 2).attr("y", h + 32)
@@ -187,7 +187,7 @@
       .attr("y1", yL(raw_fit.intercept + raw_fit.slope * xMin))
       .attr("y2", yL(raw_fit.intercept + raw_fit.slope * xMax))
       .attr("stroke", C.orange).attr("stroke-width", 2);
-    gL.append("text").attr("x", panelW - 8).attr("y", 14)
+    gL.append("text").attr("x", panelW - 8).attr("y", -10)
       .attr("text-anchor", "end").attr("fill", C.orange).attr("font-size", 11)
       .text(`slope = ${raw_fit.slope.toFixed(3)} (wrong sign!)`);
 
@@ -200,7 +200,7 @@
       .selectAll("text").attr("fill", C.muted);
     gR.append("g").call(d3.axisLeft(yR).ticks(5)).selectAll("text").attr("fill", C.muted);
     gR.selectAll(".domain, .tick line").attr("stroke", C.muted);
-    const titleR = gR.append("text").attr("x", panelW / 2).attr("y", -10)
+    const titleR = gR.append("text").attr("x", panelW / 2).attr("y", -28)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13).attr("font-weight", 600);
     const subR = gR.append("text").attr("x", panelW / 2).attr("y", h + 32)
       .attr("text-anchor", "middle").attr("fill", C.muted).attr("font-size", 11);
@@ -214,7 +214,7 @@
     const fitLine = gR.append("line")
       .attr("stroke", C.teal).attr("stroke-width", 2);
     const slopeLabel = gR.append("text")
-      .attr("x", panelW - 8).attr("y", 14)
+      .attr("x", panelW - 8).attr("y", -10)
       .attr("text-anchor", "end").attr("fill", C.teal).attr("font-size", 11);
 
     // Animate t from 0 -> 1 -> 0 ... in a slow cycle.
@@ -259,8 +259,8 @@
   // Returns { update(sim) } where sim = {coupons, sales, income, ...}.
   // ------------------------------------------------------------------
   function fwl_scatter_pair(container) {
-    const W = 760, H = 320;
-    const margin = { top: 32, right: 16, bottom: 44, left: 50 };
+    const W = 760, H = 340;
+    const margin = { top: 52, right: 16, bottom: 44, left: 50 };
     const gap = 28;
     const panelW = (W - margin.left - margin.right - gap) / 2;
     const h = H - margin.top - margin.bottom;
@@ -281,7 +281,7 @@
       g.append("g").call(d3.axisLeft(ys).ticks(5)).selectAll("text").attr("fill", C.muted);
       g.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
-      g.append("text").attr("x", panelW / 2).attr("y", -10)
+      g.append("text").attr("x", panelW / 2).attr("y", -30)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13).attr("font-weight", 600)
         .text(title);
 
@@ -295,7 +295,7 @@
         .attr("y1", ys(fit.intercept + fit.slope * xMin))
         .attr("y2", ys(fit.intercept + fit.slope * xMax))
         .attr("stroke", color).attr("stroke-width", 2);
-      g.append("text").attr("x", panelW - 8).attr("y", 14)
+      g.append("text").attr("x", panelW - 8).attr("y", -12)
         .attr("text-anchor", "end").attr("fill", color).attr("font-size", 11)
         .text(`slope = ${fit.slope.toFixed(3)}`);
       return fit.slope;
@@ -324,8 +324,8 @@
   // homogeneous within-person returns. Mimics the wage panel finding.
   // ------------------------------------------------------------------
   function within_panel_scatter(container) {
-    const W = 760, H = 360;
-    const margin = { top: 32, right: 24, bottom: 44, left: 56 };
+    const W = 760, H = 380;
+    const margin = { top: 56, right: 24, bottom: 44, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -415,7 +415,7 @@
         .selectAll("text").attr("fill", C.muted);
       g.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
-      g.append("text").attr("x", w / 2).attr("y", -12)
+      g.append("text").attr("x", w / 2).attr("y", -34)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 13).attr("font-weight", 600)
         .text(title);
       g.append("text").attr("x", w / 2).attr("y", h + 36)
@@ -440,10 +440,10 @@
         .attr("y1", ys(fit.intercept + fit.slope * xMin))
         .attr("y2", ys(fit.intercept + fit.slope * xMax))
         .attr("stroke", color).attr("stroke-width", 2.5);
-      g.append("text").attr("x", w - 10).attr("y", 14)
+      g.append("text").attr("x", w - 10).attr("y", -18)
         .attr("text-anchor", "end").attr("fill", color).attr("font-size", 12)
         .text(`slope = ${fit.slope.toFixed(3)}`);
-      g.append("text").attr("x", w - 10).attr("y", 30)
+      g.append("text").attr("x", w - 10).attr("y", -4)
         .attr("text-anchor", "end").attr("fill", C.muted).attr("font-size", 10)
         .text(sub);
       return fit.slope;
@@ -569,8 +569,8 @@
   // Used in Tab 2 to compare the two coefficients under current DGP knobs.
   // ------------------------------------------------------------------
   function fwl_compare(container) {
-    const W = 720, H = 200;
-    const margin = { top: 24, right: 24, bottom: 36, left: 110 };
+    const W = 720, H = 210;
+    const margin = { top: 32, right: 24, bottom: 36, left: 110 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -630,8 +630,8 @@
   // Histograms (Tab 2 "Run 100 simulations"): naive vs FWL estimates.
   // ------------------------------------------------------------------
   function fwl_histograms(container) {
-    const W = 720, H = 260;
-    const margin = { top: 18, right: 24, bottom: 38, left: 50 };
+    const W = 720, H = 280;
+    const margin = { top: 36, right: 24, bottom: 38, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -664,7 +664,8 @@
 
       g.append("line").attr("x1", x(data.true_alpha)).attr("x2", x(data.true_alpha))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.true_alpha) + 4).attr("y", 10)
+      g.append("text").attr("x", x(data.true_alpha)).attr("y", -8)
+        .attr("text-anchor", "middle")
         .attr("fill", C.steel).attr("font-size", 11).text(`true β = ${data.true_alpha.toFixed(2)}`);
 
       g.append("g").attr("transform", `translate(0,${h})`)
