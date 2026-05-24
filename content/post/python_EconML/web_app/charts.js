@@ -35,8 +35,9 @@
   //   sweeps from 0 to a large value. L1 hits zero abruptly; L2 only decays.
   // ------------------------------------------------------------------
   function l1_vs_l2_animation(container) {
-    const W = 720, H = 320;
-    const margin = { top: 28, right: 28, bottom: 44, left: 56 };
+    // Bottom margin sized to host axis label + legend below the plot area.
+    const W = 720, H = 360;
+    const margin = { top: 28, right: 28, bottom: 86, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -79,13 +80,33 @@
     g.append("circle").attr("r", 7).attr("fill", C.orange).attr("id", "anim-l1");
     g.append("circle").attr("r", 7).attr("fill", C.steel).attr("id", "anim-l2");
 
-    // Legend
-    const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50).attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-    lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
-    lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12).text("L1 (LASSO) — exactly zero");
-    lg.append("circle").attr("cx", 14).attr("cy", 35).attr("r", 5).attr("fill", C.steel);
-    lg.append("text").attr("x", 26).attr("y", 39).attr("fill", C.text).attr("font-size", 12).text("L2 (Ridge) — never zero");
+    // Legend — rendered BELOW the plot, centered on the chart, so it cannot
+    // overlap either coefficient curve. Widths use a fixed-em estimate (≈7.2
+    // px at 12px font) because getComputedTextLength is unreliable on SVG
+    // nodes that may not be in the visible DOM yet.
+    const legendY = h + 56;
+    const lg = g.append("g");
+    const items = [
+      { color: C.orange, dash: null,    label: "L1 (LASSO) — exactly zero" },
+      { color: C.steel,  dash: "4 4",   label: "L2 (Ridge) — never zero" },
+    ];
+    const SWATCH_W = 22, GAP_TXT = 6, GAP_ITEM = 28, PX_PER_CHAR = 7.2;
+    const itemWidths = items.map(it => SWATCH_W + GAP_TXT + it.label.length * PX_PER_CHAR);
+    const totalLegendW = itemWidths.reduce((a, b) => a + b, 0) + GAP_ITEM * (items.length - 1);
+    let cursorX = 0;
+    items.forEach((item, i) => {
+      lg.append("line")
+        .attr("x1", cursorX).attr("x2", cursorX + SWATCH_W)
+        .attr("y1", 0).attr("y2", 0)
+        .attr("stroke", item.color).attr("stroke-width", 2.5)
+        .attr("stroke-dasharray", item.dash);
+      lg.append("text")
+        .attr("x", cursorX + SWATCH_W + GAP_TXT).attr("y", 4)
+        .attr("fill", C.text).attr("font-size", 12)
+        .text(item.label);
+      cursorX += itemWidths[i] + GAP_ITEM;
+    });
+    lg.attr("transform", `translate(${Math.max(0, (w - totalLegendW) / 2)},${legendY})`);
 
     const moving_l1 = g.select("#anim-l1");
     const moving_l2 = g.select("#anim-l2");
@@ -114,8 +135,9 @@
   //     coefficients are highlighted teal.
   // ------------------------------------------------------------------
   function coefficient_path(container) {
-    const W = 720, H = 360;
-    const margin = { top: 20, right: 24, bottom: 44, left: 56 };
+    // Extra bottom margin reserves space for a color legend below the chart.
+    const W = 720, H = 400;
+    const margin = { top: 20, right: 24, bottom: 86, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -132,6 +154,35 @@
       .attr("transform", `rotate(-90) translate(${-h / 2},${-44})`)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
       .text("Coefficient β̂_j(λ)");
+
+    // Color legend — rendered BELOW the chart so it cannot overlap any
+    // coefficient path. Three entries: treatment, surviving controls,
+    // dropped controls. Widths are estimated with a fixed em (≈6.6 px at 11px
+    // font) since text bounding boxes are unreliable for SVG nodes that may
+    // not be attached to the DOM at measurement time.
+    const legendY = h + 60;
+    const lg = root.append("g");
+    const items = [
+      { color: C.orange, label: "Treatment α(λ) — held in" },
+      { color: C.teal,   label: "Active control at current λ" },
+      { color: C.faint,  label: "Dropped (β̂ = 0)" },
+    ];
+    const SWATCH_W = 22, GAP_TXT = 6, GAP_ITEM = 22, PX_PER_CHAR = 6.6;
+    const itemWidths = items.map(it => SWATCH_W + GAP_TXT + it.label.length * PX_PER_CHAR);
+    const totalLegendW = itemWidths.reduce((a, b) => a + b, 0) + GAP_ITEM * (items.length - 1);
+    let cursorX = 0;
+    items.forEach((item, i) => {
+      lg.append("line")
+        .attr("x1", cursorX).attr("x2", cursorX + SWATCH_W)
+        .attr("y1", 0).attr("y2", 0)
+        .attr("stroke", item.color).attr("stroke-width", 2.5);
+      lg.append("text")
+        .attr("x", cursorX + SWATCH_W + GAP_TXT).attr("y", 4)
+        .attr("fill", C.text).attr("font-size", 11)
+        .text(item.label);
+      cursorX += itemWidths[i] + GAP_ITEM;
+    });
+    lg.attr("transform", `translate(${Math.max(0, (w - totalLegendW) / 2)},${legendY})`);
 
     const linesG = root.append("g").attr("class", "paths");
     const cursor = root.append("line")
@@ -225,7 +276,8 @@
   // ------------------------------------------------------------------
   function forest_plot(container) {
     const W = 880;
-    const margin = { top: 28, right: 24, bottom: 36, left: 130 };
+    // bottom margin sized for axis + method-color legend below all facets
+    const margin = { top: 28, right: 24, bottom: 78, left: 130 };
     const facetGap = 24;
     const svg = d3.select(container).html("").append("svg")
       .attr("viewBox", `0 0 ${W} 320`)
@@ -247,16 +299,26 @@
       // Filter data.
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
       const nFacets = outcomes.length;
-      const facetW = (W - margin.left - margin.right - (nFacets - 1) * facetGap) / nFacets;
-      const facetH = 28 * methods.length + 24;
-      const totalH = margin.top + facetH + margin.bottom;
+      // Lay out facets as a 1-row strip when <= 3 outcomes; otherwise wrap
+      // into a 2- or 3-column grid so facet titles never overlap their
+      // neighbours' titles or data marks.
+      const cols = nFacets <= 3 ? nFacets : (nFacets <= 6 ? 3 : 4);
+      const rowsCount = Math.ceil(nFacets / cols);
+      const rowGap = 36;
+      const facetW = (W - margin.left - margin.right - (cols - 1) * facetGap) / cols;
+      const singleFacetH = 28 * methods.length + 24;
+      const facetH = singleFacetH;
+      const totalH = margin.top + rowsCount * singleFacetH + (rowsCount - 1) * rowGap + margin.bottom;
       svg.attr("viewBox", `0 0 ${W} ${totalH}`);
       svg.selectAll("g.facet").remove();
+      svg.selectAll("g.fp-legend").remove();
 
       outcomes.forEach((outcome, oi) => {
+        const col = oi % cols;
+        const row = Math.floor(oi / cols);
         const facet = svg.append("g")
           .attr("class", "facet")
-          .attr("transform", `translate(${margin.left + oi * (facetW + facetGap)},${margin.top})`);
+          .attr("transform", `translate(${margin.left + col * (facetW + facetGap)},${margin.top + row * (singleFacetH + rowGap)})`);
 
         const subset = rows.filter(d => d.outcome === outcome);
         const ext = d3.extent(subset.flatMap(d => [d.ci_lo, d.ci_hi]));
@@ -283,13 +345,13 @@
           .selectAll("text").attr("fill", C.muted).attr("font-size", 10);
         facet.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
-        // Method labels (only on the leftmost facet).
-        if (oi === 0) {
+        // Method labels (only on the leftmost facet of each row).
+        if (col === 0) {
           methods.forEach(m => {
             svg.append("text")
               .attr("class", "facet")
               .attr("x", margin.left - 10)
-              .attr("y", margin.top + y(m) + y.bandwidth() / 2 + 4)
+              .attr("y", margin.top + row * (singleFacetH + rowGap) + y(m) + y.bandwidth() / 2 + 4)
               .attr("text-anchor", "end")
               .attr("fill", C.text)
               .attr("font-size", 12)
@@ -335,6 +397,29 @@
           }).on("mouseleave", function () { tooltip.classed("show", false); });
         });
       });
+
+      // ---- method-color legend below all facets (outside plot area) ----
+      // Widths estimated with a fixed em (≈6.4 px at 11px font).
+      const legendG = svg.append("g").attr("class", "fp-legend");
+      const legendW = W - margin.left - margin.right;
+      const PX = 6.4, SWATCH = 12, GAP_TXT = 6, GAP_ITEM = 20;
+      const widths = methods.map(m => SWATCH + GAP_TXT + (m.length * PX));
+      const total = widths.reduce((a, b) => a + b, 0) + GAP_ITEM * (methods.length - 1);
+      let lx = 0;
+      methods.forEach((m, i) => {
+        legendG.append("circle")
+          .attr("cx", lx + 6).attr("cy", 0).attr("r", 5)
+          .attr("fill", colorMap[m] || C.text)
+          .attr("stroke", "#fff").attr("stroke-width", 1);
+        legendG.append("text")
+          .attr("x", lx + SWATCH + GAP_TXT).attr("y", 4)
+          .attr("fill", C.text).attr("font-size", 11)
+          .text(m);
+        lx += widths[i] + GAP_ITEM;
+      });
+      const legendY = margin.top + rowsCount * singleFacetH + (rowsCount - 1) * rowGap + 44;
+      legendG.attr("transform",
+        `translate(${margin.left + Math.max(0, (legendW - total) / 2)},${legendY})`);
     }
 
     return { update };
@@ -412,8 +497,10 @@
   //   data: { rigorous: number, cv: number, alpha_true: number }
   // ------------------------------------------------------------------
   function alpha_compare(container) {
-    const W = 720, H = 200;
-    const margin = { top: 24, right: 24, bottom: 36, left: 110 };
+    // Slightly taller top margin so the "true α" caption sits in dedicated
+    // whitespace, never above (and therefore never overlapping) a bar.
+    const W = 720, H = 220;
+    const margin = { top: 36, right: 24, bottom: 36, left: 110 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -439,7 +526,13 @@
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", -8)
+      // Caption sits in dedicated whitespace above the plot. Anchor flips so
+      // the text stays inside the SVG when alpha_true is near either edge.
+      const lblX = x(data.alpha_true);
+      const lblAnchor = lblX > w - 80 ? "end" : (lblX < 80 ? "start" : "middle");
+      const lblDx = lblAnchor === "end" ? -4 : (lblAnchor === "start" ? 4 : 0);
+      g.append("text").attr("x", lblX + lblDx).attr("y", -14)
+        .attr("text-anchor", lblAnchor)
         .attr("fill", C.steel).attr("font-size", 11)
         .text(`true α = ${data.alpha_true.toFixed(2)}`);
 
@@ -479,8 +572,10 @@
   //   alpha_true: number
   // ------------------------------------------------------------------
   function alpha_histograms(container) {
-    const W = 720, H = 260;
-    const margin = { top: 18, right: 24, bottom: 38, left: 50 };
+    // Extra top margin reserves a band above the bars for the legend + true-α
+    // label so neither can overlap a histogram bar.
+    const W = 720, H = 310;
+    const margin = { top: 54, right: 24, bottom: 38, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -512,10 +607,14 @@
       drawBars(binsC, C.orange, 0.65);
       drawBars(binsR, C.teal,   0.85);
 
+      // Vertical "true α" reference line. Label is rendered ABOVE the plot area
+      // (y = -18, in the reserved top margin) so it never overlaps a bar.
       g.append("line").attr("x1", x(data.alpha_true)).attr("x2", x(data.alpha_true))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
-      g.append("text").attr("x", x(data.alpha_true) + 4).attr("y", 10)
-        .attr("fill", C.steel).attr("font-size", 11).text(`true α = ${data.alpha_true.toFixed(2)}`);
+      g.append("text").attr("x", x(data.alpha_true)).attr("y", -22)
+        .attr("text-anchor", "middle")
+        .attr("fill", C.steel).attr("font-size", 11)
+        .text(`true α = ${data.alpha_true.toFixed(2)}`);
 
       g.append("g").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format(".2f")))
@@ -526,6 +625,31 @@
       g.append("text").attr("transform", `translate(${w / 2},${h + 32})`)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Estimated α̂ across 100 simulated datasets");
+
+      // Legend in the reserved top band (y = -42, above the plot). Widths use
+      // a fixed em estimate (≈6.4 px at 11px font).
+      const items = [
+        { color: C.teal,   label: "DL (rigorous)" },
+        { color: C.orange, label: "DL (CV / naive)" },
+      ];
+      const legendY = -42;
+      const lg = g.append("g");
+      const SWATCH_W = 14, GAP_TXT = 6, GAP_ITEM = 22, PX_PER_CHAR = 6.4;
+      const itemWidths = items.map(it => SWATCH_W + GAP_TXT + it.label.length * PX_PER_CHAR);
+      const totalLegendW = itemWidths.reduce((a, b) => a + b, 0) + GAP_ITEM * (items.length - 1);
+      let cursorX = 0;
+      items.forEach((item, i) => {
+        lg.append("rect")
+          .attr("x", cursorX).attr("y", legendY - 6)
+          .attr("width", SWATCH_W).attr("height", 10)
+          .attr("fill", item.color).attr("opacity", 0.85);
+        lg.append("text")
+          .attr("x", cursorX + SWATCH_W + GAP_TXT).attr("y", legendY + 3)
+          .attr("fill", C.text).attr("font-size", 11)
+          .text(item.label);
+        cursorX += itemWidths[i] + GAP_ITEM;
+      });
+      lg.attr("transform", `translate(${Math.max(0, (w - totalLegendW) / 2)},0)`);
     }
     return { update };
   }
@@ -537,8 +661,10 @@
   // Two parallel lines on one axis; CI band per line.
   // ------------------------------------------------------------------
   function gate_lines(container) {
-    const W = 760, H = 320;
-    const margin = { top: 30, right: 28, bottom: 50, left: 56 };
+    // Bottom margin enlarged so the series legend can sit below the x-axis
+    // without overlapping either line or its CI band.
+    const W = 760, H = 380;
+    const margin = { top: 18, right: 28, bottom: 110, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -604,16 +730,28 @@
         });
       });
 
-      // Legend
-      const lg = g.append("g").attr("transform", `translate(${w - 320},${0})`);
-      lg.append("rect").attr("width", 320).attr("height", 50)
-        .attr("fill", "rgba(15,23,41,0.65)").attr("stroke", C.line).attr("rx", 6);
+      // Legend — placed BELOW the x-axis label so it cannot overlap a line
+      // or CI band. Two stacked rows, centered. Widths use fixed em estimate.
+      const legendTopY = h + 64;
+      const lg = g.append("g");
+      const PX = 6.4;
+      const maxLegendW = 30 + Math.max(...series.map(s => s.label.length * PX));
       series.forEach((s, i) => {
-        const yy = 14 + i * 20;
-        lg.append("circle").attr("cx", 14).attr("cy", yy - 3).attr("r", 5).attr("fill", s.color);
-        lg.append("text").attr("x", 26).attr("y", yy)
-          .attr("fill", C.text).attr("font-size", 11).text(s.label);
+        const yy = legendTopY + i * 18;
+        lg.append("line")
+          .attr("x1", 0).attr("x2", 22)
+          .attr("y1", yy).attr("y2", yy)
+          .attr("stroke", s.color).attr("stroke-width", 2.5);
+        lg.append("circle")
+          .attr("cx", 11).attr("cy", yy).attr("r", 4)
+          .attr("fill", s.color)
+          .attr("stroke", "#fff").attr("stroke-width", 1);
+        lg.append("text")
+          .attr("x", 30).attr("y", yy + 4)
+          .attr("fill", C.text).attr("font-size", 11)
+          .text(s.label);
       });
+      lg.attr("transform", `translate(${Math.max(0, (w - maxLegendW) / 2)},0)`);
     }
     return { update };
   }
