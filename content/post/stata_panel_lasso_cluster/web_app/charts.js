@@ -231,11 +231,6 @@
       .attr("viewBox", `0 0 ${W} 320`)
       .attr("preserveAspectRatio", "xMidYMid meet");
     const colorMap = {
-      "First diff":    C.steel,
-      "OLS (full)":    C.muted,
-      "PSL":           "#9bdcc3",
-      "DL (rigorous)": C.teal,
-      "DL (CV)":       C.orange,
       "Pooled FE":     C.steel,
       "C-LASSO G1":    C.teal,
       "C-LASSO G2":    C.orange,
@@ -244,8 +239,8 @@
     const tooltip = d3.select(container).append("div").attr("class", "tooltip");
 
     function update(data, activeMethods, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
-      const methods = activeMethods.length ? activeMethods : ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : ["Democracy → lnPGDP", "CPI → Savings (static)", "CPI → Savings (dynamic)"];
+      const methods = activeMethods.length ? activeMethods : ["Pooled FE", "C-LASSO G1", "C-LASSO G2"];
 
       // Filter data.
       const rows = data.filter(d => outcomes.includes(d.outcome) && methods.includes(d.method));
@@ -355,7 +350,7 @@
       .attr("preserveAspectRatio", "xMidYMid meet");
 
     function update(data, activeOutcomes) {
-      const outcomes = activeOutcomes.length ? activeOutcomes : ["Violent crime", "Property crime", "Murder"];
+      const outcomes = activeOutcomes.length ? activeOutcomes : ["Democracy → lnPGDP", "CPI → Savings (static)", "CPI → Savings (dynamic)"];
       const subset = data.filter(d => outcomes.includes(d.outcome));
       const nFacets = outcomes.length;
       const facetGap = 24;
@@ -369,9 +364,9 @@
       const methodSet = new Set();
       subset.forEach(d => methodSet.add(d.method));
       const methodDomain = Array.from(methodSet);
-      // Color rule: CV-style/orange for known "over-selecting" methods, teal otherwise.
-      const orangeMethods = new Set(["DL (CV)", "C-LASSO G2"]);
-      const tealMethods   = new Set(["DL (rigorous)", "C-LASSO G1"]);
+      // Color rule: orange for the negative-slope C-LASSO group, teal for positive.
+      const orangeMethods = new Set(["C-LASSO G2"]);
+      const tealMethods   = new Set(["C-LASSO G1"]);
       const yLabel = methodDomain.some(m => m.startsWith("C-LASSO"))
         ? "Countries in group" : "Controls selected (out of 284)";
 
