@@ -563,8 +563,8 @@
   //   to control, while the observed treated path bends at the treatment date.
   // ----------------------------------------------------------------
   function parallel_trends_animation(container) {
-    const W = 720, H = 340;
-    const m = { top: 30, right: 24, bottom: 48, left: 56 };
+    const W = 720, H = 380;
+    const m = { top: 30, right: 24, bottom: 80, left: 56 };
     const w = W - m.left - m.right, h = H - m.top - m.bottom;
     const svg = ensureSVG(container, W, H);
     const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
@@ -618,21 +618,35 @@
     const pObs = g.append("path").attr("fill", "none")
       .attr("stroke", C.orange).attr("stroke-width", 2.8);
 
-    // Legend
-    const legend = svg.append("g").attr("transform", `translate(${W - 240},${10})`);
-    [["Control (untreated)", C.steel, false],
-     ["Counterfactual treated", C.muted, true],
-     ["Observed treated", C.orange, false]].forEach((d, i) => {
-      const yy = i * 16;
-      legend.append("line").attr("x1", 0).attr("x2", 22)
-        .attr("y1", yy + 6).attr("y2", yy + 6)
+    // Legend (placed below the plot to avoid overlapping lines)
+    const legendItems = [
+      ["Control (untreated)", C.steel, false],
+      ["Counterfactual treated", C.muted, true],
+      ["Observed treated", C.orange, false],
+    ];
+    const legend = svg.append("g")
+      .attr("transform", `translate(${m.left},${H - 4})`);
+    // Background rect for legibility
+    legend.append("rect")
+      .attr("x", -4).attr("y", -14)
+      .attr("width", w + 8).attr("height", 16)
+      .attr("fill", "rgba(15,23,41,0.7)").attr("rx", 4);
+    let lx = 0;
+    legendItems.forEach((d) => {
+      legend.append("line").attr("x1", lx).attr("x2", lx + 22)
+        .attr("y1", -6).attr("y2", -6)
         .attr("stroke", d[1]).attr("stroke-width", 2.4)
         .attr("stroke-dasharray", d[2] ? "5 4" : "0");
-      legend.append("text").attr("x", 28).attr("y", yy + 10)
+      legend.append("text").attr("x", lx + 28).attr("y", -2)
         .attr("fill", C.text).attr("font-size", 11).text(d[0]);
+      lx += 28 + d[0].length * 6.6 + 14;
     });
 
-    // ATT annotation at t=3
+    // ATT annotation at t=3 (with background rect for legibility)
+    const attBg = g.append("rect")
+      .attr("fill", "rgba(15,23,41,0.72)").attr("rx", 3)
+      .attr("y", 4).attr("height", 16).attr("width", 180)
+      .attr("x", w - 184);
     const attLabel = g.append("text").attr("fill", C.teal)
       .attr("font-size", 12).attr("text-anchor", "end")
       .attr("x", w - 6).attr("y", 16);
@@ -656,8 +670,8 @@
   //   [{ event_time, estimate, se }, ...]
   // ----------------------------------------------------------------
   function did_event_study(container) {
-    const W = 760, H = 360;
-    const m = { top: 28, right: 24, bottom: 48, left: 60 };
+    const W = 760, H = 400;
+    const m = { top: 28, right: 24, bottom: 80, left: 60 };
     const w = W - m.left - m.right, h = H - m.top - m.bottom;
     const svg = ensureSVG(container, W, H);
     const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
@@ -741,15 +755,22 @@
           }).on("mouseleave", function () { tooltip.classed("show", false); });
       });
 
-      // Legend
-      const legend = g.append("g").attr("transform", `translate(${w - 220},${4})`);
-      active.forEach((k, i) => {
-        const yy = i * 16;
-        legend.append("line").attr("x1", 0).attr("x2", 22)
-          .attr("y1", yy + 6).attr("y2", yy + 6)
+      // Legend (placed below x-axis label, outside plot area, with background rect)
+      const legend = svg.append("g")
+        .attr("transform", `translate(${m.left},${H - 4})`);
+      legend.append("rect")
+        .attr("x", -4).attr("y", -14)
+        .attr("width", w + 8).attr("height", 16)
+        .attr("fill", "rgba(15,23,41,0.7)").attr("rx", 4);
+      let lx = 0;
+      active.forEach((k) => {
+        const lbl = labelMap[k] || k;
+        legend.append("line").attr("x1", lx).attr("x2", lx + 22)
+          .attr("y1", -6).attr("y2", -6)
           .attr("stroke", colorMap[k]).attr("stroke-width", 2.4);
-        legend.append("text").attr("x", 28).attr("y", yy + 10)
-          .attr("fill", C.text).attr("font-size", 11).text(labelMap[k]);
+        legend.append("text").attr("x", lx + 28).attr("y", -2)
+          .attr("fill", C.text).attr("font-size", 11).text(lbl);
+        lx += 28 + lbl.length * 6.6 + 18;
       });
     }
 
@@ -917,8 +938,8 @@
   //   data: { twfe: [..], cs: [..], true_att }
   // ----------------------------------------------------------------
   function did_sim_histograms(container) {
-    const W = 760, H = 340;
-    const m = { top: 28, right: 24, bottom: 44, left: 56 };
+    const W = 760, H = 380;
+    const m = { top: 28, right: 24, bottom: 80, left: 56 };
     const w = W - m.left - m.right, h = H - m.top - m.bottom;
     const svg = ensureSVG(container, W, H);
     const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
@@ -958,20 +979,35 @@
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel)
         .attr("stroke-width", 2).attr("stroke-dasharray", "4 4");
 
-      g.append("text").attr("x", x(true_att) + 6).attr("y", 12)
+      // True-ATT label with background rect (placed near the top-left of the line)
+      const trueLbl = "True ATT = " + true_att.toFixed(3);
+      const trueX = x(true_att) + 6;
+      g.append("rect")
+        .attr("x", trueX - 3).attr("y", 0)
+        .attr("width", trueLbl.length * 6.2 + 6).attr("height", 14)
+        .attr("fill", "rgba(15,23,41,0.72)").attr("rx", 3);
+      g.append("text").attr("x", trueX).attr("y", 11)
         .attr("fill", C.steel).attr("font-size", 11)
-        .text("True ATT = " + true_att.toFixed(3));
+        .text(trueLbl);
 
       g.append("text").attr("transform", `translate(${w / 2},${h + 36})`)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Estimated ATT across " + (twfe.length || cs.length) + " simulated panels");
 
-      // Mini legend
-      const lg = g.append("g").attr("transform", `translate(${w - 160},${0})`);
-      [["TWFE", C.orange], ["CS-style", C.teal]].forEach((d, i) => {
-        const yy = i * 16;
-        lg.append("rect").attr("x", 0).attr("y", yy).attr("width", 14).attr("height", 10).attr("fill", d[1]).attr("opacity", 0.6);
-        lg.append("text").attr("x", 20).attr("y", yy + 9).attr("fill", C.text).attr("font-size", 11).text(d[0]);
+      // Mini legend placed below the x-axis label (outside plot area)
+      const lg = svg.append("g")
+        .attr("transform", `translate(${m.left},${H - 4})`);
+      lg.append("rect")
+        .attr("x", -4).attr("y", -14)
+        .attr("width", w + 8).attr("height", 16)
+        .attr("fill", "rgba(15,23,41,0.7)").attr("rx", 4);
+      let lx = 0;
+      [["TWFE", C.orange], ["CS-style", C.teal]].forEach((d) => {
+        lg.append("rect").attr("x", lx).attr("y", -10).attr("width", 14).attr("height", 9)
+          .attr("fill", d[1]).attr("opacity", 0.65);
+        lg.append("text").attr("x", lx + 20).attr("y", -2)
+          .attr("fill", C.text).attr("font-size", 11).text(d[0]);
+        lx += 20 + d[0].length * 6.6 + 20;
       });
     }
 
@@ -1024,8 +1060,13 @@
       g.append("line").attr("x1", x(0.667)).attr("x2", x(0.667))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.orange)
         .attr("stroke-dasharray", "4 4").attr("stroke-width", 1.5);
+      const bdLbl = "breakdown  M̄ ≈ 0.67";
+      g.append("rect")
+        .attr("x", x(0.667) + 3).attr("y", 4)
+        .attr("width", bdLbl.length * 6.4 + 6).attr("height", 16)
+        .attr("fill", "rgba(15,23,41,0.75)").attr("rx", 3);
       g.append("text").attr("x", x(0.667) + 6).attr("y", 16)
-        .attr("fill", C.orange).attr("font-size", 11).text("breakdown  M̄ ≈ 0.67");
+        .attr("fill", C.orange).attr("font-size", 11).text(bdLbl);
 
       g.append("text").attr("transform", `translate(${w / 2},${h + 36})`)
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)

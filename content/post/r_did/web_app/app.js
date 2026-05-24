@@ -50,8 +50,8 @@
     if (!c) return;
     // Re-use the parallel-trends animation but override draw so we control delta + pre-trend.
     // The animation builder only takes delta; we extend it here by drawing manually.
-    const W = 720, H = 340;
-    const m = { top: 30, right: 24, bottom: 48, left: 56 };
+    const W = 720, H = 380;
+    const m = { top: 30, right: 24, bottom: 80, left: 56 };
     const w = W - m.left - m.right, hh = H - m.top - m.bottom;
     c.innerHTML = "";
     const svg = d3.select(c).append("svg")
@@ -87,19 +87,34 @@
     const pCF = g.append("path").attr("fill", "none").attr("stroke", C.muted).attr("stroke-width", 2).attr("stroke-dasharray", "5 4");
     const pObs = g.append("path").attr("fill", "none").attr("stroke", C.orange).attr("stroke-width", 2.8);
 
-    const legend = svg.append("g").attr("transform", `translate(${W - 240},${8})`);
-    [["Control (untreated)", C.steel, false],
-     ["Counterfactual treated", C.muted, true],
-     ["Observed treated", C.orange, false]].forEach((d, i) => {
-      const yy = i * 16;
-      legend.append("line").attr("x1", 0).attr("x2", 22)
-        .attr("y1", yy + 6).attr("y2", yy + 6)
+    // Legend placed below the plot (outside data area) with a background rect
+    const legendItems = [
+      ["Control (untreated)", C.steel, false],
+      ["Counterfactual treated", C.muted, true],
+      ["Observed treated", C.orange, false],
+    ];
+    const legend = svg.append("g")
+      .attr("transform", `translate(${m.left},${H - 4})`);
+    legend.append("rect")
+      .attr("x", -4).attr("y", -14)
+      .attr("width", w + 8).attr("height", 16)
+      .attr("fill", "rgba(15,23,41,0.7)").attr("rx", 4);
+    let lx = 0;
+    legendItems.forEach((d) => {
+      legend.append("line").attr("x1", lx).attr("x2", lx + 22)
+        .attr("y1", -6).attr("y2", -6)
         .attr("stroke", d[1]).attr("stroke-width", 2.4)
         .attr("stroke-dasharray", d[2] ? "5 4" : "0");
-      legend.append("text").attr("x", 28).attr("y", yy + 10)
+      legend.append("text").attr("x", lx + 28).attr("y", -2)
         .attr("fill", C.text).attr("font-size", 11).text(d[0]);
+      lx += 28 + d[0].length * 6.6 + 14;
     });
 
+    // ATT annotation (with background rect for legibility)
+    g.append("rect")
+      .attr("fill", "rgba(15,23,41,0.72)").attr("rx", 3)
+      .attr("y", 4).attr("height", 16).attr("width", 200)
+      .attr("x", w - 204);
     const attLabel = g.append("text").attr("fill", C.teal)
       .attr("font-size", 12).attr("text-anchor", "end")
       .attr("x", w - 6).attr("y", 16);
