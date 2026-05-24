@@ -351,9 +351,14 @@
     g.append("path").attr("d", lineGen(dfCurve)).attr("fill", "none")
       .attr("stroke", C.teal).attr("stroke-width", 2.5);
 
-    const lg = g.append("g").attr("transform", `translate(${10},${10})`);
-    lg.append("rect").attr("width", 220).attr("height", 50)
-      .attr("fill", "rgba(15,23,41,0.7)").attr("stroke", C.line).attr("rx", 6);
+    // Legend placed in the upper-right corner, where both curves have
+    // already diverged downward at large σ_f and the plot area is empty
+    // (orange has fallen to ~0.20, teal to ~0.40, while the upper-right
+    // corner corresponds to y-values > 0.45).
+    const legW = 220, legH = 50;
+    const lg = g.append("g").attr("transform", `translate(${w - legW - 10},${10})`);
+    lg.append("rect").attr("width", legW).attr("height", legH)
+      .attr("fill", "rgba(15,23,41,0.85)").attr("stroke", C.line).attr("rx", 6);
     lg.append("circle").attr("cx", 14).attr("cy", 15).attr("r", 5).attr("fill", C.orange);
     lg.append("text").attr("x", 26).attr("y", 19).attr("fill", C.text).attr("font-size", 12)
       .text("No-factor IV (ignores factors)");
