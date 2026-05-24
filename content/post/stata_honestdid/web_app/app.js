@@ -129,13 +129,13 @@
     g.append("path").datum(areaData).attr("d", lineLo)
       .attr("fill", "none").attr("stroke", C.orange).attr("stroke-width", 2);
 
-    // Point estimate line (constant).
+    // Point estimate line (constant). The numeric label is omitted here because
+    // the legend (top-left) already documents the dashed line as
+    // "Point estimate (4.23 pp)" — adding a second label invited overlap with
+    // the moving marker's lo/hi annotations when M is near the right edge.
     g.append("line").attr("x1", 0).attr("x2", w)
       .attr("y1", y(point)).attr("y2", y(point))
       .attr("stroke", C.teal).attr("stroke-width", 2).attr("stroke-dasharray", "5 5");
-    g.append("text").attr("x", w - 6).attr("y", y(point) - 6)
-      .attr("text-anchor", "end").attr("fill", C.teal).attr("font-size", 11)
-      .text(`point estimate = ${point.toFixed(4)}`);
 
     // Moving marker.
     const marker = g.append("g");
@@ -172,8 +172,17 @@
         .attr("y1", y(c.lo)).attr("y2", y(c.hi));
       marker.select(".m-lo").attr("cx", x(m)).attr("cy", y(c.lo));
       marker.select(".m-hi").attr("cx", x(m)).attr("cy", y(c.hi));
-      labelLo.attr("x", x(m) + 8).attr("y", y(c.lo) + 4).text(`lo=${c.lo.toFixed(3)}`);
-      labelHi.attr("x", x(m) + 8).attr("y", y(c.hi) + 4).text(`hi=${c.hi.toFixed(3)}`);
+      // Flip label side & avoid overlap with static "point estimate" annotation:
+      //  - when m is in the right ~30% of the chart, anchor labels to the LEFT of the marker.
+      //  - keep a small vertical offset so the lo/hi labels never collide with the dashed
+      //    point-estimate line (which sits at y(point) = 0.0423).
+      const flip = m > 1.4;
+      const dx = flip ? -8 : 8;
+      const anchor = flip ? "end" : "start";
+      labelLo.attr("x", x(m) + dx).attr("y", y(c.lo) + 14)
+        .attr("text-anchor", anchor).text(`lo = ${c.lo.toFixed(3)}`);
+      labelHi.attr("x", x(m) + dx).attr("y", y(c.hi) - 6)
+        .attr("text-anchor", anchor).text(`hi = ${c.hi.toFixed(3)}`);
       requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
@@ -374,7 +383,9 @@
   // ------------------------------------------------------------------
   function honestdid_forest(container) {
     const W = 880;
-    const margin = { top: 28, right: 24, bottom: 44, left: 170 };
+    // Larger right margin so the per-row "[lo, hi]" label has room without
+    // overflowing the SVG viewport (most-noticeable at M=2 with wide CIs).
+    const margin = { top: 28, right: 130, bottom: 44, left: 170 };
     const svg = d3.select(container).html("").append("svg")
       .attr("preserveAspectRatio", "xMidYMid meet");
 
