@@ -633,10 +633,10 @@
   // ------------------------------------------------------------------
   function pip_forest(container) {
     const W = 880;
-    const margin = { top: 36, right: 20, bottom: 44, left: 140 };
+    const margin = { top: 56, right: 20, bottom: 44, left: 140 };
     const facetGap = 26;
     const svg = d3.select(container).html("").append("svg")
-      .attr("viewBox", `0 0 ${W} 460`)
+      .attr("viewBox", `0 0 ${W} 480`)
       .attr("preserveAspectRatio", "xMidYMid meet");
     const colorMap = {
       "Binomial":       C.steel,
@@ -661,7 +661,7 @@
       svg.selectAll("g.facet, text.facet, text.global-title").remove();
 
       svg.append("text").attr("class", "global-title")
-        .attr("x", W / 2).attr("y", 18)
+        .attr("x", W / 2).attr("y", 22)
         .attr("text-anchor", "middle").attr("fill", C.text)
         .attr("font-size", 13).attr("font-weight", 600)
         .text("Posterior Inclusion Probability across 9 candidates and up to 4 priors");
@@ -743,8 +743,8 @@
   //   under the user's chosen prior. Coloured by evidence tier.
   // ------------------------------------------------------------------
   function pip_bars(container) {
-    const W = 820, H = 360;
-    const margin = { top: 36, right: 28, bottom: 56, left: 130 };
+    const W = 820, H = 380;
+    const margin = { top: 56, right: 60, bottom: 56, left: 130 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -757,18 +757,28 @@
       rows = rows.slice().sort((a, b) => b.pip - a.pip);
       const y = d3.scaleBand().domain(rows.map(r => r.label)).range([0, h]).padding(0.25);
 
+      // Threshold lines extend slightly above the plot so labels sit clearly
+      // above any bar value labels.
       [0.5, 0.75, 0.95].forEach((thr, k) => {
         g.append("line")
           .attr("x1", x(thr)).attr("x2", x(thr))
-          .attr("y1", 0).attr("y2", h)
+          .attr("y1", -18).attr("y2", h)
           .attr("stroke", k === 2 ? C.teal : C.faint)
           .attr("stroke-width", k === 2 ? 1.5 : 1)
           .attr("stroke-dasharray", k === 0 ? "2 4" : (k === 1 ? "4 4" : null));
-        g.append("text").attr("x", x(thr)).attr("y", -8)
+        // Semi-transparent background pill behind the threshold label so it
+        // remains legible even if a bar value sits close to it.
+        const labelText = thr === 0.5 ? "0.50 weak" : thr === 0.75 ? "0.75 positive" : "0.95 strong";
+        const tw = labelText.length * 5.5 + 8;
+        g.append("rect")
+          .attr("x", x(thr) - tw / 2).attr("y", -34)
+          .attr("width", tw).attr("height", 16)
+          .attr("fill", "rgba(15,23,41,0.75)").attr("rx", 3);
+        g.append("text").attr("x", x(thr)).attr("y", -22)
           .attr("text-anchor", "middle")
           .attr("fill", k === 2 ? C.teal : C.muted)
           .attr("font-size", 10)
-          .text(thr === 0.5 ? "0.50 weak" : thr === 0.75 ? "0.75 positive" : "0.95 strong");
+          .text(labelText);
       });
 
       rows.forEach(r => {
@@ -780,10 +790,22 @@
           .attr("x", 0).attr("y", y(r.label))
           .attr("width", x(r.pip)).attr("height", y.bandwidth())
           .attr("fill", color).attr("opacity", 0.85).attr("rx", 3);
+        // Place the PIP value label inside the bar (right-aligned) when there
+        // is enough room; otherwise place it just outside the bar's right
+        // edge. This guarantees it never collides with the threshold legend
+        // markers along the top edge of the plot.
+        const labelStr = r.pip.toFixed(3) + (r.sign ? "  (" + r.sign + ")" : "");
+        const approxWidth = labelStr.length * 6.2 + 12;
+        const insideOK = x(r.pip) >= approxWidth + 8;
+        const tx = insideOK ? x(r.pip) - 6 : x(r.pip) + 6;
+        const tAnchor = insideOK ? "end" : "start";
+        const tFill = insideOK ? "#0f1729" : C.text;
+        const tWeight = insideOK ? 600 : 400;
         g.append("text")
-          .attr("x", x(r.pip) + 6).attr("y", y(r.label) + y.bandwidth() / 2 + 4)
-          .attr("fill", C.text).attr("font-size", 11)
-          .text(r.pip.toFixed(3) + (r.sign ? "  (" + r.sign + ")" : ""));
+          .attr("x", tx).attr("y", y(r.label) + y.bandwidth() / 2 + 4)
+          .attr("text-anchor", tAnchor)
+          .attr("fill", tFill).attr("font-size", 11).attr("font-weight", tWeight)
+          .text(labelStr);
         g.append("text")
           .attr("x", -8).attr("y", y(r.label) + y.bandwidth() / 2 + 4)
           .attr("text-anchor", "end").attr("fill", C.text).attr("font-size", 12)

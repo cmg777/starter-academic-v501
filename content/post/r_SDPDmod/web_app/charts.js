@@ -333,8 +333,15 @@
       g.append("line").attr("x1", x(data.beta_true)).attr("x2", x(data.beta_true))
         .attr("y1", 0).attr("y2", h)
         .attr("stroke", C.teal).attr("stroke-width", 2).attr("stroke-dasharray", "4 4");
-      g.append("text").attr("x", x(data.beta_true) + 4).attr("y", 12)
+      // Place the label with a background pill so it never disappears into a tall histogram bar.
+      const trueLabel = g.append("g");
+      const trueTxt = trueLabel.append("text").attr("x", x(data.beta_true) + 6).attr("y", 12)
         .attr("fill", C.teal).attr("font-size", 11).text(`true β = ${data.beta_true.toFixed(2)}`);
+      const trueBB = trueTxt.node().getBBox();
+      trueLabel.insert("rect", "text")
+        .attr("x", trueBB.x - 3).attr("y", trueBB.y - 1)
+        .attr("width", trueBB.width + 6).attr("height", trueBB.height + 2)
+        .attr("rx", 3).attr("fill", "rgba(15,23,41,0.78)");
 
       g.append("g").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format(".2f")))
@@ -550,35 +557,66 @@
       g.append("path").attr("fill", "none").attr("stroke", C.orange).attr("stroke-width", 2.5)
         .attr("d", lineGen(data.neighbour));
 
-      // Asymptote lines.
+      // Helper: draw a label with a semi-transparent background pill so it
+      // never disappears into the dashed asymptote line or another label.
+      function labelWithBg(parent, x0, y0, anchor, fill, text) {
+        const grp = parent.append("g");
+        const tEl = grp.append("text")
+          .attr("x", x0).attr("y", y0)
+          .attr("text-anchor", anchor).attr("fill", fill).attr("font-size", 11)
+          .text(text);
+        const bb = tEl.node().getBBox();
+        grp.insert("rect", "text")
+          .attr("x", bb.x - 4).attr("y", bb.y - 1)
+          .attr("width", bb.width + 8).attr("height", bb.height + 2)
+          .attr("rx", 3)
+          .attr("fill", "rgba(15,23,41,0.78)").attr("stroke", "none");
+        return grp;
+      }
+
+      // Asymptote lines + labels. We move the labels to the LEFT side so
+      // the top-right region stays clear for the legend, and we draw a
+      // semi-transparent background pill so the text never sits directly
+      // on top of the dashed line or another label.
+      const labelGap = 14;
+      let ownY = null, ngY = null;
       if (Number.isFinite(data.lr_own)) {
         g.append("line").attr("x1", 0).attr("x2", w)
           .attr("y1", y(data.lr_own)).attr("y2", y(data.lr_own))
           .attr("stroke", C.teal).attr("stroke-dasharray", "5 5").attr("opacity", 0.5);
-        g.append("text").attr("x", w - 4).attr("y", y(data.lr_own) - 4)
-          .attr("text-anchor", "end").attr("fill", C.teal).attr("font-size", 11)
-          .text(`long-run own ≈ ${data.lr_own.toFixed(2)}`);
+        ownY = y(data.lr_own) - 5;
       }
       if (Number.isFinite(data.lr_neighbour)) {
         g.append("line").attr("x1", 0).attr("x2", w)
           .attr("y1", y(data.lr_neighbour)).attr("y2", y(data.lr_neighbour))
           .attr("stroke", C.orange).attr("stroke-dasharray", "5 5").attr("opacity", 0.5);
-        g.append("text").attr("x", w - 4).attr("y", y(data.lr_neighbour) + 14)
-          .attr("text-anchor", "end").attr("fill", C.orange).attr("font-size", 11)
-          .text(`long-run neighbour ≈ ${data.lr_neighbour.toFixed(2)}`);
+        ngY = y(data.lr_neighbour) + 12;
+      }
+      // If the two labels would collide vertically, nudge the orange one down.
+      if (ownY !== null && ngY !== null && Math.abs(ownY - (ngY - 12 - 5)) < labelGap) {
+        if (ownY < ngY) ngY = ownY + labelGap;
+        else ownY = ngY - labelGap;
+      }
+      if (ownY !== null) {
+        labelWithBg(g, 4, ownY, "start", C.teal,
+          `long-run own ≈ ${data.lr_own.toFixed(2)}`);
+      }
+      if (ngY !== null) {
+        labelWithBg(g, 4, ngY, "start", C.orange,
+          `long-run neighbour ≈ ${data.lr_neighbour.toFixed(2)}`);
       }
 
-      // Legend
-      const lg = g.append("g").attr("transform", `translate(${w - 230},${10})`);
-      lg.append("rect").attr("width", 230).attr("height", 50)
-        .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 15).attr("y2", 15)
+      // Legend (top-right, opaque background so it can never overlap a line).
+      const lg = g.append("g").attr("transform", `translate(${w - 220},${6})`);
+      lg.append("rect").attr("width", 216).attr("height", 50)
+        .attr("fill", "rgba(15,23,41,0.92)").attr("stroke", C.line).attr("rx", 6);
+      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 18).attr("y2", 18)
         .attr("stroke", C.teal).attr("stroke-width", 2.5);
-      lg.append("text").attr("x", 38).attr("y", 19)
+      lg.append("text").attr("x", 38).attr("y", 22)
         .attr("fill", C.text).attr("font-size", 12).text("Own-state response");
-      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 35).attr("y2", 35)
+      lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 38).attr("y2", 38)
         .attr("stroke", C.orange).attr("stroke-width", 2.5);
-      lg.append("text").attr("x", 38).attr("y", 39)
+      lg.append("text").attr("x", 38).attr("y", 42)
         .attr("fill", C.text).attr("font-size", 12).text("Neighbour response");
     }
     return { update };

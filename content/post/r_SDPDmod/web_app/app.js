@@ -1,5 +1,5 @@
-// app.js — wires the DOM controls in index.html to dgp/charts modules.
-// Runs after window.DGP, window.LASSO, window.CHARTS are defined.
+// app.js — wires the DOM controls in index.html to the charts module.
+// Runs after window.CHARTS is defined.
 
 (function () {
   "use strict";
@@ -78,7 +78,7 @@
     return out;
   }
 
-  // Mulberry32 RNG + Box-Muller (mirrors DGP.simulate_lasso internals).
+  // Mulberry32 RNG + Box-Muller for the panel simulator.
   function makeRng(seed) {
     let s = seed >>> 0;
     return function () {
