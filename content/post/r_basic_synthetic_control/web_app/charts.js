@@ -638,8 +638,10 @@
   //   options: { showActual, showSynthetic, showGap, treatmentYear }
   // ------------------------------------------------------------------
   function paths_chart(container) {
-    const W = 760, H = 380;
-    const margin = { top: 24, right: 30, bottom: 44, left: 56 };
+    // Top margin enlarged so the legend can live ABOVE the plot area instead
+    // of inside the top-right corner where it used to overlap data lines.
+    const W = 760, H = 420;
+    const margin = { top: 60, right: 30, bottom: 44, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -647,6 +649,7 @@
     const xAxisG = g.append("g").attr("transform", `translate(0,${h})`);
     const yAxisG = g.append("g");
     const linesG = g.append("g");
+    const legendG = g.append("g").attr("class", "legend");
 
     g.append("text").attr("transform", `translate(${w / 2},${h + 36})`)
       .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
@@ -732,7 +735,14 @@
         const peak = data.reduce((a, b) => Math.abs(b.gap) > Math.abs(a.gap) ? b : a, data[0]);
         linesG.append("circle").attr("cx", x(peak.year)).attr("cy", y(peak.gap))
           .attr("r", 5).attr("fill", C.orange).attr("stroke", "#fff").attr("stroke-width", 1);
-        linesG.append("text").attr("x", x(peak.year) + 8).attr("y", y(peak.gap) + 4)
+        // Anchor label on whichever side keeps it inside the plot area; flip
+        // text-anchor so the label does not run off the right edge.
+        const peakX = x(peak.year);
+        const labelOnRight = (w - peakX) > 110;
+        linesG.append("text")
+          .attr("x", peakX + (labelOnRight ? 8 : -8))
+          .attr("y", y(peak.gap) + 4)
+          .attr("text-anchor", labelOnRight ? "start" : "end")
           .attr("fill", C.text).attr("font-size", 11).attr("font-weight", 600)
           .text(`peak ${peak.year}: ${peak.gap.toFixed(3)}`);
       }
@@ -762,29 +772,32 @@
         }
       });
 
-      // Legend
-      const lg = g.append("g").attr("transform", `translate(${w - 220},${10})`);
-      lg.append("rect").attr("width", 220).attr("height", opts.showGap ? 36 : 56)
-        .attr("fill", "rgba(15,23,41,0.6)").attr("stroke", C.line).attr("rx", 6);
+      // Legend — placed ABOVE the plot area in the top margin so it never
+      // overlaps the data lines (Basque & synthetic GDP both reach the
+      // top-right corner where the old in-plot legend used to live).
+      legendG.selectAll("*").remove();
+      const items = [];
       if (opts.showGap) {
-        lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 18).attr("y2", 18)
-          .attr("stroke", C.teal).attr("stroke-width", 2.6);
-        lg.append("text").attr("x", 40).attr("y", 22).attr("fill", C.text).attr("font-size", 12)
-          .text("Gap (actual − synthetic)");
+        items.push({ label: "Gap (actual − synthetic)", color: C.teal, dashed: false });
       } else {
-        if (opts.showActual) {
-          lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 18).attr("y2", 18)
-            .attr("stroke", C.orange).attr("stroke-width", 2.6);
-          lg.append("text").attr("x", 40).attr("y", 22).attr("fill", C.text).attr("font-size", 12)
-            .text("Actual Basque (observed)");
-        }
-        if (opts.showSynthetic) {
-          lg.append("line").attr("x1", 12).attr("x2", 32).attr("y1", 38).attr("y2", 38)
-            .attr("stroke", C.steel).attr("stroke-width", 2.4).attr("stroke-dasharray", "6 4");
-          lg.append("text").attr("x", 40).attr("y", 42).attr("fill", C.text).attr("font-size", 12)
-            .text("Synthetic Basque (counterfactual)");
-        }
+        if (opts.showActual)    items.push({ label: "Actual Basque (observed)",         color: C.orange, dashed: false });
+        if (opts.showSynthetic) items.push({ label: "Synthetic Basque (counterfactual)", color: C.steel,  dashed: true  });
       }
+      // Lay out left-to-right, measure approximate width per item and centre.
+      const itemPad = 24;
+      const charPx = 6.5; // approx 12px font advance
+      const widths = items.map(it => 30 + it.label.length * charPx + itemPad);
+      const totalLegendW = widths.reduce((a, b) => a + b, 0) - itemPad;
+      let cursorX = Math.max(0, (w - totalLegendW) / 2);
+      items.forEach((it, i) => {
+        const row = legendG.append("g").attr("transform", `translate(${cursorX},${-32})`);
+        const line = row.append("line").attr("x1", 0).attr("x2", 24).attr("y1", 8).attr("y2", 8)
+          .attr("stroke", it.color).attr("stroke-width", 2.6);
+        if (it.dashed) line.attr("stroke-dasharray", "6 4");
+        row.append("text").attr("x", 30).attr("y", 12)
+          .attr("fill", C.text).attr("font-size", 12).text(it.label);
+        cursorX += widths[i];
+      });
     }
     return { update };
   }
