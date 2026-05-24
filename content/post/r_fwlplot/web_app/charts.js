@@ -189,6 +189,7 @@
       .attr("stroke", C.orange).attr("stroke-width", 2);
     gL.append("text").attr("x", panelW - 8).attr("y", 14)
       .attr("text-anchor", "end").attr("fill", C.orange).attr("font-size", 11)
+      .attr("paint-order", "stroke").attr("stroke", C.bg).attr("stroke-width", 3)
       .text(`slope = ${raw_fit.slope.toFixed(3)} (wrong sign!)`);
 
     // RIGHT panel: morphing.
@@ -215,7 +216,8 @@
       .attr("stroke", C.teal).attr("stroke-width", 2);
     const slopeLabel = gR.append("text")
       .attr("x", panelW - 8).attr("y", 14)
-      .attr("text-anchor", "end").attr("fill", C.teal).attr("font-size", 11);
+      .attr("text-anchor", "end").attr("fill", C.teal).attr("font-size", 11)
+      .attr("paint-order", "stroke").attr("stroke", C.bg).attr("stroke-width", 3);
 
     // Animate t from 0 -> 1 -> 0 ... in a slow cycle.
     let t0 = null;
@@ -297,6 +299,7 @@
         .attr("stroke", color).attr("stroke-width", 2);
       g.append("text").attr("x", panelW - 8).attr("y", 14)
         .attr("text-anchor", "end").attr("fill", color).attr("font-size", 11)
+        .attr("paint-order", "stroke").attr("stroke", C.bg).attr("stroke-width", 3)
         .text(`slope = ${fit.slope.toFixed(3)}`);
       return fit.slope;
     }
@@ -442,9 +445,11 @@
         .attr("stroke", color).attr("stroke-width", 2.5);
       g.append("text").attr("x", w - 10).attr("y", 14)
         .attr("text-anchor", "end").attr("fill", color).attr("font-size", 12)
+        .attr("paint-order", "stroke").attr("stroke", C.bg).attr("stroke-width", 3)
         .text(`slope = ${fit.slope.toFixed(3)}`);
       g.append("text").attr("x", w - 10).attr("y", 30)
         .attr("text-anchor", "end").attr("fill", C.muted).attr("font-size", 10)
+        .attr("paint-order", "stroke").attr("stroke", C.bg).attr("stroke-width", 3)
         .text(sub);
       return fit.slope;
     }
@@ -596,6 +601,7 @@
         .attr("stroke", C.steel).attr("stroke-width", 2);
       g.append("text").attr("x", x(data.true_alpha) + 4).attr("y", -8)
         .attr("fill", C.steel).attr("font-size", 11)
+        .attr("paint-order", "stroke").attr("stroke", C.panel).attr("stroke-width", 3)
         .text(`true β = ${data.true_alpha.toFixed(2)}`);
 
       g.append("g").attr("transform", `translate(0,${h})`)
@@ -603,6 +609,7 @@
         .selectAll("text").attr("fill", C.muted);
       g.selectAll(".domain, .tick line").attr("stroke", C.muted);
 
+      const xTrue = x(data.true_alpha);
       labels.forEach(d => {
         const yc = y(d.name) + y.bandwidth() / 2;
         g.append("text").attr("x", -10).attr("y", yc + 4)
@@ -616,10 +623,22 @@
           .attr("width", Math.abs(x1 - x0))
           .attr("height", y.bandwidth() * 0.7)
           .attr("fill", d.color).attr("opacity", 0.85);
-        g.append("text").attr("x", x1 + (x1 >= x0 ? 6 : -6))
-          .attr("text-anchor", x1 >= x0 ? "start" : "end")
+        // Default: place value label past the bar end.
+        // If that puts it within 14px of the vertical true-β line (and the
+        // bar end isn't already past it), flip to the inside of the bar so
+        // the label and the true-β line don't sit on top of each other.
+        let tx = x1 + (x1 >= x0 ? 6 : -6);
+        let anchor = x1 >= x0 ? "start" : "end";
+        if (Math.abs(tx - xTrue) < 14 && Math.abs(x1 - x0) > 32) {
+          // Place inside the bar on the same side as the bar's "growing" direction.
+          tx = x1 + (x1 >= x0 ? -6 : 6);
+          anchor = x1 >= x0 ? "end" : "start";
+        }
+        g.append("text").attr("x", tx)
+          .attr("text-anchor", anchor)
           .attr("y", yc + 4)
           .attr("fill", C.text).attr("font-size", 12).attr("font-weight", 600)
+          .attr("paint-order", "stroke").attr("stroke", C.panel).attr("stroke-width", 3)
           .text(d.v.toFixed(4));
       });
     }
@@ -665,7 +684,9 @@
       g.append("line").attr("x1", x(data.true_alpha)).attr("x2", x(data.true_alpha))
         .attr("y1", 0).attr("y2", h).attr("stroke", C.steel).attr("stroke-width", 2);
       g.append("text").attr("x", x(data.true_alpha) + 4).attr("y", 10)
-        .attr("fill", C.steel).attr("font-size", 11).text(`true β = ${data.true_alpha.toFixed(2)}`);
+        .attr("fill", C.steel).attr("font-size", 11)
+        .attr("paint-order", "stroke").attr("stroke", C.panel).attr("stroke-width", 3)
+        .text(`true β = ${data.true_alpha.toFixed(2)}`);
 
       g.append("g").attr("transform", `translate(0,${h})`)
         .call(d3.axisBottom(x).ticks(8).tickFormat(d3.format(".2f")))
