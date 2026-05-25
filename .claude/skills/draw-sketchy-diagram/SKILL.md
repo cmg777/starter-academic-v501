@@ -88,6 +88,15 @@ chosen template's schema. For `comparison`, that means:
 - Optional `theme`: `"paper"` (default) or `"chalkboard"` (deep navy
   `#0a1d3a`, lifted accents) — pick `chalkboard` for posts whose other
   figures use the site dark-theme palette.
+- Optional `texture` (default `true`): background dot-grid + vignette. Set
+  `false` for a flat background. Optional `arrowLabels` (e.g. `["then",
+  "then"]`, one per gap) to caption the connector arrows.
+
+The renderer also applies depth/flourish automatically — panel drop-shadows,
+accent-tinted icon badges, a title highlighter swipe (paper) / underline
+(chalkboard), and vertically centered body text. See
+`references/layout-schema.md` → **Depth & texture** for what's automatic vs.
+controllable.
 
 Use **`AskUserQuestion`** to confirm the structure before writing
 anything. One block, at most four questions:
@@ -165,7 +174,8 @@ Print to the user:
   1. Re-render with a different `seed` if a hachure happens to land
      awkwardly.
   2. Tweak any panel's text by editing `<out>.layout.json` and re-running
-     `scripts/render.js`.
+     `scripts/render.js` — or adjust the look with `texture: false` (flat
+     background) or `arrowLabels` (caption the connectors).
 
 Do **not** auto-commit, push, or open a PR.
 

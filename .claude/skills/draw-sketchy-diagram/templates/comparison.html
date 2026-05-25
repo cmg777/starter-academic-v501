@@ -136,9 +136,26 @@
     ink:    { stroke: "#e8ecf2", fill: "#1c2540" }
   };
 
+  // Each theme also carries the depth/texture treatment: a drop-shadow spec
+  // (so panels lift off the board), a faint dot-grid + vignette tone (the
+  // "notebook / chalkboard" texture), and whether panel titles get a marker
+  // highlighter swipe (paper) or a sketchy underline (chalkboard — a light
+  // swipe wouldn't read on the dark navy).
   const THEMES = {
-    paper:      { bg: "#fbf7ee", ink: "#141413", inkSoft: "#4a4a48", palette: PALETTE_PAPER, ribbonFill: "#fbf7ee" },
-    chalkboard: { bg: "#0a1d3a", ink: "#e8ecf2", inkSoft: "#c8d0e0", palette: PALETTE_CHALK, ribbonFill: "#0a1d3a" }
+    paper: {
+      bg: "#fbf7ee", ink: "#141413", inkSoft: "#4a4a48", palette: PALETTE_PAPER, ribbonFill: "#fbf7ee",
+      shadow: { dx: 5, dy: 7, blur: 7, color: "#000000", opacity: 0.18 },
+      gridDot: "#141413", gridOpacity: 0.05,
+      vignetteEdge: "#8a7f6a", vignetteOpacity: 0.10,
+      titleSwipe: true
+    },
+    chalkboard: {
+      bg: "#0a1d3a", ink: "#e8ecf2", inkSoft: "#c8d0e0", palette: PALETTE_CHALK, ribbonFill: "#0a1d3a",
+      shadow: { dx: 5, dy: 8, blur: 9, color: "#000000", opacity: 0.45 },
+      gridDot: "#c8d0e0", gridOpacity: 0.05,
+      vignetteEdge: "#000000", vignetteOpacity: 0.28,
+      titleSwipe: false
+    }
   };
 
   function pickTheme(name) {
@@ -147,6 +164,15 @@
 
   function pickAccent(palette, name) {
     return palette[name] || palette.blue;
+  }
+
+  // Namespaced-element factory for the plain SVG bits (background, defs,
+  // texture dots, shadow backing rects) that aren't drawn through Rough.js.
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  function elNS(tag, attrs) {
+    const e = document.createElementNS(SVG_NS, tag);
+    for (const k in (attrs || {})) e.setAttribute(k, attrs[k]);
+    return e;
   }
 
   function svgText(parent, x, y, str, cls, size, anchor = "start", fill = null) {
@@ -220,6 +246,23 @@
     return y;
   }
 
+  // Measure the body block's baseline-to-baseline height WITHOUT drawing it,
+  // reusing the same wrap logic as wrapBody. Used to vertically center the
+  // body in the panel so short copy doesn't leave a dead gap above the ribbon.
+  function measureBodyHeight(paragraphs, opts) {
+    const { maxWidth, lineHeight, paragraphGap, size } = opts;
+    let advance = 0;
+    let drewAny = false;
+    paragraphs.forEach((p) => {
+      const lines = wrapParagraph(p, maxWidth, "body", size);
+      if (lines.length === 0) return;
+      if (drewAny) advance += paragraphGap;
+      advance += (lines.length - 1) * lineHeight;
+      drewAny = true;
+    });
+    return advance;
+  }
+
   // ---------------------------------------------------------------------------
   // Icon catalog — hand-drawn mini-illustrations via Rough.js primitives.
   // All icons draw inside a (size × size) box centered at (cx, cy), using
@@ -230,7 +273,7 @@
   function drawIcon(rc, svg, cx, cy, size, accent, kind, baseSeed) {
     const opts = (extra = {}) => Object.assign({
       stroke: accent.stroke,
-      strokeWidth: 2.2,
+      strokeWidth: 2.6,
       roughness: 1.8,
       bowing: 1.4,
       seed: baseSeed
@@ -459,13 +502,36 @@
     svg.style.background = theme.bg;
     // Make sure the background is part of the rasterized image too: paint a
     // full-bleed background rect inside the SVG before everything else.
-    {
-      const NS = "http://www.w3.org/2000/svg";
-      const bg = document.createElementNS(NS, "rect");
-      bg.setAttribute("x", 0); bg.setAttribute("y", 0);
-      bg.setAttribute("width", W); bg.setAttribute("height", H);
-      bg.setAttribute("fill", theme.bg);
-      svg.appendChild(bg);
+    svg.appendChild(elNS("rect", { x: 0, y: 0, width: W, height: H, fill: theme.bg }));
+
+    // Reusable filters/gradients: a soft panel drop-shadow and a corner
+    // vignette. Defined once in <defs> and referenced by url(#id).
+    const defs = elNS("defs", {});
+    const shadowFilter = elNS("filter", { id: "panelShadow", x: "-20%", y: "-20%", width: "140%", height: "140%" });
+    shadowFilter.appendChild(elNS("feDropShadow", {
+      dx: theme.shadow.dx, dy: theme.shadow.dy, stdDeviation: theme.shadow.blur,
+      "flood-color": theme.shadow.color, "flood-opacity": theme.shadow.opacity
+    }));
+    defs.appendChild(shadowFilter);
+    const vignette = elNS("radialGradient", { id: "vignette", cx: "50%", cy: "48%", r: "75%" });
+    vignette.appendChild(elNS("stop", { offset: "55%", "stop-color": theme.vignetteEdge, "stop-opacity": "0" }));
+    vignette.appendChild(elNS("stop", { offset: "100%", "stop-color": theme.vignetteEdge, "stop-opacity": theme.vignetteOpacity }));
+    defs.appendChild(vignette);
+    svg.appendChild(defs);
+
+    // Notebook / chalkboard texture: a faint dot-grid plus a corner vignette.
+    // Deterministic (no RNG). Disable with "texture": false in the layout.
+    const textureOn = LAYOUT.texture !== false;
+    if (textureOn) {
+      const gridGap = 46;
+      const dots = elNS("g", { fill: theme.gridDot, opacity: theme.gridOpacity });
+      for (let gy = gridGap; gy < H; gy += gridGap) {
+        for (let gx = gridGap; gx < W; gx += gridGap) {
+          dots.appendChild(elNS("circle", { cx: gx, cy: gy, r: 1.6 }));
+        }
+      }
+      svg.appendChild(dots);
+      svg.appendChild(elNS("rect", { x: 0, y: 0, width: W, height: H, fill: "url(#vignette)" }));
     }
 
     const rc = rough.svg(svg, { options: {
@@ -508,6 +574,13 @@
       const accent = pickAccent(theme.palette, panel.accent);
       const px = sideMargin + i * (panelW + gutter);
 
+      // Soft drop shadow: a clean backing rect carries the shadow so the
+      // hachure lines don't each cast their own. The sketchy panel draws on top.
+      svg.appendChild(elNS("rect", {
+        x: px, y: panelY, width: panelW, height: panelH, rx: 6,
+        fill: theme.bg, filter: "url(#panelShadow)"
+      }));
+
       // Sketchy panel rectangle. Hachure fill at low density so text reads on top.
       svg.appendChild(rc.rectangle(px, panelY, panelW, panelH, {
         stroke: accent.stroke,
@@ -521,37 +594,71 @@
         seed: SEED + i * 17
       }));
 
-      // Icon — hand-drawn glyph above the title, centered.
-      const iconSize = 56;
+      // Icon — a larger hand-drawn glyph seated in an accent-tinted badge so it
+      // reads as a focal stamp rather than a faint floating mark.
+      const iconSize = 76;
       const iconCx = px + panelW / 2;
-      const iconCy = panelY + 50;
+      const iconCy = panelY + 64;
+      svg.appendChild(rc.circle(iconCx, iconCy, iconSize + 26, {
+        fill: accent.fill,
+        fillStyle: "solid",
+        stroke: accent.stroke,
+        strokeWidth: 2.0,
+        roughness: 1.6,
+        bowing: 1.2,
+        seed: SEED + 400 + i
+      }));
       drawIcon(rc, svg, iconCx, iconCy, iconSize, accent, panel.icon, SEED + 300 + i * 7);
 
-      // Panel title with a sketchy underline. Shifted down to make room
-      // for the icon above.
-      const titleY = panelY + 140;
-      svgText(svg, px + panelW / 2, titleY, panel.title, "title", 42, "middle", accent.stroke);
-      svg.appendChild(rc.line(
-        px + 30,         titleY + 14,
-        px + panelW - 30, titleY + 14,
-        { stroke: accent.stroke, strokeWidth: 2, roughness: 2.4, seed: SEED + 100 + i }
-      ));
+      // Panel title. Paper gets a marker "highlighter" swipe behind it;
+      // chalkboard keeps a sketchy underline (a light swipe wouldn't read on
+      // the dark board). Shifted down to clear the badge above.
+      const titleY = panelY + 160;
+      const titleCx = px + panelW / 2;
+      if (theme.titleSwipe) {
+        const titleW = measureText(panel.title || "", "title", 42);
+        const swipePadX = 16;
+        const swipeH = 46;
+        const swipe = rc.rectangle(
+          titleCx - titleW / 2 - swipePadX,
+          titleY - swipeH * 0.74,
+          titleW + swipePadX * 2,
+          swipeH,
+          { fill: accent.fill, fillStyle: "solid", stroke: "none", roughness: 1.6, bowing: 1.2, seed: SEED + 150 + i }
+        );
+        swipe.setAttribute("opacity", "0.6");
+        svg.appendChild(swipe);
+        svgText(svg, titleCx, titleY, panel.title, "title", 42, "middle", accent.stroke);
+      } else {
+        svgText(svg, titleCx, titleY, panel.title, "title", 42, "middle", accent.stroke);
+        svg.appendChild(rc.line(
+          px + 30,          titleY + 14,
+          px + panelW - 30, titleY + 14,
+          { stroke: accent.stroke, strokeWidth: 2, roughness: 2.4, seed: SEED + 100 + i }
+        ));
+      }
 
-      // Body text — wraps to the panel width.
+      // Body text — wraps to the panel width and is vertically centered in the
+      // space between the title and the footnote ribbon (kills the dead gap).
       const bodyPadX = 30;
       const bodyX = px + bodyPadX;
-      const bodyY = titleY + 70;
       const ribbonH = 50;
       const ribbonGap = 20;
       const bodyMaxY = panel.footnote
         ? panelY + panelH - ribbonH - ribbonGap - 10
         : panelY + panelH - 20;
-      const yEnd = wrapBody(svg, bodyX, bodyY, panel.body || [], {
+      const bodyOpts = {
         maxWidth: panelW - 2 * bodyPadX,
         lineHeight: 30,
         paragraphGap: 38,
         size: 22
-      });
+      };
+      const blockAdvance = measureBodyHeight(panel.body || [], bodyOpts);
+      const blockHeight  = blockAdvance + bodyOpts.size;   // include first line's height
+      const regionTop    = titleY + 44;
+      const regionAvail  = Math.max(0, bodyMaxY - regionTop);
+      const bodyY = regionTop + bodyOpts.size + Math.max(0, (regionAvail - blockHeight) / 2);
+      const yEnd = wrapBody(svg, bodyX, bodyY, panel.body || [], bodyOpts);
       if (yEnd > bodyMaxY) {
         console.warn(`panel ${i} body overflows: yEnd=${Math.round(yEnd)} > maxY=${Math.round(bodyMaxY)}`);
       }
@@ -574,13 +681,23 @@
     // Down-arrows BETWEEN panels (the "leads to" or "compared with" gesture
     // from the reference image). Drawn last so they sit on top of fills.
     if (LAYOUT.arrows !== false) {
+      const arrowLabels = LAYOUT.arrowLabels || [];
       for (let i = 0; i < n - 1; i++) {
         const cx = sideMargin + i * (panelW + gutter) + panelW + gutter / 2;
         const cy = panelY + panelH / 2;
-        const arm = 20;
-        svg.appendChild(rc.line(cx - arm, cy, cx + arm, cy, { stroke: theme.ink, strokeWidth: 2, roughness: 2.2 }));
-        svg.appendChild(rc.line(cx + arm, cy, cx + arm - 12, cy - 9, { stroke: theme.ink, strokeWidth: 2, roughness: 2.2 }));
-        svg.appendChild(rc.line(cx + arm, cy, cx + arm - 12, cy + 9, { stroke: theme.ink, strokeWidth: 2, roughness: 2.2 }));
+        const arm = 24;
+        // Gently bowed shaft (a quadratic curve) for a hand-drawn "leads to".
+        svg.appendChild(rc.path(
+          `M ${cx - arm} ${cy - 6} Q ${cx} ${cy - 18} ${cx + arm} ${cy}`,
+          { stroke: theme.ink, strokeWidth: 2.6, roughness: 1.8, bowing: 1.0, seed: SEED + 500 + i }
+        ));
+        // Larger arrowhead.
+        svg.appendChild(rc.line(cx + arm, cy, cx + arm - 14, cy - 11, { stroke: theme.ink, strokeWidth: 2.6, roughness: 1.8, seed: SEED + 510 + i }));
+        svg.appendChild(rc.line(cx + arm, cy, cx + arm - 14, cy + 9,  { stroke: theme.ink, strokeWidth: 2.6, roughness: 1.8, seed: SEED + 520 + i }));
+        // Optional label above the arrow (e.g. "then").
+        if (arrowLabels[i]) {
+          svgText(svg, cx, cy - 30, arrowLabels[i], "label", 20, "middle", theme.inkSoft);
+        }
       }
     }
 

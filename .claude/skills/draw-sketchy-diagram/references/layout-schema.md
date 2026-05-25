@@ -15,6 +15,7 @@ template-specific.
 | `theme`   | string   | no       | `"paper"` | `"paper"` (cream background) or `"chalkboard"` (dark blue background, lifted accents). See **Themes** below. |
 | `title`   | string   | no       | —         | Top headline (Caveat 56). Omit for no headline. |
 | `subtitle`| string   | no       | —         | Sub-headline beneath the title (Caveat 30). |
+| `texture` | boolean  | no       | `true`    | Background dot-grid + corner vignette (the notebook / chalkboard feel). Set `false` for a flat background. Panel drop-shadows stay either way. |
 
 ## `type: "comparison"` (3-panel)
 
@@ -30,7 +31,9 @@ panels — for 2 or 4, double-check that body text still fits.
   "theme": "paper",           // or "chalkboard" — see Themes below
   "title": "Optional headline",
   "subtitle": "Optional sub-headline",
-  "arrows": true,             // false to suppress the down-arrows between panels
+  "texture": true,            // false for a flat background (no dot-grid / vignette)
+  "arrows": true,             // false to suppress the connector arrows between panels
+  "arrowLabels": ["then"],    // optional, one label per gap (n-1 entries); omit for unlabeled arrows
   "panels": [
     {
       "title":   "Panel title",        // required, rendered in Caveat 42
@@ -84,6 +87,23 @@ on the active theme.
 | `green`  | `#2e7d4f`    | `#d8ecdf`  | `#9ad9af`          | `#1e4732`       |
 | `red`    | `#a32d2d`    | `#f6d7d4`  | `#ee9b9b`          | `#5a2424`       |
 | `ink`    | `#141413`    | `#e8e6df`  | `#e8ecf2`          | `#1c2540`       |
+
+### Depth & texture (automatic)
+
+The template applies three visual treatments with no layout fields required:
+
+- **Panel drop-shadows** — every panel sits on a soft shadow so the cards
+  "lift" off the board. Always on.
+- **Background texture** — a faint dot-grid plus a corner vignette, tuned per
+  theme. Toggle with the top-level `texture` key (default `true`).
+- **Icon badges** — each panel icon is enlarged and seated in an accent-tinted
+  circle, so it reads as a focal stamp. Always on.
+- **Title flourish** — on `paper`, a marker "highlighter" swipe in the accent
+  fill sits behind each panel title; on `chalkboard`, titles keep a sketchy
+  underline (a light swipe wouldn't read on the dark board). Theme-driven.
+
+Body text is vertically centered between the title and the footnote ribbon, so
+short copy no longer leaves a dead gap.
 
 ### Sizing guidance
 

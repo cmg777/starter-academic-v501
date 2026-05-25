@@ -58,6 +58,19 @@ layout JSON (`"accent": "purple"` etc.); the active `theme` (`paper` or
 | Whiteboard / classroom feel    | 2.6 | 2.0 | `cross-hatch` | 10 |
 | Concept sketch (very loose)    | 3.5 | 2.5 | `zigzag`      | 8  |
 
+## Default aesthetic (baked into `comparison.html`)
+
+Beyond the raw Rough.js wobble, the template ships a few depth/flourish
+treatments. Tune them in the template, not the layout JSON:
+
+| Treatment | Where | Tune by |
+|-----------|-------|---------|
+| Panel drop-shadow | `<defs>` `feDropShadow` + per-theme `shadow` in `THEMES` | edit `dx`/`dy`/`blur`/`opacity` in the theme entry |
+| Background dot-grid + vignette | `render()` texture block + per-theme `gridDot`/`gridOpacity`/`vignetteEdge`/`vignetteOpacity` | edit theme fields, or disable per diagram with layout `"texture": false` |
+| Icon badge | panel loop `rc.circle(...)` before `drawIcon` | change badge diameter (`iconSize + 26`) or `fillStyle` |
+| Title highlighter swipe | panel loop, gated on `theme.titleSwipe` | adjust swipe `opacity` (0.6) / height; set `titleSwipe:false` to fall back to the underline |
+| Curved connector arrows | the `LAYOUT.arrows` block | quadratic-curve control point / `strokeWidth`; label them with layout `"arrowLabels"` |
+
 ## Things Rough.js does NOT do
 
 - **No handwritten text.** Text is plain SVG `<text>` styled with the

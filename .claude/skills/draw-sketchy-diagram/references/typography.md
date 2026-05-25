@@ -18,6 +18,11 @@ Caveat reads as a confident felt-tip; Kalam is a steadier handwriting that
 sustains longer body lines; Architects Daughter is the most "blueprint /
 notebook" of the three — good for short labels.
 
+On the `paper` theme, panel titles get a marker "highlighter" swipe (a low-
+opacity accent-fill rectangle drawn behind the text); on `chalkboard` they keep
+a sketchy underline instead, since a light swipe wouldn't read on the dark
+board. See `layout-schema.md` → **Depth & texture**.
+
 ## Why three fonts and not one
 
 Mixing two handwritten fonts is the cheapest way to fake the look of a real
