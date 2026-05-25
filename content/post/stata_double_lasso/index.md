@@ -370,11 +370,174 @@ The results:
 pdslasso DyV DxV (zv1-zv284), cluster(state) loptions(c(1.1) gamma(0.05))
 ```
 
-`pdslasso` runs the two `rlasso` calls internally, takes the union, runs the post-OLS, and reports cluster-robust SEs — the same recipe as the explicit three-step code. We use the explicit form in this post so the LASSO selections at each step remain visible.
+`pdslasso` runs the two `rlasso` calls internally, takes the union, runs the post-OLS, and reports cluster-robust SEs — the same recipe as the explicit three-step code. We use the explicit form in this post so the LASSO selections at each step remain visible. The next section unpacks the **three** distinct estimates `pdslasso` actually reports — the PDS coefficient above is only one of them.
 
 ---
 
-## 8. State-clustered standard errors
+## 8. The three estimators `pdslasso` reports
+
+When you run `pdslasso`, Stata does not give you a single number — it gives you **three** estimates of the same treatment effect $\alpha$, stacked one above the other in the output. All three are valid; all three target the same causal quantity; they differ only in *how* the high-dimensional controls $X$ are residualised out of $y$ and $d$ before the final coefficient is computed. Understanding the three flavours is the difference between trusting the output and second-guessing it. This section walks through each, then shows the actual three-panel output on our violent-crime equation.
+
+The framework is from [Belloni, Chernozhukov, Hansen and Kozbur (2016)](#19-references) and its accessible review in [Chernozhukov, Hansen and Spindler (2015)](#19-references). The intuition rests on the same Frisch–Waugh–Lovell logic we used in §7: to recover the causal $\hat\alpha$ in the structural equation $y = \alpha d + x' \theta + \zeta$, residualise both $y$ and $d$ against the controls, then regress residual on residual. The three estimators differ in *what residualisation rule* they use.
+
+### 8.1 The common starting point: filter the controls out of both sides
+
+```mermaid
+flowchart LR
+    Z["High-dim controls X (p = 284)"] --> Y["Outcome y (DyV)"]
+    Z --> D["Treatment d (DxV)"]
+    Y --> R1["residual y&#771;"]
+    D --> R2["residual d&#771;"]
+    R1 --> A["final OLS: y&#771; = &alpha; d&#771; + &epsilon;"]
+    R2 --> A
+    style Z fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
+    style Y fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
+    style D fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
+    style R1 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
+    style R2 fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
+    style A fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
+```
+
+All three estimators consume the same diagram. They diverge only at the residualisation step — how to "filter out" the controls. Method 1 uses Lasso coefficients directly; Method 2 uses OLS coefficients on the Lasso-selected controls; Method 3 skips residualisation entirely and just runs one big OLS on the union of selected controls plus the treatment.
+
+### 8.2 Method 1 — Lasso-orthogonalized regression
+
+**The strict-regularisation path.** This estimator trusts Lasso's shrunken coefficients all the way through.
+
+**Recipe.**
+1. Run `rlasso` of $y$ on $X$. Keep the residuals $\tilde y = y - X \hat\beta\_y^{\text{LASSO}}$.
+2. Run `rlasso` of $d$ on $X$. Keep the residuals $\tilde d = d - X \hat\beta\_d^{\text{LASSO}}$.
+3. Run OLS of $\tilde y$ on $\tilde d$ (with state-clustered SE). The coefficient is $\hat\alpha\_{\text{ortho}}$.
+
+**Catch.** Lasso intentionally shrinks every coefficient it keeps toward zero. So $X \hat\beta\_y^{\text{LASSO}}$ slightly *under-fits* $y$ and the residuals $\tilde y$ retain a little regularised noise. Same for $\tilde d$. The downstream $\hat\alpha\_{\text{ortho}}$ has slightly lower variance than Method 2's analogue but a small shrinkage-induced bias.
+
+### 8.3 Method 2 — Post-lasso-orthogonalized regression
+
+**The unshrunk-residual path.** This estimator uses Lasso *only* as a variable selector, then re-fits each residualisation by plain OLS.
+
+**Recipe.**
+1. Run `rlasso` of $y$ on $X$. Record the *names* of the selected controls $I\_y$.
+2. Run OLS of $y$ on $X\_{I\_y}$ (no penalty, full coefficients). Keep these residuals.
+3. Same for the treatment: `rlasso` of $d$ on $X$ → $I\_d$ → OLS of $d$ on $X\_{I\_d}$ → residuals.
+4. Final OLS of the post-Lasso residuals on each other gives $\hat\alpha\_{\text{post-ortho}}$.
+
+**Advantage.** Because step 2 is unpenalised OLS, the residualisation is sharp — no shrinkage noise leaks into the residuals. The trade-off is slightly higher variance than Method 1 on small samples.
+
+### 8.4 Method 3 — Post-double-selection (PDS) regression
+
+**The transparent path.** This is the recipe we ran explicitly in §7 — and it is the only one of the three that produces a regression table you can read in a normal textbook way.
+
+**Recipe.**
+1. Run `rlasso` of $y$ on $X$, record $I\_y$.
+2. Run `rlasso` of $d$ on $X$, record $I\_d$.
+3. Take the **union** $I\_y \cup I\_d$ — any control selected by either side stays in.
+4. Run one big OLS: regress $y$ on $d$ plus the union of selected controls (no residualisation). The coefficient on $d$ is $\hat\alpha\_{\text{PDS}}$.
+
+```mermaid
+flowchart LR
+    L1["rlasso y on X &rarr; I_y"] --> U["Union I_y &cup; I_d"]
+    L2["rlasso d on X &rarr; I_d"] --> U
+    U --> O["one big OLS:&nbsp; y = &alpha;&middot;d + X[union]&middot;&theta; + &epsilon;"]
+    O --> R["regression table with &alpha;&#770; AND control coefficients"]
+    style L1 fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
+    style L2 fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
+    style U fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
+    style O fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
+    style R fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
+```
+
+**Advantage.** Maximum transparency. You see $\hat\alpha$ alongside the coefficients of every selected control with proper SEs, t-stats, and p-values. The valid-inference guarantee from [Belloni, Chernozhukov, Hansen (2014)](#19-references) applies only to the $\hat\alpha$ row — the control-coefficient SEs are NOT valid (Stata flags this with the "Standard errors and test statistics valid for the following variables only: ..." note at the bottom of the panel).
+
+### 8.5 Summary comparison
+
+| Feature | 1. Lasso-orthogonalized | 2. Post-lasso-orthogonalized | 3. Post-double-selection (PDS) |
+|---|---|---|---|
+| **Final step** | OLS on Lasso residuals | OLS on post-Lasso residuals | OLS on raw $d$ + selected $X$ |
+| **Shrinkage bias in $\hat\alpha$?** | Yes (small) | No | No |
+| **What the output shows** | Just $\hat\alpha$ | Just $\hat\alpha$ | $\hat\alpha$ **plus** all selected control coefficients |
+| **Best for** | Slightly lower variance on small $n$ | Cleanly unshrunk residuals | Reading the result like a normal regression table |
+
+### 8.6 The actual `pdslasso` output on our data
+
+Running `pdslasso DyV DxV (zv1-zv284), cluster(state) loptions(c(1.1) gamma(0.05))` on the violent-crime equation produces three coefficient panels (slightly trimmed for readability):
+
+```text
+1.  (PDS/CHS) Selecting HD controls for dep var DyV...
+Selected: zv284
+2.  (PDS/CHS) Selecting HD controls for exog regressor DxV...
+Selected: zv228 zv244 zv279
+
+Specification:
+Regularization method:                 lasso
+Penalty loadings:                      cluster-lasso
+Number of observations:                576
+Number of clusters:                     48
+Exogenous (1):                         DxV
+High-dim controls (284):               zv1 zv2 zv3 ... zv284
+Selected controls (4):                 zv228 zv244 zv279 zv284
+Unpenalized controls (1):              _cons
+
+Structural equation:
+
+OLS using CHS lasso-orthogonalized vars
+(Std. Err. adjusted for 48 clusters in state)
+------------------------------------------------------------------------------
+             |               Robust
+         DyV | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         DxV |  -.2110147   .0899177    -2.35   0.019    -.3872502   -.0347792
+------------------------------------------------------------------------------
+
+OLS using CHS post-lasso-orthogonalized vars
+(Std. Err. adjusted for 48 clusters in state)
+------------------------------------------------------------------------------
+             |               Robust
+         DyV | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         DxV |  -.1675744   .1005712    -1.67   0.096    -.3646903    .0295416
+------------------------------------------------------------------------------
+
+OLS with PDS-selected variables and full regressor set
+(Std. Err. adjusted for 48 clusters in state)
+------------------------------------------------------------------------------
+             |               Robust
+         DyV | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         DxV |  -.1764142   .1078564    -1.64   0.102    -.3878088    .0349804
+       zv228 |     .84779    4.01065     0.21   0.833    -7.012939    8.708519
+       zv244 |  -3.437135   6.564852    -0.52   0.601    -16.30401    9.429739
+       zv279 |   .2585369   .1314611     1.97   0.049     .0008779    .5161958
+       zv284 |  -2.617675   .5835982    -4.49   0.000    -3.761506   -1.473843
+       _cons |  -1.74e-11   .0027138    -0.00   1.000    -.0053189    .0053189
+------------------------------------------------------------------------------
+Standard errors and test statistics valid for the following variables only:
+    DxV
+------------------------------------------------------------------------------
+```
+
+**Reading the three panels.** All three estimates of $\hat\alpha$ point the same direction: a one-unit increase in the differenced abortion rate is associated with a $0.17$ to $0.21$-unit decrease in the differenced violent-crime rate. The **lasso-orthogonalized** estimate is the most negative ($-0.211$, SE $0.090$, $p = 0.019$ — significant at 5%); the **post-lasso-orthogonalized** estimate moves toward zero ($-0.168$, SE $0.101$, $p = 0.096$ — just outside 10%); the **PDS** estimate sits in between ($-0.176$, SE $0.108$, $p = 0.102$). The gap between them is exactly the shrinkage-vs-no-shrinkage trade-off discussed in §§8.2–8.3.
+
+**Why does this differ from our §7 explicit recipe?** We reported DL-rigorous violent-crime as $\hat\alpha = -0.1744$ with $|I\_y \cup I\_d| = 8$. `pdslasso` reports the PDS column as $\hat\alpha = -0.1764$ with `Selected controls (4): zv228 zv244 zv279 zv284`. Same method, different selection counts (4 vs 8). The reason: `pdslasso`'s `cluster(state)` option also makes the **LASSO penalty loadings** cluster-robust (note the `Penalty loadings: cluster-lasso` line in the preamble). Our §7 explicit `rlasso` calls used the default heteroskedasticity-robust loadings. Cluster-robust loadings are *tighter* on panel data because they account for within-state autocorrelation in the score, so fewer controls survive the rigorous penalty. The point estimate barely moves (−0.176 vs −0.174) — a comforting robustness check.
+
+### 8.7 Practice tip
+
+The one-line invocation is:
+
+```stata
+pdslasso DyV DxV (zv1-zv284), cluster(state) loptions(c(1.1) gamma(0.05))
+```
+
+Try varying:
+
+- **`cluster(state)` → `robust`**: switches the LASSO loadings from cluster-robust to heteroskedasticity-robust. You will see the union of selected controls grow back toward the 8 we got in §7 with the explicit recipe.
+- **`loptions(c(1.1) gamma(0.05))` → `loptions(c(0.5) gamma(0.05))`**: loosens the rigorous penalty by lowering $c$. Many more controls survive, the post-OLS coefficient table grows, and the three estimates of $\hat\alpha$ start to diverge — exactly the "loose-penalty" pathology that §11 (currently §10) anchors on for the rigorous-vs-CV contrast.
+- **Drop `(zv1-zv284)` controls entirely**: degenerates `pdslasso` to plain OLS of `DyV` on `DxV` — you should recover the §4 first-difference baseline of $-0.1521$.
+
+The fact that **all three orthogonalisations land on essentially the same answer here** is itself the headline takeaway: when the rigorous penalty selects a sparse, sensible set of controls, the choice between lasso-residualisation, post-lasso-residualisation, and PDS does not move the causal estimate beyond its own standard error. The framework is robust to the residualisation rule precisely because the rigorous-penalty selection is itself disciplined.
+
+---
+
+## 9. State-clustered standard errors
 
 A digression on the standard errors. The 576 observations are not independent — they are 12 differenced years of data for each of 48 states, and within-state observations are autocorrelated through governor effects, state policy waves, and business-cycle exposure. Treating them as independent (Stata's default `regress` vcov) would understate the uncertainty by about 40% on this panel. The `vce(cluster state)` option applies a cluster-robust sandwich estimator with Stata's default HC1-style finite-sample adjustment ([Cameron and Miller 2015](#18-references)):
 
@@ -390,7 +553,7 @@ The cluster-count correction $G/(G-1)$ assumes the number of clusters $G$ is "la
 
 ---
 
-## 9. When does Double LASSO help most?
+## 10. When does Double LASSO help most?
 
 Look back at the DL-rigorous table in §7. For violent crime and murder, \|I_y\| is essentially zero — the LASSO of *crime* on controls picked very few variables out of 284. For all three outcomes \|I_d\| is between 8 and 12 — the LASSO of *abortion* on controls picked a handful. This asymmetry is the empirical fingerprint of the situation in which Double LASSO most helps: **the treatment is well-predicted by the controls, but the outcome is not**. Fitzgerald et al. (2026) emphasise this in their footnote 4, paraphrased: *DL is most useful when the outcome is hard to predict but the treatment is well-predicted, because that is when the second LASSO catches controls that the first one missed.*
 
@@ -408,7 +571,7 @@ A natural follow-up question: which 8 controls? The paper's §4 discussion (and 
 
 ---
 
-## 10. Rigorous vs. cross-validated penalty — and a Stata caveat
+## 11. Rigorous vs. cross-validated penalty — and a Stata caveat
 
 The second flavour of Double LASSO replaces the rigorous penalty with **3-fold cross-validation**. The recipe is identical to §7 — two LASSOs, take the union, post-OLS — but each LASSO now uses `cvlasso` to pick $\lambda$ by minimising out-of-sample mean-squared error on the prediction problem. The catch is that this choice optimises a different objective — prediction-MSE on $y$ alone, or on $d$ alone, is not the same thing as choosing the right controls for the causal estimate of $\alpha$.
 
@@ -445,7 +608,7 @@ This is not a knock on CV in general. CV's $\lambda\_{\min}$ is exactly the righ
 
 ---
 
-## 11. The forest plot
+## 12. The forest plot
 
 Stacking all five estimators against all three outcomes gives the headline figure (reproduced from §1 here for convenience):
 
@@ -473,7 +636,7 @@ The actual `twoway` call in `analysis.do` is longer because it has separate `rsp
 
 ---
 
-## 12. When to use which method?
+## 13. When to use which method?
 
 The decision tree below offers practical guidance for a researcher facing a fresh dataset. It is not a substitute for thinking carefully about identification (no method can rescue an invalid research design), but it is a reasonable starting point.
 
@@ -512,7 +675,7 @@ For our $\lambda^{\text{rig}}$ and $n = 576$, that bias is roughly 5–15% of th
 
 ---
 
-## 13. Caveats and identification
+## 14. Caveats and identification
 
 Six things to keep in mind when reading the headline estimates.
 
@@ -530,7 +693,7 @@ Six things to keep in mind when reading the headline estimates.
 
 ---
 
-## 14. Stata vs R: numeric replication
+## 15. Stata vs R: numeric replication
 
 The deterministic estimators should match the R companion to numerical precision; the LASSO-with-CV estimators are allowed to drift because of language-specific differences in fold randomisation. We classify the five rows of Table 2 into three replication tiers:
 
@@ -564,7 +727,7 @@ The actual numbers, alongside the R companion's:
 
 ---
 
-## 15. Conclusion
+## 16. Conclusion
 
 Three takeaways worth carrying away from this post.
 
@@ -578,7 +741,7 @@ If you came in expecting either a definitive statement about abortion and crime 
 
 ---
 
-## 16. Exercises
+## 17. Exercises
 
 These exercises ask you to modify and re-run the `analysis.do` script in this post. All datasets, dependencies, and helper code are already in place — you only need to change the indicated lines, run the script, and read the output.
 
@@ -594,7 +757,7 @@ These exercises ask you to modify and re-run the `analysis.do` script in this po
 
 ---
 
-## 17. Reproducing this analysis
+## 18. Reproducing this analysis
 
 Everything in this post — figures, tables, point estimates, standard errors — comes from a single self-contained Stata do-file (`analysis.do`) that loads its data from six CSVs hosted in the R companion post's `data/` folder on GitHub. The script does not need any local data files. The full reproduction recipe is:
 
@@ -619,7 +782,7 @@ A note on the seed. Every `cvlasso` call passes `seed(20260520)` so the random f
 
 ---
 
-## 18. References
+## 19. References
 
 **Academic references** (each linked to the publisher DOI):
 
