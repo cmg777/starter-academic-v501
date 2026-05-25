@@ -365,7 +365,7 @@ flowchart TD
     B --> D["Union: I_y &cup; I_d"]
     C --> D
     D --> E["Step 3: post-OLS<br/>y ~ d + X[, union]<br/>with state-clustered SE"]
-    E --> F["Causal estimate &alpha;&#770;"]
+    E --> F["Causal estimate alpha-hat"]
     style A fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
     style B fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
     style C fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
@@ -562,7 +562,7 @@ The decision tree below offers practical guidance for a researcher facing a fres
 
 ```mermaid
 flowchart TD
-    Start["You have n observations,<br/>p candidate controls,<br/>and want a causal &alpha;&#770;"] --> Q1{"p &ge; n?"}
+    Start["You have n observations,<br/>p candidate controls,<br/>and want a causal alpha-hat"] --> Q1{"p &ge; n?"}
     Q1 -->|Yes| L["LASSO methods required<br/>(OLS infeasible)"]
     Q1 -->|No| Q2{"p / n &gt; 0.3?"}
     Q2 -->|Yes, like this post<br/>p=284, n=576| L

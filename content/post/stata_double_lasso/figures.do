@@ -189,7 +189,7 @@ graph combine fig_o1 fig_o2 fig_o3, cols(3) ///
     title("Treatment-effect estimates: abortion -> crime, 1985-1997", ///
           color("$C_TXTHI") size(medsmall)) ///
     subtitle("Each panel is a different crime outcome; bars are 95% CIs from state-clustered SEs.", ///
-             color("$C_TEXT") size(small)) ///
+             color("$C_TEXT") size(small) margin(t=4 b=2)) ///
     b1title("alpha hat (effect of effective abortion rate)", ///
             color("$C_TEXT") size(small)) ///
     note("Replication of Table 2 in Fitzgerald et al. (2026). Dashed line at zero. Per-panel x-axis.", ///
@@ -296,11 +296,11 @@ graph combine fig_sel1 fig_sel2 fig_sel3, cols(3) ///
     title("Variable selection across the two Double LASSO penalties", ///
           color("$C_TXTHI") size(medsmall)) ///
     subtitle("Rigorous penalty (Belloni et al. 2012) vs. 3-fold CV (lambda.min) — out of 284 candidate controls.", ///
-             color("$C_TEXT") size(small)) ///
+             color("$C_TEXT") size(small) margin(t=4 b=2)) ///
     l1title("Number of controls", color("$C_TEXT") size(small)) ///
     note("Teal = DL (rigorous). Orange = DL (CV)." ///
          "DL-CV bars are 0 because Stata's cvlasso was run with lcount(10) for runtime — see post §11.", ///
-         color("$C_TEXT") size(vsmall)) ///
+         color("$C_TEXT") size(vsmall) linegap(*5)) ///
     imargin(small) ${DARKBG} ///
     name(fig_select, replace)
 
@@ -381,11 +381,11 @@ graph combine fig_cmp1 fig_cmp2 fig_cmp3, cols(3) ///
     title("Rigorous vs cross-validated penalty: two flavours of Double LASSO", ///
           color("$C_TXTHI") size(medsmall)) ///
     subtitle("Both procedures share the same three-step structure; they differ only in how lambda is chosen.", ///
-             color("$C_TEXT") size(small)) ///
+             color("$C_TEXT") size(small) margin(t=4 b=2)) ///
     l1title("alpha hat +/- 1.96 * SE", color("$C_TEXT") size(small)) ///
     note("Bars: 95% CIs from state-clustered SEs. Dashed line at zero." ///
          "Stata's DL-CV at lcount(10) collapses to the no-controls baseline; the R companion shows CV's true over-selection behavior.", ///
-         color("$C_TEXT") size(vsmall)) ///
+         color("$C_TEXT") size(vsmall) linegap(*5)) ///
     imargin(small) ${DARKBG} ///
     name(fig_compare, replace)
 

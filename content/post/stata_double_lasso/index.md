@@ -311,7 +311,7 @@ flowchart TD
     B --> D["Union: I_y &cup; I_d"]
     C --> D
     D --> E["Step 3: regress y d X[, union]<br/>noconstant vce(cluster state)"]
-    E --> F["Causal estimate &alpha;&#770;"]
+    E --> F["Causal estimate alpha-hat"]
     style A fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
     style B fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
     style C fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
@@ -386,9 +386,9 @@ The framework is from [Belloni, Chernozhukov, Hansen and Kozbur (2016)](#19-refe
 flowchart LR
     Z["High-dim controls X (p = 284)"] --> Y["Outcome y (DyV)"]
     Z --> D["Treatment d (DxV)"]
-    Y --> R1["residual y&#771;"]
-    D --> R2["residual d&#771;"]
-    R1 --> A["final OLS: y&#771; = &alpha; d&#771; + &epsilon;"]
+    Y --> R1["residual y"]
+    D --> R2["residual d"]
+    R1 --> A["final OLS: y-tilde = &alpha; d-tilde + &epsilon;"]
     R2 --> A
     style Z fill:#0f1729,stroke:#6a9bcc,color:#e8ecf2
     style Y fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
@@ -438,7 +438,7 @@ flowchart LR
     L1["rlasso y on X &rarr; I_y"] --> U["Union I_y &cup; I_d"]
     L2["rlasso d on X &rarr; I_d"] --> U
     U --> O["one big OLS:&nbsp; y = &alpha;&middot;d + X[union]&middot;&theta; + &epsilon;"]
-    O --> R["regression table with &alpha;&#770; AND control coefficients"]
+    O --> R["regression table with alpha-hat AND control coefficients"]
     style L1 fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
     style L2 fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
     style U fill:#1f2b5e,stroke:#d97757,color:#e8ecf2
@@ -654,7 +654,7 @@ The decision tree below offers practical guidance for a researcher facing a fres
 
 ```mermaid
 flowchart TD
-    Start["You have n observations,<br/>p candidate controls,<br/>and want a causal &alpha;&#770;"] --> Q1{"p &ge; n?"}
+    Start["You have n observations,<br/>p candidate controls,<br/>and want a causal alpha-hat"] --> Q1{"p &ge; n?"}
     Q1 -->|Yes| L["LASSO methods required<br/>(OLS infeasible)"]
     Q1 -->|No| Q2{"p / n &gt; 0.3?"}
     Q2 -->|Yes, like this post<br/>p=284, n=576| L
