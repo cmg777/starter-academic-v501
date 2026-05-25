@@ -64,7 +64,7 @@ diagram: true
 
 ## 1. Overview
 
-This is the Stata companion to [the R version](/post/r_double_lasso/) of the Double LASSO tutorial — same data, same five estimators, same identification story. The R post walks through Belloni, Chernozhukov and Hansen's (2014) extension of Donohue and Levitt's (2001) abortion-and-crime panel and shows that **Double LASSO** with the *rigorous* (theory-based) penalty reproduces the headline causal estimates from 284 candidate controls while CV-tuned LASSO overshoots dramatically. This post does the same computation in Stata using the **StataLasso** suite — `rlasso`, `cvlasso`, `pdslasso` and `lasso2` from [Ahrens, Hansen and Schaffer (2018)](#18-references) — and verifies the numbers against the R implementation.
+This is the Stata companion to [the R version](/post/r_double_lasso/) of the Double LASSO tutorial — same data, same five estimators, same identification story. The R post walks through Belloni, Chernozhukov and Hansen's (2014) extension of Donohue and Levitt's (2001) abortion-and-crime panel and shows that **Double LASSO** with the *rigorous* (theory-based) penalty reproduces the headline causal estimates from 284 candidate controls while CV-tuned LASSO overshoots dramatically. This post does the same computation in Stata using the **StataLasso** suite — `rlasso`, `cvlasso`, `pdslasso` and `lasso2` from [Ahrens, Hansen and Schaffer (2018)](#19-references) — and verifies the numbers against the R implementation.
 
 If you have already read the R version, the takeaways here are unchanged. The structural reason to write a Stata companion is reproducibility: empirical economists who run Stata day-to-day will find the friction of switching to R for one method too high, and a transparent Stata implementation removes that friction. The structural reason to *verify* it is that small implementation differences (default penalty constants, lambda parameterizations, CV-fold randomisation) can subtly change which variables get selected and, in this dataset, which sign the estimated treatment effect carries.
 
@@ -116,7 +116,7 @@ The first three are the engines; `pdslasso` is the convenience wrapper that auto
 
 ## 2. The data
 
-We use the exact panel that [Belloni, Chernozhukov and Hansen (2014)](#18-references) compiled from [Donohue and Levitt's (2001)](#18-references) original replication archive: **48 U.S. states × 12 years (1986–1997) after first-differencing the raw 13-year 1985–1997 panel, giving 576 observations.** First-differencing absorbs state fixed effects. Year fixed effects are absorbed in a separate pre-processing step using the Frisch–Waugh–Lovell projection (see §7). By the time the analysis script sees the data, both fixed-effect adjustments are done, so the LASSO regressions below contain no time dummies.
+We use the exact panel that [Belloni, Chernozhukov and Hansen (2014)](#19-references) compiled from [Donohue and Levitt's (2001)](#19-references) original replication archive: **48 U.S. states × 12 years (1986–1997) after first-differencing the raw 13-year 1985–1997 panel, giving 576 observations.** First-differencing absorbs state fixed effects. Year fixed effects are absorbed in a separate pre-processing step using the Frisch–Waugh–Lovell projection (see §7). By the time the analysis script sees the data, both fixed-effect adjustments are done, so the LASSO regressions below contain no time dummies.
 
 The treatment $d$ is the **effective abortion rate** — a weighted average of past abortion-to-birth ratios, lagged to match the ages at which crime is most prevalent. The three outcomes $y$ are state-level **violent crime, property crime, and murder rates**, each first-differenced. The candidate-control matrix $X$ has **284 columns**: it expands Donohue–Levitt's original 8 controls into squares, two-way interactions, time interactions, lagged levels, within-state means, and initial-value × time-trend interactions, then screens for multicollinearity.
 
@@ -185,7 +185,7 @@ Five regression procedures appear in this post, each with a different attitude t
 | **OLS (full)** | Add all 284 controls and let the matrix algebra sort it out. | `regress` | §5 |
 | **PSL** (Post-Structural LASSO) | One LASSO with the treatment forced in via `pnotpen()`, then plain OLS on the selected support. (Stata uses the rigorous penalty here; see §6 for the trade-off vs R's CV-tuned PSL.) | `rlasso` + `regress` | §6 |
 | **DL (rigorous)** | Two LASSOs (y on X, d on X) with the Belloni-et-al. theory-based penalty; refit OLS on the **union** of selected variables. | `rlasso` ×2 + `regress` | §7 |
-| **DL (CV)** | Same recipe as DL-rigorous but each LASSO uses 3-fold cross-validation to pick lambda. | `cvlasso` ×2 + `regress` | §10 |
+| **DL (CV)** | Same recipe as DL-rigorous but each LASSO uses 3-fold cross-validation to pick lambda. | `cvlasso` ×2 + `regress` | §11 |
 
 Two pairs of estimators do most of the pedagogical work. First-diff vs. OLS-full is the *control-count* contrast (no controls vs. too many controls). DL-rigorous vs. DL-CV is the *penalty-rule* contrast (theory vs. data-driven). PSL sits in between as the simplest one-LASSO benchmark.
 
@@ -199,7 +199,7 @@ $$
 \Delta y\_{st} = \alpha \\, \Delta d\_{st} + \varepsilon\_{st}.
 $$
 
-Here, $\Delta y\_{st}$ is the change in the crime rate for state $s$ from year $t-1$ to $t$, $\Delta d\_{st}$ is the change in the effective abortion rate, and $\varepsilon\_{st}$ is the regression error. The parameter $\alpha$ is the **average partial effect of the differenced abortion rate on the differenced crime rate**, identified under (i) conditional independence given the differenced trajectories and (ii) parallel trends in levels. We use state-clustered standard errors throughout (more on this in §8).
+Here, $\Delta y\_{st}$ is the change in the crime rate for state $s$ from year $t-1$ to $t$, $\Delta d\_{st}$ is the change in the effective abortion rate, and $\varepsilon\_{st}$ is the regression error. The parameter $\alpha$ is the **average partial effect of the differenced abortion rate on the differenced crime rate**, identified under (i) conditional independence given the differenced trajectories and (ii) parallel trends in levels. We use state-clustered standard errors throughout (more on this in §9).
 
 **Code chunk 2 — The first-difference OLS in Stata:**
 
@@ -262,7 +262,7 @@ Here, $X$ is the $n \times p$ design matrix (the treatment plus 284 controls), $
 
 ## 6. LASSO and the one-LASSO benchmark (PSL)
 
-The Least Absolute Shrinkage and Selection Operator ([Tibshirani 1996](#18-references)) modifies the OLS minimisation by adding an L1 penalty on the coefficients:
+The Least Absolute Shrinkage and Selection Operator ([Tibshirani 1996](#19-references)) modifies the OLS minimisation by adding an L1 penalty on the coefficients:
 
 $$
 \hat\beta\_{\text{LASSO}}(\lambda) = \arg\min\_{\beta \in \mathbb{R}^p} \\;
@@ -282,7 +282,7 @@ local sel : list sel - DxV          // strip the treatment out
 regress DyV DxV `sel', noconstant vce(cluster state)   // post-OLS
 ```
 
-**A design choice.** The [R companion](/post/r_double_lasso/) implements PSL with `cv.glmnet(..., penalty.factor = c(0, rep(1, p)), nfolds = 3)` — a CV-tuned LASSO with the treatment pinned. Stata's `cvlasso` exposes the same recipe via its `notpen()` option, but at this regime ($p = 284$, $n = 576$) each `cvlasso` call partials out the pinned variable and walks a 100-lambda grid in a way that takes 5+ minutes per call. To keep the post runnable in a reasonable session we use **`rlasso` with the rigorous (BCH theory) penalty** for PSL instead. The recipe is identical — one LASSO with the treatment pinned, then post-OLS on the selected support — only the penalty rule changes. The trade-off is documented in §14.
+**A design choice.** The [R companion](/post/r_double_lasso/) implements PSL with `cv.glmnet(..., penalty.factor = c(0, rep(1, p)), nfolds = 3)` — a CV-tuned LASSO with the treatment pinned. Stata's `cvlasso` exposes the same recipe via its `notpen()` option, but at this regime ($p = 284$, $n = 576$) each `cvlasso` call partials out the pinned variable and walks a 100-lambda grid in a way that takes 5+ minutes per call. To keep the post runnable in a reasonable session we use **`rlasso` with the rigorous (BCH theory) penalty** for PSL instead. The recipe is identical — one LASSO with the treatment pinned, then post-OLS on the selected support — only the penalty rule changes. The trade-off is documented in §15.
 
 A few annotations on the Stata idioms. `nocons` is correct because the data has already been partialled for year fixed effects (mean $\approx 0$). `pnotpen(DxV)` forces `DxV` into the LASSO model with zero penalty. The constants `c(1.1)` and `gamma(0.05)` are the Belloni–Chernozhukov–Hansen rigorous-penalty defaults (see §7 for derivation). The `: list sel - DxV` line is Stata's macro list-subtract: `e(selected)` from `rlasso` includes the `pnotpen` variable, so we remove it before the post-OLS regression adds `DxV` back explicitly.
 
@@ -296,7 +296,7 @@ The results:
 
 PSL with the rigorous penalty is extremely parsimonious here — for violent crime no controls survive (so the post-OLS reduces to the no-controls baseline of −0.155, which matches the §4 first-difference estimate of −0.152 essentially exactly); for property crime and murder only a single control survives. All three point estimates are negative and well-determined (SE around 0.025–0.064). Compare to the R companion's PSL implementation, which uses 3-fold cross-validation rather than the rigorous penalty: R reports −0.157, −0.068 and −0.206 with 3, 12 and 0 controls. The Stata and R PSL implementations differ in *how the LASSO selects controls* (rigorous penalty vs. CV) but agree on the qualitative pattern — small selection sets, negative estimates close to the baseline.
 
-**Why is this not the end of the story?** **Because PSL has a causal-inference blind spot.** LASSO selects controls based on how well they predict $y$. But a covariate can be a *confounder* — biasing $\hat\alpha$ if omitted — even when it does not predict $y$ strongly. Imagine a variable that is highly correlated with the treatment $d$ but only weakly with $y$. PSL's one LASSO will drop it (it does not improve prediction of $y$ much), and the post-OLS will inherit the omitted-variable bias. [Belloni, Chernozhukov and Hansen (2014)](#18-references) made exactly this point, and proposed Double LASSO as the fix.
+**Why is this not the end of the story?** **Because PSL has a causal-inference blind spot.** LASSO selects controls based on how well they predict $y$. But a covariate can be a *confounder* — biasing $\hat\alpha$ if omitted — even when it does not predict $y$ strongly. Imagine a variable that is highly correlated with the treatment $d$ but only weakly with $y$. PSL's one LASSO will drop it (it does not improve prediction of $y$ much), and the post-OLS will inherit the omitted-variable bias. [Belloni, Chernozhukov and Hansen (2014)](#19-references) made exactly this point, and proposed Double LASSO as the fix.
 
 ---
 
@@ -328,7 +328,7 @@ $$
 
 The trick is that we do not need to use *all* of $X$ in the residualisation. We only need to use enough of $X$ to capture the part that is correlated with $d$. Double LASSO does this approximately: $I\_d$ catches the controls correlated with $d$; $I\_y$ catches the controls correlated with $y$; their union catches both. Refitting OLS on $d$ plus the union approximates the FWL projection without committing to all 284 controls.
 
-The "rigorous" penalty rule chooses $\lambda$ from theory, not from CV. [Belloni, Chen, Chernozhukov and Hansen (2012)](#18-references) showed that the right scaling is
+The "rigorous" penalty rule chooses $\lambda$ from theory, not from CV. [Belloni, Chen, Chernozhukov and Hansen (2012)](#19-references) showed that the right scaling is
 
 $$
 \lambda^{\text{rig}} = \frac{2 c \\, \hat\sigma}{\sqrt{n}} \\, \Phi^{-1}\\!\left(1 - \frac{\gamma}{2 p}\right), \quad c = 1.1, \\, \gamma = 0.05,
@@ -362,7 +362,7 @@ The results:
 | Property crime | **−0.1144** | 0.0470 | [−0.207, −0.022] | 3 | 14 | 17 |
 | Murder | **−0.1229** | 0.1404 | [−0.398, +0.152] | 1 | 12 | 13 |
 
-**Reading the violent-crime row.** $\hat\alpha = -0.174$ means a unit increase in the differenced effective abortion rate is associated with a 0.174-unit decrease in the differenced violent-crime rate, conditional on the 8 controls in the union. The 95% confidence interval [−0.401, +0.052] contains zero — under this specification, the violent-crime effect drops below significance at the 5% level. The selection counts \|I_y\| = 0, \|I_d\| = 8 tell us something more interesting: the LASSO of crime on controls picked **zero** controls (out of 284), while the LASSO of abortion on controls picked 8. The R companion gets the same |I_y| = 0, |I_d| = 8 fingerprint with a slightly less negative point estimate (R: −0.0964). Same selected *count*, slightly different selected *identities* and post-OLS numbers — §14 below quantifies this drift.
+**Reading the violent-crime row.** $\hat\alpha = -0.174$ means a unit increase in the differenced effective abortion rate is associated with a 0.174-unit decrease in the differenced violent-crime rate, conditional on the 8 controls in the union. The 95% confidence interval [−0.401, +0.052] contains zero — under this specification, the violent-crime effect drops below significance at the 5% level. The selection counts \|I_y\| = 0, \|I_d\| = 8 tell us something more interesting: the LASSO of crime on controls picked **zero** controls (out of 284), while the LASSO of abortion on controls picked 8. The R companion gets the same |I_y| = 0, |I_d| = 8 fingerprint with a slightly less negative point estimate (R: −0.0964). Same selected *count*, slightly different selected *identities* and post-OLS numbers — §15 below quantifies this drift.
 
 **The one-line equivalent: `pdslasso`.** The three lines above can be collapsed into a single command:
 
@@ -530,7 +530,7 @@ pdslasso DyV DxV (zv1-zv284), cluster(state) loptions(c(1.1) gamma(0.05))
 Try varying:
 
 - **`cluster(state)` → `robust`**: switches the LASSO loadings from cluster-robust to heteroskedasticity-robust. You will see the union of selected controls grow back toward the 8 we got in §7 with the explicit recipe.
-- **`loptions(c(1.1) gamma(0.05))` → `loptions(c(0.5) gamma(0.05))`**: loosens the rigorous penalty by lowering $c$. Many more controls survive, the post-OLS coefficient table grows, and the three estimates of $\hat\alpha$ start to diverge — exactly the "loose-penalty" pathology that §11 (currently §10) anchors on for the rigorous-vs-CV contrast.
+- **`loptions(c(1.1) gamma(0.05))` → `loptions(c(0.5) gamma(0.05))`**: loosens the rigorous penalty by lowering $c$. Many more controls survive, the post-OLS coefficient table grows, and the three estimates of $\hat\alpha$ start to diverge — exactly the "loose-penalty" pathology that §11 anchors on for the rigorous-vs-CV contrast.
 - **Drop `(zv1-zv284)` controls entirely**: degenerates `pdslasso` to plain OLS of `DyV` on `DxV` — you should recover the §4 first-difference baseline of $-0.1521$.
 
 The fact that **all three orthogonalisations land on essentially the same answer here** is itself the headline takeaway: when the rigorous penalty selects a sparse, sensible set of controls, the choice between lasso-residualisation, post-lasso-residualisation, and PDS does not move the causal estimate beyond its own standard error. The framework is robust to the residualisation rule precisely because the rigorous-penalty selection is itself disciplined.
@@ -539,7 +539,7 @@ The fact that **all three orthogonalisations land on essentially the same answer
 
 ## 9. State-clustered standard errors
 
-A digression on the standard errors. The 576 observations are not independent — they are 12 differenced years of data for each of 48 states, and within-state observations are autocorrelated through governor effects, state policy waves, and business-cycle exposure. Treating them as independent (Stata's default `regress` vcov) would understate the uncertainty by about 40% on this panel. The `vce(cluster state)` option applies a cluster-robust sandwich estimator with Stata's default HC1-style finite-sample adjustment ([Cameron and Miller 2015](#18-references)):
+A digression on the standard errors. The 576 observations are not independent — they are 12 differenced years of data for each of 48 states, and within-state observations are autocorrelated through governor effects, state policy waves, and business-cycle exposure. Treating them as independent (Stata's default `regress` vcov) would understate the uncertainty by about 40% on this panel. The `vce(cluster state)` option applies a cluster-robust sandwich estimator with Stata's default HC1-style finite-sample adjustment ([Cameron and Miller 2015](#19-references)):
 
 $$
 \hat V\_{\text{cluster}} = \underbrace{\frac{N-1}{N-k}}\_{\text{small-sample}} \cdot \underbrace{\frac{G}{G-1}}\_{\text{cluster-count}} \cdot \underbrace{(X'X)^{-1}}\_{\text{bread}} \cdot \underbrace{\left(\sum\_{g=1}^G X\_g' \hat e\_g \hat e\_g' X\_g\right)}\_{\text{meat}} \cdot \underbrace{(X'X)^{-1}}\_{\text{bread}}.
@@ -685,9 +685,9 @@ Six things to keep in mind when reading the headline estimates.
 
 3. **State-clustering relies on $G \geq 30$.** Cluster-robust inference is justified asymptotically in $G$, the number of clusters. With $G = 48$ states we are above the rule of thumb. If you had only 5 or 10 clusters, the cluster-robust SE would be unreliable and you would need to switch to wild bootstrap or block bootstrap inference (Stata's `boottest` package).
 
-4. **CV LASSO is non-deterministic.** `cvlasso` randomly partitions the data into $K$ folds; without setting a seed, the variable-selection counts in §10 would vary by ±5 controls between runs and the headline coefficient by ±0.01. The script sets `seed(20260520)` on every `cvlasso` call so the post's numbers reproduce exactly. The rigorous LASSO (`rlasso`) is deterministic given the data and the penalty arguments.
+4. **CV LASSO is non-deterministic.** `cvlasso` randomly partitions the data into $K$ folds; without setting a seed, the variable-selection counts in §11 would vary by ±5 controls between runs and the headline coefficient by ±0.01. The script sets `seed(20260520)` on every `cvlasso` call so the post's numbers reproduce exactly. The rigorous LASSO (`rlasso`) is deterministic given the data and the penalty arguments.
 
-5. **`cvlasso` and `cv.glmnet` differ in their default fold assignment.** Even with the same seed value, the *integer-to-fold mapping* uses different RNG draws in Stata and R. This means that the DL-CV numbers will not bit-for-bit match the R companion; the Stata-vs-R replication check in §14 documents the actual drift.
+5. **`cvlasso` and `cv.glmnet` differ in their default fold assignment.** Even with the same seed value, the *integer-to-fold mapping* uses different RNG draws in Stata and R. This means that the DL-CV numbers will not bit-for-bit match the R companion; the Stata-vs-R replication check in §15 documents the actual drift.
 
 6. **The estimand is not population-weighted.** Every state-year observation gets equal weight. State-clustered SEs do not re-weight observations; they only adjust the variance for within-state autocorrelation. A population-weighted version (weighting state-years by state adult population) would give a different — and arguably more policy-relevant — estimand. The paper does not weight, so neither do we.
 
@@ -733,9 +733,9 @@ Three takeaways worth carrying away from this post.
 
 First, **Double LASSO is a method, not a panacea**. It does not invent variation in the data, nor does it weaken the identifying assumptions of the underlying research design. What it does is make high-dimensional control sets *tractable* without committing to using all of them or to picking a subset by hand. On a dataset where conditional independence holds and the candidate-control set is rich enough to span the confounders, DL-rigorous reproduces the Donohue–Levitt 2001 headline closely while disciplining the standard errors — and Stata produces the same answer as R to several decimal places.
 
-Second, **the rigorous penalty matters more than the language**. Switching from `rlasso` to `cvlasso` in Stata produces the same qualitative pattern as switching from `hdm::rlasso` to `glmnet::cv.glmnet` in R: the CV penalty over-selects, distorting the headline α. The Stata-vs-R replication check in §14 shows the deterministic methods agree across languages while the CV-based methods drift modestly — a reminder that the *penalty rule* you choose affects the answer more than which statistical package you run.
+Second, **the rigorous penalty matters more than the language**. Switching from `rlasso` to `cvlasso` in Stata produces the same qualitative pattern as switching from `hdm::rlasso` to `glmnet::cv.glmnet` in R: the CV penalty over-selects, distorting the headline α. The Stata-vs-R replication check in §15 shows the deterministic methods agree across languages while the CV-based methods drift modestly — a reminder that the *penalty rule* you choose affects the answer more than which statistical package you run.
 
-Third, **the regime determines the methodology**. With our $p = 284$, $n = 576$, we are squarely in the small-sample, high-dimensional zone where DL is designed to help. With $p = 8$ and $n = 5{,}000$, plain OLS would be perfectly fine — DL adds nothing when classical OLS is in its comfort zone. The decision tree in §12 is a starting point for picking the right tool for the dimensions you face.
+Third, **the regime determines the methodology**. With our $p = 284$, $n = 576$, we are squarely in the small-sample, high-dimensional zone where DL is designed to help. With $p = 8$ and $n = 5{,}000$, plain OLS would be perfectly fine — DL adds nothing when classical OLS is in its comfort zone. The decision tree in §13 is a starting point for picking the right tool for the dimensions you face.
 
 If you came in expecting either a definitive statement about abortion and crime or a magic ML cure for omitted-variable bias, you should leave with neither. What you should leave with is a clearer mental model of *when* the high-dimensional toolkit earns its complexity, and a working Stata workflow to run it on your own data.
 
@@ -772,7 +772,7 @@ Everything in this post — figures, tables, point estimates, standard errors �
    ```bash
    "/Applications/Stata/StataSE.app/Contents/MacOS/StataSE" -b do analysis.do
    ```
-4. The script writes `stata_double_lasso_*.png` (three figures: forest plot, selection bars, rigorous-vs-CV compare), `results_table2.csv` (the Table 2 replication), `selection_diagnostic.csv` (variable-selection counts), and `analysis.log` (the execution transcript). The LASSO coefficient-paths figure that appears in the R companion is omitted here — Stata's `twoway` does not overlay 284 lines as cleanly as ggplot, and the visualisation does not add to the pedagogy beyond what §10's selection-count narrative already conveys.
+4. The script writes `stata_double_lasso_*.png` (three figures: forest plot, selection bars, rigorous-vs-CV compare), `results_table2.csv` (the Table 2 replication), `selection_diagnostic.csv` (variable-selection counts), and `analysis.log` (the execution transcript). The LASSO coefficient-paths figure that appears in the R companion is omitted here — Stata's `twoway` does not overlay 284 lines as cleanly as ggplot, and the visualisation does not add to the pedagogy beyond what §11's selection-count narrative already conveys.
 
 Stata packages used: [`lassopack`](https://statalasso.github.io/) — supplies `rlasso`, `cvlasso`, `lasso2`. [`pdslasso`](https://statalasso.github.io/) — supplies `pdslasso`, `ivlasso`. [`coefplot`](https://repec.sowi.unibe.ch/stata/coefplot/) for some of the figures. Stata 16+ is required (we tested on 18.5 SE).
 
@@ -788,31 +788,43 @@ A note on the seed. Every `cvlasso` call passes `seed(20260520)` so the random f
 
 1. **Ahrens, A., Hansen, C. & Schaffer, M.** (2018, 2020). ["lassopack: Model selection and prediction with regularized regression in Stata."](https://doi.org/10.1177/1536867X20909697) *Stata Journal* 20(1): 176–235; and ["pdslasso and ivlasso: Stata programs for post-selection and post-regularization OLS or IV estimation and inference."](https://statalasso.github.io/docs/pdslasso/) The reference papers for the StataLasso suite used in this post.
 
-2. **Belloni, A., Chen, D., Chernozhukov, V. & Hansen, C.** (2012). ["Sparse models and methods for optimal instruments with an application to eminent domain."](https://doi.org/10.3982/ECTA9626) *Econometrica* 80(6): 2369–2429. The original derivation of the rigorous LASSO penalty.
+2. **Belloni, A., Chernozhukov, V. & Wang, L.** (2011). ["Square-root LASSO: Pivotal recovery of sparse signals via conic programming."](https://doi.org/10.1093/biomet/asr043) *Biometrika* 98(4): 791–806. The pivotal LASSO whose scale-invariance underpins the rigorous penalty's pilot-σ-free form used by `rlasso` and `pdslasso`.
 
-3. **Belloni, A., Chernozhukov, V. & Hansen, C.** (2014). ["Inference on treatment effects after selection among high-dimensional controls."](https://doi.org/10.1093/restud/rdt044) *Review of Economic Studies* 81(2): 608–650. The Double LASSO paper, including the empirical-application data we use in this post.
+3. **Belloni, A., Chen, D., Chernozhukov, V. & Hansen, C.** (2012). ["Sparse models and methods for optimal instruments with an application to eminent domain."](https://doi.org/10.3982/ECTA9626) *Econometrica* 80(6): 2369–2429. The original derivation of the rigorous LASSO penalty.
 
-4. **Cameron, A. C. & Miller, D. L.** (2015). ["A practitioner's guide to cluster-robust inference."](https://doi.org/10.3368/jhr.50.2.317) *Journal of Human Resources* 50(2): 317–372. The reference for the HC1 finite-sample adjustment in §8.
+4. **Belloni, A., Chernozhukov, V. & Hansen, C.** (2013). ["Inference for high-dimensional sparse econometric models."](https://doi.org/10.1017/CBO9781139060035.008) In *Advances in Economics and Econometrics: Tenth World Congress*, Vol. III: Econometrics. Foundational reference for the three-method orthogonalisation framework that `pdslasso` reports — the lasso-orthogonalized, post-lasso-orthogonalized and PDS panels in §8.
 
-5. **Donohue III, J. J. & Levitt, S. D.** (2001). ["The impact of legalized abortion on crime."](https://doi.org/10.1162/00335530151144050) *Quarterly Journal of Economics* 116(2): 379–420. The original empirical paper.
+5. **Belloni, A., Chernozhukov, V. & Hansen, C.** (2014). ["Inference on treatment effects after selection among high-dimensional controls."](https://doi.org/10.1093/restud/rdt044) *Review of Economic Studies* 81(2): 608–650. The Double LASSO paper, including the empirical-application data we use in this post.
 
-6. **Fitzgerald Sice, J., Lattimore, F., Robinson, T. & Zhu, A.** (2026). ["Double LASSO: Replication and Practical Insights."](https://doi.org/10.15456/jae.2025335.0258270663) *Journal of Applied Econometrics*, forthcoming. The source paper for this replication.
+6. **Belloni, A., Chernozhukov, V. & Hansen, C.** (2015). ["Some new asymptotic theory for least squares series: Pointwise and uniform results."](https://doi.org/10.1016/j.jeconom.2015.06.013) *Journal of Econometrics* 186(2): 345–366. Theoretical underpinning for the post-selection inference `pdslasso` implements (uniformly valid CIs after model selection).
 
-7. **Friedman, J., Hastie, T. & Tibshirani, R.** (2010). ["Regularization paths for generalized linear models via coordinate descent."](https://doi.org/10.18637/jss.v033.i01) *Journal of Statistical Software* 33(1). The reference for the `glmnet` package, whose lambda parameterisation `cvlasso`'s `lglmnet` option emulates.
+7. **Belloni, A., Chernozhukov, V., Hansen, C. & Kozbur, D.** (2016). ["Inference in high-dimensional panel models with an application to gun control."](https://doi.org/10.1080/07350015.2015.1102733) *Journal of Business & Economic Statistics* 34(4): 590–605. **Directly relevant to our state-panel setting** — extends the PDS framework to cluster-correlated data with the cluster-lasso penalty loadings `pdslasso` invokes under `cluster()`.
 
-8. **Tibshirani, R.** (1996). ["Regression shrinkage and selection via the LASSO."](https://doi.org/10.1111/j.2517-6161.1996.tb02080.x) *Journal of the Royal Statistical Society Series B* 58(1): 267–288. The original LASSO paper.
+8. **Cameron, A. C. & Miller, D. L.** (2015). ["A practitioner's guide to cluster-robust inference."](https://doi.org/10.3368/jhr.50.2.317) *Journal of Human Resources* 50(2): 317–372. The reference for the HC1 finite-sample adjustment in §9.
+
+9. **Chernozhukov, V., Hansen, C. & Spindler, M.** (2015). ["Valid post-selection and post-regularization inference: An elementary, general approach."](https://doi.org/10.1146/annurev-economics-012315-015826) *Annual Review of Economics* 7: 649–688. Accessible review of why the three-method orthogonalisation in §8 is the right framework for causal inference after LASSO selection — the most pedagogical of the pdslasso references.
+
+10. **Donohue III, J. J. & Levitt, S. D.** (2001). ["The impact of legalized abortion on crime."](https://doi.org/10.1162/00335530151144050) *Quarterly Journal of Economics* 116(2): 379–420. The original empirical paper.
+
+11. **Fitzgerald Sice, J., Lattimore, F., Robinson, T. & Zhu, A.** (2026). ["Double LASSO: Replication and Practical Insights."](https://doi.org/10.15456/jae.2025335.0258270663) *Journal of Applied Econometrics*, forthcoming. The source paper for this replication.
+
+12. **Friedman, J., Hastie, T. & Tibshirani, R.** (2010). ["Regularization paths for generalized linear models via coordinate descent."](https://doi.org/10.18637/jss.v033.i01) *Journal of Statistical Software* 33(1). The reference for the `glmnet` package, whose lambda parameterisation `cvlasso`'s `lglmnet` option emulates.
+
+13. **Spindler, M., Chernozhukov, V. & Hansen, C.** (2016). ["High-dimensional metrics in R."](https://arxiv.org/abs/1603.01700) *arXiv:1603.01700*. Companion to the `hdm` R package used in the [R companion post](/post/r_double_lasso/) — useful cross-reference for readers comparing the Stata and R implementations.
+
+14. **Tibshirani, R.** (1996). ["Regression shrinkage and selection via the LASSO."](https://doi.org/10.1111/j.2517-6161.1996.tb02080.x) *Journal of the Royal Statistical Society Series B* 58(1): 267–288. The original LASSO paper.
 
 **Stata packages used:**
 
-9. [**`lassopack`**](https://statalasso.github.io/) — SSC package supplying `rlasso` (rigorous-penalty LASSO), `cvlasso` (cross-validated LASSO), and `lasso2` (path-only LASSO).
-10. [**`pdslasso`**](https://statalasso.github.io/) — SSC package supplying `pdslasso` (post-double-selection LASSO) and `ivlasso` (IV-LASSO).
-11. [**`coefplot`**](https://repec.sowi.unibe.ch/stata/coefplot/) — SSC package for the forest plot in §11.
+15. [**`lassopack`**](https://statalasso.github.io/) — SSC package supplying `rlasso` (rigorous-penalty LASSO), `cvlasso` (cross-validated LASSO), and `lasso2` (path-only LASSO).
+16. [**`pdslasso`**](https://statalasso.github.io/) — SSC package supplying `pdslasso` (post-double-selection LASSO) and `ivlasso` (IV-LASSO). See the [online ivlasso help file](https://statalasso.github.io/docs/pdslasso/ivlasso_help/) for the full syntax and option list.
+17. [**`coefplot`**](https://repec.sowi.unibe.ch/stata/coefplot/) — SSC package for the forest plot in §12.
 
 **Data and replication archives:**
 
-12. The CSV files for this post live in [`content/post/r_double_lasso/data/`](https://github.com/cmg777/starter-academic-v501/tree/master/content/post/r_double_lasso/data) on the site's GitHub, shared with the [R companion post](/post/r_double_lasso/). They were extracted from the Matlab files in Fitzgerald et al.'s JAE replication archive by `prepare_data.R` in the R companion post.
+18. The CSV files for this post live in [`content/post/r_double_lasso/data/`](https://github.com/cmg777/starter-academic-v501/tree/master/content/post/r_double_lasso/data) on the site's GitHub, shared with the [R companion post](/post/r_double_lasso/). They were extracted from the Matlab files in Fitzgerald et al.'s JAE replication archive by `prepare_data.R` in the R companion post.
 
-13. The Donohue–Levitt (2001) original replication data is available via the QJE article's [supplementary materials](https://doi.org/10.1162/00335530151144050) and Steven Levitt's [University of Chicago page](https://pricetheory.uchicago.edu/levitt/). Belloni, Chernozhukov and Hansen (2014) extended this dataset to the 284-control specification used here.
+19. The Donohue–Levitt (2001) original replication data is available via the QJE article's [supplementary materials](https://doi.org/10.1162/00335530151144050) and Steven Levitt's [University of Chicago page](https://pricetheory.uchicago.edu/levitt/). Belloni, Chernozhukov and Hansen (2014) extended this dataset to the 284-control specification used here.
 
 ---
 
