@@ -1,0 +1,3 @@
+model,outcome,treatment_type,estimate,se_iid,se_cluster,n_folds,n_rep,ml_l,ml_m_or_g,note
+DoubleMLPLR,Violent crime,continuous,-0.11523284925355361,0.08259311276469555,0.07268171001414543,5,3,LassoCV(cv=3),LassoCV(cv=3),Robinson partialling-out + cross-fitting
+DoubleMLIRM,Violent crime,binary (median-split),-0.016259804168116856,0.004291062125439681,,3,1,Lasso(alpha=0.01),"RF classifier (100 trees, depth 5)",ATE; API demo only — binarisation destroys variation

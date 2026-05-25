@@ -1,0 +1,174 @@
+
+========================================
+STEP 1 — DATA LOADING
+========================================
+Pulling six CSVs over HTTPS — same files used by the R and Stata posts.
+
+levitt_state.csv           576 obs  (G = 48 clusters)
+levitt_linear.csv          576 x   7  (raw first differences)
+levitt_partialled.csv      576 x   7  (year-FE partialled)
+levitt_controls_viol.csv   576 x 284  (Z_v: violent-crime controls)
+levitt_controls_prop.csv   576 x 284  (Z_p: property-crime controls)
+levitt_controls_murd.csv   576 x 284  (Z_m: murder controls)
+
+========================================
+STEP 4 — FIRST-DIFFERENCE OLS (no controls baseline)
+========================================
+Model: Dy_st = alpha * Dd_st + eps_st   (D = first-difference operator)
+Run on raw first-differenced data (no year-FE partialling).
+
+  Violent crime    alpha_hat = -0.1521   (SE = 0.0337,  CI = [-0.218, -0.086])
+  Property crime   alpha_hat = -0.1084   (SE = 0.0219,  CI = [-0.151, -0.065])
+  Murder           alpha_hat = -0.2039   (SE = 0.0667,  CI = [-0.335, -0.073])
+
+  Cross-check with pyfixest (violent crime):
+    pyfixest.feols  alpha_hat = -0.1521   (SE = 0.0337)  -- matches the hand-rolled HC1 sandwich above.
+
+========================================
+STEP 5 — KITCHEN-SINK OLS (all 284 controls)
+========================================
+Feasible because p = 284 < n = 576, but many controls are near-collinear
+so SEs balloon. Watch the murder SE explode.
+
+  Violent crime    alpha_hat = +0.0135   (SE = 0.5654)  using 284 controls
+  Property crime   alpha_hat = -0.1950   (SE = 0.1937)  using 284 controls
+  Murder           alpha_hat = +2.3426   (SE = 2.6047)  using 284 controls
+
+========================================
+STEP 6 — POST-STRUCTURAL LASSO (PSL)
+========================================
+One LASSO with treatment partialled-out (FWL), then post-OLS.
+Recipe: residualize (y, X) on d → rlasso → post-OLS y ~ d + X[, sel].
+
+  Violent crime    alpha_hat = -0.1553   (SE = 0.0330)  | 0 controls selected
+  Property crime   alpha_hat = -0.1015   (SE = 0.0218)  | 0 controls selected
+  Murder           alpha_hat = -0.2061   (SE = 0.0514)  | 0 controls selected
+
+========================================
+STEP 7 — DOUBLE LASSO, RIGOROUS PENALTY (hdmpy.rlasso)
+========================================
+Two LASSOs (y on X, d on X), union of selected controls, post-OLS.
+Penalty: BCH rigorous (c=1.1, gamma=0.05) — theory-driven, not CV.
+
+  Violent crime    |I_y|=  0  |I_d|=  8  |I_y u I_d|=  8
+                   alpha_hat = -0.1043   (SE = 0.1067)
+  Property crime   |I_y|=  3  |I_d|=  9  |I_y u I_d|= 12
+                   alpha_hat = -0.0302   (SE = 0.0550)
+  Murder           |I_y|=  0  |I_d|=  9  |I_y u I_d|=  9
+                   alpha_hat = -0.1253   (SE = 0.1506)
+
+========================================
+STEP 8 — DOUBLE LASSO, CV PENALTY (sklearn.LassoCV)
+========================================
+Same recipe as STEP 7 but lambda chosen by 3-fold CV (lambda.min).
+CV is much more permissive — selection counts jump.
+
+  Violent crime    |I_y|= 13  |I_d|= 52  |I_y u I_d|= 56
+                   alpha_hat = -0.1401   (SE = 0.1035)
+  Property crime   |I_y|=  4  |I_d|= 53  |I_y u I_d|= 54
+                   alpha_hat = -0.0654   (SE = 0.0501)
+  Murder           |I_y|=  0  |I_d|= 59  |I_y u I_d|= 59
+                   alpha_hat = -0.1601   (SE = 0.2171)
+
+========================================
+STEP 9 — REPLICATION OF FITZGERALD ET AL. (2026) TABLE 2
+========================================
+       method        outcome  estimate  std_error  n_selected    ci_lo    ci_hi
+   First diff  Violent crime   -0.1521     0.0337           0  -0.2181  -0.0861
+   OLS (full)  Violent crime    0.0135     0.5654         284  -1.0947   1.1217
+          PSL  Violent crime   -0.1553     0.0330           0  -0.2199  -0.0907
+DL (rigorous)  Violent crime   -0.1043     0.1067           8  -0.3134   0.1048
+      DL (CV)  Violent crime   -0.1401     0.1035          56  -0.3430   0.0629
+   First diff Property crime   -0.1084     0.0219           0  -0.1514  -0.0654
+   OLS (full) Property crime   -0.1950     0.1937         284  -0.5745   0.1846
+          PSL Property crime   -0.1015     0.0218           0  -0.1443  -0.0587
+DL (rigorous) Property crime   -0.0302     0.0550          12  -0.1381   0.0776
+      DL (CV) Property crime   -0.0654     0.0501          54  -0.1636   0.0328
+   First diff         Murder   -0.2039     0.0667           0  -0.3347  -0.0731
+   OLS (full)         Murder    2.3426     2.6047         284  -2.7626   7.4478
+          PSL         Murder   -0.2061     0.0514           0  -0.3068  -0.1054
+DL (rigorous)         Murder   -0.1253     0.1506           9  -0.4205   0.1700
+      DL (CV)         Murder   -0.1601     0.2171          59  -0.5857   0.2655
+
+Wrote results_table2.csv
+Wrote selection_diagnostic.csv
+
+       outcome        method  n_Iy  n_Id  n_intersection  n_union
+ Violent crime DL (rigorous)     0     8               0        8
+ Violent crime       DL (CV)    13    52               9       56
+Property crime DL (rigorous)     3     9               0       12
+Property crime       DL (CV)     4    53               3       54
+        Murder DL (rigorous)     0     9               0        9
+        Murder       DL (CV)     0    59               0       59
+
+
+========================================
+STEP 10 — DOUBLEML SHOWCASE (Part B)
+========================================
+§17.1  DoubleMLPLR (Partially Linear Regression)
+§17.2  DoubleMLIRM (Interactive Regression Model, binarised treatment)
+§18    Learner comparison: LASSO vs RandomForest vs XGBoost
+
+§17.1 DoubleMLPLR (partialling out, LassoCV(cv=3) learners, n_folds=5, n_rep=3)
+-----
+  alpha_hat (DoubleMLPLR, violent crime) = -0.1152
+     iid SE     = 0.0826   95% CI = [-0.277, +0.047]
+     cluster SE = 0.0727   (hand-rolled HC1 on orthogonal scores, G=48)
+
+§17.2 DoubleMLIRM (interactive model, binarised treatment, ATE)
+-----
+CAVEAT: DoubleMLIRM requires a binary treatment. We discretise the abortion
+rate at its median purely to show the API; this is NOT a causal estimate of
+the abortion effect — coarsening a continuous treatment destroys most of the
+variation we actually care about.
+
+  ATE (DoubleMLIRM, median-split treatment) = -0.0163  (iid SE = 0.0043)
+  (For context: PLR's continuous-treatment estimate above is -0.1152.)
+
+§18 Learner comparison: DoubleMLPLR with LASSO / RandomForest / XGBoost
+-----
+  LassoCV       alpha_hat = -0.0957   iid SE = 0.0841   cluster SE = 0.0785
+  RandomForest  alpha_hat = -0.0855   iid SE = 0.1806   cluster SE = 0.1432
+  XGBoost       alpha_hat = -0.1123   iid SE = 0.2089   cluster SE = 0.1421
+
+Wrote learner_comparison.csv
+Wrote doubleml_showcase.csv
+
+========================================
+STEP 11 — FIGURES (5 dark-theme PNGs)
+========================================
+Wrote python_double_lasso_estimates.png
+Wrote python_double_lasso_selection.png
+Wrote python_double_lasso_methods_compare.png
+Wrote python_double_lasso_doubleml_showcase.png
+Wrote python_double_lasso_learners.png
+
+========================================
+STEP 12 — README.md
+========================================
+Wrote README.md
+
+========================================
+STEP 13 — SUMMARY: comparing our numbers to the paper's Table 2
+========================================
+Replication check (violent crime):
+       method  estimate_paper  std_error_paper  estimate_python  std_error_python
+   First diff          -0.152            0.034           -0.152             0.034
+DL (rigorous)          -0.104            0.123           -0.104             0.107
+          PSL          -0.155            0.033           -0.155             0.033
+   OLS (full)           0.014            0.875            0.014             0.565
+
+Generated PNG files:
+  python_double_lasso_doubleml_showcase.png
+  python_double_lasso_estimates.png
+  python_double_lasso_learners.png
+  python_double_lasso_methods_compare.png
+  python_double_lasso_selection.png
+
+Generated CSV files:
+  doubleml_showcase.csv
+  learner_comparison.csv
+  results_table2.csv
+  selection_diagnostic.csv
+
+=== Script completed successfully ===

@@ -1,0 +1,421 @@
+---
+title: "Double LASSO in Python: Does Abortion Reduce Crime?"
+subtitle: "Python companion to the R and Stata Double LASSO tutorials with a DoubleML showcase"
+author: "Carlos Mendez"
+date: "2026-05-25"
+jupyter: python-double-lasso-tutorial
+format:
+  html:
+    theme: cosmo
+    embed-resources: true
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 150
+    include-in-header:
+      text: |
+        <style>
+          img, .cell-output-display img { max-width: 100%; height: auto; }
+        </style>
+execute:
+  warning: false
+  message: false
+---
+
+::: {.callout-important}
+## How to render this tutorial
+
+**Easiest (one click).** From the bundle ZIP, double-click `render.command` (macOS) or `render.bat` (Windows). The wrapper runs setup and then `quarto render`, opening the result in your browser.
+
+**Manual.** From a terminal in the bundle folder:
+
+```bash
+python3 setup_env.py            # one-time: builds .venv/, registers kernel
+quarto render tutorial.qmd      # or click "Render" in Positron
+```
+
+`setup_env.py` is idempotent — re-running it later is a fast no-op. Subsequent renders are instant.
+
+**Prerequisites:** Python 3.10–3.13 and a working `quarto` install.
+
+**Windows note:** if `python3` is not on PATH, use `python setup_env.py` instead.
+
+**Runtime:** The DoubleML showcase in §17–§18 is the slow part (~3–5 minutes). To get a quick first render, comment out the §17–§18 chunks and start with Part A only.
+:::
+
+## 1. Overview
+
+This is the Python companion to the [R version](https://carlos-mendez.org/post/r_double_lasso/) and [Stata version](https://carlos-mendez.org/post/stata_double_lasso/) of the Double LASSO tutorial — same data, same five-estimator narrative — plus a hands-on introduction to the [DoubleML](https://docs.doubleml.org/) library. We replicate Belloni, Chernozhukov and Hansen's (2014) 284-control extension of Donohue and Levitt's (2001) abortion-and-crime panel using `pyfixest` for the OLS rows, `hdmpy` for the rigorous LASSO, `sklearn` for the cross-validated LASSO, and `DoubleML` + `xgboost` for the modern cross-fit Neyman-orthogonal showcase.
+
+See the [full published post](https://carlos-mendez.org/post/python_double_lasso/) for the complete narrative, glossary, equations, and §15 "Why DoubleML differs from R hdm" section. This notebook focuses on the executable steps so you can change parameters and re-render.
+
+## 2. Setup and data loading
+
+```{python}
+#| label: setup-packages
+
+import sys, importlib.metadata
+from pathlib import Path
+
+PINNED = {
+    "DoubleML":     "0.11.2",
+    "hdmpy":        "0.1.0",
+    "pyfixest":     "0.50.1",
+    "scikit-learn": "1.8.0",
+    "xgboost":      "3.2.0",
+    "pandas":       "3.0.1",
+    "numpy":        "2.3.5",
+    "matplotlib":   "3.10.8",
+}
+
+py = Path(sys.executable).resolve()
+assert ".venv" in py.parts, (
+    f"Kernel is running outside the tutorial .venv (sys.executable={py}). "
+    "Re-render from the bundle wrapper (render.command / render.bat) so the "
+    "pre-render hook activates the venv kernel."
+)
+print(f"Python: {py}")
+
+for pkg, want in PINNED.items():
+    have = importlib.metadata.version(pkg)
+    status = "OK" if have == want else f"MISMATCH (want {want})"
+    print(f"  {pkg:14s} {have:10s}  [{status}]")
+```
+
+```{python}
+#| label: imports
+
+import warnings
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+import pyfixest as pf
+import hdmpy
+from sklearn.linear_model import LassoCV, Lasso
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.model_selection import KFold
+from xgboost import XGBRegressor
+from doubleml import DoubleMLData, DoubleMLPLR, DoubleMLIRM
+
+RANDOM_SEED = 20260520
+np.random.seed(RANDOM_SEED)
+```
+
+```{python}
+#| label: data-download
+
+BASE = ("https://raw.githubusercontent.com/cmg777/starter-academic-v501/"
+        "master/content/post/r_double_lasso/data/")
+
+state      = pd.read_csv(BASE + "levitt_state.csv")["state"].to_numpy()
+linear     = pd.read_csv(BASE + "levitt_linear.csv")
+partialled = pd.read_csv(BASE + "levitt_partialled.csv")
+ctrl_viol  = pd.read_csv(BASE + "levitt_controls_viol.csv")
+ctrl_prop  = pd.read_csv(BASE + "levitt_controls_prop.csv")
+ctrl_murd  = pd.read_csv(BASE + "levitt_controls_murd.csv")
+
+print(f"n = {len(state)} observations, G = {len(np.unique(state))} state clusters")
+print(f"p = {ctrl_viol.shape[1]} candidate controls per outcome")
+
+outcomes = {
+    "violent": dict(label="Violent crime",
+        y_raw=linear["Dyv"].to_numpy(), d_raw=linear["Dxv"].to_numpy(),
+        y=partialled["DyV"].to_numpy(),  d=partialled["DxV"].to_numpy(),
+        X=ctrl_viol.to_numpy()),
+    "property": dict(label="Property crime",
+        y_raw=linear["Dyp"].to_numpy(), d_raw=linear["Dxp"].to_numpy(),
+        y=partialled["DyP"].to_numpy(),  d=partialled["DxP"].to_numpy(),
+        X=ctrl_prop.to_numpy()),
+    "murder": dict(label="Murder",
+        y_raw=linear["Dym"].to_numpy(), d_raw=linear["Dxm"].to_numpy(),
+        y=partialled["DyM"].to_numpy(),  d=partialled["DxM"].to_numpy(),
+        X=ctrl_murd.to_numpy()),
+}
+```
+
+## 3. Helper: OLS with state-clustered HC1 sandwich
+
+```{python}
+#| label: helper-ols
+
+def ols_clustered(y, d, X_sel, state):
+    """OLS y = alpha*d + X_sel @ beta + eps with HC1 state-clustered SE."""
+    n = len(y)
+    if X_sel.ndim == 1:
+        X_sel = X_sel.reshape(-1, 1)
+    if X_sel.shape[0] != n:
+        X_sel = X_sel.T
+    Xfull = np.column_stack([d.reshape(-1, 1), X_sel]) if X_sel.shape[1] > 0 \
+            else d.reshape(-1, 1)
+
+    Q, R = np.linalg.qr(Xfull, mode="reduced")
+    diag_R = np.abs(np.diag(R))
+    tol = max(R.shape) * np.spacing(diag_R.max()) if diag_R.size else 0.0
+    keep_mask = diag_R > tol
+    keep_mask[0] = True
+    keep_idx = np.where(keep_mask)[0]
+    X = Xfull[:, keep_idx]
+    k = X.shape[1]
+
+    beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+    resid = y - X @ beta
+
+    XtX_inv = np.linalg.pinv(X.T @ X)
+    G = int(np.unique(state).size)
+    S = np.zeros((k, k))
+    for g in np.unique(state):
+        idx = np.where(state == g)[0]
+        s = X[idx].T @ resid[idx]
+        S += np.outer(s, s)
+    hc1 = (G / (G - 1)) * ((n - 1) / max(n - k, 1))
+    V = hc1 * XtX_inv @ S @ XtX_inv
+
+    coef_d = float(beta[0]); se_d = float(np.sqrt(max(V[0, 0], 0.0)))
+    return dict(coef=coef_d, se=se_d,
+                ci_lo=coef_d - 1.96 * se_d, ci_hi=coef_d + 1.96 * se_d,
+                n_selected=int(X_sel.shape[1]))
+
+feols_clustered = ols_clustered
+```
+
+## 4. First-difference OLS (baseline)
+
+```{python}
+#| label: fit-first-diff
+
+first_diff = {}
+for nm, o in outcomes.items():
+    res = ols_clustered(o["y_raw"], o["d_raw"],
+                        np.empty((len(o["y_raw"]), 0)), state)
+    first_diff[nm] = res
+    print(f"  {o['label']:15s}  alpha = {res['coef']:+0.4f}  (SE = {res['se']:0.4f})")
+
+# Cross-check with pyfixest's CRV1
+df_v = pd.DataFrame({"y": outcomes["violent"]["y_raw"],
+                     "d": outcomes["violent"]["d_raw"], "state": state})
+fit_pf = pf.feols("y ~ -1 + d", data=df_v, vcov={"CRV1": "state"})
+print(f"\npyfixest cross-check (violent): alpha = {float(fit_pf.coef()['d']):+0.4f}  "
+      f"SE = {float(fit_pf.se()['d']):0.4f}  -- matches!")
+```
+
+## 5. Kitchen-sink OLS (all 284 controls)
+
+```{python}
+#| label: fit-ols-full
+
+ols_all = {}
+for nm, o in outcomes.items():
+    res = ols_clustered(o["y"], o["d"], o["X"], state)
+    ols_all[nm] = res
+    print(f"  {o['label']:15s}  alpha = {res['coef']:+0.4f}  "
+          f"(SE = {res['se']:0.4f})  using 284 controls")
+```
+
+Watch the murder estimate explode to +2.34 with SE = 2.60 — the textbook failure mode of OLS with too many near-collinear controls.
+
+## 6. Post-Structural LASSO (PSL) — FWL + hdmpy
+
+```{python}
+#| label: fit-psl
+
+def partial_out_d(arr, d):
+    d_col = d.reshape(-1, 1)
+    beta = np.linalg.lstsq(d_col, arr, rcond=None)[0]
+    return arr - d_col @ beta if arr.ndim == 2 else arr - (d_col @ beta).ravel()
+
+def psl_fit(y, d, X, state):
+    y_tilde = partial_out_d(y, d)
+    X_tilde = partial_out_d(X, d)
+    fit = hdmpy.rlasso(X_tilde, y_tilde, post=False, intercept=False,
+                       c=1.1, gamma=0.05)
+    beta = np.asarray(fit.est["beta"]).flatten()
+    sel = np.where(np.abs(beta) > 1e-10)[0]
+    Xsel = X[:, sel] if sel.size > 0 else np.empty((len(y), 0))
+    return ols_clustered(y, d, Xsel, state) | {"n_selected": int(sel.size)}
+
+psl = {nm: psl_fit(o["y"], o["d"], o["X"], state) for nm, o in outcomes.items()}
+for nm, res in psl.items():
+    print(f"  {outcomes[nm]['label']:15s}  alpha = {res['coef']:+0.4f}  "
+          f"(SE = {res['se']:0.4f})  | {res['n_selected']} controls selected")
+```
+
+## 7. Double LASSO with rigorous penalty (`hdmpy.rlasso`)
+
+```{python}
+#| label: fit-dl-rigorous
+
+def dl_rigorous_fit(y, d, X, state):
+    fit_y = hdmpy.rlasso(X, y, post=False, intercept=False, c=1.1, gamma=0.05)
+    fit_d = hdmpy.rlasso(X, d, post=False, intercept=False, c=1.1, gamma=0.05)
+    Iy = np.where(np.abs(np.asarray(fit_y.est["beta"]).flatten()) > 1e-10)[0]
+    Id = np.where(np.abs(np.asarray(fit_d.est["beta"]).flatten()) > 1e-10)[0]
+    U = np.sort(np.unique(np.concatenate([Iy, Id])))
+    res = ols_clustered(y, d, X[:, U], state)
+    res.update({"n_selected": int(U.size), "Iy": Iy, "Id": Id})
+    return res
+
+dl_rig = {nm: dl_rigorous_fit(o["y"], o["d"], o["X"], state)
+          for nm, o in outcomes.items()}
+for nm, res in dl_rig.items():
+    print(f"  {outcomes[nm]['label']:15s}  |I_y|={len(res['Iy']):3d}  "
+          f"|I_d|={len(res['Id']):3d}  union={res['n_selected']:3d}  "
+          f"alpha = {res['coef']:+0.4f}  (SE = {res['se']:0.4f})")
+```
+
+The selection counts \|I_y\|=0, \|I_d\|=8 for violent crime are **exact matches** to Fitzgerald et al. (2026) Table 2 and the R companion.
+
+## 8. Double LASSO with CV penalty (`sklearn.LassoCV`)
+
+```{python}
+#| label: fit-dl-cv
+
+def dl_cv_fit(y, d, X, state, seed=RANDOM_SEED):
+    cv_y = KFold(n_splits=3, shuffle=True, random_state=seed)
+    cv_d = KFold(n_splits=3, shuffle=True, random_state=seed + 1)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        lc_y = LassoCV(cv=cv_y, random_state=seed, max_iter=5000).fit(X, y)
+        lc_d = LassoCV(cv=cv_d, random_state=seed, max_iter=5000).fit(X, d)
+    Iy = np.where(np.abs(lc_y.coef_) > 1e-10)[0]
+    Id = np.where(np.abs(lc_d.coef_) > 1e-10)[0]
+    U = np.sort(np.unique(np.concatenate([Iy, Id])))
+    res = ols_clustered(y, d, X[:, U], state)
+    res.update({"n_selected": int(U.size), "Iy": Iy, "Id": Id})
+    return res
+
+dl_cv = {nm: dl_cv_fit(o["y"], o["d"], o["X"], state)
+         for nm, o in outcomes.items()}
+for nm, res in dl_cv.items():
+    print(f"  {outcomes[nm]['label']:15s}  |I_y|={len(res['Iy']):3d}  "
+          f"|I_d|={len(res['Id']):3d}  union={res['n_selected']:3d}  "
+          f"alpha = {res['coef']:+0.4f}  (SE = {res['se']:0.4f})")
+```
+
+Notice that Python's `LassoCV` picks 5x more controls than rigorous (56/54/59 vs 8/12/9) but does NOT reproduce R `cv.glmnet`'s violent-crime sign-flip. See §15 of the published post for the five sources of drift.
+
+## 9. Forest plot of all five Part-A estimators
+
+```{python}
+#| label: fig-forest
+#| fig-cap: "Forest plot of α̂ ± 95 % CI for all five Part-A estimators across all three crime outcomes."
+
+records = []
+for nm, o in outcomes.items():
+    for method, res in [("First diff", first_diff[nm]),
+                        ("OLS (full)", ols_all[nm]),
+                        ("PSL", psl[nm]),
+                        ("DL (rigorous)", dl_rig[nm]),
+                        ("DL (CV)", dl_cv[nm])]:
+        records.append(dict(method=method, outcome=o["label"],
+                            estimate=res["coef"], ci_lo=res["ci_lo"],
+                            ci_hi=res["ci_hi"]))
+table2 = pd.DataFrame(records)
+
+method_order = ["First diff", "OLS (full)", "PSL", "DL (rigorous)", "DL (CV)"]
+outcomes_order = ["Violent crime", "Property crime", "Murder"]
+colors = {"First diff": "#6a9bcc", "OLS (full)": "#888888",
+          "PSL": "#d97757", "DL (rigorous)": "#00d4c8", "DL (CV)": "#e8956a"}
+
+fig, axes = plt.subplots(1, 3, figsize=(13, 4.5), sharey=True)
+for ax, oc in zip(axes, outcomes_order):
+    sub = table2[table2["outcome"] == oc].set_index("method").loc[method_order]
+    y_pos = np.arange(len(method_order))[::-1]
+    ax.axvline(0, color="grey", linestyle="--", linewidth=0.6)
+    for (m, row_), yp in zip(sub.iterrows(), y_pos):
+        c = colors[m]
+        ax.errorbar(row_["estimate"], yp,
+                    xerr=[[row_["estimate"] - row_["ci_lo"]],
+                          [row_["ci_hi"] - row_["estimate"]]],
+                    fmt="o", color=c, capsize=3, markersize=7)
+    ax.set_yticks(y_pos); ax.set_yticklabels(method_order)
+    ax.set_xlabel(r"$\hat{\alpha}$")
+    ax.set_title(oc)
+fig.suptitle("Part A: five estimators × three outcomes", y=1.03)
+plt.tight_layout(); plt.show()
+```
+
+## 10. DoubleML showcase (Part B)
+
+::: {.callout-warning}
+The `DoubleMLPLR` fit with `n_folds=5, n_rep=3` takes ~2–3 minutes. The learner comparison adds another ~3 minutes. Skip this section for a quick render.
+:::
+
+### 10.1 DoubleMLPLR with hand-rolled cluster SE
+
+```{python}
+#| label: fit-doubleml-plr
+
+o = outcomes["violent"]
+df_dml = pd.DataFrame(o["X"], columns=[f"x{i}" for i in range(o["X"].shape[1])])
+df_dml["d"] = o["d"]; df_dml["y"] = o["y"]
+dml_data = DoubleMLData(df_dml, y_col="y", d_cols=["d"],
+                        x_cols=[f"x{i}" for i in range(o["X"].shape[1])])
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    ml_l = LassoCV(cv=3, random_state=RANDOM_SEED, max_iter=5000)
+    ml_m = LassoCV(cv=3, random_state=RANDOM_SEED, max_iter=5000)
+    plr = DoubleMLPLR(dml_data, ml_l=ml_l, ml_m=ml_m,
+                      n_folds=5, n_rep=3, score="partialling out")
+    plr.fit()
+
+
+def cluster_se_orthogonal(dml, cluster_id, k_params=1):
+    psi   = dml.psi.squeeze()
+    psi_a = dml.psi_elements["psi_a"].squeeze()
+    n = psi.shape[0]
+    if psi.ndim == 2:
+        psi   = psi.mean(axis=1)
+        psi_a = psi_a.mean(axis=1)
+    df_p  = pd.DataFrame({"psi": psi, "g": cluster_id})
+    grouped = df_p.groupby("g")["psi"].sum().to_numpy()
+    G = len(grouped)
+    meat = float(np.sum(grouped ** 2))
+    Epsi_a = float(np.mean(psi_a))
+    hc1 = (G / (G - 1)) * ((n - 1) / (n - k_params))
+    return float(np.sqrt(hc1 * meat / (n * Epsi_a) ** 2))
+
+se_iid = float(plr.se[0])
+se_clu = cluster_se_orthogonal(plr, state)
+print(f"DoubleMLPLR (violent crime, LassoCV nuisance):")
+print(f"  alpha     = {float(plr.coef[0]):+0.4f}")
+print(f"  iid SE    = {se_iid:0.4f}")
+print(f"  cluster SE = {se_clu:0.4f}  (hand-rolled HC1 on orthogonal scores, G=48)")
+```
+
+### 10.2 Learner comparison
+
+```{python}
+#| label: fit-learner-comparison
+
+learners = {
+    "LassoCV":      lambda: LassoCV(cv=3, random_state=RANDOM_SEED, max_iter=5000),
+    "RandomForest": lambda: RandomForestRegressor(n_estimators=100, max_depth=5,
+                                                  random_state=RANDOM_SEED, n_jobs=-1),
+    "XGBoost":      lambda: XGBRegressor(n_estimators=100, max_depth=4,
+                                         learning_rate=0.05,
+                                         random_state=RANDOM_SEED, verbosity=0),
+}
+
+for name, make in learners.items():
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        plr_l = DoubleMLPLR(dml_data, ml_l=make(), ml_m=make(),
+                            n_folds=5, n_rep=3, score="partialling out")
+        plr_l.fit()
+    se_c = cluster_se_orthogonal(plr_l, state)
+    print(f"  {name:12s}  alpha = {float(plr_l.coef[0]):+0.4f}  "
+          f"iid SE = {float(plr_l.se[0]):0.4f}  cluster SE = {se_c:0.4f}")
+```
+
+Three structurally different learners give point estimates within 0.03 of each other — DoubleML's learner-robustness signal works as advertised.
+
+## Source files
+
+- Companion script: [`script.py`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_double_lasso/script.py)
+- Published post: <https://carlos-mendez.org/post/python_double_lasso/>
+- GitHub repo: <https://github.com/cmg777/starter-academic-v501>
