@@ -621,18 +621,30 @@ For murder, the story is messier — kitchen-sink OLS gives a nonsensical positi
 **Code chunk 7 — Building the forest plot in Stata (compressed):**
 
 ```stata
-* After running all five estimators, build a 15-row long dataset
-* (3 outcomes x 5 methods) with estimate, std_error, ci_lo, ci_hi.
-twoway ///
-    (rspike ci_lo ci_hi method_id, horizontal) ///
-    (scatter method_id estimate, msymbol(O)) ///
-    , by(outcome_id, cols(3)) ///
-      xline(0, lpattern(dash)) ///
-      ylabel(1 "DL (CV)" 2 "DL (rigorous)" 3 "PSL" 4 "OLS (full)" 5 "First diff")
-graph export "stata_double_lasso_estimates.png", replace width(2400)
+* Load the 15-row long table written by analysis.do
+* (3 outcomes x 5 methods, with estimate / std_error / ci_lo / ci_hi).
+import delimited "results_table2.csv", clear varnames(1) case(preserve)
+
+* Build ONE twoway per outcome (rspike + scatter for each method),
+* so each panel gets its OWN x-axis range. This is Stata's analogue
+* of ggplot's facet_wrap(scales = "free_x") — and what keeps the
+* huge OLS-Murder CI from squashing the other panels.
+forvalues o = 1/3 {
+    twoway ///
+        (rspike ci_lo ci_hi y if oid==`o' & method_id==1, horizontal) ///
+        (scatter y estimate if oid==`o' & method_id==1, msymbol(O))   ///
+        /* ...repeat for method_id 2..5, each with its own colour... */ ///
+        , xline(0, lpattern(dash)) legend(off) ///
+          ylabel(1 "DL (CV)" 2 "DL (rigorous)" 3 "PSL" 4 "OLS (full)" 5 "First diff") ///
+          name(fig_o`o', replace)
+}
+
+* Stitch the 3 per-outcome panels into a 1-row strip.
+graph combine fig_o1 fig_o2 fig_o3, cols(3)
+graph export "stata_double_lasso_estimates.png", replace width(3300) height(1350)
 ```
 
-The actual `twoway` call in `analysis.do` is longer because it has separate `rspike` + `scatter` layers per method (so each estimator gets its own colour from the site palette) and applies the dark-theme `graphregion(fcolor("15 23 41"))` options. The full code is in `analysis.do` under the `* === Figure 1: forest plot ===` section header.
+We deliberately avoid Stata's `by(outcome_id, cols(3))` here: `by()` forces a single shared x-axis across panels, and OLS-Murder's CI of roughly [−3.1, +7.8] would stretch that shared axis until every other CI collapses to an invisible nub. Building three independent `twoway` graphs and combining them with `graph combine` is the base-Stata equivalent of `facet_wrap(scales = "free_x")` in ggplot2. The full per-method colour wiring (site palette: steel blue, warm orange, teal, light orange, light grey) and the dark-theme `graphregion(...)` options are in `figures.do`, which `analysis.do` calls at the end of §10.
 
 ---
 

@@ -1,37 +1,88 @@
-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/stata_doubl
-> e_lasso/figures.log
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_double_lasso/figures.log
   log type:  text
- opened on:  25 May 2026, 08:29:41
+ opened on:  25 May 2026, 11:36:56
+.     local _opened_local_log = 1
+. }
 
 . 
-. * Site palette (dark theme, matches analysis.do)
-. global C_BG    "15 23 41"
+. 
+. *---------------------------------------------------------------*
+. * Site palette (dark theme — matches analysis.do)               *
+. *---------------------------------------------------------------*
+. * Colors are RGB triplets ("R G B") so they survive Stata's
+. * color-name handling unchanged.
+. 
+. global C_BG    "15 23 41"    // dark navy background
 
-. global C_TEXT  "200 208 224"
+. global C_TEXT  "200 208 224" // body text on dark background
 
-. global C_TXTHI "232 236 242"
+. global C_TXTHI "232 236 242" // titles / emphasis text
 
-. global C_STEEL "106 155 204"
+. global C_STEEL "106 155 204" // First diff
 
-. global C_ORG   "217 119 87"
+. global C_TEXTM "200 208 224" // OLS (full) — reuse C_TEXT
 
-. global C_TEAL  "0 212 200"
+. global C_ORG   "217 119 87"  // PSL
 
-. global C_LTORG "232 149 106"
+. global C_TEAL  "0 212 200"   // DL (rigorous)
 
+. global C_LTORG "232 149 106" // DL (CV)
+
+. 
+. * DARKBG bundles the graph-region color overrides we want on EVERY
+. * twoway, graph bar, and graph combine call. Use as `${DARKBG}`.
 . global DARKBG ///
->     graphregion(fcolor("$C_BG") ifcolor("$C_BG") lcolor("$C_BG") ilcolor("$C_BG")) ///
+>     graphregion(fcolor("$C_BG") ifcolor("$C_BG") lcolor("$C_BG") ilcolor("$C_
+> BG")) ///
 >     plotregion(fcolor("$C_BG") lcolor("$C_BG"))
 
 . 
 . 
-. * === Figure 1: forest plot of all five estimators ===
+. *---------------------------------------------------------------*
+. * Output dimensions (px). Match the R companion to keep the     *
+. * two posts looking like a matched pair when viewed side by     *
+. * side on the site.                                             *
+. *---------------------------------------------------------------*
+. local WIDE     = 3300   // shared width for all 3 figures
+
+. local TALL     = 1350   // estimates + methods_compare height
+
+. local TALL_SEL = 1560   // selection bars: a bit taller because 4 metrics nee
+> d more horizontal space
+
+. 
+. 
+. 
+. *===============================================================*
+. * FIGURE 1 — Forest plot of all five estimators                 *
+. *===============================================================*
+. *
+. * The post's headline figure. Five estimators (rows) x three crime
+. * outcomes (panels), each row shows alpha-hat as a point and the
+. * 95% CI as a horizontal spike (rspike).
+. *
+. * The pedagogical point: LASSO methods (PSL, DL rigorous) land
+. * between the no-controls baseline and the kitchen-sink OLS — and
+. * you can SEE this only if each outcome panel has its own x-axis.
+. *
+. * Stata idiom: 3 independent `twoway` graphs (one per outcome),
+. * then `graph combine` into a 1x3 strip. Each per-outcome graph
+. * has 10 layers (5 methods x 2 plot types: rspike + scatter).
+. 
+. *-- 1a. IMPORT --------------------------------------------------
 . import delimited "results_table2.csv", clear varnames(1) case(preserve)
 (encoding automatically selected: ISO-8859-1)
 (7 vars, 15 obs)
 
+. 
+. *-- 1b. WRANGLE -------------------------------------------------
+. * Encode outcome and method as small numeric codes so we can
+. * select them with `if oid==`o' & method_id==`m'` and have a
+. * stable color mapping across panels.
+. 
 . gen byte oid = .
 (15 missing values generated)
 
@@ -40,6 +91,10 @@
 . qui replace oid = 2 if outcome == "Property crime"
 
 . qui replace oid = 3 if outcome == "Murder"
+
+. label define olab 1 "Violent crime" 2 "Property crime" 3 "Murder"
+
+. label values oid olab
 
 . 
 . gen byte method_id = .
@@ -56,60 +111,121 @@
 . qui replace method_id = 5 if method == "DL (CV)"
 
 . 
-. * Plot positions: invert so "First diff" is at top.
+. * Y-axis trick: we want "First diff" (id=1) at the TOP of each
+. * panel and "DL (CV)" (id=5) at the BOTTOM. twoway plots increase
+. * y upward by default, so invert the ordinal:
+. *       y = 6 - method_id   ->   First diff at y=5, DL (CV) at y=1
+. * The ylabel() statement below then re-labels y=1..5 in the
+. * desired top-to-bottom reading order.
 . gen byte y = 6 - method_id
 
 . 
-. label define olab 1 "Violent crime" 2 "Property crime" 3 "Murder"
-
-. label values oid olab
+. *-- 1c. PER-OUTCOME LOOP ----------------------------------------
+. * Build one twoway per outcome. The `if oid==`o'` clause on every
+. * layer restricts the panel to its own data so the x-axis range
+. * auto-fits that panel only (the "free x" behavior we want).
+. 
+. forvalues o = 1/3 {
+  2.     local oname : label olab `o'   // e.g. "Violent crime"
+  3. 
+.     twoway ///
+>         (rspike ci_lo ci_hi y if oid==`o' & method_id==1, ///
+>             horizontal lcolor("$C_STEEL") lwidth(medthick)) ///
+>         (scatter y estimate if oid==`o' & method_id==1, ///
+>             mcolor("$C_STEEL") msymbol(O) msize(medlarge)) ///
+>         (rspike ci_lo ci_hi y if oid==`o' & method_id==2, ///
+>             horizontal lcolor("$C_TEXTM") lwidth(medthick)) ///
+>         (scatter y estimate if oid==`o' & method_id==2, ///
+>             mcolor("$C_TEXTM") msymbol(O) msize(medlarge)) ///
+>         (rspike ci_lo ci_hi y if oid==`o' & method_id==3, ///
+>             horizontal lcolor("$C_ORG") lwidth(medthick)) ///
+>         (scatter y estimate if oid==`o' & method_id==3, ///
+>             mcolor("$C_ORG") msymbol(O) msize(medlarge)) ///
+>         (rspike ci_lo ci_hi y if oid==`o' & method_id==4, ///
+>             horizontal lcolor("$C_TEAL") lwidth(medthick)) ///
+>         (scatter y estimate if oid==`o' & method_id==4, ///
+>             mcolor("$C_TEAL") msymbol(O) msize(medlarge)) ///
+>         (rspike ci_lo ci_hi y if oid==`o' & method_id==5, ///
+>             horizontal lcolor("$C_LTORG") lwidth(medthick)) ///
+>         (scatter y estimate if oid==`o' & method_id==5, ///
+>             mcolor("$C_LTORG") msymbol(O) msize(medlarge)) ///
+>         , ///
+>         title("`oname'", color("$C_TXTHI") size(medsmall)) ///
+>         ylabel(1 "DL (CV)" 2 "DL (rigorous)" 3 "PSL" 4 "OLS (full)" 5 "First 
+> diff", ///
+>                labcolor("$C_TEXT") angle(0) noticks nogrid) ///
+>         xlabel(, labcolor("$C_TEXT")) ///
+>         ytitle("") xtitle("") ///
+>         xline(0, lpattern(dash) lcolor("$C_TEXT")) ///
+>         legend(off) ${DARKBG} ///
+>         name(fig_o`o', replace)
+  4. }
 
 . 
-. twoway ///
->     (rspike ci_lo ci_hi y if method_id==1, horizontal lcolor("$C_STEEL") lwidth(medthick)) ///
->     (scatter y estimate if method_id==1, mcolor("$C_STEEL") msymbol(O) msize(medlarge)) ///
->     (rspike ci_lo ci_hi y if method_id==2, horizontal lcolor("$C_TEXT") lwidth(medthick)) ///
->     (scatter y estimate if method_id==2, mcolor("$C_TEXT") msymbol(O) msize(medlarge)) ///
->     (rspike ci_lo ci_hi y if method_id==3, horizontal lcolor("$C_ORG") lwidth(medthick)) ///
->     (scatter y estimate if method_id==3, mcolor("$C_ORG") msymbol(O) msize(medlarge)) ///
->     (rspike ci_lo ci_hi y if method_id==4, horizontal lcolor("$C_TEAL") lwidth(medthick)) ///
->     (scatter y estimate if method_id==4, mcolor("$C_TEAL") msymbol(O) msize(medlarge)) ///
->     (rspike ci_lo ci_hi y if method_id==5, horizontal lcolor("$C_LTORG") lwidth(medthick)) ///
->     (scatter y estimate if method_id==5, mcolor("$C_LTORG") msymbol(O) msize(medlarge)) ///
->     , by(oid, cols(3) ///
->           title("Treatment-effect estimates: abortion -> crime, 1985-1997", color("$C_TXTHI") 
-> size(medsmall)) ///
->           subtitle("Each panel: 95% CIs from state-clustered SEs.", color("$C_TEXT") size(smal
-> l)) ///
->           note("Replication of Table 2 in Fitzgerald et al. (2026). Dashed line at zero.", col
-> or("$C_TEXT") size(vsmall)) ///
->           legend(off) ${DARKBG}) ///
->     subtitle(, fcolor("$C_BG") lcolor("$C_BG") size(small) color("$C_TXTHI")) ///
->     ylabel(1 "DL (CV)" 2 "DL (rigorous)" 3 "PSL" 4 "OLS (full)" 5 "First diff", ///
->            labcolor("$C_TEXT") angle(0) noticks nogrid) ///
->     xlabel(, labcolor("$C_TEXT")) ///
->     xtitle("alpha hat (effect of effective abortion rate)", color("$C_TEXT") size(small)) ///
->     ytitle("") ///
->     xline(0, lpattern(dash) lcolor("$C_TEXT")) ///
->     ${DARKBG} ///
+. *-- 1d. COMBINE + 1e. EXPORT ------------------------------------
+. graph combine fig_o1 fig_o2 fig_o3, cols(3) ///
+>     title("Treatment-effect estimates: abortion -> crime, 1985-1997", ///
+>           color("$C_TXTHI") size(medsmall)) ///
+>     subtitle("Each panel is a different crime outcome; bars are 95% CIs from 
+> state-clustered SEs.", ///
+>              color("$C_TEXT") size(small)) ///
+>     b1title("alpha hat (effect of effective abortion rate)", ///
+>             color("$C_TEXT") size(small)) ///
+>     note("Replication of Table 2 in Fitzgerald et al. (2026). Dashed line at 
+> zero. Per-panel x-axis.", ///
+>          color("$C_TEXT") size(vsmall)) ///
+>     imargin(small) ${DARKBG} ///
 >     name(fig_forest, replace)
 
 . 
-. graph export "stata_double_lasso_estimates.png", replace width(2400) height(1100)
-file
-    /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/stata_double_lasso
-    > /stata_double_lasso_estimates.png saved as PNG format
+. graph export "stata_double_lasso_estimates.png", replace width(`WIDE') height
+> (`TALL')
+file stata_double_lasso_estimates.png written in PNG format
 
-. di "Wrote stata_double_lasso_estimates.png"
-Wrote stata_double_lasso_estimates.png
+. di "Wrote stata_double_lasso_estimates.png  (`WIDE' x `TALL')"
+Wrote stata_double_lasso_estimates.png  (3300 x 1350)
 
 . 
 . 
-. * === Figure 2: selection-count bar chart ===
+. 
+. *===============================================================*
+. * FIGURE 2 — Variable-selection bar chart                       *
+. *===============================================================*
+. *
+. * For each outcome panel, four metrics on the x-axis:
+. *   |I_y|   selected in the y-equation LASSO
+. *   |I_d|   selected in the d-equation LASSO
+. *   Inter.  intersection (= |I_y \cap I_d|)
+. *   Union   union (the actual post-OLS support, |I_y U I_d|)
+. * Each metric is split into TWO bars (rigorous = teal, CV = orange).
+. * Mirrors R's faceted bar chart exactly.
+. *
+. * Why inclusion-exclusion?
+. *   The persisted selection_diagnostic.csv has |I_y|, |I_d|, and
+. *   |I_y U I_d| but NOT |I_y \cap I_d|. Rather than re-run the
+. *   10-minute analysis.do to add a column, we derive intersection
+. *   from the identity:
+. *           |A \cap B|  =  |A| + |B| - |A U B|
+. *   The math is exact (this is a set-counting identity, not an
+. *   approximation), and figures.do stays a pure presentation file.
+. *
+. * Stata idiom: 3 independent `graph bar`s (one per outcome) +
+. * `graph combine`. Within each bar chart we use the nested
+. * over(method) over(metric) pattern with `asyvars`, which tells
+. * graph bar to treat the inner over-group as separate y-series
+. * (so the two methods get distinct colors instead of identical bars).
+. 
+. *-- 2a. IMPORT --------------------------------------------------
 . import delimited "selection_diagnostic.csv", clear varnames(1) case(preserve)
 (encoding automatically selected: ISO-8859-1)
 (5 vars, 6 obs)
 
+. 
+. *-- 2b. WRANGLE -------------------------------------------------
+. gen long n_int = n_Iy + n_Id - n_union   // inclusion-exclusion: |I_y \cap I_
+> d|
+
+. 
 . gen byte oid = .
 (6 missing values generated)
 
@@ -119,6 +235,11 @@ Wrote stata_double_lasso_estimates.png
 
 . qui replace oid = 3 if outcome == "Murder"
 
+. label define olab 1 "Violent crime" 2 "Property crime" 3 "Murder", replace
+
+. label values oid olab
+
+. 
 . gen byte mid = .
 (6 missing values generated)
 
@@ -126,90 +247,120 @@ Wrote stata_double_lasso_estimates.png
 
 . qui replace mid = 2 if method == "DL (CV)"
 
-. label define olab 1 "Violent crime" 2 "Property crime" 3 "Murder"
+. label define mthlab 1 "DL (rigorous)" 2 "DL (CV)", replace
 
-. label values oid olab
-
-. 
-. * Reshape long: each row gets two metric values (n_Iy and n_Id).
-. preserve
-
-. keep oid mid n_Iy
-
-. rename n_Iy count
-
-. gen byte metric = 1
-
-. tempfile t_iy
-
-. save "`t_iy'"
-file /var/folders/tq/t98kb27n6djgrh085g476yhc0000gn/T//S_35719.000002 saved as .dta format
-
-. restore
-
-. preserve
-
-. keep oid mid n_Id
-
-. rename n_Id count
-
-. gen byte metric = 2
-
-. tempfile t_id
-
-. save "`t_id'"
-file /var/folders/tq/t98kb27n6djgrh085g476yhc0000gn/T//S_35719.000004 saved as .dta format
-
-. restore
+. label values mid mthlab
 
 . 
-. use "`t_iy'", clear
+. * Reshape long: each (outcome, method) row currently has 4 metric
+. * columns. After reshape, we get 4 rows per (outcome, method), one
+. * per metric. This is the shape `graph bar` needs for nested over().
+. keep oid mid n_Iy n_Id n_int n_union
 
-. append using "`t_id'"
-(label olab already defined)
+. reshape long n_, i(oid mid) j(metric_str) string
+(j = Id Iy int union)
 
-. label define mtlab 1 "|I_y|" 2 "|I_d|"
+Data                               Wide   ->   Long
+-----------------------------------------------------------------------------
+Number of observations                6   ->   24          
+Number of variables                   6   ->   4           
+j variable (4 values)                     ->   metric_str
+xij variables:
+                  n_Id n_Iy ... n_union   ->   n_
+-----------------------------------------------------------------------------
+
+. rename n_ count
+
+. 
+. gen byte metric = .
+(24 missing values generated)
+
+. qui replace metric = 1 if metric_str == "Iy"
+
+. qui replace metric = 2 if metric_str == "Id"
+
+. qui replace metric = 3 if metric_str == "int"
+
+. qui replace metric = 4 if metric_str == "union"
+
+. label define mtlab 1 "|I_y|" 2 "|I_d|" 3 "Intersection" 4 "Union", replace
 
 . label values metric mtlab
 
-. 
-. * 4 grouped bars per outcome panel: rigorous-Iy, CV-Iy, rigorous-Id, CV-Id.
-. gen byte bar_id = (metric - 1) * 2 + mid
-
-. label define blab 1 "|Iy| rig" 2 "|Iy| CV" 3 "|Id| rig" 4 "|Id| CV"
-
-. label values bar_id blab
+. drop metric_str
 
 . 
-. graph bar count, over(bar_id, label(angle(35) labcolor("$C_TEXT") labsize(small))) ///
->     over(oid, label(labcolor("$C_TXTHI"))) asyvars ///
->     bar(1, fcolor("$C_TEAL")  lcolor("$C_TEAL")) ///
->     bar(2, fcolor("$C_LTORG") lcolor("$C_LTORG")) ///
->     bar(3, fcolor("$C_TEAL")  lcolor("$C_TEAL")) ///
->     bar(4, fcolor("$C_LTORG") lcolor("$C_LTORG")) ///
->     blabel(bar, color("$C_TXTHI") size(small) format(%5.0f)) ///
->     title("Variable selection: rigorous vs. CV penalty", color("$C_TXTHI") size(medsmall)) ///
->     subtitle("Out of 284 candidate controls per outcome.", color("$C_TEXT") size(small)) ///
->     note("Teal = rigorous penalty (rlasso). Orange = CV penalty (cvlasso); collapsed to 0 here
-> , see post Section 10.", ///
+. *-- 2c. PER-OUTCOME LOOP ----------------------------------------
+. forvalues o = 1/3 {
+  2.     local oname : label olab `o'
+  3. 
+.     * `asyvars` is the key option here: with over(mid) inside
+.     * over(metric), Stata would by default draw 8 identically-
+.     * colored bars. asyvars instead treats `mid` as separate
+.     * y-series, giving each method its own color (bar(1) = teal
+.     * = rigorous, bar(2) = orange = CV).
+.     *
+.     * ylabel(0(5)20) is forced shared across all three panels so
+.     * the bar heights are visually comparable (max rigorous count
+.     * across outcomes is 17 — Property Union — so 20 is a safe cap).
+.     graph bar count if oid==`o', ///
+>         over(mid, gap(20) label(labcolor("$C_TEXT") labsize(small))) ///
+>         over(metric, gap(70) label(angle(20) labcolor("$C_TXTHI") labsize(sma
+> ll))) ///
+>         asyvars ///
+>         bar(1, fcolor("$C_TEAL")  lcolor("$C_TEAL")) ///
+>         bar(2, fcolor("$C_LTORG") lcolor("$C_LTORG")) ///
+>         blabel(bar, color("$C_TXTHI") size(small) format(%5.0f)) ///
+>         title("`oname'", color("$C_TXTHI") size(medsmall)) ///
+>         ytitle("") ///
+>         ylabel(0(5)20, labcolor("$C_TEXT")) ///
+>         legend(off) ${DARKBG} ///
+>         name(fig_sel`o', replace)
+  4. }
+
+. 
+. *-- 2d. COMBINE + 2e. EXPORT ------------------------------------
+. graph combine fig_sel1 fig_sel2 fig_sel3, cols(3) ///
+>     title("Variable selection across the two Double LASSO penalties", ///
+>           color("$C_TXTHI") size(medsmall)) ///
+>     subtitle("Rigorous penalty (Belloni et al. 2012) vs. 3-fold CV (lambda.mi
+> n) — out of 284 candidate controls.", ///
+>              color("$C_TEXT") size(small)) ///
+>     l1title("Number of controls", color("$C_TEXT") size(small)) ///
+>     note("Teal = DL (rigorous). Orange = DL (CV)." ///
+>          "DL-CV bars are 0 because Stata's cvlasso was run with lcount(10) fo
+> r runtime — see post §11.", ///
 >          color("$C_TEXT") size(vsmall)) ///
->     ytitle("Number of controls", color("$C_TEXT") size(small)) ///
->     ylabel(, labcolor("$C_TEXT")) ///
->     legend(off) ${DARKBG} ///
+>     imargin(small) ${DARKBG} ///
 >     name(fig_select, replace)
 
 . 
-. graph export "stata_double_lasso_selection.png", replace width(2400) height(1100)
-file
-    /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/stata_double_lasso
-    > /stata_double_lasso_selection.png saved as PNG format
+. graph export "stata_double_lasso_selection.png", replace width(`WIDE') height
+> (`TALL_SEL')
+file stata_double_lasso_selection.png written in PNG format
 
-. di "Wrote stata_double_lasso_selection.png"
-Wrote stata_double_lasso_selection.png
+. di "Wrote stata_double_lasso_selection.png  (`WIDE' x `TALL_SEL')"
+Wrote stata_double_lasso_selection.png  (3300 x 1560)
 
 . 
 . 
-. * === Figure 4: rigorous vs CV side-by-side ===
+. 
+. *===============================================================*
+. * FIGURE 3 — Rigorous vs CV side-by-side, with numeric labels   *
+. *===============================================================*
+. *
+. * Zooms in on the two Double LASSO flavours. Same 3-panel layout
+. * and same per-panel free axis. We annotate each point with its
+. * numeric alpha-hat estimate (formatted as "+0.019" / "-0.155")
+. * so the reader can read off the numbers without consulting the
+. * table.
+. *
+. * Stata idiom: scatter's `mlabel(varname)` pulls the marker label
+. * from a string variable; `mlabposition(12)` places the label at
+. * clock-face position 12 (north of the point); `mlabgap(*1.4)`
+. * lifts it a touch further so the CI cap doesn't run into the text.
+. 
+. *-- 3a. IMPORT --------------------------------------------------
 . import delimited "results_table2.csv", clear varnames(1) case(preserve)
 (encoding automatically selected: ISO-8859-1)
 (7 vars, 15 obs)
@@ -217,6 +368,8 @@ Wrote stata_double_lasso_selection.png
 . keep if method == "DL (rigorous)" | method == "DL (CV)"
 (9 observations deleted)
 
+. 
+. *-- 3b. WRANGLE -------------------------------------------------
 . gen byte oid = .
 (6 missing values generated)
 
@@ -226,6 +379,11 @@ Wrote stata_double_lasso_selection.png
 
 . qui replace oid = 3 if outcome == "Murder"
 
+. label define olab 1 "Violent crime" 2 "Property crime" 3 "Murder", replace
+
+. label values oid olab
+
+. 
 . gen byte mid = .
 (6 missing values generated)
 
@@ -233,51 +391,84 @@ Wrote stata_double_lasso_selection.png
 
 . qui replace mid = 2 if method == "DL (CV)"
 
-. label define olab 1 "Violent crime" 2 "Property crime" 3 "Murder"
+. 
+. * Pre-format the point-label string. Unlike C's printf, Stata's
+. * `string(x, "%fmt")` does NOT support the `+` flag, so we build
+. * the leading sign by hand: negative numbers already carry "-",
+. * positives get an explicit "+" prepended. The sign matters here
+. * because DL-CV flips sign on violent crime in the R companion.
+. gen str20 estfmt = string(estimate, "%5.3f")
 
-. label values oid olab
+. qui replace estfmt = "+" + estfmt if estimate > 0
 
 . 
-. twoway ///
->     (rspike ci_lo ci_hi mid if mid==1, lcolor("$C_TEAL") lwidth(medthick)) ///
->     (rspike ci_lo ci_hi mid if mid==2, lcolor("$C_LTORG") lwidth(medthick)) ///
->     (scatter estimate mid if mid==1, mcolor("$C_TEAL") msymbol(O) msize(large)) ///
->     (scatter estimate mid if mid==2, mcolor("$C_LTORG") msymbol(O) msize(large)) ///
->     , by(oid, cols(3) ///
->           title("Rigorous vs cross-validated penalty: two flavours of Double LASSO", ///
->                 color("$C_TXTHI") size(medsmall)) ///
->           subtitle("Same 3-step structure; they differ only in how lambda is chosen.", ///
->                    color("$C_TEXT") size(small)) ///
->           note("Bars: 95% CIs from state-clustered SEs. Dashed line at zero.", ///
->                color("$C_TEXT") size(vsmall)) ///
->           legend(off) ${DARKBG}) ///
->     subtitle(, fcolor("$C_BG") lcolor("$C_BG") size(small) color("$C_TXTHI")) ///
->     xlabel(1 "rigorous" 2 "CV", noticks labcolor("$C_TEXT")) ///
->     ylabel(, labcolor("$C_TEXT")) ///
->     yline(0, lpattern(dash) lcolor("$C_TEXT")) ///
->     xtitle("Penalty rule", color("$C_TEXT") size(small)) ///
->     ytitle("alpha hat", color("$C_TEXT") size(small)) ///
->     ${DARKBG} ///
+. *-- 3c. PER-OUTCOME LOOP ----------------------------------------
+. forvalues o = 1/3 {
+  2.     local oname : label olab `o'
+  3. 
+.     twoway ///
+>         (rspike ci_lo ci_hi mid if oid==`o' & mid==1, ///
+>             lcolor("$C_TEAL") lwidth(medthick)) ///
+>         (rspike ci_lo ci_hi mid if oid==`o' & mid==2, ///
+>             lcolor("$C_LTORG") lwidth(medthick)) ///
+>         (scatter estimate mid if oid==`o' & mid==1, ///
+>             mcolor("$C_TEAL") msymbol(O) msize(large) ///
+>             mlabel(estfmt) mlabcolor("$C_TXTHI") mlabsize(medsmall) ///
+>             mlabposition(3) mlabgap(*1.2)) ///
+>         (scatter estimate mid if oid==`o' & mid==2, ///
+>             mcolor("$C_LTORG") msymbol(O) msize(large) ///
+>             mlabel(estfmt) mlabcolor("$C_TXTHI") mlabsize(medsmall) ///
+>             mlabposition(3) mlabgap(*1.2)) ///
+>         , ///
+>         title("`oname'", color("$C_TXTHI") size(medsmall)) ///
+>         xlabel(1 "DL (rigorous)" 2 "DL (CV)", noticks labcolor("$C_TEXT")) //
+> /
+>         xscale(range(0.5 2.5)) ///   /* pad x-axis so points don't sit on the
+>  edge */
+>         ylabel(, labcolor("$C_TEXT") nogrid) ///
+>         yline(0, lpattern(dash) lcolor("$C_TEXT")) ///
+>         ytitle("") xtitle("") ///
+>         legend(off) ${DARKBG} ///
+>         name(fig_cmp`o', replace)
+  4. }
+
+. 
+. *-- 3d. COMBINE + 3e. EXPORT ------------------------------------
+. graph combine fig_cmp1 fig_cmp2 fig_cmp3, cols(3) ///
+>     title("Rigorous vs cross-validated penalty: two flavours of Double LASSO"
+> , ///
+>           color("$C_TXTHI") size(medsmall)) ///
+>     subtitle("Both procedures share the same three-step structure; they diffe
+> r only in how lambda is chosen.", ///
+>              color("$C_TEXT") size(small)) ///
+>     l1title("alpha hat +/- 1.96 * SE", color("$C_TEXT") size(small)) ///
+>     note("Bars: 95% CIs from state-clustered SEs. Dashed line at zero." ///
+>          "Stata's DL-CV at lcount(10) collapses to the no-controls baseline; 
+> the R companion shows CV's true over-selection behavior.", ///
+>          color("$C_TEXT") size(vsmall)) ///
+>     imargin(small) ${DARKBG} ///
 >     name(fig_compare, replace)
 
 . 
-. graph export "stata_double_lasso_methods_compare.png", replace width(2400) height(1100)
-file
-    /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/stata_double_lasso
-    > /stata_double_lasso_methods_compare.png saved as PNG format
+. graph export "stata_double_lasso_methods_compare.png", replace width(`WIDE') 
+> height(`TALL')
+file stata_double_lasso_methods_compare.png written in PNG format
 
-. di "Wrote stata_double_lasso_methods_compare.png"
-Wrote stata_double_lasso_methods_compare.png
+. di "Wrote stata_double_lasso_methods_compare.png  (`WIDE' x `TALL')"
+Wrote stata_double_lasso_methods_compare.png  (3300 x 1350)
 
 . 
 . di _n "=== All 3 figures regenerated ==="
 
 === All 3 figures regenerated ===
 
-. log close
+. 
+. * Only close the log if we opened it ourselves (standalone mode).
+. if `_opened_local_log' {
+.     log close
       name:  <unnamed>
-       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/stata_doubl
-> e_lasso/figures.log
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content
+> /post/stata_double_lasso/figures.log
   log type:  text
- closed on:  25 May 2026, 08:29:55
-------------------------------------------------------------------------------------------------
+ closed on:  25 May 2026, 11:37:08
+-------------------------------------------------------------------------------

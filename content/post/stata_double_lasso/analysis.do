@@ -543,231 +543,26 @@ di "Wrote selection_diagnostic.csv"
 restore
 
 
-* ── 10. Figures (4 dark-theme PNGs) ──────────────────────────────
+* ── 10. Figures ──────────────────────────────────────────────────
+*
+* Figure construction is delegated to the companion file figures.do,
+* which reads the two CSVs we just wrote (results_table2.csv and
+* selection_diagnostic.csv) and rebuilds all three PNGs in seconds.
+*
+* Keeping the plotting logic in one file gives us a single source of
+* truth: a styling tweak only needs to be made in figures.do (no need
+* to re-run the full ~10-minute LASSO pipeline).
+*
+* The three outputs are:
+*   stata_double_lasso_estimates.png       (forest plot, 3 panels)
+*   stata_double_lasso_selection.png       (selection bars, 4 metrics x 2 methods)
+*   stata_double_lasso_methods_compare.png (rigorous vs CV with point labels)
 
 di _n(2) "========================================"
-di "STEP 10 - FIGURES"
+di "STEP 10 - FIGURES (delegated to figures.do)"
 di "========================================"
 
-* For figures we work in a small auxiliary dataset.
-preserve
-clear
-set obs 15
-gen byte   outcome_id = ceil(_n/5)   // 1..3
-gen byte   method_id  = mod(_n-1,5)+1 // 1..5
-
-label define olab 1 "Violent crime" 2 "Property crime" 3 "Murder"
-label values outcome_id olab
-label define mlab 1 "First diff" 2 "OLS (full)" 3 "PSL" 4 "DL (rigorous)" 5 "DL (CV)"
-label values method_id mlab
-
-gen double estimate = .
-gen double std_error = .
-
-* Fill in from the saved matrices.
-forvalues i = 1/15 {
-    local oi = ceil(`i'/5)
-    local mi = mod(`i'-1,5)+1
-    if `mi' == 1 {
-        qui replace estimate  = `FD_b'[`oi',1]  in `i'
-        qui replace std_error = `FD_se'[`oi',1] in `i'
-    }
-    if `mi' == 2 {
-        qui replace estimate  = `OLS_b'[`oi',1]  in `i'
-        qui replace std_error = `OLS_se'[`oi',1] in `i'
-    }
-    if `mi' == 3 {
-        qui replace estimate  = `PSL_b'[`oi',1]  in `i'
-        qui replace std_error = `PSL_se'[`oi',1] in `i'
-    }
-    if `mi' == 4 {
-        qui replace estimate  = `DLR_b'[`oi',1]  in `i'
-        qui replace std_error = `DLR_se'[`oi',1] in `i'
-    }
-    if `mi' == 5 {
-        qui replace estimate  = `DLC_b'[`oi',1]  in `i'
-        qui replace std_error = `DLC_se'[`oi',1] in `i'
-    }
-}
-gen double ci_lo = estimate - 1.96*std_error
-gen double ci_hi = estimate + 1.96*std_error
-
-* Plot positions: invert so "First diff" is at top.
-gen byte y = 6 - method_id
-
-* === Figure 1: forest plot of all five estimates ===
-twoway ///
-    (rspike ci_lo ci_hi y if method_id==1, horizontal lcolor("$C_STEEL") lwidth(medthick)) ///
-    (scatter y estimate if method_id==1, mcolor("$C_STEEL") msymbol(O) msize(medlarge)) ///
-    (rspike ci_lo ci_hi y if method_id==2, horizontal lcolor("$C_TEXT") lwidth(medthick)) ///
-    (scatter y estimate if method_id==2, mcolor("$C_TEXT") msymbol(O) msize(medlarge)) ///
-    (rspike ci_lo ci_hi y if method_id==3, horizontal lcolor("$C_ORG") lwidth(medthick)) ///
-    (scatter y estimate if method_id==3, mcolor("$C_ORG") msymbol(O) msize(medlarge)) ///
-    (rspike ci_lo ci_hi y if method_id==4, horizontal lcolor("$C_TEAL") lwidth(medthick)) ///
-    (scatter y estimate if method_id==4, mcolor("$C_TEAL") msymbol(O) msize(medlarge)) ///
-    (rspike ci_lo ci_hi y if method_id==5, horizontal lcolor("$C_LTORG") lwidth(medthick)) ///
-    (scatter y estimate if method_id==5, mcolor("$C_LTORG") msymbol(O) msize(medlarge)) ///
-    , by(outcome_id, cols(3) ///
-          title("Treatment-effect estimates: abortion -> crime, 1985-1997", color("$C_TXTHI") size(medsmall)) ///
-          subtitle("Each panel: 95% CIs from state-clustered SEs.", color("$C_TEXT") size(small)) ///
-          note("Replication of Table 2 in Fitzgerald et al. (2026). Dashed line at zero." , color("$C_TEXT") size(vsmall)) ///
-          graphregion(fcolor("$C_BG") lcolor("$C_BG")) ///
-          plotregion(fcolor("$C_BG") lcolor("$C_BG")) ///
-          ${DARKBG} legend(off) ///
-          imargin(small)) ///
-    subtitle(, fcolor("$C_BG") lcolor("$C_BG") size(small) color("$C_TXTHI")) ///
-    ylabel(1 "DL (CV)" 2 "DL (rigorous)" 3 "PSL" 4 "OLS (full)" 5 "First diff", ///
-           labcolor("$C_TEXT") angle(0) noticks nogrid) ///
-    xlabel(, labcolor("$C_TEXT")) ///
-    xtitle("alpha hat (effect of effective abortion rate)", color("$C_TEXT") size(small)) ///
-    ytitle("") ///
-    xline(0, lpattern(dash) lcolor("$C_TEXT")) ///
-    ${DARKBG} ///
-    name(fig_forest, replace)
-
-graph export "stata_double_lasso_estimates.png", replace width(2400) height(1100)
-di "Wrote stata_double_lasso_estimates.png"
-restore
-
-
-* === Figure 2: selection-count bar chart ===
-preserve
-clear
-set obs 12
-* 3 outcomes x 2 methods (rig, CV) x 2 metrics (Iy, Id) = 12 rows.
-gen byte outcome_id = ceil(_n/4)
-gen byte block = mod(_n-1,4) + 1  // 1=rig Iy, 2=rig Id, 3=cv Iy, 4=cv Id
-label define olab 1 "Violent crime" 2 "Property crime" 3 "Murder"
-label values outcome_id olab
-
-gen str20 metric = ""
-gen str14 mtype  = ""
-gen long  count  = .
-forvalues i = 1/12 {
-    local oi = ceil(`i'/4)
-    local bl = mod(`i'-1,4) + 1
-    if `bl' == 1 {
-        qui replace metric = "|I_y|" in `i'
-        qui replace mtype  = "DL (rigorous)" in `i'
-        qui replace count  = `DLR_Iy'[`oi',1] in `i'
-    }
-    if `bl' == 2 {
-        qui replace metric = "|I_d|" in `i'
-        qui replace mtype  = "DL (rigorous)" in `i'
-        qui replace count  = `DLR_Id'[`oi',1] in `i'
-    }
-    if `bl' == 3 {
-        qui replace metric = "|I_y|" in `i'
-        qui replace mtype  = "DL (CV)" in `i'
-        qui replace count  = `DLC_Iy'[`oi',1] in `i'
-    }
-    if `bl' == 4 {
-        qui replace metric = "|I_d|" in `i'
-        qui replace mtype  = "DL (CV)" in `i'
-        qui replace count  = `DLC_Id'[`oi',1] in `i'
-    }
-}
-
-* x positions: 1,2,5,6,9,10 etc. - grouped by metric, dodged by method.
-gen double xpos = .
-* rigorous Iy at x=1, CV Iy at x=2; rigorous Id at x=4, CV Id at x=5.
-qui replace xpos = 1 if metric == "|I_y|" & mtype == "DL (rigorous)"
-qui replace xpos = 2 if metric == "|I_y|" & mtype == "DL (CV)"
-qui replace xpos = 4 if metric == "|I_d|" & mtype == "DL (rigorous)"
-qui replace xpos = 5 if metric == "|I_d|" & mtype == "DL (CV)"
-
-capture noisily {
-twoway ///
-    (bar count xpos if mtype == "DL (rigorous)", barwidth(0.85) fcolor("$C_TEAL") lcolor("$C_TEAL")) ///
-    (bar count xpos if mtype == "DL (CV)",        barwidth(0.85) fcolor("$C_LTORG") lcolor("$C_LTORG")) ///
-    (scatter count xpos, mcolor("$C_TXTHI") msymbol(none) mlabel(count) mlabcolor("$C_TXTHI") mlabsize(small) mlabposition(12)) ///
-    , by(outcome_id, cols(3) ///
-          title("Variable selection: rigorous vs CV penalty", color("$C_TXTHI") size(medsmall)) ///
-          subtitle("Out of 284 candidate controls per outcome.", color("$C_TEXT") size(small)) ///
-          note("|I_y| = controls selected when LASSOing y on X; |I_d| = controls selected when LASSOing d on X.", color("$C_TEXT") size(vsmall)) ///
-          legend(off) ///
-          ${DARKBG}) ///
-    subtitle(, fcolor("$C_BG") lcolor("$C_BG") size(small) color("$C_TXTHI")) ///
-    xlabel(1.5 "|I_y|" 4.5 "|I_d|", noticks labcolor("$C_TEXT")) ///
-    ylabel(, labcolor("$C_TEXT")) ///
-    xtitle("Selection step", color("$C_TEXT") size(small)) ytitle("Number of controls", color("$C_TEXT") size(small)) ///
-    ${DARKBG} ///
-    name(fig_select, replace)
-
-graph export "stata_double_lasso_selection.png", replace width(2400) height(1100)
-di "Wrote stata_double_lasso_selection.png"
-}
-if _rc {
-    di as error "Figure 2 (selection bars) failed; continuing with remaining figures."
-}
-restore
-
-
-* === Figure 3 (LASSO coefficient paths) — omitted from the Stata post.
-*    Stata's twoway does not overlay 284 lines as cleanly as ggplot2;
-*    the rendering time is prohibitive and the result is visually busy.
-*    Readers wanting the path visualisation should consult the R post.
-
-
-* === Figure 4: rigorous vs CV side-by-side ===
-preserve
-clear
-set obs 6
-gen byte outcome_id = ceil(_n/2)
-gen byte method_id  = mod(_n-1,2) + 1   // 1 = rigorous, 2 = CV
-label define olab 1 "Violent crime" 2 "Property crime" 3 "Murder"
-label values outcome_id olab
-
-gen double estimate  = .
-gen double std_error = .
-forvalues i = 1/6 {
-    local oi = ceil(`i'/2)
-    local mi = mod(`i'-1,2)+1
-    if `mi' == 1 {
-        qui replace estimate  = `DLR_b'[`oi',1]  in `i'
-        qui replace std_error = `DLR_se'[`oi',1] in `i'
-    }
-    else {
-        qui replace estimate  = `DLC_b'[`oi',1]  in `i'
-        qui replace std_error = `DLC_se'[`oi',1] in `i'
-    }
-}
-gen double ci_lo = estimate - 1.96*std_error
-gen double ci_hi = estimate + 1.96*std_error
-
-capture noisily {
-twoway ///
-    (rspike ci_lo ci_hi method_id if method_id==1, lcolor("$C_TEAL") lwidth(medthick)) ///
-    (rspike ci_lo ci_hi method_id if method_id==2, lcolor("$C_LTORG") lwidth(medthick)) ///
-    (scatter estimate method_id if method_id==1, mcolor("$C_TEAL") msymbol(O) msize(large)) ///
-    (scatter estimate method_id if method_id==2, mcolor("$C_LTORG") msymbol(O) msize(large)) ///
-    , by(outcome_id, cols(3) ///
-          title("Rigorous vs cross-validated penalty: two flavours of Double LASSO", color("$C_TXTHI") size(medsmall)) ///
-          subtitle("Same 3-step structure (LASSO y, LASSO d, post-OLS) - they differ only in how lambda is chosen.", color("$C_TEXT") size(small)) ///
-          note("Bars: 95% CIs from state-clustered SEs. Dashed line at zero.", color("$C_TEXT") size(vsmall)) ///
-          legend(off) ///
-          ${DARKBG}) ///
-    subtitle(, fcolor("$C_BG") lcolor("$C_BG") size(small) color("$C_TXTHI")) ///
-    xlabel(1 "rigorous" 2 "CV", noticks labcolor("$C_TEXT")) ///
-    ylabel(, labcolor("$C_TEXT")) ///
-    yline(0, lpattern(dash) lcolor("$C_TEXT")) ///
-    xtitle("Penalty rule", color("$C_TEXT") size(small)) ///
-    ytitle("alpha hat +/- 1.96 SE", color("$C_TEXT") size(small)) ///
-    ${DARKBG} ///
-    name(fig_compare, replace)
-
-graph export "stata_double_lasso_methods_compare.png", replace width(2400) height(1100)
-di "Wrote stata_double_lasso_methods_compare.png"
-}
-if _rc {
-    di as error "Figure 4 (rigorous vs CV compare) failed; continuing."
-}
-restore
-
-
-* Also wrap figure 1 in a capture so a failure does not abort the script.
-* (Figure 1 is generated above, before figures 2 and 4. The capture wrappers
-*  on 2 and 4 isolate the failure-prone twoway by() options.)
+do figures.do
 
 
 * ── 11. Summary ──────────────────────────────────────────────────
