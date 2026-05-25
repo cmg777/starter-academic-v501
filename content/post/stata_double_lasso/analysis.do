@@ -788,7 +788,26 @@ di "DL helps most when the TREATMENT is highly predictable from the"
 di "controls but the OUTCOME is not. That is the case here: the"
 di "effective abortion rate is well explained by lagged demographics"
 di "and within-state trends, while crime is much noisier."
-di ""
-di "=== Script completed successfully ==="
+
+
+* ── 12. pdslasso one-line demo (three-estimator output) ──────────
+
+* The explicit DL-rigorous recipe in Step 7 corresponds to the PDS
+* (post-double-selection) column that pdslasso reports. But pdslasso
+* also computes two additional valid estimators — the lasso-
+* orthogonalized and post-lasso-orthogonalized versions — based on
+* the Belloni-Chernozhukov-Hansen-Chen orthogonalization framework.
+* All three target the same causal alpha; they differ in how the
+* high-dimensional controls are residualised out. The post's Section
+* 8 walks through the three side-by-side; the call below produces
+* the actual three-panel output on the violent-crime equation.
+
+di _n(2) "========================================"
+di "STEP 12 - pdslasso three-estimator demo (violent crime)"
+di "========================================"
+
+pdslasso DyV DxV (zv1-zv284), cluster(state) loptions(c(1.1) gamma(0.05))
+
+di _n "=== Script completed successfully ==="
 
 log close
