@@ -38,6 +38,10 @@ links:
   icon_pack: fas
   name: "Data (CSV)"
   url: https://github.com/cmg777/starter-academic-v501/tree/master/content/post/r_double_lasso/data
+- icon: chart-bar
+  icon_pack: fas
+  name: "Stata version"
+  url: /post/stata_double_lasso/
 - icon: r-project
   icon_pack: fab
   name: "R version"
@@ -64,6 +68,8 @@ diagram: true
 ---
 
 ## 1. Overview
+
+> **Companion post.** This tutorial is one of three siblings on the same Double LASSO case study — alongside the [R version](/post/r_double_lasso/) and the [Stata version](/post/stata_double_lasso/). The three posts share the data, the five estimators, and the identification story; this Python post adds a dedicated introduction to the [DoubleML](https://docs.doubleml.org/) library in §15–§18.
 
 This is the Python companion to the [R version](/post/r_double_lasso/) and [Stata version](/post/stata_double_lasso/) of the Double LASSO tutorial — same data, same five-estimator narrative, same identification story — plus a **second part** that introduces [DoubleML](https://docs.doubleml.org/), a modern Python framework for ML-based causal inference. The R post walks through Belloni, Chernozhukov and Hansen's (2014) extension of Donohue and Levitt's (2001) abortion-and-crime panel and shows that **Double LASSO** with the *rigorous* (theory-based) penalty reproduces the headline causal estimates from 284 candidate controls while CV-tuned LASSO overshoots. This post does the same computation in Python using [`pyfixest`](https://pyfixest.org/) for OLS rows, [`hdmpy`](https://github.com/d2cml-ai/hdmpy) for the rigorous LASSO, [`scikit-learn`](https://scikit-learn.org/) for cross-validated LASSO — and then introduces `DoubleML`'s cross-fit `DoubleMLPLR`, `DoubleMLIRM`, and a learner-robustness comparison across LASSO, RandomForest, and XGBoost.
 
