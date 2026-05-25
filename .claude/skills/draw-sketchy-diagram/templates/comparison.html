@@ -1,0 +1,603 @@
+<!doctype html>
+<!--
+  Sketchy 3-panel comparison template.
+
+  Drives entirely off `window.LAYOUT` — see references/layout-schema.md.
+  When rendering is complete, `window.READY` is set to true so the headless
+  exporter knows it can read the SVG / take a screenshot.
+
+  This file is intended to be loaded by scripts/render.js via Playwright,
+  but it also works standalone: open in a browser and edit `LAYOUT_FALLBACK`
+  below to iterate visually.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>sketchy comparison</title>
+
+  <!-- Handwritten Google Fonts. Caveat is the title/headline face; Kalam is the body. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Kalam:wght@400;700&family=Architects+Daughter&display=swap" rel="stylesheet">
+
+  <!-- Rough.js, pinned major version. Loaded from CDN; the headless renderer (render.js) -->
+  <!-- fetches this through Chromium's HTTP stack at render time. -->
+  <script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.min.js"></script>
+
+  <style>
+    :root {
+      /* Default (paper) theme — overridden inline by render() for chalkboard. */
+      --paper:        #fbf7ee;
+      --ink:          #141413;
+      --ink-soft:     #4a4a48;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--paper);
+      font-family: 'Kalam', 'Architects Daughter', sans-serif;
+      color: var(--ink);
+    }
+    #stage {
+      display: block;
+      margin: 0 auto;
+      background: var(--paper);
+    }
+    /* SVG text styling — all text is real SVG <text>, not foreignObject, so it
+       rasterizes cleanly and stays selectable in the SVG output. */
+    svg text { fill: var(--ink); }
+    .title    { font-family: 'Caveat', cursive; font-weight: 700; }
+    .subtitle { font-family: 'Caveat', cursive; font-weight: 500; }
+    .body     { font-family: 'Kalam', sans-serif; font-weight: 400; }
+    .body-b   { font-family: 'Kalam', sans-serif; font-weight: 700; }
+    .label    { font-family: 'Architects Daughter', cursive; }
+  </style>
+</head>
+<body>
+  <svg id="stage" xmlns="http://www.w3.org/2000/svg"></svg>
+
+  <script>
+  // ---------------------------------------------------------------------------
+  // Fallback layout — only used when this file is opened directly in a browser,
+  // not when driven by render.js (which sets window.LAYOUT before this runs).
+  // ---------------------------------------------------------------------------
+  const LAYOUT_FALLBACK = {
+    type: "comparison",
+    seed: 42,
+    width: 1400,
+    height: 900,
+    title: "Three ways to estimate a causal effect",
+    subtitle: "side-by-side, in plain language",
+    panels: [
+      {
+        title: "Randomized trial",
+        accent: "blue",
+        icon:   "target",
+        body: [
+          "Flip a coin for each person.",
+          "Treatment ⊥ everything else.",
+          "Difference in means ≈ ATE."
+        ],
+        footnote: "gold standard"
+      },
+      {
+        title: "Matching",
+        accent: "orange",
+        icon:   "scale",
+        body: [
+          "Pair treated with similar untreated.",
+          "Assumes no hidden confounders.",
+          "Sensitive to the matching recipe."
+        ],
+        footnote: "observational"
+      },
+      {
+        title: "Instrumental variable",
+        accent: "teal",
+        icon:   "funnel",
+        body: [
+          "Find a nudge that only acts via treatment.",
+          "Estimates a LATE, not the ATE.",
+          "Weak instruments → fragile estimates."
+        ],
+        footnote: "clever but picky"
+      }
+    ]
+  };
+
+  const LAYOUT = window.LAYOUT || LAYOUT_FALLBACK;
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  // Paper theme — the default. Accent fills are tuned against #fbf7ee.
+  const PALETTE_PAPER = {
+    blue:   { stroke: "#1a3a8a", fill: "#dbeafe" },
+    orange: { stroke: "#b85a3a", fill: "#fde6d8" },
+    teal:   { stroke: "#008c84", fill: "#cff5f1" },
+    purple: { stroke: "#6b3fa0", fill: "#ece2f3" },
+    green:  { stroke: "#2e7d4f", fill: "#d8ecdf" },
+    red:    { stroke: "#a32d2d", fill: "#f6d7d4" },
+    ink:    { stroke: "#141413", fill: "#e8e6df" }
+  };
+
+  // Chalkboard theme — accents are lifted and desaturated so they read on
+  // the dark navy background (#0a1d3a, aligned with site heading blue
+  // #1a3a8a). Fills are darker than the strokes so the hachure doesn't
+  // compete with the cream body text.
+  const PALETTE_CHALK = {
+    blue:   { stroke: "#9ec3f0", fill: "#1f3461" },
+    orange: { stroke: "#f0a98a", fill: "#5a3324" },
+    teal:   { stroke: "#7be0d4", fill: "#194a47" },
+    purple: { stroke: "#c8a8e8", fill: "#3a2856" },
+    green:  { stroke: "#9ad9af", fill: "#1e4732" },
+    red:    { stroke: "#ee9b9b", fill: "#5a2424" },
+    ink:    { stroke: "#e8ecf2", fill: "#1c2540" }
+  };
+
+  const THEMES = {
+    paper:      { bg: "#fbf7ee", ink: "#141413", inkSoft: "#4a4a48", palette: PALETTE_PAPER, ribbonFill: "#fbf7ee" },
+    chalkboard: { bg: "#0a1d3a", ink: "#e8ecf2", inkSoft: "#c8d0e0", palette: PALETTE_CHALK, ribbonFill: "#0a1d3a" }
+  };
+
+  function pickTheme(name) {
+    return THEMES[name] || THEMES.paper;
+  }
+
+  function pickAccent(palette, name) {
+    return palette[name] || palette.blue;
+  }
+
+  function svgText(parent, x, y, str, cls, size, anchor = "start", fill = null) {
+    const NS = "http://www.w3.org/2000/svg";
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", x);
+    t.setAttribute("y", y);
+    t.setAttribute("class", cls);
+    t.setAttribute("font-size", size);
+    t.setAttribute("text-anchor", anchor);
+    if (fill) t.setAttribute("fill", fill);
+    t.textContent = str;
+    parent.appendChild(t);
+    return t;
+  }
+
+  // Off-screen probe used to measure rendered text width with the actual
+  // webfonts. Created once, reused across calls.
+  let _probe = null;
+  function measureText(str, cls, size) {
+    if (!_probe) {
+      const NS = "http://www.w3.org/2000/svg";
+      _probe = document.createElementNS(NS, "text");
+      _probe.setAttribute("x", -9999);
+      _probe.setAttribute("y", -9999);
+      document.getElementById("stage").appendChild(_probe);
+    }
+    _probe.setAttribute("class", cls);
+    _probe.setAttribute("font-size", size);
+    _probe.textContent = str;
+    return _probe.getComputedTextLength();
+  }
+
+  // Split a single paragraph into visual lines that fit within maxWidth.
+  // Greedy word-fill: take words until the next word would overflow.
+  function wrapParagraph(text, maxWidth, cls, size) {
+    const words = text.split(/\s+/).filter(Boolean);
+    if (words.length === 0) return [];
+    const out = [];
+    let current = words[0];
+    for (let i = 1; i < words.length; i++) {
+      const candidate = current + " " + words[i];
+      if (measureText(candidate, cls, size) <= maxWidth) {
+        current = candidate;
+      } else {
+        out.push(current);
+        current = words[i];
+      }
+    }
+    out.push(current);
+    return out;
+  }
+
+  // Render body paragraphs into <text> elements with real word-wrap.
+  // Each input entry is one paragraph; paragraphs are separated by an
+  // extra `paragraphGap`. Returns the y after the last line was drawn.
+  function wrapBody(parent, x, yStart, paragraphs, opts) {
+    const { maxWidth, lineHeight, paragraphGap, size } = opts;
+    let y = yStart;
+    let drewAny = false;
+    paragraphs.forEach((p, idx) => {
+      const lines = wrapParagraph(p, maxWidth, "body", size);
+      if (lines.length === 0) return;
+      if (drewAny) y += paragraphGap;
+      lines.forEach((line, lineIdx) => {
+        if (lineIdx > 0) y += lineHeight;
+        svgText(parent, x, y, line, "body", size);
+      });
+      drewAny = true;
+    });
+    return y;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Icon catalog — hand-drawn mini-illustrations via Rough.js primitives.
+  // All icons draw inside a (size × size) box centered at (cx, cy), using
+  // the panel's accent stroke. No fills so the icons read on either theme.
+  // To add a new icon: drop another case branch here and document it in
+  // references/icons.md.
+  // ---------------------------------------------------------------------------
+  function drawIcon(rc, svg, cx, cy, size, accent, kind, baseSeed) {
+    const opts = (extra = {}) => Object.assign({
+      stroke: accent.stroke,
+      strokeWidth: 2.2,
+      roughness: 1.8,
+      bowing: 1.4,
+      seed: baseSeed
+    }, extra);
+
+    // Bounding box helpers (left/right/top/bottom, half-size, eighths)
+    const half = size / 2;
+    const L = cx - half, R = cx + half, T = cy - half, B = cy + half;
+    const eighth = size / 8;
+
+    switch (kind) {
+      case "kitchen-sink": {
+        // Trapezoid basin with chaotic dots falling in from above.
+        // Basin: trapezoid wider at top than bottom.
+        svg.appendChild(rc.path(
+          `M ${L + eighth} ${cy - eighth * 0.5} ` +
+          `L ${R - eighth} ${cy - eighth * 0.5} ` +
+          `L ${R - eighth * 2.2} ${B} ` +
+          `L ${L + eighth * 2.2} ${B} Z`,
+          opts()
+        ));
+        // Faucet pipe stub on the right.
+        svg.appendChild(rc.line(R - eighth * 0.8, cy - eighth * 0.5, R - eighth * 0.8, T + eighth, opts()));
+        // Chaotic inputs falling in.
+        const drops = [
+          [cx - eighth * 1.6, T + eighth * 0.6],
+          [cx,                T + eighth * 1.2],
+          [cx + eighth * 1.0, T + eighth * 0.2],
+          [cx - eighth * 0.4, T + eighth * 2.2]
+        ];
+        drops.forEach((p, i) => {
+          svg.appendChild(rc.circle(p[0], p[1], eighth * 0.6, opts({ seed: baseSeed + i + 1 })));
+        });
+        break;
+      }
+      case "funnel": {
+        // Single downward funnel: wide top, narrow stem.
+        svg.appendChild(rc.path(
+          `M ${L} ${T + eighth} ` +
+          `L ${R} ${T + eighth} ` +
+          `L ${cx + eighth * 0.6} ${cy + eighth * 0.5} ` +
+          `L ${cx + eighth * 0.6} ${B} ` +
+          `L ${cx - eighth * 0.6} ${B} ` +
+          `L ${cx - eighth * 0.6} ${cy + eighth * 0.5} Z`,
+          opts()
+        ));
+        // Two input dots above.
+        svg.appendChild(rc.circle(cx - eighth, T - eighth * 0.5, eighth * 0.5, opts({ seed: baseSeed + 1 })));
+        svg.appendChild(rc.circle(cx + eighth, T - eighth * 0.5, eighth * 0.5, opts({ seed: baseSeed + 2 })));
+        break;
+      }
+      case "double-funnel": {
+        // Two funnels side-by-side, stems converging toward center bottom.
+        const off = eighth * 1.7;
+        // Left funnel.
+        svg.appendChild(rc.path(
+          `M ${cx - off - eighth * 1.8} ${T + eighth} ` +
+          `L ${cx - off + eighth * 1.8} ${T + eighth} ` +
+          `L ${cx - off + eighth * 0.4} ${cy} ` +
+          `L ${cx - eighth * 0.2} ${B} ` +
+          `L ${cx - off - eighth * 0.4} ${cy} Z`,
+          opts()
+        ));
+        // Right funnel.
+        svg.appendChild(rc.path(
+          `M ${cx + off - eighth * 1.8} ${T + eighth} ` +
+          `L ${cx + off + eighth * 1.8} ${T + eighth} ` +
+          `L ${cx + off + eighth * 0.4} ${cy} ` +
+          `L ${cx + eighth * 0.2} ${B} ` +
+          `L ${cx + off - eighth * 0.4} ${cy} Z`,
+          opts({ seed: baseSeed + 1 })
+        ));
+        break;
+      }
+      case "bar-chart": {
+        // Baseline + 3 bars of varying heights.
+        svg.appendChild(rc.line(L, B, R, B, opts()));
+        const bw = size / 5;
+        const heights = [size * 0.45, size * 0.75, size * 0.6];
+        heights.forEach((h, i) => {
+          const x = cx - bw * 1.6 + i * bw * 1.2;
+          svg.appendChild(rc.rectangle(x, B - h, bw, h, opts({ seed: baseSeed + i + 1 })));
+        });
+        break;
+      }
+      case "scatter": {
+        // Frame (L-shape axes) + scattered dots.
+        svg.appendChild(rc.line(L, B, R, B, opts()));
+        svg.appendChild(rc.line(L, B, L, T, opts({ seed: baseSeed + 1 })));
+        const pts = [
+          [cx - eighth * 1.4, cy + eighth * 0.6],
+          [cx - eighth * 0.6, cy + eighth * 0.2],
+          [cx + eighth * 0.2, cy - eighth * 0.4],
+          [cx + eighth * 1.2, cy - eighth * 1.0],
+          [cx + eighth * 0.6, cy + eighth * 1.0]
+        ];
+        pts.forEach((p, i) => {
+          svg.appendChild(rc.circle(p[0], p[1], eighth * 0.5, opts({ seed: baseSeed + 10 + i })));
+        });
+        break;
+      }
+      case "line-chart": {
+        // Frame + a rising zigzag.
+        svg.appendChild(rc.line(L, B, R, B, opts()));
+        svg.appendChild(rc.line(L, B, L, T, opts({ seed: baseSeed + 1 })));
+        const ys = [B - eighth * 0.8, B - eighth * 2.4, B - eighth * 1.8, B - eighth * 3.4, B - eighth * 3.0];
+        let prevX = L + eighth * 0.6, prevY = ys[0];
+        for (let i = 1; i < ys.length; i++) {
+          const x = L + eighth * 0.6 + (i * (size - eighth * 1.2)) / (ys.length - 1);
+          svg.appendChild(rc.line(prevX, prevY, x, ys[i], opts({ seed: baseSeed + 20 + i })));
+          prevX = x; prevY = ys[i];
+        }
+        break;
+      }
+      case "histogram": {
+        // 5 bars in a bell-ish distribution.
+        svg.appendChild(rc.line(L, B, R, B, opts()));
+        const bw = size / 6;
+        const heights = [size * 0.25, size * 0.55, size * 0.8, size * 0.55, size * 0.25];
+        heights.forEach((h, i) => {
+          const x = L + bw * 0.5 + i * bw;
+          svg.appendChild(rc.rectangle(x, B - h, bw, h, opts({ seed: baseSeed + 30 + i })));
+        });
+        break;
+      }
+      case "check": {
+        // Large checkmark stroke.
+        svg.appendChild(rc.line(L + eighth * 0.6, cy, cx - eighth * 0.4, B - eighth, opts()));
+        svg.appendChild(rc.line(cx - eighth * 0.4, B - eighth, R - eighth * 0.4, T + eighth * 0.4, opts({ seed: baseSeed + 1 })));
+        break;
+      }
+      case "x-mark": {
+        svg.appendChild(rc.line(L + eighth, T + eighth, R - eighth, B - eighth, opts()));
+        svg.appendChild(rc.line(R - eighth, T + eighth, L + eighth, B - eighth, opts({ seed: baseSeed + 1 })));
+        break;
+      }
+      case "exclamation": {
+        // Vertical stroke + dot below.
+        svg.appendChild(rc.line(cx, T + eighth * 0.4, cx, B - eighth * 1.6, opts({ strokeWidth: 3.2 })));
+        svg.appendChild(rc.circle(cx, B - eighth * 0.4, eighth * 0.6, opts({ seed: baseSeed + 1, strokeWidth: 3.0 })));
+        break;
+      }
+      case "target": {
+        // Three concentric circles + center dot.
+        svg.appendChild(rc.circle(cx, cy, size * 0.95, opts()));
+        svg.appendChild(rc.circle(cx, cy, size * 0.6,  opts({ seed: baseSeed + 1 })));
+        svg.appendChild(rc.circle(cx, cy, size * 0.3,  opts({ seed: baseSeed + 2 })));
+        svg.appendChild(rc.circle(cx, cy, eighth * 0.4, opts({ seed: baseSeed + 3, strokeWidth: 3.0 })));
+        break;
+      }
+      case "tree": {
+        // Triangle canopy + trunk.
+        svg.appendChild(rc.path(
+          `M ${cx} ${T} L ${R - eighth * 0.4} ${cy + eighth} L ${L + eighth * 0.4} ${cy + eighth} Z`,
+          opts()
+        ));
+        svg.appendChild(rc.rectangle(cx - eighth * 0.5, cy + eighth, eighth, eighth * 1.6, opts({ seed: baseSeed + 1 })));
+        break;
+      }
+      case "brain": {
+        // Two lobed circles + a few internal squiggles.
+        svg.appendChild(rc.circle(cx - eighth * 0.9, cy, size * 0.65, opts()));
+        svg.appendChild(rc.circle(cx + eighth * 0.9, cy, size * 0.65, opts({ seed: baseSeed + 1 })));
+        svg.appendChild(rc.line(cx - eighth * 1.2, cy - eighth * 0.5, cx + eighth * 1.2, cy - eighth * 0.5, opts({ seed: baseSeed + 2 })));
+        svg.appendChild(rc.line(cx - eighth * 1.0, cy + eighth * 0.4, cx + eighth * 1.0, cy + eighth * 0.4, opts({ seed: baseSeed + 3 })));
+        break;
+      }
+      case "gears": {
+        // Circle + small inner circle + 6 short tooth lines around the perimeter.
+        svg.appendChild(rc.circle(cx, cy, size * 0.85, opts()));
+        svg.appendChild(rc.circle(cx, cy, size * 0.3,  opts({ seed: baseSeed + 1 })));
+        for (let i = 0; i < 6; i++) {
+          const ang = (i * Math.PI) / 3;
+          const r1 = size * 0.45;
+          const r2 = size * 0.6;
+          svg.appendChild(rc.line(
+            cx + Math.cos(ang) * r1, cy + Math.sin(ang) * r1,
+            cx + Math.cos(ang) * r2, cy + Math.sin(ang) * r2,
+            opts({ seed: baseSeed + 10 + i, strokeWidth: 2.8 })
+          ));
+        }
+        break;
+      }
+      case "scale": {
+        // Horizontal beam with two pans hanging from the ends.
+        // Vertical post + base.
+        svg.appendChild(rc.line(cx, T + eighth * 0.3, cx, B - eighth, opts()));
+        svg.appendChild(rc.line(cx - eighth, B - eighth, cx + eighth, B - eighth, opts({ seed: baseSeed + 1 })));
+        // Horizontal beam.
+        svg.appendChild(rc.line(L + eighth * 0.4, T + eighth, R - eighth * 0.4, T + eighth, opts({ seed: baseSeed + 2 })));
+        // Suspension lines.
+        svg.appendChild(rc.line(L + eighth * 0.8, T + eighth, L + eighth * 0.8, cy - eighth * 0.2, opts({ seed: baseSeed + 3 })));
+        svg.appendChild(rc.line(R - eighth * 0.8, T + eighth, R - eighth * 0.8, cy - eighth * 0.2, opts({ seed: baseSeed + 4 })));
+        // Pans (shallow arcs as ellipses).
+        svg.appendChild(rc.ellipse(L + eighth * 0.8, cy + eighth * 0.2, eighth * 1.8, eighth * 0.8, opts({ seed: baseSeed + 5 })));
+        svg.appendChild(rc.ellipse(R - eighth * 0.8, cy + eighth * 0.2, eighth * 1.8, eighth * 0.8, opts({ seed: baseSeed + 6 })));
+        break;
+      }
+      default: {
+        // Unknown icon: small square with "?" and a console warning.
+        console.warn(`drawIcon: unknown icon kind "${kind}" — using placeholder`);
+        svg.appendChild(rc.rectangle(L + eighth, T + eighth, size - eighth * 2, size - eighth * 2, opts()));
+        svgText(svg, cx, cy + eighth * 0.6, "?", "title", size * 0.6, "middle", accent.stroke);
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Draw
+  // ---------------------------------------------------------------------------
+  function render() {
+    const svg = document.getElementById("stage");
+    const W = LAYOUT.width  || 1400;
+    const H = LAYOUT.height || 900;
+    const SEED = LAYOUT.seed || 42;
+
+    svg.setAttribute("width", W);
+    svg.setAttribute("height", H);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+    // Theme switch — drives background, ink color, accent palette, ribbon fill.
+    const theme = pickTheme(LAYOUT.theme);
+    document.documentElement.style.setProperty("--paper",    theme.bg);
+    document.documentElement.style.setProperty("--ink",      theme.ink);
+    document.documentElement.style.setProperty("--ink-soft", theme.inkSoft);
+    svg.style.background = theme.bg;
+    // Make sure the background is part of the rasterized image too: paint a
+    // full-bleed background rect inside the SVG before everything else.
+    {
+      const NS = "http://www.w3.org/2000/svg";
+      const bg = document.createElementNS(NS, "rect");
+      bg.setAttribute("x", 0); bg.setAttribute("y", 0);
+      bg.setAttribute("width", W); bg.setAttribute("height", H);
+      bg.setAttribute("fill", theme.bg);
+      svg.appendChild(bg);
+    }
+
+    const rc = rough.svg(svg, { options: {
+      roughness: 1.8,
+      bowing: 1.4,
+      seed: SEED
+    }});
+
+    // Optional headline at top.
+    const hasTitle    = !!LAYOUT.title;
+    const hasSubtitle = !!LAYOUT.subtitle;
+    let topPad = 40;
+    if (hasTitle) {
+      svgText(svg, W / 2, topPad + 50, LAYOUT.title, "title", 56, "middle", theme.ink);
+      topPad += 60;
+    }
+    if (hasSubtitle) {
+      svgText(svg, W / 2, topPad + 30, LAYOUT.subtitle, "subtitle", 30, "middle", theme.inkSoft);
+      topPad += 40;
+    }
+
+    // Panel layout: equal-width columns with gutters.
+    const panels = LAYOUT.panels || [];
+    const n      = panels.length;
+    const sideMargin   = 60;
+    const gutter       = 40;
+    const bottomMargin = 60;
+    const panelW = (W - 2 * sideMargin - (n - 1) * gutter) / n;
+    const panelH = H - topPad - bottomMargin - 20;
+    const panelY = topPad + 20;
+
+    // Validate the required per-panel fields up front so the error message
+    // names the offending panel. Thrown errors are captured by render.js as
+    // pageerror and surfaced via exit code 4.
+    panels.forEach((p, i) => {
+      if (!p.icon) throw new Error(`panel ${i} (${p.title || "untitled"}) is missing required "icon" field`);
+    });
+
+    panels.forEach((panel, i) => {
+      const accent = pickAccent(theme.palette, panel.accent);
+      const px = sideMargin + i * (panelW + gutter);
+
+      // Sketchy panel rectangle. Hachure fill at low density so text reads on top.
+      svg.appendChild(rc.rectangle(px, panelY, panelW, panelH, {
+        stroke: accent.stroke,
+        strokeWidth: 2.4,
+        fill: accent.fill,
+        fillStyle: "hachure",
+        hachureGap: 14,
+        hachureAngle: -35 + i * 25,   // vary so panels feel hand-drawn, not stamped
+        roughness: 2.0,
+        bowing: 1.6,
+        seed: SEED + i * 17
+      }));
+
+      // Icon — hand-drawn glyph above the title, centered.
+      const iconSize = 56;
+      const iconCx = px + panelW / 2;
+      const iconCy = panelY + 50;
+      drawIcon(rc, svg, iconCx, iconCy, iconSize, accent, panel.icon, SEED + 300 + i * 7);
+
+      // Panel title with a sketchy underline. Shifted down to make room
+      // for the icon above.
+      const titleY = panelY + 140;
+      svgText(svg, px + panelW / 2, titleY, panel.title, "title", 42, "middle", accent.stroke);
+      svg.appendChild(rc.line(
+        px + 30,         titleY + 14,
+        px + panelW - 30, titleY + 14,
+        { stroke: accent.stroke, strokeWidth: 2, roughness: 2.4, seed: SEED + 100 + i }
+      ));
+
+      // Body text — wraps to the panel width.
+      const bodyPadX = 30;
+      const bodyX = px + bodyPadX;
+      const bodyY = titleY + 70;
+      const ribbonH = 50;
+      const ribbonGap = 20;
+      const bodyMaxY = panel.footnote
+        ? panelY + panelH - ribbonH - ribbonGap - 10
+        : panelY + panelH - 20;
+      const yEnd = wrapBody(svg, bodyX, bodyY, panel.body || [], {
+        maxWidth: panelW - 2 * bodyPadX,
+        lineHeight: 30,
+        paragraphGap: 38,
+        size: 22
+      });
+      if (yEnd > bodyMaxY) {
+        console.warn(`panel ${i} body overflows: yEnd=${Math.round(yEnd)} > maxY=${Math.round(bodyMaxY)}`);
+      }
+
+      // Footnote in a sketchy ribbon at the bottom of the panel.
+      if (panel.footnote) {
+        const ribbonY = panelY + panelH - ribbonH - 20;
+        svg.appendChild(rc.rectangle(px + 30, ribbonY, panelW - 60, ribbonH, {
+          stroke: accent.stroke,
+          strokeWidth: 1.6,
+          fill: theme.ribbonFill,
+          fillStyle: "solid",
+          roughness: 2.4,
+          seed: SEED + 200 + i
+        }));
+        svgText(svg, px + panelW / 2, ribbonY + 33, panel.footnote, "label", 22, "middle", accent.stroke);
+      }
+    });
+
+    // Down-arrows BETWEEN panels (the "leads to" or "compared with" gesture
+    // from the reference image). Drawn last so they sit on top of fills.
+    if (LAYOUT.arrows !== false) {
+      for (let i = 0; i < n - 1; i++) {
+        const cx = sideMargin + i * (panelW + gutter) + panelW + gutter / 2;
+        const cy = panelY + panelH / 2;
+        const arm = 20;
+        svg.appendChild(rc.line(cx - arm, cy, cx + arm, cy, { stroke: theme.ink, strokeWidth: 2, roughness: 2.2 }));
+        svg.appendChild(rc.line(cx + arm, cy, cx + arm - 12, cy - 9, { stroke: theme.ink, strokeWidth: 2, roughness: 2.2 }));
+        svg.appendChild(rc.line(cx + arm, cy, cx + arm - 12, cy + 9, { stroke: theme.ink, strokeWidth: 2, roughness: 2.2 }));
+      }
+    }
+
+    // Remove the measurement probe so it doesn't appear in the exported SVG.
+    if (_probe && _probe.parentNode) _probe.parentNode.removeChild(_probe);
+
+    // Signal completion to the headless exporter.
+    window.READY = true;
+  }
+
+  // Give the webfonts a chance to load before drawing — otherwise the SVG
+  // text falls back to sans-serif and the export looks wrong.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(render);
+  } else {
+    window.addEventListener("load", render);
+  }
+  </script>
+</body>
+</html>

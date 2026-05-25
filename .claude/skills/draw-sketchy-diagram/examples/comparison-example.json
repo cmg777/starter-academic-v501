@@ -1,0 +1,43 @@
+{
+  "type": "comparison",
+  "seed": 42,
+  "width": 1400,
+  "height": 900,
+  "title": "Three ways to estimate a causal effect",
+  "subtitle": "side-by-side, in plain language",
+  "panels": [
+    {
+      "title": "Randomized trial",
+      "accent": "blue",
+      "icon": "target",
+      "body": [
+        "Flip a coin for each person.",
+        "Treatment ⊥ everything else.",
+        "Difference in means ≈ ATE."
+      ],
+      "footnote": "gold standard"
+    },
+    {
+      "title": "Matching",
+      "accent": "orange",
+      "icon": "scale",
+      "body": [
+        "Pair treated with similar untreated.",
+        "Assumes no hidden confounders.",
+        "Sensitive to the matching recipe."
+      ],
+      "footnote": "observational"
+    },
+    {
+      "title": "Instrumental variable",
+      "accent": "teal",
+      "icon": "funnel",
+      "body": [
+        "Find a nudge that only acts via treatment.",
+        "Estimates a LATE, not the ATE.",
+        "Weak instruments → fragile estimates."
+      ],
+      "footnote": "clever but picky"
+    }
+  ]
+}

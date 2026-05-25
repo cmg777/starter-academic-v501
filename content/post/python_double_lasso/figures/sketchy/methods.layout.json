@@ -1,0 +1,44 @@
+{
+  "type": "comparison",
+  "seed": 42,
+  "width": 1400,
+  "height": 900,
+  "theme": "chalkboard",
+  "title": "Does abortion reduce crime?",
+  "subtitle": "three ways to estimate the same causal effect",
+  "panels": [
+    {
+      "title": "Kitchen-sink OLS",
+      "accent": "red",
+      "icon": "kitchen-sink",
+      "body": [
+        "All 284 controls thrown in.",
+        "Coefficient is uninterpretable.",
+        "+234% effect on murder (impossible)."
+      ],
+      "footnote": "do not use"
+    },
+    {
+      "title": "Post-Structural LASSO",
+      "accent": "orange",
+      "icon": "funnel",
+      "body": [
+        "One LASSO; treatment forced in.",
+        "Plain OLS on selected support.",
+        "Simple but causally fragile."
+      ],
+      "footnote": "one-LASSO baseline"
+    },
+    {
+      "title": "Double LASSO",
+      "accent": "blue",
+      "icon": "double-funnel",
+      "body": [
+        "Two LASSOs: y on X and d on X.",
+        "Union of selections, then post-OLS.",
+        "Causal-inference safe."
+      ],
+      "footnote": "recommended"
+    }
+  ]
+}
