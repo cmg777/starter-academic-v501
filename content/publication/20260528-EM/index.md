@@ -87,7 +87,7 @@ image:
 
 ## The puzzle
 
-Okun's law is one of macroeconomics' most reliable regularities: when output grows, unemployment falls. Yet estimated for Indonesia as a single economy, the relationship all but disappears. The reason is aggregation. A vast, heterogeneous archipelago is not one labor market, and a national average quietly cancels out regions that move in opposite directions. The question, then, is not *whether* Okun's law holds in Indonesia, but *where*.
+Okun's law is one of macroeconomics' most reliable regularities: when output grows, unemployment falls. Yet estimated for Indonesia as a single economy, the relationship does not hold. The reason is aggregation. A vast, heterogeneous archipelago is not one labor market, and a national average quietly cancels out regions that move in opposite directions. The question, then, is not *whether* Okun's law holds in Indonesia, but *where*.
 
 ---
 
