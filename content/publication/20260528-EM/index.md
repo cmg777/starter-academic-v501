@@ -48,6 +48,10 @@ links:
     url: "https://doi.org/10.1016/j.econmod.2026.107687"
     icon_pack: fas
     icon: university
+  - icon: file-pdf
+    icon_pack: fas
+    name: Working paper
+    url: working-paper.pdf
   - icon: podcast
     icon_pack: fas
     name: AI Podcast

@@ -32,6 +32,7 @@ readability and presentation, and an AI Podcast player was attached.
 | 2 | Featured image | `featured.webp` | Supplied by the user |
 | 3 | Body rewrite | `index.md` body | Heavier rewrite for clarity; all facts/numbers preserved |
 | 4 | AI Podcast | `index.md` (appended player block) | catbox `i3g2l3.m4a`, stream link |
+| 5 | Working paper | `working-paper.pdf` + "Working paper" link button | Repo-hosted preprint PDF (2.8 MB) |
 
 ## Body rewrite details
 
@@ -43,6 +44,15 @@ readability and presentation, and an AI Podcast player was attached.
 - Preserved every coefficient: −0.262, −0.033, ρ = 0.135, direct −0.112, indirect −0.077.
 - Removed all emoji (clean academic headings and bullets); converted the Group-2 callout to a
   plain blockquote and the Q&A to concise prose.
+
+## Working-paper PDF
+
+- Added the preprint/working-paper PDF to the page bundle as
+  `content/publication/20260528-EM/working-paper.pdf` (2.8 MB), linked via a "Working paper"
+  front-matter button (`icon: file-pdf`, relative `url: working-paper.pdf`).
+- **First repo-hosted PDF among publications** — all prior entries link PDFs via external
+  `url_pdf`/`url_preprint` URLs. Hugo publishes the leaf-bundle resource to
+  `/publication/20260528-em/working-paper.pdf` (verified via a full build).
 
 ## AI Podcast player
 
