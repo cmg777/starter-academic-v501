@@ -3,7 +3,7 @@
    (netlify/edge-functions/geo-lang.ts) never overrides it.
    Bundled site-wide via params.yaml `plugins_js`. */
 (function () {
-  var KNOWN = { es: 1 /*, ja: 1 */ }; // root "/" = en (default language)
+  var KNOWN = { es: 1, ja: 1 }; // root "/" = en (default language)
 
   function langFromPath(p) {
     var seg = (p || "/").split("/")[1] || "";

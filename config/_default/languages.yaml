@@ -52,18 +52,44 @@ es:
         url: '#contact'
         weight: 90
 
-# Japanese — ADD LATER (additive; no structural change needed). Steps:
-#   1) Uncomment & translate this block.
-#   2) config.yaml: add a `content/ja` mount (lang: ja); change the en mount's
-#      excludeFiles to '{es,ja}/**'; set `hasCJKLanguage: true`.
-#   3) netlify/edge-functions/geo-lang.ts: add `JP: "/ja/"` and `"ja"` to KNOWN_LANGS.
-#   4) assets/js/lang-pref.js: add `ja: 1` to the KNOWN map.
-#ja:
-#  languageCode: ja-jp
-#  languageName: 日本語
-#  weight: 3
-#  params:
-#    description: '...'
-#  menu:
-#    main:
-#      - {name: 'プロフィール', url: '#about', weight: 10}
+# Japanese — served at /ja/. Mirrors the Spanish layer: the homepage and the
+# items it shows are translated; other sections stay English. Untranslated
+# real-page links (e.g. Courses) are omitted from this menu to avoid /ja/ 404s;
+# hash-anchor items scroll the /ja/ homepage and the external Events link is
+# unchanged. Infra hooks live in config.yaml (content/ja mount + hasCJKLanguage),
+# netlify/edge-functions/geo-lang.ts (JP -> /ja/), and assets/js/lang-pref.js.
+ja:
+  languageCode: ja-jp
+  languageName: 日本語
+  weight: 3
+  params:
+    description: 'カルロス・メンデス — 名古屋大学（日本）開発経済学准教授。地域開発、空間データサイエンス、応用計量経済学を研究しています。'
+  menu:
+    main:
+      - name: 'プロフィール'
+        url: '#about'
+        weight: 10
+      - name: '研究室'
+        url: '#researchLab'
+        weight: 20
+      - name: '論文'
+        url: '#featured'
+        weight: 30
+      - name: '講演'
+        url: '#talks'
+        weight: 40
+      - name: 'チュートリアル'
+        url: '#posts'
+        weight: 41
+      - name: 'プロジェクト'
+        url: '#projects'
+        weight: 45
+      - name: '学生'
+        url: '#people'
+        weight: 60
+      - name: 'イベント'
+        url: 'https://lu.ma/cmg'
+        weight: 80
+      - name: 'お問い合わせ'
+        url: '#contact'
+        weight: 90

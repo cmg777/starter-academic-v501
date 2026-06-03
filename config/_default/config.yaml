@@ -12,7 +12,7 @@ copyright: '© 2018–{year} Carlos Mendez. All rights reserved.' # Footer text 
 ############################
 
 defaultContentLanguage: en
-hasCJKLanguage: false
+hasCJKLanguage: true
 defaultContentLanguageInSubdir: false
 removePathAccents: true
 
@@ -25,22 +25,26 @@ module:
     - path: github.com/wowchemy/wowchemy-hugo-modules/wowchemy-cms
     - path: github.com/wowchemy/wowchemy-hugo-modules/wowchemy
   # Multi-language content layout (see config/_default/languages.yaml):
-  #   English -> content/      (served at /)
-  #   Spanish -> content/es/   (served at /es/)
-  # The `en` mount excludes `es/**` so English never also renders the Spanish
-  # tree, and the more-specific `es` mount serves it under /es/. The remaining
-  # mounts simply re-declare Hugo's per-component defaults (required once any
-  # `mounts` are defined) so the project's own assets/layouts/static/data/i18n
-  # continue to load. To add Japanese later: add a `content/ja` mount (lang: ja)
-  # and extend the en mount's excludeFiles to '{es,ja}/**'.
+  #   English  -> content/      (served at /)
+  #   Spanish  -> content/es/   (served at /es/)
+  #   Japanese -> content/ja/   (served at /ja/)
+  # The `en` mount excludes `{es,ja}/**` so English never also renders the
+  # translated trees, and the more-specific `es`/`ja` mounts serve them under
+  # /es/ and /ja/. The remaining mounts simply re-declare Hugo's per-component
+  # defaults (required once any `mounts` are defined) so the project's own
+  # assets/layouts/static/data/i18n continue to load. To add another language:
+  # add a `content/<lang>` mount and extend the en mount's excludeFiles.
   mounts:
     - source: content
       target: content
       lang: en
-      excludeFiles: 'es/**'
+      excludeFiles: '{es,ja}/**'
     - source: content/es
       target: content
       lang: es
+    - source: content/ja
+      target: content
+      lang: ja
     - source: assets
       target: assets
     - source: static

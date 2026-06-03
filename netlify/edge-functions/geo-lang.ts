@@ -26,12 +26,13 @@ const COUNTRY_TO_LANG: Record<string, string> = {
   // South America
   CO: "/es/", VE: "/es/", EC: "/es/", PE: "/es/", BO: "/es/",
   PY: "/es/", UY: "/es/", AR: "/es/", CL: "/es/",
-  // JP: "/ja/",   // <- future: Japanese
+  // Japan
+  JP: "/ja/",
 };
 
 // Languages we actually publish ("en" is the default, served at "/").
 // Used to validate the override cookie so a stale value can't misroute.
-const KNOWN_LANGS = new Set(["en", "es" /*, "ja" */]);
+const KNOWN_LANGS = new Set(["en", "es", "ja"]);
 
 const PREF = "lang_pref"; // manual choice (set by client JS)
 const SEEN = "geo_seen"; // "already auto-evaluated" marker (set here)
