@@ -2514,6 +2514,13 @@ body:not(.dark) .cz-showcase-media { background: rgba(20, 40, 90, 0.05); }
   .cz-showcase-media img { aspect-ratio: 16 / 9; }
 }
 
+/* Pub-showcase: scoped tweaks for /publication/ rows. Inherits .cz-showcase. */
+.pub-showcase .cz-showcase-meta {
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+.pub-showcase .pub-venue em { font-style: italic; }
+
 /* ---- 22.7 People (students) → framed cards + teal avatar ring ---- */
 .home-section.wg-people .people-person {
   padding: 1.1rem 0.8rem 1.3rem;

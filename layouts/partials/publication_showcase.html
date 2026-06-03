@@ -1,0 +1,59 @@
+{{/* Publication showcase — projects-style alternating image/text rows for /publication/.
+     Sits above the search/filter UI in layouts/section/publication.html. Reuses the
+     .cz-showcase SCSS at assets/scss/custom.scss and Wowchemy's page_links /
+     page_metadata_authors partials, so author rendering and action buttons match the
+     Featured widget cards on the homepage. */}}
+{{ $items := (where site.RegularPages "Section" "publication").ByDate.Reverse }}
+{{ $typeIcons := dict
+  "0" "file"
+  "1" "users"
+  "2" "newspaper"
+  "3" "file-export"
+  "4" "file-alt"
+  "5" "book"
+  "6" "bookmark"
+  "7" "graduation-cap"
+  "8" "certificate"
+}}
+
+<div class="universal-wrapper">
+  <div class="cz-showcase pub-showcase">
+    {{ range $items }}
+      {{ $p := . }}
+      {{ $detail := $p.RelPermalink }}
+      {{ $img := ($p.Resources.ByType "image").GetMatch "*featured*" }}
+      {{ $extLink := "" }}
+      {{ with $p.Params.doi }}{{ $extLink = . }}{{ end }}
+      {{ if not $extLink }}{{ with $p.Params.url_pdf }}{{ $extLink = . }}{{ end }}{{ end }}
+      {{ $imgLink := cond (ne $extLink "") $extLink $detail }}
+      {{ $extTarget := cond (ne $extLink "") "target=\"_blank\" rel=\"noopener\"" "" }}
+      {{ $pubType := "0" }}
+      {{ with $p.Params.publication_types }}{{ $pubType = index . 0 }}{{ end }}
+      {{ $iconName := index $typeIcons $pubType | default "file" }}
+
+      <article class="cz-showcase-item">
+        <a class="cz-showcase-media" href="{{ $imgLink }}" {{ $extTarget | safeHTMLAttr }} aria-label="{{ $p.Title }}">
+          {{ with $img }}
+            {{ $thumb := .Fit "1200x900" }}
+            <img src="{{ $thumb.RelPermalink }}" alt="{{ $p.Title }}" loading="lazy">
+          {{ else }}
+            <span class="cz-showcase-noimg"><i class="fas fa-{{ $iconName }}" aria-hidden="true"></i></span>
+          {{ end }}
+        </a>
+        <div class="cz-showcase-body">
+          <h3 class="cz-showcase-title"><a href="{{ $detail }}">{{ $p.Title }}</a></h3>
+          <div class="cz-showcase-meta pub-showcase-meta">
+            {{ partial "page_metadata_authors" $p }}
+            {{ with $p.Params.publication }}
+              <span class="middot-divider"></span>
+              <span class="pub-venue">{{ . | markdownify }}</span>
+            {{ end }}
+          </div>
+          {{ if partial "functions/has_attachments" $p }}
+            <div class="btn-links cz-showcase-links">{{ partial "page_links" (dict "page" $p "is_list" 1) }}</div>
+          {{ end }}
+        </div>
+      </article>
+    {{ end }}
+  </div>
+</div>
