@@ -1,0 +1,22 @@
+{{/*
+  event_card.html — captioned 16:9 card for the /event/ presentations gallery.
+  Like project_card.html, but the caption shows the talk date above the title.
+  Context: an event Page.
+*/}}
+{{ $p := . }}
+{{ $img := $p.Resources.GetMatch "featured*" }}
+<a class="tg-card tg-card--captioned" href="{{ $p.RelPermalink }}" title="{{ $p.Title }}" aria-label="{{ $p.Title }}">
+  <div class="tg-card-media">
+    {{ with $img }}
+      {{ $thumb := .Fill "800x450 Center" }}
+      <img class="tg-card-image" src="{{ $thumb.RelPermalink }}" alt="{{ $p.Title }}"
+           loading="lazy" decoding="async" width="800" height="450">
+    {{ else }}
+      <span class="tg-card-noimg"><i class="fas fa-chalkboard-user" aria-hidden="true"></i></span>
+    {{ end }}
+  </div>
+  <span class="tg-card-caption">
+    <span class="tg-card-cap-meta">{{ $p.Date.Format "Jan 2006" }}{{ with $p.Params.location }} &middot; {{ . }}{{ end }}</span>
+    <span class="tg-card-cap-title">{{ $p.Title }}</span>
+  </span>
+</a>

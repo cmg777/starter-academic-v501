@@ -1,0 +1,18 @@
+{{/* Default the site to the cinematic DARK theme on a first visit.
+     The Wowchemy day/night toggle still works and persists the choice
+     (localStorage `wcTheme`: 0 = light, 1 = dark, 2 = auto). We only set a
+     default when the visitor has no stored preference, so we never override
+     a returning visitor's explicit choice. A `wc-pre-dark` class on <html>
+     lets us paint a dark background immediately to avoid a white flash
+     before the theme's JS adds `body.dark`. */}}
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('wcTheme');
+      if (t === null) { localStorage.setItem('wcTheme', '1'); t = '1'; }
+      var dark = (t === '1') ||
+        (t !== '0' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) { document.documentElement.classList.add('wc-pre-dark'); }
+    } catch (e) {}
+  })();
+</script>

@@ -1,15 +1,5 @@
 ---
-title: Recent & Upcoming Talks
+title: Presentations
+lead: Invited talks, seminars, and conference presentations on the geography of development.
 cms_exclude: true
-
-# View.
-#   1 = List
-#   2 = Compact
-#   3 = Card
-view: 2
-
-# Optional header image (relative to `static/media/` folder).
-header:
-  caption: ""
-  image: ""
 ---

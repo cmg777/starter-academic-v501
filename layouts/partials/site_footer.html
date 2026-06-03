@@ -1,32 +1,47 @@
-<footer class="site-footer">
+<footer class="site-footer cz-footer">
 
-  {{ if .IsTranslated | and site.Params.footer.show_translations }}
-    <div class="powered-by d-flex flex-wrap pb-2 justify-content-center">
-      <div class="p-2 font-weight-bold"><i class="fas fa-globe pr-1" aria-hidden="true"></i>{{ i18n "languages" }}:</div>
-      <div class="p-2">{{ index site.Data.i18n.languages .Lang }}</div>
-      {{ range .Translations }}
-        <div class="p-2"><a href="{{ .Permalink }}">{{ index site.Data.i18n.languages .Lang }}</a></div>
-      {{ end }}
+  <div class="cz-footer-inner">
+    <div class="cz-footer-brand">
+      <p class="cz-brand">Carlos Mendez</p>
+      <p class="cz-tag">On the geography of development.</p>
+      <div class="cz-footer-social">
+        <a href="https://orcid.org/0000-0001-7978-2815" target="_blank" rel="noopener" aria-label="ORCID"><i class="ai ai-orcid"></i></a>
+        <a href="https://scholar.google.co.jp/citations?user=v9dK0MoAAAAJ&amp;hl=en" target="_blank" rel="noopener" aria-label="Google Scholar"><i class="ai ai-google-scholar"></i></a>
+        <a href="https://github.com/cmg777" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/mendezguerra/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+      </div>
     </div>
-  {{ end }}
 
-  {{ if or (site.GetPage "terms.md") (site.GetPage "privacy.md") }}
-  <p class="powered-by">
-    {{ with site.GetPage "privacy.md" }}
-      {{ printf "<a href=\"%s\">%s</a>" .RelPermalink .Title | safeHTML }}
-    {{ end }}
-    {{ with site.GetPage "terms.md" }}
-      {{ if site.GetPage "privacy.md" }} &middot; {{ end }}
-      {{ printf "<a href=\"%s\">%s</a>" .RelPermalink .Title | safeHTML }}
-    {{ end }}
-  </p>
-  {{ end }}
+    {{ $home := site.Home.RelPermalink }}
+    <div class="cz-footer-col">
+      <h5>Explore</h5>
+      <ul>
+        {{ range $i, $e := site.Menus.main }}{{ if lt $i 5 }}
+          {{ $u := .URL }}
+          {{ if hasPrefix $u "#" }}{{ $u = printf "%s%s" $home $u }}{{ else if not (hasPrefix $u "http") }}{{ $u = $u | relLangURL }}{{ end }}
+          <li><a href="{{ $u }}">{{ .Name }}</a></li>
+        {{ end }}{{ end }}
+      </ul>
+    </div>
 
-  <p class="powered-by">
-    {{ with site.Copyright }}{{ replace . "{year}" now.Year | markdownify }}{{ end }}
-  </p>
+    <div class="cz-footer-col">
+      <h5>Connect</h5>
+      <ul>
+        {{ range $i, $e := site.Menus.main }}{{ if ge $i 5 }}
+          {{ $u := .URL }}
+          {{ if hasPrefix $u "#" }}{{ $u = printf "%s%s" $home $u }}{{ else if not (hasPrefix $u "http") }}{{ $u = $u | relLangURL }}{{ end }}
+          <li><a href="{{ $u }}"{{ if hasPrefix $u "http" }} target="_blank" rel="noopener"{{ end }}>{{ .Name }}</a></li>
+        {{ end }}{{ end }}
+      </ul>
+    </div>
+  </div>
 
-  {{/* Display copyright license. */}}
+  <div class="cz-footer-copy">
+    <span>{{ with site.Copyright }}{{ replace . "{year}" now.Year }}{{ end }}</span>
+    <span>Graduate School of International Development &middot; Nagoya University, Japan</span>
+  </div>
+
+  {{/* Optional copyright license (renders only if enabled in params). */}}
   {{ partial "site_footer_license" . }}
 
 </footer>

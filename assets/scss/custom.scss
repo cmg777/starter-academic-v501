@@ -1184,7 +1184,7 @@ details.concept-card p:last-child {
    view-timeline scroll fade-out, and a brand-teal scroll indicator.
    ========================================================================== */
 
-@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Crimson+Pro:wght@500;600;700&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap");
 
 /* --- Section background: Ken Burns + edge masks ---
    Scoped to `#hero2-new` (the parked redesigned hero, currently
@@ -1193,6 +1193,11 @@ details.concept-card p:last-child {
 #hero2-new {
   position: relative;
   overflow: hidden;
+  /* Cancel the theme's `.home-section { padding: 110px 0 }` so the hero is
+     exactly one viewport tall (it was ~100vh + 220px, forcing a scroll and
+     dropping the scroll indicator into dead space). */
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 #hero2-new::before {
@@ -1220,12 +1225,29 @@ details.concept-card p:last-child {
   z-index: 2;
   background:
     linear-gradient(to bottom, #0e1545 0%, transparent 6%),
-    linear-gradient(to top,    #0e1545 0%, transparent 6%);
+    linear-gradient(to top,    #0e1545 0%, transparent 6%),
+    rgba(14, 21, 69, 0.28); /* global brand-navy scrim: tames bright city-light
+                               patches so the ~12% that bleeds through the panels
+                               stays calm behind the small serif text */
 }
 
 @keyframes kenBurns {
   from { transform: scale(1)    translate(0%,  0%); }
   to   { transform: scale(1.06) translate(-1%, 1%); }
+}
+
+/* Break the hero content out of the Bootstrap container/column (the blank
+   widget nests it in a `.col-lg-8`) so the panels can span near-full-width. */
+#hero2-new .container {
+  max-width: 100%;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+#hero2-new .container > .row > [class*="col"] {
+  flex: 0 0 100%;
+  max-width: 100%;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /* --- Hero container --- */
@@ -1234,8 +1256,8 @@ details.concept-card p:last-child {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  min-height: 100svh;
+  min-height: calc(100vh - 60px);
+  min-height: calc(100svh - 60px);
   padding: 6rem 1.25rem 4rem;
   text-align: center;
   color: #fff;
@@ -1251,11 +1273,14 @@ details.concept-card p:last-child {
   --px: 0px;
   --py: 0px;
   width: 100%;
-  max-width: 1080px;
-  margin: 0 auto 1.4rem;
-  padding: 1.7rem 2.5rem;
+  max-width: #{"min(95vw, 1600px)"};
+  margin: 0 auto 1.25rem;
+  padding: 1.3rem 2.5rem;
   border-radius: 4px;
-  background: rgba(18, 32, 75, 0.85);
+  background: rgba(18, 32, 75, 0.88);
+  backdrop-filter: blur(3px) saturate(115%);
+  -webkit-backdrop-filter: blur(3px) saturate(115%);
+  box-shadow: 0 4px 24px rgba(8, 14, 40, 0.35);
   opacity: 0;
   transform: translateY(18px);
   translate: var(--px) var(--py);
@@ -1266,7 +1291,7 @@ details.concept-card p:last-child {
 }
 
 .hero-glass-card:hover {
-  background: rgba(18, 32, 75, 0.90);
+  background: rgba(18, 32, 75, 0.93);
   translate: var(--px) calc(var(--py) - 2px);
 }
 
@@ -1274,8 +1299,8 @@ details.concept-card p:last-child {
 .hero-glass-card--tagline { border-left: 3px solid #d97757; }
 .hero-glass-card--author {
   border-left: 3px solid #6a9bcc;
-  max-width: 580px;
-  padding: 1.3rem 2rem;
+  max-width: #{"min(72vw, 1000px)"};
+  padding: 1.05rem 2rem;
 }
 
 .hero-glass-card--delay-1 { animation-delay: 0.15s; }
@@ -1285,13 +1310,25 @@ details.concept-card p:last-child {
 /* --- Title — same treatment as the tagline, just at title size. --- */
 .hero-title {
   font-family: "Cinzel", "Trajan Pro", Georgia, serif;
-  font-size: clamp(1.9rem, 4.4vw, 3.2rem);
+  /* vw-scaled so the title fills the near-full-width panel on ONE line across
+     desktop/tablet; caps at 3.4rem on very wide screens. */
+  font-size: clamp(1.6rem, 3.7vw, 3.4rem);
   font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1.05;
-  margin: 0 0 0.5rem;
+  letter-spacing: 0.03em;
+  line-height: 1.08;
+  margin: 0 0 0.4rem;
   text-transform: uppercase;
   color: #fff;
+  white-space: nowrap;
+}
+
+/* Below ~740px the one-line font would overflow — allow wrapping. */
+@media (max-width: 740px) {
+  .hero-title {
+    white-space: normal;
+    font-size: clamp(1.5rem, 7vw, 2rem);
+    letter-spacing: 0.04em;
+  }
 }
 
 /* --- Title underline + pulsing teal dot --- */
@@ -1368,29 +1405,8 @@ details.concept-card p:last-child {
   margin: 0 0 0.55rem;
 }
 
-.hero-social-icons {
-  display: flex;
-  justify-content: center;
-  gap: 1.1rem;
-  margin: 0 0 0.7rem;
-  font-size: 1.15rem;
-}
-
-.hero-social-icons a {
-  color: rgba(255, 255, 255, 0.75);
-  text-decoration: none;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.hero-social-icons a:hover,
-.hero-social-icons a:focus-visible {
-  color: #00d4c8;
-  transform: translateY(-2px);
-  text-decoration: none;
-}
-
 .hero-author-affiliation {
-  font-size: clamp(0.82rem, 1.05vw, 0.95rem);
+  font-size: clamp(0.85rem, 1.05vw, 0.95rem);
   color: rgba(255, 255, 255, 0.88);
   line-height: 1.5;
   margin: 0;
@@ -1409,12 +1425,18 @@ details.concept-card p:last-child {
   text-decoration: none;
   opacity: 0;
   animation: fadeIn 0.6s ease forwards;
-  animation-delay: 1.8s;
+  animation-delay: 1.3s;
 }
 
 .hero-scroll-indicator:hover,
 .hero-scroll-indicator:focus-visible {
   text-decoration: none;
+}
+
+.hero-scroll-indicator:focus-visible {
+  outline: 2px solid #00d4c8;
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 .hero-scroll-indicator:hover .hero-scroll-chevron {
@@ -1447,32 +1469,35 @@ details.concept-card p:last-child {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Scroll-driven fade-out (Chrome/Safari; Firefox falls back) --- */
-@supports (animation-timeline: view()) {
-  .hero-glass-card {
-    animation:
-      heroFadeUp 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards,
-      heroFadeOut linear both;
-    animation-timeline: auto, view();
-    animation-range: auto, exit 0% exit 70%;
-  }
-  @keyframes heroFadeOut {
-    to { opacity: 0; transform: translateY(-30px); }
-  }
-}
+/* --- Scroll-driven fade-out: REMOVED ---
+   A `@supports (animation-timeline: view())` block used to fade each panel
+   out as it scrolled away. But `#hero2-new` has `overflow: hidden` (to clip
+   the Ken Burns background), which makes it a SCROLL CONTAINER — so `view()`
+   bound the timeline to that non-scrolling box instead of the document. Each
+   panel then got a fixed, position-based "exit" progress even at scroll top:
+   the topmost (title) panel resolved to ~0.43 opacity permanently, so the
+   background map showed through the white title letters. This reproduced on
+   every browser supporting view-timelines (Chrome 115+, Safari 17.4+, mobile)
+   and was the long-standing "transparent title" bug. The fade was a minor
+   flourish; removing it makes every panel render solid (opacity 1 via the
+   `heroFadeUp ... forwards` entrance). See logs/2026-06-03-hero-title-fix.md. */
 
 /* --- Mobile --- */
 @media (max-width: 600px) {
   .hero-native {
-    padding: 5rem 0.75rem 4rem;
+    padding: 5rem 0.9rem 4rem;
   }
   .hero-glass-card {
-    padding: 1.2rem 1.1rem;
+    padding: 1.3rem 1.25rem;
     margin-bottom: 1rem;
     border-radius: 3px;
   }
   .hero-glass-card--author {
-    padding: 1rem 1rem;
+    padding: 1.15rem 1.2rem;
+  }
+  .hero-title {
+    letter-spacing: 0.05em; /* recover horizontal room so the long uppercase
+                               title doesn't wrap to a cramped third line */
   }
   .hero-scroll-indicator {
     bottom: 1.2rem;
@@ -2150,6 +2175,15 @@ body.dark {
   scrollbar-width: thin;
   scrollbar-color: rgba(106, 155, 204, 0.5) transparent;
 }
+/* Bigger teaser cards so the Posts image size matches the Projects /
+   Presentations showcase images; full image (contain) + subtle letterbox.
+   Scoped to the homepage teaser strip (the /post/ gallery is untouched). */
+.tg-teaser-strip .tg-card {
+  width: #{"min(500px, 82vw)"};
+  max-width: #{"min(500px, 82vw)"};
+  background: rgba(8, 14, 40, 0.5);
+}
+.tg-teaser-strip .tg-card-image { object-fit: contain; }
 .tg-teaser-link-row {
   text-align: right;
   margin-top: 0.5rem;
@@ -2160,4 +2194,520 @@ body.dark {
   text-decoration: none;
 }
 .tg-teaser-link:hover { color: #a85a40; text-decoration: underline; }
+
+/* =====================================================================
+   22. Cinematic homepage layer
+   Extends the hero's dark "development-from-space" language across every
+   homepage widget. Default mode = dark (set in head JS); a clean light
+   variant lives under the un-prefixed selectors, the cinematic dark under
+   `.dark`. No theme fork — targets the stable `.home-section` /
+   `.wg-<widget>` / `.section-heading` hooks. Reuses the hero glass pattern
+   (Section 21) + the Section-15 dark palette.
+   ===================================================================== */
+
+/* ---- 22.0 Tokens ---- */
+$cz-navy-0: #070d24;
+$cz-navy-1: #0a1230;
+$cz-teal:   #00d4c8;
+$cz-orange: #d97757;
+$cz-steel:  #6a9bcc;
+$cz-ink:    #eaf0fb;
+$cz-glass:  rgba(20, 32, 72, 0.55);
+$cz-hair:   rgba(124, 156, 220, 0.18);
+
+$cz-l-bg-odd:  #f6f8fc;
+$cz-l-bg-even: #eef2f9;
+$cz-l-surface: rgba(255, 255, 255, 0.88);
+$cz-l-hair:    rgba(22, 42, 88, 0.10);
+$cz-l-ink:     #18233f;
+
+$cz-grad: linear-gradient(90deg, #{$cz-teal}, #{$cz-orange});
+
+/* ---- 22.1 Glass-card mixin (light base + .dark override) ---- */
+@mixin cz-card($accent: $cz-teal, $blur: true) {
+  position: relative;
+  background: $cz-l-surface;
+  border: 1px solid $cz-l-hair;
+  border-radius: 14px;
+  @if $blur {
+    -webkit-backdrop-filter: blur(8px) saturate(115%);
+    backdrop-filter: blur(8px) saturate(115%);
+  }
+  box-shadow: 0 10px 30px rgba(20, 40, 90, 0.08);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba($accent, 0.5);
+    box-shadow: 0 18px 40px rgba(20, 40, 90, 0.14);
+  }
+  .dark & {
+    background: $cz-glass;
+    border-color: $cz-hair;
+    box-shadow: 0 18px 46px rgba(3, 8, 28, 0.45);
+  }
+  .dark &:hover {
+    border-color: rgba($accent, 0.6);
+    box-shadow: 0 26px 60px rgba(3, 8, 28, 0.6);
+  }
+}
+
+/* ---- 22.2 Section backgrounds & atmosphere ---- */
+/* Drop the per-section map images (#featured, #contact): the dark mode uses
+   one global texture; light mode stays clean. The hero is unaffected (it
+   paints its own Ken Burns ::before, not this theme bg). */
+.home-section > .home-section-bg.bg-image { display: none !important; }
+
+/* keep section content above the fixed backdrop */
+.home-section { position: relative; z-index: 1; }
+
+/* Light mode: clean, cohesive (replaces the harsh default alternation) */
+.home-section { background: $cz-l-bg-odd !important; }
+.home-section:nth-of-type(even) { background: $cz-l-bg-even !important; }
+
+/* Dark mode: one continuous cinematic backdrop; sections are subtle layers */
+.dark body { background: $cz-navy-1; }
+/* anti-flash: paint dark immediately (before the theme JS adds body.dark) */
+html.wc-pre-dark,
+html.wc-pre-dark body { background-color: $cz-navy-1 !important; }
+.dark .home-section { background: transparent !important; }
+.dark .home-section:nth-of-type(even) { background: rgba(124, 156, 220, 0.022) !important; }
+
+/* faint night-lights texture + accent glows behind the whole dark page */
+.dark .page-wrapper::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: url("/media/websiteCover5.webp") center top / cover no-repeat;
+  opacity: 0.08;
+}
+.dark .page-wrapper::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(1100px 700px at 50% -8%, rgba(0, 212, 200, 0.06), transparent 60%),
+    radial-gradient(1000px 760px at 90% 22%, rgba(217, 119, 87, 0.05), transparent 60%);
+}
+
+/* ---- 22.3 Section-header system (the cohesion engine) ---- */
+/* Force every section heading to a centered, full-width band so the
+   typographic treatment reads uniformly across all widget layouts. */
+.home-section .section-heading {
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+  text-align: center;
+  align-items: center !important;
+  margin: 0 auto 2.2rem;
+}
+.home-section .section-heading h1 {
+  font-family: "Crimson Pro", Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  font-size: clamp(1.7rem, 2.9vw, 2.5rem);
+  line-height: 1.12;
+  color: $cz-l-ink;
+  margin: 0;
+}
+.dark .home-section .section-heading h1 { color: $cz-ink; }
+
+/* teal eyebrow tick above + gradient divider below every section title */
+.home-section .section-heading h1::before {
+  content: "";
+  display: block;
+  width: 40px; height: 2px;
+  margin: 0 auto 1.1rem;
+  border-radius: 2px;
+  background: $cz-teal;
+  opacity: 0.85;
+}
+.home-section .section-heading h1::after {
+  content: "";
+  display: block;
+  width: 84px; height: 2px;
+  margin: 1.1rem auto 0;
+  border-radius: 2px;
+  background: $cz-grad;
+}
+.home-section .section-heading p {
+  font-family: "Cormorant Garamond", Garamond, Georgia, serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  color: $cz-steel;
+  margin-top: 0.9rem;
+}
+/* center the widget content rows under the centered heading */
+.home-section > .container > .row { justify-content: center; }
+
+/* ---- 22.3b About profile (bare h1 + glass profile card) ---- */
+.home-section.wg-about .container > .row {
+  margin-left: 0;
+  margin-right: 0;
+  background: $cz-l-surface;
+  border: 1px solid $cz-l-hair;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(20, 40, 90, 0.08);
+  padding: 2.2rem 1.8rem;
+}
+.dark .home-section.wg-about .container > .row {
+  background: $cz-glass;
+  border-color: $cz-hair;
+  -webkit-backdrop-filter: blur(8px) saturate(115%);
+  backdrop-filter: blur(8px) saturate(115%);
+  box-shadow: 0 18px 46px rgba(3, 8, 28, 0.45);
+}
+.home-section.wg-about h1 {
+  font-family: "Crimson Pro", Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  color: $cz-l-ink;
+}
+.dark .home-section.wg-about h1 { color: $cz-ink; }
+.home-section.wg-about h1::after {
+  content: "";
+  display: block;
+  width: 70px; height: 2px;
+  margin: 0.85rem 0 1.2rem;
+  border-radius: 2px;
+  background: $cz-grad;
+}
+
+/* ---- 22.4 Featured publications → compact glass cards ---- */
+.home-section.wg-featured .card-simple {
+  @include cz-card($cz-teal);
+  padding: 0;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.home-section.wg-featured .card-simple .article-banner { border-radius: 0; }
+
+/* One consistent left/right inset for EVERY text row (metadata, title,
+   abstract, buttons) so they share a single left edge. */
+.home-section.wg-featured .card-simple .article-metadata,
+.home-section.wg-featured .card-simple .section-subheading,
+.home-section.wg-featured .card-simple .summary-link,
+.home-section.wg-featured .card-simple .article-style,
+.home-section.wg-featured .card-simple .btn-links {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Tight vertical rhythm — kill the dead space between rows. */
+.home-section.wg-featured .card-simple .article-metadata {
+  padding-top: 0.85rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.8rem;
+}
+.home-section.wg-featured .card-simple .section-subheading {
+  padding-top: 0.85rem;
+  margin: 0 0 0.3rem;
+}
+.home-section.wg-featured .card-simple .article-title { margin: 0; }
+.home-section.wg-featured .card-simple .summary-link { display: block; }
+.home-section.wg-featured .card-simple .article-style,
+.home-section.wg-featured .card-simple .article-style p { margin: 0; }
+.home-section.wg-featured .card-simple .btn-links {
+  padding-top: 0.85rem;
+  padding-bottom: 1.1rem;
+  margin: 0;
+}
+.home-section.wg-featured .card-simple .article-title a {
+  font-family: "Crimson Pro", Georgia, serif;
+  font-weight: 600;
+}
+
+/* No underlines on the title or the abstract link (noise on the caps title). */
+.home-section.wg-featured .card-simple .article-title a,
+.home-section.wg-featured .card-simple .summary-link,
+.home-section.wg-featured .card-simple .summary-link a {
+  text-decoration: none !important;
+}
+
+/* ---- 22.5 Pages lists (publications, talks) → glass rows ---- */
+.home-section.wg-pages .media.stream-item {
+  @include cz-card($cz-orange, $blur: false);
+  padding: 1.3rem 1.5rem;
+  margin-bottom: 1.1rem;
+}
+.home-section.wg-pages .media.stream-item .article-title a {
+  font-family: "Crimson Pro", Georgia, serif;
+  font-weight: 600;
+}
+
+/* ---- 22.6 Showcase rows (Projects + Presentations via `showcase` shortcode) ---- */
+.cz-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.cz-showcase-item {
+  @include cz-card($cz-steel);
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 1.8rem;
+  align-items: center;
+  padding: 1.4rem;
+}
+.cz-showcase-media {
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  align-self: center;
+  aspect-ratio: unquote("16 / 9");
+  background: rgba(8, 14, 40, 0.5); /* subtle letterbox fill (dark) */
+}
+body:not(.dark) .cz-showcase-media { background: rgba(20, 40, 90, 0.05); }
+.cz-showcase-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* show the FULL image — never cropped */
+  display: block;
+  transition: transform 0.4s ease;
+}
+.cz-showcase-item:hover .cz-showcase-media img { transform: scale(1.03); }
+.cz-showcase-noimg {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #16224d, #0d1430);
+  color: rgba(255, 255, 255, 0.25); font-size: 3rem;
+}
+/* Alternate the image to the right on even rows. */
+.cz-showcase-item:nth-child(even) .cz-showcase-media { order: 2; }
+.cz-showcase-title {
+  font-family: "Crimson Pro", Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+.cz-showcase-title a { color: $cz-l-ink; text-decoration: none !important; }
+.dark .cz-showcase-title a { color: $cz-ink; }
+.cz-showcase-meta {
+  font-size: 0.85rem;
+  color: #6b7691;
+  margin: 0 0 0.6rem;
+  display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;
+}
+.dark .cz-showcase-meta { color: #8e99b8; }
+.cz-showcase-summary {
+  color: #44506e;
+  line-height: 1.55;
+  margin: 0 0 1rem;
+}
+.cz-showcase-summary p { margin: 0; }
+.dark .cz-showcase-summary { color: #aeb9d6; }
+.cz-showcase-links { margin: 0; }
+.cz-showcase-browse {
+  max-width: 1100px;
+  margin: 1.1rem auto 0;
+  text-align: right;
+}
+@media (max-width: 720px) {
+  .cz-showcase-item { grid-template-columns: 1fr; gap: 1rem; }
+  .cz-showcase-item:nth-child(even) .cz-showcase-media { order: 0; }
+  .cz-showcase-media img { aspect-ratio: 16 / 9; }
+}
+
+/* ---- 22.7 People (students) → framed cards + teal avatar ring ---- */
+.home-section.wg-people .people-person {
+  padding: 1.1rem 0.8rem 1.3rem;
+  border-radius: 14px;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+.home-section.wg-people .people-person:hover { transform: translateY(-3px); }
+.dark .home-section.wg-people .people-person:hover { background: rgba(124, 156, 220, 0.06); }
+.home-section.wg-people .people-person:hover { background: rgba(20, 40, 90, 0.04); }
+.home-section.wg-people .avatar.avatar-circle {
+  box-shadow: 0 0 0 2px rgba(124, 156, 220, 0.3);
+  transition: box-shadow 0.25s ease;
+}
+.home-section.wg-people .people-person:hover .avatar.avatar-circle {
+  box-shadow: 0 0 0 2px rgba(0, 212, 200, 0.7), 0 0 20px rgba(0, 212, 200, 0.32);
+}
+.home-section.wg-people .portrait-title h2 a { font-family: "Crimson Pro", Georgia, serif; }
+
+/* ---- 22.8 Contact → glass info panel + rounded map ---- */
+.home-section.wg-contact ul.fa-ul {
+  @include cz-card($cz-teal, $blur: false);
+  padding: 1.6rem 1.8rem 1.6rem 3rem;
+  list-style: none;
+}
+.home-section.wg-contact #map {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid $cz-hair;
+}
+
+/* ---- 22.9 Navbar → translucent cinematic glass ---- */
+#navbar-main {
+  background: rgba(10, 18, 48, 0.8) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  border-bottom: 1px solid rgba(124, 156, 220, 0.12);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.22);
+}
+
+/* ---- 22.10 Cinematic footer (markup in layouts/partials/site_footer.html) ---- */
+.cz-footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid $cz-hair;
+  background: linear-gradient(180deg, transparent, rgba(7, 13, 36, 0.85));
+  padding: 3.4rem 0 1.8rem;
+}
+.cz-footer-inner {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 2.4rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.cz-footer .cz-brand {
+  font-family: "Crimson Pro", Georgia, serif;
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  color: $cz-ink;
+  margin: 0 0 0.5rem;
+}
+.cz-footer .cz-tag {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  color: $cz-steel;
+  font-size: 1.05rem;
+  margin: 0 0 1rem;
+}
+.cz-footer h5 {
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: $cz-teal;
+  margin: 0 0 0.9rem;
+}
+.cz-footer ul { list-style: none; margin: 0; padding: 0; }
+.cz-footer li { margin: 0 0 0.55rem; }
+.cz-footer a { color: #aeb9d6; text-decoration: none; font-size: 0.9rem; transition: color 0.2s ease; }
+.cz-footer a:hover { color: $cz-teal; }
+.cz-footer-social { display: flex; gap: 0.9rem; margin-top: 0.4rem; font-size: 1.05rem; }
+.cz-footer-social a { color: $cz-steel; }
+.cz-footer-social a:hover { color: $cz-teal; }
+.cz-footer-copy {
+  max-width: 1100px;
+  margin: 2.2rem auto 0;
+  padding: 1.2rem 1.5rem 0;
+  border-top: 1px solid $cz-hair;
+  color: #828fb4;
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+/* light-mode footer */
+.cz-footer { background: linear-gradient(180deg, transparent, rgba(20, 40, 90, 0.05)); border-top-color: $cz-l-hair; }
+.cz-footer .cz-brand { color: $cz-l-ink; }
+.cz-footer a { color: #44506e; }
+.cz-footer-copy { color: #6b7691; border-top-color: $cz-l-hair; }
+.dark .cz-footer { background: linear-gradient(180deg, transparent, rgba(7, 13, 36, 0.85)); border-top-color: $cz-hair; }
+.dark .cz-footer .cz-brand { color: $cz-ink; }
+.dark .cz-footer a { color: #aeb9d6; }
+.dark .cz-footer-copy { color: #828fb4; border-top-color: $cz-hair; }
+
+/* ---- 22.11 Focus rings + reduced motion ---- */
+.home-section .card-simple:focus-within,
+.home-section .project-item:focus-within,
+.home-section .stream-item:focus-within { border-color: rgba(0, 212, 200, 0.5); }
+.home-section a:focus-visible,
+.cz-footer a:focus-visible {
+  outline: 2px solid $cz-teal;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-section.wg-featured .card-simple,
+  .home-section.wg-pages .media.stream-item,
+  .home-section.wg-portfolio .project-item,
+  .home-section.wg-people .people-person {
+    transition: none;
+  }
+  .home-section.wg-featured .card-simple:hover,
+  .home-section.wg-pages .media.stream-item:hover,
+  .home-section.wg-portfolio .project-item:hover,
+  .home-section.wg-people .people-person:hover { transform: none; }
+}
+
+/* ---- 22.12 Mobile ---- */
+@media (max-width: 600px) {
+  .cz-footer-inner { grid-template-columns: 1fr 1fr; gap: 1.6rem; }
+  .cz-footer-inner > :first-child { grid-column: 1 / -1; }
+  .home-section .section-heading h1 { font-size: clamp(1.5rem, 7vw, 2rem); }
+}
+
+/* ---- 22.13 Projects gallery grid (/projects/) — reuses .tg-card look ---- */
+.tg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.4rem;
+  margin: 1.8rem 0 3.5rem;
+}
+.tg-grid .tg-card {
+  width: auto;
+  max-width: none;
+}
+.tg-card--captioned .tg-card-caption {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 2;
+  padding: 1.7rem 0.95rem 0.85rem;
+  background: linear-gradient(to top, rgba(7, 13, 36, 0.94) 0%, rgba(7, 13, 36, 0.5) 55%, transparent 100%);
+  pointer-events: none;
+}
+.tg-card-cap-meta {
+  display: block;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+.tg-card-cap-title {
+  display: block;
+  color: #fff;
+  font-family: "Crimson Pro", Georgia, serif;
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.25;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.6);
+}
+.tg-card-noimg {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #16224d, #0d1430);
+  color: rgba(255, 255, 255, 0.22);
+  font-size: 2.6rem;
+}
+
+/* ---- 22.14 Uppercase headings (Crimson Pro has real lowercase; Cinzel was
+   caps-only, so the all-caps treatment must now be explicit). A small tracking
+   keeps caps legible; long card titles stay tight. ---- */
+.home-section .section-heading h1,
+.home-section.wg-about h1,
+.home-section.wg-featured .card-simple .article-title a,
+.home-section.wg-pages .media.stream-item .article-title a,
+.cz-showcase-title,
+.home-section.wg-people .portrait-title h2 a,
+.cz-footer .cz-brand,
+.tg-card-cap-title {
+  text-transform: uppercase;
+}
+.home-section.wg-featured .card-simple .article-title a,
+.home-section.wg-pages .media.stream-item .article-title a,
+.cz-showcase-title,
+.tg-card-cap-title {
+  letter-spacing: 0.02em;
+}
 

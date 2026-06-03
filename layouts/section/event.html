@@ -1,0 +1,21 @@
+{{/*
+  Section template: Presentations gallery.
+  A single responsive grid of captioned 16:9 event cards (newest first),
+  styled to match the projects gallery. No topic rows / no controls.
+*/}}
+{{ define "main" }}
+
+<div class="universal-wrapper pt-3">
+  <h1 class="tg-page-title">{{ .Title }}</h1>
+  {{ with .Params.lead }}<p class="tg-page-lead">{{ . | markdownify }}</p>{{ end }}
+</div>
+
+<div class="universal-wrapper">
+  <div class="tg-grid">
+    {{ range .Pages.ByDate.Reverse }}
+      {{ partial "event_card.html" . }}
+    {{ end }}
+  </div>
+</div>
+
+{{ end }}

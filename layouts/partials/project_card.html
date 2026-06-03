@@ -1,0 +1,22 @@
+{{/*
+  project_card.html — captioned 16:9 card for the /projects/ gallery grid.
+  Project featured images don't embed their titles (unlike the tutorial
+  infographics), so we overlay a Cinzel title caption at the bottom.
+  Context: a project Page.
+*/}}
+{{ $p := . }}
+{{ $img := $p.Resources.GetMatch "featured*" }}
+{{ $link := $p.RelPermalink }}
+{{ with $p.Params.external_link }}{{ if . }}{{ $link = . }}{{ end }}{{ end }}
+<a class="tg-card tg-card--captioned" href="{{ $link }}" title="{{ $p.Title }}" aria-label="{{ $p.Title }}">
+  <div class="tg-card-media">
+    {{ with $img }}
+      {{ $thumb := .Fill "800x450 Center" }}
+      <img class="tg-card-image" src="{{ $thumb.RelPermalink }}" alt="{{ $p.Title }}"
+           loading="lazy" decoding="async" width="800" height="450">
+    {{ else }}
+      <span class="tg-card-noimg"><i class="fas fa-layer-group" aria-hidden="true"></i></span>
+    {{ end }}
+  </div>
+  <span class="tg-card-caption"><span class="tg-card-cap-title">{{ $p.Title }}</span></span>
+</a>

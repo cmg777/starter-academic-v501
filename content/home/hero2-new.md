@@ -1,26 +1,25 @@
 ---
-# PARKED: this is the redesigned hero (Phase 1-6 of the 2026-05-11 hero
-# redesign work). Currently INACTIVE. Old Canva-JPG hero in `hero2.md`
-# is live instead while title-glyph transparency on macOS is diagnosed.
+# LIVE: this is the redesigned native hero (the old Canva-GIF hero in
+# `hero2.md` is now `active: false`). The new-hero SCSS is Section 21 of
+# `assets/scss/custom.scss`, scoped to `#hero2-new`.
 #
-# To re-activate this hero:
-#   1. Set `active: true` here
-#   2. Set `active: false` in `hero2.md`
-#   3. Save — Hugo hot-reloads. The new-hero SCSS in Section 21 of
-#      `assets/scss/custom.scss` is scoped to `#hero2-new` so it auto-
-#      applies when this widget is active.
-#
-# Open issue (pending resume): on the user's macOS, title letters render
-# as transparent (map visible through letterforms). After seven CSS
-# iterations the root cause is suspected to be a macOS Accessibility
-# setting (Reduce transparency / Increase contrast / Color filters) or
-# a non-Dark-Reader browser extension. See `logs/2026-05-11-hero-native-text.md`
-# for the full diagnostic history.
+# Title-transparency bug — RESOLVED 2026-06-03. The long-standing "title
+# letters render transparent (map visible through letterforms)" issue was
+# NOT a macOS/extension problem. Root cause: the scroll-driven `heroFadeOut`
+# used `animation-timeline: view()`, which bound to `#hero2-new` (it has
+# `overflow: hidden` for the Ken Burns bg, making it a scroll container)
+# instead of the document. The topmost (title) panel therefore resolved to a
+# fixed ~0.43 opacity even at scroll top, so the whole card — navy panel and
+# white text — was semi-transparent. Reproduced deterministically in headless
+# Chromium by diffing the title panel's computed opacity vs the (solid) lower
+# panels. Fix: removed the `heroFadeOut` view-timeline block. See
+# `logs/2026-06-03-hero-title-fix.md` (and `logs/2026-05-11-hero-native-text.md`
+# for the earlier diagnostic history).
 
 widget: blank
 
 # Activate this widget? true/false
-active: false
+active: true
 
 headless: true
 weight: 02
@@ -39,7 +38,7 @@ design:
 
 <div class="hero-native">
   <div class="hero-glass-card hero-glass-card--title hero-glass-card--delay-1">
-    <h1 class="hero-title" style="color: #ffffff; opacity: 1; -webkit-text-fill-color: #ffffff;">On the Geography of Development</h1>
+    <h1 class="hero-title">On the Geography of Development</h1>
     <div class="hero-title-underline" aria-hidden="true"></div>
     <p class="hero-subtitle">Insights from Geospatial Big Data, Development Economics, and Spatial Econometrics</p>
   </div>
@@ -50,12 +49,6 @@ design:
 
   <div class="hero-glass-card hero-glass-card--author hero-glass-card--delay-3">
     <p class="hero-author-name">Carlos Mendez</p>
-    <div class="hero-social-icons" aria-label="Social profiles">
-      <a href="https://orcid.org/0000-0001-7978-2815" target="_blank" rel="noopener" aria-label="ORCID"><i class="ai ai-orcid"></i></a>
-      <a href="https://scholar.google.co.jp/citations?user=v9dK0MoAAAAJ&amp;hl=en" target="_blank" rel="noopener" aria-label="Google Scholar"><i class="ai ai-google-scholar"></i></a>
-      <a href="https://github.com/cmg777" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
-      <a href="https://www.linkedin.com/in/mendezguerra/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-    </div>
     <p class="hero-author-affiliation">Graduate School of International Development<br>Nagoya University, Japan</p>
   </div>
 

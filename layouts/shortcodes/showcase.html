@@ -1,0 +1,52 @@
+{{/* showcase shortcode — alternating image/text "showcase" rows of the latest
+     N pages of a collection (projects or events). Mirrors the portfolio
+     showcase look the homepage Projects used, so Presentations can match it.
+     Args:
+       type          "project" | "event"      (default "project")
+       count         number of items           (default 5)
+       browse_url    optional URL → renders a "Browse all" link row
+       browse_label  label for that link        (default "Browse all")
+*/}}
+{{ $type := .Get "type" | default "project" }}
+{{ $count := int (.Get "count" | default 5) }}
+{{ $section := cond (eq $type "event") "event" "projects" }}
+{{ $items := first $count (where site.RegularPages "Section" $section).ByDate.Reverse }}
+
+<div class="cz-showcase">
+  {{ range $items }}
+    {{ $p := . }}
+    {{ $link := $p.RelPermalink }}
+    {{ $target := "" }}
+    {{ with $p.Params.external_link }}{{ $link = . }}{{ $target = "target=\"_blank\" rel=\"noopener\"" }}{{ end }}
+    {{ $img := ($p.Resources.ByType "image").GetMatch "*featured*" }}
+    <article class="cz-showcase-item">
+      <a class="cz-showcase-media" href="{{ $link }}" {{ $target | safeHTMLAttr }} aria-label="{{ $p.Title }}">
+        {{ with $img }}
+          {{ $thumb := .Fit "1200x900" }}
+          <img src="{{ $thumb.RelPermalink }}" alt="{{ $p.Title }}" loading="lazy">
+        {{ else }}
+          <span class="cz-showcase-noimg"><i class="fas fa-layer-group" aria-hidden="true"></i></span>
+        {{ end }}
+      </a>
+      <div class="cz-showcase-body">
+        <h3 class="cz-showcase-title"><a href="{{ $link }}" {{ $target | safeHTMLAttr }}>{{ $p.Title }}</a></h3>
+        {{ if eq $type "event" }}
+          <div class="cz-showcase-meta">
+            <span>{{ partial "functions/get_event_dates" $p }}</span>
+            {{ with $p.Params.location }}<span class="middot-divider"></span><span>{{ . }}</span>{{ end }}
+          </div>
+        {{ end }}
+        {{ with $p.Params.summary }}<div class="cz-showcase-summary">{{ . | markdownify | emojify }}</div>{{ end }}
+        {{ if partial "functions/has_attachments" $p }}
+          <div class="btn-links cz-showcase-links">{{ partial "page_links" (dict "page" $p "is_list" 1) }}</div>
+        {{ end }}
+      </div>
+    </article>
+  {{ end }}
+</div>
+
+{{ with .Get "browse_url" }}
+  <div class="cz-showcase-browse">
+    <a class="tg-teaser-link" href="{{ . }}">{{ $.Get "browse_label" | default "Browse all" }} &rarr;</a>
+  </div>
+{{ end }}

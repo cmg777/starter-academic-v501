@@ -22,8 +22,6 @@ design:
     image_position: center
     # Use a fun parallax-like fixed background effect on desktop? true/false
     image_parallax: false
-    # Text color (true=light, false=dark, or remove for the dynamic theme color).
-    text_color_light: true
   # Choose how many columns the section has. Valid values: 1 or 2.
   columns: '1'
 ---
