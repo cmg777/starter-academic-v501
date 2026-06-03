@@ -1,7 +1,7 @@
 {{/*
   Section template: Presentations gallery.
-  A single responsive grid of captioned 16:9 event cards (newest first),
-  styled to match the projects gallery. No topic rows / no controls.
+  Sequential alternating image/text "showcase" rows (newest first), matching
+  the homepage "Recent & Upcoming Presentations" widget look (cz-showcase).
 */}}
 {{ define "main" }}
 
@@ -11,9 +11,34 @@
 </div>
 
 <div class="universal-wrapper">
-  <div class="tg-grid">
+  <div class="cz-showcase">
     {{ range .Pages.ByDate.Reverse }}
-      {{ partial "event_card.html" . }}
+      {{ $p := . }}
+      {{ $link := $p.RelPermalink }}
+      {{ $target := "" }}
+      {{ with $p.Params.external_link }}{{ $link = . }}{{ $target = "target=\"_blank\" rel=\"noopener\"" }}{{ end }}
+      {{ $img := ($p.Resources.ByType "image").GetMatch "*featured*" }}
+      <article class="cz-showcase-item">
+        <a class="cz-showcase-media" href="{{ $link }}" {{ $target | safeHTMLAttr }} aria-label="{{ $p.Title }}">
+          {{ with $img }}
+            {{ $thumb := .Fit "1200x900" }}
+            <img src="{{ $thumb.RelPermalink }}" alt="{{ $p.Title }}" loading="lazy">
+          {{ else }}
+            <span class="cz-showcase-noimg"><i class="fas fa-chalkboard-user" aria-hidden="true"></i></span>
+          {{ end }}
+        </a>
+        <div class="cz-showcase-body">
+          <h3 class="cz-showcase-title"><a href="{{ $link }}" {{ $target | safeHTMLAttr }}>{{ $p.Title }}</a></h3>
+          <div class="cz-showcase-meta">
+            <span>{{ partial "functions/get_event_dates" $p }}</span>
+            {{ with $p.Params.location }}<span class="middot-divider"></span><span>{{ . }}</span>{{ end }}
+          </div>
+          {{ with $p.Params.summary }}<div class="cz-showcase-summary">{{ . | markdownify | emojify }}</div>{{ end }}
+          {{ if partial "functions/has_attachments" $p }}
+            <div class="btn-links cz-showcase-links">{{ partial "page_links" (dict "page" $p "is_list" 1) }}</div>
+          {{ end }}
+        </div>
+      </article>
     {{ end }}
   </div>
 </div>
