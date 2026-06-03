@@ -1,7 +1,8 @@
 {{/*
   Section template: Presentations gallery.
   Sequential alternating image/text "showcase" rows (newest first), matching
-  the homepage "Recent & Upcoming Presentations" widget look (cz-showcase).
+  the homepage "Recent & Upcoming Presentations" widget look (cz-showcase),
+  with a search box + year filter at the top (mirrors /publication/).
 */}}
 {{ define "main" }}
 
@@ -10,15 +11,52 @@
   {{ with .Params.lead }}<p class="tg-page-lead">{{ . | markdownify }}</p>{{ end }}
 </div>
 
+{{/* Distinct years for the year filter. */}}
+{{ range .Pages.ByDate.Reverse }}
+  {{ $year := print (.Date.Format "2006") }}
+  {{ $.Scratch.SetInMap "years" $year $year }}
+{{ end }}
+
 <div class="universal-wrapper">
-  <div class="cz-showcase">
+  <div class="form-row mb-4">
+    <div class="col-auto">
+      <input type="search" class="filter-search" placeholder="{{ i18n "search_placeholder" }}" autocapitalize="off"
+      autocomplete="off" autocorrect="off" role="textbox" spellcheck="false">
+    </div>
+    <div class="col-auto">
+      <select class="pub-filters form-control form-control-sm" data-filter-group="year">
+        <option value="*">{{ i18n "date" }}</option>
+        {{ $years_sorted := $.Scratch.GetSortedMapValues "years" }}
+        {{ if $years_sorted }}
+        {{ range $year := sort $years_sorted "" "desc" }}
+        <option value=".year-{{ $year }}">
+          {{ $year }}
+        </option>
+        {{ end }}
+        {{ end }}
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="universal-wrapper">
+  <div class="cz-showcase event-showcase">
     {{ range .Pages.ByDate.Reverse }}
       {{ $p := . }}
       {{ $link := $p.RelPermalink }}
       {{ $target := "" }}
       {{ with $p.Params.external_link }}{{ $link = . }}{{ $target = "target=\"_blank\" rel=\"noopener\"" }}{{ end }}
       {{ $img := ($p.Resources.ByType "image").GetMatch "*featured*" }}
-      <article class="cz-showcase-item">
+      {{ $year := $p.Date.Format "2006" }}
+      {{ $searchText := lower (printf "%s %s %s %s %s"
+            ($p.Title | default "")
+            ($p.Params.subtitle | default "")
+            ($p.Params.location | default "")
+            ($p.Params.event | default "")
+            ($p.Params.summary | default "")) }}
+      <article class="cz-showcase-item"
+               data-year="{{ $year }}"
+               data-search="{{ $searchText }}">
         <a class="cz-showcase-media" href="{{ $link }}" {{ $target | safeHTMLAttr }} aria-label="{{ $p.Title }}">
           {{ with $img }}
             {{ $thumb := .Fit "1200x900" }}
@@ -42,5 +80,33 @@
     {{ end }}
   </div>
 </div>
+
+<script>
+  (function() {
+    var searchInput = document.querySelector('.filter-search');
+    var yearSelect = document.querySelector('[data-filter-group="year"]');
+    var items = document.querySelectorAll('.event-showcase .cz-showcase-item');
+    if (!items.length) return;
+
+    function applyFilters() {
+      var q = (searchInput && searchInput.value || '').toLowerCase().trim();
+      var yearFilter = (yearSelect && yearSelect.value) || '*';
+
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var text = item.getAttribute('data-search') || '';
+        var year = item.getAttribute('data-year') || '';
+
+        var matchesSearch = !q || text.indexOf(q) !== -1;
+        var matchesYear = yearFilter === '*' || yearFilter === '.year-' + year;
+
+        item.style.display = (matchesSearch && matchesYear) ? '' : 'none';
+      }
+    }
+
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+    if (yearSelect) yearSelect.addEventListener('change', applyFilters);
+  })();
+</script>
 
 {{ end }}
