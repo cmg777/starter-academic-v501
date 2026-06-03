@@ -31,7 +31,25 @@
       {{ with $p.Params.publication_types }}{{ $pubType = index . 0 }}{{ end }}
       {{ $iconName := index $typeIcons $pubType | default "file" }}
 
-      <article class="cz-showcase-item">
+      {{/* Search tokens: title + resolved author display names + plain venue. */}}
+      {{ $authorTokens := slice }}
+      {{ range ($p.Params.authors | default slice) }}
+        {{ $authorPage := site.GetPage (printf "authors/%s" .) }}
+        {{ if $authorPage }}
+          {{ $authorTokens = $authorTokens | append $authorPage.Title }}
+        {{ else }}
+          {{ $authorTokens = $authorTokens | append . }}
+        {{ end }}
+      {{ end }}
+      {{ $venuePlain := "" }}
+      {{ with $p.Params.publication }}{{ $venuePlain = . | plainify }}{{ end }}
+      {{ $searchText := lower (printf "%s %s %s" $p.Title (delimit $authorTokens " ") $venuePlain) }}
+      {{ $year := $p.Date.Format "2006" }}
+
+      <article class="cz-showcase-item"
+               data-pubtype="{{ $pubType }}"
+               data-year="{{ $year }}"
+               data-search="{{ $searchText }}">
         <a class="cz-showcase-media" href="{{ $imgLink }}" {{ $extTarget | safeHTMLAttr }} aria-label="{{ $p.Title }}">
           {{ with $img }}
             {{ $thumb := .Fit "1200x900" }}
