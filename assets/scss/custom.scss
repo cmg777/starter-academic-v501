@@ -1328,6 +1328,23 @@ details.concept-card p:last-child {
   white-space: nowrap;
 }
 
+/* Hidden Easter-egg link: the hero title -> Canva slide decks. Renders exactly
+   like the plain title (inherit color, no underline) in every state; the only
+   tell is the pointer cursor on hover, and no tooltip — so it stays a discoverable
+   secret. Keep this comment so the "unstyled link" isn't mistaken for a bug. */
+.hero-title-link,
+.hero-title-link:hover,
+.hero-title-link:focus,
+.hero-title-link:visited {
+  color: inherit;
+  text-decoration: none;
+}
+.hero-title-link { cursor: pointer; }
+.hero-title-link:focus-visible {            /* keyboard users only — mouse users never see it */
+  outline: 2px solid #00d4c8;
+  outline-offset: 4px;
+}
+
 /* Below ~740px the one-line font would overflow — allow wrapping. */
 @media (max-width: 740px) {
   .hero-title {

@@ -90,3 +90,14 @@ title now simply appears (still carried in by the card fade-up entrance).
 
 **Still live:** B4 underline-draw + pulsing dot, B2 rotating pillars, the card
 fade-up entrance, C1 cursor parallax, and the amplified Ken Burns zoom (20s).
+
+## Follow-up 5 (same day) — hidden Easter-egg link on the title
+
+Per request, the hero `<h1>` "On the Geography of Development" is now a **hidden
+link** to the Canva slides (`https://carlos-mendez.my.canva.site/`, opens in a new
+tab). No deck named "Kanban" exists in the repo or git history, so this points at
+the Canva site root (swap to a specific deck URL anytime). Wrapped the title text
+in `<a class="hero-title-link" target="_blank" rel="noopener">` and styled it
+(`color: inherit; text-decoration: none`) to look identical to the plain title —
+the only tell is a pointer cursor on hover (plus a keyboard-only focus outline).
+No tooltip, so it stays a discoverable secret.

@@ -23,6 +23,11 @@
 # frosted-glass panels, and a word-by-word title reveal were tried and removed
 # per review.) Still NO `animation-timeline: view()` — that was the root cause of
 # the transparent-title bug above.
+#
+# Easter egg: the <h1> title is a HIDDEN link to the Canva slides
+# (https://carlos-mendez.my.canva.site/) — styled (.hero-title-link in Section 21)
+# to look exactly like plain text, pointer cursor on hover only, no tooltip.
+# Intentional, not a styling bug.
 
 widget: blank
 
@@ -46,7 +51,7 @@ design:
 
 <div class="hero-native">
   <div class="hero-glass-card hero-glass-card--title hero-glass-card--delay-1">
-    <h1 class="hero-title">On the Geography of Development</h1>
+    <h1 class="hero-title"><a class="hero-title-link" href="https://carlos-mendez.my.canva.site/" target="_blank" rel="noopener">On the Geography of Development</a></h1>
     <div class="hero-title-underline" aria-hidden="true"></div>
     <p class="hero-subtitle" data-rotate="Geospatial Big Data|Development Economics|Spatial Econometrics" aria-label="Insights from Geospatial Big Data, Development Economics, and Spatial Econometrics">Insights from Geospatial Big Data, Development Economics, and Spatial Econometrics</p>
   </div>
