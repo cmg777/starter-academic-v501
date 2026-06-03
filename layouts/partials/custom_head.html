@@ -16,3 +16,13 @@
     } catch (e) {}
   })();
 </script>
+
+{{/* SEO — x-default hreflang. The theme's site_head.html already emits reciprocal
+     hreflang for each translation plus a self-canonical; only x-default is missing.
+     Point it at the English home (defaultContentLanguage, served at "/"). Emitted
+     only on translated pages, mirroring the theme's conditional hreflang. */}}
+{{ if .IsTranslated }}
+  {{/* x-default points at the DEFAULT language home (English at "/"), i.e. the
+       first site by language weight — not the current language's home. */}}
+  <link rel="alternate" hreflang="x-default" href="{{ (index site.Sites 0).Home.Permalink }}" />
+{{ end }}

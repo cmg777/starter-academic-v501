@@ -14,8 +14,13 @@
 */}}
 {{ $p := .page }}
 {{ $img := $p.Resources.GetMatch "featured*" }}
+{{/* Translated tutorial stubs (e.g. content/es/post/<slug>/) set `card_url` so the
+     card opens the existing English tutorial; English posts set no card_url and
+     keep their own permalink (fully backward-compatible). */}}
+{{ $href := $p.RelPermalink }}
+{{ with $p.Params.card_url }}{{ $href = . }}{{ end }}
 <a class="tg-card"
-   href="{{ $p.RelPermalink }}"
+   href="{{ $href }}"
    data-topic="{{ .topicId }}"
    data-language="{{ .languageKey }}"
    data-title="{{ lower $p.Title }}"

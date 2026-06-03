@@ -24,6 +24,35 @@ module:
   imports:
     - path: github.com/wowchemy/wowchemy-hugo-modules/wowchemy-cms
     - path: github.com/wowchemy/wowchemy-hugo-modules/wowchemy
+  # Multi-language content layout (see config/_default/languages.yaml):
+  #   English -> content/      (served at /)
+  #   Spanish -> content/es/   (served at /es/)
+  # The `en` mount excludes `es/**` so English never also renders the Spanish
+  # tree, and the more-specific `es` mount serves it under /es/. The remaining
+  # mounts simply re-declare Hugo's per-component defaults (required once any
+  # `mounts` are defined) so the project's own assets/layouts/static/data/i18n
+  # continue to load. To add Japanese later: add a `content/ja` mount (lang: ja)
+  # and extend the en mount's excludeFiles to '{es,ja}/**'.
+  mounts:
+    - source: content
+      target: content
+      lang: en
+      excludeFiles: 'es/**'
+    - source: content/es
+      target: content
+      lang: es
+    - source: assets
+      target: assets
+    - source: static
+      target: static
+    - source: layouts
+      target: layouts
+    - source: data
+      target: data
+    - source: i18n
+      target: i18n
+    - source: archetypes
+      target: archetypes
 
 ############################
 ## ADVANCED

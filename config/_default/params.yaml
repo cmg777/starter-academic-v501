@@ -56,7 +56,7 @@ main_menu:
   enable: true
   align: c
   show_logo: true
-  show_language: false
+  show_language: true
   show_day_night: true
   show_search: true
   highlight_active_link: true
@@ -102,7 +102,7 @@ copyright_license:
   allow_commercial: false
   notice: 'This work is licensed under {license}'
 abstract_length: 135
-plugins_js: ['custom-scroll']
+plugins_js: ['custom-scroll', 'lang-pref']
 avatar:
   gravatar: false
   shape: circle

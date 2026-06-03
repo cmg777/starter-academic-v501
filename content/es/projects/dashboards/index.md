@@ -1,0 +1,32 @@
+---
+date: "2026-01-18T00:00:00Z"
+external_link: ""
+image:
+  caption: ""
+  focal_point: Smart
+summary: Paneles geoespaciales interactivos para el seguimiento del desarrollo regional
+tags:
+- spatial
+- regional
+title: "Paneles GeoDevelopment"
+
+url_code: ""
+url_pdf: ""
+url_slides: ""
+url_video: ""
+---
+
+
+<details class="dashboard-entry">
+<summary>Mendez, C. (2026). <em>Dinámica espacio-temporal de la población, la luminosidad, la cobertura del suelo y el PIB en Camboya (2013-2019).</em> Aplicación de Google Earth Engine. <a href="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1">Acceder a la app</a> | <a href="https://code.earthengine.google.com/46da0676f419e67f4000315b33f86cae?hideCode=true">Abrir en GEE</a></summary>
+
+{{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1" height="800px" >}}
+
+</details>
+
+<details class="dashboard-entry">
+<summary>Kanyama, Y., & Mendez, C. (2026). <em>Explorando las disparidades regionales en Japón: comparación multiescala del PIB per cápita (1990–2022).</em> Aplicación de Google Earth Engine. <a href="https://carlos-mendez.projects.earthengine.app/view/japan-regional-gdp-disparities">Acceder a la app</a> | <a href="https://code.earthengine.google.com/3033790b21263c0078debe084f8b2467?hideCode=true">Abrir en GEE</a></summary>
+
+{{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/japan-regional-gdp-disparities" height="800px" >}}
+
+</details>

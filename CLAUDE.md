@@ -395,13 +395,24 @@ Comprehensive audit of a generated interactive web app at `content/post/<slug>/w
 
 **Reference files:** `references/review-checklist.md` (10 dimensions × per-check severity), `references/scoring-and-criteria.md` (1–10 rubric, verdict-changing rules), `references/report-template.md` (canonical REVIEW.md skeleton), `references/pedagogical-alignment.md` (n-gram overlap algorithm), `references/headless-browser.md` (Playwright bootstrap + audit script), `references/focus-modes.md`, `references/test-cases.md` (10 self-validation tests including 5 deliberate sabotage scenarios).
 
+# Internationalization (i18n)
+
+The site is bilingual: **English at `/`** (default, `content/`) and **Spanish at `/es/`** (`content/es/`). Built 2026-06-04 — see `logs/2026-06-04-bilingual-spanish-homepage.md`. Currently only the **homepage and the items it shows** are translated; everything else is English. Translations are first drafts pending review.
+
+- **Content layout:** `config/_default/config.yaml` `module.mounts` keep English in `content/` and Spanish in `content/es/`, isolated via `excludeFiles: 'es/**'` on the en mount. English is NOT moved to `content/en/` (preserves all `content/post/…`, `content/publication/…` conventions the skills depend on). When any `mounts` are defined, the default component mounts (assets/static/layouts/data/i18n/archetypes) MUST be re-declared — they are.
+- **Languages/menu:** `config/_default/languages.yaml` (`en`, `es`, commented `ja`). The navbar globe switcher is enabled via `params.yaml` `main_menu.show_language: true` and appears only on translated pages. The Spanish menu omits Courses (untranslated → would 404 under `/es/`).
+- **Spanish homepage:** `content/es/home/` mirrors the active widgets of `content/home/`; bio from `content/es/authors/admin/_index.md`. Dynamic widgets (featured/showcase/people) query the current language's `site.RegularPages`, so Spanish sub-pages under `content/es/<section>/<slug>/` populate `/es/` automatically. Per-language bundles need their own image copies (avatars, `featured.*`).
+- **Tutorial cards → English:** `layouts/partials/tutorial_card.html` honours an optional `card_url` front-matter key. Spanish stubs at `content/es/post/<slug>/index.md` set `card_url: "/post/<slug>/"`, verbatim English `categories`, and `_build: {render: never, list: always}`. NEVER use the reserved `url:` key for this (it relocates the page and collides with the English URL).
+- **Geolocation:** `netlify/edge-functions/geo-lang.ts` 302-redirects Spanish-speaking countries (Latin America + Spain + Equatorial Guinea) `/ → /es/` — homepage only, fires once (`geo_seen`), respects the `lang_pref` cookie set by `assets/js/lang-pref.js` (bundled via `params.yaml` `plugins_js`). `layouts/partials/custom_head.html` adds the `x-default` hreflang. Geo can only be tested on a Netlify deploy preview / `netlify dev`, not `hugo server`.
+- **Add a language (e.g. `ja`):** uncomment the `languages.yaml` block; add a `content/ja` mount + extend the en mount's `excludeFiles` to `'{es,ja}/**'` + set `hasCJKLanguage: true`; add the country→`/ja/` line in `geo-lang.ts` and `ja: 1` in `lang-pref.js`; create `content/ja/…`. No template/structural changes.
+- **Known minor issue:** thin es post stubs republish the English bundle's small figure/script files under `/es/post/<slug>/` (a few MB; harmless). Publications/projects/events don't leak extra.
+
 # Hugo Version Constraints
 
-- Netlify: Hugo 0.89.4 (set in netlify.toml)
-- Local: Hugo 0.109.0 Extended (at `~/Library/Application Support/Hugo/0.109.0/hugo`)
+- The site requires Hugo **≥ 0.96** (`layouts/section/event.html` uses the `continue` template keyword). `netlify.toml` still pins `HUGO_VERSION = 0.89.4` (stale — too old to build the current templates); `origin/master` already ships `continue` and deploys, so Netlify builds with ≥0.96 via an env override.
+- Tested/safe window: **0.96–0.119** extended — verified building cleanly on **0.111.3** (local verification binary at `/tmp/hugo-verify/hugo`). Lower bound = `continue`; upper bound ≈ `site.GoogleAnalytics` removal (~0.120) and `paginate` removal (0.128). The 0.100 Blackfriday removal does NOT affect this site (it uses Goldmark). Re-verify Wowchemy v5 template compatibility before moving outside this window.
 - Theme minimum: 0.78 (set in theme.toml)
 - Hugo 0.91+ requires security policy for `WC_POST_CSS` env var — already configured in `config/_default/config.yaml` under `security.funcs.getenv`
-- Do NOT upgrade past 0.99.x without verifying Wowchemy v5 template compatibility (Hugo 0.100+ removed Blackfriday renderer)
 - Wowchemy modules are pinned to commit 20210324 in go.mod; updating them is a separate decision from updating Hugo
 
 # Deployment

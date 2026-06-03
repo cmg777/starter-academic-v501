@@ -1,22 +1,69 @@
 # Languages
-#   Create a section for each of your site's languages.
-#   Documentation: https://wowchemy.com/docs/guide/language/
+#   One section per site language.
+#   Content layout is handled by `module.mounts` in config.yaml:
+#     en -> content/      (served at /)
+#     es -> content/es/   (served at /es/)
+#   so no `contentDir` is set here.
+#   Docs: https://wowchemy.com/docs/guide/language/
 
-# Default language
+# Default language — English, served at the site root "/".
 en:
   languageCode: en-us
-  # Uncomment for multi-lingual sites, and move English content into `en` sub-folder.
-  #contentDir: content/en
+  languageName: English
+  weight: 1
 
-# Uncomment the lines below to configure your website in a second language.
-#zh:
-#  languageCode: zh-Hans
-#  contentDir: content/zh
-#  title: Chinese website title...
+# Spanish — served at /es/. The homepage and the items it shows are translated;
+# other sections stay English. Untranslated real-page links (e.g. Courses) are
+# omitted from this menu to avoid /es/ 404s; hash-anchor items scroll the /es/
+# homepage and the external Events link is unchanged.
+es:
+  languageCode: es-es
+  languageName: Español
+  weight: 2
+  params:
+    description: 'Carlos Mendez — Profesor Asociado de Economía del Desarrollo en la Universidad de Nagoya (Japón). Investigación sobre desarrollo regional, ciencia de datos espaciales y econometría aplicada.'
+  menu:
+    main:
+      - name: 'Perfil'
+        url: '#about'
+        weight: 10
+      - name: 'Laboratorio'
+        url: '#researchLab'
+        weight: 20
+      - name: 'Publicaciones'
+        url: '#featured'
+        weight: 30
+      - name: 'Presentaciones'
+        url: '#talks'
+        weight: 40
+      - name: 'Tutoriales'
+        url: '#posts'
+        weight: 41
+      - name: 'Proyectos'
+        url: '#projects'
+        weight: 45
+      - name: 'Estudiantes'
+        url: '#people'
+        weight: 60
+      - name: 'Eventos'
+        url: 'https://lu.ma/cmg'
+        weight: 80
+      - name: 'Contacto'
+        url: '#contact'
+        weight: 90
+
+# Japanese — ADD LATER (additive; no structural change needed). Steps:
+#   1) Uncomment & translate this block.
+#   2) config.yaml: add a `content/ja` mount (lang: ja); change the en mount's
+#      excludeFiles to '{es,ja}/**'; set `hasCJKLanguage: true`.
+#   3) netlify/edge-functions/geo-lang.ts: add `JP: "/ja/"` and `"ja"` to KNOWN_LANGS.
+#   4) assets/js/lang-pref.js: add `ja: 1` to the KNOWN map.
+#ja:
+#  languageCode: ja-jp
+#  languageName: 日本語
+#  weight: 3
 #  params:
-#    description: Site description in Chinese...
+#    description: '...'
 #  menu:
 #    main:
-#      - name: 传
-#        url: '#about'
-#        weight: 1
+#      - {name: 'プロフィール', url: '#about', weight: 10}
