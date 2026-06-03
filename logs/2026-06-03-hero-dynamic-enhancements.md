@@ -73,3 +73,9 @@ slow 32s `ease-in-out infinite alternate` breathing loop. `from` is anchored at
 `scale(1.03)` so the image is always overscanned (min ~1.5%, up to ~8%) — the C1
 cursor parallax and the pan never expose a background edge. Reduced-motion still
 disables it (static image).
+
+## Follow-up 3 (same day) — background zoom sped up
+
+Per request, increased the speed: `kenBurns` animation duration `32s → 20s`
+(still `ease-in-out infinite alternate`). The ~13% zoom range and pan are
+unchanged; the breathe just cycles faster.

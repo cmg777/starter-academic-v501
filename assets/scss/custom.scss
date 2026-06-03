@@ -1211,7 +1211,7 @@ details.concept-card p:last-child {
   background-image: url("/media/websiteCover5.webp");
   background-size: cover;
   background-position: center;
-  animation: kenBurns 32s ease-in-out infinite alternate;
+  animation: kenBurns 20s ease-in-out infinite alternate;
   /* C1 — cursor counter-parallax. `translate` composes with the kenBurns
      `transform` (scale+translate) without clobbering it; the inline JS sets
      --bg-px/--bg-py opposite the cursor. The Ken Burns zoom keeps the image
