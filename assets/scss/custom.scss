@@ -1177,11 +1177,14 @@ details.concept-card p:last-child {
 }
 
 /* ==========================================================================
-   21. Native hero panels (hero2 widget) — full enhancement pass
-   Translucent navy panels with brand-color left accents, word-by-word title
-   reveal, gradient brand underline + pulsing teal dot, Cormorant Garamond
-   italic subtitle, Ken Burns background, cursor parallax (via inline JS),
-   view-timeline scroll fade-out, and a brand-teal scroll indicator.
+   21. Native hero panels (hero2 widget) — modern/dynamic enhancement pass
+   Frosted-glass navy panels with brand-color left accents (B5), word-by-word
+   blur-in title reveal (B1), gradient brand underline that draws out + pulsing
+   teal dot (B4), Cormorant Garamond italic subtitle with rotating research
+   pillars (B2), Ken Burns + nightlights-canvas background (A1) with cursor
+   counter-parallax (C1, via inline JS), and a brand-teal scroll indicator.
+   NB: NO `animation-timeline: view()` here — it bound to #hero2-new's own
+   scroll box (overflow:hidden) and caused the 2026-06-03 transparent-title bug.
    ========================================================================== */
 
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Crimson+Pro:wght@500;600;700&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap");
@@ -1208,7 +1211,26 @@ details.concept-card p:last-child {
   background-size: cover;
   background-position: center;
   animation: kenBurns 32s ease-in-out infinite alternate;
+  /* C1 — cursor counter-parallax. `translate` composes with the kenBurns
+     `transform` (scale+translate) without clobbering it; the inline JS sets
+     --bg-px/--bg-py opposite the cursor. The 6% Ken Burns overscan hides the
+     few-px shift so no background edge is exposed. The image itself is kept. */
+  translate: var(--bg-px, 0px) var(--bg-py, 0px);
+  transition: translate 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
   z-index: 0;
+  pointer-events: none;
+}
+
+/* A1 — nightlights twinkle canvas. Injected by the inline JS as the first
+   child of #hero2-new, so it paints ON TOP of the kept photo (::before z0)
+   and below the navy scrim (::after z2). ID-qualified so it beats the
+   `#hero2-new > * { z-index:1 }` rule and resolves to position:absolute. */
+#hero2-new .hero-nightlights {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
   pointer-events: none;
 }
 
@@ -1276,8 +1298,18 @@ details.concept-card p:last-child {
   max-width: #{"min(95vw, 1600px)"};
   margin: 0 auto 1.25rem;
   padding: 1.3rem 2.5rem;
-  border-radius: 4px;
-  background: transparent;
+  border-radius: 10px;
+  /* B5 — light frosted glass (was `background: transparent`). Translucent navy
+     + a soft blur so the panels read as glass and the title stays crisp now the
+     backdrop twinkles — kept subtle so websiteCover5.webp still reads clearly
+     behind/around the cards. The brand left-accent (set by the --title/
+     --tagline/--author modifiers below) overrides just the left edge via
+     source order. */
+  background: rgba(14, 21, 69, 0.28);
+  -webkit-backdrop-filter: blur(8px) saturate(122%);
+  backdrop-filter: blur(8px) saturate(122%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 10px 32px rgba(5, 8, 30, 0.26);
   opacity: 0;
   transform: translateY(18px);
   translate: var(--px) var(--py);
@@ -1288,6 +1320,11 @@ details.concept-card p:last-child {
 
 .hero-glass-card:hover {
   translate: var(--px) calc(var(--py) - 2px);
+}
+
+/* Opaque-ish fallback where backdrop-filter is unsupported (older browsers). */
+@supports not ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) {
+  .hero-glass-card { background: rgba(14, 21, 69, 0.62); }
 }
 
 .hero-glass-card--title   { border-left: 3px solid #00d4c8; }
@@ -1317,6 +1354,25 @@ details.concept-card p:last-child {
   white-space: nowrap;
 }
 
+/* B1 — word-by-word blur-in reveal. Words are authored as <span> in the
+   markdown; each fades + de-blurs in turn. Blur/opacity (not translateY) so the
+   reveal doesn't compound with the panel's translateY entrance. */
+.hero-title-word {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(8px);
+  animation: heroWordIn 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+.hero-title-word:nth-child(1) { animation-delay: 0.28s; }
+.hero-title-word:nth-child(2) { animation-delay: 0.37s; }
+.hero-title-word:nth-child(3) { animation-delay: 0.46s; }
+.hero-title-word:nth-child(4) { animation-delay: 0.55s; }
+.hero-title-word:nth-child(5) { animation-delay: 0.64s; }
+
+@keyframes heroWordIn {
+  to { opacity: 1; filter: blur(0); }
+}
+
 /* Below ~740px the one-line font would overflow — allow wrapping. */
 @media (max-width: 740px) {
   .hero-title {
@@ -1329,7 +1385,9 @@ details.concept-card p:last-child {
 /* --- Title underline + pulsing teal dot --- */
 .hero-title-underline {
   position: relative;
-  width: 90px;
+  width: 0;            /* B4 — draws out to 90px from center (margin:auto keeps
+                          it centered as it grows; the pulsing dot ::after stays
+                          put at the midpoint). */
   height: 1px;
   margin: 0.9rem auto 0.8rem;
   background: linear-gradient(90deg,
@@ -1337,9 +1395,9 @@ details.concept-card p:last-child {
     #00d4c8 30%,
     #d97757 70%,
     transparent);
-  opacity: 0;
-  animation: fadeIn 0.6s ease forwards;
-  animation-delay: 0.95s;
+  opacity: 1;
+  animation: drawUnderline 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation-delay: 1.05s;
 }
 
 .hero-title-underline::after {
@@ -1359,6 +1417,8 @@ details.concept-card p:last-child {
 
 @keyframes fadeIn { to { opacity: 1; } }
 
+@keyframes drawUnderline { to { width: 90px; } }
+
 @keyframes pulseDot {
   0%, 100% { transform: translate(-50%, -50%) scale(1);   opacity: 0.95; }
   50%      { transform: translate(-50%, -50%) scale(1.6); opacity: 0.35; }
@@ -1375,6 +1435,31 @@ details.concept-card p:last-child {
   margin: 0 auto;
   max-width: 800px;
   letter-spacing: 0.01em;
+}
+
+/* B2 — rotating research pillars. The inline JS swaps the static subtitle for
+   "Insights from <rotator>" ONLY when motion is allowed; otherwise the full
+   comma list stays (no info loss for reduced-motion / screen readers).
+   inline-grid stacks every pillar in one cell, so the box auto-sizes to the
+   widest item and never reflows as they swap. */
+.hero-rotator {
+  display: inline-grid;
+  vertical-align: baseline;
+  margin-left: 0.35em;
+  text-align: left;
+}
+.hero-rotator-item {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  color: #9fe9e3;
+  opacity: 0;
+  transform: translateY(0.4em);
+  transition: opacity 0.55s ease,
+              transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.hero-rotator-item.is-active {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* --- Tagline --- */
@@ -1485,7 +1570,10 @@ details.concept-card p:last-child {
   .hero-glass-card {
     padding: 1.3rem 1.25rem;
     margin-bottom: 1rem;
-    border-radius: 3px;
+    border-radius: 8px;
+    /* lighter blur on mobile GPUs */
+    -webkit-backdrop-filter: blur(6px) saturate(118%);
+    backdrop-filter: blur(6px) saturate(118%);
   }
   .hero-glass-card--author {
     padding: 1.15rem 1.2rem;
@@ -1503,9 +1591,11 @@ details.concept-card p:last-child {
   .hero-scroll-indicator { display: none; }
 }
 
-/* --- Honor reduced-motion --- */
+/* --- Honor reduced-motion ---
+   The nightlights canvas (A1) and pillar rotator (B2) are simply never created
+   by the inline JS under reduced-motion, so they need no reset here. */
 @media (prefers-reduced-motion: reduce) {
-  #hero2-new::before { animation: none; }
+  #hero2-new::before { animation: none; translate: none; }
   .hero-glass-card {
     opacity: 1;
     transform: none;
@@ -1513,8 +1603,10 @@ details.concept-card p:last-child {
     animation: none;
     transition: none;
   }
+  .hero-title-word { opacity: 1; filter: none; animation: none; }
   .hero-title-underline {
     opacity: 1;
+    width: 90px;
     animation: none;
   }
   .hero-title-underline::after { animation: none; }
