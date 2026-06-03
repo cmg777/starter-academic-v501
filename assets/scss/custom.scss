@@ -1214,8 +1214,9 @@ details.concept-card p:last-child {
   animation: kenBurns 32s ease-in-out infinite alternate;
   /* C1 — cursor counter-parallax. `translate` composes with the kenBurns
      `transform` (scale+translate) without clobbering it; the inline JS sets
-     --bg-px/--bg-py opposite the cursor. The 6% Ken Burns overscan hides the
-     few-px shift so no background edge is exposed. The image itself is kept. */
+     --bg-px/--bg-py opposite the cursor. The Ken Burns zoom keeps the image
+     overscanned (min ~1.5%, up to ~8%), hiding the few-px shift so no
+     background edge is exposed. The image itself is kept. */
   translate: var(--bg-px, 0px) var(--bg-py, 0px);
   transition: translate 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
   z-index: 0;
@@ -1242,8 +1243,8 @@ details.concept-card p:last-child {
 }
 
 @keyframes kenBurns {
-  from { transform: scale(1)    translate(0%,  0%); }
-  to   { transform: scale(1.06) translate(-1%, 1%); }
+  from { transform: scale(1.03) translate( 0%,   0%);  }
+  to   { transform: scale(1.16) translate(-2%, 1.4%);  }
 }
 
 /* Break the hero content out of the Bootstrap container/column (the blank

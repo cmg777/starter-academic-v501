@@ -63,3 +63,13 @@ the inline `<script>`.
 **Still live:** B1 word-by-word title reveal, B4 drawing underline, B2 rotating
 research pillars, C1 background counter-parallax — all foreground/background
 motion that does not obscure the photo. No `animation-timeline: view()`.
+
+## Follow-up 2 (same day) — background zoom amplified
+
+The Ken Burns zoom was too subtle to read as motion (6% over 32s). Per request,
+widened `@keyframes kenBurns` to a **~13% zoom range** (`scale(1.03)` →
+`scale(1.16)`) with a slightly larger gentle pan (`-2% / 1.4%`), keeping the same
+slow 32s `ease-in-out infinite alternate` breathing loop. `from` is anchored at
+`scale(1.03)` so the image is always overscanned (min ~1.5%, up to ~8%) — the C1
+cursor parallax and the pan never expose a background edge. Reduced-motion still
+disables it (static image).
