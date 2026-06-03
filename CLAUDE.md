@@ -409,7 +409,7 @@ The site is bilingual: **English at `/`** (default, `content/`) and **Spanish at
 
 # Hugo Version Constraints
 
-- The site requires Hugo **≥ 0.96** (`layouts/section/event.html` uses the `continue` template keyword). `netlify.toml` still pins `HUGO_VERSION = 0.89.4` (stale — too old to build the current templates); `origin/master` already ships `continue` and deploys, so Netlify builds with ≥0.96 via an env override.
+- The site requires Hugo **≥ 0.96** (`layouts/section/event.html` uses the `continue` template keyword). `netlify.toml` pins `HUGO_VERSION = 0.111.3` — inside the verified window. **There is no Netlify UI env override** (a previous version of this note wrongly assumed one): on 2026-06-04 the `0.89.4` pin was confirmed to be the actual build version, failing every deploy since the `/event/` commits with `function "continue" not defined`. Bumping the pin to `0.111.3` (commit `ea6a22c`) fixed it and shipped the i18n homepage. Keep this pin in the 0.96–0.119 window; do not revert it.
 - Tested/safe window: **0.96–0.119** extended — verified building cleanly on **0.111.3** (local verification binary at `/tmp/hugo-verify/hugo`). Lower bound = `continue`; upper bound ≈ `site.GoogleAnalytics` removal (~0.120) and `paginate` removal (0.128). The 0.100 Blackfriday removal does NOT affect this site (it uses Goldmark). Re-verify Wowchemy v5 template compatibility before moving outside this window.
 - Theme minimum: 0.78 (set in theme.toml)
 - Hugo 0.91+ requires security policy for `WC_POST_CSS` env var — already configured in `config/_default/config.yaml` under `security.funcs.getenv`
