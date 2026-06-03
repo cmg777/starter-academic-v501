@@ -36,6 +36,7 @@ See @README.md for full documentation of the directory structure, tech stack, an
 - The `admin` author in the authors field refers to Carlos Mendez (content/authors/admin/)
 - Use `featured: true` to highlight important publications on the homepage
 - Data science posts use `image.placement: 3` for full-width featured images above the title
+- Events appear on the live site automatically via `content/event/<slug>/index.md`. `date:` is required (the talk date); future dates are allowed — production builds use `--buildFuture` (see netlify.toml). Leave `publishDate:` at "now" or earlier; a future `publishDate` will hide the event in production.
 
 ## Publication Types
 

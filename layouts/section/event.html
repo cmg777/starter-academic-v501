@@ -11,8 +11,9 @@
   {{ with .Params.lead }}<p class="tg-page-lead">{{ . | markdownify }}</p>{{ end }}
 </div>
 
-{{/* Distinct years for the year filter. */}}
+{{/* Distinct years for the year filter. Skip dateless events so 0001 never appears. */}}
 {{ range .Pages.ByDate.Reverse }}
+  {{ if .Date.IsZero }}{{ continue }}{{ end }}
   {{ $year := print (.Date.Format "2006") }}
   {{ $.Scratch.SetInMap "years" $year $year }}
 {{ end }}
@@ -42,6 +43,7 @@
 <div class="universal-wrapper">
   <div class="cz-showcase event-showcase">
     {{ range .Pages.ByDate.Reverse }}
+      {{ if .Date.IsZero }}{{ continue }}{{ end }}
       {{ $p := . }}
       {{ $link := $p.RelPermalink }}
       {{ $target := "" }}
