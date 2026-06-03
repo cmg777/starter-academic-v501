@@ -16,6 +16,16 @@ content:
   page_type: publication
   # Cuántas páginas mostrar (0 = todas)
   count: 3
+  # Enlace "Ver todas". No existe una página de sección en español
+  # (content/es/publication/ no tiene _index.md), por lo que el enlace apunta al
+  # listado completo en inglés. Se usa una URL relativa al protocolo (// ...) a
+  # propósito: relLangURL reescribiría una ruta relativa a /es/publication/ (404)
+  # y también relativiza una URL absoluta con el mismo host que baseURL; en
+  # cambio, deja intactas las URLs que empiezan por "//".
+  archive:
+    enable: true
+    link: "//carlos-mendez.org/publication/"
+    text: "Ver todas las publicaciones"
   # Filtros
   filters:
     author: ""
