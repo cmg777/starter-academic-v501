@@ -17,12 +17,12 @@
 # for the earlier diagnostic history).
 #
 # 2026-06-03 — modern/dynamic enhancement pass (Section 21 of custom.scss +
-# the inline <script> below): nightlights twinkle canvas painted ON TOP of the
-# KEPT websiteCover5.webp (A1), light frosted-glass panels (B5), word-by-word
-# blur-in title (B1), drawing underline (B4), rotating research pillars in the
-# subtitle (B2), and cursor counter-parallax on the background (C1). The
-# background image is intentionally preserved. Still NO `animation-timeline:
-# view()` — that was the root cause of the transparent-title bug above.
+# the inline script below): word-by-word blur-in title (B1), drawing underline
+# (B4), rotating research pillars in the subtitle (B2), and cursor
+# counter-parallax on the KEPT websiteCover5.webp background (C1). Cards stay
+# fully transparent. (A nightlights twinkle canvas + frosted-glass panels were
+# tried and removed per review.) Still NO `animation-timeline: view()` — that
+# was the root cause of the transparent-title bug above.
 
 widget: blank
 
@@ -110,118 +110,6 @@ design:
         hero.style.setProperty('--bg-px', '0px');
         hero.style.setProperty('--bg-py', '0px');
       });
-    }
-
-    /* ---- A1: nightlights twinkle canvas (painted ON TOP of the kept photo) ---- */
-    if (!reduce) {
-      var canvas = document.createElement('canvas');
-      canvas.className = 'hero-nightlights';
-      canvas.setAttribute('aria-hidden', 'true');
-      hero.insertBefore(canvas, hero.firstChild);
-      var ctx = canvas.getContext && canvas.getContext('2d');
-      if (ctx) {
-        var dpr = Math.min(window.devicePixelRatio || 1, 2);
-        var W = 0, H = 0, pts = [], sprites = {};
-        var COLORS = [
-          ['warm', 'rgba(255,233,194,'],
-          ['white', 'rgba(255,255,255,'],
-          ['teal', 'rgba(0,212,200,'],
-          ['orange', 'rgba(217,119,87,']
-        ];
-
-        function makeSprite(prefix) {
-          var s = document.createElement('canvas'), sz = 32;
-          s.width = s.height = sz;
-          var g = s.getContext('2d');
-          var rg = g.createRadialGradient(sz / 2, sz / 2, 0, sz / 2, sz / 2, sz / 2);
-          rg.addColorStop(0, prefix + '1)');
-          rg.addColorStop(0.35, prefix + '0.55)');
-          rg.addColorStop(1, prefix + '0)');
-          g.fillStyle = rg;
-          g.fillRect(0, 0, sz, sz);
-          return s;
-        }
-
-        function build() {
-          var r = hero.getBoundingClientRect();
-          W = r.width; H = r.height;
-          if (!W || !H) return;
-          canvas.width = Math.round(W * dpr);
-          canvas.height = Math.round(H * dpr);
-          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-          for (var c = 0; c < COLORS.length; c++) sprites[COLORS[c][0]] = makeSprite(COLORS[c][1]);
-          var n = Math.max(26, Math.min(105, Math.round((W * H) / 14500)));
-          var cl = [];
-          for (var k = 0; k < 4; k++) {
-            cl.push({ x: 0.12 + 0.76 * ((k + 0.5) / 4), y: (k % 2) ? 0.62 : 0.34 });
-          }
-          pts = [];
-          for (var i = 0; i < n; i++) {
-            var x, y;
-            if (Math.random() < 0.58) {
-              var a = cl[i % cl.length];
-              x = (a.x + (Math.random() - 0.5) * 0.24) * W;
-              y = (a.y + (Math.random() - 0.5) * 0.24) * H;
-            } else {
-              x = Math.random() * W;
-              y = Math.random() * H;
-            }
-            var roll = Math.random();
-            var col = roll < 0.6 ? 'warm' : roll < 0.8 ? 'white' : roll < 0.92 ? 'teal' : 'orange';
-            pts.push({
-              x: x, y: y,
-              d: 1.3 + Math.random() * 3.4,
-              col: col,
-              base: 0.30 + Math.random() * 0.40,
-              amp: 0.18 + Math.random() * 0.34,
-              sp: 0.0006 + Math.random() * 0.0016,
-              ph: Math.random() * Math.PI * 2
-            });
-          }
-        }
-
-        var last = 0, running = false, rafId = null;
-        function frame(t) {
-          if (!running) return;
-          rafId = requestAnimationFrame(frame);
-          if (t - last < 55) return;   /* ~18fps is plenty for a slow twinkle */
-          last = t;
-          ctx.clearRect(0, 0, W, H);
-          ctx.globalCompositeOperation = 'lighter';
-          for (var i = 0; i < pts.length; i++) {
-            var p = pts[i];
-            var al = p.base + p.amp * (0.5 + 0.5 * Math.sin(t * p.sp + p.ph));
-            if (al <= 0.02) continue;
-            var gd = p.d * 4;
-            ctx.globalAlpha = al > 1 ? 1 : al;
-            ctx.drawImage(sprites[p.col], p.x - gd / 2, p.y - gd / 2, gd, gd);
-          }
-          ctx.globalAlpha = 1;
-          ctx.globalCompositeOperation = 'source-over';
-        }
-        function startC() { if (!running) { running = true; last = 0; rafId = requestAnimationFrame(frame); } }
-        function stopC() { running = false; if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
-
-        build();
-        startC();
-
-        var rt;
-        window.addEventListener('resize', function () {
-          clearTimeout(rt);
-          rt = setTimeout(build, 200);
-        });
-        document.addEventListener('visibilitychange', function () {
-          if (document.hidden) stopC(); else startC();
-        });
-        if ('IntersectionObserver' in window) {
-          var io = new IntersectionObserver(function (es) {
-            for (var i = 0; i < es.length; i++) {
-              if (es[i].isIntersecting) startC(); else stopC();
-            }
-          }, { threshold: 0 });
-          io.observe(hero);
-        }
-      }
     }
 
     /* ---- B2: rotating research pillars (motion only; full text kept otherwise) ---- */

@@ -1178,11 +1178,12 @@ details.concept-card p:last-child {
 
 /* ==========================================================================
    21. Native hero panels (hero2 widget) — modern/dynamic enhancement pass
-   Frosted-glass navy panels with brand-color left accents (B5), word-by-word
-   blur-in title reveal (B1), gradient brand underline that draws out + pulsing
-   teal dot (B4), Cormorant Garamond italic subtitle with rotating research
-   pillars (B2), Ken Burns + nightlights-canvas background (A1) with cursor
-   counter-parallax (C1, via inline JS), and a brand-teal scroll indicator.
+   Transparent navy panels with brand-color left accents, word-by-word blur-in
+   title reveal (B1), gradient brand underline that draws out + pulsing teal dot
+   (B4), Cormorant Garamond italic subtitle with rotating research pillars (B2),
+   Ken Burns background with cursor counter-parallax (C1, via inline JS), and a
+   brand-teal scroll indicator. (A nightlights twinkle canvas + frosted glass
+   were tried on 2026-06-03 and removed per review — see logs.)
    NB: NO `animation-timeline: view()` here — it bound to #hero2-new's own
    scroll box (overflow:hidden) and caused the 2026-06-03 transparent-title bug.
    ========================================================================== */
@@ -1218,19 +1219,6 @@ details.concept-card p:last-child {
   translate: var(--bg-px, 0px) var(--bg-py, 0px);
   transition: translate 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
   z-index: 0;
-  pointer-events: none;
-}
-
-/* A1 — nightlights twinkle canvas. Injected by the inline JS as the first
-   child of #hero2-new, so it paints ON TOP of the kept photo (::before z0)
-   and below the navy scrim (::after z2). ID-qualified so it beats the
-   `#hero2-new > * { z-index:1 }` rule and resolves to position:absolute. */
-#hero2-new .hero-nightlights {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
   pointer-events: none;
 }
 
@@ -1298,18 +1286,8 @@ details.concept-card p:last-child {
   max-width: #{"min(95vw, 1600px)"};
   margin: 0 auto 1.25rem;
   padding: 1.3rem 2.5rem;
-  border-radius: 10px;
-  /* B5 — light frosted glass (was `background: transparent`). Translucent navy
-     + a soft blur so the panels read as glass and the title stays crisp now the
-     backdrop twinkles — kept subtle so websiteCover5.webp still reads clearly
-     behind/around the cards. The brand left-accent (set by the --title/
-     --tagline/--author modifiers below) overrides just the left edge via
-     source order. */
-  background: rgba(14, 21, 69, 0.28);
-  -webkit-backdrop-filter: blur(8px) saturate(122%);
-  backdrop-filter: blur(8px) saturate(122%);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 10px 32px rgba(5, 8, 30, 0.26);
+  border-radius: 4px;
+  background: transparent;
   opacity: 0;
   transform: translateY(18px);
   translate: var(--px) var(--py);
@@ -1320,11 +1298,6 @@ details.concept-card p:last-child {
 
 .hero-glass-card:hover {
   translate: var(--px) calc(var(--py) - 2px);
-}
-
-/* Opaque-ish fallback where backdrop-filter is unsupported (older browsers). */
-@supports not ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) {
-  .hero-glass-card { background: rgba(14, 21, 69, 0.62); }
 }
 
 .hero-glass-card--title   { border-left: 3px solid #00d4c8; }
@@ -1570,10 +1543,7 @@ details.concept-card p:last-child {
   .hero-glass-card {
     padding: 1.3rem 1.25rem;
     margin-bottom: 1rem;
-    border-radius: 8px;
-    /* lighter blur on mobile GPUs */
-    -webkit-backdrop-filter: blur(6px) saturate(118%);
-    backdrop-filter: blur(6px) saturate(118%);
+    border-radius: 3px;
   }
   .hero-glass-card--author {
     padding: 1.15rem 1.2rem;
@@ -1592,8 +1562,8 @@ details.concept-card p:last-child {
 }
 
 /* --- Honor reduced-motion ---
-   The nightlights canvas (A1) and pillar rotator (B2) are simply never created
-   by the inline JS under reduced-motion, so they need no reset here. */
+   The pillar rotator (B2) is simply never created by the inline JS under
+   reduced-motion, so it needs no reset here. */
 @media (prefers-reduced-motion: reduce) {
   #hero2-new::before { animation: none; translate: none; }
   .hero-glass-card {

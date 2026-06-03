@@ -49,3 +49,17 @@ validated, not rendered locally**:
 The visual result (twinkle intensity over the photo, glass opacity, rotator
 alignment) will be confirmed on the **Netlify deploy** — these are easy aesthetic
 dials (`rgba` alphas, point count, blur) if tuning is wanted.
+
+## Follow-up (same day, after reviewing the deploy)
+
+Per review of the live deploy, **A1 (nightlights twinkle)** and **B5 (frosted
+glass)** were removed: the canvas felt unwanted and the user wanted the card
+backgrounds **fully transparent** so `websiteCover5.webp` shows through behind the
+text exactly as before. Reverted `.hero-glass-card` to `background: transparent`
+(border-radius 4px, no blur/border/shadow, `@supports` + mobile overrides
+dropped), deleted the `.hero-nightlights` rule, and removed the canvas block from
+the inline `<script>`.
+
+**Still live:** B1 word-by-word title reveal, B4 drawing underline, B2 rotating
+research pillars, C1 background counter-parallax — all foreground/background
+motion that does not obscure the photo. No `animation-timeline: view()`.
