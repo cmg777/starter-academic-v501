@@ -1,5 +1,6 @@
 ---
-title: "Human Development Disparities and Convergence across Districts of Indonesia: A Spatial Econometric Approach"
+title: "Human Development Disparities and Convergence across Districts of Indonesia"
+subtitle: "A Spatial Econometric Approach"
 event: The Applied Regional Science Conference (ARSC) 34th Annual Meeting
 event_url: https://sites.google.com/view/arsc2020en
 location: Virtual Conference

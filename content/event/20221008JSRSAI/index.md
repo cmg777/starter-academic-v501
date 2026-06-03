@@ -1,5 +1,6 @@
 ---
-title: "Regional luminosity and economic activity in Java: What do the new satellite nighttime light data say?"
+title: "Regional luminosity and economic activity in Java"
+subtitle: "What do the new satellite nighttime light data say?"
 event: 59th Annual Meeting of the Japan Section of the Regional Science Association International  
 event_url: https://ersa.eventsair.com/ersa2022/
 location: Japan/Virtual

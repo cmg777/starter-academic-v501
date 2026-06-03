@@ -1,5 +1,6 @@
 ---
-title: "Input-Output Efficiency and Regional Convergence Clusters: Evidence from the Indonesian Provinces 1990-2010"
+title: "Input-Output Efficiency and Regional Convergence Clusters"
+subtitle: "Evidence from the Indonesian Provinces 1990-2010"
 event: The 56th Annual Meeting of the Japan Section of the Regional Science Association International
 event_url: https://sites.google.com/view/jsrsai2019/top-page?authuser=0
 location: Kurume University (Mii Campus), Fukuoka, Japan

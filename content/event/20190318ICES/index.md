@@ -1,5 +1,6 @@
 ---
-title: "Environmental Efficiency and Regional Convergence Clusters in Japan: A Nonparametric Density Approach"
+title: "Environmental Efficiency and Regional Convergence Clusters in Japan"
+subtitle: "A Nonparametric Density Approach"
 event: The 3rd International Conference on Economic Structures of the Pan Pacific Association of Input-Output Studies
 event_url: http://www.gakkai.ne.jp/papaios/en/index.html
 location: Ritsumeikan University, Osaka Prefecture, Japan

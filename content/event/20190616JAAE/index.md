@@ -1,5 +1,6 @@
 ---
-title: "Regional Efficiency Dispersion, Convergence, and Efficiency Clusters: Evidence from the Provinces of Indonesia 1990-2010"
+title: "Regional Efficiency Dispersion, Convergence, and Efficiency Clusters"
+subtitle: "Evidence from the Provinces of Indonesia 1990-2010"
 event: The 2019 Spring Conference of the Japanese Association of Applied Economics
 event_url: http://www.jaae.org/
 location: Nanzan University, Nagoya City, Japan

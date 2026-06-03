@@ -1,5 +1,6 @@
 ---
-title: "Regional Okun's law, endogeneity, and heterogeneous effects: District-level evidence from Indonesia"
+title: "Regional Okun's law, endogeneity, and heterogeneous effects"
+subtitle: "District-level evidence from Indonesia"
 event: 62st Congress  of the European Regional Science Association   
 event_url: https://ersa.eventsair.com/ersa2023
 location: Alicante Spain and Virtual

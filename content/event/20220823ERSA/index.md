@@ -1,5 +1,6 @@
 ---
-title: "Regional income convergence and conditioning factors in Turkey: Revisiting the role of spatial dependence and neighbor effects"
+title: "Regional income convergence and conditioning factors in Turkey"
+subtitle: "Revisiting the role of spatial dependence and neighbor effects"
 event: 61st Congress  of the European Regional Science Association   
 event_url: https://ersa.eventsair.com/ersa2022/
 location: Pecs Hungary and Virtual

@@ -1,5 +1,6 @@
 ---
-title: "Monitoring local development from outer space:  Promises and pitfalls of satellite nighttime lights"
+title: "Monitoring local development from outer space"
+subtitle: "Promises and pitfalls of satellite nighttime lights"
 event: "Seminar of the Geographic Data Science Lab, University of Liverpool"  
 event_url: https://www.liverpool.ac.uk/geographic-data-science/
 location: Liverpool, UK

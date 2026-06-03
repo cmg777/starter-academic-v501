@@ -1,5 +1,6 @@
 ---
-title: "Regional luminosity through the lens of the spatial Solow model: Evidence from Java, Indonesia"
+title: "Regional luminosity through the lens of the spatial Solow model"
+subtitle: "Evidence from Java, Indonesia"
 event: 60th (2023) Meeting of the Japan Section of Regional Science Association International   
 event_url: http://jsrsai.jp/en/latest_news_fixed/1978
 location: Nagoya, Japan

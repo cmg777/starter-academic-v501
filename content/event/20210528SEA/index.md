@@ -1,5 +1,6 @@
 ---
-title: "Regional disparities and heterogeneous convergence in Indonesia: A multiscale geographically weighted regression approach"
+title: "Regional disparities and heterogeneous convergence in Indonesia"
+subtitle: "A multiscale geographically weighted regression approach"
 event: XV World Conference of the Spatial Econometrics Association
 event_url: https://confit.atlas.jp/guide/event/sea2021/top
 location: Virtual Conference

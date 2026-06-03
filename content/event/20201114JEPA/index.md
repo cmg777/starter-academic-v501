@@ -1,5 +1,6 @@
 ---
-title: "Regional Income Disparities, Distributional Convergence,and Spatial Effects: Evidence from Indonesian Regions 2010-2017"
+title: "Regional Income Disparities, Distributional Convergence,and Spatial Effects"
+subtitle: "Evidence from Indonesian Regions 2010-2017"
 event: The 19th International Conference of the Japan Economic Policy Association
 event_url: http://jepa.jpn.org/en/jepa2020/
 location: Virtual Conference

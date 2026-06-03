@@ -1,5 +1,6 @@
 ---
-title: "Mapping multidimensional poverty in Cambodia: Integrating big data, socioeconomic surveys, and machine learning"
+title: "Mapping multidimensional poverty in Cambodia"
+subtitle: "Integrating big data, socioeconomic surveys, and machine learning"
 event: GSID-ISEE 2023 research workshop  
 event_url: https://lu.ma/gsid-isee2023
 location: Nagoya, Japan

@@ -1,5 +1,6 @@
 ---
-title: "Geospatial variation in development: Some insights from satellite images"
+title: "Geospatial variation in development"
+subtitle: "Some insights from satellite images"
 event:  Chennai Mathematical Institute and XKDR Forum Workshop
 event_url: https://www.papers.xkdr.org/index.html
 location: India and Virtual

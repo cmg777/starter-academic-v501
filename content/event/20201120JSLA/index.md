@@ -1,5 +1,6 @@
 ---
-title: "Economic and Social Disparities across Subnational Regions of South America: A Spatial Convergence Approach"
+title: "Economic and Social Disparities across Subnational Regions of South America"
+subtitle: "A Spatial Convergence Approach"
 event: The 57th/2020 Annual Conference of the Japan Society of Social Science on Latin America (JSLA)
 event_url: http://www.js3la.jp/meetings.html
 location: Virtual Conference

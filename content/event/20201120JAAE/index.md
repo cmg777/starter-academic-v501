@@ -1,5 +1,6 @@
 ---
-title: "Regional Income Disparities and Convergence Clubs in Indonesia: New District-Level Evidence"
+title: "Regional Income Disparities and Convergence Clubs in Indonesia"
+subtitle: "New District-Level Evidence"
 event: The 2020 Fall Meeting of the Japan Association of Applied Economics
 event_url: http://www.jaae.org/
 location: Virtual Conference

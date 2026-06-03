@@ -1,5 +1,6 @@
 ---
-title: "Regional Convergence and Spatial Dependence across Subnational Regions of ASEAN: Evidence from Satellite Nighttime Light Data"
+title: "Regional Convergence and Spatial Dependence across Subnational Regions of ASEAN"
+subtitle: "Evidence from Satellite Nighttime Light Data"
 event: The 57th Annual Meeting of the Japan Section of the Regional Science Association International
 event_url: http://jsrsai.jp/en/latest_news/1549
 location: Virtual Conference

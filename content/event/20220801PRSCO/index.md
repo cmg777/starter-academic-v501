@@ -1,5 +1,6 @@
 ---
-title: "Regional inequality clubs in the Philippines: A view from outer space"
+title: "Regional inequality clubs in the Philippines"
+subtitle: "A view from outer space"
 event: 27th Conference  of the Pacific Regional Science Conference Organisation 
 event_url: http://www.lst.hokkai-s-u.ac.jp/~soushi-s/prsco/
 location: Virtual Conference

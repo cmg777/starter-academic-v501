@@ -1,5 +1,6 @@
 ---
-title: "Nighttime Lights and Economic Activity: Evidence from Developed and Developing Countries"
+title: "Nighttime Lights and Economic Activity"
+subtitle: "Evidence from Developed and Developing Countries"
 event: 63rd Congress  of the European Regional Science Association   
 event_url: https://ersa.eventsair.com/ersa2024
 location: Azores, Portugal and Virtual

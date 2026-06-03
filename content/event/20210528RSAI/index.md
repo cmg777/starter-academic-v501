@@ -1,5 +1,6 @@
 ---
-title: "Regional disparities and heterogeneous convergence in Indonesia: A multiscale geographically weighted regression approach"
+title: "Regional disparities and heterogeneous convergence in Indonesia"
+subtitle: "A multiscale geographically weighted regression approach"
 event: 13th World Congress of the Regional Science Association International
 event_url: http://regionalscience.org/2021worldcongress/index.html
 location: Virtual Conference

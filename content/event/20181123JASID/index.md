@@ -1,5 +1,6 @@
 ---
-title: "On the Distribution Dynamics of Human Development: Evidence from the Metropolitan Regions of Bolivia"
+title: "On the Distribution Dynamics of Human Development"
+subtitle: "Evidence from the Metropolitan Regions of Bolivia"
 event: The 2018 Fall Meeting of the Japan Society for International Development
 event_url: https://www.jasid.org/conference_en
 location: Tsukuba University, Ibaraki Prefecture, Japan

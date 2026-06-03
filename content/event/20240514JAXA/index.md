@@ -1,5 +1,6 @@
 ---
-title: "Monitoring regional development in data-poor countries: Integrating satellite images, socioeconomic surveys, and machine learning"
+title: "Monitoring regional development in data-poor countries"
+subtitle: "Integrating satellite images, socioeconomic surveys, and machine learning"
 event: Satellite data X Social studies workshop organized by JAXA (衛星データ×経済社会学　ワークショップ)
 event_url: https://carlos-mendez.my.canva.site/monitoring-poverty-from-above2024
 location: X-NIHONBASHI Tokyo, Japan

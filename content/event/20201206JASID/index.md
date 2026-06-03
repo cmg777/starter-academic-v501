@@ -1,5 +1,6 @@
 ---
-title: "National and Subnational Inequality in Africa: A Club Convergence View from Outer Space Motivation"
+title: "National and Subnational Inequality in Africa"
+subtitle: "A Club Convergence View from Outer Space Motivation"
 event: The 31st Annual Conference of the Japan Society for International Development
 event_url: https://www.jasidconference.org/2020annual-en
 location: Virtual Conference

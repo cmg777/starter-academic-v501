@@ -1,5 +1,6 @@
 ---
-title: "Exploring Economic Activity from Outer Space: A Python Notebook for Processing and Analyzing Satellite Nighttime Lights"
+title: "Exploring Economic Activity from Outer Space"
+subtitle: "A Python Notebook for Processing and Analyzing Satellite Nighttime Lights"
 event: 63rd Congress  of the European Regional Science Association   
 event_url: https://ersa.eventsair.com/ersa2024
 location: Azores, Portugal and Virtual

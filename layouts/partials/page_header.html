@@ -77,8 +77,8 @@
 <div class="article-container pt-3">
   <h1>{{ $title }}</h1>
 
-  {{ with $page.Params.subtitle }}
-  <p class="page-subtitle">{{ . | markdownify | emojify }}</p>
+  {{ if and $page.Params.subtitle (ne $page.Section "event") }}
+  <p class="page-subtitle">{{ $page.Params.subtitle | markdownify | emojify }}</p>
   {{end}}
 
   {{ partial "page_metadata" (dict "page" $page "is_list" 0 "share" true) }}
@@ -95,8 +95,8 @@
 <div class="{{$ctnr}} pt-3">
   <h1>{{ $title }}</h1>
 
-  {{ with $page.Params.subtitle }}
-  <p class="page-subtitle">{{ . | markdownify | emojify }}</p>
+  {{ if and $page.Params.subtitle (ne $page.Section "event") }}
+  <p class="page-subtitle">{{ $page.Params.subtitle | markdownify | emojify }}</p>
   {{end}}
 
   {{ if not .IsNode }}
