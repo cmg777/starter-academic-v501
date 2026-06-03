@@ -22,8 +22,17 @@
       {{ $p := . }}
       {{ $detail := $p.RelPermalink }}
       {{ $img := ($p.Resources.ByType "image").GetMatch "*featured*" }}
+      {{/* Image-click target: DOI (auto-prefixed to https://doi.org/ if bare),
+           then url_pdf, then fall back to the detail page. */}}
       {{ $extLink := "" }}
-      {{ with $p.Params.doi }}{{ $extLink = . }}{{ end }}
+      {{ with $p.Params.doi }}
+        {{ $d := . }}
+        {{ if or (hasPrefix $d "http://") (hasPrefix $d "https://") }}
+          {{ $extLink = $d }}
+        {{ else }}
+          {{ $extLink = printf "https://doi.org/%s" $d }}
+        {{ end }}
+      {{ end }}
       {{ if not $extLink }}{{ with $p.Params.url_pdf }}{{ $extLink = . }}{{ end }}{{ end }}
       {{ $imgLink := cond (ne $extLink "") $extLink $detail }}
       {{ $extTarget := cond (ne $extLink "") "target=\"_blank\" rel=\"noopener\"" "" }}
