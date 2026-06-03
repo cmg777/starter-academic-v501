@@ -17,12 +17,12 @@
 # for the earlier diagnostic history).
 #
 # 2026-06-03 — modern/dynamic enhancement pass (Section 21 of custom.scss +
-# the inline script below): word-by-word blur-in title (B1), drawing underline
-# (B4), rotating research pillars in the subtitle (B2), and cursor
-# counter-parallax on the KEPT websiteCover5.webp background (C1). Cards stay
-# fully transparent. (A nightlights twinkle canvas + frosted-glass panels were
-# tried and removed per review.) Still NO `animation-timeline: view()` — that
-# was the root cause of the transparent-title bug above.
+# the inline script below): drawing underline (B4), rotating research pillars in
+# the subtitle (B2), and cursor counter-parallax on the KEPT websiteCover5.webp
+# background (C1). Cards stay fully transparent. (A nightlights twinkle canvas,
+# frosted-glass panels, and a word-by-word title reveal were tried and removed
+# per review.) Still NO `animation-timeline: view()` — that was the root cause of
+# the transparent-title bug above.
 
 widget: blank
 
@@ -46,13 +46,7 @@ design:
 
 <div class="hero-native">
   <div class="hero-glass-card hero-glass-card--title hero-glass-card--delay-1">
-    <h1 class="hero-title">
-      <span class="hero-title-word">On</span>
-      <span class="hero-title-word">the</span>
-      <span class="hero-title-word">Geography</span>
-      <span class="hero-title-word">of</span>
-      <span class="hero-title-word">Development</span>
-    </h1>
+    <h1 class="hero-title">On the Geography of Development</h1>
     <div class="hero-title-underline" aria-hidden="true"></div>
     <p class="hero-subtitle" data-rotate="Geospatial Big Data|Development Economics|Spatial Econometrics" aria-label="Insights from Geospatial Big Data, Development Economics, and Spatial Econometrics">Insights from Geospatial Big Data, Development Economics, and Spatial Econometrics</p>
   </div>

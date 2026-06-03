@@ -1178,9 +1178,9 @@ details.concept-card p:last-child {
 
 /* ==========================================================================
    21. Native hero panels (hero2 widget) — modern/dynamic enhancement pass
-   Transparent navy panels with brand-color left accents, word-by-word blur-in
-   title reveal (B1), gradient brand underline that draws out + pulsing teal dot
-   (B4), Cormorant Garamond italic subtitle with rotating research pillars (B2),
+   Transparent navy panels with brand-color left accents, a gradient brand
+   underline that draws out + pulsing teal dot (B4), Cormorant Garamond italic
+   subtitle with rotating research pillars (B2),
    Ken Burns background with cursor counter-parallax (C1, via inline JS), and a
    brand-teal scroll indicator. (A nightlights twinkle canvas + frosted glass
    were tried on 2026-06-03 and removed per review — see logs.)
@@ -1326,25 +1326,6 @@ details.concept-card p:last-child {
   text-transform: uppercase;
   color: #fff;
   white-space: nowrap;
-}
-
-/* B1 — word-by-word blur-in reveal. Words are authored as <span> in the
-   markdown; each fades + de-blurs in turn. Blur/opacity (not translateY) so the
-   reveal doesn't compound with the panel's translateY entrance. */
-.hero-title-word {
-  display: inline-block;
-  opacity: 0;
-  filter: blur(8px);
-  animation: heroWordIn 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-.hero-title-word:nth-child(1) { animation-delay: 0.28s; }
-.hero-title-word:nth-child(2) { animation-delay: 0.37s; }
-.hero-title-word:nth-child(3) { animation-delay: 0.46s; }
-.hero-title-word:nth-child(4) { animation-delay: 0.55s; }
-.hero-title-word:nth-child(5) { animation-delay: 0.64s; }
-
-@keyframes heroWordIn {
-  to { opacity: 1; filter: blur(0); }
 }
 
 /* Below ~740px the one-line font would overflow — allow wrapping. */
@@ -1574,7 +1555,6 @@ details.concept-card p:last-child {
     animation: none;
     transition: none;
   }
-  .hero-title-word { opacity: 1; filter: none; animation: none; }
   .hero-title-underline {
     opacity: 1;
     width: 90px;

@@ -79,3 +79,14 @@ disables it (static image).
 Per request, increased the speed: `kenBurns` animation duration `32s → 20s`
 (still `ease-in-out infinite alternate`). The ~13% zoom range and pan are
 unchanged; the breathe just cycles faster.
+
+## Follow-up 4 (same day) — removed the word-by-word title reveal (B1)
+
+Per request, keep only the "Insights from ___" rotation (B2) among the text
+effects and drop the **word-by-word title reveal (B1)** specifically. Reverted
+the `<h1>` to plain text ("On the Geography of Development") and deleted the
+`.hero-title-word` rules + `heroWordIn` keyframe + the reduced-motion line. The
+title now simply appears (still carried in by the card fade-up entrance).
+
+**Still live:** B4 underline-draw + pulsing dot, B2 rotating pillars, the card
+fade-up entrance, C1 cursor parallax, and the amplified Ken Burns zoom (20s).
