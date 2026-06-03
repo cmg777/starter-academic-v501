@@ -1277,7 +1277,7 @@ details.concept-card p:last-child {
   margin: 0 auto 1.25rem;
   padding: 1.3rem 2.5rem;
   border-radius: 4px;
-  background: rgba(18, 32, 75, 0.88);
+  background: rgba(18, 32, 75, 0.45);
   backdrop-filter: blur(3px) saturate(115%);
   -webkit-backdrop-filter: blur(3px) saturate(115%);
   box-shadow: 0 4px 24px rgba(8, 14, 40, 0.35);
@@ -1291,7 +1291,7 @@ details.concept-card p:last-child {
 }
 
 .hero-glass-card:hover {
-  background: rgba(18, 32, 75, 0.93);
+  background: rgba(18, 32, 75, 0.60);
   translate: var(--px) calc(var(--py) - 2px);
 }
 
@@ -1375,7 +1375,7 @@ details.concept-card p:last-child {
   font-style: italic;
   font-size: clamp(1rem, 1.6vw, 1.25rem);
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.92);
+  color: #fff;
   line-height: 1.5;
   margin: 0 auto;
   max-width: 800px;
@@ -1407,7 +1407,7 @@ details.concept-card p:last-child {
 
 .hero-author-affiliation {
   font-size: clamp(0.85rem, 1.05vw, 0.95rem);
-  color: rgba(255, 255, 255, 0.88);
+  color: #fff;
   line-height: 1.5;
   margin: 0;
 }
