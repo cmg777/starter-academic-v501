@@ -1335,9 +1335,13 @@ details.concept-card p:last-child {
 .hero-title-link,
 .hero-title-link:hover,
 .hero-title-link:focus,
+.hero-title-link:active,
 .hero-title-link:visited {
   color: inherit;
-  text-decoration: none;
+  text-decoration: none !important;
+  border-bottom: 0 !important;        /* the underline culprit — Wowchemy underlines <a> via border-bottom */
+  box-shadow: none !important;        /* belt: some link styles use an inset shadow */
+  background-image: none !important;  /* belt: or a gradient-image underline */
 }
 .hero-title-link { cursor: pointer; }
 .hero-title-link:focus-visible {            /* keyboard users only — mouse users never see it */

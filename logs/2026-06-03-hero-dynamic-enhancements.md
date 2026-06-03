@@ -101,3 +101,14 @@ in `<a class="hero-title-link" target="_blank" rel="noopener">` and styled it
 (`color: inherit; text-decoration: none`) to look identical to the plain title —
 the only tell is a pointer cursor on hover (plus a keyboard-only focus outline).
 No tooltip, so it stays a discoverable secret.
+
+## Follow-up 6 (same day) — fix the link underline + use the real deck URL
+
+The title link showed an underline on the live site. `color: inherit` worked
+(title still white, not link-blue), which proved the theme's link rules aren't
+`!important` and aren't using `text-decoration` for the underline — so it was
+Wowchemy's `border-bottom` link underline, which `text-decoration: none` can't
+touch. Hardened `.hero-title-link` with `border-bottom: 0 !important` (plus
+`box-shadow`/`background-image: none !important` belts and `text-decoration:
+none !important`). Also swapped the placeholder Canva site-root href for the real
+deck the user supplied: `https://canva.link/hhrue9c5aogivjn`.
