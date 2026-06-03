@@ -1277,21 +1277,16 @@ details.concept-card p:last-child {
   margin: 0 auto 1.25rem;
   padding: 1.3rem 2.5rem;
   border-radius: 4px;
-  background: rgba(18, 32, 75, 0);
-  backdrop-filter: blur(3px) saturate(115%);
-  -webkit-backdrop-filter: blur(3px) saturate(115%);
-  box-shadow: 0 4px 24px rgba(8, 14, 40, 0.35);
+  background: transparent;
   opacity: 0;
   transform: translateY(18px);
   translate: var(--px) var(--py);
   animation: heroFadeUp 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
   transition: translate 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
-              transform 0.35s ease,
-              background 0.3s ease;
+              transform 0.35s ease;
 }
 
 .hero-glass-card:hover {
-  background: rgba(18, 32, 75, 0);
   translate: var(--px) calc(var(--py) - 2px);
 }
 
