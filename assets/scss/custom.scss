@@ -2402,6 +2402,14 @@ html.wc-pre-dark body { background-color: $cz-navy-1 !important; }
 .home-section.wg-featured .card-simple .summary-link { display: block; }
 .home-section.wg-featured .card-simple .article-style,
 .home-section.wg-featured .card-simple .article-style p { margin: 0; }
+
+/* Summary reads as a pulled-out quote: centered and wrapped in curly quotes. */
+.home-section.wg-featured .card-simple .article-style,
+.home-section.wg-featured .card-simple .article-style p {
+  text-align: center;
+}
+.home-section.wg-featured .card-simple .article-style p::before { content: "\201C"; }
+.home-section.wg-featured .card-simple .article-style p::after  { content: "\201D"; }
 .home-section.wg-featured .card-simple .btn-links {
   padding-top: 0.85rem;
   padding-bottom: 1.1rem;
