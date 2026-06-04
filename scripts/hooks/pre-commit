@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# i18n parity pre-commit hook.
+#
+# Enable once per clone with:
+#   git config core.hooksPath scripts/hooks
+#
+# While the ES/JA backfill is still incomplete this hook runs in REPORT-ONLY
+# mode: it prints any English content missing a Spanish/Japanese counterpart but
+# does NOT block the commit. Once `scripts/i18n-parity.sh` reports zero gaps,
+# flip GATE=1 below to turn it into an enforced gate (a commit that introduces an
+# untranslated item will then fail until you run `/project:translate-content`).
+
+GATE=0   # set to 1 after the backfill reaches zero gaps
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+CHECKER="$ROOT/scripts/i18n-parity.sh"
+[ -x "$CHECKER" ] || exit 0
+
+if "$CHECKER" >/tmp/i18n-parity-precommit.out 2>&1; then
+  exit 0   # no gaps
+fi
+
+echo "----------------------------------------------------------------------"
+echo "i18n parity: English content is missing ES/JA counterparts."
+tail -n 3 /tmp/i18n-parity-precommit.out
+echo "Run 'scripts/i18n-parity.sh' for the full report, then"
+echo "'/project:translate-content --all-missing --lang all' to fill the gaps."
+echo "----------------------------------------------------------------------"
+
+if [ "$GATE" = "1" ]; then
+  echo "Commit blocked (GATE=1). Translate the missing items or amend the hook."
+  exit 1
+fi
+exit 0   # report-only: allow the commit

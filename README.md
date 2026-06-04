@@ -8,7 +8,7 @@ Academic portfolio website for **Carlos Mendez**, Associate Professor of Develop
 
 | Component | Version / Detail |
 |-----------|-----------------|
-| Static site generator | [Hugo](https://gohugo.io/) 0.89.4 |
+| Static site generator | [Hugo](https://gohugo.io/) 0.111.3 (extended) |
 | Theme | [Wowchemy](https://wowchemy.com/) v5 (via Hugo Modules) |
 | Markup | Goldmark (with `unsafe: true` for inline HTML, Mermaid diagrams) |
 | Styling | SCSS (`assets/scss/custom.scss`) |
@@ -169,6 +169,25 @@ Uses collapsible `<details>` sections with the `fullwidth-iframe` shortcode:
 
 Each author has a folder with `_index.md` containing name, role, organization, bio, social links, and `avatar.jpg`.
 
+## Internationalization (i18n)
+
+The site is **trilingual**: English at `/` (`content/`), Spanish at `/es/` (`content/es/`), and Japanese at `/ja/` (`content/ja/`). Each language has its own content tree, isolated by Hugo module mounts in `config/_default/config.yaml` (the English mount uses `excludeFiles: '{es,ja}/**'`); languages and menus live in `config/_default/languages.yaml`.
+
+Homepage widgets query the **current language's** pages with **no English fallback** — an item that lacks a `content/es/<section>/<slug>/` or `content/ja/<section>/<slug>/` counterpart simply will not appear on the `/es/` or `/ja/` homepage. Publications, events, projects, and author profiles are **full translations**; tutorial posts are lightweight **stub cards** whose card links back to the English tutorial. As of 2026-06-04 the entire backlog is backfilled (publications, events, projects, authors, post stubs all at parity).
+
+To keep this sustainable, whenever you add content of those types you must create its ES + JA counterparts in the same change:
+
+```bash
+# Translate one item (or backfill every gap) into Spanish + Japanese
+/project:translate-content <slug> --lang all
+/project:translate-content --all-missing --lang all
+
+# Report any English content lacking an ES/JA counterpart (exit non-zero on gaps)
+bash scripts/i18n-parity.sh
+```
+
+The `translate-content` skill applies the glossary at `.claude/skills/translate-content/references/glossary.md` (formal Latin American Spanish `usted`; Japanese です・ます; number localization; a do-not-translate list for query keys/URLs/DOIs). See the **Internationalization (i18n)** section of `CLAUDE.md` for the full architecture, conventions, and how to add a fourth language.
+
 ## Local Development
 
 **Prerequisites:** Go (1.15+), Git
@@ -179,7 +198,7 @@ A local Hugo Extended binary is available at:
 ~/Library/Application Support/Hugo/0.84.2/hugo
 ```
 
-> **Note:** This is v0.84.2 (the Netlify build uses 0.89.4). It works for local previews; the theme minimum is 0.78.
+> **Note:** This on-disk binary is v0.84.2, but the site now requires Hugo **≥ 0.96** (the `continue` keyword in `layouts/section/event.html`), so 0.84.2 no longer builds it. Use a 0.96–0.119 **extended** binary for local previews; the project verifies builds with **0.111.3** (the version pinned in `netlify.toml`). The theme minimum is 0.78.
 
 ```bash
 # Run the dev server
@@ -197,7 +216,7 @@ The site auto-deploys to Netlify on every push to the `master` branch.
 
 **Build configuration** (`netlify.toml`):
 - **Command:** `hugo --gc --minify -b $URL`
-- **Hugo version:** 0.89.4 (set via `HUGO_VERSION` env var)
+- **Hugo version:** 0.111.3 (set via `HUGO_VERSION` env var)
 - **Deploy previews:** Enabled with `--buildFuture` flag
 - **Cache:** `netlify-plugin-hugo-cache-resources` enabled
 
@@ -242,7 +261,7 @@ Add a new `<details>` block to `content/projects/dashboards/index.md` following 
 
 ### Skill Architecture
 
-Twelve Claude Code skills: ten organized as Write/Review pairs across five artifact stages, plus two standalone Quarto-companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, and `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
+Thirteen Claude Code skills: ten organized as Write/Review pairs across five artifact stages, plus three standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, and `translate-content` — the trilingual ES/JA translator, see [Internationalization (i18n)](#internationalization-i18n)). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
 
 | Stage | Write skill | Review skill |
 |-------|-------------|--------------|
