@@ -27,18 +27,18 @@ url_video: ""
 
 ## ¡Bienvenido/a a Dominando las métricas causales!
 
-Una guía de estudio impulsada por IA para **Dominando las métricas causales**. Aprende los fundamentos de la inferencia causal con cuadernos interactivos de Python y herramientas de IA, a partir del libro de texto fundacional [*Mastering 'Metrics: The Path from Cause to Effect*](https://www.masteringmetrics.com/) de Angrist & Pischke.
+Una guía de estudio impulsada por IA para **Dominando las métricas causales**. Aprenda los fundamentos de la inferencia causal con cuadernos interactivos de Python y herramientas de IA, a partir del libro de texto fundacional [*Mastering 'Metrics: The Path from Cause to Effect*](https://www.masteringmetrics.com/) de Angrist & Pischke.
 
 Esta plataforma incluye:
 
-- **Métodos fundamentales** -- Basados en *Mastering 'Metrics* de Angrist & Pischke. Aprende inferencia causal desde los ensayos aleatorizados hasta las diferencias en diferencias.
-- **Cuadernos de Python** -- Cuadernos de Google Colab sin instalación. Conjuntos de datos reales, código funcional e implementaciones completas de cada método.
-- **Aprendizaje impulsado por IA** -- Múltiples tutores de IA con estilos pedagógicos diferenciados.
+- **Métodos fundamentales** — Basados en *Mastering 'Metrics* de Angrist & Pischke. Aprenda inferencia causal desde los ensayos aleatorizados hasta las diferencias en diferencias.
+- **Cuadernos de Python** — Cuadernos de Google Colab sin instalación. Conjuntos de datos reales, código funcional e implementaciones completas de cada método.
+- **Aprendizaje impulsado por IA** — Múltiples tutores de IA con estilos pedagógicos diferenciados.
 
 
 ## Cuadernos interactivos de Google Colab
 
-Haz clic en cualquier insignia de abajo para abrir y ejecutar al instante en tu navegador:
+Haga clic en cualquier insignia de abajo para abrir y ejecutar al instante en su navegador:
 
 ### Parte I: El marco conceptual
 
@@ -64,17 +64,17 @@ Haz clic en cualquier insignia de abajo para abrir y ejecutar al instante en tu 
 
 ### Cómo usar los cuadernos
 
-1. **Haz clic en cualquier insignia "Open in Colab"** de arriba
-2. **Inicia sesión** con tu cuenta de Google (gratuita)
-3. **Haz clic en "Ejecutar todo"** en el menú Entorno de ejecución (o ejecuta las celdas de forma individual)
-4. **Explora y modifica** -- cambia parámetros, prueba distintos modelos, experimenta con los datos
-5. **Guarda tu trabajo** -- Archivo > Guardar una copia en Drive para conservar tus modificaciones
+1. **Haga clic en cualquier insignia "Open in Colab"** de arriba
+2. **Inicie sesión** con su cuenta de Google (gratuita)
+3. **Haga clic en "Ejecutar todo"** en el menú Entorno de ejecución (o ejecute las celdas de forma individual)
+4. **Explore y modifique** — cambie parámetros, pruebe distintos modelos, experimente con los datos
+5. **Guarde su trabajo** — Archivo > Guardar una copia en Drive para conservar sus modificaciones
 
 **¡Sin instalación, sin descargas, sin configuración!**
 
 
 ## Autores y créditos
 
-**Carlos Mendez** -- Implementación en Python y desarrollo de los cuadernos educativos
+**Carlos Mendez** — Implementación en Python y desarrollo de los cuadernos educativos
 
-**Joshua D. Angrist & Jorn-Steffen Pischke** -- Libro de texto original, [*Mastering 'Metrics*](https://www.masteringmetrics.com/)
+**Joshua D. Angrist & Jörn-Steffen Pischke** — Libro de texto original, [*Mastering 'Metrics*](https://www.masteringmetrics.com/)

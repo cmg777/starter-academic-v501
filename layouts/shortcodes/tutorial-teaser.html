@@ -19,6 +19,10 @@
   {{ end }}
 {{ end }}
 
+{{/* Language-aware "browse all" label — fixes the English leak on /es/ and /ja/ (en is the default). */}}
+{{ $browseLabels := dict "en" "Browse all tutorials" "es" "Ver todos los tutoriales" "ja" "すべてのチュートリアルを見る" }}
+{{ $browseLabel := or (index $browseLabels site.Language.Lang) (index $browseLabels "en") }}
+
 <div class="tg-teaser">
   <div class="tg-teaser-strip">
     {{ range $teaser }}
@@ -26,6 +30,6 @@
     {{ end }}
   </div>
   <div class="tg-teaser-link-row">
-    <a class="tg-teaser-link" href="/post/">Browse all tutorials &rarr;</a>
+    <a class="tg-teaser-link" href="/post/">{{ $browseLabel }} &rarr;</a>
   </div>
 </div>

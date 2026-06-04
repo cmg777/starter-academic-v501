@@ -52,9 +52,9 @@ Cuando el sol se pone y las luces se encienden, [aún queda mucho por explorar.]
 {{% callout note %}}
 CUESTIONARIO: A partir de la regresión  NTL = a + b(t),  el mapa de abajo muestra las tendencias de las luces nocturnas. [Se usa una composición RGB para la visualización](https://jeffhowarth.github.io/eeprimer/rudiments/additive_color/), donde los valores de pendiente positivos y negativos se representan con gradientes rojo y azul respectivamente, y el intercepto con un gradiente verde.
 <br>
-Con estos parámetros, ¿cómo interpretarías los colores amarillo y cian?
+Con estos parámetros, ¿cómo interpretaría usted los colores amarillo y cian?
 <br>
-(Pista: copia y pega este cuestionario en ChatGPT)
+(Pista: copie y pegue este cuestionario en ChatGPT)
 <br>
 {{% /callout %}}
 </center>
@@ -67,7 +67,7 @@ Con estos parámetros, ¿cómo interpretarías los colores amarillo y cian?
 {{% callout note %}}
 ¿Y la distribución de la población? ¿Qué podemos aprender de la dinámica espacial de la población?
 <br>
-(Haz clic en cualquier punto del mapa de abajo y descúbrelo.)
+(Haga clic en cualquier punto del mapa de abajo y descúbralo.)
 <br>
 {{% /callout %}}
 </center>

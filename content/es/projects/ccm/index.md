@@ -33,7 +33,7 @@ Una introducción a la **evaluación de impacto regional** mediante métodos mod
 Este libro en desarrollo incluye:
 
 - **Métodos cuasiexperimentales** — Desde series temporales interrumpidas hasta el control sintético y las series temporales estructurales bayesianas, con un enfoque comparativo regional.
-- **Cuadernos en R + Quarto** — Capítulos reproducibles con código plegable, listos para renderizarse localmente o ampliarse con tus propios datos.
+- **Cuadernos en R + Quarto** — Capítulos reproducibles con código plegable, listos para renderizarse localmente o ampliarse con sus propios datos.
 
 
 ## Capítulos
@@ -48,7 +48,7 @@ Este libro en desarrollo incluye:
 
 
 
-Contribuye y deja tus comentarios en [https://github.com/quarcs-lab/ccm](https://github.com/quarcs-lab/ccm).
+Contribuya y deje sus comentarios en [https://github.com/quarcs-lab/ccm](https://github.com/quarcs-lab/ccm).
 
 
 ## Proyecto relacionado

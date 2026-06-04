@@ -60,4 +60,4 @@ user_groups:
 
 Tras estudiar Ingeniería Comercial en Bolivia y Chile, trabajé como consultor para Pro-Mujer International, el Banco Mundial, DANIDA y JICA. Obtuve una maestría y un doctorado en Desarrollo Internacional en la Universidad de Nagoya, Japón. Mi investigación se centra en integrar la economía del desarrollo, la ciencia de datos espaciales y la econometría aplicada para comprender e informar mejor el proceso de desarrollo sostenible entre regiones. Mi investigación actual aborda (1) la analítica de macrodatos geoespaciales y el desarrollo socioeconómico; (2) las interacciones entre desigualdad geoespacial, pobreza y crecimiento; (3) la infraestructura regional y los flujos de movilidad; y (4) el cambio estructural espacial y la dinámica de la productividad.
 
-{{< icon name="download" pack="fas" >}} Descarga mi {{< staticref "media/CV.pdf" "newtab" >}}CV{{< /staticref >}}.
+{{< icon name="download" pack="fas" >}} Descargue mi {{< staticref "media/CV.pdf" "newtab" >}}CV{{< /staticref >}}.

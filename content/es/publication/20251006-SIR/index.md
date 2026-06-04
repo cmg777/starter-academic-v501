@@ -25,7 +25,7 @@ publication_types: ["2"]
 publication: "*Social Indicators Research*"
 publication_short: ""
 
-abstract: "Camboya ha crecido con rapidez, pero sigue siendo económicamente vulnerable, con una pobreza persistente y datos subnacionales escasos y desactualizados. Este estudio combina fuentes de macrodatos, aprendizaje automático y la Encuesta Socioeconómica de Camboya para predecir y mapear el Índice de Pobreza Multidimensional Global a partir de 10 indicadores de educación, salud y nivel de vida a escalas espaciales finas. Al integrar probabilidades de privación en cuadrícula con huellas de edificaciones, estimamos las privaciones a nivel de hogar. Un modelo de random forest alcanza una alta precisión para el agua potable, el saneamiento, el consumo de alimentos, los materiales de la vivienda, el combustible para cocinar y el acceso a la electricidad. Entre los principales predictores se encuentran las luces nocturnas, la densidad de población y las redes viarias. Persisten desafíos —en especial la necesidad de datos de entrenamiento no sesgados y la capacidad limitada para captar disparidades dentro de las provincias o los distritos. No obstante, el enfoque muestra cómo los macrodatos y el aprendizaje automático pueden complementar a las encuestas tradicionales para ofrecer mediciones más granulares y oportunas de la pobreza multidimensional."
+abstract: "Camboya ha crecido con rapidez, pero sigue siendo económicamente vulnerable, con una pobreza persistente y datos subnacionales escasos y desactualizados. Este estudio combina fuentes de macrodatos, aprendizaje automático y la Encuesta Socioeconómica de Camboya para predecir y mapear el Índice de Pobreza Multidimensional Global a partir de 10 indicadores de educación, salud y nivel de vida a escalas espaciales finas. Al integrar probabilidades de privación en cuadrícula con huellas de edificaciones, estimamos las privaciones a nivel de hogar. Un modelo de random forest alcanza una alta precisión para el agua potable, el saneamiento, el consumo de alimentos, los materiales de la vivienda, el combustible para cocinar y el acceso a la electricidad. Entre los principales predictores se encuentran las luces nocturnas, la densidad de población y las redes viales. Persisten desafíos —en especial la necesidad de datos de entrenamiento no sesgados y la capacidad limitada para captar disparidades dentro de las provincias o los distritos. No obstante, el enfoque muestra cómo los macrodatos y el aprendizaje automático pueden complementar a las encuestas tradicionales para ofrecer mediciones más granulares y oportunas de la pobreza multidimensional."
 
 # Summary. An optional shortened abstract.
 summary: "Utilizamos nuevas fuentes de macrodatos, la Encuesta Socioeconómica de Camboya y métodos de aprendizaje automático para predecir y mapear la pobreza multidimensional en Camboya."
@@ -201,7 +201,7 @@ Notas: Se eligieron diez indicadores siguiendo el MPI Global. Se aplicaron ponde
 ### 📈 Resultados – Importancia de las variables
 
 - **Luces nocturnas** = predictor clave en todos los indicadores
-- **Densidad de población** y **redes viarias** también significativas
+- **Densidad de población** y **redes viales** también significativas
 - Predicciones más sólidas: **combustible para cocinar, agua potable, saneamiento, electricidad**
 - Predicciones débiles: **asistencia escolar, atención sanitaria, activos**
 

@@ -39,7 +39,7 @@ Este repositorio está organizado para personas dedicadas a la investigación y 
 
 ## 🖥️ Paneles geoespaciales interactivos
 
-Explora los datos sin escribir código. Estas aplicaciones visualizan la dinámica espacio-temporal de indicadores clave del desarrollo.
+Explore los datos sin escribir código. Estas aplicaciones visualizan la dinámica espacio-temporal de indicadores clave del desarrollo.
 
 * [Dinámica espacio-temporal de la población, la luminosidad, la cobertura del suelo y el PIB (2013-2019)](https://carlos-mendez.projects.earthengine.app/view/geoexplorer1v100bolivia): visualiza la evolución de la densidad de población, las luces nocturnas, los cambios en la cobertura del suelo y las estimaciones del PIB en los municipios bolivianos en 2013 y 2019.
 
@@ -47,10 +47,10 @@ Explora los datos sin escribir código. Estas aplicaciones visualizan la dinámi
 
 ## 🐍 Cuadernos computacionales en la nube
 
-Tutoriales paso a paso que te ayudan a reproducir nuestro análisis. Estos cuadernos utilizan bibliotecas de Python como `GeoPandas` y `PySAL`.
+Tutoriales paso a paso que le ayudan a reproducir nuestro análisis. Estos cuadernos utilizan bibliotecas de Python como `GeoPandas` y `PySAL`.
 
 * **[Introducción al análisis exploratorio de datos espaciales (ESDA)](https://colab.research.google.com/github/quarcs-lab/ds4bolivia/blob/master/notebooks/esda.ipynb)**
-* *Enfoque:* aprende a detectar agrupaciones y valores atípicos espaciales mediante la I de Moran global y local.
+* *Enfoque:* aprenda a detectar agrupaciones y valores atípicos espaciales mediante la I de Moran global y local.
 * *Conceptos clave:* autocorrelación espacial, estadísticos LISA, mapas coropléticos.
 
 ---
@@ -59,15 +59,15 @@ Tutoriales paso a paso que te ayudan a reproducir nuestro análisis. Estos cuade
 
 Conjuntos de datos curados y listos para el análisis. Estos archivos están preprocesados para ajustarse a los límites municipales de Bolivia.
 
-* **[ODS e incrustaciones satelitales (2017)](https://github.com/quarcs-lab/ds4bolivia/blob/master/datasets/sdgs_satelliteEmbeddings2017.csv)**
+* **[ODS y embeddings satelitales (2017)](https://github.com/quarcs-lab/ds4bolivia/blob/master/datasets/sdgs_satelliteEmbeddings2017.csv)**
 * *Descripción:* un conjunto de datos combinado que une indicadores socioeconómicos (ODS) con vectores de características de alta dimensión extraídos de imágenes satelitales.
-* *Caso de uso:*　entrenar modelos de aprendizaje automático para predecir índices de pobreza o de desarrollo a partir de patrones visuales desde el espacio.
+* *Caso de uso:* entrenar modelos de aprendizaje automático para predecir índices de pobreza o de desarrollo a partir de patrones visuales desde el espacio.
 
 ---
 
 ## 📜 Cómo citar
 
-Si utilizas este repositorio en tu investigación, cítalo con los siguientes metadatos.
+Si utiliza este repositorio en su investigación, cítelo con los siguientes metadatos.
 
 ### Formato APA
 Mendez, C., Gonzales, E., Leoni, P., Andersen, L., Hendrix, P. (2024). DS4Bolivia: A Data Science Repository to Study GeoSpatial Development in Bolivia [Data set]. GitHub. https://github.com/quarcs-lab/ds4bolivia
@@ -87,7 +87,7 @@ Mendez, C., Gonzales, E., Leoni, P., Andersen, L., Hendrix, P. (2024). DS4Bolivi
 
 ---
 
-## 🚀 Construye tu propio conjunto de datos
+## 🚀 Construya su propio conjunto de datos
 
 Los conjuntos de datos están organizados en módulos, todos vinculados por un identificador único (`asdf_id`).
 
@@ -95,15 +95,15 @@ Los conjuntos de datos están organizados en módulos, todos vinculados por un i
 | :--- | :--- | :--- | :--- |
 | **Nombres de regiones** | `/regionNames/regionNames.csv` | Metadatos administrativos (nombres de municipios y de departamentos). | `asdf_id` |
 | **Socioeconómico** | `/sdg/sdg.csv` | Índices de los Objetivos de Desarrollo Sostenible (ODS) y métricas de pobreza. | `asdf_id` |
-| **Características satelitales** | `/satelliteEmbeddings/satelliteEmbeddings2017.csv` | Vectores de características (incrustaciones) extraídos de imágenes satelitales diurnas. | `asdf_id` |
+| **Características satelitales** | `/satelliteEmbeddings/satelliteEmbeddings2017.csv` | Vectores de características (embeddings) extraídos de imágenes satelitales diurnas. | `asdf_id` |
 | **Vector espacial** | `/maps/bolivia339geoqueryOpt.geojson` | Límites geométricos (polígonos) de todos los municipios. | `asdf_id` |
 
 > **⚠️ Nota importante sobre los identificadores:** > La clave principal para unir todos los conjuntos de datos de este repositorio es **`asdf_id`**.  
-> Aunque `mun_id` (el código gubernamental estándar) está presente en los datos administrativos, `asdf_id` garantiza la coherencia entre las incrustaciones satelitales y los archivos de mapas optimizados que se proporcionan aquí. Asegúrate siempre de que esta columna se trate de forma coherente como `int` o `string` en ambos dataframes antes de fusionarlos.
+> Aunque `mun_id` (el código gubernamental estándar) está presente en los datos administrativos, `asdf_id` garantiza la coherencia entre los embeddings satelitales y los archivos de mapas optimizados que se proporcionan aquí. Asegúrese siempre de que esta columna se trate de forma coherente como `int` o `string` en ambos dataframes antes de fusionarlos.
 
 ---
 
-Puedes ejecutar los ejemplos de abajo de inmediato en [Google Colab](https://colab.research.google.com/notebooks/empty.ipynb).
+Puede ejecutar los ejemplos de abajo de inmediato en [Google Colab](https://colab.research.google.com/notebooks/empty.ipynb).
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/notebooks/empty.ipynb)
 
@@ -216,4 +216,4 @@ plt.show()
 
 ## 🤝 Cómo contribuir
 
-¡Las contribuciones son bienvenidas! Si vas a corregir un problema con el sistema de referencia de coordenadas (CRS), añadir un nuevo modelo espacial o subir datos nuevos, [envía un Pull Request](https://github.com/quarcs-lab/ds4bolivia/pulls).
+¡Las contribuciones son bienvenidas! Si va a corregir un problema con el sistema de referencia de coordenadas (CRS), añadir un nuevo modelo espacial o subir datos nuevos, [envíe un Pull Request](https://github.com/quarcs-lab/ds4bolivia/pulls).

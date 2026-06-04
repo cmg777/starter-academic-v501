@@ -9,5 +9,5 @@ design:
 ---
 
 {{% callout note %}}
-Conoce a los egresados [aquí](/alumni/).
+Conozca a los egresados [aquí](/alumni/).
 {{% /callout %}}
