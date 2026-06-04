@@ -12,10 +12,9 @@ en:
   languageName: English
   weight: 1
 
-# Spanish — served at /es/. The homepage and the items it shows are translated;
-# other sections stay English. Untranslated real-page links (e.g. Courses) are
-# omitted from this menu to avoid /es/ 404s; hash-anchor items scroll the /es/
-# homepage and the external Events link is unchanged.
+# Spanish — served at /es/. The homepage, the items it shows, and the Courses
+# page are translated. Courses links to the localized /es/courses/; hash-anchor
+# items scroll the /es/ homepage and the external Events link is unchanged.
 es:
   languageCode: es-es
   languageName: Español
@@ -45,6 +44,9 @@ es:
       - name: 'Estudiantes'
         url: '#people'
         weight: 60
+      - name: 'Cursos'
+        url: '/es/courses/'
+        weight: 70
       - name: 'Eventos'
         url: 'https://lu.ma/cmg'
         weight: 80
@@ -52,11 +54,10 @@ es:
         url: '#contact'
         weight: 90
 
-# Japanese — served at /ja/. Mirrors the Spanish layer: the homepage and the
-# items it shows are translated; other sections stay English. Untranslated
-# real-page links (e.g. Courses) are omitted from this menu to avoid /ja/ 404s;
-# hash-anchor items scroll the /ja/ homepage and the external Events link is
-# unchanged. Infra hooks live in config.yaml (content/ja mount + hasCJKLanguage),
+# Japanese — served at /ja/. Mirrors the Spanish layer: the homepage, the items
+# it shows, and the Courses page are translated. Courses links to the localized
+# /ja/courses/; hash-anchor items scroll the /ja/ homepage and the external
+# Events link is unchanged. Infra hooks live in config.yaml (content/ja mount + hasCJKLanguage),
 # netlify/edge-functions/geo-lang.ts (JP -> /ja/), and assets/js/lang-pref.js.
 ja:
   languageCode: ja-jp
@@ -87,6 +88,9 @@ ja:
       - name: '学生'
         url: '#people'
         weight: 60
+      - name: 'コース'
+        url: '/ja/courses/'
+        weight: 70
       - name: 'イベント'
         url: 'https://lu.ma/cmg'
         weight: 80

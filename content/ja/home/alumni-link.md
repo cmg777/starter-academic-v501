@@ -9,5 +9,5 @@ design:
 ---
 
 {{% callout note %}}
-修了生の紹介は[こちら](/alumni/)。
+修了生の紹介は[こちら](/ja/alumni/)。
 {{% /callout %}}

@@ -70,3 +70,38 @@ stub comments), but never alter a comment that documents a query-key contract.
   false}`. Empty body. **Never** emit the reserved `url:` key.
 - **Assets:** none (figures would leak harmlessly; `publishResources: false`
   keeps them out).
+
+## courses — FULL translation (singleton landing page)
+- Path: `content/<lang>/courses/_index.md`
+- **Translate:** `title`, the intro sentence, the `<h3>` course names, the
+  `Website:`/`Posts about …` link **text**, and any descriptive prose.
+- **Keep verbatim:** `type`, the `image:` block, the `<style>` block, all
+  external URLs, Font Awesome `<i class="fas …">` icons, and HTML structure.
+  Branded external course names (e.g. "Mastering Causal Metrics") stay as-is.
+- **Localize:** the `https://carlos-mendez.org/#posts` anchors to
+  `/es/#posts` / `/ja/#posts`.
+- **Assets:** copy `featured.*`.
+- **Menu:** add a localized Courses item to the lang's `menu.main` in
+  `config/_default/languages.yaml` (URL `/<lang>/courses/`).
+
+## alumni — FULL translation (singleton widget page)
+- Path: `content/<lang>/alumni/{index.md,people.md}`
+- **Translate:** the `title` (`Egresados` / `修了生`) and `subtitle` in both files.
+- **Keep verbatim:** `type`, `widget`, `headless`, `weight`, `design`, and the
+  four Alumni `user_groups` (English query keys — they must match the English
+  Alumni groups kept on each author profile, or the widget won't populate).
+- **Also fix:** the homepage `content/<lang>/home/alumni-link.md` link must point
+  at `/<lang>/alumni/`, not the English `/alumni/`.
+
+## slides — FULL translation
+- Path: `content/<lang>/slides/<deck>/index.md`
+- **Translate:** `title`, `summary`, prose, slide headings, and speaker-note text.
+- **Keep verbatim:** the `slides:` reveal.js front matter (theme/highlight),
+  `date`, code fences, math, `{{< slide … >}}`/`{{% fragment %}}`/`{{< speaker_note >}}`
+  shortcodes, and any syntax-example code blocks shown as documentation.
+
+## page — FULL translation (root static pages: privacy, terms)
+- Path: `content/<lang>/privacy.md`, `content/<lang>/terms.md`
+- **Translate:** `title` and body prose (keep code literals like `` `draft: false` `` ).
+- **Keep verbatim:** `date`, `draft` (mirror the English value — these are
+  `draft: true` placeholders), `share`, `commentable`, `editable`, `header`.
