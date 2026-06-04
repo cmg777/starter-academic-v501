@@ -1,5 +1,5 @@
 ---
-bio: Master's student in International Development at Nagoya University. My work focuses on the intersection of sustainability, technological innovation, and environmental impact analysis
+bio: PhD student in International Development at Nagoya University. My work focuses on the intersection of sustainability, technological innovation, and environmental impact analysis
 education:
   courses:
   - course: B.A. in Economics

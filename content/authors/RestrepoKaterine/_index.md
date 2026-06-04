@@ -7,7 +7,7 @@ education:
     year: 2020
 email: "x"
 interests:
-- "Regional economy development and structural change: Spatial evidence from north-eastern China" 
+- "TBA"
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"

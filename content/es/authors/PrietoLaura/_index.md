@@ -1,5 +1,5 @@
 ---
-bio: Estudiante de maestría en Desarrollo Internacional en la Universidad de Nagoya. Mi trabajo se centra en la intersección entre la sostenibilidad, la innovación tecnológica y el análisis del impacto ambiental.
+bio: Estudiante de doctorado en Desarrollo Internacional en la Universidad de Nagoya. Mi trabajo se centra en la intersección entre la sostenibilidad, la innovación tecnológica y el análisis del impacto ambiental.
 education:
   courses:
   - course: Licenciatura en Economía

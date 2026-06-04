@@ -108,9 +108,9 @@ Local rebuild after fixes: clean, exit 0.
 
 ## 5. Recommendations — Tiers 1–4 APPLIED 2026-06-04 (per owner approval)
 
-> **Update:** the owner approved applying Tiers 1–4. All items below were applied this same day
-> **except** the two genuine *data* problems (duplicated China dissertation title ×3, Prieto MA-vs-PhD
-> contradiction), which can't be corrected without the real topics/levels — those remain open (see §7).
+> **Update:** the owner approved applying Tiers 1–4. All items below were applied this same day. The two
+> genuine *data* problems (duplicated China dissertation title ×3, Prieto MA-vs-PhD contradiction) were
+> resolved later the same day with owner-provided data — `TBA` placeholders and Prieto→PhD (see §7).
 > Tier-4 mechanical items were applied in **all** affected languages (EN + ES + JA where the string
 > exists). What was changed, verbatim:
 > - Hero `開発の地理学について` → `開発の地理学`; featured heading `主要論文` → `主要な業績`; navbar `論文` →
@@ -182,11 +182,13 @@ Local rebuild after fixes: clean, exit 0.
 - **Deploy** — the edge-function fix + all Tier 1–4 edits + this log were committed and pushed to
   `master` on 2026-06-04, triggering the Netlify rebuild that clears the live homepage 500. Verify
   post-deploy: `GET /` with no cookies → expect non-500.
-- **Data fixes needing owner input** (NOT auto-fixable — would require fabricating facts):
-  - Duplicated dissertation title `…中国東北部からの空間的エビデンス` on LeivaFavio (Peru),
-    RestrepoKaterine (Colombia), PhonSophat (Cambodia) — provide each student's real topic, fix the EN
-    source, then re-translate.
-  - PrietoLaura: MA or PhD? `role` (博士課程) and `bio` (修士課程) disagree (inherited from EN).
+- **Data fixes — RESOLVED 2026-06-04 (owner-provided):**
+  - The wrong "north-eastern China" dissertation title on LeivaFavio (Peru), RestrepoKaterine (Colombia),
+    PhonSophat (Cambodia) → replaced with the literal `TBA` in EN + ES + JA. The same title still sits on
+    3 EN-only profiles (SuleimanHussein / ChenYilin / MinhThu) — left as-is per owner (ChenYilin/MinhThu
+    may be legitimately China-focused).
+  - PrietoLaura → `bio` corrected to **PhD** in EN + ES + JA (she completed her MA in 2025; `role` and
+    `user_groups` were already PhD).
 - **Content completion** — 5 author placeholder bios (HeDu, KhounTheara, LiXiaomeng, SourHeng,
   CesarEchevarria2) await real content in both languages.
 - **Optional/invisible** — gallery-widget English comments; event YAML trailing whitespace.

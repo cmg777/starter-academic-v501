@@ -7,7 +7,7 @@ education:
     year: 2020
 email: "x"
 interests:
-- "地域経済の発展と構造変化：中国東北部からの空間的エビデンス"
+- "TBA"
 organizations:
 - name: 名古屋大学
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
