@@ -5,8 +5,7 @@ event: "地理データサイエンス研究所セミナー、リバプール大
 event_url: https://www.liverpool.ac.uk/geographic-data-science/
 location: イギリス、リバプール
 summary:  "地理データサイエンス研究所セミナー、リバプール大学"    
-abstract: "_"
-
+abstract: ""
 # Talk start and end times.
 #   End time can optionally be hidden by prefixing the line with `#`.
 date: "2024-11-13T10:10:00Z"

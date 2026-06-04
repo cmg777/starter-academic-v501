@@ -8,7 +8,7 @@ summary: AIを活用した因果推論の実践的な学習ガイド。Pythonノ
 tags:
 - python
 - causal
-title: "因果メトリクスをマスターする"
+title: "因果メトリクスをマスターする（Mastering Causal Metrics）"
 
 links:
   - name: "ウェブサイト"
@@ -31,9 +31,9 @@ url_video: ""
 
 本プラットフォームには以下が含まれます。
 
-- **基礎的な手法** -- Angrist & Pischke の *Mastering 'Metrics* に基づきます。ランダム化試験から差分の差分法まで、因果推論を学びます。
-- **Pythonノートブック** -- インストール不要のGoogle Colabノートブック。実データ、動作するコード、各手法の完全な実装を備えています。
-- **AIを活用した学習** -- 異なる教育スタイルを持つ複数のAIチューター。
+- **基礎的な手法** — Angrist & Pischke の *Mastering 'Metrics* に基づきます。ランダム化試験から差分の差分法まで、因果推論を学びます。
+- **Pythonノートブック** — インストール不要のGoogle Colabノートブック。実データ、動作するコード、各手法の完全な実装を備えています。
+- **AIを活用した学習** — 異なる教育スタイルを持つ複数のAIチューター。
 
 
 ## インタラクティブなGoogle Colabノートブック
@@ -67,14 +67,14 @@ url_video: ""
 1. 上記のいずれかの **「Open in Colab」バッジをクリックします**
 2. Googleアカウント（無料）で **ログインします**
 3. ランタイムメニューの **「すべて実行」をクリックします**（または各セルを個別に実行します）
-4. **探索して変更します** -- パラメータを変えたり、別のモデルを試したり、データで実験したりできます
-5. **作業を保存します** -- ファイル ＞ ドライブにコピーを保存 で、変更内容を保持できます
+4. **探索して変更します** — パラメータを変えたり、別のモデルを試したり、データで実験したりできます
+5. **作業を保存します** — ファイル ＞ ドライブにコピーを保存 で、変更内容を保持できます
 
 **インストール不要、ダウンロード不要、設定不要！**
 
 
 ## 著者とクレジット
 
-**Carlos Mendez** -- Pythonでの実装および教育用ノートブックの開発
+**Carlos Mendez** — Pythonでの実装および教育用ノートブックの開発
 
-**Joshua D. Angrist & Jorn-Steffen Pischke** -- 原著教科書 [*Mastering 'Metrics*](https://www.masteringmetrics.com/)
+**Joshua D. Angrist & Jörn-Steffen Pischke** — 原著教科書 [*Mastering 'Metrics*](https://www.masteringmetrics.com/)

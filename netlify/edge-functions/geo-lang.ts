@@ -44,37 +44,52 @@ export default async (
   const url = new URL(request.url);
   if (url.pathname !== "/") return; // homepage only (defense in depth)
 
-  // 1) Manual choice wins forever.
-  const pref = context.cookies.get(PREF);
-  if (pref && KNOWN_LANGS.has(pref)) {
-    if (pref === "en") return; // chose English -> stay on "/"
-    return Response.redirect(new URL(`/${pref}/`, url), 302);
+  // The homepage must NEVER 500 because of language routing. Any unexpected error
+  // (e.g. a missing geo object, an SDK quirk) falls through to English at "/".
+  try {
+    // 1) Manual choice wins forever.
+    const pref = context.cookies.get(PREF);
+    if (pref && KNOWN_LANGS.has(pref)) {
+      if (pref === "en") return; // chose English -> stay on "/"
+      return Response.redirect(new URL(`/${pref}/`, url), 302);
+    }
+
+    // 2) Already auto-evaluated this browser -> never auto-redirect again.
+    if (context.cookies.get(SEEN)) return;
+
+    // 3) Mark as seen regardless of outcome, so the auto-redirect fires at most once.
+    context.cookies.set({
+      name: SEEN,
+      value: "1",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      secure: true,
+      sameSite: "Lax",
+    });
+
+    // 4) Geo lookup. Unknown / non-mapped country (incl. most crawlers) -> no redirect.
+    const country = (context.geo?.country?.code ?? "").toUpperCase();
+    const target = COUNTRY_TO_LANG[country];
+    if (!target) return;
+
+    // 5) Mapped country (e.g. JP -> /ja/, MX -> /es/), no override, first visit -> 302.
+    // Build the redirect via the Response constructor so the headers stay MUTABLE.
+    // Response.redirect() returns a response whose headers are immutable, so calling
+    // headers.set() on it throws ("Headers are immutable") and 500s the homepage for
+    // every first-time visitor from a mapped country — construct the Response directly.
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: new URL(target, url).toString(),
+        // Don't let the CDN cache this per-visitor decision and serve it to everyone.
+        "Cache-Control": "private, no-store",
+        "Netlify-Vary": "country|cookie=lang_pref,geo_seen",
+      },
+    });
+  } catch (_err) {
+    // Never block the homepage on a routing error — serve English at "/".
+    return;
   }
-
-  // 2) Already auto-evaluated this browser -> never auto-redirect again.
-  if (context.cookies.get(SEEN)) return;
-
-  // 3) Mark as seen regardless of outcome, so the auto-redirect fires at most once.
-  context.cookies.set({
-    name: SEEN,
-    value: "1",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-    secure: true,
-    sameSite: "Lax",
-  });
-
-  // 4) Geo lookup. Unknown / non-mapped country (incl. most crawlers) -> no redirect.
-  const country = (context.geo?.country?.code ?? "").toUpperCase();
-  const target = COUNTRY_TO_LANG[country];
-  if (!target) return;
-
-  // 5) Spanish-speaking country, no override, first visit -> 302 to /es/.
-  const res = Response.redirect(new URL(target, url), 302);
-  // Don't let the CDN cache this per-visitor decision and serve it to everyone.
-  res.headers.set("Cache-Control", "private, no-store");
-  res.headers.set("Netlify-Vary", "country|cookie=lang_pref,geo_seen");
-  return res;
 };
 
 export const config: Config = {

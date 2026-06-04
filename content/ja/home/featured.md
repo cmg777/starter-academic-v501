@@ -1,5 +1,5 @@
 ---
-# Widget「Featured」（主要論文）。content/home/featured.md の翻訳。
+# Widget「Featured」（主要な業績）。content/home/featured.md の翻訳。
 widget: featured
 
 # このページはセクションを表します。
@@ -8,7 +8,7 @@ headless: true
 # このセクションが表示される順序。
 weight: 20
 
-title: 主要論文
+title: 主要な業績
 subtitle: ""
 
 content:

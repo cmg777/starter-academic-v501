@@ -32,8 +32,7 @@ tags:
 - Kuznets curve
 - regional inequality
 - subnational GDP
-- Bayesian model avaraging 
-
+- Bayesian model averaging
 
 featured: true
 

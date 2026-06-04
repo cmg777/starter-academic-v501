@@ -9,7 +9,7 @@ tags:
 - r
 - causal
 - regional
-title: "比較因果メトリクス"
+title: "比較因果メトリクス（Comparative Causal Metrics）"
 
 links:
   - name: "ウェブサイト"

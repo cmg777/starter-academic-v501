@@ -61,7 +61,7 @@ url_video: "https://youtu.be/kJ4Y6_hWadw"
 
 * **[SDGsと衛星埋め込み（2017年）](https://github.com/quarcs-lab/ds4bolivia/blob/master/datasets/sdgs_satelliteEmbeddings2017.csv)**
 * *説明：* 社会経済指標（SDGs）と、衛星画像から抽出した高次元の特徴ベクトルを結合したデータセットです。
-* *活用例：*　宇宙から捉えた視覚的パターンをもとに、貧困指標や開発指標を予測する機械学習モデルを訓練する。
+* *活用例：* 宇宙から捉えた視覚的パターンをもとに、貧困指標や開発指標を予測する機械学習モデルを訓練する。
 
 ---
 
@@ -98,7 +98,7 @@ Mendez, C., Gonzales, E., Leoni, P., Andersen, L., Hendrix, P. (2024). DS4Bolivi
 | **衛星特徴量** | `/satelliteEmbeddings/satelliteEmbeddings2017.csv` | 日中の衛星画像から抽出した特徴ベクトル（埋め込み）。 | `asdf_id` |
 | **空間ベクター** | `/maps/bolivia339geoqueryOpt.geojson` | すべての自治体の幾何境界（ポリゴン）。 | `asdf_id` |
 
-> **⚠️ 識別子に関する重要な注意：** > 本リポジトリのすべてのデータセットを結合するための主キーは **`asdf_id`** です。  
+> **⚠️ 識別子に関する重要な注意：** 本リポジトリのすべてのデータセットを結合するための主キーは **`asdf_id`** です。  
 > `mun_id`（標準的な政府コード）も行政データに含まれていますが、`asdf_id` は、ここで提供する衛星埋め込みと最適化済みマップファイルとの整合性を保証します。結合する前に、両方のデータフレームでこの列を `int` または `string` として一貫して扱うよう常に確認してください。
 
 ---

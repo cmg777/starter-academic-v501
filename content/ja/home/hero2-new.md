@@ -26,7 +26,7 @@ design:
 
 <div class="hero-native">
   <div class="hero-glass-card hero-glass-card--title hero-glass-card--delay-1">
-    <h1 class="hero-title"><a class="hero-title-link" href="https://canva.link/hhrue9c5aogivjn" target="_blank" rel="noopener">開発の地理学について</a></h1>
+    <h1 class="hero-title"><a class="hero-title-link" href="https://canva.link/hhrue9c5aogivjn" target="_blank" rel="noopener">開発の地理学</a></h1>
     <div class="hero-title-underline" aria-hidden="true"></div>
     <p class="hero-subtitle" data-rotate="地理空間ビッグデータ|開発経済学|空間計量経済学" aria-label="地理空間ビッグデータ、開発経済学、空間計量経済学からの視点">地理空間ビッグデータ、開発経済学、空間計量経済学からの視点</p>
   </div>

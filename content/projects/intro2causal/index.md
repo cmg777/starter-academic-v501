@@ -31,9 +31,9 @@ An AI-powered study guide to **Mastering Causal Metrics**. Learn the foundations
 
 This platform features:
 
-- **Foundational Methods** -- Based on *Mastering 'Metrics* by Angrist & Pischke. Learn causal inference from randomized trials to differences-in-differences.
-- **Python Notebooks** -- Zero-installation Google Colab notebooks. Real datasets, working code, and complete implementations of every method.
-- **AI-Powered Learning** -- Multiple AI tutors with distinct pedagogical styles.
+- **Foundational Methods** — Based on *Mastering 'Metrics* by Angrist & Pischke. Learn causal inference from randomized trials to differences-in-differences.
+- **Python Notebooks** — Zero-installation Google Colab notebooks. Real datasets, working code, and complete implementations of every method.
+- **AI-Powered Learning** — Multiple AI tutors with distinct pedagogical styles.
 
 
 ## Interactive Google Colab Notebooks
@@ -67,14 +67,14 @@ Click any badge below to open and run immediately in your browser:
 1. **Click any "Open in Colab" badge** above
 2. **Sign in** with your Google account (free)
 3. **Click "Run All"** in the Runtime menu (or run cells individually)
-4. **Explore and modify** -- change parameters, try different models, experiment with the data
-5. **Save your work** -- File > Save a copy in Drive to keep your modifications
+4. **Explore and modify** — change parameters, try different models, experiment with the data
+5. **Save your work** — File > Save a copy in Drive to keep your modifications
 
 **No installation, no downloads, no setup required!**
 
 
 ## Authors and Credits
 
-**Carlos Mendez** -- Python implementation and educational notebook development
+**Carlos Mendez** — Python implementation and educational notebook development
 
-**Joshua D. Angrist & Jorn-Steffen Pischke** -- Original textbook, [*Mastering 'Metrics*](https://www.masteringmetrics.com/)
+**Joshua D. Angrist & Jörn-Steffen Pischke** — Original textbook, [*Mastering 'Metrics*](https://www.masteringmetrics.com/)

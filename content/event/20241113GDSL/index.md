@@ -5,8 +5,7 @@ event: "Seminar of the Geographic Data Science Lab, University of Liverpool"
 event_url: https://www.liverpool.ac.uk/geographic-data-science/
 location: Liverpool, UK
 summary:  "Seminar of the Geographic Data Science Lab, University of Liverpool"    
-abstract: "_"
-
+abstract: ""
 # Talk start and end times.
 #   End time can optionally be hidden by prefixing the line with `#`.
 date: "2024-11-13T10:10:00Z"
