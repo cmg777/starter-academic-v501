@@ -1,4 +1,7 @@
 ---
+_build:
+  render: always
+  list: always
 bio: My research interests include macroeconomics, development economics, regional and spatial analysis, and applied econometrics.
 education:
   courses:

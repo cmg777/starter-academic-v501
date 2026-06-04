@@ -1,4 +1,7 @@
 ---
+_build:
+  render: always
+  list: always
 bio: After studying geography at Gadjah Mada University, Indonesia, I work as a development planner in the Ministry of National Development Planning/Bappenas. I have a master's degree in information technology focusing on spatial from the University of Melbourne, Australia. My research interests include regional development, economic geography, and spatial data science.
 education:
   courses:

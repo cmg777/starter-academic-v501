@@ -1,4 +1,7 @@
 ---
+_build:
+  render: always
+  list: always
 bio: My research interests include causal inference, spatial data science, and anthropology.
 education:
   courses:

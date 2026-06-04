@@ -1,4 +1,7 @@
 ---
+_build:
+  render: always
+  list: always
 bio: Research concerns the effect of Nighttime lights on regional developement, specifically on convergence in post-war countries. 
 education:
   courses:
