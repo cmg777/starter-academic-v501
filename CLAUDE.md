@@ -22,6 +22,8 @@ See @README.md for full documentation of the directory structure, tech stack, an
 
 # Content Conventions
 
+> Adding or editing any content type below also requires creating its Spanish (`content/es/…`) and Japanese (`content/ja/…`) counterpart in the same change (full translation for everything except tutorial-post bodies, which are stub cards) — see the **Translate new content (REQUIRED)** rule in the Internationalization (i18n) section.
+
 ## Naming
 
 - Publications: `content/publication/YYYYMMDD-abbreviation/index.md`

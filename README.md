@@ -173,7 +173,7 @@ Each author has a folder with `_index.md` containing name, role, organization, b
 
 The site is **trilingual**: English at `/` (`content/`), Spanish at `/es/` (`content/es/`), and Japanese at `/ja/` (`content/ja/`). Each language has its own content tree, isolated by Hugo module mounts in `config/_default/config.yaml` (the English mount uses `excludeFiles: '{es,ja}/**'`); languages and menus live in `config/_default/languages.yaml`.
 
-Homepage widgets query the **current language's** pages with **no English fallback** — an item that lacks a `content/es/<section>/<slug>/` or `content/ja/<section>/<slug>/` counterpart simply will not appear on the `/es/` or `/ja/` homepage. Publications, events, projects, and author profiles are **full translations**; tutorial posts are lightweight **stub cards** whose card links back to the English tutorial. As of 2026-06-04 the entire backlog is backfilled (publications, events, projects, authors, post stubs all at parity).
+Homepage widgets query the **current language's** pages with **no English fallback** — an item that lacks a `content/es/<section>/<slug>/` or `content/ja/<section>/<slug>/` counterpart simply will not appear on the `/es/` or `/ja/` homepage. As of 2026-06-05, **every page type is translated except the long bodies of tutorial posts**. Publications, events, projects, author profiles, the Courses page (with localized `/es/courses/` and `/ja/courses/` menu items), the Alumni page, the Slides demo, and the draft Privacy/Terms pages are **full translations**; tutorial posts are lightweight **stub cards** whose card links back to the English tutorial (the long body stays in English by design). `scripts/i18n-parity.sh` tracks all of it — per-section bundles **plus** the singleton pages (courses/alumni/privacy/terms) — and currently reports **0 gaps** for both languages.
 
 To keep this sustainable, whenever you add content of those types you must create its ES + JA counterparts in the same change:
 
@@ -232,6 +232,8 @@ This script:
 3. Updates `HUGO_VERSION` in `netlify.toml` to match
 
 ## Adding Content
+
+> **Translate it too.** Any new publication, event, project, author, course, or other page (everything except tutorial-post bodies) MUST also be translated into Spanish and Japanese in the same change, or it will not appear on `/es/` or `/ja/`. Run `/project:translate-content <slug> --lang all` and confirm `bash scripts/i18n-parity.sh` reports 0 gaps. See [Internationalization (i18n)](#internationalization-i18n).
 
 ### New Publication
 
