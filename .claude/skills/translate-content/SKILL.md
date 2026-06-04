@@ -1,7 +1,7 @@
 ---
 name: translate-content
 description: Translate a content bundle (publication, event, project, or author profile) into Spanish (/es/) and Japanese (/ja/), or generate the ES/JA stub card for a tutorial post. Full translations rewrite only reader-facing fields, keep query keys / URLs / DOIs / tags byte-for-byte, copy non-md assets (featured.*, cite.bib, avatar.*), apply the project glossary, and localize numbers per language; post stubs produce a card-only index.md that links back to the English tutorial. Detects content type from the path, is idempotent (skips existing targets unless --force), and verifies the result builds under the pinned Hugo 0.111.3. Confirms scope before writing.
-argument-hint: "<slug-or-section/slug> [--lang es|ja|all] [--all-missing] [--type publication|event|project|post|author] [--force]"
+argument-hint: "<slug-or-section/slug> [--lang es|ja|all] [--all-missing] [--type publication|event|project|post|author|courses|alumni|slides|page] [--force]"
 disable-model-invocation: true
 user-invocable: true
 ---
@@ -69,6 +69,11 @@ It is the mechanism behind the CLAUDE.md rule "Translate new content (REQUIRED)"
    item dir and infer the type. `--type` overrides. Section→type map:
    `publication`→publication, `event`→event, `projects`→project,
    `authors`→author, `post`→post. Error if not found or ambiguous.
+   **Singleton pages** (one file, not a dir of items) are also covered — `courses`
+   (`content/courses/_index.md`), `alumni` (`content/alumni/{index.md,people.md}`),
+   `slides` (`content/slides/<deck>/`), and `page` (root `privacy.md`/`terms.md`);
+   pass `--type` for these. See `field-rules.md` for their Translate-vs-Keep rules.
+   Everything except posts/tutorials gets a full translation; posts stay stub-cards.
 3. **Locate the English source.** publication/event/project →
    `content/<section>/<slug>/index.md`; author →
    `content/authors/<Folder>/_index.md`; post → `content/post/<slug>/index.md`.

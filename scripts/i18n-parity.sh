@@ -34,6 +34,19 @@ event|index.md|full|featured.*
 projects|index.md|full|featured.*
 authors|_index.md|full|avatar.*
 post|index.md|stub|
+slides|index.md|full|
+"
+
+# --- singleton pages (not section/item-dir bundles): relpath|asset_globs -----
+# Pages that are a single file rather than a directory of items (courses landing
+# page, alumni widget page, draft privacy/terms). Each is checked for an es/ja
+# counterpart and reported under the pseudo-section "page".
+SINGLETON_CONFIG="
+courses/_index.md|featured.*
+alumni/index.md|
+alumni/people.md|
+privacy.md|
+terms.md|
 "
 
 LANGS_ALL="es ja"
@@ -183,6 +196,35 @@ for lang in $LANGS; do
     # accumulate to temp file (subshell from the pipe can't mutate parent vars)
     printf '%d %d %d\n' "$missing" "$stale" "$asset_warn" >> "$TMP_ACC"
   done
+
+  # --- singleton pages (courses, alumni, privacy/terms, …) ------------------
+  if [ -z "$FILTER_SECTION" ] || [ "$FILTER_SECTION" = "page" ]; then
+   if [ -z "$FILTER_MODE" ] || [ "$FILTER_MODE" = "full" ]; then
+    printf '%s\n' "$SINGLETON_CONFIG" | while IFS='|' read -r relpath asset_globs; do
+      [ -z "$relpath" ] && continue
+      en_index="content/$relpath"
+      [ -f "$en_index" ] || continue
+      tgt_index="content/$lang/$relpath"
+      en_dir="content/$(dirname "$relpath")"
+      tgt_dir="content/$lang/$(dirname "$relpath")"
+      if [ ! -f "$tgt_index" ]; then
+        if [ "$FORMAT" = "tsv" ]; then
+          printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$lang" "page" "full" "$relpath" "$en_index" "$tgt_index"
+        else
+          printf '  %-22s page  full  MISSING -> %s\n' "$relpath" "$tgt_index"
+        fi
+        printf '1 0 0\n' >> "$TMP_ACC"
+        continue
+      fi
+      asw=0
+      if [ -n "$asset_globs" ] && has_asset "$en_dir" $asset_globs && ! has_asset "$tgt_dir" $asset_globs; then
+        asw=1
+        [ "$FORMAT" = "human" ] && printf '  %-22s page  ASSET-WARN (asset not copied)\n' "$relpath"
+      fi
+      printf '0 0 %d\n' "$asw" >> "$TMP_ACC"
+    done
+   fi
+  fi
 done
 
 # --- totals (read back the per-section accumulations) -----------------------

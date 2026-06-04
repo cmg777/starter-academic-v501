@@ -130,6 +130,15 @@ translate the words and keep the years: `Estudiante de doctorado 2023-2026` /
 | Work in Progress / In development | En desarrollo | 作成中 |
 | Download my CV | Descargue mi CV | CV（履歴書）をダウンロードできます |
 | Slides by Carlos Mendez | Diapositivas por Carlos Mendez | スライド：カルロス・メンデス |
+| Courses | Cursos | コース |
+| Alumni | Egresados | 修了生 |
+| Privacy Policy | Política de privacidad | プライバシーポリシー |
+| Terms | Términos | 利用規約 |
+| Posts about … | Publicaciones sobre … | …に関する投稿 |
+
+Branded external course names (e.g. "Mastering Causal Metrics", "Comparative
+Causal Metrics", "Econometrics Powered by AI") are kept in English on the Courses
+page — they are proper names of external course sites.
 
 ### Person-name transliteration (JA only)
 Spanish keeps Latin-script names verbatim. Japanese transliterates the
