@@ -2292,7 +2292,7 @@ $cz-grad: linear-gradient(90deg, #{$cz-teal}, #{$cz-orange});
     -webkit-backdrop-filter: blur(8px) saturate(115%);
     backdrop-filter: blur(8px) saturate(115%);
   }
-  box-shadow: 0 10px 30px rgba(20, 40, 90, 0.08);
+  box-shadow: 0 1px 2px rgba(20, 40, 90, 0.06), 0 12px 30px rgba(20, 40, 90, 0.10);
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 
   &:hover {
@@ -2403,7 +2403,7 @@ html.wc-pre-dark body { background-color: $cz-navy-1 !important; }
   background: $cz-l-surface;
   border: 1px solid $cz-l-hair;
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(20, 40, 90, 0.08);
+  box-shadow: 0 1px 2px rgba(20, 40, 90, 0.06), 0 12px 30px rgba(20, 40, 90, 0.10);
   padding: 2.2rem 1.8rem;
 }
 .dark .home-section.wg-about .container > .row {
@@ -2712,6 +2712,60 @@ body:not(.dark) .cz-showcase-media { background: rgba(20, 40, 90, 0.05); }
   .home-section.wg-portfolio .project-item:hover,
   .home-section.wg-people .people-person:hover { transform: none; }
 }
+
+/* ==========================================================================
+   22.12 Light-theme daytime identity ("bright + subtle geo")
+   The light twin of the dark cinematic layer (22.2). The theme toggles
+   `body.dark`, so EVERY rule here is guarded `body:not(.dark)` (the same
+   guard already used at the .cz-showcase-media rule) — dark mode is wholly
+   unaffected. Goal: a bright, cohesive daytime canvas — soft sky gradient +
+   light-tinted accent glows + a faint map graticule — replacing the flat
+   pale-grey alternation the un-styled baseline produced. Applies site-wide
+   (`.page-wrapper` wraps every page) and to /es/ + /ja/ (shared CSS).
+   ========================================================================== */
+
+/* ---- Daytime atmosphere: fixed sky gradient + light accent glows ---- */
+body:not(.dark) .page-wrapper::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(1100px 720px at 50% -10%, rgba(0, 212, 200, 0.07), transparent 60%),  /* cyan (hero teal)   */
+    radial-gradient(1000px 780px at 88% 16%,  rgba(37, 71, 168, 0.07), transparent 60%),   /* cobalt (hero blue) */
+    radial-gradient(900px 700px at 6% 32%,    rgba(217, 119, 87, 0.04), transparent 60%),  /* faint warm specks  */
+    linear-gradient(180deg, #eef3fd 0%, #dde7f7 48%, #cdd9f0 100%);                         /* periwinkle sky     */
+}
+/* Faint cartographic graticule — the "geo" cue. Kept low enough never to
+   compete with body text; opaque cards mute it further where text lives. */
+body:not(.dark) .page-wrapper::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(to right,  rgba(28, 52, 112, 0.04) 0, rgba(28, 52, 112, 0.04) 1px, transparent 1px, transparent 72px),
+    repeating-linear-gradient(to bottom, rgba(28, 52, 112, 0.04) 0, rgba(28, 52, 112, 0.04) 1px, transparent 1px, transparent 72px);
+}
+
+/* ---- Sections: transparent over the canvas (parallel to dark's 22.2) ----
+   Replaces the near-identical #f6f8fc / #eef2f9 alternation with one
+   continuous daytime surface; a whisper on even rows keeps gentle rhythm. */
+body:not(.dark) .home-section { background: transparent !important; }
+body:not(.dark) .home-section:nth-of-type(even) { background: rgba(28, 52, 112, 0.022) !important; }
+
+/* ---- WCAG-AA text contrast (light only). Bright teal #00d4c8 stays for
+   NON-text accents only (eyebrow ticks, gradient dividers, large-heading
+   hovers) where 3:1 suffices; text uses AA-safe deep variants. ---- */
+body:not(.dark) .home-section .section-heading p { color: #335487; } /* steel subtitle — AA on the blue canvas */
+body:not(.dark) .article-style a { color: #285f9c; }                  /* prose links ~2.6:1 -> ~5:1     */
+body:not(.dark) .article-style a:hover { color: #0a7d75; }            /* deep teal hover (AA-safe)      */
+body:not(.dark) .cz-footer a:hover { color: #0a7d75; }                /* footer hover was bright teal   */
+
+/* ---- Navbar & avatar: intentionally NOT styled here. ----
+   - Navbar keeps 22.9's navy glass (rgba(10,18,48,.8) = the hero's #0a1230)
+     with the theme's white text in BOTH modes — it matches the hero and stays
+     legible. An earlier white-navbar attempt failed: the menu labels sit in
+     nested spans the theme colors white, so a white bar -> white-on-white.
+   - No hero->About "melt" band / overflow clip: it risked covering or clipping
+     the About avatar. The navy hero now flows into the soft-blue daytime canvas
+     naturally (same blue family), so no melt is needed. ---- */
 
 /* ---- 22.12 Mobile ---- */
 @media (max-width: 600px) {
