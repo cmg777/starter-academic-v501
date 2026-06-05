@@ -128,32 +128,42 @@ ggplot(df, aes(year, value, colour = role)) +
 
 ## 4. One reusable simulated panel
 
-A three-factor model: 20 countries (5 treated `C01`-`C05`, 15 donors `C06`-`C20`),
-2000-2023, staggered adoption (2010/2013/2016), two correlated outcomes. C01-C04 are
-convex blends of donors (a good synthetic exists); **C05 is placed outside the donor hull**
-on purpose. **C05's effect is negative** by design.
+A three-factor model: 25 countries (5 treated `C01`-`C05`, 20 donors `C06`-`C25`),
+1985-2023 (a long pre-period gives the inference more power), staggered adoption
+(2010/2013/2016), two correlated outcomes. Each treated unit's effect is an immediate
+**jump** at adoption plus a mild yearly **ramp**. C01-C04 are sparse convex blends of three
+named donors each (a near-perfect synthetic exists); **C05 is placed outside the donor hull**
+on purpose. **C05's effect is small and negative** by design.
 
 ```{r}
 #| label: build-panel
-years <- 2000:2023; n_t <- length(years); s <- years - 2000
-donors  <- sprintf("C%02d", 6:20); treated <- sprintf("C%02d", 1:5)
+years <- 1985:2023; n_t <- length(years); s <- years - 1985
+donors  <- sprintf("C%02d", 6:25); treated <- sprintf("C%02d", 1:5)
 adopt <- c(C01 = 2010, C02 = 2010, C03 = 2013, C04 = 2016, C05 = 2016)
-beta1 <- c(C01 = 0.40, C02 = 0.30, C03 = 0.50, C04 = 0.20, C05 = -0.35)
-beta2 <- 0.6 * beta1
+# Treatment effect = an immediate JUMP at adoption plus a mild yearly RAMP.
+jump  <- c(C01 = 3.0, C02 = 2.5, C03 = 3.5, C04 = 2.0, C05 = -1.0)   # level shift
+slope <- c(C01 = 0.5, C02 = 0.4, C03 = 0.5, C04 = 0.3, C05 = -0.05)  # yearly ramp
 f1 <- sin(2 * pi * s / 12); f2 <- 0.05 * s; f3 <- cos(2 * pi * s / 7)
 
-dmu <- setNames(rnorm(length(donors), 10, 2), donors)
-dL1 <- setNames(runif(length(donors), 0.3, 1.5), donors)
-dL2 <- setNames(runif(length(donors), 0.3, 1.5), donors)
-dL3 <- setNames(runif(length(donors), 0.2, 1.0), donors)
-dnu <- setNames(rnorm(length(donors), 2, 0.5), donors)
-dk  <- setNames(runif(length(donors), 0.3, 0.8), donors)
+donor_mu <- setNames(rnorm(length(donors), 10, 2), donors)
+donor_L1 <- setNames(runif(length(donors), 0.3, 1.5), donors)
+donor_L2 <- setNames(runif(length(donors), 0.3, 1.5), donors)
+donor_L3 <- setNames(runif(length(donors), 0.2, 1.0), donors)
+donor_nu <- setNames(rnorm(length(donors), 2, 0.5), donors)
+donor_k  <- setNames(runif(length(donors), 0.3, 0.8), donors)
 y0 <- function(mu, L1, L2, L3) mu + L1 * f1 + L2 * f2 + L3 * f3
+
+# The known recipe behind each interior treated unit (convex weights sum to 1).
+blend <- list(
+  C01 = c(C06 = 0.45, C07 = 0.35, C08 = 0.20),
+  C02 = c(C09 = 0.40, C10 = 0.35, C11 = 0.25),
+  C03 = c(C12 = 0.45, C13 = 0.30, C14 = 0.25),
+  C04 = c(C16 = 0.40, C18 = 0.35, C20 = 0.25))
 
 rows <- list()
 for (d in donors) {
-  Y1 <- y0(dmu[d], dL1[d], dL2[d], dL3[d]) + rnorm(n_t, 0, 0.25)
-  Y2 <- 0.6 * Y1 + dnu[d] + dk[d] * f1 + rnorm(n_t, 0, 0.20)
+  Y1 <- y0(donor_mu[d], donor_L1[d], donor_L2[d], donor_L3[d]) + rnorm(n_t, 0, 0.15)
+  Y2 <- 0.6 * Y1 + donor_nu[d] + donor_k[d] * f1 + rnorm(n_t, 0, 0.12)
   rows[[d]] <- data.frame(country = d, year = years, treated_unit = 0L,
                           adopt_year = NA_integer_, treat_ms = 0L,
                           gdp_index = Y1, trade_index = Y2,
@@ -161,22 +171,25 @@ for (d in donors) {
 }
 for (tu in treated) {
   if (tu == "C05") {
-    mu <- max(dmu) + 1.2; L1 <- max(dL1) + 0.5; L2 <- max(dL2) + 0.4
-    L3 <- max(dL3) + 0.3; nu <- max(dnu) + 0.6; kk <- max(dk) + 0.3
+    mu <- max(donor_mu) + 1.2; L1 <- max(donor_L1) + 0.5; L2 <- max(donor_L2) + 0.4
+    L3 <- max(donor_L3) + 0.3; nu <- max(donor_nu) + 0.6; kk <- max(donor_k) + 0.3
   } else {
-    g <- rgamma(length(donors), 1); w <- g / sum(g)
-    mu <- sum(w * dmu); L1 <- sum(w * dL1); L2 <- sum(w * dL2)
-    L3 <- sum(w * dL3); nu <- sum(w * dnu); kk <- sum(w * dk)
+    w  <- blend[[tu]]; dn <- names(w)               # three-donor recipe
+    mu <- sum(w * donor_mu[dn]); L1 <- sum(w * donor_L1[dn])
+    L2 <- sum(w * donor_L2[dn]); L3 <- sum(w * donor_L3[dn])
+    nu <- sum(w * donor_nu[dn]); kk <- sum(w * donor_k[dn])
   }
-  Y1_0 <- y0(mu, L1, L2, L3) + rnorm(n_t, 0, 0.25)
-  Y2_0 <- 0.6 * Y1_0 + nu + kk * f1 + rnorm(n_t, 0, 0.20)
-  k <- pmax(0, years - adopt[[tu]])
+  Y1_0 <- y0(mu, L1, L2, L3) + rnorm(n_t, 0, 0.15)
+  Y2_0 <- 0.6 * Y1_0 + nu + kk * f1 + rnorm(n_t, 0, 0.12)
+  a    <- adopt[[tu]]
+  post <- as.integer(years >= a)            # 1 from adoption onward
+  k    <- pmax(0, years - a)                # years since adoption
+  eff1 <- post * jump[[tu]] + slope[[tu]] * k   # jump + ramp
+  eff2 <- 0.6 * eff1
   rows[[tu]] <- data.frame(country = tu, year = years, treated_unit = 1L,
-                           adopt_year = adopt[[tu]], treat_ms = as.integer(years >= adopt[[tu]]),
-                           gdp_index = Y1_0 + beta1[[tu]] * k,
-                           trade_index = Y2_0 + beta2[[tu]] * k,
-                           true_effect_gdp = beta1[[tu]] * k,
-                           true_effect_trade = beta2[[tu]] * k)
+                           adopt_year = a, treat_ms = as.integer(years >= a),
+                           gdp_index = Y1_0 + eff1, trade_index = Y2_0 + eff2,
+                           true_effect_gdp = eff1, true_effect_trade = eff2)
 }
 panel <- bind_rows(rows)
 write.csv(panel, "synthetic_panel_multicountry.csv", row.names = FALSE)  # reusable!
@@ -197,6 +210,10 @@ removes the leftover bias.
 
 ## 5. One treated unit: `single_augsynth`
 
+`single_augsynth` offers an inference toolbox; we report two complementary tools side by
+side: a **jackknife+** confidence interval for the average effect (robust, our primary
+report) and the **conformal** p-value for the null of no effect.
+
 ```{r}
 #| label: single
 sim_single <- panel |>
@@ -208,14 +225,22 @@ sc_plain <- augsynth(gdp_index ~ trt, country, year, sim_single,
 sc_ridge <- augsynth(gdp_index ~ trt, country, year, sim_single,
                      t_int = 2010, progfunc = "ridge", scm = TRUE)
 true_c01 <- mean(panel$true_effect_gdp[panel$country == "C01" & panel$year >= 2010])
-c(true = true_c01,
-  plain = summary(sc_plain)$average_att$Estimate,
-  ridge = summary(sc_ridge)$average_att$Estimate,
-  prefit_L2 = sc_plain$scaled_l2_imbalance)
+
+jk_plain <- summary(sc_plain, inf_type = "jackknife+")$average_att   # robust CI
+cf_plain <- summary(sc_plain, inf_type = "conformal")$average_att    # p-value
+c(true       = round(true_c01, 3),
+  plain      = round(jk_plain$Estimate, 3),
+  jk_lo      = round(jk_plain$lower_bound, 3),
+  jk_hi      = round(jk_plain$upper_bound, 3),
+  conformal_p = cf_plain$p_val,
+  prefit_L2  = round(sc_plain$scaled_l2_imbalance, 3),
+  lambda     = round(sc_ridge$lambda, 1))
 ```
 
-True effect +2.60; both estimators return +2.65. Because C01 fits well, plain SCM and
-Ridge-ASCM agree — *when fit is good, ASCM ≈ SCM.*
+True average effect +6.250; plain SCM returns +6.241, with a jackknife+ CI of
+[5.998, 6.506] that excludes zero and a conformal p-value below 0.001. The pre-fit scaled
+L2 is a tight 0.135 (so ridge's penalty lands near $\lambda \approx 2639$). Because C01
+fits well, plain SCM and Ridge-ASCM agree — *when fit is good, ASCM ≈ SCM.*
 
 ```{r}
 #| label: fig-single
@@ -239,39 +264,72 @@ ggplot(g, aes(Time)) +
 `multisynth` needs no `t_int` (it infers timing from the 0→1 switch) and returns a pooled
 average plus per-unit effects.
 
+`multisynth` offers two inference methods, and reporting both makes the point that the
+method can change the verdict. The leave-one-out **jackknife** is the natural interval for
+the average across treated units (our primary report); the **wild bootstrap** is more
+conservative because it also propagates the counterfactual-estimation uncertainty.
+
 ```{r}
 #| label: multisynth
 sim_multi <- panel |> filter(country %in% c(treated, donors)) |>
   select(country, year, treat_ms, gdp_index) |> as.data.frame()
 ms <- multisynth(gdp_index ~ treat_ms, country, year, sim_multi)
+ms_jack <- summary(ms, inf_type = "jackknife")    # primary
 set.seed(20260605)
-ms_sum <- summary(ms, inf_type = "bootstrap")
-n_leads <- ms_sum$n_leads
-overall <- subset(as.data.frame(ms_sum$att), is.na(Time))
-overall$truth <- c(Average = mean(sapply(treated, function(u) beta1[[u]] * mean(0:(n_leads-1)))),
-                   sapply(treated, function(u) beta1[[u]] * mean(0:(n_leads-1))))[overall$Level]
-overall[, c("Level", "Estimate", "lower_bound", "upper_bound", "truth")]
+ms_boot <- summary(ms, inf_type = "bootstrap")     # conservative comparison
+n_leads <- ms_jack$n_leads
+
+# True per-unit / pooled effects over the SAME common post window (leads 0..n_leads-1)
+true_unit <- sapply(treated, function(u) {
+  yrs <- adopt[[u]] + seq_len(n_leads) - 1
+  mean(panel$true_effect_gdp[panel$country == u & panel$year %in% yrs])
+})
+truth_vec <- c(Average = mean(true_unit), true_unit)
+
+jk <- subset(as.data.frame(ms_jack$att), is.na(Time),
+             c("Level", "Estimate", "lower_bound", "upper_bound"))
+bo <- subset(as.data.frame(ms_boot$att), is.na(Time),
+             c("Level", "lower_bound", "upper_bound"))
+names(bo) <- c("Level", "boot_lo", "boot_hi")
+overall <- merge(jk, bo, by = "Level", sort = FALSE)
+overall$truth <- truth_vec[overall$Level]
+cat(sprintf("nu = %.3f | global scaled L2 = %.3f | n_leads = %d\n",
+            ms$nu, ms_jack$scaled_global_l2, n_leads))
+num_cols <- sapply(overall, is.numeric)
+overall[, num_cols] <- round(overall[, num_cols], 3)
+overall
 ```
 
-Pooled estimate ~0.72 vs truth ~0.74, and every per-unit sign is right — including C05's
-negative effect.
+The auto-tuned pooling weight is `nu` ≈ 0.583 with a global scaled L2 of 0.052 and
+`n_leads` = 8. The pooled average is +3.222 against a truth of +3.155, and **the two
+inference methods disagree on significance**: the jackknife CI [0.689, 5.754] excludes
+zero, while the conservative wild bootstrap [−2.468, 9.779] does not. Every per-unit sign
+is right — including C05's negative effect (−1.012, jackknife [−1.639, −0.385], truth
+−1.175).
 
 ```{r}
 #| label: fig-multisynth
-plot(ms_sum, levels = "Average")
+plot(ms_jack, levels = "Average")
 ```
 
 ## 7. One unit, two outcomes: `augsynth_multiout`
+
+`augsynth_multiout` uses conformal inference. `summary()` defaults to `grid_size = 1`,
+which returns a valid per-outcome **p-value** (the average CI bounds are left `NA`; a full
+CI needs `grid_size > 1`, which is slow and degenerate for large effects). We report the
+conformal p-value per outcome.
 
 ```{r}
 #| label: multiout
 mo <- augsynth_multiout(gdp_index + trade_index ~ trt, country, year,
                         t_int = 2010, sim_single, progfunc = "None",
                         scm = TRUE, combine_method = "avg")
-summary(mo)$average_att
+summary(mo)$average_att   # Estimate + conformal p_val per outcome (CI bounds NA)
 ```
 
-One donor recipe recovers both outcomes (gdp ≈ +2.7 vs true +2.6; trade ≈ +1.7 vs true +1.56).
+One donor recipe recovers both outcomes: gdp_index +6.538 vs true +6.250 (conformal
+p < 0.001) and trade_index +3.531 vs true +3.750 (conformal p < 0.001) — both clearly
+significant.
 
 ## 8. Suitability test: where plain SCM fails
 
@@ -294,9 +352,12 @@ recovery$err_ridge <- abs(recovery$ridge - recovery$true)
 recovery
 ```
 
-For C05, **plain SCM gets the sign wrong** while Ridge-ASCM recovers the true negative
-effect — the mean recovery error falls by roughly two-thirds. Read the pre-treatment fit:
-when imbalance is small the methods agree; when it is large, trust augmentation.
+For C05 (true effect −1.175), **plain SCM gets the sign wrong** (+1.896, and not
+statistically significant — conformal p = 0.866), while Ridge-ASCM recovers the true
+negative effect (−1.145). The mean recovery error falls from 0.737 (plain) to 0.128
+(ridge), roughly a factor of six, and C05's pre-fit scaled L2 drops from 0.414 to 0.036.
+Read the pre-treatment fit: when imbalance is small the methods agree; when it is large,
+trust augmentation.
 
 # Part 2 — Replicating Papaioannou (2021)
 
@@ -332,14 +393,23 @@ ger_plain <- fit_country("Germany", "None")
 ger_ridge <- fit_country("Germany", "ridge")
 lv_ger <- synth_levels(ger_plain, emu |> filter(country == "Germany" | treat == 0),
                        "country", "year", "tfp", "Germany")
-c(plain = summary(ger_plain)$average_att$Estimate,
-  ridge = summary(ger_ridge)$average_att$Estimate,
-  pct_2000_07 = pct_effect(lv_ger, 2000, 2007),
-  pct_2008_17 = pct_effect(lv_ger, 2008, 2017))
+# Real data: report inference honestly — jackknife+ CI + conformal p-value.
+ger_jk <- summary(ger_plain, inf_type = "jackknife+")$average_att
+ger_cf_p <- summary(ger_plain, inf_type = "conformal")$average_att$p_val
+c(plain       = round(ger_jk$Estimate, 3),
+  jk_lo       = round(ger_jk$lower_bound, 3),
+  jk_hi       = round(ger_jk$upper_bound, 3),
+  conformal_p = ger_cf_p,
+  ridge       = round(summary(ger_ridge)$average_att$Estimate, 3),
+  pct_2000_07 = round(pct_effect(lv_ger, 2000, 2007), 1),
+  pct_2008_17 = round(pct_effect(lv_ger, 2008, 2017), 1))
 ```
 
-German TFP runs above its synthetic counterfactual after 1999 (+8% over 2000-07, +19% over
-2008-17). Plain and ridge agree because pre-fit is good.
+German TFP runs above its synthetic counterfactual after 1999: a plain-SCM average ATT of
++0.133 (+8.0% over 2000-07, +19.3% over 2008-17, pre-fit L2 ≈ 0.301). The inference is
+borderline and worth reporting honestly: the jackknife+ CI [−0.082, 0.336] *includes* zero,
+while the conformal p-value is 0.027. Ridge-ASCM agrees (+0.127, conformal p = 0.015)
+because pre-fit is good.
 
 ```{r}
 #| label: fig-germany
@@ -358,13 +428,26 @@ ggplot(df, aes(time, v, colour = series)) +
 #| label: emu-multisynth
 ms_emu <- multisynth(tfp ~ trt99, country, year,
                      emu |> select(country, year, trt99, tfp) |> as.data.frame())
+ms_emu_jack <- summary(ms_emu, inf_type = "jackknife")   # primary
 set.seed(20260605)
-ms_emu_sum <- summary(ms_emu, inf_type = "bootstrap")
-plot(ms_emu_sum, levels = "Average")
+ms_emu_boot <- summary(ms_emu, inf_type = "bootstrap")    # conservative
+
+pooled <- subset(as.data.frame(ms_emu_jack$att), is.na(Time) & Level == "Average")
+pooled_b <- subset(as.data.frame(ms_emu_boot$att), is.na(Time) & Level == "Average")
+c(pooled_att = round(pooled$Estimate, 3),
+  jk_lo      = round(pooled$lower_bound, 3),
+  jk_hi      = round(pooled$upper_bound, 3),
+  boot_lo    = round(pooled_b$lower_bound, 3),
+  boot_hi    = round(pooled_b$upper_bound, 3))
+
+plot(ms_emu_jack, levels = "Average")
 ```
 
-The pooled average masks the dynamics: a positive bump in the early euro years, eroded by
-the 2008-2014 crisis, recovering by 2017 — exactly the paper's arc.
+The pooled EMU average effect on TFP is essentially zero (−0.016) and not significant under
+either method — jackknife [−0.282, 0.250] and bootstrap [−0.259, 0.231] both straddle zero
+— but the pooled average masks the dynamics: a positive bump in the early euro years (about
++0.39 by 2000), eroded by the 2008-2014 crisis, recovering by 2017 — exactly the paper's
+arc.
 
 ## 13. Two outcomes: `augsynth_multiout`
 
@@ -374,21 +457,24 @@ d_ger <- emu |> filter(country == "Germany" | treat == 0) |> as.data.frame()
 d_ger$.trt <- d_ger$trt99
 ger_mo <- augsynth_multiout(tfp + prod_gap ~ .trt, country, year, 1999, d_ger,
                             progfunc = "None", scm = TRUE, combine_method = "concat")
-summary(ger_mo)$average_att
+summary(ger_mo)$average_att   # Estimate + conformal p_val per outcome (CI bounds NA)
 ```
 
-TFP up (+0.12) and the US productivity gap narrowing (−0.15) — one coherent story.
+TFP up (+0.116) and the US productivity gap narrowing (−0.151) — one coherent story, though
+neither outcome is individually significant under the conformal test (both p = 0.603), a
+reminder that a single-country multi-outcome fit is a descriptive, not a confirmatory, tool.
 
 ## 14. Robustness: 1992 Maastricht
 
 ```{r}
 #| label: robustness
 ger_92 <- fit_country("Germany", "None", t_int = 1992, trt = "trt92")
-c(`1999` = summary(ger_plain)$average_att$Estimate,
-  `1992` = summary(ger_92)$average_att$Estimate)
+c(`1999` = round(summary(ger_plain)$average_att$Estimate, 3),
+  `1992` = round(summary(ger_92)$average_att$Estimate, 3))
 ```
 
-Nearly identical — robust to the anticipation question.
+Nearly identical (+0.138 for the 1992 Maastricht threshold vs +0.133 for the 1999 euro
+launch) — robust to the anticipation question.
 
 ## 15. Comparing to the paper
 
@@ -403,8 +489,9 @@ ascm <- sapply(emu_members, function(cn) {
                           "country", "year", "tfp", cn), 2000, 2007)
 })
 comp <- data.frame(country = emu_members, paper = paper_2000_07[emu_members], ascm = round(ascm, 1))
-c(spearman = cor(comp$paper, comp$ascm, method = "spearman"),
-  pearson  = cor(comp$paper, comp$ascm))
+c(spearman    = round(cor(comp$paper, comp$ascm, method = "spearman"), 2),
+  pearson     = round(cor(comp$paper, comp$ascm), 2),
+  n_positive  = sum(comp$ascm > 0))
 ```
 
 ```{r}
@@ -417,8 +504,9 @@ ggplot(comp, aes(paper, ascm)) +
        x = "Paper % contribution (2000-07)", y = "ASCM % effect")
 ```
 
-Rank correlation ~0.74: ASCM confirms the paper *qualitatively* (same signs and ranking),
-which is the right bar for a method comparison with a different estimator.
+Rank correlation 0.74 (Pearson 0.76), and all 12 members show a positive TFP effect over
+2000-07: ASCM confirms the paper *qualitatively* (same signs and ranking), which is the
+right bar for a method comparison with a different estimator.
 
 ## 16. Takeaways
 

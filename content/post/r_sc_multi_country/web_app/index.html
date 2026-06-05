@@ -22,6 +22,7 @@
   <button id="tab-single" class="tab"        data-pane="pane-single" role="tab" aria-selected="false">2 · Single &amp; Suitability</button>
   <button id="tab-multi"  class="tab"        data-pane="pane-multi"  role="tab" aria-selected="false">3 · Many Units</button>
   <button id="tab-emu"    class="tab"        data-pane="pane-emu"    role="tab" aria-selected="false">4 · Replication</button>
+  <button id="tab-infer"  class="tab"        data-pane="pane-infer"  role="tab" aria-selected="false">5 · Inference</button>
 </nav>
 
 <main>
@@ -62,9 +63,9 @@
   <div class="card">
     <h3>Does the method recover a known effect?</h3>
     <p>
-      On simulated data the true treatment effect of unit C01 is a ramp we injected
-      ourselves. The estimated treated-minus-synthetic gap (blue, with its conformal band)
-      should track the true ramp (white dashed) and sit at zero before treatment.
+      On simulated data the true treatment effect of unit C01 is a jump plus a gentle ramp
+      we injected ourselves. The estimated treated-minus-synthetic gap (blue, with its conformal band)
+      should track the true effect (white dashed) and sit at zero before treatment.
     </p>
     <div class="chart-area" id="intro-chart"></div>
     <p class="note">If an estimator cannot reproduce a known truth on simulated ground, do not trust it on real data.</p>
@@ -134,6 +135,10 @@
 
   <div class="card">
     <h3 id="s-title">Actual vs synthetic control</h3>
+    <p style="margin:0 0 6px;">
+      <span class="sig-badge no" id="s-sig">—</span>
+      <span class="note" id="s-ci" style="font-style:normal;"></span>
+    </p>
     <div class="chart-area" id="single-chart"></div>
     <p class="note" id="s-note"></p>
   </div>
@@ -175,9 +180,20 @@
     <p class="note" id="m-note"></p>
   </div>
 
+  <div class="card" id="m-forest-card">
+    <h3 id="m-forest-title">Per-unit and pooled effects with jackknife CIs</h3>
+    <p class="note" style="font-style:normal;">
+      Point = estimate, bar = 95% jackknife confidence interval, orange tick = known truth.
+      <span class="sig-badge yes">teal</span> = excludes zero (significant);
+      <span class="sig-badge no">grey</span> = includes zero.
+    </p>
+    <div class="chart-area" id="multi-forest"></div>
+  </div>
+
   <div class="card" id="m-table-card">
-    <h3>Per-unit recovery (simulated)</h3>
+    <h3>Per-unit recovery: jackknife vs wild bootstrap</h3>
     <div id="multi-table"></div>
+    <p class="note">The jackknife interval (used above) excludes zero for every unit; the more conservative wild bootstrap, which also carries the counterfactual-estimation uncertainty, does not. Same estimates, different verdict — the inference method matters.</p>
   </div>
 </section>
 
@@ -207,6 +223,88 @@
     <h3>Country-by-country comparison</h3>
     <div id="emu-table"></div>
     <p class="note">Greece and Portugal turn negative in 2008–17 in both our estimates and the paper — the post-crisis reversal.</p>
+  </div>
+</section>
+
+<!-- ====================== TAB 5: INFERENCE ====================== -->
+<section id="pane-infer" class="tab-pane" role="tabpanel" aria-labelledby="tab-infer">
+  <h2>Inference: is the effect real, or could it be noise?</h2>
+  <p class="lede">
+    A point estimate is only half the story. <code>augsynth</code> ships a small toolbox of
+    inference methods, and they do not all agree. This tab shows which headline results are
+    statistically significant, explains the three tools the tutorial uses, and lets you feel
+    what drives significance with a hands-on simulator.
+  </p>
+
+  <div class="card">
+    <h3>Significance scoreboard (from the tutorial's results)</h3>
+    <p>Each headline estimate with its confidence interval or p-value, and whether it is distinguishable from zero at the 5% level.</p>
+    <div id="infer-scoreboard"></div>
+    <p class="note" style="font-style:normal;">
+      On simulated data, where we injected a real effect, every headline is significant.
+      C05 (outside the donor hull) and the real euro-area pooled effect are honestly <em>not</em>.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Three tools, matched to three estimators</h3>
+    <div class="grid grid-2">
+      <details class="gloss" open><summary>jackknife+ — single_augsynth</summary>
+        <div class="gloss-body">Leaves out one donor at a time, refits, and builds a robust confidence interval for the average effect. Our <em>primary</em> interval for a single treated unit because it is stable even when the post-treatment window is long.</div>
+      </details>
+      <details class="gloss"><summary>conformal — single_augsynth & augsynth_multiout</summary>
+        <div class="gloss-body">A permutation test that returns a p-value and a pointwise band. Powerful when the pre-period is long relative to the post-period (which is why the simulated panel starts in 1985), but lower-powered and noisier when the post-window is long. For multiple outcomes it returns a p-value per outcome.</div>
+      </details>
+      <details class="gloss"><summary>jackknife — multisynth (primary)</summary>
+        <div class="gloss-body">The natural interval for the average effect <em>across</em> treated units. Tight and significant here for the pooled and per-unit effects.</div>
+      </details>
+      <details class="gloss"><summary>wild bootstrap — multisynth (conservative)</summary>
+        <div class="gloss-body">Resamples to also propagate the counterfactual-estimation uncertainty, so it is wider. On these five units it does <em>not</em> exclude zero — the same estimates, a more cautious verdict.</div>
+      </details>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Simulator: what makes an effect significant?</h3>
+    <p>
+      An illustrative treated-minus-control gap: flat before adoption, shifted by the true effect after.
+      Move the sliders and watch the confidence interval widen or narrow and the verdict flip at the 5% line.
+      <em>(A teaching model — the real <code>augsynth</code> uses jackknife / conformal / bootstrap, not this normal approximation.)</em>
+    </p>
+    <div class="controls">
+      <div class="control">
+        <label>True effect size <span class="value" id="sim-eff-v">3.0</span></label>
+        <input type="range" id="sim-eff" min="0" max="8" step="0.1" value="3.0">
+        <div class="hint">Bigger true effect → easier to detect.</div>
+      </div>
+      <div class="control">
+        <label>Noise (σ) <span class="value" id="sim-noise-v">1.0</span></label>
+        <input type="range" id="sim-noise" min="0.2" max="4" step="0.1" value="1.0">
+        <div class="hint">More noise → wider interval, harder to detect.</div>
+      </div>
+      <div class="control">
+        <label>Pre-treatment periods <span class="value" id="sim-pre-v">15</span></label>
+        <input type="range" id="sim-pre" min="4" max="30" step="1" value="15">
+        <div class="hint">More pre-periods → a better-pinned counterfactual → tighter interval.</div>
+      </div>
+    </div>
+    <div class="sim-readout">
+      <span><span class="k">estimate</span> <span class="v" id="sim-est">—</span></span>
+      <span><span class="k">95% CI</span> <span class="v" id="sim-ci">—</span></span>
+      <span><span class="k">p-value</span> <span class="v" id="sim-p">—</span></span>
+      <span><span class="sig-badge no" id="sim-badge">—</span></span>
+    </div>
+    <div class="chart-area" id="sim-chart"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What this tab teaches</h4>
+    <ul>
+      <li><strong>Significance is not the point estimate.</strong> A large, accurate estimate can still be indistinguishable from zero if the interval is wide.</li>
+      <li><strong>Three things widen the interval:</strong> more noise, fewer pre-treatment periods (a worse-pinned counterfactual), and a poorer pre-fit.</li>
+      <li><strong>The inference method matters.</strong> The multisynth jackknife calls the pooled effect significant; the conservative wild bootstrap does not — on the same numbers.</li>
+      <li><strong>Be honest on real data.</strong> The euro-area pooled effect is near zero and not significant; we report it as such rather than dressing it up.</li>
+    </ul>
   </div>
 </section>
 

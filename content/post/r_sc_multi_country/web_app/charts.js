@@ -244,5 +244,62 @@
     };
   }
 
-  window.CHARTS = { lineChart, scatter, groupedBars, palette: C };
+  // ==================================================================
+  // forest — horizontal point-and-CI plot (one row per item), coloured by
+  // significance, with a vertical reference line (usually zero). Used to show
+  // per-unit and pooled effects with their confidence intervals.
+  //   cfg = { items:[{label, est, lo, hi, sig, truth?}], ref?:0, xlab }
+  // ==================================================================
+  function forest(container) {
+    const W = 760, m = { top: 16, right: 26, bottom: 44, left: 92 };
+    const svg = ensureSVG(container, W, 320);
+    const g = svg.append("g").attr("transform", `translate(${m.left},${m.top})`);
+    return {
+      update(cfg) {
+        const rowH = 30, H = m.top + m.bottom + cfg.items.length * rowH;
+        svg.attr("viewBox", `0 0 ${W} ${H}`);
+        const w = W - m.left - m.right, h = cfg.items.length * rowH;
+        g.selectAll("*").remove();
+        const ref = cfg.ref !== undefined ? cfg.ref : 0;
+        const vals = cfg.items.flatMap(d => [d.lo, d.hi, d.truth]).filter(Number.isFinite).concat([ref]);
+        const pad = (d3.max(vals) - d3.min(vals)) * 0.08 || 1;
+        const x = d3.scaleLinear().domain([d3.min(vals) - pad, d3.max(vals) + pad]).range([0, w]).nice();
+        const y = d3.scaleBand().domain(cfg.items.map(d => d.label)).range([0, h]).padding(0.35);
+
+        // x grid + axis
+        g.append("g").attr("transform", `translate(0,${h})`)
+          .call(d3.axisBottom(x).ticks(6)).call(styleAxis);
+        g.append("text").attr("x", w / 2).attr("y", h + 38).attr("text-anchor", "middle")
+          .attr("fill", C.muted).attr("font-size", "13px").text(cfg.xlab || "");
+        // reference line (zero)
+        g.append("line").attr("x1", x(ref)).attr("x2", x(ref)).attr("y1", -4).attr("y2", h)
+          .attr("stroke", C.muted).attr("stroke-dasharray", "4 4").attr("opacity", 0.7);
+
+        cfg.items.forEach(d => {
+          const yc = y(d.label) + y.bandwidth() / 2;
+          const col = d.sig ? C.teal : C.muted;
+          // row label
+          g.append("text").attr("x", -10).attr("y", yc + 4).attr("text-anchor", "end")
+            .attr("fill", C.text).attr("font-size", "13px").attr("font-weight", d.label === "Pooled" || d.label === "Average" ? 700 : 400)
+            .text(d.label);
+          // CI bar
+          g.append("line").attr("x1", x(d.lo)).attr("x2", x(d.hi)).attr("y1", yc).attr("y2", yc)
+            .attr("stroke", col).attr("stroke-width", 2.5).attr("opacity", 0.85);
+          ["lo", "hi"].forEach(k => g.append("line").attr("x1", x(d[k])).attr("x2", x(d[k]))
+            .attr("y1", yc - 5).attr("y2", yc + 5).attr("stroke", col).attr("stroke-width", 2));
+          // point estimate
+          g.append("circle").attr("cx", x(d.est)).attr("cy", yc).attr("r", 5)
+            .attr("fill", col).attr("stroke", C.black).attr("stroke-width", 1);
+          // truth marker
+          if (Number.isFinite(d.truth)) {
+            g.append("line").attr("x1", x(d.truth)).attr("x2", x(d.truth))
+              .attr("y1", yc - 8).attr("y2", yc + 8).attr("stroke", C.orange)
+              .attr("stroke-width", 2).attr("stroke-dasharray", "2 2");
+          }
+        });
+      }
+    };
+  }
+
+  window.CHARTS = { lineChart, scatter, groupedBars, forest, palette: C };
 })();

@@ -106,7 +106,7 @@ productivity (TFP) growth than a synthetic counterfactual built from non-euro ec
 - Use simulated data with a *known* effect to validate a causal estimator before trusting it on real data
 - Explain when augmentation (the Ridge outcome model) matters and when it does not
 - Replicate the qualitative findings of a published synthetic-control paper and compare estimates honestly
-- Choose between conformal and bootstrap inference depending on the function
+- Use `augsynth`'s inference toolbox — jackknife+, conformal, jackknife, and the wild bootstrap — and explain what makes an estimated effect *statistically significant*
 
 The diagram below maps the three functions onto one pipeline.
 
@@ -121,6 +121,7 @@ flowchart TD
     O --> W
     W --> R["+ Ridge outcome model<br/>(bias correction)"]
     R --> A["ATT = actual − synthetic"]
+    A --> I["Inference<br/>jackknife+ / conformal / bootstrap"]
     style P fill:#6a9bcc,stroke:#141413,color:#fff
     style D fill:#f5f5f5,stroke:#141413,color:#141413
     style S fill:#d97757,stroke:#141413,color:#fff
@@ -129,6 +130,7 @@ flowchart TD
     style W fill:#6a9bcc,stroke:#141413,color:#fff
     style R fill:#00d4c8,stroke:#141413,color:#141413
     style A fill:#00d4c8,stroke:#141413,color:#fff
+    style I fill:#6a9bcc,stroke:#141413,color:#fff
 ```
 
 The routing is by *shape*, not difficulty: count the treated units and the outcomes, and the
@@ -202,8 +204,10 @@ interpolation, never an extrapolation, of the donors.
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-Synthetic C01 is roughly "23% C14 + 21% C08 + 21% C10 + 19% C06 + 15% C16." The weights
-add to one; every other donor gets weight zero.
+Synthetic C01 is roughly "28% C19 + 21% C09 + 16% C13 + 11% C23 + 10% C08." The weights
+add to one; every other donor gets weight zero. (Several donor recipes can reproduce the
+same factor structure, so the recovered weights need not be the exact ones we built C01
+from — what matters is that the synthetic path matches.)
 
 </details>
 
@@ -249,7 +253,7 @@ separate) to 1 (one shared control); `augsynth` picks it automatically.
 <summary>Example</summary>
 
 Five simulated countries adopt in 2010, 2013, and 2016. `multisynth` returns a pooled
-average effect *and* a per-country effect, with `nu = 0.57` chosen automatically.
+average effect *and* a per-country effect, with `nu = 0.58` chosen automatically.
 
 </details>
 
@@ -286,26 +290,31 @@ rather than three separate jackets.
 </details>
 </div>
 
-**7. Inference: conformal vs bootstrap.**
-`single_augsynth` and `augsynth_multiout` use **conformal** inference
-(`summary(fit, inf_type = "conformal")`); `multisynth` uses a **wild bootstrap**
-(`inf_type = "bootstrap"`). They are not interchangeable — each is matched to its
-estimator.
+**7. Inference: an `augsynth` toolbox.**
+A point estimate is only half the answer; we also need to know whether it is
+distinguishable from zero. `augsynth` offers several tools. For a single unit we report
+the robust **jackknife+** confidence interval (`inf_type = "jackknife+"`) and the
+**conformal** p-value (`inf_type = "conformal"`); for many units, `multisynth` offers a
+**jackknife** interval and the more conservative **wild bootstrap**
+(`inf_type = "bootstrap"`); for multiple outcomes, conformal returns a p-value per
+outcome. Section&nbsp;9 makes this concrete.
 
 <div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-We seed the random number generator before each bootstrap so the `multisynth`
-confidence bands are reproducible.
+On the simulated panel the pooled `multisynth` effect is significant under the jackknife
+(`[0.69, 5.75]`, excludes zero) but *not* under the wild bootstrap (`[-2.47, 9.78]`) —
+the same estimate, a different verdict. The method matters.
 
 </details>
 
 <details class="concept-card concept-analogy">
 <summary>Analogy</summary>
 
-Two different rulers for two different jobs. Using the bootstrap ruler on a conformal
-problem (or vice versa) measures the wrong thing.
+Two bathroom scales. The jackknife reads your weight precisely; the wild bootstrap adds
+the uncertainty of the scale itself and reports a wider range. Neither is "wrong" — they
+answer slightly different questions.
 
 </details>
 </div>
@@ -386,40 +395,45 @@ the augmentation step. The rest of Part 1 builds up to both.
 
 ## 4. One reusable simulated panel
 
-We now build a richer panel that all three functions will share. It has **20 countries
-over 24 years (2000–2023)**: five treated units (`C01`–`C05`) and fifteen never-treated
-donors (`C06`–`C20`). The data come from a three-factor model — two common factors plus a
-unit fixed effect — so a good synthetic control genuinely exists. Treated units C01–C04
-are constructed as convex blends of the donors (inside the donor "hull"), while **C05 is
-placed deliberately outside it** to stress-test the methods later.
+We now build a richer panel that all three functions will share. It has **25 countries
+over 39 years (1985–2023)**: five treated units (`C01`–`C05`) and twenty never-treated
+donors (`C06`–`C25`). The long pre-period is deliberate — it gives the inference
+procedures in Section&nbsp;9 the statistical power they need. The data come from a
+three-factor model plus a unit fixed effect, so a good synthetic control genuinely
+exists. Treated units C01–C04 are each a **sparse convex blend of three named donors**
+(so a near-perfect synthetic control is guaranteed), while **C05 is placed deliberately
+outside the donor hull** to stress-test the methods later.
 
 Treatment is **staggered**: C01 and C02 adopt in 2010, C03 in 2013, and C04 and C05 in
-2016. Each treated unit gets a known per-year effect on a primary outcome `gdp_index`
-(and a correlated 0.6× effect on a second outcome `trade_index`). Crucially, **C05's
-effect is negative** (−0.35 per year), mimicking the real-world fact that a few euro
-members underperformed.
+2016. The effect on the primary outcome `gdp_index` is a **jump at adoption plus a gentle
+yearly ramp** (with a correlated 0.6× effect on a second outcome `trade_index`). C01–C04
+get large positive effects (a jump of +2.0 to +3.5 plus a +0.3 to +0.5 ramp); crucially,
+**C05's effect is small and negative** (a −1.0 jump, −0.05 ramp), mimicking the
+real-world fact that a few euro members underperformed.
 
 ```r
 # ... factor-model construction (see analysis.R) ...
 adopt <- c(C01 = 2010, C02 = 2010, C03 = 2013, C04 = 2016, C05 = 2016)
-beta1 <- c(C01 = 0.40, C02 = 0.30, C03 = 0.50, C04 = 0.20, C05 = -0.35)
+jump  <- c(C01 = 3.0, C02 = 2.5, C03 = 3.5, C04 = 2.0, C05 = -1.0)   # level shift
+slope <- c(C01 = 0.5, C02 = 0.4, C03 = 0.5, C04 = 0.3, C05 = -0.05)  # yearly ramp
 
 write.csv(panel, "synthetic_panel_multicountry.csv", row.names = FALSE)
 ```
 
 ```text
-Saved synthetic_panel_multicountry.csv: 20 units x 24 years = 480 rows
+Saved synthetic_panel_multicountry.csv: 25 units x 39 years = 975 rows
 Adoption schedule: C01 2010  C02 2010  C03 2013  C04 2016  C05 2016
-True outcome-1 ramps (per year): C01 0.40  C02 0.30  C03 0.50  C04 0.20  C05 -0.35
+True outcome-1 jump at adoption: C01 3.0  C02 2.5  C03 3.5  C04 2.0  C05 -1.0
+True outcome-1 yearly ramp:      C01 0.5  C02 0.4  C03 0.5  C04 0.3  C05 -0.05
 ```
 
 The saved file ships with extra columns most real datasets never give you: the *true*
 counterfactual (`gdp_index_cf`, `trade_index_cf`) and the *true* injected effect
 (`true_effect_gdp`, `true_effect_trade`). Those let us grade every estimate against
-ground truth. Below, the fifteen donor paths (grey) surround the five treated paths
+ground truth. Below, the twenty donor paths (grey) surround the five treated paths
 (colored), with dots marking each unit's adoption year.
 
-![All 20 simulated country paths, five treated units highlighted, donors in grey, adoption years marked](r_sc_multi_country_02_sim_panel_paths.png)
+![All 25 simulated country paths, five treated units highlighted, donors in grey, adoption years marked](r_sc_multi_country_02_sim_panel_paths.png)
 
 Two display equations capture what every `augsynth` call is doing under the hood. First,
 the **SCM weight problem**: find the convex donor weights $W$ that best match the treated
@@ -452,7 +466,7 @@ poor, the correction removes the leftover bias. This is the doubly-robust safety
 
 ## 5. One treated unit: `single_augsynth`
 
-The simplest case has one treated unit. We isolate `C01` together with the fifteen
+The simplest case has one treated unit. We isolate `C01` together with the twenty
 donors (never mixing in the other treated units — that would contaminate the donor pool),
 build the treatment indicator, and fit both plain SCM (`progfunc = "None"`) and
 Ridge-ASCM (`progfunc = "ridge"`). The top-level `augsynth()` function dispatches to
@@ -469,22 +483,26 @@ sc_plain <- augsynth(gdp_index ~ trt, country, year, sim_single,
 sc_ridge <- augsynth(gdp_index ~ trt, country, year, sim_single,
                      t_int = 2010, progfunc = "ridge", scm = TRUE)
 
+# jackknife+ confidence interval (robust) and conformal p-value
+summary(sc_plain, inf_type = "jackknife+")$average_att
 summary(sc_plain, inf_type = "conformal")$average_att
 ```
 
 ```text
-C01 true average post ATT      : +2.600
-Plain SCM   estimated avg ATT  : +2.651  (p=0.329, scaled L2 pre-fit=0.407)
-Ridge-ASCM  estimated avg ATT  : +2.651  (scaled L2 pre-fit=0.406, lambda=803.0)
+C01 true average post ATT : +6.250
+Plain SCM  avg ATT : +6.241  jackknife+ [5.998, 6.506]  conformal p<0.001  L2=0.135
+Ridge-ASCM avg ATT : +6.241  jackknife+ [5.998, 6.506]  conformal p<0.001  L2=0.135  lambda=2639
 ```
 
-Both estimators nail the truth: the true average effect of C01 is **+2.600** and each
-method returns **+2.651**, an error of about 2%. Notice that plain SCM and Ridge-ASCM
-give *the same answer here*. That is not a coincidence — C01 sits comfortably inside the
-donor hull, so the pre-treatment fit is already good (scaled `L2` imbalance ≈ 0.41, well
-below the 1.0 you would get from naively averaging donors), and the Ridge penalty is
-driven to a large value (`lambda` ≈ 803) that all but switches the augmentation off. This
-is the "when fit is good, ASCM ≈ SCM" principle in action.
+Both estimators nail the truth: the true average effect of C01 is **+6.250** and each
+method returns **+6.241**, an error of 0.1%. And the effect is unambiguously real — the
+**jackknife+ 95% confidence interval is `[5.998, 6.506]`, comfortably excluding zero**,
+and the conformal p-value is below 0.001. Notice that plain SCM and Ridge-ASCM give *the
+same answer here*. That is not a coincidence — C01 sits comfortably inside the donor hull,
+so the pre-treatment fit is already good (scaled `L2` imbalance ≈ 0.14, well below the 1.0
+you would get from naively averaging donors), and the Ridge penalty is driven to a large
+value (`lambda` ≈ 2639) that all but switches the augmentation off. This is the "when fit
+is good, ASCM ≈ SCM" principle in action.
 
 The synthetic control reproduces C01's pre-2010 path closely and then diverges, exactly
 as designed.
@@ -493,14 +511,14 @@ as designed.
 
 How well does the *dynamic* effect line up with the truth? The conformal gap plot
 overlays the estimated treated-minus-synthetic gap (with its pointwise band) against the
-true injected ramp. The two are nearly on top of each other after 2010, while the
+true injected effect. The two are nearly on top of each other after 2010, while the
 pre-period gap hovers around zero — the visual signature of a trustworthy synthetic
 control.
 
 ![single_augsynth gap with conformal band vs the true injected effect — near-perfect recovery](r_sc_multi_country_04_single_gap_conformal.png)
 
 The donor recipe is sparse and interpretable: synthetic C01 is built mostly from five
-donors (C14, C08, C10, C06, C16), with weights summing to one. This sparsity is a
+donors (C19, C09, C13, C23, C08), with weights summing to one. This sparsity is a
 hallmark of SCM and makes the counterfactual auditable.
 
 ---
@@ -519,44 +537,55 @@ sim_multi <- panel |>
   select(country, year, treat_ms, gdp_index)
 
 ms_sim <- multisynth(gdp_index ~ treat_ms, country, year, sim_multi)
+summary(ms_sim, inf_type = "jackknife")$att    # primary: tight interval
 set.seed(20260605)
-summary(ms_sim, inf_type = "bootstrap")$att
+summary(ms_sim, inf_type = "bootstrap")$att     # conservative comparison
 ```
 
 ```text
-multisynth nu (auto) = 0.570 ; global scaled L2 = 0.060 ; n_leads = 8
+multisynth nu (auto) = 0.583 ; global scaled L2 = 0.052 ; n_leads = 8
 
-Estimated vs TRUE average post-treatment ATT (over the common n_leads window):
-   level estimate  ci_lo ci_hi  truth
- Average    0.718 -0.537 2.264  0.735
-     C01    1.494 -1.688 4.639  1.400
-     C02    1.140 -1.555 3.556  1.050
-     C03    1.831 -2.089 5.670  1.750
-     C04    0.592 -0.554 1.694  0.700
-     C05   -1.468 -4.656 1.671 -1.225
+Estimated vs TRUE average ATT (jackknife CI [ci_lo,ci_hi] + bootstrap CI [boot_lo,boot_hi]):
+   level estimate  ci_lo ci_hi boot_lo boot_hi  truth
+ Average    3.222  0.689 5.754  -2.468   9.779  3.155
+     C01    4.756  4.461 5.050  -7.196  16.322  4.750
+     C02    4.075  3.930 4.221  -6.000  13.800  3.900
+     C03    5.362  5.154 5.570  -8.123  18.465  5.250
+     C04    2.927  2.725 3.130  -4.499  10.072  3.050
+     C05   -1.012 -1.639 -0.385 -3.039   1.195 -1.175
 ```
 
-The pooled average effect is estimated at **0.718** against a true value of **0.735** —
-recovery to within 2.5%. Just as importantly, every per-unit estimate has the **right
-sign and the right ballpark**, including C05's *negative* effect (−1.468 estimated vs
-−1.225 true). The automatically chosen pooling parameter `nu = 0.57` sits between "fully
-separate" and "fully pooled," and the tiny global imbalance (scaled `L2` = 0.06) tells us
-the joint synthetic controls fit the pre-period tightly. (One subtlety: `multisynth`
-averages effects over a *common* window of `n_leads = 8` post-treatment periods so that
-all units contribute equally — we compute the truth over the same window to keep the
-comparison fair.)
+The pooled average effect is estimated at **3.222** against a true value of **3.155** —
+recovery to within 2%. Just as importantly, every per-unit estimate has the **right sign
+and the right ballpark**, including C05's *negative* effect (−1.012 estimated vs −1.175
+true). On the inference side, the **jackknife confidence interval for the pooled effect is
+`[0.689, 5.754]`, which excludes zero — the effect is significant.** The more conservative
+**wild bootstrap gives `[-2.468, 9.779]`, which includes zero**: same estimate, but it
+also propagates the counterfactual-estimation uncertainty, so it does not reach
+significance. This is our first concrete example of *the inference method changing the
+verdict* (Section&nbsp;9 returns to it). The automatically chosen pooling parameter
+`nu = 0.58` sits between "fully separate" and "fully pooled," and the tiny global imbalance
+(scaled `L2` = 0.05) tells us the joint synthetic controls fit the pre-period tightly.
+(One subtlety: `multisynth` averages effects over a *common* window of `n_leads = 8`
+post-treatment periods so that all units contribute equally — which is why the per-unit
+estimates here, e.g. C01's **4.756**, are smaller than the full-period single_augsynth
+estimate of **6.241**; we compute the truth over the same window to keep the comparison
+fair.)
 
 The per-unit dynamics confirm the recovery. Each panel shows one treated unit's estimated
-effect by time-since-adoption against its true ramp; the pre-period sits at zero and the
-post-period climbs to meet the dashed truth line — with C05 sloping the opposite way.
+effect by time-since-adoption against its true effect; the pre-period sits at zero and the
+post-period jumps then climbs to meet the dashed truth line — with C05 dropping the
+opposite way.
 
-![multisynth per-unit treatment effects under staggered adoption, estimated vs true ramps](r_sc_multi_country_05_multisynth_percountry.png)
+![multisynth per-unit treatment effects under staggered adoption, estimated vs true effects](r_sc_multi_country_05_multisynth_percountry.png)
 
 Averaging across the five heterogeneous units gives the pooled effect path, the single
-most useful summary in a many-treated-unit study. The estimate (with its wild-bootstrap
-band) tracks the true pooled effect closely.
+most useful summary in a many-treated-unit study. The estimate tracks the true pooled
+effect closely, and the figure shows **both** inference bands — the tighter blue
+jackknife band (which excludes zero after adoption) and the wider orange wild-bootstrap
+band (which does not).
 
-![multisynth pooled average effect with bootstrap band vs the true pooled effect](r_sc_multi_country_06_multisynth_pooled.png)
+![multisynth pooled average effect with jackknife and wild-bootstrap bands vs the true pooled effect](r_sc_multi_country_06_multisynth_pooled.png)
 
 ---
 
@@ -571,20 +600,25 @@ them before treatment.
 mo <- augsynth_multiout(gdp_index + trade_index ~ trt, country, year,
                         t_int = 2010, sim_single,
                         progfunc = "None", scm = TRUE, combine_method = "avg")
-summary(mo)$average_att
+summary(mo)$average_att   # conformal p-value per outcome
 ```
 
 ```text
-      Outcome Estimate
-1   gdp_index 2.709     (true +2.600)
-2 trade_index 1.720     (true +1.560)
+      Outcome  Estimate  p_val
+1   gdp_index    6.538   <0.001     (true +6.250)
+2 trade_index    3.531   <0.001     (true +3.750)
 ```
 
 With a single set of weights, the joint fit recovers **both** effects: `gdp_index` at
-+2.709 (true +2.600) and the correlated `trade_index` at +1.720 (true +1.560), each
-within about 0.16 of the truth. The payoff of estimating them together — rather than
-running two separate `single_augsynth` fits — is that the donor weights must respect both
-series at once, which stabilizes the counterfactual when the outcomes are correlated.
++6.538 (true +6.250) and the correlated `trade_index` at +3.531 (true +3.750), and **both
+are significant** (conformal p &lt; 0.001 for each). The payoff of estimating them
+together — rather than running two separate `single_augsynth` fits — is that the donor
+weights must respect both series at once, which stabilizes the counterfactual when the
+outcomes are correlated. (A practical note on inference: `augsynth_multiout`'s
+`summary()` returns a conformal *p-value* per outcome but leaves the confidence-interval
+bounds as `NA` — a full CI needs `grid_size > 1`, which costs `grid_size` raised to the
+number-of-outcomes evaluations and, for effects this large, returns degenerate bounds. We
+therefore report the p-value.)
 
 ![augsynth_multiout: one synthetic control for two outcomes of unit C01](r_sc_multi_country_07_multiout_two_panel.png)
 
@@ -598,28 +632,31 @@ for every treated unit and tabulate how far each lands from the known truth.
 
 ```r
 # fit plain and ridge for each treated unit; compare to known effects
-recovery   # one row per unit: true_att, att_plain, att_ridge, pre-fit L2, errors
+recovery   # per unit: truth, plain, ridge, jackknife+ CI, conformal p, pre-fit L2, errors
 ```
 
 ```text
- unit true_att att_plain att_ridge prefit_l2_plain prefit_l2_ridge err_plain err_ridge
-  C01    2.600     2.651     2.651           0.407           0.406     0.051     0.051
-  C02    1.950     2.004     2.157           0.168           0.009     0.054     0.207
-  C03    2.500     2.585     2.585           0.470           0.470     0.085     0.085
-  C04    0.700     0.499     0.500           0.647           0.647     0.201     0.200
-  C05   -1.225     0.335    -1.316           0.343           0.117     1.560     0.091
+ unit true_att att_plain att_ridge  ci_lo ci_hi p_plain sign_flip prefit_l2_plain err_plain err_ridge
+  C01    6.250     6.241     6.241  5.998 6.506   0.000     FALSE           0.135     0.009     0.009
+  C02    5.100     5.319     5.319  5.066 5.563   0.000     FALSE           0.150     0.219     0.219
+  C03    6.000     6.282     6.282  5.958 6.624   0.000     FALSE           0.224     0.282     0.282
+  C04    3.050     2.948     2.949  2.608 3.305   0.000     FALSE           0.258     0.102     0.101
+  C05   -1.175     1.896    -1.145 -2.614 6.407   0.866      TRUE           0.414     3.071     0.030
 
-Mean recovery error  — plain SCM: 0.390  | Ridge-ASCM: 0.127
-C05 pre-fit scaled L2 — plain: 0.343  | ridge: 0.117 (lower = better fit)
+Mean recovery error  — plain SCM: 0.737  | Ridge-ASCM: 0.128
+C05 pre-fit scaled L2 — plain: 0.414  | ridge: 0.036 (lower = better fit)
 ```
 
-This is the headline result of Part 1. For C05, **plain SCM gets the sign wrong** — it
-estimates +0.335 when the true effect is −1.225 — because it cannot match the pre-period
-and the unmatched bias swamps the signal. **Ridge-ASCM recovers −1.316**, almost exactly
-right, by closing the pre-treatment gap (scaled `L2` falls from 0.34 to 0.12). Across all
-five units, augmentation cuts the mean recovery error from **0.390 to 0.127**. For the
-four well-fit units the two methods agree; augmentation earns its keep precisely on the
-hard case.
+This is the headline result of Part 1. For the four well-fit units (C01–C04), plain SCM
+lands within ~0.3 of the truth and its **jackknife+ interval excludes zero** (all
+significant; e.g. C01's `[5.998, 6.506]`). For **C05, plain SCM gets the sign wrong** — it
+estimates +1.896 when the true effect is −1.175 — because it cannot match the pre-period
+and the unmatched bias swamps the signal. Its interval `[-2.614, 6.407]` *includes* zero
+(conformal p = 0.87): the estimate is both **wrong and not significant**, an honest double
+failure. **Ridge-ASCM recovers −1.145**, almost exactly right, by closing the
+pre-treatment gap (scaled `L2` falls from 0.41 to 0.04). Across all five units,
+augmentation cuts the mean recovery error from **0.737 to 0.128**. For the four well-fit
+units the two methods agree; augmentation earns its keep precisely on the hard case.
 
 The picture says it all: under plain SCM the synthetic control (blue) drifts away from
 actual C05 (orange) *before* treatment — a fatal sign of poor fit — while Ridge-ASCM pins
@@ -634,7 +671,55 @@ track.
 
 ---
 
-## 9. The EMU data: replicating Papaioannou (2021)
+## 9. Inference: is the effect real?
+
+A point estimate answers "how big?"; inference answers "could this be noise?" A synthetic
+control gap is a *difference between two estimated paths*, so it carries uncertainty even
+when the point estimate is dead-on. `augsynth` ships several inference tools, and — this
+is the part most tutorials gloss over — **they do not always agree**. Choosing one and
+understanding what it measures is part of doing the method honestly.
+
+**The three tools, matched to the three estimators.**
+
+- **`single_augsynth` → jackknife+ (primary) and conformal.** The **jackknife+** interval
+  (`summary(fit, inf_type = "jackknife+")`) leaves out one donor at a time, refits, and
+  builds a robust confidence interval for the average effect. We saw it call C01's effect
+  `[5.998, 6.506]` — comfortably away from zero. The **conformal** test
+  (`inf_type = "conformal"`) is a permutation procedure that returns a p-value and a
+  *pointwise* band over time (the shaded band in the gap figures). It is powerful when the
+  pre-period is long relative to the post-period — which is exactly why this panel starts
+  in **1985**, giving twenty-plus pre-treatment years — but its p-value is noisier and
+  loses power when the post-window is long. With both tools agreeing here (jackknife+ CI
+  excludes zero, conformal p &lt; 0.001), we can trust the result.
+- **`multisynth` → jackknife (primary) and wild bootstrap.** The **jackknife** is the
+  natural interval for an average *across* treated units; on the simulated panel it put the
+  pooled effect at `[0.689, 5.754]`, **significant**. The **wild bootstrap** also
+  propagates the counterfactual-estimation uncertainty, so it is wider — `[-2.468, 9.779]`,
+  **not significant**. The estimate is identical; the verdict is not. Neither method is
+  "wrong": the jackknife asks "is the average across these units different from zero?", the
+  bootstrap asks "accounting for how hard each counterfactual was to build, is it?" When
+  they disagree, say so.
+- **`augsynth_multiout` → conformal.** Returns a p-value per outcome (both
+  &lt; 0.001 for C01); a full confidence interval needs the slow `grid_size > 1` path.
+
+**What drives significance.** Three levers widen a confidence interval and can push a real
+effect below significance: **more noise**, **fewer pre-treatment periods** (a worse-pinned
+counterfactual), and a **poorer pre-fit**. This is the same lesson the suitability test
+taught from the other side — C05's poor fit (scaled `L2` = 0.41) gave it a wide interval
+that swallowed zero, while C01's clean fit (`L2` = 0.14) produced a tight, significant one.
+The **[interactive lab](web_app/index.html)** has a fifth tab, *Inference*, with a
+significance scoreboard and a slider-driven simulator: move effect size, noise, and the
+number of pre-periods and watch the interval widen or narrow and the verdict flip at the
+5% line.
+
+**The honest-reporting rule.** On simulated data, where we *injected* a real effect, every
+headline is significant. On the real euro-area data below, some results are and some are
+not — and we report them as they come, rather than dressing a near-zero effect up as a
+finding.
+
+---
+
+## 10. The EMU data: replicating Papaioannou (2021)
 
 We now switch to real data. Papaioannou (2021) asks whether the euro raised the total
 factor productivity of its founding members. The dataset (shipped in this post's
@@ -670,7 +755,7 @@ donors (grey), with the 1999 euro launch marked.
 
 ---
 
-## 10. One country, the paper's way: synthetic Germany (plain SCM)
+## 11. One country, the paper's way: synthetic Germany (plain SCM)
 
 We start with a single country to mirror the paper's per-country synthetic controls.
 Germany is fit against the 24 donors, matching on pre-treatment TFP *and* the paper's
@@ -685,13 +770,17 @@ summary(fit)$average_att
 ```
 
 ```text
-Germany plain SCM avg ATT (TFP level): +0.133 | scaled L2 pre-fit 0.301
+Germany plain SCM avg ATT (TFP): +0.133 | jackknife+ [-0.082, 0.336] | conformal p=0.027 | L2 0.301
 Germany % effect — 2000-07: +8.0%   2008-17: +19.3%  (plain SCM)
 ```
 
 Actual German TFP runs **above** its synthetic counterfactual after 1999, with an average
 effect of **+0.133** TFP units — about **+8.0%** over 2000–2007 and **+19.3%** over
-2008–2017. The pre-treatment fit is good (scaled `L2` = 0.30). Qualitatively this matches
+2008–2017. The pre-treatment fit is good (scaled `L2` = 0.30). Here the two inference tools
+**disagree at the margin**, which is itself instructive: the conformal p-value is
+**0.027** (significant at 5%), but the jackknife+ interval `[-0.082, 0.336]` just barely
+*includes* zero. On real data with a modest effect, "significant" is genuinely borderline —
+we flag it rather than pick the answer we like. Qualitatively this still matches
 Papaioannou's finding that Germany was among the clearer winners from monetary
 integration.
 
@@ -699,7 +788,7 @@ integration.
 
 ---
 
-## 11. Ridge-ASCM as the modern extension
+## 12. Ridge-ASCM as the modern extension
 
 Does augmentation change the German verdict? We refit with `progfunc = "ridge"` and
 overlay the two counterfactuals.
@@ -711,12 +800,13 @@ fit_ridge <- augsynth(tfp ~ trt99 | hum_cap + inv_share + ec_freed + patents + a
 ```
 
 ```text
-Germany Ridge-ASCM avg ATT (TFP level): +0.127 | scaled L2 pre-fit 0.292
+Germany Ridge-ASCM avg ATT (TFP): +0.127 | conformal p=0.015 | scaled L2 pre-fit 0.292
 ```
 
-The Ridge-augmented estimate (**+0.127**) is essentially the plain-SCM estimate
-(**+0.133**) — again, because the pre-treatment fit was already good (scaled `L2` barely
-moves, 0.301 → 0.292). The two synthetic counterfactuals are nearly indistinguishable.
+The Ridge-augmented estimate (**+0.127**, conformal p = 0.015) is essentially the
+plain-SCM estimate (**+0.133**) — again, because the pre-treatment fit was already good
+(scaled `L2` barely moves, 0.301 → 0.292). The two synthetic counterfactuals are nearly
+indistinguishable.
 This is reassuring rather than disappointing: augmentation is an insurance policy, and a
 quiet premium here means the classic estimate was already trustworthy for Germany.
 
@@ -724,7 +814,7 @@ quiet premium here means the classic estimate was already trustworthy for German
 
 ---
 
-## 12. All twelve members at once: `multisynth`
+## 13. All twelve members at once: `multisynth`
 
 The multi-country headline uses `multisynth` to estimate the euro's effect across **all
 twelve members in one model**. Because every member adopts in 1999, this is a
@@ -733,19 +823,23 @@ just does not exercise the staggered machinery we saw in Part 1.
 
 ```r
 ms_emu <- multisynth(tfp ~ trt99, country, year, emu_multi)
+summary(ms_emu, inf_type = "jackknife")$att    # primary
 set.seed(20260605)
-summary(ms_emu, inf_type = "bootstrap")$att   # pooled "Average" + per-country
+summary(ms_emu, inf_type = "bootstrap")$att     # conservative comparison
 ```
 
 ```text
-Pooled EMU average ATT (TFP level): -0.016  [-0.259, 0.231]; scaled global L2 = 0.100
+Pooled EMU avg ATT (TFP): -0.016 | jackknife [-0.282, 0.250] | bootstrap [-0.259, 0.231] | global L2 = 0.100
 ```
 
-Taken at face value, the pooled average effect is a near-zero **−0.016**. But the single
-number is misleading, and reading only the average would be a mistake: **the dynamics are
-the real story.** The pooled effect path is flat through the entire pre-period (no
-pre-trend — a good sign), jumps to **+0.39 by 2000** in the first euro years, then slides
-into negative territory during the 2008–2014 crisis before recovering toward zero by
+Taken at face value, the pooled average effect is a near-zero **−0.016**, and it is **not
+statistically significant** — both the jackknife `[-0.282, 0.250]` and the wild bootstrap
+`[-0.259, 0.231]` comfortably include zero. (Unlike the simulated panel, where the two
+methods disagreed, here they agree: there is simply no pooled signal to detect.) But the
+single number is also misleading, and reading only the average would be a mistake: **the
+dynamics are the real story.** The pooled effect path is flat through the entire pre-period
+(no pre-trend — a good sign), rises to about **+0.39** in the first euro years, then
+slides into negative territory during the 2008–2014 crisis before recovering toward zero by
 2017. The early gains and the crisis losses cancel out in the long-run average. This
 dynamic — strong early, eroded by the crisis — is exactly the arc Papaioannou describes.
 
@@ -760,7 +854,7 @@ the crisis.
 
 ---
 
-## 13. Two outcomes at once: `augsynth_multiout` on Germany
+## 14. Two outcomes at once: `augsynth_multiout` on Germany
 
 The euro should, in principle, move both German TFP *and* its productivity gap versus the
 USA. We estimate them jointly.
@@ -773,22 +867,25 @@ summary(ger_mo)$average_att
 ```
 
 ```text
-   Outcome   Estimate
-1      tfp   +0.116
-2 prod_gap   -0.151
+   Outcome   Estimate   p_val
+1      tfp     +0.116    0.603
+2 prod_gap     -0.151    0.603
 ```
 
-The two estimates tell one coherent story: after the euro, German **TFP rises** (+0.116)
-*and* its **productivity gap versus the USA narrows** (−0.151, where a fall means catching
-up to the frontier). A single synthetic Germany, balanced on both series, supports both
-conclusions at once — a tidy illustration of why estimating correlated outcomes jointly
-is more than a convenience.
+The two point estimates tell one coherent story: after the euro, German **TFP rises**
+(+0.116) *and* its **productivity gap versus the USA narrows** (−0.151, where a fall means
+catching up to the frontier). A single synthetic Germany, balanced on both series, supports
+both directions at once. But honesty requires the p-value: at **0.603 for each outcome,
+neither is statistically significant.** The joint multi-outcome test is more demanding than
+the single-TFP conformal test (which was borderline at p = 0.027), and on one country's
+real data the signal is not strong enough to clear it. The *suggestive, coherent
+directions* are worth reporting — as long as we do not overstate them as established.
 
 ![Two outcomes for Germany: TFP rises above synthetic while the US productivity gap narrows](r_sc_multi_country_14_emu_multiout.png)
 
 ---
 
-## 14. Robustness: the 1992 Maastricht threshold
+## 15. Robustness: the 1992 Maastricht threshold
 
 Papaioannou notes that markets may have anticipated the euro from the 1992 Maastricht
 Treaty, not just the 1999 launch. We rerun Germany with the earlier threshold using the
@@ -813,7 +910,7 @@ Germany tells the same story.
 
 ---
 
-## 15. Comparing to the paper
+## 16. Comparing to the paper
 
 How close is our ASCM re-analysis to Papaioannou's published numbers? The paper reports a
 percentage TFP "contribution" per country per period; we compute the analogous ASCM
@@ -845,23 +942,32 @@ story — is the right bar for a method comparison. By that bar, ASCM confirms t
 
 ---
 
-## 16. Discussion
+## 17. Discussion
 
-Three threads tie Part 1 and Part 2 together.
+Four threads tie Part 1 and Part 2 together.
 
 **Validate on truth, then trust on data.** The single most useful habit this tutorial
 teaches is the order of operations: we confirmed that each `augsynth` function recovers a
-*known* effect on simulated data (errors of 2–6%) *before* turning it loose on the euro
-question. When the EMU results then showed sensible signs and a clean pre-period, we had
-earned the right to believe them. A causal estimate you cannot first reproduce on
-simulated ground truth is a leap of faith.
+*known* effect on simulated data (errors under 5% for the well-fit units) *before* turning
+it loose on the euro question. When the EMU results then showed sensible signs and a clean
+pre-period, we had earned the right to believe them. A causal estimate you cannot first
+reproduce on simulated ground truth is a leap of faith.
 
 **Augmentation is insurance, not a free lunch.** For well-fit units — C01–C04, and
 Germany — plain SCM and Ridge-ASCM agreed to the second decimal, and the Ridge penalty
 quietly switched itself off. The augmentation mattered exactly once: for C05, sitting
 outside the donor hull, where plain SCM got the *sign* wrong and Ridge-ASCM rescued it
-(mean error 0.390 → 0.127). The lesson is to read the pre-treatment imbalance every time
+(mean error 0.737 → 0.128). The lesson is to read the pre-treatment imbalance every time
 and lean on augmentation only when the fit demands it.
+
+**Inference is a choice, and the choices can disagree.** A point estimate is not a finding.
+On the simulated panel the pooled effect was significant under the jackknife but not under
+the wild bootstrap; on real German TFP the conformal p-value (0.027) and the jackknife+
+interval (which included zero) split at the margin; the pooled euro effect and the joint
+multi-outcome test were honestly null. We reported the simulated headlines as significant
+(we injected them) and the borderline and null real-data results as exactly that. Match
+the inference tool to the estimator, report when methods disagree, and never let a
+near-zero estimate masquerade as a result.
 
 **Averages hide dynamics in multi-country work.** The pooled `multisynth` effect on euro
 TFP was a forgettable −0.016 *on average*, yet the path revealed a +0.39 early bump
@@ -874,7 +980,7 @@ per-unit spread, not just the headline number.
 
 ---
 
-## 17. Summary and next steps
+## 18. Summary and next steps
 
 - The Augmented Synthetic Control Method generalizes classic SCM with an outcome-model
   bias correction that is doubly robust: it helps when the pre-treatment fit is poor and
@@ -883,9 +989,15 @@ per-unit spread, not just the headline number.
   **`multisynth`** (many units, staggered, pooled + per-unit), and
   **`augsynth_multiout`** (one unit, many outcomes). The top-level `augsynth()` dispatches
   to the right one.
-- On simulated data with a known effect, all three recovered the truth within a few
-  percent (single +2.651 vs +2.600; pooled 0.718 vs 0.735; multiout within 0.16), and the
-  suitability test showed Ridge-ASCM correcting a sign error that plain SCM could not.
+- On simulated data with a known effect, all three recovered the truth closely and
+  **significantly** (single +6.241 vs +6.250, jackknife+ `[6.00, 6.51]`; pooled
+  `multisynth` +3.222 vs 3.155, jackknife `[0.69, 5.75]`; multiout +6.54 and +3.53, both
+  conformal p &lt; 0.001), and the suitability test showed Ridge-ASCM correcting a sign
+  error that plain SCM could not — a wrong *and* non-significant estimate for C05.
+- **Inference is matched to the estimator** — jackknife+ and conformal for a single unit,
+  jackknife and the conservative wild bootstrap for `multisynth`, conformal p-values for
+  multiple outcomes — and the methods can disagree. We reported significance honestly,
+  including the borderline (Germany) and null (pooled euro, joint Germany) real-data cases.
 - On the real EMU panel, ASCM qualitatively replicated Papaioannou (2021): a positive
   early TFP effect for most members (rank correlation 0.74 with the paper), Germany up and
   its US productivity gap narrowing, Greece and Portugal turning negative after the
@@ -897,7 +1009,7 @@ in-time and in-space placebo tests for inference; or read the staggered-adoption
 in Ben-Michael, Feller, and Rothstein's companion paper. The reusable
 `synthetic_panel_multicountry.csv` is a ready-made sandbox for any of these.
 
-## 18. Exercises
+## 19. Exercises
 
 1. **Swap the outcome.** Rerun the per-country EMU fits with `prod_gap` as the primary
    outcome instead of `tfp`. Does the productivity-gap story agree with the TFP story?
@@ -910,8 +1022,12 @@ in Ben-Michael, Feller, and Rothstein's companion paper. The reusable
    C05's negative effect with `single_augsynth` and explain why plain SCM fails.
 5. **Combine differently.** In `augsynth_multiout`, switch `combine_method = "avg"` to
    `"concat"` and compare the two-outcome estimates. When might each be preferable?
+6. **Make inference disagree.** For the simulated pooled `multisynth` effect, compute both
+   `inf_type = "jackknife"` and `inf_type = "bootstrap"` intervals. Then shrink the panel
+   (drop donors or pre-periods) and watch how each interval responds. Which one flips first,
+   and why?
 
-## 19. References
+## 20. References
 
 - Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic Control Methods for
   Comparative Case Studies. *Journal of the American Statistical Association*, 105(490),

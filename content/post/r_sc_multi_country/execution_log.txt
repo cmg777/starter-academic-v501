@@ -9,11 +9,13 @@ Mean post-2012 gap (treated - control): 9.60  | true mean effect: 9.75
 ==============================================================================
 PART 1b: Build & save the reusable multi-country panel
 ==============================================================================
-Saved synthetic_panel_multicountry.csv: 20 units x 24 years = 480 rows
+Saved synthetic_panel_multicountry.csv: 25 units x 39 years = 975 rows
 Adoption schedule:  C01  C02  C03  C04  C05 
 2010 2010 2013 2016 2016 
-True outcome-1 ramps (per year):   C01   C02   C03   C04   C05 
- 0.40  0.30  0.50  0.20 -0.35 
+True outcome-1 jump at adoption:  C01  C02  C03  C04  C05 
+ 3.0  2.5  3.5  2.0 -1.0 
+True outcome-1 yearly ramp:        C01   C02   C03   C04   C05 
+ 0.50  0.40  0.50  0.30 -0.05 
   [figure] r_sc_multi_country_02_sim_panel_paths.png
 
 ==============================================================================
@@ -21,33 +23,35 @@ PART 1c: single_augsynth on C01 (plain SCM vs Ridge-ASCM)
 ==============================================================================
 One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
-C01 true average post ATT      : +2.600
-Plain SCM   estimated avg ATT  : +2.651  (p=0.329, scaled L2 pre-fit=0.407)
-Ridge-ASCM  estimated avg ATT  : +2.651  (scaled L2 pre-fit=0.406, lambda=803.0450)
+C01 true average post ATT      : +6.250
+Plain SCM   avg ATT  : +6.241  jackknife+ [5.998, 6.506] SIG | conformal p=0.0000 | L2=0.135
+Ridge-ASCM  avg ATT  : +6.241  jackknife+ [5.998, 6.506] SIG | conformal p=0.0000 | L2=0.135 lambda=2639.30
   [figure] r_sc_multi_country_03_single_actual_vs_synth.png
   [figure] r_sc_multi_country_04_single_gap_conformal.png
 Top C01 donor weights:
   donor weight
-1   C14 0.2296
-2   C08 0.2124
-3   C10 0.2090
-4   C06 0.1901
-5   C16 0.1515
-6   C09 0.0075
+1   C19 0.2810
+2   C09 0.2092
+3   C13 0.1639
+4   C23 0.1118
+5   C08 0.0970
+6   C18 0.0737
 
 ==============================================================================
 PART 1d: multisynth on 5 treated units (staggered)
 ==============================================================================
-multisynth nu (auto) = 0.570 ; global scaled L2 = 0.060 ; n_leads = 8
+multisynth nu (auto) = 0.583 ; global scaled L2 = 0.052 ; n_leads = 8
 
-Estimated vs TRUE average post-treatment ATT (over the common n_leads window):
-   level estimate  ci_lo ci_hi  truth
- Average    0.718 -0.537 2.264  0.735
-     C01    1.494 -1.688 4.639  1.400
-     C02    1.140 -1.555 3.556  1.050
-     C03    1.831 -2.089 5.670  1.750
-     C04    0.592 -0.554 1.694  0.700
-     C05   -1.468 -4.656 1.671 -1.225
+Estimated vs TRUE average ATT (common n_leads window); jackknife CI + bootstrap CI:
+   level estimate  ci_lo  ci_hi boot_lo boot_hi  truth sig_jack sig_boot
+ Average    3.222  0.689  5.754  -2.468   9.779  3.155     TRUE    FALSE
+     C01    4.756  4.461  5.050  -7.196  16.322  4.750     TRUE    FALSE
+     C02    4.075  3.930  4.221  -6.000  13.800  3.900     TRUE    FALSE
+     C03    5.362  5.154  5.570  -8.123  18.465  5.250     TRUE    FALSE
+     C04    2.927  2.725  3.130  -4.499  10.072  3.050     TRUE    FALSE
+     C05   -1.012 -1.639 -0.385  -3.039   1.195 -1.175     TRUE    FALSE
+
+Pooled average — jackknife: +3.222 [0.689, 5.754] SIGNIFICANT | bootstrap: [-2.468, 9.779] ns
   [figure] r_sc_multi_country_05_multisynth_percountry.png
 Warning message:
 Removed 15 rows containing missing values or values outside the scale range
@@ -57,13 +61,22 @@ Removed 15 rows containing missing values or values outside the scale range
 ==============================================================================
 PART 1e: augsynth_multiout on C01 (two outcomes)
 ==============================================================================
-Joint (multi-outcome) average ATT by outcome:
+Warning messages:
+1: In min(grid[ps >= alpha, i]) :
+  no non-missing arguments to min; returning Inf
+2: In max(grid[ps >= alpha, i]) :
+  no non-missing arguments to max; returning -Inf
+3: In min(grid[ps >= alpha, i]) :
+  no non-missing arguments to min; returning Inf
+4: In max(grid[ps >= alpha, i]) :
+  no non-missing arguments to max; returning -Inf
+Joint (multi-outcome) average ATT by outcome (conformal p-values):
       Outcome Estimate lower_bound upper_bound p_val
-1   gdp_index 2.708674          NA          NA 0.376
-2 trade_index 1.720435          NA          NA 0.376
+1   gdp_index 6.538132          NA          NA     0
+2 trade_index 3.531193          NA          NA     0
 
-True gdp_index ATT  : +2.600  |  multiout estimate: +2.709
-True trade_index ATT: +1.560  |  multiout estimate: +1.720
+True gdp_index ATT  : +6.250  |  multiout estimate: +6.538  (conformal p=0.0000, SIGNIFICANT)
+True trade_index ATT: +3.750  |  multiout estimate: +3.531  (conformal p=0.0000, SIGNIFICANT)
 One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
   [figure] r_sc_multi_country_07_multiout_two_panel.png
@@ -73,8 +86,6 @@ PART 1f: Suitability test — C05 (outside the donor hull)
 ==============================================================================
 One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
-Warning message:
-Tuning ridge regression when number of units (16) is almost equal to the number of time periods (16) is often unstable. 
 One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
@@ -85,23 +96,22 @@ One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
-There were 50 or more warnings (use warnings() to see the first 50)
-Recovery table (|estimate - truth| in last two columns):
- unit adopt true_att att_plain att_ridge prefit_l2_plain prefit_l2_ridge
-  C01  2010    2.600     2.651     2.651           0.407           0.406
-  C02  2010    1.950     2.004     2.157           0.168           0.009
-  C03  2013    2.500     2.585     2.585           0.470           0.470
-  C04  2016    0.700     0.499     0.500           0.647           0.647
-  C05  2016   -1.225     0.335    -1.316           0.343           0.117
- err_plain err_ridge
-     0.051     0.051
-     0.054     0.207
-     0.085     0.085
-     0.201     0.200
-     1.560     0.091
+Recovery table (jackknife+ CI [ci_lo,ci_hi]; conformal p_plain; sign_flip = plain mis-signs):
+ unit adopt true_att att_plain att_ridge  ci_lo ci_hi p_plain sign_flip
+  C01  2010    6.250     6.241     6.241  5.998 6.506   0.000     FALSE
+  C02  2010    5.100     5.319     5.319  5.066 5.563   0.000     FALSE
+  C03  2013    6.000     6.282     6.282  5.958 6.624   0.000     FALSE
+  C04  2016    3.050     2.948     2.949  2.608 3.305   0.000     FALSE
+  C05  2016   -1.175     1.896    -1.145 -2.614 6.407   0.866      TRUE
+ prefit_l2_plain prefit_l2_ridge err_plain err_ridge sig_plain
+           0.135           0.135     0.009     0.009      TRUE
+           0.150           0.150     0.219     0.219      TRUE
+           0.224           0.224     0.282     0.282      TRUE
+           0.258           0.258     0.102     0.101      TRUE
+           0.414           0.036     3.071     0.030     FALSE
 
-Mean recovery error  — plain SCM: 0.390  | Ridge-ASCM: 0.127
-C05 pre-fit scaled L2 — plain: 0.343  | ridge: 0.117 (lower = better fit)
+Mean recovery error  — plain SCM: 0.737  | Ridge-ASCM: 0.128
+C05 pre-fit scaled L2 — plain: 0.414  | ridge: 0.036 (lower = better fit)
   [figure] r_sc_multi_country_08_suitability_plain_vs_ridge.png
 
 ==============================================================================
@@ -116,8 +126,8 @@ PART 2b/2c: Germany — plain SCM and Ridge-ASCM
 ==============================================================================
 One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
-Germany plain SCM avg ATT (TFP level): +0.133 | scaled L2 pre-fit 0.301
-Germany Ridge-ASCM avg ATT (TFP level): +0.127 | scaled L2 pre-fit 0.292
+Germany plain SCM avg ATT (TFP): +0.133 | jackknife+ [-0.082, 0.336] ns | conformal p=0.0270 | L2 0.301
+Germany Ridge-ASCM avg ATT (TFP): +0.127 | conformal p=0.0150 (significant) | L2 0.292
 Germany % effect — 2000-07: +8.0%   2008-17: +19.3%  (plain SCM)
   [figure] r_sc_multi_country_10_germany_plain_scm.png
   [figure] r_sc_multi_country_11_germany_plain_vs_ridge.png
@@ -125,7 +135,7 @@ Germany % effect — 2000-07: +8.0%   2008-17: +19.3%  (plain SCM)
 ==============================================================================
 PART 2d: multisynth — pooled 12-country ATT + per-country fits
 ==============================================================================
-Pooled EMU average ATT (TFP level): -0.016  [-0.259, 0.231]; scaled global L2 = 0.100
+Pooled EMU avg ATT (TFP): -0.016 | jackknife [-0.282, 0.250] ns | bootstrap [-0.259, 0.231] ns | global L2 = 0.100
 One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
 One outcome and one treatment time found. Running single_augsynth.
@@ -172,10 +182,11 @@ Per-country ASCM (plain SCM) vs paper TFP % contributions:
 ==============================================================================
 PART 2e: augsynth_multiout — TFP and prod_gap together
 ==============================================================================
-Germany joint TFP + prod_gap average ATT:
+Germany joint TFP + prod_gap average ATT (conformal p-values):
    Outcome   Estimate lower_bound upper_bound p_val
 1      tfp  0.1161250          NA          NA 0.603
 2 prod_gap -0.1513576          NA          NA 0.603
+TFP outcome: conformal p=0.6030 (not significant) | prod_gap: conformal p=0.6030 (not significant)
 One outcome and one treatment time found. Running single_augsynth.
   [figure] r_sc_multi_country_14_emu_multiout.png
 

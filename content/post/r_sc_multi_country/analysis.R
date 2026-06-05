@@ -21,6 +21,16 @@
 # Estimand: ATT (average treatment effect on the treated) — the post-treatment
 #           gap between the treated unit's outcome and its synthetic counterfactual.
 #
+# Inference (augsynth offers a toolbox; we pick the robust option per estimator):
+#   * single_augsynth -> JACKKNIFE+ confidence interval (primary, robust) plus the
+#     CONFORMAL p-value and pointwise band (a permutation test, lower power when the
+#     post-window is long relative to the pre-period — which is why the panel starts
+#     in 1985 to give a long pre-period).
+#   * multisynth -> JACKKNIFE (primary, the natural interval for the average across
+#     treated units) AND the more conservative WILD BOOTSTRAP, reported side by side.
+#   * augsynth_multiout -> CONFORMAL p-value per outcome (an average CI needs
+#     grid_size > 1, which is slow and degenerate for large effects).
+#
 # Usage:  Rscript analysis.R 2>&1 | tee execution_log.txt
 # Output: r_sc_multi_country_*.png  (16 figures)
 #         synthetic_panel_multicountry.csv, synthetic_panel_2country_intuition.csv
@@ -174,28 +184,41 @@ results$intuition <- list(t_int = t_int_i,
 # ── 1b. One reusable multi-country panel (factor model) ───────────────────────
 rule("PART 1b: Build & save the reusable multi-country panel")
 
-years   <- 2000:2023
+years   <- 1985:2023                        # long pre-period -> powerful inference
 n_t     <- length(years)
-s       <- years - 2000
-donors  <- sprintf("C%02d", 6:20)          # 15 never-treated donors
+s       <- years - 1985
+donors  <- sprintf("C%02d", 6:25)          # 20 never-treated donors
 treated <- sprintf("C%02d", 1:5)           # 5 treated units
 adopt   <- c(C01 = 2010, C02 = 2010, C03 = 2013, C04 = 2016, C05 = 2016)
-beta1   <- c(C01 = 0.40, C02 = 0.30, C03 = 0.50, C04 = 0.20, C05 = -0.35)  # outcome-1 ramp
-beta2   <- 0.6 * beta1                                                      # outcome-2 ramp
+# Treatment effect = an immediate JUMP at adoption plus a mild yearly RAMP.
+# C01-C04 are large and clearly detectable; C05 is small, negative and (by the
+# extreme-loadings construction below) sits OUTSIDE the donor hull, so plain SCM
+# mis-signs it and its effect is not statistically distinguishable from zero.
+jump    <- c(C01 = 3.0, C02 = 2.5, C03 = 3.5, C04 = 2.0, C05 = -1.0)  # level shift
+slope   <- c(C01 = 0.5, C02 = 0.4, C03 = 0.5, C04 = 0.3, C05 = -0.05) # yearly ramp
 
 # Three latent common factors
 f1 <- sin(2 * pi * s / 12)
 f2 <- 0.05 * s
 f3 <- cos(2 * pi * s / 7)
 
-# Donor parameters (random); treated interiors are convex blends of donors so a
-# good synthetic exists, except C05 which sits OUTSIDE the donor hull on purpose.
+# Donor parameters (random); each treated interior (C01-C04) is a SPARSE convex
+# blend of three named donors, so a near-perfect synthetic control provably exists
+# and SCM should recover roughly those weights. C05 sits OUTSIDE the donor hull
+# (loadings beyond every donor) on purpose, so plain SCM cannot match it.
 donor_mu <- setNames(rnorm(length(donors), 10, 2), donors)
 donor_L1 <- setNames(runif(length(donors), 0.3, 1.5), donors)
 donor_L2 <- setNames(runif(length(donors), 0.3, 1.5), donors)
 donor_L3 <- setNames(runif(length(donors), 0.2, 1.0), donors)
 donor_nu <- setNames(rnorm(length(donors), 2, 0.5), donors)
 donor_k  <- setNames(runif(length(donors), 0.3, 0.8), donors)
+
+# The known recipe behind each interior treated unit (convex weights sum to 1).
+blend <- list(
+  C01 = c(C06 = 0.45, C07 = 0.35, C08 = 0.20),
+  C02 = c(C09 = 0.40, C10 = 0.35, C11 = 0.25),
+  C03 = c(C12 = 0.45, C13 = 0.30, C14 = 0.25),
+  C04 = c(C16 = 0.40, C18 = 0.35, C20 = 0.25))
 
 # helper to make Y(0) for given params
 y0 <- function(mu, L1, L2, L3) mu + L1 * f1 + L2 * f2 + L3 * f3
@@ -204,8 +227,8 @@ panel_rows <- list()
 
 # Donors
 for (d in donors) {
-  Y1 <- y0(donor_mu[d], donor_L1[d], donor_L2[d], donor_L3[d]) + rnorm(n_t, 0, 0.25)
-  Y2 <- 0.6 * Y1 + donor_nu[d] + donor_k[d] * f1 + rnorm(n_t, 0, 0.20)
+  Y1 <- y0(donor_mu[d], donor_L1[d], donor_L2[d], donor_L3[d]) + rnorm(n_t, 0, 0.15)
+  Y2 <- 0.6 * Y1 + donor_nu[d] + donor_k[d] * f1 + rnorm(n_t, 0, 0.12)
   panel_rows[[d]] <- data.frame(
     country = d, year = years, treated_unit = 0L, adopt_year = NA_integer_,
     treat_ms = 0L, gdp_index = Y1, trade_index = Y2,
@@ -213,25 +236,25 @@ for (d in donors) {
     true_effect_gdp = 0, true_effect_trade = 0)
 }
 
-# Treated: C01-C04 convex blends of donors (interior); C05 outside the hull
+# Treated: C01-C04 sparse convex blends of donors (interior); C05 outside the hull
 for (tu in treated) {
   if (tu == "C05") {
     mu <- max(donor_mu) + 1.2; L1 <- max(donor_L1) + 0.5
     L2 <- max(donor_L2) + 0.4; L3 <- max(donor_L3) + 0.3
     nu <- max(donor_nu) + 0.6; kk <- max(donor_k) + 0.3
   } else {
-    w  <- as.numeric(MCMCpack_rdirichlet <- {
-      g <- rgamma(length(donors), 1); g / sum(g) })   # Dirichlet weights
-    mu <- sum(w * donor_mu); L1 <- sum(w * donor_L1)
-    L2 <- sum(w * donor_L2); L3 <- sum(w * donor_L3)
-    nu <- sum(w * donor_nu); kk <- sum(w * donor_k)
+    w  <- blend[[tu]]; dn <- names(w)               # three-donor recipe
+    mu <- sum(w * donor_mu[dn]); L1 <- sum(w * donor_L1[dn])
+    L2 <- sum(w * donor_L2[dn]); L3 <- sum(w * donor_L3[dn])
+    nu <- sum(w * donor_nu[dn]); kk <- sum(w * donor_k[dn])
   }
-  Y1_0 <- y0(mu, L1, L2, L3) + rnorm(n_t, 0, 0.25)
-  Y2_0 <- 0.6 * Y1_0 + nu + kk * f1 + rnorm(n_t, 0, 0.20)
+  Y1_0 <- y0(mu, L1, L2, L3) + rnorm(n_t, 0, 0.15)
+  Y2_0 <- 0.6 * Y1_0 + nu + kk * f1 + rnorm(n_t, 0, 0.12)
   a    <- adopt[[tu]]
-  k    <- pmax(0, years - a)
-  eff1 <- beta1[[tu]] * k
-  eff2 <- beta2[[tu]] * k
+  post <- as.integer(years >= a)            # 1 from adoption onward
+  k    <- pmax(0, years - a)                # years since adoption
+  eff1 <- post * jump[[tu]] + slope[[tu]] * k   # jump + ramp
+  eff2 <- 0.6 * eff1
   panel_rows[[tu]] <- data.frame(
     country = tu, year = years, treated_unit = 1L, adopt_year = a,
     treat_ms = as.integer(years >= a),
@@ -246,7 +269,8 @@ write.csv(panel, "synthetic_panel_multicountry.csv", row.names = FALSE)
 cat(sprintf("Saved synthetic_panel_multicountry.csv: %d units x %d years = %d rows\n",
             length(unique(panel$country)), n_t, nrow(panel)))
 cat("Adoption schedule: "); print(adopt)
-cat("True outcome-1 ramps (per year): "); print(beta1)
+cat("True outcome-1 jump at adoption: "); print(jump)
+cat("True outcome-1 yearly ramp:      "); print(slope)
 
 # Figure 02 — all unit paths, treated highlighted
 panel$kind <- ifelse(panel$treated_unit == 1, "treated", "donor")
@@ -259,7 +283,7 @@ p02 <- ggplot() +
              aes(year, gdp_index), colour = NEAR_BLACK, size = 1.6) +
   scale_colour_brewer(palette = "Set1") +
   labs(title = "One simulated panel, three jobs",
-       subtitle = "15 donors (grey) and 5 treated units adopting in 2010, 2013 and 2016 (dots mark adoption)",
+       subtitle = "20 donors (grey) and 5 treated units adopting in 2010, 2013 and 2016 (dots mark adoption)",
        x = "Year", y = "Outcome 1 (gdp_index)",
        caption = "synthetic_panel_multicountry.csv — used for single_augsynth, multisynth and augsynth_multiout") +
   theme_site()
@@ -280,19 +304,31 @@ sc_plain <- augsynth(gdp_index ~ trt, country, year, sim_single,
 sc_ridge <- augsynth(gdp_index ~ trt, country, year, sim_single,
                      t_int = adopt[["C01"]], progfunc = "ridge", scm = TRUE)
 
+# single_augsynth inference. We report two complementary tools:
+#   * jackknife+ -> a robust confidence interval for the average effect (primary);
+#   * conformal  -> a p-value for H0 (no effect) plus a pointwise band over time.
 sum_plain <- summary(sc_plain, inf_type = "conformal")
 sum_ridge <- summary(sc_ridge, inf_type = "conformal")
 att_plain <- sum_plain$average_att$Estimate
 att_ridge <- sum_ridge$average_att$Estimate
 p_plain   <- sum_plain$average_att$p_val
+p_ridge   <- sum_ridge$average_att$p_val
+jk_plain  <- summary(sc_plain, inf_type = "jackknife+")$average_att
+jk_ridge  <- summary(sc_ridge, inf_type = "jackknife+")$average_att
+ci_plain  <- c(jk_plain$lower_bound, jk_plain$upper_bound)
+ci_ridge  <- c(jk_ridge$lower_bound, jk_ridge$upper_bound)
+sig_plain <- sign(ci_plain[1]) == sign(ci_plain[2])
+sig_ridge <- sign(ci_ridge[1]) == sign(ci_ridge[2])
 true_att_c01 <- mean(panel$true_effect_gdp[panel$country == "C01" &
                                              panel$year >= adopt[["C01"]]])
 
 cat(sprintf("C01 true average post ATT      : %+.3f\n", true_att_c01))
-cat(sprintf("Plain SCM   estimated avg ATT  : %+.3f  (p=%.3f, scaled L2 pre-fit=%.3f)\n",
-            att_plain, p_plain, sc_plain$scaled_l2_imbalance))
-cat(sprintf("Ridge-ASCM  estimated avg ATT  : %+.3f  (scaled L2 pre-fit=%.3f, lambda=%.4f)\n",
-            att_ridge, sc_ridge$scaled_l2_imbalance, sc_ridge$lambda))
+cat(sprintf("Plain SCM   avg ATT  : %+.3f  jackknife+ [%.3f, %.3f] %s | conformal p=%.4f | L2=%.3f\n",
+            att_plain, ci_plain[1], ci_plain[2], ifelse(sig_plain, "SIG", "ns"),
+            p_plain, sc_plain$scaled_l2_imbalance))
+cat(sprintf("Ridge-ASCM  avg ATT  : %+.3f  jackknife+ [%.3f, %.3f] %s | conformal p=%.4f | L2=%.3f lambda=%.2f\n",
+            att_ridge, ci_ridge[1], ci_ridge[2], ifelse(sig_ridge, "SIG", "ns"),
+            p_ridge, sc_ridge$scaled_l2_imbalance, sc_ridge$lambda))
 
 lv_plain <- synth_levels(sc_plain, sim_single, "country", "year", "gdp_index", "C01")
 lv_ridge <- synth_levels(sc_ridge, sim_single, "country", "year", "gdp_index", "C01")
@@ -351,7 +387,9 @@ cat("Top C01 donor weights:\n"); print(head(sim_donor_weights, 6))
 results$single <- list(
   unit = "C01", adopt = adopt[["C01"]], true_att = round(true_att_c01, 3),
   att_plain = round(att_plain, 3), att_ridge = round(att_ridge, 3),
-  p_plain = p_plain,
+  p_plain = p_plain, p_ridge = p_ridge,
+  ci_plain = round(ci_plain, 3), ci_ridge = round(ci_ridge, 3),
+  sig_plain = isTRUE(sig_plain), sig_ridge = isTRUE(sig_ridge),
   scaled_l2_plain = round(sc_plain$scaled_l2_imbalance, 3),
   scaled_l2_ridge = round(sc_ridge$scaled_l2_imbalance, 3),
   series = list(time = lv_plain$time, actual = round(lv_plain$actual, 3),
@@ -372,17 +410,28 @@ sim_multi <- panel %>%
   as.data.frame()
 
 ms_sim <- multisynth(gdp_index ~ treat_ms, country, year, sim_multi)
+# multisynth offers TWO inference methods. The leave-one-out JACKKNIFE is the
+# natural interval for the average effect across treated units and is our primary
+# report; the WILD BOOTSTRAP is more conservative (it also propagates the
+# counterfactual-estimation uncertainty) and we keep it as a comparison. Reporting
+# both makes the point that the inference method can change the verdict.
+ms_jack <- summary(ms_sim, inf_type = "jackknife")
 set.seed(20260605)
-ms_sim_sum <- summary(ms_sim, inf_type = "bootstrap")
-att_ms <- as.data.frame(ms_sim_sum$att)
+ms_boot <- summary(ms_sim, inf_type = "bootstrap")
+att_ms   <- as.data.frame(ms_jack$att)    # primary bands = jackknife
+att_boot <- as.data.frame(ms_boot$att)    # conservative comparison
 
-# Overall (Time == NA) average ATT per level
+# Overall (Time == NA) average ATT per level — jackknife bounds + bootstrap bounds
 overall <- att_ms[is.na(att_ms$Time), c("Level", "Estimate", "Std.Error",
                                         "lower_bound", "upper_bound")]
+ob <- att_boot[is.na(att_boot$Time), c("Level", "lower_bound", "upper_bound")]
+names(ob) <- c("Level", "boot_lo", "boot_hi")
+overall <- merge(overall, ob, by = "Level", sort = FALSE)
+overall <- overall[match(att_ms$Level[is.na(att_ms$Time)], overall$Level), ]
 # True per-unit and pooled averages from the KNOWN effects, computed over the
 # SAME common post-treatment window multisynth averages over (leads 0..n_leads-1)
 # so the comparison is apples-to-apples.
-n_leads_sim <- ms_sim_sum$n_leads
+n_leads_sim <- ms_jack$n_leads
 true_unit <- sapply(treated, function(u) {
   yrs <- adopt[[u]] + seq_len(n_leads_sim) - 1
   mean(panel$true_effect_gdp[panel$country == u & panel$year %in% yrs])
@@ -390,16 +439,29 @@ true_unit <- sapply(treated, function(u) {
 true_pooled <- mean(unlist(true_unit))
 
 cat(sprintf("multisynth nu (auto) = %.3f ; global scaled L2 = %.3f ; n_leads = %d\n",
-            ms_sim$nu, ms_sim_sum$scaled_global_l2, n_leads_sim))
-cat("\nEstimated vs TRUE average post-treatment ATT (over the common n_leads window):\n")
+            ms_sim$nu, ms_jack$scaled_global_l2, n_leads_sim))
+cat("\nEstimated vs TRUE average ATT (common n_leads window); jackknife CI + bootstrap CI:\n")
 ms_compare <- data.frame(
   level = overall$Level,
   estimate = round(overall$Estimate, 3),
   ci_lo = round(overall$lower_bound, 3),
   ci_hi = round(overall$upper_bound, 3),
+  boot_lo = round(overall$boot_lo, 3),
+  boot_hi = round(overall$boot_hi, 3),
   truth = round(c(Average = true_pooled, true_unit)[overall$Level], 3))
+ms_compare$sig_jack <- sign(ms_compare$ci_lo) == sign(ms_compare$ci_hi)
+ms_compare$sig_boot <- sign(ms_compare$boot_lo) == sign(ms_compare$boot_hi)
 print(ms_compare, row.names = FALSE)
-write.csv(att_ms, "sim_multisynth_att.csv", row.names = FALSE)
+cat(sprintf("\nPooled average — jackknife: %+.3f [%.3f, %.3f] %s | bootstrap: [%.3f, %.3f] %s\n",
+            ms_compare$estimate[ms_compare$level == "Average"],
+            ms_compare$ci_lo[ms_compare$level == "Average"],
+            ms_compare$ci_hi[ms_compare$level == "Average"],
+            ifelse(ms_compare$sig_jack[ms_compare$level == "Average"], "SIGNIFICANT", "ns"),
+            ms_compare$boot_lo[ms_compare$level == "Average"],
+            ms_compare$boot_hi[ms_compare$level == "Average"],
+            ifelse(ms_compare$sig_boot[ms_compare$level == "Average"], "significant", "ns")))
+write.csv(att_ms,   "sim_multisynth_att.csv",      row.names = FALSE)
+write.csv(att_boot, "sim_multisynth_att_boot.csv", row.names = FALSE)
 
 # Figure 05 — per-unit estimated vs true effect (relative time small multiples)
 att_units <- att_ms[!is.na(att_ms$Time) & att_ms$Level != "Average", ]
@@ -421,12 +483,16 @@ p05 <- ggplot(att_units, aes(Time)) +
   labs(title = "multisynth: per-unit treatment effects, staggered adoption",
        subtitle = "Effect by time relative to each unit's adoption year (0 = adoption). C05's effect is negative by design",
        x = "Years since adoption", y = "Effect on gdp_index",
-       caption = "Bands = wild-bootstrap intervals. Each panel is one treated unit.") +
+       caption = "Bands = jackknife intervals. Each panel is one treated unit.") +
   theme_site()
 save_fig(p05, "r_sc_multi_country_05_multisynth_percountry.png", h = 4.5)
 
-# Figure 06 — pooled average effect + bootstrap band vs true pooled
+# Figure 06 — pooled average effect with BOTH inference bands vs true pooled
 avg_path <- att_ms[att_ms$Level == "Average" & !is.na(att_ms$Time), ]
+avg_boot <- att_boot[att_boot$Level == "Average" & !is.na(att_boot$Time),
+                     c("Time", "lower_bound", "upper_bound")]
+names(avg_boot) <- c("Time", "boot_lo", "boot_hi")
+avg_path <- merge(avg_path, avg_boot, by = "Time")
 avg_path$true <- sapply(avg_path$Time, function(tt) {
   vals <- sapply(treated, function(u) {
     y <- adopt[[u]] + tt
@@ -436,26 +502,36 @@ avg_path$true <- sapply(avg_path$Time, function(tt) {
 p06 <- ggplot(avg_path, aes(Time)) +
   geom_hline(yintercept = 0, colour = "grey70") +
   geom_vline(xintercept = 0, linetype = "dashed", colour = NEAR_BLACK) +
-  geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), fill = STEEL_BLUE, alpha = 0.2) +
+  geom_ribbon(aes(ymin = boot_lo, ymax = boot_hi, fill = "Wild bootstrap (conservative)"),
+              alpha = 0.16) +
+  geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound, fill = "Jackknife (primary)"),
+              alpha = 0.30) +
   geom_line(aes(y = Estimate, colour = "Pooled estimate"), linewidth = 1.1) +
   geom_line(aes(y = true, colour = "True pooled effect"), linetype = "22", linewidth = 0.9) +
   scale_colour_manual(values = c("Pooled estimate" = STEEL_BLUE,
                                  "True pooled effect" = NEAR_BLACK)) +
+  scale_fill_manual(values = c("Jackknife (primary)" = STEEL_BLUE,
+                               "Wild bootstrap (conservative)" = WARM_ORANGE)) +
   labs(title = "multisynth: the pooled average effect across treated units",
-       subtitle = "Partially-pooled ATT by time since adoption, with wild-bootstrap confidence band",
+       subtitle = "Partially-pooled ATT by time since adoption; the jackknife band is tighter than the wild bootstrap",
        x = "Years since adoption", y = "Average effect on gdp_index",
-       caption = "The pooled path averages five heterogeneous units, including C05's negative effect.") +
+       caption = "Two inference methods: the jackknife (blue) excludes zero post-adoption; the wild bootstrap (orange) is wider.") +
   theme_site()
 save_fig(p06, "r_sc_multi_country_06_multisynth_pooled.png")
 
 results$multi <- list(
-  nu = round(ms_sim$nu, 3), scaled_global_l2 = round(ms_sim_sum$scaled_global_l2, 3),
+  nu = round(ms_sim$nu, 3), scaled_global_l2 = round(ms_jack$scaled_global_l2, 3),
+  inference = "jackknife (primary) and wild bootstrap (conservative comparison)",
   overall = list(level = ms_compare$level, estimate = ms_compare$estimate,
                  ci_lo = ms_compare$ci_lo, ci_hi = ms_compare$ci_hi,
+                 boot_lo = ms_compare$boot_lo, boot_hi = ms_compare$boot_hi,
+                 sig_jack = ms_compare$sig_jack, sig_boot = ms_compare$sig_boot,
                  truth = ms_compare$truth),
   pooled_path = list(time = avg_path$Time, est = round(avg_path$Estimate, 3),
                      lo = round(avg_path$lower_bound, 3),
                      hi = round(avg_path$upper_bound, 3),
+                     boot_lo = round(avg_path$boot_lo, 3),
+                     boot_hi = round(avg_path$boot_hi, 3),
                      true = round(avg_path$true, 3)))
 
 
@@ -465,15 +541,25 @@ rule("PART 1e: augsynth_multiout on C01 (two outcomes)")
 mo_sim <- augsynth_multiout(gdp_index + trade_index ~ trt, country, year,
                             adopt[["C01"]], sim_single,
                             progfunc = "None", scm = TRUE, combine_method = "avg")
-mo_sum <- summary(mo_sim)
-cat("Joint (multi-outcome) average ATT by outcome:\n"); print(mo_sum$average_att)
+# augsynth_multiout uses conformal inference. summary() defaults to grid_size = 1,
+# which returns a valid per-outcome p-value but leaves the average CI as NA
+# (a full CI needs grid_size > 1, costing grid_size^n_outcomes evaluations and,
+# for large effects, returning degenerate bounds). We therefore report the
+# conformal p-value per outcome here, with the pointwise band from the single fits.
+mo_sum <- summary(mo_sim)   # grid_size = 1 -> fast, p-value per outcome
+cat("Joint (multi-outcome) average ATT by outcome (conformal p-values):\n")
+print(mo_sum$average_att)
+mo_p_gdp   <- mo_sum$average_att$p_val[mo_sum$average_att$Outcome == "gdp_index"]
+mo_p_trade <- mo_sum$average_att$p_val[mo_sum$average_att$Outcome == "trade_index"]
 
 true_att_trade_c01 <- mean(panel$true_effect_trade[panel$country == "C01" &
                                                     panel$year >= adopt[["C01"]]])
-cat(sprintf("\nTrue gdp_index ATT  : %+.3f  |  multiout estimate: %+.3f\n",
-            true_att_c01, mo_sum$average_att$Estimate[mo_sum$average_att$Outcome == "gdp_index"]))
-cat(sprintf("True trade_index ATT: %+.3f  |  multiout estimate: %+.3f\n",
-            true_att_trade_c01, mo_sum$average_att$Estimate[mo_sum$average_att$Outcome == "trade_index"]))
+cat(sprintf("\nTrue gdp_index ATT  : %+.3f  |  multiout estimate: %+.3f  (conformal p=%.4f, %s)\n",
+            true_att_c01, mo_sum$average_att$Estimate[mo_sum$average_att$Outcome == "gdp_index"],
+            mo_p_gdp, ifelse(mo_p_gdp < 0.05, "SIGNIFICANT", "ns")))
+cat(sprintf("True trade_index ATT: %+.3f  |  multiout estimate: %+.3f  (conformal p=%.4f, %s)\n",
+            true_att_trade_c01, mo_sum$average_att$Estimate[mo_sum$average_att$Outcome == "trade_index"],
+            mo_p_trade, ifelse(mo_p_trade < 0.05, "SIGNIFICANT", "ns")))
 
 # Figure 07 — two-panel actual vs synthetic for both outcomes
 mo_pred <- predict(mo_sim, att = FALSE)   # matrix: columns per outcome
@@ -502,8 +588,10 @@ p07 <- ggplot(df07, aes(time, value, colour = series)) +
 save_fig(p07, "r_sc_multi_country_07_multiout_two_panel.png", h = 4.5)
 
 results$multiout <- list(
-  unit = "C01",
+  unit = "C01", inference = "conformal p-value per outcome (grid_size = 1)",
   outcomes = as.list(setNames(round(mo_sum$average_att$Estimate, 3), mo_sum$average_att$Outcome)),
+  pvals = list(gdp_index = mo_p_gdp, trade_index = mo_p_trade),
+  sig = list(gdp_index = isTRUE(mo_p_gdp < 0.05), trade_index = isTRUE(mo_p_trade < 0.05)),
   truth = list(gdp_index = round(true_att_c01, 3), trade_index = round(true_att_trade_c01, 3)))
 
 
@@ -530,16 +618,23 @@ recovery <- map_dfr(treated, function(u) {
   fr <- augsynth(gdp_index ~ trt, country, year, d, t_int = adopt[[u]],
                  progfunc = "ridge", scm = TRUE)
   tr <- mean(panel$true_effect_gdp[panel$country == u & panel$year >= adopt[[u]]])
+  ap <- summary(fp)$average_att$Estimate
+  jp <- summary(fp, inf_type = "jackknife+")$average_att
   data.frame(unit = u, adopt = adopt[[u]], true_att = tr,
-             att_plain = summary(fp)$average_att$Estimate,
+             att_plain = ap,
              att_ridge = summary(fr)$average_att$Estimate,
+             ci_lo = jp$lower_bound, ci_hi = jp$upper_bound,
+             p_plain = summary(fp, inf_type = "conformal")$average_att$p_val,
+             sign_flip = sign(ap) != sign(tr),
              prefit_l2_plain = fp$scaled_l2_imbalance,
              prefit_l2_ridge = fr$scaled_l2_imbalance)
 })
 recovery$err_plain <- abs(recovery$att_plain - recovery$true_att)
 recovery$err_ridge <- abs(recovery$att_ridge - recovery$true_att)
-recovery[ , -1] <- round(recovery[ , -1], 3)
-cat("Recovery table (|estimate - truth| in last two columns):\n")
+recovery$sig_plain <- sign(recovery$ci_lo) == sign(recovery$ci_hi)   # jackknife+ CI excludes 0
+num_cols <- sapply(recovery, is.numeric)
+recovery[ , num_cols] <- round(recovery[ , num_cols], 3)
+cat("Recovery table (jackknife+ CI [ci_lo,ci_hi]; conformal p_plain; sign_flip = plain mis-signs):\n")
 print(recovery, row.names = FALSE)
 write.csv(recovery, "sim_recovery_table.csv", row.names = FALSE)
 cat(sprintf("\nMean recovery error  — plain SCM: %.3f  | Ridge-ASCM: %.3f\n",
@@ -632,10 +727,18 @@ ger_lvp <- synth_levels(ger_plain, emu %>% filter(country == "Germany" | treat =
                         "country", "year", "tfp", "Germany")
 ger_lvr <- synth_levels(ger_ridge, emu %>% filter(country == "Germany" | treat == 0),
                         "country", "year", "tfp", "Germany")
-cat(sprintf("Germany plain SCM avg ATT (TFP level): %+.3f | scaled L2 pre-fit %.3f\n",
-            summary(ger_plain)$average_att$Estimate, ger_plain$scaled_l2_imbalance))
-cat(sprintf("Germany Ridge-ASCM avg ATT (TFP level): %+.3f | scaled L2 pre-fit %.3f\n",
-            summary(ger_ridge)$average_att$Estimate, ger_ridge$scaled_l2_imbalance))
+# Inference for Germany (real data — reported honestly): jackknife+ CI + conformal p
+ger_p_plain <- summary(ger_plain, inf_type = "conformal")$average_att$p_val
+ger_p_ridge <- summary(ger_ridge, inf_type = "conformal")$average_att$p_val
+ger_jk <- summary(ger_plain, inf_type = "jackknife+")$average_att
+ger_ci <- c(ger_jk$lower_bound, ger_jk$upper_bound)
+ger_sig <- sign(ger_ci[1]) == sign(ger_ci[2])
+cat(sprintf("Germany plain SCM avg ATT (TFP): %+.3f | jackknife+ [%.3f, %.3f] %s | conformal p=%.4f | L2 %.3f\n",
+            summary(ger_plain)$average_att$Estimate, ger_ci[1], ger_ci[2],
+            ifelse(ger_sig, "significant", "ns"), ger_p_plain, ger_plain$scaled_l2_imbalance))
+cat(sprintf("Germany Ridge-ASCM avg ATT (TFP): %+.3f | conformal p=%.4f (%s) | L2 %.3f\n",
+            summary(ger_ridge)$average_att$Estimate, ger_p_ridge,
+            ifelse(ger_p_ridge < 0.05, "significant", "not significant"), ger_ridge$scaled_l2_imbalance))
 cat(sprintf("Germany %% effect — 2000-07: %+.1f%%   2008-17: %+.1f%%  (plain SCM)\n",
             pct_effect(ger_lvp, 2000, 2007), pct_effect(ger_lvp, 2008, 2017)))
 
@@ -677,13 +780,22 @@ rule("PART 2d: multisynth — pooled 12-country ATT + per-country fits")
 
 emu_multi <- emu %>% select(country, year, trt99, tfp) %>% as.data.frame()
 ms_emu <- multisynth(tfp ~ trt99, country, year, emu_multi)
+# Same two inference methods as the simulated panel, reported honestly for the
+# real data: jackknife (primary) and the conservative wild bootstrap.
+ms_emu_jack <- summary(ms_emu, inf_type = "jackknife")
 set.seed(20260605)
-ms_emu_sum <- summary(ms_emu, inf_type = "bootstrap")
-att_emu <- as.data.frame(ms_emu_sum$att)
+ms_emu_boot <- summary(ms_emu, inf_type = "bootstrap")
+att_emu <- as.data.frame(ms_emu_jack$att)        # primary bands = jackknife
+att_emu_boot <- as.data.frame(ms_emu_boot$att)
 pooled_emu <- att_emu[att_emu$Level == "Average" & is.na(att_emu$Time), ]
-cat(sprintf("Pooled EMU average ATT (TFP level): %+.3f  [%.3f, %.3f]; scaled global L2 = %.3f\n",
+pooled_emu_b <- att_emu_boot[att_emu_boot$Level == "Average" & is.na(att_emu_boot$Time), ]
+emu_sig_jack <- sign(pooled_emu$lower_bound) == sign(pooled_emu$upper_bound)
+emu_sig_boot <- sign(pooled_emu_b$lower_bound) == sign(pooled_emu_b$upper_bound)
+cat(sprintf("Pooled EMU avg ATT (TFP): %+.3f | jackknife [%.3f, %.3f] %s | bootstrap [%.3f, %.3f] %s | global L2 = %.3f\n",
             pooled_emu$Estimate, pooled_emu$lower_bound, pooled_emu$upper_bound,
-            ms_emu_sum$scaled_global_l2))
+            ifelse(emu_sig_jack, "significant", "ns"),
+            pooled_emu_b$lower_bound, pooled_emu_b$upper_bound,
+            ifelse(emu_sig_boot, "significant", "ns"), ms_emu_jack$scaled_global_l2))
 write.csv(att_emu, "emu_multisynth_att.csv", row.names = FALSE)
 
 # Per-country single fits → ATT, % effects, donor weights, level series
@@ -716,17 +828,23 @@ print(emu_single, row.names = FALSE)
 write.csv(emu_single, "emu_single_att.csv", row.names = FALSE)
 write.csv(bind_rows(emu_weights), "emu_donor_weights.csv", row.names = FALSE)
 
-# Figure 12 — pooled EMU average ATT by lead
+# Figure 12 — pooled EMU average ATT by lead (jackknife + bootstrap bands)
 emu_path <- att_emu[att_emu$Level == "Average" & !is.na(att_emu$Time), ]
+emu_path_b <- att_emu_boot[att_emu_boot$Level == "Average" & !is.na(att_emu_boot$Time),
+                           c("Time", "lower_bound", "upper_bound")]
+names(emu_path_b) <- c("Time", "boot_lo", "boot_hi")
+emu_path <- merge(emu_path, emu_path_b, by = "Time")
 p12 <- ggplot(emu_path, aes(Time)) +
   geom_hline(yintercept = 0, colour = "grey70") +
   geom_vline(xintercept = 0, linetype = "dashed", colour = NEAR_BLACK) +
-  geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound), fill = STEEL_BLUE, alpha = 0.2) +
+  geom_ribbon(aes(ymin = boot_lo, ymax = boot_hi, fill = "Wild bootstrap"), alpha = 0.16) +
+  geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound, fill = "Jackknife"), alpha = 0.28) +
   geom_line(aes(y = Estimate), colour = STEEL_BLUE, linewidth = 1.1) +
+  scale_fill_manual(values = c("Jackknife" = STEEL_BLUE, "Wild bootstrap" = WARM_ORANGE)) +
   labs(title = "multisynth: the pooled EMU effect on TFP",
-       subtitle = "Average treatment effect across all 12 EMU members by years since the 1999 euro launch",
+       subtitle = "Average TFP effect across all 12 EMU members by years since the 1999 euro launch",
        x = "Years since 1999", y = "Average effect on TFP",
-       caption = "Wild-bootstrap confidence band. All 12 members adopt simultaneously (a block design).") +
+       caption = "Both bands include zero in the long run — the near-zero pooled effect is not statistically significant.") +
   theme_site()
 save_fig(p12, "r_sc_multi_country_12_emu_pooled_att.png")
 
@@ -754,8 +872,14 @@ d_ger <- emu %>% filter(country == "Germany" | treat == 0) %>% as.data.frame()
 d_ger$.trt <- d_ger$trt99
 ger_mo <- augsynth_multiout(tfp + prod_gap ~ .trt, country, year, 1999, d_ger,
                             progfunc = "None", scm = TRUE, combine_method = "concat")
-ger_mo_sum <- summary(ger_mo)
-cat("Germany joint TFP + prod_gap average ATT:\n"); print(ger_mo_sum$average_att)
+ger_mo_sum <- summary(ger_mo)   # conformal p-value per outcome (grid_size = 1)
+cat("Germany joint TFP + prod_gap average ATT (conformal p-values):\n")
+print(ger_mo_sum$average_att)
+ger_mo_p_tfp <- ger_mo_sum$average_att$p_val[ger_mo_sum$average_att$Outcome == "tfp"]
+ger_mo_p_pg  <- ger_mo_sum$average_att$p_val[ger_mo_sum$average_att$Outcome == "prod_gap"]
+cat(sprintf("TFP outcome: conformal p=%.4f (%s) | prod_gap: conformal p=%.4f (%s)\n",
+            ger_mo_p_tfp, ifelse(ger_mo_p_tfp < 0.05, "significant", "not significant"),
+            ger_mo_p_pg,  ifelse(ger_mo_p_pg  < 0.05, "significant", "not significant")))
 write.csv(ger_mo_sum$average_att, "emu_multiout_att.csv", row.names = FALSE)
 
 fit_pg <- augsynth(prod_gap ~ .trt, country, year, d_ger, t_int = 1999,
@@ -838,10 +962,19 @@ results$emu <- list(
   members = emu_members, donors = donors_emu,
   pooled_att = round(pooled_emu$Estimate, 3),
   pooled_ci = c(round(pooled_emu$lower_bound, 3), round(pooled_emu$upper_bound, 3)),
+  pooled_ci_boot = c(round(pooled_emu_b$lower_bound, 3), round(pooled_emu_b$upper_bound, 3)),
+  pooled_sig_jack = isTRUE(emu_sig_jack), pooled_sig_boot = isTRUE(emu_sig_boot),
   pooled_path = list(time = emu_path$Time, est = round(emu_path$Estimate, 3),
-                     lo = round(emu_path$lower_bound, 3), hi = round(emu_path$upper_bound, 3)),
+                     lo = round(emu_path$lower_bound, 3), hi = round(emu_path$upper_bound, 3),
+                     boot_lo = round(emu_path$boot_lo, 3), boot_hi = round(emu_path$boot_hi, 3)),
+  multiout = list(tfp_p = ger_mo_p_tfp, prod_gap_p = ger_mo_p_pg,
+                  tfp_sig = isTRUE(ger_mo_p_tfp < 0.05),
+                  prod_gap_sig = isTRUE(ger_mo_p_pg < 0.05)),
   germany = list(att_plain = round(summary(ger_plain)$average_att$Estimate, 3),
                  att_ridge = round(summary(ger_ridge)$average_att$Estimate, 3),
+                 p_plain = ger_p_plain, p_ridge = ger_p_ridge,
+                 ci_plain = round(ger_ci, 3),
+                 sig_plain = isTRUE(ger_sig), sig_ridge = isTRUE(ger_p_ridge < 0.05),
                  pct_2000_07 = round(pct_effect(ger_lvp, 2000, 2007), 1),
                  pct_2008_17 = round(pct_effect(ger_lvp, 2008, 2017), 1),
                  series = list(time = ger_lvp$time, actual = round(ger_lvp$actual, 3),

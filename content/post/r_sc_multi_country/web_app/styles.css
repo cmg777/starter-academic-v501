@@ -535,3 +535,48 @@ table.balance tr:hover { background: rgba(106, 155, 204, 0.08); }
 
 /* keep wide result tables inside their card on narrow screens */
 #multi-table, #emu-table { overflow-x: auto; }
+
+/* ---- significance badges (inference) ---- */
+.sig-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 10px;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.sig-badge.yes { background: rgba(0, 212, 200, 0.18); color: var(--teal); }
+.sig-badge.no  { background: rgba(232, 236, 242, 0.10); color: var(--muted); }
+.sig-badge.warn { background: rgba(217, 119, 87, 0.18); color: var(--orange); }
+
+/* compact "significance scoreboard" rows on the Inference tab */
+.score-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1.3fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 14px;
+}
+.score-row:last-child { border-bottom: none; }
+.score-row .fn { color: var(--text); font-weight: 600; }
+.score-row .fn code { color: var(--teal); font-size: 12px; }
+.score-row .est { color: var(--text); font-variant-numeric: tabular-nums; }
+.score-row .ci  { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
+@media (max-width: 720px) {
+  .score-row { grid-template-columns: 1fr auto; row-gap: 4px; }
+  .score-row .ci, .score-row .est { grid-column: 1; }
+}
+
+/* simulator readout line */
+.sim-readout {
+  display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: baseline;
+  margin: 4px 0 2px; font-variant-numeric: tabular-nums;
+}
+.sim-readout .k { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+.sim-readout .v { color: var(--text); font-size: 18px; font-weight: 700; }
+.sim-readout .v.teal { color: var(--teal); }
+.sim-readout .v.orange { color: var(--orange); }

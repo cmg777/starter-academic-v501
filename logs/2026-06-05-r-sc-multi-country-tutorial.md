@@ -76,3 +76,54 @@ Builds clean on the pinned Hugo **0.111.3**.
 - **Docs updated** so future posts can reuse the patterns: CLAUDE.md gained a *Slides (PDF)
   link button* section (absolute-URL/new-tab + why-not-`url_slides` theme nuance) and an AI
   Podcast reference entry; README gained a *Post Resource Buttons* note.
+
+## Update (same day) — significant effects + a real inference layer
+
+The first cut recovered point estimates accurately but **almost nothing was statistically
+significant**, and the post/web-app barely explained inference. Revised end-to-end:
+
+- **New DGP** (`analysis.R`): effect is now a **jump at adoption + a gentle ramp**;
+  treated units C01–C04 are **sparse 3-donor blends** (clean fit), C05 stays outside the
+  hull with a small negative effect; **20 donors / 25 units, 1985–2023** (a long
+  pre-period — the real lever for conformal power). Verified by four calibration probes
+  before the full run.
+- **Inference fixed and expanded** — the diagnosis was that *the inference method*, not the
+  data, drove non-significance:
+  - `single_augsynth` → **jackknife+ CI** (robust, primary) + **conformal** p-value. The
+    conformal permutation p-value is realisation-noisy and weak with a long post-window;
+    jackknife+ is stable. C01: +6.24, jackknife+ [5.998, 6.506], p < 0.001.
+  - `multisynth` → **jackknife** (primary, significant: pooled [0.689, 5.754]) **+ wild
+    bootstrap** (conservative, [−2.468, 9.779], n.s.). Reporting both is the teaching point:
+    *the inference method can change the verdict.* (Bootstrap is augsynth's default but is
+    very wide on few treated units; more donors made it *wider*, not tighter.)
+  - `augsynth_multiout` → **conformal p-value per outcome** (grid_size = 1; both p < 0.001).
+    `grid_size > 1` is ~5 min/call AND returns degenerate `±Inf` bounds, so CIs stay NA — a
+    real limitation, documented.
+  - EMU kept **honest**: Germany borderline (conformal p = 0.027 but jackknife+ CI includes
+    zero), pooled euro effect −0.016 n.s. under both methods, joint Germany multiout p = 0.60.
+- **Post** (`index.md`): new **"## 9. Inference: is the effect real?"** section (sections
+  renumbered 9→20); every number updated; explicit significance interpretation throughout;
+  mermaid pipeline gained an inference node. Build clean on Hugo 0.111.3, **0 MathJax
+  errors**, mermaid renders.
+- **Web app**: new **5th "Inference" tab** (significance scoreboard + slider-driven
+  simulator that flips the verdict at p = 0.05), significance **badges** on the single/multi
+  tabs, a **forest plot** (per-unit + pooled jackknife CIs), and the multi table now shows
+  jackknife vs bootstrap. Headless Chromium across all 5 tabs, desktop + mobile, **0 errors**.
+- **Downstream regenerated**: `results_report.md`, `execution_log.txt`, `tutorial.qmd`
+  (+ rebuilt `r_sc_multi_country.zip`), `infographic_instructions.md`. ES/JA stubs unchanged
+  (generic summary); `scripts/i18n-parity.sh` → **0 gaps**.
+- **Audited**: an adversarial numeric fact-check (every estimate/CI/p-value/significance
+  claim cross-checked against `execution_log.txt` + `results.json`) → **PASS**; a
+  writing/structure review → **ACCEPT**.
+
+### Inference gotchas worth remembering
+
+- augsynth's **conformal** average-effect p-value is a permutation test: high-variance
+  across DGP realisations and **low-power when the post-window is long relative to the
+  pre-period**. A long pre-period (start 1985) fixes it; effect size and pre-fit alone do not.
+- For a *single* treated unit, **`jackknife+`** gives a reliable average-effect CI; prefer it
+  over conformal when you need significance you can count on.
+- **`multisynth` jackknife vs wild bootstrap** answer different questions (between-unit
+  variance vs also-the-counterfactual-uncertainty); report both when they disagree.
+- **`augsynth_multiout`** has no usable average CI (NA at grid_size = 1; `±Inf`/slow at
+  grid_size > 1) — report the conformal p-value per outcome.
