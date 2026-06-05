@@ -2839,3 +2839,26 @@ body:not(.dark) .cz-footer a:hover { color: #0a7d75; }                /* footer 
   letter-spacing: 0.02em;
 }
 
+
+/* --- 23. Mermaid diagrams — dark-mode contrast fix ---
+   Wowchemy re-initialises Mermaid with theme:'dark' in dark mode (see the
+   theme's wowchemy-theming.js). Mermaid's `style <id> fill:...` directives only
+   reach RECT-shaped nodes; decision rhombi — and any node without an explicit
+   fill — fall back to the near-black dark-theme default (#1f2020). The visible
+   (HTML) node-label text renders DARK in both modes, so on that near-black
+   rhombus it becomes invisible "black text on a black box". (This Mermaid
+   version also silently ignores per-node `color:` directives.) Fix: give every
+   node shape WITHOUT an inline fill a LIGHT lavender panel — the same fill
+   Mermaid uses for rhombi in light mode — so the dark label text stays legible.
+   Explicit inline fills (the rects) keep winning via `:not([style*="fill"])`,
+   the dark label text is left as-is, and light mode is untouched. --- */
+body.dark .mermaid {
+  .node polygon:not([style*="fill"]),
+  .node rect:not([style*="fill"]),
+  .node circle:not([style*="fill"]),
+  .node ellipse:not([style*="fill"]),
+  .node path:not([style*="fill"]) {
+    fill: #ececff !important;   /* light lavender panel — legible with dark label text */
+    stroke: #6a9bcc !important; /* steel-blue border for definition */
+  }
+}
