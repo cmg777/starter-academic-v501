@@ -1,0 +1,242 @@
+
+==============================================================================
+PART 1a: Two-country intuition
+==============================================================================
+Saved synthetic_panel_2country_intuition.csv (48 rows)
+Mean post-2012 gap (treated - control): 9.60  | true mean effect: 9.75
+  [figure] r_sc_multi_country_01_two_country_intuition.png
+
+==============================================================================
+PART 1b: Build & save the reusable multi-country panel
+==============================================================================
+Saved synthetic_panel_multicountry.csv: 20 units x 24 years = 480 rows
+Adoption schedule:  C01  C02  C03  C04  C05 
+2010 2010 2013 2016 2016 
+True outcome-1 ramps (per year):   C01   C02   C03   C04   C05 
+ 0.40  0.30  0.50  0.20 -0.35 
+  [figure] r_sc_multi_country_02_sim_panel_paths.png
+
+==============================================================================
+PART 1c: single_augsynth on C01 (plain SCM vs Ridge-ASCM)
+==============================================================================
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+C01 true average post ATT      : +2.600
+Plain SCM   estimated avg ATT  : +2.651  (p=0.329, scaled L2 pre-fit=0.407)
+Ridge-ASCM  estimated avg ATT  : +2.651  (scaled L2 pre-fit=0.406, lambda=803.0450)
+  [figure] r_sc_multi_country_03_single_actual_vs_synth.png
+  [figure] r_sc_multi_country_04_single_gap_conformal.png
+Top C01 donor weights:
+  donor weight
+1   C14 0.2296
+2   C08 0.2124
+3   C10 0.2090
+4   C06 0.1901
+5   C16 0.1515
+6   C09 0.0075
+
+==============================================================================
+PART 1d: multisynth on 5 treated units (staggered)
+==============================================================================
+multisynth nu (auto) = 0.570 ; global scaled L2 = 0.060 ; n_leads = 8
+
+Estimated vs TRUE average post-treatment ATT (over the common n_leads window):
+   level estimate  ci_lo ci_hi  truth
+ Average    0.718 -0.537 2.264  0.735
+     C01    1.494 -1.688 4.639  1.400
+     C02    1.140 -1.555 3.556  1.050
+     C03    1.831 -2.089 5.670  1.750
+     C04    0.592 -0.554 1.694  0.700
+     C05   -1.468 -4.656 1.671 -1.225
+  [figure] r_sc_multi_country_05_multisynth_percountry.png
+Warning message:
+Removed 15 rows containing missing values or values outside the scale range
+(`geom_line()`). 
+  [figure] r_sc_multi_country_06_multisynth_pooled.png
+
+==============================================================================
+PART 1e: augsynth_multiout on C01 (two outcomes)
+==============================================================================
+Joint (multi-outcome) average ATT by outcome:
+      Outcome Estimate lower_bound upper_bound p_val
+1   gdp_index 2.708674          NA          NA 0.376
+2 trade_index 1.720435          NA          NA 0.376
+
+True gdp_index ATT  : +2.600  |  multiout estimate: +2.709
+True trade_index ATT: +1.560  |  multiout estimate: +1.720
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+  [figure] r_sc_multi_country_07_multiout_two_panel.png
+
+==============================================================================
+PART 1f: Suitability test — C05 (outside the donor hull)
+==============================================================================
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+Warning message:
+Tuning ridge regression when number of units (16) is almost equal to the number of time periods (16) is often unstable. 
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+There were 50 or more warnings (use warnings() to see the first 50)
+Recovery table (|estimate - truth| in last two columns):
+ unit adopt true_att att_plain att_ridge prefit_l2_plain prefit_l2_ridge
+  C01  2010    2.600     2.651     2.651           0.407           0.406
+  C02  2010    1.950     2.004     2.157           0.168           0.009
+  C03  2013    2.500     2.585     2.585           0.470           0.470
+  C04  2016    0.700     0.499     0.500           0.647           0.647
+  C05  2016   -1.225     0.335    -1.316           0.343           0.117
+ err_plain err_ridge
+     0.051     0.051
+     0.054     0.207
+     0.085     0.085
+     0.201     0.200
+     1.560     0.091
+
+Mean recovery error  — plain SCM: 0.390  | Ridge-ASCM: 0.127
+C05 pre-fit scaled L2 — plain: 0.343  | ridge: 0.117 (lower = better fit)
+  [figure] r_sc_multi_country_08_suitability_plain_vs_ridge.png
+
+==============================================================================
+PART 2: Load EMU data and construct treatment
+==============================================================================
+EMU countries (12): Austria, Belgium, Finland, France, Germany, Greece, Ireland, Italy, Luxembourg, Netherlands, Portugal, Spain
+Donor countries (24): Argentina, Australia, Brazil, Canada, Chile, China, Colombia, Egypt, Hong Kong, Iceland, Indonesia, Israel, Japan, Korea, Malaysia, Mexico, Morocco, New Zealand, Philippines, Switzerland, Thailand, Tunisia, Turkey, Uruguay
+  [figure] r_sc_multi_country_09_emu_raw_tfp_paths.png
+
+==============================================================================
+PART 2b/2c: Germany — plain SCM and Ridge-ASCM
+==============================================================================
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+Germany plain SCM avg ATT (TFP level): +0.133 | scaled L2 pre-fit 0.301
+Germany Ridge-ASCM avg ATT (TFP level): +0.127 | scaled L2 pre-fit 0.292
+Germany % effect — 2000-07: +8.0%   2008-17: +19.3%  (plain SCM)
+  [figure] r_sc_multi_country_10_germany_plain_scm.png
+  [figure] r_sc_multi_country_11_germany_plain_vs_ridge.png
+
+==============================================================================
+PART 2d: multisynth — pooled 12-country ATT + per-country fits
+==============================================================================
+Pooled EMU average ATT (TFP level): -0.016  [-0.259, 0.231]; scaled global L2 = 0.100
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+One outcome and one treatment time found. Running single_augsynth.
+
+Per-country ASCM (plain SCM) vs paper TFP % contributions:
+     country att_tfp prefit_l2 pct_2000_07 pct_2008_17 paper_2000_07
+     Austria   0.033     0.296       6.151      -1.792         17.13
+     Belgium   0.186     0.221      29.314       6.992         33.22
+     Finland   0.081     0.409      16.880      -2.833          3.32
+      France   0.272     0.181      42.681      13.871         43.61
+     Germany   0.133     0.301       7.952      19.273         34.34
+      Greece  -0.006     0.470       8.016     -12.440          9.13
+     Ireland   0.310     0.531      31.321      26.636         47.73
+       Italy   0.058     0.350      18.344      -6.775         25.50
+  Luxembourg   0.056     0.337       3.756      -1.535         -5.07
+ Netherlands   0.288     0.233      44.010      13.737         38.18
+    Portugal  -0.032     0.253       6.538     -14.300          6.80
+       Spain   0.167     0.250      31.970       5.714         26.88
+ paper_2008_17
+          5.05
+          9.72
+         -4.66
+         14.68
+         35.56
+         -7.14
+         20.41
+          1.10
+         -3.50
+         16.46
+        -11.30
+          0.47
+  [figure] r_sc_multi_country_12_emu_pooled_att.png
+  [figure] r_sc_multi_country_13_emu_percountry.png
+
+==============================================================================
+PART 2e: augsynth_multiout — TFP and prod_gap together
+==============================================================================
+Germany joint TFP + prod_gap average ATT:
+   Outcome   Estimate lower_bound upper_bound p_val
+1      tfp  0.1161250          NA          NA 0.603
+2 prod_gap -0.1513576          NA          NA 0.603
+One outcome and one treatment time found. Running single_augsynth.
+  [figure] r_sc_multi_country_14_emu_multiout.png
+
+==============================================================================
+PART 2f: Robustness — 1992 Maastricht anticipation
+==============================================================================
+One outcome and one treatment time found. Running single_augsynth.
+Germany avg ATT — 1999 spec: +0.133 | 1992 spec: +0.138
+  [figure] r_sc_multi_country_15_robustness_1992.png
+
+==============================================================================
+PART 2g: Paper vs ASCM comparison
+==============================================================================
+Correlation paper vs ASCM (2000-07 TFP % effect): Spearman 0.74 | Pearson 0.76
+Both agree TFP rose for 12 of 12 members (ASCM) vs paper's pattern.
+  [figure] r_sc_multi_country_16_paper_vs_ascm_scatter.png
+
+==============================================================================
+Writing web_app/data/results.json
+==============================================================================
+Wrote web_app/data/results.json
+
+==============================================================================
+DONE
+==============================================================================
+Figures, CSVs and results.json generated successfully.
+
+Session info:
+R version 4.5.2 (2025-10-31)
+Platform: x86_64-apple-darwin20
+Running under: macOS Tahoe 26.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.5-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.5-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Asia/Tokyo
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] jsonlite_2.0.0 purrr_1.2.1    ggplot2_4.0.1  tidyr_1.3.2    dplyr_1.1.4   
+[6] haven_2.5.5    augsynth_0.2.0
+
+loaded via a namespace (and not attached):
+ [1] Matrix_1.7-4        rgenoud_5.9-0.11    gtable_0.3.6       
+ [4] compiler_4.5.2      Rcpp_1.1.1          tidyselect_1.2.1   
+ [7] systemfonts_1.3.1   scales_1.4.0        textshaping_1.0.4  
+[10] lattice_0.22-7      readr_2.1.6         R6_2.6.1           
+[13] labeling_0.4.3      generics_0.1.4      Formula_1.2-5      
+[16] kernlab_0.9-33      forcats_1.0.0       tibble_3.3.1       
+[19] nloptr_2.2.1        osqp_1.0.0          tzdb_0.5.0         
+[22] pillar_1.11.1       RColorBrewer_1.1-3  rlang_1.1.7        
+[25] S7_0.2.1            cli_3.6.5           withr_3.0.2        
+[28] magrittr_2.0.4      grid_4.5.2          hms_1.1.4          
+[31] lifecycle_1.0.5     vctrs_0.7.0         Synth_1.1-10       
+[34] pracma_2.4.6        glue_1.8.0          farver_2.1.2       
+[37] numDeriv_2016.8-1.1 ragg_1.5.0          optimx_2025-4.9    
+[40] tools_4.5.2         pkgconfig_2.0.3    

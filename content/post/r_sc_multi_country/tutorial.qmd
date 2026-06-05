@@ -1,0 +1,436 @@
+---
+title: "Augmented Synthetic Control for Many Countries"
+subtitle: "single_augsynth, multisynth and augsynth_multiout — on simulated data, then replicating Papaioannou (2021)"
+author: "Carlos Mendez"
+date: "2026-06-05"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    code-summary: "Show code"
+    theme: darkly
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 200
+execute:
+  warning: false
+  message: false
+---
+
+## 1. Overview
+
+This is the executable companion to the blog post *"Augmented Synthetic Control for Many
+Countries."* It teaches the **Augmented Synthetic Control Method (ASCM)** with the
+[`augsynth`](https://github.com/ebenmichael/augsynth) package in two arcs:
+
+1. **Simulated data** where the true effect is known, to introduce the three entry points
+   — `single_augsynth` (one treated unit), `multisynth` (many units, staggered), and
+   `augsynth_multiout` (one unit, many outcomes) — and to *verify* each recovers the truth.
+2. **Real data**: a qualitative replication of Papaioannou (2021), *"European monetary
+   integration, TFP and productivity convergence,"* on the 12 founding euro members.
+
+```{mermaid}
+flowchart TD
+    P["Panel of countries"] --> D{"How many treated?<br/>How many outcomes?"}
+    D -->|one unit| S["single_augsynth"]
+    D -->|many units, staggered| M["multisynth"]
+    D -->|many outcomes| O["augsynth_multiout"]
+    S --> W["SCM weights"]
+    M --> W
+    O --> W
+    W --> R["+ Ridge bias correction"]
+    R --> A["ATT = actual - synthetic"]
+```
+
+## 2. Setup
+
+`augsynth` is **not on CRAN**; it installs from GitHub. The chunk below installs it (pinned
+to a reproducible commit) only if it is missing, then loads everything. Verified with
+R 4.5.2, `augsynth` 0.2.0, `Synth` 1.1.10.
+
+```{r}
+#| label: setup
+if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+if (!requireNamespace("Synth", quietly = TRUE))   install.packages("Synth")
+if (!requireNamespace("augsynth", quietly = TRUE)) {
+  remotes::install_github("ebenmichael/augsynth@7a90ea48877fae7925a72cb50bc03a315bc7c042",
+                          upgrade = "never")
+}
+
+library(augsynth)
+library(haven)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+set.seed(20260605)
+
+STEEL_BLUE  <- "#6a9bcc"; WARM_ORANGE <- "#d97757"
+NEAR_BLACK  <- "#141413"; TEAL <- "#00d4c8"; GREY_DONOR <- "grey60"
+
+theme_set(theme_minimal(base_size = 13))
+
+# actual-vs-synthetic level series from a single_augsynth fit
+synth_levels <- function(fit, data, unit_col, time_col, outcome_col, target) {
+  syn <- predict(fit, att = FALSE)
+  out <- data.frame(time = as.numeric(names(syn)), synthetic = as.numeric(syn))
+  act <- data[data[[unit_col]] == target, c(time_col, outcome_col)]
+  names(act) <- c("time", "actual")
+  merge(act, out, by = "time")
+}
+pct_effect <- function(series, from, to) {
+  s <- series[series$time >= from & series$time <= to, ]
+  100 * mean((s$actual - s$synthetic) / s$synthetic)
+}
+```
+
+The `augsynth` formula mini-language is `outcome ~ treatment | covariates`. The `unit` and
+`time` arguments name the panel columns; `t_int` is the intervention time for the
+single-unit functions. The treatment column is a 0/1 indicator that turns on at adoption.
+
+# Part 1 — Learning the method on simulated data
+
+## 3. A two-country intuition
+
+A treated country ("Atlantia") equals a clean counterfactual ("Borealis") plus an injected
+effect that switches on in 2012 (+1.5 per year). The post-2012 gap should equal the effect.
+
+```{r}
+#| label: intuition
+years <- 2000:2023; t_int <- 2012
+trend <- 40 + 1.2 * (years - 2000) + 3 * sin(2 * pi * (years - 2000) / 9)
+control <- trend + rnorm(length(years), 0, 0.6)
+true_effect <- ifelse(years >= t_int, 1.5 * (years - t_int + 1), 0)
+treated <- trend + rnorm(length(years), 0, 0.6) + true_effect
+
+c(estimated_gap = mean(treated[years >= t_int] - control[years >= t_int]),
+  true_effect   = mean(true_effect[years >= t_int]))
+```
+
+The estimated post-2012 gap is ~9.6 against a true ~9.75 — synthetic control in its
+simplest form: one perfectly matched comparison.
+
+```{r}
+#| label: fig-intuition
+df <- bind_rows(
+  data.frame(year = years, value = treated, role = "Atlantia (treated)"),
+  data.frame(year = years, value = control, role = "Borealis (counterfactual)"))
+ggplot(df, aes(year, value, colour = role)) +
+  geom_vline(xintercept = t_int, linetype = "dashed") +
+  geom_line(linewidth = 1.1) +
+  scale_colour_manual(values = c("Atlantia (treated)" = WARM_ORANGE,
+                                 "Borealis (counterfactual)" = STEEL_BLUE)) +
+  labs(title = "The core idea: a counterfactual you can see",
+       x = "Year", y = "Outcome", colour = NULL) +
+  theme(legend.position = "bottom")
+```
+
+## 4. One reusable simulated panel
+
+A three-factor model: 20 countries (5 treated `C01`-`C05`, 15 donors `C06`-`C20`),
+2000-2023, staggered adoption (2010/2013/2016), two correlated outcomes. C01-C04 are
+convex blends of donors (a good synthetic exists); **C05 is placed outside the donor hull**
+on purpose. **C05's effect is negative** by design.
+
+```{r}
+#| label: build-panel
+years <- 2000:2023; n_t <- length(years); s <- years - 2000
+donors  <- sprintf("C%02d", 6:20); treated <- sprintf("C%02d", 1:5)
+adopt <- c(C01 = 2010, C02 = 2010, C03 = 2013, C04 = 2016, C05 = 2016)
+beta1 <- c(C01 = 0.40, C02 = 0.30, C03 = 0.50, C04 = 0.20, C05 = -0.35)
+beta2 <- 0.6 * beta1
+f1 <- sin(2 * pi * s / 12); f2 <- 0.05 * s; f3 <- cos(2 * pi * s / 7)
+
+dmu <- setNames(rnorm(length(donors), 10, 2), donors)
+dL1 <- setNames(runif(length(donors), 0.3, 1.5), donors)
+dL2 <- setNames(runif(length(donors), 0.3, 1.5), donors)
+dL3 <- setNames(runif(length(donors), 0.2, 1.0), donors)
+dnu <- setNames(rnorm(length(donors), 2, 0.5), donors)
+dk  <- setNames(runif(length(donors), 0.3, 0.8), donors)
+y0 <- function(mu, L1, L2, L3) mu + L1 * f1 + L2 * f2 + L3 * f3
+
+rows <- list()
+for (d in donors) {
+  Y1 <- y0(dmu[d], dL1[d], dL2[d], dL3[d]) + rnorm(n_t, 0, 0.25)
+  Y2 <- 0.6 * Y1 + dnu[d] + dk[d] * f1 + rnorm(n_t, 0, 0.20)
+  rows[[d]] <- data.frame(country = d, year = years, treated_unit = 0L,
+                          adopt_year = NA_integer_, treat_ms = 0L,
+                          gdp_index = Y1, trade_index = Y2,
+                          true_effect_gdp = 0, true_effect_trade = 0)
+}
+for (tu in treated) {
+  if (tu == "C05") {
+    mu <- max(dmu) + 1.2; L1 <- max(dL1) + 0.5; L2 <- max(dL2) + 0.4
+    L3 <- max(dL3) + 0.3; nu <- max(dnu) + 0.6; kk <- max(dk) + 0.3
+  } else {
+    g <- rgamma(length(donors), 1); w <- g / sum(g)
+    mu <- sum(w * dmu); L1 <- sum(w * dL1); L2 <- sum(w * dL2)
+    L3 <- sum(w * dL3); nu <- sum(w * dnu); kk <- sum(w * dk)
+  }
+  Y1_0 <- y0(mu, L1, L2, L3) + rnorm(n_t, 0, 0.25)
+  Y2_0 <- 0.6 * Y1_0 + nu + kk * f1 + rnorm(n_t, 0, 0.20)
+  k <- pmax(0, years - adopt[[tu]])
+  rows[[tu]] <- data.frame(country = tu, year = years, treated_unit = 1L,
+                           adopt_year = adopt[[tu]], treat_ms = as.integer(years >= adopt[[tu]]),
+                           gdp_index = Y1_0 + beta1[[tu]] * k,
+                           trade_index = Y2_0 + beta2[[tu]] * k,
+                           true_effect_gdp = beta1[[tu]] * k,
+                           true_effect_trade = beta2[[tu]] * k)
+}
+panel <- bind_rows(rows)
+write.csv(panel, "synthetic_panel_multicountry.csv", row.names = FALSE)  # reusable!
+nrow(panel)
+```
+
+Two equations capture what every call does. The **SCM weight problem** finds convex donor
+weights $W$ matching the treated unit's pre-period:
+
+$$W^{\star} = \arg\min_{W \in \Delta} \lVert X_1 - X_0 W \rVert_V \quad\text{s.t.}\quad w_j \ge 0,\ \sum_j w_j = 1$$
+
+The **augmented estimator** subtracts an outcome-model bias correction from the SCM gap:
+
+$$\widehat{\tau}_t^{\,\mathrm{aug}} = \underbrace{\Big(Y_{1t} - \sum_j w_j Y_{jt}\Big)}_{\text{SCM gap}} - \underbrace{\Big(\widehat{m}_t(X_1) - \sum_j w_j \widehat{m}_t(X_j)\Big)}_{\text{bias correction}}$$
+
+When pre-fit is perfect the correction is zero (ASCM = SCM); when it is poor the correction
+removes the leftover bias.
+
+## 5. One treated unit: `single_augsynth`
+
+```{r}
+#| label: single
+sim_single <- panel |>
+  filter(country %in% c("C01", donors)) |>
+  mutate(trt = as.integer(country == "C01" & year >= 2010)) |> as.data.frame()
+
+sc_plain <- augsynth(gdp_index ~ trt, country, year, sim_single,
+                     t_int = 2010, progfunc = "None",  scm = TRUE)
+sc_ridge <- augsynth(gdp_index ~ trt, country, year, sim_single,
+                     t_int = 2010, progfunc = "ridge", scm = TRUE)
+true_c01 <- mean(panel$true_effect_gdp[panel$country == "C01" & panel$year >= 2010])
+c(true = true_c01,
+  plain = summary(sc_plain)$average_att$Estimate,
+  ridge = summary(sc_ridge)$average_att$Estimate,
+  prefit_L2 = sc_plain$scaled_l2_imbalance)
+```
+
+True effect +2.60; both estimators return +2.65. Because C01 fits well, plain SCM and
+Ridge-ASCM agree — *when fit is good, ASCM ≈ SCM.*
+
+```{r}
+#| label: fig-single
+lv <- synth_levels(sc_plain, sim_single, "country", "year", "gdp_index", "C01")
+g  <- summary(sc_plain)$att
+g$true <- panel$true_effect_gdp[match(g$Time, panel$year[panel$country == "C01"])]
+ggplot(g, aes(Time)) +
+  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_vline(xintercept = 2010, linetype = "dashed") +
+  geom_ribbon(data = subset(g, !is.na(lower_bound)),
+              aes(ymin = lower_bound, ymax = upper_bound), fill = STEEL_BLUE, alpha = 0.2) +
+  geom_line(aes(y = Estimate, colour = "Estimated"), linewidth = 1) +
+  geom_line(aes(y = true, colour = "True"), linetype = "22", linewidth = 0.9) +
+  scale_colour_manual(values = c(Estimated = STEEL_BLUE, True = "white")) +
+  labs(title = "single_augsynth recovers a known effect",
+       x = "Year", y = "Effect on gdp_index", colour = NULL)
+```
+
+## 6. Many treated units, staggered: `multisynth`
+
+`multisynth` needs no `t_int` (it infers timing from the 0→1 switch) and returns a pooled
+average plus per-unit effects.
+
+```{r}
+#| label: multisynth
+sim_multi <- panel |> filter(country %in% c(treated, donors)) |>
+  select(country, year, treat_ms, gdp_index) |> as.data.frame()
+ms <- multisynth(gdp_index ~ treat_ms, country, year, sim_multi)
+set.seed(20260605)
+ms_sum <- summary(ms, inf_type = "bootstrap")
+n_leads <- ms_sum$n_leads
+overall <- subset(as.data.frame(ms_sum$att), is.na(Time))
+overall$truth <- c(Average = mean(sapply(treated, function(u) beta1[[u]] * mean(0:(n_leads-1)))),
+                   sapply(treated, function(u) beta1[[u]] * mean(0:(n_leads-1))))[overall$Level]
+overall[, c("Level", "Estimate", "lower_bound", "upper_bound", "truth")]
+```
+
+Pooled estimate ~0.72 vs truth ~0.74, and every per-unit sign is right — including C05's
+negative effect.
+
+```{r}
+#| label: fig-multisynth
+plot(ms_sum, levels = "Average")
+```
+
+## 7. One unit, two outcomes: `augsynth_multiout`
+
+```{r}
+#| label: multiout
+mo <- augsynth_multiout(gdp_index + trade_index ~ trt, country, year,
+                        t_int = 2010, sim_single, progfunc = "None",
+                        scm = TRUE, combine_method = "avg")
+summary(mo)$average_att
+```
+
+One donor recipe recovers both outcomes (gdp ≈ +2.7 vs true +2.6; trade ≈ +1.7 vs true +1.56).
+
+## 8. Suitability test: where plain SCM fails
+
+C05 sits outside the donor hull. Compare plain vs ridge recovery for every treated unit.
+
+```{r}
+#| label: suitability
+recovery <- do.call(rbind, lapply(treated, function(u) {
+  d <- panel |> filter(country %in% c(u, donors)) |>
+    mutate(trt = as.integer(country == u & year >= adopt[[u]])) |> as.data.frame()
+  fp <- augsynth(gdp_index ~ trt, country, year, d, t_int = adopt[[u]], progfunc = "None",  scm = TRUE)
+  fr <- augsynth(gdp_index ~ trt, country, year, d, t_int = adopt[[u]], progfunc = "ridge", scm = TRUE)
+  tr <- mean(panel$true_effect_gdp[panel$country == u & panel$year >= adopt[[u]]])
+  data.frame(unit = u, true = round(tr, 3),
+             plain = round(summary(fp)$average_att$Estimate, 3),
+             ridge = round(summary(fr)$average_att$Estimate, 3))
+}))
+recovery$err_plain <- abs(recovery$plain - recovery$true)
+recovery$err_ridge <- abs(recovery$ridge - recovery$true)
+recovery
+```
+
+For C05, **plain SCM gets the sign wrong** while Ridge-ASCM recovers the true negative
+effect — the mean recovery error falls by roughly two-thirds. Read the pre-treatment fit:
+when imbalance is small the methods agree; when it is large, trust augmentation.
+
+# Part 2 — Replicating Papaioannou (2021)
+
+## 9. The EMU data
+
+A balanced panel of 36 countries (12 euro members, 24 donors), 1980-2017. Primary outcome
+`tfp`; secondary `prod_gap` (lower = closer to the US frontier). Treatment is
+`treat × time1` (euro × post-1999).
+
+```{r}
+#| label: emu-data
+stopifnot(file.exists("reference/dataset_revision_1.dta"))
+emu <- read_dta("reference/dataset_revision_1.dta") |>
+  mutate(country = as.character(country)) |> zap_labels() |> as.data.frame()
+emu$trt99 <- as.integer(emu$treat == 1 & emu$time1 == 1)
+emu$trt92 <- as.integer(emu$treat == 1 & emu$time2 == 1)
+covars <- c("hum_cap", "inv_share", "ec_freed", "patents", "agricult")
+emu_members <- sort(unique(emu$country[emu$treat == 1]))
+length(emu_members)
+```
+
+## 10-11. Germany: plain SCM, then Ridge-ASCM
+
+```{r}
+#| label: germany
+fit_country <- function(target, progfunc = "None", t_int = 1999, trt = "trt99") {
+  d <- emu |> filter(country == target | treat == 0) |> as.data.frame()
+  d$.trt <- d[[trt]]
+  f <- as.formula(sprintf("tfp ~ .trt | %s", paste(covars, collapse = " + ")))
+  augsynth(f, country, year, d, t_int = t_int, progfunc = progfunc, scm = TRUE)
+}
+ger_plain <- fit_country("Germany", "None")
+ger_ridge <- fit_country("Germany", "ridge")
+lv_ger <- synth_levels(ger_plain, emu |> filter(country == "Germany" | treat == 0),
+                       "country", "year", "tfp", "Germany")
+c(plain = summary(ger_plain)$average_att$Estimate,
+  ridge = summary(ger_ridge)$average_att$Estimate,
+  pct_2000_07 = pct_effect(lv_ger, 2000, 2007),
+  pct_2008_17 = pct_effect(lv_ger, 2008, 2017))
+```
+
+German TFP runs above its synthetic counterfactual after 1999 (+8% over 2000-07, +19% over
+2008-17). Plain and ridge agree because pre-fit is good.
+
+```{r}
+#| label: fig-germany
+df <- lv_ger |> pivot_longer(c(actual, synthetic), names_to = "series", values_to = "v")
+ggplot(df, aes(time, v, colour = series)) +
+  geom_vline(xintercept = 1999, linetype = "dashed") +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = c(actual = WARM_ORANGE, synthetic = STEEL_BLUE),
+                      labels = c("Germany (actual)", "Synthetic Germany")) +
+  labs(title = "Synthetic Germany (plain SCM)", x = "Year", y = "TFP", colour = NULL)
+```
+
+## 12. All twelve members: `multisynth`
+
+```{r}
+#| label: emu-multisynth
+ms_emu <- multisynth(tfp ~ trt99, country, year,
+                     emu |> select(country, year, trt99, tfp) |> as.data.frame())
+set.seed(20260605)
+ms_emu_sum <- summary(ms_emu, inf_type = "bootstrap")
+plot(ms_emu_sum, levels = "Average")
+```
+
+The pooled average masks the dynamics: a positive bump in the early euro years, eroded by
+the 2008-2014 crisis, recovering by 2017 — exactly the paper's arc.
+
+## 13. Two outcomes: `augsynth_multiout`
+
+```{r}
+#| label: emu-multiout
+d_ger <- emu |> filter(country == "Germany" | treat == 0) |> as.data.frame()
+d_ger$.trt <- d_ger$trt99
+ger_mo <- augsynth_multiout(tfp + prod_gap ~ .trt, country, year, 1999, d_ger,
+                            progfunc = "None", scm = TRUE, combine_method = "concat")
+summary(ger_mo)$average_att
+```
+
+TFP up (+0.12) and the US productivity gap narrowing (−0.15) — one coherent story.
+
+## 14. Robustness: 1992 Maastricht
+
+```{r}
+#| label: robustness
+ger_92 <- fit_country("Germany", "None", t_int = 1992, trt = "trt92")
+c(`1999` = summary(ger_plain)$average_att$Estimate,
+  `1992` = summary(ger_92)$average_att$Estimate)
+```
+
+Nearly identical — robust to the anticipation question.
+
+## 15. Comparing to the paper
+
+```{r}
+#| label: compare
+paper_2000_07 <- c(Austria=17.13, Belgium=33.22, Finland=3.32, France=43.61, Germany=34.34,
+                   Greece=9.13, Ireland=47.73, Italy=25.50, Luxembourg=-5.07,
+                   Netherlands=38.18, Portugal=6.80, Spain=26.88)
+ascm <- sapply(emu_members, function(cn) {
+  fp <- fit_country(cn, "None")
+  pct_effect(synth_levels(fp, emu |> filter(country == cn | treat == 0),
+                          "country", "year", "tfp", cn), 2000, 2007)
+})
+comp <- data.frame(country = emu_members, paper = paper_2000_07[emu_members], ascm = round(ascm, 1))
+c(spearman = cor(comp$paper, comp$ascm, method = "spearman"),
+  pearson  = cor(comp$paper, comp$ascm))
+```
+
+```{r}
+#| label: fig-compare
+ggplot(comp, aes(paper, ascm)) +
+  geom_abline(linetype = "dashed", colour = "grey60") +
+  geom_point(colour = WARM_ORANGE, size = 3) +
+  geom_text(aes(label = country), vjust = -0.8, size = 3, colour = "white") +
+  labs(title = "ASCM reproduces the paper's ranking (Spearman ~0.74)",
+       x = "Paper % contribution (2000-07)", y = "ASCM % effect")
+```
+
+Rank correlation ~0.74: ASCM confirms the paper *qualitatively* (same signs and ranking),
+which is the right bar for a method comparison with a different estimator.
+
+## 16. Takeaways
+
+- Validate on a known truth (simulated data) before trusting a causal estimate on real data.
+- Augmentation is insurance: it agrees with plain SCM when pre-fit is good and rescues the
+  estimate (even the sign) when pre-fit is poor.
+- In multi-country work, report the dynamic path and per-unit spread, not just the pooled
+  average.
+
+## References
+
+- Ben-Michael, Feller & Rothstein (2021). *The Augmented Synthetic Control Method.* JASA.
+- Papaioannou (2021). *European monetary integration, TFP and productivity convergence.*
+  Economics Letters 199, 109696.
+- `augsynth`: <https://github.com/ebenmichael/augsynth>

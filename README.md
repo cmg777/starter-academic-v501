@@ -133,6 +133,13 @@ Six sections:
 5. **Python syntax highlighting** -- Site-consistent colors for highlight.js tokens
 6. **Left-side Table of Contents** -- Sticky sidebar TOC activated by `toc: true` in front matter
 
+### Post Resource Buttons (AI Podcast, Slides)
+
+Posts can expose extra learning resources as front-matter `links:` buttons. Two conventions are documented in full in `CLAUDE.md`:
+
+- **AI Podcast** -- a self-contained inline audio-player overlay appended to the post's `index.md` (front-matter `icon: podcast` link to `#podcast-player`). See CLAUDE.md -> *AI Podcast Player*.
+- **Slides (PDF)** -- a `file-pdf` link button to a `slides.pdf` shipped in the post bundle, using an **absolute** URL so the theme opens it in a new tab. See CLAUDE.md -> *Slides (PDF) link button*.
+
 ## Content Conventions
 
 ### Publications (`content/publication/`)

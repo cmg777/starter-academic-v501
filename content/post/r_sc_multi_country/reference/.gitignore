@@ -1,0 +1,5 @@
+# Keep the dataset (read by analysis.R / tutorial.qmd); keep the published
+# Papaioannou (2021) paper PDF, appendix.pdf and the full-text .md copy LOCAL
+# only — copyright + repo size. dataset_revision_1.dta stays tracked.
+*.pdf
+Papaioannou*.md

@@ -109,8 +109,30 @@ An embedded audio player overlay for AI-generated podcast summaries of blog post
 **Reference implementations:**
 - `content/post/python_dowhy_intro/index.md` — podcast only (m4a, stream link)
 - `content/post/python_did101/index.md` — podcast + video player (wav, download link)
+- `content/post/r_sc_multi_country/index.md` — podcast only (m4a, stream link; R post)
 
 **Player features:** play/pause, skip ±15s, progress bar with buffering, time display, volume slider, playback speed (0.75x–2x), stream/download button. Dark gradient UI using site colors (`#d97757` orange accent, `#6a9bcc`/`#00d4c8` progress gradient). Slides up from bottom on click, auto-opens if URL hash is `#podcast-player`.
+
+## Slides (PDF) link button
+
+When a post ships a slide deck PDF in its page bundle (`content/post/<slug>/slides.pdf`, served at `/post/<slug>/slides.pdf`), surface it as a resource button.
+
+**When the user adds a `slides.pdf` (or says "Add slides to `<post slug>`")**, add ONE entry to the post's front-matter `links:` section — nothing in the body:
+
+```yaml
+- icon: file-pdf
+  icon_pack: fas
+  name: "Slides (PDF)"
+  url: https://carlos-mendez.org/post/<slug>/slides.pdf
+```
+
+**Use an absolute URL (not relative).** The theme partial that renders these buttons (`layouts/partials/page_links.html` in the pinned Wowchemy module) only adds `target="_blank" rel="noopener"` to a `links:` entry when its `url` has an `http(s)` scheme. A **relative** `url: slides.pdf` resolves correctly (page-bundle resource) but opens in the **same tab**; the **absolute** `https://carlos-mendez.org/post/<slug>/slides.pdf` opens the deck in a **new tab** (and matches the post's other absolute links like "MD version" / "Data (CSV)"). `file-pdf` + `fas` is the site's standard PDF icon (also used by publications).
+
+**Why not the native `url_slides` field:** Wowchemy's `url_slides` also renders a button (it resolves a relative `slides.pdf` and opens a new tab), but it is hard-labeled **"Slides"** via the site-wide `btn_slides` i18n string — *not* customizable per post. Use `url_slides: slides.pdf` only if a plain "Slides" label is fine; use the `links:` entry above when you want the "Slides (PDF)" label + PDF icon.
+
+- No body change, no embed; the PDF lives in the bundle.
+- **No i18n change** — the ES/JA counterparts are card-only stubs (`_build: {render: never}`) that link back to the English post.
+- Reference implementation: `content/post/r_sc_multi_country/` (ships `slides.pdf` + the `links:` entry).
 
 ## Tutorial bundles (`.zip`)
 

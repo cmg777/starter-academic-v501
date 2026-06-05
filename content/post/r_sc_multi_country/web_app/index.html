@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Augmented Synthetic Control — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Augmented Synthetic Control for Many Countries'. Recover a known effect, watch where plain SCM fails and ASCM corrects, and replicate Papaioannou (2021) on the euro area.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Augmented Synthetic Control — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Augmented Synthetic Control for Many Countries: A Tutorial with augsynth</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"  class="tab active" data-pane="pane-intro"  role="tab" aria-selected="true">1 · Three Functions</button>
+  <button id="tab-single" class="tab"        data-pane="pane-single" role="tab" aria-selected="false">2 · Single &amp; Suitability</button>
+  <button id="tab-multi"  class="tab"        data-pane="pane-multi"  role="tab" aria-selected="false">3 · Many Units</button>
+  <button id="tab-emu"    class="tab"        data-pane="pane-emu"    role="tab" aria-selected="false">4 · Replication</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: THREE FUNCTIONS ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+  <h2>One method, three doors: <code>augsynth</code></h2>
+  <p class="lede">
+    The Augmented Synthetic Control Method builds a credible counterfactual for a treated
+    unit from a weighted "recipe" of untreated donors — then adds an outcome model that
+    removes leftover bias when the pre-treatment fit is imperfect. The
+    <code>augsynth</code> package exposes three entry points: <code>single_augsynth</code>
+    (one treated unit), <code>multisynth</code> (many units, staggered adoption), and
+    <code>augsynth_multiout</code> (one unit, many outcomes).
+  </p>
+  <p class="lede">
+    This lab reproduces the post's findings interactively, all client-side from a
+    precomputed <code>results.json</code>. We first prove the method recovers a
+    <em>known</em> effect on simulated data, show exactly where plain SCM fails and
+    augmentation saves it, then replicate Papaioannou (2021) on the euro area.
+  </p>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-num" id="hero-recovery">—</div>
+      <div class="stat-lab">mean recovery error, plain&nbsp;→&nbsp;ridge (simulated)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="hero-c05">—</div>
+      <div class="stat-lab">C05 effect: plain SCM gets the <em>sign</em> wrong; ridge fixes it</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="hero-spearman">—</div>
+      <div class="stat-lab">rank correlation, our ASCM vs Papaioannou (2021)</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Does the method recover a known effect?</h3>
+    <p>
+      On simulated data the true treatment effect of unit C01 is a ramp we injected
+      ourselves. The estimated treated-minus-synthetic gap (blue, with its conformal band)
+      should track the true ramp (white dashed) and sit at zero before treatment.
+    </p>
+    <div class="chart-area" id="intro-chart"></div>
+    <p class="note">If an estimator cannot reproduce a known truth on simulated ground, do not trust it on real data.</p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-single">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Single &amp; Suitability</h4>
+      <p>Switch between a well-fit unit and one outside the donor hull. Watch plain SCM break and Ridge-ASCM rescue it.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-multi">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Many Units</h4>
+      <p>The pooled effect path from <code>multisynth</code>, on simulated data (vs truth) and on the 12 euro members.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-emu">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Replication</h4>
+      <p>Our per-country ASCM estimates vs the paper's reported TFP contributions, country by country.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Synthetic control</summary>
+        <div class="gloss-body">A weighted average of donor (untreated) units built to match the treated unit's pre-treatment path. The synthetic's post-treatment path is the missing counterfactual.</div>
+      </details>
+      <details class="gloss"><summary>Augmentation (bias correction)</summary>
+        <div class="gloss-body">An outcome model (Ridge regression) that estimates and subtracts the part of the gap SCM could not close. Zero when pre-fit is perfect; nonzero when it is poor.</div>
+      </details>
+      <details class="gloss"><summary>Pre-fit imbalance (scaled L2)</summary>
+        <div class="gloss-body">How far the synthetic is from the treated unit before treatment, scaled so 1.0 is the naive donor average. Small means a trustworthy match.</div>
+      </details>
+      <details class="gloss"><summary>ATT</summary>
+        <div class="gloss-body">Average treatment effect on the treated — the post-treatment gap between the actual unit and its synthetic counterfactual.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 2: SINGLE & SUITABILITY ====================== -->
+<section id="pane-single" class="tab-pane" role="tabpanel" aria-labelledby="tab-single">
+  <h2><code>single_augsynth</code> and the suitability test</h2>
+  <p class="lede">
+    One treated unit, fit against the donor pool. Unit <strong>C01</strong> sits inside the
+    donor hull, so plain SCM fits well and augmentation barely matters. Unit
+    <strong>C05</strong> was placed <em>outside</em> the hull on purpose — plain SCM cannot
+    match its pre-period, and it takes the Ridge outcome model to recover the truth.
+  </p>
+
+  <div class="controls">
+    <div class="control-group">
+      <span class="control-label">Treated unit</span>
+      <label><input type="radio" name="unit" value="C01" checked> C01 (inside hull — easy)</label>
+      <label><input type="radio" name="unit" value="C05"> C05 (outside hull — hard)</label>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num" id="s-true">—</div><div class="stat-lab">true average effect</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-plain">—</div><div class="stat-lab">plain SCM estimate</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-ridge">—</div><div class="stat-lab">Ridge-ASCM estimate</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-prefit">—</div><div class="stat-lab">pre-fit L2 (plain → ridge)</div></div>
+  </div>
+
+  <div class="card">
+    <h3 id="s-title">Actual vs synthetic control</h3>
+    <div class="chart-area" id="single-chart"></div>
+    <p class="note" id="s-note"></p>
+  </div>
+
+  <div class="card">
+    <h3>Recovery error across all five treated units</h3>
+    <p>Absolute distance between the estimate and the known truth, for plain SCM (orange) and Ridge-ASCM (teal). Augmentation helps most exactly where the fit is worst.</p>
+    <div class="chart-area" id="recovery-chart"></div>
+  </div>
+</section>
+
+<!-- ====================== TAB 3: MANY UNITS ====================== -->
+<section id="pane-multi" class="tab-pane" role="tabpanel" aria-labelledby="tab-multi">
+  <h2><code>multisynth</code>: many treated units at once</h2>
+  <p class="lede">
+    <code>multisynth</code> fits one synthetic control per treated unit and partially pools
+    them, returning a pooled average effect and per-unit effects. Toggle between the
+    <strong>simulated</strong> panel (where we can check against the known truth) and the
+    real <strong>euro-area</strong> panel of 12 members.
+  </p>
+
+  <div class="controls">
+    <div class="control-group">
+      <span class="control-label">Panel</span>
+      <label><input type="radio" name="msrc" value="sim" checked> Simulated (vs known truth)</label>
+      <label><input type="radio" name="msrc" value="emu"> Euro area (12 members)</label>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num" id="m-est">—</div><div class="stat-lab">pooled average effect</div></div>
+    <div class="stat-card"><div class="stat-num" id="m-truth">—</div><div class="stat-lab" id="m-truth-lab">true pooled effect</div></div>
+    <div class="stat-card"><div class="stat-num" id="m-l2">—</div><div class="stat-lab">scaled global L2 imbalance</div></div>
+  </div>
+
+  <div class="card">
+    <h3 id="m-title">Pooled effect path</h3>
+    <div class="chart-area" id="multi-chart"></div>
+    <p class="note" id="m-note"></p>
+  </div>
+
+  <div class="card" id="m-table-card">
+    <h3>Per-unit recovery (simulated)</h3>
+    <div id="multi-table"></div>
+  </div>
+</section>
+
+<!-- ====================== TAB 4: REPLICATION ====================== -->
+<section id="pane-emu" class="tab-pane" role="tabpanel" aria-labelledby="tab-emu">
+  <h2>Replicating Papaioannou (2021)</h2>
+  <p class="lede">
+    Did the euro raise total factor productivity? We fit a synthetic control for each of
+    the 12 founding members against 24 non-euro donors and compare our ASCM percentage
+    effect (2000–2007) to the paper's reported contribution, country by country. Points on
+    the 45-degree line agree.
+  </p>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num" id="e-spearman">—</div><div class="stat-lab">Spearman rank correlation</div></div>
+    <div class="stat-card"><div class="stat-num" id="e-pearson">—</div><div class="stat-lab">Pearson correlation</div></div>
+    <div class="stat-card"><div class="stat-num" id="e-germany">—</div><div class="stat-lab">synthetic Germany TFP effect, 2008–17</div></div>
+  </div>
+
+  <div class="card">
+    <h3>ASCM vs the paper: TFP % contribution, 2000–2007</h3>
+    <div class="chart-area" id="emu-scatter"></div>
+    <p class="note">Hover a point for the exact pair. France and the Netherlands land almost on the line; Germany and Ireland diverge in magnitude but not in sign.</p>
+  </div>
+
+  <div class="card">
+    <h3>Country-by-country comparison</h3>
+    <div id="emu-table"></div>
+    <p class="note">Greece and Portugal turn negative in 2008–17 in both our estimates and the paper — the post-crisis reversal.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Augmented Synthetic Control for Many Countries</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
