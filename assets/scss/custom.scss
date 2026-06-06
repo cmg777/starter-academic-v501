@@ -1301,10 +1301,7 @@ details.concept-card p:last-child {
   translate: var(--px) calc(var(--py) - 2px);
 }
 
-.hero-glass-card--title   { border-left: 3px solid #00d4c8; }
-.hero-glass-card--tagline { border-left: 3px solid #d97757; }
 .hero-glass-card--author {
-  border-left: 3px solid #6a9bcc;
   max-width: #{"min(72vw, 1000px)"};
   padding: 1.05rem 2rem;
 }
