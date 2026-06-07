@@ -61,8 +61,8 @@
   //    methodId: "did" | "sc" | "sdid"
   // ------------------------------------------------------------------
   function counterfactual_lines(container) {
-    const W = 760, H = 380;
-    const margin = { top: 22, right: 26, bottom: 46, left: 56 };
+    const W = 760, H = 418;
+    const margin = { top: 22, right: 26, bottom: 84, left: 56 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -117,22 +117,27 @@
         .attr("stroke-dasharray", m.dash)
         .attr("d", lineGen.y(d => y(d[m.series]))(series));
 
-      // Legend (top-left, inside plot but above the falling lines).
+      // Legend: a horizontal, centered row BELOW the x-axis (clear of the
+      // falling lines). Widths are estimated (not measured) because these charts
+      // can be rendered while their tab is display:none, where getBBox() == 0.
       legend.selectAll("*").remove();
       const items = [
-        { label: "California (observed)", color: C.orange, dash: null },
-        { label: m.label,                 color: m.color,  dash: m.dash },
+        { label: "California (observed)", color: C.orange, sw: 3.2, dash: null },
+        { label: m.label,                 color: m.color,  sw: 2.4, dash: m.dash },
       ];
-      const lg = legend.append("g").attr("transform", `translate(6, 4)`);
-      lg.append("rect").attr("width", 232).attr("height", 44)
-        .attr("fill", "rgba(15,23,41,0.66)").attr("stroke", C.line).attr("rx", 6);
+      const swLen = 26, txtGap = 7, itemGap = 28, fs = 12;
+      const estW = s => s.length * 6.6;
+      const widths = items.map(it => swLen + txtGap + estW(it.label));
+      const totalW = widths.reduce((a, b) => a + b, 0) + itemGap * (items.length - 1);
+      legend.attr("transform", `translate(0,${h + 60})`);
+      let cx = Math.max(0, (w - totalW) / 2);
       items.forEach((it, i) => {
-        lg.append("line").attr("x1", 12).attr("x2", 36)
-          .attr("y1", 15 + i * 18).attr("y2", 15 + i * 18)
-          .attr("stroke", it.color).attr("stroke-width", it.label.startsWith("California") ? 3.2 : 2.4)
-          .attr("stroke-dasharray", it.dash);
-        lg.append("text").attr("x", 44).attr("y", 19 + i * 18)
-          .attr("fill", C.text).attr("font-size", 11.5).text(it.label);
+        const ig = legend.append("g").attr("transform", `translate(${cx},0)`);
+        ig.append("line").attr("x1", 0).attr("x2", swLen).attr("y1", 0).attr("y2", 0)
+          .attr("stroke", it.color).attr("stroke-width", it.sw).attr("stroke-dasharray", it.dash);
+        ig.append("text").attr("x", swLen + txtGap).attr("y", 4)
+          .attr("fill", C.text).attr("font-size", fs).text(it.label);
+        cx += widths[i] + itemGap;
       });
     }
 
@@ -230,8 +235,8 @@
   //    ci: {lo, hi}        (normal-approx 95% interval, for shading)
   // ------------------------------------------------------------------
   function placebo_histogram(container) {
-    const W = 760, H = 340;
-    const margin = { top: 40, right: 26, bottom: 48, left: 50 };
+    const W = 760, H = 368;
+    const margin = { top: 40, right: 26, bottom: 76, left: 50 };
     const w = W - margin.left - margin.right;
     const h = H - margin.top - margin.bottom;
     const svg = ensureSVG(container, W, H);
@@ -301,18 +306,23 @@
         .attr("text-anchor", "middle").attr("fill", C.text).attr("font-size", 12)
         .text("Number of states");
 
-      // Legend in the top margin.
-      const lg = g.append("g").attr("transform", `translate(${w - 250},${-30})`);
-      lg.append("rect").attr("x", 0).attr("y", 0).attr("width", 12).attr("height", 10)
-        .attr("fill", C.steel).attr("opacity", 0.55);
-      lg.append("text").attr("x", 18).attr("y", 9).attr("fill", C.text).attr("font-size", 11)
-        .text("placebo states");
-      if (ci) {
-        lg.append("rect").attr("x", 120).attr("y", 0).attr("width", 12).attr("height", 10)
-          .attr("fill", "rgba(217, 119, 87, 0.30)");
-        lg.append("text").attr("x", 138).attr("y", 9).attr("fill", C.text).attr("font-size", 11)
-          .text("95% CI (SE-based)");
-      }
+      // Legend: a centered horizontal row at the BOTTOM, below the x-title.
+      const legItems = [{ color: C.steel, opacity: 0.55, label: "placebo states" }];
+      if (ci) legItems.push({ color: "rgba(217, 119, 87, 0.30)", opacity: 1, label: "95% CI (SE-based)" });
+      const pSw = 14, pTg = 6, pGap = 28, pFs = 11;
+      const pEst = s => s.length * 6.0;
+      const pWid = legItems.map(it => pSw + pTg + pEst(it.label));
+      const pTotal = pWid.reduce((a, b) => a + b, 0) + pGap * (legItems.length - 1);
+      const lg = g.append("g").attr("transform", `translate(0,${h + 62})`);
+      let pcx = Math.max(0, (w - pTotal) / 2);
+      legItems.forEach((it, i) => {
+        const gg = lg.append("g").attr("transform", `translate(${pcx},0)`);
+        gg.append("rect").attr("x", 0).attr("y", -9).attr("width", pSw).attr("height", 11)
+          .attr("fill", it.color).attr("opacity", it.opacity);
+        gg.append("text").attr("x", pSw + pTg).attr("y", 0)
+          .attr("fill", C.text).attr("font-size", pFs).text(it.label);
+        pcx += pWid[i] + pGap;
+      });
     }
 
     return { update };
