@@ -1,0 +1,6 @@
+method,att,se,ci_l,ci_r,note_pval
+Raw 2x2 DiD,-27.34911108193086,,,,
+"DiD (TWFE, sdid)",-27.34911,,,,
+Synthetic control (synth2),-19.48139158884684,,,,
+SC (sdid framework),-19.61966,,,,
+SDID,-15.60383,9.87941,-34.96711778850485,3.759457788504852,.0263157894736842

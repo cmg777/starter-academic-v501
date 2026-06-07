@@ -1,0 +1,1148 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      Stata 19.0
+___/   /   /___/   /   /___/       SE—Standard Edition
+
+ Statistics and Data Science       Copyright 1985-2025 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-782-8272        https://www.stata.com
+                                   979-696-4600        service@stata.com
+
+Stata license: Single-user  perpetual
+Serial number: 401906342834
+  Licensed to: CarlosMendez
+               Nagoya University
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+      3. Maximum number of variables is set to 5,000 but can be increased;
+          see help set_maxvar.
+
+. do content/post/stata_sdid/analysis.do 
+
+. *============================================================================
+> ===
+. * analysis.do
+. * Synthetic Difference-in-Differences (SDID): California's Proposition 99
+. * Companion script for the Stata tutorial post `stata_sdid`.
+. *
+. * Run (batch):
+. *   "/Applications/Stata/StataSE.app/Contents/MacOS/stata-se" -b do analysis.
+> do
+. *
+. * Requires (all from SSC): sdid, synth, synth2, distinct
+. *   . ssc install sdid
+. *   . ssc install synth2
+. *   . ssc install synth
+. *
+. * Data: prop99_example.dta (Arkhangelsky et al. 2021 / Abadie et al. 2010).
+. *       39 US states, 1970-2000, outcome = cigarette packs per capita.
+. *       California is the single treated unit; Proposition 99 takes effect 19
+> 89.
+. *       The panel is OUTCOME-ONLY (no covariates), so synthetic control and S
+> DID
+. *       see exactly the same information set -- an apples-to-apples compariso
+> n.
+. *============================================================================
+> ===
+. 
+. clear all
+
+. set more off
+
+. set scheme s2color
+
+. set linesize 100
+
+. 
+. cd "/Users/carlos/GitHub/starter-academic-v501/content/post/stata_sdid"
+/Users/carlos/GitHub/starter-academic-v501/content/post/stata_sdid
+
+. capture mkdir web_app
+
+. capture mkdir web_app/data
+
+. 
+. * Site colour palette (RGB strings for Stata graphs)
+. global TREAT "217 119 87"   // #d97757 warm orange  -> California / observed
+
+. global CTRL  "106 155 204"  // #6a9bcc steel blue    -> control / synthetic
+
+. global TEAL  "0 212 200"    // #00d4c8 teal          -> SDID
+
+. global INK   "20 20 19"     // #141413
+
+. 
+. *-------------------------------------------------------------------------------
+. * 1. DATA
+. *-------------------------------------------------------------------------------
+. capture confirm file prop99_example.dta
+
+. if _rc {
+.     webuse set www.damianclarke.net/stata/
+.     webuse prop99_example.dta, clear
+.     save prop99_example.dta, replace
+. }
+
+. use prop99_example.dta, clear
+
+. describe
+
+Contains data from prop99_example.dta
+ Observations:         1,209                  
+    Variables:             4                  4 Apr 2022 08:37
+----------------------------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+----------------------------------------------------------------------------------------------------
+state           str14   %14s                  State
+year            int     %8.0g                 Year
+packspercapita  float   %9.0g                 PacksPerCapita
+treated         byte    %8.0g                 
+----------------------------------------------------------------------------------------------------
+Sorted by: 
+
+. tab treated
+
+    treated |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      1,197       99.01       99.01
+          1 |         12        0.99      100.00
+------------+-----------------------------------
+      Total |      1,209      100.00
+
+. summarize packspercapita
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+packsperca~a |      1,209    118.8932     32.7674       40.7      296.2
+
+. 
+. encode state, gen(id)
+
+. xtset id year
+
+Panel variable: id (strongly balanced)
+ Time variable: year, 1970 to 2000
+         Delta: 1 unit
+
+. summ id if state=="California", meanonly
+
+. local ca = r(mean)
+
+. scalar ca_id = `ca'
+
+. di as result "California id = `ca'"
+California id = 3
+
+. 
+. *-------------------------------------------------------------------------------
+. * 2. EDA: California vs. the simple average of the 38 control states
+. *-------------------------------------------------------------------------------
+. preserve
+
+.     gen byte iscal = state=="California"
+
+.     collapse (mean) packs=packspercapita, by(iscal year)
+
+.     reshape wide packs, i(year) j(iscal)
+(j = 0 1)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations               62   ->   31          
+Number of variables                   3   ->   3           
+j variable (2 values)             iscal   ->   (dropped)
+xij variables:
+                                  packs   ->   packs0 packs1
+-----------------------------------------------------------------------------
+
+.     label var packs1 "California"
+
+.     label var packs0 "Average of 38 controls"
+
+.     twoway (line packs1 year, lcolor("$TREAT") lwidth(thick))                  ///
+>            (line packs0 year, lcolor("$CTRL") lwidth(medthick) lpattern(dash)), ///
+>            xline(1989, lcolor(gs10) lpattern(solid))                          ///
+>            ytitle("Cigarette packs per capita") xtitle("")                    ///
+>            xlabel(1970(5)2000)                                                ///
+>            legend(order(1 "California" 2 "Average of 38 controls") pos(1) ring(0) cols(1) size(sma
+> ll)) ///
+>            title("California vs. the raw control average", size(medium))      ///
+>            note("Vertical line: Proposition 99 takes effect (1989).")
+
+.     graph export "stata_sdid_raw_trends.png", replace width(2000)
+file stata_sdid_raw_trends.png written in PNG format
+
+. restore
+
+. 
+. *-------------------------------------------------------------------------------
+. * 3. The original difference-in-differences: a raw 2x2
+. *-------------------------------------------------------------------------------
+. gen byte cal  = state=="California"
+
+. gen byte post = year>=1989
+
+. quietly summ packspercapita if cal==1 & post==0
+
+. scalar m_ca_pre  = r(mean)
+
+. quietly summ packspercapita if cal==1 & post==1
+
+. scalar m_ca_post = r(mean)
+
+. quietly summ packspercapita if cal==0 & post==0
+
+. scalar m_co_pre  = r(mean)
+
+. quietly summ packspercapita if cal==0 & post==1
+
+. scalar m_co_post = r(mean)
+
+. scalar did2x2 = (m_ca_post - m_ca_pre) - (m_co_post - m_co_pre)
+
+. di as result "2x2 DiD = " did2x2
+2x2 DiD = -27.349111
+
+. * identical to the interaction in a saturated regression:
+. reg packspercapita i.cal##i.post
+
+      Source |       SS           df       MS      Number of obs   =     1,209
+-------------+----------------------------------   F(3, 1205)      =    105.07
+       Model |  268939.059         3  89646.3529   Prob > F        =    0.0000
+    Residual |  1028093.89     1,205  853.189952   R-squared       =    0.2073
+-------------+----------------------------------   Adj R-squared   =    0.2054
+       Total |  1297032.95     1,208  1073.70277   Root MSE        =    29.209
+
+------------------------------------------------------------------------------
+packsperca~a | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       1.cal |    -14.359   6.788699    -2.12   0.035    -27.67799   -1.040019
+      1.post |  -28.51142   1.747208   -16.32   0.000    -31.93932   -25.08351
+             |
+    cal#post |
+        1 1  |  -27.34911   10.91131    -2.51   0.012    -48.75638   -5.941839
+             |
+       _cons |   130.5695   1.087062   120.11   0.000     128.4368    132.7023
+------------------------------------------------------------------------------
+
+. drop cal post
+
+. 
+. *-------------------------------------------------------------------------------
+. * 4. The original synthetic control (Abadie et al. 2010) via synth2
+. *    Match on the full pre-period outcome PATH (each pre-year a separate
+. *    predictor) -- the fair analogue to SDID's unit weights.
+. *-------------------------------------------------------------------------------
+. local preds ""
+
+. forvalues y = 1970/1988 {
+  2.     local preds "`preds' packspercapita(`y')"
+  3. }
+
+. 
+. synth2 packspercapita `preds', trunit(`ca') trperiod(1989) frame(sc2) symbol(2) nofigure
+Fitting results in the pretreatment periods:
+--------------------------------------------------------------------------------
+ Treated Unit             : California     Treatment Time           :       1989
+--------------------------------------------------------------------------------
+ Number of Control Units  =         38     Root Mean Squared Error  =    1.65640
+ Number of Covariates     =         19     R-squared                =    0.97699
+--------------------------------------------------------------------------------
+
+Covariate balance in the pretreatment periods:
+---------------------------------------------------------------------------------------
+       Covariate      |  V.weight    Treated    Synthetic Control     Average Control  
+                      |                        Value          Bias   Value        Bias 
+----------------------+----------------------------------------------------------------
+ packspercapita(1970) |   0.0575    123.0000    117.3614    -4.58%   120.0842    -2.37%
+ packspercapita(1971) |   0.0630    121.0000    119.7564    -1.03%   123.8632     2.37%
+ packspercapita(1972) |   0.0775    123.5000    124.5763     0.87%   129.1789     4.60%
+ packspercapita(1973) |   0.0762    124.4000    124.3053    -0.08%   131.5395     5.74%
+ packspercapita(1974) |   0.0718    126.7000    126.4153    -0.22%   134.6684     6.29%
+ packspercapita(1975) |   0.0725    127.1000    126.7159    -0.30%   136.9316     7.74%
+ packspercapita(1976) |   0.0802    128.0000    128.4025     0.31%   141.2605    10.36%
+ packspercapita(1977) |   0.0696    126.4000    126.6217     0.18%   141.0895    11.62%
+ packspercapita(1978) |   0.0589    126.1000    126.0853    -0.01%   140.4737    11.40%
+ packspercapita(1979) |   0.0514    121.9000    122.8776     0.80%   138.0868    13.28%
+ packspercapita(1980) |   0.0466    120.2000    120.1817    -0.02%   138.0895    14.88%
+ packspercapita(1981) |   0.0431    118.6000    119.6467     0.88%   137.9868    16.35%
+ packspercapita(1982) |   0.0432    115.4000    116.4915     0.95%   136.2947    18.11%
+ packspercapita(1983) |   0.0391    110.8000    110.9973     0.18%   131.2500    18.46%
+ packspercapita(1984) |   0.0311    104.8000    103.4059    -1.33%   124.9026    19.18%
+ packspercapita(1985) |   0.0288    102.8000    103.1442     0.33%   123.1158    19.76%
+ packspercapita(1986) |   0.0289     99.7000     99.5867    -0.11%   120.5947    20.96%
+ packspercapita(1987) |   0.0288     97.5000    100.4232     3.00%   117.5868    20.60%
+ packspercapita(1988) |   0.0317     90.1000     91.9269     2.03%   113.8237    26.33%
+---------------------------------------------------------------------------------------
+Note: "V.weight" is the optimal covariate weight in the diagonal of V matrix.
+      "Synthetic Control" is the weighted average of donor units with optimal weights.
+      "Average Control" is the simple average of all control units with equal weights.
+
+Optimal Unit Weights:
+---------------------------
+     Unit     |    U.weight
+--------------+------------
+         Utah |     0.3940 
+      Montana |     0.2320 
+       Nevada |     0.2050 
+  Connecticut |     0.1090 
+ NewHampshire |     0.0450 
+     Colorado |     0.0150 
+---------------------------
+Note: The unit Alabama Arkansas Delaware Georgia Idaho Illinois Indiana Iowa Kansas Kentucky
+      Louisiana Maine Minnesota Mississippi Missouri Nebraska NewMexico NorthCarolina NorthDakota
+      Ohio Oklahoma Pennsylvania RhodeIsland SouthCarolina SouthDakota Tennessee Texas Vermont
+      Virginia WestVirginia Wisconsin Wyoming in the donor pool get a weight of 0.
+
+Prediction results in the posttreatment periods:
+-----------------------------------------------------------
+ Time | Actual Outcome  Synthetic Outcome  Treatment Effect
+------+----------------------------------------------------
+ 1989 |       82.4000            90.8038           -8.4038 
+ 1990 |       77.8000            86.9790           -9.1790 
+ 1991 |       68.7000            81.3086          -12.6086 
+ 1992 |       67.5000            81.2037          -13.7037 
+ 1993 |       63.4000            80.9067          -17.5067 
+ 1994 |       58.6000            80.6205          -22.0205 
+ 1995 |       56.4000            79.2257          -22.8257 
+ 1996 |       54.5000            78.4651          -23.9651 
+ 1997 |       53.8000            80.0214          -26.2214 
+ 1998 |       52.3000            75.5979          -23.2979 
+ 1999 |       47.2000            74.6804          -27.4804 
+ 2000 |       41.6000            68.1639          -26.5639 
+------+----------------------------------------------------
+ Mean |       60.3500            79.8314          -19.4814 
+-----------------------------------------------------------
+Note: The average treatment effect over the posttreatment period is -19.4814.
+
+Finished.
+
+. scalar sc_att  = e(att)
+
+. scalar sc_rmse = e(rmse)
+
+. matrix scU = e(U_wt)
+
+. matrix list scU
+
+scU[6,1]
+              Weight
+        Utah    .394
+     Montana    .232
+      Nevada    .205
+ Connecticut    .109
+NewHampshire    .045
+    Colorado    .015
+
+. 
+. * export synth2 donor weights (rownames carry the donor names)
+. local rn : rownames scU
+
+. file open fh using "web_app/data/sc_omega.csv", write replace
+
+. file write fh "state,weight" _n
+
+. local i = 0
+
+. foreach s of local rn {
+  2.     local ++i
+  3.     local w = scU[`i',1]
+  4.     file write fh "`s',`w'" _n
+  5. }
+
+. file close fh
+
+. 
+. * pull California's synthetic path + gap out of the synth2 frame (by var label)
+. tempfile scser
+
+. frame change sc2
+
+.     keep if id==`ca'
+(1,178 observations deleted)
+
+.     foreach v of varlist _all {
+  2.         local lbl : variable label `v'
+  3.         if strpos("`lbl'","prediction")        rename `v' sc_synth
+  4.         if strpos("`lbl'","treatment effect")   rename `v' sc_effect
+  5.     }
+
+.     keep year sc_synth sc_effect
+
+.     save `scser', replace
+(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000002 not found)
+file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000002 saved as .dta format
+
+. frame change default
+
+. 
+. * SC inference: in-space placebo (RMSPE-ratio) test -> p-value (optional)
+. capture noisily synth2 packspercapita `preds', trunit(`ca') trperiod(1989) placebo(unit) nofigure
+Fitting results in the pretreatment periods:
+--------------------------------------------------------------------------------
+ Treated Unit             : California     Treatment Time           :       1989
+--------------------------------------------------------------------------------
+ Number of Control Units  =         38     Root Mean Squared Error  =    1.65640
+ Number of Covariates     =         19     R-squared                =    0.97699
+--------------------------------------------------------------------------------
+
+Covariate balance in the pretreatment periods:
+---------------------------------------------------------------------------------------
+       Covariate      |  V.weight    Treated    Synthetic Control     Average Control  
+                      |                        Value          Bias   Value        Bias 
+----------------------+----------------------------------------------------------------
+ packspercapita(1970) |   0.0575    123.0000    117.3614    -4.58%   120.0842    -2.37%
+ packspercapita(1971) |   0.0630    121.0000    119.7564    -1.03%   123.8632     2.37%
+ packspercapita(1972) |   0.0775    123.5000    124.5763     0.87%   129.1789     4.60%
+ packspercapita(1973) |   0.0762    124.4000    124.3053    -0.08%   131.5395     5.74%
+ packspercapita(1974) |   0.0718    126.7000    126.4153    -0.22%   134.6684     6.29%
+ packspercapita(1975) |   0.0725    127.1000    126.7159    -0.30%   136.9316     7.74%
+ packspercapita(1976) |   0.0802    128.0000    128.4025     0.31%   141.2605    10.36%
+ packspercapita(1977) |   0.0696    126.4000    126.6217     0.18%   141.0895    11.62%
+ packspercapita(1978) |   0.0589    126.1000    126.0853    -0.01%   140.4737    11.40%
+ packspercapita(1979) |   0.0514    121.9000    122.8776     0.80%   138.0868    13.28%
+ packspercapita(1980) |   0.0466    120.2000    120.1817    -0.02%   138.0895    14.88%
+ packspercapita(1981) |   0.0431    118.6000    119.6467     0.88%   137.9868    16.35%
+ packspercapita(1982) |   0.0432    115.4000    116.4915     0.95%   136.2947    18.11%
+ packspercapita(1983) |   0.0391    110.8000    110.9973     0.18%   131.2500    18.46%
+ packspercapita(1984) |   0.0311    104.8000    103.4059    -1.33%   124.9026    19.18%
+ packspercapita(1985) |   0.0288    102.8000    103.1442     0.33%   123.1158    19.76%
+ packspercapita(1986) |   0.0289     99.7000     99.5867    -0.11%   120.5947    20.96%
+ packspercapita(1987) |   0.0288     97.5000    100.4232     3.00%   117.5868    20.60%
+ packspercapita(1988) |   0.0317     90.1000     91.9269     2.03%   113.8237    26.33%
+---------------------------------------------------------------------------------------
+Note: "V.weight" is the optimal covariate weight in the diagonal of V matrix.
+      "Synthetic Control" is the weighted average of donor units with optimal weights.
+      "Average Control" is the simple average of all control units with equal weights.
+
+Optimal Unit Weights:
+---------------------------
+     Unit     |    U.weight
+--------------+------------
+         Utah |     0.3940 
+      Montana |     0.2320 
+       Nevada |     0.2050 
+  Connecticut |     0.1090 
+ NewHampshire |     0.0450 
+     Colorado |     0.0150 
+---------------------------
+Note: The unit Alabama Arkansas Delaware Georgia Idaho Illinois Indiana Iowa Kansas Kentucky
+      Louisiana Maine Minnesota Mississippi Missouri Nebraska NewMexico NorthCarolina NorthDakota
+      Ohio Oklahoma Pennsylvania RhodeIsland SouthCarolina SouthDakota Tennessee Texas Vermont
+      Virginia WestVirginia Wisconsin Wyoming in the donor pool get a weight of 0.
+
+Prediction results in the posttreatment periods:
+-----------------------------------------------------------
+ Time | Actual Outcome  Synthetic Outcome  Treatment Effect
+------+----------------------------------------------------
+ 1989 |       82.4000            90.8038           -8.4038 
+ 1990 |       77.8000            86.9790           -9.1790 
+ 1991 |       68.7000            81.3086          -12.6086 
+ 1992 |       67.5000            81.2037          -13.7037 
+ 1993 |       63.4000            80.9067          -17.5067 
+ 1994 |       58.6000            80.6205          -22.0205 
+ 1995 |       56.4000            79.2257          -22.8257 
+ 1996 |       54.5000            78.4651          -23.9651 
+ 1997 |       53.8000            80.0214          -26.2214 
+ 1998 |       52.3000            75.5979          -23.2979 
+ 1999 |       47.2000            74.6804          -27.4804 
+ 2000 |       41.6000            68.1639          -26.5639 
+------+----------------------------------------------------
+ Mean |       60.3500            79.8314          -19.4814 
+-----------------------------------------------------------
+Note: The average treatment effect over the posttreatment period is -19.4814.
+
+Implementing placebo test using fake treatment unit Alabama...Arkansas...Colorado...Connecticut...De
+> laware...Georgia...Idaho...Illinois...Indiana...Iowa...Kansas...Kentucky...Louisiana...Maine...Min
+> nesota...Mississippi...Missouri...Montana...Nebraska...Nevada...NewHampshire...NewMexico...NorthCa
+> rolina...NorthDakota...Ohio...Oklahoma...Pennsylvania...RhodeIsland...SouthCarolina...SouthDakota.
+> ..Tennessee...Texas...Utah...Vermont...Virginia...WestVirginia...Wisconsin...Wyoming...
+
+In-space placebo test results using fake treatment units:
+-------------------------------------------------------------------------------
+      Unit     |  Pre MSPE  Post MSPE   Post/Pre MSPE    Pre MSPE of Fake Unit/
+               |                                       Pre MSPE of Treated Unit
+---------------+---------------------------------------------------------------
+    California |    2.7437   423.2949       154.2810                    1.0000 
+       Alabama |    3.3144    13.3988         4.0426                    1.2080 
+      Arkansas |    4.1998    17.7623         4.2293                    1.5307 
+      Colorado |    8.3848    50.7846         6.0567                    3.0561 
+   Connecticut |    8.6870   217.9797        25.0928                    3.1662 
+      Delaware |   11.7272   180.9220        15.4275                    4.2743 
+       Georgia |    1.1926    96.3529        80.7891                    0.4347 
+         Idaho |    4.6477    39.4554         8.4892                    1.6940 
+      Illinois |    2.0817    24.6882        11.8594                    0.7587 
+       Indiana |   12.8941   218.1950        16.9221                    4.6996 
+          Iowa |    6.0498    25.7266         4.2525                    2.2050 
+        Kansas |    6.2763     6.9810         1.1123                    2.2876 
+      Kentucky |  284.7957  1599.5168         5.6164                  103.8013 
+     Louisiana |    0.9814    30.2430        30.8150                    0.3577 
+         Maine |    5.1346    77.2638        15.0478                    1.8714 
+     Minnesota |   11.0624    21.2777         1.9234                    4.0320 
+   Mississippi |    3.0156    35.6779        11.8313                    1.0991 
+      Missouri |    0.1917   109.1983       569.7330                    0.0699 
+       Montana |    4.0778   181.5533        44.5219                    1.4863 
+      Nebraska |    0.7114    72.2221       101.5254                    0.2593 
+        Nevada |   40.3226    82.8161         2.0538                   14.6966 
+  NewHampshire | 3436.5953   134.9018         0.0393                 1252.5580 
+     NewMexico |    1.9224     7.5067         3.9049                    0.7007 
+ NorthCarolina |   81.3897    57.3684         0.7049                   29.6646 
+   NorthDakota |    7.3737    80.1903        10.8752                    2.6875 
+          Ohio |    1.6982     6.8088         4.0095                    0.6189 
+      Oklahoma |    3.8470   252.3751        65.6026                    1.4022 
+  Pennsylvania |    1.0329     8.4220         8.1541                    0.3765 
+   RhodeIsland |   14.3919   706.9300        49.1201                    5.2455 
+ SouthCarolina |    1.4021    38.4495        27.4235                    0.5110 
+   SouthDakota |    1.2707    65.0543        51.1954                    0.4631 
+     Tennessee |    5.1794   111.2945        21.4880                    1.8878 
+         Texas |    3.6756   243.4357        66.2301                    1.3397 
+          Utah |  593.7642   223.2758         0.3760                  216.4131 
+       Vermont |    6.6784   247.3277        37.0341                    2.4341 
+      Virginia |    0.6655   262.0003       393.6671                    0.2426 
+  WestVirginia |    6.3383   291.9732        46.0646                    2.3102 
+     Wisconsin |    1.7052    62.1844        36.4680                    0.6215 
+       Wyoming |   29.3926    30.5095         1.0380                   10.7129 
+-------------------------------------------------------------------------------
+Note: The probability of obtaining a post/pretreatment MSPE ratio as large as California's is
+      0.0769.
+
+In-space placebo test results using fake treatment units (continued):
+----------------------------------------------------------------
+ Time |  Treatment Effect      p-value of Treatment Effect      
+      |                     Two-sided   Right-sided   Left-sided
+------+---------------------------------------------------------
+ 1989 |          -8.4038       0.1538       0.9487       0.0769 
+ 1990 |          -9.1790       0.2308       0.8462       0.1795 
+ 1991 |         -12.6086       0.1538       0.8974       0.1282 
+ 1992 |         -13.7037       0.1282       0.9231       0.1026 
+ 1993 |         -17.5067       0.1026       0.9487       0.0769 
+ 1994 |         -22.0205       0.0769       0.9744       0.0513 
+ 1995 |         -22.8257       0.0769       0.9744       0.0513 
+ 1996 |         -23.9651       0.0769       0.9744       0.0513 
+ 1997 |         -26.2214       0.1026       0.9487       0.0769 
+ 1998 |         -23.2979       0.1026       0.9487       0.0769 
+ 1999 |         -27.4804       0.0769       0.9744       0.0513 
+ 2000 |         -26.5639       0.0769       1.0000       0.0256 
+----------------------------------------------------------------
+Note: (1) The two-sided p-value of the treatment effect for a particular period is defined as the
+      frequency that the absolute values of the placebo effects are greater than or equal to the
+      absolute value of treatment effect.
+      (2) The right-sided (left-sided) p-value of the treatment effect for a particular period is
+      defined as the frequency that the placebo effects are greater (smaller) than or equal to the
+      treatment effect.
+      (3) If the estimated treatment effect is positive, then the right-sided p-value is
+      recommended; whereas the left-sided p-value is recommended if the estimated treatment effect
+      is negative.
+
+Finished.
+
+. if _rc==0 {
+.     matrix scPV = e(pval)
+.     di as result "--- synth2 in-space placebo p-values e(pval) ---"
+--- synth2 in-space placebo p-values e(pval) ---
+.     matrix list scPV
+
+scPV[12,4]
+                       p-value:     p-value:     p-value:
+          Tr.Eff.    two-sided  right-sided   left-sided
+1989   -8.4037933    .15384615    .94871795    .07692308
+1990   -9.1790009    .23076923    .84615385    .17948718
+1991   -12.608604    .15384615     .8974359    .12820513
+1992   -13.703697    .12820513    .92307692     .1025641
+1993   -17.506699     .1025641    .94871795    .07692308
+1994     -22.0205    .07692308    .97435897    .05128205
+1995   -22.825699    .07692308    .97435897    .05128205
+1996   -23.965103    .07692308    .97435897    .05128205
+1997   -26.221401     .1025641    .94871795    .07692308
+1998   -23.297901     .1025641    .94871795    .07692308
+1999   -27.480396    .07692308    .97435897    .05128205
+2000   -26.563904    .07692308            1    .02564103
+. }
+
+. 
+. *-------------------------------------------------------------------------------
+. * 5. Synthetic difference-in-differences (Arkhangelsky et al. 2021) via sdid
+. *    Run A: point estimate + canonical figure + returned unit/time weights
+. *-------------------------------------------------------------------------------
+. use prop99_example.dta, clear
+
+. encode state, gen(id)
+
+. 
+. sdid packspercapita state year treated, method(sdid) vce(noinference) graph g1on ///
+>      returnweights mattitles                                                     ///
+>      g1_opt(ylabel(-110(20)50) xtitle(""))                                       ///
+>      g2_opt(ylabel(0(25)150) ytitle("Packs per capita"))
+
+
+Synthetic Difference-in-Differences Estimator
+
+-----------------------------------------------------------------------------
+packsperca~a |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+     treated | -15.60383          .        .        .           .           .
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+Refer to Arkhangelsky et al., (2021) for theoretical derivations.
+
+. graph export "stata_sdid_sdid_main.png", replace width(2000)
+file stata_sdid_sdid_main.png written in PNG format
+
+. scalar sdid_att = e(ATT)
+
+. di as result "SDID ATT = " sdid_att
+SDID ATT = -15.60383
+
+. 
+. * capture the treated + SDID synthetic outcome trajectories
+. matrix S = e(series)
+
+. tempfile sdidser
+
+. preserve
+
+.     clear
+
+.     svmat S, names(col)
+number of observations will be reset to 31
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 31.
+
+.     rename (Yco1989 Ytr1989) (sdid_synth ca_actual)
+
+.     keep year sdid_synth ca_actual
+
+.     save `sdidser', replace
+(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000003 not found)
+file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000003 saved as .dta format
+
+. restore
+
+. 
+. * export SDID unit weights (omega) and time weights (lambda)
+. preserve
+
+.     keep state omega1989
+
+.     duplicates drop
+
+Duplicates in terms of all variables
+
+(1,170 observations deleted)
+
+.     rename omega1989 omega
+
+.     gsort -omega
+
+.     export delimited using "web_app/data/sdid_omega.csv", replace
+file web_app/data/sdid_omega.csv saved
+
+. restore
+
+. tempfile lamf
+
+. preserve
+
+.     keep year lambda1989
+
+.     duplicates drop
+
+Duplicates in terms of all variables
+
+(1,178 observations deleted)
+
+.     rename lambda1989 lambda
+
+.     export delimited using "web_app/data/sdid_lambda.csv", replace
+file web_app/data/sdid_lambda.csv saved
+
+.     save `lamf', replace
+(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000006 not found)
+file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000006 saved as .dta format
+
+. restore
+
+. capture drop omega1989 lambda1989
+
+. 
+. * Run B: placebo inference (the valid choice with ONE treated unit)
+. sdid packspercapita state year treated, vce(placebo) seed(1213)
+Placebo replications (50). This may take some time.
+----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5
+..................................................     50
+
+
+Synthetic Difference-in-Differences Estimator
+
+-----------------------------------------------------------------------------
+packsperca~a |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+     treated | -15.60383    9.87941    -1.58    0.114   -34.96712     3.75946
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+Refer to Arkhangelsky et al., (2021) for theoretical derivations.
+
+. scalar sdid_se  = e(se)
+
+. scalar sdid_cil = e(ATT_l)
+
+. scalar sdid_cir = e(ATT_r)
+
+. di as result "SDID ATT = " e(ATT) "  SE = " sdid_se "  95% CI = [" sdid_cil "," sdid_cir "]"
+SDID ATT = -15.60383  SE = 9.87941  95% CI = [-34.967118,3.7594578]
+
+. 
+. *-------------------------------------------------------------------------------
+. * 6. The three estimators in one framework: method(did|sc|sdid)
+. *-------------------------------------------------------------------------------
+. sdid packspercapita state year treated, method(did) vce(noinference) graph g1on  ///
+>      g1_opt(ylabel(-110(20)50) xtitle(""))                                       ///
+>      g2_opt(ylabel(0(25)150) ytitle("Packs per capita"))
+
+
+Difference-in-Differences Estimator
+
+-----------------------------------------------------------------------------
+packsperca~a |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+     treated | -27.34911          .        .        .           .           .
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+
+
+. graph export "stata_sdid_did_panel.png", replace width(2000)
+file stata_sdid_did_panel.png written in PNG format
+
+. scalar did_att = e(ATT)
+
+. 
+. sdid packspercapita state year treated, method(sc) vce(noinference) graph g1on   ///
+>      g1_opt(ylabel(-110(20)50) xtitle(""))                                       ///
+>      g2_opt(ylabel(0(25)150) ytitle("Packs per capita"))
+
+
+Synthetic Control
+
+-----------------------------------------------------------------------------
+packsperca~a |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+     treated | -19.61966          .        .        .           .           .
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+
+
+. graph export "stata_sdid_sc_panel.png", replace width(2000)
+file stata_sdid_sc_panel.png written in PNG format
+
+. scalar sc_sdidframe_att = e(ATT)
+
+. 
+. di as result "DiD(sdid)=" did_att "  SC(sdid)=" sc_sdidframe_att "  SDID=" sdid_att
+DiD(sdid)=-27.34911  SC(sdid)=-19.61966  SDID=-15.60383
+
+. 
+. *-------------------------------------------------------------------------------
+. * 7. Putting them side by side: one chart of California vs. every counterfactual
+. *-------------------------------------------------------------------------------
+. preserve
+
+.     keep if state!="California"
+(31 observations deleted)
+
+.     collapse (mean) ctrl_mean=packspercapita, by(year)
+
+.     tempfile cm
+
+.     save `cm', replace
+(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000009 not found)
+file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000009 saved as .dta format
+
+. restore
+
+. 
+. use `sdidser', clear
+
+. merge 1:1 year using `scser', nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                31  
+    -----------------------------------------
+
+. merge 1:1 year using `cm',   nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                31  
+    -----------------------------------------
+
+. merge 1:1 year using `lamf', nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                31  
+    -----------------------------------------
+
+. * DiD counterfactual: California's pre-level shifted by the controls' change
+. summ ca_actual if year<=1988, meanonly
+
+. local capre = r(mean)
+
+. summ ctrl_mean if year<=1988, meanonly
+
+. local copre = r(mean)
+
+. gen did_cf = `capre' + (ctrl_mean - `copre')
+
+. * SDID counterfactual: e(series) Yco matches TRENDS not levels (unit FE absorbs
+. * the offset), so anchor it by the lambda-WEIGHTED pre-period gap -- exactly the
+. * baseline SDID differences against. Post-period (ca_actual - sdid_cf) then
+. * averages to the SDID ATT.
+. gen double pregap = lambda*(sdid_synth - ca_actual) if year<=1988 & lambda<.
+(12 missing values generated)
+
+. egen double offset_sdid = total(pregap)
+
+. gen sdid_cf = sdid_synth - offset_sdid
+
+. summ offset_sdid, meanonly
+
+. di as result "SDID lambda-weighted pre-period gap (anchor) = " r(mean)
+SDID lambda-weighted pre-period gap (anchor) = 25.352419
+
+. drop pregap offset_sdid
+
+. order year ca_actual did_cf sc_synth sdid_cf sdid_synth ctrl_mean sc_effect lambda
+
+. export delimited using "web_app/data/series.csv", replace
+file web_app/data/series.csv saved
+
+. list year ca_actual did_cf sc_synth sdid_cf, sepby(year) noobs
+
+  +--------------------------------------------------+
+  | year   ca_act~l     did_cf   sc_synth    sdid_cf |
+  |--------------------------------------------------|
+  | 1970        123   105.7252   117.3614   116.5335 |
+  |--------------------------------------------------|
+  | 1971        121   109.5042   119.7564   119.8504 |
+  |--------------------------------------------------|
+  | 1972      123.5     114.82   124.5763   124.4751 |
+  |--------------------------------------------------|
+  | 1973      124.4   117.1805   124.3053   123.7708 |
+  |--------------------------------------------------|
+  | 1974      126.7   120.3094   126.4153   124.8412 |
+  |--------------------------------------------------|
+  | 1975      127.1   122.5726   126.7159    125.064 |
+  |--------------------------------------------------|
+  | 1976        128   126.9015   128.4025   129.3823 |
+  |--------------------------------------------------|
+  | 1977      126.4   126.7305   126.6217   127.1502 |
+  |--------------------------------------------------|
+  | 1978      126.1   126.1147   126.0853   125.4456 |
+  |--------------------------------------------------|
+  | 1979      121.9   123.7278   122.8776   121.5677 |
+  |--------------------------------------------------|
+  | 1980      120.2   123.7305   120.1817   120.0172 |
+  |--------------------------------------------------|
+  | 1981      118.6   123.6278   119.6467   119.3115 |
+  |--------------------------------------------------|
+  | 1982      115.4   121.9357   116.4915   116.4296 |
+  |--------------------------------------------------|
+  | 1983      110.8    116.891   110.9973   111.7078 |
+  |--------------------------------------------------|
+  | 1984      104.8   110.5436   103.4059   103.7482 |
+  |--------------------------------------------------|
+  | 1985      102.8   108.7568   103.1442   101.8305 |
+  |--------------------------------------------------|
+  | 1986       99.7   106.2357    99.5867   98.58356 |
+  |--------------------------------------------------|
+  | 1987       97.5   103.2278   100.4232   97.31182 |
+  |--------------------------------------------------|
+  | 1988       90.1   99.46468    91.9269   91.14898 |
+  |--------------------------------------------------|
+  | 1989       82.4   95.30415   90.80379   87.24498 |
+  |--------------------------------------------------|
+  | 1990       77.8   91.30679     86.979   82.12582 |
+  |--------------------------------------------------|
+  | 1991       68.7    89.9831    81.3086   77.35355 |
+  |--------------------------------------------------|
+  | 1992       67.5   89.03574    81.2037   75.91912 |
+  |--------------------------------------------------|
+  | 1993       63.4   88.33573    80.9067   75.94547 |
+  |--------------------------------------------------|
+  | 1994       58.6   87.75942    80.6205   74.70623 |
+  |--------------------------------------------------|
+  | 1995       56.4    88.7989    79.2257   75.30577 |
+  |--------------------------------------------------|
+  | 1996       54.5   86.82521    78.4651   73.85014 |
+  |--------------------------------------------------|
+  | 1997       53.8   87.43047    80.0214   74.68352 |
+  |--------------------------------------------------|
+  | 1998       52.3   86.59889    75.5979   75.08157 |
+  |--------------------------------------------------|
+  | 1999       47.2   83.23573    74.6804   73.14493 |
+  |--------------------------------------------------|
+  | 2000       41.6   77.77521    68.1639   66.08488 |
+  +--------------------------------------------------+
+
+. 
+. twoway (line ca_actual year, lcolor("$TREAT") lwidth(thick))                     ///
+>        (line did_cf    year, lcolor(gs7)      lpattern(dash))                    ///
+>        (line sc_synth  year, lcolor("$CTRL")  lpattern(shortdash) lwidth(medthick)) ///
+>        (line sdid_cf   year, lcolor("$TEAL")  lpattern(solid)     lwidth(medthick)),  ///
+>        xline(1989, lcolor(gs10))                                                 ///
+>        ytitle("Cigarette packs per capita") xtitle("") xlabel(1970(5)2000)      ///
+>        legend(order(1 "California (observed)" 2 "DiD counterfactual"             ///
+>                     3 "Synthetic control (synth2)" 4 "SDID counterfactual")      ///
+>               rows(2) pos(6) size(small))                                        ///
+>        title("Four counterfactuals for California", size(medium))                ///
+>        note("SDID counterfactual anchored to California by its {&lambda}-weighted pre-period gap."
+> )
+
+. graph export "stata_sdid_compare_paths.png", replace width(2000)
+file stata_sdid_compare_paths.png written in PNG format
+
+. 
+. * synth2 path + gap figures (built from the merged series)
+. twoway (line ca_actual year, lcolor("$TREAT") lwidth(thick))                     ///
+>        (line sc_synth  year, lcolor("$CTRL")  lpattern(dash) lwidth(medthick)),  ///
+>        xline(1989, lcolor(gs10)) ytitle("Packs per capita") xtitle("")           ///
+>        xlabel(1970(5)2000)                                                       ///
+>        legend(order(1 "California" 2 "Synthetic California") pos(1) ring(0) cols(1) size(small)) /
+> //
+>        title("Synthetic control fit (synth2)", size(medium))
+
+. graph export "stata_sdid_sc_path.png", replace width(2000)
+file stata_sdid_sc_path.png written in PNG format
+
+. 
+. twoway (line sc_effect year, lcolor("$INK") lwidth(medthick)),                   ///
+>        yline(0, lcolor(gs10)) xline(1989, lcolor(gs10) lpattern(dash))           ///
+>        ytitle("Gap: California - synthetic") xtitle("") xlabel(1970(5)2000)      ///
+>        title("Estimated gap (synth2)", size(medium))
+
+. graph export "stata_sdid_sc_gap.png", replace width(2000)
+file stata_sdid_sc_gap.png written in PNG format
+
+. 
+. * time-weight bar chart (SDID puts all pre-weight on 1986-1988)
+. preserve
+
+.     import delimited "web_app/data/sdid_lambda.csv", clear
+(encoding automatically selected: ISO-8859-9)
+(2 vars, 31 obs)
+
+.     twoway (bar lambda year if lambda>0, color("$CTRL") barwidth(0.8)),          ///
+>            ytitle("SDID time weight ({&lambda})") xtitle("")                     ///
+>            xlabel(1970(2)1988) ylabel(0(.1).5) legend(off)                       ///
+>            title("Where SDID looks: pre-period time weights", size(medium))      ///
+>            note("All pre-treatment weight falls on 1986-1988 (0.37, 0.21, 0.43).")
+
+.     graph export "stata_sdid_lambda.png", replace width(2000)
+file stata_sdid_lambda.png written in PNG format
+
+. restore
+
+. 
+. *-------------------------------------------------------------------------------
+. * 8. Inference figure: SDID in-space placebo distribution
+. *    Drop California; assign each control as the placebo-treated unit at 1989;
+. *    re-estimate SDID; collect placebo ATTs.  p = share with |placebo| >= |obs|.
+. *-------------------------------------------------------------------------------
+. use prop99_example.dta, clear
+
+. drop if state=="California"
+(31 observations deleted)
+
+. levelsof state, local(ctrls)
+`"Alabama"' `"Arkansas"' `"Colorado"' `"Connecticut"' `"Delaware"' `"Georgia"' `"Idaho"' `"Illinois"
+> ' `"Indiana"' `"Iowa"' `"Kansas"' `"Kentucky"' `"Louisiana"' `"Maine"' `"Minnesota"' `"Mississippi
+> "' `"Missouri"' `"Montana"' `"Nebraska"' `"Nevada"' `"New Hampshire"' `"New Mexico"' `"North Carol
+> ina"' `"North Dakota"' `"Ohio"' `"Oklahoma"' `"Pennsylvania"' `"Rhode Island"' `"South Carolina"' 
+> `"South Dakota"' `"Tennessee"' `"Texas"' `"Utah"' `"Vermont"' `"Virginia"' `"West Virginia"' `"Wis
+> consin"' `"Wyoming"'
+
+. tempname pf
+
+. postfile `pf' str20 pstate double ptau using "_placebo.dta", replace
+(file _placebo.dta not found)
+
+. foreach s of local ctrls {
+  2.     preserve
+  3.         gen byte ptreat = (state=="`s'") & (year>=1989)
+  4.         capture sdid packspercapita state year ptreat, vce(noinference)
+  5.         if _rc==0 post `pf' ("`s'") (e(ATT))
+  6.     restore
+  7. }
+
+. postclose `pf'
+
+. 
+. use "_placebo.dta", clear
+
+. local aatt = sdid_att
+
+. count if abs(ptau) >= abs(`aatt')
+  1
+
+. local pc = r(N)
+
+. count
+  38
+
+. local pn = r(N)
+
+. scalar sdid_pperm = `pc'/`pn'
+
+. di as result "SDID placebo permutation p-value = " sdid_pperm "  (n=`pn')"
+SDID placebo permutation p-value = .02631579  (n=38)
+
+. export delimited using "web_app/data/placebo.csv", replace
+file web_app/data/placebo.csv saved
+
+. 
+. local aatts : di %4.1f `aatt'
+
+. local pvals : di %5.3f sdid_pperm
+
+. twoway (histogram ptau, width(2) color("${CTRL}%70") lcolor(white)),             ///
+>        xline(`aatt', lcolor("$TREAT") lwidth(thick))                             ///
+>        xtitle("Placebo ATT among control states") ytitle("Density")             ///
+>        title("SDID placebo distribution", size(medium))                         ///
+>        note("Orange line: California's estimated ATT (`aatts'). Permutation p = `pvals'.")
+
+. graph export "stata_sdid_placebo_hist.png", replace width(2000)
+file stata_sdid_placebo_hist.png written in PNG format
+
+. 
+. *-------------------------------------------------------------------------------
+. * 9. Summary table of every ATT estimate -> web_app/data/atts.csv
+. *-------------------------------------------------------------------------------
+. clear
+
+. set obs 5
+Number of observations (_N) was 0, now 5.
+
+. gen str30 method = ""
+(5 missing values generated)
+
+. gen double att  = .
+(5 missing values generated)
+
+. gen double se   = .
+(5 missing values generated)
+
+. gen double ci_l = .
+(5 missing values generated)
+
+. gen double ci_r = .
+(5 missing values generated)
+
+. gen double note_pval = .
+(5 missing values generated)
+
+. replace method = "Raw 2x2 DiD"                 in 1
+(1 real change made)
+
+. replace att = did2x2                            in 1
+(1 real change made)
+
+. replace method = "DiD (TWFE, sdid)"            in 2
+(1 real change made)
+
+. replace att = did_att                           in 2
+(1 real change made)
+
+. replace method = "Synthetic control (synth2)"  in 3
+(1 real change made)
+
+. replace att = sc_att                            in 3
+(1 real change made)
+
+. replace method = "SC (sdid framework)"         in 4
+(1 real change made)
+
+. replace att = sc_sdidframe_att                  in 4
+(1 real change made)
+
+. replace method = "SDID"                         in 5
+(1 real change made)
+
+. replace att = sdid_att                          in 5
+(1 real change made)
+
+. replace se = sdid_se                            in 5
+(1 real change made)
+
+. replace ci_l = sdid_cil                         in 5
+(1 real change made)
+
+. replace ci_r = sdid_cir                         in 5
+(1 real change made)
+
+. replace note_pval = sdid_pperm                  in 5
+(1 real change made)
+
+. export delimited using "web_app/data/atts.csv", replace
+file web_app/data/atts.csv saved
+
+. list, noobs
+
+  +----------------------------------------------------------------------------------------+
+  |                     method          att        se         ci_l        ci_r   note_pval |
+  |----------------------------------------------------------------------------------------|
+  |                Raw 2x2 DiD   -27.349111         .            .           .           . |
+  |           DiD (TWFE, sdid)    -27.34911         .            .           .           . |
+  | Synthetic control (synth2)   -19.481392         .            .           .           . |
+  |        SC (sdid framework)    -19.61966         .            .           .           . |
+  |                       SDID    -15.60383   9.87941   -34.967118   3.7594578   .02631579 |
+  +----------------------------------------------------------------------------------------+
+
+. 
+. *-------------------------------------------------------------------------------
+. * Clean up scratch file
+. *-------------------------------------------------------------------------------
+. capture erase "_placebo.dta"
+
+. 
+. di as result _n "==================== KEY NUMBERS ===================="
+
+==================== KEY NUMBERS ====================
+
+. di as result "Raw 2x2 DiD                 = " %7.2f did2x2
+Raw 2x2 DiD                 =  -27.35
+
+. di as result "DiD (sdid framework)        = " %7.2f did_att
+DiD (sdid framework)        =  -27.35
+
+. di as result "Synthetic control (synth2)  = " %7.2f sc_att   "   (RMSE " %4.2f sc_rmse ")"
+Synthetic control (synth2)  =  -19.48   (RMSE 1.66)
+
+. di as result "SC (sdid framework)         = " %7.2f sc_sdidframe_att
+SC (sdid framework)         =  -19.62
+
+. di as result "SDID                        = " %7.2f sdid_att
+SDID                        =  -15.60
+
+. di as result "SDID placebo SE             = " %7.2f sdid_se
+SDID placebo SE             =    9.88
+
+. di as result "SDID 95% CI                 = [" %6.2f sdid_cil ", " %6.2f sdid_cir "]"
+SDID 95% CI                 = [-34.97,   3.76]
+
+. di as result "SDID permutation p-value    = " %5.3f sdid_pperm
+SDID permutation p-value    = 0.026
+
+. di as result "====================================================="
+=====================================================
+
+. 
+end of do-file

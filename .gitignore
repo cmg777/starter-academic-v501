@@ -20,6 +20,12 @@ content/post/stata_iv/references/
 # extracted by prepare_data.R live in data/ and ARE committed.
 content/post/r_double_lasso/references/
 
+# Clarke et al. (2024) SDID Stata Journal paper for stata_sdid — third-party
+# source (paper markdown + online_supplementary_material.pdf + sdidExamples.pdf
+# + replication_materials.do); Hugo would publish the PDFs. The post cites the
+# paper in References; the source archive is not committed.
+content/post/stata_sdid/references/
+
 # Stata batch-mode auto-log artifact (the real log is analysis.log)
 content/post/stata_iv/stata.log
 

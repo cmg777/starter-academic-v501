@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Synthetic Difference-in-Differences — Interactive Lab</title>
+<meta name="description" content="Interactive companion to the Stata tutorial on Synthetic Difference-in-Differences (SDID) and California's Proposition 99. Toggle DiD, synthetic control, and SDID to see how each builds California's counterfactual, and explore placebo inference.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Synthetic Difference-in-Differences — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Synthetic Difference-in-Differences in Stata: California's Proposition 99</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist" aria-label="Lab sections">
+  <button id="tab-concept"  class="tab active" data-pane="pane-concept"  role="tab" aria-controls="pane-concept"  aria-selected="true">1 · Concept</button>
+  <button id="tab-explorer" class="tab"        data-pane="pane-explorer" role="tab" aria-controls="pane-explorer" aria-selected="false">2 · Weighting schemes</button>
+  <button id="tab-gap"      class="tab"        data-pane="pane-gap"      role="tab" aria-controls="pane-gap"      aria-selected="false">3 · Counterfactual &amp; gap</button>
+  <button id="tab-placebo"  class="tab"        data-pane="pane-placebo"  role="tab" aria-controls="pane-placebo"  aria-selected="false">4 · Placebo inference</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: CONCEPT ====================== -->
+<section id="pane-concept" class="tab-pane active" role="tabpanel" aria-labelledby="tab-concept">
+
+  <h2>Did Proposition 99 cut smoking? Three ways to draw the counterfactual</h2>
+  <p class="lede">
+    In 1988 California passed Proposition 99, raising cigarette taxes and funding
+    anti-smoking programs. Cigarette sales fell — but sales were already falling
+    everywhere. The hard part is the <strong>counterfactual</strong>: how many
+    packs <em>would</em> Californians have smoked without the law? Three methods
+    answer that question with three different recipes, and they disagree by a
+    lot. Use the tabs above to build each counterfactual yourself.
+  </p>
+
+  <div class="headline">
+    <div class="num did">
+      <div class="big">−27.3</div>
+      <div class="cap">Difference-in-differences<br>(2&times;2, equal weights)</div>
+    </div>
+    <div class="num sc">
+      <div class="big">−19.5</div>
+      <div class="cap">Synthetic control<br>(unit weights only)</div>
+    </div>
+    <div class="num sdid">
+      <div class="big">−15.6</div>
+      <div class="cap">SDID<br>(unit + time weights)</div>
+    </div>
+  </div>
+  <p class="note" style="text-align:center; margin-top:-6px;">
+    Average treatment effect on the treated (ATT), in cigarette packs per capita per year, 1989–2000.
+  </p>
+
+  <div class="card">
+    <h3>One regression, three weighting schemes</h3>
+    <p>
+      DiD, synthetic control, and SDID are <strong>not</strong> three unrelated
+      tools. Each is the <em>same</em> two-way fixed-effects regression of packs
+      per capita on a treatment dummy, fit with state fixed effects and year
+      fixed effects. The only thing that changes is <strong>which observations
+      get weight</strong>: which donor states stand in for California, and which
+      pre-treatment years define the baseline.
+    </p>
+    <div class="recipe">
+      <div class="recipe-card did">
+        <h4>DiD</h4>
+        <p class="weights"><b>Units:</b> all 38 controls, equal weight<br><b>Years:</b> all pre-years, equal weight</p>
+        <p class="desc">The control group is a plain average of every other state. Assumes California's untreated path would parallel that average — even though controls were higher and flatter before 1989.</p>
+      </div>
+      <div class="recipe-card sc">
+        <h4>Synthetic control</h4>
+        <p class="weights"><b>Units:</b> a few donors, weights <span class="kbd">&omega;</span><br><b>Years:</b> all pre-years, equal weight</p>
+        <p class="desc">Picks a sparse, weighted blend of donor states that tracks California's <em>level</em> before 1989. Here just 6 states get weight (Utah, Montana, Nevada, …).</p>
+      </div>
+      <div class="recipe-card sdid">
+        <h4>SDID</h4>
+        <p class="weights"><b>Units:</b> donors, weights <span class="kbd">&omega;</span><br><b>Years:</b> recent pre-years, weights <span class="kbd">&lambda;</span></p>
+        <p class="desc">Adds <em>time</em> weights on top of unit weights, concentrating the baseline on the years just before 1989 (1986–88) that look most like the post-period.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-explorer" tabindex="0" role="button" aria-label="Go to the weighting-scheme explorer">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Weighting-scheme explorer</h4>
+      <p>Flip between DiD, SC, and SDID and watch California's counterfactual redraw itself. See why DiD overshoots and SDID lands in the middle.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-gap" tabindex="0" role="button" aria-label="Go to the counterfactual and gap tab">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Counterfactual &amp; gap</h4>
+      <p>The treated-vs-synthetic view, with the estimated effect (the gap) charted below and the ATT labelled on the post-1989 region.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-placebo" tabindex="0" role="button" aria-label="Go to the placebo inference tab">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Placebo inference</h4>
+      <p>With one treated unit, you cannot rely on a standard error alone. Pretend each control was treated, collect 38 placebo effects, and see how extreme California really is.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why does SDID land between DiD and SC?</h3>
+    <p>
+      DiD compares California to a flat average of higher-smoking states, so it
+      reads off a large drop (−27.3). Synthetic control fixes the level mismatch
+      with unit weights and shrinks the estimate to −19.5. SDID keeps those unit
+      weights <em>and</em> down-weights distant pre-years that no longer resemble
+      California, removing the last bit of trend mismatch — landing at
+      <strong>−15.6 packs per capita</strong>. The three estimates are a story
+      about how much each method trusts parallel trends.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Glossary — open a card if a term is unfamiliar</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Counterfactual</summary>
+        <div class="gloss-body">What would have happened to California without Prop 99. It is never observed — every method <em>estimates</em> it from the control states.</div>
+      </details>
+      <details class="gloss"><summary>ATT</summary>
+        <div class="gloss-body">Average treatment effect on the treated. Here, the average gap between California's observed smoking and its counterfactual over 1989–2000. <em>All three methods target the same ATT; they disagree on the counterfactual.</em></div>
+      </details>
+      <details class="gloss"><summary>Difference-in-differences (DiD)</summary>
+        <div class="gloss-body">Compares the before/after change in California to the before/after change in the control group. <em>Uses every control state with equal weight.</em></div>
+      </details>
+      <details class="gloss"><summary>Parallel-trends assumption</summary>
+        <div class="gloss-body">DiD is only valid if California and the controls would have moved in parallel absent the law. <em>When pre-trends differ, the DiD estimate is biased — which is what SC and SDID try to fix.</em></div>
+      </details>
+      <details class="gloss"><summary>Synthetic control (SC)</summary>
+        <div class="gloss-body">Builds a weighted blend of donor states ("synthetic California") that matches California's pre-1989 outcome path. <em>Weights are sparse: most states get zero.</em></div>
+      </details>
+      <details class="gloss"><summary>Unit weights (&omega;)</summary>
+        <div class="gloss-body">How much each donor state contributes to the synthetic counterfactual. <em>SC keeps 6 donors; SDID spreads weight across many states (diffuse).</em></div>
+      </details>
+      <details class="gloss"><summary>Time weights (&lambda;)</summary>
+        <div class="gloss-body">SDID's extra ingredient: how much each pre-treatment year counts toward the baseline. <em>Here almost all weight falls on 1986–88 (0.37, 0.21, 0.43).</em></div>
+      </details>
+      <details class="gloss"><summary>SDID</summary>
+        <div class="gloss-body">Synthetic difference-in-differences (Arkhangelsky et al. 2021). A two-way fixed-effects regression weighted by both <span class="kbd">&omega;</span> and <span class="kbd">&lambda;</span>. <em>Robust to both level and trend mismatch.</em></div>
+      </details>
+      <details class="gloss"><summary>Placebo inference</summary>
+        <div class="gloss-body">With one treated unit there is no replication, so we reassign "treatment" to each control state in turn and build a distribution of fake effects. <em>The p-value is the share of placebos at least as large as California's.</em></div>
+      </details>
+      <details class="gloss"><summary>Donor pool</summary>
+        <div class="gloss-body">The 38 control states eligible to form the synthetic counterfactual. <em>States with their own big tobacco shocks are excluded in the original study; here all 38 are donors.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: WEIGHTING-SCHEME EXPLORER ====================== -->
+<section id="pane-explorer" class="tab-pane" role="tabpanel" aria-labelledby="tab-explorer">
+
+  <h2>Weighting-scheme explorer — pick a method, redraw the counterfactual</h2>
+  <p class="lede">
+    California's observed smoking (thick orange) is fixed. What moves is the
+    dashed counterfactual — the smoking path California "would have had". Each
+    method draws it differently because each weights the donor states and
+    pre-years differently. <strong>Click DiD, SC, or SDID and watch the
+    counterfactual snap to a new shape.</strong>
+  </p>
+
+  <div class="seg" id="explorer-seg" role="group" aria-label="Choose a method">
+    <button class="did active"  data-method="did"  aria-pressed="true">DiD</button>
+    <button class="sc"          data-method="sc"   aria-pressed="false">Synthetic control</button>
+    <button class="sdid"        data-method="sdid" aria-pressed="false">SDID</button>
+  </div>
+
+  <div class="chart-area" id="explorer-lines" style="margin-top:14px;"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Method</div>
+      <div class="stat-value" id="ex-method">DiD</div>
+      <div class="stat-sub" id="ex-method-sub">all controls, equal weight</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ATT (packs per capita)</div>
+      <div class="stat-value orange" id="ex-att">—</div>
+      <div class="stat-sub">average effect, 1989–2000</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Donor states with weight</div>
+      <div class="stat-value steel" id="ex-ndonors">—</div>
+      <div class="stat-sub" id="ex-ndonors-sub">out of 38 controls</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>DiD's counterfactual barely bends.</strong> It is California's pre-level shifted by the controls' average change. Because controls fell less steeply, the implied counterfactual stays high — so the gap (and the −27.3 ATT) is the largest of the three.</li>
+      <li><strong>SC hugs California tightly before 1989, then separates.</strong> The synthetic blend is built to match the pre-period path, so the post-1989 gap is a cleaner read on the policy — a smaller −19.5.</li>
+      <li><strong>SDID's counterfactual sits closest to California's late-1980s trajectory.</strong> Time weights pull the baseline toward 1986–88, the years most like the post-period, giving the most conservative estimate, −15.6.</li>
+    </ul>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Synthetic control weights (sparse)</h3>
+      <p class="note" style="margin-top:0;">Only 6 donor states get any weight. The synthetic counterfactual is a blend of these states.</p>
+      <div id="sc-weights"></div>
+    </div>
+    <div class="card">
+      <h3>SDID weights (diffuse)</h3>
+      <p class="note" style="margin-top:0;">SDID spreads weight across many states — no single donor dominates. Top 12 shown.</p>
+      <div id="sdid-weights"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Sparse vs diffuse — why it matters</h3>
+    <p>
+      Synthetic control's sparsity is a feature for transparency (you can name
+      the handful of states standing in for California) but a liability for
+      robustness — leaning on Utah at 39% means one idiosyncratic state can move
+      the whole estimate. SDID's diffuse weights spread that risk across dozens
+      of states, which is one reason its placebo distribution (Tab 4) is well
+      behaved.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: COUNTERFACTUAL & GAP ====================== -->
+<section id="pane-gap" class="tab-pane" role="tabpanel" aria-labelledby="tab-gap">
+
+  <h2>Counterfactual &amp; gap — the effect is the space between the lines</h2>
+  <p class="lede">
+    The treatment effect in any given year is simply California's observed
+    smoking minus its counterfactual. Above, the two lines; below, the gap
+    between them. Before 1989 the gap should hover near zero (a good
+    counterfactual matches the past); after 1989 it opens up — that opening
+    <em>is</em> the policy effect. <strong>Pick a method and read the gap.</strong>
+  </p>
+
+  <div class="seg" id="gap-seg" role="group" aria-label="Choose a method">
+    <button class="sc active" data-method="sc"   aria-pressed="true">Synthetic control</button>
+    <button class="sdid"      data-method="sdid" aria-pressed="false">SDID</button>
+    <button class="did"       data-method="did"  aria-pressed="false">DiD</button>
+  </div>
+
+  <div class="chart-area" id="gap-lines" style="margin-top:14px;"></div>
+  <div class="chart-area" id="gap-effect"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Method</div>
+      <div class="stat-value" id="gap-method">Synthetic control</div>
+      <div class="stat-sub">counterfactual shown above</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">ATT (post-1989 average gap)</div>
+      <div class="stat-value teal" id="gap-att">—</div>
+      <div class="stat-sub">packs per capita per year</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Gap in 2000 (final year)</div>
+      <div class="stat-value orange" id="gap-final">—</div>
+      <div class="stat-sub">effect grows over time</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The pre-1989 gap is the credibility test.</strong> For SC and SDID it stays near zero before the law — the counterfactual reproduces the past. For DiD the pre-period gap wanders, a visible warning that parallel trends is shaky.</li>
+      <li><strong>The effect widens every year.</strong> By 2000 California smokes roughly 26 packs per capita less than its synthetic twin — the cumulative payoff of a sustained tobacco-control program, not a one-time jump.</li>
+      <li><strong>The dashed ATT line is the average of the post-1989 gap.</strong> Switch methods and watch it move from −15.6 (SDID) to −19.5 (SC) to −27.3 (DiD) — the same ranking you saw on the Concept tab.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: PLACEBO INFERENCE ====================== -->
+<section id="pane-placebo" class="tab-pane" role="tabpanel" aria-labelledby="tab-placebo">
+
+  <h2>Placebo inference — is −15.6 bigger than chance?</h2>
+  <p class="lede">
+    One treated state means there is nothing to average over for a standard
+    error in the usual way. SDID's answer: pretend, one at a time, that each of
+    the 38 control states got the "treatment" in 1989, estimate the effect, and
+    collect all 38 fake (placebo) effects. If California's real −15.6 sits far
+    out in the tail of that distribution, the result is unlikely to be noise.
+    <strong>The orange line is California; the steel bars are the placebos.</strong>
+  </p>
+
+  <div class="chart-area" id="placebo-hist"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">California SDID ATT</div>
+      <div class="stat-value orange" id="pl-att">−15.6</div>
+      <div class="stat-sub">packs per capita</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Permutation p-value</div>
+      <div class="stat-value teal" id="pl-pval">0.026</div>
+      <div class="stat-sub">share of placebos as large</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Placebo std. error</div>
+      <div class="stat-value" id="pl-se">9.88</div>
+      <div class="stat-sub">spread of the fake effects</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Normal-approx 95% CI</div>
+      <div class="stat-value steel" id="pl-ci">[−35.0, 3.8]</div>
+      <div class="stat-sub">includes 0 — looks "insignificant"</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Two tests, two verdicts — which do you trust?</h3>
+    <p>
+      Notice the tension. The rank-based <strong>permutation test</strong> gives
+      <strong>p = 0.026</strong>: only one placebo state (out of 38) has an
+      effect as large in magnitude as California's, so the result is significant
+      at the 5% level. But the <strong>SE-based 95% interval</strong>
+      <span class="kbd">[−35.0, 3.8]</span> <em>includes zero</em>, which would
+      normally be called "not significant".
+    </p>
+    <p>
+      Both are computed from the same placebos, so why disagree? With a single
+      treated unit the standard error (9.88) is large and the normal
+      approximation is crude — the interval is conservatively wide. The
+      permutation test instead asks a sharper question: <em>where does
+      California rank among the placebos?</em> It does not assume normality and,
+      with one treated unit, is the more reliable read. The takeaway: report the
+      placebo p-value, and treat the wide SE interval as a reminder that
+      single-unit inference is inherently uncertain.
+    </p>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>California is in the left tail.</strong> Most placebo effects cluster near zero; California's −15.6 is more negative than all but one of them — the visual version of p = 0.026.</li>
+      <li><strong>The shaded band is the SE-based 95% CI.</strong> It stretches past zero on the right, which is why a naive significance test would hesitate even though the rank is extreme.</li>
+      <li><strong>A couple of placebos are large too</strong> (e.g. Rhode Island near −32). Those are states the model fits poorly; the permutation test counts them honestly rather than hiding them in a standard error.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Synthetic Difference-in-Differences in Stata: California's Proposition 99</em>
+  · Data: Abadie et al. (2010) / Arkhangelsky et al. (2021), 39 US states, 1970–2000
+  · D3.js v7 · no backend, no tracking ·
+  <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
