@@ -535,8 +535,8 @@ graph TD
         C32["3 vs 2"]:::f2
     end
 
-    T --> F1
-    T --> F2
+    T --> C10
+    T --> C21
 
     classDef data fill:#6a9bcc,stroke:#141413,color:#fff
     classDef f1 fill:#00d4c8,stroke:#141413,color:#141413
