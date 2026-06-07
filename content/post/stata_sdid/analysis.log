@@ -33,7 +33,7 @@ Notes:
 . *   "/Applications/Stata/StataSE.app/Contents/MacOS/stata-se" -b do analysis.
 > do
 . *
-. * Requires (all from SSC): sdid, synth, synth2, distinct
+. * Requires (all from SSC): sdid, synth, synth2
 . *   . ssc install sdid
 . *   . ssc install synth2
 . *   . ssc install synth
@@ -46,6 +46,8 @@ Notes:
 > DID
 . *       see exactly the same information set -- an apples-to-apples compariso
 > n.
+. *       Estimand: ATT -- the effect of Proposition 99 on California, 1989-200
+> 0.
 . *============================================================================
 > ===
 . 
@@ -58,7 +60,8 @@ Notes:
 . set linesize 100
 
 . 
-. cd "/Users/carlos/GitHub/starter-academic-v501/content/post/stata_sdid"
+. cd "/Users/carlos/GitHub/starter-academic-v501/content/post/stata_sdid"   // students: set this to
+>  your local copy of this post folder
 /Users/carlos/GitHub/starter-academic-v501/content/post/stata_sdid
 
 . capture mkdir web_app
@@ -375,8 +378,8 @@ NewHampshire    .045
 .     keep year sc_synth sc_effect
 
 .     save `scser', replace
-(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000002 not found)
-file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000002 saved as .dta format
+(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St11275.000002 not found)
+file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St11275.000002 saved as .dta format
 
 . frame change default
 
@@ -618,8 +621,8 @@ Number of observations (_N) was 0, now 31.
 .     keep year sdid_synth ca_actual
 
 .     save `sdidser', replace
-(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000003 not found)
-file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000003 saved as .dta format
+(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St11275.000003 not found)
+file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St11275.000003 saved as .dta format
 
 . restore
 
@@ -662,8 +665,8 @@ Duplicates in terms of all variables
 file web_app/data/sdid_lambda.csv saved
 
 .     save `lamf', replace
-(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000006 not found)
-file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000006 saved as .dta format
+(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St11275.000006 not found)
+file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St11275.000006 saved as .dta format
 
 . restore
 
@@ -759,8 +762,8 @@ DiD(sdid)=-27.34911  SC(sdid)=-19.61966  SDID=-15.60383
 .     tempfile cm
 
 .     save `cm', replace
-(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000009 not found)
-file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St85078.000009 saved as .dta format
+(file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St11275.000009 not found)
+file /var/folders/f_/4_1h2nwn2w91_4qmnp8p1snm0000gn/T//St11275.000009 saved as .dta format
 
 . restore
 
@@ -940,11 +943,13 @@ file stata_sdid_sc_gap.png written in PNG format
 (encoding automatically selected: ISO-8859-9)
 (2 vars, 31 obs)
 
-.     twoway (bar lambda year if lambda>0, color("$CTRL") barwidth(0.8)),          ///
+.     twoway (bar lambda year if year<=1988, color("$CTRL") barwidth(0.8)),        ///
 >            ytitle("SDID time weight ({&lambda})") xtitle("")                     ///
 >            xlabel(1970(2)1988) ylabel(0(.1).5) legend(off)                       ///
 >            title("Where SDID looks: pre-period time weights", size(medium))      ///
->            note("All pre-treatment weight falls on 1986-1988 (0.37, 0.21, 0.43).")
+>            note("Pre-period weight (1970-1988): zero until 1986, then 0.37, 0.21, 0.43 on 1986-198
+> 8." ///
+>                 "Post-1989 years are omitted; SDID weights them uniformly at 1/12.")
 
 .     graph export "stata_sdid_lambda.png", replace width(2000)
 file stata_sdid_lambda.png written in PNG format

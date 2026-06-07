@@ -276,11 +276,12 @@ graph export "stata_sdid_sc_gap.png", replace width(2000)
 * time-weight bar chart (SDID puts all pre-weight on 1986-1988)
 preserve
     import delimited "web_app/data/sdid_lambda.csv", clear
-    twoway (bar lambda year if lambda>0, color("$CTRL") barwidth(0.8)),          ///
+    twoway (bar lambda year if year<=1988, color("$CTRL") barwidth(0.8)),        ///
            ytitle("SDID time weight ({&lambda})") xtitle("")                     ///
            xlabel(1970(2)1988) ylabel(0(.1).5) legend(off)                       ///
            title("Where SDID looks: pre-period time weights", size(medium))      ///
-           note("All pre-treatment weight falls on 1986-1988 (0.37, 0.21, 0.43).")
+           note("Pre-period weight (1970-1988): zero until 1986, then 0.37, 0.21, 0.43 on 1986-1988." ///
+                "Post-1989 years are omitted; SDID weights them uniformly at 1/12.")
     graph export "stata_sdid_lambda.png", replace width(2000)
 restore
 
