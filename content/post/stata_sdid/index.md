@@ -150,18 +150,14 @@ One feature matters for a fair comparison: this panel contains **only the outcom
 
 ```mermaid
 graph LR
-    subgraph POOL["Donor pool — 38 control states"]
-      C1["Utah"]:::c
-      C2["Nevada"]:::c
-      C3["Montana"]:::c
-      C4["… 35 more"]:::c
-    end
-    CA["<b>California</b><br/>treated 1989"]:::t
-    POOL -->|"weighted average ω"| SYN["<b>Synthetic California</b><br/>the counterfactual Y(0)"]:::s
-    CA -->|"compare after 1989"| SYN
-    classDef t fill:#d97757,stroke:#141413,color:#fff;
-    classDef c fill:#6a9bcc,stroke:#141413,color:#fff;
-    classDef s fill:#00d4c8,stroke:#141413,color:#141413;
+    POOL["<b>Donor pool</b><br/>38 control states<br/>Utah, Nevada, Montana, …"]
+    CA["<b>California</b><br/>treated 1989"]
+    SYN["<b>Synthetic California</b><br/>counterfactual Y(0)"]
+    POOL -->|weighted average ω| SYN
+    CA -->|compare after 1989| SYN
+    style POOL fill:#6a9bcc,stroke:#141413,color:#fff
+    style CA fill:#d97757,stroke:#141413,color:#fff
+    style SYN fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
 Let us first look at the data with no model at all — California against the simple average of the 38 control states.
