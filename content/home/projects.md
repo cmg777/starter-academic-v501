@@ -1,5 +1,5 @@
 ---
-# Blank widget: renders the 5 latest projects as alternating image/text
+# Blank widget: renders the 3 latest projects as alternating image/text
 # "showcase" rows via the `showcase` shortcode, plus a "Browse all projects"
 # link to the /projects/ gallery.
 widget: blank
@@ -21,4 +21,4 @@ design:
   columns: '1'
 ---
 
-{{< showcase type="project" count="5" browse_url="/projects/" browse_label="Browse all projects" >}}
+{{< showcase type="project" count="3" browse_url="/projects/" browse_label="Browse all projects" >}}

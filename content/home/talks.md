@@ -1,5 +1,5 @@
 ---
-# Blank widget: renders the 5 latest events as alternating image/text
+# Blank widget: renders the 3 latest events as alternating image/text
 # "showcase" rows via the `showcase` shortcode — matching the Projects look
 # (larger images, sequential image + text).
 widget: blank
@@ -21,4 +21,4 @@ design:
   columns: '1'
 ---
 
-{{< showcase type="event" count="5" browse_url="/event/" browse_label="Browse all presentations" >}}
+{{< showcase type="event" count="3" browse_url="/event/" browse_label="Browse all presentations" >}}

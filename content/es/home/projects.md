@@ -1,5 +1,5 @@
 ---
-# Widget "blank": muestra los 5 proyectos más recientes como filas alternas
+# Widget "blank": muestra los 3 proyectos más recientes como filas alternas
 # imagen/texto mediante el shortcode `showcase`, con un enlace "Ver todos
 # los proyectos" a la galería /projects/. Traducción de content/home/projects.md.
 widget: blank
@@ -21,4 +21,4 @@ design:
   columns: '1'
 ---
 
-{{< showcase type="project" count="5" browse_url="/projects/" browse_label="Ver todos los proyectos" >}}
+{{< showcase type="project" count="3" browse_url="/projects/" browse_label="Ver todos los proyectos" >}}

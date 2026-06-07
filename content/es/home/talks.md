@@ -1,5 +1,5 @@
 ---
-# Widget "blank": muestra las 5 presentaciones más recientes como filas
+# Widget "blank": muestra las 3 presentaciones más recientes como filas
 # alternas imagen/texto mediante el shortcode `showcase` (igual que Proyectos).
 # Traducción de content/home/talks.md.
 widget: blank
@@ -21,4 +21,4 @@ design:
   columns: '1'
 ---
 
-{{< showcase type="event" count="5" browse_url="/event/" browse_label="Ver todas las presentaciones" >}}
+{{< showcase type="event" count="3" browse_url="/event/" browse_label="Ver todas las presentaciones" >}}

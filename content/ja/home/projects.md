@@ -1,5 +1,5 @@
 ---
-# Widget「blank」：最近のプロジェクト5件を、画像とテキストが交互に並ぶ
+# Widget「blank」：最近のプロジェクト3件を、画像とテキストが交互に並ぶ
 # showcase ショートコードで表示し、/projects/ ギャラリーへの「すべての
 # プロジェクトを見る」リンクを付けます。content/home/projects.md の翻訳。
 widget: blank
@@ -21,4 +21,4 @@ design:
   columns: '1'
 ---
 
-{{< showcase type="project" count="5" browse_url="/projects/" browse_label="すべてのプロジェクトを見る" >}}
+{{< showcase type="project" count="3" browse_url="/projects/" browse_label="すべてのプロジェクトを見る" >}}
