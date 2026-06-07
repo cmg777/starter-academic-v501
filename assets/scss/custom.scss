@@ -1507,13 +1507,15 @@ details.concept-card p:last-child {
   font-size: 1.4rem;
   line-height: 1;
   color: #00d4c8;
-  animation: scrollBounce 2s ease-in-out infinite;
+  animation: scrollBounce 2.8s ease-in-out infinite;
   transition: color 0.2s ease;
 }
 
 @keyframes scrollBounce {
-  0%, 100% { transform: translateY(0);    opacity: 0.9; }
-  50%      { transform: translateY(6px);  opacity: 0.5; }
+  /* A3 — calmer "rest → single gentle nudge → rest" cue (was a continuous 2s
+     +6px jiggle). Holds still through 0–60%, dips once at 80%, settles back. */
+  0%, 60%, 100% { transform: translateY(0);   opacity: 0.85; }
+  80%           { transform: translateY(5px); opacity: 0.45; }
 }
 
 /* --- Panel entrance keyframes --- */
