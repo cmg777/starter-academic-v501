@@ -2,7 +2,6 @@
 authors:
   - admin
 categories:
-  - Stata
   - Causal Inference
   - Synthetic Control
   - Difference-in-Differences (DiD)

@@ -44,7 +44,7 @@ Everything under `content/post/stata_sdid_staggered/`:
   +8.0 pp / 9 countries-7 cohorts / −3.5…+21.8).
 - **AI Podcast** player (m4a, stream) and a **Slides (PDF)** button → `Staggered_SDID.pdf`.
 - **i18n** — ES + JA card-only stubs (`content/es|ja/post/stata_sdid_staggered/`).
-- **Categories:** Stata · Causal Inference · Synthetic Control · Difference-in-Differences (DiD).
+- **Categories:** Causal Inference · Synthetic Control · Difference-in-Differences (DiD) (per request, "Stata" dropped 2026-06-08).
 
 The third-party source bundle (`reference/` — Clarke et al. 2024 full-text markdown +
 `online_supplementary_material.pdf` + `replication_materials.do`) is **git-ignored** (Hugo would

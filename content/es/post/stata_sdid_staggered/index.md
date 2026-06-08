@@ -6,7 +6,6 @@ title: "Diferencias en diferencias sintéticas con adopción escalonada (SDID) e
 summary: "Se extienden las diferencias en diferencias sintéticas al caso de adopción escalonada, en el que las unidades reciben el tratamiento en momentos distintos, y se aplican en Stata a las cuotas de género parlamentarias en 119 países: se deriva el estimador por cohorte, su agregación en el ATT global, el moderno estudio de eventos con sdid_event y la inferencia por bootstrap, jackknife y placebo."
 date: "2026-06-07T00:00:00Z"
 categories:
-  - Stata
   - Causal Inference
   - Synthetic Control
   - Difference-in-Differences (DiD)
