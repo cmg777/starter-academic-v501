@@ -26,6 +26,20 @@ content/post/r_double_lasso/references/
 # paper in References; the source archive is not committed.
 content/post/stata_sdid/references/
 
+# Ben-Michael, Feller & Rothstein (2021) ASCM paper + the full augsynth package
+# source (R/, data/, man/, vignettes/figure/ — several MB incl. a 1.5 MB raw .dta)
+# for r_augsynth — third-party reference material. The post is self-contained:
+# kansas.csv is regenerated from the package and committed, and analysis.R loads
+# it from a GitHub raw URL. The paper is cited in References; source not committed.
+content/post/r_augsynth/references/
+
+# Clarke, Pailanir, Athey & Imbens (2024) SDID Stata Journal paper (full-text .md
+# + 265 KB online_supplementary_material.pdf) and replication_materials.do for
+# stata_sdid_staggered -- third-party reference material; Hugo would publish them.
+# The post is self-contained: quota_example.dta is committed and analysis.do
+# re-fetches it; the paper is cited in References. Source archive not committed.
+content/post/stata_sdid_staggered/reference/
+
 # Stata batch-mode auto-log artifact (the real log is analysis.log)
 content/post/stata_iv/stata.log
 

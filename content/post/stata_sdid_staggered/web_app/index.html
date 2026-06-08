@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Staggered Synthetic Difference-in-Differences — Interactive Lab</title>
+<meta name="description" content="Interactive companion to the Stata tutorial on staggered Synthetic Difference-in-Differences (SDID) and parliamentary gender quotas. Explore cohort-specific effects, the synthetic counterfactual per cohort, and the sdid_event event study.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Staggered Synthetic Difference-in-Differences — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Staggered Synthetic Difference-in-Differences in Stata: Gender Quotas and Women in Parliament</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist" aria-label="Lab sections">
+  <button id="tab-concept"  class="tab active" data-pane="pane-concept"  role="tab" aria-controls="pane-concept"  aria-selected="true">1 · Concept</button>
+  <button id="tab-cohorts"  class="tab"        data-pane="pane-cohorts"  role="tab" aria-controls="pane-cohorts"  aria-selected="false">2 · Cohort effects</button>
+  <button id="tab-weights"  class="tab"        data-pane="pane-weights"  role="tab" aria-controls="pane-weights"  aria-selected="false">3 · Weights &amp; counterfactual</button>
+  <button id="tab-event"    class="tab"        data-pane="pane-event"    role="tab" aria-controls="pane-event"    aria-selected="false">4 · Event study</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: CONCEPT ====================== -->
+<section id="pane-concept" class="tab-pane active" role="tabpanel" aria-labelledby="tab-concept">
+
+  <h2>Do gender quotas raise women in parliament? Nine countries, seven clocks</h2>
+  <p class="lede">
+    Between 2000 and 2013, nine countries adopted parliamentary gender quotas —
+    each in a <strong>different year</strong>. This is a <strong>staggered
+    adoption</strong> design, where the textbook two-way fixed-effects regression
+    quietly breaks. Staggered SDID fixes it by building a <em>separate</em>
+    synthetic control for each adoption cohort and aggregating them. Use the tabs
+    to take the analysis apart.
+  </p>
+
+  <div class="headline">
+    <div class="num pos">
+      <div class="big">+8.0</div>
+      <div class="cap">Overall ATT<br>(percentage points)</div>
+    </div>
+    <div class="num mid">
+      <div class="big">9 / 7</div>
+      <div class="cap">adopting countries /<br>adoption cohorts</div>
+    </div>
+    <div class="num neg">
+      <div class="big">−3.5 … +21.8</div>
+      <div class="cap">range of cohort effects<br>(heterogeneity)</div>
+    </div>
+  </div>
+  <p class="note" style="text-align:center; margin-top:-6px;">
+    Average treatment effect on the treated (ATT), in percentage points of women in the national parliament, 119 countries, 1990–2015.
+  </p>
+
+  <div class="card">
+    <h3>Block design, staggered design, and how to aggregate</h3>
+    <p>
+      The single-adoption "block" design (one unit treated in one year) is the
+      textbook SDID setting. Real policies usually arrive on different clocks.
+      Staggered SDID runs the block analysis <strong>once per cohort</strong> —
+      always against the never-treated controls — then averages the cohort
+      effects with transparent, non-negative weights.
+    </p>
+    <div class="recipe">
+      <div class="recipe-card block">
+        <h4>Block design</h4>
+        <p class="weights"><b>Predecessor:</b> California, Prop 99</p>
+        <p class="desc">One treated unit, one adoption year (1989). A single synthetic control, a single ATT, placebo inference.</p>
+      </div>
+      <div class="recipe-card stag">
+        <h4>Staggered design</h4>
+        <p class="weights"><b>This post:</b> 9 countries, 7 cohorts</p>
+        <p class="desc">Each cohort gets its own synthetic control built from the 110 never-treated countries — never reusing an already-treated unit as a control.</p>
+      </div>
+      <div class="recipe-card aggr">
+        <h4>Aggregation</h4>
+        <p class="weights"><b>Weights:</b> treated unit-years</p>
+        <p class="desc">The overall ATT is the cohort effects weighted by each cohort's share of treated country-years. Earlier, longer-exposed cohorts count more.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-cohorts" tabindex="0" role="button" aria-label="Go to cohort effects">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Cohort effects</h4>
+      <p>See all seven cohort effects with their confidence intervals against the aggregate ATT — and the staggered adoption timeline that produces them.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-weights" tabindex="0" role="button" aria-label="Go to weights and counterfactual">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Weights &amp; counterfactual</h4>
+      <p>Pick a cohort and watch its synthetic control redraw — the treated path against its anchored counterfactual, plus the donor countries that build it.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-event" tabindex="0" role="button" aria-label="Go to the event study">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Event study</h4>
+      <p>Read the dynamic effect by event time: flat placebo coefficients before adoption, a sustained rise after — the shape behind the single number.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why an average can mislead</h3>
+    <p>
+      The headline ATT is <strong>+8.0 points</strong>, but the cohort effects
+      run from <strong>−3.5</strong> (the 2005 cohort) to <strong>+21.8</strong>
+      (the 2012 cohort). A single number is an honest <em>summary</em> only if you
+      remember the spread underneath it. And the naive two-way fixed-effects
+      regression most analysts reach for first does worse than summarize — under
+      staggered timing it can use already-treated countries as controls and return
+      a contaminated, even sign-flipped, estimate.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Glossary — open a card if a term is unfamiliar</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Staggered adoption</summary>
+        <div class="gloss-body">Units adopt treatment in <em>different</em> years (here, quota cohorts in 2000, 2002, 2003, 2005, 2010, 2012, 2013) rather than all at once.</div>
+      </details>
+      <details class="gloss"><summary>ATT</summary>
+        <div class="gloss-body">Average treatment effect on the treated — the effect of quotas in the countries that adopted them, averaged over their post-adoption years.</div>
+      </details>
+      <details class="gloss"><summary>Adoption cohort</summary>
+        <div class="gloss-body">The countries that first adopt in the same year. Staggered SDID estimates one effect per cohort, then aggregates. <em>The 2002 and 2003 cohorts have two countries each; the rest one.</em></div>
+      </details>
+      <details class="gloss"><summary>Unit weights (ω)</summary>
+        <div class="gloss-body">How much each never-treated donor country counts toward a cohort's synthetic control. <em>Each cohort gets its own ω.</em></div>
+      </details>
+      <details class="gloss"><summary>Time weights (λ)</summary>
+        <div class="gloss-body">How much each pre-adoption year counts toward the baseline — and the baseline the event study measures against.</div>
+      </details>
+      <details class="gloss"><summary>Event time</summary>
+        <div class="gloss-body">Years relative to a cohort's own adoption (… −2, −1, 0, +1 …), so cohorts that adopted in different calendar years can be compared.</div>
+      </details>
+      <details class="gloss"><summary>Pre-trend placebo</summary>
+        <div class="gloss-body">Event-study coefficients for pre-adoption periods. <em>Near zero ⇒ treated and synthetic moved in parallel before treatment — the identifying assumption made visible.</em></div>
+      </details>
+      <details class="gloss"><summary>Forbidden comparison</summary>
+        <div class="gloss-body">When a regression uses an already-treated unit as a control for a later adopter. <em>Naive TWFE does this under staggered timing; staggered SDID never does.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: COHORT EFFECTS ====================== -->
+<section id="pane-cohorts" class="tab-pane" role="tabpanel" aria-labelledby="tab-cohorts">
+
+  <h2>Cohort effects — one SDID per adoption year</h2>
+  <p class="lede">
+    Each adoption cohort gets its own clean SDID estimate. The diamonds are the
+    cohort effects with 95% confidence intervals; the teal line is the
+    treated-period-weighted aggregate ATT. <strong>Hover a cohort to read its
+    effect, precision, and aggregation weight.</strong>
+  </p>
+
+  <div class="chart-area" id="cohort-bars"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Cohort</div>
+      <div class="stat-value" id="co-year">—</div>
+      <div class="stat-sub" id="co-n">hover a diamond</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Cohort effect (pp)</div>
+      <div class="stat-value teal" id="co-tau">—</div>
+      <div class="stat-sub" id="co-se">SE</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Post-adoption years</div>
+      <div class="stat-value steel" id="co-tpost">—</div>
+      <div class="stat-sub">exposure window</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Aggregation weight</div>
+      <div class="stat-value orange" id="co-w">—</div>
+      <div class="stat-sub">share of treated country-years</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The staggered adoption timeline</h3>
+    <p class="note" style="margin-top:0;">Steel = pre-adoption (control) years; orange = treated years through 2015. The staircase is the staggered design.</p>
+    <div id="adoption-timeline"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The aggregate is not the simple average.</strong> The teal line (8.0) is weighted by treated country-years, so the earlier, longer-exposed 2000/2002/2003 cohorts pull it up; the plain mean of the seven effects is about 7.0.</li>
+      <li><strong>Precision varies wildly.</strong> Most cohorts are tightly estimated, but the 2003 cohort's interval runs from −4 to +32 (SE 9.1) — a fragile synthetic control built from few controls.</li>
+      <li><strong>Two cohorts are negative.</strong> The 2005 and 2013 cohorts sit below zero. Heterogeneity, not a universal effect, is the real finding.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: WEIGHTS & COUNTERFACTUAL ====================== -->
+<section id="pane-weights" class="tab-pane" role="tabpanel" aria-labelledby="tab-weights">
+
+  <h2>Weights &amp; counterfactual — pick a cohort, build its synthetic twin</h2>
+  <p class="lede">
+    For each cohort, SDID blends never-treated donor countries into a synthetic
+    control that tracks the cohort's <em>pre-adoption trend</em> (the level gap is
+    absorbed by the unit fixed effect, so we anchor the synthetic to the treated
+    path for display). <strong>Choose a cohort and watch its counterfactual and
+    donor mix redraw.</strong>
+  </p>
+
+  <div class="seg" id="cohort-seg" role="group" aria-label="Choose an adoption cohort">
+    <button class="cohort active" data-cohort="2000" aria-pressed="true">2000</button>
+    <button class="cohort" data-cohort="2002" aria-pressed="false">2002</button>
+    <button class="cohort" data-cohort="2003" aria-pressed="false">2003</button>
+    <button class="cohort" data-cohort="2005" aria-pressed="false">2005</button>
+    <button class="cohort" data-cohort="2010" aria-pressed="false">2010</button>
+    <button class="cohort" data-cohort="2012" aria-pressed="false">2012</button>
+    <button class="cohort" data-cohort="2013" aria-pressed="false">2013</button>
+  </div>
+
+  <div class="chart-area" id="cf-path" style="margin-top:14px;"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Cohort</div>
+      <div class="stat-value" id="w-year">2000</div>
+      <div class="stat-sub" id="w-n">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Cohort effect (pp)</div>
+      <div class="stat-value teal" id="w-tau">—</div>
+      <div class="stat-sub">post-adoption divergence</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Donor countries with weight</div>
+      <div class="stat-value steel" id="w-ndonors">—</div>
+      <div class="stat-sub">out of 110 never-treated</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Top donor countries (ω)</h3>
+      <p class="note" style="margin-top:0;">The never-treated countries whose weighted blend forms this cohort's synthetic control. Top 12 shown.</p>
+      <div id="omega-bars"></div>
+    </div>
+    <div class="card">
+      <h3>How to read the counterfactual</h3>
+      <p>
+        Before adoption, the treated cohort (orange) and its anchored synthetic
+        control (steel) move together — SDID built the synthetic to match the
+        pre-trend. After the vertical adoption line they separate: the gap is the
+        cohort's effect. A wide, diffuse donor mix (many small ω) is more robust
+        than leaning on one or two countries.
+      </p>
+      <p class="note">SDID matches the pre-period <em>trend</em>, not the level — the unit fixed effect absorbs any constant gap, which is why we anchor the synthetic to the treated path here.</p>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Pre-adoption overlap is the credibility test.</strong> If the two lines hug each other before the adoption year, the synthetic control is doing its job.</li>
+      <li><strong>The post-adoption gap is the effect.</strong> Switch cohorts and watch the divergence flip sign for 2005 and 2013 — the negative cohorts.</li>
+      <li><strong>Diffuse weights beat sparse ones.</strong> The more donor countries share the weight, the less any single idiosyncratic country can distort the counterfactual.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: EVENT STUDY ====================== -->
+<section id="pane-event" class="tab-pane" role="tabpanel" aria-labelledby="tab-event">
+
+  <h2>Event study — when does the effect appear?</h2>
+  <p class="lede">
+    The <code>sdid_event</code> command traces the effect by <strong>event
+    time</strong> — years relative to adoption — for the 2002 cohort. Points left
+    of zero are <strong>placebo</strong> tests of the parallel-trends assumption;
+    points right of zero are the <strong>dynamic ATT</strong>. Hover any point for
+    its estimate and confidence interval.
+  </p>
+
+  <div class="chart-area" id="event-study"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Largest pre-period |coef|</div>
+      <div class="stat-value steel" id="ev-pre">—</div>
+      <div class="stat-sub">placebo — should be ≈ 0</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Effect at adoption (t = 0)</div>
+      <div class="stat-value orange" id="ev-t0">—</div>
+      <div class="stat-sub">immediate jump</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Average post-period effect</div>
+      <div class="stat-value teal" id="ev-post">—</div>
+      <div class="stat-sub">dynamic ATT, 2002 cohort</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Three things to read in this plot</h3>
+    <p>
+      <strong>The baseline is λ-weighted.</strong> SDID measures everything
+      against the optimally weighted pre-period average, not the single year
+      before adoption — so the zero line is a weighted baseline.
+      <strong>Pre-period points are placebos.</strong> Here every pre-adoption
+      coefficient sits within a whisker of zero, so we cannot reject parallel
+      synthetic trends. <strong>Post-period points are the dynamic ATT.</strong>
+      The effect appears immediately at adoption, roughly doubles within a year,
+      and persists above zero for over a decade.
+    </p>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Flat before, climbing after.</strong> The visual signature of a credible event study: placebos near zero, then a sustained post-adoption rise.</li>
+      <li><strong>The confidence band widens with horizon.</strong> Late event-times rest on fewer comparisons, so the ribbon fans out — read the far-right points with caution.</li>
+      <li><strong>The post points average to the cohort ATT.</strong> Aggregated by the same treated-period logic, they reproduce the 2002 cohort's ≈ +7 effect — the number the plot unpacks.</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Staggered Synthetic Difference-in-Differences in Stata: Gender Quotas and Women in Parliament</em>
+  · Data: Bhalotra, Clarke, Gomes &amp; Venkataramani (2023), 119 countries, 1990–2015
+  · D3.js v7 · no backend, no tracking ·
+  <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1269 @@
+----------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/stata_sdid_stag
+> gered/analysis.log
+  log type:  text
+ opened on:   8 Jun 2026, 10:06:48
+
+. 
+. *-------------------------------------------------------------------------------
+. * 1. DATA -- load, persist, document the staggered structure
+. *-------------------------------------------------------------------------------
+. capture confirm file quota_example.dta
+
+. if _rc {
+.     webuse set www.damianclarke.net/stata/
+.     webuse quota_example, clear
+.     save quota_example.dta, replace
+. }
+
+. use quota_example.dta, clear
+(Balanced panel from Bhalotra, Clarke, Gomes & Venkataramani (2023))
+
+. label variable quota "Parliamentary gender quota"
+
+. 
+. describe womparl quota lngdp country year quotaYear
+
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+----------------------------------------------------------------------------------------------------
+womparl         float   %9.0g                 Women in parliament
+quota           float   %9.0g                 Parliamentary gender quota
+lngdp           float   %9.0g                 log(GDP)
+country         str30   %30s                  Country
+year            int     %8.0g                 Year
+quotaYear       float   %9.0g                 Year quota adopted
+
+. summarize womparl quota lngdp
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     womparl |      3,094    14.96531    10.97328          0       63.8
+       quota |      3,094    .0303814    .1716621          0          1
+       lngdp |      2,990    9.154291    1.136837     5.8701   11.61789
+
+. encode country, gen(id)
+
+. xtset id year
+
+Panel variable: id (strongly balanced)
+ Time variable: year, 1990 to 2015
+         Delta: 1 unit
+
+. xtdescribe
+
+      id:  1, 2, ..., 119                                    n =        119
+    year:  1990, 1991, ..., 2015                             T =         26
+           Delta(year) = 1 unit
+           Span(year)  = 26 periods
+           (id*year uniquely identifies each observation)
+
+Distribution of T_i:   min      5%     25%       50%       75%     95%     max
+                        26      26      26        26        26      26      26
+
+     Freq.  Percent    Cum. |  Pattern
+ ---------------------------+----------------------------
+      119    100.00  100.00 |  11111111111111111111111111
+ ---------------------------+----------------------------
+      119    100.00         |  XXXXXXXXXXXXXXXXXXXXXXXXXX
+
+. 
+. * Adoption cohort = first year a country is treated (quotaYear ships with the data).
+. * Verify it equals the first treated year, then tabulate cohort sizes.
+. bysort country (year): egen firsttreat = min(cond(quota==1, year, .))
+(2,860 missing values generated)
+
+. gen byte evertreat = !missing(firsttreat)
+
+. capture assert firsttreat == quotaYear if evertreat   // sanity check (quotaYear ships with the da
+> ta)
+
+. di as result "firsttreat == quotaYear check rc = " _rc
+firsttreat == quotaYear check rc = 0
+
+. di as result _n "=== Adoption cohorts (one row per country) ==="
+
+=== Adoption cohorts (one row per country) ===
+
+. preserve
+
+.     keep country firsttreat
+
+.     duplicates drop
+
+Duplicates in terms of all variables
+
+(2,975 observations deleted)
+
+.     tab firsttreat, missing
+
+ firsttreat |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2000 |          1        0.84        0.84
+       2002 |          2        1.68        2.52
+       2003 |          2        1.68        4.20
+       2005 |          1        0.84        5.04
+       2010 |          1        0.84        5.88
+       2012 |          1        0.84        6.72
+       2013 |          1        0.84        7.56
+          . |        110       92.44      100.00
+------------+-----------------------------------
+      Total |        119      100.00
+
+. restore
+
+. count if quota==1
+  94
+
+. di as result "treated country-year observations = " r(N)
+treated country-year observations = 94
+
+. 
+. * cohort sizes (countries per adoption year) for later merges + the web app
+. preserve
+
+.     keep if evertreat
+(2,860 observations deleted)
+
+.     bysort country: keep if _n==1
+(225 observations deleted)
+
+.     contract firsttreat, freq(n_treated)
+
+.     rename firsttreat cohort
+
+.     list, noobs
+
+  +-------------------+
+  | cohort   n_trea~d |
+  |-------------------|
+  |   2000          1 |
+  |   2002          2 |
+  |   2003          2 |
+  |   2005          1 |
+  |   2010          1 |
+  |-------------------|
+  |   2012          1 |
+  |   2013          1 |
+  +-------------------+
+
+.     tempfile csize
+
+.     save `csize', replace
+(file /tmp/claude-501/St23259.000003 not found)
+file /tmp/claude-501/St23259.000003 saved as .dta format
+
+. restore
+
+. 
+. *-------------------------------------------------------------------------------
+. * 2. EDA -- panelview (staggered structure) + a site-coloured trend figure
+. *-------------------------------------------------------------------------------
+. * (2a) Treatment-timing heatmap: the staggered "staircase"
+. panelview womparl quota, i(country) t(year) type(treat) bytiming               ///
+>     xtitle("Year") ytitle("Country (sorted by adoption timing)")               ///
+>     title("Staggered adoption of parliamentary gender quotas", size(medium))   ///
+>     ylabdist(10) xlabdist(5)
+
+   #  Variable        # Missing   % Missing
+--------------------------------------------
+   1  womparl               0         0.0
+   2  quota                 0         0.0
+
+Missing for |
+   how many |
+ variables? |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      3,094      100.00      100.00
+------------+-----------------------------------
+      Total |      3,094      100.00
+Note: White cells represent missing values/observations in data.
+
+. graph export "stata_sdid_staggered_panelview_treat.png", replace width(2400)
+file stata_sdid_staggered_panelview_treat.png written in PNG format
+
+. 
+. * (2b) Outcome trajectories, treated (orange) vs control (blue)
+. panelview womparl quota, i(country) t(year) type(outcome)                      ///
+>     xtitle("Year") ytitle("% women in parliament")                             ///
+>     title("Women in parliament: treated vs. control trajectories", size(medium))
+now display lines of continuous outcome
+
+. graph export "stata_sdid_staggered_panelview_outcome.png", replace width(2400)
+file stata_sdid_staggered_panelview_outcome.png written in PNG format
+
+. 
+. * (2c) Mean outcome: ever-adopting vs never-adopting (site colours)
+. preserve
+
+.     collapse (mean) womparl, by(evertreat year)
+
+.     reshape wide womparl, i(year) j(evertreat)
+(j = 0 1)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations               52   ->   26          
+Number of variables                   3   ->   3           
+j variable (2 values)         evertreat   ->   (dropped)
+xij variables:
+                                womparl   ->   womparl0 womparl1
+-----------------------------------------------------------------------------
+
+.     label var womparl1 "Ever-adopting countries (mean)"
+
+.     label var womparl0 "Never-adopting countries (mean)"
+
+.     twoway (line womparl1 year, lcolor("$TREAT") lwidth(thick))                 ///
+>            (line womparl0 year, lcolor("$CTRL")  lwidth(medthick) lpattern(dash)), ///
+>            ytitle("% women in parliament") xtitle("") xlabel(1990(5)2015)       ///
+>            legend(order(1 "Ever-adopting (mean)" 2 "Never-adopting (mean)")      ///
+>                   pos(11) ring(0) cols(1) size(small))                          ///
+>            title("Raw outcome trends by treatment group", size(medium))         ///
+>            note("Adoption is staggered (2000-2013); a single group mean blurs the timing.")
+
+.     graph export "stata_sdid_staggered_raw_trends.png", replace width(2400)
+file stata_sdid_staggered_raw_trends.png written in PNG format
+
+. restore
+
+. 
+. *-------------------------------------------------------------------------------
+. * 3. BASELINE -- static two-way fixed-effects DiD (the biased foil)
+. *    Under staggered timing with heterogeneous effects, this TWFE coefficient is
+. *    a contaminated weighted average that uses already-treated units as controls
+. *    (Goodman-Bacon 2021; de Chaisemartin & D'Haultfoeuille 2020).  Reported only
+. *    as a benchmark, NOT as a credible ATT.
+. *-------------------------------------------------------------------------------
+. capture reghdfe womparl quota, absorb(id year) vce(cluster id)
+
+. if _rc {
+.     di as error "reghdfe unavailable (rc=" _rc "); falling back to xtreg."
+.     xtreg womparl quota i.year, fe vce(cluster id)
+. }
+
+. scalar twfe_att = _b[quota]
+
+. scalar twfe_se  = _se[quota]
+
+. di as result "Static TWFE 'ATT' (biased foil) = " twfe_att "  (cluster SE " twfe_se ")"
+Static TWFE 'ATT' (biased foil) = 7.961266  (cluster SE 3.77388)
+
+. 
+. *-------------------------------------------------------------------------------
+. * 4. MAIN STAGGERED SDID -- bootstrap inference + cohort-specific effects
+. *-------------------------------------------------------------------------------
+. use quota_example.dta, clear
+(Balanced panel from Bhalotra, Clarke, Gomes & Venkataramani (2023))
+
+. label variable quota "Parliamentary gender quota"
+
+. 
+. sdid womparl country year quota, vce(bootstrap) seed(1213)
+Bootstrap replications (50). This may take some time.
+----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5
+..................................................     50
+
+
+Synthetic Difference-in-Differences Estimator
+
+-----------------------------------------------------------------------------
+     womparl |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+       quota |   8.03410    3.74040     2.15    0.032     0.70305    15.36516
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+Refer to Arkhangelsky et al., (2021) for theoretical derivations.
+
+. scalar sdid_att = e(ATT)
+
+. scalar sdid_se  = e(se)
+
+. scalar sdid_cil = e(ATT_l)
+
+. scalar sdid_cir = e(ATT_r)
+
+. di as result "SDID staggered ATT = " sdid_att "  SE = " sdid_se ///
+>              "  95% CI = [" sdid_cil ", " sdid_cir "]"
+SDID staggered ATT = 8.034102  SE = 3.740402  95% CI = [.70304879, 15.365155]
+
+. 
+. * ---- e(tau): cohort-specific ATTs (Tau, Std.Err., Time) ----
+. matrix Tau = e(tau)
+
+. matrix list Tau
+
+Tau[7,3]
+           Tau    Std.Err.        Time
+r1   8.3888685   .68278345        2000
+r2   6.9677465   .64102999        2002
+r3   13.952256   9.1289943        2003
+r4  -3.4505431   .75603453        2005
+r5   2.7490355   .44799502        2010
+r6   21.762716   .91589982        2012
+r7  -.82032354   .83151601        2013
+
+. preserve
+
+.     clear
+
+.     svmat Tau                                   // Tau1=tau, Tau2=se, Tau3=cohort year
+number of observations will be reset to 7
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 7.
+
+.     rename (Tau1 Tau2 Tau3) (tau se cohort)
+
+.     gen lci = tau - 1.96*se
+
+.     gen uci = tau + 1.96*se
+
+.     gen t_post = 2015 - cohort + 1
+
+.     merge 1:1 cohort using `csize', nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             0
+    Matched                                 7  
+    -----------------------------------------
+
+.     * aggregation weight = treated (unit x post-period) share -> reproduces overall ATT
+.     gen w_raw = n_treated * t_post
+
+.     egen w_tot = total(w_raw)
+
+.     gen agg_weight = w_raw / w_tot
+
+.     gsort cohort
+
+.     order cohort tau se lci uci n_treated t_post agg_weight
+
+.     list cohort tau se n_treated t_post agg_weight, noobs
+
+  +--------------------------------------------------------------+
+  | cohort         tau         se   n_trea~d   t_post   agg_we~t |
+  |--------------------------------------------------------------|
+  |   2000    8.388868   .6827834          1       16   .1702128 |
+  |   2002    6.967746     .64103          2       14   .2978723 |
+  |   2003    13.95226   9.128994          2       13   .2765957 |
+  |   2005   -3.450543   .7560346          1       11   .1170213 |
+  |   2010    2.749036    .447995          1        6   .0638298 |
+  |--------------------------------------------------------------|
+  |   2012    21.76272   .9158998          1        4   .0425532 |
+  |   2013   -.8203235    .831516          1        3   .0319149 |
+  +--------------------------------------------------------------+
+
+.     * verification: weighted average of cohort taus = overall ATT
+.     gen wtau = agg_weight*tau
+
+.     egen check_att = total(wtau)
+
+.     di as result "Sum of weighted cohort taus = " check_att "  (should match overall ATT " sdid_at
+> t ")"
+Sum of weighted cohort taus = 8.0341015  (should match overall ATT 8.034102)
+
+.     drop w_raw w_tot wtau check_att
+
+.     export delimited cohort tau se lci uci n_treated t_post agg_weight ///
+>         using "web_app/data/cohorts.csv", replace
+file web_app/data/cohorts.csv saved
+
+. restore
+
+. 
+. * ---- cohort-ATT figure: tau_a with 95% CI, zero line, aggregate-ATT line ----
+. preserve
+
+.     clear
+
+.     svmat Tau                                   // Tau1=tau, Tau2=se, Tau3=cohort year
+number of observations will be reset to 7
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 7.
+
+.     rename (Tau1 Tau2 Tau3) (tau se cohort)
+
+.     gen lci = tau - 1.96*se
+
+.     gen uci = tau + 1.96*se
+
+.     twoway (rcap lci uci cohort, lcolor("$CTRL"))                               ///
+>            (scatter tau cohort, mcolor("$TREAT") msize(large) ms(d)),           ///
+>            yline(0, lcolor(gs10) lpattern(dash))                                ///
+>            yline(`=sdid_att', lcolor("$TEAL") lwidth(medthick))                 ///
+>            xlabel(2000 2002 2003 2005 2010 2012 2013, angle(45))                ///
+>            ytitle("Adoption-cohort ATT (pp)") xtitle("Adoption year (cohort)")   ///
+>            legend(off)                                                          ///
+>            title("Cohort-specific SDID effects", size(medium))                  ///
+>            note("Teal line: overall weighted ATT (8.0 pp). Cohorts range from -3.5 (2005) to +21.8
+>  (2012).")
+
+.     graph export "stata_sdid_staggered_cohort_taus.png", replace width(2400)
+file stata_sdid_staggered_cohort_taus.png written in PNG format
+
+. restore
+
+. 
+. * ---- e(series): treated vs synthetic outcome path per cohort -> CSV ----
+. matrix S = e(series)
+
+. preserve
+
+.     clear
+
+.     svmat S, names(col)
+number of observations will be reset to 26
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 26.
+
+.     reshape long Yco Ytr, i(year) j(cohort)
+(j = 2000 2002 2003 2005 2010 2012 2013)
+
+Data                               Wide   ->   Long
+-----------------------------------------------------------------------------
+Number of observations               26   ->   182         
+Number of variables                  15   ->   4           
+j variable (7 values)                     ->   cohort
+xij variables:
+            Yco2000 Yco2002 ... Yco2013   ->   Yco
+            Ytr2000 Ytr2002 ... Ytr2013   ->   Ytr
+-----------------------------------------------------------------------------
+
+.     rename (Yco Ytr) (y_synth y_treated)
+
+.     drop if missing(y_treated) & missing(y_synth)
+(0 observations deleted)
+
+.     order cohort year y_treated y_synth
+
+.     sort cohort year
+
+.     export delimited using "web_app/data/series_by_cohort.csv", replace
+file web_app/data/series_by_cohort.csv saved
+
+. restore
+
+. 
+. * ---- e(lambda): pre-period time weights per cohort -> CSV ----
+. matrix L = e(lambda)
+
+. local cohlist 2000 2002 2003 2005 2010 2012 2013
+
+. preserve
+
+.     clear
+
+.     svmat L
+number of observations will be reset to 27
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 27.
+
+.     * last row holds adoption-year labels; last column (L8) is the calendar year
+.     local nr = rowsof(L)
+
+.     drop in `nr'
+(1 observation deleted)
+
+.     rename L8 year
+
+.     local j = 0
+
+.     foreach c of local cohlist {
+  2.         local ++j
+  3.         rename L`j' lam`c'
+  4.     }
+
+.     reshape long lam, i(year) j(cohort)
+(j = 2000 2002 2003 2005 2010 2012 2013)
+
+Data                               Wide   ->   Long
+-----------------------------------------------------------------------------
+Number of observations               26   ->   182         
+Number of variables                   8   ->   3           
+j variable (7 values)                     ->   cohort
+xij variables:
+            lam2000 lam2002 ... lam2013   ->   lam
+-----------------------------------------------------------------------------
+
+.     rename lam lambda
+
+.     drop if missing(lambda)
+(67 observations deleted)
+
+.     order cohort year lambda
+
+.     sort cohort year
+
+.     export delimited using "web_app/data/lambda_by_cohort.csv", replace
+file web_app/data/lambda_by_cohort.csv saved
+
+. restore
+
+. 
+. * ---- donor (unit) weights per cohort -> CSV ----
+. *      Use returnweights: the country name is native in the data, avoiding the
+. *      e(omega) matrix rownames (which mattitles fills with names that can carry
+. *      spaces).  A quick noinference re-fit returns the same weights.
+. sdid womparl country year quota, vce(noinference) returnweights
+
+
+Synthetic Difference-in-Differences Estimator
+
+-----------------------------------------------------------------------------
+     womparl |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+       quota |   8.03410          .        .        .           .           .
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+Refer to Arkhangelsky et al., (2021) for theoretical derivations.
+
+. preserve
+
+.     keep country quotaYear omega2000 omega2002 omega2003 omega2005 omega2010 omega2012 omega2013
+
+.     duplicates drop
+
+Duplicates in terms of all variables
+
+(2,975 observations deleted)
+
+.     keep if missing(quotaYear)                 // donors = never-treated countries
+(9 observations deleted)
+
+.     drop quotaYear
+
+.     reshape long omega, i(country) j(cohort)
+(j = 2000 2002 2003 2005 2010 2012 2013)
+
+Data                               Wide   ->   Long
+-----------------------------------------------------------------------------
+Number of observations              110   ->   770         
+Number of variables                   8   ->   3           
+j variable (7 values)                     ->   cohort
+xij variables:
+      omega2000 omega2002 ... omega2013   ->   omega
+-----------------------------------------------------------------------------
+
+.     drop if missing(omega) | omega==0          // keep nonzero donors
+(321 observations deleted)
+
+.     order cohort country omega
+
+.     gsort cohort -omega
+
+.     export delimited using "web_app/data/omega_by_cohort.csv", replace
+file web_app/data/omega_by_cohort.csv saved
+
+. restore
+
+. 
+. * ---- treated-vs-synthetic path for the 2002 cohort (the worked example) ----
+. *      SDID matches the pre-period TREND, not the level (the unit fixed effect
+. *      absorbs the level gap).  To visualise the counterfactual we anchor the
+. *      synthetic to the treated cohort by its lambda-weighted pre-period gap
+. *      (exactly the baseline SDID differences against; see the sdid post).
+. preserve
+
+.     import delimited "web_app/data/lambda_by_cohort.csv", clear
+(encoding automatically selected: ISO-8859-9)
+(3 vars, 115 obs)
+
+.     keep if cohort==2002
+(103 observations deleted)
+
+.     keep year lambda
+
+.     tempfile l2002
+
+.     save `l2002', replace
+(file /tmp/claude-501/St23259.00000b not found)
+file /tmp/claude-501/St23259.00000b saved as .dta format
+
+. 
+.     import delimited "web_app/data/series_by_cohort.csv", clear
+(encoding automatically selected: ISO-8859-1)
+(4 vars, 182 obs)
+
+.     keep if cohort==2002
+(156 observations deleted)
+
+.     keep year y_treated y_synth
+
+.     merge 1:1 year using `l2002', nogen
+
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                            14
+        from master                        14  
+        from using                          0  
+
+    Matched                                12  
+    -----------------------------------------
+
+.     replace lambda = 0 if missing(lambda)
+(14 real changes made)
+
+.     gen double pg = lambda*(y_synth - y_treated) if year<2002
+(14 missing values generated)
+
+.     egen double offset = total(pg)
+
+.     gen y_synth_anch = y_synth - offset
+
+.     di as result "2002 cohort lambda-weighted pre-period gap (anchor) = " offset[1]
+2002 cohort lambda-weighted pre-period gap (anchor) = 10.444628
+
+.     twoway (line y_treated    year, lcolor("$TREAT") lwidth(thick))             ///
+>            (line y_synth_anch year, lcolor("$CTRL")  lwidth(medthick) lpattern(dash)), ///
+>            xline(2001.5, lcolor(gs10))                                          ///
+>            ytitle("% women in parliament") xtitle("") xlabel(1990(5)2015)       ///
+>            legend(order(1 "Treated cohort (2002)" 2 "Synthetic control (anchored)") ///
+>                   pos(11) ring(0) cols(1) size(small))                          ///
+>            title("SDID counterfactual for the 2002 cohort", size(medium))        ///
+>            note("Synthetic anchored to the treated cohort by its {&lambda}-weighted pre-2002 gap; 
+> the post-2002 divergence is the effect.")
+
+.     graph export "stata_sdid_staggered_cohort2002_path.png", replace width(2400)
+file stata_sdid_staggered_cohort2002_path.png written in PNG format
+
+. restore
+
+. 
+. * ---- 2002-cohort pre-period time weights (lambda) bar chart ----
+. preserve
+
+.     import delimited "web_app/data/lambda_by_cohort.csv", clear
+(encoding automatically selected: ISO-8859-9)
+(3 vars, 115 obs)
+
+.     keep if cohort==2002
+(103 observations deleted)
+
+.     twoway (bar lambda year, color("$CTRL") barwidth(0.8)),                     ///
+>            ytitle("SDID time weight ({&lambda})") xtitle("")                    ///
+>            xlabel(1990(2)2001, angle(45)) legend(off)                           ///
+>            title("Where SDID looks: 2002-cohort pre-period time weights", size(medium)) ///
+>            note("Weight concentrates on the years just before 2002 -- the pre-period most like the
+>  post-period.")
+
+.     graph export "stata_sdid_staggered_lambda.png", replace width(2400)
+file stata_sdid_staggered_lambda.png written in PNG format
+
+. restore
+
+. 
+. *-------------------------------------------------------------------------------
+. * 5. COVARIATES -- optimized (Arkhangelsky et al.) vs projected (Kranz 2022)
+. *    sdid needs a balanced panel, so drop the 104 obs with missing lngdp first.
+. *-------------------------------------------------------------------------------
+. use quota_example.dta, clear
+(Balanced panel from Bhalotra, Clarke, Gomes & Venkataramani (2023))
+
+. label variable quota "Parliamentary gender quota"
+
+. drop if missing(lngdp)
+(104 observations deleted)
+
+. 
+. sdid womparl country year quota, vce(bootstrap) seed(2022) covariates(lngdp, optimized)
+Bootstrap replications (50). This may take some time.
+----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5
+..................................................     50
+
+
+Synthetic Difference-in-Differences Estimator
+
+-----------------------------------------------------------------------------
+     womparl |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+       quota |   8.05150    3.04660     2.64    0.008     2.08027    14.02273
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+Refer to Arkhangelsky et al., (2021) for theoretical derivations.
+
+. scalar att_opt = e(ATT)
+
+. scalar se_opt  = e(se)
+
+. di as result "SDID + lngdp (optimized) ATT = " att_opt "  SE = " se_opt
+SDID + lngdp (optimized) ATT = 8.051498  SE = 3.046601
+
+. 
+. sdid womparl country year quota, vce(bootstrap) seed(1213) covariates(lngdp, projected)
+Bootstrap replications (50). This may take some time.
+----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5
+..................................................     50
+
+
+Synthetic Difference-in-Differences Estimator
+
+-----------------------------------------------------------------------------
+     womparl |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+       quota |   8.05927    3.11913     2.58    0.010     1.94589    14.17264
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+Refer to Arkhangelsky et al., (2021) for theoretical derivations.
+
+. scalar att_prj = e(ATT)
+
+. scalar se_prj  = e(se)
+
+. di as result "SDID + lngdp (projected) ATT = " att_prj "  SE = " se_prj
+SDID + lngdp (projected) ATT = 8.059266  SE = 3.119126
+
+. 
+. *-------------------------------------------------------------------------------
+. * 6. EVENT STUDY -- sdid_event on the full staggered panel + the 2002 cohort
+. *-------------------------------------------------------------------------------
+. * (6a) Full staggered panel: aggregated ATT + cohort-aggregated dynamic effects
+. use quota_example.dta, clear
+(Balanced panel from Bhalotra, Clarke, Gomes & Venkataramani (2023))
+
+. label variable quota "Parliamentary gender quota"
+
+. drop if missing(lngdp)
+(104 observations deleted)
+
+. sdid_event womparl country year quota, vce(bootstrap) brep(100) effects(8) ///
+>     placebo(5) covariates(lngdp)
+Synthetic Difference-in-differences
+
+Boostrap replications (100), bootstrap mode.
+|0% ----------------------------------------- 100%|
+|.................................................|
+
+
+             |  Estimate         SE      LB CI      UB CI  Switchers 
+-------------+------------------------------------------------------
+         ATT |   8.05289   3.007588   2.158017   13.94776          9 
+    Effect_1 |  6.739649   3.174403   .5178192   12.96148          9 
+    Effect_2 |   7.38131   2.996325   1.508514   13.25411          9 
+    Effect_3 |  6.749378   3.048767   .7737942   12.72496          9 
+    Effect_4 |  8.593622   2.475094   3.742437   13.44481          8 
+    Effect_5 |  6.304031   2.458463   1.485443   11.12262          7 
+    Effect_6 |   8.35644   3.105559   2.269545   14.44334          7 
+    Effect_7 |  8.191521   3.514041      1.304   15.07904          6 
+    Effect_8 |  8.248533   3.525711   1.338139   15.15893          6 
+   Placebo_1 |   6.71234   4.419751  -1.950371   15.37505          6 
+   Placebo_2 |  7.088328   4.635759   -1.99776   16.17442          6 
+   Placebo_3 |  8.233008   5.426494  -2.402921   18.86894          6 
+   Placebo_4 |   12.4084   4.672981   3.249356   21.56744          5 
+   Placebo_5 |  11.90183   4.662348   2.763633   21.04004          5 
+
+. matrix Hfull = e(H)
+
+. di as result "sdid_event full-panel aggregated ATT = " Hfull[1,1] "  SE = " Hfull[1,2]
+sdid_event full-panel aggregated ATT = 8.0528896  SE = 3.007588
+
+. 
+. * (6b) Clean event study on the 2002 cohort (the package authors' worked example).
+. *      Effect_l = event time (l-1); Placebo_l = event time (-l).
+. use quota_example.dta, clear
+(Balanced panel from Bhalotra, Clarke, Gomes & Venkataramani (2023))
+
+. label variable quota "Parliamentary gender quota"
+
+. keep if quotaYear==2002 | quotaYear==.
+(182 observations deleted)
+
+. drop if missing(lngdp)
+(104 observations deleted)
+
+. sdid_event womparl country year quota, vce(placebo) brep(100) placebo(all) covariates(lngdp)
+Synthetic Difference-in-differences
+
+Boostrap replications (100), placebo mode.
+|0% ----------------------------------------- 100%|
+|.................................................|
+
+
+             |  Estimate         SE      LB CI      UB CI  Switchers 
+-------------+------------------------------------------------------
+         ATT |  6.853472     2.9215   1.127332   12.57961          2 
+    Effect_1 |  4.086404   1.064752    1.99949   6.173319          2 
+    Effect_2 |  9.164442   1.572465   6.082411   12.24647          2 
+    Effect_3 |  7.938504    2.21875   3.589755   12.28725          2 
+    Effect_4 |  7.198138      2.554   2.192299   12.20398          2 
+    Effect_5 |   7.00087   2.797605   1.517563   12.48418          2 
+    Effect_6 |  6.828273   3.259383   .4398817   13.21666          2 
+    Effect_7 |  6.864062    3.63997  -.2702804    13.9984          2 
+    Effect_8 |  6.302866   3.975074  -1.488279   14.09401          2 
+    Effect_9 |  6.089694   3.835474  -1.427835   13.60722          2 
+   Effect_10 |  8.778086   4.282917   .3835691    17.1726          2 
+   Effect_11 |  8.185586   4.674373  -.9761843   17.34736          2 
+   Effect_12 |   6.34902   5.128008  -3.701875   16.39992          2 
+   Effect_13 |  5.587233    5.35509  -4.908743   16.08321          2 
+   Effect_14 |  5.575424   5.452834   -5.11213   16.26298          2 
+   Placebo_1 | -.2184166   .5740168   -1.34349   .9066564          2 
+   Placebo_2 |   .242148   1.137022  -1.986414    2.47071          2 
+   Placebo_3 |  .1393919   1.163741   -2.14154   2.420324          2 
+   Placebo_4 |  .2832749   1.334074   -2.33151    2.89806          2 
+   Placebo_5 |  .4654359     1.3908  -2.260532   3.191404          2 
+   Placebo_6 |  .5156405   1.341509  -2.113718   3.144999          2 
+   Placebo_7 |  .5274185   1.343222  -2.105296   3.160133          2 
+   Placebo_8 |  .5443867   1.208532  -1.824336   2.913109          2 
+   Placebo_9 |  .7578531   1.192515  -1.579475   3.095182          2 
+  Placebo_10 |  .4876656   1.260834  -1.983569     2.9589          2 
+  Placebo_11 |  .4131066   1.008039  -1.562651   2.388864          2 
+  Placebo_12 |  .1307408    1.61198   -3.02874   3.290222          2 
+
+. matrix H = e(H)
+
+. matrix list H
+
+H[27,5]
+              Estimate          SE       LB CI       UB CI   Switchers
+       ATT   6.8534716   2.9214996   1.1273324   12.579611           2
+  Effect_1   4.0864041   1.0647522   1.9994897   6.1733185           2
+  Effect_2   9.1644416   1.5724646   6.0824109   12.246472           2
+  Effect_3   7.9385045     2.21875   3.5897545   12.287254           2
+  Effect_4   7.1981381   2.5539996   2.1922989   12.203977           2
+  Effect_5   7.0008696   2.7976052   1.5175635   12.484176           2
+  Effect_6    6.828273   3.2593833   .43988175   13.216664           2
+  Effect_7   6.8640615   3.6399704  -.27028038   13.998403           2
+  Effect_8   6.3028661   3.9750741  -1.4882792   14.094011           2
+  Effect_9   6.0896941   3.8354741  -1.4278351   13.607223           2
+ Effect_10   8.7780859   4.2829167   .38356912   17.172603           2
+ Effect_11   8.1855863   4.6743727  -.97618427   17.347357           2
+ Effect_12   6.3490205   5.1280081  -3.7018753   16.399916           2
+ Effect_13   5.5872333     5.35509  -4.9087431    16.08321           2
+ Effect_14   5.5754244   5.4528338  -5.1121298   16.262979           2
+ Placebo_1  -.21841663   .57401684  -1.3434896   .90665636           2
+ Placebo_2   .24214798   1.1370217  -1.9864145   2.4707104           2
+ Placebo_3   .13939188    1.163741  -2.1415405   2.4203242           2
+ Placebo_4   .28327488   1.3340739    -2.33151   2.8980598           2
+ Placebo_5   .46543586      1.3908  -2.2605322   3.1914039           2
+ Placebo_6   .51564047   1.3415094  -2.1137179   3.1449988           2
+ Placebo_7   .52741851   1.3432216  -2.1052958   3.1601328           2
+ Placebo_8   .54438668   1.2085319  -1.8243358   2.9131091           2
+ Placebo_9   .75785315   1.1925146  -1.5794754   3.0951817           2
+Placebo_10   .48766562   1.2608338  -1.9835685   2.9588998           2
+Placebo_11   .41310657   1.0080394  -1.5626506   2.3888637           2
+Placebo_12   .13074083     1.61198    -3.02874   3.2902217           2
+
+. 
+. local Lg  = 2015 - 2002 + 1     // 14 post-treatment (dynamic) effects
+
+. local Lpl = 2002 - 1990         // 12 pre-treatment placebos
+
+. preserve
+
+.     clear
+
+.     svmat H
+number of observations will be reset to 27
+Press any key to continue, or Break to abort
+Number of observations (_N) was 0, now 27.
+
+.     rename (H1 H2 H3 H4 H5) (coef se ci_l ci_u switchers)
+
+.     gen row = _n
+
+.     drop if row==1                                   // drop the aggregate ATT row
+(1 observation deleted)
+
+.     gen event_time = .
+(26 missing values generated)
+
+.     gen str4 period_type = ""
+(26 missing values generated)
+
+.     replace event_time = row-2      if row>=2          & row<=1+`Lg'
+(14 real changes made)
+
+.     replace period_type = "post"    if row>=2          & row<=1+`Lg'
+(14 real changes made)
+
+.     replace event_time = -(row-1-`Lg') if row>=2+`Lg'  & row<=1+`Lg'+`Lpl'
+(12 real changes made)
+
+.     replace period_type = "pre"        if row>=2+`Lg'  & row<=1+`Lg'+`Lpl'
+(12 real changes made)
+
+.     keep event_time coef se ci_l ci_u period_type
+
+.     sort event_time
+
+.     list, noobs
+
+  +-------------------------------------------------------------------+
+  |      coef         se        ci_l       ci_u   event_~e   period~e |
+  |-------------------------------------------------------------------|
+  |  .1307408    1.61198    -3.02874   3.290222        -12        pre |
+  |  .4131066   1.008039   -1.562651   2.388864        -11        pre |
+  |  .4876656   1.260834   -1.983569     2.9589        -10        pre |
+  |  .7578532   1.192515   -1.579475   3.095182         -9        pre |
+  |  .5443867   1.208532   -1.824336   2.913109         -8        pre |
+  |-------------------------------------------------------------------|
+  |  .5274185   1.343222   -2.105296   3.160133         -7        pre |
+  |  .5156405   1.341509   -2.113718   3.144999         -6        pre |
+  |  .4654359     1.3908   -2.260532   3.191404         -5        pre |
+  |  .2832749   1.334074    -2.33151    2.89806         -4        pre |
+  |  .1393919   1.163741   -2.141541   2.420324         -3        pre |
+  |-------------------------------------------------------------------|
+  |   .242148   1.137022   -1.986414   2.470711         -2        pre |
+  | -.2184166   .5740168    -1.34349   .9066564         -1        pre |
+  |  4.086404   1.064752     1.99949   6.173318          0       post |
+  |  9.164442   1.572465    6.082411   12.24647          1       post |
+  |  7.938505    2.21875    3.589755   12.28725          2       post |
+  |-------------------------------------------------------------------|
+  |  7.198138      2.554    2.192299   12.20398          3       post |
+  |   7.00087   2.797605    1.517563   12.48418          4       post |
+  |  6.828273   3.259383    .4398817   13.21666          5       post |
+  |  6.864061    3.63997   -.2702804    13.9984          6       post |
+  |  6.302866   3.975074   -1.488279   14.09401          7       post |
+  |-------------------------------------------------------------------|
+  |  6.089694   3.835474   -1.427835   13.60722          8       post |
+  |  8.778086   4.282917    .3835691    17.1726          9       post |
+  |  8.185586   4.674373   -.9761842   17.34736         10       post |
+  |   6.34902   5.128008   -3.701875   16.39992         11       post |
+  |  5.587233    5.35509   -4.908743   16.08321         12       post |
+  |-------------------------------------------------------------------|
+  |  5.575424   5.452834    -5.11213   16.26298         13       post |
+  +-------------------------------------------------------------------+
+
+.     export delimited using "web_app/data/event_study.csv", replace
+file web_app/data/event_study.csv saved
+
+. 
+.     * headline event-study figure
+.     twoway (rarea ci_l ci_u event_time, color("${CTRL}%35") lwidth(none))       ///
+>            (line coef event_time, lcolor("$TREAT") lwidth(medthick))            ///
+>            (scatter coef event_time, mcolor("$TREAT") msize(small) ms(O)),      ///
+>            yline(0, lcolor("$TEAL") lpattern(dash))                             ///
+>            xline(-0.5, lcolor(gs9) lpattern(solid))                            ///
+>            xlabel(-12(2)13) xtitle("Years relative to quota adoption (event time)") ///
+>            ytitle("Effect on women in parliament (pp)")                        ///
+>            legend(order(3 "Point estimate" 1 "95% CI") pos(11) ring(0) cols(1) size(small)) ///
+>            title("Event-study SDID for the 2002 cohort (sdid_event)", size(medium)) ///
+>            note("Pre-period placebos hug zero (parallel trends); post-period effects trace the dyn
+> amic ATT.")
+
+.     graph export "stata_sdid_staggered_event_study.png", replace width(2400)
+file stata_sdid_staggered_event_study.png written in PNG format
+
+. restore
+
+. 
+. *-------------------------------------------------------------------------------
+. * 7. INFERENCE -- bootstrap vs placebo vs jackknife (paper's 2-cohort subsample)
+. *    Drop the five single-country cohorts so jackknife (needs >1 treated unit per
+. *    period) is defined; only the 2002 & 2003 cohorts remain.
+. *-------------------------------------------------------------------------------
+. use quota_example.dta, clear
+(Balanced panel from Bhalotra, Clarke, Gomes & Venkataramani (2023))
+
+. label variable quota "Parliamentary gender quota"
+
+. drop if inlist(country,"Algeria","Kenya","Samoa","Swaziland","Tanzania")
+(130 observations deleted)
+
+. 
+. sdid womparl country year quota, vce(bootstrap) seed(1213)
+Bootstrap replications (50). This may take some time.
+----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5
+..................................................     50
+
+
+Synthetic Difference-in-Differences Estimator
+
+-----------------------------------------------------------------------------
+     womparl |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+       quota |  10.33066    4.72911     2.18    0.029     1.06178    19.59954
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+Refer to Arkhangelsky et al., (2021) for theoretical derivations.
+
+. scalar b_att = e(ATT)
+
+. scalar b_se  = e(se)
+
+. scalar b_cil = e(ATT_l)
+
+. scalar b_cir = e(ATT_r)
+
+. sdid womparl country year quota, vce(placebo) seed(1213)
+Placebo replications (50). This may take some time.
+----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5
+..................................................     50
+
+
+Synthetic Difference-in-Differences Estimator
+
+-----------------------------------------------------------------------------
+     womparl |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+       quota |  10.33066    2.34040     4.41    0.000     5.74356    14.91776
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+Refer to Arkhangelsky et al., (2021) for theoretical derivations.
+
+. scalar p_att = e(ATT)
+
+. scalar p_se  = e(se)
+
+. scalar p_cil = e(ATT_l)
+
+. scalar p_cir = e(ATT_r)
+
+. sdid womparl country year quota, vce(jackknife)
+
+
+Synthetic Difference-in-Differences Estimator
+
+-----------------------------------------------------------------------------
+     womparl |     ATT     Std. Err.     t      P>|t|    [95% Conf. Interval]
+-------------+---------------------------------------------------------------
+       quota |  10.33066    6.00560     1.72    0.085    -1.44009    22.10141
+-----------------------------------------------------------------------------
+95% CIs and p-values are based on large-sample approximations.
+Refer to Arkhangelsky et al., (2021) for theoretical derivations.
+
+. scalar j_att = e(ATT)
+
+. scalar j_se  = e(se)
+
+. scalar j_cil = e(ATT_l)
+
+. scalar j_cir = e(ATT_r)
+
+. 
+. clear
+
+. set obs 3
+Number of observations (_N) was 0, now 3.
+
+. gen str10 method = ""
+(3 missing values generated)
+
+. gen double att = .
+(3 missing values generated)
+
+. gen double se  = .
+(3 missing values generated)
+
+. gen double ci_l = .
+(3 missing values generated)
+
+. gen double ci_u = .
+(3 missing values generated)
+
+. replace method="bootstrap" in 1
+(1 real change made)
+
+. replace att=b_att in 1
+(1 real change made)
+
+. replace se=b_se in 1
+(1 real change made)
+
+. replace ci_l=b_cil in 1
+(1 real change made)
+
+. replace ci_u=b_cir in 1
+(1 real change made)
+
+. replace method="placebo" in 2
+(1 real change made)
+
+. replace att=p_att in 2
+(1 real change made)
+
+. replace se=p_se in 2
+(1 real change made)
+
+. replace ci_l=p_cil in 2
+(1 real change made)
+
+. replace ci_u=p_cir in 2
+(1 real change made)
+
+. replace method="jackknife" in 3
+(1 real change made)
+
+. replace att=j_att in 3
+(1 real change made)
+
+. replace se=j_se in 3
+(1 real change made)
+
+. replace ci_l=j_cil in 3
+(1 real change made)
+
+. replace ci_u=j_cir in 3
+(1 real change made)
+
+. gen tstat = att/se
+
+. gen pval  = 2*(1-normal(abs(tstat)))
+
+. list, noobs
+
+  +--------------------------------------------------------------------------------+
+  |    method        att         se         ci_l        ci_u      tstat       pval |
+  |--------------------------------------------------------------------------------|
+  | bootstrap   10.33066   4.729109    1.0617767   19.599543   2.184483   .0289268 |
+  |   placebo   10.33066     2.3404    5.7435603    14.91776   4.414057   .0000101 |
+  | jackknife   10.33066   6.005597   -1.4400938   22.101414   1.720172   .0854012 |
+  +--------------------------------------------------------------------------------+
+
+. export delimited using "web_app/data/inference.csv", replace
+file web_app/data/inference.csv saved
+
+. 
+. * forest plot of the three inference methods (same point estimate, different SEs)
+. gen order = _n
+
+. twoway (rcap ci_l ci_u order, horizontal lcolor("$CTRL"))                       ///
+>        (scatter order att, mcolor("$TREAT") msize(large) ms(d)),                ///
+>        xline(0, lcolor(gs10) lpattern(dash))                                    ///
+>        ylabel(1 "bootstrap" 2 "placebo" 3 "jackknife", angle(0))                ///
+>        ytitle("") xtitle("ATT on women in parliament (pp)")                     ///
+>        legend(off) ysc(reverse)                                                 ///
+>        title("Same ATT, three variance estimators (2002 & 2003 cohorts)", size(medium)) ///
+>        note("Point estimate is identical (10.3 pp); jackknife is most conservative, placebo tighte
+> st.")
+
+. graph export "stata_sdid_staggered_inference.png", replace width(2400)
+file stata_sdid_staggered_inference.png written in PNG format
+
+. 
+. *-------------------------------------------------------------------------------
+. * 8. SUMMARY TABLE -> web_app/data/atts.csv
+. *-------------------------------------------------------------------------------
+. clear
+
+. set obs 4
+Number of observations (_N) was 0, now 4.
+
+. gen str28 spec = ""
+(4 missing values generated)
+
+. gen double att = .
+(4 missing values generated)
+
+. gen double se  = .
+(4 missing values generated)
+
+. gen double ci_l = .
+(4 missing values generated)
+
+. gen double ci_u = .
+(4 missing values generated)
+
+. replace spec="Static TWFE (biased foil)" in 1
+(1 real change made)
+
+. replace att=twfe_att in 1
+(1 real change made)
+
+. replace se=twfe_se in 1
+(1 real change made)
+
+. replace spec="SDID (no covariates)" in 2
+(1 real change made)
+
+. replace att=sdid_att in 2
+(1 real change made)
+
+. replace se=sdid_se in 2
+(1 real change made)
+
+. replace ci_l=sdid_cil in 2
+(1 real change made)
+
+. replace ci_u=sdid_cir in 2
+(1 real change made)
+
+. replace spec="SDID + lngdp (optimized)" in 3
+(1 real change made)
+
+. replace att=att_opt in 3
+(1 real change made)
+
+. replace se=se_opt in 3
+(1 real change made)
+
+. replace spec="SDID + lngdp (projected)" in 4
+(1 real change made)
+
+. replace att=att_prj in 4
+(1 real change made)
+
+. replace se=se_prj in 4
+(1 real change made)
+
+. gen tstat = att/se
+
+. gen pval  = 2*(1-normal(abs(tstat)))
+
+. replace ci_l = att - 1.96*se if missing(ci_l)
+(3 real changes made)
+
+. replace ci_u = att + 1.96*se if missing(ci_u)
+(3 real changes made)
+
+. list, noobs
+
+  +-----------------------------------------------------------------------------------------------+
+  |                      spec        att         se        ci_l        ci_u      tstat       pval |
+  |-----------------------------------------------------------------------------------------------|
+  | Static TWFE (biased foil)   7.961266    3.77388   .56446111   15.358071   2.109571   .0348954 |
+  |      SDID (no covariates)   8.034102   3.740402   .70304879   15.365155   2.147925   .0317197 |
+  |  SDID + lngdp (optimized)   8.051498   3.046601     2.08016   14.022836   2.642781   .0082228 |
+  |  SDID + lngdp (projected)   8.059266   3.119126    1.945779   14.172753   2.583822   .0097712 |
+  +-----------------------------------------------------------------------------------------------+
+
+. export delimited spec att se ci_l ci_u pval using "web_app/data/atts.csv", replace
+file web_app/data/atts.csv saved
+
+. 
+. *-------------------------------------------------------------------------------
+. * 9. KEY NUMBERS
+. *-------------------------------------------------------------------------------
+. di as result _n "==================== KEY NUMBERS ===================="
+
+==================== KEY NUMBERS ====================
+
+. di as result "Static TWFE ATT (biased foil)  = " %7.2f twfe_att "  SE " %5.2f twfe_se
+Static TWFE ATT (biased foil)  =    7.96  SE  3.77
+
+. di as result "SDID staggered ATT             = " %7.2f sdid_att "  SE " %5.2f sdid_se
+SDID staggered ATT             =    8.03  SE  3.74
+
+. di as result "  95% CI                       = [" %5.2f sdid_cil ", " %5.2f sdid_cir "]"
+  95% CI                       = [ 0.70, 15.37]
+
+. di as result "SDID + lngdp (optimized)       = " %7.2f att_opt  "  SE " %5.2f se_opt
+SDID + lngdp (optimized)       =    8.05  SE  3.05
+
+. di as result "SDID + lngdp (projected)       = " %7.2f att_prj  "  SE " %5.2f se_prj
+SDID + lngdp (projected)       =    8.06  SE  3.12
+
+. di as result "Inference subsample ATT        = " %7.2f b_att
+Inference subsample ATT        =   10.33
+
+. di as result "  bootstrap SE                 = " %7.2f b_se
+  bootstrap SE                 =    4.73
+
+. di as result "  placebo SE                   = " %7.2f p_se
+  placebo SE                   =    2.34
+
+. di as result "  jackknife SE                 = " %7.2f j_se
+  jackknife SE                 =    6.01
+
+. di as result "====================================================="
+=====================================================
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/GitHub/starter-academic-v501/content/post/stata_sdid_stag
+> gered/analysis.log
+  log type:  text
+ closed on:   8 Jun 2026, 10:16:21
+----------------------------------------------------------------------------------------------------
