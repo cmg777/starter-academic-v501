@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>The Augmented Synthetic Control Method — Kansas Lab</title>
+<meta name="description" content="Interactive companion to 'The Augmented Synthetic Control Method: A Beginner's Tutorial with the Kansas Tax Cuts'. Build synthetic Kansas, watch ridge augmentation de-bias the estimate, and test significance four ways.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>The Augmented Synthetic Control Method — Kansas Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>The Augmented Synthetic Control Method: A Beginner's Tutorial with the Kansas Tax Cuts</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro" class="tab active" data-pane="pane-intro" role="tab" aria-selected="true">1 · The Big Picture</button>
+  <button id="tab-build" class="tab"        data-pane="pane-build" role="tab" aria-selected="false">2 · Build Synthetic Kansas</button>
+  <button id="tab-aug"   class="tab"        data-pane="pane-aug"   role="tab" aria-selected="false">3 · The Augmentation</button>
+  <button id="tab-infer" class="tab"        data-pane="pane-infer" role="tab" aria-selected="false">4 · Inference</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: THE BIG PICTURE ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+  <h2>Did the 2012 Kansas tax cut shrink the economy?</h2>
+  <p class="lede">
+    In 2012 Kansas enacted one of the largest state income-tax cuts in recent U.S. history —
+    Governor Brownback called it "a real-live experiment." Because there is only one Kansas,
+    the <strong>synthetic control method</strong> builds a counterfactual "synthetic Kansas"
+    from a weighted blend of other states. The <strong>augmented</strong> version adds an
+    outcome model that removes the bias left behind when the pre-2012 fit is imperfect.
+  </p>
+  <p class="lede">
+    This lab reproduces the tutorial's findings interactively, entirely client-side from a
+    precomputed <code>results.json</code>. Build the synthetic, watch augmentation deepen the
+    estimate, and test whether the effect could just be noise.
+  </p>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-num" id="hero-att">—</div>
+      <div class="stat-lab">Ridge-ASCM effect on GDP per capita (post-2012)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="hero-bias">—</div>
+      <div class="stat-lab">estimated SCM bias the augmentation removed (log pts)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="hero-rank">—</div>
+      <div class="stat-lab">Kansas's rank among 50 placebo states</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Kansas vs its synthetic control</h3>
+    <p>
+      Synthetic Kansas (blue) is a weighted blend of donor states built to match the real
+      Kansas (orange) <em>before</em> 2012. After the dashed line, the gap between them is the
+      estimated effect of the tax cut.
+    </p>
+    <div class="chart-area" id="intro-chart"></div>
+    <p class="note">Before 2012 the two lines nearly coincide — a believable counterfactual. After 2012 Kansas slips below.</p>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-build">
+      <div class="cta-tag">Tab 2</div>
+      <h4>Build Synthetic Kansas</h4>
+      <p>See the 7-state recipe and the classic-SCM gap with its conformal confidence band.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-aug">
+      <div class="cta-tag">Tab 3</div>
+      <h4>The Augmentation</h4>
+      <p>Watch ridge regression estimate and subtract the bias — deepening the effect from −2.9% to −3.9%.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-infer">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Inference</h4>
+      <p>Four ways to ask "could this be noise?" — and why they can disagree.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Synthetic control</summary>
+        <div class="gloss-body">A weighted average of donor (untreated) states built to match the treated unit's pre-treatment path. Its post-treatment path is the missing counterfactual.</div>
+      </details>
+      <details class="gloss"><summary>Augmentation (bias correction)</summary>
+        <div class="gloss-body">A ridge outcome model that estimates and subtracts the part of the gap classic SCM could not close. Zero when pre-fit is perfect; nonzero when it is poor.</div>
+      </details>
+      <details class="gloss"><summary>Pre-fit imbalance (L2)</summary>
+        <div class="gloss-body">How far the synthetic is from Kansas before 2012. Small means a trustworthy match; a poor pre-fit makes any post-treatment gap meaningless.</div>
+      </details>
+      <details class="gloss"><summary>ATT</summary>
+        <div class="gloss-body">Average treatment effect on the treated — the post-2012 gap between actual Kansas and its synthetic counterfactual, in log GDP per capita.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 2: BUILD SYNTHETIC KANSAS ====================== -->
+<section id="pane-build" class="tab-pane" role="tabpanel" aria-labelledby="tab-build">
+  <h2>Building synthetic Kansas with classic SCM</h2>
+  <p class="lede">
+    Classic SCM chooses <strong>non-negative weights that sum to one</strong> so the weighted
+    donor history matches Kansas before 2012. The constraint forces most weights to exactly
+    zero — the recipe is sparse and you can name it.
+  </p>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num" id="b-att">—</div><div class="stat-lab">classic SCM average ATT</div></div>
+    <div class="stat-card"><div class="stat-num" id="b-l2">—</div><div class="stat-lab">pre-fit L2 imbalance</div></div>
+    <div class="stat-card"><div class="stat-num" id="b-pct">—</div><div class="stat-lab">improvement over uniform weights</div></div>
+    <div class="stat-card"><div class="stat-num" id="b-ndonor">—</div><div class="stat-lab">donor states with non-zero weight</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Who is in synthetic Kansas?</h3>
+    <p>The donor weights. Hover a bar for the exact value. The other 42 states get exactly zero weight.</p>
+    <div class="chart-area" id="weights-chart"></div>
+  </div>
+
+  <div class="card">
+    <h3>The classic-SCM gap, with conformal confidence band</h3>
+    <p>Actual minus synthetic. Near zero before 2012 (good fit), persistently negative afterward. The shaded band is the pointwise conformal 95% interval.</p>
+    <div class="chart-area" id="scm-gap-chart"></div>
+    <p class="note">Notice the dip near 2005–2006 <em>before</em> treatment — pure pre-fit imbalance that a convex blend cannot remove. That is the seed of bias the augmentation will fix.</p>
+  </div>
+</section>
+
+<!-- ====================== TAB 3: THE AUGMENTATION ====================== -->
+<section id="pane-aug" class="tab-pane" role="tabpanel" aria-labelledby="tab-aug">
+  <h2>Ridge augmentation: estimate the bias, then subtract it</h2>
+  <p class="lede">
+    When the pre-2012 fit is imperfect, the post-treatment gap mixes the real effect with bias.
+    Ridge ASCM fits an outcome model, predicts the leftover imbalance, and subtracts it. A
+    penalty λ — chosen by cross-validation — controls how far the weights may extrapolate.
+  </p>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num" id="a-scm">—</div><div class="stat-lab">classic SCM ATT</div></div>
+    <div class="stat-card"><div class="stat-num" id="a-ridge">—</div><div class="stat-lab">Ridge-ASCM ATT (deeper)</div></div>
+    <div class="stat-card"><div class="stat-num" id="a-bias">—</div><div class="stat-lab">estimated SCM bias</div></div>
+    <div class="stat-card"><div class="stat-num" id="a-lambda">—</div><div class="stat-lab">λ chosen by cross-validation</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Augmentation deepens the estimated effect</h3>
+    <p>The classic-SCM gap (blue) and the Ridge-ASCM gap (teal). Both near zero before 2012; the ridge gap dips deeper afterward, because it has removed the bias from imperfect matching.</p>
+    <div class="chart-area" id="overlay-chart"></div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Choosing λ by cross-validation</h3>
+      <p>Leave-one-pre-period-out CV error vs the penalty λ (log scale). The 1-SE rule picks the largest λ within one standard error of the minimum — the conservative choice.</p>
+      <div class="chart-area" id="cv-chart"></div>
+    </div>
+    <div class="card">
+      <h3>The estimate grows as we de-bias</h3>
+      <p>Average ATT across five specifications. More balancing → a more negative estimate and a better pre-fit. The un-augmented SCM number is the conservative one.</p>
+      <div class="chart-area" id="modelcomp-chart"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 4: INFERENCE ====================== -->
+<section id="pane-infer" class="tab-pane" role="tabpanel" aria-labelledby="tab-infer">
+  <h2>Inference: could the effect just be noise?</h2>
+  <p class="lede">
+    A synthetic-control estimate is a difference between two estimated curves built from one
+    treated unit, so significance is subtle. <code>augsynth</code> ships four tools; they share
+    the same −0.040 point estimate but can disagree on whether it is distinguishable from zero.
+  </p>
+
+  <div class="card">
+    <h3>The same effect, four verdicts</h3>
+    <p>Average ATT with each method's 95% interval (where it has one) or p-value. The dashed line is zero — an interval that crosses it is not significant at 5%.</p>
+    <div class="chart-area" id="forest-chart"></div>
+    <div id="infer-scoreboard"></div>
+  </div>
+
+  <div class="card">
+    <h3>Placebo test: is Kansas unusual?</h3>
+    <p>
+      Re-estimate the effect pretending each donor was treated, and compute its post/pre RMSPE
+      ratio (how much it diverged after 2012, relative to its pre-2012 fit). Kansas (orange) should
+      stand out if the effect is real. Each dot is one state.
+    </p>
+    <div class="chart-area" id="placebo-chart"></div>
+    <p class="note" id="placebo-note"></p>
+  </div>
+
+  <div class="card">
+    <h3>Simulator: what makes an effect significant?</h3>
+    <p>
+      An illustrative treated-minus-synthetic gap: flat before treatment, shifted by the true
+      effect after. Move the sliders and watch the confidence interval widen or narrow and the
+      verdict flip at the 5% line.
+      <em>(A teaching model — real <code>augsynth</code> uses conformal / jackknife, not this normal approximation.)</em>
+    </p>
+    <div class="controls">
+      <div class="control">
+        <label>True effect (log pts × 100) <span class="value" id="sim-eff-v">4.0</span></label>
+        <input type="range" id="sim-eff" min="0" max="12" step="0.1" value="4.0">
+        <div class="hint">Bigger true effect → easier to detect.</div>
+      </div>
+      <div class="control">
+        <label>Noise (σ) <span class="value" id="sim-noise-v">3.0</span></label>
+        <input type="range" id="sim-noise" min="0.5" max="8" step="0.1" value="3.0">
+        <div class="hint">More noise → wider interval, harder to detect.</div>
+      </div>
+      <div class="control">
+        <label>Pre-treatment quarters <span class="value" id="sim-pre-v">40</span></label>
+        <input type="range" id="sim-pre" min="8" max="89" step="1" value="40">
+        <div class="hint">More pre-periods → a better-pinned counterfactual → tighter interval.</div>
+      </div>
+    </div>
+    <div class="sim-readout">
+      <span><span class="k">estimate</span> <span class="v" id="sim-est">—</span></span>
+      <span><span class="k">95% CI</span> <span class="v" id="sim-ci">—</span></span>
+      <span><span class="k">p-value</span> <span class="v" id="sim-p">—</span></span>
+      <span><span class="sig-badge no" id="sim-badge">—</span></span>
+    </div>
+    <div class="chart-area" id="sim-chart"></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What this tab teaches</h4>
+    <ul>
+      <li><strong>Significance is not the point estimate.</strong> A clear −0.040 effect can still be borderline if the interval is wide.</li>
+      <li><strong>The methods probe different variation:</strong> conformal and jackknife+ over <em>time</em>; permutation and the leave-one-donor jackknife over <em>units</em>.</li>
+      <li><strong>They can disagree:</strong> jackknife+ excludes zero, while conformal (p = 0.066), permutation (p = 0.10) and the leave-one-donor jackknife are borderline.</li>
+      <li><strong>Be honest:</strong> report several methods and call the Kansas effect real but modest, not a knock-down result.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>The Augmented Synthetic Control Method: A Beginner's Tutorial with the Kansas Tax Cuts</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

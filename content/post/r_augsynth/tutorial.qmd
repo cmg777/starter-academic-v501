@@ -1,0 +1,263 @@
+---
+title: "The Augmented Synthetic Control Method"
+subtitle: "A beginner's tutorial with the 2012 Kansas tax cuts and the augsynth package"
+author: "Carlos Mendez"
+date: "2026-06-08"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    code-summary: "Show code"
+    theme: cosmo
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 200
+execute:
+  warning: false
+  message: false
+---
+
+## 1. Overview
+
+This is the executable companion to the blog post *"The Augmented Synthetic Control Method: A Beginner's Tutorial with the Kansas Tax Cuts."* It teaches the **Augmented Synthetic Control Method (ASCM)** of Ben-Michael, Feller & Rothstein (2021) for a **single treated unit**, using the [`augsynth`](https://github.com/ebenmichael/augsynth) package and the canonical 2012 Kansas example.
+
+The question: did the 2012 Kansas income-tax cut (Governor Brownback's "real-live experiment") raise or lower the state's economy? Because there is only one Kansas, we build a **synthetic Kansas** from other states, then read off the gap.
+
+Our estimand throughout is the **ATT** (average treatment effect on the treated) for Kansas on log GDP per capita. We build the counterfactual three ways — classic SCM, Ridge ASCM, covariate-augmented ASCM — and test significance four ways.
+
+```{mermaid}
+flowchart TD
+    P["Kansas panel"] --> Q{"Good pre-2012 fit?"}
+    Q -->|yes| S["Classic SCM"]
+    Q -->|imperfect| R["Ridge ASCM"]
+    S --> B["+ bias correction"]
+    R --> B
+    B --> A["ATT = actual - synthetic"]
+    A --> I["Inference: placebo / conformal / jackknife+ / jackknife"]
+```
+
+## 2. Setup
+
+`augsynth` is **not on CRAN**; the chunk below installs it from GitHub only if it is missing, then loads everything. Verified with R 4.5.2 and `augsynth` 0.2.0.
+
+```{r}
+#| label: setup
+if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+if (!requireNamespace("augsynth", quietly = TRUE)) {
+  remotes::install_github("ebenmichael/augsynth", upgrade = "never")
+}
+
+library(augsynth)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
+
+set.seed(20260608)
+
+STEEL_BLUE  <- "#6a9bcc"; WARM_ORANGE <- "#d97757"
+NEAR_BLACK  <- "#141413"; TEAL <- "#00d4c8"; GREY_DONOR <- "grey75"
+theme_set(theme_minimal(base_size = 13))
+
+TREAT_TIME <- 2012.25   # Q2 2012, when the tax cut took effect
+KS_FIPS    <- 20        # Kansas FIPS code
+```
+
+## 3. The data
+
+The `kansas` panel (shipped with `augsynth`) covers **50 states, quarterly, 1990 Q1–2016 Q1**. We load a CSV copy from the post's GitHub folder, with a local fallback so the bundle runs offline.
+
+```{r}
+#| label: load-data
+url <- "https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_augsynth/kansas.csv"
+kansas <- if (file.exists("kansas.csv")) read_csv("kansas.csv") else read_csv(url)
+kansas <- as.data.frame(kansas)
+
+c(states = length(unique(kansas$fips)),
+  quarters = length(unique(kansas$year_qtr)),
+  rows = nrow(kansas))
+```
+
+The key variables are few: `fips` (unit id, Kansas = 20), `year_qtr` (time, e.g. `2012.25` = Q2 2012), `lngdpcapita` (the outcome — log GDP per capita), and `treated` (1 for Kansas from 2012 Q2). The treatment switches on exactly when the cut took effect:
+
+```{r}
+#| label: treatment-rows
+kansas |>
+  filter(state == "Kansas", year_qtr >= 2012, year_qtr < 2013) |>
+  select(year, qtr, year_qtr, treated, lngdpcapita)
+```
+
+With **89 pre-treatment quarters** and 16 post, we have a long history to build a credible synthetic Kansas — and, as we will see, a long pre-period is what makes inference possible. Kansas sits mid-pack among the donors, so no single state is its twin:
+
+```{r}
+#| label: fig-raw
+#| fig-cap: "Log GDP per capita: Kansas (orange) vs 49 donor states (grey)."
+ggplot() +
+  geom_line(data = filter(kansas, fips != KS_FIPS),
+            aes(year_qtr, lngdpcapita, group = fips), colour = GREY_DONOR, linewidth = 0.3) +
+  geom_line(data = filter(kansas, fips == KS_FIPS),
+            aes(year_qtr, lngdpcapita), colour = WARM_ORANGE, linewidth = 1.1) +
+  geom_vline(xintercept = TREAT_TIME, linetype = "dashed") +
+  labs(x = "Year (quarterly)", y = "log GDP per capita")
+```
+
+## 4. Classic synthetic control
+
+SCM chooses non-negative donor weights that sum to one, making the weighted donor history as close as possible to Kansas's pre-treatment path:
+
+$$\hat{\gamma}^{scm} = \arg\min_{\gamma} \| X_1 - X_0' \gamma \|_2^2 \quad \text{s.t.} \quad \sum_i \gamma_i = 1, \; \gamma_i \ge 0$$
+
+The per-quarter effect is then actual minus synthetic, $\hat{\tau}_t = Y_{1t} - \sum_i \hat{\gamma}_i^{scm} Y_{it}$. We fit it with `progfunc = "None"`:
+
+```{r}
+#| label: scm-fit
+syn <- augsynth(lngdpcapita ~ treated, fips, year_qtr, kansas,
+                progfunc = "None", scm = TRUE)
+summary(syn)
+```
+
+Classic SCM builds synthetic Kansas from **7 donors** and estimates an average post-2012 ATT of **−0.029** (≈ −2.9%), with pre-fit L2 imbalance 0.083 (79.5% better than uniform weights). The recipe is sparse and interpretable:
+
+```{r}
+#| label: scm-weights
+w <- syn$weights[, 1]
+round(sort(w[w > 0.001], decreasing = TRUE), 3)
+```
+
+```{r}
+#| label: fig-scm-outcomes
+#| fig-cap: "Actual Kansas vs its synthetic control."
+plot(syn, plot_type = "outcomes")
+```
+
+```{r}
+#| label: fig-scm-gap
+#| fig-cap: "The SCM gap (actual - synthetic) with a conformal band."
+plot(syn)
+```
+
+Before 2012 the gap hovers near zero — but not perfectly. There is a stubborn dip near 2005–2006 (a single quarter off by −0.043), pure pre-treatment imbalance that a convex combination cannot remove. **That imbalance is the seed of bias, and the motivation for augmentation.**
+
+## 5. Ridge-augmented SCM
+
+When the pre-fit is imperfect, the post-treatment gap mixes the real effect with bias from the mismatch. ASCM **estimates that bias with an outcome model and subtracts it**. The augmented counterfactual can be written as "SCM plus a bias correction":
+
+$$\hat{Y}_{1T}^{aug}(0) = \sum_i \hat{\gamma}_i^{scm} Y_{iT} + \Big( \hat{m}_{1T} - \sum_i \hat{\gamma}_i^{scm} \hat{m}_{iT} \Big)$$
+
+where $\hat{m}$ is a ridge regression of donors' outcomes on their lagged outcomes. A penalty $\lambda$ controls how far the weights may leave the convex hull; `augsynth` picks it by leave-one-pre-period-out cross-validation.
+
+```{r}
+#| label: ridge-fit
+asyn <- augsynth(lngdpcapita ~ treated, fips, year_qtr, kansas,
+                 progfunc = "Ridge", scm = TRUE)
+```
+
+```{r}
+#| label: fig-cv
+#| fig-cap: "Cross-validation MSE vs the ridge penalty lambda."
+plot(asyn, plot_type = "cv")
+```
+
+```{r}
+#| label: ridge-summary
+summary(asyn)
+```
+
+Three numbers tell the story. The estimate **deepens** from −0.029 to **−0.040** (≈ −3.9%); the pre-fit **improves** (L2 0.083 → 0.062); and `augsynth` reports an **estimated bias of 0.011** — about a third of the effect. Crucially, the weights barely move:
+
+```{r}
+#| label: weight-change
+sqrt(mean((asyn$weights[, 1] - syn$weights[, 1])^2))   # RMS change in weights
+```
+
+A negligible **0.015**: ridge bought a de-biased estimate for an almost imperceptible departure from the convex hull. The augmentation deepens the gap:
+
+```{r}
+#| label: fig-ridge-gap
+#| fig-cap: "Ridge ASCM gap with conformal band."
+plot(asyn)
+```
+
+## 6. Adding covariates
+
+We can also balance auxiliary covariates by listing them after a `|`. Both lagged outcomes and covariates then enter the SCM balance and the ridge model:
+
+```{r}
+#| label: cov-fit
+covsyn <- augsynth(lngdpcapita ~ treated | lngdpcapita + log(revstatecapita) +
+                     log(revlocalcapita) + log(avgwklywagecapita) +
+                     estabscapita + emplvlcapita,
+                   fips, year_qtr, kansas, progfunc = "ridge", scm = TRUE)
+summary(covsyn)
+```
+
+The covariate imbalance falls to **0.005 (97.7% better than uniform)** and the estimate deepens again to **−0.061**. Two short variants: `residualize = TRUE` drives covariate imbalance to exactly zero (ATT −0.055), and the simplest outcome model, a unit fixed effect (`fixedeff = TRUE`), gives −0.034. Every route agrees on the sign.
+
+## 7. Inference: could this just be noise?
+
+A synthetic-control estimate is a difference between two estimated curves built from one treated unit, so inference is subtle. `augsynth` ships four tools; they share the −0.040 point estimate but differ on uncertainty. We run them all on the Ridge fit.
+
+### Placebo / permutation (the classic approach)
+
+Re-estimate the effect pretending each *donor* was treated; Kansas should stand out if the effect is real. The statistic is the post/pre RMSPE ratio, and the p-value is Kansas's rank.
+
+```{r}
+#| label: fig-placebo
+#| fig-cap: "Placebo distribution: Kansas (orange) vs donor placebos (grey)."
+plot(asyn, plot_type = "placebo")
+```
+
+Kansas dips to the lower edge of the placebo cloud, but it is not the single most extreme path — its RMSPE ratio ranks **5th of 50** (permutation p ≈ 0.10).
+
+### Conformal inference (the default)
+
+`augsynth`'s default tests whether the post-treatment residual "conforms" to the pre-treatment residuals. With 89 pre-periods it is the most robust option here.
+
+```{r}
+#| label: conformal
+summary(asyn)$average_att   # conformal joint-null p-value
+```
+
+The joint-null p is **0.066** — borderline — though individual 2013–2014 quarters clear 5% significance.
+
+### Jackknife+ and leave-one-donor jackknife
+
+```{r}
+#| label: jackknife
+summary(asyn, inf_type = "jackknife+")$average_att   # CI for the average effect
+summary(asyn, inf_type = "jackknife")$average_att    # leave-one-donor SE
+```
+
+The **jackknife+** interval **[−0.058, −0.021] excludes zero** (significant), while the leave-one-donor **jackknife** standard error (0.024) gives a Wald interval that *includes* zero — because synthetic Kansas leans on a few high-weight donors.
+
+**The honest verdict:** the same −0.040 estimate looks significant by jackknife+ and borderline by conformal (p = 0.066), permutation (p = 0.10), and the leave-one-donor jackknife. Reporting all four — rather than the friendliest — is the responsible choice.
+
+## 8. Results and discussion
+
+```{r}
+#| label: model-comparison
+tibble::tibble(
+  spec = c("Classic SCM", "Ridge ASCM", "Covariate ASCM"),
+  att  = c(summary(syn)$average_att$Estimate,
+           summary(asyn)$average_att$Estimate,
+           summary(covsyn)$average_att$Estimate),
+  l2   = c(syn$l2_imbalance, asyn$l2_imbalance, covsyn$l2_imbalance)
+) |>
+  mutate(att = round(att, 3), l2 = round(l2, 3))
+```
+
+Reading down the ladder, **the more we de-bias and balance, the larger the measured damage**: the ATT moves −0.029 → −0.040 → −0.061 while pre-fit improves. The un-augmented SCM number is the *conservative* one.
+
+The substantive answer: the 2012 Kansas tax cut is associated with a **persistent ~3–6% shortfall** in GDP per capita relative to a synthetic Kansas, strongest in 2013–2014 and robust in sign across all specifications. Significance is borderline, and the estimate cannot separate the tax cut from contemporaneous shocks (a drought, aerospace) — so the honest read is suggestive-to-moderate evidence that the supply-side promise did not materialise.
+
+## Next steps
+
+- Try in-time placebos (move the fake treatment to 2009) and `min_1se = FALSE` for a more aggressive λ.
+- Move to **staggered adoption** (`multisynth`) and **multiple outcomes** (`augsynth_multiout`) in the companion tutorial, *Augmented Synthetic Control for Multiple Countries*.
+
+## References
+
+- Ben-Michael, E., Feller, A., & Rothstein, J. (2021). The Augmented Synthetic Control Method. *JASA* 116(536), 1789–1803.
+- Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic Control Methods. *JASA* 105(490), 493–505.
+- Chernozhukov, V., Wüthrich, K., & Zhu, Y. (2021). An Exact and Robust Conformal Inference Method. *JASA* 116(536), 1849–1864.
