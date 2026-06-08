@@ -21,7 +21,7 @@ Everything under `content/post/r_augsynth/` (full data-science pipeline + all do
 
 | File | Purpose |
 |------|---------|
-| `analysis.R` + `execution_log.txt` | Canonical script: classic SCM → Ridge ASCM → covariate ASCM (+ residualize/fixedeff notes) → 4-way inference. 10 light-theme figures, 6 result CSVs, `web_app/data/results.json`. |
+| `analysis.R` + `execution_log.txt` | Canonical script: classic SCM → Ridge ASCM → covariate ASCM (+ residualize/fixedeff notes) → 4-way inference. 10 dark-theme figures (site dark-mode palette, see Update below), 6 result CSVs, `web_app/data/results.json`. |
 | 10× `r_augsynth_NN_*.png` | Raw paths, actual-vs-synthetic, SCM gap, donor weights, CV-λ, SCM-vs-Ridge overlay, pre-fit imbalance, placebo spaghetti, 4-method inference forest, 5-spec model comparison. |
 | `results_report.md` | 9 key findings, interpretations, surprises/caveats, reproduction audit vs the vignette. |
 | `index.md` | The post — sandwich pattern, 7 concept cards (Definition/Example/Analogy), ~11 display equations, a Mermaid roadmap, a dedicated four-method **Inference** section, cross-link to `r_sc_multi_country`. |
@@ -59,3 +59,10 @@ Everything under `content/post/r_augsynth/` (full data-science pipeline + all do
 
 - **`jsonlite` NA handling**: a numeric `NA` was serialized as the string `"NA"`, which broke the web app's chart math (`"NA".toFixed` and NaN axis domains). Fixed with `write_json(..., na = "null")`; the CV-λ vector now uses `signif()` (not `round()`) so the smallest λ stays > 0 for the log axis.
 - **`augsynth` placebo gotcha**: the placebo-plot factor level for the treated unit is **`"Treatment"`**, not `"Treated"` — the permutation p-value/rank depends on matching it.
+
+## Update (2026-06-08) — dark figures + numbered sections
+
+Two refinements after the initial publish:
+
+1. **Dark-theme figures.** `analysis.R`'s `theme_site()`/`save_fig()` and per-figure colors were switched from the light palette (white background) to the site's canonical **dark** palette — `bg = #0f1729` (matches `.dark body`), grid `#1f2b5e`, text `#c8d0e0`/`#e8ecf2`, donor/placebo lines a recessive slate `#54618a`; the steel-blue/orange/teal accents are unchanged (they read well on navy). This brings the post in line with the 8 other dark-figure R posts (`r_did`, `r_double_lasso`, `r_dynamic_bma2`, …). Re-ran `analysis.R` (exit 0); all 10 PNGs overwritten; `results.json`/CSVs byte-identical (data unchanged, styling only).
+2. **Numbered sections.** Every `##`/`###` heading in `index.md` now carries a decimal number (`1.` … `13.`, with `N.M` subsections); the left TOC renders the numbers. No internal anchor cross-links existed, so the changed heading IDs break nothing; the 44 MathJax containers still render with 0 errors.

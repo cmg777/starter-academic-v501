@@ -58,7 +58,7 @@ toc: true
 diagram: true
 ---
 
-## Overview
+## 1. Overview
 
 In May 2012, Kansas enacted one of the largest state tax cuts in recent U.S. history. Governor Sam Brownback called it "a real-live experiment" in supply-side economics: slash personal income taxes, and growth — the theory went — would follow. Did it? Answering that question is harder than it sounds, because we cannot rewind history and run Kansas *without* the tax cut to compare. There is only one Kansas, and it took the treatment.
 
@@ -70,7 +70,7 @@ This tutorial teaches ASCM for a **single treated unit** through the canonical K
 
 > If you want the multi-country, staggered-adoption version of these tools (`multisynth`, `augsynth_multiout`), see the companion post [Augmented Synthetic Control for Multiple Countries](/post/r_sc_multi_country/). This tutorial is the single-treated-unit foundation to read first.
 
-### Learning objectives
+### 1.1 Learning objectives
 
 By the end of this tutorial, you will be able to:
 
@@ -106,7 +106,7 @@ flowchart TD
     style I fill:#6a9bcc,stroke:#141413,color:#fff
 ```
 
-## Key concepts
+## 2. Key concepts
 
 Before the code, here are the seven ideas that carry the whole tutorial. Each card has a plain definition, a concrete example from the Kansas study, and an everyday analogy. The two hardest for newcomers are **extrapolation** (concept 3) and **conformal inference** (concept 7) — linger on those.
 
@@ -236,7 +236,7 @@ A lie detector calibrated on a person's resting readings. A post-event spike onl
 </details>
 </div>
 
-## Setup
+## 3. Setup
 
 The `augsynth` package is not on CRAN; install it once from GitHub. The other packages are standard. We fix a random seed because two of the inference procedures use resampling.
 
@@ -265,7 +265,7 @@ A note on `augsynth`'s **formula mini-language**, which we will use repeatedly:
 - `progfunc = "None"` — pure SCM, no outcome model. `progfunc = "Ridge"` — augment with ridge regression.
 - `scm = TRUE` — use SCM (convex) weights as the starting point.
 
-## Data and key variables
+## 4. Data and key variables
 
 The `kansas` dataset ships with `augsynth`. To keep this tutorial fully reproducible, we load it from a CSV in the post's GitHub folder (a copy of the package's `kansas` object), with a local fallback.
 
@@ -312,7 +312,7 @@ kansas %>%
 
 **Interpretation.** The `treated` flag is zero for Kansas through 2012 Q1 and one from 2012 Q2 (`year_qtr = 2012.25`) onward — exactly when the tax cut took effect. Notice the outcome already *dips* in the quarters right after: `lngdpcapita` falls from 10.817 to 10.781. But that raw dip is not yet a causal estimate — every state's economy moved over this period. We need the counterfactual. With **89 pre-treatment quarters** and **16 post-treatment quarters**, we have a long history to pin down a credible synthetic Kansas — and, as we will see, a long pre-period is exactly what makes inference possible.
 
-## Exploratory view: why we need a *synthetic* control
+## 5. Exploratory view: why we need a *synthetic* control
 
 ```r
 ggplot() +
@@ -327,9 +327,9 @@ ggplot() +
 
 **Interpretation.** Kansas sits squarely *in the middle* of the pack and rises along with every other state for 26 years. This is the fundamental obstacle: there is no single state whose line lies on top of Kansas's, so we cannot just pick "the most similar state" as a comparison. We have to *construct* a comparison by blending donors. The plot also previews the difficulty to come — in the mid-2000s the lines fan apart and Kansas wanders relative to its neighbours, which is precisely where a convex blend will struggle to keep up.
 
-## Baseline: the classic synthetic control
+## 6. Baseline: the classic synthetic control
 
-### The idea, then the math
+### 6.1 The idea, then the math
 
 SCM picks donor weights so that the weighted donor outcomes reproduce the treated unit's pre-treatment path as closely as possible, subject to two rules: the weights are **non-negative** and they **sum to one**. Those two rules are what keep the synthetic interpretable and prevent wild extrapolation.
 
@@ -345,7 +345,7 @@ $$\hat{\tau}\_t = Y\_{1t} - \sum\_{i} \hat{\gamma}\_i^{scm}\\, Y\_{it}, \quad t 
 
 In words, the per-quarter ATT is Kansas's realized outcome $Y\_{1t}$ minus the weighted sum of donor outcomes (the synthetic). Here $T\_0$ is the last pre-treatment period; in code $Y\_{1t}$ is Kansas's `lngdpcapita` and the weighted sum is `predict(syn, att = FALSE)`.
 
-### Fitting it
+### 6.2 Fitting it
 
 ```r
 syn <- augsynth(lngdpcapita ~ treated, fips, year_qtr, kansas,
@@ -377,7 +377,7 @@ round(sort(w[w > 0.001], decreasing = TRUE), 3)   # the donors that actually mat
 
 **Interpretation.** This is SCM's signature virtue: **42 of the 49 donors get exactly zero weight**, and the seven that remain form a recipe you can name and defend. South Carolina carries 30% of synthetic Kansas, Washington 22%, Texas 15%. The sparsity is not an accident — the simplex constraint pushes most weights to exactly zero. The cost of that interpretability is rigidity: if no convex recipe matches Kansas perfectly, SCM cannot do better, and the leftover mismatch becomes bias.
 
-### Seeing the counterfactual and the gap
+### 6.3 Seeing the counterfactual and the gap
 
 ```r
 plot(syn, plot_type = "outcomes")   # actual Kansas vs its synthetic control
@@ -397,9 +397,9 @@ plot(syn)   # the gap (actual - synthetic) with a pointwise conformal band
 
 That stubborn mid-2000s imbalance is the motivation for everything that follows. It is exactly the situation Abadie and co-authors warn about — and exactly what ASCM was built to fix.
 
-## The augmentation: Ridge ASCM
+## 7. The augmentation: Ridge ASCM
 
-### The idea: estimate the bias, then subtract it
+### 7.1 The idea: estimate the bias, then subtract it
 
 Here is the key insight. When the synthetic does not perfectly match Kansas before treatment, the post-treatment gap mixes two things: the **real effect** and the **bias** from that imperfect match. If we could *estimate* the bias, we could subtract it off. ASCM does exactly this by fitting an **outcome model** — a regression that predicts a unit's outcome from its pre-treatment history — and using it to forecast how much the residual imbalance distorts the estimate.
 
@@ -421,7 +421,7 @@ $$\hat{\eta}^{ridge} = \arg\min\_{\eta} \frac{1}{2}\sum\_{i} \left( Y\_i - X\_i'
 
 In words: fit a regression predicting the post-period outcome from the pre-period outcomes, but shrink the coefficients toward zero by an amount set by $\lambda$. The penalty $\lambda$ — in code, `asyn$lambda` — is the single dial that controls how aggressive the bias correction is.
 
-### Why ridge ASCM barely disturbs the weights
+### 7.2 Why ridge ASCM barely disturbs the weights
 
 A beautiful result in the paper is that Ridge ASCM is equivalent to a **penalized SCM**: instead of forbidding negative weights outright, it lets the weights leave the simplex but *penalizes how far they stray from the SCM solution*:
 
@@ -435,7 +435,7 @@ $$\\| X\_1 - X\_0' \hat{\gamma}^{aug} \\|\_2 \le \frac{\lambda}{d^2 + \lambda} \
 
 In words: the augmented imbalance is the SCM imbalance multiplied by a factor that is always less than one. So augmentation never makes the pre-fit worse — it can only tighten it.
 
-### Choosing the penalty by cross-validation
+### 7.3 Choosing the penalty by cross-validation
 
 How do we pick $\lambda$? `augsynth` uses **leave-one-pre-period-out cross-validation**: drop each pre-treatment quarter in turn, predict it, and measure the error. We then pick the $\lambda$ that the data say generalizes best.
 
@@ -449,7 +449,7 @@ plot(asyn, plot_type = "cv")
 
 **Interpretation.** The CV curve is U-shaped: too small a $\lambda$ overfits the pre-period (right-hand rise is the opposite extreme, where the model becomes plain SCM), too large washes out the correction. By default `augsynth` applies the **one-standard-error rule** — it chooses the *largest* $\lambda$ whose error is within one SE of the minimum (here **λ = 0.079**). This is deliberately conservative: among statistically indistinguishable choices, it keeps the weights closest to the safe SCM solution. (Set `min_1se = FALSE` to instead minimize CV error and extrapolate more.)
 
-### What augmentation does to Kansas
+### 7.4 What augmentation does to Kansas
 
 ```r
 summary(asyn)
@@ -491,7 +491,7 @@ sqrt(mean((asyn$weights[,1] - syn$weights[,1])^2))
 
 **Interpretation.** Restricting attention to the pre-period — where the gap *should* be zero — shows exactly what augmentation fixed. SCM's worst quarter (2005 Q4, **−0.043**) is pulled back to **−0.031** by ridge, and the rest of the turbulent mid-2000s is calmed too. That is the bias correction at work: it spent its small extrapolation budget precisely where classic SCM was failing.
 
-## Adding covariates
+## 8. Adding covariates
 
 So far we matched only on the history of the outcome. But `augsynth` can also balance **auxiliary covariates** — state revenue, wages, establishments, employment — by listing them after a `|` in the formula. Both the lagged outcomes and the covariates then enter the SCM balancing problem *and* the ridge outcome model:
 
@@ -523,13 +523,13 @@ Avg Estimated Bias: 0.027
 
 Two further options are worth knowing but not belaboring. **Residualizing** (`residualize = TRUE`) first regresses the outcome on the covariates and fits ASCM on the residuals; on Kansas it drives covariate imbalance to *exactly zero* and gives an ATT of **−0.0548**. The simplest possible outcome model, a **unit fixed effect** (`fixedeff = TRUE`, which de-means each series), gives **−0.0335** — between plain SCM and ridge. Every route agrees on the sign and the rough size of the effect.
 
-## Inference: could this just be noise?
+## 9. Inference: could this just be noise?
 
 This is the part students find hardest, and for good reason: a synthetic-control estimate is a difference between two *estimated* curves, built from one treated unit. Classical standard-error formulas do not obviously apply. `augsynth` ships four tools, and they can give different verdicts. The shared question they all answer is: **is the post-treatment gap bigger than what we would see by chance?** They differ in how they define "by chance."
 
 We run all four on the Ridge ASCM fit (only the ridge estimator supports standard errors).
 
-### 1. Placebo / permutation tests (the classic approach)
+### 9.1 Placebo / permutation tests (the classic approach)
 
 The original SCM inference, due to Abadie and co-authors, is a **placebo test**. The logic: if the tax cut truly moved Kansas, then re-running the whole analysis pretending some *untreated* donor was "treated" should usually produce a much smaller gap. Do this for every donor, and you get a distribution of placebo effects to compare Kansas against.
 
@@ -547,7 +547,7 @@ plot(asyn, plot_type = "placebo")   # switches to permutation inference
 
 **Interpretation.** Kansas's pre-2012 line is buried in the grey chorus — a good fit, so it belongs in the comparison. After 2012 it drops toward the bottom edge, but it is **not the single most extreme** path. Its post/pre RMSPE ratio of **6.36 ranks 5th of 50**, giving a permutation **p = 0.10**. Read honestly: Kansas's response is unusual, but a handful of placebo states show swings just as large, so the placebo test alone cannot rule out chance at the 5% level. The placebo test is intuitive and assumption-light, but it has low power with a small donor pool and assumes Kansas is exchangeable with the donors.
 
-### 2. Conformal inference (the modern default)
+### 9.2 Conformal inference (the modern default)
 
 `augsynth`'s default is **conformal inference** (Chernozhukov, Wüthrich, and Zhu, 2021). It tests a sharp null — "the effect equals $\tau\_0$" — by checking whether, after subtracting $\tau\_0$, the post-treatment residual looks like an ordinary draw from the pre-treatment residuals. Inverting the test over a grid of $\tau\_0$ values yields a confidence interval. The p-value for "no effect" is
 
@@ -569,7 +569,7 @@ Average Post-Treatment Effect  -0.0401   p = 0.066
 
 **Interpretation.** The conformal joint-null p-value is **0.066** — borderline, just above the conventional 5% line. But the *pointwise* picture (the band in the gap plots) is sharper: several individual quarters clear significance, including **2013 Q3 (−0.059, p = 0.024)** and **2014 Q1 (−0.058, p = 0.018)**. Conformal inference is the most robust of the four here because it does not require Kansas to be exchangeable with the donors and it exploits the long pre-period.
 
-### 3. Jackknife+ over time
+### 9.3 Jackknife+ over time
 
 The **jackknife+** builds a confidence interval for the *average* effect by leaving out one pre-treatment period at a time, refitting, and using the spread of the leave-one-out prediction errors to bound the estimate.
 
@@ -583,7 +583,7 @@ Average Post-Treatment Effect  -0.0401   95% CI [-0.0576, -0.0206]
 
 **Interpretation.** The jackknife+ interval **[−0.058, −0.021] excludes zero** — by this criterion the average effect *is* significant. It is the only one of the four that gives a clean "significant" verdict for the average, because it asks a different question: how stable is the estimate when we perturb the *time* dimension, rather than whether Kansas is special among *states*.
 
-### 4. Leave-one-donor jackknife
+### 9.4 Leave-one-donor jackknife
 
 The final tool drops one *donor* at a time, recomputes the ATT, and forms a standard error from how much the estimate moves — the classic "how sensitive is this to any single comparison unit?" check.
 
@@ -597,13 +597,13 @@ Average Post-Treatment Effect  -0.0401   Std.Error 0.0242
 
 **Interpretation.** With a standard error of **0.0242**, the Wald interval is **−0.040 ± 1.96 × 0.024 = [−0.088, 0.007]**, which **includes zero**. The reason is intuitive: synthetic Kansas leans heavily on a few donors (South Carolina alone is 30%), so dropping one of them can move the estimate appreciably, inflating the standard error. This is the most conservative of the four.
 
-### Putting the four together
+### 9.5 Putting the four together
 
 ![The four inference methods side by side. All share the −0.040 point estimate; jackknife+ excludes zero, while conformal (p = 0.066), permutation (p = 0.10), and the leave-one-donor jackknife are borderline or non-significant.](r_augsynth_09_inference_compare.png)
 
 **Interpretation.** This single figure is the lesson of the section. **The point estimate is the same −0.040 in all four; what differs is the uncertainty.** The methods disagree because they probe different sources of variation — over time (conformal, jackknife+) versus over units (permutation, leave-one-donor jackknife) — and make different exchangeability assumptions. The honest conclusion is not "significant" or "not significant" but a nuanced one: a real, modest negative effect, clearly visible in 2013–2014, whose statistical strength is borderline and depends on which question you ask. **Reporting several methods, as we have, is far more honest than cherry-picking the one that clears 0.05.**
 
-## Results: the five specifications together
+## 10. Results: the five specifications together
 
 ![Average ATT across the five specifications, annotated with pre-fit L2 imbalance. The estimate grows more negative as de-biasing increases.](r_augsynth_10_model_comparison.png)
 
@@ -617,7 +617,7 @@ Average Post-Treatment Effect  -0.0401   Std.Error 0.0242
 | Residualized | −0.055 | −5.3% | 0.067 | 0.006 |
 | Fixed effects | −0.034 | −3.3% | 0.082 | — |
 
-## Discussion: what did the Kansas experiment do?
+## 11. Discussion: what did the Kansas experiment do?
 
 Putting the pieces together, the evidence points one direction: **the 2012 Kansas tax cut is associated with a persistent shortfall in GDP per capita of roughly 3 to 6%, relative to a synthetic Kansas built from other states.** The effect is strongest in 2013–2014, robust in *sign* across all five specifications, and — importantly — *larger* once we correct the bias that classic SCM leaves behind. The supply-side promise of accelerated growth does not appear in the data; if anything, Kansas underperformed its counterfactual.
 
@@ -625,7 +625,7 @@ Three caveats keep this honest. First, **significance is genuinely borderline**:
 
 For a policymaker, the practical takeaway is not a single number but a *pattern*: the better we make the comparison, the worse the tax cut looks, and at no point does it look good. That is a meaningfully different conclusion than "no detectable effect," which is what a hasty reading of the classic-SCM p-value alone might have suggested.
 
-## Summary and next steps
+## 12. Summary and next steps
 
 **What we did and found:**
 
@@ -642,13 +642,13 @@ For a policymaker, the practical takeaway is not a single number but a *pattern*
 - Move to **multiple treated units and staggered adoption** with `multisynth`, or **multiple outcomes** with `augsynth_multiout`, in the companion post on [Augmented Synthetic Control for Multiple Countries](/post/r_sc_multi_country/).
 - Run your own sensitivity checks: vary the donor pool, the pre-period length, and the test statistic in `summary(..., stat_func = ...)`.
 
-### Exercises
+### 12.1 Exercises
 
 1. **In-time placebo.** Re-fit Ridge ASCM pretending the tax cut happened in 2009 Q2 instead of 2012 Q2 (restrict the data to pre-2012 and set the fake treatment time). The estimated "effect" should be near zero. Why is this a useful check, and what would a large fake effect imply?
 2. **The penalty dial.** Re-fit with `min_1se = FALSE` so cross-validation *minimizes* the error instead of applying the one-standard-error rule. How do λ, the pre-fit L2, and the estimate change? Explain the bias–variance trade-off you observe.
 3. **Inference under the microscope.** For the classic-SCM fit, change the conformal test statistic with `summary(syn, stat_func = function(x) abs(sum(x)))`. How does the joint-null p-value change, and why might prioritizing the *average* post-treatment effect (rather than the sum of absolute effects) be more or less appropriate here?
 
-## References
+## 13. References
 
 1. Ben-Michael, E., Feller, A., & Rothstein, J. (2021). [The Augmented Synthetic Control Method](https://doi.org/10.1080/01621459.2021.1929245). *Journal of the American Statistical Association*, 116(536), 1789–1803.
 2. Abadie, A., Diamond, A., & Hainmueller, J. (2010). [Synthetic Control Methods for Comparative Case Studies](https://doi.org/10.1198/jasa.2009.ap08746). *Journal of the American Statistical Association*, 105(490), 493–505.

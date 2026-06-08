@@ -61,12 +61,17 @@ suppressPackageStartupMessages({
 SEED <- 20260608
 set.seed(SEED)
 
-# Site colour palette
+# Site accent palette (data series — bright enough to read on dark navy)
 STEEL_BLUE  <- "#6a9bcc"   # synthetic control / SCM
 WARM_ORANGE <- "#d97757"   # treated (Kansas) / actual
-NEAR_BLACK  <- "#141413"   # reference / truth
 TEAL        <- "#00d4c8"   # ridge-augmented / highlight
-GREY_DONOR  <- "grey78"    # donor pool
+# Dark theme palette (matches the site's dark-mode background, #0f1729)
+DARK_BG      <- "#0f1729"  # figure background
+DARK_PANEL   <- "#1f2b5e"  # grid lines
+LIGHT_TEXT   <- "#c8d0e0"  # axis text, labels, treatment lines, value labels
+LIGHTER_TEXT <- "#e8ecf2"  # titles / strip headings
+MUTED        <- "#8b9dc3"  # captions, secondary annotations, zero-reference lines
+GREY_DONOR   <- "#54618a"  # donor / placebo spaghetti (recessive on navy)
 
 TREAT_TIME <- 2012.25      # Q2 2012 — the tax cut takes effect
 KS_FIPS    <- 20           # Kansas FIPS code (the treated unit)
@@ -74,26 +79,32 @@ KS_FIPS    <- 20           # Kansas FIPS code (the treated unit)
 theme_site <- function(base = 13) {
   theme_minimal(base_size = base) %+replace%
     theme(
-      plot.title       = element_text(face = "bold", colour = NEAR_BLACK,
+      text             = element_text(colour = LIGHTER_TEXT),
+      plot.title       = element_text(face = "bold", colour = LIGHTER_TEXT,
                                        size = base + 1, hjust = 0,
                                        margin = margin(b = 4)),
-      plot.subtitle    = element_text(colour = NEAR_BLACK, size = base - 2,
+      plot.subtitle    = element_text(colour = LIGHT_TEXT, size = base - 2,
                                       hjust = 0, margin = margin(b = 8)),
-      plot.caption     = element_text(colour = "grey45", size = base - 4,
+      plot.caption     = element_text(colour = MUTED, size = base - 4,
                                       hjust = 0, margin = margin(t = 8)),
-      axis.title       = element_text(colour = NEAR_BLACK, size = base - 2),
-      axis.text        = element_text(colour = NEAR_BLACK, size = base - 3),
-      panel.grid.major = element_line(colour = "grey90", linewidth = 0.3),
+      plot.background  = element_rect(fill = DARK_BG, colour = NA),
+      panel.background = element_rect(fill = DARK_BG, colour = NA),
+      axis.title       = element_text(colour = LIGHT_TEXT, size = base - 2),
+      axis.text        = element_text(colour = LIGHT_TEXT, size = base - 3),
+      panel.grid.major = element_line(colour = DARK_PANEL, linewidth = 0.3),
       panel.grid.minor = element_blank(),
       legend.position  = "bottom",
       legend.title     = element_blank(),
-      strip.text       = element_text(face = "bold", colour = NEAR_BLACK,
+      legend.background = element_rect(fill = DARK_BG, colour = NA),
+      legend.key        = element_rect(fill = DARK_BG, colour = NA),
+      legend.text      = element_text(colour = LIGHT_TEXT),
+      strip.text       = element_text(face = "bold", colour = LIGHTER_TEXT,
                                       size = base - 3)
     )
 }
 
 save_fig <- function(plot, file, w = 8, h = 6) {
-  ggsave(file, plot, width = w, height = h, dpi = 300, bg = "white")
+  ggsave(file, plot, width = w, height = h, dpi = 300, bg = DARK_BG)
   cat("  [figure] ", file, "\n", sep = "")
 }
 
@@ -164,9 +175,9 @@ p01 <- ggplot() +
             aes(year_qtr, lngdpcapita, group = fips), colour = GREY_DONOR, linewidth = 0.35) +
   geom_line(data = filter(kansas, fips == KS_FIPS),
             aes(year_qtr, lngdpcapita), colour = WARM_ORANGE, linewidth = 1.1) +
-  geom_vline(xintercept = TREAT_TIME, linetype = "dashed", colour = NEAR_BLACK) +
+  geom_vline(xintercept = TREAT_TIME, linetype = "dashed", colour = LIGHT_TEXT) +
   annotate("text", x = TREAT_TIME - 0.5, y = min(kansas$lngdpcapita) + 0.05,
-           label = "tax cut\n(2012 Q2)", hjust = 1, size = 3.2, colour = NEAR_BLACK) +
+           label = "tax cut\n(2012 Q2)", hjust = 1, size = 3.2, colour = LIGHT_TEXT) +
   labs(title = "Kansas sits mid-pack: no single state is its twin",
        subtitle = "Log GSP per capita, 1990 Q1 - 2016 Q1. Kansas (orange) against 49 donor states (grey)",
        x = "Year (quarterly)", y = "log GSP per capita",
@@ -213,7 +224,7 @@ lv_merge <- merge(act, lv_scm, by = "time")            # aligned by time (robust
 df02 <- lv_merge %>%
   pivot_longer(c(actual, synthetic), names_to = "series", values_to = "value")
 p02 <- ggplot(df02, aes(time, value, colour = series)) +
-  geom_vline(xintercept = TREAT_TIME, linetype = "dashed", colour = NEAR_BLACK) +
+  geom_vline(xintercept = TREAT_TIME, linetype = "dashed", colour = LIGHT_TEXT) +
   geom_line(linewidth = 1.05) +
   scale_colour_manual(values = c(actual = WARM_ORANGE, synthetic = STEEL_BLUE),
                       labels = c(actual = "Kansas (actual)",
@@ -227,13 +238,13 @@ save_fig(p02, "r_augsynth_02_actual_vs_synthetic.png")
 
 # Figure 03 — SCM gap with conformal pointwise band
 p03 <- ggplot(scm_tab, aes(Time)) +
-  geom_hline(yintercept = 0, colour = "grey60") +
-  geom_vline(xintercept = TREAT_TIME, linetype = "dashed", colour = NEAR_BLACK) +
+  geom_hline(yintercept = 0, colour = MUTED) +
+  geom_vline(xintercept = TREAT_TIME, linetype = "dashed", colour = LIGHT_TEXT) +
   geom_ribbon(data = subset(scm_tab, !is.na(lower_bound)),
               aes(ymin = lower_bound, ymax = upper_bound), fill = STEEL_BLUE, alpha = 0.20) +
   geom_line(aes(y = Estimate), colour = STEEL_BLUE, linewidth = 1) +
   annotate("text", x = TREAT_TIME + 0.3, y = max(scm_tab$Estimate, na.rm = TRUE),
-           label = "post-treatment effect", hjust = 0, size = 3.2, colour = NEAR_BLACK) +
+           label = "post-treatment effect", hjust = 0, size = 3.2, colour = LIGHT_TEXT) +
   labs(title = "Classic SCM: the Kansas treatment-effect gap",
        subtitle = sprintf("Actual minus synthetic, with the conformal 95%% band. Average post-2012 ATT = %+.3f", scm_att),
        x = "Year (quarterly)", y = "Gap in log GSP per capita (ATT)",
@@ -244,7 +255,7 @@ save_fig(p03, "r_augsynth_03_scm_gap.png")
 # Figure 04 — donor weights
 p04 <- ggplot(w_scm, aes(reorder(paste0(state, " (", abb, ")"), weight), weight)) +
   geom_col(fill = STEEL_BLUE) +
-  geom_text(aes(label = sprintf("%.3f", weight)), hjust = -0.15, size = 3.2, colour = NEAR_BLACK) +
+  geom_text(aes(label = sprintf("%.3f", weight)), hjust = -0.15, size = 3.2, colour = LIGHT_TEXT) +
   coord_flip() +
   scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
   labs(title = "Who is in 'Synthetic Kansas'?",
@@ -294,7 +305,7 @@ p05 <- ggplot(cv_df, aes(lambdas, errors)) +
               fill = STEEL_BLUE, alpha = 0.15) +
   geom_line(colour = STEEL_BLUE, linewidth = 0.9) +
   geom_point(colour = STEEL_BLUE, size = 1.4) +
-  geom_hline(yintercept = thresh, linetype = "dotted", colour = NEAR_BLACK) +
+  geom_hline(yintercept = thresh, linetype = "dotted", colour = LIGHT_TEXT) +
   geom_vline(xintercept = ridge_lam, linetype = "dashed", colour = WARM_ORANGE) +
   annotate("text", x = ridge_lam, y = max(cv_df$errors),
            label = sprintf("  chosen lambda = %.3f\n  (1-SE rule)", ridge_lam),
@@ -313,8 +324,8 @@ gap_overlay <- bind_rows(
   transform(scm_tab[, c("Time", "Estimate")],   method = "Classic SCM"),
   transform(ridge_tab[, c("Time", "Estimate")], method = "Ridge ASCM"))
 p06 <- ggplot(gap_overlay, aes(Time, Estimate, colour = method)) +
-  geom_hline(yintercept = 0, colour = "grey60") +
-  geom_vline(xintercept = TREAT_TIME, linetype = "dashed", colour = NEAR_BLACK) +
+  geom_hline(yintercept = 0, colour = MUTED) +
+  geom_vline(xintercept = TREAT_TIME, linetype = "dashed", colour = LIGHT_TEXT) +
   geom_line(linewidth = 1.05) +
   scale_colour_manual(values = c("Classic SCM" = STEEL_BLUE, "Ridge ASCM" = TEAL)) +
   labs(title = "Augmentation deepens the estimated effect",
@@ -328,7 +339,7 @@ save_fig(p06, "r_augsynth_06_scm_vs_ascm_gap.png")
 # Figure 07 — pre-treatment imbalance (where SCM struggles, ridge corrects)
 pre_gap <- subset(gap_overlay, Time < TREAT_TIME)
 p07 <- ggplot(pre_gap, aes(Time, Estimate, colour = method)) +
-  geom_hline(yintercept = 0, colour = "grey60") +
+  geom_hline(yintercept = 0, colour = MUTED) +
   geom_line(linewidth = 0.85) +
   scale_colour_manual(values = c("Classic SCM" = STEEL_BLUE, "Ridge ASCM" = TEAL)) +
   labs(title = "Why augment? The pre-treatment imbalance SCM leaves behind",
@@ -426,15 +437,15 @@ write_csv(ratios %>% left_join(state_lookup %>% mutate(fips = as.character(fips)
 
 # Figure 08 — placebo distribution (spaghetti)
 p08 <- ggplot() +
-  geom_hline(yintercept = 0, colour = "grey60") +
-  geom_vline(xintercept = TREAT_TIME, linetype = "dashed", colour = NEAR_BLACK) +
+  geom_hline(yintercept = 0, colour = MUTED) +
+  geom_vline(xintercept = TREAT_TIME, linetype = "dashed", colour = LIGHT_TEXT) +
   geom_line(data = filter(placebo, trt_status == "Control"),
             aes(year_qtr, ATT, group = fips), colour = GREY_DONOR, linewidth = 0.3, alpha = 0.7) +
   geom_line(data = filter(placebo, trt_status == "Treatment"),
             aes(year_qtr, ATT), colour = WARM_ORANGE, linewidth = 1.2) +
   annotate("text", x = 1991, y = max(placebo$ATT) * 0.85,
            label = "each grey line = one donor\ntreated as a placebo", hjust = 0,
-           size = 3.0, colour = "grey40") +
+           size = 3.0, colour = MUTED) +
   labs(title = "Placebo test: is the Kansas gap unusual?",
        subtitle = sprintf("Kansas (orange) vs %d donor placebos. Permutation p = %.3f", nrow(ratios) - 1, perm_p),
        x = "Year (quarterly)", y = "Estimated gap (ATT)",
@@ -445,12 +456,12 @@ save_fig(p08, "r_augsynth_08_placebo_spaghetti.png")
 # Figure 09 — the four inference methods side by side
 inf_df$method <- factor(inf_df$method, levels = rev(inf_df$method))
 p09 <- ggplot(inf_df, aes(estimate, method)) +
-  geom_vline(xintercept = 0, linetype = "dashed", colour = NEAR_BLACK) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = LIGHT_TEXT) +
   geom_segment(aes(x = lower, xend = upper, y = method, yend = method),
                colour = STEEL_BLUE, linewidth = 0.9, na.rm = TRUE) +
   geom_point(size = 3, colour = WARM_ORANGE) +
   geom_text(aes(label = ifelse(is.na(p_val), "", sprintf("p = %.3f", p_val))),
-            vjust = -1.1, size = 3.1, colour = NEAR_BLACK, na.rm = TRUE) +
+            vjust = -1.1, size = 3.1, colour = LIGHT_TEXT, na.rm = TRUE) +
   labs(title = "Same effect, four ways to judge it",
        subtitle = sprintf("Average ATT = %+.3f. Jackknife+ excludes zero; the others are borderline", ridge_att),
        x = "Average treatment effect on the treated (ATT)", y = NULL,
@@ -482,11 +493,11 @@ write_csv(model_comp, "kansas_model_comparison.csv")
 # Figure 10 — average ATT across specifications
 model_comp$spec <- factor(model_comp$spec, levels = rev(model_comp$spec))
 p10 <- ggplot(model_comp, aes(att, spec)) +
-  geom_vline(xintercept = 0, linetype = "dashed", colour = NEAR_BLACK) +
-  geom_segment(aes(x = 0, xend = att, y = spec, yend = spec), colour = "grey80") +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = LIGHT_TEXT) +
+  geom_segment(aes(x = 0, xend = att, y = spec, yend = spec), colour = GREY_DONOR) +
   geom_point(aes(colour = att), size = 4) +
   geom_text(aes(label = sprintf("%+.3f  (L2 %.3f)", att, l2)),
-            vjust = -1.4, size = 3.0, colour = NEAR_BLACK) +
+            vjust = -1.4, size = 3.0, colour = LIGHT_TEXT) +
   scale_colour_gradient(low = WARM_ORANGE, high = STEEL_BLUE, guide = "none") +
   scale_x_continuous(expand = expansion(mult = c(0.14, 0.12))) +
   labs(title = "The estimate grows as we augment and balance",
