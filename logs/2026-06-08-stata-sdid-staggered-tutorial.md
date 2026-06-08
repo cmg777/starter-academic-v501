@@ -32,8 +32,9 @@ Everything under `content/post/stata_sdid_staggered/`:
   **7 CSVs** to `web_app/data/` and **8 PNG figures**. `seed(1213)`.
 - **`index.md`** — notebook-style post: ATT estimand + **6 display equations** (Goldmark/KaTeX
   escaping verified, no AVOID-list constructs), SDID-from-first-principles, the cohort→aggregate
-  derivation, a careful `sdid_event` reading guide, **3 Mermaid diagrams** (site palette), 7
-  `<details>` concept cards, sandwich pattern, **9 numeric interpretations**.
+  derivation, a careful `sdid_event` reading guide, **3 Mermaid diagrams** (site palette),
+  **10 numbered `<details>` concept cards** (definition + example + analogy each), all
+  sections/subsections numbered (1–15, with 1.1 / 3.1), sandwich pattern, **9 interpretations**.
 - **`analysis.log`**, **`quota_example.dta`** (linked Dataset button), **`results_report.md`**
   (9 key findings + reproduction audit vs the paper).
 - **Web app** — 4-tab D3 SPA at `web_app/` (Concept / Cohort effects + adoption timeline /

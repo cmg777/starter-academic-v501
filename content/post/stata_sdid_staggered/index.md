@@ -64,7 +64,7 @@ toc: true
 diagram: true
 ---
 
-## Overview
+## 1. Overview
 
 In a [previous tutorial](/post/stata_sdid/), one unit — California — adopted one policy — Proposition 99 — in one year — 1989. That **block design** is the textbook setting for synthetic difference-in-differences (SDID). But most real policies do not arrive on a single clock. Parliamentary gender quotas, minimum-wage laws, carbon taxes, and clean-air regulations are adopted by **different units in different years**. This is the **staggered adoption** design, and it is where naive panel methods quietly break.
 
@@ -100,7 +100,7 @@ graph TD
     style SATT fill:#00d4c8,stroke:#141413,color:#141413
 ```
 
-### Learning objectives
+### 1.1 Learning objectives
 
 By the end of this tutorial you will be able to:
 
@@ -109,51 +109,111 @@ By the end of this tutorial you will be able to:
 - **Estimate** the effect of gender quotas with `sdid` on a staggered panel, add a covariate two different ways (`optimized` vs `projected`), and choose among bootstrap, jackknife, and placebo inference.
 - **Read** an SDID event-study plot produced by `sdid_event`, distinguishing pre-trend placebo coefficients from post-period dynamic effects.
 
-## Key concepts at a glance
+## 2. Key concepts at a glance
+
+Each card gives a plain-language **definition**, a concrete **example** from this quota study, and an everyday **analogy**. Open any term that is unfamiliar.
 
 <details>
-<summary><b>Unit weights (ω)</b> — who forms the synthetic comparison.</summary>
+<summary><b>1. ATT (average treatment effect on the treated)</b> — the question we actually answer.</summary>
 
-A set of non-negative weights, one per never-treated "donor" country, summing to one. They build a **synthetic control**: a weighted blend of untreated countries whose pre-adoption trajectory matches the treated cohort. Each cohort gets its *own* ω.
+**Definition.** The effect of adopting a quota on the women-in-parliament share, *in the countries that adopted one*, averaged over their post-adoption years. It is not the effect a quota would have everywhere — only where one was actually tried.
+
+**Example.** Our headline ATT is **+8.0 percentage points**: across the nine adopting countries, quotas raised women's parliamentary share by about eight points relative to their no-quota counterfactual.
+
+**Analogy.** Like asking "how much did the patients who *took* the drug improve?" — not "how much would everyone improve?" You measure only the units that were actually treated.
 </details>
 
 <details>
-<summary><b>Time weights (λ)</b> — which pre-years define the baseline.</summary>
+<summary><b>2. Synthetic control</b> — a made-to-order comparison country.</summary>
 
-Non-negative weights on the pre-adoption years, summing to one. They up-weight the pre-periods that most resemble the post-period, so the "before" comparison is built from the most informative years rather than a simple average. They also define the baseline for the event study.
+**Definition.** A weighted blend of never-treated "donor" countries, built so its pre-adoption path mimics the treated cohort. It stands in for the unobservable counterfactual: what the cohort's outcome *would* have been without a quota.
+
+**Example.** The 2002 cohort's synthetic control mixes dozens of donors (Belgium, Paraguay, Cuba, …) so that, before 2002, the blend tracks the cohort's trend — then keeps going as the cohort would have without the law.
+
+**Analogy.** A stunt double cast to match the lead actor's build and movement — close enough that, in the shots you cannot film the star, the double stands in convincingly.
 </details>
 
 <details>
-<summary><b>Adoption cohort (a)</b> — the unit of the staggered estimator.</summary>
+<summary><b>3. Unit weights (ω)</b> — how much each donor counts.</summary>
 
-The set of countries that first adopt in the same calendar year (e.g. the 2002 cohort). Staggered SDID runs one self-contained SDID problem per cohort, comparing that cohort only against the **never-treated** controls.
+**Definition.** Non-negative weights, one per donor country, summing to one, that build the synthetic control. Each cohort gets its own ω.
+
+**Example.** In the 2000 cohort, 80 donors receive nonzero weight — Argentina ≈ 0.061, Guatemala ≈ 0.057, Austria ≈ 0.045 — a *diffuse* blend rather than one or two stand-ins.
+
+**Analogy.** A recipe calling for many ingredients in small, precise amounts: no single one dominates, so the dish survives a bad batch of any one ingredient.
 </details>
 
 <details>
-<summary><b>Event time</b> (relative period) — aligning cohorts by their own clock.</summary>
+<summary><b>4. Time weights (λ)</b> — which "before" years matter.</summary>
 
-Years measured *relative to each cohort's own adoption year*: t = −2, −1, 0, +1, … Re-centring on event time lets cohorts that adopted in different calendar years be averaged together.
+**Definition.** Non-negative weights on the pre-adoption years, summing to one, that decide which pre-periods define the baseline. They up-weight the years most like the post-period.
+
+**Example.** For the 2002 cohort, λ concentrates on the late 1990s and 2001 rather than spreading evenly across 1990–2001 — the recent past is the relevant baseline.
+
+**Analogy.** Forecasting tomorrow's weather, you trust last week far more than the same date five years ago. Time weights formalize "recent and similar counts more."
 </details>
 
 <details>
-<summary><b>ATT aggregation</b> — from many cohort effects to one number.</summary>
+<summary><b>5. Adoption cohort (a)</b> — units that switch on together.</summary>
 
-The overall ATT is a weighted average of the cohort effects, each weighted by its share of treated unit-by-post-period observations. Earlier and larger cohorts count for more.
+**Definition.** The set of countries that first adopt a quota in the same calendar year. Staggered SDID runs one self-contained SDID per cohort, always against the never-treated controls.
+
+**Example.** There are seven cohorts — 2000, 2002, 2003, 2005, 2010, 2012, 2013 — with two countries each in 2002 and 2003, and one in the rest.
+
+**Analogy.** School graduating classes: the "class of 2002" and the "class of 2010" share a start date and are analyzed as groups, even though all attend the same school.
 </details>
 
 <details>
-<summary><b>Pre-trend placebo test</b> — the assumption made visible.</summary>
+<summary><b>6. Staggered adoption &amp; the forbidden comparison</b> — why the naive regression breaks.</summary>
 
-Event-study coefficients for *pre-adoption* periods. If treated and synthetic-control countries were on parallel trends before treatment, these should sit near zero — a falsification check you can see.
+**Definition.** Staggered adoption means units are treated at different times. The hazard: a two-way fixed-effects regression can use *already-treated* units as controls for *later* adopters — a "forbidden comparison" that places negative weights on some effects and can flip the sign.
+
+**Example.** When the 2012 cohort adopts, a naive TWFE quietly treats the 2002 cohort — already treated, already changed — as part of its control group. Staggered SDID never does this: each cohort is compared only to the 110 never-treated countries.
+
+**Analogy.** Timing a late runner against runners who already crossed the line and slowed to a walk — your "control" is contaminated because it has already run the race.
 </details>
 
 <details>
-<summary><b>Bootstrap / jackknife / placebo</b> — three ways to get a standard error.</summary>
+<summary><b>7. Event time (relative period)</b> — every cohort on its own clock.</summary>
 
-With **9** treated units (unlike the single-unit Proposition 99 case) all three are available: bootstrap (resample units), jackknife (leave-one-out), and placebo (assign fake treatment to controls). They share the same point estimate but report different uncertainty.
+**Definition.** Time measured relative to each cohort's *own* adoption year (… −2, −1, 0, +1 …), so cohorts that adopted in different calendar years can be lined up and averaged.
+
+**Example.** Event time 0 is the year 2000 for the first cohort but 2013 for the last; re-centring lets us ask "what happens three years *after* a quota?" across all cohorts at once.
+
+**Analogy.** Comparing marathon runners by their own start gun, not the wall clock: a runner who started at 9:05 and one who started at 9:20 are both "at mile 10" measured from their own start.
 </details>
 
-## The data: gender quotas across 119 countries
+<details>
+<summary><b>8. ATT aggregation</b> — from many cohort effects to one number.</summary>
+
+**Definition.** The overall ATT is a weighted average of the cohort effects, each weighted by its share of treated unit-by-post-period observations — earlier, longer-exposed, larger cohorts count more.
+
+**Example.** The seven cohort effects span **−3.5 to +21.8**; weighted by treated country-years they average to **+8.0** (the plain unweighted mean would be ≈ 7.0).
+
+**Analogy.** A course grade that weights the final exam more than a pop quiz: the cohorts you observe for longer carry more of the final mark.
+</details>
+
+<details>
+<summary><b>9. Pre-trend placebo test</b> — the assumption you can see.</summary>
+
+**Definition.** Event-study coefficients for the *pre-adoption* periods. If treated and synthetic-control countries moved in parallel before treatment, these sit near zero — a falsification check.
+
+**Example.** For the 2002 cohort, all twelve pre-period placebos fall in **[−0.2, +0.8]** points — flat, so we cannot reject parallel synthetic trends.
+
+**Analogy.** Checking a scale by weighing nothing first: if it does not read zero when empty, you distrust every later reading. Flat placebos are that "reads zero when empty" check.
+</details>
+
+<details>
+<summary><b>10. Bootstrap, jackknife, placebo</b> — three rulers for uncertainty.</summary>
+
+**Definition.** Three ways to attach a standard error to the ATT. With many treated units all three are available; they share one point estimate but report different spread.
+
+**Example.** On the two-cohort subsample the ATT is **10.3** for all three, but the SE is **4.7** (bootstrap), **6.0** (jackknife, most conservative), and **2.3** (placebo, tightest).
+
+**Analogy.** Measuring a table with a tape, a folding ruler, and a laser: they agree on the length but disagree on the error bars — the cautious carpenter reports the widest.
+</details>
+
+## 3. The data: gender quotas across 119 countries
 
 We use `quota_example.dta`, the balanced panel from Bhalotra, Clarke, Gomes & Venkataramani (2023) distributed with the `sdid` package. The outcome is the percentage of seats held by women in the national parliament; the treatment is the adoption of a reserved-seat gender quota; the covariate is log GDP per capita.
 
@@ -196,7 +256,7 @@ In words: for every treated country and every post-adoption year, take the gap b
 
 **An observational, not experimental, setting.** Quotas are not randomly assigned. Countries that adopt them early may differ systematically — they may be wealthier, more democratic, or already on a rising trajectory of women's representation. That is exactly why we need a method that builds a *credible counterfactual* from comparison countries rather than assuming a simple before/after change would have held. Identification rests on assumptions we will keep visible: that treated and synthetic-control countries share a **common (synthetic) trend** absent treatment, **no anticipation** of the quota, **no spillovers** across countries, and that adoption timing is not itself driven by the outcome's future path.
 
-### The staggered structure
+### 3.1 The staggered structure
 
 Before modelling, let us see the timing directly. The adoption year is the first year a country is treated; we tabulate the cohorts.
 
@@ -226,7 +286,7 @@ restore
 
 Nine countries adopt a quota, spread across **seven cohorts**; the 2002 and 2003 cohorts contain two countries each, the rest one. The remaining **110 countries are never treated** — they form the donor pool from which every cohort's synthetic control is built. This staircase of adoption dates is the defining feature of a staggered design, and the reason a single "post" dummy is too blunt.
 
-## Exploratory analysis with `panelview`
+## 4. Exploratory analysis with `panelview`
 
 A staggered design is best understood by *looking* at it. The `panelview` command (Xu & Hua) draws two pictures we need: a heatmap of *who is treated when*, and the raw outcome trajectories colored by treatment status.
 
@@ -253,7 +313,7 @@ collapse (mean) womparl, by(evertreat year)
 
 Collapsing to group means tells a cautionary tale. The ever-adopting countries (orange) start the 1990s **below** the never-adopting countries (about 4% vs 10% women in parliament) and end **above** them by 2015 (about 23% vs 22%). A naive eyeball difference-in-differences on these two lines would be badly confounded: the groups began at different levels and the "treated" line aggregates countries that switched on in seven different years. The raw means motivate the machinery to come — we must compare each cohort to a *tailored* synthetic control, not to the grand average.
 
-## Synthetic difference-in-differences from first principles
+## 5. Synthetic difference-in-differences from first principles
 
 Before tackling staggered timing, fix ideas with a single cohort. SDID (Arkhangelsky et al., 2021) is a **weighted two-way fixed-effects regression**. It chooses an ATT, a constant, unit fixed effects, and time fixed effects to minimize a weighted sum of squared residuals:
 
@@ -285,7 +345,7 @@ Years that look most like the post-period get the most weight, so the "before" c
 | **Synthetic control** | optimized | uniform | **no** | level *and* trend |
 | **SDID** | optimized | optimized | yes | trend (level gap allowed) |
 
-## The staggered extension: per-cohort effects and their aggregation
+## 6. The staggered extension: per-cohort effects and their aggregation
 
 Staggered SDID is a disarmingly simple idea: **do the single-cohort analysis once per adoption cohort, then average.** For each cohort $a$, take only that cohort's treated countries plus the pure never-treated controls, solve the SDID problem above on that sub-panel to get its own $\hat{\omega}\_a$, $\hat{\lambda}\_a$, and cohort effect $\hat{\tau}\_a$. Because each cohort is compared **only to never-treated controls**, an already-treated unit is never used as a control for a later adopter — precisely the contamination that breaks naive TWFE.
 
@@ -320,7 +380,7 @@ $$
 
 In words: a cohort counts in proportion to how many treated country-years it contributes. The 2000 cohort, treated for 16 years (2000–2015), carries more weight than the 2013 cohort, treated for only 3. This is the staggered generalization of single-cohort SDID, and — unlike TWFE — every weight is positive and interpretable. (When each cohort has one treated unit, this reduces to the post-period share $T\_{post}^{a}/T\_{post}$ from Clarke et al., 2024.)
 
-## Estimation in Stata
+## 7. Estimation in Stata
 
 One command does the whole staggered procedure. We request bootstrap inference and a fixed seed for reproducibility.
 
@@ -371,7 +431,7 @@ Which pre-period years anchor that comparison? The time weights $\hat{\lambda}\_
 
 The bars show SDID's baseline for the 2002 cohort leaning on the late 1990s and 2001 — the pre-adoption years whose level most resembles the post-adoption period — rather than weighting all twelve pre-years equally as a plain difference-in-differences would. This is the time-weighting half of SDID at work: it builds the "before" from the most relevant history, which is also the baseline the event study below measures against.
 
-## Adding a covariate: optimized vs projected
+## 8. Adding a covariate: optimized vs projected
 
 Does the quota effect simply reflect economic development — richer countries both grow GDP and elect more women? We can condition on log GDP per capita. The `sdid` command offers two routes, and SDID needs a balanced panel, so we first drop the country-years with missing `lngdp`.
 
@@ -388,7 +448,7 @@ SDID + lngdp (projected) ATT = 8.0593  SE = 3.1191
 
 The two methods differ in *how* they estimate the covariate's coefficient. The **optimized** method (Arkhangelsky et al., 2021) folds the covariate adjustment into the SDID optimization itself, estimating it jointly with the weights — flexible but computationally heavy. The **projected** method (Kranz, 2022) instead regresses the outcome on the covariate among the *untreated* observations first, then runs SDID on the residuals — much faster and numerically more stable. Reassuringly, here they agree to the second decimal: **8.05 and 8.06**, essentially unchanged from the no-covariate estimate of 8.03. Controlling for income does **not** explain away the quota effect; the result is robust to the most obvious confounder.
 
-## The event study with `sdid_event`
+## 9. The event study with `sdid_event`
 
 A single ATT — even per cohort — cannot tell us *when* the effect appears, or whether treated and control countries were already diverging *before* the quota. For that we need an **event study**: the treatment effect traced out by years relative to adoption. The modern `sdid_event` command (Ciccia, Clarke & Pailañir, 2024) computes exactly this for SDID, including pre-period **placebo** estimates that serve as a parallel-trends test.
 
@@ -432,7 +492,7 @@ This plot rewards careful reading, and there are three things to look for.
 
 **Third, the points to the *right* of zero are the dynamic ATT.** The effect appears immediately at adoption (`Effect_1` = +4.1 points at event time 0), roughly doubles within a year or two (`Effect_2` = +9.2), and then settles in the +6 to +9 range for over a decade. Quotas do not just shift the level once; they sustain a higher share of women in parliament. Aggregated by the same treated-period logic as before, these dynamic effects reproduce the cohort's overall ATT of about +7 points — but the plot shows the *shape* the single number conceals.
 
-## Inference: bootstrap, jackknife, and placebo
+## 10. Inference: bootstrap, jackknife, and placebo
 
 With one treated unit (California), the previous tutorial could only use placebo/permutation inference. With **nine** treated units here, all three of `sdid`'s variance estimators are on the table. To keep the comparison clean — jackknife needs more than one treated unit *per adoption period* — we follow Clarke et al. (2024) and restrict to the two-country 2002 and 2003 cohorts by dropping the five single-country cohorts.
 
@@ -474,11 +534,11 @@ jackknife   10.33066   6.0056  -1.4401   22.1014
 
 The point estimate is **identical** across all three methods — 10.33 points on this subsample — because the inference procedure changes only the *standard error*, never the estimate. But the standard errors differ by a factor of nearly three: **jackknife is the most conservative** (SE 6.01, a confidence interval that crosses zero), **placebo is the tightest** (SE 2.34) but rests on a homoskedasticity assumption and requires more controls than treated units, and **bootstrap sits in between** (SE 4.73) and is the default. The practical takeaway: with only a handful of treated units, report the bootstrap as your headline but cross-check it — a result that is "significant" under placebo but not under jackknife deserves caution. (The subsample ATT of 10.3 is larger than the full-sample 8.0 because dropping the five single-country cohorts discards the negative 2005 and 2013 effects.)
 
-## Robustness and discussion
+## 11. Robustness and discussion
 
 Three caveats keep the result honest. **Effect concentration:** the +8 aggregate leans heavily on a few cohorts — the 2012 cohort alone contributes a +21.8 effect, and the early 2000/2002/2003 cohorts carry most of the aggregation weight. Drop the 2012 cohort and the average falls noticeably. **Fragile counterfactuals:** with only 110 controls and as few as one treated country per cohort, some synthetic controls are imprecise — the 2003 cohort's standard error of 9.13 is the tell. **Identifying assumptions:** SDID still requires no anticipation, an absorbing treatment, no cross-country spillovers, and that quota timing is not itself a response to the outcome's trajectory; the flat event-study placebos support, but cannot prove, the parallel-trends part. Finally, `quota_example` is a teaching subset of Bhalotra et al. (2023); these numbers illustrate the *method*, not a final verdict on quota policy.
 
-## Summary and key takeaways
+## 12. Summary and key takeaways
 
 - **Method.** Staggered SDID estimates a *separate, clean* synthetic difference-in-differences for each adoption cohort — comparing it only to never-treated controls — and aggregates the cohort effects $\hat{\tau}\_a$ with non-negative, treated-period-share weights. This avoids the negative-weighting trap that contaminates naive two-way fixed-effects DiD under staggered timing.
 - **Result.** Gender quotas raise the share of women in parliament by an overall **ATT of +8.0 percentage points** (SE 3.74, $p=0.032$), robust to a log-GDP control (8.05 optimized, 8.06 projected). Cohort effects range widely, from **−3.5 to +21.8 points** — heterogeneity the single number hides.
@@ -486,13 +546,13 @@ Three caveats keep the result honest. **Effect concentration:** the +8 aggregate
 - **Inference.** With nine treated units, bootstrap, jackknife, and placebo are all available; they share one point estimate (10.3 on the two-cohort illustration) but report standard errors of 4.7, 6.0, and 2.3. Jackknife is the most conservative.
 - **Bridge.** The block design (Proposition 99, the [previous tutorial](/post/stata_sdid/)) and the staggered design here are two faces of one estimator — the staggered version is just single-cohort SDID, done once per cohort and averaged.
 
-## Exercises
+## 13. Exercises
 
 1. **Re-aggregate by hand.** Pull `e(tau)` and each cohort's treated unit-count and post-period length. Verify that the treated-period-weighted average of the seven $\hat{\tau}\_a$ reproduces the overall ATT of 8.03, and show that it differs from the unweighted mean (≈ 7.0). Which cohorts move the aggregate the most?
 2. **Inference sensitivity.** Re-run the full nine-country sample with `vce(bootstrap)` and then `vce(placebo)` at `reps(500)`. How much do the standard error and confidence interval move, and which would you report given only nine treated units?
 3. **Drop the outlier cohort.** Re-estimate the overall ATT excluding the 2012 cohort (the +21.8 outlier). How far does the aggregate fall, and what does that tell you about how concentrated the average effect is?
 
-## References
+## 14. References
 
 1. Arkhangelsky, D., Athey, S., Hirshberg, D. A., Imbens, G. W., & Wager, S. (2021). [Synthetic Difference-in-Differences](https://doi.org/10.1257/aer.20190159). *American Economic Review*, 111(12), 4088–4118.
 2. Clarke, D., Pailañir, D., Athey, S., & Imbens, G. (2024). [On Synthetic Difference-in-Differences and Related Estimation Methods in Stata](https://doi.org/10.1177/1536867X241297184). *The Stata Journal*, 24(4). Package: `ssc install sdid`.
@@ -504,7 +564,7 @@ Three caveats keep the result honest. **Effect concentration:** the +8 aggregate
 
 *Related tutorials on this site:* [Synthetic Difference-in-Differences (the block design)](/post/stata_sdid/) · [Difference-in-Differences](/post/stata_did/).
 
-## Acknowledgments
+## 15. Acknowledgments
 
 This tutorial uses the `sdid` command (Clarke, Pailañir, Athey & Imbens), the `sdid_event` command (Ciccia, Clarke & Pailañir), and `panelview` (Xu & Hua). The data, `quota_example`, is distributed with `sdid` and draws on Bhalotra, Clarke, Gomes & Venkataramani (2023). All estimates were produced by the companion `analysis.do` and verified against Clarke et al. (2024). AI tools (Claude Code) assisted with drafting and figure preparation; all code was executed and every number checked by the author.
 
