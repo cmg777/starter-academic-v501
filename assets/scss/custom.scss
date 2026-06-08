@@ -1459,7 +1459,10 @@ details.concept-card p:last-child {
 }
 
 .hero-author-affiliation {
+  font-family: "Crimson Pro", Georgia, serif;  /* hero serif family (loaded :1191, was unused) */
   font-size: clamp(0.85rem, 1.05vw, 0.95rem);
+  font-weight: 500;        /* lightest weight shipped for Crimson Pro; gives white-on-photo presence */
+  letter-spacing: 0.01em;  /* same gentle tracking as .hero-subtitle; aids legibility over busy bg */
   color: #fff;
   line-height: 1.5;
   margin: 0;
