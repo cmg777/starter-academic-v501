@@ -2,15 +2,25 @@
 _build:
   render: always
   list: always
-bio: My research interests are 
+bio: My research interests are in causal inference, project evaluation, regional development, and the use of satellite nighttime light data to measure local economic activity.
 education:
   courses:
-  - course: Bachelor of 
-    institution: TBA University
-    year: 2019
-email: "x"
+  - course: PhD in International Development
+    institution: Nagoya University
+    year: "2025-2028"
+  - course: MA in International Development
+    institution: Nagoya University
+    year: 2025
+  - course: Bachelor of Business
+    institution: Zhengzhou University
+    year: 2021
+email: ""
 interests:
-- "TBA"
+- "Causal Inference"
+- "Project Evaluation"
+- "Regional Development"
+- "Nighttime Light Data"
+- "Place-based Policy"
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
@@ -18,7 +28,7 @@ role: "PhD student 2025-2028"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://carlos-mendez.org/#people
+  link: https://xiaomengli.my.canva.site/portfolio
 - icon: open-data
   icon_pack: ai
   link: https://carlos-mendez.org/#people
@@ -39,5 +49,3 @@ title: Li Xiaomeng (China)
 user_groups:
 - Doctoral students
 ---
-
-ADD a longer bio here
