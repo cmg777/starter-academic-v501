@@ -4,7 +4,7 @@ education:
   courses:
   - course: Licenciatura en Gestión Financiera
     institution: Universidad de Sarajevo
-    year: 2024
+    year: 2022
 email: "x"
 interests:
 - "Economía del desarrollo, aprendizaje automático, convergencia y control sintético."
@@ -27,7 +27,7 @@ social:
   link: 
 - icon: github
   icon_pack: fab
-  link: https://github.com/bananapeal420
+  link: https://github.com/mujkanovicadin
 superuser: false
 title: Mujkanovic Adin (Bosnia y Herzegovina)
 

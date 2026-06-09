@@ -4,7 +4,7 @@ education:
   courses:
   - course: 財務管理 学士
     institution: サラエボ大学
-    year: 2024
+    year: 2022
 email: "x"
 interests:
 - "開発経済学、機械学習、収束、合成コントロール。"
@@ -27,7 +27,7 @@ social:
   link: 
 - icon: github
   icon_pack: fab
-  link: https://github.com/bananapeal420
+  link: https://github.com/mujkanovicadin
 superuser: false
 title: Mujkanovic Adin（ボスニア・ヘルツェゴビナ）
 

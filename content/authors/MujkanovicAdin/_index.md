@@ -2,12 +2,12 @@
 _build:
   render: always
   list: always
-bio: Research concerns the effect of Nighttime lights on regional developement, specifically on convergence in post-war countries. 
+bio: Research concerns the effect of Nighttime lights on regional development, specifically on convergence in post-war countries. 
 education:
   courses:
   - course: B.A. in Financial Management
     institution: University of Sarajevo
-    year: 2024
+    year: 2022
 email: "x"
 interests:
 - "Development economics, machine learning, convergence, and synthetic control."
@@ -30,7 +30,7 @@ social:
   link: 
 - icon: github
   icon_pack: fab
-  link: https://github.com/bananapeal420
+  link: https://github.com/mujkanovicadin
 superuser: false
 title: Mujkanovic Adin (Bosnia and Herzegovina)
 
