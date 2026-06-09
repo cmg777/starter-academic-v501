@@ -18,7 +18,7 @@ role: "PhD student 2025-2028"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://www.researchgate.net/profile/He-Du-12
+  link: https://www.researchgate.net/profile/He-Du-1234454363413123
 - icon: open-data
   icon_pack: ai
   link: https://deepnote.com/@du-he
