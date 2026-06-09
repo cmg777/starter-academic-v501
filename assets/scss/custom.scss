@@ -1225,7 +1225,8 @@ details.concept-card p:last-child {
 
 #hero2-new > * {
   position: relative;
-  z-index: 1;
+  z-index: 2;  /* content wrapper sits ABOVE the ::after scrim (now z-index 1) so the
+                  text renders as true #fff and is never veiled by the navy overlay */
 }
 
 #hero2-new::after {
@@ -1233,7 +1234,9 @@ details.concept-card p:last-child {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;  /* BELOW the content wrapper (z-index 2): the scrim still calms the photo
+                  (incl. what shows through the transparent panels) but no longer veils
+                  the text — fixes the navy-grey title. */
   background:
     linear-gradient(to bottom, #0e1545 0%, transparent 7%),
     linear-gradient(to top,    #0e1545 0%, transparent 7%),
@@ -1340,7 +1343,7 @@ details.concept-card p:last-child {
 .hero-title-link:focus,
 .hero-title-link:active,
 .hero-title-link:visited {
-  color: inherit;
+  color: inherit !important;          /* force pure white; beat any theme link-color rule */
   text-decoration: none !important;
   border-bottom: 0 !important;        /* the underline culprit — Wowchemy underlines <a> via border-bottom */
   box-shadow: none !important;        /* belt: some link styles use an inset shadow */
