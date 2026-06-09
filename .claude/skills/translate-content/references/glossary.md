@@ -136,6 +136,8 @@ localizes only the word, keeping the digits: ES `2027 (previsto)`, JA `2027年�
 | natural resource economics | economía de los recursos naturales | 天然資源経済学 |
 | mining and regional development | minería y desarrollo regional | 鉱業と地域開発 |
 | satellite remote sensing | teledetección satelital | 衛星リモートセンシング |
+| remote sensing | teledetección | リモートセンシング |
+| environmental economics | economía ambiental | 環境経済学 |
 
 ### Recurring UI / sentence patterns
 | EN | ES | JA |
