@@ -60,5 +60,4 @@ I am a PhD student at the Graduate School of International Development, Nagoya U
 My current doctoral research combines applied econometrics, spatial analysis, remote sensing data, and interpretable machine learning to study regional development. One strand of my work examines labor outcomes and regional heterogeneity using satellite based measures and spatial econometric methods. Another strand investigates the relationship between economic development and inequality under model uncertainty, with a focus on Bayesian Model Averaging and flexible nonlinear specifications.
 
 I am also interested in the use of interpretable machine learning methods, such as tree based models and SHAP, to explore heterogeneous and nonlinear development patterns. More broadly, my research aims to connect new data sources with transparent quantitative methods to better understand regional inequality, labor dynamics, and development transitions.
-```
 
