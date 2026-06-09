@@ -2,12 +2,19 @@
 bio: Mis intereses de investigación incluyen la economía del desarrollo, la economía regional y la econometría espacial.
 education:
   courses:
-  - course: Maestría en Marketing
-    institution: Universidad de Mánchester
-    year: 2020
+  - course: Maestría en Administración de Empresas
+    institution: Universidad EAFIT
+    year: 2008
+  - course: Licenciatura en Ingeniería de Alimentos
+    institution: Corporación Universitaria Lasallista
+    year: 2006
 email: "x"
 interests:
-- "TBA"
+- Desigualdad nutricional
+- Epidemiología espacial
+- Economía del desarrollo
+- Economía regional
+- Econometría espacial
 organizations:
 - name: Universidad de Nagoya
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
@@ -16,9 +23,6 @@ social:
 - icon: address-card
   icon_pack: fa
   link: https://katerinerestrepo.my.canva.site/
-- icon: open-data
-  icon_pack: ai
-  link: https://deepnote.com/@karestrepo
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Katerine_Restrepo
@@ -37,4 +41,4 @@ user_groups:
 - Estudiantes de doctorado
 ---
 
-Por definir
+Mi investigación explora la desigualdad nutricional en América Latina, con especial atención a la doble carga de la desnutrición y la sobrenutrición, utilizando enfoques de econometría espacial.

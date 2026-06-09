@@ -2,15 +2,22 @@
 _build:
   render: always
   list: always
-bio: My research interests include  development economics, regional economics, and spatial econometrics.
+bio: My research interests include development economics, regional economics, and spatial econometrics.
 education:
   courses:
-  - course: M.S. in Marketing
-    institution: University of Manchester
-    year: 2020
+  - course: Master of Business Administration
+    institution: EAFIT University
+    year: 2008
+  - course: B.A. in Food Engineering
+    institution: Lasallista University Corporation
+    year: 2006
 email: "x"
 interests:
-- "TBA"
+- Nutritional inequality
+- Spatial epidemiology
+- Development economics
+- Regional economics
+- Spatial econometrics
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
@@ -19,9 +26,6 @@ social:
 - icon: address-card
   icon_pack: fa
   link: https://katerinerestrepo.my.canva.site/
-- icon: open-data
-  icon_pack: ai
-  link: https://deepnote.com/@karestrepo
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Katerine_Restrepo
@@ -40,4 +44,4 @@ user_groups:
 - Doctoral students
 ---
 
-TBA
+My research explores nutritional inequality in Latin America, with a particular focus on the dual burden of undernutrition and overnutrition using spatial econometric approaches.

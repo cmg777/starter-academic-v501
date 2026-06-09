@@ -2,12 +2,19 @@
 bio: 研究関心は、開発経済学、地域経済学、空間計量経済学です。
 education:
   courses:
-  - course: マーケティング 修士
-    institution: マンチェスター大学
-    year: 2020
+  - course: 経営管理 修士
+    institution: EAFIT大学
+    year: 2008
+  - course: 食品工学 学士
+    institution: ラサリスタ大学
+    year: 2006
 email: "x"
 interests:
-- "TBA"
+- 栄養格差
+- 空間疫学
+- 開発経済学
+- 地域経済学
+- 空間計量経済学
 organizations:
 - name: 名古屋大学
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
@@ -16,9 +23,6 @@ social:
 - icon: address-card
   icon_pack: fa
   link: https://katerinerestrepo.my.canva.site/
-- icon: open-data
-  icon_pack: ai
-  link: https://deepnote.com/@karestrepo
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Katerine_Restrepo
@@ -37,4 +41,4 @@ user_groups:
 - 博士課程学生
 ---
 
-未定
+私の研究は、ラテンアメリカにおける栄養格差を探究するものであり、特に低栄養と過栄養という二重負荷に着目し、空間計量経済学的アプローチを用いて分析しています。
