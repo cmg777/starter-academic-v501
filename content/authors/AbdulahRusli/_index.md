@@ -2,26 +2,26 @@
 _build:
   render: always
   list: always
-bio: My research interests include macroeconomics, development economics, regional and spatial analysis, and applied econometrics.
+bio: My current research uses satellite, meso, and microdata, combining remote sensing, causal inference, and a spatial econometrics approach to study rural and regional development in Indonesia.
 education:
   courses:
-  - course: M.A. in Economics
-    institution: International University of Japan
+  - course: M.Sc. in Economics
+    institution: Diponegoro University, Semarang-Indonesia
     year: 2013
 email: "x"
 interests:
-- "Regional inflation dynamics in Indonesia: Determinants, spatial factors, and convergence analysis"
+- "Regional and rural development in Indonesia, food security, energy and environmental issues"
 organizations:
 - name: Nagoya University
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "PhD student 2023-2026"
+role: "PhD student 2023-2027"
 social:
 - icon: address-card
   icon_pack: fa
-  link: https://rabdulah.net
+  link: https://regio28.com
 - icon: open-data
   icon_pack: ai
-  link: https://rabdulah.net/2024/05/co-emission-map-of-jakarta-2019-2020/
+  link: https://regio28.com/2025/12/31/melihat-perkembangan-arus-mudik-melalui-emisi/
 - icon: researchgate
   icon_pack: ai
   link: https://www.researchgate.net/profile/Rusli-Abdulah
