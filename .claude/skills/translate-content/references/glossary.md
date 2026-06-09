@@ -90,6 +90,7 @@ translate the words and keep the years: `Estudiante de doctorado 2023-2026` /
 | Nagoya University | Universidad de Nagoya | 名古屋大学 |
 | International University of Japan | Universidad Internacional de Japón | 国際大学（日本） |
 | Bolivian Catholic University | Universidad Católica Boliviana | ボリビア・カトリカ大学 |
+| Graduate School of International Development, Nagoya University | Escuela de Posgrado de Desarrollo Internacional, Universidad de Nagoya | 名古屋大学 国際開発研究科 |
 
 ### Degrees (`education.courses[].course`)
 | EN | ES | JA |
@@ -98,6 +99,14 @@ translate the words and keep the years: `Estudiante de doctorado 2023-2026` /
 | MA / Master in International Development | Maestría en Desarrollo Internacional | 国際開発学 修士 |
 | Master in Economics | Maestría en Economía | 経済学 修士 |
 | Lic. in Commercial Engineering | Licenciatura en Ingeniería Comercial | 商業工学 学士 |
+| Professional Degree in Economics | Título Profesional en Economía | 経済学 専門学位 |
+| Bachelor of Economics | Bachiller en Economía | 経済学 学士 |
+
+The `Título Profesional` / `Bachiller` pair is Peru-specific (e.g. Universidad del
+Pacífico); where a country awards a single undergraduate degree, `Bachelor of X` →
+ES `Licenciatura en X`. A `year` that embeds a descriptor word (`2027 (expected)`)
+localizes only the word, keeping the digits: ES `2027 (previsto)`, JA `2027年（予定）`
+— plain numeric years stay byte-for-byte (§4).
 
 ### Academic terms
 | EN | ES | JA |
@@ -122,6 +131,11 @@ translate the words and keep the years: `Estudiante de doctorado 2023-2026` /
 | convergence | convergencia | 収束 |
 | subnational GDP | PIB subnacional | サブナショナルGDP |
 | structural change | cambio estructural | 構造変化 |
+| regional economics | economía regional | 地域経済学 |
+| spatial econometrics | econometría espacial | 空間計量経済学 |
+| natural resource economics | economía de los recursos naturales | 天然資源経済学 |
+| mining and regional development | minería y desarrollo regional | 鉱業と地域開発 |
+| satellite remote sensing | teledetección satelital | 衛星リモートセンシング |
 
 ### Recurring UI / sentence patterns
 | EN | ES | JA |

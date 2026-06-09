@@ -1,17 +1,31 @@
 ---
-bio: Mis intereses de investigación incluyen la economía del desarrollo, la economía regional y la econometría espacial.
+bio: Mis intereses de investigación incluyen la economía del desarrollo, la economía regional, la econometría espacial, la economía de los recursos naturales, la minería y el desarrollo regional, y la teledetección satelital.
 education:
   courses:
-  - course: Maestría en Marketing
-    institution: Universidad de Mánchester
-    year: 2020
-email: "x"
+  - course: Doctorado en Desarrollo Internacional
+    institution: Escuela de Posgrado de Desarrollo Internacional, Universidad de Nagoya
+    year: "2027 (previsto)"
+  - course: Maestría en Desarrollo Internacional
+    institution: Escuela de Posgrado de Desarrollo Internacional, Universidad de Nagoya
+    year: 2019
+  - course: Título Profesional en Economía
+    institution: Universidad del Pacífico
+    year: 2014
+  - course: Bachiller en Economía
+    institution: Universidad del Pacífico
+    year: 2014
+email: "leiva.cardenas.favio.sergio.w2@s.mail.nagoya-u.ac.jp"
 interests:
-- "TBA"
+- "Economía del desarrollo"
+- "Economía regional"
+- "Econometría espacial"
+- "Economía de recursos naturales"
+- "Minería y desarrollo regional"
+- "Teledetección satelital"
 organizations:
 - name: Universidad de Nagoya
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "Estudiante de doctorado 2023-2024"
+role: "Estudiante de doctorado 2023-2027"
 social:
 - icon: address-card
   icon_pack: fa
@@ -29,12 +43,10 @@ social:
   icon_pack: fab
   link: https://github.com/Favioleiva
 superuser: false
-title: Leiva Favio (Perú)
+title: Favio Leiva Cárdenas
 
 # Grupos a los que perteneces (para el widget People).
 #   Establece esto en `[]` o coméntalo si no usas el widget People.
 user_groups:
 - Estudiantes de doctorado
 ---
-
-Por definir

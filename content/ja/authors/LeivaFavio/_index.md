@@ -1,17 +1,31 @@
 ---
-bio: 研究関心は、開発経済学、地域経済学、空間計量経済学です。
+bio: 研究関心は、開発経済学、地域経済学、空間計量経済学、天然資源経済学、鉱業と地域開発、衛星リモートセンシングです。
 education:
   courses:
-  - course: マーケティング 修士
-    institution: マンチェスター大学
-    year: 2020
-email: "x"
+  - course: 国際開発学 博士
+    institution: 名古屋大学 国際開発研究科
+    year: "2027年（予定）"
+  - course: 国際開発学 修士
+    institution: 名古屋大学 国際開発研究科
+    year: 2019
+  - course: 経済学 専門学位
+    institution: Universidad del Pacífico
+    year: 2014
+  - course: 経済学 学士
+    institution: Universidad del Pacífico
+    year: 2014
+email: "leiva.cardenas.favio.sergio.w2@s.mail.nagoya-u.ac.jp"
 interests:
-- "TBA"
+- "開発経済学"
+- "地域経済学"
+- "空間計量経済学"
+- "天然資源経済学"
+- "鉱業と地域開発"
+- "衛星リモートセンシング"
 organizations:
 - name: 名古屋大学
   url: "https://www4.gsid.nagoya-u.ac.jp/en/"
-role: "博士課程学生 2023–2024"
+role: "博士課程学生 2023–2027"
 social:
 - icon: address-card
   icon_pack: fa
@@ -29,12 +43,10 @@ social:
   icon_pack: fab
   link: https://github.com/Favioleiva
 superuser: false
-title: Leiva Favio（ペルー）
+title: Favio Leiva Cárdenas
 
 # 所属するグループ（People ウィジェット用）。
 #   People ウィジェットを使わない場合は `[]` にするかコメントアウトしてください。
 user_groups:
 - 博士課程学生
 ---
-
-未定
