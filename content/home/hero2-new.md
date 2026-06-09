@@ -53,7 +53,7 @@ design:
   <div class="hero-glass-card hero-glass-card--title hero-glass-card--delay-1">
     <h1 class="hero-title"><a class="hero-title-link" href="https://canva.link/hhrue9c5aogivjn" target="_blank" rel="noopener">On the Geography of Development</a></h1>
     <div class="hero-title-underline" aria-hidden="true"></div>
-    <p class="hero-subtitle" data-rotate="Geospatial Big Data|Development Economics|Spatial Econometrics|Causal Inference|Machine Learning" aria-label="Insights from Geospatial Big Data, Development Economics, Spatial Econometrics, Causal Inference, and Machine Learning">Insights from Geospatial Big Data, Development Economics, Spatial Econometrics, Causal Inference, and Machine Learning</p>
+    <p class="hero-subtitle" data-rotate="Geospatial Big Data|Development Economics|Spatial Econometrics|Causal Machine Learning" aria-label="Insights from Geospatial Big Data, Development Economics, Spatial Econometrics, and Causal Machine Learning">Insights from Geospatial Big Data, Development Economics, Spatial Econometrics, and Causal Machine Learning</p>
   </div>
 
   <div class="hero-glass-card hero-glass-card--tagline hero-glass-card--delay-2">
