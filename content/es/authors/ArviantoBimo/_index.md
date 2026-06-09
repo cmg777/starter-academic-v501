@@ -1,5 +1,5 @@
 ---
-bio: Tras estudiar geografía en la Universidad Gadjah Mada, Indonesia, trabajo como planificador del desarrollo en el Ministerio de Planificación del Desarrollo Nacional/Bappenas. Tengo una maestría en tecnología de la información con especialización en lo espacial por la Universidad de Melbourne, Australia. Mis intereses de investigación incluyen el desarrollo regional, la geografía económica y la ciencia de datos espaciales.
+bio: Soy planificador del desarrollo en el Ministerio de Planificación del Desarrollo Nacional (Bappenas) de Indonesia. Tengo una licenciatura en Geografía por la Universidad Gadjah Mada y una maestría en Tecnología de la Información con especialización en lo espacial por la Universidad de Melbourne, Australia. Mi trabajo y mi investigación se centran en el desarrollo regional, la geografía económica y la ciencia de datos espaciales.
 education:
   courses:
   - course: Maestría en Tecnología de la Información (Especialización Espacial)
@@ -25,9 +25,6 @@ social:
 - icon: orcid
   icon_pack: ai
   link: https://orcid.org/0009-0002-3887-3504
-- icon: linkedin
-  icon_pack: ai
-  link: https://www.linkedin.com/in/bimoarvianto/
 - icon: github
   icon_pack: fab
   link: https://github.com/Arvibim

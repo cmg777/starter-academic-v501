@@ -2,14 +2,14 @@
 _build:
   render: always
   list: always
-bio: After studying geography at Gadjah Mada University, Indonesia, I work as a development planner in the Ministry of National Development Planning/Bappenas. I have a master's degree in information technology focusing on spatial from the University of Melbourne, Australia. My research interests include regional development, economic geography, and spatial data science.
+bio: I am a development planner at Indonesia's Ministry of National Development Planning (Bappenas). I hold a bachelor's degree in Geography from Universitas Gadjah Mada and a Master's degree in Information Technology with a spatial specialization from the University of Melbourne, Australia. My work and research focus on regional development, economic geography, and spatial data science.
 education:
   courses:
-  - course: M.I.T (Spatial Specialization)
+  - course: Master of Information Technology (Spatial Specialization)
     institution: The University of Melbourne
     year: 2016
-  - course: Bachelor of Science (Geography)
-    institution: Gadjah Mada University
+  - course: Bachelor of Science in Geography
+    institution: Universitas Gadjah Mada
     year: 2010
 email: "x"
 interests:
@@ -28,9 +28,6 @@ social:
 - icon: orcid
   icon_pack: ai
   link: https://orcid.org/0009-0002-3887-3504
-- icon: linkedin
-  icon_pack: ai
-  link: https://www.linkedin.com/in/bimoarvianto/
 - icon: github
   icon_pack: fab
   link: https://github.com/Arvibim

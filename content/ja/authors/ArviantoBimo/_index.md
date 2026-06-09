@@ -1,5 +1,5 @@
 ---
-bio: インドネシアのガジャマダ大学で地理学を学んだ後、国家開発計画省（Bappenas）で開発計画担当者として働いています。オーストラリアのメルボルン大学で空間情報を専門とする情報技術の修士号を取得しました。研究関心は、地域開発、経済地理学、空間データサイエンスです。
+bio: インドネシアの国家開発計画省（Bappenas）で開発計画担当者として働いています。ガジャマダ大学で地理学の学士号を、オーストラリアのメルボルン大学で空間情報を専門とする情報技術の修士号を取得しました。研究および業務では、地域開発、経済地理学、空間データサイエンスに重点を置いています。
 education:
   courses:
   - course: 情報技術 修士（空間情報専攻）
@@ -25,9 +25,6 @@ social:
 - icon: orcid
   icon_pack: ai
   link: https://orcid.org/0009-0002-3887-3504
-- icon: linkedin
-  icon_pack: ai
-  link: https://www.linkedin.com/in/bimoarvianto/
 - icon: github
   icon_pack: fab
   link: https://github.com/Arvibim
