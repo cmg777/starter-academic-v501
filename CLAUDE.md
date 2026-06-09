@@ -171,7 +171,7 @@ Older Python posts (pre-2025) were evaluated for bundling and **skipped**: they 
 
 # Claude Code Skills
 
-Thirteen skills: ten organized as Write/Review pairs across five artifact stages, plus three standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, and `translate-content` — the trilingual ES/JA translator documented in the Internationalization (i18n) section below). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
+Fourteen skills: ten organized as Write/Review pairs across five artifact stages, plus four standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, `translate-content` — the trilingual ES/JA translator documented in the Internationalization (i18n) section below — and `update-author-profile` for tri-lingual author-profile edits/creation). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
 
 ## Pipeline overview
 
@@ -418,6 +418,27 @@ Comprehensive audit of a generated interactive web app at `content/post/<slug>/w
 **Focus modes:** `pedagogy` (Dim 7), `code` (3+4), `accessibility` (5), `data` (4), `hugo` (8), `visual` (9+10). Combine with `and`/`,`. Omitted ⇒ all 10.
 
 **Reference files:** `references/review-checklist.md` (10 dimensions × per-check severity), `references/scoring-and-criteria.md` (1–10 rubric, verdict-changing rules), `references/report-template.md` (canonical REVIEW.md skeleton), `references/pedagogical-alignment.md` (n-gram overlap algorithm), `references/headless-browser.md` (Playwright bootstrap + audit script), `references/focus-modes.md`, `references/test-cases.md` (10 self-validation tests including 5 deliberate sabotage scenarios).
+
+## update-author-profile
+
+**Location:** `.claude/skills/update-author-profile/SKILL.md`
+
+Update an existing author profile under `content/authors/<Folder>/_index.md` (or scaffold a brand-new one) from **pasted YAML or freeform notes**, keeping the Spanish (`content/es/authors/`) and Japanese (`content/ja/authors/`) counterparts in sync in the same run — `social` links / `email` / URLs copied **verbatim**, prose (`bio`, `role`, `interests`, `education`, `organizations.name`) translated via the project glossary (ES formal `usted`; JA です・ます). Fixes YAML programming typos (curly quotes, wrong icon packs, malformed URLs) so the build never breaks, preserves indentation/key-order byte-for-byte, infers the target author from the name and confirms before editing (handling `_Master` / duplicate-name edge cases), then verifies with a full Hugo 0.111.3 build + `scripts/i18n-parity.sh --section authors`. Leaves changes in the working tree for review; never commits. It is the **edit/create counterpart** to `translate-content` and **reuses** that skill's `references/field-rules.md` (§authors) + `references/glossary.md` rather than forking them.
+
+**Invocation:**
+```
+/project:update-author-profile <author name-or-slug> [pasted YAML or freeform notes] [--create] [--no-build]
+```
+
+**Examples:**
+```
+/project:update-author-profile AbdulahRusli          # then paste the new front matter
+/project:update-author-profile "Abdulah Rusli"        # inferred from name, then confirmed
+/project:update-author-profile YangWenxuan  change github to <url>, role to "PhD student 2024-2028"
+/project:update-author-profile "Jane Doe (Kenya)" --create
+```
+
+**Reference files:** `references/edit-rules.md` (diff method, typo-fix catalog, author schema + valid icon set, target-author inference), `references/create-new.md` (new-author scaffolding across EN/ES/JA), `references/scope-and-verify.md` (SCOPE block + build/parity verify recipe); plus the reused `../translate-content/references/field-rules.md` and `../translate-content/references/glossary.md`.
 
 # Internationalization (i18n)
 

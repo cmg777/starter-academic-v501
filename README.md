@@ -270,7 +270,7 @@ Add a new `<details>` block to `content/projects/dashboards/index.md` following 
 
 ### Skill Architecture
 
-Thirteen Claude Code skills: ten organized as Write/Review pairs across five artifact stages, plus three standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, and `translate-content` — the trilingual ES/JA translator, see [Internationalization (i18n)](#internationalization-i18n)). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
+Fourteen Claude Code skills: ten organized as Write/Review pairs across five artifact stages, plus four standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, `translate-content` — the trilingual ES/JA translator, see [Internationalization (i18n)](#internationalization-i18n) — and `update-author-profile` for tri-lingual author-profile edits/creation). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use **progressive disclosure** via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/`.
 
 | Stage | Write skill | Review skill |
 |-------|-------------|--------------|
@@ -380,6 +380,13 @@ Produces a verdict (ACCEPT / MINOR REVISION / MAJOR REVISION) plus a 1–10 scor
 
 Focus modes for targeted re-reviews: `pedagogy`, `code` (Dim 3+4), `accessibility`, `data`, `hugo`, `visual` (Dim 9+10). Combine with `and`/`,`. `--no-browser` skips the Playwright pass (Dims 9+10 become "not audited").
 
+### Update Author Profile
+
+**Skill:** `/project:update-author-profile <author name-or-slug> [pasted YAML or freeform notes] [--create] [--no-build]`
+**Location:** `.claude/skills/update-author-profile/SKILL.md`
+
+Update an existing author profile under `content/authors/<Folder>/_index.md` (or scaffold a new one) from **pasted YAML or freeform notes**, keeping the Spanish (`content/es/authors/`) and Japanese (`content/ja/authors/`) counterparts in sync in the same run — `social` links/`email`/URLs copied **verbatim**, prose (`bio`, `role`, `interests`, `education`, `organizations.name`) translated via the project glossary (ES formal `usted`; JA です・ます). Fixes YAML programming typos (curly quotes, wrong icon packs, malformed URLs) so the build never breaks, preserves indentation and key order byte-for-byte, infers the target author from the name and confirms before editing (handling `_Master` / duplicate-name edge cases), then verifies with a full Hugo 0.111.3 build + `scripts/i18n-parity.sh --section authors`. Leaves changes in the working tree for review; never commits. The **edit/create counterpart** to `translate-content`, it **reuses** that skill's `references/field-rules.md` (§authors) + `references/glossary.md` instead of forking them.
+
 ### Full Pipeline Example
 
 ```
@@ -397,4 +404,4 @@ Focus modes for targeted re-reviews: `pedagogy`, `code` (Dim 3+4), `accessibilit
 
 ### New Author
 
-Create `content/authors/firstname-lastname/_index.md` with profile front matter and add `avatar.jpg`.
+Create `content/authors/firstname-lastname/_index.md` with profile front matter and add `avatar.jpg`. To update an existing profile (or scaffold a new one) with the Spanish/Japanese counterparts kept in sync automatically, use the `update-author-profile` skill described above.
