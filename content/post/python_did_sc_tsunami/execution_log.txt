@@ -1,0 +1,258 @@
+
+============================================================================
+LOADING DATA
+============================================================================
+  district panel    : (1750, 30)  (source: data/aceh_tsunami_district_panel.csv)
+  sub-district panel: (3864, 19)  (source: data/aceh_tsunami_subdistrict_panel.csv)
+
+============================================================================
+DATA — panel shapes and group sizes
+============================================================================
+District panel    : 1750 rows, 125 districts, years 1999-2012
+Sub-district panel: 3864 rows, 276 kecamatans
+
+Districts by region and treatment (2004 snapshot):
+flooded          control  flooded
+region_group                     
+Aceh                  13       10
+North Sumatra         24        2
+Rest of Sumatra       76        0
+
+NOTE: gdp_growth is missing in 1999 (no prior year) and for Subulussalam 2003-06
+(an administrative change), so estimators drop those rows.
+  saved -> descriptive_stats.csv
+  saved -> group_sizes.csv
+
+============================================================================
+EDA 1 — key districts over time (GDP indexed to 2004 = 100)
+============================================================================
+  saved -> python_did_sc_tsunami_eda_timeseries.png
+
+============================================================================
+EDA 2 — distribution of GDP growth by group and period
+============================================================================
+  saved -> python_did_sc_tsunami_group_boxplots.png
+
+============================================================================
+EDA 3 — treated vs control group-mean growth (the DiD motivator)
+============================================================================
+  saved -> python_did_sc_tsunami_group_means.png
+  saved -> eda_group_means.csv
+
+============================================================================
+DiD step 1 — the naive 2x2 (treated/control x before/after 2005)
+============================================================================
+
+Mean annual GDP growth in each cell:
+
+                       Before (<=2004)  After (>=2005)  After - Before
+Control (not flooded)           0.0519          0.0497         -0.0022
+Treated (flooded)               0.0567          0.0671          0.0103
+
+  DiD by hand = (treated change) - (control change) = +0.0125
+  -> over 2005-2012, flooded districts grew about 1.3 percentage points/year faster than controls (on average).
+
+  diff-diff DifferenceInDifferences: ATT = +0.0125 (SE 0.0142, p = 0.379, 95% CI [-0.0154, +0.0404])
+  A single 'after' window blends the 2005 destruction with the 2006-08
+  boom, so the average looks small. The dynamic DiD below unpacks it.
+  saved -> baseline_2x2.csv
+
+============================================================================
+DiD step 2 — dynamic TWFE difference-in-differences (Table 2)
+============================================================================
+
+pyfixest point estimates (Sumatra controls):
+   Pre-tsunami (2003-04)    +0.0172
+   Tsunami (2005)           -0.0792
+   Recovery (2006-08)       +0.0628
+   Post-recovery (2009-12)  +0.0114
+
+Table 2 — tsunami effect on district GDP growth
+(Conley spatial-HAC SE in parentheses; *** p<.01, ** p<.05, * p<.10)
+
+                        (1) Sumatra controls  (2) Rest of Sumatra (3) Aceh non-flooded
+Pre-tsunami (2003-04)       +0.0172 (0.0159)     +0.0176 (0.0162)     +0.0154 (0.0187)
+Tsunami (2005)           -0.0792*** (0.0240)  -0.0782*** (0.0247)  -0.0841*** (0.0281)
+Recovery (2006-08)        +0.0628** (0.0244)  +0.0682*** (0.0247)     +0.0310 (0.0281)
+Post-recovery (2009-12)     +0.0114 (0.0146)     +0.0132 (0.0147)     +0.0008 (0.0204)
+Observations                           1,283                1,118                  295
+
+Reading: flooded districts lost ~8% output in 2005 (col 1) but the
+2006-08 reconstruction boom more than offset it. Versus Aceh's own
+non-flooded districts (col 3) the recovery gap is smaller — reconstruction
+spilled over to neighbouring Aceh districts, attenuating the contrast.
+  saved -> did_twfe_table2.csv
+
+============================================================================
+DiD per-capita check (Table 8)
+============================================================================
+                        (1) Sumatra controls  (2) Rest of Sumatra (3) Aceh non-flooded
+Pre-tsunami (2003-04)       +0.0233 (0.0200)     +0.0239 (0.0203)     +0.0211 (0.0227)
+Tsunami (2005)              +0.0192 (0.0239)     +0.0209 (0.0247)     +0.0098 (0.0271)
+Recovery (2006-08)       +0.0827*** (0.0261)  +0.0924*** (0.0262)     +0.0251 (0.0303)
+Post-recovery (2009-12)     +0.0133 (0.0131)     +0.0151 (0.0134)     +0.0028 (0.0199)
+Observations                           1,283                1,118                  295
+
+Reading: no significant 2005 per-capita loss (output and population fell
+together), but a significant recovery gain (fewer people sharing a rebuilt
+economy) — so the result is not merely a mortality/denominator artifact.
+  saved -> did_percapita_table8.csv
+
+============================================================================
+DiD step 3 — event study (diff-diff MultiPeriodDiD)
+============================================================================
+
+Treated-control effect on GDP growth (relative to the 2000-02 baseline):
+
+  period  effect     se  p_value
+baseline  0.0000 0.0000      NaN
+     pre  0.0172 0.0160   0.2829
+ tsunami -0.0792 0.0260   0.0024
+recovery  0.0628 0.0247   0.0109
+ postrec  0.0114 0.0149   0.4442
+
+  Pre-tsunami ~ 0 and insignificant -> parallel-trends check PASSES.
+  2005 = -0.079 (destruction); 2006-08 = +0.063/yr (reconstruction boom).
+  Cumulative recovery ~ 3 x 0.063 = +0.188 dwarfs the -0.079 loss
+  -> 'recovery beyond the counterfactual trend'.
+  saved -> event_study_effects.csv
+  saved -> python_did_sc_tsunami_event_study.png
+
+============================================================================
+NIGHT-LIGHTS step 1 — Table 1: 2004 luminosity, flooded vs not
+============================================================================
+             obs  mean   std  min   max
+Non-flooded  208  2.36  4.41  0.0  36.0
+Flooded       68  5.79  8.31  0.0  39.0
+
+Flooded coastal sub-districts are about 2.5x brighter (denser, more active).
+  saved -> table1_luminosity.csv
+
+============================================================================
+NIGHT-LIGHTS step 2 — Table 3: continuous dose-response
+============================================================================
+
+Share of population flooded:
+   Pre-tsunami (2003-04)    +0.0052    (se 0.0034)
+   Tsunami (2005)           -0.0073**  (se 0.0035)
+   Recovery (2006-08)       +0.0160*** (se 0.0022)
+   Post-recovery (2009-12)  +0.0019    (se 0.0024)
+
+Share of area flooded:
+   Pre-tsunami (2003-04)    +0.5650    (se 0.3582)
+   Tsunami (2005)           -0.7275*   (se 0.3807)
+   Recovery (2006-08)       +1.6597*** (se 0.2455)
+   Post-recovery (2009-12)  +0.2702    (se 0.2498)
+
+Reading: the more flooded a sub-district, the stronger its luminosity
+rebound during reconstruction. Share-of-area has a tiny mean, so its
+coefficient is ~100x larger than share-of-population for the same story.
+  saved -> nightlights_dose_response.csv
+
+============================================================================
+NIGHT-LIGHTS step 3 — Table 4: effect by intensity quintile
+============================================================================
+
+Effect by quintile of flooding intensity (only the top quintile bites):
+
+   Share of population flooded: Q1=+0.0010  Q2=+0.0010  Q3=+0.0009  Q4=+0.0008  Q5=+0.0018**
+   Share of area flooded: Q1=+0.0015  Q2=+0.0010  Q3=+0.0011  Q4=+0.0003  Q5=+0.0018***
+  saved -> nightlights_quintiles.csv
+  saved -> python_did_sc_tsunami_nightlights_dose.png
+
+============================================================================
+SYNTHETIC CONTROL step 1 — Figure 2: raw GDP dynamics (index 2004=100)
+============================================================================
+  2012 index — treated 177, Aceh control 162, rest 142
+  saved -> python_did_sc_tsunami_gdp_dynamics.png
+
+============================================================================
+SYNTHETIC CONTROL step 2 — Figure 3: synthetic Aceh (mlsynth VanillaSC)
+============================================================================
+  Pre-tsunami fit  : RMSE = 0.485 (small -> good pre-2005 match)
+  Post-tsunami ATT : +32.9 GDP units (~ +18.3% above counterfactual)
+  Biggest donor weights:
+      JAMBI_D01      0.133
+      BABEL_D05      0.115
+      KEPRI_D05      0.111
+      KEPRI_D04      0.093
+      BENGKULU_D06   0.084
+      JAMBI_D05      0.080
+  saved -> synthetic_control_gap.csv
+  saved -> synthetic_control_weights.csv
+  saved -> synthetic_control_summary.csv
+  saved -> python_did_sc_tsunami_synthetic_control.png
+  saved -> python_did_sc_tsunami_sc_gap.png
+  saved -> python_did_sc_tsunami_sc_weights.png
+
+============================================================================
+SPATIAL step 1 — map: treatment is geographically clustered
+============================================================================
+  saved -> python_did_sc_tsunami_spatial_map.png
+
+============================================================================
+SPATIAL step 2 — Moran's I: is there spatial autocorrelation?
+============================================================================
+  Pooled within-year Moran's I = +0.065 (permutation p = 0.003)
+  Null mean ~ -0.008, SD ~ 0.021
+  -> nearby districts share within-year shocks; the iid assumption fails.
+
+============================================================================
+SPATIAL step 3 — four standard errors for the SAME DiD estimates
+============================================================================
+
+            coefficient  estimate  SE_naive  SE_clustered  SE_Conley  SE_ConleyHAC  t(HAC)
+  Pre-tsunami (2003-04)    0.0172    0.0144        0.0159     0.0144        0.0159    1.08
+         Tsunami (2005)   -0.0792    0.0236        0.0258     0.0216        0.0240   -3.30
+     Recovery (2006-08)    0.0628    0.0146        0.0244     0.0145        0.0244    2.57
+Post-recovery (2009-12)    0.0114    0.0109        0.0148     0.0106        0.0146    0.78
+
+  Conley-HAC SEs are 1.01x-1.68x the naive SEs.
+  Point estimates are identical; only honesty about uncertainty changes.
+  Under naive SEs the recovery effect would look ***; under the paper's
+  Conley-HAC SE it is only ** — naive inference would overstate confidence.
+  saved -> conley_se_comparison.csv
+
+============================================================================
+SPATIAL step 4 — how the Conley SE depends on the distance cutoff
+============================================================================
+     0 km : SE = 0.0244 (serial only, no spatial)
+    25 km : SE = 0.0244
+    50 km : SE = 0.0244
+   100 km : SE = 0.0244
+   150 km : SE = 0.0242
+   200 km : SE = 0.0238
+   300 km : SE = 0.0234
+  saved -> conley_cutoff_sensitivity.csv
+  saved -> python_did_sc_tsunami_conley_cutoff.png
+
+============================================================================
+ROBUSTNESS — placebo, city vs rural, and a summary table
+============================================================================
+
+Placebo (neighbours of flooded as fake-treated) — expect NO effect:
+   Pre-tsunami (2003-04)    +0.0072    (se 0.0134)
+   Tsunami (2005)           +0.0025    (se 0.0318)
+   Recovery (2006-08)       +0.0064    (se 0.0255)
+   Post-recovery (2009-12)  -0.0213    (se 0.0147)
+
+City districts:
+   Pre-tsunami (2003-04)    +0.0144    (se 0.0191)
+   Tsunami (2005)           -0.0424    (se 0.0510)
+   Recovery (2006-08)       +0.1226*** (se 0.0340)
+   Post-recovery (2009-12)  +0.0141    (se 0.0245)
+
+Rural districts:
+   Pre-tsunami (2003-04)    +0.0181    (se 0.0190)
+   Tsunami (2005)           -0.0883*** (se 0.0252)
+   Recovery (2006-08)       +0.0479*   (se 0.0264)
+   Post-recovery (2009-12)  +0.0105    (se 0.0171)
+
+Reading: the placebo finds nothing (the effect is not a spatial spillover);
+rural districts took the big 2005 hit, cities led the recovery (but only 2
+flooded city districts -> imprecise, as the paper cautions).
+  saved -> robustness_results.csv
+
+============================================================================
+=== Script completed successfully ===
+============================================================================

@@ -1,0 +1,303 @@
+---
+title: "Evaluating the Economic Impact of Natural Disasters: the Aceh Tsunami"
+subtitle: "DiD, event study, night-lights dose-response, synthetic control, and Conley spatial standard errors in Python"
+author: "Carlos Mendez"
+date: "2026-06-09"
+jupyter: python_did_sc_tsunami-tutorial
+format:
+  html:
+    theme: cosmo
+    embed-resources: true
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    code-summary: "Show code"
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 150
+    include-in-header:
+      text: |
+        <style>
+          img, .cell-output-display img { max-width: 100%; height: auto; }
+        </style>
+execute:
+  warning: false
+  message: false
+---
+
+::: {.callout-important}
+## How to render this tutorial
+
+**Easiest (one click).** From the bundle ZIP, double-click `render.command` (macOS) or `render.bat` (Windows). The wrapper runs setup and then `quarto render`, opening the result in your browser.
+
+**Manual.** From a terminal in the bundle folder:
+
+```bash
+python3 setup_env.py            # one-time: builds .venv/, registers kernel, installs packages
+quarto render tutorial.qmd      # or click "Render" in Positron
+```
+
+`setup_env.py` is idempotent — re-running it later is a fast no-op. The first run installs `mlsynth` from GitHub, so it needs internet.
+
+**Prerequisites:** Python 3.10–3.13 and a working `quarto` install.
+:::
+
+> **Synthetic data.** This tutorial runs on *synthetic, calibrated* data created for teaching. It reproduces the findings of Heger & Neumayer (2019) — the signs, the statistical significance, and the approximate magnitudes of the key coefficients; magnitudes can differ slightly. Learn the methods, not new facts about Aceh. Full write-up with equations and the reproduction audit: <https://carlos-mendez.org/post/python_did_sc_tsunami/>.
+
+```{python}
+#| label: verify-env
+# Confirm the kernel is running inside the bundle's hermetic .venv with the
+# pinned package versions (created by setup_env.py via the pre-render hook).
+import sys, importlib.metadata
+from pathlib import Path
+
+PINNED = {"numpy": "2.3.5", "pandas": "3.0.1", "matplotlib": "3.10.8",
+          "scipy": "1.17.1", "pyfixest": "0.50.1", "diff-diff": "3.5.2"}
+py = Path(sys.executable).resolve()
+assert ".venv" in py.parts, (
+    f"Kernel is running outside the tutorial .venv (sys.executable={py}). "
+    "Run `python3 setup_env.py`, then re-render so the venv kernel is used.")
+print(f"Python: {py}")
+for pkg, want in PINNED.items():
+    have = importlib.metadata.version(pkg)
+    print(f"  {pkg:12s} {have:10s} {'OK' if have == want else f'(pinned {want})'}")
+print(f"  mlsynth      {importlib.metadata.version('mlsynth'):10s} (git)")
+```
+
+## 1. Setup
+
+```{python}
+import numpy as np, pandas as pd, matplotlib.pyplot as plt
+import pyfixest as pf, diff_diff as dd
+from mlsynth import VanillaSC
+np.random.seed(42)
+STEEL_BLUE, WARM_ORANGE, TEAL = "#6a9bcc", "#d97757", "#00d4c8"
+LIGHT_TEXT = "#444"  # light-theme axis text for notebook display
+```
+
+## 2. The DiD design helpers
+
+The post period is split into four event-time windows — **pre** (2003-04),
+**tsunami** (2005), **recovery** (2006-08), **post-recovery** (2009-12) — all relative
+to the omitted 2000-02 baseline.
+
+```{python}
+PERIOD_TO_TERM = {"pre": "D_pre", "tsunami": "D_2005",
+                  "recovery": "D_recov", "postrec": "D_post"}
+DID_TERMS = ["D_pre", "D_2005", "D_recov", "D_post"]
+TERM_LABELS = {"D_pre": "Pre (2003-04)", "D_2005": "Tsunami (2005)",
+               "D_recov": "Recovery (2006-08)", "D_post": "Post-rec (2009-12)"}
+
+def make_did_terms(df, treat_col):
+    out = df.copy()
+    treat = out[treat_col].astype(float)
+    for period, term in PERIOD_TO_TERM.items():
+        out[term] = treat * (out["period"] == period).astype(float)
+    return out
+
+def did_formula(outcome, unit_fe, time_fe="year"):
+    return f"{outcome} ~ {' + '.join(DID_TERMS)} | {unit_fe} + {time_fe}"
+
+def stars(t):
+    a = abs(t)
+    return "***" if a > 2.576 else "**" if a > 1.96 else "*" if a > 1.645 else ""
+
+def main_sample(d):
+    return d[d.region_group != "North Sumatra"]
+```
+
+## 3. Load the two panels
+
+```{python}
+district = pd.read_csv("data/aceh_tsunami_district_panel.csv")
+subdistrict = pd.read_csv("data/aceh_tsunami_subdistrict_panel.csv")
+print("district:", district.shape, "| subdistrict:", subdistrict.shape)
+print(district.groupby(["region_group", "flooded"]).size().unstack("flooded", fill_value=0))
+```
+
+## 4. Exploratory analysis
+
+Group-mean growth, treated vs control — the picture difference-in-differences was made for.
+
+```{python}
+samp = main_sample(district).dropna(subset=["gdp_growth"]).copy()
+means = (samp.groupby(["year", "flooded"])["gdp_growth"].mean()
+         .unstack("flooded").rename(columns={0: "Control", 1: "Treated (flooded)"}))
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.plot(means["Control"], "--o", color=STEEL_BLUE, label="Control")
+ax.plot(means["Treated (flooded)"], "-o", color=WARM_ORANGE, label="Treated (flooded)")
+ax.axvline(2004.5, color="grey", ls=":"); ax.set_xlabel("Year")
+ax.set_ylabel("Mean GDP growth"); ax.legend(); plt.show()
+```
+
+## 5. Difference-in-differences
+
+### 5.1 The 2x2 intuition
+$$\widehat{\text{DiD}} = (\bar g_{\text{treat,after}} - \bar g_{\text{treat,before}}) - (\bar g_{\text{ctrl,after}} - \bar g_{\text{ctrl,before}})$$
+
+```{python}
+sample = make_did_terms(main_sample(district), "flooded").dropna(subset=["gdp_growth"])
+cell = sample.groupby(["flooded", "post"])["gdp_growth"].mean().unstack("post")
+cell.columns, cell.index = ["Before", "After"], ["Control", "Treated"]
+cell["change"] = cell["After"] - cell["Before"]
+print(cell.round(4))
+res = dd.DifferenceInDifferences(cluster="district_id").fit(
+    sample, outcome="gdp_growth", treatment="flooded", time="post")
+print(f"\nDiD ATT = {res.att:+.4f} (SE {res.se:.4f}, p = {res.p_value:.3f})")
+```
+
+### 5.2 The dynamic DiD (the paper's headline)
+$$\Delta Y_{it} = \beta_1 D_i\mathbf{1}[\text{pre}] + \beta_2 D_i\mathbf{1}[2005] + \beta_3 D_i\mathbf{1}[\text{recovery}] + \beta_4 D_i\mathbf{1}[\text{post}] + \alpha_i + \gamma_t + \varepsilon_{it}$$
+
+```{python}
+m = pf.feols(did_formula("gdp_growth", "district_id"),
+             data=make_did_terms(main_sample(district), "flooded"),
+             vcov={"CRV1": "district_id"})
+m.tidy().loc[DID_TERMS, ["Estimate", "Std. Error", "Pr(>|t|)"]].round(4)
+```
+
+### 5.3 Event study
+
+```{python}
+mp = dd.MultiPeriodDiD(cluster="district_id").fit(
+    sample, outcome="gdp_growth", treatment="flooded", time="period",
+    reference_period="baseline", absorb=["district_id"])
+order = ["pre", "tsunami", "recovery", "postrec"]
+eff = [0.0] + [mp.period_effects[p].effect for p in order]
+se = [0.0] + [mp.period_effects[p].se for p in order]
+x = np.arange(5)
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.axhline(0, color="grey", lw=1); ax.axvline(2, color=STEEL_BLUE, ls="--")
+ax.errorbar(x, eff, yerr=1.96*np.array(se), fmt="o-", color=WARM_ORANGE, capsize=4)
+ax.set_xticks(x); ax.set_xticklabels(["Baseline", "Pre", "2005", "Recovery", "Post"])
+ax.set_ylabel("Effect on GDP growth"); plt.show()
+for p in order:
+    e = mp.period_effects[p]
+    print(f"{p:9s} {e.effect:+.4f} (se {e.se:.4f}, p {e.p_value:.3f})")
+```
+
+## 6. Night-lights dose-response (sub-district)
+
+Log-summed luminosity: $\text{NL}_{ct} = \log(\sum_n (\text{DN}_{nct} + 0.001))$. We
+interact the *continuous* flood intensity with the event-time periods.
+
+```{python}
+snap = subdistrict[subdistrict.year == 2004]
+print(snap.groupby("flooded")["avg_luminosity"].agg(["count","mean","std"]).round(2))
+
+def nl_fit(treat):
+    df = make_did_terms(subdistrict, treat)
+    return pf.feols("nl_growth ~ D_pre + D_2005 + D_recov + D_post | kecamatan_id + year",
+                    data=df, vcov={"CRV1": "kecamatan_id"})
+
+print("\nShare of population flooded:")
+print(nl_fit("share_pop_flooded").tidy().loc[DID_TERMS, ["Estimate","Std. Error","Pr(>|t|)"]].round(4))
+```
+
+## 7. Synthetic control (mlsynth VanillaSC)
+
+```{python}
+treated = (district[(district.flooded == 1) & (district.region_group == "Aceh")]
+           .groupby("year", as_index=False)["gdp_const_usd_m"].mean()
+           .assign(unitid="Aceh (flooded)").rename(columns={"year":"time","gdp_const_usd_m":"outcome"}))
+donors = (district[district.region_group == "Rest of Sumatra"][["district_id","year","gdp_const_usd_m"]]
+          .rename(columns={"district_id":"unitid","year":"time","gdp_const_usd_m":"outcome"}))
+panel = pd.concat([treated[["unitid","time","outcome"]], donors], ignore_index=True)
+panel["treat"] = ((panel.unitid == "Aceh (flooded)") & (panel.time >= 2005)).astype(int)
+
+out = VanillaSC({"df": panel, "outcome":"outcome","treat":"treat",
+                 "unitid":"unitid","time":"time","display_graphs": False}).fit().model_dump()
+ts = out["time_series"]
+yrs = np.asarray(ts["time_periods"]); obs = np.asarray(ts["observed_outcome"], float).ravel()
+syn = np.asarray(ts["counterfactual_outcome"], float).ravel()
+print(f"pre-RMSE = {out['fit_diagnostics']['rmse_pre']:.3f}  |  "
+      f"ATT = +{out['effects']['att']:.1f} ({out['effects']['att_percent']:+.1f}%)")
+fig, ax = plt.subplots(figsize=(9, 5))
+ax.plot(yrs, obs, color=WARM_ORANGE, lw=2.4, label="Treated: flooded Aceh")
+ax.plot(yrs, syn, "--", color="black", lw=1.8, label="Synthetic Aceh")
+ax.fill_between(yrs, obs, syn, where=(yrs >= 2005), color=TEAL, alpha=0.2, label="effect (gap)")
+ax.axvline(2004.5, color="grey", ls=":"); ax.legend(); ax.set_ylabel("GDP (const USD, m)"); plt.show()
+```
+
+## 8. Conley spatial standard errors
+
+All 10 treated districts cluster in one corner of Sumatra, so naive standard errors are
+too small. The estimator below returns the four DiD coefficients with four standard
+errors each (naive / clustered / Conley spatial / Conley-HAC).
+
+```{python}
+def haversine_matrix(lat, lon):
+    lat = np.radians(np.asarray(lat, float)); lon = np.radians(np.asarray(lon, float))
+    dphi = lat[None, :] - lat[:, None]; dlmb = lon[None, :] - lon[:, None]
+    a = np.sin(dphi/2)**2 + np.cos(lat)[:, None]*np.cos(lat)[None, :]*np.sin(dlmb/2)**2
+    return 2*6371.0*np.arcsin(np.sqrt(np.clip(a, 0, 1)))
+
+def morans_i(x, W):
+    x = np.asarray(x, float); xc = x - x.mean()
+    return (len(x)/W.sum()) * (xc @ (W @ xc)) / (xc @ xc)
+
+def _two_way_within(Z, unit, time, n_iter=60):
+    Z = Z.astype(float).copy()
+    for _ in range(n_iter):
+        for g in (unit, time):
+            tmp = pd.DataFrame(Z); tmp["_g"] = g
+            Z = Z - tmp.groupby("_g").transform("mean").to_numpy()
+    return Z
+
+def conley_did(sample, outcome="gdp_growth", treat="flooded", unit="district_id", cutoff=100.0):
+    df = make_did_terms(sample, treat).dropna(subset=[outcome]).copy()
+    Z = df[[outcome] + DID_TERMS].to_numpy(float)
+    u = df[unit].to_numpy(); yr = df["year"].to_numpy()
+    lat = df["latitude"].to_numpy(); lon = df["longitude"].to_numpy()
+    Zw = _two_way_within(Z, u, yr); y, X = Zw[:, 0], Zw[:, 1:]
+    XtXi = np.linalg.inv(X.T @ X); beta = XtXi @ (X.T @ y); e = y - X @ beta; k = X.shape[1]
+    se = lambda meat: np.sqrt(np.maximum(np.diag(XtXi @ meat @ XtXi), 0.0))
+    se_n = se(X.T @ (X * (e**2)[:, None]))
+    mc = np.zeros((k, k))
+    for uu in np.unique(u):
+        m = u == uu; s = X[m].T @ e[m]; mc += np.outer(s, s)
+    bart = lambda D: (np.eye(D.shape[0]) if cutoff <= 0 else np.maximum(0.0, 1.0 - D/cutoff))
+    ms = np.zeros((k, k))
+    for t in np.unique(yr):
+        m = yr == t; Wt = bart(haversine_matrix(lat[m], lon[m]))
+        ms += X[m].T @ (Wt * np.outer(e[m], e[m])) @ X[m]
+    D = haversine_matrix(lat, lon)
+    su = u[:, None] == u[None, :]; sy = yr[:, None] == yr[None, :]
+    off = np.where(sy & ~su, bart(D), 0.0) if cutoff > 0 else np.zeros_like(D)
+    W = su.astype(float) + off
+    se_h = se(X.T @ (W * np.outer(e, e)) @ X)
+    return pd.DataFrame({"coef": [TERM_LABELS[t] for t in DID_TERMS], "estimate": beta,
+                         "SE_naive": se_n, "SE_clustered": se(mc),
+                         "SE_Conley": se(ms), "SE_ConleyHAC": se_h})
+
+tab = conley_did(main_sample(district))
+tab["t(HAC)"] = (tab.estimate / tab.SE_ConleyHAC).round(2)
+print(tab.round(4).to_string(index=False))
+```
+
+## 9. Robustness: placebo + city vs rural
+
+The placebo (neighbours of flooded districts as fake-treated) should find nothing.
+
+```{python}
+print("Placebo (neighbours):")
+print(conley_did(district[district.flooded == 0], treat="neighbour_of_flooded")
+      [["coef","estimate","SE_ConleyHAC"]].round(4).to_string(index=False))
+for dtype, tag in [("Kota","City"), ("Kabupaten","Rural")]:
+    print(f"\n{tag} districts:")
+    s = main_sample(district); s = s[s.district_type == dtype]
+    print(conley_did(s)[["coef","estimate","SE_ConleyHAC"]].round(4).to_string(index=False))
+```
+
+## Takeaways
+
+- 2005 shock **-0.079\*\*\***; recovery **+0.063\*\***; synthetic-control gap **+18%**.
+- Only the worst-hit night-lights quintile rebounds significantly (dose-response).
+- Conley spatial-HAC SEs roughly double the recovery SE (0.0146 -> 0.0244): an honest
+  ** instead of a spurious ***. The point estimate never moves.
+- Small treated N (10 districts) + synthetic data + parallel-trends identification:
+  strong evidence, stated with caveats.
+
+Full discussion, equations, and the reproduction audit:
+<https://carlos-mendez.org/post/python_did_sc_tsunami/>
+

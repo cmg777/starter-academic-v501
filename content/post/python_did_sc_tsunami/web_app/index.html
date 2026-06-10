@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Aceh Tsunami: DiD &amp; Synthetic Control — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Evaluating the Economic Impact of Natural Disasters: the Aceh Tsunami'. A parallel-trends animation, a forest plot of the real estimates, a tsunami DGP simulator, and a naive-vs-Conley standard-error explorer.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Aceh Tsunami — Interactive Causal-Inference Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Evaluating the Economic Impact of Natural Disasters</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button data-tab="overview" class="active">1 · The idea</button>
+  <button data-tab="forest">2 · The estimates</button>
+  <button data-tab="simulator">3 · Tsunami simulator</button>
+  <button data-tab="inference">4 · Honest standard errors</button>
+</nav>
+
+<main>
+
+<!-- TAB 1 ─────────────────────────────────────────────────────────── -->
+<section id="pane-overview" class="tab-pane active">
+  <h2>Did a disaster leave Aceh richer — and how would we ever know?</h2>
+  <p class="lede">
+    The 2004 tsunami flooded some Aceh districts and spared others by accident of coastal
+    geography. Comparing the two — before and after — is a natural experiment. Four ideas run
+    through this lab:
+  </p>
+  <div class="pedagogy" style="margin-bottom:18px;">
+    <h4>The four takeaways</h4>
+    <ul>
+      <li><strong>Disaster → a higher long-run path.</strong> Flooded districts lost ~8% of output in 2005 but grew +6.3%/yr in 2006–08, ending permanently higher — confirmed by a synthetic control (+18%).</li>
+      <li><strong>A single "after" hides the story.</strong> The pooled 2×2 estimate was an insignificant +0.0125; only splitting time into event-time windows revealed the dip-then-overshoot.</li>
+      <li><strong>Clustered treatment demands honest inference.</strong> With all 10 treated districts in one corner of the map, Conley spatial standard errors roughly double the recovery SE — a spurious *** becomes an honest **.</li>
+      <li><strong>Intensity concentrates the effect.</strong> Only the worst-hit places rebound the most — the average is driven by where damage, and reconstruction, was greatest.</li>
+    </ul>
+  </div>
+
+  <div class="chart-area">
+    <div id="anim"></div>
+    <div class="chart-caption">Treated (flooded) vs control group-mean GDP growth, 2000–2012. Parallel before 2005, then the treated line dives (−0.03 in 2005) and overshoots (+0.12 in 2007); the shaded area is the difference-in-differences gap.</div>
+  </div>
+
+  <h3>Key concepts</h3>
+  <details class="gloss"><summary>Difference-in-Differences (DiD)</summary>
+    <div class="gloss-body">Compare the <em>change</em> in the treated group to the <em>change</em> in the control group; the difference of those differences is the causal estimate. It nets out anything permanent about a district and any trend shared by the whole country.</div>
+  </details>
+  <details class="gloss"><summary>Parallel trends</summary>
+    <div class="gloss-body">DiD's identifying assumption: absent the tsunami, flooded and non-flooded districts would have grown by the same amount on average. Tested here by the flat pre-2005 lines and the near-zero pre-tsunami coefficient (<em>+0.0172, ns</em>).</div>
+  </details>
+  <details class="gloss"><summary>ATT — average treatment effect on the treated</summary>
+    <div class="gloss-body">The effect <em>on the flooded districts</em>, not on a district chosen at random. Both DiD and synthetic control target the ATT.</div>
+  </details>
+  <details class="gloss"><summary>Conley spatial-HAC standard errors</summary>
+    <div class="gloss-body">Standard errors that let a district's errors correlate with <em>nearby</em> districts in the same year (spatial) and with itself over time (serial). They are larger — and more honest — than naive errors when the treated units cluster in space. Explore them in Tab 4.</div>
+  </details>
+</section>
+
+<!-- TAB 2 ─────────────────────────────────────────────────────────── -->
+<section id="pane-forest" class="tab-pane">
+  <h2>The real estimates, with honest confidence intervals</h2>
+  <p class="lede">Every coefficient from the post, with its Conley spatial-HAC 95% interval. A bar that
+    crosses the dashed zero line is not statistically distinguishable from "no effect". Toggle the
+    rows; hover a bar for its exact estimate, SE, and t-statistic.</p>
+  <div class="method-toggle" id="forest-toggles" style="margin-bottom:16px;"></div>
+  <div class="chart-area">
+    <div id="forest-chart"></div>
+    <div class="chart-caption">Teal = significantly positive, orange = significantly negative, grey = not significant (95%). Estimates are dynamic-DiD coefficients on annual growth.</div>
+  </div>
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li>The <strong>2005 shock</strong> and the <strong>recovery</strong> are both significant for district GDP — but the recovery bar sits much further from zero relative to its width.</li>
+      <li><strong>Per-capita</strong> shows no significant 2005 loss (output and population fell together) yet a strong recovery gain — not a denominator artifact.</li>
+      <li>The <strong>placebo</strong> (neighbours of flooded districts) bars straddle zero — exactly what a credible design should find.</li>
+      <li><strong>Rural</strong> districts took the 2005 hit; <strong>city</strong> districts led the recovery (but with only 2 flooded cities, that bar is wide).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- TAB 3 ─────────────────────────────────────────────────────────── -->
+<section id="pane-simulator" class="tab-pane">
+  <h2>Simulate a tsunami: can DiD recover the truth?</h2>
+  <p class="lede">Generate a synthetic district panel with a known 2005 shock and recovery boom, then
+    let the dynamic DiD estimate them. Shrink the number of treated districts toward the real study's
+    <strong>10</strong> and watch the estimate stay centered on the truth but scatter more — the
+    small-sample fragility behind the post's wide standard errors.</p>
+  <div class="controls">
+    <div class="control"><label>Treated districts <span class="value" id="v-ntreated">10</span></label>
+      <input type="range" id="s-ntreated" min="5" max="60" step="1" value="10">
+      <div class="hint">The real study had only 10 — that is the whole precision problem.</div></div>
+    <div class="control"><label>True 2005 shock <span class="value" id="v-shock">-0.080</span></label>
+      <input type="range" id="s-shock" min="-0.15" max="0" step="0.005" value="-0.08">
+      <div class="hint">The destruction effect (paper: ≈ −0.079).</div></div>
+    <div class="control"><label>True recovery / yr <span class="value" id="v-recovery">+0.063</span></label>
+      <input type="range" id="s-recovery" min="0" max="0.12" step="0.005" value="0.063">
+      <div class="hint">The reconstruction boom (paper: ≈ +0.063).</div></div>
+    <div class="control"><label>Noise (SD) <span class="value" id="v-noise">0.06</span></label>
+      <input type="range" id="s-noise" min="0.02" max="0.10" step="0.005" value="0.06">
+      <div class="hint">Idiosyncratic district-year variation.</div></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">Recovery — your estimate</div><div class="stat-value teal" id="st-rec-est">—</div><div class="stat-sub">one simulated draw</div></div>
+    <div class="stat"><div class="stat-label">Recovery — the truth</div><div class="stat-value" id="st-rec-true">—</div><div class="stat-sub">what you set</div></div>
+    <div class="stat"><div class="stat-label">2005 shock — estimate</div><div class="stat-value orange" id="st-shock-est">—</div><div class="stat-sub">one simulated draw</div></div>
+  </div>
+  <div class="chart-area">
+    <div id="sim-chart"></div>
+    <div class="chart-caption">One simulated draw: the dynamic-DiD estimate (orange) against the true injected effect (steel dashed). Move a slider to redraw.</div>
+  </div>
+  <button class="action" id="run-sims">▶ Run 200 simulations</button>
+  <div id="sim-hist-wrap" style="display:none; margin-top:18px;">
+    <div class="stat-row">
+      <div class="stat"><div class="stat-label">Spread of the estimate (SD)</div><div class="stat-value teal" id="st-sd">—</div><div class="stat-sub" id="st-sd-msg"></div></div>
+    </div>
+    <div class="chart-area">
+      <div id="sim-hist"></div>
+      <div class="chart-caption">Sampling distribution of the recovery estimate across 200 draws. Orange line = the truth; dashed = the mean. The wider this is, the larger the honest standard error.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TAB 4 ─────────────────────────────────────────────────────────── -->
+<section id="pane-inference" class="tab-pane">
+  <h2>The point estimate never moves — only your honesty about it</h2>
+  <p class="lede">All 10 treated districts sit in one corner of Sumatra, so their shocks are not
+    independent (Moran's I = +0.065, p = 0.003). As you dial up the spatial correlation, the recovery
+    effect's standard error inflates from naive toward Conley spatial-HAC — and the significance verdict
+    changes — while the estimate stays fixed at <strong>+0.0628</strong>.</p>
+  <div class="controls">
+    <div class="control"><label>Spatial correlation strength <span class="value" id="v-rho">0.95</span></label>
+      <input type="range" id="s-rho" min="0" max="1" step="0.01" value="0.95">
+      <div class="hint">0 = treat every district as independent (naive). 1 = the paper's full Conley spatial-HAC adjustment.</div></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">Recovery estimate</div><div class="stat-value" id="st-est" >+0.0628</div><div class="stat-sub">fixed — never changes</div></div>
+    <div class="stat"><div class="stat-label">Effective SE</div><div class="stat-value teal" id="st-eff-se">—</div><div class="stat-sub">naive → Conley-HAC</div></div>
+    <div class="stat"><div class="stat-label">t-statistic</div><div class="stat-value" id="st-tstat">—</div><div class="stat-sub">estimate ÷ SE</div></div>
+    <div class="stat"><div class="stat-label">Significance</div><div class="stat-value teal" id="st-sig">—</div><div class="stat-sub" id="st-sig-msg"></div></div>
+  </div>
+  <div class="chart-area">
+    <div id="inf-chart"></div>
+    <div class="chart-caption">The 95% confidence interval for the recovery effect widens as spatial correlation rises; the four bars are the standard-error recipes computed in the post.</div>
+  </div>
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li>Drag the slider to <strong>0</strong>: the naive SE (0.0146) gives a t of 4.3 and <strong>***</strong> — a confidence the data do not support.</li>
+      <li>Drag to <strong>1</strong>: the Conley-HAC SE (0.0244) gives a t of 2.57 and an honest <strong>**</strong>.</li>
+      <li>The orange dot — the point estimate — never moves. Spatial standard errors change <em>inference</em>, not the estimate.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Evaluating the Economic Impact of Natural Disasters: the Aceh Tsunami</em> ·
+  D3.js v7 · synthetic teaching data · no backend, no tracking ·
+  <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

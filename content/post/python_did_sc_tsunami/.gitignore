@@ -1,0 +1,5 @@
+# Local working material only — never publish/commit.
+# Holds the copyrighted source PDF, the synthetic-data generator, and the
+# replication codebase used to build this tutorial. The two data CSVs the post
+# actually loads live in data/ (committed); everything here stays local.
+reference/

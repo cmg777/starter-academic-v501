@@ -1,0 +1,9 @@
+coefficient,measure,estimate,se,p_value
+Pre-tsunami (2003-04),Share of population flooded,0.005236,0.003435,0.128631
+Tsunami (2005),Share of population flooded,-0.007278,0.003479,0.037393
+Recovery (2006-08),Share of population flooded,0.015989,0.00221,0.0
+Post-recovery (2009-12),Share of population flooded,0.001901,0.002403,0.429634
+Pre-tsunami (2003-04),Share of area flooded,0.564958,0.358228,0.115924
+Tsunami (2005),Share of area flooded,-0.727493,0.380744,0.057081
+Recovery (2006-08),Share of area flooded,1.659678,0.245532,0.0
+Post-recovery (2009-12),Share of area flooded,0.270199,0.249816,0.280382

@@ -1,0 +1,3 @@
+group,obs,mean,std,min,max
+Non-flooded,208,2.36,4.41,0.0,36.0
+Flooded,68,5.79,8.31,0.0,39.0

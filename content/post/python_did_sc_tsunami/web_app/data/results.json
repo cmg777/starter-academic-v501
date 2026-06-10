@@ -1,0 +1,36 @@
+{
+  "_note": "Real numbers from the post's script.py (synthetic, calibrated data). See content/post/python_did_sc_tsunami/.",
+  "trajectories": {
+    "years": [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012],
+    "control":  [0.0554, 0.0519, 0.0528, 0.0625, 0.0368, 0.0517, 0.0479, 0.0468, 0.0521, 0.0352, 0.0624, 0.0553, 0.0463],
+    "treated":  [0.0495, 0.0613, 0.0434, 0.0753, 0.0542, -0.0295, 0.1053, 0.1249, 0.0992, 0.0377, 0.0731, 0.0716, 0.0544]
+  },
+  "event_study": [
+    {"period": "Baseline\n2000-02", "estimate": 0.0,     "se": 0.0},
+    {"period": "Pre\n2003-04",       "estimate": 0.0172,  "se": 0.0160},
+    {"period": "Tsunami\n2005",      "estimate": -0.0792, "se": 0.0260},
+    {"period": "Recovery\n2006-08",  "estimate": 0.0628,  "se": 0.0247},
+    {"period": "Post-rec\n2009-12",  "estimate": 0.0114,  "se": 0.0149}
+  ],
+  "estimates": [
+    {"group": "District GDP growth", "label": "2005 shock",        "estimate": -0.0792, "se": 0.0240},
+    {"group": "District GDP growth", "label": "Recovery 2006-08",  "estimate": 0.0628,  "se": 0.0244},
+    {"group": "GDP per capita",      "label": "2005 shock",        "estimate": 0.0192,  "se": 0.0239},
+    {"group": "GDP per capita",      "label": "Recovery 2006-08",  "estimate": 0.0827,  "se": 0.0261},
+    {"group": "Placebo (neighbours)","label": "2005 shock",        "estimate": 0.0025,  "se": 0.0318},
+    {"group": "Placebo (neighbours)","label": "Recovery 2006-08",  "estimate": 0.0064,  "se": 0.0255},
+    {"group": "City districts",      "label": "2005 shock",        "estimate": -0.0424, "se": 0.0510},
+    {"group": "City districts",      "label": "Recovery 2006-08",  "estimate": 0.1226,  "se": 0.0341},
+    {"group": "Rural districts",     "label": "2005 shock",        "estimate": -0.0883, "se": 0.0252},
+    {"group": "Rural districts",     "label": "Recovery 2006-08",  "estimate": 0.0479,  "se": 0.0264}
+  ],
+  "se_comparison": [
+    {"coef": "Pre 2003-04",   "estimate": 0.0172,  "naive": 0.0144, "clustered": 0.0159, "conley": 0.0144, "hac": 0.0159},
+    {"coef": "Tsunami 2005",  "estimate": -0.0792, "naive": 0.0236, "clustered": 0.0258, "conley": 0.0216, "hac": 0.0240},
+    {"coef": "Recovery 06-08","estimate": 0.0628,  "naive": 0.0146, "clustered": 0.0244, "conley": 0.0145, "hac": 0.0244},
+    {"coef": "Post 2009-12",  "estimate": 0.0114,  "naive": 0.0109, "clustered": 0.0148, "conley": 0.0106, "hac": 0.0146}
+  ],
+  "truth": {"shock_2005": -0.0792, "recovery": 0.0628, "n_treated": 10, "n_control": 89},
+  "synth": {"att_pct": 18.3, "rmse_pre": 0.485},
+  "moran": {"i": 0.065, "p": 0.003}
+}

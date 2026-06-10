@@ -1,0 +1,13 @@
+check,coefficient,estimate,se_naive,se_clustered,se_conley,se_hac,n
+placebo (neighbours),Pre-tsunami (2003-04),0.00723,0.01306,0.01288,0.01353,0.01336,1465
+placebo (neighbours),Tsunami (2005),0.00249,0.03547,0.03246,0.03484,0.03176,1465
+placebo (neighbours),Recovery (2006-08),0.00641,0.01682,0.02542,0.01686,0.02545,1465
+placebo (neighbours),Post-recovery (2009-12),-0.0213,0.01109,0.01428,0.01159,0.01467,1465
+city districts,Pre-tsunami (2003-04),0.01444,0.02464,0.01866,0.02495,0.01906,295
+city districts,Tsunami (2005),-0.04239,0.07267,0.07546,0.04681,0.05104,295
+city districts,Recovery (2006-08),0.12257,0.03178,0.03829,0.02652,0.03405,295
+city districts,Post-recovery (2009-12),0.01409,0.02279,0.02249,0.02482,0.02453,295
+rural districts,Pre-tsunami (2003-04),0.01809,0.01656,0.01931,0.01617,0.01898,988
+rural districts,Tsunami (2005),-0.08826,0.02269,0.02496,0.02296,0.0252,988
+rural districts,Recovery (2006-08),0.04793,0.01545,0.02654,0.01529,0.02645,988
+rural districts,Post-recovery (2009-12),0.01053,0.012,0.01761,0.01125,0.01711,988

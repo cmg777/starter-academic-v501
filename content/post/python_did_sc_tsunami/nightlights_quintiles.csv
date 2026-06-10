@@ -1,0 +1,11 @@
+measure,quintile,estimate,se,p_value
+Share of population flooded,1,0.001002,0.000918,0.275812
+Share of population flooded,2,0.001047,0.000872,0.230596
+Share of population flooded,3,0.000884,0.001064,0.406919
+Share of population flooded,4,0.000833,0.000835,0.319273
+Share of population flooded,5,0.001796,0.000737,0.015491
+Share of area flooded,1,0.001458,0.000952,0.126694
+Share of area flooded,2,0.000952,0.000741,0.199807
+Share of area flooded,3,0.001093,0.000948,0.249902
+Share of area flooded,4,0.000254,0.001101,0.818019
+Share of area flooded,5,0.001758,0.000631,0.005685
