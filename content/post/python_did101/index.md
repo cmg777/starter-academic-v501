@@ -63,6 +63,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+Evaluating whether an educational intervention works is complicated by the fact that outcomes often drift upward for reasons unrelated to the program, so a simple before-after comparison conflates the treatment effect with secular trends. This tutorial introduces the Difference-in-Differences (DiD) design in Python as a way to recover the causal effect of an after-school tutoring program on student performance. It uses the simulated case study from Corral and Yang (2024), in which 10 of 35 high schools in one region adopt a tutoring program, with the outcome being the average GPA of low-income students on a 0–100 scale; the 2×2 dataset has 70 observations (35 schools over 2 periods) and an event-study extension reaches 280 observations across 8 periods. Estimation proceeds through manual 2×2 double differencing, classical OLS with a treated×post interaction, and two-way fixed effects (TWFE) using the PyFixest package, comparing iid, HC1, CRV1, and CRV3 standard errors and building publication-quality tables with etable() and Great Tables. The naive before-after change of 36.20 GPA points overstates the effect by 43%, because 10.88 points reflect a region-wide trend; DiD isolates an ATT of 25.32 points, stable across specifications (25.315 to 25.328) with R² near 0.995, and the event study shows insignificant pre-trends (0.34, -0.32, 0.59) alongside an immediate, sustained post-treatment effect of 24.71 to 25.70. The results demonstrate that a credible comparison group and clean research design, rather than the choice of variance estimator, drive valid causal conclusions.
+
 ## 1. Overview
 
 How much does an after-school tutoring program improve student performance? A school district implemented a new after-school tutoring program in 10 of its 35 high schools. After one year, the average GPA in tutored schools jumped from **60.17** to **96.37** — a staggering **36.20-point** increase. Case closed?

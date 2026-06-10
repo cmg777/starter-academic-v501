@@ -60,6 +60,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+The resource curse hypothesis asks whether natural resource wealth helps or harms economic development, and a growing literature argues that the answer depends on local institutional quality. This tutorial estimates heterogeneous causal effects of mining and mineral prices on development and tests whether institutions moderate the mining margin and the price margin differently. It uses simulated panel data with known ground-truth parameters — 3,000 district-year observations covering 300 districts across 8 countries over 2003–2012 — whose structure mirrors Hodler, Lechner and Raschky (2023); treatment has four levels (no mining, and mining at low, medium, and high prices) and is heavily imbalanced at 85%/5%/5%/5%, with log nighttime lights as the outcome. The method is EconML's `CausalForestDML`, a Double Machine Learning causal forest with Gradient Boosting nuisance models, honest trees, 5-fold cross-fitting via `GroupKFold` on districts, and Bootstrap-of-Little-Bags inference, complemented by GATE estimation and a `SingleTreeCateInterpreter`. The forest recovers an ATE of 0.240 for the basic mining effect (90% CI [0.124, 0.355]), within sampling error of the true 0.250 and removing nearly all of the 0.141 bias in the naive estimate of 0.109; the price gradient is non-linear (2-1 = 0.029, not significant; 3-1 = 0.220, significant at 5%), and GATEs reveal that institutions moderate the mining effect (range 0.089 across executive-constraint levels) but not the price effect (range 0.045). The exercise demonstrates that causal forests can discover institutional moderation and non-linear shape without parametric pre-specification, while remaining only as credible as the conditional independence assumption.
+
 ## Overview
 
 Can natural resource wealth be both a blessing and a curse? And can local institutions determine which way it goes? In this tutorial, we use **EconML's `CausalForestDML`** to estimate **heterogeneous causal effects** of mining and mineral prices on economic development --- and test whether institutional quality moderates those effects differently for mining versus price shocks.

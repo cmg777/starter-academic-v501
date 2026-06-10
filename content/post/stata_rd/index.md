@@ -50,6 +50,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+Educational institutions invest heavily in tutoring to close achievement gaps, yet credibly measuring whether such programs work is difficult because students cannot be randomly assigned to receive them. This tutorial sets out to estimate the causal effect of a school tutoring program on end-of-year exit exam scores by exploiting a sharp, rule-based eligibility threshold using regression discontinuity design (RDD) in Stata. The data comprise 1,000 students with entrance exam scores ranging from 28.8 to 99.8 (mean 78.1) and exit exam scores from 42.8 to 84.5 (mean 66.2), of whom 241 (24.1%) were automatically enrolled in tutoring for scoring 70 or below. The analysis verifies the sharp design (100% compliance with zero crossovers), then estimates the local average treatment effect using both parametric OLS and nonparametric local-polynomial estimation via the rdrobust and rddensity packages, followed by bandwidth-sensitivity, kernel, McCrary density, and placebo-cutoff checks. Parametric OLS estimates a treatment effect of 10.80 points (95% CI 9.22 to 12.38, R-squared 0.27), while rdrobust, using an MSE-optimal bandwidth of 9.98 points, estimates a local effect of 8.58 points (95% CI 4.54 to 12.14); both are significant at p < 0.001. The effect is stable across bandwidths (−8.20 to −9.16), robust to kernel choice, shows no manipulation (density test p = 0.58), and appears only at the true cutoff. These results imply that rule-based tutoring meaningfully raises exit scores by 9 to 11 points — roughly 13 to 16% of the mean — though the estimate remains local to the cutoff.
+
 ## 1. Overview
 
 Educational institutions constantly strive to improve student outcomes and close achievement gaps. One common strategy is to provide targeted tutoring to students who are struggling academically. But does tutoring actually work? And how can we rigorously measure its effect when we cannot randomly assign students to receive it?

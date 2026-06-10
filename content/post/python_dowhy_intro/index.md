@@ -53,6 +53,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+Observational data routinely conflate causation with selection: more productive people may simply choose to work from home, making naive comparisons misleading whenever confounders are present. This tutorial introduces causal inference through DoWhy, a Python library, with the objective of recovering a known treatment effect from observational data and showing how its four-step framework — Model, Identify, Estimate, Refute — keeps causal assumptions separate from statistical estimation. The analysis uses a simulated observational dataset of 5,000 employees in which the true average treatment effect (ATE) of working from home on productivity is fixed at 1.0 points; treatment is non-randomly assigned through two confounders (introversion and number of children), and a subway-disruption instrument satisfies the exclusion restriction by construction. Four estimators are applied — linear regression, inverse probability weighting (IPW), doubly robust estimation (AIPW), and instrumental variables (2SLS) — and compared against the naive difference in means. The naive estimate of 1.39 overshoots the truth by 39%, while the backdoor methods recover the ATE closely (regression 1.0051, SE 0.0614; IPW 1.0275, SE 0.0754; AIPW 1.0115, SE 0.0623) and IV returns 0.8881 with a much larger SE of 0.3303 despite a strong first-stage F of 293.0; refutation tests (placebo ≈ 0, random common cause and data subset ≈ 1.0) confirm stability. The results show that explicit identification and method comparison — not precision alone — separate genuinely causal estimates from confidently wrong ones.
+
 ## Overview
 
 Does working from home actually make employees more productive, or do more productive people simply *choose* to work from home? This is the fundamental challenge of **causal inference**: distinguishing genuine cause-and-effect relationships from misleading correlations driven by confounding variables.

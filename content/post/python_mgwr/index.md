@@ -46,6 +46,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+National convergence statistics ask whether poorer regions catch up to richer ones, but a single global regression coefficient forces every locality onto the same line and can hide where the catching-up process actually operates. This tutorial asks whether economic convergence proceeds at the same pace everywhere in Indonesia or whether geography shapes how fast poorer districts close the gap. The analysis uses a cross-section of 514 Indonesian districts with log GDP per capita in 2010 and the subsequent growth rate through 2018, drawn from the QuaRCS data repository. Using Python's mgwr package together with GeoPandas and mapclassify, it progresses from a global OLS β-convergence baseline to Multiscale Geographically Weighted Regression (MGWR), which lets each standardized variable find its own spatial bandwidth via back-fitting. The global regression reports a single convergence coefficient of −0.195 (p < 0.001) but explains only 21% of growth variation (R² = 0.214). MGWR raises the fit to R² = 0.762 and lowers AICc from 1341.25 to 838.41, selecting a bandwidth of 44 districts (about 8.6% of the sample) for both the intercept and the slope and using 52.1 effective parameters. The convergence coefficient ranges from −1.74 (strong local catching-up) to +0.42 (local divergence), and only 149 of 514 districts (29%) show statistically significant convergence after multiple-testing correction, concentrated in western Sumatra and Kalimantan. These results imply that Indonesia's apparent national convergence is geographically selective, and that spatially targeted rather than uniform policies are needed to address an uneven development landscape.
+
 ## 1. Overview
 
 When we ask "do poorer regions catch up to richer ones?", the standard approach is to run a single regression across all regions and report one coefficient. But what if the answer depends on *where* you look? A negative coefficient in Sumatra does not mean the same process is at work in Papua. A global regression forces every district onto the same line --- and in doing so, it may hide the most interesting part of the story.

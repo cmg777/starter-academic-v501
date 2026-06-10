@@ -55,6 +55,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+Standard panel-data models force every unit to share the same slope coefficients, a homogeneity assumption that can disguise opposing behavioral responses behind a misleading average. This tutorial demonstrates the Classifier-LASSO (C-LASSO) method of Su, Shi, and Phillips (2016) to discover latent group structures in which countries within a group share slopes while groups differ, implemented through the `classifylasso` Stata command (Huang, Wang, and Zhou 2024). Two applications are used: a balanced panel of 56 countries observed over 15 years (840 observations, 1995—2010) on savings behavior, and a panel of 98 countries from 1970 to 2010 (4,018 observations) on democracy and growth. The method jointly estimates the number of groups, group memberships, and group-specific coefficients via penalized least squares, selecting the number of groups by an information criterion (consistently K = 2), using a postlasso step for valid inference and a half-panel jackknife to correct Nickell bias in dynamic specifications. In the dynamic savings model, CPI inflation reverses sign across groups (−0.160 in Group 1 versus +0.197 in Group 2, both p < 0.001), reconciling the insignificant pooled estimate of +0.030, while within R-squared rises from 0.20—0.24 (static) to 0.44—0.50 (dynamic). For democracy, the pooled fixed-effects effect of +1.055 (p = 0.005) masks a +2.151 effect in 57 countries (p < 0.001) and a −0.936 effect in 41 countries (p = 0.007) — a genuine sign reversal exemplifying Simpson's paradox. The implication is that pooled estimates can be qualitatively wrong, and C-LASSO offers a principled middle ground between fully homogeneous and fully heterogeneous panel models.
+
 ## 1. Overview
 
 Do all countries respond the same way to inflation? To interest rates? To democratic transitions? Most panel data models assume yes. They force every country to share the same slope coefficients. That is a strong assumption --- and often a wrong one.

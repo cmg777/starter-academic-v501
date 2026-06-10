@@ -53,6 +53,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+Including multiple variables in a regression raises a deceptively simple question: what does it actually mean to "control for" a confounder, and how can that adjustment be visualized when a multivariate fit cannot be drawn on a two-dimensional scatter plot? This tutorial answers that question through the Frisch-Waugh-Lovell (FWL) theorem, which shows that any coefficient from a multivariate regression can be recovered from a univariate regression after partialling-out the other variables. Inspired by Courthoud (2022), the analysis uses a simulated retail dataset of 50 stores in which neighborhood income confounds the effect of discount coupons on daily sales, with a known true causal effect (ATE) of exactly +0.2. Using OLS in statsmodels, the study estimates naive, full, and residualized (FWL) regressions, then visualizes the conditional relationship with seaborn and matplotlib. The naive regression of sales on coupons yields a misleading slope of -0.1059 (p = 0.365), but controlling for income reverses it to +0.2673 (p = 0.031), with income itself at +0.3836 (p < 0.001); the FWL residualize-both procedure reproduces +0.2673 (SE 0.118, p = 0.028) exactly, and extending to two controls gives +0.2706. This sign reversal — a textbook Simpson's paradox — demonstrates that omitted-variable bias can flip an effect's direction, and that FWL both verifies what multivariate regression does under the hood and provides the linear prototype for Double Machine Learning.
+
 ## Overview
 
 Including multiple variables in a regression raises a natural question: what does it actually mean to "control for" a confounder? The output is a coefficient, but a multivariate regression cannot be plotted on a simple two-dimensional scatter plot. This makes it hard to build intuition about what the regression is doing behind the scenes.

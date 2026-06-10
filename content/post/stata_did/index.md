@@ -58,6 +58,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+Evaluating whether a government program works is difficult when a randomized controlled trial is not feasible and policies are rolled out to some units but not others, as is common in education policy. This tutorial introduces the Difference-in-Differences (DiD) design in Stata to estimate the Average Treatment Effect on the Treated (ATT) of a fictitious after-school tutoring program implemented in 10 of 35 high schools to raise the GPA of low-income students, based on the case study of Corral and Yang (2024). The analysis uses simulated school-level panel data: a 2x2 dataset of 35 schools observed at two time points (70 observations) and an expanded event-study dataset of 8 periods with treatment onset at period 5 (280 observations). It progresses from a naive interrupted time series to the full DiD framework, demonstrating five equivalent estimators (`diff`, `reg`, `didregress`, `xtreg`, and `reghdfe`) and an event study that tests the parallel trends assumption. The naive before-after comparison yields a 36.20-point jump, but DiD nets out the comparison group's 10.88-point secular trend to recover an ATT of approximately 25.32 GPA points (SE = 0.627, p < 0.001), stable across all five methods (25.31–25.33) and specifications. The event study confirms near-zero, insignificant pre-treatment leads (0.34, −0.32, 0.59; all p > 0.10) and an immediate, persistent effect across lags (24.71–25.70). The results show that a credible comparison group and parallel-trends testing are essential, as the naive estimate overstates the effect by 43%.
+
 ## Overview
 
 How can we evaluate whether a government program actually works when a randomized controlled trial (RCT) is not feasible? Education researchers frequently face this challenge: a new policy is rolled out in some schools but not others, and we need to know whether it made a difference. **Difference-in-Differences (DiD)** is one of the most widely used quasi-experimental designs for answering this kind of causal question.

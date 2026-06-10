@@ -52,6 +52,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+When we map human development across South America, prosperous and lagging regions appear to cluster geographically, yet visual inspection alone cannot establish whether this clustering is statistically significant or how it evolves over time. This tutorial applies exploratory spatial data analysis (ESDA) to ask whether nearby regions share similar development levels and how their spatial clusters shifted between 2013 and 2019. The data are the Subnational Human Development Index (SHDI) and its Health, Education, and Income components from the Global Data Lab (Smits and Permanyer, 2019) for 153 sub-national regions across 12 South American countries. Using GeoPandas, PySAL, and splot, the analysis builds a row-standardized Queen contiguity spatial weights matrix (mean 4.93 neighbours, two island isolates), computes global Moran's I with 999 permutations, identifies local clusters with LISA, and tracks space-time dynamics via a directional Moran scatter plot. Mean SHDI rose only modestly (0.7424 to 0.7477, +0.0053), as income fell in 71 of 153 regions (46.4%), yet spatial clustering strengthened: global Moran's I increased from 0.5680 to 0.6320 (both p = 0.001). In 2019, LISA flagged 30 high-high and 37 low-low regions, the low-low cluster expanding from 29 to 37 while high-high stayed near constant (31 to 30) with 87% persistence. The Venezuela–Bolivia contrast is stark: Venezuela's 24 regions fell uniformly (mean -0.0653, 88% changing quadrant), while Bolivia's 9 gained steadily (+0.0333). These results reveal entrenched, spatially contagious development inequality, suggesting that spatially targeted, cross-border interventions may outperform uniform national programs.
+
 ## 1. Overview
 
 When we look at a map of human development across South America, a pattern immediately stands out: prosperous regions tend to cluster together, and so do lagging regions. But is this clustering statistically significant, or could it arise by chance? And how have these spatial clusters evolved over time?

@@ -49,6 +49,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+When development is tracked over time, the measuring instrument itself must stay fixed, yet running Principal Component Analysis (PCA) separately for each period lets both the eigenvector weights and the standardization parameters drift, rendering scores non-comparable across years. This tutorial sets out to build a temporally comparable composite Human Development Index using pooled PCA and to contrast it with the naive per-period approach. The data are the Subnational Human Development Index from the Global Data Lab (Smits and Permanyer, 2019), covering Education, Health, and Income sub-indices for 153 sub-national regions across 12 South American countries in 2013 and 2019, reshaped into a 306-row panel (153 regions × 2 periods). Pooled PCA stacks all periods and computes a single set of standardization parameters, eigenvector weights, and normalization bounds from the combined data, implemented from scratch in NumPy and validated against scikit-learn. The period means reveal a mixed signal — education rose +0.0225 and health +0.0134 while income declined -0.0202, driven by collapses such as Venezuela's income falling from 0.782 to 0.630. The pooled PC1 captures 72.42% of variance with weights [0.5642, 0.5448, 0.6204] and registers a net development shift of +0.1439 that per-period PCA forces to zero by construction; the two methods disagree on the direction of change for 16 of 153 regions (about 10%, Spearman ρ = 0.9818 on rankings). Validated against the official SHDI, pooled PCA attains R² = 0.9823 versus 0.9750 for per-period (and R² = 0.9964 versus 0.9913 for changes over time), confirming that pooled standardization is essential whenever composite indicators must be compared across time.
+
 ## 1. Overview
 
 In the [Introduction to PCA Analysis for Building Development Indicators](/post/python_pca/), we built a Health Index from two indicators using a six-step pipeline. That tutorial's Discussion section raised a critical warning:

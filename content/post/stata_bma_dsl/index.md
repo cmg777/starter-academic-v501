@@ -54,6 +54,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+When many control variables could plausibly enter a regression, researchers face model uncertainty: with 12 candidate controls there are $2^{12} = 4{,}096$ possible specifications, and choosing one is a hidden assumption. This tutorial demonstrates two principled solutions — Bayesian Model Averaging (BMA, via Stata's `bmaregress`) and Post-Double-Selection LASSO (DSL, via `dsregress`) — applied to testing the inverted-N Environmental Kuznets Curve, where log CO2 per capita follows a cubic function of log GDP. It uses a synthetic panel of 1,600 observations (80 countries over 1995–2014, log GDP spanning roughly \\$1,065 to \\$158,000) built with a known answer key in which 5 controls truly affect emissions and 7 are pure noise, allowing each method to be graded against ground truth. With country and year fixed effects, BMA recovers GDP posterior means (-7.139, 0.808, -0.030) almost exactly matching the true DGP (-7.100, 0.810, -0.030) and correctly flags 6 of 8 true predictors at PIP ≥ 0.80 — fossil fuel (PIP = 1.000), industry (0.999), and renewable energy (0.959) — with zero false positives, missing only the weak-signal urban (PIP ≈ 0.27) and democracy (≈ 0.02) controls; DSL produces fast cluster-robust estimates (-7.433, 0.840, -0.031) in seconds. Stripping fixed effects inflates the GDP coefficient 2–3x (pooled BMA -21.26, pooled DSL -22.03) and generates 5 false positives, with intervals failing to cover the truth. The implication is clear: both methods tame model uncertainty and recover the inverted-N shape, but only when fixed effects absorb unobserved panel heterogeneity first.
+
 ## 1. Overview
 
 Can countries grow their way out of pollution? The **Environmental Kuznets Curve (EKC)** hypothesis says yes --- up to a point. As economies develop, pollution first rises with industrialization and then falls as countries grow wealthy enough to afford cleaner technology. But recent research suggests a more complex **inverted-N** shape: pollution falls at very low incomes, rises through industrialization, and then falls again at high incomes.

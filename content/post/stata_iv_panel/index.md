@@ -52,6 +52,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+The correlation between economic deprivation and civil conflict is well documented, but correlation is not causation: omitted confounders, reverse causality, and measurement error in proxies for local income all threaten any naive regression of conflict on economic activity. This tutorial sets out to estimate the causal effect of economic shocks on civil conflict by replicating and extending Hodler and Raschky (2014), who took the rainfall-as-instrument strategy of Miguel, Satyanath, and Sergenti (2004) to the subnational level. The data comprise 96,591 region-year observations from 5,689 administrative regions across 53 African countries over 1994–2010, where conflict is measured as a binary outcome (1+ or 25+ deaths), nighttime light intensity proxies economic activity, and lagged rainfall and the Palmer Drought Severity Index serve as instruments. Using Stata's `xtreg` and `xtivreg2`, the analysis runs fixed-effects OLS, reduced-form, and 2SLS/IV estimation with region-specific trends, year effects, and clustered standard errors. OLS returns a near-zero coefficient of 0.001 (p = 0.50), whereas 2SLS yields −0.296 (SE 0.076, p < 0.01) using both instruments, a roughly 300-fold gap consistent with attenuation bias. A 10% decline in economic activity raises the probability of conflict by about 3 percentage points—a 66% increase over the 4.6% baseline—with strong first-stage F-statistics (24.62–40.33, above the Stock-Yogo threshold of 16.38) and a Hansen J p-value of 0.932 confirming instrument strength and validity. The results imply that poverty reduction is conflict prevention, underscoring the security implications of climate-driven economic shocks.
+
 ## 1. Overview
 
 Does poverty cause violence? This is one of the most important questions in development economics --- and one of the hardest to answer. The correlation between economic deprivation and civil conflict is well documented, but correlation is not causation. Poor regions may experience more conflict for reasons unrelated to their poverty, or conflict itself may destroy economic activity, creating reverse causality.

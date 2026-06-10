@@ -55,6 +55,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+Carbon pricing is a central instrument of climate policy, yet establishing that a carbon tax causally reduces emissions—without sacrificing economic growth—remains empirically hard because emissions also respond to oil prices, technology, and the business cycle. This post replicates Andersson (2019) in Python to ask whether Sweden's 1991 carbon tax cut transport CO2 emissions and at what economic cost. The data are an OECD panel of 15 advanced economies observed over 1960–2005 (46 years, with 30 pre-treatment and 16 post-treatment years), measuring per-capita transport CO2 emissions in metric tons, complemented by Sweden-specific price, tax, GDP, and gasoline-consumption series. The analysis layers a naive single-country before/after comparison, difference-in-differences, and the synthetic-control method (`pysyncon`), validated by in-time, in-space, and leave-one-out placebo tests, followed by tax-incidence, OLS, and instrumental-variable (2SLS) demand regressions (`pyfixest`). Synthetic Sweden—built from six donors (Denmark, Belgium, New Zealand, Greece, United States, Switzerland)—implies an average annual reduction of 11.3% over 1990–2005 (permutation p = 0.067; leave-one-out range 8.8% to 13%), with a Synthetic-GDP counterfactual matching actual GDP to within \\$233 per capita by 2005, ruling out a growth penalty. Pass-through is complete (coefficient ≈ 1.15), and consumers respond about three times more strongly to taxes (semi-elasticity −0.186) than to prices (−0.060), with the carbon tax alone accounting for roughly 75% of the 2005 reform wedge. The findings imply that salient, persistent, fully passed-through carbon taxes—and revenue-neutral tax swaps—can deliver real emission reductions at no measurable cost to growth.
+
 ## Overview
 
 In 1991, Sweden put a price on carbon dioxide. It was one of the first countries in the world to do so. The reform sat on top of two earlier taxes on transport fuel — a value-added tax (VAT, added in 1990) and an older energy tax. Together, these taxes pushed Sweden's retail gasoline price well above the wholesale price set by world oil markets.

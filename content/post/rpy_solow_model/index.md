@@ -44,6 +44,10 @@ url_slides: ""
 url_video: ""
 ---
 
+## Abstract
+
+A central question in development economics is how countries grow richer and why some grow faster than others, including whether poorer countries are catching up to wealthier ones. This tutorial offers a computational introduction to the augmented Solow growth model, an enhanced version of Solow's foundational 1956 framework that adds human capital following Mankiw, Romer, and Weil (1992), to explain cross-country growth disparities and to assess the model's convergence prediction. The model treats output as a function of physical capital, labor, technology, and human capital, with capital subject to diminishing returns, and it is taken to cross-country data on economic indicators such as GDP, investment rates, and education levels across three samples: a non-oil sample of 98 countries, an intermediate sample of 75 countries, and an OECD sample of 22 countries. Using parallel implementations in R, Python, and Stata, the analysis transforms variables like GDP, savings, and education into logarithmic form and estimates the roles of savings, population growth, and human capital in determining income levels and growth rates. The results show that the data support conditional rather than unconditional convergence, meaning countries grow toward their own steady states defined by their savings rates, population growth, and human capital. The augmented model thus enriches our understanding of why growth depends not only on physical investment and labor but also on how well a workforce is educated and trained.
+
 ## 📊 The Augmented Solow Model: An Overview with Python, R, and Stata
 
 **How do countries grow richer, and why do some grow faster than others?** Today, we're diving into a computational exploration of economic growth using the **augmented Solow model**, an enhanced version of Solow's foundational 1956 model that includes insights from Mankiw, Romer, and Weil (1992). This model helps explain **why some countries grow richer than others** and whether poor countries are indeed catching up to the wealthier ones. Let's unpack the model, the equations, and what the data says.

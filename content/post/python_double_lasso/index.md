@@ -67,6 +67,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+When a candidate-control set is large relative to the sample, plain OLS becomes unstable and atheoretical "kitchen-sink" specifications yield uninterpretable causal estimates, motivating high-dimensional variable selection. This Python tutorial reproduces the Belloni, Chernozhukov and Hansen (2014) extension of Donohue and Levitt's (2001) abortion-and-crime study, asking whether Double LASSO recovers credible treatment effects from a rich control set and how it compares to the modern DoubleML cross-fitting framework. The data are the replication panel of 48 U.S. states over 12 years (1986–1997 after first-differencing the 1985–1997 series), giving 576 observations with 284 candidate controls per crime outcome. Five Part-A estimators are implemented — first-difference OLS, full OLS, Post-Structural LASSO, and Double LASSO under both the rigorous (BCH theory-based) and cross-validated penalties — using pyfixest, hdmpy, and scikit-learn, with state-clustered HC1 standard errors; Part B adds DoubleMLPLR, DoubleMLIRM, and a LASSO/RandomForest/XGBoost learner-robustness check from the DoubleML library. The no-controls baseline gives a violent-crime effect of −0.152, whereas full OLS with all 284 controls is uninterpretable, exploding to +2.34 for murder with confidence interval [−2.76, +7.45]. Rigorous Double LASSO selects just 8 controls for violent crime and matches the paper's selection counts and point estimate exactly (−0.104), while DoubleMLPLR returns −0.115 and the three nuisance learners span −0.0855 to −0.1123. The results show that the theory-driven rigorous penalty, not the choice of language or learner, governs credible high-dimensional causal inference.
+
 ## 1. Overview
 
 > **Companion post.** This tutorial is one of three siblings on the same Double LASSO case study — alongside the [R version](/post/r_double_lasso/) and the [Stata version](/post/stata_double_lasso/). The three posts share the data, the five estimators, and the identification story; this Python post adds a dedicated introduction to the [DoubleML](https://docs.doubleml.org/) library in §15–§18.

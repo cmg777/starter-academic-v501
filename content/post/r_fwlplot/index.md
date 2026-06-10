@@ -50,6 +50,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+A recurring difficulty in applied regression is explaining what it means to "control for" a variable, since the multidimensional relationship a multiple-regression coefficient describes cannot be drawn on a 2D scatter plot. This tutorial addresses that gap by using the Frisch-Waugh-Lovell (FWL) theorem — which states that any regression coefficient equals the slope of a simple bivariate regression after partialling the other controls out of both axes — to render "controlling for X" as a picture. The objective is to build intuition progressively with the fwlplot R package (Butts & McDermott, 2024), built on fixest, across one simulated and two real datasets: an n=200 simulated retail panel, the nycflights13 data (317,578 cleaned flights from New York's three airports in 2013), and the Wooldridge wagepan panel (545 individuals over 8 years, 1980–1987, 4,360 observations). Using fwl_plot(), feols(), and manual residualization, the simulated case shows confounding by income reverse the naive coupon-on-sales slope from -0.093 to the controlled +0.212 (true effect +0.2), with the omitted-variable-bias formula predicting the bias as 0.300 × (-0.494) = -0.148 and manual FWL reproducing the feols coefficient to six decimals (0.212288). With fixed effects, the flights air-time coefficient moves from -0.003 to -0.007, and individual fixed effects steepen the within-person return to experience from 0.03 to 0.122 (R² rising from 0.148 to 0.617). The implication is that the residualized scatter is both an exact visual counterpart to every regression coefficient and a diagnostic that exposes confounding, nonlinearity, and weak identification that tables hide.
+
 ## 1. Overview
 
 "What does it actually mean to *control for* a variable?" This is perhaps the most common question in applied regression --- and one of the hardest to answer intuitively. When we say "the effect of coupons on sales, controlling for income," we are describing a relationship that lives in multidimensional space and cannot be directly plotted on a 2D scatter plot. Or can it?

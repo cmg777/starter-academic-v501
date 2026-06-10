@@ -50,6 +50,10 @@ toc: true
 diagram: true
 ---
 
+## Abstract
+
+Over \\$7 trillion sits in U.S. 401(k) accounts, yet it remains unclear whether expanding eligibility genuinely boosts retirement savings or merely reshuffles existing wealth, because a naive comparison conflates the causal effect with confounders such as income and education. This tutorial estimates the causal effect of 401(k) eligibility and participation on net financial assets, separating genuine savings gains from confounding bias. The data come from the 1991 Survey of Income and Program Participation (SIPP), a nationally representative survey of 9,915 U.S. households in which 37.1% are eligible for a 401(k) and 26.2% participate. Three Double Machine Learning models from the DoubleML Python package are applied — Partially Linear Regression (PLR) and the doubly robust Interactive Regression Model (IRM), both targeting the Average Treatment Effect of eligibility, and the Interactive IV Model (IIVM), which uses eligibility as an instrument for participation to recover the Local Average Treatment Effect on compliers — each fit with four ML learners (Lasso, Random Forest, Decision Tree, XGBoost) under cross-fitting. The naive eligibility gap of \\$19,559 falls to a mean ATE of \\$8,730 (PLR) and \\$8,213 (IRM), implying roughly \\$10,829 (55%) was confounding bias, while the IIVM LATE reaches \\$11,746. These results indicate that expanding 401(k) eligibility meaningfully raises retirement savings, by about \\$8,500 per newly eligible household on average and closer to \\$12,000 for the marginal compliers that such expansions target.
+
 ## Overview
 
 Does having access to a 401(k) plan actually cause households to save more, or do households with 401(k) access simply have higher incomes and save more regardless? This question matters: over \\$7 trillion sits in 401(k) accounts in the United States, and policymakers need to know whether expanding eligibility genuinely boosts retirement savings or merely reshuffles existing wealth.
