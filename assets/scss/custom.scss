@@ -1452,24 +1452,25 @@ details.concept-card p:last-child {
   letter-spacing: 0.01em;
 }
 .hero-rotator-sizer { visibility: hidden; }
-/* Cyan→indigo gradient text (Indonesia514 palette). text-shadow can't follow
-   background-clipped text, so the legibility glow over the photo is a recolored
-   drop-shadow filter instead. */
+/* Brand teal→steel-blue gradient text — two of the site's three accent colors
+   (the hero title-underline runs the same teal→steel→orange). text-shadow can't
+   follow background-clipped text, so the legibility glow over the photo is a
+   recolored teal drop-shadow filter instead. */
 .hero-rotator-text {
-  background-image: linear-gradient(135deg, #22d3ee 0%, #818cf8 100%);
+  background-image: linear-gradient(135deg, #00d4c8 0%, #6a9bcc 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  filter: drop-shadow(0 0 9px rgba(34, 211, 238, 0.40))
+  filter: drop-shadow(0 0 9px rgba(0, 212, 200, 0.40))
           drop-shadow(0 1px 2px rgba(8, 12, 38, 0.55));
 }
-/* Blinking caret, cyan to match the gradient's leading edge. */
+/* Blinking caret, brand teal to match the gradient's leading edge. */
 .hero-rotator-cursor {
-  color: #22d3ee;
+  color: #00d4c8;
   font-weight: 400;
   margin-left: 0.04em;
-  text-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
+  text-shadow: 0 0 8px rgba(0, 212, 200, 0.5);
   animation: heroCaretBlink 1s step-end infinite;
 }
 @keyframes heroCaretBlink {
