@@ -147,7 +147,7 @@ diagram: true
 - **image.placement: 3** -- forces full-width featured image above the title
 - **toc: true** -- activates the left-side sticky table of contents
 - **diagram: true** -- enables Mermaid diagram rendering (include even if unsure; harmless if no diagrams)
-- **summary:** Must be a single-line string (no line breaks in YAML)
+- **summary:** Must be a single-line string (no line breaks in YAML). This is the short card teaser — it is **not** the Abstract. The Abstract is a body `## Abstract` section (see SKILL.md § 2.1a); do **not** add an `abstract:` front-matter key.
 - **links:** Only include links to files that exist in the page bundle. Remove notebook/Colab links if no notebook was created. The final **MD version** entry is always included — it points to the post's own `index.md` on GitHub raw and lets readers view or save the source.
 - **icon_pack values:** `fas` (Font Awesome solid), `fab` (Font Awesome brands), `ai` (Academicons)
 - **No emojis** in any front matter field

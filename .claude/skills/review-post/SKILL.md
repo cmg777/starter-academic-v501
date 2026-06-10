@@ -11,7 +11,7 @@ user-invocable: true
 Act as an **expert professor of data science and econometrics** reviewing a
 tutorial blog post on this site. This skill merges the legacy `referee-post`
 (11 deep review passes) and `proofread-post` (10 surface checks) into a single
-comprehensive review with **12 non-overlapping dimensions**. Every check from
+comprehensive review with **13 non-overlapping dimensions**. Every check from
 both legacy skills is covered exactly once -- nothing is duplicated, nothing is
 dropped.
 
@@ -33,13 +33,14 @@ conversation without modifying any files.
 ## Focus keyword table
 
 When `focus:` is provided, restrict the review to the matching dimensions only.
-If omitted, run all 12 dimensions. Multiple keywords can be combined with
+If omitted, run all 13 dimensions. Multiple keywords can be combined with
 `and`: `focus: code and math`.
 
 | Focus keyword | Dimensions run |
 |---|---|
 | `code` | 1 (Code execution), 4 (Code quality) |
 | `structure` | 2 (Front matter and links), 3 (Markdown structure) |
+| `abstract` | 13 (Abstract) |
 | `math` | 7 (Mathematical equations) |
 | `explanations` | 5 (Sandwich pattern), 6 (Beginner accessibility) |
 | `interpretations` | 8 (Interpretations) |
@@ -47,7 +48,8 @@ If omitted, run all 12 dimensions. Multiple keywords can be combined with
 | `grammar` | 9 (grammar/spelling subset only) |
 | `rigor` | 10 (Academic rigor), 11 (Narrative flow) |
 | `images` | 12 (Images, Mermaid, and deliverables) |
-| (omitted) | All 12 dimensions |
+| `abstract` | 13 (Abstract) |
+| (omitted) | All 13 dimensions |
 
 ---
 
@@ -86,7 +88,7 @@ Before starting the review, present the user with a brief confirmation:
 
 2. **Scope**: If `focus:` was provided: "Running focused review:
    [DIMENSION NAMES]."
-   If no focus: "Running full review (all 12 dimensions including code
+   If no focus: "Running full review (all 13 dimensions including code
    execution). This is thorough and will take several minutes as I read
    the entire post, run the code, and check all dimensions."
 
@@ -514,6 +516,43 @@ If no companion files exist, mark deliverables as N/A.
 
 ---
 
+### Dimension 13: Abstract
+
+Every substantive tutorial opens with a journal-style `## Abstract` section: a
+single paragraph that previews the whole arc (canonical example:
+`content/post/python_doubleml/index.md`). Verify:
+
+- [ ] A `## Abstract` heading exists and is the **first** section of the body
+      -- it appears before `## Overview` (or before the first `## ` heading).
+- [ ] It is a **single continuous paragraph** -- no bullets, no bold sub-labels
+      (e.g. no "**Motivation:**"), no sub-headings.
+- [ ] Length is roughly **150-250 words**.
+- [ ] The prose flows through the **six beats in order**: motivation ->
+      research objective -> data -> methods -> main results -> main implication.
+- [ ] The results sentence cites **real numbers that match the post body**.
+      Cross-check each figure against the output blocks captured in
+      **Dimension 1 (Code execution)** and the numbers verified in
+      **Dimension 8 (Interpretations)**. A number in the Abstract that does not
+      match the post is a **HIGH** issue (it misleads the skimming reader).
+- [ ] Site formatting: literal currency uses `\\$` (not a bare `$`), em dashes
+      (—) not `--`, and any math follows the Goldmark-safe escaping in
+      `references/latex-escaping.md`.
+
+**Severity guidance:**
+
+- Abstract **missing** on a substantive tutorial (a now-required section) -> **HIGH**.
+- Abstract numbers **do not match** the post body -> **HIGH**.
+- Present but **malformed** -- bold labels, bullets, multiple paragraphs,
+  not the first section, or length far outside ~150-250 words -> **MEDIUM**.
+- A **missing beat** or weak/illogical flow -> **MEDIUM**.
+
+If the post is a thin landing/announcement page with no in-body analysis to
+summarize (it just links out to an external notebook), mark this dimension
+**N/A** -- do not penalize. This mirrors the "Key concepts missing is not
+always a defect" carve-out in Dimension 3.
+
+---
+
 ## Step 2 -- Produce the Review Report
 
 Read `references/report-template.md` for the full report template. Deliver
@@ -565,6 +604,7 @@ Each dimension is scored 1-10:
 
 - [ ] Read the **entire** `index.md`, not just the first few sections
 - [ ] Ran the code and compared output (Dimension 1)
+- [ ] Verified the Abstract (Dimension 13): present as the first section, single-paragraph six-beat structure, and numbers cross-checked against the output blocks
 - [ ] Counted interpretation paragraphs (exact count vs. 8 minimum)
 - [ ] Counted figures (exact count vs. 3 minimum)
 - [ ] Counted display-math equations (exact count vs. 2 minimum)

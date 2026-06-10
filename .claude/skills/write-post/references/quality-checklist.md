@@ -9,6 +9,7 @@ Run through every item before delivering the post.
 
 - [ ] Front matter follows Wowchemy conventions (match reference post)
 - [ ] `toc: true` is set
+- [ ] Abstract section present as the **first** section (before Overview): one paragraph ~150-250 words, six beats (motivation -> objective -> data -> methods -> results-with-real-numbers -> implication), no bold labels/bullets, numbers match the post body
 - [ ] Overview motivates the case study question
 - [ ] Learning objectives present (3-5 bullets)
 - [ ] Summary in front matter is a single line

@@ -261,6 +261,22 @@ After:
 
 ---
 
+## 13. Abstract Section
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| `## Abstract` present and first section | PASS/FAIL/N/A | |
+| Single paragraph (no bullets/bold labels) | PASS/FAIL | |
+| Word count ~150-250 | PASS/FAIL | |
+| Six beats in order (motivation -> objective -> data -> methods -> results -> implication) | PASS/FAIL | |
+| Numbers match the post body | PASS/FAIL | |
+| Formatting (`\\$`, em dashes, safe math) | PASS/FAIL | |
+
+<Abstract findings roll into the **Structure** score; number mismatches or a
+missing Abstract on a substantive tutorial are HIGH and feed the verdict.>
+
+---
+
 ## Priority Action Items
 
 1. **[HIGH]** <most critical issue -- location and fix>

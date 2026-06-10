@@ -315,14 +315,14 @@ Verify results report accuracy against script output, check interpretation quali
 **Skill:** `/project:write-post <topic> dataset: <dataset> [references: <URLs>]` OR `/project:write-post <post slug>`
 **Location:** `.claude/skills/write-post/SKILL.md`
 
-Write a notebook-style blog post (`index.md`). Two modes: (A) consume existing script + results report, or (B) standalone with `[VERIFY]` markers. Enforces sandwich pattern, 8+ interpretations, LaTeX escaping.
+Write a notebook-style blog post (`index.md`). Two modes: (A) consume existing script + results report, or (B) standalone with `[VERIFY]` markers. Opens every post with a journal-style `## Abstract` section (one ~150-250 word, six-beat paragraph before Overview), and enforces the sandwich pattern, 8+ interpretations, and LaTeX escaping.
 
 ### Review Data Science Post
 
-**Skill:** `/project:review-post <post slug> [focus: code | structure | math | explanations | interpretations | writing | grammar | rigor | images]`
+**Skill:** `/project:review-post <post slug> [focus: code | structure | math | explanations | interpretations | writing | grammar | rigor | images | abstract]`
 **Location:** `.claude/skills/review-post/SKILL.md`
 
-Comprehensive review across 12 dimensions (merges deep expert review with proofreading). Produces a scored report with verdict. Read-only.
+Comprehensive review across 13 dimensions (merges deep expert review with proofreading; the 13th checks the journal-style `## Abstract` section and cross-checks its numbers against the post body). Produces a scored report with verdict. Read-only.
 
 ### Write Infographic Instructions
 

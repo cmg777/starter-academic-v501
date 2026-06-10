@@ -19,6 +19,13 @@
 | **MINOR REVISION** | No HIGH issues but 3+ MEDIUM, or 1 HIGH that is easy to fix. Needs targeted improvements. |
 | **MAJOR REVISION** | 2+ HIGH issues, or fundamental problems with methodology, narrative, or code correctness. Needs significant rework. |
 
+**Abstract rule (Dimension 13):** a number in the Abstract that does not match
+the post body, or a missing Abstract on a substantive tutorial, is **HIGH**
+(and drives MINOR/MAJOR per the table above). A present-but-malformed Abstract
+(bold labels, bullets, multiple paragraphs, not the first section, or length
+far outside ~150-250 words) or a missing beat is **MEDIUM**. Thin
+landing/announcement posts with no in-body analysis to summarize are **N/A**.
+
 ## Scoring Guidelines
 
 Each dimension is scored 1-10:
@@ -44,7 +51,8 @@ Each dimension is scored 1-10:
 | `grammar` | 9 (grammar/spelling subset only) |
 | `rigor` | 10 (Academic rigor), 11 (Narrative flow) |
 | `images` | 12 (Images, Mermaid, deliverables) |
-| (omitted) | All 12 dimensions |
+| `abstract` | 13 (Abstract) |
+| (omitted) | All 13 dimensions |
 
 ## Reviewer Guidelines
 
@@ -61,6 +69,7 @@ Each dimension is scored 1-10:
 
 - [ ] Read the **entire** post
 - [ ] Ran the code and compared output
+- [ ] Verified the Abstract (Dimension 13): first section, single-paragraph six-beat structure, numbers cross-checked against output blocks
 - [ ] Counted interpretation paragraphs (exact count vs. 8 minimum)
 - [ ] Counted figures (exact count vs. 3 minimum)
 - [ ] Checked every code block for sandwich pattern

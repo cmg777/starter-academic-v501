@@ -223,6 +223,7 @@ question, and the results answer it.
 
 | Section | Content | Required |
 |---------|---------|----------|
+| **Abstract** | One dense paragraph (~150-250 words), no headings/bullets/bold labels, flowing through six beats: motivation -> research objective -> data -> methods -> main results (with real numbers) -> main implication. Always the **first** section, immediately before Overview. See § 2.1a | Yes |
 | **Overview** | 1-2 paragraphs: What question are we answering? Why does this method matter? Frame as "We want to know X. Method Y can help because Z." | Yes |
 | **Learning objectives** | 3-5 bullets with strong action verbs (Understand, Implement, Estimate, Assess, Compare). Avoid vague verbs like "explore" or "see" | Yes |
 | **Key concepts** | 5-8 vocabulary terms in toggle-card format: bold term + always-visible **Definition** paragraph (short sentences) + 2-column row with collapsible **Example** card (grounded in this post's data) and **Analogy** card (familiar-domain comparison). See `references/key-concepts-template.md` for the full HTML pattern, SCSS dependency, and copy-paste block | Encouraged for tutorials introducing new vocabulary |
@@ -272,6 +273,52 @@ question, and the results answer it.
   (3) a practical limitation, (4) a next step.
 - Each takeaway should stand alone as something the reader remembers a week
   later.
+
+#### 2.1a Abstract (the six-beat opener)
+
+Every post opens with a `## Abstract` section: a single journal-style
+paragraph that gives the reader the whole arc before they dive in. It is the
+**first** section of the body — immediately after the YAML front matter and
+**before** `## Overview`. Do **not** renumber existing sections (Overview stays
+`## Overview` or `## 1. Overview`).
+
+**Six beats, in this order, as one connected paragraph:**
+
+1. **Motivation** -- why this question matters in the real world.
+2. **Research objective** -- the specific question this post answers.
+3. **Data** -- dataset name, units, sample size, time span, source.
+4. **Methods** -- the technique(s) / package(s) used.
+5. **Main results** -- the headline findings, **with real numbers** taken
+   from this post's own output (effect sizes, R^2, counts, percentages).
+6. **Main implication** -- the "so what?": what a practitioner or policymaker
+   should take away.
+
+**Rules:**
+
+- One paragraph, ~150-250 words, third person, present tense.
+- **No bold sub-labels** (do NOT write "**Motivation:**"), no bullets, no
+  sub-headings -- the six beats are connected sentences in flowing prose.
+- The results sentence must cite **numbers that already appear in the post**.
+  Never invent or approximate a number that the analysis did not produce
+  (in Mode B, mark any not-yet-computed figure `[VERIFY]` like the rest of the
+  body).
+- English body only -- the ES/JA stubs are card-only and are not affected.
+- Math/escaping: follow the same rules as the rest of the post -- `\\$` for
+  literal currency, `\_` for subscripts, em dashes (—) not `--`; keep LaTeX
+  minimal. See `references/latex-escaping.md` (do not re-document it here).
+
+**Skeleton (generic — replace every bracket with real content and numbers):**
+
+```markdown
+## Abstract
+
+[Why the problem matters]. This tutorial [states the objective] by analyzing
+[dataset: units, N, span, source] with [method(s)/package]. [Headline result
+sentence with the real numbers], [secondary result]. These findings imply
+[the practical takeaway].
+
+## Overview
+```
 
 #### 2.2 The sandwich pattern (CRITICAL)
 
@@ -498,6 +545,7 @@ Run through the quality checklist from `references/quality-checklist.md`.
 
 | Check | Requirement |
 |-------|-------------|
+| Abstract | Present as the **first** section (before Overview); one paragraph ~150-250 words; six beats in order (motivation -> objective -> data -> methods -> results -> implication); no bold labels/bullets; numbers match the post body |
 | Sandwich pattern | Every output-producing code block has explanation -> code -> output -> interpretation |
 | Interpretations | At least 8 paragraphs with specific numeric values |
 | Figures | At least 3 figure references (`![alt](file.png)`) |

@@ -276,6 +276,7 @@ Write a notebook-style data science blog post (`index.md`). Has two modes: (A) c
 ```
 
 **Key conventions:**
+- Abstract first: every post opens with a `## Abstract` section (before Overview) — one ~150-250 word paragraph through six beats (motivation → objective → data → methods → results-with-real-numbers → implication), no bold labels, body-only (no `abstract:` front-matter key)
 - Sandwich pattern: explanation -> code -> output -> interpretation
 - At least 8 interpretation paragraphs with specific numeric values
 - At least 2 display-math equations with plain-language explanations and variable mapping
@@ -288,14 +289,14 @@ Write a notebook-style data science blog post (`index.md`). Has two modes: (A) c
 
 **Location:** `.claude/skills/review-post/SKILL.md`
 
-Comprehensive review of a data science blog post. Merges deep expert review with final proofreading into one thorough pass across 12 dimensions. Produces a scored report with verdict (ACCEPT / MINOR REVISION / MAJOR REVISION), dimension scores, and priority action items. Supports `focus:` for targeted reviews. Read-only.
+Comprehensive review of a data science blog post. Merges deep expert review with final proofreading into one thorough pass across 13 dimensions. Produces a scored report with verdict (ACCEPT / MINOR REVISION / MAJOR REVISION), dimension scores, and priority action items. Supports `focus:` for targeted reviews. Read-only.
 
 **Invocation:**
 ```
-/project:review-post <post slug> [focus: code | structure | math | explanations | interpretations | writing | grammar | rigor | images]
+/project:review-post <post slug> [focus: code | structure | math | explanations | interpretations | writing | grammar | rigor | images | abstract]
 ```
 
-**12 review dimensions:** code execution, front matter & links, markdown structure, code quality, sandwich pattern, beginner accessibility, mathematical equations, interpretations, writing clarity & grammar, academic rigor, narrative flow, images/Mermaid/deliverables.
+**13 review dimensions:** code execution, front matter & links, markdown structure, code quality, sandwich pattern, beginner accessibility, mathematical equations, interpretations, writing clarity & grammar, academic rigor, narrative flow, images/Mermaid/deliverables, abstract (journal-style `## Abstract` section: present and first, single-paragraph six-beat structure, numbers cross-checked against the post body — mismatch is HIGH).
 
 **Reference files:** `references/report-template.md`, `references/scoring-and-criteria.md`, `references/latex-escaping.md`
 
