@@ -1428,11 +1428,12 @@ details.concept-card p:last-child {
   opacity: 0.85;
 }
 
-/* B2 — rotating research pillars. The inline JS swaps the static subtitle for
-   "Insights from <rotator>" ONLY when motion is allowed; otherwise the full
-   comma list stays (no info loss for reduced-motion / screen readers).
-   inline-grid stacks every pillar in one cell, so the box auto-sizes to the
-   widest item and never reflows as they swap. */
+/* B2 — typewriter research pillars (Indonesia514-style). The inline JS swaps the
+   static subtitle for "Insights from <typewriter>" ONLY when motion is allowed;
+   otherwise the full comma list stays (no info loss for reduced-motion / screen
+   readers). An invisible sizer holding the LONGEST pillar shares the grid cell
+   with the live (typed) layer, so the box width is pinned to the widest item and
+   the centered subtitle never reflows as the caret types and deletes. */
 .hero-rotator {
   display: inline-grid;
   vertical-align: baseline;
@@ -1440,24 +1441,40 @@ details.concept-card p:last-child {
   max-width: 100%;
   text-align: left;
 }
-.hero-rotator-item {
+.hero-rotator-sizer,
+.hero-rotator-live {
   grid-area: 1 / 1;
   white-space: nowrap;
-  /* the focal element — markedly larger, bolder, luminous brand teal with a soft
-     glow so the rotating insight is the most "notorious" part of the subtitle. */
+  /* the focal element — markedly larger and bolder so the typed insight is the
+     most "notorious" part of the subtitle. */
   font-size: clamp(1.3rem, 2.7vw, 1.95rem);
   font-weight: 500;
   letter-spacing: 0.01em;
-  color: #9fe9e3;
-  text-shadow: 0 0 20px rgba(0, 212, 200, 0.45), 0 1px 3px rgba(8, 12, 38, 0.6);
-  opacity: 0;
-  transform: translateY(0.4em);
-  transition: opacity 0.55s ease,
-              transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
-.hero-rotator-item.is-active {
-  opacity: 1;
-  transform: translateY(0);
+.hero-rotator-sizer { visibility: hidden; }
+/* Cyan→indigo gradient text (Indonesia514 palette). text-shadow can't follow
+   background-clipped text, so the legibility glow over the photo is a recolored
+   drop-shadow filter instead. */
+.hero-rotator-text {
+  background-image: linear-gradient(135deg, #22d3ee 0%, #818cf8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0 9px rgba(34, 211, 238, 0.40))
+          drop-shadow(0 1px 2px rgba(8, 12, 38, 0.55));
+}
+/* Blinking caret, cyan to match the gradient's leading edge. */
+.hero-rotator-cursor {
+  color: #22d3ee;
+  font-weight: 400;
+  margin-left: 0.04em;
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
+  animation: heroCaretBlink 1s step-end infinite;
+}
+@keyframes heroCaretBlink {
+  0%, 50%   { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 /* --- Tagline --- */
@@ -1589,7 +1606,8 @@ details.concept-card p:last-child {
   .hero-rotator {
     text-align: center;     /* centered wrapped lines read better than left-rag on mobile */
   }
-  .hero-rotator-item {
+  .hero-rotator-sizer,
+  .hero-rotator-live {
     white-space: normal;    /* let the enlarged term wrap on narrow screens (no h-scroll) */
   }
   .hero-scroll-indicator {

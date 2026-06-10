@@ -86,7 +86,8 @@ design:
       });
     }
 
-    /* ---- B2: pilares de investigación rotatorios (sólo movimiento) ---- */
+    /* ---- B2: pilares de investigación tipo máquina de escribir (estilo
+       Indonesia514; sólo movimiento, lista completa para reduced-motion) ---- */
     if (!reduce) {
       var sub = hero.querySelector('.hero-subtitle[data-rotate]');
       if (sub) {
@@ -99,21 +100,49 @@ design:
           var rot = document.createElement('span');
           rot.className = 'hero-rotator';
           rot.setAttribute('aria-hidden', 'true');
-          for (var q = 0; q < items.length; q++) {
-            var it = document.createElement('span');
-            it.className = 'hero-rotator-item' + (q === 0 ? ' is-active' : '');
-            it.textContent = items[q];
-            rot.appendChild(it);
+          /* sizer invisible = frase más larga, para que la línea centrada no
+             se reacomode mientras el texto se escribe y se borra */
+          var longest = items[0];
+          for (var q = 1; q < items.length; q++) {
+            if (items[q].length > longest.length) longest = items[q];
           }
+          var sizer = document.createElement('span');
+          sizer.className = 'hero-rotator-sizer';
+          sizer.textContent = longest;
+          var live = document.createElement('span');
+          live.className = 'hero-rotator-live';
+          var txt = document.createElement('span');
+          txt.className = 'hero-rotator-text';
+          var cur = document.createElement('span');
+          cur.className = 'hero-rotator-cursor';
+          cur.textContent = '|';
+          live.appendChild(txt);
+          live.appendChild(cur);
+          rot.appendChild(sizer);
+          rot.appendChild(live);
           sub.appendChild(lead);
           sub.appendChild(rot);
-          var ritems = rot.querySelectorAll('.hero-rotator-item');
-          var ri = 0;
-          setInterval(function () {
-            ritems[ri].classList.remove('is-active');
-            ri = (ri + 1) % ritems.length;
-            ritems[ri].classList.add('is-active');
-          }, 2800);
+
+          var ti = 0, ci = 0, deleting = false;
+          var TYPE = 90, DEL = 45, HOLD = 1800, GAP = 500;
+          function tick() {
+            var word = items[ti];
+            if (!deleting) {
+              ci++;
+              txt.textContent = word.slice(0, ci);
+              if (ci >= word.length) { deleting = true; return setTimeout(tick, HOLD); }
+              return setTimeout(tick, TYPE);
+            }
+            ci--;
+            txt.textContent = word.slice(0, ci);
+            if (ci <= 0) {
+              deleting = false;
+              ti = (ti + 1) % items.length;
+              return setTimeout(tick, GAP);
+            }
+            return setTimeout(tick, DEL);
+          }
+          setTimeout(tick, 600);
         }
       }
     }
