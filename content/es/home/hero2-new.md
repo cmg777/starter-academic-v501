@@ -28,7 +28,7 @@ design:
   <div class="hero-glass-card hero-glass-card--title hero-glass-card--delay-1">
     <h1 class="hero-title"><a class="hero-title-link" href="https://canva.link/hhrue9c5aogivjn" target="_blank" rel="noopener">Sobre la geografía del desarrollo</a></h1>
     <div class="hero-title-underline" aria-hidden="true"></div>
-    <p class="hero-subtitle" data-rotate="Macrodatos geoespaciales|Economía del desarrollo|Econometría espacial|Aprendizaje automático causal" aria-label="Perspectivas desde los macrodatos geoespaciales, la economía del desarrollo, la econometría espacial y el aprendizaje automático causal">Perspectivas desde los macrodatos geoespaciales, la economía del desarrollo, la econometría espacial y el aprendizaje automático causal</p>
+    <p class="hero-subtitle" data-rotate="Macrodatos geoespaciales|Economía del desarrollo|Econometría espacial|Aprendizaje automático espacial|Aprendizaje automático causal" aria-label="Perspectivas desde los macrodatos geoespaciales, la economía del desarrollo, la econometría espacial, el aprendizaje automático espacial y el aprendizaje automático causal">Perspectivas desde los macrodatos geoespaciales, la economía del desarrollo, la econometría espacial, el aprendizaje automático espacial y el aprendizaje automático causal</p>
   </div>
 
   <div class="hero-glass-card hero-glass-card--tagline hero-glass-card--delay-2">

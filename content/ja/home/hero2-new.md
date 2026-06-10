@@ -28,7 +28,7 @@ design:
   <div class="hero-glass-card hero-glass-card--title hero-glass-card--delay-1">
     <h1 class="hero-title"><a class="hero-title-link" href="https://canva.link/hhrue9c5aogivjn" target="_blank" rel="noopener">開発の地理学</a></h1>
     <div class="hero-title-underline" aria-hidden="true"></div>
-    <p class="hero-subtitle" data-rotate="地理空間ビッグデータ|開発経済学|空間計量経済学|因果機械学習" aria-label="地理空間ビッグデータ、開発経済学、空間計量経済学、因果機械学習からの視点">地理空間ビッグデータ、開発経済学、空間計量経済学、因果機械学習からの視点</p>
+    <p class="hero-subtitle" data-rotate="地理空間ビッグデータ|開発経済学|空間計量経済学|空間機械学習|因果機械学習" aria-label="地理空間ビッグデータ、開発経済学、空間計量経済学、空間機械学習、因果機械学習からの視点">地理空間ビッグデータ、開発経済学、空間計量経済学、空間機械学習、因果機械学習からの視点</p>
   </div>
 
   <div class="hero-glass-card hero-glass-card--tagline hero-glass-card--delay-2">
