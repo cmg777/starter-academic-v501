@@ -60,7 +60,7 @@ tags:
   - mlsynth
   - spatial
   - natural disasters
-title: "Evaluating the Impact of Natural Disasters in Python: The Case Study of Aceh Tsunami"
+title: "Bouncing Back Better? Evaluating the Economic Impact of the Aceh Tsunami"
 url_code: ""
 url_pdf: ""
 url_slides: ""
