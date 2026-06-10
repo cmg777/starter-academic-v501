@@ -1188,7 +1188,7 @@ details.concept-card p:last-child {
    scroll box (overflow:hidden) and caused the 2026-06-03 transparent-title bug.
    ========================================================================== */
 
-@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Courier+Prime:wght@400;700&family=Crimson+Pro:wght@500;600;700&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IBM+Plex+Mono:wght@500;600&family=Crimson+Pro:wght@500;600;700&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap");
 
 /* --- Section background: Ken Burns + edge masks ---
    Scoped to `#hero2-new` (the parked redesigned hero, currently
@@ -1446,14 +1446,15 @@ details.concept-card p:last-child {
   grid-area: 1 / 1;
   white-space: nowrap;
   /* the focal element — a typewriter (monospace) face so it reads "consistent with a
-     writing machine" and the type-on animation feels authentic. Courier Prime is the
-     mono leg of the site's serif + sans + mono trio. The sizer shares this font so the
-     width-reservation still matches the (wider) mono — no reflow. Latin-only, so JA
-     keywords fall back to "Courier New"/system monospace. */
-  font-family: "Courier Prime", "Courier New", monospace;
+     writing machine" and the type-on animation feels authentic. IBM Plex Mono is the
+     mono leg of the site's serif + sans + mono trio, and (unlike Courier Prime) has a
+     true Medium (500) weight — a step softer than full bold. The sizer shares this font
+     so the width-reservation still matches the mono — no reflow. Latin-only, so JA
+     keywords fall back to ui-monospace/system monospace. */
+  font-family: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
   font-style: normal;
   font-size: clamp(1.3rem, 2.7vw, 1.95rem);
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.01em;
 }
 .hero-rotator-sizer { visibility: hidden; }
@@ -1465,7 +1466,7 @@ details.concept-card p:last-child {
 /* Blinking caret, same flat electric cyan as the keyword. */
 .hero-rotator-cursor {
   color: #00e5ff;
-  font-weight: 700;
+  font-weight: 500;
   margin-left: 0.04em;
   animation: heroCaretBlink 1s step-end infinite;
 }
