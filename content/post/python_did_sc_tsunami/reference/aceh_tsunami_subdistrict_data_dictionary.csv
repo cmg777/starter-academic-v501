@@ -1,0 +1,20 @@
+variable,label,description,units,role,how_created,paper_reference,example_values,notes
+kecamatan_id,Sub-district ID,Unique identifier for the sub-district (Kecamatan).,string,identifier,Assigned KEC_001 .. KEC_276.,Sect. 2.1; Map 1,KEC_017,276 Aceh kecamatans.
+kecamatan_name,Sub-district name,Readable name linking the kecamatan to its parent district.,string,identifier,Built as <ParentDistrict>_Kec_<nn>.,Map 1,AcehBesar_Kec_03,Per user choice for sub-district labels.
+district_name,Parent district,Aceh district the kecamatan belongs to.,string,identifier,Assigned when distributing 276 kecamatans across 23 districts.,Maps 1-2,Aceh Besar,Context only; regressions use kecamatan fixed effects.
+province,Province,Always Aceh (night-lights analysis is Aceh-only).,string,identifier,Constant 'Aceh'.,Sect. 2.1,Aceh,
+flooded,Flooded dummy,1 if the kecamatan was flooded by the tsunami.,0/1,treatment,68 of 276 kecamatans set to flooded (Table 1 split).,Table 1; Sect. 2.2,1,Sub-district treatment indicator.
+share_pop_flooded,Share of population flooded,Share of the kecamatan's population in flooded area (exogenous dose).,0-1,treatment,latent dose * 0.62 + noise (flooded only); GRUMP-population analogue.,Sect. 2.2; Table 3,0.31,Continuous intensity measure (i).
+share_area_flooded,Share of area flooded,Share of the kecamatan's physical area that was flooded (exogenous dose).,0-1,treatment,latent dose * 0.00566 + noise (flooded only); tiny mean -> ~+1.75 coefficient.,Sect. 2.2; Table 3,0.012,Continuous intensity measure (ii).
+flood_intensity_quintile,Flood-intensity quintile,Quintile (1-5) of the flooding-intensity distribution among flooded units.,0-5,treatment,qcut of the latent dose into 5 groups among flooded kecamatans; 0 for non-flooded.,Table 4,5,Only the top quintile shows a significant effect.
+area_km2,Area,Approximate land area of the kecamatan.,km^2,covariate,Drawn lognormal (30-1500 km^2).,fn. 4,182.5,Sets the number of night-light pixels.
+n_pixels,Pixel count,Number of ~0.86 km^2 night-light grid cells in the kecamatan.,count,covariate,round(area_km2 / 0.86).,fn. 4,212,30x30 arc-second pixels ~ 0.86 km^2 at the equator.
+latitude,Latitude,"Kecamatan-centroid latitude (decimal degrees, +N).",degrees,identifier,Parent Aceh district centroid + ~20 km jitter (flooded ones nudged seaward).,Map 1; Conley SEs,5.48,Enables Conley spatial SEs at sub-district level.
+longitude,Longitude,"Kecamatan-centroid longitude (decimal degrees, +E).",degrees,identifier,See latitude.,Map 1; Conley SEs,95.40,Time-invariant.
+year,Year,Calendar year of the observation.,year,identifier,Panel spans 1999-2012.,Sect. 2.1,2006,Growth defined 2000-2012.
+post,Post-tsunami dummy,1 for years 2005 and later.,0/1,derived,1 if year >= 2005.,Sect. 2.3,1,
+period,DiD period,Event-time period for the staggered DiD dummies.,category,derived,baseline 2000-02 / pre 2003-04 / tsunami 2005 / recovery 2006-08 / postrec 2009-12.,Table 3,recovery,Baseline 2000-02 is the omitted reference.
+avg_luminosity,Average luminosity,Mean Digital Number (brightness) across the kecamatan's pixels.,DN (0-63),outcome,"nl_sum / n_pixels, top-coded at 63 (DMSP saturation). 2004 values match Table 1.",Table 1; Map 1,5.10,Flooded 2004 mean ~5.28; non-flooded ~2.30.
+nl_sum,Summed luminosity,Sum of Digital Numbers over all pixels in the kecamatan.,DN-sum,outcome,exp(nl_log) - 0.001.,Sect. 2.1,1081.4,The unit-level activity measure underlying nl_log.
+nl_log,Log luminosity,log( sum of (DN + 0.001) ) -- the transformed regression variable.,log DN-sum,outcome,Cumulated from the 2004 anchor using the nl_growth series.,Sect. 2.1 (eq. NL); Michalopoulos & Papaioannou 2011,6.986,Matches the paper's log night-lights transform.
+nl_growth,Night-lights growth,Annual growth rate of log night-lights (log difference).,proportion/yr,outcome,"kecamatan_FE + year_FE + theta(period)*dose^2 (flooded) + N(0,0.005) noise.",Tables 3-4,0.142,Main dependent variable; NaN in 1999.

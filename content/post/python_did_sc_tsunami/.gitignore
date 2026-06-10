@@ -1,5 +1,17 @@
-# Local working material only — never publish/commit.
-# Holds the copyrighted source PDF, the synthetic-data generator, and the
-# replication codebase used to build this tutorial. The two data CSVs the post
-# actually loads live in data/ (committed); everything here stays local.
-reference/
+# The copyrighted source paper PDF must NEVER be committed or published.
+reference/*.pdf
+
+# Regenerable byproducts and caches — keep the committed reference/ tree to
+# source only (run reference/replication/run_all.py to recreate these).
+__pycache__/
+reference/replication/figures/
+reference/replication/tables/
+
+# Tutorial-build helpers (notebook/qmd generators) — not part of the paper
+# replication, so they stay local.
+reference/make_notebook.py
+reference/make_qmd.py
+
+# Everything else under reference/ (the replication code, the synthetic-data
+# generator, the data dictionaries, the READMEs, and the data panels) IS
+# committed so the replication is self-contained.

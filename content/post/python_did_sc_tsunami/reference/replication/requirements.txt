@@ -1,0 +1,30 @@
+# =============================================================================
+# Replication environment — Heger & Neumayer (2019) teaching suite
+# Tested with Python 3.12 on macOS (Intel / x86_64).
+# =============================================================================
+#
+# RECOMMENDED SETUP (the system Python on this machine cannot pip-install):
+#
+#     uv venv --python 3.12 .venv
+#     uv pip install --python .venv/bin/python -r requirements.txt
+#     .venv/bin/python run_all.py
+#
+# -----------------------------------------------------------------------------
+# IMPORTANT — Intel macOS pin:
+# pyfixest depends on numba, and recent numba/llvmlite (llvmlite >= 0.44) no
+# longer ship x86_64-macOS wheels, so they try to build LLVM from source and
+# FAIL. Pinning to the versions below (which still have Intel-Mac wheels) is the
+# fix. On Apple Silicon / Linux you can usually drop these two pins.
+# -----------------------------------------------------------------------------
+numba==0.60.0
+llvmlite==0.43.0
+
+# --- the three estimation libraries requested ---
+pyfixest==0.50.1     # two-way fixed-effects DiD regression tables (Tables 2-9)
+diff-diff==3.5.2     # difference-in-differences: intuition + pyfixest cross-check
+mlsynth @ git+https://github.com/jgreathouse9/mlsynth.git   # synthetic control (NOT on PyPI)
+
+# --- plotting / data (usually pulled in transitively, pinned loosely here) ---
+matplotlib>=3.8
+pandas>=2.0
+numpy>=1.24,<2.1
