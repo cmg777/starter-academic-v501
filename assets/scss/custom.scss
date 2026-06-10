@@ -1457,25 +1457,26 @@ details.concept-card p:last-child {
    follow background-clipped text, so the legibility glow over the photo is a
    recolored teal drop-shadow filter instead. */
 .hero-rotator-text {
-  /* teal-dominant: brand teal holds across ~70% of the word, steel blue is only a
+  /* teal-dominant: a lightened brand teal (#33ddd0, closer to the bright teal
+     city-lights in the photo) holds across ~70% of the word; steel blue is only a
      trailing accent — keeps it unmistakably teal while preserving the on-brand gradient. */
-  background-image: linear-gradient(135deg, #00d4c8 0%, #00d4c8 70%, #6a9bcc 100%);
+  background-image: linear-gradient(135deg, #33ddd0 0%, #33ddd0 70%, #6a9bcc 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
   /* stronger teal glow + a wider soft halo make the teal the most prominent thing
      in the subtitle; the dark contact shadow keeps the glyph edges crisp over the photo. */
-  filter: drop-shadow(0 0 13px rgba(0, 212, 200, 0.55))
-          drop-shadow(0 0 26px rgba(0, 212, 200, 0.30))
+  filter: drop-shadow(0 0 13px rgba(51, 221, 208, 0.55))
+          drop-shadow(0 0 26px rgba(51, 221, 208, 0.30))
           drop-shadow(0 1px 2px rgba(8, 12, 38, 0.55));
 }
-/* Blinking caret, brand teal to match the gradient's leading edge. */
+/* Blinking caret, lightened brand teal to match the gradient's leading edge. */
 .hero-rotator-cursor {
-  color: #00d4c8;
+  color: #33ddd0;
   font-weight: 400;
   margin-left: 0.04em;
-  text-shadow: 0 0 10px rgba(0, 212, 200, 0.6);
+  text-shadow: 0 0 10px rgba(51, 221, 208, 0.6);
   animation: heroCaretBlink 1s step-end infinite;
 }
 @keyframes heroCaretBlink {
