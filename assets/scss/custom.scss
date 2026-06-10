@@ -1453,7 +1453,7 @@ details.concept-card p:last-child {
   font-family: "Courier Prime", "Courier New", monospace;
   font-style: normal;
   font-size: clamp(1.3rem, 2.7vw, 1.95rem);
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 0.01em;
 }
 .hero-rotator-sizer { visibility: hidden; }
@@ -1465,7 +1465,7 @@ details.concept-card p:last-child {
 /* Blinking caret, same flat electric cyan as the keyword. */
 .hero-rotator-cursor {
   color: #00e5ff;
-  font-weight: 400;
+  font-weight: 700;
   margin-left: 0.04em;
   animation: heroCaretBlink 1s step-end infinite;
 }
