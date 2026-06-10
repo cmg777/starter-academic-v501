@@ -1446,9 +1446,14 @@ details.concept-card p:last-child {
   grid-area: 1 / 1;
   white-space: nowrap;
   /* the focal element — markedly larger and bolder so the typed insight is the
-     most "notorious" part of the subtitle. */
+     most "notorious" part of the subtitle. Crimson Pro UPRIGHT (a hero font, reused
+     from the author line / section headings) sets the keyword apart from the Cinzel
+     CAPS title and the italic "Insights from" lead — no 4th font family. The sizer
+     shares this font so the width-reservation still matches (no reflow). */
+  font-family: "Crimson Pro", Georgia, serif;
+  font-style: normal;
   font-size: clamp(1.3rem, 2.7vw, 1.95rem);
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.01em;
 }
 .hero-rotator-sizer { visibility: hidden; }
