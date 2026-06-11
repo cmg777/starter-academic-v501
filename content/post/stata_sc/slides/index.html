@@ -215,9 +215,9 @@
 <h2>Smoking was falling everywhere — so did the tax change anything?</h2>
 <p>In 1988, California voters passed <strong>Proposition 99</strong>: a 25-cents-per-pack cigarette tax plus funded anti-smoking education, effective January 1989.</p>
 <div class="fragment">
-<p>But national smoking was already in decline. A simple before-and-after comparison confounds the policy with a trend pushing sales down <em>everywhere</em>. <em>What would California have done without the law?</em></p>
+<p>But national smoking was already falling. <em>What would California have done without the law?</em></p>
 <aside class="notes">
-<p>This is the central problem of single-unit policy evaluation. We cannot just compare California before and after 1989, because secular trends — rising health awareness, federal regulation — were already lowering sales nationwide. We need a credible counterfactual: a “California that never passed Prop 99.”</p>
+<p>A simple before-and-after comparison confounds the policy with a trend pushing sales down everywhere. This is the central problem of single-unit policy evaluation. We cannot just compare California before and after 1989, because secular trends — rising health awareness, federal regulation — were already lowering sales nationwide. We need a credible counterfactual: a “California that never passed Prop 99.”</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -286,8 +286,9 @@
 </section>
 <section id="scm-builds-a-counterfactual-by-matching-pre-treatment-predictors" class="slide level2 center">
 <h2>SCM builds a counterfactual by matching pre-treatment predictors</h2>
-<p><span class="math display">\[\min\_{W} \sum\_{m=1}^{M} v\_m \left( X\_{1m} - \sum\_{j=2}^{J+1} w\_j X\_{jm} \right)^2\]</span></p>
-<p>Choose donor weights <span class="math inline">\(w\_j \ge 0\)</span> summing to one so the weighted donors match California’s predictors <span class="math inline">\(X\_{1m}\)</span>; predictor weights <span class="math inline">\(v\_m\)</span> set how much each covariate matters.</p>
+<p><span class="math display">\[\min_{W} \sum_{m=1}^{M} v_m \left( X_{1m} - \sum_{j=2}^{J+1} w_j X_{jm} \right)^2\]</span></p>
+<p>Pick donor weights <span class="math inline">\(w_j \ge 0\)</span> that sum to one and match California’s predictors <span class="math inline">\(X_{1m}\)</span>.</p>
+<p>The weights <span class="math inline">\(v_m\)</span> set how much each covariate matters.</p>
 <p><span class="comment">The synthetic control is a <strong>convex combination</strong> of real states — no extrapolation beyond the donor pool.</span></p>
 <aside class="notes">
 <p>This is a nested optimization. The outer problem picks the V-weights (predictor importance); the inner problem picks the W-weights (donor shares) that minimize the weighted predictor distance. The non-negativity and sum-to-one constraints are what keep the synthetic interpretable and guard against overfitting.</p>
@@ -305,11 +306,11 @@
 </section>
 <section id="the-treatment-effect-is-the-gap-between-actual-and-synthetic-california" class="slide level2 center">
 <h2>The treatment effect is the gap between actual and synthetic California</h2>
-<p><span class="math display">\[\hat{\tau}\_t = Y\_{1t} - \sum\_{j=2}^{J+1} w\_j^* Y\_{jt}\]</span></p>
-<p>In year <span class="math inline">\(t\)</span>, the effect is California’s actual sales minus the synthetic’s prediction. A negative <span class="math inline">\(\hat{\tau}\_t\)</span> means Prop 99 <em>lowered</em> sales. The <strong>ATT</strong> is the mean of <span class="math inline">\(\hat{\tau}\_t\)</span> over 1989–2000.</p>
+<p><span class="math display">\[\hat{\tau}_t = Y_{1t} - \sum_{j=2}^{J+1} w_j^* Y_{jt}\]</span></p>
+<p>The effect in year <span class="math inline">\(t\)</span> is California’s actual sales minus the synthetic’s prediction. A negative <span class="math inline">\(\hat{\tau}_t\)</span> means Prop 99 <em>lowered</em> sales.</p>
 <p><span class="comment">Identification rests on <strong>good pre-treatment fit</strong>, <strong>no interference</strong>, and <strong>no anticipation</strong> — assumptions you can largely inspect, not just assume.</span></p>
 <aside class="notes">
-<p>Unlike DiD, you do not need parallel trends as an article of faith. If the synthetic tracks the real unit closely before treatment, the post-treatment divergence is credibly the effect. The three assumptions: Prop 99 did not change other states’ sales (no interference), donors did not pass similar laws pre-1989 (no anticipation), and the synthetic reproduces the pre-1989 path (good fit).</p>
+<p>The ATT is the mean of these yearly gaps over 1989–2000. Unlike DiD, you do not need parallel trends as an article of faith. If the synthetic tracks the real unit closely before treatment, the post-treatment divergence is credibly the effect. The three assumptions: Prop 99 did not change other states’ sales (no interference), donors did not pass similar laws pre-1989 (no anticipation), and the synthetic reproduces the pre-1989 path (good fit).</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -571,7 +572,7 @@
 <h2>No single donor drives the result — leave-one-out stays negative</h2>
 
 <img data-src="../stata_sc_loo_combined.png" class="r-stretch quarto-figure-center"><p class="caption">Leave-one-out: synthetic California’s prediction stays similar whichever weighted donor state is dropped.</p><aside class="notes">
-<p>Drop each of the five weighted donors in turn. For 2000 the LOO range is [−28.4, −23.5] around a baseline of −25.6 — a 4.9-pack spread, ~19% of the estimate. No iteration approaches zero, even when Utah (a third of the weight) is removed. The overall LOO ATT (−18.87) is within 0.13 packs of the baseline (−19.0).</p>
+<p>Drop each of the five weighted donors in turn. For 2000 the LOO range is [−28.4, −23.5] around a baseline of −25.6 — a 4.9-pack spread, ~19% of the estimate. No iteration approaches zero, even when Utah (a third of the weight) is removed. The leave-one-out estimates stay close to the baseline ATT of −19.0 packs.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

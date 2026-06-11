@@ -49,7 +49,7 @@ format:
 
 ## "Controlling for income" is a 4-D claim we keep trying to draw in 2-D
 
-When we say "the effect of coupons on sales, *controlling for income*," we describe a relationship that lives in many dimensions.
+"The effect of coupons on sales, *controlling for income*" is a relationship in many dimensions.
 
 . . .
 
@@ -120,7 +120,7 @@ The Frisch–Waugh–Lovell theorem: the coefficient on X1 in the full regressio
 
 ## Controlling for income is one line — and it flips the slope to +0.212
 
-``` {.r code-line-numbers="1|3|3-4"}
+``` {.r code-line-numbers="1|2|1-2"}
 fwl_plot(sales ~ coupons,          data = store_data, ggplot = TRUE)  # slope −0.093
 fwl_plot(sales ~ coupons + income, data = store_data, ggplot = TRUE)  # slope +0.212
 ```

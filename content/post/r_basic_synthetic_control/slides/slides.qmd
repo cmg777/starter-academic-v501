@@ -53,7 +53,7 @@ In 1970 the Basque Country entered decades of sustained terrorist activity. The 
 
 . . .
 
-The Basque GDP path we *did* observe is only half the story. The path it *would* have followed without conflict — the counterfactual — was never recorded. *How do you measure a road not taken?*
+The path we observed is only half the story. The path without conflict — the counterfactual — was never recorded. *How do you measure a road not taken?*
 
 ::: {.notes}
 This is the fundamental problem of causal inference in a single case study. We observe one Basque Country with conflict; we never observe the parallel-universe Basque without it. Classical difference-in-differences needs many treated units; here there is exactly one. That is what motivates synthetic control.
@@ -84,7 +84,7 @@ The spoiler figure for the data structure. Don't over-explain: just plant that t
 
 $$\alpha_{1t} = Y_{1t} - Y_{1t}^{N}, \quad t \geq 1970$$
 
-The treatment effect at year $t$ is actual Basque GDP $Y_{1t}$ minus the no-conflict counterfactual $Y_{1t}^{N}$.
+Treatment effect = actual GDP minus the no-conflict counterfactual $Y_{1t}^{N}$.
 
 [The fundamental problem: $Y_{1t}^{N}$ is never observed. Synthetic control estimates it as a weighted average of donor regions.]{.comment}
 
@@ -161,7 +161,7 @@ prepare_basque() is a helper wrapping dataprep() that packages the four matrices
 | Pre-treatment loss $V$ | 0.0089 |
 | Pre-treatment loss $W$ (MSPE) | 0.2467 |
 
-[Sparsity is typical: only a few donors resemble the treated unit, so the rest get weight zero.]{.comment}
+[Sparsity is typical: few donors resemble the treated unit, the rest get zero.]{.comment}
 
 ::: {.notes}
 Three numbers tell the story. The weights sum to one (convexity respected). Only 2 of 16 donors get non-trivial weight. Both pre-treatment losses are small — a tight fit. This sparse solution is one of synthetic control's appeals over black-box prediction: you can read the recipe.
@@ -191,7 +191,7 @@ This is the one-line summary a reader can carry away. Catalonia and Madrid are t
 | Agriculture share % | 6.84 | 6.18 | 21.4 |
 | Pop. density 1969 | 247 | 196 | 99.4 |
 
-[The synthetic nails outcome-relevant predictors; density shows the largest residual gap.]{.comment}
+[Outcome-relevant predictors match closely; density is the largest gap.]{.comment}
 
 ::: {.notes}
 Pre-treatment GDP matches almost exactly: 5.28 vs 5.27, against a donor mean of just 3.58 — the synthetic is far closer to Basque than the average region is. Education shares fall within a few points. The optimizer correctly recognized Basque as an industrial, low-agriculture region (agriculture 6.84% vs donor mean 21.4%) and downweighted farming economies. Density (247 vs 196) is the largest gap but it is a static control, not an outcome predictor, so it carries little weight in the fit.

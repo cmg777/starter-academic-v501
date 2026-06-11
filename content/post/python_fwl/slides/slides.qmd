@@ -118,7 +118,7 @@ def simulate_store_data(n=50, seed=42):
 [We *plant* the answer (+0.2) in the data, then check whether each estimator finds it.]{.comment}
 
 ::: {.notes}
-Why simulate? Because the true causal effect is known by construction — exactly +0.2 — so we can grade every method against ground truth. 50 stores, income centered at $50K, coupons depend negatively on income, sales depend positively on both. This is a controlled experiment inside the computer.
+Why simulate? Because the true causal effect is known by construction — exactly +0.2 — so we can grade every method against ground truth. 50 stores, income centered at \$50K, coupons depend negatively on income, sales depend positively on both. This is a controlled experiment inside the computer.
 :::
 
 ## The naive slope is −0.106 — and points the wrong way (p = 0.365)
@@ -130,7 +130,7 @@ Why simulate? Because the true causal effect is known by construction — exactl
 [Not just imprecise — the sign is *backwards* from the true +0.2. The confounder is pulling it down.]{.comment}
 
 ::: {.notes}
-Each extra percentage point of coupons is "associated with" $106 less in daily sales — but it is not significant and it contradicts the planted +0.2. Wealthy neighborhoods use fewer coupons yet spend more, so the raw slope inherits income's negative coupon link. This is the result the controls will fix.
+Each extra percentage point of coupons is "associated with" \$106 less in daily sales — but it is not significant and it contradicts the planted +0.2. Wealthy neighborhoods use fewer coupons yet spend more, so the raw slope inherits income's negative coupon link. This is the result the controls will fix.
 :::
 
 ## Add income as a control and the slope flips to +0.267 (p = 0.031)
@@ -205,7 +205,7 @@ This is the payoff plot — the conditional relationship a multivariate regressi
 
 ## Adding the means back keeps the slope but restores readable units
 
-![Same residual scatter shifted by the sample means — axes now read ~34% coupons and ~$33.6K sales, slope still +0.267.](../fwl_scaled_residuals.png)
+![Same residual scatter shifted by the sample means — axes now read ~34% coupons and ~\$33.6K sales, slope still +0.267.](../fwl_scaled_residuals.png)
 
 ::: {.notes}
 A residual of −5 doesn't mean −5% coupon usage; it means 5 points below what income predicts. Adding each variable's mean back shifts the axes into interpretable units without touching the slope (still 0.2673, p = 0.029). This is the version for a slide or a stakeholder report.
@@ -267,7 +267,7 @@ Every FWL variant matches its full-regression twin to four decimals. The only th
 
 . . .
 
-[Response.]{.rebuttal} FWL is pure algebra — it reproduces what OLS already computes, nothing more. The causal reading rests on the *assumption* that income is the only confounder (a correctly specified, linear backdoor). FWL makes that adjustment visible; it cannot certify it.
+[Response.]{.rebuttal} FWL is pure algebra — it only reproduces what OLS already computes. The causal reading needs one assumption: income is the only confounder. FWL pictures that adjustment; it cannot certify it.
 
 ::: {.notes}
 Steelman, don't strawman. If income affects coupons or sales nonlinearly, OLS residuals won't fully clean the confounding — that's the linearity caveat in the post. And if a second confounder is omitted, no amount of residualizing on income saves you. FWL disciplines and pictures the adjustment; identification still comes from the DAG.

@@ -153,7 +153,7 @@ Relevance, visualized. Australia, New Zealand, the USA — the lowest-mortality 
 | Diagnostic | Value | Threshold |
 |---|---:|---:|
 | Kleibergen-Paap rk Wald F | [16.32]{.key} | 10 (rule of thumb) |
-| Stock-Yogo 10% max IV size | 16.32 | 16.38 (iid) |
+| Stock-Yogo 10% max IV size | — | 16.38 (iid) |
 | Anderson-Rubin Wald (robust) | 61.66 | $p < 0.0001$ |
 
 [Borderline on the conventional threshold; the weak-IV-robust AR test reassures.]{.comment}
@@ -232,7 +232,7 @@ Across 27 specifications the institutional coefficient stays in the 0.55–1.36 
 
 . . .
 
-[Response.]{.rebuttal} Add health controls and the effect dips to 0.55–0.69. But there the first-stage F falls to 1.2–4.9 (weak IV), and Hansen J fails to reject ($p = 0.46$–$0.80$). The doubt is real; it is the place to keep an open mind.
+[Response.]{.rebuttal} Add health controls and the effect dips to 0.55–0.69. But there the first-stage F falls to 1.2–4.9 (weak IV), and Hansen J fails to reject ($p = 0.46$–$0.76$). The doubt is real; it is the place to keep an open mind.
 
 ::: {.notes}
 Steelman, don't strawman. Health is the tightest threat to exclusion. AJR's reading: modern health is a "bad control" — itself an outcome of institutions, so adjusting for it shrinks the coefficient artifactually. A critic's reading: disease is a genuine direct channel. The data cannot adjudicate. Add Albouy (2012): ~36% of mortality observations are imputed or shared, so Hansen J non-rejection has low power against shared imputation noise. Honesty over comfort.

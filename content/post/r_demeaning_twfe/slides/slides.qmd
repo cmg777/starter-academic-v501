@@ -118,9 +118,9 @@ $$\tilde{x}_{it} = x_{it} - \bar{x}_{i\cdot} - \bar{x}_{\cdot t} + \bar{x}_{\cdo
 The double-dot accent here is the within-transformed variable. Demeaning growth for Brazil in 1965 means: subtract Brazil's 8-period average, subtract 1965's 150-country average, then add back the grand mean over all 1,200 rows. Repeat for every variable.
 :::
 
-## Why add the grand mean back? Or you subtract the overlap twice
+## Why add the grand mean back? Miss it and you subtract the overlap twice
 
-Subtract both the country mean and the time mean and the **grand mean leaves twice** — once inside each. Add $\bar{x}_{\cdot\cdot}$ back once to restore it.
+Subtract both the country mean and the time mean, and you remove the **grand mean twice** — it hides inside each. Add $\bar{x}_{\cdot\cdot}$ back once to undo that.
 
 [Like a Venn diagram: remove both circles entirely and the overlap is deleted twice. Add the overlap back once.]{.comment}
 
@@ -226,7 +226,7 @@ This is the central result. All five slopes are identical to at least 12 signifi
 [Convergence $\hat\beta$ on log initial income — *identical* from `feols()` and from `lm()` on demeaned data]{.bignum-label}
 
 ::: {.notes}
-A country one log-point poorer at the start of a period grows about 5.5 percentage points faster, conditional on country and period fixed effects — strong conditional β-convergence (t = −14.8). The headline is not the economics but the equivalence: the same number falls out of two notations of the same calculation.
+A country one log-point poorer at the start of a period grows about 5.5 percentage points faster, conditional on country and period fixed effects — strong conditional β-convergence (t = −14.77). The headline is not the economics but the equivalence: the same number falls out of two notations of the same calculation.
 :::
 
 ## Demeaning *is* the picture: wide spread collapses to within-variation
@@ -259,7 +259,7 @@ The point estimates are exact, but inference is not free. lm() doesn't know that
 
 . . .
 
-[Response.]{.rebuttal} Because correct points $\neq$ correct inference. `lm()` understates SEs by 7–22%, giving artificially narrow CIs and inflated $t$-stats. `feols()` makes the df correction *and* offers clustering for serial correlation — use a dedicated panel estimator for any hypothesis test.
+[Response.]{.rebuttal} Because correct points $\neq$ correct inference. `lm()` understates SEs by 7–22% — narrow CIs, inflated $t$-stats. `feols()` fixes the df *and* clusters for serial correlation. Use a panel estimator for any test.
 
 ::: {.notes}
 Steelman, don't strawman. The manual route is a teaching device and a proof — it is genuinely the same calculation for β. But shipping it in applied work would publish over-confident standard errors. The convenience of lm() is exactly the trap.

@@ -70,7 +70,7 @@ Spoiler figure for Act I. Don't reveal the DiD number yet — just plant that a 
 ## Where we're going
 
 ::: {.incremental}
-- The naive ITS trap: why before-after overstates the effect
+- The naive ITS trap: before-after overstates the effect
 - The 2×2 DiD design — a comparison group rebuilds the counterfactual
 - Five equivalent Stata estimators land on one number
 - The event study — testing parallel trends with pre-treatment leads
@@ -164,7 +164,9 @@ $$Y_{it} = \alpha + \beta_1 \text{Treat}_i + \beta_2 \text{Post}_t + \beta_3 (\t
 reg gpa treated post txp, robust
 ```
 
-[$\hat\beta_3 = 25.31$ (SE 0.61). The constant 71.22 is the comparison pre-mean; $\hat\beta_1 = -11.05$ the baseline gap; $\hat\beta_2 = 10.89$ the common trend.]{.comment}
+[$\hat\beta_3 = 25.31$ (SE 0.61) — the DiD.]{.comment}
+
+[The rest is nuisance: constant 71.22 (comparison pre-mean), $\hat\beta_1 = -11.05$ (baseline gap), $\hat\beta_2 = 10.89$ (common trend).]{.comment}
 
 ::: {.notes}
 Regression decomposes the DiD into building blocks and — crucially — lets you add controls, flexible standard errors, and extensions the manual subtraction cannot. The interaction coefficient is the entire causal payload; everything else is nuisance structure.
@@ -179,7 +181,9 @@ xtreg  gpa txp i.time, fe vce(cluster id)
 reghdfe gpa txp, absorb(id time) cluster(id)
 ```
 
-[Unit effects $\gamma_i$ wipe out permanent school differences; time effects $\vartheta_t$ wipe out common shocks. What remains is $\hat\beta_3 = 25.31$.]{.comment}
+[$\gamma_i$ wipes out permanent school differences.]{.comment}
+
+[$\vartheta_t$ wipes out common shocks. What remains: $\hat\beta_3 = 25.31$.]{.comment}
 
 ::: {.notes}
 Like a two-pass photo filter: the first pass removes school-specific stains (rich/poor, urban/rural), the second removes period-specific glare (a nationwide reform). `reghdfe` gives byte-identical results to `xtreg` but scales to large panels. Within R-squared 0.9946 — again, simulated-data clean.
@@ -242,6 +246,7 @@ The most informative figure in the analysis. The three visible leads are 0.34, �
 | lead 2 | 0.593 | 0.423 | no |
 | lag 0 | [25.028]{.key} | 0.445 | yes |
 | lag 1 | 24.705 | 0.559 | yes |
+| lag 2 | 24.768 | 0.739 | yes |
 | lag 3 | 25.701 | 0.797 | yes |
 
 [Lags span < 1 GPA point across four periods: no fade-out, no ramp-up — an immediate, sustained effect.]{.comment}

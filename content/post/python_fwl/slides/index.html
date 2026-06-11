@@ -684,7 +684,7 @@
 <h2>Does FWL make this causal? No — it visualizes, it does not identify</h2>
 <p><span class="objection">Objection.</span> Residualizing on income looks like a trick that manufactures a causal effect.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> FWL is pure algebra — it reproduces what OLS already computes, nothing more. The causal reading rests on the <em>assumption</em> that income is the only confounder (a correctly specified, linear backdoor). FWL makes that adjustment visible; it cannot certify it.</p>
+<p><span class="rebuttal">Response.</span> FWL is pure algebra — it only reproduces what OLS already computes. The causal reading needs one assumption: income is the only confounder. FWL pictures that adjustment; it cannot certify it.</p>
 <aside class="notes">
 <p>Steelman, don’t strawman. If income affects coupons or sales nonlinearly, OLS residuals won’t fully clean the confounding — that’s the linearity caveat in the post. And if a second confounder is omitted, no amount of residualizing on income saves you. FWL disciplines and pictures the adjustment; identification still comes from the DAG.</p>
 <style type="text/css">

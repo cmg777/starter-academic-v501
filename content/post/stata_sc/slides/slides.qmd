@@ -53,10 +53,10 @@ In 1988, California voters passed **Proposition 99**: a 25-cents-per-pack cigare
 
 . . .
 
-But national smoking was already in decline. A simple before-and-after comparison confounds the policy with a trend pushing sales down *everywhere*. *What would California have done without the law?*
+But national smoking was already falling. *What would California have done without the law?*
 
 ::: {.notes}
-This is the central problem of single-unit policy evaluation. We cannot just compare California before and after 1989, because secular trends — rising health awareness, federal regulation — were already lowering sales nationwide. We need a credible counterfactual: a "California that never passed Prop 99."
+A simple before-and-after comparison confounds the policy with a trend pushing sales down everywhere. This is the central problem of single-unit policy evaluation. We cannot just compare California before and after 1989, because secular trends — rising health awareness, federal regulation — were already lowering sales nationwide. We need a credible counterfactual: a "California that never passed Prop 99."
 :::
 
 ## A raw comparison hints at an effect — but the comparator is crude
@@ -96,9 +96,11 @@ With a single treated unit and aggregate data, difference-in-differences' parall
 
 ## SCM builds a counterfactual by matching pre-treatment predictors
 
-$$\min\_{W} \sum\_{m=1}^{M} v\_m \left( X\_{1m} - \sum\_{j=2}^{J+1} w\_j X\_{jm} \right)^2$$
+$$\min_{W} \sum_{m=1}^{M} v_m \left( X_{1m} - \sum_{j=2}^{J+1} w_j X_{jm} \right)^2$$
 
-Choose donor weights $w\_j \ge 0$ summing to one so the weighted donors match California's predictors $X\_{1m}$; predictor weights $v\_m$ set how much each covariate matters.
+Pick donor weights $w_j \ge 0$ that sum to one and match California's predictors $X_{1m}$.
+
+The weights $v_m$ set how much each covariate matters.
 
 [The synthetic control is a **convex combination** of real states — no extrapolation beyond the donor pool.]{.comment}
 
@@ -108,14 +110,14 @@ This is a nested optimization. The outer problem picks the V-weights (predictor 
 
 ## The treatment effect is the gap between actual and synthetic California
 
-$$\hat{\tau}\_t = Y\_{1t} - \sum\_{j=2}^{J+1} w\_j^* Y\_{jt}$$
+$$\hat{\tau}_t = Y_{1t} - \sum_{j=2}^{J+1} w_j^* Y_{jt}$$
 
-In year $t$, the effect is California's actual sales minus the synthetic's prediction. A negative $\hat{\tau}\_t$ means Prop 99 *lowered* sales. The **ATT** is the mean of $\hat{\tau}\_t$ over 1989–2000.
+The effect in year $t$ is California's actual sales minus the synthetic's prediction. A negative $\hat{\tau}_t$ means Prop 99 *lowered* sales.
 
 [Identification rests on **good pre-treatment fit**, **no interference**, and **no anticipation** — assumptions you can largely inspect, not just assume.]{.comment}
 
 ::: {.notes}
-Unlike DiD, you do not need parallel trends as an article of faith. If the synthetic tracks the real unit closely before treatment, the post-treatment divergence is credibly the effect. The three assumptions: Prop 99 did not change other states' sales (no interference), donors did not pass similar laws pre-1989 (no anticipation), and the synthetic reproduces the pre-1989 path (good fit).
+The ATT is the mean of these yearly gaps over 1989–2000. Unlike DiD, you do not need parallel trends as an article of faith. If the synthetic tracks the real unit closely before treatment, the post-treatment divergence is credibly the effect. The three assumptions: Prop 99 did not change other states' sales (no interference), donors did not pass similar laws pre-1989 (no anticipation), and the synthetic reproduces the pre-1989 path (good fit).
 :::
 
 ## One `synth2` call fits the baseline synthetic control
@@ -240,7 +242,7 @@ Fake-period effects average about −6.0 packs; real-period effects roughly doub
 ![Leave-one-out: synthetic California's prediction stays similar whichever weighted donor state is dropped.](../stata_sc_loo_combined.png)
 
 ::: {.notes}
-Drop each of the five weighted donors in turn. For 2000 the LOO range is [−28.4, −23.5] around a baseline of −25.6 — a 4.9-pack spread, ~19% of the estimate. No iteration approaches zero, even when Utah (a third of the weight) is removed. The overall LOO ATT (−18.87) is within 0.13 packs of the baseline (−19.0).
+Drop each of the five weighted donors in turn. For 2000 the LOO range is [−28.4, −23.5] around a baseline of −25.6 — a 4.9-pack spread, ~19% of the estimate. No iteration approaches zero, even when Utah (a third of the weight) is removed. The leave-one-out estimates stay close to the baseline ATT of −19.0 packs.
 :::
 
 ## Does choosing controls by fit make this causal? Not by itself

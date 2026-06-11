@@ -333,9 +333,9 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="why-add-the-grand-mean-back-or-you-subtract-the-overlap-twice" class="slide level2 center">
-<h2>Why add the grand mean back? Or you subtract the overlap twice</h2>
-<p>Subtract both the country mean and the time mean and the <strong>grand mean leaves twice</strong> — once inside each. Add <span class="math inline">\(\bar{x}_{\cdot\cdot}\)</span> back once to restore it.</p>
+<section id="why-add-the-grand-mean-back-miss-it-and-you-subtract-the-overlap-twice" class="slide level2 center">
+<h2>Why add the grand mean back? Miss it and you subtract the overlap twice</h2>
+<p>Subtract both the country mean and the time mean, and you remove the <strong>grand mean twice</strong> — it hides inside each. Add <span class="math inline">\(\bar{x}_{\cdot\cdot}\)</span> back once to undo that.</p>
 <p><span class="comment">Like a Venn diagram: remove both circles entirely and the overlap is deleted twice. Add the overlap back once.</span></p>
 <aside class="notes">
 <p>Without the +grand-mean term, the demeaned variables are not centred at zero, the intercept is no longer ~0, and the FWL equivalence with TWFE breaks. The grand-mean correction is algebraically necessary, not cosmetic. This is also Exercise 1 in the post.</p>
@@ -529,7 +529,7 @@
 <p><span class="bignum">−0.055286</span></p>
 <p><span class="bignum-label">Convergence <span class="math inline">\(\hat\beta\)</span> on log initial income — <em>identical</em> from <code>feols()</code> and from <code>lm()</code> on demeaned data</span></p>
 <aside class="notes">
-<p>A country one log-point poorer at the start of a period grows about 5.5 percentage points faster, conditional on country and period fixed effects — strong conditional β-convergence (t = −14.8). The headline is not the economics but the equivalence: the same number falls out of two notations of the same calculation.</p>
+<p>A country one log-point poorer at the start of a period grows about 5.5 percentage points faster, conditional on country and period fixed effects — strong conditional β-convergence (t = −14.77). The headline is not the economics but the equivalence: the same number falls out of two notations of the same calculation.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -597,7 +597,7 @@
 <h2>The strongest objection — and the answer</h2>
 <p><span class="objection">Objection.</span> “If <code>lm()</code> on demeaned data nails the coefficients, why not just use it and skip <code>fixest</code>?”</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Because correct points <span class="math inline">\(\neq\)</span> correct inference. <code>lm()</code> understates SEs by 7–22%, giving artificially narrow CIs and inflated <span class="math inline">\(t\)</span>-stats. <code>feols()</code> makes the df correction <em>and</em> offers clustering for serial correlation — use a dedicated panel estimator for any hypothesis test.</p>
+<p><span class="rebuttal">Response.</span> Because correct points <span class="math inline">\(\neq\)</span> correct inference. <code>lm()</code> understates SEs by 7–22% — narrow CIs, inflated <span class="math inline">\(t\)</span>-stats. <code>feols()</code> fixes the df <em>and</em> clusters for serial correlation. Use a panel estimator for any test.</p>
 <aside class="notes">
 <p>Steelman, don’t strawman. The manual route is a teaching device and a proof — it is genuinely the same calculation for β. But shipping it in applied work would publish over-confident standard errors. The convenience of lm() is exactly the trap.</p>
 <style type="text/css">

@@ -213,7 +213,7 @@
 </section>
 <section id="controlling-for-income-is-a-4-d-claim-we-keep-trying-to-draw-in-2-d" class="slide level2 center">
 <h2>“Controlling for income” is a 4-D claim we keep trying to draw in 2-D</h2>
-<p>When we say “the effect of coupons on sales, <em>controlling for income</em>,” we describe a relationship that lives in many dimensions.</p>
+<p>“The effect of coupons on sales, <em>controlling for income</em>” is a relationship in many dimensions.</p>
 <div class="fragment">
 <p>You cannot put it on a scatter plot. <em>Or can you?</em></p>
 <aside class="notes">
@@ -343,7 +343,7 @@
 </section>
 <section id="controlling-for-income-is-one-line-and-it-flips-the-slope-to-0.212" class="slide level2 center">
 <h2>Controlling for income is one line — and it flips the slope to +0.212</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|3|3-4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">fwl_plot</span>(sales <span class="sc">~</span> coupons,          <span class="at">data =</span> store_data, <span class="at">ggplot =</span> <span class="cn">TRUE</span>)  <span class="co"># slope −0.093</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2|1-2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">fwl_plot</span>(sales <span class="sc">~</span> coupons,          <span class="at">data =</span> store_data, <span class="at">ggplot =</span> <span class="cn">TRUE</span>)  <span class="co"># slope −0.093</span></span>
 <span id="cb1-2"><a href=""></a><span class="fu">fwl_plot</span>(sales <span class="sc">~</span> coupons <span class="sc">+</span> income, <span class="at">data =</span> store_data, <span class="at">ggplot =</span> <span class="cn">TRUE</span>)  <span class="co"># slope +0.212</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>fwl_plot()</code> residualizes both <code>coupons</code> and <code>sales</code> on <code>income</code> behind the scenes, then plots the residuals with the regression line on top.</p>
 <aside class="notes">

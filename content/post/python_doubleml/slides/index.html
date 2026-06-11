@@ -231,11 +231,11 @@
       }</style></aside>
 </div>
 </section>
-<section id="the-raw-gap-is-real-but-small-control-2.057-vs-bonus-1.971-in-log-duration" class="slide level2 center">
-<h2>The raw gap is real but small: control 2.057 vs bonus 1.971 in log duration</h2>
+<section id="the-raw-gap-is-real-but-small-bonus-duration-sits-0.09-log-points-lower" class="slide level2 center">
+<h2>The raw gap is real but small: bonus duration sits ~0.09 log points lower</h2>
 
 <img data-src="../doubleml_outcome_by_treatment.png" class="r-stretch quarto-figure-center"><p class="caption">Log unemployment duration by group — both distributions pile up near 3.0–3.5; the bonus group’s mean sits ~0.09 log points lower.</p><aside class="notes">
-<p>Spoiler / framing figure. Don’t over-read it — the ~0.09 raw gap is a hint, not the causal effect. We earn the disciplined number in Act II and come back to where it lands. The left-skew (median 2.398 &gt; mean 2.028) shows some claimants found work very fast.</p>
+<p>Spoiler / framing figure. The per-group means are control 2.057 vs bonus 1.971 — a ~0.09 raw gap. Don’t over-read it: that’s a hint, not the causal effect. We earn the disciplined number in Act II and come back to where it lands. The left-skew (median 2.398 &gt; mean 2.028) shows some claimants found work very fast.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -307,7 +307,7 @@
 <p>Standard linear adjustment regresses <span class="math inline">\(Y\)</span> on <span class="math inline">\(D\)</span> and the covariates:</p>
 <p><span class="math display">\[Y_i = \alpha + \beta\, D_i + X_i'\gamma + \epsilon_i\]</span></p>
 <div class="fragment">
-<p><span class="comment">If the true <span class="math inline">\(X \to Y\)</span> map is <em>nonlinear</em>, a linear <span class="math inline">\(X_i'\gamma\)</span> leaves predictable variation in the residual — wider standard errors than necessary.</span></p>
+<p><span class="comment">A linear <span class="math inline">\(X_i'\gamma\)</span> can miss nonlinear structure in <span class="math inline">\(X \to Y\)</span>. The leftover variation widens the standard errors.</span></p>
 <aside class="notes">
 <p>This motivates ML. In an observational study, linear adjustment also risks residual confounding bias. In this RCT there is no bias to remove, so the payoff of flexible adjustment is variance reduction: absorbing more of inuidur1’s variation tightens the CI around the same ATE.</p>
 <style type="text/css">
@@ -473,7 +473,7 @@
 <td>Lasso</td>
 <td style="text-align: right;">−0.0712</td>
 <td style="text-align: right;">0.0354</td>
-<td style="text-align: right;">0.045</td>
+<td style="text-align: right;">0.044</td>
 <td style="text-align: center;">[−0.141, −0.002]</td>
 </tr>
 </tbody>
@@ -531,7 +531,7 @@
 <h2>Does flexible ML <em>make</em> this causal? No — the RCT does</h2>
 <p><span class="objection">Objection.</span> “You ran fancy machine learning, so the −0.0736 must be the true causal effect.”</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> The identification comes from <strong>randomization</strong>, not from DML. ML only partials out <span class="math inline">\(X\)</span> flexibly and delivers valid inference. On observational data, <span class="math inline">\(\hat\theta_0\)</span> is causal only under conditional independence given <span class="math inline">\(X\)</span> — DML disciplines <em>adjustment</em>, it cannot manufacture <em>identification</em>.</p>
+<p><span class="rebuttal">Response.</span> Identification comes from <strong>randomization</strong>, not DML. ML only partials out <span class="math inline">\(X\)</span> and delivers valid inference. DML disciplines <em>adjustment</em> — it cannot manufacture <em>identification</em>.</p>
 <aside class="notes">
 <p>Steelman, don’t strawman. DML’s contribution is valid, learner-robust inference with flexible nuisance control — not a license to skip the identifying assumptions. Here the RCT supplies identification; on observational data the analyst must defend conditional independence and overlap separately. PLR also assumes a constant θ_0 (no heterogeneity); the IRM relaxes that.</p>
 <style type="text/css">

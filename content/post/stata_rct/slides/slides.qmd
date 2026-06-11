@@ -49,14 +49,14 @@ format:
 
 ## Governments spend billions on cash transfers — but does the money actually raise welfare?
 
-Cash transfers are among the most common development interventions worldwide. The hard part is not sending the money — it is *proving* it worked.
+The hard part isn't sending the money — it is *proving* it worked.
 
 . . .
 
-We sidestep the usual ambiguity with a simulation where the answer is known in advance: the program raises consumption by **12%** ($0.12$ log points). *Can a toolkit of estimators recover a number we already know?*
+So we simulate a known truth: the program raises consumption by **12%** ($0.12$ log points). *Can the estimators recover it?*
 
 ::: {.notes}
-Open with the policy stakes, then reveal the pedagogical trick: simulated data with a known true effect of 0.12 log points. The whole talk is a controlled experiment on the estimators themselves — we judge each method by how close it lands to a ground truth we planted.
+Cash transfers are among the most common development interventions worldwide. Open with the policy stakes, then reveal the pedagogical trick: simulated data with a known true effect of 0.12 log points. The whole talk is a controlled experiment on the estimators themselves — we judge each method by how close it lands to a ground truth we planted.
 :::
 
 ## One dataset, twelve estimates — and the spread already tells a story
@@ -120,11 +120,11 @@ The first thing to verify in any RCT. SMD is the scale-free imbalance measure: m
 |---|---:|---:|---:|
 | Consumption $y$ | 10.025 | 10.006 | <0.05 |
 | Age | 35.34 | 34.93 | <0.05 |
-| Education | 11.97 | 12.08 | <0.05 |
+| Education | 11.97 | 12.08 | 0.052 |
 | Female-headed | 0.484 | 0.531 | [0.093]{.key} |
 | Poverty | 0.307 | 0.318 | <0.05 |
 
-[$p = 0.038$ for `female` — significant, but an SMD of $9.3\%$ is the right lens: large $n$ makes tiny gaps "significant."]{.comment}
+[$p = 0.038$ flags `female`, but the SMD of $9.3\%$ is the right lens — large $n$ makes tiny gaps "significant."]{.comment}
 
 ::: {.notes}
 P-values mislead at large n — they flag a 4.6pp gender gap as "significant" while the SMD says it is small and below threshold. The lesson: judge balance with standardized differences, not p-values. We carry female (and the others) into estimation as precision controls.
@@ -189,10 +189,10 @@ Name the estimand for every method — this is the discipline the post insists o
 
 . . .
 
-Adding covariates (RA, IPW, doubly robust) does **not** fix confounding here — there is none. It soaks up residual variation, tightening the estimate. *In observational studies the same controls would be doing the heavy lifting of identification.*
+No confounding here, so covariates don't fix bias — they soak up residual variation and tighten the estimate.
 
 ::: {.notes}
-This is the single most important conceptual point for an RCT audience, and the most commonly muddled. Distinguish the randomized framing (adjustment = precision) from the observational framing (adjustment = bias removal). The estimators are identical; their *job* is not.
+In observational studies the same controls would be doing the heavy lifting of identification. This is the single most important conceptual point for an RCT audience, and the most commonly muddled. Distinguish the randomized framing (adjustment = precision) from the observational framing (adjustment = bias removal). The estimators are identical; their *job* is not.
 :::
 
 ## Three strategies, three things to model: outcome, treatment, or both
@@ -222,7 +222,7 @@ RA predicts the missing counterfactual from an outcome model; IPW reweights obse
 
 $$\hat\tau_{DR}^{ATE} = \frac1N \sum_{i=1}^{N}\Big[\hat\mu_1(X_i) - \hat\mu_0(X_i) + \frac{T_i\,(Y_i - \hat\mu_1)}{\hat p(X_i)} - \frac{(1-T_i)(Y_i - \hat\mu_0)}{1 - \hat p(X_i)}\Big]$$
 
-The first two terms are the RA prediction; the last two are IPW-weighted residuals that cancel RA's bias when the propensity model is right.
+First two terms: the RA prediction. Last two: IPW residuals that cancel RA's bias.
 
 [Belt and suspenders: if the belt fails, the suspenders hold. Only *both* wrong is fatal.]{.comment}
 
@@ -288,7 +288,8 @@ The motivation for going panel. Observable covariates leave unobservable confoun
 
 $$\hat\tau_{DiD} = \underbrace{(\bar Y_{T,post} - \bar Y_{T,pre})}_{\text{effect}\,+\,\text{trend}} - \underbrace{(\bar Y_{C,post} - \bar Y_{C,pre})}_{\text{trend only}}$$
 
-The treated change carries the effect *plus* the common time trend; the control change carries the trend *alone*. Subtract, and the trend cancels.
+Treated change = effect + trend. Control change = trend alone.
+Subtract — the trend cancels.
 
 [Identification rides on **parallel trends** — plausible here because randomization equalized the groups at baseline.]{.comment}
 
@@ -304,7 +305,7 @@ xtdidregress (y) (treat_post), group(id) time(year) vce(cluster id)
 *  ATET = 0.135  (SE 0.027)  95% CI [0.081, 0.188]
 ```
 
-[0.135]{.key} sits a touch above the cross-sectional $0.113$, with a wider SE ($0.027$ vs $0.019$) — the price of differencing within households.
+[0.135]{.key} sits just above the cross-sectional $0.113$ — the wider SE ($0.027$ vs $0.019$) is the price of differencing.
 
 ::: {.notes}
 DiD estimates the ATT because its counterfactual — control trend applied to the treated baseline — is constructed only for the treated group. The wider SE is not a defect: it reflects honest within-household differencing. The headline value still covers 0.12. Standard errors clustered at the household level.

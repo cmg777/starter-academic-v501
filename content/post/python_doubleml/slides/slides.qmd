@@ -59,12 +59,12 @@ But people who *get* a treatment can differ from those who don't. *Is the gap th
 The core challenge of causal inference: separating a genuine treatment effect from confounders — variables that move both the treatment and the outcome. Here the design protects us (it's an RCT), but the slide poses the universal worry so the audience feels why we need a principled adjustment, not just a raw mean difference.
 :::
 
-## The raw gap is real but small: control 2.057 vs bonus 1.971 in log duration
+## The raw gap is real but small: bonus duration sits ~0.09 log points lower
 
 ![Log unemployment duration by group — both distributions pile up near 3.0–3.5; the bonus group's mean sits ~0.09 log points lower.](../doubleml_outcome_by_treatment.png)
 
 ::: {.notes}
-Spoiler / framing figure. Don't over-read it — the ~0.09 raw gap is a hint, not the causal effect. We earn the disciplined number in Act II and come back to where it lands. The left-skew (median 2.398 > mean 2.028) shows some claimants found work very fast.
+Spoiler / framing figure. The per-group means are control 2.057 vs bonus 1.971 — a ~0.09 raw gap. Don't over-read it: that's a hint, not the causal effect. We earn the disciplined number in Act II and come back to where it lands. The left-skew (median 2.398 > mean 2.028) shows some claimants found work very fast.
 :::
 
 ## Where we're going
@@ -111,7 +111,7 @@ $$Y_i = \alpha + \beta\, D_i + X_i'\gamma + \epsilon_i$$
 
 . . .
 
-[If the true $X \to Y$ map is *nonlinear*, a linear $X_i'\gamma$ leaves predictable variation in the residual — wider standard errors than necessary.]{.comment}
+[A linear $X_i'\gamma$ can miss nonlinear structure in $X \to Y$. The leftover variation widens the standard errors.]{.comment}
 
 ::: {.notes}
 This motivates ML. In an observational study, linear adjustment also risks residual confounding bias. In this RCT there is no bias to remove, so the payoff of flexible adjustment is variance reduction: absorbing more of inuidur1's variation tightens the CI around the same ATE.
@@ -204,7 +204,7 @@ The Act III payoff. θ̂ = −0.0736 ⇒ ≈ 7.4% on the log scale, ≈ 7.1% pro
 | Learner | $\hat\theta_0$ | SE | $p$ | 95% CI |
 |---|---:|---:|---:|:---:|
 | Random Forest | [−0.0736]{.key} | 0.0354 | 0.038 | [−0.143, −0.004] |
-| Lasso | −0.0712 | 0.0354 | 0.045 | [−0.141, −0.002] |
+| Lasso | −0.0712 | 0.0354 | 0.044 | [−0.141, −0.002] |
 
 [Two utterly different learners, a 0.0024 gap — under 7% of one standard error.]{.comment}
 
@@ -234,7 +234,7 @@ Honesty slide. Both intervals clear zero, but the upper bounds (0.4% and 0.2% re
 
 . . .
 
-[Response.]{.rebuttal} The identification comes from **randomization**, not from DML. ML only partials out $X$ flexibly and delivers valid inference. On observational data, $\hat\theta_0$ is causal only under conditional independence given $X$ — DML disciplines *adjustment*, it cannot manufacture *identification*.
+[Response.]{.rebuttal} Identification comes from **randomization**, not DML. ML only partials out $X$ and delivers valid inference. DML disciplines *adjustment* — it cannot manufacture *identification*.
 
 ::: {.notes}
 Steelman, don't strawman. DML's contribution is valid, learner-robust inference with flexible nuisance control — not a license to skip the identifying assumptions. Here the RCT supplies identification; on observational data the analyst must defend conditional independence and overlap separately. PLR also assumes a constant θ_0 (no heterogeneity); the IRM relaxes that.

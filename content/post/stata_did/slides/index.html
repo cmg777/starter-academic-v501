@@ -251,7 +251,7 @@
 <section id="where-were-going" class="slide level2 center">
 <h2>Where we’re going</h2>
 <ul>
-<li class="fragment">The naive ITS trap: why before-after overstates the effect</li>
+<li class="fragment">The naive ITS trap: before-after overstates the effect</li>
 <li class="fragment">The 2×2 DiD design — a comparison group rebuilds the counterfactual</li>
 <li class="fragment">Five equivalent Stata estimators land on one number</li>
 <li class="fragment">The event study — testing parallel trends with pre-treatment leads</li>
@@ -439,7 +439,8 @@
 <h2>The same number as a regression: the interaction <code>txp</code> IS the DiD</h2>
 <p><span class="math display">\[Y_{it} = \alpha + \beta_1 \text{Treat}_i + \beta_2 \text{Post}_t + \beta_3 (\text{Treat}_i \times \text{Post}_t) + \varepsilon_{it}\]</span></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-code-line-numbers="1|1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb2-1"><a href=""></a><span class="kw">reg</span> gpa treated <span class="kw">post</span> txp, <span class="kw">robust</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment"><span class="math inline">\(\hat\beta_3 = 25.31\)</span> (SE 0.61). The constant 71.22 is the comparison pre-mean; <span class="math inline">\(\hat\beta_1 = -11.05\)</span> the baseline gap; <span class="math inline">\(\hat\beta_2 = 10.89\)</span> the common trend.</span></p>
+<p><span class="comment"><span class="math inline">\(\hat\beta_3 = 25.31\)</span> (SE 0.61) — the DiD.</span></p>
+<p><span class="comment">The rest is nuisance: constant 71.22 (comparison pre-mean), <span class="math inline">\(\hat\beta_1 = -11.05\)</span> (baseline gap), <span class="math inline">\(\hat\beta_2 = 10.89\)</span> (common trend).</span></p>
 <aside class="notes">
 <p>Regression decomposes the DiD into building blocks and — crucially — lets you add controls, flexible standard errors, and extensions the manual subtraction cannot. The interaction coefficient is the entire causal payload; everything else is nuisance structure.</p>
 <style type="text/css">
@@ -459,7 +460,8 @@
 <p><span class="math display">\[Y_{it} = \beta_3 (\text{Treat}_i \times \text{Post}_t) + \gamma_i + \vartheta_t + \varepsilon_{it}\]</span></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-code-line-numbers="1|2"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb3-1"><a href=""></a><span class="kw">xtreg</span>  gpa txp i.time, <span class="kw">fe</span> <span class="kw">vce</span>(<span class="kw">cluster</span> id)</span>
 <span id="cb3-2"><a href=""></a>reghdfe gpa txp, absorb(id time) <span class="kw">cluster</span>(id)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">Unit effects <span class="math inline">\(\gamma_i\)</span> wipe out permanent school differences; time effects <span class="math inline">\(\vartheta_t\)</span> wipe out common shocks. What remains is <span class="math inline">\(\hat\beta_3 = 25.31\)</span>.</span></p>
+<p><span class="comment"><span class="math inline">\(\gamma_i\)</span> wipes out permanent school differences.</span></p>
+<p><span class="comment"><span class="math inline">\(\vartheta_t\)</span> wipes out common shocks. What remains: <span class="math inline">\(\hat\beta_3 = 25.31\)</span>.</span></p>
 <aside class="notes">
 <p>Like a two-pass photo filter: the first pass removes school-specific stains (rich/poor, urban/rural), the second removes period-specific glare (a nationwide reform). <code>reghdfe</code> gives byte-identical results to <code>xtreg</code> but scales to large panels. Within R-squared 0.9946 — again, simulated-data clean.</p>
 <style type="text/css">
@@ -634,6 +636,12 @@
 <td style="text-align: center;">yes</td>
 </tr>
 <tr class="even">
+<td>lag 2</td>
+<td style="text-align: right;">24.768</td>
+<td style="text-align: right;">0.739</td>
+<td style="text-align: center;">yes</td>
+</tr>
+<tr class="odd">
 <td>lag 3</td>
 <td style="text-align: right;">25.701</td>
 <td style="text-align: right;">0.797</td>

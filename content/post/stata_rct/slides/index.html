@@ -213,11 +213,11 @@
 </section>
 <section id="governments-spend-billions-on-cash-transfers-but-does-the-money-actually-raise-welfare" class="slide level2 center">
 <h2>Governments spend billions on cash transfers — but does the money actually raise welfare?</h2>
-<p>Cash transfers are among the most common development interventions worldwide. The hard part is not sending the money — it is <em>proving</em> it worked.</p>
+<p>The hard part isn’t sending the money — it is <em>proving</em> it worked.</p>
 <div class="fragment">
-<p>We sidestep the usual ambiguity with a simulation where the answer is known in advance: the program raises consumption by <strong>12%</strong> (<span class="math inline">\(0.12\)</span> log points). <em>Can a toolkit of estimators recover a number we already know?</em></p>
+<p>So we simulate a known truth: the program raises consumption by <strong>12%</strong> (<span class="math inline">\(0.12\)</span> log points). <em>Can the estimators recover it?</em></p>
 <aside class="notes">
-<p>Open with the policy stakes, then reveal the pedagogical trick: simulated data with a known true effect of 0.12 log points. The whole talk is a controlled experiment on the estimators themselves — we judge each method by how close it lands to a ground truth we planted.</p>
+<p>Cash transfers are among the most common development interventions worldwide. Open with the policy stakes, then reveal the pedagogical trick: simulated data with a known true effect of 0.12 log points. The whole talk is a controlled experiment on the estimators themselves — we judge each method by how close it lands to a ground truth we planted.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -374,7 +374,7 @@
 <td>Education</td>
 <td style="text-align: right;">11.97</td>
 <td style="text-align: right;">12.08</td>
-<td style="text-align: right;">&lt;0.05</td>
+<td style="text-align: right;">0.052</td>
 </tr>
 <tr class="even">
 <td>Female-headed</td>
@@ -390,7 +390,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><span class="math inline">\(p = 0.038\)</span> for <code>female</code> — significant, but an SMD of <span class="math inline">\(9.3\%\)</span> is the right lens: large <span class="math inline">\(n\)</span> makes tiny gaps “significant.”</span></p>
+<p><span class="comment"><span class="math inline">\(p = 0.038\)</span> flags <code>female</code>, but the SMD of <span class="math inline">\(9.3\%\)</span> is the right lens — large <span class="math inline">\(n\)</span> makes tiny gaps “significant.”</span></p>
 <aside class="notes">
 <p>P-values mislead at large n — they flag a 4.6pp gender gap as “significant” while the SMD says it is small and below threshold. The lesson: judge balance with standardized differences, not p-values. We carry female (and the others) into estimation as precision controls.</p>
 <style type="text/css">
@@ -495,9 +495,9 @@
 <h2>In an RCT, controls don’t remove bias — they buy precision</h2>
 <p><span class="comment">Randomized treatment is independent of potential outcomes, so the raw difference in means is <em>already</em> unbiased.</span></p>
 <div class="fragment">
-<p>Adding covariates (RA, IPW, doubly robust) does <strong>not</strong> fix confounding here — there is none. It soaks up residual variation, tightening the estimate. <em>In observational studies the same controls would be doing the heavy lifting of identification.</em></p>
+<p>No confounding here, so covariates don’t fix bias — they soak up residual variation and tighten the estimate.</p>
 <aside class="notes">
-<p>This is the single most important conceptual point for an RCT audience, and the most commonly muddled. Distinguish the randomized framing (adjustment = precision) from the observational framing (adjustment = bias removal). The estimators are identical; their <em>job</em> is not.</p>
+<p>In observational studies the same controls would be doing the heavy lifting of identification. This is the single most important conceptual point for an RCT audience, and the most commonly muddled. Distinguish the randomized framing (adjustment = precision) from the observational framing (adjustment = bias removal). The estimators are identical; their <em>job</em> is not.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -547,7 +547,7 @@
 <section id="doubly-robust-estimation-one-model-can-be-wrong-and-the-answer-still-holds" class="slide level2 center">
 <h2>Doubly robust estimation: one model can be wrong and the answer still holds</h2>
 <p><span class="math display">\[\hat\tau_{DR}^{ATE} = \frac1N \sum_{i=1}^{N}\Big[\hat\mu_1(X_i) - \hat\mu_0(X_i) + \frac{T_i\,(Y_i - \hat\mu_1)}{\hat p(X_i)} - \frac{(1-T_i)(Y_i - \hat\mu_0)}{1 - \hat p(X_i)}\Big]\]</span></p>
-<p>The first two terms are the RA prediction; the last two are IPW-weighted residuals that cancel RA’s bias when the propensity model is right.</p>
+<p>First two terms: the RA prediction. Last two: IPW residuals that cancel RA’s bias.</p>
 <p><span class="comment">Belt and suspenders: if the belt fails, the suspenders hold. Only <em>both</em> wrong is fatal.</span></p>
 <aside class="notes">
 <p>Walk the two pieces. If the outcome model is right, residuals average to zero and DR collapses to RA. If the propensity model is right, the weighted residuals fix the RA bias. Getting at least one model approximately right is far easier than getting both perfect — that is the whole appeal.</p>
@@ -692,7 +692,7 @@
 <section id="did-is-a-difference-of-differences-the-control-trend-is-the-counterfactual" class="slide level2 center">
 <h2>DiD is a difference of differences — the control trend is the counterfactual</h2>
 <p><span class="math display">\[\hat\tau_{DiD} = \underbrace{(\bar Y_{T,post} - \bar Y_{T,pre})}_{\text{effect}\,+\,\text{trend}} - \underbrace{(\bar Y_{C,post} - \bar Y_{C,pre})}_{\text{trend only}}\]</span></p>
-<p>The treated change carries the effect <em>plus</em> the common time trend; the control change carries the trend <em>alone</em>. Subtract, and the trend cancels.</p>
+<p>Treated change = effect + trend. Control change = trend alone. Subtract — the trend cancels.</p>
 <p><span class="comment">Identification rides on <strong>parallel trends</strong> — plausible here because randomization equalized the groups at baseline.</span></p>
 <aside class="notes">
 <p>The control group’s drift (e.g.&nbsp;nationwide income growth) is what the treated group would have experienced anyway. Subtracting it isolates the program. The identifying assumption is parallel trends, not equal levels — groups can start anywhere as long as they would have moved together absent treatment. Randomization makes that very credible.</p>
@@ -713,7 +713,7 @@
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-code-line-numbers="1|3"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb2-1"><a href=""></a><span class="kw">gen</span> treat_post = treat * <span class="kw">post</span></span>
 <span id="cb2-2"><a href=""></a>xtdidregress (<span class="fu">y</span>) (treat_post), <span class="fu">group</span>(id) time(<span class="fu">year</span>) <span class="kw">vce</span>(<span class="kw">cluster</span> id)</span>
 <span id="cb2-3"><a href=""></a>*  ATET = 0.135  (<span class="kw">SE</span> 0.027)  95% CI [0.081, 0.188]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="key">0.135</span> sits a touch above the cross-sectional <span class="math inline">\(0.113\)</span>, with a wider SE (<span class="math inline">\(0.027\)</span> vs <span class="math inline">\(0.019\)</span>) — the price of differencing within households.</p>
+<p><span class="key">0.135</span> sits just above the cross-sectional <span class="math inline">\(0.113\)</span> — the wider SE (<span class="math inline">\(0.027\)</span> vs <span class="math inline">\(0.019\)</span>) is the price of differencing.</p>
 <aside class="notes">
 <p>DiD estimates the ATT because its counterfactual — control trend applied to the treated baseline — is constructed only for the treated group. The wider SE is not a defect: it reflects honest within-household differencing. The headline value still covers 0.12. Standard errors clustered at the household level.</p>
 <style type="text/css">

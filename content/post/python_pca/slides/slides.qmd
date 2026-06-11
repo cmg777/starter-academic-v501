@@ -103,43 +103,43 @@ This is the spine of the whole talk. The mermaid pipeline in the post is this li
 
 $$IM_i^{*} = -1 \times IM_i$$
 
-Multiply the "more is bad" indicator by $-1$. Now a large value of $IM^{*}$ means *low* infant mortality — a good outcome.
+Multiply the "more is bad" indicator by $-1$ — now bigger always means healthier.
 
 [The raw correlation flips from $-0.96$ to $+0.96$; same relationship, properly aligned.]{.comment}
 
 ::: {.notes}
-Analogy from the post: averaging exam scores where one professor grades 0–100 (higher better) and another grades demerits (lower better). You must flip the demerit scale first. Country_01's infant mortality 18.6 becomes -18.6, now read as "18.6 units of infant survival."
+A large value of IM* now means *low* infant mortality — a good outcome. Analogy from the post: averaging exam scores where one professor grades 0–100 (higher better) and another grades demerits (lower better). You must flip the demerit scale first. Country_01's infant mortality 18.6 becomes -18.6, now read as "18.6 units of infant survival."
 :::
 
 ## Step 2 — standardize so years and rates share one ruler
 
 $$Z_{ij} = \frac{X_{ij} - \bar{X}_j}{\sigma_j}$$
 
-Subtract each variable's mean, divide by its standard deviation. Both indicators now have **mean 0, SD 1** — unitless, directly comparable.
+Subtract the mean, divide by the SD — both indicators become **mean 0, SD 1** and directly comparable.
 
 [We use the population SD ($\sigma$, ddof=0): PCA treats the dataset as the full population.]{.comment}
 
 ::: {.notes}
-Without this, infant mortality would dominate purely because its physical spread (3.5–58.7) is wider than life expectancy's (54.9–84.7). After z-scoring, a country 2 SD above average in longevity is directly comparable to one 2 SD above in survival. Note describe() reports std 8.62 (ddof=1) vs 8.53 here (ddof=0) — same data, different denominator.
+The z-scores are now unitless, so years and rates share one ruler. Without this, infant mortality would dominate purely because its physical spread (3.5–58.7) is wider than life expectancy's (54.9–84.7). After z-scoring, a country 2 SD above average in longevity is directly comparable to one 2 SD above in survival. Note describe() reports std 8.62 (ddof=1) vs 8.53 here (ddof=0) — same data, different denominator.
 :::
 
 ## Step 3 — for standardized data, covariance *is* correlation
 
 $$\Sigma = \frac{1}{n} Z^\top Z = \begin{pmatrix} 1 & r \\ r & 1 \end{pmatrix}$$
 
-Standardization guarantees **1s on the diagonal** (unit variance) and the **correlation $r$ off-diagonal**. With two variables, PCA only has to decompose this single $2 \times 2$ matrix.
+Standardized data puts **1s on the diagonal** and the **correlation $r$ off-diagonal**.
 
 [Here the off-diagonal is $r = 0.96$ — the two indicators move almost in lockstep.]{.comment}
 
 ::: {.notes}
-The covariance matrix quantifies the overlap and tells the algorithm: these two variables share a lot of redundant information, so you can compress them with little loss. 96% of the movement in one is mirrored by the other.
+With two variables, PCA only has to decompose this single 2×2 matrix. The covariance matrix quantifies the overlap and tells the algorithm: these two variables share a lot of redundant information, so you can compress them with little loss. 96% of the movement in one is mirrored by the other.
 :::
 
 ## Step 4 — eigen-decomposition finds the direction of maximum spread
 
 $$\Sigma \mathbf{v} = \lambda \mathbf{v}$$
 
-The **eigenvector** $\mathbf{v}$ is the direction of greatest spread — its components become the index weights. The **eigenvalue** $\lambda$ is the variance along that direction.
+**Eigenvector** $\mathbf{v}$ = direction of greatest spread (the index weights). **Eigenvalue** $\lambda$ = variance along it.
 
 [For a $2\times2$ correlation matrix: $\lambda_1 = 1 + r$, $\lambda_2 = 1 - r$.]{.comment}
 
@@ -180,7 +180,7 @@ This is the key teaching point. A 2x2 correlation matrix always has eigenvectors
 
 $$PC1_i = w_1 Z_{i,LE} + w_2 Z_{i,IM}$$
 
-The eigenvector *is* the recipe: multiply each country's z-scores by the weights and sum. Two variables officially become one composite number.
+The eigenvector *is* the recipe — multiply each z-score by its weight and sum.
 
 ``` {.python code-line-numbers="1-2|3"}
 w1, w2 = eigenvectors[0, 0], eigenvectors[1, 0]   # 0.7071, 0.7071
@@ -188,7 +188,7 @@ df["pc1"] = w1 * df["z_le"] + w2 * df["z_im"]      # project onto PC1
 ```
 
 ::: {.notes}
-Geometrically: drop each country's 2D dot squarely onto the diagonal PC1 line; its position along the line is its health score. Country_01: 0.7071*1.04 + 0.7071*0.76 = 1.27 — well above the mean of 0, healthier half of the sample. Scores range -2.39 to +2.37.
+Two variables officially become one composite number. Geometrically: drop each country's 2D dot squarely onto the diagonal PC1 line; its position along the line is its health score. Country_01: 0.7071*1.04 + 0.7071*0.76 = 1.27 — well above the mean of 0, healthier half of the sample. Scores range -2.39 to +2.37.
 :::
 
 ## PC1 scores rank every country on one health axis
@@ -203,7 +203,7 @@ The top scorers pair high life expectancy (81–85 years) with very low infant m
 
 $$HI_i = \frac{PC1_i - PC1_{\min}}{PC1_{\max} - PC1_{\min}}$$
 
-Min-max scaling: the worst country maps to **0**, the best to **1**, everyone else proportionally between.
+Min-max scaling: worst → **0**, best → **1**, everyone proportional between.
 
 [Country_01's PC1 of 1.27 becomes a Health Index of 0.77 — "better than 77% of the scale."]{.comment}
 

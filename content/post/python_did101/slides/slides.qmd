@@ -67,7 +67,7 @@ This is the central hook. The naive before-after story looks like a triumph, but
 The spoiler figure for Act I. Don't resolve it yet — just plant the suspicion. Curriculum reforms, new textbooks, students maturing: any of these could lift GPA in all schools, not just the treated ones. The naive approach conflates the treatment effect with the secular trend.
 :::
 
-## Where we're going
+## The plan: from naive before-after to an 8-period event study
 
 ::: {.incremental}
 - The lab: a 35-school, 2-period panel — a clean 2×2 design
@@ -228,7 +228,7 @@ t = −1 is the omitted reference (normalized to zero). The three pre-treatment 
 Four pre-treatment periods and four post-treatment periods, with each of the 10 treated schools contributing one observation per relative time. The clean staggered-on-simultaneously structure is what lets the event study cleanly separate leads from lags.
 :::
 
-## Does LASSO-style flexibility make this causal? No — assumptions still carry it
+## Does precision make this causal? No — the assumptions still carry it
 
 [Objection.]{.objection} The estimate is precise and the pre-trends are flat — surely DiD has proven tutoring caused the gain.
 
