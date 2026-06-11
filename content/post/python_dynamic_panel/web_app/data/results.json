@@ -1,0 +1,31 @@
+{
+  "_comment": "Estimates parsed from the post's production Python run (estimates_summary.csv + proliferation_grid.csv, script.py via pydynpd 0.2.2 / pyfixest 0.50.1). 'estimates' drives the Tab-2 forest plot ('outcome' is the single parameter rho, 'n_selected' = number of GMM-style instruments, null where not applicable). 'diagnostics' and 'proliferation' drive Tab 3. 'bracket' is the Bond (2002) OLS-FE bracket. All values rounded to 4 decimal places.",
+
+  "bracket": { "fe": 0.6262, "ols": 0.9617 },
+
+  "estimates": [
+    {"method": "Pooled OLS",                    "outcome": "rho (employment persistence)", "estimate": 0.9617, "se": 0.0084, "ci_lo": 0.9453, "ci_hi": 0.9781, "n_selected": null, "hansen_p": null,   "ar2_p": null},
+    {"method": "Fixed effects",                 "outcome": "rho (employment persistence)", "estimate": 0.6262, "se": 0.0515, "ci_lo": 0.5252, "ci_hi": 0.7272, "n_selected": null, "hansen_p": null,   "ar2_p": null},
+    {"method": "Anderson-Hsiao IV",             "outcome": "rho (employment persistence)", "estimate": 1.2327, "se": 0.4782, "ci_lo": 0.2955, "ci_hi": 2.1699, "n_selected": 1,    "hansen_p": null,   "ar2_p": null},
+    {"method": "Diff GMM (one-step)",           "outcome": "rho (employment persistence)", "estimate": 0.7075, "se": 0.0842, "ci_lo": 0.5425, "ci_hi": 0.8725, "n_selected": 91,   "hansen_p": 0.2113, "ar2_p": 0.8913},
+    {"method": "Diff GMM (two-step)",           "outcome": "rho (employment persistence)", "estimate": 0.6788, "se": 0.0891, "ci_lo": 0.5042, "ci_hi": 0.8534, "n_selected": 91,   "hansen_p": 0.2113, "ar2_p": 0.8660},
+    {"method": "Sys GMM (one-step, collapsed)", "outcome": "rho (employment persistence)", "estimate": 0.9025, "se": 0.0634, "ci_lo": 0.7781, "ci_hi": 1.0268, "n_selected": 32,   "hansen_p": 0.4621, "ar2_p": 0.9492},
+    {"method": "Sys GMM (two-step, collapsed)", "outcome": "rho (employment persistence)", "estimate": 0.9270, "se": 0.0785, "ci_lo": 0.7731, "ci_hi": 1.0809, "n_selected": 32,   "hansen_p": 0.4621, "ar2_p": 0.9944}
+  ],
+
+  "diagnostics": [
+    {"model": "Diff GMM (two-step)",            "ar1_z": -4.46, "ar1_p": 0.0000, "ar2_z": -0.17, "ar2_p": 0.8660, "hansen_chi2": 88.797, "hansen_df": 79, "hansen_p": 0.2113, "n_instruments": 91},
+    {"model": "Sys GMM (two-step, collapsed)",  "ar1_z": -4.49, "ar1_p": 0.0000, "ar2_z": -0.01, "ar2_p": 0.9944, "hansen_chi2": 18.918, "hansen_df": 19, "hansen_p": 0.4621, "n_instruments": 32}
+  ],
+
+  "proliferation": [
+    {"window": "2:3",  "collapsed": false, "n_instruments": 68,  "rho": 0.9555, "se": 0.0322, "hansen_p": 0.0348, "ar2_p": 0.7631},
+    {"window": "2:3",  "collapsed": true,  "n_instruments": 17,  "rho": 0.9211, "se": 0.1001, "hansen_p": 0.0957, "ar2_p": 0.9343},
+    {"window": "2:5",  "collapsed": false, "n_instruments": 95,  "rho": 0.9354, "se": 0.0335, "hansen_p": 0.1859, "ar2_p": 0.7343},
+    {"window": "2:5",  "collapsed": true,  "n_instruments": 23,  "rho": 0.9374, "se": 0.0982, "hansen_p": 0.2546, "ar2_p": 0.9084},
+    {"window": "2:99", "collapsed": false, "n_instruments": 113, "rho": 0.9296, "se": 0.0274, "hansen_p": 0.2349, "ar2_p": 0.8052},
+    {"window": "2:99", "collapsed": true,  "n_instruments": 32,  "rho": 0.9270, "se": 0.0785, "hansen_p": 0.4621, "ar2_p": 0.9944}
+  ],
+
+  "selection": []
+}

@@ -36,6 +36,9 @@ featured: true
 # Icons: https://fontawesome.com/search
 
 links:
+  - name: "Overview Slides"
+    url: "https://canva.link/bjzfw6wnzssy47y"
+    icon_pack: ai
   - name: "Website"
     url: "https://quarcs-lab.github.io/metricsai/"
     icon_pack: ai

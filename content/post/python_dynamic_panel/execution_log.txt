@@ -1,0 +1,342 @@
+
+======================================================================
+1. DATA LOADING: Arellano-Bond (1991) UK employment panel
+======================================================================
+Dataset shape: (1031, 10)
+Firms: 140, years: 1976-1984
+
+Observations per firm (unbalanced panel):
+                n_firms
+years_observed         
+7                   103
+8                    23
+9                    14
+
+Summary statistics (log variables used in estimation):
+              n         w         k        ys
+count  1031.000  1031.000  1031.000  1031.000
+mean      1.056     3.143    -0.442     4.638
+std       1.342     0.263     1.514     0.094
+min      -2.263     2.082    -4.431     4.465
+25%       0.166     3.027    -1.510     4.576
+50%       0.827     3.178    -0.658     4.611
+75%       1.949     3.314     0.406     4.706
+max       4.687     3.812     3.852     4.855
+
+Between-firm SD of log employment: 1.339
+Within-firm SD of log employment:  0.195
+Employment differences are mostly BETWEEN firms - exactly the
+situation where unobserved firm effects alpha_i loom large.
+
+Saved figure: python_dynamic_panel_trajectories.png
+
+======================================================================
+2. DATA PREPARATION: lags and first differences by firm
+======================================================================
+Full panel rows: 1031
+Estimation sample after requiring one lag: 891 rows (140 firms)
+Each lag costs the first year(s) of every firm - with T as small as
+7-9, observations are precious. Keep this in mind for GMM later.
+
+Exported: data_prepared.csv
+
+======================================================================
+3. BASELINE: pooled OLS vs fixed effects - the bias bracket
+======================================================================
+Model: n ~ L1.n + w + L1.w + k + L1.k + year dummies
+Pooled OLS ignores alpha_i: L1.n is positively correlated with the
+omitted firm effect, so rho is biased UPWARD.
+Fixed effects (within) removes alpha_i but creates a mechanical
+negative correlation between demeaned L1.n and the demeaned error -
+the Nickell (1981) bias, of order 1/T, biasing rho DOWNWARD.
+
+Pooled OLS (year dummies, SEs clustered by firm):
+             Estimate  Std. Error   t value  Pr(>|t|)    2.5%   97.5%
+Coefficient                                                          
+n_lag1         0.9617      0.0084  115.0717    0.0000  0.9452  0.9782
+w             -0.4147      0.1600   -2.5915    0.0106 -0.7311 -0.0983
+w_lag1         0.3556      0.1559    2.2803    0.0241  0.0473  0.6639
+k              0.3997      0.0565    7.0710    0.0000  0.2879  0.5114
+k_lag1        -0.3675      0.0565   -6.4990    0.0000 -0.4793 -0.2557
+
+Fixed effects / within (firm + year dummies, clustered SEs):
+             Estimate  Std. Error  t value  Pr(>|t|)    2.5%   97.5%
+Coefficient                                                         
+n_lag1         0.6262      0.0515  12.1510    0.0000  0.5243  0.7281
+w             -0.5035      0.1450  -3.4729    0.0007 -0.7902 -0.2169
+w_lag1         0.2308      0.1077   2.1420    0.0339  0.0178  0.4438
+k              0.4078      0.0566   7.2024    0.0000  0.2959  0.5198
+k_lag1        -0.1648      0.0547  -3.0100    0.0031 -0.2730 -0.0565
+
+  rho_OLS = 0.9617 (se 0.0084)   <- upper bound (biased up)
+  rho_FE  = 0.6262 (se 0.0515)   <- lower bound (biased down)
+
+THE BRACKET (Bond 2002): a consistent estimate of rho should lie
+between 0.626 and 0.962. Any estimator outside this
+range deserves suspicion.
+
+Saved figure: python_dynamic_panel_bias_bracket.png
+Exported: ols_results.csv, fe_results.csv
+
+======================================================================
+4. ANDERSON-HSIAO: first-difference IV - right idea, noisy answer
+======================================================================
+First-differencing kills alpha_i but makes d.L1.n endogenous (it
+contains eps_i,t-1). Anderson-Hsiao (1981): instrument d.L1.n with
+the LEVEL n_i,t-2, which predicts the difference but - if eps is not
+serially correlated - is uncorrelated with d.eps_it.
+
+Anderson-Hsiao 2SLS (differences, year dummies, clustered SEs):
+             Estimate  Std. Error  t value  Pr(>|t|)    2.5%   97.5%
+Coefficient                                                         
+d_w           -0.5243      0.2135  -2.4556    0.0153 -0.9465 -0.1021
+d_w_lag1       0.5808      0.3128   1.8566    0.0655 -0.0377  1.1992
+d_k            0.2463      0.0777   3.1693    0.0019  0.0927  0.4000
+d_k_lag1      -0.2925      0.1964  -1.4890    0.1388 -0.6808  0.0959
+d_n_lag1       1.2327      0.4782   2.5781    0.0110  0.2873  2.1781
+
+  rho_AH = 1.2327 (se 0.4782)
+  95% CI: [0.296, 2.170]
+Consistent in theory, useless in practice here: one instrument, and
+the confidence interval swallows the whole OLS-FE bracket. GMM's
+insight: EVERY deeper lag is also a valid instrument - use them all.
+
+Exported: anderson_hsiao_results.csv
+
+======================================================================
+5. DIFFERENCE GMM (Arellano-Bond 1991) via pydynpd
+======================================================================
+All available lags (t-2 and deeper) of n, w, k instrument the
+differenced equation: 'n L(1:1).n L(0:1).w L(0:1).k | gmm(n, 2:99) gmm(w, 2:99) gmm(k, 2:99) | timedumm nolevel'
+
+One-step difference GMM:
+ Dynamic panel-data estimation, one-step difference GMM
+ Group variable: id                               Number of obs = 751     
+ Time variable: year                              Min obs per group: 5    
+ Number of instruments = 91                       Max obs per group: 7    
+ Number of groups = 140                           Avg obs per group: 5.36 
++-----------+------------+---------------------+------------+-----------+-----+
+|     n     |   coef.    | Corrected Std. Err. |     z      |   P>|z|   |     |
++-----------+------------+---------------------+------------+-----------+-----+
+|    L1.n   | 0.7074701  |      0.0841788      | 8.4043723  | 0.0000000 | *** |
+|     w     | -0.7087965 |      0.1171020      | -6.0528147 | 0.0000000 | *** |
+|    L1.w   | 0.5000149  |      0.1113282      | 4.4913603  | 0.0000071 | *** |
+|     k     | 0.4659776  |      0.1010440      | 4.6116293  | 0.0000040 | *** |
+|    L1.k   | -0.2151309 |      0.0858525      | -2.5058195 | 0.0122168 |  *  |
+| year_1978 | 0.0057636  |      0.0166077      | 0.3470434  | 0.7285587 |     |
+| year_1979 | 0.0136366  |      0.0193748      | 0.7038306  | 0.4815383 |     |
+| year_1980 | -0.0071557 |      0.0213479      | -0.3351935 | 0.7374791 |     |
+| year_1981 | -0.0340692 |      0.0264327      | -1.2889049 | 0.1974311 |     |
+| year_1982 | -0.0059175 |      0.0272325      | -0.2172936 | 0.8279795 |     |
+| year_1983 | 0.0187213  |      0.0288529      | 0.6488533  | 0.5164332 |     |
+| year_1984 | 0.0352279  |      0.0331578      | 1.0624312  | 0.2880400 |     |
++-----------+------------+---------------------+------------+-----------+-----+
+Hansen test of overid. restrictions: chi(79) = 88.797 Prob > Chi2 = 0.211
+Arellano-Bond test for AR(1) in first differences: z = -5.50 Pr > z =0.000
+Arellano-Bond test for AR(2) in first differences: z = -0.14 Pr > z =0.891
+
+
+Two-step difference GMM (Windmeijer-corrected SEs):
+ Dynamic panel-data estimation, two-step difference GMM
+ Group variable: id                               Number of obs = 751     
+ Time variable: year                              Min obs per group: 5    
+ Number of instruments = 91                       Max obs per group: 7    
+ Number of groups = 140                           Avg obs per group: 5.36 
++-----------+------------+---------------------+------------+-----------+-----+
+|     n     |   coef.    | Corrected Std. Err. |     z      |   P>|z|   |     |
++-----------+------------+---------------------+------------+-----------+-----+
+|    L1.n   | 0.6787867  |      0.0890781      | 7.6201324  | 0.0000000 | *** |
+|     w     | -0.7198296 |      0.1221408      | -5.8934431 | 0.0000000 | *** |
+|    L1.w   | 0.4626914  |      0.1134755      | 4.0774568  | 0.0000455 | *** |
+|     k     | 0.4539046  |      0.1275537      | 3.5585358  | 0.0003729 | *** |
+|    L1.k   | -0.1914923 |      0.1044671      | -1.8330393 | 0.0667967 |     |
+| year_1978 | 0.0052583  |      0.0156783      | 0.3353880  | 0.7373324 |     |
+| year_1979 | 0.0081292  |      0.0188528      | 0.4311953  | 0.6663264 |     |
+| year_1980 | -0.0125121 |      0.0213151      | -0.5870084 | 0.5571981 |     |
+| year_1981 | -0.0389696 |      0.0259642      | -1.5008968 | 0.1333823 |     |
+| year_1982 | -0.0110198 |      0.0280678      | -0.3926153 | 0.6946036 |     |
+| year_1983 | 0.0188432  |      0.0307305      | 0.6131750  | 0.5397606 |     |
+| year_1984 | 0.0346064  |      0.0336964      | 1.0270068  | 0.3044173 |     |
++-----------+------------+---------------------+------------+-----------+-----+
+Hansen test of overid. restrictions: chi(79) = 88.797 Prob > Chi2 = 0.211
+Arellano-Bond test for AR(1) in first differences: z = -4.46 Pr > z =0.000
+Arellano-Bond test for AR(2) in first differences: z = -0.17 Pr > z =0.866
+
+
+  one-step: rho = 0.7075 (se 0.0842)
+  two-step: rho = 0.6788 (se 0.0891), 91 instruments
+
+WARNING SIGN (Bond 2002): rho_diffGMM = 0.679 sits close to
+the FE lower bound (0.626) - within one standard error of it,
+far from the upper half of the bracket. With rho this close to 1, lagged
+LEVELS barely predict future DIFFERENCES - weak instruments drag the
+difference GMM estimate down. This motivates system GMM.
+
+Exported: diff_gmm_results.csv
+
+======================================================================
+6. SYSTEM GMM (Blundell-Bond 1998) via pydynpd
+======================================================================
+System GMM stacks the differenced equation AND the levels equation,
+instrumenting levels with lagged differences. Extra assumption: firm
+deviations from steady state are uncorrelated with alpha_i (mean
+stationarity). Collapsed instruments keep the count honest.
+
+Two-step system GMM, collapsed instruments:
+ Dynamic panel-data estimation, two-step system GMM
+ Group variable: id                               Number of obs = 751     
+ Time variable: year                              Min obs per group: 5    
+ Number of instruments = 32                       Max obs per group: 7    
+ Number of groups = 140                           Avg obs per group: 5.36 
++-----------+------------+---------------------+------------+-----------+-----+
+|     n     |   coef.    | Corrected Std. Err. |     z      |   P>|z|   |     |
++-----------+------------+---------------------+------------+-----------+-----+
+|    L1.n   | 0.9269913  |      0.0785085      | 11.8075341 | 0.0000000 | *** |
+|     w     | -0.8155041 |      0.2763832      | -2.9506278 | 0.0031713 |  ** |
+|    L1.w   | 0.6331152  |      0.3327639      | 1.9025958  | 0.0570933 |     |
+|     k     | 0.5894690  |      0.1715356      | 3.4364236  | 0.0005894 | *** |
+|    L1.k   | -0.4888581 |      0.1969821      | -2.4817381 | 0.0130743 |  *  |
+| year_1978 | 0.0215577  |      0.0280611      | 0.7682429  | 0.4423429 |     |
+| year_1979 | 0.0437393  |      0.0373670      | 1.1705321  | 0.2417869 |     |
+| year_1980 | 0.0338457  |      0.0400282      | 0.8455475  | 0.3978052 |     |
+| year_1981 | 0.0147678  |      0.0544092      | 0.2714210  | 0.7860672 |     |
+| year_1982 | 0.0577658  |      0.0555424      | 1.0400310  | 0.2983255 |     |
+| year_1983 | 0.0848864  |      0.0471996      | 1.7984554  | 0.0721049 |     |
+| year_1984 | 0.0799244  |      0.0411493      | 1.9423035  | 0.0521004 |     |
+|    _con   | 0.6404202  |      0.4628017      | 1.3837897  | 0.1664229 |     |
++-----------+------------+---------------------+------------+-----------+-----+
+Hansen test of overid. restrictions: chi(19) = 18.918 Prob > Chi2 = 0.462
+Arellano-Bond test for AR(1) in first differences: z = -4.49 Pr > z =0.000
+Arellano-Bond test for AR(2) in first differences: z = -0.01 Pr > z =0.994
+
+
+One-step system GMM, collapsed instruments:
+ Dynamic panel-data estimation, one-step system GMM
+ Group variable: id                               Number of obs = 751     
+ Time variable: year                              Min obs per group: 5    
+ Number of instruments = 32                       Max obs per group: 7    
+ Number of groups = 140                           Avg obs per group: 5.36 
++-----------+------------+---------------------+------------+-----------+-----+
+|     n     |   coef.    | Corrected Std. Err. |     z      |   P>|z|   |     |
++-----------+------------+---------------------+------------+-----------+-----+
+|    L1.n   | 0.9024603  |      0.0634304      | 14.2275598 | 0.0000000 | *** |
+|     w     | -0.7727454 |      0.2227516      | -3.4690908 | 0.0005222 | *** |
+|    L1.w   | 0.6431681  |      0.2380502      | 2.7018173  | 0.0068962 |  ** |
+|     k     | 0.6235219  |      0.1489092      | 4.1872635  | 0.0000282 | *** |
+|    L1.k   | -0.5111490 |      0.1762255      | -2.9005388 | 0.0037252 |  ** |
+| year_1978 | 0.0123814  |      0.0230174      | 0.5379150  | 0.5906357 |     |
+| year_1979 | 0.0334238  |      0.0284310      | 1.1756114  | 0.2397502 |     |
+| year_1980 | 0.0252671  |      0.0328913      | 0.7682020  | 0.4423672 |     |
+| year_1981 | 0.0130379  |      0.0426232      | 0.3058873  | 0.7596905 |     |
+| year_1982 | 0.0522858  |      0.0424192      | 1.2325966  | 0.2177263 |     |
+| year_1983 | 0.0663111  |      0.0381680      | 1.7373465  | 0.0823260 |     |
+| year_1984 | 0.0649112  |      0.0356630      | 1.8201276  | 0.0687396 |     |
+|    _con   | 0.5111072  |      0.4130100      | 1.2375178  | 0.2158949 |     |
++-----------+------------+---------------------+------------+-----------+-----+
+Hansen test of overid. restrictions: chi(19) = 18.918 Prob > Chi2 = 0.462
+Arellano-Bond test for AR(1) in first differences: z = -4.83 Pr > z =0.000
+Arellano-Bond test for AR(2) in first differences: z = -0.06 Pr > z =0.949
+
+
+  two-step: rho = 0.9270 (se 0.0785), 32 instruments
+  one-step: rho = 0.9025 (se 0.0634)
+
+DIAGNOSTICS for the headline model (two-step system GMM):
+  AR(1) in differences: p = 0.000  -> should REJECT (mechanical)
+  AR(2) in differences: p = 0.994  -> must NOT reject (validates t-2 instruments)
+  Hansen J overidentification: p = 0.462 -> comfortably
+  away from both 0.05 (instruments invalid) and 1.0 (too many
+  instruments, test losing power). rho = 0.927 sits INSIDE the
+  OLS-FE bracket [0.626, 0.962] - all checks pass.
+
+Exported: sys_gmm_results.csv
+
+======================================================================
+7. INSTRUMENT PROLIFERATION: lag windows vs collapse
+======================================================================
+GMM's blessing is its curse: with T=9, 'use every lag' generates
+instruments quadratically in T. Too many instruments overfit the
+endogenous variables and weaken the Hansen test (p -> 1 is a red
+flag, not a pass). Roodman's rule of thumb: instruments < N groups.
+
+  lags 2:3   collapse=False ->  68 instruments, rho = 0.956, Hansen p = 0.035
+  lags 2:3   collapse=True  ->  17 instruments, rho = 0.921, Hansen p = 0.096
+  lags 2:5   collapse=False ->  95 instruments, rho = 0.935, Hansen p = 0.186
+  lags 2:5   collapse=True  ->  23 instruments, rho = 0.937, Hansen p = 0.255
+  lags 2:99  collapse=False -> 113 instruments, rho = 0.930, Hansen p = 0.235
+  lags 2:99  collapse=True  ->  32 instruments, rho = 0.927, Hansen p = 0.462
+
+Read the uncollapsed column top to bottom: as instruments pile up the
+Hansen p-value drifts steadily upward (0.04 -> 0.19 -> 0.24) even though
+the model is the same - the test weakens as it is overfitted, and at the
+textbook extreme it ends at the p ~ 1.0 red flag. The uncollapsed 2:3
+spec is also instructive: Hansen REJECTS it (p < 0.05) while its
+collapsed twin passes - proliferation distorts the test in both tails.
+Collapsing keeps estimates stable with a fraction of the instruments.
+Exported: proliferation_grid.csv
+Saved figure: python_dynamic_panel_instrument_proliferation.png
+
+======================================================================
+8. REPLICATION CHECK: the pydynpd documentation example
+======================================================================
+Different specification, same machinery: the pydynpd README/vignette
+estimates the original Arellano-Bond two-lag model. Replicating it
+verifies our toolchain against the package's published output (which
+itself matches Stata's xtabond2).
+
+ Dynamic panel-data estimation, two-step difference GMM
+ Group variable: id                               Number of obs = 611     
+ Time variable: year                              Min obs per group: 4    
+ Number of instruments = 42                       Max obs per group: 6    
+ Number of groups = 140                           Avg obs per group: 4.36 
++-----------+------------+---------------------+------------+-----------+-----+
+|     n     |   coef.    | Corrected Std. Err. |     z      |   P>|z|   |     |
++-----------+------------+---------------------+------------+-----------+-----+
+|    L1.n   | 0.2710675  |      0.1382542      | 1.9606462  | 0.0499203 |  *  |
+|    L2.n   | -0.0233928 |      0.0419665      | -0.5574151 | 0.5772439 |     |
+|     w     | -0.5668527 |      0.2092231      | -2.7093219 | 0.0067421 |  ** |
+|     k     | 0.3613939  |      0.0662624      | 5.4539824  | 0.0000000 | *** |
+| year_1979 | 0.0011898  |      0.0092322      | 0.1288765  | 0.8974554 |     |
+| year_1980 | -0.0316432 |      0.0116155      | -2.7242254 | 0.0064453 |  ** |
+| year_1981 | -0.0900163 |      0.0206593      | -4.3571693 | 0.0000132 | *** |
+| year_1982 | -0.0996210 |      0.0296036      | -3.3651654 | 0.0007650 | *** |
+| year_1983 | -0.0693308 |      0.0404276      | -1.7149347 | 0.0863572 |     |
+| year_1984 | -0.0614505 |      0.0475525      | -1.2922666 | 0.1962648 |     |
++-----------+------------+---------------------+------------+-----------+-----+
+Hansen test of overid. restrictions: chi(32) = 32.666 Prob > Chi2 = 0.434
+Arellano-Bond test for AR(1) in first differences: z = -1.29 Pr > z =0.198
+Arellano-Bond test for AR(2) in first differences: z = -0.31 Pr > z =0.760
+
+
+  Published vignette values: L1.n = 0.2710675, Hansen chi2 = 32.666,
+  42 instruments.
+  Our run:                   L1.n = 0.2710675, Hansen chi2 = 32.666, 42 instruments.
+  Exact match: True
+
+Exported: ab_replication_results.csv
+
+======================================================================
+9. SYNTHESIS: the whole story on one axis
+======================================================================
+                    estimator   rho1     se  ci_lo  ci_hi  hansen_p  ar1_p  ar2_p  n_instruments
+                   Pooled OLS 0.9617 0.0084 0.9453 0.9781       NaN    NaN    NaN            NaN
+                Fixed effects 0.6262 0.0515 0.5252 0.7272       NaN    NaN    NaN            NaN
+            Anderson-Hsiao IV 1.2327 0.4782 0.2955 2.1699       NaN    NaN    NaN            1.0
+          Diff GMM (one-step) 0.7075 0.0842 0.5425 0.8725    0.2113    0.0 0.8913           91.0
+          Diff GMM (two-step) 0.6788 0.0891 0.5042 0.8534    0.2113    0.0 0.8660           91.0
+Sys GMM (one-step, collapsed) 0.9025 0.0634 0.7781 1.0268    0.4621    0.0 0.9492           32.0
+Sys GMM (two-step, collapsed) 0.9270 0.0785 0.7731 1.0809    0.4621    0.0 0.9944           32.0
+
+Exported: estimates_summary.csv
+Saved figure: python_dynamic_panel_estimates_forest.png
+
+Takeaways:
+  1. OLS (0.962) and FE (0.626) bracket the truth from above/below.
+  2. Anderson-Hsiao is consistent but imprecise (se 0.48).
+  3. Difference GMM (0.679) hugs the FE bound -> weak-instrument
+     symptom when the series is persistent (Bond 2002 diagnostic).
+  4. System GMM (0.927, se 0.079) is inside the bracket with
+     clean diagnostics (AR(2) p=0.99, Hansen p=0.46).
+  5. Employment is highly persistent: about 93% of a shock survives into the next year.
+
+=== Script completed successfully ===

@@ -17,7 +17,7 @@ links:
 
 #url_code: "https://github.com/quarcs-lab/metricsai"
 url_pdf: ""
-url_slides: ""
+url_slides: "https://canva.link/bjzfw6wnzssy47y"
 url_video: ""
 ---
 
