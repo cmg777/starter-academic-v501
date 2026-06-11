@@ -269,7 +269,6 @@
 <p><span class="math display">\[\tau = E[\Delta Y \mid d \le \bar d] - E[\Delta Y \mid d &gt; \bar d]\]</span></p>
 <div class="fragment">
 <p>Crucially, <span class="math inline">\(\bar d\)</span> appears <em>inside</em> the expectation. Change the cutoff and you change the <strong>estimand</strong> — not just the precision.</p>
-<p><span class="comment">Identification rests on <strong>local parallel trends</strong>: absent treatment, <span class="math inline">\(E[\Delta Y(0) \mid d \le \bar d] = E[\Delta Y(0) \mid d &gt; \bar d]\)</span>.</span></p>
 <aside class="notes">
 <p>State the estimand out loud: ATT inside the ring, with the outer ring as the counterfactual trend. The identifying assumption is local parallel trends (Butts 2023, Assumption 2). The cross-section admits no formal pre-trends test — the nonparametric curve’s behavior past the cutoff is the closest informal check we get.</p>
 <style type="text/css">

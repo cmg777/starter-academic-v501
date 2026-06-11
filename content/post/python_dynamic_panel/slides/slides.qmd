@@ -75,7 +75,7 @@ The Arellano-Bond (1991) panel: 140 UK manufacturing firms, 1,031 firm-years, un
 
 $$n_{it} = \rho\, n_{i,t-1} + \beta_1 w_{it} + \beta_2 w_{i,t-1} + \beta_3 k_{it} + \beta_4 k_{i,t-1} + \alpha_i + \delta_t + \varepsilon_{it}$$
 
-[A *lagged dependent variable* on the right-hand side while the firm effect $\alpha_i$ sits in the error: $n_{i,t-1}$ depends on $\alpha_i$ by construction, so the regressor is correlated with the error no matter how many controls we add.]{.comment}
+[A *lagged dependent variable* sits on the right while the firm effect $\alpha_i$ sits in the error. By construction $n_{i,t-1}$ depends on $\alpha_i$ — so the regressor is correlated with the error, no matter how many controls we add.]{.comment}
 
 ::: {.notes}
 Blundell and Bond's (1998) dynamic labor-demand equation on this very dataset: log employment n on its own lag, current and lagged log real wage w and log capital k, a firm effect α_i, year effects δ_t. A firm with a high permanent level had high employment last year too — so the endogeneity is mechanical, not an omitted-variable accident. Important framing: ρ is a descriptive/structural persistence parameter, not a causal effect — no treatment, no ATE/ATT. Identification will rest on sequential exogeneity and no serial correlation in ε, partially testable via AR(2) and Hansen.

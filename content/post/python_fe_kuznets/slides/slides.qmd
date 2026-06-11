@@ -53,10 +53,10 @@ In 1955 Simon Kuznets argued that inequality *rises* as countries industrialize,
 
 . . .
 
-But that curve was fitted on a handful of rich nations. With satellite-lights data on **180 countries**, does the inverted-U still hold? *Or does the story have a third act?*
+With satellite-lights data on **180 countries**, does the inverted-U still hold — *or is there a third act?*
 
 ::: {.notes}
-The hook. Kuznets is one of the most-tested hypotheses in development economics. The whole deck stress-tests his shape against modern panel data. Plant the question; we resolve it in Act III.
+The hook. Kuznets fitted his curve on a handful of rich nations; it is one of the most-tested hypotheses in development economics. The whole deck stress-tests his shape against modern panel data. Plant the question; we resolve it in Act III.
 :::
 
 ## Pooled across 180 countries, the cloud bends twice — an N, not a single hump
@@ -175,7 +175,7 @@ The pipe separates regressors from fixed effects: everything after | is absorbed
 The turn of the act. Pooled OLS gave 0.241 / −0.028 / 0.001 at p ≈ 0.07; fixing both dimensions sharpens the magnitudes (0.293 / −0.032 / 0.001) and the significance jumps to p < 0.001 for every term. Overall R² is 0.975 — but that's mostly the FE mechanically explaining levels. The honest number is the within-R² of 0.142.
 :::
 
-## The honest fit is the within-R², and it rises 16× from linear to cubic
+## The honest fit is the within-R², and it climbs from 0.009 to 0.142 from linear to cubic
 
 | Two-way FE model | $\hat\beta_1$ | $p$ | within-$R^2$ |
 |---|---:|---:|---:|

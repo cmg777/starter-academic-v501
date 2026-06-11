@@ -217,7 +217,7 @@
 <div class="fragment">
 <p>There is exactly one treated unit and no control. <em>Where does the counterfactual come from?</em></p>
 <aside class="notes">
-<p>This is the defining problem of comparative case studies: a single treated unit, no natural control group. Donohue-Levitt-style difference-in-differences needs an untreated comparison; here there is none. The synthetic control method manufactures one. Set up the stakes: a real policy question with a one-of-a-kind treatment.</p>
+<p>This is the defining problem of comparative case studies: a single treated unit, no natural control group. Standard difference-in-differences needs an untreated comparison; here there is none. The synthetic control method manufactures one. Set up the stakes: a real policy question with a one-of-a-kind treatment.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -460,15 +460,13 @@
 <div class="column" style="width:50%;">
 <h3 id="in-sample">In-sample</h3>
 <ul>
-<li>Weights estimated from a <em>finite</em> pre-window</li>
-<li>31 years, 16 weights <span class="math inline">\(\Rightarrow\)</span> sampling noise</li>
+<li>Weights from a <em>finite</em> pre-window (31 years, 16 weights) <span class="math inline">\(\Rightarrow\)</span> sampling noise</li>
 <li>Monte Carlo simulation</li>
 </ul>
 </div><div class="column" style="width:50%;">
 <h3 id="out-of-sample">Out-of-sample</h3>
 <ul>
-<li>Post-1990 shocks the model cannot foresee</li>
-<li>Structural breaks, surprises</li>
+<li>Post-1990 shocks the model never saw</li>
 <li>Gaussian concentration bound</li>
 </ul>
 </div></div>

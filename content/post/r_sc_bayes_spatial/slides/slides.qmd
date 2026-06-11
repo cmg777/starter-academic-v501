@@ -49,7 +49,7 @@ format:
 
 ## Two assumptions decide whether you trust the most-studied policy in econometrics
 
-California's 1988 Proposition 99 raised the cigarette tax 25 cents. The classical synthetic control answer — a 25–30 pack drop — has been quoted for two decades.
+Prop 99 raised California's cigarette tax 25 cents in 1988. The classic answer — a 25–30 pack drop — has been quoted for 20 years.
 
 . . .
 
@@ -61,7 +61,7 @@ This is the central tension. Classical SCM gives a clean headline, but the simpl
 
 ## Same data, three estimators, one ATT — but the donor pool quadruples
 
-![ATT for classical SCM, Bayesian horseshoe, and Bayesian spatial SAR — robust at −18 to −16 packs/capita while active donors climb 4 → 23 → 27.](../r_sc_bayes_spatial_01_classical_paths.png)
+![ATT stays −18 to −16 packs/capita across all three estimators; active donors climb 4 → 23 → 27.](../r_sc_bayes_spatial_01_classical_paths.png)
 
 ::: {.notes}
 Spoiler figure. Don't explain the gap yet — just plant that the headline ATT survives all three specifications, while the synthetic California's *composition* does not. We earn each estimator in Act II and return to this picture.
@@ -282,7 +282,7 @@ Three reads. The sign and order of magnitude agree across all three — none of 
 
 . . .
 
-[Response.]{.rebuttal} Correct. The ATT is identified only under conditional independence given $X$ and parallel trends. The horseshoe just selects controls flexibly; the SAR layer just *tests* SUTVA — and rejects it. We evaluate a *method*, not the abortion-style causal claim.
+[Response.]{.rebuttal} Correct. The ATT is identified only under conditional independence given $X$ and parallel trends. The horseshoe just selects controls flexibly; the SAR layer just *tests* SUTVA — and rejects it. We evaluate a *method*, not a naive causal claim.
 
 ::: {.notes}
 Steelman, don't strawman. Bayesian machinery disciplines selection and surfaces spillovers; it does not relax the core identifying assumptions. The contribution is showing that SUTVA is testable and, here, false — which widens the policy's measured reach.

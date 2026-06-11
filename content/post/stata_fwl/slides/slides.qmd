@@ -53,7 +53,7 @@ A store manager asks: do coupons lift sales? The raw scatter says *no* — more 
 
 . . .
 
-But "the effect of coupons, holding income fixed" lives in three dimensions. *How do you put that on two axes?*
+"Holding income fixed" lives in three dimensions. *How do you put that on two axes?*
 
 ::: {.notes}
 This is the hook of the whole tutorial. Everyone uses the phrase "controlling for X," but almost no one can point to the picture. The FWL theorem is the bridge — it turns a multidimensional regression coefficient into a two-dimensional slope you can literally plot. Keep this concrete: one manager, one question, one scatter.
@@ -88,10 +88,10 @@ Spoiler figure — don't explain the mechanism yet. Just plant that the left and
 - **Confounder** — `income`: rich areas get *fewer* coupons but buy *more*
 :::
 
-[The store targets promotions at lower-income areas, so coupons and income are negatively linked (−0.71). Income also lifts sales. That opens a backdoor path the naive slope never blocks.]{.comment}
+[Coupons and income are negatively linked (−0.71) — a backdoor the naive slope misses.]{.comment}
 
 ::: {.notes}
-The data-generating process is known: coupons → sales is +0.2, income → coupons is −0.5, income → sales is +0.3. Because we built it, we know the naive estimate is wrong on purpose. This is the controlled lab where we can check that FWL recovers the truth.
+The store targets promotions at lower-income areas, so coupons and income are negatively linked (−0.71). Income also lifts sales. That opens a backdoor path the naive slope never blocks. The data-generating process is known: coupons → sales is +0.2, income → coupons is −0.5, income → sales is +0.3. Because we built it, we know the naive estimate is wrong on purpose. This is the controlled lab where we can check that FWL recovers the truth.
 :::
 
 ## The raw correlation lies: coupons and sales correlate −0.17
@@ -112,12 +112,12 @@ Walk the three rows. The first row is the trap. Rows two and three explain why: 
 
 $$\hat\beta_1=\frac{\operatorname{Cov}(\tilde y,\tilde x_1)}{\operatorname{Var}(\tilde x_1)}$$
 
-Regress $y$ on the controls $Z$ and keep the residual $\tilde y$. Regress $x_1$ on $Z$ and keep $\tilde x_1$. The simple slope of $\tilde y$ on $\tilde x_1$ **equals** the multiple-regression coefficient on $x_1$.
+Residualize both axes on $Z$, then read one slope — it **equals** the multiple-regression coefficient on $x_1$.
 
 [The tildes mean "the part $Z$ cannot explain." Two paths, one number.]{.comment}
 
 ::: {.notes}
-This is the algebraic heart of the deck. The multivariate β₁ is not an approximation of the residual-on-residual slope — it is exactly that slope. Frisch & Waugh (1933) and Lovell (1963) proved it. Everything downstream — scatterfit, reghdfe, fixed effects — is this identity in disguise.
+Spell out the recipe aloud: regress $y$ on the controls $Z$ and keep the residual $\tilde y$; regress $x_1$ on $Z$ and keep $\tilde x_1$; the simple slope of $\tilde y$ on $\tilde x_1$ is the multiple-regression coefficient on $x_1$. This is the algebraic heart of the deck. The multivariate β₁ is not an approximation of the residual-on-residual slope — it is exactly that slope. Frisch & Waugh (1933) and Lovell (1963) proved it. Everything downstream — scatterfit, reghdfe, fixed effects — is this identity in disguise.
 :::
 
 ## One option turns the multiple regression into a partial-regression plot
@@ -257,10 +257,10 @@ This is the trilogy payoff. The naive −0.093, the controlled +0.212, the OVB �
 
 . . .
 
-[Response.]{.rebuttal} It is not. FWL is an *algebraic identity* about a linear regression coefficient — it visualizes "holding Z fixed," nothing more. The +0.212 is causal here only because *we built* a known DGP; in real data, identification still rests on having the right controls in Z. FWL shows what a coefficient *is*, not whether it deserves a causal reading.
+[Response.]{.rebuttal} It is not. FWL is an *algebraic identity* — it visualizes "holding Z fixed," nothing more. The +0.212 is causal here only because *we built* the DGP.
 
 ::: {.notes}
-Steelman, don't strawman. The partial-regression plot is seductive — it looks like causal evidence. But it is purely mechanical: it reports the slope of the multiple regression, full stop. Whether that slope is the causal effect depends entirely on whether Z blocks the relevant backdoors. In the toy data it does (we wrote the DGP); in the wild, that is an assumption, not a guarantee.
+In real data, identification still rests on having the right controls in Z. FWL shows what a coefficient *is*, not whether it deserves a causal reading. Steelman, don't strawman. The partial-regression plot is seductive — it looks like causal evidence. But it is purely mechanical: it reports the slope of the multiple regression, full stop. Whether that slope is the causal effect depends entirely on whether Z blocks the relevant backdoors. In the toy data it does (we wrote the DGP); in the wild, that is an assumption, not a guarantee.
 :::
 
 # "Controlling for X" is a residual-on-residual slope you can finally draw. {.divider background-color="#141413"}

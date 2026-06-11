@@ -271,7 +271,7 @@ Jointness measures whether two regressors appear in models together (complements
 
 [Act III]{.act}
 
-## GDP is highly persistent — only ~5% of the steady-state gap closes per decade
+## GDP is highly persistent — only ~8% of the steady-state gap closes per decade
 
 $$\alpha \approx 0.92 \;\Rightarrow\; \text{convergence speed} = 1 - \alpha \approx 0.08 \text{ per decade}$$
 

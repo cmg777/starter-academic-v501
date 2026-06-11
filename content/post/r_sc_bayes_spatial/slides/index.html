@@ -213,7 +213,7 @@
 </section>
 <section id="two-assumptions-decide-whether-you-trust-the-most-studied-policy-in-econometrics" class="slide level2 center">
 <h2>Two assumptions decide whether you trust the most-studied policy in econometrics</h2>
-<p>California’s 1988 Proposition 99 raised the cigarette tax 25 cents. The classical synthetic control answer — a 25–30 pack drop — has been quoted for two decades.</p>
+<p>Prop 99 raised California’s cigarette tax 25 cents in 1988. The classic answer — a 25–30 pack drop — has been quoted for 20 years.</p>
 <div class="fragment">
 <p>But it rests on two quiet assumptions: donor weights live on a <em>sparse simplex</em>, and donor states are <em>unaffected</em> by California’s policy. <em>What if both are wrong?</em></p>
 <aside class="notes">
@@ -234,7 +234,7 @@
 <section id="same-data-three-estimators-one-att-but-the-donor-pool-quadruples" class="slide level2 center">
 <h2>Same data, three estimators, one ATT — but the donor pool quadruples</h2>
 
-<img data-src="../r_sc_bayes_spatial_01_classical_paths.png" class="r-stretch quarto-figure-center"><p class="caption">ATT for classical SCM, Bayesian horseshoe, and Bayesian spatial SAR — robust at −18 to −16 packs/capita while active donors climb 4 → 23 → 27.</p><aside class="notes">
+<img data-src="../r_sc_bayes_spatial_01_classical_paths.png" class="r-stretch quarto-figure-center"><p class="caption">ATT stays −18 to −16 packs/capita across all three estimators; active donors climb 4 → 23 → 27.</p><aside class="notes">
 <p>Spoiler figure. Don’t explain the gap yet — just plant that the headline ATT survives all three specifications, while the synthetic California’s <em>composition</em> does not. We earn each estimator in Act II and return to this picture.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -628,7 +628,7 @@
 <h2>Does the SAR layer make this causal? No — two assumptions still carry the weight</h2>
 <p><span class="objection">Objection.</span> A spatial model and machine-selected controls can’t manufacture identification.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Correct. The ATT is identified only under conditional independence given <span class="math inline">\(X\)</span> and parallel trends. The horseshoe just selects controls flexibly; the SAR layer just <em>tests</em> SUTVA — and rejects it. We evaluate a <em>method</em>, not the abortion-style causal claim.</p>
+<p><span class="rebuttal">Response.</span> Correct. The ATT is identified only under conditional independence given <span class="math inline">\(X\)</span> and parallel trends. The horseshoe just selects controls flexibly; the SAR layer just <em>tests</em> SUTVA — and rejects it. We evaluate a <em>method</em>, not a naive causal claim.</p>
 <aside class="notes">
 <p>Steelman, don’t strawman. Bayesian machinery disciplines selection and surfaces spillovers; it does not relax the core identifying assumptions. The contribution is showing that SUTVA is testable and, here, false — which widens the policy’s measured reach.</p>
 <style type="text/css">

@@ -288,10 +288,10 @@
 <h2>A data trap: “missing” was coded as zero, not as missing</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb1-1"><a href=""></a><span class="kw">mvdecode</span> DemocIndxLag PolitFreeLag EconFreeLag, mv(0)</span>
 <span id="cb1-2"><a href=""></a><span class="kw">sum</span> DemocIndxLag PolitFreeLag EconFreeLag</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The three lagged institutional variables encode missing data as <span class="math inline">\(0\)</span>. Left raw, those zeros masquerade as legitimate observations of “no economic freedom.”</p>
+<p>The three lagged institutional variables encode missing data as <span class="math inline">\(0\)</span>.</p>
 <p><span class="comment"><code>DemocIndxLag</code> loses 86.5% of its rows to recoding — which is why the published study drops it entirely.</span></p>
 <aside class="notes">
-<p>After mvdecode, EconFreeLag’s mean rises from 4.67 to 5.76 and its minimum from 0 to 1.82 — the apparent zeros were spurious. PolitFreeLag and EconFreeLag retain 1,168 and 1,349 valid country-years; DemocIndxLag retains only 225, effectively unusable.</p>
+<p>Left raw, those zeros masquerade as legitimate observations of “no economic freedom.” After mvdecode, EconFreeLag’s mean rises from 4.67 to 5.76 and its minimum from 0 to 1.82 — the apparent zeros were spurious. PolitFreeLag and EconFreeLag retain 1,168 and 1,349 valid country-years; DemocIndxLag retains only 225, effectively unusable.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -380,10 +380,10 @@
 <section id="the-fix-first-difference-to-kill-alpha_i-then-instrument-the-lag" class="slide level2 center">
 <h2>The fix: first-difference to kill <span class="math inline">\(\alpha_i\)</span>, then instrument the lag</h2>
 <p><span class="math display">\[\Delta\ln\text{GDPpc}_{i,t} = \rho\,\Delta\ln\text{GDPpc}_{i,t-1} + \beta\,\Delta\text{War}_{i,t} + \Delta\varepsilon_{i,t}\]</span></p>
-<p>Differencing erases <span class="math inline">\(\alpha_i\)</span> exactly. But <span class="math inline">\(\Delta\ln\text{GDPpc}_{i,t-1}\)</span> and <span class="math inline">\(\Delta\varepsilon_{i,t}\)</span> both contain <span class="math inline">\(\varepsilon_{i,t-1}\)</span> — so the differenced lag is endogenous.</p>
+<p>Differencing erases <span class="math inline">\(\alpha_i\)</span> exactly — but it makes the differenced lag endogenous.</p>
 <p><span class="comment">Belt and suspenders: differencing removes confounders, lag-instruments handle the lagged-DV endogeneity.</span></p>
 <aside class="notes">
-<p>First-differencing is the launching pad for difference GMM. The differenced lag’s correlation with the differenced error is the problem the internal instruments solve. War and Coup are also treated as endogenous, since country-specific shocks could drive both GDP and conflict at once.</p>
+<p>The differenced lag <span class="math inline">\(\Delta\ln\text{GDPpc}_{i,t-1}\)</span> and the differenced error <span class="math inline">\(\Delta\varepsilon_{i,t}\)</span> both contain <span class="math inline">\(\varepsilon_{i,t-1}\)</span> — that shared term is the endogeneity. First-differencing is the launching pad for difference GMM. The differenced lag’s correlation with the differenced error is the problem the internal instruments solve. War and Coup are also treated as endogenous, since country-specific shocks could drive both GDP and conflict at once.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -399,10 +399,10 @@
 <section id="deeper-lags-are-valid-instruments-the-arellanobond-moment-conditions" class="slide level2 center">
 <h2>Deeper lags are valid instruments: the Arellano–Bond moment conditions</h2>
 <p><span class="math display">\[E\!\left[\,\ln\text{GDPpc}_{i,t-s}\cdot\Delta\varepsilon_{i,t}\,\right] = 0 \qquad \text{for } s \geq 2\]</span></p>
-<p>Lags <span class="math inline">\(2\)</span> and deeper of the <em>level</em> are uncorrelated with the differenced error — so <span class="math inline">\(\ln\text{GDPpc}_{i,t-2}, \ln\text{GDPpc}_{i,t-3},\ldots\)</span> instrument <span class="math inline">\(\Delta\ln\text{GDPpc}_{i,t-1}\)</span>.</p>
+<p>Lags <span class="math inline">\(2\)</span> and deeper of the <em>level</em> are uncorrelated with the differenced error — so they are valid instruments for the differenced lag.</p>
 <p><span class="comment">We use lags <span class="math inline">\(2\)</span>–<span class="math inline">\(6\)</span>: deep enough to be exogenous, shallow enough to contain instrument proliferation.</span></p>
 <aside class="notes">
-<p>These moment conditions form the basis of the GMM estimator. Restricting to lag(2 6) limits the instrument-matrix size — Roodman’s (2009) concern is that too many instruments over-fit endogenous regressors and weaken the Hansen J test. Like using last week’s weather to predict this week’s: exogenous to today’s shock, predictive of yesterday’s value.</p>
+<p>Concretely, <span class="math inline">\(\ln\text{GDPpc}_{i,t-2}, \ln\text{GDPpc}_{i,t-3},\ldots\)</span> instrument <span class="math inline">\(\Delta\ln\text{GDPpc}_{i,t-1}\)</span>. These moment conditions form the basis of the GMM estimator. Restricting to lag(2 6) limits the instrument-matrix size — Roodman’s (2009) concern is that too many instruments over-fit endogenous regressors and weaken the Hansen J test. Like using last week’s weather to predict this week’s: exogenous to today’s shock, predictive of yesterday’s value.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

@@ -210,10 +210,14 @@ Finding 2: non-linearity. The step from low to medium prices does essentially no
 
 . . .
 
-[Response.]{.rebuttal} Correct. $\tau(\mathbf{x})$ is identified only under **conditional independence given $\mathbf{X}$** (unconfoundedness) and adequate **overlap**. The forest just estimates $g$ and $f$ flexibly; it can't rule out an omitted confounder. The 3-vs-2 contrast even *failed* on overlap — a feature, not a bug, of honest estimation.
+[Response.]{.rebuttal} Correct. $\tau(\mathbf{x})$ is identified only under **conditional independence given $\mathbf{X}$** (unconfoundedness) and adequate **overlap**.
+
+. . .
+
+The forest estimates $g$ and $f$ — it cannot rule out an omitted confounder. The 3-vs-2 contrast even *failed* on overlap: a feature of honest estimation.
 
 ::: {.notes}
-Steelman, don't strawman. cate disciplines estimation; it does not deliver identification for free. The 3-2 price comparison has propensity scores near zero on 300 obs and AIPW refuses to report — the estimator telling you the data can't answer the question. That honesty is exactly what you want.
+Steelman, don't strawman. The forest just estimates the nuisance functions flexibly; identification still rests entirely on conditional independence and overlap. cate disciplines estimation; it does not deliver identification for free. The 3-2 price comparison has propensity scores near zero on 300 obs and AIPW refuses to report — the estimator telling you the data can't answer the question. That honesty is exactly what you want.
 :::
 
 # The Resolution {.divider background-color="#00d4c8"}

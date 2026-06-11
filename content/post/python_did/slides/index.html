@@ -327,7 +327,7 @@
 <li class="fragment"><strong>50 treated, 50 control</strong>; treatment switches on at period 5</li>
 <li class="fragment"><strong>True effect = 5.0</strong> baked in, so every estimate has a ground truth to hit</li>
 </ul>
-<p><span class="comment">Synthetic panel data with a built-in <code>true_effect</code> column — the benchmark that lets us check the estimator against the right answer.</span></p>
+<p><span class="comment">A built-in <code>true_effect</code> column gives every estimate a known target to hit.</span></p>
 <aside class="notes">
 <p>Using simulated data with a known effect is the pedagogical move: we can verify the estimator recovers the truth before trusting it on real data where the truth is unknown. The 2×2 crosstab is perfectly balanced — 250 observations in each of the four cells.</p>
 <style type="text/css">
@@ -502,9 +502,9 @@
 <li class="fragment"><strong>90 never-treated</strong> units — a clean control group</li>
 <li class="fragment">Effects <strong>grow over time</strong> by construction (2.0 → 3.2 for the earliest cohort)</li>
 </ul>
-<p><span class="comment">Two-Way Fixed Effects fits one pooled coefficient <span class="math inline">\(\delta\)</span> in <span class="math inline">\(Y_{it} = \gamma_i + \lambda_t + \delta D_{it} + \varepsilon_{it}\)</span> — a weighted average of many 2×2 comparisons, some of them poisoned.</span></p>
+<p><span class="comment">TWFE fits one pooled <span class="math inline">\(\delta\)</span> — a weighted average of many 2×2 comparisons, some of them poisoned.</span></p>
 <aside class="notes">
-<p>With a single treatment time, TWFE’s δ is correct. With staggered timing it becomes a weighted average of all pairwise 2×2 comparisons — and some of those use already-treated units as controls. When effects grow over time, that drags the estimate down.</p>
+<p>The TWFE specification is Y_it = γ_i + λ_t + δ·D_it + ε_it. With a single treatment time, δ is correct. With staggered timing it becomes a weighted average of all pairwise 2×2 comparisons — and some of those use already-treated units as controls. When effects grow over time, that drags the estimate down.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

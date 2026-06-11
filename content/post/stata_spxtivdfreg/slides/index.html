@@ -215,7 +215,10 @@
 <h2>When the crisis hit, credit risk spread two ways — and standard tools saw only one</h2>
 <p>When the 2007–2009 crisis struck, non-performing loans surged across the whole US banking system at once.</p>
 <div class="fragment">
-<p>Two channels did it: <strong>spatial spillovers</strong> between interconnected banks, and <strong>common factors</strong> — macro shocks that hit every bank together. <em>Stata’s <code>xsmle</code> and <code>spxtregress</code> cannot model the second one.</em></p>
+<p>Two channels did it: <strong>spatial spillovers</strong> between banks, and <strong>common factors</strong> — macro shocks that hit every bank at once.</p>
+</div>
+<div class="fragment">
+<p><em>Stata’s <code>xsmle</code> and <code>spxtregress</code> model only the first.</em></p>
 <aside class="notes">
 <p>This is the central tension. Bank risk does not stay contained. It travels along lending relationships (spatial) AND it responds to aggregate shocks like interest-rate moves and the housing collapse (common factors). The standard spatial-panel toolkit in Stata can do spatial lags but cannot accommodate unobserved common factors — that gap is what the whole deck is about.</p>
 <style type="text/css">
@@ -633,7 +636,7 @@
 </section>
 <section id="the-strongest-objection-and-the-answer" class="slide level2 center">
 <h2>The strongest objection — and the answer</h2>
-<p><span class="objection">Objection.</span> The mean-group estimator drives the spatial lag to insignificance (<span class="math inline">\(\psi = 0.032\)</span>, <span class="math inline">\(p = 0.54\)</span>). So maybe the spillovers were never real.</p>
+<p><span class="objection">Objection.</span> The mean-group estimator drives the spatial lag to insignificance (<span class="math inline">\(\psi = 0.032\)</span>, <span class="math inline">\(p = 0.536\)</span>). So maybe the spillovers were never real.</p>
 <div class="fragment">
 <p><span class="rebuttal">Response.</span> Imposing homogeneous slopes on heterogeneous banks can manufacture spurious spatial dependence — but MG is only <span class="math inline">\(\sqrt{N}\)</span>-consistent with just 35 periods, so a few outlier banks can swamp the average. Read it as a caution, not a refutation: <span class="math inline">\(\rho\)</span> stays stable at 0.301, and theory still predicts interconnection.</p>
 <aside class="notes">

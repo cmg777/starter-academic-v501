@@ -322,9 +322,9 @@
 <section id="gwr-lets-every-district-keep-its-own-slope-and-intercept" class="slide level2 center">
 <h2>GWR lets every district keep its own slope and intercept</h2>
 <p><span class="math display">\[g_i = \alpha(u_i, v_i) + \beta(u_i, v_i) \cdot \ln(y_{i,2010}) + \varepsilon_i\]</span></p>
-<p>Now <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are <strong>functions of location</strong> <span class="math inline">\((u_i, v_i)\)</span>. A distance-decay kernel weights nearby districts more; a <strong>bandwidth</strong> <span class="math inline">\(h\)</span> sets how many neighbours each local regression listens to.</p>
+<p>Now <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are <strong>functions of location</strong> <span class="math inline">\((u_i, v_i)\)</span> — one regression per place.</p>
 <aside class="notes">
-<p>GWR fits one regression per location, weighted by spatial proximity. Small bandwidth = highly local and noisy; large bandwidth = smooth, approaching the global model. The coefficients become maps instead of single numbers. But standard GWR has one catch — addressed on the next slide.</p>
+<p>A distance-decay kernel weights nearby districts more. A bandwidth <span class="math inline">\(h\)</span> sets how many neighbours each local regression listens to. GWR fits one regression per location, weighted by spatial proximity. Small bandwidth = highly local and noisy; large bandwidth = smooth, approaching the global model. The coefficients become maps instead of single numbers. But standard GWR has one catch — addressed on the next slide.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

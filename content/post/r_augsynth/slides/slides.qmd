@@ -258,10 +258,10 @@ The lesson of the section in one figure. The point estimate is −0.040 in all f
 
 . . .
 
-[Response.]{.rebuttal} Correct. The ATT is identified only if a weighted donor blend can stand in for Kansas's untreated path, with no anticipation and no interference. ASCM disciplines *selection*; it cannot strip out the 2012–2013 drought or aerospace shocks. The estimate is the *net* gap — suggestive-to-moderate evidence, not a knock-down result.
+[Response.]{.rebuttal} Correct. ASCM disciplines *selection*; it cannot manufacture identification. The ATT still needs a credible donor blend, no anticipation, no interference — and the gap mixes the tax cut with the drought and aerospace shocks. *Suggestive-to-moderate evidence, not a knock-down result.*
 
 ::: {.notes}
-Steelman, don't strawman. ASCM improves the counterfactual; it does not relax the identifying assumptions. Significance is genuinely borderline, and the gap mixes the tax cut with contemporaneous shocks a synthetic control cannot separate.
+Steelman, don't strawman. The ATT is identified only if a weighted donor blend can stand in for Kansas's untreated path, with no anticipation and no interference; ASCM improves the counterfactual but does not relax those identifying assumptions. Significance is genuinely borderline, and the estimate is the net gap — it cannot strip out the 2012–2013 drought or the aerospace-sector shocks a synthetic control cannot separate.
 :::
 
 # The better we make the comparison, the worse the tax cut looks — and never good. {.divider background-color="#141413"}

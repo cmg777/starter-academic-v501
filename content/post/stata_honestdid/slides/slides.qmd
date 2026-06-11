@@ -141,7 +141,7 @@ This is the estimate the entire sensitivity analysis stress-tests — not one ho
 The 2x2 gives one pre-snapshot and one post-snapshot per group. They look parallel — but a single photo cannot reveal whether one runner was already speeding up. We assume parallel trends because we have no evidence against it, and equally none for it. honestdid is the way forward.
 :::
 
-## Relative magnitudes bounds the post-violation by the worst pre-violation
+## The relative-magnitudes restriction bounds the post-violation by the worst pre-violation
 
 $$\Delta^{RM}(\bar M): \quad |\delta_t^{\text{post}}| \;\le\; \bar M \cdot \max_{s \in \text{pre}} |\delta_s|$$
 
@@ -208,7 +208,7 @@ A car can be fast yet safe if it accelerated gradually; a sudden swerve is dange
 
 [M-bar 1.5-2]{.bignum}
 
-[breakdown value under $\Delta^{RM}$ · the post-violation must exceed ~2x the worst pre-deviation to overturn the result]{.bignum-label}
+[breakdown value under $\Delta^{RM}$ · the post-violation must be 1.5–2x the worst pre-deviation to overturn the result]{.bignum-label}
 
 ::: {.notes}
 With five pre-periods the scaling factor is larger, so the CI widens faster than in the 2x2. At M-bar = 1.5 the lower bound is 0.003; at M-bar = 2 it turns to −0.007. So the breakdown lands between 1.5 and 2 — robust, though tighter than the one-pre-period 2x2.

@@ -54,7 +54,7 @@ In 1990, West Germany reunified with the East. Did that integration *lower* the 
 There is exactly one treated unit and no control. *Where does the counterfactual come from?*
 
 ::: {.notes}
-This is the defining problem of comparative case studies: a single treated unit, no natural control group. Donohue-Levitt-style difference-in-differences needs an untreated comparison; here there is none. The synthetic control method manufactures one. Set up the stakes: a real policy question with a one-of-a-kind treatment.
+This is the defining problem of comparative case studies: a single treated unit, no natural control group. Standard difference-in-differences needs an untreated comparison; here there is none. The synthetic control method manufactures one. Set up the stakes: a real policy question with a one-of-a-kind treatment.
 :::
 
 ## Even with a counterfactual, a point estimate alone cannot tell us if the gap is real
@@ -183,14 +183,12 @@ $$\hat{\tau}_T - \tau_T = \underbrace{\mathbf{p}_T'(\boldsymbol{\beta}_0 - \hat{
 :::: {.columns}
 ::: {.column width="50%"}
 ### In-sample
-- Weights estimated from a *finite* pre-window
-- 31 years, 16 weights $\Rightarrow$ sampling noise
+- Weights from a *finite* pre-window (31 years, 16 weights) $\Rightarrow$ sampling noise
 - Monte Carlo simulation
 :::
 ::: {.column width="50%"}
 ### Out-of-sample
-- Post-1990 shocks the model cannot foresee
-- Structural breaks, surprises
+- Post-1990 shocks the model never saw
 - Gaussian concentration bound
 :::
 ::::

@@ -49,14 +49,14 @@ format:
 
 ## Does poverty cause violence? Regress conflict on income and you get nothing
 
-Poor regions see more conflict. But correlation is not causation: unobserved institutions, reverse causality, and a noisy income proxy all contaminate the regression.
+Poor regions see more conflict — but correlation is not causation.
 
 . . .
 
 So we regress conflict on economic activity — and the slope is **0.001**, indistinguishable from zero. *Is the effect real, or is the measurement broken?*
 
 ::: {.notes}
-The headline puzzle. A naive OLS regression of conflict on nighttime lights returns essentially zero. That is not "no effect" — it is a contaminated reading. The whole deck is about cleaning the thermometer.
+The headline puzzle. A naive OLS regression of conflict on nighttime lights returns essentially zero. Three things contaminate that regression: unobserved institutions, reverse causality, and a noisy income proxy. So 0.001 is not "no effect" — it is a contaminated reading. The whole deck is about cleaning the thermometer.
 :::
 
 ## OLS says zero; 2SLS says −0.30 — same data, a 300-fold gap
@@ -102,10 +102,10 @@ This is the endogeneity slide. Economic activity is endogenous in the conflict r
 - **Instruments** — lagged log rainfall and lagged drought (Palmer index), two years prior
 :::
 
-[Region fixed effects, region-specific time trends, and year effects are absorbed via pre-detrended variables; SEs clustered on 5,689 regions.]{.comment}
+[Region effects, region trends, and year effects are pre-absorbed. SEs clustered on 5,689 regions.]{.comment}
 
 ::: {.notes}
-A 48-... no — 5,689-region subnational panel from Hodler & Raschky (2014), taking Miguel, Satyanath & Sergenti's rainfall-IV idea below the country level. Conflict is rare: only 4.6% of region-years have any conflict death.
+A 5,689-region subnational panel from Hodler & Raschky (2014), taking Miguel, Satyanath & Sergenti's rainfall-IV idea below the country level. Conflict is rare: only 4.6% of region-years have any conflict death.
 
 The detrended *_dt variables are residuals from region-specific linear trends — equivalent to including those trends in the regression.
 :::
@@ -157,7 +157,7 @@ This is the second stage. OLS estimates δ inconsistently because Light is endog
 Naming the estimand is mandatory for a causal deck. The IV estimate is local to compliers, not the population ATE. The post's Section 9 discusses exactly this LATE-vs-ATE distinction.
 :::
 
-## Two LASSO... no — two stages: fit lights from weather, then conflict from fitted lights
+## Two stages: fit lights from weather, then conflict from fitted lights
 
 ``` {.stata code-line-numbers="1|2-3|4-5"}
 xtset objectid year
@@ -187,7 +187,7 @@ First-stage relevance, visualized. Each dot is a bin average after partialing ou
 Higher PDSI = less drought → more light. The cloud is tighter than the rainfall plot, foreshadowing the higher first-stage F (40.33 vs 24.62). Drought hits agriculture harder and more directly than rainfall fluctuations.
 :::
 
-## Both weather instruments predict conflict directly — the reduced form holds
+## Both weather instruments move conflict in the reduced form — the IV numerator is real
 
 ![Reduced-form coefficients (weather → conflict): more rain and less drought both predict less future conflict, for both outcomes.](../stata_iv_panel_reduced_form.png)
 

@@ -121,9 +121,9 @@ The estimand stays the ATE, E[Y(1)] − E[Y(0)]. What changes is what we ask of 
 Re-expression of the post's first Mermaid diagram. The dashed node U feeds arrows into X and Y; X also feeds Y (the effect we want). DoubleML/DoWhy assume this U away — conditional ignorability. Partial identification refuses to.
 :::
 
-## The observable gap is 38 points — but it is a confounded gap
+## The observable gap is 38.2 points — but it is a confounded gap
 
-![Observed job rates: 25.4% untrained vs 63.6% trained — a raw 38-point gap that mixes effect and selection.](../partial_id_observed_probs.png)
+![Observed job rates: 25.4% untrained vs 63.6% trained — a raw 38.2-point gap that mixes effect and selection.](../partial_id_observed_probs.png)
 
 ::: {.notes}
 This is all we get to see in a real study: the two conditional job rates. Trained workers find jobs at more than twice the rate. But the treated group is enriched with experienced workers who would have been hired anyway, so the gap is not the causal effect.

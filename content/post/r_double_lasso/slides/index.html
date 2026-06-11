@@ -198,7 +198,7 @@
   <h1 class="title">Double LASSO for Causal Inference</h1>
   <p class="subtitle">Does abortion reduce crime? A disciplined replication</p>
   <div class="title-result-strip">
-    <div class="kr"><span class="kr-num">−0.096</span><span class="kr-cap">rigorous Double-LASSO</span></div>
+    <div class="kr"><span class="kr-num">−0.096</span><span class="kr-cap">rigorous Double LASSO</span></div>
     <div class="kr"><span class="kr-num">+0.019</span><span class="kr-cap">cross-validated · sign flip</span></div>
     <div class="kr"><span class="kr-num">284</span><span class="kr-cap">candidate controls</span></div>
   </div>
@@ -234,7 +234,7 @@
 <section id="five-estimators-three-crimes-wildly-different-answers-from-one-dataset" class="slide level2 center">
 <h2>Five estimators, three crimes — wildly different answers from one dataset</h2>
 
-<img data-src="../r_double_lasso_estimates.png" class="r-stretch quarto-figure-center"><p class="caption"><span class="math inline">\(\hat\alpha \pm 95\%\)</span> CI · First-diff, kitchen-sink OLS, PSL, Double-LASSO (rigorous), Double-LASSO (CV). Dashed line = zero.</p><aside class="notes">
+<img data-src="../r_double_lasso_estimates.png" class="r-stretch quarto-figure-center"><p class="caption"><span class="math inline">\(\hat\alpha \pm 95\%\)</span> CI · First-diff, kitchen-sink OLS, PSL, Double LASSO (rigorous), Double LASSO (CV). Dashed line = zero.</p><aside class="notes">
 <p>Spoiler figure. Don’t explain every bar yet — just plant that the estimators disagree, sometimes flipping sign. We earn each one in Act II and come back to this picture.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -366,11 +366,11 @@
       }</style></aside>
 </section>
 <section id="six-lines-fit-the-rigorous-double-lasso-in-r" class="slide level2 center">
-<h2>Six lines fit the rigorous Double-LASSO in R</h2>
+<h2>Six lines fit the rigorous Double LASSO in R</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="2-3|4|5|6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a><span class="fu">library</span>(hdm); <span class="fu">library</span>(sandwich); <span class="fu">library</span>(lmtest)</span>
 <span id="cb1-2"><a href=""></a>Iy <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">rlasso</span>(X, y)<span class="sc">$</span>index)     <span class="co"># controls that predict crime</span></span>
 <span id="cb1-3"><a href=""></a>Id <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">rlasso</span>(X, d)<span class="sc">$</span>index)     <span class="co"># controls that predict abortion</span></span>
-<span id="cb1-4"><a href=""></a>S  <span class="ot">&lt;-</span> <span class="fu">union</span>(Iy, Id)                  <span class="co"># the union is the Double-LASSO safeguard</span></span>
+<span id="cb1-4"><a href=""></a>S  <span class="ot">&lt;-</span> <span class="fu">union</span>(Iy, Id)                  <span class="co"># the union is the Double LASSO safeguard</span></span>
 <span id="cb1-5"><a href=""></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> d <span class="sc">+</span> X[, S])            <span class="co"># post-OLS on the selected support</span></span>
 <span id="cb1-6"><a href=""></a><span class="fu">coeftest</span>(fit, <span class="at">vcov =</span> vcovCL, <span class="at">cluster =</span> state)[<span class="st">"d"</span>, ]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <aside class="notes">
@@ -461,9 +461,9 @@
 <p><span class="act">Act III</span></p>
 </section>
 <section id="rigorous-double-lasso-restores-a-sensible-0.096-for-violent-crime" class="slide level2 center" data-background-color="#141413">
-<h2>Rigorous Double-LASSO restores a sensible −0.096 for violent crime</h2>
+<h2>Rigorous Double LASSO restores a sensible −0.096 for violent crime</h2>
 <p><span class="bignum">−0.096</span></p>
-<p><span class="bignum-label"><span class="math inline">\(\hat\alpha\)</span>, rigorous Double-LASSO (SE 0.051) · matches the paper’s −0.104; selection counts match exactly</span></p>
+<p><span class="bignum-label"><span class="math inline">\(\hat\alpha\)</span>, rigorous Double LASSO (SE 0.051) · matches the paper’s −0.104; selection counts match exactly</span></p>
 <aside class="notes">
 <p>Between the no-controls baseline (−0.152) and the kitchen-sink mess (+0.014), the rigorous DL lands at −0.096 off just 8 controls. The 95% CI [−0.197, +0.004] barely contains zero — one notch below 5% significance, an honest result.</p>
 <style type="text/css">

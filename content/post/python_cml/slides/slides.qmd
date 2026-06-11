@@ -53,10 +53,10 @@ A government runs a job-training programme. The average effect is positive. So w
 
 . . .
 
-But caseworkers steer the *neediest* jobseekers into training, and a simple comparison cannot tell the programme's effect apart from *who got selected*. *Average is not enough.*
+Caseworkers steer the *neediest* into training. A simple comparison then confuses *the programme* with *who was selected*. *Average is not enough.*
 
 ::: {.notes}
-This is the central tension. A single average number — even a correct one — hides the heterogeneity that actually drives good policy. We need to estimate not just whether the programme works, but for whom, and then act on that. The whole deck builds toward a personalised assignment rule.
+This is the central tension. Caseworkers steer the neediest jobseekers into training, so a simple comparison cannot tell the programme's effect apart from who got selected. A single average number — even a correct one — hides the heterogeneity that actually drives good policy. We need to estimate not just whether the programme works, but for whom, and then act on that. The whole deck builds toward a personalised assignment rule.
 :::
 
 ## A naive comparison says +5.1 months — but the true effect is +5.6
@@ -86,10 +86,10 @@ $$\text{ATE} = E[Y(1) - Y(0)]$$
 $$\text{GATE}(z) = E[Y(1) - Y(0) \mid Z = z]$$
 $$\text{IATE}(x) = E[Y(1) - Y(0) \mid X = x]$$
 
-[Population average → subgroup average → one number *per person*. Skipping to the finest estimand without securing the average is the most common mistake in applied CML.]{.comment}
+[Population average → subgroup average → one number *per person*. Earn the coarse estimand before the fine one — the order is the discipline.]{.comment}
 
 ::: {.notes}
-Y(1) and Y(0) are the potential outcomes under treatment and control; only one is ever observed. ATE is the headline policy number; GATE conditions on a named subgroup Z (here Dutch proficiency); IATE conditions on the full covariate vector X. A credible average is the floor on which any subgroup analysis stands, and credible group effects are the floor under any individual analysis.
+Skipping to the finest estimand without securing the average is the most common mistake in applied CML — earn each level in order. Y(1) and Y(0) are the potential outcomes under treatment and control; only one is ever observed. ATE is the headline policy number; GATE conditions on a named subgroup Z (here Dutch proficiency); IATE conditions on the full covariate vector X. A credible average is the floor on which any subgroup analysis stands, and credible group effects are the floor under any individual analysis.
 :::
 
 ## The identifying assumption: unconfoundedness, not randomisation

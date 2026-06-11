@@ -213,11 +213,12 @@
 </section>
 <section id="when-place-secretly-drives-both-x-and-y-mgwr-maps-the-confounder-not-the-effect" class="slide level2 center">
 <h2>When place secretly drives both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, MGWR maps the confounder, not the effect</h2>
-<p>If an unobserved attribute of place — geography, institutions, persistent norms — shifts the outcome <em>and</em> the levels of the covariates, MGWR’s local slopes absorb that contamination.</p>
+<p>An unobserved attribute of place shifts the outcome <em>and</em> the covariate levels.</p>
+<p>MGWR’s local slopes then absorb that contamination.</p>
 <div class="fragment">
 <p>What looks like genuine spatial heterogeneity is omitted-variable bias wearing a map. <em>Can we get the real coefficients back?</em></p>
 <aside class="notes">
-<p>This is the central tension of spatially varying coefficient models. The same data give a “rich local-effects map” that is actually a picture of the confounder. Li &amp; Fotheringham (2026) name this the indirect contextual effect and propose MGWFER to remove it.</p>
+<p>The unobserved attribute could be geography, institutions, or persistent local norms. This is the central tension of spatially varying coefficient models. The same data give a “rich local-effects map” that is actually a picture of the confounder. Li &amp; Fotheringham (2026) name this the indirect contextual effect and propose MGWFER to remove it.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -611,9 +612,9 @@
 <h2>The strongest objection — does the within-transform make this causal?</h2>
 <p><span class="objection">Objection.</span> Demeaning only removes <em>time-invariant</em> confounders — a one-trick pony. Real places change.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Correct, and the paper is candid: identification rests on four assumptions — time-invariant <span class="math inline">\(sc\)</span>, strict exogeneity, no time-varying confounders, stable slopes. MGWFER removes one specific bias cleanly; it does not manufacture identification, and it cannot recover effects of time-invariant <em>measurable</em> covariates.</p>
+<p><span class="rebuttal">Response.</span> True. MGWFER removes <em>time-invariant</em> confounding cleanly — and only that. It does not manufacture identification.</p>
 <aside class="notes">
-<p>Steelman, don’t strawman. The within-transformation deals with time-invariant confounding only; any unobserved factor that changes over time and correlates with both x and y still biases MGWFER. Time-invariant measurable covariates (e.g.&nbsp;distance to highway) get swept into alpha_hat and are no longer separable — a structural property of FE estimators. Be honest about the boundary.</p>
+<p>Steelman, don’t strawman. Identification rests on four assumptions: time-invariant sc, strict exogeneity, no time-varying confounders, and stable slopes. The within-transformation deals with time-invariant confounding only; any unobserved factor that changes over time and correlates with both x and y still biases MGWFER. Time-invariant measurable covariates (e.g.&nbsp;distance to highway) get swept into alpha_hat and are no longer separable — a structural property of FE estimators. Be honest about the boundary.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

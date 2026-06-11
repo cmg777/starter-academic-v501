@@ -91,8 +91,6 @@ $$\tau = E[\Delta Y \mid d \le \bar d] - E[\Delta Y \mid d > \bar d]$$
 
 Crucially, $\bar d$ appears *inside* the expectation. Change the cutoff and you change the **estimand** — not just the precision.
 
-[Identification rests on **local parallel trends**: absent treatment, $E[\Delta Y(0) \mid d \le \bar d] = E[\Delta Y(0) \mid d > \bar d]$.]{.comment}
-
 ::: {.notes}
 State the estimand out loud: ATT inside the ring, with the outer ring as the counterfactual trend. The identifying assumption is local parallel trends (Butts 2023, Assumption 2). The cross-section admits no formal pre-trends test — the nonparametric curve's behavior past the cutoff is the closest informal check we get.
 :::

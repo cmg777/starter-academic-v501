@@ -225,7 +225,7 @@ multisynth across all 12 members is a simultaneous block design (all adopt in 19
 ![Synthetic control for every euro member: most run above their synthetic counterfactual after 1999; Greece and Portugal fall below post-crisis.](../r_sc_multi_country_13_emu_percountry.png)
 
 ::: {.notes}
-Twelve single_augsynth fits, each member vs the 24 donors. Most members run above their synthetic counterfactuals after 1999. Greece and Portugal converge to or fall below theirs after the crisis (Greece +8.0% → −12.4%, Portugal +6.5% → −14.3%) — matching the paper's negative post-crisis contributions. Averages hide dynamics; the per-unit spread is the honest multi-country report.
+Twelve single_augsynth fits, each member vs the 24 donors. Most members run above their synthetic counterfactuals after 1999. Greece and Portugal converge to or fall below theirs after the crisis (Greece −12.4% in 2008–17, Portugal −14.3%) — matching the paper's negative post-crisis contributions. Averages hide dynamics; the per-unit spread is the honest multi-country report.
 :::
 
 ## ASCM ranks the euro winners just as Papaioannou did: Spearman 0.74 {background-color="#141413"}

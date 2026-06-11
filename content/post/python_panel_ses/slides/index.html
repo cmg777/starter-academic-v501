@@ -584,8 +584,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="time-clustering-over-rejects-at-9.0-false-positives-almost-twice-as-often" class="slide level2 center">
-<h2>Time clustering over-rejects at 9.0% — false positives almost twice as often</h2>
+<section id="the-too-small-ses-sit-at-0.550.58-the-honest-benchmark-understating-uncertainty-by-40" class="slide level2 center">
+<h2>The too-small SEs sit at 0.55–0.58× the honest benchmark — understating uncertainty by ~40%</h2>
 
 <img data-src="../panel_ses_ratios.png" class="r-stretch quarto-figure-center"><p class="caption">SE ratios relative to the entity-clustered benchmark. Ratios below 1.0 understate uncertainty.</p><aside class="notes">
 <p>The outlier from the Monte Carlo: FE + time-clustered rejects at 9.0%, nearly double 5% — 10 year-clusters violate large-cluster asymptotics, so the SEs are too small. This ratios figure normalizes everything to the entity-clustered SE: conventional and White on the pooled model sit at 0.55–0.58x, understating uncertainty by ~40%. TWFE + entity-clustered (3.2%) is mildly conservative — a benign property versus over-rejection.</p>
@@ -601,8 +601,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="does-machine-correcting-the-se-make-the-estimate-causal-no" class="slide level2 center">
-<h2>Does machine-correcting the SE make the estimate causal? No</h2>
+<section id="does-fixing-the-se-make-the-estimate-causal-no" class="slide level2 center">
+<h2>Does fixing the SE make the estimate causal? No</h2>
 <p><span class="objection">Objection.</span> “Clustered/robust SEs and a 6.6% rejection rate mean my coefficient is now the true causal effect.”</p>
 <div class="fragment">
 <p><span class="rebuttal">Response.</span> Standard errors fix <em>inference</em>, never <em>identification</em>. The 0.48 estimate is unbiased here only because <strong>fixed effects</strong> removed the time-invariant confounder <span class="math inline">\(\mu_i\)</span>. A time-varying confounder would still bias <span class="math inline">\(\beta\)</span> — and no SE could detect it.</p>

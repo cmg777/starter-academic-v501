@@ -116,10 +116,10 @@ This is the classic growth-economics test. The sign of beta is the whole questio
 
 $$g_i = \alpha(u_i, v_i) + \beta(u_i, v_i) \cdot \ln(y_{i,2010}) + \varepsilon_i$$
 
-Now $\alpha$ and $\beta$ are **functions of location** $(u_i, v_i)$. A distance-decay kernel weights nearby districts more; a **bandwidth** $h$ sets how many neighbours each local regression listens to.
+Now $\alpha$ and $\beta$ are **functions of location** $(u_i, v_i)$ — one regression per place.
 
 ::: {.notes}
-GWR fits one regression per location, weighted by spatial proximity. Small bandwidth = highly local and noisy; large bandwidth = smooth, approaching the global model. The coefficients become maps instead of single numbers. But standard GWR has one catch — addressed on the next slide.
+A distance-decay kernel weights nearby districts more. A bandwidth $h$ sets how many neighbours each local regression listens to. GWR fits one regression per location, weighted by spatial proximity. Small bandwidth = highly local and noisy; large bandwidth = smooth, approaching the global model. The coefficients become maps instead of single numbers. But standard GWR has one catch — addressed on the next slide.
 :::
 
 ## GWR's flaw: one bandwidth for all variables — MGWR removes it

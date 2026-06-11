@@ -123,7 +123,7 @@ This is the load-bearing assumption. It does not require equal levels — only e
 - **True effect = 5.0** baked in, so every estimate has a ground truth to hit
 :::
 
-[Synthetic panel data with a built-in `true_effect` column — the benchmark that lets us check the estimator against the right answer.]{.comment}
+[A built-in `true_effect` column gives every estimate a known target to hit.]{.comment}
 
 ::: {.notes}
 Using simulated data with a known effect is the pedagogical move: we can verify the estimator recovers the truth before trusting it on real data where the truth is unknown. The 2×2 crosstab is perfectly balanced — 250 observations in each of the four cells.
@@ -211,10 +211,10 @@ Pre-treatment leads range from −0.52 to −0.28, all insignificant (p > 0.3) �
 - Effects **grow over time** by construction (2.0 → 3.2 for the earliest cohort)
 :::
 
-[Two-Way Fixed Effects fits one pooled coefficient $\delta$ in $Y_{it} = \gamma_i + \lambda_t + \delta D_{it} + \varepsilon_{it}$ — a weighted average of many 2×2 comparisons, some of them poisoned.]{.comment}
+[TWFE fits one pooled $\delta$ — a weighted average of many 2×2 comparisons, some of them poisoned.]{.comment}
 
 ::: {.notes}
-With a single treatment time, TWFE's δ is correct. With staggered timing it becomes a weighted average of all pairwise 2×2 comparisons — and some of those use already-treated units as controls. When effects grow over time, that drags the estimate down.
+The TWFE specification is Y_it = γ_i + λ_t + δ·D_it + ε_it. With a single treatment time, δ is correct. With staggered timing it becomes a weighted average of all pairwise 2×2 comparisons — and some of those use already-treated units as controls. When effects grow over time, that drags the estimate down.
 :::
 
 ## Cohorts move in parallel, then jump at *their own* onset — TWFE then mis-uses early adopters as controls

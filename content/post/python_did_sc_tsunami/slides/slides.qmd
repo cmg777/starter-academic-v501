@@ -70,7 +70,7 @@ This is the fundamental problem of causal inference. Y(1) is observed for floode
 
 ## The wave's path was geography, not choice — that is what makes it a natural experiment
 
-Whether the water reached a stretch of coast was governed by **elevation, vegetation, and offshore depth** — read off satellite inundation maps, not chosen by economics. Flooded vs spared is plausibly *unrelated* to a district's economic prospects.
+**Elevation, vegetation, and offshore depth** decided which coast flooded — read off satellite maps, not chosen by economics. So flooded vs spared is plausibly *unrelated* to a district's economic prospects.
 
 . . .
 
@@ -283,9 +283,9 @@ For disaster policy the design lesson matters as much as the result: a credible 
 Steelman first: this is a single, exceptionally well-funded case study on simulated data with a tiny treatment group. The honest reply is that every credibility check — placebo, pre-trend, spatial inference — has been run and survived, and the conclusion is stated as evidence about well-governed mega-reconstruction, not disaster aid in general.
 :::
 
-## Five numbers, five lessons
+## Five numbers to remember
 
-| Number to remember | Value |
+| Number | Value |
 |---|---:|
 | 2005 output shock | [−0.0792]{.key}\*\*\* |
 | 2006–08 recovery premium (per year) | +0.0628\*\* |
@@ -293,16 +293,10 @@ Steelman first: this is a single, exceptionally well-funded case study on simula
 | Moran's I (spatial autocorrelation) | +0.065 |
 | Recovery SE: naive → Conley-HAC | 0.0146 → 0.0244 |
 
-::: {.incremental}
-- A single "after" hides the story — let evolving effects evolve.
-- Triangulate across methods; agreement beats any one estimate.
-- Satellite data unlock localized questions invisible at the national grain.
-- Clustered treatment demands honest, spatially-corrected inference.
-- Mind the small print: 10 districts, synthetic data, an assumption — strong evidence, stated with its caveats.
-:::
+[And five lessons: let evolving effects evolve · triangulate · satellite data unlock localized questions · clustered treatment needs honest inference · mind the small print.]{.comment}
 
 ::: {.notes}
-Close on the numbers, then the lessons. The next steps in the post: staggered-adoption DiD estimators, prediction intervals for the synthetic control, a wider donor pool.
+Close on the numbers, then the five lessons. One: the pooled 2×2 was an insignificant +0.0125 — only event-time windows revealed the −0.079 collapse and +0.063 overshoot, so let evolving effects evolve. Two: DiD, event study, dose-response, and synthetic control all pointed the same way; agreement beats any one estimate. Three: night-lights exposed a dose-response invisible at the district grain. Four: Conley spatial errors downgraded the recovery from a spurious *** to an honest ** without touching the point estimate. Five: ten treated districts on synthetic data, identified by an assumption — strong evidence, stated with its caveats. Next steps in the post: staggered-adoption DiD estimators, prediction intervals for the synthetic control, a wider donor pool.
 :::
 
 # A poor region, well-governed reconstruction, a permanently higher path. {.divider background-color="#141413"}

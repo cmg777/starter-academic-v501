@@ -180,7 +180,7 @@ This is the mirror image of the unit-weight problem. DiD and SC treat 1972 and 1
 | `1.post` | −28.51 | 1.75 | yes |
 | `1.cal` | −14.36 | 6.79 | yes |
 
-[The 2×2 DiD: California's before/after drop (−55.9) minus the controls' drop (−28.5) = **−27.35** packs.]{.comment}
+[The 2×2 DiD: California's before/after drop (−55.86) minus the controls' drop (−28.51) = **−27.35** packs.]{.comment}
 
 ::: {.notes}
 This is the simplest credible estimate — a 2×2 difference-in-differences, computed by hand with reg packspercapita i.cal##i.post. But it trusts parallel trends against the simple average of 38 very different states, and the raw-trends figure already showed California drifting away from that average before 1989. If California was on a steeper path for unrelated reasons, DiD overstates the effect.

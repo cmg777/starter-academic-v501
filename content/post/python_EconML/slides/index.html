@@ -275,9 +275,9 @@
 <section id="we-want-the-cate-a-function-of-mathbfx-not-a-single-number" class="slide level2 center">
 <h2>We want the CATE — a function of <span class="math inline">\(\mathbf{x}\)</span>, not a single number</h2>
 <p><span class="math display">\[\tau(\mathbf{x}) = E\{Y_i(1) - Y_i(0) \mid \mathbf{X}_i = \mathbf{x}\}\]</span></p>
-<p><span class="comment">Among districts that look like <span class="math inline">\(\mathbf{x}\)</span>, what is the average gap between the treated and untreated potential outcomes? Where <span class="math inline">\(\tau(\cdot)\)</span> bends with <span class="math inline">\(\mathbf{x}\)</span>, mining helps some districts more than others — that bend is the whole point.</span></p>
+<p><span class="comment">Where <span class="math inline">\(\tau(\cdot)\)</span> bends with <span class="math inline">\(\mathbf{x}\)</span>, mining helps some districts more than others — that bend is the whole point.</span></p>
 <aside class="notes">
-<p>Estimand: the Conditional Average Treatment Effect. When τ is constant in x, one ATE summarizes everything. When it bends, we have heterogeneity. The causal forest estimates that bend without us pre-specifying its shape.</p>
+<p>Estimand: the Conditional Average Treatment Effect. Read it as: among districts that look like x, what is the average gap between the treated and untreated potential outcomes? When τ is constant in x, one ATE summarizes everything. When it bends, we have heterogeneity. The causal forest estimates that bend without us pre-specifying its shape.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -327,8 +327,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="the-treatment-is-brutally-imbalanced-85-of-districts-never-mine" class="slide level2 center">
-<h2>The treatment is brutally imbalanced — 85% of districts never mine</h2>
+<section id="the-treatment-is-brutally-imbalanced-85-of-district-years-never-mine" class="slide level2 center">
+<h2>The treatment is brutally imbalanced — 85% of district-years never mine</h2>
 
 <img data-src="../python_econml_treatment_dist.png" class="r-stretch quarto-figure-center"><p class="caption">Treatment distribution. 2,550 control observations but only 150 per mining level — within-mining contrasts lean on just 300 rows.</p><aside class="notes">
 <p>The 85/5/5/5 split is what makes this hard. Plenty of controls, scarce treated units. Price-effect standard errors will be large because only 150 observations per level contribute, and within-mining comparisons (like 3-1) draw on 300.</p>
@@ -555,14 +555,14 @@
 <h3 id="mining-effect-1-0">Mining effect (1-0)</h3>
 <ul>
 <li>rises with quality of government</li>
-<li>range 0.089 across exec. constraints</li>
+<li>matches the exec.-constraints range of 0.089</li>
 <li>institutions <em>amplify</em> mining</li>
 </ul>
 </div><div class="column" style="width:50%;">
 <h3 id="price-effect-3-1">Price effect (3-1)</h3>
 <ul>
 <li>flat across quality of government</li>
-<li>range 0.045, no monotone pattern</li>
+<li>matches the exec.-constraints range of 0.045</li>
 <li>institutions <em>do not</em> touch price</li>
 </ul>
 </div></div>
@@ -619,9 +619,9 @@
 <h2>The strongest objection — and the answer</h2>
 <p><span class="objection">Objection.</span> A machine that picks controls cannot manufacture causal identification.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Exactly right. <span class="math inline">\(\tau(\mathbf{x})\)</span> is identified <em>only</em> under the Conditional Independence Assumption. The forest discovers heterogeneity flexibly and earns honest confidence intervals — but it cannot rule out an unobserved confounder. With real data, the CIA is untestable; here it holds only because we built it in.</p>
+<p><span class="rebuttal">Response.</span> Exactly right. <span class="math inline">\(\tau(\mathbf{x})\)</span> is identified <em>only</em> under the Conditional Independence Assumption — the forest earns honest intervals, but it cannot rule out an unobserved confounder.</p>
 <aside class="notes">
-<p>Steelman the critique. DML disciplines estimation and inference; it does not relax the identifying assumption. BLB SEs even treat panel observations as independent, so true clustered SEs would be larger. The Stata companion uses vce(cluster district_id). The method is a tool for credible heterogeneity estimation, conditional on identification holding.</p>
+<p>Steelman the critique. The forest discovers heterogeneity flexibly and earns honest confidence intervals, but it cannot relax the identifying assumption. With real data the CIA is untestable; here it holds only because we built it in. DML disciplines estimation and inference; it does not relax identification. BLB SEs even treat panel observations as independent, so true clustered SEs would be larger. The Stata companion uses vce(cluster district_id). The method is a tool for credible heterogeneity estimation, conditional on identification holding.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

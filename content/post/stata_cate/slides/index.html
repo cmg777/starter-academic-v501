@@ -215,9 +215,9 @@
 <h2>“What is the effect?” is the wrong question — ask “for whom?”</h2>
 <p>The textbook workflow ends with one number: the <strong>Average Treatment Effect</strong>.</p>
 <div class="fragment">
-<p>But policy makers, doctors, and managers never act on the average. They need to know <em>who</em> the program helps — and who it leaves behind. <em>That’s the CATE.</em></p>
+<p>But no one acts on the average. The real question is <em>who</em> the program helps. <em>That’s the CATE.</em></p>
 <aside class="notes">
-<p>This is the central motivation. A single ATE collapses a policy’s impact into one number, but the decision a policymaker faces is targeting: who should get the program. The whole deck is built to show that the average can hide an order-of-magnitude spread in effects.</p>
+<p>This is the central motivation. Policy makers, doctors, and managers never act on the average — they need to know who the program helps and who it leaves behind. A single ATE collapses a policy’s impact into one number, but the decision a policymaker faces is targeting: who should get the program. The whole deck is built to show that the average can hide an order-of-magnitude spread in effects.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -301,8 +301,8 @@
 <h1>The Investigation</h1>
 <p><span class="act">Act II</span></p>
 </section>
-<section id="the-estimand-is-a-function-not-a-number-tauxey1-y0mid-x" class="slide level2 center">
-<h2>The estimand is a function, not a number: <span class="math inline">\(\tau(x)=E[y(1)-y(0)\mid x]\)</span></h2>
+<section id="the-estimand-is-a-function-not-a-number-taumathbfxey1-y0mid-mathbfx" class="slide level2 center">
+<h2>The estimand is a function, not a number: <span class="math inline">\(\tau(\mathbf{x})=E[y(1)-y(0)\mid \mathbf{x}]\)</span></h2>
 <p><span class="math display">\[\tau(\mathbf{x}) = E\big[\,y(1) - y(0) \mid \mathbf{x}\,\big]\]</span></p>
 <p>The average effect <em>among households whose covariates equal</em> <span class="math inline">\(\mathbf{x}\)</span>. Where <span class="math inline">\(\tau(\mathbf{x})\)</span> bends with <span class="math inline">\(\mathbf{x}\)</span>, the program helps some households more than others.</p>
 <p><span class="comment">The single ATE is just <span class="math inline">\(E[\tau(\mathbf{X})]\)</span> — the CATE averaged over the population.</span></p>
@@ -720,9 +720,9 @@
 <h2>Does the causal forest make this causal? No — the assumptions still carry it</h2>
 <p><span class="objection">Objection.</span> A machine that flexibly selects controls surely earns us the causal interpretation.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> It does not. <span class="math inline">\(\tau(\mathbf{x})\)</span> is identified <em>only</em> under <strong>unconfoundedness given <span class="math inline">\(\mathbf{x}\)</span></strong> and <strong>overlap</strong>. If, say, employer match rates vary with income and we never observe them, the income gradient is biased. The forest fits the function; it cannot rule out an unmeasured confounder.</p>
+<p><span class="rebuttal">Response.</span> It does not. <span class="math inline">\(\tau(\mathbf{x})\)</span> is identified <em>only</em> under <strong>unconfoundedness</strong> and <strong>overlap</strong>. The forest fits the function; it cannot rule out an unmeasured confounder.</p>
 <aside class="notes">
-<p>Steelman, don’t strawman. The <code>cate</code> command disciplines estimation; it does not relax the identifying assumptions. The most credible threat here is an income-correlated unobserved confounder like the employer match rate. Honest practice: report the gradient as conditional on the unconfoundedness assumption, and flag the overlap check (teffects overlap / estat osample) as the natural follow-up.</p>
+<p>Steelman, don’t strawman. The <code>cate</code> command disciplines estimation; it does not relax the identifying assumptions. If, say, employer match rates vary with income and we never observe them, the income gradient is biased. The most credible threat here is an income-correlated unobserved confounder like the employer match rate. Honest practice: report the gradient as conditional on the unconfoundedness assumption, and flag the overlap check (teffects overlap / estat osample) as the natural follow-up.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

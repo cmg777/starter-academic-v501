@@ -231,8 +231,8 @@
       }</style></aside>
 </div>
 </section>
-<section id="one-dataset-four-estimators-very-different-answers" class="slide level2 center">
-<h2>One dataset, four estimators, very different answers</h2>
+<section id="one-dataset-three-models-very-different-answers" class="slide level2 center">
+<h2>One dataset, three models, very different answers</h2>
 
 <img data-src="../pension_grand_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Naive baselines (gray) versus three DML models across four ML learners, <span class="math inline">\(\hat\theta \pm 95\%\)</span> CI. Naive overstates; DML cuts it roughly in half.</p><aside class="notes">
 <p>Spoiler figure — plant it now, earn it in Act II. Don’t explain every bar yet. Just note the two gray naive bars sit far to the right of everything else, the steel (PLR) and orange (IRM) bars cluster together around $8,000–$9,000, and the teal (IIVM) bars sit higher because they answer a different question. We return to this picture in the Resolution.</p>
@@ -444,11 +444,11 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="two-different-recipes-same-answer-plr-and-irm-agree-within-518" class="slide level2 center">
-<h2>Two different recipes, same answer: PLR and IRM agree within $518</h2>
+<section id="two-different-recipes-same-answer-plr-and-irm-agree-within-517" class="slide level2 center">
+<h2>Two different recipes, same answer: PLR and IRM agree within $517</h2>
 
 <img data-src="../pension_irm_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">IRM estimates across four learners ($7,924–$8,559) are even tighter than PLR, with smaller standard errors.</p><aside class="notes">
-<p>IRM mean is $8,213 — only $518 below PLR’s $8,730. This convergence is the payoff of running both: partialling-out (PLR) and doubly-robust AIPW (IRM) rest on different assumptions and combine nuisances differently, yet they agree the ATE is $8,000–$9,000. That agreement means the number isn’t an artifact of one modeling choice. IRM’s SEs are even a touch smaller ($1,185 vs $1,339), so the propensity approach is slightly more efficient here. The close agreement also signals limited effect heterogeneity.</p>
+<p>IRM mean is $8,213 — only $517 below PLR’s $8,730. This convergence is the payoff of running both: partialling-out (PLR) and doubly-robust AIPW (IRM) rest on different assumptions and combine nuisances differently, yet they agree the ATE is $8,000–$9,000. That agreement means the number isn’t an artifact of one modeling choice. IRM’s SEs are even a touch smaller ($1,185 vs $1,339), so the propensity approach is slightly more efficient here. The close agreement also signals limited effect heterogeneity.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -625,9 +625,12 @@
 <h2>Does DML <em>make</em> this causal? No — two assumptions still carry the weight</h2>
 <p><span class="objection">Objection.</span> Letting an ML model pick the controls can’t manufacture identification.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Correct. The ATE is identified only under <strong>conditional exogeneity of eligibility given X</strong>; the LATE adds <strong>instrument validity and monotonicity</strong>. DML disciplines <em>estimation</em> — flexible nuisances plus orthogonality plus cross-fitting — it does not relax the <em>identifying</em> assumptions. If financial literacy confounds eligibility and savings, the estimates stay biased.</p>
+<p><span class="rebuttal">Response.</span> Correct. DML disciplines <em>estimation</em>, not <em>identification</em>.</p>
+</div>
+<div class="fragment">
+<p>The ATE needs <strong>conditional exogeneity</strong>; the LATE adds <strong>instrument validity and monotonicity</strong>.</p>
 <aside class="notes">
-<p>Steelman, don’t strawman. DML’s contribution is honest, efficient estimation given identification — not identification itself. Conditional exogeneity is untestable; the IV exclusion restriction is an assumption, not a result. The 1991 SIPP is also a single cross-section, and extreme asset outliers (−$502k to +$1.5M) pull the mean-based ATE. The method is a microscope, not a randomizer.</p>
+<p>Steelman, don’t strawman. DML’s contribution is honest, efficient estimation given identification — not identification itself. The ATE is identified only under conditional exogeneity of eligibility given X; the LATE adds instrument validity and monotonicity. Flexible nuisances plus orthogonality plus cross-fitting discipline estimation, but they do not relax the identifying assumptions — if financial literacy confounds eligibility and savings, the estimates stay biased. Conditional exogeneity is untestable; the IV exclusion restriction is an assumption, not a result. The 1991 SIPP is also a single cross-section, and extreme asset outliers (−$502k to +$1.5M) pull the mean-based ATE. The method is a microscope, not a randomizer.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

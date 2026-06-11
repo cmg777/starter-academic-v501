@@ -303,7 +303,7 @@
 <li class="fragment"><strong>Predictor</strong> — log income in the <em>start</em> year</li>
 <li class="fragment"><strong>Sample</strong> — 84 countries with data since 1960; oil producers and sub-1M-population states excluded</li>
 </ul>
-<p><span class="comment">5,040 country-year rows. A balanced panel means the same 84 countries appear every year — no composition effects masquerading as convergence.</span></p>
+<p><span class="comment">5,040 country-year rows. Balanced means the same 84 countries appear every year — so no composition effects.</span></p>
 <aside class="notes">
 <p>Penn World Tables 10.0, expenditure-side real GDP at chained PPPs — comparable across price levels. Following Patel, Sandefur &amp; Subramanian (2021) we drop oil economies (income is resource rent, not productive catch-up) and tiny states. Balancing the panel is the load-bearing design choice: it fixes N = 84 in every year, so the sigma series later can’t be contaminated by countries entering or leaving.</p>
 <style type="text/css">
@@ -467,7 +467,7 @@
 </section>
 <section id="statas-nl-estimates-beta-in-one-line-start-it-at-the-2-benchmark" class="slide level2 center">
 <h2>Stata’s <code>nl</code> estimates <span class="math inline">\(\beta\)</span> in one line — start it at the 2% benchmark</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2|2"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb1-1"><a href=""></a><span class="kw">local</span> <span class="fu">s</span> = 19</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb1-1"><a href=""></a><span class="kw">local</span> <span class="fu">s</span> = 19</span>
 <span id="cb1-2"><a href=""></a><span class="kw">nl</span> (outcome = {b0=1} - (1 - <span class="fu">exp</span>(-1*{b1=0.02}*<span class="ot">`s'</span>))/<span class="ot">`s'</span> * initial_inc), <span class="kw">vce</span>(<span class="kw">robust</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="comment"><code>{b1=0.02}</code> is <span class="math inline">\(\beta\)</span> with the 2% benchmark as its starting guess; the iterative solver then minimises squared residuals.</span></p>
 <aside class="notes">

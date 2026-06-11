@@ -49,7 +49,7 @@ format:
 
 ## When one state raises its cigarette tax, smokers cross the border
 
-A tax hike in one state sends border-county smokers to a cheaper neighbour. So a state's consumption depends on its *neighbours'* prices and consumption — a **spatial spillover**.
+A tax hike in one state sends border-county smokers to a cheaper neighbour. So your consumption depends on your *neighbours'* — a **spatial spillover**.
 
 . . .
 
@@ -89,10 +89,10 @@ Spoiler figure for persistence. Kentucky (a tobacco state) stays above 150 packs
 - **Neighbours** — the `usa46` binary contiguity matrix, **row-normalized**
 :::
 
-[Log-log means every coefficient is an elasticity: a percent change in consumption per percent change in price. State and year fixed effects absorb tobacco culture and national anti-smoking trends.]{.comment}
+[Log-log: every coefficient is an elasticity — % change in consumption per % change in price.]{.comment}
 
 ::: {.notes}
-The Cigar dataset (Baltagi 1992). pimin — minimum neighbour price — is left out on purpose: its correlation with the spatial lag W·logp is 0.92, so the SDM's W·logp term captures the same cross-border channel more flexibly.
+State and year fixed effects absorb tobacco culture and national anti-smoking trends. The Cigar dataset (Baltagi 1992). pimin — minimum neighbour price — is left out on purpose: its correlation with the spatial lag W·logp is 0.92, so the SDM's W·logp term captures the same cross-border channel more flexibly.
 :::
 
 ## Neighbours are sparse: 188 of 2,116 pairs, ~4 neighbours per state
@@ -173,7 +173,7 @@ SDPDm() is the maximum-likelihood workhorse: model = "sdm" adds WXθ to SAR; LYt
 
 ## Lee-Yu corrects the small-sample bias, lifting ρ from 0.223 to 0.262
 
-The 46 + 30 = 76 fixed effects create an **incidental-parameter bias** in spatial ML. Lee-Yu (2010) transforms the data to concentrate them out before estimation.
+The 46 + 30 = 76 fixed effects create an **incidental-parameter bias** in spatial ML.
 
 ::: {.incremental}
 - Uncorrected SDM: $\rho = 0.223$  →  Lee-Yu: $\rho = 0.262$ (a 17% upward correction)
@@ -183,7 +183,7 @@ The 46 + 30 = 76 fixed effects create an **incidental-parameter bias** in spatia
 [For short panels ($T < 10$) the correction would matter far more; here it mainly rescues $\rho$.]{.comment}
 
 ::: {.notes}
-The uncorrected estimator understates spatial dependence. With 30 time periods the slope bias is small, but ρ — the parameter most sensitive to the incidental-parameter problem — moves a meaningful 17%. We adopt the Lee-Yu version as the preferred static SDM.
+Lee-Yu (2010) transforms the data to concentrate the fixed effects out before estimation. The uncorrected estimator understates spatial dependence. With 30 time periods the slope bias is small, but ρ — the parameter most sensitive to the incidental-parameter problem — moves a meaningful 17%. We adopt the Lee-Yu version as the preferred static SDM.
 :::
 
 ## SDM adds neighbours' covariates — and flips the income spillover negative
@@ -283,10 +283,16 @@ The most precisely estimated parameter in the entire analysis. ~87% of consumpti
 
 . . .
 
-[Response.]{.rebuttal} Correct. Two-way fixed effects strip time-invariant state heterogeneity and common shocks, and the spatial/dynamic terms model interdependence — but a causal tax elasticity still needs no time-varying confounders and a stable spatial process ($|\tau + \rho\eta| < 1$). The deck demonstrates a *modeling workflow*, not an identified policy experiment.
+[Response.]{.rebuttal} Correct — this is a *modeling workflow*, not an identified policy experiment.
+
+::: {.incremental}
+- FE strip time-invariant state heterogeneity and common shocks
+- A causal tax elasticity still needs no time-varying confounders
+- And a stable spatial process ($|\tau + \rho\eta| < 1$)
+:::
 
 ::: {.notes}
-Steelman, don't strawman. The post is careful: SDPDmod gives a principled way to model spatial and temporal dependence, but it does not manufacture identification. The elasticities are descriptive of an interdependent system under FE; reading them as the causal effect of a tax requires the standard panel assumptions plus stationarity of the dynamic-spatial system.
+Steelman, don't strawman. Two-way fixed effects strip state heterogeneity and common shocks, and the spatial/dynamic terms model interdependence — but that is not identification. The post is careful: SDPDmod gives a principled way to model spatial and temporal dependence, but it does not manufacture identification. The elasticities are descriptive of an interdependent system under FE; reading them as the causal effect of a tax requires the standard panel assumptions plus stationarity of the dynamic-spatial system.
 :::
 
 ## One dataset, three lessons the workflow makes visible

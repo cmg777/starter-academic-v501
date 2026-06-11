@@ -48,14 +48,16 @@ format:
 
 ## When place secretly drives both $x$ and $y$, MGWR maps the confounder, not the effect
 
-If an unobserved attribute of place — geography, institutions, persistent norms — shifts the outcome *and* the levels of the covariates, MGWR's local slopes absorb that contamination.
+An unobserved attribute of place shifts the outcome *and* the covariate levels.
+
+MGWR's local slopes then absorb that contamination.
 
 . . .
 
 What looks like genuine spatial heterogeneity is omitted-variable bias wearing a map. *Can we get the real coefficients back?*
 
 ::: {.notes}
-This is the central tension of spatially varying coefficient models. The same data give a "rich local-effects map" that is actually a picture of the confounder. Li & Fotheringham (2026) name this the indirect contextual effect and propose MGWFER to remove it.
+The unobserved attribute could be geography, institutions, or persistent local norms. This is the central tension of spatially varying coefficient models. The same data give a "rich local-effects map" that is actually a picture of the confounder. Li & Fotheringham (2026) name this the indirect contextual effect and propose MGWFER to remove it.
 :::
 
 ## One dataset, six estimators, and a coefficient surface that flips sign
@@ -262,10 +264,10 @@ Under the indirect channel every covariate looks like a noisy proxy for sc, so P
 
 . . .
 
-[Response.]{.rebuttal} Correct, and the paper is candid: identification rests on four assumptions — time-invariant $sc$, strict exogeneity, no time-varying confounders, stable slopes. MGWFER removes one specific bias cleanly; it does not manufacture identification, and it cannot recover effects of time-invariant *measurable* covariates.
+[Response.]{.rebuttal} True. MGWFER removes *time-invariant* confounding cleanly — and only that. It does not manufacture identification.
 
 ::: {.notes}
-Steelman, don't strawman. The within-transformation deals with time-invariant confounding only; any unobserved factor that changes over time and correlates with both x and y still biases MGWFER. Time-invariant measurable covariates (e.g. distance to highway) get swept into alpha_hat and are no longer separable — a structural property of FE estimators. Be honest about the boundary.
+Steelman, don't strawman. Identification rests on four assumptions: time-invariant sc, strict exogeneity, no time-varying confounders, and stable slopes. The within-transformation deals with time-invariant confounding only; any unobserved factor that changes over time and correlates with both x and y still biases MGWFER. Time-invariant measurable covariates (e.g. distance to highway) get swept into alpha_hat and are no longer separable — a structural property of FE estimators. Be honest about the boundary.
 :::
 
 ## The stakes are real: on Georgia data, MGWFER flips poverty's sign and 10× the place effect

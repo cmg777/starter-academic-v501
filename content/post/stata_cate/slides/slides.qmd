@@ -53,10 +53,10 @@ The textbook workflow ends with one number: the **Average Treatment Effect**.
 
 . . .
 
-But policy makers, doctors, and managers never act on the average. They need to know *who* the program helps — and who it leaves behind. *That's the CATE.*
+But no one acts on the average. The real question is *who* the program helps. *That's the CATE.*
 
 ::: {.notes}
-This is the central motivation. A single ATE collapses a policy's impact into one number, but the decision a policymaker faces is targeting: who should get the program. The whole deck is built to show that the average can hide an order-of-magnitude spread in effects.
+This is the central motivation. Policy makers, doctors, and managers never act on the average — they need to know who the program helps and who it leaves behind. A single ATE collapses a policy's impact into one number, but the decision a policymaker faces is targeting: who should get the program. The whole deck is built to show that the average can hide an order-of-magnitude spread in effects.
 :::
 
 ## The raw gap is $19,557 — but most of it is selection, not the program
@@ -94,7 +94,7 @@ Spoiler figure. Don't explain every bar yet — just plant that one policy produ
 
 [Act II]{.act}
 
-## The estimand is a function, not a number: $\tau(x)=E[y(1)-y(0)\mid x]$
+## The estimand is a function, not a number: $\tau(\mathbf{x})=E[y(1)-y(0)\mid \mathbf{x}]$
 
 $$\tau(\mathbf{x}) = E\big[\,y(1) - y(0) \mid \mathbf{x}\,\big]$$
 
@@ -308,10 +308,10 @@ This is the nuance the headline $8,000 erases entirely. About a quarter of the s
 
 . . .
 
-[Response.]{.rebuttal} It does not. $\tau(\mathbf{x})$ is identified *only* under **unconfoundedness given $\mathbf{x}$** and **overlap**. If, say, employer match rates vary with income and we never observe them, the income gradient is biased. The forest fits the function; it cannot rule out an unmeasured confounder.
+[Response.]{.rebuttal} It does not. $\tau(\mathbf{x})$ is identified *only* under **unconfoundedness** and **overlap**. The forest fits the function; it cannot rule out an unmeasured confounder.
 
 ::: {.notes}
-Steelman, don't strawman. The `cate` command disciplines estimation; it does not relax the identifying assumptions. The most credible threat here is an income-correlated unobserved confounder like the employer match rate. Honest practice: report the gradient as conditional on the unconfoundedness assumption, and flag the overlap check (teffects overlap / estat osample) as the natural follow-up.
+Steelman, don't strawman. The `cate` command disciplines estimation; it does not relax the identifying assumptions. If, say, employer match rates vary with income and we never observe them, the income gradient is biased. The most credible threat here is an income-correlated unobserved confounder like the employer match rate. Honest practice: report the gradient as conditional on the unconfoundedness assumption, and flag the overlap check (teffects overlap / estat osample) as the natural follow-up.
 :::
 
 ## The average is a press release; the CATE is the policy {background-color="#141413"}

@@ -200,7 +200,7 @@
   <div class="title-result-strip">
     <div class="kr"><span class="kr-num">−0.025/yr</span><span class="kr-cap">convergence trend, 1960–2007</span></div>
     <div class="kr"><span class="kr-num">0.19</span><span class="kr-cap">short-run λ persistence (slope)</span></div>
-    <div class="kr"><span class="kr-num">91%</span><span class="kr-cap">Polity-2 OVB gap closed</span></div>
+    <div class="kr"><span class="kr-num">91%</span><span class="kr-cap">Polity 2 OVB gap closed</span></div>
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
@@ -213,7 +213,7 @@
 </section>
 <section id="for-30-years-the-data-said-poor-countries-were-not-catching-up" class="slide level2 center">
 <h2>For 30 years the data said poor countries were <em>not</em> catching up</h2>
-<p>In the 1960s, richer countries grew <strong>faster</strong> than poorer ones — a world of divergence. Through the 1970s–1990s, the convergence slope sat indistinguishable from zero.</p>
+<p>In the 1960s, richer countries grew <strong>faster</strong> — divergence. Through the 1970s–1990s, the convergence slope sat near zero.</p>
 <div class="fragment">
 <p>Then, around 2000, it reversed: poor countries began growing faster — <em>unconditional convergence</em>. <strong>What changed?</strong></p>
 <aside class="notes">
@@ -369,7 +369,7 @@
 <h2>Growth correlates have themselves been converging since 1985</h2>
 
 <img data-src="../stata_convergence2_correlate_convergence.png" class="r-stretch quarto-figure-center"><p class="caption">Convergence in six representative correlates: population growth, investment, education, democracy, government spending, credit. All slopes negative.</p><aside class="notes">
-<p>Regress each correlate’s 1985→2015 change on its 1985 level; a negative slope means countries that started worse improved most. Strongest: inflation (β = −3.07), investment (β = −2.98), democracy/Polity-2 (β = −2.03), all significant at 0.1%. The notable exception is Barro-Lee schooling (β = −0.16, n.s.). Policies and institutions are compressing across countries — but does that <em>cause</em> income convergence?</p>
+<p>Regress each correlate’s 1985→2015 change on its 1985 level; a negative slope means countries that started worse improved most. Strongest: inflation (β = −3.07), investment (β = −2.98), democracy/Polity 2 (β = −2.03), all significant at 0.1%. The notable exception is Barro-Lee schooling (β = −0.16, n.s.). Policies and institutions are compressing across countries — but does that <em>cause</em> income convergence?</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -385,10 +385,10 @@
 <section id="the-omitted-variable-bias-identity-links-the-two-literatures-in-one-line" class="slide level2 center">
 <h2>The omitted-variable-bias identity links the two literatures in one line</h2>
 <p><span class="math display">\[\beta - \beta^{\ast} = \delta \times \lambda\]</span></p>
-<p>The gap between <strong>unconditional</strong> (<span class="math inline">\(\beta\)</span>) and <strong>conditional</strong> (<span class="math inline">\(\beta^{\ast}\)</span>) convergence equals the product of <span class="math inline">\(\delta\)</span> (how much richer countries have <em>more</em> of a correlate) and <span class="math inline">\(\lambda\)</span> (how much that correlate predicts growth).</p>
+<p>The convergence gap = <span class="math inline">\(\delta\)</span> (income → correlate) <span class="math inline">\(\times\)</span> <span class="math inline">\(\lambda\)</span> (correlate → growth).</p>
 <p><span class="comment">This is an exact algebraic identity, not an approximation — when the gap closes, at least one of <span class="math inline">\(\delta\)</span> or <span class="math inline">\(\lambda\)</span> must have shrunk.</span></p>
 <aside class="notes">
-<p>This is the analytical heart of the talk. Three regressions: (1) growth on income → β; (2) growth on income + correlate → β* and λ; (3) correlate on income → δ. OVB algebra forces β − β* = δ × λ exactly. So there are exactly three ways unconditional convergence can emerge: β* shifts, δ shifts, or λ shifts. The empirical work is just deciding which.</p>
+<p>The gap between unconditional (β) and conditional (β<em>) convergence equals δ × λ: δ is how much richer countries have </em>more* of a correlate; λ is how much that correlate predicts growth. This is the analytical heart of the talk. Three regressions: (1) growth on income → β; (2) growth on income + correlate → β* and λ; (3) correlate on income → δ. OVB algebra forces β − β* = δ × λ exactly. So there are exactly three ways unconditional convergence can emerge: β* shifts, δ shifts, or λ shifts. The empirical work is just deciding which.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -485,7 +485,7 @@
 <h2>λ is the half that broke: short-run correlates lose all persistence</h2>
 
 <img data-src="../stata_convergence2_lambda_flattening.png" class="r-stretch quarto-figure-center"><p class="caption">Growth-regression slope <span class="math inline">\(\lambda\)</span> in 2005 vs.&nbsp;1985. Solow fundamentals hug the 45° line; short-run correlates scatter near zero.</p><aside class="notes">
-<p>The most striking result. Solow fundamentals: slope 0.86, R² = 0.95 — they predict growth almost as well in 2005 as 1985. Short-run policy/institution correlates: slope 0.19, R² = 0.06 — essentially NO relationship between what predicted growth in 1985 and what predicts it in 2005. Polity-2 λ fell 0.89→0.34, FH political rights 1.11→0.19. The 1990s growth regressions failed their out-of-sample test.</p>
+<p>The most striking result. Solow fundamentals: slope 0.86, R² = 0.95 — they predict growth almost as well in 2005 as 1985. Short-run policy/institution correlates: slope 0.19, R² = 0.06 — essentially NO relationship between what predicted growth in 1985 and what predicts it in 2005. Polity 2 λ fell 0.89→0.34, FH political rights 1.11→0.19. The 1990s growth regressions failed their out-of-sample test.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -556,9 +556,9 @@
       }</style></aside>
 </section>
 <section id="the-polity-2-ovb-gap-closed-91-in-twenty-years" class="slide level2 center" data-background-color="#141413">
-<h2>The Polity-2 OVB gap closed 91% in twenty years</h2>
+<h2>The Polity 2 OVB gap closed 91% in twenty years</h2>
 <p><span class="bignum">91%</span></p>
-<p><span class="bignum-label">Polity-2 <span class="math inline">\(\beta-\beta^{\ast}\)</span> gap fell from <span class="math inline">\(0.440\)</span> (1985) to <span class="math inline">\(0.040\)</span> (2005)</span></p>
+<p><span class="bignum-label">Polity 2 <span class="math inline">\(\beta-\beta^{\ast}\)</span> gap fell from <span class="math inline">\(0.440\)</span> (1985) to <span class="math inline">\(0.040\)</span> (2005)</span></p>
 <aside class="notes">
 <p>The Act-III payoff number, matching the worked example. Driven almost entirely by λ collapsing from 0.89 to 0.18 while δ stayed comparatively stable. This is the post’s headline reduction — and it generalizes across the short-run correlate set.</p>
 <style type="text/css">
@@ -577,9 +577,9 @@
 <h2>Does this make convergence <em>causal</em>? No — it is still a description</h2>
 <p><span class="objection">Objection.</span> If we know exactly why unconditional convergence emerged, surely we can advise poor countries on what to do.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> The OVB identity decomposes <strong>correlations</strong>, not causal effects. A flattening <span class="math inline">\(\lambda\)</span> could mean genuine causal change, convergence in unobserved variables, or merely reduced cross-country variation making coefficients noisier. The panel is unbalanced and ends pre-2008. This is a conditional association, not an ATE — and emphatically not policy advice.</p>
+<p><span class="rebuttal">Response.</span> The OVB identity decomposes <strong>correlations</strong>, not causal effects. A conditional association — not an ATE, and not policy advice.</p>
 <aside class="notes">
-<p>Steelman, don’t strawman. The descriptive caveat is the honest core of the talk. Cross-country growth regressions do not identify causal effects; the OVB framework just decomposes the observed gap. The Washington-Consensus reading is exactly the over-claim the out-of-sample test cautions against.</p>
+<p>A flattening λ could mean genuine causal change, convergence in unobserved variables, or merely reduced cross-country variation making coefficients noisier. The panel is unbalanced and ends pre-2008. Steelman, don’t strawman. The descriptive caveat is the honest core of the talk. Cross-country growth regressions do not identify causal effects; the OVB framework just decomposes the observed gap. The Washington Consensus reading is exactly the over-claim the out-of-sample test cautions against.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -596,7 +596,7 @@
 <section id="let-the-data-not-the-1990s-regressions-tell-you-what-predicts-growth." class="title-slide slide level1 divider center" data-background-color="#141413">
 <h1>Let the data, not the 1990s regressions, tell you what predicts growth.</h1>
 <aside class="notes">
-<p>The single takeaway and the resolution of the Act-I hook. Unconditional convergence emerged not because institutions stopped tracking income (δ stable), but because short-run policy variables stopped predicting growth (λ collapsed). The durability of Washington-Consensus growth regressions is in doubt — Solow fundamentals endure; policy correlates did not survive 25 years of new data.</p>
+<p>The single takeaway and the resolution of the Act-I hook. Unconditional convergence emerged not because institutions stopped tracking income (δ stable), but because short-run policy variables stopped predicting growth (λ collapsed). The durability of Washington Consensus growth regressions is in doubt — Solow fundamentals endure; policy correlates did not survive 25 years of new data.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

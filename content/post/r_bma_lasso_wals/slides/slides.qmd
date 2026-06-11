@@ -183,7 +183,7 @@ The $\lambda\sum_j|\beta_j|$ penalty is what makes corners. Ridge's L2 ball has 
 10-fold CV chooses λ. Reading the path left to right, noise variables are eliminated first because they buy too little prediction to justify their penalty cost. GDP requires the largest penalty to be killed — the strongest signal in the data.
 :::
 
-## At $\lambda_{1\text{se}}$, LASSO keeps six variables — all of them real
+## At the parsimonious penalty, LASSO keeps six variables — all real
 
 ![Six bars survive (steel blue = true predictor correctly kept); gray bars are dropped. No orange — zero noise variables falsely selected.](../bma_lasso_wals_09_lasso_selected.png)
 
@@ -213,10 +213,10 @@ $$p(\gamma_j)\propto\exp(-|\gamma_j|/\tau)$$
 ![The Laplace prior (WALS) is peaked at zero with heavy tails — skeptical but open-minded. Its negative log *is* LASSO's L1 penalty.](../bma_lasso_wals_11_priors.png)
 
 ::: {.notes}
-Remarkable connection: LASSO's MAP estimate under a Laplace prior gives $\lambda=\sigma^2/\tau$. Same prior belief — most coefficients near zero — used two ways: LASSO for hard selection (zeros), WALS for soft averaging (continuous weights). WALS also orthogonalizes the auxiliaries so the 4,096-model problem decomposes into 12 independent ones — no MCMC, near-instant.
+Remarkable connection: LASSO's MAP estimate under a Laplace prior gives $\lambda=\sigma^2/\tau$. Same prior, used two ways — LASSO zeros coefficients, WALS averages them. And WALS orthogonalizes the auxiliaries, so the 4,096-model problem becomes 12 independent ones — no MCMC, near-instant.
 :::
 
-## WALS makes GDP tower: $|t|=34.62$ dwarfs everything else
+## WALS makes GDP tower: $|t|=34.62$, far above every other variable
 
 ![Six variables clear the $|t|\geq 2$ line; GDP's bar runs off the chart at 34.62, trade network next at 4.39. Noise variables all sit below 1.5.](../bma_lasso_wals_10_wals_tstat.png)
 

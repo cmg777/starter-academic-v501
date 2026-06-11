@@ -123,7 +123,7 @@ Walk the two sources of randomness aloud. Bagging (bootstrap aggregating) decorr
 :::
 ::::
 
-[Letting the model glimpse the test set during tuning is *data leakage* — it inflates the score and lies about generalization.]{.comment}
+[Let the model peek at the test set during tuning and you get *data leakage* — an inflated score that lies about generalization.]{.comment}
 
 ::: {.notes}
 The discipline is the point of the lesson. With only 339 rows, a single 68-row test set could be unrepresentative by luck, which is exactly why 5-fold cross-validation inside the training set matters: it rotates the validation fold and averages, giving a steadier read before we ever spend the test set.
@@ -245,7 +245,7 @@ This table is the punchline of the practical lesson. A common beginner instinct 
 
 . . .
 
-[Response.]{.rebuttal} If it were overfitting, CV and test R-squared would diverge wildly; instead both sit near **0.23–0.27**, and bagging plus the $\sqrt{64}$ feature subset cap variance by design. The model is *under*-powered by the features, not over-fit to the rows.
+[Response.]{.rebuttal} Overfitting would split CV and test R-squared apart. Instead both sit near **0.23–0.27**. The model is *under*-powered by the features, not over-fit to the rows.
 
 ::: {.notes}
 Steelman the worry — deep trees on small n is a real overfitting setup. The rebuttal is empirical: the small, stable gap between cross-validated and held-out performance is the signature of a model that generalizes about as well as it can. Random Forests are famously hard to overfit because averaging decorrelated trees shrinks variance. The constraint here is information, not capacity.

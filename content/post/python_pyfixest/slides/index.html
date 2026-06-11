@@ -357,8 +357,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="adding-fixed-effects-cumulatively-drives-r-squared-from-0.12-to-0.61" class="slide level2 center">
-<h2>Adding fixed effects cumulatively drives R-squared from 0.12 to 0.61</h2>
+<section id="adding-fixed-effects-keeps-the-x1-effect-near-1.0-as-the-ci-narrows" class="slide level2 center">
+<h2>Adding fixed effects keeps the X1 effect near −1.0 as the CI narrows</h2>
 
 <img data-src="../pyfixest_coef_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Coefficient on <span class="math inline">\(X_1\)</span> across No FE, one-way, and two-way specifications — stable near <span class="math inline">\(-1.0\)</span> as the CI narrows.</p><aside class="notes">
 <p>Using csw0(f1, f2), one call fits three nested models. The X1 coefficient stays near −1.0 (−1.000 → −0.949 → −0.919) while R² climbs 0.123 → 0.437 → 0.609 and the SE shrinks 0.082 → 0.060. Stability across specifications is the credibility check; a large swing would flag omitted-variable concerns.</p>
@@ -422,8 +422,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="iv-through-fixed-effects-recovers-a-strong-first-stage-f-311" class="slide level2 center">
-<h2>IV through fixed effects recovers a strong first stage (F = 311)</h2>
+<section id="iv-through-fixed-effects-recovers-a-strong-first-stage" class="slide level2 center">
+<h2>IV through fixed effects recovers a strong first stage</h2>
 <p><span class="math display">\[\underbrace{X_1 = \pi_0 + \pi_1 Z_1 + \pi_2 Z_2 + \alpha_i + \gamma_t + \nu}_{\text{first stage}} \;\Rightarrow\; \underbrace{Y_2 = \beta\, \hat{X}_1 + \alpha_i + \gamma_t + \epsilon}_{\text{second stage}}\]</span></p>
 <p>The IV estimate is <span class="math inline">\(-1.600\)</span> (SE 0.336) vs OLS <span class="math inline">\(\approx -1.0\)</span> — attenuation reversed; first-stage <span class="math inline">\(F = 311.54 \gg 10\)</span>.</p>
 <aside class="notes">
@@ -501,7 +501,7 @@
 <section id="worker-fixed-effects-cut-the-union-premium-from-18.3-to-7.8" class="slide level2 center" data-background-color="#141413">
 <h2>Worker fixed effects cut the union premium from 18.3% to 7.8%</h2>
 <p><span class="bignum">7.8%</span></p>
-<p><span class="bignum-label">union premium under one-way worker FE (was 18.3% in pooled OLS · SE 0.024)</span></p>
+<p><span class="bignum-label">union premium under one-way worker FE (was 18.3% in pooled OLS; one-way FE SE 0.024)</span></p>
 <aside class="notes">
 <p>The hero number. Between the pooled OLS premium of 18.3% and the FE premium of 7.8%, the gap is selection: workers who join unions differ systematically in unobserved ability. This is the routine, dramatic correction that makes FE appear in nearly every panel paper.</p>
 <style type="text/css">

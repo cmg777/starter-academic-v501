@@ -132,12 +132,12 @@ $$\ln(\text{CO2})_{it} = \beta_1 \ln G_{it} + \beta_2 (\ln G_{it})^2 + \beta_3 (
 This is the true DGP. The inverted-N needs β1<0, β2>0, β3<0, and we built it with exactly that pattern (−7.1, 0.81, −0.03). Country fixed effects α_i and year effects δ_t soak up unobserved heterogeneity — keep this in mind, because dropping them later breaks everything. The exam: can BMA and DSL recover both the cubic shape and the 5 true controls?
 :::
 
-## Throw in all 12 controls and the answer barely moves — so which controls belong?
+## Adding all 12 controls shifts the GDP coefficient — yet still won't say which controls belong
 
 ![GDP polynomial coefficients shift between the sparse and kitchen-sink fixed effects specifications — the visible signature of model uncertainty.](../stata_bma_dsl_fig2_instability.png)
 
 ::: {.notes}
-The kitchen-sink regression (all 12 controls) gets the three strong predictors right — fossil fuel, industry, urban are significant — and most noise variables are insignificant. But democracy's estimate (−0.0003, p=0.97) is nowhere near its true −0.005: weak signals are hard even with the correct model. The coefficients shift enough to move the turning points by ~$2,000. Standard FE leaves us guessing.
+The kitchen-sink regression (all 12 controls) gets the three strong predictors right — fossil fuel, industry, urban are significant — and most noise variables are insignificant. But democracy's estimate (−0.0003, p=0.97) is nowhere near its true −0.005: weak signals are hard even with the correct model. The coefficients shift enough to move the turning points by ~\$2,000. Standard FE leaves us guessing.
 :::
 
 ## BMA averages over all 4,096 models and weights each by how well it fits

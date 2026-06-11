@@ -53,7 +53,7 @@ Stronger property-rights institutions track far higher income across countries. 
 
 . . .
 
-But maybe rich countries simply *afford* better courts. Maybe geography drives both. *The slope is correlation; it cannot prove cause.*
+But maybe rich countries simply *afford* better courts — or geography drives both. *The slope is correlation; it cannot prove cause.*
 
 ::: {.notes}
 This is the central problem of the whole tutorial. Everyone agrees something about institutions matters, but the simple cross-country plot is contaminated by reverse causality, omitted variables, and measurement error. We need a research design, not just a regression.
@@ -255,7 +255,7 @@ Three biases pull in opposite directions: reverse causality and omitted variable
 ::::
 
 ::: {.notes}
-LASSO-free but assumption-bound: 2SLS recovers a complier effect, not the population ATE. Albouy's imputation critique limits what overidentification non-rejection can buy — shared imputation noise would let the alternative instruments agree falsely. Honest IV reporting names both the estimand and the maintained assumptions.
+2SLS recovers a complier effect, not the population ATE. Albouy's imputation critique limits what overidentification non-rejection can buy — shared imputation noise would let the alternative instruments agree falsely. Honest IV reporting names both the estimand and the maintained assumptions.
 :::
 
 # Let the disease environment of 1700, not the regression of 1995, identify the effect of institutions. {.divider background-color="#141413"}

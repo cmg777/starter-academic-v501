@@ -333,7 +333,7 @@
 <li>~1.5% of data per prediction</li>
 </ul>
 </div></div>
-<p><span class="comment">Letting the model glimpse the test set during tuning is <em>data leakage</em> — it inflates the score and lies about generalization.</span></p>
+<p><span class="comment">Let the model peek at the test set during tuning and you get <em>data leakage</em> — an inflated score that lies about generalization.</span></p>
 <aside class="notes">
 <p>The discipline is the point of the lesson. With only 339 rows, a single 68-row test set could be unrepresentative by luck, which is exactly why 5-fold cross-validation inside the training set matters: it rotates the validation fold and averages, giving a steadier read before we ever spend the test set.</p>
 <style type="text/css">
@@ -550,7 +550,7 @@
 <h2>Did the forest overfit? No — and the gap to the data ceiling is the proof</h2>
 <p><span class="objection">Objection.</span> A 500-tree, depth-30 forest on only 271 rows must be memorizing noise.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> If it were overfitting, CV and test R-squared would diverge wildly; instead both sit near <strong>0.23–0.27</strong>, and bagging plus the <span class="math inline">\(\sqrt{64}\)</span> feature subset cap variance by design. The model is <em>under</em>-powered by the features, not over-fit to the rows.</p>
+<p><span class="rebuttal">Response.</span> Overfitting would split CV and test R-squared apart. Instead both sit near <strong>0.23–0.27</strong>. The model is <em>under</em>-powered by the features, not over-fit to the rows.</p>
 <aside class="notes">
 <p>Steelman the worry — deep trees on small n is a real overfitting setup. The rebuttal is empirical: the small, stable gap between cross-validated and held-out performance is the signature of a model that generalizes about as well as it can. Random Forests are famously hard to overfit because averaging decorrelated trees shrinks variance. The constraint here is information, not capacity.</p>
 <style type="text/css">

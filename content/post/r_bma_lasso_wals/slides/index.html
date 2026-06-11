@@ -378,8 +378,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="at-lambda_1textse-lasso-keeps-six-variables-all-of-them-real" class="slide level2 center">
-<h2>At <span class="math inline">\(\lambda_{1\text{se}}\)</span>, LASSO keeps six variables — all of them real</h2>
+<section id="at-the-parsimonious-penalty-lasso-keeps-six-variables-all-real" class="slide level2 center">
+<h2>At the parsimonious penalty, LASSO keeps six variables — all real</h2>
 
 <img data-src="../bma_lasso_wals_09_lasso_selected.png" class="r-stretch quarto-figure-center"><p class="caption">Six bars survive (steel blue = true predictor correctly kept); gray bars are dropped. No orange — zero noise variables falsely selected.</p><aside class="notes">
 <p>The parsimonious 1-SE model keeps log_gdp, industry, fossil_fuel, urban_pop, democracy, trade_network. Only agriculture is dropped among the true predictors. Perfect specificity — every noise variable correctly excluded.</p>
@@ -453,7 +453,7 @@
 <p><span class="math display">\[p(\gamma_j)\propto\exp(-|\gamma_j|/\tau)\]</span></p>
 
 <img data-src="../bma_lasso_wals_11_priors.png" class="r-stretch quarto-figure-center"><p class="caption">The Laplace prior (WALS) is peaked at zero with heavy tails — skeptical but open-minded. Its negative log <em>is</em> LASSO’s L1 penalty.</p><aside class="notes">
-<p>Remarkable connection: LASSO’s MAP estimate under a Laplace prior gives <span class="math inline">\(\lambda=\sigma^2/\tau\)</span>. Same prior belief — most coefficients near zero — used two ways: LASSO for hard selection (zeros), WALS for soft averaging (continuous weights). WALS also orthogonalizes the auxiliaries so the 4,096-model problem decomposes into 12 independent ones — no MCMC, near-instant.</p>
+<p>Remarkable connection: LASSO’s MAP estimate under a Laplace prior gives <span class="math inline">\(\lambda=\sigma^2/\tau\)</span>. Same prior, used two ways — LASSO zeros coefficients, WALS averages them. And WALS orthogonalizes the auxiliaries, so the 4,096-model problem becomes 12 independent ones — no MCMC, near-instant.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -466,8 +466,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="wals-makes-gdp-tower-t34.62-dwarfs-everything-else" class="slide level2 center">
-<h2>WALS makes GDP tower: <span class="math inline">\(|t|=34.62\)</span> dwarfs everything else</h2>
+<section id="wals-makes-gdp-tower-t34.62-far-above-every-other-variable" class="slide level2 center">
+<h2>WALS makes GDP tower: <span class="math inline">\(|t|=34.62\)</span>, far above every other variable</h2>
 
 <img data-src="../bma_lasso_wals_10_wals_tstat.png" class="r-stretch quarto-figure-center"><p class="caption">Six variables clear the <span class="math inline">\(|t|\geq 2\)</span> line; GDP’s bar runs off the chart at 34.62, trade network next at 4.39. Noise variables all sit below 1.5.</p><aside class="notes">
 <p>WALS returns familiar t-statistics. Using |t| ≥ 2 (the frequentist analog of PIP ≥ 0.80): GDP 34.62, trade_network 4.39, industry 4.01, fossil_fuel 3.26, urban_pop 3.11, democracy 2.58 all pass. Agriculture (|t| = 1.13) falls just short — its β = 0.005 is too small to detect at n = 120.</p>

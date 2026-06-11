@@ -8,7 +8,7 @@ date: today
 date-format: long
 key-results:
   - num: "−0.096"
-    cap: "rigorous Double-LASSO"
+    cap: "rigorous Double LASSO"
   - num: "+0.019"
     cap: "cross-validated · sign flip"
   - num: "284"
@@ -61,7 +61,7 @@ This is the central tension of high-dimensional causal inference: variable selec
 
 ## Five estimators, three crimes — wildly different answers from one dataset
 
-![$\hat\alpha \pm 95\%$ CI · First-diff, kitchen-sink OLS, PSL, Double-LASSO (rigorous), Double-LASSO (CV). Dashed line = zero.](../r_double_lasso_estimates.png)
+![$\hat\alpha \pm 95\%$ CI · First-diff, kitchen-sink OLS, PSL, Double LASSO (rigorous), Double LASSO (CV). Dashed line = zero.](../r_double_lasso_estimates.png)
 
 ::: {.notes}
 Spoiler figure. Don't explain every bar yet — just plant that the estimators disagree, sometimes flipping sign. We earn each one in Act II and come back to this picture.
@@ -136,13 +136,13 @@ Run it twice — once for $y$ on $X$ (set $I_y$), once for $d$ on $X$ (set $I_d$
 PSL selects only on y, so it can drop a control that predicts the treatment but not the outcome — exactly the omitted variable that biases α. Double LASSO's second LASSO (d on X) catches it. Frisch–Waugh–Lovell guarantees the post-OLS α is unbiased if the union captures the confounding.
 :::
 
-## Six lines fit the rigorous Double-LASSO in R
+## Six lines fit the rigorous Double LASSO in R
 
 ``` {.r code-line-numbers="2-3|4|5|6"}
 library(hdm); library(sandwich); library(lmtest)
 Iy <- which(rlasso(X, y)$index)     # controls that predict crime
 Id <- which(rlasso(X, d)$index)     # controls that predict abortion
-S  <- union(Iy, Id)                  # the union is the Double-LASSO safeguard
+S  <- union(Iy, Id)                  # the union is the Double LASSO safeguard
 fit <- lm(y ~ d + X[, S])            # post-OLS on the selected support
 coeftest(fit, vcov = vcovCL, cluster = state)["d", ]
 ```
@@ -196,11 +196,11 @@ Even in the treatment equation alone, CV's MSE-optimal λ keeps 143 controls. Pr
 
 [Act III]{.act}
 
-## Rigorous Double-LASSO restores a sensible −0.096 for violent crime {background-color="#141413"}
+## Rigorous Double LASSO restores a sensible −0.096 for violent crime {background-color="#141413"}
 
 [−0.096]{.bignum}
 
-[$\hat\alpha$, rigorous Double-LASSO (SE 0.051) · matches the paper's −0.104; selection counts match exactly]{.bignum-label}
+[$\hat\alpha$, rigorous Double LASSO (SE 0.051) · matches the paper's −0.104; selection counts match exactly]{.bignum-label}
 
 ::: {.notes}
 Between the no-controls baseline (−0.152) and the kitchen-sink mess (+0.014), the rigorous DL lands at −0.096 off just 8 controls. The 95% CI [−0.197, +0.004] barely contains zero — one notch below 5% significance, an honest result.

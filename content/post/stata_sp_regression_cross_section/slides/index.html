@@ -213,7 +213,7 @@
 </section>
 <section id="crime-does-not-respect-neighborhood-boundaries-but-ols-pretends-it-does" class="slide level2 center">
 <h2>Crime does not respect neighborhood boundaries — but OLS pretends it does</h2>
-<p>In Columbus, Ohio, a tract’s crime depends on its own income and housing — and on what happens <em>next door</em>: displacement, diffusion, shared risk.</p>
+<p>A tract’s crime depends on its own income and housing — and on what happens <em>next door</em>: displacement, diffusion, shared risk.</p>
 <div class="fragment">
 <p>Treat 49 neighborhoods as 49 independent observations and you may <em>bias</em> every coefficient. <em>So we must test that assumption.</em></p>
 <aside class="notes">
@@ -720,9 +720,12 @@
 <h2>Does the spillover make this causal? No — it disciplines description, not identification</h2>
 <p><span class="objection">Objection.</span> You’ve shown neighbours’ income predicts crime — surely that’s a policy lever.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> It is a robust <em>spatial pattern</em>, not a causal effect. <span class="math inline">\(W\)</span> is chosen, not estimated; <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\theta\)</span>, <span class="math inline">\(\lambda\)</span> are weakly separable; and the SDM-vs-SDEM choice is <em>non-nested</em> — global vs local spillovers fit the data equally well but mean different things. Treat <span class="math inline">\(-1.20\)</span> as a well-measured association, not a treatment effect.</p>
+<p><span class="rebuttal">Response.</span> It is a robust <em>spatial pattern</em>, not a causal effect.</p>
+</div>
+<div class="fragment">
+<p>Treat <span class="math inline">\(-1.20\)</span> as a well-measured association, not a treatment effect.</p>
 <aside class="notes">
-<p>Steelman the policy reading, then bound it. The estimand here is descriptive spatial association under a fixed W. No randomization, no natural experiment. The SDM (global feedback) and SDEM (local spillover + common factors) are observationally near-identical yet tell different stories — a caution against over-reading any single coefficient.</p>
+<p>Steelman the policy reading, then bound it. Three reasons it is descriptive, not causal: W is chosen, not estimated; ρ, θ, λ are only weakly separable; and the SDM-vs-SDEM choice is non-nested — global vs local spillovers fit the data equally well but mean different things. The estimand here is descriptive spatial association under a fixed W. No randomization, no natural experiment. The SDM (global feedback) and SDEM (local spillover + common factors) are observationally near-identical yet tell different stories — a caution against over-reading any single coefficient.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

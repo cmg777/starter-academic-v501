@@ -283,10 +283,10 @@ With age, schooling, female, and year dummies, POLS drops to 0.057 (controls abs
 
 . . .
 
-[Response.]{.rebuttal} Correct. FE/FDFE/TWFE/CRE target the ATE for *union switchers* only under **strict exogeneity given the worker fixed effect**. They remove time-invariant confounders, not time-*varying* ones (a promotion that coincides with joining a union). POLS and Between carry no causal reading absent unconfoundedness.
+[Response.]{.rebuttal} Correct. FE/FDFE/TWFE/CRE target the ATE for *union switchers* only — and only under **strict exogeneity given the worker fixed effect**.
 
 ::: {.notes}
-Steelman, don't strawman. Fixed effects discipline the comparison; they do not relax identification. The within estimand is local — it is identified off the ~9% of workers who switched status — and rests on strict exogeneity conditional on α_i. Reporting both the within and cross-sectional estimands, as the post does, is the honest move.
+Steelman, don't strawman. They remove time-invariant confounders, not time-varying ones — a promotion that coincides with joining a union still biases the within estimate. POLS and Between carry no causal reading absent unconfoundedness. Fixed effects discipline the comparison; they do not relax identification. The within estimand is local — it is identified off the ~9% of workers who switched status — and rests on strict exogeneity conditional on α_i. Reporting both the within and cross-sectional estimands, as the post does, is the honest move.
 :::
 
 ## In low-power settings, lead with CRE/Mundlak — it dominates Hausman {background-color="#141413"}

@@ -88,7 +88,11 @@ Spoiler figure. Across South America, education rose +0.0225 and health +0.0134,
 - **Shape** — reshaped wide → long into **306 rows** (153 regions × 2 periods)
 :::
 
-[All three indicators are positive-direction (higher = better), so no polarity flip is needed. The `period` column is metadata — it never enters the PCA.]{.comment}
+[All three indicators run higher = better — no polarity flip needed.]{.comment}
+
+::: {.notes}
+The `period` column is metadata — it is carried through for analysis but never enters the PCA computation. From PCA's perspective there are 306 observations, not two separate groups.
+:::
 
 ## Real development data is messier than simulation: PC1 will capture less
 
@@ -126,7 +130,7 @@ $$Z_{ij,t}^{\text{pool}}=\frac{X_{ij,t}-\bar{X}_j^{\text{pool}}}{\sigma_j^{\text
 
 The pooled mean $\bar{X}_j^{\text{pool}}$ and SD $\sigma_j^{\text{pool}}$ are computed from **all 306 rows at once**, then applied to every observation in every period.
 
-[Per-period uses a different baseline each year; pooled uses one. The increase from 0.926 to 0.946 maps to a *genuine* z-score increase.]{.comment}
+[Per-period shifts the baseline each year; pooled fixes it — so 0.926 → 0.946 is a *genuine* z-score rise.]{.comment}
 
 ::: {.notes}
 Analogy: measuring children at age 5 and age 10. Per-period compares each child only to same-age peers — you can't see growth because the reference group changes. Pooled measures everyone against the combined distribution, so the z-score increase reflects actual growth. Without it, the income decline (0.736 → 0.715) would be re-centred away.

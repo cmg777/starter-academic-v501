@@ -213,11 +213,11 @@
 </section>
 <section id="does-poverty-cause-violence-regress-conflict-on-income-and-you-get-nothing" class="slide level2 center">
 <h2>Does poverty cause violence? Regress conflict on income and you get nothing</h2>
-<p>Poor regions see more conflict. But correlation is not causation: unobserved institutions, reverse causality, and a noisy income proxy all contaminate the regression.</p>
+<p>Poor regions see more conflict — but correlation is not causation.</p>
 <div class="fragment">
 <p>So we regress conflict on economic activity — and the slope is <strong>0.001</strong>, indistinguishable from zero. <em>Is the effect real, or is the measurement broken?</em></p>
 <aside class="notes">
-<p>The headline puzzle. A naive OLS regression of conflict on nighttime lights returns essentially zero. That is not “no effect” — it is a contaminated reading. The whole deck is about cleaning the thermometer.</p>
+<p>The headline puzzle. A naive OLS regression of conflict on nighttime lights returns essentially zero. Three things contaminate that regression: unobserved institutions, reverse causality, and a noisy income proxy. So 0.001 is not “no effect” — it is a contaminated reading. The whole deck is about cleaning the thermometer.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -291,9 +291,9 @@
 <li class="fragment"><strong>Endogenous regressor</strong> — lagged log nighttime light intensity (the income proxy)</li>
 <li class="fragment"><strong>Instruments</strong> — lagged log rainfall and lagged drought (Palmer index), two years prior</li>
 </ul>
-<p><span class="comment">Region fixed effects, region-specific time trends, and year effects are absorbed via pre-detrended variables; SEs clustered on 5,689 regions.</span></p>
+<p><span class="comment">Region effects, region trends, and year effects are pre-absorbed. SEs clustered on 5,689 regions.</span></p>
 <aside class="notes">
-<p>A 48-… no — 5,689-region subnational panel from Hodler &amp; Raschky (2014), taking Miguel, Satyanath &amp; Sergenti’s rainfall-IV idea below the country level. Conflict is rare: only 4.6% of region-years have any conflict death.</p>
+<p>A 5,689-region subnational panel from Hodler &amp; Raschky (2014), taking Miguel, Satyanath &amp; Sergenti’s rainfall-IV idea below the country level. Conflict is rare: only 4.6% of region-years have any conflict death.</p>
 <p>The detrended *_dt variables are residuals from region-specific linear trends — equivalent to including those trends in the regression.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -372,8 +372,8 @@
       }</style></aside>
 </div>
 </section>
-<section id="two-lasso-no-two-stages-fit-lights-from-weather-then-conflict-from-fitted-lights" class="slide level2 center">
-<h2>Two LASSO… no — two stages: fit lights from weather, then conflict from fitted lights</h2>
+<section id="two-stages-fit-lights-from-weather-then-conflict-from-fitted-lights" class="slide level2 center">
+<h2>Two stages: fit lights from weather, then conflict from fitted lights</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2-3|4-5"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb1-1"><a href=""></a>xtset objectid <span class="fu">year</span></span>
 <span id="cb1-2"><a href=""></a>xtivreg2 ucdp_death_dummy_dt <span class="co">///</span></span>
 <span id="cb1-3"><a href=""></a>    (llnlight01_dt = l2lnrain01_dt l2meanpdsi_dt) Iyear*, <span class="co">///</span></span>
@@ -427,8 +427,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="both-weather-instruments-predict-conflict-directly-the-reduced-form-holds" class="slide level2 center">
-<h2>Both weather instruments predict conflict directly — the reduced form holds</h2>
+<section id="both-weather-instruments-move-conflict-in-the-reduced-form-the-iv-numerator-is-real" class="slide level2 center">
+<h2>Both weather instruments move conflict in the reduced form — the IV numerator is real</h2>
 
 <img data-src="../stata_iv_panel_reduced_form.png" class="r-stretch quarto-figure-center"><p class="caption">Reduced-form coefficients (weather → conflict): more rain and less drought both predict less future conflict, for both outcomes.</p><aside class="notes">
 <p>The reduced form is the numerator of the IV ratio. Rainfall → conflict −0.011 (p = 0.001); drought → conflict −0.002 (p &lt; 0.001). Both negative, both in the expected direction. If the instruments had no reduced-form relationship with conflict, there would be nothing for IV to scale up.</p>

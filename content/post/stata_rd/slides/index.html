@@ -215,7 +215,7 @@
 <h2>You can’t randomize tutoring — so how do you prove it works?</h2>
 <p>A school enrolled every student scoring <strong>70 or below</strong> on an entrance exam into free tutoring. Above 70, nothing.</p>
 <div class="fragment">
-<p>The struggling students who got help also started behind. <em>Compare raw outcomes and you measure the program plus the gap it was meant to close.</em> How do you separate the two?</p>
+<p>The students who got help also started behind. <em>Compare raw outcomes and you measure the program plus the gap.</em></p>
 <aside class="notes">
 <p>The fundamental problem: students were not assigned at random. Below-cutoff students differ systematically from above-cutoff students. A naive treated-minus-untreated comparison conflates the tutoring effect with selection. The whole tutorial is about how a rule-based threshold rescues identification.</p>
 <style type="text/css">
@@ -323,7 +323,7 @@
 <h2>The estimand is the LATE — the jump in the CEF <em>at</em> the cutoff</h2>
 <p><span class="math display">\[\tau_{RD}=\lim_{x\downarrow c}E[Y\mid X=x]-\lim_{x\uparrow c}E[Y\mid X=x]\]</span></p>
 <p>The difference between the expected exit score just above the cutoff and just below it.</p>
-<p><span class="comment">Identification rests on <strong>continuity</strong>: absent tutoring, potential outcomes would pass <em>smoothly</em> through 70. The estimate is local — it speaks only to students near the threshold.</span></p>
+<p><span class="comment">Identification rests on <strong>continuity</strong>: absent tutoring, outcomes pass <em>smoothly</em> through 70.</span></p>
 <aside class="notes">
 <p>Name the estimand explicitly: the Local Average Treatment Effect at the cutoff. The continuity assumption is the load-bearing one — students just below 70 would, absent treatment, look like students just above. We cannot extrapolate τ to a student scoring 30 or 95.</p>
 <style type="text/css">
@@ -602,7 +602,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">A spread of less than one point across a 4× change in window — the result is not an artifact of bandwidth choice.</span></p>
+<p><span class="comment">Less than one point across a 4× change in window — not a bandwidth artifact.</span></p>
 <aside class="notes">
 <p>Bandwidth is the analyst’s most discretionary RDD choice, so this is the key robustness test. From the tightest window (BW 5, a handful of students) to the widest (BW 20), τ moves less than a point and stays significant at p &lt; 0.001. Narrower bandwidths inflate the SE (2.34 vs 1.13) as expected. The mild drift toward −9.2 hints at slight curvature far from the cutoff.</p>
 <style type="text/css">
@@ -672,7 +672,7 @@
 <h2>Does machine-picking the bandwidth make this causal? No.</h2>
 <p><span class="objection">Objection.</span> A data-driven bandwidth and a clever package can’t manufacture identification.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Correct — and we never claim they do. The LATE is identified only under <strong>continuity</strong> of potential outcomes at 70 (no manipulation, no other policy switching on at the same score). rdrobust just estimates the discontinuity flexibly; the McCrary test and placebos <em>defend</em> the assumption, they don’t replace it.</p>
+<p><span class="rebuttal">Response.</span> Correct — and we never claim they do. Identification rests on <strong>continuity</strong> at 70; <code>rdrobust</code> just estimates the jump. The density and placebo tests <em>defend</em> that assumption — they don’t replace it.</p>
 <aside class="notes">
 <p>Steelman the critique. RDD’s credibility comes from the assumption, not the estimator. We support continuity indirectly (density p = 0.58, clean placebos) but can’t prove it — and with no covariates we can’t run smoothness-on-covariates checks. The honest caveat: the estimate is local to the cutoff and says nothing about students scoring 30 or 95.</p>
 <style type="text/css">
@@ -720,7 +720,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">9–11 points is ~13–16% of the mean exit score (66.2) — the difference between passing and failing for a borderline student.</span></p>
+<p><span class="comment">9–11 points is ~13–16% of the mean exit score (66.2) — passing vs failing for a borderline student.</span></p>
 <aside class="notes">
 <p>The payoff table. Global and local methods, parametric and nonparametric, all land in a 9–11 point band, all p &lt; 0.001. Scaled against a mean of 66.2, that’s a 13–16% gain. For policy, a sharp test-score rule is both easy to implement and easy to evaluate — but the effect remains a LATE at the cutoff.</p>
 <style type="text/css">

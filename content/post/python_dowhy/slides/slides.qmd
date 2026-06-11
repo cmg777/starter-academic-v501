@@ -67,7 +67,7 @@ This is the central challenge of causal inference: distinguishing a genuine trea
 Spoiler figure — the payoff we earn across the deck. Don't explain every bar yet. Just plant two facts: the adjusted estimators agree with each other (around \$1,550–\$1,736), and they all sit below the naive \$1,794. We come back to this picture in Act III.
 :::
 
-## Where we're going
+## One estimand, four steps, five estimators — do they agree?
 
 ::: {.incremental}
 - The estimand: the **ATE** of NSW job training on 1978 earnings

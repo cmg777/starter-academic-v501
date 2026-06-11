@@ -213,7 +213,7 @@
 </section>
 <section id="when-one-state-raises-its-cigarette-tax-smokers-cross-the-border" class="slide level2 center">
 <h2>When one state raises its cigarette tax, smokers cross the border</h2>
-<p>A tax hike in one state sends border-county smokers to a cheaper neighbour. So a state’s consumption depends on its <em>neighbours’</em> prices and consumption — a <strong>spatial spillover</strong>.</p>
+<p>A tax hike in one state sends border-county smokers to a cheaper neighbour. So your consumption depends on your <em>neighbours’</em> — a <strong>spatial spillover</strong>.</p>
 <div class="fragment">
 <p>Standard panel methods assume each state stands alone. <em>What do they miss?</em></p>
 <aside class="notes">
@@ -270,9 +270,9 @@
 <li class="fragment"><strong>Treatment-of-interest</strong> — <span class="math inline">\(\log\)</span> real price (<code>logp</code>); also <span class="math inline">\(\log\)</span> real income (<code>logy</code>)</li>
 <li class="fragment"><strong>Neighbours</strong> — the <code>usa46</code> binary contiguity matrix, <strong>row-normalized</strong></li>
 </ul>
-<p><span class="comment">Log-log means every coefficient is an elasticity: a percent change in consumption per percent change in price. State and year fixed effects absorb tobacco culture and national anti-smoking trends.</span></p>
+<p><span class="comment">Log-log: every coefficient is an elasticity — % change in consumption per % change in price.</span></p>
 <aside class="notes">
-<p>The Cigar dataset (Baltagi 1992). pimin — minimum neighbour price — is left out on purpose: its correlation with the spatial lag W·logp is 0.92, so the SDM’s W·logp term captures the same cross-border channel more flexibly.</p>
+<p>State and year fixed effects absorb tobacco culture and national anti-smoking trends. The Cigar dataset (Baltagi 1992). pimin — minimum neighbour price — is left out on purpose: its correlation with the spatial lag W·logp is 0.92, so the SDM’s W·logp term captures the same cross-border channel more flexibly.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -440,14 +440,14 @@
 </section>
 <section id="lee-yu-corrects-the-small-sample-bias-lifting-ρ-from-0.223-to-0.262" class="slide level2 center">
 <h2>Lee-Yu corrects the small-sample bias, lifting ρ from 0.223 to 0.262</h2>
-<p>The 46 + 30 = 76 fixed effects create an <strong>incidental-parameter bias</strong> in spatial ML. Lee-Yu (2010) transforms the data to concentrate them out before estimation.</p>
+<p>The 46 + 30 = 76 fixed effects create an <strong>incidental-parameter bias</strong> in spatial ML.</p>
 <ul>
 <li class="fragment">Uncorrected SDM: <span class="math inline">\(\rho = 0.223\)</span> → Lee-Yu: <span class="math inline">\(\rho = 0.262\)</span> (a 17% upward correction)</li>
 <li class="fragment">Slopes barely move (<span class="math inline">\(\beta_{\text{logp}}\)</span>: <span class="math inline">\(-1.003 \to -1.001\)</span>) — expected with <span class="math inline">\(T = 30\)</span></li>
 </ul>
 <p><span class="comment">For short panels (<span class="math inline">\(T &lt; 10\)</span>) the correction would matter far more; here it mainly rescues <span class="math inline">\(\rho\)</span>.</span></p>
 <aside class="notes">
-<p>The uncorrected estimator understates spatial dependence. With 30 time periods the slope bias is small, but ρ — the parameter most sensitive to the incidental-parameter problem — moves a meaningful 17%. We adopt the Lee-Yu version as the preferred static SDM.</p>
+<p>Lee-Yu (2010) transforms the data to concentrate the fixed effects out before estimation. The uncorrected estimator understates spatial dependence. With 30 time periods the slope bias is small, but ρ — the parameter most sensitive to the incidental-parameter problem — moves a meaningful 17%. We adopt the Lee-Yu version as the preferred static SDM.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -657,9 +657,14 @@
 <h2>Does any of this estimate a causal tax effect? Not without the usual assumptions</h2>
 <p><span class="objection">Objection.</span> The W·logp coefficient and the impacts read like causal cross-border effects — but the data are observational.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Correct. Two-way fixed effects strip time-invariant state heterogeneity and common shocks, and the spatial/dynamic terms model interdependence — but a causal tax elasticity still needs no time-varying confounders and a stable spatial process (<span class="math inline">\(|\tau + \rho\eta| &lt; 1\)</span>). The deck demonstrates a <em>modeling workflow</em>, not an identified policy experiment.</p>
+<p><span class="rebuttal">Response.</span> Correct — this is a <em>modeling workflow</em>, not an identified policy experiment.</p>
+<ul>
+<li class="fragment">FE strip time-invariant state heterogeneity and common shocks</li>
+<li class="fragment">A causal tax elasticity still needs no time-varying confounders</li>
+<li class="fragment">And a stable spatial process (<span class="math inline">\(|\tau + \rho\eta| &lt; 1\)</span>)</li>
+</ul>
 <aside class="notes">
-<p>Steelman, don’t strawman. The post is careful: SDPDmod gives a principled way to model spatial and temporal dependence, but it does not manufacture identification. The elasticities are descriptive of an interdependent system under FE; reading them as the causal effect of a tax requires the standard panel assumptions plus stationarity of the dynamic-spatial system.</p>
+<p>Steelman, don’t strawman. Two-way fixed effects strip state heterogeneity and common shocks, and the spatial/dynamic terms model interdependence — but that is not identification. The post is careful: SDPDmod gives a principled way to model spatial and temporal dependence, but it does not manufacture identification. The elasticities are descriptive of an interdependent system under FE; reading them as the causal effect of a tax requires the standard panel assumptions plus stationarity of the dynamic-spatial system.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

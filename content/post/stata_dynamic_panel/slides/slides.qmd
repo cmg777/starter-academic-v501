@@ -101,12 +101,12 @@ mvdecode DemocIndxLag PolitFreeLag EconFreeLag, mv(0)
 sum DemocIndxLag PolitFreeLag EconFreeLag
 ```
 
-The three lagged institutional variables encode missing data as $0$. Left raw, those zeros masquerade as legitimate observations of "no economic freedom."
+The three lagged institutional variables encode missing data as $0$.
 
 [`DemocIndxLag` loses 86.5% of its rows to recoding — which is why the published study drops it entirely.]{.comment}
 
 ::: {.notes}
-After mvdecode, EconFreeLag's mean rises from 4.67 to 5.76 and its minimum from 0 to 1.82 — the apparent zeros were spurious. PolitFreeLag and EconFreeLag retain 1,168 and 1,349 valid country-years; DemocIndxLag retains only 225, effectively unusable.
+Left raw, those zeros masquerade as legitimate observations of "no economic freedom." After mvdecode, EconFreeLag's mean rises from 4.67 to 5.76 and its minimum from 0 to 1.82 — the apparent zeros were spurious. PolitFreeLag and EconFreeLag retain 1,168 and 1,349 valid country-years; DemocIndxLag retains only 225, effectively unusable.
 :::
 
 ## War and coup are heavy-tailed; GDP is near-symmetric
@@ -153,24 +153,24 @@ Stephen Nickell (1981) showed the within-transformation introduces this bias. It
 
 $$\Delta\ln\text{GDPpc}_{i,t} = \rho\,\Delta\ln\text{GDPpc}_{i,t-1} + \beta\,\Delta\text{War}_{i,t} + \Delta\varepsilon_{i,t}$$
 
-Differencing erases $\alpha_i$ exactly. But $\Delta\ln\text{GDPpc}_{i,t-1}$ and $\Delta\varepsilon_{i,t}$ both contain $\varepsilon_{i,t-1}$ — so the differenced lag is endogenous.
+Differencing erases $\alpha_i$ exactly — but it makes the differenced lag endogenous.
 
 [Belt and suspenders: differencing removes confounders, lag-instruments handle the lagged-DV endogeneity.]{.comment}
 
 ::: {.notes}
-First-differencing is the launching pad for difference GMM. The differenced lag's correlation with the differenced error is the problem the internal instruments solve. War and Coup are also treated as endogenous, since country-specific shocks could drive both GDP and conflict at once.
+The differenced lag $\Delta\ln\text{GDPpc}_{i,t-1}$ and the differenced error $\Delta\varepsilon_{i,t}$ both contain $\varepsilon_{i,t-1}$ — that shared term is the endogeneity. First-differencing is the launching pad for difference GMM. The differenced lag's correlation with the differenced error is the problem the internal instruments solve. War and Coup are also treated as endogenous, since country-specific shocks could drive both GDP and conflict at once.
 :::
 
 ## Deeper lags are valid instruments: the Arellano–Bond moment conditions
 
 $$E\!\left[\,\ln\text{GDPpc}_{i,t-s}\cdot\Delta\varepsilon_{i,t}\,\right] = 0 \qquad \text{for } s \geq 2$$
 
-Lags $2$ and deeper of the *level* are uncorrelated with the differenced error — so $\ln\text{GDPpc}_{i,t-2}, \ln\text{GDPpc}_{i,t-3},\ldots$ instrument $\Delta\ln\text{GDPpc}_{i,t-1}$.
+Lags $2$ and deeper of the *level* are uncorrelated with the differenced error — so they are valid instruments for the differenced lag.
 
 [We use lags $2$–$6$: deep enough to be exogenous, shallow enough to contain instrument proliferation.]{.comment}
 
 ::: {.notes}
-These moment conditions form the basis of the GMM estimator. Restricting to lag(2 6) limits the instrument-matrix size — Roodman's (2009) concern is that too many instruments over-fit endogenous regressors and weaken the Hansen J test. Like using last week's weather to predict this week's: exogenous to today's shock, predictive of yesterday's value.
+Concretely, $\ln\text{GDPpc}_{i,t-2}, \ln\text{GDPpc}_{i,t-3},\ldots$ instrument $\Delta\ln\text{GDPpc}_{i,t-1}$. These moment conditions form the basis of the GMM estimator. Restricting to lag(2 6) limits the instrument-matrix size — Roodman's (2009) concern is that too many instruments over-fit endogenous regressors and weaken the Hansen J test. Like using last week's weather to predict this week's: exogenous to today's shock, predictive of yesterday's value.
 :::
 
 ## Six lines fit difference GMM in Stata with `xtabond2`

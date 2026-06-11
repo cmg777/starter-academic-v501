@@ -111,7 +111,7 @@ Keep these two straight throughout. Beta = a behavioural tendency (rear runners 
 - **Sample** — 84 countries with data since 1960; oil producers and sub-1M-population states excluded
 :::
 
-[5,040 country-year rows. A balanced panel means the same 84 countries appear every year — no composition effects masquerading as convergence.]{.comment}
+[5,040 country-year rows. Balanced means the same 84 countries appear every year — so no composition effects.]{.comment}
 
 ::: {.notes}
 Penn World Tables 10.0, expenditure-side real GDP at chained PPPs — comparable across price levels. Following Patel, Sandefur & Subramanian (2021) we drop oil economies (income is resource rent, not productive catch-up) and tiny states. Balancing the panel is the load-bearing design choice: it fixes N = 84 in every year, so the sigma series later can't be contaminated by countries entering or leaving.
@@ -188,7 +188,7 @@ This motivates NLS. OLS estimates the bracketed expression as a single coefficie
 
 ## Stata's `nl` estimates $\beta$ in one line — start it at the 2% benchmark
 
-``` {.stata code-line-numbers="1|2|2"}
+``` {.stata code-line-numbers="1|2"}
 local s = 19
 nl (outcome = {b0=1} - (1 - exp(-1*{b1=0.02}*`s'))/`s' * initial_inc), vce(robust)
 ```

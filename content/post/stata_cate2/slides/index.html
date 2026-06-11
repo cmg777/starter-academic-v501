@@ -477,9 +477,12 @@
 <h2>A random forest chooses controls — it cannot relax identification</h2>
 <p><span class="objection">Objection.</span> Machine-learning the nuisance functions can’t conjure a causal effect from observational data.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> Correct. <span class="math inline">\(\tau(\mathbf{x})\)</span> is identified only under <strong>conditional independence given <span class="math inline">\(\mathbf{X}\)</span></strong> (unconfoundedness) and adequate <strong>overlap</strong>. The forest just estimates <span class="math inline">\(g\)</span> and <span class="math inline">\(f\)</span> flexibly; it can’t rule out an omitted confounder. The 3-vs-2 contrast even <em>failed</em> on overlap — a feature, not a bug, of honest estimation.</p>
+<p><span class="rebuttal">Response.</span> Correct. <span class="math inline">\(\tau(\mathbf{x})\)</span> is identified only under <strong>conditional independence given <span class="math inline">\(\mathbf{X}\)</span></strong> (unconfoundedness) and adequate <strong>overlap</strong>.</p>
+</div>
+<div class="fragment">
+<p>The forest estimates <span class="math inline">\(g\)</span> and <span class="math inline">\(f\)</span> — it cannot rule out an omitted confounder. The 3-vs-2 contrast even <em>failed</em> on overlap: a feature of honest estimation.</p>
 <aside class="notes">
-<p>Steelman, don’t strawman. cate disciplines estimation; it does not deliver identification for free. The 3-2 price comparison has propensity scores near zero on 300 obs and AIPW refuses to report — the estimator telling you the data can’t answer the question. That honesty is exactly what you want.</p>
+<p>Steelman, don’t strawman. The forest just estimates the nuisance functions flexibly; identification still rests entirely on conditional independence and overlap. cate disciplines estimation; it does not deliver identification for free. The 3-2 price comparison has propensity scores near zero on 300 obs and AIPW refuses to report — the estimator telling you the data can’t answer the question. That honesty is exactly what you want.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

@@ -47,7 +47,7 @@ format:
 
 [Act I]{.act}
 
-## When Virginia raises its cigarette tax, smokers in five neighboring states change their behavior
+## When Virginia raises its cigarette tax, smokers in neighboring states change their behavior
 
 A state's cigarette tax is a *local* instrument. But consumers near borders simply drive across the line to buy cheaper packs.
 

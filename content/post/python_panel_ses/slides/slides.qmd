@@ -221,7 +221,7 @@ Driscoll-Kraay uses a Newey-West time kernel on cross-sectional averages — rob
 One CI plot could be lucky. The Monte Carlo runs 500 datasets from the same DGP and asks: how often does the 95% CI for the unbiased FE estimate miss the true 0.5? FE + entity-clustered rejects at 6.6% — close to 5% and within simulation noise. Conventional (6.0%) and White (6.4%) also do fine here because after FE the within-firm errors are nearly homoskedastic with 100 clusters to absorb the rest.
 :::
 
-## Time clustering over-rejects at 9.0% — false positives almost twice as often
+## The too-small SEs sit at 0.55–0.58× the honest benchmark — understating uncertainty by ~40%
 
 ![SE ratios relative to the entity-clustered benchmark. Ratios below 1.0 understate uncertainty.](../panel_ses_ratios.png)
 
@@ -229,7 +229,7 @@ One CI plot could be lucky. The Monte Carlo runs 500 datasets from the same DGP 
 The outlier from the Monte Carlo: FE + time-clustered rejects at 9.0%, nearly double 5% — 10 year-clusters violate large-cluster asymptotics, so the SEs are too small. This ratios figure normalizes everything to the entity-clustered SE: conventional and White on the pooled model sit at 0.55–0.58x, understating uncertainty by ~40%. TWFE + entity-clustered (3.2%) is mildly conservative — a benign property versus over-rejection.
 :::
 
-## Does machine-correcting the SE make the estimate causal? No
+## Does fixing the SE make the estimate causal? No
 
 [Objection.]{.objection} "Clustered/robust SEs and a 6.6% rejection rate mean my coefficient is now the true causal effect."
 

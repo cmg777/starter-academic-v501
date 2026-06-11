@@ -76,10 +76,10 @@ The naive 1-0 estimate of 0.109 is a 56% underestimate of the true 0.250. Mining
 
 $$\tau(\mathbf{x}) = E\{Y_i(1) - Y_i(0) \mid \mathbf{X}_i = \mathbf{x}\}$$
 
-[Among districts that look like $\mathbf{x}$, what is the average gap between the treated and untreated potential outcomes? Where $\tau(\cdot)$ bends with $\mathbf{x}$, mining helps some districts more than others — that bend is the whole point.]{.comment}
+[Where $\tau(\cdot)$ bends with $\mathbf{x}$, mining helps some districts more than others — that bend is the whole point.]{.comment}
 
 ::: {.notes}
-Estimand: the Conditional Average Treatment Effect. When τ is constant in x, one ATE summarizes everything. When it bends, we have heterogeneity. The causal forest estimates that bend without us pre-specifying its shape.
+Estimand: the Conditional Average Treatment Effect. Read it as: among districts that look like x, what is the average gap between the treated and untreated potential outcomes? When τ is constant in x, one ATE summarizes everything. When it bends, we have heterogeneity. The causal forest estimates that bend without us pre-specifying its shape.
 :::
 
 ## Where we're going
@@ -110,7 +110,7 @@ Estimand: the Conditional Average Treatment Effect. When τ is constant in x, on
 Using simulated data with known parameters is the trick: we can verify the forest recovers the true ATEs. The DGP follows a real study so the structure is realistic, but the controlled setting lets us validate the methodology rather than debate the economics.
 :::
 
-## The treatment is brutally imbalanced — 85% of districts never mine
+## The treatment is brutally imbalanced — 85% of district-years never mine
 
 ![Treatment distribution. 2,550 control observations but only 150 per mining level — within-mining contrasts lean on just 300 rows.](../python_econml_treatment_dist.png)
 
@@ -230,13 +230,13 @@ Finding 3b. The price-effect GATE spans only 0.045 with no monotone pattern. By 
 ::: {.column width="50%"}
 ### Mining effect (1-0)
 - rises with quality of government
-- range 0.089 across exec. constraints
+- matches the exec.-constraints range of 0.089
 - institutions *amplify* mining
 :::
 ::: {.column width="50%"}
 ### Price effect (3-1)
 - flat across quality of government
-- range 0.045, no monotone pattern
+- matches the exec.-constraints range of 0.045
 - institutions *do not* touch price
 :::
 ::::
@@ -269,10 +269,10 @@ SingleTreeCateInterpreter fits a shallow tree to the predicted CATEs themselves 
 
 . . .
 
-[Response.]{.rebuttal} Exactly right. $\tau(\mathbf{x})$ is identified *only* under the Conditional Independence Assumption. The forest discovers heterogeneity flexibly and earns honest confidence intervals — but it cannot rule out an unobserved confounder. With real data, the CIA is untestable; here it holds only because we built it in.
+[Response.]{.rebuttal} Exactly right. $\tau(\mathbf{x})$ is identified *only* under the Conditional Independence Assumption — the forest earns honest intervals, but it cannot rule out an unobserved confounder.
 
 ::: {.notes}
-Steelman the critique. DML disciplines estimation and inference; it does not relax the identifying assumption. BLB SEs even treat panel observations as independent, so true clustered SEs would be larger. The Stata companion uses vce(cluster district_id). The method is a tool for credible heterogeneity estimation, conditional on identification holding.
+Steelman the critique. The forest discovers heterogeneity flexibly and earns honest confidence intervals, but it cannot relax the identifying assumption. With real data the CIA is untestable; here it holds only because we built it in. DML disciplines estimation and inference; it does not relax identification. BLB SEs even treat panel observations as independent, so true clustered SEs would be larger. The Stata companion uses vce(cluster district_id). The method is a tool for credible heterogeneity estimation, conditional on identification holding.
 :::
 
 # Let the data reveal *for whom* — but never forget the assumption that makes it causal. {.divider background-color="#141413"}

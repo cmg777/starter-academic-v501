@@ -47,7 +47,7 @@ format:
 
 ## Crime does not respect neighborhood boundaries — but OLS pretends it does
 
-In Columbus, Ohio, a tract's crime depends on its own income and housing — and on what happens *next door*: displacement, diffusion, shared risk.
+A tract's crime depends on its own income and housing — and on what happens *next door*: displacement, diffusion, shared risk.
 
 . . .
 
@@ -291,10 +291,14 @@ Gibbons & Overman (2012): endogenous-interaction (ρ) and error-interaction (λ)
 
 . . .
 
-[Response.]{.rebuttal} It is a robust *spatial pattern*, not a causal effect. $W$ is chosen, not estimated; $\rho$, $\theta$, $\lambda$ are weakly separable; and the SDM-vs-SDEM choice is *non-nested* — global vs local spillovers fit the data equally well but mean different things. Treat $-1.20$ as a well-measured association, not a treatment effect.
+[Response.]{.rebuttal} It is a robust *spatial pattern*, not a causal effect.
+
+. . .
+
+Treat $-1.20$ as a well-measured association, not a treatment effect.
 
 ::: {.notes}
-Steelman the policy reading, then bound it. The estimand here is descriptive spatial association under a fixed W. No randomization, no natural experiment. The SDM (global feedback) and SDEM (local spillover + common factors) are observationally near-identical yet tell different stories — a caution against over-reading any single coefficient.
+Steelman the policy reading, then bound it. Three reasons it is descriptive, not causal: W is chosen, not estimated; ρ, θ, λ are only weakly separable; and the SDM-vs-SDEM choice is non-nested — global vs local spillovers fit the data equally well but mean different things. The estimand here is descriptive spatial association under a fixed W. No randomization, no natural experiment. The SDM (global feedback) and SDEM (local spillover + common factors) are observationally near-identical yet tell different stories — a caution against over-reading any single coefficient.
 :::
 
 # Let the data choose the channel — but never forget your neighbours. {.divider background-color="#141413"}

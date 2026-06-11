@@ -53,7 +53,11 @@ When the 2007–2009 crisis struck, non-performing loans surged across the whole
 
 . . .
 
-Two channels did it: **spatial spillovers** between interconnected banks, and **common factors** — macro shocks that hit every bank together. *Stata's `xsmle` and `spxtregress` cannot model the second one.*
+Two channels did it: **spatial spillovers** between banks, and **common factors** — macro shocks that hit every bank at once.
+
+. . .
+
+*Stata's `xsmle` and `spxtregress` model only the first.*
 
 ::: {.notes}
 This is the central tension. Bank risk does not stay contained. It travels along lending relationships (spatial) AND it responds to aggregate shocks like interest-rate moves and the housing collapse (common factors). The standard spatial-panel toolkit in Stata can do spatial lags but cannot accommodate unobserved common factors — that gap is what the whole deck is about.
@@ -264,7 +268,7 @@ Two multipliers stack. The temporal multiplier 1/(1−ρ) = 1.41 captures the sh
 
 ## The strongest objection — and the answer
 
-[Objection.]{.objection} The mean-group estimator drives the spatial lag to insignificance ($\psi = 0.032$, $p = 0.54$). So maybe the spillovers were never real.
+[Objection.]{.objection} The mean-group estimator drives the spatial lag to insignificance ($\psi = 0.032$, $p = 0.536$). So maybe the spillovers were never real.
 
 . . .
 

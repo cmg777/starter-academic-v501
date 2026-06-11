@@ -47,7 +47,7 @@ format:
 
 [Act I]{.act}
 
-## Same data, opposite answers — and the only thing that changed was the weights
+## Same data, opposite answers — only the weights changed
 
 Twenty million people gained Medicaid under the ACA's staggered roll-out. Did fewer of them die?
 
@@ -97,7 +97,7 @@ The treated group's change minus the control group's change — both means taken
 Identification needs only one restriction: parallel trends — absent expansion, treated and control counties would have moved together. Everything in this deck is an ATT; the only quarrel is which weighted average of the unit-level effects we target.
 :::
 
-## A switch in weights silently moves 11 points of mass between the two biggest cohorts
+## Weighting shifts 11 points of mass between the two biggest cohorts
 
 | treat_year | counties | share counties | share adults (2013) |
 |---|---:|---:|---:|

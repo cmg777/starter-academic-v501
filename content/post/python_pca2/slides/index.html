@@ -269,7 +269,20 @@
 <li class="fragment"><strong>Coverage</strong> — 153 sub-national regions, 12 South American countries, 2013 &amp; 2019</li>
 <li class="fragment"><strong>Shape</strong> — reshaped wide → long into <strong>306 rows</strong> (153 regions × 2 periods)</li>
 </ul>
-<p><span class="comment">All three indicators are positive-direction (higher = better), so no polarity flip is needed. The <code>period</code> column is metadata — it never enters the PCA.</span></p>
+<p><span class="comment">All three indicators run higher = better — no polarity flip needed.</span></p>
+<aside class="notes">
+<p>The <code>period</code> column is metadata — it is carried through for analysis but never enters the PCA computation. From PCA’s perspective there are 306 observations, not two separate groups.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="real-development-data-is-messier-than-simulation-pc1-will-capture-less" class="slide level2 center">
 <h2>Real development data is messier than simulation: PC1 will capture less</h2>
@@ -348,7 +361,7 @@
 <h2>Pooled standardization measures every region against one fixed ruler</h2>
 <p><span class="math display">\[Z_{ij,t}^{\text{pool}}=\frac{X_{ij,t}-\bar{X}_j^{\text{pool}}}{\sigma_j^{\text{pool}}}\]</span></p>
 <p>The pooled mean <span class="math inline">\(\bar{X}_j^{\text{pool}}\)</span> and SD <span class="math inline">\(\sigma_j^{\text{pool}}\)</span> are computed from <strong>all 306 rows at once</strong>, then applied to every observation in every period.</p>
-<p><span class="comment">Per-period uses a different baseline each year; pooled uses one. The increase from 0.926 to 0.946 maps to a <em>genuine</em> z-score increase.</span></p>
+<p><span class="comment">Per-period shifts the baseline each year; pooled fixes it — so 0.926 → 0.946 is a <em>genuine</em> z-score rise.</span></p>
 <aside class="notes">
 <p>Analogy: measuring children at age 5 and age 10. Per-period compares each child only to same-age peers — you can’t see growth because the reference group changes. Pooled measures everyone against the combined distribution, so the z-score increase reflects actual growth. Without it, the income decline (0.736 → 0.715) would be re-centred away.</p>
 <style type="text/css">

@@ -169,7 +169,7 @@ $$\widehat{Y_{1t}(0)} = \hat\alpha + \hat\beta\, t, \qquad t > t^*$$
 
 A linear fit on 1970–1988 ($\hat\beta = -1.78$ packs/year, $R^2 = 0.74$) extended forward; the gap to observed averages **−28.3 packs**.
 
-[Identifying assumption: the pre-trend has the right *shape*. No comparison unit, so it can't separate policy from secular decline.]{.comment}
+[Assumption: the pre-trend has the right *shape*. No comparison unit — so it can't separate policy from the secular decline.]{.comment}
 
 ::: {.notes}
 Method 3a. ITS needs no control unit — it borrows from California's own past — but pays in a stronger pre-trend assumption. −28.3 is essentially the naive −27.0 because both use only within-California information. Suggestive coincidence, not reassurance: both can be biased the same way.

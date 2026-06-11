@@ -73,7 +73,7 @@ Spoiler figure for the problem. The right-shifted WFH distribution is not all ca
 - The lab: 5,000 employees, a known ATE of 1.0, two confounders, one instrument
 - DoWhy's four steps — Model, Identify, Estimate, Refute
 - Four estimators across two identification strategies
-- The lesson: identification and method comparison, not precision, separate causal from confidently-wrong
+- The lesson: identification and method comparison — not precision — separate causal from confidently wrong
 :::
 
 # The Investigation {.divider background-color="#6a9bcc"}
@@ -231,8 +231,8 @@ The Act-III payoff. Of regression (1.0051), IPW (1.0275), and AIPW (1.0115), the
 | Refuter | Expected | New effect | Verdict |
 |---|:--:|---:|:--:|
 | Placebo treatment | $\approx 0$ | [−0.00003]{.key} | pass |
-| Random common cause | $\approx 1.0$ | 1.0051 | pass |
-| Data subset (80%) | $\approx 1.0$ | 0.9988 | pass |
+| Random common cause | $\approx 1.0$ | 1.005 | pass |
+| Data subset (80%) | $\approx 1.0$ | 0.999 | pass |
 
 [Permute the treatment and the effect collapses to zero; add a fake confounder or drop 20% of rows and it barely moves.]{.comment}
 
@@ -240,7 +240,7 @@ The Act-III payoff. Of regression (1.0051), IPW (1.0275), and AIPW (1.0115), the
 This is what makes the four-step framework more than bookkeeping. The placebo refuter is the most convincing: replace the real treatment with a random one and a working method must return ~0 — it returns −0.00003 (p = 0.96). Random-common-cause and data-subset confirm the estimate is not fragile. Robustness is demonstrated, not asserted.
 :::
 
-## Does machine-selected adjustment make this causal? No — assumptions still carry it
+## Do four estimators and passing refuters make it causal? No — assumptions still carry it
 
 [Objection.]{.objection} Running four estimators and passing refutation tests can't *manufacture* identification.
 

@@ -254,7 +254,7 @@
 <li class="fragment">The lab: 5,000 employees, a known ATE of 1.0, two confounders, one instrument</li>
 <li class="fragment">DoWhy’s four steps — Model, Identify, Estimate, Refute</li>
 <li class="fragment">Four estimators across two identification strategies</li>
-<li class="fragment">The lesson: identification and method comparison, not precision, separate causal from confidently-wrong</li>
+<li class="fragment">The lesson: identification and method comparison — not precision — separate causal from confidently wrong</li>
 </ul>
 </section></section>
 <section>
@@ -552,13 +552,13 @@
 <tr class="even">
 <td>Random common cause</td>
 <td style="text-align: center;"><span class="math inline">\(\approx 1.0\)</span></td>
-<td style="text-align: right;">1.0051</td>
+<td style="text-align: right;">1.005</td>
 <td style="text-align: center;">pass</td>
 </tr>
 <tr class="odd">
 <td>Data subset (80%)</td>
 <td style="text-align: center;"><span class="math inline">\(\approx 1.0\)</span></td>
-<td style="text-align: right;">0.9988</td>
+<td style="text-align: right;">0.999</td>
 <td style="text-align: center;">pass</td>
 </tr>
 </tbody>
@@ -578,8 +578,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="does-machine-selected-adjustment-make-this-causal-no-assumptions-still-carry-it" class="slide level2 center">
-<h2>Does machine-selected adjustment make this causal? No — assumptions still carry it</h2>
+<section id="do-four-estimators-and-passing-refuters-make-it-causal-no-assumptions-still-carry-it" class="slide level2 center">
+<h2>Do four estimators and passing refuters make it causal? No — assumptions still carry it</h2>
 <p><span class="objection">Objection.</span> Running four estimators and passing refutation tests can’t <em>manufacture</em> identification.</p>
 <div class="fragment">
 <p><span class="rebuttal">Response.</span> Correct. The ATE is identified only under <strong>unconfoundedness</strong> (backdoor) or the <strong>exclusion restriction</strong> (IV). DoWhy makes those assumptions explicit and stress-tests the estimate — it cannot prove them. Refuters catch fragility, not unmeasured confounders.</p>

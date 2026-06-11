@@ -52,7 +52,7 @@ A school enrolled every student scoring **70 or below** on an entrance exam into
 
 . . .
 
-The struggling students who got help also started behind. *Compare raw outcomes and you measure the program plus the gap it was meant to close.* How do you separate the two?
+The students who got help also started behind. *Compare raw outcomes and you measure the program plus the gap.*
 
 ::: {.notes}
 The fundamental problem: students were not assigned at random. Below-cutoff students differ systematically from above-cutoff students. A naive treated-minus-untreated comparison conflates the tutoring effect with selection. The whole tutorial is about how a rule-based threshold rescues identification.
@@ -125,7 +125,7 @@ $$\tau_{RD}=\lim_{x\downarrow c}E[Y\mid X=x]-\lim_{x\uparrow c}E[Y\mid X=x]$$
 
 The difference between the expected exit score just above the cutoff and just below it.
 
-[Identification rests on **continuity**: absent tutoring, potential outcomes would pass *smoothly* through 70. The estimate is local — it speaks only to students near the threshold.]{.comment}
+[Identification rests on **continuity**: absent tutoring, outcomes pass *smoothly* through 70.]{.comment}
 
 ::: {.notes}
 Name the estimand explicitly: the Local Average Treatment Effect at the cutoff. The continuity assumption is the load-bearing one — students just below 70 would, absent treatment, look like students just above. We cannot extrapolate τ to a student scoring 30 or 95.
@@ -256,7 +256,7 @@ The sign flip trips up every first reader. OLS estimates the effect of treat = 1
 | 15 | −8.842 | 1.312 | <0.001 |
 | 20 | −9.157 | 1.131 | <0.001 |
 
-[A spread of less than one point across a 4× change in window — the result is not an artifact of bandwidth choice.]{.comment}
+[Less than one point across a 4× change in window — not a bandwidth artifact.]{.comment}
 
 ::: {.notes}
 Bandwidth is the analyst's most discretionary RDD choice, so this is the key robustness test. From the tightest window (BW 5, a handful of students) to the widest (BW 20), τ moves less than a point and stays significant at p < 0.001. Narrower bandwidths inflate the SE (2.34 vs 1.13) as expected. The mild drift toward −9.2 hints at slight curvature far from the cutoff.
@@ -292,7 +292,7 @@ If the effect were a fluke of functional form, we'd see "effects" at arbitrary c
 
 . . .
 
-[Response.]{.rebuttal} Correct — and we never claim they do. The LATE is identified only under **continuity** of potential outcomes at 70 (no manipulation, no other policy switching on at the same score). rdrobust just estimates the discontinuity flexibly; the McCrary test and placebos *defend* the assumption, they don't replace it.
+[Response.]{.rebuttal} Correct — and we never claim they do. Identification rests on **continuity** at 70; `rdrobust` just estimates the jump. The density and placebo tests *defend* that assumption — they don't replace it.
 
 ::: {.notes}
 Steelman the critique. RDD's credibility comes from the assumption, not the estimator. We support continuity indirectly (density p = 0.58, clean placebos) but can't prove it — and with no covariates we can't run smoothness-on-covariates checks. The honest caveat: the estimate is local to the cutoff and says nothing about students scoring 30 or 95.
@@ -306,7 +306,7 @@ Steelman the critique. RDD's credibility comes from the assumption, not the esti
 | Parametric OLS (quadratic) | +9.22 | 6.87 – 11.57 | <0.001 |
 | Nonparametric rdrobust | 8.58 | 4.54 – 12.14 | <0.001 |
 
-[9–11 points is ~13–16% of the mean exit score (66.2) — the difference between passing and failing for a borderline student.]{.comment}
+[9–11 points is ~13–16% of the mean exit score (66.2) — passing vs failing for a borderline student.]{.comment}
 
 ::: {.notes}
 The payoff table. Global and local methods, parametric and nonparametric, all land in a 9–11 point band, all p < 0.001. Scaled against a mean of 66.2, that's a 13–16% gain. For policy, a sharp test-score rule is both easy to implement and easy to evaluate — but the effect remains a LATE at the cutoff.

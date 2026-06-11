@@ -59,7 +59,7 @@ But eligible households also earn **\$15,368** more income. *Is the gap the plan
 This is the central question of the tutorial. The raw eligibility gap of $19,559 is the kind of number a press release quotes. Our job over the next 18 slides is to find out how much of it is the causal effect of access and how much is confounding — chiefly income. Policymakers expanding 401(k) eligibility need the causal part, not the press-release part.
 :::
 
-## One dataset, four estimators, very different answers
+## One dataset, three models, very different answers
 
 ![Naive baselines (gray) versus three DML models across four ML learners, $\hat\theta \pm 95\%$ CI. Naive overstates; DML cuts it roughly in half.](../pension_grand_comparison.png)
 
@@ -197,12 +197,12 @@ $$\theta_0 = E\!\left[g_0(1,X) - g_0(0,X) + \frac{D\,(Y-g_0(1,X))}{m_0(X)} - \fr
 IRM drops PLR's additivity. It combines an outcome model g0(D,X) with a propensity score m0(X) = P(D=1|X) into the doubly-robust score above. "Doubly robust" = consistent if either model is correct, not necessarily both. Propensity weighting upweights informative rare controls — an "eligible-type" household that wasn't eligible is the cleanest counterfactual. Trimming at 0.01 drops extreme propensity scores so the IPW weights stay stable.
 :::
 
-## Two different recipes, same answer: PLR and IRM agree within \$518
+## Two different recipes, same answer: PLR and IRM agree within \$517
 
 ![IRM estimates across four learners (\$7,924–\$8,559) are even tighter than PLR, with smaller standard errors.](../pension_irm_comparison.png)
 
 ::: {.notes}
-IRM mean is $8,213 — only $518 below PLR's $8,730. This convergence is the payoff of running both: partialling-out (PLR) and doubly-robust AIPW (IRM) rest on different assumptions and combine nuisances differently, yet they agree the ATE is $8,000–$9,000. That agreement means the number isn't an artifact of one modeling choice. IRM's SEs are even a touch smaller ($1,185 vs $1,339), so the propensity approach is slightly more efficient here. The close agreement also signals limited effect heterogeneity.
+IRM mean is $8,213 — only $517 below PLR's $8,730. This convergence is the payoff of running both: partialling-out (PLR) and doubly-robust AIPW (IRM) rest on different assumptions and combine nuisances differently, yet they agree the ATE is $8,000–$9,000. That agreement means the number isn't an artifact of one modeling choice. IRM's SEs are even a touch smaller ($1,185 vs $1,339), so the propensity approach is slightly more efficient here. The close agreement also signals limited effect heterogeneity.
 :::
 
 ## Participation is a choice — so we instrument it with eligibility
@@ -288,10 +288,14 @@ The ATE answers "what's the average effect?"; the LATE answers "what's the effec
 
 . . .
 
-[Response.]{.rebuttal} Correct. The ATE is identified only under **conditional exogeneity of eligibility given X**; the LATE adds **instrument validity and monotonicity**. DML disciplines *estimation* — flexible nuisances plus orthogonality plus cross-fitting — it does not relax the *identifying* assumptions. If financial literacy confounds eligibility and savings, the estimates stay biased.
+[Response.]{.rebuttal} Correct. DML disciplines *estimation*, not *identification*.
+
+. . .
+
+The ATE needs **conditional exogeneity**; the LATE adds **instrument validity and monotonicity**.
 
 ::: {.notes}
-Steelman, don't strawman. DML's contribution is honest, efficient estimation given identification — not identification itself. Conditional exogeneity is untestable; the IV exclusion restriction is an assumption, not a result. The 1991 SIPP is also a single cross-section, and extreme asset outliers (−$502k to +$1.5M) pull the mean-based ATE. The method is a microscope, not a randomizer.
+Steelman, don't strawman. DML's contribution is honest, efficient estimation given identification — not identification itself. The ATE is identified only under conditional exogeneity of eligibility given X; the LATE adds instrument validity and monotonicity. Flexible nuisances plus orthogonality plus cross-fitting discipline estimation, but they do not relax the identifying assumptions — if financial literacy confounds eligibility and savings, the estimates stay biased. Conditional exogeneity is untestable; the IV exclusion restriction is an assumption, not a result. The 1991 SIPP is also a single cross-section, and extreme asset outliers (−$502k to +$1.5M) pull the mean-based ATE. The method is a microscope, not a randomizer.
 :::
 
 # Separate "is the effect real?" from "for whom?" — and let cross-fitting do the rest. {.divider background-color="#141413"}

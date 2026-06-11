@@ -89,7 +89,7 @@ Don't explain the construction yet — just plant the picture. Before 1990 the t
 - **Window** — 30 pre-treatment years to fit, 16 post-treatment to measure
 :::
 
-[A long pre-period is a structural advantage: it lets us check the counterfactual *before* the policy, where we know the gap should be zero.]{.comment}
+[The long pre-period is a structural advantage. It lets us check the counterfactual *before* the policy — where the gap should be zero.]{.comment}
 
 ## The estimand is the ATT: how much lower were Swedish emissions than a no-reform Sweden?
 
@@ -200,7 +200,7 @@ We re-run the whole SCM fifteen times, treating each country as if it were Swede
 Maybe one quirky donor — Denmark — drives everything? We re-fit six times, each excluding one high-weight donor. The reduction ranges from 8.8% (drop Switzerland) to 13% (drop Denmark); all six bracket the headline 11% and stay negative. Even the most conservative exclusion beats the unweighted DiD. The result is not a single-donor artefact. All three falsification tests pass.
 :::
 
-## Was it just a recession? Synthetic GDP overlaps actual GDP within $233 by 2005
+## Was it just a recession? Synthetic GDP overlaps actual GDP within \$233 by 2005
 
 ![Sweden's actual GDP vs a separately-built Synthetic Sweden (GDP). The paths overlap throughout the post-period.](../python_sc_co2tax_gdp_synth.png)
 

@@ -53,10 +53,10 @@ A raw comparison says smokers' newborns are **275 grams lighter**. Striking — 
 
 . . .
 
-Mothers who smoke are younger, less educated, less likely to be married, less likely to get early prenatal care. *Each of those alone predicts a lighter baby.*
+Smokers are younger, less educated, less often married, less likely to seek early prenatal care. *Each alone predicts a lighter baby.*
 
 ::: {.notes}
-This is the central tension of observational causal inference. The 275 g gap mixes the effect of smoking with the effect of every characteristic that differs between smokers and non-smokers. The whole tutorial is about subtracting that second piece — the selection bias — and seeing what is left.
+This is the central tension of observational causal inference. Mothers who smoke are younger, less educated, less likely to be married, and less likely to get early prenatal care — and each of those characteristics, on its own, predicts a lighter baby. The 275 g gap mixes the effect of smoking with the effect of every characteristic that differs between smokers and non-smokers. The whole tutorial is about subtracting that second piece — the selection bias — and seeing what is left.
 :::
 
 ## One unadjusted shift — and we cannot yet say what causes it

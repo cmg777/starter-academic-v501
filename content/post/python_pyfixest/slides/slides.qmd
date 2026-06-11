@@ -136,7 +136,7 @@ fit_iv  = pf.feols("Y2 ~ 1 | f1 + f2 | X1 ~ Z1 + Z2", data=data) # FE + IV
 The whole API in four lines. The pipe separates outcome ~ regressors from the fixed-effects slot; a second pipe adds the IV stage. Formula syntax is borrowed from R's fixest. Demeaning is silent and fast even with thousands of groups — that is the high-dimensional part.
 :::
 
-## Adding fixed effects cumulatively drives R-squared from 0.12 to 0.61
+## Adding fixed effects keeps the X1 effect near −1.0 as the CI narrows
 
 ![Coefficient on $X_1$ across No FE, one-way, and two-way specifications — stable near $-1.0$ as the CI narrows.](../pyfixest_coef_comparison.png)
 
@@ -159,7 +159,7 @@ Using csw0(f1, f2), one call fits three nested models. The X1 coefficient stays 
 Cluster-robust SEs allow arbitrary within-group correlation — essential when observations inside a group are not independent. Moving from HC1 to CRV3 inflates the SE 50% (0.0833 → 0.1247) and drops the t-stat from 12.2 to 8.2. Here every p-value still clears 0.001, but for a weaker effect this could flip significance. Default to clustering at the level where errors travel together.
 :::
 
-## IV through fixed effects recovers a strong first stage (F = 311)
+## IV through fixed effects recovers a strong first stage
 
 $$\underbrace{X_1 = \pi_0 + \pi_1 Z_1 + \pi_2 Z_2 + \alpha_i + \gamma_t + \nu}_{\text{first stage}} \;\Rightarrow\; \underbrace{Y_2 = \beta\, \hat{X}_1 + \alpha_i + \gamma_t + \epsilon}_{\text{second stage}}$$
 
@@ -193,7 +193,7 @@ Vella–Verbeek NLSY panel: 545 young men over 8 years, 4,360 rows. One-way FE c
 
 [7.8%]{.bignum}
 
-[union premium under one-way worker FE (was 18.3% in pooled OLS · SE 0.024)]{.bignum-label}
+[union premium under one-way worker FE (was 18.3% in pooled OLS; one-way FE SE 0.024)]{.bignum-label}
 
 ::: {.notes}
 The hero number. Between the pooled OLS premium of 18.3% and the FE premium of 7.8%, the gap is selection: workers who join unions differ systematically in unobserved ability. This is the routine, dramatic correction that makes FE appear in nearly every panel paper.
