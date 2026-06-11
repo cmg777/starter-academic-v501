@@ -13,8 +13,10 @@ diagnostics plus an instrument-proliferation experiment.
 - [x] Results report (`results_report.md`)
 - [x] Blog post (`index.md`)
 - [x] Infographic (`infographic_instructions.md`)
-- [ ] Web app
-- [ ] Quarto bundle / Colab notebook / slides
+- [x] Web app (`web_app/` — 4-tab interactive Dynamic Panel Explorer)
+- [x] Quarto bundle (`python_dynamic_panel.zip`)
+- [x] Colab notebook (`notebook.ipynb` — executed with outputs, 46 cells, replication check passed)
+- [x] Slides (`slides/` — Quarto reveal.js deck, 25 slides; plus `slides.pdf`)
 
 ## Figures
 

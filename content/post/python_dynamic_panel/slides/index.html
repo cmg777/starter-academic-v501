@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.37">
+
+  <meta name="dcterms.date" content="2026-06-11">
+  <title>Dynamic Panel Data Models in Python</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-f8a16d63170f62ba6229f8000d3e1445.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Dynamic Panel Data Models in Python</h1>
+  <p class="subtitle">From Nickell bias to system GMM — how persistent is firm employment?</p>
+  <div class="title-result-strip">
+    <div class="kr"><span class="kr-num">0.927</span><span class="kr-cap">system GMM persistence (SE 0.079)</span></div>
+    <div class="kr"><span class="kr-num">[0.63, 0.96]</span><span class="kr-cap">the OLS–FE bias bracket</span></div>
+    <div class="kr"><span class="kr-num">32</span><span class="kr-cap">collapsed instruments · 140 firms</span></div>
+  </div>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University (GSID)</p>
+  <p class="date">June 11, 2026</p>
+</section>
+<section>
+<section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
+<h1>The Tension</h1>
+<p><span class="act">Act I</span></p>
+</section>
+<section id="same-regression-same-data-and-shock-half-lives-of-1.5-9-or-18-years" class="slide level2 center">
+<h2>Same regression, same data — and shock half-lives of 1.5, 9, or 18 years</h2>
+<p>How much of this year’s employment shock is still visible <em>next</em> year?</p>
+<div class="fragment">
+<p>The answer is one number: <span class="math inline">\(\rho\)</span>, the coefficient on lagged employment. The estimators in this deck — run on the <strong>same 140-firm UK panel</strong> — will claim <span class="math inline">\(\hat\rho = 0.626\)</span>, <span class="math inline">\(0.927\)</span>, and <span class="math inline">\(0.962\)</span>.</p>
+</div>
+<div class="fragment">
+<p><em>One of them is defensible. None of them announces which.</em></p>
+<aside class="notes">
+<p>The hook: ρ is the echo strength of the labor market. At ρ = 0.6 a shock fades within a couple of years; at ρ = 0.95 a 1980 shock is still audible in 1988. The implied half-lives across our estimates run from 1.5 years (fixed effects) through 9 years (system GMM) to 18 years (pooled OLS). A policymaker evaluating a temporary employment subsidy gets completely different cost-benefit horizons depending on which estimate they believe — so the estimator choice IS the economics here.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="firms-orbit-their-own-levels-a-fixed-effect-and-persistence-at-once" class="slide level2 center">
+<h2>Firms orbit their own levels — a fixed effect and persistence at once</h2>
+
+<img data-src="../python_dynamic_panel_trajectories.png" class="r-stretch quarto-figure-center"><p class="caption">Each blue line is one firm, 1976–1984. Lines are parallel-ish (a firm fixed effect) and smooth (high persistence). The orange median dips after 1980 — the UK recession the year dummies absorb.</p><aside class="notes">
+<p>The Arellano-Bond (1991) panel: 140 UK manufacturing firms, 1,031 firm-years, unbalanced (7–9 years per firm). Two features are visible simultaneously: the lines rarely cross — each firm orbits its own level, the signature of a large firm effect α_i — and each line is smooth, the signature of high persistence. The variance decomposition makes it precise: between-firm SD of log employment is 1.339, within-firm SD only 0.195 — a factor of seven. An estimator that mishandles α_i will be wrong by a lot, not a little.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-model-commits-the-one-sin-ordinary-panel-methods-cannot-forgive" class="slide level2 center">
+<h2>The model commits the one sin ordinary panel methods cannot forgive</h2>
+<p><span class="math display">\[n_{it} = \rho\, n_{i,t-1} + \beta_1 w_{it} + \beta_2 w_{i,t-1} + \beta_3 k_{it} + \beta_4 k_{i,t-1} + \alpha_i + \delta_t + \varepsilon_{it}\]</span></p>
+<p><span class="comment">A <em>lagged dependent variable</em> on the right-hand side while the firm effect <span class="math inline">\(\alpha_i\)</span> sits in the error: <span class="math inline">\(n_{i,t-1}\)</span> depends on <span class="math inline">\(\alpha_i\)</span> by construction, so the regressor is correlated with the error no matter how many controls we add.</span></p>
+<aside class="notes">
+<p>Blundell and Bond’s (1998) dynamic labor-demand equation on this very dataset: log employment n on its own lag, current and lagged log real wage w and log capital k, a firm effect α_i, year effects δ_t. A firm with a high permanent level had high employment last year too — so the endogeneity is mechanical, not an omitted-variable accident. Important framing: ρ is a descriptive/structural persistence parameter, not a causal effect — no treatment, no ATE/ATT. Identification will rest on sequential exogeneity and no serial correlation in ε, partially testable via AR(2) and Hansen.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="where-were-going" class="slide level2 center">
+<h2>Where we’re going</h2>
+<ul>
+<li class="fragment">Run pooled OLS and fixed effects — two <em>known-direction</em> failures that bracket the truth</li>
+<li class="fragment">Anderson-Hsiao IV: consistent in theory, useless in practice</li>
+<li class="fragment">Difference GMM: passes every printed test, hugs the wrong bound</li>
+<li class="fragment">System GMM: the defensible headline, <span class="math inline">\(\hat\rho = 0.927\)</span></li>
+<li class="fragment">The diagnostics decoder — AR(1), AR(2), Hansen, and why p <span class="math inline">\(\approx\)</span> 1 is a red flag</li>
+<li class="fragment">Instrument proliferation, collapsing, and a digit-for-digit replication check</li>
+</ul>
+<aside class="notes">
+<p>The arc is an estimator ladder: each rung fails informatively and motivates the next. The meta-lesson to plant now: the winner will not be identified by any single printed statistic — only by the workflow (bracket, weak-instrument logic, proliferation experiment, replication).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>The Investigation</h1>
+<p><span class="act">Act II</span></p>
+</section>
+<section id="pooled-ols-and-fixed-effects-fail-in-opposite-known-directions" class="slide level2 center">
+<h2>Pooled OLS and fixed effects fail in opposite, known directions</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h3 id="pooled-ols-biased-up">Pooled OLS — biased UP</h3>
+<ul>
+<li>Ignores <span class="math inline">\(\alpha_i\)</span>: it stays in the error</li>
+<li><span class="math inline">\(n_{i,t-1}\)</span> is <em>positively</em> correlated with <span class="math inline">\(\alpha_i\)</span></li>
+<li>The lag gets credit for the firm effect’s work</li>
+<li><span class="math inline">\(\hat\rho = 0.962\)</span> (SE 0.008) — near a unit root</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<h3 id="fixed-effects-biased-down">Fixed effects — biased DOWN</h3>
+<ul>
+<li>Demeaning removes <span class="math inline">\(\alpha_i\)</span> exactly…</li>
+<li>…but the firm mean contains <em>future</em> shocks</li>
+<li>Nickell bias, order <span class="math inline">\(1/T\)</span> — and <span class="math inline">\(T\)</span> is 7–9 here</li>
+<li><span class="math inline">\(\hat\rho = 0.626\)</span> (SE 0.052)</li>
+</ul>
+</div></div>
+<aside class="notes">
+<p>Same regression run twice, changing only the treatment of α_i. OLS: persistently large firms look like firms with enormous persistence — orbit differences masquerade as dynamics. FE: the within transformation subtracts a firm average computed over the whole window, so it contains shocks dated after t; the demeaned lag and demeaned error share content, creating a mechanical negative correlation (Nickell 1981). Adding firms does not help — only longer panels do. The gap is 0.336 — half-life of 18 years vs 1.5 years — and the two clustered CIs do not even overlap.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-wrong-answers-bracket-the-truth-any-consistent-estimate-must-land-in-0.626-0.962" class="slide level2 center">
+<h2>Two wrong answers bracket the truth: any consistent estimate must land in [0.626, 0.962]</h2>
+
+<img data-src="../python_dynamic_panel_bias_bracket.png" class="r-stretch quarto-figure-center"><p class="caption">Bond’s (2002) bracket: OLS marks the ceiling, FE the floor. The shaded band is the playing field for every estimator that follows.</p><aside class="notes">
+<p>Because both bias directions are known from theory, the two wrong answers become a measuring instrument. Bond’s rule: a candidate below the band has a Nickell-like problem; above it (or beyond the unit-root line), an OLS-like problem; and — the subtle case coming in two slides — an estimate just barely inside the band, hugging an edge, is probably being dragged there by a fixable weakness. This figure is the yardstick for the rest of the talk.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="anderson-hsiao-iv-is-consistent-and-useless-1.233-with-a-ci-1.87-wide" class="slide level2 center">
+<h2>Anderson-Hsiao IV is consistent — and useless: 1.233 with a CI 1.87 wide</h2>
+<p>First-difference away <span class="math inline">\(\alpha_i\)</span>, then instrument <span class="math inline">\(\Delta n_{i,t-1}\)</span> with the level <span class="math inline">\(n_{i,t-2}\)</span>:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: center;">95% CI</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\hat\rho\)</span> (Anderson-Hsiao 2SLS)</td>
+<td style="text-align: right;"><span class="key">1.233</span></td>
+<td style="text-align: right;">0.478</td>
+<td style="text-align: center;">[0.296, 2.170]</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">The CI contains the whole bracket, the unit root, and explosive dynamics — all at once.</span></p>
+<aside class="notes">
+<p>Anderson and Hsiao (1981): differencing kills α_i without touching future shocks, but Δn_{i,t-1} and Δε_it share ε_{i,t-1}, so we instrument with n_{i,t-2} — valid under sequential exogeneity. The point estimate is above the unit root, which nobody believes; the right reading is that ONE instrument extracts far too little information from a highly persistent series. The courtroom analogy: a single admissible witness whose testimony is valid but cannot convict. The fix is not a better witness but more of them — if n_{i,t-2} is valid, so is every deeper lag.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="arellano-bond-every-lag-dated-t-2-or-earlier-is-a-valid-instrument" class="slide level2 center">
+<h2>Arellano-Bond: every lag dated <span class="math inline">\(t-2\)</span> or earlier is a valid instrument</h2>
+<p><span class="math display">\[E\big[\,n_{i,t-s}\,\Delta\varepsilon_{it}\,\big] = 0 \qquad \text{for all } s \ge 2\]</span></p>
+<p><span class="comment">Employment two or more years ago carries no information about this year’s <em>change</em> in shocks — and the same holds for lagged <span class="math inline">\(w\)</span> and <span class="math inline">\(k\)</span>. Dozens of moment conditions, combined optimally by GMM.</span></p>
+<aside class="notes">
+<p>This is difference GMM (Arellano-Bond 1991): generalize Anderson-Hsiao from one moment condition to a whole family, with the GMM weighting matrix listening more carefully to the informative ones. With T = 9 the count reaches 91 instruments. Two-step GMM re-weights using first-step residuals — more efficient, but its naive SEs are badly downward-biased, so we quote the Windmeijer (2005) correction throughout.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-command-strings-run-the-whole-gmm-ladder-in-pydynpd" class="slide level2 center">
+<h2>Two command strings run the whole GMM ladder in pydynpd</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1-4|6-9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a><span class="co"># difference GMM: lagged LEVELS instrument the differenced equation</span></span>
+<span id="cb1-2"><a href=""></a>diff <span class="op">=</span> regression.abond(</span>
+<span id="cb1-3"><a href=""></a>    <span class="st">"n L(1:1).n L(0:1).w L(0:1).k | gmm(n, 2:99) gmm(w, 2:99) "</span></span>
+<span id="cb1-4"><a href=""></a>    <span class="st">"gmm(k, 2:99) | timedumm nolevel"</span>, df, [<span class="st">"id"</span>, <span class="st">"year"</span>])</span>
+<span id="cb1-5"><a href=""></a></span>
+<span id="cb1-6"><a href=""></a><span class="co"># system GMM: drop `nolevel` (add the levels equation), collapse instruments</span></span>
+<span id="cb1-7"><a href=""></a>sys <span class="op">=</span> regression.abond(</span>
+<span id="cb1-8"><a href=""></a>    <span class="st">"n L(1:1).n L(0:1).w L(0:1).k | gmm(n, 2:99) gmm(w, 2:99) "</span></span>
+<span id="cb1-9"><a href=""></a>    <span class="st">"gmm(k, 2:99) | timedumm collapse"</span>, df, [<span class="st">"id"</span>, <span class="st">"year"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<aside class="notes">
+<p>pydynpd (Wu, Hua and Xu 2023) takes a Stata-style command string deliberately close to xtabond2 — its published output is validated against xtabond2, which the replication check in Act III exploits. The spec: n on its first lag plus current and lagged w and k; gmm(·, 2:99) declares all lags from t−2 back as GMM-style instruments; timedumm adds year dummies; nolevel = differenced equation only (difference GMM); collapse combines each lag depth into one instrument column. The OLS/FE/IV benchmarks run in pyfixest. Full script in the post.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="difference-gmm-passes-every-printed-test-and-still-gives-a-suspect-0.679" class="slide level2 center">
+<h2>Difference GMM passes every printed test — and still gives a suspect 0.679</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Two-step diff GMM</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\hat\rho\)</span> (L1.n)</td>
+<td style="text-align: right;"><span class="key">0.679</span></td>
+</tr>
+<tr class="even">
+<td>SE (Windmeijer)</td>
+<td style="text-align: right;">0.089</td>
+</tr>
+<tr class="odd">
+<td>Instruments</td>
+<td style="text-align: right;">91</td>
+</tr>
+<tr class="even">
+<td>AR(2) p</td>
+<td style="text-align: right;">0.866</td>
+</tr>
+<tr class="odd">
+<td>Hansen p</td>
+<td style="text-align: right;">0.211</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">0.679 sits 0.053 above the FE floor of 0.626 — within one SE of the biased bound.</span></p>
+<aside class="notes">
+<p>Every diagnostic passes: AR(1) rejects as it mechanically must, AR(2) is nowhere near rejecting, Hansen is comfortable. Yet Bond’s informal diagnostic fails loudly: the estimate sits in the bottom sixth of the bracket, hugging the FE bound. The mechanism: when the true series is highly persistent, the level two years ago barely predicts this year’s CHANGE — a near-random-walk changes unpredictably — so all 91 instruments are individually weak, and weak-instrument bias in this design points toward the within estimator. Blundell and Bond demonstrated precisely this failure on precisely this dataset. An estimator that passes every formal test while giving a suspect answer is the single most valuable lesson of the tutorial.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="blundell-bond-flips-the-logic-lagged-differences-instrument-the-levels" class="slide level2 center">
+<h2>Blundell-Bond flips the logic: lagged differences instrument the levels</h2>
+<p><span class="math display">\[E\big[\,\Delta n_{i,t-1}\,(\alpha_i + \varepsilon_{it})\,\big] = 0\]</span></p>
+<p><span class="comment">Even for a persistent series, last year’s <em>change</em> is informative about this year’s <em>level</em>. The price is one new assumption — <strong>mean stationarity</strong>: firms’ initial deviations from their steady states must be unrelated to <span class="math inline">\(\alpha_i\)</span>.</span></p>
+<aside class="notes">
+<p>System GMM stacks the differenced equation (keeping its Arellano-Bond instruments) with the original levels equation, instrumented by lagged differences. The lake analogy: learning a lake’s depth from ripples alone (differences) vs also using waterline marks on the shore (levels) — when the lake is calm, the ripples carry almost no information. Mean stationarity is untestable directly, but the Hansen test gets indirect bite because the levels moments are overidentifying. We also collapse instruments to 32 — safely below Roodman’s rule that instruments should not outnumber the 140 firms.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="ninety-three-percent-of-an-employment-shock-survives-into-next-year" class="slide level2 center" data-background-color="#141413">
+<h2>Ninety-three percent of an employment shock survives into next year</h2>
+<p><span class="bignum">0.927</span></p>
+<p><span class="bignum-label">system GMM, two-step, 32 collapsed instruments (SE 0.079) — inside the bracket, upper half</span></p>
+<aside class="notes">
+<p>The headline: ρ̂ = 0.927, a shock half-life of roughly nine years — 0.927^5 ≈ 0.68 of a shock still present after five years — versus the 1.5 years fixed effects would have claimed. Firm employment behaves almost like a random walk around firm-specific levels: hiring, firing, and training frictions are large. One honest caveat to say out loud: the 95% CI [0.773, 1.081] includes 1.0, so a unit root cannot be rejected — the defensible claim is the point estimate and its lower bound, not “employment is stationary.”</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-headlines-diagnostics-are-textbook-clean" class="slide level2 center">
+<h2>The headline’s diagnostics are textbook-clean</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Two-step system GMM (collapsed)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\hat\rho\)</span> (L1.n)</td>
+<td style="text-align: right;"><span class="key">0.927</span></td>
+</tr>
+<tr class="even">
+<td>SE (Windmeijer)</td>
+<td style="text-align: right;">0.079</td>
+</tr>
+<tr class="odd">
+<td>Instruments</td>
+<td style="text-align: right;">32 (vs 140 firms)</td>
+</tr>
+<tr class="even">
+<td>AR(1) p</td>
+<td style="text-align: right;">0.000 — <em>rejects, as required</em></td>
+</tr>
+<tr class="odd">
+<td>AR(2) p</td>
+<td style="text-align: right;">0.994 — <em>clean</em></td>
+</tr>
+<tr class="even">
+<td>Hansen p</td>
+<td style="text-align: right;">0.462 — <em>comfortable middle</em></td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>Wage and capital elasticities also sharpen: short-run wage elasticity −0.816 (SE 0.276), capital 0.589 (SE 0.172). Resist reporting the implied long-run wage elasticity (β1+β2)/(1−ρ) ≈ −2.5 without a warning — its denominator 1−ρ ≈ 0.073 makes it explosively fragile. But why is AR(1) rejecting “as required”? And is a bigger Hansen p always better? That’s Act III — two of these three tests are routinely read backwards.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="trust-but-verify" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>Trust, But Verify</h1>
+<p><span class="act">Act III</span></p>
+</section>
+<section id="the-diagnostics-decoder-two-of-the-three-tests-are-read-backwards" class="slide level2 center">
+<h2>The diagnostics decoder: two of the three tests are read backwards</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 30%">
+<col style="width: 40%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Test</th>
+<th>Correct reading</th>
+<th style="text-align: right;">Headline value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AR(1) in differences</td>
+<td><strong>Must reject</strong> — rejection is mechanical good news</td>
+<td style="text-align: right;">p = 0.000 ✓</td>
+</tr>
+<tr class="even">
+<td>AR(2) in differences</td>
+<td><strong>Must not reject</strong> — this validates the <span class="math inline">\(t-2\)</span> instruments</td>
+<td style="text-align: right;"><span class="key">p = 0.994</span></td>
+</tr>
+<tr class="odd">
+<td>Hansen J</td>
+<td><strong>Two-tailed in spirit</strong> — p &lt; 0.05 is invalid; p near 1 is an overwhelmed test</td>
+<td style="text-align: right;">p = 0.462 ✓</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>AR(1): differencing makes adjacent errors overlap — Δε_it and Δε_{i,t−1} share ε_{i,t−1}, like adjacent dominoes sharing an edge — so consecutive differenced errors are negatively correlated WHEN THE MODEL IS RIGHT. A beginner who sees p = 0.000 and concludes failure has it exactly backwards. AR(2) is the test that matters: if ε were serially correlated, the t−2 instruments would be contaminated — the witnesses tipped off. Hansen: reading it one-tailed is the classic trap; Roodman warns that values approaching 1.0 signal an overwhelmed test, not valid instruments. Our 0.462 with 32 instruments is comfortable — the same 0.462 with 130 instruments would be a warning.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-hansen-p-value-responds-to-the-instrument-count-not-just-validity" class="slide level2 center">
+<h2>The Hansen p-value responds to the instrument count, not just validity</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Lag window</th>
+<th>Collapsed</th>
+<th style="text-align: right;">Instruments</th>
+<th style="text-align: right;"><span class="math inline">\(\hat\rho\)</span></th>
+<th style="text-align: right;">Hansen p</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2:3</td>
+<td>no</td>
+<td style="text-align: right;">68</td>
+<td style="text-align: right;">0.956</td>
+<td style="text-align: right;"><span class="key">0.035</span></td>
+</tr>
+<tr class="even">
+<td>2:3</td>
+<td>yes</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">0.921</td>
+<td style="text-align: right;">0.096</td>
+</tr>
+<tr class="odd">
+<td>2:5</td>
+<td>no</td>
+<td style="text-align: right;">95</td>
+<td style="text-align: right;">0.935</td>
+<td style="text-align: right;">0.186</td>
+</tr>
+<tr class="even">
+<td>2:99</td>
+<td>no</td>
+<td style="text-align: right;">113</td>
+<td style="text-align: right;">0.930</td>
+<td style="text-align: right;">0.235</td>
+</tr>
+<tr class="odd">
+<td>2:99</td>
+<td>yes</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">0.927</td>
+<td style="text-align: right;">0.462</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">Same model six times; only the plumbing changes. Uncollapsed 2:3 is <em>rejected</em> (p = 0.035) while its collapsed twin <em>passes</em> — driven purely by instrument count.</span></p>
+<aside class="notes">
+<p>The experiment: re-estimate the identical system-GMM model varying only the lag window and collapsing. Reassuring: ρ̂ barely moves — all six cells in [0.921, 0.956]. Unsettling: the test we would use to DEFEND it is not stable. Reading the uncollapsed rows, the count climbs 68 → 95 → 113 (approaching the 140-firm ceiling) and Hansen drifts 0.035 → 0.186 → 0.235 mechanically. The endpoint of that trajectory is the notorious “Hansen p = 1.000” red flag. (The full grid with SEs and AR(2) is in the post; the 2:5 collapsed row, 23 instruments, p = 0.255, is omitted here for space.)</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="more-instruments-is-not-better-proliferation-disarms-the-test-that-guards-you" class="slide level2 center">
+<h2>More instruments is not better — proliferation disarms the test that guards you</h2>
+
+<img data-src="../python_dynamic_panel_instrument_proliferation.png" class="r-stretch quarto-figure-center"><p class="caption">Hansen p against instrument count: full matrix (steel) vs collapsed (teal), the p = 0.05 rejection line, and the 140-firm Roodman ceiling.</p><aside class="notes">
+<p>The teal diamonds buy nearly identical point estimates with a quarter of the instruments, at the honest price of larger standard errors — 0.0785 collapsed vs 0.0274 uncollapsed at the 2:99 window. That uncollapsed SE looks like a precision triumph, but it is too-good-to-be-true precision: 113 instruments fitted to 140 firms are partly fitting noise, and the same overfitting that flatters the SE disarms the Hansen test. The headline deliberately takes the larger, more honest SE.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-toolchain-replicates-the-published-benchmark-digit-for-digit" class="slide level2 center">
+<h2>The toolchain replicates the published benchmark digit for digit</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Published vignette</th>
+<th style="text-align: right;">Our run</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>L1.n</td>
+<td style="text-align: right;">0.2710675</td>
+<td style="text-align: right;"><span class="key">0.2710675</span></td>
+</tr>
+<tr class="even">
+<td>Hansen <span class="math inline">\(\chi^2\)</span></td>
+<td style="text-align: right;">32.666</td>
+<td style="text-align: right;">32.666</td>
+</tr>
+<tr class="odd">
+<td>Instruments</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">42</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">Exact match under a hard assertion — the NumPy-2 compatibility shim perturbs nothing.</span></p>
+<aside class="notes">
+<p>Before trusting novel output from a patched package, replicate its published benchmark: the pydynpd README’s original Arellano-Bond two-lag specification on this same data, itself validated against Stata’s xtabond2. The much lower 0.271 is NOT a contradiction of 0.927 — it is difference GMM (same weak-instrument drag as before) on a different, two-lag specification with a restricted instrument window. “The” persistence estimate is always joint with the specification and estimator. Also note AR(1) does not reject here (p = 0.198): with two lags soaking up the dynamics, even the mechanical correlation is muted — diagnostics must be read against the model, not a universal rulebook.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="seven-estimators-one-parameter-only-the-workflow-identifies-the-winner" class="slide level2 center">
+<h2>Seven estimators, one parameter — only the workflow identifies the winner</h2>
+
+<img data-src="../python_dynamic_panel_estimates_forest.png" class="r-stretch quarto-figure-center"><p class="caption">Every estimator with its 95% CI against the shaded OLS–FE bracket. Grey defines the band; blue (Anderson-Hsiao) straddles everything; orange (difference GMM) hugs the floor; teal (system GMM) lands in the upper half.</p><aside class="notes">
+<p>The tutorial in one image. Nothing on any single printed line of output separates the winner from the losers — difference GMM’s table looks as healthy as system GMM’s. Only the bracket logic, the weak-instrument reasoning, the proliferation experiment, and the replication check identify 0.927 as the defensible answer. One-step vs two-step movements (0.708→0.679; 0.903→0.927) are small — the weighting scheme refines rather than drives the answer.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="your-own-ci-includes-the-unit-root-why-believe-0.927" class="slide level2 center">
+<h2>“Your own CI includes the unit root — why believe 0.927?”</h2>
+<p><span class="objection">Objection.</span> The headline CI [0.773, 1.081] contains <span class="math inline">\(\rho = 1\)</span>, mean stationarity is untestable, and one common <span class="math inline">\(\rho\)</span> is imposed on all 140 firms.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span> All true — which is why the claim is the <em>point estimate and its lower bound</em>, never “employment is stationary.” The estimate survives the bracket check, a 6-cell proliferation grid (range 0.921–0.956), clean AR(2)/Hansen, and an exact replication — and the mean-stationarity price is stated out loud, not hidden.</p>
+<aside class="notes">
+<p>Steelman the pushback honestly: this is 1970s–80s UK manufacturing, a methods showcase rather than a current estimate; the long-run elasticities are mechanically fragile (1−ρ ≈ 0.073); GMM tests have limited power with N = 140. The defense is not that the diagnostics are perfect, but that every weakness is bounded and disclosed — which is exactly the standard the deck argues a referee should apply to ANY dynamic-panel coefficient.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-dynamic-panel-checklist-you-take-home" class="slide level2 center">
+<h2>The dynamic-panel checklist you take home</h2>
+<ul>
+<li class="fragment"><strong>Run OLS and FE first</strong> — record the bracket; they are the measuring stick</li>
+<li class="fragment"><strong>A difference-GMM estimate hugging the FE bound is a weak-instrument symptom</strong> — passing Hansen and AR(2) does not clear it</li>
+<li class="fragment"><strong>Prefer system GMM when persistence is high</strong> — and name the mean-stationarity assumption you are buying</li>
+<li class="fragment"><strong>AR(1) must reject; AR(2) must not; read Hansen two-tailed</strong></li>
+<li class="fragment"><strong>Collapse instruments and report the count</strong> relative to the number of groups</li>
+<li class="fragment"><strong>Replicate a published benchmark</strong> before trusting novel numbers</li>
+</ul>
+<aside class="notes">
+<p>The post’s seven-point checklist, compressed. Concrete payoff for a practitioner: with ρ ≈ 0.93, a one-year employment subsidy is still two-thirds visible five years later — dramatically changing any cost-benefit horizon relative to the FE story, under which the boost loses three-quarters of its effect within three years. An analyst who naively ran fixed effects on a short firm panel would be wrong by a factor of six in half-life terms.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section id="no-single-p-value-separates-0.927-from-0.679-the-bracket-plus-diagnostics-workflow-does." class="title-slide slide level1 divider center" data-background-color="#141413">
+<h1>No single p-value separates 0.927 from 0.679 — the bracket-plus-diagnostics workflow does.</h1>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

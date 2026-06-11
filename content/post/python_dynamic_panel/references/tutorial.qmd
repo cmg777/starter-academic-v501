@@ -1,75 +1,48 @@
 ---
-authors:
-  - admin
-categories:
-  - Python
-  - Panel Data
-date: "2026-06-11T00:00:00Z"
-draft: false
-featured: false
-external_link: ""
-image:
-  caption: ""
-  focal_point: Smart
-  placement: 3
-  preview_only: false
-links:
-  - icon: chalkboard-teacher
-    icon_pack: fas
-    name: "Slides (HTML)"
-    url: slides/index.html
-  - icon: file-pdf
-    icon_pack: fas
-    name: "Slides (PDF)"
-    url: https://carlos-mendez.org/post/python_dynamic_panel/slides.pdf
-  - icon: laptop-code
-    icon_pack: fas
-    name: "Web app"
-    url: web_app/index.html
-  - icon: code
-    icon_pack: fas
-    name: "Python script"
-    url: script.py
-  - icon: file-code
-    icon_pack: fas
-    name: "Quarto project (.zip)"
-    url: python_dynamic_panel.zip
-  - icon: database
-    icon_pack: fas
-    name: "Data (CSV)"
-    url: abdata.csv
-  - icon: google-colab
-    icon_pack: ai
-    name: "Google Colab"
-    url: https://colab.research.google.com/github/cmg777/starter-academic-v501/blob/master/content/post/python_dynamic_panel/notebook.ipynb
-  - icon: book
-    icon_pack: fas
-    name: "Jupyter notebook"
-    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dynamic_panel/notebook.ipynb
-  - icon: podcast
-    icon_pack: fas
-    name: AI Podcast
-    url: "/post/python_dynamic_panel/#podcast-player"
-  - icon: markdown
-    icon_pack: fab
-    name: "MD version"
-    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dynamic_panel/index.md
-slides:
-summary: How persistent is firm employment? Pooled OLS, fixed effects, Anderson-Hsiao IV, Arellano-Bond difference GMM, and Blundell-Bond system GMM on the classic 140-firm UK panel — and how the AR(2), Hansen, and instrument-collapse diagnostics separate the one defensible estimate from four seductive wrong ones.
-tags:
-  - python
-  - econometrics
-  - panel data
-  - dynamic panels
-  - gmm
 title: "Dynamic Panel Data Models in Python: From Nickell Bias to System GMM"
-url_code: ""
-url_pdf: ""
-url_slides: ""
-url_video: ""
-toc: true
-diagram: true
+subtitle: "How persistent is firm employment? From Nickell bias to system GMM"
+author: "Carlos Mendez"
+date: "2026-06-11"
+jupyter: python_dynamic_panel-tutorial
+format:
+  html:
+    theme: cosmo
+    embed-resources: true
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 150
+    include-in-header:
+      text: |
+        <style>
+          img, .cell-output-display img { max-width: 100%; height: auto; }
+        </style>
+execute:
+  warning: false
+  message: false
 ---
+
+::: {.callout-important}
+## How to render this tutorial
+
+**Easiest (one click).** From the bundle ZIP, double-click `render.command` (macOS) or `render.bat` (Windows). The wrapper runs setup and then `quarto render`, opening the result in your browser.
+
+**Manual.** From a terminal in the bundle folder:
+
+```bash
+python3 setup_env.py            # one-time: builds .venv/, registers kernel
+quarto render tutorial.qmd      # or click "Render" in Positron
+```
+
+`setup_env.py` is idempotent — re-running it later is a fast no-op. Subsequent renders are instant.
+
+**Prerequisites:** Python 3.11–3.13 and a working `quarto` install.
+
+**Windows note:** if `python3` is not on PATH, use `python setup_env.py` instead.
+:::
 
 ## Abstract
 
@@ -83,13 +56,13 @@ Think of $\rho$ as the *echo strength* of the labor market. If $\rho = 0.6$, a s
 
 Formally, we estimate the dynamic labor-demand model that Blundell and Bond (1998) used on this very dataset:
 
-$$n\_{it} = \rho n\_{i,t-1} + \beta\_1 w\_{it} + \beta\_2 w\_{i,t-1} + \beta\_3 k\_{it} + \beta\_4 k\_{i,t-1} + \alpha\_i + \delta\_t + \varepsilon\_{it}$$
+$$n_{it} = \rho n_{i,t-1} + \beta_1 w_{it} + \beta_2 w_{i,t-1} + \beta_3 k_{it} + \beta_4 k_{i,t-1} + \alpha_i + \delta_t + \varepsilon_{it}$$
 
-In words, this says: a firm's log employment this year ($n\_{it}$) equals a fraction $\rho$ of its log employment last year, plus the effects of current and lagged log real wages ($w$) and log capital ($k$), plus a permanent firm-specific level $\alpha\_i$ (the *firm fixed effect*: management quality, industry niche, plant size), plus a year effect $\delta\_t$ shared by all firms (the macro cycle), plus an idiosyncratic shock $\varepsilon\_{it}$. In the code, $n$, $w$, and $k$ are literally the columns `n`, `w`, and `k` of `abdata.csv`; $n\_{i,t-1}$ is the constructed column `n_lag1`; and $\rho$ is the coefficient the output tables label `n_lag1` or `L1.n`.
+In words, this says: a firm's log employment this year ($n_{it}$) equals a fraction $\rho$ of its log employment last year, plus the effects of current and lagged log real wages ($w$) and log capital ($k$), plus a permanent firm-specific level $\alpha_i$ (the *firm fixed effect*: management quality, industry niche, plant size), plus a year effect $\delta_t$ shared by all firms (the macro cycle), plus an idiosyncratic shock $\varepsilon_{it}$. In the code, $n$, $w$, and $k$ are literally the columns `n`, `w`, and `k` of `abdata.csv`; $n_{i,t-1}$ is the constructed column `n_lag1`; and $\rho$ is the coefficient the output tables label `n_lag1` or `L1.n`.
 
-Why is this hard? Because the model commits the one sin that ordinary panel methods cannot forgive: it puts a *lagged dependent variable* on the right-hand side while an unobserved firm effect $\alpha\_i$ sits in the error. Last year's employment $n\_{i,t-1}$ obviously depends on $\alpha\_i$ — a firm with a high permanent level had high employment last year too — so the regressor is correlated with part of the error term *by construction*, no matter how many controls we add. Pooled OLS breaks one way, fixed effects breaks the opposite way, and the resolution requires a genuinely different idea: using the panel's own history as instruments, which is what the Arellano-Bond and Blundell-Bond generalized method of moments (GMM) estimators do.
+Why is this hard? Because the model commits the one sin that ordinary panel methods cannot forgive: it puts a *lagged dependent variable* on the right-hand side while an unobserved firm effect $\alpha_i$ sits in the error. Last year's employment $n_{i,t-1}$ obviously depends on $\alpha_i$ — a firm with a high permanent level had high employment last year too — so the regressor is correlated with part of the error term *by construction*, no matter how many controls we add. Pooled OLS breaks one way, fixed effects breaks the opposite way, and the resolution requires a genuinely different idea: using the panel's own history as instruments, which is what the Arellano-Bond and Blundell-Bond generalized method of moments (GMM) estimators do.
 
-Importantly, the framing here is **descriptive and structural, not causal**: $\rho$ is a persistence parameter of a dynamic labor-demand equation — there is no treatment, and we estimate no ATE or ATT. What identification requires instead is *sequential exogeneity* of the instruments (past values of the variables must be uncorrelated with future shocks) and *no serial correlation* in $\varepsilon\_{it}$ — assumptions we can partially test with the AR(2) and Hansen diagnostics that occupy the second half of the tutorial.
+Importantly, the framing here is **descriptive and structural, not causal**: $\rho$ is a persistence parameter of a dynamic labor-demand equation — there is no treatment, and we estimate no ATE or ATT. What identification requires instead is *sequential exogeneity* of the instruments (past values of the variables must be uncorrelated with future shocks) and *no serial correlation* in $\varepsilon_{it}$ — assumptions we can partially test with the AR(2) and Hansen diagnostics that occupy the second half of the tutorial.
 
 **Learning objectives:**
 
@@ -101,7 +74,7 @@ Importantly, the framing here is **descriptive and structural, not causal**: $\r
 
 The diagram below is the roadmap: every estimator we run, why it fails or succeeds, and the order in which the tutorial visits them.
 
-```mermaid
+```{mermaid}
 flowchart TD
     A["Dynamic panel model:<br/>n_it = rho n_i,t-1 + ... + alpha_i + eps_it"]
     A --> B["Pooled OLS<br/>rho = 0.962, biased UP<br/>(L1.n absorbs alpha_i)"]
@@ -147,14 +120,14 @@ A shout in a canyon. $\rho$ is the echo strength: at $\rho = 0.6$ each echo retu
 </details>
 </div>
 
-**2. Firm fixed effect** $\alpha\_i$.
+**2. Firm fixed effect** $\alpha_i$.
 A permanent, unobserved firm-specific level. It captures management quality, technology, and market niche. It never changes over the sample. It sits in the error term unless the estimator deals with it explicitly.
 
 <div class="concept-pair">
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-In our panel, the between-firm standard deviation of log employment is 1.339 while the within-firm standard deviation is only 0.195 — a factor of seven. Firms differ enormously from each other and barely move around their own levels, so $\alpha\_i$ dominates the data. Figure 1 shows each firm orbiting its own level.
+In our panel, the between-firm standard deviation of log employment is 1.339 while the within-firm standard deviation is only 0.195 — a factor of seven. Firms differ enormously from each other and barely move around their own levels, so $\alpha_i$ dominates the data. Figure 1 shows each firm orbiting its own level.
 
 </details>
 
@@ -211,7 +184,7 @@ The identifying assumption behind dynamic-panel GMM. Past values of the variable
 <details class="concept-card concept-example">
 <summary>Example</summary>
 
-For the differenced equation, sequential exogeneity delivers the moment conditions $E[n\_{i,t-s} \Delta\varepsilon\_{it}] = 0$ for $s \ge 2$. Our AR(2) test (p = 0.994) checks the part of this that is checkable: if $\varepsilon\_{it}$ were serially correlated, the $t-2$ lags would be contaminated and the moments would fail.
+For the differenced equation, sequential exogeneity delivers the moment conditions $E[n_{i,t-s} \Delta\varepsilon_{it}] = 0$ for $s \ge 2$. Our AR(2) test (p = 0.994) checks the part of this that is checkable: if $\varepsilon_{it}$ were serially correlated, the $t-2$ lags would be contaminated and the moments would fail.
 
 </details>
 
@@ -224,7 +197,7 @@ Witnesses who left the building before the crime. Anything they saw (lags dated 
 </div>
 
 **6. Difference GMM (Arellano-Bond 1991).**
-First-difference the equation to kill $\alpha\_i$. The differenced lag is still endogenous. Instrument it with all available lagged levels, dated $t-2$ and earlier. Weight the many moment conditions optimally. This generalizes Anderson-Hsiao from one instrument to dozens.
+First-difference the equation to kill $\alpha_i$. The differenced lag is still endogenous. Instrument it with all available lagged levels, dated $t-2$ and earlier. Weight the many moment conditions optimally. This generalizes Anderson-Hsiao from one instrument to dozens.
 
 <div class="concept-pair">
 <details class="concept-card concept-example">
@@ -243,7 +216,7 @@ Replacing one courtroom witness with a panel of forty. Each extra witness adds a
 </div>
 
 **7. System GMM and mean stationarity (Blundell-Bond 1998).**
-Stack the differenced equation with the original levels equation. Instrument levels with lagged differences. This requires one extra assumption: firms' initial deviations from their steady-state paths are uncorrelated with $\alpha\_i$. The payoff is much stronger instruments when $\rho$ is large.
+Stack the differenced equation with the original levels equation. Instrument levels with lagged differences. This requires one extra assumption: firms' initial deviations from their steady-state paths are uncorrelated with $\alpha_i$. The payoff is much stronger instruments when $\rho$ is large.
 
 <div class="concept-pair">
 <details class="concept-card concept-example">
@@ -292,9 +265,43 @@ Both libraries install from PyPI. The version pin matters here, because the comp
 pip install pydynpd==0.2.2 pyfixest
 ```
 
+```{python}
+#| label: setup-packages
+
+import sys, importlib.metadata
+from pathlib import Path
+
+# Pinned versions used to produce the published numbers. The notebook's
+# .venv/ was created and populated by `setup_env.py` (see _quarto.yml
+# pre-render hook). This chunk verifies that the kernel is running inside
+# that .venv/ and that the installed versions match.
+
+PINNED = {
+    "matplotlib": "3.10.9",
+    "numpy":      "2.3.5",
+    "pandas":     "3.0.3",
+    "pydynpd":    "0.2.2",
+    "pyfixest":   "0.50.1",
+}
+
+py = Path(sys.executable).resolve()
+assert ".venv" in py.parts, (
+    f"Kernel is running outside the tutorial .venv (sys.executable={py}). "
+    "Re-render from Positron so the pre-render hook activates the venv kernel."
+)
+print(f"Python: {py}")
+
+for pkg, want in PINNED.items():
+    have = importlib.metadata.version(pkg)
+    status = "OK" if have == want else f"MISMATCH (want {want})"
+    print(f"  {pkg:18s} {have:10s}  [{status}]")
+```
+
 One practical wrinkle deserves a friendly explanation rather than a silent workaround. `pydynpd` 0.2.2 was written before NumPy 2.0, which removed the alias `np.in1d` and stopped allowing `float()` and `math.sqrt()` to be called directly on 1x1 matrices. Rather than downgrading NumPy or forking the package, we apply a six-line *compatibility shim*: restore the `np.in1d` alias, and inject tiny wrapper functions into the one `pydynpd` module that does the offending scalar conversions (`specification_tests`). Because Python module globals shadow builtins, the injected `float` and `math.sqrt` wrappers are picked up only inside that module — the rest of the session is untouched. Section 11's digit-for-digit replication of the package's published benchmark confirms the shim does not perturb any estimate.
 
-```python
+```{python}
+#| label: setup-shim
+
 import contextlib
 import io
 import math
@@ -338,7 +345,9 @@ import pyfixest as pf
 
 Next, the configuration block: the random seed (used only to pick which firms appear in Figure 1 — every estimator below is closed-form and deterministic), the site color palette, the dark-theme matplotlib settings, and two strings that define our *running specification*. `SPEC_MAIN` is the pydynpd formula for the AR(1) labor-demand model — `n` on its first lag plus current and lagged `w` and `k` — and `GMM_FULL` declares that all lags from $t-2$ back to the start of the sample (`2:99`) of `n`, `w`, and `k` are available as GMM-style instruments.
 
-```python
+```{python}
+#| label: config
+
 RANDOM_SEED = 42
 np.random.seed(RANDOM_SEED)
 
@@ -400,7 +409,9 @@ GMM_FULL = "gmm(n, 2:99) gmm(w, 2:99) gmm(k, 2:99)"
 
 Finally, two small helpers we will reuse constantly. `run_abond` wraps `pydynpd.regression.abond` — the package's single entry point, which takes a Stata-style command string, the dataframe, and the panel identifiers `["id", "year"]` — and optionally swallows the table it prints (useful in the grid experiment of Section 10, where we run six models and want a readable log). `gmm_summary` pulls the headline numbers out of a fitted model: $\hat{\rho}$ and its standard error, a 95 percent confidence interval, the Hansen and AR-test p-values, and the instrument count.
 
-```python
+```{python}
+#| label: helpers
+
 def run_abond(command_str, df, quiet=False):
     """Run pydynpd and return the first fitted model.
 
@@ -437,9 +448,19 @@ def gmm_summary(model, label):
 
 The dataset is the original Arellano and Bond (1991) panel: an unbalanced sample of UK manufacturing firms observed annually from 1976 to 1984, distributed with `pydynpd` (and with Stata, R's `plm`, and virtually every dynamic-panel teaching resource since). It is the canonical *teaching* dataset of this literature — the same data Arellano and Bond, Blundell and Bond (1998), and Roodman (2009) all used to illustrate the estimators — so every number we produce can be checked against forty years of published output. The columns we use are already in logs: `n` (employment), `w` (real wage), `k` (gross capital), and `ys` (industry output).
 
-Before estimating anything, we want three facts: how big the panel is, how unbalanced it is, and — most importantly — *where the variation lives*. The last question is answered by splitting the standard deviation of log employment into a between-firm part (how much firms differ from each other on average) and a within-firm part (how much each firm moves around its own average). That decomposition will tell us in advance how much trouble $\alpha\_i$ is going to cause.
+Before estimating anything, we want three facts: how big the panel is, how unbalanced it is, and — most importantly — *where the variation lives*. The last question is answered by splitting the standard deviation of log employment into a between-firm part (how much firms differ from each other on average) and a within-firm part (how much each firm moves around its own average). That decomposition will tell us in advance how much trouble $\alpha_i$ is going to cause.
 
-```python
+```{python}
+#| label: data-load
+
+if not DATA_PATH.exists():
+    import urllib.request
+    urllib.request.urlretrieve(
+        "https://raw.githubusercontent.com/cmg777/starter-academic-v501"
+        "/master/content/post/python_dynamic_panel/abdata.csv",
+        DATA_PATH,
+    )
+
 df = pd.read_csv(DATA_PATH)
 print(f"Dataset shape: {df.shape}")
 print(f"Firms: {df['id'].nunique()}, years: {df['year'].min()}-{df['year'].max()}")
@@ -457,37 +478,14 @@ print(f"\nBetween-firm SD of log employment: {df.groupby('id')['n'].mean().std()
 print(f"Within-firm SD of log employment:  {(df['n'] - firm_mean_n).std():.3f}")
 ```
 
-```text
-Dataset shape: (1031, 10)
-Firms: 140, years: 1976-1984
-
-Observations per firm (unbalanced panel):
-                n_firms
-years_observed
-7                   103
-8                    23
-9                    14
-
-Summary statistics (log variables used in estimation):
-              n         w         k        ys
-count  1031.000  1031.000  1031.000  1031.000
-mean      1.056     3.143    -0.442     4.638
-std       1.342     0.263     1.514     0.094
-min      -2.263     2.082    -4.431     4.465
-25%       0.166     3.027    -1.510     4.576
-50%       0.827     3.178    -0.658     4.611
-75%       1.949     3.314     0.406     4.706
-max       4.687     3.812     3.852     4.855
-
-Between-firm SD of log employment: 1.339
-Within-firm SD of log employment:  0.195
-```
-
-**Interpretation.** The panel holds 1,031 firm-year observations on 140 firms — *short and wide*: many firms (large N) observed for only 7 to 9 years each (small T). That geometry matters twice over. It is exactly the setting dynamic-panel GMM was designed for, and exactly where Nickell bias — which shrinks at rate $1/T$ — bites hardest. The panel is unbalanced (103 firms appear for 7 years, 23 for 8, 14 for all 9), which all our estimators handle natively. The decisive number is the variance decomposition: the between-firm SD of log employment (1.339) is nearly **seven times** the within-firm SD (0.195). Employment differences live almost entirely *across* firms, which means the unobserved firm level $\alpha\_i$ is the dominant feature of these data — and any estimator that mishandles it will be wrong by a lot, not a little.
+**Interpretation.** The panel holds 1,031 firm-year observations on 140 firms — *short and wide*: many firms (large N) observed for only 7 to 9 years each (small T). That geometry matters twice over. It is exactly the setting dynamic-panel GMM was designed for, and exactly where Nickell bias — which shrinks at rate $1/T$ — bites hardest. The panel is unbalanced (103 firms appear for 7 years, 23 for 8, 14 for all 9), which all our estimators handle natively. The decisive number is the variance decomposition: the between-firm SD of log employment (1.339) is nearly **seven times** the within-firm SD (0.195). Employment differences live almost entirely *across* firms, which means the unobserved firm level $\alpha_i$ is the dominant feature of these data — and any estimator that mishandles it will be wrong by a lot, not a little.
 
 A picture makes the same point more vividly. We plot the log-employment path of 40 randomly chosen firms (the only place the seed is used), the median across all 140 firms, and one example firm.
 
-```python
+```{python}
+#| label: fig-trajectories
+#| fig-cap: "Log-employment paths for 40 sample firms in steel blue, the median across all 140 firms in orange, and one example firm in teal, 1976 to 1984."
+
 rng = np.random.default_rng(RANDOM_SEED)
 sample_ids = rng.choice(df["id"].unique(), size=40, replace=False)
 
@@ -507,20 +505,18 @@ ax.set_title("Firm employment paths are persistent and parallel-ish:\n"
              "each firm orbits its own level - a firm fixed effect",
              fontsize=13)
 ax.legend(loc="upper right")
-plt.savefig(f"{SLUG}_trajectories.png", dpi=300, bbox_inches="tight",
-            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 ```
 
-![Log-employment paths for 40 sample firms in steel blue, the median across all 140 firms in orange, and one example firm in teal, 1976 to 1984.](python_dynamic_panel_trajectories.png)
-
-**Interpretation.** Each blue line is one firm, and the picture shows the two ingredients that make $\rho$ hard to estimate, simultaneously. First, the lines are roughly *parallel* and rarely cross: each firm orbits its own level, the visual signature of a large firm fixed effect $\alpha\_i$. Second, each line is *smooth*: a firm's employment this year looks a lot like last year, the visual signature of high persistence. The orange median drifts gently downward after 1980 — the early-1980s UK manufacturing recession, a common shock that the year dummies $\delta\_t$ will absorb in every model below. This figure is the "why" of the whole tutorial: an estimator that ignores $\alpha\_i$ will mistake orbit differences for persistence, and one that removes $\alpha\_i$ clumsily will damage the persistence signal it is trying to measure. Before we can demonstrate either failure, we need lags and differences.
+**Interpretation.** Each blue line is one firm, and the picture shows the two ingredients that make $\rho$ hard to estimate, simultaneously. First, the lines are roughly *parallel* and rarely cross: each firm orbits its own level, the visual signature of a large firm fixed effect $\alpha_i$. Second, each line is *smooth*: a firm's employment this year looks a lot like last year, the visual signature of high persistence. The orange median drifts gently downward after 1980 — the early-1980s UK manufacturing recession, a common shock that the year dummies $\delta_t$ will absorb in every model below. This figure is the "why" of the whole tutorial: an estimator that ignores $\alpha_i$ will mistake orbit differences for persistence, and one that removes $\alpha_i$ clumsily will damage the persistence signal it is trying to measure. Before we can demonstrate either failure, we need lags and differences.
 
 ## 4. Data preparation: lags and first differences
 
 Every estimator below runs on transformed variables: one-period lags of `n`, `w`, and `k` for the level equations, and first differences (this year minus last year, firm by firm) for the Anderson-Hsiao regression. Two details matter. The transformations must respect firm boundaries — firm 2's first year must not "inherit" a lag from firm 1's last year, which is why everything goes through `groupby("id")`. And each lag is *expensive*: it costs every firm its first observed year, because there is no earlier year to look back to.
 
-```python
+```{python}
+#| label: data-prepare
+
 d = df.sort_values(["id", "year"]).copy()
 g = d.groupby("id")
 for v in ["n", "w", "k"]:
@@ -540,28 +536,25 @@ print(f"Estimation sample after requiring one lag: {len(est_sample)} rows "
 d.to_csv("data_prepared.csv", index=False)
 ```
 
-```text
-Full panel rows: 1031
-Estimation sample after requiring one lag: 891 rows (140 firms)
-```
-
 **Interpretation.** Requiring a single lag shrinks the sample from 1,031 to 891 rows — a 13.6 percent cut — while keeping all 140 firms. This is the first lesson in dynamic-panel frugality: with T as small as 7, every additional lag or difference burns a meaningful share of the data. Watch the observation counts fall as the methods get hungrier — the GMM estimators below will run on 751 observations, and the two-lag replication specification in Section 11 on just 611. The exported `data_prepared.csv` carries every lag and difference constructed here, so all estimators run on identically built variables. We are now ready to watch the first two estimators fail — informatively.
 
 ## 5. The bias bracket: pooled OLS vs fixed effects
 
-Here is the heart of the problem, and it is worth slowing down for. We will run the *same regression* twice — log employment on its lag, wages, capital, and year dummies — changing only how it treats the firm effect $\alpha\_i$. Both treatments fail, but in *opposite, theoretically known directions*, and that is what makes the failure useful.
+Here is the heart of the problem, and it is worth slowing down for. We will run the *same regression* twice — log employment on its lag, wages, capital, and year dummies — changing only how it treats the firm effect $\alpha_i$. Both treatments fail, but in *opposite, theoretically known directions*, and that is what makes the failure useful.
 
-**Why pooled OLS is biased upward.** Pooled OLS simply ignores $\alpha\_i$, leaving it in the error term. But last year's employment $n\_{i,t-1}$ depends on $\alpha\_i$ — high-level firms had high employment last year too — so the regressor is positively correlated with the error. OLS rewards the lag for work the firm effect is doing: persistently large firms look like firms with enormous persistence, and $\hat{\rho}$ gets pushed *up* toward 1. Think of mistaking the planets' different orbits for the dynamics of a single planet.
+**Why pooled OLS is biased upward.** Pooled OLS simply ignores $\alpha_i$, leaving it in the error term. But last year's employment $n_{i,t-1}$ depends on $\alpha_i$ — high-level firms had high employment last year too — so the regressor is positively correlated with the error. OLS rewards the lag for work the firm effect is doing: persistently large firms look like firms with enormous persistence, and $\hat{\rho}$ gets pushed *up* toward 1. Think of mistaking the planets' different orbits for the dynamics of a single planet.
 
-**Why fixed effects is biased downward.** The within estimator subtracts each firm's sample average from every variable, which removes $\alpha\_i$ exactly. The trap is subtler: the firm average being subtracted is computed over the firm's *whole* observation window, so it contains the firm's *future* shocks. After demeaning, the equation looks like
+**Why fixed effects is biased downward.** The within estimator subtracts each firm's sample average from every variable, which removes $\alpha_i$ exactly. The trap is subtler: the firm average being subtracted is computed over the firm's *whole* observation window, so it contains the firm's *future* shocks. After demeaning, the equation looks like
 
-$$\tilde{n}\_{it} = \rho \tilde{n}\_{i,t-1} + \cdots + \tilde{\varepsilon}\_{it}, \qquad \tilde{\varepsilon}\_{it} = \varepsilon\_{it} - \frac{1}{T\_i}\sum\_{s=1}^{T\_i} \varepsilon\_{is}$$
+$$\tilde{n}_{it} = \rho \tilde{n}_{i,t-1} + \cdots + \tilde{\varepsilon}_{it}, \qquad \tilde{\varepsilon}_{it} = \varepsilon_{it} - \frac{1}{T_i}\sum_{s=1}^{T_i} \varepsilon_{is}$$
 
-In words, this says: every demeaned variable (the tildes) is the original minus the firm's own average, and the demeaned error at time $t$ contains a slice of *every* period's shock — including shocks dated before $t$, which also live inside the demeaned lag $\tilde{n}\_{i,t-1}$. That shared content creates a mechanical *negative* correlation between regressor and error: the Nickell (1981) bias, of order $1/T\_i$ (the code's `est_sample` has $T\_i$ between 6 and 8 after the lag). It is like grading a student against a course average that includes the exams they have not taken yet. Crucially, adding more firms does not help — only longer panels do, and ours is short.
+In words, this says: every demeaned variable (the tildes) is the original minus the firm's own average, and the demeaned error at time $t$ contains a slice of *every* period's shock — including shocks dated before $t$, which also live inside the demeaned lag $\tilde{n}_{i,t-1}$. That shared content creates a mechanical *negative* correlation between regressor and error: the Nickell (1981) bias, of order $1/T_i$ (the code's `est_sample` has $T_i$ between 6 and 8 after the lag). It is like grading a student against a course average that includes the exams they have not taken yet. Crucially, adding more firms does not help — only longer panels do, and ours is short.
 
 Two failures with known signs are a measurement instrument in their own right: Bond (2002) turned them into a diagnostic. Run both, and you get a *bracket* that any consistent estimator must land inside.
 
-```python
+```{python}
+#| label: fit-ols-fe
+
 FORMULA_RHS = "n_lag1 + w + w_lag1 + k + k_lag1"
 ols = pf.feols(f"n ~ {FORMULA_RHS} | year", data=est_sample,
                vcov={"CRV1": "id"})
@@ -581,34 +574,14 @@ print(f"  rho_FE  = {rho_fe:.4f} (se {se_fe:.4f})   <- lower bound (biased down)
 
 The [`pf.feols`](https://py-econometrics.github.io/pyfixest/reference/estimation.estimation.feols.html) call deserves a word on first use: the formula's `| year` part absorbs year fixed effects (and `| id + year` absorbs both firm and year effects) without creating dummy columns, and `vcov={"CRV1": "id"}` requests cluster-robust standard errors by firm — essential here, because each firm's observations are serially dependent by the very nature of the model.
 
-```text
-Pooled OLS (year dummies, SEs clustered by firm):
-             Estimate  Std. Error   t value  Pr(>|t|)    2.5%   97.5%
-Coefficient
-n_lag1         0.9617      0.0084  115.0717    0.0000  0.9452  0.9782
-w             -0.4147      0.1600   -2.5915    0.0106 -0.7311 -0.0983
-w_lag1         0.3556      0.1559    2.2803    0.0241  0.0473  0.6639
-k              0.3997      0.0565    7.0710    0.0000  0.2879  0.5114
-k_lag1        -0.3675      0.0565   -6.4990    0.0000 -0.4793 -0.2557
-
-Fixed effects / within (firm + year dummies, clustered SEs):
-             Estimate  Std. Error  t value  Pr(>|t|)    2.5%   97.5%
-Coefficient
-n_lag1         0.6262      0.0515  12.1510    0.0000  0.5243  0.7281
-w             -0.5035      0.1450  -3.4729    0.0007 -0.7902 -0.2169
-w_lag1         0.2308      0.1077   2.1420    0.0339  0.0178  0.4438
-k              0.4078      0.0566   7.2024    0.0000  0.2959  0.5198
-k_lag1        -0.1648      0.0547  -3.0100    0.0031 -0.2730 -0.0565
-
-  rho_OLS = 0.9617 (se 0.0084)   <- upper bound (biased up)
-  rho_FE  = 0.6262 (se 0.0515)   <- lower bound (biased down)
-```
-
 **Interpretation.** The two "wrong" estimators disagree by 0.336 — an enormous gap in economic terms. Pooled OLS says $\hat{\rho} = 0.9617$, so close to a *unit root* — the $\rho = 1$ boundary at which shocks never decay at all — that an employment shock would have a half-life of about 18 years; fixed effects says $\hat{\rho} = 0.6262$, a half-life of about 1.5 years. Same data, same regression, opposite stories about the labor market — and *neither is right*, but both errors have known sign. The bracket [0.626, 0.962] is sharply identified: the two cluster-robust confidence intervals ([0.945, 0.978] and [0.524, 0.728]) do not even overlap. Meanwhile the control variables behave sensibly in both columns — the wage elasticity is negative (about −0.41 to −0.50) and the capital elasticity positive (about 0.40) — a reminder that a regression can be perfectly reasonable about its controls while being badly biased on the one coefficient we actually care about.
 
 The bracket deserves its own picture, because it is the yardstick every later estimate will be measured against.
 
-```python
+```{python}
+#| label: fig-bias-bracket
+#| fig-cap: "Error-bar plot of the pooled OLS estimate at 0.962 and the fixed-effects estimate at 0.626 with the shaded credible bracket between them and the unit-root line at 1.0."
+
 fig, ax = plt.subplots(figsize=(9, 4.8))
 fig.patch.set_linewidth(0)
 ax.axvspan(rho_fe, rho_ols, color=GRID_LINE, alpha=0.55, zorder=0)
@@ -631,29 +604,27 @@ ax.set_yticklabels(["Pooled OLS", "Fixed effects"])
 ax.set_ylim(-0.6, 1.8)
 ax.set_xlabel(r"Estimate of employment persistence  $\hat{\rho}$  (L1.n)")
 ax.set_title("Two wrong answers that bracket the truth", fontsize=13)
-plt.savefig(f"{SLUG}_bias_bracket.png", dpi=300, bbox_inches="tight",
-            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 
 ols.tidy().reset_index().to_csv("ols_results.csv", index=False)
 fe.tidy().reset_index().to_csv("fe_results.csv", index=False)
 ```
 
-![Error-bar plot of the pooled OLS estimate at 0.962 and the fixed-effects estimate at 0.626 with the shaded credible bracket between them and the unit-root line at 1.0.](python_dynamic_panel_bias_bracket.png)
-
 **Interpretation.** The shaded band between 0.626 and 0.962 is the playing field for the rest of the tutorial. Bond's (2002) rule is simple and powerful: a candidate estimator that lands *below* the band is suffering something Nickell-like; one that lands *above* it (or beyond the unit-root line at 1.0) is suffering something OLS-like or worse; and — the subtle case we will meet in Section 7 — one that lands just barely inside the band, hugging an edge, is probably being dragged toward that edge by a fixable weakness. With the yardstick built, we can try the first estimator that is actually *consistent* for $\rho$: a clever instrumental-variables idea from 1981.
 
 ## 6. Anderson-Hsiao IV: consistent but imprecise
 
-Anderson and Hsiao (1981) proposed a two-step escape from the trap. **Step one: difference away the firm effect.** Subtracting each firm's $t-1$ equation from its $t$ equation eliminates $\alpha\_i$ exactly — no demeaning, no contamination from future shocks:
+Anderson and Hsiao (1981) proposed a two-step escape from the trap. **Step one: difference away the firm effect.** Subtracting each firm's $t-1$ equation from its $t$ equation eliminates $\alpha_i$ exactly — no demeaning, no contamination from future shocks:
 
-$$\Delta n\_{it} = \rho \Delta n\_{i,t-1} + \beta\_1 \Delta w\_{it} + \beta\_2 \Delta w\_{i,t-1} + \beta\_3 \Delta k\_{it} + \beta\_4 \Delta k\_{i,t-1} + \Delta\delta\_t + \Delta\varepsilon\_{it}$$
+$$\Delta n_{it} = \rho \Delta n_{i,t-1} + \beta_1 \Delta w_{it} + \beta_2 \Delta w_{i,t-1} + \beta_3 \Delta k_{it} + \beta_4 \Delta k_{i,t-1} + \Delta\delta_t + \Delta\varepsilon_{it}$$
 
-In words, this says: the *change* in employment depends on the lagged *change* in employment, the changes in the controls, and the change in the shock — and $\alpha\_i$, being constant, has vanished from the equation. In the code, the deltas are the constructed columns `d_n`, `d_n_lag1`, `d_w`, and so on. But differencing creates a new endogeneity problem: $\Delta n\_{i,t-1} = n\_{i,t-1} - n\_{i,t-2}$ contains $\varepsilon\_{i,t-1}$, and $\Delta\varepsilon\_{it} = \varepsilon\_{it} - \varepsilon\_{i,t-1}$ contains it too — the regressor and the error share a term again.
+In words, this says: the *change* in employment depends on the lagged *change* in employment, the changes in the controls, and the change in the shock — and $\alpha_i$, being constant, has vanished from the equation. In the code, the deltas are the constructed columns `d_n`, `d_n_lag1`, `d_w`, and so on. But differencing creates a new endogeneity problem: $\Delta n_{i,t-1} = n_{i,t-1} - n_{i,t-2}$ contains $\varepsilon_{i,t-1}$, and $\Delta\varepsilon_{it} = \varepsilon_{it} - \varepsilon_{i,t-1}$ contains it too — the regressor and the error share a term again.
 
-**Step two: instrument the differenced lag.** An *instrument* is a variable correlated with the troublesome regressor but uncorrelated with the error. The level $n\_{i,t-2}$ qualifies: it obviously helps predict the change $\Delta n\_{i,t-1}$, and — provided $\varepsilon\_{it}$ is not serially correlated — it predates and is therefore independent of both shocks inside $\Delta\varepsilon\_{it}$. This is sequential exogeneity doing its first day of work. We estimate by two-stage least squares (2SLS), which `pyfixest` expresses with a third formula part: `d_n_lag1 ~ n_lag2`.
+**Step two: instrument the differenced lag.** An *instrument* is a variable correlated with the troublesome regressor but uncorrelated with the error. The level $n_{i,t-2}$ qualifies: it obviously helps predict the change $\Delta n_{i,t-1}$, and — provided $\varepsilon_{it}$ is not serially correlated — it predates and is therefore independent of both shocks inside $\Delta\varepsilon_{it}$. This is sequential exogeneity doing its first day of work. We estimate by two-stage least squares (2SLS), which `pyfixest` expresses with a third formula part: `d_n_lag1 ~ n_lag2`.
 
-```python
+```{python}
+#| label: fit-anderson-hsiao
+
 ah_sample = d.dropna(subset=["d_n", "d_n_lag1", "d_w", "d_w_lag1",
                              "d_k", "d_k_lag1", "n_lag2"]).copy()
 ah = pf.feols("d_n ~ d_w + d_w_lag1 + d_k + d_k_lag1 | year | d_n_lag1 ~ n_lag2",
@@ -668,33 +639,21 @@ print(f"  95% CI: [{rho_ah - 1.96 * se_ah:.3f}, {rho_ah + 1.96 * se_ah:.3f}]")
 ah.tidy().reset_index().to_csv("anderson_hsiao_results.csv", index=False)
 ```
 
-```text
-Anderson-Hsiao 2SLS (differences, year dummies, clustered SEs):
-             Estimate  Std. Error  t value  Pr(>|t|)    2.5%   97.5%
-Coefficient
-d_w           -0.5243      0.2135  -2.4556    0.0153 -0.9465 -0.1021
-d_w_lag1       0.5808      0.3128   1.8566    0.0655 -0.0377  1.1992
-d_k            0.2463      0.0777   3.1693    0.0019  0.0927  0.4000
-d_k_lag1      -0.2925      0.1964  -1.4890    0.1388 -0.6808  0.0959
-d_n_lag1       1.2327      0.4782   2.5781    0.0110  0.2873  2.1781
-
-  rho_AH = 1.2327 (se 0.4782)
-  95% CI: [0.296, 2.170]
-```
-
-**Interpretation.** The point estimate is $\hat{\rho} = 1.2327$ — *above* the unit root, outside the bracket — with a standard error of 0.4782, nearly 60 times the OLS standard error. The 95 percent confidence interval [0.296, 2.170] is 1.87 units wide: it contains the entire OLS-FE bracket, the unit root, and explosive dynamics, all at once. Taken literally, the estimate says every employment shock *amplifies* over time, which nobody believes; taken correctly, it says that one instrument extracts far too little information from a highly persistent series to be useful. Anderson-Hsiao is the courtroom with a single admissible witness: the testimony is valid, but you cannot convict on it. The fix is not a *better* witness but *more* of them — and that observation is the doorway to GMM. If $n\_{i,t-2}$ is a valid instrument, then by the same logic so are $n\_{i,t-3}$, $n\_{i,t-4}$, and every deeper lag of every sequentially exogenous variable.
+**Interpretation.** The point estimate is $\hat{\rho} = 1.2327$ — *above* the unit root, outside the bracket — with a standard error of 0.4782, nearly 60 times the OLS standard error. The 95 percent confidence interval [0.296, 2.170] is 1.87 units wide: it contains the entire OLS-FE bracket, the unit root, and explosive dynamics, all at once. Taken literally, the estimate says every employment shock *amplifies* over time, which nobody believes; taken correctly, it says that one instrument extracts far too little information from a highly persistent series to be useful. Anderson-Hsiao is the courtroom with a single admissible witness: the testimony is valid, but you cannot convict on it. The fix is not a *better* witness but *more* of them — and that observation is the doorway to GMM. If $n_{i,t-2}$ is a valid instrument, then by the same logic so are $n_{i,t-3}$, $n_{i,t-4}$, and every deeper lag of every sequentially exogenous variable.
 
 ## 7. Difference GMM (Arellano-Bond 1991)
 
-Arellano and Bond's insight turns Anderson-Hsiao's single moment condition into a whole family. Under sequential exogeneity and no serial correlation in $\varepsilon\_{it}$, *every* level dated $t-2$ or earlier is uncorrelated with the differenced error:
+Arellano and Bond's insight turns Anderson-Hsiao's single moment condition into a whole family. Under sequential exogeneity and no serial correlation in $\varepsilon_{it}$, *every* level dated $t-2$ or earlier is uncorrelated with the differenced error:
 
-$$E[n\_{i,t-s} \Delta\varepsilon\_{it}] = 0 \quad \text{for all } s \ge 2$$
+$$E[n_{i,t-s} \Delta\varepsilon_{it}] = 0 \quad \text{for all } s \ge 2$$
 
 In words, this says: the firm's employment level two or more years ago carries no information about this year's *change* in shocks — so each such lag can serve as an instrument for the differenced equation. The same holds for lagged `w` and `k`. With T = 9, that is dozens of conditions (later periods have more usable lags than early ones), and the *generalized method of moments* — a framework that finds the parameter values making all these zero-correlation conditions hold as closely as possible, weighting the more informative ones more heavily — combines them optimally. The `pydynpd` command string encodes exactly this: our `SPEC_MAIN` plus `gmm(n, 2:99) gmm(w, 2:99) gmm(k, 2:99)` (use every lag from depth 2 onward), `timedumm` (add year dummies), and `nolevel` (differenced equation only — that is what makes it *difference* GMM).
 
 One estimation detail to know before reading the output: GMM comes in *one-step* and *two-step* flavors. Two-step re-weights the moment conditions using the first step's residuals, which is asymptotically more efficient, but its naive standard errors are badly downward-biased in samples like ours — so `pydynpd` reports the Windmeijer (2005) finite-sample correction, and the two-step column is the one to quote.
 
-```python
+```{python}
+#| label: fit-diff-gmm
+
 print("One-step difference GMM:")
 diff_one = run_abond(f"{SPEC_MAIN} | {GMM_FULL} | timedumm nolevel onestep", d)
 print("\nTwo-step difference GMM (Windmeijer-corrected SEs):")
@@ -709,44 +668,21 @@ print(f"  two-step: rho = {s2['rho1']:.4f} (se {s2['se']:.4f}), "
 diff_two.regression_table.to_csv("diff_gmm_results.csv", index=False)
 ```
 
-The two-step table (year-dummy rows omitted for brevity; the full table is in `execution_log.txt`):
-
-```text
- Dynamic panel-data estimation, two-step difference GMM
- Group variable: id                               Number of obs = 751
- Time variable: year                              Min obs per group: 5
- Number of instruments = 91                       Max obs per group: 7
- Number of groups = 140                           Avg obs per group: 5.36
-+-----------+------------+---------------------+------------+-----------+-----+
-|     n     |   coef.    | Corrected Std. Err. |     z      |   P>|z|   |     |
-+-----------+------------+---------------------+------------+-----------+-----+
-|    L1.n   | 0.6787867  |      0.0890781      | 7.6201324  | 0.0000000 | *** |
-|     w     | -0.7198296 |      0.1221408      | -5.8934431 | 0.0000000 | *** |
-|    L1.w   | 0.4626914  |      0.1134755      | 4.0774568  | 0.0000455 | *** |
-|     k     | 0.4539046  |      0.1275537      | 3.5585358  | 0.0003729 | *** |
-|    L1.k   | -0.1914923 |      0.1044671      | -1.8330393 | 0.0667967 |     |
-+-----------+------------+---------------------+------------+-----------+-----+
-Hansen test of overid. restrictions: chi(79) = 88.797 Prob > Chi2 = 0.211
-Arellano-Bond test for AR(1) in first differences: z = -4.46 Pr > z =0.000
-Arellano-Bond test for AR(2) in first differences: z = -0.17 Pr > z =0.866
-
-  one-step: rho = 0.7075 (se 0.0842)
-  two-step: rho = 0.6788 (se 0.0891), 91 instruments
-```
-
 **Interpretation.** The machinery works exactly as advertised — 91 instruments across 751 usable observations, a two-step estimate of $\hat{\rho} = 0.6788$ (SE 0.0891), and every printed diagnostic passes: AR(1) rejects as it mechanically must (z = −4.46, p = 0.000 — see Section 9), AR(2) is nowhere near rejecting (p = 0.866), and Hansen accepts the *overidentifying restrictions* — with 91 instruments for far fewer parameters, the extra moment conditions must all tell a mutually consistent story, and here they do ($\chi^2(79) = 88.797$, p = 0.211). And yet this estimate should *not* be trusted, for a reason no printed test reveals: it sits only 0.053 above the FE lower bound of 0.626 — within one standard error of it, in the bottom sixth of the bracket. This is Bond's (2002) informal diagnostic failing loudly. The mechanism is intuitive once seen: when the true series is highly persistent, the level two years ago barely predicts this year's *change* — a near-random-walk series changes unpredictably — so all 91 instruments are individually weak, and weak-instrument bias in this design points toward the within estimator. Blundell and Bond (1998) demonstrated precisely this failure *on precisely this dataset*. An estimator that passes every formal test while giving a suspect answer is the single most valuable lesson of this tutorial — and their fix is the next section.
 
 ## 8. System GMM (Blundell-Bond 1998): the headline model
 
-If lagged *levels* are weak instruments for *differences*, Blundell and Bond asked, what about the reverse? Lagged *differences* turn out to be strong instruments for *levels* — even for a persistent series, last year's *change* is informative about this year's *level*. System GMM therefore estimates a stacked *system* of both equations at once: the differenced equation keeps its Arellano-Bond instruments, and the original levels equation (which retains $\alpha\_i$) gets instrumented by lagged differences. The new moment conditions are
+If lagged *levels* are weak instruments for *differences*, Blundell and Bond asked, what about the reverse? Lagged *differences* turn out to be strong instruments for *levels* — even for a persistent series, last year's *change* is informative about this year's *level*. System GMM therefore estimates a stacked *system* of both equations at once: the differenced equation keeps its Arellano-Bond instruments, and the original levels equation (which retains $\alpha_i$) gets instrumented by lagged differences. The new moment conditions are
 
-$$E[\Delta n\_{i,t-1}(\alpha\_i + \varepsilon\_{it})] = 0$$
+$$E[\Delta n_{i,t-1}(\alpha_i + \varepsilon_{it})] = 0$$
 
-In words, this says: last year's employment *change* must be uncorrelated with the firm's permanent level $\alpha\_i$ (and with today's shock). That is a genuinely new assumption — *mean stationarity*: firms may sit at wildly different steady-state levels, but their initial deviations from those steady states must be unrelated to the levels themselves. Picture boats anchored at different depths along a coastline: the anchors differ (the $\alpha\_i$), but each boat bobs around its own anchor in the same way — no boat starts systematically far from its mooring. It is untestable directly, but the Hansen test gets indirect bite on it because the levels moments are overidentifying.
+In words, this says: last year's employment *change* must be uncorrelated with the firm's permanent level $\alpha_i$ (and with today's shock). That is a genuinely new assumption — *mean stationarity*: firms may sit at wildly different steady-state levels, but their initial deviations from those steady states must be unrelated to the levels themselves. Picture boats anchored at different depths along a coastline: the anchors differ (the $\alpha_i$), but each boat bobs around its own anchor in the same way — no boat starts systematically far from its mooring. It is untestable directly, but the Hansen test gets indirect bite on it because the levels moments are overidentifying.
 
 Two practical choices complete the headline specification. We use *collapsed* instruments — `pydynpd`'s `collapse` option combines each lag depth into a single instrument column instead of one column per depth-and-period combination, holding the count to 32, safely below Roodman's (2009) rule of thumb that instruments should not outnumber the 140 firms. And we again quote the two-step, Windmeijer-corrected results. Dropping `nolevel` from the command string is what switches `pydynpd` from difference to system GMM.
 
-```python
+```{python}
+#| label: fit-sys-gmm
+
 print("Two-step system GMM, collapsed instruments:")
 sys_two = run_abond(f"{SPEC_MAIN} | {GMM_FULL} | timedumm collapse", d)
 print("\nOne-step system GMM, collapsed instruments:")
@@ -761,33 +697,7 @@ print(f"  one-step: rho = {s4['rho1']:.4f} (se {s4['se']:.4f})")
 sys_two.regression_table.to_csv("sys_gmm_results.csv", index=False)
 ```
 
-The two-step table (year-dummy rows omitted; full table in `execution_log.txt`):
-
-```text
- Dynamic panel-data estimation, two-step system GMM
- Group variable: id                               Number of obs = 751
- Time variable: year                              Min obs per group: 5
- Number of instruments = 32                       Max obs per group: 7
- Number of groups = 140                           Avg obs per group: 5.36
-+-----------+------------+---------------------+------------+-----------+-----+
-|     n     |   coef.    | Corrected Std. Err. |     z      |   P>|z|   |     |
-+-----------+------------+---------------------+------------+-----------+-----+
-|    L1.n   | 0.9269913  |      0.0785085      | 11.8075341 | 0.0000000 | *** |
-|     w     | -0.8155041 |      0.2763832      | -2.9506278 | 0.0031713 |  ** |
-|    L1.w   | 0.6331152  |      0.3327639      | 1.9025958  | 0.0570933 |     |
-|     k     | 0.5894690  |      0.1715356      | 3.4364236  | 0.0005894 | *** |
-|    L1.k   | -0.4888581 |      0.1969821      | -2.4817381 | 0.0130743 |  *  |
-|    _con   | 0.6404202  |      0.4628017      | 1.3837897  | 0.1664229 |     |
-+-----------+------------+---------------------+------------+-----------+-----+
-Hansen test of overid. restrictions: chi(19) = 18.918 Prob > Chi2 = 0.462
-Arellano-Bond test for AR(1) in first differences: z = -4.49 Pr > z =0.000
-Arellano-Bond test for AR(2) in first differences: z = -0.01 Pr > z =0.994
-
-  two-step: rho = 0.9270 (se 0.0785), 32 instruments
-  one-step: rho = 0.9025 (se 0.0634)
-```
-
-**Interpretation.** This is the headline of the tutorial: $\hat{\rho} = 0.9270$ (SE 0.0785) — inside the bracket, in its upper half, 0.25 above the weak-instrument difference-GMM estimate, with 32 collapsed instruments and textbook diagnostics: AR(1) rejects mechanically (p = 0.000, as it should), AR(2) is immaculate (z = −0.01, p = 0.994), and Hansen sits at p = 0.462, comfortably away from both the 0.05 rejection region and the p-near-1 overfitting flag. Substantively, about 93 percent of an employment shock survives into the next year — a shock half-life of roughly nine years ($0.927^5 \approx 0.68$ still present after five) — versus the 1.5 years fixed effects would have claimed. One honest caveat belongs right next to the headline: the 95 percent CI [0.773, 1.081] includes 1.0, so a unit root cannot be rejected at the 5 percent level; the defensible claim is the point estimate and its lower bound, not "employment is stationary." The factor demands also sharpen: the short-run wage elasticity is −0.8155 (SE 0.2764) and the capital elasticity 0.5895 (SE 0.1715). Resist the temptation to report the implied long-run wage elasticity $(\beta\_1 + \beta\_2)/(1 - \rho) \approx -2.5$ without a warning — its denominator $1 - \rho \approx 0.073$ makes it explosively fragile to tiny changes in $\hat{\rho}$.
+**Interpretation.** This is the headline of the tutorial: $\hat{\rho} = 0.9270$ (SE 0.0785) — inside the bracket, in its upper half, 0.25 above the weak-instrument difference-GMM estimate, with 32 collapsed instruments and textbook diagnostics: AR(1) rejects mechanically (p = 0.000, as it should), AR(2) is immaculate (z = −0.01, p = 0.994), and Hansen sits at p = 0.462, comfortably away from both the 0.05 rejection region and the p-near-1 overfitting flag. Substantively, about 93 percent of an employment shock survives into the next year — a shock half-life of roughly nine years ($0.927^5 \approx 0.68$ still present after five) — versus the 1.5 years fixed effects would have claimed. One honest caveat belongs right next to the headline: the 95 percent CI [0.773, 1.081] includes 1.0, so a unit root cannot be rejected at the 5 percent level; the defensible claim is the point estimate and its lower bound, not "employment is stationary." The factor demands also sharpen: the short-run wage elasticity is −0.8155 (SE 0.2764) and the capital elasticity 0.5895 (SE 0.1715). Resist the temptation to report the implied long-run wage elasticity $(\beta_1 + \beta_2)/(1 - \rho) \approx -2.5$ without a warning — its denominator $1 - \rho \approx 0.073$ makes it explosively fragile to tiny changes in $\hat{\rho}$.
 
 We have leaned on the phrases "AR(2) clean" and "Hansen comfortable" several times now. Before stress-testing the headline, let us make the diagnostic logic itself explicit — because two of the three tests are routinely read backwards.
 
@@ -797,13 +707,13 @@ Every dynamic-panel GMM table ends with the same three tests, and each has a non
 
 | Test | What it checks | Correct reading | Our headline value |
 |---|---|---|---|
-| AR(1) in differences | First-order serial correlation in $\Delta\varepsilon\_{it}$ | **Must reject.** Rejection is mechanical and *good news* | z = −4.49, p = 0.000 — rejects, as required |
-| AR(2) in differences | Second-order serial correlation in $\Delta\varepsilon\_{it}$, which would mean $\varepsilon\_{it}$ itself is AR(1) | **Must not reject.** This is the test that validates the $t-2$ instruments | z = −0.01, p = 0.994 — clean |
+| AR(1) in differences | First-order serial correlation in $\Delta\varepsilon_{it}$ | **Must reject.** Rejection is mechanical and *good news* | z = −4.49, p = 0.000 — rejects, as required |
+| AR(2) in differences | Second-order serial correlation in $\Delta\varepsilon_{it}$, which would mean $\varepsilon_{it}$ itself is AR(1) | **Must not reject.** This is the test that validates the $t-2$ instruments | z = −0.01, p = 0.994 — clean |
 | Hansen J | Joint validity of the overidentifying restrictions | **Two-tailed in spirit.** p < 0.05 means instruments look invalid; p near 1 means the test has been overwhelmed by too many instruments | p = 0.462 — comfortable on both sides |
 
-**Why AR(1) must reject.** Differencing makes adjacent errors overlap: $\Delta\varepsilon\_{it} = \varepsilon\_{it} - \varepsilon\_{i,t-1}$ and $\Delta\varepsilon\_{i,t-1} = \varepsilon\_{i,t-1} - \varepsilon\_{i,t-2}$ share the term $\varepsilon\_{i,t-1}$ — like adjacent dominoes sharing an edge — so consecutive differenced errors are negatively correlated *when the model is right*. A beginner who sees "AR(1): p = 0.000" and concludes the model failed has it exactly backwards; it is the *absence* of AR(1) rejection that should raise eyebrows (as in our Section 11 replication, where the two-lag specification has already absorbed the dependence, AR(1) p = 0.198).
+**Why AR(1) must reject.** Differencing makes adjacent errors overlap: $\Delta\varepsilon_{it} = \varepsilon_{it} - \varepsilon_{i,t-1}$ and $\Delta\varepsilon_{i,t-1} = \varepsilon_{i,t-1} - \varepsilon_{i,t-2}$ share the term $\varepsilon_{i,t-1}$ — like adjacent dominoes sharing an edge — so consecutive differenced errors are negatively correlated *when the model is right*. A beginner who sees "AR(1): p = 0.000" and concludes the model failed has it exactly backwards; it is the *absence* of AR(1) rejection that should raise eyebrows (as in our Section 11 replication, where the two-lag specification has already absorbed the dependence, AR(1) p = 0.198).
 
-**Why AR(2) is the one that matters.** If $\varepsilon\_{it}$ were serially correlated, then $n\_{i,t-2}$ would contain $\varepsilon\_{i,t-2}$-flavored information that also lives in $\Delta\varepsilon\_{i,t-1}$ — the witnesses would have been tipped off, and the entire instrument set would be invalid. AR(2) in differences is precisely the test for that contamination. Our p = 0.994 could hardly be cleaner.
+**Why AR(2) is the one that matters.** If $\varepsilon_{it}$ were serially correlated, then $n_{i,t-2}$ would contain $\varepsilon_{i,t-2}$-flavored information that also lives in $\Delta\varepsilon_{i,t-1}$ — the witnesses would have been tipped off, and the entire instrument set would be invalid. AR(2) in differences is precisely the test for that contamination. Our p = 0.994 could hardly be cleaner.
 
 **Why a big Hansen p-value is not automatically good news.** The Hansen J test asks whether the 32 moment conditions are mutually consistent. Reading it one-tailed ("bigger p is better") is the classic trap: as Section 10 demonstrates *experimentally*, piling on instruments inflates the p-value mechanically, with the notorious "Hansen p = 1.000" as the terminal symptom of an overfitted, powerless test. Roodman (2009) warns that implausibly high values approaching 1.0 signal an overwhelmed test rather than valid instruments. Our 0.462 with only 32 collapsed instruments (against 140 firms) is in the comfortable middle — but the same 0.462 with 130 instruments would be a warning, not a pass.
 
@@ -813,7 +723,9 @@ That last claim — that the Hansen p-value responds to the instrument *count*, 
 
 We re-estimate the *identical* system-GMM model six times, varying only two plumbing choices: the lag window (`2:3` = use lags 2 and 3 only; `2:5`; `2:99` = use everything) and whether the instrument matrix is collapsed. If the Hansen test were a pure validity meter, its p-value would be roughly stable across these cells. It is not.
 
-```python
+```{python}
+#| label: proliferation-grid
+
 grid_specs = [
     ("2:3", False), ("2:3", True),
     ("2:5", False), ("2:5", True),
@@ -837,15 +749,6 @@ grid = pd.DataFrame(grid_rows)
 grid.to_csv("proliferation_grid.csv", index=False)
 ```
 
-```text
-  lags 2:3   collapse=False ->  68 instruments, rho = 0.956, Hansen p = 0.035
-  lags 2:3   collapse=True  ->  17 instruments, rho = 0.921, Hansen p = 0.096
-  lags 2:5   collapse=False ->  95 instruments, rho = 0.935, Hansen p = 0.186
-  lags 2:5   collapse=True  ->  23 instruments, rho = 0.937, Hansen p = 0.255
-  lags 2:99  collapse=False -> 113 instruments, rho = 0.930, Hansen p = 0.235
-  lags 2:99  collapse=True  ->  32 instruments, rho = 0.927, Hansen p = 0.462
-```
-
 The full grid, with standard errors and AR(2) p-values from `proliferation_grid.csv`:
 
 | Lag window | Collapsed | Instruments | $\hat{\rho}$ | SE | Hansen p | AR(2) p |
@@ -861,7 +764,10 @@ The full grid, with standard errors and AR(2) p-values from `proliferation_grid.
 
 The grid deserves its own picture: instrument count on the x-axis, Hansen p-value on the y-axis, full-matrix and collapsed specifications as two marker series.
 
-```python
+```{python}
+#| label: fig-instrument-proliferation
+#| fig-cap: "Scatter of Hansen p-value against instrument count for six system-GMM specifications, full matrix versus collapsed, with the 0.05 rejection line and the 140-firm ceiling marked."
+
 fig, ax = plt.subplots(figsize=(9, 5.5))
 fig.patch.set_linewidth(0)
 for collapsed, col, marker, lab in [(False, STEEL_BLUE, "o", "Full instrument matrix"),
@@ -885,13 +791,8 @@ ax.set_ylabel("Hansen test p-value")
 ax.set_ylim(-0.06, 1.0)
 ax.set_title("Instrument proliferation: more is not better", fontsize=13)
 ax.legend(loc="upper left")
-plt.savefig(f"{SLUG}_instrument_proliferation.png", dpi=300,
-            bbox_inches="tight", facecolor=DARK_NAVY, edgecolor=DARK_NAVY,
-            pad_inches=0)
 plt.show()
 ```
-
-![Scatter of Hansen p-value against instrument count for six system-GMM specifications, full matrix versus collapsed, with the 0.05 rejection line and the 140-firm ceiling marked.](python_dynamic_panel_instrument_proliferation.png)
 
 **Interpretation.** The figure makes the trade visible: the teal diamonds (collapsed) buy nearly identical point estimates with a quarter of the instruments, at the honest price of larger standard errors — 0.0785 collapsed versus 0.0274 uncollapsed at the 2:99 window. That uncollapsed SE looks like a precision triumph, but it is precisely the too-good-to-be-true precision Roodman warns about: 113 instruments fitted to 140 firms are partly fitting noise, and the same overfitting that flatters the SE is what disarms the Hansen test. Our headline deliberately takes the larger, more honest standard error. One robustness layer remains: proving that the *software itself* computes what it claims, by replicating a published benchmark exactly.
 
@@ -899,7 +800,9 @@ plt.show()
 
 Good practice with any estimation package — especially one we patched with a compatibility shim — is to replicate its published benchmark before trusting novel output. The `pydynpd` README estimates the *original* Arellano-Bond (1991) two-lag specification on this same dataset: two lags of `n` on the right-hand side, a restricted instrument window `gmm(n, 2:4)`, wages treated as predetermined (correlated with past shocks but not the current one) with `gmm(w, 1:3)`, capital as a standard exogenous instrument `iv(k)`, and difference GMM (`nolevel`). The package authors validated that output against Stata's `xtabond2`. Note this is a *different model* from our running specification — the point here is toolchain verification, not a second opinion on $\rho$. The script enforces the match with a hard assertion that would abort the run on any discrepancy.
 
-```python
+```{python}
+#| label: fit-replication
+
 ab_repl = run_abond(
     "n L(1:2).n w k | gmm(n, 2:4) gmm(w, 1:3) iv(k) | timedumm nolevel", d)
 rt = ab_repl.regression_table
@@ -917,33 +820,15 @@ if not match:
 ab_repl.regression_table.to_csv("ab_replication_results.csv", index=False)
 ```
 
-```text
- Dynamic panel-data estimation, two-step difference GMM
- Group variable: id                               Number of obs = 611
- Number of instruments = 42                       Number of groups = 140
-+-----------+------------+---------------------+------------+-----------+-----+
-|    L1.n   | 0.2710675  |      0.1382542      | 1.9606462  | 0.0499203 |  *  |
-|    L2.n   | -0.0233928 |      0.0419665      | -0.5574151 | 0.5772439 |     |
-|     w     | -0.5668527 |      0.2092231      | -2.7093219 | 0.0067421 |  ** |
-|     k     | 0.3613939  |      0.0662624      | 5.4539824  | 0.0000000 | *** |
-+-----------+------------+---------------------+------------+-----------+-----+
-Hansen test of overid. restrictions: chi(32) = 32.666 Prob > Chi2 = 0.434
-Arellano-Bond test for AR(1) in first differences: z = -1.29 Pr > z =0.198
-Arellano-Bond test for AR(2) in first differences: z = -0.31 Pr > z =0.760
-
-  Published vignette values: L1.n = 0.2710675, Hansen chi2 = 32.666,
-  42 instruments.
-  Our run:                   L1.n = 0.2710675, Hansen chi2 = 32.666, 42 instruments.
-  Exact match: True
-```
-
 **Interpretation.** The replication is exact to all printed digits: `L1.n` = 0.2710675, Hansen $\chi^2(32)$ = 32.666 (p = 0.434), 42 instruments, 611 observations — `Exact match: True` under the hard assertion. This verifies the entire toolchain, NumPy-2 shim included, against the package's own benchmark (itself validated against `xtabond2`). Two teaching points hide in the output. First, the much lower persistence coefficient here (0.271) is *not* a contradiction of our headline 0.927: this is difference GMM — subject to the same weak-instrument drag we diagnosed in Section 7 — on a two-lag dynamic specification with a restricted instrument window. "The" persistence estimate is always joint with the specification and estimator that produced it. Second, notice AR(1) here does *not* reject (p = 0.198): with two lags of `n` soaking up the dynamics, even the mechanical differencing correlation is muted — another reminder that diagnostic values must be read against the model, not against a universal rulebook. Time to put all seven estimates on one axis.
 
 ## 12. Synthesis: seven estimators, one parameter
 
 Each section produced a number; the story only snaps into focus when they share an axis. We assemble the summary table and draw the forest plot that the whole tutorial has been building toward.
 
-```python
+```{python}
+#| label: synthesis-table
+
 summary_rows = [
     {"estimator": "Pooled OLS", "rho1": rho_ols, "se": se_ols,
      "ci_lo": rho_ols - 1.96 * se_ols, "ci_hi": rho_ols + 1.96 * se_ols,
@@ -964,22 +849,14 @@ print(summary.round(4).to_string(index=False))
 summary.to_csv("estimates_summary.csv", index=False)
 ```
 
-```text
-                    estimator   rho1     se  ci_lo  ci_hi  hansen_p  ar1_p  ar2_p  n_instruments
-                   Pooled OLS 0.9617 0.0084 0.9453 0.9781       NaN    NaN    NaN            NaN
-                Fixed effects 0.6262 0.0515 0.5252 0.7272       NaN    NaN    NaN            NaN
-            Anderson-Hsiao IV 1.2327 0.4782 0.2955 2.1699       NaN    NaN    NaN            1.0
-          Diff GMM (one-step) 0.7075 0.0842 0.5425 0.8725    0.2113    0.0 0.8913           91.0
-          Diff GMM (two-step) 0.6788 0.0891 0.5042 0.8534    0.2113    0.0 0.8660           91.0
-Sys GMM (one-step, collapsed) 0.9025 0.0634 0.7781 1.0268    0.4621    0.0 0.9492           32.0
-Sys GMM (two-step, collapsed) 0.9270 0.0785 0.7731 1.0809    0.4621    0.0 0.9944           32.0
-```
-
 **Interpretation.** Read as a single table, the ladder is unambiguous. The two naive estimators (0.9617 and 0.6262) define the bracket. Anderson-Hsiao (1.2327) is the only estimator *outside* it, with a confidence interval wider than everyone else's put together. The two difference-GMM rows (0.7075 and 0.6788) sit in the bracket's bottom sixth with 91 instruments each — formally admissible, substantively suspect. The two system-GMM rows (0.9025 and 0.9270) sit in the upper half with 32 collapsed instruments, the cleanest AR(2) values in the table (0.9492 and 0.9944), and Hansen p-values in the comfortable middle (0.4621). The one-step versus two-step movements (0.7075 to 0.6788; 0.9025 to 0.9270) are visible but small — a useful sanity check that the weighting scheme refines rather than drives the answer.
 
 The forest plot turns that table into the tutorial's closing image: every estimator on one axis, each with its 95 percent confidence interval, against the shaded OLS—FE bracket.
 
-```python
+```{python}
+#| label: fig-estimates-forest
+#| fig-cap: "Forest plot of the persistence estimate with 95 percent confidence intervals for all seven estimators, with the OLS-FE bracket shaded and the unit-root line dashed."
+
 order = ["Pooled OLS", "Fixed effects", "Anderson-Hsiao IV",
          "Diff GMM (one-step)", "Diff GMM (two-step)",
          "Sys GMM (one-step, collapsed)", "Sys GMM (two-step, collapsed)"]
@@ -1011,12 +888,8 @@ ax.set_ylim(-1.1, len(plot_df) - 0.4)
 ax.set_title("Seven estimators, one parameter:\n"
              "system GMM lands inside the bracket with tight precision",
              fontsize=13)
-plt.savefig(f"{SLUG}_estimates_forest.png", dpi=300, bbox_inches="tight",
-            facecolor=DARK_NAVY, edgecolor=DARK_NAVY, pad_inches=0)
 plt.show()
 ```
-
-![Forest plot of the persistence estimate with 95 percent confidence intervals for all seven estimators, with the OLS-FE bracket shaded and the unit-root line dashed.](python_dynamic_panel_estimates_forest.png)
 
 **Interpretation.** The forest plot is the tutorial in one image. The grey markers (OLS at 0.962, FE at 0.626) define the shaded credible band. Anderson-Hsiao's enormous blue whisker — confidence interval width 1.87 — straddles everything, including the dashed unit-root line. The orange difference-GMM pair sits at the bottom of the band, hugging the FE bound exactly as Bond's diagnostic predicts under weak instruments. And the teal system-GMM pair (0.902 and 0.927) lands in the upper half of the band with usable precision. Notice what separates the winner from the losers: *nothing on any single printed line of output*. Difference GMM's table looks as healthy as system GMM's. Only the bracket logic, the weak-instrument reasoning, the proliferation experiment, and the replication check — the workflow, not a p-value — identify 0.927 as the defensible answer.
 
@@ -1028,7 +901,7 @@ Return to the question the Overview posed: *how persistent is firm employment?* 
 
 For your own work, the tutorial compresses into a checklist:
 
-1. **Run pooled OLS and fixed effects first** and record the bracket $[\hat{\rho}\_{FE}, \hat{\rho}\_{OLS}]$. They are not throwaway regressions; they are your measuring stick (here: [0.626, 0.962]).
+1. **Run pooled OLS and fixed effects first** and record the bracket $[\hat{\rho}_{FE}, \hat{\rho}_{OLS}]$. They are not throwaway regressions; they are your measuring stick (here: [0.626, 0.962]).
 2. **Treat a difference-GMM estimate near the FE bound as a weak-instrument symptom** (ours: 0.679, within one SE of 0.626), especially when the series is persistent. Passing Hansen and AR(2) does not clear it.
 3. **Prefer system GMM when persistence is high** — but say out loud that you are buying identification with the mean-stationarity assumption, and check that the estimate lands inside the bracket (ours: 0.927).
 4. **Read AR(1) as "must reject," AR(2) as "must not reject."** AR(2) is the test that protects your instruments (ours: p = 0.994).
@@ -1042,7 +915,7 @@ The remaining caveats are the agenda for the next post — and the summary below
 
 **Takeaways:**
 
-- **Method.** A lagged dependent variable plus a fixed effect defeats both workhorses in opposite directions: pooled OLS overstated persistence by loading $\alpha\_i$ onto the lag ($\hat{\rho} = 0.962$), and the within estimator understated it through Nickell bias ($\hat{\rho} = 0.626$, with $T \approx 7$—$9$). Their disagreement — 0.336 — is not noise; it is a diagnostic bracket.
+- **Method.** A lagged dependent variable plus a fixed effect defeats both workhorses in opposite directions: pooled OLS overstated persistence by loading $\alpha_i$ onto the lag ($\hat{\rho} = 0.962$), and the within estimator understated it through Nickell bias ($\hat{\rho} = 0.626$, with $T \approx 7$—$9$). Their disagreement — 0.336 — is not noise; it is a diagnostic bracket.
 - **Method.** Consistency is not enough: Anderson-Hsiao IV is consistent yet returned 1.233 with a CI of width 1.87, and difference GMM passed every printed test (Hansen p = 0.211, AR(2) p = 0.866) while hugging the biased FE bound at 0.679. The defensible estimate — system GMM's 0.927 (SE 0.079), AR(2) p = 0.994, Hansen p = 0.462, 32 collapsed instruments — was identified by the workflow, not by any single statistic.
 - **Data.** The panel's variance is lopsided: between-firm SD of log employment (1.339) is seven times the within-firm SD (0.195), and each lag burned data (1,031 rows down to 891, then 751, then 611 across specifications). Short-and-wide panels are simultaneously where dynamic GMM is needed and where it is data-hungriest.
 - **Limitation.** The headline CI [0.773, 1.081] includes the unit root, so "employment is stationary" is not a defensible claim — only the point estimate and its lower bound are. The model also imposes one common $\rho$ on all 140 firms, assumes mean stationarity (untestable directly), and describes 1970s—80s UK manufacturing — a methods showcase, not a current estimate of employment dynamics.
@@ -1054,7 +927,7 @@ If you can explain to a colleague why difference GMM's clean-looking table shoul
 
 ## 15. Exercises
 
-1. **Move the bracket.** Re-estimate the pooled OLS and FE models dropping the lagged controls (`w_lag1`, `k_lag1`) from `FORMULA_RHS`. Does the bracket $[\hat{\rho}\_{FE}, \hat{\rho}\_{OLS}]$ shift? Does the system-GMM estimate (re-run with the corresponding `SPEC_MAIN`) stay inside it?
+1. **Move the bracket.** Re-estimate the pooled OLS and FE models dropping the lagged controls (`w_lag1`, `k_lag1`) from `FORMULA_RHS`. Does the bracket $[\hat{\rho}_{FE}, \hat{\rho}_{OLS}]$ shift? Does the system-GMM estimate (re-run with the corresponding `SPEC_MAIN`) stay inside it?
 2. **Stress the proliferation grid.** Extend `grid_specs` with windows `2:4` and `2:7`, collapsed and uncollapsed. Plot the new points onto Figure 3's axes. Does the uncollapsed Hansen p-value continue its mechanical drift? Find the smallest uncollapsed window that Hansen rejects.
 3. **Predetermined wages.** Our running specification treats `w` like `n` (instruments from $t-2$). Following the replication example's `gmm(w, 1:3)`, re-run system GMM treating wages as *predetermined* (instruments from $t-1$). Define in one sentence what predetermined means here, and report how $\hat{\rho}$, AR(2), and Hansen change.
 
@@ -1071,433 +944,8 @@ If you can explain to a colleague why difference GMM's clean-looking table shoul
 9. [pydynpd — GitHub repository and documentation (includes the Arellano-Bond dataset and the replication benchmark)](https://github.com/dazhwu/pydynpd)
 10. [pyfixest — Documentation](https://py-econometrics.github.io/pyfixest/pyfixest.html)
 
----
+## Source files
 
-<style>
-.podcast-overlay {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-  animation: podSlideUp 0.35s ease-out;
-}
-@keyframes podSlideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-.podcast-overlay.pod-closing {
-  animation: podSlideDown 0.3s ease-in forwards;
-}
-@keyframes podSlideDown {
-  from { transform: translateY(0); }
-  to { transform: translateY(100%); }
-}
-.podcast-container {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  padding: 18px 24px 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  box-shadow: 0 -4px 32px rgba(0,0,0,0.5);
-  border-top: 1px solid rgba(106,155,204,0.2);
-}
-.podcast-inner {
-  max-width: 800px;
-  margin: 0 auto;
-}
-.podcast-top-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-.podcast-icon {
-  width: 42px;
-  height: 42px;
-  background: linear-gradient(135deg, #d97757, #e8956a);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.podcast-icon svg {
-  width: 22px;
-  height: 22px;
-  fill: #fff;
-}
-.podcast-title-block {
-  flex: 1;
-  min-width: 0;
-}
-.podcast-title-block h4 {
-  margin: 0 0 1px 0;
-  color: #f0ece2;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.podcast-title-block span {
-  color: #8b9dc3;
-  font-size: 11px;
-}
-.podcast-close-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-  flex-shrink: 0;
-}
-.podcast-close-btn:hover {
-  background: rgba(255,255,255,0.1);
-}
-.podcast-close-btn svg {
-  width: 20px;
-  height: 20px;
-  fill: #8b9dc3;
-}
-.podcast-progress-wrap {
-  margin-bottom: 12px;
-}
-.podcast-time-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #8b9dc3;
-  margin-bottom: 5px;
-  font-variant-numeric: tabular-nums;
-}
-.podcast-bar-bg {
-  width: 100%;
-  height: 6px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 3px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: height 0.15s;
-}
-.podcast-bar-buffered {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: rgba(106,155,204,0.25);
-  border-radius: 3px;
-  transition: width 0.3s;
-}
-.podcast-bar-progress {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: linear-gradient(90deg, #6a9bcc, #00d4c8);
-  border-radius: 3px;
-  transition: width 0.1s linear;
-}
-.podcast-bar-bg:hover {
-  height: 10px;
-  margin-top: -2px;
-}
-.podcast-controls-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.podcast-transport {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.podcast-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s;
-}
-.podcast-btn svg {
-  fill: #c8d0e0;
-  transition: fill 0.2s;
-}
-.podcast-btn:hover svg {
-  fill: #f0ece2;
-}
-.podcast-btn-skip {
-  position: relative;
-}
-.podcast-btn-skip span {
-  position: absolute;
-  font-size: 7px;
-  font-weight: 700;
-  color: #c8d0e0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  margin-top: 1px;
-}
-.podcast-btn-play {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #d97757, #e8956a);
-  border-radius: 50%;
-  box-shadow: 0 3px 12px rgba(217,119,87,0.4);
-  transition: all 0.2s;
-}
-.podcast-btn-play:hover {
-  transform: scale(1.08);
-  box-shadow: 0 5px 20px rgba(217,119,87,0.5);
-}
-.podcast-btn-play svg {
-  fill: #fff;
-  width: 22px;
-  height: 22px;
-}
-.podcast-extras {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.podcast-volume-wrap {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.podcast-volume-wrap svg {
-  fill: #8b9dc3;
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.podcast-volume-wrap svg:hover {
-  fill: #c8d0e0;
-}
-.podcast-volume-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 60px;
-  height: 4px;
-  background: rgba(255,255,255,0.12);
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-}
-.podcast-volume-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  background: #6a9bcc;
-  border-radius: 50%;
-  cursor: pointer;
-}
-.podcast-speed-btn {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: #c8d0e0;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-  min-width: 40px;
-  text-align: center;
-}
-.podcast-speed-btn:hover {
-  background: rgba(106,155,204,0.2);
-  border-color: #6a9bcc;
-  color: #f0ece2;
-}
-.podcast-download-btn {
-  background: none;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
-  padding: 4px 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: #8b9dc3;
-  font-size: 11px;
-  font-family: inherit;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-.podcast-download-btn:hover {
-  border-color: #6a9bcc;
-  color: #f0ece2;
-  background: rgba(106,155,204,0.1);
-}
-.podcast-download-btn svg {
-  width: 14px;
-  height: 14px;
-  fill: currentColor;
-}
-@media (max-width: 600px) {
-  .podcast-container { padding: 14px 16px 16px; }
-  .podcast-volume-wrap { display: none; }
-  .podcast-title-block h4 { font-size: 13px; }
-  .podcast-extras { gap: 8px; }
-}
-</style>
-
-<div class="podcast-overlay" id="podOverlay">
-<div class="podcast-container">
-<div class="podcast-inner">
-  <audio id="podAudio" preload="none" src="https://files.catbox.moe/6h3ivr.m4a"></audio>
-
-  <div class="podcast-top-row">
-    <div class="podcast-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 1a5 5 0 0 0-5 5v4a5 5 0 0 0 10 0V6a5 5 0 0 0-5-5zm0 16a7 7 0 0 1-7-7H3a9 9 0 0 0 8 8.94V22h2v-3.06A9 9 0 0 0 21 10h-2a7 7 0 0 1-7 7z"/></svg>
-    </div>
-    <div class="podcast-title-block">
-      <h4>AI Podcast: Dynamic Panel Data Models</h4>
-      <span id="podDurationLabel">Click play to load</span>
-    </div>
-    <button class="podcast-close-btn" onclick="podClose()" title="Close player">
-      <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-    </button>
-  </div>
-
-  <div class="podcast-progress-wrap">
-    <div class="podcast-time-row">
-      <span id="podCurrent">0:00</span>
-      <span id="podDuration">0:00</span>
-    </div>
-    <div class="podcast-bar-bg" id="podBarBg" onclick="podSeek(event)">
-      <div class="podcast-bar-buffered" id="podBuffered"></div>
-      <div class="podcast-bar-progress" id="podProgress"></div>
-    </div>
-  </div>
-
-  <div class="podcast-controls-row">
-    <div class="podcast-transport">
-      <button class="podcast-btn podcast-btn-skip" onclick="podSkip(-15)" title="Back 15s">
-        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-        <span>15</span>
-      </button>
-      <button class="podcast-btn podcast-btn-play" id="podPlayBtn" onclick="podToggle()" title="Play">
-        <svg id="podIconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        <svg id="podIconPause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-      </button>
-      <button class="podcast-btn podcast-btn-skip" onclick="podSkip(15)" title="Forward 15s">
-        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg>
-        <span>15</span>
-      </button>
-    </div>
-    <div class="podcast-extras">
-      <div class="podcast-volume-wrap">
-        <svg id="podVolIcon" onclick="podMute()" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8.5v7a4.47 4.47 0 0 0 2.5-3.5zM14 3.23v2.06a6.51 6.51 0 0 1 0 13.42v2.06A8.51 8.51 0 0 0 14 3.23z"/></svg>
-        <input type="range" class="podcast-volume-slider" id="podVolume" min="0" max="1" step="0.05" value="0.8">
-      </div>
-      <button class="podcast-speed-btn" id="podSpeedBtn" onclick="podCycleSpeed()" title="Playback speed">1x</button>
-      <a class="podcast-download-btn" href="https://files.catbox.moe/6h3ivr.m4a" target="_blank" rel="noopener" title="Stream">
-        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      </a>
-    </div>
-  </div>
-</div>
-</div>
-</div>
-
-<script>
-(function(){
-  var overlay = document.getElementById('podOverlay');
-  var a = document.getElementById('podAudio');
-  var speeds = [0.75, 1, 1.25, 1.5, 2];
-  var si = 1;
-  var opened = false;
-  function fmt(s){
-    if(isNaN(s)) return '0:00';
-    var m=Math.floor(s/60), sec=Math.floor(s%60);
-    return m+':'+(sec<10?'0':'')+sec;
-  }
-  document.addEventListener('click', function(e){
-    var link = e.target.closest('a.btn-page-header');
-    if(!link) return;
-    var text = link.textContent.trim();
-    if(text.indexOf('AI Podcast') === -1) return;
-    e.preventDefault();
-    e.stopPropagation();
-    overlay.style.display = 'block';
-    overlay.classList.remove('pod-closing');
-    if(!opened){
-      a.preload = 'metadata';
-      a.load();
-      opened = true;
-    }
-  });
-  a.volume = 0.8;
-  a.addEventListener('loadedmetadata', function(){
-    document.getElementById('podDuration').textContent = fmt(a.duration);
-    document.getElementById('podDurationLabel').textContent = fmt(a.duration) + ' minutes';
-  });
-  a.addEventListener('timeupdate', function(){
-    document.getElementById('podCurrent').textContent = fmt(a.currentTime);
-    var pct = a.duration ? (a.currentTime/a.duration)*100 : 0;
-    document.getElementById('podProgress').style.width = pct+'%';
-  });
-  a.addEventListener('progress', function(){
-    if(a.buffered.length>0){
-      var pct = (a.buffered.end(a.buffered.length-1)/a.duration)*100;
-      document.getElementById('podBuffered').style.width = pct+'%';
-    }
-  });
-  a.addEventListener('ended', function(){
-    document.getElementById('podIconPlay').style.display='';
-    document.getElementById('podIconPause').style.display='none';
-  });
-  window.podToggle = function(){
-    if(a.paused){a.play();document.getElementById('podIconPlay').style.display='none';document.getElementById('podIconPause').style.display='';}
-    else{a.pause();document.getElementById('podIconPlay').style.display='';document.getElementById('podIconPause').style.display='none';}
-  };
-  window.podSkip = function(s){a.currentTime = Math.max(0,Math.min(a.duration||0,a.currentTime+s));};
-  window.podSeek = function(e){
-    var rect = document.getElementById('podBarBg').getBoundingClientRect();
-    var pct = (e.clientX - rect.left)/rect.width;
-    a.currentTime = pct * (a.duration||0);
-  };
-  window.podMute = function(){
-    a.muted = !a.muted;
-    document.getElementById('podVolume').value = a.muted ? 0 : a.volume;
-  };
-  window.podCycleSpeed = function(){
-    si = (si+1) % speeds.length;
-    a.playbackRate = speeds[si];
-    document.getElementById('podSpeedBtn').textContent = speeds[si]+'x';
-  };
-  window.podClose = function(){
-    overlay.classList.add('pod-closing');
-    setTimeout(function(){ overlay.style.display='none'; }, 300);
-    a.pause();
-    document.getElementById('podIconPlay').style.display='';
-    document.getElementById('podIconPause').style.display='none';
-  };
-  document.getElementById('podVolume').addEventListener('input', function(){
-    a.volume = this.value;
-    a.muted = false;
-  });
-  if(window.location.hash === '#podcast-player'){
-    overlay.style.display = 'block';
-    a.preload = 'metadata';
-    a.load();
-    opened = true;
-  }
-})();
-</script>
+- Companion script: [`script.py`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dynamic_panel/script.py)
+- Published post: <https://carlos-mendez.org/post/python_dynamic_panel/>
+- GitHub repo: <https://github.com/cmg777/starter-academic-v501>
