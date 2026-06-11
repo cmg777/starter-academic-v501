@@ -56,7 +56,7 @@ url_video: ""
 
 ## 🐍 クイックスタート
 
-データセットをGitHubから直接読み込み、`pandas` で `districtID` をキーに結合します。
+データセットをGitHubから直接読み込み、`pandas` で `districtID` をキーに結合します。以下のコードは、空の [Google Colab スクラッチパッド](https://colab.research.google.com/notebooks/empty.ipynb) で実行できます。設定やインストールは不要です。
 
 ```python
 import pandas as pd

@@ -56,7 +56,7 @@ Curated datasets organized into modules, all linked by a unique identifier (`dis
 
 ## 🐍 Quick start
 
-Stream the datasets directly from GitHub and merge them on `districtID` with `pandas`.
+Stream the datasets directly from GitHub and merge them on `districtID` with `pandas`. You can run the code below in a blank [Google Colab scratchpad](https://colab.research.google.com/notebooks/empty.ipynb) — no setup or installation required.
 
 ```python
 import pandas as pd

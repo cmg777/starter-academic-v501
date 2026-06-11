@@ -56,7 +56,7 @@ Conjuntos de datos curados y organizados en módulos, todos vinculados por un id
 
 ## 🐍 Inicio rápido
 
-Transmita los conjuntos de datos directamente desde GitHub y fusiónelos por `districtID` con `pandas`.
+Transmita los conjuntos de datos directamente desde GitHub y fusiónelos por `districtID` con `pandas`. Puede ejecutar el código siguiente en un [borrador de Google Colab](https://colab.research.google.com/notebooks/empty.ipynb) en blanco, sin necesidad de configuración ni instalación.
 
 ```python
 import pandas as pd
