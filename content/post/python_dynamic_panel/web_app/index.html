@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Dynamic Panel Explorer — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Dynamic Panel Data Models in Python: From Nickell Bias to System GMM'. Simulate the bias bracket, explore the seven-estimator forest plot, decode AR(2) and Hansen diagnostics, and pick the right estimator.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Dynamic Panel Explorer — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Dynamic Panel Data Models in Python: From Nickell Bias to System GMM</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-bracket" class="tab active" data-pane="pane-bracket" role="tab" aria-selected="true">1 · The Bias Bracket</button>
+  <button id="tab-ladder"  class="tab"        data-pane="pane-ladder"  role="tab" aria-selected="false">2 · The Estimator Ladder</button>
+  <button id="tab-diag"    class="tab"        data-pane="pane-diag"    role="tab" aria-selected="false">3 · Diagnostics Decoder</button>
+  <button id="tab-chooser" class="tab"        data-pane="pane-chooser" role="tab" aria-selected="false">4 · Method Chooser</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: THE BIAS BRACKET ====================== -->
+<section id="pane-bracket" class="tab-pane active" role="tabpanel" aria-labelledby="tab-bracket">
+
+  <h2>How persistent is firm employment? Two wrong answers that bracket the truth</h2>
+  <p class="lede">
+    If this year's employment depends on last year's, the model needs
+    <em>yesterday's outcome on the right-hand side</em> — and that one change
+    breaks both workhorse panel estimators in opposite directions. Pooled OLS
+    loads the omitted firm effect onto the lag and lands <strong>above</strong>
+    the true persistence ρ; the within (fixed-effects) estimator picks up
+    Nickell bias and lands <strong>below</strong> it. Two wrong answers with
+    <em>known signs</em> are a measuring stick: the truth must sit inside the
+    bracket. In the post's real data the bracket is [0.626, 0.962].
+    <strong>Set the true ρ yourself, then drag T and N and watch the bracket
+    form around it.</strong>
+  </p>
+
+  <div class="card">
+    <h3>Why the bracket tightens as T grows (animation)</h3>
+    <p>
+      Average ρ̂ across simulated panels as the panel length <em>T</em> grows,
+      holding true ρ = 0.80. The <strong style="color:#8b9dc3;">grey</strong>
+      curve is pooled OLS: biased <em>up</em> by the firm effect α<sub>i</sub>,
+      and longer panels do not save it. The
+      <strong style="color:#d97757;">orange</strong> curve is fixed effects:
+      biased <em>down</em> by order −1/T (Nickell), so it climbs toward the
+      truth as T grows. The bracket between them is widest exactly where the
+      post's data lives — T ≈ 7–9 years per firm.
+    </p>
+    <div class="chart-area" id="bb-anim"></div>
+  </div>
+
+  <h3>Simulate your own panel</h3>
+  <div class="controls">
+    <div class="control">
+      <label>True ρ <span class="value" id="bb-rho-val">0.80</span></label>
+      <input type="range" id="bb-rho" min="0.10" max="0.99" step="0.01" value="0.80" aria-label="true rho">
+      <div class="hint">Persistence of the simulated employment process. The post's defended estimate is ρ ≈ 0.93 — try the high end and watch both biases grow.</div>
+    </div>
+    <div class="control">
+      <label>Years per firm T <span class="value" id="bb-T-val">8</span></label>
+      <input type="range" id="bb-T" min="3" max="20" step="1" value="8" aria-label="panel length T">
+      <div class="hint">Nickell bias is of order −1/T: severe at T = 3, modest at T = 20. The Arellano-Bond panel has T = 7–9.</div>
+    </div>
+    <div class="control">
+      <label>Number of firms N <span class="value" id="bb-N-val">140</span></label>
+      <input type="range" id="bb-N" min="50" max="500" step="10" value="140" aria-label="number of firms N">
+      <div class="hint">More firms shrink the noise in both estimates but do <em>not</em> remove either bias — Nickell bias survives N → ∞.</div>
+    </div>
+  </div>
+
+  <div class="chart-area" id="bb-bar"></div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">true ρ</div>
+      <div class="stat-value" id="bb-stat-true" style="color:#6a9bcc;">0.80</div>
+      <div class="stat-sub">the target both estimators miss</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">OLS ρ̂ (pooled)</div>
+      <div class="stat-value" id="bb-stat-ols" style="color:#8b9dc3;">—</div>
+      <div class="stat-sub">biased up: lag absorbs α<sub>i</sub> (post: 0.962)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">FE ρ̂ (within)</div>
+      <div class="stat-value orange" id="bb-stat-fe">—</div>
+      <div class="stat-sub">Nickell bias ≈ −(1+ρ)/T (post: 0.626)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">bracket width</div>
+      <div class="stat-value teal" id="bb-stat-width">—</div>
+      <div class="stat-sub">OLS ρ̂ − FE ρ̂ (post: 0.336)</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Drag T down to 3 or 4.</strong> The orange FE bar sinks far below the steel true-ρ line — at the post's T ≈ 7–9 the simulated FE bias is the same order as the real one (0.626 against a defended 0.927).</li>
+      <li><strong>Drag T up to 20.</strong> FE climbs toward the truth while the grey OLS bar barely moves: <strong>Nickell bias</strong> is a short-panel disease, the OLS bias is a fixed-effect disease, and only one of them is cured by time.</li>
+      <li><strong>Set ρ = 0.95.</strong> The bracket is widest when the series is most persistent — exactly when you most need GMM and when difference GMM's instruments are weakest (Tab 2 shows this on the real data).</li>
+      <li><strong>Push N to 500 and reseed.</strong> The bars stop jittering but stay on the wrong side of the line. More firms buy precision, never consistency — the <strong>bracket</strong> is a bias problem, not a noise problem.</li>
+    </ul>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="bb-reseed">Reseed random draws</button>
+      <button class="action secondary" id="bb-reset">Reset to defaults</button>
+    </div>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-ladder">
+      <div class="cta-tag">Tab 2</div>
+      <h4>The Estimator Ladder</h4>
+      <p>The post's seven real estimates on one axis — OLS, FE, Anderson-Hsiao IV, difference and system GMM — with the bracket band shaded and a story behind every point.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-diag">
+      <div class="cta-tag">Tab 3</div>
+      <h4>Diagnostics Decoder</h4>
+      <p>AR(1), AR(2), and Hansen read correctly — including why p = 0.000 can be good news and p = 0.99 can be a red flag — plus the instrument-proliferation experiment.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-chooser">
+      <div class="cta-tag">Tab 4</div>
+      <h4>Method Chooser</h4>
+      <p>Answer three questions about your own panel and get the estimator the post's workflow would recommend, with the full practitioner checklist.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Lagged dependent variable &amp; ρ</summary>
+        <div class="gloss-body">The model puts yesterday's outcome on the right-hand side: <code>n[i,t] = ρ n[i,t-1] + βx + α_i + ε</code>. ρ is the persistence — the fraction of this year's employment inherited from last year. <em>The post's headline: ρ̂ = 0.927, so ~93% of a shock survives into the next year.</em></div>
+      </details>
+      <details class="gloss"><summary>Firm fixed effect α<sub>i</sub></summary>
+        <div class="gloss-body">A permanent firm-specific level (management quality, industry niche, plant size) sitting in the error. Last year's employment depends on it by construction, so the lag is correlated with the error no matter how many controls you add.</div>
+      </details>
+      <details class="gloss"><summary>Nickell bias</summary>
+        <div class="gloss-body">The downward bias of ρ̂ when fixed effects are applied to a dynamic model on a short panel. Order −(1+ρ)/T. <em>With T ≈ 7–9 here, FE returns 0.626 against a defended 0.927.</em></div>
+      </details>
+      <details class="gloss"><summary>The bias bracket (Bond 2002)</summary>
+        <div class="gloss-body">OLS is biased up, FE is biased down — so any consistent estimator must land between them. <em>Here: [0.626, 0.962]. A GMM estimate hugging the FE floor is a weak-instrument symptom even when every printed test passes.</em></div>
+      </details>
+      <details class="gloss"><summary>Sequential exogeneity</summary>
+        <div class="gloss-body">The identification assumption behind the lag instruments: past values of the variables must be uncorrelated with <em>future</em> shocks. Partially testable — the AR(2) test guards exactly this for the t−2 instruments.</div>
+      </details>
+      <details class="gloss"><summary>Difference GMM (Arellano-Bond 1991)</summary>
+        <div class="gloss-body">First-difference away α<sub>i</sub>, then instrument Δn[i,t−1] with <em>all</em> available lagged levels (t−2 and deeper), weighted optimally. <em>Here: 91 instruments, ρ̂ = 0.679 — hugging the FE bound because lagged levels barely predict differences when ρ is near 1.</em></div>
+      </details>
+      <details class="gloss"><summary>System GMM &amp; mean stationarity (Blundell-Bond 1998)</summary>
+        <div class="gloss-body">Stacks the differenced equation with the <em>levels</em> equation (instrumented by lagged differences), buying identification strength from one extra untestable assumption: firms' initial deviations from steady state are uncorrelated with α<sub>i</sub>. <em>Here: ρ̂ = 0.927 with 32 collapsed instruments — the headline.</em></div>
+      </details>
+      <details class="gloss"><summary>Instrument proliferation &amp; collapsing</summary>
+        <div class="gloss-body">The instrument count grows quadratically with T and can approach the number of groups (Roodman's ceiling: here 140 firms), overfitting the endogenous variables and disarming the Hansen test. Collapsing keeps one instrument per lag depth instead of one per lag-and-period. <em>Here: 113 → 32 instruments; Hansen p 0.235 → 0.462; SE honestly larger.</em></div>
+      </details>
+    </div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 2: THE ESTIMATOR LADDER ====================== -->
+<section id="pane-ladder" class="tab-pane" role="tabpanel" aria-labelledby="tab-ladder">
+
+  <h2>Seven estimators, one parameter — the post's real results</h2>
+  <p class="lede">
+    Every number below comes from the post's production run on the classic
+    Arellano-Bond (1991) panel — 140 UK manufacturing firms, 1976–1984
+    (<code>estimates_summary.csv</code>). All seven estimators target the same
+    ρ; they disagree because each treats the firm effect α<sub>i</sub>
+    differently. The shaded band is the OLS–FE bracket [0.626, 0.962]; the
+    dashed line is the unit root ρ = 1. <strong>Toggle estimators on and off,
+    hover a point for its numbers, and click it for its story.</strong>
+  </p>
+
+  <div class="card">
+    <h3>Estimators</h3>
+    <div class="method-toggle" id="lad-methods">
+      <label><input type="checkbox" value="Pooled OLS" checked> Pooled OLS</label>
+      <label><input type="checkbox" value="Fixed effects" checked> Fixed effects</label>
+      <label><input type="checkbox" value="Anderson-Hsiao IV" checked> Anderson-Hsiao IV</label>
+      <label><input type="checkbox" value="Diff GMM (one-step)" checked> Diff GMM (one-step)</label>
+      <label><input type="checkbox" value="Diff GMM (two-step)" checked> Diff GMM (two-step)</label>
+      <label><input type="checkbox" value="Sys GMM (one-step, collapsed)" checked> Sys GMM (one-step)</label>
+      <label><input type="checkbox" value="Sys GMM (two-step, collapsed)" checked> Sys GMM (two-step)</label>
+    </div>
+  </div>
+
+  <div class="chart-area" id="lad-chart"></div>
+
+  <div class="card" id="lad-story">
+    <h3 id="lad-story-title">Click any estimate above for its story</h3>
+    <p id="lad-story-body">
+      Each point on the ladder has a one-paragraph biography: what the
+      estimator does to the firm effect, why it lands where it lands, and what
+      the post concluded about it. Click a point (or its CI bar) to read it
+      here.
+    </p>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The bracket band does the first screening.</strong> OLS (0.962) and FE (0.626) define it; Anderson-Hsiao (1.233) lands entirely <em>outside</em> it, above the unit root — consistent in theory, useless in practice with a CI 1.87 wide.</li>
+      <li><strong>Both difference-GMM points hug the floor.</strong> 0.708 and 0.679 sit within one SE of the FE bound — Bond's weak-instrument symptom. They pass every printed test (Hansen p = 0.211, AR(2) p = 0.866) and are still not to be trusted.</li>
+      <li><strong>System GMM lands in the upper half of the band.</strong> 0.902 (one-step) and the headline 0.927 (two-step, 32 collapsed instruments) — the only estimates that pass the bracket check <em>and</em> the printed diagnostics together.</li>
+      <li><strong>The headline CI touches the dashed line.</strong> [0.773, 1.081] includes ρ = 1: the post can defend "persistence ≈ 0.93", not "employment is stationary". Honest reporting keeps the caveat attached.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Why the half-life is the substantive stake</h3>
+    <p>
+      ρ̂ = 0.626 (FE) implies an employment-shock half-life of ≈ 1.5 years; the
+      defended 0.927 implies ≈ 9 years; OLS's 0.962 implies ≈ 18. Same
+      regression, same data — the estimator choice alone moves the implied
+      labor-market adjustment speed by a factor of twelve. That is what the
+      ladder is for: not picking the prettiest p-value, but picking the rung
+      whose <em>bias story</em> survives scrutiny.
+    </p>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 3: DIAGNOSTICS DECODER ====================== -->
+<section id="pane-diag" class="tab-pane" role="tabpanel" aria-labelledby="tab-diag">
+
+  <h2>AR(1), AR(2), Hansen — and the proliferation experiment</h2>
+  <p class="lede">
+    Every dynamic-panel GMM table ends with the same three tests, and each has
+    a non-obvious reading: AR(1) <em>must reject</em> (it is mechanical),
+    AR(2) <em>must not reject</em> (it protects the t−2 instruments), and
+    Hansen is <em>two-tailed in spirit</em> — p &lt; 0.05 flags invalid
+    instruments, but p drifting toward 1 flags an overwhelmed test. Below are
+    the post's real values, the six-specification proliferation experiment
+    that proves the Hansen drift on this very data, and a short quiz.
+    <strong>Read the bars, hover the scatter, then test yourself.</strong>
+  </p>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>The three tests, real values</h3>
+      <p class="note" style="margin:0 0 10px;">Diff GMM (two-step, 91 instruments) vs the headline Sys GMM (two-step, 32 collapsed). Green zone = where each p-value <em>should</em> be.</p>
+      <div class="chart-area" id="dg-tests"></div>
+    </div>
+    <div class="card">
+      <h3>Instrument proliferation (six system-GMM specs)</h3>
+      <p class="note" style="margin:0 0 10px;">Same model six times; only the lag window and collapsing change. Hover a point for ρ̂, SE, and AR(2).</p>
+      <div class="chart-area" id="dg-prolif"></div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>AR(1) p = 0.000 in both models — and that is good news.</strong> Differencing makes adjacent errors share ε<sub>i,t−1</sub>, so AR(1) must reject when the model is right. The test that must stay clean is AR(2): 0.866 (diff) and 0.994 (sys) both pass.</li>
+      <li><strong>Read the uncollapsed circles left to right:</strong> 68 → 95 → 113 instruments pushes Hansen p from 0.035 to 0.235 with the model unchanged. That drift is mechanical overfitting, and its endpoint is the notorious p ≈ 1 red flag.</li>
+      <li><strong>Proliferation distorts both tails.</strong> The uncollapsed 2:3 spec is outright <em>rejected</em> (p = 0.0348) while its collapsed twin passes (p = 0.0957) — same lag window, same data, opposite verdicts, driven purely by instrument count.</li>
+      <li><strong>ρ̂ barely moves across all six cells</strong> — [0.921, 0.956]. The point estimate is robust; the <em>test you would use to defend it</em> is not. Collapsing (teal diamonds) buys an honest test at the price of a larger SE (0.0785 vs 0.0274 at 2:99).</li>
+    </ul>
+  </div>
+
+  <h3>What would worry you? (click an answer)</h3>
+  <div class="grid grid-2">
+    <div class="card quiz" data-answer="fine">
+      <h3>AR(1) in differences: z = −4.49, p = 0.000</h3>
+      <p>Your difference-GMM output strongly rejects no first-order serial correlation in the differenced residuals.</p>
+      <div class="note quiz-buttons">
+        <button class="action secondary" data-pick="worry">Worry</button>
+        <button class="action secondary" data-pick="fine">Fine</button>
+      </div>
+      <p class="quiz-feedback note" hidden></p>
+    </div>
+    <div class="card quiz" data-answer="fine">
+      <h3>AR(2) in differences: z = −0.01, p = 0.994</h3>
+      <p>The second-order test could hardly be further from rejecting. Is a p-value this close to 1 suspicious here?</p>
+      <div class="note quiz-buttons">
+        <button class="action secondary" data-pick="worry">Worry</button>
+        <button class="action secondary" data-pick="fine">Fine</button>
+      </div>
+      <p class="quiz-feedback note" hidden></p>
+    </div>
+    <div class="card quiz" data-answer="worry">
+      <h3>Hansen J: p = 0.97 with 130 instruments, N = 140</h3>
+      <p>A colleague reports system GMM whose Hansen test "passes comfortably" at p = 0.97, using 130 instruments on 140 groups.</p>
+      <div class="note quiz-buttons">
+        <button class="action secondary" data-pick="worry">Worry</button>
+        <button class="action secondary" data-pick="fine">Fine</button>
+      </div>
+      <p class="quiz-feedback note" hidden></p>
+    </div>
+    <div class="card quiz" data-answer="worry">
+      <h3>GMM ρ̂ = 0.679 when FE gave 0.626 — all tests pass</h3>
+      <p>Difference GMM lands within one SE of the fixed-effects bound on a persistent series, with Hansen p = 0.211 and AR(2) p = 0.866.</p>
+      <div class="note quiz-buttons">
+        <button class="action secondary" data-pick="worry">Worry</button>
+        <button class="action secondary" data-pick="fine">Fine</button>
+      </div>
+      <p class="quiz-feedback note" hidden></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The decoder in one table</h3>
+    <div class="method-row"><span class="label">AR(1) in differences</span><span class="val">must REJECT — rejection is mechanical good news (ours: p = 0.000)</span></div>
+    <div class="method-row"><span class="label">AR(2) in differences</span><span class="val">must NOT reject — validates the t−2 instruments (ours: p = 0.994)</span></div>
+    <div class="method-row"><span class="label">Hansen J</span><span class="val">two-tailed: p &lt; 0.05 invalid; p → 1 overwhelmed (ours: 0.462 with 32 instruments)</span></div>
+    <div class="method-row"><span class="label">Instrument count</span><span class="val">report it vs the number of groups; collapse when it grows (ours: 32 vs 140 firms)</span></div>
+  </div>
+
+</section>
+
+<!-- ====================== TAB 4: METHOD CHOOSER ====================== -->
+<section id="pane-chooser" class="tab-pane" role="tabpanel" aria-labelledby="tab-chooser">
+
+  <h2>Which estimator does your panel need?</h2>
+  <p class="lede">
+    The post's workflow compresses into three questions about your data.
+    <strong>Answer them below and the recommendation updates live</strong> —
+    then read the checklist that applies no matter which cell you land in.
+    (This assumes your model has a lagged dependent variable; without one,
+    ordinary FE with clustered SEs is usually fine.)
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Is T small? (&lt; ~20 periods)</label>
+      <div class="method-toggle" id="mc-q-t" role="group" aria-label="is T small">
+        <label><input type="radio" name="mc-t" value="yes" checked> Yes — short panel</label>
+        <label><input type="radio" name="mc-t" value="no"> No — long panel</label>
+      </div>
+      <div class="hint">Nickell bias is order −1/T. The post's panel: T = 7–9 → firmly "small".</div>
+    </div>
+    <div class="control">
+      <label>Is the series persistent? (ρ near 1)</label>
+      <div class="method-toggle" id="mc-q-rho" role="group" aria-label="is rho persistent">
+        <label><input type="radio" name="mc-rho" value="yes" checked> Yes — ρ ≳ 0.8</label>
+        <label><input type="radio" name="mc-rho" value="no"> No — ρ moderate</label>
+      </div>
+      <div class="hint">Check your own OLS-FE bracket: if both endpoints are high, the series is persistent (post: [0.626, 0.962]).</div>
+    </div>
+    <div class="control">
+      <label>Are other regressors endogenous or predetermined?</label>
+      <div class="method-toggle" id="mc-q-endog" role="group" aria-label="are regressors endogenous">
+        <label><input type="radio" name="mc-endog" value="yes" checked> Yes — e.g. wages respond to shocks</label>
+        <label><input type="radio" name="mc-endog" value="no"> No — strictly exogenous</label>
+      </div>
+      <div class="hint">The post instruments w and k with their own lags via gmm(w, ...) gmm(k, ...); strictly exogenous regressors can enter as iv(...) instead.</div>
+    </div>
+  </div>
+
+  <div class="card" id="mc-rec">
+    <h3 id="mc-rec-title">Recommendation</h3>
+    <p id="mc-rec-body"></p>
+    <p class="note" id="mc-rec-note"></p>
+  </div>
+
+  <div class="chart-area" id="mc-tree"></div>
+
+  <div class="pedagogy">
+    <h4>The practitioner checklist (from the post's Discussion)</h4>
+    <ul>
+      <li><strong>Run pooled OLS and fixed effects first</strong> and record the bracket [ρ̂<sub>FE</sub>, ρ̂<sub>OLS</sub>] — they are your measuring stick, not throwaway regressions (here: [0.626, 0.962]).</li>
+      <li><strong>Treat a difference-GMM estimate near the FE bound as a weak-instrument symptom</strong> (here: 0.679, within one SE of 0.626) — passing Hansen and AR(2) does not clear it.</li>
+      <li><strong>Prefer system GMM when persistence is high</strong>, say out loud that you are buying identification with mean stationarity, and check the estimate lands inside the bracket (here: 0.927).</li>
+      <li><strong>Read AR(1) as "must reject", AR(2) as "must not reject"</strong> — AR(2) is the test that protects your instruments (here: p = 0.994).</li>
+      <li><strong>Read Hansen two-tailed</strong>: below 0.05 is rejection, drifting toward 1 as instruments accumulate is overfitting (here: 0.462 with 32 instruments).</li>
+      <li><strong>Collapse instruments and report the count vs the number of groups</strong> (here: 32 vs 140 firms; uncollapsed hit 113) — accept the larger SE as the price of honesty.</li>
+      <li><strong>Replicate a published benchmark</strong> with your exact toolchain before trusting novel numbers (here: digit-for-digit match to the pydynpd README).</li>
+    </ul>
+  </div>
+
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Dynamic Panel Data Models in Python: From Nickell Bias to System GMM</em> · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="lasso.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
