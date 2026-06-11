@@ -1,0 +1,41 @@
+---
+title: "{{TITLE}}"
+subtitle: "{{SUBTITLE}}"
+author: "{{AUTHOR}}"
+date: "{{DATE}}"
+key-results:                  # the title-slide number strip — 3 headline numbers (from results_report.md)
+{{KEY_RESULTS}}               #   - num: "−0.096"
+                              #     cap: "rigorous Double-LASSO"
+format:
+  revealjs:
+    output-file: index.html
+    # NOT embed-resources: RevealChalkboard (a core feature) is incompatible with
+    # self-contained output, so the deck ships index.html + slides_files/ (Hugo serves
+    # this fine — see the tutorial.html precedent). Figures are referenced ../<slug>_*.png.
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true              # vertical-centres content → centred dividers + strategic white space
+    slide-number: c/t
+    menu: true                # revealjs-menu plugin (press M)
+    chalkboard: true          # draw on slides (press B)
+    preview-links: auto
+    overview: true            # press O
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center         # + auto-stretch (default on) bounds images to the slide → no overflow
+    auto-stretch: true
+    highlight-style: github
+    link-external-icon: false
+---
+
+{{SLIDES}}
+
+<!--
+  {{SLIDES}} is the deck body in Quarto markdown — see references/slide-archetypes.md.
+  Render: cd into this dir, then `quarto render slides.qmd` → index.html + slides_files/.
+  The deck reuses the post's figures in place via ../<slug>_*.png (one level up).
+-->
