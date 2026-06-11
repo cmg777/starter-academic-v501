@@ -13,6 +13,10 @@ image:
   placement: 3
   preview_only: false
 links:
+- icon: chalkboard-teacher
+  icon_pack: fas
+  name: "Slides (HTML)"
+  url: slides/index.html
 - icon: laptop-code
   icon_pack: fas
   name: "Web app"

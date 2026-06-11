@@ -1,0 +1,247 @@
+---
+title: "Introduction to Causal Inference: Double Machine Learning"
+subtitle: "Does a cash bonus shorten unemployment? Debiasing an RCT with ML"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "−0.0736"
+    cap: "DML · Random Forest"
+  - num: "−0.0712"
+    cap: "DML · Lasso · same answer"
+  - num: "5,099"
+    cap: "UI claimants · randomized"
+format:
+  revealjs:
+    output-file: index.html
+    # NOT embed-resources: RevealChalkboard (a core feature) is incompatible with
+    # self-contained output, so the deck ships index.html + slides_files/ (Hugo serves
+    # this fine — see the tutorial.html precedent). Figures are referenced ../doubleml_*.png.
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true              # vertical-centres content → centred dividers + strategic white space
+    slide-number: c/t
+    menu: true                # revealjs-menu plugin (press M)
+    chalkboard: true          # draw on slides (press B)
+    preview-links: auto
+    overview: true            # press O
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center         # + auto-stretch (default on) bounds images to the slide → no overflow
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs DEFAULT) — renders $…$ / $$…$$ across the whole slide
+    # DOM (body, captions, headings, table cells). Loads from a CDN; reveal.js is local.
+    # Do NOT set `html-math-method: katex` — it is broken in revealjs (no auto-render call,
+    # so math shows as raw LaTeX). See references/render-and-fix.md.
+    link-external-icon: false
+---
+
+# The Tension {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## Did the bonus *cause* faster reemployment — or did different people get it?
+
+Pennsylvania offered some unemployment-insurance claimants a **cash bonus** for finding work quickly. The bonus group did leave the rolls a bit sooner.
+
+. . .
+
+But people who *get* a treatment can differ from those who don't. *Is the gap the bonus — or the people?*
+
+::: {.notes}
+The core challenge of causal inference: separating a genuine treatment effect from confounders — variables that move both the treatment and the outcome. Here the design protects us (it's an RCT), but the slide poses the universal worry so the audience feels why we need a principled adjustment, not just a raw mean difference.
+:::
+
+## The raw gap is real but small: control 2.057 vs bonus 1.971 in log duration
+
+![Log unemployment duration by group — both distributions pile up near 3.0–3.5; the bonus group's mean sits ~0.09 log points lower.](../doubleml_outcome_by_treatment.png)
+
+::: {.notes}
+Spoiler / framing figure. Don't over-read it — the ~0.09 raw gap is a hint, not the causal effect. We earn the disciplined number in Act II and come back to where it lands. The left-skew (median 2.398 > mean 2.028) shows some claimants found work very fast.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- The lab: a 5,099-claimant randomized bonus experiment with 15 covariates
+- Why even an RCT benefits from covariate adjustment — *precision*, not bias
+- The Partially Linear model and the partialling-out estimator
+- Double Machine Learning: cross-fitting two ML predictions
+- The lesson: on an RCT, DML sharpens inference; it doesn't move the point
+:::
+
+# The Investigation {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## The lab: 5,099 claimants, randomly split 3,354 control vs 1,745 bonus
+
+::: {.incremental}
+- **Outcome** $Y$ — `inuidur1`, log unemployment duration (mean 2.028, sd 1.215)
+- **Treatment** $D$ — `tg`, the bonus *offer* (1 = offered, 0 = control)
+- **Controls** $X$ — 15 demographic and labor-market covariates
+:::
+
+[Treatment was *assigned at random*, so $D$ is independent of $X$ by design — the estimand is a clean **Average Treatment Effect (ATE)**.]{.comment}
+
+::: {.notes}
+Because assignment is random, there is no confounding to remove — a crucial framing for the whole talk. The estimand is the ATE of the bonus offer on log duration. That is exactly what makes the RCT the right place to *learn the method*: we can check that flexible adjustment leaves the answer essentially unchanged.
+:::
+
+## Randomization worked: covariate means line up almost exactly across groups
+
+![Mean of each of the 15 covariates, control (steel) vs bonus (orange) — the bars are nearly the same height everywhere.](../doubleml_covariate_balance.png)
+
+::: {.notes}
+Balance check. `female`, `black`, the age indicators, and the economic indicators (`durable`, `lusd`, `husd`) are essentially equal across arms. This is the visual confirmation that any duration gap is unlikely to be driven by *observable* confounders — and the reason DML here buys precision, not de-confounding.
+:::
+
+## In an RCT, covariates can't fix bias — but they *can* sharpen precision
+
+Standard linear adjustment regresses $Y$ on $D$ and the covariates:
+
+$$Y_i = \alpha + \beta\, D_i + X_i'\gamma + \epsilon_i$$
+
+. . .
+
+[If the true $X \to Y$ map is *nonlinear*, a linear $X_i'\gamma$ leaves predictable variation in the residual — wider standard errors than necessary.]{.comment}
+
+::: {.notes}
+This motivates ML. In an observational study, linear adjustment also risks residual confounding bias. In this RCT there is no bias to remove, so the payoff of flexible adjustment is variance reduction: absorbing more of inuidur1's variation tightens the CI around the same ATE.
+:::
+
+## Linear adjustment already pulls the naive −0.0855 toward −0.0717
+
+``` {.python code-line-numbers="1-3|5-7"}
+ols = LinearRegression()                 # naive: Y on D only
+ols.fit(df[["tg"]], df["inuidur1"])
+# coefficient → -0.0855
+
+ols_full = LinearRegression()            # add the 15 covariates linearly
+ols_full.fit(df[["tg"] + COVARIATES], df["inuidur1"])
+# coefficient → -0.0717
+```
+
+[Naive OLS: **−0.0855**.  With covariates: **−0.0717**. The shift is precision, not bias.]{.comment}
+
+::: {.notes}
+Two reference points before any ML. The naive estimate (−0.0855, an 8.6% reduction) becomes −0.0717 (7.2%) once we adjust. In a randomized design the move is not "removing confounding" — it is absorbing residual outcome variation. DML's job is to do this absorption *flexibly*.
+:::
+
+## DML splits the outcome into a linear treatment term plus a flexible nuisance
+
+$$Y = D\,\theta_0 + g_0(X) + \varepsilon, \qquad E[\varepsilon \mid D, X] = 0$$
+
+$$D = m_0(X) + V, \qquad E[V \mid X] = 0$$
+
+[$\theta_0$ is the causal **ATE**. $g_0(X)$ and $m_0(X)$ are *nuisance* functions — scaffolding we estimate but don't report.]{.comment}
+
+::: {.notes}
+The Partially Linear Regression (PLR) model. Linearity is imposed only on the treatment D; covariates can enter g_0 arbitrarily flexibly. g_0 predicts Y from X; m_0 predicts D from X. In this RCT m_0 is roughly constant (the assignment probability), but g_0 still soaks up predictive structure in inuidur1.
+:::
+
+## Partial out both sides, then regress the residuals — that's the whole trick
+
+$$\tilde{Y} = Y - \hat{g}_0(X), \qquad \tilde{D} = D - \hat{m}_0(X)$$
+
+$$\hat{\theta}_0 = \frac{\sum_i \tilde{D}_i\,\tilde{Y}_i}{\sum_i \tilde{D}_i^{2}}$$
+
+[Like noise-canceling headphones: ML learns how $X$ drives $Y$ and $D$, we subtract it, and only the $D \to Y$ signal is left.]{.comment}
+
+::: {.notes}
+The partialling-out estimator. The residualised score (Y − g(X))(D − m(X)) is Neyman-orthogonal: small ML errors in the nuisance estimates do not bias θ to first order. That orthogonality is what lets us swap learners later and still trust the estimate.
+:::
+
+## Cross-fitting computes each residual out-of-sample to kill regularization bias
+
+$$\hat{\theta}_0^{CF} = \frac{\sum_{k=1}^{K}\sum_{i \in I_k} \tilde{D}_i^{(k)}\,\tilde{Y}_i^{(k)}}{\sum_{k=1}^{K}\sum_{i \in I_k} \big(\tilde{D}_i^{(k)}\big)^2}$$
+
+[Split into $K=5$ folds; each fold's residuals come from models trained on the *other four*, then average.]{.comment}
+
+::: {.notes}
+Without sample-splitting, the ML penalty contaminates θ — regularization bias. Cross-fitting is like grading exams with a model that never saw that student's work: each fold's predictions are out-of-sample, which preserves valid standard errors, p-values, and confidence intervals.
+:::
+
+## Six lines in `doubleml`: wrap the data, pick a learner, cross-fit, read θ
+
+``` {.python code-line-numbers="1|3-4|6-8"}
+dml_data = DoubleMLData(df, y_col="inuidur1", d_cols="tg", x_cols=COVARIATES)
+
+learner = RandomForestRegressor(n_estimators=500, max_depth=5,
+                                max_features="sqrt", random_state=42)
+dml_plr_rf = DoubleMLPLR(dml_data, clone(learner), clone(learner), n_folds=5)
+dml_plr_rf.fit()
+print(dml_plr_rf.summary)            # tg: -0.0736  (SE 0.0354, p 0.0378)
+```
+
+::: {.notes}
+The full pipeline. DoubleMLData declares the Y/D/X roles; the same Random Forest (500 trees, depth 5, sqrt features) serves both nuisance models via clone(); DoubleMLPLR does the 5-fold cross-fitting and returns θ with valid inference. Capping depth at 5 keeps the nuisance models from destabilising the cross-fitted residuals.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## The bonus offer shortens log unemployment duration by 7.4% {background-color="#141413"}
+
+[−0.0736]{.bignum}
+
+[$\hat\theta_0$, DML · Random Forest (SE 0.0354, $p=0.038$) · 95% CI [−0.143, −0.004]]{.bignum-label}
+
+::: {.notes}
+The Act III payoff. θ̂ = −0.0736 ⇒ ≈ 7.4% on the log scale, ≈ 7.1% proportional reduction in actual duration (e^−0.0736 − 1). t = −2.077, p = 0.0378 — significant at 5%. The interval [−0.1430, −0.0041] excludes zero but only barely; the magnitude is genuine but uncertain.
+:::
+
+## Swap Random Forest for Lasso and the answer barely moves: −0.0712
+
+| Learner | $\hat\theta_0$ | SE | $p$ | 95% CI |
+|---|---:|---:|---:|:---:|
+| Random Forest | [−0.0736]{.key} | 0.0354 | 0.038 | [−0.143, −0.004] |
+| Lasso | −0.0712 | 0.0354 | 0.045 | [−0.141, −0.002] |
+
+[Two utterly different learners, a 0.0024 gap — under 7% of one standard error.]{.comment}
+
+::: {.notes}
+Robustness via learner-agnosticism. Random Forest (nonparametric trees) and Lasso (penalized linear) disagree by 0.0024, both significant at 5%, both excluding zero. Neyman-orthogonality is why this works: the estimate doesn't hinge on getting the nuisance functional form "right". A strong signal the result isn't a modeling artifact.
+:::
+
+## All four roads lead to ~−0.07: the methods agree on sign and size
+
+![Naive OLS (−0.0855) is largest; covariate OLS and both DML estimates cluster near −0.07. Dashed line = zero; only DML carries valid CIs.](../doubleml_coefficient_comparison.png)
+
+::: {.notes}
+The four estimators side by side. Naive OLS is the outlier in magnitude; adjustment and DML pull toward −0.07. The DML pair sits *between* the two OLS benchmarks — exactly what an RCT predicts, since g_0(X) is nearly flat when D ⊥ X. The difference DML makes here is the error bars, not the dot.
+:::
+
+## Both DML intervals exclude zero — but only just
+
+![DML-RF [−0.143, −0.004] and DML-Lasso [−0.141, −0.002]; near-identical width, upper bounds hugging zero.](../doubleml_confint.png)
+
+::: {.notes}
+Honesty slide. Both intervals clear zero, but the upper bounds (0.4% and 0.2% reduction) sit right at the boundary. So: a statistically significant negative effect, modest size, estimated with real uncertainty. The right policy reading is "the bonus plausibly helped," not "the bonus cut duration by exactly 7.4%."
+:::
+
+## Does flexible ML *make* this causal? No — the RCT does
+
+[Objection.]{.objection} "You ran fancy machine learning, so the −0.0736 must be the true causal effect."
+
+. . .
+
+[Response.]{.rebuttal} The identification comes from **randomization**, not from DML. ML only partials out $X$ flexibly and delivers valid inference. On observational data, $\hat\theta_0$ is causal only under conditional independence given $X$ — DML disciplines *adjustment*, it cannot manufacture *identification*.
+
+::: {.notes}
+Steelman, don't strawman. DML's contribution is valid, learner-robust inference with flexible nuisance control — not a license to skip the identifying assumptions. Here the RCT supplies identification; on observational data the analyst must defend conditional independence and overlap separately. PLR also assumes a constant θ_0 (no heterogeneity); the IRM relaxes that.
+:::
+
+# On a clean experiment, Double ML sharpens the answer — it doesn't change it. {.divider background-color="#141413"}
+
+::: {.notes}
+The single takeaway. DML's real value isn't a different point estimate (OLS gives ~7% too) — it's the infrastructure: valid standard errors, confidence intervals, and robustness to nonlinear confounding. On this RCT that shows up as a tighter, trustworthy −0.0736. On messy observational data where g_0(X) is genuinely complex, plain OLS breaks while DML stays valid — that's where the method earns its keep.
+:::

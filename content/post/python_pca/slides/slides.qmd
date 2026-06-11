@@ -1,0 +1,288 @@
+---
+title: "PCA for Development Indicators"
+subtitle: "Compressing correlated indicators into one composite index"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "97.97%"
+    cap: "variance captured by PC1"
+  - num: "0.7071"
+    cap: "equal weight on each indicator"
+  - num: "1.3e-15"
+    cap: "manual vs scikit-learn gap"
+format:
+  revealjs:
+    output-file: index.html
+    # NOT embed-resources: RevealChalkboard (a core feature) is incompatible with
+    # self-contained output, so the deck ships index.html + slides_files/ (Hugo serves
+    # this fine — see the tutorial.html precedent). Figures are referenced ../pca_*.png.
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs default) — renders $…$ / $$…$$ across the whole slide
+    # DOM. Loads from a CDN; reveal.js is local. Do NOT set html-math-method: katex.
+    link-external-icon: false
+---
+
+# The Tension {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## How do you rank 50 countries when health has many faces?
+
+Life expectancy is in *years*. Infant mortality is a *rate per 1,000*. You cannot add years to rates.
+
+. . .
+
+And the two pull in **opposite directions** — more years is good, more deaths is bad. *Which single number captures a country's health?*
+
+::: {.notes}
+The central tension of composite-index building in development economics: progress is rarely one metric, yet policymakers want one ranking. The indicators are in incompatible units and even point opposite ways. PCA is the disciplined way to compress them.
+:::
+
+## The two indicators tell one story — in opposite directions
+
+![Raw health indicators for 50 simulated countries: a very strong negative relationship, $r = -0.96$.](../pca_raw_scatter.png)
+
+::: {.notes}
+Spoiler figure. Don't unpack every dot — just plant that the cloud is a tight diagonal line. That tightness (r = -0.96) is exactly the redundancy PCA will exploit. Note the directional conflict we must fix first: higher life expectancy sits with lower infant mortality.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- Align indicator directions, then put them on a common scale
+- Measure how much the two indicators overlap
+- Let eigen-decomposition find the optimal blending weights
+- Project, rescale, and verify against scikit-learn
+:::
+
+::: {.notes}
+Teaching agenda built from the post's learning objectives: polarity + standardization, covariance, eigen-decomposition, scoring + normalization, verification. Six steps, one composite index.
+:::
+
+# The Investigation {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## Six steps turn two raw indicators into one composite index
+
+::: {.incremental}
+- **Step 1** — Polarity adjustment: flip "more is bad" indicators
+- **Step 2** — Standardization: z-scores, mean 0, SD 1
+- **Step 3** — Covariance matrix: measure the overlap
+- **Step 4** — Eigen-decomposition: find the optimal direction
+- **Step 5** — Scoring: project onto PC1
+- **Step 6** — Normalization: rescale to $[0, 1]$
+:::
+
+[No step can be skipped — each one feeds the next.]{.comment}
+
+::: {.notes}
+This is the spine of the whole talk. The mermaid pipeline in the post is this list. Standardization is the prerequisite that makes "years" and "rates" comparable; eigen-decomposition is the mathematical core.
+:::
+
+## Step 1 — flip infant mortality so "up" always means "better"
+
+$$IM_i^{*} = -1 \times IM_i$$
+
+Multiply the "more is bad" indicator by $-1$. Now a large value of $IM^{*}$ means *low* infant mortality — a good outcome.
+
+[The raw correlation flips from $-0.96$ to $+0.96$; same relationship, properly aligned.]{.comment}
+
+::: {.notes}
+Analogy from the post: averaging exam scores where one professor grades 0–100 (higher better) and another grades demerits (lower better). You must flip the demerit scale first. Country_01's infant mortality 18.6 becomes -18.6, now read as "18.6 units of infant survival."
+:::
+
+## Step 2 — standardize so years and rates share one ruler
+
+$$Z_{ij} = \frac{X_{ij} - \bar{X}_j}{\sigma_j}$$
+
+Subtract each variable's mean, divide by its standard deviation. Both indicators now have **mean 0, SD 1** — unitless, directly comparable.
+
+[We use the population SD ($\sigma$, ddof=0): PCA treats the dataset as the full population.]{.comment}
+
+::: {.notes}
+Without this, infant mortality would dominate purely because its physical spread (3.5–58.7) is wider than life expectancy's (54.9–84.7). After z-scoring, a country 2 SD above average in longevity is directly comparable to one 2 SD above in survival. Note describe() reports std 8.62 (ddof=1) vs 8.53 here (ddof=0) — same data, different denominator.
+:::
+
+## Step 3 — for standardized data, covariance *is* correlation
+
+$$\Sigma = \frac{1}{n} Z^\top Z = \begin{pmatrix} 1 & r \\ r & 1 \end{pmatrix}$$
+
+Standardization guarantees **1s on the diagonal** (unit variance) and the **correlation $r$ off-diagonal**. With two variables, PCA only has to decompose this single $2 \times 2$ matrix.
+
+[Here the off-diagonal is $r = 0.96$ — the two indicators move almost in lockstep.]{.comment}
+
+::: {.notes}
+The covariance matrix quantifies the overlap and tells the algorithm: these two variables share a lot of redundant information, so you can compress them with little loss. 96% of the movement in one is mirrored by the other.
+:::
+
+## Step 4 — eigen-decomposition finds the direction of maximum spread
+
+$$\Sigma \mathbf{v} = \lambda \mathbf{v}$$
+
+The **eigenvector** $\mathbf{v}$ is the direction of greatest spread — its components become the index weights. The **eigenvalue** $\lambda$ is the variance along that direction.
+
+[For a $2\times2$ correlation matrix: $\lambda_1 = 1 + r$, $\lambda_2 = 1 - r$.]{.comment}
+
+::: {.notes}
+Imagine plotting all 50 countries with standardized life expectancy on x and infant survival on y — a narrow diagonal cloud. PC1 is a line through its long axis (maximum separation between countries); PC2 is perpendicular (countries bunch up, little information). Eigen-decomposition removes human bias: the math, not a guess, picks the optimal weights.
+:::
+
+## With $r = 0.96$, PC1 absorbs almost all the variance: 97.97%
+
+![PC1 and PC2 eigenvector arrows over the standardized data — PC1 (orange) runs along the diagonal of maximum spread.](../pca_standardized_eigenvectors.png)
+
+::: {.notes}
+Closed-form: lambda_1 = 1 + 0.9595 = 1.9595, lambda_2 = 1 - 0.9595 = 0.0405. Variance explained by PC1 = 1.9595 / 2 = 97.97%. The orange PC1 arrow runs diagonally; the teal PC2 arrow is perpendicular and short, capturing only the 2% residual. Higher correlation means more variance on PC1.
+:::
+
+## A single number keeps 98% of the information
+
+![PC1 captures 98.0% of total variance; PC2 captures just 2.0%.](../pca_variance_explained.png)
+
+::: {.notes}
+The eigenvalues sum to 2 (the number of variables). PC1's near-total dominance confirms heavy redundancy — the ideal scenario for PCA compression. The remaining 2% on PC2 is mostly simulation noise. At zero correlation both eigenvalues would equal 1 and PCA would buy you nothing.
+:::
+
+## Two standardized variables *always* get equal weights — 0.7071 each
+
+| Component | $w_1$ (LE) | $w_2$ (IM*) | Variance |
+|---|---:|---:|---:|
+| PC1 | [0.7071]{.key} | [0.7071]{.key} | 97.97% |
+| PC2 | 0.7071 | −0.7071 | 2.03% |
+
+[$0.7071 \approx 1/\sqrt{2}$ — a mathematical certainty for any two standardized variables, regardless of $r$.]{.comment}
+
+::: {.notes}
+This is the key teaching point. A 2x2 correlation matrix always has eigenvectors [1/sqrt2, 1/sqrt2] and [1/sqrt2, -1/sqrt2] — the correlation only changes the eigenvalues (how much variance), never the weights. So PC1 here is just a scaled average of the two z-scores. With 3+ variables the weights diverge, and that is where PCA earns its keep.
+:::
+
+## Step 5 — project each country onto PC1 to get its score
+
+$$PC1_i = w_1 Z_{i,LE} + w_2 Z_{i,IM}$$
+
+The eigenvector *is* the recipe: multiply each country's z-scores by the weights and sum. Two variables officially become one composite number.
+
+``` {.python code-line-numbers="1-2|3"}
+w1, w2 = eigenvectors[0, 0], eigenvectors[1, 0]   # 0.7071, 0.7071
+df["pc1"] = w1 * df["z_le"] + w2 * df["z_im"]      # project onto PC1
+```
+
+::: {.notes}
+Geometrically: drop each country's 2D dot squarely onto the diagonal PC1 line; its position along the line is its health score. Country_01: 0.7071*1.04 + 0.7071*0.76 = 1.27 — well above the mean of 0, healthier half of the sample. Scores range -2.39 to +2.37.
+:::
+
+## PC1 scores rank every country on one health axis
+
+![50 countries ranked by PC1 score — teal above average, orange below, roughly symmetric around zero.](../pca_pc1_scores.png)
+
+::: {.notes}
+The top scorers pair high life expectancy (81–85 years) with very low infant mortality (3.5–8.6 per 1,000); the bottom scorers show the opposite. Mean is exactly 0 (standardized inputs). But negative scores are hard to communicate in a policy report — which motivates Step 6.
+:::
+
+## Step 6 — rescale to [0, 1] so a policymaker can read it
+
+$$HI_i = \frac{PC1_i - PC1_{\min}}{PC1_{\max} - PC1_{\min}}$$
+
+Min-max scaling: the worst country maps to **0**, the best to **1**, everyone else proportionally between.
+
+[Country_01's PC1 of 1.27 becomes a Health Index of 0.77 — "better than 77% of the scale."]{.comment}
+
+::: {.notes}
+You cannot publish "this country scores -2.39." Normalization forces the worst to 0 and the best to 1, producing a purely data-driven index that is instantly understandable. The mean Health Index is 0.50 — close to 0.5 by symmetry.
+:::
+
+## The Health Index reveals a stark three-tier health divide
+
+![Health Index for 50 countries, orange (worst) to teal (best). Country_05 sits at exactly 0.00.](../pca_health_index.png)
+
+::: {.notes}
+Countries cluster into three groups: high above 0.75, a middle band, and a struggling cluster below 0.25. The bottom 10 all fall below 0.16 — systemic weakness across both longevity and infant survival, candidates for comprehensive health packages. Country_05 has no visible bar: it's the minimum, mapped to exactly 0.00 by definition.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## PC1 captures 97.97% of the variance — almost lossless compression {background-color="#141413"}
+
+[97.97%]{.bignum}
+
+[variance retained by a single composite index built from two correlated indicators]{.bignum-label}
+
+::: {.notes}
+The answer to the opening question: yes, PCA collapses two correlated health indicators into one Health Index that keeps virtually all the information. The compression is near-lossless precisely because r = 0.96.
+:::
+
+## The manual pipeline matches scikit-learn to machine precision
+
+![Manual vs scikit-learn PC1 scores: all 50 points fall on the 45-degree line of perfect agreement.](../pca_sklearn_comparison.png)
+
+::: {.notes}
+Max absolute difference 1.33e-15 — machine-precision zero. Correlation 1.000000. One subtlety: eigenvectors are defined up to a sign flip, so sklearn may return opposite-sign scores; we check the correlation and flip if needed. The six-step manual pipeline collapses to ~15 lines of sklearn, reusable by changing only the CSV path and the positive/negative column lists.
+:::
+
+## The whole pipeline, end to end
+
+| Step | Output | Key result |
+|---|---|---|
+| Polarity | $IM^{*} = -IM$ | $r$: $-0.96 \to +0.96$ |
+| Standardize | $Z$ | mean 0, SD 1 |
+| Covariance | $2\times2$ matrix | off-diagonal $r = 0.96$ |
+| Eigen-decompose | $\lambda$, $\mathbf{v}$ | PC1 = [98.0%]{.key} |
+| Score | PC1 | range $[-2.39, 2.37]$ |
+| Normalize | Health Index | range $[0.00, 1.00]$ |
+
+::: {.notes}
+This is the post's summary table — the six steps and their load-bearing numbers in one frame. Use it as the recap before the caveats.
+:::
+
+## Does an equal-weight average make PCA pointless here? No
+
+[Objection.]{.objection} With two standardized variables the weights are forced to 0.7071 each, so PC1 is just a scaled average — why bother with eigen-decomposition?
+
+. . .
+
+[Response.]{.rebuttal} True in the two-variable case. But the *machinery* is what scales: with 15 or 20 indicators PCA discovers **unequal** weights that reflect each variable's unique contribution — something no manual averaging scheme can find. The two-variable case is a transparent warm-up, not the destination.
+
+::: {.notes}
+Steelman the objection honestly. The post is explicit: equal weights are a 2-variable certainty; the real power emerges in higher dimensions. Reference Mendez & Gonzales (2021): PCA over malnutrition, language barriers, dropout, and education inequality across 339 Bolivian municipalities — there the weights genuinely differ.
+:::
+
+## The index measures *relative* performance — read it with care
+
+::: {.incremental}
+- A score of 1.0 means *best in this sample*, not perfect health
+- Adding or removing countries shifts every score (z-scores and min-max bounds both move)
+- A health index of 0.77 is **not** comparable to an education index of 0.77 — different eigenvectors, different scales
+- Year-by-year comparison needs a **pooled PCA** to hold the weights fixed
+:::
+
+::: {.notes}
+The post's discussion caveats. Relativity is the big one: every score depends on which countries are in the sample. Cross-domain and over-time comparisons require extra methodological choices — pooled PCA, or the kind of normalization the UNDP HDI uses.
+:::
+
+# Highly correlated indicators compress almost losslessly — but PCA earns its keep in high dimensions. {.divider background-color="#141413"}
+
+::: {.notes}
+The single takeaway. Two correlated indicators collapse to one number with 98% of the information retained and equal weights — a clean teaching case. The method's real value is the same machinery applied to 15 or 20 indicators, where it discovers the weights you could never guess.
+:::
