@@ -79,15 +79,15 @@ Phase-1 figure manifest. Quarto keeps the `../` reference; the smoke test checks
 
 ---
 
-## 7. KaTeX renders an equation in red (unsupported macro)
+## 7. An equation renders as a MathJax error
 
-**Symptom.** An equation shows as red error text; the smoke test passed (no browser).
+**Symptom.** An equation shows a "Math Processing Error" / red text; the static smoke test passed.
 
-**Cause.** A KaTeX-unsupported macro (`\bm`, `\xrightarrow`, …). In a `.qmd` there is **no**
-Goldmark, so write plain LaTeX — but KaTeX's macro set still applies.
+**Cause.** A macro MathJax can't process (rare — MathJax 2's macro set is broad), or a typo. In
+a `.qmd` there is **no** Goldmark, so write plain LaTeX.
 
-**Fix.** Replace with a KaTeX-supported form (`\bm{x}`→`\mathbf{x}`, `\xrightarrow`→`\to`).
-`\mathbb`/`\hat`/`\sum`/`\|…\|` are fine. Always eyeball math in the Hugo preview.
+**Fix.** Correct the macro/typo (`\mathbb`/`\hat`/`\sum`/`\arg\min`/`\|…\|`/`\pm` are all fine).
+Always eyeball math in a **real browser**, not just the static smoke test (see §12).
 
 ---
 
@@ -136,3 +136,21 @@ deliberately does **not** ignore `slides_files/`.
 `title-slide.html` (source) **and** `index.html` + `slides_files/` (the served deck, ~8 MB):
 `git add content/post/<slug>/slides/`. Only Quarto's local cache is ignored
 (`content/post/*/slides/.quarto/`). Never add a `.gitignore` rule that catches `slides_files/`.
+
+---
+
+## 12. Math shows as raw LaTeX (`\hat\alpha`) instead of typeset
+
+**Symptom.** Slides display the LaTeX **source** — `\hat\alpha \pm 95\%` — not the typeset math.
+The static smoke test passed (it only checks that `$…$` became `<span class="math">` spans, NOT
+that they actually *render*).
+
+**Cause.** `html-math-method: katex` is **broken in Quarto revealjs**: it emits
+`<span class="math inline">\hat\alpha</span>` (raw) and loads KaTeX, but adds **no auto-render
+call**, so KaTeX is never invoked.
+
+**Fix.** Use the **default MathJax** — do NOT set `html-math-method`. MathJax (the reveal math
+plugin) renders `\(…\)` across the whole slide DOM (body, captions, headings, table cells).
+**Verify in a real browser** — the static smoke test cannot see unrendered math (this is the bug
+that shipped twice). See the Playwright math-render check in `verification-checklist.md` +
+`templates/math-check.cjs`.

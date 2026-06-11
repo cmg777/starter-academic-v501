@@ -53,6 +53,29 @@ Exits 0/1, `[✓]/[✗]` per assertion. Checks the rendered files: `index.html` 
 + menu wired in; speaker notes; ≥1 brand divider (`data-background-color`); 6 ≤ `<section>` ≤
 60; every `../<slug>_*.png` exists on disk; no leaked `{{…}}` markers.
 
+**Layer B canNOT verify that math RENDERS** — it only sees that `$…$` became `<span class="math">`
+spans, not whether they typeset. A broken math engine ships raw `\hat\alpha` and Layer B still
+passes. That is what Layer C catches.
+
+---
+
+## Layer C — browser math-render check (MANDATORY when the deck has math)
+
+The static layers cannot see unrendered math (this bug shipped twice before this check existed).
+Drive a real browser to confirm the LaTeX typesets:
+```bash
+# Playwright usually lives only in the npx cache — locate it, then point NODE_PATH at it:
+PW=$(find "$HOME/.npm/_npx" -path '*node_modules/playwright/package.json' 2>/dev/null | head -1)
+NODE_PATH="$(dirname "$(dirname "$PW")")" node \
+  .claude/skills/write-slides/references/templates/math-check.cjs \
+  "$PWD/content/post/<slug>/slides/index.html"
+```
+`math-check.cjs` opens the deck in the system Chrome, waits for MathJax, traverses **every**
+slide (via `Reveal.next()`, covering the vertical content sub-slides under each `#` divider), and
+**fails (`[✗]`) if any slide shows raw backslash-LaTeX** (`\hat`, `\(`, …); it exits 0 only when
+all math rendered. If Playwright/Chrome is unavailable, fall back to a manual eyeball: open the
+deck and confirm `$\hat\alpha$` shows as α̂, not `\hat\alpha`. **Never commit with raw LaTeX.**
+
 ---
 
 ## Report template (Phase 5)

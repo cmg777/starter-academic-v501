@@ -19,8 +19,8 @@ Conventions:
   `β → $\beta$`, `|I_d| → $|I_d|$`, `± → $\pm$`, `≈ → $\approx$`. **Mixed numbers:** full math in
   captions/bullets/comments/labels (`$\hat\alpha = -0.096$`), but keep the orange `[…]{.key}`
   cells and the giant `[…]{.bignum}` as **styled text** (math drops their colour/size). **Notes
-  stay Unicode** — the speaker-notes window doesn't run the math renderer. (KaTeX from a pinned
-  CDN; no Goldmark escaping here — this is a `.qmd`, not `index.md`.)
+  stay Unicode** — the speaker-notes window doesn't run the math renderer. (MathJax — Quarto
+  revealjs's default, from a CDN; no Goldmark escaping here — this is a `.qmd`, not `index.md`.)
 
 ---
 
@@ -162,7 +162,7 @@ $$\hat\beta(\lambda)=\arg\min_\beta \tfrac{1}{2n}\|y-X\beta\|_2^2+\lambda\sum_j|
 selection.]{.comment}
 ```
 **Use:** one equation per slide with a plain-language gloss (`.comment`, centred). Plain
-LaTeX — Pandoc/KaTeX render it; no `\\$`/`\_` gymnastics.
+LaTeX — Pandoc/MathJax render it; no `\\$`/`\_` gymnastics.
 
 ---
 

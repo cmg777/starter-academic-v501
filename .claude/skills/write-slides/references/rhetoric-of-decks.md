@@ -154,7 +154,7 @@ unchanged; only the mechanics differ.
 | `\includegraphics{fig.pdf}` | `![caption](../<slug>_fig.png)` (auto-stretch bounds it) |
 | `booktabs` table | a markdown table (theme-styled; `[cell]{.key}` highlights the headline) |
 | `lstlisting` code block | ` ``` {.r code-line-numbers="…"} ` (highlighted, not executed) |
-| LaTeX math | plain `$…$` / `$$…$$` (Pandoc + KaTeX) |
+| LaTeX math | plain `$…$` / `$$…$$` (Pandoc + MathJax) |
 | Beamer notes | `::: {.notes}` (press **S** for speaker view) |
 | `pdflatex` zero-warning compile loop | `quarto render` + Hugo HTTP-200 + Node smoke test |
 | `/tikz`, `referee2`, graphics audit sub-agents | not ported (Beamer/LaTeX-specific) |
@@ -165,7 +165,7 @@ unchanged; only the mechanics differ.
 `index.md` escaping rules do **not** apply — write **plain LaTeX** in the deck:
 `$\hat\beta_j$`, `$\|y-X\beta\|_2^2$`, `$5` for currency, single backslashes, raw underscores.
 When porting an equation out of `index.md`, **drop** its Goldmark escaping (`\\$ → $`,
-`\_ → _`, `\\| → \|`). KaTeX's macro set still applies (see `render-and-fix.md` §7).
+`\_ → _`, `\\| → \|`). MathJax's macro set still applies (see `render-and-fix.md` §7).
 
 ---
 

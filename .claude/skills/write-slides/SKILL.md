@@ -247,8 +247,13 @@ Run [`references/verification-checklist.md`](references/verification-checklist.m
 **Layer 0** (`quarto render` → `index.html` + `slides_files/`, render-and-fix loop); **Layer
 A** (Hugo ≥0.96 HTTP-200 on the deck + a sampled `slides_files/` asset + every `../<slug>_*.png`
 + the post page; plus the YAML-link check that the button points to `…/slides/index.html`, not
-`/slides/`); **Layer B** (the Node static smoke test). If no ≥0.96 Hugo binary is available,
-mark Layer A `[~]` and rely on Layer B. Always kill any Hugo process started.
+`/slides/`); **Layer B** (the Node static smoke test); and **Layer C** — a Playwright browser
+**math-render check** (`templates/math-check.cjs`) that loads the deck, traverses every slide,
+and **fails on raw LaTeX**. Layer C is **mandatory when the deck has math**: the static layers
+only see that `$…$` became `<span class="math">`, NOT that it *renders* — a broken engine ships
+raw `\hat\alpha`. If no ≥0.96 Hugo binary is available, mark Layer A `[~]` and rely on Layer B;
+if Playwright/Chrome is unavailable, eyeball the math manually (open the deck; `$\hat\alpha$`
+must show as α̂, not `\hat\alpha`). Always kill any Hugo process started.
 
 ---
 

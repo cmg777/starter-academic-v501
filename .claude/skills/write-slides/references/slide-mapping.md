@@ -99,7 +99,7 @@ deck's three most load-bearing numbers (e.g. the hero estimate, its contrast, an
 ## Porting equations (drop the Goldmark escaping)
 
 The post's `index.md` is Goldmark + MathJax, so its math is escaped for *that* pipeline. The
-deck's `.qmd` is **Pandoc + KaTeX**, so **drop** that escaping when copying an equation in:
+deck's `.qmd` is **Pandoc + MathJax**, so **drop** that escaping when copying an equation in:
 
 | In `index.md` | In the deck (`slides.qmd`) |
 |---|---|
@@ -109,8 +109,8 @@ deck's `.qmd` is **Pandoc + KaTeX**, so **drop** that escaping when copying an e
 | `\\,` `\\;` `\\%` | `\,` `\;` `\%` |
 | `\theta`, `\hat`, `\sum` (already fine) | unchanged |
 
-Inline math `$…$`, display `$$…$$`. Verify visually in the Hugo preview (KaTeX errors render
-red but the smoke test can't catch them — see `render-and-fix.md` §7 for unsupported macros).
+Inline math `$…$`, display `$$…$$`. Verify visually in the Hugo preview (MathJax errors render
+visibly but the smoke test can't catch them — see `render-and-fix.md` §7 for unsupported macros).
 
 ## Math symbols → LaTeX (never literal Unicode)
 
@@ -129,7 +129,9 @@ red but the smoke test can't catch them — see `render-and-fix.md` §7 for unsu
   Plain standalone numbers (284, 143) stay text.
 - **Notes stay Unicode.** The reveal speaker-notes window doesn't run the math renderer, so
   LaTeX source would show raw there — keep `α̂` etc. inside `::: {.notes}`.
-- Engine: **KaTeX from a pinned CDN** (reveal.js is bundled locally; math needs a network).
+- Engine: **MathJax** — Quarto revealjs's default, loaded from a CDN (reveal.js itself is
+  bundled locally; math needs a network). Do NOT set `html-math-method: katex` (broken in
+  revealjs — math shows as raw LaTeX).
 
 ---
 

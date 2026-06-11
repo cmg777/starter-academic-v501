@@ -32,11 +32,10 @@ format:
     fig-align: center         # + auto-stretch (default on) bounds images to the slide → no overflow
     auto-stretch: true
     highlight-style: github
-    # KaTeX renders the LaTeX math. NOTE: Quarto loads KaTeX from a CDN (pinned here);
-    # reveal.js itself is bundled locally in slides_files/. Math needs network.
-    html-math-method:
-      method: katex
-      url: "https://cdn.jsdelivr.net/npm/katex@0.16.21/dist"
+    # Math: MathJax (Quarto revealjs DEFAULT) — renders $…$ / $$…$$ across the whole slide
+    # DOM (body, captions, headings, table cells). Loads from a CDN; reveal.js is local.
+    # Do NOT set `html-math-method: katex` — it is broken in revealjs (no auto-render call,
+    # so math shows as raw LaTeX). See references/render-and-fix.md.
     link-external-icon: false
 ---
 
