@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="dcterms.date" content="2026-06-11">
+  <title>Bouncing Back Better?</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Bouncing Back Better?</h1>
+  <p class="subtitle">Evaluating the economic impact of the 2004 Aceh tsunami</p>
+  <div class="title-result-strip">
+    <div class="kr"><span class="kr-num">−7.9%</span><span class="kr-cap">output shock in 2005</span></div>
+    <div class="kr"><span class="kr-num">+6.3pp/yr</span><span class="kr-cap">recovery premium 2006–08</span></div>
+    <div class="kr"><span class="kr-num">+18.3%</span><span class="kr-cap">synthetic-control gap by 2012</span></div>
+  </div>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University (GSID)</p>
+  <p class="date">June 11, 2026</p>
+</section>
+<section>
+<section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
+<h1>The Tension</h1>
+<p><span class="act">Act I</span></p>
+</section>
+<section id="a-magnitude-9.1-quake-a-wave-9-km-inland-and-130000-lives-lost-in-one-province" class="slide level2 center">
+<h2>A magnitude-9.1 quake, a wave 9 km inland, and ~130,000 lives lost in one province</h2>
+<p>On 26 December 2004 a tsunami flooded a third of Aceh’s coastline. Then something unusual followed: the <strong>largest reconstruction effort ever</strong> aimed at a developing-world disaster — about <strong>USD 7.0 billion spent</strong>, through a low-corruption agency.</p>
+<div class="fragment">
+<p>So, a decade later: was Aceh <strong>richer or poorer</strong> than it would have been without the wave? <em>Catastrophe destroys; well-spent aid rebuilds. Which force won?</em></p>
+<aside class="notes">
+<p>The hook is the genuine ambiguity. Disasters destroy capital and people, but Aceh received aid worth roughly 150% of its damages, spent unusually well. The point of the talk is not just “what happened” but “how could you ever measure it credibly”.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="you-only-ever-observe-the-world-where-the-tsunami-did-happen" class="slide level2 center">
+<h2>You only ever observe the world where the tsunami <em>did</em> happen</h2>
+<p>To answer it, we need Aceh’s <strong>counterfactual</strong> — the output it would have had with no tsunami. That world is never observed; it must be <em>estimated</em>.</p>
+<div class="fragment">
+<p>Our target is the <strong>ATT</strong> — the average effect of the treatment on the treated:</p>
+<p><span class="math display">\[\text{ATT} = E[\,Y(1) - Y(0) \mid D = 1\,]\]</span></p>
+<p><span class="comment">The effect <em>on the flooded districts</em> — not on some randomly chosen district.</span></p>
+<aside class="notes">
+<p>This is the fundamental problem of causal inference. Y(1) is observed for flooded Aceh; Y(0) is not. DiD estimates Y(0) from the control group’s trend; synthetic control estimates it from a weighted blend of donor districts. Both target the ATT.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-waves-path-was-geography-not-choice-that-is-what-makes-it-a-natural-experiment" class="slide level2 center">
+<h2>The wave’s path was geography, not choice — that is what makes it a natural experiment</h2>
+<p>Whether the water reached a stretch of coast was governed by <strong>elevation, vegetation, and offshore depth</strong> — read off satellite inundation maps, not chosen by economics. Flooded vs spared is plausibly <em>unrelated</em> to a district’s economic prospects.</p>
+<div class="fragment">
+<p><span class="objection">A note on the data.</span> Everything here runs on <strong>synthetic, calibrated</strong> data — tuned to reproduce Heger &amp; Neumayer (2019)’s signs, significance, and approximate magnitudes. Learn the <em>methods</em>, not new facts about Aceh.</p>
+<aside class="notes">
+<p>Treatment is defined off DLR/ZKI and Dartmouth Flood Observatory maps made 1–5 days after the wave — exogenous geographic happenstance. The synthetic-data caveat is stated up front for honesty; Section 11 of the post audits it column by column.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section></section>
+<section>
+<section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>The Investigation</h1>
+<p><span class="act">Act II</span></p>
+</section>
+<section id="one-disaster-measured-at-two-grains-district-gdp-and-sub-district-night-lights" class="slide level2 center">
+<h2>One disaster, measured at two grains — district GDP and sub-district night-lights</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h3 id="district-gdp">District GDP</h3>
+<ul>
+<li>125 Sumatran districts</li>
+<li>annual, 1999–2012 (1,750 rows)</li>
+<li><strong>10 flooded Aceh</strong> districts treated</li>
+<li>outcome: real GDP growth (oil &amp; gas excluded)</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<h3 id="sub-district-night-lights">Sub-district night-lights</h3>
+<ul>
+<li>276 Aceh sub-districts</li>
+<li>satellite luminosity (DMSP-OLS, 0–63)</li>
+<li>continuous <em>dose</em>: share flooded</li>
+<li>outcome: log-luminosity growth</li>
+</ul>
+</div></div>
+<p><span class="comment">Only <strong>10 treated units</strong> — the recurring source of statistical caution.</span></p>
+<aside class="notes">
+<p>National GDP would barely flinch at a one-province shock, so we need sub-national data at two grains. District GDP gives the headline DiD; the finer night-lights panel lets us ask whether the harder-hit places rebounded more.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="parallel-before-2005-then-a-dive-and-an-overshoot" class="slide level2 center">
+<h2>Parallel before 2005, then a dive and an overshoot</h2>
+
+<img data-src="../python_did_sc_tsunami_group_means.png" class="r-stretch quarto-figure-center"><p class="caption">Treated (orange) vs control (blue) group-mean growth: lockstep before the tsunami, then the treated line plunges to ≈ −0.027 and overshoots to ≈ +0.124 in 2007.</p><aside class="notes">
+<p>This is the picture DiD was invented for. Pre-2005 the two lines move together — the visual signature of parallel trends. At the tsunami the treated line dives; then it over-shoots before settling back toward the control. The eye is convinced; the rest of the talk quantifies it and attaches a margin of error.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-single-after-hides-the-story" class="slide level2 center">
+<h2>A single “after” hides the story</h2>
+<p>The simplest DiD splits time into before/after and takes the difference of the two changes:</p>
+<p><span class="math display">\[\widehat{\text{DiD}} = \big(\bar{g}_{\text{treat, after}} - \bar{g}_{\text{treat, before}}\big) - \big(\bar{g}_{\text{ctrl, after}} - \bar{g}_{\text{ctrl, before}}\big)\]</span></p>
+<div class="fragment">
+<p>That pooled number is <strong>+0.0125, insignificant</strong> (p = 0.38) — because one “after” window blends the <strong>2005 destruction</strong> with the <strong>2006–08 boom</strong>, and they nearly cancel.</p>
+<aside class="notes">
+<p>The pooled estimate is not wrong, it is uninformative. The fix is to let the effect vary over time — split the post period into event-time windows. That is the paper’s headline specification.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="in-2005-then-6.3-ppyr-faster-in-200608" class="slide level2 center">
+<h2>−7.9% in 2005, then +6.3 pp/yr faster in 2006–08</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1-2|3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>m <span class="op">=</span> pf.feols(<span class="st">"gdp_growth ~ D_pre + D_2005 + D_recov + D_post | district_id + year"</span>,</span>
+<span id="cb1-2"><a href=""></a>             data<span class="op">=</span>df, vcov<span class="op">=</span>{<span class="st">"CRV1"</span>: <span class="st">"district_id"</span>})</span>
+<span id="cb1-3"><a href=""></a>m.coef().<span class="bu">round</span>(<span class="dv">4</span>)   <span class="co"># D_2005 = −0.0792 · D_recov = +0.0628</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Event-time window</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Conley-HAC SE</th>
+<th style="text-align: center;">Sig.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pre-tsunami (2003–04)</td>
+<td style="text-align: right;">+0.0172</td>
+<td style="text-align: right;">0.0159</td>
+<td style="text-align: center;">ns</td>
+</tr>
+<tr class="even">
+<td>Tsunami (2005)</td>
+<td style="text-align: right;"><span class="key">−0.0792</span></td>
+<td style="text-align: right;">0.0240</td>
+<td style="text-align: center;">***</td>
+</tr>
+<tr class="odd">
+<td>Recovery (2006–08)</td>
+<td style="text-align: right;"><span class="key">+0.0628</span></td>
+<td style="text-align: right;">0.0244</td>
+<td style="text-align: center;">**</td>
+</tr>
+<tr class="even">
+<td>Post-recovery (2009–12)</td>
+<td style="text-align: right;">+0.0114</td>
+<td style="text-align: right;">0.0146</td>
+<td style="text-align: center;">ns</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">Flat pre-trend → parallel trends passes; the gain neither evaporates nor compounds → a <em>permanently higher</em> path.</span></p>
+<aside class="notes">
+<p>Three takeaways. The pre-tsunami coefficient is small and insignificant — parallel trends survives its formal placebo. The 2005 coefficient is −0.0792 (≈ 8% slower the year the wave hit). The recovery coefficient is +0.0628; three years of that premium more than erase the one-year loss. This is the paper’s signature “recovery beyond the counterfactual trend”.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-event-study-shows-why-the-pooled-average-misled" class="slide level2 center">
+<h2>The event study shows <em>why</em> the pooled average misled</h2>
+
+<img data-src="../python_did_sc_tsunami_event_study.png" class="r-stretch quarto-figure-center"><p class="caption">Treated-minus-control effect by period (95% CIs): baseline and pre-trend sit on zero, 2005 collapses to −0.079, recovery rebounds to +0.063, then drifts back but stays positive.</p><aside class="notes">
+<p>The single “after” dummy averaged the deep-negative 2005 point with the high recovery point and got a muted, insignificant number. The event study shows the whole arc — a flat pre-trend (identification visibly satisfied), a sharp collapse, a significant rebound, and a persistent higher level.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="not-a-denominator-artifact-per-capita-recovery-is-even-larger" class="slide level2 center">
+<h2>Not a denominator artifact — per-capita recovery is even larger</h2>
+<p>A worry: maybe “growth” rose only because population fell (130,000 deaths and displacement). Re-running the DiD on <strong>GDP per capita</strong>:</p>
+<div class="fragment">
+<p><span class="bignum">+0.0827</span></p>
+<p><span class="bignum-label">recovery coefficient on per-capita growth, p &lt; 0.01 — output per person rose, not just totals</span></p>
+<aside class="notes">
+<p>In per-capita terms there is no significant 2005 loss (output and population fell together that year), but the recovery gain strengthens to +0.0827. Fewer people then shared a rebuilt, better-capitalized economy. The effect survives dividing by population.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-harder-hit-rebounded-more-and-only-the-worst-hit-fifth-significantly" class="slide level2 center">
+<h2>The harder-hit rebounded more — and only the worst-hit fifth significantly</h2>
+
+<img data-src="../python_did_sc_tsunami_nightlights_dose.png" class="r-stretch quarto-figure-center"><p class="caption">Night-lights dose-response: continuous period effects (left) and effect by flood-intensity quintile (right) — only Q5, the most heavily flooded sub-districts, rebounds significantly.</p><table class="caption-top">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quintile</th>
+<th style="text-align: center;">Q1</th>
+<th style="text-align: center;">Q2</th>
+<th style="text-align: center;">Q3</th>
+<th style="text-align: center;">Q4</th>
+<th style="text-align: center;">Q5 (worst-hit)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Recovery effect</td>
+<td style="text-align: center;">+0.0010</td>
+<td style="text-align: center;">+0.0010</td>
+<td style="text-align: center;">+0.0009</td>
+<td style="text-align: center;">+0.0008</td>
+<td style="text-align: center;"><span class="key">+0.0018</span>**</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>Each unit of population-share flooded buys +0.016/year extra luminosity growth in recovery (p &lt; 0.001). But the average is not spread evenly — only the top intensity quintile shows a significant rebound. The effect concentrates exactly where the damage, and therefore the reconstruction spending, was greatest.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-synthetic-aceh-built-from-76-donors-tracks-the-pre-2005-path-almost-exactly" class="slide level2 center">
+<h2>A synthetic Aceh, built from 76 donors, tracks the pre-2005 path almost exactly</h2>
+<p>Synthetic control picks non-negative weights <span class="math inline">\(w\)</span> that sum to one to minimize pre-treatment mismatch:</p>
+<p><span class="math display">\[w^{\ast} = \arg\min_{w}\ (X_1 - X_0 w)^{\top} V (X_1 - X_0 w) \quad \text{s.t.}\quad w_j \ge 0,\ \textstyle\sum_j w_j = 1\]</span></p>
+
+<img data-src="../python_did_sc_tsunami_synthetic_control.png" class="r-stretch quarto-figure-center"><p class="caption">Actual flooded Aceh vs synthetic Aceh: the synthetic line shadows the treated path before 2005 (pre-RMSE 0.485), then the actual line pulls clearly above.</p><aside class="notes">
+<p>A pre-RMSE of 0.485 against GDP levels near 200 means synthetic Aceh shadows the real thing almost perfectly before 2005 — which is what licenses trusting it as a counterfactual afterward. The top weight is only 0.13; the counterfactual rests on many modest donors, not one look-alike.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="above-its-no-tsunami-twin-by-2012-and-the-gap-opens-only-after-the-wave" class="slide level2 center">
+<h2>+18.3% above its no-tsunami twin by 2012 — and the gap opens only after the wave</h2>
+
+<img data-src="../python_did_sc_tsunami_sc_gap.png" class="r-stretch quarto-figure-center"><p class="caption">The treated-minus-synthetic gap: indistinguishable from zero before 2005, then steadily positive.</p><p><span class="comment">Two very different methods — DiD and synthetic control — now agree: flooded Aceh ended materially above where it was heading.</span></p>
+<aside class="notes">
+<p>By 2012 actual Aceh is at 370.9 vs the synthetic 295.0 — a +18.3% gap. The gap plot isolates the divergence: zero before treatment, opening afterward. Triangulation across independent methods is a far stronger claim than any one method alone.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="all-10-treated-units-sit-in-one-corner-of-the-map" class="slide level2 center">
+<h2>All 10 treated units sit in one corner of the map</h2>
+
+<img data-src="../python_did_sc_tsunami_spatial_map.png" class="r-stretch quarto-figure-center"><p class="caption">Longitude–latitude scatter of every Sumatran district: the 10 flooded (treated) units, in orange, cluster on Aceh’s far north-west coast.</p><p><span class="comment">Near things are more related than distant things — their growth shocks are <em>not</em> independent draws.</span></p>
+<aside class="notes">
+<p>When treated units are packed together, a good monsoon, a regional price swing, or the reconstruction boom itself hits them together. The default standard error assumes independence, so it counts more truly-independent information than the data contain — and reports SEs that are too small.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-point-estimate-never-moved-only-our-honesty-about-it-did" class="slide level2 center">
+<h2>The point estimate never moved — only our honesty about it did</h2>
+<p>Moran’s I on the residuals is <strong>+0.065</strong> (permutation p = 0.003): nearby districts’ growth is significantly correlated. The fix is a <strong>Conley spatial-HAC</strong> standard error.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Recovery effect</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Naive SE</th>
+<th style="text-align: right;">Conley-HAC SE</th>
+<th style="text-align: right;">t(HAC)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2006–08</td>
+<td style="text-align: right;">+0.0628</td>
+<td style="text-align: right;">0.0146</td>
+<td style="text-align: right;"><span class="key">0.0244</span></td>
+<td style="text-align: right;">+2.57</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">Same +0.0628 in every column. The SE inflates 1.68× — downgrading a spurious *** to an honest **.</span></p>
+<aside class="notes">
+<p>Under the naive error the recovery effect would have a t above 4 and look significant at 1%. Under the honest Conley-HAC error its t is 2.57 — significant at 5%, not 1%. A careless analyst would have overstated the confidence threefold. The SE is stable across the 25–100 km cutoff range the paper uses.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>The Resolution</h1>
+<p><span class="act">Act III</span></p>
+</section>
+<section id="four-methods-one-story-recovery-beyond-the-counterfactual-trend" class="slide level2 center">
+<h2>Four methods, one story: recovery beyond the counterfactual trend</h2>
+<ul>
+<li class="fragment"><strong>DiD</strong> — −7.9% in 2005, +6.3 pp/yr in 2006–08, on a permanently higher path</li>
+<li class="fragment"><strong>Event study</strong> — flat pre-trend, sharp collapse, significant rebound</li>
+<li class="fragment"><strong>Night-lights</strong> — the dose-response: only the worst-hit quintile rebounds</li>
+<li class="fragment"><strong>Synthetic control</strong> — +18.3% above the no-tsunami Aceh by 2012</li>
+</ul>
+<p><span class="comment">Triangulation, not a single regression, is what makes the claim credible.</span></p>
+<aside class="notes">
+<p>Four tools built on different assumptions all point the same way. That convergence — not the precision of any one estimate — is the strongest part of the evidence.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="well-governed-mega-reconstruction-can-bend-a-poor-regions-path-upward" class="slide level2 center">
+<h2>Well-governed mega-reconstruction can bend a poor region’s path upward</h2>
+<p>The lesson is <strong>not</strong> “disasters are good” — 130,000 people died. It is that a localized catastrophe followed by <strong>large, well-spent aid</strong> can leave a poor region permanently better off.</p>
+<div class="fragment">
+<p>Aceh received aid worth ≈ <strong>150% of its damages</strong>, through a low-corruption agency, rebuilt “better than before.” <em>That combination — not the wave — bent the growth path upward.</em></p>
+<aside class="notes">
+<p>For disaster policy the design lesson matters as much as the result: a credible evaluation needs exogenous exposure (geography, not choice), a finer-than-national unit of analysis, and spatially honest standard errors.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-strongest-objection-and-the-answer" class="slide level2 center">
+<h2>The strongest objection — and the answer</h2>
+<p><span class="objection">Objection.</span> The data are <strong>synthetic</strong>, and there are only <strong>10 treated districts</strong> — point estimates are fragile, standard errors wide.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span> The synthetic data are <em>calibrated</em> to the paper’s signs, significance, and magnitudes (audited column by column). And the small-N fragility is met head-on: a <strong>flat pre-trend</strong>, a <strong>null neighbour placebo</strong>, and <strong>Conley-HAC</strong> errors that already price in the clustering. The caveats narrow the claim — they do not overturn it.</p>
+<aside class="notes">
+<p>Steelman first: this is a single, exceptionally well-funded case study on simulated data with a tiny treatment group. The honest reply is that every credibility check — placebo, pre-trend, spatial inference — has been run and survived, and the conclusion is stated as evidence about well-governed mega-reconstruction, not disaster aid in general.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="five-numbers-five-lessons" class="slide level2 center">
+<h2>Five numbers, five lessons</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Number to remember</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2005 output shock</td>
+<td style="text-align: right;"><span class="key">−0.0792</span>***</td>
+</tr>
+<tr class="even">
+<td>2006–08 recovery premium (per year)</td>
+<td style="text-align: right;">+0.0628**</td>
+</tr>
+<tr class="odd">
+<td>Synthetic-control gap by 2012</td>
+<td style="text-align: right;">+18.3%</td>
+</tr>
+<tr class="even">
+<td>Moran’s I (spatial autocorrelation)</td>
+<td style="text-align: right;">+0.065</td>
+</tr>
+<tr class="odd">
+<td>Recovery SE: naive → Conley-HAC</td>
+<td style="text-align: right;">0.0146 → 0.0244</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li class="fragment">A single “after” hides the story — let evolving effects evolve.</li>
+<li class="fragment">Triangulate across methods; agreement beats any one estimate.</li>
+<li class="fragment">Satellite data unlock localized questions invisible at the national grain.</li>
+<li class="fragment">Clustered treatment demands honest, spatially-corrected inference.</li>
+<li class="fragment">Mind the small print: 10 districts, synthetic data, an assumption — strong evidence, stated with its caveats.</li>
+</ul>
+<aside class="notes">
+<p>Close on the numbers, then the lessons. The next steps in the post: staggered-adoption DiD estimators, prediction intervals for the synthetic control, a wider donor pool.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section id="a-poor-region-well-governed-reconstruction-a-permanently-higher-path." class="title-slide slide level1 divider center" data-background-color="#141413">
+<h1>A poor region, well-governed reconstruction, a permanently higher path.</h1>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

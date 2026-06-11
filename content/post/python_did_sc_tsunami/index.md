@@ -16,13 +16,17 @@ image:
   placement: 3
   preview_only: false
 links:
+- icon: person-chalkboard
+  icon_pack: fas
+  name: "Slides (HTML)"
+  url: slides/index.html
 - icon: laptop-code
   icon_pack: fas
   name: "Web app"
   url: web_app/index.html
 - icon: file-pdf
   icon_pack: fas
-  name: "Slides (PDF)"
+  name: "AI Slides"
   url: https://carlos-mendez.org/post/python_did_sc_tsunami/Natural_Disaster_Causal_Inference.pdf
 - icon: code
   icon_pack: fas
