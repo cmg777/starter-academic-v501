@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="dcterms.date" content="2026-06-11">
+  <title>A Beginner’s Guide to Causal Inference with DoWhy</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">A Beginner’s Guide to Causal Inference with DoWhy</h1>
+  <p class="subtitle">Recovering a known effect from observational data, the Model→Identify→Estimate→Refute way</p>
+  <div class="title-result-strip">
+    <div class="kr"><span class="kr-num">1.39</span><span class="kr-cap">naive estimate · 39% too high</span></div>
+    <div class="kr"><span class="kr-num">1.01</span><span class="kr-cap">doubly robust recovers the ATE</span></div>
+    <div class="kr"><span class="kr-num">5,000</span><span class="kr-cap">simulated employees</span></div>
+  </div>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University (GSID)</p>
+  <p class="date">June 11, 2026</p>
+</section>
+<section>
+<section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
+<h1>The Tension</h1>
+<p><span class="act">Act I</span></p>
+</section>
+<section id="does-working-from-home-raise-productivity-or-do-productive-people-just-choose-it" class="slide level2 center">
+<h2>Does working from home raise productivity — or do productive people just choose it?</h2>
+<p>A company compares 5,000 employees and finds work-from-home staff are <strong>1.39 points</strong> more productive.</p>
+<div class="fragment">
+<p>But the true effect is only <strong>1.0</strong>. <em>Where did the extra 0.39 come from?</em></p>
+<aside class="notes">
+<p>This is the central problem of causal inference: in observational data, the people who take the treatment are different from those who don’t. Introverts both prefer WFH and are independently more productive. So a raw comparison mixes the effect of WFH with the effect of being an introvert. The whole deck is about recovering the 1.0 we secretly built into the simulation.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-naive-comparison-says-1.39-confidently-wrong-by-39" class="slide level2 center">
+<h2>The naive comparison says +1.39 — confidently wrong by 39%</h2>
+
+<img data-src="../dowhy_intro_eda.png" class="r-stretch quarto-figure-center"><p class="caption">Panel A: WFH (orange) vs office (blue) productivity. Panel B: WFH workers are more introverted and have more children — the fingerprint of self-selection.</p><aside class="notes">
+<p>Spoiler figure for the problem. The right-shifted WFH distribution is not all causal — part of it reflects covariate imbalance shown in Panel B: introversion 5.19 vs 4.55, children 1.58 vs 1.33. The dotted line marks where the office distribution would sit if only the true 1.0 effect acted. Plant the tension; we resolve it in Act III.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="where-were-going" class="slide level2 center">
+<h2>Where we’re going</h2>
+<ul>
+<li class="fragment">The lab: 5,000 employees, a known ATE of 1.0, two confounders, one instrument</li>
+<li class="fragment">DoWhy’s four steps — Model, Identify, Estimate, Refute</li>
+<li class="fragment">Four estimators across two identification strategies</li>
+<li class="fragment">The lesson: identification and method comparison, not precision, separate causal from confidently-wrong</li>
+</ul>
+</section></section>
+<section>
+<section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>The Investigation</h1>
+<p><span class="act">Act II</span></p>
+</section>
+<section id="we-simulate-the-truth-so-we-can-check-who-recovers-it" class="slide level2 center">
+<h2>We simulate the truth so we can check who recovers it</h2>
+<ul>
+<li class="fragment"><strong>Outcome</strong> — <code>productivity</code> (mean 53.88), with a true WFH effect baked in at <strong>+1.0</strong></li>
+<li class="fragment"><strong>Treatment</strong> — <code>work_from_home</code> (66.2% treated), assigned <em>non-randomly</em></li>
+<li class="fragment"><strong>Confounders</strong> — <code>introversion</code> and <code>num_children</code> drive <em>both</em> treatment and outcome</li>
+<li class="fragment"><strong>Instrument</strong> — <code>subway_disruption</code> shifts WFH but never touches productivity directly</li>
+</ul>
+<p><span class="comment">The estimand is the <strong>average treatment effect (ATE)</strong> — and we know it equals 1.0, so every method is graded against the truth.</span></p>
+</section>
+<section id="confounders-open-a-backdoor-path-the-naive-estimate-cant-close" class="slide level2 center">
+<h2>Confounders open a backdoor path the naive estimate can’t close</h2>
+
+<img data-src="../dowhy_intro_dag.png" class="r-stretch quarto-figure-center"><p class="caption">The DAG (DoWhy Step 1). Introversion and children point into <em>both</em> WFH and productivity — a backdoor path. Subway disruption points only into WFH: the makings of an instrument.</p><aside class="notes">
+<p>This is DoWhy Step 1 (Model) drawn as a DAG. The single arrow T→Y is the causal effect we want. The two confounders create backdoor paths T←I→Y and T←C→Y. Block those and the remaining association is causal. The instrument gives a second, independent route to identification.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="dowhy-forces-four-explicit-steps-keeping-assumptions-apart-from-estimation" class="slide level2 center">
+<h2>DoWhy forces four explicit steps — keeping assumptions apart from estimation</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Question</th>
+<th style="text-align: left;">What you do</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Model</strong></td>
+<td>What do I assume?</td>
+<td style="text-align: left;">Draw the DAG</td>
+</tr>
+<tr class="even">
+<td><strong>Identify</strong></td>
+<td>Is the effect computable?</td>
+<td style="text-align: left;"><span class="key">Backdoor or IV</span></td>
+</tr>
+<tr class="odd">
+<td><strong>Estimate</strong></td>
+<td>What’s the number?</td>
+<td style="text-align: left;">Regression, IPW, AIPW, IV</td>
+</tr>
+<tr class="even">
+<td><strong>Refute</strong></td>
+<td>Is it robust?</td>
+<td style="text-align: left;">Placebo, random cause, subset</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">Identification (a <em>causal</em> question about the graph) stays separate from estimation (a <em>statistical</em> question about the data).</span></p>
+</section>
+<section id="step-2-identify-the-backdoor-estimand-conditions-on-the-confounders" class="slide level2 center">
+<h2>Step 2 — Identify: the backdoor estimand conditions on the confounders</h2>
+<p><span class="math display">\[ATE = E\!\left[\frac{\partial}{\partial T}\, E[\,Y \mid T, X_1, X_2\,]\right]\]</span></p>
+<p>Condition on <code>introversion</code> (<span class="math inline">\(X_1\)</span>) and <code>num_children</code> (<span class="math inline">\(X_2\)</span>) and the leftover <span class="math inline">\(T\)</span>–<span class="math inline">\(Y\)</span> association <em>is</em> the causal effect.</p>
+<p><span class="comment">The assumption is <strong>unconfoundedness</strong>: no unmeasured common cause of WFH and productivity. Untestable from data alone.</span></p>
+<aside class="notes">
+<p>Identification is purely theoretical — it depends on the graph, not the numbers. DoWhy reads the DAG and reports that conditioning on the two confounders blocks every backdoor path. This is “selection on observables.” Its Achilles heel: miss one confounder and every backdoor estimate is biased, with no internal warning.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="step-2-identify-the-instrument-gives-a-second-assumption-free-route" class="slide level2 center">
+<h2>Step 2 — Identify: the instrument gives a second, assumption-free route</h2>
+<p><span class="math display">\[ATE = \frac{E\!\left[\partial Y / \partial Z\right]}{E\!\left[\partial T / \partial Z\right]}\]</span></p>
+<p>Divide the instrument’s effect on the outcome (reduced form) by its effect on the treatment (first stage).</p>
+<p><span class="comment">The assumption is the <strong>exclusion restriction</strong>: <span class="math inline">\(Z\)</span> moves productivity <em>only</em> through WFH. True by construction here.</span></p>
+<aside class="notes">
+<p>Same target — the ATE — reached a different way. IV does not require observing the confounders; it requires a valid instrument. Subway disruption is random with respect to introversion and family size, affects WFH, and (by construction) has no direct path to productivity. Trade-off: it only identifies the effect for “compliers” and, as we’ll see, it’s far noisier.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="step-3-estimate-backdoor-regression-recovers-1.0051-almost-exactly" class="slide level2 center">
+<h2>Step 3 — Estimate: backdoor regression recovers 1.0051, almost exactly</h2>
+<p><span class="math display">\[Y_i = \beta_0 + \beta_1 T_i + \beta_2 X_{1i} + \beta_3 X_{2i} + \varepsilon_i\]</span></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1-4|5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>estimate_reg <span class="op">=</span> model.estimate_effect(</span>
+<span id="cb1-2"><a href=""></a>    identified_estimand,</span>
+<span id="cb1-3"><a href=""></a>    method_name<span class="op">=</span><span class="st">"backdoor.linear_regression"</span>,</span>
+<span id="cb1-4"><a href=""></a>    confidence_intervals<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-5"><a href=""></a>)   <span class="co"># ATE 1.0051 · robust SE 0.0614 · 95% CI [0.885, 1.126]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><span class="comment"><span class="math inline">\(\beta_1\)</span> is the causal effect — <em>if</em> the model is right and every confounder is in.</span></p>
+<aside class="notes">
+<p>The simplest backdoor method: put the confounders in as controls. Bias is 0.5%. The HC1 robust SE of 0.0614 guards against heteroskedasticity. It works here because the true DGP is linear — in practice we rarely know the functional form, which is exactly why we run several methods.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="step-3-estimate-ipw-reweights-to-a-pseudo-randomized-population" class="slide level2 center">
+<h2>Step 3 — Estimate: IPW reweights to a pseudo-randomized population</h2>
+<p><span class="math display">\[\widehat{ATE}_{IPW} = \frac{1}{N}\sum_{i=1}^{N}\left[\frac{T_i Y_i}{\hat{e}(X_i)} - \frac{(1-T_i)Y_i}{1-\hat{e}(X_i)}\right]\]</span></p>
+<p>Weight each person by the inverse of their <strong>propensity score</strong> <span class="math inline">\(\hat{e}(X_i)=P(T_i=1\mid X_i)\)</span>, so treatment becomes independent of confounders.</p>
+<p><span class="comment">IPW gives <strong>1.0275</strong> (SE 0.0754). It models <em>who gets treated</em>, not the outcome — so it costs a little precision.</span></p>
+<aside class="notes">
+<p>Completely different philosophy from regression: model the treatment-assignment mechanism, not the outcome. Reweighting builds a pseudo-population that mimics a randomized trial. Bias 2.8%. The slightly larger SE is the price of discarding the outcome model and leaning entirely on propensity scores.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="step-3-estimate-doubly-robust-is-two-insurance-policies-in-one" class="slide level2 center">
+<h2>Step 3 — Estimate: doubly robust is two insurance policies in one</h2>
+<p><span class="math display">\[\widehat{ATE}_{DR} = \frac{1}{N}\sum_{i=1}^{N}\Big[(\hat{\mu}_1 - \hat{\mu}_0) + \frac{T_i(Y_i-\hat{\mu}_1)}{\hat{e}(X_i)} - \frac{(1-T_i)(Y_i-\hat{\mu}_0)}{1-\hat{e}(X_i)}\Big]\]</span></p>
+<p>Combine an outcome model (<span class="math inline">\(\hat{\mu}_1,\hat{\mu}_0\)</span>) with the IPW reweight. Consistent if <strong>either</strong> model is right.</p>
+<p><span class="comment">AIPW gives <strong>1.0115</strong> (SE 0.0623) — smallest bias of the four, precision matching regression.</span></p>
+<aside class="notes">
+<p>Belt and suspenders. If the propensity model fails, the outcome model saves you; if the outcome model fails, the reweight does. Both wrong is the only failure mode. When both are right, AIPW hits the semiparametric efficiency bound — the smallest possible variance — which is why its SE nearly equals regression’s despite the extra machinery.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="step-3-estimate-iv-survives-unmeasured-confounders-but-pays-in-noise" class="slide level2 center">
+<h2>Step 3 — Estimate: IV survives unmeasured confounders, but pays in noise</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-code-line-numbers="1-5|6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>estimate_iv <span class="op">=</span> model.estimate_effect(</span>
+<span id="cb2-2"><a href=""></a>    identified_estimand,</span>
+<span id="cb2-3"><a href=""></a>    method_name<span class="op">=</span><span class="st">"iv.instrumental_variable"</span>,</span>
+<span id="cb2-4"><a href=""></a>    method_params<span class="op">=</span>{<span class="st">"iv_instrument_name"</span>: <span class="st">"subway_disruption"</span>},</span>
+<span id="cb2-5"><a href=""></a>)   <span class="co"># first-stage F = 293 (strong) · ATE 0.8881 · SE 0.3303</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><span class="comment">The instrument is strong (F = 293), yet the Wald ratio amplifies noise — SE <strong>0.3303</strong>, more than <span class="math inline">\(5\times\)</span> regression’s.</span></p>
+<aside class="notes">
+<p>IV does not condition on confounders — it uses only the exogenous WFH variation the subway shock provides. That’s its superpower: validity even with unmeasured confounders. The cost: dividing a reduced-form effect by a first-stage effect propagates uncertainty from both stages through the delta method, blowing the CI out to [0.24, 1.54].</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="all-four-causal-methods-land-near-1.0-the-naive-estimate-misses-entirely" class="slide level2 center">
+<h2>All four causal methods land near 1.0; the naive estimate misses entirely</h2>
+
+<img data-src="../dowhy_intro_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Point estimates with 95% CIs against the true ATE (dashed). Naive overshoots; backdoor trio is tight; IV is unbiased but wide.</p><aside class="notes">
+<p>The money figure. Regression, IPW, and AIPW cluster tightly around the dashed truth line; IV is centered nearby but far wider; the naive estimate sits well above, and crucially its CI does not even cross 1.0 — confidently wrong. Walk left to right: precision falls as we demand fewer assumptions.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-small-standard-error-is-not-a-good-estimate-the-naive-one-proves-it" class="slide level2 center">
+<h2>A small standard error is not a good estimate — the naive one proves it</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Method</th>
+<th style="text-align: right;"><span class="math inline">\(\widehat{ATE}\)</span></th>
+<th style="text-align: right;">Robust SE</th>
+<th style="text-align: center;">Covers 1.0?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Naive</td>
+<td style="text-align: right;"><span class="key">1.3853</span></td>
+<td style="text-align: right;">0.0716</td>
+<td style="text-align: center;">no</td>
+</tr>
+<tr class="even">
+<td>Regression</td>
+<td style="text-align: right;">1.0051</td>
+<td style="text-align: right;">0.0614</td>
+<td style="text-align: center;">yes</td>
+</tr>
+<tr class="odd">
+<td>IPW</td>
+<td style="text-align: right;">1.0275</td>
+<td style="text-align: right;">0.0754</td>
+<td style="text-align: center;">yes</td>
+</tr>
+<tr class="even">
+<td>Doubly robust</td>
+<td style="text-align: right;">1.0115</td>
+<td style="text-align: right;">0.0623</td>
+<td style="text-align: center;">yes</td>
+</tr>
+<tr class="odd">
+<td>IV (2SLS)</td>
+<td style="text-align: right;">0.8881</td>
+<td style="text-align: right;">0.3303</td>
+<td style="text-align: center;">yes</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">The naive CI [1.25, 1.53] is <em>narrow</em> — and excludes the truth. Precision without validity is worthless.</span></p>
+</section></section>
+<section>
+<section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>The Resolution</h1>
+<p><span class="act">Act III</span></p>
+</section>
+<section id="doubly-robust-nails-the-known-effect-1.01-against-a-truth-of-1.00" class="slide level2 center" data-background-color="#141413">
+<h2>Doubly robust nails the known effect: 1.01 against a truth of 1.00</h2>
+<p><span class="bignum">1.0115</span></p>
+<p><span class="bignum-label"><span class="math inline">\(\widehat{ATE}\)</span>, AIPW (SE 0.0623) · smallest bias of the four · matches the planted truth of 1.0</span></p>
+<aside class="notes">
+<p>The Act-III payoff. Of regression (1.0051), IPW (1.0275), and AIPW (1.0115), the doubly robust estimator combines the smallest absolute bias with regression-level precision. It is the method I’d reach for first on real data: insurance against misspecification plus near-optimal variance.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="step-4-refute-three-stress-tests-three-passes" class="slide level2 center">
+<h2>Step 4 — Refute: three stress tests, three passes</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Refuter</th>
+<th style="text-align: center;">Expected</th>
+<th style="text-align: right;">New effect</th>
+<th style="text-align: center;">Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Placebo treatment</td>
+<td style="text-align: center;"><span class="math inline">\(\approx 0\)</span></td>
+<td style="text-align: right;"><span class="key">−0.00003</span></td>
+<td style="text-align: center;">pass</td>
+</tr>
+<tr class="even">
+<td>Random common cause</td>
+<td style="text-align: center;"><span class="math inline">\(\approx 1.0\)</span></td>
+<td style="text-align: right;">1.0051</td>
+<td style="text-align: center;">pass</td>
+</tr>
+<tr class="odd">
+<td>Data subset (80%)</td>
+<td style="text-align: center;"><span class="math inline">\(\approx 1.0\)</span></td>
+<td style="text-align: right;">0.9988</td>
+<td style="text-align: center;">pass</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">Permute the treatment and the effect collapses to zero; add a fake confounder or drop 20% of rows and it barely moves.</span></p>
+<aside class="notes">
+<p>This is what makes the four-step framework more than bookkeeping. The placebo refuter is the most convincing: replace the real treatment with a random one and a working method must return ~0 — it returns −0.00003 (p = 0.96). Random-common-cause and data-subset confirm the estimate is not fragile. Robustness is demonstrated, not asserted.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="does-machine-selected-adjustment-make-this-causal-no-assumptions-still-carry-it" class="slide level2 center">
+<h2>Does machine-selected adjustment make this causal? No — assumptions still carry it</h2>
+<p><span class="objection">Objection.</span> Running four estimators and passing refutation tests can’t <em>manufacture</em> identification.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span> Correct. The ATE is identified only under <strong>unconfoundedness</strong> (backdoor) or the <strong>exclusion restriction</strong> (IV). DoWhy makes those assumptions explicit and stress-tests the estimate — it cannot prove them. Refuters catch fragility, not unmeasured confounders.</p>
+<aside class="notes">
+<p>Steelman, don’t strawman. The refutation tests probe stability under perturbations we can simulate; they say nothing about a confounder we never measured. The value of DoWhy is transparency — every causal claim is traceable to an assumption encoded in the DAG — not a guarantee of truth. On real data, the exclusion restriction and unconfoundedness must be defended with domain knowledge.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section></section>
+<section id="declare-your-assumptions-compare-your-methods-then-refute-thats-what-makes-it-causal." class="title-slide slide level1 divider center" data-background-color="#141413">
+<h1>Declare your assumptions, compare your methods, then refute — that’s what makes it causal.</h1>
+<aside class="notes">
+<p>The single takeaway. The naive 1.39 was precise and wrong; the backdoor trio recovered 1.0 within 3%; IV traded precision for robustness to unmeasured confounding; doubly robust was best of all. None of it works without Step 1 — writing down the DAG — and Step 4 — trying to break your own result.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

@@ -1,0 +1,270 @@
+---
+title: "Random Forest Regression"
+subtitle: "How much development signal hides in a satellite image?"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "0.23"
+    cap: "test R-squared (held-out)"
+  - num: "4.7"
+    cap: "MAE in IMDS points"
+  - num: "64"
+    cap: "satellite embedding dimensions"
+format:
+  revealjs:
+    output-file: index.html
+    # NOT embed-resources: RevealChalkboard (a core feature) is incompatible with
+    # self-contained output, so the deck ships index.html + slides_files/ (Hugo serves
+    # this fine — see the tutorial.html precedent). Figures are referenced ../ml_*.png.
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs default) — renders $…$ / $$…$$ across the whole slide
+    # DOM. Loads from a CDN; reveal.js is local. Do NOT set html-math-method: katex.
+    link-external-icon: false
+---
+
+# The Tension {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## Can a 64-number summary of a satellite photo tell you how a town is doing?
+
+Bolivia has 339 municipalities. Many lack reliable survey data — yet every one of them is photographed from space.
+
+. . .
+
+A Google embedding model crushes each 2017 image into **64 numbers**. *Do those numbers know anything about human development?*
+
+::: {.notes}
+This is the core promise of remote-sensing-for-development: imagery is cheap and global, surveys are expensive and sparse. The whole tutorial is a stress test of how much of that promise is real. Frame it as an honest empirical question, not a foregone conclusion.
+:::
+
+## Predictions cluster near the mean — the model knows the middle, not the edges
+
+![Actual vs predicted IMDS on the 68 held-out municipalities; the dashed line is perfect prediction.](../ml_actual_vs_predicted.png)
+
+::: {.notes}
+Spoiler figure. Don't explain every point yet — just plant the shape: the cloud hugs the 47–55 band and the extremes get pulled toward the center. We earn this picture in Act III; for now it tells us the signal is real but bounded.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- The data: 339 municipalities, a 0–100 development index, 64 image embeddings
+- Random Forest — bagging plus random feature subsets to fight overfitting
+- The honest protocol: train/test split, 5-fold CV, randomized tuning
+- The lesson: the ceiling is the features, not the hyperparameters
+:::
+
+# The Investigation {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## The target is tightly bunched: most towns score between 47 and 55
+
+![Distribution of IMDS across 339 municipalities; dashed = mean (51.1), dotted = median (50.5).](../ml_target_distribution.png)
+
+::: {.notes}
+This bunching is the whole difficulty. With a standard deviation of only 6.77 on a 0–100 scale, there is little spread for a model to explain. The handful of towns above 70 are the big cities (La Paz, Santa Cruz, Cochabamba). A model that just guesses "about 51" is already hard to beat.
+:::
+
+## No single embedding is a smoking gun — the best correlations are only 0.25–0.40
+
+![Correlation matrix: the ten embedding dimensions most correlated with IMDS.](../ml_embedding_correlations.png)
+
+::: {.notes}
+Moderate, not strong. That is typical for satellite-derived features against a complex socioeconomic outcome. Several embeddings also correlate with each other (overlapping spatial patterns) — multicollinearity that would trouble OLS but that a Random Forest shrugs off because it subsamples features at every split.
+:::
+
+## A Random Forest averages many decorrelated trees to cut variance
+
+$$\hat{y} = \frac{1}{B} \sum_{b=1}^{B} T_b(\mathbf{x})$$
+
+Each tree $T_b$ is grown on a bootstrap resample, and at every split only $\sqrt{64}=8$ features are even considered.
+
+[Bootstrap rows + random feature subsets = trees that make *different* mistakes; averaging cancels the noise.]{.comment}
+
+::: {.notes}
+Walk the two sources of randomness aloud. Bagging (bootstrap aggregating) decorrelates by resampling rows; the random feature subset decorrelates further by hiding columns. Lower correlation between trees means a bigger variance reduction when you average — that is the entire trick. Here B is n_estimators (100 baseline, 500 tuned) and x is the 64-dimensional embedding vector.
+:::
+
+## Honesty first: split 339 into 271 train / 68 test before fitting anything
+
+:::: {.columns}
+::: {.column width="50%"}
+### Train (271)
+- everything the model fits on
+- 5-fold CV runs *inside* here
+- tuning never sees the test set
+:::
+::: {.column width="50%"}
+### Test (68)
+- touched once, at the very end
+- the honest generalization score
+- ~1.5% of data per prediction
+:::
+::::
+
+[Letting the model glimpse the test set during tuning is *data leakage* — it inflates the score and lies about generalization.]{.comment}
+
+::: {.notes}
+The discipline is the point of the lesson. With only 339 rows, a single 68-row test set could be unrepresentative by luck, which is exactly why 5-fold cross-validation inside the training set matters: it rotates the validation fold and averages, giving a steadier read before we ever spend the test set.
+:::
+
+## Five rotating exams give a steadier read than one lucky split
+
+``` {.python code-line-numbers="1|2|3-4"}
+baseline_rf = RandomForestRegressor(n_estimators=100, random_state=RANDOM_SEED)
+cv_scores = cross_val_score(baseline_rf, X_train, y_train, cv=5, scoring="r2")
+# 5-fold CV R²: [0.152 0.187 0.270 0.308 0.345]
+# Mean CV R² = 0.2526  (± 0.0728)
+```
+
+[The fold-to-fold swing from 0.15 to 0.35 is the small-sample noise we are fighting.]{.comment}
+
+::: {.notes}
+The wide spread across folds (sd ≈ 0.07) is the small-n reality: 271 municipalities, sliced five ways, look quite different from each other. The CV mean of 0.2526 is our reliable baseline target — about a quarter of IMDS variance explained before any tuning.
+:::
+
+## Tuning buys 2 points of cross-validated R-squared: 0.2526 to 0.2721
+
+``` {.python code-line-numbers="1-5|6-9|11"}
+param_distributions = {
+    "n_estimators": [100, 200, 300, 500],
+    "max_depth": [None, 10, 20, 30],
+    "min_samples_leaf": randint(1, 5),
+    "max_features": ["sqrt", "log2", None],
+}
+search = RandomizedSearchCV(
+    RandomForestRegressor(random_state=RANDOM_SEED),
+    param_distributions, n_iter=50, cv=5, scoring="r2",
+)
+search.fit(X_train, y_train)   # best CV R² = 0.2721 → 500 trees, max_depth=30
+```
+
+::: {.notes}
+RandomizedSearchCV samples 50 random configurations rather than exhausting a grid — far cheaper and usually just as good. The winner deepens the trees (max_depth=30) but keeps max_features="sqrt", which is what preserves tree diversity. Hold the thought: this 2-point CV gain is about to evaporate on the test set.
+:::
+
+## A59, A42 and A26 carry the signal — but importance is spread thin
+
+![Top-20 embedding dimensions by permutation importance (drop in test R-squared when a feature is shuffled).](../ml_feature_importance_permutation.png)
+
+::: {.notes}
+Permutation importance is the trustworthy method: shuffle one column on the test set, watch R² fall. A59 is the clear leader under both this and the impurity-based MDI ranking, with A42 and A26 close behind. But note how gently the bars decline — no single dimension dominates. The forest is reading many faint visual patterns at once, not one bright signal.
+:::
+
+## MDI and permutation disagree — trust the one measured on held-out data
+
+:::: {.columns}
+::: {.column width="50%"}
+### MDI (impurity)
+- built into the fitted model, free
+- ranks A30 and A59 on top
+- biased toward high-cardinality features
+:::
+::: {.column width="50%"}
+### Permutation
+- shuffles each feature on the **test** set
+- A59 on top; A30 drops sharply
+- unbiased by scale or cardinality
+:::
+::::
+
+[When the two rankings diverge, permutation wins — it measures predictive contribution, not split bookkeeping.]{.comment}
+
+::: {.notes}
+This is a teaching moment about feature-importance pitfalls. MDI counts how often a feature is used to split and how much impurity it removes, which rewards features with many distinct values. Permutation directly asks "does generalization suffer without you?" — a cleaner question for honest interpretation.
+:::
+
+## The relationships are non-linear thresholds — which is why a tree beats a line
+
+![Partial dependence for the top-6 embeddings: sharp rises then plateaus, not straight lines.](../ml_partial_dependence.png)
+
+::: {.notes}
+Partial dependence averages the prediction as one feature sweeps its range, holding the rest at their observed distribution. The step-like shapes — flat, then a sharp climb, then a plateau — are exactly what a linear regression would smear into a single slope. This justifies reaching for a Random Forest: it captures the rural-to-urban threshold without anyone hand-coding it.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## On unseen towns the tuned forest explains about 23% of the variation {background-color="#141413"}
+
+[0.23]{.bignum}
+
+[test R-squared (tuned: 0.2297, RMSE 6.52, MAE 4.72) — essentially equal to the untuned 0.2307]{.bignum-label}
+
+::: {.notes}
+Here is the headline, and the twist: tuning moved CV R² up by 2 points but the held-out test R² actually nudged down (0.2307 → 0.2297). The 2-point CV gain did not transfer. That is the small-sample lesson in one line — chasing hyperparameters when the data has limited signal buys almost nothing.
+:::
+
+## The model is typically off by 4.7 IMDS points — and worst at the extremes
+
+![Residuals versus predicted IMDS: roughly centered on zero, but the spread widens at the edges.](../ml_residuals.png)
+
+::: {.notes}
+MAE of 4.7 on a scale where most towns sit between 47 and 55 means the typical error is a meaningful slice of the whole spread. Residuals are centered (no gross bias) but fan out at the extremes — heteroscedasticity that matches the regression-to-the-mean we saw in the very first scatter. The model is confident about average towns and lost on unusual ones.
+:::
+
+## Tuning was a wash — proof the ceiling is the features, not the knobs
+
+| Metric | Baseline | Tuned |
+|---|---:|---:|
+| R-squared | [0.2307]{.key} | 0.2297 |
+| RMSE | 6.52 | 6.52 |
+| MAE | 4.68 | 4.72 |
+
+[Default and tuned land on top of each other — when the signal is capped, configuration barely moves the needle.]{.comment}
+
+::: {.notes}
+This table is the punchline of the practical lesson. A common beginner instinct is to keep tuning; here it is empirically pointless. The honest read is that 64 embeddings carry roughly a quarter of IMDS variance, full stop. More trees and deeper splits cannot manufacture signal that is not in the features.
+:::
+
+## Did the forest overfit? No — and the gap to the data ceiling is the proof
+
+[Objection.]{.objection} A 500-tree, depth-30 forest on only 271 rows must be memorizing noise.
+
+. . .
+
+[Response.]{.rebuttal} If it were overfitting, CV and test R-squared would diverge wildly; instead both sit near **0.23–0.27**, and bagging plus the $\sqrt{64}$ feature subset cap variance by design. The model is *under*-powered by the features, not over-fit to the rows.
+
+::: {.notes}
+Steelman the worry — deep trees on small n is a real overfitting setup. The rebuttal is empirical: the small, stable gap between cross-validated and held-out performance is the signature of a model that generalizes about as well as it can. Random Forests are famously hard to overfit because averaging decorrelated trees shrinks variance. The constraint here is information, not capacity.
+:::
+
+## The 77% it misses lives off-camera: pair the pixels with survey data
+
+::: {.incremental}
+- Governance, migration, and informal economies are invisible from orbit
+- Satellite embeddings are a genuine but partial proxy — a starting layer
+- Next experiment: fuse embeddings with administrative or survey covariates
+:::
+
+::: {.notes}
+End on the constructive turn. The roughly 23% explained is not a failure — it is honest evidence that imagery captures real development structure. The roughly 77% unexplained tells you precisely where to look next: the human factors a camera cannot see. The natural follow-up is data fusion, not a fancier model.
+:::
+
+# Satellite pixels know the middle of the distribution — for the edges, you still need the survey. {.divider background-color="#141413"}
+
+::: {.notes}
+The single takeaway. Imagery is a powerful, cheap first layer that explains about a quarter of municipal development and nails typical towns, but it regresses the extremes to the mean and tuning cannot rescue that. Treat embeddings as one input among several, not a replacement for ground truth.
+:::

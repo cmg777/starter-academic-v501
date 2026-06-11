@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="dcterms.date" content="2026-06-11">
+  <title>Three Methods for Robust Variable Selection</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Three Methods for Robust Variable Selection</h1>
+  <p class="subtitle">BMA, LASSO, and WALS — graded against a known answer key</p>
+  <div class="title-result-strip">
+    <div class="kr"><span class="kr-num">4</span><span class="kr-cap">triple-robust predictors</span></div>
+    <div class="kr"><span class="kr-num">85.7%</span><span class="kr-cap">LASSO / WALS sensitivity</span></div>
+    <div class="kr"><span class="kr-num">4,096</span><span class="kr-cap">candidate models</span></div>
+  </div>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University (GSID)</p>
+  <p class="date">June 11, 2026</p>
+</section>
+<section>
+<section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
+<h1>The Tension</h1>
+<p><span class="act">Act I</span></p>
+</section>
+<section id="with-12-candidate-drivers-2124096-models-give-4096-different-answers" class="slide level2 center">
+<h2>With 12 candidate drivers, <span class="math inline">\(2^{12}=4{,}096\)</span> models give 4,096 different answers</h2>
+<p>You advise a government on climate policy. You have a dozen candidate drivers of CO<span class="math inline">\(_2\)</span> emissions and a limited budget.</p>
+<div class="fragment">
+<p>Run one regression and report it, and you have assumed the other <strong>4,095</strong> models are wrong. <em>Which subset truly matters — and which are red herrings?</em></p>
+<aside class="notes">
+<p>This is the variable-selection problem. Specification searching — try many models, drop the insignificant, report the winner — inflates false discoveries through the file-drawer and pretesting problems. The same data can yield opposite answers depending on the selection rule.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="we-built-an-answer-key-7-true-predictors-5-pure-noise-impostors" class="slide level2 center">
+<h2>We built an answer key: 7 true predictors, 5 pure-noise impostors</h2>
+
+<img data-src="../bma_lasso_wals_01_correlation.png" class="r-stretch quarto-figure-center"><p class="caption">Noise variables (trade openness, tourism, credit) are deliberately correlated with GDP and other true predictors — the multicollinearity that makes naive OLS unreliable.</p><aside class="notes">
+<p>Spoiler / setup figure. 120 synthetic countries, 12 candidate regressors. set.seed(2017). Seven coefficients are truly nonzero, five are exactly zero. The five noise variables are correlated with GDP, so in OLS they “borrow” explanatory power. Because we designed the DGP, we know the truth and can grade each method.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="naive-ols-already-flirts-with-spurious-significance" class="slide level2 center" data-background-color="#141413">
+<h2>Naive OLS already flirts with spurious significance</h2>
+<p><span class="bignum">0.98</span></p>
+<p><span class="bignum-label"><span class="math inline">\(R^2\)</span> of the kitchen-sink OLS — a great fit that still cannot tell signal from noise</span></p>
+<aside class="notes">
+<p>Throw all 12 regressors into lm(): R² = 0.98, but noise variables get non-negligible coefficients. log_trade t = −0.86, corruption t = 0.05 — not significant here, yet in a different draw they could cross 5%. That fragility is exactly what principled selection fixes.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="where-were-going" class="slide level2 center">
+<h2>Where we’re going</h2>
+<ul>
+<li class="fragment">The lab: 120 countries, 12 candidate regressors, a known answer key</li>
+<li class="fragment"><strong>BMA</strong> — average 4,096 models, read off Posterior Inclusion Probabilities</li>
+<li class="fragment"><strong>LASSO</strong> — an L1 penalty that zeroes weak controls automatically</li>
+<li class="fragment"><strong>WALS</strong> — fast frequentist averaging that returns t-statistics</li>
+<li class="fragment">The payoff: which variables survive <em>all three</em></li>
+</ul>
+</section></section>
+<section>
+<section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>The Investigation</h1>
+<p><span class="act">Act II</span></p>
+</section>
+<section id="three-mechanically-distinct-answers-to-one-question" class="slide level2 center">
+<h2>Three mechanically distinct answers to one question</h2>
+<div class="columns">
+<div class="column" style="width:33%;">
+<h3 id="bma">BMA</h3>
+<ul>
+<li>Average all 4,096 models</li>
+<li>Weight by posterior probability</li>
+<li>Output: <span class="math inline">\(\Pr(M_k\mid y)\)</span> → PIP</li>
+</ul>
+</div><div class="column" style="width:33%;">
+<h3 id="lasso">LASSO</h3>
+<ul>
+<li>One L1-penalized fit</li>
+<li>Drives weak coefficients to zero</li>
+<li>Output: a sparse subset</li>
+</ul>
+</div><div class="column" style="width:33%;">
+<h3 id="wals">WALS</h3>
+<ul>
+<li>Frequentist averaging</li>
+<li>Orthogonalize, then average</li>
+<li>Output: t-statistics</li>
+</ul>
+</div></div>
+<p><span class="comment">Different machinery, same target — agreement across them is what earns credibility.</span></p>
+<aside class="notes">
+<p>The pedagogical spine. BMA is Bayesian and explores the whole model space; LASSO finds one MAP-style sparse model; WALS averages in closed form. They share the goal of separating signal from noise but get there by genuinely different routes — the precondition for triangulation.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="bma-is-just-bayes-rule-applied-to-4096-models" class="slide level2 center">
+<h2>BMA is just Bayes’ rule applied to 4,096 models</h2>
+<p><span class="math display">\[P(M_k\mid y)=\frac{P(y\mid M_k)\,P(M_k)}{\sum_{l=1}^{2^K} P(y\mid M_l)\,P(M_l)}\]</span></p>
+<p><span class="comment">The marginal likelihood <span class="math inline">\(P(y\mid M_k)\)</span> is a built-in Occam’s razor — complex models spread their probability thin.</span></p>
+<aside class="notes">
+<p>Replace “fair coin / biased coin” with “which variables belong in the model.” Uniform model prior P(M_k)=1/4096, so the posterior is driven entirely by the data. With 12 regressors the sampler explores all 4,096 models efficiently.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-variables-pip-is-a-weighted-democratic-vote-across-models" class="slide level2 center">
+<h2>A variable’s PIP is a weighted democratic vote across models</h2>
+<p><span class="math display">\[\text{PIP}_j=\sum_{k:\,j\in M_k} P(M_k\mid y)\]</span></p>
+<p>Each of the 4,096 models votes for which variables matter — but better-fitting models get louder voices. We call PIP <span class="math inline">\(\geq 0.80\)</span> “robust” (Raftery 1995).</p>
+<aside class="notes">
+<p>PIP is the total posterior mass on models containing variable j. The toy 3-variable example makes this concrete: log_gdp PIP = 1.000, fossil_fuel = 0.965, the noise variable log_trade = 0.099 — exactly the pattern we want.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="bma-flags-four-robust-drivers-and-zero-false-positives" class="slide level2 center">
+<h2>BMA flags four robust drivers and zero false positives</h2>
+
+<img data-src="../bma_lasso_wals_04_bma_pip.png" class="r-stretch quarto-figure-center"><p class="caption">GDP (PIP = 1.00), trade network (0.986), fossil fuel (0.948), industry (0.841) clear the 0.80 line; all five noise variables sit below 0.15.</p><aside class="notes">
+<p>Clear signal/noise separation. Urban_pop (0.648) and democracy (0.607) land borderline — true predictors whose effects are moderate enough that BMA hedges. Agriculture (β = 0.005, PIP = 0.087) is missed: BMA prioritizes precision over sensitivity.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-top-models-agree-the-same-four-variables-every-time" class="slide level2 center">
+<h2>The top models agree: the same four variables, every time</h2>
+
+<img data-src="../bma_lasso_wals_06_bma_inclusion.png" class="r-stretch quarto-figure-center"><p class="caption">Variable-inclusion map of the top 100 models. Column width = posterior probability; blue = positive coefficient, gray = excluded. The core four form solid bands across the whole axis.</p><aside class="notes">
+<p>x-axis is cumulative posterior model probability, so wide columns are the models the data strongly supports. log_gdp, trade_network, fossil_fuel, industry are solid blue across nearly the entire axis. Noise variables flicker in and out, sometimes with the wrong (orange) sign — a visual signature of fragility.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="lasso-trades-a-little-bias-for-a-large-cut-in-variance" class="slide level2 center">
+<h2>LASSO trades a little bias for a large cut in variance</h2>
+<p><span class="math display">\[\text{MSE}=\text{Bias}^2+\text{Variance}+\text{Irreducible noise}\]</span></p>
+
+<img data-src="../bma_lasso_wals_02_bias_variance.png" class="r-stretch quarto-figure-center"><p class="caption">As complexity rises, bias falls but variance explodes. The optimal model lives in between — exactly where regularized methods operate.</p><aside class="notes">
+<p>OLS is unbiased but high-variance with many correlated regressors. A penalty acts like a budget constraint: variables that don’t earn their keep get zeroed. The whole point of LASSO is to sit at the minimum of this U-shaped total error.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-l1-diamond-has-corners-that-is-why-lasso-selects" class="slide level2 center">
+<h2>The L1 diamond has corners — that is why LASSO selects</h2>
+<p><span class="math display">\[\hat\beta_{\text{LASSO}}=\arg\min_\beta\ \frac{1}{2n}\|y-X\beta\|^2+\lambda\sum_{j=1}^{p}|\beta_j|\]</span></p>
+
+<img data-src="../bma_lasso_wals_03_l1_l2_geometry.png" class="r-stretch quarto-figure-center"><p class="caption">L1 contours hit a corner (a coefficient is set to exactly zero); L2 (Ridge) hits a smooth circle and never reaches zero.</p><aside class="notes">
+<p>The <span class="math inline">\(\lambda\sum_j|\beta_j|\)</span> penalty is what makes corners. Ridge’s L2 ball has none, so it shrinks but never selects. LASSO does estimation and selection simultaneously; Ridge only estimates.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="noise-dies-first-gdp-is-the-last-variable-standing" class="slide level2 center">
+<h2>Noise dies first; GDP is the last variable standing</h2>
+
+<img data-src="../bma_lasso_wals_07_lasso_path.png" class="r-stretch quarto-figure-center"><p class="caption">Regularization path — as <span class="math inline">\(\lambda\)</span> grows (left→right), orange noise variables hit zero first; GDP (<span class="math inline">\(\beta=1.200\)</span>) persists longest. Dashed/dotted lines mark <span class="math inline">\(\lambda_{\min}\)</span> and <span class="math inline">\(\lambda_{1\text{se}}\)</span>.</p><aside class="notes">
+<p>10-fold CV chooses λ. Reading the path left to right, noise variables are eliminated first because they buy too little prediction to justify their penalty cost. GDP requires the largest penalty to be killed — the strongest signal in the data.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="at-lambda_1textse-lasso-keeps-six-variables-all-of-them-real" class="slide level2 center">
+<h2>At <span class="math inline">\(\lambda_{1\text{se}}\)</span>, LASSO keeps six variables — all of them real</h2>
+
+<img data-src="../bma_lasso_wals_09_lasso_selected.png" class="r-stretch quarto-figure-center"><p class="caption">Six bars survive (steel blue = true predictor correctly kept); gray bars are dropped. No orange — zero noise variables falsely selected.</p><aside class="notes">
+<p>The parsimonious 1-SE model keeps log_gdp, industry, fossil_fuel, urban_pop, democracy, trade_network. Only agriculture is dropped among the true predictors. Perfect specificity — every noise variable correctly excluded.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="post-lasso-un-shrinks-the-coefficients-back-toward-the-truth" class="slide level2 center">
+<h2>Post-LASSO un-shrinks the coefficients back toward the truth</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th style="text-align: right;">LASSO <span class="math inline">\(\hat\beta\)</span></th>
+<th style="text-align: right;">Post-LASSO <span class="math inline">\(\hat\beta\)</span></th>
+<th style="text-align: right;">True <span class="math inline">\(\beta\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>log_gdp</td>
+<td style="text-align: right;">1.190</td>
+<td style="text-align: right;"><span class="key">1.165</span></td>
+<td style="text-align: right;">1.200</td>
+</tr>
+<tr class="even">
+<td>fossil_fuel</td>
+<td style="text-align: right;">0.007</td>
+<td style="text-align: right;">0.012</td>
+<td style="text-align: right;">0.012</td>
+</tr>
+<tr class="odd">
+<td>urban_pop</td>
+<td style="text-align: right;">0.004</td>
+<td style="text-align: right;">0.008</td>
+<td style="text-align: right;">0.010</td>
+</tr>
+<tr class="even">
+<td>trade_network</td>
+<td style="text-align: right;">0.631</td>
+<td style="text-align: right;">0.898</td>
+<td style="text-align: right;">0.500</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">LASSO selects; OLS on the selected set estimates — recovering unbiased magnitudes.</span></p>
+<aside class="notes">
+<p>L1 shrinks coefficients by design, so raw LASSO estimates are too small (fossil_fuel 0.007 vs true 0.012). Post-LASSO (Belloni–Chernozhukov 2013) refits OLS on the selected support: fossil_fuel snaps to 0.012, exactly the truth. Trade_network overshoots (0.898) — a low-variance regressor is genuinely hard to pin down.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="wals-averages-with-the-same-prior-lasso-uses-for-selection" class="slide level2 center">
+<h2>WALS averages with the <em>same</em> prior LASSO uses for selection</h2>
+<p><span class="math display">\[p(\gamma_j)\propto\exp(-|\gamma_j|/\tau)\]</span></p>
+
+<img data-src="../bma_lasso_wals_11_priors.png" class="r-stretch quarto-figure-center"><p class="caption">The Laplace prior (WALS) is peaked at zero with heavy tails — skeptical but open-minded. Its negative log <em>is</em> LASSO’s L1 penalty.</p><aside class="notes">
+<p>Remarkable connection: LASSO’s MAP estimate under a Laplace prior gives <span class="math inline">\(\lambda=\sigma^2/\tau\)</span>. Same prior belief — most coefficients near zero — used two ways: LASSO for hard selection (zeros), WALS for soft averaging (continuous weights). WALS also orthogonalizes the auxiliaries so the 4,096-model problem decomposes into 12 independent ones — no MCMC, near-instant.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="wals-makes-gdp-tower-t34.62-dwarfs-everything-else" class="slide level2 center">
+<h2>WALS makes GDP tower: <span class="math inline">\(|t|=34.62\)</span> dwarfs everything else</h2>
+
+<img data-src="../bma_lasso_wals_10_wals_tstat.png" class="r-stretch quarto-figure-center"><p class="caption">Six variables clear the <span class="math inline">\(|t|\geq 2\)</span> line; GDP’s bar runs off the chart at 34.62, trade network next at 4.39. Noise variables all sit below 1.5.</p><aside class="notes">
+<p>WALS returns familiar t-statistics. Using |t| ≥ 2 (the frequentist analog of PIP ≥ 0.80): GDP 34.62, trade_network 4.39, industry 4.01, fossil_fuel 3.26, urban_pop 3.11, democracy 2.58 all pass. Agriculture (|t| = 1.13) falls just short — its β = 0.005 is too small to detect at n = 120.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>The Resolution</h1>
+<p><span class="act">Act III</span></p>
+</section>
+<section id="four-variables-are-triple-robust-the-strongest-claims-the-data-supports" class="slide level2 center">
+<h2>Four variables are triple-robust — the strongest claims the data supports</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th style="text-align: right;">BMA PIP</th>
+<th style="text-align: center;">LASSO</th>
+<th style="text-align: right;">WALS <span class="math inline">\(\|t\|\)</span></th>
+<th style="text-align: center;">Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>log_gdp</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: right;">34.62</td>
+<td style="text-align: center;"><span class="key">3</span></td>
+</tr>
+<tr class="even">
+<td>trade_network</td>
+<td style="text-align: right;">0.986</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: right;">4.39</td>
+<td style="text-align: center;"><span class="key">3</span></td>
+</tr>
+<tr class="odd">
+<td>fossil_fuel</td>
+<td style="text-align: right;">0.948</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: right;">3.26</td>
+<td style="text-align: center;"><span class="key">3</span></td>
+</tr>
+<tr class="even">
+<td>industry</td>
+<td style="text-align: right;">0.841</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: right;">4.01</td>
+<td style="text-align: center;"><span class="key">3</span></td>
+</tr>
+<tr class="odd">
+<td>urban_pop</td>
+<td style="text-align: right;">0.648</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: right;">3.11</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr class="even">
+<td>democracy</td>
+<td style="text-align: right;">0.607</td>
+<td style="text-align: center;">yes</td>
+<td style="text-align: right;">2.58</td>
+<td style="text-align: center;">2</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">All five noise variables: flagged by none. Agreement across mechanically distinct methods is what earns credibility.</span></p>
+<aside class="notes">
+<p>The convergence slide. GDP, trade network, fossil fuel, industry are flagged by all three — triple-robust. Urban_pop and democracy are double-robust: LASSO and WALS say yes, BMA hedges in its borderline zone. That split is itself informative — the evidence is real but not overwhelming.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="three-columns-of-agreement-and-two-honest-splits" class="slide level2 center">
+<h2>Three columns of agreement — and two honest splits</h2>
+
+<img data-src="../bma_lasso_wals_12_heatmap.png" class="r-stretch quarto-figure-center"><p class="caption">Method-agreement heatmap. Top four rows solid steel blue across all three methods; bottom five (noise) solid orange. Urban_pop and democracy split blue (LASSO/WALS) vs orange (BMA).</p><aside class="notes">
+<p>The visual of triangulation. Unanimous blue at the top, unanimous orange at the bottom. The two split rows are exactly the moderate-effect true predictors where BMA’s stricter Occam’s razor diverges from LASSO and WALS. Disagreement is concentrated precisely where the truth is borderline.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="bma-and-wals-line-up-but-bmas-bar-is-set-higher" class="slide level2 center">
+<h2>BMA and WALS line up — but BMA’s bar is set higher</h2>
+
+<img data-src="../bma_lasso_wals_13_pip_vs_t.png" class="r-stretch quarto-figure-center"><p class="caption">BMA PIP vs WALS <span class="math inline">\(|t|\)</span>. Upper-right quadrant = robust by both (the core four). Urban_pop and democracy: high <span class="math inline">\(|t|\)</span> but PIP &lt; 0.80 — BMA’s conservatism made visible.</p><aside class="notes">
+<p>Strong positive relationship between the Bayesian and frequentist robustness measures. The interesting zone is the middle: urban_pop and democracy clear WALS’s |t| ≥ 2 but miss BMA’s PIP ≥ 0.80. LASSO selection (triangles) tracks the WALS threshold — the same six variables.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="all-three-recover-gdp-almost-exactly-small-effects-are-harder" class="slide level2 center">
+<h2>All three recover GDP almost exactly; small effects are harder</h2>
+
+<img data-src="../bma_lasso_wals_14_coef_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Estimates vs true coefficients, faceted by method. Points on the 45° line = perfect recovery. GDP lands on the line for all three; trade network is overshot by all (low-variance regressor).</p><aside class="notes">
+<p>GDP (β = 1.200) recovered almost exactly everywhere. Fossil_fuel (0.012) and urban_pop (0.010) well estimated. Trade_network is overshot (true 0.500, estimates ~0.85–0.90) because its variance is low. BMA’s posterior means are slightly attenuated for PIPs below 1.0 — averaging pulls them toward zero.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="same-data-perfect-specificity-but-lassowals-see-more" class="slide level2 center">
+<h2>Same data, perfect specificity — but LASSO/WALS see more</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Method</th>
+<th style="text-align: right;">Sensitivity</th>
+<th style="text-align: right;">Specificity</th>
+<th style="text-align: right;">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>BMA</td>
+<td style="text-align: right;">57.1%</td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">75.0%</td>
+</tr>
+<tr class="even">
+<td>LASSO</td>
+<td style="text-align: right;"><span class="key">85.7%</span></td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">91.7%</td>
+</tr>
+<tr class="odd">
+<td>WALS</td>
+<td style="text-align: right;"><span class="key">85.7%</span></td>
+<td style="text-align: right;">100%</td>
+<td style="text-align: right;">91.7%</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">Zero false positives across the board; the gap is in catching the moderate true effects.</span></p>
+<aside class="notes">
+<p>All three reach 100% specificity — no noise variable is ever flagged. LASSO and WALS detect 6 of 7 true predictors (85.7%); BMA detects 4 (57.1%) because it parks urban_pop and democracy in the borderline zone. Agriculture (β = 0.005) is missed by all — too small to distinguish from noise at n = 120.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="does-triangulation-make-this-causal-no-it-disciplines-selection-not-identification" class="slide level2 center">
+<h2>Does triangulation make this causal? No — it disciplines selection, not identification</h2>
+<p><span class="objection">Objection.</span> Agreeing across three methods still can’t manufacture a causal effect.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span> Correct. Triangulation buys <strong>robustness of selection</strong>, not identification. These coefficients are conditional associations; causal claims would still need exogeneity, no confounding, and correct functional form. The synthetic answer key validates the <em>methods</em>, not a CO<span class="math inline">\(_2\)</span> policy.</p>
+<aside class="notes">
+<p>Steelman, don’t strawman. The value here is methodological: variables flagged by mechanically distinct procedures are credible <em>as robust determinants in this regression</em>. Nonlinearity, heteroskedasticity, and endogeneity must still be addressed before any causal reading.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section></section>
+<section id="when-three-different-methods-agree-believe-the-variable-not-any-single-model." class="title-slide slide level1 divider center" data-background-color="#141413">
+<h1>When three different methods agree, believe the variable — not any single model.</h1>
+<aside class="notes">
+<p>The one takeaway. Model uncertainty is real (4,096 models) but addressable. BMA, LASSO, and WALS converge on four triple-robust drivers and unanimously reject the noise; their two disagreements pinpoint exactly where the evidence is genuinely borderline. Triangulation across paradigms turns model uncertainty into honest inference.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

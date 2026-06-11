@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="dcterms.date" content="2026-06-11">
+  <title>Dynamic Panel BMA</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Dynamic Panel BMA</h1>
+  <p class="subtitle">Which factors truly drive economic growth — once reverse causality is handled?</p>
+  <div class="title-result-strip">
+    <div class="kr"><span class="kr-num">0.990</span><span class="kr-cap">population — robust across every prior</span></div>
+    <div class="kr"><span class="kr-num">0.92</span><span class="kr-cap">lagged GDP — slow convergence</span></div>
+    <div class="kr"><span class="kr-num">512</span><span class="kr-cap">models averaged</span></div>
+  </div>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University (GSID)</p>
+  <p class="date">June 11, 2026</p>
+</section>
+<section>
+<section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
+<h1>The Tension</h1>
+<p><span class="act">Act I</span></p>
+</section>
+<section id="a-government-asks-which-of-9-levers-actually-accelerates-growth" class="slide level2 center">
+<h2>A government asks: which of 9 levers actually accelerates growth?</h2>
+<p>You advise a government with a panel of 73 countries over four decades and nine candidate drivers — investment, education, trade, population, life expectancy, and more.</p>
+<div class="fragment">
+<p>But today’s GDP may itself <em>cause</em> investment and trade. <em>Can you trust a regression that assumes the arrow only runs one way?</em></p>
+<aside class="notes">
+<p>This is the framing of the whole tutorial. Fast-growing countries also invest, trade, and educate more — so cross-sectional growth regressions, which assume strict exogeneity, can confidently point to the wrong variables. Reverse causality contaminates the answer before model uncertainty even enters.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="with-9-candidates-there-are-512-models-and-no-reason-to-trust-just-one" class="slide level2 center">
+<h2>With 9 candidates there are 512 models — and no reason to trust just one</h2>
+<p>Build one model with all 9 regressors? Drop trade? Use only investment and education? With 9 candidates there are <span class="math inline">\(2^9 = 512\)</span> possible specifications.</p>
+<div class="fragment">
+<p>Bayesian Model Averaging refuses to pick one. It <em>averages</em> all 512, weighting each by how well it fits — so the conclusion never rests on a single lucky specification.</p>
+<aside class="notes">
+<p>BMA replaces “which model is right?” with “how much does each model deserve to be believed?” Each specification gets a posterior weight; the reported coefficients are weighted averages across the whole 2^K space. The companion cross-sectional post averaged 4,096 models of CO2 emissions; here we move to dynamic panel data.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="where-were-going" class="slide level2 center">
+<h2>Where we’re going</h2>
+<ul>
+<li class="fragment">Why cross-sectional BMA misleads when regressors are endogenous</li>
+<li class="fragment">The dynamic panel fix: lagged GDP + entity and time fixed effects</li>
+<li class="fragment">BMA over all 512 models — Posterior Inclusion Probabilities (PIPs)</li>
+<li class="fragment">Stress-testing every PIP against three different priors</li>
+<li class="fragment">Jointness: which determinants are complements</li>
+</ul>
+</section></section>
+<section>
+<section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>The Investigation</h1>
+<p><span class="act">Act II</span></p>
+</section>
+<section id="cross-sectional-bma-assumes-strict-exogeneity-and-growth-data-breaks-it" class="slide level2 center">
+<h2>Cross-sectional BMA assumes strict exogeneity — and growth data breaks it</h2>
+<p>Judge a runner’s program by their finish time — but faster runners also <em>chose</em> better programs. Did the program cause the speed, or the speed attract the program?</p>
+<div class="fragment">
+<p>That is <strong>reverse causality</strong>. Countries that grow faster invest, trade, and educate more — so a model averaged over biased specifications averages over biased answers.</p>
+<aside class="notes">
+<p>The model-averaging machinery works perfectly; the individual models it averages are biased. The fix is to control for last period’s GDP — by conditioning on where a country <em>was</em>, we isolate which new factors push it forward and break the feedback loop.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-solow-model-makes-lagged-gdp-unavoidable-not-optional" class="slide level2 center">
+<h2>The Solow model makes lagged GDP unavoidable, not optional</h2>
+<p><span class="math display">\[\ln y_{it} = \alpha \ln y_{i,t-1} + \beta' x_{it} + \eta_i + \zeta_t + v_{it}\]</span></p>
+<p>The convergence prediction puts last period’s GDP on the right-hand side. The persistence <span class="math inline">\(\alpha\)</span> measures how slowly countries approach their steady state.</p>
+<p><span class="comment">Omitting <span class="math inline">\(\ln y_{i,t-1}\)</span> assumes <span class="math inline">\(\alpha = 0\)</span> — instantaneous convergence, which the data flatly rejects.</span></p>
+<aside class="notes">
+<p>α close to 1 means slow convergence (countries stay near their current income for a long time); α close to 0 means fast. The lagged dependent variable is not an ad hoc add-on — it falls straight out of the Solow beta-convergence equation. Entity effects absorb geography and institutions; time effects remove global shocks.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="weak-exogeneity-buys-realism-past-feedback-allowed-current-shock-forbidden" class="slide level2 center">
+<h2>Weak exogeneity buys realism: past feedback allowed, current shock forbidden</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h3 id="strict-exogeneity-cross-section">Strict exogeneity (cross-section)</h3>
+<ul>
+<li>one time snapshot</li>
+<li>no lagged outcome</li>
+<li>no fixed effects</li>
+<li>regressors clean at <em>all</em> times</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<h3 id="weak-exogeneity-dynamic-panel">Weak exogeneity (dynamic panel)</h3>
+<ul>
+<li>four decades of panel</li>
+<li>lagged GDP included</li>
+<li>entity + time effects</li>
+<li>only the <em>current</em> shock <span class="math inline">\(v_{it}\)</span> ruled out</li>
+</ul>
+</div></div>
+<aside class="notes">
+<p>Weak exogeneity allows past GDP growth to influence current investment — the realistic feedback loop — while requiring only that today’s idiosyncratic shock v_it does not simultaneously move today’s investment. Much weaker than strict exogeneity, and exactly what growth data needs.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="estimate-all-512-models-by-marginal-likelihood-not-r-squared" class="slide level2 center">
+<h2>Estimate all 512 models by marginal likelihood, not R-squared</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1-2|4-9|11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>data_std <span class="ot">&lt;-</span> <span class="fu">feature_standardization</span>(economic_growth,</span>
+<span id="cb1-2"><a href=""></a>              <span class="at">excluded_cols =</span> <span class="fu">c</span>(country, year, gdp))  <span class="co"># mean 0, sd 1</span></span>
+<span id="cb1-3"><a href=""></a><span class="co"># demean by year → remove time fixed effects, then estimate every model</span></span>
+<span id="cb1-4"><a href=""></a>full <span class="ot">&lt;-</span> <span class="fu">optim_model_space</span>(<span class="at">df =</span> data_prepared,</span>
+<span id="cb1-5"><a href=""></a>          <span class="at">dep_var_col =</span> gdp, <span class="at">timestamp_col =</span> year,</span>
+<span id="cb1-6"><a href=""></a>          <span class="at">entity_col  =</span> country, <span class="at">init_value =</span> <span class="fl">0.5</span>)</span>
+<span id="cb1-7"><a href=""></a>bma_results <span class="ot">&lt;-</span> <span class="fu">bma</span>(full, <span class="at">df =</span> data_prepared, <span class="at">round =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><span class="comment">Marginal likelihood scores each of 512 “recipes” — rewarding fit, penalizing needless complexity.</span></p>
+<aside class="notes">
+<p>Unlike R-squared, which always rises when you add variables, the marginal likelihood integrates out parameter uncertainty and penalizes complexity — a 9-regressor model that barely beats a 5-regressor one scores lower. The package ships a precomputed full_model_space so the several-minute optimization can be skipped.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="kitchen-sink-fe-finds-6-of-10-significant-but-the-verdict-reshuffles" class="slide level2 center">
+<h2>Kitchen-sink FE finds 6 of 10 significant — but the verdict reshuffles</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Regressor</th>
+<th style="text-align: right;">Coef.</th>
+<th style="text-align: right;">p-value</th>
+<th style="text-align: center;">Sig. 5%?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>lag GDP</td>
+<td style="text-align: right;"><span class="key">0.619</span></td>
+<td style="text-align: right;">0.000</td>
+<td style="text-align: center;">yes</td>
+</tr>
+<tr class="even">
+<td>trade openness</td>
+<td style="text-align: right;">0.120</td>
+<td style="text-align: right;">0.002</td>
+<td style="text-align: center;">yes</td>
+</tr>
+<tr class="odd">
+<td>education</td>
+<td style="text-align: right;">0.016</td>
+<td style="text-align: right;">0.632</td>
+<td style="text-align: center;">no</td>
+</tr>
+<tr class="even">
+<td>life expectancy</td>
+<td style="text-align: right;">0.115</td>
+<td style="text-align: right;">0.637</td>
+<td style="text-align: center;">no</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">Drop one variable and the significance pattern changes — this fragility is what BMA is built to fix.</span></p>
+<aside class="notes">
+<p>The kitchen-sink fixed-effects model commits to one specification. Its lagged-GDP coefficient (0.619) is well below the BMA posterior mean (0.919) — multicollinearity among 9 regressors pulls it down. R-squared is 0.988 on 292 observations. BMA replaces the binary significant/insignificant verdict with a continuous probability scale.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="bma-grades-each-variable-on-a-continuous-pip-scale-population-leads-at-0.990" class="slide level2 center">
+<h2>BMA grades each variable on a continuous PIP scale — population leads at 0.990</h2>
+
+<img data-src="../r_dynamic_bma_pip.png" class="r-stretch quarto-figure-center"><p class="caption">Posterior Inclusion Probabilities, all 9 regressors, sorted with the 0.75 and 0.50 threshold lines.</p><aside class="notes">
+<p>The PIP is the share of posterior mass in models that include the variable — a “batting average.” Population dominates at 0.990 (strong evidence), life expectancy at 0.864. Five variables clear the 0.75 positive-evidence threshold; the rest sit in the 0.50–0.75 moderate zone. No variable falls below 0.50 — the data supports relatively large models.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="population-is-the-single-most-robust-determinant-pip-0.990" class="slide level2 center" data-background-color="#141413">
+<h2>Population is the single most robust determinant: PIP = 0.990</h2>
+<p><span class="bignum">0.990</span></p>
+<p><span class="bignum-label">Population PIP under the binomial prior — appears in virtually every high-quality model</span></p>
+<aside class="notes">
+<p>On Raftery’s classification 0.990 is “strong” evidence — just short of the 0.99 “very strong” cut. Population is followed by life expectancy at 0.864 and investment share at 0.773. Every one of the 9 candidates exceeds 0.65, so this is a story about which variables are <em>most</em> robust, not which clear a yes/no bar.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-data-concentrates-posterior-mass-on-a-few-large-models" class="slide level2 center">
+<h2>The data concentrates posterior mass on a few large models</h2>
+
+<img data-src="../r_bdsm_03_model_pmp_combined.png" class="r-stretch quarto-figure-center"><p class="caption">Prior (flat, dashed) vs posterior (concentrated, solid) probability across all 512 models.</p><aside class="notes">
+<p>The prior is nearly flat; the posterior spikes on a handful of models while most receive negligible weight. That concentration is the signature of informative data — 73 countries over four decades carry enough information to strongly favor certain specifications.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-posterior-wants-big-models-expected-size-jumps-from-4.5-to-7" class="slide level2 center">
+<h2>The posterior wants big models — expected size jumps from 4.5 to ~7</h2>
+
+<img data-src="../r_bdsm_05_model_sizes.png" class="r-stretch quarto-figure-center"><p class="caption">Prior vs posterior distribution over model sizes (regressors excluding the lagged outcome).</p><aside class="notes">
+<p>The binomial prior centers on 4–5 regressors (EMS = 4.5); the posterior shifts to 6.908. Under the binomial-beta prior it reaches 8.556 — the data wants nearly all 9 candidates. Consistent with every variable having PIP above 0.65: the data sees signal almost everywhere.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-best-single-model-carries-only-8.9-of-the-mass-no-model-is-the-model" class="slide level2 center" data-background-color="#141413">
+<h2>The best single model carries only 8.9% of the mass — no model is “the” model</h2>
+<p><span class="bignum">8.9%</span></p>
+<p><span class="bignum-label">Posterior weight on the top-ranked specification; the other 91% spreads across hundreds of nearby models</span></p>
+<aside class="notes">
+<p>The top model includes all 9 regressors (PMP = 0.089); the next seven each drop exactly one variable — a “kitchen sink minus one” pattern. Population and life expectancy are never dropped across the top 8, matching their high PIPs. This is precisely why averaging beats selecting: betting on one specification ignores 91% of the evidence.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="posterior-coefficients-population-and-life-expectancy-clear-zero-cleanly" class="slide level2 center">
+<h2>Posterior coefficients: population and life expectancy clear zero cleanly</h2>
+
+<img data-src="../r_dynamic_bma_coef.png" class="r-stretch quarto-figure-center"><p class="caption">Posterior means with approximate 95% credible intervals (<span class="math inline">\(\text{PM} \pm 2\cdot\text{PSD}\)</span>) for all 9 regressors.</p><aside class="notes">
+<p>Population and life expectancy have the largest positive posterior means with intervals away from zero. Democracy is clearly negative. Education and government share straddle zero — reflecting sign instability. BMA’s intervals are wider than ordinary confidence intervals because they absorb variation <em>across</em> specifications, not just within one.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="populations-coefficient-is-tight-positive-and-centered-near-0.12" class="slide level2 center">
+<h2>Population’s coefficient is tight, positive, and centered near 0.12</h2>
+
+<img data-src="../r_bdsm_09_coef_hist_pop.png" class="r-stretch quarto-figure-center"><p class="caption">Posterior coefficient distribution for population across all 512 models, weighted by model probability.</p><aside class="notes">
+<p>A tight, entirely positive distribution centered around 0.12 — strong and stable evidence for a positive effect on growth. This is the visual companion to population’s 0.990 PIP: not just frequently included, but consistently signed and precisely estimated.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-skeptical-prior-is-the-real-test-only-population-and-life-expectancy-survive-it" class="slide level2 center">
+<h2>A skeptical prior is the real test — only population and life expectancy survive it</h2>
+
+<img data-src="../r_dynamic_bma_sensitivity.png" class="r-stretch quarto-figure-center"><p class="caption">PIPs under three priors (skeptical EMS=2, binomial, binomial-beta). Segment width = sensitivity.</p><aside class="notes">
+<p>Segment width shows how much each PIP moves across priors. Population is rock-solid (0.964–0.998); life expectancy moderately sensitive (0.637–0.974). Under the skeptical EMS=2 prior, investment share collapses from 0.773 to 0.483 and democracy to 0.372 — only pop and lnlex stay above 0.5. The headline: robustness means surviving the prior that <em>wants</em> you gone.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-dilution-prior-penalizes-redundant-controls-the-ranking-holds" class="slide level2 center">
+<h2>A dilution prior penalizes redundant controls — the ranking holds</h2>
+
+<img data-src="../r_bdsm_16_sizes_dilution.png" class="r-stretch quarto-figure-center"><p class="caption">Model sizes under the dilution prior (penalizing correlated regressors); expected size falls 6.91 → 6.53.</p><aside class="notes">
+<p>The dilution prior multiplies each model’s prior by the determinant of its regressors’ correlation matrix — near-duplicate variables get pushed toward zero. PIPs drop modestly (ish 0.773 → 0.718) and expected size falls from 6.91 to 6.53, but the ranking is unchanged: pop and lnlex stay on top. A clean robustness check against multicollinearity inflation.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="population-and-life-expectancy-are-complements-not-substitutes-jointness-0.711" class="slide level2 center">
+<h2>Population and life expectancy are complements, not substitutes — jointness 0.711</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<h3 id="complements-everywhere">Complements everywhere</h3>
+<ul>
+<li>All HCGHM pairs are positive</li>
+<li>Strongest: <span class="math inline">\(\text{pop} \times \text{lnlex} = 0.711\)</span></li>
+<li><span class="math inline">\(\text{pop} \times \text{ish} = 0.530\)</span></li>
+<li><span class="math inline">\(\text{pop} \times \text{opem} = 0.517\)</span></li>
+</ul>
+</div><div class="column" style="width:45%;">
+<h3 id="reading-it">Reading it</h3>
+<ul>
+<li>No substitution detected</li>
+<li>Determinants add distinct stories</li>
+<li>Investment price is the loner</li>
+</ul>
+</div></div>
+<aside class="notes">
+<p>Jointness measures whether two regressors appear in models together (complements) or apart (substitutes). Every pair here is a complement — population and life expectancy most strongly at 0.711, meaning they tell additive, non-overlapping growth stories. Under the binomial-beta prior the values climb to 0.944 because larger models make co-appearance more likely.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>The Resolution</h1>
+<p><span class="act">Act III</span></p>
+</section>
+<section id="gdp-is-highly-persistent-only-5-of-the-steady-state-gap-closes-per-decade" class="slide level2 center">
+<h2>GDP is highly persistent — only ~5% of the steady-state gap closes per decade</h2>
+<p><span class="math display">\[\alpha \approx 0.92 \;\Rightarrow\; \text{convergence speed} = 1 - \alpha \approx 0.08 \text{ per decade}\]</span></p>
+<p>The lagged-GDP coefficient near 0.92 means a country’s income is dominated by its own past — convergence to its steady state is a slow crawl.</p>
+<p><span class="comment">That persistence absorbs the cross-sectional variation, leaving fewer variables with independent power.</span></p>
+<aside class="notes">
+<p>The kitchen-sink FE coefficient (0.619) understates persistence; the BMA posterior mean is 0.919–0.943 depending on prior. Strong persistence is exactly why dynamic panel BMA reshapes the landscape of “robust” determinants relative to cross-sectional BMA — much of what looked causal was just inertia.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="controlling-for-reverse-causality-leaves-population-and-public-health-standing" class="slide level2 center">
+<h2>Controlling for reverse causality leaves population and public health standing</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Determinant</th>
+<th style="text-align: right;">Bin.</th>
+<th style="text-align: right;">Bin-Beta</th>
+<th style="text-align: right;">EMS=2</th>
+<th style="text-align: center;">Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>population</td>
+<td style="text-align: right;"><span class="key">0.990</span></td>
+<td style="text-align: right;">0.998</td>
+<td style="text-align: right;">0.964</td>
+<td style="text-align: center;">Robust</td>
+</tr>
+<tr class="even">
+<td>life expectancy</td>
+<td style="text-align: right;">0.864</td>
+<td style="text-align: right;">0.974</td>
+<td style="text-align: right;">0.637</td>
+<td style="text-align: center;">Robust</td>
+</tr>
+<tr class="odd">
+<td>investment share</td>
+<td style="text-align: right;">0.773</td>
+<td style="text-align: right;">0.954</td>
+<td style="text-align: right;">0.483</td>
+<td style="text-align: center;">Sensitive</td>
+</tr>
+<tr class="even">
+<td>democracy</td>
+<td style="text-align: right;">0.678</td>
+<td style="text-align: right;">0.929</td>
+<td style="text-align: right;">0.372</td>
+<td style="text-align: center;">Sensitive</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">Robust = PIP above 0.5 even under the skeptical prior. Only two determinants qualify.</span></p>
+<aside class="notes">
+<p>This is the payoff table. Investment and trade look promising under the default prior but become ambiguous under EMS=2. Education and democracy — despite intuitive appeal — are fragile. For a policymaker, population dynamics and public health are the levers with the strongest evidence across all modeling assumptions.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="does-dynamic-panel-bma-make-these-causal-no-it-disciplines-it-doesnt-identify" class="slide level2 center">
+<h2>Does dynamic panel BMA make these causal? No — it disciplines, it doesn’t identify</h2>
+<p><span class="objection">Objection.</span> Adding a lagged outcome and fixed effects can’t manufacture causal identification.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span> Correct. The estimates are consistent only under <strong>weak exogeneity</strong> — current regressors uncorrelated with the <em>current</em> shock. If contemporaneous feedback is strong, bias remains. BMA handles model uncertainty and reverse causality through persistence; it does not relax the identifying assumption.</p>
+<aside class="notes">
+<p>Steelman, don’t strawman. Weak exogeneity is weaker than strict, but it is still an assumption — a same-period GDP shock that immediately moves investment would break it. The contribution is robustness of <em>which</em> determinants survive, not a clean causal effect for any one of them.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section></section>
+<section id="once-reverse-causality-is-handled-only-population-and-public-health-hold-up." class="title-slide slide level1 divider center" data-background-color="#141413">
+<h1>Once reverse causality is handled, only population and public health hold up.</h1>
+<aside class="notes">
+<p>The single takeaway. Across 512 models and three priors, controlling for GDP’s persistence dissolves most “robust” growth determinants — leaving population dynamics and life expectancy as the two levers with evidence that survives even a skeptical prior.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

@@ -15,6 +15,10 @@ image:
   focal_point: Smart
   placement: 3
 links:
+- icon: chalkboard-teacher
+  icon_pack: fas
+  name: "Slides (HTML)"
+  url: slides/index.html
 - icon: laptop-code
   icon_pack: fas
   name: Web app

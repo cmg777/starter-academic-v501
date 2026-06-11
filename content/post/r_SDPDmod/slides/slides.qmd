@@ -1,0 +1,308 @@
+---
+title: "Spatial Dynamic Panel Data Modeling in R"
+subtitle: "Cigarette demand across 46 US states — where space meets habit"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "99.89%"
+    cap: "static SDM wins (Bayesian)"
+  - num: "−1.23"
+    cap: "total static price elasticity"
+  - num: "τ ≈ 0.86"
+    cap: "habit persistence dominates"
+format:
+  revealjs:
+    output-file: index.html
+    # NOT embed-resources: RevealChalkboard (a core feature) is incompatible with
+    # self-contained output, so the deck ships index.html + slides_files/ (Hugo serves
+    # this fine — see the tutorial.html precedent). Figures are referenced ../<slug>_*.png.
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs default) — renders $…$ / $$…$$ across the whole slide
+    # DOM (body, captions, headings, table cells). Loads from a CDN; reveal.js is local.
+    # Do NOT set `html-math-method: katex` — it is broken in revealjs (no auto-render call,
+    # so math shows as raw LaTeX). See references/render-and-fix.md.
+    link-external-icon: false
+---
+
+# The Tension {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## When one state raises its cigarette tax, smokers cross the border
+
+A tax hike in one state sends border-county smokers to a cheaper neighbour. So a state's consumption depends on its *neighbours'* prices and consumption — a **spatial spillover**.
+
+. . .
+
+Standard panel methods assume each state stands alone. *What do they miss?*
+
+::: {.notes}
+This is the motivating story. Cross-border shopping makes the 46 states an interdependent system, not 46 isolated regressions. The whole deck is about what a model that ignores neighbours — and ignores yesterday — gets wrong.
+:::
+
+## A 30-year panel already whispers the answer: states stay where they start
+
+![Cigarette sales per capita, 46 US states, 1963–1992. Five states highlighted. Heavy smokers stay heavy; a common downward trend after the late 1970s.](../r_SDPDmod_fig4_eda_spaghetti.png)
+
+::: {.notes}
+Spoiler figure for persistence. Kentucky (a tobacco state) stays above 150 packs per capita; Utah stays low. That visual stickiness foreshadows the dominant lagged-dependent-variable coefficient τ ≈ 0.86 in the dynamic models. The shared post-1970s decline is what time fixed effects will absorb.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- The lab: a 46-state, 30-year panel and a contiguity matrix $W$
+- Let the data choose the model — Bayesian comparison across six specifications
+- Static SAR → SDM, with Lee-Yu bias correction
+- Add time: dynamic SDM, habit persistence, and direct/indirect effects
+- The lesson: ignore spillovers *or* habit, and tobacco-tax conclusions mislead
+:::
+
+# The Investigation {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## The lab: 46 states × 30 years of log-elasticities, neighbours from a $W$ matrix
+
+::: {.incremental}
+- **Outcome** — $\log$ cigarette packs per capita (`logc`), 1,380 balanced observations
+- **Treatment-of-interest** — $\log$ real price (`logp`); also $\log$ real income (`logy`)
+- **Neighbours** — the `usa46` binary contiguity matrix, **row-normalized**
+:::
+
+[Log-log means every coefficient is an elasticity: a percent change in consumption per percent change in price. State and year fixed effects absorb tobacco culture and national anti-smoking trends.]{.comment}
+
+::: {.notes}
+The Cigar dataset (Baltagi 1992). pimin — minimum neighbour price — is left out on purpose: its correlation with the spatial lag W·logp is 0.92, so the SDM's W·logp term captures the same cross-border channel more flexibly.
+:::
+
+## Neighbours are sparse: 188 of 2,116 pairs, ~4 neighbours per state
+
+![Binary contiguity matrix of 46 US states. Coloured cell = a shared border. Only 8.9% of cells are neighbours.](../r_SDPDmod_fig1_weight_matrix.png)
+
+::: {.notes}
+188 non-zero entries, 8.9% density, 4.09 neighbours on average. Maine has 1 neighbour; Missouri has 8. After row-normalization, the spatial lag Wy of any variable is the simple average across a state's contiguous neighbours — so ρWy reads as "how much your neighbours' average pulls you."
+:::
+
+## Six spatial models, one equation — they differ in *where* space enters
+
+$$y_t = \rho W y_t + X_t \beta + W X_t \theta + u_t, \quad u_t = \lambda W u_t + \epsilon_t$$
+
+::: {.incremental}
+- $\rho$ — neighbours' **outcomes** spill over (SAR)
+- $\theta$ — neighbours' **covariates** spill over (SLX)
+- $\lambda$ — spatial correlation in the **errors** (SEM)
+- The **SDM** keeps $\rho$ and $\theta$; OLS sets all three to zero
+:::
+
+[`blmpSDPD()` scores every model at once with a log-marginal posterior — no ad-hoc sequence of Wald tests.]{.comment}
+
+::: {.notes}
+The general nesting structure: SDM is SAR plus spatial lags of X; SAR, SEM, SLX, SDEM are restrictions. Bayesian comparison assigns a probability to every candidate simultaneously, which is exactly what we want for a "which specification?" question.
+:::
+
+## Let the data choose: the static SDM wins with 99.89% posterior probability
+
+![Posterior model probabilities across three specifications — static individual FE, static two-way FE, dynamic two-way FE.](../r_SDPDmod_fig2_model_comparison.png)
+
+::: {.notes}
+Under individual FE the SDM gets 99.89%; SDEM 0.11%; everything else ≈ 0. OLS and SLX never win — spatial dependence is unambiguously present. Adding two-way FE tightens the race (SDM 45.9% vs SDEM 41.3%); adding dynamics flattens it entirely, foreshadowing that the lagged dependent variable absorbs the persistence spatial lags used to carry.
+:::
+
+## SDM dominates the static race — but dynamics flatten every model
+
+| Specification | Top model | Prob. | Runner-up | Prob. |
+|---|---|---:|---|---:|
+| Static, individual FE | SDM | [99.89%]{.key} | SDEM | 0.11% |
+| Static, two-way FE | SDM | 45.92% | SDEM | 41.31% |
+| Dynamic, two-way FE | SEM | 29.84% | SAR | 25.73% |
+
+[Once the lagged outcome enters, the spatial signal weakens — the data can no longer tell the spatial models apart.]{.comment}
+
+::: {.notes}
+Three takeaways: (1) spatial dependence is real (OLS/SLX never win); (2) SDM is the preferred static model — both ρWy and WXθ matter; (3) dynamics dissolve the discrimination, because yt−1 captures the temporal persistence the spatial lags were borrowing.
+:::
+
+## SAR makes neighbours' consumption pull your own — ρ = 0.187, highly significant
+
+$$y_t = \rho W y_t + X_t \beta + \mu_i + \gamma_t + \epsilon_t$$
+
+::: {.incremental}
+- Two-way FE: $\rho = 0.187$, $t = 6.52$ — a state inherits a fraction of its neighbours' consumption
+- Price elasticity $\beta_{\text{logp}} = -0.995$; income $\beta_{\text{logy}} = 0.464$, both significant
+- With individual FE only, $\rho$ inflates to 0.298 and price collapses to $-0.53$ — time trends confound it
+:::
+
+::: {.notes}
+The story of why two-way FE matters: dropping time effects lets common national trends masquerade as price effects (−0.53) and inflate the spatial coefficient (0.298). Once year effects are in, price snaps to ≈ −1.0 and income becomes significant — cigarettes are a normal good at the state level.
+:::
+
+## Six lines fit a spatial-Durbin panel with Lee-Yu correction in R
+
+``` {.r code-line-numbers="1|2-4|5|6"}
+data("usa46", package = "SDPDmod")
+W <- rownor(usa46)                       # row-normalize the contiguity matrix
+mod <- SDPDm(logc ~ logp + logy, data = data1, W = W,
+             index = c("state","year"), model = "sdm",
+             effect = "twoways", LYtrans = TRUE)   # Lee-Yu bias correction
+summary(impactsSDPDm(mod))               # direct / indirect / total
+```
+
+::: {.notes}
+SDPDm() is the maximum-likelihood workhorse: model = "sdm" adds WXθ to SAR; LYtrans = TRUE applies the Lee-Yu transformation; impactsSDPDm() turns the raw coefficients into direct, indirect, and total effects. The whole pipeline — Bayesian selection, estimation, decomposition — lives in one package.
+:::
+
+## Lee-Yu corrects the small-sample bias, lifting ρ from 0.223 to 0.262
+
+The 46 + 30 = 76 fixed effects create an **incidental-parameter bias** in spatial ML. Lee-Yu (2010) transforms the data to concentrate them out before estimation.
+
+::: {.incremental}
+- Uncorrected SDM: $\rho = 0.223$  →  Lee-Yu: $\rho = 0.262$ (a 17% upward correction)
+- Slopes barely move ($\beta_{\text{logp}}$: $-1.003 \to -1.001$) — expected with $T = 30$
+:::
+
+[For short panels ($T < 10$) the correction would matter far more; here it mainly rescues $\rho$.]{.comment}
+
+::: {.notes}
+The uncorrected estimator understates spatial dependence. With 30 time periods the slope bias is small, but ρ — the parameter most sensitive to the incidental-parameter problem — moves a meaningful 17%. We adopt the Lee-Yu version as the preferred static SDM.
+:::
+
+## SDM adds neighbours' covariates — and flips the income spillover negative
+
+| Effect | logp $\hat\beta$ | logy $\hat\beta$ |
+|---|---:|---:|
+| Direct | [−1.010]{.key} | 0.588 |
+| Indirect (spillover) | −0.219 | −0.197 |
+| Total | −1.230 | 0.391 |
+
+[The income spillover is *negative* (−0.20): richer neighbours pull your consumption *down* — a channel the SAR cannot see.]{.comment}
+
+::: {.notes}
+Price tells the familiar story: direct −1.01, indirect −0.22, total −1.23. But income reverses sign relative to SAR (+0.10 there): the significant W·logy ≈ −0.31 means richer neighbours reduce own-state demand, plausibly through substitution toward premium or out-of-state channels. The SDM's WXθ terms are what make this visible.
+:::
+
+## Ignore spillovers and you understate the price response by 22% {background-color="#141413"}
+
+[−1.23]{.bignum}
+
+[Total static-SDM price elasticity vs a $-1.01$ direct effect — spillovers add 22%]{.bignum-label}
+
+::: {.notes}
+This is the headline of the static analysis. A state evaluating a tax increase with a non-spatial model (β ≈ −1.0) underestimates the true consumption reduction once neighbour feedback is counted. Spatial spillovers are economically meaningful: ~18% of the total effect.
+:::
+
+## Cigarettes are habit-forming — so yesterday belongs in the model
+
+$$y_t = \rho W y_t + \tau y_{t-1} + \eta W y_{t-1} + X_t \beta + W X_t \theta + \mu_i + \gamma_t + \epsilon_t$$
+
+::: {.incremental}
+- $\tau y_{t-1}$ — own past consumption (**habit persistence**)
+- $\eta W y_{t-1}$ — neighbours' past consumption (**spatiotemporal diffusion**)
+:::
+
+[A static $\rho$ must absorb *both* spatial spillover and serial correlation — so it is biased upward.]{.comment}
+
+::: {.notes}
+Nicotine addiction makes last year's smokers this year's smokers. If the model omits yt−1, the contemporaneous spatial coefficient has to do double duty, conflating "your neighbours smoke" with "you smoked last year, and so did they." Adding the temporal lag separates the two.
+:::
+
+## Add time and the spatial story shrinks: τ = 0.86 dominates, ρ falls to 0.16
+
+| Parameter | Static SDM (LY) | Dynamic SDM (LY) |
+|---|---:|---:|
+| $\tau$ (logc$_{t-1}$) | — | [0.864]{.key} |
+| $\rho$ (W·logc) | 0.262 | 0.162 |
+| $\beta_{\text{logp}}$ | −1.001 | −0.271 |
+| W·logp | 0.091 (n.s.) | 0.196 (sig.) |
+
+[Habit persistence is the dominant force; the static SDM was overstating contemporaneous spatial dependence.]{.comment}
+
+::: {.notes}
+τ = 0.864 (t = 67) is by far the largest, most precise parameter — about 87% of last year's consumption carries over. ρ falls from 0.262 to 0.162 once we control for that persistence: much of what looked spatial was temporal. And W·logp turns positive and significant — the next slide.
+:::
+
+## The dynamic SDM uncovers cross-border shopping: W·logp = +0.20, significant
+
+When a *neighbour* raises its price, your consumption **rises** — smokers buy more in your now-cheaper state.
+
+::: {.incremental}
+- Static SDM: $W\cdot\text{logp} = 0.091$, not significant — masked by $\rho W y$
+- Dynamic SDM: $W\cdot\text{logp} = 0.196$, $t = 4.46$ — the cross-border signal emerges
+:::
+
+[The spatial lag of consumption hid the effect; only proper dynamics reveal it.]{.comment}
+
+::: {.notes}
+This is the substantive payoff. The static model's ρWy term soaks up the cross-border channel, so W·logp looks null. Once yt−1 and Wyt−1 are in, the price-of-neighbours coefficient stands free and positive — exactly the cross-border shopping the opening story predicted.
+:::
+
+## Short-run vs long-run: a 1% price hike cuts demand 0.26% now, 1.93% eventually
+
+![Direct, indirect, and total effects of price and income — static SDM vs dynamic SDM short-run and long-run.](../r_SDPDmod_fig3_impact_decomposition.png)
+
+::: {.notes}
+Habit persistence (τ = 0.864) amplifies the initial shock: short-run direct price elasticity −0.26 balloons to −1.93 in the long run, a ~7× snowball. The static SDM (−1.01 direct) overstates the *immediate* response by ~4×. Short-run indirect price is positive (+0.18) — cross-border shopping again — partly offsetting the direct effect; long-run totals carry wide standard errors, so steady-state predictions need caution.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## Habit persistence rules: τ ≈ 0.86 dwarfs the spatial coefficient {background-color="#141413"}
+
+[0.864]{.bignum}
+
+[Temporal-lag coefficient $\tau$ in the dynamic SDM ($t = 67$) — vs a contemporaneous $\rho = 0.16$]{.bignum-label}
+
+::: {.notes}
+The most precisely estimated parameter in the entire analysis. ~87% of consumption carries over year to year. Space matters — ρ = 0.16 is significant — but it is small next to the inertia of addiction. Static models that omit τ mistake persistence for spillover.
+:::
+
+## Does any of this estimate a causal tax effect? Not without the usual assumptions
+
+[Objection.]{.objection} The W·logp coefficient and the impacts read like causal cross-border effects — but the data are observational.
+
+. . .
+
+[Response.]{.rebuttal} Correct. Two-way fixed effects strip time-invariant state heterogeneity and common shocks, and the spatial/dynamic terms model interdependence — but a causal tax elasticity still needs no time-varying confounders and a stable spatial process ($|\tau + \rho\eta| < 1$). The deck demonstrates a *modeling workflow*, not an identified policy experiment.
+
+::: {.notes}
+Steelman, don't strawman. The post is careful: SDPDmod gives a principled way to model spatial and temporal dependence, but it does not manufacture identification. The elasticities are descriptive of an interdependent system under FE; reading them as the causal effect of a tax requires the standard panel assumptions plus stationarity of the dynamic-spatial system.
+:::
+
+## One dataset, three lessons the workflow makes visible
+
+::: {.incremental}
+- **Spillovers are real** — total static price elasticity $-1.23$ is 22% above the direct $-1.01$
+- **Habit dominates dynamics** — $\tau \approx 0.86$; short-run price response is a quarter of the static estimate
+- **Cross-border shopping emerges** — $W\cdot\text{logp} = +0.20$, only once dynamics are specified
+:::
+
+::: {.notes}
+The summary slide. Each lesson maps to a section: Bayesian comparison + impacts (spillovers), dynamic SDM (habit), dynamic SDM W·logp (cross-border). Robustness: a 2nd-order W lifts ρ to 0.449 and makes W·logp significant — spillovers may reach beyond immediate neighbours.
+:::
+
+# Ignore your neighbours or ignore yesterday, and your tobacco-tax forecast is wrong. {.divider background-color="#141413"}
+
+::: {.notes}
+The single takeaway, resolving the Act-I hook. Cross-border shopping (space) and addiction (time) jointly shape cigarette demand; a model that drops either one — the standard panel regression, or a static spatial model — gives a misleading answer for tax policy. SDPDmod lets you keep both.
+:::

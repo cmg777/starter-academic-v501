@@ -1,0 +1,296 @@
+---
+title: "Spatial Dynamic Panels with Common Factors"
+subtitle: "Credit risk in US banking, the spxtivdfreg way"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "0.394"
+    cap: "spatial spillover psi"
+  - num: "7.765"
+    cap: "long-run total effect"
+  - num: "33.5%"
+    cap: "variance from factors"
+format:
+  revealjs:
+    output-file: index.html
+    # NOTE: not embed-resources — RevealChalkboard (a core feature) is
+    # incompatible with self-contained output, so the deck ships
+    # index.html + slides_files/ (served fine by Hugo, like tutorial.html).
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs default) — renders $…$ / $$…$$ across the whole slide
+    # DOM (body, captions, headings, table cells). Loads from a CDN; reveal.js is local.
+    # Do NOT set `html-math-method: katex` — it is broken in revealjs (no auto-render call,
+    # so math shows as raw LaTeX). See references/render-and-fix.md.
+    link-external-icon: false
+---
+
+# The Tension {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## When the crisis hit, credit risk spread two ways — and standard tools saw only one
+
+When the 2007–2009 crisis struck, non-performing loans surged across the whole US banking system at once.
+
+. . .
+
+Two channels did it: **spatial spillovers** between interconnected banks, and **common factors** — macro shocks that hit every bank together. *Stata's `xsmle` and `spxtregress` cannot model the second one.*
+
+::: {.notes}
+This is the central tension. Bank risk does not stay contained. It travels along lending relationships (spatial) AND it responds to aggregate shocks like interest-rate moves and the housing collapse (common factors). The standard spatial-panel toolkit in Stata can do spatial lags but cannot accommodate unobserved common factors — that gap is what the whole deck is about.
+:::
+
+## One equation must absorb four kinds of endogeneity at once
+
+$$NPL_{it} = \psi \sum_{j=1}^{N} w_{ij}\, NPL_{jt} + \rho\, NPL_{i,t-1} + x_{it}\beta + \alpha_i + \lambda_i' f_t + \varepsilon_{it}$$
+
+[Spatial lag $\psi W\,NPL$, temporal lag $\rho\,NPL_{i,t-1}$, endogenous covariates $x_{it}\beta$, bank effect $\alpha_i$, and the latent factors $\lambda_i' f_t$ — every term but $\alpha_i$ is a source of endogeneity.]{.comment}
+
+::: {.notes}
+Walk it left to right. The spatial lag is endogenous (i depends on j and j on i — simultaneity). The temporal lag correlates with the fixed effect. INEFF is an endogenous regressor. And the interactive fixed effect λ_i' f_t enters both the regressors and the error, inducing cross-sectional dependence and omitted-variable bias. Four problems, one estimator.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- The lab: 350 US banks, 36 quarters, an economic-distance network
+- The estimator: defactor first, then run IV
+- The full model: a significant spatial lag and one-third of the variance from factors
+- Three stress tests: drop the factors, drop the spatial lag, free the slopes
+:::
+
+# The Investigation {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## The lab: 350 US banks across the entire crisis, 12,250 observations
+
+::: {.incremental}
+- **Outcome** — `NPL`, non-performing loans over total loans (%)
+- **Span** — 2006:Q1 to 2014:Q4, 36 quarters straddling the GFC
+- **Network** — a $350 \times 350$ weight matrix $W$, not geographic but **economic-distance** (Spearman rank correlations of bank debt ratios)
+:::
+
+[Strongly balanced: every bank in every quarter. The matrix is row-standardized with about 18 neighbours per bank, so the spatial lag is a weighted average of interconnected banks.]{.comment}
+
+::: {.notes}
+The economic-distance W is the key modelling choice. Two banks are neighbours if their debt-ratio rank correlation exceeds the 95th percentile — so two banks on opposite coasts can be "neighbours" if they lend alike. 6,300 nonzero entries / 350 banks ≈ 18 neighbours. Effective sample is 12,250 = 350 × 35 after the lag.
+:::
+
+## Defactored IV is a two-step trick: subtract the rainstorm, then read each pond
+
+:::: {.columns}
+::: {.column width="50%"}
+### Step 1 — Defactor
+
+- Extract latent common factors $\lambda_i' f_t$ by principal components
+- Remove them from data *before* estimating
+:::
+::: {.column width="50%"}
+### Step 2 — IV / GMM
+
+- Run instrumental variables on the **defactored** data
+- Standard 2SLS asymptotics now hold
+:::
+::::
+
+[Removing the factors first kills the cross-sectional dependence — no incidental-parameters bias, no Lee–Yu correction.]{.comment}
+
+::: {.notes}
+The analogy from the post: a global rainstorm hits every pond at once. All ponds rise together — not because they're connected, but because of the same outside force. Subtract that rain first; the remaining variation is the local circuitry the spatial/temporal model wants to learn. Because the factors come out before the IV step, classic 2SLS asymptotics apply.
+:::
+
+## INEFF is endogenous, so INTEREST does the instrumenting
+
+``` {.stata code-line-numbers="1|2|3"}
+spxtivdfreg NPL INEFF CAR SIZE BUFFER PROFIT QUALITY LIQUIDITY, ///
+    absorb(ID) splag tlags(1) spmatrix("W.csv", import) ///
+    iv(INTEREST CAR SIZE BUFFER PROFIT QUALITY LIQUIDITY, splags lag(1)) std
+```
+
+[`splag` adds the spatial lag, `tlags(1)` the temporal lag, `iv(...)` instruments `INEFF` with `INTEREST` and lags, `std` standardizes before extracting factors.]{.comment}
+
+::: {.notes}
+One command carries the whole model. INEFF (operational inefficiency) is endogenous — high NPL lowers measured efficiency (reverse causality) and unobserved management quality drives both. INTEREST (interest expenses / deposits) is the excluded instrument, alongside lagged exogenous regressors. The `std` option standardizes covariates so the principal-components factor step is numerically stable across very different scales.
+:::
+
+## The estimator finds the factors itself: 2 in the regressors, 1 in the errors
+
+::: {.incremental}
+- $r_x = 2$ common factors in the regressors
+- $r_u = 1$ common factor in the error term
+- Together they capture Fed policy, the housing collapse, the interbank freeze
+:::
+
+[Heterogeneous loadings $\lambda_i$ let each bank react to the same aggregate shock with its own intensity — something two-way fixed effects cannot do.]{.comment}
+
+::: {.notes}
+This is the payoff of interactive fixed effects over plain time dummies. Time dummies would only work if a shock hit all 350 banks equally. The λ_i' f_t structure lets a big, systemically-exposed bank load heavily on the recession factor while a small local bank barely moves. The estimator chooses the number of factors automatically here.
+:::
+
+## With factors in, the spatial lag is real: a 0.39 contemporaneous spillover {background-color="#141413"}
+
+[0.394]{.bignum}
+
+[$\psi$, spatial autoregressive parameter (z = 4.65, p < 0.001) — neighbours' NPL up 1 pp raises this bank's NPL by 0.39 pp]{.bignum-label}
+
+::: {.notes}
+Financial contagion through interconnected lending: when one bank's borrowers default, it cascades to economically linked banks. ψ = 0.394 is strongly significant. Pair this with ρ = 0.290 (z = 5.33) — about 29% of last quarter's NPL persists to this quarter via workouts, foreclosures, write-offs.
+:::
+
+## LIQUIDITY dominates the covariates, and the J-test blesses the instruments
+
+| Term | Coef. | z | Sig.? |
+|---|---:|---:|:--:|
+| $\psi$ (W·NPL) | [0.394]{.key} | 4.65 | yes |
+| $\rho$ (L1.NPL) | 0.290 | 5.33 | yes |
+| LIQUIDITY | 2.452 | 9.09 | yes |
+| INEFF | 0.447 | 4.28 | yes |
+| BUFFER | −0.055 | −4.59 | yes |
+
+[Hansen J: $\chi^2(19) = 18.83$, $p = 0.468$ — fails to reject, so the instruments survive overidentification.]{.comment}
+
+::: {.notes}
+LIQUIDITY has the biggest effect: a 1-pp rise in the loan-to-deposit ratio adds 2.45 pp of NPL — banks that lend aggressively relative to deposits carry more risk. INEFF confirms the "bad management" hypothesis. BUFFER is protective: better-capitalized banks have lower credit risk. And the Hansen J passing (p = 0.468) tells us the IV strategy — INTEREST plus lagged exogenous regressors — is appropriate.
+:::
+
+## One-third of the residual variance is pure macro shock
+
+[33.5%]{.bignum}
+
+[$\rho_{factor} = \sigma_f^2 / (\sigma_f^2 + \sigma_e^2)$ with $\sigma_f = 0.642$, $\sigma_e = 0.904$ — the share a no-factor model would bake into biased coefficients]{.bignum-label}
+
+::: {.notes}
+This is the quantitative case for modelling factors explicitly. A full third of what's left after the regressors is common, serially correlated macro variation. Sweep it into the error and it contaminates everything that's correlated with it — which is the whole next act.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## Drop the factors and temporal persistence doubles while the J-test rejects
+
+| Term | With factors | Without factors |
+|---|:--:|:--:|
+| $\psi$ (spatial) | 0.394*** | 0.288*** |
+| $\rho$ (temporal) | 0.290*** | [0.594***]{.key} |
+| LIQUIDITY | 2.452*** | 0.843*** |
+| Factors $(r_x, r_u)$ | 2, 1 | 0, 0 |
+| J-test $p$ | 0.468 | [0.000]{.key} |
+
+[Excluded factors are serially correlated, so $\rho$ swells to absorb them — and the instruments are no longer valid.]{.comment}
+
+::: {.notes}
+The differences are striking and systematic. ρ doubles from 0.290 to 0.594 because the serially-correlated common factors, once excluded, get soaked up by the temporal lag — the model confuses macro persistence with bank-level risk persistence. LIQUIDITY collapses by two-thirds. And crucially the J-test now REJECTS (p < 0.001): without factors, the exclusion restriction breaks, so the model is misspecified. That's a formal statistical justification for keeping the factors.
+:::
+
+## The no-factor model also masks a real effect: SIZE goes insignificant
+
+:::: {.columns}
+::: {.column width="50%"}
+### With factors
+
+- SIZE = 0.223, **significant** (z = 2.36)
+- larger banks load more on macro shocks
+:::
+::: {.column width="50%"}
+### Without factors
+
+- SIZE = 0.089, **not significant**
+- exposure mistaken for noise
+:::
+::::
+
+[Omitting factors can hide a genuine relationship, not just inflate spurious ones.]{.comment}
+
+::: {.notes}
+This is the subtle direction of the bias. Big banks have larger factor loadings — they're more exposed to systematic macro shocks. Pull the factors out and that exposure is misattributed to noise, so SIZE drops to insignificance. Factor omission distorts coefficients in BOTH directions: inflating some (ρ), masking others (SIZE).
+:::
+
+## The spatial lag earns its place: dropping it inflates the covariates
+
+| Term | Full model | Without spatial lag |
+|---|:--:|:--:|
+| $\psi$ (W·NPL) | [0.394***]{.key} | — |
+| $\rho$ (L1.NPL) | 0.290*** | 0.323*** |
+| INEFF | 0.447*** | 0.638*** |
+| SIZE | 0.223** | 0.346*** |
+| J-test $p$ | 0.468 | 0.226 |
+
+[Both pass the J-test — the choice is economic, and theory says banks are interconnected.]{.comment}
+
+::: {.notes}
+Remove the spatial lag and the leftover covariates must explain the cross-sectional co-movement on their own: INEFF jumps 43%, SIZE 55%, and ρ ticks up to absorb the missing spatial dynamics. Both specs have valid instruments (p = 0.468 vs 0.226), so the J-test can't decide between them. We prefer the full model because financial theory predicts interdependence and ψ = 0.394 is highly significant.
+:::
+
+## A permanent liquidity shock costs three times what the coefficient shows {background-color="#141413"}
+
+[7.765]{.bignum}
+
+[Long-run total effect of LIQUIDITY vs a short-run coefficient of 2.452 — amplified over time and across the network]{.bignum-label}
+
+::: {.notes}
+The short-run coefficient is the first ripple; the long-run total is the whole wake. A permanent 1-pp rise in the loan-to-deposit ratio across all banks eventually lifts system-wide NPL by nearly 7.8 pp. The contemporaneous reading badly understates the true cost of excessive lending.
+:::
+
+## Long-run impact = short-run effect, amplified twice
+
+$$\text{Total LR effect} = \frac{\beta}{(1-\rho)(1-\psi)} = \frac{2.452}{(1-0.290)(1-0.394)} \approx 7.77$$
+
+[The temporal multiplier $1/(1-\rho) = 1.41$ compounds the shock over time; the spatial multiplier $1/(1-\psi) = 1.65$ spreads it across the network.]{.comment}
+
+::: {.notes}
+Two multipliers stack. The temporal multiplier 1/(1−ρ) = 1.41 captures the shock feeding back through lagged NPL. The spatial multiplier 1/(1−ψ) = 1.65 captures it spreading through the ~18-neighbour network. For nearly every covariate the long-run INDIRECT (spillover) effect is as large as or larger than the direct effect — for LIQUIDITY, 4.22 indirect vs 3.55 direct.
+:::
+
+## The strongest objection — and the answer
+
+[Objection.]{.objection} The mean-group estimator drives the spatial lag to insignificance ($\psi = 0.032$, $p = 0.54$). So maybe the spillovers were never real.
+
+. . .
+
+[Response.]{.rebuttal} Imposing homogeneous slopes on heterogeneous banks can manufacture spurious spatial dependence — but MG is only $\sqrt{N}$-consistent with just 35 periods, so a few outlier banks can swamp the average. Read it as a caution, not a refutation: $\rho$ stays stable at 0.301, and theory still predicts interconnection.
+
+::: {.notes}
+Steelman, don't strawman. The MG result is genuinely uncomfortable: free every bank's slopes and the average ψ collapses to 0.032. That can happen because pooled homogeneity creates spurious spatial dependence when slopes truly differ. But MG trades efficiency for flexibility — √N vs √NT consistency — and with T = 35 a handful of extreme bank-specific estimates can dominate. The temporal persistence ρ ≈ 0.30 is rock-stable across all four specifications, which argues the dynamics are real.
+:::
+
+## Four specifications, one verdict: factors stay, spatial lag stays
+
+| | Full | No factors | No spatial | MG |
+|---|:--:|:--:|:--:|:--:|
+| $\psi$ | [0.394***]{.key} | 0.288*** | — | 0.032 |
+| $\rho$ | 0.290*** | 0.594*** | 0.323*** | 0.301*** |
+| LIQUIDITY | 2.452*** | 0.843*** | 2.534*** | 6.330*** |
+| J-test $p$ | 0.468 | 0.000 | 0.226 | — |
+
+[The J-test decides factors; theory and significance decide the spatial lag; MG is a robustness check, read with care.]{.comment}
+
+::: {.notes}
+Decision rule from the post: run with and without factors first. The J-test rejects without (p < 0.001), so factors are mandatory. With factors, ψ is highly significant, so keep the spatial lag — that's the full model. MG is a final robustness probe that flags possible slope heterogeneity but shouldn't overturn the preferred specification given its small-T fragility.
+:::
+
+# Model the common factors, or the spatial story you tell will be the wrong one. {.divider background-color="#141413"}
+
+::: {.notes}
+The single takeaway. Unobserved macro shocks aren't a nuisance to sweep into the error — they're 33.5% of the residual variance, and ignoring them doubles ρ, halves LIQUIDITY, and invalidates the instruments. Defactor first, then let IV recover the genuine spatial (0.394) and temporal (0.290) dynamics — whose long-run amplification (7.765 for LIQUIDITY) is the real policy story.
+:::

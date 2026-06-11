@@ -1,0 +1,268 @@
+---
+title: "Identifying Latent Group Structures in Panel Data"
+subtitle: "Classifier-LASSO in Stata — when the pooled average is a lie"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "+2.151"
+    cap: "democracy effect, Group 1 (57 countries)"
+  - num: "−0.936"
+    cap: "democracy effect, Group 2 (41 countries)"
+  - num: "+1.055"
+    cap: "pooled estimate that fits neither group"
+format:
+  revealjs:
+    output-file: index.html
+    # NOTE: not embed-resources — RevealChalkboard (a core feature) is
+    # incompatible with self-contained output, so the deck ships
+    # index.html + slides_files/ (served fine by Hugo, like tutorial.html).
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs default) — renders $…$ / $$…$$ across the whole slide
+    # DOM (body, captions, headings, table cells). Loads from a CDN; reveal.js is local.
+    # Do NOT set `html-math-method: katex` — it is broken in revealjs (no auto-render call,
+    # so math shows as raw LaTeX). See references/render-and-fix.md.
+    link-external-icon: false
+---
+
+# The Tension {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## A pooled regression says "democracy raises growth by +1.055." That number describes no one.
+
+Acemoglu, Naidu, Restrepo & Robinson (2019) found democracy causes growth — one pooled coefficient for all 98 countries.
+
+. . .
+
+But a single slope forces Japan and Nigeria to react identically. *What if the average is hiding two opposite stories?*
+
+::: {.notes}
+This is the central tension. Pooled panel models impose one slope on everyone. When the truth is heterogeneous — and signs differ across countries — that average can be qualitatively wrong, not just imprecise. The whole talk earns the claim that +1.055 is a mirage.
+:::
+
+## Across 56 countries, savings trajectories diverge, cross, and cluster — they are not one process
+
+![Savings-to-GDP ratio across 56 countries (1995–2010); each line is one country, revealing wide dispersion in dynamics.](../stata_panel_lasso_cluster_fig1_savings_scatter.png)
+
+::: {.notes}
+The spoiler picture for Act I. Don't dissect every line — just plant that countries plainly do not move in lockstep. Some stay positive, others swing below zero. This is exactly the heterogeneity a single pooled slope erases.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- The problem: homogeneous slopes can disguise opposing responses
+- Classifier-LASSO — sort units into latent groups that *share* slopes
+- Two applications: savings (sign-flipping inflation) and democracy (sign-flipping growth)
+- The lesson: a principled middle ground between one slope and N slopes
+:::
+
+# The Investigation {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## Three ways to handle heterogeneity — and only one is principled
+
+:::: {.columns}
+::: {.column width="50%"}
+### One slope for all
+- Pooled / fixed effects
+- $\boldsymbol{\beta}_i = \boldsymbol{\beta}$ for every unit
+- Powerful, but a contaminated average if slopes truly differ
+:::
+::: {.column width="50%"}
+### A slope per unit
+- Mean-group estimator
+- $\boldsymbol{\beta}_i$ free for all $N$ units
+- Unbiased, but noisy with only $T \approx 15$
+:::
+::::
+
+[C-LASSO sits in the middle: $K$ latent groups, slopes shared *within* a group, free *across* groups.]{.comment}
+
+::: {.notes}
+Pooled OLS is the fully-homogeneous extreme; the mean-group estimator is the fully-heterogeneous extreme. C-LASSO is the parsimonious compromise — it discovers a small number of groups instead of imposing one slope or estimating N noisy ones.
+:::
+
+## C-LASSO penalizes each unit toward the *nearest* group center — a gravitational pull
+
+$$Q_{NT,\lambda}^{(K)} = \frac{1}{NT}\sum_{i=1}^{N}\sum_{t=1}^{T}\big(y_{it}-\boldsymbol{\beta}_i'\mathbf{x}_{it}\big)^2 + \frac{\lambda_{NT}}{N}\sum_{i=1}^{N}\prod_{k=1}^{K}\|\boldsymbol{\beta}_i-\boldsymbol{\alpha}_k\|$$
+
+[The product penalty $\prod_k\|\boldsymbol{\beta}_i-\boldsymbol{\alpha}_k\|$ vanishes when $\boldsymbol{\beta}_i$ is near *any* center $\boldsymbol{\alpha}_k$ — that's what sorts unit $i$ into a group.]{.comment}
+
+::: {.notes}
+First term: ordinary sum of squared residuals. Second term: a product over the K group centers. If a unit's coefficients sit near any one center, the product collapses toward zero and the penalty is cheap — the unit is pulled into that group. Far from all centers, the penalty stays large. λ controls how strong the pull is.
+:::
+
+## The recipe is three steps: sort, re-estimate unpenalized, then pick K by an information criterion
+
+::: {.incremental}
+- **Sort** — for each candidate $K$, iterate group centers and reassignments to convergence
+- **Postlasso** — discard the penalized fit; re-run plain OLS *within* each group for valid SEs
+- **Select $K$** — choose the $K$ minimizing an information criterion (fit vs. complexity referee)
+:::
+
+::: {.notes}
+The penalized stage chooses the partition; it does not give honest inference because the LASSO penalty biases coefficients. So we re-run unpenalized OLS within each estimated group — the postlasso step — and report those standard errors and p-values. The IC plays referee: more groups fit better but cost parameters.
+:::
+
+## With zero controls split out, the pooled CPI effect on savings is a flat, insignificant +0.030
+
+| Variable | Pooled / FE coef. | Significant? |
+|---|---:|:--:|
+| lagsavings | 0.605 | yes |
+| gdp | 0.188 | yes |
+| cpi | [+0.030]{.key} | no |
+| interest | +0.006 | no |
+
+[The textbook read: "inflation and interest rates don't affect savings." Hold that thought.]{.comment}
+
+::: {.notes}
+Pooled OLS and fixed effects are virtually identical here (R-squared 0.438). Lagged savings and GDP growth are strong and significant. CPI and the interest rate look like nothing. A meteorologist reporting "no temperature change" in a city where half the neighborhoods warmed and half cooled would be making exactly this mistake.
+:::
+
+## Six lines of Stata fit the whole C-LASSO workflow — estimate, select K, assign groups
+
+``` {.stata code-line-numbers="1|2|3|4-5"}
+classifylasso savings cpi interest gdp, grouplist(1/5) tolerance(1e-4)
+classoselect, postselection        // unpenalized re-fit for valid inference
+predict gid_static, gid            // assign each country to its group
+classocoef cpi                     // plot group-specific coefficients
+classogroup                        // plot the IC across candidate K
+```
+
+::: {.notes}
+One command sweeps K = 1..5 and reports the IC for each; classoselect runs the postlasso re-fit; predict ... gid writes the group label; classocoef and classogroup are the postestimation plots. The full do-file is in the post — these are the load-bearing lines.
+:::
+
+## The information criterion bottoms out cleanly at K = 2 — a clear U-shape
+
+![IC (left axis) and iterations to convergence (right axis) by number of groups, static savings model — minimized at K=2.](../stata_panel_lasso_cluster_fig2_group_selection_static.png)
+
+::: {.notes}
+The triangle marks the IC minimum at K = 2; the curve rises monotonically from K = 3. K = 2 converged in about 3 iterations, while K ≥ 3 hit the 20-iteration cap — a tell that the data can't support more groups. Two latent groups it is.
+:::
+
+## Inflation *erodes* savings for 34 countries but *boosts* it for 22 — the pooled zero was averaging both
+
+| Group | cpi | interest | gdp |
+|---|---:|---:|---:|
+| Group 1 (34 countries) | [−0.181]{.key} | −0.197 | +0.335 |
+| Group 2 (22 countries) | [+0.478]{.key} | +0.263 | +0.112 |
+
+[All four highlighted CPI/interest coefficients are significant at $p < 0.001$. The pooled +0.030 was $-0.181$ and $+0.478$ canceling.]{.comment}
+
+::: {.notes}
+Group 1: higher inflation erodes the real value of savings, so people save less. Group 2: higher inflation triggers precautionary saving — households save more amid uncertainty. Same shock, opposite behavior. The "insignificant" pooled CPI wasn't no effect; it was two opposing effects hidden inside the average.
+:::
+
+## The sign reversal is not a static artifact: it survives adding lagged savings — and confidence bands don't overlap
+
+![CPI coefficient and 95% bands by group, dynamic savings model: Group 1 negative, Group 2 positive, non-overlapping bands.](../stata_panel_lasso_cluster_fig3_coef_cpi.png)
+
+::: {.notes}
+This is the smoking-gun figure. The dynamic model (with lagged savings, half-panel jackknife for Nickell bias) again selects K = 2 and again splits CPI: −0.160 for 31 countries, +0.197 for 25 countries, both p < 0.001. The 95% bands do not overlap — a robust sign reversal, not a marginal wobble.
+:::
+
+## The interest-rate effect splits the same way — substitution wins in one group, income in the other
+
+![Interest-rate coefficient and 95% bands by group, dynamic savings model: the same negative-vs-positive split as CPI.](../stata_panel_lasso_cluster_fig4_coef_interest.png)
+
+::: {.notes}
+Group 1 saves less when rates rise (−0.149); Group 2 saves more (+0.123). One reading: in Group 1's deeper financial markets the substitution effect dominates (consume now); in Group 2's thinner markets the income effect dominates (saving is more rewarding). Adding the lag also lifted within R-squared from 0.20–0.24 to 0.44–0.50.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## Now democracy: the pooled two-way FE effect on log GDP is +1.055, clustered on 98 countries
+
+| Term | Coefficient | Clustered SE | p |
+|---|---:|---:|---:|
+| Democracy | [+1.055]{.key} | 0.370 | 0.005 |
+| lagged GDP | +0.970 | 0.006 | <0.001 |
+
+[Standard errors clustered on 98 countries. This replicates Acemoglu et al. (2019): on average, democracy promotes growth.]{.comment}
+
+::: {.notes}
+Two-way fixed effects (country and year), lagged GDP, standard errors clustered on the 98 countries. The pooled democracy coefficient is +1.055, significant at p = 0.005. The standard "democracy causes growth" story. But we have learned what "on average" can hide — so we run C-LASSO with the same clustering.
+:::
+
+## C-LASSO again picks K = 2 for democracy — though the IC race is close (range 3.267–3.280)
+
+![IC and iteration count, democracy model — minimized at K=2, but IC values span just 0.013 across all K.](../stata_panel_lasso_cluster_fig5_democracy_selection.png)
+
+::: {.notes}
+K = 2 is selected, consistent with both savings specifications. Honesty check: the IC values range only from 3.267 to 3.280 — a span of 0.013 — so the 2-group structure is optimal but not overwhelmingly dominant. This is exactly why you should test sensitivity to the ρ tuning parameter.
+:::
+
+## For 57 countries democracy helps; for 41 it hurts — a genuine sign reversal {background-color="#141413"}
+
+[+2.151]{.bignum}
+
+[Democracy effect on log GDP, Group 1 of 57 countries (p < 0.001); Group 2's 41 countries get −0.936 (p = 0.007)]{.bignum-label}
+
+::: {.notes}
+The tutorial's most striking result, with clustered SEs throughout. Group 1 (57 countries): +2.151, more than twice the pooled estimate. Group 2 (41 countries): −0.936, negative and significant. The coefficient literally changes sign. For 58% of countries democracy tracks GDP gains; for 42% it tracks declines.
+:::
+
+## The polarization is unmistakable — neither group's band crosses zero, and +1.055 describes neither
+
+![Democracy coefficient by country and group: Group 1 (57) clusters near +2.2, Group 2 (41) near −1.0; pooled +1.05 fits neither.](../stata_panel_lasso_cluster_fig6_democracy_coef.png)
+
+::: {.notes}
+The key figure. Each dot is a country's own coefficient; the horizontal lines are the group postlasso estimates with 95% bands. Group 1 strongly positive, Group 2 negative, neither band crossing zero. This is not "some benefit, some see nothing" — it is a true sign reversal in the conditional association.
+:::
+
+## Side by side: the pooled coefficient sits between two effects it never represents
+
+| | Pooled FE | Group 1 | Group 2 |
+|---|---:|---:|---:|
+| Democracy coef. | +1.055 | [+2.151]{.key} | [−0.936]{.key} |
+| Clustered SE | 0.370 | 0.546 | 0.348 |
+| p-value | 0.005 | <0.001 | 0.007 |
+| Countries | 98 | 57 | 41 |
+
+[This is Simpson's paradox in a panel: the aggregate trend reverses inside the subgroups.]{.comment}
+
+::: {.notes}
+The pooled +1.055 lands between +2.151 and −0.936 and describes neither group. A policymaker reading only the pooled result would conclude democracy universally promotes growth and miss that for 41 countries the relationship runs the other way. Across all three specifications the IC chose K = 2 — the latent structure is robust, not a one-off.
+:::
+
+## Does C-LASSO make this causal? No — it disciplines selection, not identification
+
+[Objection.]{.objection} You sorted countries by their coefficients, so of course the groups have different coefficients — and a sign flip sounds like overfitting.
+
+. . .
+
+[Response.]{.rebuttal} The sorting is penalized and validated by an out-of-sample-style IC that *consistently* picks K = 2 across three specifications; the postlasso re-fit gives honest, country-clustered SEs with non-overlapping bands. C-LASSO chooses *controls/groups* flexibly — it does not relax the identifying assumptions of Acemoglu et al. (2019). These remain conditional associations.
+
+::: {.notes}
+Steelman, don't strawman. The worry about mechanical grouping is real, which is why the IC and the postlasso inference matter — the partition is selected, not hand-drawn, and the inference is unpenalized with clustered SEs. But the method evaluates structure, not causation; the post explicitly keeps the causal claim conditional on the original identifying assumptions.
+:::
+
+# When slopes might differ, let the data sort the groups — before you trust the average. {.divider background-color="#141413"}
+
+::: {.notes}
+The single takeaway. A pooled slope is a bet that everyone responds alike. C-LASSO tests that bet cheaply — and here it found the average concealing a sign reversal in both savings and democracy. The difference between "+1.055, democracy helps" and "+2.151 for some, −0.936 for others."
+:::

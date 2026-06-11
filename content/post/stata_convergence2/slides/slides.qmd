@@ -1,0 +1,251 @@
+---
+title: "Converging to Convergence"
+subtitle: "Why unconditional convergence emerged — and what it tells us about growth regressions"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "−0.025/yr"
+    cap: "convergence trend, 1960–2007"
+  - num: "0.19"
+    cap: "short-run λ persistence (slope)"
+  - num: "91%"
+    cap: "Polity-2 OVB gap closed"
+format:
+  revealjs:
+    output-file: index.html
+    # NOT embed-resources: RevealChalkboard (a core feature) is incompatible with
+    # self-contained output, so the deck ships index.html + slides_files/ (Hugo serves
+    # this fine — see the tutorial.html precedent). Figures are referenced ../<slug>_*.png.
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs default) — renders $…$ / $$…$$ across the whole slide
+    # DOM. Loads from a CDN; reveal.js is local. Do NOT set html-math-method: katex.
+    link-external-icon: false
+---
+
+# The Tension {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## For 30 years the data said poor countries were *not* catching up
+
+In the 1960s, richer countries grew **faster** than poorer ones — a world of divergence. Through the 1970s–1990s, the convergence slope sat indistinguishable from zero.
+
+. . .
+
+Then, around 2000, it reversed: poor countries began growing faster — *unconditional convergence*. **What changed?**
+
+::: {.notes}
+This is the central puzzle. For decades the cross-country growth literature found no unconditional (absolute) convergence — at best convergence *conditional* on institutions. Kremer, Willis & You (2021) document the reversal and, more importantly, explain it. The whole talk earns that explanation.
+:::
+
+## One slope, flipping sign across six decades, is the fact to explain
+
+![10-year growth vs. log GDP per capita, by decade. The fitted slope swings from positive (divergence) to steeply negative (convergence).](../stata_convergence2_scatter_by_decade.png)
+
+::: {.notes}
+Spoiler figure. Don't read every panel yet — just plant that the slope flips sign. In numbers: β = +0.53 in the 1960s (p = 0.006) to −0.76 by 2007 (p < 0.001). We come back to this picture as the thing the OVB framework has to account for.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- The facts: a 58-year, ~160-country panel where convergence emerged around 2000
+- The OVB identity: $\beta - \beta^{\ast} = \delta \times \lambda$ in one line
+- Growth correlates themselves converged — but that is *not* the driver
+- The real story: short-run growth regressions stopped predicting growth
+:::
+
+::: {.notes}
+Teaching deck roadmap, built from the post's learning objectives. We establish facts (Act I), build the decomposition machinery (Act II), then resolve which component moved (Act III).
+:::
+
+# The Investigation {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## The lab: 160 countries, 58 years, 8,328 observations, 50+ correlates
+
+::: {.incremental}
+- **Outcome** — 10-year forward-looking GDP-per-capita growth (mean $1.96\%$/yr)
+- **Income** — log GDP per capita (mean $8.71$, SD $1.19$ log points)
+- **Correlates** — 50+ policy, institutional, and cultural variables, grouped into Solow fundamentals vs. short-run vs. long-run vs. culture
+:::
+
+[Unbalanced panel — 109 countries in 1960, 160 by 1990. Penn World Table 10.0 plus the Kremer et al. replication covariates. The analysis is **descriptive**: cross-country association, not a causal ATE.]{.comment}
+
+::: {.notes}
+Emphasize the descriptive framing up front — everything here is a conditional association, never a treatment effect. The Solow-vs-short-run split is load-bearing: the punchline is that these two groups behave completely differently in growth regressions.
+:::
+
+## Convergence is a trend, not a snapshot: −0.025 per year
+
+![Rolling year-by-year $\beta$ with 95% CI. It drifts from about $+0.5$ in the 1960s to about $-0.8$ by 2008, crossing zero in the late 1990s.](../stata_convergence2_beta_trend.png)
+
+::: {.notes}
+The paper's methodological innovation: study the *trend* in convergence, not whether it exists at one date. A year-interacted regression gives a separate βₜ each year. The fitted linear trend is −0.025/yr (p < 0.01) — about 1.2 points of growth per half-century. βₜ fluctuated near zero through the 1970s–80s, then dropped sharply and became consistently negative after 1999.
+:::
+
+## Beta convergence leads sigma convergence by about a decade
+
+![SD of log GDP per capita across countries. Sigma rises from $0.95$ (1960) to a peak of $1.22$ (2000), then eases to $1.17$.](../stata_convergence2_sigma.png)
+
+::: {.notes}
+Beta (poor growing faster) is necessary but not sufficient for sigma (the distribution narrowing). Sigma rose for four decades of widening inequality, peaked at 1.22 in 2000, then began to ease — roughly a decade after beta turned negative around 1999. Catch-up must beat the random shocks that push countries apart, so sigma lags.
+:::
+
+## Convergence compresses the pack from both ends
+
+![Mean 10-year growth by income quartile. The richest quartile falls from fastest (1960) to slowest (2007); the poorest accelerates.](../stata_convergence2_growth_by_quartile.png)
+
+::: {.notes}
+Q4 (richest) grew fastest in the 1960s at 3.49%/yr; Q1 (poorest) at 2.46%. By 2007 the order fully reversed — Q1 at 3.02%, Q4 at just 0.31%. Catch-up at the bottom AND a slowdown at the top. Like a marathon where the leaders slow and the back-runners speed up.
+:::
+
+## The catch-up is global — it survives dropping any single region
+
+![Rolling $\beta$ trend with each major region excluded one at a time. The negative trend holds in every case.](../stata_convergence2_beta_excluding_regions.png)
+
+::: {.notes}
+The obvious worry: is this just China / East Asia? No. Excluding Sub-Saharan Africa makes convergence *stronger* (β reaches −1.25 by 2000), because Africa's troubles dragged the global slope toward zero. Excluding Europe/North America weakens it but it stays clearly negative. Genuinely global.
+:::
+
+## Growth correlates have themselves been converging since 1985
+
+![Convergence in six representative correlates: population growth, investment, education, democracy, government spending, credit. All slopes negative.](../stata_convergence2_correlate_convergence.png)
+
+::: {.notes}
+Regress each correlate's 1985→2015 change on its 1985 level; a negative slope means countries that started worse improved most. Strongest: inflation (β = −3.07), investment (β = −2.98), democracy/Polity-2 (β = −2.03), all significant at 0.1%. The notable exception is Barro-Lee schooling (β = −0.16, n.s.). Policies and institutions are compressing across countries — but does that *cause* income convergence?
+:::
+
+## The omitted-variable-bias identity links the two literatures in one line
+
+$$\beta - \beta^{\ast} = \delta \times \lambda$$
+
+The gap between **unconditional** ($\beta$) and **conditional** ($\beta^{\ast}$) convergence equals the product of $\delta$ (how much richer countries have *more* of a correlate) and $\lambda$ (how much that correlate predicts growth).
+
+[This is an exact algebraic identity, not an approximation — when the gap closes, at least one of $\delta$ or $\lambda$ must have shrunk.]{.comment}
+
+::: {.notes}
+This is the analytical heart of the talk. Three regressions: (1) growth on income → β; (2) growth on income + correlate → β* and λ; (3) correlate on income → δ. OVB algebra forces β − β* = δ × λ exactly. So there are exactly three ways unconditional convergence can emerge: β* shifts, δ shifts, or λ shifts. The empirical work is just deciding which.
+:::
+
+## For democracy, the gap closed because λ collapsed — not δ
+
+| Polity 2 | $\delta$ | $\lambda$ | gap $=\delta\lambda$ |
+|---|---:|---:|---:|
+| 1985 | 0.494 | 0.891 | [0.440]{.key} |
+| 2005 | 0.216 | 0.183 | [0.040]{.key} |
+
+[$\delta$ roughly halved, but $\lambda$ fell $\sim5\times$ — democracy went from a strong growth predictor to nearly none. The gap closed 91%.]{.comment}
+
+::: {.notes}
+Worked example that encapsulates the whole argument. In 1985 unconditional β = +0.33 (divergence), but conditional β* = −0.11 — controlling for democracy revealed catch-up. The 0.44 gap is exactly 0.494 × 0.891. By 2005, λ collapsed from 0.89 to 0.18; the gap shrank to 0.04 — a 91% reduction. Both ingredients were present in 1985; by 2005 the λ ingredient had nearly vanished.
+:::
+
+## Three normalized regressions reproduce the OVB worked example
+
+``` {.stata code-line-numbers="1|2-4|6-7"}
+gen polity2_norm = polity2 / `sd_polity2'        // comparable units
+reg loggdp_growth_10 loggdp if year==1985, robust                  // beta
+reg loggdp_growth_10 loggdp polity2_norm if year==1985, robust     // beta*, lambda
+reg polity2_norm loggdp if year==1985, robust                      // delta
+* check: (beta - beta*)  ==  delta * lambda      // OVB identity
+* repeat the block for year==2005
+```
+
+::: {.notes}
+Illustrative, not executed. The point: every piece of the OVB decomposition is just three ordinary OLS regressions per period. Normalizing by the 1985 SD puts every correlate in comparable units so λ's across variables can be compared on one scale.
+:::
+
+## δ is the half that did *not* move: slopes cluster on the 45° line
+
+![Correlate-income slope $\delta$ in 2015 vs. 1985, by variable group. Points hug the 45° line.](../stata_convergence2_delta_stability.png)
+
+::: {.notes}
+Fitted slopes: Solow 0.88, short-run 0.89, long-run 1.02, culture 0.88 — all near 1. The income-institution relationship barely changed in 30 years: richer countries still have more democracy, investment, and credit in essentially the same proportions. The "modernization hypothesis" passes its out-of-sample test. So δ is NOT the driver — the answer has to be λ.
+:::
+
+## λ is the half that broke: short-run correlates lose all persistence
+
+![Growth-regression slope $\lambda$ in 2005 vs. 1985. Solow fundamentals hug the 45° line; short-run correlates scatter near zero.](../stata_convergence2_lambda_flattening.png)
+
+::: {.notes}
+The most striking result. Solow fundamentals: slope 0.86, R² = 0.95 — they predict growth almost as well in 2005 as 1985. Short-run policy/institution correlates: slope 0.19, R² = 0.06 — essentially NO relationship between what predicted growth in 1985 and what predicts it in 2005. Polity-2 λ fell 0.89→0.34, FH political rights 1.11→0.19. The 1990s growth regressions failed their out-of-sample test.
+:::
+
+## Solow keeps its punch; policy variables flatten {background-color="#141413"}
+
+[0.19]{.bignum}
+
+[short-run $\lambda$ persistence (slope, $R^2 = 0.06$) vs. $0.86$ for Solow fundamentals]{.bignum-label}
+
+::: {.notes}
+The single number that carries the talk. Investment, population growth, and education still predict growth (λ slope 0.86). Democracy, governance, fiscal and financial indicators — the Washington Consensus variables — do not (0.19). With δ stable and λ collapsed, their product δλ must shrink toward zero.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## Stable δ × collapsed λ ⇒ the OVB gap vanishes for policy variables
+
+![$\delta\times\lambda$ in 2005 vs. 1985. Short-run correlate products collapse to near zero (slope 0.09); Solow retains more (slope 0.74).](../stata_convergence2_ovb_gap.png)
+
+::: {.notes}
+The mechanism, confirmed. Because δ held and λ flattened, the OVB product δλ for short-run correlates fell to almost nothing (fitted slope 0.09). In 1985 omitting these variables made unconditional convergence look much worse than conditional; by 2005 the two are nearly identical. Solow fundamentals kept more of their bias (slope 0.74) precisely because both their components held.
+:::
+
+## Absolute convergence "converged to" conditional convergence
+
+![Unconditional $\beta$ (ink) and conditional $\beta^{\ast}$ (steel) on a fixed 73-country sample. The gap collapses from $1.49$ (1985) to $0.15$ (2000).](../stata_convergence2_absolute_vs_conditional.png)
+
+::: {.notes}
+The title finding in one chart. On a fixed sample of 73 countries with all 10 correlates: in 1985 unconditional β = +0.42 (divergence) but conditional β* = −1.07 — gap 1.49. By 2000 unconditional had fallen to −0.39, conditional −0.54 — gap just 0.15. The Solow prediction of conditional convergence held all along; the real world caught up to it.
+:::
+
+## The Polity-2 OVB gap closed 91% in twenty years {background-color="#141413"}
+
+[91%]{.bignum}
+
+[Polity-2 $\beta-\beta^{\ast}$ gap fell from $0.440$ (1985) to $0.040$ (2005)]{.bignum-label}
+
+::: {.notes}
+The Act-III payoff number, matching the worked example. Driven almost entirely by λ collapsing from 0.89 to 0.18 while δ stayed comparatively stable. This is the post's headline reduction — and it generalizes across the short-run correlate set.
+:::
+
+## Does this make convergence *causal*? No — it is still a description
+
+[Objection.]{.objection} If we know exactly why unconditional convergence emerged, surely we can advise poor countries on what to do.
+
+. . .
+
+[Response.]{.rebuttal} The OVB identity decomposes **correlations**, not causal effects. A flattening $\lambda$ could mean genuine causal change, convergence in unobserved variables, or merely reduced cross-country variation making coefficients noisier. The panel is unbalanced and ends pre-2008. This is a conditional association, not an ATE — and emphatically not policy advice.
+
+::: {.notes}
+Steelman, don't strawman. The descriptive caveat is the honest core of the talk. Cross-country growth regressions do not identify causal effects; the OVB framework just decomposes the observed gap. The Washington-Consensus reading is exactly the over-claim the out-of-sample test cautions against.
+:::
+
+# Let the data, not the 1990s regressions, tell you what predicts growth. {.divider background-color="#141413"}
+
+::: {.notes}
+The single takeaway and the resolution of the Act-I hook. Unconditional convergence emerged not because institutions stopped tracking income (δ stable), but because short-run policy variables stopped predicting growth (λ collapsed). The durability of Washington-Consensus growth regressions is in doubt — Solow fundamentals endure; policy correlates did not survive 25 years of new data.
+:::

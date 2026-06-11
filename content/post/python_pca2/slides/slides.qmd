@@ -1,0 +1,269 @@
+---
+title: "Pooled PCA for Development Indicators Across Time"
+subtitle: "When you track development over time, the ruler must stay fixed"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "72.4%"
+    cap: "variance captured by pooled PC1"
+  - num: "+0.144"
+    cap: "net development shift, hidden by per-period PCA"
+  - num: "16 / 153"
+    cap: "regions where the two methods disagree"
+format:
+  revealjs:
+    output-file: index.html
+    # NOTE: not embed-resources — RevealChalkboard (a core feature) is
+    # incompatible with self-contained output, so the deck ships
+    # index.html + slides_files/ (served fine by Hugo, like tutorial.html).
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs default) — renders $…$ / $$…$$ across the whole slide
+    # DOM (body, captions, headings, table cells). Loads from a CDN; reveal.js is local.
+    # Do NOT set `html-math-method: katex` — it is broken in revealjs (no auto-render call,
+    # so math shows as raw LaTeX). See references/render-and-fix.md.
+    link-external-icon: false
+---
+
+# The Tension {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## If the ruler changes between measurements, you cannot tell whether the object grew or the ruler shrank
+
+We want one composite Human Development Index for **153 South American regions**, comparable across **2013 and 2019**.
+
+. . .
+
+But running PCA *separately* each period lets the weights **and** the standardization drift. *Did development change, or did the yardstick?*
+
+::: {.notes}
+This is the central problem of building composite indicators over time. The measuring instrument itself must stay fixed. If you re-fit PCA each period, both the eigenvector weights and the z-score parameters (means, SDs) move — a region's index can rise simply because the sample's average fell.
+:::
+
+## Education and health rose, but income *fell* — a mixed signal a naive method erases
+
+![2013 (steel) vs 2019 (orange). The teal arrow connects the period centroids: the cloud shifts right (education up) but down (income down).](../pca2_period_shift_scatter.png)
+
+::: {.notes}
+Spoiler figure. Across South America, education rose +0.0225 and health +0.0134, but income declined −0.0202 — driven by collapses such as Venezuela's income falling from 0.782 to 0.630. This mixed signal is exactly what makes the pooled-vs-per-period choice consequential. We earn the rest in Act II.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- The data: a 153-region × 2-period panel of three HDI sub-indices
+- The problem: per-period PCA produces non-comparable scores
+- The fix: pooled standardization, weights, and bounds from stacked data
+- The payoff: a fixed yardstick that validates against the official SHDI
+:::
+
+# The Investigation {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## The lab: 153 regions × 2 periods = a 306-row panel of three sub-indices
+
+::: {.incremental}
+- **Indicators** — Education, Health, Income sub-indices (Global Data Lab SHDI)
+- **Coverage** — 153 sub-national regions, 12 South American countries, 2013 & 2019
+- **Shape** — reshaped wide → long into **306 rows** (153 regions × 2 periods)
+:::
+
+[All three indicators are positive-direction (higher = better), so no polarity flip is needed. The `period` column is metadata — it never enters the PCA.]{.comment}
+
+## Real development data is messier than simulation: PC1 will capture less
+
+| Pair | Correlation |
+|---|---:|
+| Education – Income | [0.68]{.key} |
+| Health – Income | 0.63 |
+| Education – Health | 0.44 |
+
+[Far below the $r > 0.93$ of simulated data — the three indicators carry more independent information.]{.comment}
+
+::: {.notes}
+The weak Education–Health link (0.44) means a region can have high literacy but mediocre life expectancy, or vice versa — they are partly independent dimensions. Lower correlations mean PC1 absorbs less of the total variance: real human development is genuinely multi-dimensional.
+:::
+
+## Per-period PCA re-fits the weights every period — the index formula itself drifts
+
+![PC1 eigenvector weights shift between 2013 and 2019: education's weight drops, health's jumps.](../pca2_perperiod_weights.png)
+
+::: {.notes}
+The 2013 weights are [0.583, 0.510, 0.632]; the 2019 weights are [0.541, 0.566, 0.623]. Education's weight drops −0.043 while health's jumps +0.056. So a region's 2013 HDI and 2019 HDI are computed with different recipes — temporal comparison is unreliable before we even reach the data.
+:::
+
+## Re-centring each period to zero erases the net signal — 43 regions appear to decline
+
+![Per-period PCA: the 10 largest rank shifts. Teal = improved, orange = declined.](../pca2_perperiod_rank_shift.png)
+
+::: {.notes}
+Per-period standardization forces each period's mean to zero, so the net positive shift in education and health is invisible by construction. 43 of 153 regions appear to decline despite the overall improvement. Running example: City of Buenos Aires shows a per-period HDI fall of −0.04 (ranked #1 in 2013) — yet its education and health both rose. Is it really declining, or is the shifting ruler hiding the story?
+:::
+
+## Pooled standardization measures every region against one fixed ruler
+
+$$Z_{ij,t}^{\text{pool}}=\frac{X_{ij,t}-\bar{X}_j^{\text{pool}}}{\sigma_j^{\text{pool}}}$$
+
+The pooled mean $\bar{X}_j^{\text{pool}}$ and SD $\sigma_j^{\text{pool}}$ are computed from **all 306 rows at once**, then applied to every observation in every period.
+
+[Per-period uses a different baseline each year; pooled uses one. The increase from 0.926 to 0.946 maps to a *genuine* z-score increase.]{.comment}
+
+::: {.notes}
+Analogy: measuring children at age 5 and age 10. Per-period compares each child only to same-age peers — you can't see growth because the reference group changes. Pooled measures everyone against the combined distribution, so the z-score increase reflects actual growth. Without it, the income decline (0.736 → 0.715) would be re-centred away.
+:::
+
+## One eigen-decomposition on the stacked data yields a single, fixed set of weights
+
+$$\Sigma^{\text{pool}}\,\mathbf{v}_k=\lambda_k\,\mathbf{v}_k,\qquad PC1_{i,t}=\sum_{j} w_j\,Z_{ij,t}^{\text{pool}}$$
+
+Pooled eigenvalues $[2.173,\,0.563,\,0.264]$; PC1 weights $[0.564,\,0.545,\,0.620]$ — **the same recipe for 2013 and 2019**.
+
+[Because the weights come from the pooled data, the index formula no longer drifts between periods.]{.comment}
+
+::: {.notes}
+Income carries the heaviest weight (0.620), then education (0.564), then health (0.545). With three variables, PCA *discovers* data-driven weights — unlike the two-variable case where equal weights were a mathematical certainty. Crucially, these weights are fixed across time.
+:::
+
+## scikit-learn confirms it: `fit_transform` on stacked data *is* pooled PCA
+
+``` {.python code-line-numbers="2|3-4|5-6"}
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+scaler = StandardScaler()              # POOLED: fit on ALL 306 rows
+Z = scaler.fit_transform(df[cols])
+pca = PCA(n_components=1)              # one set of weights for both periods
+df["pc1"] = pca.fit_transform(Z)[:, 0]
+```
+
+::: {.notes}
+No special panel-data library is needed — pooling is simply fitting the scaler and PCA on the stacked frame. The sklearn weights [0.5642, 0.5448, 0.6204] and variance ratio 0.7242 match the from-scratch NumPy implementation to 2e-15. Validation against the manual code is the reproducibility check.
+:::
+
+## PC1 captures 72.4% of variance — strong, but real data is not one-dimensional
+
+![Variance explained: PC1 72.4%, PC2 18.8%, PC3 8.8%.](../pca2_pooled_variance_explained.png)
+
+::: {.notes}
+72.4% is a strong majority but well below the 96% in the simulated tutorial. PC2 (18.8%) and PC3 (8.8%) are not negligible — some development dimensions (e.g. high-education / low-income profiles) are not captured by a single index. We focus on PC1 as the composite HDI, but PC2 may carry policy-relevant structure.
+:::
+
+## The fixed yardstick reveals a net development shift of +0.144 that per-period PCA zeroes out {background-color="#141413"}
+
+[+0.144]{.bignum}
+
+[pooled PC1 mean: $-0.072$ in 2013 $\to$ $+0.072$ in 2019 · net progress, invisible under per-period PCA]{.bignum-label}
+
+::: {.notes}
+The 2013 mean PC1 is −0.072 (below the grand mean) and 2019 is +0.072 (above). The +0.144 shift is pooled PCA's measure of net regional progress — modest, reflecting education/health gains partly offset by income decline. Under per-period PCA this shift is exactly zero by construction: the net progress would simply not exist.
+:::
+
+## With a fixed scale, the 2019 HDI bars consistently extend past 2013
+
+![Pooled HDI, top and bottom 15 regions. Orange (2019) vs steel (2013); the dashed line splits the groups.](../pca2_pooled_hdi_bars.png)
+
+::: {.notes}
+Chilean regions and Buenos Aires top the 2019 ranking; remote regions of Guyana, Bolivia and Suriname anchor the bottom. Buenos Aires has pooled HDI 0.946 (2013) → 0.965 (2019), a +0.019 improvement — where per-period PCA had shown a −0.040 decline. Pooled correctly shows it improved modestly while being overtaken by faster-improving Chilean regions.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## The two methods disagree on the *direction* of change for 16 of 153 regions
+
+![Pooled vs per-period HDI change. The dashed 45° line is perfect agreement; most points sit below it.](../pca2_pooled_vs_perperiod_change.png)
+
+::: {.notes}
+The cloud sits systematically below the line: per-period PCA understates improvement (or overstates decline) because it erases the net positive shift in education and health. In all 16 disagreement cases, per-period shows a decline while pooled shows an improvement — a policymaker reading per-period PCA could wrongly conclude these regions are "falling behind."
+:::
+
+## High rank agreement, but consequential re-orderings: Spearman ρ = 0.982
+
+![Improvement-rank comparison. Crossing lines mark where the two methods re-order who improved most.](../pca2_rank_comparison_bump.png)
+
+::: {.notes}
+Spearman ρ = 0.9818 on improvement rankings — the methods largely agree on who improved most. But the crossing lines show specific re-orderings: regions whose gains were partly masked by the shifting per-period baseline get ranked lower under per-period PCA. High aggregate agreement does not rule out consequential individual differences.
+:::
+
+## Validated against the official SHDI, pooled PCA wins on both levels and dynamics
+
+| Comparison | Pooled $R^2$ | Per-period $R^2$ |
+|---|---:|---:|
+| Levels (vs SHDI) | [0.9823]{.key} | 0.9750 |
+| Changes (vs SHDI) | [0.9964]{.key} | 0.9913 |
+
+[The official SHDI uses a fixed geometric-mean formula across years — so it tracks the fixed-yardstick pooled index more tightly.]{.comment}
+
+::: {.notes}
+Pooled PCA correlates r = 0.991 with the official SHDI (R² = 0.9823) vs 0.9750 for per-period. For changes over time the gap holds: 0.9964 vs 0.9913. Both differences are small but consistent and in the same direction — when the goal is temporal comparability, fitting on stacked data is the right choice.
+:::
+
+## Pooled PCA reproduces the official benchmark across periods with almost no scatter
+
+![Validation against the official SHDI: pooled (left) clusters both periods tightly on the fit line; per-period (right) scatters wider.](../pca2_validation_vs_shdi.png)
+
+::: {.notes}
+Left panel: pooled PCA points from both periods intermix seamlessly along the fit line — exactly what a temporally comparable index should do. Right panel: per-period PCA scatters wider, reflecting the distortion from re-centring each period to its own baseline.
+:::
+
+## Tracking dynamics is the real test — pooled change fits the SHDI change almost exactly
+
+![SHDI change validation: pooled (left, R² = 0.996) falls almost on the line; per-period (right, R² = 0.991) disperses more.](../pca2_validation_changes.png)
+
+::: {.notes}
+The change validation is more compelling than the level validation. Both methods track SHDI dynamics well (r > 0.99), but pooled is the tighter fit (0.9964 vs 0.9913). Since the whole promise of pooled PCA is capturing dynamics, this is the test that matters most.
+:::
+
+## A fixed classification makes the map honest: 40 regions climbed, 25 fell
+
+![Pooled-PCA HDI choropleths, 2013 vs 2019, with Fisher-Jenks breaks fixed from 2013. Any colour change is a real threshold crossing.](../pca2_choropleth_hdi.png)
+
+::: {.notes}
+Holding the 2013 Fisher-Jenks breaks constant in the 2019 map is essential — a region changes colour only if it genuinely crossed a development threshold. 40 regions moved up a class, 88 stayed, 25 declined. Upward mobility concentrates in the Andes (Peru, Bolivia, Colombia); the declines are predominantly Venezuelan states — a cartographic echo of the economic crisis.
+:::
+
+## Education converged, but income and health diverged — overall inequality rose
+
+![Gini index by indicator, 2013 vs 2019. Education's Gini falls; health and income rise.](../pca2_gini_dynamics.png)
+
+::: {.notes}
+Education is the only dimension that converged (Gini 0.0655 → 0.0639). Health (+0.0023) and income (+0.0036) diverged; the composite HDI Gini rose 0.1712 → 0.1795. So development progress is not uniform across dimensions — South America narrowed educational gaps while income setbacks (especially Venezuela) widened. A composite index captures these cross-cutting dynamics in one number.
+:::
+
+## Does PCA make the index "true"? No — it makes it *comparable*
+
+[Objection.]{.objection} PC1 discards 28% of the variance and the weights are sample-specific — adding or removing regions changes every score.
+
+. . .
+
+[Response.]{.rebuttal} Correct, and worth stating plainly. Pooled PCA does not claim a true index — it guarantees a **fixed yardstick** across time. PC2 (19%) may hold real structure; the index is relative to this sample. What pooling buys is comparability, validated at $R^2 = 0.98$ against the official SHDI.
+
+::: {.notes}
+Steelman, don't strawman. PC1 captures 72% of variance, so 28% is lost in compression. The pooled approach also assumes a stable correlation structure between 2013 and 2019 — a strong assumption over a volatile 6-year window. The contribution is methodological comparability, not a claim that PCA weights are the "right" weights.
+:::
+
+# Fit the standardization and the weights on the stacked data, and the yardstick stops moving. {.divider background-color="#141413"}
+
+::: {.notes}
+The single takeaway. Whenever a composite indicator must be compared across time, pool: one standardization, one set of weights, one normalization — computed once from all periods together. That is the difference between seeing +0.144 of real progress and zeroing it out by construction.
+:::

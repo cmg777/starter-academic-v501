@@ -1,0 +1,326 @@
+---
+title: "Exploratory Spatial Data Analysis"
+subtitle: "Spatial clusters and dynamics of human development in South America"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "0.57 → 0.63"
+    cap: "global Moran's I rose"
+  - num: "30 / 37"
+    cap: "HH / LL clusters · 2019"
+  - num: "999"
+    cap: "permutations · p = 0.001"
+format:
+  revealjs:
+    output-file: index.html
+    # NOT embed-resources: RevealChalkboard (a core feature) is incompatible with
+    # self-contained output, so the deck ships index.html + slides_files/ (Hugo serves
+    # this fine — see the tutorial.html precedent). Figures are referenced ../esda2_*.png.
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs default) — renders $…$ / $$…$$ across the whole slide
+    # DOM (body, captions, headings, table cells). Loads from a CDN; reveal.js is local.
+    # Do NOT set `html-math-method: katex` — it is broken in revealjs (no auto-render call,
+    # so math shows as raw LaTeX). See references/render-and-fix.md.
+    link-external-icon: false
+---
+
+# The Tension {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## Prosperous and lagging regions cluster on the map — but is the pattern real?
+
+Map human development across South America and a pattern jumps out: rich regions sit next to rich, poor next to poor.
+
+. . .
+
+But the eye is easily fooled. *Is this clustering statistically significant, or could it arise by chance?* And how does it move over time?
+
+::: {.notes}
+This is the central question of exploratory spatial data analysis. Standard EDA treats observations as independent — but regions are not. A choropleth can suggest clustering; only a formal test can confirm it. We will build that test from the ground up, then watch the clusters move between 2013 and 2019.
+:::
+
+## One dataset, two snapshots: 153 regions, 12 countries, six years apart
+
+![Subnational HDI in 2013 vs 2019, Fisher–Jenks classes held constant. The Southern Cone (red) and the Amazon–Guyana band (blue) read as spatial blocks, not scatter.](../esda2_choropleth_hdi.png)
+
+::: {.notes}
+The spoiler map. Don't dwell on every region yet — just plant that high and low values appear to occupy contiguous territory. 43 regions moved up a class, 86 stayed, 24 fell. That block structure is exactly what Moran's I will quantify in Act II.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- The lab: a 153-region, two-period panel of subnational HDI
+- Spatial weights — defining who is a "neighbour"
+- Global Moran's I — one number for the whole map, tested by permutation
+- LISA — *where* the clusters actually are
+- Space–time dynamics — how the clusters moved, 2013 to 2019
+:::
+
+# The Investigation {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## The lab: subnational HDI for 153 regions across 12 countries, 2013 and 2019
+
+::: {.incremental}
+- **Outcome** — the Subnational Human Development Index (SHDI), plus its Health, Education, Income components
+- **Geography** — polygon geometries for 153 sub-national regions, 12 South American countries
+- **Two snapshots** — 2013 and 2019, the same data as the Pooled-PCA tutorial
+:::
+
+[Source: Global Data Lab (Smits & Permanyer, 2019). Mean SHDI rose only $+0.0053$ overall — yet income *fell* in 71 of 153 regions (46.4%). The aggregate calm hides spatial turbulence.]{.comment}
+
+## Spatial autocorrelation has no meaning until you define "neighbour"
+
+A **spatial weights matrix** $W$ is an $n \times n$ array whose entry $w_{ij}$ encodes the link between regions $i$ and $j$ — $w_{ij}>0$ if they are neighbours, $0$ if not.
+
+:::: {.columns}
+::: {.column width="50%"}
+### Queen contiguity
+
+- neighbours if they share *any* boundary point — even a corner
+- the broadest, most forgiving rule
+:::
+::: {.column width="50%"}
+### Rook contiguity
+
+- neighbours only if they share an *edge*
+- stricter; drops corner-only touches
+:::
+::::
+
+[We use Queen — appropriate for irregular administrative borders. Then row-standardize ($w_{ij}\to w_{ij}/\sum_j w_{ij}$) so each row sums to 1.]{.comment}
+
+::: {.notes}
+Row-standardization is what makes the spatial lag interpretable: after it, the lag is the simple average of a region's neighbours' values, regardless of how many neighbours it has. This is the building block of every statistic that follows.
+:::
+
+## Queen contiguity links 153 regions with 4.93 neighbours on average — two islands left isolated
+
+![Queen-contiguity network over South America: a line joins each region's centroid to every neighbour's. Dense in southern Brazil and northern Argentina; sparse in the Amazon.](../esda2_spatial_weights.png)
+
+::: {.notes}
+153 regions, mean 4.93 neighbours, min 0, max 11. Two island territories — San Andrés (COL) and Nueva Esparta (VEN) — have zero neighbours and are excluded from the spatial statistics by PySAL. This network is the skeleton; every Moran's I and LISA value rides on it.
+:::
+
+## Moran's I asks one question: do like values sit next to like values?
+
+$$I = \frac{n}{\sum_{i}\sum_{j} w_{ij}} \cdot \frac{\sum_{i}\sum_{j} w_{ij}(x_i-\bar{x})(x_j-\bar{x})}{\sum_{i}(x_i-\bar{x})^2}$$
+
+[For each pair of neighbours it multiplies their deviations from the mean. High-next-to-high (and low-next-to-low) makes the products positive — so $I>0$ means clustering.]{.comment}
+
+::: {.notes}
+I ≈ +1 strong clustering of similar values; I ≈ 0 random; I ≈ −1 a checkerboard. The expected value under randomness is E(I) = −1/(n−1), here −0.0066 — essentially zero. The numerator is a cross-product of neighbour deviations; the leading fraction just normalizes by the total weight.
+:::
+
+## We test I by shuffling the map 999 times — no normality assumption needed
+
+``` {.python code-line-numbers="1|3-4|6-7"}
+from esda.moran import Moran
+
+moran_2013 = Moran(gdf["shdi2013"], W, permutations=999)
+moran_2019 = Moran(gdf["shdi2019"], W, permutations=999)
+
+print(moran_2019.I, moran_2019.p_sim, moran_2019.z_sim)
+# 0.6320   0.0010   11.9890
+```
+
+[A permutation test reshuffles all SHDI values across regions 999 times — like dealing cards to random seats — and asks how often a random map beats the real one.]{.comment}
+
+::: {.notes}
+Inference here is non-parametric: we never assume the data are normal. We build the reference distribution by brute force. p_sim = 0.0010 is the smallest p achievable with 999 draws — the observed clustering never once appeared by chance. z = 11.99 is roughly twelve standard deviations above the random mean.
+:::
+
+## Both years cluster strongly — and the clustering *strengthened*: I rose 0.568 → 0.632
+
+| Year | Moran's $I$ | $p$ (perm.) | $z$ |
+|---|---:|---:|---:|
+| 2013 | 0.5680 | [0.0010]{.key} | 10.77 |
+| 2019 | [0.6320]{.key} | 0.0010 | 11.99 |
+
+[Expected $I$ under randomness $= -0.0066$. The observed values are an order of magnitude away — and 2019 is *higher* than 2013.]{.comment}
+
+::: {.notes}
+This is the headline of the global analysis. Both years are far above the random expectation and both have the minimum possible p-value. The increase from 0.568 to 0.632 is the first sign of a deepening spatial divide — the gap between rich and poor regions is not just large, it is becoming more spatially organized.
+:::
+
+## The Moran scatter plot turns I into a picture: its slope *is* Moran's I
+
+![Standardized SHDI ($z_i$) vs spatial lag ($Wz_i$), 2013 and 2019. The orange regression line's slope equals $I$; the steeper 2019 line shows the rise. Most points fall in the HH and LL quadrants.](../esda2_moran_global.png)
+
+::: {.notes}
+Each point is a region; the x-axis is its own standardized value, the y-axis its neighbours' average. Four quadrants: HH top-right (rich among rich), LL bottom-left (poor among poor), and the two off-diagonal outlier quadrants LH and HL. The mass on the HH–LL diagonal is positive autocorrelation made visible; the steeper 2019 slope is the 0.064 rise in I.
+:::
+
+## Global I says clustering exists — LISA says *where* it lives
+
+The local Moran statistic decomposes the global $I$ into one value per region:
+
+$$I_i = z_i \sum_{j} w_{ij} z_j$$
+
+[Each region's own standardized value $z_i$ times the average of its neighbours' — large and positive in a cluster's core, negative for a spatial outlier.]{.comment}
+
+::: {.notes}
+Anselin (1995). Summing the I_i over all regions recovers (a scaling of) the global I — LISA is literally global Moran's I taken apart region by region. Each region is then assigned to a quadrant — HH, LL, HL, LH — and a permutation p-value; we keep those significant at p < 0.10.
+:::
+
+## Four cluster types — two hot/cold cores and two rare outliers
+
+:::: {.columns}
+::: {.column width="50%"}
+### Clusters (the diagonal)
+
+- **HH** — high value, high neighbours → a *hot spot*
+- **LL** — low value, low neighbours → a *cold spot / deprivation trap*
+:::
+::: {.column width="50%"}
+### Outliers (off-diagonal)
+
+- **HL** — high value among low neighbours
+- **LH** — low value among high neighbours
+:::
+::::
+
+[Significance is permutation-based: only regions with $p<0.10$ are coloured; the rest stay grey.]{.comment}
+
+::: {.notes}
+HH and LL are the story; HL and LH are the exceptions that prove the rule. In 2019 there are just 5 HL and 1 LH out of 153 — spatial outliers are genuinely rare here, which itself is evidence of strong positive autocorrelation.
+:::
+
+## LISA pins the clusters: 30 HH in the Southern Cone, 37 LL in the Amazon–Guyana band
+
+![LISA for SHDI 2019: Moran scatter coloured by significant quadrant (left), cluster map (right). HH (red) clusters in the Southern Cone; LL (blue) across Guyana and the Amazon.](../esda2_lisa_2019.png)
+
+::: {.notes}
+At p < 0.10: 30 HH, 37 LL, 5 HL, 1 LH, 80 not significant. The HH core is anchored by R. Metropolitana (CHL), C. Buenos Aires (ARG), Antofagasta (CHL); the LL core by three Guyanese regions. San Andrés (COL) is the lone HL — a high-development island among lower mainland neighbours. The clusters cover roughly half the map.
+:::
+
+## The cold spot is spreading: the LL cluster grew 29 → 37 while HH held steady
+
+:::: {.columns}
+::: {.column width="50%"}
+### 2013
+
+- HH: **31**
+- LL: **29**
+- HL: 5 · LH: 0
+:::
+::: {.column width="50%"}
+### 2019
+
+- HH: **30**
+- LL: **37**
+- HL: 5 · LH: 1
+:::
+::::
+
+[Prosperity clusters stable; deprivation cluster expanding by 8 regions. Asymmetric evolution — the signature of a localized crisis.]{.comment}
+
+::: {.notes}
+The HH cluster barely moves (31 → 30); the LL cluster grows by eight. From the transition table, 27 of 31 HH regions stayed HH (87% persistence), and 17 previously non-significant regions joined the LL cluster. Entrenched at the top, spreading at the bottom.
+:::
+
+## 87% of hot spots persist; the growth is all at the cold end {background-color="#141413"}
+
+[87%]{.bignum}
+
+[of 2013 HH regions were still HH in 2019 (27 of 31) — while 17 non-significant regions fell into the LL cluster]{.bignum-label}
+
+::: {.notes}
+Persistence is the quiet finding. Prosperity corridors in the Southern Cone are structurally locked in. The churn happens at the bottom — regions falling *into* the deprivation cluster, not out of it. That one-directional drift is what makes the spatial divide deepen rather than blur.
+:::
+
+## Regions move within the scatter even without crossing significance — track the vectors
+
+![Directional Moran scatter: an arrow from each region's 2013 position to its 2019 position in (standardized value, spatial lag) space. Orange = 2013, teal = 2019.](../esda2_directional_moran.png)
+
+::: {.notes}
+The LISA transition table only sees changes in significance. This view shows continuous movement. 95 regions (62.1%) stayed in the same quadrant; 58 (37.9%) crossed. The HH and LL quadrants are the most stable. But watch the long arrows sweeping from HH down into LL — those are the regions in free fall, and they cluster by country.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## Two countries, opposite engines: Venezuela collapses uniformly, Bolivia climbs steadily
+
+![Directional Moran scatter, Bolivia (left) vs Venezuela (right). Bolivia's arrows are short and rightward; Venezuela's are long, bundled, sweeping southwest into LL.](../esda2_directional_ven_bol.png)
+
+::: {.notes}
+Bolivia: 9 regions, mean change +0.033, range [+0.030, +0.035] — tight, broad-based gains, 78% staying in quadrant. Venezuela: 24 regions, mean change −0.065, range [−0.067, −0.064] — a near-uniform national collapse, 88% crossing quadrants, 21 of 24 ending in LL. Same plot, opposite stories.
+:::
+
+## Venezuela's 24 regions fell almost uniformly — 88% crossed into a worse quadrant {background-color="#141413"}
+
+[−0.065]{.bignum}
+
+[mean SHDI change across Venezuela's 24 regions; 21 of 24 ended in the LL quadrant (range a tight −0.067 to −0.064)]{.bignum-label}
+
+::: {.notes}
+The narrow range is the tell: this was not a few bad regions, it was the whole country moving together. And it was spatially contagious — Venezuela's decline dragged down the spatial lags of neighbouring Colombian and Brazilian border regions, which is what expanded the continental LL cluster. Negative shocks travel across borders faster than positive ones.
+:::
+
+## A country that climbs alone stays trapped: Bolivia gained +0.033 yet never left LL
+
+| Country | $n$ | Mean change | Quadrant stability |
+|---|---:|---:|---:|
+| Bolivia | 9 | [+0.0333]{.key} | 7 of 9 stayed (78%) |
+| Venezuela | 24 | [−0.0653]{.key} | 3 of 24 stayed (12%) |
+
+[Bolivia's arrows point right — own development improved — but its neighbours stayed poor, so it remained inside the LL cold spot.]{.comment}
+
+::: {.notes}
+The juxtaposition is the policy lesson in miniature. Bolivia made real, broad-based gains and still could not escape the low-development cluster, because escaping a spatial trap requires your neighbours to improve too. Venezuela shows the inverse: collapse propagates outward. Spatial structure is destiny unless you act on the neighbourhood, not just the region.
+:::
+
+## Does positive Moran's I make this a causal claim? No — it is description, not identification
+
+[Objection.]{.objection} "Spatial clustering proves neighbours *cause* each other's development."
+
+. . .
+
+[Response.]{.rebuttal} No. Moran's I and LISA are *descriptive* — they measure spatial pattern, not mechanism. Clustering can come from genuine spillovers, from shared regional shocks, or from omitted common factors. ESDA flags *where* to look; identifying *why* needs a spatial regression and an identification strategy.
+
+::: {.notes}
+Steelman, don't strawman. The strong, persistent I is real and important — but it is the start of an investigation, not its end. Distinguishing true spillover from common-shock clustering is exactly the job of spatial lag / spatial error models, which is the natural next tutorial. ESDA earns the question; it does not answer it.
+:::
+
+## What ESDA bought us: a deepening divide invisible to aspatial summary statistics
+
+::: {.incremental}
+- Aggregate SHDI barely moved ($+0.0053$) — yet $I$ rose from 0.568 to 0.632
+- 30 HH and 37 LL significant clusters; the cold spot grew by 8 regions
+- 87% HH persistence — prosperity corridors are structurally locked in
+- The Venezuela–Bolivia contrast shows clusters expand by contagion, shrink only by slow internal climb
+:::
+
+::: {.notes}
+The closing synthesis. The single most important point: the headline average said "modest improvement," and it was wrong about what mattered. Only the spatial lens revealed an entrenched, spreading divide. That is the case for ESDA in one slide.
+:::
+
+# Let the map speak: a flat average can hide a deepening, spatially contagious divide. {.divider background-color="#141413"}
+
+::: {.notes}
+The one sentence to remember. Aspatial statistics averaged away the story; Moran's I and LISA recovered it. When observations have addresses, ignore geography at your peril.
+:::

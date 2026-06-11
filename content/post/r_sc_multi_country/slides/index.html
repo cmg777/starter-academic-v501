@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="dcterms.date" content="2026-06-11">
+  <title>Augmented Synthetic Control for Multiple Countries</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #24292e;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #24292e; } /* Normal */
+    code span.al { color: #ff5555; font-weight: bold; } /* Alert */
+    code span.an { color: #6a737d; } /* Annotation */
+    code span.at { color: #d73a49; } /* Attribute */
+    code span.bn { color: #005cc5; } /* BaseN */
+    code span.bu { color: #d73a49; } /* BuiltIn */
+    code span.cf { color: #d73a49; } /* ControlFlow */
+    code span.ch { color: #032f62; } /* Char */
+    code span.cn { color: #005cc5; } /* Constant */
+    code span.co { color: #6a737d; } /* Comment */
+    code span.cv { color: #6a737d; } /* CommentVar */
+    code span.do { color: #6a737d; } /* Documentation */
+    code span.dt { color: #d73a49; } /* DataType */
+    code span.dv { color: #005cc5; } /* DecVal */
+    code span.er { color: #ff5555; text-decoration: underline; } /* Error */
+    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
+    code span.fl { color: #005cc5; } /* Float */
+    code span.fu { color: #6f42c1; } /* Function */
+    code span.im { color: #032f62; } /* Import */
+    code span.in { color: #6a737d; } /* Information */
+    code span.kw { color: #d73a49; } /* Keyword */
+    code span.op { color: #24292e; } /* Operator */
+    code span.ot { color: #6f42c1; } /* Other */
+    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.re { color: #6a737d; } /* RegionMarker */
+    code span.sc { color: #005cc5; } /* SpecialChar */
+    code span.ss { color: #032f62; } /* SpecialString */
+    code span.st { color: #032f62; } /* String */
+    code span.va { color: #e36209; } /* Variable */
+    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.wa { color: #ff5555; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Augmented Synthetic Control for Multiple Countries</h1>
+  <p class="subtitle">Validate on a known truth, then trust the euro question</p>
+  <div class="title-result-strip">
+    <div class="kr"><span class="kr-num">+6.241</span><span class="kr-cap">recovered vs true +6.250</span></div>
+    <div class="kr"><span class="kr-num">0.128</span><span class="kr-cap">mean error after augmentation</span></div>
+    <div class="kr"><span class="kr-num">0.74</span><span class="kr-cap">Spearman vs Papaioannou (2021)</span></div>
+  </div>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University (GSID)</p>
+  <p class="date">June 11, 2026</p>
+</section>
+<section>
+<section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
+<h1>The Tension</h1>
+<p><span class="act">Act I</span></p>
+</section>
+<section id="we-never-see-the-counterfactual-so-how-do-we-trust-a-country-level-estimate" class="slide level2 center">
+<h2>We never see the counterfactual — so how do we trust a country-level estimate?</h2>
+<p>Did joining the euro make a country more productive? We see only the world that <em>happened</em> — never the path it <strong>would</strong> have taken.</p>
+<div class="fragment">
+<p>Synthetic control builds the missing twin from a weighted recipe of donor countries. But classic SCM works <em>only</em> when the pre-treatment match is nearly perfect — and across structurally different countries it rarely is. <em>So when can we believe it?</em></p>
+<aside class="notes">
+<p>The estimand throughout is the ATT per treated country: actual minus synthetic, after the policy. The whole tension is that this is a difference of two estimated paths, one of which is a counterfactual we can never observe. Classic SCM’s Achilles heel is a small, heterogeneous donor pool — exactly the cross-country setting.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-honest-answer-prove-the-estimator-on-a-known-truth-before-you-trust-the-data" class="slide level2 center">
+<h2>The honest answer: prove the estimator on a known truth before you trust the data</h2>
+<ul>
+<li class="fragment"><strong>Part 1</strong> — a simulated 25-country panel where the <em>true</em> effect is injected and known</li>
+<li class="fragment"><strong>Part 2</strong> — a qualitative replication of Papaioannou (2021) on the real euro area</li>
+<li class="fragment">The bridge — the Augmented SCM adds a Ridge bias-correction that earns its keep only on hard cases</li>
+</ul>
+<p><span class="comment">We never trust a number on real data that the same method could not first recover on simulated ground truth.</span></p>
+<aside class="notes">
+<p>This is the deck’s spine: validate-then-trust. The simulated panel is the lab; the euro replication is the field. The augmentation (Ridge outcome model) is the safety net that sits quietly until the pre-treatment fit is poor.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="where-were-going" class="slide level2 center">
+<h2>Where we’re going</h2>
+<ul>
+<li class="fragment">Three <code>augsynth</code> entry points — one unit, many units, many outcomes</li>
+<li class="fragment">Validate each on simulated data with a <em>known</em> ATT</li>
+<li class="fragment">When augmentation rescues a sign error plain SCM cannot</li>
+<li class="fragment">Inference that refuses to over-claim — and can disagree with itself</li>
+<li class="fragment">The euro question: synthetic Germany and the pooled EMU effect</li>
+</ul>
+</section></section>
+<section>
+<section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>The Investigation</h1>
+<p><span class="act">Act II</span></p>
+</section>
+<section id="one-pipeline-three-doors-route-the-panel-by-its-shape-not-its-difficulty" class="slide level2 center">
+<h2>One pipeline, three doors: route the panel by its shape, not its difficulty</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h3 id="count-the-treated-units-and-outcomes">Count the treated units and outcomes</h3>
+<ul>
+<li>one unit, one outcome → <code>single_augsynth</code></li>
+<li>many units, staggered → <code>multisynth</code></li>
+<li>one unit, many outcomes → <code>augsynth_multiout</code></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<h3 id="they-all-converge">They all converge</h3>
+<ul>
+<li>convex donor weights <span class="math inline">\(W\)</span> — a recipe</li>
+<li>optional Ridge bias correction</li>
+<li>ATT read off as actual <span class="math inline">\(-\)</span> synthetic</li>
+<li>then inference</li>
+</ul>
+</div></div>
+<p><span class="comment">Formula mini-language: <code>outcome ~ treatment | covariates</code>.</span></p>
+<aside class="notes">
+<p>The post opens with a Mermaid flowchart; reveal.js does not bundle mermaid, so it is re-expressed here as a two-column routing slide. The key point is that routing is by shape — count treated units and outcomes — and all three then share the same SCM-plus-Ridge machinery and the same ATT definition.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-lab-25-countries-39-years-a-known-effect-injected-into-five-of-them" class="slide level2 center">
+<h2>The lab: 25 countries, 39 years, a known effect injected into five of them</h2>
+
+<img data-src="../r_sc_multi_country_02_sim_panel_paths.png" class="r-stretch quarto-figure-center"><p class="caption">25 simulated paths — five treated units (colored) inside a cloud of 20 donors (grey); dots mark each adoption year.</p><aside class="notes">
+<p>975 rows: 25 units × 39 years (1985–2023). Five treated (C01–C05), 20 never-treated donors. The long pre-period is deliberate — it gives the inference procedures their power. C01–C04 are sparse convex blends of three donors each, so a clean synthetic exists; C05 is placed outside the donor hull on purpose to stress-test augmentation later. Treatment is staggered: 2010, 2010, 2013, 2016, 2016.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="scm-solves-a-constrained-recipe-ascm-subtracts-what-the-fit-still-misses" class="slide level2 center">
+<h2>SCM solves a constrained recipe; ASCM subtracts what the fit still misses</h2>
+<p><span class="math display">\[W^{\star} = \arg\min_{W \in \Delta}\ \lVert X_1 - X_0 W \rVert_V \quad\text{s.t.}\quad w_j \ge 0,\ \sum_j w_j = 1\]</span></p>
+<p><span class="math display">\[\hat\tau_t^{\,\mathrm{aug}} = \Big(Y_{1t} - \sum_j w_j Y_{jt}\Big) - \Big(\hat m_t(X_1) - \sum_j w_j\,\hat m_t(X_j)\Big)\]</span></p>
+<p><span class="comment">The first term is the plain SCM gap; the second is the Ridge correction <span class="math inline">\(\hat m_t\)</span>. Perfect pre-fit → correction vanishes → ASCM <span class="math inline">\(=\)</span> SCM.</span></p>
+<aside class="notes">
+<p>W lives on the simplex Δ — non-negative weights summing to one, so the synthetic interpolates donors and never extrapolates. The augmented estimator is doubly robust: it is the SCM gap minus what the prognostic model m-hat (a Ridge regression on lagged outcomes) predicts the residual imbalance to be. When the donors already reproduce m-hat(X1), the correction is zero. This is why augmentation is insurance, not a free lunch.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="single_augsynth-recovers-c01s-att-to-within-0.1-and-its-significant" class="slide level2 center">
+<h2><code>single_augsynth</code> recovers C01’s ATT to within 0.1% — and it’s significant</h2>
+
+<img data-src="../r_sc_multi_country_03_single_actual_vs_synth.png" class="r-stretch quarto-figure-center"><p class="caption">C01 actual vs its synthetic control: the synthetic tracks the pre-2010 path closely, then the gap opens.</p><aside class="notes">
+<p>True average post ATT for C01 is +6.250; plain SCM and Ridge-ASCM both return +6.241 — an error of 0.009. Jackknife+ 95% CI [5.998, 6.506] excludes zero; conformal p &lt; 0.001. The two estimators agree because C01 sits inside the donor hull (scaled L2 = 0.135) and the Ridge λ ≈ 2639 all but switches augmentation off — the “when fit is good, ASCM ≈ SCM” lesson.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-dynamic-gap-lands-on-the-true-injected-effect-after-treatment" class="slide level2 center">
+<h2>The dynamic gap lands on the true injected effect after treatment</h2>
+
+<img data-src="../r_sc_multi_country_04_single_gap_conformal.png" class="r-stretch quarto-figure-center"><p class="caption">Estimated treated-minus-synthetic gap with its conformal band, overlaid on the true injected effect — near-perfect recovery.</p><aside class="notes">
+<p>The conformal band is pointwise over time. Pre-2010 the gap hovers at zero — the visual signature of a trustworthy synthetic control — and post-2010 it climbs right onto the dashed truth line. The conformal test is powerful precisely because the pre-period is long relative to the post-period, which is why this panel starts in 1985.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="six-lines-fit-a-single-unit-ascm-in-r" class="slide level2 center">
+<h2>Six lines fit a single-unit ASCM in R</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1-2|4-5|7-8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>sim_single <span class="ot">&lt;-</span> panel <span class="sc">|&gt;</span></span>
+<span id="cb1-2"><a href=""></a>  <span class="fu">mutate</span>(<span class="at">trt =</span> <span class="fu">as.integer</span>(country <span class="sc">==</span> <span class="st">"C01"</span> <span class="sc">&amp;</span> year <span class="sc">&gt;=</span> <span class="dv">2010</span>))</span>
+<span id="cb1-3"><a href=""></a></span>
+<span id="cb1-4"><a href=""></a>sc_plain <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(gdp_index <span class="sc">~</span> trt, country, year, sim_single,</span>
+<span id="cb1-5"><a href=""></a>                     <span class="at">t_int =</span> <span class="dv">2010</span>, <span class="at">progfunc =</span> <span class="st">"None"</span>,  <span class="at">scm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-6"><a href=""></a>sc_ridge <span class="ot">&lt;-</span> <span class="fu">augsynth</span>(gdp_index <span class="sc">~</span> trt, country, year, sim_single,</span>
+<span id="cb1-7"><a href=""></a>                     <span class="at">t_int =</span> <span class="dv">2010</span>, <span class="at">progfunc =</span> <span class="st">"ridge"</span>, <span class="at">scm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-8"><a href=""></a><span class="fu">summary</span>(sc_plain, <span class="at">inf_type =</span> <span class="st">"jackknife+"</span>)<span class="sc">$</span>average_att</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<aside class="notes">
+<p>The top-level augsynth() dispatches to single_augsynth() when it sees one treated unit and one intervention time. progfunc = “None” is plain SCM (Abadie’s classic estimator); progfunc = “ridge” turns on the bias-correction outcome model. Inference is requested at summary() time, not at fit time.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="multisynth-recovers-the-pooled-att-and-every-per-unit-sign-including-a-negative-one" class="slide level2 center">
+<h2><code>multisynth</code> recovers the pooled ATT — and every per-unit sign, including a negative one</h2>
+
+<img data-src="../r_sc_multi_country_05_multisynth_percountry.png" class="r-stretch quarto-figure-center"><p class="caption">Per-unit treatment effects under staggered adoption: each unit’s estimate climbs to meet its dashed truth line — and C05 drops the opposite way.</p><aside class="notes">
+<p>multisynth needs no t_int — it infers each unit’s adoption from the 0→1 switch — and returns a pooled average plus per-unit effects, partially pooling them (auto nu = 0.583, global scaled L2 = 0.052). Pooled estimate 3.222 vs true 3.155. Every per-unit estimate has the right sign and ballpark, including C05’s negative −1.012 vs true −1.175. Per-unit values look smaller than single_augsynth’s 6.241 because multisynth averages over a common 8-lead window.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="same-estimate-different-verdict-jackknife-says-significant-the-bootstrap-says-not" class="slide level2 center">
+<h2>Same estimate, different verdict: jackknife says significant, the bootstrap says not</h2>
+
+<img data-src="../r_sc_multi_country_06_multisynth_pooled.png" class="r-stretch quarto-figure-center"><p class="caption">Pooled average effect with the tight jackknife band (excludes zero) and the wide wild-bootstrap band (includes zero), vs the true pooled effect.</p><aside class="notes">
+<p>This is the first concrete case of inference changing the headline. Pooled jackknife 95% CI [0.689, 5.754] excludes zero — significant. The wild bootstrap [−2.468, 9.779] is roughly 5× wider and includes zero — not significant. Neither is wrong: the jackknife asks “is the average across these units nonzero?”, the bootstrap additionally propagates how hard each counterfactual was to build. When they disagree, say so.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="when-a-unit-sits-outside-the-donor-hull-plain-scm-gets-the-sign-wrong" class="slide level2 center">
+<h2>When a unit sits outside the donor hull, plain SCM gets the <em>sign</em> wrong</h2>
+
+<img data-src="../r_sc_multi_country_08_suitability_plain_vs_ridge.png" class="r-stretch quarto-figure-center"><p class="caption">Suitability test for C05: plain SCM (blue) drifts from actual C05 (orange) <em>before</em> treatment; Ridge-ASCM pins them together pre-2016.</p><aside class="notes">
+<p>C05 was built outside the donor hull on purpose. No convex blend of donors reproduces its pre-period, so plain SCM estimates +1.896 when the truth is −1.175 — a sign error. Crucially its jackknife+ CI [−2.614, 6.407] includes zero and conformal p = 0.866, so honest inference correctly flags it as null: wrong AND not significant. Ridge-ASCM closes the pre-fit gap (scaled L2 0.414 → 0.036) and recovers −1.145.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="augmentation-cuts-the-mean-recovery-error-from-0.737-to-0.128" class="slide level2 center" data-background-color="#141413">
+<h2>Augmentation cuts the mean recovery error from 0.737 to 0.128</h2>
+<p><span class="bignum">0.128</span></p>
+<p><span class="bignum-label">mean recovery error across five units after Ridge-ASCM — down from 0.737 under plain SCM</span></p>
+<aside class="notes">
+<p>For the four well-fit units (C01–C04) plain SCM and Ridge-ASCM agree to the second decimal — augmentation does nothing. It earns its keep exactly once, on C05, the hard case. The practical rule: always read the pre-treatment scaled L2 imbalance; if it is small either method is fine, if it is large trust the augmented estimate and be suspicious of any synthetic control whose pre-period does not track.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>The Resolution</h1>
+<p><span class="act">Act III</span></p>
+</section>
+<section id="on-real-data-synthetic-germanys-tfp-runs-0.133-above-its-counterfactual-after-1999" class="slide level2 center">
+<h2>On real data, synthetic Germany’s TFP runs +0.133 above its counterfactual after 1999</h2>
+
+<img data-src="../r_sc_multi_country_10_germany_plain_scm.png" class="r-stretch quarto-figure-center"><p class="caption">Synthetic Germany under plain SCM: actual TFP (orange) rises above the synthetic counterfactual (blue) after the 1999 euro launch.</p><aside class="notes">
+<p>Germany is fit against 24 non-euro donors, matching on pre-1999 TFP plus the paper’s predictors (human capital, investment share, economic freedom, patents, agriculture). Average ATT +0.133 TFP units — about +8.0% over 2000–07 and +19.3% over 2008–17. Pre-fit is good (scaled L2 = 0.30), so Ridge barely moves it (+0.127). Inference is honestly borderline: conformal p = 0.027 (significant) but jackknife+ [−0.082, 0.336] just includes zero. We flag it rather than pick the convenient answer.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-pooled-euro-average-is-a-forgettable-0.016-but-the-path-tells-the-story" class="slide level2 center">
+<h2>The pooled euro average is a forgettable −0.016 — but the <em>path</em> tells the story</h2>
+
+<img data-src="../r_sc_multi_country_12_emu_pooled_att.png" class="r-stretch quarto-figure-center"><p class="caption">Pooled euro-area effect on TFP: flat pre-1999, a +0.39 early bump, eroded into negative territory by the 2008–2014 crisis, recovering by 2017.</p><aside class="notes">
+<p>multisynth across all 12 members is a simultaneous block design (all adopt in 1999). Pooled average ATT −0.016, jackknife [−0.282, 0.250] and bootstrap [−0.259, 0.231] both include zero — not significant under either. But the single number is misleading: the path is flat in the pre-period (no pre-trend, validating the design), rises to ≈ +0.39 in the early euro years, then slides negative through the crisis. Early gains and crisis losses cancel in the long-run average — exactly the arc Papaioannou describes.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="per-member-fits-reveal-the-heterogeneity-the-average-hides" class="slide level2 center">
+<h2>Per-member fits reveal the heterogeneity the average hides</h2>
+
+<img data-src="../r_sc_multi_country_13_emu_percountry.png" class="r-stretch quarto-figure-center"><p class="caption">Synthetic control for every euro member: most run above their synthetic counterfactual after 1999; Greece and Portugal fall below post-crisis.</p><aside class="notes">
+<p>Twelve single_augsynth fits, each member vs the 24 donors. Most members run above their synthetic counterfactuals after 1999. Greece and Portugal converge to or fall below theirs after the crisis (Greece +8.0% → −12.4%, Portugal +6.5% → −14.3%) — matching the paper’s negative post-crisis contributions. Averages hide dynamics; the per-unit spread is the honest multi-country report.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="ascm-ranks-the-euro-winners-just-as-papaioannou-did-spearman-0.74" class="slide level2 center" data-background-color="#141413">
+<h2>ASCM ranks the euro winners just as Papaioannou did: Spearman 0.74</h2>
+<p><span class="bignum">0.74</span></p>
+<p><span class="bignum-label">Spearman rank correlation between our ASCM TFP % effects and the paper’s, 2000–07 (Pearson 0.76)</span></p>
+<aside class="notes">
+<p>Strong agreement given augsynth uses a different estimator and donor-matching scheme than the paper’s classic SCM. France (42.7% vs 43.6%) and the Netherlands (44.0% vs 38.2%) land almost on the 45-degree line; a few diverge in magnitude (Germany, Ireland) but not in sign. The pattern replicates: large euro-era gains for France, the Netherlands, Belgium, Spain, Ireland, and post-crisis reversals for Greece and Portugal. Qualitative replication — same signs, same ranking, same dynamic story — is the right bar for a method comparison.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-numbers-line-up-around-the-45-degree-line-not-on-top-of-it" class="slide level2 center">
+<h2>The numbers line up around the 45-degree line, not on top of it</h2>
+
+<img data-src="../r_sc_multi_country_16_paper_vs_ascm_scatter.png" class="r-stretch quarto-figure-center"><p class="caption">ASCM vs Papaioannou (2021): per-member TFP % contributions cluster around the 45-degree line, Spearman 0.74.</p><p><span class="comment">We do not reproduce the paper’s numbers exactly — and should not. Same signs, same ranking, same dynamic story is the right bar.</span></p>
+<aside class="notes">
+<p>The estimators differ, so exact matches are not expected. All 12 members are positive in 2000–07. The scatter is the visual verdict: a method comparison passes when the qualitative pattern replicates, not when the decimals match.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="does-ascm-make-this-causal-no-two-assumptions-still-carry-the-weight" class="slide level2 center">
+<h2>Does ASCM make this causal? No — two assumptions still carry the weight</h2>
+<p><span class="objection">Objection.</span> Machine-augmented donor weighting can’t manufacture identification — you’ve just dressed up a correlation.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span> Correct, and we never claim otherwise. The ATT is identified only under <strong>no anticipation / a credible pre-treatment fit</strong> and the <strong>absence of confounding shocks</strong> coinciding with the euro. ASCM disciplines the <em>counterfactual construction</em>; it cannot rule out a contemporaneous shock. That is why we validated on simulated truth, read every pre-fit, and reported the borderline and null results as exactly that.</p>
+<aside class="notes">
+<p>Steelman, don’t strawman. The robustness check (1992 vs 1999 dating: +0.138 vs +0.133) and the flat pre-trend address anticipation and pre-trend confounding, but they cannot exclude a coincident shock. Honest synthetic-control work disciplines selection and reports uncertainty; it does not relax the identifying assumptions.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section></section>
+<section id="validate-on-a-known-truth-lean-on-augmentation-only-when-the-fit-demands-it-and-read-the-path-not-the-average." class="title-slide slide level1 divider center" data-background-color="#141413">
+<h1>Validate on a known truth, lean on augmentation only when the fit demands it, and read the path — not the average.</h1>
+<aside class="notes">
+<p>The single takeaway. Four habits make multi-country synthetic control honest: confirm the estimator recovers a known effect before trusting it on real data; read the pre-treatment imbalance every time and let augmentation work only on the hard cases; match the inference tool to the estimator and report when methods disagree; and read dynamics, because a near-zero average (−0.016) can hide a real +0.39 early bump erased by a crisis.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

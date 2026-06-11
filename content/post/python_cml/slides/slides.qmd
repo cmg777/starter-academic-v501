@@ -1,0 +1,274 @@
+---
+title: "Causal Machine Learning for Policy Evaluation"
+subtitle: "From ATE to IATE to a better training-assignment rule"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "5.520"
+    cap: "DoubleML ATE · covers truth"
+  - num: "0.956"
+    cap: "IATE correlation with truth"
+  - num: "99.5%"
+    cap: "of oracle welfare recovered"
+format:
+  revealjs:
+    output-file: index.html
+    # NOTE: not embed-resources — RevealChalkboard (a core feature) is
+    # incompatible with self-contained output, so the deck ships
+    # index.html + slides_files/ (served fine by Hugo, like tutorial.html).
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs default) — renders $…$ / $$…$$ across the whole slide
+    # DOM (body, captions, headings, table cells). Loads from a CDN; reveal.js is local.
+    # Do NOT set `html-math-method: katex` — it is broken in revealjs (no auto-render call,
+    # so math shows as raw LaTeX). See references/render-and-fix.md.
+    link-external-icon: false
+---
+
+# The Tension {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## "Does training work?" is the wrong question — the right one is "for whom?"
+
+A government runs a job-training programme. The average effect is positive. So we train everyone — right?
+
+. . .
+
+But caseworkers steer the *neediest* jobseekers into training, and a simple comparison cannot tell the programme's effect apart from *who got selected*. *Average is not enough.*
+
+::: {.notes}
+This is the central tension. A single average number — even a correct one — hides the heterogeneity that actually drives good policy. We need to estimate not just whether the programme works, but for whom, and then act on that. The whole deck builds toward a personalised assignment rule.
+:::
+
+## A naive comparison says +5.1 months — but the true effect is +5.6
+
+![Forest plot · Naive, DoubleML, CausalForestDML, and the truth (orange star, 5.628). The naive interval sits entirely below the truth.](../cml_method_comparison.png)
+
+::: {.notes}
+Spoiler figure. Don't explain every interval yet — just plant that the naive estimator's CI sits entirely below the truth (confounding), DoubleML straddles it, and the forest's average is tight but slightly low. We earn each of these in Act II and come back to this picture in Act III.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- The estimands: ATE → GATE → IATE, each one finer than the last
+- The data: 5,000 synthetic jobseekers with *known* true effects
+- DoubleML for the average; a causal forest for the individual
+- The payoff: turn individual effects into a welfare-maximising rule
+:::
+
+# The Investigation {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## Three estimands, increasing granularity — and we must earn them in order
+
+$$\text{ATE} = E[Y(1) - Y(0)]$$
+$$\text{GATE}(z) = E[Y(1) - Y(0) \mid Z = z]$$
+$$\text{IATE}(x) = E[Y(1) - Y(0) \mid X = x]$$
+
+[Population average → subgroup average → one number *per person*. Skipping to the finest estimand without securing the average is the most common mistake in applied CML.]{.comment}
+
+::: {.notes}
+Y(1) and Y(0) are the potential outcomes under treatment and control; only one is ever observed. ATE is the headline policy number; GATE conditions on a named subgroup Z (here Dutch proficiency); IATE conditions on the full covariate vector X. A credible average is the floor on which any subgroup analysis stands, and credible group effects are the floor under any individual analysis.
+:::
+
+## The identifying assumption: unconfoundedness, not randomisation
+
+The data are **observational**. We assume *selection-on-observables*: conditional on $X$, treatment is as good as random.
+
+$$D \perp \{Y(1), Y(0)\} \mid X$$
+
+[This is the strong assumption that licenses everything downstream. The naive difference-in-means is therefore *genuinely biased* here — not merely imprecise.]{.comment}
+
+::: {.notes}
+Unconfoundedness is the load-bearing identifying assumption. Conditional on the six covariates (age, education, prior employment, Dutch proficiency, sex, migrant status), treatment assignment is as good as random. The synthetic DGP satisfies this by construction; in a real ALMP it is the assumption a referee would attack. Machine learning chooses controls flexibly — it cannot manufacture identification.
+:::
+
+## The lab: 5,000 jobseekers, six covariates, and a known ground truth
+
+::: {.incremental}
+- **Outcome** $Y$ — months employed over a 30-month follow-up (mean 22.7)
+- **Treatment** $D$ — received training (52.8% treated)
+- **Covariates** $X$ — age, education, prior employment, Dutch proficiency, sex, migrant
+- **Truth** — because the data are *synthetic*, $\tau_i$ is known for every person
+:::
+
+[Synthetic Flemish-ALMP cohort modelled on Cockx, Lechner & Bollens (2023). Every estimator is benchmarked against the truth.]{.comment}
+
+::: {.notes}
+The treatment share of 52.8% is high for a real ALMP, but it is calibrated to keep overlap comfortable in all four Dutch-proficiency strata. The outcome has room (floor 0, ceiling 30) for a realistic 5-to-8-month effect. Knowing the truth is the pedagogical superpower here: we can score every estimator against it.
+:::
+
+## Overlap holds: propensities stay inside [0.21, 0.81], so no trimming bites
+
+![Propensity-score histograms by treatment status; the two distributions overlap heavily across [0.2, 0.8].](../cml_overlap.png)
+
+::: {.notes}
+The first check before any doubly-robust estimator runs. Estimated propensities fall inside [0.21, 0.81], so neither strict positivity nor the conventional [0.05, 0.95] trimming bounds bind. The treated mean (0.551) sits just 0.049 above the untreated mean (0.502) — mildly confounded, not randomised. That is exactly the regime where doubly-robust methods are designed to beat a naive baseline.
+:::
+
+## With zero adjustment, the naive estimate is biased down by half a month {background-color="#141413"}
+
+[−0.52]{.bignum}
+
+[Naive bias in months · estimate 5.111 [4.93, 5.30], its 95% CI *fails to cover* the true 5.628]{.bignum-label}
+
+::: {.notes}
+Difference-in-means: average Y for treated, average for untreated, subtract. Under unconfoundedness with observational data this is generally biased. The bias is −0.517 months, about 9.2% of truth, and the CI misses entirely. Why? Caseworkers steer low-Dutch-proficiency jobseekers — those with the largest effects but also the weakest employability — into training, and a simple comparison cannot separate the programme from the selection.
+:::
+
+## DoubleML's doubly-robust score is correct if *either* nuisance is correct
+
+$$\psi_i = g_1(X_i) - g_0(X_i) + \frac{D_i\,(Y_i - g_1(X_i))}{m(X_i)} - \frac{(1-D_i)\,(Y_i - g_0(X_i))}{1 - m(X_i)}$$
+
+[Outcome regression $g_d(X) = E[Y \mid D=d, X]$ plus an inverse-propensity residual correction. $E[\psi_i] = \text{ATE}$ if *either* $g$ or $m$ is right — the "double" in doubly robust.]{.comment}
+
+::: {.notes}
+The Interactive Regression Model of Chernozhukov et al. (2018). Two nuisances: an outcome regression g and a propensity m. Cross-fitting — train nuisances on K−1 folds, predict on the held-out fold, rotate — prevents the forests from overfitting their own training sample and contaminating the score. Orthogonality buys a root-n rate even with slow machine-learning nuisances. The grading-with-someone-else's-rubric analogy from the post lands well here.
+:::
+
+## Six lines of DoubleML, with random-forest nuisances and 5-fold cross-fitting
+
+``` {.python code-line-numbers="1|2-3|4-7|8"}
+dml_data = DoubleMLData(df, y_col="Y", d_cols="D", x_cols=X_COLS)
+ml_g = RandomForestRegressor(n_estimators=200, min_samples_leaf=5)
+ml_m = RandomForestClassifier(n_estimators=200, min_samples_leaf=5)
+dml_irm = DoubleMLIRM(
+    dml_data, ml_g=ml_g, ml_m=ml_m,
+    n_folds=5, score="ATE", trimming_threshold=0.01,
+)
+dml_irm.fit(store_predictions=True)   # coef[0] is the ATE
+```
+
+::: {.notes}
+ml_g learns the outcome surface; ml_m learns the propensity. n_folds=5 sets the cross-fitting. trimming_threshold=0.01 discards the tiny extreme tails of the propensity. store_predictions=True is what lets us reuse the cross-fitted nuisances for the GATE in the next act without re-fitting. The ATE is dml_irm.coef[0]; the full script lives in the post.
+:::
+
+## DoubleML closes 79% of the bias and its CI now covers the truth {background-color="#141413"}
+
+[5.520]{.bignum}
+
+[DoubleML ATE [5.36, 5.68] · covers the true 5.628 · bias cut from −0.52 to −0.11; SE 0.094 → 0.081]{.bignum-label}
+
+::: {.notes}
+Once the random-forest nuisances absorb how both treatment and outcome depend on the covariates, residual bias collapses from 0.517 to 0.108 months — a 79% reduction — and the CI now covers the truth. The estimate rises from "about 5.1 extra months" to "about 5.5". And DoubleML is slightly *more* precise too (SE 0.081 vs 0.094): the cross-fitted nuisances soak up outcome variance the naive estimator leaves behind.
+:::
+
+## The effect is not flat: GATE falls from 7.5 to 2.9 as Dutch proficiency rises
+
+![Estimated GATE (steel) vs true GATE (orange) by Dutch proficiency; both decline monotonically and nearly coincide.](../cml_gate_dutch.png)
+
+::: {.notes}
+Reuse the same doubly-robust psi: E[psi | Z=z] = GATE(z), so a simple group-mean of the cross-fitted pseudo-outcomes is unbiased — no re-fitting needed. Estimated 7.47 / 6.13 / 4.50 / 2.91 against truth 7.63 / 6.12 / 4.61 / 3.13, every estimate within 0.22 months, all four CIs covering. The lowest-proficiency stratum benefits about 2.6× more than the highest — training compensates for a labour-market handicap. SEs widen in the thin top stratum (n=725).
+:::
+
+## The causal forest goes one level deeper: one effect estimate per person
+
+![Estimated IATE vs true individual effect $\tau$ for 5,000 jobseekers, with a 45° line; points cluster tightly on the diagonal.](../cml_iate_scatter.png)
+
+::: {.notes}
+A causal forest is a random forest whose trees split on heterogeneity in the *treatment effect*, not the outcome; each leaf is a small neighbourhood with a locally constant IATE. EconML's CausalForestDML with 400 honest trees. Correlation with truth 0.956, MAE just 0.40 months — small against the 4.5-month spread of true effects. The mean of the IATEs (5.456) is within 0.17 of the true ATE, so the forest ranks *and* is calibrated in level.
+:::
+
+## Individual effects shift left with proficiency — heterogeneity, person by person
+
+![Estimated IATEs coloured by Dutch proficiency; a dashed line marks the true ATE of 5.63. Distributions shift monotonically left as proficiency rises.](../cml_iate_distribution.png)
+
+::: {.notes}
+The four IATE distributions slide leftwards as Dutch proficiency rises — exactly the GATE pattern, now at the individual level — and their union centres on the true ATE. Crucially, there is visible spread *within* each colour: meaningful heterogeneity remains even among jobseekers who share a dutch_prof value, which the group-level GATE cannot see but the forest can.
+:::
+
+## Right tool, right job: DoubleML for the ATE, the forest for ranking
+
+:::: {.columns}
+::: {.column width="50%"}
+### DoubleML (IRM)
+
+- targets the **population ATE** directly
+- CI [5.36, 5.68] **covers** truth
+- doubly robust, $\sqrt{n}$ rate
+- use for "*what is the ATE?*"
+:::
+::: {.column width="50%"}
+### CausalForestDML
+
+- one **IATE per person**, corr 0.956
+- mean-of-IATEs CI [5.42, 5.50] *misses* truth
+- ranks individuals, finds heterogeneity
+- use for "*for whom?*"
+:::
+::::
+
+::: {.notes}
+The forest's tight CI is for the *average of individual predictions*, not the population ATE — it does not pick up the forest's small downward calibration bias, so its upper bound (5.50) sits below truth (5.628). That is not a contradiction; the two intervals target different things. Operational division of labour: DoubleML for ATE inference, causal forest for heterogeneity and ranking.
+:::
+
+# The Resolution {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## Welfare is the per-person sum of treated effects net of cost
+
+$$W(\text{rule}) = E\big[\,\text{rule}(X)\cdot(\tau(X) - c)\,\big]$$
+
+[For everyone the rule treats, add their true effect minus the cost $c = 4$ months. Treat-all leaves welfare on the table; *targeting* the responders does better.]{.comment}
+
+::: {.notes}
+The whole reason to estimate individual effects rather than stop at the average: they enable personalised policy. The welfare-optimal rule trains person i iff their *true* effect exceeds the cost. We don't know the truth in practice, so we plug in the forest's IATE estimate. Four rules: treat none, treat all, the IATE rule (treat where iate_hat > cost), and an oracle that knows the true tau.
+:::
+
+## A simple IATE rule recovers 99.5% of oracle welfare {background-color="#141413"}
+
+[1.749]{.bignum}
+
+[Welfare/person under the IATE rule vs oracle 1.758 (99.5%) and treat-all 1.628 (+7.4%); treats 83.9% vs the oracle's 83.8%]{.bignum-label}
+
+::: {.notes}
+Treat-none yields zero. Treat-all yields 1.628 (the ATE 5.63 minus cost 4.0). The targeted IATE rule lifts welfare to 1.749 — 99.5% of the oracle's 1.758 — and beats treat-all by 7.4%, while treating almost exactly the same share the oracle would. The tiny remaining gap (0.009 months) reflects the 0.40-month MAE: misranked individuals cluster near the cost cutoff where the welfare slope is shallow, so errors barely cost anything.
+:::
+
+## The payoff in one panel: targeting beats treating everyone
+
+![Average net welfare per person under four rules; the IATE rule (1.749) nearly matches the oracle (1.758) and beats treat-all (1.628).](../cml_policy_welfare.png)
+
+::: {.notes}
+This is the bar chart version of the previous big number — the concrete demonstration that CML is not an academic exercise. Treat-none (0.00), treat-all (1.628), IATE rule (1.749), oracle (1.758). The IATE rule is visually indistinguishable from the oracle and clearly above treat-all. Personalised effect estimates convert directly into a better assignment rule.
+:::
+
+## Does LASSO-style flexibility make this causal? No — the assumption still carries it
+
+[Objection.]{.objection} A flexible forest that picks its own controls must be "more causal" than a naive comparison.
+
+. . .
+
+[Response.]{.rebuttal} Flexibility helps *estimation*, not *identification*. $\tau$ is identified only under **unconfoundedness** and **overlap**; the forest just estimates it well *given* those. On a real cohort with thin overlap, the favourable performance here would not transfer for free.
+
+::: {.notes}
+Steelman, don't strawman. CML disciplines and flexibilises estimation; it cannot relax the identifying assumptions. The synthetic DGP makes overlap easy by construction (propensities in [0.21, 0.81]); in a real ALMP, propensities drift toward 0/1, the doubly-robust score gets sensitive to small denominators, and trimming choices matter far more than they appear to here.
+:::
+
+# Estimate the average, learn the individual, then assign by who benefits. {.divider background-color="#141413"}
+
+::: {.notes}
+The single takeaway. DoubleML answers "should we run this programme?"; the causal forest answers "for whom?"; the welfare rule turns that answer into action — recovering 99.5% of oracle welfare from a synthetic cohort, the concrete promise of Causal Machine Learning for policy.
+:::
