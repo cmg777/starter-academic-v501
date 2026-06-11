@@ -16,9 +16,9 @@ image:
   placement: 3
   preview_only: false
 links:
-- icon: person-chalkboard
+- icon: chalkboard-teacher
   icon_pack: fas
-  name: "Slides (HTML)"
+  name: "Slides"
   url: slides/index.html
 - icon: laptop-code
   icon_pack: fas
