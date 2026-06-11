@@ -67,12 +67,11 @@ The validated block lives in `templates/slides.qmd.tmpl`. Key options:
 
 - **Slides:** `##` = a content slide (its heading is the assertion title); `#` = a section
   divider. See `slide-archetypes.md`.
-- **Math:** write **LaTeX, never literal Unicode** (`$\hat\alpha$` not `α̂`, `$\lambda$` not
-  `λ`, `$|I_d|$`, `$\pm$`). Rendered by **MathJax** (Quarto revealjs's default engine — no `html-math-method` needed;
-  reveal.js itself is local, but math needs a network). **No Goldmark** here, so the `index.md` escaping rules (`\\$`, `\_`) do **not**
-  apply. **Mixed numbers** — full math in captions/bullets/labels, but keep `[…]{.key}` /
-  `[…]{.bignum}` as styled text; **notes stay Unicode** (the notes window doesn't render math).
-  See `slide-mapping.md`.
+- **Math:** write **LaTeX, never literal Unicode** (`$\hat\alpha$` not `α̂`). Rendered by
+  **MathJax** (Quarto revealjs's default — no `html-math-method`; reveal.js is local but math
+  needs a network; why not KaTeX → `render-and-fix.md §12`). **No Goldmark** here, so `index.md`
+  escaping (`\\$`, `\_`) does **not** apply. The Unicode→LaTeX table + mixed-numbers +
+  notes-stay-Unicode rules are the canonical `slide-mapping.md §Math symbols → LaTeX`.
 - **Code:** ` ``` {.r code-line-numbers="2-3|5"} ` highlights (without executing) and reveals
   line-groups as fragments. Use `.r` / `.python` / `.stata`.
 - **Figures:** `![caption](../<slug>_fig.png)` — `auto-stretch` bounds, `fig-align` centres.

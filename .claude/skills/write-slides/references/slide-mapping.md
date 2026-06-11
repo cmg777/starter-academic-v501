@@ -129,9 +129,9 @@ visibly but the smoke test can't catch them — see `render-and-fix.md` §7 for 
   Plain standalone numbers (284, 143) stay text.
 - **Notes stay Unicode.** The reveal speaker-notes window doesn't run the math renderer, so
   LaTeX source would show raw there — keep `α̂` etc. inside `::: {.notes}`.
-- Engine: **MathJax** — Quarto revealjs's default, loaded from a CDN (reveal.js itself is
-  bundled locally; math needs a network). Do NOT set `html-math-method: katex` (broken in
-  revealjs — math shows as raw LaTeX).
+- Engine: **MathJax** — Quarto revealjs's default, from a CDN (reveal.js is bundled locally; math
+  needs a network). Do NOT set `html-math-method: katex` — it is broken in revealjs (why, and the
+  static/browser guards that catch it → `render-and-fix.md §12`).
 
 ---
 

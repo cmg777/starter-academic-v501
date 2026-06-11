@@ -50,31 +50,35 @@ BASE="/abs/.../content/post/<slug>/slides" node \
 ```
 Exits 0/1, `[✓]/[✗]` per assertion. Checks the rendered files: `index.html` + `slides_files/`
 + `slides.qmd` present; reveal structure; the **title key-result strip** rendered; chalkboard
-+ menu wired in; speaker notes; ≥1 brand divider (`data-background-color`); 6 ≤ `<section>` ≤
-60; every `../<slug>_*.png` exists on disk; no leaked `{{…}}` markers.
++ menu wired in; speaker notes; **(if the deck has math) MathJax is referenced and the math spans
+use `\(…\)` delimiters** — a static guard that catches the `html-math-method: katex` misconfig;
+≥1 brand divider (`data-background-color`); 6 ≤ `<section>` ≤ 60; every `../<slug>_*.png` exists
+on disk; no leaked `{{…}}` markers.
 
-**Layer B canNOT verify that math RENDERS** — it only sees that `$…$` became `<span class="math">`
-spans, not whether they typeset. A broken math engine ships raw `\hat\alpha` and Layer B still
-passes. That is what Layer C catches.
+**Layer B's math guard is static** — it catches the **katex-misconfiguration** (wrong delimiters
+in the emitted HTML), but it canNOT confirm math actually **renders at runtime** (e.g. a MathJax
+CDN failure still ships raw `\hat\alpha`). That is what Layer C catches.
 
 ---
 
 ## Layer C — browser math-render check (MANDATORY when the deck has math)
 
-The static layers cannot see unrendered math (this bug shipped twice before this check existed).
-Drive a real browser to confirm the LaTeX typesets:
+The static layers cannot confirm runtime rendering (this bug shipped twice before this check
+existed). Drive a real browser to confirm the LaTeX typesets — no `NODE_PATH` needed,
+`math-check.cjs` auto-locates Playwright:
 ```bash
-# Playwright usually lives only in the npx cache — locate it, then point NODE_PATH at it:
-PW=$(find "$HOME/.npm/_npx" -path '*node_modules/playwright/package.json' 2>/dev/null | head -1)
-NODE_PATH="$(dirname "$(dirname "$PW")")" node \
-  .claude/skills/write-slides/references/templates/math-check.cjs \
+node .claude/skills/write-slides/references/templates/math-check.cjs \
   "$PWD/content/post/<slug>/slides/index.html"
+# First run only, if Playwright is missing (exit 3):  npx playwright install chromium
 ```
-`math-check.cjs` opens the deck in the system Chrome, waits for MathJax, traverses **every**
-slide (via `Reveal.next()`, covering the vertical content sub-slides under each `#` divider), and
-**fails (`[✗]`) if any slide shows raw backslash-LaTeX** (`\hat`, `\(`, …); it exits 0 only when
-all math rendered. If Playwright/Chrome is unavailable, fall back to a manual eyeball: open the
-deck and confirm `$\hat\alpha$` shows as α̂, not `\hat\alpha`. **Never commit with raw LaTeX.**
+`math-check.cjs` auto-resolves Playwright (project / any npx-cache hash / global npm root — via
+the `loadChromium()` it shares with `draw-sketchy-diagram/scripts/render.js`), opens the deck in
+the system Chrome (bundled Chromium fallback), waits for MathJax, traverses **every** slide (via
+`Reveal.next()`, covering the vertical content sub-slides under each `#` divider), and **fails
+(`[✗]`) if any slide shows raw backslash-LaTeX** (`\hat`, `\(`, …); it exits 0 only when all math
+rendered. If Playwright/Chrome is unavailable (exit 3), mark Layer C `[~]` and fall back to a
+manual eyeball — open the deck and confirm `$\hat\alpha$` shows as α̂, not `\hat\alpha` (bootstrap
+per `.claude/skills/review-app/references/headless-browser.md`). **Never commit with raw LaTeX.**
 
 ---
 

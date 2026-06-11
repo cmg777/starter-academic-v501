@@ -5,18 +5,46 @@
 // leaves the spans as raw `\hat\alpha`, which the static test happily passes. This drives a real
 // browser and fails if ANY slide shows raw backslash-LaTeX.
 //
-// Usage:
-//   NODE_PATH=<dir containing node_modules/playwright> node math-check.cjs <abs path to index.html>
-// Playwright is often only in the npx cache; find it with:
-//   find "$HOME/.npm/_npx" -path '*node_modules/playwright/package.json' | head -1
-// then NODE_PATH=<that .../node_modules>. Uses the system Chrome (channel:'chrome'); falls back
-// to Playwright's bundled Chromium if present.
+// Usage (no NODE_PATH needed — Playwright is auto-located):
+//   node math-check.cjs <abs path to index.html>
+// First run only, if Playwright is missing:  npx playwright install chromium
+// Uses the system Chrome (channel:'chrome'); falls back to Playwright's bundled Chromium.
 
-const { chromium } = require("playwright");
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
+const { execSync } = require("child_process");
+const { createRequire } = require("module");
+
+// Resolve Playwright from any reachable install (project, every npx cache hash, or global npm
+// root) — hash-agnostic, so no NODE_PATH hunting. Mirrors draw-sketchy-diagram/scripts/render.js.
+function loadChromium() {
+  try { return require("playwright").chromium; } catch (_) {}
+  try { return require("playwright-core").chromium; } catch (_) {}
+  const candidates = [];
+  const npxRoot = path.join(os.homedir(), ".npm", "_npx");
+  if (fs.existsSync(npxRoot)) {
+    for (const sub of fs.readdirSync(npxRoot)) candidates.push(path.join(npxRoot, sub, "node_modules"));
+  }
+  try {
+    const globalRoot = execSync("npm root -g", { encoding: "utf8" }).trim();
+    if (globalRoot) candidates.push(globalRoot);
+  } catch (_) {}
+  for (const nm of candidates) {
+    if (!fs.existsSync(path.join(nm, "playwright", "package.json"))) continue;
+    try { return createRequire(path.join(nm, "_anchor.js"))("playwright").chromium; } catch (_) {}
+  }
+  return null;
+}
 
 (async () => {
   const file = process.argv[2];
   if (!file) { console.error("usage: node math-check.cjs <abs index.html>"); process.exit(2); }
+  const chromium = loadChromium();
+  if (!chromium) {
+    console.error("[✗] Playwright not found. Run: npx playwright install chromium");
+    process.exit(3);
+  }
   let browser;
   try { browser = await chromium.launch({ channel: "chrome" }); }
   catch { try { browser = await chromium.launch(); }

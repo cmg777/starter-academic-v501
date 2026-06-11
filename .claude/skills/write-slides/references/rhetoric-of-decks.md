@@ -161,11 +161,11 @@ unchanged; only the mechanics differ.
 | original theme per deck | **fixed site brand** (`site-brand.scss`, never per-deck) |
 | Beamer PDF output | reveal.js HTML (menu/chalkboard/speaker view); manual `?print-pdf` for a handout |
 
-**Escaping note.** A `.qmd` is processed by **Pandoc, not Goldmark**, so the project's
-`index.md` escaping rules do **not** apply — write **plain LaTeX** in the deck:
-`$\hat\beta_j$`, `$\|y-X\beta\|_2^2$`, `$5` for currency, single backslashes, raw underscores.
-When porting an equation out of `index.md`, **drop** its Goldmark escaping (`\\$ → $`,
-`\_ → _`, `\\| → \|`). MathJax's macro set still applies (see `render-and-fix.md` §7).
+**Escaping note.** A `.qmd` is **Pandoc, not Goldmark** — write **plain LaTeX** (single
+backslashes, raw underscores, `$5` for currency, e.g. `$\hat\beta_j$`, `$\|y-X\beta\|_2^2$`) and
+**drop** any `index.md` Goldmark escaping when porting an equation. The full conversion table is
+the canonical `slide-mapping.md §Porting equations`; MathJax's macro set still applies
+(`render-and-fix.md §7`).
 
 ---
 

@@ -15,12 +15,10 @@ Conventions:
 - Reveal one step at a time: `. . .` (a pause between blocks), `::: {.incremental}` (a list),
   or `{.fragment}` on a span/element.
 - Figures use a relative path up to the post bundle: `![caption](../<slug>_fig.png)`.
-- **Math: write LaTeX, never literal Unicode.** `α̂ → $\hat\alpha$`, `λ → $\lambda$`,
-  `β → $\beta$`, `|I_d| → $|I_d|$`, `± → $\pm$`, `≈ → $\approx$`. **Mixed numbers:** full math in
-  captions/bullets/comments/labels (`$\hat\alpha = -0.096$`), but keep the orange `[…]{.key}`
-  cells and the giant `[…]{.bignum}` as **styled text** (math drops their colour/size). **Notes
-  stay Unicode** — the speaker-notes window doesn't run the math renderer. (MathJax — Quarto
-  revealjs's default, from a CDN; no Goldmark escaping here — this is a `.qmd`, not `index.md`.)
+- **Math: write LaTeX, never literal Unicode** (`α̂ → $\hat\alpha$`, `± → $\pm$`). The full rules
+  — the Unicode→LaTeX table, **mixed numbers** (keep `[…]{.key}`/`[…]{.bignum}` as styled text),
+  and **notes stay Unicode** — are the canonical `slide-mapping.md §Math symbols → LaTeX`. (MathJax
+  is the engine; no Goldmark escaping here — this is a `.qmd`, not `index.md`.)
 
 ---
 

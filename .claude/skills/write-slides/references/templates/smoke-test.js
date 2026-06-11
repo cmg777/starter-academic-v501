@@ -43,6 +43,17 @@ if (html !== null) {
   check("menu plugin enabled", /menu/i.test(html));
   check("speaker notes present", /class="notes"/.test(html));
 
+  // 3b. math engine sanity — catches the `html-math-method: katex` misconfig that ships raw
+  //     LaTeX. MathJax emits `class="math inline">\(…`; broken KaTeX emits `…">\hat…`. This is
+  //     a delimiter check only — runtime rendering is Layer C (the browser math-check.cjs).
+  const mathSpans = (html.match(/class="math (inline|display)"/g) || []).length;
+  if (mathSpans > 0) {
+    check("math: MathJax engine referenced",
+          /mathjax|tex-chtml|MathJax\.js/i.test(html), `${mathSpans} math span(s)`);
+    check("math: spans use MathJax \\(…\\) delimiters, not raw \\command",
+          !/class="math (inline|display)">\\[a-zA-Z]/.test(html));
+  }
+
   // 4. brand dividers / dark slides
   const bg = (html.match(/data-background-color=/g) || []).length;
   check("≥1 brand divider / dark slide (data-background-color)", bg >= 1, `${bg} found`);
