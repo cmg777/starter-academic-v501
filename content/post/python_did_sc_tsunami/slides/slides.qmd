@@ -42,14 +42,14 @@ format:
 
 ## A magnitude-9.1 quake, a wave 9 km inland, and ~130,000 lives lost in one province
 
-On 26 December 2004 a tsunami flooded a third of Aceh's coastline. Then something unusual followed: the **largest reconstruction effort ever** aimed at a developing-world disaster — about **USD 7.0 billion spent**, through a low-corruption agency.
+A third of Aceh's coastline, flooded in one morning. Then the **largest disaster-reconstruction effort ever** — about **USD 7.0 billion**, well spent.
 
 . . .
 
-So, a decade later: was Aceh **richer or poorer** than it would have been without the wave? *Catastrophe destroys; well-spent aid rebuilds. Which force won?*
+A decade later: was Aceh **richer or poorer** than without the wave?
 
 ::: {.notes}
-The hook is the genuine ambiguity. Disasters destroy capital and people, but Aceh received aid worth roughly 150% of its damages, spent unusually well. The point of the talk is not just "what happened" but "how could you ever measure it credibly".
+The hook is the genuine ambiguity. Catastrophe destroys; well-spent aid rebuilds — which force won? The aid came through an unusually low-corruption agency, worth roughly 150% of Aceh's damages, spent unusually well. The point of the talk is not just "what happened" but "how could you ever measure it credibly".
 :::
 
 ## You only ever observe the world where the tsunami *did* happen
@@ -125,7 +125,9 @@ $$\widehat{\text{DiD}} = \big(\bar{g}_{\text{treat, after}} - \bar{g}_{\text{tre
 
 . . .
 
-That pooled number is **+0.0125, insignificant** (p = 0.38) — because one "after" window blends the **2005 destruction** with the **2006–08 boom**, and they nearly cancel.
+Pooled DiD: **+0.0125**, insignificant (p = 0.38).
+
+One "after" blends the **2005 crash** with the **2006–08 boom** — they cancel.
 
 ::: {.notes}
 The pooled estimate is not wrong, it is uninformative. The fix is to let the effect vary over time — split the post period into event-time windows. That is the paper's headline specification.
@@ -146,7 +148,7 @@ m.coef().round(4)   # D_2005 = −0.0792 · D_recov = +0.0628
 | Recovery (2006–08) | [+0.0628]{.key} | 0.0244 | \*\* |
 | Post-recovery (2009–12) | +0.0114 | 0.0146 | ns |
 
-[Flat pre-trend → parallel trends passes; the gain neither evaporates nor compounds → a *permanently higher* path.]{.comment}
+[Flat pre-trend → parallel trends holds. The gain persists but doesn't compound → a *permanently higher* path.]{.comment}
 
 ::: {.notes}
 Three takeaways. The pre-tsunami coefficient is small and insignificant — parallel trends survives its formal placebo. The 2005 coefficient is −0.0792 (≈ 8% slower the year the wave hit). The recovery coefficient is +0.0628; three years of that premium more than erase the one-year loss. This is the paper's signature "recovery beyond the counterfactual trend".
@@ -192,7 +194,7 @@ Synthetic control picks non-negative weights $w$ that sum to one to minimize pre
 
 $$w^{\ast} = \arg\min_{w}\ (X_1 - X_0 w)^{\top} V (X_1 - X_0 w) \quad \text{s.t.}\quad w_j \ge 0,\ \textstyle\sum_j w_j = 1$$
 
-![Actual flooded Aceh vs synthetic Aceh: the synthetic line shadows the treated path before 2005 (pre-RMSE 0.485), then the actual line pulls clearly above.](../python_did_sc_tsunami_synthetic_control.png)
+![Synthetic Aceh tracks the real path before 2005 (pre-RMSE 0.485); afterward the actual line pulls above.](../python_did_sc_tsunami_synthetic_control.png)
 
 ::: {.notes}
 A pre-RMSE of 0.485 against GDP levels near 200 means synthetic Aceh shadows the real thing almost perfectly before 2005 — which is what licenses trusting it as a counterfactual afterward. The top weight is only 0.13; the counterfactual rests on many modest donors, not one look-alike.
@@ -257,7 +259,9 @@ The lesson is **not** "disasters are good" — 130,000 people died. It is that a
 
 . . .
 
-Aceh received aid worth ≈ **150% of its damages**, through a low-corruption agency, rebuilt "better than before." *That combination — not the wave — bent the growth path upward.*
+Aid ≈ **150% of damages** · low-corruption agency · "built back better."
+
+*That combination — not the wave — bent the path upward.*
 
 ::: {.notes}
 For disaster policy the design lesson matters as much as the result: a credible evaluation needs exogenous exposure (geography, not choice), a finer-than-national unit of analysis, and spatially honest standard errors.
@@ -269,7 +273,11 @@ For disaster policy the design lesson matters as much as the result: a credible 
 
 . . .
 
-[Response.]{.rebuttal} The synthetic data are *calibrated* to the paper's signs, significance, and magnitudes (audited column by column). And the small-N fragility is met head-on: a **flat pre-trend**, a **null neighbour placebo**, and **Conley-HAC** errors that already price in the clustering. The caveats narrow the claim — they do not overturn it.
+[Response.]{.rebuttal}
+
+- Synthetic data are *calibrated* to the paper — audited column by column.
+- Small-N met head-on: **flat pre-trend**, **null placebo**, **Conley-HAC** errors.
+- Caveats narrow the claim — they don't overturn it.
 
 ::: {.notes}
 Steelman first: this is a single, exceptionally well-funded case study on simulated data with a tiny treatment group. The honest reply is that every credibility check — placebo, pre-trend, spatial inference — has been run and survived, and the conclusion is stated as evidence about well-governed mega-reconstruction, not disaster aid in general.

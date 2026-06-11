@@ -6,8 +6,8 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.37">
 
   <meta name="dcterms.date" content="2026-06-11">
   <title>Bouncing Back Better?</title>
@@ -17,6 +17,9 @@
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
   <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -95,7 +98,7 @@
     code span.vs { color: #032f62; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-f8a16d63170f62ba6229f8000d3e1445.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -213,11 +216,11 @@
 </section>
 <section id="a-magnitude-9.1-quake-a-wave-9-km-inland-and-130000-lives-lost-in-one-province" class="slide level2 center">
 <h2>A magnitude-9.1 quake, a wave 9 km inland, and ~130,000 lives lost in one province</h2>
-<p>On 26 December 2004 a tsunami flooded a third of Aceh’s coastline. Then something unusual followed: the <strong>largest reconstruction effort ever</strong> aimed at a developing-world disaster — about <strong>USD 7.0 billion spent</strong>, through a low-corruption agency.</p>
+<p>A third of Aceh’s coastline, flooded in one morning. Then the <strong>largest disaster-reconstruction effort ever</strong> — about <strong>USD 7.0 billion</strong>, well spent.</p>
 <div class="fragment">
-<p>So, a decade later: was Aceh <strong>richer or poorer</strong> than it would have been without the wave? <em>Catastrophe destroys; well-spent aid rebuilds. Which force won?</em></p>
+<p>A decade later: was Aceh <strong>richer or poorer</strong> than without the wave?</p>
 <aside class="notes">
-<p>The hook is the genuine ambiguity. Disasters destroy capital and people, but Aceh received aid worth roughly 150% of its damages, spent unusually well. The point of the talk is not just “what happened” but “how could you ever measure it credibly”.</p>
+<p>The hook is the genuine ambiguity. Catastrophe destroys; well-spent aid rebuilds — which force won? The aid came through an unusually low-corruption agency, worth roughly 150% of Aceh’s damages, spent unusually well. The point of the talk is not just “what happened” but “how could you ever measure it credibly”.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -335,7 +338,8 @@
 <p>The simplest DiD splits time into before/after and takes the difference of the two changes:</p>
 <p><span class="math display">\[\widehat{\text{DiD}} = \big(\bar{g}_{\text{treat, after}} - \bar{g}_{\text{treat, before}}\big) - \big(\bar{g}_{\text{ctrl, after}} - \bar{g}_{\text{ctrl, before}}\big)\]</span></p>
 <div class="fragment">
-<p>That pooled number is <strong>+0.0125, insignificant</strong> (p = 0.38) — because one “after” window blends the <strong>2005 destruction</strong> with the <strong>2006–08 boom</strong>, and they nearly cancel.</p>
+<p>Pooled DiD: <strong>+0.0125</strong>, insignificant (p = 0.38).</p>
+<p>One “after” blends the <strong>2005 crash</strong> with the <strong>2006–08 boom</strong> — they cancel.</p>
 <aside class="notes">
 <p>The pooled estimate is not wrong, it is uninformative. The fix is to let the effect vary over time — split the post period into event-time windows. That is the paper’s headline specification.</p>
 <style type="text/css">
@@ -392,7 +396,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Flat pre-trend → parallel trends passes; the gain neither evaporates nor compounds → a <em>permanently higher</em> path.</span></p>
+<p><span class="comment">Flat pre-trend → parallel trends holds. The gain persists but doesn’t compound → a <em>permanently higher</em> path.</span></p>
 <aside class="notes">
 <p>Three takeaways. The pre-tsunami coefficient is small and insignificant — parallel trends survives its formal placebo. The 2005 coefficient is −0.0792 (≈ 8% slower the year the wave hit). The recovery coefficient is +0.0628; three years of that premium more than erase the one-year loss. This is the paper’s signature “recovery beyond the counterfactual trend”.</p>
 <style type="text/css">
@@ -497,7 +501,7 @@
 <p>Synthetic control picks non-negative weights <span class="math inline">\(w\)</span> that sum to one to minimize pre-treatment mismatch:</p>
 <p><span class="math display">\[w^{\ast} = \arg\min_{w}\ (X_1 - X_0 w)^{\top} V (X_1 - X_0 w) \quad \text{s.t.}\quad w_j \ge 0,\ \textstyle\sum_j w_j = 1\]</span></p>
 
-<img data-src="../python_did_sc_tsunami_synthetic_control.png" class="r-stretch quarto-figure-center"><p class="caption">Actual flooded Aceh vs synthetic Aceh: the synthetic line shadows the treated path before 2005 (pre-RMSE 0.485), then the actual line pulls clearly above.</p><aside class="notes">
+<img data-src="../python_did_sc_tsunami_synthetic_control.png" class="r-stretch quarto-figure-center"><p class="caption">Synthetic Aceh tracks the real path before 2005 (pre-RMSE 0.485); afterward the actual line pulls above.</p><aside class="notes">
 <p>A pre-RMSE of 0.485 against GDP levels near 200 means synthetic Aceh shadows the real thing almost perfectly before 2005 — which is what licenses trusting it as a counterfactual afterward. The top weight is only 0.13; the counterfactual rests on many modest donors, not one look-alike.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -617,7 +621,8 @@
 <h2>Well-governed mega-reconstruction can bend a poor region’s path upward</h2>
 <p>The lesson is <strong>not</strong> “disasters are good” — 130,000 people died. It is that a localized catastrophe followed by <strong>large, well-spent aid</strong> can leave a poor region permanently better off.</p>
 <div class="fragment">
-<p>Aceh received aid worth ≈ <strong>150% of its damages</strong>, through a low-corruption agency, rebuilt “better than before.” <em>That combination — not the wave — bent the growth path upward.</em></p>
+<p>Aid ≈ <strong>150% of damages</strong> · low-corruption agency · “built back better.”</p>
+<p><em>That combination — not the wave — bent the path upward.</em></p>
 <aside class="notes">
 <p>For disaster policy the design lesson matters as much as the result: a credible evaluation needs exogenous exposure (geography, not choice), a finer-than-national unit of analysis, and spatially honest standard errors.</p>
 <style type="text/css">
@@ -637,7 +642,12 @@
 <h2>The strongest objection — and the answer</h2>
 <p><span class="objection">Objection.</span> The data are <strong>synthetic</strong>, and there are only <strong>10 treated districts</strong> — point estimates are fragile, standard errors wide.</p>
 <div class="fragment">
-<p><span class="rebuttal">Response.</span> The synthetic data are <em>calibrated</em> to the paper’s signs, significance, and magnitudes (audited column by column). And the small-N fragility is met head-on: a <strong>flat pre-trend</strong>, a <strong>null neighbour placebo</strong>, and <strong>Conley-HAC</strong> errors that already price in the clustering. The caveats narrow the claim — they do not overturn it.</p>
+<p><span class="rebuttal">Response.</span></p>
+<ul>
+<li>Synthetic data are <em>calibrated</em> to the paper — audited column by column.</li>
+<li>Small-N met head-on: <strong>flat pre-trend</strong>, <strong>null placebo</strong>, <strong>Conley-HAC</strong> errors.</li>
+<li>Caveats narrow the claim — they don’t overturn it.</li>
+</ul>
 <aside class="notes">
 <p>Steelman first: this is a single, exceptionally well-funded case study on simulated data with a tiny treatment group. The honest reply is that every credibility check — placebo, pre-trend, spatial inference — has been run and survived, and the conclusion is stated as evidence about well-governed mega-reconstruction, not disaster aid in general.</p>
 <style type="text/css">
