@@ -15,25 +15,36 @@ Conventions:
 - Reveal one step at a time: `. . .` (a pause between blocks), `::: {.incremental}` (a list),
   or `{.fragment}` on a span/element.
 - Figures use a relative path up to the post bundle: `![caption](../<slug>_fig.png)`.
-- Plain LaTeX for math (`$…$`, `$$…$$`) — no Goldmark escaping (this is a `.qmd`, not `index.md`).
+- **Math: write LaTeX, never literal Unicode.** `α̂ → $\hat\alpha$`, `λ → $\lambda$`,
+  `β → $\beta$`, `|I_d| → $|I_d|$`, `± → $\pm$`, `≈ → $\approx$`. **Mixed numbers:** full math in
+  captions/bullets/comments/labels (`$\hat\alpha = -0.096$`), but keep the orange `[…]{.key}`
+  cells and the giant `[…]{.bignum}` as **styled text** (math drops their colour/size). **Notes
+  stay Unicode** — the speaker-notes window doesn't run the math renderer. (KaTeX from a pinned
+  CDN; no Goldmark escaping here — this is a `.qmd`, not `index.md`.)
 
 ---
 
 ## 1. Title  — front matter only (no body slide)
 
-Quarto auto-generates the title slide from the front matter; the custom `title-slide.html`
-partial adds the **key-result number strip**. Just fill the front matter:
+Quarto builds the title slide from the front matter via the custom `title-slide.html` partial,
+which renders — in order — the title, subtitle, the **key-result number strip**, then the
+**hyperlinked author**, the **university**, and the **date**. Fill the front matter:
 ```yaml
 title: "DECK TITLE"
 subtitle: "ONE-LINE FRAMING"
-author: "Carlos Mendez · Nagoya University (GSID)"
-date: "YYYY-MM-DD"
+deck-author: "Carlos Mendez"                   # author name (rendered as a link)
+deck-author-url: "https://carlos-mendez.org"   # author homepage
+institute: "Nagoya University (GSID)"          # the university line
+date: today                                    # auto-stamps the render/update date
+date-format: long                              # renders "June 11, 2026"
 key-results:                 # 3 headline numbers → the centred brand-coloured strip
   - { num: "−0.096", cap: "rigorous Double-LASSO" }
   - { num: "+0.019", cap: "cross-validated · sign flip" }
   - { num: "284",    cap: "candidate controls" }
 ```
-**Use:** always. No `#`/`##` for it — it is the rendered title slide.
+**Use:** always. No `#`/`##` for it — it is the rendered title slide. (`deck-author` /
+`deck-author-url` are custom fields the partial reads; Quarto's structured `author:` schema
+doesn't expose name+url cleanly in the revealjs title-slide partial, so we bypass it.)
 
 ---
 
@@ -106,7 +117,7 @@ sizing. One figure, one message. The alt/caption is the reading aid; the `##` is
 ```markdown
 ## WHAT THE TABLE PROVES
 
-| COL A | α̂ | SE | Sig.? |
+| COL A | $\hat\alpha$ | SE | Sig.? |
 |---|---:|---:|:--:|
 | ROW 1 | [HEADLINE NUMBER]{.key} | 0.034 | yes |
 | ROW 2 | −0.108 | 0.022 | yes |
@@ -201,7 +212,7 @@ objection (orange), then answer (teal).
 
 [−0.096]{.bignum}
 
-[α̂ on the treatment, rigorous Double-LASSO (SE 0.034)]{.bignum-label}
+[$\hat\alpha$ on the treatment, rigorous Double-LASSO (SE 0.034)]{.bignum-label}
 ```
 **Use:** the Act-III payoff. One giant number + one line on a dark slide (reveal auto-flips
 text to light via `has-dark-background`; the theme makes `.bignum` teal there). The number

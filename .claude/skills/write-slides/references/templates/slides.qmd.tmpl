@@ -1,8 +1,11 @@
 ---
 title: "{{TITLE}}"
 subtitle: "{{SUBTITLE}}"
-author: "{{AUTHOR}}"
-date: "{{DATE}}"
+deck-author: "{{AUTHOR}}"           # title-slide author name (hyperlinked below)
+deck-author-url: "{{AUTHOR_URL}}"   # the author's homepage, e.g. https://carlos-mendez.org
+institute: "{{INSTITUTE}}"          # the university line, e.g. Nagoya University (GSID)
+date: today                         # auto-stamps the render/update date ("created or updated")
+date-format: long                   # renders e.g. "June 11, 2026"
 key-results:                  # the title-slide number strip — 3 headline numbers (from results_report.md)
 {{KEY_RESULTS}}               #   - num: "−0.096"
                               #     cap: "rigorous Double-LASSO"
@@ -29,6 +32,11 @@ format:
     fig-align: center         # + auto-stretch (default on) bounds images to the slide → no overflow
     auto-stretch: true
     highlight-style: github
+    # KaTeX renders the LaTeX math. NOTE: Quarto loads KaTeX from a CDN (pinned here);
+    # reveal.js itself is bundled locally in slides_files/. Math needs network.
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.16.21/dist"
     link-external-icon: false
 ---
 

@@ -67,16 +67,23 @@ The validated block lives in `templates/slides.qmd.tmpl`. Key options:
 
 - **Slides:** `##` = a content slide (its heading is the assertion title); `#` = a section
   divider. See `slide-archetypes.md`.
-- **Math:** plain LaTeX `$…$` / `$$…$$` (Pandoc + KaTeX). **No Goldmark** here, so the
-  `index.md` escaping rules (`\\$`, `\_`) do **not** apply — write normal LaTeX.
+- **Math:** write **LaTeX, never literal Unicode** (`$\hat\alpha$` not `α̂`, `$\lambda$` not
+  `λ`, `$|I_d|$`, `$\pm$`). Rendered by **KaTeX loaded from a pinned CDN** (the
+  `html-math-method` block in the front matter; reveal.js itself is local, but math needs a
+  network). **No Goldmark** here, so the `index.md` escaping rules (`\\$`, `\_`) do **not**
+  apply. **Mixed numbers** — full math in captions/bullets/labels, but keep `[…]{.key}` /
+  `[…]{.bignum}` as styled text; **notes stay Unicode** (the notes window doesn't render math).
+  See `slide-mapping.md`.
 - **Code:** ` ``` {.r code-line-numbers="2-3|5"} ` highlights (without executing) and reveals
   line-groups as fragments. Use `.r` / `.python` / `.stata`.
 - **Figures:** `![caption](../<slug>_fig.png)` — `auto-stretch` bounds, `fig-align` centres.
 - **Columns:** `:::: {.columns} ::: {.column width="50%"} … ::: ::::`.
 - **Speaker notes:** `::: {.notes} … :::`.
 - **Reveals:** `. . .` (pause), `::: {.incremental}` (list), `{.fragment}` (element).
-- **Title strip:** front-matter `key-results:` (a list of `{num, cap}`) → the partial renders
-  a centred `.title-result-strip`; the theme colours the three numbers orange/teal/steel.
+- **Title slide:** the partial renders title → subtitle → the **key-result strip** (front-matter
+  `key-results:`, a list of `{num, cap}`; theme colours the three numbers orange/teal/steel) →
+  the **hyperlinked author** (`deck-author` + `deck-author-url`) → the **university**
+  (`institute`) → the **date** (`date: today`, `date-format: long`).
 - **Dividers / dark slides:** `{.divider background-color="#…"}` (white centred) or
   `{background-color="#141413"}` (reveal auto-adds `has-dark-background`; the theme flips text
   to light).
@@ -90,7 +97,7 @@ The validated block lives in `templates/slides.qmd.tmpl`. Key options:
 | Title slide has a key visual | `title-slide.html` partial + `key-results` → the number strip |
 | Figures respect slide margins | Quarto **`auto-stretch`** (default) + `fig-align: center` + a `max-width:100%` SCSS guard — **no viewport units** |
 | Section dividers centred (middle of slide) | `center: true` + `.divider` class on the `#` heading |
-| Strategic white space; centred figures/tables/captions | `center: true` (block centred) + SCSS centres `figcaption`/`.comment`; lists stay left |
+| Strategic white space; centred figures/tables/captions | `center: true` (block centred) + SCSS centres `figcaption` and makes `.comment` a centred **`display:block`** (a `[…]{.comment}` span is inline, so it needs block to centre); lists stay left |
 
 ---
 

@@ -1,8 +1,11 @@
 ---
 title: "Double LASSO for Causal Inference"
 subtitle: "Does abortion reduce crime? A disciplined replication"
-author: "Carlos Mendez · Nagoya University (GSID)"
-date: "2026-05-21"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
 key-results:
   - num: "−0.096"
     cap: "rigorous Double-LASSO"
@@ -33,6 +36,11 @@ format:
     fig-align: center
     auto-stretch: true
     highlight-style: github
+    # KaTeX renders the LaTeX. NOTE: Quarto loads KaTeX from a CDN (pinned here);
+    # reveal.js itself is bundled locally in slides_files/. Math needs network.
+    html-math-method:
+      method: katex
+      url: "https://cdn.jsdelivr.net/npm/katex@0.16.21/dist"
     link-external-icon: false
 ---
 
@@ -54,7 +62,7 @@ This is the central tension of high-dimensional causal inference: variable selec
 
 ## Five estimators, three crimes — wildly different answers from one dataset
 
-![α̂ ± 95% CI · First-diff, kitchen-sink OLS, PSL, Double-LASSO (rigorous), Double-LASSO (CV). Dashed line = zero.](../r_double_lasso_estimates.png)
+![$\hat\alpha \pm 95\%$ CI · First-diff, kitchen-sink OLS, PSL, Double-LASSO (rigorous), Double-LASSO (CV). Dashed line = zero.](../r_double_lasso_estimates.png)
 
 ::: {.notes}
 Spoiler figure. Don't explain every bar yet — just plant that the estimators disagree, sometimes flipping sign. We earn each one in Act II and come back to this picture.
@@ -81,7 +89,7 @@ Spoiler figure. Don't explain every bar yet — just plant that the estimators d
 - **Controls** — 8 original covariates expanded to **284** (lags, interactions, trends)
 :::
 
-[State fixed effects absorbed by first-differencing; year effects partialled out (Frisch–Waugh–Lovell). p/n ≈ 0.49 — the high-dimensional regime where Double LASSO is meant to help.]{.comment}
+[State fixed effects absorbed by first-differencing; year effects partialled out (Frisch–Waugh–Lovell). $p/n \approx 0.49$ — the high-dimensional regime where Double LASSO is meant to help.]{.comment}
 
 ## Five estimators ask the same question with escalating discipline
 
@@ -95,7 +103,7 @@ Spoiler figure. Don't explain every bar yet — just plant that the estimators d
 
 ## With zero controls, more abortion tracks less crime: −0.152
 
-| Outcome | α̂ | SE | Sig. 5%? |
+| Outcome | $\hat\alpha$ | SE | Sig. 5%? |
 |---|---:|---:|:--:|
 | Violent | [−0.152]{.key} | 0.034 | yes |
 | Property | −0.108 | 0.022 | yes |
@@ -111,7 +119,7 @@ All three negative and significant with state-clustered standard errors (48 clus
 
 [+2.34]{.bignum}
 
-[Kitchen-sink OLS, murder (α̂); violent crime *flips sign* to +0.014]{.bignum-label}
+[Kitchen-sink OLS, murder ($\hat\alpha$); violent crime *flips sign* to +0.014]{.bignum-label}
 
 ::: {.notes}
 p = 284 < n = 576, so OLS technically inverts — but near-collinear controls make the estimate nonsense and the SEs balloon (R silently drops 3 rank-deficient columns). The cautionary tale that motivates disciplined selection.
@@ -146,30 +154,30 @@ coeftest(fit, vcov = vcovCL, cluster = state)["d", ]
 
 ## Theory keeps 8 controls; cross-validation keeps 150
 
-![|I_y|, |I_d|, intersection, union out of 284 candidates — rigorous (teal) vs CV (orange).](../r_double_lasso_selection.png)
+![$|I_y|$, $|I_d|$, intersection, union out of 284 candidates — rigorous (teal) vs CV (orange).](../r_double_lasso_selection.png)
 
 ::: {.notes}
 For violent crime the rigorous union is 8; the CV union is 150 — twenty times more. |I_y| = 0 for violent and murder: no control predicts crime well enough to survive the rigorous threshold, while |I_d| = 8–9 says abortion is predictable. That asymmetry is exactly when DL helps most.
 :::
 
-## Theory-tuned λ protects the causal signal; prediction-tuned λ flips it
+## Theory-tuned $\lambda$ protects the causal signal; prediction-tuned $\lambda$ flips it
 
 :::: {.columns}
 ::: {.column width="50%"}
 ### Rigorous (theory)
 
-- λ from Belloni et al. theory
+- $\lambda$ from Belloni et al. theory
 - 8–12 controls kept
-- violent α̂ = **−0.096**
+- violent $\hat\alpha = -0.096$
 - selection matches the paper exactly
 :::
 ::: {.column width="50%"}
 ### CV (prediction)
 
-- λ minimises prediction MSE
+- $\lambda$ minimises prediction MSE
 - 109–161 controls kept
-- violent α̂ = **+0.019** (sign flip)
-- murder α̂ = **−1.11** (explodes)
+- violent $\hat\alpha = +0.019$ (sign flip)
+- murder $\hat\alpha = -1.11$ (explodes)
 :::
 ::::
 
@@ -177,9 +185,9 @@ For violent crime the rigorous union is 8; the CV union is 150 — twenty times 
 Same three-step recipe, same data — only λ differs. CV optimises prediction, so it includes marginally-useful controls; cumulatively they soak up the treatment's variation.
 :::
 
-## Cross-validation's λ is so small that 143 of 284 controls survive
+## Cross-validation's $\lambda$ is so small that 143 of 284 controls survive
 
-![Coefficient paths, d-equation (violent panel). Dashed line = log(λ.min); 143 paths nonzero there.](../r_double_lasso_paths.png)
+![Coefficient paths, $d$-equation (violent panel). Dashed line = $\log(\lambda_{\min})$; 143 paths nonzero there.](../r_double_lasso_paths.png)
 
 ::: {.notes}
 Even in the treatment equation alone, CV's MSE-optimal λ keeps 143 controls. Prediction-optimal is not selection-optimal for a causal target — the whole lesson in one picture.
@@ -193,7 +201,7 @@ Even in the treatment equation alone, CV's MSE-optimal λ keeps 143 controls. Pr
 
 [−0.096]{.bignum}
 
-[α̂, rigorous Double-LASSO (SE 0.051) · matches the paper's −0.104; selection counts match exactly]{.bignum-label}
+[$\hat\alpha$, rigorous Double-LASSO (SE 0.051) · matches the paper's −0.104; selection counts match exactly]{.bignum-label}
 
 ::: {.notes}
 Between the no-controls baseline (−0.152) and the kitchen-sink mess (+0.014), the rigorous DL lands at −0.096 off just 8 controls. The 95% CI [−0.197, +0.004] barely contains zero — one notch below 5% significance, an honest result.
@@ -205,7 +213,7 @@ Between the no-controls baseline (−0.152) and the kitchen-sink mess (+0.014), 
 
 . . .
 
-[Response.]{.rebuttal} Correct. α is identified only under **conditional independence given X** and **parallel trends**. LASSO just chooses controls flexibly; it can't rule out collider bias or bias amplification. The paper evaluates a *method*, not the abortion–crime claim.
+[Response.]{.rebuttal} Correct. $\alpha$ is identified only under **conditional independence given X** and **parallel trends**. LASSO just chooses controls flexibly; it can't rule out collider bias or bias amplification. The paper evaluates a *method*, not the abortion–crime claim.
 
 ::: {.notes}
 Steelman, don't strawman. DL disciplines selection; it does not relax the identifying assumptions. Fitzgerald et al. explicitly disclaim a substantive causal reading.

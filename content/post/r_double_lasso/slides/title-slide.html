@@ -10,9 +10,9 @@ $for(key-results)$
 $endfor$
   </div>
 $endif$
-$for(author)$
-  <p class="author">$author$</p>
-$endfor$
+$if(deck-author)$
+  <p class="author">$if(deck-author-url)$<a href="$deck-author-url$">$deck-author$</a>$else$$deck-author$$endif$</p>
+$endif$
 $for(institute)$
   <p class="institute">$institute$</p>
 $endfor$

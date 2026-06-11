@@ -200,14 +200,17 @@ before `y`.
 Copy unchanged from `references/templates/`: **`site-brand.scss`** and **`title-slide.html`**.
 
 ### 3.3 Author `slides.qmd`
-Start from `references/templates/slides.qmd.tmpl`. Fill the front matter: `title`/`subtitle`/
-`author`/`date`, and **`key-results:`** (the 3 confirmed headline numbers as `{num, cap}`).
-Write the body from the approved outline using
-[`references/slide-archetypes.md`](references/slide-archetypes.md) +
+Start from `references/templates/slides.qmd.tmpl`. Fill the front matter: `title`/`subtitle`;
+the title-slide **`deck-author`** + **`deck-author-url`** (hyperlinked author), **`institute`**
+(university), **`date: today`** + **`date-format: long`** (auto-stamps the render/update date);
+and **`key-results:`** (the 3 confirmed headline numbers as `{num, cap}`). Write the body from
+the approved outline using [`references/slide-archetypes.md`](references/slide-archetypes.md) +
 [`references/slide-mapping.md`](references/slide-mapping.md): `##` assertion titles; figures
 `![caption](../<slug>_*.png)`; Markdown tables with `[cell]{.key}`; code ` ``` {.r
-code-line-numbers="…"} `; equations `$$…$$` (plain LaTeX — drop Goldmark escaping); columns
-`::: {.columns}`; speaker notes `::: {.notes}`; dividers `# … {.divider background-color="…"}`.
+code-line-numbers="…"} `; equations `$$…$$`; columns `::: {.columns}`; speaker notes
+`::: {.notes}`; dividers `# … {.divider background-color="…"}`. **Write all on-slide math as
+LaTeX `$...$`, never literal Unicode** (`$\hat\alpha$` not `α̂`); Mixed numbers (keep
+`.key`/`.bignum` as styled text); notes stay Unicode (slide-mapping § "Math symbols → LaTeX").
 Run the **MB/MC + one-idea-per-slide pass** (rhetoric-of-decks § MB/MC) before rendering.
 
 ### 3.4 Render

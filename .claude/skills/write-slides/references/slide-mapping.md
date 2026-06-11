@@ -112,6 +112,25 @@ deck's `.qmd` is **Pandoc + KaTeX**, so **drop** that escaping when copying an e
 Inline math `$…$`, display `$$…$$`. Verify visually in the Hugo preview (KaTeX errors render
 red but the smoke test can't catch them — see `render-and-fix.md` §7 for unsupported macros).
 
+## Math symbols → LaTeX (never literal Unicode)
+
+`α̂` (alpha + combining circumflex) and other Unicode math render inconsistently. Convert
+**all on-slide** math symbols to LaTeX `$...$`:
+
+| Unicode | LaTeX | · | Unicode | LaTeX |
+|---|---|---|---|---|
+| `α̂` | `$\hat\alpha$` | · | `±` | `$\pm$` |
+| `α` `β` `λ` `γ` | `$\alpha$` `$\beta$` `$\lambda$` `$\gamma$` | · | `≈` | `$\approx$` |
+| `\|I_y\|` `\|I_d\|` | `$\|I_y\|$` `$\|I_d\|$` | · | `∑` `∈` `∪` | `$\sum$` `$\in$` `$\cup$` |
+
+- **Mixed numbers:** in captions/bullets/comments/labels write the full expression
+  (`violent α̂ = −0.096` → `violent $\hat\alpha = -0.096$`); but keep the orange `[…]{.key}`
+  table cells and the giant `[…]{.bignum}` as **styled text** (math drops their colour/size).
+  Plain standalone numbers (284, 143) stay text.
+- **Notes stay Unicode.** The reveal speaker-notes window doesn't run the math renderer, so
+  LaTeX source would show raw there — keep `α̂` etc. inside `::: {.notes}`.
+- Engine: **KaTeX from a pinned CDN** (reveal.js is bundled locally; math needs a network).
+
 ---
 
 ## Edge cases (full handling in `render-and-fix.md`)
