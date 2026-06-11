@@ -2,7 +2,7 @@
 
 Academic portfolio website for Carlos Mendez (carlos-mendez.org). Built with Hugo + Wowchemy v5 theme, deployed on Netlify.
 
-See @README.md for full documentation of the directory structure, tech stack, and content conventions.
+See `README.md` for human-facing documentation of the directory structure, tech stack, and content conventions.
 
 # Tech Stack
 
@@ -191,7 +191,7 @@ Older Python posts (pre-2025) were evaluated for bundling and **skipped**: they 
 
 # Claude Code Skills
 
-Fifteen skills: ten organized as Write/Review pairs across five artifact stages, plus five standalone companion skills (`write-slides` for a branded Quarto reveal.js slide deck generated from a post, `write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, `translate-content` — the trilingual ES/JA translator documented in the Internationalization (i18n) section below — and `update-author-profile` for tri-lingual author-profile edits/creation). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
+Sixteen skills: twelve organized as Write/Review pairs across six artifact stages (the slide deck gained its `review-slides` partner), plus four standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, `translate-content` — the trilingual ES/JA translator documented in the Internationalization (i18n) section below — and `update-author-profile` for tri-lingual author-profile edits/creation). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
 
 ## Pipeline overview
 
@@ -204,7 +204,7 @@ Fifteen skills: ten organized as Write/Review pairs across five artifact stages,
 | Interactive web app (static HTML/CSS/JS, D3) | `/project:write-app` | `/project:review-app` |
 | Quarto notebook (R/Python/Stata, lighter) | `/project:write-quarto-notebook` | — |
 | Quarto notebook (Python, friction-free bundle) | `/project:write-quarto-notebook-python` | — |
-| Slide deck (Quarto reveal.js) | `/project:write-slides` | — |
+| Slide deck (Quarto reveal.js) | `/project:write-slides` | `/project:review-slides` |
 
 ## Shared conventions
 
@@ -217,270 +217,29 @@ Fifteen skills: ten organized as Write/Review pairs across five artifact stages,
 - Reference posts (Python): `content/post/python_ml_random_forest/index.md` (ML), `content/post/python_dowhy/index.md` (causal inference), `content/post/python_fwl/index.md` (dark theme figures, simulated data), `content/post/python_pyfixest/index.md` (panel data, fixed effects, dark theme figures), `content/post/python_esda2/index.md` (ESDA, spatial autocorrelation, LISA), `content/post/python_mgwr/index.md` (MGWR, spatially varying coefficients)
 - Reference posts (Stata): `content/post/stata_rct/index.md` (RCT with panel data, RA/IPW/DR/DiD/DRDID, Mermaid diagrams, equations with analogies)
 
-## write-script
+## Skills index
+
+Each skill's full documentation (invocation, examples, reference files, conventions) lives in its own `SKILL.md` and is loaded when the skill is invoked — only this one-line index belongs in `CLAUDE.md`.
+
+- `write-script` — `.claude/skills/write-script/SKILL.md` — write and execute a data science script (Python/Stata/R); produces script, execution log, and PNG figures.
+- `review-script` — `.claude/skills/review-script/SKILL.md` — 8-dimension scored review of a script (read-only).
+- `write-results-report` — `.claude/skills/write-results-report/SKILL.md` — execute a script and produce `results_report.md` with structured interpretations.
+- `review-results-report` — `.claude/skills/review-results-report/SKILL.md` — verify results-report accuracy against script output (read-only).
+- `write-post` — `.claude/skills/write-post/SKILL.md` — write a notebook-style blog post (`index.md`); enforces `## Abstract`, sandwich pattern, 8+ interpretations, LaTeX escaping.
+- `review-post` — `.claude/skills/review-post/SKILL.md` — 13-dimension scored review of a post with verdict (read-only).
+- `write-infographic` — `.claude/skills/write-infographic/SKILL.md` — generate a chalkboard-style infographic prompt (full + negative + condensed + panel reference data).
+- `review-infographic` — `.claude/skills/review-infographic/SKILL.md` — cross-check infographic numbers against the source post (read-only).
+- `write-app` — `.claude/skills/write-app/SKILL.md` — generate a 4-tab interactive D3 web app for a post; interview-driven, ships to `content/post/<slug>/web_app/`.
+- `review-app` — `.claude/skills/review-app/SKILL.md` — 10-dimension Playwright-driven audit of a generated web app (read-only).
+- `write-quarto-notebook` — `.claude/skills/write-quarto-notebook/SKILL.md` — generate a `tutorial.qmd` for an R/Python/Stata post (lighter chunk-time install pattern).
+- `write-quarto-notebook-python` — `.claude/skills/write-quarto-notebook-python/SKILL.md` — Python-only friction-free Quarto bundle (hermetic `.venv` + one-click render wrappers + `<slug>.zip`).
+- `write-slides` — `.claude/skills/write-slides/SKILL.md` — generate a branded Quarto reveal.js deck for a post; interview-driven, ships to `content/post/<slug>/slides/`.
+- `review-slides` — `.claude/skills/review-slides/SKILL.md` — read-only 10-dimension scored audit of a write-slides deck (source fidelity, conceptual/technical correctness, title↔body consistency, readability & simplicity, typos, design adherence, branding integrity, accessibility, deliverables); static smoke test + headless browser pass; writes `slides/SLIDES_REVIEW.md`.
+- `translate-content` — `.claude/skills/translate-content/SKILL.md` — trilingual ES/JA translator (see Internationalization (i18n) section below).
+- `update-author-profile` — `.claude/skills/update-author-profile/SKILL.md` — edit/create an author profile with ES + JA counterparts kept in sync.
+
+Legacy skills are preserved at `.claude/skills/legacy/` for reference.
 
-**Location:** `.claude/skills/write-script/SKILL.md`
-
-Write and execute a data science script (Python/Stata/R). Produces the script file, execution_log.txt, and PNG figures. Does NOT write the blog post or results report.
-
-**Invocation:**
-```
-/project:write-script <topic> dataset: <dataset> [references: <URLs>] [language: python|stata|r] [theme: light|dark]
-```
-
-**Examples:**
-```
-/project:write-script double machine learning dataset: DS4Bolivia references: https://docs.doubleml.org/stable/intro/intro.html
-/project:write-script k-means clustering dataset: https://archive.ics.uci.edu/ml/datasets/Iris
-/project:write-script spatial regression in R dataset: PySAL example data
-/project:write-script RCT evaluation in Stata dataset: dataSIM4RCT.dta references: causal.pdf
-```
-
-**Reference files:** `references/data-sources.md`, `references/figure-conventions.md`, `references/causal-inference.md`, `references/script-templates.md`, `references/execution-protocol.md`
-
-## review-script
-
-**Location:** `.claude/skills/review-script/SKILL.md`
-
-Expert review of a data science script. Runs the code, checks output, reviews quality across 8 dimensions (execution, structure, code quality, reproducibility, figures, data handling, statistical correctness, causal inference). Produces a scored review report. Read-only.
-
-**Invocation:**
-```
-/project:review-script <post slug>
-```
-
-**Reference files:** `references/review-checklist.md`, `references/scoring-and-criteria.md`
-
-## write-results-report
-
-**Location:** `.claude/skills/write-results-report/SKILL.md`
-
-Execute a data science script and produce a structured results report (`results_report.md`) with interpretations. Bridges the gap between raw code output and the blog post. Every number gets domain context. At least 5 key findings with specific numbers.
-
-**Invocation:**
-```
-/project:write-results-report <post slug>
-```
-
-**Reference files:** `references/report-structure.md`, `references/interpretation-guide.md`
-
-## review-results-report
-
-**Location:** `.claude/skills/review-results-report/SKILL.md`
-
-Expert review of a results report. Verifies accuracy against script output, checks interpretation quality, validates completeness. Read-only.
-
-**Invocation:**
-```
-/project:review-results-report <post slug>
-```
-
-**Reference files:** `references/review-checklist.md`, `references/scoring-and-criteria.md`
-
-## write-post
-
-**Location:** `.claude/skills/write-post/SKILL.md`
-
-Write a notebook-style data science blog post (`index.md`). Has two modes: (A) consume existing script + results_report.md with real numbers, or (B) standalone with inline code blocks and `[VERIFY]` markers. Enforces sandwich pattern, 8+ interpretations, 3+ figures, LaTeX escaping.
-
-**Invocation:**
-```
-/project:write-post <topic> dataset: <dataset> [references: <URLs>]
-/project:write-post <post slug>
-```
-
-**Examples:**
-```
-/project:write-post double machine learning dataset: DS4Bolivia
-/project:write-post python_doubleml
-/project:write-post k-means clustering dataset: Iris
-```
-
-**Key conventions:**
-- Abstract first: every post opens with a `## Abstract` section (before Overview) — one ~150-250 word paragraph through six beats (motivation → objective → data → methods → results-with-real-numbers → implication), no bold labels, body-only (no `abstract:` front-matter key)
-- Sandwich pattern: explanation -> code -> output -> interpretation
-- At least 8 interpretation paragraphs with specific numeric values
-- At least 2 display-math equations with plain-language explanations and variable mapping
-- `toc: true` and `image.placement: 3` in front matter
-- Beginner accessibility: define jargon, explain "why", analogies, concrete before abstract
-
-**Reference files:** `references/latex-escaping.md`, `references/figure-conventions.md`, `references/causal-inference.md`, `references/front-matter-templates.md`, `references/quality-checklist.md`
-
-## review-post
-
-**Location:** `.claude/skills/review-post/SKILL.md`
-
-Comprehensive review of a data science blog post. Merges deep expert review with final proofreading into one thorough pass across 13 dimensions. Produces a scored report with verdict (ACCEPT / MINOR REVISION / MAJOR REVISION), dimension scores, and priority action items. Supports `focus:` for targeted reviews. Read-only.
-
-**Invocation:**
-```
-/project:review-post <post slug> [focus: code | structure | math | explanations | interpretations | writing | grammar | rigor | images | abstract]
-```
-
-**13 review dimensions:** code execution, front matter & links, markdown structure, code quality, sandwich pattern, beginner accessibility, mathematical equations, interpretations, writing clarity & grammar, academic rigor, narrative flow, images/Mermaid/deliverables, abstract (journal-style `## Abstract` section: present and first, single-paragraph six-beat structure, numbers cross-checked against the post body — mismatch is HIGH).
-
-**Reference files:** `references/report-template.md`, `references/scoring-and-criteria.md`, `references/latex-escaping.md`
-
-## write-infographic
-
-**Location:** `.claude/skills/write-infographic/SKILL.md`
-
-Generate a storyboard-first chalkboard infographic prompt for a blog post. Uses a Story Spine narrative arc and simple sketch metaphors (not precise charts) that Gemini can render well. Produces `infographic_instructions.md` with 4 sections: (A) lean flowing-prose AI image prompt (~800-1,000 words), (B) negative prompt, (C) condensed ~200-word prompt, (D) panel reference data with body text for manual overlay. Confirms Story Spine, story beats, and 3 BIG numbers before generating.
-
-**Invocation:**
-```
-/project:write-infographic <post slug>
-```
-
-**Reference files:** `references/panel-templates.md`, `references/static-sections.md`, `references/visual-metaphor-vocabulary.md`
-
-## review-infographic
-
-**Location:** `.claude/skills/review-infographic/SKILL.md`
-
-Expert review of infographic instructions. Cross-checks every number against the source post, evaluates storyboard coherence and sketch quality (metaphorical vs precise), verifies narrative arc and Story Spine, and suggests variant improvements. Read-only.
-
-**Invocation:**
-```
-/project:review-infographic <post slug>
-```
-
-**Reference files:** `references/review-checklist.md`, `references/panel-templates.md`
-
-## write-quarto-notebook
-
-**Location:** `.claude/skills/write-quarto-notebook/SKILL.md`
-
-Generate a self-contained Quarto notebook (`tutorial.qmd`) from an existing R / Python / Stata post + companion script so readers can render the tutorial locally in Positron or RStudio. Pins exact package versions probed from the developer's machine for reproducibility (R: `pak::pkg_install("pkg@x.y.z")`, Python: `pip install pkg==version`, Stata: not supported by SSC). Renders locally to verify, retries up to 3× with an auto-fix catalog on common errors. Adds a "Quarto (.qmd)" link button to the post's front matter on success.
-
-**Invocation:**
-```
-/project:write-quarto-notebook <post slug> [--no-render] [--no-link]
-```
-
-**Examples:**
-```
-/project:write-quarto-notebook r_causalpolicy_workshop
-/project:write-quarto-notebook python_doubleml
-/project:write-quarto-notebook stata_cate2 --no-render
-```
-
-**Output paths (language-specific):**
-- R → `content/post/<slug>/tutorial.qmd` (theme: darkly)
-- Python → `content/post/<slug>/references/tutorial.qmd` (theme: cosmo, `jupyter: python3`)
-- Stata → `content/post/<slug>/references/tutorial.qmd` (theme: cosmo, `jupyter: nbstata`)
-
-**Reference files:** `references/language-conventions.md`, `references/transformations.md`, `references/render-and-fix.md`, `references/verification-checklist.md`
-
-## write-quarto-notebook-python
-
-**Location:** `.claude/skills/write-quarto-notebook-python/SKILL.md`
-
-Generate a **friction-free Quarto bundle** for an existing Python tutorial post. Beyond `tutorial.qmd`, the bundle ships a hermetic `.venv` bootstrap (`setup_env.py` with preflight + auto-relaunch + kernel registration), responsive-figure CSS, one-click render wrappers (`render.command` for macOS + `render.bat` for Windows), a bundle `README.md`, a `build_bundle.sh` packager, and a downloadable `<slug>.zip`. Probes pinned versions from the dev machine; applies macOS Intel wheel-availability overrides (e.g. `numba==0.62.1` + `llvmlite==0.45.0`) when the script triggers them.
-
-Runs **parallel** to `write-quarto-notebook` — keep the lighter chunk-time-install pattern (`write-quarto-notebook`) for posts where it suffices; use this skill when you want students to download a ZIP, double-click `render.command`, and have it work with no Python-environment debugging.
-
-**Invocation:**
-```
-/project:write-quarto-notebook-python <post slug> [--no-render] [--no-link]
-```
-
-**Examples:**
-```
-/project:write-quarto-notebook-python python_pyfixest
-/project:write-quarto-notebook-python python_pca
-/project:write-quarto-notebook-python python_doubleml --no-render
-```
-
-**Deliverables (always):** `references/tutorial.qmd`, `references/setup_env.py`, `references/_quarto.yml`, `references/render.command`, `references/render.bat`, `references/README.md`, `build_bundle.sh`, `<slug>.zip`, plus the `index.md` link update ("Quarto project (.zip)").
-
-**Reference files:** `references/templates/` (canonical templates for each bundle file), `references/intel-wheel-catalog.md` (last Intel-wheel versions for known problem packages), `references/transformations.md`, `references/render-and-fix.md`, `references/verification-checklist.md`
-
-## write-app
-
-**Location:** `.claude/skills/write-app/SKILL.md`
-
-Generate an interactive, pedagogical web app for an existing post. The skill's signature behaviour is the **interactive interview**: after reading the post's content, data, and main results, it uses `AskUserQuestion` to confirm key takeaways, tab structure, data approach, and performance caps before writing any file. Output is a 4-tab single-page app (HTML + CSS + JS + D3) that ships as `content/post/<slug>/web_app/`, opens from a YAML `Web app` button, and runs entirely client-side on GitHub Pages / Netlify. Validated against `r_double_lasso` (the reference implementation).
-
-**Invocation:**
-```
-/project:write-app <post slug> [--no-link] [--no-verify]
-```
-
-**Examples:**
-```
-/project:write-app r_double_lasso
-/project:write-app python_doubleml
-/project:write-app r_did --no-verify
-```
-
-**Widget archetypes (10):** concept-animation, penalty-slider, forest-plot, dgp-simulator (4 READY); did-event-study, feature-importance, moran-scatter, train-test-split, sensitivity-heatmap, bayesian-posterior (6 STUB). The skill picks 3–4 per post based on topic detection, then confirms in the Phase-2 interview.
-
-**Reference files:** `references/widget-catalog.md`, `references/interview-questions.md`, `references/topic-detection.md`, `references/data-handling.md`, `references/pedagogy-conventions.md`, `references/verification-checklist.md`, `references/render-and-fix.md`, `references/test-cases.md`, `references/templates/` (verbatim JS modules + index.html.tmpl + widgets/).
-
-## review-app
-
-**Location:** `.claude/skills/review-app/SKILL.md`
-
-Comprehensive audit of a generated interactive web app at `content/post/<slug>/web_app/`. Inspects 10 non-overlapping dimensions (file completeness, HTML structure, JS correctness, data contract, accessibility, performance, pedagogy, Hugo integration, visual design, mobile responsiveness). Reuses `write-app`'s `smoke-test.js` under Node `vm`, spins up a Hugo dev server for HTTP-200 checks, then drives a headless Chromium via Playwright across all four tabs in both desktop (1280×800) and mobile (375×667) viewports. Includes a post↔app **pedagogical alignment** check (n-gram overlap between the post's top 3 takeaways and the app's Tab-1 lede + tab headings). Produces a verdict (ACCEPT / MINOR REVISION / MAJOR REVISION), 1–10 score per dimension, and an issues table written to `content/post/<slug>/web_app/REVIEW.md`. Read-only.
-
-**Invocation:**
-```
-/project:review-app <post slug> [focus: pedagogy | code | accessibility | data | hugo | visual] [--no-browser]
-```
-
-**Examples:**
-```
-/project:review-app r_double_lasso
-/project:review-app r_double_lasso focus: pedagogy
-/project:review-app python_doubleml focus: code and accessibility
-/project:review-app r_did --no-browser
-```
-
-**Focus modes:** `pedagogy` (Dim 7), `code` (3+4), `accessibility` (5), `data` (4), `hugo` (8), `visual` (9+10). Combine with `and`/`,`. Omitted ⇒ all 10.
-
-**Reference files:** `references/review-checklist.md` (10 dimensions × per-check severity), `references/scoring-and-criteria.md` (1–10 rubric, verdict-changing rules), `references/report-template.md` (canonical REVIEW.md skeleton), `references/pedagogical-alignment.md` (n-gram overlap algorithm), `references/headless-browser.md` (Playwright bootstrap + audit script), `references/focus-modes.md`, `references/test-cases.md` (10 self-validation tests including 5 deliberate sabotage scenarios).
-
-## write-slides
-
-**Location:** `.claude/skills/write-slides/SKILL.md`
-
-Generate a **Quarto reveal.js slide deck** from an existing post. Signature behaviour: an audience-triage + key-takeaway + **outline-checkpoint** interview (`AskUserQuestion`) that ports Scott Cunningham's "Rhetoric of Decks" (audience ethos·pathos·logos balance, 3-act Tension→Investigation→Resolution arc, assertion titles, one-idea-per-slide, MB/MC pacing, Devil's-Advocate). The skill writes a `slides.qmd` (`format: revealjs`) + a branded SCSS theme + a custom title-slide partial (a **key-result number strip**), then runs `quarto render` → `content/post/<slug>/slides/index.html` + `slides_files/`. Built-in **menu, chalkboard, speaker view, preview-links, overview**; reveal.js bundled locally (MathJax math from a CDN); branded to the **fixed** site palette; opened from a "Slides (HTML)" button. Reuses the post's figures in place (`../<slug>_*.png`). English-only (rides with the English post like `web_app/`; no ES/JA copies). Verification: `quarto render` + Hugo ≥0.96 HTTP-200 + a Node static smoke test. Needs the Quarto CLI to (re)generate. Write-only — no review pair yet.
-
-**Invocation:**
-```
-/project:write-slides <post slug> [--no-link] [--no-verify]
-```
-
-**Examples:**
-```
-/project:write-slides r_double_lasso
-/project:write-slides python_did101
-/project:write-slides r_did --no-verify
-```
-
-**Reference files:** `references/rhetoric-of-decks.md`, `references/slide-archetypes.md`, `references/interview-questions.md`, `references/quarto-revealjs-guide.md`, `references/slide-mapping.md`, `references/verification-checklist.md`, `references/render-and-fix.md`, `references/templates/` (slides.qmd.tmpl, site-brand.scss, title-slide.html, smoke-test.js).
-
-## update-author-profile
-
-**Location:** `.claude/skills/update-author-profile/SKILL.md`
-
-Update an existing author profile under `content/authors/<Folder>/_index.md` (or scaffold a brand-new one) from **pasted YAML or freeform notes**, keeping the Spanish (`content/es/authors/`) and Japanese (`content/ja/authors/`) counterparts in sync in the same run — `social` links / `email` / URLs copied **verbatim**, prose (`bio`, `role`, `interests`, `education`, `organizations.name`) translated via the project glossary (ES formal `usted`; JA です・ます). Fixes YAML programming typos (curly quotes, wrong icon packs, malformed URLs) so the build never breaks, preserves indentation/key-order byte-for-byte, infers the target author from the name and confirms before editing (handling `_Master` / duplicate-name edge cases), then verifies with a full Hugo 0.111.3 build + `scripts/i18n-parity.sh --section authors`. Leaves changes in the working tree for review; never commits. It is the **edit/create counterpart** to `translate-content` and **reuses** that skill's `references/field-rules.md` (§authors) + `references/glossary.md` rather than forking them.
-
-**Invocation:**
-```
-/project:update-author-profile <author name-or-slug> [pasted YAML or freeform notes] [--create] [--no-build]
-```
-
-**Examples:**
-```
-/project:update-author-profile AbdulahRusli          # then paste the new front matter
-/project:update-author-profile "Abdulah Rusli"        # inferred from name, then confirmed
-/project:update-author-profile YangWenxuan  change github to <url>, role to "PhD student 2024-2028"
-/project:update-author-profile "Jane Doe (Kenya)" --create
-```
-
-**Reference files:** `references/edit-rules.md` (diff method, typo-fix catalog, author schema + valid icon set, target-author inference), `references/create-new.md` (new-author scaffolding across EN/ES/JA), `references/scope-and-verify.md` (SCOPE block + build/parity verify recipe); plus the reused `../translate-content/references/field-rules.md` and `../translate-content/references/glossary.md`.
 
 # Internationalization (i18n)
 
