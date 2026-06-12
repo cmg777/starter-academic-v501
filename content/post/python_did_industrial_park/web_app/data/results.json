@@ -1,0 +1,120 @@
+{
+  "_note": "Real numbers from the post's script.py output CSVs (synthetic, calibrated to Huang, Wang & Xu 2026). See content/post/python_did_industrial_park/. All values teach the staggered-DiD methods; they are NOT evidence about Ethiopia.",
+
+  "event_study_light": [
+    {"k": -5, "estimate": -0.013936, "se": 0.017612, "p": 0.428784},
+    {"k": -4, "estimate": -0.001342, "se": 0.013821, "p": 0.922639},
+    {"k": -3, "estimate": -0.027464, "se": 0.012685, "p": 0.030383},
+    {"k": -2, "estimate": -0.013484, "se": 0.007678, "p": 0.079054},
+    {"k": -1, "estimate": 0.0,       "se": 0.0,      "p": null},
+    {"k":  0, "estimate":  0.115279, "se": 0.029483, "p": 0.000092},
+    {"k":  1, "estimate":  0.192771, "se": 0.042218, "p": 0.000005},
+    {"k":  2, "estimate":  0.218727, "se": 0.064120, "p": 0.000647},
+    {"k":  3, "estimate":  0.313817, "se": 0.088043, "p": 0.000365},
+    {"k":  4, "estimate":  0.484351, "se": 0.046256, "p": 0.0},
+    {"k":  5, "estimate":  0.469656, "se": 0.071156, "p": 0.0}
+  ],
+  "event_study_meta": {
+    "ref_k": -1,
+    "max_pre_abs_t": 2.17,
+    "twfe_with_trends": 0.21521,
+    "twfe_no_trends": 0.27044,
+    "naive_2x2": 0.20106,
+    "naive_2x2_se": 0.08848,
+    "naive_2x2_p": 0.02316
+  },
+
+  "estimators": [
+    {"name": "TWFE",               "att": 0.26991, "se": 0.10054, "stars": "***", "note": "Two-way fixed effects (district + region×year)"},
+    {"name": "Sun-Abraham",        "att": 0.29910, "se": 0.02456, "stars": "***", "note": "Interaction-weighted, saturated event study (2021)"},
+    {"name": "Borusyak/Gardner",   "att": 0.30220, "se": 0.09075, "stars": "***", "note": "Imputation / did2s (2024)"},
+    {"name": "Callaway-Sant'Anna", "att": 0.25607, "se": 0.07626, "stars": "***", "note": "Group-time ATT aggregation (2021)"}
+  ],
+
+  "bacon": {
+    "twfe": 0.26991,
+    "n_comparisons": 64,
+    "by_type": [
+      {"type": "Treated vs never-treated", "key": "clean_tvn",  "weight": 0.9542, "avg_estimate": 0.2708, "n": 8,  "forbidden": false},
+      {"type": "Earlier vs later (clean)",  "key": "clean_evl",  "weight": 0.0338, "avg_estimate": 0.3370, "n": 28, "forbidden": false},
+      {"type": "Later vs earlier (forbidden)", "key": "forbidden_lve", "weight": 0.0121, "avg_estimate": 0.0138, "n": 28, "forbidden": true}
+    ],
+    "points": [
+      {"type": "clean_tvn", "estimate": 0.2567, "weight": 0.04909},
+      {"type": "clean_tvn", "estimate": 0.7519, "weight": 0.15861},
+      {"type": "clean_tvn", "estimate": 0.3681, "weight": 0.15106},
+      {"type": "clean_tvn", "estimate": 0.4952, "weight": 0.20770},
+      {"type": "clean_tvn", "estimate": -0.0592, "weight": 0.18127},
+      {"type": "clean_tvn", "estimate": -0.3195, "weight": 0.09819},
+      {"type": "clean_tvn", "estimate": 0.1050, "weight": 0.07049},
+      {"type": "clean_tvn", "estimate": 0.0729, "weight": 0.03776},
+      {"type": "clean_evl", "estimate": 0.4798, "weight": 0.00272},
+      {"type": "clean_evl", "estimate": 0.7193, "weight": 0.00223},
+      {"type": "clean_evl", "estimate": -0.0362, "weight": 0.00223},
+      {"type": "clean_evl", "estimate": 0.3534, "weight": 0.00206},
+      {"type": "clean_evl", "estimate": 0.3521, "weight": 0.00204},
+      {"type": "clean_evl", "estimate": 0.6190, "weight": 0.00186},
+      {"type": "clean_evl", "estimate": 0.4522, "weight": 0.00037},
+      {"type": "clean_evl", "estimate": 0.1517, "weight": 0.00043},
+      {"type": "forbidden_lve", "estimate": 0.3905, "weight": 0.00124},
+      {"type": "forbidden_lve", "estimate": -0.1696, "weight": 0.00111},
+      {"type": "forbidden_lve", "estimate": 0.5950, "weight": 0.00087},
+      {"type": "forbidden_lve", "estimate": 0.2514, "weight": 0.00087},
+      {"type": "forbidden_lve", "estimate": -0.2267, "weight": 0.00074},
+      {"type": "forbidden_lve", "estimate": -0.4225, "weight": 0.00062}
+    ]
+  },
+
+  "het_distance": [
+    {"moderator": "dist_addis_km",        "label": "Distance to Addis Ababa",  "main_treatment": 3.371379, "interaction": -0.008218, "se": 0.002320, "t": -3.542211, "stars": "***", "axis_max": 450},
+    {"moderator": "dist_state_capital_km","label": "Distance to state capital", "main_treatment": 2.630892, "interaction": -0.008623, "se": 0.004056, "t": -2.125977, "stars": "**",  "axis_max": 320},
+    {"moderator": "dist_nearest_city_km", "label": "Distance to nearest city",  "main_treatment": 3.515305, "interaction": -0.033515, "se": 0.006844, "t": -4.897342, "stars": "***", "axis_max": 110}
+  ],
+  "het_roads": [
+    {"moderator": "primary_road_density", "label": "Primary-road density", "main_treatment": 1.530639, "interaction": 0.326397, "se": 0.847477, "t": 0.385140, "stars": "",   "axis_max": 3.0},
+    {"moderator": "paved_road_density",   "label": "Paved-road density",   "main_treatment": 1.169819, "interaction": 0.669450, "se": 0.321742, "t": 2.080702, "stars": "**", "axis_max": 3.0}
+  ],
+
+  "household": [
+    {"group": "Household welfare", "label": "Durable goods p.c.", "estimate": 0.22860, "se": 0.02837, "stars": "***", "mean": 0.308, "unit": "index", "note": "~74% lift off the 0.308 base"},
+    {"group": "Household welfare", "label": "Housing quality",    "estimate": 0.24797, "se": 0.01929, "stars": "***", "mean": 0.307, "unit": "prob", "note": "+24.8 pp off a 30.7% base"},
+    {"group": "Household welfare", "label": "Wealth index",       "estimate": 0.38251, "se": 0.04614, "stars": "***", "mean": 0.0,   "unit": "sd",   "note": "+0.38 SD shift"}
+  ],
+  "employment": [
+    {"group": "Non-ag employment", "label": "Full sample", "estimate": 0.09110, "se": 0.05801, "stars": "",    "n": 17219, "note": "NULL on average (t = 1.57)"},
+    {"group": "Non-ag employment", "label": "Women",       "estimate": 0.14045, "se": 0.04683, "stars": "***", "n": 11055, "note": "+14 pp — the gender climax (t = 3.00)"},
+    {"group": "Non-ag employment", "label": "Men",         "estimate": 0.01762, "se": 0.09336, "stars": "",    "n": 6164,  "note": "≈ 0 (t = 0.19)"}
+  ],
+  "empowerment": [
+    {"group": "Women's empowerment", "label": "Decision power",  "estimate": 0.10957, "se": 0.01937, "stars": "***", "n": 4737,  "mean": 0.871, "note": "+11 pp off a 0.871 base"},
+    {"group": "Women's empowerment", "label": "Savings account", "estimate": 0.31533, "se": 0.01819, "stars": "***", "n": 11155, "mean": 0.063, "note": "enormous off a 6.3% base"},
+    {"group": "Women's empowerment", "label": "Accepts DV",      "estimate": -0.20961, "se": 0.02543, "stars": "***", "n": 11109, "mean": 0.635, "note": "−21 pp off a 63.5% base — falling acceptance"}
+  ],
+
+  "household_event_study": [
+    {"phase": -3, "estimate": -0.019664, "se": 0.048207},
+    {"phase": -2, "estimate":  0.023555, "se": 0.032932},
+    {"phase": -1, "estimate":  0.0,      "se": 0.0},
+    {"phase":  0, "estimate":  0.260567, "se": 0.039849},
+    {"phase":  1, "estimate":  0.151251, "se": 0.038653}
+  ],
+  "female_employment_event_study": [
+    {"phase": -3, "estimate": -0.076557, "se": 0.061486},
+    {"phase": -2, "estimate": -0.054297, "se": 0.046042},
+    {"phase": -1, "estimate":  0.0,      "se": 0.0},
+    {"phase":  0, "estimate":  0.131145, "se": 0.051942},
+    {"phase":  1, "estimate":  0.041881, "se": 0.081498}
+  ],
+
+  "spillover": [
+    {"outcome": "IHS night-light", "term": "treatment", "estimate": 0.271223, "se": 0.100599, "stars": "***"},
+    {"outcome": "IHS night-light", "term": "nearby",     "estimate": 0.064813, "se": 0.060994, "stars": ""}
+  ],
+
+  "twfe_satellite": [
+    {"outcome": "IHS night-light",  "spec": "no trends",   "estimate": 0.27044, "se": 0.10067, "stars": "***"},
+    {"outcome": "IHS night-light",  "spec": "with trends", "estimate": 0.21521, "se": 0.08327, "stars": "***"},
+    {"outcome": "Impervious ratio", "spec": "no trends",   "estimate": 0.02921, "se": 0.00419, "stars": "***"},
+    {"outcome": "Impervious ratio", "spec": "with trends", "estimate": 0.02631, "se": 0.00372, "stars": "***"}
+  ]
+}

@@ -1,0 +1,23 @@
+variable,label,description,units,role,how_created,paper_reference,example_values,notes
+ind_id,Individual ID,Unique individual identifier (per round; NO panel key).,string,identifier,IND_000000.. (repeated cross-section).,Sect. 3.1.3,IND_004321,
+survey_round,DHS round,Ethiopia DHS survey round.,year,identifier,Five rounds.,Sect. 3.1.3,2016,Region-by-round FE key.
+district_id,District ID,District (woreda) of the respondent.,string,identifier,Same map as the panel.,Eq. (2),ET_D006,
+region_id,Region ID,Region code.,int,identifier,From the district.,Eq. (2),1,
+treated,Treated dummy,1 if the district ever hosts a park.,0/1,treatment,From the district.,Sect. 3.2,1,
+treatment,Treatment indicator,1 if district treated AND round >= open round.,0/1,treatment,Round-level open map.,Eq. (2),1,
+event_phase,Event phase,Round position relative to opening {-3..+1} (NaN for controls).,"Int [-3,1]",derived,Round index minus open-round index.,Fig. 3,0,
+sex,Sex,"0 = male, 1 = female.",0/1,covariate,"Fixed female/male counts (11,336 F / 6,164 M).",Table 6,1,Women-only outcomes are NaN for men.
+age,Age,Respondent age.,years,covariate,"Normal, 15-64.",Eq. (2) X_i,30,
+age_sq,Age squared,Square of age.,years^2,covariate,age**2.,Eq. (2) X_i,900,
+nonag_employment,Non-agricultural employment,1 if employed outside agriculture.,0/1,outcome,"Clipped LPM, per-sex tau (female precise, male noisy).",Table 6,1,"Full mean ~0.312; female ATT 0.133***, male 0.015 ns. N=17,219 (F 11,055 / M 6,164)."
+decision_power,Decision-making power,1 if the woman has the final say on key household decisions (women only).,0/1,outcome,Clipped LPM (ceiling at 0.899).,Table 7 cols 1-2,1,"Mean ~0.899; ATT 0.103***. Women only; N=4,737."
+savings_account,Savings account,1 if the woman owns a savings account (women only).,0/1,outcome,Clipped LPM (floor at 0.063).,Table 7 cols 3-4,0,"Mean ~0.063; ATT 0.318***. Women only; N=11,155."
+dv_accept,DV acceptance,1 if the woman accepts domestic violence under any of 5 conditions (women only).,0/1,outcome,Clipped LPM.,Table 7 cols 5-6,1,"Mean ~0.636; ATT -0.212***. Women only; N=11,109."
+dv_goingout,DV: going out,DV justified for going out without telling husband (women only).,0/1,outcome,Clipped LPM.,Table A15 col 1,0,ATT -0.134*; mean ~0.437.
+dv_kids,DV: neglecting kids,DV justified for neglecting the children (women only).,0/1,outcome,Clipped LPM.,Table A15 col 2,0,ATT -0.153***; mean ~0.491.
+dv_arguing,DV: arguing,DV justified for arguing with husband (women only).,0/1,outcome,Clipped LPM.,Table A15 col 3,0,ATT -0.173**; mean ~0.425.
+dv_sex,DV: refusing sex,DV justified for refusing sex (women only).,0/1,outcome,Clipped LPM.,Table A15 col 4,0,ATT -0.096; mean ~0.363.
+dv_food,DV: burning food,DV justified for burning the food (women only).,0/1,outcome,Clipped LPM.,Table A15 col 5,0,ATT -0.099; mean ~0.411.
+hh_size,Household size,Household size.,persons,covariate,Mildly correlated with treatment.,Eq. (2) X_i,5,
+age_head,Age of head,Age of the household head.,years,covariate,Mildly correlated with treatment.,Eq. (2) X_i,43,
+survey_weight,Survey weight,DHS sampling weight.,weight,covariate,Gamma draw.,Tables 6-7 notes,1.0,feols weights=survey_weight.

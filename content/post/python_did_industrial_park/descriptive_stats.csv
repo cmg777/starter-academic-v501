@@ -1,0 +1,13 @@
+variable,count,mean,std,min,25%,50%,75%,max,layer
+ihs_light,2224.0,0.3516,0.7154,0.0,0.0,0.0001,0.2878,3.0581,district_panel
+light_intensity,2224.0,0.6679,1.6726,0.0,0.0,0.0001,0.2918,10.6196,district_panel
+impervious_ratio,556.0,0.032,0.0141,0.0,0.0232,0.0313,0.0401,0.0848,district_panel
+dist_addis_km,2224.0,212.6473,121.7844,0.0,134.6504,213.4975,288.4383,545.6603,district_panel
+primary_road_density,2224.0,0.8438,0.8253,0.02,0.2273,0.5532,1.3144,4.133,district_panel
+durable_goods_pc,12207.0,0.308,0.487,-1.6665,-0.0213,0.3082,0.6343,2.1682,household_rcs
+housing_quality,12206.0,0.3066,0.4611,0.0,0.0,0.0,1.0,1.0,household_rcs
+wealth_index,9688.0,-0.0005,1.0202,-3.8518,-0.6799,-0.0114,0.6756,3.4091,household_rcs
+nonag_employment,17219.0,0.3426,0.4746,0.0,0.0,0.0,1.0,1.0,individual_rcs
+decision_power,4737.0,0.8708,0.3355,0.0,1.0,1.0,1.0,1.0,individual_rcs
+savings_account,11155.0,0.0627,0.2424,0.0,0.0,0.0,0.0,1.0,individual_rcs
+dv_accept,11109.0,0.6353,0.4814,0.0,0.0,1.0,1.0,1.0,individual_rcs

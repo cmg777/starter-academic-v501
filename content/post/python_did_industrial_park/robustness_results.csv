@@ -1,0 +1,4 @@
+subset,estimate,se,n_obs,stars
+Full sample,0.215211,0.083265,2224,***
+Drop Addis Ababa region,0.155001,0.091007,1984,*
+Controls >= 50 km from a city,0.214272,0.085436,1392,**

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Ethiopian Industrial Parks: Staggered DiD — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'The Socioeconomic Impacts of Industrial Parks in Ethiopia'. An interactive event-study path, a TWFE-vs-modern-estimator forest with a Goodman-Bacon weight breakdown, a distance/road heterogeneity explorer, and the welfare + gender 'who benefits' story — all on synthetic teaching data.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Ethiopian Industrial Parks — Staggered DiD Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>The Socioeconomic Impacts of Industrial Parks in Ethiopia</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button data-tab="event" class="active">1 · Event study</button>
+  <button data-tab="estimators">2 · Estimator comparison</button>
+  <button data-tab="hetero">3 · Heterogeneity</button>
+  <button data-tab="benefits">4 · Who benefits</button>
+</nav>
+
+<main>
+
+<!-- TAB 1 ─────────────────────────────────────────────────────────── -->
+<section id="pane-event" class="tab-pane active">
+  <h2>The dynamic path of the park effect</h2>
+  <p class="lede">
+    A park is not a switch — its effect on nighttime light builds for ~5 years. The event study
+    normalizes every coefficient to the year before opening (<strong>k = −1</strong>): the four
+    pre-opening leads should hug zero (the parallel-trends signature), then the post-opening path
+    rises. Drag the <em>post-horizon</em> slider to reveal years one at a time, and simulate a noisy
+    draw to see why only <strong>17 treated woredas</strong> make late-year estimates wobble.
+  </p>
+
+  <div class="pedagogy" style="margin-bottom:18px;">
+    <h4>The three takeaways of this lab</h4>
+    <ul>
+      <li><strong>A flat pre-trend, then a rising effect to a +0.48 plateau.</strong> Pre-opening leads run −0.027 to −0.001 (largest |t| = 2.17); the effect jumps to +0.115 at k = 0 and climbs to +0.484 by k = 4 — which is why the naive 2×2 (+0.201) understates the long-run ATT.</li>
+      <li><strong>Modern estimators agree with TWFE — the staggered-bias problem is empirically negligible here.</strong> TWFE, Sun-Abraham, Borusyak/Gardner and Callaway-Sant'Anna all land in 0.21–0.30 because 95.4% of the TWFE weight is "clean" treated-vs-never comparisons.</li>
+      <li><strong>The average hides the story — women gain where the pooled effect is null.</strong> Non-ag employment is +0.091 (ns) overall but +0.140*** for women and ≈ 0 for men; empowerment and household welfare follow the jobs.</li>
+    </ul>
+  </div>
+
+  <div class="controls">
+    <div class="control"><label>Post-period horizon <span class="value" id="v-horizon">5</span></label>
+      <input type="range" id="s-horizon" min="0" max="5" step="1" value="5">
+      <div class="hint">How many post-opening years to show (k = 0 … this). Pre-opening leads are always shown.</div></div>
+    <div class="control"><label>Simulated treated woredas <span class="value" id="v-ntreated">17</span></label>
+      <input type="range" id="s-ntreated" min="5" max="120" step="1" value="17">
+      <div class="hint">The real study had only 17 — fewer treated units make the simulated path wobble more.</div></div>
+    <div class="control"><label>Inject a pre-trend <span class="value" id="v-pretrend">0.000</span></label>
+      <input type="range" id="s-pretrend" min="-0.04" max="0.04" step="0.005" value="0">
+      <div class="hint">Add a slope to the pre-opening leads to break parallel trends (the true study's is ≈ 0).</div></div>
+  </div>
+
+  <div class="chart-area">
+    <div id="event-chart"></div>
+    <div class="chart-caption">Orange = the post's published IHS-light coefficients (teal markers = significant post-opening, grey = not). Steel dashed = your simulated draw. The shaded left band is the pre-trend region. Move a slider to redraw.</div>
+  </div>
+  <button class="action" id="resim">▶ Redraw the simulated path</button>
+
+  <h3>Key concepts</h3>
+  <details class="gloss"><summary>Event-study / dynamic DiD</summary>
+    <div class="gloss-body">Instead of one "after" coefficient, estimate a separate effect for each year relative to opening (event time <em>k</em>). The leads (k &lt; 0) test the parallel-trends assumption; the lags (k ≥ 0) trace the build-up of the effect.</div></details>
+  <details class="gloss"><summary>Parallel trends (the identifying assumption)</summary>
+    <div class="gloss-body">Absent the park, treated and control woredas would have followed the same light path. It is <em>untestable</em>, but flat pre-opening leads are suggestive support. Here the largest pre-period |t| is just <em>2.17</em>.</div></details>
+  <details class="gloss"><summary>ATT — average treatment effect on the treated</summary>
+    <div class="gloss-body">The effect <em>on the woredas that actually got a park</em>, under parallel trends. Every estimator in this lab targets the same ATT; this is an <em>observational</em> setting (parks are not randomly placed), so the FE design does confounding control, not precision-only adjustment.</div></details>
+  <details class="gloss"><summary>Why the naive 2×2 understates the effect</summary>
+    <div class="gloss-body">Collapsing the staggered design at the median opening year (2017) gives a 2×2 DiD of <em>+0.201</em>. Because the effect ramps up over 5 years, averaging the small early post-years with the large late ones pulls that blended number below the long-run ATT.</div></details>
+</section>
+
+<!-- TAB 2 ─────────────────────────────────────────────────────────── -->
+<section id="pane-estimators" class="tab-pane">
+  <h2>Four estimators, one estimand — and the Goodman-Bacon teaching moment</h2>
+  <p class="lede">
+    Under staggered timing, two-way fixed effects (TWFE) can use already-treated units as controls —
+    the "forbidden comparisons" that can flip its sign. Three modern estimators avoid them. Here all
+    four land in the same <strong>0.21–0.30</strong> band. The Goodman-Bacon decomposition shows
+    <em>why</em>: toggle the forbidden comparisons to see how little weight they carry.
+  </p>
+
+  <div class="chart-area">
+    <div id="estimator-chart"></div>
+    <div class="chart-caption">TWFE vs Sun-Abraham vs Borusyak/Gardner vs Callaway-Sant'Anna ATT on IHS night-light, with 95% intervals. The teal band marks the 0.21–0.30 agreement zone. Hover for the SE and method note.</div>
+  </div>
+
+  <div class="method-toggle" id="bacon-toggle" style="margin:8px 0 14px;">
+    <label><input type="checkbox" id="cb-forbidden"> Highlight the "forbidden" later-vs-earlier comparisons</label>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">Clean weight (treated vs never)</div><div class="stat-value teal">95.4%</div><div class="stat-sub">avg 2×2 = +0.271</div></div>
+    <div class="stat"><div class="stat-label">Clean weight (earlier vs later)</div><div class="stat-value">3.4%</div><div class="stat-sub">avg 2×2 = +0.337</div></div>
+    <div class="stat"><div class="stat-label">Forbidden weight (later vs earlier)</div><div class="stat-value orange">1.2%</div><div class="stat-sub">avg 2×2 = +0.014</div></div>
+  </div>
+  <div class="chart-area">
+    <div id="bacon-chart"></div>
+    <div class="chart-caption">Each bubble is one of the 64 underlying 2×2 comparisons; bubble size ∝ its Goodman-Bacon weight. Teal = clean treated-vs-never, steel = clean earlier-vs-later, orange = forbidden later-vs-earlier. The dashed line is the TWFE coefficient (+0.270).</div>
+  </div>
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li>The four estimator intervals <strong>overlap heavily</strong> — a spread of only 0.046 IHS units across methods that can diverge sharply in other settings.</li>
+      <li>The big teal bubbles (treated vs never) sit near the TWFE line and carry <strong>95.4%</strong> of the weight — they <em>are</em> the headline.</li>
+      <li>Toggle the highlight: the orange forbidden bubbles are <strong>tiny</strong> (1.2% of weight) and near zero, so they barely move TWFE. The negative-weights problem is real in principle but <strong>empirically negligible</strong> whenever a large never-treated pool dominates.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- TAB 3 ─────────────────────────────────────────────────────────── -->
+<section id="pane-hetero" class="tab-pane">
+  <h2>Location fundamentals: the effect fades with distance, roads amplify it</h2>
+  <p class="lede">
+    A park does not lift every woreda equally. The implied effect on raw light <em>fades</em> the
+    farther a woreda lies from an economic center and is <em>amplified</em> by denser roads. Pick a
+    moderator, then drag the marker along the axis to read the marginal effect — and find where it
+    crosses zero.
+  </p>
+
+  <div class="method-toggle" id="mod-toggle" style="margin-bottom:14px;"></div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">Effect at the marker</div><div class="stat-value teal" id="st-eff">—</div><div class="stat-sub" id="st-eff-sub">raw-light units</div></div>
+    <div class="stat"><div class="stat-label">Interaction slope</div><div class="stat-value" id="st-slope">—</div><div class="stat-sub" id="st-slope-sub">per unit of moderator</div></div>
+    <div class="stat"><div class="stat-label">Significance</div><div class="stat-value" id="st-mod-sig">—</div><div class="stat-sub" id="st-mod-sig-sub"></div></div>
+  </div>
+
+  <div class="chart-area">
+    <div id="het-chart"></div>
+    <div class="chart-caption">Implied marginal park effect = main treatment + interaction × moderator. Drag the steel marker (or click the line) to move along the axis. Orange line = a negative (fading) slope; teal = a positive (amplifying) slope.</div>
+  </div>
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li>All three <strong>distance</strong> interactions are negative — the effect fades with distance. Distance-to-nearest-city is the steepest (−0.0335***): the implied effect crosses zero by roughly <strong>105 km</strong> out.</li>
+      <li>Both <strong>road</strong> interactions are positive — denser roads amplify the effect — but only paved-road density is significant (+0.669**); primary-road density is correctly signed yet borderline (+0.326, ns).</li>
+      <li>With only 17 treated woredas, the mutually-correlated moderators cannot all be precise at once — direction is on target everywhere; precision is what the small treated sample cannot fully deliver.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- TAB 4 ─────────────────────────────────────────────────────────── -->
+<section id="pane-benefits" class="tab-pane">
+  <h2>Who benefits? Welfare rises, and the gender split is the story</h2>
+  <p class="lede">
+    The satellite light effect is real — but who actually gains? Households near a park gain durables,
+    housing, and wealth. Then the analytical climax: non-agricultural employment is <strong>null on
+    average</strong> yet <strong>large and significant for women</strong>, and the empowerment cascade
+    (decision power, savings, falling acceptance of domestic violence) follows the jobs.
+  </p>
+
+  <div class="method-toggle" id="benefit-toggle" style="margin-bottom:14px;">
+    <label><input type="radio" name="benefit" value="household" checked> Household welfare</label>
+    <label><input type="radio" name="benefit" value="employment"> Employment by sex</label>
+    <label><input type="radio" name="benefit" value="empowerment"> Women's empowerment</label>
+  </div>
+
+  <div class="chart-area">
+    <div id="benefit-chart"></div>
+    <div class="chart-caption">ATT with 95% intervals. Teal = significantly positive, orange = significantly negative, grey = not significant. A bar crossing the dashed zero line is indistinguishable from "no effect". Hover a row for the SE, CI, and base rate.</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">Employment — full sample</div><div class="stat-value" id="st-emp-full">+0.091</div><div class="stat-sub">t = 1.57 · NULL</div></div>
+    <div class="stat"><div class="stat-label">Employment — women</div><div class="stat-value teal" id="st-emp-women">+0.140</div><div class="stat-sub">t = 3.00 · ***</div></div>
+    <div class="stat"><div class="stat-label">Employment — men</div><div class="stat-value" id="st-emp-men">+0.018</div><div class="stat-sub">t = 0.19 · ≈ 0</div></div>
+  </div>
+
+  <div class="chart-area">
+    <div id="rcs-event-chart"></div>
+    <div class="chart-caption">Repeated-cross-section phase event studies: household durables (orange) and women's non-ag employment (teal). Both have flat pre-phases and jump at phase 0 — the RCS analogue of a clean pre-trend.</div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Welfare rises broadly:</strong> durables +0.229***, housing +0.248***, wealth +0.383*** — adding controls barely moves them, confirming the FE design absorbs the main confounding.</li>
+      <li><strong>The pooled employment bar straddles zero</strong> (+0.091, ns) — read alone it would say "parks don't move jobs". Switch to "by sex": the +0.140*** female gain is diluted by the ≈ 0 male effect. The split <em>is</em> the finding.</li>
+      <li><strong>Empowerment follows:</strong> decision power +0.110***, savings +0.315*** (enormous off a 6.3% base), and acceptance of domestic violence <em>falls</em> −0.210*** — economic agency translating into bargaining power and shifting norms.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>The Socioeconomic Impacts of Industrial Parks in Ethiopia</em>
+  (method after Huang, Wang &amp; Xu 2026) · D3.js v7 (bundled locally) ·
+  100% synthetic teaching data — not evidence about Ethiopia · no backend, no tracking ·
+  <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="vendor/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

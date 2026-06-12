@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="slides_files/libs/clipboard/clipboard.min.js"></script>
+<script src="slides_files/libs/quarto-html/tabby.min.js"></script>
+<script src="slides_files/libs/quarto-html/popper.min.js"></script>
+<script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
+
+  <meta name="dcterms.date" content="2026-06-12">
+  <title>Do Industrial Parks Work?</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="slides_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Do Industrial Parks Work?</h1>
+  <p class="subtitle">Evaluating place-based policy in Ethiopia with staggered difference-in-differences</p>
+  <div class="title-result-strip">
+    <div class="kr"><span class="kr-num">+0.215***</span><span class="kr-cap">IHS night-light per park</span></div>
+    <div class="kr"><span class="kr-num">4 estimators agree</span><span class="kr-cap">TWFE · SA · BG · CS</span></div>
+    <div class="kr"><span class="kr-num">+0.140***</span><span class="kr-cap">female jobs · null on average</span></div>
+  </div>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University (GSID)</p>
+  <p class="date">June 12, 2026</p>
+</section>
+<section>
+<section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
+<h1>The Tension</h1>
+<p><span class="act">Act I</span></p>
+</section>
+<section id="governments-spend-billions-fencing-land-for-factories-does-anything-grow-outside-the-fence" class="slide level2 center">
+<h2>Governments spend billions fencing land for factories — does anything grow outside the fence?</h2>
+<p>An industrial park is serviced land, power, and a one-stop customs office, rented to garment and leather factories. Ethiopia opened <strong>20+ parks across 18 districts, 2008–2021</strong>.</p>
+<div class="fragment">
+<p>The promise: jobs, a wage economy, a rural region pulled forward. The fear: a bright <strong>enclave</strong> behind a fence while the surrounding districts see nothing.</p>
+<aside class="notes">
+<p>Place-based subsidies are one of the most popular instruments of modern development policy, and one of the most contested. The genuine ambiguity is the hook: a park could light up satellite imagery yet leave household living standards flat, or create jobs on average yet only for men. The point of the talk is not just “what happened” but “how could you measure it credibly when the government chose where parks go”.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-question-has-two-halves-whether-and-for-whom" class="slide level2 center">
+<h2>The question has two halves — <em>whether</em>, and <em>for whom</em></h2>
+<p>A park could raise satellite luminosity yet leave living standards flat. It could add jobs on average — yet only for men.</p>
+<div class="fragment">
+<p>So we ask both: <strong>do parks raise local activity</strong>, and <strong>who inside the district actually benefits?</strong></p>
+<p><span class="comment">The “for whom” turns out to carry the headline.</span></p>
+<aside class="notes">
+<p>This two-sided framing is what makes the study more than an impact evaluation. The average effect and the distributional effect can point in opposite directions, and the talk is built so the audience feels that tension before the data resolve it. The teaching payoff in Act III is that a reader who quotes only the average employment number badly misreads the study.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-government-did-not-flip-a-coin-parks-went-where-growth-already-was" class="slide level2 center">
+<h2>The government did not flip a coin — parks went where growth already was</h2>
+<p>Parks were sited near cities and roads — districts that were <strong>already growing faster</strong>. So a naive treated-vs-control gap confounds the park with the place.</p>
+<div class="fragment">
+<p>We need a design that nets out pre-existing differences <em>and</em> handles a <strong>staggered</strong> rollout (parks opened in different years). That design is <strong>difference-in-differences</strong>.</p>
+<p><span class="objection">A note on the data.</span> Everything runs on <strong>synthetic, calibrated</strong> data — tuned to reproduce Huang, Wang &amp; Xu (2026)’s signs, stars, and approximate magnitudes. Learn the <em>methods</em>, not new facts about Ethiopia.</p>
+<aside class="notes">
+<p>This is the identification problem stated plainly. Selection on pre-trends is the central threat: the parks were placed in already-advantaged woredas. The fix is district and region-by-year fixed effects plus baseline-trend interactions — confounding control, not the precision-only adjustment of an experiment. The synthetic-data caveat is stated up front for honesty; Section 13 of the post audits it cell by cell.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="one-estimand-the-att-threads-through-everything" class="slide level2 center">
+<h2>One estimand — the ATT — threads through everything</h2>
+<div class="columns">
+<div class="column" style="width:58%;">
+<p>We want the <strong>Average Treatment effect on the Treated</strong>:</p>
+<p><span class="math display">\[\text{ATT} = E[\,Y_i(1) - Y_i(0) \mid D_i = 1\,]\]</span></p>
+<p>The effect on the <strong>17 districts that got a park</strong> — not on a random district — identified under <strong>parallel trends</strong>.</p>
+</div><div class="column" style="width:42%;">
+<ul>
+<li>Naive 2×2 — the cartoon</li>
+<li>TWFE + event study — the workhorse</li>
+<li>Sun-Abraham · Borusyak · Callaway-Sant’Anna — the insurance</li>
+</ul>
+</div></div>
+<p><span class="comment">Three data streams · one design · an escalating ladder of estimators.</span></p>
+<aside class="notes">
+<p>The estimand is the ATT, not the population-wide ATE: it is the effect on these parks in this setting and travels only as far as that. The ladder metaphor frames the whole investigation — the naive 2×2 is the cartoon version, TWFE and its event-study view are the workhorse, and the three modern estimators are the robustness insurance that the workhorse has not been led astray by staggered timing.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="the-investigation" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>The Investigation</h1>
+<p><span class="act">Act II</span></p>
+</section>
+<section id="one-policy-measured-at-three-grains-satellite-household-individual" class="slide level2 center">
+<h2>One policy, measured at three grains — satellite, household, individual</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h3 id="satellite-panel">Satellite panel</h3>
+<ul>
+<li>139 woredas × 16 years (2,224 rows)</li>
+<li><strong>17 treated</strong> vs <strong>122 matched controls</strong></li>
+<li>outcome: IHS nighttime light</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<h3 id="dhs-repeated-cross-sections">DHS repeated cross-sections</h3>
+<ul>
+<li>13,200 households · 17,900 individuals</li>
+<li>5 survey rounds, <em>fresh</em> respondents</li>
+<li>no panel key → coarse event phases</li>
+</ul>
+</div></div>
+<p><span class="comment">Only <strong>17 treated woredas</strong> — the recurring source of statistical caution.</span></p>
+<aside class="notes">
+<p>National statistics would barely flinch at a few new factories, so we need sub-national data — and at three grains. The district layer is a balanced panel that supports an annual event study; the household and individual layers are repeated cross-sections of different respondents, so they admit only coarse event phases and survey-weighted regressions, never unit fixed effects. The 17/122 split is small on the treated side, which is exactly why several effects are borderline.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="parallel-before-the-rollout-then-the-treated-woredas-pull-away" class="slide level2 center">
+<h2>Parallel before the rollout, then the treated woredas pull away</h2>
+
+<img data-src="../python_did_industrial_park_01_parallel_trends.png" class="r-stretch quarto-figure-center"><p class="caption">Baseline-normalized group-mean IHS light: treated (orange) and control (blue) overlap before 2008, then the treated series climbs while controls stay flat.</p><aside class="notes">
+<p>This is the picture DiD was invented for. Indexed to each group’s pre-2008 mean, the two series sit on top of each other before the rollout — in 2008 treated is at −0.0018 and control at −0.0030, essentially identical, the visual signature of parallel trends. From 2014 the treated series climbs steadily while controls hover near zero. The eye already sees a matched pair that diverges only after parks open; the rest of the talk measures that divergence. We plot baseline-normalized light because the synthetic bright-base device puts raw treated/control levels miles apart.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="staggered-means-there-is-no-single-before-each-cohort-has-its-own-clock" class="slide level2 center">
+<h2>Staggered means there is no single “before” — each cohort has its own clock</h2>
+
+<img data-src="../python_did_industrial_park_02_cohort_staircase.png" class="r-stretch quarto-figure-center"><p class="caption">Cohort staircase: each opening-year cohort turns up at its own park-opening date against a flat never-treated baseline.</p><p><span class="comment">1 woreda in 2008, then 2–3 per year across 2014–2020 — 17 in total.</span></p>
+<aside class="notes">
+<p>The staggered structure is easier to see one cohort at a time. The 2016 cohort lifts off in 2016, the 2018 cohort in 2018, while the never-treated line stays flat and even drifts down slightly. There is no single treatment date, so any honest estimator must align each cohort to its own clock. Every event time has at least three treated woredas behind it, so the dynamic path is estimated off real data at each lag.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="treatment-is-spatially-clustered-which-will-matter-for-standard-errors" class="slide level2 center">
+<h2>Treatment is spatially clustered — which will matter for standard errors</h2>
+
+<img data-src="../python_did_industrial_park_03_treatment_map.png" class="r-stretch quarto-figure-center"><p class="caption">Treatment map: the 17 treated woredas (orange) cluster spatially among the 122 matched controls (blue).</p><p><span class="comment">Near things are more related than distant things — their shocks are <em>not</em> independent draws.</span></p>
+<aside class="notes">
+<p>Plotting treated and control woredas by longitude and latitude shows the treated units are spatially clustered, not randomly sprinkled — parks went to a handful of regions near cities and roads. Clustered treatment means a regional shock could hit several treated woredas at once, so their errors are unlikely to be independent. That is precisely the problem Conley spatial standard errors fix in Act III. Hold this picture; we return to it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-single-after-blends-the-slow-start-with-the-late-surge-and-understates-the-effect" class="slide level2 center">
+<h2>A single “after” blends the slow start with the late surge — and understates the effect</h2>
+<p>The simplest estimate collapses the design at the median opening year and takes a difference of differences:</p>
+<p><span class="math display">\[\widehat{\text{DiD}} = \big(\bar{Y}_{\text{treat, post}} - \bar{Y}_{\text{treat, pre}}\big) - \big(\bar{Y}_{\text{ctrl, post}} - \bar{Y}_{\text{ctrl, pre}}\big)\]</span></p>
+<div class="fragment">
+<p>Naive 2×2 ATT: <strong>+0.2011</strong> (SE 0.0885, p = 0.023).</p>
+<p>The effect ramps over ~5 years, so averaging small early years with large late ones pulls the mean down.</p>
+<aside class="notes">
+<p>Treated light rises +0.1929 post-opening while controls fall −0.0082, so the difference-in-differences is +0.2011 — significant at 5%, with the by-hand and diff-diff estimates agreeing to four decimals. But this blended 2×2 understates the dynamic effect because the event study below reaches +0.48; it also leans on the Goodman-Bacon forbidden comparisons we worry about under staggering. The fix is to let the effect vary over time and absorb confounders with fixed effects.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-workhorse-adds-two-way-fixed-effects-and-a-park-lifts-light-0.215" class="slide level2 center">
+<h2>The workhorse adds two-way fixed effects — and a park lifts light +0.215</h2>
+<p>The static TWFE specification, for woreda <span class="math inline">\(d\)</span> in year <span class="math inline">\(t\)</span>:</p>
+<p><span class="math display">\[Y_{dt} = \beta \, D_{dt} + \alpha_d + \gamma_{r(d),t} + \varepsilon_{dt}\]</span></p>
+<p><span class="math inline">\(\alpha_d\)</span> absorbs the bright base; <span class="math inline">\(\gamma_{r(d),t}\)</span> absorbs regional shocks; <span class="math inline">\(\beta\)</span> is the <strong>ATT</strong>.</p>
+<p><span class="comment">With baseline-trend interactions: <span class="math inline">\(\hat\beta = +0.2152\)</span> (SE 0.0833, <span class="math inline">\(t = 2.58\)</span>, sig. at 1%) — a ~21% rise in luminosity.</span></p>
+<aside class="notes">
+<p>The woreda fixed effect absorbs anything permanent about a district, including its synthetic bright base; the region-by-year fixed effect absorbs shocks common to a whole region in a given year. The with-trends specification adds time-by-baseline interactions so each woreda follows its own linear trend. The estimate drops from +0.270 without trends to +0.215 with them — a textbook differential-trend confound, since treated woredas were already more urban in 2007 and trending up faster. The with-trends number is the cleaner ATT.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="across-all-three-satellite-outcomes-the-park-effect-is-positive" class="slide level2 center">
+<h2>Across all three satellite outcomes the park effect is positive</h2>
+
+<img data-src="../python_did_industrial_park_05_twfe_forest.png" class="r-stretch quarto-figure-center"><p class="caption">Table 1 forest: a positive park ATT across IHS light, raw light, and the impervious-surface ratio, no-trends vs with-trends.</p><aside class="notes">
+<p>The static TWFE recovers the paper’s headline: IHS light +0.2152 with trends, raw light +1.618, and the impervious-surface ratio +0.0263 (t = 7.07) — about 2.6 percentage points of built-up land, the most precisely estimated satellite coefficient in the study. The raw-light coefficient runs high (+1.618 vs the paper’s 1.276), a documented synthetic artifact of the bright-base device that we flag in the reproduction audit. All three point the same way.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-event-study-shows-when-the-effect-arrives-flat-before-rising-after" class="slide level2 center">
+<h2>The event study shows <em>when</em> the effect arrives — flat before, rising after</h2>
+
+<img data-src="../python_did_industrial_park_06_event_study.png" class="r-stretch quarto-figure-center"><p class="caption">Event study: the four pre-opening leads hug zero, then the effect jumps at k = 0 and climbs to a +0.48 plateau by k = 4–5.</p><p><span class="comment">Pre-trend flat (largest <span class="math inline">\(|t| = 2.17\)</span>) → parallel trends credible. Effect builds, not jumps.</span></p>
+<aside class="notes">
+<p>The figure tells the whole story in one arc. The four pre-opening leads hug zero — they range from −0.0275 to −0.0013, largest absolute t just 2.17 — weak enough to read as a flat pre-trend. The jump comes strictly after opening: +0.1153 at k = 0 (p = 0.0001), climbing through +0.1928 and +0.2187, plateauing at +0.4844 by k = 4. This rising-then-flattening dynamic is exactly why the naive 2×2 understated the long-run ATT. The flat pre-period is suggestive support for parallel trends — never proof, since the assumption concerns the unobserved post-period counterfactual.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-teaching-moment-staggered-twfe-can-use-already-treated-units-as-controls" class="slide level2 center">
+<h2>The teaching moment: staggered TWFE can use already-treated units as controls</h2>
+<p><span class="objection">The worry.</span> Under staggered timing TWFE makes “forbidden comparisons” — already-treated woredas as controls for later-treated ones. When effects grow over time, those comparisons get <strong>negative weights</strong> and can bias, even flip, the estimate.</p>
+<div class="fragment">
+<p><span class="rebuttal">The fix.</span> <strong>Sun-Abraham</strong>, <strong>Borusyak/Gardner</strong>, and <strong>Callaway-Sant’Anna</strong> only ever compare treated cohorts to <em>clean</em> (never- or not-yet-treated) controls. Each targets the same ATT — if they agree with TWFE, the bias is not biting.</p>
+<aside class="notes">
+<p>Here is the worry stated precisely. Because our effects clearly grow over time, from +0.12 to +0.48, the forbidden comparisons are exactly the dangerous kind. The fix is a generation of estimators that only ever compare treated cohorts to clean controls. This is the central teaching moment of the deck: the modern staggered-DiD literature in one slide. The test is convergence — if three robust estimators reproduce the TWFE headline, a reader worried about negative weights can relax.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="four-estimators-one-estimand-they-agree-within-0.046-ihs-units" class="slide level2 center">
+<h2>Four estimators, one estimand — they agree within 0.046 IHS units</h2>
+
+<img data-src="../python_did_industrial_park_07_estimator_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Four estimators compared: TWFE +0.270, Sun-Abraham +0.299, Borusyak/Gardner +0.302, Callaway-Sant’Anna +0.256 — all in a tight band, each significant at 1%.</p><table class="caption-top">
+<thead>
+<tr class="header">
+<th>Estimator</th>
+<th style="text-align: right;">ATT</th>
+<th style="text-align: center;">Sig.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>TWFE</td>
+<td style="text-align: right;">+0.2699</td>
+<td style="text-align: center;">***</td>
+</tr>
+<tr class="even">
+<td>Sun-Abraham</td>
+<td style="text-align: right;">+0.2991</td>
+<td style="text-align: center;">***</td>
+</tr>
+<tr class="odd">
+<td>Borusyak/Gardner</td>
+<td style="text-align: right;"><span class="key">+0.3022</span></td>
+<td style="text-align: center;">***</td>
+</tr>
+<tr class="even">
+<td>Callaway-Sant’Anna</td>
+<td style="text-align: right;">+0.2561</td>
+<td style="text-align: center;">***</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>All four target the same ATT and land in a tight band — a spread of only 0.046 IHS units across methods that in other settings can diverge sharply. They agree because there is a real never-treated comparison group (the 122 controls) and the treatment effect is fairly homogeneous, so the conditions that make TWFE’s forbidden comparisons dangerous simply do not bind. This agreement is the methodological payoff of the talk.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="and-the-goodman-bacon-decomposition-shows-why-95.4-clean-weight" class="slide level2 center">
+<h2>And the Goodman-Bacon decomposition shows <em>why</em> — 95.4% clean weight</h2>
+
+<img data-src="../python_did_industrial_park_08_bacon_weights.png" class="r-stretch quarto-figure-center"><p class="caption">Goodman-Bacon decomposition: the clean treated-vs-never 2×2 comparisons carry nearly all the weight; the forbidden later-vs-earlier comparisons carry almost none.</p><table class="caption-top">
+<thead>
+<tr class="header">
+<th>Comparison type</th>
+<th style="text-align: right;">Weight</th>
+<th style="text-align: right;">Avg estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Treated vs never</td>
+<td style="text-align: right;"><span class="key">95.42%</span></td>
+<td style="text-align: right;">+0.2708</td>
+</tr>
+<tr class="even">
+<td>Earlier vs later</td>
+<td style="text-align: right;">3.38%</td>
+<td style="text-align: right;">+0.3370</td>
+</tr>
+<tr class="odd">
+<td>Later vs earlier (forbidden)</td>
+<td style="text-align: right;">1.21%</td>
+<td style="text-align: right;">+0.0135</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>The decomposition breaks the +0.2699 TWFE coefficient into 64 underlying 2×2 comparisons. The clean treated-vs-never comparisons carry 95.42% of the weight and average +0.2708 — essentially the headline. The forbidden later-vs-earlier comparisons, the ones that can flip TWFE’s sign, carry just 1.21% and contribute a near-zero +0.0135. The lesson worth keeping: the negative-weights problem is real in principle but empirically negligible whenever a large never-treated pool dominates the weighting, as the 122 PSM controls do.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="where-parks-work-the-effect-fades-with-distance-and-is-amplified-by-roads" class="slide level2 center">
+<h2>Where parks work: the effect fades with distance and is amplified by roads</h2>
+
+<img data-src="../python_did_industrial_park_09_heterogeneity.png" class="r-stretch quarto-figure-center"><p class="caption">Heterogeneity: the implied park effect fades the farther a woreda lies from Addis, its state capital, or the nearest city.</p><p><span class="comment">Distance to nearest city <span class="math inline">\(-0.0335\)</span> (<span class="math inline">\(t = -4.90\)</span>) · paved roads <span class="math inline">\(+0.6695\)</span> (<span class="math inline">\(t = 2.08\)</span>). Place is first-order.</span></p>
+<aside class="notes">
+<p>Location fundamentals sharply moderate park effectiveness, exactly as the paper argues. All three distance interactions are negative — the effect fades with distance from economic centers — and three are significant, the steepest being distance to nearest city at −0.0335. Both road interactions are positive; paved-road density is significant at +0.6695. The primary-road interaction is correctly signed but borderline insignificant — an honest synthetic limitation of only 17 treated woredas, which cannot make mutually-correlated moderators all precise at once. Direction is solid; precision is what the small sample cannot fully deliver.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="net-new-activity-not-displacement-no-measurable-spillover-to-neighbours" class="slide level2 center">
+<h2>Net-new activity, not displacement — no measurable spillover to neighbours</h2>
+
+<img data-src="../python_did_industrial_park_10_spillover.png" class="r-stretch quarto-figure-center"><p class="caption">Spillover test: treatment lifts the host woreda strongly (+0.27), but the effect on control neighbours within 10 km is about zero.</p><p><span class="comment"><code>nearby</code> <span class="math inline">\(= +0.0648\)</span> (<span class="math inline">\(t = 1.06\)</span>), insignificant — so the host’s gain is net-new, and SUTVA holds.</span></p>
+<aside class="notes">
+<p>The spillover test adds a nearby indicator for control woredas within 10 km of an operational park. If parks merely displaced activity, nearby should be negative; if the gains are net-new, it should be zero. It comes in at +0.0648 (t = 1.06), small and indistinguishable from zero, while the host effect stays +0.2712. No spillover means the gain is net-new activity, and the never-treated controls are not contaminated by proximity — so SUTVA is plausible and the main ATT is not biased by treated-on-control externalities. The parks behave like relatively self-contained enclaves.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="households-near-a-park-gain-durables-housing-and-wealth" class="slide level2 center">
+<h2>Households near a park gain durables, housing, and wealth</h2>
+
+<img data-src="../python_did_industrial_park_11_household_forest.png" class="r-stretch quarto-figure-center"><p class="caption">Table 5 forest: households near a park gain durable goods, housing quality, and wealth, with or without controls.</p><table class="caption-top">
+<thead>
+<tr class="header">
+<th>Outcome</th>
+<th style="text-align: right;">ATT (with controls)</th>
+<th style="text-align: center;">Sig.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Durable goods p.c.</td>
+<td style="text-align: right;"><span class="key">+0.2286</span> (~74%)</td>
+<td style="text-align: center;">***</td>
+</tr>
+<tr class="even">
+<td>Housing quality</td>
+<td style="text-align: right;">+0.2480</td>
+<td style="text-align: center;">***</td>
+</tr>
+<tr class="odd">
+<td>Wealth index</td>
+<td style="text-align: right;">+0.3825 SD</td>
+<td style="text-align: center;">***</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>Switching to the DHS household repeated cross-section: because each round samples different households there is no panel key, so the effect is identified off district-by-round group means with survey weights, district and region-by-round fixed effects, no household fixed effect. All three living-standards outcomes rise sharply. Durables gain +0.2286 against a 0.308 mean — a ~74% lift. Adding controls barely moves any estimate, which confirms the design already absorbs the main confounding.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="clean-timing-in-the-survey-data-too-flat-pre-phases-then-a-jump" class="slide level2 center">
+<h2>Clean timing in the survey data too — flat pre-phases, then a jump</h2>
+
+<img data-src="../python_did_industrial_park_12_household_event_study.png" class="r-stretch quarto-figure-center"><p class="caption">Household durables RCS event study: flat, insignificant pre-phases, then a jump at park opening (phase 0).</p><p><span class="comment">Phase <span class="math inline">\(-3\)</span>: <span class="math inline">\(-0.020\)</span> (ns) · phase <span class="math inline">\(-2\)</span>: <span class="math inline">\(+0.024\)</span> (ns) · phase <span class="math inline">\(0\)</span>: <span class="math inline">\(+0.261\)</span> (p &lt; 0.001).</span></p>
+<aside class="notes">
+<p>Because the DHS data are repeated cross-sections, the household event study uses coarse phase dummies rather than annual event time. The two pre-opening phases are flat and insignificant, both straddling zero, so there is no differential pre-trend in household durables. The effect jumps to +0.2606 at phase 0 and stays strongly positive after. This is the RCS counterpart to the satellite no-anticipation evidence, with the honest caveat that two pre-phases make a low-powered test.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-climax-average-employment-is-null-but-the-female-effect-is-large" class="slide level2 center">
+<h2>The climax: average employment is null — but the female effect is large</h2>
+
+<img data-src="../python_did_industrial_park_13_employment_empowerment.png" class="r-stretch quarto-figure-center"><p class="caption">The gender story: employment is null overall but large for women; women’s decision power and savings rise while acceptance of domestic violence falls.</p><table class="caption-top">
+<thead>
+<tr class="header">
+<th>Non-ag employment</th>
+<th style="text-align: right;">ATT</th>
+<th style="text-align: right;"><span class="math inline">\(t\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Full sample</td>
+<td style="text-align: right;">+0.0911 (ns)</td>
+<td style="text-align: right;">+1.57</td>
+</tr>
+<tr class="even">
+<td>Women</td>
+<td style="text-align: right;"><span class="key">+0.1404</span>***</td>
+<td style="text-align: right;">+3.00</td>
+</tr>
+<tr class="odd">
+<td>Men</td>
+<td style="text-align: right;">+0.0176 (ns)</td>
+<td style="text-align: right;">+0.19</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>This is the analytical climax and a textbook case for heterogeneity analysis. The average non-agricultural employment effect is +0.0911 — insignificant — which read alone would suggest parks do not move employment at all. But pooling the sexes hides a strong gendered split: the female effect is +0.1404 (significant at 1%) while the male effect is essentially zero. The parks, concentrated in textiles and garments, pull women into factory wage work; the men were largely already off-farm, so the average washes out. A reader who quoted only the full-sample number would badly misread the study — the sex split is the finding, not a footnote.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="factory-jobs-cascade-into-agency-power-up-savings-up-dv-acceptance-down" class="slide level2 center">
+<h2>Factory jobs cascade into agency — power up, savings up, DV-acceptance down</h2>
+<p><span class="bignum">+0.140</span></p>
+<p><span class="bignum-label">women’s non-ag employment ATT (p &lt; 0.01) — and the empowerment cascade that follows</span></p>
+<div class="fragment">
+<p>Decision power <strong>+0.110</strong>*** · savings account <strong>+0.315</strong>*** · accepts domestic violence <strong>−0.210</strong>*** (women only).</p>
+<aside class="notes">
+<p>With factory jobs, women’s outcomes shift across the board. Decision-making power rises +0.1096, savings-account ownership rises +0.3153 — enormous against a 6.3% base — and acceptance of domestic violence falls −0.2096, a ~21-point reduction off a 63.5% base. Economic agency translates into household bargaining power and shifting gender norms. The female-employment and decision-power event studies both sit near zero pre-opening and turn up at and after phase 0, reinforcing the no-anticipation reading: women’s gains appear with the park, not before it. This is the substantive heart of the study.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section></section>
+<section>
+<section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>The Resolution</h1>
+<p><span class="act">Act III</span></p>
+</section>
+<section id="honest-inference-inflates-the-se-2.4-but-the-headline-survives" class="slide level2 center">
+<h2>Honest inference inflates the SE 2.4× — but the headline survives</h2>
+<p>Treated woredas cluster in space, so a regional shock hits several at once — the naive SE assumes independence and is too small. The fix is a <strong>Conley spatial-HAC</strong> standard error; the point estimate never moves.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>With-trends light ATT</th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Naive HC0</th>
+<th style="text-align: right;">Conley-HAC</th>
+<th style="text-align: right;"><span class="math inline">\(t\)</span>(HAC)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2008–2020</td>
+<td style="text-align: right;">+0.2152</td>
+<td style="text-align: right;">0.0329</td>
+<td style="text-align: right;"><span class="key">0.0799</span></td>
+<td style="text-align: right;">+2.69</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">Same +0.2152 in every column. The SE inflates 2.43× — yet still significant at 1%.</span></p>
+<aside class="notes">
+<p>Recall from the map that all 17 treated woredas cluster spatially. The Conley spatial-HAC SE allows a district’s errors to correlate with itself over time and with nearby districts in the same year. The most conservative Conley-HAC SE is 0.0799 — 2.43× the naive HC0 SE of 0.0329 — yet the ATT stays significant at t = 2.69. The cluster SE (0.0792) and the Conley-HAC SE (0.0799) are nearly identical, so clustering at the district level already captures most of the dependence; spatial correlation beyond the district adds little. The estimate is also stable on restricted control pools.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="four-findings-one-story-well-sited-parks-reshape-activity-through-women" class="slide level2 center">
+<h2>Four findings, one story: well-sited parks reshape activity — through women</h2>
+<ul>
+<li class="fragment"><strong>Activity</strong> — +0.215 IHS light (~21%), +2.6 pp built-up land, no spillover</li>
+<li class="fragment"><strong>Staggered-robust</strong> — four estimators agree within 0.046, 95.4% clean Bacon weight</li>
+<li class="fragment"><strong>Welfare</strong> — durables +0.229, housing +0.248, wealth +0.383 SD</li>
+<li class="fragment"><strong>Gender</strong> — null on average (+0.091), but female jobs +0.140 and the agency cascade</li>
+</ul>
+<p><span class="comment">Triangulation across methods — not a single regression — is what makes the claim credible.</span></p>
+<aside class="notes">
+<p>Four families of results built on different assumptions all point the same way. A park raises local activity, the staggered-bias worry does not bite because a large never-treated pool dominates the weighting, households near a park grow richer, and the employment and empowerment gains run through women. That convergence — not the precision of any one estimate — is the strongest part of the evidence.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-design-lessons-follow-the-roads-and-disaggregate-by-sex" class="slide level2 center">
+<h2>Two design lessons: follow the roads, and disaggregate by sex</h2>
+<p>The lesson is <strong>not</strong> “build parks everywhere.” It is that <strong>where</strong> and <strong>for whom</strong> decide whether place-based policy works.</p>
+<div class="fragment">
+<ul>
+<li><strong>Site selection</strong> — the effect fades −0.0335 per km to the nearest city and is amplified by paved roads. A park in a remote, poorly-connected woreda would do far less.</li>
+<li><strong>Inclusion</strong> — gains run through female-intensive sectors. An evaluation that measured only the <em>average</em> would conclude the parks failed on jobs and miss their largest social return.</li>
+</ul>
+<aside class="notes">
+<p>For place-based policy the design lessons matter as much as the result. First, proximity to existing economic centers is first-order, so policy should follow the roads. Second, because the employment and empowerment gains run through textiles and garments, evaluations should be sex-disaggregated by default. These two lessons are the transferable content even though the synthetic numbers are not.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="the-strongest-objection-and-the-answer" class="slide level2 center">
+<h2>The strongest objection — and the answer</h2>
+<p><span class="objection">Objection.</span> The data are <strong>synthetic</strong>, there are only <strong>17 treated woredas</strong>, and this is <strong>observational</strong> — point estimates fragile, identification on faith.</p>
+<div class="fragment">
+<p><span class="rebuttal">Response.</span></p>
+<ul>
+<li>Synthetic data are <em>calibrated</em> to the paper — audited cell by cell in Section 13.</li>
+<li>Small-N met head-on: <strong>flat pre-trends</strong>, <strong>null spillover</strong>, <strong>four-estimator agreement</strong>, <strong>Conley-HAC</strong> errors.</li>
+<li>The caveats narrow the claim — they don’t overturn it.</li>
+</ul>
+<aside class="notes">
+<p>Steelman first: this is a tiny treated group on simulated data in a setting where parks were not randomly placed. The honest reply is that every credibility check — pre-trend, placebo-style spillover test, staggered-robust cross-checks, spatial inference — has been run and survived, and the conclusion is stated as evidence about well-sited parks in this setting, not place-based policy in general. The ATT travels only as far as these parks in this context.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</div>
+</section>
+<section id="five-numbers-to-remember" class="slide level2 center">
+<h2>Five numbers to remember</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Number</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Light ATT (with trends)</td>
+<td style="text-align: right;"><span class="key">+0.2152</span>*** (~21%)</td>
+</tr>
+<tr class="even">
+<td>Four-estimator spread</td>
+<td style="text-align: right;">0.046 IHS units</td>
+</tr>
+<tr class="odd">
+<td>Clean Bacon weight</td>
+<td style="text-align: right;">95.4%</td>
+</tr>
+<tr class="even">
+<td>Female employment ATT</td>
+<td style="text-align: right;">+0.140*** (vs +0.091 ns)</td>
+</tr>
+<tr class="odd">
+<td>Light SE: naive → Conley-HAC</td>
+<td style="text-align: right;">0.0329 → 0.0799</td>
+</tr>
+</tbody>
+</table>
+<p><span class="comment">And five lessons: let evolving effects evolve · triangulate estimators · disaggregate by sex · place is first-order · honest inference, honest caveats.</span></p>
+<aside class="notes">
+<p>Close on the numbers, then the lessons. One: the pooled 2×2 understated the dynamic — only the event study revealed the build to +0.48, so let evolving effects evolve. Two: four estimators and a Bacon decomposition all pointed the same way; agreement beats any one estimate. Three: the average employment effect was null while the female effect was the headline — heterogeneity analysis turned a null into the finding. Four: the effect fades with distance and grows with roads, so place is first-order. Five: 17 treated woredas on synthetic data, identified by an assumption — strong teaching evidence, stated with its caveats. Next steps in the post: a Callaway-Sant’Anna dynamic aggregation, a Rambachan-Roth pre-trend sensitivity, and testing whether labor-intensive parks drive the female effect.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section id="well-sited-parks-reshape-a-local-economy-and-womens-lives-but-only-a-sex-disaggregated-look-reveals-it." class="title-slide slide level1 divider center" data-background-color="#141413">
+<h1>Well-sited parks reshape a local economy — and women’s lives — but only a sex-disaggregated look reveals it.</h1>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="slides_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="slides_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="slides_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': true,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

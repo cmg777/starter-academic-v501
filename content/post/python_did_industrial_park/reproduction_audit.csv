@@ -1,0 +1,26 @@
+stage,synthetic_coef,synthetic_se,synthetic_sig,paper_value,note
+"Table 1: IHS light, no trends",0.2704,0.1007,***,0.265,on target (~0.265)
+"Table 1: IHS light, with trends",0.2152,0.0833,***,0.214,on target (~0.214)
+"Table 1: raw light, no trends",1.7316,0.4807,***,1.723,"synthetic ~1.7 (high vs paper 1.276; bright-base device, documented)"
+"Table 1: raw light, with trends",1.6181,0.454,***,1.276,synthetic ~1.6 (high; documented known gap)
+"Table 1: impervious, no trends",0.0292,0.0042,***,0.032,on target (~0.032)
+"Table 1: impervious, with trends",0.0263,0.0037,***,0.028,on target (~0.028)
+Table 2: nearby spillover (IHS),0.0648,0.061,,0.0,nearby ~0 ns (no spillover) -- target
+Table 3: interaction dist_addis_km,-0.0082,0.0023,***,neg.,negative & sig -- effect fades w/ distance
+Table 3: interaction dist_state_capital_km,-0.0086,0.0041,**,neg.,negative & sig -- effect fades w/ distance
+Table 3: interaction dist_nearest_city_km,-0.0335,0.0068,***,neg.,negative & sig -- effect fades w/ distance
+Table 4: interaction primary_road_density,0.3264,0.8475,,pos.,positive on-magnitude but BORDERLINE ns (documented)
+Table 4: interaction paved_road_density,0.6695,0.3217,**,pos.,positive & sig -- roads amplify
+Table 5: durables (controls),0.2286,0.0284,***,0.226,on target
+Table 5: housing (controls),0.248,0.0193,***,0.252,on target
+Table 5: wealth (controls),0.3825,0.0461,***,0.409,on target
+Table 6: employment full,0.0911,0.058,,0.11,INSIGNIFICANT on average -- target
+Table 6: employment female,0.1404,0.0468,***,0.133,FEMALE ATT *** -- the climax
+Table 6: employment male,0.0176,0.0934,,0.015,male ~0 ns -- target
+Table 7: decision power,0.1096,0.0194,***,0.103,on target
+Table 7: savings account,0.3153,0.0182,***,0.318,on target
+Table 7: DV acceptance,-0.2096,0.0254,***,-0.212,on target
+Staggered: TWFE ATT (IHS),0.2699,0.1005,***,~0.21-0.30,agrees with TWFE -- target band
+Staggered: Sun-Abraham ATT (IHS),0.2991,0.0246,***,~0.21-0.30,agrees with TWFE -- target band
+Staggered: Borusyak/Gardner ATT (IHS),0.3022,0.0907,***,~0.21-0.30,agrees with TWFE -- target band
+Staggered: Callaway-Sant'Anna ATT (IHS),0.2561,0.0763,***,~0.21-0.30,agrees with TWFE -- target band

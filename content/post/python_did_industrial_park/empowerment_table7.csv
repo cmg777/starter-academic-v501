@@ -1,0 +1,4 @@
+outcome,variable,estimate,se,t,stars,n_obs
+Decision power,decision_power,0.10957,0.01937,5.65778,***,4737
+Savings account,savings_account,0.31533,0.01819,17.33552,***,11155
+Accepts DV,dv_accept,-0.20961,0.02543,-8.24119,***,11109

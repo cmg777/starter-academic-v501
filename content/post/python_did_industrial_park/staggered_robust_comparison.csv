@@ -1,0 +1,5 @@
+estimator,att,se,stars
+TWFE,0.26991,0.10054,***
+Sun-Abraham,0.2991,0.02456,***
+Borusyak/Gardner,0.3022,0.09075,***
+Callaway-Sant'Anna,0.25607,0.07626,***

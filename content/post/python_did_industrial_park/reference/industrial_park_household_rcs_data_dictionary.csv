@@ -1,0 +1,14 @@
+variable,label,description,units,role,how_created,paper_reference,example_values,notes
+hh_id,Household ID,Unique household identifier (per round; NO panel key).,string,identifier,HH_000000.. (repeated cross-section).,Sect. 3.1.3,HH_001234,Different households each round.
+survey_round,DHS round,Ethiopia DHS survey round.,"year {2000,2005,2011,2016,2019}",identifier,Five DHS rounds.,Sect. 3.1.3,2016,Region-by-round FE key.
+district_id,District ID,District (woreda) of the household (links to the panel).,string,identifier,Same district_id -> open_year map as the panel.,Eq. (2),ET_D006,
+region_id,Region ID,Region code (region-by-round FE key).,int,identifier,From the district.,Eq. (2) mu_rt,1,
+treated,Treated dummy,1 if the district ever hosts a park.,0/1,treatment,From the district.,Sect. 3.2,1,
+treatment,Treatment indicator,1 if the district is treated AND survey_round >= the park's open round.,0/1,treatment,Round-level open map (modal treated district opens in the 2016 round).,Eq. (2),1,The DiD treatment variable.
+event_phase,Event phase,"Round position relative to opening, in {-3,-2,-1,0,+1} (NaN for controls).","Int [-3,1]",derived,Round index minus open-round index.,Fig. 2,0; -2,Event-study phase (RCS).
+durable_goods_pc,Durable goods per capita,Number of durable items per household member.,count/person,outcome,Linear DGP: intercept + FE + tau*treatment + kappa*X + noise.,Table 5 cols 1-2,0.0; 0.7,Mean ~0.297; ATT 0.226 (controls) / 0.251 (no controls).
+housing_quality,Housing quality,1 if the household has electricity + piped water + toilet + finished floor.,0/1,outcome,Clipped LPM (Bernoulli of a clipped linear probability).,Table 5 cols 3-4,1,Mean ~0.305; ATT 0.252.
+wealth_index,DHS wealth index,"Standardized DHS wealth index (PCA of assets), z-scored per round.",z-score,outcome,"Linear DGP, SD~1.",Table 5 cols 5-6,0.4; -0.8,"Mean ~0; ATT 0.409*. N=9,688 (availability mask)."
+hh_size,Household size,Number of household members.,persons,covariate,"Normal, MILDLY correlated with treatment (control variable).",Eq. (2) X_i,5,Drives the with/without-controls gap.
+age_head,Age of head,Age of the household head.,years,covariate,"Normal, mildly correlated with treatment.",Eq. (2) X_i,43,
+survey_weight,Survey weight,DHS sampling weight (regressions are weighted).,weight,covariate,"Gamma draw, mean ~1.",Tables 5-7 notes,1.0,feols weights=survey_weight.

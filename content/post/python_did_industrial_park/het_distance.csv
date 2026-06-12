@@ -1,0 +1,4 @@
+moderator,main_treatment,interaction,se,t,stars
+dist_addis_km,3.371379,-0.008218,0.00232,-3.542211,***
+dist_state_capital_km,2.630892,-0.008623,0.004056,-2.125977,**
+dist_nearest_city_km,3.515305,-0.033515,0.006844,-4.897342,***

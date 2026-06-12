@@ -1,0 +1,5 @@
+outcome,term,estimate,se,t,stars
+IHS night-light,treatment,0.271223,0.100599,2.696084,***
+IHS night-light,nearby,0.064813,0.060994,1.062617,
+Raw night-light,treatment,1.732771,0.480626,3.605239,***
+Raw night-light,nearby,0.092673,0.068457,1.353737,

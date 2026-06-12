@@ -1,0 +1,7 @@
+outcome,variable,spec,estimate,se,t,stars,n_obs
+IHS night-light,ihs_light,no_trends,0.27044,0.10067,2.68634,***,2224
+IHS night-light,ihs_light,with_trends,0.21521,0.08327,2.58464,***,2224
+Raw night-light,light_intensity,no_trends,1.73165,0.48074,3.60205,***,2224
+Raw night-light,light_intensity,with_trends,1.61812,0.45399,3.56422,***,2224
+Impervious ratio,impervious_ratio,no_trends,0.02921,0.00419,6.97063,***,556
+Impervious ratio,impervious_ratio,with_trends,0.02631,0.00372,7.06635,***,556

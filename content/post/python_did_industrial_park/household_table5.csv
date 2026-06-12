@@ -1,0 +1,7 @@
+outcome,variable,spec,estimate,se,t,stars,n_obs
+Durable goods p.c.,durable_goods_pc,no_controls,0.24893,0.0288,8.64338,***,12207
+Durable goods p.c.,durable_goods_pc,with_controls,0.2286,0.02837,8.05767,***,12207
+Housing quality,housing_quality,no_controls,0.24837,0.01888,13.15494,***,12206
+Housing quality,housing_quality,with_controls,0.24797,0.01929,12.85255,***,12206
+Wealth index,wealth_index,no_controls,0.38748,0.04568,8.48319,***,9688
+Wealth index,wealth_index,with_controls,0.38251,0.04614,8.29042,***,9688

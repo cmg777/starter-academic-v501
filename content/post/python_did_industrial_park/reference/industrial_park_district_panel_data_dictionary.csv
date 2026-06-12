@@ -1,0 +1,35 @@
+variable,label,description,units,role,how_created,paper_reference,example_values,notes
+district_id,District ID,Unique identifier for the district (woreda).,string,identifier,Assigned ET_D001..ET_D139; treated first.,Sect. 3.1.1; Table A1,ET_D001; ET_D045,Stable key for panel/RCS merges.
+district_name,District name,District (woreda) name. Real-ish names for the 17 treated woredas (Table A1); systematic placeholders for controls.,string,identifier,Treated names from Appendix Table A1; controls '<region> woreda <id>'.,Table A1,Hawassa; Amhara woreda 045,Treated names approximate the host woredas of the parks.
+region,Region,Ethiopian regional state.,string,identifier,Hand-coded for treated (Table A1); allocated to controls in proportion to park presence.,Sect. 2.2; Table A1,Oromia; Amhara,
+region_id,Region ID,Integer code for the region (region-by-year FE key).,int,identifier,Map of region -> integer.,Eq. (1) mu_rt,1; 2,Used for region^year fixed effects.
+treated,Treated dummy,1 if the district ever hosts an industrial park.,0/1,treatment,17 treated woredas (Table A1) + 122 PSM controls.,Sect. 3.2,1,Time-invariant; 17 ones.
+open_year,Park opening year,Calendar year the district's first park opened (NaN for controls).,Int (2008-2021),treatment,"Cohort design 2008:1,2014:2,2015:2,2016:3,2017:3,2018:2,2019:2,2020:2 (Table A1).",Sect. 2.2; Table A1,2016,Defines staggered treatment timing; NaN for never-treated.
+treatment,Treatment indicator,1 if district is treated AND year >= open_year (Eq. 1 D_dt).,0/1,treatment,treated AND year>=open_year.,Eq. (1),1,The DiD treatment variable; stays 1 once on.
+nearby,Nearby dummy,1 if a control district is within 10 km of an operational park in that year (Table 2 spillover).,0/1,treatment,A few controls flagged in post years; carry NO treatment effect.,Table 2; Sect. 4.2,1,Spillover indicator -> coef ~0 ns.
+event_time,Event time k,"Years since opening, clipped to [-5,+5] (NaN for controls).","Int [-5,5]",derived,"year - open_year, clipped.",Eq. (3); Fig. 1,0; -3,Event-study k; >=3 treated per k.
+year,Year,Calendar year (2005-2020).,year,identifier,Balanced annual panel.,Sect. 3.1.2,2016,"139 x 16 = 2,224 rows."
+post,Post dummy,Equals the treatment indicator (1 once a district's park is open).,0/1,derived,= treatment.,Eq. (1),1,
+light_intensity,Nighttime light,Harmonized nighttime-light digital number (raw luminosity).,DN,outcome,Two-part DGP: extensive Bernoulli x intensive bright-base + treatment ramp.,Table 1 cols 3-4,0.0; 6.4,raw-light ATT ~1.6 (trends).
+ihs_light,IHS light,"Inverse hyperbolic sine of light_intensity, asinh(light).",asinh(DN),outcome,asinh(light_intensity).,Table 1 cols 1-2,0.0; 2.55,ATT ~0.214 (trends).
+light_positive,Light>0 dummy,1 if light_intensity>0 (extensive margin).,0/1,outcome,Stable demeaned-threshold Bernoulli; ~0.99 treated / 0.527 control.,Table A4 col 1,1,LPM extensive-margin coef ~0.009 ns.
+impervious_ratio,Impervious ratio,Impervious surface area / district land area (urbanization).,"ratio [0,1]",outcome,Additive ramp + shared-urbanization trend; observed only 2005/2010/2015/2020.,Table 1 cols 5-6,0.03; 0.07,556 non-null; ATT ~0.028 (trends).
+longitude,Longitude,District-centroid longitude.,degrees,covariate,Drawn to match Table A3 (treated 38.96/1.24).,Table A3; trends,38.9,Time-invariant; trend interaction.
+latitude,Latitude,District-centroid latitude.,degrees,covariate,Drawn to match Table A3 (treated 9.42/1.80).,Table A3; trends,9.4,Time-invariant; trend interaction.
+elevation,Elevation,Average elevation (SRTM DEM).,metres,covariate,Table A3 (treated 1849/560).,Sect. 3.1.2; Table A3,1850,
+slope,Terrain slope,Average terrain slope (SRTM DEM).,degrees,covariate,Table A3 (treated 5.25/3.45).,Sect. 3.1.2; Table A3,5.3,
+dist_addis_km,Distance to Addis Ababa,Distance to Addis Ababa.,km,covariate,Table A3 (treated 195/143).,Table 3 col 1; Table A3,195,Het moderator (Table 3).
+dist_state_capital_km,Distance to state capital,Distance to the regional capital.,km,covariate,Table A3 (treated 113/121).,Table 3 col 2,113,Het moderator (Table 3).
+dist_nearest_city_km,Distance to nearest city,Distance to the nearest large (top-50) city.,km,covariate,Table A3 (treated 52/50).,Table 3 col 3,52,Het moderator (Table 3).
+urbanization_rate_2007,Urbanization rate 2007,2007-census urban-population share.,"share [0,1]",covariate,Table A3 (treated 0.282/0.325).,Sect. 3.1.2; Table A3,0.28,Drives the shared differential trend (attenuation).
+employment_rate_2007,Employment rate 2007,2007-census employment rate.,"share [0,1]",covariate,Table A3 (treated 0.655/0.109).,Table A3,0.66,
+log_pop_density_2007,Log population density 2007,Log of 2007 population density.,log/km^2,covariate,Table A3 (treated 5.245/1.579).,Sect. 3.2; Table A3,5.2,PSM matching covariate.
+population_2007,Population 2007,2007-census district population.,persons,covariate,exp(log_pop_density)*1600 km^2.,Sect. 3.1.2,215000,Trend interaction (population).
+primary_road_density,Primary road density,Primary-road density (gROADS 2008).,km/km^2,covariate,"Gamma draw, wide spread.",Table 4 col 1,0.6,Het moderator (Table 4).
+paved_road_density,Paved road density,Paved-road density (gROADS 2008).,km/km^2,covariate,"Gamma draw, wide spread.",Table 4 col 2,0.3,Het moderator (Table 4).
+share_christian_2007,Share Christian 2007,2007-census Christian population share.,"share [0,1]",covariate,Beta draw.,Trends; Table 1 notes,0.6,Trend interaction (ethnic/religious composition).
+share_amharic_2007,Share Amharic 2007,2007-census Amharic-speaker share.,"share [0,1]",covariate,Beta draw.,Trends; Table 1 notes,0.4,Trend interaction (linguistic composition).
+labor_intensive_park,Labor-intensive park,1 if the treated district's park is labor-intensive (NaN for controls).,0/1,covariate,From Table A1 sectoral specialization.,Table A12 col 2,1,Heterogeneity moderator (Table A12).
+public_park,Public park,1 if the treated district's park is publicly owned (NaN for controls).,0/1,covariate,From Table A1 (16/22 public).,Table A12 col 3,1,Heterogeneity moderator (Table A12).
+china_aid,Chinese aid,1 if the district received infrastructure-related Chinese ODA (from first receipt).,0/1,covariate,Random ~12% of districts.,Table A7,0,Concurrent-intervention control.
+transport_project,Transport project,1 if a major transport project traverses the district (from completion).,0/1,covariate,Random ~10% of districts.,Table A7,0,Concurrent-intervention control.

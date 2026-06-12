@@ -1,0 +1,3 @@
+group,Pre-opening,Post-opening,Post - Pre,did_att_hand,did_att_diffdiff,did_se,did_p
+Control (never-treated),0.09905,0.09088,-0.00816,0.20106,0.20106,0.08848,0.02316
+Treated (park),2.13081,2.3237,0.19289,0.20106,0.20106,0.08848,0.02316

@@ -162,6 +162,7 @@ Some Quarto tutorials ship companion files (`setup_env.py`, `_quarto.yml`, `rend
 
 Tutorials currently shipping a `<slug>.zip` bundle at the post root:
 
+- `content/post/python_did_industrial_park/` (2026-06-12)
 - `content/post/python_dynamic_panel/` (2026-06-11)
 - `content/post/python_sc_co2tax/` (2026-05-15)
 - `content/post/python_iv/` (2026-05-09)
