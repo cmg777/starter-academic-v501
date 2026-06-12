@@ -80,6 +80,18 @@ This is the fundamental problem of causal inference. Y(1) is observed for floode
 Treatment is defined off DLR/ZKI and Dartmouth Flood Observatory maps made 1–5 days after the wave — exogenous geographic happenstance. The synthetic-data caveat is stated up front for honesty; Section 11 of the post audits it column by column.
 :::
 
+## Six paths a shocked economy can take
+
+After the wave, Aceh could have landed anywhere on a **menu of trajectories** — measured against the output it would have had with no tsunami (the dotted counterfactual).
+
+![A typology of post-disaster recovery paths, each plotted against its no-disaster counterfactual trend: permanently lower path, full recovery to trend, bust and boom, bust and permanently higher path, and creative destruction.](../recoveryPaths.jpeg)
+
+[Which one did Aceh take? Act II finds out.]{.comment}
+
+::: {.notes}
+The conceptual menu. A disaster can leave a region permanently poorer, exactly back on trend, temporarily above then back (bust and boom), permanently above ("build back better" — sustainable recovery beyond the counterfactual), or trigger a wave of upgrading (creative destruction). The whole investigation is about which archetype fits Aceh — the answer, foreshadowed here, is the permanently-higher path.
+:::
+
 # The Investigation {.divider background-color="#6a9bcc"}
 
 [Act II]{.act}

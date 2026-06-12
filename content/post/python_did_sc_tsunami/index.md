@@ -85,6 +85,11 @@ So here is a genuinely hard question: **a decade later, was Aceh richer or poore
 
 This post is a hands-on answer. We treat the tsunami as a **natural experiment**: the wave flooded some districts and spared others for reasons of coastal geography that have nothing to do with their economic prospects. Comparing the flooded "treated" districts to the un-flooded "control" districts — before and after 2004 — lets us isolate the disaster-plus-reconstruction effect. We will measure it four different ways, each answering a slightly sharper version of the question, and we will be honest about uncertainty when the treated places all sit in one corner of the map.
 
+But what should we even be looking for? A disaster does not push an economy onto a single, predetermined track. Relative to the path it *would* have followed without the wave (the dotted counterfactual below), output could end up permanently lower, snap right back to trend, overshoot and then fall back, settle permanently higher, or be remade entirely. These are the archetypes our estimates will have to choose between.
+
+![A typology of post-disaster recovery paths: each panel plots a region's output against the output it would have had with no disaster (dotted counterfactual trend).](recoveryPaths.jpeg)
+*Six archetypal trajectories a shocked economy can follow — from a permanently lower path to creative destruction. Which one did Aceh take? The four methods below answer that.*
+
 > **A note on the data (please read this).** This tutorial is *inspired by and based on* the study by **Heger & Neumayer (2019)**, but it runs on **synthetic data created for teaching**. The paper's real inputs (World Bank GDP, satellite night-lights, tsunami inundation maps) are licensed or confidential. Our dataset is *calibrated* so that re-running the paper's analyses reproduces its **findings** — the signs, the statistical significance, and the *approximate* magnitudes of the key coefficients. The direction and significance of most results match the paper closely; **the magnitudes can differ slightly** (we tabulate exactly how in [Section 11](#11-reproduction-audit-synthetic-data-vs-the-paper)). Use this to learn the *methods*, not to draw new conclusions about Aceh.
 
 ### 1.1 Learning objectives
