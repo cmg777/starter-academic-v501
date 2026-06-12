@@ -103,6 +103,16 @@ The effect on the **17 districts that got a park** — not on a random district 
 The estimand is the ATT, not the population-wide ATE: it is the effect on these parks in this setting and travels only as far as that. The ladder metaphor frames the whole investigation — the naive 2×2 is the cartoon version, TWFE and its event-study view are the workhorse, and the three modern estimators are the robustness insurance that the workhorse has not been led astray by staggered timing.
 :::
 
+## Where the industrial parks are located
+
+![Ethiopia's industrial parks (red dots), regional state capitals (blue stars), and the paved and primary road network.](../map_industrial_parks.png){fig-align="center" width="60%"}
+
+[Source: Appendix Figure A2 in Huang, Wang & Xu (2026). Real park locations from the paper; this tutorial uses synthetic calibrated data.]{.comment}
+
+::: {.notes}
+The parks cluster near Addis Ababa and the main transport corridors but reach peripheral regions too — this geographic clustering is exactly why we later need Conley spatial standard errors. The map is the paper's real geography; our analysis runs on synthetic calibrated data.
+:::
+
 # The Investigation {.divider background-color="#6a9bcc"}
 
 [Act II]{.act}

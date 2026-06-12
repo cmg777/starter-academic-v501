@@ -149,6 +149,16 @@ graph LR
 
 The key idea the diagram encodes is that one estimand — the ATT — threads through everything. The naive 2×2 is the cartoon version; TWFE and its event-study view are the workhorse; and the three modern estimators are the robustness insurance that the workhorse has not been led astray by staggered timing. Each box maps onto a section below, and the gender finding (the teal "Empowerment" box) is where the analysis lands.
 
+### 1.3 Where are the industrial parks located?
+
+Ethiopia placed its parks deliberately — clustered around the capital, Addis Ababa, and the main transport corridors, yet reaching into peripheral regions of the country. Before we build any statistical machinery, it helps to see the real geography we are modeling.
+
+![Map of Ethiopia showing the locations of its industrial parks (red dots), the regional state capitals (blue stars), and the paved and primary road network.](map_industrial_parks.png)
+
+*Source: Appendix Figure A2 in Huang, Wang & Xu (2026), "The socioeconomic impacts of industrial parks in Ethiopia." The map shows the paper's real park locations for geographic context; this tutorial's analysis runs on synthetic data calibrated to reproduce the paper's results.*
+
+That deliberate clustering near cities and roads is exactly the kind of non-random placement our design has to handle — so before estimating anything, the next section pins down the vocabulary that makes the treated-versus-control comparison credible.
+
 ## 2. Key concepts
 
 The post leans on a small vocabulary repeatedly, and the later sections assume you can move between these terms quickly. Each concept below has three parts. The **definition** is always visible; the **example** and **analogy** sit behind clickable cards — open them when you need them, leave them closed for a quick scan. If a later section mentions "forbidden comparisons" or "repeated cross-section" and the term feels slippery, this is the section to re-read.
