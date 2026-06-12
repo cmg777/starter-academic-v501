@@ -104,17 +104,5 @@
     {"phase": -1, "estimate":  0.0,      "se": 0.0},
     {"phase":  0, "estimate":  0.131145, "se": 0.051942},
     {"phase":  1, "estimate":  0.041881, "se": 0.081498}
-  ],
-
-  "spillover": [
-    {"outcome": "IHS night-light", "term": "treatment", "estimate": 0.271223, "se": 0.100599, "stars": "***"},
-    {"outcome": "IHS night-light", "term": "nearby",     "estimate": 0.064813, "se": 0.060994, "stars": ""}
-  ],
-
-  "twfe_satellite": [
-    {"outcome": "IHS night-light",  "spec": "no trends",   "estimate": 0.27044, "se": 0.10067, "stars": "***"},
-    {"outcome": "IHS night-light",  "spec": "with trends", "estimate": 0.21521, "se": 0.08327, "stars": "***"},
-    {"outcome": "Impervious ratio", "spec": "no trends",   "estimate": 0.02921, "se": 0.00419, "stars": "***"},
-    {"outcome": "Impervious ratio", "spec": "with trends", "estimate": 0.02631, "se": 0.00372, "stars": "***"}
   ]
 }

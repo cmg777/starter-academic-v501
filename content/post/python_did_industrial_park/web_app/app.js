@@ -7,7 +7,9 @@
   function activateTab(id) {
     tabs.forEach((t) => {
       document.getElementById("pane-" + t).classList.toggle("active", t === id);
-      document.querySelector(`.tab-strip button[data-tab="${t}"]`).classList.toggle("active", t === id);
+      const btn = document.querySelector(`.tab-strip button[data-tab="${t}"]`);
+      btn.classList.toggle("active", t === id);
+      btn.setAttribute("aria-selected", String(t === id));
     });
   }
   document.querySelectorAll(".tab-strip button").forEach((b) =>

@@ -6,8 +6,8 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.8.27">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.37">
 
   <meta name="dcterms.date" content="2026-06-12">
   <title>Do Industrial Parks Work?</title>
@@ -17,6 +17,9 @@
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
   <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -29,7 +32,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-f8a16d63170f62ba6229f8000d3e1445.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -147,7 +150,7 @@
 </section>
 <section id="governments-spend-billions-fencing-land-for-factories-does-anything-grow-outside-the-fence" class="slide level2 center">
 <h2>Governments spend billions fencing land for factories — does anything grow outside the fence?</h2>
-<p>An industrial park is serviced land, power, and a one-stop customs office, rented to garment and leather factories. Ethiopia opened <strong>20+ parks across 18 districts, 2008–2021</strong>.</p>
+<p>An industrial park: serviced land, power, one-stop customs — rented to garment and leather factories. Ethiopia opened <strong>20+ parks across 18 districts, 2008–2021</strong>.</p>
 <div class="fragment">
 <p>The promise: jobs, a wage economy, a rural region pulled forward. The fear: a bright <strong>enclave</strong> behind a fence while the surrounding districts see nothing.</p>
 <aside class="notes">
@@ -191,7 +194,7 @@
 <p>Parks were sited near cities and roads — districts that were <strong>already growing faster</strong>. So a naive treated-vs-control gap confounds the park with the place.</p>
 <div class="fragment">
 <p>We need a design that nets out pre-existing differences <em>and</em> handles a <strong>staggered</strong> rollout (parks opened in different years). That design is <strong>difference-in-differences</strong>.</p>
-<p><span class="objection">A note on the data.</span> Everything runs on <strong>synthetic, calibrated</strong> data — tuned to reproduce Huang, Wang &amp; Xu (2026)’s signs, stars, and approximate magnitudes. Learn the <em>methods</em>, not new facts about Ethiopia.</p>
+<p><span class="objection">A note on the data.</span> <strong>Synthetic, calibrated</strong> data — tuned to Huang, Wang &amp; Xu (2026)’s signs and magnitudes. Learn the <em>methods</em>, not facts about Ethiopia.</p>
 <aside class="notes">
 <p>This is the identification problem stated plainly. Selection on pre-trends is the central threat: the parks were placed in already-advantaged woredas. The fix is district and region-by-year fixed effects plus baseline-trend interactions — confounding control, not the precision-only adjustment of an experiment. The synthetic-data caveat is stated up front for honesty; Section 13 of the post audits it cell by cell.</p>
 <style type="text/css">

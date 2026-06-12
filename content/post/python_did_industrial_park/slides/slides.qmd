@@ -42,7 +42,7 @@ format:
 
 ## Governments spend billions fencing land for factories — does anything grow outside the fence?
 
-An industrial park is serviced land, power, and a one-stop customs office, rented to garment and leather factories. Ethiopia opened **20+ parks across 18 districts, 2008–2021**.
+An industrial park: serviced land, power, one-stop customs — rented to garment and leather factories. Ethiopia opened **20+ parks across 18 districts, 2008–2021**.
 
 . . .
 
@@ -74,7 +74,7 @@ Parks were sited near cities and roads — districts that were **already growing
 
 We need a design that nets out pre-existing differences *and* handles a **staggered** rollout (parks opened in different years). That design is **difference-in-differences**.
 
-[A note on the data.]{.objection} Everything runs on **synthetic, calibrated** data — tuned to reproduce Huang, Wang & Xu (2026)'s signs, stars, and approximate magnitudes. Learn the *methods*, not new facts about Ethiopia.
+[A note on the data.]{.objection} **Synthetic, calibrated** data — tuned to Huang, Wang & Xu (2026)'s signs and magnitudes. Learn the *methods*, not facts about Ethiopia.
 
 ::: {.notes}
 This is the identification problem stated plainly. Selection on pre-trends is the central threat: the parks were placed in already-advantaged woredas. The fix is district and region-by-year fixed effects plus baseline-trend interactions — confounding control, not the precision-only adjustment of an experiment. The synthetic-data caveat is stated up front for honesty; Section 13 of the post audits it cell by cell.

@@ -17,17 +17,17 @@
   </div>
 </header>
 
-<nav class="tab-strip" role="tablist">
-  <button data-tab="event" class="active">1 · Event study</button>
-  <button data-tab="estimators">2 · Estimator comparison</button>
-  <button data-tab="hetero">3 · Heterogeneity</button>
-  <button data-tab="benefits">4 · Who benefits</button>
+<nav class="tab-strip" role="tablist" aria-label="Lab sections">
+  <button id="tab-event" data-tab="event" role="tab" aria-selected="true" aria-controls="pane-event" class="active">1 · Event study</button>
+  <button id="tab-estimators" data-tab="estimators" role="tab" aria-selected="false" aria-controls="pane-estimators">2 · Estimator comparison</button>
+  <button id="tab-hetero" data-tab="hetero" role="tab" aria-selected="false" aria-controls="pane-hetero">3 · Heterogeneity</button>
+  <button id="tab-benefits" data-tab="benefits" role="tab" aria-selected="false" aria-controls="pane-benefits">4 · Who benefits</button>
 </nav>
 
 <main>
 
 <!-- TAB 1 ─────────────────────────────────────────────────────────── -->
-<section id="pane-event" class="tab-pane active">
+<section id="pane-event" class="tab-pane active" role="tabpanel" aria-labelledby="tab-event">
   <h2>The dynamic path of the park effect</h2>
   <p class="lede">
     A park is not a switch — its effect on nighttime light builds for ~5 years. The event study
@@ -48,13 +48,13 @@
 
   <div class="controls">
     <div class="control"><label>Post-period horizon <span class="value" id="v-horizon">5</span></label>
-      <input type="range" id="s-horizon" min="0" max="5" step="1" value="5">
+      <input type="range" id="s-horizon" min="0" max="5" step="1" value="5" aria-label="Post-period horizon: years after opening to show">
       <div class="hint">How many post-opening years to show (k = 0 … this). Pre-opening leads are always shown.</div></div>
     <div class="control"><label>Simulated treated woredas <span class="value" id="v-ntreated">17</span></label>
-      <input type="range" id="s-ntreated" min="5" max="120" step="1" value="17">
+      <input type="range" id="s-ntreated" min="5" max="120" step="1" value="17" aria-label="Number of simulated treated woredas">
       <div class="hint">The real study had only 17 — fewer treated units make the simulated path wobble more.</div></div>
     <div class="control"><label>Inject a pre-trend <span class="value" id="v-pretrend">0.000</span></label>
-      <input type="range" id="s-pretrend" min="-0.04" max="0.04" step="0.005" value="0">
+      <input type="range" id="s-pretrend" min="-0.04" max="0.04" step="0.005" value="0" aria-label="Injected pre-trend slope on the pre-opening leads">
       <div class="hint">Add a slope to the pre-opening leads to break parallel trends (the true study's is ≈ 0).</div></div>
   </div>
 
@@ -73,10 +73,16 @@
     <div class="gloss-body">The effect <em>on the woredas that actually got a park</em>, under parallel trends. Every estimator in this lab targets the same ATT; this is an <em>observational</em> setting (parks are not randomly placed), so the FE design does confounding control, not precision-only adjustment.</div></details>
   <details class="gloss"><summary>Why the naive 2×2 understates the effect</summary>
     <div class="gloss-body">Collapsing the staggered design at the median opening year (2017) gives a 2×2 DiD of <em>+0.201</em>. Because the effect ramps up over 5 years, averaging the small early post-years with the large late ones pulls that blended number below the long-run ATT.</div></details>
+  <details class="gloss"><summary>Forbidden comparisons &amp; negative weights</summary>
+    <div class="gloss-body">Under staggered timing, two-way fixed effects quietly uses <em>already-treated</em> units as controls for later-treated ones. When effects grow over time these "forbidden" comparisons get negative weights and can bias — even flip — the estimate. Here they carry just <em>1.2%</em> of the weight, so the bias is negligible.</div></details>
+  <details class="gloss"><summary>Repeated-cross-section DiD</summary>
+    <div class="gloss-body">When each survey round samples <em>different</em> households (no panel key), you cannot use unit fixed effects. The effect is identified off district × round group means, absorbing district and region × round fixed effects — used here for the DHS welfare and employment outcomes.</div></details>
+  <details class="gloss"><summary>Conley spatial-HAC standard errors</summary>
+    <div class="gloss-body">Because the 17 treated woredas cluster in space, a regional shock hits several at once, so errors are not independent draws. Conley errors let a district's errors correlate with nearby districts in the same year; here the SE inflates <em>2.43×</em> (0.033 → 0.080) yet the effect stays significant.</div></details>
 </section>
 
 <!-- TAB 2 ─────────────────────────────────────────────────────────── -->
-<section id="pane-estimators" class="tab-pane">
+<section id="pane-estimators" class="tab-pane" role="tabpanel" aria-labelledby="tab-estimators">
   <h2>Four estimators, one estimand — and the Goodman-Bacon teaching moment</h2>
   <p class="lede">
     Under staggered timing, two-way fixed effects (TWFE) can use already-treated units as controls —
@@ -113,7 +119,7 @@
 </section>
 
 <!-- TAB 3 ─────────────────────────────────────────────────────────── -->
-<section id="pane-hetero" class="tab-pane">
+<section id="pane-hetero" class="tab-pane" role="tabpanel" aria-labelledby="tab-hetero">
   <h2>Location fundamentals: the effect fades with distance, roads amplify it</h2>
   <p class="lede">
     A park does not lift every woreda equally. The implied effect on raw light <em>fades</em> the
@@ -145,7 +151,7 @@
 </section>
 
 <!-- TAB 4 ─────────────────────────────────────────────────────────── -->
-<section id="pane-benefits" class="tab-pane">
+<section id="pane-benefits" class="tab-pane" role="tabpanel" aria-labelledby="tab-benefits">
   <h2>Who benefits? Welfare rises, and the gender split is the story</h2>
   <p class="lede">
     The satellite light effect is real — but who actually gains? Households near a park gain durables,
