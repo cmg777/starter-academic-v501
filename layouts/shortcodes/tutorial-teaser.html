@@ -8,7 +8,9 @@
 {{ $count := int (.Get "count" | default 6) }}
 
 {{ $posts := where site.RegularPages "Section" "post" }}
-{{ $posts = $posts.ByDate.Reverse }}
+{{/* Most-recently-updated first: .Lastmod = git commit date of the post's index.md
+     (enableGitInfo), falling back to the `date` front matter when no git info exists. */}}
+{{ $posts = $posts.ByLastmod.Reverse }}
 {{ $teaser := slice }}
 {{ range $posts }}
   {{ $cats := default (slice) .Params.categories }}

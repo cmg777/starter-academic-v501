@@ -19,13 +19,16 @@
      keep their own permalink (fully backward-compatible). */}}
 {{ $href := $p.RelPermalink }}
 {{ with $p.Params.card_url }}{{ $href = . }}{{ end }}
+{{/* data-date drives the /post/ archive's Newest/Oldest sort. Default = creation
+     date (.Date); the homepage teaser passes useLastmod to track the git update date. */}}
+{{ $cardDate := $p.Date }}{{ if .useLastmod }}{{ $cardDate = $p.Lastmod }}{{ end }}
 <a class="tg-card"
    href="{{ $href }}"
    data-topic="{{ .topicId }}"
    data-language="{{ .languageKey }}"
    data-title="{{ lower $p.Title }}"
    data-summary="{{ with $p.Params.summary }}{{ lower (. | plainify) }}{{ end }}"
-   data-date="{{ $p.Date.Format "2006-01-02" }}"
+   data-date="{{ $cardDate.Format "2006-01-02" }}"
    title="{{ $p.Title }}"
    aria-label="{{ $p.Title }}">
   <div class="tg-card-media">

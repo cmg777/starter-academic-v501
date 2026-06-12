@@ -62,7 +62,9 @@ module:
 ## ADVANCED
 ############################
 
-enableGitInfo: false
+# Mirrors HUGO_ENABLEGITINFO=true in netlify.toml so local builds match production:
+# .Lastmod = last git commit date of a page's index.md (falls back to `date`).
+enableGitInfo: true
 summaryLength: 30
 paginate: 10
 enableEmoji: true

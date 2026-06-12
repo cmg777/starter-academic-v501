@@ -35,6 +35,9 @@
 {{ $langData := index $languages $lang }}
 {{ if not $langData }}{{ $langData = dict "label" "—" "color" "#6c757d" }}{{ end }}
 
+{{/* Homepage-only path (tutorial-teaser): tag the card so its data-date uses
+     .Lastmod, matching the teaser's most-recently-updated ordering. The /post/
+     archive renders tutorial_card.html directly and keeps creation-date data-date. */}}
 {{ partial "tutorial_card.html" (dict
     "page" $p
     "topicId" $topic.id
@@ -43,4 +46,5 @@
     "topicIcon" $topic.icon
     "languageKey" $lang
     "languageLabel" $langData.label
-    "languageColor" $langData.color) }}
+    "languageColor" $langData.color
+    "useLastmod" true) }}
