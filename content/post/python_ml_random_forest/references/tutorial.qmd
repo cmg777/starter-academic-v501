@@ -836,6 +836,140 @@ plt.show()
 
 The methods rank as theory predicts (Optuna ≥ random ≥ grid for equal budgets), but the improvement is tiny — well within the fold-to-fold standard deviation from Section 7. The tuning gain is smaller than the noise, which is why the main tutorial keeps the defaults. Spend effort on tuning when a baseline and a learning curve suggest there is headroom to win.
 
+## Appendix C — Introduction to machine learning with multivariate regression
+
+The main tutorial used a Random Forest — a flexible black box across all 64 features. This appendix re-introduces the *same* workflow with the simplest model, **multiple linear regression**, on only the **first four features (A00–A03)**: a model you can write as one equation, evaluated with the identical 5-fold cross-validation, out-of-fold predictions, metrics, plots, importance, and partial dependence.
+
+### C.1 The model — predict IMDS from four features
+
+$\hat y = \beta_0 + \beta_1 A00 + \beta_2 A01 + \beta_3 A02 + \beta_4 A03$. Each coefficient is the change in predicted IMDS per one-unit change in that feature, holding the others fixed.
+
+```{python}
+#| label: lr-fit
+from sklearn.linear_model import LinearRegression
+
+LR_FEATURES = FEATURE_COLS[:4]          # A00, A01, A02, A03
+X4 = X[LR_FEATURES]
+lr_full = LinearRegression().fit(X4, y)
+print("intercept:", round(lr_full.intercept_, 2))
+print({f: round(float(c), 2) for f, c in zip(LR_FEATURES, lr_full.coef_)})
+```
+
+Every term is visible and interpretable — but a model fit on all the data says nothing about generalization. For that we cross-validate.
+
+### C.2 Five-fold cross-validation and out-of-fold predictions
+
+Reuse the same `kf` and the same `cross_validate` / `cross_val_predict` calls — only the model and feature set change.
+
+```{python}
+#| label: lr-cv
+lr = LinearRegression()
+lr_cv = cross_validate(lr, X4, y, cv=kf,
+                       scoring=("r2", "neg_root_mean_squared_error", "neg_mean_absolute_error"))
+lr_fold_r2 = lr_cv["test_r2"]
+lr_fold_rmse = -lr_cv["test_neg_root_mean_squared_error"]
+lr_fold_mae = -lr_cv["test_neg_mean_absolute_error"]
+lr_oof = cross_val_predict(lr, X4, y, cv=kf)
+lr_resid = np.asarray(y) - lr_oof
+print("Per-fold R²:", lr_fold_r2.round(3))
+print(f"Mean R²: {lr_fold_r2.mean():.3f} ± {lr_fold_r2.std():.3f}")
+print(f"Pooled OOF R²: {r2_score(y, lr_oof):.3f}")
+```
+
+### C.3 Evaluating the predictions
+
+```{python}
+#| label: lr-table
+lr_table = pd.DataFrame({
+    "Fold": list(range(1, N_FOLDS + 1)) + ["Mean", "Std"],
+    "R2": list(lr_fold_r2.round(3)) + [round(lr_fold_r2.mean(), 3), round(lr_fold_r2.std(), 3)],
+    "RMSE": list(lr_fold_rmse.round(2)) + [round(lr_fold_rmse.mean(), 2), round(lr_fold_rmse.std(), 2)],
+    "MAE": list(lr_fold_mae.round(2)) + [round(lr_fold_mae.mean(), 2), round(lr_fold_mae.std(), 2)],
+})
+print(lr_table.to_string(index=False))
+```
+
+The linear model explains only ~6% of IMDS variation (pooled OOF R² ≈ 0.06) — low, but the *workflow* is the lesson, not the score. The same pipeline, with more features or a flexible model, does better.
+
+### C.4 Evaluation plots
+
+```{python}
+#| label: fig-lr-actual-vs-predicted
+#| fig-cap: "Linear regression: out-of-fold predicted vs actual IMDS, colored by fold."
+fig, ax = plt.subplots(figsize=(7.2, 7.2))
+for k in range(1, N_FOLDS + 1):
+    m = fold_id == k
+    ax.scatter(y[m], lr_oof[m], s=34, alpha=0.75, edgecolors="white", linewidth=0.4,
+               color=FOLD_COLORS[k - 1], label=f"Fold {k}")
+lims = [float(y.min()) - 2, float(y.max()) + 2]
+ax.plot(lims, lims, "--", color="#141413", linewidth=1.8, label="Perfect prediction")
+ax.set_xlim(lims); ax.set_ylim(lims); ax.set_aspect("equal")
+ax.set_xlabel("Actual IMDS"); ax.set_ylabel("Predicted IMDS (out-of-fold)")
+ax.set_title("Linear regression (4 features): out-of-fold predictions")
+ax.legend(loc="lower right", ncol=2, fontsize=9)
+plt.show()
+```
+
+```{python}
+#| label: fig-lr-residuals
+#| fig-cap: "Linear regression: out-of-fold residuals, colored by fold."
+fig, ax = plt.subplots(figsize=(8, 5))
+for k in range(1, N_FOLDS + 1):
+    m = fold_id == k
+    ax.scatter(lr_oof[m], lr_resid[m], s=30, alpha=0.7, edgecolors="white", linewidth=0.4,
+               color=FOLD_COLORS[k - 1], label=f"Fold {k}")
+ax.axhline(0, color="#141413", linestyle="--", linewidth=1.8)
+ax.set_xlabel("Predicted IMDS (out-of-fold)"); ax.set_ylabel("Residual (actual − predicted)")
+ax.set_title("Linear regression: out-of-fold residuals")
+ax.legend(loc="upper right", ncol=2, fontsize=9)
+plt.show()
+```
+
+With so little signal, predictions barely spread — almost every town is pulled to the mean of ~51, and the residuals stay large.
+
+### C.5 Feature importance
+
+For a linear model, importance *is* the coefficient. Standardize the features so they are comparable; the standardized coefficient's magnitude is the importance and its sign the direction.
+
+```{python}
+#| label: fig-lr-importance
+#| fig-cap: "Linear regression: standardized (signed) coefficients."
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+
+std = make_pipeline(StandardScaler(), LinearRegression()).fit(X4, y)
+std_coefs = std[-1].coef_
+print({f: round(float(c), 2) for f, c in zip(LR_FEATURES, std_coefs)})
+fig, ax = plt.subplots(figsize=(7, 4.5))
+ax.bar(LR_FEATURES, std_coefs,
+       color=["#6a9bcc" if c >= 0 else "#d97757" for c in std_coefs],
+       edgecolor="white", alpha=0.9, width=0.6)
+ax.axhline(0, color="#141413", linewidth=1)
+ax.set_ylabel("Standardized coefficient")
+ax.set_title("Linear regression: standardized coefficients (signed importance)")
+plt.show()
+```
+
+A00 dominates; A01 is essentially zero. This is the linear analogue of permutation importance — free, signed, straight from the equation.
+
+### C.6 Partial dependence
+
+```{python}
+#| label: fig-lr-partial-dependence
+#| fig-cap: "Linear regression: partial dependence is a straight line for every feature."
+fig, axes = plt.subplots(1, 4, figsize=(16, 4))
+PartialDependenceDisplay.from_estimator(lr_full, X4, LR_FEATURES, ax=axes.ravel(), grid_resolution=50)
+fig.suptitle("Linear regression: partial dependence is a straight line", fontsize=13)
+plt.tight_layout(rect=[0, 0, 1, 0.93])
+plt.show()
+```
+
+Every panel is a **straight line** — a linear model's effect is constant, the slope being the coefficient. Contrast the forest's bending, plateauing curves (Section 11): that is exactly what a flexible model buys you.
+
+### C.7 How it compares to the Random Forest
+
+Linear regression on 4 features reaches a pooled out-of-fold R² of about 0.06; the Random Forest on 64 features reaches 0.22 — roughly four times the explained variance, from more features and non-linearity. Yet both were built and judged with the *identical* workflow. Swapping `LinearRegression()` for `RandomForestRegressor()` is a one-line change.
+
 ## Source files
 
 - Companion script: [`script.py`](https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_ml_random_forest/script.py)

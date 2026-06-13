@@ -153,6 +153,44 @@
     "best_improvement": 0.0273,
     "n_trials": 40
   },
+  "linear": {
+    "features": [
+      "A00",
+      "A01",
+      "A02",
+      "A03"
+    ],
+    "fold_r2": [
+      0.0542,
+      0.0706,
+      -0.0396,
+      0.0937,
+      0.0563
+    ],
+    "mean_r2": 0.047,
+    "std_r2": 0.0456,
+    "mean_rmse": 6.5175,
+    "std_rmse": 0.7415,
+    "mean_mae": 5.022,
+    "std_mae": 0.5792,
+    "pooled_r2": 0.0587,
+    "pooled_rmse": 6.5603,
+    "pooled_mae": 5.022,
+    "intercept": 54.4217,
+    "coefficients": {
+      "A00": 19.5891,
+      "A01": -0.3487,
+      "A02": 15.9854,
+      "A03": 12.6603
+    },
+    "std_coefficients": {
+      "A00": 1.6131,
+      "A01": -0.0215,
+      "A02": 0.698,
+      "A03": 0.4194
+    },
+    "rf_pooled_r2": 0.2252
+  },
   "oof_predictions": [
     {
       "id": 0,

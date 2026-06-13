@@ -40,6 +40,7 @@ Usage:
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -86,6 +87,15 @@ COLOR_DARK = "#141413"      # near black
 COLOR_TEAL = "#00d4c8"      # teal
 FOLD_COLORS = ["#6a9bcc", "#d97757", "#00d4c8", "#8e6fb0", "#e0a23a"]
 
+# Opt-in dark style for the published blog post (run with RF_FIG_STYLE=dark). The
+# default light run produces the canonical ml_*.png that the slide deck reuses; the
+# dark run writes ml_*_dark.png on a navy canvas matching the site's dark theme.
+DARK = os.environ.get("RF_FIG_STYLE", "").lower() == "dark"
+SUFFIX = "_dark" if DARK else ""
+LINE = "#c8d0e0" if DARK else COLOR_DARK          # reference lines (45-deg, means, hlines)
+BASELINE_BAR = "#9aa6bd" if DARK else COLOR_DARK  # tuning-comparison baseline bar
+ANNOT_FC = "#0f1729" if DARK else "white"         # annotation box fill
+
 plt.rcParams.update({
     "figure.dpi": 110,
     "savefig.dpi": 300,
@@ -96,6 +106,14 @@ plt.rcParams.update({
     "grid.alpha": 0.25,
     "font.size": 11,
 })
+if DARK:
+    plt.rcParams.update({
+        "figure.facecolor": "#1a2236", "axes.facecolor": "#1a2236", "savefig.facecolor": "#1a2236",
+        "text.color": "#e8ecf2", "axes.titlecolor": "#e8ecf2", "axes.labelcolor": "#c8d0e0",
+        "axes.edgecolor": "#3a4a6a", "xtick.color": "#c8d0e0", "ytick.color": "#c8d0e0",
+        "grid.color": "#33415c", "grid.alpha": 0.4,
+        "legend.facecolor": "#0f1729", "legend.edgecolor": "#3a4a6a", "legend.labelcolor": "#e8ecf2",
+    })
 
 
 def rmse(y_true, y_pred) -> float:
@@ -150,15 +168,15 @@ fig, ax = plt.subplots(figsize=(8, 5))
 ax.hist(y, bins=30, edgecolor="white", alpha=0.85, color=COLOR_PRIMARY)
 ax.axvline(y.mean(), color=COLOR_ACCENT, linestyle="--", linewidth=2,
            label=f"Mean = {y.mean():.1f}")
-ax.axvline(y.median(), color=COLOR_DARK, linestyle=":", linewidth=2,
+ax.axvline(y.median(), color=LINE, linestyle=":", linewidth=2,
            label=f"Median = {y.median():.1f}")
 ax.set_xlabel(TARGET_LABEL)
 ax.set_ylabel("Count")
 ax.set_title(f"Distribution of {TARGET_SHORT} across {n_obs} municipalities")
 ax.legend()
-plt.savefig(OUTPUT_DIR / "ml_target_distribution.png")
+plt.savefig(OUTPUT_DIR / f"ml_target_distribution{SUFFIX}.png")
 plt.close()
-print("Saved: ml_target_distribution.png")
+print(f"Saved: ml_target_distribution{SUFFIX}.png")
 
 # 5.2 Embedding correlations
 correlations = X.corrwith(y).abs().sort_values(ascending=False)
@@ -168,9 +186,9 @@ fig, ax = plt.subplots(figsize=(10, 8))
 sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="RdBu_r", center=0,
             square=True, ax=ax, vmin=-1, vmax=1)
 ax.set_title(f"Correlations: top-10 embeddings & {TARGET_SHORT}")
-plt.savefig(OUTPUT_DIR / "ml_embedding_correlations.png")
+plt.savefig(OUTPUT_DIR / f"ml_embedding_correlations{SUFFIX}.png")
 plt.close()
-print("Saved: ml_embedding_correlations.png")
+print(f"Saved: ml_embedding_correlations{SUFFIX}.png")
 summary["eda"] = {
     "top_corr_feature": top10_features[0],
     "top_corr_value": round(float(correlations.iloc[0]), 3),
@@ -234,8 +252,8 @@ fold_table = pd.DataFrame({
     "RMSE": list(np.round(fold_rmse, 4)) + [round(fold_rmse.mean(), 4), round(fold_rmse.std(), 4)],
     "MAE": list(np.round(fold_mae, 4)) + [round(fold_mae.mean(), 4), round(fold_mae.std(), 4)],
 })
-fold_table.to_csv(OUTPUT_DIR / "ml_cv_fold_metrics.csv", index=False)
-print("Saved: ml_cv_fold_metrics.csv")
+fold_table.to_csv(OUTPUT_DIR / f"ml_cv_fold_metrics.csv", index=False)
+print(f"Saved: ml_cv_fold_metrics.csv")
 
 summary["cv"] = {
     "n_folds": N_FOLDS,
@@ -264,8 +282,8 @@ folds = np.arange(1, N_FOLDS + 1)
 for ax, (name, vals, color) in zip(axes, panels):
     ax.bar(folds, vals, color=color, edgecolor="white", alpha=0.9, width=0.65)
     m, s = vals.mean(), vals.std()
-    ax.axhspan(m - s, m + s, color=COLOR_DARK, alpha=0.08)
-    ax.axhline(m, color=COLOR_DARK, linestyle="--", linewidth=1.5)
+    ax.axhspan(m - s, m + s, color=LINE, alpha=0.12 if DARK else 0.08)
+    ax.axhline(m, color=LINE, linestyle="--", linewidth=1.5)
     ax.set_xticks(folds)
     ax.set_xlabel("Fold")
     ax.set_ylabel(name)
@@ -273,9 +291,9 @@ for ax, (name, vals, color) in zip(axes, panels):
 fig.suptitle("Performance varies across the five folds (dashed = mean, band = ±1 SD)",
              fontsize=13)
 plt.tight_layout(rect=(0, 0, 1, 0.94))
-plt.savefig(OUTPUT_DIR / "ml_per_fold_metrics.png")
+plt.savefig(OUTPUT_DIR / f"ml_per_fold_metrics{SUFFIX}.png")
 plt.close()
-print("Saved: ml_per_fold_metrics.png")
+print(f"Saved: ml_per_fold_metrics{SUFFIX}.png")
 
 # ---------------------------------------------------------------------------
 # 9. Actual vs predicted (all 339 points, colored by fold)
@@ -288,7 +306,7 @@ for k in range(1, N_FOLDS + 1):
     ax.scatter(y[m], oof_pred[m], s=34, alpha=0.75, edgecolors="white",
                linewidth=0.4, color=FOLD_COLORS[k - 1], label=f"Fold {k}")
 lims = [float(min(y.min(), oof_pred.min())) - 2, float(max(y.max(), oof_pred.max())) + 2]
-ax.plot(lims, lims, "--", color=COLOR_DARK, linewidth=1.8, label="Perfect prediction")
+ax.plot(lims, lims, "--", color=LINE, linewidth=1.8, label="Perfect prediction")
 ax.set_xlim(lims)
 ax.set_ylim(lims)
 ax.set_aspect("equal")
@@ -297,11 +315,11 @@ ax.set_ylabel(f"Predicted {TARGET_SHORT} (out-of-fold)")
 ax.set_title(f"Out-of-fold predictions for all {n_obs} municipalities")
 ax.text(0.04, 0.95, f"Pooled OOF R² = {pooled_r2:.3f}", transform=ax.transAxes,
         va="top", ha="left", fontsize=11,
-        bbox=dict(boxstyle="round", fc="white", ec=COLOR_DARK, alpha=0.8))
+        bbox=dict(boxstyle="round", fc=ANNOT_FC, ec=LINE, alpha=0.85))
 ax.legend(loc="lower right", fontsize=9, ncol=2)
-plt.savefig(OUTPUT_DIR / "ml_actual_vs_predicted.png")
+plt.savefig(OUTPUT_DIR / f"ml_actual_vs_predicted{SUFFIX}.png")
 plt.close()
-print("Saved: ml_actual_vs_predicted.png")
+print(f"Saved: ml_actual_vs_predicted{SUFFIX}.png")
 
 # 9.2 Residuals, colored by fold
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -309,14 +327,14 @@ for k in range(1, N_FOLDS + 1):
     m = fold_id == k
     ax.scatter(oof_pred[m], residuals[m], s=30, alpha=0.7, edgecolors="white",
                linewidth=0.4, color=FOLD_COLORS[k - 1], label=f"Fold {k}")
-ax.axhline(0, color=COLOR_DARK, linestyle="--", linewidth=1.8)
+ax.axhline(0, color=LINE, linestyle="--", linewidth=1.8)
 ax.set_xlabel(f"Predicted {TARGET_SHORT} (out-of-fold)")
 ax.set_ylabel("Residual (actual − predicted)")
 ax.set_title("Out-of-fold residuals vs predicted values")
 ax.legend(loc="upper right", fontsize=9, ncol=2)
-plt.savefig(OUTPUT_DIR / "ml_residuals.png")
+plt.savefig(OUTPUT_DIR / f"ml_residuals{SUFFIX}.png")
 plt.close()
-print("Saved: ml_residuals.png")
+print(f"Saved: ml_residuals{SUFFIX}.png")
 
 # ---------------------------------------------------------------------------
 # 10. Comparing distributions: predicted vs actual  -> ml_distribution_overlap.png
@@ -340,9 +358,9 @@ ax.set_xlabel(TARGET_SHORT)
 ax.set_ylabel("Density")
 ax.set_title(f"Predicted vs actual distribution  (KS = {ks_stat:.3f}, p = {ks_p:.3g})")
 ax.legend()
-plt.savefig(OUTPUT_DIR / "ml_distribution_overlap.png")
+plt.savefig(OUTPUT_DIR / f"ml_distribution_overlap{SUFFIX}.png")
 plt.close()
-print("Saved: ml_distribution_overlap.png")
+print(f"Saved: ml_distribution_overlap{SUFFIX}.png")
 
 dist_stats = pd.DataFrame({
     "Statistic": ["Mean", "Std", "Min", "Max"],
@@ -351,8 +369,8 @@ dist_stats = pd.DataFrame({
     "Predicted (OOF)": [round(float(oof_pred.mean()), 2), round(float(oof_pred.std()), 2),
                         round(float(oof_pred.min()), 2), round(float(oof_pred.max()), 2)],
 })
-dist_stats.to_csv(OUTPUT_DIR / "ml_distribution_stats.csv", index=False)
-print("Saved: ml_distribution_stats.csv")
+dist_stats.to_csv(OUTPUT_DIR / f"ml_distribution_stats.csv", index=False)
+print(f"Saved: ml_distribution_stats.csv")
 summary["distribution"] = {
     "actual_mean": round(float(y.mean()), 2), "actual_std": round(float(y.std()), 2),
     "pred_mean": round(float(oof_pred.mean()), 2), "pred_std": round(float(oof_pred.std()), 2),
@@ -374,9 +392,9 @@ fig, ax = plt.subplots(figsize=(10, 6))
 top20_mdi.sort_values().plot.barh(ax=ax, color=COLOR_PRIMARY, edgecolor="white")
 ax.set_xlabel("Mean decrease in impurity")
 ax.set_title(f"Top-20 feature importance (MDI) for {TARGET_SHORT}")
-plt.savefig(OUTPUT_DIR / "ml_feature_importance_mdi.png")
+plt.savefig(OUTPUT_DIR / f"ml_feature_importance_mdi{SUFFIX}.png")
 plt.close()
-print("Saved: ml_feature_importance_mdi.png")
+print(f"Saved: ml_feature_importance_mdi{SUFFIX}.png")
 
 # 11.2 Permutation importance
 perm = permutation_importance(rf_full, X, y, n_repeats=10,
@@ -387,9 +405,9 @@ fig, ax = plt.subplots(figsize=(10, 6))
 top20_perm.sort_values().plot.barh(ax=ax, color=COLOR_ACCENT, edgecolor="white")
 ax.set_xlabel("Mean decrease in R² (permutation)")
 ax.set_title(f"Top-20 feature importance (permutation) for {TARGET_SHORT}")
-plt.savefig(OUTPUT_DIR / "ml_feature_importance_permutation.png")
+plt.savefig(OUTPUT_DIR / f"ml_feature_importance_permutation{SUFFIX}.png")
 plt.close()
-print("Saved: ml_feature_importance_permutation.png")
+print(f"Saved: ml_feature_importance_permutation{SUFFIX}.png")
 
 summary["importance"] = {
     "mdi_top5": [[f, round(float(mdi[f]), 4)] for f in mdi.sort_values(ascending=False).head(5).index],
@@ -406,9 +424,9 @@ PartialDependenceDisplay.from_estimator(
 )
 fig.suptitle(f"Partial dependence — top-6 features for {TARGET_SHORT}", fontsize=14)
 plt.tight_layout(rect=(0, 0, 1, 0.95))
-plt.savefig(OUTPUT_DIR / "ml_partial_dependence.png")
+plt.savefig(OUTPUT_DIR / f"ml_partial_dependence{SUFFIX}.png")
 plt.close()
-print("Saved: ml_partial_dependence.png")
+print(f"Saved: ml_partial_dependence{SUFFIX}.png")
 summary["pdp_features"] = top6
 
 # ---------------------------------------------------------------------------
@@ -420,8 +438,8 @@ results_df = pd.DataFrame({
     "Per-fold SD": [f"{fold_r2.std():.3f}", f"{fold_rmse.std():.2f}", f"{fold_mae.std():.2f}"],
     "Pooled OOF": [f"{pooled_r2:.3f}", f"{pooled_rmse:.2f}", f"{pooled_mae:.2f}"],
 })
-results_df.to_csv(OUTPUT_DIR / "ml_rf_results.csv", index=False)
-print("Saved: ml_rf_results.csv")
+results_df.to_csv(OUTPUT_DIR / f"ml_rf_results.csv", index=False)
+print(f"Saved: ml_rf_results.csv")
 
 # ===========================================================================
 # APPENDIX A — Why a single train/test split is unreliable
@@ -440,7 +458,7 @@ single_split_r2 = r2_score(
 
 fig, ax = plt.subplots(figsize=(8.5, 5))
 ax.hist(split_r2, bins=30, color=COLOR_PRIMARY, alpha=0.8, edgecolor="white")
-ax.axvline(single_split_r2, color=COLOR_DARK, linestyle=":", linewidth=2,
+ax.axvline(single_split_r2, color=LINE, linestyle=":", linewidth=2,
            label=f"One split (seed 42) = {single_split_r2:.3f}")
 ax.axvline(pooled_r2, color=COLOR_ACCENT, linestyle="--", linewidth=2,
            label=f"5-fold CV (pooled OOF) = {pooled_r2:.3f}")
@@ -449,9 +467,9 @@ ax.set_ylabel("Count")
 ax.set_title(f"Test R² over 200 random 80/20 splits "
              f"(range {split_r2.min():.2f} to {split_r2.max():.2f})")
 ax.legend()
-plt.savefig(OUTPUT_DIR / "ml_appendix_split_variability.png")
+plt.savefig(OUTPUT_DIR / f"ml_appendix_split_variability{SUFFIX}.png")
 plt.close()
-print("Saved: ml_appendix_split_variability.png")
+print(f"Saved: ml_appendix_split_variability{SUFFIX}.png")
 summary["appendix_split"] = {
     "n_splits": 200,
     "split_r2_min": round(float(split_r2.min()), 3),
@@ -523,20 +541,20 @@ ax.scatter(np.arange(1, len(trial_vals) + 1), trial_vals, s=28, alpha=0.6,
            color=COLOR_PRIMARY, label="Trial CV R²")
 ax.plot(np.arange(1, len(trial_vals) + 1), running_best, color=COLOR_ACCENT,
         linewidth=2, label="Best so far")
-ax.axhline(baseline_cv_r2, color=COLOR_DARK, linestyle=":", linewidth=1.8,
+ax.axhline(baseline_cv_r2, color=LINE, linestyle=":", linewidth=1.8,
            label=f"Baseline (untuned) = {baseline_cv_r2:.3f}")
 ax.set_xlabel("Optuna trial")
 ax.set_ylabel("Mean 5-fold CV R²")
 ax.set_title("Optuna search history (TPE sampler)")
 ax.legend()
-plt.savefig(OUTPUT_DIR / "ml_appendix_optuna_history.png")
+plt.savefig(OUTPUT_DIR / f"ml_appendix_optuna_history{SUFFIX}.png")
 plt.close()
-print("Saved: ml_appendix_optuna_history.png")
+print(f"Saved: ml_appendix_optuna_history{SUFFIX}.png")
 
 # Tuning comparison bar chart.
 methods = ["Baseline", "Grid", "Random", "Optuna"]
 scores = [baseline_cv_r2, float(grid.best_score_), float(rand.best_score_), float(study.best_value)]
-colors = [COLOR_DARK, COLOR_PRIMARY, COLOR_TEAL, COLOR_ACCENT]
+colors = [BASELINE_BAR, COLOR_PRIMARY, COLOR_TEAL, COLOR_ACCENT]
 fig, ax = plt.subplots(figsize=(8, 5))
 bars = ax.bar(methods, scores, color=colors, edgecolor="white", alpha=0.9, width=0.6)
 for b, s in zip(bars, scores):
@@ -545,13 +563,13 @@ for b, s in zip(bars, scores):
 ax.set_ylabel("Best mean 5-fold CV R²")
 ax.set_ylim(0, max(scores) * 1.18)
 ax.set_title("Tuning buys almost nothing over the baseline")
-plt.savefig(OUTPUT_DIR / "ml_appendix_tuning_comparison.png")
+plt.savefig(OUTPUT_DIR / f"ml_appendix_tuning_comparison{SUFFIX}.png")
 plt.close()
-print("Saved: ml_appendix_tuning_comparison.png")
+print(f"Saved: ml_appendix_tuning_comparison{SUFFIX}.png")
 
 tuning_df = pd.DataFrame({"Method": methods, "Best CV R2": [round(s, 4) for s in scores]})
-tuning_df.to_csv(OUTPUT_DIR / "ml_tuning_comparison.csv", index=False)
-print("Saved: ml_tuning_comparison.csv")
+tuning_df.to_csv(OUTPUT_DIR / f"ml_tuning_comparison.csv", index=False)
+print(f"Saved: ml_tuning_comparison.csv")
 
 best_overall = max(
     [("Grid", grid.best_score_, grid.best_params_),
@@ -563,8 +581,8 @@ best_params = {k: ("None" if v is None else v) for k, v in best_overall[2].items
 params_df = pd.DataFrame(
     [{"Parameter": k, "Value": v} for k, v in best_params.items()]
 )
-params_df.to_csv(OUTPUT_DIR / "ml_rf_best_params.csv", index=False)
-print("Saved: ml_rf_best_params.csv")
+params_df.to_csv(OUTPUT_DIR / f"ml_rf_best_params.csv", index=False)
+print(f"Saved: ml_rf_best_params.csv")
 
 summary["tuning"] = {
     "baseline_cv_r2": round(baseline_cv_r2, 4),
@@ -575,6 +593,121 @@ summary["tuning"] = {
     "best_params": best_params,
     "best_improvement": round(float(best_overall[1]) - baseline_cv_r2, 4),
     "n_trials": 40,
+}
+
+# ===========================================================================
+# APPENDIX C — Introduction to ML with multivariate (linear) regression
+# ===========================================================================
+# The same 5-fold CV workflow as the main body, but with the simplest model —
+# multiple linear regression — on only the first four embedding features. The
+# point is transparency: a model you can write as an equation, evaluated with
+# the identical cross_validate / cross_val_predict / partial-dependence tools.
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+
+LR_FEATURES = FEATURE_COLS[:4]          # A00, A01, A02, A03
+X4 = X[LR_FEATURES]
+lr = LinearRegression()
+
+# C.2 cross-validation + out-of-fold predictions (same kf / fold_id as the body)
+lr_cv = cross_validate(
+    lr, X4, y, cv=kf,
+    scoring=("r2", "neg_root_mean_squared_error", "neg_mean_absolute_error"),
+)
+lr_fold_r2 = lr_cv["test_r2"]
+lr_fold_rmse = -lr_cv["test_neg_root_mean_squared_error"]
+lr_fold_mae = -lr_cv["test_neg_mean_absolute_error"]
+lr_oof = cross_val_predict(lr, X4, y, cv=kf)
+lr_pooled_r2 = r2_score(y, lr_oof)
+lr_pooled_rmse = rmse(y, lr_oof)
+lr_pooled_mae = mean_absolute_error(y, lr_oof)
+lr_resid = np.asarray(y) - lr_oof
+print(f"\n[Linear] per-fold R²: {lr_fold_r2.round(3)}")
+print(f"[Linear] mean R² {lr_fold_r2.mean():.3f} ± {lr_fold_r2.std():.3f} | "
+      f"pooled OOF R² {lr_pooled_r2:.3f}")
+
+# C.1 fitted model (on all data) + C.5 standardized coefficients
+lr_full = LinearRegression().fit(X4, y)
+std_pipe = make_pipeline(StandardScaler(), LinearRegression()).fit(X4, y)
+std_coefs = std_pipe.named_steps["linearregression"].coef_
+
+# C.4 evaluation plots — OOF actual vs predicted (by fold)
+fig, ax = plt.subplots(figsize=(7.2, 7.2))
+for k in range(1, N_FOLDS + 1):
+    m = fold_id == k
+    ax.scatter(y[m], lr_oof[m], s=34, alpha=0.75, edgecolors="white",
+               linewidth=0.4, color=FOLD_COLORS[k - 1], label=f"Fold {k}")
+lims = [float(y.min()) - 2, float(y.max()) + 2]
+ax.plot(lims, lims, "--", color=LINE, linewidth=1.8, label="Perfect prediction")
+ax.set_xlim(lims); ax.set_ylim(lims); ax.set_aspect("equal")
+ax.set_xlabel("Actual IMDS"); ax.set_ylabel("Predicted IMDS (out-of-fold)")
+ax.set_title("Linear regression (4 features): out-of-fold predictions")
+ax.text(0.04, 0.95, f"Pooled OOF R² = {lr_pooled_r2:.3f}", transform=ax.transAxes,
+        va="top", bbox=dict(boxstyle="round", fc=ANNOT_FC, ec=LINE, alpha=0.85))
+ax.legend(loc="lower right", ncol=2, fontsize=9)
+plt.savefig(OUTPUT_DIR / f"ml_lr_actual_vs_predicted{SUFFIX}.png")
+plt.close()
+print(f"Saved: ml_lr_actual_vs_predicted{SUFFIX}.png")
+
+# C.4 residuals
+fig, ax = plt.subplots(figsize=(8, 5))
+for k in range(1, N_FOLDS + 1):
+    m = fold_id == k
+    ax.scatter(lr_oof[m], lr_resid[m], s=30, alpha=0.7, edgecolors="white",
+               linewidth=0.4, color=FOLD_COLORS[k - 1], label=f"Fold {k}")
+ax.axhline(0, color=LINE, linestyle="--", linewidth=1.8)
+ax.set_xlabel("Predicted IMDS (out-of-fold)"); ax.set_ylabel("Residual (actual − predicted)")
+ax.set_title("Linear regression: out-of-fold residuals")
+ax.legend(loc="upper right", ncol=2, fontsize=9)
+plt.savefig(OUTPUT_DIR / f"ml_lr_residuals{SUFFIX}.png")
+plt.close()
+print(f"Saved: ml_lr_residuals{SUFFIX}.png")
+
+# C.5 standardized coefficients (signed importance)
+fig, ax = plt.subplots(figsize=(7, 4.5))
+bar_colors = [COLOR_PRIMARY if c >= 0 else COLOR_ACCENT for c in std_coefs]
+ax.bar(LR_FEATURES, std_coefs, color=bar_colors, edgecolor="white", alpha=0.9, width=0.6)
+ax.axhline(0, color=LINE, linewidth=1)
+ax.set_ylabel("Standardized coefficient")
+ax.set_title("Linear regression: standardized coefficients (signed importance)")
+plt.savefig(OUTPUT_DIR / f"ml_lr_importance{SUFFIX}.png")
+plt.close()
+print(f"Saved: ml_lr_importance{SUFFIX}.png")
+
+# C.6 partial dependence — straight lines for a linear model
+fig, axes = plt.subplots(1, 4, figsize=(16, 4))
+PartialDependenceDisplay.from_estimator(lr_full, X4, LR_FEATURES, ax=axes.ravel(),
+                                        grid_resolution=50)
+fig.suptitle("Linear regression: partial dependence is a straight line", fontsize=13)
+plt.tight_layout(rect=[0, 0, 1, 0.93])
+plt.savefig(OUTPUT_DIR / f"ml_lr_partial_dependence{SUFFIX}.png")
+plt.close()
+print(f"Saved: ml_lr_partial_dependence{SUFFIX}.png")
+
+# Results table + summary
+lr_results = pd.DataFrame({
+    "Fold": list(range(1, N_FOLDS + 1)) + ["Mean", "Std"],
+    "R2": list(lr_fold_r2.round(4)) + [round(lr_fold_r2.mean(), 4), round(lr_fold_r2.std(), 4)],
+    "RMSE": list(lr_fold_rmse.round(2)) + [round(lr_fold_rmse.mean(), 2), round(lr_fold_rmse.std(), 2)],
+    "MAE": list(lr_fold_mae.round(2)) + [round(lr_fold_mae.mean(), 2), round(lr_fold_mae.std(), 2)],
+})
+lr_results.to_csv(OUTPUT_DIR / f"ml_lr_results.csv", index=False)
+print(f"Saved: ml_lr_results.csv")
+
+summary["linear"] = {
+    "features": LR_FEATURES,
+    "fold_r2": [round(float(v), 4) for v in lr_fold_r2],
+    "mean_r2": round(float(lr_fold_r2.mean()), 4), "std_r2": round(float(lr_fold_r2.std()), 4),
+    "mean_rmse": round(float(lr_fold_rmse.mean()), 4), "std_rmse": round(float(lr_fold_rmse.std()), 4),
+    "mean_mae": round(float(lr_fold_mae.mean()), 4), "std_mae": round(float(lr_fold_mae.std()), 4),
+    "pooled_r2": round(float(lr_pooled_r2), 4),
+    "pooled_rmse": round(float(lr_pooled_rmse), 4),
+    "pooled_mae": round(float(lr_pooled_mae), 4),
+    "intercept": round(float(lr_full.intercept_), 4),
+    "coefficients": {f: round(float(c), 4) for f, c in zip(LR_FEATURES, lr_full.coef_)},
+    "std_coefficients": {f: round(float(c), 4) for f, c in zip(LR_FEATURES, std_coefs)},
+    "rf_pooled_r2": round(float(pooled_r2), 4),
 }
 
 # ---------------------------------------------------------------------------
@@ -598,9 +731,9 @@ summary["importance_full"] = {
                     for f in perm_imp.sort_values(ascending=False).head(20).index],
 }
 
-with open(OUTPUT_DIR / "ml_summary.json", "w") as fh:
+with open(OUTPUT_DIR / f"ml_summary.json", "w") as fh:
     json.dump(summary, fh, indent=2)
-print("Saved: ml_summary.json")
+print(f"Saved: ml_summary.json")
 
 # ---------------------------------------------------------------------------
 # Console summary

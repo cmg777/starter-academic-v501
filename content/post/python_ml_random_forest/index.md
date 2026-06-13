@@ -93,6 +93,10 @@ graph TD
     I --> J["Partial dependence plots"]
     A -.optional.-> K["Appendix A<br/>train/test split"]
     C -.optional.-> L["Appendix B<br/>grid / random / Optuna tuning"]
+    classDef box fill:#1f2b5e,stroke:#6a9bcc,stroke-width:1px,color:#e8ecf2;
+    classDef appendix fill:#141a2e,stroke:#8a93a8,stroke-width:1px,color:#c8d0e0;
+    class A,B,C,D,E,F,G,H,I,J box;
+    class K,L appendix;
 ```
 
 ## 2. Key learning objectives
@@ -383,7 +387,7 @@ plt.savefig(IMAGES_DIR / "ml_target_distribution.png", dpi=300, bbox_inches="tig
 plt.show()
 ```
 
-![Distribution of IMDS scores across Bolivia's municipalities. The dashed line marks the mean, the dotted line marks the median.](ml_target_distribution.png)
+![Distribution of IMDS scores across Bolivia's municipalities. The dashed line marks the mean, the dotted line marks the median.](ml_target_distribution_dark.png)
 
 The distribution is roughly bell-shaped with a slight right skew — the mean (51.1) sits just above the median (50.5), indicating a small tail of higher-performing municipalities. Most scores fall between 47 and 55, meaning the majority of Bolivia's municipalities have similar mid-range development levels. The handful of outliers above 70 likely correspond to larger urban centers like La Paz, Santa Cruz, and Cochabamba, which have significantly higher development infrastructure. These extremes are exactly the municipalities a low-signal model will struggle with later.
 
@@ -404,7 +408,7 @@ plt.savefig(IMAGES_DIR / "ml_embedding_correlations.png", dpi=300, bbox_inches="
 plt.show()
 ```
 
-![Correlation matrix of the top-10 most correlated satellite embedding dimensions with IMDS.](ml_embedding_correlations.png)
+![Correlation matrix of the top-10 most correlated satellite embedding dimensions with IMDS.](ml_embedding_correlations_dark.png)
 
 The strongest individual correlation between any single embedding dimension and IMDS is about 0.37 (dimension A30); the rest of the top ten sit in the 0.25–0.35 range. These are *moderate* correlations — typical for satellite-derived features predicting complex socioeconomic outcomes, and an early hint that no single feature will carry the model. Several embedding dimensions are also correlated with each other, suggesting they capture overlapping spatial patterns. A Random Forest handles this *multicollinearity* (features carrying overlapping information) gracefully because it selects feature subsets at each split. There is real signal here, just not a lot of it — so let's build the model and measure exactly how much.
 
@@ -451,6 +455,8 @@ graph TD
     R3 --> O
     R4 --> O
     R5 --> O
+    classDef box fill:#1f2b5e,stroke:#6a9bcc,stroke-width:1px,color:#e8ecf2;
+    class D,S,R1,R2,R3,R4,R5,O box;
 ```
 
 In code, `KFold` defines the folds and `cross_validate` runs the five rounds, returning a score per fold for each metric we ask for. We score with R², RMSE, and MAE at once.
@@ -537,7 +543,7 @@ plt.savefig(IMAGES_DIR / "ml_per_fold_metrics.png", dpi=300, bbox_inches="tight"
 plt.show()
 ```
 
-![Per-fold R-squared, RMSE, and MAE for the baseline Random Forest. The dashed line marks the mean across folds; the shaded band is plus or minus one standard deviation.](ml_per_fold_metrics.png)
+![Per-fold R-squared, RMSE, and MAE for the baseline Random Forest. The dashed line marks the mean across folds; the shaded band is plus or minus one standard deviation.](ml_per_fold_metrics_dark.png)
 
 Notice that the three metrics partly disagree about *which* fold is hardest. Fold 2 has the worst RMSE (7.34) and MAE (5.05) but not the worst R²; fold 3 has the worst R² but a middling RMSE. That happens because R² is measured *relative to each fold's own variance* — fold 3 must contain municipalities that are unusually close together, so even small absolute errors blow up the R². This is a useful reminder that no single metric is the whole story, and that R² in particular can be deceptive when the test sample is small and homogeneous.
 
@@ -577,7 +583,7 @@ plt.savefig(IMAGES_DIR / "ml_actual_vs_predicted.png", dpi=300, bbox_inches="tig
 plt.show()
 ```
 
-![Out-of-fold predicted versus actual IMDS for all 339 municipalities, each point colored by the cross-validation fold in which it was held out. The dashed line is perfect prediction.](ml_actual_vs_predicted.png)
+![Out-of-fold predicted versus actual IMDS for all 339 municipalities, each point colored by the cross-validation fold in which it was held out. The dashed line is perfect prediction.](ml_actual_vs_predicted_dark.png)
 
 Two things stand out. First, the colors are thoroughly intermingled — there is no region of the plot that belongs to a single fold — which is the visual confirmation that `KFold(shuffle=True)` mixed the municipalities well; if one fold occupied, say, only the high-IMDS corner, our per-fold metrics would be untrustworthy. Second, and more substantively, the cloud is clearly *flatter than the 45-degree line*: low-IMDS municipalities (left) are predicted too high, and high-IMDS municipalities (right) are predicted too low. The town with the highest actual IMDS (80.2) is predicted at only about 51. This **regression to the mean** is the fingerprint of a model with limited signal — it hedges toward the safe national average rather than committing to extreme values.
 
@@ -599,7 +605,7 @@ plt.savefig(IMAGES_DIR / "ml_residuals.png", dpi=300, bbox_inches="tight")
 plt.show()
 ```
 
-![Out-of-fold residuals versus predicted IMDS, colored by fold. A cloud centered on zero indicates no systematic bias, but the upward tilt at the right reveals under-prediction of high-IMDS municipalities.](ml_residuals.png)
+![Out-of-fold residuals versus predicted IMDS, colored by fold. A cloud centered on zero indicates no systematic bias, but the upward tilt at the right reveals under-prediction of high-IMDS municipalities.](ml_residuals_dark.png)
 
 The residual cloud is centered near zero overall, but it is not patternless: it tilts upward on the right, where the largest positive residuals sit. Those are the high-IMDS municipalities the model under-predicts — the same regression-to-the-mean effect, viewed from a different angle. The spread of residuals is also a little wider at the extremes than in the middle (mild *heteroscedasticity*). Because the colors are again well mixed, we can be confident this pattern is a property of the model, not an artifact of one unlucky fold.
 
@@ -628,7 +634,7 @@ plt.savefig(IMAGES_DIR / "ml_distribution_overlap.png", dpi=300, bbox_inches="ti
 plt.show()
 ```
 
-![Overlapping density histograms of the actual IMDS scores and the out-of-fold predictions. The predicted distribution is much narrower and concentrated near the mean.](ml_distribution_overlap.png)
+![Overlapping density histograms of the actual IMDS scores and the out-of-fold predictions. The predicted distribution is much narrower and concentrated near the mean.](ml_distribution_overlap_dark.png)
 
 The two distributions share almost the same center but have very different widths. The predictions form a tall, narrow spike around 51, while the actual scores spread out into both tails. The model has essentially learned the *average* municipality very well and the *unusual* ones hardly at all — it reproduces the location of the distribution but not its shape.
 
@@ -669,7 +675,7 @@ plt.savefig(IMAGES_DIR / "ml_feature_importance_mdi.png", dpi=300, bbox_inches="
 plt.show()
 ```
 
-![Top-20 satellite embedding features ranked by mean decrease in impurity. Dimension A30 is far ahead of the rest.](ml_feature_importance_mdi.png)
+![Top-20 satellite embedding features ranked by mean decrease in impurity. Dimension A30 is far ahead of the rest.](ml_feature_importance_mdi_dark.png)
 
 One dimension dominates: **A30** accounts for about 12% of the total impurity reduction, roughly twice the next feature, A59. After those two the importance falls off into a long tail of dimensions contributing 1–4% each. This matches what we saw in the correlation heatmap (A30 was the single most correlated feature) and tells us the forest leans heavily on a small handful of visual signals, with everything else playing a supporting role.
 
@@ -690,7 +696,7 @@ plt.savefig(IMAGES_DIR / "ml_feature_importance_permutation.png", dpi=300, bbox_
 plt.show()
 ```
 
-![Top-20 satellite embedding features ranked by permutation importance — the mean drop in R-squared when each feature is shuffled. A30 and A59 lead.](ml_feature_importance_permutation.png)
+![Top-20 satellite embedding features ranked by permutation importance — the mean drop in R-squared when each feature is shuffled. A30 and A59 lead.](ml_feature_importance_permutation_dark.png)
 
 Permutation importance tells the same story even more emphatically: shuffling **A30** alone costs the model about 0.25 in R² — larger than the model's entire out-of-fold R² of 0.22, because removing the best feature drags the model below the mean-prediction baseline. A59 is again second (about 0.11), followed by A26, A36, and A13. The close agreement between the two very different importance methods is reassuring: A30 and A59 are genuinely the embedding dimensions that distinguish Bolivia's municipalities, not artifacts of how a particular method counts.
 
@@ -708,7 +714,7 @@ plt.savefig(IMAGES_DIR / "ml_partial_dependence.png", dpi=300, bbox_inches="tigh
 plt.show()
 ```
 
-![Partial dependence plots for the top-6 satellite embedding features, showing how each feature's value shifts the predicted IMDS.](ml_partial_dependence.png)
+![Partial dependence plots for the top-6 satellite embedding features, showing how each feature's value shifts the predicted IMDS.](ml_partial_dependence_dark.png)
 
 The curves are clearly non-linear. Several dimensions — A30 most visibly — show a **threshold effect**: predicted IMDS is flat across low values, then rises over a narrow band, then plateaus. These step-like shapes are precisely what a linear regression would miss and what justifies a Random Forest here. Notice, too, the vertical scale: even the most important feature moves the prediction by only a few IMDS points over its whole range. No single dimension is a magic lever — consistent with the modest R² and the broadly distributed importance we have seen throughout.
 
@@ -789,7 +795,7 @@ print(f"Test R² over 200 splits: min={split_r2.min():.2f}, max={split_r2.max():
 Test R² over 200 splits: min=-0.09, max=0.46, mean=0.21, sd=0.11
 ```
 
-![Histogram of test R-squared over 200 random 80/20 splits. The values range from about -0.09 to 0.46; the single seed-42 split and the 5-fold CV estimate are marked.](ml_appendix_split_variability.png)
+![Histogram of test R-squared over 200 random 80/20 splits. The values range from about -0.09 to 0.46; the single seed-42 split and the 5-fold CV estimate are marked.](ml_appendix_split_variability_dark.png)
 
 The **same model on the same data** scores anywhere from −0.09 to 0.46 depending only on which municipalities land in the test set. The seed-42 split we started with (0.231) was simply a middle-of-the-road draw; a less lucky researcher reporting a single split might have published 0.05 or 0.40 with equal justification. Cross-validation's pooled estimate (0.225) sits sensibly in the middle of this cloud, but it comes with a standard deviation and uses every observation for both training and testing. That is why the main tutorial uses CV — and why, on small datasets, you should be deeply suspicious of any performance number that comes from a single split.
 
@@ -870,7 +876,7 @@ print(f"Optuna best CV R²: {study.best_value:.3f}  {study.best_params}")
 Optuna best CV R²: 0.251  {'n_estimators': 200, 'max_depth': None, 'min_samples_split': 3, 'min_samples_leaf': 1, 'max_features': 'sqrt'}
 ```
 
-![Optuna search history. Each dot is one trial's cross-validated R-squared; the orange line is the best value found so far; the dotted line is the untuned baseline.](ml_appendix_optuna_history.png)
+![Optuna search history. Each dot is one trial's cross-validated R-squared; the orange line is the best value found so far; the dotted line is the untuned baseline.](ml_appendix_optuna_history_dark.png)
 
 The history plot shows the TPE sampler quickly climbing above the baseline and then refining — most of the gain arrives in the first dozen trials. Optuna also scales naturally to larger search spaces, supports pruning unpromising trials early, and records every trial for later inspection, which is why it has become a popular choice for serious tuning.
 
@@ -883,9 +889,150 @@ The history plot shows the TPE sampler quickly climbing above the baseline and t
 | Random search | 0.248 |
 | Optuna (TPE) | 0.251 |
 
-![Bar chart comparing the best cross-validated R-squared of the baseline against grid search, random search, and Optuna. All tuned values sit only marginally above the baseline.](ml_appendix_tuning_comparison.png)
+![Bar chart comparing the best cross-validated R-squared of the baseline against grid search, random search, and Optuna. All tuned values sit only marginally above the baseline.](ml_appendix_tuning_comparison_dark.png)
 
 All three search strategies improve the cross-validated R², and they rank exactly as theory predicts: Optuna (Bayesian) ≥ random ≥ grid, given equal budgets. But the *size* of the improvement is tiny — from 0.224 to 0.251, well within the 0.173 fold-to-fold standard deviation we measured in Section 8. In other words, the tuning gain is smaller than the noise. That is the honest reason the main tutorial keeps the defaults: when the signal in the features is the binding constraint, hyperparameter tuning rearranges the deck chairs. Tuning is a powerful tool — just spend your effort on it when a baseline and a learning curve suggest there is headroom to win.
+
+## Appendix C — Introduction to machine learning with multivariate regression
+
+The main tutorial used a Random Forest — a flexible "black box" that fits non-linear patterns across all 64 features. This appendix re-introduces the *same* machine-learning workflow with the **simplest possible model: multiple linear regression**, on only the **first four satellite features (A00–A03)**. The goal is transparency: a model you can write as a single equation, evaluated with the identical 5-fold cross-validation, out-of-fold predictions, metrics, plots, importance, and partial dependence you saw above. If you have never built a machine-learning model before, start here.
+
+### C.1 The model — predict IMDS from four features
+
+Multiple linear regression assumes the target is a weighted sum of the features plus an intercept:
+
+$$\hat{y} = \beta\_0 + \beta\_1\,A00 + \beta\_2\,A01 + \beta\_3\,A02 + \beta\_4\,A03$$
+
+Each coefficient $\beta\_j$ is the change in predicted IMDS for a one-unit increase in that feature, holding the others fixed. We use scikit-learn's `LinearRegression` and deliberately keep just four features so the whole model fits on one line.
+
+```python
+from sklearn.linear_model import LinearRegression
+
+LR_FEATURES = FEATURE_COLS[:4]   # A00, A01, A02, A03
+X4 = X[LR_FEATURES]
+lr = LinearRegression().fit(X4, y)
+print("intercept:", round(lr.intercept_, 2))
+print({f: round(float(c), 2) for f, c in zip(LR_FEATURES, lr.coef_)})
+```
+
+```text
+intercept: 54.42
+{'A00': 19.59, 'A01': -0.35, 'A02': 15.99, 'A03': 12.66}
+```
+
+Fitted on all 339 municipalities, the model is $\hat{y} = 54.42 + 19.59\,A00 - 0.35\,A01 + 15.99\,A02 + 12.66\,A03$. Unlike the forest, every term is visible and interpretable: A00, A02, and A03 push IMDS up, while A01 barely moves it. But a model fit on all the data tells us nothing about *generalization* — for that we need cross-validation.
+
+### C.2 Five-fold cross-validation and out-of-fold predictions
+
+We reuse the exact same `KFold` object and the same `cross_validate` / `cross_val_predict` calls as the main body — only the model and the feature set change. Every municipality again gets one out-of-fold prediction from a model that never saw it.
+
+```python
+from sklearn.model_selection import cross_validate, cross_val_predict
+
+cv = cross_validate(lr, X4, y, cv=kf,
+                    scoring=("r2", "neg_root_mean_squared_error", "neg_mean_absolute_error"))
+lr_fold_r2 = cv["test_r2"]
+lr_oof = cross_val_predict(lr, X4, y, cv=kf)
+print("Per-fold R²:", lr_fold_r2.round(3))
+print(f"Mean R²: {lr_fold_r2.mean():.3f} ± {lr_fold_r2.std():.3f}")
+print(f"Pooled OOF R²: {r2_score(y, lr_oof):.3f}")
+```
+
+```text
+Per-fold R²: [ 0.054  0.071 -0.04   0.094  0.056]
+Mean R²: 0.047 ± 0.046
+Pooled OOF R²: 0.059
+```
+
+### C.3 Evaluating the predictions
+
+| Fold | R² | RMSE | MAE |
+|:----:|:----:|:----:|:----:|
+| 1 | 0.054 | 7.23 | 5.40 |
+| 2 | 0.071 | 7.55 | 5.89 |
+| 3 | −0.040 | 5.75 | 4.55 |
+| 4 | 0.094 | 5.79 | 4.27 |
+| 5 | 0.056 | 6.28 | 5.00 |
+| **Mean** | **0.047** | **6.52** | **5.02** |
+| **SD** | **0.046** | **0.74** | **0.58** |
+
+The linear model explains only about **6% of the variation in IMDS** (pooled out-of-fold R² 0.059; RMSE 6.56, MAE 5.02), and on fold 3 it again dips slightly negative. That is low — but the number is not the point. The point is that four raw features and a straight-line model already let you run the entire honest evaluation pipeline. With more features or a more flexible model (the Random Forest), the same pipeline does better; the *method* is identical.
+
+### C.4 Evaluation plots
+
+The same two diagnostics as the main body: out-of-fold predicted-vs-actual (colored by fold) and the residuals.
+
+```python
+fig, ax = plt.subplots(figsize=(7.2, 7.2))
+for k in range(1, 6):
+    m = fold_id == k
+    ax.scatter(y[m], lr_oof[m], s=34, alpha=0.75, color=FOLD_COLORS[k - 1], label=f"Fold {k}")
+ax.plot(lims, lims, "--", color="#141413", label="Perfect prediction")
+plt.savefig(IMAGES_DIR / "ml_lr_actual_vs_predicted.png", dpi=300, bbox_inches="tight")
+plt.show()
+```
+
+![Out-of-fold predicted versus actual IMDS from the four-feature linear regression, colored by fold. The cloud is nearly flat — the model barely separates high- from low-IMDS towns.](ml_lr_actual_vs_predicted_dark.png)
+
+With so little signal, the predictions barely spread along the vertical axis — almost every town is predicted close to the national mean of 51, so the cloud is nearly horizontal and the extremes are missed entirely. The residuals tell the same story:
+
+```python
+residuals = y - lr_oof
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.scatter(lr_oof, residuals, alpha=0.7, c=[FOLD_COLORS[k - 1] for k in fold_id])
+ax.axhline(0, color="#141413", linestyle="--")
+plt.savefig(IMAGES_DIR / "ml_lr_residuals.png", dpi=300, bbox_inches="tight")
+plt.show()
+```
+
+![Out-of-fold residuals from the linear regression versus the predicted IMDS, colored by fold.](ml_lr_residuals_dark.png)
+
+The residuals are large and centered on zero with no strong curvature — a straight-line model cannot bend to fit what four features miss.
+
+### C.5 Feature importance
+
+For a linear model, *importance is the coefficient itself*. To compare features on a common scale we standardize them first (so each is in standard-deviation units); the **standardized coefficient** then measures how many IMDS points the prediction moves per one-standard-deviation change in the feature, and its **sign** gives the direction.
+
+```python
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+
+std = make_pipeline(StandardScaler(), LinearRegression()).fit(X4, y)
+print({f: round(float(c), 2) for f, c in zip(LR_FEATURES, std[-1].coef_)})
+```
+
+```text
+{'A00': 1.61, 'A01': -0.02, 'A02': 0.7, 'A03': 0.42}
+```
+
+![Standardized (signed) coefficients of the four-feature linear regression. A00 dominates; A01 is essentially zero.](ml_lr_importance_dark.png)
+
+**A00** is by far the most important feature — a one-standard-deviation increase raises predicted IMDS by about 1.6 points — followed by A02 and A03; **A01 contributes almost nothing** (and slightly negatively). This is the linear analogue of the Random Forest's permutation importance, but here it comes for free, with a direction, directly from the fitted equation.
+
+### C.6 Partial dependence
+
+The same `PartialDependenceDisplay` we used for the forest, applied to the linear model:
+
+```python
+from sklearn.inspection import PartialDependenceDisplay
+
+PartialDependenceDisplay.from_estimator(lr, X4, LR_FEATURES)
+plt.savefig(IMAGES_DIR / "ml_lr_partial_dependence.png", dpi=300, bbox_inches="tight")
+plt.show()
+```
+
+![Partial dependence for the four features under linear regression. Every panel is a straight line whose slope is the feature's coefficient.](ml_lr_partial_dependence_dark.png)
+
+Every panel is a **straight line** — because a linear model's effect is, by construction, constant. The slope of each line is exactly that feature's coefficient: steep and positive for A00, nearly flat for A01. Contrast this with the forest's partial-dependence plots (Section 12), which bend and plateau. That contrast *is* the difference between a linear model and a flexible one: the forest can discover thresholds and interactions that the straight lines here cannot.
+
+### C.7 How it compares to the Random Forest
+
+| Model | Features | Pooled out-of-fold R² |
+|:------|:--------:|:---------------------:|
+| Linear regression | 4 (A00–A03) | 0.059 |
+| Random Forest | 64 | 0.225 |
+
+The Random Forest explains roughly four times as much variance — partly because it sees all 64 features, partly because it captures non-linear patterns the straight lines cannot. But the linear model is fully transparent (one equation, four coefficients you can read off directly), and — the real lesson of this appendix — **both were built and judged with the identical workflow**: a 5-fold split, out-of-fold predictions, R²/RMSE/MAE, evaluation plots, feature importance, and partial dependence. Once you know that workflow, swapping `LinearRegression()` for `RandomForestRegressor()` — or any other estimator — is a one-line change.
 
 #### Acknowledgements
 
