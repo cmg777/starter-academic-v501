@@ -9,7 +9,7 @@ minimal jupyter packages it needs to discover the kernel.
 Idempotent: re-running after a successful first render is a no-op (~1 second)
 because every step short-circuits when the desired state is already met.
 
-Requires only Python 3.10+ stdlib. Works on macOS and Windows. Linux works
+Requires only Python 3.11+ stdlib. Works on macOS and Windows. Linux works
 for free.
 """
 
@@ -27,12 +27,13 @@ from pathlib import Path
 GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
 
 PINNED: dict[str, str] = {
-    "matplotlib":   "3.8.3",
-    "numpy":        "1.26.4",
-    "pandas":       "2.2.1",
-    "scikit-learn": "1.4.1.post1",
-    "scipy":        "1.12.0",
+    "matplotlib":   "3.10.8",
+    "numpy":        "2.4.3",
+    "pandas":       "3.0.1",
+    "scikit-learn": "1.8.0",
+    "scipy":        "1.17.1",
     "seaborn":      "0.13.2",
+    "optuna":       "4.7.0",
     "jupyter":      "1.1.1",
     "ipykernel":    "6.29.3",
 }
@@ -160,11 +161,11 @@ def ensure_outer_jupyter() -> None:
     )
 
 
-SUPPORTED_PY = {(3, 10), (3, 11), (3, 12), (3, 13)}
+SUPPORTED_PY = {(3, 11), (3, 12), (3, 13)}
 
 _PROBE_SCRIPT = (
     "import sys; from xml.parsers import expat; "
-    "assert sys.version_info[:2] in {(3,10),(3,11),(3,12),(3,13)}"
+    "assert sys.version_info[:2] in {(3,11),(3,12),(3,13)}"
 )
 
 
@@ -215,25 +216,25 @@ def _probe_candidate(path: str) -> bool:
 
 
 def find_compatible_python() -> str | None:
-    """Scan common Python install locations for a 3.10-3.13 with intact pyexpat."""
+    """Scan common Python install locations for a 3.11-3.13 with intact pyexpat."""
     home = Path.home()
     seen: set[str] = set()
     candidates: list[str] = []
 
     # PATH-resolved version-specific shims (most likely to be on the user's PATH).
-    for v in ("3.13", "3.12", "3.11", "3.10"):
+    for v in ("3.13", "3.12", "3.11"):
         found = shutil.which(f"python{v}")
         if found:
             candidates.append(found)
 
     # Homebrew Intel and Apple Silicon prefixes.
     for prefix in ("/usr/local", "/opt/homebrew"):
-        for v in ("3.13", "3.12", "3.11", "3.10"):
+        for v in ("3.13", "3.12", "3.11"):
             candidates.append(f"{prefix}/opt/python@{v}/bin/python{v}")
             candidates.append(f"{prefix}/bin/python{v}")
 
     # python.org installer layout.
-    for v in ("3.13", "3.12", "3.11", "3.10"):
+    for v in ("3.13", "3.12", "3.11"):
         candidates.append(
             f"/Library/Frameworks/Python.framework/Versions/{v}/bin/python3"
         )
@@ -270,7 +271,7 @@ def find_compatible_python() -> str | None:
 
 def preflight() -> None:
     suffix = (
-        "\nOnce you have a working Python 3.10-3.13, re-run:\n"
+        "\nOnce you have a working Python 3.11-3.13, re-run:\n"
         "  python3 setup_env.py    (or use the absolute path to that Python)\n"
     )
 
@@ -294,7 +295,9 @@ def preflight() -> None:
     if not version_unsupported and pyexpat_error is None and not venv_broken:
         return
 
-    # Outer Python is unfit. Try to relaunch with a working one before erroring.
+    # Outer Python is unfit (unsupported version, broken pyexpat, or a Python
+    # that cannot build a working hermetic venv). Try to relaunch with a working
+    # one before erroring.
     alt = find_compatible_python()
     if alt:
         ver = ".".join(map(str, sys.version_info[:3]))
@@ -331,12 +334,11 @@ def preflight() -> None:
     if version_unsupported:
         ver = ".".join(map(str, sys.version_info[:3]))
         print(
-            f"ERROR: this tutorial needs Python 3.10, 3.11, 3.12, or 3.13.\n"
+            f"ERROR: this tutorial needs Python 3.11, 3.12, or 3.13.\n"
             f"You ran setup_env.py with Python {ver} at {sys.executable}.\n\n"
-            f"The pinned `numba`/`llvmlite` wheels (when present) cover\n"
-            f"cp310-cp313 only. Python 3.14 has no prebuilt numba wheels yet,\n"
-            f"and Python <=3.9 is below the minimum for modern data-science\n"
-            f"packages.\n\n"
+            f"The pinned numpy 2.4 / pandas 3.0 wheels cover cp311-cp313 only.\n"
+            f"Python 3.14 wheels for the full pinned stack are not all available\n"
+            f"yet, and Python <=3.10 is below the minimum for these pins.\n\n"
             f"Install a supported Python (any one):\n"
             f"  - miniforge:  brew install miniforge && conda create -n tut python=3.11 -y\n"
             f"  - python.org: https://www.python.org/downloads/\n"

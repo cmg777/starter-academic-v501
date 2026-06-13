@@ -1,0 +1,3036 @@
+{
+  "data": {
+    "n_obs": 339,
+    "n_features": 64,
+    "target_mean": 51.05,
+    "target_std": 6.77,
+    "target_min": 35.7,
+    "target_max": 80.2,
+    "target_median": 50.5
+  },
+  "eda": {
+    "top_corr_feature": "A30",
+    "top_corr_value": 0.372,
+    "top10_features": [
+      "A30",
+      "A59",
+      "A43",
+      "A33",
+      "A04",
+      "A00",
+      "A52",
+      "A28",
+      "A41",
+      "A10"
+    ]
+  },
+  "cv": {
+    "n_folds": 5,
+    "fold_sizes": [
+      68,
+      68,
+      68,
+      68,
+      67
+    ],
+    "fold_r2": [
+      0.2092,
+      0.1211,
+      -0.0321,
+      0.453,
+      0.3669
+    ],
+    "fold_rmse": [
+      6.6095,
+      7.3382,
+      5.7258,
+      4.4946,
+      5.1447
+    ],
+    "fold_mae": [
+      4.7264,
+      5.0527,
+      4.4252,
+      3.8229,
+      4.0524
+    ],
+    "mean_r2": 0.2236,
+    "std_r2": 0.1728,
+    "mean_rmse": 5.8626,
+    "std_rmse": 1.014,
+    "mean_mae": 4.4159,
+    "std_mae": 0.444,
+    "pooled_r2": 0.2252,
+    "pooled_rmse": 5.9518,
+    "pooled_mae": 4.417
+  },
+  "distribution": {
+    "actual_mean": 51.05,
+    "actual_std": 6.77,
+    "pred_mean": 51.02,
+    "pred_std": 3.54,
+    "pred_min": 40.66,
+    "pred_max": 61.79,
+    "std_shrinkage_pct": 47.7,
+    "ks_stat": 0.1858,
+    "ks_p": 1.5641193184912198e-05
+  },
+  "importance": {
+    "mdi_top5": [
+      [
+        "A30",
+        0.1235
+      ],
+      [
+        "A59",
+        0.064
+      ],
+      [
+        "A13",
+        0.0393
+      ],
+      [
+        "A26",
+        0.0359
+      ],
+      [
+        "A36",
+        0.0284
+      ]
+    ],
+    "perm_top5": [
+      [
+        "A30",
+        0.2501
+      ],
+      [
+        "A59",
+        0.1084
+      ],
+      [
+        "A26",
+        0.0674
+      ],
+      [
+        "A36",
+        0.0576
+      ],
+      [
+        "A13",
+        0.0411
+      ]
+    ]
+  },
+  "pdp_features": [
+    "A30",
+    "A59",
+    "A26",
+    "A36",
+    "A13",
+    "A33"
+  ],
+  "appendix_split": {
+    "n_splits": 200,
+    "split_r2_min": -0.093,
+    "split_r2_max": 0.461,
+    "split_r2_mean": 0.212,
+    "split_r2_std": 0.112,
+    "single_split_r2": 0.231
+  },
+  "tuning": {
+    "baseline_cv_r2": 0.2236,
+    "grid_cv_r2": 0.2441,
+    "random_cv_r2": 0.2478,
+    "optuna_cv_r2": 0.2509,
+    "best_method": "Optuna",
+    "best_params": {
+      "n_estimators": 200,
+      "max_depth": "None",
+      "min_samples_split": 3,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt"
+    },
+    "best_improvement": 0.0273,
+    "n_trials": 40
+  },
+  "oof_predictions": [
+    {
+      "id": 0,
+      "name": "0",
+      "actual": 53.2,
+      "predicted": 49.48,
+      "fold": 4,
+      "residual": 3.72
+    },
+    {
+      "id": 1,
+      "name": "1",
+      "actual": 50.5,
+      "predicted": 49.68,
+      "fold": 5,
+      "residual": 0.82
+    },
+    {
+      "id": 2,
+      "name": "2",
+      "actual": 47.3,
+      "predicted": 49.38,
+      "fold": 3,
+      "residual": -2.08
+    },
+    {
+      "id": 3,
+      "name": "3",
+      "actual": 58.1,
+      "predicted": 44.32,
+      "fold": 1,
+      "residual": 13.78
+    },
+    {
+      "id": 4,
+      "name": "4",
+      "actual": 43.5,
+      "predicted": 49.11,
+      "fold": 4,
+      "residual": -5.61
+    },
+    {
+      "id": 5,
+      "name": "5",
+      "actual": 50.4,
+      "predicted": 50.09,
+      "fold": 1,
+      "residual": 0.31
+    },
+    {
+      "id": 6,
+      "name": "6",
+      "actual": 42.2,
+      "predicted": 42.44,
+      "fold": 2,
+      "residual": -0.24
+    },
+    {
+      "id": 7,
+      "name": "7",
+      "actual": 42.1,
+      "predicted": 41.98,
+      "fold": 2,
+      "residual": 0.12
+    },
+    {
+      "id": 8,
+      "name": "8",
+      "actual": 56.8,
+      "predicted": 47.99,
+      "fold": 4,
+      "residual": 8.81
+    },
+    {
+      "id": 9,
+      "name": "9",
+      "actual": 61.3,
+      "predicted": 49.13,
+      "fold": 1,
+      "residual": 12.16
+    },
+    {
+      "id": 10,
+      "name": "10",
+      "actual": 50.6,
+      "predicted": 50.16,
+      "fold": 2,
+      "residual": 0.44
+    },
+    {
+      "id": 11,
+      "name": "11",
+      "actual": 54.3,
+      "predicted": 51.25,
+      "fold": 4,
+      "residual": 3.05
+    },
+    {
+      "id": 12,
+      "name": "12",
+      "actual": 52.5,
+      "predicted": 52.5,
+      "fold": 4,
+      "residual": 0.0
+    },
+    {
+      "id": 13,
+      "name": "13",
+      "actual": 46.0,
+      "predicted": 48.72,
+      "fold": 5,
+      "residual": -2.72
+    },
+    {
+      "id": 14,
+      "name": "14",
+      "actual": 43.1,
+      "predicted": 47.99,
+      "fold": 4,
+      "residual": -4.89
+    },
+    {
+      "id": 15,
+      "name": "15",
+      "actual": 50.9,
+      "predicted": 55.19,
+      "fold": 2,
+      "residual": -4.29
+    },
+    {
+      "id": 16,
+      "name": "16",
+      "actual": 50.3,
+      "predicted": 51.0,
+      "fold": 1,
+      "residual": -0.7
+    },
+    {
+      "id": 17,
+      "name": "17",
+      "actual": 51.2,
+      "predicted": 51.33,
+      "fold": 2,
+      "residual": -0.13
+    },
+    {
+      "id": 18,
+      "name": "18",
+      "actual": 67.4,
+      "predicted": 52.46,
+      "fold": 2,
+      "residual": 14.94
+    },
+    {
+      "id": 19,
+      "name": "19",
+      "actual": 47.5,
+      "predicted": 48.55,
+      "fold": 2,
+      "residual": -1.05
+    },
+    {
+      "id": 20,
+      "name": "20",
+      "actual": 49.0,
+      "predicted": 51.69,
+      "fold": 5,
+      "residual": -2.69
+    },
+    {
+      "id": 21,
+      "name": "21",
+      "actual": 46.6,
+      "predicted": 49.78,
+      "fold": 5,
+      "residual": -3.18
+    },
+    {
+      "id": 22,
+      "name": "22",
+      "actual": 64.0,
+      "predicted": 53.59,
+      "fold": 2,
+      "residual": 10.41
+    },
+    {
+      "id": 23,
+      "name": "23",
+      "actual": 55.0,
+      "predicted": 50.05,
+      "fold": 3,
+      "residual": 4.95
+    },
+    {
+      "id": 24,
+      "name": "24",
+      "actual": 40.4,
+      "predicted": 43.32,
+      "fold": 2,
+      "residual": -2.92
+    },
+    {
+      "id": 25,
+      "name": "25",
+      "actual": 47.5,
+      "predicted": 50.9,
+      "fold": 1,
+      "residual": -3.4
+    },
+    {
+      "id": 26,
+      "name": "26",
+      "actual": 58.1,
+      "predicted": 58.32,
+      "fold": 4,
+      "residual": -0.22
+    },
+    {
+      "id": 27,
+      "name": "27",
+      "actual": 48.1,
+      "predicted": 52.52,
+      "fold": 4,
+      "residual": -4.42
+    },
+    {
+      "id": 28,
+      "name": "28",
+      "actual": 48.4,
+      "predicted": 55.05,
+      "fold": 4,
+      "residual": -6.65
+    },
+    {
+      "id": 29,
+      "name": "29",
+      "actual": 46.8,
+      "predicted": 46.41,
+      "fold": 3,
+      "residual": 0.39
+    },
+    {
+      "id": 30,
+      "name": "30",
+      "actual": 41.8,
+      "predicted": 47.74,
+      "fold": 2,
+      "residual": -5.94
+    },
+    {
+      "id": 31,
+      "name": "31",
+      "actual": 56.4,
+      "predicted": 54.24,
+      "fold": 2,
+      "residual": 2.16
+    },
+    {
+      "id": 32,
+      "name": "32",
+      "actual": 55.4,
+      "predicted": 51.92,
+      "fold": 4,
+      "residual": 3.48
+    },
+    {
+      "id": 33,
+      "name": "33",
+      "actual": 53.0,
+      "predicted": 56.44,
+      "fold": 1,
+      "residual": -3.44
+    },
+    {
+      "id": 34,
+      "name": "34",
+      "actual": 59.0,
+      "predicted": 52.95,
+      "fold": 5,
+      "residual": 6.05
+    },
+    {
+      "id": 35,
+      "name": "35",
+      "actual": 42.3,
+      "predicted": 47.69,
+      "fold": 4,
+      "residual": -5.39
+    },
+    {
+      "id": 36,
+      "name": "36",
+      "actual": 45.8,
+      "predicted": 49.7,
+      "fold": 4,
+      "residual": -3.9
+    },
+    {
+      "id": 37,
+      "name": "37",
+      "actual": 40.1,
+      "predicted": 47.67,
+      "fold": 3,
+      "residual": -7.57
+    },
+    {
+      "id": 38,
+      "name": "38",
+      "actual": 51.3,
+      "predicted": 52.54,
+      "fold": 3,
+      "residual": -1.24
+    },
+    {
+      "id": 39,
+      "name": "39",
+      "actual": 36.4,
+      "predicted": 49.07,
+      "fold": 1,
+      "residual": -12.67
+    },
+    {
+      "id": 40,
+      "name": "40",
+      "actual": 36.3,
+      "predicted": 43.67,
+      "fold": 4,
+      "residual": -7.37
+    },
+    {
+      "id": 41,
+      "name": "41",
+      "actual": 47.1,
+      "predicted": 51.32,
+      "fold": 4,
+      "residual": -4.22
+    },
+    {
+      "id": 42,
+      "name": "42",
+      "actual": 54.1,
+      "predicted": 51.33,
+      "fold": 1,
+      "residual": 2.77
+    },
+    {
+      "id": 43,
+      "name": "43",
+      "actual": 47.5,
+      "predicted": 47.62,
+      "fold": 5,
+      "residual": -0.12
+    },
+    {
+      "id": 44,
+      "name": "44",
+      "actual": 50.0,
+      "predicted": 51.46,
+      "fold": 3,
+      "residual": -1.46
+    },
+    {
+      "id": 45,
+      "name": "45",
+      "actual": 43.9,
+      "predicted": 51.03,
+      "fold": 1,
+      "residual": -7.13
+    },
+    {
+      "id": 46,
+      "name": "46",
+      "actual": 46.8,
+      "predicted": 50.31,
+      "fold": 1,
+      "residual": -3.51
+    },
+    {
+      "id": 47,
+      "name": "47",
+      "actual": 55.2,
+      "predicted": 49.42,
+      "fold": 4,
+      "residual": 5.78
+    },
+    {
+      "id": 48,
+      "name": "48",
+      "actual": 63.9,
+      "predicted": 54.81,
+      "fold": 5,
+      "residual": 9.09
+    },
+    {
+      "id": 49,
+      "name": "49",
+      "actual": 49.4,
+      "predicted": 53.72,
+      "fold": 5,
+      "residual": -4.32
+    },
+    {
+      "id": 50,
+      "name": "50",
+      "actual": 42.4,
+      "predicted": 50.13,
+      "fold": 5,
+      "residual": -7.73
+    },
+    {
+      "id": 51,
+      "name": "51",
+      "actual": 46.3,
+      "predicted": 50.37,
+      "fold": 4,
+      "residual": -4.07
+    },
+    {
+      "id": 52,
+      "name": "52",
+      "actual": 55.1,
+      "predicted": 54.06,
+      "fold": 5,
+      "residual": 1.04
+    },
+    {
+      "id": 53,
+      "name": "53",
+      "actual": 55.1,
+      "predicted": 51.06,
+      "fold": 5,
+      "residual": 4.04
+    },
+    {
+      "id": 54,
+      "name": "54",
+      "actual": 55.7,
+      "predicted": 56.91,
+      "fold": 5,
+      "residual": -1.21
+    },
+    {
+      "id": 55,
+      "name": "55",
+      "actual": 64.1,
+      "predicted": 55.28,
+      "fold": 1,
+      "residual": 8.82
+    },
+    {
+      "id": 56,
+      "name": "56",
+      "actual": 48.9,
+      "predicted": 49.92,
+      "fold": 2,
+      "residual": -1.02
+    },
+    {
+      "id": 57,
+      "name": "57",
+      "actual": 48.1,
+      "predicted": 47.67,
+      "fold": 1,
+      "residual": 0.43
+    },
+    {
+      "id": 58,
+      "name": "58",
+      "actual": 57.7,
+      "predicted": 55.03,
+      "fold": 5,
+      "residual": 2.67
+    },
+    {
+      "id": 59,
+      "name": "59",
+      "actual": 55.4,
+      "predicted": 54.76,
+      "fold": 2,
+      "residual": 0.64
+    },
+    {
+      "id": 60,
+      "name": "60",
+      "actual": 44.0,
+      "predicted": 53.56,
+      "fold": 2,
+      "residual": -9.56
+    },
+    {
+      "id": 61,
+      "name": "61",
+      "actual": 55.6,
+      "predicted": 48.89,
+      "fold": 4,
+      "residual": 6.71
+    },
+    {
+      "id": 62,
+      "name": "62",
+      "actual": 56.5,
+      "predicted": 52.46,
+      "fold": 4,
+      "residual": 4.04
+    },
+    {
+      "id": 63,
+      "name": "63",
+      "actual": 51.3,
+      "predicted": 52.54,
+      "fold": 1,
+      "residual": -1.24
+    },
+    {
+      "id": 64,
+      "name": "64",
+      "actual": 48.4,
+      "predicted": 49.13,
+      "fold": 4,
+      "residual": -0.72
+    },
+    {
+      "id": 65,
+      "name": "65",
+      "actual": 47.5,
+      "predicted": 43.29,
+      "fold": 3,
+      "residual": 4.21
+    },
+    {
+      "id": 66,
+      "name": "66",
+      "actual": 50.5,
+      "predicted": 51.69,
+      "fold": 2,
+      "residual": -1.19
+    },
+    {
+      "id": 67,
+      "name": "67",
+      "actual": 45.5,
+      "predicted": 51.94,
+      "fold": 3,
+      "residual": -6.44
+    },
+    {
+      "id": 68,
+      "name": "68",
+      "actual": 52.0,
+      "predicted": 50.96,
+      "fold": 3,
+      "residual": 1.04
+    },
+    {
+      "id": 69,
+      "name": "69",
+      "actual": 47.2,
+      "predicted": 53.11,
+      "fold": 2,
+      "residual": -5.91
+    },
+    {
+      "id": 70,
+      "name": "70",
+      "actual": 46.9,
+      "predicted": 52.88,
+      "fold": 3,
+      "residual": -5.98
+    },
+    {
+      "id": 71,
+      "name": "71",
+      "actual": 52.8,
+      "predicted": 50.14,
+      "fold": 5,
+      "residual": 2.66
+    },
+    {
+      "id": 72,
+      "name": "72",
+      "actual": 55.6,
+      "predicted": 53.68,
+      "fold": 1,
+      "residual": 1.92
+    },
+    {
+      "id": 73,
+      "name": "73",
+      "actual": 53.8,
+      "predicted": 48.11,
+      "fold": 1,
+      "residual": 5.69
+    },
+    {
+      "id": 74,
+      "name": "74",
+      "actual": 52.4,
+      "predicted": 53.38,
+      "fold": 3,
+      "residual": -0.98
+    },
+    {
+      "id": 75,
+      "name": "75",
+      "actual": 51.4,
+      "predicted": 52.33,
+      "fold": 1,
+      "residual": -0.93
+    },
+    {
+      "id": 76,
+      "name": "76",
+      "actual": 40.3,
+      "predicted": 44.99,
+      "fold": 1,
+      "residual": -4.69
+    },
+    {
+      "id": 77,
+      "name": "77",
+      "actual": 41.0,
+      "predicted": 44.11,
+      "fold": 2,
+      "residual": -3.11
+    },
+    {
+      "id": 78,
+      "name": "78",
+      "actual": 49.2,
+      "predicted": 51.28,
+      "fold": 1,
+      "residual": -2.08
+    },
+    {
+      "id": 79,
+      "name": "79",
+      "actual": 69.8,
+      "predicted": 49.34,
+      "fold": 2,
+      "residual": 20.46
+    },
+    {
+      "id": 80,
+      "name": "80",
+      "actual": 68.5,
+      "predicted": 51.55,
+      "fold": 5,
+      "residual": 16.95
+    },
+    {
+      "id": 81,
+      "name": "81",
+      "actual": 65.8,
+      "predicted": 50.55,
+      "fold": 2,
+      "residual": 15.25
+    },
+    {
+      "id": 82,
+      "name": "82",
+      "actual": 68.1,
+      "predicted": 61.79,
+      "fold": 1,
+      "residual": 6.3
+    },
+    {
+      "id": 83,
+      "name": "83",
+      "actual": 58.8,
+      "predicted": 54.54,
+      "fold": 3,
+      "residual": 4.25
+    },
+    {
+      "id": 84,
+      "name": "84",
+      "actual": 64.0,
+      "predicted": 53.9,
+      "fold": 1,
+      "residual": 10.1
+    },
+    {
+      "id": 85,
+      "name": "85",
+      "actual": 55.0,
+      "predicted": 53.05,
+      "fold": 3,
+      "residual": 1.95
+    },
+    {
+      "id": 86,
+      "name": "86",
+      "actual": 47.8,
+      "predicted": 51.03,
+      "fold": 3,
+      "residual": -3.23
+    },
+    {
+      "id": 87,
+      "name": "87",
+      "actual": 56.4,
+      "predicted": 54.08,
+      "fold": 5,
+      "residual": 2.32
+    },
+    {
+      "id": 88,
+      "name": "88",
+      "actual": 54.4,
+      "predicted": 53.99,
+      "fold": 5,
+      "residual": 0.41
+    },
+    {
+      "id": 89,
+      "name": "89",
+      "actual": 52.7,
+      "predicted": 49.59,
+      "fold": 4,
+      "residual": 3.12
+    },
+    {
+      "id": 90,
+      "name": "90",
+      "actual": 61.1,
+      "predicted": 55.05,
+      "fold": 1,
+      "residual": 6.05
+    },
+    {
+      "id": 91,
+      "name": "91",
+      "actual": 47.9,
+      "predicted": 51.63,
+      "fold": 5,
+      "residual": -3.73
+    },
+    {
+      "id": 92,
+      "name": "92",
+      "actual": 59.5,
+      "predicted": 49.69,
+      "fold": 2,
+      "residual": 9.81
+    },
+    {
+      "id": 93,
+      "name": "93",
+      "actual": 40.4,
+      "predicted": 52.43,
+      "fold": 2,
+      "residual": -12.03
+    },
+    {
+      "id": 94,
+      "name": "94",
+      "actual": 62.5,
+      "predicted": 58.45,
+      "fold": 2,
+      "residual": 4.05
+    },
+    {
+      "id": 95,
+      "name": "95",
+      "actual": 51.8,
+      "predicted": 54.45,
+      "fold": 4,
+      "residual": -2.65
+    },
+    {
+      "id": 96,
+      "name": "96",
+      "actual": 63.0,
+      "predicted": 55.99,
+      "fold": 3,
+      "residual": 7.01
+    },
+    {
+      "id": 97,
+      "name": "97",
+      "actual": 59.5,
+      "predicted": 46.56,
+      "fold": 3,
+      "residual": 12.94
+    },
+    {
+      "id": 98,
+      "name": "98",
+      "actual": 42.7,
+      "predicted": 50.5,
+      "fold": 4,
+      "residual": -7.8
+    },
+    {
+      "id": 99,
+      "name": "99",
+      "actual": 40.6,
+      "predicted": 45.83,
+      "fold": 5,
+      "residual": -5.23
+    },
+    {
+      "id": 100,
+      "name": "100",
+      "actual": 49.8,
+      "predicted": 52.39,
+      "fold": 4,
+      "residual": -2.59
+    },
+    {
+      "id": 101,
+      "name": "101",
+      "actual": 70.6,
+      "predicted": 47.83,
+      "fold": 2,
+      "residual": 22.76
+    },
+    {
+      "id": 102,
+      "name": "102",
+      "actual": 52.3,
+      "predicted": 52.66,
+      "fold": 5,
+      "residual": -0.36
+    },
+    {
+      "id": 103,
+      "name": "103",
+      "actual": 48.6,
+      "predicted": 51.59,
+      "fold": 4,
+      "residual": -2.99
+    },
+    {
+      "id": 104,
+      "name": "104",
+      "actual": 50.8,
+      "predicted": 48.46,
+      "fold": 1,
+      "residual": 2.34
+    },
+    {
+      "id": 105,
+      "name": "105",
+      "actual": 50.1,
+      "predicted": 50.36,
+      "fold": 5,
+      "residual": -0.26
+    },
+    {
+      "id": 106,
+      "name": "106",
+      "actual": 46.2,
+      "predicted": 48.23,
+      "fold": 5,
+      "residual": -2.03
+    },
+    {
+      "id": 107,
+      "name": "107",
+      "actual": 46.5,
+      "predicted": 50.91,
+      "fold": 3,
+      "residual": -4.41
+    },
+    {
+      "id": 108,
+      "name": "108",
+      "actual": 50.5,
+      "predicted": 51.62,
+      "fold": 1,
+      "residual": -1.12
+    },
+    {
+      "id": 109,
+      "name": "109",
+      "actual": 45.2,
+      "predicted": 51.23,
+      "fold": 1,
+      "residual": -6.03
+    },
+    {
+      "id": 110,
+      "name": "110",
+      "actual": 51.5,
+      "predicted": 49.66,
+      "fold": 1,
+      "residual": 1.84
+    },
+    {
+      "id": 111,
+      "name": "111",
+      "actual": 53.1,
+      "predicted": 47.75,
+      "fold": 2,
+      "residual": 5.35
+    },
+    {
+      "id": 112,
+      "name": "112",
+      "actual": 48.6,
+      "predicted": 49.75,
+      "fold": 3,
+      "residual": -1.15
+    },
+    {
+      "id": 113,
+      "name": "113",
+      "actual": 48.4,
+      "predicted": 49.27,
+      "fold": 1,
+      "residual": -0.87
+    },
+    {
+      "id": 114,
+      "name": "114",
+      "actual": 46.4,
+      "predicted": 48.45,
+      "fold": 2,
+      "residual": -2.04
+    },
+    {
+      "id": 115,
+      "name": "115",
+      "actual": 47.5,
+      "predicted": 54.53,
+      "fold": 3,
+      "residual": -7.03
+    },
+    {
+      "id": 116,
+      "name": "116",
+      "actual": 53.1,
+      "predicted": 46.42,
+      "fold": 1,
+      "residual": 6.68
+    },
+    {
+      "id": 117,
+      "name": "117",
+      "actual": 56.5,
+      "predicted": 50.77,
+      "fold": 3,
+      "residual": 5.73
+    },
+    {
+      "id": 118,
+      "name": "118",
+      "actual": 42.5,
+      "predicted": 41.52,
+      "fold": 1,
+      "residual": 0.98
+    },
+    {
+      "id": 119,
+      "name": "119",
+      "actual": 44.7,
+      "predicted": 47.04,
+      "fold": 1,
+      "residual": -2.34
+    },
+    {
+      "id": 120,
+      "name": "120",
+      "actual": 43.1,
+      "predicted": 46.0,
+      "fold": 3,
+      "residual": -2.9
+    },
+    {
+      "id": 121,
+      "name": "121",
+      "actual": 52.7,
+      "predicted": 57.05,
+      "fold": 5,
+      "residual": -4.35
+    },
+    {
+      "id": 122,
+      "name": "122",
+      "actual": 49.6,
+      "predicted": 48.02,
+      "fold": 3,
+      "residual": 1.58
+    },
+    {
+      "id": 123,
+      "name": "123",
+      "actual": 51.1,
+      "predicted": 55.81,
+      "fold": 4,
+      "residual": -4.71
+    },
+    {
+      "id": 124,
+      "name": "124",
+      "actual": 60.5,
+      "predicted": 59.64,
+      "fold": 1,
+      "residual": 0.86
+    },
+    {
+      "id": 125,
+      "name": "125",
+      "actual": 43.6,
+      "predicted": 42.79,
+      "fold": 3,
+      "residual": 0.81
+    },
+    {
+      "id": 126,
+      "name": "126",
+      "actual": 42.9,
+      "predicted": 52.61,
+      "fold": 1,
+      "residual": -9.71
+    },
+    {
+      "id": 127,
+      "name": "127",
+      "actual": 45.6,
+      "predicted": 49.15,
+      "fold": 3,
+      "residual": -3.55
+    },
+    {
+      "id": 128,
+      "name": "128",
+      "actual": 52.0,
+      "predicted": 54.08,
+      "fold": 4,
+      "residual": -2.08
+    },
+    {
+      "id": 129,
+      "name": "129",
+      "actual": 48.9,
+      "predicted": 50.82,
+      "fold": 3,
+      "residual": -1.92
+    },
+    {
+      "id": 130,
+      "name": "130",
+      "actual": 52.3,
+      "predicted": 49.36,
+      "fold": 5,
+      "residual": 2.94
+    },
+    {
+      "id": 131,
+      "name": "131",
+      "actual": 57.6,
+      "predicted": 57.7,
+      "fold": 4,
+      "residual": -0.1
+    },
+    {
+      "id": 132,
+      "name": "132",
+      "actual": 57.1,
+      "predicted": 51.06,
+      "fold": 2,
+      "residual": 6.04
+    },
+    {
+      "id": 133,
+      "name": "133",
+      "actual": 58.6,
+      "predicted": 50.71,
+      "fold": 3,
+      "residual": 7.89
+    },
+    {
+      "id": 134,
+      "name": "134",
+      "actual": 44.4,
+      "predicted": 51.27,
+      "fold": 5,
+      "residual": -6.87
+    },
+    {
+      "id": 135,
+      "name": "135",
+      "actual": 73.7,
+      "predicted": 60.13,
+      "fold": 4,
+      "residual": 13.57
+    },
+    {
+      "id": 136,
+      "name": "136",
+      "actual": 53.2,
+      "predicted": 49.0,
+      "fold": 4,
+      "residual": 4.2
+    },
+    {
+      "id": 137,
+      "name": "137",
+      "actual": 51.0,
+      "predicted": 50.66,
+      "fold": 2,
+      "residual": 0.34
+    },
+    {
+      "id": 138,
+      "name": "138",
+      "actual": 47.1,
+      "predicted": 50.25,
+      "fold": 4,
+      "residual": -3.15
+    },
+    {
+      "id": 139,
+      "name": "139",
+      "actual": 46.2,
+      "predicted": 50.65,
+      "fold": 1,
+      "residual": -4.45
+    },
+    {
+      "id": 140,
+      "name": "140",
+      "actual": 57.9,
+      "predicted": 47.2,
+      "fold": 2,
+      "residual": 10.7
+    },
+    {
+      "id": 141,
+      "name": "141",
+      "actual": 63.7,
+      "predicted": 56.85,
+      "fold": 4,
+      "residual": 6.85
+    },
+    {
+      "id": 142,
+      "name": "142",
+      "actual": 50.8,
+      "predicted": 51.54,
+      "fold": 4,
+      "residual": -0.74
+    },
+    {
+      "id": 143,
+      "name": "143",
+      "actual": 56.4,
+      "predicted": 52.33,
+      "fold": 2,
+      "residual": 4.07
+    },
+    {
+      "id": 144,
+      "name": "144",
+      "actual": 50.5,
+      "predicted": 49.83,
+      "fold": 1,
+      "residual": 0.67
+    },
+    {
+      "id": 145,
+      "name": "145",
+      "actual": 52.1,
+      "predicted": 50.87,
+      "fold": 2,
+      "residual": 1.23
+    },
+    {
+      "id": 146,
+      "name": "146",
+      "actual": 37.6,
+      "predicted": 44.46,
+      "fold": 3,
+      "residual": -6.86
+    },
+    {
+      "id": 147,
+      "name": "147",
+      "actual": 41.9,
+      "predicted": 49.06,
+      "fold": 2,
+      "residual": -7.16
+    },
+    {
+      "id": 148,
+      "name": "148",
+      "actual": 48.2,
+      "predicted": 52.16,
+      "fold": 2,
+      "residual": -3.96
+    },
+    {
+      "id": 149,
+      "name": "149",
+      "actual": 48.1,
+      "predicted": 51.25,
+      "fold": 5,
+      "residual": -3.15
+    },
+    {
+      "id": 150,
+      "name": "150",
+      "actual": 48.1,
+      "predicted": 51.9,
+      "fold": 4,
+      "residual": -3.8
+    },
+    {
+      "id": 151,
+      "name": "151",
+      "actual": 53.0,
+      "predicted": 52.34,
+      "fold": 5,
+      "residual": 0.66
+    },
+    {
+      "id": 152,
+      "name": "152",
+      "actual": 57.6,
+      "predicted": 52.69,
+      "fold": 2,
+      "residual": 4.91
+    },
+    {
+      "id": 153,
+      "name": "153",
+      "actual": 52.5,
+      "predicted": 54.71,
+      "fold": 3,
+      "residual": -2.21
+    },
+    {
+      "id": 154,
+      "name": "154",
+      "actual": 53.1,
+      "predicted": 53.55,
+      "fold": 3,
+      "residual": -0.45
+    },
+    {
+      "id": 155,
+      "name": "155",
+      "actual": 58.7,
+      "predicted": 53.18,
+      "fold": 1,
+      "residual": 5.52
+    },
+    {
+      "id": 156,
+      "name": "156",
+      "actual": 51.2,
+      "predicted": 53.04,
+      "fold": 4,
+      "residual": -1.84
+    },
+    {
+      "id": 157,
+      "name": "157",
+      "actual": 58.0,
+      "predicted": 48.95,
+      "fold": 3,
+      "residual": 9.05
+    },
+    {
+      "id": 158,
+      "name": "158",
+      "actual": 49.1,
+      "predicted": 49.18,
+      "fold": 1,
+      "residual": -0.08
+    },
+    {
+      "id": 159,
+      "name": "159",
+      "actual": 55.7,
+      "predicted": 51.94,
+      "fold": 4,
+      "residual": 3.76
+    },
+    {
+      "id": 160,
+      "name": "160",
+      "actual": 67.4,
+      "predicted": 56.33,
+      "fold": 5,
+      "residual": 11.07
+    },
+    {
+      "id": 161,
+      "name": "161",
+      "actual": 58.0,
+      "predicted": 53.08,
+      "fold": 5,
+      "residual": 4.92
+    },
+    {
+      "id": 162,
+      "name": "162",
+      "actual": 39.4,
+      "predicted": 45.15,
+      "fold": 4,
+      "residual": -5.75
+    },
+    {
+      "id": 163,
+      "name": "163",
+      "actual": 57.0,
+      "predicted": 50.38,
+      "fold": 2,
+      "residual": 6.62
+    },
+    {
+      "id": 164,
+      "name": "164",
+      "actual": 52.5,
+      "predicted": 51.53,
+      "fold": 3,
+      "residual": 0.97
+    },
+    {
+      "id": 165,
+      "name": "165",
+      "actual": 53.4,
+      "predicted": 53.03,
+      "fold": 1,
+      "residual": 0.37
+    },
+    {
+      "id": 166,
+      "name": "166",
+      "actual": 45.4,
+      "predicted": 52.95,
+      "fold": 5,
+      "residual": -7.55
+    },
+    {
+      "id": 167,
+      "name": "167",
+      "actual": 50.5,
+      "predicted": 52.24,
+      "fold": 2,
+      "residual": -1.74
+    },
+    {
+      "id": 168,
+      "name": "168",
+      "actual": 49.4,
+      "predicted": 47.08,
+      "fold": 3,
+      "residual": 2.32
+    },
+    {
+      "id": 169,
+      "name": "169",
+      "actual": 58.8,
+      "predicted": 56.12,
+      "fold": 5,
+      "residual": 2.68
+    },
+    {
+      "id": 170,
+      "name": "170",
+      "actual": 59.2,
+      "predicted": 54.45,
+      "fold": 4,
+      "residual": 4.75
+    },
+    {
+      "id": 171,
+      "name": "171",
+      "actual": 50.1,
+      "predicted": 52.23,
+      "fold": 4,
+      "residual": -2.13
+    },
+    {
+      "id": 172,
+      "name": "172",
+      "actual": 43.4,
+      "predicted": 49.87,
+      "fold": 1,
+      "residual": -6.47
+    },
+    {
+      "id": 173,
+      "name": "173",
+      "actual": 50.1,
+      "predicted": 53.05,
+      "fold": 1,
+      "residual": -2.95
+    },
+    {
+      "id": 174,
+      "name": "174",
+      "actual": 37.9,
+      "predicted": 48.57,
+      "fold": 5,
+      "residual": -10.67
+    },
+    {
+      "id": 175,
+      "name": "175",
+      "actual": 52.1,
+      "predicted": 54.4,
+      "fold": 3,
+      "residual": -2.3
+    },
+    {
+      "id": 176,
+      "name": "176",
+      "actual": 80.2,
+      "predicted": 50.88,
+      "fold": 1,
+      "residual": 29.32
+    },
+    {
+      "id": 177,
+      "name": "177",
+      "actual": 49.3,
+      "predicted": 51.69,
+      "fold": 2,
+      "residual": -2.39
+    },
+    {
+      "id": 178,
+      "name": "178",
+      "actual": 47.4,
+      "predicted": 52.13,
+      "fold": 4,
+      "residual": -4.73
+    },
+    {
+      "id": 179,
+      "name": "179",
+      "actual": 47.0,
+      "predicted": 48.99,
+      "fold": 2,
+      "residual": -1.99
+    },
+    {
+      "id": 180,
+      "name": "180",
+      "actual": 47.0,
+      "predicted": 57.04,
+      "fold": 3,
+      "residual": -10.04
+    },
+    {
+      "id": 181,
+      "name": "181",
+      "actual": 48.7,
+      "predicted": 49.91,
+      "fold": 1,
+      "residual": -1.21
+    },
+    {
+      "id": 182,
+      "name": "182",
+      "actual": 51.8,
+      "predicted": 51.12,
+      "fold": 1,
+      "residual": 0.68
+    },
+    {
+      "id": 183,
+      "name": "183",
+      "actual": 49.3,
+      "predicted": 57.42,
+      "fold": 3,
+      "residual": -8.12
+    },
+    {
+      "id": 184,
+      "name": "184",
+      "actual": 51.5,
+      "predicted": 51.28,
+      "fold": 3,
+      "residual": 0.22
+    },
+    {
+      "id": 185,
+      "name": "185",
+      "actual": 54.3,
+      "predicted": 51.71,
+      "fold": 2,
+      "residual": 2.59
+    },
+    {
+      "id": 186,
+      "name": "186",
+      "actual": 40.0,
+      "predicted": 48.22,
+      "fold": 3,
+      "residual": -8.22
+    },
+    {
+      "id": 187,
+      "name": "187",
+      "actual": 48.0,
+      "predicted": 49.15,
+      "fold": 5,
+      "residual": -1.15
+    },
+    {
+      "id": 188,
+      "name": "188",
+      "actual": 50.1,
+      "predicted": 51.19,
+      "fold": 5,
+      "residual": -1.1
+    },
+    {
+      "id": 189,
+      "name": "189",
+      "actual": 38.2,
+      "predicted": 45.04,
+      "fold": 5,
+      "residual": -6.84
+    },
+    {
+      "id": 190,
+      "name": "190",
+      "actual": 47.7,
+      "predicted": 51.54,
+      "fold": 5,
+      "residual": -3.84
+    },
+    {
+      "id": 191,
+      "name": "191",
+      "actual": 49.1,
+      "predicted": 55.24,
+      "fold": 5,
+      "residual": -6.14
+    },
+    {
+      "id": 192,
+      "name": "192",
+      "actual": 50.2,
+      "predicted": 52.73,
+      "fold": 4,
+      "residual": -2.53
+    },
+    {
+      "id": 193,
+      "name": "193",
+      "actual": 47.6,
+      "predicted": 54.64,
+      "fold": 3,
+      "residual": -7.04
+    },
+    {
+      "id": 194,
+      "name": "194",
+      "actual": 57.5,
+      "predicted": 54.12,
+      "fold": 2,
+      "residual": 3.38
+    },
+    {
+      "id": 195,
+      "name": "195",
+      "actual": 66.2,
+      "predicted": 46.63,
+      "fold": 3,
+      "residual": 19.57
+    },
+    {
+      "id": 196,
+      "name": "196",
+      "actual": 51.2,
+      "predicted": 50.67,
+      "fold": 3,
+      "residual": 0.53
+    },
+    {
+      "id": 197,
+      "name": "197",
+      "actual": 52.1,
+      "predicted": 54.88,
+      "fold": 1,
+      "residual": -2.78
+    },
+    {
+      "id": 198,
+      "name": "198",
+      "actual": 48.1,
+      "predicted": 51.82,
+      "fold": 2,
+      "residual": -3.72
+    },
+    {
+      "id": 199,
+      "name": "199",
+      "actual": 44.9,
+      "predicted": 50.22,
+      "fold": 2,
+      "residual": -5.32
+    },
+    {
+      "id": 200,
+      "name": "200",
+      "actual": 45.1,
+      "predicted": 48.01,
+      "fold": 4,
+      "residual": -2.91
+    },
+    {
+      "id": 201,
+      "name": "201",
+      "actual": 55.5,
+      "predicted": 50.67,
+      "fold": 5,
+      "residual": 4.83
+    },
+    {
+      "id": 202,
+      "name": "202",
+      "actual": 47.0,
+      "predicted": 46.18,
+      "fold": 2,
+      "residual": 0.82
+    },
+    {
+      "id": 203,
+      "name": "203",
+      "actual": 47.4,
+      "predicted": 50.87,
+      "fold": 1,
+      "residual": -3.47
+    },
+    {
+      "id": 204,
+      "name": "204",
+      "actual": 38.5,
+      "predicted": 41.15,
+      "fold": 4,
+      "residual": -2.65
+    },
+    {
+      "id": 205,
+      "name": "205",
+      "actual": 43.3,
+      "predicted": 46.41,
+      "fold": 5,
+      "residual": -3.11
+    },
+    {
+      "id": 206,
+      "name": "206",
+      "actual": 47.5,
+      "predicted": 46.92,
+      "fold": 4,
+      "residual": 0.58
+    },
+    {
+      "id": 207,
+      "name": "207",
+      "actual": 46.2,
+      "predicted": 54.61,
+      "fold": 5,
+      "residual": -8.41
+    },
+    {
+      "id": 208,
+      "name": "208",
+      "actual": 47.4,
+      "predicted": 51.51,
+      "fold": 1,
+      "residual": -4.11
+    },
+    {
+      "id": 209,
+      "name": "209",
+      "actual": 50.9,
+      "predicted": 49.16,
+      "fold": 2,
+      "residual": 1.74
+    },
+    {
+      "id": 210,
+      "name": "210",
+      "actual": 51.6,
+      "predicted": 50.85,
+      "fold": 1,
+      "residual": 0.75
+    },
+    {
+      "id": 211,
+      "name": "211",
+      "actual": 55.1,
+      "predicted": 48.55,
+      "fold": 2,
+      "residual": 6.55
+    },
+    {
+      "id": 212,
+      "name": "212",
+      "actual": 52.2,
+      "predicted": 50.05,
+      "fold": 5,
+      "residual": 2.15
+    },
+    {
+      "id": 213,
+      "name": "213",
+      "actual": 52.7,
+      "predicted": 50.79,
+      "fold": 4,
+      "residual": 1.91
+    },
+    {
+      "id": 214,
+      "name": "214",
+      "actual": 47.1,
+      "predicted": 51.01,
+      "fold": 5,
+      "residual": -3.91
+    },
+    {
+      "id": 215,
+      "name": "215",
+      "actual": 51.4,
+      "predicted": 49.06,
+      "fold": 4,
+      "residual": 2.34
+    },
+    {
+      "id": 216,
+      "name": "216",
+      "actual": 47.4,
+      "predicted": 43.24,
+      "fold": 4,
+      "residual": 4.16
+    },
+    {
+      "id": 217,
+      "name": "217",
+      "actual": 44.8,
+      "predicted": 51.12,
+      "fold": 5,
+      "residual": -6.33
+    },
+    {
+      "id": 218,
+      "name": "218",
+      "actual": 44.1,
+      "predicted": 52.3,
+      "fold": 4,
+      "residual": -8.2
+    },
+    {
+      "id": 219,
+      "name": "219",
+      "actual": 50.5,
+      "predicted": 50.08,
+      "fold": 2,
+      "residual": 0.42
+    },
+    {
+      "id": 220,
+      "name": "220",
+      "actual": 52.6,
+      "predicted": 50.6,
+      "fold": 2,
+      "residual": 1.99
+    },
+    {
+      "id": 221,
+      "name": "221",
+      "actual": 48.5,
+      "predicted": 48.28,
+      "fold": 1,
+      "residual": 0.22
+    },
+    {
+      "id": 222,
+      "name": "222",
+      "actual": 36.4,
+      "predicted": 48.67,
+      "fold": 2,
+      "residual": -12.26
+    },
+    {
+      "id": 223,
+      "name": "223",
+      "actual": 49.2,
+      "predicted": 44.61,
+      "fold": 3,
+      "residual": 4.59
+    },
+    {
+      "id": 224,
+      "name": "224",
+      "actual": 55.5,
+      "predicted": 44.62,
+      "fold": 3,
+      "residual": 10.88
+    },
+    {
+      "id": 225,
+      "name": "225",
+      "actual": 43.6,
+      "predicted": 43.31,
+      "fold": 3,
+      "residual": 0.29
+    },
+    {
+      "id": 226,
+      "name": "226",
+      "actual": 53.1,
+      "predicted": 47.68,
+      "fold": 4,
+      "residual": 5.42
+    },
+    {
+      "id": 227,
+      "name": "227",
+      "actual": 43.0,
+      "predicted": 44.21,
+      "fold": 3,
+      "residual": -1.21
+    },
+    {
+      "id": 228,
+      "name": "228",
+      "actual": 40.9,
+      "predicted": 45.53,
+      "fold": 1,
+      "residual": -4.63
+    },
+    {
+      "id": 229,
+      "name": "229",
+      "actual": 46.0,
+      "predicted": 44.73,
+      "fold": 2,
+      "residual": 1.27
+    },
+    {
+      "id": 230,
+      "name": "230",
+      "actual": 51.9,
+      "predicted": 52.15,
+      "fold": 4,
+      "residual": -0.25
+    },
+    {
+      "id": 231,
+      "name": "231",
+      "actual": 45.0,
+      "predicted": 51.72,
+      "fold": 1,
+      "residual": -6.72
+    },
+    {
+      "id": 232,
+      "name": "232",
+      "actual": 38.4,
+      "predicted": 44.46,
+      "fold": 2,
+      "residual": -6.06
+    },
+    {
+      "id": 233,
+      "name": "233",
+      "actual": 40.8,
+      "predicted": 48.23,
+      "fold": 3,
+      "residual": -7.43
+    },
+    {
+      "id": 234,
+      "name": "234",
+      "actual": 48.3,
+      "predicted": 47.81,
+      "fold": 2,
+      "residual": 0.49
+    },
+    {
+      "id": 235,
+      "name": "235",
+      "actual": 47.5,
+      "predicted": 50.76,
+      "fold": 5,
+      "residual": -3.26
+    },
+    {
+      "id": 236,
+      "name": "236",
+      "actual": 53.5,
+      "predicted": 54.4,
+      "fold": 5,
+      "residual": -0.9
+    },
+    {
+      "id": 237,
+      "name": "237",
+      "actual": 54.2,
+      "predicted": 52.98,
+      "fold": 3,
+      "residual": 1.22
+    },
+    {
+      "id": 238,
+      "name": "238",
+      "actual": 42.2,
+      "predicted": 50.62,
+      "fold": 3,
+      "residual": -8.42
+    },
+    {
+      "id": 239,
+      "name": "239",
+      "actual": 52.7,
+      "predicted": 52.7,
+      "fold": 2,
+      "residual": -0.0
+    },
+    {
+      "id": 240,
+      "name": "240",
+      "actual": 46.7,
+      "predicted": 57.0,
+      "fold": 3,
+      "residual": -10.3
+    },
+    {
+      "id": 241,
+      "name": "241",
+      "actual": 51.6,
+      "predicted": 52.93,
+      "fold": 5,
+      "residual": -1.33
+    },
+    {
+      "id": 242,
+      "name": "242",
+      "actual": 53.0,
+      "predicted": 52.43,
+      "fold": 2,
+      "residual": 0.57
+    },
+    {
+      "id": 243,
+      "name": "243",
+      "actual": 54.2,
+      "predicted": 51.71,
+      "fold": 5,
+      "residual": 2.49
+    },
+    {
+      "id": 244,
+      "name": "244",
+      "actual": 46.7,
+      "predicted": 52.68,
+      "fold": 3,
+      "residual": -5.98
+    },
+    {
+      "id": 245,
+      "name": "245",
+      "actual": 52.9,
+      "predicted": 51.49,
+      "fold": 4,
+      "residual": 1.41
+    },
+    {
+      "id": 246,
+      "name": "246",
+      "actual": 52.4,
+      "predicted": 51.85,
+      "fold": 2,
+      "residual": 0.55
+    },
+    {
+      "id": 247,
+      "name": "247",
+      "actual": 48.0,
+      "predicted": 57.58,
+      "fold": 2,
+      "residual": -9.58
+    },
+    {
+      "id": 248,
+      "name": "248",
+      "actual": 55.5,
+      "predicted": 53.12,
+      "fold": 3,
+      "residual": 2.38
+    },
+    {
+      "id": 249,
+      "name": "249",
+      "actual": 54.7,
+      "predicted": 53.08,
+      "fold": 4,
+      "residual": 1.62
+    },
+    {
+      "id": 250,
+      "name": "250",
+      "actual": 62.7,
+      "predicted": 51.16,
+      "fold": 2,
+      "residual": 11.54
+    },
+    {
+      "id": 251,
+      "name": "251",
+      "actual": 40.3,
+      "predicted": 50.75,
+      "fold": 5,
+      "residual": -10.45
+    },
+    {
+      "id": 252,
+      "name": "252",
+      "actual": 60.9,
+      "predicted": 52.44,
+      "fold": 5,
+      "residual": 8.46
+    },
+    {
+      "id": 253,
+      "name": "253",
+      "actual": 46.8,
+      "predicted": 55.01,
+      "fold": 3,
+      "residual": -8.21
+    },
+    {
+      "id": 254,
+      "name": "254",
+      "actual": 69.6,
+      "predicted": 45.96,
+      "fold": 2,
+      "residual": 23.64
+    },
+    {
+      "id": 255,
+      "name": "255",
+      "actual": 44.1,
+      "predicted": 49.34,
+      "fold": 3,
+      "residual": -5.24
+    },
+    {
+      "id": 256,
+      "name": "256",
+      "actual": 53.4,
+      "predicted": 56.38,
+      "fold": 3,
+      "residual": -2.98
+    },
+    {
+      "id": 257,
+      "name": "257",
+      "actual": 58.8,
+      "predicted": 54.44,
+      "fold": 5,
+      "residual": 4.36
+    },
+    {
+      "id": 258,
+      "name": "258",
+      "actual": 52.9,
+      "predicted": 55.79,
+      "fold": 3,
+      "residual": -2.89
+    },
+    {
+      "id": 259,
+      "name": "259",
+      "actual": 49.8,
+      "predicted": 56.56,
+      "fold": 5,
+      "residual": -6.76
+    },
+    {
+      "id": 260,
+      "name": "260",
+      "actual": 55.0,
+      "predicted": 57.45,
+      "fold": 4,
+      "residual": -2.45
+    },
+    {
+      "id": 261,
+      "name": "261",
+      "actual": 47.8,
+      "predicted": 50.95,
+      "fold": 1,
+      "residual": -3.15
+    },
+    {
+      "id": 262,
+      "name": "262",
+      "actual": 53.6,
+      "predicted": 58.37,
+      "fold": 3,
+      "residual": -4.77
+    },
+    {
+      "id": 263,
+      "name": "263",
+      "actual": 49.2,
+      "predicted": 51.41,
+      "fold": 5,
+      "residual": -2.21
+    },
+    {
+      "id": 264,
+      "name": "264",
+      "actual": 46.5,
+      "predicted": 52.06,
+      "fold": 5,
+      "residual": -5.56
+    },
+    {
+      "id": 265,
+      "name": "265",
+      "actual": 47.8,
+      "predicted": 51.77,
+      "fold": 4,
+      "residual": -3.97
+    },
+    {
+      "id": 266,
+      "name": "266",
+      "actual": 53.4,
+      "predicted": 51.23,
+      "fold": 1,
+      "residual": 2.17
+    },
+    {
+      "id": 267,
+      "name": "267",
+      "actual": 53.9,
+      "predicted": 48.93,
+      "fold": 4,
+      "residual": 4.97
+    },
+    {
+      "id": 268,
+      "name": "268",
+      "actual": 53.7,
+      "predicted": 50.34,
+      "fold": 2,
+      "residual": 3.36
+    },
+    {
+      "id": 269,
+      "name": "269",
+      "actual": 54.7,
+      "predicted": 53.2,
+      "fold": 5,
+      "residual": 1.5
+    },
+    {
+      "id": 270,
+      "name": "270",
+      "actual": 61.8,
+      "predicted": 56.74,
+      "fold": 5,
+      "residual": 5.06
+    },
+    {
+      "id": 271,
+      "name": "271",
+      "actual": 45.5,
+      "predicted": 49.8,
+      "fold": 3,
+      "residual": -4.3
+    },
+    {
+      "id": 272,
+      "name": "272",
+      "actual": 47.3,
+      "predicted": 51.03,
+      "fold": 2,
+      "residual": -3.74
+    },
+    {
+      "id": 273,
+      "name": "273",
+      "actual": 46.4,
+      "predicted": 47.57,
+      "fold": 5,
+      "residual": -1.17
+    },
+    {
+      "id": 274,
+      "name": "274",
+      "actual": 51.1,
+      "predicted": 48.89,
+      "fold": 3,
+      "residual": 2.21
+    },
+    {
+      "id": 275,
+      "name": "275",
+      "actual": 56.1,
+      "predicted": 55.99,
+      "fold": 2,
+      "residual": 0.1
+    },
+    {
+      "id": 276,
+      "name": "276",
+      "actual": 60.1,
+      "predicted": 55.77,
+      "fold": 5,
+      "residual": 4.33
+    },
+    {
+      "id": 277,
+      "name": "277",
+      "actual": 53.1,
+      "predicted": 57.11,
+      "fold": 4,
+      "residual": -4.01
+    },
+    {
+      "id": 278,
+      "name": "278",
+      "actual": 54.0,
+      "predicted": 53.77,
+      "fold": 1,
+      "residual": 0.23
+    },
+    {
+      "id": 279,
+      "name": "279",
+      "actual": 57.5,
+      "predicted": 56.76,
+      "fold": 3,
+      "residual": 0.74
+    },
+    {
+      "id": 280,
+      "name": "280",
+      "actual": 57.7,
+      "predicted": 55.72,
+      "fold": 1,
+      "residual": 1.98
+    },
+    {
+      "id": 281,
+      "name": "281",
+      "actual": 57.8,
+      "predicted": 54.63,
+      "fold": 4,
+      "residual": 3.17
+    },
+    {
+      "id": 282,
+      "name": "282",
+      "actual": 57.3,
+      "predicted": 55.31,
+      "fold": 3,
+      "residual": 1.99
+    },
+    {
+      "id": 283,
+      "name": "283",
+      "actual": 49.6,
+      "predicted": 49.68,
+      "fold": 4,
+      "residual": -0.08
+    },
+    {
+      "id": 284,
+      "name": "284",
+      "actual": 58.1,
+      "predicted": 55.74,
+      "fold": 1,
+      "residual": 2.36
+    },
+    {
+      "id": 285,
+      "name": "285",
+      "actual": 58.4,
+      "predicted": 56.04,
+      "fold": 3,
+      "residual": 2.36
+    },
+    {
+      "id": 286,
+      "name": "286",
+      "actual": 51.6,
+      "predicted": 56.14,
+      "fold": 1,
+      "residual": -4.54
+    },
+    {
+      "id": 287,
+      "name": "287",
+      "actual": 58.6,
+      "predicted": 52.4,
+      "fold": 3,
+      "residual": 6.2
+    },
+    {
+      "id": 288,
+      "name": "288",
+      "actual": 52.6,
+      "predicted": 50.82,
+      "fold": 3,
+      "residual": 1.78
+    },
+    {
+      "id": 289,
+      "name": "289",
+      "actual": 48.1,
+      "predicted": 57.27,
+      "fold": 2,
+      "residual": -9.17
+    },
+    {
+      "id": 290,
+      "name": "290",
+      "actual": 52.2,
+      "predicted": 53.33,
+      "fold": 4,
+      "residual": -1.13
+    },
+    {
+      "id": 291,
+      "name": "291",
+      "actual": 49.8,
+      "predicted": 52.27,
+      "fold": 4,
+      "residual": -2.47
+    },
+    {
+      "id": 292,
+      "name": "292",
+      "actual": 43.5,
+      "predicted": 50.06,
+      "fold": 4,
+      "residual": -6.56
+    },
+    {
+      "id": 293,
+      "name": "293",
+      "actual": 51.7,
+      "predicted": 50.91,
+      "fold": 5,
+      "residual": 0.79
+    },
+    {
+      "id": 294,
+      "name": "294",
+      "actual": 50.0,
+      "predicted": 48.19,
+      "fold": 3,
+      "residual": 1.81
+    },
+    {
+      "id": 295,
+      "name": "295",
+      "actual": 51.0,
+      "predicted": 47.95,
+      "fold": 4,
+      "residual": 3.05
+    },
+    {
+      "id": 296,
+      "name": "296",
+      "actual": 61.3,
+      "predicted": 48.4,
+      "fold": 1,
+      "residual": 12.9
+    },
+    {
+      "id": 297,
+      "name": "297",
+      "actual": 49.7,
+      "predicted": 52.4,
+      "fold": 2,
+      "residual": -2.7
+    },
+    {
+      "id": 298,
+      "name": "298",
+      "actual": 48.0,
+      "predicted": 50.94,
+      "fold": 2,
+      "residual": -2.94
+    },
+    {
+      "id": 299,
+      "name": "299",
+      "actual": 54.7,
+      "predicted": 52.29,
+      "fold": 2,
+      "residual": 2.41
+    },
+    {
+      "id": 300,
+      "name": "300",
+      "actual": 35.7,
+      "predicted": 48.08,
+      "fold": 1,
+      "residual": -12.38
+    },
+    {
+      "id": 301,
+      "name": "301",
+      "actual": 50.1,
+      "predicted": 50.12,
+      "fold": 3,
+      "residual": -0.02
+    },
+    {
+      "id": 302,
+      "name": "302",
+      "actual": 40.5,
+      "predicted": 43.3,
+      "fold": 2,
+      "residual": -2.8
+    },
+    {
+      "id": 303,
+      "name": "303",
+      "actual": 41.1,
+      "predicted": 45.74,
+      "fold": 4,
+      "residual": -4.64
+    },
+    {
+      "id": 304,
+      "name": "304",
+      "actual": 50.5,
+      "predicted": 48.77,
+      "fold": 4,
+      "residual": 1.73
+    },
+    {
+      "id": 305,
+      "name": "305",
+      "actual": 43.6,
+      "predicted": 51.43,
+      "fold": 1,
+      "residual": -7.83
+    },
+    {
+      "id": 306,
+      "name": "306",
+      "actual": 56.4,
+      "predicted": 50.7,
+      "fold": 1,
+      "residual": 5.7
+    },
+    {
+      "id": 307,
+      "name": "307",
+      "actual": 47.1,
+      "predicted": 55.3,
+      "fold": 3,
+      "residual": -8.2
+    },
+    {
+      "id": 308,
+      "name": "308",
+      "actual": 54.7,
+      "predicted": 49.98,
+      "fold": 5,
+      "residual": 4.73
+    },
+    {
+      "id": 309,
+      "name": "309",
+      "actual": 47.0,
+      "predicted": 49.75,
+      "fold": 5,
+      "residual": -2.75
+    },
+    {
+      "id": 310,
+      "name": "310",
+      "actual": 49.1,
+      "predicted": 50.74,
+      "fold": 5,
+      "residual": -1.64
+    },
+    {
+      "id": 311,
+      "name": "311",
+      "actual": 49.9,
+      "predicted": 53.23,
+      "fold": 4,
+      "residual": -3.33
+    },
+    {
+      "id": 312,
+      "name": "312",
+      "actual": 45.2,
+      "predicted": 52.88,
+      "fold": 3,
+      "residual": -7.68
+    },
+    {
+      "id": 313,
+      "name": "313",
+      "actual": 45.9,
+      "predicted": 44.43,
+      "fold": 5,
+      "residual": 1.47
+    },
+    {
+      "id": 314,
+      "name": "314",
+      "actual": 49.3,
+      "predicted": 51.44,
+      "fold": 1,
+      "residual": -2.14
+    },
+    {
+      "id": 315,
+      "name": "315",
+      "actual": 59.9,
+      "predicted": 49.37,
+      "fold": 1,
+      "residual": 10.53
+    },
+    {
+      "id": 316,
+      "name": "316",
+      "actual": 56.5,
+      "predicted": 51.68,
+      "fold": 1,
+      "residual": 4.82
+    },
+    {
+      "id": 317,
+      "name": "317",
+      "actual": 55.6,
+      "predicted": 50.62,
+      "fold": 1,
+      "residual": 4.98
+    },
+    {
+      "id": 318,
+      "name": "318",
+      "actual": 52.1,
+      "predicted": 57.71,
+      "fold": 3,
+      "residual": -5.61
+    },
+    {
+      "id": 319,
+      "name": "319",
+      "actual": 54.3,
+      "predicted": 49.46,
+      "fold": 1,
+      "residual": 4.84
+    },
+    {
+      "id": 320,
+      "name": "320",
+      "actual": 58.9,
+      "predicted": 53.76,
+      "fold": 4,
+      "residual": 5.14
+    },
+    {
+      "id": 321,
+      "name": "321",
+      "actual": 66.6,
+      "predicted": 56.49,
+      "fold": 2,
+      "residual": 10.11
+    },
+    {
+      "id": 322,
+      "name": "322",
+      "actual": 43.1,
+      "predicted": 45.76,
+      "fold": 2,
+      "residual": -2.66
+    },
+    {
+      "id": 323,
+      "name": "323",
+      "actual": 45.9,
+      "predicted": 49.55,
+      "fold": 2,
+      "residual": -3.64
+    },
+    {
+      "id": 324,
+      "name": "324",
+      "actual": 46.2,
+      "predicted": 51.87,
+      "fold": 4,
+      "residual": -5.67
+    },
+    {
+      "id": 325,
+      "name": "325",
+      "actual": 47.8,
+      "predicted": 50.24,
+      "fold": 1,
+      "residual": -2.44
+    },
+    {
+      "id": 326,
+      "name": "326",
+      "actual": 54.7,
+      "predicted": 52.19,
+      "fold": 5,
+      "residual": 2.51
+    },
+    {
+      "id": 327,
+      "name": "327",
+      "actual": 52.9,
+      "predicted": 53.5,
+      "fold": 3,
+      "residual": -0.6
+    },
+    {
+      "id": 328,
+      "name": "328",
+      "actual": 49.2,
+      "predicted": 49.65,
+      "fold": 2,
+      "residual": -0.45
+    },
+    {
+      "id": 329,
+      "name": "329",
+      "actual": 37.2,
+      "predicted": 40.66,
+      "fold": 1,
+      "residual": -3.46
+    },
+    {
+      "id": 330,
+      "name": "330",
+      "actual": 51.1,
+      "predicted": 51.41,
+      "fold": 5,
+      "residual": -0.31
+    },
+    {
+      "id": 331,
+      "name": "331",
+      "actual": 51.1,
+      "predicted": 43.96,
+      "fold": 1,
+      "residual": 7.14
+    },
+    {
+      "id": 332,
+      "name": "332",
+      "actual": 38.9,
+      "predicted": 42.87,
+      "fold": 4,
+      "residual": -3.97
+    },
+    {
+      "id": 333,
+      "name": "333",
+      "actual": 45.0,
+      "predicted": 49.14,
+      "fold": 5,
+      "residual": -4.14
+    },
+    {
+      "id": 334,
+      "name": "334",
+      "actual": 56.8,
+      "predicted": 51.91,
+      "fold": 1,
+      "residual": 4.89
+    },
+    {
+      "id": 335,
+      "name": "335",
+      "actual": 47.6,
+      "predicted": 52.86,
+      "fold": 4,
+      "residual": -5.26
+    },
+    {
+      "id": 336,
+      "name": "336",
+      "actual": 53.0,
+      "predicted": 45.37,
+      "fold": 1,
+      "residual": 7.63
+    },
+    {
+      "id": 337,
+      "name": "337",
+      "actual": 62.0,
+      "predicted": 53.16,
+      "fold": 5,
+      "residual": 8.84
+    },
+    {
+      "id": 338,
+      "name": "338",
+      "actual": 59.3,
+      "predicted": 55.1,
+      "fold": 5,
+      "residual": 4.2
+    }
+  ],
+  "importance_full": {
+    "mdi": [
+      {
+        "feature": "A30",
+        "importance": 0.12348
+      },
+      {
+        "feature": "A59",
+        "importance": 0.06398
+      },
+      {
+        "feature": "A13",
+        "importance": 0.03928
+      },
+      {
+        "feature": "A26",
+        "importance": 0.03595
+      },
+      {
+        "feature": "A36",
+        "importance": 0.02836
+      },
+      {
+        "feature": "A50",
+        "importance": 0.02788
+      },
+      {
+        "feature": "A42",
+        "importance": 0.02337
+      },
+      {
+        "feature": "A63",
+        "importance": 0.02307
+      },
+      {
+        "feature": "A33",
+        "importance": 0.02288
+      },
+      {
+        "feature": "A15",
+        "importance": 0.02075
+      },
+      {
+        "feature": "A20",
+        "importance": 0.01929
+      },
+      {
+        "feature": "A32",
+        "importance": 0.01913
+      },
+      {
+        "feature": "A01",
+        "importance": 0.01839
+      },
+      {
+        "feature": "A58",
+        "importance": 0.01815
+      },
+      {
+        "feature": "A48",
+        "importance": 0.01728
+      },
+      {
+        "feature": "A21",
+        "importance": 0.01719
+      },
+      {
+        "feature": "A43",
+        "importance": 0.01674
+      },
+      {
+        "feature": "A24",
+        "importance": 0.01663
+      },
+      {
+        "feature": "A16",
+        "importance": 0.01662
+      },
+      {
+        "feature": "A51",
+        "importance": 0.01596
+      }
+    ],
+    "permutation": [
+      {
+        "feature": "A30",
+        "importance": 0.25008
+      },
+      {
+        "feature": "A59",
+        "importance": 0.10844
+      },
+      {
+        "feature": "A26",
+        "importance": 0.06737
+      },
+      {
+        "feature": "A36",
+        "importance": 0.0576
+      },
+      {
+        "feature": "A13",
+        "importance": 0.04107
+      },
+      {
+        "feature": "A33",
+        "importance": 0.02882
+      },
+      {
+        "feature": "A50",
+        "importance": 0.02843
+      },
+      {
+        "feature": "A63",
+        "importance": 0.02771
+      },
+      {
+        "feature": "A42",
+        "importance": 0.02658
+      },
+      {
+        "feature": "A15",
+        "importance": 0.02219
+      },
+      {
+        "feature": "A16",
+        "importance": 0.0207
+      },
+      {
+        "feature": "A29",
+        "importance": 0.01925
+      },
+      {
+        "feature": "A43",
+        "importance": 0.01789
+      },
+      {
+        "feature": "A24",
+        "importance": 0.0167
+      },
+      {
+        "feature": "A21",
+        "importance": 0.01661
+      },
+      {
+        "feature": "A58",
+        "importance": 0.01649
+      },
+      {
+        "feature": "A20",
+        "importance": 0.01627
+      },
+      {
+        "feature": "A01",
+        "importance": 0.01473
+      },
+      {
+        "feature": "A48",
+        "importance": 0.01449
+      },
+      {
+        "feature": "A28",
+        "importance": 0.01432
+      }
+    ]
+  }
+}

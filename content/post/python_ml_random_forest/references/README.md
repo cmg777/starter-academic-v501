@@ -16,7 +16,7 @@ Executable companion to the blog post:
 
 ## Prerequisites
 
-- Python 3.10–3.13 (any standard install: python.org, Homebrew, miniconda, miniforge).
+- Python 3.11–3.13 (any standard install: python.org, Homebrew, miniconda, miniforge). The pinned numpy 2.4 / pandas 3.0 require Python ≥ 3.11.
 - A working [Quarto](https://quarto.org/) install.
 - [Positron](https://positron.posit.co/) is recommended; any terminal with `quarto` on PATH also works.
 
@@ -47,10 +47,10 @@ Subsequent renders are instant — step 2 is only needed once per machine.
 ## Troubleshooting
 
 - **Wrapper refuses to open on macOS (Gatekeeper):** the `render.command` is unsigned, so the first time you double-click it macOS may block it. Right-click → **Open** → confirm in the dialog. After that, double-clicking works normally. As a fallback, run `bash render.command` from a terminal.
-- **Auto-relaunch:** if `python3` on your PATH is unsupported (e.g., Python 3.14 with no `numba` wheels, or 3.9 below the package minimum), `setup_env.py` scans your machine for a compatible Python 3.10–3.13 and relaunches itself with it. You'll see a `Note: ... Relaunching setup_env.py with it...` line — that's expected.
+- **Auto-relaunch:** if `python3` on your PATH is unsupported (e.g., Python 3.14 without full wheels, or 3.10 below the pinned-package minimum), `setup_env.py` scans your machine for a compatible Python 3.11–3.13 and relaunches itself with it. You'll see a `Note: ... Relaunching setup_env.py with it...` line — that's expected.
 - **Windows:** if `python3` is not on PATH, use `python setup_env.py` instead.
 - **Kernel not found:** if Render reports `Jupyter kernel 'python_ml_random_forest-tutorial' not found`, you skipped the manual step — run `python3 setup_env.py` in a terminal and try again. The one-click wrapper avoids this entirely.
-- **"This tutorial needs Python 3.10, 3.11, 3.12, or 3.13":** your `python3` is outside the supported range. Install a working Python (miniforge, python.org, or Homebrew `python@3.13`) and re-run.
+- **"This tutorial needs Python 3.11, 3.12, or 3.13":** your `python3` is outside the supported range. Install a working Python (miniforge, python.org, or Homebrew `python@3.13`) and re-run.
 - **`ImportError: ... pyexpat.cpython-3XX-darwin.so`:** your Python's `pyexpat` stdlib binding is broken — most often Homebrew `python@3.14` on macOS, whose `pyexpat.so` is linked against a newer `libexpat` than the system ships. Fix by switching to a different Python (`~/miniforge3/envs/<env>/bin/python3 setup_env.py`), installing from python.org, or `brew uninstall python@3.14 && brew install python@3.13`.
 
 ## Source

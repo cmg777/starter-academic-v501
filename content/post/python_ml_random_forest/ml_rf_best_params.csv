@@ -1,6 +1,6 @@
 Parameter,Value
-max_depth,30
-max_features,sqrt
+n_estimators,200
+max_depth,None
+min_samples_split,3
 min_samples_leaf,1
-min_samples_split,4
-n_estimators,500
+max_features,sqrt

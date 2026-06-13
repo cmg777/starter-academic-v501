@@ -270,6 +270,11 @@ button.action.secondary {
   color: var(--text);
 }
 button.action[disabled] { opacity: 0.5; cursor: not-allowed; }
+button.action.secondary.active-round {
+  border-color: var(--orange);
+  background: rgba(217, 119, 87, 0.18);
+  color: var(--text);
+}
 
 .tag {
   display: inline-block;

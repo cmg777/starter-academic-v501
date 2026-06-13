@@ -1,0 +1,5 @@
+Method,Best CV R2
+Baseline,0.2236
+Grid,0.2441
+Random,0.2478
+Optuna,0.2509
