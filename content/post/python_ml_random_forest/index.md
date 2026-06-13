@@ -64,7 +64,7 @@ diagram: true
 
 ## Abstract
 
-Satellite imagery is increasingly used as a low-cost proxy for socioeconomic conditions in places where survey data are sparse, raising the question of how much development-related signal it actually contains. This tutorial predicts Bolivia's Municipal Sustainable Development Index (IMDS) — a composite score on a 0–100 scale — from satellite image embeddings, and uses the problem to introduce the core ideas of machine learning for continuous outcomes. The data come from the DS4Bolivia repository and cover all 339 Bolivian municipalities with complete coverage and no missing values, pairing IMDS scores (mean 51.05, standard deviation 6.77, ranging 35.70 to 80.20) with 64-dimensional feature vectors extracted from 2017 satellite imagery. Rather than judging the model on a single 80/20 train/test split, we evaluate it with **5-fold cross-validation**: each of the 339 municipalities receives an *out-of-fold* prediction from a forest that never saw it during training. A baseline Random Forest with default hyperparameters explains about 22% of the variation in IMDS (pooled out-of-fold R² 0.225, RMSE 5.95, MAE 4.42), but the per-fold R² swings from −0.03 to 0.45 (mean 0.224, standard deviation 0.173) — a spread that a single number would have hidden, and the reason we always report a standard deviation alongside the mean. Comparing the distribution of predictions to the distribution of the actual scores shows the predictions are compressed toward the centre (predicted standard deviation 3.54 vs 6.77 actual; a two-sample Kolmogorov–Smirnov test rejects equality, p < 0.001), the classic regression-to-the-mean signature of a model with limited signal. Permutation importance singles out embedding dimensions A30 and A59, and partial dependence plots reveal non-linear threshold effects. Two appendices keep the main story clean: Appendix A shows *why* a single train/test split is unreliable here, and Appendix B compares grid search, random search, and Optuna and finds that tuning buys almost nothing over the baseline. The practical message is that satellite embeddings carry real but limited development signal, so pairing them with administrative or survey data is the natural next step.
+Satellite imagery is increasingly used as a low-cost proxy for socioeconomic conditions where survey data are sparse, raising the question of how much development signal it actually contains. This tutorial predicts Bolivia's Municipal Sustainable Development Index (IMDS) — a 0–100 composite — from satellite image embeddings, and uses the problem to introduce the core ideas of machine learning for continuous outcomes. The data, from the DS4Bolivia repository, cover all 339 municipalities with no missing values, pairing IMDS scores (mean 51.05, standard deviation 6.77) with 64-dimensional embeddings from 2017 imagery. Rather than trusting a single 80/20 split, we evaluate with **5-fold cross-validation**: every municipality receives an *out-of-fold* prediction from a forest that never saw it. A baseline Random Forest explains about 22% of IMDS variation (pooled out-of-fold R² 0.225), but the per-fold R² swings from −0.03 to 0.45 (standard deviation 0.173) — the spread a single number would hide, and the reason we report a standard deviation alongside the mean. The predictions are compressed toward the centre (predicted standard deviation 3.54 vs 6.77; a Kolmogorov–Smirnov test rejects equality, p < 0.001), the classic regression-to-the-mean signature of limited signal. Permutation importance singles out embedding dimensions A30 and A59, with non-linear threshold effects in the partial-dependence plots. Two appendices keep the main story clean: why a single split is unreliable here, and why grid, random, and Optuna tuning buys almost nothing over the baseline. The practical message is that satellite embeddings carry real but limited development signal, so pairing them with administrative or survey data is the natural next step.
 
 ## 1. Introduction
 
@@ -173,8 +173,8 @@ Bagging plus also blindfolding each juror to a random subset of evidence.
 </details>
 </div>
 
-**4. Cross-validation** — $K$-fold CV.
-Split the data into $K$ equal folds. Train on $K-1$ folds and test on the held-out fold; rotate so every fold is the test set exactly once. Averages out the luck of any single split.
+**4. Cross-validation** — $k$-fold CV.
+Split the data into $k$ equal folds. Train on $k-1$ folds and test on the held-out fold; rotate so every fold is the test set exactly once. Averages out the luck of any single split.
 
 <div class="concept-pair">
 <details class="concept-card concept-example">
@@ -268,7 +268,7 @@ Which ingredient mattered most for the cake's flavour.
 </details>
 </div>
 
-**9. Partial dependence plot** — $\bar f(x\_k) = E\_{X\_{-k}}[\hat f(x\_k, X\_{-k})]$.
+**9. Partial dependence plot** — $\bar f(x\_j) = E\_{X\_{-j}}[\hat f(x\_j, X\_{-j})]$.
 Average prediction as one feature varies, with all other features held at their observed distribution. Shows the marginal shape of the relationship.
 
 <div class="concept-pair">
@@ -901,7 +901,7 @@ The main tutorial used a Random Forest — a flexible "black box" that fits non-
 
 Multiple linear regression assumes the target is a weighted sum of the features plus an intercept:
 
-$$\hat{y} = \beta\_0 + \beta\_1\,A00 + \beta\_2\,A01 + \beta\_3\,A02 + \beta\_4\,A03$$
+$$\hat{y} = \beta\_0 + \beta\_1\\,A00 + \beta\_2\\,A01 + \beta\_3\\,A02 + \beta\_4\\,A03$$
 
 Each coefficient $\beta\_j$ is the change in predicted IMDS for a one-unit increase in that feature, holding the others fixed. We use scikit-learn's `LinearRegression` and deliberately keep just four features so the whole model fits on one line.
 
@@ -920,7 +920,7 @@ intercept: 54.42
 {'A00': 19.59, 'A01': -0.35, 'A02': 15.99, 'A03': 12.66}
 ```
 
-Fitted on all 339 municipalities, the model is $\hat{y} = 54.42 + 19.59\,A00 - 0.35\,A01 + 15.99\,A02 + 12.66\,A03$. Unlike the forest, every term is visible and interpretable: A00, A02, and A03 push IMDS up, while A01 barely moves it. But a model fit on all the data tells us nothing about *generalization* — for that we need cross-validation.
+Fitted on all 339 municipalities, the model is $\hat{y} = 54.42 + 19.59\\,A00 - 0.35\\,A01 + 15.99\\,A02 + 12.66\\,A03$. Unlike the forest, every term is visible and interpretable: A00, A02, and A03 push IMDS up, while A01 barely moves it. But a model fit on all the data tells us nothing about *generalization* — for that we need cross-validation.
 
 ### C.2 Five-fold cross-validation and out-of-fold predictions
 
@@ -966,7 +966,7 @@ The same two diagnostics as the main body: out-of-fold predicted-vs-actual (colo
 fig, ax = plt.subplots(figsize=(7.2, 7.2))
 for k in range(1, 6):
     m = fold_id == k
-    ax.scatter(y[m], lr_oof[m], s=34, alpha=0.75, color=FOLD_COLORS[k - 1], label=f"Fold {k}")
+    ax.scatter(y[m], lr_oof[m], s=34, alpha=0.75, color=fold_colors[k - 1], label=f"Fold {k}")
 ax.plot(lims, lims, "--", color="#141413", label="Perfect prediction")
 plt.savefig(IMAGES_DIR / "ml_lr_actual_vs_predicted.png", dpi=300, bbox_inches="tight")
 plt.show()
@@ -979,7 +979,7 @@ With so little signal, the predictions barely spread along the vertical axis —
 ```python
 residuals = y - lr_oof
 fig, ax = plt.subplots(figsize=(8, 5))
-ax.scatter(lr_oof, residuals, alpha=0.7, c=[FOLD_COLORS[k - 1] for k in fold_id])
+ax.scatter(lr_oof, residuals, alpha=0.7, c=[fold_colors[k - 1] for k in fold_id])
 ax.axhline(0, color="#141413", linestyle="--")
 plt.savefig(IMAGES_DIR / "ml_lr_residuals.png", dpi=300, bbox_inches="tight")
 plt.show()
