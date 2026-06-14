@@ -18,6 +18,13 @@ url_video: ""
 
 
 <details class="dashboard-entry">
+<summary>Mendez, C. (2026). <em>Localized monthly time series of nighttime lights (VIIRS-like) 1992-2024.</em> Google Earth Engine Application. <a href="https://carlos-mendez.projects.earthengine.app/view/viirs-like-monthly">Access App</a> | <a href="https://code.earthengine.google.com/5160aef0c95d524d8c44f64adf8fea37?hideCode=true">Open in GEE</a></summary>
+
+{{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/viirs-like-monthly" height="800px" >}}
+
+</details>
+
+<details class="dashboard-entry">
 <summary>Mendez, C. (2026). <em>Localized annual time series of nighttime lights (DMSP-like) 1992-2025.</em> Google Earth Engine Application. <a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ">Access App</a> | <a href="https://code.earthengine.google.com/b7ac9913beb022a719f7b26aa38cb4fe?hideCode=true">Open in GEE</a></summary>
 
 {{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ" height="800px" >}}
