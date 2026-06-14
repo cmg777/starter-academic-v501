@@ -10,7 +10,14 @@
 {{ $type := .Get "type" | default "project" }}
 {{ $count := int (.Get "count" | default 5) }}
 {{ $section := cond (eq $type "event") "event" "projects" }}
-{{ $items := first $count (where site.RegularPages "Section" $section).ByDate.Reverse }}
+{{ $pages := where site.RegularPages "Section" $section }}
+{{/* Projects: most-recently-updated first — .Lastmod = git commit date of the project's
+     index.md (enableGitInfo), falling back to `date`. So adding/editing+committing a project
+     surfaces it at the top of the homepage Projects widget automatically. Mirrors the Posts &
+     Tutorials tutorial-teaser. Events keep `date`-descending (talk date). */}}
+{{ $sorted := $pages.ByDate.Reverse }}
+{{ if eq $section "projects" }}{{ $sorted = $pages.ByLastmod.Reverse }}{{ end }}
+{{ $items := first $count $sorted }}
 
 <div class="cz-showcase">
   {{ range $items }}

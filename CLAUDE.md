@@ -52,6 +52,10 @@ Font Awesome icons are used in link buttons. Common icon_pack values: `fas` (sol
 
 The homepage is a widget-based layout. Each file in `content/home/` is a section, ordered by the `weight` field in its front matter. To activate/deactivate a section, toggle `active: true/false`. Lower weight = appears higher on the page.
 
+## Projects widget ordering (most-recently-updated first)
+
+The homepage Projects widget (`content/home/projects.md` and its `content/es/` + `content/ja/` counterparts) renders via the `showcase` shortcode (`layouts/shortcodes/showcase.html`), which sorts the `projects` section by `.ByLastmod.Reverse` — most-recently-updated first, where `.Lastmod` is the git commit date of the project's `index.md` (`enableGitInfo: true` in `config/_default/config.yaml`, mirrored by `HUGO_ENABLEGITINFO=true` in `netlify.toml`; falls back to the `date` front matter when no git info). **Convention: whenever you add or edit a project under `content/projects/<slug>/` (plus its ES/JA counterparts), committing the change automatically makes that project appear FIRST in the homepage Projects widget — no manual `date`/`weight` bump needed.** This mirrors the Posts & Tutorials teaser (`tutorial-teaser.html`, `.ByLastmod.Reverse`). The same `showcase` shortcode also renders the Talks/Presentations widget (`content/home/talks.md`, `type=event`), which intentionally keeps `date`-descending order (talk date) — the projects-only sort is guarded by `if eq $section "projects"`.
+
 # Custom Components
 
 ## Shortcode: fullwidth-iframe
