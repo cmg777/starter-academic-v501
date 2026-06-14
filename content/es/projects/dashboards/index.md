@@ -18,7 +18,7 @@ url_video: ""
 
 
 <details class="dashboard-entry">
-<summary>Mendez, C. (2026). <em>Series temporales anuales localizadas de luces nocturnas (tipo DMSP) 1992-2025.</em> Aplicación de Google Earth Engine. <a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ">Acceder a la app</a> | <a href="https://code.earthengine.google.com/2f70778fdd7d5b3082fbd4517604ffcf?hideCode=true">Abrir en GEE</a></summary>
+<summary>Mendez, C. (2026). <em>Series temporales anuales localizadas de luces nocturnas (tipo DMSP) 1992-2025.</em> Aplicación de Google Earth Engine. <a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ">Acceder a la app</a> | <a href="https://code.earthengine.google.com/b7ac9913beb022a719f7b26aa38cb4fe?hideCode=true">Abrir en GEE</a></summary>
 
 {{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ" height="800px" >}}
 

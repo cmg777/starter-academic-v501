@@ -18,7 +18,7 @@ url_video: ""
 
 
 <details class="dashboard-entry">
-<summary>Mendez, C. (2026). <em>夜間光（DMSP相当）の局所的な年次時系列（1992–2025年）。</em> Google Earth Engine アプリ。<a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ">アプリを開く</a> | <a href="https://code.earthengine.google.com/2f70778fdd7d5b3082fbd4517604ffcf?hideCode=true">GEEで開く</a></summary>
+<summary>Mendez, C. (2026). <em>夜間光（DMSP相当）の局所的な年次時系列（1992–2025年）。</em> Google Earth Engine アプリ。<a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ">アプリを開く</a> | <a href="https://code.earthengine.google.com/b7ac9913beb022a719f7b26aa38cb4fe?hideCode=true">GEEで開く</a></summary>
 
 {{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ" height="800px" >}}
 

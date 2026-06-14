@@ -18,7 +18,7 @@ url_video: ""
 
 
 <details class="dashboard-entry">
-<summary>Mendez, C. (2026). <em>Localized annual time series of nighttime lights (DMSP-like) 1992-2025.</em> Google Earth Engine Application. <a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ">Access App</a> | <a href="https://code.earthengine.google.com/2f70778fdd7d5b3082fbd4517604ffcf?hideCode=true">Open in GEE</a></summary>
+<summary>Mendez, C. (2026). <em>Localized annual time series of nighttime lights (DMSP-like) 1992-2025.</em> Google Earth Engine Application. <a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ">Access App</a> | <a href="https://code.earthengine.google.com/b7ac9913beb022a719f7b26aa38cb4fe?hideCode=true">Open in GEE</a></summary>
 
 {{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ" height="800px" >}}
 
