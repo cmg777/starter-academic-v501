@@ -25,6 +25,13 @@ url_video: ""
 </details>
 
 <details class="dashboard-entry">
+<summary>Mendez, C. (2026). <em>夜間光（DMSP相当）の地域別年次時系列（1992–2025年）。</em> Google Earth Engine アプリ。<a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ-regional">アプリを開く</a> | <a href="https://code.earthengine.google.com/2dbe8a1211bdc75508d3973ebc3d67a7?hideCode=true">GEEで開く</a></summary>
+
+{{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ-regional" height="800px" >}}
+
+</details>
+
+<details class="dashboard-entry">
 <summary>Mendez, C. (2026). <em>カンボジアにおける人口、夜間光、土地被覆、GDPの時空間ダイナミクス（2013–2019年）。</em> Google Earth Engine アプリ。<a href="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1">アプリを開く</a> | <a href="https://code.earthengine.google.com/46da0676f419e67f4000315b33f86cae?hideCode=true">GEEで開く</a></summary>
 
 {{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1" height="800px" >}}
