@@ -18,6 +18,13 @@ url_video: ""
 
 
 <details class="dashboard-entry">
+<summary>Mendez, C. (2026). <em>Series temporales anuales localizadas de luces nocturnas (tipo DMSP) 1992-2025.</em> Aplicación de Google Earth Engine. <a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ">Acceder a la app</a> | <a href="https://code.earthengine.google.com/2f70778fdd7d5b3082fbd4517604ffcf?hideCode=true">Abrir en GEE</a></summary>
+
+{{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ" height="800px" >}}
+
+</details>
+
+<details class="dashboard-entry">
 <summary>Mendez, C. (2026). <em>Dinámica espacio-temporal de la población, la luminosidad, la cobertura del suelo y el PIB en Camboya (2013-2019).</em> Aplicación de Google Earth Engine. <a href="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1">Acceder a la app</a> | <a href="https://code.earthengine.google.com/46da0676f419e67f4000315b33f86cae?hideCode=true">Abrir en GEE</a></summary>
 
 {{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/geoexplorer1" height="800px" >}}
