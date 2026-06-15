@@ -91,6 +91,8 @@ When adding new page types that use the fullwidth-iframe shortcode, check that a
 
 The dashboards project page (content/projects/dashboards/index.md) uses native `<details>/<summary>` elements. Each dashboard entry wraps its citation in `<summary>` and the fullwidth-iframe shortcode inside `<details class="dashboard-entry">`. This defers iframe loading until the user expands the section.
 
+**GEE source-code link is NOT shown publicly.** Each entry's `<summary>` keeps only the visible "Access App" link (which opens the published GEE app). The app's underlying Earth Engine **source code** link must NOT be rendered — preserve it instead as an HTML comment on its own line directly under the `<summary>`: `<!-- Source code (GEE): https://code.earthengine.google.com/<id>?hideCode=true -->`. Apply this in all three language bundles (EN/ES/JA). Convention adopted 2026-06-15 (see `logs/2026-06-15-dashboards-hide-gee-source-links.md`); the previously-shown `| Open in GEE` / `| Abrir en GEE` / `| GEEで開く` links were removed.
+
 ## AI Podcast Player
 
 An embedded audio player overlay for AI-generated podcast summaries of blog posts. The player is self-contained inline HTML/CSS/JS appended to each post's `index.md` — no external dependencies or shared templates.
