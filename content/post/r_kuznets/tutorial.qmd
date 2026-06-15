@@ -1,6 +1,6 @@
 ---
 title: "Spatial Inequality and the Kuznets Curve"
-subtitle: "A synthetic R replication of Lessmann (2013) — WCV, fixest TWFE, and semiparametric estimates"
+subtitle: "A synthetic R replication of Lessmann (2014) — WCV, fixest TWFE, and semiparametric estimates"
 author: "Carlos Mendez"
 date: "2026-06-14"
 format:
@@ -19,7 +19,7 @@ execute:
   message: false
 ---
 
-This notebook reproduces the main results of **Lessmann (2013)**, "Spatial inequality and development — Is there an inverted-U relationship?" on a **synthetic** dataset. There is no real data: we simulate regional GDP per capita for 56 countries, compute the population-weighted coefficient of variation (WCV), and calibrate the data-generating process so the regressions match the paper in direction, significance and approximate magnitude. The companion blog post has the full narrative; this `.qmd` is the runnable version.
+This notebook reproduces the main results of **Lessmann (2014)**, "Spatial inequality and development — Is there an inverted-U relationship?" on a **synthetic** dataset. There is no real data: we simulate regional GDP per capita for 56 countries, compute the population-weighted coefficient of variation (WCV), and calibrate the data-generating process so the regressions match the paper in direction, significance and approximate magnitude. The companion blog post has the full narrative; this `.qmd` is the runnable version.
 
 ```{r setup}
 #| label: setup
@@ -255,4 +255,4 @@ round(coeftest(s4, vcov=vcovHC(s4,"HC1"))[c("nonag","I(nonag^2)"),c(1,3)], 5)
 - The high-income upturn appears **between** countries (cross-section) but vanishes **within** countries (panel) — the key contrast.
 - Structural change (the non-agricultural share) reproduces the curve.
 
-**Reference:** Lessmann, C. (2013). Spatial inequality and development — Is there an inverted-U relationship? *Journal of Public Economics*, 106, 35–51.
+**Reference:** Lessmann, C. (2014). Spatial inequality and development — Is there an inverted-U relationship? *Journal of Development Economics*, 106, 35–51.

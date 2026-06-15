@@ -46,7 +46,7 @@ Kuznets (1955) and Williamson (1965) had an answer: as countries develop, spatia
 
 . . .
 
-But the data to test it — regional accounts for poor *and* rich countries — barely exist. Lessmann (2013) assembled them. We rebuild the exercise on **synthetic** data so the whole pipeline is open.
+But the data to test it — regional accounts for poor *and* rich countries — barely exist. Lessmann (2014) assembled them. We rebuild the exercise on **synthetic** data so the whole pipeline is open.
 
 ::: {.notes}
 The hook: an old, intuitive hypothesis that was very hard to test because of data. We make it teachable by simulating a world calibrated to the paper.
@@ -179,5 +179,5 @@ Development raises inequality because it reshuffles where output is made; as the
 Full tutorial, code, data and web app: **carlos-mendez.org/post/r_kuznets**
 
 ::: {.notes}
-Reference: Lessmann, C. (2013). Spatial inequality and development — Is there an inverted-U relationship? Journal of Public Economics 106, 35–51. Synthetic data; pedagogical replication.
+Reference: Lessmann, C. (2014). Spatial inequality and development — Is there an inverted-U relationship? Journal of Development Economics 106, 35–51. Synthetic data; pedagogical replication.
 :::

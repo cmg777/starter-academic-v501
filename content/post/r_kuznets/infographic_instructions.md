@@ -18,11 +18,11 @@ Panel 4 (row 2, col 1), circled "4": title "BETWEEN vs WITHIN" in steel blue sma
 
 Panel 5 (row 2, col 2), circled "5": title "THE SECTORAL ENGINE" in steel blue small-caps. A chalk sketch of a farm morphing into factories then office towers, with an inverted-U traced above it. Callout "STRUCTURAL CHANGE" in teal. Chalk-white text: "Replace income with the non-agricultural share of output and the same inverted-U appears -- development reshuffles where output is made." Small chalk tags: "trade +" and "federalism --" and "urbanization --". A chalk arrow to Panel 6 labeled "So what should policy do?" in muted gray.
 
-Panel 6 (row 2, col 3), circled "6": title "A TRANSITIONAL GAP" in steel blue small-caps. A chalk hourglass with sand running, beside a lagging region being lifted by a chalk arrow labeled "human capital." Callout "GAPS TEND TO NARROW" in teal. Chalk-white text: "Wide regional gaps are largely a transitional phase of development -- but the transition can take decades and stoke conflict. Invest in lagging regions." A muted-gray note: "Synthetic data; replication of Lessmann (2013)."
+Panel 6 (row 2, col 3), circled "6": title "A TRANSITIONAL GAP" in steel blue small-caps. A chalk hourglass with sand running, beside a lagging region being lifted by a chalk arrow labeled "human capital." Callout "GAPS TEND TO NARROW" in teal. Chalk-white text: "Wide regional gaps are largely a transitional phase of development -- but the transition can take decades and stoke conflict. Invest in lagging regions." A muted-gray note: "Synthetic data; replication of Lessmann (2014)."
 
 ### Margin Elements
 
-Top-left margin: a small chalk compass rose. Bottom-right margin: a chalk citation "Lessmann (2013), J. Public Economics 106" in muted gray. Scattered faint chalk equations near the edges: "Y = ln(GDP p.c.)" and "f(Y) + gamma X + e". A few chalk-dust smudges in the corners.
+Top-left margin: a small chalk compass rose. Bottom-right margin: a chalk citation "Lessmann (2014), J. Development Economics 106" in muted gray. Scattered faint chalk equations near the edges: "Y = ln(GDP p.c.)" and "f(Y) + gamma X + e". A few chalk-dust smudges in the corners.
 
 ## Negative Prompt
 
@@ -30,7 +30,7 @@ photorealistic, 3D render, glossy, neon, pure white (#ffffff), saturated primary
 
 ## Condensed Prompt (~300 words)
 
-Academic chalkboard sketchnote, 1920x1080, dark navy (#0e1545) background. Hand-drawn chalk lettering with chalk-dust particles. Title banner "THE SPATIAL KUZNETS CURVE" in steel blue (#8bb8e0) small-caps; italic subtitle "As countries develop, do regional gaps widen then narrow?" Six panels in a 3x2 grid, each with a steel-blue chalk rounded border and an orange circled numeral, connected by chalk arrows. Chalk white (#f0ece2) body text; warm orange (#e8956a) for key numbers and the fragile upturn; teal (#00d4c8) for positive findings; muted gray (#b0a89a) for connectors. Panel 1 "THE WILLIAMSON QUESTION": a globe with bright/dim regions, three overlapping curves (line, inverted-U, N-shape), "56 COUNTRIES, 1980--2009". Panel 2 "BUILDING THE WCV": three chalk bars with a dashed mean line, "POPULATION-WEIGHTED". Panel 3 "RISE, FALL, RISE AGAIN": a roller-coaster N-shape curve with peak "$2,100" and trough "$31,000" in orange. Panel 4 "BETWEEN vs WITHIN": split sketch of many country dots vs one country's path; "FIXED EFFECTS CHANGE THE STORY" in teal; note the within-country cubic is zero. Panel 5 "THE SECTORAL ENGINE": farm morphing to factories to office towers under an inverted-U; "STRUCTURAL CHANGE" in teal. Panel 6 "A TRANSITIONAL GAP": an hourglass and a lagging region lifted by "human capital"; "GAPS TEND TO NARROW" in teal. Margin: chalk citation "Lessmann (2013)", faint chalk equations, chalk-dust smudges. No photorealism, no pure white, no emoji, readable lettering.
+Academic chalkboard sketchnote, 1920x1080, dark navy (#0e1545) background. Hand-drawn chalk lettering with chalk-dust particles. Title banner "THE SPATIAL KUZNETS CURVE" in steel blue (#8bb8e0) small-caps; italic subtitle "As countries develop, do regional gaps widen then narrow?" Six panels in a 3x2 grid, each with a steel-blue chalk rounded border and an orange circled numeral, connected by chalk arrows. Chalk white (#f0ece2) body text; warm orange (#e8956a) for key numbers and the fragile upturn; teal (#00d4c8) for positive findings; muted gray (#b0a89a) for connectors. Panel 1 "THE WILLIAMSON QUESTION": a globe with bright/dim regions, three overlapping curves (line, inverted-U, N-shape), "56 COUNTRIES, 1980--2009". Panel 2 "BUILDING THE WCV": three chalk bars with a dashed mean line, "POPULATION-WEIGHTED". Panel 3 "RISE, FALL, RISE AGAIN": a roller-coaster N-shape curve with peak "$2,100" and trough "$31,000" in orange. Panel 4 "BETWEEN vs WITHIN": split sketch of many country dots vs one country's path; "FIXED EFFECTS CHANGE THE STORY" in teal; note the within-country cubic is zero. Panel 5 "THE SECTORAL ENGINE": farm morphing to factories to office towers under an inverted-U; "STRUCTURAL CHANGE" in teal. Panel 6 "A TRANSITIONAL GAP": an hourglass and a lagging region lifted by "human capital"; "GAPS TEND TO NARROW" in teal. Margin: chalk citation "Lessmann (2014)", faint chalk equations, chalk-dust smudges. No photorealism, no pure white, no emoji, readable lettering.
 
 ## Panel Reference Data
 
@@ -69,4 +69,4 @@ Academic chalkboard sketchnote, 1920x1080, dark navy (#0e1545) background. Hand-
 - Title: A TRANSITIONAL GAP
 - Callout: GAPS TEND TO NARROW
 - Body: Wide regional gaps are largely a transitional phase — invest in lagging regions' human capital.
-- Note: Synthetic data; replication of Lessmann (2013).
+- Note: Synthetic data; replication of Lessmann (2014).

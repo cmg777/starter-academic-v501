@@ -14,8 +14,8 @@ printf 'project:\n  type: default\n' > "$STAGE/_quarto.yml"
 cat > "$STAGE/README.md" <<'MD'
 # Spatial Inequality and the Kuznets Curve — Quarto project
 
-Synthetic R replication of **Lessmann (2013)**, "Spatial inequality and development —
-Is there an inverted-U relationship?" (*Journal of Public Economics* 106, 35–51).
+Synthetic R replication of **Lessmann (2014)**, "Spatial inequality and development —
+Is there an inverted-U relationship?" (*Journal of Development Economics* 106, 35–51).
 
 ## Render
 ```bash

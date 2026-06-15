@@ -1,6 +1,6 @@
 # r_kuznets — artifact inventory
 
-Synthetic R replication of **Lessmann (2013)**, "Spatial inequality and development: Is there an inverted-U relationship?" (*J. Public Economics* 106, 35–51).
+Synthetic R replication of **Lessmann (2014)**, "Spatial inequality and development: Is there an inverted-U relationship?" (*J. Development Economics* 106, 35–51).
 
 ## Reproduce
 ```bash

@@ -1,6 +1,6 @@
 {
   "title": "Spatial Inequality and the Kuznets Curve",
-  "note": "Synthetic replication of Lessmann (2013). All estimates are from simulated, calibrated data.",
+  "note": "Synthetic replication of Lessmann (2014). All estimates are from simulated, calibrated data.",
   "cubic": { "b1": 4.39655, "b2": -0.49883, "b3": 0.01845, "intercept": -11.84 },
   "turning_points": { "peak_ln": 7.67, "trough_ln": 10.36, "peak_usd": 2146, "trough_usd": 31443 },
   "forest": [

@@ -1,4 +1,4 @@
-# Results report — synthetic replication of Lessmann (2013)
+# Results report — synthetic replication of Lessmann (2014)
 
 | | |
 |---|---|
@@ -11,7 +11,7 @@
 
 ## Execution summary
 
-The script simulates regional GDP-per-capita micro-data for **56 synthetic countries over 1980–2009**, computes the population-weighted coefficient of variation (WCV) of regional GDP p.c. from those regions, and runs the full battery of regressions from Lessmann (2013). It writes **18 figures** (14 plots + 4 regression-table images), **12 CSVs** (including `results_discriminant.csv`), and prints a calibration scoreboard. The headline finding reproduces cleanly: the relationship between spatial inequality and development is an **inverted-U with a high-income upturn** in the cross-section (an N-shape), and a **clean inverted-U within countries** in the panel — exactly the pattern Lessmann reports. No warnings beyond benign `fixest` singleton notes (one-observation country cells dropped from the FE estimation).
+The script simulates regional GDP-per-capita micro-data for **56 synthetic countries over 1980–2009**, computes the population-weighted coefficient of variation (WCV) of regional GDP p.c. from those regions, and runs the full battery of regressions from Lessmann (2014). It writes **18 figures** (14 plots + 4 regression-table images), **12 CSVs** (including `results_discriminant.csv`), and prints a calibration scoreboard. The headline finding reproduces cleanly: the relationship between spatial inequality and development is an **inverted-U with a high-income upturn** in the cross-section (an N-shape), and a **clean inverted-U within countries** in the panel — exactly the pattern Lessmann reports. No warnings beyond benign `fixest` singleton notes (one-observation country cells dropped from the FE estimation).
 
 ## Data overview
 
@@ -116,7 +116,7 @@ Excluding the poorest countries (GDP < \$1,000) leaves a cubic that no longer tr
 
 ## Reproduction audit (synthetic vs paper)
 
-| Quantity | Paper (Lessmann 2013) | Synthetic | Match |
+| Quantity | Paper (Lessmann 2014) | Synthetic | Match |
 |---|---|---|---|
 | CS (1) ln(GDP) | −0.098\*\*\* | −0.092\*\*\* | ✓ |
 | CS (4) ln(GDP) / ² | +0.330\* / −0.021\* | +0.338\* / −0.020\*\* | ✓ |

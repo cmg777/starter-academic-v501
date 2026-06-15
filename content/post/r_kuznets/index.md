@@ -48,7 +48,7 @@ links:
   name: "Data (CSV)"
   url: https://github.com/cmg777/starter-academic-v501/tree/master/content/post/r_kuznets/data
 slides:
-summary: A beginner-friendly R replication of Lessmann (2013) on the spatial Kuznets curve — building the weighted coefficient of variation from simulated regional data, then estimating the inverted-U with cross-section OLS, two-way fixed effects in fixest, and the Robinson and Baltagi–Li semiparametric estimators.
+summary: A beginner-friendly R replication of Lessmann (2014) on the spatial Kuznets curve — building the weighted coefficient of variation from simulated regional data, then estimating the inverted-U with cross-section OLS, two-way fixed effects in fixest, and the Robinson and Baltagi–Li semiparametric estimators.
 tags:
   - r
   - econometrics
@@ -67,11 +67,11 @@ diagram: true
 
 ## Abstract
 
-Why do some countries have huge gaps between their richest and poorest regions while others are remarkably even? Lessmann (2013) revisits a classic idea from Kuznets (1955) and Williamson (1965): as countries develop, spatial inequality first *rises*, then *falls* — an inverted-U. This tutorial replicates that study in R on a **synthetic** dataset, so the entire data-generating process is open and reproducible. We simulate regional GDP per capita for 56 countries over 1980–2009, compute the population-weighted coefficient of variation (WCV) of regional income from those regions, and estimate the relationship with cross-section OLS, two-way fixed effects via `fixest`, and the Robinson (1988) and Baltagi–Li (2002) semiparametric estimators. The cross-section recovers a significant inverted-U with a high-income upturn — a cubic whose turning points sit at about \\$2,100 and \\$31,000 of GDP per capita — while the within-country panel shows a *clean* inverted-U (the cubic term is insignificant). Spatial inequality correlates with personal (Gini) inequality at about 0.32, and a sectoral channel — the non-agricultural share of output — reproduces the same curve. The practical lesson is that wide regional gaps are, to a first approximation, a transitional feature of development that tends to narrow as economies mature; for learners, the post is a hands-on tour of measurement, fixed effects, polynomial specification, and flexible semiparametric regression.
+Why do some countries have huge gaps between their richest and poorest regions while others are remarkably even? Lessmann (2014) revisits a classic idea from Kuznets (1955) and Williamson (1965): as countries develop, spatial inequality first *rises*, then *falls* — an inverted-U. This tutorial replicates that study in R on a **synthetic** dataset, so the entire data-generating process is open and reproducible. We simulate regional GDP per capita for 56 countries over 1980–2009, compute the population-weighted coefficient of variation (WCV) of regional income from those regions, and estimate the relationship with cross-section OLS, two-way fixed effects via `fixest`, and the Robinson (1988) and Baltagi–Li (2002) semiparametric estimators. The cross-section recovers a significant inverted-U with a high-income upturn — a cubic whose turning points sit at about \\$2,100 and \\$31,000 of GDP per capita — while the within-country panel shows a *clean* inverted-U (the cubic term is insignificant). Spatial inequality correlates with personal (Gini) inequality at about 0.32, and a sectoral channel — the non-agricultural share of output — reproduces the same curve. The practical lesson is that wide regional gaps are, to a first approximation, a transitional feature of development that tends to narrow as economies mature; for learners, the post is a hands-on tour of measurement, fixed effects, polynomial specification, and flexible semiparametric regression.
 
 ## 1. Overview
 
-**The case-study question.** *Is the link between spatial inequality and economic development an inverted-U — and does it turn N-shaped (rising again) at very high income?* Lessmann (2013) assembled a hard-to-find panel of regional accounts to answer it. We cannot share that proprietary data, so we do the next best thing for teaching: **build a synthetic world** whose data-generating process reproduces the paper's findings, and walk through every estimator on it.
+**The case-study question.** *Is the link between spatial inequality and economic development an inverted-U — and does it turn N-shaped (rising again) at very high income?* Lessmann (2014) assembled a hard-to-find panel of regional accounts to answer it. We cannot share that proprietary data, so we do the next best thing for teaching: **build a synthetic world** whose data-generating process reproduces the paper's findings, and walk through every estimator on it.
 
 Why does this matter? Wide regional gaps are not just an accounting curiosity. Interregional inequality often travels with ethnic and political tension, and in extreme cases raises the risk of internal conflict. Understanding *when* such gaps widen and *when* they close is directly useful for regional policy.
 
@@ -615,15 +615,15 @@ What does this mean for policy? Wide regional gaps are, to a first approximation
 
 ## 16. References
 
-- Lessmann, C. (2013). Spatial inequality and development — Is there an inverted-U relationship? *Journal of Public Economics*, 106, 35–51.
+- Lessmann, C. (2014). Spatial inequality and development — Is there an inverted-U relationship? *Journal of Development Economics*, 106, 35–51.
 - Kuznets, S. (1955). Economic growth and income inequality. *American Economic Review*, 45(1), 1–28.
-- Williamson, J. G. (1965). Regional inequality and the process of national development. *Economic Development and Cultural Change*, 13(4), 3–45.
+- Williamson, J. G. (1965). Regional inequality and the process of national development: A description of the patterns. *Economic Development and Cultural Change*, 13(4), 1–84.
 - Robinson, P. M. (1988). Root-N-consistent semiparametric regression. *Econometrica*, 56(4), 931–954.
 - Baltagi, B. H., & Li, D. (2002). Series estimation of partially linear panel data models with fixed effects. *Annals of Economics and Finance*, 3, 103–116.
 - Mendez, C. (2026). *Turning Points and Discriminant Analysis* — a note on why high posterior inclusion probabilities (or statistical significance) do not guarantee a genuine cubic shape.
-- Gravina, A. F., & Lanzafame, M. (2025). "What's your shape?" A data-driven approach to estimating the Environmental Kuznets Curve.
+- Gravina, A. F., & Lanzafame, M. (2025). "What's your shape?" A data-driven approach to estimating the Environmental Kuznets Curve. *Energy Economics*, 148.
 - Eicher, T. S., Papageorgiou, C., & Raftery, A. E. (2011). Default priors and predictive performance in Bayesian model averaging, with application to growth determinants. *Journal of Applied Econometrics*, 26(1), 30–55.
-- Bergé, L. (2018). Efficient estimation of maximum likelihood models with multiple fixed effects: the `fixest` package. *CREA Discussion Paper*.
+- Bergé, L. (2018). Efficient estimation of maximum likelihood models with multiple fixed effects: the R package `FENmlm`. *CREA Discussion Papers*, 13.
 - Hayfield, T., & Racine, J. S. (2008). Nonparametric econometrics: the `np` package. *Journal of Statistical Software*, 27(5).
 
 ---

@@ -1,6 +1,6 @@
-# Scope — synthetic R replication of Lessmann (2013)
+# Scope — synthetic R replication of Lessmann (2014)
 
-**Paper:** Lessmann, C. (2013). "Spatial inequality and development: Is there an inverted-U relationship?" *Journal of Public Economics* 106, 35–51.
+**Paper:** Lessmann, C. (2014). "Spatial inequality and development: Is there an inverted-U relationship?" *Journal of Development Economics* 106, 35–51.
 
 **Goal:** A beginner-friendly, comprehensive R tutorial that replicates the paper's main results on a SYNTHETIC dataset (no real data). Regional GDP-per-capita micro-data are simulated for 56 countries (1980–2009); the population-weighted coefficient of variation (WCV) is then *computed* from those regions. The data-generating process is calibrated so the regressions reproduce the paper in direction, significance, and approximate magnitude.
 

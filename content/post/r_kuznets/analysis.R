@@ -1,7 +1,7 @@
 ## =============================================================================
 ## Spatial inequality and the Kuznets curve — a synthetic replication of
-## Lessmann (2013), "Spatial inequality and development: Is there an inverted-U
-## relationship?", Journal of Public Economics 106, 35-51.
+## Lessmann (2014), "Spatial inequality and development: Is there an inverted-U
+## relationship?", Journal of Development Economics 106, 35-51.
 ##
 ## There is NO real data behind this tutorial. We SIMULATE regional GDP-per-capita
 ## micro-data for 56 synthetic countries (1980-2009), COMPUTE the population-
@@ -49,7 +49,7 @@ gg_save <- function(p, file, w = 8, h = 6) {
 dir.create("data", showWarnings = FALSE)
 
 cat("============================================================\n")
-cat(" Lessmann (2013) synthetic replication — analysis.R\n")
+cat(" Lessmann (2014) synthetic replication — analysis.R\n")
 cat("============================================================\n\n")
 
 ## =============================================================================
@@ -252,7 +252,7 @@ p3 <- ggplot(cs, aes(wcv, gini)) +
        subtitle = "Synthetic cross-section of 56 countries, period means 2000-2009",
        x = "Spatial inequality (WCV of regional GDP p.c.)",
        y = "Personal inequality (Gini of household income)",
-       caption = "Replicating Lessmann (2013), Fig. 3") + theme_kuz()
+       caption = "Replicating Lessmann (2014), Fig. 3") + theme_kuz()
 gg_save(p3, "r_kuznets_03_gini_vs_wcv.png")
 
 ## WCV by World Bank region (context) -----------------------------------------
@@ -268,7 +268,7 @@ p2 <- ggplot(reg_means, aes(reorder(label, wcv), wcv)) +
   labs(title = "Spatial inequality around the world",
        subtitle = "Mean synthetic WCV by World Bank region, 2000-2009",
        x = NULL, y = "WCV of regional GDP p.c.",
-       caption = "Replicating Lessmann (2013), Table 1") + theme_kuz()
+       caption = "Replicating Lessmann (2014), Table 1") + theme_kuz()
 gg_save(p2, "r_kuznets_02_wcv_by_region.png")
 
 ## WCV explainer (two-region toy) ---------------------------------------------
@@ -332,7 +332,7 @@ p4 <- ggplot(cs, aes(lnGDP, wcv)) +
   labs(title = "Cross-section: spatial inequality vs development",
        subtitle = "A line slopes down; the cubic reveals an inverted-U with a high-income upturn",
        x = "ln(GDP per capita)", y = "WCV (period mean 2000-2009)",
-       caption = "Replicating Lessmann (2013), Table 2") +
+       caption = "Replicating Lessmann (2014), Table 2") +
   theme_kuz() + theme(legend.position = c(0.85, 0.85))
 gg_save(p4, "r_kuznets_04_crosssection_polys.png")
 
@@ -396,7 +396,7 @@ p6 <- ggplot(data.frame(x = xg, y = fitq), aes(x, y)) +
   labs(title = "Within-country inverted-U from two-way fixed effects",
        subtitle = "Fitted WCV from the quadratic TWFE model (annual panel)",
        x = "ln(GDP per capita)", y = "Fitted WCV",
-       caption = "Replicating Lessmann (2013), Table 3, col. (2)") + theme_kuz()
+       caption = "Replicating Lessmann (2014), Table 3, col. (2)") + theme_kuz()
 gg_save(p6, "r_kuznets_06_twfe_fit.png")
 
 ## =============================================================================
@@ -531,7 +531,7 @@ p8 <- ggplot(fdf, aes(x, f)) +
   labs(title = "Semiparametric cross-section: the Robinson estimator",
        subtitle = "Flexible partial fit f(ln GDP); points are partial residuals, band is 90%",
        x = "ln(GDP per capita)", y = "Spatial inequality (partial residual)",
-       caption = "Replicating Lessmann (2013), Fig. 4 (Robinson 1988)") + theme_kuz()
+       caption = "Replicating Lessmann (2014), Fig. 4 (Robinson 1988)") + theme_kuz()
 gg_save(p8, "r_kuznets_08_robinson_partial.png")
 
 ## =============================================================================
@@ -606,7 +606,7 @@ p11 <- ggplot(cs, aes(nonag, wcv)) +
   labs(title = "The sectoral channel behind the Kuznets curve",
        subtitle = "Inequality rises then falls with the non-agricultural share of GVA",
        x = "Non-agricultural GVA / GDP (%)", y = "WCV (period mean)",
-       caption = "Replicating Lessmann (2013), Table 6") + theme_kuz()
+       caption = "Replicating Lessmann (2014), Table 6") + theme_kuz()
 gg_save(p11, "r_kuznets_11_sectoral.png")
 
 ## =============================================================================
@@ -644,7 +644,7 @@ p13 <- ggplot(cs, aes(lnGDP, wcv)) +
   labs(title = "Robustness: excluding the poorest countries",
        subtitle = "Blue cubic = full sample; orange cubic = richer subsample",
        x = "ln(GDP per capita)", y = "WCV (period mean)",
-       caption = "Replicating Lessmann (2013), Table A.6") +
+       caption = "Replicating Lessmann (2014), Table A.6") +
   theme_kuz() + theme(legend.position = c(0.8, 0.85))
 gg_save(p13, "r_kuznets_13_exclude_poorest.png")
 
@@ -664,7 +664,7 @@ pR <- ggplot(lvl_df, aes(x, f)) +
   labs(title="(b) Income in levels", x="GDP per capita ($000s)", y=NULL) + theme_kuz()
 p12 <- (pL | pR) + plot_annotation(
   title = "Why the high-income upturn is fragile: logs vs levels",
-  subtitle = "Replicating Lessmann (2013), Fig. 7 — the upturn appears only without the log transform",
+  subtitle = "Replicating Lessmann (2014), Fig. 7 — the upturn appears only without the log transform",
   theme = theme_kuz())
 ggsave("r_kuznets_12_log_vs_level.png", p12, width = 11, height = 5, dpi = 300, bg = DARK_BG)
 cat("  saved r_kuznets_12_log_vs_level.png\n")

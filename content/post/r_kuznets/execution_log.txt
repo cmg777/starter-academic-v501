@@ -1,5 +1,5 @@
 ============================================================
- Lessmann (2013) synthetic replication — analysis.R
+ Lessmann (2014) synthetic replication — analysis.R
 ============================================================
 
 Simulating regional micro-data for 56 countries ...
