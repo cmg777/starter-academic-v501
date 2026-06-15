@@ -1,0 +1,131 @@
+============================================================
+ Lessmann (2013) synthetic replication — analysis.R
+============================================================
+
+Simulating regional micro-data for 56 countries ...
+  annual obs N=890 | 5-year obs N=212 | cross-section N=56
+
+Worked WCV example: ybar=17600, WCV=0.434
+
+============================================================
+Fig 3: GINI = 0.311 + 0.208 * WCV (t = 2.45), corr = 0.316
+`geom_smooth()` using formula = 'y ~ x'
+  saved r_kuznets_03_gini_vs_wcv.png 
+  saved r_kuznets_02_wcv_by_region.png 
+  saved r_kuznets_01_wcv_explainer.png 
+
+== Table 2: cross-section parametric OLS (HC1 White SE) ==
+  (1) lnGDP=-0.092*** (t=-4.23)  adjR2=0.328
+  (4) lnGDP=0.338* (t=1.95)  adjR2=0.670
+  (5) lnGDP=4.397*** (t=3.28)  adjR2=0.732
+  saved r_kuznets_04_crosssection_polys.png 
+
+== Table 3: panel two-way FE (fixest, White/hetero SE) ==
+NOTE: 1/0 fixed-effect singleton was removed (1 observation).
+NOTE: 1/0 fixed-effect singleton was removed (1 observation).
+NOTE: 1/0 fixed-effect singleton was removed (1 observation).
+NOTE: 3/0 fixed-effect singletons were removed (3 observations).
+NOTE: 3/0 fixed-effect singletons were removed (3 observations).
+NOTE: 3/0 fixed-effect singletons were removed (3 observations).
+  annual (2): lnGDP=0.394**  lnGDP^2=-0.0211**
+  annual (3): lnGDP^3=-0.0008 (cubic should be n.s.)
+  within-R2 annual: 0.010/0.016/0.017 | 5-yr (2) lnGDP=0.339* lnGDP^2=-0.0191
+  saved r_kuznets_05_panel_spaghetti.png 
+  saved r_kuznets_06_twfe_fit.png 
+
+== Turning points of the cross-section cubic ==
+                          type    ln_gdp gdp_usd
+1   maximum (inequality peaks)  7.671285    2146
+2 minimum (inequality troughs) 10.355942   31443
+  saved r_kuznets_07_turning_points.png 
+
+== Discriminant test (D = b2^2 - 3 b1 b3) ==
+  observed income range: $315 - $82,653
+                               case     b1        b2         b3          D
+1 Cross-section cubic (significant) 4.3965 -0.498830  0.0184473  0.0055186
+2       Panel cubic (insignificant) 0.1875  0.001737 -0.0008357  0.0004731
+3     Synthetic 5a: genuine N-shape 4.4000 -0.500000  0.0180000  0.0124000
+4      Synthetic 5b: monotonic trap 4.4000 -0.400000  0.0180000 -0.0776000
+5  Synthetic 5c: turns out of range 4.4000 -0.500000  0.0010000  0.2368000
+                               regime    tp_low    tp_high in_range
+1    2 turning points (both in range) 2.146e+03  3.144e+04     TRUE
+2 2 turning points (>=1 OUT of range) 3.416e-04  1.170e+04    FALSE
+3    2 turning points (both in range) 1.336e+03  8.257e+04     TRUE
+4                     monotonic (D<0)        NA         NA    FALSE
+5 2 turning points (>=1 OUT of range) 8.646e+01 6.730e+142    FALSE
+  saved r_kuznets_14_discriminant_regimes.png
+
+== Table 4: semiparametric cross-section (Robinson double-residual) ==
+             robinson_coef       t npplreg_coef
+lnunits             0.1650  3.9405       0.1575
+lnarea              0.0174  1.5326       0.0157
+area_units          0.0183  1.9372       0.0165
+ethnic              0.1263  1.5236       0.1144
+trade_gdp           0.0021  4.0348       0.0020
+urbanization       -0.0057 -3.0047      -0.0056
+federal            -0.0670 -1.7456      -0.0525
+  saved r_kuznets_08_robinson_partial.png 
+
+== Table 5: semiparametric panel (Baltagi-Li B-spline, order k=4) ==
+NOTE: 1/0 fixed-effect singleton was removed (1 observation).
+NOTE: 3/0 fixed-effect singletons were removed (3 observations).
+                 estimate       t within_r2
+trade_gdp...1      0.0002  0.5639    0.0207
+urbanization...2  -0.0027 -2.7846    0.0207
+trade_gdp...3     -0.0001 -0.1284    0.0677
+urbanization...4  -0.0029 -2.6340    0.0677
+  saved r_kuznets_09_baltagili_annual.png 
+  saved r_kuznets_10_baltagili_5yr.png 
+
+== Table 6: sectoral data (non-agricultural GVA / GDP) ==
+  nonag=0.0165***  nonag^2=-0.00014***
+  saved r_kuznets_11_sectoral.png 
+
+== Robustness: exclude poorest, exclude capitals, alt measures, log vs level ==
+                        test    estimate t_or_note
+1        cubic (full sample) 0.018447299  3.059705
+2  cubic (exclude GDP<$1000) 0.026214775  2.231205
+3 WCV vs WCV-no-capital corr 0.838733337        NA
+4                   CV cubic 0.024881155  2.231873
+5        regional-Gini cubic 0.007246332  5.150747
+  saved r_kuznets_13_exclude_poorest.png 
+NOTE: 1/0 fixed-effect singleton was removed (1 observation).
+  saved r_kuznets_12_log_vs_level.png
+
+== Table A.3: summary statistics ==
+               Mean    SD   Min    Max
+WCV            0.36  0.19  0.04   1.08
+CV             0.45  0.25  0.07   1.50
+Regional Gini  0.18  0.09  0.02   0.36
+ln(units)      2.39  0.81  0.69   3.93
+ln(area)      12.69  1.95  5.77  16.61
+Ethnic frac.   0.31  0.17  0.02   0.69
+Trade/GDP     81.77 28.72 24.94 153.56
+Urbanization  69.48 11.75 42.61  94.98
+Federal        0.21  0.41  0.00   1.00
+ln(GDP p.c.)   9.36  1.23  5.88  11.29
+
+== Rendering regression-table images ==
+file:////var/folders/tq/t98kb27n6djgrh085g476yhc0000gn/T//Rtmp8iy5JJ/file13936580ce7e9.html screenshot completed
+  saved r_kuznets_table2_crosssection.png 
+file:////var/folders/tq/t98kb27n6djgrh085g476yhc0000gn/T//Rtmp8iy5JJ/file13936464f21dd.html screenshot completed
+  saved r_kuznets_table3_panel.png 
+file:////var/folders/tq/t98kb27n6djgrh085g476yhc0000gn/T//Rtmp8iy5JJ/file139367538583a.html screenshot completed
+  saved r_kuznets_table4_5_semipar.png 
+file:////var/folders/tq/t98kb27n6djgrh085g476yhc0000gn/T//Rtmp8iy5JJ/file13936462883f5.html screenshot completed
+  saved r_kuznets_tableA3_summary.png 
+
+============================================================
+ CALIBRATION SCOREBOARD (paper target -> synthetic)
+============================================================
+ CS  (1) lnGDP       -0.098*** -> -0.092***
+ CS  (4) lnGDP/^2  +0.33*/-0.021* -> 0.338* / -0.020**
+ CS  (5) cubic 3.86**/-0.45**/0.017** -> 4.40***/-0.499***/0.0184***
+ CS  adjR2 0.43/0.66/0.69 -> 0.33/0.67/0.73
+ CS  turning points 7.5/10.1 -> 7.7/10.4 ($2,146/$31,443)
+ DISC CS cubic D=+0.0055 (2 turning points (both in range)) ; panel cubic D=+0.0005 (2 turning points (>=1 OUT of range))
+ PAN (2) lnGDP/^2 0.345**/-0.018** -> 0.394**/-0.0211** ; cubic n.s. -> -0.0008
+ FIG3 slope 0.152 (t2.97) -> 0.208 (t2.45) ; Tab6 nonag inverted-U -> 0.0165***/-0.00014***
+ N annual/5yr/cs 915/207/56 -> 890/212/56
+
+=== Script completed successfully ===

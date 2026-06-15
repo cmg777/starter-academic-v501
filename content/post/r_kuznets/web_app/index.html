@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Spatial Kuznets Curve — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Spatial Inequality and the Kuznets Curve'. Build the weighted coefficient of variation, morph the development curve, find its turning points, and compare cross-section vs two-way fixed-effects estimates.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Spatial Kuznets Curve — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Spatial Inequality and the Kuznets Curve</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro" class="tab active" data-pane="pane-intro" role="tab" aria-selected="true">1 · Idea</button>
+  <button id="tab-wcv"   class="tab"        data-pane="pane-wcv"   role="tab" aria-selected="false">2 · Build the WCV</button>
+  <button id="tab-curve" class="tab"        data-pane="pane-curve" role="tab" aria-selected="false">3 · Curve Explorer</button>
+  <button id="tab-forest" class="tab"       data-pane="pane-forest" role="tab" aria-selected="false">4 · OLS vs FE</button>
+</nav>
+
+<main>
+
+<!-- ============ TAB 1: IDEA ============ -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+  <h2>Does spatial inequality rise then fall with development?</h2>
+  <p class="lede">
+    Kuznets (1955) and Williamson (1965) proposed an <strong>inverted-U</strong>: as a country
+    industrialises, a few leading regions surge ahead and regional gaps widen; later, as the
+    modern economy spreads out, the gaps close again. Lessmann (2013) tested this across 56
+    countries. This lab lets you rebuild the core pieces yourself — on the same synthetic data
+    used in the post.
+  </p>
+  <div class="card">
+    <h3>From a straight line to an N-shape</h3>
+    <p>
+      The same scatter supports three stories depending on the functional form. Press play to
+      watch a straight line bend into an inverted-U, then into the cubic <em>N-shape</em> with a
+      high-income upturn — the shape the cross-section data actually prefer.
+    </p>
+    <div class="chart-area" id="intro-anim"></div>
+    <div class="controls-row">
+      <button id="intro-play" class="btn">▶ Morph line → quadratic → cubic</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>What you'll do</h3>
+    <ul>
+      <li><strong>Build the WCV</strong> — drag region incomes and populations and watch the inequality index update.</li>
+      <li><strong>Curve Explorer</strong> — turn the polynomial dials and read off the turning points in dollars.</li>
+      <li><strong>OLS vs FE</strong> — see how country fixed effects sharpen the within-country inverted-U.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ TAB 2: BUILD THE WCV ============ -->
+<section id="pane-wcv" class="tab-pane" role="tabpanel" aria-labelledby="tab-wcv">
+  <h2>Build the weighted coefficient of variation</h2>
+  <p class="lede">
+    The WCV is the <em>population-weighted</em> spread of regional GDP per capita, divided by the
+    country mean: a large poor region counts more than a tiny rich enclave. Drag the sliders for a
+    three-region country and watch <span class="kbd">WCV</span> respond.
+  </p>
+  <div class="layout-2col">
+    <div class="card">
+      <h3>Three regions</h3>
+      <div id="wcv-sliders"></div>
+      <p class="formula">WCV = (1/ȳ) · [ Σ pⱼ (ȳ − yⱼ)² ]<sup>½</sup></p>
+    </div>
+    <div class="card">
+      <h3>Result</h3>
+      <div class="chart-area" id="wcv-chart"></div>
+      <div id="wcv-readout" class="readout"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TAB 3: CURVE EXPLORER ============ -->
+<section id="pane-curve" class="tab-pane" role="tabpanel" aria-labelledby="tab-curve">
+  <h2>Curve Explorer — find the turning points</h2>
+  <p class="lede">
+    The cross-section model is WCV = β₁Y + β₂Y² + β₃Y³ + … with Y = ln(GDP p.c.). An inverted-U
+    needs β₁ &gt; 0 and β₂ &lt; 0; a positive β₃ adds the high-income upturn. Turning points solve
+    β₁ + 2β₂Y + 3β₃Y² = 0. Drag the dials; the dashed lines mark where the curve turns.
+  </p>
+  <div class="layout-2col">
+    <div class="card">
+      <h3>Coefficients</h3>
+      <div id="curve-sliders"></div>
+      <button id="curve-reset" class="btn">Reset to the paper's cubic</button>
+    </div>
+    <div class="card">
+      <h3>Fitted curve & turning points</h3>
+      <div class="chart-area" id="curve-chart"></div>
+      <div id="curve-readout" class="readout"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TAB 4: OLS vs FE ============ -->
+<section id="pane-forest" class="tab-pane" role="tabpanel" aria-labelledby="tab-forest">
+  <h2>Cross-section OLS vs two-way fixed effects</h2>
+  <p class="lede">
+    Both estimators recover the inverted-U (β₁ &gt; 0, β₂ &lt; 0), but they answer different
+    questions: OLS compares <em>different countries</em>; fixed effects compare <em>each country with
+    itself</em> over time. The forest plot shows the income coefficients with 95% intervals.
+  </p>
+  <div class="card">
+    <div class="chart-area" id="forest-chart"></div>
+    <div id="forest-readout" class="readout"></div>
+  </div>
+  <div class="card">
+    <h3>The key contrast</h3>
+    <p>
+      The <em>quadratic</em> inverted-U is significant under both estimators. But the <em>cubic</em>
+      high-income upturn is significant only in the cross-section — within countries it is
+      statistically zero. The upturn is a <strong>between-country</strong> phenomenon (rich service
+      economies differ from rich manufacturing ones), not something a single country lives through.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Synthetic data · D3.js v7 · no backend, no tracking ·
+  <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

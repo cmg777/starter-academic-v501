@@ -1,0 +1,12 @@
+/.quarto/
+**/*.quarto_ipynb
+
+# Reference inputs — kept locally for reference, NOT committed to this public repo
+# (consistent with the repo-wide "paper source not committed" convention). The
+# Lessmann (2013) source is copyrighted (Elsevier); the discriminant note is an
+# internal cross-project draft. Both are cited in the post's References instead.
+.source-paper-lessmann-2013.md
+.turning_points_and_discriminant_analysis.pdf
+
+# np bandwidth cache (a build artifact; analysis.R regenerates it if missing)
+np_cs_bw.rds

@@ -1,0 +1,258 @@
+---
+title: "Spatial Inequality and the Kuznets Curve"
+subtitle: "A synthetic R replication of Lessmann (2013) — WCV, fixest TWFE, and semiparametric estimates"
+author: "Carlos Mendez"
+date: "2026-06-14"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    theme: darkly
+    code-fold: show
+    code-summary: "Show code"
+    fig-width: 8
+    fig-height: 5.2
+    fig-dpi: 200
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+This notebook reproduces the main results of **Lessmann (2013)**, "Spatial inequality and development — Is there an inverted-U relationship?" on a **synthetic** dataset. There is no real data: we simulate regional GDP per capita for 56 countries, compute the population-weighted coefficient of variation (WCV), and calibrate the data-generating process so the regressions match the paper in direction, significance and approximate magnitude. The companion blog post has the full narrative; this `.qmd` is the runnable version.
+
+```{r setup}
+#| label: setup
+if (!requireNamespace("pacman", quietly = TRUE))
+  install.packages("pacman", repos = "https://cloud.r-project.org")
+pacman::p_load(dplyr, tidyr, ggplot2, scales, fixest, sandwich, lmtest,
+               splines, np, modelsummary)
+options(np.messages = FALSE)
+set.seed(123)
+
+STEEL <- "#6a9bcc"; ORANGE <- "#d97757"; TEAL <- "#00d4c8"
+DARK_BG <- "#0f1729"; DARK_PANEL <- "#1f2b5e"; LIGHT_TEXT <- "#c8d0e0"; LIGHTER <- "#e8ecf2"
+theme_kuz <- function(base = 13) theme_minimal(base_size = base) %+replace% theme(
+  plot.background=element_rect(fill=DARK_BG,colour=NA), panel.background=element_rect(fill=DARK_BG,colour=NA),
+  panel.grid.major=element_line(colour=DARK_PANEL,linewidth=.3), panel.grid.minor=element_blank(),
+  text=element_text(colour=LIGHT_TEXT), axis.text=element_text(colour=LIGHT_TEXT),
+  plot.title=element_text(colour=LIGHTER,face="bold",hjust=0),
+  plot.subtitle=element_text(colour=LIGHT_TEXT,hjust=0), legend.position="right")
+```
+
+## The synthetic data-generating process
+
+We hard-code each country's number of regions, land area and a 2009 income anchor (from the paper's appendix), then simulate regional GDP and population shares, and finally **compute** the WCV from those regions. The within-country inverted-U lives in the time-varying regional dispersion; the between-country cubic lives in a time-invariant country term that country fixed effects absorb.
+
+```{r dgp}
+#| label: dgp
+#| code-fold: true
+source_dgp <- function() {
+cty <- data.frame(
+  name = c("Australia","Austria","Belgium","Bolivia","Brazil","Bulgaria","Canada","Chile","China",
+    "Colombia","Croatia","Czech Rep.","Denmark","Estonia","Finland","France","Georgia","Germany","Greece",
+    "Hungary","India","Indonesia","Iran","Ireland","Italy","Japan","Kazakhstan","Korea","Latvia","Lithuania",
+    "Malta","Mexico","Mongolia","Netherlands","New Zealand","Norway","Panama","Peru","Philippines","Poland",
+    "Portugal","Romania","Russia","Slovak Rep.","Slovenia","South Africa","Spain","Sweden","Switzerland",
+    "Tanzania","Thailand","Turkey","Ukraine","United Kingdom","United States","Uzbekistan"),
+  n_reg = c(8,9,11,9,27,6,12,13,30,33,3,8,3,5,6,22,9,30,13,7,28,33,28,2,20,10,16,7,6,10,2,32,22,12,2,7,9,
+    24,17,16,7,8,7,4,2,9,18,8,7,21,7,26,27,37,51,14),
+  area = c(7680000,82500,30300,1080000,8460000,109444,9090000,744000,9330000,1110000,54622,77300,42400,42400,
+    304667,548000,69500,349000,129000,89600,2970000,1810000,1630000,68900,294000,365000,2700000,97044,62267,
+    62700,320,1940000,1550000,33800,268000,304000,74300,1280000,298000,304667,91500,230000,16400000,48100,
+    20100,1210000,499000,410000,40000,886000,511000,770000,579000,242000,9160000,425000),
+  y2009 = c(10.9,10.8,10.7,7.8,9.2,8.9,10.8,9.5,8.4,8.8,9.4,9.9,11.0,9.6,10.8,10.7,8.0,10.8,10.2,9.5,6.8,8.0,
+    8.9,10.9,10.5,10.7,9.0,10.0,9.4,9.5,9.8,9.3,7.8,10.9,10.3,11.4,9.0,8.7,7.8,9.4,10.1,8.9,9.3,9.6,10.0,8.9,
+    10.4,10.9,11.2,6.0,8.6,9.2,8.2,10.7,11.1,7.5), stringsAsFactors=FALSE)
+cty$lnarea <- log(cty$area); cty$lnunits <- log(cty$n_reg)
+cty$federal <- as.integer(cty$name %in% c("United States","Canada","Brazil","India","Germany","Australia",
+  "Switzerland","Austria","Belgium","Mexico","Russia","South Africa"))
+hg <- c("China","India","Kazakhstan","Russia","Estonia","Latvia","Lithuania","Poland","Romania","Bulgaria",
+  "Ukraine","Uzbekistan","Mongolia","Georgia","Indonesia","Czech Rep.","Slovak Rep.","Croatia","Turkey")
+cty$g <- ifelse(cty$name %in% hg, 0.052, 0.022)
+cty$g[cty$name=="China"] <- .09; cty$g[cty$name %in% c("India","Kazakhstan")] <- .06
+rich <- cty$y2009>=10.2; mid <- cty$y2009>=8.8 & cty$y2009<10.2
+cty$start <- ifelse(rich,1982,ifelse(mid,1993,2000)); cty$end <- ifelse(rich,2004,ifelse(mid,2007,2008))
+cty$start[cty$name=="Uzbekistan"]<-2008; cty$end[cty$name=="Uzbekistan"]<-2008
+cty$start[cty$name %in% c("New Zealand","Iran")]<-2000; cty$end[cty$name %in% c("New Zealand","Iran")]<-2003
+cty }
+cty <- source_dgp()
+
+P <- list(theta0=-11.11,h1=.39,h2=-.02,c1=3.474,c2=-.431,c3=.017,l_eth=.19,l_fed=-.18,l_units=.09,l_area=.048,
+  tb=.0032,ub=-.003,tw=.0006,uw=-.0025,na0=.4,na1=.9,sd_y=.03,sd_trade_w=6,sd_urb_w=1,sd_nu=.034,sd_eps=.06,
+  sd_gini=.115,gini_a=.323,gini_b=.13)
+wcv_fun <- function(y,p){yb<-sum(p*y);sqrt(sum(p*(yb-y)^2))/yb}
+
+set.seed(123); reg <- vector("list", nrow(cty))
+for(i in seq_len(nrow(cty))){
+  n<-cty$n_reg[i]; p<-sort(rgamma(n,.85),decreasing=TRUE); p<-p/sum(p)
+  big<-cty$federal[i]==1||cty$y2009[i]>=10.2; wcap<-if(big)runif(1,.05,.18) else runif(1,.12,.32)
+  p<-p*(1-wcap); p[1]<-p[1]+wcap; p<-p/sum(p)
+  z<-rnorm(n); z[1]<-z[1]+if(big)runif(1,.3,1) else runif(1,.8,2); z<-z-sum(p*z); z<-z/sqrt(sum(p*z^2))
+  reg[[i]]<-list(p=p,z=z) }
+set.seed(124); C<-cty
+C$ethnic<-pmin(.75,pmax(0,.75*rbeta(nrow(C),1,1.7)))
+C$urb_mean<-pmin(97,pmax(24,42+6.8*(C$y2009-5.8)+rnorm(nrow(C),0,7)))
+C$trade_mean<-pmin(171,pmax(25,85-6.5*(C$lnarea-12.7)+rnorm(nrow(C),0,28)))
+C$area_units<-C$lnarea/C$lnunits
+rows<-list()
+for(i in seq_len(nrow(C))){
+  yrs<-C$start[i]:C$end[i]; Tn<-length(yrs)
+  Y<-C$y2009[i]-C$g[i]*(2009-yrs)+as.numeric(arima.sim(list(ar=.6),Tn,sd=P$sd_y))
+  tr<-pmin(171,pmax(15,C$trade_mean[i]+rnorm(Tn,0,P$sd_trade_w)))
+  ur<-pmin(99,pmax(20,C$urb_mean[i]+cumsum(rnorm(Tn,.15,P$sd_urb_w))))
+  cs<-yrs>=2000&yrs<=2009; ybar<-mean(Y[cs]); trbar<-mean(tr[cs]); urbar<-mean(ur[cs])
+  h<-P$h1*Y+P$h2*Y^2; phi<-P$c1*ybar+P$c2*ybar^2+P$c3*ybar^3
+  Xc<-P$l_eth*C$ethnic[i]+P$l_fed*C$federal[i]+P$l_units*C$lnunits[i]+P$l_area*C$lnarea[i]
+  Wb<-P$tb*trbar+P$ub*urbar; Ww<-P$tw*(tr-trbar)+P$uw*(ur-urbar)
+  target<-pmin(1.1,pmax(.04,P$theta0+h+phi+Xc+Wb+Ww+rnorm(1,0,P$sd_nu)+rnorm(Tn,0,P$sd_eps)))
+  p<-reg[[i]]$p; z<-reg[[i]]$z; wcv<-numeric(Tn)
+  for(t in seq_len(Tn)){d<-sqrt(log(1+target[t]^2)); wcv[t]<-wcv_fun(exp(Y[t])*exp(d*z-.5*d^2),p)}
+  rows[[i]]<-data.frame(country=C$name[i],year=yrs,lnGDP=Y,wcv=wcv,trade_gdp=tr,urbanization=ur,
+    nonag=100/(1+exp(-(P$na0+P$na1*(Y-8)))),ethnic=C$ethnic[i],federal=C$federal[i],
+    lnunits=C$lnunits[i],lnarea=C$lnarea[i],area_units=C$area_units[i]) }
+annual<-bind_rows(rows); annual$period5<-cut(annual$year,c(1979,1984,1989,1994,1999,2004,2009),labels=1:6)
+cs<-annual|>filter(year>=2000,year<=2009)|>group_by(country)|>
+  summarise(across(c(wcv,lnGDP,trade_gdp,urbanization,nonag,ethnic,federal,lnunits,lnarea,area_units),mean),.groups="drop")
+set.seed(130); cs$gini<-P$gini_a+P$gini_b*cs$wcv+rnorm(nrow(cs),0,P$sd_gini)
+p5<-annual|>group_by(country,period5)|>summarise(across(c(wcv,lnGDP,trade_gdp,urbanization),mean),.groups="drop")|>filter(!is.na(period5))
+cat(sprintf("annual N=%d | 5-yr N=%d | cross-section N=%d\n",nrow(annual),nrow(p5),nrow(cs)))
+```
+
+## Cross-section parametric estimates (Table 2)
+
+We regress the period-mean WCV on a polynomial in `ln(GDP per capita)` plus controls, with White (HC1) standard errors. The inverted-U emerges with controls; the cubic adds the high-income upturn.
+
+```{r table2}
+#| label: table2
+m1 <- lm(wcv ~ lnGDP, cs)
+m2 <- lm(wcv ~ lnGDP + I(lnGDP^2), cs)
+m3 <- lm(wcv ~ lnGDP + I(lnGDP^2) + lnunits + lnarea + area_units, cs)
+m4 <- lm(wcv ~ lnGDP + I(lnGDP^2) + lnunits + lnarea + area_units + ethnic + trade_gdp + urbanization + federal, cs)
+m5 <- lm(wcv ~ lnGDP + I(lnGDP^2) + I(lnGDP^3) + lnunits + lnarea + area_units + ethnic + trade_gdp + urbanization + federal, cs)
+mods <- list("(1)"=m1,"(2)"=m2,"(3)"=m3,"(4)"=m4,"(5)"=m5)
+modelsummary(mods, vcov = lapply(mods, \(m) vcovHC(m,"HC1")),
+  coef_map = c(lnGDP="ln(GDP p.c.)","I(lnGDP^2)"="ln(GDP p.c.)^2","I(lnGDP^3)"="ln(GDP p.c.)^3",
+    lnunits="ln(units)",lnarea="ln(area)",ethnic="Ethnic frac.",trade_gdp="Trade/GDP",
+    urbanization="Urbanization",federal="Federal"),
+  gof_map=c("nobs","adj.r.squared"), stars=c('*'=.1,'**'=.05,'***'=.01),
+  title="Table 2 — Cross-section parametric estimates (synthetic)")
+```
+
+```{r fig-cs}
+#| label: fig-cs
+gr <- data.frame(lnGDP=seq(min(cs$lnGDP),max(cs$lnGDP),length.out=200))
+cm <- cs |> summarise(across(c(lnunits,lnarea,area_units,ethnic,trade_gdp,urbanization,federal),mean))
+grc <- cbind(gr, cm[rep(1,200),]); grc$lin<-predict(m1,grc); grc$cub<-predict(m5,grc)
+grc$quad<-predict(lm(wcv~lnGDP+I(lnGDP^2),cs),grc)
+ggplot(cs,aes(lnGDP,wcv))+geom_point(colour=STEEL,size=2.3,alpha=.85)+
+  geom_line(data=grc,aes(y=lin),colour=LIGHT_TEXT,linewidth=1)+
+  geom_line(data=grc,aes(y=quad),colour=TEAL,linewidth=1)+
+  geom_line(data=grc,aes(y=cub),colour=ORANGE,linewidth=1.1)+
+  labs(title="Cross-section: spatial inequality vs development",
+       subtitle="Line declines; cubic reveals an inverted-U with a high-income upturn",
+       x="ln(GDP per capita)",y="WCV (period mean 2000-2009)")+theme_kuz()
+```
+
+The bivariate slope is negative, but the controls reveal a significant inverted-U (column 4), and the cubic (column 5) adds the upturn — the N-shape.
+
+## Turning points
+
+```{r turning}
+#| label: turning
+bc <- coef(m5)
+roots <- sort(Re(polyroot(c(bc["lnGDP"], 2*bc["I(lnGDP^2)"], 3*bc["I(lnGDP^3)"]))))
+data.frame(type=c("peak","trough"), ln_gdp=round(roots,2), gdp_usd=round(exp(roots)))
+```
+
+Spatial inequality rises to about \$2,100 of GDP per capita, falls to about \$31,000, then rises again.
+
+## The discriminant test: does the curve really bend?
+
+Significance of all three cubic terms is **necessary but not sufficient** for a genuine bend. A cubic $f(x)=\beta_1 x+\beta_2 x^2+\beta_3 x^3$ has two real turning points iff its discriminant $D=\beta_2^2-3\beta_1\beta_3>0$ — and you must also check the turning points fall inside the observed income range.
+
+```{r discriminant}
+#| label: discriminant
+cubic_disc <- function(b1,b2,b3) b2^2 - 3*b1*b3
+obs <- range(exp(annual$lnGDP))
+diag1 <- function(label,b1,b2,b3){
+  D <- cubic_disc(b1,b2,b3)
+  if (D>0){ usd <- sort(exp(c(-b2-sqrt(D), -b2+sqrt(D))/(3*b3)))
+    data.frame(case=label, D=round(D,4),
+               tp_low=signif(usd[1],3), tp_high=signif(usd[2],3),
+               in_range=all(usd>=obs[1] & usd<=obs[2])) }
+  else data.frame(case=label, D=round(D,4), tp_low=NA, tp_high=NA, in_range=FALSE)
+}
+bcs <- coef(m5)
+an2 <- transform(annual, lnGDP2 = lnGDP^2, lnGDP3 = lnGDP^3)
+bpa <- coef(feols(wcv ~ lnGDP + lnGDP2 + lnGDP3 + trade_gdp + urbanization |
+                  country + year, an2))
+rbind(
+  diag1("Cross-section cubic (significant)", bcs["lnGDP"], bcs["I(lnGDP^2)"], bcs["I(lnGDP^3)"]),
+  diag1("Panel cubic (insignificant)",       bpa["lnGDP"], bpa["lnGDP2"], bpa["lnGDP3"]),
+  diag1("Synthetic: monotonic trap (D<0)",   4.4, -0.40, 0.018),
+  diag1("Synthetic: turns out of range",     4.4, -0.50, 0.001)
+)
+```
+
+The cross-section cubic has $D>0$ with both turning points in range (a genuine N-shape); the panel cubic and the two synthetic traps do not. **Significance answers "keep the term?"; the discriminant answers "does the curve bend, and where?"** — you need both. (In Bayesian model averaging the same trap reads "high PIP ≠ a genuine bend.")
+
+## Panel two-way fixed effects (Table 3)
+
+With country and year fixed effects via `fixest`, the within-country relationship is a clean inverted-U and the cubic term is **insignificant** — there is no within-country upturn.
+
+```{r table3}
+#| label: table3
+fa1 <- feols(wcv ~ lnGDP + trade_gdp + urbanization | country+year, annual, vcov="hetero")
+fa2 <- feols(wcv ~ lnGDP + I(lnGDP^2) + trade_gdp + urbanization | country+year, annual, vcov="hetero")
+fa3 <- feols(wcv ~ lnGDP + I(lnGDP^2) + I(lnGDP^3) + trade_gdp + urbanization | country+year, annual, vcov="hetero")
+etable(fa1, fa2, fa3, dict=c(lnGDP="ln(GDP p.c.)","I(lnGDP^2)"="ln(GDP p.c.)^2",
+  "I(lnGDP^3)"="ln(GDP p.c.)^3", trade_gdp="Trade/GDP", urbanization="Urbanization"),
+  fitstat=~n+wr2)
+```
+
+## Semiparametric cross-section: Robinson (1988)
+
+The partially-linear model `WCV = a + f(lnGDP) + gamma*X` lets the income effect be any smooth curve. Robinson's double-residual estimator partials `lnGDP` out non-parametrically, then runs OLS on the residuals.
+
+```{r robinson}
+#| label: robinson
+Xn <- c("lnunits","lnarea","ethnic","trade_gdp","urbanization","federal")
+rn <- function(v) residuals(npreg(v ~ cs$lnGDP, regtype="ll", ckertype="gaussian", bws=sd(cs$lnGDP)*.6))
+ey <- rn(cs$wcv); eX <- sapply(Xn, \(nm) rn(cs[[nm]]))
+round(summary(lm(ey ~ eX - 1))$coefficients[,c(1,2,3)], 4) |> `rownames<-`(Xn)
+```
+
+```{r robinson-fig}
+#| label: robinson-fig
+fY <- cs$wcv - as.matrix(cs[Xn]) %*% coef(lm(ey ~ eX - 1))
+g <- seq(min(cs$lnGDP),max(cs$lnGDP),length.out=200)
+fg <- npreg(fY ~ cs$lnGDP, regtype="ll", ckertype="gaussian", bws=sd(cs$lnGDP)*.55,
+            exdat=data.frame(`cs$lnGDP`=g, check.names=FALSE))
+ggplot(data.frame(x=g,f=fitted(fg),se=fg$merr),aes(x,f))+
+  geom_ribbon(aes(ymin=f-1.645*se,ymax=f+1.645*se),fill=STEEL,alpha=.2)+
+  geom_point(data=data.frame(x=cs$lnGDP,f=fY),colour=STEEL,alpha=.5,size=1.7)+
+  geom_line(colour=ORANGE,linewidth=1.2)+
+  labs(title="Robinson semiparametric partial fit",x="ln(GDP per capita)",
+       y="Spatial inequality (partial residual)")+theme_kuz()
+```
+
+The flexible curve traces the same inverted-U with a high-income upturn — independent of the polynomial assumption.
+
+## Sectoral channel (Table 6)
+
+Replacing income with the non-agricultural share of output reproduces the inverted-U, confirming structural change as the mechanism.
+
+```{r sectoral}
+#| label: sectoral
+s4 <- lm(wcv ~ nonag + I(nonag^2) + lnunits + lnarea + area_units + ethnic + trade_gdp + urbanization + federal, cs)
+round(coeftest(s4, vcov=vcovHC(s4,"HC1"))[c("nonag","I(nonag^2)"),c(1,3)], 5)
+```
+
+## Takeaways
+
+- The inverted-U is robust across OLS, two-way fixed effects, and semiparametric estimators.
+- The high-income upturn appears **between** countries (cross-section) but vanishes **within** countries (panel) — the key contrast.
+- Structural change (the non-agricultural share) reproduces the curve.
+
+**Reference:** Lessmann, C. (2013). Spatial inequality and development — Is there an inverted-U relationship? *Journal of Public Economics*, 106, 35–51.

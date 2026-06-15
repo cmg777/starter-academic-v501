@@ -1,0 +1,6 @@
+"case","b1","b2","b3","D","regime","tp_low","tp_high","in_range"
+"Cross-section cubic (significant)",4.39654748491624,-0.498830475024872,0.0184472994217287,0.00551855918524591,"2 turning points (both in range)",2146,31440,TRUE
+"Panel cubic (insignificant)",0.187470039695474,0.00173718484859605,-0.00083574986058049,0.000473051989813725,"2 turning points (>=1 OUT of range)",0.0003416,11700,FALSE
+"Synthetic 5a: genuine N-shape",4.4,-0.5,0.018,0.0124,"2 turning points (both in range)",1336,82570,TRUE
+"Synthetic 5b: monotonic trap",4.4,-0.4,0.018,-0.0776,"monotonic (D<0)",NA,NA,FALSE
+"Synthetic 5c: turns out of range",4.4,-0.5,0.001,0.2368,"2 turning points (>=1 OUT of range)",86.46,6.73e+142,FALSE
