@@ -85,15 +85,15 @@ Why does this matter? Wide regional gaps are not just an accounting curiosity. I
 
 ```mermaid
 graph LR
-    A[Simulate regional GDP] --> B[Compute WCV]
-    B --> C[Cross-section OLS<br/>Table 2]
-    B --> D[Two-way FE<br/>Table 3]
-    C --> E[Turning points]
-    E --> J[Discriminant test]
-    C --> F[Robinson semiparametric<br/>Fig 4]
-    D --> G[Baltagi–Li semiparametric<br/>Fig 5]
-    B --> H[Sectoral channel<br/>Table 6]
-    B --> I[Robustness]
+    A["Simulate regional GDP"] --> B["Compute WCV"]
+    B --> C["Cross-section OLS<br/>Table 2"]
+    B --> D["Two-way FE<br/>Table 3"]
+    C --> E["Turning points"]
+    E --> J["Discriminant test"]
+    C --> F["Robinson semiparametric<br/>Fig 4"]
+    D --> G["Baltagi–Li semiparametric<br/>Fig 5"]
+    B --> H["Sectoral channel<br/>Table 6"]
+    B --> I["Robustness"]
     style A fill:#1f2b5e,stroke:#6a9bcc,color:#e8ecf2
     style J fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
     style B fill:#1f2b5e,stroke:#00d4c8,color:#e8ecf2
