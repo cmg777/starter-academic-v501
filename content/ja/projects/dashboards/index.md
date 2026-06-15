@@ -41,6 +41,13 @@ url_video: ""
 </details>
 
 <details class="dashboard-entry">
+<summary>Mendez, C. (2026). <em>夜間光（VIIRS相当）の地域別年次時系列（1992–2024年）。</em> Google Earth Engine アプリ。<a href="https://carlos-mendez.projects.earthengine.app/view/viirs-like-yearly-region">アプリを開く</a></summary>
+
+{{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/viirs-like-yearly-region" height="800px" >}}
+
+</details>
+
+<details class="dashboard-entry">
 <summary>Mendez, C. (2026). <em>夜間光（DMSP相当）の局所的な年次時系列（1992–2025年）。</em> Google Earth Engine アプリ。<a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ">アプリを開く</a></summary>
 <!-- Source code (GEE): https://code.earthengine.google.com/b7ac9913beb022a719f7b26aa38cb4fe?hideCode=true -->
 

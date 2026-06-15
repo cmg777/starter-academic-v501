@@ -41,6 +41,13 @@ url_video: ""
 </details>
 
 <details class="dashboard-entry">
+<summary>Mendez, C. (2026). <em>Series temporales anuales regionales de luces nocturnas (tipo VIIRS) 1992-2024.</em> Aplicación de Google Earth Engine. <a href="https://carlos-mendez.projects.earthengine.app/view/viirs-like-yearly-region">Acceder a la app</a></summary>
+
+{{< fullwidth-iframe src="https://carlos-mendez.projects.earthengine.app/view/viirs-like-yearly-region" height="800px" >}}
+
+</details>
+
+<details class="dashboard-entry">
 <summary>Mendez, C. (2026). <em>Series temporales anuales localizadas de luces nocturnas (tipo DMSP) 1992-2025.</em> Aplicación de Google Earth Engine. <a href="https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ">Acceder a la app</a></summary>
 <!-- Source code (GEE): https://code.earthengine.google.com/b7ac9913beb022a719f7b26aa38cb4fe?hideCode=true -->
 
