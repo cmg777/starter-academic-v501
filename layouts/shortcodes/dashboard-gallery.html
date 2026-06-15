@@ -1,0 +1,13 @@
+{{/*
+  dashboard-gallery.html — wrapper for the dashboards card grid.
+  Emits the responsive grid container and renders the nested {{< dashboard-card >}}
+  calls inside it. Using a paired shortcode (rather than a raw <div> in markdown)
+  keeps the cards inside the grid regardless of Goldmark HTML-block parsing.
+
+  Usage:
+    {{< dashboard-gallery >}}
+    {{< dashboard-card title="…" cite="…" url="…" image="…" >}}
+    <!-- Source code (GEE): … -->
+    {{< /dashboard-gallery >}}
+*/}}
+<div class="dashboard-gallery">{{ .Inner | safeHTML }}</div>
