@@ -44,19 +44,24 @@ The legacy `fullwidth-iframe` shortcode and its overflow-reset CSS were left unt
 used elsewhere); only the dashboards page stopped calling it. `.dashboard-entry` CSS also left
 in place (now unused).
 
-## Known issue surfaced by the capture (app-side, NOT the screenshots)
+## Issue surfaced by the capture — RESOLVED 2026-06-15
 
-Two apps render broken in their public viewers, so their thumbnails reflect that:
+At first capture, two apps rendered broken in their public viewers, so their thumbnails reflected
+that:
 
 - `viirs-like-yearly` — on-screen error: `ImageCollection.load …
   projects/ee-carlosmendez777/assets/viirs_like_annual not found (does not exist or caller
-  does not have access)`; map shows plain satellite imagery.
-- `viirs-like-yearly-region` — no nighttime-lights layer renders (plain terrain).
+  does not have access)`; map showed plain satellite imagery.
+- `viirs-like-yearly-region` — no nighttime-lights layer rendered (plain terrain).
 
-Both are the two **annual VIIRS** apps and both depend on the same `viirs_like_annual` EE asset,
-which the public viewer cannot access. **Fix is on the GEE side** (share/republish that asset);
-then re-shoot just those two:
-`node scripts/capture-dashboard-screenshots.cjs --slug viirs-like-yearly --slug viirs-like-yearly-region`.
+Both are the two **annual VIIRS** apps and both depended on the same `viirs_like_annual` EE asset,
+which the public viewer could not access.
+
+**Resolved 2026-06-15**: the asset was fixed on the GEE side and both apps now render correctly
+(`viirs-like-yearly` shows its annual-radiance chart; `viirs-like-yearly-region` shows the lights
+layer + legend). Both thumbnails were re-captured with
+`node scripts/capture-dashboard-screenshots.cjs --slug viirs-like-yearly --slug viirs-like-yearly-region`
+and committed.
 
 ## Verification
 
