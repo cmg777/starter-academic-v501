@@ -79,3 +79,9 @@ content/post/*/slides/.quarto/
 # pydynpd package source used only as reference material for the python_dynamic_panel
 # tutorial — never publish or commit it (Hugo would copy ~7MB into public/).
 content/post/python_dynamic_panel/referenceMaterials/
+
+# Lessmann & Seidel (2017) replication archive — reference material only for the
+# python_kuznets_dmsp tutorial — never publish or commit it (Hugo would copy ~166MB
+# into public/). Kept on local disk for reference; Netlify builds from git so it
+# never reaches production.
+content/post/python_kuznets_dmsp/Lessmann-2017-Regional-inequality-convergence-and-its-determinants/

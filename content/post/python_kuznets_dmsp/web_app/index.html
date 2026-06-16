@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Regional Inequality from Outer Space — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Regional Inequality from Outer Space: Predicting GDP from Nighttime Lights and Building Inequality Indices in Python'. Four D3-driven tabs: a lights-to-GDP calibration slider, a population-weighted inequality-index builder, a Kuznets-curve explorer, and a Conley spatial-error widget.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Regional Inequality from Outer Space — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Regional Inequality from Outer Space: Predicting GDP from Nighttime Lights and Building Inequality Indices in Python</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-lights"   class="tab active" data-pane="pane-lights"   role="tab" aria-selected="true">1 · Lights → GDP</button>
+  <button id="tab-index"    class="tab"        data-pane="pane-index"    role="tab" aria-selected="false">2 · Build an inequality index</button>
+  <button id="tab-kuznets"  class="tab"        data-pane="pane-kuznets"  role="tab" aria-selected="false">3 · Kuznets explorer</button>
+  <button id="tab-spatial"  class="tab"        data-pane="pane-spatial"  role="tab" aria-selected="false">4 · Spatial errors</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: LIGHTS -> GDP ====================== -->
+<section id="pane-lights" class="tab-pane active" role="tabpanel" aria-labelledby="tab-lights">
+  <h2>Lights → GDP: the calibration slope</h2>
+  <p class="lede">
+    Lessmann and Seidel (2017) predict a region's income from how brightly it
+    glows at night. The model regresses log regional GDP per capita on log
+    nighttime light, and the slope — the <strong>light-to-GDP elasticity β</strong> —
+    is the single most important number in the prediction step. Slide it and watch
+    the prediction line pivot through the data cloud.
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Light elasticity β <span class="value" id="lt-beta-val">0.102</span></label>
+      <input type="range" id="lt-beta" min="0.000" max="0.400" step="0.001" value="0.102" aria-label="light to GDP elasticity beta">
+      <div class="hint">Preferred random-effects estimate (col 7) = 0.102. The clean within-region FE estimate (col 2) = 0.190 is marked in teal.</div>
+    </div>
+    <div class="control" style="display:flex; flex-direction:column; justify-content:center; gap:8px;">
+      <button class="action secondary" id="lt-snap-102">Snap to β = 0.102 (RE col 7)</button>
+      <button class="action secondary" id="lt-snap-190">Snap to β = 0.190 (FE col 2)</button>
+    </div>
+  </div>
+
+  <div class="chart-area">
+    <div id="lt-chart"></div>
+    <div class="legend-row">
+      <span class="key"><span class="dot" style="background:#6a9bcc"></span>region-years (calibration sample)</span>
+      <span class="key"><span class="bar" style="border-top-color:#d97757"></span>your prediction line (slope β)</span>
+      <span class="key"><span class="bar dash" style="border-top-color:#00d4c8"></span>FE col 2 reference (β = 0.190)</span>
+    </div>
+    <div class="chart-caption">Predicted log-GDP = const + β · log-light. The line pivots through the cloud's centre as you move β.</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Your slope β</div>
+      <div class="stat-value orange" id="lt-stat-beta">0.102</div>
+      <div class="stat-sub">a 10% brighter region ⇒ <span id="lt-stat-pct">1.0</span>% richer</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Prediction quality</div>
+      <div class="stat-value teal">r = 0.925</div>
+      <div class="stat-sub">predicted vs observed log income (5,258 region-years)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">National-income elasticity</div>
+      <div class="stat-value">0.889</div>
+      <div class="stat-sub">regional income tracks national almost 1-for-1; light adds the detail</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Inequality payoff</div>
+      <div class="stat-value">0.49 vs 0.21</div>
+      <div class="stat-sub">Gini correlation: predicted income vs raw light</div>
+    </div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Move β toward 0.190.</strong> That is the clean within-region elasticity (col 2): a steeper slope, before national income and geography are absorbed.</li>
+      <li><strong>Move β toward 0.102.</strong> The preferred random-effects slope. Smaller, because national income already does most of the conversion — light fine-tunes the regional detail.</li>
+      <li><strong>The fit is good either way.</strong> Predicted and observed log income correlate <span class="kbd">r = 0.925</span> across four orders of magnitude of income — what licenses applying the model to regions with no statistics.</li>
+    </ul>
+  </div>
+
+  <div class="cta-cards">
+    <div class="cta-card" data-goto="pane-index">
+      <div class="cta-tag">Tab 2</div><h4>Build an inequality index</h4>
+      <p>Turn six regional incomes into a single number. Drag incomes and populations and watch the weighted Gini, Theil, and CV update — next to the equal-weight Gini.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-kuznets">
+      <div class="cta-tag">Tab 3</div><h4>Kuznets explorer</h4>
+      <p>Fit a linear, quadratic, or cubic curve to inequality vs log income and watch the N-shape emerge as terms are added.</p>
+    </div>
+    <div class="cta-card" data-goto="pane-spatial">
+      <div class="cta-tag">Tab 4</div><h4>Spatial errors</h4>
+      <p>Widen the Conley radius and watch the confidence interval on β = 0.190 grow — while the estimate stays far from zero.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Glossary (open a card if a term is unfamiliar)</h3>
+    <div class="grid grid-2">
+      <details class="gloss"><summary>Nighttime lights as an income proxy</summary>
+        <div class="gloss-body">The brightness a satellite records over a place, used as a stand-in for its economic output. <em>Imperfect — predict income from light rather than equate the two.</em></div></details>
+      <details class="gloss"><summary>Light-to-GDP elasticity (β)</summary>
+        <div class="gloss-body">The % change in predicted regional GDP for a 1% change in light per pixel. <em>β = 0.102 in the preferred model; 0.190 in the clean within-region column.</em></div></details>
+      <details class="gloss"><summary>Population-weighted index</summary>
+        <div class="gloss-body">An inequality summary where each region counts in proportion to its population. <em>Ties the index to where people actually live.</em></div></details>
+      <details class="gloss"><summary>The role of population weights</summary>
+        <div class="gloss-body">Whether each region counts once or by its population changes the number. <em>Weighted and unweighted Gini correlate only 0.75.</em></div></details>
+      <details class="gloss"><summary>Spatial Kuznets curve</summary>
+        <div class="gloss-body">The hypothesis that regional inequality rises then falls as countries develop. <em>Here an N-shape: rise, fall, faint upturn.</em></div></details>
+      <details class="gloss"><summary>Conley (spatial-HAC) standard errors</summary>
+        <div class="gloss-body">Standard errors that let nearby regions' errors correlate. <em>Wider, and more honest, than treating regions as independent.</em></div></details>
+      <details class="gloss"><summary>Random vs fixed effects</summary>
+        <div class="gloss-body">RE keeps the between-region variation FE discards. <em>RE col 7 = 0.102; FE col 7 = 0.049; they agree (0.190) only in col 2.</em></div></details>
+      <details class="gloss"><summary>Theil index / GE(α)</summary>
+        <div class="gloss-body">Generalized-entropy measures that weight gaps at the top (α large) or bottom (α small). <em>GE(1) = Theil; GE(0) = mean log deviation.</em></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 2: INEQUALITY INDEX ====================== -->
+<section id="pane-index" class="tab-pane" role="tabpanel" aria-labelledby="tab-index">
+  <h2>Build an inequality index from six regions</h2>
+  <p class="lede">
+    The post compresses each country's many regional incomes into one number,
+    weighting each region by its population. <strong>Drag the income and
+    population of six regions and watch the population-weighted Gini, Theil and
+    CV update live</strong> — alongside the <em>equal-weight</em> Gini, so you can
+    see exactly what the weights do.
+  </p>
+
+  <div class="card">
+    <h3>Six regions — drag income (k$) and population (millions)</h3>
+    <div class="region-grid" id="ix-regions"></div>
+    <div class="note" style="margin-top:10px;">
+      <button class="action secondary" id="ix-reset">Reset to defaults</button>
+      <button class="action secondary" id="ix-equalize">Make all regions equal</button>
+      <button class="action secondary" id="ix-onerich">One rich capital</button>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat">
+      <div class="stat-label">Weighted Gini</div>
+      <div class="stat-value teal" id="ix-gini">—</div>
+      <div class="stat-sub">double-sum |yᵢ−yⱼ|·wᵢwⱼ / (2·(Σw)²·μ)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Equal-weight Gini</div>
+      <div class="stat-value orange" id="ix-gini-unw">—</div>
+      <div class="stat-sub">every region counts once</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Theil  GE(1)</div>
+      <div class="stat-value" id="ix-theil">—</div>
+      <div class="stat-sub">Σ pᵢ rᵢ ln rᵢ</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">CV (weighted)</div>
+      <div class="stat-value" id="ix-cv">—</div>
+      <div class="stat-sub">√(Σ pᵢ rᵢ² − 1)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">MLD  GE(0)</div>
+      <div class="stat-value" id="ix-mld">—</div>
+      <div class="stat-sub">Σ pᵢ ln(1/rᵢ)</div>
+    </div>
+  </div>
+
+  <div class="chart-area">
+    <div id="ix-chart"></div>
+    <div class="chart-caption">Population-weighted income profile: bar height = region income, bar width ∝ population. The dashed orange line is the population-weighted mean.</div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Weighted ≠ equal-weight.</strong> Push the <em>smallest</em> region to an extreme income: the equal-weight Gini jumps, but the weighted Gini barely moves — population weighting discounts tiny extreme regions. In the post the two correlate only 0.75.</li>
+      <li><strong>"Make all regions equal"</strong> drives every index to 0 — perfect equality.</li>
+      <li><strong>"One rich capital"</strong> concentrates income in one populous region: the indices rise together because all five measures agree on the same story (they correlate above 0.9 in the data).</li>
+      <li><strong>Weighting usually lowers inequality</strong> (by ~0.003 on average in the post) — so always report whether you counted regions or people.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== TAB 3: KUZNETS EXPLORER ====================== -->
+<section id="pane-kuznets" class="tab-pane" role="tabpanel" aria-labelledby="tab-kuznets">
+  <h2>Kuznets explorer: how the curve bends as terms are added</h2>
+  <p class="lede">
+    Does regional inequality first rise, then fall, as countries grow richer?
+    The post fits a <strong>cubic</strong> in log income with country and period
+    fixed effects: const −0.799, lg 0.293, lg² −0.032, lg³ 0.00112 — a positive,
+    negative, positive sign pattern that traces an <strong>N-shape</strong>.
+    Toggle the curve order and watch the bends appear.
+  </p>
+
+  <div class="card">
+    <h3>Fitted curve order</h3>
+    <div class="segmented" id="kz-order" role="group" aria-label="curve order">
+      <button data-order="1">Linear</button>
+      <button data-order="2">Quadratic</button>
+      <button data-order="3" class="active">Cubic (post)</button>
+    </div>
+    <div class="note" style="margin-top:8px;">
+      <em>Linear</em> can only go up or down; <em>quadratic</em> bends once (the classic Kuznets hump); the <em>cubic</em> adds a faint second upturn — the N.
+    </div>
+  </div>
+
+  <div class="chart-area">
+    <div id="kz-chart"></div>
+    <div class="legend-row">
+      <span class="key"><span class="dot" style="background:#6a9bcc"></span>country-period observations</span>
+      <span class="key"><span class="bar" style="border-top-color:#d97757"></span>fitted curve</span>
+      <span class="key"><span class="dot" style="background:#00d4c8"></span>turning points / N-shape markers</span>
+    </div>
+    <div class="chart-caption">Regional Gini vs log GDP per capita. With the cubic, the curve rises, falls, and turns faintly up again — the N-shape.</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">lg (linear)</div><div class="stat-value" id="kz-b1">—</div><div class="stat-sub">post: 0.293</div></div>
+    <div class="stat"><div class="stat-label">lg² (quadratic)</div><div class="stat-value" id="kz-b2">—</div><div class="stat-sub">post: −0.032</div></div>
+    <div class="stat"><div class="stat-label">lg³ (cubic)</div><div class="stat-value" id="kz-b3">—</div><div class="stat-sub">post: 0.00112</div></div>
+    <div class="stat"><div class="stat-label">Shape</div><div class="stat-value teal" id="kz-shape">—</div><div class="stat-sub">from the active terms</div></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>Linear → Quadratic.</strong> The straight line becomes a hump — inequality rises then falls. That is the original Kuznets prediction.</li>
+      <li><strong>Quadratic → Cubic.</strong> A faint upturn appears at the very top: the N-shape. The cubic term (0.00112) is tiny but flips the high-income tail back up.</li>
+      <li><strong>The cloud is wide.</strong> Development explains the <em>shape</em>, not the scatter — country-specific factors (named in Tab&nbsp;1's glossary and the post's determinants) account for the rest. Ethnic inequality is the strongest, at 0.071.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ====================== TAB 4: SPATIAL ERRORS ====================== -->
+<section id="pane-spatial" class="tab-pane" role="tabpanel" aria-labelledby="tab-spatial">
+  <h2>Spatial errors: how far do shocks travel?</h2>
+  <p class="lede">
+    Regions are not independent — a boom in one province spills into its
+    neighbours, so their regression errors are correlated. The
+    <strong>Conley spatial-HAC</strong> correction widens the standard error on
+    the clean light elasticity (β = 0.190) by letting regions within a chosen
+    radius correlate. <strong>Slide the radius and watch the confidence interval
+    widen — while the point estimate stays fixed.</strong>
+  </p>
+
+  <div class="controls">
+    <div class="control">
+      <label>Conley radius (km) <span class="value" id="sp-r-val">1000</span></label>
+      <input type="range" id="sp-r" min="1000" max="5000" step="1" value="1000" aria-label="Conley cutoff radius in kilometres">
+      <div class="hint">Errors of regions within this great-circle distance are allowed to be correlated. Wider radius ⇒ fewer "independent" observations ⇒ larger SE.</div>
+    </div>
+    <div class="control" style="display:flex; flex-direction:column; justify-content:center; gap:6px;">
+      <button class="action secondary" id="sp-1000">1,000 km</button>
+      <button class="action secondary" id="sp-2500">2,500 km</button>
+      <button class="action secondary" id="sp-5000">5,000 km</button>
+    </div>
+  </div>
+
+  <div class="chart-area">
+    <div id="sp-chart"></div>
+    <div class="legend-row">
+      <span class="key"><span class="dot" style="background:#00d4c8"></span>point estimate β = 0.190 (fixed)</span>
+      <span class="key"><span class="bar" style="border-top-color:#d97757"></span>Conley 95% CI (widens with radius)</span>
+      <span class="key"><span class="dot" style="background:#8b9dc3"></span>naive iid 95% CI (SE 0.013)</span>
+    </div>
+    <div class="chart-caption">The point estimate holds fixed; only the confidence interval grows as spatial correlation is allowed over a wider radius.</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">Point estimate β</div><div class="stat-value teal">0.190</div><div class="stat-sub">FE col 2 (held fixed)</div></div>
+    <div class="stat"><div class="stat-label">Conley SE</div><div class="stat-value orange" id="sp-se">0.026</div><div class="stat-sub">at the chosen radius</div></div>
+    <div class="stat"><div class="stat-label">Naive iid SE</div><div class="stat-value">0.013</div><div class="stat-sub">treats regions as independent</div></div>
+    <div class="stat"><div class="stat-label">t-statistic (Conley)</div><div class="stat-value" id="sp-t">—</div><div class="stat-sub">β / Conley SE</div></div>
+  </div>
+
+  <div class="pedagogy">
+    <h4>What to look for</h4>
+    <ul>
+      <li><strong>The interval widens, the dot does not move.</strong> Conley SEs (0.026 → 0.037 across 1,000–5,000 km) are two to three times the naive 0.013, because neighbouring regions are not independent observations.</li>
+      <li><strong>Still far from zero.</strong> Even at the widest radius the t-statistic stays above 5, so the lights-predict-income relationship is not a mirage created by ignoring geography.</li>
+      <li><strong>Counting independent witnesses.</strong> If ten "witnesses" all heard the same rumour you have one fact, not ten — Conley errors discount correlated neighbours.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Interactive companion to <em>Regional Inequality from Outer Space</em> · replication of Lessmann &amp; Seidel (2017) · D3.js v7 · no backend, no tracking · <a href="../" target="_blank" rel="noopener">Back to the post</a>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="dgp.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

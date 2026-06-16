@@ -1,0 +1,393 @@
+---
+title: "Regional Inequality from Outer Space"
+subtitle: "Predicting GDP from nighttime lights and building inequality indices in Python"
+date: "2026-06-15"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    embed-resources: true
+    theme: cosmo
+    fig-width: 8
+    fig-height: 5
+execute:
+  warning: false
+  message: false
+jupyter: python_kuznets_dmsp-tutorial
+---
+
+This is the runnable companion to the blog post of the same name — a replication of
+**Lessmann & Seidel (2017)**, "Regional inequality, convergence, and its determinants —
+A view from outer space." We predict regional GDP from satellite nighttime lights, build
+five population-weighted inequality indices from scratch, and estimate the regional
+Kuznets curve, its determinants, and a spatial-HAC robustness check with **PyFixest**.
+
+The bundle builds a hermetic `.venv/` for you (see `README.md`); the chunk below confirms
+the tutorial is running inside it.
+
+```{python}
+#| label: env-check
+import sys
+from pathlib import Path
+in_venv = ".venv" in Path(sys.executable).resolve().parts
+print("Running inside the bundle .venv:" , in_venv)
+print("Python:", sys.version.split()[0])
+```
+
+## Setup and imports
+
+```{python}
+#| label: imports
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import pyfixest as pf
+from linearmodels.panel import RandomEffects
+import statsmodels.formula.api as smf
+
+STEEL, ORANGE, INK, TEAL = "#6a9bcc", "#d97757", "#141413", "#00d4c8"
+np.random.seed(42)
+plt.rcParams.update({"figure.dpi": 110, "axes.spines.top": False,
+                     "axes.spines.right": False, "axes.grid": True,
+                     "grid.color": "#e6e3dd"})
+```
+
+## Loading the data
+
+The small CSVs are downloaded from the post's public GitHub folder, with a local
+`data/` fallback.
+
+```{python}
+#| label: load
+BASE = ("https://raw.githubusercontent.com/cmg777/starter-academic-v501/"
+        "master/content/post/python_kuznets_dmsp/data/")
+
+def load(name):
+    try:
+        return pd.read_csv(BASE + name)
+    except Exception:
+        return pd.read_csv("data/" + name)
+
+pred = load("Prediction_Data.csv")   # region-year: lights -> GDP training set
+t2   = load("Table_2_data.csv")      # region-year: inequality-index inputs
+t3   = load("Table_3_data.csv")      # country-year: Kuznets data
+t4   = load("Table_4_data.csv")      # country-year: determinants
+tb4  = load("Table_B4_data.csv")     # region-year: lat/lon for spatial errors
+f5   = load("Figure_5_data.csv")     # country-year: regional vs personal Gini
+print("region-years:", pred.shape[0], " | country-years:", t3.shape[0])
+
+GRP = {"eap": "East Asia & Pacific", "eca": "Europe & Central Asia",
+       "lac": "Latin America & Carib.", "mena": "Mid. East & N. Africa",
+       "sa": "South Asia", "ssa": "Sub-Saharan Africa"}
+def row_group(r):
+    for g in GRP:
+        if r.get(g, 0) == 1:
+            return GRP[g]
+    return "N. America & high-inc."
+pred["wb_group"] = pred.apply(row_group, axis=1)
+pred["satyear"]  = sum(i * pred[f"satyear_{i}"] for i in range(1, 8)).astype(int)
+pred["group_id"] = pred["wb_group"]
+country_group = pred.groupby("Country_ISO")["wb_group"].agg(
+    lambda s: s.value_counts().index[0])
+```
+
+## Cross-country dynamics of inequality
+
+Before modelling anything, we map the landscape: how the regional Gini differs across world
+regions and how the five inequality indices co-move.
+
+```{python}
+#| label: eda-region
+IDX = ["GINIW_pred_GDP_pc", "COVW_pred_GDP_pc", "GE_1W_pred_GDP_pc",
+       "GE_0W_pred_GDP_pc", "GE_m1W_pred_GDP_pc"]
+eda = t3.copy()
+eda["wb_group"] = eda["Country_ISO"].map(country_group)
+order = eda.groupby("wb_group")["GINIW_pred_GDP_pc"].median().sort_values().index.tolist()
+data_by = [eda.loc[eda.wb_group == g, "GINIW_pred_GDP_pc"].dropna() for g in order]
+
+fig, ax = plt.subplots(figsize=(8.5, 4.4))
+bp = ax.boxplot(data_by, vert=False, patch_artist=True, widths=0.6, showfliers=False)
+for p in bp["boxes"]:
+    p.set(facecolor=STEEL, alpha=0.65, edgecolor=INK)
+for m in bp["medians"]:
+    m.set(color=ORANGE, linewidth=2)
+ax.set_yticklabels(order)
+ax.set(xlabel="regional inequality (GINIW)",
+       title="Regional inequality across World Bank regions")
+plt.show()
+print(eda.groupby("wb_group")["GINIW_pred_GDP_pc"].median().sort_values().round(4))
+```
+
+Sub-Saharan Africa has the highest median regional inequality (about 0.096), two and a half
+times North America's (0.038). Rich regions are not only richer; their internal income map is
+far more even.
+
+```{python}
+#| label: eda-heatmap
+cmat = t3[IDX].corr()
+print("corr(Gini, CV)   =", round(cmat.iloc[0, 1], 3))
+print("corr(Gini, Theil)=", round(cmat.iloc[0, 2], 3))
+```
+
+All five indices correlate above 0.9, so the headline Gini results below do not hinge on the
+choice of index.
+
+## Predicting GDP from nighttime lights (Table 1)
+
+We regress log regional GDP per capita on log light per pixel plus controls. PyFixest gives
+the fixed-effects elasticities; the paper used random effects, which we add as a sidebar.
+
+$$y_r = \beta_0 + \beta_1 \ell_r + \beta_2 g_c + \gamma' X_r + \mu_g + \tau_s + \varepsilon_r$$
+
+```{python}
+#| label: table1-fe
+GEO = ("log_N_pix_top_cod_1_ppix + log_N_pix_low_cod_1_ppix + log_area + "
+       "log_region + log_region_X_log_area")
+specs = {
+ 1: "log_GDP_pc_Region ~ log_Light_ppix_Region",
+ 2: "log_GDP_pc_Region ~ log_Light_ppix_Region | code_Coutry_Region + satyear",
+ 4: "log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country | Country_ISO + satyear",
+ 7: f"log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country + {GEO} | group_id + satyear",
+}
+for k, fml in specs.items():
+    m = pf.feols(fml, data=pred, vcov={"CRV1": "Country_ISO"})
+    print(f"col {k}: FE light elasticity = {m.coef()['log_Light_ppix_Region']:.3f}")
+```
+
+Column 2 (region fixed effects) gives the clean within elasticity of **0.190**. Now the
+random-effects sidebar that reproduces the paper's preferred column 7.
+
+```{python}
+#| label: table1-re
+panel    = pred.set_index(["code_Coutry_Region", "year"])
+clusters = pd.DataFrame({"c": pd.Categorical(panel["Country_ISO"]).codes}, index=panel.index)
+gdum = pd.get_dummies(panel["group_id"], drop_first=True).astype(float)
+satm = panel[[f"satyear_{i}" for i in range(1, 8)]].astype(float)
+geo  = panel[["log_N_pix_top_cod_1_ppix", "log_N_pix_low_cod_1_ppix",
+              "log_area", "log_region", "log_region_X_log_area"]]
+X7 = pd.concat([pd.Series(1.0, index=panel.index, name="const"),
+                panel[["log_Light_ppix_Region", "log_GDP_pc_Country"]], geo,
+                gdum, satm], axis=1)
+re7 = RandomEffects(panel["log_GDP_pc_Region"], X7).fit(
+    cov_type="clustered", clusters=clusters)
+print("RE col 7 light elasticity     =", round(re7.params["log_Light_ppix_Region"], 3))
+print("RE col 7 national-GDP elasticity =", round(re7.params["log_GDP_pc_Country"], 3))
+```
+
+The random-effects light elasticity is **0.102** (vs 0.049 with fixed effects): random effects
+keep the between-region variation the within estimator discards. National income enters at
+0.889 — regional income tracks national income almost one-for-one.
+
+```{python}
+#| label: prediction
+fitted_log = X7.values @ re7.params.reindex(X7.columns).values
+obs_log = panel["log_GDP_pc_Region"].values
+r = np.corrcoef(fitted_log, obs_log)[0, 1]
+fig, ax = plt.subplots(figsize=(5.2, 5))
+ax.scatter(fitted_log, obs_log, s=8, facecolors="none", edgecolors=STEEL, alpha=0.4)
+ax.plot([4, 13], [4, 13], color=ORANGE, lw=2)
+ax.set(xlim=(4, 13), ylim=(4, 13), xlabel="predicted log GDP p.c.",
+       ylabel="observed log GDP p.c.", title=f"Predicted vs observed (r = {r:.3f})")
+plt.show()
+print("corr(predicted, observed) =", round(r, 3))
+```
+
+Predicted and observed income correlate **0.925** — the calibration generalises across the
+whole income range, which licenses predicting income for regions with no statistics.
+
+## Constructing the inequality indicators (Table 2)
+
+Every index starts from population-weighted incomes. The Gini is the average absolute income
+gap between two random people; the generalized-entropy indices and the CV weight the tails
+differently.
+
+```{python}
+#| label: ineq-fn
+def ineq_indices(y, w):
+    y, w = np.asarray(y, float), np.asarray(w, float)
+    ok = np.isfinite(y) & np.isfinite(w) & (w > 0) & (y > 0)
+    y, w = y[ok], w[ok]
+    sw = w.sum(); mu = (w * y).sum() / sw
+    p = w / sw; r = y / mu
+    ge_m1 = 0.5 * ((p * r**-1).sum() - 1)
+    ge_0  = (p * (-np.log(r))).sum()
+    ge_1  = (p * r * np.log(r)).sum()
+    cv    = np.sqrt(2 * 0.5 * ((p * r**2).sum() - 1))
+    gini  = (np.abs(y[:, None] - y[None, :]) * np.outer(w, w)).sum() / (2 * sw**2 * mu)
+    return dict(GINIW=gini, GE_m1W=ge_m1, GE_0W=ge_0, GE_1W=ge_1, COVW=cv)
+
+deu = t2[(t2.Country_ISO == "DEU") & (t2.year == 2010)]
+print("Germany 2010 (", len(deu), "regions):",
+      {k: round(v, 4) for k, v in ineq_indices(deu["pred_GDP_pc_Region"], deu["Pop_Region"]).items()})
+```
+
+Germany's 16 regions yield a low population-weighted Gini of 0.028 — exactly what we expect for
+a country whose regions cluster near the average. Now the role of population weights.
+
+```{python}
+#| label: pop-weights
+def gini_unweighted(y):
+    y = np.asarray(y, float); y = y[np.isfinite(y) & (y > 0)]
+    n, mu = y.size, y.mean()
+    return np.abs(y[:, None] - y[None, :]).sum() / (2 * n**2 * mu)
+
+rows = []
+for (iso, yr_), g in t2.groupby(["Country_ISO", "year"]):
+    v = ineq_indices(g["pred_GDP_pc_Region"], g["Pop_Region"])
+    v.update(Country_ISO=iso, year=yr_, GINI_unw=gini_unweighted(g["pred_GDP_pc_Region"]))
+    rows.append(v)
+built = pd.DataFrame(rows)
+w = built.dropna(subset=["GINIW", "GINI_unw"])
+print("corr(weighted, unweighted) =", round(w["GINIW"].corr(w["GINI_unw"]), 3))
+print("mean(weighted - unweighted) =", round((w["GINIW"] - w["GINI_unw"]).mean(), 4))
+
+fig, ax = plt.subplots(figsize=(5.2, 5))
+ax.scatter(w["GINI_unw"], w["GINIW"], s=10, facecolors="none", edgecolors=STEEL, alpha=0.45)
+mx = max(w["GINI_unw"].max(), w["GINIW"].max()) * 1.02
+ax.plot([0, mx], [0, mx], color=ORANGE, lw=2)
+ax.set(xlabel="unweighted Gini", ylabel="population-weighted Gini",
+       title="The role of population weights")
+plt.show()
+```
+
+Weighted and unweighted Gini correlate only **0.75**, and weighting *lowers* inequality on
+average: small income-extreme regions count for less when we weight by people. Always report
+your weighting.
+
+## The regional Kuznets curve (Table 3)
+
+```{python}
+#| label: kuznets
+def collapse5(df, vars_):
+    d = df[(df.year >= 1990) & (df.year <= 2014)].copy()
+    d["p5"] = pd.cut(d.year, [1989, 1994, 1999, 2004, 2009, 2014],
+                     labels=[1, 2, 3, 4, 5]).astype("int64")
+    return d.groupby(["Country_ISO", "p5"], as_index=False)[vars_].mean()
+
+agg = collapse5(t3, ["GDP_pc_Country"] + IDX)
+agg["lg"] = np.log(agg["GDP_pc_Country"]); agg["lg2"] = agg.lg**2; agg["lg3"] = agg.lg**3
+k3 = pf.feols("GINIW_pred_GDP_pc ~ lg + lg2 + lg3 | Country_ISO + p5",
+              data=agg, vcov={"CRV1": "Country_ISO"})
+print("GINIW cubic:", [round(k3.coef()[t], 4) for t in ["lg", "lg2", "lg3"]],
+      "| N =", k3._N, "| countries =", agg.Country_ISO.nunique())
+```
+
+The cubic is **0.293 / −0.032 / 0.001** — positive, negative, positive: an N-shape. Inequality
+rises with development, falls, then edges up at the very top.
+
+```{python}
+#| label: kuznets-fig
+mfe = smf.ols("GINIW_pred_GDP_pc ~ lg + lg2 + lg3 + C(Country_ISO) + C(p5)", agg).fit()
+bb = {k: mfe.params[k] for k in ["lg", "lg2", "lg3"]}
+peff = {1: 0.0}
+for k in (2, 3, 4, 5):
+    peff[k] = mfe.params.get(f"C(p5)[T.{k}]", 0.0)
+agg["partial"] = agg["GINIW_pred_GDP_pc"] - agg["p5"].map(peff)
+cons = (agg["partial"] - (bb["lg"]*agg.lg + bb["lg2"]*agg.lg2 + bb["lg3"]*agg.lg3)).mean()
+xs = np.linspace(5.5, 11.8, 200)
+ys = cons + bb["lg"]*xs + bb["lg2"]*xs**2 + bb["lg3"]*xs**3
+fig, ax = plt.subplots(figsize=(6.4, 4.5))
+ax.scatter(agg.lg, agg.partial, s=12, facecolors="none", edgecolors=STEEL, alpha=0.5)
+ax.plot(xs, ys, color=INK, lw=2.4)
+ax.set(xlim=(5.5, 11.8), ylim=(0, 0.16), xlabel="log GDP per capita",
+       ylabel="partial regional inequality (GINIW)", title="The regional Kuznets curve")
+plt.show()
+```
+
+## Determinants of regional inequality (Table 4)
+
+```{python}
+#| label: determinants
+agg4 = collapse5(t4, ["GINIW_pred_GDP_pc", "GDP_pc_Country", "Pop_Country",
+                      "Resources_rents_share_of_GDP", "Arable_land", "Trade_GDP_share",
+                      "FDI_share_of_GDP", "area", "price_gasoline", "Aid",
+                      "School_enrollment_secondary", "GINIW_Eth_light"])
+agg4["lg"] = np.log(agg4["GDP_pc_Country"]); agg4["lg2"] = agg4.lg**2; agg4["lg3"] = agg4.lg**3
+agg4["aid_GDP"] = agg4["Aid"] / (agg4["GDP_pc_Country"] * agg4["Pop_Country"])
+agg4["Resources_rents_share_of_GDP"] /= 100
+agg4["School_enrollment_secondary"] /= 100
+agg4["Area_X_price_gasoline"] = agg4["area"] * agg4["price_gasoline"] / 1e7
+def det_fit(extra):
+    return pf.feols(f"GINIW_pred_GDP_pc ~ lg + lg2 + lg3 + {extra} | Country_ISO + p5",
+                    data=agg4, vcov={"CRV1": "Country_ISO"})
+d1 = det_fit("Resources_rents_share_of_GDP + Arable_land")
+d5 = det_fit("GINIW_Eth_light")
+print("resource rents   =", round(d1.coef()["Resources_rents_share_of_GDP"], 3))
+print("arable land      =", round(d1.coef()["Arable_land"], 3))
+print("ethnic inequality =", round(d5.coef()["GINIW_Eth_light"], 3), "(N =", int(d5._N), ")")
+```
+
+The strongest correlate is **ethnic inequality (0.071)**. Resource rents push inequality up
+(0.018); a larger arable-land share pulls it down (−0.053).
+
+## Spatial robustness: Conley standard errors (Table B.4)
+
+```{python}
+#| label: conley
+tb4["satyear"] = sum(i * tb4[f"satyear_{i}"] for i in range(1, 8)).astype(int)
+cols = ["log_GDP_pc_Region", "log_Light_ppix_Region", "Latitude", "Longitude",
+        "code_Coutry_Region", "satyear"]
+dfb = tb4.dropna(subset=cols).copy()
+cnt = dfb["code_Coutry_Region"].value_counts()
+dfb = dfb[dfb["code_Coutry_Region"].isin(cnt[cnt > 1].index)].copy()
+mb = pf.feols("log_GDP_pc_Region ~ log_Light_ppix_Region | code_Coutry_Region + satyear",
+              data=dfb)
+b_b4 = float(mb.coef()["log_Light_ppix_Region"])
+xfit = pf.feols("log_Light_ppix_Region ~ 1 | code_Coutry_Region + satyear", data=dfb)
+xt, u = np.asarray(xfit.resid()), np.asarray(mb.resid())
+sxx = float(np.sum(xt**2))
+gb = dfb.assign(xu=xt*u).groupby("code_Coutry_Region")
+agg_s = gb["xu"].sum().to_numpy()
+lat = np.radians(gb["Latitude"].first().to_numpy())
+lon = np.radians(gb["Longitude"].first().to_numpy())
+R, nr = 6371.0, agg_s.size
+def conley_var(dist):
+    v = 0.0
+    for i in range(nr):
+        a = (np.sin((lat-lat[i])/2)**2 + np.cos(lat[i])*np.cos(lat)*np.sin((lon-lon[i])/2)**2)
+        dij = 2*R*np.arcsin(np.minimum(1.0, np.sqrt(a)))
+        v += agg_s[i] * np.sum(np.maximum(0.0, 1 - dij/dist) * agg_s)
+    return v / sxx**2
+print("point estimate =", round(b_b4, 3))
+for r_ in (1000, 2500, 5000):
+    print(f"Conley SE @ {r_} km = {np.sqrt(conley_var(r_)):.3f}")
+print("naive iid SE     =", round(float(mb.se()['log_Light_ppix_Region']), 3))
+```
+
+Allowing for spatial correlation roughly doubles to triples the standard error (0.013 →
+0.026–0.037), but the elasticity of 0.190 stays far from zero.
+
+## Regional versus personal inequality (Figure 5a)
+
+```{python}
+#| label: fig5
+d5f = f5[(f5.year > 2000) & (f5.year < 2013)].copy()
+a5 = d5f.groupby("Country_ISO", as_index=False)[["GINIW_pred_GDP_pc", "Giniall"]].mean()
+a5["GINIall_100"] = a5["Giniall"] / 100
+p5 = a5.dropna(subset=["GINIall_100", "GINIW_pred_GDP_pc"])
+slope, icept = np.polyfit(p5["GINIW_pred_GDP_pc"], p5["GINIall_100"], 1)
+fig, ax = plt.subplots(figsize=(5.8, 4.6))
+ax.scatter(p5["GINIW_pred_GDP_pc"], p5["GINIall_100"], marker="^", s=24,
+           facecolors="none", edgecolors=STEEL)
+xs = np.linspace(p5["GINIW_pred_GDP_pc"].min(), p5["GINIW_pred_GDP_pc"].max(), 200)
+ax.plot(xs, slope*xs + icept, color=ORANGE, lw=2.2)
+ax.set(xlabel="interregional inequality (GINIW)", ylabel="interpersonal inequality (Gini)",
+       title=f"Regional vs personal inequality (slope {slope:.3f})")
+plt.show()
+print("n =", len(p5), "countries | slope =", round(slope, 3))
+```
+
+Across 144 countries the household-income Gini rises with the regional Gini (slope **0.587**):
+places with wide gaps between regions also have wide gaps between people.
+
+## References
+
+1. Lessmann, C., & Seidel, A. (2017). Regional inequality, convergence, and its determinants —
+   A view from outer space. *European Economic Review*, 92, 110–132.
+2. Henderson, J. V., Storeygard, A., & Weil, D. N. (2012). Measuring economic growth from outer
+   space. *American Economic Review*, 102(2), 994–1028.
+3. Gennaioli, N., La Porta, R., Lopez-de-Silanes, F., & Shleifer, A. (2014). Growth in regions.
+   *Journal of Economic Growth*, 19(3), 259–309.
+4. [PyFixest documentation](https://py-econometrics.github.io/pyfixest/) ·
+   [linearmodels documentation](https://bashtage.github.io/linearmodels/)

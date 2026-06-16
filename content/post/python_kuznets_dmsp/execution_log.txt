@@ -1,0 +1,59 @@
+===========================================================================
+Regional Inequality from Outer Space -- Lessmann & Seidel (2017)
+===========================================================================
+
+[1] Loading bundled CSVs from data/ ...
+    Prediction_Data      5258 rows x  30 cols
+    Table_2_data         5258 rows x   8 cols
+    Table_3_data         3675 rows x   9 cols
+    Table_4_data         3675 rows x  17 cols
+    Table_B4_data        5258 rows x  14 cols
+    Figure_5_data        3675 rows x   5 cols
+    Training sample: 5258 region-years, 1504 regions, 81 countries.
+
+[2] EDA -- cross-country dynamics of the key variables ...
+    light: mean=0.96 | GINIW: mean=0.064, median=0.061, max=0.163
+    GINIW 0.0702 (1992) -> 0.0612 (2012)
+    median GINIW by region:
+      N. America & high-inc.     0.0385
+      Europe & Central Asia      0.0421
+      South Asia                 0.0451
+      Mid. East & N. Africa      0.0585
+      Latin America & Carib.     0.0724
+      East Asia & Pacific        0.0780
+      Sub-Saharan Africa         0.0962
+    corr(Gini, CV)=0.969 | corr(Gini, Theil)=0.927
+
+[3] Table 1 -- predicting regional GDP from nighttime lights ...
+    PyFixest FE/OLS light elasticity by col (1)-(7): 0.359 / 0.190 / 0.134 / 0.131 / 0.268 / 0.094 / 0.049
+    linearmodels RE light elasticity by col (1)-(7): 0.399 / 0.190 / 0.153 / 0.123 / 0.232 / 0.104 / 0.102
+    col 7 national-GDP elasticity: RE=0.889, FE=0.896
+    prediction check: corr(predicted, observed log GDP p.c.) = 0.925 over 5258 region-years
+
+[4] Constructing inequality indices from scratch ...
+    built indices for 277 country-years.
+    Germany 2010: 16 regions, GINIW=0.0278, Theil=0.0016, CV=0.0565
+    weighted vs unweighted Gini: corr=0.747, mean(weighted-unweighted)=-0.0034
+    cross-sample check: corr(training-subset, published GINIW)=0.879, mean abs diff=8.71e-03  (N=277)
+    Table 2 correlations across 78 countries:
+      predicted-vs-observed: Gini=0.49  GE(-1)=0.39  MLD GE(0)=0.45  Theil GE(1)=0.50  CV=0.52
+      light-vs-observed:     Gini=0.21  GE(-1)=0.11  MLD GE(0)=0.21  Theil GE(1)=0.30  CV=0.29
+
+[5] Table 3 -- the regional Kuznets curve (PyFixest) ...
+    GINIW cubic: 0.293 / -0.032 / 0.0011  (N=879, countries=180)
+    Figure 4 cubic (OLS-dummies): 0.293 / -0.032 / 0.0011
+
+[6] Table 4 -- determinants of regional inequality (PyFixest) ...
+    ethnic-inequality coefficient (col 5) = 0.071 (N=844)
+
+[7] Table B.4 -- Conley spatial-HAC standard errors ...
+    point estimate = 0.190; Conley SE 0.026@1000km / 0.034@2500km / 0.037@5000km; iid SE=0.013
+
+[8] Figure 5a -- regional vs personal inequality ...
+    n=144 countries | OLS slope=0.587
+
+===========================================================================
+Generated 14 figures and 12 CSV result files.
+Figures: python_kuznets_dmsp_01_distributions.png, python_kuznets_dmsp_02_time_trends.png, python_kuznets_dmsp_03_by_wb_region.png, python_kuznets_dmsp_04_index_corr_heatmap.png, python_kuznets_dmsp_05_table1.png, python_kuznets_dmsp_06_predicted_vs_observed.png, python_kuznets_dmsp_07_population_weights.png, python_kuznets_dmsp_08_index_validation.png, python_kuznets_dmsp_08_table2_correlations.png, python_kuznets_dmsp_09_table3.png, python_kuznets_dmsp_10_kuznets_scatter.png, python_kuznets_dmsp_11_table4.png, python_kuznets_dmsp_12_conley_se.png, python_kuznets_dmsp_13_regional_vs_personal.png
+
+=== Script completed successfully ===

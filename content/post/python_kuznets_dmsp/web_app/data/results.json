@@ -1,0 +1,70 @@
+{
+  "title": "Regional Inequality from Outer Space",
+  "post_slug": "python_kuznets_dmsp",
+  "source": "Lessmann and Seidel (2017), European Economic Review 92, 110-132; replicated in Python.",
+  "light_elasticity": {
+    "note": "Light-to-GDP elasticity (beta_1) across selected columns of Table 1. RE col 7 = preferred prediction model; FE col 2 = clean within-region elasticity used for the Conley robustness check.",
+    "re_col7": 0.102,
+    "fe_col2": 0.190,
+    "by_column": [
+      { "col": 1, "label": "Pooled OLS",                 "fe": 0.359, "re": 0.359 },
+      { "col": 2, "label": "+ region & satellite FE",    "fe": 0.190, "re": 0.190 },
+      { "col": 4, "label": "+ national income",          "fe": 0.131, "re": 0.131 },
+      { "col": 7, "label": "+ geography (full)",         "fe": 0.049, "re": 0.102 }
+    ],
+    "national_gdp_elasticity_re7": 0.889
+  },
+  "prediction": {
+    "corr_pred_vs_observed": 0.925,
+    "n_region_years": 5258,
+    "n_regions_calibration": 1504,
+    "n_countries_calibration": 81,
+    "gini_corr_predicted": 0.49,
+    "gini_corr_raw_light": 0.21
+  },
+  "kuznets_cubic": {
+    "note": "Cubic in log GDP per capita with country and period fixed effects (Table 3). Sign pattern + / - / + is an N-shape.",
+    "const": -0.799,
+    "lg": 0.293,
+    "lg2": -0.032,
+    "lg3": 0.00112,
+    "n_obs": 879,
+    "n_countries": 180,
+    "log_gdp_min": 6.5,
+    "log_gdp_max": 11.5,
+    "peak_usd_approx": 3000
+  },
+  "determinants": {
+    "note": "Coefficient on each determinant added to the Kuznets cubic with country + period FE (Table 4). Positive = associated with more regional inequality.",
+    "ethnic_inequality": 0.071,
+    "resource_rents": 0.018,
+    "arable_land": -0.053,
+    "trade_openness": 0.005,
+    "foreign_aid": 0.015
+  },
+  "conley": {
+    "note": "Spatial-HAC (Conley) standard errors for the clean light elasticity beta = 0.190 (FE column 2), at three great-circle cutoff radii, versus the naive iid standard error.",
+    "beta": 0.190,
+    "naive_se": 0.013,
+    "by_radius_km": [
+      { "radius": 1000, "se": 0.026 },
+      { "radius": 2500, "se": 0.034 },
+      { "radius": 5000, "se": 0.037 }
+    ]
+  },
+  "regional_vs_personal": {
+    "note": "OLS slope of household-income (personal) Gini on the regional Gini, across 144 countries (Figure 5a).",
+    "slope": 0.587,
+    "n_countries": 144
+  },
+  "indices_comovement": {
+    "corr_gini_cv": 0.969,
+    "corr_gini_theil": 0.927
+  },
+  "regions_default": {
+    "note": "Six illustrative regions for the inequality-index builder. Incomes in thousands of USD per capita; populations in millions. Spread chosen so the weighted Gini lands near a realistic mid-range value.",
+    "names":       ["Capital",  "Coast",  "Industrial", "Plains", "Highlands", "Frontier"],
+    "income_kusd": [22.0,       14.0,     11.0,         7.5,      5.0,         3.5],
+    "pop_millions":[8.0,        6.0,      9.0,          5.0,      3.0,         1.5]
+  }
+}

@@ -1,0 +1,255 @@
+---
+title: "Regional Inequality from Outer Space"
+subtitle: "Nighttime lights become a global income map — and reveal an N-shaped Kuznets curve"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "0.102"
+    cap: "light elasticity · lights → income"
+  - num: "0.925"
+    cap: "predicted vs observed · calibration fit"
+  - num: "0.071"
+    cap: "ethnic Gini · strongest driver"
+format:
+  revealjs:
+    output-file: index.html
+    # NOT embed-resources: RevealChalkboard (a core feature) is incompatible with
+    # self-contained output, so the deck ships index.html + slides_files/ (Hugo serves
+    # this fine — see the tutorial.html precedent). Figures are referenced
+    # ../python_kuznets_dmsp_*.png and reused in place (not copied).
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    # Math: MathJax (Quarto revealjs default) — renders $…$ / $$…$$ across the whole slide
+    # DOM (body, captions, headings, table cells). Loads from a CDN; reveal.js is local.
+    # Do NOT set `html-math-method: katex` — it is broken in revealjs (no auto-render call,
+    # so math shows as raw LaTeX). See references/render-and-fix.md.
+    link-external-icon: false
+---
+
+# The Problem {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## Almost every country reports one GDP number — and nothing about its insides
+
+A government can tell you its national GDP, but rarely the income of each province inside it.
+
+. . .
+
+Two countries with the *same* national income can look completely different on the inside — one a single booming capital ringed by poor hinterlands, the other broadly shared. **Without subnational data, that gap is invisible.**
+
+::: {.notes}
+The motivating tension. National accounts are universal; subnational accounts are a luxury most statistical offices cannot afford. So the question "is growth shared across a country's territory?" is unanswerable for most of the world. The whole deck is about manufacturing the missing data from a source every country has — light at night.
+:::
+
+## The idea: let satellites do the accounting — brighter places are, on average, richer
+
+Lessmann and Seidel (2017) use **nighttime light** as a stand-in for income: electricity, roads, and activity all glow, so brightness correlates with output where statistics do not exist.
+
+. . .
+
+Their pipeline, rebuilt here in Python end to end:
+
+::: {.incremental}
+- **Predict** regional GDP from light + a few controls
+- **Construct** population-weighted inequality indices from those predictions
+- **Estimate** how regional inequality moves with development
+:::
+
+::: {.notes}
+The key move is not "light = income" — deserts and oil flares would wreck that. It is "predict income from light," calibrating on the regions where income is observed and then applying the model where it is not. Light supplies the residual subnational texture once national income is controlled for.
+:::
+
+## Where we're going
+
+::: {.incremental}
+- **Calibration** — turn light into income; how good is the fit?
+- **Construction** — five inequality indices from scratch; why population weights matter
+- **The curve** — an N-shaped regional Kuznets relationship
+- **Drivers & robustness** — ethnic inequality, and a spatial-HAC stress test
+:::
+
+# The Calibration {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## The lab: 5,258 region-years calibrate the model; 180 countries get measured
+
+::: {.incremental}
+- **Calibration sample** — 1,504 subnational regions in 81 countries that have *both* observed GDP and a light reading (5,258 region-years)
+- **Country panel** — 180 countries, 1992–2012, each carrying inequality indices built from its regions
+- **Two units, kept straight** — predict at the *region* level, measure inequality at the *country* level
+:::
+
+[Mean regional Gini $= 0.064$ (SD $0.033$, max $0.163$): most countries are internally fairly equal, with a long unequal tail.]{.comment}
+
+::: {.notes}
+Keeping the two units straight is the single most common source of confusion. The region-year files are the training set for the lights→income model; the country-year files are where the Kuznets and determinant regressions live. The wide income range across countries is what lets us see the whole curve.
+:::
+
+## Light becomes income through a calibrated elasticity, net of national income and geography
+
+$$y_r = \beta_0 + \beta_1 \ell_r + \beta_2 g_c + \gamma' X_r + \mu_g + \tau_s + \varepsilon_r$$
+
+[A region's log income $y_r$ = baseline, plus elasticity $\beta_1$ on its log light $\ell_r$, plus a near-one-for-one adjustment $\beta_2$ for its country's income $g_c$, plus geography $X_r$, world-region $\mu_g$ and satellite $\tau_s$ effects. The number we care about is $\beta_1$.]{.comment}
+
+::: {.notes}
+Light is never credited with what national income, geography, satellite generation, or broad world region should explain — those are all controlled for. What's left, beta-one, is the genuine subnational gradient: how much brighter maps to how much richer once scale is removed.
+:::
+
+## The calibrated light elasticity is 0.102, with regional income tracking national income one-for-one {background-color="#141413"}
+
+[0.102]{.bignum}
+
+[random-effects light elasticity (col 7) · national-GDP elasticity $= 0.889$ · matches the paper exactly]{.bignum-label}
+
+::: {.notes}
+The headline calibration number. A 10% brighter region is predicted ~1% richer once national income and geography are held fixed — modest, because national GDP already absorbs most of the cross-country scale; lights then sharpen the within-country map. The paper uses random effects (which keep between-region variation), not fixed effects; PyFixest gives 0.049 here, linearmodels' RE gives 0.102. The fixed-effects and random-effects estimates agree exactly only in column 2, the one true FE column (0.190).
+:::
+
+## The predictions hug the 45° line across four orders of magnitude of income
+
+![Predicted vs observed log regional GDP per capita, 5,258 region-years. The scatter tracks the 45° line from the poorest regions to the richest — the calibration generalises rather than fitting one income band ($r = 0.925$).](../python_kuznets_dmsp_06_predicted_vs_observed.png)
+
+::: {.notes}
+This is the honest test of the calibration: reconstruct fitted income from the column-7 coefficients and compare to observed values. r = 0.925 across all 5,258 region-years, and crucially the fit holds across four orders of magnitude — it is not memorising one income band. That is what licenses applying these coefficients to every region on Earth, including the tens of thousands with no income statistics.
+:::
+
+# The Construction {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## Five inequality indices, built from scratch and weighted by population
+
+$$\bar y = \frac{\sum_i w_i y_i}{\sum_i w_i}, \qquad
+  p_i = \frac{w_i}{\sum_j w_j}, \qquad
+  r_i = \frac{y_i}{\bar y}$$
+
+[Each country's regional incomes $y_i$ and populations $w_i$ collapse to one number: the Gini, three generalized-entropy indices GE($-1$)/GE($0$)/GE($1$), and the coefficient of variation — every region counting in proportion to its people.]{.comment}
+
+::: {.notes}
+The whole measurement apparatus is one function: take a country-year's regional incomes and populations, return all five indices. The crucial coding trap is the Gini's absolute pairwise difference |y_i − y_j| summed over all pairs, not a product. Germany 2010 is the sanity check: 16 broadly-similar regions yield a population-weighted Gini of just 0.028 — low, as expected.
+:::
+
+## Population weights are not cosmetic — they correlate only 0.75 with equal weights
+
+![Population-weighted vs equal-weight Gini across country-years. Most points sit below the 45° line: weighting lowers measured inequality (mean gap $-0.0034$) because tiny income-extreme regions lose influence (corr $= 0.75$).](../python_kuznets_dmsp_07_population_weights.png)
+
+::: {.notes}
+Equal weighting lets a tiny mining province or remote capital swing the index. Population weighting ties it to where people actually live — the policy-relevant quantity — and pulls the index down on average. The lesson is general: always report your weighting, because the same country looks more or less unequal depending on whether you count regions or people. Predicting income first also doubles how well the indices track observed inequality (Gini correlation 0.49 vs 0.21 for raw light).
+:::
+
+# The Result {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## With country and period fixed effects, the regional Kuznets curve is an N — not a single hump
+
+$$\text{GINIW}_{ct} = \beta_1 \ln Y_{ct} + \beta_2 (\ln Y_{ct})^2
+   + \beta_3 (\ln Y_{ct})^3 + \alpha_c + \delta_t + u_{ct}$$
+
+| Cubic term | Estimate | Sign |
+|---|---:|:--|
+| $\beta_1$ (linear) | [$0.293$]{.key} | rises with early development |
+| $\beta_2$ (quadratic) | $-0.032$ | then bends down |
+| $\beta_3$ (cubic) | $0.001$ | faint upturn at the very top |
+
+[$N = 879$, 180 countries, 5-year periods. Same sign pattern across all five indices — the N is not an artefact of the Gini.]{.comment}
+
+::: {.notes}
+Country and period fixed effects mean the curve is identified from each country's own changes over time, not from rich-vs-poor comparisons. Positive, negative, positive: inequality rises through industrialisation, narrows as countries converge internally, then edges up at the richest incomes. This is Williamson's hump with a third act. It reproduces the paper's coefficients exactly.
+:::
+
+## Three development phases, one descriptive association
+
+![Regional inequality (net of period effects) against log development, with the fitted cubic overlaid. The curve rises to a gentle peak near \$3,000 per capita, declines through middle income, and ticks faintly upward at the top.](../python_kuznets_dmsp_10_kuznets_scatter.png)
+
+::: {.incremental}
+- **Early development** — activity concentrates; inequality *rises*
+- **Middle income** — lagging regions catch up; inequality *falls*
+- **The very richest** — agglomeration re-concentrates; a faint *rise*
+:::
+
+::: {.notes}
+The scatter is wide — development explains the shape but leaves plenty of country-specific variation, which the determinants try to name. The estimand is a within-country conditional association, not a causal effect: fixed effects strip time-invariant confounders, but there is no treatment and no exogenous variation in development. Read the curve as description, not a policy lever.
+:::
+
+# The Drivers {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## Beyond income, ethnic inequality is the strongest driver — by far {background-color="#141413"}
+
+[0.071]{.bignum}
+
+[ethnic-Gini coefficient ($p < 0.001$, $N = 844$) · vs a mean regional Gini of $0.064$]{.bignum-label}
+
+::: {.notes}
+Adding structural controls on top of the cubic + FE: countries where income differs sharply across ethnic homelands also have sharply unequal regions — the internal economic geography is bound up with the human geography. Resource rents push inequality up (+0.018, the resource curse), trade openness +0.005, aid/GDP +0.015; arable-land share pulls it down (−0.053) because dispersed farming equalizes regions. The licensed-ICRG institutional-quality column cannot be reproduced and is omitted.
+:::
+
+## Ranked side by side: ethnicity towers; farmland pulls the other way
+
+![Determinants of regional inequality. Ethnic inequality (0.071) dwarfs resource rents (+0.018), aid (+0.015), and trade (+0.005); arable land (−0.053) is the largest equalizing force.](../python_kuznets_dmsp_11_table4.png)
+
+::: {.notes}
+The sample size drifts across columns (857 down to 585) as different controls go missing, so read the columns as separate windows, not one nested model. The policy reading: name the levers most associated with the gap — resource dependence and ethnic division concentrate inequality; broad-based farming and schooling spread it.
+:::
+
+# Robustness {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## Allowing neighbours to share shocks doubles the standard error — the elasticity still holds
+
+![Conley spatial-HAC standard errors for the clean light elasticity ($\beta = 0.190$). The confidence interval widens with the radius — SE rises from 0.013 (iid) to 0.026/0.034/0.037 at 1,000/2,500/5,000 km — while the point estimate stays fixed and far from zero.](../python_kuznets_dmsp_12_conley_se.png)
+
+| Inference | SE | $t \approx$ |
+|---|---:|---:|
+| Naive (iid) | $0.013$ | $14$ |
+| Conley 1,000 km | $0.026$ | $7$ |
+| Conley 5,000 km | [$0.037$]{.key} | $5$ |
+
+[The point estimate $\beta = 0.190$ never moves; only the honest uncertainty grows.]{.comment}
+
+::: {.notes}
+Regions are not independent — a boom in one province spills into its neighbours, so treating each region-year as an independent witness understates uncertainty two- to three-fold. The Conley correction weights cross-products of region scores by a Bartlett kernel on great-circle distance. Even at the widest radius the elasticity sits far from zero (t ≈ 5), so the lights-predict-income relationship is real, not a mirage created by ignoring geography.
+:::
+
+## Does machine-assembled satellite data make this causal? No
+
+[Objection.]{.objection} You absorbed country and period effects and survived a spatial-HAC test — surely development *causes* this inequality path?
+
+. . .
+
+[Response.]{.rebuttal} No. The lights→GDP step is a *prediction* model, not a structural relationship; the Kuznets and determinant regressions are within-country **associations** conditional on the FE, not causal effects. The income figures are predictions — accurate on average, wrong for any single unusual region.
+
+::: {.notes}
+Steelman, don't strawman. Fixed effects remove time-invariant confounders and the Conley correction fixes inference, but neither manufactures exogeneity: time-varying confounders and reverse causality remain. And every income number is a prediction. Honesty about both is what keeps the method credible — and points the next step toward IV or shift-share designs.
+:::
+
+# You can now see inequality inside a country with no statistical office. {.divider background-color="#141413"}
+
+[Predict income from light · weight by people · let the curve bend twice.]{.act}
+
+::: {.notes}
+The single takeaway. The method turns a data desert into a global, comparable income map: a 0.102 light elasticity, predictions correlating 0.925 with observed income, inequality measures tracking the data twice as well as raw light. The places where growth fails to spread are now visible and measurable, and the levers most associated with the gap — ethnic division, resource dependence — are nameable. Two cautions frame all of it: descriptive associations, not causal effects; and predicted incomes, not measured ones.
+:::
