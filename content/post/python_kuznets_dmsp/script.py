@@ -618,6 +618,114 @@ print(f"    Figure 4 cubic (OLS-dummies): {bb['lg']:.3f} / {bb['lg2']:.3f} "
       f"/ {bb['lg3']:.4f}")
 
 # ===========================================================================
+# 5b. TURNING POINTS AND THE DISCRIMINANT TEST
+# ===========================================================================
+# The cubic GINIW = b1*lnY + b2*lnY^2 + b3*lnY^3 (+ FE) turns where its marginal
+# effect dGINIW/dlnY = b1 + 2*b2*lnY + 3*b3*lnY^2 crosses zero -- a quadratic with
+# at most two roots. Two REAL roots exist iff the discriminant D = b2^2 - 3*b1*b3
+# is positive. Significance of all three terms is necessary but NOT sufficient for
+# an N-shape: we also need D > 0 AND both turning points inside the observed range.
+print("\n[5b] Turning points and the discriminant test ...")
+
+b1, b2, bcub = float(b3["lg"]), float(b3["lg2"]), float(b3["lg3"])
+obs_lo, obs_hi = float(agg3.GDP_pc_Country.min()), float(agg3.GDP_pc_Country.max())
+
+
+def cubic_disc(p1, p2, p3):
+    """Discriminant of the cubic's derivative; D > 0 <=> two real turning points."""
+    return p2 ** 2 - 3 * p1 * p3
+
+
+def cubic_diag(label, p1, p2, p3, lo=obs_lo, hi=obs_hi):
+    """One row of the 'significance is not shape' table."""
+    D = cubic_disc(p1, p2, p3)
+    if D > 1e-12:
+        r = np.sort([(-p2 - np.sqrt(D)) / (3 * p3),
+                     (-p2 + np.sqrt(D)) / (3 * p3)])           # ln turning points
+        usd = np.exp(r)
+        both_in = bool((usd >= lo).all() and (usd <= hi).all())
+        regime = ("2 turning points (both in range)" if both_in
+                  else "2 turning points (>=1 OUT of range)")
+        return dict(case=label, b1=p1, b2=p2, b3=p3, D=D, regime=regime,
+                    tp_low=float(usd[0]), tp_high=float(usd[1]), in_range=both_in)
+    return dict(case=label, b1=p1, b2=p2, b3=p3, D=D,
+                regime="inflection only (D=0)" if abs(D) <= 1e-12 else "monotonic (D<0)",
+                tp_low=np.nan, tp_high=np.nan, in_range=False)
+
+
+# --- the project's own cubic ------------------------------------------------
+D = cubic_disc(b1, b2, bcub)
+sq = np.sqrt(D)
+roots = np.sort([(-b2 - sq) / (3 * bcub), (-b2 + sq) / (3 * bcub)])
+tp_usd = np.exp(roots)
+print(f"    cubic betas : {b1:.4f} / {b2:.4f} / {bcub:.5f}")
+print(f"    discriminant: D = {D:+.6f}  -> "
+      f"{'two real turning points' if D > 0 else 'no real turning points'}")
+print(f"    turning pts : ln={roots[0]:.2f} (${tp_usd[0]:,.0f})  and  "
+      f"ln={roots[1]:.2f} (${tp_usd[1]:,.0f})")
+print(f"    income range: ${obs_lo:,.0f} - ${obs_hi:,.0f}")
+pd.DataFrame({"type": ["maximum (inequality peaks)", "minimum (inequality troughs)"],
+              "ln_gdp": roots, "gdp_usd": np.round(tp_usd).astype(int)}
+             ).to_csv(f"{SLUG}_turning_points.csv", index=False)
+
+# --- Figure 14: where does the curve turn? (the marginal effect) ------------
+xg = np.linspace(float(agg3.lg.min()), float(agg3.lg.max()), 200)
+deriv = b1 + 2 * b2 * xg + 3 * bcub * xg ** 2
+fig, ax = plt.subplots(figsize=(6.6, 4.4))
+ax.axhline(0, color=GREY, lw=0.9)
+ax.plot(xg, deriv, color=STEEL, lw=2.2)
+for r_, u_ in zip(roots, tp_usd):
+    if xg.min() <= r_ <= xg.max():
+        ax.axvline(r_, color=ORANGE, ls="--", lw=1.4)
+        ax.plot([r_], [0], "o", color=TEAL, ms=8, zorder=5)
+        ax.annotate(f"ln={r_:.1f}\n(\\${u_:,.0f})", xy=(r_, 0),
+                    xytext=(r_, deriv.max() * 0.55), ha="center",
+                    color=TEAL, fontsize=9, fontweight="bold")
+ax.set(xlabel="log GDP per capita", ylabel="marginal effect on inequality",
+       title="Where does the regional Kuznets curve turn?")
+fig.text(0.5, -0.01, r"Marginal effect $\beta_1 + 2\beta_2 Y + 3\beta_3 Y^2$; "
+         "roots mark the inverted-U peak and the high-income upturn",
+         ha="center", fontsize=8, color=GREY)
+fig.tight_layout()
+fig.savefig(fig_path(14, "turning_points"))
+plt.close(fig)
+
+# --- the discriminant table: significance is not shape ----------------------
+# Row 1 is this post's fitted cubic; rows 2-4 are synthetic cases with the SAME
+# N-shape sign pattern (b1>0, b2<0, b3>0) that nevertheless fail in different ways.
+disc_df = pd.DataFrame([
+    cubic_diag("This post's cubic (panel FE)", b1, b2, bcub),
+    cubic_diag("Synthetic A: genuine N-shape", 0.220, -0.026, 0.0010),
+    cubic_diag("Synthetic B: monotonic trap", 0.220, -0.020, 0.0010),
+    cubic_diag("Synthetic C: turns out of range", 0.220, -0.026, 0.0001),
+])
+print("    -- significance is not shape -------------------------------------")
+print(disc_df[["case", "b1", "b2", "b3", "D", "regime", "in_range"]]
+      .to_string(index=False))
+disc_df.to_csv(f"{SLUG}_discriminant.csv", index=False)
+
+# --- Figure 15: same significant terms, three shapes (vary only b2) ---------
+b2_zero = -np.sqrt(3 * b1 * bcub)                      # the D = 0 knife-edge
+regimes = [("D < 0  (monotonic)", -0.025),
+           ("D = 0  (inflection)", b2_zero),
+           ("D > 0  (genuine N-shape)", b2)]
+fig, axes = plt.subplots(1, 3, figsize=(11, 3.6))
+for ax, (lab, p2) in zip(axes, regimes):
+    f = b1 * xg + p2 * xg ** 2 + bcub * xg ** 3
+    f = f - f.mean()
+    Dp = cubic_disc(b1, p2, bcub)
+    ax.plot(xg, f, color=ORANGE, lw=2.0)
+    ax.axhline(0, color=GREY, lw=0.7)
+    ax.set_title(f"{lab}\nD = {Dp:+.5f}", fontsize=10)
+    ax.set_xlabel("log GDP per capita")
+axes[0].set_ylabel("partial fit, centred")
+fig.suptitle("Same significant terms, three different shapes "
+             "(only the squared term changes)", fontweight="bold")
+fig.tight_layout(rect=(0, 0, 1, 0.95))
+fig.savefig(fig_path(15, "discriminant_regimes"))
+plt.close(fig)
+
+# ===========================================================================
 # 6. DETERMINANTS OF REGIONAL INEQUALITY (TABLE 4)
 # ===========================================================================
 print("\n[6] Table 4 -- determinants of regional inequality (PyFixest) ...")

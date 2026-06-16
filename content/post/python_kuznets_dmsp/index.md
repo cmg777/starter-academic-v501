@@ -559,7 +559,7 @@ col 7: light elasticity = 0.049
 
 The pooled elasticity of 0.359 (column 1) falls to 0.190 once we absorb region fixed effects
 (column 2), and falls further as national income and geography are added. Column 2 is worth
-remembering: 0.190 is the *clean within-region* elasticity, the number Section 10 stress-tests
+remembering: 0.190 is the *clean within-region* elasticity, the number Section 11 stress-tests
 for spatial correlation. Column 7's fixed-effects elasticity of 0.049 is the smallest,
 because once national income and broad region are absorbed there is little cross-region
 variation left for light to explain. But the paper did not use fixed effects here — it used
@@ -797,9 +797,9 @@ measured, we can ask how it moves with development.
 Now the classic question. As countries grow richer, does regional inequality rise then fall?
 We regress the regional Gini on a cubic in log national income, with country and period fixed
 effects so the relationship is identified from each country's *own* changes over time, not
-from rich-vs-poor comparisons. This and the next two sections are deliberately brief; the
-companion post [python_fe_kuznets](/post/python_fe_kuznets/) works the turning-point algebra
-and period-by-period stability in full.
+from rich-vs-poor comparisons. Section 9 then works the turning-point algebra and the
+discriminant test in full; the companion post [python_fe_kuznets](/post/python_fe_kuznets/)
+adds the period-by-period stability of the curve.
 
 ### 8.1 The cubic specification in PyFixest
 
@@ -856,9 +856,164 @@ fig.savefig("python_kuznets_dmsp_10_kuznets_scatter.png", dpi=300)
 The fitted curve rises to a gentle peak around a log income of 8 (roughly \\$3,000 per capita),
 declines through the middle-income range, and flattens — with a barely perceptible uptick — at
 the top. The scatter is wide: development explains the *shape* but leaves plenty of
-country-specific variation, which is what the determinants in the next section try to name.
+country-specific variation, which is what the determinants in Section 10 try to name.
 
-## 9. What drives regional inequality?
+## 9. Turning points and the discriminant test
+
+The cubic in §8 *can* bend twice — but does it actually, and does it bend inside the range of
+incomes we observe? This section answers both, and it is the most transferable skill in the
+post: any time you fit a cubic, these two checks tell you whether the curve really has the
+shape its coefficients seem to promise. The same two-step test is developed on a synthetic
+panel in the R companion post [r_kuznets](/post/r_kuznets/); here we apply it to the
+lights-based regional Gini.
+
+### 9.1 Calculating the turning points
+
+Where does the curve change direction? At a turning point the slope is zero, so we set the
+derivative of the cubic to zero:
+
+$$\frac{\partial \text{GINIW}}{\partial \ln Y} = \beta\_1 + 2\beta\_2 \ln Y + 3\beta\_3 (\ln Y)^2 = 0.$$
+
+This is a *quadratic* in $\ln Y$, so it has at most two roots — the inverted-U peak and the
+high-income trough. We solve it with the quadratic formula and exponentiate each root back
+into dollars:
+
+```python
+b1, b2, b3 = m.coef()[["lg", "lg2", "lg3"]]        # 0.293 / -0.032 / 0.00112
+D = b2**2 - 3*b1*b3                                 # the discriminant (see 9.2)
+roots = np.sort([(-b2 - np.sqrt(D)) / (3*b3),
+                 (-b2 + np.sqrt(D)) / (3*b3)])       # turning points, in ln Y
+print("turning points: ln =", roots.round(2), "->  $", np.exp(roots).round(0))
+```
+
+```text
+turning points: ln = [ 7.74 11.25] ->  $ [ 2287. 77206.]
+```
+
+![Where the regional Kuznets curve turns: the marginal effect crosses zero twice](python_kuznets_dmsp_14_turning_points.png)
+
+Regional inequality **rises** with development up to ln(GDP) ≈ 7.7 (about **\\$2,287**),
+**falls** through the middle-income range until ln(GDP) ≈ 11.3 (about **\\$77,206**), and then
+**rises again**. **Interpretation 1:** the first threshold marks the industrial take-off where
+a few leading regions surge ahead of the rest; the second marks the maturity where
+within-country convergence has run its course and post-industrial forces — services, finance,
+skilled-city agglomeration — begin to pull the richest regions apart again. Both turning points
+fall inside the observed income range (\\$190–\\$117,191), so this is a genuine N-shape rather
+than an extrapolation, and the two thresholds match the companion
+[python_fe_kuznets](/post/python_fe_kuznets/) post exactly. The figure plots the *marginal
+effect* (the derivative) rather than the curve itself, because the turning points are precisely
+where that line crosses zero.
+
+### 9.2 The discriminant: does the curve really bend?
+
+Solving for the roots numerically works, but it hides *why* a cubic sometimes has two turning
+points and sometimes none. The quadratic $\beta\_1 + 2\beta\_2 Y + 3\beta\_3 Y^2 = 0$ has two
+real solutions exactly when its discriminant is positive. After dropping a harmless factor of
+4 (algebra below), the rule collapses to a single number:
+
+$$D \\;\equiv\\; \beta\_2^2 - 3\\,\beta\_1\beta\_3.$$
+
+There are three regimes:
+
+| Discriminant | Real turning points | Shape over the income line | Verdict |
+|---|---|---|---|
+| $D > 0$ | 2 | rise–fall–rise (an "N on its side") | the cubic shape is **real** |
+| $D = 0$ | 1 (inflection) | a single flat spot, no reversal | knife-edge boundary |
+| $D < 0$ | 0 | monotonic — never reverses | the cubic shape is **not real** |
+
+The textbook quadratic discriminant is
+$b^2 - 4ac = (2\beta\_2)^2 - 4(3\beta\_3)(\beta\_1) = 4(\beta\_2^2 - 3\beta\_1\beta\_3) = 4D$;
+the factor of 4 never changes the sign, so we work with the tidier
+$D = \beta\_2^2 - 3\beta\_1\beta\_3$. For our cubic:
+
+```python
+D = b2**2 - 3*b1*b3
+print(f"D = {D:+.6f}  ->  {'two turning points' if D > 0 else 'monotonic'}")
+```
+
+```text
+D = +0.000035  ->  two turning points
+```
+
+![Same significant terms, three shapes: only the discriminant decides whether the cubic bends](python_kuznets_dmsp_15_discriminant_regimes.png)
+
+**Interpretation 2:** $D = +0.000035$ is positive, so the N-shape is real — but only *just*.
+The figure holds the linear and cubic terms at their fitted values and changes **only** the
+squared term: when $D<0$ the curve climbs monotonically, at $D=0$ it develops a single flat
+inflection, and once $D>0$ it bends into the genuine rise–fall–rise. Our cubic sits a hair
+above the $D=0$ knife-edge, so the third "act" — the post-\\$77k upturn — is real but faint,
+exactly the "barely perceptible uptick" the §8 scatter showed. A slightly smaller squared term
+would erase it altogether.
+
+### 9.3 Two checks, not one: significance is not shape
+
+Here is the trap. All three income terms in our cubic are individually significant, and it is
+tempting to conclude "therefore the relationship is a genuine cubic with two turning points."
+That inference is wrong as stated. Significance answers *"does the data prefer keeping this
+term?"*; it does **not** answer *"does the fitted curve actually bend inside the income range
+we observe?"* The discriminant — plus a check on *where* the turning points fall — answers the
+second question. Applying both checks to our cubic and to three illustrative cases makes the
+distinction concrete:
+
+```python
+def diagnose(label, b1, b2, b3, lo, hi):
+    D = b2**2 - 3*b1*b3
+    if D <= 0:
+        return dict(case=label, D=D, regime="monotonic (D<0)", in_range=False)
+    tp = np.exp(np.sort([(-b2 - np.sqrt(D))/(3*b3), (-b2 + np.sqrt(D))/(3*b3)]))
+    ok = bool((tp >= lo).all() and (tp <= hi).all())
+    regime = "2 turning points " + ("(both in range)" if ok else "(>=1 OUT of range)")
+    return dict(case=label, D=D, regime=regime, in_range=ok)
+
+lo, hi = agg.GDP_pc_Country.min(), agg.GDP_pc_Country.max()
+rows = [diagnose("This post's cubic (panel FE)",   b1,    b2,    b3,     lo, hi),
+        diagnose("Synthetic A: genuine N-shape",    0.220, -0.026, 0.0010, lo, hi),
+        diagnose("Synthetic B: monotonic trap",     0.220, -0.020, 0.0010, lo, hi),
+        diagnose("Synthetic C: turns out of range", 0.220, -0.026, 0.0001, lo, hi)]
+print(pd.DataFrame(rows).to_string(index=False))
+```
+
+```text
+                           case         D                              regime  in_range
+   This post's cubic (panel FE)  0.000035    2 turning points (both in range)      True
+   Synthetic A: genuine N-shape  0.000016    2 turning points (both in range)      True
+    Synthetic B: monotonic trap -0.000260                     monotonic (D<0)     False
+Synthetic C: turns out of range  0.000610 2 turning points (>=1 OUT of range)     False
+```
+
+Read the rows from top to bottom:
+
+- **This post's cubic** — $D = +0.000035 > 0$ and *both* turning points (\\$2,287 and
+  \\$77,206) fall inside the observed range (\\$190–\\$117,191). Significance and shape agree:
+  a genuine, if marginal, N-shape.
+- **Synthetic A** — the same sign pattern with a clean $D>0$ and both turning points in range.
+  This is what an unambiguous N-shape looks like.
+- **Synthetic B** (the trap) — the *same signs* as a real N-shape, only the squared term is a
+  touch smaller in magnitude, and $D = -0.00026 < 0$. The curve is monotonic everywhere. A
+  cubic regression on such data could report all three terms as "significant" and still have no
+  turning point at all.
+- **Synthetic C** — $D>0$, so two turning points exist *mathematically*, but the tiny cubic
+  term throws the upper one to an astronomical income far outside any real economy. Inside the
+  observed range the curve never reverses. "Two turning points exist" would be technically true
+  and practically misleading.
+
+**Interpretation 3:** significance (does the data want the term?) and the discriminant-plus-range
+check (does the curve actually bend, and where?) are different questions, and you need both.
+Reporting "all three GDP terms are significant, so the curve is cubic" can fail in two distinct
+ways — the discriminant can be negative (B), or the turning points can fall outside the data
+(C). The honest workflow is: report the coefficients, compute $D$, and *if* $D>0$ confirm the
+turning points lie inside the observed income range before claiming an inverted-U or N-shape.
+
+> **Aside (for Bayesian model averaging).** The same trap reappears with a different label. In a
+> BMA, a term's posterior inclusion probability (PIP) near 1.00 is the Bayesian analogue of
+> "statistically significant." But a high PIP on the cubic term no more guarantees a genuine
+> bend than a significant cubic coefficient does — you still compute
+> $D = \beta\_2^2 - 3\beta\_1\beta\_3$ from the posterior-mean coefficients and check the
+> turning-point range. The R companion post
+> [r_kuznets](/post/r_kuznets/#7-turning-points-and-the-discriminant-test) works this analogy
+> through with field data.
+
+## 10. What drives regional inequality?
 
 If two equally rich countries differ in regional inequality, what accounts for the gap? We
 add blocks of structural controls on top of the cubic — natural resources and farmland, trade
@@ -897,7 +1052,7 @@ the licensed ICRG database) cannot be reproduced and is omitted. The sample size
 columns (857 down to 585) as different controls go missing, so the columns should be read as
 separate windows, not a single nested model.
 
-## 10. Spatial robustness: Conley standard errors
+## 11. Spatial robustness: Conley standard errors
 
 Regions are not independent: a boom in one province spills into its neighbours, so their
 regression errors are correlated. Ignoring that makes standard errors too small and t-statistics
@@ -932,7 +1087,7 @@ above 5 at the widest radius), so the lights-predict-income relationship is not 
 mirage created by ignoring geography. The figure shows the confidence interval widening with
 the radius while the point estimate holds fixed.
 
-## 11. Regional versus personal inequality
+## 12. Regional versus personal inequality
 
 A natural question: is *regional* inequality (gaps between places) just a reflection of
 *personal* inequality (gaps between people)? We compare each country's regional Gini with its
@@ -957,7 +1112,7 @@ between a country's regions are also, in part, distributional policies between i
 This connects the satellite-based regional measure back to the inequality people actually
 experience.
 
-## 12. Discussion
+## 13. Discussion
 
 We set out to answer a measurement question — can we see inside countries from space? — and a
 substantive one — how does regional inequality move with development? The answer to the first
@@ -977,7 +1132,7 @@ resource dependence, ethnic division — are nameable. Two cautions frame all of
 relationships are descriptive associations with fixed effects, not causal effects; and the
 income figures are *predictions*, accurate on average but wrong for any single unusual region.
 
-## 13. Summary and next steps
+## 14. Summary and next steps
 
 - **Method insight.** Nighttime lights predict regional income with an elasticity of 0.102 and
   a 0.925 correlation with observed income; predicting income first, rather than equating light
@@ -998,7 +1153,7 @@ income figures are *predictions*, accurate on average but wrong for any single u
   past 2012; or carry the full-world prediction through to rebuild the global income map and
   the choropleth figures we skipped here.
 
-## 14. Exercises
+## 15. Exercises
 
 1. **Re-weight the world.** Modify `ineq_indices` to weight regions by land area instead of
    population, recompute the regional Gini for every country, and compare the cross-country
@@ -1010,7 +1165,7 @@ income figures are *predictions*, accurate on average but wrong for any single u
    10,000 km. Plot the standard error against the radius. At what distance does spatial
    correlation stop mattering for the light elasticity?
 
-## 15. References
+## 16. References
 
 1. [Lessmann, C., & Seidel, A. (2017). Regional inequality, convergence, and its determinants — A view from outer space. *European Economic Review*, 92, 110–132.](https://doi.org/10.1016/j.euroecorev.2016.11.009)
 2. [Henderson, J. V., Storeygard, A., & Weil, D. N. (2012). Measuring economic growth from outer space. *American Economic Review*, 102(2), 994–1028.](https://doi.org/10.1257/aer.102.2.994)
@@ -1019,6 +1174,8 @@ income figures are *predictions*, accurate on average but wrong for any single u
 5. [Conley, T. G. (1999). GMM estimation with cross sectional dependence. *Journal of Econometrics*, 92(1), 1–45.](https://doi.org/10.1016/S0304-4076(98)00084-0)
 6. [PyFixest — fast fixed-effects estimation in Python (documentation)](https://py-econometrics.github.io/pyfixest/)
 7. [linearmodels — panel data models in Python (documentation)](https://bashtage.github.io/linearmodels/)
+8. [Mendez, C. (2026). The spatial Kuznets curve in R: turning points and the discriminant test (companion post, synthetic replication of Lessmann 2013).](/post/r_kuznets/)
+9. [Mendez, C. (2026). Regional inequality and the Kuznets curve: panel fixed effects in Python (companion post).](/post/python_fe_kuznets/)
 
 ---
 

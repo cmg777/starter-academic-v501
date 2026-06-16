@@ -295,6 +295,66 @@ ax.set(xlim=(5.5, 11.8), ylim=(0, 0.16), xlabel="log GDP per capita",
 plt.show()
 ```
 
+## Turning points and the discriminant test
+
+A cubic *can* bend twice — but does it, and inside the income range we observe? The marginal
+effect $\partial\,\mathrm{GINIW}/\partial \ln Y = \beta_1 + 2\beta_2 \ln Y + 3\beta_3 (\ln Y)^2$
+is zero at the turning points, and two **real** turning points exist only when the discriminant
+$D = \beta_2^2 - 3\beta_1\beta_3$ is positive. (Significance of all three terms is necessary but
+not sufficient: we also need $D>0$ **and** both turning points inside the observed range.) The
+same two checks are developed at length in the R companion post
+[r_kuznets](https://carlos-mendez.org/post/r_kuznets/).
+
+```{python}
+#| label: turning-points
+GREY = "#b0a89a"
+b1, b2, b3c = [k3.coef()[t] for t in ["lg", "lg2", "lg3"]]
+D = b2**2 - 3*b1*b3c
+roots = np.sort([(-b2 - np.sqrt(D))/(3*b3c), (-b2 + np.sqrt(D))/(3*b3c)])
+lo, hi = agg.GDP_pc_Country.min(), agg.GDP_pc_Country.max()
+print(f"D = {D:+.6f}  (>0 -> two turning points)")
+print("turning points $:", np.exp(roots).round(0),
+      "| income range $:", round(lo), "-", round(hi))
+
+xg = np.linspace(agg.lg.min(), agg.lg.max(), 200)
+deriv = b1 + 2*b2*xg + 3*b3c*xg**2
+fig, ax = plt.subplots(figsize=(6.4, 4.2))
+ax.axhline(0, color=GREY, lw=0.9); ax.plot(xg, deriv, color=STEEL, lw=2.2)
+for r, u in zip(roots, np.exp(roots)):
+    ax.axvline(r, color=ORANGE, ls="--", lw=1.4); ax.plot([r], [0], "o", color=TEAL, ms=8)
+    ax.annotate(f"${u:,.0f}", (r, 0), (r, deriv.max()*0.5), ha="center", color=TEAL)
+ax.set(xlabel="log GDP per capita", ylabel="marginal effect",
+       title="Where does the curve turn?")
+plt.show()
+```
+
+Both turning points (about \$2,287 and \$77,206) fall inside the observed range, so this is a
+genuine — if marginal — N-shape: $D = +0.000035$ sits just above the $D=0$ knife-edge. Holding
+the linear and cubic terms fixed and varying **only** the squared term shows how the sign of $D$
+decides the shape:
+
+```{python}
+#| label: discriminant-regimes
+b2_zero = -np.sqrt(3*b1*b3c)
+fig, axes = plt.subplots(1, 3, figsize=(11, 3.4))
+for ax, (lab, p2) in zip(axes, [("D < 0 (monotonic)", -0.025),
+                                ("D = 0 (inflection)", b2_zero),
+                                ("D > 0 (genuine N)", b2)]):
+    f = b1*xg + p2*xg**2 + b3c*xg**3; f = f - f.mean()
+    ax.plot(xg, f, color=ORANGE, lw=2.0); ax.axhline(0, color=GREY, lw=0.7)
+    ax.set_title(f"{lab}\nD = {p2**2 - 3*b1*b3c:+.5f}", fontsize=10)
+    ax.set_xlabel("log GDP per capita")
+fig.suptitle("Same significant terms, three shapes", fontweight="bold")
+fig.tight_layout(); plt.show()
+```
+
+**Significance is not shape.** A cubic can have all three terms significant yet be monotonic
+($D<0$) or turn only outside the data ($D>0$ with a turning point at an absurd income). Always
+report the coefficients, compute $D$, and confirm the turning points are in range before claiming
+an N-shape — see
+[r_kuznets](https://carlos-mendez.org/post/r_kuznets/#7-turning-points-and-the-discriminant-test)
+for the full treatment, including the Bayesian model-averaging analogue.
+
 ## Determinants of regional inequality (Table 4)
 
 ```{python}

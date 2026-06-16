@@ -1,0 +1,5 @@
+case,b1,b2,b3,D,regime,tp_low,tp_high,in_range
+This post's cubic (panel FE),0.2931105750185993,-0.031969228608440134,0.0011223624678763785,3.5102652803088675e-05,2 turning points (both in range),2287.0483475639016,77205.84990618036,True
+Synthetic A: genuine N-shape,0.22,-0.026,0.001,1.5999999999999955e-05,2 turning points (both in range),1530.4748616641612,22026.465794806638,True
+Synthetic B: monotonic trap,0.22,-0.02,0.001,-0.00026,monotonic (D<0),,,False
+Synthetic C: turns out of range,0.22,-0.026,0.0001,0.00061,2 turning points (>=1 OUT of range),76.66202169327654,2.4724637248415368e+73,False
