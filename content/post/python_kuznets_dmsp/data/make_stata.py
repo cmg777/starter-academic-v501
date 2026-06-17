@@ -51,6 +51,8 @@ ZIP_NAME = "python_kuznets_dmsp_data.zip"
 STUDY_TITLE = "Regional Inequality from Outer Space"
 STUDY_SUB = ("Predicting regional GDP from nighttime lights and building inequality indices in "
              "Python - a replication of Lessmann & Seidel (2017).")
+PUB_YEAR = "2026"            # publication year of this dataset/replication (matches the post)
+AUTHOR = "Mendez, Carlos"
 
 # Columns that are 0/1 indicators -> get the yes/no value label.
 DUMMIES = {
@@ -933,7 +935,7 @@ code{background:#eef1f6;padding:1px 6px;border-radius:5px;font-size:.88em;
 ul.tight li{margin:5px 0}
 .explorer-controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:6px 0 12px}
 #varSearch{flex:1;min-width:240px;padding:9px 13px;border:1px solid var(--line);border-radius:9px;
-  font-size:14px;background:#fff}
+  font-size:14px;background:var(--card);color:var(--ink)}
 #varSearch:focus{outline:2px solid var(--steel);border-color:var(--steel)}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{background:#eef1f6;border:1px solid var(--line);color:#3b3f46;border-radius:20px;
@@ -946,16 +948,70 @@ ul.tight li{margin:5px 0}
 .tab.active{background:var(--steel);color:#fff;border-color:var(--steel)}
 .dl-grid td .btn{margin:2px 4px 2px 0}
 footer{padding:26px 20px 60px;color:var(--muted);font-size:13px}
+.hint{font-size:13px;color:var(--muted)}
+.vlink{color:var(--muted);font-size:12px;text-decoration:none;margin-left:5px;opacity:.55}
+.vlink:hover{opacity:1;color:var(--steel);text-decoration:none}
+nav.toc a.active{color:var(--steel);font-weight:700}
+#themeToggle{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--ink);
+  border-radius:8px;padding:3px 11px;font-size:14px;cursor:pointer;line-height:1.3}
+#themeToggle:hover{border-color:var(--steel);color:var(--steel)}
+:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
+/* ---- dark theme (boot script resolves OS preference to an explicit data-theme) ---- */
+[data-theme="dark"]{--bg:#0b1120;--card:#121a2e;--line:#26304a;--muted:#9aa6bd;--ink:#e8ecf2;}
+[data-theme="dark"] nav.toc{background:rgba(11,17,32,.92)}
+[data-theme="dark"] p.lead{color:#c2c9d6}
+[data-theme="dark"] th{background:#1b2540;color:#cdd6e6}
+[data-theme="dark"] table.sortable th:hover{background:#243056}
+[data-theme="dark"] table.sortable th.nosort:hover{background:#1b2540}
+[data-theme="dark"] tbody tr:hover{background:#172138}
+[data-theme="dark"] code{background:#1b2540;color:#cfe1f5}
+[data-theme="dark"] .note{background:#13233a}
+[data-theme="dark"] .btn.ghost{background:#1d2742}
+[data-theme="dark"] .btn.ghost:hover{background:#26304a}
+[data-theme="dark"] .chip{background:#1d2742;color:#c2c9d6}
+[data-theme="dark"] .tab{background:#1d2742;color:#c2c9d6}
+[data-theme="dark"] .missbar{background:#26304a}
+[data-theme="dark"] .spark-na{color:#5d6884}
 @media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:25px}
-  h2{font-size:20px}}
+  h2{font-size:20px}#themeToggle{margin-left:0}}
+@media print{
+  nav.toc,.tabs,#expandBtn,.code .copy,.explorer-controls,#themeToggle,.btn,.vlink,
+  .hero .back{display:none!important}
+  .ds-panel{display:block!important}
+  .tbl-wrap,.tbl-wrap.tall{max-height:none!important;overflow:visible!important}
+  .hero{background:#fff!important;color:#000!important}
+  .hero h1,.hero .kicker,.hero p.sub,.kpi .n,.kpi .l{color:#000!important}
+  .kpi{border-color:#bbb}
+  body{background:#fff;color:#000}
+  section{border-color:#ccc;page-break-inside:auto}
+}
 """
 
 _PAGE_JS = """
 function copyCode(b){var c=b.parentElement.querySelector('code').innerText;
  navigator.clipboard.writeText(c).then(function(){var t=b.textContent;b.textContent='Copied!';
   setTimeout(function(){b.textContent=t;},1400);});}
-function showTab(i){document.querySelectorAll('.ds-panel').forEach(function(p,j){p.style.display=(i===j?'block':'none');});
+var _activeTab=0,_expanded=false;
+function showTab(i){_activeTab=i;
+ document.querySelectorAll('.ds-panel').forEach(function(p,j){p.style.display=(i===j?'block':'none');});
  document.querySelectorAll('.tab').forEach(function(b,j){b.classList.toggle('active',i===j);});}
+function toggleExpand(){_expanded=!_expanded;
+ document.querySelectorAll('.ds-panel').forEach(function(p){p.style.display=_expanded?'block':'none';});
+ var tabs=document.querySelector('.tabs');if(tabs)tabs.style.display=_expanded?'none':'';
+ var b=document.getElementById('expandBtn');if(b)b.textContent=_expanded?'Tabbed view':'Expand all datasets';
+ if(!_expanded)showTab(_activeTab);}
+function openTab(e,i){if(e)e.preventDefault();
+ if(_expanded){var p=document.querySelectorAll('.ds-panel')[i];if(p)p.scrollIntoView({behavior:'smooth'});}
+ else{showTab(i);var d=document.getElementById('datasets');if(d)d.scrollIntoView({behavior:'smooth'});}}
+function copyVarLink(e,name){if(e)e.preventDefault();
+ var url=location.href.split('#')[0]+'#var-'+name;
+ try{history.replaceState(null,'','#var-'+name);}catch(_){}
+ navigator.clipboard.writeText(url).then(function(){var t=e.target,o=t.textContent;
+  t.textContent='\\u2713';setTimeout(function(){t.textContent=o;},1200);});}
+function toggleTheme(){var d=document.documentElement,t=(d.dataset.theme==='dark')?'light':'dark';
+ d.dataset.theme=t;try{localStorage.setItem('dd-theme',t);}catch(_){}setThemeIcon(t);}
+function setThemeIcon(t){var b=document.getElementById('themeToggle');
+ if(b){b.textContent=(t==='dark'?'\\u2600 Light':'\\u263e Dark');}}
 var _chip='all';
 function setChip(b){_chip=b.getAttribute('data-k');
  document.querySelectorAll('.chip').forEach(function(c){c.classList.toggle('active',c===b);});filterVars();}
@@ -974,7 +1030,21 @@ document.addEventListener('click',function(e){var th=e.target.closest('table.sor
  rows.sort(function(a,b){var x=a.children[idx].innerText.trim(),y=b.children[idx].innerText.trim();
   var nx=_num(x),ny=_num(y);if(nx!==null&&ny!==null)return asc?nx-ny:ny-nx;
   return asc?x.localeCompare(y):y.localeCompare(x);});rows.forEach(function(r){tb.appendChild(r);});});
-document.addEventListener('DOMContentLoaded',function(){if(document.getElementById('varSearch'))filterVars();showTab(0);});
+document.addEventListener('DOMContentLoaded',function(){
+ if(document.getElementById('varSearch'))filterVars();
+ showTab(0);
+ setThemeIcon(document.documentElement.dataset.theme||'light');
+ // scroll-spy: highlight the current section in the top nav
+ var links={};document.querySelectorAll('nav.toc a').forEach(function(a){links[a.getAttribute('href')]=a;});
+ if(window.IntersectionObserver){
+  var obs=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){
+   var id='#'+en.target.id;for(var k in links)links[k].classList.remove('active');
+   if(links[id])links[id].classList.add('active');}});},{rootMargin:'-45% 0px -50% 0px'});
+  document.querySelectorAll('main section[id]').forEach(function(s){obs.observe(s);});}
+ // deep link to a variable
+ if(location.hash.indexOf('#var-')===0){var r=document.getElementById(location.hash.slice(1));
+  if(r)setTimeout(function(){r.scrollIntoView({block:'center'});},60);}
+});
 """
 
 
@@ -1006,6 +1076,7 @@ def _dataset_panel(name, df):
 
 
 def _explorer(frames):
+    file_idx = {name[:-4]: i for i, name in enumerate(FILE_ORDER)}
     var_files, sample = {}, {}
     for name in FILE_ORDER:
         for c in frames[name].columns:
@@ -1015,11 +1086,18 @@ def _explorer(frames):
     for c in sorted(var_files):
         md = COLUMNS[c]
         k = _TYPE_FILTER[md["kind"]]
+        files = ", ".join(f'<a href="#datasets" onclick="openTab(event,{file_idx[fn]})">{h(fn)}</a>'
+                          for fn in var_files[c])
         rows.append(
-            f'<tr data-name="{h(c.lower())}" data-label="{h(md["label"].lower())}" data-kind="{k}">'
-            f'<td><code>{h(c)}</code></td><td>{type_badge(md["kind"])}</td>'
-            f'<td>{sparkline_svg(sample[c], md["kind"])}</td><td>{h(md["label"])}</td>'
-            f'<td>{h(md["units"])}</td><td>{h(", ".join(var_files[c]))}</td>'
+            f'<tr id="var-{h(c)}" data-name="{h(c.lower())}" data-label="{h(md["label"].lower())}" '
+            f'data-kind="{k}">'
+            f'<td><code>{h(c)}</code>'
+            f'<a class="vlink" href="#var-{h(c)}" title="Copy link to this variable" '
+            f'onclick="copyVarLink(event,\'{h(c)}\')">#</a></td>'
+            f'<td>{type_badge(md["kind"])}</td>'
+            f'<td>{sparkline_svg(sample[c], md["kind"])}</td>'
+            f'<td>{h(md["label"])}</td><td>{h(md["defn"])}</td>'
+            f'<td>{h(md["units"])}</td><td>{files}</td>'
             f'<td>{h(md["source"])}</td></tr>')
     controls = ('<div class="explorer-controls">'
                 '<input id="varSearch" type="search" oninput="filterVars()" '
@@ -1032,7 +1110,8 @@ def _explorer(frames):
                 '</div><span id="varCount" class="varcount"></span></div>')
     table = ('<div class="tbl-wrap tall"><table id="varTable" class="sortable"><thead><tr>'
              '<th>Variable</th><th>Type</th><th class="nosort">Distribution</th><th>Label</th>'
-             '<th>Units</th><th>In files</th><th>Source</th></tr></thead><tbody>'
+             '<th>Definition</th><th>Units</th><th>In files</th><th>Source</th>'
+             '</tr></thead><tbody>'
              + "".join(rows) + "</tbody></table></div>")
     return controls + table
 
@@ -1091,7 +1170,8 @@ def build_html(frames):
     for name in FILE_ORDER:
         for c in frames[name].columns:
             var_files.setdefault(c, set()).add(name)
-    matrix_rows = [[f"<code>{h(c)}</code>"] + ["&#9679;" if n in var_files[c] else "" for n in FILE_ORDER]
+    matrix_rows = [[f'<a href="#var-{h(c)}"><code>{h(c)}</code></a>']
+                   + ["&#9679;" if n in var_files[c] else "" for n in FILE_ORDER]
                    for c in sorted(var_files)]
     matrix_tbl = html_table(["Variable"] + [short[n] for n in FILE_ORDER], matrix_rows,
                             raw_cols=set(range(7)), tall=True)
@@ -1100,9 +1180,38 @@ def build_html(frames):
                    for i, name in enumerate(FILE_ORDER))
     panels = "".join(_dataset_panel(name, frames[name]) for name in FILE_ORDER)
 
+    # citations (APA + BibTeX); f-string braces doubled where literal braces are needed
+    apa_text = (f"Mendez, C. ({PUB_YEAR}). Regional inequality from outer space: Predicting GDP "
+                f"from nighttime lights and building inequality indices in Python [Data set]. "
+                f"{SITE_POST}\n\n"
+                "Lessmann, C., & Seidel, A. (2017). Regional inequality, convergence, and its "
+                "determinants — A view from outer space. European Economic Review, 92, "
+                "110–132.")
+    bibtex_text = (
+        "@misc{mendez2026kuznetsdmsp,\n"
+        "  author       = {Mendez, Carlos},\n"
+        "  title        = {Regional Inequality from Outer Space: Predicting GDP from Nighttime "
+        "Lights and Building Inequality Indices in Python},\n"
+        f"  year         = {{{PUB_YEAR}}},\n"
+        f"  howpublished = {{\\url{{{SITE_POST}}}}},\n"
+        "  note         = {Data set; replication of Lessmann and Seidel (2017)}\n"
+        "}\n\n"
+        "@article{lessmann2017regional,\n"
+        "  author  = {Lessmann, Christian and Seidel, Andr\\'{e}},\n"
+        "  title   = {Regional inequality, convergence, and its determinants---A view from outer "
+        "space},\n"
+        "  journal = {European Economic Review},\n"
+        "  volume  = {92},\n"
+        "  pages   = {110--132},\n"
+        "  year    = {2017}\n"
+        "}")
+
     out = [
         "<!doctype html>", '<html lang="en"><head>', '<meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
+        '<script>(function(){try{var t=localStorage.getItem("dd-theme");'
+        'if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";'
+        'document.documentElement.dataset.theme=t;}catch(e){}})();</script>',
         f"<title>Data dictionary &middot; {h(STUDY_TITLE)}</title>",
         f'<meta name="description" content="Interactive data dictionary for {h(STUDY_TITLE)}: '
         'datasets, variables, distributions, and downloads.">',
@@ -1114,9 +1223,12 @@ def build_html(frames):
         f'<div class="kpis">{kpi_html}</div>', "</div></header>",
         '<nav class="toc"><div class="wrap">',
         '<a href="#downloads">Downloads</a><a href="#load">Load in code</a>',
-        '<a href="#overview">Overview</a><a href="#explorer">Variable explorer</a>',
-        '<a href="#index">Cross-file index</a><a href="#formulas">Formulas</a>',
-        '<a href="#datasets">Datasets</a><a href="#caveats">Caveats</a>',
+        '<a href="#overview">Overview</a><a href="#cite">Cite</a>',
+        '<a href="#explorer">Variable explorer</a><a href="#index">Cross-file index</a>',
+        '<a href="#formulas">Formulas</a><a href="#datasets">Datasets</a>',
+        '<a href="#caveats">Caveats</a>',
+        '<button id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">'
+        '&#9790; Dark</button>',
         "</div></nav>", '<main class="wrap">',
 
         '<section id="downloads"><h2>Downloads</h2>',
@@ -1152,6 +1264,11 @@ def build_html(frames):
         'regional incomes in the region files.</div>',
         "<h3>Data sources</h3>", src_tbl, "</section>",
 
+        '<section id="cite"><h2>Cite this data</h2>',
+        '<p class="lead">Please cite both this dataset/replication and the original study.</p>',
+        "<h3>APA</h3>", code_block(apa_text),
+        "<h3>BibTeX</h3>", code_block(bibtex_text), "</section>",
+
         '<section id="explorer"><h2>Variable explorer '
         f'<span class="hint">search &amp; filter all {len(all_cols)} variables</span></h2>',
         '<p class="lead">Type to filter by name or label, or use the chips to filter by type. Each '
@@ -1168,6 +1285,9 @@ def build_html(frames):
         '<section id="datasets"><h2>The six datasets</h2>',
         '<p class="lead">Switch datasets with the tabs. Each shows the full variable dictionary plus '
         'a sortable statistics table with mini distributions and data coverage.</p>',
+        '<p><button id="expandBtn" class="btn ghost small" onclick="toggleExpand()">'
+        'Expand all datasets</button> <span class="hint">expand to search '
+        '(Ctrl/&#8984;+F) or print across all six datasets</span></p>',
         f'<div class="tabs">{tabs}</div>{panels}', "</section>",
 
         '<section id="caveats"><h2>Known limitations &amp; caveats</h2>',
