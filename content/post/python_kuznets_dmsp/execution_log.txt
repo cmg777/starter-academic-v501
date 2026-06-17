@@ -27,6 +27,10 @@ Resources_rents_share_of_GDP      1992      2012          177 3620
                    fedelupd2      1992      2009          154 2724
     Figure_5 Giniall coverage: [{'year_min': 1992, 'year_max': 2012, 'n_countries': 153, 'N': 1330}]
 
+[1c] EDA -- key variables over 5-year periods (box-plots) ...
+    median region GDP p.c. by period: {'90-94': 2419.132, '95-99': 6943.359, '00-04': 8272.157, '05-09': 9344.879, '10-14': 13818.833}
+    median regional Gini by period: {'90-94': 0.063, '95-99': 0.061, '00-04': 0.059, '05-09': 0.061, '10-14': 0.059}
+
 [2] EDA -- cross-country dynamics of the key variables ...
     light: mean=0.96 | GINIW: mean=0.064, median=0.061, max=0.163
     GINIW 0.0702 (1992) -> 0.0612 (2012)
@@ -81,7 +85,7 @@ Synthetic C: turns out of range 0.220000 -0.026000 0.000100  0.000610 2 turning 
     n=144 countries | OLS slope=0.587
 
 ===========================================================================
-Generated 17 figures and 16 CSV result files.
-Figures: python_kuznets_dmsp_01_distributions.png, python_kuznets_dmsp_02_time_trends.png, python_kuznets_dmsp_03_by_wb_region.png, python_kuznets_dmsp_04_index_corr_heatmap.png, python_kuznets_dmsp_05_table1.png, python_kuznets_dmsp_06_predicted_vs_observed.png, python_kuznets_dmsp_07_population_weights.png, python_kuznets_dmsp_08_table2_correlations.png, python_kuznets_dmsp_09_table3.png, python_kuznets_dmsp_10_kuznets_scatter.png, python_kuznets_dmsp_11_table4.png, python_kuznets_dmsp_12_conley_se.png, python_kuznets_dmsp_13_regional_vs_personal.png, python_kuznets_dmsp_14_turning_points.png, python_kuznets_dmsp_15_discriminant_regimes.png, python_kuznets_dmsp_16_summary_region.png, python_kuznets_dmsp_17_summary_country.png
+Generated 19 figures and 16 CSV result files.
+Figures: python_kuznets_dmsp_01_distributions.png, python_kuznets_dmsp_02_time_trends.png, python_kuznets_dmsp_03_by_wb_region.png, python_kuznets_dmsp_04_index_corr_heatmap.png, python_kuznets_dmsp_05_table1.png, python_kuznets_dmsp_06_predicted_vs_observed.png, python_kuznets_dmsp_07_population_weights.png, python_kuznets_dmsp_08_table2_correlations.png, python_kuznets_dmsp_09_table3.png, python_kuznets_dmsp_10_kuznets_scatter.png, python_kuznets_dmsp_11_table4.png, python_kuznets_dmsp_12_conley_se.png, python_kuznets_dmsp_13_regional_vs_personal.png, python_kuznets_dmsp_14_turning_points.png, python_kuznets_dmsp_15_discriminant_regimes.png, python_kuznets_dmsp_16_summary_region.png, python_kuznets_dmsp_17_summary_country.png, python_kuznets_dmsp_18_eda_region_boxplots.png, python_kuznets_dmsp_19_eda_country_boxplots.png
 
 === Script completed successfully ===

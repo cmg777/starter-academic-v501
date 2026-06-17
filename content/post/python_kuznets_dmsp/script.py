@@ -155,52 +155,87 @@ def _fmt(v):
     return f"{v:.4f}"
 
 
-def summary_table(spec, title, path, note):
-    """spec: list of (label, Series). Render N / mean / sd / min / median / max."""
-    cols = ["N", "mean", "sd", "min", "median", "max"]
+def summarise_panel(spec, y0, y1, title, path, note):
+    """Panel summary table for ALL substantive variables of one unit of observation.
+
+    spec: list of (label, df, col, scale). Columns: N / mean / sd / min / median /
+    max / mean in the first panel year (y0) / mean in the last panel year (y1).
+    If a variable is unobserved in an endpoint year, fall back to its nearest
+    observed year (earliest for y0, latest for y1).
+    """
+    cols = ["N", "mean", "sd", "min", "median", "max", f"mean {y0}", f"mean {y1}"]
     rlab, cells = [], []
-    for label, s in spec:
-        s = pd.to_numeric(s, errors="coerce")
+    for label, df, col, scale in spec:
+        s = pd.to_numeric(df[col], errors="coerce") * scale
+        yr = df["year"]
+        obs = sorted(yr[s.notna()].unique())
+
+        def yr_mean(target, latest=False):
+            v = s[yr == target]
+            if v.notna().any():
+                return v.mean()
+            if not obs:
+                return np.nan
+            return s[yr == (obs[-1] if latest else obs[0])].mean()
+
         rlab.append(label)
         cells.append([f"{int(s.notna().sum()):,}", _fmt(s.mean()), _fmt(s.std()),
-                      _fmt(s.min()), _fmt(s.median()), _fmt(s.max())])
-    render_table_png(cols, rlab, cells, title, path, note=note, figw=9.0)
+                      _fmt(s.min()), _fmt(s.median()), _fmt(s.max()),
+                      _fmt(yr_mean(y0)), _fmt(yr_mean(y1, latest=True))])
+    render_table_png(cols, rlab, cells, title, path, note=note, figw=11.5)
     return pd.DataFrame(cells, index=rlab, columns=cols)
 
 
+# All substantive region-level variables (Prediction + Table_2); IDs and the
+# one-hot region-group / satellite dummies are excluded.
 region_spec = [
-    ("Observed GDP p.c. (region, US$)", pred["GDP_pc_Region"]),
-    ("Predicted GDP p.c. (region, US$)", t2["pred_GDP_pc_Region"]),
-    ("Log light per pixel (region)", pred["log_Light_ppix_Region"]),
-    ("Total light (region, summed DN)", t2["Light_Region"]),
-    ("Population (region)", pred["Pop_Region"]),
+    ("Observed GDP p.c. (region, US$)", pred, "GDP_pc_Region", 1),
+    ("Predicted GDP p.c. (region, US$)", t2, "pred_GDP_pc_Region", 1),
+    ("log observed GDP p.c. (region)", pred, "log_GDP_pc_Region", 1),
+    ("log GDP p.c. (country)", pred, "log_GDP_pc_Country", 1),
+    ("log light per pixel (region)", pred, "log_Light_ppix_Region", 1),
+    ("Total light (region, summed DN)", t2, "Light_Region", 1),
+    ("Total light (country, summed DN)", t2, "Light_Country", 1),
+    ("log # top-coded pixels", pred, "log_N_pix_top_cod_1_ppix", 1),
+    ("log # low-coded pixels", pred, "log_N_pix_low_cod_1_ppix", 1),
+    ("log region area", pred, "log_area", 1),
+    ("log # regions in country", pred, "log_region", 1),
+    ("log region x log area", pred, "log_region_X_log_area", 1),
+    ("Population (region)", pred, "Pop_Region", 1),
+    ("Population (country)", pred, "Pop_Country", 1),
 ]
+# All substantive country-level variables (Table_3 + Table_4 + Figure_5).
 country_spec = [
-    ("GDP p.c. (country, US$)", t3["GDP_pc_Country"]),
-    ("Regional Gini (GINIW)", t3["GINIW_pred_GDP_pc"]),
-    ("Coeff. of variation (CV)", t3["COVW_pred_GDP_pc"]),
-    ("Theil index GE(1)", t3["GE_1W_pred_GDP_pc"]),
-    ("Mean log deviation GE(0)", t3["GE_0W_pred_GDP_pc"]),
-    ("GE(-1)", t3["GE_m1W_pred_GDP_pc"]),
-    ("Resource rents (% GDP)", t4["Resources_rents_share_of_GDP"]),
-    ("Arable land (share)", t4["Arable_land"]),
-    ("Trade (share of GDP)", t4["Trade_GDP_share"]),
-    ("FDI (share of GDP)", t4["FDI_share_of_GDP"]),
-    ("Gasoline price (US$/L)", t4["price_gasoline"]),
-    ("Net aid (US$ bn)", t4["Aid"] / 1e9),
-    ("Secondary enrollment (%)", t4["School_enrollment_secondary"]),
-    ("Ethnic inequality (light Gini)", t4["GINIW_Eth_light"]),
-    ("Polity2 (-1 to +1)", t4["Polity2"]),
-    ("Personal income Gini (0-100)", f5["Giniall"]),
+    ("GDP p.c. (country, US$)", t3, "GDP_pc_Country", 1),
+    ("Regional Gini (GINIW)", t3, "GINIW_pred_GDP_pc", 1),
+    ("Coeff. of variation (CV)", t3, "COVW_pred_GDP_pc", 1),
+    ("Theil index GE(1)", t3, "GE_1W_pred_GDP_pc", 1),
+    ("Mean log deviation GE(0)", t3, "GE_0W_pred_GDP_pc", 1),
+    ("GE(-1)", t3, "GE_m1W_pred_GDP_pc", 1),
+    ("Population (country)", t4, "Pop_Country", 1),
+    ("Resource rents (% GDP)", t4, "Resources_rents_share_of_GDP", 1),
+    ("Arable land (share)", t4, "Arable_land", 1),
+    ("Trade (share of GDP)", t4, "Trade_GDP_share", 1),
+    ("FDI (share of GDP)", t4, "FDI_share_of_GDP", 1),
+    ("Land area (sq km)", t4, "area", 1),
+    ("Gasoline price (US$/L)", t4, "price_gasoline", 1),
+    ("Net aid (US$ bn)", t4, "Aid", 1e-9),
+    ("Secondary enrollment (% gross)", t4, "School_enrollment_secondary", 1),
+    ("Ethnic inequality (light Gini)", t4, "GINIW_Eth_light", 1),
+    ("Polity2 (-1 to +1)", t4, "Polity2", 1),
+    ("Federal state (0/1)", t4, "fedelupd2", 1),
+    ("Personal income Gini (0-100)", f5, "Giniall", 1),
 ]
-sr = summary_table(region_spec, "Summary statistics: region-level variables",
-                   fig_path(16, "summary_region"),
-                   note="Region-year observations. Construction & sources: data dictionary "
-                        "(Appendix A).")
-sc = summary_table(country_spec, "Summary statistics: country-level variables",
-                   fig_path(17, "summary_country"),
-                   note="Country-year observations; net aid scaled to US$ billions. "
-                        "Construction & sources: Appendix A.")
+sr = summarise_panel(region_spec, 1992, 2010,
+                     "Summary statistics: region-level variables (panel, 1992-2010)",
+                     fig_path(16, "summary_region"),
+                     note="Region-year (training sample). 'mean 1992 / mean 2010' = mean in the "
+                          "first / last panel year. Construction & sources: Appendix A.")
+sc = summarise_panel(country_spec, 1992, 2012,
+                     "Summary statistics: country-level variables (panel, 1992-2012)",
+                     fig_path(17, "summary_country"),
+                     note="Country-year. 'mean 1992 / mean 2012' = mean in the first / last panel "
+                          "year; net aid in US$ bn. Construction & sources: Appendix A.")
 sr.to_csv(f"{SLUG}_summary_region.csv")
 sc.to_csv(f"{SLUG}_summary_country.csv")
 
@@ -234,6 +269,93 @@ print(cov[(cov.file == "Table_4_data") & (cov.column.isin(_show))]
 print("    Figure_5 Giniall coverage:",
       cov[(cov.file == "Figure_5_data") & (cov.column == "Giniall")]
       [["year_min", "year_max", "n_countries", "N"]].to_dict("records"))
+
+# ===========================================================================
+# 1c. EXPLORATORY DATA ANALYSIS: KEY VARIABLES OVER TIME (5-YEAR PERIODS)
+# ===========================================================================
+# Box-plots over time: each box is the cross-sectional distribution of a
+# variable across units within a 5-year period (the same periods used by the
+# Kuznets regressions). Reading left->right shows the time dynamics; the box
+# height shows the cross-sectional spread in that period.
+print("\n[1c] EDA -- key variables over 5-year periods (box-plots) ...")
+P_BINS = [1989, 1994, 1999, 2004, 2009, 2014]
+P_LABS = ["90-94", "95-99", "00-04", "05-09", "10-14"]
+
+
+def period_boxes(ax, df, unit, col, title, logy=False):
+    d = df[df["year"].between(1990, 2014)].copy()
+    d["p"] = pd.cut(d["year"], P_BINS, labels=P_LABS)
+    if unit is None:                                   # pool unit-years (no unit id)
+        g = d[["p", col]].rename(columns={col: "v"})
+    else:                                              # one value per unit per period
+        g = (d.groupby([unit, "p"], observed=True)[col].mean()
+             .reset_index().rename(columns={col: "v"}))
+    cats = [c for c in P_LABS if (g["p"] == c).any()]
+    data = [pd.to_numeric(g.loc[g["p"] == c, "v"], errors="coerce").dropna().values
+            for c in cats]
+    bp = ax.boxplot(data, patch_artist=True, showfliers=False, widths=0.6)
+    for patch in bp["boxes"]:
+        patch.set(facecolor=STEEL, alpha=0.65, edgecolor=INK)
+    for med in bp["medians"]:
+        med.set(color=ORANGE, linewidth=2)
+    ax.set_xticks(range(1, len(cats) + 1))
+    ax.set_xticklabels(cats)
+    if logy:
+        ax.set_yscale("log")
+    ax.set_title(title, fontsize=11)
+    ax.set_xlabel("5-year period")
+
+
+# --- Figure 18: region-level variables (training sample, 1992-2010) --------
+fig, axes = plt.subplots(2, 2, figsize=(10, 7.2))
+period_boxes(axes[0, 0], pred, "code_Coutry_Region", "log_Light_ppix_Region",
+             "Log light per pixel")
+period_boxes(axes[0, 1], pred, "code_Coutry_Region", "GDP_pc_Region",
+             "Observed GDP p.c. (US$, log axis)", logy=True)
+period_boxes(axes[1, 0], t2, None, "pred_GDP_pc_Region",
+             "Predicted GDP p.c. (US$, log axis)", logy=True)
+period_boxes(axes[1, 1], pred, "code_Coutry_Region", "Pop_Region",
+             "Population (log axis)", logy=True)
+fig.suptitle("Region-level variables over time (training sample: 81 countries, 1992-2010)",
+             fontweight="bold")
+fig.tight_layout(rect=(0, 0, 1, 0.95))
+fig.savefig(fig_path(18, "eda_region_boxplots"))
+plt.close(fig)
+
+# --- Figure 19: country-level variables (180 countries, 1992-2012) ---------
+t4 = t4.assign(Aid_bn=t4["Aid"] / 1e9)                 # net aid in US$ billions
+country_eda = [
+    (t3, "GDP_pc_Country", "GDP p.c. (US$, log axis)", True),
+    (t3, "GINIW_pred_GDP_pc", "Regional Gini (GINIW)", False),
+    (t4, "Resources_rents_share_of_GDP", "Resource rents (% GDP)", False),
+    (t4, "Trade_GDP_share", "Trade (share of GDP)", False),
+    (t4, "price_gasoline", "Gasoline price (US$/L)", False),
+    (t4, "Aid_bn", "Net aid (US$ bn)", False),
+    (t4, "GINIW_Eth_light", "Ethnic inequality", False),
+    (f5, "Giniall", "Personal income Gini", False),
+]
+fig, axes = plt.subplots(2, 4, figsize=(16, 7.4))
+for ax, (df, col, title, logy) in zip(axes.flat, country_eda):
+    period_boxes(ax, df, "Country_ISO", col, title, logy=logy)
+fig.suptitle("Country-level variables over time (180 countries, 1992-2012)",
+             fontweight="bold")
+fig.tight_layout(rect=(0, 0, 1, 0.95))
+fig.savefig(fig_path(19, "eda_country_boxplots"))
+plt.close(fig)
+
+
+def _period_med(df, unit, col):
+    d = df[df["year"].between(1990, 2014)].copy()
+    d["p"] = pd.cut(d["year"], P_BINS, labels=P_LABS)
+    m = (d.groupby([unit, "p"], observed=True)[col].mean()
+         .groupby("p", observed=True).median())
+    return {k: round(float(v), 3) for k, v in m.items()}
+
+
+print("    median region GDP p.c. by period:",
+      _period_med(pred, "code_Coutry_Region", "GDP_pc_Region"))
+print("    median regional Gini by period:",
+      _period_med(t3, "Country_ISO", "GINIW_pred_GDP_pc"))
 
 # ===========================================================================
 # 2. EDA: CROSS-COUNTRY DYNAMICS OF INEQUALITY
@@ -277,6 +399,7 @@ yr = (eda[(eda.year >= 1992) & (eda.year <= 2012)]
 fig, ax1 = plt.subplots(figsize=(7, 4.2))
 ax1.plot(yr.year, yr.GINIW, color=STEEL, marker="o", lw=2, label="mean GINIW")
 ax1.set(xlabel="year", ylabel="mean regional inequality (GINIW)")
+ax1.set_xticks([1992, 1996, 2000, 2004, 2008, 2012])   # integer years, no decimals
 ax1.tick_params(axis="y", labelcolor=STEEL)
 ax2 = ax1.twinx()
 ax2.plot(yr.year, yr.logGDP, color=ORANGE, marker="s", lw=2,

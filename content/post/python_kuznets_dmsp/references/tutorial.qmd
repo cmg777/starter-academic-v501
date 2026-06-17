@@ -131,6 +131,51 @@ print()
 print(country.round(3))
 ```
 
+### Exploratory data analysis
+
+Summary tables hide how the *whole distribution* moves over time. Box-plots over the five 5-year
+periods (the same periods used in the Kuznets regressions) show both the cross-sectional spread (box
+height) and the time dynamics (left → right) — once for region-level, once for country-level variables.
+
+```{python}
+#| label: eda-boxplots
+def period_boxes(ax, df, unit, col, title, logy=False):
+    d = df[df.year.between(1990, 2014)].assign(
+        p=lambda x: pd.cut(x.year, [1989, 1994, 1999, 2004, 2009, 2014],
+                           labels=["90-94", "95-99", "00-04", "05-09", "10-14"]))
+    g = (d[["p", col]] if unit is None
+         else d.groupby([unit, "p"], observed=True)[col].mean().reset_index())
+    cats = [c for c in ["90-94", "95-99", "00-04", "05-09", "10-14"] if (g["p"] == c).any()]
+    bp = ax.boxplot([pd.to_numeric(g.loc[g["p"] == c, col], errors="coerce").dropna() for c in cats],
+                    patch_artist=True, showfliers=False, widths=0.6)
+    for b in bp["boxes"]:
+        b.set(facecolor=STEEL, alpha=0.65, edgecolor=INK)
+    for m in bp["medians"]:
+        m.set(color=ORANGE, linewidth=2)
+    ax.set_xticks(range(1, len(cats) + 1)); ax.set_xticklabels(cats)
+    if logy:
+        ax.set_yscale("log")
+    ax.set_title(title, fontsize=10)
+
+fig, axes = plt.subplots(2, 2, figsize=(9, 6.5))
+period_boxes(axes[0, 0], pred, "code_Coutry_Region", "log_Light_ppix_Region", "Log light per pixel")
+period_boxes(axes[0, 1], pred, "code_Coutry_Region", "GDP_pc_Region", "Observed GDP p.c. (log)", logy=True)
+period_boxes(axes[1, 0], t2, None, "pred_GDP_pc_Region", "Predicted GDP p.c. (log)", logy=True)
+period_boxes(axes[1, 1], pred, "code_Coutry_Region", "Pop_Region", "Population (log)", logy=True)
+fig.suptitle("Region-level variables over time", fontweight="bold"); fig.tight_layout(); plt.show()
+
+cc = [(t3, "GDP_pc_Country", "GDP p.c. (log)", True),
+      (t3, "GINIW_pred_GDP_pc", "Regional Gini", False),
+      (t4, "Resources_rents_share_of_GDP", "Resource rents (% GDP)", False),
+      (t4, "Trade_GDP_share", "Trade / GDP", False),
+      (t4, "price_gasoline", "Gasoline price ($/L)", False),
+      (f5, "Giniall", "Personal income Gini", False)]
+fig, axes = plt.subplots(2, 3, figsize=(12, 6.5))
+for ax, (df, col, title, logy) in zip(axes.flat, cc):
+    period_boxes(ax, df, "Country_ISO", col, title, logy=logy)
+fig.suptitle("Country-level variables over time", fontweight="bold"); fig.tight_layout(); plt.show()
+```
+
 ## Cross-country dynamics of inequality
 
 Before modelling anything, we map the landscape: how the regional Gini differs across world

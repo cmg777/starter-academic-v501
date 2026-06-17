@@ -461,14 +461,17 @@ and public databases; tracing that chain is what makes the numbers interpretable
 
 ### 4.4 Descriptive statistics
 
-With the variables defined, two summary tables give their shape. We split by unit of observation,
-because the region files (1992–2010) and the country files (1992–2012) sit on different panels.
+With the variables defined, two summary tables give their shape — **every substantive variable**,
+split by unit of observation (the region files run 1992–2010, the country files 1992–2012). Besides
+the usual N / mean / sd / min / median / max, each row also carries the variable's **mean in the
+first and last panel year**, so the panel's time dimension is visible directly in the table.
 
 ```python
-# N, mean, sd, min, median, max for the numeric variables, by unit of observation
-region_stats  = summarise(region_level_vars)      # observed/predicted income, light, population
-country_stats = summarise(country_level_vars)     # GDP, the 5 indices, the determinants
-print(country_stats.round(3))                      # see script.py for the full table builder
+# all substantive variables: N, mean, sd, min, median, max, plus the mean in the
+# first vs last panel year (so level shifts over the panel show up in the table)
+region_stats  = summarise_panel(region_vars,  y0=1992, y1=2010)   # 14 region-level variables
+country_stats = summarise_panel(country_vars, y0=1992, y1=2012)   # 19 country-level variables
+print(country_stats)                               # see script.py for the full table builder
 ```
 
 ![Summary statistics of the region-level variables](python_kuznets_dmsp_16_summary_region.png)
@@ -484,7 +487,51 @@ determinants are where to be careful: several are **sparsely observed** — the 
 (N = 1,366), the personal income Gini (N = 1,330), secondary enrolment (N = 2,566) and net aid
 (N = 2,964) cover far fewer country-years than the core panel's 3,675 — which is exactly why §10's
 determinant regressions run on shifting subsamples. The full per-variable coverage, construction,
-and sources are tabulated in [Appendix A](#appendix-a-data-dictionary).
+and sources are tabulated in [Appendix A](#appendix-a-data-dictionary). The first/last-year columns
+already hint at the dynamics — the regional Gini drifts from 0.070 (1992) to 0.061 (2012) while mean
+country GDP per capita climbs from \\$9,962 to \\$14,892 — which §4.5 now makes visual.
+
+### 4.5 Exploratory data analysis
+
+Summary tables compress each variable to a few numbers; they hide how the *whole distribution* moves
+over time. A **box-plot over time** restores that. We bin the years into the same five 5-year periods
+used later in the Kuznets regressions (§8) and, for each period, draw a box of the variable's
+distribution across units (each unit contributes its period mean). Reading a row of boxes
+left-to-right shows the **time dynamics**; the height of each box shows the **cross-sectional spread**
+in that period. We do this once for the region-level variables and once for the country-level ones,
+so you can get a feel for every dataset.
+
+```python
+# one box per 5-year period; box = cross-sectional distribution of unit period-means
+def period_boxes(ax, df, unit, col, logy=False):
+    df = df.assign(p=pd.cut(df.year, [1989, 1994, 1999, 2004, 2009, 2014],
+                            labels=["90–94", "95–99", "00–04", "05–09", "10–14"]))
+    g = df.groupby([unit, "p"], observed=True)[col].mean().reset_index()
+    ax.boxplot([g.loc[g.p == c, col].dropna() for c in g.p.cat.categories], showfliers=False)
+    if logy:
+        ax.set_yscale("log")
+# ... 2x2 region panels + 2x4 country panels; see script.py for the full builder
+```
+
+![Region-level key variables over time, by 5-year period](python_kuznets_dmsp_18_eda_region_boxplots.png)
+
+The region-level panels (from `Prediction_Data` and `Table_2`, the 81-country training sample) tell a
+clear growth story: **log light per pixel** and both **observed and predicted GDP per capita** shift
+upward period by period — median region income rises more than fivefold, from about \\$2,400 in
+1990–94 to \\$13,800 in 2010–14 — while **regional population** is broadly flat with an enormous spread
+(regions span five orders of magnitude). The light and income boxes also *widen* over time, a reminder
+that the DMSP sensors read brighter in later years.
+
+![Country-level key variables over time, by 5-year period](python_kuznets_dmsp_19_eda_country_boxplots.png)
+
+The country-level panels pull from three datasets — `Table_3` (GDP and the regional Gini), `Table_4`
+(the determinants), and `Figure_5` (the personal Gini). Country GDP per capita rises steadily; the
+**regional Gini** is strikingly stable around 0.06 with a slowly narrowing spread (the convergence §5
+will quantify); **gasoline prices** and **trade shares** drift upward; **resource rents** and **net
+aid** are heavily right-skewed with fat upper tails in every period; and the **personal income Gini**
+edges down. Two cautions the boxes make obvious: the determinants are noisier and patchier than the
+core variables (recall their thinner coverage, §4.4), and the region-level boxes describe only the
+81-country training subsample, not all 180 countries.
 
 With the data documented, we look at how inequality behaves across countries.
 
