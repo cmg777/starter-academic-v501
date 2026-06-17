@@ -1249,7 +1249,7 @@ the exact figure, step by step.
 # pf.feols hides the fixed effects; statsmodels with C(...) keeps them as
 # coefficients we can read off. Same model, just a form we can take apart.
 import statsmodels.formula.api as smf
-mfe = smf.ols("GINIW_pred_GDP_pc ~ lg + lg2 + lg3 + C(Country_ISO) + C(p5)", agg3).fit()
+mfe = smf.ols("GINIW_pred_GDP_pc ~ lg + lg2 + lg3 + C(Country_ISO) + C(p5)", agg).fit()
 bb  = {k: mfe.params[k] for k in ["lg", "lg2", "lg3"]}   # the three cubic coefficients
 ```
 
@@ -1261,15 +1261,15 @@ bb  = {k: mfe.params[k] for k in ["lg", "lg2", "lg3"]}   # the three cubic coeff
 peff = {1: 0.0}
 for k in (2, 3, 4, 5):
     peff[k] = mfe.params.get(f"C(p5)[T.{k}]", 0.0)
-agg3["partial"] = agg3["GINIW_pred_GDP_pc"] - agg3["p5"].map(peff)
+agg["partial"] = agg["GINIW_pred_GDP_pc"] - agg["p5"].map(peff)
 ```
 
 ```python
 # --- Step 3: choose a constant so the curve sits inside the cloud -----------
 # The country dummies shift the whole cloud up/down; we recenter the curve to the
 # average height of the points so the line is drawn through them, not above/below.
-cons = (agg3["partial"]
-        - (bb["lg"]*agg3.lg + bb["lg2"]*agg3.lg2 + bb["lg3"]*agg3.lg3)).mean()
+cons = (agg["partial"]
+        - (bb["lg"]*agg.lg + bb["lg2"]*agg.lg2 + bb["lg3"]*agg.lg3)).mean()
 
 # --- Step 4: evaluate the fitted cubic on a smooth grid of incomes ----------
 xs = np.linspace(5.5, 11.8, 200)                          # log-income grid
@@ -1280,7 +1280,7 @@ ys = cons + bb["lg"]*xs + bb["lg2"]*xs**2 + bb["lg3"]*xs**3
 # --- Step 5: draw the scatter of points + the fitted curve ------------------
 # STEEL / INK are the site palette (steel blue, near-black).
 fig, ax = plt.subplots(figsize=(6.4, 4.6))
-ax.scatter(agg3.lg, agg3.partial, s=14, facecolors="none",   # the cloud, net of period effects
+ax.scatter(agg.lg, agg.partial, s=14, facecolors="none",   # the cloud, net of period effects
            edgecolors=STEEL, alpha=0.55)
 ax.plot(xs, ys, color=INK, lw=2.4, label="fitted cubic")     # the curve on top
 ax.set(xlim=(5.5, 11.8), ylim=(0, 0.16), xlabel="log GDP per capita",
