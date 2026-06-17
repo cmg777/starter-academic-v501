@@ -732,11 +732,13 @@ def linkify(text):
         h(text))
 
 
-def html_table(headers, rows, raw_cols=(), sortable=False, tid=""):
+def html_table(headers, rows, raw_cols=(), sortable=False, tid="", tall=False, nosort_cols=()):
     cls = ' class="sortable"' if sortable else ""
     idattr = f' id="{tid}"' if tid else ""
-    out = [f'<div class="tbl-wrap"><table{cls}{idattr}>', "<thead><tr>"]
-    out += [f"<th>{h(x)}</th>" for x in headers]
+    wcls = "tbl-wrap tall" if tall else "tbl-wrap"
+    out = [f'<div class="{wcls}"><table{cls}{idattr}>', "<thead><tr>"]
+    for i, x in enumerate(headers):
+        out.append(f'<th class="nosort">{h(x)}</th>' if i in nosort_cols else f"<th>{h(x)}</th>")
     out.append("</tr></thead><tbody>")
     for r in rows:
         out.append("<tr>")
@@ -898,11 +900,15 @@ p.lead{color:#3b3f46;max-width:820px}
 .btn.ghost{background:#eef1f6;color:var(--ink)}.btn.ghost:hover{background:#e2e7f0;color:var(--ink)}
 .btn.small{padding:5px 11px;font-size:13px}
 .tbl-wrap{overflow-x:auto;margin:8px 0;border:1px solid var(--line);border-radius:10px}
+.tbl-wrap.tall{max-height:78vh;overflow:auto}
 table{border-collapse:collapse;width:100%;font-size:13.5px;background:var(--card)}
 th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
-th{background:#eef2f8;color:#27324a;font-weight:700;white-space:nowrap;position:sticky;top:0}
+th{background:#eef2f8;color:#27324a;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:2}
 table.sortable th{cursor:pointer}table.sortable th:hover{background:#e2e9f4}
 table.sortable th::after{content:' \\2195';color:#9aa3b2;font-size:11px}
+table.sortable th.nosort{cursor:default}
+table.sortable th.nosort:hover{background:#eef2f8}
+table.sortable th.nosort::after{content:''}
 tbody tr:hover{background:#f3f7fc}
 code{background:#eef1f6;padding:1px 6px;border-radius:5px;font-size:.88em;
   font-family:'SF Mono',Menlo,Consolas,monospace;color:#243}
@@ -961,6 +967,7 @@ function filterVars(){var q=(document.getElementById('varSearch').value||'').toL
  var el=document.getElementById('varCount');if(el)el.textContent=s+' variable'+(s===1?'':'s')+' shown';}
 function _num(v){var x=parseFloat(String(v).replace(/[,%$]/g,''));return isNaN(x)?null:x;}
 document.addEventListener('click',function(e){var th=e.target.closest('table.sortable th');if(!th)return;
+ if(th.classList.contains('nosort'))return;
  var tbl=th.closest('table'),idx=Array.prototype.indexOf.call(th.parentNode.children,th);
  var tb=tbl.querySelector('tbody'),rows=Array.prototype.slice.call(tb.querySelectorAll('tr'));
  var asc=!(th.getAttribute('data-asc')==='1');th.setAttribute('data-asc',asc?'1':'0');
@@ -986,7 +993,7 @@ def _dataset_panel(name, df):
                           dict_rows, raw_cols={0})
     stat_tbl = html_table(["Variable", "Distribution", "Coverage", "N", "Distinct",
                            "Min", "Mean", "Median", "Max", "SD"],
-                          stat_rows, raw_cols={0, 1, 2}, sortable=True)
+                          stat_rows, raw_cols={0, 1, 2}, sortable=True, nosort_cols={1, 2})
     return (f'<div class="ds-panel" id="ds-{h(base)}">'
             f'<p class="meta"><span class="badge b-frame">{h(m["grain"])}</span> '
             f'&nbsp;{df.shape[0]:,} &times; {df.shape[1]} &middot; {h(m["years"])} &middot; '
@@ -1023,8 +1030,8 @@ def _explorer(frames):
                 '<button class="chip" data-k="dummy" onclick="setChip(this)">Dummy</button>'
                 '<button class="chip" data-k="id" onclick="setChip(this)">Identifier</button>'
                 '</div><span id="varCount" class="varcount"></span></div>')
-    table = ('<div class="tbl-wrap"><table id="varTable" class="sortable"><thead><tr>'
-             '<th>Variable</th><th>Type</th><th>Distribution</th><th>Label</th>'
+    table = ('<div class="tbl-wrap tall"><table id="varTable" class="sortable"><thead><tr>'
+             '<th>Variable</th><th>Type</th><th class="nosort">Distribution</th><th>Label</th>'
              '<th>Units</th><th>In files</th><th>Source</th></tr></thead><tbody>'
              + "".join(rows) + "</tbody></table></div>")
     return controls + table
@@ -1085,7 +1092,8 @@ def build_html(frames):
             var_files.setdefault(c, set()).add(name)
     matrix_rows = [[f"<code>{h(c)}</code>"] + ["&#9679;" if n in var_files[c] else "" for n in FILE_ORDER]
                    for c in sorted(var_files)]
-    matrix_tbl = html_table(["Variable"] + [short[n] for n in FILE_ORDER], matrix_rows, raw_cols=set(range(7)))
+    matrix_tbl = html_table(["Variable"] + [short[n] for n in FILE_ORDER], matrix_rows,
+                            raw_cols=set(range(7)), tall=True)
 
     tabs = "".join(f'<button class="tab" onclick="showTab({i})">{h(name[:-4])}</button>'
                    for i, name in enumerate(FILE_ORDER))
