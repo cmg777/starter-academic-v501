@@ -32,6 +32,8 @@ matplotlib.use("Agg")                     # headless backend
 import matplotlib.pyplot as plt
 import pyfixest as pf
 from linearmodels.panel import RandomEffects, PanelOLS
+import re
+import maketables as mt
 
 warnings.filterwarnings("ignore")
 np.random.seed(42)
@@ -56,38 +58,17 @@ def fig_path(n, name):
     return f"{SLUG}_{n:02d}_{name}.png"
 
 
-def render_table_png(col_labels, row_labels, cell_text, title, path,
-                     note=None, figw=None):
-    """Render a results table as a clean matplotlib PNG (no browser needed)."""
-    nrows, ncols = len(row_labels), len(col_labels)
-    figw = figw or max(6.0, 1.7 + 1.45 * ncols)
-    fig, ax = plt.subplots(figsize=(figw, 0.55 * nrows + 1.4))
-    ax.axis("off")
-    ax.set_title(title, color=INK, fontsize=12, fontweight="bold", pad=14)
-    tbl = ax.table(cellText=cell_text, rowLabels=row_labels,
-                   colLabels=col_labels, cellLoc="center",
-                   rowLoc="left", loc="center")
-    tbl.auto_set_font_size(False)
-    tbl.set_fontsize(10)
-    tbl.scale(1, 1.45)
-    for (r, c), cell in tbl.get_celld().items():
-        cell.set_edgecolor("#d8d4cc")
-        if r == 0:                                  # header row
-            cell.set_facecolor(STEEL)
-            cell.set_text_props(color="white", fontweight="bold")
-        elif c == -1:                               # row labels
-            cell.set_text_props(fontweight="bold", color=INK)
-            cell.set_facecolor("#f5f3ee")
-        else:
-            cell.set_facecolor("white" if r % 2 else "#faf9f6")
-    if note:
-        fig.text(0.5, 0.02, note, ha="center", fontsize=8, color=GREY)
-    fig.savefig(path)
-    plt.close(fig)
-
-
-def stars(p):
-    return "***" if p < 0.01 else "**" if p < 0.05 else "*" if p < 0.1 else ""
+def write_mt(obj, name):
+    """Render a maketables ETable/MTable to a self-contained HTML snippet, give it
+    a STABLE div id (so re-runs are byte-stable), and save it as the page-bundle
+    resource <name>.html that index.md inlines via the include-html shortcode."""
+    html = obj.make("html")
+    m = re.search(r'<div id="([^"]+)"', html)
+    if m:
+        html = html.replace(m.group(1), "mt-" + name.replace("_", "-"))
+    with open(f"{name}.html", "w", encoding="utf-8") as fh:
+        fh.write(html)
+    return html
 
 
 print("=" * 75)
@@ -155,35 +136,41 @@ def _fmt(v):
     return f"{v:.4f}"
 
 
-def summarise_panel(spec, y0, y1, title, path, note):
-    """Panel summary table for ALL substantive variables of one unit of observation.
+def summarise_panel(spec, y0, y1, title, note, name):
+    """Initial-vs-final distribution table for ALL substantive variables of one unit.
 
-    spec: list of (label, df, col, scale). Columns: N / mean / sd / min / median /
-    max / mean in the first panel year (y0) / mean in the last panel year (y1).
-    If a variable is unobserved in an endpoint year, fall back to its nearest
-    observed year (earliest for y0, latest for y1).
+    spec: list of (label, df, col, scale). For each variable we report five
+    statistics -- mean, median, sd, min, max -- computed twice: over the initial
+    panel year (y0) and over the final panel year (y1). Columns are paired by
+    statistic via a 2-level header (stat -> year). If a variable is unobserved in
+    an endpoint year, fall back to its nearest observed year. Rendered as a
+    maketables MTable and saved to <name>.html.
     """
-    cols = ["N", "mean", "sd", "min", "median", "max", f"mean {y0}", f"mean {y1}"]
-    rlab, cells = [], []
+    stat_fns = [("mean", "mean"), ("median", "median"), ("sd", "std"),
+                ("min", "min"), ("max", "max")]
+    rows = {}
     for label, df, col, scale in spec:
         s = pd.to_numeric(df[col], errors="coerce") * scale
         yr = df["year"]
         obs = sorted(yr[s.notna()].unique())
 
-        def yr_mean(target, latest=False):
+        def yslice(target, latest=False):
             v = s[yr == target]
-            if v.notna().any():
-                return v.mean()
-            if not obs:
-                return np.nan
-            return s[yr == (obs[-1] if latest else obs[0])].mean()
+            if v.notna().any() or not obs:
+                return v
+            return s[yr == (obs[-1] if latest else obs[0])]
 
-        rlab.append(label)
-        cells.append([f"{int(s.notna().sum()):,}", _fmt(s.mean()), _fmt(s.std()),
-                      _fmt(s.min()), _fmt(s.median()), _fmt(s.max()),
-                      _fmt(yr_mean(y0)), _fmt(yr_mean(y1, latest=True))])
-    render_table_png(cols, rlab, cells, title, path, note=note, figw=11.5)
-    return pd.DataFrame(cells, index=rlab, columns=cols)
+        vi, vf = yslice(y0), yslice(y1, latest=True)
+        row = []
+        for _, fn in stat_fns:
+            row.append(_fmt(getattr(vi, fn)()))
+            row.append(_fmt(getattr(vf, fn)()))
+        rows[label] = row
+    cols = pd.MultiIndex.from_tuples(
+        [(lab, str(yr_)) for lab, _ in stat_fns for yr_ in (y0, y1)])
+    out = pd.DataFrame.from_dict(rows, orient="index", columns=cols)
+    write_mt(mt.MTable(out, caption=title, notes=note), name)
+    return out
 
 
 # All substantive region-level variables (Prediction + Table_2); IDs and the
@@ -227,15 +214,17 @@ country_spec = [
     ("Personal income Gini (0-100)", f5, "Giniall", 1),
 ]
 sr = summarise_panel(region_spec, 1992, 2010,
-                     "Summary statistics: region-level variables (panel, 1992-2010)",
-                     fig_path(16, "summary_region"),
-                     note="Region-year (training sample). 'mean 1992 / mean 2010' = mean in the "
-                          "first / last panel year. Construction & sources: Appendix A.")
+                     "Summary statistics: region-level variables (initial 1992 vs final 2010)",
+                     "Region-year (training sample). Each statistic is computed over the cross-"
+                     "section in the first (1992) and last (2010) panel year; nearest-year "
+                     "fallback if unobserved. Net values in source units. Sources: Appendix A.",
+                     "summary_region")
 sc = summarise_panel(country_spec, 1992, 2012,
-                     "Summary statistics: country-level variables (panel, 1992-2012)",
-                     fig_path(17, "summary_country"),
-                     note="Country-year. 'mean 1992 / mean 2012' = mean in the first / last panel "
-                          "year; net aid in US$ bn. Construction & sources: Appendix A.")
+                     "Summary statistics: country-level variables (initial 1992 vs final 2012)",
+                     "Country-year. Each statistic is computed over the cross-section in the first "
+                     "(1992) and last (2012) panel year; nearest-year fallback if unobserved; net "
+                     "aid in US$ bn. Sources: Appendix A.",
+                     "summary_country")
 sr.to_csv(f"{SLUG}_summary_region.csv")
 sc.to_csv(f"{SLUG}_summary_country.csv")
 
@@ -477,14 +466,16 @@ sat_d = [f"satyear_{i}" for i in range(1, 8)]
 # coefficient on log light per pixel. SEs clustered by country.
 GEO = ("log_N_pix_top_cod_1_ppix + log_N_pix_low_cod_1_ppix + log_area + "
        "log_region + log_region_X_log_area")
+# NB: no spaces around the FE '+' (e.g. "code_Coutry_Region+satyear") so the
+# fixed-effect names stay clean for maketables' felabels relabeling.
 fe_specs = {
     1: "log_GDP_pc_Region ~ log_Light_ppix_Region",
-    2: "log_GDP_pc_Region ~ log_Light_ppix_Region | code_Coutry_Region + satyear",
-    3: "log_GDP_pc_Region ~ log_Light_ppix_Region | Country_ISO + satyear",
-    4: "log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country | Country_ISO + satyear",
-    5: "log_GDP_pc_Region ~ log_Light_ppix_Region | group_id + satyear",
-    6: "log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country | group_id + satyear",
-    7: f"log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country + {GEO} | group_id + satyear",
+    2: "log_GDP_pc_Region ~ log_Light_ppix_Region | code_Coutry_Region+satyear",
+    3: "log_GDP_pc_Region ~ log_Light_ppix_Region | Country_ISO+satyear",
+    4: "log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country | Country_ISO+satyear",
+    5: "log_GDP_pc_Region ~ log_Light_ppix_Region | group_id+satyear",
+    6: "log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country | group_id+satyear",
+    7: f"log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country + {GEO} | group_id+satyear",
 }
 fe_models, fe_b = {}, {}
 for k, fml in fe_specs.items():
@@ -542,28 +533,30 @@ print("    linearmodels RE light elasticity by col (1)-(7): "
 print(f"    col 7 national-GDP elasticity: RE={b_natgdp_re7:.3f}, "
       f"FE={b_natgdp_fe7:.3f}")
 
-# --- 3.3 Assemble Table 1 as a PNG (FE vs RE side by side) ------------------
-col_labels = [f"({k})" for k in range(1, 8)]
-row_labels = ["log light (PyFixest FE/OLS)", "log light (paper, RE)",
-              "national GDP control", "geography controls",
-              "region FE", "country FE", "WB-group FE", "satellite FE"]
-ctrl = {1: ("--", "--", "", "", "", ""),
-        2: ("--", "--", "Yes", "", "", "Yes"),
-        3: ("--", "--", "", "Yes", "", "Yes"),
-        4: ("Yes", "--", "", "Yes", "", "Yes"),
-        5: ("--", "--", "", "", "Yes", "Yes"),
-        6: ("Yes", "--", "", "", "Yes", "Yes"),
-        7: ("Yes", "Yes", "", "", "Yes", "Yes")}
-cells = [[f"{fe_b[k]:.3f}" for k in range(1, 8)],
-         [f"{re_b[k]:.3f}" for k in range(1, 8)]]
-for ridx in range(6):
-    cells.append([ctrl[k][ridx] for k in range(1, 8)])
-render_table_png(col_labels, row_labels, cells,
-                 "Table 1. Nighttime lights predict regional GDP per capita",
-                 fig_path(5, "table1"),
-                 note="Dependent variable: log regional GDP per capita. "
-                      "Elasticity = coefficient on log light per pixel.",
-                 figw=11)
+# --- 3.3 Assemble Table 1 as a maketables regression table (7 specs) --------
+# Seven side-by-side PyFixest specifications, as in the paper's Table 1. The
+# coefficient on log light per pixel is the elasticity. The random-effects form
+# (the paper's published estimator) gives essentially the same elasticity and is
+# noted below the table rather than as a parallel set of columns.
+T1_LAB = {"log_Light_ppix_Region": "log light per pixel",
+          "log_GDP_pc_Country": "log GDP p.c. (country)",
+          "log_N_pix_top_cod_1_ppix": "log # top-coded pixels",
+          "log_N_pix_low_cod_1_ppix": "log # low-coded pixels",
+          "log_area": "log area", "log_region": "log # regions",
+          "log_region_X_log_area": "log # regions × log area"}
+T1_FE = {"code_Coutry_Region": "Region FE", "Country_ISO": "Country FE",
+         "group_id": "WB-group FE", "satyear": "Satellite FE"}
+et1 = mt.ETable([fe_models[k] for k in range(1, 8)],
+                model_heads=[f"({k})" for k in range(1, 8)],
+                labels=T1_LAB, felabels=T1_FE,
+                coef_fmt="b:.3f* (se:.3f)", model_stats=["N", "r2"], show_fe=True,
+                caption="Table 1. Nighttime lights predict regional GDP per capita",
+                notes="Dependent variable: log regional GDP per capita (PyFixest FE/OLS; "
+                      "SEs clustered by country, in parentheses). The coefficient on log light "
+                      "per pixel is the elasticity. The random-effects estimator used in the "
+                      f"published table is very close (col 7: RE={re_b[7]:.3f}). "
+                      "* p<.1  ** p<.05  *** p<.01.")
+write_mt(et1, "table1_prediction")
 
 # --- 3.4 Form the predictions (col 7) and validate -------------------------
 # Reconstruct fitted log GDP per capita from the RE col-7 design matrix X.beta,
@@ -728,24 +721,18 @@ print("      predicted-vs-observed: "
 print("      light-vs-observed:     "
       + "  ".join(f"{l}={v:.2f}" for l, v in zip(lab5, lo)))
 
-# Figure 8: the Table 2 correlations as grouped bars (our indices reproduce the
-# paper's Table 2 exactly -- the real validation that the construction is right).
-x = np.arange(len(lab5))
-fig, ax = plt.subplots(figsize=(7.2, 4.3))
-ax.bar(x - 0.2, po, width=0.4, color=STEEL, label="predicted vs observed")
-ax.bar(x + 0.2, lo, width=0.4, color=ORANGE, label="raw light vs observed")
-for xi, v in zip(x - 0.2, po):
-    ax.text(xi, v + 0.01, f"{v:.2f}", ha="center", fontsize=8)
-for xi, v in zip(x + 0.2, lo):
-    ax.text(xi, v + 0.01, f"{v:.2f}", ha="center", fontsize=8)
-ax.set_xticks(x); ax.set_xticklabels(lab5)
-ax.set(ylim=(0, 0.65), ylabel="correlation across countries",
-       title="Inequality measured from predicted income tracks the\nobserved "
-             "data (reproducing the paper's Table 2)")
-ax.legend(frameon=False, loc="upper right")
-fig.tight_layout()
-fig.savefig(fig_path(8, "table2_correlations"))
-plt.close(fig)
+# Table 2 as a maketables correlation table: do our predicted-income inequality
+# measures track the same measures from observed income, and do they beat raw light?
+t2tab = pd.DataFrame(
+    {"Predicted income vs observed": [f"{v:.2f}" for v in po],
+     "Raw light vs observed": [f"{v:.2f}" for v in lo]}, index=lab5)
+t2tab.index.name = "Inequality index"
+write_mt(mt.MTable(t2tab,
+                   caption="Table 2. Inequality from predicted income tracks observed inequality",
+                   notes=f"Cross-country correlations across {len(percty)} countries (period means "
+                         "2001-2012) between each inequality measure computed from predicted income "
+                         "(or from raw light) and the same measure computed from observed income."),
+         "table2_validation")
 
 # ===========================================================================
 # 5. THE REGIONAL KUZNETS CURVE (TABLE 3)
@@ -767,7 +754,7 @@ agg3["lg3"] = agg3["lg"] ** 3
 
 
 def kuz_fit(dv, rhs):
-    return pf.feols(f"{dv} ~ {rhs} | Country_ISO + p5", data=agg3,
+    return pf.feols(f"{dv} ~ {rhs} | Country_ISO+p5", data=agg3,
                     vcov={"CRV1": "Country_ISO"})
 
 
@@ -780,31 +767,20 @@ b3 = k3.coef()
 print(f"    GINIW cubic: {b3['lg']:.3f} / {b3['lg2']:.3f} / "
       f"{b3['lg3']:.4f}  (N={N3}, countries={agg3.Country_ISO.nunique()})")
 
-# Table 3 PNG
-col_labels = ["(1) lin", "(2) quad", "(3) cubic", "(4) CV", "(5) Theil",
-              "(6) MLD", "(7) GE(-1)"]
-mods3 = [k1, k2, k3] + [k_other[c] for c in IDX[1:]]
+# Table 3 as a maketables regression table (7 columns).
 rterms = ["lg", "lg2", "lg3"]
-rlab = ["log GDP p.c.", "(log GDP p.c.)²", "(log GDP p.c.)³", "N", "countries"]
-cells3 = []
-for t_ in rterms:
-    row = []
-    for m in mods3:
-        if t_ in m.coef().index:
-            b = m.coef()[t_]
-            p = m.pvalue()[t_]
-            row.append(f"{b:.3f}{stars(p)}")
-        else:
-            row.append("--")
-    cells3.append(row)
-cells3.append([f"{int(m._N)}" for m in mods3])
-cells3.append([f"{agg3.Country_ISO.nunique()}" for _ in mods3])
-render_table_png(col_labels, rlab, cells3,
-                 "Table 3. The regional Kuznets curve (country + period FE)",
-                 fig_path(9, "table3"),
-                 note="Dependent variable in cols (1)-(3): Gini (GINIW). "
-                      "* p<.1  ** p<.05  *** p<.01. Clustered by country.",
-                 figw=11)
+T3_LAB = {"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)²", "lg3": "(log GDP p.c.)³"}
+et3 = mt.ETable([k1, k2, k3] + [k_other[c] for c in IDX[1:]],
+                model_heads=["(1) Gini, linear", "(2) Gini, quadratic", "(3) Gini, cubic",
+                             "(4) CV", "(5) Theil", "(6) MLD", "(7) GE(-1)"],
+                labels=T3_LAB, felabels={"Country_ISO": "Country FE", "p5": "Period FE"},
+                coef_fmt="b:.3f* (se:.3f)", model_stats=["N", "r2"], show_fe=True,
+                caption="Table 3. The regional Kuznets curve",
+                notes="Cols (1)-(3): dependent variable = regional Gini (GINIW), adding the "
+                      "linear / quadratic / cubic term in log GDP p.c. Cols (4)-(7): the cubic for "
+                      "the other four inequality indices. Country + 5-year-period FE; SEs "
+                      "clustered by country. * p<.1  ** p<.05  *** p<.01.")
+write_mt(et3, "table3_kuznets")
 pd.DataFrame({
     "metric": ["GINIW_lg", "GINIW_lg2", "GINIW_lg3", "N", "n_countries"]
     + [f"{IDX_LAB[c]}_lg3" for c in IDX[1:]],
@@ -958,7 +934,7 @@ agg4 = collapse5(t4, ["GINIW_pred_GDP_pc", "GDP_pc_Country", "Pop_Country",
                       "Resources_rents_share_of_GDP", "Arable_land",
                       "Trade_GDP_share", "FDI_share_of_GDP", "area",
                       "price_gasoline", "Aid", "School_enrollment_secondary",
-                      "GINIW_Eth_light"])
+                      "GINIW_Eth_light", "Polity2", "fedelupd2"])
 agg4["lg"] = np.log(agg4["GDP_pc_Country"])
 agg4["lg2"] = agg4["lg"] ** 2
 agg4["lg3"] = agg4["lg"] ** 3
@@ -966,30 +942,36 @@ agg4["aid_GDP"] = agg4["Aid"] / (agg4["GDP_pc_Country"] * agg4["Pop_Country"])
 agg4["Resources_rents_share_of_GDP"] /= 100
 agg4["School_enrollment_secondary"] /= 100
 agg4["Area_X_price_gasoline"] = agg4["area"] * agg4["price_gasoline"] / 1e7
+agg4["lgXfed"] = agg4["lg"] * agg4["fedelupd2"]         # log GDP × Federal interaction
 CUBIC = "lg + lg2 + lg3"
 
 
 def det_fit(extra):
-    return pf.feols(f"GINIW_pred_GDP_pc ~ {CUBIC} + {extra} | Country_ISO + p5",
+    return pf.feols(f"GINIW_pred_GDP_pc ~ {CUBIC} + {extra} | Country_ISO+p5",
                     data=agg4, vcov={"CRV1": "Country_ISO"})
 
 
+d0 = pf.feols(f"GINIW_pred_GDP_pc ~ {CUBIC} | Country_ISO+p5",
+              data=agg4, vcov={"CRV1": "Country_ISO"})      # baseline (cubic only)
 d1 = det_fit("Resources_rents_share_of_GDP + Arable_land")
 d2 = det_fit("Trade_GDP_share + FDI_share_of_GDP")
 d3 = det_fit("price_gasoline + Area_X_price_gasoline")
+d_inst = det_fit("Polity2 + lgXfed")                        # institutions (ICRG omitted)
 d4 = det_fit("aid_GDP + School_enrollment_secondary")
 d5 = det_fit("GINIW_Eth_light")
-det_models = {"(1) resources": d1, "(2) openness": d2, "(3) geography": d3,
-              "(4) aid+school": d4, "(5) ethnic": d5}
+det_models = {"(1) resources": d1, "(2) openness": d2, "(3) mobility": d3,
+              "(4) institutions": d_inst, "(5) transfers/edu": d4, "(6) ethnicity": d5}
 det_keys = {"(1) resources": ["Resources_rents_share_of_GDP", "Arable_land"],
             "(2) openness": ["Trade_GDP_share", "FDI_share_of_GDP"],
-            "(3) geography": ["price_gasoline", "Area_X_price_gasoline"],
-            "(4) aid+school": ["aid_GDP", "School_enrollment_secondary"],
-            "(5) ethnic": ["GINIW_Eth_light"]}
+            "(3) mobility": ["price_gasoline", "Area_X_price_gasoline"],
+            "(4) institutions": ["Polity2", "lgXfed"],
+            "(5) transfers/edu": ["aid_GDP", "School_enrollment_secondary"],
+            "(6) ethnicity": ["GINIW_Eth_light"]}
 KLAB = {"Resources_rents_share_of_GDP": "resource rents",
         "Arable_land": "arable land", "Trade_GDP_share": "trade/GDP",
         "FDI_share_of_GDP": "FDI/GDP", "price_gasoline": "gasoline price",
-        "Area_X_price_gasoline": "area × gasoline", "aid_GDP": "aid/GDP",
+        "Area_X_price_gasoline": "area × gasoline", "Polity2": "Polity2",
+        "lgXfed": "log GDP × Federal", "aid_GDP": "aid/GDP",
         "School_enrollment_secondary": "schooling",
         "GINIW_Eth_light": "ethnic inequality"}
 res_rows = []
@@ -1005,22 +987,26 @@ b_eth = d5.coef()["GINIW_Eth_light"]
 print(f"    ethnic-inequality coefficient (col 5) = {b_eth:.3f} "
       f"(N={int(d5._N)})")
 
-# Table 4 PNG: one row per control block
-col_labels = ["control", "coef", "", "N"]
-rlbl, cells4 = [], []
-for nm, m in det_models.items():
-    for k in det_keys[nm]:
-        rlbl.append(f"{nm}: {KLAB[k]}")
-        b = m.coef()[k]
-        p = m.pvalue()[k]
-        cells4.append([KLAB[k], f"{b:.3f}", stars(p), f"{int(m._N)}"])
-render_table_png(col_labels, rlbl, cells4,
-                 "Table 4. Determinants of regional inequality",
-                 fig_path(11, "table4"),
-                 note="All columns add the cubic in log GDP p.c. + country & "
-                      "period FE. Published col 4 (ICRG) is not reproducible. "
-                      "* p<.1 ** p<.05 *** p<.01.",
-                 figw=9)
+# Table 4 as a maketables side-by-side regression table (baseline + 6 blocks).
+T4_LAB = {"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)²", "lg3": "(log GDP p.c.)³",
+          "Resources_rents_share_of_GDP": "Resource rents/GDP", "Arable_land": "Arable land",
+          "Trade_GDP_share": "Trade/GDP", "FDI_share_of_GDP": "FDI/GDP",
+          "price_gasoline": "Gasoline price", "Area_X_price_gasoline": "Area × gasoline",
+          "Polity2": "Polity2", "lgXfed": "log GDP × Federal",
+          "aid_GDP": "Aid/GDP", "School_enrollment_secondary": "Schooling",
+          "GINIW_Eth_light": "Ethnic inequality"}
+et4 = mt.ETable([d0, d1, d2, d3, d_inst, d4, d5],
+                model_heads=["(0) baseline", "(1) resources", "(2) openness", "(3) mobility",
+                             "(4) institutions", "(5) transfers/edu", "(6) ethnicity"],
+                labels=T4_LAB, felabels={"Country_ISO": "Country FE", "p5": "Period FE"},
+                coef_fmt="b:.3f* (se:.3f)", model_stats=["N", "r2"], show_fe=True,
+                caption="Table 4. Determinants of regional inequality (dependent variable: GINIW)",
+                notes="Each column adds a block of determinants to the cubic in log GDP p.c. with "
+                      "country + 5-year-period FE; SEs clustered by country, in parentheses. The "
+                      "institutions column uses Polity2 and a log GDP × Federal interaction; the "
+                      "paper's ICRG bureaucratic-quality measure is licensed and omitted. "
+                      "* p<.1  ** p<.05  *** p<.01.")
+write_mt(et4, "table4_determinants")
 
 # ===========================================================================
 # 7. SPATIAL ROBUSTNESS: CONLEY STANDARD ERRORS (TABLE B.4)

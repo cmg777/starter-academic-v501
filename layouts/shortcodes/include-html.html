@@ -1,0 +1,11 @@
+{{/*
+  include-html: inline a page-bundle HTML resource into the page body.
+  Usage:  {{< include-html "table4_determinants.html" >}}
+  The named file must be a resource of the current page bundle (e.g. a maketables
+  table written next to index.md). Its content is emitted as safe HTML.
+*/ -}}
+{{- with .Page.Resources.GetMatch (.Get 0) -}}
+{{- .Content | safeHTML -}}
+{{- else -}}
+{{- warnf "include-html: resource %q not found in %q" (.Get 0) $.Page.Path -}}
+{{- end -}}

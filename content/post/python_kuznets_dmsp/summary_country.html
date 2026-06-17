@@ -1,0 +1,349 @@
+<div id="mt-summary-country" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>
+#mt-summary-country table {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#mt-summary-country thead, tbody, tfoot, tr, td, th { border-style: none; }
+ tr { background-color: transparent; }
+#mt-summary-country p { margin: 0; padding: 0; }
+ #mt-summary-country .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: hidden; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: hidden; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #mt-summary-country .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #mt-summary-country .gt_title { color: #333333; font-size: 16px; font-weight: initial; padding-top: 6px; padding-bottom: 6px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #mt-summary-country .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 5px; padding-bottom: 7px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #mt-summary-country .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #mt-summary-country .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #mt-summary-country .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: black; border-bottom-style: solid; border-bottom-width: 0.25px; border-bottom-color: black; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #mt-summary-country .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 16px; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 0px; border-left-color: white; border-right-style: none; border-right-width: 0px; border-right-color: white; vertical-align: bottom; padding-top: 2px; padding-bottom: 7px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #mt-summary-country .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 16px; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #mt-summary-country .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #mt-summary-country .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #mt-summary-country .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 0.25px; border-bottom-color: black; vertical-align: bottom; padding-top: 2px; padding-bottom: 2px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #mt-summary-country .gt_spanner_row { border-bottom-style: hidden; }
+ #mt-summary-country .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 16px; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 0.25px; border-top-color: black; border-bottom-style: solid; border-bottom-width: 0.25px; border-bottom-color: black; border-left-style: none; border-left-width: 1px; border-left-color: white; border-right-style: none; border-right-width: 1px; border-right-color: white; vertical-align: middle; text-align: left; }
+ #mt-summary-country .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 16px; font-weight: initial; border-top-style: solid; border-top-width: 0.25px; border-top-color: black; border-bottom-style: solid; border-bottom-width: 0.25px; border-bottom-color: black; vertical-align: middle; }
+ #mt-summary-country .gt_from_md> :first-child { margin-top: 0; }
+ #mt-summary-country .gt_from_md> :last-child { margin-bottom: 0; }
+ #mt-summary-country .gt_row { padding-top: 2px; padding-bottom: 2px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: none; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 0px; border-left-color: white; border-right-style: none; border-right-width: 0px; border-right-color: white; vertical-align: middle; overflow-x: hidden; }
+ #mt-summary-country .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 16px; font-weight: initial; text-transform: inherit; border-right-style: hidden; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #mt-summary-country .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #mt-summary-country .gt_row_group_first td { border-top-width: 0.25px; }
+ #mt-summary-country .gt_row_group_first th { border-top-width: 0.25px; }
+ #mt-summary-country .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #mt-summary-country .gt_table_body { border-top-style: solid; border-top-width: 0px; border-top-color: black; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: black; }
+ #mt-summary-country .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #mt-summary-country .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #mt-summary-country .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #mt-summary-country .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #mt-summary-country .gt_sourcenote { font-size: 10px; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #mt-summary-country .gt_left { text-align: left; }
+ #mt-summary-country .gt_center { text-align: center; }
+ #mt-summary-country .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #mt-summary-country .gt_font_normal { font-weight: normal; }
+ #mt-summary-country .gt_font_bold { font-weight: bold; }
+ #mt-summary-country .gt_font_italic { font-style: italic; }
+ #mt-summary-country .gt_super { font-size: 65%; }
+ #mt-summary-country .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #mt-summary-country .gt_asterisk { font-size: 100%; vertical-align: 0; }
+ 
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+
+  <tr class="gt_heading">
+    <td colspan="11" class="gt_heading gt_title gt_font_normal">Summary statistics: country-level variables (initial 1992 vs final 2012)</td>
+  </tr>
+<tr class="gt_col_headings gt_spanner_row">
+  <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id=""></th>
+  <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="mean">
+    <span class="gt_column_spanner">mean</span>
+  </th>
+  <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="median">
+    <span class="gt_column_spanner">median</span>
+  </th>
+  <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="sd">
+    <span class="gt_column_spanner">sd</span>
+  </th>
+  <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="min">
+    <span class="gt_column_spanner">min</span>
+  </th>
+  <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="max">
+    <span class="gt_column_spanner">max</span>
+  </th>
+</tr>
+<tr class="gt_col_headings">
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="0">1992</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="1">2012</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="2">1992</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="3">2012</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="4">1992</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="5">2012</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="6">1992</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="7">2012</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="8">1992</th>
+  <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="9">2012</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+  <tr>
+    <th class="gt_row gt_left gt_stub">GDP p.c. (country, US$)</th>
+    <td class="gt_row gt_center">9,962</td>
+    <td class="gt_row gt_center">14,892</td>
+    <td class="gt_row gt_center">5,518</td>
+    <td class="gt_row gt_center">9,514</td>
+    <td class="gt_row gt_center">12,650</td>
+    <td class="gt_row gt_center">16,345</td>
+    <td class="gt_row gt_center">258.24</td>
+    <td class="gt_row gt_center">656.04</td>
+    <td class="gt_row gt_center">95,637</td>
+    <td class="gt_row gt_center">117,450</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Regional Gini (GINIW)</th>
+    <td class="gt_row gt_center">0.0702</td>
+    <td class="gt_row gt_center">0.0612</td>
+    <td class="gt_row gt_center">0.0658</td>
+    <td class="gt_row gt_center">0.0584</td>
+    <td class="gt_row gt_center">0.0348</td>
+    <td class="gt_row gt_center">0.0333</td>
+    <td class="gt_row gt_center">0.0055</td>
+    <td class="gt_row gt_center">0.0019</td>
+    <td class="gt_row gt_center">0.1549</td>
+    <td class="gt_row gt_center">0.1594</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Coeff. of variation (CV)</th>
+    <td class="gt_row gt_center">0.1407</td>
+    <td class="gt_row gt_center">0.1203</td>
+    <td class="gt_row gt_center">0.1350</td>
+    <td class="gt_row gt_center">0.1092</td>
+    <td class="gt_row gt_center">0.0710</td>
+    <td class="gt_row gt_center">0.0682</td>
+    <td class="gt_row gt_center">0.0228</td>
+    <td class="gt_row gt_center">0.0035</td>
+    <td class="gt_row gt_center">0.3327</td>
+    <td class="gt_row gt_center">0.3647</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Theil index GE(1)</th>
+    <td class="gt_row gt_center">0.0118</td>
+    <td class="gt_row gt_center">0.0092</td>
+    <td class="gt_row gt_center">0.0088</td>
+    <td class="gt_row gt_center">0.0062</td>
+    <td class="gt_row gt_center">0.0107</td>
+    <td class="gt_row gt_center">0.0099</td>
+    <td class="gt_row gt_center">0.0003</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">0.0484</td>
+    <td class="gt_row gt_center">0.0577</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Mean log deviation GE(0)</th>
+    <td class="gt_row gt_center">0.0115</td>
+    <td class="gt_row gt_center">0.0090</td>
+    <td class="gt_row gt_center">0.0086</td>
+    <td class="gt_row gt_center">0.0063</td>
+    <td class="gt_row gt_center">0.0101</td>
+    <td class="gt_row gt_center">0.0093</td>
+    <td class="gt_row gt_center">0.0003</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">0.0444</td>
+    <td class="gt_row gt_center">0.0514</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">GE(-1)</th>
+    <td class="gt_row gt_center">0.0114</td>
+    <td class="gt_row gt_center">0.0089</td>
+    <td class="gt_row gt_center">0.0085</td>
+    <td class="gt_row gt_center">0.0064</td>
+    <td class="gt_row gt_center">0.0100</td>
+    <td class="gt_row gt_center">0.0090</td>
+    <td class="gt_row gt_center">0.0003</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">0.0442</td>
+    <td class="gt_row gt_center">0.0471</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Population (country)</th>
+    <td class="gt_row gt_center">31,575,094</td>
+    <td class="gt_row gt_center">38,439,786</td>
+    <td class="gt_row gt_center">6,867,280</td>
+    <td class="gt_row gt_center">7,946,582</td>
+    <td class="gt_row gt_center">115,924,412</td>
+    <td class="gt_row gt_center">139,059,234</td>
+    <td class="gt_row gt_center">2,690</td>
+    <td class="gt_row gt_center">4,906</td>
+    <td class="gt_row gt_center">1,161,010,304</td>
+    <td class="gt_row gt_center">1,353,431,168</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Resource rents (% GDP)</th>
+    <td class="gt_row gt_center">8.51</td>
+    <td class="gt_row gt_center">10.34</td>
+    <td class="gt_row gt_center">3.25</td>
+    <td class="gt_row gt_center">4.38</td>
+    <td class="gt_row gt_center">12.57</td>
+    <td class="gt_row gt_center">13.53</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">84.03</td>
+    <td class="gt_row gt_center">73.40</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Arable land (share)</th>
+    <td class="gt_row gt_center">0.1455</td>
+    <td class="gt_row gt_center">0.1504</td>
+    <td class="gt_row gt_center">0.1025</td>
+    <td class="gt_row gt_center">0.1087</td>
+    <td class="gt_row gt_center">0.1424</td>
+    <td class="gt_row gt_center">0.1387</td>
+    <td class="gt_row gt_center">0.0004</td>
+    <td class="gt_row gt_center">0.0009</td>
+    <td class="gt_row gt_center">0.6614</td>
+    <td class="gt_row gt_center">0.5896</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Trade (share of GDP)</th>
+    <td class="gt_row gt_center">0.7551</td>
+    <td class="gt_row gt_center">0.9300</td>
+    <td class="gt_row gt_center">0.6380</td>
+    <td class="gt_row gt_center">0.8515</td>
+    <td class="gt_row gt_center">0.4512</td>
+    <td class="gt_row gt_center">0.5060</td>
+    <td class="gt_row gt_center">0.1075</td>
+    <td class="gt_row gt_center">0.2662</td>
+    <td class="gt_row gt_center">2.80</td>
+    <td class="gt_row gt_center">4.50</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">FDI (share of GDP)</th>
+    <td class="gt_row gt_center">0.0180</td>
+    <td class="gt_row gt_center">0.0494</td>
+    <td class="gt_row gt_center">0.0073</td>
+    <td class="gt_row gt_center">0.0296</td>
+    <td class="gt_row gt_center">0.0444</td>
+    <td class="gt_row gt_center">0.0676</td>
+    <td class="gt_row gt_center">-0.1342</td>
+    <td class="gt_row gt_center">-0.0618</td>
+    <td class="gt_row gt_center">0.3981</td>
+    <td class="gt_row gt_center">0.4313</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Land area (sq km)</th>
+    <td class="gt_row gt_center">757,199</td>
+    <td class="gt_row gt_center">727,792</td>
+    <td class="gt_row gt_center">175,020</td>
+    <td class="gt_row gt_center">155,360</td>
+    <td class="gt_row gt_center">1,978,672</td>
+    <td class="gt_row gt_center">1,917,722</td>
+    <td class="gt_row gt_center">50.00</td>
+    <td class="gt_row gt_center">50.00</td>
+    <td class="gt_row gt_center">16,380,084</td>
+    <td class="gt_row gt_center">16,380,084</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Gasoline price (US$/L)</th>
+    <td class="gt_row gt_center">0.7865</td>
+    <td class="gt_row gt_center">1.21</td>
+    <td class="gt_row gt_center">0.6902</td>
+    <td class="gt_row gt_center">1.22</td>
+    <td class="gt_row gt_center">0.3661</td>
+    <td class="gt_row gt_center">0.4629</td>
+    <td class="gt_row gt_center">0.0260</td>
+    <td class="gt_row gt_center">0.0201</td>
+    <td class="gt_row gt_center">1.67</td>
+    <td class="gt_row gt_center">2.22</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Net aid (US$ bn)</th>
+    <td class="gt_row gt_center">0.5640</td>
+    <td class="gt_row gt_center">0.7073</td>
+    <td class="gt_row gt_center">0.2207</td>
+    <td class="gt_row gt_center">0.3559</td>
+    <td class="gt_row gt_center">0.8743</td>
+    <td class="gt_row gt_center">0.9827</td>
+    <td class="gt_row gt_center">-0.3904</td>
+    <td class="gt_row gt_center">-0.1499</td>
+    <td class="gt_row gt_center">5.48</td>
+    <td class="gt_row gt_center">6.78</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Secondary enrollment (% gross)</th>
+    <td class="gt_row gt_center">63.86</td>
+    <td class="gt_row gt_center">81.86</td>
+    <td class="gt_row gt_center">68.94</td>
+    <td class="gt_row gt_center">90.90</td>
+    <td class="gt_row gt_center">33.14</td>
+    <td class="gt_row gt_center">28.02</td>
+    <td class="gt_row gt_center">5.36</td>
+    <td class="gt_row gt_center">15.92</td>
+    <td class="gt_row gt_center">119.97</td>
+    <td class="gt_row gt_center">135.54</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Ethnic inequality (light Gini)</th>
+    <td class="gt_row gt_center">0.2851</td>
+    <td class="gt_row gt_center">0.2656</td>
+    <td class="gt_row gt_center">0.2020</td>
+    <td class="gt_row gt_center">0.1985</td>
+    <td class="gt_row gt_center">0.2679</td>
+    <td class="gt_row gt_center">0.2474</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">0.8106</td>
+    <td class="gt_row gt_center">0.8123</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Polity2 (-1 to +1)</th>
+    <td class="gt_row gt_center">0.2454</td>
+    <td class="gt_row gt_center">0.4377</td>
+    <td class="gt_row gt_center">0.6000</td>
+    <td class="gt_row gt_center">0.7000</td>
+    <td class="gt_row gt_center">0.7051</td>
+    <td class="gt_row gt_center">0.6041</td>
+    <td class="gt_row gt_center">-1.00</td>
+    <td class="gt_row gt_center">-1.00</td>
+    <td class="gt_row gt_center">1.00</td>
+    <td class="gt_row gt_center">1.00</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Federal state (0/1)</th>
+    <td class="gt_row gt_center">0.1389</td>
+    <td class="gt_row gt_center">0.1364</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">0.3470</td>
+    <td class="gt_row gt_center">0.3443</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">0.0000</td>
+    <td class="gt_row gt_center">1.00</td>
+    <td class="gt_row gt_center">1.00</td>
+  </tr>
+  <tr>
+    <th class="gt_row gt_left gt_stub">Personal income Gini (0-100)</th>
+    <td class="gt_row gt_center">37.54</td>
+    <td class="gt_row gt_center">46.12</td>
+    <td class="gt_row gt_center">36.10</td>
+    <td class="gt_row gt_center">47.25</td>
+    <td class="gt_row gt_center">10.23</td>
+    <td class="gt_row gt_center">6.46</td>
+    <td class="gt_row gt_center">20.20</td>
+    <td class="gt_row gt_center">31.70</td>
+    <td class="gt_row gt_center">61.30</td>
+    <td class="gt_row gt_center">55.00</td>
+  </tr>
+</tbody>
+  <tfoot class="gt_sourcenotes">
+  
+  <tr>
+    <td class="gt_sourcenote" colspan="11">Country-year. Each statistic is computed over the cross-section in the first (1992) and last (2012) panel year; nearest-year fallback if unobserved; net aid in US$ bn. Sources: Appendix A.</td>
+  </tr>
+
+</tfoot>
+
+</table>
+
+</div>
+        

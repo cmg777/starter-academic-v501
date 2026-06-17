@@ -43,6 +43,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import pyfixest as pf
+import maketables as mt
 from linearmodels.panel import RandomEffects
 import statsmodels.formula.api as smf
 
@@ -105,30 +106,35 @@ summary tables give the variables' shape (region files span 1992–2010; country
 
 ```{python}
 #| label: summary-stats
-def summarise(cols):
-    rows = {}
-    for label, s in cols.items():
-        s = pd.to_numeric(s, errors="coerce")
-        rows[label] = [int(s.notna().sum()), s.mean(), s.std(), s.min(), s.median(), s.max()]
-    return pd.DataFrame(rows, index=["N", "mean", "sd", "min", "median", "max"]).T
+def _f(v):
+    if pd.isna(v):
+        return "--"
+    a = abs(v)
+    return f"{v:,.0f}" if a >= 1000 else (f"{v:.2f}" if a >= 1 else f"{v:.4f}")
 
-region = summarise({
-    "Observed GDP p.c. (region)": pred["GDP_pc_Region"],
-    "Predicted GDP p.c. (region)": t2["pred_GDP_pc_Region"],
-    "Log light per pixel (region)": pred["log_Light_ppix_Region"],
-    "Population (region)": pred["Pop_Region"],
-})
-country = summarise({
-    "GDP p.c. (country)": t3["GDP_pc_Country"],
-    "Regional Gini (GINIW)": t3["GINIW_pred_GDP_pc"],
-    "Resource rents (% GDP)": t4["Resources_rents_share_of_GDP"],
-    "Gasoline price (US$/L)": t4["price_gasoline"],
-    "Net aid (US$ bn)": t4["Aid"] / 1e9,
-    "Personal income Gini": f5["Giniall"],
-})
-print(region.round(2))
-print()
-print(country.round(3))
+def summarise_panel(spec, y0, y1):
+    fns = [("mean", "mean"), ("median", "median"), ("sd", "std"), ("min", "min"), ("max", "max")]
+    rows = {}
+    for label, df, col in spec:
+        s = pd.to_numeric(df[col], errors="coerce"); yr = df["year"]
+        obs = sorted(yr[s.notna()].unique())
+        def ys(t, last=False):
+            v = s[yr == t]
+            return v if (v.notna().any() or not obs) else s[yr == (obs[-1] if last else obs[0])]
+        vi, vf = ys(y0), ys(y1, last=True)
+        rows[label] = [_f(getattr(v, fn)()) for _, fn in fns for v in (vi, vf)]
+    cols = pd.MultiIndex.from_tuples([(l, str(y)) for l, _ in fns for y in (y0, y1)])
+    return pd.DataFrame.from_dict(rows, orient="index", columns=cols)
+
+country = summarise_panel([
+    ("GDP p.c. (country, $)", t3, "GDP_pc_Country"),
+    ("Regional Gini (GINIW)", t3, "GINIW_pred_GDP_pc"),
+    ("Resource rents (% GDP)", t4, "Resources_rents_share_of_GDP"),
+    ("Gasoline price ($/L)", t4, "price_gasoline"),
+    ("Personal income Gini", f5, "Giniall"),
+], 1992, 2012)
+# each statistic computed for the initial vs final panel year
+mt.MTable(country).make("gt")
 ```
 
 ### Exploratory data analysis
@@ -230,13 +236,16 @@ GEO = ("log_N_pix_top_cod_1_ppix + log_N_pix_low_cod_1_ppix + log_area + "
        "log_region + log_region_X_log_area")
 specs = {
  1: "log_GDP_pc_Region ~ log_Light_ppix_Region",
- 2: "log_GDP_pc_Region ~ log_Light_ppix_Region | code_Coutry_Region + satyear",
- 4: "log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country | Country_ISO + satyear",
- 7: f"log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country + {GEO} | group_id + satyear",
+ 2: "log_GDP_pc_Region ~ log_Light_ppix_Region | code_Coutry_Region+satyear",
+ 4: "log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country | Country_ISO+satyear",
+ 7: f"log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country + {GEO} | group_id+satyear",
 }
-for k, fml in specs.items():
-    m = pf.feols(fml, data=pred, vcov={"CRV1": "Country_ISO"})
-    print(f"col {k}: FE light elasticity = {m.coef()['log_Light_ppix_Region']:.3f}")
+fe_models = {k: pf.feols(fml, data=pred, vcov={"CRV1": "Country_ISO"})
+             for k, fml in specs.items()}
+mt.ETable(list(fe_models.values()), model_heads=[f"({k})" for k in specs],
+          felabels={"code_Coutry_Region": "Region FE", "Country_ISO": "Country FE",
+                    "group_id": "WB-group FE", "satyear": "Satellite FE"},
+          coef_fmt="b:.3f* (se:.3f)", show_fe=True).make("gt")
 ```
 
 Column 2 (region fixed effects) gives the clean within elasticity of **0.190**. Now the
@@ -351,10 +360,18 @@ def collapse5(df, vars_):
 
 agg = collapse5(t3, ["GDP_pc_Country"] + IDX)
 agg["lg"] = np.log(agg["GDP_pc_Country"]); agg["lg2"] = agg.lg**2; agg["lg3"] = agg.lg**3
-k3 = pf.feols("GINIW_pred_GDP_pc ~ lg + lg2 + lg3 | Country_ISO + p5",
-              data=agg, vcov={"CRV1": "Country_ISO"})
-print("GINIW cubic:", [round(k3.coef()[t], 4) for t in ["lg", "lg2", "lg3"]],
-      "| N =", k3._N, "| countries =", agg.Country_ISO.nunique())
+def kuz_fit(dv, rhs):
+    return pf.feols(f"{dv} ~ {rhs} | Country_ISO+p5", data=agg, vcov={"CRV1": "Country_ISO"})
+k1 = kuz_fit("GINIW_pred_GDP_pc", "lg")
+k2 = kuz_fit("GINIW_pred_GDP_pc", "lg + lg2")
+k3 = kuz_fit("GINIW_pred_GDP_pc", "lg + lg2 + lg3")
+k_other = {c: kuz_fit(c, "lg + lg2 + lg3") for c in IDX[1:]}
+mt.ETable([k1, k2, k3] + [k_other[c] for c in IDX[1:]],
+          model_heads=["(1) Gini, linear", "(2) Gini, quadratic", "(3) Gini, cubic",
+                       "(4) CV", "(5) Theil", "(6) MLD", "(7) GE(-1)"],
+          labels={"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)^2", "lg3": "(log GDP p.c.)^3"},
+          felabels={"Country_ISO": "Country FE", "p5": "Period FE"},
+          coef_fmt="b:.3f* (se:.3f)", show_fe=True).make("gt")
 ```
 
 The cubic is **0.293 / −0.032 / 0.001** — positive, negative, positive: an N-shape. Inequality
@@ -446,20 +463,35 @@ for the full treatment, including the Bayesian model-averaging analogue.
 agg4 = collapse5(t4, ["GINIW_pred_GDP_pc", "GDP_pc_Country", "Pop_Country",
                       "Resources_rents_share_of_GDP", "Arable_land", "Trade_GDP_share",
                       "FDI_share_of_GDP", "area", "price_gasoline", "Aid",
-                      "School_enrollment_secondary", "GINIW_Eth_light"])
+                      "School_enrollment_secondary", "GINIW_Eth_light", "Polity2", "fedelupd2"])
 agg4["lg"] = np.log(agg4["GDP_pc_Country"]); agg4["lg2"] = agg4.lg**2; agg4["lg3"] = agg4.lg**3
 agg4["aid_GDP"] = agg4["Aid"] / (agg4["GDP_pc_Country"] * agg4["Pop_Country"])
 agg4["Resources_rents_share_of_GDP"] /= 100
 agg4["School_enrollment_secondary"] /= 100
 agg4["Area_X_price_gasoline"] = agg4["area"] * agg4["price_gasoline"] / 1e7
+agg4["lgXfed"] = agg4["lg"] * agg4["fedelupd2"]
 def det_fit(extra):
-    return pf.feols(f"GINIW_pred_GDP_pc ~ lg + lg2 + lg3 + {extra} | Country_ISO + p5",
+    return pf.feols(f"GINIW_pred_GDP_pc ~ lg+lg2+lg3 + {extra} | Country_ISO+p5",
                     data=agg4, vcov={"CRV1": "Country_ISO"})
+d0 = pf.feols("GINIW_pred_GDP_pc ~ lg+lg2+lg3 | Country_ISO+p5",
+              data=agg4, vcov={"CRV1": "Country_ISO"})
 d1 = det_fit("Resources_rents_share_of_GDP + Arable_land")
+d2 = det_fit("Trade_GDP_share + FDI_share_of_GDP")
+d3 = det_fit("price_gasoline + Area_X_price_gasoline")
+d_inst = det_fit("Polity2 + lgXfed")            # institutions (ICRG omitted)
+d4 = det_fit("aid_GDP + School_enrollment_secondary")
 d5 = det_fit("GINIW_Eth_light")
-print("resource rents   =", round(d1.coef()["Resources_rents_share_of_GDP"], 3))
-print("arable land      =", round(d1.coef()["Arable_land"], 3))
-print("ethnic inequality =", round(d5.coef()["GINIW_Eth_light"], 3), "(N =", int(d5._N), ")")
+mt.ETable([d0, d1, d2, d3, d_inst, d4, d5],
+          model_heads=["(0) baseline", "(1) resources", "(2) openness", "(3) mobility",
+                       "(4) institutions", "(5) transfers/edu", "(6) ethnicity"],
+          labels={"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)^2", "lg3": "(log GDP p.c.)^3",
+                  "Resources_rents_share_of_GDP": "Resource rents/GDP", "Arable_land": "Arable land",
+                  "Trade_GDP_share": "Trade/GDP", "FDI_share_of_GDP": "FDI/GDP",
+                  "price_gasoline": "Gasoline price", "Area_X_price_gasoline": "Area x gasoline",
+                  "Polity2": "Polity2", "lgXfed": "log GDP x Federal", "aid_GDP": "Aid/GDP",
+                  "School_enrollment_secondary": "Schooling", "GINIW_Eth_light": "Ethnic inequality"},
+          felabels={"Country_ISO": "Country FE", "p5": "Period FE"},
+          coef_fmt="b:.3f* (se:.3f)", show_fe=True).make("gt")
 ```
 
 The strongest correlate is **ethnic inequality (0.071)**. Resource rents push inequality up

@@ -462,34 +462,34 @@ and public databases; tracing that chain is what makes the numbers interpretable
 ### 4.4 Descriptive statistics
 
 With the variables defined, two summary tables give their shape — **every substantive variable**,
-split by unit of observation (the region files run 1992–2010, the country files 1992–2012). Besides
-the usual N / mean / sd / min / median / max, each row also carries the variable's **mean in the
-first and last panel year**, so the panel's time dimension is visible directly in the table.
+split by unit of observation (region files 1992–2010, country files 1992–2012). Because the data are
+panels, each statistic — **mean, median, sd, min and max** — is reported **twice: for the initial
+year and the final year**. That way the table shows not just the level of each variable but how its
+whole distribution shifted over two decades. The tables are built with
+[`maketables`](https://github.com/py-econometrics/maketables).
 
 ```python
-# all substantive variables: N, mean, sd, min, median, max, plus the mean in the
-# first vs last panel year (so level shifts over the panel show up in the table)
-region_stats  = summarise_panel(region_vars,  y0=1992, y1=2010)   # 14 region-level variables
-country_stats = summarise_panel(country_vars, y0=1992, y1=2012)   # 19 country-level variables
-print(country_stats)                               # see script.py for the full table builder
+import maketables as mt
+# for every substantive variable: mean/median/sd/min/max in the initial vs final
+# panel year, paired by statistic in a 2-level column header
+region_stats  = summarise_panel(region_spec,  1992, 2010)   # 14 region-level variables
+country_stats = summarise_panel(country_spec, 1992, 2012)   # 19 country-level variables
+mt.MTable(country_stats).make("html")            # professional HTML; see script.py
 ```
 
-![Summary statistics of the region-level variables](python_kuznets_dmsp_16_summary_region.png)
+{{< include-html "summary_region.html" >}}
 
-![Summary statistics of the country-level variables](python_kuznets_dmsp_17_summary_country.png)
+{{< include-html "summary_country.html" >}}
 
-At the region level, observed and predicted GDP per capita have similar centres (medians near
-\\$8,770 and \\$8,325), but the predictions are less dispersed — the model smooths the extremes,
-compressing the observed \\$226–\\$150,768 range to \\$360–\\$70,638. At the country level the five
-inequality indices are all small and right-skewed (the regional Gini averages 0.064, max 0.163),
-echoing §4.1's point that most countries are internally fairly equal with a long unequal tail. The
-determinants are where to be careful: several are **sparsely observed** — the gasoline price
-(N = 1,366), the personal income Gini (N = 1,330), secondary enrolment (N = 2,566) and net aid
-(N = 2,964) cover far fewer country-years than the core panel's 3,675 — which is exactly why §10's
-determinant regressions run on shifting subsamples. The full per-variable coverage, construction,
-and sources are tabulated in [Appendix A](#appendix-a-data-dictionary). The first/last-year columns
-already hint at the dynamics — the regional Gini drifts from 0.070 (1992) to 0.061 (2012) while mean
-country GDP per capita climbs from \\$9,962 to \\$14,892 — which §4.5 now makes visual.
+The initial-vs-final columns make the dynamics explicit. At the region level, both observed and
+predicted GDP per capita shift up markedly over the two decades, while the predicted distribution
+stays narrower than the observed one — the lights model smooths the extremes. At the country level
+the regional Gini drifts **down** (mean 0.070 in 1992 → 0.061 in 2012) even as mean GDP per capita
+**rises** (\\$9,962 → \\$14,892) — the convergence §5 will formalise. The determinants are where to
+be careful: several are **sparsely observed** — the gasoline price, the personal income Gini,
+secondary enrolment and net aid cover far fewer country-years than the core panel (their per-variable
+coverage is tabulated in [Appendix A](#appendix-a-data-dictionary)), which is exactly why §10's
+determinant regressions run on shifting subsamples. §4.5 now makes the time dynamics visual.
 
 ### 4.5 Exploratory data analysis
 
@@ -761,16 +761,26 @@ RE col 7 light elasticity = 0.102
 RE col 7 national-GDP elasticity = 0.889
 ```
 
-![Table 1: nighttime lights predict regional GDP per capita, fixed effects vs random effects](python_kuznets_dmsp_05_table1.png)
+```python
+import maketables as mt
+# the seven PyFixest specifications side by side, as in the paper's Table 1
+et1 = mt.ETable([fe_models[k] for k in range(1, 8)],
+                model_heads=[f"({k})" for k in range(1, 8)],
+                coef_fmt="b:.3f* (se:.3f)", show_fe=True)
+et1.make("html")                                  # professional HTML table
+```
+
+{{< include-html "table1_prediction.html" >}}
 
 The random-effects elasticity in column 7 is **0.102** — exactly the paper's number — versus
 the 0.049 we got with fixed effects. They differ because random effects keep the
 between-region information that the within estimator throws away; with national income
 already controlling for most of the scale, that between-region variation is where light earns
 its keep. The national-GDP elasticity of **0.889** confirms regional income tracks national
-income almost one-for-one, with light supplying the residual subnational detail. The full
-seven-column table (figure above) lists both estimators for every specification; they agree
-exactly in column 2, the one true fixed-effects column (0.190).
+income almost one-for-one, with light supplying the residual subnational detail. The
+seven-column table above reports the PyFixest FE/OLS estimate for every specification (the note
+records that the random-effects elasticity is essentially identical); column 2 is the one true
+fixed-effects column, where FE and RE coincide at 0.190.
 
 ### 6.4 Forming the predictions
 
@@ -932,20 +942,17 @@ correlation between inequality measured from *predicted* income and inequality m
 *observed* income. Second, an honest caveat about coverage.
 
 ```python
-# correlations across countries, 2001-2012 means (see script.py for the full loop)
-print("predicted vs observed:", [round(x, 2) for x in pred_obs])
-print("raw light vs observed:", [round(x, 2) for x in light_obs])
+import maketables as mt
+# cross-country correlations (2001-2012 means) for the five indices
+t2tab = pd.DataFrame({"Predicted income vs observed": pred_obs,
+                      "Raw light vs observed": light_obs}, index=index_labels)
+mt.MTable(t2tab).make("html")                     # professional HTML table
 ```
 
-```text
-predicted vs observed: [0.49, 0.39, 0.45, 0.50, 0.52]   # Gini, GE(-1), MLD, Theil, CV
-raw light vs observed: [0.21, 0.11, 0.21, 0.30, 0.29]
-```
-
-![Inequality from predicted income tracks observed inequality (Table 2)](python_kuznets_dmsp_08_table2_correlations.png)
+{{< include-html "table2_validation.html" >}}
 
 Inequality computed from *predicted* income correlates with inequality from *observed* income
-at 0.49 for the Gini — more than double the 0.21 we get from raw light density (figure above),
+at 0.49 for the Gini — more than double the 0.21 we get from raw light density (table above),
 and the same pattern holds for all five indices. This is the payoff of the prediction step:
 turning light into income first, instead of treating brightness as income, roughly doubles
 how well we measure inequality. One honest caveat: our from-scratch indices are built on the
@@ -994,14 +1001,24 @@ lg3     0.001
 N = 879  countries = 180
 ```
 
-![Table 3: the regional Kuznets cubic](python_kuznets_dmsp_09_table3.png)
+```python
+import maketables as mt
+# the Gini ladder (linear / quadratic / cubic) + the cubic for the other four indices
+et3 = mt.ETable([k1, k2, k3] + [k_other[c] for c in IDX[1:]],
+                model_heads=["(1) Gini, linear", "(2) Gini, quadratic", "(3) Gini, cubic",
+                             "(4) CV", "(5) Theil", "(6) MLD", "(7) GE(-1)"],
+                coef_fmt="b:.3f* (se:.3f)", show_fe=True)
+et3.make("html")                                  # professional HTML table
+```
+
+{{< include-html "table3_kuznets.html" >}}
 
 The cubic coefficients are **0.293 / −0.032 / 0.001** — positive, negative, positive — exactly
 the paper's values. The positive linear term means inequality rises with income at low levels;
 the negative quadratic bends the curve down; the tiny positive cubic adds a faint upturn at
-the very top. This is an **N-shape**: a Kuznets hump with a third act. The full table (figure
-above) shows the same sign pattern for all four other indices, so the shape is not an artefact
-of the Gini.
+the very top. This is an **N-shape**: a Kuznets hump with a third act. The full table above —
+columns (1)–(3) building up the Gini ladder, (4)–(7) the cubic for the other four indices —
+shows the same sign pattern throughout, so the shape is not an artefact of the Gini.
 
 ### 8.2 Visualising the curve
 
@@ -1178,42 +1195,45 @@ turning points lie inside the observed income range before claiming an inverted-
 
 ## 10. What drives regional inequality?
 
-If two equally rich countries differ in regional inequality, what accounts for the gap? We
-add blocks of structural controls on top of the cubic — natural resources and farmland, trade
-and investment openness, geography and transport, aid and schooling, and ethnic inequality —
-each as its own PyFixest regression with country and period fixed effects. We report each
-control's coefficient; a positive sign means the factor is associated with *more* regional
-inequality.
+If two equally rich countries differ in regional inequality, what accounts for the gap? Following
+the paper's Table 4, we add blocks of structural determinants on top of the cubic — **(0)** a
+baseline with the cubic alone, then **(1)** resources, **(2)** openness, **(3)** mobility/transport,
+**(4)** institutions, **(5)** transfers and education, and **(6)** ethnicity — each with country and
+period fixed effects and country-clustered standard errors. A positive coefficient means the factor
+is associated with *more* regional inequality. The seven specifications go side by side in a
+[`maketables`](https://github.com/py-econometrics/maketables) regression table.
 
 ```python
-def det_fit(extra):
-    return pf.feols(f"GINIW_pred_GDP_pc ~ lg + lg2 + lg3 + {extra} | Country_ISO + p5",
+import maketables as mt
+def det_fit(extra):                                # add a determinant block to the cubic
+    return pf.feols(f"GINIW_pred_GDP_pc ~ lg+lg2+lg3 + {extra} | Country_ISO+p5",
                     data=agg4, vcov={"CRV1": "Country_ISO"})
 
-d1 = det_fit("Resources_rents_share_of_GDP + Arable_land")
-d5 = det_fit("GINIW_Eth_light")
-print("resource rents :", round(d1.coef()["Resources_rents_share_of_GDP"], 3))
-print("arable land    :", round(d1.coef()["Arable_land"], 3))
-print("ethnic inequality:", round(d5.coef()["GINIW_Eth_light"], 3))
+d0     = pf.feols("GINIW_pred_GDP_pc ~ lg+lg2+lg3 | Country_ISO+p5",
+                  data=agg4, vcov={"CRV1": "Country_ISO"})       # (0) baseline
+d1     = det_fit("Resources_rents_share_of_GDP + Arable_land")   # (1) resources
+d_inst = det_fit("Polity2 + lgXfed")                             # (4) institutions (lgXfed = log GDP × Federal)
+d5     = det_fit("GINIW_Eth_light")                              # (6) ethnicity
+# d2 openness, d3 mobility, d4 transfers+education are built the same way
+mt.ETable([d0, d1, d2, d3, d_inst, d4, d5],
+          model_heads=["(0) baseline", "(1) resources", "(2) openness", "(3) mobility",
+                       "(4) institutions", "(5) transfers/edu", "(6) ethnicity"],
+          coef_fmt="b:.3f* (se:.3f)", show_fe=True).make("html")
 ```
 
-```text
-resource rents   : 0.018
-arable land      : -0.053
-ethnic inequality: 0.071
-```
+{{< include-html "table4_determinants.html" >}}
 
-![Table 4: determinants of regional inequality](python_kuznets_dmsp_11_table4.png)
-
-The strongest correlate by far is **ethnic inequality** at **0.071** (p < 0.001): countries
-where income differs sharply across ethnic homelands also have sharply unequal regions.
-Resource rents push inequality up (0.018, p < 0.01) — resource wealth concentrates in a few
-regions — while a larger arable-land share pulls it down (−0.053, p < 0.001), consistent with
-agriculture spreading income more evenly. Trade openness adds a small positive effect (0.005),
-and aid relative to GDP a positive 0.015. One column of the paper (institutional quality, from
-the licensed ICRG database) cannot be reproduced and is omitted. The sample size drifts across
-columns (857 down to 585) as different controls go missing, so the columns should be read as
-separate windows, not a single nested model.
+The strongest determinant by far is **ethnic inequality** (column 6): **0.071** (p < 0.001) —
+countries where income differs sharply across ethnic homelands also have sharply unequal regions.
+Among the rest, **resource rents** push inequality up (0.018, p < 0.01) — resource wealth
+concentrates in a few regions — while a larger **arable-land share** pulls it down (−0.053,
+p < 0.001), consistent with agriculture spreading income more evenly; **trade openness** adds a small
+positive effect (0.005, p < 0.01) and **aid relative to GDP** a positive 0.015 (p < 0.05). The
+**institutions** column (4) is the one we can only partly reproduce: Polity2 and a log GDP × Federal
+interaction are both small and insignificant here, and the paper's ICRG bureaucratic-quality index is
+licensed and omitted. The cubic in log GDP survives every block, and the sample drifts from column to
+column (N falls from 879 in the baseline to 573 where the sparse institutions variables bind), so the
+columns are best read as separate windows, not one nested model.
 
 ## 11. Spatial robustness: Conley standard errors
 

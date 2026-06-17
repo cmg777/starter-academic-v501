@@ -38,6 +38,7 @@ PINNED: dict[str, str] = {
     "pyfixest":     "0.60.0",
     "scipy":        "1.17.1",
     "statsmodels":  "0.14.6",
+    "maketables":   "0.1.8",
     "jupyter":      "1.1.1",
     "ipykernel":    "6.29.3",
 }

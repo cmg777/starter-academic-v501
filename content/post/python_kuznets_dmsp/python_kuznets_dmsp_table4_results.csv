@@ -3,8 +3,10 @@ column,control,coef,p,N
 (1) resources,arable land,-0.0529,0.0003,857
 (2) openness,trade/GDP,0.0051,0.0069,817
 (2) openness,FDI/GDP,0.0094,0.1965,817
-(3) geography,gasoline price,0.0006,0.7827,672
-(3) geography,area × gasoline,0.006,0.0491,672
-(4) aid+school,aid/GDP,0.0152,0.0277,585
-(4) aid+school,schooling,-0.0141,0.0533,585
-(5) ethnic,ethnic inequality,0.0709,0.0,844
+(3) mobility,gasoline price,0.0006,0.7827,672
+(3) mobility,area × gasoline,0.006,0.0491,672
+(4) institutions,Polity2,-0.0007,0.6312,573
+(4) institutions,log GDP × Federal,-0.0008,0.8548,573
+(5) transfers/edu,aid/GDP,0.0152,0.0277,585
+(5) transfers/edu,schooling,-0.0141,0.0533,585
+(6) ethnicity,ethnic inequality,0.0709,0.0,844
