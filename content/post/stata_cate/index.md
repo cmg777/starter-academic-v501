@@ -33,6 +33,10 @@ links:
   icon_pack: fab
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/stata_cate/index.md
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary"
+  url: data/index.html
 slides:
 summary: Estimate how the effect of 401(k) eligibility on household assets varies across households using Stata 19's new cate command, with PO, AIPW, GATE, GATES, and nonparametric series estimators applied to the canonical assets3 dataset
 tags:

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>(function(){try{var t=localStorage.getItem("dd-theme");if(!t)t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light";document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+<title>Data dictionary &middot; Causal Inference with DoWhy: Working From Home &amp; Productivity</title>
+<meta name="description" content="Interactive data dictionary for Causal Inference with DoWhy: Working From Home &amp; Productivity.">
+<style>
+:root{--steel:#6a9bcc;--orange:#d97757;--ink:#141413;--teal:#00d4c8;
+  --bg:#f6f7f9;--card:#fff;--line:#e4e6ea;--muted:#6b6f76;--dark:#0f1729;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);background:var(--bg);line-height:1.6;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;}
+a{color:var(--steel);text-decoration:none}a:hover{text-decoration:underline}
+.hero{background:linear-gradient(135deg,#0f1729 0%,#1f2b5e 55%,#2a4a7a 100%);color:#fff;
+  padding:40px 20px 30px}
+.wrap{max-width:1100px;margin:0 auto}
+.hero .back{color:#aeb9d6;font-size:14px}
+.hero .kicker{color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  font-size:12px;margin:14px 0 6px}
+.hero h1{margin:0;font-size:32px;font-weight:800;letter-spacing:-.02em}
+.hero p.sub{margin:8px 0 0;color:#d7dcea;max-width:780px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:22px}
+.kpi{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:12px;
+  padding:12px 14px}
+.kpi .n{font-size:24px;font-weight:800;color:#fff}
+.kpi .l{font-size:12px;color:#aeb9d6;text-transform:uppercase;letter-spacing:.04em}
+nav.toc{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.toc .wrap{display:flex;flex-wrap:wrap;gap:4px 18px;padding:11px 20px;font-size:14px}
+nav.toc a{color:var(--ink);font-weight:500}
+main{padding:0 20px}
+section{padding:30px 0;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+h2{font-size:23px;margin:0 0 6px;padding-left:12px;border-left:4px solid var(--orange)}
+h2 .hint{font-size:13px;font-weight:400;color:var(--muted);border:0;padding:0;margin-left:8px}
+h3{font-size:17px;margin:22px 0 8px}h4{font-size:15px;margin:18px 0 6px;color:var(--muted)}
+p.lead{color:#3b3f46;max-width:820px}
+.btn{display:inline-block;background:var(--steel);color:#fff;padding:8px 14px;border-radius:9px;
+  font-size:14px;font-weight:600;margin:4px 6px 4px 0;transition:.15s}
+.btn:hover{background:var(--orange);text-decoration:none;transform:translateY(-1px)}
+.btn.zip{background:var(--orange);font-size:15px;padding:11px 20px}
+.btn.zip:hover{background:#c4623f}
+.btn.ghost{background:#eef1f6;color:var(--ink)}.btn.ghost:hover{background:#e2e7f0;color:var(--ink)}
+.btn.small{padding:5px 11px;font-size:13px}
+.tbl-wrap{overflow-x:auto;margin:8px 0;border:1px solid var(--line);border-radius:10px}
+.tbl-wrap.tall{max-height:78vh;overflow:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px;background:var(--card)}
+th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{background:#eef2f8;color:#27324a;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:2}
+table.sortable th{cursor:pointer}table.sortable th:hover{background:#e2e9f4}
+table.sortable th::after{content:' \2195';color:#9aa3b2;font-size:11px}
+table.sortable th.nosort{cursor:default}
+table.sortable th.nosort:hover{background:#eef2f8}
+table.sortable th.nosort::after{content:''}
+tbody tr:hover{background:#f3f7fc}
+code{background:#eef1f6;padding:1px 6px;border-radius:5px;font-size:.88em;
+  font-family:'SF Mono',Menlo,Consolas,monospace;color:#243}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
+  color:#fff;letter-spacing:.02em;white-space:nowrap}
+.b-cont{background:var(--steel)}.b-dummy{background:var(--orange)}
+.b-id{background:#7a8699}.b-year{background:#1aa39a}.b-frame{background:#27324a}
+.spark{display:block}.spark rect{fill:var(--steel)}.spark-dummy rect{fill:var(--orange)}
+.spark-na{color:#b9bec7}
+.missbar{display:inline-block;width:54px;height:8px;background:#e9ecf1;border-radius:5px;
+  overflow:hidden;vertical-align:middle}
+.missfill{display:block;height:100%;background:linear-gradient(90deg,#3fae8e,#00d4c8)}
+.misspct{font-size:12px;color:var(--muted);margin-left:6px;vertical-align:middle}
+.code{position:relative;margin:12px 0}
+.code pre{background:#0f1729;color:#e8ecf2;padding:16px;border-radius:11px;overflow-x:auto;margin:0}
+.code pre code{background:none;color:inherit;padding:0;font-size:13px;line-height:1.55}
+.code .copy{position:absolute;top:9px;right:9px;background:#27324a;color:#c8d0e0;border:none;
+  border-radius:7px;padding:4px 11px;font-size:12px;cursor:pointer}
+.code .copy:hover{background:var(--steel);color:#fff}
+.note{background:#eef6fb;border-left:4px solid var(--steel);padding:11px 15px;
+  border-radius:0 9px 9px 0;margin:14px 0;font-size:14px}
+ul.tight li{margin:5px 0}
+.explorer-controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:6px 0 12px}
+#varSearch{flex:1;min-width:240px;padding:9px 13px;border:1px solid var(--line);border-radius:9px;
+  font-size:14px;background:var(--card);color:var(--ink)}
+#varSearch:focus{outline:2px solid var(--steel);border-color:var(--steel)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:#eef1f6;border:1px solid var(--line);color:#3b3f46;border-radius:20px;
+  padding:6px 13px;font-size:13px;font-weight:600;cursor:pointer}
+.chip.active{background:var(--steel);color:#fff;border-color:var(--steel)}
+.varcount{font-size:13px;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
+.tab{background:#eef1f6;border:1px solid var(--line);border-radius:9px 9px 0 0;padding:8px 14px;
+  font-size:13.5px;font-weight:600;cursor:pointer;color:#3b3f46}
+.tab.active{background:var(--steel);color:#fff;border-color:var(--steel)}
+.dl-grid td .btn{margin:2px 4px 2px 0}
+footer{padding:26px 20px 60px;color:var(--muted);font-size:13px}
+.hint{font-size:13px;color:var(--muted)}
+.meta{font-size:13.5px;color:var(--muted);margin:4px 0}
+.vlink{color:var(--muted);font-size:12px;text-decoration:none;margin-left:5px;opacity:.55}
+.vlink:hover{opacity:1;color:var(--steel);text-decoration:none}
+nav.toc a.active{color:var(--steel);font-weight:700}
+#themeToggle{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--ink);
+  border-radius:8px;padding:3px 11px;font-size:14px;cursor:pointer;line-height:1.3}
+#themeToggle:hover{border-color:var(--steel);color:var(--steel)}
+:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
+[data-theme="dark"]{--bg:#0b1120;--card:#121a2e;--line:#26304a;--muted:#9aa6bd;--ink:#e8ecf2;}
+[data-theme="dark"] nav.toc{background:rgba(11,17,32,.92)}
+[data-theme="dark"] p.lead{color:#c2c9d6}
+[data-theme="dark"] th{background:#1b2540;color:#cdd6e6}
+[data-theme="dark"] table.sortable th:hover{background:#243056}
+[data-theme="dark"] table.sortable th.nosort:hover{background:#1b2540}
+[data-theme="dark"] tbody tr:hover{background:#172138}
+[data-theme="dark"] code{background:#1b2540;color:#cfe1f5}
+[data-theme="dark"] .note{background:#13233a}
+[data-theme="dark"] .btn.ghost{background:#1d2742}
+[data-theme="dark"] .btn.ghost:hover{background:#26304a}
+[data-theme="dark"] .chip{background:#1d2742;color:#c2c9d6}
+[data-theme="dark"] .tab{background:#1d2742;color:#c2c9d6}
+[data-theme="dark"] .missbar{background:#26304a}
+[data-theme="dark"] .spark-na{color:#5d6884}
+@media(max-width:760px){.hero h1{font-size:25px}h2{font-size:20px}#themeToggle{margin-left:0}}
+@media print{
+  nav.toc,.tabs,#expandBtn,.code .copy,.explorer-controls,#themeToggle,.btn,.vlink,
+  .hero .back{display:none!important}
+  .ds-panel{display:block!important}
+  .tbl-wrap,.tbl-wrap.tall{max-height:none!important;overflow:visible!important}
+  .hero{background:#fff!important;color:#000!important}
+  .hero h1,.hero .kicker,.hero p.sub,.kpi .n,.kpi .l{color:#000!important}
+  .kpi{border-color:#bbb}
+  body{background:#fff;color:#000}
+  section{border-color:#ccc;page-break-inside:auto}
+}
+</style>
+</head><body>
+<header class="hero"><div class="wrap">
+<a class="back" href="https://carlos-mendez.org/post/python_dowhy_intro/">&larr; Back to the post</a>
+<div class="kicker">Interactive data dictionary</div>
+<h1>Causal Inference with DoWhy: Working From Home &amp; Productivity</h1>
+<p class="sub">A fully synthetic 5,000-employee observational dataset with a known true treatment effect (ATE = 1.0).</p>
+<div class="kpis"><div class="kpi"><div class="n">1</div><div class="l">dataset</div></div><div class="kpi"><div class="n">5</div><div class="l">variables</div></div><div class="kpi"><div class="n">5,000</div><div class="l">employees</div></div><div class="kpi"><div class="n">ATE = 1.0</div><div class="l">true effect</div></div></div>
+</div></header>
+<nav class="toc"><div class="wrap">
+<a href="#downloads">Downloads</a><a href="#load">Load in code</a><a href="#overview">Overview</a><a href="#cite">Cite</a><a href="#explorer">Variable explorer</a><a href="#index">Cross-file index</a><a href="#formulas">Formulas</a><a href="#datasets">Datasets</a><a href="#caveats">Caveats</a>
+<button id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">&#9790; Dark</button>
+</div></nav>
+<main class="wrap">
+<section id="downloads"><h2>Downloads</h2><p class="lead">Each dataset is available as a labeled Stata <code>.dta</code> and its source file.</p><p><a class="btn zip" href="https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dowhy_intro/data/python_dowhy_intro_data.zip" target="_blank" rel="noopener">&#8681; Download all data (ZIP)</a><a class="btn ghost" href="https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dowhy_intro/data/stata_codebook.do" target="_blank" rel="noopener">stata_codebook.do</a></p><div class="dl-grid"><div class="tbl-wrap"><table><thead><tr><th>Dataset</th><th>Grain</th><th>Rows</th><th>Stata</th><th>Source</th></tr></thead><tbody><tr><td><code>wfh_simulated_data</code></td><td>employee (cross-section)</td><td>5,000 &times; 5</td><td><a class="btn small" href="https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dowhy_intro/data/wfh_simulated_data.dta" target="_blank" rel="noopener">wfh_simulated_data.dta</a></td><td><a class="btn ghost small" href="https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dowhy_intro/data/wfh_simulated_data.csv" target="_blank" rel="noopener">wfh_simulated_data.csv</a></td></tr></tbody></table></div></div><p class="note">Run <code>stata_codebook.do</code> in Stata once to attach long-form per-variable notes to the <code>.dta</code> files.</p></section><section id="load"><h2>Load directly in code</h2><p class="lead">Every file loads straight from GitHub (raw URLs). Swap the file name to load any dataset.</p><h3>Stata</h3><div class="code"><button class="copy" type="button" onclick="copyCode(this)">Copy</button><pre><code>* Stata 14+ : `use` reads an https URL directly
+global BASE &quot;https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dowhy_intro/data/&quot;
+use &quot;${BASE}wfh_simulated_data.dta&quot;, clear
+describe
+notes</code></pre></div><h3>Python</h3><div class="code"><button class="copy" type="button" onclick="copyCode(this)">Copy</button><pre><code>!pip install -q pyreadstat
+import pandas as pd
+BASE = &quot;https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dowhy_intro/data/&quot;
+df = pd.read_stata(BASE + &quot;wfh_simulated_data.dta&quot;)
+
+# load every dataset at once
+files = [&quot;wfh_simulated_data&quot;]
+data = {f: pd.read_stata(BASE + f + &quot;.dta&quot;) for f in files}
+
+# pyreadstat (richest metadata) reads LOCAL files -&gt; download first
+import pyreadstat, urllib.request
+urllib.request.urlretrieve(BASE + &quot;wfh_simulated_data.dta&quot;, &quot;wfh_simulated_data.dta&quot;)
+df, meta = pyreadstat.read_dta(&quot;wfh_simulated_data.dta&quot;)</code></pre></div><p class="note">Copy and paste this snippet in Google Colab app. <a href="https://colab.research.google.com/notebooks/empty.ipynb" target="_blank" rel="noopener">https://colab.research.google.com/notebooks/empty.ipynb</a></p><h3>R</h3><div class="code"><button class="copy" type="button" onclick="copyCode(this)">Copy</button><pre><code># R : haven::read_dta auto-downloads an https URL
+library(haven)
+BASE &lt;- &quot;https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dowhy_intro/data/&quot;
+df &lt;- read_dta(paste0(BASE, &quot;wfh_simulated_data.dta&quot;))</code></pre></div></section><section id="overview"><h2>Overview &amp; sources</h2><p class="lead">Companion data for a beginner-friendly causal-inference tutorial that uses <strong>DoWhy</strong>'s four-step framework (Model, Identify, Estimate, Refute) to recover a <strong>known</strong> average treatment effect from observational data. The dataset is <strong>fully synthetic</strong>: 5,000 employees with a binary work-from-home treatment, a continuous productivity outcome, two confounders (introversion, number of children) that drive self-selection into treatment, and a subway-disruption instrument that satisfies the exclusion restriction by construction. Because the true causal effect is fixed at <strong>1.0 productivity points</strong>, every estimator can be scored against the truth: the naive difference in means overshoots to 1.39, while the backdoor methods (regression, IPW, doubly robust) recover ~1.0 and IV (2SLS) returns 0.89 with a much wider interval. The entire data-generating process is open and reproducible.
+</p><div class="note"><strong>One file.</strong> <code>wfh_simulated_data</code> is a cross-section &mdash; one row per simulated employee (5,000 rows), with no time or panel dimension. There is no identifier column; rows are exchangeable draws from the data-generating process.
+</div><h3>Data sources</h3><div class="tbl-wrap"><table><thead><tr><th>Source</th><th>Provides</th><th>Reference / URL</th></tr></thead><tbody><tr><td>Synthetic (this study)</td><td>All values — simulated via a calibrated data-generating process (open &amp;amp; reproducible)</td><td>Mendez, C. (2026). See the post&#x27;s Python script script.py (function generate_wfh_data) for the full DGP.</td></tr><tr><td>DoWhy</td><td>End-to-end causal-inference library implementing the Model/Identify/Estimate/Refute workflow</td><td>Sharma, A., &amp; Kiciman, E. (2020). DoWhy: An end-to-end library for causal inference. arXiv:2011.04216. <a href="https://www.pywhy.org/dowhy/" target="_blank" rel="noopener">https://www.pywhy.org/dowhy/</a></td></tr><tr><td>Method references</td><td>Estimators and identification concepts (backdoor/IV, propensity score, doubly robust)</td><td>Pearl (2009); Rosenbaum &amp; Rubin (1983); Robins, Rotnitzky &amp; Zhao (1994); Angrist &amp; Pischke (2009).</td></tr><tr><td>Tutorial inspiration</td><td>Worked DoWhy walkthrough this beginner&amp;#x27;s guide adapts</td><td>DataCamp. Introduction to Causal AI using the DoWhy library in Python. <a href="https://www.datacamp.com/tutorial/intro-to-causal-ai-using-the-dowhy-library-in-python" target="_blank" rel="noopener">https://www.datacamp.com/tutorial/intro-to-causal-ai-using-the-dowhy-library-in-python</a></td></tr></tbody></table></div></section><section id="cite"><h2>Cite this data</h2><p class="lead">Please cite this dataset as follows.</p><h3>APA</h3><div class="code"><button class="copy" type="button" onclick="copyCode(this)">Copy</button><pre><code>Mendez, C. (2026). A Beginner&#x27;s Guide to Causal Inference with DoWhy in Python [Data set]. https://carlos-mendez.org/post/python_dowhy_intro/
+
+Sharma, A., &amp; Kiciman, E. (2020). DoWhy: An end-to-end library for causal inference. arXiv preprint arXiv:2011.04216. Pearl, J. (2009). Causality: Models, Reasoning, and Inference (2nd ed.). Cambridge University Press.</code></pre></div><h3>BibTeX</h3><div class="code"><button class="copy" type="button" onclick="copyCode(this)">Copy</button><pre><code>@misc{mendez2026pythondowhyintro,
+  author       = {Mendez, Carlos},
+  title        = {A Beginner&#x27;s Guide to Causal Inference with DoWhy in Python},
+  year         = {2026},
+  howpublished = {\url{https://carlos-mendez.org/post/python_dowhy_intro/}},
+  note         = {Data set}
+}
+
+@article{sharma2020dowhy,
+  author  = {Sharma, Amit and Kiciman, Emre},
+  title   = {DoWhy: An End-to-End Library for Causal Inference},
+  journal = {arXiv preprint arXiv:2011.04216},
+  year    = {2020}
+}
+@book{pearl2009causality,
+  author    = {Pearl, Judea},
+  title     = {Causality: Models, Reasoning, and Inference},
+  edition   = {2nd},
+  publisher = {Cambridge University Press},
+  year      = {2009}
+}</code></pre></div></section><section id="explorer"><h2>Variable explorer <span class="hint">search &amp; filter all 5 variables</span></h2><p class="lead">Type to filter by name or label, or use the chips to filter by type. Each row shows a mini distribution. Click a header to sort.</p><div class="explorer-controls"><input id="varSearch" type="search" oninput="filterVars()" placeholder="Search variables by name or label..." aria-label="Search variables"><div class="chips"><button class="chip active" data-k="all" onclick="setChip(this)">All</button><button class="chip" data-k="cont" onclick="setChip(this)">Continuous</button><button class="chip" data-k="dummy" onclick="setChip(this)">Dummy</button><button class="chip" data-k="id" onclick="setChip(this)">Identifier</button></div><span id="varCount" class="varcount"></span></div><div class="tbl-wrap tall"><table id="varTable" class="sortable"><thead><tr><th>Variable</th><th>Type</th><th class="nosort">Distribution</th><th>Label</th><th>Definition</th><th>Units</th><th>In files</th><th>Source</th></tr></thead><tbody><tr id="var-introversion" data-name="introversion" data-label="introversion (confounder)" data-kind="cont"><td><code>introversion</code><a class="vlink" href="#var-introversion" title="Copy link to this variable" onclick="copyVarLink(event,'introversion')">#</a></td><td><span class="badge b-cont">continuous</span></td><td><svg class="spark" viewBox="0 0 96 26" width="96" height="26" preserveAspectRatio="none" role="img"><title>min -0.473 | median 4.99 | max 10.2</title><rect x="1.00" y="15.63" width="3.32" height="9.37"></rect><rect x="4.92" y="20.15" width="3.32" height="4.85"></rect><rect x="8.83" y="19.02" width="3.32" height="5.98"></rect><rect x="12.75" y="17.42" width="3.32" height="7.58"></rect><rect x="16.67" y="15.69" width="3.32" height="9.31"></rect><rect x="20.58" y="13.57" width="3.32" height="11.43"></rect><rect x="24.50" y="10.17" width="3.32" height="14.83"></rect><rect x="28.42" y="8.11" width="3.32" height="16.89"></rect><rect x="32.33" y="7.12" width="3.32" height="17.88"></rect><rect x="36.25" y="4.92" width="3.32" height="20.08"></rect><rect x="40.17" y="3.13" width="3.32" height="21.87"></rect><rect x="44.08" y="1.86" width="3.32" height="23.14"></rect><rect x="48.00" y="2.13" width="3.32" height="22.87"></rect><rect x="51.92" y="1.86" width="3.32" height="23.14"></rect><rect x="55.83" y="1.00" width="3.32" height="24.00"></rect><rect x="59.75" y="5.92" width="3.32" height="19.08"></rect><rect x="63.67" y="8.18" width="3.32" height="16.82"></rect><rect x="67.58" y="11.11" width="3.32" height="13.89"></rect><rect x="71.50" y="13.50" width="3.32" height="11.50"></rect><rect x="75.42" y="15.69" width="3.32" height="9.31"></rect><rect x="79.33" y="16.62" width="3.32" height="8.38"></rect><rect x="83.25" y="19.55" width="3.32" height="5.45"></rect><rect x="87.17" y="20.41" width="3.32" height="4.59"></rect><rect x="91.08" y="14.83" width="3.32" height="10.17"></rect></svg></td><td>Introversion (confounder)</td><td>Personality trait; higher values = more introverted. A confounder of WFH and productivity.</td><td>scale (~0-10)</td><td><a href="#datasets" onclick="openTab(event,0)">wfh_simulated_data</a></td><td>Simulation</td></tr><tr id="var-num_children" data-name="num_children" data-label="number of children (confounder)" data-kind="cont"><td><code>num_children</code><a class="vlink" href="#var-num_children" title="Copy link to this variable" onclick="copyVarLink(event,'num_children')">#</a></td><td><span class="badge b-cont">continuous</span></td><td><svg class="spark" viewBox="0 0 96 26" width="96" height="26" preserveAspectRatio="none" role="img"><title>min 0 | median 1 | max 8</title><rect x="1.00" y="9.11" width="3.32" height="15.89"></rect><rect x="4.92" y="25.00" width="3.32" height="0.00"></rect><rect x="8.83" y="25.00" width="3.32" height="0.00"></rect><rect x="12.75" y="25.00" width="3.32" height="0.00"></rect><rect x="16.67" y="1.00" width="3.32" height="24.00"></rect><rect x="20.58" y="25.00" width="3.32" height="0.00"></rect><rect x="24.50" y="25.00" width="3.32" height="0.00"></rect><rect x="28.42" y="25.00" width="3.32" height="0.00"></rect><rect x="32.33" y="25.00" width="3.32" height="0.00"></rect><rect x="36.25" y="6.70" width="3.32" height="18.30"></rect><rect x="40.17" y="25.00" width="3.32" height="0.00"></rect><rect x="44.08" y="25.00" width="3.32" height="0.00"></rect><rect x="48.00" y="25.00" width="3.32" height="0.00"></rect><rect x="51.92" y="25.00" width="3.32" height="0.00"></rect><rect x="55.83" y="16.06" width="3.32" height="8.94"></rect><rect x="59.75" y="25.00" width="3.32" height="0.00"></rect><rect x="63.67" y="25.00" width="3.32" height="0.00"></rect><rect x="67.58" y="25.00" width="3.32" height="0.00"></rect><rect x="71.50" y="25.00" width="3.32" height="0.00"></rect><rect x="75.42" y="22.04" width="3.32" height="2.96"></rect><rect x="79.33" y="25.00" width="3.32" height="0.00"></rect><rect x="83.25" y="25.00" width="3.32" height="0.00"></rect><rect x="87.17" y="25.00" width="3.32" height="0.00"></rect><rect x="91.08" y="23.50" width="3.32" height="1.50"></rect></svg></td><td>Number of children (confounder)</td><td>Count of children in the household. A confounder of WFH and productivity.</td><td>count</td><td><a href="#datasets" onclick="openTab(event,0)">wfh_simulated_data</a></td><td>Simulation</td></tr><tr id="var-productivity" data-name="productivity" data-label="productivity score (outcome)" data-kind="cont"><td><code>productivity</code><a class="vlink" href="#var-productivity" title="Copy link to this variable" onclick="copyVarLink(event,'productivity')">#</a></td><td><span class="badge b-cont">continuous</span></td><td><svg class="spark" viewBox="0 0 96 26" width="96" height="26" preserveAspectRatio="none" role="img"><title>min 43.9 | median 53.9 | max 62.5</title><rect x="1.00" y="15.69" width="3.32" height="9.31"></rect><rect x="4.92" y="20.99" width="3.32" height="4.01"></rect><rect x="8.83" y="18.07" width="3.32" height="6.93"></rect><rect x="12.75" y="17.45" width="3.32" height="7.55"></rect><rect x="16.67" y="15.96" width="3.32" height="9.04"></rect><rect x="20.58" y="13.51" width="3.32" height="11.49"></rect><rect x="24.50" y="10.52" width="3.32" height="14.48"></rect><rect x="28.42" y="9.23" width="3.32" height="15.77"></rect><rect x="32.33" y="8.21" width="3.32" height="16.79"></rect><rect x="36.25" y="3.65" width="3.32" height="21.35"></rect><rect x="40.17" y="1.75" width="3.32" height="23.25"></rect><rect x="44.08" y="1.54" width="3.32" height="23.46"></rect><rect x="48.00" y="1.00" width="3.32" height="24.00"></rect><rect x="51.92" y="2.36" width="3.32" height="22.64"></rect><rect x="55.83" y="3.92" width="3.32" height="21.08"></rect><rect x="59.75" y="5.83" width="3.32" height="19.17"></rect><rect x="63.67" y="8.48" width="3.32" height="16.52"></rect><rect x="67.58" y="9.63" width="3.32" height="15.37"></rect><rect x="71.50" y="10.93" width="3.32" height="14.07"></rect><rect x="75.42" y="13.78" width="3.32" height="11.22"></rect><rect x="79.33" y="15.96" width="3.32" height="9.04"></rect><rect x="83.25" y="19.02" width="3.32" height="5.98"></rect><rect x="87.17" y="19.08" width="3.32" height="5.92"></rect><rect x="91.08" y="13.51" width="3.32" height="11.49"></rect></svg></td><td>Productivity score (outcome)</td><td>Continuous outcome: employee productivity, in points.</td><td>points</td><td><a href="#datasets" onclick="openTab(event,0)">wfh_simulated_data</a></td><td>Simulation</td></tr><tr id="var-subway_disruption" data-name="subway_disruption" data-label="subway line disrupted (instrument, 1=yes)" data-kind="dummy"><td><code>subway_disruption</code><a class="vlink" href="#var-subway_disruption" title="Copy link to this variable" onclick="copyVarLink(event,'subway_disruption')">#</a></td><td><span class="badge b-dummy">dummy</span></td><td><svg class="spark spark-dummy" viewBox="0 0 96 26" width="96" height="26" preserveAspectRatio="none" role="img"><title>share coded 1 = 0.419</title><rect x="1.00" y="1.00" width="46.40" height="24.00"></rect><rect x="48.00" y="7.68" width="46.40" height="17.32"></rect></svg></td><td>Subway line disrupted (instrument, 1=yes)</td><td>Binary instrument: 1 if the employee lives near a disrupted subway line. Affects treatment only (exclusion restriction).</td><td>0/1</td><td><a href="#datasets" onclick="openTab(event,0)">wfh_simulated_data</a></td><td>Simulation</td></tr><tr id="var-work_from_home" data-name="work_from_home" data-label="works from home (treatment, 1=yes)" data-kind="dummy"><td><code>work_from_home</code><a class="vlink" href="#var-work_from_home" title="Copy link to this variable" onclick="copyVarLink(event,'work_from_home')">#</a></td><td><span class="badge b-dummy">dummy</span></td><td><svg class="spark spark-dummy" viewBox="0 0 96 26" width="96" height="26" preserveAspectRatio="none" role="img"><title>share coded 1 = 0.662</title><rect x="1.00" y="12.77" width="46.40" height="12.23"></rect><rect x="48.00" y="1.00" width="46.40" height="24.00"></rect></svg></td><td>Works from home (treatment, 1=yes)</td><td>Binary treatment: 1 if the employee works from home, 0 if office-based.</td><td>0/1</td><td><a href="#datasets" onclick="openTab(event,0)">wfh_simulated_data</a></td><td>Simulation</td></tr></tbody></table></div></section><section id="index"><h2>Cross-file variable index</h2><p class="lead">Which file each variable appears in (&#9679; = present).</p><div class="tbl-wrap tall"><table><thead><tr><th>Variable</th><th>wfh_simulated_data</th></tr></thead><tbody><tr><td><a href="#var-introversion"><code>introversion</code></a></td><td>&#9679;</td></tr><tr><td><a href="#var-num_children"><code>num_children</code></a></td><td>&#9679;</td></tr><tr><td><a href="#var-productivity"><code>productivity</code></a></td><td>&#9679;</td></tr><tr><td><a href="#var-subway_disruption"><code>subway_disruption</code></a></td><td>&#9679;</td></tr><tr><td><a href="#var-work_from_home"><code>work_from_home</code></a></td><td>&#9679;</td></tr></tbody></table></div></section><section id="formulas"><h2>Construction &amp; formulas</h2><p>The dataset is generated by a known structural model so that every estimator can be checked
+against the truth. For employee <code>i</code> the causal graph is
+<code>subway_disruption &rarr; work_from_home &rarr; productivity</code>, with
+<code>introversion</code> and <code>num_children</code> pointing into <strong>both</strong>
+treatment and outcome (confounders).</p>
+<ul class="tight">
+  <li><strong>Confounders.</strong>
+    <code>introversion ~ Normal(5, 1.5)</code>;
+    <code>num_children ~ Poisson(1.5)</code>.</li>
+  <li><strong>Instrument.</strong>
+    <code>subway_disruption ~ Bernoulli(0.4)</code> &mdash; affects treatment only.</li>
+  <li><strong>Treatment assignment</strong> (observational, non-random):
+    <code>logit P(WFH) = &minus;1.5 + 0.3&middot;introversion + 0.2&middot;num_children + 1.0&middot;subway_disruption</code>;
+    <code>work_from_home ~ Bernoulli(P(WFH))</code>.</li>
+  <li><strong>Outcome.</strong>
+    <code>productivity = 50 + 1.0&middot;work_from_home + 0.8&middot;introversion &minus; 0.5&middot;num_children + &epsilon;</code>,
+    with <code>&epsilon; ~ Normal(0, 2)</code>. The instrument does <strong>not</strong> enter
+    this equation &mdash; the exclusion restriction holds by construction.</li>
+</ul>
+<p>The coefficient on <code>work_from_home</code> in the outcome equation is the
+<strong>true average treatment effect (ATE = 1.0)</strong> &mdash; the target every estimator in
+the post is judged against. Confounder bias arises because introverts both self-select into WFH
+(treatment coefficient 0.3) and are independently more productive (outcome coefficient 0.8), so a
+naive WFH&minus;office comparison overstates the effect (1.39 vs the true 1.0).</p>
+</section><section id="datasets"><h2>The datasets</h2><p class="lead">Switch datasets with the tabs. Each shows the full variable dictionary plus a sortable statistics table with mini distributions and data coverage.</p><p><button id="expandBtn" class="btn ghost small" onclick="toggleExpand()">Expand all datasets</button> <span class="hint">expand to search (Ctrl/&#8984;+F) or print across all datasets</span></p><div class="tabs"><button class="tab" onclick="showTab(0)">wfh_simulated_data</button></div><div class="ds-panel" id="ds-wfh_simulated_data"><p class="meta"><span class="badge b-frame">employee (cross-section)</span> &nbsp;5,000 &times; 5 &middot; n/a (no time dimension) &middot; 5,000 simulated employees</p><p class="meta">Panel key: <code>none (rows are exchangeable; no identifier column)</code> &middot; Recover a known ATE (=1.0) of working from home on productivity via DoWhy&#x27;s four-step framework; compare naive, regression, IPW, doubly-robust, and IV estimators.</p><h4>Variable dictionary</h4><div class="tbl-wrap"><table><thead><tr><th>Variable</th><th>Label</th><th>Definition</th><th>Construction</th><th>Units</th><th>Source</th><th>Coverage</th></tr></thead><tbody><tr><td><code>work_from_home</code> <span class="badge b-dummy">dummy</span></td><td>Works from home (treatment, 1=yes)</td><td>Binary treatment: 1 if the employee works from home, 0 if office-based.</td><td>Bernoulli draw with P from logit(-1.5 + 0.3*introversion + 0.2*num_children + 1.0*subway_disruption); non-random (observational) assignment.</td><td>0/1</td><td>Simulation</td><td>5,000 employees</td></tr><tr><td><code>productivity</code> <span class="badge b-cont">continuous</span></td><td>Productivity score (outcome)</td><td>Continuous outcome: employee productivity, in points.</td><td>50 + 1.0*work_from_home + 0.8*introversion - 0.5*num_children + Normal(0,2) noise; the coefficient 1.0 on work_from_home is the true ATE.</td><td>points</td><td>Simulation</td><td>5,000 employees</td></tr><tr><td><code>introversion</code> <span class="badge b-cont">continuous</span></td><td>Introversion (confounder)</td><td>Personality trait; higher values = more introverted. A confounder of WFH and productivity.</td><td>Normal(mean=5, sd=1.5) draw. Raises both the probability of WFH (logit coef 0.3) and productivity (outcome coef 0.8).</td><td>scale (~0-10)</td><td>Simulation</td><td>5,000 employees</td></tr><tr><td><code>num_children</code> <span class="badge b-cont">continuous</span></td><td>Number of children (confounder)</td><td>Count of children in the household. A confounder of WFH and productivity.</td><td>Poisson(lambda=1.5) draw. Raises the probability of WFH (logit coef 0.2) but lowers productivity (outcome coef -0.5).</td><td>count</td><td>Simulation</td><td>5,000 employees</td></tr><tr><td><code>subway_disruption</code> <span class="badge b-dummy">dummy</span></td><td>Subway line disrupted (instrument, 1=yes)</td><td>Binary instrument: 1 if the employee lives near a disrupted subway line. Affects treatment only (exclusion restriction).</td><td>Bernoulli(0.4) draw. Enters the treatment logit (coef 1.0) but NOT the outcome equation, so the exclusion restriction holds by construction.</td><td>0/1</td><td>Simulation</td><td>5,000 employees</td></tr></tbody></table></div><h4>Distribution &amp; statistics <span style="font-weight:400;color:#6b6f76">(click a header to sort)</span></h4><div class="tbl-wrap"><table class="sortable"><thead><tr><th>Variable</th><th class="nosort">Distribution</th><th class="nosort">Coverage</th><th>N</th><th>Distinct</th><th>Min</th><th>Mean</th><th>Median</th><th>Max</th><th>SD</th></tr></thead><tbody><tr><td><code>work_from_home</code></td><td><svg class="spark spark-dummy" viewBox="0 0 96 26" width="96" height="26" preserveAspectRatio="none" role="img"><title>share coded 1 = 0.662</title><rect x="1.00" y="12.77" width="46.40" height="12.23"></rect><rect x="48.00" y="1.00" width="46.40" height="24.00"></rect></svg></td><td><span class="missbar" title="5,000 of 5,000 non-missing (100.0%)"><span class="missfill" style="width:100.0%"></span></span><span class="misspct">100%</span></td><td>5,000</td><td>2</td><td>0</td><td>0.662</td><td>1.00</td><td>1.00</td><td>0.473</td></tr><tr><td><code>productivity</code></td><td><svg class="spark" viewBox="0 0 96 26" width="96" height="26" preserveAspectRatio="none" role="img"><title>min 43.9 | median 53.9 | max 62.5</title><rect x="1.00" y="15.69" width="3.32" height="9.31"></rect><rect x="4.92" y="20.99" width="3.32" height="4.01"></rect><rect x="8.83" y="18.07" width="3.32" height="6.93"></rect><rect x="12.75" y="17.45" width="3.32" height="7.55"></rect><rect x="16.67" y="15.96" width="3.32" height="9.04"></rect><rect x="20.58" y="13.51" width="3.32" height="11.49"></rect><rect x="24.50" y="10.52" width="3.32" height="14.48"></rect><rect x="28.42" y="9.23" width="3.32" height="15.77"></rect><rect x="32.33" y="8.21" width="3.32" height="16.79"></rect><rect x="36.25" y="3.65" width="3.32" height="21.35"></rect><rect x="40.17" y="1.75" width="3.32" height="23.25"></rect><rect x="44.08" y="1.54" width="3.32" height="23.46"></rect><rect x="48.00" y="1.00" width="3.32" height="24.00"></rect><rect x="51.92" y="2.36" width="3.32" height="22.64"></rect><rect x="55.83" y="3.92" width="3.32" height="21.08"></rect><rect x="59.75" y="5.83" width="3.32" height="19.17"></rect><rect x="63.67" y="8.48" width="3.32" height="16.52"></rect><rect x="67.58" y="9.63" width="3.32" height="15.37"></rect><rect x="71.50" y="10.93" width="3.32" height="14.07"></rect><rect x="75.42" y="13.78" width="3.32" height="11.22"></rect><rect x="79.33" y="15.96" width="3.32" height="9.04"></rect><rect x="83.25" y="19.02" width="3.32" height="5.98"></rect><rect x="87.17" y="19.08" width="3.32" height="5.92"></rect><rect x="91.08" y="13.51" width="3.32" height="11.49"></rect></svg></td><td><span class="missbar" title="5,000 of 5,000 non-missing (100.0%)"><span class="missfill" style="width:100.0%"></span></span><span class="misspct">100%</span></td><td>5,000</td><td>5,000</td><td>43.90</td><td>53.88</td><td>53.87</td><td>62.52</td><td>2.49</td></tr><tr><td><code>introversion</code></td><td><svg class="spark" viewBox="0 0 96 26" width="96" height="26" preserveAspectRatio="none" role="img"><title>min -0.473 | median 4.99 | max 10.2</title><rect x="1.00" y="15.63" width="3.32" height="9.37"></rect><rect x="4.92" y="20.15" width="3.32" height="4.85"></rect><rect x="8.83" y="19.02" width="3.32" height="5.98"></rect><rect x="12.75" y="17.42" width="3.32" height="7.58"></rect><rect x="16.67" y="15.69" width="3.32" height="9.31"></rect><rect x="20.58" y="13.57" width="3.32" height="11.43"></rect><rect x="24.50" y="10.17" width="3.32" height="14.83"></rect><rect x="28.42" y="8.11" width="3.32" height="16.89"></rect><rect x="32.33" y="7.12" width="3.32" height="17.88"></rect><rect x="36.25" y="4.92" width="3.32" height="20.08"></rect><rect x="40.17" y="3.13" width="3.32" height="21.87"></rect><rect x="44.08" y="1.86" width="3.32" height="23.14"></rect><rect x="48.00" y="2.13" width="3.32" height="22.87"></rect><rect x="51.92" y="1.86" width="3.32" height="23.14"></rect><rect x="55.83" y="1.00" width="3.32" height="24.00"></rect><rect x="59.75" y="5.92" width="3.32" height="19.08"></rect><rect x="63.67" y="8.18" width="3.32" height="16.82"></rect><rect x="67.58" y="11.11" width="3.32" height="13.89"></rect><rect x="71.50" y="13.50" width="3.32" height="11.50"></rect><rect x="75.42" y="15.69" width="3.32" height="9.31"></rect><rect x="79.33" y="16.62" width="3.32" height="8.38"></rect><rect x="83.25" y="19.55" width="3.32" height="5.45"></rect><rect x="87.17" y="20.41" width="3.32" height="4.59"></rect><rect x="91.08" y="14.83" width="3.32" height="10.17"></rect></svg></td><td><span class="missbar" title="5,000 of 5,000 non-missing (100.0%)"><span class="missfill" style="width:100.0%"></span></span><span class="misspct">100%</span></td><td>5,000</td><td>5,000</td><td>-0.473</td><td>4.97</td><td>4.99</td><td>10.18</td><td>1.50</td></tr><tr><td><code>num_children</code></td><td><svg class="spark" viewBox="0 0 96 26" width="96" height="26" preserveAspectRatio="none" role="img"><title>min 0 | median 1 | max 8</title><rect x="1.00" y="9.11" width="3.32" height="15.89"></rect><rect x="4.92" y="25.00" width="3.32" height="0.00"></rect><rect x="8.83" y="25.00" width="3.32" height="0.00"></rect><rect x="12.75" y="25.00" width="3.32" height="0.00"></rect><rect x="16.67" y="1.00" width="3.32" height="24.00"></rect><rect x="20.58" y="25.00" width="3.32" height="0.00"></rect><rect x="24.50" y="25.00" width="3.32" height="0.00"></rect><rect x="28.42" y="25.00" width="3.32" height="0.00"></rect><rect x="32.33" y="25.00" width="3.32" height="0.00"></rect><rect x="36.25" y="6.70" width="3.32" height="18.30"></rect><rect x="40.17" y="25.00" width="3.32" height="0.00"></rect><rect x="44.08" y="25.00" width="3.32" height="0.00"></rect><rect x="48.00" y="25.00" width="3.32" height="0.00"></rect><rect x="51.92" y="25.00" width="3.32" height="0.00"></rect><rect x="55.83" y="16.06" width="3.32" height="8.94"></rect><rect x="59.75" y="25.00" width="3.32" height="0.00"></rect><rect x="63.67" y="25.00" width="3.32" height="0.00"></rect><rect x="67.58" y="25.00" width="3.32" height="0.00"></rect><rect x="71.50" y="25.00" width="3.32" height="0.00"></rect><rect x="75.42" y="22.04" width="3.32" height="2.96"></rect><rect x="79.33" y="25.00" width="3.32" height="0.00"></rect><rect x="83.25" y="25.00" width="3.32" height="0.00"></rect><rect x="87.17" y="25.00" width="3.32" height="0.00"></rect><rect x="91.08" y="23.50" width="3.32" height="1.50"></rect></svg></td><td><span class="missbar" title="5,000 of 5,000 non-missing (100.0%)"><span class="missfill" style="width:100.0%"></span></span><span class="misspct">100%</span></td><td>5,000</td><td>9</td><td>0</td><td>1.50</td><td>1.00</td><td>8.00</td><td>1.22</td></tr><tr><td><code>subway_disruption</code></td><td><svg class="spark spark-dummy" viewBox="0 0 96 26" width="96" height="26" preserveAspectRatio="none" role="img"><title>share coded 1 = 0.419</title><rect x="1.00" y="1.00" width="46.40" height="24.00"></rect><rect x="48.00" y="7.68" width="46.40" height="17.32"></rect></svg></td><td><span class="missbar" title="5,000 of 5,000 non-missing (100.0%)"><span class="missfill" style="width:100.0%"></span></span><span class="misspct">100%</span></td><td>5,000</td><td>2</td><td>0</td><td>0.419</td><td>0</td><td>1.00</td><td>0.493</td></tr></tbody></table></div></div></section><section id="caveats"><h2>Known limitations &amp; caveats</h2><ul class="tight"><li><strong>Synthetic data.</strong> There is no real survey behind this dataset; values are drawn from the data-generating process above. Results are internally consistent with the simulation but are not empirical evidence about real-world work-from-home effects.</li><li><strong>Known truth by design.</strong> The true ATE is fixed at 1.0 so methods can be scored. On real data the truth is unknown — that is exactly why identification (DoWhy's Step 2) and refutation (Step 4) matter.</li><li><strong>Cross-section, not a panel.</strong> Each row is one simulated employee at a single point; there is no time dimension, no repeated measurement, and no row identifier.</li><li><strong>Exclusion restriction is assumed true here.</strong> <code>subway_disruption</code> is built to affect productivity only through WFH choice. In practice the exclusion restriction cannot be tested from data and must be justified by domain knowledge.</li><li><strong>Selection on observables is satisfiable here.</strong> The two confounders are fully observed, so backdoor methods are unbiased by construction; with a missing confounder they would be biased while IV would remain valid.</li></ul></section>
+</main>
+<footer class="wrap">Generated by <code>build_data_dictionary.py</code> &middot; Stata format <code>.dta</code> v118 &middot; <a href="https://carlos-mendez.org/post/python_dowhy_intro/">Back to the post</a></footer>
+<script>
+function copyCode(b){var c=b.parentElement.querySelector('code').innerText;
+ navigator.clipboard.writeText(c).then(function(){var t=b.textContent;b.textContent='Copied!';
+  setTimeout(function(){b.textContent=t;},1400);});}
+var _activeTab=0,_expanded=false;
+function showTab(i){_activeTab=i;
+ document.querySelectorAll('.ds-panel').forEach(function(p,j){p.style.display=(i===j?'block':'none');});
+ document.querySelectorAll('.tab').forEach(function(b,j){b.classList.toggle('active',i===j);});}
+function toggleExpand(){_expanded=!_expanded;
+ document.querySelectorAll('.ds-panel').forEach(function(p){p.style.display=_expanded?'block':'none';});
+ var tabs=document.querySelector('.tabs');if(tabs)tabs.style.display=_expanded?'none':'';
+ var b=document.getElementById('expandBtn');if(b)b.textContent=_expanded?'Tabbed view':'Expand all datasets';
+ if(!_expanded)showTab(_activeTab);}
+function openTab(e,i){if(e)e.preventDefault();
+ if(_expanded){var p=document.querySelectorAll('.ds-panel')[i];if(p)p.scrollIntoView({behavior:'smooth'});}
+ else{showTab(i);var d=document.getElementById('datasets');if(d)d.scrollIntoView({behavior:'smooth'});}}
+function copyVarLink(e,name){if(e)e.preventDefault();
+ var url=location.href.split('#')[0]+'#var-'+name;
+ try{history.replaceState(null,'','#var-'+name);}catch(_){}
+ navigator.clipboard.writeText(url).then(function(){var t=e.target,o=t.textContent;
+  t.textContent='✓';setTimeout(function(){t.textContent=o;},1200);});}
+function toggleTheme(){var d=document.documentElement,t=(d.dataset.theme==='dark')?'light':'dark';
+ d.dataset.theme=t;try{localStorage.setItem('dd-theme',t);}catch(_){}setThemeIcon(t);}
+function setThemeIcon(t){var b=document.getElementById('themeToggle');
+ if(b){b.textContent=(t==='dark'?'☀ Light':'☾ Dark');}}
+var _chip='all';
+function setChip(b){_chip=b.getAttribute('data-k');
+ document.querySelectorAll('.chip').forEach(function(c){c.classList.toggle('active',c===b);});filterVars();}
+function filterVars(){var q=(document.getElementById('varSearch').value||'').toLowerCase();
+ var rows=document.querySelectorAll('#varTable tbody tr');var s=0;
+ rows.forEach(function(r){var nm=r.getAttribute('data-name'),lb=r.getAttribute('data-label'),k=r.getAttribute('data-kind');
+  var okT=(!q||nm.indexOf(q)>-1||lb.indexOf(q)>-1),okK=(_chip==='all'||k===_chip);
+  var v=okT&&okK;r.style.display=v?'':'none';if(v)s++;});
+ var el=document.getElementById('varCount');if(el)el.textContent=s+' variable'+(s===1?'':'s')+' shown';}
+function _num(v){var x=parseFloat(String(v).replace(/[,%$]/g,''));return isNaN(x)?null:x;}
+document.addEventListener('click',function(e){var th=e.target.closest('table.sortable th');if(!th)return;
+ if(th.classList.contains('nosort'))return;
+ var tbl=th.closest('table'),idx=Array.prototype.indexOf.call(th.parentNode.children,th);
+ var tb=tbl.querySelector('tbody'),rows=Array.prototype.slice.call(tb.querySelectorAll('tr'));
+ var asc=!(th.getAttribute('data-asc')==='1');th.setAttribute('data-asc',asc?'1':'0');
+ rows.sort(function(a,b){var x=a.children[idx].innerText.trim(),y=b.children[idx].innerText.trim();
+  var nx=_num(x),ny=_num(y);if(nx!==null&&ny!==null)return asc?nx-ny:ny-nx;
+  return asc?x.localeCompare(y):y.localeCompare(x);});rows.forEach(function(r){tb.appendChild(r);});});
+document.addEventListener('DOMContentLoaded',function(){
+ if(document.getElementById('varSearch'))filterVars();
+ showTab(0);
+ setThemeIcon(document.documentElement.dataset.theme||'light');
+ var links={};document.querySelectorAll('nav.toc a').forEach(function(a){links[a.getAttribute('href')]=a;});
+ if(window.IntersectionObserver){
+  var obs=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){
+   var id='#'+en.target.id;for(var k in links)links[k].classList.remove('active');
+   if(links[id])links[id].classList.add('active');}});},{rootMargin:'-45% 0px -50% 0px'});
+  document.querySelectorAll('main section[id]').forEach(function(s){obs.observe(s);});}
+ if(location.hash.indexOf('#var-')===0){var r=document.getElementById(location.hash.slice(1));
+  if(r)setTimeout(function(){r.scrollIntoView({block:'center'});},60);}
+});
+</script>
+</body></html>

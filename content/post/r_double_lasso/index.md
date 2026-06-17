@@ -38,10 +38,10 @@ links:
   icon_pack: fab
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_double_lasso/index.md
-- icon: database
+- icon: book
   icon_pack: fas
-  name: "Data (CSV)"
-  url: https://github.com/cmg777/starter-academic-v501/tree/master/content/post/r_double_lasso/data
+  name: "Data dictionary"
+  url: data/index.html
 slides:
 summary: A beginner-friendly walkthrough of Double LASSO for causal inference, replicating Fitzgerald, Lattimore, Robinson and Zhu's (2026) analysis of the Donohue–Levitt abortion–crime question with 284 candidate controls and state-clustered standard errors.
 tags:

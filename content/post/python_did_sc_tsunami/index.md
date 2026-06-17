@@ -52,6 +52,10 @@ links:
   icon_pack: fab
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_did_sc_tsunami/index.md
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary"
+  url: data/index.html
 summary: "Evaluate the long-run economic impact of a localized natural disaster with causal inference in Python. A beginner's replication of Heger & Neumayer (2019) on the 2004 Aceh tsunami, using synthetic calibrated data: dynamic difference-in-differences with pyfixest, an event study with diff-diff, a night-lights dose-response, synthetic control with mlsynth, and Conley spatial standard errors."
 tags:
   - python

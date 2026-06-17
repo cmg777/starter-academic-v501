@@ -34,10 +34,10 @@ links:
     icon_pack: fas
     name: "Quarto project (.zip)"
     url: r_augsynth.zip
-  - icon: database
+  - icon: book
     icon_pack: fas
-    name: "Data (CSV)"
-    url: https://github.com/cmg777/starter-academic-v501/tree/master/content/post/r_augsynth
+    name: "Data dictionary"
+    url: data/index.html
   - icon: podcast
     icon_pack: fas
     name: AI Podcast

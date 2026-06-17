@@ -25,6 +25,10 @@ links:
   icon_pack: fas
   name: "R script"
   url: analysis.R
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary"
+  url: data/index.html
 - icon: open-data
   icon_pack: ai
   name: "[R] Google Colab"

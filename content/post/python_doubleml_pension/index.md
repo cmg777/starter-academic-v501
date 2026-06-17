@@ -34,6 +34,10 @@ links:
   icon_pack: fas
   name: "Quarto project (.zip)"
   url: python_doubleml_pension.zip
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary"
+  url: data/index.html
 - icon: markdown
   icon_pack: fab
   name: "MD version"

@@ -27,10 +27,10 @@ links:
   icon_pack: fas
   name: "Stata do-file"
   url: analysis.do
-- icon: database
+- icon: book
   icon_pack: fas
-  name: "Dataset (.dta)"
-  url: prop99_example.dta
+  name: "Data dictionary"
+  url: data/index.html
 - icon: file-alt
   icon_pack: fas
   name: "Stata log"

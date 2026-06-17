@@ -39,6 +39,10 @@ links:
   icon_pack: fas
   name: "Jupyter notebook"
   url: notebook.ipynb
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary"
+  url: data/index.html
 - icon: markdown
   icon_pack: fab
   name: "MD version"

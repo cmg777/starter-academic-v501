@@ -25,6 +25,10 @@ links:
   icon_pack: fas
   name: "R script"
   url: analysis.R
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary"
+  url: data/index.html
 - icon: markdown
   icon_pack: fab
   name: "MD version"

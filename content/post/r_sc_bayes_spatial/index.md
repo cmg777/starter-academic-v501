@@ -34,6 +34,10 @@ links:
     icon_pack: fab
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_sc_bayes_spatial/index.md
+  - icon: book
+    icon_pack: fas
+    name: "Data dictionary"
+    url: data/index.html
 slides:
 summary: "Replicating the California tobacco case study from Sakaguchi & Tagawa in R: three estimators, one ATT, and a Nevada-sized spillover."
 tags:

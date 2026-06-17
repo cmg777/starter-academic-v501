@@ -26,10 +26,10 @@ links:
   icon_pack: fas
   name: "Stata do-file"
   url: analysis.do
-- icon: database
+- icon: book
   icon_pack: fas
-  name: "Dataset (.csv)"
-  url: https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_cate2/sim_resource_curse.csv
+  name: "Data dictionary"
+  url: data/index.html
 - icon: file-alt
   icon_pack: fas
   name: "Stata log"

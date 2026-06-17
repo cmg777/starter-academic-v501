@@ -34,10 +34,10 @@ links:
     icon_pack: fas
     name: "Quarto project (.zip)"
     url: python_dynamic_panel.zip
-  - icon: database
+  - icon: book
     icon_pack: fas
-    name: "Data (CSV)"
-    url: abdata.csv
+    name: "Data dictionary"
+    url: data/index.html
   - icon: google-colab
     icon_pack: ai
     name: "Google Colab"

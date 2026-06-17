@@ -26,6 +26,10 @@ links:
     icon_pack: fas
     name: "Python script"
     url: script.py
+  - icon: book
+    icon_pack: fas
+    name: "Data dictionary"
+    url: data/index.html
   - icon: file-code
     icon_pack: fas
     name: "Quarto project (.zip)"

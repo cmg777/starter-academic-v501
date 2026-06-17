@@ -41,6 +41,10 @@ links:
   icon_pack: fab
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dowhy_intro/index.md
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary"
+  url: data/index.html
 slides:
 summary: A beginner-friendly introduction to causal inference using DoWhy's four-step framework with simulated observational data on working from home and productivity
 tags:

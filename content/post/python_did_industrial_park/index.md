@@ -35,18 +35,10 @@ links:
     icon_pack: fas
     name: "Python script"
     url: script.py
-  - icon: table
+  - icon: book
     icon_pack: fas
-    name: "Data (district panel CSV)"
-    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_did_industrial_park/data/industrial_park_district_panel.csv
-  - icon: table
-    icon_pack: fas
-    name: "Data (household RCS CSV)"
-    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_did_industrial_park/data/industrial_park_household_rcs.csv
-  - icon: table
-    icon_pack: fas
-    name: "Data (individual RCS CSV)"
-    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_did_industrial_park/data/industrial_park_individual_rcs.csv
+    name: "Data dictionary"
+    url: data/index.html
   - icon: file-code
     icon_pack: fas
     name: "Quarto project (.zip)"
