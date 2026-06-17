@@ -54,6 +54,14 @@ links:
   icon_pack: fas
   name: "Data (CSV)"
   url: https://github.com/cmg777/starter-academic-v501/tree/master/content/post/python_kuznets_dmsp/data
+- icon: database
+  icon_pack: fas
+  name: "Data (Stata .dta)"
+  url: https://github.com/cmg777/starter-academic-v501/tree/master/content/post/python_kuznets_dmsp/data
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary (README)"
+  url: https://github.com/cmg777/starter-academic-v501/blob/master/content/post/python_kuznets_dmsp/data/README.md
 slides:
 summary: A comprehensive, beginner-friendly Python replication of Lessmann and Seidel (2017) — turning satellite nighttime lights into predicted regional GDP, building five population-weighted inequality indices from scratch, exploring the cross-country dynamics of regional inequality, and estimating the regional Kuznets curve, its determinants, and a Conley spatial-HAC robustness check with PyFixest.
 tags:
