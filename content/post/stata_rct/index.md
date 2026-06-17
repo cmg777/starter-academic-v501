@@ -25,10 +25,10 @@ links:
   icon_pack: fas
   name: "Stata do-file"
   url: analysis.do
-- icon: database
+- icon: book
   icon_pack: fas
-  name: "Dataset (.dta)"
-  url: https://github.com/quarcs-lab/data-open/raw/master/ametrics/dataSIM4RCT.dta
+  name: "Data dictionary"
+  url: data/index.html
 - icon: file-alt
   icon_pack: fas
   name: "Stata log"

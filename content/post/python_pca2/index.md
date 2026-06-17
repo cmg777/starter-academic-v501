@@ -33,6 +33,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary"
+  url: data/index.html
 - icon: markdown
   icon_pack: fab
   name: "MD version"

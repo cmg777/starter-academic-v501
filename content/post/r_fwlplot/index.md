@@ -29,10 +29,10 @@ links:
   icon_pack: fas
   name: "Quarto project (.zip)"
   url: r_fwlplot.zip
-- icon: database
+- icon: book
   icon_pack: fas
-  name: "Datasets (CSV)"
-  url: store_data.csv
+  name: "Data dictionary"
+  url: data/index.html
 - icon: markdown
   icon_pack: fab
   name: "MD version"

@@ -25,10 +25,10 @@ links:
   icon_pack: fas
   name: "Stata do-file"
   url: analysis.do
-- icon: database
+- icon: book
   icon_pack: fas
-  name: "Dataset (.csv)"
-  url: https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_bma_dsl/synthetic_ekc_panel.csv
+  name: "Data dictionary"
+  url: data/index.html
 - icon: file-alt
   icon_pack: fas
   name: "Stata log"

@@ -42,6 +42,10 @@ links:
     icon_pack: fab
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_sc_co2tax/index.md
+  - icon: book
+    icon_pack: fas
+    name: "Data dictionary"
+    url: data/index.html
 slides:
 summary: "Synthetic Control and IV in Python — replicating Andersson (2019) on Sweden's carbon tax and CO2 emissions with pysyncon and pyfixest."
 tags:

@@ -41,6 +41,10 @@ links:
   icon_pack: fab
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_scpi/index.md
+- icon: book
+  icon_pack: fas
+  name: "Data dictionary"
+  url: data/index.html
 slides:
 summary: Synthetic control with prediction intervals quantifies uncertainty in Germany's reunification GDP impact using the scpi package.
 tags:

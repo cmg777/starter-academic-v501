@@ -33,10 +33,10 @@ links:
   icon_pack: fas
   name: "JSS article"
   url: https://doi.org/10.18637/jss.v113.i06
-- icon: database
+- icon: book
   icon_pack: fas
-  name: "Dataset (.dta)"
-  url: https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_spxtivdfreg/references/v113i06.dta
+  name: "Data dictionary"
+  url: data/index.html
 - icon: markdown
   icon_pack: fab
   name: "MD version"

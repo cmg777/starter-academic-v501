@@ -26,14 +26,10 @@ links:
   icon_pack: fas
   name: "Stata do-file"
   url: analysis.do
-- icon: database
+- icon: book
   icon_pack: fas
-  name: "Savings data (.dta)"
-  url: https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_panel_lasso_cluster/refMaterials/saving.dta
-- icon: database
-  icon_pack: fas
-  name: "Democracy data (.dta)"
-  url: https://github.com/cmg777/starter-academic-v501/raw/master/content/post/stata_panel_lasso_cluster/refMaterials/democracy.dta
+  name: "Data dictionary"
+  url: data/index.html
 - icon: file-alt
   icon_pack: fas
   name: "Stata log"
