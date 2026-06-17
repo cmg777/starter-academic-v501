@@ -43,10 +43,10 @@ links:
   icon_pack: fab
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_kuznets/index.md
-- icon: database
+- icon: book
   icon_pack: fas
-  name: "Data (CSV)"
-  url: https://github.com/cmg777/starter-academic-v501/tree/master/content/post/r_kuznets/data
+  name: "Data dictionary"
+  url: data/index.html
 slides:
 summary: A beginner-friendly R replication of Lessmann (2014) on the spatial Kuznets curve — building the weighted coefficient of variation from simulated regional data, then estimating the inverted-U with cross-section OLS, two-way fixed effects in fixest, and the Robinson and Baltagi–Li semiparametric estimators.
 tags:
