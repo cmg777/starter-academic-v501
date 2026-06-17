@@ -1,0 +1,94 @@
+# Example data_dictionary.yaml (abridged) — modeled on python_kuznets_dmsp.
+# Shows every section. A real file lists ALL datasets in `files` and ALL variables in `columns`.
+# Everything is optional; omit a section to drop it from the page.
+
+study:
+  title: "Regional Inequality from Outer Space"
+  subtitle: "Predicting regional GDP from nighttime lights and building inequality indices."
+  overview: >
+    Companion data for a Python replication of Lessmann &amp; Seidel (2017): predict regional GDP
+    per capita from DMSP-OLS nighttime lights, build five population-weighted inequality indices,
+    and estimate the spatial Kuznets curve across up to 180 countries, 1992-2012.
+  panel_structure: >
+    <strong>Panel structure.</strong> Region files are keyed by region x year over a
+    1,504-region / 81-country training frame (1992-2010); country files by Country_ISO x year over
+    180 countries (1992-2012).
+  kpis:
+    - {n: 180, l: "countries"}
+    - {n: "1992–2012", l: "years"}
+
+dta_format_version: 118
+
+sources:
+  - name: "NOAA/NGDC DMSP-OLS"
+    provides: "Nighttime lights (stable lights v4, DN 0-63)"
+    reference: "NOAA NGDC. https://www.ngdc.noaa.gov/eog/dmsp.html"
+  - name: "World Bank WDI"
+    provides: "National accounts and determinants"
+    reference: "World Bank, WDI. https://databank.worldbank.org/source/world-development-indicators"
+
+formulas_html: |
+  <p>Inequality indices are computed within each country-year across regions, on predicted
+  regional income <code>y</code>, weighted by population share <code>p_i</code>.</p>
+  <ul class="tight">
+    <li><strong>Gini</strong>: <code>GINIW = ( sum_i sum_j p_i p_j |y_i - y_j| ) / (2*ybar)</code></li>
+    <li><strong>Theil GE(1)</strong>: <code>sum_i p_i (y_i/ybar) ln(y_i/ybar)</code></li>
+  </ul>
+
+caveats:
+  - "DMSP digital numbers cap at 63 (top-coding); the brightest cores are censored."
+  - "Several determinants are observed for far fewer country-years than the core panel."
+
+citation:
+  author: "Mendez, Carlos"
+  year: "2026"
+  extra_apa: >
+    Lessmann, C., &amp; Seidel, A. (2017). Regional inequality, convergence, and its determinants
+    — A view from outer space. European Economic Review, 92, 110-132.
+  extra_bibtex: |
+    @article{lessmann2017regional,
+      author  = {Lessmann, Christian and Seidel, Andr\'{e}},
+      title   = {Regional inequality, convergence, and its determinants---A view from outer space},
+      journal = {European Economic Review}, volume = {92}, pages = {110--132}, year = {2017}
+    }
+
+files:
+  Table_3_data.csv:
+    label: "Country-year panel: GDP + 5 inequality indices"
+    grain: "country-year"
+    years: "1992-2012"
+    coverage: "180 countries"
+    key: "Country_ISO x year"
+    purpose: "Estimate the spatial Kuznets curve."
+    note: "Core Kuznets dataset; five population-weighted indices from predicted regional incomes."
+
+columns:
+  Country_ISO:
+    label: "Country code (ISO 3166-1 alpha-3)"
+    definition: "Three-letter country identifier."
+    source: "GADM"
+    kind: str
+  year:
+    label: "Calendar year"
+    kind: year
+  GDP_pc_Country:
+    label: "National GDP per capita (2005 PPP US$)"
+    definition: "National GDP per capita."
+    construction: "World Bank WDI, constant 2005 PPP US$."
+    units: "US$ (2005 PPP)"
+    source: "World Bank WDI"
+    kind: cont
+  GINIW_pred_GDP_pc:
+    label: "Pop-weighted regional Gini (predicted income)"
+    definition: "Population-weighted Gini of predicted regional income within a country-year."
+    construction: "Gini of pred_GDP_pc_Region weighted by Pop_Region, per country-year."
+    units: "0-1"
+    source: "This study"
+    coverage: "country frame"
+    kind: cont
+  fedelupd2:
+    label: "Federal-state dummy (1=federal)"
+    definition: "1 if the country is federally organised."
+    units: "0/1"
+    kind: dummy
+    value_labels: {0: "No", 1: "Yes"}

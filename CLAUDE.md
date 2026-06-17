@@ -216,7 +216,7 @@ Older Python posts (pre-2025) were evaluated for bundling and **skipped**: they 
 
 # Claude Code Skills
 
-Sixteen skills: twelve organized as Write/Review pairs across six artifact stages (the slide deck gained its `review-slides` partner), plus four standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, `translate-content` — the trilingual ES/JA translator documented in the Internationalization (i18n) section below — and `update-author-profile` for tri-lingual author-profile edits/creation). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
+Seventeen skills: twelve organized as Write/Review pairs across six artifact stages (the slide deck gained its `review-slides` partner), plus five standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, `write-data-dictionary` for an interactive HTML data-dictionary page + Stata pipeline over a post's `data/` folder, `translate-content` — the trilingual ES/JA translator documented in the Internationalization (i18n) section below — and `update-author-profile` for tri-lingual author-profile edits/creation). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
 
 ## Pipeline overview
 
@@ -230,6 +230,7 @@ Sixteen skills: twelve organized as Write/Review pairs across six artifact stage
 | Quarto notebook (R/Python/Stata, lighter) | `/project:write-quarto-notebook` | — |
 | Quarto notebook (Python, friction-free bundle) | `/project:write-quarto-notebook-python` | — |
 | Slide deck (Quarto reveal.js) | `/project:write-slides` | `/project:review-slides` |
+| Data dictionary (interactive HTML + Stata pipeline) | `/project:write-data-dictionary` | — |
 
 ## Shared conventions
 
@@ -261,6 +262,7 @@ Each skill's full documentation (invocation, examples, reference files, conventi
 - `write-slides` — `.claude/skills/write-slides/SKILL.md` — generate a branded Quarto reveal.js deck for a post; interview-driven, ships to `content/post/<slug>/slides/`.
 - `review-slides` — `.claude/skills/review-slides/SKILL.md` — read-only 10-dimension scored audit of a write-slides deck (source fidelity, conceptual/technical correctness, title↔body consistency, readability & simplicity, typos, design adherence, branding integrity, accessibility, deliverables); static smoke test + headless browser pass; writes `slides/SLIDES_REVIEW.md`.
 - `translate-content` — `.claude/skills/translate-content/SKILL.md` — trilingual ES/JA translator (see Internationalization (i18n) section below).
+- `write-data-dictionary` — `.claude/skills/write-data-dictionary/SKILL.md` — generate an interactive, self-contained HTML data dictionary (+ labeled Stata `.dta`, README, codebook `.do`, download-all ZIP) for a post's `data/` folder; metadata-driven (per-post `data_dictionary.yaml` + a generic renderer), dark mode, searchable variable explorer with distribution sparklines, tabbed per-dataset dictionaries, cross-file index, citations; reference implementation `content/post/python_kuznets_dmsp/data/`.
 - `update-author-profile` — `.claude/skills/update-author-profile/SKILL.md` — edit/create an author profile with ES + JA counterparts kept in sync.
 
 Legacy skills are preserved at `.claude/skills/legacy/` for reference.
