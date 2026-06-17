@@ -379,6 +379,73 @@ iframe {
   background-color: transparent;
 }
 
+/* C2. Embedded maketables (Great Tables) regression tables.
+   The maketables HTML tables (Tables 1-4 + the §4.4 summaries) ship their own
+   light-theme Great-Tables CSS (white background, #333 text) scoped to their
+   `#mt-…` ids, which is unreadable on the dark theme. Recolour them to the site
+   palette in BOTH modes, mirroring the `.article-style table` rules above.
+   Scoped to the stable wrapper id prefix; !important beats GT's id-scoped CSS. */
+.article-style [id^="mt-"] .gt_table {
+  background-color: transparent !important;
+  color: #141413 !important;
+  margin: 1.5rem auto !important;
+  font-size: 0.92rem !important;
+  border-top-color: rgba(20, 20, 19, 0.18) !important;
+  border-bottom-color: rgba(20, 20, 19, 0.18) !important;
+}
+.article-style [id^="mt-"] .gt_heading,
+.article-style [id^="mt-"] .gt_title,
+.article-style [id^="mt-"] .gt_subtitle {
+  color: #1a3a8a !important;
+  background-color: transparent !important;
+  font-weight: 700 !important;
+}
+.article-style [id^="mt-"] .gt_col_heading,
+.article-style [id^="mt-"] .gt_column_spanner,
+.article-style [id^="mt-"] .gt_columns_top_border,
+.article-style [id^="mt-"] .gt_columns_bottom_border {
+  color: #0e1545 !important;
+  background-color: transparent !important;
+}
+.article-style [id^="mt-"] .gt_col_headings,
+.article-style [id^="mt-"] .gt_columns_bottom_border {
+  border-bottom: 2px solid #00d4c8 !important;
+}
+.article-style [id^="mt-"] .gt_column_spanner {
+  border-bottom-color: rgba(0, 212, 200, 0.45) !important;
+}
+.article-style [id^="mt-"] .gt_row,
+.article-style [id^="mt-"] .gt_stub {
+  color: #141413 !important;
+  background-color: transparent !important;
+  border-top-color: rgba(20, 20, 19, 0.08) !important;
+  border-bottom-color: rgba(20, 20, 19, 0.08) !important;
+}
+.article-style [id^="mt-"] .gt_striped {
+  background-color: rgba(106, 155, 204, 0.06) !important;
+}
+.article-style [id^="mt-"] .gt_group_heading,
+.article-style [id^="mt-"] .gt_group_heading_row {
+  color: #6a9bcc !important;
+  background-color: transparent !important;
+  font-weight: 600 !important;
+}
+.article-style [id^="mt-"] .gt_sourcenote,
+.article-style [id^="mt-"] .gt_sourcenotes,
+.article-style [id^="mt-"] .gt_footnote {
+  color: #6c757d !important;
+  background-color: transparent !important;
+  font-size: 0.8rem !important;
+}
+/* Descriptive-statistics summary tables (§4.4): widen the variable-name (stub)
+   column so the long labels are easy to read. */
+.article-style [id^="mt-summary-"] .gt_stub,
+.article-style [id^="mt-summary-"] .gt_stubhead {
+  min-width: 15rem !important;
+  white-space: normal !important;
+  text-align: left !important;
+}
+
 /* D. Blockquotes — warm orange accent */
 .article-style blockquote {
   border-left-color: #d97757;
@@ -886,6 +953,49 @@ body,
 
 .dark .article-style table tbody tr:hover {
   background-color: rgba(0, 212, 200, 0.08);
+}
+
+/* C2. Embedded maketables (Great Tables) tables — dark theme */
+.dark .article-style [id^="mt-"] .gt_table {
+  color: rgba(255, 255, 255, 0.84) !important;
+  border-top-color: rgba(255, 255, 255, 0.14) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.14) !important;
+}
+.dark .article-style [id^="mt-"] .gt_heading,
+.dark .article-style [id^="mt-"] .gt_title,
+.dark .article-style [id^="mt-"] .gt_subtitle {
+  color: #c8d0e0 !important;
+}
+.dark .article-style [id^="mt-"] .gt_col_heading,
+.dark .article-style [id^="mt-"] .gt_column_spanner,
+.dark .article-style [id^="mt-"] .gt_columns_top_border,
+.dark .article-style [id^="mt-"] .gt_columns_bottom_border {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.dark .article-style [id^="mt-"] .gt_col_headings,
+.dark .article-style [id^="mt-"] .gt_columns_bottom_border {
+  border-bottom-color: #00d4c8 !important;
+}
+.dark .article-style [id^="mt-"] .gt_column_spanner {
+  border-bottom-color: rgba(0, 212, 200, 0.6) !important;
+}
+.dark .article-style [id^="mt-"] .gt_row,
+.dark .article-style [id^="mt-"] .gt_stub {
+  color: rgba(255, 255, 255, 0.84) !important;
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+.dark .article-style [id^="mt-"] .gt_striped {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+.dark .article-style [id^="mt-"] .gt_group_heading,
+.dark .article-style [id^="mt-"] .gt_group_heading_row {
+  color: #8bb8e0 !important;
+}
+.dark .article-style [id^="mt-"] .gt_sourcenote,
+.dark .article-style [id^="mt-"] .gt_sourcenotes,
+.dark .article-style [id^="mt-"] .gt_footnote {
+  color: rgba(255, 255, 255, 0.55) !important;
 }
 
 /* D. Blockquotes */
