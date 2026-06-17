@@ -369,7 +369,7 @@ k2 = kuz_fit("GINIW_pred_GDP_pc", "lg + lg2")
 k3 = kuz_fit("GINIW_pred_GDP_pc", "lg + lg2 + lg3")
 k_other = {c: kuz_fit(c, "lg + lg2 + lg3") for c in IDX[1:]}
 mt.ETable([k1, k2, k3] + [k_other[c] for c in IDX[1:]],
-          model_heads=["linear", "quadratic", "cubic", "cubic", "cubic", "cubic", "cubic"],
+          model_heads=["linear", "quadratic", "cubic", "", "", "", ""],
           labels={"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)^2", "lg3": "(log GDP p.c.)^3",
                   "GINIW_pred_GDP_pc": "Population-weighted regional Gini",
                   "COVW_pred_GDP_pc": "Coeff. of variation", "GE_1W_pred_GDP_pc": "Theil index",

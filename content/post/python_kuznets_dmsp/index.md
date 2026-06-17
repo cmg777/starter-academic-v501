@@ -1007,7 +1007,7 @@ import maketables as mt
 # the Gini ladder (linear / quadratic / cubic) + the cubic for the other four indices
 # labels relabel the dependent-variable spanner per column (Gini, CV, Theil, ...)
 et3 = mt.ETable([k1, k2, k3] + [k_other[c] for c in IDX[1:]],
-                model_heads=["linear", "quadratic", "cubic", "cubic", "cubic", "cubic", "cubic"],
+                model_heads=["linear", "quadratic", "cubic", "", "", "", ""],
                 labels={"GINIW_pred_GDP_pc": "Population-weighted regional Gini", ...},
                 coef_fmt="b:.3f* (se:.3f)", show_fe=True)
 et3.make("html")                                  # professional HTML table

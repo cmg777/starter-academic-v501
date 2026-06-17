@@ -782,7 +782,7 @@ T3_LAB = {"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)²", "lg3": "(log GDP p.c.
           "GE_0W_pred_GDP_pc": "Mean log deviation",
           "GE_m1W_pred_GDP_pc": "GE(−1)"}
 et3 = mt.ETable([k1, k2, k3] + [k_other[c] for c in IDX[1:]],
-                model_heads=["linear", "quadratic", "cubic", "cubic", "cubic", "cubic", "cubic"],
+                model_heads=["linear", "quadratic", "cubic", "", "", "", ""],
                 labels=T3_LAB, felabels={"Country_ISO": "Country FE", "p5": "Period FE"},
                 coef_fmt="b:.3f* (se:.3f)", model_stats=["N", "r2"], show_fe=True,
                 caption="Table 3. The regional Kuznets curve",
