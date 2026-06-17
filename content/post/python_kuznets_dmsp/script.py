@@ -134,6 +134,108 @@ print(f"    Training sample: {pred.shape[0]} region-years, "
       f"{n_reg} regions, {n_cty} countries.")
 
 # ===========================================================================
+# 1b. DATA DICTIONARY: SUMMARY STATISTICS & COVERAGE
+# ===========================================================================
+# Descriptive statistics for the data dictionary (Appendix A of the post),
+# split by unit of observation, plus a per-column coverage table (year span,
+# #countries/#regions, N non-missing) that grounds the dictionary's Coverage
+# column -- many determinants are only sparsely observed.
+print("\n[1b] Summary statistics and coverage for the data dictionary ...")
+
+
+def _fmt(v):
+    """Context-aware number format for the summary tables."""
+    if pd.isna(v):
+        return "--"
+    a = abs(v)
+    if a >= 1000:
+        return f"{v:,.0f}"
+    if a >= 1:
+        return f"{v:.2f}"
+    return f"{v:.4f}"
+
+
+def summary_table(spec, title, path, note):
+    """spec: list of (label, Series). Render N / mean / sd / min / median / max."""
+    cols = ["N", "mean", "sd", "min", "median", "max"]
+    rlab, cells = [], []
+    for label, s in spec:
+        s = pd.to_numeric(s, errors="coerce")
+        rlab.append(label)
+        cells.append([f"{int(s.notna().sum()):,}", _fmt(s.mean()), _fmt(s.std()),
+                      _fmt(s.min()), _fmt(s.median()), _fmt(s.max())])
+    render_table_png(cols, rlab, cells, title, path, note=note, figw=9.0)
+    return pd.DataFrame(cells, index=rlab, columns=cols)
+
+
+region_spec = [
+    ("Observed GDP p.c. (region, US$)", pred["GDP_pc_Region"]),
+    ("Predicted GDP p.c. (region, US$)", t2["pred_GDP_pc_Region"]),
+    ("Log light per pixel (region)", pred["log_Light_ppix_Region"]),
+    ("Total light (region, summed DN)", t2["Light_Region"]),
+    ("Population (region)", pred["Pop_Region"]),
+]
+country_spec = [
+    ("GDP p.c. (country, US$)", t3["GDP_pc_Country"]),
+    ("Regional Gini (GINIW)", t3["GINIW_pred_GDP_pc"]),
+    ("Coeff. of variation (CV)", t3["COVW_pred_GDP_pc"]),
+    ("Theil index GE(1)", t3["GE_1W_pred_GDP_pc"]),
+    ("Mean log deviation GE(0)", t3["GE_0W_pred_GDP_pc"]),
+    ("GE(-1)", t3["GE_m1W_pred_GDP_pc"]),
+    ("Resource rents (% GDP)", t4["Resources_rents_share_of_GDP"]),
+    ("Arable land (share)", t4["Arable_land"]),
+    ("Trade (share of GDP)", t4["Trade_GDP_share"]),
+    ("FDI (share of GDP)", t4["FDI_share_of_GDP"]),
+    ("Gasoline price (US$/L)", t4["price_gasoline"]),
+    ("Net aid (US$ bn)", t4["Aid"] / 1e9),
+    ("Secondary enrollment (%)", t4["School_enrollment_secondary"]),
+    ("Ethnic inequality (light Gini)", t4["GINIW_Eth_light"]),
+    ("Polity2 (-1 to +1)", t4["Polity2"]),
+    ("Personal income Gini (0-100)", f5["Giniall"]),
+]
+sr = summary_table(region_spec, "Summary statistics: region-level variables",
+                   fig_path(16, "summary_region"),
+                   note="Region-year observations. Construction & sources: data dictionary "
+                        "(Appendix A).")
+sc = summary_table(country_spec, "Summary statistics: country-level variables",
+                   fig_path(17, "summary_country"),
+                   note="Country-year observations; net aid scaled to US$ billions. "
+                        "Construction & sources: Appendix A.")
+sr.to_csv(f"{SLUG}_summary_region.csv")
+sc.to_csv(f"{SLUG}_summary_country.csv")
+
+# Per-column coverage across all six files (year span, #countries, #regions, N).
+FILES = [("Prediction_Data", pred), ("Table_2_data", t2), ("Table_3_data", t3),
+         ("Table_4_data", t4), ("Table_B4_data", tb4), ("Figure_5_data", f5)]
+cov_rows = []
+for fname, df in FILES:
+    rid = "code_Coutry_Region" if "code_Coutry_Region" in df.columns else None
+    for col in df.columns:
+        nn = df[col].notna()
+        yrs = df.loc[nn, "year"] if "year" in df.columns else pd.Series([], dtype=float)
+        cov_rows.append({
+            "file": fname, "column": col, "N": int(nn.sum()),
+            "year_min": int(yrs.min()) if len(yrs) else "",
+            "year_max": int(yrs.max()) if len(yrs) else "",
+            "n_countries": int(df.loc[nn, "Country_ISO"].nunique())
+            if "Country_ISO" in df.columns else "",
+            "n_regions": int(df.loc[nn, rid].nunique()) if rid else "",
+        })
+cov = pd.DataFrame(cov_rows)
+cov.to_csv(f"{SLUG}_coverage.csv", index=False)
+print(f"    wrote summary_region / summary_country / coverage CSVs "
+      f"({len(cov)} column-coverage rows across {len(FILES)} files)")
+_show = ["Resources_rents_share_of_GDP", "Arable_land", "Trade_GDP_share",
+         "FDI_share_of_GDP", "price_gasoline", "Aid", "School_enrollment_secondary",
+         "GINIW_Eth_light", "Polity2", "fedelupd2"]
+print("    determinants coverage (Table_4):")
+print(cov[(cov.file == "Table_4_data") & (cov.column.isin(_show))]
+      [["column", "year_min", "year_max", "n_countries", "N"]].to_string(index=False))
+print("    Figure_5 Giniall coverage:",
+      cov[(cov.file == "Figure_5_data") & (cov.column == "Giniall")]
+      [["year_min", "year_max", "n_countries", "N"]].to_dict("records"))
+
+# ===========================================================================
 # 2. EDA: CROSS-COUNTRY DYNAMICS OF INEQUALITY
 # ===========================================================================
 print("\n[2] EDA -- cross-country dynamics of the key variables ...")

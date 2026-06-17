@@ -11,6 +11,22 @@ Regional Inequality from Outer Space -- Lessmann & Seidel (2017)
     Figure_5_data        3675 rows x   5 cols
     Training sample: 5258 region-years, 1504 regions, 81 countries.
 
+[1b] Summary statistics and coverage for the data dictionary ...
+    wrote summary_region / summary_country / coverage CSVs (86 column-coverage rows across 6 files)
+    determinants coverage (Table_4):
+                      column  year_min  year_max  n_countries    N
+Resources_rents_share_of_GDP      1992      2012          177 3620
+                 Arable_land      1992      2012          178 3603
+             Trade_GDP_share      1992      2012          176 3509
+            FDI_share_of_GDP      1992      2012          174 3477
+              price_gasoline      1992      2012          162 1366
+                         Aid      1992      2012          155 2964
+ School_enrollment_secondary      1992      2012          172 2566
+             GINIW_Eth_light      1992      2012          173 3528
+                     Polity2      1992      2012          157 3158
+                   fedelupd2      1992      2009          154 2724
+    Figure_5 Giniall coverage: [{'year_min': 1992, 'year_max': 2012, 'n_countries': 153, 'N': 1330}]
+
 [2] EDA -- cross-country dynamics of the key variables ...
     light: mean=0.96 | GINIW: mean=0.064, median=0.061, max=0.163
     GINIW 0.0702 (1992) -> 0.0612 (2012)
@@ -65,7 +81,7 @@ Synthetic C: turns out of range 0.220000 -0.026000 0.000100  0.000610 2 turning 
     n=144 countries | OLS slope=0.587
 
 ===========================================================================
-Generated 15 figures and 13 CSV result files.
-Figures: python_kuznets_dmsp_01_distributions.png, python_kuznets_dmsp_02_time_trends.png, python_kuznets_dmsp_03_by_wb_region.png, python_kuznets_dmsp_04_index_corr_heatmap.png, python_kuznets_dmsp_05_table1.png, python_kuznets_dmsp_06_predicted_vs_observed.png, python_kuznets_dmsp_07_population_weights.png, python_kuznets_dmsp_08_table2_correlations.png, python_kuznets_dmsp_09_table3.png, python_kuznets_dmsp_10_kuznets_scatter.png, python_kuznets_dmsp_11_table4.png, python_kuznets_dmsp_12_conley_se.png, python_kuznets_dmsp_13_regional_vs_personal.png, python_kuznets_dmsp_14_turning_points.png, python_kuznets_dmsp_15_discriminant_regimes.png
+Generated 17 figures and 16 CSV result files.
+Figures: python_kuznets_dmsp_01_distributions.png, python_kuznets_dmsp_02_time_trends.png, python_kuznets_dmsp_03_by_wb_region.png, python_kuznets_dmsp_04_index_corr_heatmap.png, python_kuznets_dmsp_05_table1.png, python_kuznets_dmsp_06_predicted_vs_observed.png, python_kuznets_dmsp_07_population_weights.png, python_kuznets_dmsp_08_table2_correlations.png, python_kuznets_dmsp_09_table3.png, python_kuznets_dmsp_10_kuznets_scatter.png, python_kuznets_dmsp_11_table4.png, python_kuznets_dmsp_12_conley_se.png, python_kuznets_dmsp_13_regional_vs_personal.png, python_kuznets_dmsp_14_turning_points.png, python_kuznets_dmsp_15_discriminant_regimes.png, python_kuznets_dmsp_16_summary_region.png, python_kuznets_dmsp_17_summary_country.png
 
 === Script completed successfully ===

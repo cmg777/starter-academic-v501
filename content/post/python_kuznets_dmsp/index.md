@@ -333,7 +333,16 @@ def load(name):
 The `load` helper means every reader — on Colab, on a laptop, online or offline — gets the
 same data with no manual downloads. Next we read the files and look at their shapes.
 
-## 4. The data: three views of the world
+## 4. The data: sources and construction
+
+This section documents the data behind every number in the post: what each file is for, where
+each variable originally came from, how it was constructed, and what it looks like
+descriptively. Everything traces back to Lessmann and Seidel (2017). The exhaustive,
+column-by-column reference — construction, original source, units, and time–country coverage
+for **all six files** — lives in [Appendix A](#appendix-a-data-dictionary); this section gives
+the readable tour.
+
+### 4.1 Three views of the world
 
 The replication ships three "views" of the same world. The **region-year** files
 (`Prediction_Data.csv`, `Table_2_data.csv`, `Table_B4_data.csv`) describe individual
@@ -370,7 +379,114 @@ that have *both* an observed GDP figure and a light reading, the sample used to 
 the lights model. The country-year files hold 3,675 rows spanning 180 countries and the
 years 1992–2012. Keeping the two units straight is essential: we calibrate and predict at
 the region level, then measure inequality and run the Kuznets regressions at the country
-level. Before any modelling, we look at how inequality behaves across countries.
+level.
+
+### 4.2 The six files at a glance
+
+Six CSVs, each a tidy panel keyed by country (and, for the region files, by region) and year.
+The complete column inventory for every file is in [Appendix A.1](#a1-the-six-datasets-in-detail);
+here is what each file is *for* and what it carries.
+
+- **`Prediction_Data.csv`** — *region-year* (5,258 × 30; 1,504 regions in 81 countries; 1992–2010).
+  **Purpose:** the training sample that calibrates the light→income model (Table 1). These are the
+  regions that have *both* an observed GDP figure (Gennaioli et al. 2014) and a light reading.
+  **Components:** identifiers (`Country_ISO`, `code_Coutry_Region`, `id_t_j` = year+ISO); observed
+  income (`GDP_pc_Region`, `log_GDP_pc_Region`); the model regressors (`log_Light_ppix_Region`,
+  `log_GDP_pc_Country`, log top-/low-coded pixel counts, `log_area`, `log_region`, their
+  interaction); World-Bank region-group dummies (`eap`…`ssa`); satellite-configuration dummies
+  (`satyear_1`–`satyear_7`).
+- **`Table_2_data.csv`** — *region-year* (5,258 × 8; same training frame). **Purpose:** inputs to
+  *validate* the inequality indices — it pairs predicted and observed regional income with
+  region/country light and population. **Components:** `pred_GDP_pc_Region`, `GDP_pc_Region`,
+  `Light_Region`, `Light_Country`, `Pop_Region`, `Pop_Country`.
+- **`Table_3_data.csv`** — *country-year* (3,675 × 9; 180 countries; 1992–2012). **Purpose:** the
+  Kuznets dataset — national income plus the five population-weighted inequality indices built from
+  predicted regional income. **Components:** `GDP_pc_Country` and `GINIW_`, `COVW_`, `GE_1W_`,
+  `GE_0W_`, `GE_m1W_pred_GDP_pc`.
+- **`Table_4_data.csv`** — *country-year* (3,675 × 17; 180 countries; 1992–2012). **Purpose:** the
+  determinants dataset — the Kuznets variables plus the structural correlates of regional
+  inequality. **Components:** `GINIW_pred_GDP_pc`, `GDP_pc_Country`, `Pop_Country`, and the
+  determinants `Resources_rents_share_of_GDP`, `Arable_land`, `Trade_GDP_share`, `FDI_share_of_GDP`,
+  `area`, `price_gasoline`, `Aid`, `School_enrollment_secondary`, `GINIW_Eth_light`, `Polity2`,
+  `fedelupd2`.
+- **`Table_B4_data.csv`** — *region-year* (5,258 × 14; training frame). **Purpose:** the
+  spatial-robustness dataset — it adds each region's centroid so the Conley spatial-HAC standard
+  errors (§11) can down-weight distant regions. **Components:** `Latitude`, `Longitude`,
+  `log_GDP_pc_Region`, `log_Light_ppix_Region`, `satyear_1`–`satyear_7`.
+- **`Figure_5_data.csv`** — *country-year* (3,675 × 5; 180 countries; 1992–2012). **Purpose:** the
+  regional-versus-personal comparison (§12) — it sets the regional Gini beside a national
+  interpersonal income Gini. **Components:** `GINIW_pred_GDP_pc` and `Giniall` (the personal Gini,
+  observed for only 153 countries / 1,330 country-years).
+
+### 4.3 How the key variables were built
+
+Every variable above is the end of a construction chain that begins with raw satellite imagery
+and public databases; tracing that chain is what makes the numbers interpretable.
+
+- **Nighttime lights.** The light data are the DMSP-OLS *stable lights* product processed by the
+  U.S. NOAA/National Geophysical Data Center: a digital number from 0 (dark) to 63 (saturated) for
+  every ≈0.86 km² pixel, available annually from 1992. The authors average the light per pixel
+  within each region and, following Hodler and Raschky (2014), add 0.01 where a region would
+  otherwise read zero so the log is defined. Two censoring problems matter — bright cities
+  top-code at 63, sparse areas bottom-code at 0 — which is why the prediction model also carries
+  the counts of top- and low-coded pixels.
+- **Sub-national boundaries.** Regions are the 1st-level administrative units (states, provinces,
+  cantons) from the GADM database — roughly OECD TL2 / EUROSTAT NUTS1 — 3,166 regions across 180
+  countries. The gridded light and population rasters are aggregated to these polygons.
+- **Observed regional income.** The observed regional GDP per capita used to *train* the model
+  comes from Gennaioli et al. (2014): GDP per capita in constant 2005 PPP US\\$ for 1,503 regions
+  in 82 countries, an unbalanced panel built from OECD, national-statistics, and
+  human-development-report sources.
+- **Population.** Regional population comes from the Gridded Population of the World (GPW) v3 raster
+  (CIESIN): population density times region area, rounded up so the minimum is one, with the
+  5-year survey waves interpolated to annual values.
+- **Predicted regional income.** Because observed regional income exists for only ~80 countries,
+  the model in §6 regresses log observed regional income on log light per pixel plus controls
+  (country income, top-/low-coded pixel counts, number of regions, area and their interaction, and
+  World-Bank region-group and satellite fixed effects) on the training sample, then *predicts*
+  regional income for all 3,166 regions in 180 countries (1992–2012). The calibrated light
+  elasticity is 0.102. Country-level controls come from the World Bank's World Development
+  Indicators (WDI) and the CIA World Factbook.
+- **Inequality indices.** From the predicted regional incomes, §7 builds five population-weighted
+  indices per country-year — the Gini (`GINIW`), the coefficient of variation (`COVW`), and the
+  generalized-entropy family GE(−1), GE(0) = mean log deviation, GE(1) = Theil — each weighting a
+  region by its share of the national population so sparsely-populated outliers (e.g. Canada's
+  Northern Territories) do not dominate.
+- **Determinants.** The structural correlates in §10 are mostly WDI series — resource rents,
+  arable-land share, trade and FDI shares, the gasoline pump price, net aid, and secondary-school
+  enrolment — plus the Polity IV democracy score (Center for Systemic Peace, rescaled to
+  \[−1, +1]), a federalism dummy, and an *ethnic-inequality* index that applies the same
+  population-weighted light-Gini to ethnic homelands (GREG geo-referencing, Weidmann et al. 2010;
+  method of Alesina et al. 2016).
+
+### 4.4 Descriptive statistics
+
+With the variables defined, two summary tables give their shape. We split by unit of observation,
+because the region files (1992–2010) and the country files (1992–2012) sit on different panels.
+
+```python
+# N, mean, sd, min, median, max for the numeric variables, by unit of observation
+region_stats  = summarise(region_level_vars)      # observed/predicted income, light, population
+country_stats = summarise(country_level_vars)     # GDP, the 5 indices, the determinants
+print(country_stats.round(3))                      # see script.py for the full table builder
+```
+
+![Summary statistics of the region-level variables](python_kuznets_dmsp_16_summary_region.png)
+
+![Summary statistics of the country-level variables](python_kuznets_dmsp_17_summary_country.png)
+
+At the region level, observed and predicted GDP per capita have similar centres (medians near
+\\$8,770 and \\$8,325), but the predictions are less dispersed — the model smooths the extremes,
+compressing the observed \\$226–\\$150,768 range to \\$360–\\$70,638. At the country level the five
+inequality indices are all small and right-skewed (the regional Gini averages 0.064, max 0.163),
+echoing §4.1's point that most countries are internally fairly equal with a long unequal tail. The
+determinants are where to be careful: several are **sparsely observed** — the gasoline price
+(N = 1,366), the personal income Gini (N = 1,330), secondary enrolment (N = 2,566) and net aid
+(N = 2,964) cover far fewer country-years than the core panel's 3,675 — which is exactly why §10's
+determinant regressions run on shifting subsamples. The full per-variable coverage, construction,
+and sources are tabulated in [Appendix A](#appendix-a-data-dictionary).
+
+With the data documented, we look at how inequality behaves across countries.
 
 ## 5. Cross-country dynamics of inequality
 
@@ -1176,6 +1292,125 @@ income figures are *predictions*, accurate on average but wrong for any single u
 7. [linearmodels — panel data models in Python (documentation)](https://bashtage.github.io/linearmodels/)
 8. [Mendez, C. (2026). The spatial Kuznets curve in R: turning points and the discriminant test (companion post, synthetic replication of Lessmann 2013).](/post/r_kuznets/)
 9. [Mendez, C. (2026). Regional inequality and the Kuznets curve: panel fixed effects in Python (companion post).](/post/python_fe_kuznets/)
+
+**Original data sources**
+
+10. [Hodler, R., & Raschky, P. A. (2014). Regional favoritism. *Quarterly Journal of Economics*, 129(2), 995–1033.](https://doi.org/10.1093/qje/qju004)
+11. [Alesina, A., Michalopoulos, S., & Papaioannou, E. (2016). Ethnic inequality. *Journal of Political Economy*, 124(2), 428–488.](https://doi.org/10.1086/685300)
+12. [Weidmann, N. B., Rød, J. K., & Cederman, L.-E. (2010). Representing ethnic groups in space: A new dataset (GREG). *Journal of Peace Research*, 47(4), 491–499.](https://doi.org/10.1177/0022343310368352)
+13. [NOAA / National Geophysical Data Center — DMSP-OLS Nighttime Lights (Version 4 "stable lights").](https://www.ngdc.noaa.gov/eog/dmsp/downloadV4composites.html)
+14. [GADM — Database of Global Administrative Areas.](https://gadm.org/)
+15. [CIESIN — Gridded Population of the World (GPW), v3.](https://sedac.ciesin.columbia.edu/data/collection/gpw-v3)
+16. [World Bank — World Development Indicators (WDI).](https://databank.worldbank.org/source/world-development-indicators)
+17. [Central Intelligence Agency — The World Factbook.](https://www.cia.gov/the-world-factbook/)
+18. [Center for Systemic Peace — Polity IV Annual Time-Series.](https://www.systemicpeace.org/inscrdata.html)
+
+## Appendix A. Data dictionary
+
+This appendix documents **every column in all six data files**: what it is, how it was originally
+constructed, its source, its units, and its **time–country coverage**. Coverage is written as
+*years · units · N*, where *N* is the number of non-missing observations and *units* counts the
+distinct countries (country files) or regions (region files) with data. Definitions follow Lessmann
+and Seidel (2017) and the official variable labels in the authors' replication archive; coverage and
+statistics are computed in `script.py`.
+
+### A.1 The six datasets in detail
+
+All six files are tidy panels. The **region files** are keyed by region × year over the
+1,504-region / 81-country training frame (1992–2010); the **country files** are keyed by
+`Country_ISO` × year over 180 countries (1992–2012). The inequality indices in the country files are
+built from the predicted regional incomes in the region files.
+
+| File | Unit | Rows × Cols | Years | Countries | Regions | What it is for |
+|---|---|---|---|---|---|---|
+| `Prediction_Data.csv` | region-year | 5,258 × 30 | 1992–2010 | 81 | 1,504 | Train the light→income model (Table 1) |
+| `Table_2_data.csv` | region-year | 5,258 × 8 | 1992–2010 | 81 | 1,504\* | Validate the inequality indices (Table 2) |
+| `Table_3_data.csv` | country-year | 3,675 × 9 | 1992–2012 | 180 | — | Kuznets curve: GDP + 5 indices (Table 3) |
+| `Table_4_data.csv` | country-year | 3,675 × 17 | 1992–2012 | 180 | — | Determinants of inequality (Table 4) |
+| `Table_B4_data.csv` | region-year | 5,258 × 14 | 1992–2010 | 81 | 1,504 | Conley spatial-HAC errors (+ lat/lon) |
+| `Figure_5_data.csv` | country-year | 3,675 × 5 | 1992–2012 | 180 | — | Regional vs personal inequality |
+
+\* `Table_2_data.csv` has no explicit region-id column, but its rows are the same 1,504-region
+training frame at region-year.
+
+### A.2 Variable dictionary
+
+Coverage shorthand: region-frame variables are **1992–2010 · 1,504 reg (81 ctry) · N = 5,258** unless
+noted; core country-frame variables are **1992–2012 · 180 ctry · N = 3,675** unless noted.
+
+**Identifiers and keys**
+
+| Variable | What it is | How constructed | Source | Unit | Coverage |
+|---|---|---|---|---|---|
+| `Country_ISO` | Country code (ISO 3166-1) | Assigned per country | GADM | string | all files |
+| `Country_NAME` | Country name | — | GADM | string | all files |
+| `Region_NAME` | Region name | 1st-level admin-unit name | GADM | string | region frame |
+| `code_Coutry_Region` | Numeric region key (original spelling kept) | Region identifier | Authors | integer | region frame |
+| `id_t_j` | Country-year key | Concatenation of year + ISO (e.g. `2010CHE`) | Authors | string | region frame |
+| `year` | Calendar year | — | — | year | per file (see A.1) |
+
+**Lights and income**
+
+| Variable | What it is | How constructed | Source | Unit | Coverage |
+|---|---|---|---|---|---|
+| `log_Light_ppix_Region` | Log avg nighttime light per pixel | Region mean of DMSP-OLS stable-lights DN (0–63); +0.01 if zero, then log | NOAA/NGDC | log DN | region frame |
+| `Light_Region` | Regional total lights | Sum of pixel DN over the region | NOAA/NGDC | summed DN | 1992–2010 · 81 ctry · 5,258 (Table_2) |
+| `Light_Country` | Country total lights | Sum of pixel DN over the country | NOAA/NGDC | summed DN | 1992–2010 · 81 ctry · 5,258 (Table_2) |
+| `GDP_pc_Region` | Observed regional GDP per capita | Regional accounts, constant 2005 PPP US\\$ | Gennaioli et al. (2014) | US\\$ | region frame |
+| `log_GDP_pc_Region` | Log of `GDP_pc_Region` | Natural log | Gennaioli et al. (2014) | log US\\$ | region frame |
+| `pred_GDP_pc_Region` | Predicted regional GDP per capita | Fitted values of the eq.-1 RE model applied to all regions | This paper (model) | US\\$ | 1992–2010 · 81 ctry · 5,258 (Table_2) |
+| `GDP_pc_Country` | National GDP per capita | constant 2005 PPP US\\$ | World Bank WDI | US\\$ | country frame |
+| `log_GDP_pc_Country` | Log national GDP per capita | Natural log | World Bank WDI | log US\\$ | region frame |
+
+**Prediction-model regressors and fixed-effect dummies**
+
+| Variable | What it is | How constructed | Source | Unit | Coverage |
+|---|---|---|---|---|---|
+| `log_N_pix_top_cod_1_ppix` | Log # top-coded pixels (DN = 63) | Count of saturated pixels per region, logged | NOAA/NGDC | log count | region frame |
+| `log_N_pix_low_cod_1_ppix` | Log # low-coded pixels (DN = 0) | Count of dark pixels per region, logged | NOAA/NGDC | log count | region frame |
+| `log_area` | Log region area | Region polygon area, logged | GADM | log km² | region frame |
+| `log_region` | Log # regions in the country | Count of regions per country, logged | GADM / Gennaioli | log count | region frame |
+| `log_region_X_log_area` | Interaction term | `log_region` × `log_area` | Derived | — | region frame |
+| `eap`, `eca`, `lac`, `mena`, `sa`, `ssa` | World-Bank region-group dummies | 1 if the country is in that group (North America = reference) | World Bank | 0/1 | region frame |
+| `satyear_1` … `satyear_7` | Satellite-configuration dummies | 1 per satellite/sensor era (sensors change and age over time) | NOAA/NGDC | 0/1 | region frame |
+
+**Population and geography**
+
+| Variable | What it is | How constructed | Source | Unit | Coverage |
+|---|---|---|---|---|---|
+| `Pop_Region` | Regional total population | Population density × region area, rounded up (min 1); 5-yr waves interpolated to annual | GPW v3 (CIESIN) | persons | region frame |
+| `Pop_Country` | Country total population | Sum of regional populations | GPW v3 (CIESIN) | persons | region & country frames |
+| `area` | Country land area | Total land area (excl. inland water) | World Bank WDI | km² | country frame |
+| `Latitude`, `Longitude` | Region centroid coordinates | Polygon centroid | GADM | degrees | region frame (Table_B4) |
+
+**Inequality indices** (all population-weighted, on predicted regional income)
+
+| Variable | What it is | How constructed | Source | Unit | Coverage |
+|---|---|---|---|---|---|
+| `GINIW_pred_GDP_pc` | Regional Gini | Population-weighted Gini of `pred_GDP_pc_Region` within a country-year | This paper | 0–1 | country frame |
+| `COVW_pred_GDP_pc` | Regional coefficient of variation | Population-weighted CV | This paper | ≥ 0 | country frame |
+| `GE_1W_pred_GDP_pc` | Theil index, GE(1) | Population-weighted GE(α = 1) | This paper | ≥ 0 | country frame |
+| `GE_0W_pred_GDP_pc` | Mean log deviation, GE(0) | Population-weighted GE(α = 0) | This paper | ≥ 0 | country frame |
+| `GE_m1W_pred_GDP_pc` | GE(−1) | Population-weighted GE(α = −1) | This paper | ≥ 0 | country frame |
+| `Giniall` | National interpersonal income Gini | Household-survey income Gini (0–100 scale) | Lessmann & Seidel (2017) | 0–100 | 1992–2012 · 153 ctry · 1,330 (Figure_5) |
+
+**Determinants** (country frame, 1992–2012)
+
+| Variable | What it is | How constructed | Source | Unit | Coverage |
+|---|---|---|---|---|---|
+| `Resources_rents_share_of_GDP` | Natural-resource rents | Oil + gas + coal + mineral + forest rents, % of GDP | World Bank WDI | % GDP | 177 ctry · N = 3,620 |
+| `Arable_land` | Arable-land share | Arable land as a share of land area (FAO definition) | World Bank WDI | share | 178 ctry · N = 3,603 |
+| `Trade_GDP_share` | Trade openness | (Exports + imports) / GDP | World Bank WDI | ratio | 176 ctry · N = 3,509 |
+| `FDI_share_of_GDP` | FDI openness | Net FDI inflows / GDP | World Bank WDI | ratio | 174 ctry · N = 3,477 |
+| `price_gasoline` | Gasoline pump price | Pump price, PPP constant 2005 US\\$/litre (the paper's "transport cost" = area × price) | World Bank WDI | US\\$/L | 162 ctry · N = 1,366 |
+| `Aid` | Aid flows | Net aid received, constant 2011 US\\$ | World Bank WDI | US\\$ | 155 ctry · N = 2,964 |
+| `School_enrollment_secondary` | Secondary-school enrolment | Gross secondary enrolment ratio | World Bank WDI | % gross | 172 ctry · N = 2,566 |
+| `GINIW_Eth_light` | Ethnic inequality | Population-weighted light-Gini across ethnic homelands (method of Alesina et al. 2016) | NOAA/NGDC + GREG (Weidmann et al. 2010) | 0–1 | 173 ctry · N = 3,528 |
+| `Polity2` | Democracy–autocracy score | Polity IV combined score, rescaled −1 (autocracy) to +1 (democracy) | Center for Systemic Peace, Polity IV | −1…+1 | 157 ctry · N = 3,158 |
+| `fedelupd2` | Federalism dummy | 1 if the country is federally organised | Authors | 0/1 | 1992–2009 · 154 ctry · N = 2,724 |
+
+The authors' Table 4 also uses an ICRG "bureaucratic quality" index, which is licensed and **not**
+redistributed in this bundle; the post therefore omits that one determinant column.
 
 ---
 

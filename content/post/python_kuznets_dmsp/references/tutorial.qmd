@@ -92,6 +92,45 @@ country_group = pred.groupby("Country_ISO")["wb_group"].agg(
     lambda s: s.value_counts().index[0])
 ```
 
+### Variables, sources, and descriptive statistics
+
+The variables come from Lessmann and Seidel (2017): nighttime lights are the DMSP-OLS
+stable-lights product (NOAA/NGDC) aggregated to GADM 1st-level regions; observed regional income
+is from Gennaioli et al. (2014); population from GPW v3 (CIESIN); the inequality indices are
+population-weighted Gini/CV/GE built from predicted regional income; and the determinants are
+mostly World Bank WDI series. The post's
+[Appendix A](https://carlos-mendez.org/post/python_kuznets_dmsp/#appendix-a-data-dictionary) is a
+full data dictionary — every column, with construction, source, and time–country coverage. Two
+summary tables give the variables' shape (region files span 1992–2010; country files 1992–2012):
+
+```{python}
+#| label: summary-stats
+def summarise(cols):
+    rows = {}
+    for label, s in cols.items():
+        s = pd.to_numeric(s, errors="coerce")
+        rows[label] = [int(s.notna().sum()), s.mean(), s.std(), s.min(), s.median(), s.max()]
+    return pd.DataFrame(rows, index=["N", "mean", "sd", "min", "median", "max"]).T
+
+region = summarise({
+    "Observed GDP p.c. (region)": pred["GDP_pc_Region"],
+    "Predicted GDP p.c. (region)": t2["pred_GDP_pc_Region"],
+    "Log light per pixel (region)": pred["log_Light_ppix_Region"],
+    "Population (region)": pred["Pop_Region"],
+})
+country = summarise({
+    "GDP p.c. (country)": t3["GDP_pc_Country"],
+    "Regional Gini (GINIW)": t3["GINIW_pred_GDP_pc"],
+    "Resource rents (% GDP)": t4["Resources_rents_share_of_GDP"],
+    "Gasoline price (US$/L)": t4["price_gasoline"],
+    "Net aid (US$ bn)": t4["Aid"] / 1e9,
+    "Personal income Gini": f5["Giniall"],
+})
+print(region.round(2))
+print()
+print(country.round(3))
+```
+
 ## Cross-country dynamics of inequality
 
 Before modelling anything, we map the landscape: how the regional Gini differs across world
