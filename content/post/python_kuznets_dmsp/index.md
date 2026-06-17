@@ -50,18 +50,10 @@ links:
   icon_pack: fab
   name: "MD version"
   url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_kuznets_dmsp/index.md
-- icon: database
-  icon_pack: fas
-  name: "Data (CSV)"
-  url: https://github.com/cmg777/starter-academic-v501/tree/master/content/post/python_kuznets_dmsp/data
-- icon: database
-  icon_pack: fas
-  name: "Data (Stata .dta)"
-  url: https://github.com/cmg777/starter-academic-v501/tree/master/content/post/python_kuznets_dmsp/data
 - icon: book
   icon_pack: fas
-  name: "Data dictionary (README)"
-  url: https://github.com/cmg777/starter-academic-v501/blob/master/content/post/python_kuznets_dmsp/data/README.md
+  name: "Data dictionary"
+  url: data/index.html
 slides:
 summary: A comprehensive, beginner-friendly Python replication of Lessmann and Seidel (2017) — turning satellite nighttime lights into predicted regional GDP, building five population-weighted inequality indices from scratch, exploring the cross-country dynamics of regional inequality, and estimating the regional Kuznets curve, its determinants, and a Conley spatial-HAC robustness check with PyFixest.
 tags:
@@ -307,16 +299,16 @@ random-effects table PyFixest cannot estimate, and **statsmodels** for a conveni
 regression behind one figure. PyFixest needs Python 3.10 or newer.
 
 ```python
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import pyfixest as pf
-from linearmodels.panel import RandomEffects
-import statsmodels.formula.api as smf
+import numpy as np                              # arrays and math
+import pandas as pd                             # data frames (tables)
+import matplotlib.pyplot as plt                 # figures
+import pyfixest as pf                           # fixed-effects / OLS regressions
+from linearmodels.panel import RandomEffects    # the one random-effects model (Section 6)
+import statsmodels.formula.api as smf           # a convenience regression (one figure)
 
 # Site colour palette (used in every figure)
 STEEL, ORANGE, INK, TEAL = "#6a9bcc", "#d97757", "#141413", "#00d4c8"
-np.random.seed(42)
+np.random.seed(42)                              # make any randomness reproducible
 ```
 
 The site palette keeps the figures consistent: steel blue for primary data, warm orange for
@@ -360,6 +352,7 @@ and coordinates. The **country-year** files (`Table_3_data.csv`, `Table_4_data.c
 computed from its regions. We read all six.
 
 ```python
+# --- load all six bundled CSVs (comment = unit of observation + purpose) ----
 pred = load("Prediction_Data.csv")   # region-year: lights -> GDP training set
 t2   = load("Table_2_data.csv")      # region-year: inequality-index inputs
 t3   = load("Table_3_data.csv")      # country-year: Kuznets data
@@ -367,6 +360,7 @@ t4   = load("Table_4_data.csv")      # country-year: determinants
 tb4  = load("Table_B4_data.csv")     # region-year: lat/lon for spatial errors
 f5   = load("Figure_5_data.csv")     # country-year: regional vs personal Gini
 
+# --- print each file's shape: rows (observations) x columns (variables) -----
 for name, df in [("Prediction_Data", pred), ("Table_2_data", t2),
                  ("Table_3_data", t3), ("Table_4_data", t4),
                  ("Table_B4_data", tb4), ("Figure_5_data", f5)]:
@@ -559,10 +553,11 @@ Gini (at the country level). Looking at distributions first tells us whether var
 skewed, bounded, or multi-modal — facts that shape the models we can fit.
 
 ```python
+# three histograms side by side; .dropna() drops missing values before plotting
 fig, axes = plt.subplots(1, 3, figsize=(12, 3.6))
-axes[0].hist(pred["log_Light_ppix_Region"].dropna(), bins=40, color=STEEL)
-axes[1].hist(np.log(pred["GDP_pc_Region"].dropna()), bins=40, color=ORANGE)
-axes[2].hist(t3["GINIW_pred_GDP_pc"].dropna(), bins=40, color=TEAL)
+axes[0].hist(pred["log_Light_ppix_Region"].dropna(), bins=40, color=STEEL)   # log light
+axes[1].hist(np.log(pred["GDP_pc_Region"].dropna()), bins=40, color=ORANGE)  # log region income
+axes[2].hist(t3["GINIW_pred_GDP_pc"].dropna(), bins=40, color=TEAL)          # regional Gini
 # ... titles and labels omitted for brevity (see script.py)
 fig.savefig("python_kuznets_dmsp_01_distributions.png", dpi=300)
 
@@ -591,11 +586,14 @@ them on a shared timeline. Plotting the two series together previews the Kuznets
 do they move in the same direction or in opposite directions?
 
 ```python
-yr = (t3[(t3.year >= 1992) & (t3.year <= 2012)]
-      .assign(logGDP=lambda d: np.log(d.GDP_pc_Country))
-      .groupby("year").agg(GINIW=("GINIW_pred_GDP_pc", "mean"),
-                           logGDP=("logGDP", "mean")).reset_index())
-print(yr.iloc[[0, -1]].round(4).to_string(index=False))
+# Read this pandas chain top to bottom:
+yr = (t3[(t3.year >= 1992) & (t3.year <= 2012)]           # 1. keep years 1992-2012
+      .assign(logGDP=lambda d: np.log(d.GDP_pc_Country))  # 2. add a log-income column
+      .groupby("year")                                    # 3. one group per year
+      .agg(GINIW=("GINIW_pred_GDP_pc", "mean"),           # 4. average the Gini each year ...
+           logGDP=("logGDP", "mean"))                     #    ... and the log income too
+      .reset_index())
+print(yr.iloc[[0, -1]].round(4).to_string(index=False))   # show the first & last year
 ```
 
 ```text
@@ -675,49 +673,112 @@ landscape mapped, we turn to the engine of the whole exercise — turning light 
 
 ## 6. Predicting GDP from nighttime lights
 
-This is the first of the two construction stages, and the foundation of everything after it.
-The goal is a model that takes a region's nighttime brightness plus a few controls and
-returns a prediction of its income — a model we can then apply to regions that have *no*
-income statistics. We build it exactly as Table 1 of the paper does, calibrating on the
-1,504 regions where income is observed.
+This is the first of the two construction stages, and the foundation of everything that
+follows. The goal is a **prediction model**: feed it a region's nighttime brightness plus a
+handful of controls, and it returns a guess of that region's income. Once the model is trained
+on the regions where we *do* observe income, we can turn it loose on the tens of thousands of
+regions where we *do not* — which is the whole reason the satellite data is so valuable. We
+build the model exactly as Table 1 of the paper does, calibrating it on the 1,504 regions that
+have observed income.
+
+Why should light predict income at all? At night, economic activity — factories, offices, lit
+streets, houses with electricity — shows up from space as brightness, and richer places tend
+to be brighter. The relationship is far from perfect (an oil field flares brightly with almost
+no one around; a dense but poor city can be dim), which is exactly why we add controls and,
+later, measure how good the predictions really are.
 
 ### 6.1 The idea: light as a proxy for income
 
-We regress the log of a region's GDP per capita on the log of its light per pixel, plus
-controls that absorb everything light should *not* be credited with — national income,
-geography, satellite generation, and broad world region. Formally:
+We regress the **log of a region's GDP per capita** on the **log of its light per pixel**,
+plus controls that soak up everything brightness should *not* be given credit for — the
+country's overall income level, geography, the satellite generation, and the broad world
+region. Working in logs lets us read the slope as an **elasticity**: a percentage change in
+light maps to a percentage change in income. Formally:
 
 $$y\_r = \beta\_0 + \beta\_1 \ell\_r + \beta\_2 g\_c + \gamma' X\_r + \mu\_g + \tau\_s + \varepsilon\_r$$
 
-In words, this says a region's log income $y\_r$ is a baseline $\beta\_0$, plus an elasticity
-$\beta\_1$ times its log light $\ell\_r$, plus a near-one-for-one adjustment $\beta\_2$ for its
-country's log income $g\_c$, plus geography controls $X\_r$ (pixel saturation, area, number of
-regions), plus a world-region effect $\mu\_g$ and a satellite-generation effect $\tau\_s$. In
-code, $y\_r$ is `log_GDP_pc_Region`, $\ell\_r$ is `log_Light_ppix_Region`, $g\_c$ is
-`log_GDP_pc_Country`, and the fixed effects $\mu\_g, \tau\_s$ are the `group_id` and `satyear`
-columns. The coefficient we care about is $\beta\_1$ — the light-to-GDP elasticity.
+Reading the equation one term at a time, with the dataset column name in parentheses:
 
-### 6.2 Seven specifications in PyFixest
+- $y\_r$ — **log regional GDP per capita** (`log_GDP_pc_Region`): the outcome we want to
+  predict, for region $r$.
+- $\beta\_1 \ell\_r$ — the **light elasticity** $\beta\_1$ times **log light per pixel**
+  (`log_Light_ppix_Region`). This is the one coefficient we truly care about: how strongly
+  brightness tracks income once everything else is held fixed.
+- $\beta\_2 g\_c$ — an adjustment for **log national GDP per capita** (`log_GDP_pc_Country`)
+  of region $r$'s country $c$. Without it, light would be unfairly credited with gaps that are
+  really just rich-country-versus-poor-country differences.
+- $\gamma' X\_r$ — the **geography controls** (`log_area`, the number of regions `log_region`,
+  their interaction `log_region_X_log_area`, and two pixel-saturation counts
+  `log_N_pix_top_cod_1_ppix` / `log_N_pix_low_cod_1_ppix`). These absorb the fact that a
+  physically huge region, or one whose brightest pixels are "topped out" at the sensor's
+  maximum, registers light differently for reasons that have nothing to do with being rich.
+- $\mu\_g$ — a **world-region fixed effect** (`group_id`, e.g. Sub-Saharan Africa, Latin
+  America): a separate baseline for each broad region, soaking up whatever makes a whole
+  continent systematically brighter or dimmer.
+- $\tau\_s$ — a **satellite-generation fixed effect** (`satyear`): different satellites and
+  years calibrate brightness differently, and this term absorbs those technical differences.
+- $\varepsilon\_r$ — everything left over.
 
-The paper builds the model up in seven steps, each adding fixed effects or controls, so we
-can watch the elasticity stabilise. We run all seven as fixed-effects/OLS models in PyFixest.
-The fixed effects go after the `|`; standard errors are clustered by country (`CRV1`).
+Each control answers a specific *"but couldn't that gap just be …?"* objection. Drop the
+national-income term and $\beta\_1$ would partly pick up *between-country* wealth gaps; drop
+the satellite effect and it would partly pick up *sensor* changes. What survives on $\beta\_1$
+is the part of the brightness–income link we can actually defend.
+
+A quick feel for the magnitude: an elasticity of, say, $0.10$ means a region that is **twice
+as bright** (a 100% increase in light) is predicted to be only about 7% richer, since
+$2^{0.10}\approx 1.07$. Light moves far more than income — brightness is a noisy proxy, useful
+on average but nowhere near one-for-one.
+
+### 6.2 Building the model up, one control at a time
+
+The paper does not jump straight to the full model. It builds up in seven steps, each adding a
+fixed effect or a control, so we can *watch the light elasticity change* as more is held
+fixed. That progression is itself the lesson: it reveals how much of the raw brightness–income
+link is real, and how much was just rich-versus-poor confounding. We estimate each step with
+PyFixest (`pf.feols`), which fits ordinary least squares with optional fixed effects.
+
+Two pieces of PyFixest syntax for newcomers. Anything after the `|` in the formula is a
+**fixed effect** — a separate intercept for every value of that column, swept out of the data
+before the slope is estimated. And `vcov={"CRV1": "Country_ISO"}` asks for **standard errors
+clustered by country**: it tells the model that regions in the same country are not
+independent observations, so it should not over-state how precise the estimates are.
+
+First we build the two label columns the fixed effects need:
 
 ```python
-# Build the fixed-effect columns PyFixest needs (categoricals, not 0/1 dummies)
-pred["satyear"]  = sum(i * pred[f"satyear_{i}"] for i in range(1, 8)).astype(int)
-pred["group_id"] = pred.filter(["eap","eca","lac","mena","sa","ssa"]).idxmax(axis=1)
+# --- Step 1: build the categorical columns the fixed effects need ----------
+# PyFixest wants ONE label column per fixed effect (not a wall of 0/1 dummies).
 
+# satyear_1 ... satyear_7 are 0/1 flags; fold them into a single 1-7 code.
+pred["satyear"] = sum(i * pred[f"satyear_{i}"] for i in range(1, 8)).astype(int)
+
+# eap/eca/.../ssa are 0/1 world-region flags. idxmax(axis=1) returns, for each
+# row, the NAME of the column that equals 1 -- i.e. it turns the one-hot dummies
+# back into a single world-region label per region.
+pred["group_id"] = pred.filter(["eap", "eca", "lac", "mena", "sa", "ssa"]).idxmax(axis=1)
+```
+
+Now the ladder. We show four rungs — pooled, region fixed effects, plus national income, and
+the full model — and print the light elasticity at each:
+
+```python
+# --- Step 2: the ladder of specifications (each rung adds something) --------
 GEO = ("log_N_pix_top_cod_1_ppix + log_N_pix_low_cod_1_ppix + log_area + "
-       "log_region + log_region_X_log_area")
+       "log_region + log_region_X_log_area")                # the geography controls
 specs = {
- 1: "log_GDP_pc_Region ~ log_Light_ppix_Region",
- 2: "log_GDP_pc_Region ~ log_Light_ppix_Region | code_Coutry_Region + satyear",
- 4: "log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country | Country_ISO + satyear",
- 7: f"log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country + {GEO} | group_id + satyear",
+  # rung 1: pooled OLS, no fixed effects -- the raw, confounded correlation
+  1: "log_GDP_pc_Region ~ log_Light_ppix_Region",
+  # rung 2: + region & satellite FE -> the clean WITHIN-region elasticity
+  2: "log_GDP_pc_Region ~ log_Light_ppix_Region | code_Coutry_Region + satyear",
+  # rung 4: + national income, so light is not credited with rich-vs-poor gaps
+  4: "log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country | Country_ISO + satyear",
+  # rung 7: + all geography controls and world-region FE -- the full model
+  7: f"log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country + {GEO} | group_id + satyear",
 }
+
+# --- Step 3: fit each rung and read off the light elasticity ----------------
 for k, fml in specs.items():
-    m = pf.feols(fml, data=pred, vcov={"CRV1": "Country_ISO"})
+    m = pf.feols(fml, data=pred, vcov={"CRV1": "Country_ISO"})   # cluster by country
     print(f"col {k}: light elasticity = {m.coef()['log_Light_ppix_Region']:.3f}")
 ```
 
@@ -728,83 +789,147 @@ col 4: light elasticity = 0.131
 col 7: light elasticity = 0.049
 ```
 
-The pooled elasticity of 0.359 (column 1) falls to 0.190 once we absorb region fixed effects
-(column 2), and falls further as national income and geography are added. Column 2 is worth
-remembering: 0.190 is the *clean within-region* elasticity, the number Section 11 stress-tests
-for spatial correlation. Column 7's fixed-effects elasticity of 0.049 is the smallest,
-because once national income and broad region are absorbed there is little cross-region
-variation left for light to explain. But the paper did not use fixed effects here — it used
-random effects, and the difference is instructive.
+Watch the elasticity fall as we climb the ladder. The **pooled** estimate of 0.359 (column 1)
+blends two very different comparisons: brighter-versus-dimmer regions *within* a country, and
+richer-versus-poorer *countries*. Adding **region fixed effects** (column 2) discards the
+cross-region comparison and keeps only the within-region one — the elasticity drops to 0.190.
+This is the *clean within-region* number, and it is the one Section 11 later stress-tests for
+spatial correlation. Adding **national income** (column 4, 0.131) strips out what was really a
+country-level wealth effect, and the **full model** with every geography control (column 7,
+0.049) leaves only the thin sliver of variation that survives after region, country, and
+continent are all accounted for.
 
-### 6.3 The random-effects sidebar
+So which number is "right"? It depends on what we plan to do with the model — and that turns
+on the choice between **fixed effects** and **random effects**. That choice is important
+enough, and is the estimator the paper actually publishes, that it gets its own section.
 
-PyFixest estimates only fixed-effects and OLS models. The paper's Table 1, however, uses a
-**random-effects** estimator — it treats each region's intercept as a random draw and uses
-*both* the differences between regions and the changes within them. To reproduce the
-published numbers we briefly switch to `linearmodels.RandomEffects`, then put the two
-estimators side by side. This is also the cleanest illustration in the post of why the choice
-of estimator changes the number.
+### 6.3 Fixed effects vs random effects — and why prediction needs random effects
+
+This is the conceptual core of the whole construction, so we will take it slowly. Both
+estimators fit the *same* equation; they differ in **what variation they use** and — crucially
+for us — in **whether the fitted model can be applied to a brand-new region**.
+
+**Fixed effects (FE)** give every region its own intercept and then compare a region only to
+*itself over time*. Every difference *between* regions is swept away as a nuisance. This is
+wonderfully safe: anything permanent about a region — its terrain, its history, its
+institutions — is automatically controlled for, even things we never measured. But there is a
+price. The region intercepts are estimated *only* for regions in the training sample. Show a
+fitted FE model a region it has never seen, and it has no intercept for that region; it
+literally cannot produce a prediction.
+
+**Random effects (RE)** instead treat each region's intercept as a **random draw from a common
+distribution** with one estimated mean and variance. Because the region effect is now
+summarised by a couple of shared parameters rather than one free intercept per region, the
+model can use *both* the within-region variation (changes over time) *and* the between-region
+variation (richer-versus-poorer regions). The payoff is decisive: RE produces **one
+coefficient vector that applies to any region**, in the sample or out of it — so we can
+predict income for the tens of thousands of regions that have no income statistics at all.
+
+| | **Fixed effects** | **Random effects** (used by the paper) |
+|---|---|---|
+| Uses which variation? | within-region only | within **and** between region |
+| Controls unobserved region traits? | yes, automatically | only if uncorrelated with the regressors |
+| Predict for a new, unseen region? | **no** (no intercept for it) | **yes** — one shared model |
+| Use of the data | discards between-region signal | more efficient |
+| Key assumption | none on the region effect | region effect uncorrelated with regressors |
+
+For the paper's goal — drawing a global income map by predicting *every* region on Earth —
+fixed effects are simply not an option, and that is exactly why **the published Table 1 uses
+random effects**. PyFixest does only FE/OLS, so for this one step we switch to
+`linearmodels.RandomEffects`. Let us build the random-effects fit slowly, in four steps.
 
 ```python
-panel    = pred.set_index(["code_Coutry_Region", "year"])
-clusters = pd.DataFrame({"c": pd.Categorical(panel["Country_ISO"]).codes},
-                        index=panel.index)
+# --- Step 1: tell the estimator the panel structure ------------------------
+# A "panel" = the same units (regions) observed over several years. Indexing by
+# (region, year) tells RandomEffects which rows belong to the same region.
+panel = pred.set_index(["code_Coutry_Region", "year"])
+```
 
+```python
+# --- Step 2: cluster the standard errors by country ------------------------
+# Regions in the same country move together, so we cluster on country: turn each
+# country code into an integer label (one per row) for the clustered covariance.
+clusters = pd.DataFrame(
+    {"c": pd.Categorical(panel["Country_ISO"]).codes},
+    index=panel.index,
+)
+```
+
+```python
+# --- Step 3: a small helper that fits the RE model for any set of regressors --
 def re_fit(cols):
+    # Always prepend a constant -- the shared baseline intercept ...
     X = pd.concat([pd.Series(1.0, index=panel.index, name="const")] + cols, axis=1)
-    y = panel["log_GDP_pc_Region"]
+    y = panel["log_GDP_pc_Region"]                  # outcome: log regional income
+    # ... then fit random effects with country-clustered standard errors.
     return RandomEffects(y, X).fit(cov_type="clustered", clusters=clusters)
+```
 
-re7 = re_fit([panel[["log_Light_ppix_Region", "log_GDP_pc_Country",
-                     "log_N_pix_top_cod_1_ppix", "log_N_pix_low_cod_1_ppix",
-                     "log_area", "log_region", "log_region_X_log_area"]],
-              pd.get_dummies(panel["group_id"], drop_first=True).astype(float),
-              panel[[f"satyear_{i}" for i in range(1, 8)]].astype(float)])
-print("RE col 7 light elasticity = %.3f" % re7.params["log_Light_ppix_Region"])
-print("RE col 7 national-GDP elasticity = %.3f" % re7.params["log_GDP_pc_Country"])
+```python
+# --- Step 4: fit the full (column-7) specification -------------------------
+# Regressors: log light + log national income + the five geography controls,
+# the world-region dummies, and the satellite-generation dummies.
+re7 = re_fit([
+    panel[["log_Light_ppix_Region", "log_GDP_pc_Country",
+           "log_N_pix_top_cod_1_ppix", "log_N_pix_low_cod_1_ppix",
+           "log_area", "log_region", "log_region_X_log_area"]],
+    pd.get_dummies(panel["group_id"], drop_first=True).astype(float),  # world region
+    panel[[f"satyear_{i}" for i in range(1, 8)]].astype(float),        # satellite
+])
+print("RE col 7 light elasticity        = %.3f" % re7.params["log_Light_ppix_Region"])
+print("RE col 7 national-GDP elasticity  = %.3f" % re7.params["log_GDP_pc_Country"])
 ```
 
 ```text
-RE col 7 light elasticity = 0.102
-RE col 7 national-GDP elasticity = 0.889
+RE col 7 light elasticity        = 0.102
+RE col 7 national-GDP elasticity  = 0.889
 ```
 
+The random-effects light elasticity in column 7 is **0.102** — exactly the paper's published
+number — versus the **0.049** we got from fixed effects. Why is RE roughly twice as large?
+Because it keeps the between-region information that the within estimator threw away: with
+national income already absorbing most of the scale, the *between-region* spread is precisely
+where light still earns its keep. The national-income elasticity of **0.889** confirms that a
+region's income tracks its country's income almost one-for-one, with light supplying the
+remaining subnational detail.
+
+We report all seven specifications side by side below. The note records that the
+random-effects elasticity is essentially identical to the FE/OLS estimate; column 2, the one
+pure fixed-effects column, is where FE and RE coincide at 0.190.
+
 ```python
+# --- the seven specifications side by side, as in the paper's Table 1 ------
 import maketables as mt
-# the seven PyFixest specifications side by side, as in the paper's Table 1
-et1 = mt.ETable([fe_models[k] for k in range(1, 8)],
-                head_order="d",                   # dependent-variable header + (1)-(7)
-                labels={"log_GDP_pc_Region": "log regional GDP per capita", ...},
-                coef_fmt="b:.3f* (se:.3f)", show_fe=True)
-et1.make("html")                                  # professional HTML table
+et1 = mt.ETable(
+    [fe_models[k] for k in range(1, 8)],
+    head_order="d",                                # header: dependent variable + (1)-(7)
+    labels={"log_GDP_pc_Region": "log regional GDP per capita", ...},  # readable names
+    coef_fmt="b:.3f* (se:.3f)", show_fe=True,
+)
+et1.make("html")                                   # -> self-contained HTML table
 ```
 
 {{< include-html "table1_prediction.html" >}}
 
-The random-effects elasticity in column 7 is **0.102** — exactly the paper's number — versus
-the 0.049 we got with fixed effects. They differ because random effects keep the
-between-region information that the within estimator throws away; with national income
-already controlling for most of the scale, that between-region variation is where light earns
-its keep. The national-GDP elasticity of **0.889** confirms regional income tracks national
-income almost one-for-one, with light supplying the residual subnational detail. The
-seven-column table above reports the PyFixest FE/OLS estimate for every specification (the note
-records that the random-effects elasticity is essentially identical); column 2 is the one true
-fixed-effects column, where FE and RE coincide at 0.190.
+### 6.4 Forming the predictions — and a worked example
 
-### 6.4 Forming the predictions
-
-A model is only useful if we can *predict* with it. We reconstruct the fitted log income for
-every region from the column-7 coefficients — multiply each region's characteristics by the
-estimated $\beta$'s and add them up — then exponentiate to get a predicted GDP per capita in
-dollars. Comparing the predictions to the observed values is the honest test of whether the
-calibration generalises.
+A model is only useful if we can actually *predict* with it. Prediction here is mechanical:
+take each region's characteristics, multiply them by the estimated random-effects
+coefficients, and add everything up. That gives a **fitted log income**; because the model is
+in logs, we **exponentiate** to get back to dollars.
 
 ```python
-X7      = re_design([...])                  # the column-7 design matrix (see script.py)
-fitted_log = X7.values @ re7.params.reindex(X7.columns).values
-pred_pc    = np.exp(fitted_log)             # predicted GDP per capita, in dollars
-obs_log    = panel["log_GDP_pc_Region"].values
-r = np.corrcoef(fitted_log, obs_log)[0, 1]
+# --- Step 1: predicted LOG income = (design matrix) x (RE coefficients) -----
+# X7 has one row per region-year and one column per regressor (plus the constant).
+# The matrix product X7 @ beta applies the SAME coefficient vector to every region --
+# this is what fixed effects could not do, and why we used random effects.
+X7         = re_design([...])                                   # design matrix (see script.py)
+fitted_log = X7.values @ re7.params.reindex(X7.columns).values  # X . beta
+
+# --- Step 2: undo the log to get dollars, then check against reality --------
+pred_pc = np.exp(fitted_log)                # predicted GDP per capita, in dollars
+obs_log = panel["log_GDP_pc_Region"].values
+r = np.corrcoef(fitted_log, obs_log)[0, 1]  # how close are predictions to observed income?
 print(f"corr(predicted, observed log GDP per capita) = {r:.3f}")
 ```
 
@@ -812,14 +937,25 @@ print(f"corr(predicted, observed log GDP per capita) = {r:.3f}")
 corr(predicted, observed log GDP per capita) = 0.925
 ```
 
+**A worked example, by hand.** Imagine a region with log light per pixel
+$\ell\_r = 1.5$ in a country with log national income $g\_c = 9.0$, and suppose (to keep it
+simple) its geography controls and region/satellite effects net out to roughly zero. Using the
+two headline coefficients, its predicted log income is about the shared constant, plus
+$0.102 \times 1.5$ from light, plus $0.889 \times 9.0$ from national income. Notice how the
+national-income term dominates: *most* of a region's predicted income comes from **which
+country it is in**, while light nudges the estimate up or down to capture how that particular
+region compares with its neighbours. Exponentiating the sum returns a figure in dollars. The
+full model simply does this for all 5,258 region-years at once with the matrix product
+`X7 @ beta`.
+
 ![Predicted versus observed regional income](python_kuznets_dmsp_06_predicted_vs_observed.png)
 
 Predicted and observed log income correlate **0.925** across all 5,258 region-years, and the
 scatter hugs the 45° line across four orders of magnitude of income (figure above). The model
-is not memorising one income band; it generalises from the poorest regions to the richest.
-That is what licenses the next move the paper makes — applying these coefficients to *every*
-region on Earth, including the tens of thousands with no income statistics, to build a
-complete global income map. With predicted income in hand, we can finally measure inequality.
+is not just memorising one income band — it generalises from the poorest regions to the
+richest. That is what licenses the paper's key move: applying these random-effects coefficients
+to *every* region on Earth, including the tens of thousands with no income statistics, to build
+a complete global income map. With predicted income in hand, we can finally measure inequality.
 
 ## 7. Constructing the inequality indicators
 
@@ -845,6 +981,15 @@ relative to the national average. In code, $y\_i$ is `pred_GDP_pc_Region`, $w\_i
 is the key design choice: a region matters in proportion to how many people experience its
 income.
 
+A tiny example makes this concrete. Suppose a country has three regions with incomes
+$y = (1, 2, 3)$ and equal populations $w = (1, 1, 1)$. Then the population-weighted mean is
+$\bar y = (1+2+3)/3 = 2$, each population share is $p\_i = 1/3$, and the relative incomes are
+$r = (0.5, 1.0, 1.5)$ — the poor region earns half the average, the rich one earns 1.5×. Every
+index below is just a different way of summarising how far that vector $r$ spreads away from
+$1$. If the three populations were *unequal* — say the rich region held most of the people —
+the same incomes would produce a different mean and different shares, and the inequality
+numbers would move accordingly. That is population weighting at work.
+
 ### 7.2 The five indices from scratch
 
 The **Gini** is the average absolute income gap between two randomly chosen people, scaled
@@ -865,23 +1010,55 @@ log relative income. A crucial coding detail: the Gini uses the **absolute diffe
 $|y\_i - y\_j|$, summed over all pairs — not a product — which is the classic trap when
 writing a weighted Gini by hand.
 
+We build all five indices in a single function, `ineq_indices(y, w)`, where `y` is the vector
+of regional incomes and `w` the vector of regional populations. Let us read it in three steps.
+
+First, clean the inputs and form the three ingredients from §7.1:
+
 ```python
 def ineq_indices(y, w):
     """Five population-weighted inequality indices from first principles."""
+    # --- Step 1: clean the inputs ------------------------------------------
     y, w = np.asarray(y, float), np.asarray(w, float)
-    ok = np.isfinite(y) & np.isfinite(w) & (w > 0) & (y > 0)
+    ok = np.isfinite(y) & np.isfinite(w) & (w > 0) & (y > 0)   # drop missing / non-positive
     y, w = y[ok], w[ok]
-    sw = w.sum()
-    mu = (w * y).sum() / sw            # population-weighted mean
-    p  = w / sw                        # population shares
-    r  = y / mu                        # relative incomes
-    ge_m1 = 0.5 * ((p * r**-1).sum() - 1)
-    ge_0  = (p * (-np.log(r))).sum()           # mean log deviation
-    ge_1  = (p * r * np.log(r)).sum()          # Theil index
-    cv    = np.sqrt(2 * 0.5 * ((p * r**2).sum() - 1))
-    gini  = (np.abs(y[:, None] - y[None, :]) * np.outer(w, w)).sum() / (2 * sw**2 * mu)
+
+    # --- Step 2: the three ingredients (mean, shares, relative incomes) -----
+    sw = w.sum()                       # total population
+    mu = (w * y).sum() / sw            # population-weighted mean income (ȳ)
+    p  = w / sw                        # population shares (pᵢ, they sum to 1)
+    r  = y / mu                        # relative incomes (rᵢ = yᵢ / ȳ)
+```
+
+Next, the four entropy-style indices. Each is a weighted average over `p` of some function of
+`r`; they differ only in *which* function, which is what makes each one sensitive to a
+different part of the distribution:
+
+```python
+    # --- Step 3a: the generalized-entropy family + coefficient of variation -
+    ge_m1 = 0.5 * ((p * r**-1).sum() - 1)      # GE(-1): very sensitive to the poorest
+    ge_0  = (p * (-np.log(r))).sum()           # GE(0)  = mean log deviation
+    ge_1  = (p * r * np.log(r)).sum()          # GE(1)  = Theil index
+    cv    = np.sqrt(2 * 0.5 * ((p * r**2).sum() - 1))   # coefficient of variation
+```
+
+Finally, the Gini. This is the one line worth slowing down on:
+
+```python
+    # --- Step 3b: the Gini = population-weighted average gap between people --
+    # y[:, None] - y[None, :] builds the full matrix of pairwise income gaps:
+    # entry (i, j) is yᵢ - yⱼ. np.abs makes them |yᵢ - yⱼ|; np.outer(w, w)
+    # weights each pair by both populations. Summing and normalising gives Gini.
+    gini = (np.abs(y[:, None] - y[None, :]) * np.outer(w, w)).sum() / (2 * sw**2 * mu)
     return dict(GINIW=gini, GE_m1W=ge_m1, GE_0W=ge_0, GE_1W=ge_1, COVW=cv)
 ```
+
+Two things to flag for beginners. The expression `y[:, None] - y[None, :]` is a NumPy
+*broadcasting* trick: it turns a length-$n$ vector into an $n\times n$ matrix of all pairwise
+differences in one stroke, with no Python loop. And the classic trap when coding a weighted
+Gini by hand is to forget the **absolute value** — the Gini sums $|y\_i - y\_j|$, the *size* of
+each gap, not the signed difference or a product; drop the `np.abs` and the answer collapses to
+zero.
 
 This single function is the whole measurement apparatus. It takes a country-year's regional
 incomes and populations and returns all five indices. Everything downstream — the Kuznets
@@ -894,6 +1071,8 @@ Germany is a good test case: 16 regions of broadly similar income, so we expect 
 inequality number. We pull its 2010 regions and run them through the function by hand.
 
 ```python
+# Pull Germany's 2010 rows, then feed its regional incomes + populations
+# straight into the function we just wrote and print all five indices.
 deu = t2[(t2.Country_ISO == "DEU") & (t2.year == 2010)]
 print("regions:", len(deu))
 print(ineq_indices(deu["pred_GDP_pc_Region"], deu["Pop_Region"]))
@@ -917,14 +1096,17 @@ country-year *without* weights — letting every region count once — and compa
 exactly what the weights do.
 
 ```python
+# --- Step 1: an equal-weight Gini (same formula, but every region counts once) --
+# Note what is missing versus ineq_indices: no population weights w, no np.outer.
 def gini_unweighted(y):
     y = np.asarray(y, float); y = y[np.isfinite(y) & (y > 0)]
     n, mu = y.size, y.mean()
     return np.abs(y[:, None] - y[None, :]).sum() / (2 * n**2 * mu)
 
-# built = weighted GINIW per country-year; GINI_unw = equal-weight version
-corr_wu  = built["GINIW"].corr(built["GINI_unw"])
-mean_gap = (built["GINIW"] - built["GINI_unw"]).mean()
+# --- Step 2: compare the two Ginis across every country-year -------------------
+# `built` already holds the weighted GINIW and the equal-weight GINI_unw side by side.
+corr_wu  = built["GINIW"].corr(built["GINI_unw"])          # do they even agree?
+mean_gap = (built["GINIW"] - built["GINI_unw"]).mean()     # and in which direction?
 print(f"corr(weighted, unweighted) = {corr_wu:.3f}")
 print(f"mean(weighted - unweighted) = {mean_gap:+.4f}")
 ```
@@ -952,10 +1134,13 @@ correlation between inequality measured from *predicted* income and inequality m
 
 ```python
 import maketables as mt
-# cross-country correlations (2001-2012 means) for the five indices
+# For each index we have two correlations across countries (2001-2012 means):
+#   pred_obs  = inequality from PREDICTED income vs from OBSERVED income (our method)
+#   light_obs = inequality from RAW LIGHT        vs from OBSERVED income (the shortcut)
+# A higher number means the measure tracks "true" (observed-income) inequality better.
 t2tab = pd.DataFrame({"Predicted income vs observed": pred_obs,
                       "Raw light vs observed": light_obs}, index=index_labels)
-mt.MTable(t2tab).make("html")                     # professional HTML table
+mt.MTable(t2tab).make("html")                     # -> self-contained HTML table
 ```
 
 {{< include-html "table2_validation.html" >}}
@@ -982,8 +1167,8 @@ adds the period-by-period stability of the curve.
 
 ### 8.1 The cubic specification in PyFixest
 
-We average the data into 5-year periods (to smooth annual noise), build the cubic terms, and
-estimate with country and period fixed effects clustered by country. The specification is
+We average the data into 5-year periods, build the cubic terms, and estimate with country and
+period fixed effects, clustering by country. The specification is
 
 $$\text{GINIW}\_{ct} = \beta\_1 \ln Y\_{ct} + \beta\_2 (\ln Y\_{ct})^2
    + \beta\_3 (\ln Y\_{ct})^3 + \alpha\_c + \delta\_t + u\_{ct},$$
@@ -992,11 +1177,30 @@ where $\text{GINIW}\_{ct}$ is country $c$'s regional Gini in period $t$, $\ln Y\
 log GDP per capita, and $\alpha\_c, \delta\_t$ are country and period fixed effects. In code
 $\ln Y$ and its powers are `lg, lg2, lg3`, and the fixed effects are `Country_ISO + p5`.
 
+Three modelling choices are worth unpacking before the code:
+
+- **Why 5-year periods?** Annual inequality numbers are jumpy — one noisy year can swing a small
+  country's Gini. Averaging into five-year blocks smooths that noise, so we fit the development
+  *trend* rather than yearly wobble.
+- **Why a cubic?** A straight line can only rise or fall; a quadratic can bend *once* (the
+  classic inverted-U hump); a **cubic** can bend *twice*, letting inequality rise, fall, and then
+  edge up again. We let the data pick the shape instead of imposing a hump in advance.
+- **What do the fixed effects buy us?** The **country** effect $\alpha\_c$ compares each country
+  only with *its own past*, never with richer or poorer countries — so the curve is identified
+  from how inequality moves as a country develops, not from a rich-vs-poor snapshot. The
+  **period** effect $\delta\_t$ strips out global shocks common to all countries in a period. As
+  before, clustering by country keeps the standard errors honest.
+
 ```python
-agg = collapse_to_5yr(t3)                     # country x 5-year-period means
-agg["lg"]  = np.log(agg["GDP_pc_Country"])
-agg["lg2"] = agg["lg"]**2
-agg["lg3"] = agg["lg"]**3
+# --- Step 1: collapse annual data to country x 5-year-period means ----------
+agg = collapse_to_5yr(t3)                     # one row per (country, 5-year period)
+
+# --- Step 2: build the cubic terms in log national income -------------------
+agg["lg"]  = np.log(agg["GDP_pc_Country"])    # ln Y
+agg["lg2"] = agg["lg"]**2                     # (ln Y)²
+agg["lg3"] = agg["lg"]**3                     # (ln Y)³
+
+# --- Step 3: fit the cubic with country + period FE, clustered by country ---
 m = pf.feols("GINIW_pred_GDP_pc ~ lg + lg2 + lg3 | Country_ISO + p5",
              data=agg, vcov={"CRV1": "Country_ISO"})
 print(m.coef()[["lg", "lg2", "lg3"]].round(3).to_string())
@@ -1032,21 +1236,71 @@ shows the same sign pattern throughout, so the shape is not an artefact of the G
 
 ### 8.2 Visualising the curve
 
-Coefficients are abstract; a picture is not. We plot each country-period's regional Gini
-(net of period effects) against its log income, and overlay the fitted cubic. Seeing the cloud
-of points and the curve together shows how much variation the Kuznets shape actually captures.
+Coefficients are abstract; a picture is not. We want to plot each country-period as a point —
+its regional Gini against its log income — and lay the fitted cubic on top. But there is a
+subtlety. The model also contains country and period fixed effects, so if we scatter the *raw*
+Gini the points scatter wildly around the curve, because each one still carries its country's
+and period's effect. The fix is a **partial-residual plot**: we strip the period effect out of
+each point first, so what remains lines up with the income-driven cubic. Here is how to build
+the exact figure, step by step.
 
 ```python
-# partial-residual scatter + fitted cubic (period effects removed); see script.py
+# --- Step 1: refit the cubic with EXPLICIT dummies to recover the effects ---
+# pf.feols hides the fixed effects; statsmodels with C(...) keeps them as
+# coefficients we can read off. Same model, just a form we can take apart.
+import statsmodels.formula.api as smf
+mfe = smf.ols("GINIW_pred_GDP_pc ~ lg + lg2 + lg3 + C(Country_ISO) + C(p5)", agg3).fit()
+bb  = {k: mfe.params[k] for k in ["lg", "lg2", "lg3"]}   # the three cubic coefficients
+```
+
+```python
+# --- Step 2: net the PERIOD effect out of every point -----------------------
+# Collect each 5-year period's estimated effect (period 1 is the baseline = 0),
+# then subtract it from that point's Gini. The result, "partial", is the part of
+# inequality NOT explained by which period it is -- i.e. net of period effects.
+peff = {1: 0.0}
+for k in (2, 3, 4, 5):
+    peff[k] = mfe.params.get(f"C(p5)[T.{k}]", 0.0)
+agg3["partial"] = agg3["GINIW_pred_GDP_pc"] - agg3["p5"].map(peff)
+```
+
+```python
+# --- Step 3: choose a constant so the curve sits inside the cloud -----------
+# The country dummies shift the whole cloud up/down; we recenter the curve to the
+# average height of the points so the line is drawn through them, not above/below.
+cons = (agg3["partial"]
+        - (bb["lg"]*agg3.lg + bb["lg2"]*agg3.lg2 + bb["lg3"]*agg3.lg3)).mean()
+
+# --- Step 4: evaluate the fitted cubic on a smooth grid of incomes ----------
+xs = np.linspace(5.5, 11.8, 200)                          # log-income grid
+ys = cons + bb["lg"]*xs + bb["lg2"]*xs**2 + bb["lg3"]*xs**3
+```
+
+```python
+# --- Step 5: draw the scatter of points + the fitted curve ------------------
+# STEEL / INK are the site palette (steel blue, near-black).
+fig, ax = plt.subplots(figsize=(6.4, 4.6))
+ax.scatter(agg3.lg, agg3.partial, s=14, facecolors="none",   # the cloud, net of period effects
+           edgecolors=STEEL, alpha=0.55)
+ax.plot(xs, ys, color=INK, lw=2.4, label="fitted cubic")     # the curve on top
+ax.set(xlim=(5.5, 11.8), ylim=(0, 0.16), xlabel="log GDP per capita",
+       ylabel="partial regional inequality (GINIW)",
+       title="Regional inequality and development (Figure 4)")
+ax.legend(loc="upper right", frameon=False)
+fig.tight_layout()
 fig.savefig("python_kuznets_dmsp_10_kuznets_scatter.png", dpi=300)
 ```
 
 ![Regional inequality and development, with the fitted cubic (Figure 4)](python_kuznets_dmsp_10_kuznets_scatter.png)
 
-The fitted curve rises to a gentle peak around a log income of 8 (roughly \\$3,000 per capita),
-declines through the middle-income range, and flattens — with a barely perceptible uptick — at
-the top. The scatter is wide: development explains the *shape* but leaves plenty of
-country-specific variation, which is what the determinants in Section 10 try to name.
+Reading the figure: the fitted curve rises to a gentle peak around a log income of 8 (roughly
+\\$3,000 per capita), declines through the middle-income range, and flattens — with a barely
+perceptible uptick — at the very top, tracing the **N-shape** the coefficients implied. Each
+circle is one country in one 5-year period, net of period effects, so the vertical spread that
+remains is genuine *country-to-country* variation in inequality at a given income level. That
+the cloud is wide is the honest takeaway: development explains the **shape** of regional
+inequality, but a great deal is left over — and naming those leftover drivers is exactly what
+the determinants in Section 10 set out to do.
 
 ## 9. Turning points and the discriminant test
 

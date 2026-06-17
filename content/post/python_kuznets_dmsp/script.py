@@ -487,7 +487,12 @@ print("    PyFixest FE/OLS light elasticity by col (1)-(7): "
 b_natgdp_fe7 = float(fe_models[7].coef()["log_GDP_pc_Country"])
 
 # --- 3.2 linearmodels random-effects sidebar (the paper's published table) --
-panel = pred.set_index(["code_Coutry_Region", "year"])
+# WHY random effects (not fixed effects): fixed effects compare each region only
+# with itself over time, so they cannot predict for a region OUTSIDE the sample
+# (there is no intercept for it). Random effects treat each region's intercept as
+# a draw from a common distribution, giving ONE coefficient vector usable for ANY
+# region -- exactly what the paper needs to predict income for every region on Earth.
+panel = pred.set_index(["code_Coutry_Region", "year"])   # (region, year) panel index
 cluster_id = pd.Categorical(panel["Country_ISO"].values).codes
 clusters = pd.DataFrame({"c": cluster_id}, index=panel.index)
 cdum = pd.get_dummies(panel["Country_ISO"], prefix="cty",
@@ -607,6 +612,7 @@ def ineq_indices(y, w):
 
     y = regional income, w = regional population. Returns Gini, GE(-1),
     GE(0)=MLD, GE(1)=Theil and the coefficient of variation (CV)."""
+    # --- Step 1: clean the inputs (drop missing / non-positive) ------------
     y = np.asarray(y, float)
     w = np.asarray(w, float)
     ok = np.isfinite(y) & np.isfinite(w) & (w > 0) & (y > 0)
@@ -614,15 +620,21 @@ def ineq_indices(y, w):
     if y.size < 2:
         return dict(GINIW=np.nan, GE_m1W=np.nan, GE_0W=np.nan,
                     GE_1W=np.nan, COVW=np.nan)
-    sw = w.sum()
-    mu = (w * y).sum() / sw                  # population-weighted mean
-    p = w / sw                               # population shares
-    r = y / mu                               # relative incomes
-    ge_m1 = 0.5 * ((p * r ** -1).sum() - 1)
-    ge_0 = (p * (-np.log(r))).sum()
-    ge_1 = (p * r * np.log(r)).sum()
+    # --- Step 2: the three ingredients (mean, shares, relative incomes) ----
+    sw = w.sum()                             # total population
+    mu = (w * y).sum() / sw                  # population-weighted mean income
+    p = w / sw                               # population shares (sum to 1)
+    r = y / mu                               # relative incomes (y_i / mean)
+    # --- Step 3a: generalized-entropy family + coefficient of variation ----
+    ge_m1 = 0.5 * ((p * r ** -1).sum() - 1)  # GE(-1): sensitive to the poorest
+    ge_0 = (p * (-np.log(r))).sum()          # GE(0) = mean log deviation
+    ge_1 = (p * r * np.log(r)).sum()         # GE(1) = Theil index
     ge_2 = 0.5 * ((p * r ** 2).sum() - 1)
-    cv = np.sqrt(2 * ge_2)
+    cv = np.sqrt(2 * ge_2)                    # coefficient of variation
+    # --- Step 3b: Gini = population-weighted avg gap between people ---------
+    # y[:,None]-y[None,:] is the matrix of all pairwise gaps; np.abs keeps the
+    # SIZE of each gap (the classic trap is forgetting the absolute value);
+    # np.outer(w, w) weights each pair by both populations.
     gini = (np.abs(y[:, None] - y[None, :]) * np.outer(w, w)).sum() \
         / (2 * sw ** 2 * mu)
     return dict(GINIW=gini, GE_m1W=ge_m1, GE_0W=ge_0, GE_1W=ge_1, COVW=cv)
@@ -799,16 +811,23 @@ pd.DataFrame({
 }).to_csv(f"{SLUG}_table3_results.csv", index=False)
 
 # --- 5.x The Kuznets scatter with fitted cubic (Figure 4) ------------------
+# A partial-residual plot: refit with EXPLICIT dummies (statsmodels) so we can
+# read off the period effects, net them out of each point, then draw the cubic
+# through the resulting cloud (the points sit in a tight band around the curve).
 import statsmodels.formula.api as smf
+# Step 1: refit the same cubic with explicit country + period dummies
 mfe = smf.ols("GINIW_pred_GDP_pc ~ lg + lg2 + lg3 + C(Country_ISO) + C(p5)",
               agg3).fit()
-bb = {k: mfe.params[k] for k in rterms}
+bb = {k: mfe.params[k] for k in rterms}            # the three cubic coefficients
+# Step 2: net each 5-year period's effect out of its points (period 1 = baseline 0)
 peff = {1: 0.0}
 for k in (2, 3, 4, 5):
     peff[k] = mfe.params.get(f"C(p5)[T.{k}]", 0.0)
 agg3["partial"] = agg3["GINIW_pred_GDP_pc"] - agg3["p5"].map(peff)
+# Step 3: recenter the curve to the average height of the cloud
 cons = (agg3["partial"] - (bb["lg"] * agg3.lg + bb["lg2"] * agg3.lg2
         + bb["lg3"] * agg3.lg3)).mean()
+# Step 4: evaluate the fitted cubic on a smooth grid of log incomes
 xs = np.linspace(5.5, 11.8, 200)
 ys = cons + bb["lg"] * xs + bb["lg2"] * xs ** 2 + bb["lg3"] * xs ** 3
 fig, ax = plt.subplots(figsize=(6.4, 4.6))

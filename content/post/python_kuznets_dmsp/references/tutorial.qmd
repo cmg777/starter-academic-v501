@@ -255,7 +255,10 @@ random-effects sidebar that reproduces the paper's preferred column 7.
 
 ```{python}
 #| label: table1-re
-panel    = pred.set_index(["code_Coutry_Region", "year"])
+# WHY random effects: fixed effects can't predict for a region outside the sample
+# (no intercept for it); random effects give ONE coefficient vector usable for any
+# region -- which is what the paper needs to map income for every region on Earth.
+panel    = pred.set_index(["code_Coutry_Region", "year"])      # (region, year) panel
 clusters = pd.DataFrame({"c": pd.Categorical(panel["Country_ISO"]).codes}, index=panel.index)
 gdum = pd.get_dummies(panel["group_id"], drop_first=True).astype(float)
 satm = panel[[f"satyear_{i}" for i in range(1, 8)]].astype(float)
@@ -300,15 +303,19 @@ differently.
 ```{python}
 #| label: ineq-fn
 def ineq_indices(y, w):
+    # Step 1: clean inputs (drop missing / non-positive)
     y, w = np.asarray(y, float), np.asarray(w, float)
     ok = np.isfinite(y) & np.isfinite(w) & (w > 0) & (y > 0)
     y, w = y[ok], w[ok]
+    # Step 2: the three ingredients -- mean, population shares, relative incomes
     sw = w.sum(); mu = (w * y).sum() / sw
     p = w / sw; r = y / mu
+    # Step 3a: generalized-entropy family (+ CV); each weights the tails differently
     ge_m1 = 0.5 * ((p * r**-1).sum() - 1)
     ge_0  = (p * (-np.log(r))).sum()
     ge_1  = (p * r * np.log(r)).sum()
     cv    = np.sqrt(2 * 0.5 * ((p * r**2).sum() - 1))
+    # Step 3b: Gini -- all-pairs |y_i - y_j| (keep the abs!), weighted by populations
     gini  = (np.abs(y[:, None] - y[None, :]) * np.outer(w, w)).sum() / (2 * sw**2 * mu)
     return dict(GINIW=gini, GE_m1W=ge_m1, GE_0W=ge_0, GE_1W=ge_1, COVW=cv)
 
@@ -383,12 +390,17 @@ rises with development, falls, then edges up at the very top.
 
 ```{python}
 #| label: kuznets-fig
+# Partial-residual plot: refit with explicit dummies, net out the period effects,
+# then draw the cubic through the cloud (points sit in a band around the curve).
+# Step 1: refit the same cubic with explicit country + period dummies
 mfe = smf.ols("GINIW_pred_GDP_pc ~ lg + lg2 + lg3 + C(Country_ISO) + C(p5)", agg).fit()
 bb = {k: mfe.params[k] for k in ["lg", "lg2", "lg3"]}
+# Step 2: net each 5-year period's effect out of its points (period 1 = baseline 0)
 peff = {1: 0.0}
 for k in (2, 3, 4, 5):
     peff[k] = mfe.params.get(f"C(p5)[T.{k}]", 0.0)
 agg["partial"] = agg["GINIW_pred_GDP_pc"] - agg["p5"].map(peff)
+# Step 3: recenter the curve to the cloud; Step 4: evaluate it on a smooth grid
 cons = (agg["partial"] - (bb["lg"]*agg.lg + bb["lg2"]*agg.lg2 + bb["lg3"]*agg.lg3)).mean()
 xs = np.linspace(5.5, 11.8, 200)
 ys = cons + bb["lg"]*xs + bb["lg2"]*xs**2 + bb["lg3"]*xs**3
