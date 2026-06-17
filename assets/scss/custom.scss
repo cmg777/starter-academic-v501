@@ -317,6 +317,73 @@ iframe {
   border-radius: 0;
 }
 
+/* C. Code-block copy button (injected by assets/js/copy-code.js) */
+.article-style .code-copy-wrap {
+  position: relative;
+}
+
+/* keep room in the top-right so the button never overlaps the first code line */
+.article-style .code-copy-wrap > pre {
+  padding-right: 3rem;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.4rem;
+  line-height: 0;
+  border: 1px solid rgba(20, 20, 19, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #57606a;
+  cursor: pointer;
+  opacity: 0.45;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* unobtrusive until the block is hovered or the button is focused */
+.code-copy-wrap:hover .code-copy-btn,
+.code-copy-btn:focus-visible {
+  opacity: 1;
+}
+
+.code-copy-btn:hover {
+  color: #00a99d;
+  border-color: #00d4c8;
+}
+
+.code-copy-btn .cc-check {
+  display: none;
+}
+
+.code-copy-btn .cc-tip {
+  display: none;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* copied state: show the check + "Copied!" label, accent in teal */
+.code-copy-btn.copied {
+  opacity: 1;
+  color: #00a99d;
+  border-color: #00d4c8;
+}
+.code-copy-btn.copied .cc-copy {
+  display: none;
+}
+.code-copy-btn.copied .cc-check {
+  display: inline;
+}
+.code-copy-btn.copied .cc-tip {
+  display: inline;
+}
+
 /* B. Output figures */
 .article-style img {
   border-radius: 4px;
@@ -933,6 +1000,18 @@ body,
 /* Reset inline code styles inside pre blocks */
 .dark .article-style pre code {
   background: transparent;
+}
+
+/* C. Code-block copy button (dark mode) */
+.dark .code-copy-btn {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(26, 34, 54, 0.85);
+  color: #aab4c5;
+}
+.dark .code-copy-btn:hover,
+.dark .code-copy-btn.copied {
+  color: #00d4c8;
+  border-color: #00d4c8;
 }
 
 .dark .article-style img + em,
