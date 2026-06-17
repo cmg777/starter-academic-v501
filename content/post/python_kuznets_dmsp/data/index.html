@@ -122,7 +122,8 @@ use &quot;${BASE}Table_3_data.dta&quot;, clear
 describe        // variable + value labels
 notes           // long-form documentation (after running stata_codebook.do)</code></pre></div>
 <h3>Python</h3>
-<div class="code"><button class="copy" type="button" onclick="copyCode(this)">Copy</button><pre><code># Python : pandas reads a .dta URL directly (values + variable labels)
+<div class="code"><button class="copy" type="button" onclick="copyCode(this)">Copy</button><pre><code>!pip install -q pyreadstat
+# Python : pandas reads a .dta URL directly (values + variable labels)
 import pandas as pd
 BASE = &quot;https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_kuznets_dmsp/data/&quot;
 df = pd.read_stata(BASE + &quot;Table_3_data.dta&quot;)
@@ -136,6 +137,7 @@ data = {f: pd.read_stata(BASE + f + &quot;.dta&quot;) for f in files}
 import pyreadstat, urllib.request
 urllib.request.urlretrieve(BASE + &quot;Table_3_data.dta&quot;, &quot;Table_3_data.dta&quot;)
 df, meta = pyreadstat.read_dta(&quot;Table_3_data.dta&quot;)</code></pre></div>
+<p class="note">Copy and paste this snippet in Google Colab app. <a href="https://colab.research.google.com/notebooks/empty.ipynb" target="_blank" rel="noopener">https://colab.research.google.com/notebooks/empty.ipynb</a></p>
 <h3>R</h3>
 <div class="code"><button class="copy" type="button" onclick="copyCode(this)">Copy</button><pre><code># R : haven::read_dta auto-downloads an https URL
 library(haven)

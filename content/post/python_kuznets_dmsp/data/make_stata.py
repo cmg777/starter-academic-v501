@@ -1065,7 +1065,8 @@ def build_html(frames):
                   f'use "${{BASE}}Table_3_data.dta", clear\n'
                   f'describe        // variable + value labels\n'
                   f'notes           // long-form documentation (after running stata_codebook.do)')
-    python_code = (f'# Python : pandas reads a .dta URL directly (values + variable labels)\n'
+    python_code = (f'!pip install -q pyreadstat\n'
+                   f'# Python : pandas reads a .dta URL directly (values + variable labels)\n'
                    f'import pandas as pd\n'
                    f'BASE = "{RAW_BASE}"\n'
                    f'df = pd.read_stata(BASE + "Table_3_data.dta")\n\n'
@@ -1133,6 +1134,9 @@ def build_html(frames):
         'Swap the file name to load any of the six datasets.</p>',
         "<h3>Stata</h3>", code_block(stata_code),
         "<h3>Python</h3>", code_block(python_code),
+        '<p class="note">Copy and paste this snippet in Google Colab app. '
+        '<a href="https://colab.research.google.com/notebooks/empty.ipynb" target="_blank" '
+        'rel="noopener">https://colab.research.google.com/notebooks/empty.ipynb</a></p>',
         "<h3>R</h3>", code_block(r_code), "</section>",
 
         '<section id="overview"><h2>Overview &amp; sources</h2>',
