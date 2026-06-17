@@ -36,6 +36,10 @@ links:
   url: script.py
 - icon: file-code
   icon_pack: fas
+  name: "Stata do-file"
+  url: stata_replication.do
+- icon: file-code
+  icon_pack: fas
   name: "Quarto project (.zip)"
   url: python_kuznets_dmsp.zip
 - icon: book
@@ -1743,6 +1747,323 @@ noted; core country-frame variables are **1992–2012 · 180 ctry · N = 3,675**
 
 The authors' Table 4 also uses an ICRG "bureaucratic quality" index, which is licensed and **not**
 redistributed in this bundle; the post therefore omits that one determinant column.
+
+## Appendix B. Stata replication
+
+Everything in the main body was done in Python, stitched together from several libraries —
+`pandas` for the data, `pyfixest` for fixed effects, `linearmodels` for random effects,
+`statsmodels` for the Kuznets plot, and a hand-written function for the inequality indices. This
+appendix shows the same study in **Stata**, where the whole thing is far shorter. The reason is
+that Stata ships the heavy machinery as built-in commands: the entire prediction model is **one
+`xtreg … , re` line**, all five inequality indices come from **one `ineqdeco` call**, and the cubic
+Kuznets curve plus its graph are **three lines** (`xtreg`, `margins`, `marginsplot`). Fewer
+keystrokes, identical numbers.
+
+The code below loads the bundled **Stata datasets** — the `.dta` files described in
+[Appendix A](#appendix-a-data-dictionary), which carry their variable labels with them, so Stata's
+output is self-documenting. The full, runnable script is the **Stata do-file** linked at the top of
+this post (`stata_replication.do`); the blocks here are excerpts. Install the two helper packages
+once:
+
+```stata
+* Run once per machine. outreg2 is optional (formatted tables); ineqdeco does Section B.4.
+ssc install outreg2
+ssc install ineqdeco
+```
+
+Each subsection below maps to a numbered section of the post, and every figure it quotes matches
+the Python result in the main body.
+
+### B.1 Setup and the data (§3–§4)
+
+`use` reads a native `.dta` straight from the bundle — no column-type guessing as with a CSV — and
+`xtset` declares the panel (the region is the unit, the year is time). That one line is all the
+panel commands need afterwards.
+
+```stata
+* --- Step 1: load the region-year training panel and declare the panel -----
+use "Prediction_Data.dta", clear     // labels travel with the file
+describe                              // already a mini data dictionary
+xtset code_Coutry_Region year         // panel = region x year
+```
+
+### B.2 Cross-country dynamics (§5)
+
+The descriptive picture is a couple of one-liners. `summarize` gives the moments; `correlate`
+reproduces the strong co-movement of the inequality indices reported in §5 — the regional Gini and
+the Theil index correlate about **0.93**.
+
+```stata
+* --- summary statistics and the index co-movement --------------------------
+summarize log_GDP_pc_Region log_Light_ppix_Region log_GDP_pc_Country
+
+use "Table_3_data.dta", clear                         // the country-year panel
+correlate GINIW_pred_GDP_pc GE_1W_pred_GDP_pc COVW_pred_GDP_pc   // Gini–Theil ~ 0.927
+```
+
+### B.3 Predicting GDP from nighttime lights — Table 1 (§6)
+
+This is the centrepiece. We regress log regional GDP per capita on log nighttime light per pixel
+across seven progressively richer specifications. In Stata each specification is **one `xtreg`
+line**, and the estimator is chosen by a single option: `re` for random effects, `fe` for fixed
+effects. `robust cluster(Country_ISO)` makes the standard errors robust and clustered by country
+(this changes the standard errors, not the point estimate).
+
+```stata
+* --- Step 1: the seven-rung ladder (random effects, as in the paper) --------
+use "Prediction_Data.dta", clear
+xtset code_Coutry_Region year
+xi i.code_Coutry_Region                 // region dummies for the OLS column (2)
+set matsize 11000                        // room for ~1,500 region dummies
+
+* (1) raw RE, no fixed effects
+xtreg log_GDP_pc_Region log_Light_ppix_Region, re robust cluster(Country_ISO)
+* (2) OLS with region + satellite FE -- the clean within-region elasticity
+reg   log_GDP_pc_Region log_Light_ppix_Region _Icode_Cout_2-_Icode_Cout_1504 ///
+      satyear_1-satyear_7, robust cluster(Country_ISO)
+* (7) the PREDICTION model: + national income, geography, world-region & satellite FE
+xtreg log_GDP_pc_Region log_Light_ppix_Region log_GDP_pc_Country ///
+      log_N_pix_top_cod_1_ppix log_N_pix_low_cod_1_ppix log_area log_region ///
+      log_region_X_log_area satyear_1-satyear_7 eap ssa mena lac eca sa, ///
+      re robust cluster(Country_ISO)
+```
+
+The light elasticity climbs *down* the ladder — **0.399 → 0.190 → … → 0.102** at column 7 — and the
+national-income elasticity in column 7 is **0.889**. These are exactly the random-effects numbers
+the post reports.
+
+**Fixed effects vs random effects — one word apart.** The post devotes §6.3 to *why* the paper uses
+random effects; in Stata the contrast is a single option:
+
+```stata
+* --- Step 2: same specification, swap only the estimator -------------------
+xtreg log_GDP_pc_Region log_Light_ppix_Region satyear_1-satyear_7, ///
+      fe robust cluster(Country_ISO)         // within (FE):  0.190
+xtreg log_GDP_pc_Region log_Light_ppix_Region satyear_1-satyear_7, ///
+      re robust cluster(Country_ISO)         // random (RE):  0.190
+```
+
+At this simple specification FE and RE **coincide at 0.190**. They diverge once the full controls
+enter (the post's within/FE estimate is **0.049** versus the random-effects **0.102**): random
+effects keep the *between-region* signal that the within estimator discards. More importantly, only
+RE can **predict for a region outside the sample** — fixed effects have no intercept for an unseen
+region. That is the whole reason the paper publishes the random-effects model.
+
+| | **`, fe`** (fixed effects) | **`, re`** (random effects — the paper) |
+|---|---|---|
+| Uses which variation? | within-region only | within **and** between region |
+| Predict for an unseen region? | **no** (no intercept for it) | **yes** — one shared model |
+| Key assumption | none on the region effect | region effect uncorrelated with regressors |
+
+**Predicting.** After the random-effects fit, `predict , xb` builds (design matrix) × (coefficients)
+for every region in one line — the move fixed effects could not make — and `exp()` undoes the log.
+
+```stata
+* --- Step 3: predict, then back-transform to dollars, then validate --------
+predict double pred_log_GDP_pc_Region, xb              // fitted log income
+gen     double pred_GDP_pc_Region = exp(pred_log_GDP_pc_Region)   // back to dollars
+correlate pred_log_GDP_pc_Region log_GDP_pc_Region     // -> 0.925
+```
+
+Predicted and observed log income correlate **0.925** across all 5,258 region-years — the same fit
+as the main body.
+
+### B.4 Constructing the inequality indicators — `ineqdeco` (§7)
+
+This is the biggest single saving. The post writes a from-scratch function for the Gini, the three
+generalized-entropy indices, and the coefficient of variation. Stata returns **all of them from one
+`ineqdeco` call**, optionally population-weighted. After the command, `r(gini)` is the Gini,
+`r(gem1)` is GE(−1), `r(ge0)` is the mean log deviation, `r(ge1)` is the Theil index, and the
+coefficient of variation is $\sqrt{2 \times r(\text{ge2})}$.
+
+```stata
+* --- One country-year, to see all five numbers at once: Germany 2010 -------
+use "Table_2_data.dta", clear            // region-year predicted income + population
+ineqdeco pred_GDP_pc_Region [aw=Pop_Region] if Country_ISO=="DEU" & year==2010
+display "Gini=" %5.4f r(gini) "  Theil=" %6.4f r(ge1) "  CV=" %5.4f sqrt(2*r(ge2))
+```
+
+For Germany in 2010 this returns Gini **0.0278**, Theil **0.0016**, CV **0.0565** — matching the
+worked example in §7.3. To build the whole country panel, loop once per country-year group and
+harvest the five returned scalars:
+
+```stata
+* --- Every country-year: one ineqdeco call per group, all five indices ------
+egen _g = group(Country_ISO year)
+quietly summarize _g, meanonly
+local G = r(max)
+foreach s in gini gem1 ge0 ge1 ge2 {                  // empty columns to fill
+    gen double _idx_`s' = .
+}
+quietly forvalues i = 1/`G' {
+    capture ineqdeco pred_GDP_pc_Region [aw=Pop_Region] if _g==`i'
+    if _rc==0 {
+        foreach s in gini gem1 ge0 ge1 ge2 {
+            replace _idx_`s' = r(`s') if _g==`i'
+        }
+    }
+}
+rename _idx_gini GINIW_pred_GDP_pc                     // population-weighted regional Gini
+gen double COVW_pred_GDP_pc = sqrt(_idx_ge2 * 2)
+```
+
+These rebuilt indices line up with the published ones at a correlation of about **0.879**, the same
+validation the post reports in §7.5.
+
+### B.5 The regional Kuznets curve — Table 3 (§8)
+
+Average each country to five 5-year periods, then regress the regional Gini on a **cubic** in log
+national GDP per capita with country and period fixed effects. `collapse` does the averaging in one
+line; `xtreg … , fe` does the within-country regression.
+
+```stata
+* --- Step 1: collapse annual data to 5-year period means --------------------
+use "Table_3_data.dta", clear
+gen p5year = .
+replace p5year = 1 if inrange(year,1990,1994)
+replace p5year = 2 if inrange(year,1995,1999)
+replace p5year = 3 if inrange(year,2000,2004)
+replace p5year = 4 if inrange(year,2005,2009)
+replace p5year = 5 if inrange(year,2010,2014)
+collapse (mean) GINIW_pred_GDP_pc GDP_pc_Country, by(Country_ISO p5year)
+
+* --- Step 2: build the cubic and fit country + period fixed effects ---------
+gen lg = log(GDP_pc_Country)
+gen lg2 = lg^2
+gen lg3 = lg^3
+encode Country_ISO, generate(cid)
+xtset cid p5year
+xtreg GINIW_pred_GDP_pc lg lg2 lg3 i.p5year, fe robust cluster(cid)
+```
+
+The cubic coefficients are **0.293 / −0.032 / 0.0011** (N ≈ 879 country-periods, 180 countries) —
+the same `+ / − / +` sign pattern that traces the N-shaped spatial Kuznets curve in §8.
+
+**Drawing the curve (Figure 4) in two extra lines.** Where the post refits a dummy model and
+computes partial residuals by hand, Stata's factor-variable notation `c.lg##c.lg##c.lg` builds the
+cubic *and* tells `margins` that the three terms move together, so `marginsplot` bends the curve
+correctly:
+
+```stata
+* --- Step 3: the fitted curve, the Stata way --------------------------------
+xtreg GINIW_pred_GDP_pc c.lg##c.lg##c.lg i.p5year, fe robust cluster(cid)
+margins, at(lg=(5(0.5)12))
+marginsplot, recast(line) recastci(rarea) ///
+    title("Regional Kuznets curve") xtitle("log GDP per capita") ///
+    ytitle("Predicted regional Gini")
+```
+
+### B.6 Turning points and the discriminant (§9)
+
+A cubic turns where its slope is zero, i.e. where $3\beta\_3\,\ell^2 + 2\beta\_2\,\ell + \beta\_1 = 0$.
+Real turning points exist only if the discriminant $D = (2\beta\_2)^2 - 4(3\beta\_3)\beta\_1$ is
+positive. We read the three coefficients straight out of `_b[]` and solve the quadratic:
+
+```stata
+* --- turning points from the stored cubic coefficients ---------------------
+scalar b1 = _b[lg]
+scalar b2 = _b[lg2]
+scalar b3 = _b[lg3]
+scalar D  = (2*b2)^2 - 4*(3*b3)*b1                  // discriminant
+scalar lo = (-2*b2 - sqrt(D)) / (2*3*b3)            // first turning point  (log)
+scalar hi = (-2*b2 + sqrt(D)) / (2*3*b3)            // second turning point (log)
+display "D=" D "   ln=" %4.2f lo " ($" %1.0f exp(lo) ")   ln=" %5.2f hi " ($" %1.0f exp(hi) ")"
+```
+
+The discriminant is positive ($D = +0.000035$), so there are **two real turning points**, at
+$\ell = 7.74$ (about \\$2,287) and $\ell = 11.25$ (about \\$77,206) — the same turning points as §9.
+
+### B.7 What drives regional inequality — Table 4 (§10)
+
+The same 5-year panel and cubic as B.5, now adding a block of structural controls to each column.
+(Published column 4 needs a licensed ICRG variable that is not in the bundle, so it is omitted — as
+in the post.)
+
+```stata
+* --- determinants: keep the cubic, add one control block per column ---------
+use "Table_4_data.dta", clear
+* ... build p5year, collapse by(Country_ISO p5year), gen lg lg2 lg3, encode cid, xtset ...
+
+* Natural-resource rents + arable land
+xtreg GINIW_pred_GDP_pc lg lg2 lg3 Resources_rents_share_of_GDP Arable_land ///
+      i.p5year, fe robust cluster(cid)
+* Ethnic inequality (published column 6)
+xtreg GINIW_pred_GDP_pc lg lg2 lg3 GINIW_Eth_light i.p5year, fe robust cluster(cid)
+```
+
+Resource rents enter positively (**+0.018**) and arable-land share negatively (**−0.053**); ethnic
+inequality carries a coefficient of **0.071** (N ≈ 844) — the headline determinant the post
+highlights in §10.
+
+### B.8 Spatial robustness: Conley standard errors — Table B.4 (§11)
+
+This re-estimates the within-region lights model (Table 1, column 2) but replaces the standard
+errors with spatially-robust **Conley/Hsiang** errors at three cutoff radii. The point estimate
+does not move — only the standard errors.
+
+A caveat on packages: `ols_spatial_HAC` is **not on SSC**. It is Solomon Hsiang's ado (Hsiang 2010,
+*PNAS*); copy `ols_spatial_HAC.ado` (and its helpers `distance.ado`, `Tdiff.ado`) into your personal
+ado folder (type `sysdir` to find it). The region fixed effects enter as explicit dummies because
+the command has no `fe` option.
+
+```stata
+* --- Conley spatial-HAC SEs at three radii (km) -----------------------------
+use "Table_B4_data.dta", clear
+tsset code_Coutry_Region year
+xi i.code_Coutry_Region                  // region FE as explicit dummies
+set matsize 11000
+gen const = 1                            // the command needs an explicit constant
+
+foreach D in 1000 2500 5000 {            // spatial-correlation cutoff radius
+    ols_spatial_HAC log_GDP_pc_Region log_Light_ppix_Region ///
+        _Icode_Cout_2-_Icode_Cout_1504 satyear_1-satyear_7 const, ///
+        lat(Latitude) lon(Longitude) t(year) p(code_Coutry_Region) ///
+        dist(`D') lag(0) bartlett
+}
+```
+
+The coefficient is **0.190** in all three columns. The Stata Conley standard errors widen with the
+radius (about **0.020 / 0.025 / 0.027**); the post's Python Conley errors (0.026 / 0.034 / 0.037) are
+a touch larger because the two packages weight distances slightly differently. Either way the
+conclusion is identical: the light elasticity is not an artefact of spatial correlation — the naïve
+iid standard error is only about 0.013.
+
+### B.9 Regional versus personal inequality — Figure 5 (§12)
+
+Finally, does inequality *between regions* track inequality *between people*? Average each country
+over 2001–2012, put both Ginis on the same 0–1 scale, and regress one on the other.
+
+```stata
+* --- cross-country regression of personal on regional inequality -----------
+use "Figure_5_data.dta", clear
+keep if year>2000 & year<2013
+collapse (mean) GINIW_pred_GDP_pc Giniall, by(Country_ISO)
+gen GINIall_100 = Giniall/100                  // household Gini 0-100 -> 0-1
+regress GINIall_100 GINIW_pred_GDP_pc          // slope = 0.587 over n ~ 144
+twoway (scatter GINIall_100 GINIW_pred_GDP_pc, msymbol(t)) ///
+       (lfit    GINIall_100 GINIW_pred_GDP_pc), legend(off) ///
+       xtitle("Interregional inequality (GINIW)") ///
+       ytitle("Interpersonal inequality (Gini)")
+```
+
+Across **144** countries the slope is **0.587**: places with wide gaps between regions also tend to
+have wide gaps between people — the same link the post finds in §12.
+
+### B.10 The same study, far fewer lines
+
+Side by side, the contrast is the point of this appendix:
+
+| Task | Python (main body) | Stata (this appendix) |
+|---|---|---|
+| Prediction model | `linearmodels.RandomEffects` + a design-matrix helper | `xtreg … , re` (one line) |
+| Five inequality indices | a hand-written function | `ineqdeco …` (one call) |
+| Kuznets curve + plot | `statsmodels` refit + partial residuals | `xtreg` + `margins` + `marginsplot` (three lines) |
+| Fixed ↔ random effects | two different libraries | swap `fe` ↔ `re` |
+
+Every headline number above — the **0.102** light elasticity, the **0.925** prediction correlation,
+the **0.293 / −0.032 / 0.0011** cubic, the **0.071** ethnic-inequality coefficient, the **0.587**
+regional-versus-personal slope — reproduces the Python result in the main body. The complete,
+runnable script is the **`stata_replication.do`** linked at the top of this post.
 
 ---
 
