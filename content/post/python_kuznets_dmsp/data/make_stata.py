@@ -994,7 +994,8 @@ def _dataset_panel(name, df):
             f'<p class="meta">Panel key: <code>{h(m["key"])}</code> &middot; {h(m["purpose"])}</p>'
             f'<h4>Variable dictionary</h4>{dict_tbl}'
             f'<h4>Distribution &amp; statistics <span style="font-weight:400;color:#6b6f76">'
-            f'(click a header to sort)</span></h4>{stat_tbl}')
+            f'(click a header to sort)</span></h4>{stat_tbl}'
+            f'</div>')
 
 
 def _explorer(frames):
@@ -1140,7 +1141,7 @@ def build_html(frames):
         "<h3>Data sources</h3>", src_tbl, "</section>",
 
         '<section id="explorer"><h2>Variable explorer '
-        '<span class="hint">search &amp; filter all 53 variables</span></h2>',
+        f'<span class="hint">search &amp; filter all {len(all_cols)} variables</span></h2>',
         '<p class="lead">Type to filter by name or label, or use the chips to filter by type. Each '
         'row shows a mini distribution of the variable. Click a column header to sort.</p>',
         _explorer(frames), "</section>",
