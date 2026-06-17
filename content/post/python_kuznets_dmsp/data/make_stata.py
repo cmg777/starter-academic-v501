@@ -1047,19 +1047,19 @@ def build_html(frames):
         base, df = name[:-4], frames[name]
         dl_rows.append([f"<code>{h(base)}</code>", h(FILES[name]["grain"]),
                         f"{df.shape[0]:,} &times; {df.shape[1]}",
-                        f'<a class="btn small" href="./{base}.dta" download>{base}.dta</a>',
-                        f'<a class="btn ghost small" href="./{base}.csv" download>{base}.csv</a>'])
+                        f'<a class="btn small" href="{RAW_BASE}{base}.dta" target="_blank" rel="noopener">{base}.dta</a>',
+                        f'<a class="btn ghost small" href="{RAW_BASE}{base}.csv" target="_blank" rel="noopener">{base}.csv</a>'])
     dl_tbl = html_table(["Dataset", "Grain", "Rows", "Stata", "CSV"], dl_rows, raw_cols={0, 2, 3, 4})
 
     # code snippets (on-site URLs)
     stata_code = (f'* Stata 14+ : `use` reads an https URL directly\n'
-                  f'global BASE "{SITE_DATA}"\n'
+                  f'global BASE "{RAW_BASE}"\n'
                   f'use "${{BASE}}Table_3_data.dta", clear\n'
                   f'describe        // variable + value labels\n'
                   f'notes           // long-form documentation (after running stata_codebook.do)')
     python_code = (f'# Python : pandas reads a .dta URL directly (values + variable labels)\n'
                    f'import pandas as pd\n'
-                   f'BASE = "{SITE_DATA}"\n'
+                   f'BASE = "{RAW_BASE}"\n'
                    f'df = pd.read_stata(BASE + "Table_3_data.dta")\n\n'
                    f'# load all six datasets at once\n'
                    f'files = ["Prediction_Data", "Table_2_data", "Table_3_data",\n'
@@ -1071,7 +1071,7 @@ def build_html(frames):
                    f'df, meta = pyreadstat.read_dta("Table_3_data.dta")')
     r_code = (f'# R : haven::read_dta auto-downloads an https URL\n'
               f'library(haven)\n'
-              f'BASE <- "{SITE_DATA}"\n'
+              f'BASE <- "{RAW_BASE}"\n'
               f'df <- read_dta(paste0(BASE, "Table_3_data.dta"))   # labels via attr(df$var, "label")')
 
     # sources + cross-file matrix
@@ -1112,16 +1112,16 @@ def build_html(frames):
         '<section id="downloads"><h2>Downloads</h2>',
         '<p class="lead">All data are free to download. Each dataset comes in two identical forms &mdash; '
         'Stata <code>.dta</code> (with embedded variable and value labels) and plain <code>.csv</code>.</p>',
-        f'<p><a class="btn zip" href="./{ZIP_NAME}" download>&#8681; Download all data (ZIP)</a>'
-        f'<a class="btn ghost" href="./stata_codebook.do" download>stata_codebook.do</a></p>',
+        f'<p><a class="btn zip" href="{RAW_BASE}{ZIP_NAME}" target="_blank" rel="noopener">&#8681; Download all data (ZIP)</a>'
+        f'<a class="btn ghost" href="{RAW_BASE}stata_codebook.do" target="_blank" rel="noopener">stata_codebook.do</a></p>',
         f'<div class="dl-grid">{dl_tbl}</div>',
         '<p class="note">Run <code>stata_codebook.do</code> in Stata once to attach long-form '
         'per-variable notes to the <code>.dta</code> files.</p></section>',
 
         '<section id="load"><h2>Load directly in code</h2>',
-        '<p class="lead">Every file loads straight from this site &mdash; no manual download needed '
-        '(except <code>pyreadstat</code>, which reads local files). Swap the file name to load any of '
-        'the six datasets.</p>',
+        '<p class="lead">Every file loads straight from GitHub (raw URLs &mdash; robust and stable) '
+        '&mdash; no manual download needed (except <code>pyreadstat</code>, which reads local files). '
+        'Swap the file name to load any of the six datasets.</p>',
         "<h3>Stata</h3>", code_block(stata_code),
         "<h3>Python</h3>", code_block(python_code),
         "<h3>R</h3>", code_block(r_code), "</section>",
