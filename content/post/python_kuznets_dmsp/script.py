@@ -538,7 +538,8 @@ print(f"    col 7 national-GDP elasticity: RE={b_natgdp_re7:.3f}, "
 # coefficient on log light per pixel is the elasticity. The random-effects form
 # (the paper's published estimator) gives essentially the same elasticity and is
 # noted below the table rather than as a parallel set of columns.
-T1_LAB = {"log_Light_ppix_Region": "log light per pixel",
+T1_LAB = {"log_GDP_pc_Region": "log regional GDP per capita",   # dependent variable
+          "log_Light_ppix_Region": "log light per pixel",
           "log_GDP_pc_Country": "log GDP p.c. (country)",
           "log_N_pix_top_cod_1_ppix": "log # top-coded pixels",
           "log_N_pix_low_cod_1_ppix": "log # low-coded pixels",
@@ -546,8 +547,10 @@ T1_LAB = {"log_Light_ppix_Region": "log light per pixel",
           "log_region_X_log_area": "log # regions × log area"}
 T1_FE = {"code_Coutry_Region": "Region FE", "Country_ISO": "Country FE",
          "group_id": "WB-group FE", "satyear": "Satellite FE"}
+# head_order="d": header = dependent-variable spanner + the canonical (1)-(7)
+# column numbers only (the seven specs differ by their FE rows, shown below).
 et1 = mt.ETable([fe_models[k] for k in range(1, 8)],
-                model_heads=[f"({k})" for k in range(1, 8)],
+                head_order="d",
                 labels=T1_LAB, felabels=T1_FE,
                 coef_fmt="b:.3f* (se:.3f)", model_stats=["N", "r2"], show_fe=True,
                 caption="Table 1. Nighttime lights predict regional GDP per capita",
@@ -767,12 +770,19 @@ b3 = k3.coef()
 print(f"    GINIW cubic: {b3['lg']:.3f} / {b3['lg2']:.3f} / "
       f"{b3['lg3']:.4f}  (N={N3}, countries={agg3.Country_ISO.nunique()})")
 
-# Table 3 as a maketables regression table (7 columns).
+# Table 3 as a maketables regression table (7 columns). The dependent-variable
+# labels make the top spanner read the index names (cols 1-3 share the Gini); the
+# descriptive heads carry the polynomial degree, and the canonical (1)-(7) numbers
+# are maketables' own single numbering row.
 rterms = ["lg", "lg2", "lg3"]
-T3_LAB = {"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)²", "lg3": "(log GDP p.c.)³"}
+T3_LAB = {"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)²", "lg3": "(log GDP p.c.)³",
+          "GINIW_pred_GDP_pc": "Population-weighted regional Gini",
+          "COVW_pred_GDP_pc": "Coeff. of variation",
+          "GE_1W_pred_GDP_pc": "Theil index",
+          "GE_0W_pred_GDP_pc": "Mean log deviation",
+          "GE_m1W_pred_GDP_pc": "GE(−1)"}
 et3 = mt.ETable([k1, k2, k3] + [k_other[c] for c in IDX[1:]],
-                model_heads=["(1) Gini, linear", "(2) Gini, quadratic", "(3) Gini, cubic",
-                             "(4) CV", "(5) Theil", "(6) MLD", "(7) GE(-1)"],
+                model_heads=["linear", "quadratic", "cubic", "cubic", "cubic", "cubic", "cubic"],
                 labels=T3_LAB, felabels={"Country_ISO": "Country FE", "p5": "Period FE"},
                 coef_fmt="b:.3f* (se:.3f)", model_stats=["N", "r2"], show_fe=True,
                 caption="Table 3. The regional Kuznets curve",
@@ -988,7 +998,8 @@ print(f"    ethnic-inequality coefficient (col 5) = {b_eth:.3f} "
       f"(N={int(d5._N)})")
 
 # Table 4 as a maketables side-by-side regression table (baseline + 6 blocks).
-T4_LAB = {"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)²", "lg3": "(log GDP p.c.)³",
+T4_LAB = {"GINIW_pred_GDP_pc": "Population-weighted regional Gini",   # dependent variable
+          "lg": "log GDP p.c.", "lg2": "(log GDP p.c.)²", "lg3": "(log GDP p.c.)³",
           "Resources_rents_share_of_GDP": "Resource rents/GDP", "Arable_land": "Arable land",
           "Trade_GDP_share": "Trade/GDP", "FDI_share_of_GDP": "FDI/GDP",
           "price_gasoline": "Gasoline price", "Area_X_price_gasoline": "Area × gasoline",
@@ -996,11 +1007,11 @@ T4_LAB = {"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)²", "lg3": "(log GDP p.c.
           "aid_GDP": "Aid/GDP", "School_enrollment_secondary": "Schooling",
           "GINIW_Eth_light": "Ethnic inequality"}
 et4 = mt.ETable([d0, d1, d2, d3, d_inst, d4, d5],
-                model_heads=["(0) baseline", "(1) resources", "(2) openness", "(3) mobility",
-                             "(4) institutions", "(5) transfers/edu", "(6) ethnicity"],
+                model_heads=["baseline", "resources", "openness", "mobility",
+                             "institutions", "transfers/edu", "ethnicity"],
                 labels=T4_LAB, felabels={"Country_ISO": "Country FE", "p5": "Period FE"},
                 coef_fmt="b:.3f* (se:.3f)", model_stats=["N", "r2"], show_fe=True,
-                caption="Table 4. Determinants of regional inequality (dependent variable: GINIW)",
+                caption="Table 4. Determinants of regional inequality",
                 notes="Each column adds a block of determinants to the cubic in log GDP p.c. with "
                       "country + 5-year-period FE; SEs clustered by country, in parentheses. The "
                       "institutions column uses Polity2 and a log GDP × Federal interaction; the "

@@ -242,7 +242,9 @@ specs = {
 }
 fe_models = {k: pf.feols(fml, data=pred, vcov={"CRV1": "Country_ISO"})
              for k, fml in specs.items()}
-mt.ETable(list(fe_models.values()), model_heads=[f"({k})" for k in specs],
+mt.ETable(list(fe_models.values()), head_order="d",
+          labels={"log_GDP_pc_Region": "log regional GDP per capita",
+                  "log_Light_ppix_Region": "log light per pixel"},
           felabels={"code_Coutry_Region": "Region FE", "Country_ISO": "Country FE",
                     "group_id": "WB-group FE", "satyear": "Satellite FE"},
           coef_fmt="b:.3f* (se:.3f)", show_fe=True).make("gt")
@@ -367,9 +369,11 @@ k2 = kuz_fit("GINIW_pred_GDP_pc", "lg + lg2")
 k3 = kuz_fit("GINIW_pred_GDP_pc", "lg + lg2 + lg3")
 k_other = {c: kuz_fit(c, "lg + lg2 + lg3") for c in IDX[1:]}
 mt.ETable([k1, k2, k3] + [k_other[c] for c in IDX[1:]],
-          model_heads=["(1) Gini, linear", "(2) Gini, quadratic", "(3) Gini, cubic",
-                       "(4) CV", "(5) Theil", "(6) MLD", "(7) GE(-1)"],
-          labels={"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)^2", "lg3": "(log GDP p.c.)^3"},
+          model_heads=["linear", "quadratic", "cubic", "cubic", "cubic", "cubic", "cubic"],
+          labels={"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)^2", "lg3": "(log GDP p.c.)^3",
+                  "GINIW_pred_GDP_pc": "Population-weighted regional Gini",
+                  "COVW_pred_GDP_pc": "Coeff. of variation", "GE_1W_pred_GDP_pc": "Theil index",
+                  "GE_0W_pred_GDP_pc": "Mean log deviation", "GE_m1W_pred_GDP_pc": "GE(−1)"},
           felabels={"Country_ISO": "Country FE", "p5": "Period FE"},
           coef_fmt="b:.3f* (se:.3f)", show_fe=True).make("gt")
 ```
@@ -482,9 +486,10 @@ d_inst = det_fit("Polity2 + lgXfed")            # institutions (ICRG omitted)
 d4 = det_fit("aid_GDP + School_enrollment_secondary")
 d5 = det_fit("GINIW_Eth_light")
 mt.ETable([d0, d1, d2, d3, d_inst, d4, d5],
-          model_heads=["(0) baseline", "(1) resources", "(2) openness", "(3) mobility",
-                       "(4) institutions", "(5) transfers/edu", "(6) ethnicity"],
-          labels={"lg": "log GDP p.c.", "lg2": "(log GDP p.c.)^2", "lg3": "(log GDP p.c.)^3",
+          model_heads=["baseline", "resources", "openness", "mobility",
+                       "institutions", "transfers/edu", "ethnicity"],
+          labels={"GINIW_pred_GDP_pc": "Population-weighted regional Gini",
+                  "lg": "log GDP p.c.", "lg2": "(log GDP p.c.)^2", "lg3": "(log GDP p.c.)^3",
                   "Resources_rents_share_of_GDP": "Resource rents/GDP", "Arable_land": "Arable land",
                   "Trade_GDP_share": "Trade/GDP", "FDI_share_of_GDP": "FDI/GDP",
                   "price_gasoline": "Gasoline price", "Area_X_price_gasoline": "Area x gasoline",

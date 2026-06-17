@@ -765,7 +765,8 @@ RE col 7 national-GDP elasticity = 0.889
 import maketables as mt
 # the seven PyFixest specifications side by side, as in the paper's Table 1
 et1 = mt.ETable([fe_models[k] for k in range(1, 8)],
-                model_heads=[f"({k})" for k in range(1, 8)],
+                head_order="d",                   # dependent-variable header + (1)-(7)
+                labels={"log_GDP_pc_Region": "log regional GDP per capita", ...},
                 coef_fmt="b:.3f* (se:.3f)", show_fe=True)
 et1.make("html")                                  # professional HTML table
 ```
@@ -1004,9 +1005,10 @@ N = 879  countries = 180
 ```python
 import maketables as mt
 # the Gini ladder (linear / quadratic / cubic) + the cubic for the other four indices
+# labels relabel the dependent-variable spanner per column (Gini, CV, Theil, ...)
 et3 = mt.ETable([k1, k2, k3] + [k_other[c] for c in IDX[1:]],
-                model_heads=["(1) Gini, linear", "(2) Gini, quadratic", "(3) Gini, cubic",
-                             "(4) CV", "(5) Theil", "(6) MLD", "(7) GE(-1)"],
+                model_heads=["linear", "quadratic", "cubic", "cubic", "cubic", "cubic", "cubic"],
+                labels={"GINIW_pred_GDP_pc": "Population-weighted regional Gini", ...},
                 coef_fmt="b:.3f* (se:.3f)", show_fe=True)
 et3.make("html")                                  # professional HTML table
 ```
@@ -1196,9 +1198,9 @@ turning points lie inside the observed income range before claiming an inverted-
 ## 10. What drives regional inequality?
 
 If two equally rich countries differ in regional inequality, what accounts for the gap? Following
-the paper's Table 4, we add blocks of structural determinants on top of the cubic — **(0)** a
-baseline with the cubic alone, then **(1)** resources, **(2)** openness, **(3)** mobility/transport,
-**(4)** institutions, **(5)** transfers and education, and **(6)** ethnicity — each with country and
+the paper's Table 4, we add blocks of structural determinants on top of the cubic — **(1)** a
+baseline with the cubic alone, then **(2)** resources, **(3)** openness, **(4)** mobility/transport,
+**(5)** institutions, **(6)** transfers and education, and **(7)** ethnicity — each with country and
 period fixed effects and country-clustered standard errors. A positive coefficient means the factor
 is associated with *more* regional inequality. The seven specifications go side by side in a
 [`maketables`](https://github.com/py-econometrics/maketables) regression table.
@@ -1216,20 +1218,21 @@ d_inst = det_fit("Polity2 + lgXfed")                             # (4) instituti
 d5     = det_fit("GINIW_Eth_light")                              # (6) ethnicity
 # d2 openness, d3 mobility, d4 transfers+education are built the same way
 mt.ETable([d0, d1, d2, d3, d_inst, d4, d5],
-          model_heads=["(0) baseline", "(1) resources", "(2) openness", "(3) mobility",
-                       "(4) institutions", "(5) transfers/edu", "(6) ethnicity"],
+          model_heads=["baseline", "resources", "openness", "mobility",
+                       "institutions", "transfers/edu", "ethnicity"],
+          labels={"GINIW_pred_GDP_pc": "Population-weighted regional Gini", ...},
           coef_fmt="b:.3f* (se:.3f)", show_fe=True).make("html")
 ```
 
 {{< include-html "table4_determinants.html" >}}
 
-The strongest determinant by far is **ethnic inequality** (column 6): **0.071** (p < 0.001) —
+The strongest determinant by far is **ethnic inequality** (column 7): **0.071** (p < 0.001) —
 countries where income differs sharply across ethnic homelands also have sharply unequal regions.
 Among the rest, **resource rents** push inequality up (0.018, p < 0.01) — resource wealth
 concentrates in a few regions — while a larger **arable-land share** pulls it down (−0.053,
 p < 0.001), consistent with agriculture spreading income more evenly; **trade openness** adds a small
 positive effect (0.005, p < 0.01) and **aid relative to GDP** a positive 0.015 (p < 0.05). The
-**institutions** column (4) is the one we can only partly reproduce: Polity2 and a log GDP × Federal
+**institutions** column (5) is the one we can only partly reproduce: Polity2 and a log GDP × Federal
 interaction are both small and insignificant here, and the paper's ICRG bureaucratic-quality index is
 licensed and omitted. The cubic in log GDP survives every block, and the sample drifts from column to
 column (N falls from 879 in the baseline to 573 where the sparse institutions variables bind), so the
