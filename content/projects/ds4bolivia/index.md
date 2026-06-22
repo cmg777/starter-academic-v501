@@ -70,13 +70,13 @@ Curated datasets ready for analysis. These files are pre-processed to align with
 If you use this repository in your research, please cite it using the following metadata.
 
 ### APA Format
-Mendez, C., Gonzales, E., Leoni, P., Andersen, L., Hendrix, P. (2024). DS4Bolivia: A Data Science Repository to Study GeoSpatial Development in Bolivia [Data set]. GitHub. https://github.com/quarcs-lab/ds4bolivia
+Mendez, C., Gonzales, E., Leoni, P., Andersen, L., Peralta, H. (2026). DS4Bolivia: A Data Science Repository to Study GeoSpatial Development in Bolivia [Data set]. GitHub. https://github.com/quarcs-lab/ds4bolivia
 
 ### BibTeX Format
 
 ```bibtex
 @misc{ds4bolivia2026,
-  author = {Mendez, Carlos and Gonzales, Erick and Leoni, Pedro and Andersen, Lykke and Hendrix, Peralta},
+  author = {Mendez, Carlos and Gonzales, Erick and Leoni, Pedro and Andersen, Lykke and Peralta, Hendrix},
   title = {{DS4Bolivia}: A Data Science Repository to Study GeoSpatial Development in Bolivia},
   year = {2026},
   publisher = {GitHub},
