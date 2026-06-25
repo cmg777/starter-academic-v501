@@ -34,11 +34,17 @@ module:
   # defaults (required once any `mounts` are defined) so the project's own
   # assets/layouts/static/data/i18n continue to load. To add another language:
   # add a `content/<lang>` mount and extend the en mount's excludeFiles.
+  # `cv/**` is also excluded: content/cv/ holds the LaTeX CV build project
+  # (main.tex + moderncv .cls/.sty + avatar.png + certificates/), not website
+  # content — keeping it out of the build prevents an empty /cv/ page and stops
+  # the .tex/.sty/.pdf sources from leaking into the published site. The only
+  # public CV artifact is static/media/CV.pdf (served at /media/CV.pdf), which
+  # the update-cv skill compiles from content/cv/main.tex.
   mounts:
     - source: content
       target: content
       lang: en
-      excludeFiles: '{es,ja}/**'
+      excludeFiles: '{es,ja,cv}/**'
     - source: content/es
       target: content
       lang: es

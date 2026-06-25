@@ -85,3 +85,18 @@ content/post/python_dynamic_panel/referenceMaterials/
 # into public/). Kept on local disk for reference; Netlify builds from git so it
 # never reaches production.
 content/post/python_kuznets_dmsp/Lessmann-2017-Regional-inequality-convergence-and-its-determinants/
+
+# LaTeX CV build artifacts (content/cv/). The CV SOURCE — main.tex, the moderncv
+# .cls/.sty files, avatar.png, certificates/ — IS committed; only the transient
+# compile outputs are ignored. The published PDF is static/media/CV.pdf (compiled
+# and copied there by the update-cv skill), NOT content/cv/main.pdf.
+content/cv/*.aux
+content/cv/*.log
+content/cv/*.out
+content/cv/*.fls
+content/cv/*.fdb_latexmk
+content/cv/*.synctex.gz
+content/cv/*.toc
+content/cv/*.bbl
+content/cv/*.blg
+content/cv/main.pdf

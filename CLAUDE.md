@@ -214,9 +214,38 @@ Older Python posts (pre-2025) were evaluated for bundling and **skipped**: they 
 
 **Legacy convention (`static/uploads/` location)**: `content/post/python_pyfixest/` predates the new convention. Its bundle ships as `static/uploads/python_pyfixest_tutorial.zip` and is linked as "Tutorial bundle (.zip)". Whenever `tutorial.qmd`, `setup_env.py`, `_quarto.yml`, `script.py`, or the bundle `README.md` changes, run `bash content/post/python_pyfixest/build_bundle.sh` and commit the regenerated `static/uploads/python_pyfixest_tutorial.zip` in the same commit. This bundle can be migrated to the post-root convention as a separate cleanup task.
 
+# Curriculum Vitae (CV)
+
+The academic CV is a hand-written **moderncv LaTeX** project at `content/cv/` — `main.tex` plus the
+moderncv `.cls`/`.sty` files, `avatar.png`, and `certificates/` (award PDFs). It compiles to
+`static/media/CV.pdf`, served at `https://carlos-mendez.org/media/CV.pdf` and linked from each
+author-profile bundle via `{{< staticref "media/CV.pdf" "newtab" >}}CV{{< /staticref >}}`
+(EN/ES/JA). The CV is **English-only** — the site's i18n rules do not apply to it.
+
+- **`content/cv/` is excluded from the Hugo build.** The content mount in
+  `config/_default/config.yaml` uses `excludeFiles: '{es,ja,cv}/**'`, so the LaTeX sources never
+  publish and no empty `/cv/` page is generated. The **only** public CV artifact is
+  `static/media/CV.pdf`. LaTeX build artifacts (`*.aux`/`*.log`/`*.out`/… and `main.pdf`) under
+  `content/cv/` are gitignored; the `.tex`/`.cls`/`.sty`/`avatar.png`/`certificates/` sources ARE committed.
+- **Compile manually:** `cd content/cv && latexmk -pdf main.tex` (or `pdflatex main.tex` ×2), then
+  copy `content/cv/main.pdf` to `static/media/CV.pdf`. A full TeX toolchain (`pdflatex`, `latexmk`)
+  is installed locally.
+- **`main.tex` sections.** Hand-maintained: Academic Positions, Education, Research/Teaching Fields,
+  Teaching Experience, Other Experience, Awards, Research Grants, Professional Activities. **Three
+  website-driven sections** are synced from website content: **Publications and Research**
+  (← `content/publication/`, routed by `publication_types`), **Recent Presentations**
+  (← `content/event/`), and **Software, Databases, and Web Applications** (← `content/projects/`).
+
+**The `update-cv` skill** (`/project:update-cv`, see Claude Code Skills) automates the sync: it
+reads the website's latest content, **adds only items missing from the CV** (matched by DOI +
+normalized title — it never rewrites, reorders, or deletes existing entries, and never touches the
+hand-maintained sections), looks up coauthors/journal on **Crossref** by the publication's `doi`
+(asking you to confirm each drafted line; prompts you when there's no DOI), then compiles `main.tex`
+and copies the PDF to `static/media/CV.pdf`. It leaves everything **uncommitted** for review.
+
 # Claude Code Skills
 
-Seventeen skills: twelve organized as Write/Review pairs across six artifact stages (the slide deck gained its `review-slides` partner), plus five standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, `write-data-dictionary` for an interactive HTML data-dictionary page + Stata pipeline over a post's `data/` folder, `translate-content` — the trilingual ES/JA translator documented in the Internationalization (i18n) section below — and `update-author-profile` for tri-lingual author-profile edits/creation). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
+Eighteen skills: twelve organized as Write/Review pairs across six artifact stages (the slide deck gained its `review-slides` partner), plus six standalone companion skills (`write-quarto-notebook` for R/Python/Stata with a lighter chunk-time install pattern, `write-quarto-notebook-python` for Python-only with a friction-free hermetic-venv bundle pattern, `write-data-dictionary` for an interactive HTML data-dictionary page + Stata pipeline over a post's `data/` folder, `translate-content` — the trilingual ES/JA translator documented in the Internationalization (i18n) section below — `update-author-profile` for tri-lingual author-profile edits/creation, and `update-cv` for syncing the LaTeX CV (`content/cv/main.tex`) from the website's latest publications/talks/projects and rebuilding the served `static/media/CV.pdf`). Each skill excels at one thing. Skills are independent (can be invoked standalone) but compose naturally into a pipeline: script -> results report -> blog post -> infographic -> web app. All skills follow a three-phase interaction pattern: (1) confirm scope, (2) execute, (3) offer follow-ups. Skills use progressive disclosure via `references/` subdirectories. Legacy skills are preserved at `.claude/skills/legacy/` for reference.
 
 ## Pipeline overview
 
@@ -264,6 +293,7 @@ Each skill's full documentation (invocation, examples, reference files, conventi
 - `translate-content` — `.claude/skills/translate-content/SKILL.md` — trilingual ES/JA translator (see Internationalization (i18n) section below).
 - `write-data-dictionary` — `.claude/skills/write-data-dictionary/SKILL.md` — generate an interactive, self-contained HTML data dictionary (+ labeled Stata `.dta`, README, codebook `.do`, download-all ZIP) for a post's `data/` folder; metadata-driven (per-post `data_dictionary.yaml` + a generic renderer), dark mode, searchable variable explorer with distribution sparklines, tabbed per-dataset dictionaries, cross-file index, citations; reference implementation `content/post/python_kuznets_dmsp/data/`.
 - `update-author-profile` — `.claude/skills/update-author-profile/SKILL.md` — edit/create an author profile with ES + JA counterparts kept in sync.
+- `update-cv` — `.claude/skills/update-cv/SKILL.md` — additively sync the LaTeX CV (`content/cv/main.tex`) with the website's latest publications/talks/software, look up coauthors via Crossref (by DOI), compile with pdflatex, and copy the PDF to `static/media/CV.pdf`. See the **Curriculum Vitae (CV)** section. English-only; never touches hand-maintained CV sections; leaves changes uncommitted.
 
 Legacy skills are preserved at `.claude/skills/legacy/` for reference.
 
