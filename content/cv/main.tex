@@ -10,6 +10,10 @@
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
 
 \usepackage[scale=0.75]{geometry} % Reduce document margins
+
+% Subtle, type-specific clickable link label (Software/Databases/Web Apps section)
+\definecolor{cvlinkgrey}{gray}{0.40}
+\newcommand{\cvlink}[2]{\href{#1}{\textcolor{cvlinkgrey}{#2\,$\rightarrow$}}}
 %\setlength{\hintscolumnwidth}{3cm} % Uncomment to change the width of the dates column
 %\setlength{\makecvtitlenamewidth}{10cm} % For the 'classic' style, uncomment to adjust the width of the space allocated to your name
 
@@ -461,42 +465,42 @@ Causes and policy challenges. In Otsubo S. (Ed.), \textit{Globalization and Deve
 
 \subsection{Software}
 
-\cvitem{2026}{expdpy: A Python library to explore panel data interactively. \url{https://cmg777.github.io/expdpy/}}
-\cvitem{2026}{expdpy-explore: A streamlit app to explore panel data interactively. \url{https://expdpy-explore.streamlit.app/}}
-\cvitem{2026}{expdpy-analyze: A streamlit app to analyze panel data interactively. \url{https://expdpy-analyze.streamlit.app/}}
-\cvitem{2026}{expdpy-learn: A streamlit app to learn panel data interactively. \url{https://expdpy-learn.streamlit.app/}}
+\cvitem{2026}{expdpy: A Python library to explore panel data interactively. \cvlink{https://cmg777.github.io/expdpy/}{Website}}
+\cvitem{2026}{expdpy-explore: A streamlit app to explore panel data interactively. \cvlink{https://expdpy-explore.streamlit.app/}{Website}}
+\cvitem{2026}{expdpy-analyze: A streamlit app to analyze panel data interactively. \cvlink{https://expdpy-analyze.streamlit.app/}{Website}}
+\cvitem{2026}{expdpy-learn: A streamlit app to learn panel data interactively. \cvlink{https://expdpy-learn.streamlit.app/}{Website}}
 
 
 
 \subsection{Databases}
 
-\cvitem{2026}{DS4Bolivia: A data science repository to study geospatial development in Bolivia. \url{https://quarcs-lab.github.io/ds4bolivia}}
+\cvitem{2026}{DS4Bolivia: A data science repository to study geospatial development in Bolivia. \cvlink{https://quarcs-lab.github.io/ds4bolivia}{Repository}}
 
-\cvitem{2026}{Indonesia514: A data science repository to study regional development across 514 districts in Indonesia. \url{https://quarcs-lab.github.io/indonesia514/}}
+\cvitem{2026}{Indonesia514: A data science repository to study regional development across 514 districts in Indonesia. \cvlink{https://quarcs-lab.github.io/indonesia514/}{Repository}}
 
-\cvitem{2026}{Bolivia112: A data science repository to study regional development across the 112 provinces of Bolivia. \url{https://quarcs-lab.github.io/bolivia112/}}
+\cvitem{2026}{Bolivia112: A data science repository to study regional development across the 112 provinces of Bolivia. \cvlink{https://quarcs-lab.github.io/bolivia112/}{Repository}}
 
 \subsection{Web Applications}
 
-\cvitem{2026}{Localized monthly time series of nighttime lights (VIIRS-like) 1992-2024. Google Earth Engine application. \url{https://carlos-mendez.projects.earthengine.app/view/viirs-like-monthly}}
+\cvitem{2026}{Localized monthly time series of nighttime lights (VIIRS-like) 1992-2024. Google Earth Engine application. \cvlink{https://carlos-mendez.projects.earthengine.app/view/viirs-like-monthly}{Launch app}}
 
-\cvitem{2026}{Regional monthly time series of nighttime lights (VIIRS-like) 1992-2024. Google Earth Engine application. \url{https://carlos-mendez.projects.earthengine.app/view/viirs-like-monthly-regions}}
+\cvitem{2026}{Regional monthly time series of nighttime lights (VIIRS-like) 1992-2024. Google Earth Engine application. \cvlink{https://carlos-mendez.projects.earthengine.app/view/viirs-like-monthly-regions}{Launch app}}
 
-\cvitem{2026}{Localized annual time series of nighttime lights (VIIRS-like) 1992-2024. Google Earth Engine application. \url{https://carlos-mendez.projects.earthengine.app/view/viirs-like-yearly}}
+\cvitem{2026}{Localized annual time series of nighttime lights (VIIRS-like) 1992-2024. Google Earth Engine application. \cvlink{https://carlos-mendez.projects.earthengine.app/view/viirs-like-yearly}{Launch app}}
 
-\cvitem{2026}{Regional annual time series of nighttime lights (VIIRS-like) 1992-2024. Google Earth Engine application. \url{https://carlos-mendez.projects.earthengine.app/view/viirs-like-yearly-region}}
+\cvitem{2026}{Regional annual time series of nighttime lights (VIIRS-like) 1992-2024. Google Earth Engine application. \cvlink{https://carlos-mendez.projects.earthengine.app/view/viirs-like-yearly-region}{Launch app}}
 
-\cvitem{2026}{Localized annual time series of nighttime lights (DMSP-like) 1992-2025. Google Earth Engine application. \url{https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ}}
+\cvitem{2026}{Localized annual time series of nighttime lights (DMSP-like) 1992-2025. Google Earth Engine application. \cvlink{https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ}{Launch app}}
 
-\cvitem{2026}{Regional annual time series of nighttime lights (DMSP-like) 1992-2025. Google Earth Engine application. \url{https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ-regional}}
+\cvitem{2026}{Regional annual time series of nighttime lights (DMSP-like) 1992-2025. Google Earth Engine application. \cvlink{https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ-regional}{Launch app}}
 
-\cvitem{2026}{Split view of nighttime lights (DMSP-like) across the world 1992-2025. Google Earth Engine application. \url{https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ-split-view}}
+\cvitem{2026}{Split view of nighttime lights (DMSP-like) across the world 1992-2025. Google Earth Engine application. \cvlink{https://carlos-mendez.projects.earthengine.app/view/dmsp-like-econ-split-view}{Launch app}}
 
-\cvitem{2026}{Space-time dynamics of population, luminosity, land cover, and GDP in Cambodia (2013-2019). Google Earth Engine application. \url{https://carlos-mendez.projects.earthengine.app/view/geoexplorer1}}
+\cvitem{2026}{Space-time dynamics of population, luminosity, land cover, and GDP in Cambodia (2013-2019). Google Earth Engine application. \cvlink{https://carlos-mendez.projects.earthengine.app/view/geoexplorer1}{Launch app}}
 
-\cvitem{2025}{GeoDevelopment observatory of Cambodia: A public platform for the analysis, monitoring, and evaluation of sustainable regional development in Cambodia. \url{https://bit.ly/gdo-cambodia}}
+\cvitem{2025}{GeoDevelopment observatory of Cambodia: A public platform for the analysis, monitoring, and evaluation of sustainable regional development in Cambodia. \cvlink{https://bit.ly/gdo-cambodia}{Launch app}}
 
-\cvitem{2025}{Exploring regional disparities in Japan: A multi-scale comparison of GDP per capita (1990-2022) (with Yuna Kanyama). \url{https://carlos-mendez.projects.earthengine.app/view/japan-regional-gdp-disparities}}
+\cvitem{2025}{Exploring regional disparities in Japan: A multi-scale comparison of GDP per capita (1990-2022) (with Yuna Kanyama). \cvlink{https://carlos-mendez.projects.earthengine.app/view/japan-regional-gdp-disparities}{Launch app}}
 
 
 
