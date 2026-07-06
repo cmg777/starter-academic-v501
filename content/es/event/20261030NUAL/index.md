@@ -1,9 +1,9 @@
 ---
 title: "Aprendizaje e investigación asistidos por IA: producción, verificación e integración de herramientas"
-event: "Reunión Anual de la Asociación de Exalumnos de la Universidad de Nagoya, Filial de Tailandia"
+event: "Conferencista magistral, Reunión Anual de la Asociación de Exalumnos de la Universidad de Nagoya, Filial de Tailandia"
 event_url: ""
 location: Universidad Thammasat, Bangkok, Tailandia
-summary: "Reunión Anual de la Asociación de Exalumnos de la Universidad de Nagoya, Filial de Tailandia"
+summary: "Conferencista magistral, Reunión Anual de la Asociación de Exalumnos de la Universidad de Nagoya, Filial de Tailandia"
 abstract: "Esta presentación introduce un marco conceptual para integrar la inteligencia artificial en el aprendizaje y la investigación. A medida que la IA mejora en la generación de contenidos, el principal desafío es garantizar que el trabajo asistido por IA siga siendo confiable y transparente. El marco aborda este cambio a través de tres ejes centrales. Primero, posiciona las herramientas de IA como instrumentos colaborativos que requieren una supervisión humana estructurada. Los usuarios deben separar con claridad la producción de contenidos de los procesos de verificación. Segundo, el marco describe estrategias prácticas para el aprendizaje asistido por IA. Estas incluyen activar el modo de planificación, utilizar habilidades agénticas y proporcionar materiales de referencia. Una estrategia clave consiste en indicar a la IA que formule preguntas aclaratorias antes de ejecutar las tareas, lo que reduce las suposiciones y mejora la calidad. Tercero, la presentación examina la investigación asistida por IA. Destaca cómo plataformas como GitHub permiten flujos de trabajo transparentes y auditables. Al posibilitar revisiones paso a paso del código, los resultados y los manuscritos, los investigadores pueden evitar las prácticas de “caja negra”. En última instancia, una integración eficaz de la IA requiere un diseño intencional del flujo de trabajo. Al combinar habilidades agénticas, verificación iterativa y documentación clara, la IA puede potenciar el juicio humano en lugar de reemplazarlo."
 
 # Talk start and end times.
