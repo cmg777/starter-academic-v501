@@ -85,7 +85,7 @@ $$\text{ATT} = E[Y^1_k - Y^0_k \mid \text{Post}]$$
 
 The average gap between what treated units experienced and what they *would have* experienced without the policy.
 
-[$E[Y^0_k\mid\text{Post}]$ — the treated group's untreated outcome — is a counterfactual we never observe. DiD reconstructs it from the control group.]{.comment}
+[$E[Y^0_k\mid\text{Post}]$ — the treated group's untreated outcome — is a counterfactual we never observe. DiD reconstructs it from the control group.]{.takeaway .fragment}
 
 ::: {.notes}
 The fundamental problem of causal inference: for any one unit we see only one potential outcome. We give up on individual effects and target the average over the treated subpopulation. ATT, not ATE — this is the policy-relevant quantity: did it help the people it was aimed at?
@@ -97,7 +97,7 @@ $$\hat{\delta}^{2 \times 2}_{kU} = \big( \bar{Y}_k^{Post} - \bar{Y}_k^{Pre} \big
 
 The first difference removes time-invariant differences between groups; the second removes the trend common to both.
 
-[Algebra splits this into $\underbrace{\text{ATT}}$ plus a $\underbrace{\text{non-parallel-trends bias}}$. The bias vanishes exactly when parallel trends holds.]{.comment}
+[Algebra splits this into $\underbrace{\text{ATT}}$ plus a $\underbrace{\text{non-parallel-trends bias}}$. The bias vanishes exactly when parallel trends holds.]{.takeaway .fragment}
 
 ::: {.notes}
 The Cunningham (2021) decomposition: the 2×2 estimator equals the ATT plus a bias term comparing the untreated trajectories of the two groups. If their untreated outcomes would have moved in parallel, the bias is zero and DiD cleanly identifies the ATT.
@@ -109,7 +109,7 @@ $$E[Y^0_k|\text{Post}] - E[Y^0_k|\text{Pre}] = E[Y^0_U|\text{Post}] - E[Y^0_U|\t
 
 Two cities can sit at different score *levels*; DiD only needs them to have been *rising at the same speed* absent treatment.
 
-[We can check pre-treatment trends, but never the post-treatment counterfactual — which is why Act III brings sensitivity analysis.]{.comment}
+[We can check pre-treatment trends, but never the post-treatment counterfactual — which is why Act III brings sensitivity analysis.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the load-bearing assumption. It does not require equal levels — only equal trends. And the post-treatment half is untestable because the treated group's untreated outcome is never observed. Roth (2022) also warns that conditioning on passing a pre-test distorts later inference.
@@ -123,7 +123,7 @@ This is the load-bearing assumption. It does not require equal levels — only e
 - **True effect = 5.0** baked in, so every estimate has a ground truth to hit
 :::
 
-[A built-in `true_effect` column gives every estimate a known target to hit.]{.comment}
+[A built-in `true_effect` column gives every estimate a known target to hit.]{.takeaway .fragment}
 
 ::: {.notes}
 Using simulated data with a known effect is the pedagogical move: we can verify the estimator recovers the truth before trusting it on real data where the truth is unknown. The 2×2 crosstab is perfectly balanced — 250 observations in each of the four cells.
@@ -178,7 +178,7 @@ The 95% confidence interval [4.64, 5.60] comfortably contains the true value of 
 | Control | 0.4047 | 0.0798 |
 | Difference | [0.1216]{.key} | 0.1158 |
 
-[$t = 1.05$, $p = 0.29$ — fail to reject equal slopes. But *failing to reject is not confirming*: the test has low power with only 5 pre-periods.]{.comment}
+[$t = 1.05$, $p = 0.29$ — fail to reject equal slopes. But *failing to reject is not confirming*: the test has low power with only 5 pre-periods.]{.takeaway .fragment}
 
 ::: {.notes}
 The treated and control slopes differ by just 0.12, far from significant. This removes the most obvious objection to parallel trends but cannot prove it. With only 5 pre-treatment periods the test has limited power, and Roth (2022) shows pre-testing can distort later inference. That is precisely why HonestDiD enters in Act III.
@@ -211,7 +211,7 @@ Pre-treatment leads range from −0.52 to −0.28, all insignificant (p > 0.3) �
 - Effects **grow over time** by construction (2.0 → 3.2 for the earliest cohort)
 :::
 
-[TWFE fits one pooled $\delta$ — a weighted average of many 2×2 comparisons, some of them poisoned.]{.comment}
+[TWFE fits one pooled $\delta$ — a weighted average of many 2×2 comparisons, some of them poisoned.]{.takeaway .fragment}
 
 ::: {.notes}
 The TWFE specification is Y_it = γ_i + λ_t + δ·D_it + ε_it. With a single treatment time, δ is correct. With staggered timing it becomes a weighted average of all pairwise 2×2 comparisons — and some of those use already-treated units as controls. When effects grow over time, that drags the estimate down.
@@ -255,7 +255,7 @@ $$\text{ATT}(g,t) = E[Y_t - Y_{g-1}\mid G=g] - E[Y_t - Y_{g-1}\mid G=\infty]$$
 
 Each building block is a 2×2 that compares cohort $g$ against the **never-treated** group only — every forbidden comparison eliminated by construction.
 
-[A *doubly robust* version reweights controls (propensity) **and** models their outcome change (regression): valid if *either* is right.]{.comment}
+[A *doubly robust* version reweights controls (propensity) **and** models their outcome change (regression): valid if *either* is right.]{.takeaway .fragment}
 
 ::: {.notes}
 CS computes a separate ATT for each cohort g and calendar period t, using only never-treated controls, then aggregates with valid weights. The doubly robust estimator is belt-and-suspenders: inverse-probability weighting plus outcome regression, consistent if either model is correctly specified.
@@ -324,7 +324,7 @@ Rambachan & Roth (2023) replace the all-or-nothing parallel-trends assumption wi
 
 ![Robust 95% CI (steel band) widening with M; ATT (teal) flat at 2.41; the lower bound is still positive (0.38) at the M = 15 grid edge (orange line).](../did_honest_sensitivity.png)
 
-[At $M=0$: CI [2.53, 2.66]. At $M=15$: CI [0.38, 4.81] — still excludes zero.]{.comment}
+[At $M=0$: CI [2.53, 2.66]. At $M=15$: CI [0.38, 4.81] — still excludes zero.]{.takeaway .fragment}
 
 ::: {.notes}
 The band expands symmetrically as M grows. At M = 10 the lower bound is still 1.10; at M = 15 it is 0.38 — the grid edge, with the true breakdown lying even further out. In applied work a breakdown above M = 3 is considered strong. This result clears that bar five times over.
@@ -348,7 +348,7 @@ To overturn the effect, post-treatment parallel-trend violations would have to e
 | Staggered (naive) | TWFE | 2.18 |
 | Staggered (clean) | Callaway–Sant'Anna | [2.41]{.key} |
 
-[Always report the breakdown value alongside the estimate — here $M = 15$, exceptionally robust.]{.comment}
+[Always report the breakdown value alongside the estimate — here $M = 15$, exceptionally robust.]{.takeaway .fragment}
 
 ::: {.notes}
 The classic estimator nails 5.0 when timing is uniform. Under staggered timing, naive TWFE is biased to 2.18; CS corrects it to 2.41 and reveals the growth dynamics; HonestDiD certifies robustness at M = 15. Caveats: synthetic data, linearly-growing effects, no spillovers — real applications need covariates and additional robustness checks.

@@ -60,7 +60,7 @@ A park could raise satellite luminosity yet leave living standards flat. It coul
 
 So we ask both: **do parks raise local activity**, and **who inside the district actually benefits?**
 
-[The "for whom" turns out to carry the headline.]{.comment}
+[The "for whom" turns out to carry the headline.]{.takeaway .fragment}
 
 ::: {.notes}
 This two-sided framing is what makes the study more than an impact evaluation. The average effect and the distributional effect can point in opposite directions, and the talk is built so the audience feels that tension before the data resolve it. The teaching payoff in Act III is that a reader who quotes only the average employment number badly misreads the study.
@@ -97,7 +97,7 @@ The effect on the **17 districts that got a park** — not on a random district 
 :::
 ::::
 
-[Three data streams · one design · an escalating ladder of estimators.]{.comment}
+[Three data streams · one design · an escalating ladder of estimators.]{.takeaway .fragment}
 
 ::: {.notes}
 The estimand is the ATT, not the population-wide ATE: it is the effect on these parks in this setting and travels only as far as that. The ladder metaphor frames the whole investigation — the naive 2×2 is the cartoon version, TWFE and its event-study view are the workhorse, and the three modern estimators are the robustness insurance that the workhorse has not been led astray by staggered timing.
@@ -107,7 +107,7 @@ The estimand is the ATT, not the population-wide ATE: it is the effect on these 
 
 ![Ethiopia's industrial parks (red dots), regional state capitals (blue stars), and the paved and primary road network.](../map_industrial_parks.png){fig-align="center" width="60%"}
 
-[Source: Appendix Figure A2 in Huang, Wang & Xu (2026). Real park locations from the paper; this tutorial uses synthetic calibrated data.]{.comment}
+[Source: Appendix Figure A2 in Huang, Wang & Xu (2026). Real park locations from the paper; this tutorial uses synthetic calibrated data.]{.takeaway .fragment}
 
 ::: {.notes}
 The parks cluster near Addis Ababa and the main transport corridors but reach peripheral regions too — this geographic clustering is exactly why we later need Conley spatial standard errors. The map is the paper's real geography; our analysis runs on synthetic calibrated data.
@@ -134,7 +134,7 @@ The parks cluster near Addis Ababa and the main transport corridors but reach pe
 :::
 ::::
 
-[Only **17 treated woredas** — the recurring source of statistical caution.]{.comment}
+[Only **17 treated woredas** — the recurring source of statistical caution.]{.takeaway .fragment}
 
 ::: {.notes}
 National statistics would barely flinch at a few new factories, so we need sub-national data — and at three grains. The district layer is a balanced panel that supports an annual event study; the household and individual layers are repeated cross-sections of different respondents, so they admit only coarse event phases and survey-weighted regressions, never unit fixed effects. The 17/122 split is small on the treated side, which is exactly why several effects are borderline.
@@ -152,7 +152,7 @@ This is the picture DiD was invented for. Indexed to each group's pre-2008 mean,
 
 ![Cohort staircase: each opening-year cohort turns up at its own park-opening date against a flat never-treated baseline.](../python_did_industrial_park_02_cohort_staircase.png)
 
-[1 woreda in 2008, then 2–3 per year across 2014–2020 — 17 in total.]{.comment}
+[1 woreda in 2008, then 2–3 per year across 2014–2020 — 17 in total.]{.takeaway .fragment}
 
 ::: {.notes}
 The staggered structure is easier to see one cohort at a time. The 2016 cohort lifts off in 2016, the 2018 cohort in 2018, while the never-treated line stays flat and even drifts down slightly. There is no single treatment date, so any honest estimator must align each cohort to its own clock. Every event time has at least three treated woredas behind it, so the dynamic path is estimated off real data at each lag.
@@ -162,7 +162,7 @@ The staggered structure is easier to see one cohort at a time. The 2016 cohort l
 
 ![Treatment map: the 17 treated woredas (orange) cluster spatially among the 122 matched controls (blue).](../python_did_industrial_park_03_treatment_map.png)
 
-[Near things are more related than distant things — their shocks are *not* independent draws.]{.comment}
+[Near things are more related than distant things — their shocks are *not* independent draws.]{.takeaway .fragment}
 
 ::: {.notes}
 Plotting treated and control woredas by longitude and latitude shows the treated units are spatially clustered, not randomly sprinkled — parks went to a handful of regions near cities and roads. Clustered treatment means a regional shock could hit several treated woredas at once, so their errors are unlikely to be independent. That is precisely the problem Conley spatial standard errors fix in Act III. Hold this picture; we return to it.
@@ -192,7 +192,7 @@ $$Y_{dt} = \beta \, D_{dt} + \alpha_d + \gamma_{r(d),t} + \varepsilon_{dt}$$
 
 $\alpha_d$ absorbs the bright base; $\gamma_{r(d),t}$ absorbs regional shocks; $\beta$ is the **ATT**.
 
-[With baseline-trend interactions: $\hat\beta = +0.2152$ (SE 0.0833, $t = 2.58$, sig. at 1%) — a ~21% rise in luminosity.]{.comment}
+[With baseline-trend interactions: $\hat\beta = +0.2152$ (SE 0.0833, $t = 2.58$, sig. at 1%) — a ~21% rise in luminosity.]{.takeaway .fragment}
 
 ::: {.notes}
 The woreda fixed effect absorbs anything permanent about a district, including its synthetic bright base; the region-by-year fixed effect absorbs shocks common to a whole region in a given year. The with-trends specification adds time-by-baseline interactions so each woreda follows its own linear trend. The estimate drops from +0.270 without trends to +0.215 with them — a textbook differential-trend confound, since treated woredas were already more urban in 2007 and trending up faster. The with-trends number is the cleaner ATT.
@@ -210,7 +210,7 @@ The static TWFE recovers the paper's headline: IHS light +0.2152 with trends, ra
 
 ![Event study: the four pre-opening leads hug zero, then the effect jumps at k = 0 and climbs to a +0.48 plateau by k = 4–5.](../python_did_industrial_park_06_event_study.png)
 
-[Pre-trend flat (largest $|t| = 2.17$) → parallel trends credible. Effect builds, not jumps.]{.comment}
+[Pre-trend flat (largest $|t| = 2.17$) → parallel trends credible. Effect builds, not jumps.]{.takeaway .fragment}
 
 ::: {.notes}
 The figure tells the whole story in one arc. The four pre-opening leads hug zero — they range from −0.0275 to −0.0013, largest absolute t just 2.17 — weak enough to read as a flat pre-trend. The jump comes strictly after opening: +0.1153 at k = 0 (p = 0.0001), climbing through +0.1928 and +0.2187, plateauing at +0.4844 by k = 4. This rising-then-flattening dynamic is exactly why the naive 2×2 understated the long-run ATT. The flat pre-period is suggestive support for parallel trends — never proof, since the assumption concerns the unobserved post-period counterfactual.
@@ -261,7 +261,7 @@ The decomposition breaks the +0.2699 TWFE coefficient into 64 underlying 2×2 co
 
 ![Heterogeneity: the implied park effect fades the farther a woreda lies from Addis, its state capital, or the nearest city.](../python_did_industrial_park_09_heterogeneity.png)
 
-[Distance to nearest city $-0.0335$ ($t = -4.90$) · paved roads $+0.6695$ ($t = 2.08$). Place is first-order.]{.comment}
+[Distance to nearest city $-0.0335$ ($t = -4.90$) · paved roads $+0.6695$ ($t = 2.08$). Place is first-order.]{.takeaway .fragment}
 
 ::: {.notes}
 Location fundamentals sharply moderate park effectiveness, exactly as the paper argues. All three distance interactions are negative — the effect fades with distance from economic centers — and three are significant, the steepest being distance to nearest city at −0.0335. Both road interactions are positive; paved-road density is significant at +0.6695. The primary-road interaction is correctly signed but borderline insignificant — an honest synthetic limitation of only 17 treated woredas, which cannot make mutually-correlated moderators all precise at once. Direction is solid; precision is what the small sample cannot fully deliver.
@@ -271,7 +271,7 @@ Location fundamentals sharply moderate park effectiveness, exactly as the paper 
 
 ![Spillover test: treatment lifts the host woreda strongly (+0.27), but the effect on control neighbours within 10 km is about zero.](../python_did_industrial_park_10_spillover.png)
 
-[`nearby` $= +0.0648$ ($t = 1.06$), insignificant — so the host's gain is net-new, and SUTVA holds.]{.comment}
+[`nearby` $= +0.0648$ ($t = 1.06$), insignificant — so the host's gain is net-new, and SUTVA holds.]{.takeaway .fragment}
 
 ::: {.notes}
 The spillover test adds a nearby indicator for control woredas within 10 km of an operational park. If parks merely displaced activity, nearby should be negative; if the gains are net-new, it should be zero. It comes in at +0.0648 (t = 1.06), small and indistinguishable from zero, while the host effect stays +0.2712. No spillover means the gain is net-new activity, and the never-treated controls are not contaminated by proximity — so SUTVA is plausible and the main ATT is not biased by treated-on-control externalities. The parks behave like relatively self-contained enclaves.
@@ -295,7 +295,7 @@ Switching to the DHS household repeated cross-section: because each round sample
 
 ![Household durables RCS event study: flat, insignificant pre-phases, then a jump at park opening (phase 0).](../python_did_industrial_park_12_household_event_study.png)
 
-[Phase $-3$: $-0.020$ (ns) · phase $-2$: $+0.024$ (ns) · phase $0$: $+0.261$ (p < 0.001).]{.comment}
+[Phase $-3$: $-0.020$ (ns) · phase $-2$: $+0.024$ (ns) · phase $0$: $+0.261$ (p < 0.001).]{.takeaway .fragment}
 
 ::: {.notes}
 Because the DHS data are repeated cross-sections, the household event study uses coarse phase dummies rather than annual event time. The two pre-opening phases are flat and insignificant, both straddling zero, so there is no differential pre-trend in household durables. The effect jumps to +0.2606 at phase 0 and stays strongly positive after. This is the RCS counterpart to the satellite no-anticipation evidence, with the honest caveat that two pre-phases make a low-powered test.
@@ -341,7 +341,7 @@ Treated woredas cluster in space, so a regional shock hits several at once — t
 |---|---:|---:|---:|---:|
 | 2008–2020 | +0.2152 | 0.0329 | [0.0799]{.key} | +2.69 |
 
-[Same +0.2152 in every column. The SE inflates 2.43× — yet still significant at 1%.]{.comment}
+[Same +0.2152 in every column. The SE inflates 2.43× — yet still significant at 1%.]{.takeaway .fragment}
 
 ::: {.notes}
 Recall from the map that all 17 treated woredas cluster spatially. The Conley spatial-HAC SE allows a district's errors to correlate with itself over time and with nearby districts in the same year. The most conservative Conley-HAC SE is 0.0799 — 2.43× the naive HC0 SE of 0.0329 — yet the ATT stays significant at t = 2.69. The cluster SE (0.0792) and the Conley-HAC SE (0.0799) are nearly identical, so clustering at the district level already captures most of the dependence; spatial correlation beyond the district adds little. The estimate is also stable on restricted control pools.
@@ -356,7 +356,7 @@ Recall from the map that all 17 treated woredas cluster spatially. The Conley sp
 - **Gender** — null on average (+0.091), but female jobs +0.140 and the agency cascade
 :::
 
-[Triangulation across methods — not a single regression — is what makes the claim credible.]{.comment}
+[Triangulation across methods — not a single regression — is what makes the claim credible.]{.takeaway .fragment}
 
 ::: {.notes}
 Four families of results built on different assumptions all point the same way. A park raises local activity, the staggered-bias worry does not bite because a large never-treated pool dominates the weighting, households near a park grow richer, and the employment and empowerment gains run through women. That convergence — not the precision of any one estimate — is the strongest part of the evidence.
@@ -401,7 +401,7 @@ Steelman first: this is a tiny treated group on simulated data in a setting wher
 | Female employment ATT | +0.140\*\*\* (vs +0.091 ns) |
 | Light SE: naive → Conley-HAC | 0.0329 → 0.0799 |
 
-[And five lessons: let evolving effects evolve · triangulate estimators · disaggregate by sex · place is first-order · honest inference, honest caveats.]{.comment}
+[And five lessons: let evolving effects evolve · triangulate estimators · disaggregate by sex · place is first-order · honest inference, honest caveats.]{.takeaway .fragment}
 
 ::: {.notes}
 Close on the numbers, then the lessons. One: the pooled 2×2 understated the dynamic — only the event study revealed the build to +0.48, so let evolving effects evolve. Two: four estimators and a Bacon decomposition all pointed the same way; agreement beats any one estimate. Three: the average employment effect was null while the female effect was the headline — heterogeneity analysis turned a null into the finding. Four: the effect fades with distance and grows with roads, so place is first-order. Five: 17 treated woredas on synthetic data, identified by an assumption — strong teaching evidence, stated with its caveats. Next steps in the post: a Callaway-Sant'Anna dynamic aggregation, a Rambachan-Roth pre-trend sensitivity, and testing whether labor-intensive parks drive the female effect.

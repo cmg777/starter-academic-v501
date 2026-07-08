@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Introduction to Causal Inference: Double Machine Learning</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -270,7 +270,7 @@
 <li class="fragment"><strong>Treatment</strong> <span class="math inline">\(D\)</span> — <code>tg</code>, the bonus <em>offer</em> (1 = offered, 0 = control)</li>
 <li class="fragment"><strong>Controls</strong> <span class="math inline">\(X\)</span> — 15 demographic and labor-market covariates</li>
 </ul>
-<p><span class="comment">Treatment was <em>assigned at random</em>, so <span class="math inline">\(D\)</span> is independent of <span class="math inline">\(X\)</span> by design — the estimand is a clean <strong>Average Treatment Effect (ATE)</strong>.</span></p>
+<p><span class="takeaway fragment">Treatment was <em>assigned at random</em>, so <span class="math inline">\(D\)</span> is independent of <span class="math inline">\(X\)</span> by design — the estimand is a clean <strong>Average Treatment Effect (ATE)</strong>.</span></p>
 <aside class="notes">
 <p>Because assignment is random, there is no confounding to remove — a crucial framing for the whole talk. The estimand is the ATE of the bonus offer on log duration. That is exactly what makes the RCT the right place to <em>learn the method</em>: we can check that flexible adjustment leaves the answer essentially unchanged.</p>
 <style type="text/css">
@@ -307,7 +307,7 @@
 <p>Standard linear adjustment regresses <span class="math inline">\(Y\)</span> on <span class="math inline">\(D\)</span> and the covariates:</p>
 <p><span class="math display">\[Y_i = \alpha + \beta\, D_i + X_i'\gamma + \epsilon_i\]</span></p>
 <div class="fragment">
-<p><span class="comment">A linear <span class="math inline">\(X_i'\gamma\)</span> can miss nonlinear structure in <span class="math inline">\(X \to Y\)</span>. The leftover variation widens the standard errors.</span></p>
+<p><span class="takeaway fragment">A linear <span class="math inline">\(X_i'\gamma\)</span> can miss nonlinear structure in <span class="math inline">\(X \to Y\)</span>. The leftover variation widens the standard errors.</span></p>
 <aside class="notes">
 <p>This motivates ML. In an observational study, linear adjustment also risks residual confounding bias. In this RCT there is no bias to remove, so the payoff of flexible adjustment is variance reduction: absorbing more of inuidur1’s variation tightens the CI around the same ATE.</p>
 <style type="text/css">
@@ -332,7 +332,7 @@
 <span id="cb1-5"><a href=""></a>ols_full <span class="op">=</span> LinearRegression()            <span class="co"># add the 15 covariates linearly</span></span>
 <span id="cb1-6"><a href=""></a>ols_full.fit(df[[<span class="st">"tg"</span>] <span class="op">+</span> COVARIATES], df[<span class="st">"inuidur1"</span>])</span>
 <span id="cb1-7"><a href=""></a><span class="co"># coefficient → -0.0717</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">Naive OLS: <strong>−0.0855</strong>. With covariates: <strong>−0.0717</strong>. The shift is precision, not bias.</span></p>
+<p><span class="takeaway fragment">Naive OLS: <strong>−0.0855</strong>. With covariates: <strong>−0.0717</strong>. The shift is precision, not bias.</span></p>
 <aside class="notes">
 <p>Two reference points before any ML. The naive estimate (−0.0855, an 8.6% reduction) becomes −0.0717 (7.2%) once we adjust. In a randomized design the move is not “removing confounding” — it is absorbing residual outcome variation. DML’s job is to do this absorption <em>flexibly</em>.</p>
 <style type="text/css">
@@ -351,7 +351,7 @@
 <h2>DML splits the outcome into a linear treatment term plus a flexible nuisance</h2>
 <p><span class="math display">\[Y = D\,\theta_0 + g_0(X) + \varepsilon, \qquad E[\varepsilon \mid D, X] = 0\]</span></p>
 <p><span class="math display">\[D = m_0(X) + V, \qquad E[V \mid X] = 0\]</span></p>
-<p><span class="comment"><span class="math inline">\(\theta_0\)</span> is the causal <strong>ATE</strong>. <span class="math inline">\(g_0(X)\)</span> and <span class="math inline">\(m_0(X)\)</span> are <em>nuisance</em> functions — scaffolding we estimate but don’t report.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(\theta_0\)</span> is the causal <strong>ATE</strong>. <span class="math inline">\(g_0(X)\)</span> and <span class="math inline">\(m_0(X)\)</span> are <em>nuisance</em> functions — scaffolding we estimate but don’t report.</span></p>
 <aside class="notes">
 <p>The Partially Linear Regression (PLR) model. Linearity is imposed only on the treatment D; covariates can enter g_0 arbitrarily flexibly. g_0 predicts Y from X; m_0 predicts D from X. In this RCT m_0 is roughly constant (the assignment probability), but g_0 still soaks up predictive structure in inuidur1.</p>
 <style type="text/css">
@@ -370,7 +370,7 @@
 <h2>Partial out both sides, then regress the residuals — that’s the whole trick</h2>
 <p><span class="math display">\[\tilde{Y} = Y - \hat{g}_0(X), \qquad \tilde{D} = D - \hat{m}_0(X)\]</span></p>
 <p><span class="math display">\[\hat{\theta}_0 = \frac{\sum_i \tilde{D}_i\,\tilde{Y}_i}{\sum_i \tilde{D}_i^{2}}\]</span></p>
-<p><span class="comment">Like noise-canceling headphones: ML learns how <span class="math inline">\(X\)</span> drives <span class="math inline">\(Y\)</span> and <span class="math inline">\(D\)</span>, we subtract it, and only the <span class="math inline">\(D \to Y\)</span> signal is left.</span></p>
+<p><span class="takeaway fragment">Like noise-canceling headphones: ML learns how <span class="math inline">\(X\)</span> drives <span class="math inline">\(Y\)</span> and <span class="math inline">\(D\)</span>, we subtract it, and only the <span class="math inline">\(D \to Y\)</span> signal is left.</span></p>
 <aside class="notes">
 <p>The partialling-out estimator. The residualised score (Y − g(X))(D − m(X)) is Neyman-orthogonal: small ML errors in the nuisance estimates do not bias θ to first order. That orthogonality is what lets us swap learners later and still trust the estimate.</p>
 <style type="text/css">
@@ -388,7 +388,7 @@
 <section id="cross-fitting-computes-each-residual-out-of-sample-to-kill-regularization-bias" class="slide level2 center">
 <h2>Cross-fitting computes each residual out-of-sample to kill regularization bias</h2>
 <p><span class="math display">\[\hat{\theta}_0^{CF} = \frac{\sum_{k=1}^{K}\sum_{i \in I_k} \tilde{D}_i^{(k)}\,\tilde{Y}_i^{(k)}}{\sum_{k=1}^{K}\sum_{i \in I_k} \big(\tilde{D}_i^{(k)}\big)^2}\]</span></p>
-<p><span class="comment">Split into <span class="math inline">\(K=5\)</span> folds; each fold’s residuals come from models trained on the <em>other four</em>, then average.</span></p>
+<p><span class="takeaway fragment">Split into <span class="math inline">\(K=5\)</span> folds; each fold’s residuals come from models trained on the <em>other four</em>, then average.</span></p>
 <aside class="notes">
 <p>Without sample-splitting, the ML penalty contaminates θ — regularization bias. Cross-fitting is like grading exams with a model that never saw that student’s work: each fold’s predictions are out-of-sample, which preserves valid standard errors, p-values, and confidence intervals.</p>
 <style type="text/css">
@@ -478,7 +478,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Two utterly different learners, a 0.0024 gap — under 7% of one standard error.</span></p>
+<p><span class="takeaway fragment">Two utterly different learners, a 0.0024 gap — under 7% of one standard error.</span></p>
 <aside class="notes">
 <p>Robustness via learner-agnosticism. Random Forest (nonparametric trees) and Lasso (penalized linear) disagree by 0.0024, both significant at 5%, both excluding zero. Neyman-orthogonality is why this works: the estimate doesn’t hinge on getting the nuisance functional form “right”. A strong signal the result isn’t a modeling artifact.</p>
 <style type="text/css">

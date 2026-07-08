@@ -86,7 +86,7 @@ $$\text{ATE} = E[Y(1) - Y(0)]$$
 $$\text{GATE}(z) = E[Y(1) - Y(0) \mid Z = z]$$
 $$\text{IATE}(x) = E[Y(1) - Y(0) \mid X = x]$$
 
-[Population average → subgroup average → one number *per person*. Earn the coarse estimand before the fine one — the order is the discipline.]{.comment}
+[Population average → subgroup average → one number *per person*. Earn the coarse estimand before the fine one — the order is the discipline.]{.takeaway .fragment}
 
 ::: {.notes}
 Skipping to the finest estimand without securing the average is the most common mistake in applied CML — earn each level in order. Y(1) and Y(0) are the potential outcomes under treatment and control; only one is ever observed. ATE is the headline policy number; GATE conditions on a named subgroup Z (here Dutch proficiency); IATE conditions on the full covariate vector X. A credible average is the floor on which any subgroup analysis stands, and credible group effects are the floor under any individual analysis.
@@ -98,7 +98,7 @@ The data are **observational**. We assume *selection-on-observables*: conditiona
 
 $$D \perp \{Y(1), Y(0)\} \mid X$$
 
-[This is the strong assumption that licenses everything downstream. The naive difference-in-means is therefore *genuinely biased* here — not merely imprecise.]{.comment}
+[This is the strong assumption that licenses everything downstream. The naive difference-in-means is therefore *genuinely biased* here — not merely imprecise.]{.takeaway .fragment}
 
 ::: {.notes}
 Unconfoundedness is the load-bearing identifying assumption. Conditional on the six covariates (age, education, prior employment, Dutch proficiency, sex, migrant status), treatment assignment is as good as random. The synthetic DGP satisfies this by construction; in a real ALMP it is the assumption a referee would attack. Machine learning chooses controls flexibly — it cannot manufacture identification.
@@ -113,7 +113,7 @@ Unconfoundedness is the load-bearing identifying assumption. Conditional on the 
 - **Truth** — because the data are *synthetic*, $\tau_i$ is known for every person
 :::
 
-[Synthetic Flemish-ALMP cohort modelled on Cockx, Lechner & Bollens (2023). Every estimator is benchmarked against the truth.]{.comment}
+[Synthetic Flemish-ALMP cohort modelled on Cockx, Lechner & Bollens (2023). Every estimator is benchmarked against the truth.]{.takeaway .fragment}
 
 ::: {.notes}
 The treatment share of 52.8% is high for a real ALMP, but it is calibrated to keep overlap comfortable in all four Dutch-proficiency strata. The outcome has room (floor 0, ceiling 30) for a realistic 5-to-8-month effect. Knowing the truth is the pedagogical superpower here: we can score every estimator against it.
@@ -141,7 +141,7 @@ Difference-in-means: average Y for treated, average for untreated, subtract. Und
 
 $$\psi_i = g_1(X_i) - g_0(X_i) + \frac{D_i\,(Y_i - g_1(X_i))}{m(X_i)} - \frac{(1-D_i)\,(Y_i - g_0(X_i))}{1 - m(X_i)}$$
 
-[Outcome regression $g_d(X) = E[Y \mid D=d, X]$ plus an inverse-propensity residual correction. $E[\psi_i] = \text{ATE}$ if *either* $g$ or $m$ is right — the "double" in doubly robust.]{.comment}
+[Outcome regression $g_d(X) = E[Y \mid D=d, X]$ plus an inverse-propensity residual correction. $E[\psi_i] = \text{ATE}$ if *either* $g$ or $m$ is right — the "double" in doubly robust.]{.takeaway .fragment}
 
 ::: {.notes}
 The Interactive Regression Model of Chernozhukov et al. (2018). Two nuisances: an outcome regression g and a propensity m. Cross-fitting — train nuisances on K−1 folds, predict on the held-out fold, rotate — prevents the forests from overfitting their own training sample and contaminating the score. Orthogonality buys a root-n rate even with slow machine-learning nuisances. The grading-with-someone-else's-rubric analogy from the post lands well here.
@@ -231,7 +231,7 @@ The forest's tight CI is for the *average of individual predictions*, not the po
 
 $$W(\text{rule}) = E\big[\,\text{rule}(X)\cdot(\tau(X) - c)\,\big]$$
 
-[For everyone the rule treats, add their true effect minus the cost $c = 4$ months. Treat-all leaves welfare on the table; *targeting* the responders does better.]{.comment}
+[For everyone the rule treats, add their true effect minus the cost $c = 4$ months. Treat-all leaves welfare on the table; *targeting* the responders does better.]{.takeaway .fragment}
 
 ::: {.notes}
 The whole reason to estimate individual effects rather than stop at the average: they enable personalised policy. The welfare-optimal rule trains person i iff their *true* effect exceeds the cost. We don't know the truth in practice, so we plug in the forest's IATE estimate. Four rules: treat none, treat all, the IATE rule (treat where iate_hat > cost), and an oracle that knows the true tau.

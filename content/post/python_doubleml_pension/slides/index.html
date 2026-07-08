@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Double Machine Learning with 401(k) Data</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -284,7 +284,7 @@
 <li class="fragment"><strong>Endogenous treatment</strong> — actual participation (<code>p401</code>), 26.2%</li>
 <li class="fragment"><strong>Controls</strong> <span class="math inline">\(X\)</span> — 9 covariates: income, age, education, family size, and 5 more</li>
 </ul>
-<p><span class="comment">Eligibility is set by the <em>employer</em>; participation is a <em>household choice</em>. That distinction drives all three models.</span></p>
+<p><span class="takeaway fragment">Eligibility is set by the <em>employer</em>; participation is a <em>household choice</em>. That distinction drives all three models.</span></p>
 <aside class="notes">
 <p>9,915 U.S. households. The outcome is wildly skewed — median $1,499, mean $18,052, range from −$502,302 to $1,536,798. About 70% of eligible households actually enroll. The eligibility-vs-participation split is the hinge of the whole deck: eligibility is plausibly exogenous after conditioning on X; participation is a choice tangled up with unobserved financial discipline.</p>
 <style type="text/css">
@@ -319,7 +319,7 @@
 <section id="the-naive-estimate-is-the-causal-effect-plus-confounding-bias" class="slide level2 center">
 <h2>The naive estimate is the causal effect <em>plus</em> confounding bias</h2>
 <p><span class="math display">\[\hat\Delta_{\text{naive}} = \underbrace{\theta_0}_{\text{causal effect}} + \underbrace{\text{bias}}_{\text{income, education, }\ldots}\]</span></p>
-<p><span class="comment">The naive $19,559 is not wrong arithmetic — it is the right gap answering the wrong question. DML’s whole job is to subtract the second term.</span></p>
+<p><span class="takeaway fragment">The naive $19,559 is not wrong arithmetic — it is the right gap answering the wrong question. DML’s whole job is to subtract the second term.</span></p>
 <aside class="notes">
 <p>The naive difference-in-means is a clean number that confuses two things. Decompose it: the true causal effect we want, plus all pre-existing differences between the groups. Standard linear regression can subtract some bias, but only if the confounding is linear. When income-to-savings curves nonlinearly, linear adjustment leaves bias behind. That is the gap ML fills.</p>
 <style type="text/css">
@@ -345,7 +345,7 @@
 <h3 id="m_0x-edmid-x"><span class="math inline">\(m_0(X) = E[D\mid X]\)</span></h3>
 <p>Predict eligibility from covariates. Residual <span class="math inline">\(\tilde D = D - \hat m_0(X)\)</span> is the <em>surprise</em> eligibility.</p>
 </div></div>
-<p><span class="comment">Regress <span class="math inline">\(\tilde Y\)</span> on <span class="math inline">\(\tilde D\)</span>: the slope is <span class="math inline">\(\hat\theta_0\)</span>. Both residuals are cleaned of confounding, so only the causal channel remains.</span></p>
+<p><span class="takeaway fragment">Regress <span class="math inline">\(\tilde Y\)</span> on <span class="math inline">\(\tilde D\)</span>: the slope is <span class="math inline">\(\hat\theta_0\)</span>. Both residuals are cleaned of confounding, so only the causal channel remains.</span></p>
 <aside class="notes">
 <p>Think noise-cancelling headphones: the ML models learn the confounding “noise” pattern and subtract it; the clean causal signal is what’s left. This is partialling out — the same logic as Frisch–Waugh–Lovell, but with flexible learners instead of OLS, so it captures nonlinear confounding. Crucially θ comes from the unshrunk residual-on-residual regression, never from a shrunk ML coefficient.</p>
 <style type="text/css">
@@ -370,7 +370,7 @@
 <h3 id="cross-fitting-k-fold">Cross-fitting (K-fold)</h3>
 <p>Fit <span class="math inline">\(\hat g_0, \hat m_0\)</span> on <span class="math inline">\(K-1\)</span> folds, predict on the held-out fold, rotate. No row is ever scored by a model that saw it.</p>
 </div></div>
-<p><span class="comment">Orthogonality kills <em>regularization</em> bias; cross-fitting kills <em>overfitting</em> bias. Together they let Lasso, forests, or XGBoost serve as nuisance learners with no harm to inference.</span></p>
+<p><span class="takeaway fragment">Orthogonality kills <em>regularization</em> bias; cross-fitting kills <em>overfitting</em> bias. Together they let Lasso, forests, or XGBoost serve as nuisance learners with no harm to inference.</span></p>
 <aside class="notes">
 <p>This is the engine of the whole method. The orthogonal (doubly-robust) score is built so first-order nuisance errors cancel — that is why we can plug in biased, regularized ML estimates. Cross-fitting is the rotating-judge trick: each fold’s residuals come from a model that never saw that fold, so a flexible learner can’t memorize quirks and manufacture artificially clean residuals. Remove either safeguard and the inference breaks.</p>
 <style type="text/css">
@@ -429,7 +429,7 @@
 <section id="irm-relaxes-the-constant-effect-assumption-and-lands-at-8213" class="slide level2 center">
 <h2>IRM relaxes the constant-effect assumption — and lands at $8,213</h2>
 <p><span class="math display">\[\theta_0 = E\!\left[g_0(1,X) - g_0(0,X) + \frac{D\,(Y-g_0(1,X))}{m_0(X)} - \frac{(1-D)\,(Y-g_0(0,X))}{1-m_0(X)}\right]\]</span></p>
-<p><span class="comment">The doubly-robust (AIPW) score: an outcome model corrected by inverse-propensity weighting. Consistent if <em>either</em> <span class="math inline">\(g_0\)</span> or <span class="math inline">\(m_0\)</span> is right — a safety net.</span></p>
+<p><span class="takeaway fragment">The doubly-robust (AIPW) score: an outcome model corrected by inverse-propensity weighting. Consistent if <em>either</em> <span class="math inline">\(g_0\)</span> or <span class="math inline">\(m_0\)</span> is right — a safety net.</span></p>
 <aside class="notes">
 <p>IRM drops PLR’s additivity. It combines an outcome model g0(D,X) with a propensity score m0(X) = P(D=1|X) into the doubly-robust score above. “Doubly robust” = consistent if either model is correct, not necessarily both. Propensity weighting upweights informative rare controls — an “eligible-type” household that wasn’t eligible is the cleanest counterfactual. Trimming at 0.01 drops extreme propensity scores so the IPW weights stay stable.</p>
 <style type="text/css">
@@ -465,7 +465,7 @@
 <h2>Participation is a choice — so we instrument it with eligibility</h2>
 <p><span class="math display">\[\theta_{\text{LATE}} = \frac{E[Y\mid Z=1] - E[Y\mid Z=0]}{E[D\mid Z=1] - E[D\mid Z=0]}\]</span></p>
 <p>Participation <span class="math inline">\(D\)</span> is endogenous (financial discipline is unobserved). Eligibility <span class="math inline">\(Z\)</span> is a <strong>nudge</strong>: it opens the door without forcing anyone through.</p>
-<p><span class="comment">A Wald-type ratio: the instrument’s effect on savings, divided by its effect on participation.</span></p>
+<p><span class="takeaway fragment">A Wald-type ratio: the instrument’s effect on savings, divided by its effect on participation.</span></p>
 <aside class="notes">
 <p>PLR and IRM estimate the effect of eligibility, which is plausibly exogenous given X. But the effect of actually participating is endogenous — the enroll/don’t-enroll choice is driven by unobserved traits (financial literacy, savings motivation) that also drive savings. IIVM uses eligibility as an instrument for participation: relevance (you can’t participate without being eligible) plus exclusion (eligibility affects savings only through participation, given X). The estimand it recovers is the LATE.</p>
 <style type="text/css">
@@ -513,7 +513,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The LATE is the effect of participation on the marginal households a policy actually moves.</span></p>
+<p><span class="takeaway fragment">The LATE is the effect of participation on the marginal households a policy actually moves.</span></p>
 <aside class="notes">
 <p>Eligibility flips the participation status of compliers only. Always-takers would save in IRAs or taxable accounts anyway; never-takers won’t enroll no matter what. The instrument doesn’t move them, so they’re not in the estimate. That’s why the LATE is “local” — it’s the effect for exactly the population an eligibility expansion targets. Defiers are ruled out by the monotonicity assumption.</p>
 <style type="text/css">

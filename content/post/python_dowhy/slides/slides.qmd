@@ -90,7 +90,7 @@ $$\text{ATE} = E[Y(1) - Y(0)]$$
 
 The expected earnings gain from moving **anyone** — treated or not — from no-training to training.
 
-[Four methods target the ATE directly; matching drifts toward the **ATT** (the effect on those actually trained) because it discards unmatched controls.]{.comment}
+[Four methods target the ATE directly; matching drifts toward the **ATT** (the effect on those actually trained) because it discards unmatched controls.]{.takeaway .fragment}
 
 ::: {.notes}
 Name the estimand before estimating it. ATE answers "what if we trained everyone at random?"; ATT answers "what was the effect on those who enrolled?" The distinction matters because enrollees may differ systematically. We flag matching's drift toward ATT when we get there.
@@ -105,7 +105,7 @@ Name the estimand before estimating it. ATE answers "what if we trained everyone
 - **Refute** — stress-test the result with falsification tests
 :::
 
-[You cannot estimate before you identify, and you cannot identify before you model. That ordering *is* the contribution.]{.comment}
+[You cannot estimate before you identify, and you cannot identify before you model. That ordering *is* the contribution.]{.takeaway .fragment}
 
 ::: {.notes}
 Most software jumps straight from data to a coefficient and calls it causal. DoWhy's discipline is the sequence: assumptions first, formula second, number third, stress test last. The post's running analogy: build the bridge, check it stands, drive a truck across, then earthquake-test it.
@@ -119,7 +119,7 @@ Most software jumps straight from data to a coefficient and calls it causal. DoW
 - **Covariates** — age, education, race, marital status, degree, prior earnings (`re74`, `re75`)
 :::
 
-[All eight covariates are measured *before* treatment, so they can only be confounders — never mediators or colliders.]{.comment}
+[All eight covariates are measured *before* treatment, so they can only be confounders — never mediators or colliders.]{.takeaway .fragment}
 
 ::: {.notes}
 The Lalonde data from the National Supported Work Demonstration. Randomization gives a credible ground truth, which is why this is the benchmark dataset for testing causal estimators. The 8 pre-treatment covariates make the graph simple: every covariate points to both treatment and outcome.
@@ -155,7 +155,7 @@ $$\frac{d}{d[\text{treat}]}\, E[\text{re78} \mid \text{age}, \text{educ}, \text{
 
 Conditioning on the eight covariates **blocks every backdoor path**, so the effect is identified — *under unconfoundedness* (no hidden common cause).
 
-[DoWhy checks backdoor, instrumental-variable, and front-door strategies automatically, and returns the formula — not a guess about what to "control for".]{.comment}
+[DoWhy checks backdoor, instrumental-variable, and front-door strategies automatically, and returns the formula — not a guess about what to "control for".]{.takeaway .fragment}
 
 ::: {.notes}
 Identification is the bridge between assumptions (the graph) and computation (the data). It answers "can we even compute this without a new experiment?" Here the answer is yes via backdoor adjustment, conditional on the one assumption that there is no unmeasured confounder. DoWhy automates the check, preventing the common mistake of hand-picking controls.
@@ -181,7 +181,7 @@ Identification is the bridge between assumptions (the graph) and computation (th
 :::
 ::::
 
-[If outcome-based and treatment-based methods agree, neither model is badly misspecified — that agreement is the robustness check.]{.comment}
+[If outcome-based and treatment-based methods agree, neither model is badly misspecified — that agreement is the robustness check.]{.takeaway .fragment}
 
 ::: {.notes}
 The five estimators split into three families by *what they model*. Outcome modeling specifies how covariates relate to earnings; treatment modeling specifies how covariates relate to assignment (the propensity score); doubly robust does both. Comparing across paradigms is powerful precisely because they fail in different ways.
@@ -233,7 +233,7 @@ AIPW starts from regression adjustment and adds an IPW-weighted correction on th
 | PS stratification | \$1,617 | treatment |
 | PS matching | \$1,736 | treatment (→ ATT) |
 
-[The doubly robust \$1,620 is the most credible single estimate — it survives misspecification of either model.]{.comment}
+[The doubly robust \$1,620 is the most credible single estimate — it survives misspecification of either model.]{.takeaway .fragment}
 
 ::: {.notes}
 Convergence across fundamentally different strategies is the headline of the estimate step. Matching is the outlier at \$1,736 and closest to the naive value because it discards unmatched controls — its estimand drifts toward the ATT. On a control mean of \$4,555 the cluster is roughly a 34–38% earnings gain.
@@ -261,7 +261,7 @@ The placebo refuter replaces real treatment with a random permutation. If the ef
 | Random common cause | \$1,676 | 0.90 | stable with noise |
 | Data subset (80%) | \$1,728 | 0.80 | stable across subsamples |
 
-[Surviving placebo, random-common-cause, and subset tests is *evidence*, not proof — refutation can falsify, never confirm.]{.comment}
+[Surviving placebo, random-common-cause, and subset tests is *evidence*, not proof — refutation can falsify, never confirm.]{.takeaway .fragment}
 
 ::: {.notes}
 Three falsification tests, three different threats: artifact (placebo), omitted confounder (random common cause), and influential observations (subset). The estimate holds across all three. The honest caveat: passing tests cannot prove causation, but failing any one would be a strong signal something is wrong.

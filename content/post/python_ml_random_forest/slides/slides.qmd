@@ -100,7 +100,7 @@ $$\hat{y} = \frac{1}{B} \sum_{b=1}^{B} T_b(\mathbf{x})$$
 
 Each tree $T_b$ is grown on a bootstrap resample, and at every split only $\sqrt{64}=8$ features are even considered.
 
-[Bootstrap rows + random feature subsets = trees that make *different* mistakes; averaging cancels the noise.]{.comment}
+[Bootstrap rows + random feature subsets = trees that make *different* mistakes; averaging cancels the noise.]{.takeaway .fragment}
 
 ::: {.notes}
 Walk the two sources of randomness aloud. Bagging (bootstrap aggregating) decorrelates by resampling rows; the random feature subset decorrelates further by hiding columns. Lower correlation between trees means a bigger variance reduction when you average — that is the entire trick. Here B is n_estimators (100 by default) and x is the 64-dimensional embedding vector. We keep the defaults; tuning lives in the appendix.
@@ -123,7 +123,7 @@ Walk the two sources of randomness aloud. Bagging (bootstrap aggregating) decorr
 :::
 ::::
 
-[A single 80/20 split is a lottery: across 200 random seeds the test R-squared ranges from −0.09 to 0.46 (Appendix A).]{.comment}
+[A single 80/20 split is a lottery: across 200 random seeds the test R-squared ranges from −0.09 to 0.46 (Appendix A).]{.takeaway .fragment}
 
 ::: {.notes}
 This replaces the old "hold out 68 towns" slide. With only 339 rows a single test set is both wasteful and noisy. Cross-validation rotates the held-out fold so every observation is tested exactly once and trained on four times. `cross_val_predict` stitches the held-out predictions back together into one out-of-fold prediction per town — that is what we plot for all 339.
@@ -144,7 +144,7 @@ oof_pred = cross_val_predict(baseline_rf, X, y, cv=kf)  # one prediction / town
 # pooled out-of-fold R² = 0.225
 ```
 
-[Fold 3 scores **−0.03** — worse than guessing the average. One lucky split could have shown you only the 0.45.]{.comment}
+[Fold 3 scores **−0.03** — worse than guessing the average. One lucky split could have shown you only the 0.45.]{.takeaway .fragment}
 
 ::: {.notes}
 The five fold scores are the whole point. They swing from a negative value to 0.45 — a standard deviation (0.173) almost as large as the mean (0.224). A single train/test split hands you exactly one of these numbers with no way to know which. cross_val_predict reuses the same folds to give one out-of-fold prediction per municipality; pooled over all 339 that is an R² of 0.225.
@@ -183,7 +183,7 @@ Permutation importance shuffles one column and watches R² fall. A30 is the runa
 :::
 ::::
 
-[Two very different methods crowning the same feature is evidence A30 is real signal, not a counting artifact.]{.comment}
+[Two very different methods crowning the same feature is evidence A30 is real signal, not a counting artifact.]{.takeaway .fragment}
 
 ::: {.notes}
 A teaching moment on importance pitfalls. MDI rewards features used in many splits, which can inflate high-cardinality continuous features; permutation asks the cleaner question "does generalization suffer without you?" When they disagree, trust permutation — but here they agree emphatically on A30, which raises our confidence that the signal is genuine.
@@ -231,7 +231,7 @@ MAE of 4.4 on a scale where most towns sit between 47 and 55 means the typical e
 
 ![Best cross-validated R-squared: baseline vs grid search, random search, and Optuna (Appendix B).](../ml_appendix_tuning_comparison.png)
 
-[The methods rank as theory predicts — Optuna ≥ random ≥ grid — but every gain is smaller than the 0.17 fold-to-fold noise.]{.comment}
+[The methods rank as theory predicts — Optuna ≥ random ≥ grid — but every gain is smaller than the 0.17 fold-to-fold noise.]{.takeaway .fragment}
 
 ::: {.notes}
 Appendix B in one slide. All three search strategies improve the cross-validated R², and they rank exactly as theory says given equal budgets. But the jump from 0.224 to 0.251 is well inside the fold-to-fold standard deviation — the tuning gain is smaller than the measurement noise. That is the empirical reason the main analysis keeps the defaults.

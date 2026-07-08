@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Exploratory Spatial Data Analysis</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -270,7 +270,7 @@
 <li class="fragment"><strong>Geography</strong> — polygon geometries for 153 sub-national regions, 12 South American countries</li>
 <li class="fragment"><strong>Two snapshots</strong> — 2013 and 2019, the same data as the Pooled-PCA tutorial</li>
 </ul>
-<p><span class="comment">Source: Global Data Lab (Smits &amp; Permanyer, 2019). Mean SHDI rose only <span class="math inline">\(+0.0053\)</span> overall — yet income <em>fell</em> in 71 of 153 regions (46.4%). The aggregate calm hides spatial turbulence.</span></p>
+<p><span class="takeaway fragment">Source: Global Data Lab (Smits &amp; Permanyer, 2019). Mean SHDI rose only <span class="math inline">\(+0.0053\)</span> overall — yet income <em>fell</em> in 71 of 153 regions (46.4%). The aggregate calm hides spatial turbulence.</span></p>
 </section>
 <section id="spatial-autocorrelation-has-no-meaning-until-you-define-neighbour" class="slide level2 center">
 <h2>Spatial autocorrelation has no meaning until you define “neighbour”</h2>
@@ -289,7 +289,7 @@
 <li>stricter; drops corner-only touches</li>
 </ul>
 </div></div>
-<p><span class="comment">We use Queen — appropriate for irregular administrative borders. Then row-standardize (<span class="math inline">\(w_{ij}\to w_{ij}/\sum_j w_{ij}\)</span>) so each row sums to 1.</span></p>
+<p><span class="takeaway fragment">We use Queen — appropriate for irregular administrative borders. Then row-standardize (<span class="math inline">\(w_{ij}\to w_{ij}/\sum_j w_{ij}\)</span>) so each row sums to 1.</span></p>
 <aside class="notes">
 <p>Row-standardization is what makes the spatial lag interpretable: after it, the lag is the simple average of a region’s neighbours’ values, regardless of how many neighbours it has. This is the building block of every statistic that follows.</p>
 <style type="text/css">
@@ -324,7 +324,7 @@
 <section id="morans-i-asks-one-question-do-like-values-sit-next-to-like-values" class="slide level2 center">
 <h2>Moran’s I asks one question: do like values sit next to like values?</h2>
 <p><span class="math display">\[I = \frac{n}{\sum_{i}\sum_{j} w_{ij}} \cdot \frac{\sum_{i}\sum_{j} w_{ij}(x_i-\bar{x})(x_j-\bar{x})}{\sum_{i}(x_i-\bar{x})^2}\]</span></p>
-<p><span class="comment">For each pair of neighbours it multiplies their deviations from the mean. High-next-to-high (and low-next-to-low) makes the products positive — so <span class="math inline">\(I&gt;0\)</span> means clustering.</span></p>
+<p><span class="takeaway fragment">For each pair of neighbours it multiplies their deviations from the mean. High-next-to-high (and low-next-to-low) makes the products positive — so <span class="math inline">\(I&gt;0\)</span> means clustering.</span></p>
 <aside class="notes">
 <p>I ≈ +1 strong clustering of similar values; I ≈ 0 random; I ≈ −1 a checkerboard. The expected value under randomness is E(I) = −1/(n−1), here −0.0066 — essentially zero. The numerator is a cross-product of neighbour deviations; the leading fraction just normalizes by the total weight.</p>
 <style type="text/css">
@@ -348,7 +348,7 @@
 <span id="cb1-5"><a href=""></a></span>
 <span id="cb1-6"><a href=""></a><span class="bu">print</span>(moran_2019.I, moran_2019.p_sim, moran_2019.z_sim)</span>
 <span id="cb1-7"><a href=""></a><span class="co"># 0.6320   0.0010   11.9890</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">A permutation test reshuffles all SHDI values across regions 999 times — like dealing cards to random seats — and asks how often a random map beats the real one.</span></p>
+<p><span class="takeaway fragment">A permutation test reshuffles all SHDI values across regions 999 times — like dealing cards to random seats — and asks how often a random map beats the real one.</span></p>
 <aside class="notes">
 <p>Inference here is non-parametric: we never assume the data are normal. We build the reference distribution by brute force. p_sim = 0.0010 is the smallest p achievable with 999 draws — the observed clustering never once appeared by chance. z = 11.99 is roughly twelve standard deviations above the random mean.</p>
 <style type="text/css">
@@ -389,7 +389,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Expected <span class="math inline">\(I\)</span> under randomness <span class="math inline">\(= -0.0066\)</span>. The observed values are an order of magnitude away — and 2019 is <em>higher</em> than 2013.</span></p>
+<p><span class="takeaway fragment">Expected <span class="math inline">\(I\)</span> under randomness <span class="math inline">\(= -0.0066\)</span>. The observed values are an order of magnitude away — and 2019 is <em>higher</em> than 2013.</span></p>
 <aside class="notes">
 <p>This is the headline of the global analysis. Both years are far above the random expectation and both have the minimum possible p-value. The increase from 0.568 to 0.632 is the first sign of a deepening spatial divide — the gap between rich and poor regions is not just large, it is becoming more spatially organized.</p>
 <style type="text/css">
@@ -425,7 +425,7 @@
 <h2>Global I says clustering exists — LISA says <em>where</em> it lives</h2>
 <p>The local Moran statistic decomposes the global <span class="math inline">\(I\)</span> into one value per region:</p>
 <p><span class="math display">\[I_i = z_i \sum_{j} w_{ij} z_j\]</span></p>
-<p><span class="comment">Each region’s own standardized value <span class="math inline">\(z_i\)</span> times the average of its neighbours’ — large and positive in a cluster’s core, negative for a spatial outlier.</span></p>
+<p><span class="takeaway fragment">Each region’s own standardized value <span class="math inline">\(z_i\)</span> times the average of its neighbours’ — large and positive in a cluster’s core, negative for a spatial outlier.</span></p>
 <aside class="notes">
 <p>Anselin (1995). Summing the I_i over all regions recovers (a scaling of) the global I — LISA is literally global Moran’s I taken apart region by region. Each region is then assigned to a quadrant — HH, LL, HL, LH — and a permutation p-value; we keep those significant at p &lt; 0.10.</p>
 <style type="text/css">
@@ -456,7 +456,7 @@
 <li><strong>LH</strong> — low value among high neighbours</li>
 </ul>
 </div></div>
-<p><span class="comment">Significance is permutation-based: only regions with <span class="math inline">\(p&lt;0.10\)</span> are coloured; the rest stay grey.</span></p>
+<p><span class="takeaway fragment">Significance is permutation-based: only regions with <span class="math inline">\(p&lt;0.10\)</span> are coloured; the rest stay grey.</span></p>
 <aside class="notes">
 <p>HH and LL are the story; HL and LH are the exceptions that prove the rule. In 2019 there are just 5 HL and 1 LH out of 153 — spatial outliers are genuinely rare here, which itself is evidence of strong positive autocorrelation.</p>
 <style type="text/css">
@@ -506,7 +506,7 @@
 <li>HL: 5 · LH: 1</li>
 </ul>
 </div></div>
-<p><span class="comment">Prosperity clusters stable; deprivation cluster expanding by 8 regions. Asymmetric evolution — the signature of a localized crisis.</span></p>
+<p><span class="takeaway fragment">Prosperity clusters stable; deprivation cluster expanding by 8 regions. Asymmetric evolution — the signature of a localized crisis.</span></p>
 <aside class="notes">
 <p>The HH cluster barely moves (31 → 30); the LL cluster grows by eight. From the transition table, 27 of 31 HH regions stayed HH (87% persistence), and 17 previously non-significant regions joined the LL cluster. Entrenched at the top, spreading at the bottom.</p>
 <style type="text/css">
@@ -622,7 +622,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Bolivia’s arrows point right — own development improved — but its neighbours stayed poor, so it remained inside the LL cold spot.</span></p>
+<p><span class="takeaway fragment">Bolivia’s arrows point right — own development improved — but its neighbours stayed poor, so it remained inside the LL cold spot.</span></p>
 <aside class="notes">
 <p>The juxtaposition is the policy lesson in miniature. Bolivia made real, broad-based gains and still could not escape the low-development cluster, because escaping a spatial trap requires your neighbours to improve too. Venezuela shows the inverse: collapse propagates outward. Spatial structure is destiny unless you act on the neighbourhood, not just the region.</p>
 <style type="text/css">

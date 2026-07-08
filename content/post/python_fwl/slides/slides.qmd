@@ -95,7 +95,7 @@ Built from the post's five learning objectives. Teaching deck, so we signpost. K
 :::
 :::
 ::: {.column width="45%"}
-[The path `coupons ← income → sales` is non-causal. Leave it open and the negative income→coupon link leaks into the coupon slope.]{.comment}
+[The path `coupons ← income → sales` is non-causal. Leave it open and the negative income→coupon link leaks into the coupon slope.]{.takeaway .fragment}
 :::
 ::::
 
@@ -115,7 +115,7 @@ def simulate_store_data(n=50, seed=42):
     return pd.DataFrame(...)
 ```
 
-[We *plant* the answer (+0.2) in the data, then check whether each estimator finds it.]{.comment}
+[We *plant* the answer (+0.2) in the data, then check whether each estimator finds it.]{.takeaway .fragment}
 
 ::: {.notes}
 Why simulate? Because the true causal effect is known by construction — exactly +0.2 — so we can grade every method against ground truth. 50 stores, income centered at \$50K, coupons depend negatively on income, sales depend positively on both. This is a controlled experiment inside the computer.
@@ -127,7 +127,7 @@ Why simulate? Because the true causal effect is known by construction — exactl
 |---|---:|---:|:--:|
 | Naive OLS (no controls) | [−0.1059]{.key} | 0.116 | 0.365 |
 
-[Not just imprecise — the sign is *backwards* from the true +0.2. The confounder is pulling it down.]{.comment}
+[Not just imprecise — the sign is *backwards* from the true +0.2. The confounder is pulling it down.]{.takeaway .fragment}
 
 ::: {.notes}
 Each extra percentage point of coupons is "associated with" \$106 less in daily sales — but it is not significant and it contradicts the planted +0.2. Wealthy neighborhoods use fewer coupons yet spend more, so the raw slope inherits income's negative coupon link. This is the result the controls will fix.
@@ -140,7 +140,7 @@ Each extra percentage point of coupons is "associated with" \$106 less in daily 
 | Naive OLS | −0.1059 | — | 0.365 |
 | Full OLS (+ income) | [+0.2673]{.key} | +0.3836 | 0.031 |
 
-[Conditioning on income blocks the backdoor: the estimate jumps to +0.267, close to the true +0.2.]{.comment}
+[Conditioning on income blocks the backdoor: the estimate jumps to +0.267, close to the true +0.2.]{.takeaway .fragment}
 
 ::: {.notes}
 One control reverses the conclusion. The CI [0.025, 0.509] now excludes zero. Income itself is strongly positive (+0.3836, p < 0.001), confirming richer stores spend more. But what is the regression *doing* when it "controls for" income? That mechanism is FWL.
@@ -152,7 +152,7 @@ $$\hat\beta_1^{FWL}=\frac{\mathrm{Cov}(\tilde y,\ \tilde x_1)}{\mathrm{Var}(\til
 
 where $\tilde x_1$ is the residual of $x_1$ (coupons) regressed on $x_2$ (income), and $\tilde y$ is the residual of $y$ (sales) regressed on $x_2$.
 
-[Remove income from coupons, remove income from sales, then regress the leftovers. Same $\hat\beta_1$.]{.comment}
+[Remove income from coupons, remove income from sales, then regress the leftovers. Same $\hat\beta_1$.]{.takeaway .fragment}
 
 ::: {.notes}
 Frisch & Waugh (1933), Lovell (1963). This is an algebraic identity, not an approximation. The tilde is partialling-out: keep only the variation orthogonal to income. Three equivalent estimators — full OLS, residualize-X-only, residualize-both — all return the same coefficient on coupons.
@@ -168,7 +168,7 @@ df["sales_tilde"]   = smf.ols("sales ~ income",   df).fit().resid
 fwl = smf.ols("sales_tilde ~ coupons_tilde - 1", df).fit()
 ```
 
-[Residuals are mean-zero, so we drop the intercept. The coefficient on `coupons_tilde` *is* the controlled effect.]{.comment}
+[Residuals are mean-zero, so we drop the intercept. The coefficient on `coupons_tilde` *is* the controlled effect.]{.takeaway .fragment}
 
 ::: {.notes}
 The full script is in the post; these are the load-bearing lines. Step 1 residualizes only coupons and gets the right coefficient but a blown-up SE (1.271). Step 2 residualizes sales too and the SE collapses back to 0.118 — that's why we residualize *both*.
@@ -181,7 +181,7 @@ The full script is in the post; these are the load-bearing lines. Step 1 residua
 | Step 1 — residualize $x_1$ only | +0.2673 | 1.271 | 0.834 |
 | Step 2 — residualize both | [+0.2673]{.key} | 0.118 | 0.028 |
 
-[Same coefficient to four decimals; residualizing the outcome too restores the SE to match full OLS (0.120).]{.comment}
+[Same coefficient to four decimals; residualizing the outcome too restores the SE to match full OLS (0.120).]{.takeaway .fragment}
 
 ::: {.notes}
 Step 1's SE explodes because income's variation is still sitting in sales, inflating the residual variance. Once sales is also residualized, SE = 0.118 and p = 0.028 — nearly identical to full OLS. The tiny gap is a degrees-of-freedom adjustment. FWL is exact for the point estimate.
@@ -218,7 +218,7 @@ A residual of −5 doesn't mean −5% coupon usage; it means 5 points below what
 | Full OLS (+ income + day) | +0.2706 | 0.119 | 0.028 |
 | FWL (+ income + day) | [+0.2706]{.key} | 0.116 | 0.023 |
 
-[Partial out income *and* day-of-week from both sides — identical coefficient. The theorem holds for any number of controls.]{.comment}
+[Partial out income *and* day-of-week from both sides — identical coefficient. The theorem holds for any number of controls.]{.takeaway .fragment}
 
 ::: {.notes}
 Day-of-week itself isn't significant (0.3195, p = 0.198), but absorbing its variance sharpens the coupon estimate slightly, from 0.2673 to 0.2706. The FWL recipe is unchanged — residualize on the full control set, then regress. This is exactly why fixed-effects packages (reghdfe, fixest, pyfixest) partial out hundreds of dummies first.
@@ -292,7 +292,7 @@ Steelman, don't strawman. If income affects coupons or sales nonlinearly, OLS re
 :::
 ::::
 
-[Same residualize-then-regress logic; swap OLS for a flexible learner and you get a debiased causal estimate.]{.comment}
+[Same residualize-then-regress logic; swap OLS for a flexible learner and you get a debiased causal estimate.]{.takeaway .fragment}
 
 ::: {.notes}
 Chernozhukov et al. (2018). The whole DML estimator is FWL with the OLS partial-out replaced by cross-fitted machine learning. Master FWL and DML stops being mysterious — it is this same plot, learned with a smarter mop. The companion post python_doubleml runs it on a real experiment.

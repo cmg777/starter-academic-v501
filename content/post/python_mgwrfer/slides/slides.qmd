@@ -89,7 +89,7 @@ Spoiler figure. Don't explain every panel yet — just plant that the confounder
 - **Covariates** — each one coupled to place: $x_{k}=0.05\,sc_i+\nu_k$
 :::
 
-[We simulate the paper's DGP (Eqs. 39–45) verbatim on a 15×15 grid. The coupling makes the indirect channel $sc\to x_k$ active — that is the whole point.]{.comment}
+[We simulate the paper's DGP (Eqs. 39–45) verbatim on a 15×15 grid. The coupling makes the indirect channel $sc\to x_k$ active — that is the whole point.]{.takeaway .fragment}
 
 ::: {.notes}
 675 observations total. beta_1 is a quadratic dome (1.06–2.00), beta_2 a linear gradient, beta_3 constant at 1.5, beta_4 identically zero. alpha_i = 30(exp(j/15)−1). The smaller grid (vs the paper's 30×30) keeps three bandwidth searches under ~15 minutes while exercising every step.
@@ -102,7 +102,7 @@ Spoiler figure. Don't explain every panel yet — just plant that the confounder
 | $\mathrm{Cor}(x_k, sc)$ | [0.84]{.key} | every covariate tracks place |
 | $\mathrm{Cor}(x_4, y)$ | [0.84]{.key} | spurious — $\beta_4\equiv 0$ |
 
-[A regression that does not condition on $sc$ will read this 0.84 as a real effect. That is the bias mechanism, made concrete.]{.comment}
+[A regression that does not condition on $sc$ will read this 0.84 as a real effect. That is the bias mechanism, made concrete.]{.takeaway .fragment}
 
 ::: {.notes}
 With sigma_x = 0.5 and 0.05·sc where sc spans 2–52, the deterministic place component dominates the noise — Cor ≈ 0.84 for all four covariates. x_4 has no causal role, yet shares the common parent sc with y, so it inherits a 0.84 correlation. This is a textbook spurious correlation through a common cause.
@@ -114,7 +114,7 @@ $$y = \beta_0 + \textstyle\sum_k x_k\beta_k + sc + \varepsilon, \qquad sc = \del
 
 $$\Rightarrow\quad y = (\beta_0+\delta_0) + \textstyle\sum_k x_k(\beta_k+\delta_k) + (\varepsilon+\eta)$$
 
-[Hide $sc$ in the error and project it on the covariates: the bias on each slope is exactly $\delta_k$, the indirect contextual effect.]{.comment}
+[Hide $sc$ in the error and project it on the covariates: the bias on each slope is exactly $\delta_k$, the indirect contextual effect.]{.takeaway .fragment}
 
 ::: {.notes}
 Adapted from Wooldridge (2010, 65–67) and Eqs. 4–8 in the paper. sc is unobservable, so it folds into the error. Because sc has a linear projection on the x's (that's the coupling), OLS or MGWR recovers beta_k + delta_k. The magnitude of the bias is the magnitude of the indirect contextual effect. Kill delta_k and you restore identification.
@@ -129,7 +129,7 @@ Adapted from Wooldridge (2010, 65–67) and Eqs. 4–8 in the paper. sc is unobs
 - **MGWFER** — local surfaces *and* clean identification
 :::
 
-[Only MGWFER inherits the FE estimator's identification while delivering a location-specific coefficient surface.]{.comment}
+[Only MGWFER inherits the FE estimator's identification while delivering a location-specific coefficient surface.]{.takeaway .fragment}
 
 ::: {.notes}
 The lineup mirrors the paper's full Table 2 / Table 3. The narrative arc is escalating discipline: global naive → global FE → local naive → local FE. MGWFER is the one cell in this 2×2 (global/local × naive/FE) that has both surfaces and identification.
@@ -143,7 +143,7 @@ The lineup mirrors the paper's full Table 2 / Table 3. The narrative arc is esca
 | $\beta_3$ | 1.50 | 5.79*** | [1.55***]{.key} |
 | $\beta_4$ | 0.00 | 4.16*** | [0.02 n.s.]{.key} |
 
-[OLS has nowhere to put $sc$ except into the slopes — Wooldridge's $\hat\beta_k=\beta_k+\delta_k$. The within-transform neutralises it.]{.comment}
+[OLS has nowhere to put $sc$ except into the slopes — Wooldridge's $\hat\beta_k=\beta_k+\delta_k$. The within-transform neutralises it.]{.takeaway .fragment}
 
 ::: {.notes}
 The paper's Table 2 on one screen. OLS and pooled OLS estimate the true 1.5 slopes at ~6 and declare a significant beta_4 ≈ 4.2 even though beta_4 is zero. Individual FE recovers 1.57, 1.55, and beta_4 ≈ 0.02 (p = 0.66), and reconstructs mean(alpha) to within 0.06 of truth. Identification restored — but FE gives one number per coefficient, not a map.
@@ -163,7 +163,7 @@ $$\tilde{y}_{it} = y_{it} - \bar{y}_i = \textstyle\sum_k \beta_k(u_i,v_i)\,(x_{k
 
 Since $\alpha_i$ is the same in every period, $\alpha_i-\alpha_i=0$ — demeaning cancels it to machine precision.
 
-[Like zeroing a kitchen scale: subtract the container's weight ($\alpha_i$) so only the contents (the slopes) remain.]{.comment}
+[Like zeroing a kitchen scale: subtract the container's weight ($\alpha_i$) so only the contents (the slopes) remain.]{.takeaway .fragment}
 
 ::: {.notes}
 The workhorse of panel econometrics. After demeaning, the max unit mean is 7e-15 — numerically exact removal. What remains is within-unit variation driven only by the spatially varying slopes and noise. The key causal assumption: no time-varying confounders (strict exogeneity conditional on the fixed effects).
@@ -177,7 +177,7 @@ The workhorse of panel econometrics. After demeaning, the max unit mean is 7e-15
 - The confounder spanned $[2.07,\ 51.55]$ — and is now gone
 :::
 
-[Most of the original variation was *between* units. Demeaning isolates the *within*-unit signal that identifies the slopes.]{.comment}
+[Most of the original variation was *between* units. Demeaning isolates the *within*-unit signal that identifies the slopes.]{.takeaway .fragment}
 
 ::: {.notes}
 This slide makes the within/between split concrete. Five-sixths of the raw spread lived between units, carried by alpha. Once it's removed, what's left is the part of y that moves over time inside one unit — exactly the variation the spatially varying coefficients explain.
@@ -226,7 +226,7 @@ $$\hat\alpha_i = \bar y_i - \textstyle\sum_{k} \hat\beta_{bwk}(u_i,v_i)\,\bar x_
 
 Once the slopes are clean, the leftover per-unit mean *is* the intrinsic contextual effect — no longer a nuisance, now an output.
 
-[In MGWR the role of place hid inside one intercept; in MGWFER it is explicit, per-unit, and significance-testable.]{.comment}
+[In MGWR the role of place hid inside one intercept; in MGWFER it is explicit, per-unit, and significance-testable.]{.takeaway .fragment}
 
 ::: {.notes}
 Eq. 30 of the paper. Take each unit's mean outcome, subtract the contribution of its mean covariates at the local slopes; what's left is the unmeasured place effect. The derivation parallels the textbook FE result with location-specific slopes substituted for the global beta.

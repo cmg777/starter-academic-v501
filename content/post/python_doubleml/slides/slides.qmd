@@ -89,7 +89,7 @@ Spoiler / framing figure. The per-group means are control 2.057 vs bonus 1.971 �
 - **Controls** $X$ — 15 demographic and labor-market covariates
 :::
 
-[Treatment was *assigned at random*, so $D$ is independent of $X$ by design — the estimand is a clean **Average Treatment Effect (ATE)**.]{.comment}
+[Treatment was *assigned at random*, so $D$ is independent of $X$ by design — the estimand is a clean **Average Treatment Effect (ATE)**.]{.takeaway .fragment}
 
 ::: {.notes}
 Because assignment is random, there is no confounding to remove — a crucial framing for the whole talk. The estimand is the ATE of the bonus offer on log duration. That is exactly what makes the RCT the right place to *learn the method*: we can check that flexible adjustment leaves the answer essentially unchanged.
@@ -111,7 +111,7 @@ $$Y_i = \alpha + \beta\, D_i + X_i'\gamma + \epsilon_i$$
 
 . . .
 
-[A linear $X_i'\gamma$ can miss nonlinear structure in $X \to Y$. The leftover variation widens the standard errors.]{.comment}
+[A linear $X_i'\gamma$ can miss nonlinear structure in $X \to Y$. The leftover variation widens the standard errors.]{.takeaway .fragment}
 
 ::: {.notes}
 This motivates ML. In an observational study, linear adjustment also risks residual confounding bias. In this RCT there is no bias to remove, so the payoff of flexible adjustment is variance reduction: absorbing more of inuidur1's variation tightens the CI around the same ATE.
@@ -129,7 +129,7 @@ ols_full.fit(df[["tg"] + COVARIATES], df["inuidur1"])
 # coefficient → -0.0717
 ```
 
-[Naive OLS: **−0.0855**.  With covariates: **−0.0717**. The shift is precision, not bias.]{.comment}
+[Naive OLS: **−0.0855**.  With covariates: **−0.0717**. The shift is precision, not bias.]{.takeaway .fragment}
 
 ::: {.notes}
 Two reference points before any ML. The naive estimate (−0.0855, an 8.6% reduction) becomes −0.0717 (7.2%) once we adjust. In a randomized design the move is not "removing confounding" — it is absorbing residual outcome variation. DML's job is to do this absorption *flexibly*.
@@ -141,7 +141,7 @@ $$Y = D\,\theta_0 + g_0(X) + \varepsilon, \qquad E[\varepsilon \mid D, X] = 0$$
 
 $$D = m_0(X) + V, \qquad E[V \mid X] = 0$$
 
-[$\theta_0$ is the causal **ATE**. $g_0(X)$ and $m_0(X)$ are *nuisance* functions — scaffolding we estimate but don't report.]{.comment}
+[$\theta_0$ is the causal **ATE**. $g_0(X)$ and $m_0(X)$ are *nuisance* functions — scaffolding we estimate but don't report.]{.takeaway .fragment}
 
 ::: {.notes}
 The Partially Linear Regression (PLR) model. Linearity is imposed only on the treatment D; covariates can enter g_0 arbitrarily flexibly. g_0 predicts Y from X; m_0 predicts D from X. In this RCT m_0 is roughly constant (the assignment probability), but g_0 still soaks up predictive structure in inuidur1.
@@ -153,7 +153,7 @@ $$\tilde{Y} = Y - \hat{g}_0(X), \qquad \tilde{D} = D - \hat{m}_0(X)$$
 
 $$\hat{\theta}_0 = \frac{\sum_i \tilde{D}_i\,\tilde{Y}_i}{\sum_i \tilde{D}_i^{2}}$$
 
-[Like noise-canceling headphones: ML learns how $X$ drives $Y$ and $D$, we subtract it, and only the $D \to Y$ signal is left.]{.comment}
+[Like noise-canceling headphones: ML learns how $X$ drives $Y$ and $D$, we subtract it, and only the $D \to Y$ signal is left.]{.takeaway .fragment}
 
 ::: {.notes}
 The partialling-out estimator. The residualised score (Y − g(X))(D − m(X)) is Neyman-orthogonal: small ML errors in the nuisance estimates do not bias θ to first order. That orthogonality is what lets us swap learners later and still trust the estimate.
@@ -163,7 +163,7 @@ The partialling-out estimator. The residualised score (Y − g(X))(D − m(X)) i
 
 $$\hat{\theta}_0^{CF} = \frac{\sum_{k=1}^{K}\sum_{i \in I_k} \tilde{D}_i^{(k)}\,\tilde{Y}_i^{(k)}}{\sum_{k=1}^{K}\sum_{i \in I_k} \big(\tilde{D}_i^{(k)}\big)^2}$$
 
-[Split into $K=5$ folds; each fold's residuals come from models trained on the *other four*, then average.]{.comment}
+[Split into $K=5$ folds; each fold's residuals come from models trained on the *other four*, then average.]{.takeaway .fragment}
 
 ::: {.notes}
 Without sample-splitting, the ML penalty contaminates θ — regularization bias. Cross-fitting is like grading exams with a model that never saw that student's work: each fold's predictions are out-of-sample, which preserves valid standard errors, p-values, and confidence intervals.
@@ -206,7 +206,7 @@ The Act III payoff. θ̂ = −0.0736 ⇒ ≈ 7.4% on the log scale, ≈ 7.1% pro
 | Random Forest | [−0.0736]{.key} | 0.0354 | 0.038 | [−0.143, −0.004] |
 | Lasso | −0.0712 | 0.0354 | 0.044 | [−0.141, −0.002] |
 
-[Two utterly different learners, a 0.0024 gap — under 7% of one standard error.]{.comment}
+[Two utterly different learners, a 0.0024 gap — under 7% of one standard error.]{.takeaway .fragment}
 
 ::: {.notes}
 Robustness via learner-agnosticism. Random Forest (nonparametric trees) and Lasso (penalized linear) disagree by 0.0024, both significant at 5%, both excluding zero. Neyman-orthogonality is why this works: the estimate doesn't hinge on getting the nuisance functional form "right". A strong signal the result isn't a modeling artifact.

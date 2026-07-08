@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>High-Dimensional Fixed Effects Regression</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -284,7 +284,7 @@
 <h2>A fixed effect is just one extra intercept per group</h2>
 <p><span class="math display">\[Y_{it} = \alpha_i + X_{it}\beta + u_{it}\]</span></p>
 <p>Add a unit-specific intercept <span class="math inline">\(\alpha_i\)</span> that absorbs <strong>every</strong> time-invariant characteristic of unit <span class="math inline">\(i\)</span> — observed or not.</p>
-<p><span class="comment">Block one entire class of confounders — innate ability, firm culture, institutional quality — in a single step.</span></p>
+<p><span class="takeaway fragment">Block one entire class of confounders — innate ability, firm culture, institutional quality — in a single step.</span></p>
 <aside class="notes">
 <p>The mechanism: α_i soaks up anything constant within a unit. You don’t have to name the confounder or even measure it — as long as it doesn’t change over the observation window, the fixed effect removes it. That is the whole appeal of FE for observational panel data.</p>
 <style type="text/css">
@@ -303,7 +303,7 @@
 <h2>Absorbing group FE is mathematically identical to demeaning</h2>
 <p><span class="math display">\[\hat{\beta}_{FE} = \left(\sum_{i} \ddot{X}_i' \ddot{X}_i\right)^{-1} \sum_{i} \ddot{X}_i' \ddot{Y}_i\]</span></p>
 <p>where <span class="math inline">\(\ddot{X}_i = X_{it} - \bar{X}_i\)</span> and <span class="math inline">\(\ddot{Y}_i = Y_{it} - \bar{Y}_i\)</span> are demeaned within each group.</p>
-<p><span class="comment">Subtract each group’s own average, then run plain OLS — that is all a fixed effect does.</span></p>
+<p><span class="takeaway fragment">Subtract each group’s own average, then run plain OLS — that is all a fixed effect does.</span></p>
 <aside class="notes">
 <p>The within transformation. Replace every variable by its deviation from the unit’s own time-average. Equivalent to including unit dummies, but vastly faster — modern packages demean rather than estimate thousands of nuisance intercepts. The post proves the equivalence numerically: FE absorption and manual demeaning both give −1.0190 on X1.</p>
 <style type="text/css">
@@ -407,7 +407,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The estimate never moves; only honesty about uncertainty does.</span></p>
+<p><span class="takeaway fragment">The estimate never moves; only honesty about uncertainty does.</span></p>
 <aside class="notes">
 <p>Cluster-robust SEs allow arbitrary within-group correlation — essential when observations inside a group are not independent. Moving from HC1 to CRV3 inflates the SE 50% (0.0833 → 0.1247) and drops the t-stat from 12.2 to 8.2. Here every p-value still clears 0.001, but for a weaker effect this could flip significance. Default to clustering at the level where errors travel together.</p>
 <style type="text/css">
@@ -483,7 +483,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">One worker intercept each: the union premium halves and <span class="math inline">\(R^2\)</span> more than triples.</span></p>
+<p><span class="takeaway fragment">One worker intercept each: the union premium halves and <span class="math inline">\(R^2\)</span> more than triples.</span></p>
 <aside class="notes">
 <p>Vella–Verbeek NLSY panel: 545 young men over 8 years, 4,360 rows. One-way FE cuts the union premium 18.3% → 7.8% — over half the raw association was who selects into unions, not what unions do. R² jumps 0.175 → 0.605. The price: educ, black, hisp are perfectly collinear with worker dummies and silently dropped.</p>
 <style type="text/css">
@@ -538,7 +538,7 @@
 <h2>CRE swaps entity dummies for career averages and buys education back</h2>
 <p><span class="math display">\[\ln(wage_{it}) = \beta X_{it} + \gamma Z_i + \pi \bar{X}_i + \epsilon_{it}\]</span></p>
 <p>Replace 545 worker dummies with each worker’s career averages <span class="math inline">\(\bar{X}_i\)</span>.</p>
-<p><span class="comment">Time-varying <span class="math inline">\(\hat\beta\)</span> still match one-way FE; the time-invariant <span class="math inline">\(\gamma\)</span> become estimable again.</span></p>
+<p><span class="takeaway fragment">Time-varying <span class="math inline">\(\hat\beta\)</span> still match one-way FE; the time-invariant <span class="math inline">\(\gamma\)</span> become estimable again.</span></p>
 <aside class="notes">
 <p>The Mundlak (1978) device. The individual means proxy for the unobserved effect α_i, so once they are controlled the time-invariant variables are no longer collinear with anything. CRE assumes α_i is a linear function of the career averages — stronger than FE’s unrestricted α_i, but it recovers education and race.</p>
 <style type="text/css">

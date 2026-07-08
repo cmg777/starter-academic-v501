@@ -88,7 +88,7 @@ The spoiler figure. Don't explain every bar yet — just plant that the estimato
 - **Window** — restricted to **2010 and 2012**, so $T = 2$ and the panel is balanced
 :::
 
-[With $T = 2$, every worker contributes exactly two rows — the cleanest setting to see that first-differences and the within estimator are the *same thing*.]{.comment}
+[With $T = 2$, every worker contributes exactly two rows — the cleanest setting to see that first-differences and the within estimator are the *same thing*.]{.takeaway .fragment}
 
 ::: {.notes}
 NLSY-style data on US workers; the full file has five waves (2010–2018) but we keep two for pedagogical clarity. 4,398 worker-year observations, balanced. The low unionization rate (16.3%) matters: any estimator that leans on cross-sectional variation is working mostly with non-union workers.
@@ -117,7 +117,7 @@ NLSY-style data on US workers; the full file has five waves (2010–2018) but we
 :::
 ::::
 
-[Hausman and the Mundlak term are the formal tests for choosing between the two camps.]{.comment}
+[Hausman and the Mundlak term are the formal tests for choosing between the two camps.]{.takeaway .fragment}
 
 ::: {.notes}
 This columns slide replaces the post's Mermaid decision diagram (Quarto revealjs does not bundle mermaid.js, so a fenced mermaid block would render as raw text). The left side leans on between-worker variation; the right side on within-worker variation. CRE/Mundlak sits in the middle and recovers both. We will run both specification tests and they agree.
@@ -147,7 +147,7 @@ print(fit_pols.coef()["union"])   # 0.0750
 # Union coefficient: 0.0750  (SE 0.0231)
 ```
 
-[Highly significant ($t \approx 3.25$) — and almost certainly biased if ability selects out of union jobs.]{.comment}
+[Highly significant ($t \approx 3.25$) — and almost certainly biased if ability selects out of union jobs.]{.takeaway .fragment}
 
 ::: {.notes}
 POLS treats every worker-year as independent, ignoring the panel. 7.5 log points, SE 2.3. This is the textbook cross-sectional answer and the number a naive analyst reports. The rest of the post is a tour through ways of subtracting the selection bias out. Between is its near-twin (0.066) because 94% of union variance is between-worker.
@@ -159,7 +159,7 @@ $$y_{i,2012} - y_{i,2010} = \beta\,(x_{i,2012} - x_{i,2010}) + (u_{i,2012} - u_{
 
 The worker-specific effect $\alpha_i$ — ability, schooling, gender — *cancels in the subtraction*. What is left is identified only by workers who **changed** union status.
 
-[FDFE $= 0.2113$ (SE 0.079); the SE is $3.4\times$ larger than POLS — the switcher-only signature.]{.comment}
+[FDFE $= 0.2113$ (SE 0.079); the SE is $3.4\times$ larger than POLS — the switcher-only signature.]{.takeaway .fragment}
 
 ::: {.notes}
 Start from y_it = α_i + β x_it + u_it; difference across the two periods and α_i drops out. The point estimate is almost three times POLS (0.211 vs 0.075) with a wide CI [≈0.06, 0.37] that still excludes zero. Workers who switch into unions are a different population from always-union workers, so the within parameter is genuinely different — and arguably cleaner.
@@ -181,7 +181,7 @@ fit_dvfe = pf.feols("lwage ~ union + C(ID_str)", data=df, vcov="HC1") # 2,198 du
 # Both → 0.2103;  FDFE → 0.2113 (the +0.001 is an intercept-driven year trend)
 ```
 
-[Within transformation, first-differences, and dummy-variable FE are three recipes for the **same dish**. Absorption (`| ID`) is just the fast one.]{.comment}
+[Within transformation, first-differences, and dummy-variable FE are three recipes for the **same dish**. Absorption (`| ID`) is just the fast one.]{.takeaway .fragment}
 
 ::: {.notes}
 DVFE with N−1 = 2,198 worker dummies recovers 0.2103 exactly. Modern software prefers absorption purely for speed: 2,199 dummies still runs fast, but at N = 100,000 the dummy spec is prohibitive while absorbed FE stays trivial. The FDFE +0.001 gap closes once we add a year effect — that is two-way FE, next.
@@ -194,7 +194,7 @@ fit_twfe = pf.feols("lwage ~ union + age | ID + year", data=df, vcov={"CRV1": "I
 # Union coefficient: 0.2129  (SE 0.0793)
 ```
 
-[Absorbing the year effect removes the aggregate wage trend FD's intercept was capturing. Time-invariant regressors (schooling, female) are *silently absorbed*.]{.comment}
+[Absorbing the year effect removes the aggregate wage trend FD's intercept was capturing. Time-invariant regressors (schooling, female) are *silently absorbed*.]{.takeaway .fragment}
 
 ::: {.notes}
 TWFE = 0.2129, all but identical to one-way FE because with T = 2 the time effect is small. The +0.002 vs FE is exactly the trend FD's intercept absorbed. You cannot identify the effect of something that does not change within a worker — which is why applied researchers reach for CRE/Mundlak when they want within identification AND coefficients on time-invariant variables.
@@ -208,7 +208,7 @@ fit_re = RandomEffects(df_re["lwage"], exog).fit(cov_type="robust")
 # Union coefficient: 0.1092  (SE 0.0299)
 ```
 
-[RE is a variance-weighted average of between and within. With only 9% within, it leans toward the *between* picture — and SE is $2.7\times$ tighter than FE.]{.comment}
+[RE is a variance-weighted average of between and within. With only 9% within, it leans toward the *between* picture — and SE is $2.7\times$ tighter than FE.]{.takeaway .fragment}
 
 ::: {.notes}
 RE treats α_i as a random draw uncorrelated with the regressors and uses GLS to blend within and between efficiently. Here it lands at 0.109, squarely between POLS (0.075) and FE (0.210), leaning toward POLS because within variation is thin. The SE (0.030) is striking — but that precision is real only if individual effects are uncorrelated with union status. The FE–POLS gap suggests they are not, so the precision is bought with bias.
@@ -220,7 +220,7 @@ $$H = (\hat\beta_{\mathrm{FE}} - \hat\beta_{\mathrm{RE}})'\,[V_{\mathrm{FE}} - V
 
 If FE and RE disagree a lot, $H$ is large and RE is suspect. Here $H = 1.79$, $p = 0.180$ — *fail to reject*.
 
-[But $H$ has low power exactly when within variation is thin: a noisy FE inflates $V_{\mathrm{FE}}$ and shrinks $H$ mechanically.]{.comment}
+[But $H$ has low power exactly when within variation is thin: a noisy FE inflates $V_{\mathrm{FE}}$ and shrinks $H$ mechanically.]{.takeaway .fragment}
 
 ::: {.notes}
 β_FE − β_RE = +0.101, a real gap, yet H = 1.79 on 1 df gives p = 0.180 > 0.05, so the textbook script says "use RE." Take that verdict with a grain of salt: the large V_FE in the denominator is doing the work, not RE's consistency. The Mundlak alternative tells the same story with more nuance, next.
@@ -232,7 +232,7 @@ $$y_{it} = \alpha + \beta\,x_{it} + \gamma\,\bar{x}_i + u_{it}$$
 
 Add each worker's **mean** union exposure $\bar{x}_i$, then run RE. The within coefficient $\beta$ equals FE; the mean coefficient $\gamma$ tests whether $\alpha_i$ correlates with $x$.
 
-[CRE within $= 0.2103$ (matches FE exactly); Mundlak term $\gamma = -0.144$, $p = 0.072$ — borderline, hinting at negative selection.]{.comment}
+[CRE within $= 0.2103$ (matches FE exactly); Mundlak term $\gamma = -0.144$, $p = 0.072$ — borderline, hinting at negative selection.]{.takeaway .fragment}
 
 ::: {.notes}
 Mundlak (1978) proved β here is numerically identical to FE — and it is, to four decimals (0.2103). The γ on union_bar is −0.144, p = 0.072: workers with higher average union exposure earn less even after conditioning on within changes, consistent with lower-wage workers selecting into unions. Same direction as Hausman, but it reaches the borderline zone because it doesn't fight the same noise penalty.
@@ -263,7 +263,7 @@ The Act-III payoff. Cross-sectional methods say 7–11%; within methods say ~21%
 | FE      | [0.2103]{.key}      | 0.0812 | within demeaned |
 | CRE     | 0.2103              | 0.0703 | RE + Mundlak (= within) |
 
-[Cross-sectional 7–11% · within ~21%. Standard errors swing inversely — the within camp is noisier but causally cleaner.]{.comment}
+[Cross-sectional 7–11% · within ~21%. Standard errors swing inversely — the within camp is noisier but causally cleaner.]{.takeaway .fragment}
 
 ::: {.notes}
 The payoff table. The six methods cluster into two camps roughly three-fold apart. Cross-sectional methods are 2–3× more precise but identify a biased (under our hypothesis) parameter; within methods are noisier but cleaner under weaker assumptions. Reporting both estimands side by side is more honest than picking one.

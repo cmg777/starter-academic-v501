@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Difference-in-Differences in Python</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -267,7 +267,7 @@
 <h2>DiD estimates the ATT — the effect on the units that actually got treated</h2>
 <p><span class="math display">\[\text{ATT} = E[Y^1_k - Y^0_k \mid \text{Post}]\]</span></p>
 <p>The average gap between what treated units experienced and what they <em>would have</em> experienced without the policy.</p>
-<p><span class="comment"><span class="math inline">\(E[Y^0_k\mid\text{Post}]\)</span> — the treated group’s untreated outcome — is a counterfactual we never observe. DiD reconstructs it from the control group.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(E[Y^0_k\mid\text{Post}]\)</span> — the treated group’s untreated outcome — is a counterfactual we never observe. DiD reconstructs it from the control group.</span></p>
 <aside class="notes">
 <p>The fundamental problem of causal inference: for any one unit we see only one potential outcome. We give up on individual effects and target the average over the treated subpopulation. ATT, not ATE — this is the policy-relevant quantity: did it help the people it was aimed at?</p>
 <style type="text/css">
@@ -286,7 +286,7 @@
 <h2>Difference twice: kill the level gap, then kill the common trend</h2>
 <p><span class="math display">\[\hat{\delta}^{2 \times 2}_{kU} = \big( \bar{Y}_k^{Post} - \bar{Y}_k^{Pre} \big) - \big( \bar{Y}_U^{Post} - \bar{Y}_U^{Pre} \big)\]</span></p>
 <p>The first difference removes time-invariant differences between groups; the second removes the trend common to both.</p>
-<p><span class="comment">Algebra splits this into <span class="math inline">\(\underbrace{\text{ATT}}\)</span> plus a <span class="math inline">\(\underbrace{\text{non-parallel-trends bias}}\)</span>. The bias vanishes exactly when parallel trends holds.</span></p>
+<p><span class="takeaway fragment">Algebra splits this into <span class="math inline">\(\underbrace{\text{ATT}}\)</span> plus a <span class="math inline">\(\underbrace{\text{non-parallel-trends bias}}\)</span>. The bias vanishes exactly when parallel trends holds.</span></p>
 <aside class="notes">
 <p>The Cunningham (2021) decomposition: the 2×2 estimator equals the ATT plus a bias term comparing the untreated trajectories of the two groups. If their untreated outcomes would have moved in parallel, the bias is zero and DiD cleanly identifies the ATT.</p>
 <style type="text/css">
@@ -305,7 +305,7 @@
 <h2>Parallel trends is about slopes, not levels — and it is fundamentally untestable</h2>
 <p><span class="math display">\[E[Y^0_k|\text{Post}] - E[Y^0_k|\text{Pre}] = E[Y^0_U|\text{Post}] - E[Y^0_U|\text{Pre}]\]</span></p>
 <p>Two cities can sit at different score <em>levels</em>; DiD only needs them to have been <em>rising at the same speed</em> absent treatment.</p>
-<p><span class="comment">We can check pre-treatment trends, but never the post-treatment counterfactual — which is why Act III brings sensitivity analysis.</span></p>
+<p><span class="takeaway fragment">We can check pre-treatment trends, but never the post-treatment counterfactual — which is why Act III brings sensitivity analysis.</span></p>
 <aside class="notes">
 <p>This is the load-bearing assumption. It does not require equal levels — only equal trends. And the post-treatment half is untestable because the treated group’s untreated outcome is never observed. Roth (2022) also warns that conditioning on passing a pre-test distorts later inference.</p>
 <style type="text/css">
@@ -327,7 +327,7 @@
 <li class="fragment"><strong>50 treated, 50 control</strong>; treatment switches on at period 5</li>
 <li class="fragment"><strong>True effect = 5.0</strong> baked in, so every estimate has a ground truth to hit</li>
 </ul>
-<p><span class="comment">A built-in <code>true_effect</code> column gives every estimate a known target to hit.</span></p>
+<p><span class="takeaway fragment">A built-in <code>true_effect</code> column gives every estimate a known target to hit.</span></p>
 <aside class="notes">
 <p>Using simulated data with a known effect is the pedagogical move: we can verify the estimator recovers the truth before trusting it on real data where the truth is unknown. The 2×2 crosstab is perfectly balanced — 250 observations in each of the four cells.</p>
 <style type="text/css">
@@ -444,7 +444,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><span class="math inline">\(t = 1.05\)</span>, <span class="math inline">\(p = 0.29\)</span> — fail to reject equal slopes. But <em>failing to reject is not confirming</em>: the test has low power with only 5 pre-periods.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(t = 1.05\)</span>, <span class="math inline">\(p = 0.29\)</span> — fail to reject equal slopes. But <em>failing to reject is not confirming</em>: the test has low power with only 5 pre-periods.</span></p>
 <aside class="notes">
 <p>The treated and control slopes differ by just 0.12, far from significant. This removes the most obvious objection to parallel trends but cannot prove it. With only 5 pre-treatment periods the test has limited power, and Roth (2022) shows pre-testing can distort later inference. That is precisely why HonestDiD enters in Act III.</p>
 <style type="text/css">
@@ -502,7 +502,7 @@
 <li class="fragment"><strong>90 never-treated</strong> units — a clean control group</li>
 <li class="fragment">Effects <strong>grow over time</strong> by construction (2.0 → 3.2 for the earliest cohort)</li>
 </ul>
-<p><span class="comment">TWFE fits one pooled <span class="math inline">\(\delta\)</span> — a weighted average of many 2×2 comparisons, some of them poisoned.</span></p>
+<p><span class="takeaway fragment">TWFE fits one pooled <span class="math inline">\(\delta\)</span> — a weighted average of many 2×2 comparisons, some of them poisoned.</span></p>
 <aside class="notes">
 <p>The TWFE specification is Y_it = γ_i + λ_t + δ·D_it + ε_it. With a single treatment time, δ is correct. With staggered timing it becomes a weighted average of all pairwise 2×2 comparisons — and some of those use already-treated units as controls. When effects grow over time, that drags the estimate down.</p>
 <style type="text/css">
@@ -599,7 +599,7 @@
 <h2>Callaway–Sant’Anna rebuilds the estimate from clean group-time ATTs only</h2>
 <p><span class="math display">\[\text{ATT}(g,t) = E[Y_t - Y_{g-1}\mid G=g] - E[Y_t - Y_{g-1}\mid G=\infty]\]</span></p>
 <p>Each building block is a 2×2 that compares cohort <span class="math inline">\(g\)</span> against the <strong>never-treated</strong> group only — every forbidden comparison eliminated by construction.</p>
-<p><span class="comment">A <em>doubly robust</em> version reweights controls (propensity) <strong>and</strong> models their outcome change (regression): valid if <em>either</em> is right.</span></p>
+<p><span class="takeaway fragment">A <em>doubly robust</em> version reweights controls (propensity) <strong>and</strong> models their outcome change (regression): valid if <em>either</em> is right.</span></p>
 <aside class="notes">
 <p>CS computes a separate ATT for each cohort g and calendar period t, using only never-treated controls, then aggregates with valid weights. The doubly robust estimator is belt-and-suspenders: inverse-probability weighting plus outcome regression, consistent if either model is correctly specified.</p>
 <style type="text/css">
@@ -711,7 +711,7 @@
 <section id="the-ci-stays-above-zero-even-when-violations-are-15-the-worst-pre-trend" class="slide level2 center">
 <h2>The CI stays above zero even when violations are 15× the worst pre-trend</h2>
 
-<img data-src="../did_honest_sensitivity.png" class="r-stretch quarto-figure-center"><p class="caption">Robust 95% CI (steel band) widening with M; ATT (teal) flat at 2.41; the lower bound is still positive (0.38) at the M = 15 grid edge (orange line).</p><p><span class="comment">At <span class="math inline">\(M=0\)</span>: CI [2.53, 2.66]. At <span class="math inline">\(M=15\)</span>: CI [0.38, 4.81] — still excludes zero.</span></p>
+<img data-src="../did_honest_sensitivity.png" class="r-stretch quarto-figure-center"><p class="caption">Robust 95% CI (steel band) widening with M; ATT (teal) flat at 2.41; the lower bound is still positive (0.38) at the M = 15 grid edge (orange line).</p><p><span class="takeaway fragment">At <span class="math inline">\(M=0\)</span>: CI [2.53, 2.66]. At <span class="math inline">\(M=15\)</span>: CI [0.38, 4.81] — still excludes zero.</span></p>
 <aside class="notes">
 <p>The band expands symmetrically as M grows. At M = 10 the lower bound is still 1.10; at M = 15 it is 0.38 — the grid edge, with the true breakdown lying even further out. In applied work a breakdown above M = 3 is considered strong. This result clears that bar five times over.</p>
 <style type="text/css">
@@ -772,7 +772,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Always report the breakdown value alongside the estimate — here <span class="math inline">\(M = 15\)</span>, exceptionally robust.</span></p>
+<p><span class="takeaway fragment">Always report the breakdown value alongside the estimate — here <span class="math inline">\(M = 15\)</span>, exceptionally robust.</span></p>
 <aside class="notes">
 <p>The classic estimator nails 5.0 when timing is uniform. Under staggered timing, naive TWFE is biased to 2.18; CS corrects it to 2.41 and reveals the growth dynamics; HonestDiD certifies robustness at M = 15. Caveats: synthetic data, linearly-growing effects, no spillovers — real applications need covariates and additional robustness checks.</p>
 <style type="text/css">

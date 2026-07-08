@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>PCA for Development Indicators</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -285,7 +285,7 @@
 <li class="fragment"><strong>Step 5</strong> — Scoring: project onto PC1</li>
 <li class="fragment"><strong>Step 6</strong> — Normalization: rescale to <span class="math inline">\([0, 1]\)</span></li>
 </ul>
-<p><span class="comment">No step can be skipped — each one feeds the next.</span></p>
+<p><span class="takeaway fragment">No step can be skipped — each one feeds the next.</span></p>
 <aside class="notes">
 <p>This is the spine of the whole talk. The mermaid pipeline in the post is this list. Standardization is the prerequisite that makes “years” and “rates” comparable; eigen-decomposition is the mathematical core.</p>
 <style type="text/css">
@@ -304,7 +304,7 @@
 <h2>Step 1 — flip infant mortality so “up” always means “better”</h2>
 <p><span class="math display">\[IM_i^{*} = -1 \times IM_i\]</span></p>
 <p>Multiply the “more is bad” indicator by <span class="math inline">\(-1\)</span> — now bigger always means healthier.</p>
-<p><span class="comment">The raw correlation flips from <span class="math inline">\(-0.96\)</span> to <span class="math inline">\(+0.96\)</span>; same relationship, properly aligned.</span></p>
+<p><span class="takeaway fragment">The raw correlation flips from <span class="math inline">\(-0.96\)</span> to <span class="math inline">\(+0.96\)</span>; same relationship, properly aligned.</span></p>
 <aside class="notes">
 <p>A large value of IM* now means <em>low</em> infant mortality — a good outcome. Analogy from the post: averaging exam scores where one professor grades 0–100 (higher better) and another grades demerits (lower better). You must flip the demerit scale first. Country_01’s infant mortality 18.6 becomes -18.6, now read as “18.6 units of infant survival.”</p>
 <style type="text/css">
@@ -323,7 +323,7 @@
 <h2>Step 2 — standardize so years and rates share one ruler</h2>
 <p><span class="math display">\[Z_{ij} = \frac{X_{ij} - \bar{X}_j}{\sigma_j}\]</span></p>
 <p>Subtract the mean, divide by the SD — both indicators become <strong>mean 0, SD 1</strong> and directly comparable.</p>
-<p><span class="comment">We use the population SD (<span class="math inline">\(\sigma\)</span>, ddof=0): PCA treats the dataset as the full population.</span></p>
+<p><span class="takeaway fragment">We use the population SD (<span class="math inline">\(\sigma\)</span>, ddof=0): PCA treats the dataset as the full population.</span></p>
 <aside class="notes">
 <p>The z-scores are now unitless, so years and rates share one ruler. Without this, infant mortality would dominate purely because its physical spread (3.5–58.7) is wider than life expectancy’s (54.9–84.7). After z-scoring, a country 2 SD above average in longevity is directly comparable to one 2 SD above in survival. Note describe() reports std 8.62 (ddof=1) vs 8.53 here (ddof=0) — same data, different denominator.</p>
 <style type="text/css">
@@ -342,7 +342,7 @@
 <h2>Step 3 — for standardized data, covariance <em>is</em> correlation</h2>
 <p><span class="math display">\[\Sigma = \frac{1}{n} Z^\top Z = \begin{pmatrix} 1 &amp; r \\ r &amp; 1 \end{pmatrix}\]</span></p>
 <p>Standardized data puts <strong>1s on the diagonal</strong> and the <strong>correlation <span class="math inline">\(r\)</span> off-diagonal</strong>.</p>
-<p><span class="comment">Here the off-diagonal is <span class="math inline">\(r = 0.96\)</span> — the two indicators move almost in lockstep.</span></p>
+<p><span class="takeaway fragment">Here the off-diagonal is <span class="math inline">\(r = 0.96\)</span> — the two indicators move almost in lockstep.</span></p>
 <aside class="notes">
 <p>With two variables, PCA only has to decompose this single 2×2 matrix. The covariance matrix quantifies the overlap and tells the algorithm: these two variables share a lot of redundant information, so you can compress them with little loss. 96% of the movement in one is mirrored by the other.</p>
 <style type="text/css">
@@ -361,7 +361,7 @@
 <h2>Step 4 — eigen-decomposition finds the direction of maximum spread</h2>
 <p><span class="math display">\[\Sigma \mathbf{v} = \lambda \mathbf{v}\]</span></p>
 <p><strong>Eigenvector</strong> <span class="math inline">\(\mathbf{v}\)</span> = direction of greatest spread (the index weights). <strong>Eigenvalue</strong> <span class="math inline">\(\lambda\)</span> = variance along it.</p>
-<p><span class="comment">For a <span class="math inline">\(2\times2\)</span> correlation matrix: <span class="math inline">\(\lambda_1 = 1 + r\)</span>, <span class="math inline">\(\lambda_2 = 1 - r\)</span>.</span></p>
+<p><span class="takeaway fragment">For a <span class="math inline">\(2\times2\)</span> correlation matrix: <span class="math inline">\(\lambda_1 = 1 + r\)</span>, <span class="math inline">\(\lambda_2 = 1 - r\)</span>.</span></p>
 <aside class="notes">
 <p>Imagine plotting all 50 countries with standardized life expectancy on x and infant survival on y — a narrow diagonal cloud. PC1 is a line through its long axis (maximum separation between countries); PC2 is perpendicular (countries bunch up, little information). Eigen-decomposition removes human bias: the math, not a guess, picks the optimal weights.</p>
 <style type="text/css">
@@ -436,7 +436,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><span class="math inline">\(0.7071 \approx 1/\sqrt{2}\)</span> — a mathematical certainty for any two standardized variables, regardless of <span class="math inline">\(r\)</span>.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(0.7071 \approx 1/\sqrt{2}\)</span> — a mathematical certainty for any two standardized variables, regardless of <span class="math inline">\(r\)</span>.</span></p>
 <aside class="notes">
 <p>This is the key teaching point. A 2x2 correlation matrix always has eigenvectors [1/sqrt2, 1/sqrt2] and [1/sqrt2, -1/sqrt2] — the correlation only changes the eigenvalues (how much variance), never the weights. So PC1 here is just a scaled average of the two z-scores. With 3+ variables the weights diverge, and that is where PCA earns its keep.</p>
 <style type="text/css">
@@ -492,7 +492,7 @@
 <h2>Step 6 — rescale to [0, 1] so a policymaker can read it</h2>
 <p><span class="math display">\[HI_i = \frac{PC1_i - PC1_{\min}}{PC1_{\max} - PC1_{\min}}\]</span></p>
 <p>Min-max scaling: worst → <strong>0</strong>, best → <strong>1</strong>, everyone proportional between.</p>
-<p><span class="comment">Country_01’s PC1 of 1.27 becomes a Health Index of 0.77 — “better than 77% of the scale.”</span></p>
+<p><span class="takeaway fragment">Country_01’s PC1 of 1.27 becomes a Health Index of 0.77 — “better than 77% of the scale.”</span></p>
 <aside class="notes">
 <p>You cannot publish “this country scores -2.39.” Normalization forces the worst to 0 and the best to 1, producing a purely data-driven index that is instantly understandable. The mean Health Index is 0.50 — close to 0.5 by symmetry.</p>
 <style type="text/css">

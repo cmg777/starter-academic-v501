@@ -86,7 +86,7 @@ Spoiler figure. Don't explain every bar yet — just plant that for the SAME reg
 - **Errors** — within-firm AR(1) serial correlation, $\rho = 0.5$
 :::
 
-[Because ability drives both $x$ and $y$, pooled OLS is *biased by design* — and AR(1) errors make SE choice critical.]{.comment}
+[Because ability drives both $x$ and $y$, pooled OLS is *biased by design* — and AR(1) errors make SE choice critical.]{.takeaway .fragment}
 
 ::: {.notes}
 Simulated data has a decisive advantage: we know the answer. If the true effect is exactly 0.5, we can check whether each SE estimator's 95% CI covers 0.5 about 95% of the time. The DGP: y = 2.0 + 0.5·x + mu_i + lambda_t + eps_it, with mu_i correlated with x.
@@ -120,7 +120,7 @@ Left panel: each firm occupies a different region of x–y space — that's betw
 |---|---:|---:|---:|
 | Pooled OLS (conventional) | [1.0318]{.key} | 0.0345 | 29.9 |
 
-[The estimate is *wrong*, and the tiny SE makes us wrongly confident in the wrong number.]{.comment}
+[The estimate is *wrong*, and the tiny SE makes us wrongly confident in the wrong number.]{.takeaway .fragment}
 
 ::: {.notes}
 Omitted-variable bias in action: high-ability firms invest more in R&D and perform better, so the regression credits R&D for what ability does. The conventional SE of 0.0345 yields a t of 29.9 — doubly misleading: biased point estimate AND a too-small SE that ignores within-firm correlation. First lesson: a biased estimator with small SEs is worse than a noisy unbiased one.
@@ -130,7 +130,7 @@ Omitted-variable bias in action: high-ability firms invest more in R&D and perfo
 
 $$\hat{\Sigma}_{\text{White}} = (X'X)^{-1}\left(\sum_{i=1}^{N} X_i'\,\hat{e}_i^{\,2}\,X_i\right)(X'X)^{-1}$$
 
-[White SE = 0.0361 vs conventional 0.0345 — the $t$ slips only from 29.9 to 28.6.]{.comment}
+[White SE = 0.0361 vs conventional 0.0345 — the $t$ slips only from 29.9 to 28.6.]{.takeaway .fragment}
 
 ::: {.notes}
 The White estimator allows each observation its own variance, but still treats observations as independent. It cannot see that firm 1's 2015 error correlates with its 2016 error. For panel data the binding problem is within-cluster correlation, so White helps almost nothing.
@@ -144,7 +144,7 @@ The White estimator allows each observation its own variance, but still treats o
 | White (HC) | 1.0318 | 0.0361 | 28.6 |
 | Cluster: entity | 1.0318 | [0.0621]{.key} | 16.6 |
 
-[Ten observations from one firm carry far less than ten independent observations' worth of information.]{.comment}
+[Ten observations from one firm carry far less than ten independent observations' worth of information.]{.takeaway .fragment}
 
 ::: {.notes}
 Entity clustering allows arbitrary correlation within a firm. The SE jumps to 0.0621 — 80% above conventional, nearly double White. The t falls from 29.9 to 16.6. Analogy: surveying 100 students across 10 classrooms gives you closer to 10 independent data points than 100. In a weaker-effect setting this correction could flip "significant" to "insignificant."
@@ -158,7 +158,7 @@ Entity clustering allows arbitrary correlation within a firm. The SE jumps to 0.
 | Cluster: time (10 groups) | 1.0318 | [0.0168]{.key} | 61.3 |
 | Cluster: both | 1.0318 | 0.0532 | 19.4 |
 
-[Cluster on the dimension with $\ge 40$–$50$ groups. Here that is firms (100), not years (10).]{.comment}
+[Cluster on the dimension with $\ge 40$–$50$ groups. Here that is firms (100), not years (10).]{.takeaway .fragment}
 
 ::: {.notes}
 Time-clustered SEs are SMALLER than conventional, and t leaps to 61 — a trap. Clustered SEs rely on large-cluster asymptotics; 10 year-clusters is far too few. Two-way clustering (0.0532) sits between entity-only and time-only because the weak time dimension drags it down.
@@ -203,7 +203,7 @@ The core visual message. All five pooled OLS intervals sit far to the right of 0
 |---|---:|---:|---:|
 | Pooled (Driscoll-Kraay, BW=3) | 1.0318 | [0.0158]{.key} | 65.4 |
 
-[Smallest SE in the deck — because firms are independent given their fixed effects *in this DGP*.]{.comment}
+[Smallest SE in the deck — because firms are independent given their fixed effects *in this DGP*.]{.takeaway .fragment}
 
 ::: {.notes}
 Driscoll-Kraay uses a Newey-West time kernel on cross-sectional averages — robust to spatial/cross-sectional dependence and serial correlation. Here cross-sectional dependence is weak, so DK is tiny. With strong common shocks (e.g. banks in a recession) and a long T, DK becomes the macro-panel standard. cov_type="kernel", kernel="bartlett", bandwidth=3.

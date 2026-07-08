@@ -75,7 +75,7 @@ The Arellano-Bond (1991) panel: 140 UK manufacturing firms, 1,031 firm-years, un
 
 $$n_{it} = \rho\, n_{i,t-1} + \beta_1 w_{it} + \beta_2 w_{i,t-1} + \beta_3 k_{it} + \beta_4 k_{i,t-1} + \alpha_i + \delta_t + \varepsilon_{it}$$
 
-[A *lagged dependent variable* sits on the right while the firm effect $\alpha_i$ sits in the error. By construction $n_{i,t-1}$ depends on $\alpha_i$ — so the regressor is correlated with the error, no matter how many controls we add.]{.comment}
+[A *lagged dependent variable* sits on the right while the firm effect $\alpha_i$ sits in the error. By construction $n_{i,t-1}$ depends on $\alpha_i$ — so the regressor is correlated with the error, no matter how many controls we add.]{.takeaway .fragment}
 
 ::: {.notes}
 Blundell and Bond's (1998) dynamic labor-demand equation on this very dataset: log employment n on its own lag, current and lagged log real wage w and log capital k, a firm effect α_i, year effects δ_t. A firm with a high permanent level had high employment last year too — so the endogeneity is mechanical, not an omitted-variable accident. Important framing: ρ is a descriptive/structural persistence parameter, not a causal effect — no treatment, no ATE/ATT. Identification will rest on sequential exogeneity and no serial correlation in ε, partially testable via AR(2) and Hansen.
@@ -139,7 +139,7 @@ First-difference away $\alpha_i$, then instrument $\Delta n_{i,t-1}$ with the le
 |---|---:|---:|:---:|
 | $\hat\rho$ (Anderson-Hsiao 2SLS) | [1.233]{.key} | 0.478 | [0.296, 2.170] |
 
-[The CI contains the whole bracket, the unit root, and explosive dynamics — all at once.]{.comment}
+[The CI contains the whole bracket, the unit root, and explosive dynamics — all at once.]{.takeaway .fragment}
 
 ::: {.notes}
 Anderson and Hsiao (1981): differencing kills α_i without touching future shocks, but Δn_{i,t-1} and Δε_it share ε_{i,t-1}, so we instrument with n_{i,t-2} — valid under sequential exogeneity. The point estimate is above the unit root, which nobody believes; the right reading is that ONE instrument extracts far too little information from a highly persistent series. The courtroom analogy: a single admissible witness whose testimony is valid but cannot convict. The fix is not a better witness but more of them — if n_{i,t-2} is valid, so is every deeper lag.
@@ -149,7 +149,7 @@ Anderson and Hsiao (1981): differencing kills α_i without touching future shock
 
 $$E\big[\,n_{i,t-s}\,\Delta\varepsilon_{it}\,\big] = 0 \qquad \text{for all } s \ge 2$$
 
-[Employment two or more years ago carries no information about this year's *change* in shocks — and the same holds for lagged $w$ and $k$. Dozens of moment conditions, combined optimally by GMM.]{.comment}
+[Employment two or more years ago carries no information about this year's *change* in shocks — and the same holds for lagged $w$ and $k$. Dozens of moment conditions, combined optimally by GMM.]{.takeaway .fragment}
 
 ::: {.notes}
 This is difference GMM (Arellano-Bond 1991): generalize Anderson-Hsiao from one moment condition to a whole family, with the GMM weighting matrix listening more carefully to the informative ones. With T = 9 the count reaches 91 instruments. Two-step GMM re-weights using first-step residuals — more efficient, but its naive SEs are badly downward-biased, so we quote the Windmeijer (2005) correction throughout.
@@ -183,7 +183,7 @@ pydynpd (Wu, Hua and Xu 2023) takes a Stata-style command string deliberately cl
 | AR(2) p | 0.866 |
 | Hansen p | 0.211 |
 
-[0.679 sits 0.053 above the FE floor of 0.626 — within one SE of the biased bound.]{.comment}
+[0.679 sits 0.053 above the FE floor of 0.626 — within one SE of the biased bound.]{.takeaway .fragment}
 
 ::: {.notes}
 Every diagnostic passes: AR(1) rejects as it mechanically must, AR(2) is nowhere near rejecting, Hansen is comfortable. Yet Bond's informal diagnostic fails loudly: the estimate sits in the bottom sixth of the bracket, hugging the FE bound. The mechanism: when the true series is highly persistent, the level two years ago barely predicts this year's CHANGE — a near-random-walk changes unpredictably — so all 91 instruments are individually weak, and weak-instrument bias in this design points toward the within estimator. Blundell and Bond demonstrated precisely this failure on precisely this dataset. An estimator that passes every formal test while giving a suspect answer is the single most valuable lesson of the tutorial.
@@ -193,7 +193,7 @@ Every diagnostic passes: AR(1) rejects as it mechanically must, AR(2) is nowhere
 
 $$E\big[\,\Delta n_{i,t-1}\,(\alpha_i + \varepsilon_{it})\,\big] = 0$$
 
-[Even for a persistent series, last year's *change* is informative about this year's *level*. The price is one new assumption — **mean stationarity**: firms' initial deviations from their steady states must be unrelated to $\alpha_i$.]{.comment}
+[Even for a persistent series, last year's *change* is informative about this year's *level*. The price is one new assumption — **mean stationarity**: firms' initial deviations from their steady states must be unrelated to $\alpha_i$.]{.takeaway .fragment}
 
 ::: {.notes}
 System GMM stacks the differenced equation (keeping its Arellano-Bond instruments) with the original levels equation, instrumented by lagged differences. The lake analogy: learning a lake's depth from ripples alone (differences) vs also using waterline marks on the shore (levels) — when the lake is calm, the ripples carry almost no information. Mean stationarity is untestable directly, but the Hansen test gets indirect bite because the levels moments are overidentifying. We also collapse instruments to 32 — safely below Roodman's rule that instruments should not outnumber the 140 firms.
@@ -250,7 +250,7 @@ AR(1): differencing makes adjacent errors overlap — Δε_it and Δε_{i,t−1}
 | 2:99 | no | 113 | 0.930 | 0.235 |
 | 2:99 | yes | 32 | 0.927 | 0.462 |
 
-[Same model six times; only the plumbing changes. Uncollapsed 2:3 is *rejected* (p = 0.035) while its collapsed twin *passes* — driven purely by instrument count.]{.comment}
+[Same model six times; only the plumbing changes. Uncollapsed 2:3 is *rejected* (p = 0.035) while its collapsed twin *passes* — driven purely by instrument count.]{.takeaway .fragment}
 
 ::: {.notes}
 The experiment: re-estimate the identical system-GMM model varying only the lag window and collapsing. Reassuring: ρ̂ barely moves — all six cells in [0.921, 0.956]. Unsettling: the test we would use to DEFEND it is not stable. Reading the uncollapsed rows, the count climbs 68 → 95 → 113 (approaching the 140-firm ceiling) and Hansen drifts 0.035 → 0.186 → 0.235 mechanically. The endpoint of that trajectory is the notorious "Hansen p = 1.000" red flag. (The full grid with SEs and AR(2) is in the post; the 2:5 collapsed row, 23 instruments, p = 0.255, is omitted here for space.)
@@ -272,7 +272,7 @@ The teal diamonds buy nearly identical point estimates with a quarter of the ins
 | Hansen $\chi^2$ | 32.666 | 32.666 |
 | Instruments | 42 | 42 |
 
-[Exact match under a hard assertion — the NumPy-2 compatibility shim perturbs nothing.]{.comment}
+[Exact match under a hard assertion — the NumPy-2 compatibility shim perturbs nothing.]{.takeaway .fragment}
 
 ::: {.notes}
 Before trusting novel output from a patched package, replicate its published benchmark: the pydynpd README's original Arellano-Bond two-lag specification on this same data, itself validated against Stata's xtabond2. The much lower 0.271 is NOT a contradiction of 0.927 — it is difference GMM (same weak-instrument drag as before) on a different, two-lag specification with a restricted instrument window. "The" persistence estimate is always joint with the specification and estimator. Also note AR(1) does not reject here (p = 0.198): with two lags soaking up the dynamics, even the mechanical correlation is muted — diagnostics must be read against the model, not a universal rulebook.

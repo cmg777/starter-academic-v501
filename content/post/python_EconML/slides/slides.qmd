@@ -66,7 +66,7 @@ The resource-curse literature argues the answer hinges on local institutional qu
 | Mining vs none (1-0) | [0.109]{.key} | 0.250 | −0.141 |
 | High vs low price (3-1) | 0.413 | 0.300 | +0.113 |
 
-[Mining districts differ systematically — worse geography, weaker institutions — so a raw difference-in-means confounds selection with effect.]{.comment}
+[Mining districts differ systematically — worse geography, weaker institutions — so a raw difference-in-means confounds selection with effect.]{.takeaway .fragment}
 
 ::: {.notes}
 The naive 1-0 estimate of 0.109 is a 56% underestimate of the true 0.250. Mining districts have characteristics that independently depress development, biasing the simple comparison downward. This is the bias the causal forest must remove.
@@ -76,7 +76,7 @@ The naive 1-0 estimate of 0.109 is a 56% underestimate of the true 0.250. Mining
 
 $$\tau(\mathbf{x}) = E\{Y_i(1) - Y_i(0) \mid \mathbf{X}_i = \mathbf{x}\}$$
 
-[Where $\tau(\cdot)$ bends with $\mathbf{x}$, mining helps some districts more than others — that bend is the whole point.]{.comment}
+[Where $\tau(\cdot)$ bends with $\mathbf{x}$, mining helps some districts more than others — that bend is the whole point.]{.takeaway .fragment}
 
 ::: {.notes}
 Estimand: the Conditional Average Treatment Effect. Read it as: among districts that look like x, what is the average gap between the treated and untreated potential outcomes? When τ is constant in x, one ATE summarizes everything. When it bends, we have heterogeneity. The causal forest estimates that bend without us pre-specifying its shape.
@@ -104,7 +104,7 @@ Estimand: the Conditional Average Treatment Effect. Read it as: among districts 
 - **Ground truth built in** — so we can check the method recovers it
 :::
 
-[Structure mirrors Hodler, Lechner & Raschky (2023); because we built the data, the identifying assumption holds by construction.]{.comment}
+[Structure mirrors Hodler, Lechner & Raschky (2023); because we built the data, the identifying assumption holds by construction.]{.takeaway .fragment}
 
 ::: {.notes}
 Using simulated data with known parameters is the trick: we can verify the forest recovers the true ATEs. The DGP follows a real study so the structure is realistic, but the controlled setting lets us validate the methodology rather than debate the economics.
@@ -124,7 +124,7 @@ $$Y_i = \tau(\mathbf{X}_i)\, T_i + g_0(\mathbf{X}_i, \mathbf{W}_i) + \varepsilon
 
 $$T_i = m_0(\mathbf{X}_i, \mathbf{W}_i) + v_i$$
 
-[Subtract the predictable parts: $\tilde Y_i = \tau(\mathbf{X}_i)\,\tilde T_i + \varepsilon_i$. The nuisance functions $g_0, m_0$ exist only to be subtracted out.]{.comment}
+[Subtract the predictable parts: $\tilde Y_i = \tau(\mathbf{X}_i)\,\tilde T_i + \varepsilon_i$. The nuisance functions $g_0, m_0$ exist only to be subtracted out.]{.takeaway .fragment}
 
 ::: {.notes}
 Partially linear model (Robinson 1988; Chernozhukov et al. 2018). Estimate g0 and m0 with any flexible learner, residualize Y and T, then regress Y-tilde on T-tilde with a covariate-dependent slope. That slope is the CATE. This is Frisch-Waugh-Lovell with machine-learning residualizers.
@@ -134,7 +134,7 @@ Partially linear model (Robinson 1988; Chernozhukov et al. 2018). Estimate g0 an
 
 $$\left.\frac{\partial}{\partial \eta} E[\psi(W; \tau, \eta)] \right|_{\eta = \eta_0} = 0$$
 
-[At the truth, the estimating equation is *flat* in the nuisances. A 10% error in $\hat g_0$ enters $\hat\tau$ at order $(0.10)^2 \approx 0.01$ — second order.]{.comment}
+[At the truth, the estimating equation is *flat* in the nuisances. A 10% error in $\hat g_0$ enters $\hat\tau$ at order $(0.10)^2 \approx 0.01$ — second order.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the self-righting-boat property. Even if Gradient Boosting converges at the slow O(n^-1/4) rate, the second-stage estimate of tau stays root-n-consistent and asymptotically normal. A naive plug-in two-stage procedure loses this and inherits the slow nuisance rate.
@@ -164,7 +164,7 @@ honest=True separates the sample that chooses splits from the one that estimates
 
 $$\{Y_i(0), Y_i(1), Y_i(2), Y_i(3)\} \perp T_i \mid (\mathbf{X}_i, \mathbf{W}_i)$$
 
-[Conditional Independence: once we know a district's geography, institutions, country, and year, mining status is as good as random. *We built the data, so it holds here — in real data it is untestable.*]{.comment}
+[Conditional Independence: once we know a district's geography, institutions, country, and year, mining status is as good as random. *We built the data, so it holds here — in real data it is untestable.*]{.takeaway .fragment}
 
 ::: {.notes}
 The CIA, a.k.a. unconfoundedness or selection on observables. Two real-world violation channels: mineral surveys that predict both mining and unrelated infrastructure, and political connections that attract both concessions and roads. "We used a causal forest" does not relax the CIA — the method is only as credible as the controls.
@@ -202,7 +202,7 @@ The headline pedagogical point: residualizing against observed confounders is wh
 | High vs low (3-1) | [0.220]{.key} | 0.101 | 5% |
 | High vs medium (3-2) | 0.191 | 0.109 | 10% |
 
-[Flat from low to medium, then a jump at high prices — shape discovery with no functional form pre-specified.]{.comment}
+[Flat from low to medium, then a jump at high prices — shape discovery with no functional form pre-specified.]{.takeaway .fragment}
 
 ::: {.notes}
 Finding 2. The 2-1 interval [−0.137, 0.194] easily contains zero: medium prices add nothing detectable beyond basic mining. 3-1 is significant at 5%. The forest recovered the true price-response curve's qualitative shape — this is what causal ML buys you over a parametric interaction.
@@ -241,7 +241,7 @@ Finding 3b. The price-effect GATE spans only 0.045 with no monotone pattern. By 
 :::
 ::::
 
-[Quality of government tells the same story as executive constraints — robust to the institutional measure.]{.comment}
+[Quality of government tells the same story as executive constraints — robust to the institutional measure.]{.takeaway .fragment}
 
 ::: {.notes}
 The GATEs-by-quality-of-government plots reproduce the pattern: mining effect positively sloped, price effect flat. Two different institutional proxies, one conclusion — the moderation is in mining, not price.

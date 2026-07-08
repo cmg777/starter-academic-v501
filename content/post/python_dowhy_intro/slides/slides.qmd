@@ -89,7 +89,7 @@ Spoiler figure for the problem. The right-shifted WFH distribution is not all ca
 - **Instrument** — `subway_disruption` shifts WFH but never touches productivity directly
 :::
 
-[The estimand is the **average treatment effect (ATE)** — and we know it equals 1.0, so every method is graded against the truth.]{.comment}
+[The estimand is the **average treatment effect (ATE)** — and we know it equals 1.0, so every method is graded against the truth.]{.takeaway .fragment}
 
 ## Confounders open a backdoor path the naive estimate can't close
 
@@ -108,7 +108,7 @@ This is DoWhy Step 1 (Model) drawn as a DAG. The single arrow T→Y is the causa
 | **Estimate** | What's the number? | Regression, IPW, AIPW, IV |
 | **Refute** | Is it robust? | Placebo, random cause, subset |
 
-[Identification (a *causal* question about the graph) stays separate from estimation (a *statistical* question about the data).]{.comment}
+[Identification (a *causal* question about the graph) stays separate from estimation (a *statistical* question about the data).]{.takeaway .fragment}
 
 ## Step 2 — Identify: the backdoor estimand conditions on the confounders
 
@@ -116,7 +116,7 @@ $$ATE = E\!\left[\frac{\partial}{\partial T}\, E[\,Y \mid T, X_1, X_2\,]\right]$
 
 Condition on `introversion` ($X_1$) and `num_children` ($X_2$) and the leftover $T$–$Y$ association *is* the causal effect.
 
-[The assumption is **unconfoundedness**: no unmeasured common cause of WFH and productivity. Untestable from data alone.]{.comment}
+[The assumption is **unconfoundedness**: no unmeasured common cause of WFH and productivity. Untestable from data alone.]{.takeaway .fragment}
 
 ::: {.notes}
 Identification is purely theoretical — it depends on the graph, not the numbers. DoWhy reads the DAG and reports that conditioning on the two confounders blocks every backdoor path. This is "selection on observables." Its Achilles heel: miss one confounder and every backdoor estimate is biased, with no internal warning.
@@ -128,7 +128,7 @@ $$ATE = \frac{E\!\left[\partial Y / \partial Z\right]}{E\!\left[\partial T / \pa
 
 Divide the instrument's effect on the outcome (reduced form) by its effect on the treatment (first stage).
 
-[The assumption is the **exclusion restriction**: $Z$ moves productivity *only* through WFH. True by construction here.]{.comment}
+[The assumption is the **exclusion restriction**: $Z$ moves productivity *only* through WFH. True by construction here.]{.takeaway .fragment}
 
 ::: {.notes}
 Same target — the ATE — reached a different way. IV does not require observing the confounders; it requires a valid instrument. Subway disruption is random with respect to introversion and family size, affects WFH, and (by construction) has no direct path to productivity. Trade-off: it only identifies the effect for "compliers" and, as we'll see, it's far noisier.
@@ -146,7 +146,7 @@ estimate_reg = model.estimate_effect(
 )   # ATE 1.0051 · robust SE 0.0614 · 95% CI [0.885, 1.126]
 ```
 
-[$\beta_1$ is the causal effect — *if* the model is right and every confounder is in.]{.comment}
+[$\beta_1$ is the causal effect — *if* the model is right and every confounder is in.]{.takeaway .fragment}
 
 ::: {.notes}
 The simplest backdoor method: put the confounders in as controls. Bias is 0.5%. The HC1 robust SE of 0.0614 guards against heteroskedasticity. It works here because the true DGP is linear — in practice we rarely know the functional form, which is exactly why we run several methods.
@@ -158,7 +158,7 @@ $$\widehat{ATE}_{IPW} = \frac{1}{N}\sum_{i=1}^{N}\left[\frac{T_i Y_i}{\hat{e}(X_
 
 Weight each person by the inverse of their **propensity score** $\hat{e}(X_i)=P(T_i=1\mid X_i)$, so treatment becomes independent of confounders.
 
-[IPW gives **1.0275** (SE 0.0754). It models *who gets treated*, not the outcome — so it costs a little precision.]{.comment}
+[IPW gives **1.0275** (SE 0.0754). It models *who gets treated*, not the outcome — so it costs a little precision.]{.takeaway .fragment}
 
 ::: {.notes}
 Completely different philosophy from regression: model the treatment-assignment mechanism, not the outcome. Reweighting builds a pseudo-population that mimics a randomized trial. Bias 2.8%. The slightly larger SE is the price of discarding the outcome model and leaning entirely on propensity scores.
@@ -170,7 +170,7 @@ $$\widehat{ATE}_{DR} = \frac{1}{N}\sum_{i=1}^{N}\Big[(\hat{\mu}_1 - \hat{\mu}_0)
 
 Combine an outcome model ($\hat{\mu}_1,\hat{\mu}_0$) with the IPW reweight. Consistent if **either** model is right.
 
-[AIPW gives **1.0115** (SE 0.0623) — smallest bias of the four, precision matching regression.]{.comment}
+[AIPW gives **1.0115** (SE 0.0623) — smallest bias of the four, precision matching regression.]{.takeaway .fragment}
 
 ::: {.notes}
 Belt and suspenders. If the propensity model fails, the outcome model saves you; if the outcome model fails, the reweight does. Both wrong is the only failure mode. When both are right, AIPW hits the semiparametric efficiency bound — the smallest possible variance — which is why its SE nearly equals regression's despite the extra machinery.
@@ -186,7 +186,7 @@ estimate_iv = model.estimate_effect(
 )   # first-stage F = 293 (strong) · ATE 0.8881 · SE 0.3303
 ```
 
-[The instrument is strong (F = 293), yet the Wald ratio amplifies noise — SE **0.3303**, more than $5\times$ regression's.]{.comment}
+[The instrument is strong (F = 293), yet the Wald ratio amplifies noise — SE **0.3303**, more than $5\times$ regression's.]{.takeaway .fragment}
 
 ::: {.notes}
 IV does not condition on confounders — it uses only the exogenous WFH variation the subway shock provides. That's its superpower: validity even with unmeasured confounders. The cost: dividing a reduced-form effect by a first-stage effect propagates uncertainty from both stages through the delta method, blowing the CI out to [0.24, 1.54].
@@ -210,7 +210,7 @@ The money figure. Regression, IPW, and AIPW cluster tightly around the dashed tr
 | Doubly robust | 1.0115 | 0.0623 | yes |
 | IV (2SLS) | 0.8881 | 0.3303 | yes |
 
-[The naive CI [1.25, 1.53] is *narrow* — and excludes the truth. Precision without validity is worthless.]{.comment}
+[The naive CI [1.25, 1.53] is *narrow* — and excludes the truth. Precision without validity is worthless.]{.takeaway .fragment}
 
 # The Resolution {.divider background-color="#00d4c8"}
 
@@ -234,7 +234,7 @@ The Act-III payoff. Of regression (1.0051), IPW (1.0275), and AIPW (1.0115), the
 | Random common cause | $\approx 1.0$ | 1.005 | pass |
 | Data subset (80%) | $\approx 1.0$ | 0.999 | pass |
 
-[Permute the treatment and the effect collapses to zero; add a fake confounder or drop 20% of rows and it barely moves.]{.comment}
+[Permute the treatment and the effect collapses to zero; add a fake confounder or drop 20% of rows and it barely moves.]{.takeaway .fragment}
 
 ::: {.notes}
 This is what makes the four-step framework more than bookkeeping. The placebo refuter is the most convincing: replace the real treatment with a random one and a working method must return ~0 — it returns −0.00003 (p = 0.96). Random-common-cause and data-subset confirm the estimate is not fragile. Robustness is demonstrated, not asserted.

@@ -89,7 +89,7 @@ The spoiler map. Don't dwell on every region yet — just plant that high and lo
 - **Two snapshots** — 2013 and 2019, the same data as the Pooled-PCA tutorial
 :::
 
-[Source: Global Data Lab (Smits & Permanyer, 2019). Mean SHDI rose only $+0.0053$ overall — yet income *fell* in 71 of 153 regions (46.4%). The aggregate calm hides spatial turbulence.]{.comment}
+[Source: Global Data Lab (Smits & Permanyer, 2019). Mean SHDI rose only $+0.0053$ overall — yet income *fell* in 71 of 153 regions (46.4%). The aggregate calm hides spatial turbulence.]{.takeaway .fragment}
 
 ## Spatial autocorrelation has no meaning until you define "neighbour"
 
@@ -110,7 +110,7 @@ A **spatial weights matrix** $W$ is an $n \times n$ array whose entry $w_{ij}$ e
 :::
 ::::
 
-[We use Queen — appropriate for irregular administrative borders. Then row-standardize ($w_{ij}\to w_{ij}/\sum_j w_{ij}$) so each row sums to 1.]{.comment}
+[We use Queen — appropriate for irregular administrative borders. Then row-standardize ($w_{ij}\to w_{ij}/\sum_j w_{ij}$) so each row sums to 1.]{.takeaway .fragment}
 
 ::: {.notes}
 Row-standardization is what makes the spatial lag interpretable: after it, the lag is the simple average of a region's neighbours' values, regardless of how many neighbours it has. This is the building block of every statistic that follows.
@@ -128,7 +128,7 @@ Row-standardization is what makes the spatial lag interpretable: after it, the l
 
 $$I = \frac{n}{\sum_{i}\sum_{j} w_{ij}} \cdot \frac{\sum_{i}\sum_{j} w_{ij}(x_i-\bar{x})(x_j-\bar{x})}{\sum_{i}(x_i-\bar{x})^2}$$
 
-[For each pair of neighbours it multiplies their deviations from the mean. High-next-to-high (and low-next-to-low) makes the products positive — so $I>0$ means clustering.]{.comment}
+[For each pair of neighbours it multiplies their deviations from the mean. High-next-to-high (and low-next-to-low) makes the products positive — so $I>0$ means clustering.]{.takeaway .fragment}
 
 ::: {.notes}
 I ≈ +1 strong clustering of similar values; I ≈ 0 random; I ≈ −1 a checkerboard. The expected value under randomness is E(I) = −1/(n−1), here −0.0066 — essentially zero. The numerator is a cross-product of neighbour deviations; the leading fraction just normalizes by the total weight.
@@ -146,7 +146,7 @@ print(moran_2019.I, moran_2019.p_sim, moran_2019.z_sim)
 # 0.6320   0.0010   11.9890
 ```
 
-[A permutation test reshuffles all SHDI values across regions 999 times — like dealing cards to random seats — and asks how often a random map beats the real one.]{.comment}
+[A permutation test reshuffles all SHDI values across regions 999 times — like dealing cards to random seats — and asks how often a random map beats the real one.]{.takeaway .fragment}
 
 ::: {.notes}
 Inference here is non-parametric: we never assume the data are normal. We build the reference distribution by brute force. p_sim = 0.0010 is the smallest p achievable with 999 draws — the observed clustering never once appeared by chance. z = 11.99 is roughly twelve standard deviations above the random mean.
@@ -159,7 +159,7 @@ Inference here is non-parametric: we never assume the data are normal. We build 
 | 2013 | 0.5680 | [0.0010]{.key} | 10.77 |
 | 2019 | [0.6320]{.key} | 0.0010 | 11.99 |
 
-[Expected $I$ under randomness $= -0.0066$. The observed values are an order of magnitude away — and 2019 is *higher* than 2013.]{.comment}
+[Expected $I$ under randomness $= -0.0066$. The observed values are an order of magnitude away — and 2019 is *higher* than 2013.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the headline of the global analysis. Both years are far above the random expectation and both have the minimum possible p-value. The increase from 0.568 to 0.632 is the first sign of a deepening spatial divide — the gap between rich and poor regions is not just large, it is becoming more spatially organized.
@@ -179,7 +179,7 @@ The local Moran statistic decomposes the global $I$ into one value per region:
 
 $$I_i = z_i \sum_{j} w_{ij} z_j$$
 
-[Each region's own standardized value $z_i$ times the average of its neighbours' — large and positive in a cluster's core, negative for a spatial outlier.]{.comment}
+[Each region's own standardized value $z_i$ times the average of its neighbours' — large and positive in a cluster's core, negative for a spatial outlier.]{.takeaway .fragment}
 
 ::: {.notes}
 Anselin (1995). Summing the I_i over all regions recovers (a scaling of) the global I — LISA is literally global Moran's I taken apart region by region. Each region is then assigned to a quadrant — HH, LL, HL, LH — and a permutation p-value; we keep those significant at p < 0.10.
@@ -202,7 +202,7 @@ Anselin (1995). Summing the I_i over all regions recovers (a scaling of) the glo
 :::
 ::::
 
-[Significance is permutation-based: only regions with $p<0.10$ are coloured; the rest stay grey.]{.comment}
+[Significance is permutation-based: only regions with $p<0.10$ are coloured; the rest stay grey.]{.takeaway .fragment}
 
 ::: {.notes}
 HH and LL are the story; HL and LH are the exceptions that prove the rule. In 2019 there are just 5 HL and 1 LH out of 153 — spatial outliers are genuinely rare here, which itself is evidence of strong positive autocorrelation.
@@ -235,7 +235,7 @@ At p < 0.10: 30 HH, 37 LL, 5 HL, 1 LH, 80 not significant. The HH core is anchor
 :::
 ::::
 
-[Prosperity clusters stable; deprivation cluster expanding by 8 regions. Asymmetric evolution — the signature of a localized crisis.]{.comment}
+[Prosperity clusters stable; deprivation cluster expanding by 8 regions. Asymmetric evolution — the signature of a localized crisis.]{.takeaway .fragment}
 
 ::: {.notes}
 The HH cluster barely moves (31 → 30); the LL cluster grows by eight. From the transition table, 27 of 31 HH regions stayed HH (87% persistence), and 17 previously non-significant regions joined the LL cluster. Entrenched at the top, spreading at the bottom.
@@ -288,7 +288,7 @@ The narrow range is the tell: this was not a few bad regions, it was the whole c
 | Bolivia | 9 | [+0.0333]{.key} | 7 of 9 stayed (78%) |
 | Venezuela | 24 | [−0.0653]{.key} | 3 of 24 stayed (12%) |
 
-[Bolivia's arrows point right — own development improved — but its neighbours stayed poor, so it remained inside the LL cold spot.]{.comment}
+[Bolivia's arrows point right — own development improved — but its neighbours stayed poor, so it remained inside the LL cold spot.]{.takeaway .fragment}
 
 ::: {.notes}
 The juxtaposition is the policy lesson in miniature. Bolivia made real, broad-based gains and still could not escape the low-development cluster, because escaping a spatial trap requires your neighbours to improve too. Venezuela shows the inverse: collapse propagates outward. Spatial structure is destiny unless you act on the neighbourhood, not just the region.

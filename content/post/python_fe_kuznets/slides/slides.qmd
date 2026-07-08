@@ -88,7 +88,7 @@ The spoiler figure. Don't dissect every fit yet — just plant that inequality i
 - **Structure** — an unbalanced panel, 168 countries in period 1 growing to 180 by period 5
 :::
 
-[Periods are 5-year averages from 1990–1994 through 2010–2013; mean Gini $= 0.064$, SD $= 0.033$.]{.comment}
+[Periods are 5-year averages from 1990–1994 through 2010–2013; mean Gini $= 0.064$, SD $= 0.033$.]{.takeaway .fragment}
 
 ::: {.notes}
 The Gini coefficient comes from Lessmann & Seidel (2017): subnational GDP proxied by nighttime light intensity, then aggregated to a within-country Gini. Slightly unbalanced because some poor countries enter the lights record late. The wide income range is what lets us see both ends of the curve.
@@ -98,7 +98,7 @@ The Gini coefficient comes from Lessmann & Seidel (2017): subnational GDP proxie
 
 $$\text{Gini}_i = \beta_0 + \beta_1 \ln Y_i + \beta_2 (\ln Y_i)^2 + \beta_3 (\ln Y_i)^3 + \varepsilon_i$$
 
-[$\beta_2$ lets the curve bend once (an inverted-U if negative); $\beta_3$ lets it bend a *second* time (an N if positive). A linear term alone forces monotonicity.]{.comment}
+[$\beta_2$ lets the curve bend once (an inverted-U if negative); $\beta_3$ lets it bend a *second* time (an N if positive). A linear term alone forces monotonicity.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the specification ladder: linear imposes a straight line, quadratic imposes one hump, cubic allows two turns. We fit all three and let the data pick. The pre-computed powers log_GDPpc2 and log_GDPpc3 keep us byte-aligned with the original Stata replication.
@@ -112,7 +112,7 @@ This is the specification ladder: linear imposes a straight line, quadratic impo
 | Quadratic | $0.015$ | $-0.002$ | — | $0.170$ |
 | Cubic | [$0.241$]{.key} | $-0.028$ | $0.001$ | $0.176$ |
 
-[Cubic terms are only marginally significant ($p \approx 0.07$–$0.09$), and $R^2$ barely moves across the ladder.]{.comment}
+[Cubic terms are only marginally significant ($p \approx 0.07$–$0.09$), and $R^2$ barely moves across the ladder.]{.takeaway .fragment}
 
 ::: {.notes}
 Pooled OLS treats every country-period as an independent draw — it mixes between-country and within-country variation. The cubic hints at the N but can't commit: p-values hover around 0.07. The low R² (0.176) says cross-sectional differences dominate. Something is contaminating these estimates.
@@ -145,7 +145,7 @@ $$\text{Gini}_{it} = \beta_1 \ln Y_{it} + \beta_2 (\ln Y_{it})^2 + \beta_3 (\ln 
 :::
 ::::
 
-[What's left is the *within* estimator: how each country's inequality moves as it develops, net of fixed traits and global shocks.]{.comment}
+[What's left is the *within* estimator: how each country's inequality moves as it develops, net of fixed traits and global shocks.]{.takeaway .fragment}
 
 ::: {.notes}
 Two-way FE adds a dummy per country and a dummy per period. The first wipe removes time-invariant country stains; the second removes period-specific glare. Identification then comes only from within-country, within-period deviations. This is association conditional on those effects — not a causal claim.
@@ -182,7 +182,7 @@ The turn of the act. Pooled OLS gave 0.241 / −0.028 / 0.001 at p ≈ 0.07; fix
 | Linear | $-0.003$ | $0.265$ | $0.009$ |
 | Cubic | [$0.293$]{.key} | $<0.001$ | $0.142$ |
 
-[A researcher who fit only the linear FE model would conclude development has *no* effect — a false negative born of forcing a straight line through an N.]{.comment}
+[A researcher who fit only the linear FE model would conclude development has *no* effect — a false negative born of forcing a straight line through an N.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the key pedagogical contrast. The linear within-R² is 0.009 and the coefficient is insignificant: averaging the rising and falling phases cancels to roughly zero. The cubic raises within-R² to 0.142 — 14% of within-country variation — because it lets the opposing phases coexist. You need both the polynomial AND the fixed effects.
@@ -216,7 +216,7 @@ Solving the derivative ∂Gini/∂lnY = β₁ + 2β₂lnY + 3β₃(lnY)² = 0 gi
 - **Above \$77,205** — knowledge-economy agglomeration re-concentrates; inequality *rises again*
 :::
 
-[Fixed effects strip time-invariant confounders, but the relationship is descriptive: read it as conditional association, not a policy lever.]{.comment}
+[Fixed effects strip time-invariant confounders, but the relationship is descriptive: read it as conditional association, not a policy lever.]{.takeaway .fragment}
 
 ::: {.notes}
 The estimand here is a within-country conditional association — the slope of Gini on log income, net of country and period effects. It is not an ATE: there is no treatment, no exogenous variation in development. The post is explicit that "determinants" mean associations conditional on the Kuznets polynomial and the FE.

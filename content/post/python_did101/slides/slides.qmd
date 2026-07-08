@@ -96,7 +96,7 @@ The simulated case study from Corral and Yang (2024): 70 observations (35 school
 | Comparison (25) | 71.22 | 82.10 | [+10.88]{.key} |
 | Treated (10) | 60.17 | 96.37 | +36.20 |
 
-[The comparison group's +10.88 is the secular trend — the rise that would have happened anyway.]{.comment}
+[The comparison group's +10.88 is the secular trend — the rise that would have happened anyway.]{.takeaway .fragment}
 
 ::: {.notes}
 The comparison schools never got tutoring, yet their GPA still rose 10.88 points. Under parallel trends we assume the treated schools would have drifted by the same 10.88 absent the program. That single number is what the naive estimator wrongly handed to the program.
@@ -108,7 +108,7 @@ $$DiD = \Big(\bar{Y}^{post}_{treat} - \bar{Y}^{pre}_{treat}\Big) - \Big(\bar{Y}^
 
 $$DiD = (96.37 - 60.17) - (82.10 - 71.22) = 36.20 - 10.88 = 25.32$$
 
-[Subtract the trend the control group reveals; what's left is the program's causal effect.]{.comment}
+[Subtract the trend the control group reveals; what's left is the program's causal effect.]{.takeaway .fragment}
 
 ::: {.notes}
 The treated runner sped up by 36.20 units; the comparison runner sped up by 10.88. The coaching effect is the extra 25.32 units only the coached runner gained. This is the entire idea — everything that follows just implements it more flexibly with regression.
@@ -128,7 +128,7 @@ $$E[Y_{i,1}(0) - Y_{i,0}(0) \mid D=1] = E[Y_{i,1}(0) - Y_{i,0}(0) \mid D=0]$$
 
 The *change* in untreated potential outcomes is the same for both groups — so the control's trend stands in for the treated group's missing counterfactual.
 
-[The estimand is the ATT: the average effect for the schools that actually got the program.]{.comment}
+[The estimand is the ATT: the average effect for the schools that actually got the program.]{.takeaway .fragment}
 
 ::: {.notes}
 State the estimand explicitly. DiD recovers the ATT — the effect on the treated — not the ATE. The two diverge when treatment effects vary with selection into treatment. Parallel trends is the identifying assumption; SUTVA (no spillovers between schools) is the other load-bearing assumption.
@@ -160,7 +160,7 @@ $$Y_{it} = \beta\,(\text{Treat}_i \times \text{Post}_t) + \gamma_i + \vartheta_t
 fit_twfe = pf.feols("gpa ~ txp | id + time", data=df, vcov={"CRV1": "id"})
 ```
 
-[$\gamma_i$ wipes school stains, $\vartheta_t$ wipes period glare. PyFixest's `|` pipe absorbs both — no dummy bookkeeping.]{.comment}
+[$\gamma_i$ wipes school stains, $\vartheta_t$ wipes period glare. PyFixest's `|` pipe absorbs both — no dummy bookkeeping.]{.takeaway .fragment}
 
 ::: {.notes}
 Because treated is collinear with school fixed effects and post is collinear with time fixed effects, only txp survives — and it's still 25.315. Everything left of the pipe is estimated; everything right is absorbed. CRV1 clusters standard errors at the school level, the right choice when treatment varies by school and within-school observations are correlated.
@@ -214,7 +214,7 @@ The 8-period extension (280 observations) replaces the single interaction with o
 | t = 0 | [25.03]{.key} | [24.12, 25.93] | yes |
 | t = 3 | 25.70 | [24.08, 27.32] | yes |
 
-[Three near-zero leads validate parallel trends; four large lags trace a stable effect.]{.comment}
+[Three near-zero leads validate parallel trends; four large lags trace a stable effect.]{.takeaway .fragment}
 
 ::: {.notes}
 t = −1 is the omitted reference (normalized to zero). The three pre-treatment leads are tiny and insignificant — the design is credible. The four post-treatment lags (25.03, 24.71, 24.77, 25.70) are all significant at p < 0.001 and remarkably flat: the program works from day one and shows no decay over four periods.

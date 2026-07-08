@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Causal Machine Learning for Policy Evaluation</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -265,7 +265,7 @@
 <section id="three-estimands-increasing-granularity-and-we-must-earn-them-in-order" class="slide level2 center">
 <h2>Three estimands, increasing granularity — and we must earn them in order</h2>
 <p><span class="math display">\[\text{ATE} = E[Y(1) - Y(0)]\]</span> <span class="math display">\[\text{GATE}(z) = E[Y(1) - Y(0) \mid Z = z]\]</span> <span class="math display">\[\text{IATE}(x) = E[Y(1) - Y(0) \mid X = x]\]</span></p>
-<p><span class="comment">Population average → subgroup average → one number <em>per person</em>. Earn the coarse estimand before the fine one — the order is the discipline.</span></p>
+<p><span class="takeaway fragment">Population average → subgroup average → one number <em>per person</em>. Earn the coarse estimand before the fine one — the order is the discipline.</span></p>
 <aside class="notes">
 <p>Skipping to the finest estimand without securing the average is the most common mistake in applied CML — earn each level in order. Y(1) and Y(0) are the potential outcomes under treatment and control; only one is ever observed. ATE is the headline policy number; GATE conditions on a named subgroup Z (here Dutch proficiency); IATE conditions on the full covariate vector X. A credible average is the floor on which any subgroup analysis stands, and credible group effects are the floor under any individual analysis.</p>
 <style type="text/css">
@@ -284,7 +284,7 @@
 <h2>The identifying assumption: unconfoundedness, not randomisation</h2>
 <p>The data are <strong>observational</strong>. We assume <em>selection-on-observables</em>: conditional on <span class="math inline">\(X\)</span>, treatment is as good as random.</p>
 <p><span class="math display">\[D \perp \{Y(1), Y(0)\} \mid X\]</span></p>
-<p><span class="comment">This is the strong assumption that licenses everything downstream. The naive difference-in-means is therefore <em>genuinely biased</em> here — not merely imprecise.</span></p>
+<p><span class="takeaway fragment">This is the strong assumption that licenses everything downstream. The naive difference-in-means is therefore <em>genuinely biased</em> here — not merely imprecise.</span></p>
 <aside class="notes">
 <p>Unconfoundedness is the load-bearing identifying assumption. Conditional on the six covariates (age, education, prior employment, Dutch proficiency, sex, migrant status), treatment assignment is as good as random. The synthetic DGP satisfies this by construction; in a real ALMP it is the assumption a referee would attack. Machine learning chooses controls flexibly — it cannot manufacture identification.</p>
 <style type="text/css">
@@ -307,7 +307,7 @@
 <li class="fragment"><strong>Covariates</strong> <span class="math inline">\(X\)</span> — age, education, prior employment, Dutch proficiency, sex, migrant</li>
 <li class="fragment"><strong>Truth</strong> — because the data are <em>synthetic</em>, <span class="math inline">\(\tau_i\)</span> is known for every person</li>
 </ul>
-<p><span class="comment">Synthetic Flemish-ALMP cohort modelled on Cockx, Lechner &amp; Bollens (2023). Every estimator is benchmarked against the truth.</span></p>
+<p><span class="takeaway fragment">Synthetic Flemish-ALMP cohort modelled on Cockx, Lechner &amp; Bollens (2023). Every estimator is benchmarked against the truth.</span></p>
 <aside class="notes">
 <p>The treatment share of 52.8% is high for a real ALMP, but it is calibrated to keep overlap comfortable in all four Dutch-proficiency strata. The outcome has room (floor 0, ceiling 30) for a realistic 5-to-8-month effect. Knowing the truth is the pedagogical superpower here: we can score every estimator against it.</p>
 <style type="text/css">
@@ -360,7 +360,7 @@
 <section id="doublemls-doubly-robust-score-is-correct-if-either-nuisance-is-correct" class="slide level2 center">
 <h2>DoubleML’s doubly-robust score is correct if <em>either</em> nuisance is correct</h2>
 <p><span class="math display">\[\psi_i = g_1(X_i) - g_0(X_i) + \frac{D_i\,(Y_i - g_1(X_i))}{m(X_i)} - \frac{(1-D_i)\,(Y_i - g_0(X_i))}{1 - m(X_i)}\]</span></p>
-<p><span class="comment">Outcome regression <span class="math inline">\(g_d(X) = E[Y \mid D=d, X]\)</span> plus an inverse-propensity residual correction. <span class="math inline">\(E[\psi_i] = \text{ATE}\)</span> if <em>either</em> <span class="math inline">\(g\)</span> or <span class="math inline">\(m\)</span> is right — the “double” in doubly robust.</span></p>
+<p><span class="takeaway fragment">Outcome regression <span class="math inline">\(g_d(X) = E[Y \mid D=d, X]\)</span> plus an inverse-propensity residual correction. <span class="math inline">\(E[\psi_i] = \text{ATE}\)</span> if <em>either</em> <span class="math inline">\(g\)</span> or <span class="math inline">\(m\)</span> is right — the “double” in doubly robust.</span></p>
 <aside class="notes">
 <p>The Interactive Regression Model of Chernozhukov et al.&nbsp;(2018). Two nuisances: an outcome regression g and a propensity m. Cross-fitting — train nuisances on K−1 folds, predict on the held-out fold, rotate — prevents the forests from overfitting their own training sample and contaminating the score. Orthogonality buys a root-n rate even with slow machine-learning nuisances. The grading-with-someone-else’s-rubric analogy from the post lands well here.</p>
 <style type="text/css">
@@ -510,7 +510,7 @@
 <section id="welfare-is-the-per-person-sum-of-treated-effects-net-of-cost" class="slide level2 center">
 <h2>Welfare is the per-person sum of treated effects net of cost</h2>
 <p><span class="math display">\[W(\text{rule}) = E\big[\,\text{rule}(X)\cdot(\tau(X) - c)\,\big]\]</span></p>
-<p><span class="comment">For everyone the rule treats, add their true effect minus the cost <span class="math inline">\(c = 4\)</span> months. Treat-all leaves welfare on the table; <em>targeting</em> the responders does better.</span></p>
+<p><span class="takeaway fragment">For everyone the rule treats, add their true effect minus the cost <span class="math inline">\(c = 4\)</span> months. Treat-all leaves welfare on the table; <em>targeting</em> the responders does better.</span></p>
 <aside class="notes">
 <p>The whole reason to estimate individual effects rather than stop at the average: they enable personalised policy. The welfare-optimal rule trains person i iff their <em>true</em> effect exceeds the cost. We don’t know the truth in practice, so we plug in the forest’s IATE estimate. Four rules: treat none, treat all, the IATE rule (treat where iate_hat &gt; cost), and an oracle that knows the true tau.</p>
 <style type="text/css">

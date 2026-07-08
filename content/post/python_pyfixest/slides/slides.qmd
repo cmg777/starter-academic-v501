@@ -95,7 +95,7 @@ $$Y_{it} = \alpha_i + X_{it}\beta + u_{it}$$
 
 Add a unit-specific intercept $\alpha_i$ that absorbs **every** time-invariant characteristic of unit $i$ — observed or not.
 
-[Block one entire class of confounders — innate ability, firm culture, institutional quality — in a single step.]{.comment}
+[Block one entire class of confounders — innate ability, firm culture, institutional quality — in a single step.]{.takeaway .fragment}
 
 ::: {.notes}
 The mechanism: α_i soaks up anything constant within a unit. You don't have to name the confounder or even measure it — as long as it doesn't change over the observation window, the fixed effect removes it. That is the whole appeal of FE for observational panel data.
@@ -107,7 +107,7 @@ $$\hat{\beta}_{FE} = \left(\sum_{i} \ddot{X}_i' \ddot{X}_i\right)^{-1} \sum_{i} 
 
 where $\ddot{X}_i = X_{it} - \bar{X}_i$ and $\ddot{Y}_i = Y_{it} - \bar{Y}_i$ are demeaned within each group.
 
-[Subtract each group's own average, then run plain OLS — that is all a fixed effect does.]{.comment}
+[Subtract each group's own average, then run plain OLS — that is all a fixed effect does.]{.takeaway .fragment}
 
 ::: {.notes}
 The within transformation. Replace every variable by its deviation from the unit's own time-average. Equivalent to including unit dummies, but vastly faster — modern packages demean rather than estimate thousands of nuisance intercepts. The post proves the equivalence numerically: FE absorption and manual demeaning both give −1.0190 on X1.
@@ -153,7 +153,7 @@ Using csw0(f1, f2), one call fits three nested models. The X1 coefficient stays 
 | CRV1 (group) | 0.1172 | −8.7 |
 | CRV3 (group) | [0.1247]{.key} | −8.2 |
 
-[The estimate never moves; only honesty about uncertainty does.]{.comment}
+[The estimate never moves; only honesty about uncertainty does.]{.takeaway .fragment}
 
 ::: {.notes}
 Cluster-robust SEs allow arbitrary within-group correlation — essential when observations inside a group are not independent. Moving from HC1 to CRV3 inflates the SE 50% (0.0833 → 0.1247) and drops the t-stat from 12.2 to 8.2. Here every p-value still clears 0.001, but for a weaker effect this could flip significance. Default to clustering at the level where errors travel together.
@@ -183,7 +183,7 @@ When the regressor is endogenous, FE alone is not enough. PyFixest's `Y2 ~ 1 | f
 | black | −0.135 | dropped |
 | R-squared | 0.175 | 0.605 |
 
-[One worker intercept each: the union premium halves and $R^2$ more than triples.]{.comment}
+[One worker intercept each: the union premium halves and $R^2$ more than triples.]{.takeaway .fragment}
 
 ::: {.notes}
 Vella–Verbeek NLSY panel: 545 young men over 8 years, 4,360 rows. One-way FE cuts the union premium 18.3% → 7.8% — over half the raw association was who selects into unions, not what unions do. R² jumps 0.175 → 0.605. The price: educ, black, hisp are perfectly collinear with worker dummies and silently dropped.
@@ -215,7 +215,7 @@ $$\ln(wage_{it}) = \beta X_{it} + \gamma Z_i + \pi \bar{X}_i + \epsilon_{it}$$
 
 Replace 545 worker dummies with each worker's career averages $\bar{X}_i$.
 
-[Time-varying $\hat\beta$ still match one-way FE; the time-invariant $\gamma$ become estimable again.]{.comment}
+[Time-varying $\hat\beta$ still match one-way FE; the time-invariant $\gamma$ become estimable again.]{.takeaway .fragment}
 
 ::: {.notes}
 The Mundlak (1978) device. The individual means proxy for the unobserved effect α_i, so once they are controlled the time-invariant variables are no longer collinear with anything. CRE assumes α_i is a linear function of the career averages — stronger than FE's unrestricted α_i, but it recovers education and race.

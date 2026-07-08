@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.9.37">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-13">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Random Forest Regression</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,9 +17,6 @@
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
   <style>
-    /* Default styles provided by pandoc.
-    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-    */
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -62,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-f8a16d63170f62ba6229f8000d3e1445.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -193,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -207,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 13, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -303,7 +300,7 @@
 <h2>A Random Forest averages many decorrelated trees to cut variance</h2>
 <p><span class="math display">\[\hat{y} = \frac{1}{B} \sum_{b=1}^{B} T_b(\mathbf{x})\]</span></p>
 <p>Each tree <span class="math inline">\(T_b\)</span> is grown on a bootstrap resample, and at every split only <span class="math inline">\(\sqrt{64}=8\)</span> features are even considered.</p>
-<p><span class="comment">Bootstrap rows + random feature subsets = trees that make <em>different</em> mistakes; averaging cancels the noise.</span></p>
+<p><span class="takeaway fragment">Bootstrap rows + random feature subsets = trees that make <em>different</em> mistakes; averaging cancels the noise.</span></p>
 <aside class="notes">
 <p>Walk the two sources of randomness aloud. Bagging (bootstrap aggregating) decorrelates by resampling rows; the random feature subset decorrelates further by hiding columns. Lower correlation between trees means a bigger variance reduction when you average — that is the entire trick. Here B is n_estimators (100 by default) and x is the 64-dimensional embedding vector. We keep the defaults; tuning lives in the appendix.</p>
 <style type="text/css">
@@ -336,7 +333,7 @@
 <li>→ honest predictions for all 339</li>
 </ul>
 </div></div>
-<p><span class="comment">A single 80/20 split is a lottery: across 200 random seeds the test R-squared ranges from −0.09 to 0.46 (Appendix A).</span></p>
+<p><span class="takeaway fragment">A single 80/20 split is a lottery: across 200 random seeds the test R-squared ranges from −0.09 to 0.46 (Appendix A).</span></p>
 <aside class="notes">
 <p>This replaces the old “hold out 68 towns” slide. With only 339 rows a single test set is both wasteful and noisy. Cross-validation rotates the held-out fold so every observation is tested exactly once and trained on four times. <code>cross_val_predict</code> stitches the held-out predictions back together into one out-of-fold prediction per town — that is what we plot for all 339.</p>
 <style type="text/css">
@@ -363,7 +360,7 @@
 <span id="cb1-8"><a href=""></a></span>
 <span id="cb1-9"><a href=""></a>oof_pred <span class="op">=</span> cross_val_predict(baseline_rf, X, y, cv<span class="op">=</span>kf)  <span class="co"># one prediction / town</span></span>
 <span id="cb1-10"><a href=""></a><span class="co"># pooled out-of-fold R² = 0.225</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">Fold 3 scores <strong>−0.03</strong> — worse than guessing the average. One lucky split could have shown you only the 0.45.</span></p>
+<p><span class="takeaway fragment">Fold 3 scores <strong>−0.03</strong> — worse than guessing the average. One lucky split could have shown you only the 0.45.</span></p>
 <aside class="notes">
 <p>The five fold scores are the whole point. They swing from a negative value to 0.45 — a standard deviation (0.173) almost as large as the mean (0.224). A single train/test split hands you exactly one of these numbers with no way to know which. cross_val_predict reuses the same folds to give one out-of-fold prediction per municipality; pooled over all 339 that is an R² of 0.225.</p>
 <style type="text/css">
@@ -430,7 +427,7 @@
 <li>unbiased by scale or cardinality</li>
 </ul>
 </div></div>
-<p><span class="comment">Two very different methods crowning the same feature is evidence A30 is real signal, not a counting artifact.</span></p>
+<p><span class="takeaway fragment">Two very different methods crowning the same feature is evidence A30 is real signal, not a counting artifact.</span></p>
 <aside class="notes">
 <p>A teaching moment on importance pitfalls. MDI rewards features used in many splits, which can inflate high-cardinality continuous features; permutation asks the cleaner question “does generalization suffer without you?” When they disagree, trust permutation — but here they agree emphatically on A30, which raises our confidence that the signal is genuine.</p>
 <style type="text/css">
@@ -522,7 +519,7 @@
 <section id="does-tuning-rescue-it-grid-random-and-optuna-all-lift-r-squared-by-0.03" class="slide level2 center">
 <h2>Does tuning rescue it? Grid, random, and Optuna all lift R-squared by &lt; 0.03</h2>
 
-<img data-src="../ml_appendix_tuning_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Best cross-validated R-squared: baseline vs grid search, random search, and Optuna (Appendix B).</p><p><span class="comment">The methods rank as theory predicts — Optuna ≥ random ≥ grid — but every gain is smaller than the 0.17 fold-to-fold noise.</span></p>
+<img data-src="../ml_appendix_tuning_comparison.png" class="r-stretch quarto-figure-center"><p class="caption">Best cross-validated R-squared: baseline vs grid search, random search, and Optuna (Appendix B).</p><p><span class="takeaway fragment">The methods rank as theory predicts — Optuna ≥ random ≥ grid — but every gain is smaller than the 0.17 fold-to-fold noise.</span></p>
 <aside class="notes">
 <p>Appendix B in one slide. All three search strategies improve the cross-validated R², and they rank exactly as theory says given equal budgets. But the jump from 0.224 to 0.251 is well inside the fold-to-fold standard deviation — the tuning gain is smaller than the measurement noise. That is the empirical reason the main analysis keeps the defaults.</p>
 <style type="text/css">

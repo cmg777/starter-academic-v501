@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.9.37">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-16">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Regional Inequality from Outer Space</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,9 +17,6 @@
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
   <style>
-    /* Default styles provided by pandoc.
-    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-    */
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -32,7 +29,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-f8a16d63170f62ba6229f8000d3e1445.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -127,7 +124,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -141,7 +138,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 16, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-problem" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -214,7 +211,7 @@
 <li class="fragment"><strong>Country panel</strong> — 180 countries, 1992–2012, each carrying inequality indices built from its regions</li>
 <li class="fragment"><strong>Two units, kept straight</strong> — predict at the <em>region</em> level, measure inequality at the <em>country</em> level</li>
 </ul>
-<p><span class="comment">Mean regional Gini <span class="math inline">\(= 0.064\)</span> (SD <span class="math inline">\(0.033\)</span>, max <span class="math inline">\(0.163\)</span>): most countries are internally fairly equal, with a long unequal tail.</span></p>
+<p><span class="takeaway fragment">Mean regional Gini <span class="math inline">\(= 0.064\)</span> (SD <span class="math inline">\(0.033\)</span>, max <span class="math inline">\(0.163\)</span>): most countries are internally fairly equal, with a long unequal tail.</span></p>
 <aside class="notes">
 <p>Keeping the two units straight is the single most common source of confusion. The region-year files are the training set for the lights→income model; the country-year files are where the Kuznets and determinant regressions live. The wide income range across countries is what lets us see the whole curve.</p>
 <style type="text/css">
@@ -232,7 +229,7 @@
 <section id="light-becomes-income-through-a-calibrated-elasticity-net-of-national-income-and-geography" class="slide level2 center">
 <h2>Light becomes income through a calibrated elasticity, net of national income and geography</h2>
 <p><span class="math display">\[y_r = \beta_0 + \beta_1 \ell_r + \beta_2 g_c + \gamma' X_r + \mu_g + \tau_s + \varepsilon_r\]</span></p>
-<p><span class="comment">A region’s log income <span class="math inline">\(y_r\)</span> = baseline, plus elasticity <span class="math inline">\(\beta_1\)</span> on its log light <span class="math inline">\(\ell_r\)</span>, plus a near-one-for-one adjustment <span class="math inline">\(\beta_2\)</span> for its country’s income <span class="math inline">\(g_c\)</span>, plus geography <span class="math inline">\(X_r\)</span>, world-region <span class="math inline">\(\mu_g\)</span> and satellite <span class="math inline">\(\tau_s\)</span> effects. The number we care about is <span class="math inline">\(\beta_1\)</span>.</span></p>
+<p><span class="takeaway fragment">A region’s log income <span class="math inline">\(y_r\)</span> = baseline, plus elasticity <span class="math inline">\(\beta_1\)</span> on its log light <span class="math inline">\(\ell_r\)</span>, plus a near-one-for-one adjustment <span class="math inline">\(\beta_2\)</span> for its country’s income <span class="math inline">\(g_c\)</span>, plus geography <span class="math inline">\(X_r\)</span>, world-region <span class="math inline">\(\mu_g\)</span> and satellite <span class="math inline">\(\tau_s\)</span> effects. The number we care about is <span class="math inline">\(\beta_1\)</span>.</span></p>
 <aside class="notes">
 <p>Light is never credited with what national income, geography, satellite generation, or broad world region should explain — those are all controlled for. What’s left, beta-one, is the genuine subnational gradient: how much brighter maps to how much richer once scale is removed.</p>
 <style type="text/css">
@@ -292,7 +289,7 @@
 <p><span class="math display">\[\bar y = \frac{\sum_i w_i y_i}{\sum_i w_i}, \qquad
   p_i = \frac{w_i}{\sum_j w_j}, \qquad
   r_i = \frac{y_i}{\bar y}\]</span></p>
-<p><span class="comment">Each country’s regional incomes <span class="math inline">\(y_i\)</span> and populations <span class="math inline">\(w_i\)</span> collapse to one number: the Gini, three generalized-entropy indices GE(<span class="math inline">\(-1\)</span>)/GE(<span class="math inline">\(0\)</span>)/GE(<span class="math inline">\(1\)</span>), and the coefficient of variation — every region counting in proportion to its people.</span></p>
+<p><span class="takeaway fragment">Each country’s regional incomes <span class="math inline">\(y_i\)</span> and populations <span class="math inline">\(w_i\)</span> collapse to one number: the Gini, three generalized-entropy indices GE(<span class="math inline">\(-1\)</span>)/GE(<span class="math inline">\(0\)</span>)/GE(<span class="math inline">\(1\)</span>), and the coefficient of variation — every region counting in proportion to its people.</span></p>
 <aside class="notes">
 <p>The whole measurement apparatus is one function: take a country-year’s regional incomes and populations, return all five indices. The crucial coding trap is the Gini’s absolute pairwise difference |y_i − y_j| summed over all pairs, not a product. Germany 2010 is the sanity check: 16 broadly-similar regions yield a population-weighted Gini of just 0.028 — low, as expected.</p>
 <style type="text/css">
@@ -359,7 +356,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><span class="math inline">\(N = 879\)</span>, 180 countries, 5-year periods. Same sign pattern across all five indices — the N is not an artefact of the Gini.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(N = 879\)</span>, 180 countries, 5-year periods. Same sign pattern across all five indices — the N is not an artefact of the Gini.</span></p>
 <aside class="notes">
 <p>Country and period fixed effects mean the curve is identified from each country’s own changes over time, not from rich-vs-poor comparisons. Positive, negative, positive: inequality rises through industrialisation, narrows as countries converge internally, then edges up at the richest incomes. This is Williamson’s hump with a third act. It reproduces the paper’s coefficients exactly.</p>
 <style type="text/css">
@@ -470,7 +467,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The point estimate <span class="math inline">\(\beta = 0.190\)</span> never moves; only the honest uncertainty grows.</span></p>
+<p><span class="takeaway fragment">The point estimate <span class="math inline">\(\beta = 0.190\)</span> never moves; only the honest uncertainty grows.</span></p>
 <aside class="notes">
 <p>Regions are not independent — a boom in one province spills into its neighbours, so treating each region-year as an independent witness understates uncertainty two- to three-fold. The Conley correction weights cross-products of region scores by a Bartlett kernel on great-circle distance. Even at the widest radius the elasticity sits far from zero (t ≈ 5), so the lights-predict-income relationship is real, not a mirage created by ignoring geography.</p>
 <style type="text/css">

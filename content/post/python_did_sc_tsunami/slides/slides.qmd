@@ -62,7 +62,7 @@ Our target is the **ATT** — the average effect of the treatment on the treated
 
 $$\text{ATT} = E[\,Y(1) - Y(0) \mid D = 1\,]$$
 
-[The effect *on the flooded districts* — not on some randomly chosen district.]{.comment}
+[The effect *on the flooded districts* — not on some randomly chosen district.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the fundamental problem of causal inference. Y(1) is observed for flooded Aceh; Y(0) is not. DiD estimates Y(0) from the control group's trend; synthetic control estimates it from a weighted blend of donor districts. Both target the ATT.
@@ -86,7 +86,7 @@ After the wave, Aceh could have landed anywhere on a **menu of trajectories** �
 
 ![A typology of post-disaster recovery paths, each plotted against its no-disaster counterfactual trend: permanently lower path, full recovery to trend, bust and boom, bust and permanently higher path, and creative destruction.](../recoveryPaths.jpeg)
 
-[Which one did Aceh take? Act II finds out.]{.comment}
+[Which one did Aceh take? Act II finds out.]{.takeaway .fragment}
 
 ::: {.notes}
 The conceptual menu. A disaster can leave a region permanently poorer, exactly back on trend, temporarily above then back (bust and boom), permanently above ("build back better" — sustainable recovery beyond the counterfactual), or trigger a wave of upgrading (creative destruction). The whole investigation is about which archetype fits Aceh — the answer, foreshadowed here, is the permanently-higher path.
@@ -115,7 +115,7 @@ The conceptual menu. A disaster can leave a region permanently poorer, exactly b
 :::
 ::::
 
-[Only **10 treated units** — the recurring source of statistical caution.]{.comment}
+[Only **10 treated units** — the recurring source of statistical caution.]{.takeaway .fragment}
 
 ::: {.notes}
 National GDP would barely flinch at a one-province shock, so we need sub-national data at two grains. District GDP gives the headline DiD; the finer night-lights panel lets us ask whether the harder-hit places rebounded more.
@@ -160,7 +160,7 @@ m.coef().round(4)   # D_2005 = −0.0792 · D_recov = +0.0628
 | Recovery (2006–08) | [+0.0628]{.key} | 0.0244 | \*\* |
 | Post-recovery (2009–12) | +0.0114 | 0.0146 | ns |
 
-[Flat pre-trend → parallel trends holds. The gain persists but doesn't compound → a *permanently higher* path.]{.comment}
+[Flat pre-trend → parallel trends holds. The gain persists but doesn't compound → a *permanently higher* path.]{.takeaway .fragment}
 
 ::: {.notes}
 Three takeaways. The pre-tsunami coefficient is small and insignificant — parallel trends survives its formal placebo. The 2005 coefficient is −0.0792 (≈ 8% slower the year the wave hit). The recovery coefficient is +0.0628; three years of that premium more than erase the one-year loss. This is the paper's signature "recovery beyond the counterfactual trend".
@@ -216,7 +216,7 @@ A pre-RMSE of 0.485 against GDP levels near 200 means synthetic Aceh shadows the
 
 ![The treated-minus-synthetic gap: indistinguishable from zero before 2005, then steadily positive.](../python_did_sc_tsunami_sc_gap.png)
 
-[Two very different methods — DiD and synthetic control — now agree: flooded Aceh ended materially above where it was heading.]{.comment}
+[Two very different methods — DiD and synthetic control — now agree: flooded Aceh ended materially above where it was heading.]{.takeaway .fragment}
 
 ::: {.notes}
 By 2012 actual Aceh is at 370.9 vs the synthetic 295.0 — a +18.3% gap. The gap plot isolates the divergence: zero before treatment, opening afterward. Triangulation across independent methods is a far stronger claim than any one method alone.
@@ -226,7 +226,7 @@ By 2012 actual Aceh is at 370.9 vs the synthetic 295.0 — a +18.3% gap. The gap
 
 ![Longitude–latitude scatter of every Sumatran district: the 10 flooded (treated) units, in orange, cluster on Aceh's far north-west coast.](../python_did_sc_tsunami_spatial_map.png)
 
-[Near things are more related than distant things — their growth shocks are *not* independent draws.]{.comment}
+[Near things are more related than distant things — their growth shocks are *not* independent draws.]{.takeaway .fragment}
 
 ::: {.notes}
 When treated units are packed together, a good monsoon, a regional price swing, or the reconstruction boom itself hits them together. The default standard error assumes independence, so it counts more truly-independent information than the data contain — and reports SEs that are too small.
@@ -240,7 +240,7 @@ Moran's I on the residuals is **+0.065** (permutation p = 0.003): nearby distric
 |---|---:|---:|---:|---:|
 | 2006–08 | +0.0628 | 0.0146 | [0.0244]{.key} | +2.57 |
 
-[Same +0.0628 in every column. The SE inflates 1.68× — downgrading a spurious \*\*\* to an honest \*\*.]{.comment}
+[Same +0.0628 in every column. The SE inflates 1.68× — downgrading a spurious \*\*\* to an honest \*\*.]{.takeaway .fragment}
 
 ::: {.notes}
 Under the naive error the recovery effect would have a t above 4 and look significant at 1%. Under the honest Conley-HAC error its t is 2.57 — significant at 5%, not 1%. A careless analyst would have overstated the confidence threefold. The SE is stable across the 25–100 km cutoff range the paper uses.
@@ -259,7 +259,7 @@ Under the naive error the recovery effect would have a t above 4 and look signif
 - **Synthetic control** — +18.3% above the no-tsunami Aceh by 2012
 :::
 
-[Triangulation, not a single regression, is what makes the claim credible.]{.comment}
+[Triangulation, not a single regression, is what makes the claim credible.]{.takeaway .fragment}
 
 ::: {.notes}
 Four tools built on different assumptions all point the same way. That convergence — not the precision of any one estimate — is the strongest part of the evidence.
@@ -305,7 +305,7 @@ Steelman first: this is a single, exceptionally well-funded case study on simula
 | Moran's I (spatial autocorrelation) | +0.065 |
 | Recovery SE: naive → Conley-HAC | 0.0146 → 0.0244 |
 
-[And five lessons: let evolving effects evolve · triangulate · satellite data unlock localized questions · clustered treatment needs honest inference · mind the small print.]{.comment}
+[And five lessons: let evolving effects evolve · triangulate · satellite data unlock localized questions · clustered treatment needs honest inference · mind the small print.]{.takeaway .fragment}
 
 ::: {.notes}
 Close on the numbers, then the five lessons. One: the pooled 2×2 was an insignificant +0.0125 — only event-time windows revealed the −0.079 collapse and +0.063 overshoot, so let evolving effects evolve. Two: DiD, event study, dose-response, and synthetic control all pointed the same way; agreement beats any one estimate. Three: night-lights exposed a dose-response invisible at the district grain. Four: Conley spatial errors downgraded the recovery from a spurious *** to an honest ** without touching the point estimate. Five: ten treated districts on synthetic data, identified by an assumption — strong evidence, stated with its caveats. Next steps in the post: staggered-adoption DiD estimators, prediction intervals for the synthetic control, a wider donor pool.

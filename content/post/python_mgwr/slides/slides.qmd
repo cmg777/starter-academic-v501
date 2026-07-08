@@ -88,7 +88,7 @@ Spoiler tension figure. The slope is negative and highly significant (p < 0.001)
 - **Geography** — 514 districts across 17,000 islands, from dense Java to remote Papua
 :::
 
-[Cross-section from the QuaRCS repository; convergence means a *negative* slope on initial income.]{.comment}
+[Cross-section from the QuaRCS repository; convergence means a *negative* slope on initial income.]{.takeaway .fragment}
 
 ::: {.notes}
 The richest district (13.44) is roughly 690,000 dollars per capita — likely a resource-extraction enclave — and the poorest (7.17) about 1,300 dollars. That range, plus growth from severe contraction to rapid expansion, is exactly the variance a single line cannot capture.
@@ -106,7 +106,7 @@ Before fitting anything, map the two variables. Initial income is highest in Jak
 
 $$g_i = \alpha + \beta \cdot \ln(y_{i,2010}) + \varepsilon_i$$
 
-[A negative $\beta$ means poorer districts grow faster — the gap shrinks. Here $\beta = -0.195$, but it is a single number for the whole country.]{.comment}
+[A negative $\beta$ means poorer districts grow faster — the gap shrinks. Here $\beta = -0.195$, but it is a single number for the whole country.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the classic growth-economics test. The sign of beta is the whole question: negative means convergence. The limitation is structural — one alpha, one beta, no room for geography to matter.
@@ -139,7 +139,7 @@ A distance-decay kernel weights nearby districts more. A bandwidth $h$ sets how 
 :::
 ::::
 
-[The "multiscale" point: baseline conditions may vary over large regions while convergence speed shifts sharply between neighbours.]{.comment}
+[The "multiscale" point: baseline conditions may vary over large regions while convergence speed shifts sharply between neighbours.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the methodological advance. MGWR relaxes GWR's single-bandwidth constraint through iterative back-fitting, letting each variable find its own optimal spatial scale from the data. It assumes local stationarity — the relationship is approximately constant among the nearest h districts even if it differs across the full map.
@@ -170,7 +170,7 @@ Standardization is load-bearing — without it the per-variable bandwidths are n
 | Intercept | [44]{.key} | 26.81 | 3.13 |
 | Convergence slope | [44]{.key} | 25.27 | 3.11 |
 
-[Both variables converge on the same window here; with more covariates MGWR could assign each a very different scale.]{.comment}
+[Both variables converge on the same window here; with more covariates MGWR could assign each a very different scale.]{.takeaway .fragment}
 
 ::: {.notes}
 A bandwidth of 44 out of 514 is highly local — each district's regression listens only to its 44 nearest neighbours. That tight window is the signal that the convergence relationship genuinely varies across the archipelago rather than being a smooth national gradient.
@@ -215,7 +215,7 @@ One giant number to make the heterogeneity visceral. The global model collapses 
 | AICc | 1341.25 | 838.41 |
 | Bandwidth | all (514) | 44 |
 
-[Adjusted $R^2$ of 0.736 already nets out the 52 effective parameters — the gain is real, not overfitting.]{.comment}
+[Adjusted $R^2$ of 0.736 already nets out the 52 effective parameters — the gain is real, not overfitting.]{.takeaway .fragment}
 
 ::: {.notes}
 R² more than triples, from 0.214 to 0.762. The AICc drop of over 500 is decisive — a difference that large is not explainable by extra flexibility alone. The effective parameter count is 52.1, far more than OLS's 2 but far less than fitting 514 separate regressions (1,028 parameters). MGWR finds the right complexity automatically.

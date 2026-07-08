@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Pooled PCA for Development Indicators Across Time</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -269,7 +269,7 @@
 <li class="fragment"><strong>Coverage</strong> — 153 sub-national regions, 12 South American countries, 2013 &amp; 2019</li>
 <li class="fragment"><strong>Shape</strong> — reshaped wide → long into <strong>306 rows</strong> (153 regions × 2 periods)</li>
 </ul>
-<p><span class="comment">All three indicators run higher = better — no polarity flip needed.</span></p>
+<p><span class="takeaway fragment">All three indicators run higher = better — no polarity flip needed.</span></p>
 <aside class="notes">
 <p>The <code>period</code> column is metadata — it is carried through for analysis but never enters the PCA computation. From PCA’s perspective there are 306 observations, not two separate groups.</p>
 <style type="text/css">
@@ -308,7 +308,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Far below the <span class="math inline">\(r &gt; 0.93\)</span> of simulated data — the three indicators carry more independent information.</span></p>
+<p><span class="takeaway fragment">Far below the <span class="math inline">\(r &gt; 0.93\)</span> of simulated data — the three indicators carry more independent information.</span></p>
 <aside class="notes">
 <p>The weak Education–Health link (0.44) means a region can have high literacy but mediocre life expectancy, or vice versa — they are partly independent dimensions. Lower correlations mean PC1 absorbs less of the total variance: real human development is genuinely multi-dimensional.</p>
 <style type="text/css">
@@ -361,7 +361,7 @@
 <h2>Pooled standardization measures every region against one fixed ruler</h2>
 <p><span class="math display">\[Z_{ij,t}^{\text{pool}}=\frac{X_{ij,t}-\bar{X}_j^{\text{pool}}}{\sigma_j^{\text{pool}}}\]</span></p>
 <p>The pooled mean <span class="math inline">\(\bar{X}_j^{\text{pool}}\)</span> and SD <span class="math inline">\(\sigma_j^{\text{pool}}\)</span> are computed from <strong>all 306 rows at once</strong>, then applied to every observation in every period.</p>
-<p><span class="comment">Per-period shifts the baseline each year; pooled fixes it — so 0.926 → 0.946 is a <em>genuine</em> z-score rise.</span></p>
+<p><span class="takeaway fragment">Per-period shifts the baseline each year; pooled fixes it — so 0.926 → 0.946 is a <em>genuine</em> z-score rise.</span></p>
 <aside class="notes">
 <p>Analogy: measuring children at age 5 and age 10. Per-period compares each child only to same-age peers — you can’t see growth because the reference group changes. Pooled measures everyone against the combined distribution, so the z-score increase reflects actual growth. Without it, the income decline (0.736 → 0.715) would be re-centred away.</p>
 <style type="text/css">
@@ -380,7 +380,7 @@
 <h2>One eigen-decomposition on the stacked data yields a single, fixed set of weights</h2>
 <p><span class="math display">\[\Sigma^{\text{pool}}\,\mathbf{v}_k=\lambda_k\,\mathbf{v}_k,\qquad PC1_{i,t}=\sum_{j} w_j\,Z_{ij,t}^{\text{pool}}\]</span></p>
 <p>Pooled eigenvalues <span class="math inline">\([2.173,\,0.563,\,0.264]\)</span>; PC1 weights <span class="math inline">\([0.564,\,0.545,\,0.620]\)</span> — <strong>the same recipe for 2013 and 2019</strong>.</p>
-<p><span class="comment">Because the weights come from the pooled data, the index formula no longer drifts between periods.</span></p>
+<p><span class="takeaway fragment">Because the weights come from the pooled data, the index formula no longer drifts between periods.</span></p>
 <aside class="notes">
 <p>Income carries the heaviest weight (0.620), then education (0.564), then health (0.545). With three variables, PCA <em>discovers</em> data-driven weights — unlike the two-variable case where equal weights were a mathematical certainty. Crucially, these weights are fixed across time.</p>
 <style type="text/css">
@@ -531,7 +531,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The official SHDI uses a fixed geometric-mean formula across years — so it tracks the fixed-yardstick pooled index more tightly.</span></p>
+<p><span class="takeaway fragment">The official SHDI uses a fixed geometric-mean formula across years — so it tracks the fixed-yardstick pooled index more tightly.</span></p>
 <aside class="notes">
 <p>Pooled PCA correlates r = 0.991 with the official SHDI (R² = 0.9823) vs 0.9750 for per-period. For changes over time the gap holds: 0.9964 vs 0.9913. Both differences are small but consistent and in the same direction — when the goal is temporal comparability, fitting on stacked data is the right choice.</p>
 <style type="text/css">

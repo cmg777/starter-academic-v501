@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Standard Errors in Panel Data</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -269,7 +269,7 @@
 <li class="fragment"><strong>Treatment</strong> <span class="math inline">\(x\)</span> — R&amp;D intensity, <em>correlated with</em> unobserved firm ability</li>
 <li class="fragment"><strong>Errors</strong> — within-firm AR(1) serial correlation, <span class="math inline">\(\rho = 0.5\)</span></li>
 </ul>
-<p><span class="comment">Because ability drives both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, pooled OLS is <em>biased by design</em> — and AR(1) errors make SE choice critical.</span></p>
+<p><span class="takeaway fragment">Because ability drives both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, pooled OLS is <em>biased by design</em> — and AR(1) errors make SE choice critical.</span></p>
 <aside class="notes">
 <p>Simulated data has a decisive advantage: we know the answer. If the true effect is exactly 0.5, we can check whether each SE estimator’s 95% CI covers 0.5 about 95% of the time. The DGP: y = 2.0 + 0.5·x + mu_i + lambda_t + eps_it, with mu_i correlated with x.</p>
 <style type="text/css">
@@ -343,7 +343,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The estimate is <em>wrong</em>, and the tiny SE makes us wrongly confident in the wrong number.</span></p>
+<p><span class="takeaway fragment">The estimate is <em>wrong</em>, and the tiny SE makes us wrongly confident in the wrong number.</span></p>
 <aside class="notes">
 <p>Omitted-variable bias in action: high-ability firms invest more in R&amp;D and perform better, so the regression credits R&amp;D for what ability does. The conventional SE of 0.0345 yields a t of 29.9 — doubly misleading: biased point estimate AND a too-small SE that ignores within-firm correlation. First lesson: a biased estimator with small SEs is worse than a noisy unbiased one.</p>
 <style type="text/css">
@@ -361,7 +361,7 @@
 <section id="white-ses-barely-move-the-needle-correlation-not-heteroskedasticity-is-the-problem" class="slide level2 center">
 <h2>White SEs barely move the needle — correlation, not heteroskedasticity, is the problem</h2>
 <p><span class="math display">\[\hat{\Sigma}_{\text{White}} = (X'X)^{-1}\left(\sum_{i=1}^{N} X_i'\,\hat{e}_i^{\,2}\,X_i\right)(X'X)^{-1}\]</span></p>
-<p><span class="comment">White SE = 0.0361 vs conventional 0.0345 — the <span class="math inline">\(t\)</span> slips only from 29.9 to 28.6.</span></p>
+<p><span class="takeaway fragment">White SE = 0.0361 vs conventional 0.0345 — the <span class="math inline">\(t\)</span> slips only from 29.9 to 28.6.</span></p>
 <aside class="notes">
 <p>The White estimator allows each observation its own variance, but still treats observations as independent. It cannot see that firm 1’s 2015 error correlates with its 2016 error. For panel data the binding problem is within-cluster correlation, so White helps almost nothing.</p>
 <style type="text/css">
@@ -408,7 +408,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Ten observations from one firm carry far less than ten independent observations’ worth of information.</span></p>
+<p><span class="takeaway fragment">Ten observations from one firm carry far less than ten independent observations’ worth of information.</span></p>
 <aside class="notes">
 <p>Entity clustering allows arbitrary correlation within a firm. The SE jumps to 0.0621 — 80% above conventional, nearly double White. The t falls from 29.9 to 16.6. Analogy: surveying 100 students across 10 classrooms gives you closer to 10 independent data points than 100. In a weaker-effect setting this correction could flip “significant” to “insignificant.”</p>
 <style type="text/css">
@@ -455,7 +455,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Cluster on the dimension with <span class="math inline">\(\ge 40\)</span>–<span class="math inline">\(50\)</span> groups. Here that is firms (100), not years (10).</span></p>
+<p><span class="takeaway fragment">Cluster on the dimension with <span class="math inline">\(\ge 40\)</span>–<span class="math inline">\(50\)</span> groups. Here that is firms (100), not years (10).</span></p>
 <aside class="notes">
 <p>Time-clustered SEs are SMALLER than conventional, and t leaps to 61 — a trap. Clustered SEs rely on large-cluster asymptotics; 10 year-clusters is far too few. Two-way clustering (0.0532) sits between entity-only and time-only because the weak time dimension drags it down.</p>
 <style type="text/css">
@@ -547,7 +547,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Smallest SE in the deck — because firms are independent given their fixed effects <em>in this DGP</em>.</span></p>
+<p><span class="takeaway fragment">Smallest SE in the deck — because firms are independent given their fixed effects <em>in this DGP</em>.</span></p>
 <aside class="notes">
 <p>Driscoll-Kraay uses a Newey-West time kernel on cross-sectional averages — robust to spatial/cross-sectional dependence and serial correlation. Here cross-sectional dependence is weak, so DK is tiny. With strong common shocks (e.g.&nbsp;banks in a recession) and a long T, DK becomes the macro-panel standard. cov_type=“kernel”, kernel=“bartlett”, bandwidth=3.</p>
 <style type="text/css">

@@ -94,7 +94,7 @@ Agenda built from the post's learning objectives. Teaching deck, so we signpost 
 - **Controls** $X$ — 9 covariates: income, age, education, family size, and 5 more
 :::
 
-[Eligibility is set by the *employer*; participation is a *household choice*. That distinction drives all three models.]{.comment}
+[Eligibility is set by the *employer*; participation is a *household choice*. That distinction drives all three models.]{.takeaway .fragment}
 
 ::: {.notes}
 9,915 U.S. households. The outcome is wildly skewed — median $1,499, mean $18,052, range from −$502,302 to $1,536,798. About 70% of eligible households actually enroll. The eligibility-vs-participation split is the hinge of the whole deck: eligibility is plausibly exogenous after conditioning on X; participation is a choice tangled up with unobserved financial discipline.
@@ -112,7 +112,7 @@ Left panel: the income distributions barely overlap — eligible households aver
 
 $$\hat\Delta_{\text{naive}} = \underbrace{\theta_0}_{\text{causal effect}} + \underbrace{\text{bias}}_{\text{income, education, }\ldots}$$
 
-[The naive \$19,559 is not wrong arithmetic — it is the right gap answering the wrong question. DML's whole job is to subtract the second term.]{.comment}
+[The naive \$19,559 is not wrong arithmetic — it is the right gap answering the wrong question. DML's whole job is to subtract the second term.]{.takeaway .fragment}
 
 ::: {.notes}
 The naive difference-in-means is a clean number that confuses two things. Decompose it: the true causal effect we want, plus all pre-existing differences between the groups. Standard linear regression can subtract some bias, but only if the confounding is linear. When income-to-savings curves nonlinearly, linear adjustment leaves bias behind. That is the gap ML fills.
@@ -135,7 +135,7 @@ Predict eligibility from covariates. Residual $\tilde D = D - \hat m_0(X)$ is th
 :::
 ::::
 
-[Regress $\tilde Y$ on $\tilde D$: the slope is $\hat\theta_0$. Both residuals are cleaned of confounding, so only the causal channel remains.]{.comment}
+[Regress $\tilde Y$ on $\tilde D$: the slope is $\hat\theta_0$. Both residuals are cleaned of confounding, so only the causal channel remains.]{.takeaway .fragment}
 
 ::: {.notes}
 Think noise-cancelling headphones: the ML models learn the confounding "noise" pattern and subtract it; the clean causal signal is what's left. This is partialling out — the same logic as Frisch–Waugh–Lovell, but with flexible learners instead of OLS, so it captures nonlinear confounding. Crucially θ comes from the unshrunk residual-on-residual regression, never from a shrunk ML coefficient.
@@ -156,7 +156,7 @@ Fit $\hat g_0, \hat m_0$ on $K-1$ folds, predict on the held-out fold, rotate. N
 :::
 ::::
 
-[Orthogonality kills *regularization* bias; cross-fitting kills *overfitting* bias. Together they let Lasso, forests, or XGBoost serve as nuisance learners with no harm to inference.]{.comment}
+[Orthogonality kills *regularization* bias; cross-fitting kills *overfitting* bias. Together they let Lasso, forests, or XGBoost serve as nuisance learners with no harm to inference.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the engine of the whole method. The orthogonal (doubly-robust) score is built so first-order nuisance errors cancel — that is why we can plug in biased, regularized ML estimates. Cross-fitting is the rotating-judge trick: each fold's residuals come from a model that never saw that fold, so a flexible learner can't memorize quirks and manufacture artificially clean residuals. Remove either safeguard and the inference breaks.
@@ -191,7 +191,7 @@ PLR assumes one constant treatment effect θ0 and lets the controls enter g0 fle
 
 $$\theta_0 = E\!\left[g_0(1,X) - g_0(0,X) + \frac{D\,(Y-g_0(1,X))}{m_0(X)} - \frac{(1-D)\,(Y-g_0(0,X))}{1-m_0(X)}\right]$$
 
-[The doubly-robust (AIPW) score: an outcome model corrected by inverse-propensity weighting. Consistent if *either* $g_0$ or $m_0$ is right — a safety net.]{.comment}
+[The doubly-robust (AIPW) score: an outcome model corrected by inverse-propensity weighting. Consistent if *either* $g_0$ or $m_0$ is right — a safety net.]{.takeaway .fragment}
 
 ::: {.notes}
 IRM drops PLR's additivity. It combines an outcome model g0(D,X) with a propensity score m0(X) = P(D=1|X) into the doubly-robust score above. "Doubly robust" = consistent if either model is correct, not necessarily both. Propensity weighting upweights informative rare controls — an "eligible-type" household that wasn't eligible is the cleanest counterfactual. Trimming at 0.01 drops extreme propensity scores so the IPW weights stay stable.
@@ -211,7 +211,7 @@ $$\theta_{\text{LATE}} = \frac{E[Y\mid Z=1] - E[Y\mid Z=0]}{E[D\mid Z=1] - E[D\m
 
 Participation $D$ is endogenous (financial discipline is unobserved). Eligibility $Z$ is a **nudge**: it opens the door without forcing anyone through.
 
-[A Wald-type ratio: the instrument's effect on savings, divided by its effect on participation.]{.comment}
+[A Wald-type ratio: the instrument's effect on savings, divided by its effect on participation.]{.takeaway .fragment}
 
 ::: {.notes}
 PLR and IRM estimate the effect of eligibility, which is plausibly exogenous given X. But the effect of actually participating is endogenous — the enroll/don't-enroll choice is driven by unobserved traits (financial literacy, savings motivation) that also drive savings. IIVM uses eligibility as an instrument for participation: relevance (you can't participate without being eligible) plus exclusion (eligibility affects savings only through participation, given X). The estimand it recovers is the LATE.
@@ -226,7 +226,7 @@ PLR and IRM estimate the effect of eligibility, which is plausibly exogenous giv
 | **Compliers** | [Participate *because* eligible]{.key} | yes |
 | Defiers | Assumed not to exist (monotonicity) | — |
 
-[The LATE is the effect of participation on the marginal households a policy actually moves.]{.comment}
+[The LATE is the effect of participation on the marginal households a policy actually moves.]{.takeaway .fragment}
 
 ::: {.notes}
 Eligibility flips the participation status of compliers only. Always-takers would save in IRAs or taxable accounts anyway; never-takers won't enroll no matter what. The instrument doesn't move them, so they're not in the estimate. That's why the LATE is "local" — it's the effect for exactly the population an eligibility expansion targets. Defiers are ruled out by the monotonicity assumption.

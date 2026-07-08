@@ -89,7 +89,7 @@ Don't explain the construction yet — just plant the picture. Before 1990 the t
 - **Window** — 30 pre-treatment years to fit, 16 post-treatment to measure
 :::
 
-[The long pre-period is a structural advantage. It lets us check the counterfactual *before* the policy — where the gap should be zero.]{.comment}
+[The long pre-period is a structural advantage. It lets us check the counterfactual *before* the policy — where the gap should be zero.]{.takeaway .fragment}
 
 ## The estimand is the ATT: how much lower were Swedish emissions than a no-reform Sweden?
 
@@ -97,7 +97,7 @@ $$\tau_t = Y^{\text{obs}}_{\text{Sweden},t} - \hat Y^{N}_{\text{Sweden},t}, \qqu
 
 We never observe $\hat Y^{N}$ — Sweden *without* the tax. Synthetic control estimates it as a weighted blend of donors.
 
-[$Y^{\text{obs}}$ is what happened; $\hat Y^{N}$ is the counterfactual; the gap $\tau_t$ is the treatment effect on the treated.]{.comment}
+[$Y^{\text{obs}}$ is what happened; $\hat Y^{N}$ is the counterfactual; the gap $\tau_t$ is the treatment effect on the treated.]{.takeaway .fragment}
 
 ::: {.notes}
 ATT, not ATE: we estimate the effect for the one treated unit, Sweden, not an average over a population. The donor weights w_j are non-negative and sum to one, so the synthetic is a genuine convex combination — an interpolation among real countries, never an extrapolation. That convexity is what makes the method credible.
@@ -111,7 +111,7 @@ ATT, not ATE: we estimate the effect for the one treated unit, Sweden, not an av
 | DiD vs Denmark | [−0.140]{.key} | 0.116 | 0.23 |
 | DiD vs OECD pool (cluster SE) | −0.214 | 0.083 | 0.02 |
 
-[Differencing against a control flips +0.55 to negative — but one control is underpowered, and the pre-trends don't line up.]{.comment}
+[Differencing against a control flips +0.55 to negative — but one control is underpowered, and the pre-trends don't line up.]{.takeaway .fragment}
 
 ::: {.notes}
 Denmark alone reproduces Andersson's −0.140 exactly, but p = 0.23: one control is a noisy counterfactual. The full 14-country pool with cluster-robust SEs tightens to −0.214, p = 0.02. The catch: the pre-1990 CO2 plots show Sweden and the OECD mean were not on parallel trends. DiD's key assumption is visibly violated — which is exactly why we move to synthetic control, which does not need parallel trends, only a good pre-period fit.
@@ -123,7 +123,7 @@ $$w^* = \arg\min_{w}\ (X_1 - X_0 w)^\top V (X_1 - X_0 w) \quad \text{s.t.} \quad
 
 $X_1$ are Sweden's pre-treatment predictors; $X_0$ the donors'. The optimiser also picks $V$ to minimise pre-period CO2 prediction error.
 
-[Non-negative weights that sum to one $\Rightarrow$ the synthetic is a convex blend — no extrapolation, no parallel-trends assumption.]{.comment}
+[Non-negative weights that sum to one $\Rightarrow$ the synthetic is a convex blend — no extrapolation, no parallel-trends assumption.]{.takeaway .fragment}
 
 ::: {.notes}
 Two nested optimisations: pick the donor weights w given the predictor-importance matrix V, then pick V so the resulting synthetic best tracks Sweden's actual CO2 in the pre-period. The constraints are the whole point — they force the counterfactual to live inside the convex hull of real countries.
@@ -214,7 +214,7 @@ $$\Delta p^*_t = \beta_0 + \beta_1\, \Delta \Theta_t + \beta_2\, \Delta T_t + \v
 
 The 95% CI is roughly $[0.85, 1.45]$ — it contains 1. We cannot reject full pass-through.
 
-[If oil firms had absorbed the tax, the price signal never reaches drivers. They didn't — so the behavioural channel is real.]{.comment}
+[If oil firms had absorbed the tax, the price signal never reaches drivers. They didn't — so the behavioural channel is real.]{.takeaway .fragment}
 
 ::: {.notes}
 Regressing the year-on-year change in the retail price on changes in the oil price and the energy-plus-carbon tax. β₂ = 1.15, statistically indistinguishable from one. Working in first differences strips out time-invariant levels and isolates the response to new tax movements. This matters: the demand elasticities below are responses to a real pump-price change, not to a hidden refiner absorption.
@@ -239,7 +239,7 @@ Regressing the year-on-year change in the retail price on changes in the oil pri
 :::
 ::::
 
-[Salience + permanence: a tax is announced, debated, and persistent; a price drift is just a number on a billboard.]{.comment}
+[Salience + permanence: a tax is announced, debated, and persistent; a price drift is just a number on a billboard.]{.takeaway .fragment}
 
 ::: {.notes}
 Log-level model, so coefficients are semi-elasticities. The 3-to-1 ratio is the section's headline behavioural finding, and it barely moves across four nested OLS specs or three IV variants. Newey-West HAC(16) SEs — matching Andersson's Stata — are actually tighter than HC1 here. Both elasticities stay highly significant.

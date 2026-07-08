@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Dynamic Panel Data Models in Python</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -254,7 +254,7 @@
 <section id="the-model-commits-the-one-sin-ordinary-panel-methods-cannot-forgive" class="slide level2 center">
 <h2>The model commits the one sin ordinary panel methods cannot forgive</h2>
 <p><span class="math display">\[n_{it} = \rho\, n_{i,t-1} + \beta_1 w_{it} + \beta_2 w_{i,t-1} + \beta_3 k_{it} + \beta_4 k_{i,t-1} + \alpha_i + \delta_t + \varepsilon_{it}\]</span></p>
-<p><span class="comment">A <em>lagged dependent variable</em> sits on the right while the firm effect <span class="math inline">\(\alpha_i\)</span> sits in the error. By construction <span class="math inline">\(n_{i,t-1}\)</span> depends on <span class="math inline">\(\alpha_i\)</span> — so the regressor is correlated with the error, no matter how many controls we add.</span></p>
+<p><span class="takeaway fragment">A <em>lagged dependent variable</em> sits on the right while the firm effect <span class="math inline">\(\alpha_i\)</span> sits in the error. By construction <span class="math inline">\(n_{i,t-1}\)</span> depends on <span class="math inline">\(\alpha_i\)</span> — so the regressor is correlated with the error, no matter how many controls we add.</span></p>
 <aside class="notes">
 <p>Blundell and Bond’s (1998) dynamic labor-demand equation on this very dataset: log employment n on its own lag, current and lagged log real wage w and log capital k, a firm effect α_i, year effects δ_t. A firm with a high permanent level had high employment last year too — so the endogeneity is mechanical, not an omitted-variable accident. Important framing: ρ is a descriptive/structural persistence parameter, not a causal effect — no treatment, no ATE/ATT. Identification will rest on sequential exogeneity and no serial correlation in ε, partially testable via AR(2) and Hansen.</p>
 <style type="text/css">
@@ -376,7 +376,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The CI contains the whole bracket, the unit root, and explosive dynamics — all at once.</span></p>
+<p><span class="takeaway fragment">The CI contains the whole bracket, the unit root, and explosive dynamics — all at once.</span></p>
 <aside class="notes">
 <p>Anderson and Hsiao (1981): differencing kills α_i without touching future shocks, but Δn_{i,t-1} and Δε_it share ε_{i,t-1}, so we instrument with n_{i,t-2} — valid under sequential exogeneity. The point estimate is above the unit root, which nobody believes; the right reading is that ONE instrument extracts far too little information from a highly persistent series. The courtroom analogy: a single admissible witness whose testimony is valid but cannot convict. The fix is not a better witness but more of them — if n_{i,t-2} is valid, so is every deeper lag.</p>
 <style type="text/css">
@@ -394,7 +394,7 @@
 <section id="arellano-bond-every-lag-dated-t-2-or-earlier-is-a-valid-instrument" class="slide level2 center">
 <h2>Arellano-Bond: every lag dated <span class="math inline">\(t-2\)</span> or earlier is a valid instrument</h2>
 <p><span class="math display">\[E\big[\,n_{i,t-s}\,\Delta\varepsilon_{it}\,\big] = 0 \qquad \text{for all } s \ge 2\]</span></p>
-<p><span class="comment">Employment two or more years ago carries no information about this year’s <em>change</em> in shocks — and the same holds for lagged <span class="math inline">\(w\)</span> and <span class="math inline">\(k\)</span>. Dozens of moment conditions, combined optimally by GMM.</span></p>
+<p><span class="takeaway fragment">Employment two or more years ago carries no information about this year’s <em>change</em> in shocks — and the same holds for lagged <span class="math inline">\(w\)</span> and <span class="math inline">\(k\)</span>. Dozens of moment conditions, combined optimally by GMM.</span></p>
 <aside class="notes">
 <p>This is difference GMM (Arellano-Bond 1991): generalize Anderson-Hsiao from one moment condition to a whole family, with the GMM weighting matrix listening more carefully to the informative ones. With T = 9 the count reaches 91 instruments. Two-step GMM re-weights using first-step residuals — more efficient, but its naive SEs are badly downward-biased, so we quote the Windmeijer (2005) correction throughout.</p>
 <style type="text/css">
@@ -466,7 +466,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">0.679 sits 0.053 above the FE floor of 0.626 — within one SE of the biased bound.</span></p>
+<p><span class="takeaway fragment">0.679 sits 0.053 above the FE floor of 0.626 — within one SE of the biased bound.</span></p>
 <aside class="notes">
 <p>Every diagnostic passes: AR(1) rejects as it mechanically must, AR(2) is nowhere near rejecting, Hansen is comfortable. Yet Bond’s informal diagnostic fails loudly: the estimate sits in the bottom sixth of the bracket, hugging the FE bound. The mechanism: when the true series is highly persistent, the level two years ago barely predicts this year’s CHANGE — a near-random-walk changes unpredictably — so all 91 instruments are individually weak, and weak-instrument bias in this design points toward the within estimator. Blundell and Bond demonstrated precisely this failure on precisely this dataset. An estimator that passes every formal test while giving a suspect answer is the single most valuable lesson of the tutorial.</p>
 <style type="text/css">
@@ -484,7 +484,7 @@
 <section id="blundell-bond-flips-the-logic-lagged-differences-instrument-the-levels" class="slide level2 center">
 <h2>Blundell-Bond flips the logic: lagged differences instrument the levels</h2>
 <p><span class="math display">\[E\big[\,\Delta n_{i,t-1}\,(\alpha_i + \varepsilon_{it})\,\big] = 0\]</span></p>
-<p><span class="comment">Even for a persistent series, last year’s <em>change</em> is informative about this year’s <em>level</em>. The price is one new assumption — <strong>mean stationarity</strong>: firms’ initial deviations from their steady states must be unrelated to <span class="math inline">\(\alpha_i\)</span>.</span></p>
+<p><span class="takeaway fragment">Even for a persistent series, last year’s <em>change</em> is informative about this year’s <em>level</em>. The price is one new assumption — <strong>mean stationarity</strong>: firms’ initial deviations from their steady states must be unrelated to <span class="math inline">\(\alpha_i\)</span>.</span></p>
 <aside class="notes">
 <p>System GMM stacks the differenced equation (keeping its Arellano-Bond instruments) with the original levels equation, instrumented by lagged differences. The lake analogy: learning a lake’s depth from ripples alone (differences) vs also using waterline marks on the shore (levels) — when the lake is calm, the ripples carry almost no information. Mean stationarity is untestable directly, but the Hansen test gets indirect bite because the levels moments are overidentifying. We also collapse instruments to 32 — safely below Roodman’s rule that instruments should not outnumber the 140 firms.</p>
 <style type="text/css">
@@ -669,7 +669,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Same model six times; only the plumbing changes. Uncollapsed 2:3 is <em>rejected</em> (p = 0.035) while its collapsed twin <em>passes</em> — driven purely by instrument count.</span></p>
+<p><span class="takeaway fragment">Same model six times; only the plumbing changes. Uncollapsed 2:3 is <em>rejected</em> (p = 0.035) while its collapsed twin <em>passes</em> — driven purely by instrument count.</span></p>
 <aside class="notes">
 <p>The experiment: re-estimate the identical system-GMM model varying only the lag window and collapsing. Reassuring: ρ̂ barely moves — all six cells in [0.921, 0.956]. Unsettling: the test we would use to DEFEND it is not stable. Reading the uncollapsed rows, the count climbs 68 → 95 → 113 (approaching the 140-firm ceiling) and Hansen drifts 0.035 → 0.186 → 0.235 mechanically. The endpoint of that trajectory is the notorious “Hansen p = 1.000” red flag. (The full grid with SEs and AR(2) is in the post; the 2:5 collapsed row, 23 instruments, p = 0.255, is omitted here for space.)</p>
 <style type="text/css">
@@ -729,7 +729,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Exact match under a hard assertion — the NumPy-2 compatibility shim perturbs nothing.</span></p>
+<p><span class="takeaway fragment">Exact match under a hard assertion — the NumPy-2 compatibility shim perturbs nothing.</span></p>
 <aside class="notes">
 <p>Before trusting novel output from a patched package, replicate its published benchmark: the pydynpd README’s original Arellano-Bond two-lag specification on this same data, itself validated against Stata’s xtabond2. The much lower 0.271 is NOT a contradiction of 0.927 — it is difference GMM (same weak-instrument drag as before) on a different, two-lag specification with a restricted instrument window. “The” persistence estimate is always joint with the specification and estimator. Also note AR(1) does not reject here (p = 0.198): with two lags soaking up the dynamics, even the mechanical correlation is muted — diagnostics must be read against the model, not a universal rulebook.</p>
 <style type="text/css">

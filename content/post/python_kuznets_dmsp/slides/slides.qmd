@@ -99,7 +99,7 @@ The key move is not "light = income" — deserts and oil flares would wreck that
 - **Two units, kept straight** — predict at the *region* level, measure inequality at the *country* level
 :::
 
-[Mean regional Gini $= 0.064$ (SD $0.033$, max $0.163$): most countries are internally fairly equal, with a long unequal tail.]{.comment}
+[Mean regional Gini $= 0.064$ (SD $0.033$, max $0.163$): most countries are internally fairly equal, with a long unequal tail.]{.takeaway .fragment}
 
 ::: {.notes}
 Keeping the two units straight is the single most common source of confusion. The region-year files are the training set for the lights→income model; the country-year files are where the Kuznets and determinant regressions live. The wide income range across countries is what lets us see the whole curve.
@@ -109,7 +109,7 @@ Keeping the two units straight is the single most common source of confusion. Th
 
 $$y_r = \beta_0 + \beta_1 \ell_r + \beta_2 g_c + \gamma' X_r + \mu_g + \tau_s + \varepsilon_r$$
 
-[A region's log income $y_r$ = baseline, plus elasticity $\beta_1$ on its log light $\ell_r$, plus a near-one-for-one adjustment $\beta_2$ for its country's income $g_c$, plus geography $X_r$, world-region $\mu_g$ and satellite $\tau_s$ effects. The number we care about is $\beta_1$.]{.comment}
+[A region's log income $y_r$ = baseline, plus elasticity $\beta_1$ on its log light $\ell_r$, plus a near-one-for-one adjustment $\beta_2$ for its country's income $g_c$, plus geography $X_r$, world-region $\mu_g$ and satellite $\tau_s$ effects. The number we care about is $\beta_1$.]{.takeaway .fragment}
 
 ::: {.notes}
 Light is never credited with what national income, geography, satellite generation, or broad world region should explain — those are all controlled for. What's left, beta-one, is the genuine subnational gradient: how much brighter maps to how much richer once scale is removed.
@@ -143,7 +143,7 @@ $$\bar y = \frac{\sum_i w_i y_i}{\sum_i w_i}, \qquad
   p_i = \frac{w_i}{\sum_j w_j}, \qquad
   r_i = \frac{y_i}{\bar y}$$
 
-[Each country's regional incomes $y_i$ and populations $w_i$ collapse to one number: the Gini, three generalized-entropy indices GE($-1$)/GE($0$)/GE($1$), and the coefficient of variation — every region counting in proportion to its people.]{.comment}
+[Each country's regional incomes $y_i$ and populations $w_i$ collapse to one number: the Gini, three generalized-entropy indices GE($-1$)/GE($0$)/GE($1$), and the coefficient of variation — every region counting in proportion to its people.]{.takeaway .fragment}
 
 ::: {.notes}
 The whole measurement apparatus is one function: take a country-year's regional incomes and populations, return all five indices. The crucial coding trap is the Gini's absolute pairwise difference |y_i − y_j| summed over all pairs, not a product. Germany 2010 is the sanity check: 16 broadly-similar regions yield a population-weighted Gini of just 0.028 — low, as expected.
@@ -172,7 +172,7 @@ $$\text{GINIW}_{ct} = \beta_1 \ln Y_{ct} + \beta_2 (\ln Y_{ct})^2
 | $\beta_2$ (quadratic) | $-0.032$ | then bends down |
 | $\beta_3$ (cubic) | $0.001$ | faint upturn at the very top |
 
-[$N = 879$, 180 countries, 5-year periods. Same sign pattern across all five indices — the N is not an artefact of the Gini.]{.comment}
+[$N = 879$, 180 countries, 5-year periods. Same sign pattern across all five indices — the N is not an artefact of the Gini.]{.takeaway .fragment}
 
 ::: {.notes}
 Country and period fixed effects mean the curve is identified from each country's own changes over time, not from rich-vs-poor comparisons. Positive, negative, positive: inequality rises through industrialisation, narrows as countries converge internally, then edges up at the richest incomes. This is Williamson's hump with a third act. It reproduces the paper's coefficients exactly.
@@ -228,7 +228,7 @@ The sample size drifts across columns (857 down to 585) as different controls go
 | Conley 1,000 km | $0.026$ | $7$ |
 | Conley 5,000 km | [$0.037$]{.key} | $5$ |
 
-[The point estimate $\beta = 0.190$ never moves; only the honest uncertainty grows.]{.comment}
+[The point estimate $\beta = 0.190$ never moves; only the honest uncertainty grows.]{.takeaway .fragment}
 
 ::: {.notes}
 Regions are not independent — a boom in one province spills into its neighbours, so treating each region-year as an independent witness understates uncertainty two- to three-fold. The Conley correction weights cross-products of region scores by a Bartlett kernel on great-circle distance. Even at the widest radius the elasticity sits far from zero (t ≈ 5), so the lights-predict-income relationship is real, not a mirage created by ignoring geography.

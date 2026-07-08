@@ -85,7 +85,7 @@ The treatment effect in each post-1990 year is the difference between what we se
 
 $$\tau_T = Y_{1T}(1) - Y_{1T}(0)$$
 
-[$Y_{1T}(1)$ is observed; $Y_{1T}(0)$ — West Germany *without* reunification — is never observed, so we estimate it.]{.comment}
+[$Y_{1T}(1)$ is observed; $Y_{1T}(0)$ — West Germany *without* reunification — is never observed, so we estimate it.]{.takeaway .fragment}
 
 ::: {.notes}
 Name the estimand explicitly: this is the ATT for the single treated unit (West Germany), period by period. It is not an average over many units — there is only one. The fundamental problem of causal inference is that Y(0) for a treated unit is counterfactual. Synthetic control is a strategy for imputing that missing potential outcome.
@@ -99,7 +99,7 @@ The simplex constraint keeps the blend honest:
 
 $$\hat w_j \ge 0, \qquad \sum_j \hat w_j = 1$$
 
-[Non-negative weights that sum to one make synthetic West Germany a *convex combination* — it never extrapolates beyond the real donor data.]{.comment}
+[Non-negative weights that sum to one make synthetic West Germany a *convex combination* — it never extrapolates beyond the real donor data.]{.takeaway .fragment}
 
 ::: {.notes}
 Rather than picking one comparison country, blend many so their weighted average matches West Germany before 1990. The simplex (weights ≥ 0, summing to 1) is the classic Abadie-Diamond-Hainmueller constraint. It buys interpretability and rules out extrapolation. We relax it later (lasso/ridge/OLS) to test robustness.
@@ -114,7 +114,7 @@ Rather than picking one comparison country, blend many so their weighted average
 - **Window** — 1960–1990 to fit weights; 1991–2003 to measure the gap
 :::
 
-[`cointegrated_data=True`: GDP series share a common upward drift, so the estimator matches the trend, not a fixed level.]{.comment}
+[`cointegrated_data=True`: GDP series share a common upward drift, so the estimator matches the trend, not a fixed level.]{.takeaway .fragment}
 
 ::: {.notes}
 Data from Abadie (2021). 31 pre-treatment years is a generous window for estimating 16 weights. Setting cointegrated_data=True matters because GDP is non-stationary — treating these as stationary would distort the weights. West Germany sits in the upper part of the GDP distribution, so the synthetic must lean on rich donors.
@@ -170,7 +170,7 @@ Pre-treatment RMSE is 0.072 — about 0.6% of West Germany's pre-1990 GDP. The s
 | 2000 | 26.94 | 29.70 | −2.757 |
 | 2003 | 28.86 | 32.32 | [−3.465]{.key} |
 
-[Average gap 1991–2003: −$1,668 per capita — a substantial, *growing* cost.]{.comment}
+[Average gap 1991–2003: −$1,668 per capita — a substantial, *growing* cost.]{.takeaway .fragment}
 
 ::: {.notes}
 The gap starts slightly positive (+$502 in 1991) — a brief delay or initial boost — then turns negative in 1993 and grows monotonically to −$3,465 by 2003, roughly 11% of predicted GDP. Average over the window is −$1,668. But these are point estimates with no uncertainty attached. The whole question now is: could this be noise?
@@ -228,7 +228,7 @@ The headline number. This is the per-capita cost of reunification by the end of 
 | Ridge | 0.040 | −2.719 | −1.415 |
 | OLS | 0.040 | −2.380 | −1.323 |
 
-[Every constraint agrees: reunification lowered GDP. Only the magnitude shifts.]{.comment}
+[Every constraint agrees: reunification lowered GDP. Only the magnitude shifts.]{.takeaway .fragment}
 
 ::: {.notes}
 Simplex and lasso are nearly identical (lasso relaxes simplex). Ridge and OLS fit the pre-period tighter (RMSE 0.040) by using flexible weights, but estimate a somewhat smaller gap — unconstrained weights can overfit the pre-period, shrinking the apparent divergence. The qualitative conclusion is constraint-invariant: the sign and rough magnitude are robust.

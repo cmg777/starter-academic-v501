@@ -77,7 +77,7 @@ Point identification: if $x+y=10$ and $y=6$, then $x=4$ — *exactly*.
 
 Partial identification: if you only know $y\in[4,7]$, then $x\in[3,6]$. You did not pin $x$ down, but you ruled values out.
 
-[Credible uncertainty over incredible certainty.]{.comment}
+[Credible uncertainty over incredible certainty.]{.takeaway .fragment}
 
 ::: {.notes}
 The estimand stays the ATE, E[Y(1)] − E[Y(0)]. What changes is what we ask of the data: not a single value, but the *identified set* — every value consistent with the observed distribution under minimal assumptions. Manski's move: stop assuming the confounder away; bound instead.
@@ -115,7 +115,7 @@ The estimand stays the ATE, E[Y(1)] − E[Y(0)]. What changes is what we ask of 
 :::
 ::::
 
-[The backdoor criterion needs $U$; since $U$ is unmeasured, every point estimate is biased by an unknown amount.]{.comment}
+[The backdoor criterion needs $U$; since $U$ is unmeasured, every point estimate is biased by an unknown amount.]{.takeaway .fragment}
 
 ::: {.notes}
 Re-expression of the post's first Mermaid diagram. The dashed node U feeds arrows into X and Y; X also feeds Y (the effect we want). DoubleML/DoWhy assume this U away — conditional ignorability. Partial identification refuses to.
@@ -135,7 +135,7 @@ $$E[Y(1)] = E[Y\mid X{=}1]\,P(X{=}1) + E[Y(1)\mid X{=}0]\,P(X{=}0)$$
 
 We observe the first term; the counterfactual $E[Y(1)\mid X{=}0]$ is unknown but, for a binary $Y$, lies in $[0,1]$. Plug in the worst and best cases.
 
-[No parametric model, no exclusion restriction — only "the unseen counterfactual is a probability."]{.comment}
+[No parametric model, no exclusion restriction — only "the unseen counterfactual is a probability."]{.takeaway .fragment}
 
 ::: {.notes}
 Like a verdict from eyewitnesses only: we know the outcomes for the groups we saw; for the counterfactual outcomes we never observe, we assume the worst and the best to bracket the truth. The same logic bounds E[Y(0)]. ATE bounds = lowest E[Y(1)] minus highest E[Y(0)], and vice versa.
@@ -152,7 +152,7 @@ E_Y1 = (P_Y1_X1*P_X1 + 0*P_X0,  P_Y1_X1*P_X1 + 1*P_X0)
 ATE_lower, ATE_upper = E_Y1[0] - E_Y0_upper, E_Y1[1] - E_Y0_lower
 ```
 
-[`CausalBoundingEngine` matches the hand computation exactly — and in under a millisecond.]{.comment}
+[`CausalBoundingEngine` matches the hand computation exactly — and in under a millisecond.]{.takeaway .fragment}
 
 ::: {.notes}
 The package's manski() reproduces the manual numbers to four decimals (−0.2980, 0.7020) in ~0.0001 s because the bounds are closed-form: no optimization. The manual block is what is really happening under the hood.
@@ -175,7 +175,7 @@ For a binary outcome the Manski width is 1.0 by construction. The interval [−0
 | Manski (no assumptions) | −0.2980 | 0.7020 | [1.0000]{.key} |
 | Autobound (LP) | −0.2980 | 0.7020 | 1.0000 |
 
-[Autobound solves an optimization and lands on the *same* interval — the worst-case distributions are genuinely valid.]{.comment}
+[Autobound solves an optimization and lands on the *same* interval — the worst-case distributions are genuinely valid.]{.takeaway .fragment}
 
 ::: {.notes}
 Identical bounds is a result, not a failure: it proves no LP trick can tighten the no-assumption interval. Autobound takes 0.30 s vs Manski's 0.0001 s to reach the same place — the price of generality.
@@ -187,7 +187,7 @@ $$H(U \mid X, Y) \leq \theta$$
 
 Bound how *surprising* the hidden confounder may be. At $\theta = 0.1$ the ATE tightens to $[-0.2279,\ 0.4540]$ — width 0.6819.
 
-[Entropy is a middle ground: more than "nothing" (Manski), less than "no confounders" (DoubleML).]{.comment}
+[Entropy is a middle ground: more than "nothing" (Manski), less than "no confounders" (DoubleML).]{.takeaway .fragment}
 
 ::: {.notes}
 H is Shannon entropy — a fair coin is maximally surprising, a two-headed coin has zero entropy. Capping H(U|X,Y) limits how much the confounder can redistribute probability mass. Smaller θ ⟹ stricter ⟹ tighter. The bound still crosses zero, but it now rules out large positive effects.
@@ -207,7 +207,7 @@ $$\text{PNS} = P\big(Y_{X=1}=1 \,\cap\, Y_{X=0}=0\big)$$
 
 PNS is the share of workers who *would* get a job if trained and would *not* if untrained — individual-level causation, not a population average.
 
-[Tian–Pearl bounds: PNS $\in [0.000,\ 0.702]$.]{.comment}
+[Tian–Pearl bounds: PNS $\in [0.000,\ 0.702]$.]{.takeaway .fragment}
 
 ::: {.notes}
 The ATE averages over people; PNS asks how many individuals genuinely switched because of training. It matters for legal and medical "but-for" questions. The lower bound of exactly zero means we cannot rule out that training was never the active cause for anyone; the upper bound caps true switchers at 70.2%.
@@ -270,7 +270,7 @@ Steelman the critique: wide bounds frustrate decision-makers. But partial identi
 :::
 ::::
 
-[The identified set narrows only when you bring new information to bear.]{.comment}
+[The identified set narrows only when you bring new information to bear.]{.takeaway .fragment}
 
 ::: {.notes}
 Re-expression of the post's decision Mermaid: are all confounders observed? → point ID (DoWhy/DoubleML). No, but an instrument? → IV/2SLS point ID. Neither? → partial identification, compute bounds. Monotonicity alone roughly halves the Manski width.

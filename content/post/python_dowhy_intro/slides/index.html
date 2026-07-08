@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>A Beginner’s Guide to Causal Inference with DoWhy</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -270,7 +270,7 @@
 <li class="fragment"><strong>Confounders</strong> — <code>introversion</code> and <code>num_children</code> drive <em>both</em> treatment and outcome</li>
 <li class="fragment"><strong>Instrument</strong> — <code>subway_disruption</code> shifts WFH but never touches productivity directly</li>
 </ul>
-<p><span class="comment">The estimand is the <strong>average treatment effect (ATE)</strong> — and we know it equals 1.0, so every method is graded against the truth.</span></p>
+<p><span class="takeaway fragment">The estimand is the <strong>average treatment effect (ATE)</strong> — and we know it equals 1.0, so every method is graded against the truth.</span></p>
 </section>
 <section id="confounders-open-a-backdoor-path-the-naive-estimate-cant-close" class="slide level2 center">
 <h2>Confounders open a backdoor path the naive estimate can’t close</h2>
@@ -322,13 +322,13 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Identification (a <em>causal</em> question about the graph) stays separate from estimation (a <em>statistical</em> question about the data).</span></p>
+<p><span class="takeaway fragment">Identification (a <em>causal</em> question about the graph) stays separate from estimation (a <em>statistical</em> question about the data).</span></p>
 </section>
 <section id="step-2-identify-the-backdoor-estimand-conditions-on-the-confounders" class="slide level2 center">
 <h2>Step 2 — Identify: the backdoor estimand conditions on the confounders</h2>
 <p><span class="math display">\[ATE = E\!\left[\frac{\partial}{\partial T}\, E[\,Y \mid T, X_1, X_2\,]\right]\]</span></p>
 <p>Condition on <code>introversion</code> (<span class="math inline">\(X_1\)</span>) and <code>num_children</code> (<span class="math inline">\(X_2\)</span>) and the leftover <span class="math inline">\(T\)</span>–<span class="math inline">\(Y\)</span> association <em>is</em> the causal effect.</p>
-<p><span class="comment">The assumption is <strong>unconfoundedness</strong>: no unmeasured common cause of WFH and productivity. Untestable from data alone.</span></p>
+<p><span class="takeaway fragment">The assumption is <strong>unconfoundedness</strong>: no unmeasured common cause of WFH and productivity. Untestable from data alone.</span></p>
 <aside class="notes">
 <p>Identification is purely theoretical — it depends on the graph, not the numbers. DoWhy reads the DAG and reports that conditioning on the two confounders blocks every backdoor path. This is “selection on observables.” Its Achilles heel: miss one confounder and every backdoor estimate is biased, with no internal warning.</p>
 <style type="text/css">
@@ -347,7 +347,7 @@
 <h2>Step 2 — Identify: the instrument gives a second, assumption-free route</h2>
 <p><span class="math display">\[ATE = \frac{E\!\left[\partial Y / \partial Z\right]}{E\!\left[\partial T / \partial Z\right]}\]</span></p>
 <p>Divide the instrument’s effect on the outcome (reduced form) by its effect on the treatment (first stage).</p>
-<p><span class="comment">The assumption is the <strong>exclusion restriction</strong>: <span class="math inline">\(Z\)</span> moves productivity <em>only</em> through WFH. True by construction here.</span></p>
+<p><span class="takeaway fragment">The assumption is the <strong>exclusion restriction</strong>: <span class="math inline">\(Z\)</span> moves productivity <em>only</em> through WFH. True by construction here.</span></p>
 <aside class="notes">
 <p>Same target — the ATE — reached a different way. IV does not require observing the confounders; it requires a valid instrument. Subway disruption is random with respect to introversion and family size, affects WFH, and (by construction) has no direct path to productivity. Trade-off: it only identifies the effect for “compliers” and, as we’ll see, it’s far noisier.</p>
 <style type="text/css">
@@ -370,7 +370,7 @@
 <span id="cb1-3"><a href=""></a>    method_name<span class="op">=</span><span class="st">"backdoor.linear_regression"</span>,</span>
 <span id="cb1-4"><a href=""></a>    confidence_intervals<span class="op">=</span><span class="va">True</span>,</span>
 <span id="cb1-5"><a href=""></a>)   <span class="co"># ATE 1.0051 · robust SE 0.0614 · 95% CI [0.885, 1.126]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment"><span class="math inline">\(\beta_1\)</span> is the causal effect — <em>if</em> the model is right and every confounder is in.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(\beta_1\)</span> is the causal effect — <em>if</em> the model is right and every confounder is in.</span></p>
 <aside class="notes">
 <p>The simplest backdoor method: put the confounders in as controls. Bias is 0.5%. The HC1 robust SE of 0.0614 guards against heteroskedasticity. It works here because the true DGP is linear — in practice we rarely know the functional form, which is exactly why we run several methods.</p>
 <style type="text/css">
@@ -389,7 +389,7 @@
 <h2>Step 3 — Estimate: IPW reweights to a pseudo-randomized population</h2>
 <p><span class="math display">\[\widehat{ATE}_{IPW} = \frac{1}{N}\sum_{i=1}^{N}\left[\frac{T_i Y_i}{\hat{e}(X_i)} - \frac{(1-T_i)Y_i}{1-\hat{e}(X_i)}\right]\]</span></p>
 <p>Weight each person by the inverse of their <strong>propensity score</strong> <span class="math inline">\(\hat{e}(X_i)=P(T_i=1\mid X_i)\)</span>, so treatment becomes independent of confounders.</p>
-<p><span class="comment">IPW gives <strong>1.0275</strong> (SE 0.0754). It models <em>who gets treated</em>, not the outcome — so it costs a little precision.</span></p>
+<p><span class="takeaway fragment">IPW gives <strong>1.0275</strong> (SE 0.0754). It models <em>who gets treated</em>, not the outcome — so it costs a little precision.</span></p>
 <aside class="notes">
 <p>Completely different philosophy from regression: model the treatment-assignment mechanism, not the outcome. Reweighting builds a pseudo-population that mimics a randomized trial. Bias 2.8%. The slightly larger SE is the price of discarding the outcome model and leaning entirely on propensity scores.</p>
 <style type="text/css">
@@ -408,7 +408,7 @@
 <h2>Step 3 — Estimate: doubly robust is two insurance policies in one</h2>
 <p><span class="math display">\[\widehat{ATE}_{DR} = \frac{1}{N}\sum_{i=1}^{N}\Big[(\hat{\mu}_1 - \hat{\mu}_0) + \frac{T_i(Y_i-\hat{\mu}_1)}{\hat{e}(X_i)} - \frac{(1-T_i)(Y_i-\hat{\mu}_0)}{1-\hat{e}(X_i)}\Big]\]</span></p>
 <p>Combine an outcome model (<span class="math inline">\(\hat{\mu}_1,\hat{\mu}_0\)</span>) with the IPW reweight. Consistent if <strong>either</strong> model is right.</p>
-<p><span class="comment">AIPW gives <strong>1.0115</strong> (SE 0.0623) — smallest bias of the four, precision matching regression.</span></p>
+<p><span class="takeaway fragment">AIPW gives <strong>1.0115</strong> (SE 0.0623) — smallest bias of the four, precision matching regression.</span></p>
 <aside class="notes">
 <p>Belt and suspenders. If the propensity model fails, the outcome model saves you; if the outcome model fails, the reweight does. Both wrong is the only failure mode. When both are right, AIPW hits the semiparametric efficiency bound — the smallest possible variance — which is why its SE nearly equals regression’s despite the extra machinery.</p>
 <style type="text/css">
@@ -430,7 +430,7 @@
 <span id="cb2-3"><a href=""></a>    method_name<span class="op">=</span><span class="st">"iv.instrumental_variable"</span>,</span>
 <span id="cb2-4"><a href=""></a>    method_params<span class="op">=</span>{<span class="st">"iv_instrument_name"</span>: <span class="st">"subway_disruption"</span>},</span>
 <span id="cb2-5"><a href=""></a>)   <span class="co"># first-stage F = 293 (strong) · ATE 0.8881 · SE 0.3303</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">The instrument is strong (F = 293), yet the Wald ratio amplifies noise — SE <strong>0.3303</strong>, more than <span class="math inline">\(5\times\)</span> regression’s.</span></p>
+<p><span class="takeaway fragment">The instrument is strong (F = 293), yet the Wald ratio amplifies noise — SE <strong>0.3303</strong>, more than <span class="math inline">\(5\times\)</span> regression’s.</span></p>
 <aside class="notes">
 <p>IV does not condition on confounders — it uses only the exogenous WFH variation the subway shock provides. That’s its superpower: validity even with unmeasured confounders. The cost: dividing a reduced-form effect by a first-stage effect propagates uncertainty from both stages through the delta method, blowing the CI out to [0.24, 1.54].</p>
 <style type="text/css">
@@ -506,7 +506,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The naive CI [1.25, 1.53] is <em>narrow</em> — and excludes the truth. Precision without validity is worthless.</span></p>
+<p><span class="takeaway fragment">The naive CI [1.25, 1.53] is <em>narrow</em> — and excludes the truth. Precision without validity is worthless.</span></p>
 </section></section>
 <section>
 <section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
@@ -563,7 +563,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Permute the treatment and the effect collapses to zero; add a fake confounder or drop 20% of rows and it barely moves.</span></p>
+<p><span class="takeaway fragment">Permute the treatment and the effect collapses to zero; add a fake confounder or drop 20% of rows and it barely moves.</span></p>
 <aside class="notes">
 <p>This is what makes the four-step framework more than bookkeeping. The placebo refuter is the most convincing: replace the real treatment with a random one and a working method must return ~0 — it returns −0.00003 (p = 0.96). Random-common-cause and data-subset confirm the estimate is not fragile. Robustness is demonstrated, not asserted.</p>
 <style type="text/css">
