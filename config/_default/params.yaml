@@ -20,7 +20,7 @@ twitter: 'https://x.com/carlosmendez777'
 
 # Contact (edit or remove options as required)
 
-email: 
+email: carlos.mendez.n9@f.mail.nagoya-u.ac.jp
 phone: +81 052 789 4345
 address:
   street: Furocho, Chikusa-ku
@@ -47,8 +47,8 @@ contact_links:
     link: 'https://x.com/carlosmendez777'
   - icon: envelope
     icon_pack: fa
-    name: carlos [at] gsid.nagoya-u.ac.jp
-    link: 'mailto:carlosmendez777@gmail.com'
+    name: carlos.mendez.n9 [at] f.mail.nagoya-u.ac.jp
+    link: 'mailto:carlos.mendez.n9@f.mail.nagoya-u.ac.jp'
 
 # Site header
 
