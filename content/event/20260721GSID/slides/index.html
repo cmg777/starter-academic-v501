@@ -478,55 +478,6 @@ Course: <a href="https://quarcs-lab.github.io/metricsai/" target="_blank" rel="n
           display:block!important;
       }</style></aside>
 </section>
-<section id="case-study-can-satellites-see-poverty-in-bolivia" class="slide level2 center">
-<h2>Case study: can satellites see poverty in Bolivia?</h2>
-<p>One question ties the pipeline together:</p>
-<p><em>Can satellite data predict local economic development across Bolivia’s 339 municipalities?</em></p>
-<aside class="notes">
-<p>The book’s flagship case. It makes the abstract pipeline concrete: query satellite indicators, then use statistics, econometrics, and machine learning to answer a real development question.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="nighttime-lights-satellite-embeddings-a-development-index" class="slide level2 center">
-<h2>Nighttime lights + satellite embeddings → a development index</h2>
-<div class="flowchain">
-<div class="ins">
-<div class="box ntl">
-<b>Nighttime lights</b><small>economic-activity proxy</small>
-</div>
-<div class="box emb">
-<b>Satellite embeddings</b><small>64-dim · physical infrastructure</small>
-</div>
-</div>
-<span class="dgram-arrow">→</span>
-<div class="box out">
-<b>Development index</b><small>IMDS · 0–100</small>
-</div>
-</div>
-<p><span class="comment fragment">Lights capture activity at night; embeddings capture the built environment by day.</span></p>
-<aside class="notes">
-<p>DS4Bolivia: 339 municipalities. Nighttime lights (log NTL per capita) proxy economic activity; 64-dimensional deep-learning embeddings of daytime imagery (Sentinel-2/Landsat) capture buildings, roads, and vegetation. Together they predict the Municipal Sustainable Development Index.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
 <section id="exploration-in-colab-becomes-a-research-project-managed-in-github" class="slide level2 center">
 <h2>Exploration in Colab becomes a research project — managed in GitHub</h2>
 <p>The notebook answered the question. Now make the work <strong>reproducible and reviewable</strong>.</p>

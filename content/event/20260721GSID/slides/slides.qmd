@@ -275,33 +275,6 @@ Connect **Google Earth Engine** and query satellite data straight from a noteboo
 This is the big-data turn the workshop emphasizes. Earth Engine hosts petabytes of satellite imagery; from Colab you query only what you need. Pollution, energy, and social indicators all become variables you can analyze.
 :::
 
-## Case study: can satellites see poverty in Bolivia?
-
-One question ties the pipeline together:
-
-*Can satellite data predict local economic development across Bolivia's 339 municipalities?*
-
-::: {.notes}
-The book's flagship case. It makes the abstract pipeline concrete: query satellite indicators, then use statistics, econometrics, and machine learning to answer a real development question.
-:::
-
-## Nighttime lights + satellite embeddings → a development index
-
-<div class="flowchain">
-<div class="ins">
-<div class="box ntl"><b>Nighttime lights</b><small>economic-activity proxy</small></div>
-<div class="box emb"><b>Satellite embeddings</b><small>64-dim · physical infrastructure</small></div>
-</div>
-<span class="dgram-arrow">→</span>
-<div class="box out"><b>Development index</b><small>IMDS · 0–100</small></div>
-</div>
-
-[Lights capture activity at night; embeddings capture the built environment by day.]{.comment .fragment}
-
-::: {.notes}
-DS4Bolivia: 339 municipalities. Nighttime lights (log NTL per capita) proxy economic activity; 64-dimensional deep-learning embeddings of daytime imagery (Sentinel-2/Landsat) capture buildings, roads, and vegetation. Together they predict the Municipal Sustainable Development Index.
-:::
-
 ## Exploration in Colab becomes a research project — managed in GitHub
 
 The notebook answered the question. Now make the work **reproducible and reviewable**.
