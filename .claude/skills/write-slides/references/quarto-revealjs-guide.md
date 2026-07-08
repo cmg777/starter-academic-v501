@@ -11,7 +11,7 @@ that Hugo serves from the post bundle. Read this in Phase 3.
 | File | Role | Per-run |
 |---|---|---|
 | `slides.qmd` | The deck source (`format: revealjs`). Front matter = engine config; body = the slides. | **Composed per post** from `slides.qmd.tmpl` + the archetypes. |
-| `site-brand.scss` | The revealjs theme (brand palette/fonts/archetype styling). | **Copied verbatim** from `templates/site-brand.scss`. |
+| `site-brand.scss` | The revealjs theme (brand palette/fonts/archetype styling). The deck canvas is a deliberate **light cool gray** (`$body-bg: #eef1f6`), not pure white. | **Copied verbatim** from `templates/site-brand.scss`. |
 | `title-slide.html` | A Quarto title-slide **partial** that renders the key-result number strip. | **Copied verbatim** from `templates/title-slide.html`. |
 
 Render (from the `slides/` dir):

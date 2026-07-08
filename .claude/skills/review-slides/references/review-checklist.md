@@ -149,6 +149,7 @@ See `design-adherence.md` for the full rubric.
       key-result strip as a pipeline (see design-adherence). A numeric strip must not use it.
 - [ ] Title-strip stats use the three brand colors (orange `#d97757`, teal
       `#00d4c8`, steel `#6a9bcc`); no off-palette hex introduced in `slides.qmd`.
+- [ ] Page background is the brand light-cool-gray `$body-bg: #eef1f6` (deliberate, not white).
 - [ ] `center: true`, chalkboard, menu, overview still enabled in front matter.
 - [ ] No per-deck font or theme override injected.
 

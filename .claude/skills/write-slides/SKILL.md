@@ -99,6 +99,7 @@ Hugo, not Quarto, so the rendered output must be in git. Only Quarto's local cac
 | Teal | `#00d4c8` | Act III divider, table head rule, 2nd title stat, dark-slide accents |
 | Heading blue | `#1a3a8a` | Assertion titles, headings |
 | Ink | `#141413` | Body text; headline/closing slide background |
+| Page background | `#eef1f6` | The deck canvas — a deliberate **light cool gray** (NOT pure white), in the steel/navy family so it stays on-brand. Set via `$body-bg`. |
 | Display font | Cinzel | Title, dividers, big number, key-result numbers |
 | Mono font | IBM Plex Mono | Code blocks |
 
