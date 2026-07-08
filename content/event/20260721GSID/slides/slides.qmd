@@ -339,6 +339,8 @@ The research counterpart to skills-and-planning. When an AI agent proposes chang
 
 ![The responsible-ai-assisted-research-101 template: analysis code, data, the manuscript, and an agent operating manual — all versioned in one place.](img/shot-github-repo.png)
 
+<p style="text-align:center; margin:0.15em 0 0; font-size:0.82em;"><a href="https://github.com/quarcs-lab/responsible-ai-assisted-research-101" target="_blank" rel="noopener" data-preview-link="false">github.com/quarcs-lab/responsible-ai-assisted-research-101</a></p>
+
 ::: {.notes}
 A concrete template (github.com/quarcs-lab/responsible-ai-assisted-research-101): numbered analysis scripts, immutable raw data, code-emitted tables/figures, a DECISIONS.md and LOG.md, and a CLAUDE.md operating manual for the agent. One place, fully reproducible.
 :::
