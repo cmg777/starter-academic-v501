@@ -95,7 +95,7 @@
     code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-9b58ec14c6e77dd4bed0a59f9cec700e.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -216,6 +216,7 @@
 <p>Donohue &amp; Levitt found more abortion access tracked less crime. Belloni–Chernozhukov–Hansen then expanded 8 controls into <strong>284</strong>.</p>
 <div class="fragment">
 <p>Keep too few and you risk confounding. Keep too many and the signal drowns. <em>Which subset?</em></p>
+<p><span class="takeaway fragment">Variable selection <em>is</em> the result — the same data gives opposite answers by which controls you keep.</span></p>
 <aside class="notes">
 <p>This is the central tension of high-dimensional causal inference: variable selection decides the result. The same data will give opposite answers depending on the selection rule.</p>
 <style type="text/css">
@@ -234,7 +235,8 @@
 <section id="five-estimators-three-crimes-wildly-different-answers-from-one-dataset" class="slide level2 center">
 <h2>Five estimators, three crimes — wildly different answers from one dataset</h2>
 
-<img data-src="../r_double_lasso_estimates.png" class="r-stretch quarto-figure-center"><p class="caption"><span class="math inline">\(\hat\alpha \pm 95\%\)</span> CI · First-diff, kitchen-sink OLS, PSL, Double LASSO (rigorous), Double LASSO (CV). Dashed line = zero.</p><aside class="notes">
+<img data-src="../r_double_lasso_estimates.png" class="r-stretch quarto-figure-center"><p class="caption"><span class="math inline">\(\hat\alpha \pm 95\%\)</span> CI · First-diff, kitchen-sink OLS, PSL, Double LASSO (rigorous), Double LASSO (CV). Dashed line = zero.</p><p><span class="takeaway fragment">One dataset, five estimators — and the sign of the effect is up for grabs.</span></p>
+<aside class="notes">
 <p>Spoiler figure. Don’t explain every bar yet — just plant that the estimators disagree, sometimes flipping sign. We earn each one in Act II and come back to this picture.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -269,7 +271,20 @@
 <li class="fragment"><strong>Treatment</strong> — the “effective abortion rate”</li>
 <li class="fragment"><strong>Controls</strong> — 8 original covariates expanded to <strong>284</strong> (lags, interactions, trends)</li>
 </ul>
-<p><span class="takeaway fragment">State fixed effects absorbed by first-differencing; year effects partialled out (Frisch–Waugh–Lovell). <span class="math inline">\(p/n \approx 0.49\)</span> — the high-dimensional regime where Double LASSO is meant to help.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(p/n \approx 0.49\)</span> — the high-dimensional regime where Double LASSO is meant to help.</span></p>
+<aside class="notes">
+<p>State fixed effects are absorbed by first-differencing; year effects are partialled out via Frisch–Waugh–Lovell before the LASSO sees the data.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="five-estimators-ask-the-same-question-with-escalating-discipline" class="slide level2 center">
 <h2>Five estimators ask the same question with escalating discipline</h2>
@@ -280,6 +295,7 @@
 <li class="fragment"><strong>Double LASSO (rigorous)</strong> — two LASSOs, theory-chosen penalty</li>
 <li class="fragment"><strong>Double LASSO (CV)</strong> — two LASSOs, cross-validated penalty</li>
 </ul>
+<p><span class="takeaway fragment">Same question, escalating discipline — from zero controls to two theory-tuned LASSOs.</span></p>
 </section>
 <section id="with-zero-controls-more-abortion-tracks-less-crime-0.152" class="slide level2 center">
 <h2>With zero controls, more abortion tracks less crime: −0.152</h2>
@@ -349,7 +365,8 @@
 <section id="double-lasso-selects-on-the-outcome-and-the-treatment-then-runs-ols" class="slide level2 center">
 <h2>Double LASSO selects on the outcome <em>and</em> the treatment, then runs OLS</h2>
 <p><span class="math display">\[\hat\beta(\lambda)=\arg\min_\beta\ \frac{1}{2n}\sum_{i=1}^{n}\big(y_i-x_i^\top\beta\big)^2+\lambda\sum_{j=1}^{p}|\beta_j|\]</span></p>
-<p>Run it twice — once for <span class="math inline">\(y\)</span> on <span class="math inline">\(X\)</span> (set <span class="math inline">\(I_y\)</span>), once for <span class="math inline">\(d\)</span> on <span class="math inline">\(X\)</span> (set <span class="math inline">\(I_d\)</span>) — then OLS of <span class="math inline">\(y\)</span> on <span class="math inline">\(d\)</span> and the <strong>union</strong> <span class="math inline">\(I_y\cup I_d\)</span>.</p>
+<p>Run two LASSOs: <span class="math inline">\(y\)</span> on <span class="math inline">\(X\)</span> → <span class="math inline">\(I_y\)</span>, and <span class="math inline">\(d\)</span> on <span class="math inline">\(X\)</span> → <span class="math inline">\(I_d\)</span>.</p>
+<p>Then OLS of <span class="math inline">\(y\)</span> on <span class="math inline">\(d\)</span> and the <strong>union</strong> <span class="math inline">\(I_y\cup I_d\)</span>.</p>
 <p><span class="takeaway fragment">The L1 penalty <span class="math inline">\(\lambda\sum_j|\beta_j|\)</span> zeroes weak controls; the union keeps anything that predicts <em>either</em> side.</span></p>
 <aside class="notes">
 <p>PSL selects only on y, so it can drop a control that predicts the treatment but not the outcome — exactly the omitted variable that biases α. Double LASSO’s second LASSO (d on X) catches it. Frisch–Waugh–Lovell guarantees the post-OLS α is unbiased if the union captures the confounding.</p>
@@ -373,6 +390,7 @@
 <span id="cb1-4"><a href=""></a>S  <span class="ot">&lt;-</span> <span class="fu">union</span>(Iy, Id)                  <span class="co"># the union is the Double LASSO safeguard</span></span>
 <span id="cb1-5"><a href=""></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> d <span class="sc">+</span> X[, S])            <span class="co"># post-OLS on the selected support</span></span>
 <span id="cb1-6"><a href=""></a><span class="fu">coeftest</span>(fit, <span class="at">vcov =</span> vcovCL, <span class="at">cluster =</span> state)[<span class="st">"d"</span>, ]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><span class="takeaway fragment">Two <code>rlasso</code> fits, their union, one post-OLS — the entire estimator in six lines.</span></p>
 <aside class="notes">
 <p>“Rigorous” means hdm::rlasso chooses λ from Belloni et al.’s theory (c = 1.1, γ = 0.05), not from cross-validation. The post-OLS step is load-bearing: α comes from unshrunk OLS on the selected support, never from LASSO’s shrunk coefficients.</p>
 <style type="text/css">
@@ -390,7 +408,8 @@
 <section id="theory-keeps-8-controls-cross-validation-keeps-150" class="slide level2 center">
 <h2>Theory keeps 8 controls; cross-validation keeps 150</h2>
 
-<img data-src="../r_double_lasso_selection.png" class="r-stretch quarto-figure-center"><p class="caption"><span class="math inline">\(|I_y|\)</span>, <span class="math inline">\(|I_d|\)</span>, intersection, union out of 284 candidates — rigorous (teal) vs CV (orange).</p><aside class="notes">
+<img data-src="../r_double_lasso_selection.png" class="r-stretch quarto-figure-center"><p class="caption"><span class="math inline">\(|I_y|\)</span>, <span class="math inline">\(|I_d|\)</span>, intersection, union out of 284 candidates — rigorous (teal) vs CV (orange).</p><p><span class="takeaway fragment">The rigorous penalty under-selects on purpose; CV’s 20× larger union chases prediction, not the causal signal.</span></p>
+<aside class="notes">
 <p>For violent crime the rigorous union is 8; the CV union is 150 — twenty times more. |I_y| = 0 for violent and murder: no control predicts crime well enough to survive the rigorous threshold, while |I_d| = 8–9 says abortion is predictable. That asymmetry is exactly when DL helps most.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -441,7 +460,8 @@
 <section id="cross-validations-lambda-is-so-small-that-143-of-284-controls-survive" class="slide level2 center">
 <h2>Cross-validation’s <span class="math inline">\(\lambda\)</span> is so small that 143 of 284 controls survive</h2>
 
-<img data-src="../r_double_lasso_paths.png" class="r-stretch quarto-figure-center"><p class="caption">Coefficient paths, <span class="math inline">\(d\)</span>-equation (violent panel). Dashed line = <span class="math inline">\(\log(\lambda_{\min})\)</span>; 143 paths nonzero there.</p><aside class="notes">
+<img data-src="../r_double_lasso_paths.png" class="r-stretch quarto-figure-center"><p class="caption">Coefficient paths, <span class="math inline">\(d\)</span>-equation (violent panel). Dashed line = <span class="math inline">\(\log(\lambda_{\min})\)</span>; 143 paths nonzero there.</p><p><span class="takeaway fragment">Prediction-optimal is not selection-optimal — the causal target doesn’t want these 143 controls.</span></p>
+<aside class="notes">
 <p>Even in the treatment equation alone, CV’s MSE-optimal λ keeps 143 controls. Prediction-optimal is not selection-optimal for a causal target — the whole lesson in one picture.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -463,7 +483,7 @@
 <section id="rigorous-double-lasso-restores-a-sensible-0.096-for-violent-crime" class="slide level2 center" data-background-color="#141413">
 <h2>Rigorous Double LASSO restores a sensible −0.096 for violent crime</h2>
 <p><span class="bignum">−0.096</span></p>
-<p><span class="bignum-label"><span class="math inline">\(\hat\alpha\)</span>, rigorous Double LASSO (SE 0.051) · matches the paper’s −0.104; selection counts match exactly</span></p>
+<p><span class="bignum-label"><span class="math inline">\(\hat\alpha\)</span>, rigorous Double LASSO (SE 0.051) · within 0.01 of the paper’s estimate; selection counts match exactly</span></p>
 <aside class="notes">
 <p>Between the no-controls baseline (−0.152) and the kitchen-sink mess (+0.014), the rigorous DL lands at −0.096 off just 8 controls. The 95% CI [−0.197, +0.004] barely contains zero — one notch below 5% significance, an honest result.</p>
 <style type="text/css">

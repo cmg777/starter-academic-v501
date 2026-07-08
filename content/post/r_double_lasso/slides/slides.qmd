@@ -55,6 +55,8 @@ Donohue & Levitt found more abortion access tracked less crime. Belloni–Cherno
 
 Keep too few and you risk confounding. Keep too many and the signal drowns. *Which subset?*
 
+[Variable selection *is* the result — the same data gives opposite answers by which controls you keep.]{.takeaway .fragment}
+
 ::: {.notes}
 This is the central tension of high-dimensional causal inference: variable selection decides the result. The same data will give opposite answers depending on the selection rule.
 :::
@@ -62,6 +64,8 @@ This is the central tension of high-dimensional causal inference: variable selec
 ## Five estimators, three crimes — wildly different answers from one dataset
 
 ![$\hat\alpha \pm 95\%$ CI · First-diff, kitchen-sink OLS, PSL, Double LASSO (rigorous), Double LASSO (CV). Dashed line = zero.](../r_double_lasso_estimates.png)
+
+[One dataset, five estimators — and the sign of the effect is up for grabs.]{.takeaway .fragment}
 
 ::: {.notes}
 Spoiler figure. Don't explain every bar yet — just plant that the estimators disagree, sometimes flipping sign. We earn each one in Act II and come back to this picture.
@@ -88,7 +92,11 @@ Spoiler figure. Don't explain every bar yet — just plant that the estimators d
 - **Controls** — 8 original covariates expanded to **284** (lags, interactions, trends)
 :::
 
-[State fixed effects absorbed by first-differencing; year effects partialled out (Frisch–Waugh–Lovell). $p/n \approx 0.49$ — the high-dimensional regime where Double LASSO is meant to help.]{.takeaway .fragment}
+[$p/n \approx 0.49$ — the high-dimensional regime where Double LASSO is meant to help.]{.takeaway .fragment}
+
+::: {.notes}
+State fixed effects are absorbed by first-differencing; year effects are partialled out via Frisch–Waugh–Lovell before the LASSO sees the data.
+:::
 
 ## Five estimators ask the same question with escalating discipline
 
@@ -99,6 +107,8 @@ Spoiler figure. Don't explain every bar yet — just plant that the estimators d
 - **Double LASSO (rigorous)** — two LASSOs, theory-chosen penalty
 - **Double LASSO (CV)** — two LASSOs, cross-validated penalty
 :::
+
+[Same question, escalating discipline — from zero controls to two theory-tuned LASSOs.]{.takeaway .fragment}
 
 ## With zero controls, more abortion tracks less crime: −0.152
 
@@ -128,7 +138,9 @@ p = 284 < n = 576, so OLS technically inverts — but near-collinear controls ma
 
 $$\hat\beta(\lambda)=\arg\min_\beta\ \frac{1}{2n}\sum_{i=1}^{n}\big(y_i-x_i^\top\beta\big)^2+\lambda\sum_{j=1}^{p}|\beta_j|$$
 
-Run it twice — once for $y$ on $X$ (set $I_y$), once for $d$ on $X$ (set $I_d$) — then OLS of $y$ on $d$ and the **union** $I_y\cup I_d$.
+Run two LASSOs: $y$ on $X$ → $I_y$, and $d$ on $X$ → $I_d$.
+
+Then OLS of $y$ on $d$ and the **union** $I_y\cup I_d$.
 
 [The L1 penalty $\lambda\sum_j|\beta_j|$ zeroes weak controls; the union keeps anything that predicts *either* side.]{.takeaway .fragment}
 
@@ -147,6 +159,8 @@ fit <- lm(y ~ d + X[, S])            # post-OLS on the selected support
 coeftest(fit, vcov = vcovCL, cluster = state)["d", ]
 ```
 
+[Two `rlasso` fits, their union, one post-OLS — the entire estimator in six lines.]{.takeaway .fragment}
+
 ::: {.notes}
 "Rigorous" means hdm::rlasso chooses λ from Belloni et al.'s theory (c = 1.1, γ = 0.05), not from cross-validation. The post-OLS step is load-bearing: α comes from unshrunk OLS on the selected support, never from LASSO's shrunk coefficients.
 :::
@@ -154,6 +168,8 @@ coeftest(fit, vcov = vcovCL, cluster = state)["d", ]
 ## Theory keeps 8 controls; cross-validation keeps 150
 
 ![$|I_y|$, $|I_d|$, intersection, union out of 284 candidates — rigorous (teal) vs CV (orange).](../r_double_lasso_selection.png)
+
+[The rigorous penalty under-selects on purpose; CV's 20× larger union chases prediction, not the causal signal.]{.takeaway .fragment}
 
 ::: {.notes}
 For violent crime the rigorous union is 8; the CV union is 150 — twenty times more. |I_y| = 0 for violent and murder: no control predicts crime well enough to survive the rigorous threshold, while |I_d| = 8–9 says abortion is predictable. That asymmetry is exactly when DL helps most.
@@ -188,6 +204,8 @@ Same three-step recipe, same data — only λ differs. CV optimises prediction, 
 
 ![Coefficient paths, $d$-equation (violent panel). Dashed line = $\log(\lambda_{\min})$; 143 paths nonzero there.](../r_double_lasso_paths.png)
 
+[Prediction-optimal is not selection-optimal — the causal target doesn't want these 143 controls.]{.takeaway .fragment}
+
 ::: {.notes}
 Even in the treatment equation alone, CV's MSE-optimal λ keeps 143 controls. Prediction-optimal is not selection-optimal for a causal target — the whole lesson in one picture.
 :::
@@ -200,7 +218,7 @@ Even in the treatment equation alone, CV's MSE-optimal λ keeps 143 controls. Pr
 
 [−0.096]{.bignum}
 
-[$\hat\alpha$, rigorous Double LASSO (SE 0.051) · matches the paper's −0.104; selection counts match exactly]{.bignum-label}
+[$\hat\alpha$, rigorous Double LASSO (SE 0.051) · within 0.01 of the paper's estimate; selection counts match exactly]{.bignum-label}
 
 ::: {.notes}
 Between the no-controls baseline (−0.152) and the kitchen-sink mess (+0.014), the rigorous DL lands at −0.096 off just 8 controls. The 95% CI [−0.197, +0.004] barely contains zero — one notch below 5% significance, an honest result.

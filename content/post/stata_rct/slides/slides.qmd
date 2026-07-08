@@ -256,7 +256,7 @@ The grammar is the lesson: where the covariates sit tells you what's being model
 This is the Act-II payoff. The simple diff-in-means is 0.116; covariate-adjusted RA/IPW/DR all land at 0.113. They converge because randomization makes both the outcome model and the propensity model approximately correct — so there is nothing for them to disagree about. ATE and ATT are also nearly identical (0.113 each), confirming homogeneous effects.
 :::
 
-## RA, IPW, and DR agree because randomization made every model approximately right
+## RA, IPW, and DR agree because randomization made every model approximately right {.smaller}
 
 | Method | Models | Estimand | Estimate | 95% CI |
 |---|---|:--:|:--:|:--:|
@@ -337,7 +337,7 @@ This is the panel analogue of cross-sectional AIPW, applied to changes rather th
 The community drdid package and Stata 17's built-in xthdidregress aipw return identical 0.137 — a clean cross-implementation check. xthdidregress labels it "cohort 2024" because it is built for staggered adoption; our two-period design has a single cohort. The DR-DiD is the most robust panel estimator in the toolkit.
 :::
 
-## Cross-section vs. panel: different estimands, different data, same truth inside the bars
+## Cross-section vs. panel: different estimands, different data, same truth inside the bars {.smaller}
 
 | Method | Estimand | Data | Estimate | 95% CI |
 |---|:--:|:--:|:--:|:--:|
