@@ -152,7 +152,7 @@ See `design-adherence.md` for the full rubric.
       key-result strip as a pipeline (see design-adherence). A numeric strip must not use it.
 - [ ] Title-strip stats use the three brand colors (orange `#d97757`, teal
       `#00d4c8`, steel `#6a9bcc`); no off-palette hex introduced in `slides.qmd`.
-- [ ] Page background is the brand light-cool-gray `$body-bg: #eef1f6` (deliberate, not white;
+- [ ] Page background is the brand deep navy `$body-bg: #0f1729` (dark mode;
       browser pass `background: ok`).
 - [ ] Title slide has the orange accent rule under the title and the refined byline (author
       larger than institute/date) — theme-provided; browser pass `accent-rule: ok` / `byline: refined`.

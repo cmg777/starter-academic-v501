@@ -6,7 +6,7 @@
 //   3. density     — visible word count and bullet (<li>) count on the slide
 //
 // Plus a one-time DESIGN/BRANDING pass on the title slide (folds into Dim 7/8):
-//   4. background  — the deck canvas is the brand light cool gray #eef1f6 (not white)
+//   4. background  — the deck canvas is the brand deep navy #0f1729 (dark mode)
 //   5. accent rule — the thin orange rule under the title (#title-slide .title::after)
 //   6. byline      — author name larger than institute/date (refined byline)
 //   7. pipeline    — if the key-result strip has kr-arrows, it must be a WORD strip
@@ -37,7 +37,7 @@ const { createRequire } = require("module");
 const WORD_CAP = 60;     // visible words on a single slide before it reads as dense
 const BULLET_CAP = 5;    // <li> bullets before the slide is overloaded
 const OVERFLOW_TOL = 8;  // px of slop allowed before content counts as overflowing
-const BRAND_BG = "rgb(238, 241, 246)";    // $body-bg: #eef1f6 — the deliberate light cool gray canvas
+const BRAND_BG = "rgb(15, 23, 41)";       // $body-bg: #0f1729 — the deep navy dark-mode canvas
 const BRAND_ORANGE = "rgb(217, 119, 87)"; // $orange: #d97757 — the title accent rule color
 
 // Resolve Playwright from any reachable install (project, npx cache, global npm
@@ -121,44 +121,81 @@ function loadChromium() {
   }, { bg: BRAND_BG, orange: BRAND_ORANGE }).catch(() => ({}));
   const dbFlags = design || {};
 
-  const rows = [];
-  let rawLatex = 0, overflow = 0, dense = 0;
+  // Visit each slide ONCE (not fragment-by-fragment) and measure the INNERMOST slide
+  // (Reveal.getCurrentSlide()), not the outer stack `section.present` — decks nest `##`
+  // content slides as vertical children under each `#` divider, so the outer stack's
+  // innerText / <li> count sums the whole act (the old cumulative-count bug).
+  //
+  // Navigating with Reveal.slide(h, v) lands at fragment 0, which resets reveal's
+  // code-line-number ZOOM and fragment transforms — so overflow is measured on the
+  // stable, settled layout (a fragment walk instead catches transient zoom states and
+  // reports false overflow). We then force every fragment visible (resets the takeaway
+  // card's translateY) to measure the fullest layout. Overflow is checked against the
+  // `.reveal` viewport (the real clip boundary), not the content-fit section box.
+  const layout = await page.evaluate(() =>
+    [...document.querySelectorAll(".reveal .slides > section")].map(
+      (h) => [...h.children].filter((c) => c.tagName === "SECTION").length
+    )
+  );
 
-  for (let k = 0; k < total; k++) {
-    await page.waitForTimeout(220);
-    const info = await page.evaluate((tol) => {
-      const s = document.querySelector("section.present") || document.body;
-      const text = (s.innerText || "").trim();
-      const words = text ? text.split(/\s+/).length : 0;
-      const bullets = s.querySelectorAll("li").length;
-      // Raw LaTeX commands / \( \) delimiters still visible = math not typeset.
-      const m = text.match(/\\[a-zA-Z]+|\\\(|\\\)/g);
-      const raw = m ? [...new Set(m)].slice(0, 6) : [];
-      // Overflow: does any child extend past the slide container's box?
-      const slideBox = s.getBoundingClientRect();
-      let over = false;
-      for (const el of s.querySelectorAll("*")) {
-        const r = el.getBoundingClientRect();
-        if (r.height === 0 && r.width === 0) continue;
-        if (r.bottom > slideBox.bottom + tol || r.right > slideBox.right + tol ||
-            r.top < slideBox.top - tol || r.left < slideBox.left - tol) { over = true; break; }
-      }
-      // Best-effort assertion title = first heading text on the slide.
-      const h = s.querySelector("h1, h2, h3");
-      const title = h ? (h.innerText || "").trim().slice(0, 50) : "";
-      return { words, bullets, raw, over, title };
-    }, OVERFLOW_TOL);
-
-    if (info.raw.length) rawLatex++;
-    if (info.over) overflow++;
-    if (info.words > WORD_CAP || info.bullets > BULLET_CAP) dense++;
-
-    rows.push({ slide: k, ...info });
-    await page.evaluate(() => window.Reveal && Reveal.next());
+  const seen = new Map();  // "h-v" -> row
+  for (let h = 0; h < layout.length; h++) {
+    const vCount = layout[h] || 1;  // 0 vertical children ⇒ the section itself is one slide
+    for (let v = 0; v < vCount; v++) {
+      await page.evaluate(([H, V]) => window.Reveal && Reveal.slide(H, V), [h, v]);
+      await page.waitForTimeout(220);
+      await page.evaluate(() => {
+        const s = window.Reveal && Reveal.getCurrentSlide();
+        if (s) s.querySelectorAll(".fragment").forEach((f) => f.classList.add("visible"));
+      });
+      // Wait for the slide's images to finish loading + reveal's auto-stretch to resize
+      // them to fit (a transiently-oversized figure otherwise reads as a false overflow).
+      await page.evaluate(() => new Promise((res) => {
+        const s = window.Reveal && Reveal.getCurrentSlide();
+        const imgs = s ? [...s.querySelectorAll("img")].filter((i) => !i.complete) : [];
+        if (!imgs.length) return res();
+        let n = imgs.length;
+        const done = () => { if (--n <= 0) res(); };
+        imgs.forEach((i) => { i.addEventListener("load", done); i.addEventListener("error", done); });
+        setTimeout(res, 1500);
+      }));
+      await page.waitForTimeout(320);
+      const info = await page.evaluate((tol) => {
+        const s = (window.Reveal && Reveal.getCurrentSlide()) ||
+                  document.querySelector("section.present") || document.body;
+        const cfg = (window.Reveal && Reveal.getConfig()) || { width: 960, height: 700 };
+        const text = (s.innerText || "").trim();
+        const words = text ? text.split(/\s+/).length : 0;
+        const bullets = s.querySelectorAll("li").length;
+        // Raw LaTeX commands / \( \) delimiters still visible = math not typeset.
+        const m = text.match(/\\[a-zA-Z]+|\\\(|\\\)/g);
+        const raw = m ? [...new Set(m)].slice(0, 6) : [];
+        // Overflow: does the slide's own content exceed the configured slide frame?
+        // scrollHeight/scrollWidth are in the slide's pre-scale coordinates — immune to
+        // reveal's zoom/scale transforms that make getBoundingClientRect() report phantom
+        // overflow. auto-stretch keeps a fitting figure ≤ frame, so a true positive means
+        // the content genuinely cannot fit at the deck's native size.
+        const over = s.scrollHeight > cfg.height + tol || s.scrollWidth > cfg.width + tol;
+        const hh = s.querySelector("h1, h2, h3");
+        const title = hh ? (hh.innerText || "").trim().slice(0, 50) : "";
+        return { words, bullets, raw, over, title };
+      }, OVERFLOW_TOL);
+      const key = h + "-" + v;
+      seen.set(key, { ...info, key, h, v });
+    }
   }
   await browser.close();
 
+  const rows = [...seen.values()].sort((a, b) => (a.h - b.h) || (a.v - b.v));
+  let rawLatex = 0, overflow = 0, dense = 0;
+  for (const r of rows) {
+    if (r.raw.length) rawLatex++;
+    if (r.over) overflow++;
+    if (r.words > WORD_CAP || r.bullets > BULLET_CAP) dense++;
+  }
+
   // Per-slide lines (machine-readable-ish; the skill folds these into dimensions).
+  // Slide label is the Reveal h.v index (h = horizontal / act, v = vertical / slide-in-act).
   for (const r of rows) {
     const flags = [];
     if (r.raw.length) flags.push("RAW-LATEX:" + r.raw.join(","));
@@ -166,11 +203,11 @@ function loadChromium() {
     if (r.words > WORD_CAP) flags.push("WORDS:" + r.words);
     if (r.bullets > BULLET_CAP) flags.push("BULLETS:" + r.bullets);
     const tag = flags.length ? "[!] " + flags.join(" ") : "[ok]";
-    console.log(`slide ${String(r.slide).padStart(2)} ${tag}  words=${r.words} bullets=${r.bullets}` +
+    console.log(`slide ${r.key.padStart(5)} ${tag}  words=${r.words} bullets=${r.bullets}` +
                 (r.title ? `  "${r.title}"` : ""));
   }
 
-  console.log(`\nslides traversed: ${total}`);
+  console.log(`\nslides traversed: ${rows.length}`);
   console.log(`raw-latex slides: ${rawLatex}   overflow slides: ${overflow}   dense slides: ${dense}` +
               `   (caps: ${WORD_CAP} words / ${BULLET_CAP} bullets)`);
 

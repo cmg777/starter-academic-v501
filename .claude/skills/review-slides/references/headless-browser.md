@@ -16,8 +16,9 @@ The browser pass drives Chromium across every slide and measures all three.
 ## The script
 
 `references/templates/slide-audit.cjs` — a vendored extension of `write-slides`'s
-`math-check.cjs`. Same Playwright auto-locator and per-slide `Reveal.next()` walk
-(covers vertical sub-slides under `#` dividers), plus overflow and word/bullet
+`math-check.cjs`. Same Playwright auto-locator; it visits each slide once via
+`Reveal.slide(h, v)` (covers vertical sub-slides under `#` dividers) and measures
+the **innermost** current slide (`Reveal.getCurrentSlide()`), plus overflow and word/bullet
 measurement.
 
 ```bash
@@ -44,10 +45,10 @@ raw-latex slides: 1   overflow slides: 1   dense slides: 1   (caps: 60 words / 5
 | Signal       | Cap / rule                              | Folds into        | Severity |
 |--------------|-----------------------------------------|-------------------|----------|
 | Raw LaTeX    | any `\command` / `\(` visible           | Dim 3             | HIGH     |
-| Overflow     | child box past slide box by > 8 px      | Dim 9             | HIGH     |
+| Overflow     | slide `scrollHeight`/`scrollWidth` past the configured frame by > 8 px | Dim 9 | HIGH |
 | Words/slide  | > 60 visible words                      | Dim 5, Dim 9      | MED      |
 | Bullets/slide| > 5 `<li>`                              | Dim 5, Dim 7      | MED      |
-| Background   | canvas ≠ brand `#eef1f6` (`rgb(238,241,246)`) | Dim 8       | MED      |
+| Background   | canvas ≠ brand `#0f1729` (`rgb(15,23,41)`) | Dim 8          | MED      |
 | Accent rule  | no `#title-slide .title::after` rule    | Dim 8             | MED      |
 | Byline       | author font-size ≤ institute/date       | Dim 8             | MED      |
 | Pipeline     | `kr-arrow` present on a **numeric** strip | Dim 8           | MED      |

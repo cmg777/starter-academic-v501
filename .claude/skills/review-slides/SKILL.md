@@ -80,7 +80,7 @@ Full per-check lists are in `references/review-checklist.md`. In brief:
    `write-slides/references/templates/` copy, and `title-slide.html` too *except*
    the one approved `$sep$`/`kr-arrow` word-strip pipeline variation (the theme is
    otherwise immutable); the title-strip uses the three brand colors; the page
-   background is the brand light cool gray `#eef1f6`; the title accent rule +
+   background is the brand deep navy `#0f1729` (dark mode); the title accent rule +
    refined byline are theme-provided (expected); no per-deck theming drift. The
    browser pass surfaces `background`/`accent-rule`/`byline`/`pipeline` signals.
 9. **Accessibility & legibility** — figures carry captions; math that had a
@@ -211,7 +211,7 @@ node .claude/skills/review-slides/references/templates/slide-audit.cjs \
 
 It prints, per slide: a math-render verdict, an overflow flag (content extends past
 the 960×700 slide box), and word/bullet counts, plus a one-time **design/branding**
-block on the title slide — `background` (== `#eef1f6`), `accent-rule`, `byline`,
+block on the title slide — `background` (== `#0f1729`), `accent-rule`, `byline`,
 `pipeline` (word-strip ok vs `ARROWS-ON-NUMERIC`), and the deck-wide
 `takeaway-cards` count → Dimensions 7/8. Fold these into Dimensions 3
 (math render), 5/9 (density, legibility), and 9 (overflow). Capture a screenshot

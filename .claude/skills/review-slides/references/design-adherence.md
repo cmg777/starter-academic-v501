@@ -119,8 +119,8 @@ every run. Any per-deck theming, off-palette color, or font override is a design
 violation **and** a branding-integrity (Dim 8) finding. Do not double-count —
 record it under Dim 8 and reference it from Dim 7.
 
-**Page background.** The deck canvas is a deliberate **light cool gray** (`$body-bg: #eef1f6`),
-not pure white — expected, on-brand (steel/navy family). Don't flag it.
+**Page background.** The deck canvas is **dark mode** — a deep navy (`$body-bg: #0f1729`)
+with light text (`#e6ebf3`) — expected, on-brand. Don't flag it.
 
 _The background, accent rule, byline, pipeline (word-vs-numeric), and takeaway-card count are all
 auto-checked by the browser pass (`slide-audit.cjs` → the `design/branding` block); see
