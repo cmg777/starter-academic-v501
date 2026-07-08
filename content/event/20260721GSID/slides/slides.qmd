@@ -225,6 +225,8 @@ NotebookLM is the content-transformation layer: a single source set fans out int
 
 ![Every chapter of the metricsAI project becomes an AI-generated audio discussion — published as a podcast on Spotify.](img/shot-notebooklm.png)
 
+<p style="text-align:center; margin:0.15em 0 0; font-size:0.82em;"><a href="https://open.spotify.com/show/2lN5pA3l10UdHe61ZCoHcF?si=IFFMpG3pROepG61o8qbnvg" target="_blank" rel="noopener" data-preview-link="false">Listen on Spotify</a></p>
+
 ::: {.notes}
 Concrete example: the metricsAI podcast series is NotebookLM "Deep Dives" — two AI voices discussing each chapter. Students listen on their commute; the source is always the chapter, so it stays grounded.
 :::
