@@ -28,7 +28,7 @@ image:
 links:
 url_code: ""
 url_pdf: ""
-url_slides: "https://carlos-mendez.org/event/20260721GSID/slides/index.html"
+url_slides: "https://carlos-mendez.org/talk/data-science-econometrics-and-research-in-the-age-of-ai/slides/index.html"
 url_video: ""
 
 # Projects (optional).
