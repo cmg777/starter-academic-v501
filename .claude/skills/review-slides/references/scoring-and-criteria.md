@@ -45,7 +45,11 @@ Score floors imposed by specific checks:
   not show ⇒ max 4.
 - **Dim 8 (Branding integrity):** any non-empty diff against the canonical
   `site-brand.scss` / `title-slide.html` ⇒ max 4 (HIGH), unless the template
-  legitimately advanced after generation (then LOW, no floor).
+  legitimately advanced after generation (then LOW, no floor). **Exception —
+  no floor:** a `title-slide.html` diff that is *solely* the approved `$sep$`/
+  `kr-arrow` word-strip pipeline variation (design-adherence) is NOT a violation.
+  From the browser pass, `ARROWS-ON-NUMERIC` (arrows on a numeric strip) or a
+  `background`/`accent-rule`/`byline` mismatch are Dim-8 findings but MED (no HIGH floor).
 - **Dim 10 (Deliverables):** `index.md` deck link uses the trailing-slash
   `/slides/` form, or `index.html`/`slides_files/` missing ⇒ max 4.
 
@@ -94,7 +98,8 @@ These override score arithmetic — the show-stoppers:
 | Raw `\hat`/`\(` visible on any slide (browser pass)        | MAJOR (Dim 3 ≤ 3)       |
 | `smoke-test.js` exits non-zero                             | MAJOR (Dim 3 ≤ 3)       |
 | Slide title contradicts its own body                       | MAJOR (Dim 4 ≤ 4)       |
-| `site-brand.scss` / `title-slide.html` modified            | MAJOR (Dim 8 ≤ 4)       |
+| `site-brand.scss` / `title-slide.html` modified (except the approved `$sep$`/`kr-arrow` word-strip variation) | MAJOR (Dim 8 ≤ 4) |
+| `ARROWS-ON-NUMERIC` / background / accent-rule / byline mismatch (browser pass) | MINOR (Dim 8 ≤ 6) |
 | `index.md` link uses `url: slides/` (trailing slash)       | MAJOR (Dim 10 ≤ 4)      |
 | `index.html` or `slides_files/` missing                    | MAJOR (Dim 10 ≤ 3)      |
 | A slide overflows and clips content (browser pass)         | MINOR (Dim 9 ≤ 5)       |

@@ -135,6 +135,9 @@ See `design-adherence.md` for the full rubric.
       fragment advances; underloaded slides (one word where a sentence belongs)
       flagged for merge.
 - [ ] **Devil's-Advocate slide** present near the end for Seminar/Working decks.
+- [ ] **Takeaway cards:** substantive content slides end with a `[…]{.takeaway .fragment}`
+      card (browser pass reports the deck-wide count); a slide left on a small `.comment`
+      gloss where it should be a takeaway → LOW/MED "promote to `.takeaway`".
 - [ ] **Notes carry the prose**; slides are visual anchors, not documents.
 - [ ] Closing slide is **not** "Questions?" / "Thank you".
 
@@ -149,7 +152,10 @@ See `design-adherence.md` for the full rubric.
       key-result strip as a pipeline (see design-adherence). A numeric strip must not use it.
 - [ ] Title-strip stats use the three brand colors (orange `#d97757`, teal
       `#00d4c8`, steel `#6a9bcc`); no off-palette hex introduced in `slides.qmd`.
-- [ ] Page background is the brand light-cool-gray `$body-bg: #eef1f6` (deliberate, not white).
+- [ ] Page background is the brand light-cool-gray `$body-bg: #eef1f6` (deliberate, not white;
+      browser pass `background: ok`).
+- [ ] Title slide has the orange accent rule under the title and the refined byline (author
+      larger than institute/date) — theme-provided; browser pass `accent-rule: ok` / `byline: refined`.
 - [ ] `center: true`, chalkboard, menu, overview still enabled in front matter.
 - [ ] No per-deck font or theme override injected.
 

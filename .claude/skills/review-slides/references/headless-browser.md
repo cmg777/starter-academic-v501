@@ -47,6 +47,15 @@ raw-latex slides: 1   overflow slides: 1   dense slides: 1   (caps: 60 words / 5
 | Overflow     | child box past slide box by > 8 px      | Dim 9             | HIGH     |
 | Words/slide  | > 60 visible words                      | Dim 5, Dim 9      | MED      |
 | Bullets/slide| > 5 `<li>`                              | Dim 5, Dim 7      | MED      |
+| Background   | canvas ≠ brand `#eef1f6` (`rgb(238,241,246)`) | Dim 8       | MED      |
+| Accent rule  | no `#title-slide .title::after` rule    | Dim 8             | MED      |
+| Byline       | author font-size ≤ institute/date       | Dim 8             | MED      |
+| Pipeline     | `kr-arrow` present on a **numeric** strip | Dim 8           | MED      |
+| Takeaway     | deck-wide `.takeaway` card count (0 on a content-heavy deck is a note) | Dim 7 | LOW/MED |
+
+The first four are the one-time **design/branding** pass on the title slide (plus the deck-wide
+takeaway count); they surface in the `design/branding (title slide):` summary block. Like density,
+they are reported findings the skill weighs — they do **not** change the exit code.
 
 The script's exit code reflects **HIGH visual issues only**:
 
@@ -71,6 +80,11 @@ Density over the caps is reported in the per-slide lines but does **not** set ex
   trims or splits the slide.
 - **Clean run** → Dimensions 3 (render) and 9 (overflow) get full marks from the
   browser side; density count of 0 supports a high Dimension 5 score.
+- **`design/branding` block** → Dimension 8 (branding). `background MISMATCH`,
+  `accent-rule MISSING`, `byline FLAT`, or `ARROWS-ON-NUMERIC` are MED Dim-8 findings
+  (a deck rendered from a stale/off theme, or arrows misused on a numeric strip). All-ok
+  supports a high Dim 8. `takeaway-cards N` → Dimension 7: `N = 0` on a deck with several
+  substantive content slides is a "promote concluding lines to `.takeaway`" note (design-adherence).
 
 ---
 
@@ -105,5 +119,6 @@ review, it does not fail it.
 The deck is the *same* artifact `write-slides` already verifies with
 `math-check.cjs`. Reusing its Playwright loader and traversal keeps the two skills
 in lock-step: if `write-slides` changes how a deck renders, the shared traversal
-logic changes in one place. `slide-audit.cjs` only *adds* measurement (overflow,
-density) on top of the proven math-render walk.
+logic changes in one place. `slide-audit.cjs` *adds* measurement (overflow,
+density) and a one-time design/branding pass (background, accent rule, byline,
+pipeline, takeaway count) on top of the proven math-render walk.

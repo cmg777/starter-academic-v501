@@ -72,13 +72,17 @@ Full per-check lists are in `references/review-checklist.md`. In brief:
 7. **write-slides design adherence** — the Three Laws (one idea per slide; the
    slide serves the spoken word), assertion (not label) titles, the 3-act arc,
    figure-first method slides, audience-appropriate density, MB/MC pacing, no
-   slide exceeding ~4 fragment advances, a Devil's-Advocate slide when
+   slide exceeding ~4 fragment advances, substantive content slides ending on a
+   `[…]{.takeaway .fragment}` card, a Devil's-Advocate slide when
    seminar/working, and a closing slide that is one declarative sentence (never
    "Questions?" / "Thank you"). See `references/design-adherence.md`.
-8. **Branding integrity** — `site-brand.scss` and `title-slide.html` are
-   byte-identical to the canonical `write-slides/references/templates/` copies
-   (the theme is immutable); the title-strip uses the three brand colors; no
-   per-deck theming drift.
+8. **Branding integrity** — `site-brand.scss` is byte-identical to the canonical
+   `write-slides/references/templates/` copy, and `title-slide.html` too *except*
+   the one approved `$sep$`/`kr-arrow` word-strip pipeline variation (the theme is
+   otherwise immutable); the title-strip uses the three brand colors; the page
+   background is the brand light cool gray `#eef1f6`; the title accent rule +
+   refined byline are theme-provided (expected); no per-deck theming drift. The
+   browser pass surfaces `background`/`accent-rule`/`byline`/`pipeline` signals.
 9. **Accessibility & legibility** — figures carry captions; math that had a
    plain-language companion in the post keeps one; color is not the sole signal;
    no slide is so dense it is illegible at projector size (browser overflow pass).
@@ -178,7 +182,11 @@ diff content/post/<slug>/slides/title-slide.html \
 
 Any non-empty diff is a HIGH branding finding (the theme must be immutable),
 unless the canonical template itself has legitimately advanced since the deck was
-generated — in that case note it as LOW with the explanation.
+generated — in that case note it as LOW with the explanation. **One approved
+exception:** a `title-slide.html` diff that is *solely* the `$sep$`/`kr-arrow`
+word-strip pipeline block (a word key-result strip like Learn→Explore→Research) is
+NOT a violation — verify it is only that block, and confirm the strip is word
+labels, not numbers.
 
 For Dimension 1 (source fidelity), build a small ledger: for every number,
 figure, table, equation, and code block on a slide, name the matching location in
@@ -202,7 +210,10 @@ node .claude/skills/review-slides/references/templates/slide-audit.cjs \
 ```
 
 It prints, per slide: a math-render verdict, an overflow flag (content extends past
-the 960×700 slide box), and word/bullet counts. Fold these into Dimensions 3
+the 960×700 slide box), and word/bullet counts, plus a one-time **design/branding**
+block on the title slide — `background` (== `#eef1f6`), `accent-rule`, `byline`,
+`pipeline` (word-strip ok vs `ARROWS-ON-NUMERIC`), and the deck-wide
+`takeaway-cards` count → Dimensions 7/8. Fold these into Dimensions 3
 (math render), 5/9 (density, legibility), and 9 (overflow). Capture a screenshot
 **only** when a HIGH visual finding is detected (overflow that clips content, or
 unrendered math) — save as `SLIDES_REVIEW_<slide>.png` in the deck folder.

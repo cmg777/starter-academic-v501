@@ -122,6 +122,10 @@ record it under Dim 8 and reference it from Dim 7.
 **Page background.** The deck canvas is a deliberate **light cool gray** (`$body-bg: #eef1f6`),
 not pure white — expected, on-brand (steel/navy family). Don't flag it.
 
+_The background, accent rule, byline, pipeline (word-vs-numeric), and takeaway-card count are all
+auto-checked by the browser pass (`slide-audit.cjs` → the `design/branding` block); see
+`headless-browser.md`. Use those signals; this section is the rubric they map to._
+
 **Title slide.** The orange **accent rule** under the title and the **refined byline**
 (author name larger; institute + date smaller/grey) are theme-provided — expected, not
 violations. **One approved `title-slide.html` variation:** a *word* key-result strip may be

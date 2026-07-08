@@ -123,7 +123,8 @@ the rest to `::: {.notes}`.
 - A single labeled setup line.
 - A single concluding sentence — typically the slide's `[…]{.takeaway .fragment}`
   card (the orange accent card each content slide ends on). This is expected, not a
-  wall of prose; do not over-flag it.
+  wall of prose; do not over-flag it. (A small grey `.comment` is a figure/equation
+  *gloss* — also fine; the prominent `.takeaway` card is the slide's *conclusion*.)
 - Structured content: a short list (≤5), a table, a two-item contrast, an equation
   with a one-line gloss.
 - Domain terms used correctly and defined for the audience.

@@ -166,7 +166,8 @@ To re-check just the dimension you fixed:
 - Node version: <vN.N.N>
 - Playwright: <enabled vN | disabled (--no-browser) | missing>
 - smoke-test.js: <PASS | FAIL (n checks)>
-- Branding diff: <clean | site-brand.scss differs | title-slide.html differs>
+- Branding diff: <clean | site-brand.scss differs | title-slide.html differs (arrow-only OK)>
+- Design/branding (browser pass): background <ok | MISMATCH>; accent-rule <ok | missing>; byline <refined | flat>; pipeline <none | word-ok | ARROWS-ON-NUMERIC>; takeaway-cards <N>
 - Tooling notes: <e.g. "Chromium via system Chrome channel.">
 
 ---
