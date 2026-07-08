@@ -277,7 +277,7 @@ This is the big-data turn the workshop emphasizes. Earth Engine hosts petabytes 
 
 ## Exploration in Colab becomes a research project — managed in GitHub
 
-The notebook answered the question. Now make the work **reproducible and reviewable**.
+A notebook is where discovery happens. Now make the work **reproducible and reviewable**.
 
 [A promising exploration → a project anyone can re-run and audit → GitHub.]{.comment .fragment}
 
