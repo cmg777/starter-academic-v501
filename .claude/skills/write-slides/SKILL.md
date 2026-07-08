@@ -102,6 +102,9 @@ Hugo, not Quarto, so the rendered output must be in git. Only Quarto's local cac
 | Display font | Cinzel | Title, dividers, big number, key-result numbers |
 | Mono font | IBM Plex Mono | Code blocks |
 
+The warm orange also carries the **`.takeaway` card** — each content slide's concluding line
+(see the **Takeaway card** component in `slide-archetypes.md`). Reuses `$orange`/`$ink`; no new color.
+
 ---
 
 ## Phase 1: Pre-flight (read-only)
@@ -208,10 +211,13 @@ the approved outline using [`references/slide-archetypes.md`](references/slide-a
 [`references/slide-mapping.md`](references/slide-mapping.md): `##` assertion titles; figures
 `![caption](../<slug>_*.png)`; Markdown tables with `[cell]{.key}`; code ` ``` {.r
 code-line-numbers="…"} `; equations `$$…$$`; columns `::: {.columns}`; speaker notes
-`::: {.notes}`; dividers `# … {.divider background-color="…"}`. **Write all on-slide math as
-LaTeX `$...$`, never literal Unicode** (`$\hat\alpha$` not `α̂`); Mixed numbers (keep
-`.key`/`.bignum` as styled text); notes stay Unicode (slide-mapping § "Math symbols → LaTeX").
-Run the **MB/MC + one-idea-per-slide pass** (rhetoric-of-decks § MB/MC) before rendering.
+`::: {.notes}`; dividers `# … {.divider background-color="…"}`. **End each substantive content
+slide with its takeaway card** — the concluding line as `[…]{.takeaway .fragment}` (the
+**Takeaway card** component in slide-archetypes.md); reserve `.comment` for small
+figure/equation glosses. **Write all on-slide math as LaTeX `$...$`, never literal Unicode**
+(`$\hat\alpha$` not `α̂`); Mixed numbers (keep `.key`/`.bignum` as styled text); notes stay
+Unicode (slide-mapping § "Math symbols → LaTeX"). Run the **MB/MC + one-idea-per-slide pass**
+(rhetoric-of-decks § MB/MC) before rendering.
 
 ### 3.4 Render
 ```bash
@@ -324,3 +330,6 @@ suggest the matching `render-and-fix.md` entry; offer a re-run.
 7. **Trailing-slash guard.** The rendered post page contains `href="/post/<slug>/slides/index.html"`.
 8. **Chalkboard/embed-resources guard.** `embed-resources: true` is NOT set (render would
    fail); the deck ships `index.html` + `slides_files/`.
+9. **Takeaway cards.** Substantive content slides end with a `[…]{.takeaway .fragment}` card
+   (renders as the orange accent card, rises/fades in last); `.comment` is used only for small
+   figure/equation glosses, not for the slide's concluding takeaway.

@@ -120,11 +120,11 @@ sizing. One figure, one message. The alt/caption is the reading aid; the `##` is
 | ROW 1 | [HEADLINE NUMBER]{.key} | 0.034 | yes |
 | ROW 2 | −0.108 | 0.022 | yes |
 
-[Optional one-line takeaway under the table.]{.comment}
+[One-line takeaway under the table.]{.takeaway .fragment}
 ```
 **Use:** Act III, where the payoff lands. Trim to the 2–3 load-bearing columns; tag the
 headline cell `[…]{.key}` (renders orange). The theme styles it booktabs-ish (no vertical
-rules, teal head rule).
+rules, teal head rule). Close with the takeaway card (see the **Takeaway card** component below).
 
 ---
 
@@ -159,8 +159,10 @@ $$\hat\beta(\lambda)=\arg\min_\beta \tfrac{1}{2n}\|y-X\beta\|_2^2+\lambda\sum_j|
 [The L1 penalty $\lambda\sum_j|\beta_j|$ shrinks weak controls to exactly zero — that's the
 selection.]{.comment}
 ```
-**Use:** one equation per slide with a plain-language gloss (`.comment`, centred). Plain
-LaTeX — Pandoc/MathJax render it; no `\\$`/`\_` gymnastics.
+**Use:** one equation per slide with a plain-language gloss (`.comment`, small/centred — it
+*explains* the equation). If the closing line is instead the slide's **concluding takeaway**
+(not a gloss of the math), use `[…]{.takeaway .fragment}` (the **Takeaway card** component
+below). Plain LaTeX — Pandoc/MathJax render it; no `\\$`/`\_` gymnastics.
 
 ---
 
@@ -228,10 +230,34 @@ centred `#` section slide on ink. **Never** "Questions?", "Thank you", or a cont
 
 ---
 
+## Takeaway card — the concluding line of a content slide
+
+Not a full archetype — a **component** most content slides (Narrative, Figure, Table) should
+end with: the slide's assertion restated as one memorable sentence, rendered as a prominent
+brand **accent card** (soft orange fill, bold orange left bar, larger semibold text) that
+**rises + fades in** as the final fragment.
+
+```markdown
+[One-sentence takeaway — the point, stated so it sticks.]{.takeaway .fragment}
+```
+
+- **`.takeaway` vs `.comment`.** `.takeaway` is the prominent card — the slide's conclusion.
+  `.comment` stays the small grey caption/gloss that *explains* a figure/table/equation. Don't
+  swap them: a takeaway is a claim you want remembered; a gloss is a reading aid.
+- **Always a `.fragment`** so it lands last, after the evidence above it. It counts as one
+  fragment advance (keep the slide's total ≤ ~4).
+- Sits on white content slides (never on a `.divider`); the styling lives in `site-brand.scss`.
+- This is the per-slide takeaway — distinct from the single **Closing** divider (archetype 12),
+  which is the deck's one final thesis.
+
+---
+
 ## Assembly notes
 
 - Order follows the approved Phase-2 outline: front-matter title → Act I divider → … →
   Closing. The auto title slide is first; the body starts at the Act I `#` divider.
+- Prefer ending each substantive content slide with a `[…]{.takeaway .fragment}` — the
+  assertion title states the claim; the takeaway card restates it as the memorable line.
 - Prefer horizontal slides; use a vertical sub-stack only when one idea genuinely needs
   sub-steps (Quarto: nest with `##` under a `#`, or use `. . .`).
 - Every content slide gets a `##` assertion; only the title, dividers, and closing use `#`

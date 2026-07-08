@@ -38,7 +38,9 @@ Recommend **Teaching** for tutorial posts (the common case).
 ## Round 2 (always): Key takeaways + headline numbers
 
 Open with: *"I read the post and pulled these takeaways and headline numbers. Act III
-lands on them; confirm or amend."* Two questions in one call:
+lands on them; confirm or amend."* Two questions in one call. (The confirmed takeaways
+seed both the Resolution's assertion titles **and** the per-slide `.takeaway` cards — the
+concluding orange accent card each content slide ends on; see `slide-archetypes.md`.)
 
 ```
 Q1: Which assertions should the deck's Resolution land on? (these become the

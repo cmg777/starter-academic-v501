@@ -82,7 +82,25 @@ SCOPE. Flag a deck far outside its band (e.g. a 35-slide conference talk, or a
 - **Underloaded** (cut/merge): one word where a sentence belongs; a point the
   audience already inferred; a slide that repeats the previous one. → LOW/MED.
 - No slide should exceed ~4 fragment advances; 1–2 deliberate dense slides for
-  effect are allowed.
+  effect are allowed. The slide's `[…]{.takeaway .fragment}` card is an **expected**
+  final advance — do not flag it as overload.
+
+---
+
+## Takeaway cards (concluding line of a content slide)
+
+The `write-slides` convention is that most substantive content slides end with a
+`[…]{.takeaway .fragment}` — the slide's assertion restated as one memorable
+sentence, rendered as the orange **accent card** (rises/fades in last). It is an
+approved theme class (`.takeaway` in `site-brand.scss`), distinct from `.comment`
+(the small grey figure/equation gloss).
+
+- A content slide that clearly has a concluding line but leaves it as a small
+  `.comment` gloss (or omits the card) → LOW/MED (Dim 7), "promote to `.takeaway`."
+- Do **not** flag `.takeaway` itself, its orange styling, or its one fragment as a
+  branding/overload violation — it is in the verbatim template.
+- The per-slide `.takeaway` is not a substitute for the single **Closing** divider
+  (one declarative thesis); both may appear.
 
 ---
 

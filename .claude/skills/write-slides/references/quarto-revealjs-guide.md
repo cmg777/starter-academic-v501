@@ -96,6 +96,7 @@ The validated block lives in `templates/slides.qmd.tmpl`. Key options:
 | Figures respect slide margins | Quarto **`auto-stretch`** (default) + `fig-align: center` + a `max-width:100%` SCSS guard — **no viewport units** |
 | Section dividers centred (middle of slide) | `center: true` + `.divider` class on the `#` heading |
 | Strategic white space; centred figures/tables/captions | `center: true` (block centred) + SCSS centres `figcaption` and makes `.comment` a centred **`display:block`** (a `[…]{.comment}` span is inline, so it needs block to centre); lists stay left |
+| A slide's concluding takeaway made prominent | `[…]{.takeaway .fragment}` → the orange **accent card** (SCSS `.takeaway`), rising/fading in last. Its prominent sibling to the small grey `.comment` gloss — don't confuse the two |
 
 ---
 

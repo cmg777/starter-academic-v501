@@ -24,8 +24,11 @@ draft the outline) and Phase 3 (to assemble slides). It applies the principles i
 | Headline interpretation / hero number | Headline-result (11) | III |
 | Limitations / critique paragraph | Devil's-Advocate (10) | III (or late II) |
 | Summary / Takeaways | Closing (12), single sentence | III |
+| Each slide's concluding line | Takeaway card `[…]{.takeaway .fragment}` (component) | any |
 
-Each act is preceded by a Divider (3).
+Each act is preceded by a Divider (3). The **per-slide** takeaway card (the orange accent
+card each content slide ends on) is distinct from the single **Closing** divider — the card
+restates that one slide's assertion; the Closing is the deck's final thesis.
 
 ---
 

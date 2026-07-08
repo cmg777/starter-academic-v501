@@ -121,7 +121,9 @@ the rest to `::: {.notes}`.
 ## What is acceptable (do not over-flag)
 
 - A single labeled setup line.
-- A single concluding sentence.
+- A single concluding sentence — typically the slide's `[…]{.takeaway .fragment}`
+  card (the orange accent card each content slide ends on). This is expected, not a
+  wall of prose; do not over-flag it.
 - Structured content: a short list (≤5), a table, a two-item contrast, an equation
   with a one-line gloss.
 - Domain terms used correctly and defined for the audience.

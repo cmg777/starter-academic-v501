@@ -59,6 +59,13 @@ on disk; no leaked `{{…}}` markers.
 in the emitted HTML), but it canNOT confirm math actually **renders at runtime** (e.g. a MathJax
 CDN failure still ships raw `\hat\alpha`). That is what Layer C catches.
 
+**Takeaway-card check.** Confirm the deck's substantive content slides carry a
+`class="takeaway"` element (the concluding orange accent card) — `grep -c 'class="[^"]*takeaway'
+index.html` should be ≥1 and roughly match the number of content slides — and that the compiled
+theme CSS (`slides_files/libs/revealjs/dist/theme/quarto-*.css`) contains the `.reveal .takeaway`
+rule. When eyeballing in the browser (Layer C / preview), click through a takeaway slide and
+confirm the card renders as the orange accent card and rises/fades in on its final fragment.
+
 ---
 
 ## Layer C — browser math-render check (MANDATORY when the deck has math)
@@ -111,6 +118,7 @@ Node smoke test (Layer B)
 
 Slide inventory
   [✓] <N> slides — <a> figure · <b> code · <c> table · <d> equation · Devil's-Advocate: <y/n>
+  [✓] takeaway cards: <k> content slides end with a .takeaway card
 
 Overall: <PASS | FAIL>
 ```
