@@ -1,0 +1,424 @@
+---
+title: "Data Science, Econometrics, and Research in the Age of AI"
+subtitle: "Producing with AI, verifying with discipline"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: "2026-07-21"
+date-format: long
+key-results:
+  - num: "Learn"
+    cap: "NotebookLM"
+  - num: "Explore"
+    cap: "Google Colab"
+  - num: "Research"
+    cap: "GitHub"
+format:
+  revealjs:
+    output-file: index.html
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    link-external-icon: false
+---
+
+# The New Trade-off in the Age of AI {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+<style>
+/* ===== workshop deck diagrams (brand-colored, em-scaled for reveal) ===== */
+.reveal .dgram-arrow { color: #6a9bcc; font-weight: 700; font-size: 1.4em; margin: 0 0.1em; }
+
+/* framed illustrative screenshots (the only <img> on slides are the 4 crops) */
+.reveal .slides img { border: 1px solid rgba(20,20,19,0.14); border-radius: 10px; box-shadow: 0 8px 30px rgba(20,20,19,0.20); }
+
+/* Act I — production vs verification 2x2 */
+.reveal .tradeoff { max-width: 19em; margin: 0.2em auto 0; font-size: 0.74em; }
+.reveal .tradeoff .axis-top,
+.reveal .tradeoff .axis-bot { text-align: center; color: #6a6a68; text-transform: uppercase; letter-spacing: 0.09em; font-size: 0.78em; }
+.reveal .tradeoff .axis-top { margin-bottom: 0.35em; }
+.reveal .tradeoff .axis-bot { margin-top: 0.35em; }
+.reveal .tradeoff .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45em; }
+.reveal .tradeoff .cell { border: 2px solid rgba(20,20,19,0.16); border-radius: 0.45em; padding: 0.55em 0.5em; line-height: 1.2; }
+.reveal .tradeoff .cell b { display: block; font-size: 0.9em; letter-spacing: 0.03em; margin-bottom: 0.15em; }
+.reveal .tradeoff .cell small { color: #6a6a68; }
+.reveal .tradeoff .danger { border-color: #d97757; background: rgba(217,119,87,0.10); }
+.reveal .tradeoff .danger b { color: #d97757; }
+.reveal .tradeoff .old { border-color: #6a9bcc; background: rgba(106,155,204,0.10); }
+.reveal .tradeoff .old b { color: #1a3a8a; }
+
+/* NotebookLM fan-out */
+.reveal .fanout { display: flex; align-items: center; justify-content: center; gap: 0.5em; flex-wrap: wrap; font-size: 0.8em; }
+.reveal .fanout .src { border: 2px solid #d97757; border-radius: 0.5em; padding: 0.6em 0.8em; background: rgba(217,119,87,0.07); }
+.reveal .fanout .src b { color: #d97757; }
+.reveal .fanout .src small { display: block; color: #6a6a68; font-size: 0.8em; margin-top: 0.2em; }
+.reveal .fanout .outs { display: grid; grid-template-columns: repeat(2, auto); gap: 0.4em; }
+.reveal .fanout .outs span { border: 1.5px solid #6a9bcc; border-radius: 2em; padding: 0.28em 0.7em; white-space: nowrap; }
+
+/* Bolivia flow */
+.reveal .flowchain { display: flex; align-items: center; justify-content: center; gap: 0.5em; flex-wrap: wrap; font-size: 0.8em; }
+.reveal .flowchain .ins { display: flex; flex-direction: column; gap: 0.4em; }
+.reveal .flowchain .box { border: 2px solid rgba(20,20,19,0.16); border-radius: 0.5em; padding: 0.5em 0.75em; line-height: 1.2; box-shadow: none; }
+.reveal .flowchain .box b { display: block; }
+.reveal .flowchain .box small { color: #6a6a68; font-size: 0.82em; }
+.reveal .flowchain .ntl { border-color: #d97757; } .reveal .flowchain .ntl b { color: #d97757; }
+.reveal .flowchain .emb { border-color: #6a9bcc; } .reveal .flowchain .emb b { color: #1a3a8a; }
+.reveal .flowchain .out { border-color: #00a99f; background: rgba(0,212,200,0.10); } .reveal .flowchain .out b { color: #0d7d74; }
+
+/* Integrated loop triad — Learn=orange, Explore=teal, Research=steel (matches title strip) */
+.reveal .triad { display: flex; align-items: center; justify-content: center; gap: 0.4em; flex-wrap: wrap; font-size: 0.86em; }
+.reveal .triad .stage { border: 2px solid; border-radius: 0.5em; padding: 0.55em 0.9em; min-width: 6em; }
+.reveal .triad .stage b { display: block; font-family: "Cinzel", serif; font-size: 1.1em; }
+.reveal .triad .stage small { color: #6a6a68; }
+.reveal .triad .learn { border-color: #d97757; } .reveal .triad .learn b { color: #d97757; }
+.reveal .triad .explore { border-color: #00a99f; } .reveal .triad .explore b { color: #0d7d74; }
+.reveal .triad .research { border-color: #6a9bcc; } .reveal .triad .research b { color: #1a3a8a; }
+.reveal .loopnote { text-align: center; color: #6a6a68; margin-top: 0.55em; font-size: 0.8em; letter-spacing: 0.03em; }
+</style>
+
+## Producing content has never been cheaper
+
+AI writes the essay, the code, and the chart in seconds — for almost nothing.
+
+. . .
+
+*But can we trust what it produced?*
+
+::: {.notes}
+Open on the shift everyone already feels: production is nearly free. The provocation — cheap to make is not the same as safe to use. That gap is the whole talk.
+:::
+
+## Cheap to produce, expensive to verify — the new danger zone
+
+<div class="tradeoff">
+<div class="axis-top">↑ higher cost of verification</div>
+<div class="grid">
+<div class="cell danger"><b>NEW DANGER ZONE</b><small>cheap to make,<br>expensive to confirm</small></div>
+<div class="cell"><b>Costly all around</b><small>slow to make and<br>hard to check</small></div>
+<div class="cell"><b>Trivial</b><small>easy to make,<br>easy to check</small></div>
+<div class="cell old"><b>OLD WORLD</b><small>manual effort<br>embedded the checking</small></div>
+</div>
+<div class="axis-bot">low cost of production &nbsp;←&nbsp;·&nbsp;→&nbsp; high cost of production</div>
+</div>
+
+[AI slashes production cost — but not verification cost — so work migrates into the danger zone.]{.comment}
+
+::: {.notes}
+Adapted from Clifford Russel. Old world (bottom-right): making something by hand was costly, and that manual effort embedded the checking. AI moves us to the top-left: production collapses toward zero, but verification cost stays high — now it is the binding constraint. The rest of the talk is about tools that pull verification back down.
+:::
+
+## The real risk is black-box work — in learning and in research
+
+When we can't check the output, we're trusting a black box.
+
+::: {.incremental}
+- In **learning** — plausible answers that quietly mislead.
+- In **research** — results no reviewer, including you, can audit.
+:::
+
+[The fix isn't to avoid AI. It's to design a workflow that separates *production* from *verification*.]{.comment}
+
+::: {.notes}
+Name the stakes for both halves of the talk. Black-box learning erodes understanding; black-box research erodes credibility. Bridge to the response: intentional workflow design.
+:::
+
+## One principle, three tools, one workflow
+
+::: {.incremental}
+- **One principle** — separate what AI *produces* from what you *verify*.
+- **Three tools** — NotebookLM (learn), Google Colab (explore), GitHub (research).
+- **One workflow** — plan, produce with AI, verify at every step.
+:::
+
+::: {.notes}
+The roadmap. Each tool maps to a stage of the research life cycle and to a place where verification has to live. Keep it a promise, not a summary.
+:::
+
+# Working With AI: Three Tools, One Discipline {.divider background-color="#6a9bcc"}
+
+[Act II]{.act}
+
+## From "prompt engineering" to designing AI agent skills
+
+A one-off clever prompt is fragile. A **skill** is reusable — and it can carry its own checks.
+
+::: {.incremental}
+- generates **consistent** outputs
+- defines **sequential** tasks
+- applies **verification** tests
+:::
+
+[Stop tuning prompts; start designing the agent's skills.]{.comment}
+
+::: {.notes}
+The mindset shift. Prompt engineering optimizes a single interaction; skill design encodes a repeatable procedure with checks built in. This is the discipline that makes the three tools trustworthy.
+:::
+
+## Great AI work starts with planning — and clarifying questions
+
+Before it executes, make the AI **plan** and **ask**:
+
+> *"Before you start, ask me questions until you are 95% confident you understand exactly what I need. Do not make any assumptions."*
+
+::: {.incremental}
+- activate **planning mode** first
+- supply **reference materials** and examples
+- build **verification** into the task
+:::
+
+::: {.notes}
+This slide is self-referential — it is the exact instruction that produced this deck. Clarifying questions up front remove assumptions, which is where AI quality is won or lost.
+:::
+
+# NotebookLM — Learn {.divider background-color="#141413"}
+
+[Tool 1]{.act}
+
+## NotebookLM grounds AI in *your* sources — a protected study environment
+
+You give it your notes, PDFs, slides, and data. It answers **only from those sources**.
+
+[Grounded in your materials → far less hallucination, and every answer is traceable.]{.comment}
+
+::: {.notes}
+The key idea for a general audience: unlike an open chatbot, NotebookLM is walled to the documents you upload. That protected environment is exactly what makes it safe for study — answers stay tied to trusted sources.
+:::
+
+## One set of notes → podcasts, videos, summaries, quizzes, and a grounded chatbot
+
+<div class="fanout">
+<div class="src"><b>Your sources</b><small>notes · PDFs · slides · data</small></div>
+<span class="dgram-arrow">→</span>
+<div class="outs">
+<span>🎙 Podcast</span>
+<span>🎬 Video overview</span>
+<span>📝 Summary</span>
+<span>❓ Quiz</span>
+<span>💬 Grounded chat</span>
+</div>
+</div>
+
+[One upload becomes many ways to learn — the AI podcasts and AI tutors behind metricsAI work exactly this way.]{.comment}
+
+::: {.notes}
+NotebookLM is the content-transformation layer: a single source set fans out into audio, video, text, self-test, and conversation.
+:::
+
+## In practice: NotebookLM "Deep Dives" you can listen to
+
+![Every chapter of the metricsAI project becomes an AI-generated audio discussion — published as a podcast on Spotify.](img/shot-notebooklm.png)
+
+::: {.notes}
+Concrete example: the metricsAI podcast series is NotebookLM "Deep Dives" — two AI voices discussing each chapter. Students listen on their commute; the source is always the chapter, so it stays grounded.
+:::
+
+# Google Colab — Explore {.divider background-color="#141413"}
+
+[Tool 2]{.act}
+
+## Colab: a data-science lab in the browser, with AI inside
+
+::: {.incremental}
+- **zero installation** — nothing to set up
+- **free** CPUs and GPUs
+- **AI inside** — it writes code and explains errors
+:::
+
+[Start on your laptop at a café; the lab is the same everywhere.]{.comment}
+
+::: {.notes}
+Colab removes the single biggest barrier for beginners — installation. For a general audience, stress: it is just a browser tab, but it is a real computational notebook with AI help built in.
+:::
+
+## metricsAI: a full econometrics course in Colab notebooks
+
+![Every chapter ships as a Google Colab notebook — code, output plots, and an AI assistant beside it.](img/shot-colab.png)
+
+::: {.notes}
+This is what "a lab in the browser, with AI inside" looks like: a Colab notebook running the chapter's code, with plots inline and an AI Summary/assistant panel. No install — just open the link.
+:::
+
+## With the right credentials, Colab reaches planetary-scale data
+
+Connect **Google Earth Engine** and query satellite data straight from a notebook:
+
+::: {.incremental}
+- **pollution** — aerosols, air quality
+- **energy** — nighttime lights
+- **social** — population and development indicators
+:::
+
+[Big geospatial data, no supercomputer — just a notebook and credentials.]{.comment}
+
+::: {.notes}
+This is the big-data turn the workshop emphasizes. Earth Engine hosts petabytes of satellite imagery; from Colab you query only what you need. Pollution, energy, and social indicators all become variables you can analyze.
+:::
+
+## Case study: can satellites see poverty in Bolivia?
+
+One question ties the pipeline together:
+
+*Can satellite data predict local economic development across Bolivia's 339 municipalities?*
+
+::: {.notes}
+The book's flagship case. It makes the abstract pipeline concrete: query satellite indicators, then use statistics, econometrics, and machine learning to answer a real development question.
+:::
+
+## Nighttime lights + satellite embeddings → a development index
+
+<div class="flowchain">
+<div class="ins">
+<div class="box ntl"><b>Nighttime lights</b><small>economic-activity proxy</small></div>
+<div class="box emb"><b>Satellite embeddings</b><small>64-dim · physical infrastructure</small></div>
+</div>
+<span class="dgram-arrow">→</span>
+<div class="box out"><b>Development index</b><small>IMDS · 0–100</small></div>
+</div>
+
+[Lights capture activity at night; embeddings capture the built environment by day.]{.comment}
+
+::: {.notes}
+DS4Bolivia: 339 municipalities. Nighttime lights (log NTL per capita) proxy economic activity; 64-dimensional deep-learning embeddings of daytime imagery (Sentinel-2/Landsat) capture buildings, roads, and vegetation. Together they predict the Municipal Sustainable Development Index.
+:::
+
+## From indicators to inference: OLS first, then machine learning
+
+::: {.incremental}
+- **OLS baseline** — development ~ nighttime lights → about 60% of the variation explained
+- **Machine learning** — Random Forest, XGBoost → capture nonlinearities the line misses
+:::
+
+[Statistics → econometrics → machine learning, on data we gathered ourselves.]{.comment}
+
+::: {.notes}
+The analytical arc: start simple and interpretable (OLS, R-squared about 0.6), then let ML models exploit the richer signal. Once the indicators are in the notebook, the full toolkit is available.
+:::
+
+## Exploration in Colab becomes a research project — managed in GitHub
+
+The notebook answered the question. Now make the work **reproducible and reviewable**.
+
+[A promising exploration → a project anyone can re-run and audit → GitHub.]{.comment}
+
+::: {.notes}
+Bridge to Tool 3. A Colab notebook is where discovery happens; GitHub is where it becomes credible research. This is the natural hand-off.
+:::
+
+# GitHub — Research {.divider background-color="#141413"}
+
+[Tool 3]{.act}
+
+## GitHub makes AI-assisted research transparent and auditable
+
+Collaborate with AI agents the way you would with a careful coauthor — in the open.
+
+[Claude Code + GitHub + Overleaf: code, results, and manuscript, all version-controlled.]{.comment}
+
+::: {.notes}
+The research counterpart to skills-and-planning. When an AI agent proposes changes through GitHub, every decision is recorded and reviewable.
+:::
+
+## Everything lives in one repository
+
+![The responsible-ai-assisted-research-101 template: analysis code, data, the manuscript, and an agent operating manual — all versioned in one place.](img/shot-github-repo.png)
+
+::: {.notes}
+A concrete template (github.com/quarcs-lab/responsible-ai-assisted-research-101): numbered analysis scripts, immutable raw data, code-emitted tables/figures, a DECISIONS.md and LOG.md, and a CLAUDE.md operating manual for the agent. One place, fully reproducible.
+:::
+
+## Change the unit of verification: review a story step-by-step
+
+Not a monolithic block of text — a sequence of small, legible changes.
+
+::: {.incremental}
+- each **commit** is one decision
+- each **diff** shows exactly what changed
+- the **history** is the audit trail
+:::
+
+::: {.notes}
+Goldsmith-Pinkham's framing. Reviewing a 40-page output is hopeless; reviewing 40 small commits is tractable. Version control changes what you verify — from a result to the chain of steps that produced it.
+:::
+
+## 800 lines to trust, or 12 to check?
+
+![Left: an 800-line dump you'd have to trust wholesale. Right: a bounded 12-line diff and the commit story you actually review.](img/shot-github-verify.png)
+
+::: {.notes}
+The unit of verification, made visual: a wall of 800 lines is cognitive overload; a 12-line bounded diff plus a readable commit history (validate measures, add CAR analysis, add stages…) is something a human can actually check, one decision at a time.
+:::
+
+## A work environment built for verification — the antidote to black-box research
+
+GitHub manages the discussion of the **code**, the **results**, and the **story** of the manuscript.
+
+[Every claim traces back to the commit that produced it.]{.comment}
+
+::: {.notes}
+Tie back to Act I. Black-box research is unverifiable by construction; a version-controlled environment makes verification the default. And in the age of AI the barrier is low — your AI agent can teach you Git as you go.
+:::
+
+## But doesn't AI just do the work for me?
+
+[Objection.]{.objection} If the AI produces everything, what is left for the researcher?
+
+. . .
+
+[Response.]{.rebuttal} AI **produces**; you **verify and decide**. The judgment — what question, which check, whether to trust the result — stays human. The tools make that judgment *easier to exercise*, not optional.
+
+::: {.notes}
+The ethos slide. Steelman the worry honestly, then answer: the division of labor is production (AI) versus verification and judgment (human). That is the whole thesis in one exchange.
+:::
+
+# One Integrated Workflow {.divider background-color="#00d4c8"}
+
+[Act III]{.act}
+
+## Learn → Explore → Research: NotebookLM, Colab, GitHub in one loop
+
+<div class="triad">
+<div class="stage learn"><b>Learn</b><small>NotebookLM</small></div>
+<span class="dgram-arrow">→</span>
+<div class="stage explore"><b>Explore</b><small>Google Colab</small></div>
+<span class="dgram-arrow">→</span>
+<div class="stage research"><b>Research</b><small>GitHub</small></div>
+</div>
+
+<div class="loopnote">↻ iterate — and verify at every step</div>
+
+::: {.notes}
+The payoff picture. Understand a topic with NotebookLM, explore and analyze data in Colab, then formalize it as reproducible research in GitHub — looping back as you learn more. Verification runs through all three.
+:::
+
+## Three takeaways
+
+::: {.incremental}
+1. **Understand the trade-off** — AI cuts production cost, so verification becomes the job.
+2. **AI assists both learning and research** — but only with verification built in.
+3. **Integrate the tools** — agentic skills with NotebookLM, Colab, and GitHub serve *both* production and verification.
+:::
+
+::: {.notes}
+Keep it to three; each maps to one act of the talk.
+:::
+
+# In the age of AI, the scarce skill is not production — it's verification. {.divider background-color="#141413"}
+
+::: {.notes}
+The single sentence to remember. It resolves the Act-I hook: production got cheap, so the value — and the discipline — moves to verification and judgment. That is what these three tools are for.
+:::
