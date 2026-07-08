@@ -97,7 +97,7 @@ The spoiler picture for Act I. Don't dissect every line — just plant that coun
 :::
 ::::
 
-[C-LASSO sits in the middle: $K$ latent groups, slopes shared *within* a group, free *across* groups.]{.comment}
+[C-LASSO sits in the middle: $K$ latent groups, slopes shared *within* a group, free *across* groups.]{.takeaway .fragment}
 
 ::: {.notes}
 Pooled OLS is the fully-homogeneous extreme; the mean-group estimator is the fully-heterogeneous extreme. C-LASSO is the parsimonious compromise — it discovers a small number of groups instead of imposing one slope or estimating N noisy ones.
@@ -107,7 +107,7 @@ Pooled OLS is the fully-homogeneous extreme; the mean-group estimator is the ful
 
 $$Q_{NT,\lambda}^{(K)} = \frac{1}{NT}\sum_{i=1}^{N}\sum_{t=1}^{T}\big(y_{it}-\boldsymbol{\beta}_i'\mathbf{x}_{it}\big)^2 + \frac{\lambda_{NT}}{N}\sum_{i=1}^{N}\prod_{k=1}^{K}\|\boldsymbol{\beta}_i-\boldsymbol{\alpha}_k\|$$
 
-[The product penalty $\prod_k\|\boldsymbol{\beta}_i-\boldsymbol{\alpha}_k\|$ vanishes when $\boldsymbol{\beta}_i$ is near *any* center $\boldsymbol{\alpha}_k$ — that's what sorts unit $i$ into a group.]{.comment}
+[The product penalty $\prod_k\|\boldsymbol{\beta}_i-\boldsymbol{\alpha}_k\|$ vanishes when $\boldsymbol{\beta}_i$ is near *any* center $\boldsymbol{\alpha}_k$ — that's what sorts unit $i$ into a group.]{.takeaway .fragment}
 
 ::: {.notes}
 First term: ordinary sum of squared residuals. Second term: a product over the K group centers. If a unit's coefficients sit near any one center, the product collapses toward zero and the penalty is cheap — the unit is pulled into that group. Far from all centers, the penalty stays large. λ controls how strong the pull is.
@@ -134,7 +134,7 @@ The penalized stage chooses the partition; it does not give honest inference bec
 | cpi | [+0.030]{.key} | no |
 | interest | +0.006 | no |
 
-[The textbook read: "inflation and interest rates don't affect savings." Hold that thought.]{.comment}
+[The textbook read: "inflation and interest rates don't affect savings." Hold that thought.]{.takeaway .fragment}
 
 ::: {.notes}
 Pooled OLS and fixed effects are virtually identical here (R-squared 0.438). Lagged savings and GDP growth are strong and significant. CPI and the interest rate look like nothing. A meteorologist reporting "no temperature change" in a city where half the neighborhoods warmed and half cooled would be making exactly this mistake.
@@ -169,7 +169,7 @@ The triangle marks the IC minimum at K = 2; the curve rises monotonically from K
 | Group 1 (34 countries) | [−0.181]{.key} | −0.197 | +0.335 |
 | Group 2 (22 countries) | [+0.478]{.key} | +0.263 | +0.112 |
 
-[All four highlighted CPI/interest coefficients are significant at $p < 0.001$. The pooled +0.030 was $-0.181$ and $+0.478$ canceling.]{.comment}
+[All four highlighted CPI/interest coefficients are significant at $p < 0.001$. The pooled +0.030 was $-0.181$ and $+0.478$ canceling.]{.takeaway .fragment}
 
 ::: {.notes}
 Group 1: higher inflation erodes the real value of savings, so people save less. Group 2: higher inflation triggers precautionary saving — households save more amid uncertainty. Same shock, opposite behavior. The "insignificant" pooled CPI wasn't no effect; it was two opposing effects hidden inside the average.
@@ -202,7 +202,7 @@ Group 1 saves less when rates rise (−0.149); Group 2 saves more (+0.123). One 
 | Democracy | [+1.055]{.key} | 0.370 | 0.005 |
 | lagged GDP | +0.970 | 0.006 | <0.001 |
 
-[Standard errors clustered on 98 countries. This replicates Acemoglu et al. (2019): on average, democracy promotes growth.]{.comment}
+[Standard errors clustered on 98 countries. This replicates Acemoglu et al. (2019): on average, democracy promotes growth.]{.takeaway .fragment}
 
 ::: {.notes}
 Two-way fixed effects (country and year), lagged GDP, standard errors clustered on the 98 countries. The pooled democracy coefficient is +1.055, significant at p = 0.005. The standard "democracy causes growth" story. But we have learned what "on average" can hide — so we run C-LASSO with the same clustering.
@@ -243,7 +243,7 @@ The key figure. Each dot is a country's own coefficient; the horizontal lines ar
 | p-value | 0.005 | <0.001 | 0.007 |
 | Countries | 98 | 57 | 41 |
 
-[This is Simpson's paradox in a panel: the aggregate trend reverses inside the subgroups.]{.comment}
+[This is Simpson's paradox in a panel: the aggregate trend reverses inside the subgroups.]{.takeaway .fragment}
 
 ::: {.notes}
 The pooled +1.055 lands between +2.151 and −0.936 and describes neither group. A policymaker reading only the pooled result would conclude democracy universally promotes growth and miss that for 41 countries the relationship runs the other way. Across all three specifications the IC chose K = 2 — the latent structure is robust, not a one-off.

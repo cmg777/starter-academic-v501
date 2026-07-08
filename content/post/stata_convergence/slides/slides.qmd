@@ -83,7 +83,7 @@ This is the post's first money chart — and a deliberate red herring. The OLS s
 :::
 ::::
 
-[The twist this talk delivers: beta convergence can be real while the distribution still widens.]{.comment}
+[The twist this talk delivers: beta convergence can be real while the distribution still widens.]{.takeaway .fragment}
 
 ::: {.notes}
 Keep these two straight throughout. Beta = a behavioural tendency (rear runners are faster). Sigma = an outcome (is the pack actually bunching?). Young, Higgins & Levy proved beta is necessary but not sufficient for sigma. The whole Act III payoff is that we observe exactly this gap.
@@ -111,7 +111,7 @@ Keep these two straight throughout. Beta = a behavioural tendency (rear runners 
 - **Sample** — 84 countries with data since 1960; oil producers and sub-1M-population states excluded
 :::
 
-[5,040 country-year rows. Balanced means the same 84 countries appear every year — so no composition effects.]{.comment}
+[5,040 country-year rows. Balanced means the same 84 countries appear every year — so no composition effects.]{.takeaway .fragment}
 
 ::: {.notes}
 Penn World Tables 10.0, expenditure-side real GDP at chained PPPs — comparable across price levels. Following Patel, Sandefur & Subramanian (2021) we drop oil economies (income is resource rent, not productive catch-up) and tiny states. Balancing the panel is the load-bearing design choice: it fixes N = 84 in every year, so the sigma series later can't be contaminated by countries entering or leaving.
@@ -121,7 +121,7 @@ Penn World Tables 10.0, expenditure-side real GDP at chained PPPs — comparable
 
 $$g_i = \alpha + \lambda \cdot \ln(y_{i,0}) + \varepsilon_i$$
 
-[$g_i$ is country $i$'s annualized growth; $\ln(y_{i,0})$ is its log starting income. A **negative** $\lambda$ means convergence — the poor grow faster.]{.comment}
+[$g_i$ is country $i$'s annualized growth; $\ln(y_{i,0})$ is its log starting income. A **negative** $\lambda$ means convergence — the poor grow faster.]{.takeaway .fragment}
 
 ::: {.notes}
 This is unconditional (absolute) beta convergence: no controls for institutions, schooling, or savings. It's the strong form of the hypothesis. The sign of one coefficient settles the direction; everything that follows refines its magnitude and stability.
@@ -142,7 +142,7 @@ This is unconditional (absolute) beta convergence: no controls for institutions,
 | 1960–2000 | [+0.00437]{.key} | 0.007 | divergence |
 | 2000–2019 | [−0.00352]{.key} | 0.019 | convergence |
 
-[A total swing of 0.0079 — a complete reversal that the 60-year pooled regression silently averaged away.]{.comment}
+[A total swing of 0.0079 — a complete reversal that the 60-year pooled regression silently averaged away.]{.takeaway .fragment}
 
 ::: {.notes}
 A textbook reminder of why pooled estimates mislead: when the sign of a relationship flips mid-sample, the full-period coefficient can read as "nothing happened." The story *is* the break. Chow tests, rolling windows, and a year-2000 dummy all locate it at the same place.
@@ -152,7 +152,7 @@ A textbook reminder of why pooled estimates mislead: when the sign of a relation
 
 $$\beta = \frac{-\ln(1 + \lambda s)}{s} \qquad\qquad \tau = \frac{\ln 2}{\beta}$$
 
-[$\lambda$ depends on the window length $s$; the Barro–Sala-i-Martin **speed** $\beta$ does not. The **half-life** $\tau$ is the years to close half the gap.]{.comment}
+[$\lambda$ depends on the window length $s$; the Barro–Sala-i-Martin **speed** $\beta$ does not. The **half-life** $\tau$ is the years to close half the gap.]{.takeaway .fragment}
 
 ::: {.notes}
 The raw OLS slope mixes the convergence speed with how long the window is, so it can't be compared across periods. Barro & Sala-i-Martin (1992) show lambda = -(1 - exp(-beta·s))/s; invert it and you get beta as a function of lambda and s. Half-life is just the radioactive-decay formula — the most human-readable summary of beta.
@@ -180,7 +180,7 @@ At this pace a country at one-tenth of US income would need nearly two centuries
 
 $$\frac{1}{s}\ln\!\frac{y_{i,t+s}}{y_{i,t}} = \alpha - \frac{1 - e^{-\beta s}}{s}\,\ln(y_{i,t}) + \varepsilon_i$$
 
-[OLS needs parameters to enter *linearly*. Here $\beta$ is trapped in $e^{-\beta s}$ — so OLS can only recover the whole blob $\lambda$, then we back out $\beta$.]{.comment}
+[OLS needs parameters to enter *linearly*. Here $\beta$ is trapped in $e^{-\beta s}$ — so OLS can only recover the whole blob $\lambda$, then we back out $\beta$.]{.takeaway .fragment}
 
 ::: {.notes}
 This motivates NLS. OLS estimates the bracketed expression as a single coefficient lambda; the structural beta must be extracted algebraically afterward. Nonlinear least squares minimises the same sum of squared residuals but allows the parameter to sit inside any function — so it can chase beta directly.
@@ -193,7 +193,7 @@ local s = 19
 nl (outcome = {b0=1} - (1 - exp(-1*{b1=0.02}*`s'))/`s' * initial_inc), vce(robust)
 ```
 
-[`{b1=0.02}` is $\beta$ with the 2% benchmark as its starting guess; the iterative solver then minimises squared residuals.]{.comment}
+[`{b1=0.02}` is $\beta$ with the 2% benchmark as its starting guess; the iterative solver then minimises squared residuals.]{.takeaway .fragment}
 
 ::: {.notes}
 nl puts the full nonlinear equation in parentheses and free parameters in curly braces with starting values. {b0} is the intercept, {b1} is beta. vce(robust) gives heteroskedasticity-robust SEs. The big payoff: the SE and p-value attach to beta *itself* — no delta method needed.
@@ -207,7 +207,7 @@ nl puts the full nonlinear equation in parentheses and free parameters in curly 
 | 1995–2019 | +0.00182 | +0.00182 | $10^{-17}$ |
 | 1960–2000 | −0.00402 | −0.00402 | $10^{-16}$ |
 
-[The Barro–Sala-i-Martin equation is a *reparameterization* of the linear model — so the two routes must coincide.]{.comment}
+[The Barro–Sala-i-Martin equation is a *reparameterization* of the linear model — so the two routes must coincide.]{.takeaway .fragment}
 
 ::: {.notes}
 The differences are numerical noise, ~10^-17. Both minimise the same residual sum of squares; only the parameterization differs. So the choice is convenience, not correctness: OLS for speed and guaranteed convergence of the solver, NLS when you want inference on beta directly.

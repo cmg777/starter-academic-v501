@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Spatial Dynamic Panels with Common Factors</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -237,7 +237,7 @@
 <section id="one-equation-must-absorb-four-kinds-of-endogeneity-at-once" class="slide level2 center">
 <h2>One equation must absorb four kinds of endogeneity at once</h2>
 <p><span class="math display">\[NPL_{it} = \psi \sum_{j=1}^{N} w_{ij}\, NPL_{jt} + \rho\, NPL_{i,t-1} + x_{it}\beta + \alpha_i + \lambda_i' f_t + \varepsilon_{it}\]</span></p>
-<p><span class="comment">Spatial lag <span class="math inline">\(\psi W\,NPL\)</span>, temporal lag <span class="math inline">\(\rho\,NPL_{i,t-1}\)</span>, endogenous covariates <span class="math inline">\(x_{it}\beta\)</span>, bank effect <span class="math inline">\(\alpha_i\)</span>, and the latent factors <span class="math inline">\(\lambda_i' f_t\)</span> — every term but <span class="math inline">\(\alpha_i\)</span> is a source of endogeneity.</span></p>
+<p><span class="takeaway fragment">Spatial lag <span class="math inline">\(\psi W\,NPL\)</span>, temporal lag <span class="math inline">\(\rho\,NPL_{i,t-1}\)</span>, endogenous covariates <span class="math inline">\(x_{it}\beta\)</span>, bank effect <span class="math inline">\(\alpha_i\)</span>, and the latent factors <span class="math inline">\(\lambda_i' f_t\)</span> — every term but <span class="math inline">\(\alpha_i\)</span> is a source of endogeneity.</span></p>
 <aside class="notes">
 <p>Walk it left to right. The spatial lag is endogenous (i depends on j and j on i — simultaneity). The temporal lag correlates with the fixed effect. INEFF is an endogenous regressor. And the interactive fixed effect λ_i’ f_t enters both the regressors and the error, inducing cross-sectional dependence and omitted-variable bias. Four problems, one estimator.</p>
 <style type="text/css">
@@ -273,7 +273,7 @@
 <li class="fragment"><strong>Span</strong> — 2006:Q1 to 2014:Q4, 36 quarters straddling the GFC</li>
 <li class="fragment"><strong>Network</strong> — a <span class="math inline">\(350 \times 350\)</span> weight matrix <span class="math inline">\(W\)</span>, not geographic but <strong>economic-distance</strong> (Spearman rank correlations of bank debt ratios)</li>
 </ul>
-<p><span class="comment">Strongly balanced: every bank in every quarter. The matrix is row-standardized with about 18 neighbours per bank, so the spatial lag is a weighted average of interconnected banks.</span></p>
+<p><span class="takeaway fragment">Strongly balanced: every bank in every quarter. The matrix is row-standardized with about 18 neighbours per bank, so the spatial lag is a weighted average of interconnected banks.</span></p>
 <aside class="notes">
 <p>The economic-distance W is the key modelling choice. Two banks are neighbours if their debt-ratio rank correlation exceeds the 95th percentile — so two banks on opposite coasts can be “neighbours” if they lend alike. 6,300 nonzero entries / 350 banks ≈ 18 neighbours. Effective sample is 12,250 = 350 × 35 after the lag.</p>
 <style type="text/css">
@@ -304,7 +304,7 @@
 <li>Standard 2SLS asymptotics now hold</li>
 </ul>
 </div></div>
-<p><span class="comment">Removing the factors first kills the cross-sectional dependence — no incidental-parameters bias, no Lee–Yu correction.</span></p>
+<p><span class="takeaway fragment">Removing the factors first kills the cross-sectional dependence — no incidental-parameters bias, no Lee–Yu correction.</span></p>
 <aside class="notes">
 <p>The analogy from the post: a global rainstorm hits every pond at once. All ponds rise together — not because they’re connected, but because of the same outside force. Subtract that rain first; the remaining variation is the local circuitry the spatial/temporal model wants to learn. Because the factors come out before the IV step, classic 2SLS asymptotics apply.</p>
 <style type="text/css">
@@ -324,7 +324,7 @@
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2|3"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb1-1"><a href=""></a>spxtivdfreg NPL INEFF CAR SIZE BUFFER PROFIT QUALITY LIQUIDITY, <span class="co">///</span></span>
 <span id="cb1-2"><a href=""></a>    absorb(ID) splag tlags(1) spmatrix(<span class="st">"W.csv"</span>, import) <span class="co">///</span></span>
 <span id="cb1-3"><a href=""></a>    iv(INTEREST CAR SIZE BUFFER PROFIT QUALITY LIQUIDITY, splags lag(1)) <span class="fu">std</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment"><code>splag</code> adds the spatial lag, <code>tlags(1)</code> the temporal lag, <code>iv(...)</code> instruments <code>INEFF</code> with <code>INTEREST</code> and lags, <code>std</code> standardizes before extracting factors.</span></p>
+<p><span class="takeaway fragment"><code>splag</code> adds the spatial lag, <code>tlags(1)</code> the temporal lag, <code>iv(...)</code> instruments <code>INEFF</code> with <code>INTEREST</code> and lags, <code>std</code> standardizes before extracting factors.</span></p>
 <aside class="notes">
 <p>One command carries the whole model. INEFF (operational inefficiency) is endogenous — high NPL lowers measured efficiency (reverse causality) and unobserved management quality drives both. INTEREST (interest expenses / deposits) is the excluded instrument, alongside lagged exogenous regressors. The <code>std</code> option standardizes covariates so the principal-components factor step is numerically stable across very different scales.</p>
 <style type="text/css">
@@ -346,7 +346,7 @@
 <li class="fragment"><span class="math inline">\(r_u = 1\)</span> common factor in the error term</li>
 <li class="fragment">Together they capture Fed policy, the housing collapse, the interbank freeze</li>
 </ul>
-<p><span class="comment">Heterogeneous loadings <span class="math inline">\(\lambda_i\)</span> let each bank react to the same aggregate shock with its own intensity — something two-way fixed effects cannot do.</span></p>
+<p><span class="takeaway fragment">Heterogeneous loadings <span class="math inline">\(\lambda_i\)</span> let each bank react to the same aggregate shock with its own intensity — something two-way fixed effects cannot do.</span></p>
 <aside class="notes">
 <p>This is the payoff of interactive fixed effects over plain time dummies. Time dummies would only work if a shock hit all 350 banks equally. The λ_i’ f_t structure lets a big, systemically-exposed bank load heavily on the recession factor while a small local bank barely moves. The estimator chooses the number of factors automatically here.</p>
 <style type="text/css">
@@ -423,7 +423,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Hansen J: <span class="math inline">\(\chi^2(19) = 18.83\)</span>, <span class="math inline">\(p = 0.468\)</span> — fails to reject, so the instruments survive overidentification.</span></p>
+<p><span class="takeaway fragment">Hansen J: <span class="math inline">\(\chi^2(19) = 18.83\)</span>, <span class="math inline">\(p = 0.468\)</span> — fails to reject, so the instruments survive overidentification.</span></p>
 <aside class="notes">
 <p>LIQUIDITY has the biggest effect: a 1-pp rise in the loan-to-deposit ratio adds 2.45 pp of NPL — banks that lend aggressively relative to deposits carry more risk. INEFF confirms the “bad management” hypothesis. BUFFER is protective: better-capitalized banks have lower credit risk. And the Hansen J passing (p = 0.468) tells us the IV strategy — INTEREST plus lagged exogenous regressors — is appropriate.</p>
 <style type="text/css">
@@ -499,7 +499,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Excluded factors are serially correlated, so <span class="math inline">\(\rho\)</span> swells to absorb them — and the instruments are no longer valid.</span></p>
+<p><span class="takeaway fragment">Excluded factors are serially correlated, so <span class="math inline">\(\rho\)</span> swells to absorb them — and the instruments are no longer valid.</span></p>
 <aside class="notes">
 <p>The differences are striking and systematic. ρ doubles from 0.290 to 0.594 because the serially-correlated common factors, once excluded, get soaked up by the temporal lag — the model confuses macro persistence with bank-level risk persistence. LIQUIDITY collapses by two-thirds. And crucially the J-test now REJECTS (p &lt; 0.001): without factors, the exclusion restriction breaks, so the model is misspecified. That’s a formal statistical justification for keeping the factors.</p>
 <style type="text/css">
@@ -530,7 +530,7 @@
 <li>exposure mistaken for noise</li>
 </ul>
 </div></div>
-<p><span class="comment">Omitting factors can hide a genuine relationship, not just inflate spurious ones.</span></p>
+<p><span class="takeaway fragment">Omitting factors can hide a genuine relationship, not just inflate spurious ones.</span></p>
 <aside class="notes">
 <p>This is the subtle direction of the bias. Big banks have larger factor loadings — they’re more exposed to systematic macro shocks. Pull the factors out and that exposure is misattributed to noise, so SIZE drops to insignificance. Factor omission distorts coefficients in BOTH directions: inflating some (ρ), masking others (SIZE).</p>
 <style type="text/css">
@@ -583,7 +583,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Both pass the J-test — the choice is economic, and theory says banks are interconnected.</span></p>
+<p><span class="takeaway fragment">Both pass the J-test — the choice is economic, and theory says banks are interconnected.</span></p>
 <aside class="notes">
 <p>Remove the spatial lag and the leftover covariates must explain the cross-sectional co-movement on their own: INEFF jumps 43%, SIZE 55%, and ρ ticks up to absorb the missing spatial dynamics. Both specs have valid instruments (p = 0.468 vs 0.226), so the J-test can’t decide between them. We prefer the full model because financial theory predicts interdependence and ψ = 0.394 is highly significant.</p>
 <style type="text/css">
@@ -619,7 +619,7 @@
 <section id="long-run-impact-short-run-effect-amplified-twice" class="slide level2 center">
 <h2>Long-run impact = short-run effect, amplified twice</h2>
 <p><span class="math display">\[\text{Total LR effect} = \frac{\beta}{(1-\rho)(1-\psi)} = \frac{2.452}{(1-0.290)(1-0.394)} \approx 7.77\]</span></p>
-<p><span class="comment">The temporal multiplier <span class="math inline">\(1/(1-\rho) = 1.41\)</span> compounds the shock over time; the spatial multiplier <span class="math inline">\(1/(1-\psi) = 1.65\)</span> spreads it across the network.</span></p>
+<p><span class="takeaway fragment">The temporal multiplier <span class="math inline">\(1/(1-\rho) = 1.41\)</span> compounds the shock over time; the spatial multiplier <span class="math inline">\(1/(1-\psi) = 1.65\)</span> spreads it across the network.</span></p>
 <aside class="notes">
 <p>Two multipliers stack. The temporal multiplier 1/(1−ρ) = 1.41 captures the shock feeding back through lagged NPL. The spatial multiplier 1/(1−ψ) = 1.65 captures it spreading through the ~18-neighbour network. For nearly every covariate the long-run INDIRECT (spillover) effect is as large as or larger than the direct effect — for LIQUIDITY, 4.22 indirect vs 3.55 direct.</p>
 <style type="text/css">
@@ -697,7 +697,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The J-test decides factors; theory and significance decide the spatial lag; MG is a robustness check, read with care.</span></p>
+<p><span class="takeaway fragment">The J-test decides factors; theory and significance decide the spatial lag; MG is a robustness check, read with care.</span></p>
 <aside class="notes">
 <p>Decision rule from the post: run with and without factors first. The J-test rejects without (p &lt; 0.001), so factors are mandatory. With factors, ψ is highly significant, so keep the spatial lag — that’s the full model. MG is a final robustness probe that flags possible slope heterogeneity but shouldn’t overturn the preferred specification given its small-T fragility.</p>
 <style type="text/css">

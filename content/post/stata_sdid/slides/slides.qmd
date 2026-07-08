@@ -93,7 +93,7 @@ Built from the post's learning objectives. Teaching deck, so we give the audienc
 - **No covariates** — SC and SDID see *exactly* the same information
 :::
 
-[1,209 observations, of which only **12** are treated. That extreme imbalance is the defining feature of a comparative case study — and it dictates how we do inference.]{.comment}
+[1,209 observations, of which only **12** are treated. That extreme imbalance is the defining feature of a comparative case study — and it dictates how we do inference.]{.takeaway .fragment}
 
 ::: {.notes}
 The panel is strongly balanced (no gaps), which every method requires. The "outcome only, no covariates" design is deliberate: it means any difference between SC and SDID comes from the estimator, not from a different set of predictors. California is id 3 after an alphabetical encode.
@@ -111,7 +111,7 @@ California sits at a different level than the average donor and was already on a
 
 $$\tau = \frac{1}{N_{tr}\, T_{post}} \sum_{i:\, W_i = 1}\ \sum_{t > T_{pre}} \left[\, Y_{it}(1) - Y_{it}(0) \,\right]$$
 
-[Average, over treated units and post-1988 years, of the outcome *with* the policy minus the outcome that *would* have occurred without it. With $N_{tr}=1$, every method is just a different way to impute the missing $Y_{it}(0)$.]{.comment}
+[Average, over treated units and post-1988 years, of the outcome *with* the policy minus the outcome that *would* have occurred without it. With $N_{tr}=1$, every method is just a different way to impute the missing $Y_{it}(0)$.]{.takeaway .fragment}
 
 ::: {.notes}
 Name the estimand explicitly: this is the average treatment effect on the treated, not a population ATE. Because California was not randomly assigned to treatment, this is an observational design — identification rests on a stable comparison group and no California-specific shock, not on randomization.
@@ -121,7 +121,7 @@ Name the estimand explicitly: this is the average treatment effect on the treate
 
 $$\left(\hat{\tau}^{sdid}, \hat{\mu}, \hat{\alpha}, \hat{\beta}\right) = \underset{\tau,\mu,\alpha,\beta}{\arg\min} \sum_{i=1}^{N} \sum_{t=1}^{T} \left(Y_{it} - \mu - \alpha_i - \beta_t - W_{it}\,\tau\right)^{2}\, \hat{\omega}_i^{sdid}\, \hat{\lambda}_t^{sdid}$$
 
-[$\alpha_i$ is a state fixed effect, $\beta_t$ a year fixed effect, $\tau$ the ATT. The two extra terms — $\hat{\omega}_i$ (unit weight) and $\hat{\lambda}_t$ (time weight) — are everything that separates SDID from ordinary regression.]{.comment}
+[$\alpha_i$ is a state fixed effect, $\beta_t$ a year fixed effect, $\tau$ the ATT. The two extra terms — $\hat{\omega}_i$ (unit weight) and $\hat{\lambda}_t$ (time weight) — are everything that separates SDID from ordinary regression.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the unifying view of Arkhangelsky et al. (2021). Read the symbols against the Stata variables: Y is packspercapita, W is treated. Set the two weights to special values and you recover the older estimators — that is the next two slides.
@@ -146,7 +146,7 @@ This is the unifying view of Arkhangelsky et al. (2021). Read the symbols agains
 :::
 ::::
 
-[SDID keeps the best of both: optimized $\hat{\omega}_i$ *and* $\hat{\lambda}_t$, with the unit FE retained — match the trend, allow a level gap.]{.comment}
+[SDID keeps the best of both: optimized $\hat{\omega}_i$ *and* $\hat{\lambda}_t$, with the unit FE retained — match the trend, allow a level gap.]{.takeaway .fragment}
 
 ::: {.notes}
 DiD is just two-way fixed effects — uniform everything. SC keeps unit weights but, by dropping the unit fixed effect, must reproduce California's level outright, a demanding requirement and the reason SC sometimes cannot find a good fit. The contrast is genuinely inseparable, which is why it earns a two-column slide.
@@ -156,7 +156,7 @@ DiD is just two-way fixed effects — uniform everything. SC keeps unit weights 
 
 $$\hat{\omega}^{sdid} = \underset{\omega \in \Omega}{\arg\min} \sum_{t=1}^{T_{pre}} \left(\omega_0 + \sum_{i=1}^{N_{co}} \omega_i\, Y_{it} - \frac{1}{N_{tr}} \sum_{i=N_{co}+1}^{N} Y_{it}\right)^{2} + \zeta^{2}\, T_{pre}\, \lVert \omega \rVert_2^{2}$$
 
-[The intercept $\omega_0$ lets SDID match California's *trend* without matching its *level*. The ridge penalty $\zeta^{2} T_{pre} \lVert \omega \rVert_2^{2}$ spreads weight across donors instead of betting on one or two.]{.comment}
+[The intercept $\omega_0$ lets SDID match California's *trend* without matching its *level*. The ridge penalty $\zeta^{2} T_{pre} \lVert \omega \rVert_2^{2}$ spreads weight across donors instead of betting on one or two.]{.takeaway .fragment}
 
 ::: {.notes}
 Choose nonnegative weights summing to one (the set Ω) so the weighted control outcome, plus an intercept, comes as close as possible to California in every pre-treatment year. The penalty is what makes SDID's weights diffuse compared to classic SC — a deliberate trade of a little pre-period fit for a more stable comparison group.
@@ -166,7 +166,7 @@ Choose nonnegative weights summing to one (the set Ω) so the weighted control o
 
 $$\hat{\lambda}^{sdid} = \underset{\lambda \in \Lambda}{\arg\min} \sum_{i=1}^{N_{co}} \left(\lambda_0 + \sum_{t=1}^{T_{pre}} \lambda_t\, Y_{it} - \frac{1}{T_{post}} \sum_{t=T_{pre}+1}^{T} Y_{it}\right)^{2} + \zeta_{\lambda}^{2}\, N_{co}\, \lVert \lambda \rVert^{2}$$
 
-[Find pre-period year weights so the weighted pre-period outcome matches each control's *post-period average*. Years that look most like the post-period get the most weight — we will see all of it land on **1986–1988**.]{.comment}
+[Find pre-period year weights so the weighted pre-period outcome matches each control's *post-period average*. Years that look most like the post-period get the most weight — we will see all of it land on **1986–1988**.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the mirror image of the unit-weight problem. DiD and SC treat 1972 and 1988 as equally informative; SDID does not. The intuition: smoking behavior in 1972 tells us little about the 1995 counterfactual, while the late 1980s tell us a lot. This is the one ingredient SC lacks entirely.
@@ -180,7 +180,7 @@ This is the mirror image of the unit-weight problem. DiD and SC treat 1972 and 1
 | `1.post` | −28.51 | 1.75 | yes |
 | `1.cal` | −14.36 | 6.79 | yes |
 
-[The 2×2 DiD: California's before/after drop (−55.86) minus the controls' drop (−28.51) = **−27.35** packs.]{.comment}
+[The 2×2 DiD: California's before/after drop (−55.86) minus the controls' drop (−28.51) = **−27.35** packs.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the simplest credible estimate — a 2×2 difference-in-differences, computed by hand with reg packspercapita i.cal##i.post. But it trusts parallel trends against the simple average of 38 very different states, and the raw-trends figure already showed California drifting away from that average before 1989. If California was on a steeper path for unrelated reasons, DiD overstates the effect.
@@ -226,7 +226,7 @@ sdid packspercapita state year treated, method(sc)   vce(noinference) graph
 sdid packspercapita state year treated, method(sdid) vce(noinference) graph
 ```
 
-[`method(did)` returns −27.349 — identical to the hand-computed 2×2. `method(sc)` returns −19.620, essentially the standalone `synth2`'s −19.481. All three are special cases of one weighted regression.]{.comment}
+[`method(did)` returns −27.349 — identical to the hand-computed 2×2. `method(sc)` returns −19.620, essentially the standalone `synth2`'s −19.481. All three are special cases of one weighted regression.]{.takeaway .fragment}
 
 ::: {.notes}
 This is Clarke et al.'s (2024) practical payoff: you don't switch packages or rewrite the model — one option flips the estimator, and estimation, inference (vce), and the diagnostic graph all work identically. The tiny SC gap reflects different regularization: sdid matches the full pre-period path with a ridge penalty, synth2 optimizes Abadie's predictor-weighting V-matrix. Because the weights are computed once and reused, it is computationally cheap.
@@ -277,7 +277,7 @@ Between the no-controls baseline and the kitchen-sink comparison, SDID lands at 
 :::
 ::::
 
-[The design forces the method: $N_{tr}=1$ rules out jackknife and bootstrap, leaving the permutation procedure.]{.comment}
+[The design forces the method: $N_{tr}=1$ rules out jackknife and bootstrap, leaving the permutation procedure.]{.takeaway .fragment}
 
 ::: {.notes}
 This is not a free choice. The jackknife is literally undefined here — when it deletes California, the treated-removed estimate does not exist. The bootstrap's asymptotics require many treated units. The placebo procedure keeps the controls, repeatedly assigns the treatment structure to a control state as a fake treatment, and uses the placebo spread as the variance. Run it with vce(placebo) seed(1213).

@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Staggered Synthetic Difference-in-Differences</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -269,7 +269,7 @@
 <li class="fragment"><strong>Treatment</strong> <span class="math inline">\(W_{it}\)</span> — adopting a quota; <em>absorbing</em> (once on, stays on)</li>
 <li class="fragment"><strong>Donor pool</strong> — the <strong>110 never-treated</strong> countries every synthetic control is built from</li>
 </ul>
-<p><span class="comment">Balanced panel: <span class="math inline">\(119 \times 26 = 3{,}094\)</span> observations. Treated country-years are scarce — only 3% of the panel.</span></p>
+<p><span class="takeaway fragment">Balanced panel: <span class="math inline">\(119 \times 26 = 3{,}094\)</span> observations. Treated country-years are scarce — only 3% of the panel.</span></p>
 </section>
 <section id="the-staircase-cohorts-switch-on-one-column-at-a-time" class="slide level2 center">
 <h2>The staircase: cohorts switch on one column at a time</h2>
@@ -309,7 +309,7 @@
 <h2>SDID is a <em>weighted</em> two-way fixed-effects regression</h2>
 <p><span class="math display">\[\left(\hat\tau,\hat\mu,\hat\alpha,\hat\beta\right)=\arg\min_{\tau,\mu,\alpha,\beta}\sum_{i=1}^{N}\sum_{t=1}^{T}\left(Y_{it}-\mu-\alpha_i-\beta_t-W_{it}\,\tau\right)^2\,\hat\omega_i\,\hat\lambda_t\]</span></p>
 <p>Run a DiD, but weight each observation by a <strong>unit weight</strong> <span class="math inline">\(\hat\omega_i\)</span> times a <strong>time weight</strong> <span class="math inline">\(\hat\lambda_t\)</span>.</p>
-<p><span class="comment">Set every weight equal and you recover ordinary DiD; the weights are what make SDID special — and each solves its <em>own</em> optimization.</span></p>
+<p><span class="takeaway fragment">Set every weight equal and you recover ordinary DiD; the weights are what make SDID special — and each solves its <em>own</em> optimization.</span></p>
 <aside class="notes">
 <p>α_i is a country fixed effect, β_t a year fixed effect, W_it the treatment dummy, τ the ATT we want. The unit and time weights are not free parameters — they each minimize their own objective, which is the next two slides.</p>
 <style type="text/css">
@@ -327,7 +327,7 @@
 <section id="unit-weights-omega-build-a-synthetic-control-that-tracks-the-treated-trend" class="slide level2 center">
 <h2>Unit weights <span class="math inline">\(\omega\)</span> build a synthetic control that tracks the treated trend</h2>
 <p><span class="math display">\[\hat\omega=\arg\min_{\omega_0,\,\omega\ge 0}\sum_{t=1}^{T_{pre}}\left(\omega_0+\sum_{i=1}^{N_{co}}\omega_i\,Y_{it}-\frac{1}{N_{tr}}\sum_{i=1}^{N_{tr}}Y_{it}\right)^2+\zeta^2\,T_{pre}\,\lVert\omega\rVert^2\]</span></p>
-<p><span class="comment">The intercept <span class="math inline">\(\omega_0\)</span> is the SDID twist: it lets the synthetic match the <em>trend</em> without matching the <em>level</em> — any level gap is absorbed by <span class="math inline">\(\alpha_i\)</span>. The ridge penalty <span class="math inline">\(\zeta^2\lVert\omega\rVert^2\)</span> spreads weight across many donors.</span></p>
+<p><span class="takeaway fragment">The intercept <span class="math inline">\(\omega_0\)</span> is the SDID twist: it lets the synthetic match the <em>trend</em> without matching the <em>level</em> — any level gap is absorbed by <span class="math inline">\(\alpha_i\)</span>. The ridge penalty <span class="math inline">\(\zeta^2\lVert\omega\rVert^2\)</span> spreads weight across many donors.</span></p>
 <aside class="notes">
 <p>Non-negative weights, one per donor, summing to one. Synthetic control by contrast drops the intercept and the penalty and must match the level too — that’s the difference. In the 2000 cohort, 80 donors get nonzero weight (Argentina ≈ 0.061, Guatemala ≈ 0.057), a diffuse blend rather than one or two stand-ins.</p>
 <style type="text/css">
@@ -402,7 +402,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Optimizing both axes — and letting the unit FE absorb the level — is what distinguishes SDID.</span></p>
+<p><span class="takeaway fragment">Optimizing both axes — and letting the unit FE absorb the level — is what distinguishes SDID.</span></p>
 </section>
 <section id="staggered-sdid-do-the-single-cohort-analysis-once-per-cohort-then-average" class="slide level2 center">
 <h2>Staggered SDID: do the single-cohort analysis once per cohort, then average</h2>
@@ -420,7 +420,7 @@
 <li>exactly the contamination that breaks naive TWFE</li>
 </ul>
 </div></div>
-<p><span class="comment">Estimand: the <strong>ATT under staggered timing</strong> — the effect on the units that actually adopted, averaged over their post-adoption years.</span></p>
+<p><span class="takeaway fragment">Estimand: the <strong>ATT under staggered timing</strong> — the effect on the units that actually adopted, averaged over their post-adoption years.</span></p>
 <aside class="notes">
 <p>Disarmingly simple. The block-design SDID from the previous tutorial, run once per adoption cohort. Because every cohort is compared only to the 110 never-treated countries, the forbidden comparison can never happen — that’s the whole point relative to TWFE.</p>
 <style type="text/css">
@@ -439,7 +439,7 @@
 <h2>The overall ATT is a non-negative, treated-period-weighted average</h2>
 <p><span class="math display">\[\widehat{ATT}=\sum_{a\in\mathcal{A}}\frac{N_{tr}^{a}\,T_{post}^{a}}{\sum_{b\in\mathcal{A}}N_{tr}^{b}\,T_{post}^{b}}\ \hat\tau_a\]</span></p>
 <p>A cohort counts in proportion to how many treated country-years it contributes.</p>
-<p><span class="comment">The 2000 cohort (treated 16 years) carries more weight than the 2013 cohort (treated 3). Unlike TWFE, <em>every weight is positive and interpretable.</em></span></p>
+<p><span class="takeaway fragment">The 2000 cohort (treated 16 years) carries more weight than the 2013 cohort (treated 3). Unlike TWFE, <em>every weight is positive and interpretable.</em></span></p>
 <aside class="notes">
 <p>This is the staggered generalization of single-cohort SDID. When each cohort has one treated unit it reduces to the post-period share T_post^a / T_post from Clarke et al.&nbsp;(2024). The non-negativity is the headline contrast with TWFE, whose implicit weights can go negative.</p>
 <style type="text/css">
@@ -535,7 +535,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The aggregate 8.03 is the <em>weighted</em> average; the plain mean of the seven would be ≈ 7.0.</span></p>
+<p><span class="takeaway fragment">The aggregate 8.03 is the <em>weighted</em> average; the plain mean of the seven would be ≈ 7.0.</span></p>
 <aside class="notes">
 <p>Two of seven cohorts are negative. The 2003 cohort is essentially uninformative — SE 9.13, a CI from −4 to +32, the tell of a fragile synthetic control built from few controls. The 2000/2002/2003 cohorts carry 75% of the aggregation weight because they are early and long-exposed. (I dropped 2010 and 2013 from this table to fit the slide; full e(tau) in the post.)</p>
 <style type="text/css">
@@ -583,7 +583,7 @@
 <li>ATT = <strong>8.06</strong>, SE 3.12</li>
 </ul>
 </div></div>
-<p><span class="comment">Both within 0.03 of the no-covariate <strong>8.03</strong> — the obvious confounder (richer countries) doesn’t account for it.</span></p>
+<p><span class="takeaway fragment">Both within 0.03 of the no-covariate <strong>8.03</strong> — the obvious confounder (richer countries) doesn’t account for it.</span></p>
 <aside class="notes">
 <p>The two routes differ in how they estimate the covariate’s coefficient — optimized is flexible but heavy; projected is faster and numerically stable. They agree to the second decimal, which is reassuring. Both p &lt; 0.01.</p>
 <style type="text/css">
@@ -619,7 +619,7 @@
 <h2>The dynamic effect, in one definition</h2>
 <p><span class="math display">\[\delta_{\ell}=\left(\bar Y_{\ell}^{\,tr}-\bar Y_{\ell}^{\,co}\right)-\left(\bar Y_{base}^{\,tr}-\bar Y_{base}^{\,co}\right),\qquad \bar Y_{base}^{\,g}=\sum_{t=1}^{T_{pre}}\hat\lambda_t\,\bar Y_t^{\,g}\]</span></p>
 <p>The treated-minus-synthetic gap at event time <span class="math inline">\(\ell\)</span>, <em>net of the same gap at the <span class="math inline">\(\lambda\)</span>-weighted baseline</em>.</p>
-<p><span class="comment">Pre-period <span class="math inline">\(\delta_\ell\)</span> near zero is the parallel-trends placebo; post-period <span class="math inline">\(\delta_\ell &gt; 0\)</span> is the dynamic effect.</span></p>
+<p><span class="takeaway fragment">Pre-period <span class="math inline">\(\delta_\ell\)</span> near zero is the parallel-trends placebo; post-period <span class="math inline">\(\delta_\ell &gt; 0\)</span> is the dynamic effect.</span></p>
 </section></section>
 <section>
 <section id="the-resolution" class="title-slide slide level1 divider center" data-background-color="#00d4c8">

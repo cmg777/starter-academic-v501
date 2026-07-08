@@ -90,7 +90,7 @@ Teaching deck roadmap, built from the post's learning objectives. We establish f
 - **Correlates** — 50+ policy, institutional, and cultural variables, grouped into Solow fundamentals vs. short-run vs. long-run vs. culture
 :::
 
-[Unbalanced panel — 109 countries in 1960, 160 by 1990. Penn World Table 10.0 plus the Kremer et al. replication covariates. The analysis is **descriptive**: cross-country association, not a causal ATE.]{.comment}
+[Unbalanced panel — 109 countries in 1960, 160 by 1990. Penn World Table 10.0 plus the Kremer et al. replication covariates. The analysis is **descriptive**: cross-country association, not a causal ATE.]{.takeaway .fragment}
 
 ::: {.notes}
 Emphasize the descriptive framing up front — everything here is a conditional association, never a treatment effect. The Solow-vs-short-run split is load-bearing: the punchline is that these two groups behave completely differently in growth regressions.
@@ -142,7 +142,7 @@ $$\beta - \beta^{\ast} = \delta \times \lambda$$
 
 The convergence gap = $\delta$ (income → correlate) $\times$ $\lambda$ (correlate → growth).
 
-[This is an exact algebraic identity, not an approximation — when the gap closes, at least one of $\delta$ or $\lambda$ must have shrunk.]{.comment}
+[This is an exact algebraic identity, not an approximation — when the gap closes, at least one of $\delta$ or $\lambda$ must have shrunk.]{.takeaway .fragment}
 
 ::: {.notes}
 The gap between unconditional (β) and conditional (β*) convergence equals δ × λ: δ is how much richer countries have *more* of a correlate; λ is how much that correlate predicts growth. This is the analytical heart of the talk. Three regressions: (1) growth on income → β; (2) growth on income + correlate → β* and λ; (3) correlate on income → δ. OVB algebra forces β − β* = δ × λ exactly. So there are exactly three ways unconditional convergence can emerge: β* shifts, δ shifts, or λ shifts. The empirical work is just deciding which.
@@ -155,7 +155,7 @@ The gap between unconditional (β) and conditional (β*) convergence equals δ �
 | 1985 | 0.494 | 0.891 | [0.440]{.key} |
 | 2005 | 0.216 | 0.183 | [0.040]{.key} |
 
-[$\delta$ roughly halved, but $\lambda$ fell $\sim5\times$ — democracy went from a strong growth predictor to nearly none. The gap closed 91%.]{.comment}
+[$\delta$ roughly halved, but $\lambda$ fell $\sim5\times$ — democracy went from a strong growth predictor to nearly none. The gap closed 91%.]{.takeaway .fragment}
 
 ::: {.notes}
 Worked example that encapsulates the whole argument. In 1985 unconditional β = +0.33 (divergence), but conditional β* = −0.11 — controlling for democracy revealed catch-up. The 0.44 gap is exactly 0.494 × 0.891. By 2005, λ collapsed from 0.89 to 0.18; the gap shrank to 0.04 — a 91% reduction. Both ingredients were present in 1985; by 2005 the λ ingredient had nearly vanished.

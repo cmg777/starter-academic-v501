@@ -66,7 +66,7 @@ This is the central motivation. Policy makers, doctors, and managers never act o
 | Eligible for 401(k) | [$30,347]{.key} | 3,682 |
 | Not eligible | $10,790 | 6,231 |
 
-[Eligible workers are older, richer, more educated — so the $19,557 gap conflates the effect with *who selects into* eligibility.]{.comment}
+[Eligible workers are older, richer, more educated — so the $19,557 gap conflates the effect with *who selects into* eligibility.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the naive view, and it fails. If e401k were randomly assigned, $19,557 would be the ATE. It isn't — eligibility is a function of which employer you chose. The job of every estimator that follows is to strip out the selection and recover the causal part.
@@ -100,7 +100,7 @@ $$\tau(\mathbf{x}) = E\big[\,y(1) - y(0) \mid \mathbf{x}\,\big]$$
 
 The average effect *among households whose covariates equal* $\mathbf{x}$. Where $\tau(\mathbf{x})$ bends with $\mathbf{x}$, the program helps some households more than others.
 
-[The single ATE is just $E[\tau(\mathbf{X})]$ — the CATE averaged over the population.]{.comment}
+[The single ATE is just $E[\tau(\mathbf{X})]$ — the CATE averaged over the population.]{.takeaway .fragment}
 
 ::: {.notes}
 The CATE is a function of x, not a scalar. If τ(x) were constant we'd be back at the ATE. The whole point of the deck is that it is NOT constant. Note y(1) and y(0) are potential outcomes — we only ever observe one per household, so this is fundamentally a missing-data problem.
@@ -125,7 +125,7 @@ $$0 < \Pr(d=1\mid \mathbf{x}) < 1$$
 :::
 ::::
 
-[Machine learning chooses controls flexibly; it cannot manufacture identification.]{.comment}
+[Machine learning chooses controls flexibly; it cannot manufacture identification.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the load-bearing slide for rigor. The causal forest gives us a flexible τ̂(x), but identification rests entirely on these two assumptions — they are assumptions about the world, not about the estimator. Overlap is what keeps the inverse-propensity weights in AIPW from blowing up.
@@ -139,7 +139,7 @@ This is the load-bearing slide for rigor. The causal forest gives us a flexible 
 - **Covariates** — age, education, income, pension, marriage, two-earner, IRA, homeownership
 :::
 
-[`assets3`, the canonical Chernozhukov–Hansen excerpt shipped with Stata 19.]{.comment}
+[`assets3`, the canonical Chernozhukov–Hansen excerpt shipped with Stata 19.]{.takeaway .fragment}
 
 ::: {.notes}
 The heavy right tail of assets is exactly why a single-number ATE struggles — skewness 10.6, kurtosis 187. When the outcome is that skewed, the effect is almost guaranteed to be heterogeneous across the income distribution.
@@ -155,7 +155,7 @@ global catecovars age educ i.incomecat i.pension i.married i.twoearn i.ira i.own
 cate po (asset $catecovars) (e401k), rseed(12345671)
 ```
 
-[Lasso for the nuisance functions (cross-fitted), a generalized random forest for $\tau(\mathbf{x})$, honest-tree bootstrap for the CIs — Stata 18 needed hand-rolled loops.]{.comment}
+[Lasso for the nuisance functions (cross-fitted), a generalized random forest for $\tau(\mathbf{x})$, honest-tree bootstrap for the CIs — Stata 18 needed hand-rolled loops.]{.takeaway .fragment}
 
 ::: {.notes}
 The full do-file is in the post; these are the load-bearing lines. `cate po` is the partialing-out estimator: it residualizes both the outcome and the treatment against the covariates (cross-fitting), then fits a causal forest on the residuals. rseed makes the cross-fitting reproducible.
@@ -178,7 +178,7 @@ The full do-file is in the post; these are the load-bearing lines. `cate po` is 
 :::
 ::::
 
-[Both return a per-household effect function $\hat\tau(\mathbf{x}_i)$ — they differ only in how they map nuisances into it.]{.comment}
+[Both return a per-household effect function $\hat\tau(\mathbf{x}_i)$ — they differ only in how they map nuisances into it.]{.takeaway .fragment}
 
 ::: {.notes}
 PO and AIPW make different model assumptions but produce the same kind of object. AIPW's double robustness is the headline property: it stays consistent if EITHER the outcome model OR the propensity model is correct. The cost is sensitivity to extreme propensities, which is why overlap matters.
@@ -201,7 +201,7 @@ When a mature parametric estimator and two machine-learning estimators that shar
 | `cate po` | 4.11 | 0.043 | reject homogeneity |
 | `cate aipw` | [5.54]{.key} | 0.019 | reject homogeneity |
 
-[`estat heterogeneity` — $H_0:\ \tau(\mathbf{x})$ is constant. Both reject at 5%, so the heterogeneity hunt is not chasing noise.]{.comment}
+[`estat heterogeneity` — $H_0:\ \tau(\mathbf{x})$ is constant. Both reject at 5%, so the heterogeneity hunt is not chasing noise.]{.takeaway .fragment}
 
 ::: {.notes}
 Before exploring HOW the effect varies, we ask WHETHER it varies. Both estimators reject the constant-effect null. AIPW rejects more strongly (p = 0.019 vs 0.043), consistent with its higher efficiency when both nuisance models are well-specified. This licenses everything that follows.
@@ -224,7 +224,7 @@ This is the visual answer to "is the average hiding something?" The mean of $7,9
 | Age (per year) | +205 | 0.082 |
 | Education (per year) | −442 | 0.365 |
 
-[`estat projection`: the only coefficient significant at 1% is the top income category. $R^2=0.0045$ — most heterogeneity is *nonlinear*, captured by the forest, not the projection.]{.comment}
+[`estat projection`: the only coefficient significant at 1% is the top income category. $R^2=0.0045$ — most heterogeneity is *nonlinear*, captured by the forest, not the projection.]{.takeaway .fragment}
 
 ::: {.notes}
 A causal forest fits τ̂(x) flexibly but a flexible function is hard to summarize. The linear projection answers "which variables shift the predicted effect?" Income dominates. The low R² is a feature, not a bug — it tells us the real structure is curvature the projection can't see, which is exactly why we need GATE and the series fit.
@@ -262,7 +262,7 @@ GATES flips GATE around: instead of naming groups in advance, it sorts household
 | Age (years) | 45.2 | 35.0 | 10.2 | 35.7 |
 | Education (years) | 14.0 | 12.7 | 1.4 | 18.6 |
 
-[`estat classification`: the data sorted itself; income is the dominant marker of who responds. All three gaps have $t>18$.]{.comment}
+[`estat classification`: the data sorted itself; income is the dominant marker of who responds. All three gaps have $t>18$.]{.takeaway .fragment}
 
 ::: {.notes}
 The data did the sorting; now we ask what makes the top quartile different. The high-effect group is older, richer, and more educated — but income is the dominant signal, fully consistent with the projection and the GATE-by-income picture. The story: 401(k) eligibility helps people who already had latent demand for retirement saving and the slack to act on it.

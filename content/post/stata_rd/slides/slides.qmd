@@ -78,7 +78,7 @@ A deterministic assignment rule, drawn as a flow:
 :::
 ::::
 
-[Students just below and just above 70 are comparable by construction — only treatment differs.]{.comment}
+[Students just below and just above 70 are comparable by construction — only treatment differs.]{.takeaway .fragment}
 
 ::: {.notes}
 This replaces the post's Mermaid flow diagram. The entrance exam is the running variable; the cutoff at 70 is a sharp, rule-based boundary. Comparing students immediately on either side approximates an experiment because the threshold, not the students, decides treatment.
@@ -113,7 +113,7 @@ This is the money chart — plant it now, earn it in Act II. Don't explain bins 
 - **Treatment** — 241 students (24.1%) scoring $\le 70$ were tutored
 :::
 
-[The entrance distribution is right-skewed — most students cleared 70, so only about a quarter received tutoring.]{.comment}
+[The entrance distribution is right-skewed — most students cleared 70, so only about a quarter received tutoring.]{.takeaway .fragment}
 
 ::: {.notes}
 Five variables, 1,000 rows. We center the running variable at the cutoff (centered = entrance − 70) so the treatment coefficient reads directly as the discontinuity jump. The outcome is more compressed (SD 7.6) than the running variable (SD 12.7).
@@ -125,7 +125,7 @@ $$\tau_{RD}=\lim_{x\downarrow c}E[Y\mid X=x]-\lim_{x\uparrow c}E[Y\mid X=x]$$
 
 The difference between the expected exit score just above the cutoff and just below it.
 
-[Identification rests on **continuity**: absent tutoring, outcomes pass *smoothly* through 70.]{.comment}
+[Identification rests on **continuity**: absent tutoring, outcomes pass *smoothly* through 70.]{.takeaway .fragment}
 
 ::: {.notes}
 Name the estimand explicitly: the Local Average Treatment Effect at the cutoff. The continuity assumption is the load-bearing one — students just below 70 would, absent treatment, look like students just above. We cannot extrapolate τ to a student scoring 30 or 95.
@@ -138,7 +138,7 @@ Name the estimand explicitly: the Local Average Treatment Effect at the cutoff. 
 | Above cutoff ($>70$) | [759]{.key} | 0 | 759 |
 | At or below ($\le 70$) | 0 | [241]{.key} | 241 |
 
-[Zero crossovers in either direction — treatment is a deterministic function of the score. This is a *sharp* RDD, the strongest form.]{.comment}
+[Zero crossovers in either direction — treatment is a deterministic function of the score. This is a *sharp* RDD, the strongest form.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the sharp-vs-fuzzy check. 100% of below-cutoff students were treated, 0% of above-cutoff. No one slipped through. A fuzzy design (say 70% take-up below, 5% above) would need an instrumental-variables-style estimator; here the discontinuity in treatment is exactly 1, so the LATE is identified directly.
@@ -185,7 +185,7 @@ The simplest specification: one slope for both sides, a level shift τ for the t
 | 2 | Linear, different slopes | 10.797 | 0.816 | 0.268 |
 | 3 | Quadratic | 9.223 | 1.198 | 0.271 |
 
-[The interaction term is essentially zero (−0.001), and R² is flat across all three — added flexibility buys nothing.]{.comment}
+[The interaction term is essentially zero (−0.001), and R² is flat across all three — added flexibility buys nothing.]{.takeaway .fragment}
 
 ::: {.notes}
 Allowing different slopes each side (Model 2) leaves τ unchanged at 10.80; the interaction is −0.001 (p = 0.98), so the entrance-exit relationship has the same slope on both sides. The quadratic nudges τ down to 9.22 with a wider SE. The story is stable — but all three impose a functional form on the whole sample. That motivates going nonparametric.
@@ -202,7 +202,7 @@ ssc install rdrobust, replace
 rdrobust exit_exam entrance_exam, c(70)
 ```
 
-[Smaller bandwidth → less bias (more comparable units) but more variance (fewer observations). `rdrobust` picks the MSE-optimal $h$ automatically.]{.comment}
+[Smaller bandwidth → less bias (more comparable units) but more variance (fewer observations). `rdrobust` picks the MSE-optimal $h$ automatically.]{.takeaway .fragment}
 
 ::: {.notes}
 This is Cattaneo–Idrobo–Titiunik's local-polynomial estimator. It throws away the global functional form and only uses students within a narrow window of the cutoff, weighting by a triangular kernel. The bandwidth is the central tuning choice — and rdrobust chooses it for you to minimize mean squared error.
@@ -237,7 +237,7 @@ The MSE-optimal bandwidth is 9.98 points, so only students scoring roughly 60–
 :::
 ::::
 
-[Opposite signs, identical message: tutoring raises exit scores by roughly 9–11 points at the cutoff.]{.comment}
+[Opposite signs, identical message: tutoring raises exit scores by roughly 9–11 points at the cutoff.]{.takeaway .fragment}
 
 ::: {.notes}
 The sign flip trips up every first reader. OLS estimates the effect of treat = 1, which is positive. rdrobust estimates the discontinuity scanning left→right, which is negative because we move from tutored to untreated. They target the *same* LATE; the ~25% magnitude gap is scope (global vs local) plus the data-driven bandwidth.
@@ -256,7 +256,7 @@ The sign flip trips up every first reader. OLS estimates the effect of treat = 1
 | 15 | −8.842 | 1.312 | <0.001 |
 | 20 | −9.157 | 1.131 | <0.001 |
 
-[Less than one point across a 4× change in window — not a bandwidth artifact.]{.comment}
+[Less than one point across a 4× change in window — not a bandwidth artifact.]{.takeaway .fragment}
 
 ::: {.notes}
 Bandwidth is the analyst's most discretionary RDD choice, so this is the key robustness test. From the tightest window (BW 5, a handful of students) to the widest (BW 20), τ moves less than a point and stays significant at p < 0.001. Narrower bandwidths inflate the SE (2.34 vs 1.13) as expected. The mild drift toward −9.2 hints at slight curvature far from the cutoff.
@@ -306,7 +306,7 @@ Steelman the critique. RDD's credibility comes from the assumption, not the esti
 | Parametric OLS (quadratic) | +9.22 | 6.87 – 11.57 | <0.001 |
 | Nonparametric rdrobust | 8.58 | 4.54 – 12.14 | <0.001 |
 
-[9–11 points is ~13–16% of the mean exit score (66.2) — passing vs failing for a borderline student.]{.comment}
+[9–11 points is ~13–16% of the mean exit score (66.2) — passing vs failing for a borderline student.]{.takeaway .fragment}
 
 ::: {.notes}
 The payoff table. Global and local methods, parametric and nonparametric, all land in a 9–11 point band, all p < 0.001. Scaled against a mean of 66.2, that's a 13–16% gain. For policy, a sharp test-score rule is both easy to implement and easy to evaluate — but the effect remains a LATE at the cutoff.

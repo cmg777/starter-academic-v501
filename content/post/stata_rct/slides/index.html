@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Evaluating a Cash Transfer RCT with Panel Data</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -264,7 +264,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Twelve specifications, three estimands, one truth at <span class="math inline">\(0.12\)</span> — and <em>every</em> 95% CI covers it.</span></p>
+<p><span class="takeaway fragment">Twelve specifications, three estimands, one truth at <span class="math inline">\(0.12\)</span> — and <em>every</em> 95% CI covers it.</span></p>
 <aside class="notes">
 <p>This is the spoiler table. Don’t defend each row yet — just plant that the methods cluster tightly and the true value sits inside every interval. We earn each estimator in Act II and return to this picture at the close.</p>
 <style type="text/css">
@@ -314,7 +314,7 @@
 <li class="fragment"><strong>Assignment</strong> — <code>treat</code> randomized within poverty strata (intent-to-treat)</li>
 <li class="fragment"><strong>Receipt</strong> — <code>D</code>, endogenous: only 85% of offered households took up</li>
 </ul>
-<p><span class="comment">State the wedge early: random <code>treat</code> is exogenous; actual <code>D</code> is a choice. Most of the deck estimates the <em>offer</em> effect; Act III’s coda returns to <em>receipt</em>.</span></p>
+<p><span class="takeaway fragment">State the wedge early: random <code>treat</code> is exogenous; actual <code>D</code> is a choice. Most of the deck estimates the <em>offer</em> effect; Act III’s coda returns to <em>receipt</em>.</span></p>
 <aside class="notes">
 <p>The simulated panel is strongly balanced — every household appears in both waves, no attrition. Distinguish offer (treat, exogenous by randomization) from receipt (D, endogenous by self-selection). 51.8% were offered; 46.15% received. That 5.65pp gap is the compliance problem we postpone to Act III.</p>
 <style type="text/css">
@@ -390,7 +390,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><span class="math inline">\(p = 0.038\)</span> flags <code>female</code>, but the SMD of <span class="math inline">\(9.3\%\)</span> is the right lens — large <span class="math inline">\(n\)</span> makes tiny gaps “significant.”</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(p = 0.038\)</span> flags <code>female</code>, but the SMD of <span class="math inline">\(9.3\%\)</span> is the right lens — large <span class="math inline">\(n\)</span> makes tiny gaps “significant.”</span></p>
 <aside class="notes">
 <p>P-values mislead at large n — they flag a 4.6pp gender gap as “significant” while the SMD says it is small and below threshold. The lesson: judge balance with standardized differences, not p-values. We carry female (and the others) into estimation as precision controls.</p>
 <style type="text/css">
@@ -409,7 +409,7 @@
 <h2>A formal balance check: AIPW on baseline data should — and does — find nothing</h2>
 <p><span class="math display">\[\hat\tau_{\text{baseline}} = -0.024 \quad (p = 0.196)\]</span></p>
 <p>Run the doubly-robust estimator on <strong>baseline only</strong>, before the program exists. A null “effect” is exactly what a clean randomization predicts.</p>
-<p><span class="comment">Overidentification test: <span class="math inline">\(\chi^2(5) = 3.22\)</span>, <span class="math inline">\(p = 0.667\)</span> — no residual imbalance after weighting.</span></p>
+<p><span class="takeaway fragment">Overidentification test: <span class="math inline">\(\chi^2(5) = 3.22\)</span>, <span class="math inline">\(p = 0.667\)</span> — no residual imbalance after weighting.</span></p>
 <aside class="notes">
 <p>This is a clever pre-flight: if randomization is real, a treatment effect estimated before treatment must be zero. AIPW returns -0.024, n.s., and the overid test fails to reject balance. It doubles as a soft introduction to doubly-robust estimation before we lean on it for real.</p>
 <style type="text/css">
@@ -476,7 +476,7 @@
 <li>“Did it help the participants?”</li>
 </ul>
 </div></div>
-<p><span class="comment">Under randomization with homogeneous effects, ATE <span class="math inline">\(=\)</span> ATT. DiD will only ever give us the ATT.</span></p>
+<p><span class="takeaway fragment">Under randomization with homogeneous effects, ATE <span class="math inline">\(=\)</span> ATT. DiD will only ever give us the ATT.</span></p>
 <aside class="notes">
 <p>Name the estimand for every method — this is the discipline the post insists on. Cross-sectional teffects can target either ATE or ATT. DiD is structurally ATT-only because its counterfactual is built for the treated group. Foreshadow that distinction now.</p>
 <style type="text/css">
@@ -493,7 +493,7 @@
 </section>
 <section id="in-an-rct-controls-dont-remove-bias-they-buy-precision" class="slide level2 center">
 <h2>In an RCT, controls don’t remove bias — they buy precision</h2>
-<p><span class="comment">Randomized treatment is independent of potential outcomes, so the raw difference in means is <em>already</em> unbiased.</span></p>
+<p><span class="takeaway fragment">Randomized treatment is independent of potential outcomes, so the raw difference in means is <em>already</em> unbiased.</span></p>
 <div class="fragment">
 <p>No confounding here, so covariates don’t fix bias — they soak up residual variation and tighten the estimate.</p>
 <aside class="notes">
@@ -529,7 +529,7 @@
 <li>Fails on extreme weights</li>
 </ul>
 </div></div>
-<p><span class="comment">Doubly robust (AIPW / IPWRA) fits <strong>both</strong> — and is consistent if <em>either</em> one is correct.</span></p>
+<p><span class="takeaway fragment">Doubly robust (AIPW / IPWRA) fits <strong>both</strong> — and is consistent if <em>either</em> one is correct.</span></p>
 <aside class="notes">
 <p>RA predicts the missing counterfactual from an outcome model; IPW reweights observed outcomes by inverse propensity; DR stitches them together. Each fails in a different way — outcome misspecification vs.&nbsp;extreme weights — which is exactly why combining them is insurance.</p>
 <style type="text/css">
@@ -548,7 +548,7 @@
 <h2>Doubly robust estimation: one model can be wrong and the answer still holds</h2>
 <p><span class="math display">\[\hat\tau_{DR}^{ATE} = \frac1N \sum_{i=1}^{N}\Big[\hat\mu_1(X_i) - \hat\mu_0(X_i) + \frac{T_i\,(Y_i - \hat\mu_1)}{\hat p(X_i)} - \frac{(1-T_i)(Y_i - \hat\mu_0)}{1 - \hat p(X_i)}\Big]\]</span></p>
 <p>First two terms: the RA prediction. Last two: IPW residuals that cancel RA’s bias.</p>
-<p><span class="comment">Belt and suspenders: if the belt fails, the suspenders hold. Only <em>both</em> wrong is fatal.</span></p>
+<p><span class="takeaway fragment">Belt and suspenders: if the belt fails, the suspenders hold. Only <em>both</em> wrong is fatal.</span></p>
 <aside class="notes">
 <p>Walk the two pieces. If the outcome model is right, residuals average to zero and DR collapses to RA. If the propensity model is right, the weighted residuals fix the RA bias. Getting at least one model approximately right is far easier than getting both perfect — that is the whole appeal.</p>
 <style type="text/css">
@@ -654,7 +654,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Adjusted estimates (<span class="math inline">\(0.113\)</span>) sit just below the raw <span class="math inline">\(0.116\)</span> — that gap <em>is</em> the precision gain from controlling for the gender imbalance.</span></p>
+<p><span class="takeaway fragment">Adjusted estimates (<span class="math inline">\(0.113\)</span>) sit just below the raw <span class="math inline">\(0.116\)</span> — that gap <em>is</em> the precision gain from controlling for the gender imbalance.</span></p>
 <aside class="notes">
 <p>The convergence is the reassuring signal: when methods that model different things agree, you trust the design. The 0.003 drop from 0.116 to 0.113 is the covariate adjustment doing its precision job. In a messier observational dataset these rows would scatter, and DR would be the one to trust.</p>
 <style type="text/css">
@@ -693,7 +693,7 @@
 <h2>DiD is a difference of differences — the control trend is the counterfactual</h2>
 <p><span class="math display">\[\hat\tau_{DiD} = \underbrace{(\bar Y_{T,post} - \bar Y_{T,pre})}_{\text{effect}\,+\,\text{trend}} - \underbrace{(\bar Y_{C,post} - \bar Y_{C,pre})}_{\text{trend only}}\]</span></p>
 <p>Treated change = effect + trend. Control change = trend alone. Subtract — the trend cancels.</p>
-<p><span class="comment">Identification rides on <strong>parallel trends</strong> — plausible here because randomization equalized the groups at baseline.</span></p>
+<p><span class="takeaway fragment">Identification rides on <strong>parallel trends</strong> — plausible here because randomization equalized the groups at baseline.</span></p>
 <aside class="notes">
 <p>The control group’s drift (e.g.&nbsp;nationwide income growth) is what the treated group would have experienced anyway. Subtracting it isolates the program. The identifying assumption is parallel trends, not equal levels — groups can start anywhere as long as they would have moved together absent treatment. Randomization makes that very credible.</p>
 <style type="text/css">
@@ -732,7 +732,7 @@
 <h2>Doubly robust DiD: Sant’Anna–Zhao bring the “either model” guarantee to panels</h2>
 <p><span class="math display">\[\hat\tau_{DR}^{DiD} = \frac{1}{N_1}\sum_{i=1}^{N}\big[w_1(D_i) - w_0(D_i, X_i)\big]\big[\Delta Y_i - \hat\mu_{0,\Delta}(X_i)\big]\]</span></p>
 <p>Subtract the control-group’s <em>predicted change</em> from each household’s actual change <span class="math inline">\(\Delta Y_i\)</span>, then IPW-reweight so controls resemble the treated. Consistent if <strong>either</strong> model is right.</p>
-<p><span class="comment">Needs only <strong>conditional</strong> parallel trends — covariate-specific time trends are allowed.</span></p>
+<p><span class="takeaway fragment">Needs only <strong>conditional</strong> parallel trends — covariate-specific time trends are allowed.</span></p>
 <aside class="notes">
 <p>This is the panel analogue of cross-sectional AIPW, applied to changes rather than levels. It relaxes parallel trends to a conditional version: trends can differ across covariate groups (poor vs non-poor) and the ATT is still identified. When both models are right it hits the semiparametric efficiency bound. It also dodges the heterogeneity traps of naive two-way fixed effects.</p>
 <style type="text/css">
@@ -820,7 +820,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">DiD’s value is <strong>not</strong> a tighter SE — it is robustness to time-invariant unobservables.</span></p>
+<p><span class="takeaway fragment">DiD’s value is <strong>not</strong> a tighter SE — it is robustness to time-invariant unobservables.</span></p>
 <aside class="notes">
 <p>The DiD estimates (0.135–0.137) sit slightly above the cross-sectional 0.113, but every interval brackets 0.12. The reason to reach for DiD is not precision — its SEs are wider — but insurance against fixed confounders that randomization would not be providing in an observational world.</p>
 <style type="text/css">
@@ -868,7 +868,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The doubly-robust receipt estimate (<span class="math inline">\(0.117\)</span>) lands closest to the truth; both cover <span class="math inline">\(0.12\)</span>.</span></p>
+<p><span class="takeaway fragment">The doubly-robust receipt estimate (<span class="math inline">\(0.117\)</span>) lands closest to the truth; both cover <span class="math inline">\(0.12\)</span>.</span></p>
 <aside class="notes">
 <p>treat is the valid instrument for D: randomized, strongly predictive of receipt, affecting consumption only through the transfer. etregress gives 0.147 — larger than the offer effect because non-compliers dilute the ITT. The DR receipt estimate, controlling for baseline y0, is 0.117, nearest to 0.12. The Wald test rho=0 (p=0.901) finds no endogeneity, as expected in a clean RCT.</p>
 <style type="text/css">

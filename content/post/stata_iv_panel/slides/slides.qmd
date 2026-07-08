@@ -88,7 +88,7 @@ Spoiler figure — the money chart. Do not explain every bar yet. Just plant tha
 - **Measurement error** — nighttime lights $\neq$ true GDP, biasing the slope toward zero
 :::
 
-[The instrumental-variables strategy attacks all three at once — if we can find an exogenous source of variation in economic activity.]{.comment}
+[The instrumental-variables strategy attacks all three at once — if we can find an exogenous source of variation in economic activity.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the endogeneity slide. Economic activity is endogenous in the conflict regression for three distinct reasons, and they need not push the same direction. The OLS slope is a contaminated mix of the causal effect and all three biases.
@@ -102,7 +102,7 @@ This is the endogeneity slide. Economic activity is endogenous in the conflict r
 - **Instruments** — lagged log rainfall and lagged drought (Palmer index), two years prior
 :::
 
-[Region effects, region trends, and year effects are pre-absorbed. SEs clustered on 5,689 regions.]{.comment}
+[Region effects, region trends, and year effects are pre-absorbed. SEs clustered on 5,689 regions.]{.takeaway .fragment}
 
 ::: {.notes}
 A 5,689-region subnational panel from Hodler & Raschky (2014), taking Miguel, Satyanath & Sergenti's rainfall-IV idea below the country level. Conflict is rare: only 4.6% of region-years have any conflict death.
@@ -139,7 +139,7 @@ The two-year lag is what makes exclusion defensible: weather at t-2 plausibly ha
 
 $$Conflict_{it} = \delta\, Light_{i,t-1} + \alpha_i + \beta_i t + \gamma_t + \varepsilon_{it}$$
 
-[$\alpha_i$ are region fixed effects, $\beta_i t$ region-specific trends, $\gamma_t$ year effects. The parameter $\delta$ is the causal effect of economic activity on conflict probability.]{.comment}
+[$\alpha_i$ are region fixed effects, $\beta_i t$ region-specific trends, $\gamma_t$ year effects. The parameter $\delta$ is the causal effect of economic activity on conflict probability.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the second stage. OLS estimates δ inconsistently because Light is endogenous; 2SLS replaces Light with the part of it that weather explains. Same equation, honest estimate.
@@ -235,7 +235,7 @@ The payoff. Once we isolate the weather-driven part of lights, the effect is lar
 | Drought($t-2$) | −0.293 | 0.085 | yes |
 | Both | [−0.296]{.key} | 0.076 | yes |
 
-[The estimate barely moves across instruments — strong evidence the causal finding is robust, not an artifact of one weather variable.]{.comment}
+[The estimate barely moves across instruments — strong evidence the causal finding is robust, not an artifact of one weather variable.]{.takeaway .fragment}
 
 ::: {.notes}
 Robustness as agreement. Three different exogenous shocks, three nearly-identical answers. The "both" column is the most efficient (smallest SE) and is the headline. Contrast with OLS at 0.001 in the same table.
@@ -261,7 +261,7 @@ Translate the coefficient into something a policymaker feels. −0.296 × 0.1 �
 | First-stage F (Drought) | [40.33]{.key} | > 16.38 | strong |
 | Hansen $J$ (overid) | $p = 0.93$ | $p > 0.10$ | valid |
 
-[Both instruments clear Stock–Yogo by a wide margin; the overid test says they tell the same story.]{.comment}
+[Both instruments clear Stock–Yogo by a wide margin; the overid test says they tell the same story.]{.takeaway .fragment}
 
 ::: {.notes}
 Relevance via the first-stage F (both well past Stock-Yogo's 16.38 for 10% maximal size). Joint validity via Hansen J: with two instruments and one regressor we are overidentified by one, and J = 0.007 (p = 0.93) strongly fails to reject. Strong + consistent = license to believe the IV estimate.

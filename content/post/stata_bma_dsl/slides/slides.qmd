@@ -67,7 +67,7 @@ This is the model-uncertainty problem. The EKC is the substantive object — log
 | $\beta_2$ (GDP$^2$) | 0.849 | 0.806 | 0.810 |
 | $\beta_3$ (GDP$^3$) | −0.031 | −0.030 | −0.030 |
 
-[Same data, same fixed effects — the linear term swings from −7.498 to −7.131 just by adding controls.]{.comment}
+[Same data, same fixed effects — the linear term swings from −7.498 to −7.131 just by adding controls.]{.takeaway .fragment}
 
 ::: {.notes}
 Both standard specifications get the inverted-N sign pattern right (β1<0, β2>0, β3<0), but the magnitudes shift. Kitchen-sink is closer to the truth because the sparse model omits true controls and that biases it. But which of the 12 actually belong? Standard FE can't tell you — it just hands you whichever model you chose.
@@ -116,7 +116,7 @@ The trick that makes this tutorial work: synthetic data with a known data-genera
 :::
 ::::
 
-[Four decoys are deliberately correlated with GDP — they will look "significant" by piggybacking on GDP's real effect.]{.comment}
+[Four decoys are deliberately correlated with GDP — they will look "significant" by piggybacking on GDP's real effect.]{.takeaway .fragment}
 
 ::: {.notes}
 N = 1,600 (80 countries, 20 years). The outcome is generated from a cubic EKC with country and year fixed effects plus the 5 true controls. The hard part: four noise variables are correlated with GDP, so a naive regression flags them as significant. The job of BMA and DSL is to see through that correlation and keep only the 5 true controls.
@@ -126,7 +126,7 @@ N = 1,600 (80 countries, 20 years). The outcome is generated from a cubic EKC wi
 
 $$\ln(\text{CO2})_{it} = \beta_1 \ln G_{it} + \beta_2 (\ln G_{it})^2 + \beta_3 (\ln G_{it})^3 + \mathbf{X}_{it}^{\text{true}}\boldsymbol{\gamma} + \alpha_i + \delta_t + \varepsilon_{it}$$
 
-[A cubic in log GDP $G$ gives the inverted-N; $\alpha_i$ and $\delta_t$ absorb country and year heterogeneity; $\mathbf{X}^{\text{true}}$ is the 5 controls we must rediscover.]{.comment}
+[A cubic in log GDP $G$ gives the inverted-N; $\alpha_i$ and $\delta_t$ absorb country and year heterogeneity; $\mathbf{X}^{\text{true}}$ is the 5 controls we must rediscover.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the true DGP. The inverted-N needs β1<0, β2>0, β3<0, and we built it with exactly that pattern (−7.1, 0.81, −0.03). Country fixed effects α_i and year effects δ_t soak up unobserved heterogeneity — keep this in mind, because dropping them later breaks everything. The exam: can BMA and DSL recover both the cubic shape and the 5 true controls?
@@ -146,7 +146,7 @@ $$P(M_k \mid \text{data}) = \frac{P(\text{data} \mid M_k)\, P(M_k)}{\sum_{l} P(\
 
 Each model's weight is its fit (marginal likelihood) times its prior. Better-fitting, **parsimonious** models earn more weight — BMA's built-in Occam's razor.
 
-[Instead of betting on one horse, BMA spreads bets across the whole field.]{.comment}
+[Instead of betting on one horse, BMA spreads bets across the whole field.]{.takeaway .fragment}
 
 ::: {.notes}
 The marginal likelihood integrates over all coefficient values, so a model with many parameters spreads its prior thin and only recovers that probability if the data strongly support the extra dimensions. That is why BMA automatically penalizes complexity. With these weights in hand we can do two things: average coefficients, and score each variable.
@@ -156,7 +156,7 @@ The marginal likelihood integrates over all coefficient values, so a model with 
 
 $$\text{PIP}_j = \sum_{k:\, x_j \in M_k} P(M_k \mid \text{data})$$
 
-[A variable in every high-probability model has $\text{PIP} \to 1$; one only in long-shot models stays near 0. We treat $\text{PIP} \geq 0.80$ as "robust."]{.comment}
+[A variable in every high-probability model has $\text{PIP} \to 1$; one only in long-shot models stays near 0. We treat $\text{PIP} \geq 0.80$ as "robust."]{.takeaway .fragment}
 
 ::: {.notes}
 PIP sums the posterior weight of every model that contains the variable — Raftery's thresholds: ≥0.99 decisive, 0.95–0.99 very strong, 0.80–0.95 strong/robust, below 0.50 weak. 0.80 is the standard applied cutoff. The BMA posterior mean shrinks each coefficient toward zero in proportion to the evidence against inclusion, so a PIP of 0.5 roughly halves the conditional estimate. PIP is the signature output we grade against the answer key.
@@ -171,7 +171,7 @@ bmaregress $outcome $gdp_vars $controls ///
     mcmcsize(50000) rseed(9988) inputorder pipcutoff(0.8)
 ```
 
-[`($fe, always)` forces country and year FE into every model; `groupfv` moves the 80 country dummies as one package, not 80 independent choices.]{.comment}
+[`($fe, always)` forces country and year FE into every model; `groupfv` moves the 80 country dummies as one package, not 80 independent choices.]{.takeaway .fragment}
 
 ::: {.notes}
 Uniform model prior = every model equally likely a priori; UIP = unit-information g-prior, relatively uninformative. mcmcsize draws 50,000 models via MC³; rseed fixes reproducibility. Without groupfv, i.country_id would be 80 separate selection choices — a 2^80 model space, meaningless. With it, the dummies enter or leave as a roster. pipcutoff(0.8) is a display threshold only.
@@ -209,7 +209,7 @@ $$\hat{S} = \hat{S}_Y \cup \hat{S}_{D_1} \cup \hat{S}_{D_2} \cup \hat{S}_{D_3}, 
 
 LASSO on the outcome ($\hat S_Y$) **and** on each GDP term ($\hat S_{D_k}$); the **union** is the safety net; then OLS on that union.
 
-[The second selection catches a confounder the outcome-LASSO would miss — that is the "double."]{.comment}
+[The second selection catches a confounder the outcome-LASSO would miss — that is the "double."]{.takeaway .fragment}
 
 ::: {.notes}
 Belloni, Chernozhukov & Hansen (2014). The L1 penalty's sharp corner at zero forces weak coefficients to exactly zero — that is what makes LASSO a selector, unlike Ridge. The union is the key insight: a control that predicts the treatment but only weakly predicts the outcome could be dropped by a single outcome-LASSO and bias the GDP coefficient. The d-LASSO catches it. dsregress chooses λ by a plugin formula, no cross-validation.
@@ -223,7 +223,7 @@ Belloni, Chernozhukov & Hansen (2014). The L1 penalty's sharp corner at zero for
 | $\beta_2$ (GDP$^2$) | 0.840 | 0.810 | yes |
 | $\beta_3$ (GDP$^3$) | −0.031 | −0.030 | yes |
 
-[Cluster-robust SEs, four internal LASSOs, union, then OLS — all in seconds. Wald $\chi^2 = 53.15$, $p < 0.001$.]{.comment}
+[Cluster-robust SEs, four internal LASSOs, union, then OLS — all in seconds. Wald $\chi^2 = 53.15$, $p < 0.001$.]{.takeaway .fragment}
 
 ::: {.notes}
 DSL lands between the sparse and kitchen-sink FE, close to BMA. Why not closer to the truth? In this panel, 99 of 112 candidates are FE dummies; LASSO retains nearly all of them (102 of 112) and has little room to discriminate among the 12 controls of interest. So the final OLS sits near the kitchen-sink. To see LASSO's selection power unleashed, you have to remove the FE — which we do next, with a warning.

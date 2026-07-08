@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Treatment Effects in Stata</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -269,7 +269,7 @@
 <li class="fragment"><strong>Treatment</strong> <span class="math inline">\(D\)</span> — mother smoked during pregnancy (<code>mbsmoke</code>)</li>
 <li class="fragment"><strong>Confounders</strong> <span class="math inline">\(X\)</span> — age, education, marital status, prenatal care, parity, father’s age</li>
 </ul>
-<p><span class="comment">Smokers are 18.6% of the sample (864 of 4,642). The minority-treatment imbalance is exactly why a difference of means is risky.</span></p>
+<p><span class="takeaway fragment">Smokers are 18.6% of the sample (864 of 4,642). The minority-treatment imbalance is exactly why a difference of means is risky.</span></p>
 <aside class="notes">
 <p>cattaneo2.dta, popularized by Cattaneo (2010). These six covariates are pre-treatment by construction — the basic discipline of a credible adjustment set. The same X that drives the smoking decision also drives birth weight, which is the back-door path every estimator must block.</p>
 <style type="text/css">
@@ -288,7 +288,7 @@
 <h2>We want one of two averages, not one mother’s effect</h2>
 <p><span class="math display">\[\tau_{ATE}=E[Y(1)-Y(0)] \qquad \tau_{ATT}=E[Y(1)-Y(0)\mid D=1]\]</span></p>
 <p>We never see both potential outcomes for the same mother — causal inference is <strong>a missing-data problem in disguise</strong>.</p>
-<p><span class="comment">ATE asks “what if smoking became universal?” · ATT asks “what is happening to those who currently smoke?”</span></p>
+<p><span class="takeaway fragment">ATE asks “what if smoking became universal?” · ATT asks “what is happening to those who currently smoke?”</span></p>
 <aside class="notes">
 <p>The fundamental problem of causal inference: for each mother we observe Y(1) or Y(0), never both. Every estimator is a different way of imputing the missing potential outcome. ATE and ATT answer different policy questions and can diverge — we see that concretely for NNM in Act III.</p>
 <style type="text/css">
@@ -315,7 +315,7 @@
 <p><span class="math display">\[0&lt;e(X)&lt;1\]</span></p>
 <p>For every covariate profile, both smokers and non-smokers exist. <strong>Testable</strong> — we check it.</p>
 </div></div>
-<p><span class="comment">Here <span class="math inline">\(e(X)=\Pr(D=1\mid X)\)</span> is the propensity score. SUTVA — no interference, one version of treatment — rounds out the three.</span></p>
+<p><span class="takeaway fragment">Here <span class="math inline">\(e(X)=\Pr(D=1\mid X)\)</span> is the propensity score. SUTVA — no interference, one version of treatment — rounds out the three.</span></p>
 <aside class="notes">
 <p>If unconfoundedness fails, ALL six estimators are biased in the same direction, including the doubly robust ones. If overlap fails, the comparison is partly undefined. None of the methods repairs an assumption violation — they only correct for what X can see. We return to this in the Devil’s-Advocate slide.</p>
 <style type="text/css">
@@ -380,7 +380,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Doubly robust (IPWRA, AIPW): consistent if <em>either</em> model is right. NNM is the only fully model-free estimator.</span></p>
+<p><span class="takeaway fragment">Doubly robust (IPWRA, AIPW): consistent if <em>either</em> model is right. NNM is the only fully model-free estimator.</span></p>
 <aside class="notes">
 <p>RA models only the outcome; IPW and PSM model only the treatment; IPWRA and AIPW model both. NNM fits no parametric model at all. PSM is closer to IPW than to NNM — both lean entirely on a correct propensity model. This table is the mental map we return to as each method is added.</p>
 <style type="text/css">
@@ -399,7 +399,7 @@
 <h2>With no controls, OLS just restates the biased −275 g gap</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb1-1"><a href=""></a><span class="kw">regress</span> bweight mbsmoke, <span class="kw">vce</span>(<span class="kw">robust</span>)</span>
 <span id="cb1-2"><a href=""></a>* mbsmoke coefficient: -275.25 g  (95% CI -316.8, -233.7;  t = -12.97)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">A precise estimate of the <em>wrong</em> quantity — it absorbs the causal effect plus every covariate that differs between the groups.</span></p>
+<p><span class="takeaway fragment">A precise estimate of the <em>wrong</em> quantity — it absorbs the causal effect plus every covariate that differs between the groups.</span></p>
 <aside class="notes">
 <p>This is the biased reference point: the answer if we treat observational data as a randomized experiment. R² is only 3.4% — smoking alone explains little of birth-weight variation — but the average gap is estimated very precisely thanks to n = 4,642. Every adjusted estimator pulls this number toward zero.</p>
 <style type="text/css">
@@ -419,7 +419,7 @@
 <p><span class="math display">\[\hat\tau_{RA}=\frac{1}{n}\sum_{i=1}^{n}\big[\hat\mu_1(X_i)-\hat\mu_0(X_i)\big]\]</span></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-code-line-numbers="1"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb2-1"><a href=""></a>teffects ra (bweight mmarried mage prenatal1 fbaby) (mbsmoke), ate</span>
 <span id="cb2-2"><a href=""></a>* ATE = -239.6 g   ATT = -223.3 g</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">Fit one outcome model per arm, predict both potential outcomes for everyone, average the gap. <span class="math inline">\(\hat\mu_d(X)=E[Y\mid D=d,X]\)</span>.</span></p>
+<p><span class="takeaway fragment">Fit one outcome model per arm, predict both potential outcomes for everyone, average the gap. <span class="math inline">\(\hat\mu_d(X)=E[Y\mid D=d,X]\)</span>.</span></p>
 <aside class="notes">
 <p>The naive −275 g has shrunk by 35.6 g (13%) just by adjusting for marital status, age, prenatal care, and parity. The by-hand recreation — two regress calls, two predicts, a difference — recovers −239.64 g, matching teffects ra to four significant figures. That is the demystification: teffects ra is not a black box.</p>
 <style type="text/css">
@@ -438,7 +438,7 @@
 <h2>IPW models the treatment instead — and lands at −230.9 g</h2>
 <p><span class="math display">\[\hat\tau_{IPW}=\frac{1}{n}\sum_i\left[\frac{D_iY_i}{\hat e(X_i)}-\frac{(1-D_i)Y_i}{1-\hat e(X_i)}\right]\]</span></p>
 <p>Reweight every mother by the inverse of her propensity to smoke — the reweighted sample mimics a randomized experiment.</p>
-<p><span class="comment">RA models birth weight; IPW models smoking. They agree to within ~9 g — the first strong signal the effect is real, not a one-model artifact.</span></p>
+<p><span class="takeaway fragment">RA models birth weight; IPW models smoking. They agree to within ~9 g — the first strong signal the effect is real, not a one-model artifact.</span></p>
 <aside class="notes">
 <p>The survey-sampling analogy: under-represented combinations (a married 35-year-old smoker) get more weight, so the reweighted sample looks randomized. probit-IPW gives −230.9 g; the by-hand logit version gives −232.1 g, within 1.2 g — the link function barely matters here.</p>
 <style type="text/css">
@@ -488,7 +488,7 @@
 <li>attains the efficiency bound</li>
 </ul>
 </div></div>
-<p><span class="comment">Belt and suspenders: only a <em>simultaneous</em> failure of both models breaks them. They differ by 0.6 g.</span></p>
+<p><span class="takeaway fragment">Belt and suspenders: only a <em>simultaneous</em> failure of both models breaks them. They differ by 0.6 g.</span></p>
 <aside class="notes">
 <p>IPWRA combines the two models by literally running weighted regression; AIPW adds an additive correction from semiparametric efficiency theory, which gives it the smallest possible asymptotic variance among regular doubly robust estimators. If the outcome model is exactly right, AIPW’s correction vanishes and it collapses to RA. AIPW is the recommended default when both models are credible. Stata’s aipw reports ATE only.</p>
 <style type="text/css">
@@ -619,7 +619,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Four methods: ATT closer to zero than ATE. NNM reverses it — the actual smokers sit where smoking does <em>more</em> damage.</span></p>
+<p><span class="takeaway fragment">Four methods: ATT closer to zero than ATE. NNM reverses it — the actual smokers sit where smoking does <em>more</em> damage.</span></p>
 <aside class="notes">
 <p>AIPW reports no ATT in Stata — a software detail, not a conceptual limit. NNM’s ATT &gt; ATE is a real feature of matching on observed covariates: the matched comparison weights the covariate region where actual smokers live, and there smoking is more harmful than at the population average. Which estimand to report depends on your policy question, not on which is “more correct.”</p>
 <style type="text/css">

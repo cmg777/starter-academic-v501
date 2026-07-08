@@ -88,7 +88,7 @@ Spoiler figure for Act I. Don't reveal the DiD number yet — just plant that a 
 - **Design** — every treated school switches on at the *same* time (no staggering)
 :::
 
-[A strongly-balanced panel: 35 schools × 2 periods = 70 observations. The estimand is the **ATT** $E[Y_i(1)-Y_i(0)\mid D_i=1]$ — the effect *for the schools that actually got the program*.]{.comment}
+[A strongly-balanced panel: 35 schools × 2 periods = 70 observations. The estimand is the **ATT** $E[Y_i(1)-Y_i(0)\mid D_i=1]$ — the effect *for the schools that actually got the program*.]{.takeaway .fragment}
 
 ## All 10 treated schools switch on together — the ideal 2×2 setup
 
@@ -110,7 +110,7 @@ Three lines: actual treated (60→96), comparison (71→82), and the counterfact
 
 $$E[Y_{i,1}(0) - Y_{i,0}(0) \mid D=1] = E[Y_{i,1}(0) - Y_{i,0}(0) \mid D=0]$$
 
-[Different starting *levels* are fine. Different *changes* — divergent slopes — would break the design. This is the one assumption that does the causal work.]{.comment}
+[Different starting *levels* are fine. Different *changes* — divergent slopes — would break the design. This is the one assumption that does the causal work.]{.takeaway .fragment}
 
 ::: {.notes}
 We can never observe the treated group's untreated outcome in the post-period, so this is fundamentally untestable. What we CAN do is check pre-treatment trends — if the groups tracked each other before the program, the assumption is at least plausible. That check is the event study in Act III.
@@ -120,7 +120,7 @@ We can never observe the treated group's untreated outcome in the post-period, s
 
 $$DiD = \Big(\bar{Y}_{1}^{T} - \bar{Y}_{0}^{T}\Big) - \Big(\bar{Y}_{1}^{C} - \bar{Y}_{0}^{C}\Big)$$
 
-[Treated change $36.20$ minus comparison change $10.88$ = the program's effect, with the common time trend removed.]{.comment}
+[Treated change $36.20$ minus comparison change $10.88$ = the program's effect, with the common time trend removed.]{.takeaway .fragment}
 
 ::: {.notes}
 Like two runners improving between races: if both were expected to improve from training, only the EXTRA improvement of the coached runner is the coaching effect. The comparison group's 10.88 is the "training effect"; the remaining 25.32 is the "coaching effect" — the tutoring program.
@@ -134,7 +134,7 @@ Like two runners improving between races: if both were expected to improve from 
 | Treated (10 schools) | 60.17 | 96.37 | 36.20 |
 | **DiD estimate** | | | [25.32]{.key} |
 
-[Roughly one-third of the treated group's raw gain (10.88 points) was natural drift, not the program.]{.comment}
+[Roughly one-third of the treated group's raw gain (10.88 points) was natural drift, not the program.]{.takeaway .fragment}
 
 ::: {.notes}
 Note the treated schools START lower (60.17 vs 71.22) — the program targeted schools with greater need. The pre-difference is −11.05; the post-difference is +14.27; the change in the gap, 25.32, is the ATT. This deficit-to-advantage reversal is the most compelling pattern in the data.
@@ -164,9 +164,9 @@ $$Y_{it} = \alpha + \beta_1 \text{Treat}_i + \beta_2 \text{Post}_t + \beta_3 (\t
 reg gpa treated post txp, robust
 ```
 
-[$\hat\beta_3 = 25.31$ (SE 0.61) — the DiD.]{.comment}
+[$\hat\beta_3 = 25.31$ (SE 0.61) — the DiD.]{.takeaway .fragment}
 
-[The rest is nuisance: constant 71.22 (comparison pre-mean), $\hat\beta_1 = -11.05$ (baseline gap), $\hat\beta_2 = 10.89$ (common trend).]{.comment}
+[The rest is nuisance: constant 71.22 (comparison pre-mean), $\hat\beta_1 = -11.05$ (baseline gap), $\hat\beta_2 = 10.89$ (common trend).]{.takeaway .fragment}
 
 ::: {.notes}
 Regression decomposes the DiD into building blocks and — crucially — lets you add controls, flexible standard errors, and extensions the manual subtraction cannot. The interaction coefficient is the entire causal payload; everything else is nuisance structure.
@@ -181,9 +181,9 @@ xtreg  gpa txp i.time, fe vce(cluster id)
 reghdfe gpa txp, absorb(id time) cluster(id)
 ```
 
-[$\gamma_i$ wipes out permanent school differences.]{.comment}
+[$\gamma_i$ wipes out permanent school differences.]{.takeaway .fragment}
 
-[$\vartheta_t$ wipes out common shocks. What remains: $\hat\beta_3 = 25.31$.]{.comment}
+[$\vartheta_t$ wipes out common shocks. What remains: $\hat\beta_3 = 25.31$.]{.takeaway .fragment}
 
 ::: {.notes}
 Like a two-pass photo filter: the first pass removes school-specific stains (rich/poor, urban/rural), the second removes period-specific glare (a nationwide reform). `reghdfe` gives byte-identical results to `xtreg` but scales to large panels. Within R-squared 0.9946 — again, simulated-data clean.
@@ -199,7 +199,7 @@ Like a two-pass photo filter: the first pass removes school-specific stains (ric
 | `xtreg` (TWFE) | 25.315 | 0.585 | yes |
 | `reghdfe` (+ covariate) | [25.328]{.key} | 0.605 | yes |
 
-[Adding the female-share control moves the estimate by ~0.01 points. The design — not the covariates — does the heavy lifting.]{.comment}
+[Adding the female-share control moves the estimate by ~0.01 points. The design — not the covariates — does the heavy lifting.]{.takeaway .fragment}
 
 ::: {.notes}
 `didregress` (Stata 17+) labels its output ATET and auto-clusters at the school level, which is why its SE is the largest (0.834). The point estimate is rock-stable: in a well-designed DiD with proper fixed effects, covariates are cosmetic for identification. The differences are all in the standard errors, not the estimate.
@@ -223,7 +223,7 @@ This is the Act-I hook resolved. The naive 36.20 attributed all of the treated g
 
 $$Y_{it} = \alpha + \sum_{j=-m}^{q} \theta_j \cdot \text{treat}_{it}(t = k+j) + \gamma_i + \vartheta_t + \varepsilon_{it}$$
 
-[Replace the single interaction with one coefficient $\theta_j$ per period relative to onset. Leads ($j<0$) test pre-trends; lags ($j\geq 0$) trace dynamics. The base period $j=-1$ is omitted.]{.comment}
+[Replace the single interaction with one coefficient $\theta_j$ per period relative to onset. Leads ($j<0$) test pre-trends; lags ($j\geq 0$) trace dynamics. The base period $j=-1$ is omitted.]{.takeaway .fragment}
 
 ::: {.notes}
 We switch to the expanded 8-period dataset (280 obs, treatment onset at period 5). The event study does double duty: pre-treatment leads near zero make parallel trends plausible, and post-treatment lags show whether the effect is immediate, ramps up, or fades.
@@ -249,7 +249,7 @@ The most informative figure in the analysis. The three visible leads are 0.34, �
 | lag 2 | 24.768 | 0.739 | yes |
 | lag 3 | 25.701 | 0.797 | yes |
 
-[Lags span < 1 GPA point across four periods: no fade-out, no ramp-up — an immediate, sustained effect.]{.comment}
+[Lags span < 1 GPA point across four periods: no fade-out, no ramp-up — an immediate, sustained effect.]{.takeaway .fragment}
 
 ::: {.notes}
 Pre-treatment leads range from −0.32 to 0.59, fluctuations well within sampling noise. Post-treatment lags range from 24.71 to 25.70 — remarkably flat. The program delivered its full benefit from period one and held it, consistent with a structural change in academic support rather than a temporary boost.

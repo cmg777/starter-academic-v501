@@ -88,7 +88,7 @@ Before 1989 California broadly tracks the donor-pool average, then drops sharply
 - **Predictors** — log income, share aged 15–24, retail price, beer, plus `cigsale` in 1975/1980/1988
 :::
 
-[Strongly balanced: 1,209 observations, 19 pre-treatment years and 12 post-treatment years. The estimand is the **ATT** — the effect on California, the one treated unit — *not* the ATE.]{.comment}
+[Strongly balanced: 1,209 observations, 19 pre-treatment years and 12 post-treatment years. The estimand is the **ATT** — the effect on California, the one treated unit — *not* the ATE.]{.takeaway .fragment}
 
 ::: {.notes}
 With a single treated unit and aggregate data, difference-in-differences' parallel-trends assumption is hard to test. SCM instead builds an explicit counterfactual and lets you *see* the match quality in the pre-treatment period. California is state == 3 in the data.
@@ -102,7 +102,7 @@ Pick donor weights $w_j \ge 0$ that sum to one and match California's predictors
 
 The weights $v_m$ set how much each covariate matters.
 
-[The synthetic control is a **convex combination** of real states — no extrapolation beyond the donor pool.]{.comment}
+[The synthetic control is a **convex combination** of real states — no extrapolation beyond the donor pool.]{.takeaway .fragment}
 
 ::: {.notes}
 This is a nested optimization. The outer problem picks the V-weights (predictor importance); the inner problem picks the W-weights (donor shares) that minimize the weighted predictor distance. The non-negativity and sum-to-one constraints are what keep the synthetic interpretable and guard against overfitting.
@@ -114,7 +114,7 @@ $$\hat{\tau}_t = Y_{1t} - \sum_{j=2}^{J+1} w_j^* Y_{jt}$$
 
 The effect in year $t$ is California's actual sales minus the synthetic's prediction. A negative $\hat{\tau}_t$ means Prop 99 *lowered* sales.
 
-[Identification rests on **good pre-treatment fit**, **no interference**, and **no anticipation** — assumptions you can largely inspect, not just assume.]{.comment}
+[Identification rests on **good pre-treatment fit**, **no interference**, and **no anticipation** — assumptions you can largely inspect, not just assume.]{.takeaway .fragment}
 
 ::: {.notes}
 The ATT is the mean of these yearly gaps over 1989–2000. Unlike DiD, you do not need parallel trends as an article of faith. If the synthetic tracks the real unit closely before treatment, the post-treatment divergence is credibly the effect. The three assumptions: Prop 99 did not change other states' sales (no interference), donors did not pass similar laws pre-1989 (no anticipation), and the synthetic reproduces the pre-1989 path (good fit).
@@ -128,7 +128,7 @@ synth2 cigsale lnincome age15to24 retprice beer ///
     trunit(3) trperiod(1989) xperiod(1980(1)1988) nested allopt
 ```
 
-[`trunit(3)` = California · `trperiod(1989)` = treatment year · `nested` = outer V / inner W · `allopt` = multiple starts to dodge local optima.]{.comment}
+[`trunit(3)` = California · `trperiod(1989)` = treatment year · `nested` = outer V / inner W · `allopt` = multiple starts to dodge local optima.]{.takeaway .fragment}
 
 ::: {.notes}
 Seven predictors: four economic/demographic variables averaged over 1980–1988, plus cigarette sales at three pre-treatment anchor years (1975, 1980, 1988). The `nested allopt` combination is the gold-standard specification — slower, but it avoids spurious local optima in the V-weight search.
@@ -189,7 +189,7 @@ Effect starts at −7.6 packs (1989), reaches −26.4 by 1999, plateaus near −
 | Virginia | 2.78 | 79.0 |
 | Missouri | 1.20 | 70.9 |
 
-[The post/pre MSPE ratio asks: how much worse does fit get *after* 1989 than before? California's is highest by far.]{.comment}
+[The post/pre MSPE ratio asks: how much worse does fit get *after* 1989 than before? California's is highest by far.]{.takeaway .fragment}
 
 ::: {.notes}
 A genuine effect should blow up the post-treatment prediction error relative to a small pre-treatment error. California's ratio of 123.5 dwarfs the runners-up. This is the conservative inference statistic — it rewards both a large gap AND a tight pre-treatment fit.

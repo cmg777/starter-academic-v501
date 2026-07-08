@@ -88,7 +88,7 @@ Spoiler figure for Act I. Don't explain the mechanism yet — just plant that th
 - **Confounders** $X$ — age, education, marital status, prenatal care, parity, father's age
 :::
 
-[Smokers are 18.6% of the sample (864 of 4,642). The minority-treatment imbalance is exactly why a difference of means is risky.]{.comment}
+[Smokers are 18.6% of the sample (864 of 4,642). The minority-treatment imbalance is exactly why a difference of means is risky.]{.takeaway .fragment}
 
 ::: {.notes}
 cattaneo2.dta, popularized by Cattaneo (2010). These six covariates are pre-treatment by construction — the basic discipline of a credible adjustment set. The same X that drives the smoking decision also drives birth weight, which is the back-door path every estimator must block.
@@ -100,7 +100,7 @@ $$\tau_{ATE}=E[Y(1)-Y(0)] \qquad \tau_{ATT}=E[Y(1)-Y(0)\mid D=1]$$
 
 We never see both potential outcomes for the same mother — causal inference is **a missing-data problem in disguise**.
 
-[ATE asks "what if smoking became universal?" · ATT asks "what is happening to those who currently smoke?"]{.comment}
+[ATE asks "what if smoking became universal?" · ATT asks "what is happening to those who currently smoke?"]{.takeaway .fragment}
 
 ::: {.notes}
 The fundamental problem of causal inference: for each mother we observe Y(1) or Y(0), never both. Every estimator is a different way of imputing the missing potential outcome. ATE and ATT answer different policy questions and can diverge — we see that concretely for NNM in Act III.
@@ -125,7 +125,7 @@ For every covariate profile, both smokers and non-smokers exist. **Testable** �
 :::
 ::::
 
-[Here $e(X)=\Pr(D=1\mid X)$ is the propensity score. SUTVA — no interference, one version of treatment — rounds out the three.]{.comment}
+[Here $e(X)=\Pr(D=1\mid X)$ is the propensity score. SUTVA — no interference, one version of treatment — rounds out the three.]{.takeaway .fragment}
 
 ::: {.notes}
 If unconfoundedness fails, ALL six estimators are biased in the same direction, including the doubly robust ones. If overlap fails, the comparison is partly undefined. None of the methods repairs an assumption violation — they only correct for what X can see. We return to this in the Devil's-Advocate slide.
@@ -142,7 +142,7 @@ If unconfoundedness fails, ALL six estimators are biased in the same direction, 
 | NNM | — | — | Match on covariates (Mahalanobis) |
 | PSM | — | ✓ | Match on the propensity score |
 
-[Doubly robust (IPWRA, AIPW): consistent if *either* model is right. NNM is the only fully model-free estimator.]{.comment}
+[Doubly robust (IPWRA, AIPW): consistent if *either* model is right. NNM is the only fully model-free estimator.]{.takeaway .fragment}
 
 ::: {.notes}
 RA models only the outcome; IPW and PSM model only the treatment; IPWRA and AIPW model both. NNM fits no parametric model at all. PSM is closer to IPW than to NNM — both lean entirely on a correct propensity model. This table is the mental map we return to as each method is added.
@@ -155,7 +155,7 @@ regress bweight mbsmoke, vce(robust)
 * mbsmoke coefficient: -275.25 g  (95% CI -316.8, -233.7;  t = -12.97)
 ```
 
-[A precise estimate of the *wrong* quantity — it absorbs the causal effect plus every covariate that differs between the groups.]{.comment}
+[A precise estimate of the *wrong* quantity — it absorbs the causal effect plus every covariate that differs between the groups.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the biased reference point: the answer if we treat observational data as a randomized experiment. R² is only 3.4% — smoking alone explains little of birth-weight variation — but the average gap is estimated very precisely thanks to n = 4,642. Every adjusted estimator pulls this number toward zero.
@@ -170,7 +170,7 @@ teffects ra (bweight mmarried mage prenatal1 fbaby) (mbsmoke), ate
 * ATE = -239.6 g   ATT = -223.3 g
 ```
 
-[Fit one outcome model per arm, predict both potential outcomes for everyone, average the gap. $\hat\mu_d(X)=E[Y\mid D=d,X]$.]{.comment}
+[Fit one outcome model per arm, predict both potential outcomes for everyone, average the gap. $\hat\mu_d(X)=E[Y\mid D=d,X]$.]{.takeaway .fragment}
 
 ::: {.notes}
 The naive −275 g has shrunk by 35.6 g (13%) just by adjusting for marital status, age, prenatal care, and parity. The by-hand recreation — two regress calls, two predicts, a difference — recovers −239.64 g, matching teffects ra to four significant figures. That is the demystification: teffects ra is not a black box.
@@ -182,7 +182,7 @@ $$\hat\tau_{IPW}=\frac{1}{n}\sum_i\left[\frac{D_iY_i}{\hat e(X_i)}-\frac{(1-D_i)
 
 Reweight every mother by the inverse of her propensity to smoke — the reweighted sample mimics a randomized experiment.
 
-[RA models birth weight; IPW models smoking. They agree to within ~9 g — the first strong signal the effect is real, not a one-model artifact.]{.comment}
+[RA models birth weight; IPW models smoking. They agree to within ~9 g — the first strong signal the effect is real, not a one-model artifact.]{.takeaway .fragment}
 
 ::: {.notes}
 The survey-sampling analogy: under-represented combinations (a married 35-year-old smoker) get more weight, so the reweighted sample looks randomized. probit-IPW gives −230.9 g; the by-hand logit version gives −232.1 g, within 1.2 g — the link function barely matters here.
@@ -215,7 +215,7 @@ This is the key IPW diagnostic. Without overlap, IPW explodes — a non-smoker w
 :::
 ::::
 
-[Belt and suspenders: only a *simultaneous* failure of both models breaks them. They differ by 0.6 g.]{.comment}
+[Belt and suspenders: only a *simultaneous* failure of both models breaks them. They differ by 0.6 g.]{.takeaway .fragment}
 
 ::: {.notes}
 IPWRA combines the two models by literally running weighted regression; AIPW adds an additive correction from semiparametric efficiency theory, which gives it the smallest possible asymptotic variance among regular doubly robust estimators. If the outcome model is exactly right, AIPW's correction vanishes and it collapses to RA. AIPW is the recommended default when both models are credible. Stata's aipw reports ATE only.
@@ -277,7 +277,7 @@ Reading top to bottom: the naive baseline's CI lies entirely below every adjuste
 | NNM | −210.1 | [−238.5]{.key} |
 | PSM | −229.4 | −224.6 |
 
-[Four methods: ATT closer to zero than ATE. NNM reverses it — the actual smokers sit where smoking does *more* damage.]{.comment}
+[Four methods: ATT closer to zero than ATE. NNM reverses it — the actual smokers sit where smoking does *more* damage.]{.takeaway .fragment}
 
 ::: {.notes}
 AIPW reports no ATT in Stata — a software detail, not a conceptual limit. NNM's ATT > ATE is a real feature of matching on observed covariates: the matched comparison weights the covariate region where actual smokers live, and there smoking is more harmful than at the population average. Which estimand to report depends on your policy question, not on which is "more correct."

@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Taming Model Uncertainty in the EKC</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -263,7 +263,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Same data, same fixed effects — the linear term swings from −7.498 to −7.131 just by adding controls.</span></p>
+<p><span class="takeaway fragment">Same data, same fixed effects — the linear term swings from −7.498 to −7.131 just by adding controls.</span></p>
 <aside class="notes">
 <p>Both standard specifications get the inverted-N sign pattern right (β1&lt;0, β2&gt;0, β3&lt;0), but the magnitudes shift. Kitchen-sink is closer to the truth because the sparse model omits true controls and that biases it. But which of the 12 actually belong? Standard FE can’t tell you — it just hands you whichever model you chose.</p>
 <style type="text/css">
@@ -329,7 +329,7 @@
 <li><code>pop_density</code>, <code>corruption</code>, <code>fdi</code></li>
 </ul>
 </div></div>
-<p><span class="comment">Four decoys are deliberately correlated with GDP — they will look “significant” by piggybacking on GDP’s real effect.</span></p>
+<p><span class="takeaway fragment">Four decoys are deliberately correlated with GDP — they will look “significant” by piggybacking on GDP’s real effect.</span></p>
 <aside class="notes">
 <p>N = 1,600 (80 countries, 20 years). The outcome is generated from a cubic EKC with country and year fixed effects plus the 5 true controls. The hard part: four noise variables are correlated with GDP, so a naive regression flags them as significant. The job of BMA and DSL is to see through that correlation and keep only the 5 true controls.</p>
 <style type="text/css">
@@ -347,7 +347,7 @@
 <section id="the-model-uncertainty-we-are-fighting-written-as-one-equation" class="slide level2 center">
 <h2>The model uncertainty we are fighting, written as one equation</h2>
 <p><span class="math display">\[\ln(\text{CO2})_{it} = \beta_1 \ln G_{it} + \beta_2 (\ln G_{it})^2 + \beta_3 (\ln G_{it})^3 + \mathbf{X}_{it}^{\text{true}}\boldsymbol{\gamma} + \alpha_i + \delta_t + \varepsilon_{it}\]</span></p>
-<p><span class="comment">A cubic in log GDP <span class="math inline">\(G\)</span> gives the inverted-N; <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\delta_t\)</span> absorb country and year heterogeneity; <span class="math inline">\(\mathbf{X}^{\text{true}}\)</span> is the 5 controls we must rediscover.</span></p>
+<p><span class="takeaway fragment">A cubic in log GDP <span class="math inline">\(G\)</span> gives the inverted-N; <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\delta_t\)</span> absorb country and year heterogeneity; <span class="math inline">\(\mathbf{X}^{\text{true}}\)</span> is the 5 controls we must rediscover.</span></p>
 <aside class="notes">
 <p>This is the true DGP. The inverted-N needs β1&lt;0, β2&gt;0, β3&lt;0, and we built it with exactly that pattern (−7.1, 0.81, −0.03). Country fixed effects α_i and year effects δ_t soak up unobserved heterogeneity — keep this in mind, because dropping them later breaks everything. The exam: can BMA and DSL recover both the cubic shape and the 5 true controls?</p>
 <style type="text/css">
@@ -383,7 +383,7 @@
 <h2>BMA averages over all 4,096 models and weights each by how well it fits</h2>
 <p><span class="math display">\[P(M_k \mid \text{data}) = \frac{P(\text{data} \mid M_k)\, P(M_k)}{\sum_{l} P(\text{data} \mid M_l)\, P(M_l)}\]</span></p>
 <p>Each model’s weight is its fit (marginal likelihood) times its prior. Better-fitting, <strong>parsimonious</strong> models earn more weight — BMA’s built-in Occam’s razor.</p>
-<p><span class="comment">Instead of betting on one horse, BMA spreads bets across the whole field.</span></p>
+<p><span class="takeaway fragment">Instead of betting on one horse, BMA spreads bets across the whole field.</span></p>
 <aside class="notes">
 <p>The marginal likelihood integrates over all coefficient values, so a model with many parameters spreads its prior thin and only recovers that probability if the data strongly support the extra dimensions. That is why BMA automatically penalizes complexity. With these weights in hand we can do two things: average coefficients, and score each variable.</p>
 <style type="text/css">
@@ -401,7 +401,7 @@
 <section id="the-pip-is-a-democratic-vote-what-share-of-good-models-keep-a-variable" class="slide level2 center">
 <h2>The PIP is a democratic vote: what share of good models keep a variable?</h2>
 <p><span class="math display">\[\text{PIP}_j = \sum_{k:\, x_j \in M_k} P(M_k \mid \text{data})\]</span></p>
-<p><span class="comment">A variable in every high-probability model has <span class="math inline">\(\text{PIP} \to 1\)</span>; one only in long-shot models stays near 0. We treat <span class="math inline">\(\text{PIP} \geq 0.80\)</span> as “robust.”</span></p>
+<p><span class="takeaway fragment">A variable in every high-probability model has <span class="math inline">\(\text{PIP} \to 1\)</span>; one only in long-shot models stays near 0. We treat <span class="math inline">\(\text{PIP} \geq 0.80\)</span> as “robust.”</span></p>
 <aside class="notes">
 <p>PIP sums the posterior weight of every model that contains the variable — Raftery’s thresholds: ≥0.99 decisive, 0.95–0.99 very strong, 0.80–0.95 strong/robust, below 0.50 weak. 0.80 is the standard applied cutoff. The BMA posterior mean shrinks each coefficient toward zero in proportion to the evidence against inclusion, so a PIP of 0.5 roughly halves the conditional estimate. PIP is the signature output we grade against the answer key.</p>
 <style type="text/css">
@@ -422,7 +422,7 @@
 <span id="cb1-2"><a href=""></a>    (<span class="ot">$fe</span>, always), <span class="co">///</span></span>
 <span id="cb1-3"><a href=""></a>    mprior(uniform) groupfv gprior(uip) <span class="co">///</span></span>
 <span id="cb1-4"><a href=""></a>    mcmcsize(50000) rseed(9988) inputorder pipcutoff(0.8)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment"><code>($fe, always)</code> forces country and year FE into every model; <code>groupfv</code> moves the 80 country dummies as one package, not 80 independent choices.</span></p>
+<p><span class="takeaway fragment"><code>($fe, always)</code> forces country and year FE into every model; <code>groupfv</code> moves the 80 country dummies as one package, not 80 independent choices.</span></p>
 <aside class="notes">
 <p>Uniform model prior = every model equally likely a priori; UIP = unit-information g-prior, relatively uninformative. mcmcsize draws 50,000 models via MC³; rseed fixes reproducibility. Without groupfv, i.country_id would be 80 separate selection choices — a 2^80 model space, meaningless. With it, the dummies enter or leave as a roster. pipcutoff(0.8) is a display threshold only.</p>
 <style type="text/css">
@@ -493,7 +493,7 @@
 <h2>DSL takes a different road: select controls twice, then run a clean OLS</h2>
 <p><span class="math display">\[\hat{S} = \hat{S}_Y \cup \hat{S}_{D_1} \cup \hat{S}_{D_2} \cup \hat{S}_{D_3}, \qquad \hat{\boldsymbol{\beta}}^{\text{LASSO}} = \arg\min_{\boldsymbol{\beta}}\ \tfrac{1}{2N}\textstyle\sum_i (y_i - \mathbf{x}_i'\boldsymbol{\beta})^2 + \lambda\sum_j |\beta_j|\]</span></p>
 <p>LASSO on the outcome (<span class="math inline">\(\hat S_Y\)</span>) <strong>and</strong> on each GDP term (<span class="math inline">\(\hat S_{D_k}\)</span>); the <strong>union</strong> is the safety net; then OLS on that union.</p>
-<p><span class="comment">The second selection catches a confounder the outcome-LASSO would miss — that is the “double.”</span></p>
+<p><span class="takeaway fragment">The second selection catches a confounder the outcome-LASSO would miss — that is the “double.”</span></p>
 <aside class="notes">
 <p>Belloni, Chernozhukov &amp; Hansen (2014). The L1 penalty’s sharp corner at zero forces weak coefficients to exactly zero — that is what makes LASSO a selector, unlike Ridge. The union is the key insight: a control that predicts the treatment but only weakly predicts the outcome could be dropped by a single outcome-LASSO and bias the GDP coefficient. The d-LASSO catches it. dsregress chooses λ by a plugin formula, no cross-validation.</p>
 <style type="text/css">
@@ -540,7 +540,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Cluster-robust SEs, four internal LASSOs, union, then OLS — all in seconds. Wald <span class="math inline">\(\chi^2 = 53.15\)</span>, <span class="math inline">\(p &lt; 0.001\)</span>.</span></p>
+<p><span class="takeaway fragment">Cluster-robust SEs, four internal LASSOs, union, then OLS — all in seconds. Wald <span class="math inline">\(\chi^2 = 53.15\)</span>, <span class="math inline">\(p &lt; 0.001\)</span>.</span></p>
 <aside class="notes">
 <p>DSL lands between the sparse and kitchen-sink FE, close to BMA. Why not closer to the truth? In this panel, 99 of 112 candidates are FE dummies; LASSO retains nearly all of them (102 of 112) and has little room to discriminate among the 12 controls of interest. So the final OLS sits near the kitchen-sink. To see LASSO’s selection power unleashed, you have to remove the FE — which we do next, with a warning.</p>
 <style type="text/css">

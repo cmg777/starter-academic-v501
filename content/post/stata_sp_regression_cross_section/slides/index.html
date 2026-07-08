@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Cross-Sectional Spatial Regression in Stata</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -234,7 +234,7 @@
 <section id="ols-residuals-cluster-in-space-morans-i-0.222-p-0.005" class="slide level2 center">
 <h2>OLS residuals cluster in space: Moran’s I = 0.222, p = 0.005</h2>
 <p><span class="math display">\[I = \frac{N}{S_0}\cdot\frac{e' W e}{e' e}\]</span></p>
-<p><span class="comment">On the OLS residuals, <span class="math inline">\(I = 0.222\)</span> (<span class="math inline">\(z = 2.84\)</span>, <span class="math inline">\(p = 0.005\)</span>): high-crime tracts neighbour high-crime tracts. The i.i.d.-error assumption fails.</span></p>
+<p><span class="takeaway fragment">On the OLS residuals, <span class="math inline">\(I = 0.222\)</span> (<span class="math inline">\(z = 2.84\)</span>, <span class="math inline">\(p = 0.005\)</span>): high-crime tracts neighbour high-crime tracts. The i.i.d.-error assumption fails.</span></p>
 <aside class="notes">
 <p>Moran’s I on the residuals is the smoking gun. e is the OLS residual vector, W the row-standardized weight matrix, S₀ the sum of W’s elements. Positive and significant means clustering — exactly the spatial dependence OLS ignores. This motivates the whole model family.</p>
 <style type="text/css">
@@ -270,7 +270,7 @@
 <li class="fragment"><strong>Covariates</strong> — <code>INC</code> (income, $1k; mean 14.4) and <code>HOVAL</code> (house value, $1k; mean 38.4)</li>
 <li class="fragment"><strong>Neighbours</strong> — Queen contiguity: share a border <em>or</em> a vertex; row-standardized</li>
 </ul>
-<p><span class="comment">Row-standardized means each row of <span class="math inline">\(W\)</span> sums to 1, so the spatial lag <span class="math inline">\(W y\)</span> is the <em>weighted average</em> among a tract’s neighbours — about 4.8 of them.</span></p>
+<p><span class="takeaway fragment">Row-standardized means each row of <span class="math inline">\(W\)</span> sums to 1, so the spatial lag <span class="math inline">\(W y\)</span> is the <em>weighted average</em> among a tract’s neighbours — about 4.8 of them.</span></p>
 <aside class="notes">
 <p>W is built with spmatrix fromdata, normalize(row). 236 nonzero cells out of 2,401 → ~4.8 neighbours each. W is chosen before estimation, never estimated. Different W can change every downstream number — a key caveat.</p>
 <style type="text/css">
@@ -293,7 +293,7 @@
 <span id="cb1-4"><a href=""></a><span class="kw">mata</span>: st_store(., <span class="st">"W_INC"</span>, W_mata * inc)   <span class="co">// neighbours' avg income</span></span>
 <span id="cb1-5"><a href=""></a><span class="kw">gen</span> <span class="kw">double</span> W_HOVAL = .</span>
 <span id="cb1-6"><a href=""></a><span class="kw">mata</span>: st_store(., <span class="st">"W_HOVAL"</span>, W_mata * hoval)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment"><span class="math inline">\(W\cdot INC\)</span> and <span class="math inline">\(W\cdot HOVAL\)</span> are pre-computed in Mata, then entered as ordinary regressors in SLX/SDM/SDEM/GNS.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(W\cdot INC\)</span> and <span class="math inline">\(W\cdot HOVAL\)</span> are pre-computed in Mata, then entered as ordinary regressors in SLX/SDM/SDEM/GNS.</span></p>
 <aside class="notes">
 <p>We compute WX explicitly rather than via spregress’s ivarlag(), which can flip signs in some Stata versions. Explicit WX is transparent and matches Elhorst (2014) and PySAL’s spreg.</p>
 <style type="text/css">
@@ -379,7 +379,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Anselin’s rule favours <strong>SEM</strong> here — but the full taxonomy will tell a subtler story.</span></p>
+<p><span class="takeaway fragment">Anselin’s rule favours <strong>SEM</strong> here — but the full taxonomy will tell a subtler story.</span></p>
 <aside class="notes">
 <p>Moran’s I says “there is spatial dependence”; it does not say what form. The LM tests separate lag from error. Standard and robust LM-error both beat LM-lag, so the classic decision rule points to SEM. But we will see the WXθ channel reveals a spillover SEM cannot detect.</p>
 <style type="text/css">
@@ -397,7 +397,7 @@
 <section id="sar-a-tracts-crime-depends-directly-on-its-neighbours-crime-rho-0.428" class="slide level2 center">
 <h2>SAR: a tract’s crime depends directly on its neighbours’ crime, <span class="math inline">\(\rho = 0.428\)</span></h2>
 <p><span class="math display">\[y = \rho W y + X\beta + \varepsilon\]</span></p>
-<p><span class="comment"><span class="math inline">\(\rho = 0.428\)</span> (<span class="math inline">\(z = 3.49\)</span>, <span class="math inline">\(p &lt; 0.001\)</span>): a contagion channel. Because <span class="math inline">\(W y\)</span> is endogenous, we fit by maximum likelihood, not OLS.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(\rho = 0.428\)</span> (<span class="math inline">\(z = 3.49\)</span>, <span class="math inline">\(p &lt; 0.001\)</span>): a contagion channel. Because <span class="math inline">\(W y\)</span> is endogenous, we fit by maximum likelihood, not OLS.</span></p>
 <aside class="notes">
 <p>SAR adds the spatial lag of the outcome. ρ = 0.428 is large positive spatial dependence. Wy is correlated with the error, so OLS is inconsistent — spregress, ml, dvarlag(W) does ML. The own-income coefficient drops from −1.60 (OLS) to −1.03 because ρ now absorbs spillover OLS had loaded onto income.</p>
 <style type="text/css">
@@ -415,7 +415,7 @@
 <section id="sem-spatial-dependence-hides-in-the-errors-lambda-0.562" class="slide level2 center">
 <h2>SEM: spatial dependence hides in the errors, <span class="math inline">\(\lambda = 0.562\)</span></h2>
 <p><span class="math display">\[y = X\beta + u, \quad u = \lambda W u + \varepsilon\]</span></p>
-<p><span class="comment"><span class="math inline">\(\lambda = 0.562\)</span> (<span class="math inline">\(z = 4.23\)</span>, <span class="math inline">\(p &lt; 0.001\)</span>). Spatial dependence is a <em>nuisance</em> in the error — so the SEM yields <strong>zero</strong> spillover effects by construction.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(\lambda = 0.562\)</span> (<span class="math inline">\(z = 4.23\)</span>, <span class="math inline">\(p &lt; 0.001\)</span>). Spatial dependence is a <em>nuisance</em> in the error — so the SEM yields <strong>zero</strong> spillover effects by construction.</span></p>
 <aside class="notes">
 <p>SEM treats spatial structure as correlated unobservables — policing, land use, gang networks. λ = 0.562 is strong. Log-likelihood −184.4 beats OLS −187.4. But because the structural equation is unchanged, estat impact returns indirect = 0 for every variable. If spillovers are real, that is too restrictive.</p>
 <style type="text/css">
@@ -457,7 +457,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><span class="math inline">\(W\cdot INC = -1.40\)</span> (<span class="math inline">\(p = 0.016\)</span>): richer neighbours mean less own crime. No spatial multiplier, so <span class="math inline">\(\theta\)</span> <em>is</em> the indirect effect.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(W\cdot INC = -1.40\)</span> (<span class="math inline">\(p = 0.016\)</span>): richer neighbours mean less own crime. No spatial multiplier, so <span class="math inline">\(\theta\)</span> <em>is</em> the indirect effect.</span></p>
 <aside class="notes">
 <p>SLX is OLS with WX added — no feedback loop, so effects read straight off the coefficients. Neighbours’ income spillover is large and significant; neighbours’ house value (+0.21) is not. Total income effect −2.50, well past OLS’s −1.60. LR vs OLS = 6.8 (2 df) rejects OLS.</p>
 <style type="text/css">
@@ -476,7 +476,7 @@
 <h2>SDM: combine lag-of-<span class="math inline">\(y\)</span> and lag-of-<span class="math inline">\(X\)</span> — the general-purpose hub</h2>
 <p><span class="math display">\[y = \rho W y + X\beta + W X\theta + \varepsilon\]</span></p>
 <p>Two spillover channels at once: <strong>global</strong> feedback through <span class="math inline">\(\rho W y\)</span> and <strong>local</strong> spillover through <span class="math inline">\(W X\theta\)</span>.</p>
-<p><span class="comment">The SDM nests SAR (<span class="math inline">\(\theta = 0\)</span>), SLX (<span class="math inline">\(\rho = 0\)</span>), and SEM (common-factor) — so we can <em>test down</em> from it.</span></p>
+<p><span class="takeaway fragment">The SDM nests SAR (<span class="math inline">\(\theta = 0\)</span>), SLX (<span class="math inline">\(\rho = 0\)</span>), and SEM (common-factor) — so we can <em>test down</em> from it.</span></p>
 <aside class="notes">
 <p>SDM is the workhorse. ρ = 0.404 stays significant; the individual θ terms are insignificant here (W·INC = −0.58, p = 0.31), but their joint role is what the specification tests judge — and the impact decomposition tells the real story.</p>
 <style type="text/css">
@@ -517,7 +517,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Direct effects stay near the other models; the indirect income effect is <strong>larger</strong> than in SAR (<span class="math inline">\(-0.76\)</span>) because SDM counts <em>both</em> channels.</span></p>
+<p><span class="takeaway fragment">Direct effects stay near the other models; the indirect income effect is <strong>larger</strong> than in SAR (<span class="math inline">\(-0.76\)</span>) because SDM counts <em>both</em> channels.</span></p>
 <aside class="notes">
 <p>Key contrast with SAR: SAR forces every variable’s indirect/direct ratio to be identical (a consequence of spillovers running only through the multiplier). SDM frees θ, so income and house value can have different spillover intensities — and they do. Total income effect −2.52.</p>
 <style type="text/css">
@@ -550,7 +550,7 @@
 <li>but power is thin at <span class="math inline">\(n = 49\)</span></li>
 </ul>
 </div></div>
-<p><span class="comment">Only <span class="math inline">\(\rho\)</span> is indispensable; <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\lambda\)</span> survive on economics, not on a Wald test.</span></p>
+<p><span class="takeaway fragment">Only <span class="math inline">\(\rho\)</span> is indispensable; <span class="math inline">\(\theta\)</span> and <span class="math inline">\(\lambda\)</span> survive on economics, not on a Wald test.</span></p>
 <aside class="notes">
 <p>The mermaid spec-test figure in the post becomes this slide. The SLX restriction (ρ = 0) is rejected — feedback matters. Both the SAR (θ = 0) and SEM (common-factor θ + ρβ = 0) restrictions are NOT rejected at 5%, but Elhorst warns the SAR’s equal-ratio constraint is economically restrictive and the SEM forces zero spillovers. So we keep θ.</p>
 <style type="text/css">
@@ -636,7 +636,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Direct effects are stable everywhere; the <em>spillover</em> is where the models disagree — and SLX/SDM/SDEM/GNS all say it is large and negative.</span></p>
+<p><span class="takeaway fragment">Direct effects are stable everywhere; the <em>spillover</em> is where the models disagree — and SLX/SDM/SDEM/GNS all say it is large and negative.</span></p>
 <aside class="notes">
 <p>House value’s direct effect is rock-steady at −0.27 to −0.30 across all eight models. Income’s direct effect is steady too. The action is entirely in the indirect column: OLS and SEM say zero, SAR’s is small and constrained, while the four θ-models converge on −1.2 to −1.5. That convergence is what makes the spillover credible.</p>
 <style type="text/css">
@@ -701,7 +701,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Seven spatial parameters chasing 49 observations: <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\lambda\)</span>, and the <span class="math inline">\(\theta\)</span>’s are only <em>weakly identified</em> together, so every one goes insignificant.</span></p>
+<p><span class="takeaway fragment">Seven spatial parameters chasing 49 observations: <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\lambda\)</span>, and the <span class="math inline">\(\theta\)</span>’s are only <em>weakly identified</em> together, so every one goes insignificant.</span></p>
 <aside class="notes">
 <p>Gibbons &amp; Overman (2012): endogenous-interaction (ρ) and error-interaction (λ) effects are weakly identified separately; combine them and significance collapses. GNS log-likelihood barely beats SDM/SDEM and its AIC is higher. The most general model is not the best model — parsimony wins.</p>
 <style type="text/css">

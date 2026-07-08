@@ -88,7 +88,7 @@ War prevalence rises monotonically through the Cold War, peaking at 51 countries
 - **Controls** — Coup intensity, lagged Economic Freedom (Fraser), lagged Political Freedom (Freedom House)
 :::
 
-[An *unbalanced* panel: 1,663 country-years, T ranging from 1 to 13 — exactly what Arellano–Bond was designed for.]{.comment}
+[An *unbalanced* panel: 1,663 country-years, T ranging from 1 to 13 — exactly what Arellano–Bond was designed for.]{.takeaway .fragment}
 
 ::: {.notes}
 CatoJ.dta combines four canonical sources documented in Thies & Baum (2020). War and Coup are continuous magnitude indices on a 0–1 scale with means below 0.10 — the median country-year has neither, but the right tail is heavy (95th percentile of War = 0.571). Only 48% of countries have a complete 13-period record.
@@ -103,7 +103,7 @@ sum DemocIndxLag PolitFreeLag EconFreeLag
 
 The three lagged institutional variables encode missing data as $0$.
 
-[`DemocIndxLag` loses 86.5% of its rows to recoding — which is why the published study drops it entirely.]{.comment}
+[`DemocIndxLag` loses 86.5% of its rows to recoding — which is why the published study drops it entirely.]{.takeaway .fragment}
 
 ::: {.notes}
 Left raw, those zeros masquerade as legitimate observations of "no economic freedom." After mvdecode, EconFreeLag's mean rises from 4.67 to 5.76 and its minimum from 0 to 1.82 — the apparent zeros were spurious. PolitFreeLag and EconFreeLag retain 1,168 and 1,349 valid country-years; DemocIndxLag retains only 225, effectively unusable.
@@ -131,7 +131,7 @@ $$\ln\text{GDPpc}_{i,t} = \rho\,\ln\text{GDPpc}_{i,t-1} + \beta\,\text{War}_{i,t
 
 The lagged term $\rho\,\ln\text{GDPpc}_{i,t-1}$ captures inertia: income is sticky. $\alpha_i$ absorbs every time-invariant country trait; $\delta_t$ absorbs global shocks.
 
-[The lag is what makes the model "dynamic" — and what makes it hard to estimate.]{.comment}
+[The lag is what makes the model "dynamic" — and what makes it hard to estimate.]{.takeaway .fragment}
 
 ::: {.notes}
 Mapped to code: ρ is the coefficient on L.lnGDPpercapita; β is the coefficient on War; α_i is the country fixed effect; δ_t is captured by i.Year. Strong inertia in income (ρ ≈ 0.68) is the substantive reason the dynamic specification is needed — a static regression would mis-attribute persistence to the covariates.
@@ -155,7 +155,7 @@ $$\Delta\ln\text{GDPpc}_{i,t} = \rho\,\Delta\ln\text{GDPpc}_{i,t-1} + \beta\,\De
 
 Differencing erases $\alpha_i$ exactly — but it makes the differenced lag endogenous.
 
-[Belt and suspenders: differencing removes confounders, lag-instruments handle the lagged-DV endogeneity.]{.comment}
+[Belt and suspenders: differencing removes confounders, lag-instruments handle the lagged-DV endogeneity.]{.takeaway .fragment}
 
 ::: {.notes}
 The differenced lag $\Delta\ln\text{GDPpc}_{i,t-1}$ and the differenced error $\Delta\varepsilon_{i,t}$ both contain $\varepsilon_{i,t-1}$ — that shared term is the endogeneity. First-differencing is the launching pad for difference GMM. The differenced lag's correlation with the differenced error is the problem the internal instruments solve. War and Coup are also treated as endogenous, since country-specific shocks could drive both GDP and conflict at once.
@@ -167,7 +167,7 @@ $$E\!\left[\,\ln\text{GDPpc}_{i,t-s}\cdot\Delta\varepsilon_{i,t}\,\right] = 0 \q
 
 Lags $2$ and deeper of the *level* are uncorrelated with the differenced error — so they are valid instruments for the differenced lag.
 
-[We use lags $2$–$6$: deep enough to be exogenous, shallow enough to contain instrument proliferation.]{.comment}
+[We use lags $2$–$6$: deep enough to be exogenous, shallow enough to contain instrument proliferation.]{.takeaway .fragment}
 
 ::: {.notes}
 Concretely, $\ln\text{GDPpc}_{i,t-2}, \ln\text{GDPpc}_{i,t-3},\ldots$ instrument $\Delta\ln\text{GDPpc}_{i,t-1}$. These moment conditions form the basis of the GMM estimator. Restricting to lag(2 6) limits the instrument-matrix size — Roodman's (2009) concern is that too many instruments over-fit endogenous regressors and weaken the Hansen J test. Like using last week's weather to predict this week's: exogenous to today's shock, predictive of yesterday's value.
@@ -196,7 +196,7 @@ robust twostep requests two-step efficient estimation with the Windmeijer (2005)
 | War (contemp.) | [−0.219]{.key} | 0.057 | −3.84 | yes |
 | Coup (contemp.) | −0.091 | 0.028 | −3.19 | yes |
 
-[N = 1,187 country-years · 155 countries · 146 instruments · AR(2) $p = 0.091$ · Hansen $p = 0.184$.]{.comment}
+[N = 1,187 country-years · 155 countries · 146 instruments · AR(2) $p = 0.091$ · Hansen $p = 0.184$.]{.takeaway .fragment}
 
 ::: {.notes}
 A strongly persistent process: ρ = 0.679 means ~two-thirds of log GDP carries to the next quinquennium. A contemporaneous Magnitude-7 war reduces log GDP by 0.219 log points ≈ a 19.6% drop within five years (95% CI [−0.330, −0.107]). A contemporaneous coup costs another ~8.7%. Both diagnostics pass — AR(2) is a borderline pass just above 0.05.
@@ -219,7 +219,7 @@ The contemporaneous-War intervals sit clearly below zero across all four models;
 | L.EconFreedom | — | 0.020 | — | 0.028 |
 | L.PolitFreedom | — | — | 0.0003 | 0.0002 |
 
-[Economic freedom predicts growth ($t$ up to 3.31); political freedom never crosses $t = 1$.]{.comment}
+[Economic freedom predicts growth ($t$ up to 3.31); political freedom never crosses $t = 1$.]{.takeaway .fragment}
 
 ::: {.notes}
 War stays −0.16 to −0.24, all significant at 1% (t between −3.82 and −5.20). Adding economic freedom in Model 2 pushes the war effect more negative — economically freer country-years co-occur with smaller war losses, a confounder the specification removes. A one-point rise on the 1–10 Fraser index raises GDP by 2.0% (M2) to 2.8% (M4). Political freedom is indistinguishable from zero throughout.
@@ -256,7 +256,7 @@ The cumulative War effect is negative and its 95% CI excludes zero in every spec
 | 3 | −0.224 | 0.075 | −2.99 | + Polit. freedom |
 | 4 | [−0.166]{.key} | 0.076 | −2.19 | + both |
 
-[−0.35 → −0.17 is a 53% reduction: war damages institutions, and damaged institutions hurt growth.]{.comment}
+[−0.35 → −0.17 is a 53% reduction: war damages institutions, and damaged institutions hurt growth.]{.takeaway .fragment}
 
 ::: {.notes}
 Roughly half the cumulative war penalty operates through degraded economic and political institutions; the other half through direct capital destruction, displacement, lost trade. Policy implication: post-conflict reconstruction that rebuilds physical capital while ignoring institutional repair recovers only about half the lost ground.

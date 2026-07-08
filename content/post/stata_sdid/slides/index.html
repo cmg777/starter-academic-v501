@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Synthetic Difference-in-Differences in Stata</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -283,7 +283,7 @@
 <li class="fragment"><strong>Donor pool</strong> — 38 control states, no comparable tobacco program</li>
 <li class="fragment"><strong>No covariates</strong> — SC and SDID see <em>exactly</em> the same information</li>
 </ul>
-<p><span class="comment">1,209 observations, of which only <strong>12</strong> are treated. That extreme imbalance is the defining feature of a comparative case study — and it dictates how we do inference.</span></p>
+<p><span class="takeaway fragment">1,209 observations, of which only <strong>12</strong> are treated. That extreme imbalance is the defining feature of a comparative case study — and it dictates how we do inference.</span></p>
 <aside class="notes">
 <p>The panel is strongly balanced (no gaps), which every method requires. The “outcome only, no covariates” design is deliberate: it means any difference between SC and SDID comes from the estimator, not from a different set of predictors. California is id 3 after an alphabetical encode.</p>
 <style type="text/css">
@@ -318,7 +318,7 @@
 <section id="the-estimand-is-the-att-the-effect-of-the-policy-on-california" class="slide level2 center">
 <h2>The estimand is the ATT — the effect of the policy <em>on California</em></h2>
 <p><span class="math display">\[\tau = \frac{1}{N_{tr}\, T_{post}} \sum_{i:\, W_i = 1}\ \sum_{t &gt; T_{pre}} \left[\, Y_{it}(1) - Y_{it}(0) \,\right]\]</span></p>
-<p><span class="comment">Average, over treated units and post-1988 years, of the outcome <em>with</em> the policy minus the outcome that <em>would</em> have occurred without it. With <span class="math inline">\(N_{tr}=1\)</span>, every method is just a different way to impute the missing <span class="math inline">\(Y_{it}(0)\)</span>.</span></p>
+<p><span class="takeaway fragment">Average, over treated units and post-1988 years, of the outcome <em>with</em> the policy minus the outcome that <em>would</em> have occurred without it. With <span class="math inline">\(N_{tr}=1\)</span>, every method is just a different way to impute the missing <span class="math inline">\(Y_{it}(0)\)</span>.</span></p>
 <aside class="notes">
 <p>Name the estimand explicitly: this is the average treatment effect on the treated, not a population ATE. Because California was not randomly assigned to treatment, this is an observational design — identification rests on a stable comparison group and no California-specific shock, not on randomization.</p>
 <style type="text/css">
@@ -336,7 +336,7 @@
 <section id="sdid-is-one-weighted-two-way-fixed-effects-regression" class="slide level2 center">
 <h2>SDID is one weighted two-way fixed-effects regression</h2>
 <p><span class="math display">\[\left(\hat{\tau}^{sdid}, \hat{\mu}, \hat{\alpha}, \hat{\beta}\right) = \underset{\tau,\mu,\alpha,\beta}{\arg\min} \sum_{i=1}^{N} \sum_{t=1}^{T} \left(Y_{it} - \mu - \alpha_i - \beta_t - W_{it}\,\tau\right)^{2}\, \hat{\omega}_i^{sdid}\, \hat{\lambda}_t^{sdid}\]</span></p>
-<p><span class="comment"><span class="math inline">\(\alpha_i\)</span> is a state fixed effect, <span class="math inline">\(\beta_t\)</span> a year fixed effect, <span class="math inline">\(\tau\)</span> the ATT. The two extra terms — <span class="math inline">\(\hat{\omega}_i\)</span> (unit weight) and <span class="math inline">\(\hat{\lambda}_t\)</span> (time weight) — are everything that separates SDID from ordinary regression.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(\alpha_i\)</span> is a state fixed effect, <span class="math inline">\(\beta_t\)</span> a year fixed effect, <span class="math inline">\(\tau\)</span> the ATT. The two extra terms — <span class="math inline">\(\hat{\omega}_i\)</span> (unit weight) and <span class="math inline">\(\hat{\lambda}_t\)</span> (time weight) — are everything that separates SDID from ordinary regression.</span></p>
 <aside class="notes">
 <p>This is the unifying view of Arkhangelsky et al.&nbsp;(2021). Read the symbols against the Stata variables: Y is packspercapita, W is treated. Set the two weights to special values and you recover the older estimators — that is the next two slides.</p>
 <style type="text/css">
@@ -369,7 +369,7 @@
 <li>must match California’s <em>level</em> <strong>and</strong> trend</li>
 </ul>
 </div></div>
-<p><span class="comment">SDID keeps the best of both: optimized <span class="math inline">\(\hat{\omega}_i\)</span> <em>and</em> <span class="math inline">\(\hat{\lambda}_t\)</span>, with the unit FE retained — match the trend, allow a level gap.</span></p>
+<p><span class="takeaway fragment">SDID keeps the best of both: optimized <span class="math inline">\(\hat{\omega}_i\)</span> <em>and</em> <span class="math inline">\(\hat{\lambda}_t\)</span>, with the unit FE retained — match the trend, allow a level gap.</span></p>
 <aside class="notes">
 <p>DiD is just two-way fixed effects — uniform everything. SC keeps unit weights but, by dropping the unit fixed effect, must reproduce California’s level outright, a demanding requirement and the reason SC sometimes cannot find a good fit. The contrast is genuinely inseparable, which is why it earns a two-column slide.</p>
 <style type="text/css">
@@ -387,7 +387,7 @@
 <section id="unit-weights-make-the-synthetic-track-californias-pre-period-path" class="slide level2 center">
 <h2>Unit weights make the synthetic track California’s pre-period path</h2>
 <p><span class="math display">\[\hat{\omega}^{sdid} = \underset{\omega \in \Omega}{\arg\min} \sum_{t=1}^{T_{pre}} \left(\omega_0 + \sum_{i=1}^{N_{co}} \omega_i\, Y_{it} - \frac{1}{N_{tr}} \sum_{i=N_{co}+1}^{N} Y_{it}\right)^{2} + \zeta^{2}\, T_{pre}\, \lVert \omega \rVert_2^{2}\]</span></p>
-<p><span class="comment">The intercept <span class="math inline">\(\omega_0\)</span> lets SDID match California’s <em>trend</em> without matching its <em>level</em>. The ridge penalty <span class="math inline">\(\zeta^{2} T_{pre} \lVert \omega \rVert_2^{2}\)</span> spreads weight across donors instead of betting on one or two.</span></p>
+<p><span class="takeaway fragment">The intercept <span class="math inline">\(\omega_0\)</span> lets SDID match California’s <em>trend</em> without matching its <em>level</em>. The ridge penalty <span class="math inline">\(\zeta^{2} T_{pre} \lVert \omega \rVert_2^{2}\)</span> spreads weight across donors instead of betting on one or two.</span></p>
 <aside class="notes">
 <p>Choose nonnegative weights summing to one (the set Ω) so the weighted control outcome, plus an intercept, comes as close as possible to California in every pre-treatment year. The penalty is what makes SDID’s weights diffuse compared to classic SC — a deliberate trade of a little pre-period fit for a more stable comparison group.</p>
 <style type="text/css">
@@ -405,7 +405,7 @@
 <section id="time-weights-are-sdids-signature-which-pre-years-predict-the-post-period" class="slide level2 center">
 <h2>Time weights are SDID’s signature: which pre-years predict the post-period?</h2>
 <p><span class="math display">\[\hat{\lambda}^{sdid} = \underset{\lambda \in \Lambda}{\arg\min} \sum_{i=1}^{N_{co}} \left(\lambda_0 + \sum_{t=1}^{T_{pre}} \lambda_t\, Y_{it} - \frac{1}{T_{post}} \sum_{t=T_{pre}+1}^{T} Y_{it}\right)^{2} + \zeta_{\lambda}^{2}\, N_{co}\, \lVert \lambda \rVert^{2}\]</span></p>
-<p><span class="comment">Find pre-period year weights so the weighted pre-period outcome matches each control’s <em>post-period average</em>. Years that look most like the post-period get the most weight — we will see all of it land on <strong>1986–1988</strong>.</span></p>
+<p><span class="takeaway fragment">Find pre-period year weights so the weighted pre-period outcome matches each control’s <em>post-period average</em>. Years that look most like the post-period get the most weight — we will see all of it land on <strong>1986–1988</strong>.</span></p>
 <aside class="notes">
 <p>This is the mirror image of the unit-weight problem. DiD and SC treat 1972 and 1988 as equally informative; SDID does not. The intuition: smoking behavior in 1972 tells us little about the 1995 counterfactual, while the late 1980s tell us a lot. This is the one ingredient SC lacks entirely.</p>
 <style type="text/css">
@@ -452,7 +452,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The 2×2 DiD: California’s before/after drop (−55.86) minus the controls’ drop (−28.51) = <strong>−27.35</strong> packs.</span></p>
+<p><span class="takeaway fragment">The 2×2 DiD: California’s before/after drop (−55.86) minus the controls’ drop (−28.51) = <strong>−27.35</strong> packs.</span></p>
 <aside class="notes">
 <p>This is the simplest credible estimate — a 2×2 difference-in-differences, computed by hand with reg packspercapita i.cal##i.post. But it trusts parallel trends against the simple average of 38 very different states, and the raw-trends figure already showed California drifting away from that average before 1989. If California was on a steeper path for unrelated reasons, DiD overstates the effect.</p>
 <style type="text/css">
@@ -540,7 +540,7 @@
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2|3"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb1-1"><a href=""></a>sdid packspercapita state <span class="fu">year</span> treated, method(did)  <span class="kw">vce</span>(noinference) <span class="kw">graph</span></span>
 <span id="cb1-2"><a href=""></a>sdid packspercapita state <span class="fu">year</span> treated, method(<span class="kw">sc</span>)   <span class="kw">vce</span>(noinference) <span class="kw">graph</span></span>
 <span id="cb1-3"><a href=""></a>sdid packspercapita state <span class="fu">year</span> treated, method(sdid) <span class="kw">vce</span>(noinference) <span class="kw">graph</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment"><code>method(did)</code> returns −27.349 — identical to the hand-computed 2×2. <code>method(sc)</code> returns −19.620, essentially the standalone <code>synth2</code>’s −19.481. All three are special cases of one weighted regression.</span></p>
+<p><span class="takeaway fragment"><code>method(did)</code> returns −27.349 — identical to the hand-computed 2×2. <code>method(sc)</code> returns −19.620, essentially the standalone <code>synth2</code>’s −19.481. All three are special cases of one weighted regression.</span></p>
 <aside class="notes">
 <p>This is Clarke et al.’s (2024) practical payoff: you don’t switch packages or rewrite the model — one option flips the estimator, and estimation, inference (vce), and the diagnostic graph all work identically. The tiny SC gap reflects different regularization: sdid matches the full pre-period path with a ridge penalty, synth2 optimizes Abadie’s predictor-weighting V-matrix. Because the weights are computed once and reused, it is computationally cheap.</p>
 <style type="text/css">
@@ -646,7 +646,7 @@
 <li>the spread of placebo effects becomes the variance</li>
 </ul>
 </div></div>
-<p><span class="comment">The design forces the method: <span class="math inline">\(N_{tr}=1\)</span> rules out jackknife and bootstrap, leaving the permutation procedure.</span></p>
+<p><span class="takeaway fragment">The design forces the method: <span class="math inline">\(N_{tr}=1\)</span> rules out jackknife and bootstrap, leaving the permutation procedure.</span></p>
 <aside class="notes">
 <p>This is not a free choice. The jackknife is literally undefined here — when it deletes California, the treated-removed estimate does not exist. The bootstrap’s asymptotics require many treated units. The placebo procedure keeps the controls, repeatedly assigns the treatment structure to a control state as a fake treatment, and uses the placebo spread as the variance. Run it with vce(placebo) seed(1213).</p>
 <style type="text/css">

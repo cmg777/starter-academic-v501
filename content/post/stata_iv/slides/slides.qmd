@@ -96,7 +96,7 @@ Spoiler figure — we earn each estimate in Act II. Don't explain every bar yet.
 
 $$Y_i = \alpha + \beta X_i + U_i, \quad \text{with} \;\; \mathrm{Cov}(X_i, U_i) \neq 0$$
 
-[$Y$ is log GDP, $X$ is institutional quality, $U$ collects every unobserved driver of income. The non-zero covariance is exactly what biases OLS.]{.comment}
+[$Y$ is log GDP, $X$ is institutional quality, $U$ collects every unobserved driver of income. The non-zero covariance is exactly what biases OLS.]{.takeaway .fragment}
 
 ::: {.notes}
 This is endogeneity in one line. Institutions are endogenous because they are jointly determined with GDP, share confounders with GDP (geography, culture, human capital), and are measured with noise. OLS of Y on X does not recover beta even in infinite samples. The Durbin-Wu-Hausman test later confirms the endogeneity is real, not just assumed.
@@ -110,7 +110,7 @@ This is endogeneity in one line. Institutions are endogenous because they are jo
 - **Exogeneity** — $Z$ is uncorrelated with $U$. *Untestable.*
 :::
 
-[Settler mortality must shift institutions (we can check) and reach 1995 GDP only through them (we must assume).]{.comment}
+[Settler mortality must shift institutions (we can check) and reach 1995 GDP only through them (we must assume).]{.takeaway .fragment}
 
 ::: {.notes}
 Relevance is the one condition data can verify — the first-stage F-statistic. Exclusion and exogeneity are the heart of every IV paper and are assumptions, not findings. AJR's substantive claim is that 1700-era mortality cannot touch 1995 income except by shaping the institutions countries inherited. Overidentification (Hansen J) can partially probe this, but never prove it.
@@ -120,7 +120,7 @@ Relevance is the one condition data can verify — the first-stage F-statistic. 
 
 $$\hat\beta_{2SLS} = \frac{\widehat{\mathrm{Cov}}(Y, Z)}{\widehat{\mathrm{Cov}}(X, Z)} = \frac{\hat\beta_{RF}}{\hat\beta_{FS}}$$
 
-[Stage 1 regresses $X$ on $Z$; stage 2 regresses $Y$ on the *predicted* $\hat X$. With one instrument, the IV estimate is just reduced form $\div$ first stage.]{.comment}
+[Stage 1 regresses $X$ on $Z$; stage 2 regresses $Y$ on the *predicted* $\hat X$. With one instrument, the IV estimate is just reduced form $\div$ first stage.]{.takeaway .fragment}
 
 ::: {.notes}
 The sieve analogy: stage 1 catches the dirt (the confounded part of institutions), and only the clean signal — the part of X predicted by the instrument — passes through to stage 2. ivreg2 does both stages internally and reports correct second-stage standard errors. Crucially the ratio identity below makes IV concrete: it is one division.
@@ -134,7 +134,7 @@ The sieve analogy: stage 1 catches the dirt (the confounded part of institutions
 | Base (N=64) | [0.522]{.key} | 0.050 | yes |
 | + continents | 0.390 | 0.051 | yes |
 
-[This is the number the IV will stress-test — not one it generates.]{.comment}
+[This is the number the IV will stress-test — not one it generates.]{.takeaway .fragment}
 
 ::: {.notes}
 The naive OLS slope is remarkably stable: 0.53 full sample, 0.52 base sample, falling only to 0.39 with continent dummies. A one-point rise in expropriation protection (0–10 scale) is associated with a 39–53% income gain. But three biases lurk: reverse causality and omitted variables push it up, measurement error pulls it down. We need IV to decompose 0.522 into bias plus true effect.
@@ -156,7 +156,7 @@ Relevance, visualized. Australia, New Zealand, the USA — the lowest-mortality 
 | Stock-Yogo 10% max IV size | — | 16.38 (iid) |
 | Anderson-Rubin Wald (robust) | 61.66 | $p < 0.0001$ |
 
-[Borderline on the conventional threshold; the weak-IV-robust AR test reassures.]{.comment}
+[Borderline on the conventional threshold; the weak-IV-robust AR test reassures.]{.takeaway .fragment}
 
 ::: {.notes}
 Honest disclosure: 16.32 vs the Stock-Yogo iid threshold of 16.38 is essentially a wash. It clears the Staiger-Stock F > 10 rule of thumb but sits right at the more refined bar. Under robust SEs the right benchmark is the Olea-Pflueger effective F (weakivtest). The Anderson-Rubin Wald test (F = 61.66) is weak-IV-robust and confirms significance even if you distrust conventional 2SLS asymptotics on a borderline F.
@@ -179,7 +179,7 @@ ivreg2 logpgp95 (avexpr = logem4), ///
     robust first endog(avexpr)
 ```
 
-[`(avexpr = logem4)` declares the endogenous regressor and its instrument; `endog()` runs the Durbin-Wu-Hausman test.]{.comment}
+[`(avexpr = logem4)` declares the endogenous regressor and its instrument; `endog()` runs the Durbin-Wu-Hausman test.]{.takeaway .fragment}
 
 ::: {.notes}
 ivreg2 is the IV workhorse from SSC. The parenthetical syntax (endogenous = instrument) is the whole IV declaration. `first` prints the first-stage F; `endog(avexpr)` triggers the Durbin-Wu-Hausman endogeneity test. robust gives heteroskedasticity-consistent SEs throughout. The full do-file runs all of Tables 1–8; these are the load-bearing lines.
@@ -206,7 +206,7 @@ The headline. 2SLS = 0.944, robust SE 0.176, 95% CI [0.60, 1.29], significant at
 | OLS | 0.522 | 0.050 | — |
 | 2SLS | [0.944]{.key} | 0.176 | +81% |
 
-[Durbin-Wu-Hausman $\chi^2 = 9.09$ ($p = 0.003$) rejects OLS consistency.]{.comment}
+[Durbin-Wu-Hausman $\chi^2 = 9.09$ ($p = 0.003$) rejects OLS consistency.]{.takeaway .fragment}
 
 ::: {.notes}
 Three biases pull in opposite directions: reverse causality and omitted variables push OLS up, classical measurement error pulls it down. IV being LARGER than OLS implies the downward (attenuation) bias dominates — the institutional index is a noisy proxy for the true property-rights regime, and de-noising it via IV reveals a steeper causal slope. The endogeneity test confirms the gap is statistical, not noise: OLS is genuinely biased here.
@@ -220,7 +220,7 @@ Three biases pull in opposite directions: reverse causality and omitted variable
 - **Health channels** (Tab 7): 0.55–0.69 — the *only* dip toward OLS
 :::
 
-[No control set drives the coefficient to zero or flips its sign.]{.comment}
+[No control set drives the coefficient to zero or flips its sign.]{.takeaway .fragment}
 
 ::: {.notes}
 Across 27 specifications the institutional coefficient stays in the 0.55–1.36 range with the 0.944 baseline near the middle. British/French dummies, legal origin, religion shares, temperature, humidity, minerals, landlock, ethnolinguistic fractionalization — none kill it. The health-channel specs (malaria, life expectancy, infant mortality) are the only place it approaches OLS, and there the first-stage F collapses below 5, so read those CIs not point estimates.

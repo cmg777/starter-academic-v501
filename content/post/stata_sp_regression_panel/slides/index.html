@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Spatial Panel Regression in Stata</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -271,7 +271,7 @@
 <li class="fragment"><strong>Regressors</strong> — log real price <code>logp</code>, log real per-capita income <code>logy</code></li>
 <li class="fragment"><strong>Weight matrix</strong> — binary contiguity <span class="math inline">\(W\)</span>, row-standardized so <span class="math inline">\(Wy\)</span> is a <em>neighbor average</em></li>
 </ul>
-<p><span class="comment">Strongly balanced Baltagi panel, 1963–1992. Two states are neighbors if they share a border; the diagonal of <span class="math inline">\(W\)</span> is zero (no self-loop).</span></p>
+<p><span class="takeaway fragment">Strongly balanced Baltagi panel, 1963–1992. Two states are neighbors if they share a border; the diagonal of <span class="math inline">\(W\)</span> is zero (no self-loop).</span></p>
 <aside class="notes">
 <p>Between-state variation in logc (0.225) exceeds within-state variation (0.125), so cross-state composition matters — which foreshadows why fixed effects move the elasticities. For logp the pattern reverses: within-state variation (0.280) beats between (0.193), because real prices changed a lot over 30 years.</p>
 <style type="text/css">
@@ -294,7 +294,7 @@
 <span id="cb1-4"><a href=""></a>* Load the balanced cigarette panel and declare it</span>
 <span id="cb1-5"><a href=""></a><span class="kw">use</span> <span class="st">".../cigar/baltagi_cigar.dta"</span>, <span class="kw">clear</span></span>
 <span id="cb1-6"><a href=""></a>xtset state <span class="fu">year</span>      <span class="co">// panel: state (46), time: year 1963–1992</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment"><code>norm(row)</code> makes each row of <span class="math inline">\(W\)</span> sum to 1, so <span class="math inline">\(Wy\)</span> for California averages Nevada, Oregon, and Arizona’s consumption.</span></p>
+<p><span class="takeaway fragment"><code>norm(row)</code> makes each row of <span class="math inline">\(W\)</span> sum to 1, so <span class="math inline">\(Wy\)</span> for California averages Nevada, Oregon, and Arizona’s consumption.</span></p>
 <aside class="notes">
 <p>spmat dta reads columns m1..m46 as the weight matrix object Wst. Row-standardization is the convention that lets you read the spatial lag as “the average of my neighbors,” not an unscaled sum. xtset declares the panel so xtreg and xsmle know the state and time dimensions.</p>
 <style type="text/css">
@@ -335,7 +335,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><span class="math inline">\(R^2 = 0.224\)</span>. This naive benchmark ignores the panel structure entirely — every state treated as an independent draw.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(R^2 = 0.224\)</span>. This naive benchmark ignores the panel structure entirely — every state treated as an independent draw.</span></p>
 <aside class="notes">
 <p>Pooled OLS treats all 1,380 observations as independent. The negative price and positive income elasticities are both significant, but the assumption of no systematic cross-state differences is untenable given the large between-state variation. This is the loosest of four benchmarks; the next three add discipline.</p>
 <style type="text/css">
@@ -410,7 +410,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Within <span class="math inline">\(R^2 = 0.789\)</span> — state <em>and</em> year effects absorbed. But every state still depends only on its <strong>own</strong> price and income.</span></p>
+<p><span class="takeaway fragment">Within <span class="math inline">\(R^2 = 0.789\)</span> — state <em>and</em> year effects absorbed. But every state still depends only on its <strong>own</strong> price and income.</span></p>
 <aside class="notes">
 <p>Two-way FE controls simultaneously for state heterogeneity and common time shocks. Its −0.40 is the most defensible non-spatial estimate, intermediate between region FE (−0.23) and time FE (−0.86). It is the number the spatial model will overturn — not because it is biased in the usual sense, but because it omits an entire channel: the neighbors.</p>
 <style type="text/css">
@@ -428,7 +428,7 @@
 <section id="the-spatial-durbin-model-lets-neighbors-y-and-neighbors-x-both-move-local-consumption" class="slide level2 center">
 <h2>The Spatial Durbin Model lets neighbors’ <span class="math inline">\(Y\)</span> <em>and</em> neighbors’ <span class="math inline">\(X\)</span> both move local consumption</h2>
 <p><span class="math display">\[y_{it} = \rho \sum_{j=1}^{N} w_{ij}\, y_{jt} + x_{it}\beta + \sum_{j=1}^{N} w_{ij}\, x_{jt}\theta + \mu_i + \lambda_t + \varepsilon_{it}\]</span></p>
-<p><span class="comment"><span class="math inline">\(\rho W y\)</span> is the neighbor-consumption feedback; <span class="math inline">\(W X \theta\)</span> is the spillover of neighbors’ prices and incomes; <span class="math inline">\(\mu_i,\lambda_t\)</span> are state and year effects.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(\rho W y\)</span> is the neighbor-consumption feedback; <span class="math inline">\(W X \theta\)</span> is the spillover of neighbors’ prices and incomes; <span class="math inline">\(\mu_i,\lambda_t\)</span> are state and year effects.</span></p>
 <aside class="notes">
 <p>The SDM is the most general member of the spatial panel family. It carries three spatial pieces: the spatial lag of the dependent variable (rho W y), the own effects (X beta), and the spatial lags of the regressors (W X theta). It nests SAR (theta = 0), SLX (rho = 0), and SEM (a common-factor restriction) as special cases — which is what makes the Wald tests in Act II so clean.</p>
 <style type="text/css">
@@ -448,7 +448,7 @@
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-code-line-numbers="1|2|3"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb2-1"><a href=""></a>xsmle logc logp logy, <span class="kw">fe</span> <span class="dv">type</span>(both) wmat(Wst) <span class="fu">mod</span>(sdm) <span class="co">///</span></span>
 <span id="cb2-2"><a href=""></a>      <span class="kw">effects</span> nsim(999) <span class="kw">nolog</span></span>
 <span id="cb2-3"><a href=""></a><span class="kw">estimates</span> <span class="kw">store</span> sdm1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment"><code>type(both)</code> = two-way FE; <code>mod(sdm)</code> = Spatial Durbin; <code>effects</code> decomposes the impact into direct + indirect via 999 Monte Carlo draws.</span></p>
+<p><span class="takeaway fragment"><code>type(both)</code> = two-way FE; <code>mod(sdm)</code> = Spatial Durbin; <code>effects</code> decomposes the impact into direct + indirect via 999 Monte Carlo draws.</span></p>
 <aside class="notes">
 <p>xsmle is the workhorse for ML estimation of spatial panels. The effects option is essential: in a spatial model the regression coefficient is NOT the marginal effect, because a change in one state’s x ripples through neighbors and partly echoes back. The 999 simulations produce standard errors for the direct, indirect, and total impacts.</p>
 <style type="text/css">
@@ -495,7 +495,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Higher neighbor prices also cut local consumption — exactly the cross-border-shopping signature.</span></p>
+<p><span class="takeaway fragment">Higher neighbor prices also cut local consumption — exactly the cross-border-shopping signature.</span></p>
 <aside class="notes">
 <p>Rho = 0.265 with z = 8.08 is strong positive spatial dependence: a 1% rise in average neighbor consumption raises this state’s consumption by 0.27%. The negative coefficient on neighbors’ prices is the cross-border story: when the state next door raises prices, there is less arbitrage opportunity, reinforcing the local price effect.</p>
 <style type="text/css">
@@ -513,7 +513,7 @@
 <section id="the-coefficient-is-not-the-effect-price-decomposes-into-direct-0.31-and-indirect-0.31" class="slide level2 center">
 <h2>The coefficient is not the effect: price decomposes into direct −0.31 and indirect −0.31</h2>
 <p><span class="math display">\[\text{Total} = \underbrace{-0.313}_{\text{direct, own state}} + \underbrace{-0.314}_{\text{indirect, spillover}} = -0.627\]</span></p>
-<p><span class="comment">The spillover is <strong>as large as</strong> the own-state effect — when neighbors raise prices 1%, local consumption falls about as much as if the state had raised its own price.</span></p>
+<p><span class="takeaway fragment">The spillover is <strong>as large as</strong> the own-state effect — when neighbors raise prices 1%, local consumption falls about as much as if the state had raised its own price.</span></p>
 <aside class="notes">
 <p>This is the payoff of the effects decomposition. In a spatial model the partial derivative of y_i with respect to x_i (direct) differs from the regression beta because of feedback through the network. The indirect effect is the cross-state spillover. Here they are nearly equal, so summing them roughly doubles the apparent price sensitivity.</p>
 <style type="text/css">
@@ -574,7 +574,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">With <span class="math inline">\(T = 30\)</span>, the incidental-parameters bias of order <span class="math inline">\(1/T\)</span> is small; the near-identical estimates confirm the ML results are reliable.</span></p>
+<p><span class="takeaway fragment">With <span class="math inline">\(T = 30\)</span>, the incidental-parameters bias of order <span class="math inline">\(1/T\)</span> is small; the near-identical estimates confirm the ML results are reliable.</span></p>
 <aside class="notes">
 <p>Spatial panels with fixed effects suffer the incidental-parameters problem: the number of fixed-effect parameters grows with N, biasing ML by order 1/T. Lee and Yu (2010) correct the leading term. Here T = 30 is large enough that the correction changes rho by 0.005 and the total effect by 0.004 — reassuring stability. We keep the Lee–Yu estimates as the preferred specification.</p>
 <style type="text/css">
@@ -650,7 +650,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Spatial dependence in cigarette demand is <em>substantive</em>, not a nuisance — neighbors’ consumption, prices, and incomes all matter.</span></p>
+<p><span class="takeaway fragment">Spatial dependence in cigarette demand is <em>substantive</em>, not a nuisance — neighbors’ consumption, prices, and incomes all matter.</span></p>
 <aside class="notes">
 <p>The SDM cannot be simplified. Neighbors’ X variables matter (SAR rejected), the autoregressive feedback matters (SLX rejected), and the dependence is not just correlated errors (SEM rejected). The strong SLX rejection — chi2 = 61 — says the spatial multiplier is real: a shock in one state genuinely propagates through the network.</p>
 <style type="text/css">
@@ -723,7 +723,7 @@
 <section id="static-models-hide-the-timing-short-run-elasticity-0.15-long-run-0.42" class="slide level2 center">
 <h2>Static models hide the timing: short-run elasticity −0.15, long-run −0.42</h2>
 <p><span class="math display">\[\text{long-run} = \frac{\hat\beta_{logp}}{1 - \tau} = \frac{-0.150}{1 - 0.639} \approx -0.42\]</span></p>
-<p><span class="comment">The static SDM conflates short- and long-run responses into one coefficient; the dynamic model separates how <em>fast</em> a tax bites from how <em>hard</em> it eventually bites.</span></p>
+<p><span class="takeaway fragment">The static SDM conflates short- and long-run responses into one coefficient; the dynamic model separates how <em>fast</em> a tax bites from how <em>hard</em> it eventually bites.</span></p>
 <aside class="notes">
 <p>The dynamic short-run own-price elasticity is −0.15, about half the static SDM’s −0.31. But dividing by (1 − tau) recovers a long-run elasticity near −0.42, close to the static estimate. So the static SDM was reporting something between the short- and long-run; the dynamic model tells you a tax takes several years to reach full effect because consumers adjust habits slowly.</p>
 <style type="text/css">

@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Conditional Average Treatment Effects (CATE) with Stata 19</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -254,7 +254,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Eligible workers are older, richer, more educated — so the $19,557 gap conflates the effect with <em>who selects into</em> eligibility.</span></p>
+<p><span class="takeaway fragment">Eligible workers are older, richer, more educated — so the $19,557 gap conflates the effect with <em>who selects into</em> eligibility.</span></p>
 <aside class="notes">
 <p>This is the naive view, and it fails. If e401k were randomly assigned, $19,557 would be the ATE. It isn’t — eligibility is a function of which employer you chose. The job of every estimator that follows is to strip out the selection and recover the causal part.</p>
 <style type="text/css">
@@ -305,7 +305,7 @@
 <h2>The estimand is a function, not a number: <span class="math inline">\(\tau(\mathbf{x})=E[y(1)-y(0)\mid \mathbf{x}]\)</span></h2>
 <p><span class="math display">\[\tau(\mathbf{x}) = E\big[\,y(1) - y(0) \mid \mathbf{x}\,\big]\]</span></p>
 <p>The average effect <em>among households whose covariates equal</em> <span class="math inline">\(\mathbf{x}\)</span>. Where <span class="math inline">\(\tau(\mathbf{x})\)</span> bends with <span class="math inline">\(\mathbf{x}\)</span>, the program helps some households more than others.</p>
-<p><span class="comment">The single ATE is just <span class="math inline">\(E[\tau(\mathbf{X})]\)</span> — the CATE averaged over the population.</span></p>
+<p><span class="takeaway fragment">The single ATE is just <span class="math inline">\(E[\tau(\mathbf{X})]\)</span> — the CATE averaged over the population.</span></p>
 <aside class="notes">
 <p>The CATE is a function of x, not a scalar. If τ(x) were constant we’d be back at the ATE. The whole point of the deck is that it is NOT constant. Note y(1) and y(0) are potential outcomes — we only ever observe one per household, so this is fundamentally a missing-data problem.</p>
 <style type="text/css">
@@ -338,7 +338,7 @@
 <li>37% / 63% split → comfortable overlap</li>
 </ul>
 </div></div>
-<p><span class="comment">Machine learning chooses controls flexibly; it cannot manufacture identification.</span></p>
+<p><span class="takeaway fragment">Machine learning chooses controls flexibly; it cannot manufacture identification.</span></p>
 <aside class="notes">
 <p>This is the load-bearing slide for rigor. The causal forest gives us a flexible τ̂(x), but identification rests entirely on these two assumptions — they are assumptions about the world, not about the estimator. Overlap is what keeps the inverse-propensity weights in AIPW from blowing up.</p>
 <style type="text/css">
@@ -360,7 +360,7 @@
 <li class="fragment"><strong>Treatment</strong> — employer-offered 401(k) <em>eligibility</em> (not participation): 37.1% eligible</li>
 <li class="fragment"><strong>Covariates</strong> — age, education, income, pension, marriage, two-earner, IRA, homeownership</li>
 </ul>
-<p><span class="comment"><code>assets3</code>, the canonical Chernozhukov–Hansen excerpt shipped with Stata 19.</span></p>
+<p><span class="takeaway fragment"><code>assets3</code>, the canonical Chernozhukov–Hansen excerpt shipped with Stata 19.</span></p>
 <aside class="notes">
 <p>The heavy right tail of assets is exactly why a single-number ATE struggles — skewness 10.6, kurtosis 187. When the outcome is that skewed, the effect is almost guaranteed to be heterogeneous across the income distribution.</p>
 <style type="text/css">
@@ -382,7 +382,7 @@
 <span id="cb1-3"><a href=""></a><span class="kw">global</span> catecovars age educ i.incomecat i.pension i.married i.twoearn i.ira i.ownhome</span>
 <span id="cb1-4"><a href=""></a></span>
 <span id="cb1-5"><a href=""></a>cate po (asset <span class="ot">$catecovars</span>) (e401k), rseed(12345671)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">Lasso for the nuisance functions (cross-fitted), a generalized random forest for <span class="math inline">\(\tau(\mathbf{x})\)</span>, honest-tree bootstrap for the CIs — Stata 18 needed hand-rolled loops.</span></p>
+<p><span class="takeaway fragment">Lasso for the nuisance functions (cross-fitted), a generalized random forest for <span class="math inline">\(\tau(\mathbf{x})\)</span>, honest-tree bootstrap for the CIs — Stata 18 needed hand-rolled loops.</span></p>
 <aside class="notes">
 <p>The full do-file is in the post; these are the load-bearing lines. <code>cate po</code> is the partialing-out estimator: it residualizes both the outcome and the treatment against the covariates (cross-fitting), then fits a causal forest on the residuals. rseed makes the cross-fitting reproducible.</p>
 <style type="text/css">
@@ -415,7 +415,7 @@
 <li>ATE <span class="math inline">\(= \$8{,}120\)</span></li>
 </ul>
 </div></div>
-<p><span class="comment">Both return a per-household effect function <span class="math inline">\(\hat\tau(\mathbf{x}_i)\)</span> — they differ only in how they map nuisances into it.</span></p>
+<p><span class="takeaway fragment">Both return a per-household effect function <span class="math inline">\(\hat\tau(\mathbf{x}_i)\)</span> — they differ only in how they map nuisances into it.</span></p>
 <aside class="notes">
 <p>PO and AIPW make different model assumptions but produce the same kind of object. AIPW’s double robustness is the headline property: it stays consistent if EITHER the outcome model OR the propensity model is correct. The cost is sensitivity to extreme propensities, which is why overlap matters.</p>
 <style type="text/css">
@@ -474,7 +474,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><code>estat heterogeneity</code> — <span class="math inline">\(H_0:\ \tau(\mathbf{x})\)</span> is constant. Both reject at 5%, so the heterogeneity hunt is not chasing noise.</span></p>
+<p><span class="takeaway fragment"><code>estat heterogeneity</code> — <span class="math inline">\(H_0:\ \tau(\mathbf{x})\)</span> is constant. Both reject at 5%, so the heterogeneity hunt is not chasing noise.</span></p>
 <aside class="notes">
 <p>Before exploring HOW the effect varies, we ask WHETHER it varies. Both estimators reject the constant-effect null. AIPW rejects more strongly (p = 0.019 vs 0.043), consistent with its higher efficiency when both nuisance models are well-specified. This licenses everything that follows.</p>
 <style type="text/css">
@@ -539,7 +539,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><code>estat projection</code>: the only coefficient significant at 1% is the top income category. <span class="math inline">\(R^2=0.0045\)</span> — most heterogeneity is <em>nonlinear</em>, captured by the forest, not the projection.</span></p>
+<p><span class="takeaway fragment"><code>estat projection</code>: the only coefficient significant at 1% is the top income category. <span class="math inline">\(R^2=0.0045\)</span> — most heterogeneity is <em>nonlinear</em>, captured by the forest, not the projection.</span></p>
 <aside class="notes">
 <p>A causal forest fits τ̂(x) flexibly but a flexible function is hard to summarize. The linear projection answers “which variables shift the predicted effect?” Income dominates. The low R² is a feature, not a bug — it tells us the real structure is curvature the projection can’t see, which is exactly why we need GATE and the series fit.</p>
 <style type="text/css">
@@ -641,7 +641,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><code>estat classification</code>: the data sorted itself; income is the dominant marker of who responds. All three gaps have <span class="math inline">\(t&gt;18\)</span>.</span></p>
+<p><span class="takeaway fragment"><code>estat classification</code>: the data sorted itself; income is the dominant marker of who responds. All three gaps have <span class="math inline">\(t&gt;18\)</span>.</span></p>
 <aside class="notes">
 <p>The data did the sorting; now we ask what makes the top quartile different. The high-effect group is older, richer, and more educated — but income is the dominant signal, fully consistent with the projection and the GATE-by-income picture. The story: 401(k) eligibility helps people who already had latent demand for retirement saving and the slack to act on it.</p>
 <style type="text/css">

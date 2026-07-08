@@ -61,7 +61,7 @@ The central tension: the standard regression assumes each unit is independent. C
 
 $$I = \frac{N}{S_0}\cdot\frac{e' W e}{e' e}$$
 
-[On the OLS residuals, $I = 0.222$ ($z = 2.84$, $p = 0.005$): high-crime tracts neighbour high-crime tracts. The i.i.d.-error assumption fails.]{.comment}
+[On the OLS residuals, $I = 0.222$ ($z = 2.84$, $p = 0.005$): high-crime tracts neighbour high-crime tracts. The i.i.d.-error assumption fails.]{.takeaway .fragment}
 
 ::: {.notes}
 Moran's I on the residuals is the smoking gun. e is the OLS residual vector, W the row-standardized weight matrix, S₀ the sum of W's elements. Positive and significant means clustering — exactly the spatial dependence OLS ignores. This motivates the whole model family.
@@ -88,7 +88,7 @@ Moran's I on the residuals is the smoking gun. e is the OLS residual vector, W t
 - **Neighbours** — Queen contiguity: share a border *or* a vertex; row-standardized
 :::
 
-[Row-standardized means each row of $W$ sums to 1, so the spatial lag $W y$ is the *weighted average* among a tract's neighbours — about 4.8 of them.]{.comment}
+[Row-standardized means each row of $W$ sums to 1, so the spatial lag $W y$ is the *weighted average* among a tract's neighbours — about 4.8 of them.]{.takeaway .fragment}
 
 ::: {.notes}
 W is built with spmatrix fromdata, normalize(row). 236 nonzero cells out of 2,401 → ~4.8 neighbours each. W is chosen before estimation, never estimated. Different W can change every downstream number — a key caveat.
@@ -105,7 +105,7 @@ gen double W_HOVAL = .
 mata: st_store(., "W_HOVAL", W_mata * hoval)
 ```
 
-[$W\cdot INC$ and $W\cdot HOVAL$ are pre-computed in Mata, then entered as ordinary regressors in SLX/SDM/SDEM/GNS.]{.comment}
+[$W\cdot INC$ and $W\cdot HOVAL$ are pre-computed in Mata, then entered as ordinary regressors in SLX/SDM/SDEM/GNS.]{.takeaway .fragment}
 
 ::: {.notes}
 We compute WX explicitly rather than via spregress's ivarlag(), which can flip signs in some Stata versions. Explicit WX is transparent and matches Elhorst (2014) and PySAL's spreg.
@@ -144,7 +144,7 @@ This is the Russian-nesting-doll taxonomy. GNS is the biggest doll; every other 
 | Robust LM-error | 2.19 | 0.139 | survives |
 | Robust LM-lag | 0.26 | 0.612 | fades |
 
-[Anselin's rule favours **SEM** here — but the full taxonomy will tell a subtler story.]{.comment}
+[Anselin's rule favours **SEM** here — but the full taxonomy will tell a subtler story.]{.takeaway .fragment}
 
 ::: {.notes}
 Moran's I says "there is spatial dependence"; it does not say what form. The LM tests separate lag from error. Standard and robust LM-error both beat LM-lag, so the classic decision rule points to SEM. But we will see the WXθ channel reveals a spillover SEM cannot detect.
@@ -154,7 +154,7 @@ Moran's I says "there is spatial dependence"; it does not say what form. The LM 
 
 $$y = \rho W y + X\beta + \varepsilon$$
 
-[$\rho = 0.428$ ($z = 3.49$, $p < 0.001$): a contagion channel. Because $W y$ is endogenous, we fit by maximum likelihood, not OLS.]{.comment}
+[$\rho = 0.428$ ($z = 3.49$, $p < 0.001$): a contagion channel. Because $W y$ is endogenous, we fit by maximum likelihood, not OLS.]{.takeaway .fragment}
 
 ::: {.notes}
 SAR adds the spatial lag of the outcome. ρ = 0.428 is large positive spatial dependence. Wy is correlated with the error, so OLS is inconsistent — spregress, ml, dvarlag(W) does ML. The own-income coefficient drops from −1.60 (OLS) to −1.03 because ρ now absorbs spillover OLS had loaded onto income.
@@ -164,7 +164,7 @@ SAR adds the spatial lag of the outcome. ρ = 0.428 is large positive spatial de
 
 $$y = X\beta + u, \quad u = \lambda W u + \varepsilon$$
 
-[$\lambda = 0.562$ ($z = 4.23$, $p < 0.001$). Spatial dependence is a *nuisance* in the error — so the SEM yields **zero** spillover effects by construction.]{.comment}
+[$\lambda = 0.562$ ($z = 4.23$, $p < 0.001$). Spatial dependence is a *nuisance* in the error — so the SEM yields **zero** spillover effects by construction.]{.takeaway .fragment}
 
 ::: {.notes}
 SEM treats spatial structure as correlated unobservables — policing, land use, gang networks. λ = 0.562 is strong. Log-likelihood −184.4 beats OLS −187.4. But because the structural equation is unchanged, estat impact returns indirect = 0 for every variable. If spillovers are real, that is too restrictive.
@@ -179,7 +179,7 @@ $$y = X\beta + W X\theta + \varepsilon$$
 | **INC** | −1.10*** | [−1.40**]{.key} | −2.50*** |
 | **HOVAL** | −0.29*** | +0.21 | −0.08 |
 
-[$W\cdot INC = -1.40$ ($p = 0.016$): richer neighbours mean less own crime. No spatial multiplier, so $\theta$ *is* the indirect effect.]{.comment}
+[$W\cdot INC = -1.40$ ($p = 0.016$): richer neighbours mean less own crime. No spatial multiplier, so $\theta$ *is* the indirect effect.]{.takeaway .fragment}
 
 ::: {.notes}
 SLX is OLS with WX added — no feedback loop, so effects read straight off the coefficients. Neighbours' income spillover is large and significant; neighbours' house value (+0.21) is not. Total income effect −2.50, well past OLS's −1.60. LR vs OLS = 6.8 (2 df) rejects OLS.
@@ -191,7 +191,7 @@ $$y = \rho W y + X\beta + W X\theta + \varepsilon$$
 
 Two spillover channels at once: **global** feedback through $\rho W y$ and **local** spillover through $W X\theta$.
 
-[The SDM nests SAR ($\theta = 0$), SLX ($\rho = 0$), and SEM (common-factor) — so we can *test down* from it.]{.comment}
+[The SDM nests SAR ($\theta = 0$), SLX ($\rho = 0$), and SEM (common-factor) — so we can *test down* from it.]{.takeaway .fragment}
 
 ::: {.notes}
 SDM is the workhorse. ρ = 0.404 stays significant; the individual θ terms are insignificant here (W·INC = −0.58, p = 0.31), but their joint role is what the specification tests judge — and the impact decomposition tells the real story.
@@ -204,7 +204,7 @@ SDM is the workhorse. ρ = 0.404 stays significant; the individual θ terms are 
 | **INC** | −1.03*** | [−1.50*]{.key} | −2.52*** |
 | **HOVAL** | −0.28*** | +0.22 | −0.07 |
 
-[Direct effects stay near the other models; the indirect income effect is **larger** than in SAR ($-0.76$) because SDM counts *both* channels.]{.comment}
+[Direct effects stay near the other models; the indirect income effect is **larger** than in SAR ($-0.76$) because SDM counts *both* channels.]{.takeaway .fragment}
 
 ::: {.notes}
 Key contrast with SAR: SAR forces every variable's indirect/direct ratio to be identical (a consequence of spillovers running only through the multiplier). SDM frees θ, so income and house value can have different spillover intensities — and they do. Total income effect −2.52.
@@ -227,7 +227,7 @@ Key contrast with SAR: SAR forces every variable's indirect/direct ratio to be i
 :::
 ::::
 
-[Only $\rho$ is indispensable; $\theta$ and $\lambda$ survive on economics, not on a Wald test.]{.comment}
+[Only $\rho$ is indispensable; $\theta$ and $\lambda$ survive on economics, not on a Wald test.]{.takeaway .fragment}
 
 ::: {.notes}
 The mermaid spec-test figure in the post becomes this slide. The SLX restriction (ρ = 0) is rejected — feedback matters. Both the SAR (θ = 0) and SEM (common-factor θ + ρβ = 0) restrictions are NOT rejected at 5%, but Elhorst warns the SAR's equal-ratio constraint is economically restrictive and the SEM forces zero spillovers. So we keep θ.
@@ -255,7 +255,7 @@ The SDEM (y = Xβ + WXθ + u, u = λWu + ε) is the headline. λ = 0.404 (p = 0.
 | INC indirect | 0 | −0.76 | 0 | −1.40 | −1.50 | [−1.20]{.key} | −1.37 |
 | INC total | −1.60 | −1.86 | −0.94 | −2.50 | −2.52 | −2.26 | −2.40 |
 
-[Direct effects are stable everywhere; the *spillover* is where the models disagree — and SLX/SDM/SDEM/GNS all say it is large and negative.]{.comment}
+[Direct effects are stable everywhere; the *spillover* is where the models disagree — and SLX/SDM/SDEM/GNS all say it is large and negative.]{.takeaway .fragment}
 
 ::: {.notes}
 House value's direct effect is rock-steady at −0.27 to −0.30 across all eight models. Income's direct effect is steady too. The action is entirely in the indirect column: OLS and SEM say zero, SAR's is small and constrained, while the four θ-models converge on −1.2 to −1.5. That convergence is what makes the spillover credible.
@@ -279,7 +279,7 @@ Policy translation: a $1,000 income rise cuts crime ~1.0 directly and another ~1
 | $\lambda$ | — | 0.40** | 0.15 (p=.88) |
 | $W\cdot INC$ | −0.58 | −1.20** | −0.69 (p=.68) |
 
-[Seven spatial parameters chasing 49 observations: $\rho$, $\lambda$, and the $\theta$'s are only *weakly identified* together, so every one goes insignificant.]{.comment}
+[Seven spatial parameters chasing 49 observations: $\rho$, $\lambda$, and the $\theta$'s are only *weakly identified* together, so every one goes insignificant.]{.takeaway .fragment}
 
 ::: {.notes}
 Gibbons & Overman (2012): endogenous-interaction (ρ) and error-interaction (λ) effects are weakly identified separately; combine them and significance collapses. GNS log-likelihood barely beats SDM/SDEM and its AIC is higher. The most general model is not the best model — parsimony wins.

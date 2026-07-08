@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>The Synthetic Control Method in Stata</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -269,7 +269,7 @@
 <li class="fragment"><strong>Treatment</strong> — Prop 99, California only, from 1989</li>
 <li class="fragment"><strong>Predictors</strong> — log income, share aged 15–24, retail price, beer, plus <code>cigsale</code> in 1975/1980/1988</li>
 </ul>
-<p><span class="comment">Strongly balanced: 1,209 observations, 19 pre-treatment years and 12 post-treatment years. The estimand is the <strong>ATT</strong> — the effect on California, the one treated unit — <em>not</em> the ATE.</span></p>
+<p><span class="takeaway fragment">Strongly balanced: 1,209 observations, 19 pre-treatment years and 12 post-treatment years. The estimand is the <strong>ATT</strong> — the effect on California, the one treated unit — <em>not</em> the ATE.</span></p>
 <aside class="notes">
 <p>With a single treated unit and aggregate data, difference-in-differences’ parallel-trends assumption is hard to test. SCM instead builds an explicit counterfactual and lets you <em>see</em> the match quality in the pre-treatment period. California is state == 3 in the data.</p>
 <style type="text/css">
@@ -289,7 +289,7 @@
 <p><span class="math display">\[\min_{W} \sum_{m=1}^{M} v_m \left( X_{1m} - \sum_{j=2}^{J+1} w_j X_{jm} \right)^2\]</span></p>
 <p>Pick donor weights <span class="math inline">\(w_j \ge 0\)</span> that sum to one and match California’s predictors <span class="math inline">\(X_{1m}\)</span>.</p>
 <p>The weights <span class="math inline">\(v_m\)</span> set how much each covariate matters.</p>
-<p><span class="comment">The synthetic control is a <strong>convex combination</strong> of real states — no extrapolation beyond the donor pool.</span></p>
+<p><span class="takeaway fragment">The synthetic control is a <strong>convex combination</strong> of real states — no extrapolation beyond the donor pool.</span></p>
 <aside class="notes">
 <p>This is a nested optimization. The outer problem picks the V-weights (predictor importance); the inner problem picks the W-weights (donor shares) that minimize the weighted predictor distance. The non-negativity and sum-to-one constraints are what keep the synthetic interpretable and guard against overfitting.</p>
 <style type="text/css">
@@ -308,7 +308,7 @@
 <h2>The treatment effect is the gap between actual and synthetic California</h2>
 <p><span class="math display">\[\hat{\tau}_t = Y_{1t} - \sum_{j=2}^{J+1} w_j^* Y_{jt}\]</span></p>
 <p>The effect in year <span class="math inline">\(t\)</span> is California’s actual sales minus the synthetic’s prediction. A negative <span class="math inline">\(\hat{\tau}_t\)</span> means Prop 99 <em>lowered</em> sales.</p>
-<p><span class="comment">Identification rests on <strong>good pre-treatment fit</strong>, <strong>no interference</strong>, and <strong>no anticipation</strong> — assumptions you can largely inspect, not just assume.</span></p>
+<p><span class="takeaway fragment">Identification rests on <strong>good pre-treatment fit</strong>, <strong>no interference</strong>, and <strong>no anticipation</strong> — assumptions you can largely inspect, not just assume.</span></p>
 <aside class="notes">
 <p>The ATT is the mean of these yearly gaps over 1989–2000. Unlike DiD, you do not need parallel trends as an article of faith. If the synthetic tracks the real unit closely before treatment, the post-treatment divergence is credibly the effect. The three assumptions: Prop 99 did not change other states’ sales (no interference), donors did not pass similar laws pre-1989 (no anticipation), and the synthetic reproduces the pre-1989 path (good fit).</p>
 <style type="text/css">
@@ -328,7 +328,7 @@
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-code-line-numbers="1|2|3"><pre class="sourceCode numberSource stata number-lines code-with-copy"><code class="sourceCode stata"><span id="cb1-1"><a href=""></a>synth2 cigsale lnincome age15to24 retprice beer <span class="co">///</span></span>
 <span id="cb1-2"><a href=""></a>    cigsale(1988) cigsale(1980) cigsale(1975), <span class="co">///</span></span>
 <span id="cb1-3"><a href=""></a>    trunit(3) trperiod(1989) xperiod(1980(1)1988) nested allopt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment"><code>trunit(3)</code> = California · <code>trperiod(1989)</code> = treatment year · <code>nested</code> = outer V / inner W · <code>allopt</code> = multiple starts to dodge local optima.</span></p>
+<p><span class="takeaway fragment"><code>trunit(3)</code> = California · <code>trperiod(1989)</code> = treatment year · <code>nested</code> = outer V / inner W · <code>allopt</code> = multiple starts to dodge local optima.</span></p>
 <aside class="notes">
 <p>Seven predictors: four economic/demographic variables averaged over 1980–1988, plus cigarette sales at three pre-treatment anchor years (1975, 1980, 1988). The <code>nested allopt</code> combination is the gold-standard specification — slower, but it avoids spurious local optima in the V-weight search.</p>
 <style type="text/css">
@@ -467,7 +467,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The post/pre MSPE ratio asks: how much worse does fit get <em>after</em> 1989 than before? California’s is highest by far.</span></p>
+<p><span class="takeaway fragment">The post/pre MSPE ratio asks: how much worse does fit get <em>after</em> 1989 than before? California’s is highest by far.</span></p>
 <aside class="notes">
 <p>A genuine effect should blow up the post-treatment prediction error relative to a small pre-treatment error. California’s ratio of 123.5 dwarfs the runners-up. This is the conservative inference statistic — it rewards both a large gap AND a tight pre-treatment fit.</p>
 <style type="text/css">

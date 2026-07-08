@@ -105,7 +105,7 @@ This is the spoiler thesis. Everything that follows builds the machinery to comp
 - **Estimand** — the average treatment effect on the treated (ATT), under parallel trends
 :::
 
-[Observational, not randomized: states *chose* to expand, so parallel trends is a genuine concern — exactly the worry `honestdid` quantifies.]{.comment}
+[Observational, not randomized: states *chose* to expand, so parallel trends is a genuine concern — exactly the worry `honestdid` quantifies.]{.takeaway .fragment}
 
 ## The 2x2 DiD is the difference of two changes
 
@@ -113,7 +113,7 @@ $$Y_{it} = \alpha + \beta\,\text{Treat}_i + \gamma\,\text{Post}_t + \delta\,(\te
 
 The interaction $\delta$ **is** the DiD estimate: how much the treated group's change exceeds the control group's change.
 
-[Control rose 6.46 pp; treated rose 12.64 pp; the difference is the policy effect.]{.comment}
+[Control rose 6.46 pp; treated rose 12.64 pp; the difference is the policy effect.]{.takeaway .fragment}
 
 ::: {.notes}
 Collapse the panel to one pre-mean (2008–2013) and one post-mean (2014–2015). Four cells, two changes, one difference. The same delta comes out of the regression with state-clustered SEs.
@@ -127,7 +127,7 @@ Collapse the panel to one pre-mean (2008–2013) and one post-mean (2014–2015)
 | Control change (61.90% to 68.36%) | +6.46 pp |
 | **DiD ATT** $\hat\delta$ | [+6.18 pp]{.key} |
 
-[$t = 7.24$, $p < 0.001$, 95% CI $[4.45,\ 7.91]$ pp · clustered on 38 states.]{.comment}
+[$t = 7.24$, $p < 0.001$, 95% CI $[4.45,\ 7.91]$ pp · clustered on 38 states.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the estimate the entire sensitivity analysis stress-tests — not one honestdid generates, but the one it robustifies. Highly significant under parallel trends. The question is what happens when we stop assuming parallel trends holds exactly.
@@ -147,7 +147,7 @@ $$\Delta^{RM}(\bar M): \quad |\delta_t^{\text{post}}| \;\le\; \bar M \cdot \max_
 
 Set $\bar M = 1$ and the post-treatment violation may be *as large as* the worst pre-treatment deviation; $\bar M = 2$ allows twice that.
 
-[We never observe the true $\delta_s$ — the package uses the estimated pre-period coefficients and their uncertainty to build valid CIs.]{.comment}
+[We never observe the true $\delta_s$ — the package uses the estimated pre-period coefficients and their uncertainty to build valid CIs.]{.takeaway .fragment}
 
 ::: {.notes}
 "No worse than the wobbles we already saw." Sweeping M-bar upward from 0 traces how the robust CI widens. The breakdown value is the M-bar where it first reaches zero. This restriction needs only ONE pre-period — so it works even in the bare 2x2.
@@ -194,7 +194,7 @@ $$\Delta^{SD}(M): \quad \big|(\delta_{t+1}-\delta_t)-(\delta_t-\delta_{t-1})\big
 
 Relative magnitudes is a **speed limit** on the violation; smoothness is an **acceleration limit** — the trend may drift, but not lurch.
 
-[Needs $\ge 2$ pre-periods (three points define one acceleration) — unavailable in the 2x2, unlocked by the full panel.]{.comment}
+[Needs $\ge 2$ pre-periods (three points define one acceleration) — unavailable in the 2x2, unlocked by the full panel.]{.takeaway .fragment}
 
 ::: {.notes}
 A car can be fast yet safe if it accelerated gradually; a sudden swerve is dangerous even at moderate speed. M=0 forces a perfectly linear trend extrapolation; larger M allows more curvature. Unlike M-bar, M is measured in the outcome's own units (insurance share).
@@ -255,7 +255,7 @@ Two restrictions, two angles. RM is a dimensionless multiplier, intuitive and wo
 
 ![Relative magnitudes on Callaway-Sant'Anna (csdid) event-study estimates. The breakdown again lands between $\bar M = 1.5$ and $2$.](../stata_honestdid_csdid.png)
 
-[Callaway-Sant'Anna ATT agrees with TWFE here because we held a single 2014 cohort — a clean robustness check.]{.comment}
+[Callaway-Sant'Anna ATT agrees with TWFE here because we held a single 2014 cohort — a clean robustness check.]{.takeaway .fragment}
 
 ::: {.notes}
 csdid handles staggered adoption and heterogeneous timing, where naive TWFE can mislead. At M-bar = 1.5 the lower bound is 0.004; at 2 it is −0.007 — nearly identical to the TWFE breakdown. With multiple cohorts and heterogeneous effects the two can diverge, which is why this comparison matters.

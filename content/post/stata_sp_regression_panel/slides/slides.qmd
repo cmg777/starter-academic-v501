@@ -91,7 +91,7 @@ Spoiler. Don't explain the mechanism yet — just plant the gap. The "best" non-
 - **Weight matrix** — binary contiguity $W$, row-standardized so $Wy$ is a *neighbor average*
 :::
 
-[Strongly balanced Baltagi panel, 1963–1992. Two states are neighbors if they share a border; the diagonal of $W$ is zero (no self-loop).]{.comment}
+[Strongly balanced Baltagi panel, 1963–1992. Two states are neighbors if they share a border; the diagonal of $W$ is zero (no self-loop).]{.takeaway .fragment}
 
 ::: {.notes}
 Between-state variation in logc (0.225) exceeds within-state variation (0.125), so cross-state composition matters — which foreshadows why fixed effects move the elasticities. For logp the pattern reverses: within-state variation (0.280) beats between (0.193), because real prices changed a lot over 30 years.
@@ -108,7 +108,7 @@ use ".../cigar/baltagi_cigar.dta", clear
 xtset state year      // panel: state (46), time: year 1963–1992
 ```
 
-[`norm(row)` makes each row of $W$ sum to 1, so $Wy$ for California averages Nevada, Oregon, and Arizona's consumption.]{.comment}
+[`norm(row)` makes each row of $W$ sum to 1, so $Wy$ for California averages Nevada, Oregon, and Arizona's consumption.]{.takeaway .fragment}
 
 ::: {.notes}
 spmat dta reads columns m1..m46 as the weight matrix object Wst. Row-standardization is the convention that lets you read the spatial lag as "the average of my neighbors," not an unscaled sum. xtset declares the panel so xtreg and xsmle know the state and time dimensions.
@@ -121,7 +121,7 @@ spmat dta reads columns m1..m46 as the weight matrix object Wst. Row-standardiza
 | `logp` (price) | [−0.386]{.key} | 0.031 | yes |
 | `logy` (income) | 0.372 | 0.026 | yes |
 
-[$R^2 = 0.224$. This naive benchmark ignores the panel structure entirely — every state treated as an independent draw.]{.comment}
+[$R^2 = 0.224$. This naive benchmark ignores the panel structure entirely — every state treated as an independent draw.]{.takeaway .fragment}
 
 ::: {.notes}
 Pooled OLS treats all 1,380 observations as independent. The negative price and positive income elasticities are both significant, but the assumption of no systematic cross-state differences is untenable given the large between-state variation. This is the loosest of four benchmarks; the next three add discipline.
@@ -159,7 +159,7 @@ The contrast is the whole point of comparing fixed-effects schemes. Region FE ex
 | `logp` (price) | [−0.402]{.key} | 0.027 | yes |
 | `logy` (income) | 0.119 | 0.048 | 5% |
 
-[Within $R^2 = 0.789$ — state *and* year effects absorbed. But every state still depends only on its **own** price and income.]{.comment}
+[Within $R^2 = 0.789$ — state *and* year effects absorbed. But every state still depends only on its **own** price and income.]{.takeaway .fragment}
 
 ::: {.notes}
 Two-way FE controls simultaneously for state heterogeneity and common time shocks. Its −0.40 is the most defensible non-spatial estimate, intermediate between region FE (−0.23) and time FE (−0.86). It is the number the spatial model will overturn — not because it is biased in the usual sense, but because it omits an entire channel: the neighbors.
@@ -169,7 +169,7 @@ Two-way FE controls simultaneously for state heterogeneity and common time shock
 
 $$y_{it} = \rho \sum_{j=1}^{N} w_{ij}\, y_{jt} + x_{it}\beta + \sum_{j=1}^{N} w_{ij}\, x_{jt}\theta + \mu_i + \lambda_t + \varepsilon_{it}$$
 
-[$\rho W y$ is the neighbor-consumption feedback; $W X \theta$ is the spillover of neighbors' prices and incomes; $\mu_i,\lambda_t$ are state and year effects.]{.comment}
+[$\rho W y$ is the neighbor-consumption feedback; $W X \theta$ is the spillover of neighbors' prices and incomes; $\mu_i,\lambda_t$ are state and year effects.]{.takeaway .fragment}
 
 ::: {.notes}
 The SDM is the most general member of the spatial panel family. It carries three spatial pieces: the spatial lag of the dependent variable (rho W y), the own effects (X beta), and the spatial lags of the regressors (W X theta). It nests SAR (theta = 0), SLX (rho = 0), and SEM (a common-factor restriction) as special cases — which is what makes the Wald tests in Act II so clean.
@@ -183,7 +183,7 @@ xsmle logc logp logy, fe type(both) wmat(Wst) mod(sdm) ///
 estimates store sdm1
 ```
 
-[`type(both)` = two-way FE; `mod(sdm)` = Spatial Durbin; `effects` decomposes the impact into direct + indirect via 999 Monte Carlo draws.]{.comment}
+[`type(both)` = two-way FE; `mod(sdm)` = Spatial Durbin; `effects` decomposes the impact into direct + indirect via 999 Monte Carlo draws.]{.takeaway .fragment}
 
 ::: {.notes}
 xsmle is the workhorse for ML estimation of spatial panels. The effects option is essential: in a spatial model the regression coefficient is NOT the marginal effect, because a change in one state's x ripples through neighbors and partly echoes back. The 999 simulations produce standard errors for the direct, indirect, and total impacts.
@@ -197,7 +197,7 @@ xsmle is the workhorse for ML estimation of spatial panels. The effects option i
 | `[Wx]logp` (neighbor price) | −0.206 | 0.065 | −3.17 |
 | `[Spatial]rho` | [0.265]{.key} | 0.033 | 8.08 |
 
-[Higher neighbor prices also cut local consumption — exactly the cross-border-shopping signature.]{.comment}
+[Higher neighbor prices also cut local consumption — exactly the cross-border-shopping signature.]{.takeaway .fragment}
 
 ::: {.notes}
 Rho = 0.265 with z = 8.08 is strong positive spatial dependence: a 1% rise in average neighbor consumption raises this state's consumption by 0.27%. The negative coefficient on neighbors' prices is the cross-border story: when the state next door raises prices, there is less arbitrage opportunity, reinforcing the local price effect.
@@ -207,7 +207,7 @@ Rho = 0.265 with z = 8.08 is strong positive spatial dependence: a 1% rise in av
 
 $$\text{Total} = \underbrace{-0.313}_{\text{direct, own state}} + \underbrace{-0.314}_{\text{indirect, spillover}} = -0.627$$
 
-[The spillover is **as large as** the own-state effect — when neighbors raise prices 1%, local consumption falls about as much as if the state had raised its own price.]{.comment}
+[The spillover is **as large as** the own-state effect — when neighbors raise prices 1%, local consumption falls about as much as if the state had raised its own price.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the payoff of the effects decomposition. In a spatial model the partial derivative of y_i with respect to x_i (direct) differs from the regression beta because of feedback through the network. The indirect effect is the cross-state spillover. Here they are nearly equal, so summing them roughly doubles the apparent price sensitivity.
@@ -231,7 +231,7 @@ The headline. Non-spatial models understate price sensitivity because they disca
 | `logp` (own) | −0.307 | −0.304 |
 | Total price effect | [−0.627]{.key} | −0.623 |
 
-[With $T = 30$, the incidental-parameters bias of order $1/T$ is small; the near-identical estimates confirm the ML results are reliable.]{.comment}
+[With $T = 30$, the incidental-parameters bias of order $1/T$ is small; the near-identical estimates confirm the ML results are reliable.]{.takeaway .fragment}
 
 ::: {.notes}
 Spatial panels with fixed effects suffer the incidental-parameters problem: the number of fixed-effect parameters grows with N, biasing ML by order 1/T. Lee and Yu (2010) correct the leading term. Here T = 30 is large enough that the correction changes rho by 0.005 and the total effect by 0.004 — reassuring stability. We keep the Lee–Yu estimates as the preferred specification.
@@ -263,7 +263,7 @@ Each test attacks one nested restriction. SAR sets theta = 0 (only neighbors' co
 | SLX | $\rho = 0$ | 61.04 | <0.001 | [reject]{.key} |
 | SEM | $\theta + \rho\beta = 0$ | 8.49 | 0.014 | [reject]{.key} |
 
-[Spatial dependence in cigarette demand is *substantive*, not a nuisance — neighbors' consumption, prices, and incomes all matter.]{.comment}
+[Spatial dependence in cigarette demand is *substantive*, not a nuisance — neighbors' consumption, prices, and incomes all matter.]{.takeaway .fragment}
 
 ::: {.notes}
 The SDM cannot be simplified. Neighbors' X variables matter (SAR rejected), the autoregressive feedback matters (SLX rejected), and the dependence is not just correlated errors (SEM rejected). The strong SLX rejection — chi2 = 61 — says the spatial multiplier is real: a shock in one state genuinely propagates through the network.
@@ -310,7 +310,7 @@ Tau = 0.654 estimated alone, 0.639 jointly with the spatiotemporal lag — large
 
 $$\text{long-run} = \frac{\hat\beta_{logp}}{1 - \tau} = \frac{-0.150}{1 - 0.639} \approx -0.42$$
 
-[The static SDM conflates short- and long-run responses into one coefficient; the dynamic model separates how *fast* a tax bites from how *hard* it eventually bites.]{.comment}
+[The static SDM conflates short- and long-run responses into one coefficient; the dynamic model separates how *fast* a tax bites from how *hard* it eventually bites.]{.takeaway .fragment}
 
 ::: {.notes}
 The dynamic short-run own-price elasticity is −0.15, about half the static SDM's −0.31. But dividing by (1 − tau) recovers a long-run elasticity near −0.42, close to the static estimate. So the static SDM was reporting something between the short- and long-run; the dynamic model tells you a tax takes several years to reach full effect because consumers adjust habits slowly.

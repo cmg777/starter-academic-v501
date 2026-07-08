@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Visualizing Regression with the FWL Theorem in Stata</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -269,7 +269,7 @@
 <li class="fragment"><strong>Treatment</strong> — <code>coupons</code> distributed (true effect +0.2)</li>
 <li class="fragment"><strong>Confounder</strong> — <code>income</code>: rich areas get <em>fewer</em> coupons but buy <em>more</em></li>
 </ul>
-<p><span class="comment">Coupons and income are negatively linked (−0.71) — a backdoor the naive slope misses.</span></p>
+<p><span class="takeaway fragment">Coupons and income are negatively linked (−0.71) — a backdoor the naive slope misses.</span></p>
 <aside class="notes">
 <p>The store targets promotions at lower-income areas, so coupons and income are negatively linked (−0.71). Income also lifts sales. That opens a backdoor path the naive slope never blocks. The data-generating process is known: coupons → sales is +0.2, income → coupons is −0.5, income → sales is +0.3. Because we built it, we know the naive estimate is wrong on purpose. This is the controlled lab where we can check that FWL recovers the truth.</p>
 <style type="text/css">
@@ -312,7 +312,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The true coupon effect is +0.2 — the negative raw correlation is income leaking through.</span></p>
+<p><span class="takeaway fragment">The true coupon effect is +0.2 — the negative raw correlation is income leaking through.</span></p>
 <aside class="notes">
 <p>Walk the three rows. The first row is the trap. Rows two and three explain why: income is the hidden third variable correlated with both. Any tool that ignores income inherits this leak. That motivates partialling out.</p>
 <style type="text/css">
@@ -331,7 +331,7 @@
 <h2>The FWL theorem: residualize first, then read one slope</h2>
 <p><span class="math display">\[\hat\beta_1=\frac{\operatorname{Cov}(\tilde y,\tilde x_1)}{\operatorname{Var}(\tilde x_1)}\]</span></p>
 <p>Residualize both axes on <span class="math inline">\(Z\)</span>, then read one slope — it <strong>equals</strong> the multiple-regression coefficient on <span class="math inline">\(x_1\)</span>.</p>
-<p><span class="comment">The tildes mean “the part <span class="math inline">\(Z\)</span> cannot explain.” Two paths, one number.</span></p>
+<p><span class="takeaway fragment">The tildes mean “the part <span class="math inline">\(Z\)</span> cannot explain.” Two paths, one number.</span></p>
 <aside class="notes">
 <p>Spell out the recipe aloud: regress <span class="math inline">\(y\)</span> on the controls <span class="math inline">\(Z\)</span> and keep the residual <span class="math inline">\(\tilde y\)</span>; regress <span class="math inline">\(x_1\)</span> on <span class="math inline">\(Z\)</span> and keep <span class="math inline">\(\tilde x_1\)</span>; the simple slope of <span class="math inline">\(\tilde y\)</span> on <span class="math inline">\(\tilde x_1\)</span> is the multiple-regression coefficient on <span class="math inline">\(x_1\)</span>. This is the algebraic heart of the deck. The multivariate β₁ is not an approximation of the residual-on-residual slope — it is exactly that slope. Frisch &amp; Waugh (1933) and Lovell (1963) proved it. Everything downstream — scatterfit, reghdfe, fixed effects — is this identity in disguise.</p>
 <style type="text/css">
@@ -397,7 +397,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The +0.212 lands right on the true effect of +0.2; income’s coefficient lands on its true 0.3.</span></p>
+<p><span class="takeaway fragment">The +0.212 lands right on the true effect of +0.2; income’s coefficient lands on its true 0.3.</span></p>
 <aside class="notes">
 <p>This is the payoff of the controls() call as a table. The coupon coefficient goes from −0.093 (significant but wrong-signed) to +0.212. R² climbs from 0.03 to 0.32. The full regression on the right is exactly what the right-hand scatter on the spoiler slide was showing.</p>
 <style type="text/css">
@@ -416,7 +416,7 @@
 <h2>The omitted-variable-bias formula predicts the gap exactly</h2>
 <p><span class="math display">\[\text{bias}=\hat\gamma\times\hat\delta=0.300\times(-0.494)=-0.148\]</span></p>
 <p><span class="math inline">\(\hat\gamma\)</span> is income’s effect on sales; <span class="math inline">\(\hat\delta\)</span> is the coupons-on-income slope. The naive slope is the true slope plus this bias.</p>
-<p><span class="comment">Nothing mysterious: a positive <span class="math inline">\(\hat\gamma\)</span> times a negative <span class="math inline">\(\hat\delta\)</span> drags the naive estimate down.</span></p>
+<p><span class="takeaway fragment">Nothing mysterious: a positive <span class="math inline">\(\hat\gamma\)</span> times a negative <span class="math inline">\(\hat\delta\)</span> drags the naive estimate down.</span></p>
 <aside class="notes">
 <p>OVB is the flip side of FWL. The bias the naive regression suffers is exactly γ̂ · δ̂ = 0.300 × (−0.494) = −0.148. True 0.212 plus bias −0.148 ≈ 0.064; the actual naive −0.093 differs only by sampling noise at n = 200. The point: the confounding is fully accounted for by one product of two slopes.</p>
 <style type="text/css">
@@ -441,7 +441,7 @@
 <span id="cb2-6"><a href=""></a><span class="kw">predict</span> resid_coupons, residuals</span>
 <span id="cb2-7"><a href=""></a>* Step 3 — <span class="kw">regress</span> residual <span class="kw">on</span> residual</span>
 <span id="cb2-8"><a href=""></a><span class="kw">regress</span> resid_sales resid_coupons      <span class="co">// slope = 0.212288</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">The manual slope 0.212288 equals the full-regression coefficient 0.212288 — not close, <em>identical</em>.</span></p>
+<p><span class="takeaway fragment">The manual slope 0.212288 equals the full-regression coefficient 0.212288 — not close, <em>identical</em>.</span></p>
 <aside class="notes">
 <p>This is the proof-by-doing. Three regress/predict steps reproduce the multivariate coefficient to six decimals. It is an algebraic identity, not a numerical coincidence — which is why scatterfit can draw it as a single fitted line. The intercept on the residual regression is essentially zero, as FWL guarantees.</p>
 <style type="text/css">
@@ -567,7 +567,7 @@
 <li>no binning / on-plot stats</li>
 </ul>
 </div></div>
-<p><span class="comment">The numbers match across all three because the datasets are identical — FWL is the same theorem everywhere.</span></p>
+<p><span class="takeaway fragment">The numbers match across all three because the datasets are identical — FWL is the same theorem everywhere.</span></p>
 <aside class="notes">
 <p>This is the trilogy payoff. The naive −0.093, the controlled +0.212, the OVB −0.148 — identical across the R, Python, and Stata posts because they share the data. Stata’s extras (binned scatters, on-plot regparameters) are conveniences, not different math. A student who learns FWL once can read it in any language.</p>
 <style type="text/css">

@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>How Far Can Parallel Trends Bend Before DiD Breaks?</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -293,13 +293,13 @@
 <li class="fragment"><strong>Control</strong> — 16 states that <strong>never</strong> expanded</li>
 <li class="fragment"><strong>Estimand</strong> — the average treatment effect on the treated (ATT), under parallel trends</li>
 </ul>
-<p><span class="comment">Observational, not randomized: states <em>chose</em> to expand, so parallel trends is a genuine concern — exactly the worry <code>honestdid</code> quantifies.</span></p>
+<p><span class="takeaway fragment">Observational, not randomized: states <em>chose</em> to expand, so parallel trends is a genuine concern — exactly the worry <code>honestdid</code> quantifies.</span></p>
 </section>
 <section id="the-2x2-did-is-the-difference-of-two-changes" class="slide level2 center">
 <h2>The 2x2 DiD is the difference of two changes</h2>
 <p><span class="math display">\[Y_{it} = \alpha + \beta\,\text{Treat}_i + \gamma\,\text{Post}_t + \delta\,(\text{Treat}_i \times \text{Post}_t) + \varepsilon_{it}\]</span></p>
 <p>The interaction <span class="math inline">\(\delta\)</span> <strong>is</strong> the DiD estimate: how much the treated group’s change exceeds the control group’s change.</p>
-<p><span class="comment">Control rose 6.46 pp; treated rose 12.64 pp; the difference is the policy effect.</span></p>
+<p><span class="takeaway fragment">Control rose 6.46 pp; treated rose 12.64 pp; the difference is the policy effect.</span></p>
 <aside class="notes">
 <p>Collapse the panel to one pre-mean (2008–2013) and one post-mean (2014–2015). Four cells, two changes, one difference. The same delta comes out of the regression with state-clustered SEs.</p>
 <style type="text/css">
@@ -338,7 +338,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><span class="math inline">\(t = 7.24\)</span>, <span class="math inline">\(p &lt; 0.001\)</span>, 95% CI <span class="math inline">\([4.45,\ 7.91]\)</span> pp · clustered on 38 states.</span></p>
+<p><span class="takeaway fragment"><span class="math inline">\(t = 7.24\)</span>, <span class="math inline">\(p &lt; 0.001\)</span>, 95% CI <span class="math inline">\([4.45,\ 7.91]\)</span> pp · clustered on 38 states.</span></p>
 <aside class="notes">
 <p>This is the estimate the entire sensitivity analysis stress-tests — not one honestdid generates, but the one it robustifies. Highly significant under parallel trends. The question is what happens when we stop assuming parallel trends holds exactly.</p>
 <style type="text/css">
@@ -374,7 +374,7 @@
 <h2>The relative-magnitudes restriction bounds the post-violation by the worst pre-violation</h2>
 <p><span class="math display">\[\Delta^{RM}(\bar M): \quad |\delta_t^{\text{post}}| \;\le\; \bar M \cdot \max_{s \in \text{pre}} |\delta_s|\]</span></p>
 <p>Set <span class="math inline">\(\bar M = 1\)</span> and the post-treatment violation may be <em>as large as</em> the worst pre-treatment deviation; <span class="math inline">\(\bar M = 2\)</span> allows twice that.</p>
-<p><span class="comment">We never observe the true <span class="math inline">\(\delta_s\)</span> — the package uses the estimated pre-period coefficients and their uncertainty to build valid CIs.</span></p>
+<p><span class="takeaway fragment">We never observe the true <span class="math inline">\(\delta_s\)</span> — the package uses the estimated pre-period coefficients and their uncertainty to build valid CIs.</span></p>
 <aside class="notes">
 <p>“No worse than the wobbles we already saw.” Sweeping M-bar upward from 0 traces how the robust CI widens. The breakdown value is the M-bar where it first reaches zero. This restriction needs only ONE pre-period — so it works even in the bare 2x2.</p>
 <style type="text/css">
@@ -473,7 +473,7 @@
 <h2>Smoothness limits how fast the trend can change direction</h2>
 <p><span class="math display">\[\Delta^{SD}(M): \quad \big|(\delta_{t+1}-\delta_t)-(\delta_t-\delta_{t-1})\big| \;\le\; M \quad \text{for all } t\]</span></p>
 <p>Relative magnitudes is a <strong>speed limit</strong> on the violation; smoothness is an <strong>acceleration limit</strong> — the trend may drift, but not lurch.</p>
-<p><span class="comment">Needs <span class="math inline">\(\ge 2\)</span> pre-periods (three points define one acceleration) — unavailable in the 2x2, unlocked by the full panel.</span></p>
+<p><span class="takeaway fragment">Needs <span class="math inline">\(\ge 2\)</span> pre-periods (three points define one acceleration) — unavailable in the 2x2, unlocked by the full panel.</span></p>
 <aside class="notes">
 <p>A car can be fast yet safe if it accelerated gradually; a sudden swerve is dangerous even at moderate speed. M=0 forces a perfectly linear trend extrapolation; larger M allows more curvature. Unlike M-bar, M is measured in the outcome’s own units (insurance share).</p>
 <style type="text/css">
@@ -622,7 +622,7 @@
 <section id="the-staggered-robust-estimator-reaches-the-same-verdict" class="slide level2 center">
 <h2>The staggered-robust estimator reaches the same verdict</h2>
 
-<img data-src="../stata_honestdid_csdid.png" class="r-stretch quarto-figure-center"><p class="caption">Relative magnitudes on Callaway-Sant’Anna (csdid) event-study estimates. The breakdown again lands between <span class="math inline">\(\bar M = 1.5\)</span> and <span class="math inline">\(2\)</span>.</p><p><span class="comment">Callaway-Sant’Anna ATT agrees with TWFE here because we held a single 2014 cohort — a clean robustness check.</span></p>
+<img data-src="../stata_honestdid_csdid.png" class="r-stretch quarto-figure-center"><p class="caption">Relative magnitudes on Callaway-Sant’Anna (csdid) event-study estimates. The breakdown again lands between <span class="math inline">\(\bar M = 1.5\)</span> and <span class="math inline">\(2\)</span>.</p><p><span class="takeaway fragment">Callaway-Sant’Anna ATT agrees with TWFE here because we held a single 2014 cohort — a clean robustness check.</span></p>
 <aside class="notes">
 <p>csdid handles staggered adoption and heterogeneous timing, where naive TWFE can mislead. At M-bar = 1.5 the lower bound is 0.004; at 2 it is −0.007 — nearly identical to the TWFE breakdown. With multiple cohorts and heterogeneous effects the two can diverge, which is why this comparison matters.</p>
 <style type="text/css">

@@ -68,7 +68,7 @@ Cash transfers are among the most common development interventions worldwide. Op
 | Endogenous treatment (IV) | ATE (receipt) | 0.147 |
 | **True effect** | — | **0.12** |
 
-[Twelve specifications, three estimands, one truth at $0.12$ — and *every* 95% CI covers it.]{.comment}
+[Twelve specifications, three estimands, one truth at $0.12$ — and *every* 95% CI covers it.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the spoiler table. Don't defend each row yet — just plant that the methods cluster tightly and the true value sits inside every interval. We earn each estimator in Act II and return to this picture at the close.
@@ -100,7 +100,7 @@ The roadmap mirrors the post's learning objectives. Each stage adds robustness: 
 - **Receipt** — `D`, endogenous: only 85% of offered households took up
 :::
 
-[State the wedge early: random `treat` is exogenous; actual `D` is a choice. Most of the deck estimates the *offer* effect; Act III's coda returns to *receipt*.]{.comment}
+[State the wedge early: random `treat` is exogenous; actual `D` is a choice. Most of the deck estimates the *offer* effect; Act III's coda returns to *receipt*.]{.takeaway .fragment}
 
 ::: {.notes}
 The simulated panel is strongly balanced — every household appears in both waves, no attrition. Distinguish offer (treat, exogenous by randomization) from receipt (D, endogenous by self-selection). 51.8% were offered; 46.15% received. That 5.65pp gap is the compliance problem we postpone to Act III.
@@ -124,7 +124,7 @@ The first thing to verify in any RCT. SMD is the scale-free imbalance measure: m
 | Female-headed | 0.484 | 0.531 | [0.093]{.key} |
 | Poverty | 0.307 | 0.318 | <0.05 |
 
-[$p = 0.038$ flags `female`, but the SMD of $9.3\%$ is the right lens — large $n$ makes tiny gaps "significant."]{.comment}
+[$p = 0.038$ flags `female`, but the SMD of $9.3\%$ is the right lens — large $n$ makes tiny gaps "significant."]{.takeaway .fragment}
 
 ::: {.notes}
 P-values mislead at large n — they flag a 4.6pp gender gap as "significant" while the SMD says it is small and below threshold. The lesson: judge balance with standardized differences, not p-values. We carry female (and the others) into estimation as precision controls.
@@ -136,7 +136,7 @@ $$\hat\tau_{\text{baseline}} = -0.024 \quad (p = 0.196)$$
 
 Run the doubly-robust estimator on **baseline only**, before the program exists. A null "effect" is exactly what a clean randomization predicts.
 
-[Overidentification test: $\chi^2(5) = 3.22$, $p = 0.667$ — no residual imbalance after weighting.]{.comment}
+[Overidentification test: $\chi^2(5) = 3.22$, $p = 0.667$ — no residual imbalance after weighting.]{.takeaway .fragment}
 
 ::: {.notes}
 This is a clever pre-flight: if randomization is real, a treatment effect estimated before treatment must be zero. AIPW returns -0.024, n.s., and the overid test fails to reject balance. It doubles as a soft introduction to doubly-robust estimation before we lean on it for real.
@@ -177,7 +177,7 @@ $$E[Y(1) - Y(0) \mid T = 1]$$
 :::
 ::::
 
-[Under randomization with homogeneous effects, ATE $=$ ATT. DiD will only ever give us the ATT.]{.comment}
+[Under randomization with homogeneous effects, ATE $=$ ATT. DiD will only ever give us the ATT.]{.takeaway .fragment}
 
 ::: {.notes}
 Name the estimand for every method — this is the discipline the post insists on. Cross-sectional teffects can target either ATE or ATT. DiD is structurally ATT-only because its counterfactual is built for the treated group. Foreshadow that distinction now.
@@ -185,7 +185,7 @@ Name the estimand for every method — this is the discipline the post insists o
 
 ## In an RCT, controls don't remove bias — they buy precision
 
-[Randomized treatment is independent of potential outcomes, so the raw difference in means is *already* unbiased.]{.comment}
+[Randomized treatment is independent of potential outcomes, so the raw difference in means is *already* unbiased.]{.takeaway .fragment}
 
 . . .
 
@@ -212,7 +212,7 @@ In observational studies the same controls would be doing the heavy lifting of i
 :::
 ::::
 
-[Doubly robust (AIPW / IPWRA) fits **both** — and is consistent if *either* one is correct.]{.comment}
+[Doubly robust (AIPW / IPWRA) fits **both** — and is consistent if *either* one is correct.]{.takeaway .fragment}
 
 ::: {.notes}
 RA predicts the missing counterfactual from an outcome model; IPW reweights observed outcomes by inverse propensity; DR stitches them together. Each fails in a different way — outcome misspecification vs. extreme weights — which is exactly why combining them is insurance.
@@ -224,7 +224,7 @@ $$\hat\tau_{DR}^{ATE} = \frac1N \sum_{i=1}^{N}\Big[\hat\mu_1(X_i) - \hat\mu_0(X_
 
 First two terms: the RA prediction. Last two: IPW residuals that cancel RA's bias.
 
-[Belt and suspenders: if the belt fails, the suspenders hold. Only *both* wrong is fatal.]{.comment}
+[Belt and suspenders: if the belt fails, the suspenders hold. Only *both* wrong is fatal.]{.takeaway .fragment}
 
 ::: {.notes}
 Walk the two pieces. If the outcome model is right, residuals average to zero and DR collapses to RA. If the propensity model is right, the weighted residuals fix the RA bias. Getting at least one model approximately right is far easier than getting both perfect — that is the whole appeal.
@@ -266,7 +266,7 @@ This is the Act-II payoff. The simple diff-in-means is 0.116; covariate-adjusted
 | IPWRA (doubly robust) | both | ATE | [0.113]{.key} | [0.075, 0.150] |
 | **True effect** | — | — | **0.12** | — |
 
-[Adjusted estimates ($0.113$) sit just below the raw $0.116$ — that gap *is* the precision gain from controlling for the gender imbalance.]{.comment}
+[Adjusted estimates ($0.113$) sit just below the raw $0.116$ — that gap *is* the precision gain from controlling for the gender imbalance.]{.takeaway .fragment}
 
 ::: {.notes}
 The convergence is the reassuring signal: when methods that model different things agree, you trust the design. The 0.003 drop from 0.116 to 0.113 is the covariate adjustment doing its precision job. In a messier observational dataset these rows would scatter, and DR would be the one to trust.
@@ -291,7 +291,7 @@ $$\hat\tau_{DiD} = \underbrace{(\bar Y_{T,post} - \bar Y_{T,pre})}_{\text{effect
 Treated change = effect + trend. Control change = trend alone.
 Subtract — the trend cancels.
 
-[Identification rides on **parallel trends** — plausible here because randomization equalized the groups at baseline.]{.comment}
+[Identification rides on **parallel trends** — plausible here because randomization equalized the groups at baseline.]{.takeaway .fragment}
 
 ::: {.notes}
 The control group's drift (e.g. nationwide income growth) is what the treated group would have experienced anyway. Subtracting it isolates the program. The identifying assumption is parallel trends, not equal levels — groups can start anywhere as long as they would have moved together absent treatment. Randomization makes that very credible.
@@ -317,7 +317,7 @@ $$\hat\tau_{DR}^{DiD} = \frac{1}{N_1}\sum_{i=1}^{N}\big[w_1(D_i) - w_0(D_i, X_i)
 
 Subtract the control-group's *predicted change* from each household's actual change $\Delta Y_i$, then IPW-reweight so controls resemble the treated. Consistent if **either** model is right.
 
-[Needs only **conditional** parallel trends — covariate-specific time trends are allowed.]{.comment}
+[Needs only **conditional** parallel trends — covariate-specific time trends are allowed.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the panel analogue of cross-sectional AIPW, applied to changes rather than levels. It relaxes parallel trends to a conditional version: trends can differ across covariate groups (poor vs non-poor) and the ATT is still identified. When both models are right it hits the semiparametric efficiency bound. It also dodges the heterogeneity traps of naive two-way fixed effects.
@@ -347,7 +347,7 @@ The community drdid package and Stata 17's built-in xthdidregress aipw return id
 | DR-DiD (`xthdidregress`) | ATT | both waves | 0.137 | [0.084, 0.191] |
 | **True effect** | — | — | **0.12** | — |
 
-[DiD's value is **not** a tighter SE — it is robustness to time-invariant unobservables.]{.comment}
+[DiD's value is **not** a tighter SE — it is robustness to time-invariant unobservables.]{.takeaway .fragment}
 
 ::: {.notes}
 The DiD estimates (0.135–0.137) sit slightly above the cross-sectional 0.113, but every interval brackets 0.12. The reason to reach for DiD is not precision — its SEs are wider — but insurance against fixed confounders that randomization would not be providing in an observational world.
@@ -362,7 +362,7 @@ Most of the deck estimated the *offer* (`treat`, intent-to-treat). The effect of
 | `etregress` (IV) | ATE (receipt) | 0.147 | [0.099, 0.195] |
 | `teffects ipwra` + $y_0$ | ATE (receipt) | [0.117]{.key} | [0.054, 0.180] |
 
-[The doubly-robust receipt estimate ($0.117$) lands closest to the truth; both cover $0.12$.]{.comment}
+[The doubly-robust receipt estimate ($0.117$) lands closest to the truth; both cover $0.12$.]{.takeaway .fragment}
 
 ::: {.notes}
 treat is the valid instrument for D: randomized, strongly predictive of receipt, affecting consumption only through the transfer. etregress gives 0.147 — larger than the offer effect because non-compliers dilute the ITT. The DR receipt estimate, controlling for baseline y0, is 0.117, nearest to 0.12. The Wald test rho=0 (p=0.901) finds no endogeneity, as expected in a clean RCT.

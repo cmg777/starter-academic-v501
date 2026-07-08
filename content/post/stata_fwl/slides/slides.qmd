@@ -88,7 +88,7 @@ Spoiler figure — don't explain the mechanism yet. Just plant that the left and
 - **Confounder** — `income`: rich areas get *fewer* coupons but buy *more*
 :::
 
-[Coupons and income are negatively linked (−0.71) — a backdoor the naive slope misses.]{.comment}
+[Coupons and income are negatively linked (−0.71) — a backdoor the naive slope misses.]{.takeaway .fragment}
 
 ::: {.notes}
 The store targets promotions at lower-income areas, so coupons and income are negatively linked (−0.71). Income also lifts sales. That opens a backdoor path the naive slope never blocks. The data-generating process is known: coupons → sales is +0.2, income → coupons is −0.5, income → sales is +0.3. Because we built it, we know the naive estimate is wrong on purpose. This is the controlled lab where we can check that FWL recovers the truth.
@@ -102,7 +102,7 @@ The store targets promotions at lower-income areas, so coupons and income are ne
 | income · coupons | −0.71 | store sends fewer coupons to rich areas |
 | income · sales | +0.50 | rich areas buy more |
 
-[The true coupon effect is +0.2 — the negative raw correlation is income leaking through.]{.comment}
+[The true coupon effect is +0.2 — the negative raw correlation is income leaking through.]{.takeaway .fragment}
 
 ::: {.notes}
 Walk the three rows. The first row is the trap. Rows two and three explain why: income is the hidden third variable correlated with both. Any tool that ignores income inherits this leak. That motivates partialling out.
@@ -114,7 +114,7 @@ $$\hat\beta_1=\frac{\operatorname{Cov}(\tilde y,\tilde x_1)}{\operatorname{Var}(
 
 Residualize both axes on $Z$, then read one slope — it **equals** the multiple-regression coefficient on $x_1$.
 
-[The tildes mean "the part $Z$ cannot explain." Two paths, one number.]{.comment}
+[The tildes mean "the part $Z$ cannot explain." Two paths, one number.]{.takeaway .fragment}
 
 ::: {.notes}
 Spell out the recipe aloud: regress $y$ on the controls $Z$ and keep the residual $\tilde y$; regress $x_1$ on $Z$ and keep $\tilde x_1$; the simple slope of $\tilde y$ on $\tilde x_1$ is the multiple-regression coefficient on $x_1$. This is the algebraic heart of the deck. The multivariate β₁ is not an approximation of the residual-on-residual slope — it is exactly that slope. Frisch & Waugh (1933) and Lovell (1963) proved it. Everything downstream — scatterfit, reghdfe, fixed effects — is this identity in disguise.
@@ -141,7 +141,7 @@ scatterfit (Ahrens 2024) is built on reghdfe. The controls() option does the FWL
 | income | — | 0.3004 | confounder, near true 0.3 |
 | R² | 0.028 | 0.321 | variation explained jumps |
 
-[The +0.212 lands right on the true effect of +0.2; income's coefficient lands on its true 0.3.]{.comment}
+[The +0.212 lands right on the true effect of +0.2; income's coefficient lands on its true 0.3.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the payoff of the controls() call as a table. The coupon coefficient goes from −0.093 (significant but wrong-signed) to +0.212. R² climbs from 0.03 to 0.32. The full regression on the right is exactly what the right-hand scatter on the spoiler slide was showing.
@@ -153,7 +153,7 @@ $$\text{bias}=\hat\gamma\times\hat\delta=0.300\times(-0.494)=-0.148$$
 
 $\hat\gamma$ is income's effect on sales; $\hat\delta$ is the coupons-on-income slope. The naive slope is the true slope plus this bias.
 
-[Nothing mysterious: a positive $\hat\gamma$ times a negative $\hat\delta$ drags the naive estimate down.]{.comment}
+[Nothing mysterious: a positive $\hat\gamma$ times a negative $\hat\delta$ drags the naive estimate down.]{.takeaway .fragment}
 
 ::: {.notes}
 OVB is the flip side of FWL. The bias the naive regression suffers is exactly γ̂ · δ̂ = 0.300 × (−0.494) = −0.148. True 0.212 plus bias −0.148 ≈ 0.064; the actual naive −0.093 differs only by sampling noise at n = 200. The point: the confounding is fully accounted for by one product of two slopes.
@@ -172,7 +172,7 @@ predict resid_coupons, residuals
 regress resid_sales resid_coupons      // slope = 0.212288
 ```
 
-[The manual slope 0.212288 equals the full-regression coefficient 0.212288 — not close, *identical*.]{.comment}
+[The manual slope 0.212288 equals the full-regression coefficient 0.212288 — not close, *identical*.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the proof-by-doing. Three regress/predict steps reproduce the multivariate coefficient to six decimals. It is an algebraic identity, not a numerical coincidence — which is why scatterfit can draw it as a single fitted line. The intercept on the residual regression is essentially zero, as FWL guarantees.
@@ -245,7 +245,7 @@ The Wooldridge wage panel: 545 individuals, 8 years. Panel A's wide fan is peopl
 :::
 ::::
 
-[The numbers match across all three because the datasets are identical — FWL is the same theorem everywhere.]{.comment}
+[The numbers match across all three because the datasets are identical — FWL is the same theorem everywhere.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the trilogy payoff. The naive −0.093, the controlled +0.212, the OVB −0.148 — identical across the R, Python, and Stata posts because they share the data. Stata's extras (binned scatters, on-plot regparameters) are conveniences, not different math. A student who learns FWL once can read it in any language.

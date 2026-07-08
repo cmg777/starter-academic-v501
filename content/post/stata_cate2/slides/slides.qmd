@@ -86,7 +86,7 @@ $$\tau(\mathbf{x}) = E\{Y_i(1) - Y_i(0) \mid \mathbf{X}_i = \mathbf{x}\}$$
 
 The **CATE** is the average effect for districts with covariate profile $\mathbf{x}$. Where $\tau(\mathbf{x})$ bends, mining helps some districts more than others.
 
-[A single ATE is just $E\{\tau(\mathbf{X})\}$ — this function averaged over everyone, discarding exactly the heterogeneity we want.]{.comment}
+[A single ATE is just $E\{\tau(\mathbf{X})\}$ — this function averaged over everyone, discarding exactly the heterogeneity we want.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the formal move from ATE to CATE. Y(1) and Y(0) are potential outcomes — we see only one per unit. Identification rests on conditional independence given X (unconfoundedness): once we condition on the covariates, treatment is as-good-as-random. Stata's cate estimates this whole function, then averages it to GATEs and the ATE.
@@ -101,7 +101,7 @@ This is the formal move from ATE to CATE. Y(1) and Y(0) are potential outcomes �
 - **Moderators** — executive constraints (1–6) and quality of government
 :::
 
-[Because the data-generating process is known, every estimate can be scored against its true value — a luxury real data never gives.]{.comment}
+[Because the data-generating process is known, every estimate can be scored against its true value — a luxury real data never gives.]{.takeaway .fragment}
 
 ::: {.notes}
 The treatment is highly imbalanced: 85% control, 5% in each treated price tier. This mirrors real mining data where few districts have active mines. The cate command handles it with honest random forests and sample-splitting. Ground-truth ATEs: 1-0 = 0.25, 3-1 = 0.30, 2-1 = 0.05.
@@ -124,7 +124,7 @@ The treatment is highly imbalanced: 85% control, 5% in each treated price tier. 
 :::
 ::::
 
-[Stata's `cate` needs a *binary* treatment, so we subset to two groups at a time and run a generalized random forest on each contrast.]{.comment}
+[Stata's `cate` needs a *binary* treatment, so we subset to two groups at a time and run a generalized random forest on each contrast.]{.takeaway .fragment}
 
 ::: {.notes}
 The six pairwise comparisons map directly onto the three paper findings. Mining-vs-none uses ~2,700 obs (well-identified); within-mining price contrasts use only ~300 obs (~150 per group), so expect wider CIs there.
@@ -178,7 +178,7 @@ catevars (x) drive heterogeneity; controls (w) are country/year fixed effects fo
 | 3 vs 1 | 0.414 | 0.30 |
 | 2 vs 1 | 0.099 | 0.05 |
 
-[Some confounders push the raw gap above the truth, some below — geography, institutions, and wealth all differ across mining status.]{.comment}
+[Some confounders push the raw gap above the truth, some below — geography, institutions, and wealth all differ across mining status.]{.takeaway .fragment}
 
 ::: {.notes}
 The naive difference-in-means mixes the causal effect with confounding. This is exactly what causal ML is for: adjust for the covariates flexibly and recover the true effect. The naive 1-vs-0 gap of 0.109 badly understates the 0.25 truth; cate will pull it back toward the right region.
@@ -249,7 +249,7 @@ Robustness: swap executive constraints for quality of government and the downwar
 | Weak institutions (exec $\leq 2$) | [0.297]{.key} | 0.022 | 558 |
 | Strong institutions (exec $\geq 4$) | 0.092 | 0.016 | 1,526 |
 
-[The mining effect is **more than three times larger** in weakly-governed districts — the same slope, now as a policy-ready contrast.]{.comment}
+[The mining effect is **more than three times larger** in weakly-governed districts — the same slope, now as a policy-ready contrast.]{.takeaway .fragment}
 
 ::: {.notes}
 estat ate on subsets turns the GATE curve into two numbers a policymaker can act on. Mining buys far more nighttime light in weakly-governed districts (0.297) than in strongly-governed ones (0.092). This is the targeting payoff of CATE: it tells you where the treatment works hardest.
