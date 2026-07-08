@@ -374,7 +374,7 @@ Tie back to the opening trade-off. Black-box research is unverifiable by constru
 
 . . .
 
-[Response.]{.rebuttal} AI **produces**; you **verify and decide**. The judgment — what question, which check, whether to trust the result — stays human. The tools make that judgment *easier to exercise*, not optional.
+[Response.]{.rebuttal} AI **produces**; you **design, verify and decide**. The judgment — what question, which check, whether to trust the result — stays human. The tools make that judgment *easier to exercise*, not optional.
 
 ::: {.notes}
 The ethos slide. Steelman the worry honestly, then answer: the division of labor is production (AI) versus verification and judgment (human). That is the whole thesis in one exchange.
