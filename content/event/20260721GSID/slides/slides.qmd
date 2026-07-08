@@ -300,19 +300,6 @@ The book's flagship case. It makes the abstract pipeline concrete: query satelli
 DS4Bolivia: 339 municipalities. Nighttime lights (log NTL per capita) proxy economic activity; 64-dimensional deep-learning embeddings of daytime imagery (Sentinel-2/Landsat) capture buildings, roads, and vegetation. Together they predict the Municipal Sustainable Development Index.
 :::
 
-## From indicators to inference: OLS first, then machine learning
-
-::: {.incremental}
-- **OLS baseline** — development ~ nighttime lights → about 60% of the variation explained
-- **Machine learning** — Random Forest, XGBoost → capture nonlinearities the line misses
-:::
-
-[Statistics → econometrics → machine learning, on data we gathered ourselves.]{.comment}
-
-::: {.notes}
-The analytical arc: start simple and interpretable (OLS, R-squared about 0.6), then let ML models exploit the richer signal. Once the indicators are in the notebook, the full toolkit is available.
-:::
-
 ## Exploration in Colab becomes a research project — managed in GitHub
 
 The notebook answered the question. Now make the work **reproducible and reviewable**.
