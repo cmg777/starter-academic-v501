@@ -12,5 +12,13 @@ $sep$
 $endfor$
   </div>
 $endif$
-  <p class="title-meta">$if(deck-author)$$if(deck-author-url)$<a href="$deck-author-url$">$deck-author$</a>$else$$deck-author$$endif$$endif$$for(institute)$ <span class="sep">&middot;</span> $institute$$endfor$$if(date)$ <span class="sep">&middot;</span> $date$$endif$</p>
+$if(deck-author)$
+  <p class="author">$if(deck-author-url)$<a href="$deck-author-url$">$deck-author$</a>$else$$deck-author$$endif$</p>
+$endif$
+$for(institute)$
+  <p class="institute">$institute$</p>
+$endfor$
+$if(date)$
+  <p class="date">$date$</p>
+$endif$
 </section>

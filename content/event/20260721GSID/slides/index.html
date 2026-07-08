@@ -138,7 +138,9 @@
     <span class="kr-arrow" aria-hidden="true">→</span>
     <div class="kr"><span class="kr-num">Research</span><span class="kr-cap">GitHub</span></div>
   </div>
-  <p class="title-meta"><a href="https://carlos-mendez.org">Carlos Mendez</a> <span class="sep">·</span> Nagoya University (GSID) <span class="sep">·</span> 2026</p>
+  <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
+  <p class="institute">Nagoya University</p>
+  <p class="date">2026</p>
 </section>
 <section>
 <section id="the-new-trade-off-in-the-age-of-ai" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -250,12 +252,14 @@
   color: #6a9bcc; font-weight: 700; font-size: 1.5em; line-height: 1;
   align-self: flex-start; margin-top: 0.15em;   /* sit against the Cinzel word, not the caption */
 }
-/* Footer meta — one tidy grey line: author · institute · year */
-.reveal #title-slide .title-meta {
-  margin: 0.6em 0 0; text-align: center; font-size: 0.62em; color: #6a6a68;
-}
-.reveal #title-slide .title-meta a { color: #6a9bcc; }
-.reveal #title-slide .title-meta .sep { color: #b7bcc4; margin: 0 0.15em; }
+/* Footer meta — three tidy stacked lines: author, institute, year */
+.reveal #title-slide .author,
+.reveal #title-slide .institute,
+.reveal #title-slide .date { text-align: center; line-height: 1.3; margin: 0.1em 0; }
+.reveal #title-slide .author { margin-top: 0.7em; font-size: 0.74em; }
+.reveal #title-slide .author a { color: #6a9bcc; }
+.reveal #title-slide .institute { font-size: 0.64em; color: #6a6a68; }
+.reveal #title-slide .date { font-size: 0.64em; color: #6a6a68; }
 </style>
 </section>
 <section id="producing-content-has-never-been-cheaper" class="slide level2 center">
