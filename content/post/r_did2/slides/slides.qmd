@@ -85,7 +85,7 @@ Teaching agenda built from the post's learning objectives. The thread through al
 
 [Act II]{.act}
 
-## The estimand: an ATT whose weight *is* the question
+## The estimand: an ATT whose weight *is* the question {.smaller}
 
 $$\text{ATT}_\omega(2014) = \big(\mathbb{E}_\omega[Y_{2014}\mid D{=}1] - \mathbb{E}_\omega[Y_{2013}\mid D{=}1]\big) - \big(\mathbb{E}_\omega[Y_{2014}\mid D{=}0] - \mathbb{E}_\omega[Y_{2013}\mid D{=}0]\big)$$
 
