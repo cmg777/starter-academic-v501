@@ -38,7 +38,7 @@ format:
 
 # The New Trade-off in the Age of AI {.divider background-color="#d97757"}
 
-[The shift]{.act}
+[The problem]{.act}
 
 <style>
 /* ===== workshop deck diagrams (brand-colored, em-scaled for reveal) ===== */
@@ -47,7 +47,7 @@ format:
 /* framed illustrative screenshots (the only <img> on slides are the 4 crops) */
 .reveal .slides img { border: 1px solid rgba(20,20,19,0.14); border-radius: 10px; box-shadow: 0 8px 30px rgba(20,20,19,0.20); }
 
-/* The shift — production vs verification 2x2, with L-shaped axes (arrows + low/high) */
+/* Trade-off 2x2 — production vs verification, with L-shaped axes (arrows + low/high) */
 .reveal .tradeoff {
   display: grid;
   grid-template-columns: auto auto 1fr;   /* [v-title][v-ticks][plot] */
