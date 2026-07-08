@@ -66,6 +66,10 @@ Options:
 If the post had **no** `results_report.md`, Q2 is mandatory — do not invent numbers;
 make the user supply or confirm them.
 
+The title strip is usually 3 **numbers**, but it can be 3 **word** labels naming an arc/tools
+(e.g. Learn / Explore / Research). Only a *word* strip is eligible for the optional
+pipeline-arrow treatment (slide-archetypes archetype 1) — never a numeric one.
+
 ---
 
 ## Round 3 (always): Outline checkpoint — the gate before writing

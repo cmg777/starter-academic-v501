@@ -119,6 +119,14 @@ every run. Any per-deck theming, off-palette color, or font override is a design
 violation **and** a branding-integrity (Dim 8) finding. Do not double-count —
 record it under Dim 8 and reference it from Dim 7.
 
+**Title slide.** The orange **accent rule** under the title and the **refined byline**
+(author name larger; institute + date smaller/grey) are theme-provided — expected, not
+violations. **One approved `title-slide.html` variation:** a *word* key-result strip may be
+connected as a pipeline by inserting a Pandoc `$sep$` block emitting `<span class="kr-arrow">`
+between items (the theme ships the dormant `.kr-arrow` style + `:nth-of-type` colors). So the
+Dim-8 `title-slide.html` diff may legitimately show just that arrow block. A **numeric** strip
+must NOT use arrows — flag that as a design error.
+
 ---
 
 ## Quick design verdict heuristics

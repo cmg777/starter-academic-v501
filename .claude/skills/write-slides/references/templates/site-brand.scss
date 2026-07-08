@@ -20,7 +20,7 @@ $font-family-monospace:  "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consola
 
 // Reveal sizing + base colors
 $presentation-font-size-root: 34px;
-$body-bg:    #ffffff;
+$body-bg:    #f6f8fb;
 $body-color: $ink;
 $link-color: $steel;
 $link-color-hover: $teal;
@@ -93,6 +93,15 @@ $presentation-list-bullet-color: $steel;
 .reveal .takeaway.fragment.visible { transform: translateY(0); }
 .reveal strong { color: $heading; }
 
+// --- Title slide: thin orange accent rule under the title (title slide only —
+//     distinct from the .slides section h2 assertion underline; dividers use section.divider h1) ---
+.reveal #title-slide .title { margin-bottom: 0; }
+.reveal #title-slide .title::after {
+  content: ""; display: block; width: 2.6em; height: 3px;
+  background: $orange; border-radius: 2px; margin: 0.4em auto 0.55em;
+}
+.reveal #title-slide .subtitle { color: lighten($ink, 25%); font-size: 1.05em; letter-spacing: 0.01em; margin: 0 0 0.2em; }
+
 // --- Title-slide key-result strip (rendered by title-slide.html partial) ---
 .reveal .title-result-strip {
   display: flex; justify-content: center; gap: 1.6em; flex-wrap: wrap;
@@ -102,14 +111,30 @@ $presentation-list-bullet-color: $steel;
 .reveal .title-result-strip .kr-num {
   font-family: "Cinzel", serif; font-weight: 700; font-size: 1.9em; line-height: 1;
 }
-.reveal .title-result-strip .kr:nth-child(1) .kr-num { color: $orange; }
-.reveal .title-result-strip .kr:nth-child(2) .kr-num { color: $teal; }
-.reveal .title-result-strip .kr:nth-child(3) .kr-num { color: $steel; }
+// Colors by .kr order via :nth-of-type — robust to interleaved .kr-arrow spans (the optional
+// pipeline recipe); identical result when there are no arrows.
+.reveal .title-result-strip .kr:nth-of-type(1) .kr-num { color: $orange; }
+.reveal .title-result-strip .kr:nth-of-type(2) .kr-num { color: $teal; }
+.reveal .title-result-strip .kr:nth-of-type(3) .kr-num { color: $steel; }
 .reveal .title-result-strip .kr-cap {
   font-size: 0.42em; color: lighten($ink, 35%); margin-top: 0.35em;
   text-transform: uppercase; letter-spacing: 0.09em;
 }
-.reveal .title-slide .subtitle { color: lighten($ink, 25%); }
+// Dormant: styles the optional pipeline arrows between WORD key-results (see slide-archetypes
+// archetype 1). Inert unless title-slide.html emits <span class="kr-arrow">→</span> via $sep$.
+.reveal .title-result-strip .kr-arrow {
+  color: $steel; font-weight: 700; font-size: 1.5em; line-height: 1;
+  align-self: flex-start; margin-top: 0.15em;
+}
+
+// --- Title-slide byline: author is the primary line; institute + date smaller/grey ---
+.reveal #title-slide .author,
+.reveal #title-slide .institute,
+.reveal #title-slide .date { text-align: center; line-height: 1.3; margin: 0.1em 0; }
+.reveal #title-slide .author { margin-top: 0.7em; font-size: 0.95em; }
+.reveal #title-slide .author a { color: $steel; }
+.reveal #title-slide .institute { font-size: 0.64em; color: lighten($ink, 35%); }
+.reveal #title-slide .date { font-size: 0.64em; color: lighten($ink, 35%); }
 
 // --- Section dividers: full-bleed brand colour, white centred Cinzel ---
 .reveal section.divider h1,

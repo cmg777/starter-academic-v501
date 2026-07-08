@@ -201,6 +201,11 @@ before `y`.
 
 ### 3.2 Copy verbatim templates
 Copy unchanged from `references/templates/`: **`site-brand.scss`** and **`title-slide.html`**.
+The theme gives the title slide a thin orange **accent rule** + a **refined byline** (author
+primary; institute/date smaller/grey) automatically. **Optional:** if the `key-results` are
+*word* labels forming an arc (Learn → Explore → Research), connect them with the pipeline-arrow
+`$sep$` edit to `title-slide.html` (slide-archetypes archetype 1) — the one approved
+`title-slide.html` variation; **word strips only, never numeric key-results**.
 
 ### 3.3 Author `slides.qmd`
 Start from `references/templates/slides.qmd.tmpl`. Fill the front matter: `title`/`subtitle`;
@@ -333,3 +338,6 @@ suggest the matching `render-and-fix.md` entry; offer a re-run.
 9. **Takeaway cards.** Substantive content slides end with a `[…]{.takeaway .fragment}` card
    (renders as the orange accent card, rises/fades in last); `.comment` is used only for small
    figure/equation glosses, not for the slide's concluding takeaway.
+10. **Title-slide polish.** The title slide shows the orange accent rule under the title and the
+    refined byline (author larger; institute/date smaller/grey). A word-strip deck may use the
+    `$sep$` pipeline arrows; a numeric-strip deck must NOT (colors stay orange/teal/steel).

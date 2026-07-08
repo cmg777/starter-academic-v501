@@ -44,6 +44,26 @@ key-results:                 # 3 headline numbers → the centred brand-coloured
 `deck-author-url` are custom fields the partial reads; Quarto's structured `author:` schema
 doesn't expose name+url cleanly in the revealjs title-slide partial, so we bypass it.)
 
+**Automatic polish (theme).** The title slide gets a thin orange **accent rule** under the title
+and a **refined byline** (author name larger/primary; institute + date smaller/grey) for free —
+no markup needed; both live in `site-brand.scss`.
+
+**Optional — connect a WORD strip as a pipeline.** When the three `key-results` are *word*
+labels that form an arc (e.g. `Learn` → `Explore` → `Research`), you can render them as a
+connected flow. Add Pandoc's `$sep$` between the loop items in this deck's `title-slide.html`
+(the strip's colors already use `:nth-of-type`, so they survive the interleaved spans, and the
+theme ships a dormant `.kr-arrow` style):
+```
+$for(key-results)$
+    <div class="kr"><span class="kr-num">$key-results.num$</span><span class="kr-cap">$key-results.cap$</span></div>
+$sep$
+    <span class="kr-arrow" aria-hidden="true">&rarr;</span>
+$endfor$
+```
+Optionally tighten the strip in this deck (`.title-result-strip { gap: 0.9em; }`).
+**Word strips only — never numeric key-results** (arrows between `−0.096` / `+0.019` / `284`
+are nonsense). Reference: `content/event/20260721GSID/slides/`.
+
 ---
 
 ## 2. Agenda (optional)

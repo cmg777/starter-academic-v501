@@ -144,7 +144,9 @@ See `design-adherence.md` for the full rubric.
 
 - [ ] `diff` `slides/site-brand.scss` against
       `write-slides/references/templates/site-brand.scss` — must be empty.
-- [ ] `diff` `slides/title-slide.html` against the template — must be empty.
+- [ ] `diff` `slides/title-slide.html` against the template — must be empty, EXCEPT the one
+      approved variation: a `$sep$` block emitting `<span class="kr-arrow">` to connect a *word*
+      key-result strip as a pipeline (see design-adherence). A numeric strip must not use it.
 - [ ] Title-strip stats use the three brand colors (orange `#d97757`, teal
       `#00d4c8`, steel `#6a9bcc`); no off-palette hex introduced in `slides.qmd`.
 - [ ] `center: true`, chalkboard, menu, overview still enabled in front matter.
