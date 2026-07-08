@@ -38,7 +38,7 @@ format:
 
 # The New Trade-off in the Age of AI {.divider background-color="#d97757"}
 
-[Act I]{.act}
+[The shift]{.act}
 
 <style>
 /* ===== workshop deck diagrams (brand-colored, em-scaled for reveal) ===== */
@@ -47,7 +47,7 @@ format:
 /* framed illustrative screenshots (the only <img> on slides are the 4 crops) */
 .reveal .slides img { border: 1px solid rgba(20,20,19,0.14); border-radius: 10px; box-shadow: 0 8px 30px rgba(20,20,19,0.20); }
 
-/* Act I — production vs verification 2x2, with L-shaped axes (arrows + low/high) */
+/* The shift — production vs verification 2x2, with L-shaped axes (arrows + low/high) */
 .reveal .tradeoff {
   display: grid;
   grid-template-columns: auto auto 1fr;   /* [v-title][v-ticks][plot] */
@@ -185,42 +185,6 @@ Name the stakes for both halves of the talk. Black-box learning erodes understan
 
 ::: {.notes}
 The roadmap. Each tool maps to a stage of the research life cycle and to a place where verification has to live. Keep it a promise, not a summary.
-:::
-
-# Working With AI: Three Tools, One Discipline {.divider background-color="#6a9bcc"}
-
-[Act II]{.act}
-
-## From "prompt engineering" to designing AI agent skills
-
-A one-off clever prompt is fragile. A **skill** is reusable — and it can carry its own checks.
-
-::: {.incremental}
-- generates **consistent** outputs
-- defines **sequential** tasks
-- applies **verification** tests
-:::
-
-[Stop tuning prompts; start designing the agent's skills.]{.comment}
-
-::: {.notes}
-The mindset shift. Prompt engineering optimizes a single interaction; skill design encodes a repeatable procedure with checks built in. This is the discipline that makes the three tools trustworthy.
-:::
-
-## Great AI work starts with planning — and clarifying questions
-
-Before it executes, make the AI **plan** and **ask**:
-
-> *"Before you start, ask me questions until you are 95% confident you understand exactly what I need. Do not make any assumptions."*
-
-::: {.incremental}
-- activate **planning mode** first
-- supply **reference materials** and examples
-- build **verification** into the task
-:::
-
-::: {.notes}
-This slide is self-referential — it is the exact instruction that produced this deck. Clarifying questions up front remove assumptions, which is where AI quality is won or lost.
 :::
 
 # NotebookLM — Learn {.divider background-color="#141413"}
@@ -408,7 +372,7 @@ GitHub manages the discussion of the **code**, the **results**, and the **story*
 [Every claim traces back to the commit that produced it.]{.comment}
 
 ::: {.notes}
-Tie back to Act I. Black-box research is unverifiable by construction; a version-controlled environment makes verification the default. And in the age of AI the barrier is low — your AI agent can teach you Git as you go.
+Tie back to the opening trade-off. Black-box research is unverifiable by construction; a version-controlled environment makes verification the default. And in the age of AI the barrier is low — your AI agent can teach you Git as you go.
 :::
 
 ## But doesn't AI just do the work for me?
@@ -425,7 +389,7 @@ The ethos slide. Steelman the worry honestly, then answer: the division of labor
 
 # One Integrated Workflow {.divider background-color="#00d4c8"}
 
-[Act III]{.act}
+[Putting it together]{.act}
 
 ## Learn → Explore → Research: NotebookLM, Colab, GitHub in one loop
 
@@ -448,7 +412,7 @@ The payoff picture. Understand a topic with NotebookLM, explore and analyze data
 ::: {.incremental}
 1. **Understand the trade-off** — AI cuts production cost, so verification becomes the job.
 2. **AI assists both learning and research** — but only with verification built in.
-3. **Integrate the tools** — agentic skills with NotebookLM, Colab, and GitHub serve *both* production and verification.
+3. **Integrate the tools** — NotebookLM, Colab, and GitHub together serve *both* production and verification.
 :::
 
 ::: {.notes}

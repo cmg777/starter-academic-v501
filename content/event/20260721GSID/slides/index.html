@@ -143,7 +143,7 @@
 <section>
 <section id="the-new-trade-off-in-the-age-of-ai" class="title-slide slide level1 divider center" data-background-color="#d97757">
 <h1>The New Trade-off in the Age of AI</h1>
-<p><span class="act">Act I</span></p>
+<p><span class="act">The shift</span></p>
 <style>
 /* ===== workshop deck diagrams (brand-colored, em-scaled for reveal) ===== */
 .reveal .dgram-arrow { color: #6a9bcc; font-weight: 700; font-size: 1.4em; margin: 0 0.1em; }
@@ -151,7 +151,7 @@
 /* framed illustrative screenshots (the only <img> on slides are the 4 crops) */
 .reveal .slides img { border: 1px solid rgba(20,20,19,0.14); border-radius: 10px; box-shadow: 0 8px 30px rgba(20,20,19,0.20); }
 
-/* Act I — production vs verification 2x2, with L-shaped axes (arrows + low/high) */
+/* The shift — production vs verification 2x2, with L-shaped axes (arrows + low/high) */
 .reveal .tradeoff {
   display: grid;
   grid-template-columns: auto auto 1fr;   /* [v-title][v-ticks][plot] */
@@ -327,59 +327,6 @@ Cost of production
 </ul>
 <aside class="notes">
 <p>The roadmap. Each tool maps to a stage of the research life cycle and to a place where verification has to live. Keep it a promise, not a summary.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section></section>
-<section>
-<section id="working-with-ai-three-tools-one-discipline" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
-<h1>Working With AI: Three Tools, One Discipline</h1>
-<p><span class="act">Act II</span></p>
-</section>
-<section id="from-prompt-engineering-to-designing-ai-agent-skills" class="slide level2 center">
-<h2>From “prompt engineering” to designing AI agent skills</h2>
-<p>A one-off clever prompt is fragile. A <strong>skill</strong> is reusable — and it can carry its own checks.</p>
-<ul>
-<li class="fragment">generates <strong>consistent</strong> outputs</li>
-<li class="fragment">defines <strong>sequential</strong> tasks</li>
-<li class="fragment">applies <strong>verification</strong> tests</li>
-</ul>
-<p><span class="comment">Stop tuning prompts; start designing the agent’s skills.</span></p>
-<aside class="notes">
-<p>The mindset shift. Prompt engineering optimizes a single interaction; skill design encodes a repeatable procedure with checks built in. This is the discipline that makes the three tools trustworthy.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="great-ai-work-starts-with-planning-and-clarifying-questions" class="slide level2 center">
-<h2>Great AI work starts with planning — and clarifying questions</h2>
-<p>Before it executes, make the AI <strong>plan</strong> and <strong>ask</strong>:</p>
-<blockquote>
-<p><em>“Before you start, ask me questions until you are 95% confident you understand exactly what I need. Do not make any assumptions.”</em></p>
-</blockquote>
-<ul>
-<li class="fragment">activate <strong>planning mode</strong> first</li>
-<li class="fragment">supply <strong>reference materials</strong> and examples</li>
-<li class="fragment">build <strong>verification</strong> into the task</li>
-</ul>
-<aside class="notes">
-<p>This slide is self-referential — it is the exact instruction that produced this deck. Clarifying questions up front remove assumptions, which is where AI quality is won or lost.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -697,7 +644,7 @@ Cost of production
 <p>GitHub manages the discussion of the <strong>code</strong>, the <strong>results</strong>, and the <strong>story</strong> of the manuscript.</p>
 <p><span class="comment">Every claim traces back to the commit that produced it.</span></p>
 <aside class="notes">
-<p>Tie back to Act I. Black-box research is unverifiable by construction; a version-controlled environment makes verification the default. And in the age of AI the barrier is low — your AI agent can teach you Git as you go.</p>
+<p>Tie back to the opening trade-off. Black-box research is unverifiable by construction; a version-controlled environment makes verification the default. And in the age of AI the barrier is low — your AI agent can teach you Git as you go.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -733,7 +680,7 @@ Cost of production
 <section>
 <section id="one-integrated-workflow" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
 <h1>One Integrated Workflow</h1>
-<p><span class="act">Act III</span></p>
+<p><span class="act">Putting it together</span></p>
 </section>
 <section id="learn-explore-research-notebooklm-colab-github-in-one-loop" class="slide level2 center">
 <h2>Learn → Explore → Research: NotebookLM, Colab, GitHub in one loop</h2>
@@ -772,7 +719,7 @@ Cost of production
 <ol type="1">
 <li class="fragment"><strong>Understand the trade-off</strong> — AI cuts production cost, so verification becomes the job.</li>
 <li class="fragment"><strong>AI assists both learning and research</strong> — but only with verification built in.</li>
-<li class="fragment"><strong>Integrate the tools</strong> — agentic skills with NotebookLM, Colab, and GitHub serve <em>both</em> production and verification.</li>
+<li class="fragment"><strong>Integrate the tools</strong> — NotebookLM, Colab, and GitHub together serve <em>both</em> production and verification.</li>
 </ol>
 <aside class="notes">
 <p>Keep it to three; each maps to one act of the talk.</p>
