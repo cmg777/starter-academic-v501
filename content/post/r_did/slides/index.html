@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Difference-in-Differences for Policy Evaluation</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -236,7 +236,7 @@
 <p>From 2001–2007 the federal minimum wage sat frozen at <strong>$5.15/hour</strong>, while states raised their own floors at <em>different times</em>.</p>
 <div class="fragment">
 <p>Counties fall into cohorts indexed by their first-increase year <span class="math inline">\(G \in \{0, 2004, 2006\}\)</span>: 102 treated in 2004, 226 in 2006, and <strong>1,417 never-treated</strong>.</p>
-<p><span class="comment">Staggered adoption: there is no single “before” and “after” for the country — each state has its own clock.</span></p>
+<p><span class="takeaway fragment">Staggered adoption: there is no single “before” and “after” for the country — each state has its own clock.</span></p>
 <aside class="notes">
 <p>Staggered treatment timing is the source of all the trouble. With a single common treatment date, TWFE is fine. The moment treatment dates differ across units, TWFE starts making comparisons it should not. 8,725 county-year observations, 1,745 counties, 2003–2007.</p>
 <style type="text/css">
@@ -287,7 +287,7 @@
 <h2>Identification rests on one assumption: parallel trends</h2>
 <p><span class="math display">\[\mathrm{ATT} = E[\Delta Y_{t^{\ast}} \mid D=1] - E[\Delta Y_{t^{\ast}} \mid D=0]\]</span></p>
 <p>The treated group’s change in outcomes, <em>minus</em> the comparison group’s change. Valid <strong>only if</strong> both groups would have moved in parallel absent treatment.</p>
-<p><span class="comment">The estimand is the ATT — the effect on the counties that actually raised their wage.</span></p>
+<p><span class="takeaway fragment">The estimand is the ATT — the effect on the counties that actually raised their wage.</span></p>
 <aside class="notes">
 <p>Notation: D=1 treated, D=0 untreated, ΔY the pre-to-post change. Parallel trends is the identifying assumption, and it is not directly testable — pre-trends near zero are necessary but not sufficient. State this estimand clearly: ATT, not ATE. We never claim an effect for counties that didn’t change their wage.</p>
 <style type="text/css">
@@ -309,7 +309,7 @@
 <li class="fragment"><strong>Good:</strong> treated vs <em>not-yet-treated</em> or <em>never-treated</em></li>
 <li class="fragment"><strong>Bad:</strong> later-treated vs <em>already-treated</em> — the control is itself under treatment</li>
 </ul>
-<p><span class="comment">Like grading a student’s improvement against classmates who already took the test — the “control” already saw the answer key.</span></p>
+<p><span class="takeaway fragment">Like grading a student’s improvement against classmates who already took the test — the “control” already saw the answer key.</span></p>
 <aside class="notes">
 <p>Under treatment-effect heterogeneity the TWFE coefficient is a weighted average of group-time effects, and some weights go negative. In principle TWFE could return a negative estimate even if every true effect were positive. This is the de Chaisemartin–D’Haultfœuille / Goodman-Bacon critique in one slide.</p>
 <style type="text/css">
@@ -328,7 +328,7 @@
 <h2>The fix: estimate one clean effect per cohort × period, then aggregate</h2>
 <p><span class="math display">\[\mathrm{ATT}(g,t) = E[\,Y_t(g) - Y_t(0) \mid G = g\,]\]</span></p>
 <p>The effect for cohort <span class="math inline">\(g\)</span>, measured in calendar period <span class="math inline">\(t\)</span> — each cell compared <em>only</em> to clean (never- or not-yet-treated) controls.</p>
-<p><span class="comment">Callaway–Sant’Anna (2021): separate identification from estimation. Build the grid of <span class="math inline">\(\mathrm{ATT}(g,t)\)</span> first, average it later.</span></p>
+<p><span class="takeaway fragment">Callaway–Sant’Anna (2021): separate identification from estimation. Build the grid of <span class="math inline">\(\mathrm{ATT}(g,t)\)</span> first, average it later.</span></p>
 <aside class="notes">
 <p>This is the conceptual heart. Instead of one regression coefficient, we get a grid of building-block parameters, each identified by a clean comparison under parallel trends. No forbidden comparisons can enter, by construction.</p>
 <style type="text/css">
@@ -410,7 +410,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">TWFE <em>understated</em> the negative effect by about a third — attenuated toward zero.</span></p>
+<p><span class="takeaway fragment">TWFE <em>understated</em> the negative effect by about a third — attenuated toward zero.</span></p>
 <aside class="notes">
 <p>The overall ATT weights each ATT(g,t) by group size and number of post periods. Group-level: G=2004 at −0.089 (treated longer, more dynamics) vs G=2006 at −0.043. The headline contrast is −0.057 vs −0.038.</p>
 <style type="text/css">
@@ -492,7 +492,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Three independent modeling routes agree — no model-dependence artifact.</span></p>
+<p><span class="takeaway fragment">Three independent modeling routes agree — no model-dependence artifact.</span></p>
 <aside class="notes">
 <p>Conditional parallel trends: trends need only be parallel after conditioning on log population and log average pay. Doubly robust = belt and suspenders: consistent if EITHER the outcome regression OR the propensity score is right. Going from −0.057 to −0.065 is a small, sensible move once county characteristics are netted out.</p>
 <style type="text/css">

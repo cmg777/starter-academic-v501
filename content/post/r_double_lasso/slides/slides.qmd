@@ -88,7 +88,7 @@ Spoiler figure. Don't explain every bar yet — just plant that the estimators d
 - **Controls** — 8 original covariates expanded to **284** (lags, interactions, trends)
 :::
 
-[State fixed effects absorbed by first-differencing; year effects partialled out (Frisch–Waugh–Lovell). $p/n \approx 0.49$ — the high-dimensional regime where Double LASSO is meant to help.]{.comment}
+[State fixed effects absorbed by first-differencing; year effects partialled out (Frisch–Waugh–Lovell). $p/n \approx 0.49$ — the high-dimensional regime where Double LASSO is meant to help.]{.takeaway .fragment}
 
 ## Five estimators ask the same question with escalating discipline
 
@@ -108,7 +108,7 @@ Spoiler figure. Don't explain every bar yet — just plant that the estimators d
 | Property | −0.108 | 0.022 | yes |
 | Murder | −0.204 | 0.067 | yes |
 
-[This is the result the four LASSO methods stress-test — not one they generate.]{.comment}
+[This is the result the four LASSO methods stress-test — not one they generate.]{.takeaway .fragment}
 
 ::: {.notes}
 All three negative and significant with state-clustered standard errors (48 clusters). A one-unit rise in the differenced abortion rate ≈ a 15% fall in violent crime. Does this survive adding 284 controls?
@@ -130,7 +130,7 @@ $$\hat\beta(\lambda)=\arg\min_\beta\ \frac{1}{2n}\sum_{i=1}^{n}\big(y_i-x_i^\top
 
 Run it twice — once for $y$ on $X$ (set $I_y$), once for $d$ on $X$ (set $I_d$) — then OLS of $y$ on $d$ and the **union** $I_y\cup I_d$.
 
-[The L1 penalty $\lambda\sum_j|\beta_j|$ zeroes weak controls; the union keeps anything that predicts *either* side.]{.comment}
+[The L1 penalty $\lambda\sum_j|\beta_j|$ zeroes weak controls; the union keeps anything that predicts *either* side.]{.takeaway .fragment}
 
 ::: {.notes}
 PSL selects only on y, so it can drop a control that predicts the treatment but not the outcome — exactly the omitted variable that biases α. Double LASSO's second LASSO (d on X) catches it. Frisch–Waugh–Lovell guarantees the post-OLS α is unbiased if the union captures the confounding.

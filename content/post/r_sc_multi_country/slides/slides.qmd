@@ -67,7 +67,7 @@ The estimand throughout is the ATT per treated country: actual minus synthetic, 
 - The bridge — the Augmented SCM adds a Ridge bias-correction that earns its keep only on hard cases
 :::
 
-[We never trust a number on real data that the same method could not first recover on simulated ground truth.]{.comment}
+[We never trust a number on real data that the same method could not first recover on simulated ground truth.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the deck's spine: validate-then-trust. The simulated panel is the lab; the euro replication is the field. The augmentation (Ridge outcome model) is the safety net that sits quietly until the pre-treatment fit is poor.
@@ -107,7 +107,7 @@ This is the deck's spine: validate-then-trust. The simulated panel is the lab; t
 :::
 ::::
 
-[Formula mini-language: `outcome ~ treatment | covariates`.]{.comment}
+[Formula mini-language: `outcome ~ treatment | covariates`.]{.takeaway .fragment}
 
 ::: {.notes}
 The post opens with a Mermaid flowchart; reveal.js does not bundle mermaid, so it is re-expressed here as a two-column routing slide. The key point is that routing is by shape — count treated units and outcomes — and all three then share the same SCM-plus-Ridge machinery and the same ATT definition.
@@ -127,7 +127,7 @@ $$W^{\star} = \arg\min_{W \in \Delta}\ \lVert X_1 - X_0 W \rVert_V \quad\text{s.
 
 $$\hat\tau_t^{\,\mathrm{aug}} = \Big(Y_{1t} - \sum_j w_j Y_{jt}\Big) - \Big(\hat m_t(X_1) - \sum_j w_j\,\hat m_t(X_j)\Big)$$
 
-[The first term is the plain SCM gap; the second is the Ridge correction $\hat m_t$. Perfect pre-fit → correction vanishes → ASCM $=$ SCM.]{.comment}
+[The first term is the plain SCM gap; the second is the Ridge correction $\hat m_t$. Perfect pre-fit → correction vanishes → ASCM $=$ SCM.]{.takeaway .fragment}
 
 ::: {.notes}
 W lives on the simplex Δ — non-negative weights summing to one, so the synthetic interpolates donors and never extrapolates. The augmented estimator is doubly robust: it is the SCM gap minus what the prognostic model m-hat (a Ridge regression on lagged outcomes) predicts the residual imbalance to be. When the donors already reproduce m-hat(X1), the correction is zero. This is why augmentation is insurance, not a free lunch.
@@ -242,7 +242,7 @@ Strong agreement given augsynth uses a different estimator and donor-matching sc
 
 ![ASCM vs Papaioannou (2021): per-member TFP % contributions cluster around the 45-degree line, Spearman 0.74.](../r_sc_multi_country_16_paper_vs_ascm_scatter.png)
 
-[We do not reproduce the paper's numbers exactly — and should not. Same signs, same ranking, same dynamic story is the right bar.]{.comment}
+[We do not reproduce the paper's numbers exactly — and should not. Same signs, same ranking, same dynamic story is the right bar.]{.takeaway .fragment}
 
 ::: {.notes}
 The estimators differ, so exact matches are not expected. All 12 members are positive in 2000–07. The scatter is the visual verdict: a method comparison passes when the qualitative pattern replicates, not when the decimals match.

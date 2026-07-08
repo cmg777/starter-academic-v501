@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Double LASSO for Causal Inference</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-11fbf5f7b3ad2307d449591d5e123d26.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -269,7 +269,7 @@
 <li class="fragment"><strong>Treatment</strong> — the “effective abortion rate”</li>
 <li class="fragment"><strong>Controls</strong> — 8 original covariates expanded to <strong>284</strong> (lags, interactions, trends)</li>
 </ul>
-<p><span class="comment">State fixed effects absorbed by first-differencing; year effects partialled out (Frisch–Waugh–Lovell). <span class="math inline">\(p/n \approx 0.49\)</span> — the high-dimensional regime where Double LASSO is meant to help.</span></p>
+<p><span class="takeaway fragment">State fixed effects absorbed by first-differencing; year effects partialled out (Frisch–Waugh–Lovell). <span class="math inline">\(p/n \approx 0.49\)</span> — the high-dimensional regime where Double LASSO is meant to help.</span></p>
 </section>
 <section id="five-estimators-ask-the-same-question-with-escalating-discipline" class="slide level2 center">
 <h2>Five estimators ask the same question with escalating discipline</h2>
@@ -313,7 +313,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">This is the result the four LASSO methods stress-test — not one they generate.</span></p>
+<p><span class="takeaway fragment">This is the result the four LASSO methods stress-test — not one they generate.</span></p>
 <aside class="notes">
 <p>All three negative and significant with state-clustered standard errors (48 clusters). A one-unit rise in the differenced abortion rate ≈ a 15% fall in violent crime. Does this survive adding 284 controls?</p>
 <style type="text/css">
@@ -350,7 +350,7 @@
 <h2>Double LASSO selects on the outcome <em>and</em> the treatment, then runs OLS</h2>
 <p><span class="math display">\[\hat\beta(\lambda)=\arg\min_\beta\ \frac{1}{2n}\sum_{i=1}^{n}\big(y_i-x_i^\top\beta\big)^2+\lambda\sum_{j=1}^{p}|\beta_j|\]</span></p>
 <p>Run it twice — once for <span class="math inline">\(y\)</span> on <span class="math inline">\(X\)</span> (set <span class="math inline">\(I_y\)</span>), once for <span class="math inline">\(d\)</span> on <span class="math inline">\(X\)</span> (set <span class="math inline">\(I_d\)</span>) — then OLS of <span class="math inline">\(y\)</span> on <span class="math inline">\(d\)</span> and the <strong>union</strong> <span class="math inline">\(I_y\cup I_d\)</span>.</p>
-<p><span class="comment">The L1 penalty <span class="math inline">\(\lambda\sum_j|\beta_j|\)</span> zeroes weak controls; the union keeps anything that predicts <em>either</em> side.</span></p>
+<p><span class="takeaway fragment">The L1 penalty <span class="math inline">\(\lambda\sum_j|\beta_j|\)</span> zeroes weak controls; the union keeps anything that predicts <em>either</em> side.</span></p>
 <aside class="notes">
 <p>PSL selects only on y, so it can drop a control that predicts the treatment but not the outcome — exactly the omitted variable that biases α. Double LASSO’s second LASSO (d on X) catches it. Frisch–Waugh–Lovell guarantees the post-OLS α is unbiased if the union captures the confounding.</p>
 <style type="text/css">

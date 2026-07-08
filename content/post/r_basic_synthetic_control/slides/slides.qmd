@@ -86,7 +86,7 @@ $$\alpha_{1t} = Y_{1t} - Y_{1t}^{N}, \quad t \geq 1970$$
 
 Treatment effect = actual GDP minus the no-conflict counterfactual $Y_{1t}^{N}$.
 
-[The fundamental problem: $Y_{1t}^{N}$ is never observed. Synthetic control estimates it as a weighted average of donor regions.]{.comment}
+[The fundamental problem: $Y_{1t}^{N}$ is never observed. Synthetic control estimates it as a weighted average of donor regions.]{.takeaway .fragment}
 
 ::: {.notes}
 State the estimand explicitly: the average treatment effect on the treated, year by year. Y₁ₜ is realized; Y₁ₜ^N is the missing potential outcome. Everything in the method is machinery to estimate that one unobserved quantity credibly.
@@ -98,7 +98,7 @@ $$\hat{\alpha}_{1t} = Y_{1t} - \sum_{j=2}^{18} w_j^{*}\, Y_{jt}, \quad t \geq 19
 
 The donor weights $w_j^{*}$ are non-negative, sum to one, and are picked to match the Basque *pre-treatment* predictors.
 
-[If the pre-1970 match is good, the post-1970 gap is the most plausible estimate of the conflict's cost.]{.comment}
+[If the pre-1970 match is good, the post-1970 gap is the most plausible estimate of the conflict's cost.]{.takeaway .fragment}
 
 ::: {.notes}
 The estimator is the actual outcome minus the synthetic outcome. The synthetic is a convex combination of the 16 donor regions. The identifying logic: match the observables before treatment, and — under the factor-model assumptions of Abadie et al. — the unobservable counterfactual is matched too.
@@ -113,7 +113,7 @@ The estimator is the actual outcome minus the synthetic outcome. The synthetic i
 - **Predictors** — 13 covariates: education, investment, sector shares, density
 :::
 
-[774 rows = 18 regions × 43 years. Pre-treatment window 1955–1969; post-treatment evaluation 1970–1997.]{.comment}
+[774 rows = 18 regions × 43 years. Pre-treatment window 1955–1969; post-treatment evaluation 1970–1997.]{.takeaway .fragment}
 
 ::: {.notes}
 The basque panel ships with the Synth package. Region 1 is the Spanish national aggregate, which we drop. The pre-treatment outcomes Z are annual GDP over 1960–1969; the predictors X are the 13 matched covariates. Keep this slide as the orientation map for the whole method.
@@ -161,7 +161,7 @@ prepare_basque() is a helper wrapping dataprep() that packages the four matrices
 | Pre-treatment loss $V$ | 0.0089 |
 | Pre-treatment loss $W$ (MSPE) | 0.2467 |
 
-[Sparsity is typical: few donors resemble the treated unit, the rest get zero.]{.comment}
+[Sparsity is typical: few donors resemble the treated unit, the rest get zero.]{.takeaway .fragment}
 
 ::: {.notes}
 Three numbers tell the story. The weights sum to one (convexity respected). Only 2 of 16 donors get non-trivial weight. Both pre-treatment losses are small — a tight fit. This sparse solution is one of synthetic control's appeals over black-box prediction: you can read the recipe.
@@ -175,7 +175,7 @@ Three numbers tell the story. The weights sum to one (convexity respected). Only
 | Madrid (Comunidad De) | 0.149 |
 | Every other region | 0 |
 
-[Basque $\approx$ 85% Catalonia + 15% Madrid — the only two comparably industrial, urban, wealthy regions.]{.comment}
+[Basque $\approx$ 85% Catalonia + 15% Madrid — the only two comparably industrial, urban, wealthy regions.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the one-line summary a reader can carry away. Catalonia and Madrid are the only pre-1970 Spanish regions comparably industrial and wealthy, so the optimizer leans entirely on them. Remember Catalonia's 85% dominance — it returns as a caveat in Act III's placebo. The dataset stores the region as "Cataluna" without the tilde.
@@ -191,7 +191,7 @@ This is the one-line summary a reader can carry away. Catalonia and Madrid are t
 | Agriculture share % | 6.84 | 6.18 | 21.4 |
 | Pop. density 1969 | 247 | 196 | 99.4 |
 
-[Outcome-relevant predictors match closely; density is the largest gap.]{.comment}
+[Outcome-relevant predictors match closely; density is the largest gap.]{.takeaway .fragment}
 
 ::: {.notes}
 Pre-treatment GDP matches almost exactly: 5.28 vs 5.27, against a donor mean of just 3.58 — the synthetic is far closer to Basque than the average region is. Education shares fall within a few points. The optimizer correctly recognized Basque as an industrial, low-agriculture region (agriculture 6.84% vs donor mean 21.4%) and downweighted farming economies. Density (247 vs 196) is the largest gap but it is a static control, not an outcome predictor, so it carries little weight in the fit.
@@ -235,7 +235,7 @@ The headline causal estimate. Average Basque GDP over the window was about 7 tho
 | Post-1970 MSPE | 0.391 |
 | Post/pre ratio | [64.7]{.key} |
 
-[Comparable to Basque's own ratio of 60.1 — one placebo run has limited inferential power.]{.comment}
+[Comparable to Basque's own ratio of 60.1 — one placebo run has limited inferential power.]{.takeaway .fragment}
 
 ::: {.notes}
 The first falsification pretends Catalonia — a never-treated donor — was the treated unit. Its pre-1970 MSPE is tiny (0.006) but post-1970 MSPE is large (0.391), a ratio of 64.7. That is comparable to Basque's 60.1, which is uncomfortable at first glance. The honest answer: a single placebo says little; we need the full distribution across all regions, which the in-space placebo provides.

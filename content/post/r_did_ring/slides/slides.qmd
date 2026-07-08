@@ -114,7 +114,7 @@ $$Y_{it} = \alpha_i + \gamma_t + \tau\, D_i P_t + \varepsilon_{it}$$
 | First-differences | [0.3097]{.key} | 0.0258 | 0.30 |
 | Two-way FE | 0.3097 | 0.0258 | 0.30 |
 
-[The two are *algebraically* identical — that is why the ring DiD is one line of `feols()`.]{.comment}
+[The two are *algebraically* identical — that is why the ring DiD is one line of `feols()`.]{.takeaway .fragment}
 
 ::: {.notes}
 On a 500-unit panel with true effect 0.30, first-differences and TWFE return numerically identical estimates (0.3097) and SEs (0.0258), both within one SE of truth. The equivalence is exact, not approximate — it licenses writing the ring DiD as one regression on first-differenced outcomes.
@@ -160,7 +160,7 @@ ring_dgp <- ring_data |>
   feols(delta_y ~ treat_ring, cluster = "neighborhood", data = _)
 ```
 
-[`delta_y` is the first-differenced outcome; `treat_ring` is the 0/1 inner-ring indicator. The whole estimator is that one regression.]{.comment}
+[`delta_y` is the first-differenced outcome; `treat_ring` is the 0/1 inner-ring indicator. The whole estimator is that one regression.]{.takeaway .fragment}
 
 ::: {.notes}
 Because of the 2×2 equivalence, the entire parametric ring estimator is a single feols() call on first-differenced log prices with a treated-ring dummy and neighborhood-clustered errors. The Linden-Rockoff sibling swaps in close_post_move and srn_year fixed effects — same shape.

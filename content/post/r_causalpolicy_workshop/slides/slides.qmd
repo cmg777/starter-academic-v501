@@ -84,7 +84,7 @@ $$Y_{it} = D_{it}\, Y_{it}(1) + (1 - D_{it})\, Y_{it}(0)$$
 
 Each state-year has two *potential* outcomes; we observe only one. For California after 1989 the missing one is $Y_{it}(0)$ — sales **without** the tax.
 
-[Every estimator in this deck is a different way to impute that missing $Y_{it}(0)$.]{.comment}
+[Every estimator in this deck is a different way to impute that missing $Y_{it}(0)$.]{.takeaway .fragment}
 
 ::: {.notes}
 Neyman–Rubin potential outcomes. D = 1 for California from 1989 onward, 0 everywhere else. The fundamental problem of causal inference (Holland 1986): for any treated unit we see at most one potential outcome. The whole tutorial is a tour of methods that fill in the missing Y(0).
@@ -136,7 +136,7 @@ Estimand discipline: name the causal quantity before quoting a number. ATT and A
 :::
 ::::
 
-[Six dashed arrows feed one counterfactual box; the gap to the observed series is the effect.]{.comment}
+[Six dashed arrows feed one counterfactual box; the gap to the observed series is the effect.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the §1 Mermaid diagram re-expressed as two columns (revealjs does not bundle mermaid.js). The orange box — California observed — is identical across methods. The blue counterfactual box is the construction. Methods differ only in the data source feeding that construction and the identifying assumption it leans on.
@@ -149,7 +149,7 @@ This is the §1 Mermaid diagram re-expressed as two columns (revealjs does not b
 | Pre-period mean (1984–88) | 98.98 | — | — |
 | Post-period shift | [−27.02]{.key} | 5.30 | <0.001 |
 
-[Estimand: purely *descriptive*. Identifying assumption: California's pre-level would have frozen — almost certainly false.]{.comment}
+[Estimand: purely *descriptive*. Identifying assumption: California's pre-level would have frozen — almost certainly false.]{.takeaway .fragment}
 
 ::: {.notes}
 Method 1. Imputes Y(0) as California's own pre-period mean. The −27.02 drop silently bundles the nationwide secular decline into the "effect". It is the largest number any method reports — that is the warning sign, not a feature. It sets the upper bound the disciplined methods will shrink.
@@ -169,7 +169,7 @@ $$\widehat{Y_{1t}(0)} = \hat\alpha + \hat\beta\, t, \qquad t > t^*$$
 
 A linear fit on 1970–1988 ($\hat\beta = -1.78$ packs/year, $R^2 = 0.74$) extended forward; the gap to observed averages **−28.3 packs**.
 
-[Assumption: the pre-trend has the right *shape*. No comparison unit — so it can't separate policy from the secular decline.]{.comment}
+[Assumption: the pre-trend has the right *shape*. No comparison unit — so it can't separate policy from the secular decline.]{.takeaway .fragment}
 
 ::: {.notes}
 Method 3a. ITS needs no control unit — it borrows from California's own past — but pays in a stronger pre-trend assumption. −28.3 is essentially the naive −27.0 because both use only within-California information. Suggestive coincidence, not reassurance: both can be biased the same way.
@@ -241,7 +241,7 @@ The four-stage tidy pipeline: declare the treated unit and intervention time, de
 | cigsale_1980 | 120.2 | 120.2 | 138.1 |
 | cigsale_1988 | 90.1 | [91.4]{.key} | 114.2 |
 
-[On 1988 sales, synthetic California (91.4) almost matches the real 90.1 — the donor average (114.2) is 24 packs off.]{.comment}
+[On 1988 sales, synthetic California (91.4) almost matches the real 90.1 — the donor average (114.2) is 24 packs off.]{.takeaway .fragment}
 
 ::: {.notes}
 Balance table. Read the synthetic column against California: far closer than the unweighted donor average on every predictor. That 24-pack gap on cigsale_1988 between the donor average and California is exactly the bias the naive pre-post method silently absorbed. Good pre-period balance is what licenses reading the post-period gap as an effect.
@@ -281,7 +281,7 @@ Method 6. Estimand: ATT, identified by a BSTS prior plus a regression on donor s
 | Synthetic Control | ATT | [−18.9]{.key} |
 | CausalImpact | ATT | −12.8 |
 
-[Consensus cluster (RDD, SCM, CausalImpact): −13 to −20. Outliers: DiD collapses, ARIMA flips.]{.comment}
+[Consensus cluster (RDD, SCM, CausalImpact): −13 to −20. Outliers: DiD collapses, ARIMA flips.]{.takeaway .fragment}
 
 ::: {.notes}
 Three clusters. (1) Causal consensus — RDD −20.1, SCM −18.9, CausalImpact −12.8 — all principled donor-information machinery, overlapping intervals. (2) Pre-trend-only overshoot — naive −27, ITS-growth −28, ~50% too large, no comparison unit. (3) Broken outliers in opposite directions — DiD vs Nevada and ITS-ARIMA. The honest headline: ~15–20 packs.

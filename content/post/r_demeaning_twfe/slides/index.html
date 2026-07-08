@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>What Does TWFE Actually Do?</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -296,7 +296,7 @@
 <h2>TWFE is OLS with a country intercept <em>and</em> a period intercept</h2>
 <p><span class="math display">\[y_{it} = \alpha_i + \lambda_t + \beta x_{it} + u_{it}\]</span></p>
 <p>Each country <span class="math inline">\(i\)</span> gets its own intercept <span class="math inline">\(\alpha_i\)</span>; each period <span class="math inline">\(t\)</span> gets its own <span class="math inline">\(\lambda_t\)</span>. Together they absorb every time-invariant country trait and every country-invariant shock.</p>
-<p><span class="comment">Those intercepts are the “controls.” FWL says we can <em>project them out</em> instead of estimating them.</span></p>
+<p><span class="takeaway fragment">Those intercepts are the “controls.” FWL says we can <em>project them out</em> instead of estimating them.</span></p>
 <aside class="notes">
 <p>α_i soaks up persistent country differences (geography, institutions, long-run level); λ_t soaks up common shocks (a global recession, a productivity boom). This is exactly the “controls Z” that FWL lets us residualize away rather than carry in one giant dummy regression.</p>
 <style type="text/css">
@@ -336,7 +336,7 @@
 <section id="why-add-the-grand-mean-back-miss-it-and-you-subtract-the-overlap-twice" class="slide level2 center">
 <h2>Why add the grand mean back? Miss it and you subtract the overlap twice</h2>
 <p>Subtract both the country mean and the time mean, and you remove the <strong>grand mean twice</strong> — it hides inside each. Add <span class="math inline">\(\bar{x}_{\cdot\cdot}\)</span> back once to undo that.</p>
-<p><span class="comment">Like a Venn diagram: remove both circles entirely and the overlap is deleted twice. Add the overlap back once.</span></p>
+<p><span class="takeaway fragment">Like a Venn diagram: remove both circles entirely and the overlap is deleted twice. Add the overlap back once.</span></p>
 <aside class="notes">
 <p>Without the +grand-mean term, the demeaned variables are not centred at zero, the intercept is no longer ~0, and the FWL equivalence with TWFE breaks. The grand-mean correction is algebraically necessary, not cosmetic. This is also Exercise 1 in the post.</p>
 <style type="text/css">
@@ -355,7 +355,7 @@
 <h2>Frisch–Waugh–Lovell: residualize-then-regress equals the full regression</h2>
 <p><span class="math display">\[\hat{\beta}_{\text{TWFE}} = \hat{\beta}_{\text{OLS on demeaned data}}\]</span></p>
 <p>The slope on <span class="math inline">\(x\)</span> controlling for the dummies equals the slope from OLS on the <em>residualized</em> <span class="math inline">\(y\)</span> and <span class="math inline">\(x\)</span>. TWFE is the special case where the controls are the country and time dummies.</p>
-<p><span class="comment">Noise-cancelling headphones: subtract the engine hum from the signal first, then listen — same music as a silent room.</span></p>
+<p><span class="takeaway fragment">Noise-cancelling headphones: subtract the engine hum from the signal first, then listen — same music as a silent room.</span></p>
 <aside class="notes">
 <p>FWL is the theoretical guarantee behind the whole tutorial. “Either include all the dummies in one big regression, or project them out of both y and x and regress the residuals” — the coefficient on x is identical either way. Not approximately: exactly, as an algebraic identity.</p>
 <style type="text/css">
@@ -457,7 +457,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">All six means sit at <span class="math inline">\(10^{-15}\)</span> or smaller — effectively zero. The transformation is implemented correctly.</span></p>
+<p><span class="takeaway fragment">All six means sit at <span class="math inline">\(10^{-15}\)</span> or smaller — effectively zero. The transformation is implemented correctly.</span></p>
 <aside class="notes">
 <p>This is the sanity check before the big claim. If the grand-mean term had been dropped, these means would not be zero and the intercept of the OLS step would not vanish. What’s left is pure within-variation — deviation from each country’s own average and each period’s common trend.</p>
 <style type="text/css">
@@ -509,7 +509,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment"><code>all.equal()</code> returns <code>TRUE</code>. Largest difference 3.05e−16 ≈ IEEE-754 machine epsilon (2.2e−16).</span></p>
+<p><span class="takeaway fragment"><code>all.equal()</code> returns <code>TRUE</code>. Largest difference 3.05e−16 ≈ IEEE-754 machine epsilon (2.2e−16).</span></p>
 <aside class="notes">
 <p>This is the central result. All five slopes are identical to at least 12 significant digits; the biggest discrepancy is floating-point noise, not estimation error. It is an exact algebraic identity guaranteed by FWL, verified empirically on real-ish data.</p>
 <style type="text/css">

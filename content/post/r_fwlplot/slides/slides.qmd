@@ -88,7 +88,7 @@ Spoiler figure. Don't explain the residualization yet — just plant the shock: 
 - **Confounder** — `income`: rich areas get *fewer* coupons ($-0.5$) but buy *more* ($+0.3$)
 :::
 
-[Income opens a backdoor path coupons ← income → sales. Block it, or the naive slope is biased.]{.comment}
+[Income opens a backdoor path coupons ← income → sales. Block it, or the naive slope is biased.]{.takeaway .fragment}
 
 ::: {.notes}
 We simulate so the true answer is known. The store targets promotions at lower-income areas, so income is negatively linked to coupons and positively linked to sales — a textbook confounder. The data-generating process is sales = 10 + 0.2·coupons + 0.3·income + 0.5·dayofweek + noise.
@@ -102,7 +102,7 @@ We simulate so the true answer is known. The store targets promotions at lower-i
 | income ↔ coupons | −0.709 |
 | income ↔ sales | +0.500 |
 
-[A negative *raw* coupon–sales correlation, even though the true effect is positive — Simpson's paradox in one table.]{.comment}
+[A negative *raw* coupon–sales correlation, even though the true effect is positive — Simpson's paradox in one table.]{.takeaway .fragment}
 
 ::: {.notes}
 Income is strongly negative with coupons (−0.709) and strongly positive with sales (+0.500). Those two channels combine to drag the raw coupons–sales correlation negative. A naive analyst cancels the coupon program and loses revenue.
@@ -112,7 +112,7 @@ Income is strongly negative with coupons (−0.709) and strongly positive with s
 
 $$\hat\beta_1=(\tilde X_1'\tilde X_1)^{-1}\tilde X_1'\tilde Y,\qquad \tilde Y=M_{X_2}Y,\quad \tilde X_1=M_{X_2}X_1$$
 
-[$M_{X_2}=I-X_2(X_2'X_2)^{-1}X_2'$ is the residual-maker: it strips the influence of the controls $X_2$ from whatever it multiplies.]{.comment}
+[$M_{X_2}=I-X_2(X_2'X_2)^{-1}X_2'$ is the residual-maker: it strips the influence of the controls $X_2$ from whatever it multiplies.]{.takeaway .fragment}
 
 ::: {.notes}
 The Frisch–Waugh–Lovell theorem: the coefficient on X1 in the full regression equals the slope of a simple regression of the residualized outcome on the residualized regressor. Two routes, one number. The residual-maker matrix M projects out X2. Here Y is sales, X1 is coupons, X2 is income.
@@ -139,7 +139,7 @@ Same formula syntax as fixest::feols(), including the | operator for fixed effec
 | income | — | +0.3004 |
 | R² | 0.028 | 0.321 |
 
-[Every number here is a visual feature of the `fwl_plot()` scatter: the slope, and how tight the cloud is.]{.comment}
+[Every number here is a visual feature of the `fwl_plot()` scatter: the slope, and how tight the cloud is.]{.takeaway .fragment}
 
 ::: {.notes}
 etable(fe_naive, fe_full) from feols. Adding income flips coupons from −0.093 to +0.212 and lifts R² from 0.028 to 0.321. The income coefficient 0.300 recovers the true 0.3. The picture and the table are the same fact.
@@ -154,7 +154,7 @@ resid_x <- resid(lm(coupons ~ income, data = store_data))  # coupons income can'
 fwl_manual <- lm(resid_y ~ resid_x)                         # slope = the coupon coefficient
 ```
 
-[Like comparing height *for your age*: judge each store's coupons and sales relative to its income level.]{.comment}
+[Like comparing height *for your age*: judge each store's coupons and sales relative to its income level.]{.takeaway .fragment}
 
 ::: {.notes}
 The three-step recipe IS the FWL theorem. Step 1 residualizes sales on income, step 2 residualizes coupons on income, step 3 regresses one residual on the other. Every multiple regression is doing this implicitly for each coefficient.
@@ -174,7 +174,7 @@ This is not an approximation; it is an exact algebraic identity. The byte-for-by
 
 $$\text{bias}=\hat\gamma\times\hat\delta = 0.300\times(-0.494) = -0.148$$
 
-[$\hat\gamma$ = income's effect on sales; $\hat\delta$ = slope of coupons on income. True $+0.212$ plus bias $-0.148$ ≈ the naive $-0.093$.]{.comment}
+[$\hat\gamma$ = income's effect on sales; $\hat\delta$ = slope of coupons on income. True $+0.212$ plus bias $-0.148$ ≈ the naive $-0.093$.]{.takeaway .fragment}
 
 ::: {.notes}
 Omitted-variable bias = (effect of omitted variable on outcome) × (slope of omitted on treatment) = 0.300 × (−0.494) = −0.148. True + bias = 0.212 − 0.148 = 0.064, close to the actual naive −0.093 (the gap is n = 200 sampling noise). The point: if you know the signs of the confounder's two effects, you know which way the naive estimate tilts.
@@ -186,7 +186,7 @@ Including airport (or person) fixed effects = partialling out each group's mean 
 
 . . .
 
-[A race handicap: convert raw times into "faster or slower than your own average," then compare fairly.]{.comment}
+[A race handicap: convert raw times into "faster or slower than your own average," then compare fairly.]{.takeaway .fragment}
 
 ::: {.notes}
 Demeaning subtracts each group's average from every observation in that group, so we compare each unit to itself, not to other units. FWL guarantees this demeaning gives the same coefficients as a full set of dummy variables — which is exactly how fixest scales to millions of rows: demeaning is O(N), the dummy matrix is O(N×K).
@@ -208,7 +208,7 @@ Demeaning subtracts each group's average from every observation in that group, s
 | Origin FE | −0.0061 | 0.00058 |
 | Origin + Dest FE | [−0.0067]{.key} | 1.19e-5 |
 
-[Within-route, longer-than-usual air time predicts *slightly less* delay — possibly tail-wind days.]{.comment}
+[Within-route, longer-than-usual air time predicts *slightly less* delay — possibly tail-wind days.]{.takeaway .fragment}
 
 ::: {.notes}
 The coefficient moves from −0.003 to −0.007 (the "." marker = significant only at 10%). Panel C answers a sharper question than Panel A: "for flights on the same route, does longer-than-usual air time predict higher-than-usual delay?" Weakly negative. The vanishing within R² warns the within-route variation is almost too small to identify anything.

@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Augmented Synthetic Control for Multiple Countries</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -238,7 +238,7 @@
 <li class="fragment"><strong>Part 2</strong> — a qualitative replication of Papaioannou (2021) on the real euro area</li>
 <li class="fragment">The bridge — the Augmented SCM adds a Ridge bias-correction that earns its keep only on hard cases</li>
 </ul>
-<p><span class="comment">We never trust a number on real data that the same method could not first recover on simulated ground truth.</span></p>
+<p><span class="takeaway fragment">We never trust a number on real data that the same method could not first recover on simulated ground truth.</span></p>
 <aside class="notes">
 <p>This is the deck’s spine: validate-then-trust. The simulated panel is the lab; the euro replication is the field. The augmentation (Ridge outcome model) is the safety net that sits quietly until the pre-treatment fit is poor.</p>
 <style type="text/css">
@@ -287,7 +287,7 @@
 <li>then inference</li>
 </ul>
 </div></div>
-<p><span class="comment">Formula mini-language: <code>outcome ~ treatment | covariates</code>.</span></p>
+<p><span class="takeaway fragment">Formula mini-language: <code>outcome ~ treatment | covariates</code>.</span></p>
 <aside class="notes">
 <p>The post opens with a Mermaid flowchart; reveal.js does not bundle mermaid, so it is re-expressed here as a two-column routing slide. The key point is that routing is by shape — count treated units and outcomes — and all three then share the same SCM-plus-Ridge machinery and the same ATT definition.</p>
 <style type="text/css">
@@ -323,7 +323,7 @@
 <h2>SCM solves a constrained recipe; ASCM subtracts what the fit still misses</h2>
 <p><span class="math display">\[W^{\star} = \arg\min_{W \in \Delta}\ \lVert X_1 - X_0 W \rVert_V \quad\text{s.t.}\quad w_j \ge 0,\ \sum_j w_j = 1\]</span></p>
 <p><span class="math display">\[\hat\tau_t^{\,\mathrm{aug}} = \Big(Y_{1t} - \sum_j w_j Y_{jt}\Big) - \Big(\hat m_t(X_1) - \sum_j w_j\,\hat m_t(X_j)\Big)\]</span></p>
-<p><span class="comment">The first term is the plain SCM gap; the second is the Ridge correction <span class="math inline">\(\hat m_t\)</span>. Perfect pre-fit → correction vanishes → ASCM <span class="math inline">\(=\)</span> SCM.</span></p>
+<p><span class="takeaway fragment">The first term is the plain SCM gap; the second is the Ridge correction <span class="math inline">\(\hat m_t\)</span>. Perfect pre-fit → correction vanishes → ASCM <span class="math inline">\(=\)</span> SCM.</span></p>
 <aside class="notes">
 <p>W lives on the simplex Δ — non-negative weights summing to one, so the synthetic interpolates donors and never extrapolates. The augmented estimator is doubly robust: it is the SCM gap minus what the prognostic model m-hat (a Ridge regression on lagged outcomes) predicts the residual imbalance to be. When the donors already reproduce m-hat(X1), the correction is zero. This is why augmentation is insurance, not a free lunch.</p>
 <style type="text/css">
@@ -542,7 +542,7 @@
 <section id="the-numbers-line-up-around-the-45-degree-line-not-on-top-of-it" class="slide level2 center">
 <h2>The numbers line up around the 45-degree line, not on top of it</h2>
 
-<img data-src="../r_sc_multi_country_16_paper_vs_ascm_scatter.png" class="r-stretch quarto-figure-center"><p class="caption">ASCM vs Papaioannou (2021): per-member TFP % contributions cluster around the 45-degree line, Spearman 0.74.</p><p><span class="comment">We do not reproduce the paper’s numbers exactly — and should not. Same signs, same ranking, same dynamic story is the right bar.</span></p>
+<img data-src="../r_sc_multi_country_16_paper_vs_ascm_scatter.png" class="r-stretch quarto-figure-center"><p class="caption">ASCM vs Papaioannou (2021): per-member TFP % contributions cluster around the 45-degree line, Spearman 0.74.</p><p><span class="takeaway fragment">We do not reproduce the paper’s numbers exactly — and should not. Same signs, same ranking, same dynamic story is the right bar.</span></p>
 <aside class="notes">
 <p>The estimators differ, so exact matches are not expected. All 12 members are positive in 2000–07. The scatter is the visual verdict: a method comparison passes when the qualitative pattern replicates, not when the decimals match.</p>
 <style type="text/css">

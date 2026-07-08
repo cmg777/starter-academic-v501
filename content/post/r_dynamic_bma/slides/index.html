@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Dynamic Panel BMA</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -290,7 +290,7 @@
 <h2>The Solow model makes lagged GDP unavoidable, not optional</h2>
 <p><span class="math display">\[\ln y_{it} = \alpha \ln y_{i,t-1} + \beta' x_{it} + \eta_i + \zeta_t + v_{it}\]</span></p>
 <p>The convergence prediction puts last period’s GDP on the right-hand side. The persistence <span class="math inline">\(\alpha\)</span> measures how slowly countries approach their steady state.</p>
-<p><span class="comment">Omitting <span class="math inline">\(\ln y_{i,t-1}\)</span> assumes <span class="math inline">\(\alpha = 0\)</span> — instantaneous convergence, which the data flatly rejects.</span></p>
+<p><span class="takeaway fragment">Omitting <span class="math inline">\(\ln y_{i,t-1}\)</span> assumes <span class="math inline">\(\alpha = 0\)</span> — instantaneous convergence, which the data flatly rejects.</span></p>
 <aside class="notes">
 <p>α close to 1 means slow convergence (countries stay near their current income for a long time); α close to 0 means fast. The lagged dependent variable is not an ad hoc add-on — it falls straight out of the Solow beta-convergence equation. Entity effects absorb geography and institutions; time effects remove global shocks.</p>
 <style type="text/css">
@@ -348,7 +348,7 @@
 <span id="cb1-5"><a href=""></a>          <span class="at">dep_var_col =</span> gdp, <span class="at">timestamp_col =</span> year,</span>
 <span id="cb1-6"><a href=""></a>          <span class="at">entity_col  =</span> country, <span class="at">init_value =</span> <span class="fl">0.5</span>)</span>
 <span id="cb1-7"><a href=""></a>bma_results <span class="ot">&lt;-</span> <span class="fu">bma</span>(full, <span class="at">df =</span> data_prepared, <span class="at">round =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">Marginal likelihood scores each of 512 “recipes” — rewarding fit, penalizing needless complexity.</span></p>
+<p><span class="takeaway fragment">Marginal likelihood scores each of 512 “recipes” — rewarding fit, penalizing needless complexity.</span></p>
 <aside class="notes">
 <p>Unlike R-squared, which always rises when you add variables, the marginal likelihood integrates out parameter uncertainty and penalizes complexity — a 9-regressor model that barely beats a 5-regressor one scores lower. The package ships a precomputed full_model_space so the several-minute optimization can be skipped.</p>
 <style type="text/css">
@@ -401,7 +401,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Drop one variable and the significance pattern changes — this fragility is what BMA is built to fix.</span></p>
+<p><span class="takeaway fragment">Drop one variable and the significance pattern changes — this fragility is what BMA is built to fix.</span></p>
 <aside class="notes">
 <p>The kitchen-sink fixed-effects model commits to one specification. Its lagged-GDP coefficient (0.619) is well below the BMA posterior mean (0.919) — multicollinearity among 9 regressors pulls it down. R-squared is 0.988 on 292 observations. BMA replaces the binary significant/insignificant verdict with a continuous probability scale.</p>
 <style type="text/css">
@@ -613,7 +613,7 @@
 <h2>GDP is highly persistent — only ~8% of the steady-state gap closes per decade</h2>
 <p><span class="math display">\[\alpha \approx 0.92 \;\Rightarrow\; \text{convergence speed} = 1 - \alpha \approx 0.08 \text{ per decade}\]</span></p>
 <p>The lagged-GDP coefficient near 0.92 means a country’s income is dominated by its own past — convergence to its steady state is a slow crawl.</p>
-<p><span class="comment">That persistence absorbs the cross-sectional variation, leaving fewer variables with independent power.</span></p>
+<p><span class="takeaway fragment">That persistence absorbs the cross-sectional variation, leaving fewer variables with independent power.</span></p>
 <aside class="notes">
 <p>The kitchen-sink FE coefficient (0.619) understates persistence; the BMA posterior mean is 0.919–0.943 depending on prior. Strong persistence is exactly why dynamic panel BMA reshapes the landscape of “robust” determinants relative to cross-sectional BMA — much of what looked causal was just inertia.</p>
 <style type="text/css">
@@ -671,7 +671,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Robust = PIP above 0.5 even under the skeptical prior. Only two determinants qualify.</span></p>
+<p><span class="takeaway fragment">Robust = PIP above 0.5 even under the skeptical prior. Only two determinants qualify.</span></p>
 <aside class="notes">
 <p>This is the payoff table. Investment and trade look promising under the default prior but become ambiguous under EMS=2. Education and democracy — despite intuitive appeal — are fragile. For a policymaker, population dynamics and public health are the levers with the strongest evidence across all modeling assumptions.</p>
 <style type="text/css">

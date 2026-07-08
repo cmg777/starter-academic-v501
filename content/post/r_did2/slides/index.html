@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Difference-in-Differences for Regional Data</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -280,7 +280,7 @@
 <h2>The estimand: an ATT whose weight <em>is</em> the question</h2>
 <p><span class="math display">\[\text{ATT}_\omega(2014) = \big(\mathbb{E}_\omega[Y_{2014}\mid D{=}1] - \mathbb{E}_\omega[Y_{2013}\mid D{=}1]\big) - \big(\mathbb{E}_\omega[Y_{2014}\mid D{=}0] - \mathbb{E}_\omega[Y_{2013}\mid D{=}0]\big)\]</span></p>
 <p>The treated group’s change minus the control group’s change — both means taken under weighting scheme <span class="math inline">\(\omega\)</span>.</p>
-<p><span class="comment">Equal weights <span class="math inline">\(\Rightarrow\)</span> the typical treated <em>county</em>. Population weights <span class="math inline">\(\Rightarrow\)</span> the typical treated <em>adult</em>. The subscript on <span class="math inline">\(\mathbb{E}_\omega\)</span> carries the choice into the parameter itself.</span></p>
+<p><span class="takeaway fragment">Equal weights <span class="math inline">\(\Rightarrow\)</span> the typical treated <em>county</em>. Population weights <span class="math inline">\(\Rightarrow\)</span> the typical treated <em>adult</em>. The subscript on <span class="math inline">\(\mathbb{E}_\omega\)</span> carries the choice into the parameter itself.</span></p>
 <aside class="notes">
 <p>Identification needs only one restriction: parallel trends — absent expansion, treated and control counties would have moved together. Everything in this deck is an ATT; the only quarrel is which weighted average of the unit-level effects we target.</p>
 <style type="text/css">
@@ -327,7 +327,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Population weighting rebalances toward large, urban 2014 expanders and small, rural never-expanders — a <em>different comparison</em>, not a tighter one.</span></p>
+<p><span class="takeaway fragment">Population weighting rebalances toward large, urban 2014 expanders and small, rural never-expanders — a <em>different comparison</em>, not a tighter one.</span></p>
 <aside class="notes">
 <p>This 11-point gap between county shares and population shares for the two largest cohorts is the proximate cause of the sign reversal. The three small cohorts shrink further under weighting. Switching the weight is switching the comparison.</p>
 <style type="text/css">
@@ -350,7 +350,7 @@
 <span id="cb1-4"><a href=""></a><span class="fu">feols</span>(crude_rate_20_64 <span class="sc">~</span> D<span class="sc">:</span>Post <span class="sc">|</span> county_code <span class="sc">+</span> year, <span class="at">cluster =</span> <span class="sc">~</span>county_code)</span>
 <span id="cb1-5"><a href=""></a><span class="co"># (c) long difference: collapse to one row per county</span></span>
 <span id="cb1-6"><a href=""></a><span class="fu">feols</span>(diff <span class="sc">~</span> D, <span class="at">data =</span> short_long_diff, <span class="at">cluster =</span> <span class="sc">~</span>county_code)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><span class="comment">All three return <span class="math inline">\(+0.122\)</span> unweighted and <span class="math inline">\(-2.563\)</span> weighted — identical to three decimals.</span></p>
+<p><span class="takeaway fragment">All three return <span class="math inline">\(+0.122\)</span> unweighted and <span class="math inline">\(-2.563\)</span> weighted — identical to three decimals.</span></p>
 <aside class="notes">
 <p>This is the manuscript’s algebraic Result 1. For the 2x2 design there is no methodological choice between Levels, TWFE and Long-difference — they are the same estimator written three ways. The only substantive choice is whether to weight. Every later stage carries that lesson.</p>
 <style type="text/css">
@@ -403,7 +403,7 @@
 <h2>Doubly robust DRDID is consistent if <em>either</em> model is right</h2>
 <p><span class="math display">\[\widehat{\text{ATT}}_{\text{DR}} = \frac{1}{n}\sum_{i=1}^{n}\big(\hat{w}_{D=1}(D_i) - \hat{w}_{D=0}(D_i, X_i)\big)\big(\Delta Y_i - \hat{\mu}_{\Delta, D=0}(X_i)\big)\]</span></p>
 <p>Each county contributes a propensity-weighted residual: how far its 2013-to-2014 change strayed from the outcome model’s prediction for an untreated unit with the same covariates.</p>
-<p><span class="comment">Belt-and-suspenders: the outcome model <em>or</em> the propensity model can be wrong — not both.</span></p>
+<p><span class="takeaway fragment">Belt-and-suspenders: the outcome model <em>or</em> the propensity model can be wrong — not both.</span></p>
 <aside class="notes">
 <p>The “double” is that consistency survives misspecification of either the outcome regression or the propensity score, never requiring both. DRDID lands between OR and IPW because it is essentially a weighted combination of them.</p>
 <style type="text/css">
@@ -446,7 +446,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Within-weighting spread <span class="math inline">\(\le 0.8\)</span>; across-weighting gap <span class="math inline">\(\approx 2.5\)</span>. None of the six 95% CIs excludes zero.</span></p>
+<p><span class="takeaway fragment">Within-weighting spread <span class="math inline">\(\le 0.8\)</span>; across-weighting gap <span class="math inline">\(\approx 2.5\)</span>. None of the six 95% CIs excludes zero.</span></p>
 <aside class="notes">
 <p>Adjustment moves the unweighted point from +0.12 (cell means) to −1.23 (DRDID) and the weighted from −2.56 to −3.76. Method and target parameter are orthogonal axes — and the second dominates. Note the causal framing: this is confounding control under observational identification, so covariates change the target parameter (unconditional ATT → ATT conditional on X), not just precision.</p>
 <style type="text/css">
@@ -513,7 +513,7 @@
 <h2>Callaway–Sant’Anna uses <em>all</em> the timing — one ATT(g,t) per cohort-year cell</h2>
 <p><span class="math display">\[\text{ATT}(g,t) = \mathbb{E}_\omega\big[Y_{i,t}(g) - Y_{i,t}(\infty)\mid G_i = g\big]\]</span></p>
 <p>The effect of first expanding in year <span class="math inline">\(g\)</span>, relative to never expanding, evaluated at calendar time <span class="math inline">\(t\)</span>, restricted to units whose actual start year is <span class="math inline">\(g\)</span>.</p>
-<p><span class="comment">Never make a mid-treatment unit serve as a “control” for an untreated one — the forbidden comparison that naive TWFE quietly makes.</span></p>
+<p><span class="takeaway fragment">Never make a mid-treatment unit serve as a “control” for an untreated one — the forbidden comparison that naive TWFE quietly makes.</span></p>
 <aside class="notes">
 <p><span class="math inline">\(G_i \in \{2014, 2015, 2016, 2019, \infty\}\)</span>. The design estimates a separate ATT(g,t) for each of 4×11 cohort-year cells, then aggregates — by cohort, or by event time. Identification is parallel trends with respect to the never-treated group, cohort by cohort.</p>
 <style type="text/css">
@@ -623,7 +623,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The gap is widest where staggered cohort heterogeneity is in play, narrowest where the 2x2 forces a single comparison.</span></p>
+<p><span class="takeaway fragment">The gap is widest where staggered cohort heterogeneity is in play, narrowest where the 2x2 forces a single comparison.</span></p>
 <aside class="notes">
 <p>The methodological choice between estimators within a row is always smaller than the choice between the two columns. That is the central pedagogical point of the whole pipeline, made quantitative.</p>
 <style type="text/css">
@@ -693,7 +693,7 @@
 <li>the policy-relevant target</li>
 </ul>
 </div></div>
-<p><span class="comment">No CI excludes zero by a comfortable margin. When the policy is denominated in <em>people</em>, weight by people.</span></p>
+<p><span class="takeaway fragment">No CI excludes zero by a comfortable margin. When the policy is denominated in <em>people</em>, weight by people.</span></p>
 <aside class="notes">
 <p>The cleanest answer the data support: not powerful enough to settle the question, and the unweighted and weighted estimands answer different questions. A federal cost-benefit assessment weights by adults; a study of which county types saw the largest local effects weights not at all. Both are legitimate — be explicit about which is on offer.</p>
 <style type="text/css">

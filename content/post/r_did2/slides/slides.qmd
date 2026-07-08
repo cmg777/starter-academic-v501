@@ -91,7 +91,7 @@ $$\text{ATT}_\omega(2014) = \big(\mathbb{E}_\omega[Y_{2014}\mid D{=}1] - \mathbb
 
 The treated group's change minus the control group's change — both means taken under weighting scheme $\omega$.
 
-[Equal weights $\Rightarrow$ the typical treated *county*. Population weights $\Rightarrow$ the typical treated *adult*. The subscript on $\mathbb{E}_\omega$ carries the choice into the parameter itself.]{.comment}
+[Equal weights $\Rightarrow$ the typical treated *county*. Population weights $\Rightarrow$ the typical treated *adult*. The subscript on $\mathbb{E}_\omega$ carries the choice into the parameter itself.]{.takeaway .fragment}
 
 ::: {.notes}
 Identification needs only one restriction: parallel trends — absent expansion, treated and control counties would have moved together. Everything in this deck is an ATT; the only quarrel is which weighted average of the unit-level effects we target.
@@ -105,7 +105,7 @@ Identification needs only one restriction: parallel trends — absent expansion,
 | 2014       |   978 | 37.6% | [49.5%]{.key} |
 | 2015 / 2016 / 2019 | 404 | 15.6% | 12.4% |
 
-[Population weighting rebalances toward large, urban 2014 expanders and small, rural never-expanders — a *different comparison*, not a tighter one.]{.comment}
+[Population weighting rebalances toward large, urban 2014 expanders and small, rural never-expanders — a *different comparison*, not a tighter one.]{.takeaway .fragment}
 
 ::: {.notes}
 This 11-point gap between county shares and population shares for the two largest cohorts is the proximate cause of the sign reversal. The three small cohorts shrink further under weighting. Switching the weight is switching the comparison.
@@ -122,7 +122,7 @@ feols(crude_rate_20_64 ~ D:Post | county_code + year, cluster = ~county_code)
 feols(diff ~ D, data = short_long_diff, cluster = ~county_code)
 ```
 
-[All three return $+0.122$ unweighted and $-2.563$ weighted — identical to three decimals.]{.comment}
+[All three return $+0.122$ unweighted and $-2.563$ weighted — identical to three decimals.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the manuscript's algebraic Result 1. For the 2x2 design there is no methodological choice between Levels, TWFE and Long-difference — they are the same estimator written three ways. The only substantive choice is whether to weight. Every later stage carries that lesson.
@@ -150,7 +150,7 @@ $$\widehat{\text{ATT}}_{\text{DR}} = \frac{1}{n}\sum_{i=1}^{n}\big(\hat{w}_{D=1}
 
 Each county contributes a propensity-weighted residual: how far its 2013-to-2014 change strayed from the outcome model's prediction for an untreated unit with the same covariates.
 
-[Belt-and-suspenders: the outcome model *or* the propensity model can be wrong — not both.]{.comment}
+[Belt-and-suspenders: the outcome model *or* the propensity model can be wrong — not both.]{.takeaway .fragment}
 
 ::: {.notes}
 The "double" is that consistency survives misspecification of either the outcome regression or the propensity score, never requiring both. DRDID lands between OR and IPW because it is essentially a weighted combination of them.
@@ -164,7 +164,7 @@ The "double" is that consistency survives misspecification of either the outcome
 | IPW                      | $-0.859$ | $-3.842$ |
 | Doubly robust (DRDID)    | $-1.226$ | [$-3.756$]{.key} |
 
-[Within-weighting spread $\le 0.8$; across-weighting gap $\approx 2.5$. None of the six 95% CIs excludes zero.]{.comment}
+[Within-weighting spread $\le 0.8$; across-weighting gap $\approx 2.5$. None of the six 95% CIs excludes zero.]{.takeaway .fragment}
 
 ::: {.notes}
 Adjustment moves the unweighted point from +0.12 (cell means) to −1.23 (DRDID) and the weighted from −2.56 to −3.76. Method and target parameter are orthogonal axes — and the second dominates. Note the causal framing: this is confounding control under observational identification, so covariates change the target parameter (unconditional ATT → ATT conditional on X), not just precision.
@@ -205,7 +205,7 @@ $$\text{ATT}(g,t) = \mathbb{E}_\omega\big[Y_{i,t}(g) - Y_{i,t}(\infty)\mid G_i =
 
 The effect of first expanding in year $g$, relative to never expanding, evaluated at calendar time $t$, restricted to units whose actual start year is $g$.
 
-[Never make a mid-treatment unit serve as a "control" for an untreated one — the forbidden comparison that naive TWFE quietly makes.]{.comment}
+[Never make a mid-treatment unit serve as a "control" for an untreated one — the forbidden comparison that naive TWFE quietly makes.]{.takeaway .fragment}
 
 ::: {.notes}
 $G_i \in \{2014, 2015, 2016, 2019, \infty\}$. The design estimates a separate ATT(g,t) for each of 4×11 cohort-year cells, then aggregates — by cohort, or by event time. Identification is parallel trends with respect to the never-treated group, cohort by cohort.
@@ -250,7 +250,7 @@ This is the single number to remember. The pre-period treated-minus-control gap 
 | 2xT dynamic (avg $e\ge0$) | $+9.428$ | $-0.684$ | [$10.11$]{.key} |
 | GxT dynamic (avg $e\ge0$) | $+7.917$ | $+0.266$ | $7.65$ |
 
-[The gap is widest where staggered cohort heterogeneity is in play, narrowest where the 2x2 forces a single comparison.]{.comment}
+[The gap is widest where staggered cohort heterogeneity is in play, narrowest where the 2x2 forces a single comparison.]{.takeaway .fragment}
 
 ::: {.notes}
 The methodological choice between estimators within a row is always smaller than the choice between the two columns. That is the central pedagogical point of the whole pipeline, made quantitative.
@@ -293,7 +293,7 @@ Steelman, don't strawman. Sun–Abraham / Callaway–Sant'Anna solve TWFE's nega
 :::
 ::::
 
-[No CI excludes zero by a comfortable margin. When the policy is denominated in *people*, weight by people.]{.comment}
+[No CI excludes zero by a comfortable margin. When the policy is denominated in *people*, weight by people.]{.takeaway .fragment}
 
 ::: {.notes}
 The cleanest answer the data support: not powerful enough to settle the question, and the unweighted and weighted estimands answer different questions. A federal cost-benefit assessment weights by adults; a study of which county types saw the largest local effects weights not at all. Both are legitimate — be explicit about which is on offer.

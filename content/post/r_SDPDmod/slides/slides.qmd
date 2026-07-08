@@ -89,7 +89,7 @@ Spoiler figure for persistence. Kentucky (a tobacco state) stays above 150 packs
 - **Neighbours** — the `usa46` binary contiguity matrix, **row-normalized**
 :::
 
-[Log-log: every coefficient is an elasticity — % change in consumption per % change in price.]{.comment}
+[Log-log: every coefficient is an elasticity — % change in consumption per % change in price.]{.takeaway .fragment}
 
 ::: {.notes}
 State and year fixed effects absorb tobacco culture and national anti-smoking trends. The Cigar dataset (Baltagi 1992). pimin — minimum neighbour price — is left out on purpose: its correlation with the spatial lag W·logp is 0.92, so the SDM's W·logp term captures the same cross-border channel more flexibly.
@@ -114,7 +114,7 @@ $$y_t = \rho W y_t + X_t \beta + W X_t \theta + u_t, \quad u_t = \lambda W u_t +
 - The **SDM** keeps $\rho$ and $\theta$; OLS sets all three to zero
 :::
 
-[`blmpSDPD()` scores every model at once with a log-marginal posterior — no ad-hoc sequence of Wald tests.]{.comment}
+[`blmpSDPD()` scores every model at once with a log-marginal posterior — no ad-hoc sequence of Wald tests.]{.takeaway .fragment}
 
 ::: {.notes}
 The general nesting structure: SDM is SAR plus spatial lags of X; SAR, SEM, SLX, SDEM are restrictions. Bayesian comparison assigns a probability to every candidate simultaneously, which is exactly what we want for a "which specification?" question.
@@ -136,7 +136,7 @@ Under individual FE the SDM gets 99.89%; SDEM 0.11%; everything else ≈ 0. OLS 
 | Static, two-way FE | SDM | 45.92% | SDEM | 41.31% |
 | Dynamic, two-way FE | SEM | 29.84% | SAR | 25.73% |
 
-[Once the lagged outcome enters, the spatial signal weakens — the data can no longer tell the spatial models apart.]{.comment}
+[Once the lagged outcome enters, the spatial signal weakens — the data can no longer tell the spatial models apart.]{.takeaway .fragment}
 
 ::: {.notes}
 Three takeaways: (1) spatial dependence is real (OLS/SLX never win); (2) SDM is the preferred static model — both ρWy and WXθ matter; (3) dynamics dissolve the discrimination, because yt−1 captures the temporal persistence the spatial lags were borrowing.
@@ -180,7 +180,7 @@ The 46 + 30 = 76 fixed effects create an **incidental-parameter bias** in spatia
 - Slopes barely move ($\beta_{\text{logp}}$: $-1.003 \to -1.001$) — expected with $T = 30$
 :::
 
-[For short panels ($T < 10$) the correction would matter far more; here it mainly rescues $\rho$.]{.comment}
+[For short panels ($T < 10$) the correction would matter far more; here it mainly rescues $\rho$.]{.takeaway .fragment}
 
 ::: {.notes}
 Lee-Yu (2010) transforms the data to concentrate the fixed effects out before estimation. The uncorrected estimator understates spatial dependence. With 30 time periods the slope bias is small, but ρ — the parameter most sensitive to the incidental-parameter problem — moves a meaningful 17%. We adopt the Lee-Yu version as the preferred static SDM.
@@ -194,7 +194,7 @@ Lee-Yu (2010) transforms the data to concentrate the fixed effects out before es
 | Indirect (spillover) | −0.219 | −0.197 |
 | Total | −1.230 | 0.391 |
 
-[The income spillover is *negative* (−0.20): richer neighbours pull your consumption *down* — a channel the SAR cannot see.]{.comment}
+[The income spillover is *negative* (−0.20): richer neighbours pull your consumption *down* — a channel the SAR cannot see.]{.takeaway .fragment}
 
 ::: {.notes}
 Price tells the familiar story: direct −1.01, indirect −0.22, total −1.23. But income reverses sign relative to SAR (+0.10 there): the significant W·logy ≈ −0.31 means richer neighbours reduce own-state demand, plausibly through substitution toward premium or out-of-state channels. The SDM's WXθ terms are what make this visible.
@@ -219,7 +219,7 @@ $$y_t = \rho W y_t + \tau y_{t-1} + \eta W y_{t-1} + X_t \beta + W X_t \theta + 
 - $\eta W y_{t-1}$ — neighbours' past consumption (**spatiotemporal diffusion**)
 :::
 
-[A static $\rho$ must absorb *both* spatial spillover and serial correlation — so it is biased upward.]{.comment}
+[A static $\rho$ must absorb *both* spatial spillover and serial correlation — so it is biased upward.]{.takeaway .fragment}
 
 ::: {.notes}
 Nicotine addiction makes last year's smokers this year's smokers. If the model omits yt−1, the contemporaneous spatial coefficient has to do double duty, conflating "your neighbours smoke" with "you smoked last year, and so did they." Adding the temporal lag separates the two.
@@ -234,7 +234,7 @@ Nicotine addiction makes last year's smokers this year's smokers. If the model o
 | $\beta_{\text{logp}}$ | −1.001 | −0.271 |
 | W·logp | 0.091 (n.s.) | 0.196 (sig.) |
 
-[Habit persistence is the dominant force; the static SDM was overstating contemporaneous spatial dependence.]{.comment}
+[Habit persistence is the dominant force; the static SDM was overstating contemporaneous spatial dependence.]{.takeaway .fragment}
 
 ::: {.notes}
 τ = 0.864 (t = 67) is by far the largest, most precise parameter — about 87% of last year's consumption carries over. ρ falls from 0.262 to 0.162 once we control for that persistence: much of what looked spatial was temporal. And W·logp turns positive and significant — the next slide.
@@ -249,7 +249,7 @@ When a *neighbour* raises its price, your consumption **rises** — smokers buy 
 - Dynamic SDM: $W\cdot\text{logp} = 0.196$, $t = 4.46$ — the cross-border signal emerges
 :::
 
-[The spatial lag of consumption hid the effect; only proper dynamics reveal it.]{.comment}
+[The spatial lag of consumption hid the effect; only proper dynamics reveal it.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the substantive payoff. The static model's ρWy term soaks up the cross-border channel, so W·logp looks null. Once yt−1 and Wyt−1 are in, the price-of-neighbours coefficient stands free and positive — exactly the cross-border shopping the opening story predicted.

@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Three Methods for Robust Variable Selection</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,7 +29,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -124,7 +124,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -138,7 +138,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -240,7 +240,7 @@
 <li>Output: t-statistics</li>
 </ul>
 </div></div>
-<p><span class="comment">Different machinery, same target — agreement across them is what earns credibility.</span></p>
+<p><span class="takeaway fragment">Different machinery, same target — agreement across them is what earns credibility.</span></p>
 <aside class="notes">
 <p>The pedagogical spine. BMA is Bayesian and explores the whole model space; LASSO finds one MAP-style sparse model; WALS averages in closed form. They share the goal of separating signal from noise but get there by genuinely different routes — the precondition for triangulation.</p>
 <style type="text/css">
@@ -258,7 +258,7 @@
 <section id="bma-is-just-bayes-rule-applied-to-4096-models" class="slide level2 center">
 <h2>BMA is just Bayes’ rule applied to 4,096 models</h2>
 <p><span class="math display">\[P(M_k\mid y)=\frac{P(y\mid M_k)\,P(M_k)}{\sum_{l=1}^{2^K} P(y\mid M_l)\,P(M_l)}\]</span></p>
-<p><span class="comment">The marginal likelihood <span class="math inline">\(P(y\mid M_k)\)</span> is a built-in Occam’s razor — complex models spread their probability thin.</span></p>
+<p><span class="takeaway fragment">The marginal likelihood <span class="math inline">\(P(y\mid M_k)\)</span> is a built-in Occam’s razor — complex models spread their probability thin.</span></p>
 <aside class="notes">
 <p>Replace “fair coin / biased coin” with “which variables belong in the model.” Uniform model prior P(M_k)=1/4096, so the posterior is driven entirely by the data. With 12 regressors the sampler explores all 4,096 models efficiently.</p>
 <style type="text/css">
@@ -433,7 +433,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">LASSO selects; OLS on the selected set estimates — recovering unbiased magnitudes.</span></p>
+<p><span class="takeaway fragment">LASSO selects; OLS on the selected set estimates — recovering unbiased magnitudes.</span></p>
 <aside class="notes">
 <p>L1 shrinks coefficients by design, so raw LASSO estimates are too small (fossil_fuel 0.007 vs true 0.012). Post-LASSO (Belloni–Chernozhukov 2013) refits OLS on the selected support: fossil_fuel snaps to 0.012, exactly the truth. Trade_network overshoots (0.898) — a low-variance regressor is genuinely hard to pin down.</p>
 <style type="text/css">
@@ -545,7 +545,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">All five noise variables: flagged by none. Agreement across mechanically distinct methods is what earns credibility.</span></p>
+<p><span class="takeaway fragment">All five noise variables: flagged by none. Agreement across mechanically distinct methods is what earns credibility.</span></p>
 <aside class="notes">
 <p>The convergence slide. GDP, trade network, fossil fuel, industry are flagged by all three — triple-robust. Urban_pop and democracy are double-robust: LASSO and WALS say yes, BMA hedges in its borderline zone. That split is itself informative — the evidence is real but not overwhelming.</p>
 <style type="text/css">
@@ -643,7 +643,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">Zero false positives across the board; the gap is in catching the moderate true effects.</span></p>
+<p><span class="takeaway fragment">Zero false positives across the board; the gap is in catching the moderate true effects.</span></p>
 <aside class="notes">
 <p>All three reach 100% specificity — no noise variable is ever flagged. LASSO and WALS detect 6 of 7 true predictors (85.7%); BMA detects 4 (57.1%) because it parks urban_pop and democracy in the borderline zone. Agriculture (β = 0.005) is missed by all — too small to distinguish from noise at n = 120.</p>
 <style type="text/css">

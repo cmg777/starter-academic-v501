@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>Bayesian Spatial Synthetic Control</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -266,7 +266,7 @@
 <h2>The estimand is the ATT for one treated unit: California</h2>
 <p><span class="math display">\[\mathrm{ATT} = E\big[Y_i(1) - Y_i(0) \mid D_i = 1\big]\]</span></p>
 <p>With a single treated unit, the ATT is the gap between <em>observed</em> California and a <em>counterfactual</em> California, averaged over 1988–2000.</p>
-<p><span class="comment">Every stage targets the <strong>same</strong> ATT — only the way it builds the counterfactual California changes.</span></p>
+<p><span class="takeaway fragment">Every stage targets the <strong>same</strong> ATT — only the way it builds the counterfactual California changes.</span></p>
 <aside class="notes">
 <p>Be explicit about the estimand: this is the average treatment effect on the treated, not on the population. We never observe untreated California after 1988, so we construct a synthetic twin from donor states. The whole deck is about how that twin is built.</p>
 <style type="text/css">
@@ -289,7 +289,7 @@
 <li class="fragment"><strong>Donors</strong> — the other 38 states, untreated throughout</li>
 <li class="fragment"><strong>Pre / post</strong> — 18 pre-treatment years, 13 post-treatment years</li>
 </ul>
-<p><span class="comment">Spatial structure ships with the data: a 38×38 binary contiguity matrix <span class="math inline">\(W\)</span> among donors, row-normalized before it enters the SAR likelihood.</span></p>
+<p><span class="takeaway fragment">Spatial structure ships with the data: a 38×38 binary contiguity matrix <span class="math inline">\(W\)</span> among donors, row-normalized before it enters the SAR likelihood.</span></p>
 </section>
 <section id="three-estimators-relax-one-assumption-at-a-time" class="slide level2 center">
 <h2>Three estimators relax one assumption at a time</h2>
@@ -309,7 +309,7 @@
 <li>C++ Gibbs samplers</li>
 </ul>
 </div></div>
-<p><span class="comment">Each arrow weakens an assumption: Stage 1 imposes simplex + SUTVA; Stage 2 relaxes the simplex; Stage 3 also relaxes SUTVA.</span></p>
+<p><span class="takeaway fragment">Each arrow weakens an assumption: Stage 1 imposes simplex + SUTVA; Stage 2 relaxes the simplex; Stage 3 also relaxes SUTVA.</span></p>
 <aside class="notes">
 <p>The pipeline is the post’s Mermaid diagram, re-expressed as columns: classical → Bayesian horseshoe → Bayesian spatial SAR, then diagnostics and cross-stage comparison. The pedagogical point is what <em>moves</em> between stages.</p>
 <style type="text/css">
@@ -327,7 +327,7 @@
 <section id="with-zero-substantive-controls-the-simplex-picks-just-four-donors" class="slide level2 center">
 <h2>With zero substantive controls, the simplex picks just four donors</h2>
 <p><span class="math display">\[\widehat\alpha = \arg\min_\alpha \big\| Y_{1,\text{pre}} - Y_{c,\text{pre}}\,\alpha \big\|^2 \quad \text{s.t.}\quad \alpha_j \ge 0,\ \sum_j \alpha_j = 1\]</span></p>
-<p><span class="comment">The non-negativity-plus-sum-to-one constraint is an implicit regularizer — it pushes most weights to exactly zero.</span></p>
+<p><span class="takeaway fragment">The non-negativity-plus-sum-to-one constraint is an implicit regularizer — it pushes most weights to exactly zero.</span></p>
 <aside class="notes">
 <p>Read the equation aloud: match California’s pre-treatment sales with a convex combination of donors. The simplex serves interpretability, but it also forces sparsity. Is the four-donor synthetic the data talking, or the constraint?</p>
 <style type="text/css">
@@ -370,7 +370,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The other 34 donors are essentially zero — a near-pure four-state synthetic California.</span></p>
+<p><span class="takeaway fragment">The other 34 donors are essentially zero — a near-pure four-state synthetic California.</span></p>
 <aside class="notes">
 <p>Utah, Nevada, Montana, Connecticut carry 97.5% of the weight. Two questions hang over this: is the sparsity real, and is Nevada — California’s neighbour — contaminated by spillovers? Stages 2 and 3 attack each.</p>
 <style type="text/css">
@@ -407,7 +407,7 @@
 <h2>The horseshoe prior keeps zero overwhelmingly likely — yet lets a few donors escape</h2>
 <p><span class="math display">\[\alpha_j \mid \tau, \lambda_j \sim \mathcal{N}\big(0,\ \tau^2 \lambda_j^2\big), \quad \lambda_j \sim \mathcal{C}^+(0,1), \quad \tau \sim \mathcal{C}^+(0,1)\]</span></p>
 <p>A global scale <span class="math inline">\(\tau\)</span> pulls everything toward zero; a <em>local</em> scale <span class="math inline">\(\lambda_j\)</span> lets individual donors break free. The half-Cauchy tails do the rest.</p>
-<p><span class="comment">Now the <strong>data</strong>, not the constraint, decide which donors get non-zero mass.</span></p>
+<p><span class="takeaway fragment">Now the <strong>data</strong>, not the constraint, decide which donors get non-zero mass.</span></p>
 <aside class="notes">
 <p>The horseshoe replaces the simplex with a soft, heavy-tailed regularizer. Most weights hug zero; a handful escape. This is the test of whether the four-donor sparsity was real.</p>
 <style type="text/css">
@@ -460,7 +460,7 @@
 <h2>Drop SUTVA: each donor’s sales depend on its neighbours’ sales</h2>
 <p><span class="math display">\[Y_{c,t} = \rho\, W\, Y_{c,t} + X_{c,t}\beta + Y_c^{\text{lag}}\alpha + \varepsilon_t\]</span></p>
 <p>The spatial lag <span class="math inline">\(W Y_{c,t}\)</span> is the row-normalized neighbour average; <span class="math inline">\(\rho\)</span> measures how strongly a state co-moves with its neighbours. When <span class="math inline">\(\rho = 0\)</span> we recover Stage 2.</p>
-<p><span class="comment">If <span class="math inline">\(\rho &gt; 0\)</span>, a donor’s sales are partly its neighbours’ — so Nevada’s post-1988 sales are part of the <strong>treatment effect</strong>, not the counterfactual.</span></p>
+<p><span class="takeaway fragment">If <span class="math inline">\(\rho &gt; 0\)</span>, a donor’s sales are partly its neighbours’ — so Nevada’s post-1988 sales are part of the <strong>treatment effect</strong>, not the counterfactual.</span></p>
 <aside class="notes">
 <p>This is where SUTVA is dropped. The SAR layer lets California’s policy diffuse into adjacent donors through W. The cross-border-shopping literature predicts exactly this for the California–Nevada line.</p>
 <style type="text/css">
@@ -609,7 +609,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The headline ATT is robust; the donor pool’s <em>shape</em> is not — and the Stage-3 interval is artificially narrow (ESS(ρ) = 3 at tutorial scale).</span></p>
+<p><span class="takeaway fragment">The headline ATT is robust; the donor pool’s <em>shape</em> is not — and the Stage-3 interval is artificially narrow (ESS(ρ) = 3 at tutorial scale).</span></p>
 <aside class="notes">
 <p>Three reads. The sign and order of magnitude agree across all three — none of the intervals reaches zero. The active-donor count rises 4 → 23 → 27 as priors relax, so the sparse four-donor synthetic is one of many plausible counterfactuals. The Stage-3 CrI is the narrowest but least trustworthy because rho has not mixed at 5,000 iterations.</p>
 <style type="text/css">

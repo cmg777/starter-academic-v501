@@ -96,7 +96,7 @@ Spoiler figure. Before the dashed line the two series are a believable double; a
 - **Donor pool** — the 49 other states; none cut taxes like Kansas
 :::
 
-[The 89-quarter pre-period is the engine of inference — long enough to make the conformal and jackknife procedures informative, and to give every donor a credible placebo path.]{.comment}
+[The 89-quarter pre-period is the engine of inference — long enough to make the conformal and jackknife procedures informative, and to give every donor a credible placebo path.]{.takeaway .fragment}
 
 ::: {.notes}
 Balanced panel: 50 × 105 = 5,250 rows, 1990 Q1–2016 Q1. The treated flag turns on at year_qtr = 2012.25, exactly when the cut took effect. The raw outcome already dips after — but that's not yet causal; we need the synthetic.
@@ -108,7 +108,7 @@ The estimand is the **ATT** — Kansas's actual outcome minus its synthetic, aft
 
 $$\hat{\gamma}^{scm} = \arg\min_{\gamma}\ \|X_1 - X_0'\gamma\|_2^2 \quad \text{s.t.} \quad \sum_i \gamma_i = 1,\ \gamma_i \ge 0$$
 
-[The two rules — non-negative, sum to one — keep the synthetic interpretable and forbid wild extrapolation. The per-quarter effect is then $\hat{\tau}_t = Y_{1t} - \sum_i \hat{\gamma}_i^{scm} Y_{it}$.]{.comment}
+[The two rules — non-negative, sum to one — keep the synthetic interpretable and forbid wild extrapolation. The per-quarter effect is then $\hat{\tau}_t = Y_{1t} - \sum_i \hat{\gamma}_i^{scm} Y_{it}$.]{.takeaway .fragment}
 
 ::: {.notes}
 X1 is Kansas's pre-2012 series; X0 holds the 49 donors. The weights are syn$weights. ATT, not ATE: we ask what the tax cut did to Kansas specifically, not to an average state.
@@ -144,7 +144,7 @@ This is the textbook trigger for augmentation. A convex combination cannot elimi
 
 $$\hat{Y}_{1T}^{aug}(0) = \sum_i \hat{\gamma}_i^{scm} Y_{iT} + \Big( \hat{m}_{1T} - \sum_i \hat{\gamma}_i^{scm}\hat{m}_{iT} \Big)$$
 
-[Start from the plain SCM counterfactual (first term); add the imbalance the ridge outcome model $\hat{m}$ predicts (the parenthesis). If the SCM fit were perfect, the correction vanishes — augmentation only acts where there is imbalance to fix.]{.comment}
+[Start from the plain SCM counterfactual (first term); add the imbalance the ridge outcome model $\hat{m}$ predicts (the parenthesis). If the SCM fit were perfect, the correction vanishes — augmentation only acts where there is imbalance to fix.]{.takeaway .fragment}
 
 ::: {.notes}
 The default outcome model is ridge regression of donors' outcomes on their lagged outcomes. augsynth reports the parenthesis as "Avg Estimated Bias." The estimator is doubly robust: it can also be read as "predict Kansas from the model, then correct with SCM-weighted donor residuals."
@@ -224,7 +224,7 @@ The whole augmentation is one keyword: progfunc = "Ridge" instead of "None." Cro
 | Ridge ASCM | [−0.040]{.key} | −3.9% | 0.062 | 0.011 |
 | Covariate ASCM | −0.061 | −5.9% | 0.054 | 0.027 |
 
-[The more we de-bias and balance, the larger the measured damage — the un-augmented SCM number is the *conservative* one.]{.comment}
+[The more we de-bias and balance, the larger the measured damage — the un-augmented SCM number is the *conservative* one.]{.takeaway .fragment}
 
 ::: {.notes}
 Adding revenue, wages, establishments and employment after the | drives covariate imbalance to 0.005 (97.7% better than uniform). Fixed-effect (−0.034) and residualized (−0.055) variants fall between these. Every route agrees on sign and rough size — that monotonic pattern is reassuring, not alarming.

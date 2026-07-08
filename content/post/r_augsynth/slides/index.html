@@ -6,10 +6,10 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
-  <meta name="dcterms.date" content="2026-06-11">
+  <meta name="dcterms.date" content="2026-07-08">
   <title>The Augmented Synthetic Control Method</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -59,43 +59,43 @@
       }
     pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #24292e;  }
+      { color: #e1e4e8; background-color: #24292e; }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #24292e; } /* Normal */
+    code span { color: #e1e4e8; } /* Normal */
     code span.al { color: #ff5555; font-weight: bold; } /* Alert */
     code span.an { color: #6a737d; } /* Annotation */
-    code span.at { color: #d73a49; } /* Attribute */
-    code span.bn { color: #005cc5; } /* BaseN */
-    code span.bu { color: #d73a49; } /* BuiltIn */
-    code span.cf { color: #d73a49; } /* ControlFlow */
-    code span.ch { color: #032f62; } /* Char */
-    code span.cn { color: #005cc5; } /* Constant */
+    code span.at { color: #f97583; } /* Attribute */
+    code span.bn { color: #79b8ff; } /* BaseN */
+    code span.bu { color: #f97583; } /* BuiltIn */
+    code span.cf { color: #f97583; } /* ControlFlow */
+    code span.ch { color: #9ecbff; } /* Char */
+    code span.cn { color: #79b8ff; } /* Constant */
     code span.co { color: #6a737d; } /* Comment */
     code span.cv { color: #6a737d; } /* CommentVar */
     code span.do { color: #6a737d; } /* Documentation */
-    code span.dt { color: #d73a49; } /* DataType */
-    code span.dv { color: #005cc5; } /* DecVal */
+    code span.dt { color: #f97583; } /* DataType */
+    code span.dv { color: #79b8ff; } /* DecVal */
     code span.er { color: #ff5555; text-decoration: underline; } /* Error */
-    code span.ex { color: #d73a49; font-weight: bold; } /* Extension */
-    code span.fl { color: #005cc5; } /* Float */
-    code span.fu { color: #6f42c1; } /* Function */
-    code span.im { color: #032f62; } /* Import */
+    code span.ex { color: #f97583; font-weight: bold; } /* Extension */
+    code span.fl { color: #79b8ff; } /* Float */
+    code span.fu { color: #b392f0; } /* Function */
+    code span.im { color: #9ecbff; } /* Import */
     code span.in { color: #6a737d; } /* Information */
-    code span.kw { color: #d73a49; } /* Keyword */
-    code span.op { color: #24292e; } /* Operator */
-    code span.ot { color: #6f42c1; } /* Other */
-    code span.pp { color: #d73a49; } /* Preprocessor */
+    code span.kw { color: #f97583; } /* Keyword */
+    code span.op { color: #e1e4e8; } /* Operator */
+    code span.ot { color: #b392f0; } /* Other */
+    code span.pp { color: #f97583; } /* Preprocessor */
     code span.re { color: #6a737d; } /* RegionMarker */
-    code span.sc { color: #005cc5; } /* SpecialChar */
-    code span.ss { color: #032f62; } /* SpecialString */
-    code span.st { color: #032f62; } /* String */
-    code span.va { color: #e36209; } /* Variable */
-    code span.vs { color: #032f62; } /* VerbatimString */
+    code span.sc { color: #79b8ff; } /* SpecialChar */
+    code span.ss { color: #9ecbff; } /* SpecialString */
+    code span.st { color: #9ecbff; } /* String */
+    code span.va { color: #ffab70; } /* Variable */
+    code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-530021870a52ee60b3f5e86ec9e6fece.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -190,7 +190,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -204,7 +204,7 @@
   </div>
   <p class="author"><a href="https://carlos-mendez.org">Carlos Mendez</a></p>
   <p class="institute">Nagoya University (GSID)</p>
-  <p class="date">June 11, 2026</p>
+  <p class="date">July 8, 2026</p>
 </section>
 <section>
 <section id="the-tension" class="title-slide slide level1 divider center" data-background-color="#d97757">
@@ -286,7 +286,7 @@
 <li class="fragment"><strong>Treated unit</strong> — Kansas (FIPS 20), treated from 2012 Q2 onward</li>
 <li class="fragment"><strong>Donor pool</strong> — the 49 other states; none cut taxes like Kansas</li>
 </ul>
-<p><span class="comment">The 89-quarter pre-period is the engine of inference — long enough to make the conformal and jackknife procedures informative, and to give every donor a credible placebo path.</span></p>
+<p><span class="takeaway fragment">The 89-quarter pre-period is the engine of inference — long enough to make the conformal and jackknife procedures informative, and to give every donor a credible placebo path.</span></p>
 <aside class="notes">
 <p>Balanced panel: 50 × 105 = 5,250 rows, 1990 Q1–2016 Q1. The treated flag turns on at year_qtr = 2012.25, exactly when the cut took effect. The raw outcome already dips after — but that’s not yet causal; we need the synthetic.</p>
 <style type="text/css">
@@ -305,7 +305,7 @@
 <h2>SCM builds the counterfactual from a convex blend of donors</h2>
 <p>The estimand is the <strong>ATT</strong> — Kansas’s actual outcome minus its synthetic, after treatment. SCM picks weights on the <strong>simplex</strong> (non-negative, summing to one):</p>
 <p><span class="math display">\[\hat{\gamma}^{scm} = \arg\min_{\gamma}\ \|X_1 - X_0'\gamma\|_2^2 \quad \text{s.t.} \quad \sum_i \gamma_i = 1,\ \gamma_i \ge 0\]</span></p>
-<p><span class="comment">The two rules — non-negative, sum to one — keep the synthetic interpretable and forbid wild extrapolation. The per-quarter effect is then <span class="math inline">\(\hat{\tau}_t = Y_{1t} - \sum_i \hat{\gamma}_i^{scm} Y_{it}\)</span>.</span></p>
+<p><span class="takeaway fragment">The two rules — non-negative, sum to one — keep the synthetic interpretable and forbid wild extrapolation. The per-quarter effect is then <span class="math inline">\(\hat{\tau}_t = Y_{1t} - \sum_i \hat{\gamma}_i^{scm} Y_{it}\)</span>.</span></p>
 <aside class="notes">
 <p>X1 is Kansas’s pre-2012 series; X0 holds the 49 donors. The weights are syn$weights. ATT, not ATE: we ask what the tax cut did to Kansas specifically, not to an average state.</p>
 <style type="text/css">
@@ -375,7 +375,7 @@
 <section id="ascm-estimates-the-leftover-bias-with-an-outcome-model-then-subtracts-it" class="slide level2 center">
 <h2>ASCM estimates the leftover bias with an outcome model, then subtracts it</h2>
 <p><span class="math display">\[\hat{Y}_{1T}^{aug}(0) = \sum_i \hat{\gamma}_i^{scm} Y_{iT} + \Big( \hat{m}_{1T} - \sum_i \hat{\gamma}_i^{scm}\hat{m}_{iT} \Big)\]</span></p>
-<p><span class="comment">Start from the plain SCM counterfactual (first term); add the imbalance the ridge outcome model <span class="math inline">\(\hat{m}\)</span> predicts (the parenthesis). If the SCM fit were perfect, the correction vanishes — augmentation only acts where there is imbalance to fix.</span></p>
+<p><span class="takeaway fragment">Start from the plain SCM counterfactual (first term); add the imbalance the ridge outcome model <span class="math inline">\(\hat{m}\)</span> predicts (the parenthesis). If the SCM fit were perfect, the correction vanishes — augmentation only acts where there is imbalance to fix.</span></p>
 <aside class="notes">
 <p>The default outcome model is ridge regression of donors’ outcomes on their lagged outcomes. augsynth reports the parenthesis as “Avg Estimated Bias.” The estimator is doubly robust: it can also be read as “predict Kansas from the model, then correct with SCM-weighted donor residuals.”</p>
 <style type="text/css">
@@ -534,7 +534,7 @@
 </tr>
 </tbody>
 </table>
-<p><span class="comment">The more we de-bias and balance, the larger the measured damage — the un-augmented SCM number is the <em>conservative</em> one.</span></p>
+<p><span class="takeaway fragment">The more we de-bias and balance, the larger the measured damage — the un-augmented SCM number is the <em>conservative</em> one.</span></p>
 <aside class="notes">
 <p>Adding revenue, wages, establishments and employment after the | drives covariate imbalance to 0.005 (97.7% better than uniform). Fixed-effect (−0.034) and residualized (−0.055) variants fall between these. Every route agrees on sign and rough size — that monotonic pattern is reassuring, not alarming.</p>
 <style type="text/css">

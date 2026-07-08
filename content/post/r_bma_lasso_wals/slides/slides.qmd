@@ -113,7 +113,7 @@ Throw all 12 regressors into lm(): R² = 0.98, but noise variables get non-negli
 :::
 ::::
 
-[Different machinery, same target — agreement across them is what earns credibility.]{.comment}
+[Different machinery, same target — agreement across them is what earns credibility.]{.takeaway .fragment}
 
 ::: {.notes}
 The pedagogical spine. BMA is Bayesian and explores the whole model space; LASSO finds one MAP-style sparse model; WALS averages in closed form. They share the goal of separating signal from noise but get there by genuinely different routes — the precondition for triangulation.
@@ -123,7 +123,7 @@ The pedagogical spine. BMA is Bayesian and explores the whole model space; LASSO
 
 $$P(M_k\mid y)=\frac{P(y\mid M_k)\,P(M_k)}{\sum_{l=1}^{2^K} P(y\mid M_l)\,P(M_l)}$$
 
-[The marginal likelihood $P(y\mid M_k)$ is a built-in Occam's razor — complex models spread their probability thin.]{.comment}
+[The marginal likelihood $P(y\mid M_k)$ is a built-in Occam's razor — complex models spread their probability thin.]{.takeaway .fragment}
 
 ::: {.notes}
 Replace "fair coin / biased coin" with "which variables belong in the model." Uniform model prior P(M_k)=1/4096, so the posterior is driven entirely by the data. With 12 regressors the sampler explores all 4,096 models efficiently.
@@ -200,7 +200,7 @@ The parsimonious 1-SE model keeps log_gdp, industry, fossil_fuel, urban_pop, dem
 | urban_pop | 0.004 | 0.008 | 0.010 |
 | trade_network | 0.631 | 0.898 | 0.500 |
 
-[LASSO selects; OLS on the selected set estimates — recovering unbiased magnitudes.]{.comment}
+[LASSO selects; OLS on the selected set estimates — recovering unbiased magnitudes.]{.takeaway .fragment}
 
 ::: {.notes}
 L1 shrinks coefficients by design, so raw LASSO estimates are too small (fossil_fuel 0.007 vs true 0.012). Post-LASSO (Belloni–Chernozhukov 2013) refits OLS on the selected support: fossil_fuel snaps to 0.012, exactly the truth. Trade_network overshoots (0.898) — a low-variance regressor is genuinely hard to pin down.
@@ -239,7 +239,7 @@ WALS returns familiar t-statistics. Using |t| ≥ 2 (the frequentist analog of P
 | urban_pop | 0.648 | yes | 3.11 | 2 |
 | democracy | 0.607 | yes | 2.58 | 2 |
 
-[All five noise variables: flagged by none. Agreement across mechanically distinct methods is what earns credibility.]{.comment}
+[All five noise variables: flagged by none. Agreement across mechanically distinct methods is what earns credibility.]{.takeaway .fragment}
 
 ::: {.notes}
 The convergence slide. GDP, trade network, fossil fuel, industry are flagged by all three — triple-robust. Urban_pop and democracy are double-robust: LASSO and WALS say yes, BMA hedges in its borderline zone. That split is itself informative — the evidence is real but not overwhelming.
@@ -277,7 +277,7 @@ GDP (β = 1.200) recovered almost exactly everywhere. Fossil_fuel (0.012) and ur
 | LASSO | [85.7%]{.key} | 100% | 91.7% |
 | WALS | [85.7%]{.key} | 100% | 91.7% |
 
-[Zero false positives across the board; the gap is in catching the moderate true effects.]{.comment}
+[Zero false positives across the board; the gap is in catching the moderate true effects.]{.takeaway .fragment}
 
 ::: {.notes}
 All three reach 100% specificity — no noise variable is ever flagged. LASSO and WALS detect 6 of 7 true predictors (85.7%); BMA detects 4 (57.1%) because it parks urban_pop and democracy in the borderline zone. Agriculture (β = 0.005) is missed by all — too small to distinguish from noise at n = 120.

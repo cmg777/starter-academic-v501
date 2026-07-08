@@ -86,7 +86,7 @@ $$\mathrm{ATT} = E\big[Y_i(1) - Y_i(0) \mid D_i = 1\big]$$
 
 With a single treated unit, the ATT is the gap between *observed* California and a *counterfactual* California, averaged over 1988–2000.
 
-[Every stage targets the **same** ATT — only the way it builds the counterfactual California changes.]{.comment}
+[Every stage targets the **same** ATT — only the way it builds the counterfactual California changes.]{.takeaway .fragment}
 
 ::: {.notes}
 Be explicit about the estimand: this is the average treatment effect on the treated, not on the population. We never observe untreated California after 1988, so we construct a synthetic twin from donor states. The whole deck is about how that twin is built.
@@ -101,7 +101,7 @@ Be explicit about the estimand: this is the average treatment effect on the trea
 - **Pre / post** — 18 pre-treatment years, 13 post-treatment years
 :::
 
-[Spatial structure ships with the data: a 38×38 binary contiguity matrix $W$ among donors, row-normalized before it enters the SAR likelihood.]{.comment}
+[Spatial structure ships with the data: a 38×38 binary contiguity matrix $W$ among donors, row-normalized before it enters the SAR likelihood.]{.takeaway .fragment}
 
 ## Three estimators relax one assumption at a time
 
@@ -122,7 +122,7 @@ Be explicit about the estimand: this is the average treatment effect on the trea
 :::
 ::::
 
-[Each arrow weakens an assumption: Stage 1 imposes simplex + SUTVA; Stage 2 relaxes the simplex; Stage 3 also relaxes SUTVA.]{.comment}
+[Each arrow weakens an assumption: Stage 1 imposes simplex + SUTVA; Stage 2 relaxes the simplex; Stage 3 also relaxes SUTVA.]{.takeaway .fragment}
 
 ::: {.notes}
 The pipeline is the post's Mermaid diagram, re-expressed as columns: classical → Bayesian horseshoe → Bayesian spatial SAR, then diagnostics and cross-stage comparison. The pedagogical point is what *moves* between stages.
@@ -132,7 +132,7 @@ The pipeline is the post's Mermaid diagram, re-expressed as columns: classical �
 
 $$\widehat\alpha = \arg\min_\alpha \big\| Y_{1,\text{pre}} - Y_{c,\text{pre}}\,\alpha \big\|^2 \quad \text{s.t.}\quad \alpha_j \ge 0,\ \sum_j \alpha_j = 1$$
 
-[The non-negativity-plus-sum-to-one constraint is an implicit regularizer — it pushes most weights to exactly zero.]{.comment}
+[The non-negativity-plus-sum-to-one constraint is an implicit regularizer — it pushes most weights to exactly zero.]{.takeaway .fragment}
 
 ::: {.notes}
 Read the equation aloud: match California's pre-treatment sales with a convex combination of donors. The simplex serves interpretability, but it also forces sparsity. Is the four-donor synthetic the data talking, or the constraint?
@@ -147,7 +147,7 @@ Read the equation aloud: match California's pre-treatment sales with a convex co
 | Montana | 0.245 |
 | Connecticut | 0.148 |
 
-[The other 34 donors are essentially zero — a near-pure four-state synthetic California.]{.comment}
+[The other 34 donors are essentially zero — a near-pure four-state synthetic California.]{.takeaway .fragment}
 
 ::: {.notes}
 Utah, Nevada, Montana, Connecticut carry 97.5% of the weight. Two questions hang over this: is the sparsity real, and is Nevada — California's neighbour — contaminated by spillovers? Stages 2 and 3 attack each.
@@ -169,7 +169,7 @@ $$\alpha_j \mid \tau, \lambda_j \sim \mathcal{N}\big(0,\ \tau^2 \lambda_j^2\big)
 
 A global scale $\tau$ pulls everything toward zero; a *local* scale $\lambda_j$ lets individual donors break free. The half-Cauchy tails do the rest.
 
-[Now the **data**, not the constraint, decide which donors get non-zero mass.]{.comment}
+[Now the **data**, not the constraint, decide which donors get non-zero mass.]{.takeaway .fragment}
 
 ::: {.notes}
 The horseshoe replaces the simplex with a soft, heavy-tailed regularizer. Most weights hug zero; a handful escape. This is the test of whether the four-donor sparsity was real.
@@ -197,7 +197,7 @@ $$Y_{c,t} = \rho\, W\, Y_{c,t} + X_{c,t}\beta + Y_c^{\text{lag}}\alpha + \vareps
 
 The spatial lag $W Y_{c,t}$ is the row-normalized neighbour average; $\rho$ measures how strongly a state co-moves with its neighbours. When $\rho = 0$ we recover Stage 2.
 
-[If $\rho > 0$, a donor's sales are partly its neighbours' — so Nevada's post-1988 sales are part of the **treatment effect**, not the counterfactual.]{.comment}
+[If $\rho > 0$, a donor's sales are partly its neighbours' — so Nevada's post-1988 sales are part of the **treatment effect**, not the counterfactual.]{.takeaway .fragment}
 
 ::: {.notes}
 This is where SUTVA is dropped. The SAR layer lets California's policy diffuse into adjacent donors through W. The cross-border-shopping literature predicts exactly this for the California–Nevada line.
@@ -270,7 +270,7 @@ Nevada absorbs −3.75 packs/capita — 16× the next state (Idaho, −0.228) an
 | Bayesian HS | −15.84 | [−21.76, −9.48] | 23 |
 | Bayesian Spatial SAR | −16.59 | [−16.78, −16.39] | 27 |
 
-[The headline ATT is robust; the donor pool's *shape* is not — and the Stage-3 interval is artificially narrow (ESS(ρ) = 3 at tutorial scale).]{.comment}
+[The headline ATT is robust; the donor pool's *shape* is not — and the Stage-3 interval is artificially narrow (ESS(ρ) = 3 at tutorial scale).]{.takeaway .fragment}
 
 ::: {.notes}
 Three reads. The sign and order of magnitude agree across all three — none of the intervals reaches zero. The active-donor count rises 4 → 23 → 27 as priors relax, so the sparse four-donor synthetic is one of many plausible counterfactuals. The Stage-3 CrI is the narrowest but least trustworthy because rho has not mixed at 5,000 iterations.

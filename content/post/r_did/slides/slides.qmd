@@ -67,7 +67,7 @@ From 2001–2007 the federal minimum wage sat frozen at **\$5.15/hour**, while s
 
 Counties fall into cohorts indexed by their first-increase year $G \in \{0, 2004, 2006\}$: 102 treated in 2004, 226 in 2006, and **1,417 never-treated**.
 
-[Staggered adoption: there is no single "before" and "after" for the country — each state has its own clock.]{.comment}
+[Staggered adoption: there is no single "before" and "after" for the country — each state has its own clock.]{.takeaway .fragment}
 
 ::: {.notes}
 Staggered treatment timing is the source of all the trouble. With a single common treatment date, TWFE is fine. The moment treatment dates differ across units, TWFE starts making comparisons it should not. 8,725 county-year observations, 1,745 counties, 2003–2007.
@@ -100,7 +100,7 @@ $$\mathrm{ATT} = E[\Delta Y_{t^{\ast}} \mid D=1] - E[\Delta Y_{t^{\ast}} \mid D=
 
 The treated group's change in outcomes, *minus* the comparison group's change. Valid **only if** both groups would have moved in parallel absent treatment.
 
-[The estimand is the ATT — the effect on the counties that actually raised their wage.]{.comment}
+[The estimand is the ATT — the effect on the counties that actually raised their wage.]{.takeaway .fragment}
 
 ::: {.notes}
 Notation: D=1 treated, D=0 untreated, ΔY the pre-to-post change. Parallel trends is the identifying assumption, and it is not directly testable — pre-trends near zero are necessary but not sufficient. State this estimand clearly: ATT, not ATE. We never claim an effect for counties that didn't change their wage.
@@ -115,7 +115,7 @@ With staggered timing, TWFE mixes **two** kinds of comparison:
 - **Bad:** later-treated vs *already-treated* — the control is itself under treatment
 :::
 
-[Like grading a student's improvement against classmates who already took the test — the "control" already saw the answer key.]{.comment}
+[Like grading a student's improvement against classmates who already took the test — the "control" already saw the answer key.]{.takeaway .fragment}
 
 ::: {.notes}
 Under treatment-effect heterogeneity the TWFE coefficient is a weighted average of group-time effects, and some weights go negative. In principle TWFE could return a negative estimate even if every true effect were positive. This is the de Chaisemartin–D'Haultfœuille / Goodman-Bacon critique in one slide.
@@ -127,7 +127,7 @@ $$\mathrm{ATT}(g,t) = E[\,Y_t(g) - Y_t(0) \mid G = g\,]$$
 
 The effect for cohort $g$, measured in calendar period $t$ — each cell compared *only* to clean (never- or not-yet-treated) controls.
 
-[Callaway–Sant'Anna (2021): separate identification from estimation. Build the grid of $\mathrm{ATT}(g,t)$ first, average it later.]{.comment}
+[Callaway–Sant'Anna (2021): separate identification from estimation. Build the grid of $\mathrm{ATT}(g,t)$ first, average it later.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the conceptual heart. Instead of one regression coefficient, we get a grid of building-block parameters, each identified by a clean comparison under parallel trends. No forbidden comparisons can enter, by construction.
@@ -165,7 +165,7 @@ For G=2004: −0.033 on impact, −0.068 after a year, −0.123 after two, −0.
 | TWFE | −0.038 | 0.008 | yes |
 | Callaway–Sant'Anna | [−0.057]{.key} | 0.008 | yes |
 
-[TWFE *understated* the negative effect by about a third — attenuated toward zero.]{.comment}
+[TWFE *understated* the negative effect by about a third — attenuated toward zero.]{.takeaway .fragment}
 
 ::: {.notes}
 The overall ATT weights each ATT(g,t) by group size and number of post periods. Group-level: G=2004 at −0.089 (treated longer, more dynamics) vs G=2006 at −0.043. The headline contrast is −0.057 vs −0.038.
@@ -196,7 +196,7 @@ twfeweights decomposition: both TWFE and ATT^O are weighted averages of the SAME
 | IPW | −0.065 | 0.008 |
 | Doubly robust | [−0.065]{.key} | 0.008 |
 
-[Three independent modeling routes agree — no model-dependence artifact.]{.comment}
+[Three independent modeling routes agree — no model-dependence artifact.]{.takeaway .fragment}
 
 ::: {.notes}
 Conditional parallel trends: trends need only be parallel after conditioning on log population and log average pay. Doubly robust = belt and suspenders: consistent if EITHER the outcome regression OR the propensity score is right. Going from −0.057 to −0.065 is a small, sensible move once county characteristics are netted out.

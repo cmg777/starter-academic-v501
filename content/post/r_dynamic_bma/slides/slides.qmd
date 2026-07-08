@@ -103,7 +103,7 @@ $$\ln y_{it} = \alpha \ln y_{i,t-1} + \beta' x_{it} + \eta_i + \zeta_t + v_{it}$
 
 The convergence prediction puts last period's GDP on the right-hand side. The persistence $\alpha$ measures how slowly countries approach their steady state.
 
-[Omitting $\ln y_{i,t-1}$ assumes $\alpha = 0$ — instantaneous convergence, which the data flatly rejects.]{.comment}
+[Omitting $\ln y_{i,t-1}$ assumes $\alpha = 0$ — instantaneous convergence, which the data flatly rejects.]{.takeaway .fragment}
 
 ::: {.notes}
 α close to 1 means slow convergence (countries stay near their current income for a long time); α close to 0 means fast. The lagged dependent variable is not an ad hoc add-on — it falls straight out of the Solow beta-convergence equation. Entity effects absorb geography and institutions; time effects remove global shocks.
@@ -146,7 +146,7 @@ full <- optim_model_space(df = data_prepared,
 bma_results <- bma(full, df = data_prepared, round = 3)
 ```
 
-[Marginal likelihood scores each of 512 "recipes" — rewarding fit, penalizing needless complexity.]{.comment}
+[Marginal likelihood scores each of 512 "recipes" — rewarding fit, penalizing needless complexity.]{.takeaway .fragment}
 
 ::: {.notes}
 Unlike R-squared, which always rises when you add variables, the marginal likelihood integrates out parameter uncertainty and penalizes complexity — a 9-regressor model that barely beats a 5-regressor one scores lower. The package ships a precomputed full_model_space so the several-minute optimization can be skipped.
@@ -161,7 +161,7 @@ Unlike R-squared, which always rises when you add variables, the marginal likeli
 | education | 0.016 | 0.632 | no |
 | life expectancy | 0.115 | 0.637 | no |
 
-[Drop one variable and the significance pattern changes — this fragility is what BMA is built to fix.]{.comment}
+[Drop one variable and the significance pattern changes — this fragility is what BMA is built to fix.]{.takeaway .fragment}
 
 ::: {.notes}
 The kitchen-sink fixed-effects model commits to one specification. Its lagged-GDP coefficient (0.619) is well below the BMA posterior mean (0.919) — multicollinearity among 9 regressors pulls it down. R-squared is 0.988 on 292 observations. BMA replaces the binary significant/insignificant verdict with a continuous probability scale.
@@ -277,7 +277,7 @@ $$\alpha \approx 0.92 \;\Rightarrow\; \text{convergence speed} = 1 - \alpha \app
 
 The lagged-GDP coefficient near 0.92 means a country's income is dominated by its own past — convergence to its steady state is a slow crawl.
 
-[That persistence absorbs the cross-sectional variation, leaving fewer variables with independent power.]{.comment}
+[That persistence absorbs the cross-sectional variation, leaving fewer variables with independent power.]{.takeaway .fragment}
 
 ::: {.notes}
 The kitchen-sink FE coefficient (0.619) understates persistence; the BMA posterior mean is 0.919–0.943 depending on prior. Strong persistence is exactly why dynamic panel BMA reshapes the landscape of "robust" determinants relative to cross-sectional BMA — much of what looked causal was just inertia.
@@ -292,7 +292,7 @@ The kitchen-sink FE coefficient (0.619) understates persistence; the BMA posteri
 | investment share | 0.773 | 0.954 | 0.483 | Sensitive |
 | democracy | 0.678 | 0.929 | 0.372 | Sensitive |
 
-[Robust = PIP above 0.5 even under the skeptical prior. Only two determinants qualify.]{.comment}
+[Robust = PIP above 0.5 even under the skeptical prior. Only two determinants qualify.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the payoff table. Investment and trade look promising under the default prior but become ambiguous under EMS=2. Education and democracy — despite intuitive appeal — are fragile. For a policymaker, population dynamics and public health are the levers with the strongest evidence across all modeling assumptions.

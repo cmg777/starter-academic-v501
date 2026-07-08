@@ -98,7 +98,7 @@ $$y_{it} = \alpha_i + \lambda_t + \beta x_{it} + u_{it}$$
 
 Each country $i$ gets its own intercept $\alpha_i$; each period $t$ gets its own $\lambda_t$. Together they absorb every time-invariant country trait and every country-invariant shock.
 
-[Those intercepts are the "controls." FWL says we can *project them out* instead of estimating them.]{.comment}
+[Those intercepts are the "controls." FWL says we can *project them out* instead of estimating them.]{.takeaway .fragment}
 
 ::: {.notes}
 α_i soaks up persistent country differences (geography, institutions, long-run level); λ_t soaks up common shocks (a global recession, a productivity boom). This is exactly the "controls Z" that FWL lets us residualize away rather than carry in one giant dummy regression.
@@ -122,7 +122,7 @@ The double-dot accent here is the within-transformed variable. Demeaning growth 
 
 Subtract both the country mean and the time mean, and you remove the **grand mean twice** — it hides inside each. Add $\bar{x}_{\cdot\cdot}$ back once to undo that.
 
-[Like a Venn diagram: remove both circles entirely and the overlap is deleted twice. Add the overlap back once.]{.comment}
+[Like a Venn diagram: remove both circles entirely and the overlap is deleted twice. Add the overlap back once.]{.takeaway .fragment}
 
 ::: {.notes}
 Without the +grand-mean term, the demeaned variables are not centred at zero, the intercept is no longer ~0, and the FWL equivalence with TWFE breaks. The grand-mean correction is algebraically necessary, not cosmetic. This is also Exercise 1 in the post.
@@ -134,7 +134,7 @@ $$\hat{\beta}_{\text{TWFE}} = \hat{\beta}_{\text{OLS on demeaned data}}$$
 
 The slope on $x$ controlling for the dummies equals the slope from OLS on the *residualized* $y$ and $x$. TWFE is the special case where the controls are the country and time dummies.
 
-[Noise-cancelling headphones: subtract the engine hum from the signal first, then listen — same music as a silent room.]{.comment}
+[Noise-cancelling headphones: subtract the engine hum from the signal first, then listen — same music as a silent room.]{.takeaway .fragment}
 
 ::: {.notes}
 FWL is the theoretical guarantee behind the whole tutorial. "Either include all the dummies in one big regression, or project them out of both y and x and regress the residuals" — the coefficient on x is identical either way. Not approximately: exactly, as an algebraic identity.
@@ -195,7 +195,7 @@ Illustrative skeleton — the post uses dplyr group_by/left_join, but the algebr
 | `ln_y_initial_dm` | 8.3e−15 |
 | `gov_cons_dm` | 1.8e−16 |
 
-[All six means sit at $10^{-15}$ or smaller — effectively zero. The transformation is implemented correctly.]{.comment}
+[All six means sit at $10^{-15}$ or smaller — effectively zero. The transformation is implemented correctly.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the sanity check before the big claim. If the grand-mean term had been dropped, these means would not be zero and the intercept of the OLS step would not vanish. What's left is pure within-variation — deviation from each country's own average and each period's common trend.
@@ -213,7 +213,7 @@ This is the sanity check before the big claim. If the grand-mean term had been d
 | `log_s_k` | 0.019725 | 0.019725 | 3.5e−18 |
 | `gov_cons` | −0.102795 | −0.102795 | −3.1e−16 |
 
-[`all.equal()` returns `TRUE`. Largest difference 3.05e−16 ≈ IEEE-754 machine epsilon (2.2e−16).]{.comment}
+[`all.equal()` returns `TRUE`. Largest difference 3.05e−16 ≈ IEEE-754 machine epsilon (2.2e−16).]{.takeaway .fragment}
 
 ::: {.notes}
 This is the central result. All five slopes are identical to at least 12 significant digits; the biggest discrepancy is floating-point noise, not estimation error. It is an exact algebraic identity guaranteed by FWL, verified empirically on real-ish data.
