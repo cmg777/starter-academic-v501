@@ -251,6 +251,8 @@ Colab removes the single biggest barrier for beginners — installation. For a g
 
 ![Every chapter ships as a Google Colab notebook — code, output plots, and an AI assistant beside it.](img/shot-colab.png)
 
+<p style="text-align:center; margin:0.15em 0 0; font-size:0.8em;">Course: <a href="https://quarcs-lab.github.io/metricsai/" target="_blank" rel="noopener" data-preview-link="false">quarcs-lab.github.io/metricsai</a> &nbsp;·&nbsp; Example: <a href="https://colab.research.google.com/github/quarcs-lab/metricsai/blob/main/notebooks_colab/ch01_Analysis_of_Economics_Data.ipynb" target="_blank" rel="noopener" data-preview-link="false">Chapter 1 in Colab</a></p>
+
 ::: {.notes}
 This is what "a lab in the browser, with AI inside" looks like: a Colab notebook running the chapter's code, with plots inline and an AI Summary/assistant panel. No install — just open the link.
 :::
