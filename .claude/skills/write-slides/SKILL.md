@@ -90,21 +90,24 @@ Hugo, not Quarto, so the rendered output must be in git. Only Quarto's local cac
 
 ## Site color palette (fixed brand — every deck)
 
-`site-brand.scss` carries these (sourced from `assets/scss/custom.scss`); do not vary them:
+`site-brand.scss` carries these (sourced from `assets/scss/custom.scss`); do not vary them.
+**The theme is dark mode** — a navy canvas with light text; the brand accents are unchanged.
 
 | Token | Hex | Use in the deck |
 |---|---|---|
-| Steel blue | `#6a9bcc` | Act II divider, links, list markers, 3rd title stat |
-| Warm orange | `#d97757` | Act I divider, assertion underline, key table cell, big number, 1st stat |
-| Teal | `#00d4c8` | Act III divider, table head rule, 2nd title stat, dark-slide accents |
-| Heading blue | `#1a3a8a` | Assertion titles, headings |
-| Ink | `#141413` | Body text; headline/closing slide background |
-| Page background | `#eef1f6` | The deck canvas — a deliberate **light cool gray** (NOT pure white), in the steel/navy family so it stays on-brand. Set via `$body-bg`. |
+| Navy (canvas) | `#0f1729` | The deck canvas — **dark mode**. Set via `$body-bg: $navy`. |
+| Body text | `#e6ebf3` | Body copy on the navy canvas. Set via `$body-color`. |
+| Headings | `#f2f5fa` | Assertion titles / headings (near-white on navy). |
+| Muted | `#aebfd8` | Captions, figure/equation glosses, byline meta, key-result labels (`$muted`). |
+| Steel blue | `#6a9bcc` | Links, list markers, **bold `strong` text**, 3rd title stat |
+| Warm orange | `#d97757` | Act I + closing dividers, assertion underline, key table cell, big number, 1st stat, `.takeaway` accent |
+| Teal | `#00d4c8` | Integrated/Act III divider, table head rule, 2nd title stat, link hover, dark-slide accents |
+| Brand blue | `#1a3a8a` | Full-bleed section/"tool" divider backgrounds (readable on navy) |
 | Display font | Cinzel | Title, dividers, big number, key-result numbers |
 | Mono font | IBM Plex Mono | Code blocks |
 
 The warm orange also carries the **`.takeaway` card** — each content slide's concluding line
-(see the **Takeaway card** component in `slide-archetypes.md`). Reuses `$orange`/`$ink`; no new color.
+(see the **Takeaway card** component in `slide-archetypes.md`). Reuses `$orange` with light text; no new color.
 
 ---
 

@@ -228,25 +228,26 @@ objection (orange), then answer (teal).
 ## 11. Headline-result
 
 ```markdown
-## THE RESULT, AS A SENTENCE {background-color="#141413"}
+## THE RESULT, AS A SENTENCE {background-color="#1a3a8a"}
 
 [−0.096]{.bignum}
 
 [$\hat\alpha$ on the treatment, rigorous Double-LASSO (SE 0.034)]{.bignum-label}
 ```
-**Use:** the Act-III payoff. One giant number + one line on a dark slide (reveal auto-flips
-text to light via `has-dark-background`; the theme makes `.bignum` teal there). The number
-must match `results_report.md`.
+**Use:** the Act-III payoff. One giant number + one line on a full-bleed brand-blue slide that
+lifts off the navy canvas (`has-dark-background` keeps text light; the theme makes `.bignum` teal
+there). The number must match `results_report.md`.
 
 ---
 
 ## 12. Closing
 
 ```markdown
-# THE ONE SENTENCE YOU WANT THEM TO REMEMBER. {.divider background-color="#141413"}
+# THE ONE SENTENCE YOU WANT THEM TO REMEMBER. {.divider background-color="#1a3a8a"}
 ```
 **Use:** always, the final slide. A declarative thesis (the resolution of the Act-I hook) as a
-centred `#` section slide on ink. **Never** "Questions?", "Thank you", or a contact list.
+centred `#` section slide on a full-bleed brand colour (brand blue, or `$orange` to bookend an
+Act-I orange divider). **Never** "Questions?", "Thank you", or a contact list.
 
 ---
 

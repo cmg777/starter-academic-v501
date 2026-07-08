@@ -45,7 +45,7 @@ format:
 .reveal .dgram-arrow { color: #6a9bcc; font-weight: 700; font-size: 1.4em; margin: 0 0.1em; }
 
 /* framed illustrative screenshots (the only <img> on slides are the 4 crops) */
-.reveal .slides img { border: 1px solid rgba(20,20,19,0.14); border-radius: 10px; box-shadow: 0 8px 30px rgba(20,20,19,0.20); }
+.reveal .slides img { border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.45); }
 
 /* Trade-off 2x2 — production vs verification, with L-shaped axes (arrows + low/high) */
 .reveal .tradeoff {
@@ -58,71 +58,71 @@ format:
 .reveal .tradeoff .vtitle {
   grid-column: 1; grid-row: 1; place-self: center;
   writing-mode: vertical-rl; transform: rotate(180deg); text-align: center;
-  color: #46505e; letter-spacing: 0.03em; font-size: 0.84em;
+  color: #aebfd8; letter-spacing: 0.03em; font-size: 0.84em;
 }
 .reveal .tradeoff .vticks {
   grid-column: 2; grid-row: 1;
   display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end;
-  padding: 0.15em 0.2em; color: #5b6472; font-size: 0.84em; font-weight: 600;
+  padding: 0.15em 0.2em; color: #aebfd8; font-size: 0.84em; font-weight: 600;
 }
 .reveal .tradeoff .plot {
   grid-column: 3; grid-row: 1; position: relative;
-  border-left: 2px solid #7c8593; border-bottom: 2px solid #7c8593;
+  border-left: 2px solid #8f9bad; border-bottom: 2px solid #8f9bad;
   padding: 0.5em 0.15em 0.6em 0.6em;
 }
 .reveal .tradeoff .plot::before {   /* up arrowhead atop the vertical axis */
   content: ""; position: absolute; top: -7px; left: -5px;
-  border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #7c8593;
+  border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #8f9bad;
 }
 .reveal .tradeoff .plot::after {    /* right arrowhead at the end of the horizontal axis */
   content: ""; position: absolute; right: -7px; bottom: -5px;
-  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #7c8593;
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #8f9bad;
 }
 .reveal .tradeoff .xticks {
   grid-column: 3; grid-row: 2;
   display: flex; justify-content: space-between;
-  padding: 0.12em 0.15em 0; color: #5b6472; font-size: 0.84em; font-weight: 600;
+  padding: 0.12em 0.15em 0; color: #aebfd8; font-size: 0.84em; font-weight: 600;
 }
 .reveal .tradeoff .htitle {
   grid-column: 3; grid-row: 3;
-  text-align: center; color: #46505e; letter-spacing: 0.03em; font-size: 0.84em; margin-top: 0.05em;
+  text-align: center; color: #aebfd8; letter-spacing: 0.03em; font-size: 0.84em; margin-top: 0.05em;
 }
 .reveal .tradeoff .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45em; }
-.reveal .tradeoff .cell { border: 2px solid rgba(20,20,19,0.16); border-radius: 0.45em; padding: 0.55em 0.5em; line-height: 1.2; }
+.reveal .tradeoff .cell { border: 2px solid rgba(255,255,255,0.16); border-radius: 0.45em; padding: 0.55em 0.5em; line-height: 1.2; }
 .reveal .tradeoff .cell b { display: block; font-size: 0.9em; letter-spacing: 0.03em; margin-bottom: 0.15em; }
-.reveal .tradeoff .cell small { color: #6a6a68; }
-.reveal .tradeoff .danger { border-color: #d97757; background: rgba(217,119,87,0.10); }
+.reveal .tradeoff .cell small { color: #aebfd8; }
+.reveal .tradeoff .danger { border-color: #d97757; background: rgba(217,119,87,0.16); }
 .reveal .tradeoff .danger b { color: #d97757; }
-.reveal .tradeoff .old { border-color: #6a9bcc; background: rgba(106,155,204,0.10); }
-.reveal .tradeoff .old b { color: #1a3a8a; }
+.reveal .tradeoff .old { border-color: #6a9bcc; background: rgba(106,155,204,0.16); }
+.reveal .tradeoff .old b { color: #8fb3dd; }
 
 /* NotebookLM fan-out */
 .reveal .fanout { display: flex; align-items: center; justify-content: center; gap: 0.5em; flex-wrap: wrap; font-size: 0.8em; }
-.reveal .fanout .src { border: 2px solid #d97757; border-radius: 0.5em; padding: 0.6em 0.8em; background: rgba(217,119,87,0.07); }
+.reveal .fanout .src { border: 2px solid #d97757; border-radius: 0.5em; padding: 0.6em 0.8em; background: rgba(217,119,87,0.14); }
 .reveal .fanout .src b { color: #d97757; }
-.reveal .fanout .src small { display: block; color: #6a6a68; font-size: 0.8em; margin-top: 0.2em; }
+.reveal .fanout .src small { display: block; color: #aebfd8; font-size: 0.8em; margin-top: 0.2em; }
 .reveal .fanout .outs { display: grid; grid-template-columns: repeat(2, auto); gap: 0.4em; }
 .reveal .fanout .outs span { border: 1.5px solid #6a9bcc; border-radius: 2em; padding: 0.28em 0.7em; white-space: nowrap; }
 
 /* Bolivia flow */
 .reveal .flowchain { display: flex; align-items: center; justify-content: center; gap: 0.5em; flex-wrap: wrap; font-size: 0.8em; }
 .reveal .flowchain .ins { display: flex; flex-direction: column; gap: 0.4em; }
-.reveal .flowchain .box { border: 2px solid rgba(20,20,19,0.16); border-radius: 0.5em; padding: 0.5em 0.75em; line-height: 1.2; box-shadow: none; }
+.reveal .flowchain .box { border: 2px solid rgba(255,255,255,0.16); border-radius: 0.5em; padding: 0.5em 0.75em; line-height: 1.2; box-shadow: none; }
 .reveal .flowchain .box b { display: block; }
-.reveal .flowchain .box small { color: #6a6a68; font-size: 0.82em; }
+.reveal .flowchain .box small { color: #aebfd8; font-size: 0.82em; }
 .reveal .flowchain .ntl { border-color: #d97757; } .reveal .flowchain .ntl b { color: #d97757; }
-.reveal .flowchain .emb { border-color: #6a9bcc; } .reveal .flowchain .emb b { color: #1a3a8a; }
-.reveal .flowchain .out { border-color: #00a99f; background: rgba(0,212,200,0.10); } .reveal .flowchain .out b { color: #0d7d74; }
+.reveal .flowchain .emb { border-color: #6a9bcc; } .reveal .flowchain .emb b { color: #8fb3dd; }
+.reveal .flowchain .out { border-color: #00a99f; background: rgba(0,212,200,0.16); } .reveal .flowchain .out b { color: #22c7b5; }
 
 /* Integrated loop triad — Learn=orange, Explore=teal, Research=steel (matches title strip) */
 .reveal .triad { display: flex; align-items: center; justify-content: center; gap: 0.4em; flex-wrap: wrap; font-size: 0.86em; }
 .reveal .triad .stage { border: 2px solid; border-radius: 0.5em; padding: 0.55em 0.9em; min-width: 6em; }
 .reveal .triad .stage b { display: block; font-family: "Cinzel", serif; font-size: 1.1em; }
-.reveal .triad .stage small { color: #6a6a68; }
+.reveal .triad .stage small { color: #aebfd8; }
 .reveal .triad .learn { border-color: #d97757; } .reveal .triad .learn b { color: #d97757; }
-.reveal .triad .explore { border-color: #00a99f; } .reveal .triad .explore b { color: #0d7d74; }
-.reveal .triad .research { border-color: #6a9bcc; } .reveal .triad .research b { color: #1a3a8a; }
-.reveal .loopnote { text-align: center; color: #6a6a68; margin-top: 0.55em; font-size: 0.8em; letter-spacing: 0.03em; }
+.reveal .triad .explore { border-color: #00a99f; } .reveal .triad .explore b { color: #22c7b5; }
+.reveal .triad .research { border-color: #6a9bcc; } .reveal .triad .research b { color: #8fb3dd; }
+.reveal .loopnote { text-align: center; color: #aebfd8; margin-top: 0.55em; font-size: 0.8em; letter-spacing: 0.03em; }
 
 /* ===== Title slide — pipeline arrows: tighten the strip (theme provides the accent rule,
    byline, :nth-of-type colors, and the .kr-arrow style; see the write-slides template). ===== */
@@ -191,7 +191,7 @@ Name the stakes for both halves of the talk. Black-box learning erodes understan
 The roadmap. Each tool maps to a stage of the research life cycle and to a place where verification has to live. Keep it a promise, not a summary.
 :::
 
-# NotebookLM — Learn {.divider background-color="#141413"}
+# NotebookLM — Learn {.divider background-color="#1a3a8a"}
 
 [Tool 1]{.act}
 
@@ -235,7 +235,7 @@ NotebookLM is the content-transformation layer: a single source set fans out int
 Concrete example: the metricsAI podcast series is NotebookLM "Deep Dives" — two AI voices discussing each chapter. Students listen on their commute; the source is always the chapter, so it stays grounded.
 :::
 
-# Google Colab — Explore {.divider background-color="#141413"}
+# Google Colab — Explore {.divider background-color="#1a3a8a"}
 
 [Tool 2]{.act}
 
@@ -289,7 +289,7 @@ A notebook is where discovery happens. Now make the work **reproducible and revi
 Bridge to Tool 3. A Colab notebook is where discovery happens; GitHub is where it becomes credible research. This is the natural hand-off.
 :::
 
-# GitHub — Research {.divider background-color="#141413"}
+# GitHub — Research {.divider background-color="#1a3a8a"}
 
 [Tool 3]{.act}
 
@@ -389,7 +389,7 @@ The payoff picture. Understand a topic with NotebookLM, explore and analyze data
 Keep it to three; each maps to one act of the talk.
 :::
 
-# In the age of AI, the scarce skill is not production — it's verification. {.divider background-color="#141413"}
+# In the age of AI, the scarce skill is not production — it's verification. {.divider background-color="#d97757"}
 
 ::: {.notes}
 The single sentence to remember. It resolves the Act-I hook: production got cheap, so the value — and the discipline — moves to verification and judgment. That is what these three tools are for.

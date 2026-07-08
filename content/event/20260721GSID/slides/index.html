@@ -6,7 +6,7 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-8b4baf804e461d9b72633f0de59a0cac.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.8.27">
 
   <meta name="dcterms.date" content="2026-01-01">
@@ -29,7 +29,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-11fbf5f7b3ad2307d449591d5e123d26.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-30e199f8599492bc715969fb4e1d58d2.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -124,7 +124,7 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
@@ -151,7 +151,7 @@
 .reveal .dgram-arrow { color: #6a9bcc; font-weight: 700; font-size: 1.4em; margin: 0 0.1em; }
 
 /* framed illustrative screenshots (the only <img> on slides are the 4 crops) */
-.reveal .slides img { border: 1px solid rgba(20,20,19,0.14); border-radius: 10px; box-shadow: 0 8px 30px rgba(20,20,19,0.20); }
+.reveal .slides img { border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.45); }
 
 /* Trade-off 2x2 — production vs verification, with L-shaped axes (arrows + low/high) */
 .reveal .tradeoff {
@@ -164,71 +164,71 @@
 .reveal .tradeoff .vtitle {
   grid-column: 1; grid-row: 1; place-self: center;
   writing-mode: vertical-rl; transform: rotate(180deg); text-align: center;
-  color: #46505e; letter-spacing: 0.03em; font-size: 0.84em;
+  color: #aebfd8; letter-spacing: 0.03em; font-size: 0.84em;
 }
 .reveal .tradeoff .vticks {
   grid-column: 2; grid-row: 1;
   display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end;
-  padding: 0.15em 0.2em; color: #5b6472; font-size: 0.84em; font-weight: 600;
+  padding: 0.15em 0.2em; color: #aebfd8; font-size: 0.84em; font-weight: 600;
 }
 .reveal .tradeoff .plot {
   grid-column: 3; grid-row: 1; position: relative;
-  border-left: 2px solid #7c8593; border-bottom: 2px solid #7c8593;
+  border-left: 2px solid #8f9bad; border-bottom: 2px solid #8f9bad;
   padding: 0.5em 0.15em 0.6em 0.6em;
 }
 .reveal .tradeoff .plot::before {   /* up arrowhead atop the vertical axis */
   content: ""; position: absolute; top: -7px; left: -5px;
-  border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #7c8593;
+  border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #8f9bad;
 }
 .reveal .tradeoff .plot::after {    /* right arrowhead at the end of the horizontal axis */
   content: ""; position: absolute; right: -7px; bottom: -5px;
-  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #7c8593;
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #8f9bad;
 }
 .reveal .tradeoff .xticks {
   grid-column: 3; grid-row: 2;
   display: flex; justify-content: space-between;
-  padding: 0.12em 0.15em 0; color: #5b6472; font-size: 0.84em; font-weight: 600;
+  padding: 0.12em 0.15em 0; color: #aebfd8; font-size: 0.84em; font-weight: 600;
 }
 .reveal .tradeoff .htitle {
   grid-column: 3; grid-row: 3;
-  text-align: center; color: #46505e; letter-spacing: 0.03em; font-size: 0.84em; margin-top: 0.05em;
+  text-align: center; color: #aebfd8; letter-spacing: 0.03em; font-size: 0.84em; margin-top: 0.05em;
 }
 .reveal .tradeoff .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45em; }
-.reveal .tradeoff .cell { border: 2px solid rgba(20,20,19,0.16); border-radius: 0.45em; padding: 0.55em 0.5em; line-height: 1.2; }
+.reveal .tradeoff .cell { border: 2px solid rgba(255,255,255,0.16); border-radius: 0.45em; padding: 0.55em 0.5em; line-height: 1.2; }
 .reveal .tradeoff .cell b { display: block; font-size: 0.9em; letter-spacing: 0.03em; margin-bottom: 0.15em; }
-.reveal .tradeoff .cell small { color: #6a6a68; }
-.reveal .tradeoff .danger { border-color: #d97757; background: rgba(217,119,87,0.10); }
+.reveal .tradeoff .cell small { color: #aebfd8; }
+.reveal .tradeoff .danger { border-color: #d97757; background: rgba(217,119,87,0.16); }
 .reveal .tradeoff .danger b { color: #d97757; }
-.reveal .tradeoff .old { border-color: #6a9bcc; background: rgba(106,155,204,0.10); }
-.reveal .tradeoff .old b { color: #1a3a8a; }
+.reveal .tradeoff .old { border-color: #6a9bcc; background: rgba(106,155,204,0.16); }
+.reveal .tradeoff .old b { color: #8fb3dd; }
 
 /* NotebookLM fan-out */
 .reveal .fanout { display: flex; align-items: center; justify-content: center; gap: 0.5em; flex-wrap: wrap; font-size: 0.8em; }
-.reveal .fanout .src { border: 2px solid #d97757; border-radius: 0.5em; padding: 0.6em 0.8em; background: rgba(217,119,87,0.07); }
+.reveal .fanout .src { border: 2px solid #d97757; border-radius: 0.5em; padding: 0.6em 0.8em; background: rgba(217,119,87,0.14); }
 .reveal .fanout .src b { color: #d97757; }
-.reveal .fanout .src small { display: block; color: #6a6a68; font-size: 0.8em; margin-top: 0.2em; }
+.reveal .fanout .src small { display: block; color: #aebfd8; font-size: 0.8em; margin-top: 0.2em; }
 .reveal .fanout .outs { display: grid; grid-template-columns: repeat(2, auto); gap: 0.4em; }
 .reveal .fanout .outs span { border: 1.5px solid #6a9bcc; border-radius: 2em; padding: 0.28em 0.7em; white-space: nowrap; }
 
 /* Bolivia flow */
 .reveal .flowchain { display: flex; align-items: center; justify-content: center; gap: 0.5em; flex-wrap: wrap; font-size: 0.8em; }
 .reveal .flowchain .ins { display: flex; flex-direction: column; gap: 0.4em; }
-.reveal .flowchain .box { border: 2px solid rgba(20,20,19,0.16); border-radius: 0.5em; padding: 0.5em 0.75em; line-height: 1.2; box-shadow: none; }
+.reveal .flowchain .box { border: 2px solid rgba(255,255,255,0.16); border-radius: 0.5em; padding: 0.5em 0.75em; line-height: 1.2; box-shadow: none; }
 .reveal .flowchain .box b { display: block; }
-.reveal .flowchain .box small { color: #6a6a68; font-size: 0.82em; }
+.reveal .flowchain .box small { color: #aebfd8; font-size: 0.82em; }
 .reveal .flowchain .ntl { border-color: #d97757; } .reveal .flowchain .ntl b { color: #d97757; }
-.reveal .flowchain .emb { border-color: #6a9bcc; } .reveal .flowchain .emb b { color: #1a3a8a; }
-.reveal .flowchain .out { border-color: #00a99f; background: rgba(0,212,200,0.10); } .reveal .flowchain .out b { color: #0d7d74; }
+.reveal .flowchain .emb { border-color: #6a9bcc; } .reveal .flowchain .emb b { color: #8fb3dd; }
+.reveal .flowchain .out { border-color: #00a99f; background: rgba(0,212,200,0.16); } .reveal .flowchain .out b { color: #22c7b5; }
 
 /* Integrated loop triad — Learn=orange, Explore=teal, Research=steel (matches title strip) */
 .reveal .triad { display: flex; align-items: center; justify-content: center; gap: 0.4em; flex-wrap: wrap; font-size: 0.86em; }
 .reveal .triad .stage { border: 2px solid; border-radius: 0.5em; padding: 0.55em 0.9em; min-width: 6em; }
 .reveal .triad .stage b { display: block; font-family: "Cinzel", serif; font-size: 1.1em; }
-.reveal .triad .stage small { color: #6a6a68; }
+.reveal .triad .stage small { color: #aebfd8; }
 .reveal .triad .learn { border-color: #d97757; } .reveal .triad .learn b { color: #d97757; }
-.reveal .triad .explore { border-color: #00a99f; } .reveal .triad .explore b { color: #0d7d74; }
-.reveal .triad .research { border-color: #6a9bcc; } .reveal .triad .research b { color: #1a3a8a; }
-.reveal .loopnote { text-align: center; color: #6a6a68; margin-top: 0.55em; font-size: 0.8em; letter-spacing: 0.03em; }
+.reveal .triad .explore { border-color: #00a99f; } .reveal .triad .explore b { color: #22c7b5; }
+.reveal .triad .research { border-color: #6a9bcc; } .reveal .triad .research b { color: #8fb3dd; }
+.reveal .loopnote { text-align: center; color: #aebfd8; margin-top: 0.55em; font-size: 0.8em; letter-spacing: 0.03em; }
 
 /* ===== Title slide — pipeline arrows: tighten the strip (theme provides the accent rule,
    byline, :nth-of-type colors, and the .kr-arrow style; see the write-slides template). ===== */
@@ -346,7 +346,7 @@ Cost of production
       }</style></aside>
 </section></section>
 <section>
-<section id="notebooklm-learn" class="title-slide slide level1 divider center" data-background-color="#141413">
+<section id="notebooklm-learn" class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
 <h1>NotebookLM — Learn</h1>
 <p><span class="act">Tool 1</span></p>
 </section>
@@ -415,7 +415,7 @@ Cost of production
       }</style></aside>
 </section></section>
 <section>
-<section id="google-colab-explore" class="title-slide slide level1 divider center" data-background-color="#141413">
+<section id="google-colab-explore" class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
 <h1>Google Colab — Explore</h1>
 <p><span class="act">Tool 2</span></p>
 </section>
@@ -503,7 +503,7 @@ Course: <a href="https://quarcs-lab.github.io/metricsai/" target="_blank" rel="n
       }</style></aside>
 </section></section>
 <section>
-<section id="github-research" class="title-slide slide level1 divider center" data-background-color="#141413">
+<section id="github-research" class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
 <h1>GitHub — Research</h1>
 <p><span class="act">Tool 3</span></p>
 </section>
@@ -680,7 +680,7 @@ Course: <a href="https://quarcs-lab.github.io/metricsai/" target="_blank" rel="n
           display:block!important;
       }</style></aside>
 </section></section>
-<section id="in-the-age-of-ai-the-scarce-skill-is-not-production-its-verification." class="title-slide slide level1 divider center" data-background-color="#141413">
+<section id="in-the-age-of-ai-the-scarce-skill-is-not-production-its-verification." class="title-slide slide level1 divider center" data-background-color="#d97757">
 <h1>In the age of AI, the scarce skill is not production — it’s verification.</h1>
 <aside class="notes">
 <p>The single sentence to remember. It resolves the Act-I hook: production got cheap, so the value — and the discipline — moves to verification and judgment. That is what these three tools are for.</p>

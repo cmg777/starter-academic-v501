@@ -11,7 +11,7 @@ that Hugo serves from the post bundle. Read this in Phase 3.
 | File | Role | Per-run |
 |---|---|---|
 | `slides.qmd` | The deck source (`format: revealjs`). Front matter = engine config; body = the slides. | **Composed per post** from `slides.qmd.tmpl` + the archetypes. |
-| `site-brand.scss` | The revealjs theme (brand palette/fonts/archetype styling). The deck canvas is a deliberate **light cool gray** (`$body-bg: #eef1f6`), not pure white. | **Copied verbatim** from `templates/site-brand.scss`. |
+| `site-brand.scss` | The revealjs theme (brand palette/fonts/archetype styling). **Dark mode:** the deck canvas is deep navy (`$body-bg: $navy` / `#0f1729`) with light text (`#e6ebf3`). | **Copied verbatim** from `templates/site-brand.scss`. |
 | `title-slide.html` | A Quarto title-slide **partial** that renders the key-result number strip. | **Copied verbatim** from `templates/title-slide.html`. |
 
 Render (from the `slides/` dir):
@@ -82,9 +82,10 @@ The validated block lives in `templates/slides.qmd.tmpl`. Key options:
   `key-results:`, a list of `{num, cap}`; theme colours the three numbers orange/teal/steel) →
   the **hyperlinked author** (`deck-author` + `deck-author-url`) → the **university**
   (`institute`) → the **date** (`date: today`, `date-format: long`).
-- **Dividers / dark slides:** `{.divider background-color="#…"}` (white centred) or
-  `{background-color="#141413"}` (reveal auto-adds `has-dark-background`; the theme flips text
-  to light).
+- **Dividers / emphasis slides:** `{.divider background-color="#…"}` (white centred Cinzel).
+  On the dark navy canvas, pick a **brand colour** for full-bleed emphasis so it stands out from
+  the canvas — brand blue `#1a3a8a`, `$orange`, or `$teal`. Avoid near-black (`#141413`), which
+  blends into navy. Dark brand fills still get `has-dark-background`; the theme keeps text light.
 
 ---
 
