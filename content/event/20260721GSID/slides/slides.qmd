@@ -47,12 +47,46 @@ format:
 /* framed illustrative screenshots (the only <img> on slides are the 4 crops) */
 .reveal .slides img { border: 1px solid rgba(20,20,19,0.14); border-radius: 10px; box-shadow: 0 8px 30px rgba(20,20,19,0.20); }
 
-/* Act I — production vs verification 2x2 */
-.reveal .tradeoff { max-width: 19em; margin: 0.2em auto 0; font-size: 0.74em; }
-.reveal .tradeoff .axis-top,
-.reveal .tradeoff .axis-bot { text-align: center; color: #6a6a68; text-transform: uppercase; letter-spacing: 0.09em; font-size: 0.78em; }
-.reveal .tradeoff .axis-top { margin-bottom: 0.35em; }
-.reveal .tradeoff .axis-bot { margin-top: 0.35em; }
+/* Act I — production vs verification 2x2, with L-shaped axes (arrows + low/high) */
+.reveal .tradeoff {
+  display: grid;
+  grid-template-columns: auto auto 1fr;   /* [v-title][v-ticks][plot] */
+  grid-template-rows: 1fr auto auto;       /* [plot][x-ticks][h-title] */
+  column-gap: 0.3em; row-gap: 0.12em;
+  max-width: 25em; margin: 0.2em auto 0; font-size: 0.72em;
+}
+.reveal .tradeoff .vtitle {
+  grid-column: 1; grid-row: 1; place-self: center;
+  writing-mode: vertical-rl; transform: rotate(180deg); text-align: center;
+  color: #46505e; letter-spacing: 0.03em; font-size: 0.84em;
+}
+.reveal .tradeoff .vticks {
+  grid-column: 2; grid-row: 1;
+  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end;
+  padding: 0.15em 0.2em; color: #5b6472; font-size: 0.84em; font-weight: 600;
+}
+.reveal .tradeoff .plot {
+  grid-column: 3; grid-row: 1; position: relative;
+  border-left: 2px solid #7c8593; border-bottom: 2px solid #7c8593;
+  padding: 0.5em 0.15em 0.6em 0.6em;
+}
+.reveal .tradeoff .plot::before {   /* up arrowhead atop the vertical axis */
+  content: ""; position: absolute; top: -7px; left: -5px;
+  border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #7c8593;
+}
+.reveal .tradeoff .plot::after {    /* right arrowhead at the end of the horizontal axis */
+  content: ""; position: absolute; right: -7px; bottom: -5px;
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid #7c8593;
+}
+.reveal .tradeoff .xticks {
+  grid-column: 3; grid-row: 2;
+  display: flex; justify-content: space-between;
+  padding: 0.12em 0.15em 0; color: #5b6472; font-size: 0.84em; font-weight: 600;
+}
+.reveal .tradeoff .htitle {
+  grid-column: 3; grid-row: 3;
+  text-align: center; color: #46505e; letter-spacing: 0.03em; font-size: 0.84em; margin-top: 0.05em;
+}
 .reveal .tradeoff .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45em; }
 .reveal .tradeoff .cell { border: 2px solid rgba(20,20,19,0.16); border-radius: 0.45em; padding: 0.55em 0.5em; line-height: 1.2; }
 .reveal .tradeoff .cell b { display: block; font-size: 0.9em; letter-spacing: 0.03em; margin-bottom: 0.15em; }
@@ -106,14 +140,18 @@ Open on the shift everyone already feels: production is nearly free. The provoca
 ## Cheap to produce, expensive to verify — the new danger zone
 
 <div class="tradeoff">
-<div class="axis-top">↑ higher cost of verification</div>
+<div class="vtitle">Cost of verification</div>
+<div class="vticks"><span>high</span><span>low</span></div>
+<div class="plot">
 <div class="grid">
 <div class="cell danger"><b>NEW DANGER ZONE</b><small>cheap to make,<br>expensive to confirm</small></div>
 <div class="cell"><b>Costly all around</b><small>slow to make and<br>hard to check</small></div>
 <div class="cell"><b>Trivial</b><small>easy to make,<br>easy to check</small></div>
 <div class="cell old"><b>OLD WORLD</b><small>manual effort<br>embedded the checking</small></div>
 </div>
-<div class="axis-bot">low cost of production &nbsp;←&nbsp;·&nbsp;→&nbsp; high cost of production</div>
+</div>
+<div class="xticks"><span>low</span><span>high</span></div>
+<div class="htitle">Cost of production</div>
 </div>
 
 [AI slashes production cost — but not verification cost — so work migrates into the danger zone.]{.comment}
