@@ -1,6 +1,9 @@
 ---
 title: "Data Science, Econometrics, and Research in the Age of AI"
 subtitle: "Production, Verification, and Tool Integration"
+slug: "gsid-ai-2026"
+aliases:
+  - "/talk/data-science-econometrics-and-research-in-the-age-of-ai/"
 event: "Seminar, Graduate School of International Development (GSID), Nagoya University"
 event_url: ""
 location: "Graduate School of International Development (GSID), Nagoya University, Japan"
@@ -28,7 +31,7 @@ image:
 links:
 url_code: ""
 url_pdf: ""
-url_slides: "https://carlos-mendez.org/talk/data-science-econometrics-and-research-in-the-age-of-ai/slides/index.html"
+url_slides: "https://carlos-mendez.org/talk/gsid-ai-2026/slides/index.html"
 url_video: ""
 
 # Projects (optional).

@@ -1,6 +1,7 @@
 ---
 title: "La ciencia de datos, la econometría y la investigación en la era de la IA"
 subtitle: "Producción, verificación e integración de herramientas"
+slug: "gsid-ai-2026"
 event: "Seminario, Escuela de Posgrado en Desarrollo Internacional (GSID), Universidad de Nagoya"
 event_url: ""
 location: "Escuela de Posgrado en Desarrollo Internacional (GSID), Universidad de Nagoya, Japón"
@@ -28,7 +29,7 @@ image:
 links:
 url_code: ""
 url_pdf: ""
-url_slides: "https://carlos-mendez.org/talk/data-science-econometrics-and-research-in-the-age-of-ai/slides/index.html"
+url_slides: "https://carlos-mendez.org/talk/gsid-ai-2026/slides/index.html"
 url_video: ""
 
 # Projects (optional).
@@ -42,7 +43,7 @@ math: false
  padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
  border-radius: 8px; will-change: transform;">
   <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-    src="/talk/data-science-econometrics-and-research-in-the-age-of-ai/slides/index.html" allowfullscreen="allowfullscreen" allow="fullscreen">
+    src="/talk/gsid-ai-2026/slides/index.html" allowfullscreen="allowfullscreen" allow="fullscreen">
   </iframe>
 </div>
-<a href="/talk/data-science-econometrics-and-research-in-the-age-of-ai/slides/index.html" target="_blank" rel="noopener">Abra las diapositivas en pantalla completa</a> — por Carlos Mendez. Presione <strong>M</strong> para el menú, <strong>F</strong> para pantalla completa y <strong>S</strong> para las notas del orador.
+<a href="/talk/gsid-ai-2026/slides/index.html" target="_blank" rel="noopener">Abra las diapositivas en pantalla completa</a> — por Carlos Mendez. Presione <strong>M</strong> para el menú, <strong>F</strong> para pantalla completa y <strong>S</strong> para las notas del orador.

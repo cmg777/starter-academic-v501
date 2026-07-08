@@ -1,6 +1,7 @@
 ---
 title: "AI時代のデータサイエンス・計量経済学・研究"
 subtitle: "生産・検証・ツールの統合"
+slug: "gsid-ai-2026"
 event: "セミナー、名古屋大学 大学院国際開発研究科（GSID）"
 event_url: ""
 location: "名古屋大学 大学院国際開発研究科（GSID）、日本"
@@ -28,7 +29,7 @@ image:
 links:
 url_code: ""
 url_pdf: ""
-url_slides: "https://carlos-mendez.org/talk/data-science-econometrics-and-research-in-the-age-of-ai/slides/index.html"
+url_slides: "https://carlos-mendez.org/talk/gsid-ai-2026/slides/index.html"
 url_video: ""
 
 # Projects (optional).
@@ -42,7 +43,7 @@ math: false
  padding-bottom: 0; box-shadow: 0 2px 8px 0 rgba(63,69,81,0.16); margin-top: 1.6em; margin-bottom: 0.9em; overflow: hidden;
  border-radius: 8px; will-change: transform;">
   <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
-    src="/talk/data-science-econometrics-and-research-in-the-age-of-ai/slides/index.html" allowfullscreen="allowfullscreen" allow="fullscreen">
+    src="/talk/gsid-ai-2026/slides/index.html" allowfullscreen="allowfullscreen" allow="fullscreen">
   </iframe>
 </div>
-<a href="/talk/data-science-econometrics-and-research-in-the-age-of-ai/slides/index.html" target="_blank" rel="noopener">スライドを全画面で開く</a> — Carlos Mendez。<strong>M</strong> でメニュー、<strong>F</strong> で全画面、<strong>S</strong> で発表者ノートを表示します。
+<a href="/talk/gsid-ai-2026/slides/index.html" target="_blank" rel="noopener">スライドを全画面で開く</a> — Carlos Mendez。<strong>M</strong> でメニュー、<strong>F</strong> で全画面、<strong>S</strong> で発表者ノートを表示します。
