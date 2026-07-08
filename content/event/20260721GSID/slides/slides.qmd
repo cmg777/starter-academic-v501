@@ -154,7 +154,7 @@ Open on the shift everyone already feels: production is nearly free. The provoca
 <div class="htitle">Cost of production</div>
 </div>
 
-[AI slashes production cost — but not verification cost — so work migrates into the danger zone.]{.comment}
+[AI slashes production cost — but not verification cost — so work migrates into the danger zone.]{.comment .fragment}
 
 ::: {.notes}
 Adapted from Clifford Russel. Old world (bottom-right): making something by hand was costly, and that manual effort embedded the checking. AI moves us to the top-left: production collapses toward zero, but verification cost stays high — now it is the binding constraint. The rest of the talk is about tools that pull verification back down.
@@ -169,7 +169,7 @@ When we can't check the output, we're trusting a black box.
 - In **research** — results no reviewer, including you, can audit.
 :::
 
-[The fix isn't to avoid AI. It's to design a workflow that separates *production* from *verification*.]{.comment}
+[The fix isn't to avoid AI. It's to design a workflow that separates *production* from *verification*.]{.comment .fragment}
 
 ::: {.notes}
 Name the stakes for both halves of the talk. Black-box learning erodes understanding; black-box research erodes credibility. Bridge to the response: intentional workflow design.
@@ -195,7 +195,7 @@ The roadmap. Each tool maps to a stage of the research life cycle and to a place
 
 You give it your notes, PDFs, slides, and data. It answers **only from those sources**.
 
-[Grounded in your materials → far less hallucination, and every answer is traceable.]{.comment}
+[Grounded in your materials → far less hallucination, and every answer is traceable.]{.comment .fragment}
 
 ::: {.notes}
 The key idea for a general audience: unlike an open chatbot, NotebookLM is walled to the documents you upload. That protected environment is exactly what makes it safe for study — answers stay tied to trusted sources.
@@ -215,7 +215,7 @@ The key idea for a general audience: unlike an open chatbot, NotebookLM is walle
 </div>
 </div>
 
-[One upload becomes many ways to learn — the AI podcasts and AI tutors behind metricsAI work exactly this way.]{.comment}
+[One upload becomes many ways to learn — the AI podcasts and AI tutors behind metricsAI work exactly this way.]{.comment .fragment}
 
 ::: {.notes}
 NotebookLM is the content-transformation layer: a single source set fans out into audio, video, text, self-test, and conversation.
@@ -243,7 +243,7 @@ Concrete example: the metricsAI podcast series is NotebookLM "Deep Dives" — tw
 - **AI inside** — it writes code and explains errors
 :::
 
-[Start on your laptop at a café; the lab is the same everywhere.]{.comment}
+[Start on your laptop at a café; the lab is the same everywhere.]{.comment .fragment}
 
 ::: {.notes}
 Colab removes the single biggest barrier for beginners — installation. For a general audience, stress: it is just a browser tab, but it is a real computational notebook with AI help built in.
@@ -269,7 +269,7 @@ Connect **Google Earth Engine** and query satellite data straight from a noteboo
 - **social** — population and development indicators
 :::
 
-[Big geospatial data, no supercomputer — just a notebook and credentials.]{.comment}
+[Big geospatial data, no supercomputer — just a notebook and credentials.]{.comment .fragment}
 
 ::: {.notes}
 This is the big-data turn the workshop emphasizes. Earth Engine hosts petabytes of satellite imagery; from Colab you query only what you need. Pollution, energy, and social indicators all become variables you can analyze.
@@ -296,7 +296,7 @@ The book's flagship case. It makes the abstract pipeline concrete: query satelli
 <div class="box out"><b>Development index</b><small>IMDS · 0–100</small></div>
 </div>
 
-[Lights capture activity at night; embeddings capture the built environment by day.]{.comment}
+[Lights capture activity at night; embeddings capture the built environment by day.]{.comment .fragment}
 
 ::: {.notes}
 DS4Bolivia: 339 municipalities. Nighttime lights (log NTL per capita) proxy economic activity; 64-dimensional deep-learning embeddings of daytime imagery (Sentinel-2/Landsat) capture buildings, roads, and vegetation. Together they predict the Municipal Sustainable Development Index.
@@ -306,7 +306,7 @@ DS4Bolivia: 339 municipalities. Nighttime lights (log NTL per capita) proxy econ
 
 The notebook answered the question. Now make the work **reproducible and reviewable**.
 
-[A promising exploration → a project anyone can re-run and audit → GitHub.]{.comment}
+[A promising exploration → a project anyone can re-run and audit → GitHub.]{.comment .fragment}
 
 ::: {.notes}
 Bridge to Tool 3. A Colab notebook is where discovery happens; GitHub is where it becomes credible research. This is the natural hand-off.
@@ -320,7 +320,7 @@ Bridge to Tool 3. A Colab notebook is where discovery happens; GitHub is where i
 
 Collaborate with AI agents the way you would with a careful coauthor — in the open.
 
-[Claude Code + GitHub + Overleaf: code, results, and manuscript, all version-controlled.]{.comment}
+[Claude Code + GitHub + Overleaf: code, results, and manuscript, all version-controlled.]{.comment .fragment}
 
 ::: {.notes}
 The research counterpart to skills-and-planning. When an AI agent proposes changes through GitHub, every decision is recorded and reviewable.
@@ -362,7 +362,7 @@ The unit of verification, made visual: a wall of 800 lines is cognitive overload
 
 GitHub manages the discussion of the **code**, the **results**, and the **story** of the manuscript.
 
-[Every claim traces back to the commit that produced it.]{.comment}
+[Every claim traces back to the commit that produced it.]{.comment .fragment}
 
 ::: {.notes}
 Tie back to the opening trade-off. Black-box research is unverifiable by construction; a version-controlled environment makes verification the default. And in the age of AI the barrier is low — your AI agent can teach you Git as you go.
