@@ -7,16 +7,10 @@ $if(key-results)$
   <div class="title-result-strip">
 $for(key-results)$
     <div class="kr"><span class="kr-num">$key-results.num$</span><span class="kr-cap">$key-results.cap$</span></div>
+$sep$
+    <span class="kr-arrow" aria-hidden="true">&rarr;</span>
 $endfor$
   </div>
 $endif$
-$if(deck-author)$
-  <p class="author">$if(deck-author-url)$<a href="$deck-author-url$">$deck-author$</a>$else$$deck-author$$endif$</p>
-$endif$
-$for(institute)$
-  <p class="institute">$institute$</p>
-$endfor$
-$if(date)$
-  <p class="date">$date$</p>
-$endif$
+  <p class="title-meta">$if(deck-author)$$if(deck-author-url)$<a href="$deck-author-url$">$deck-author$</a>$else$$deck-author$$endif$$endif$$for(institute)$ <span class="sep">&middot;</span> $institute$$endfor$$if(date)$ <span class="sep">&middot;</span> $date$$endif$</p>
 </section>

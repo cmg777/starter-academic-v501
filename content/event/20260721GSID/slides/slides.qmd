@@ -5,7 +5,7 @@ deck-author: "Carlos Mendez"
 deck-author-url: "https://carlos-mendez.org"
 institute: "Nagoya University (GSID)"
 date: "2026-07-21"
-date-format: long
+date-format: "YYYY"
 key-results:
   - num: "Learn"
     cap: "NotebookLM"
@@ -123,6 +123,35 @@ format:
 .reveal .triad .explore { border-color: #00a99f; } .reveal .triad .explore b { color: #0d7d74; }
 .reveal .triad .research { border-color: #6a9bcc; } .reveal .triad .research b { color: #1a3a8a; }
 .reveal .loopnote { text-align: center; color: #6a6a68; margin-top: 0.55em; font-size: 0.8em; letter-spacing: 0.03em; }
+
+/* ===== Title slide — refined polish (scoped to #title-slide only) ===== */
+/* Thin orange accent rule between title and subtitle */
+.reveal #title-slide h1.title { margin-bottom: 0; }
+.reveal #title-slide h1.title::after {
+  content: ""; display: block; width: 2.6em; height: 3px;
+  background: #d97757; border-radius: 2px; margin: 0.4em auto 0.55em;
+}
+/* Subtitle — a touch larger, airier, sits just under the rule */
+.reveal #title-slide .subtitle {
+  font-size: 1.05em; letter-spacing: 0.01em; margin: 0 0 0.2em;
+}
+/* Pipeline strip: tighten gaps so the arrows read as connectors; align to the word row */
+.reveal #title-slide .title-result-strip { gap: 0.9em; align-items: flex-start; margin: 1.1em 0 0.9em; }
+/* Re-assert Learn/Explore/Research colors by .kr order (nth-of-type ignores the arrow spans,
+   unlike the theme's nth-child which the inserted arrows would shift). */
+.reveal #title-slide .title-result-strip .kr:nth-of-type(1) .kr-num { color: #d97757; }  /* orange */
+.reveal #title-slide .title-result-strip .kr:nth-of-type(2) .kr-num { color: #00d4c8; }  /* teal */
+.reveal #title-slide .title-result-strip .kr:nth-of-type(3) .kr-num { color: #6a9bcc; }  /* steel */
+.reveal #title-slide .kr-arrow {
+  color: #6a9bcc; font-weight: 700; font-size: 1.5em; line-height: 1;
+  align-self: flex-start; margin-top: 0.15em;   /* sit against the Cinzel word, not the caption */
+}
+/* Footer meta — one tidy grey line: author · institute · year */
+.reveal #title-slide .title-meta {
+  margin: 0.6em 0 0; text-align: center; font-size: 0.62em; color: #6a6a68;
+}
+.reveal #title-slide .title-meta a { color: #6a9bcc; }
+.reveal #title-slide .title-meta .sep { color: #b7bcc4; margin: 0 0.15em; }
 </style>
 
 ## Producing content has never been cheaper
