@@ -58,6 +58,13 @@ content/post/r_sc_bayes_spatial/replication-package/
 # (~220 KB LaTeX; third-party reference material, not source for this post).
 content/post/r_did2/reference/manuscript.tex
 
+# Cunningham (2026) "Covariates, diff in diff and LaLonde test" Substack source
+# (his prose + Stata/R code) for python_did_covariates_lalonde -- third-party
+# copyrighted reference material. Hugo already excludes it from the build; it is
+# not committed. The post cites and credits the essay in its References.
+# Glob covers the folder under either spelling (key-ref/ or key-referecence/).
+content/post/python_did_covariates_lalonde/key-ref*/
+
 # Quarto render artefacts in any post directory (tutorial.qmd is the source;
 # readers render their own HTML locally). Python bundles place tutorial.qmd
 # under references/, so render artefacts land there too.

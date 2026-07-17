@@ -1,0 +1,206 @@
+---
+title: "Covariates in Difference-in-Differences"
+subtitle: "The LaLonde test in Python — when do covariates rescue a DiD?"
+deck-author: "Carlos Mendez"
+deck-author-url: "https://carlos-mendez.org"
+institute: "Nagoya University (GSID)"
+date: today
+date-format: long
+key-results:
+  - num: "3,621"
+    cap: "naive DiD · 2× too large"
+  - num: "1,711–1,993"
+    cap: "covariates in the trend"
+  - num: "1,794"
+    cap: "experimental benchmark (ATT)"
+format:
+  revealjs:
+    output-file: index.html
+    theme: [default, site-brand.scss]
+    template-partials:
+      - title-slide.html
+    center: true
+    slide-number: c/t
+    menu: true
+    chalkboard: true
+    preview-links: auto
+    overview: true
+    progress: true
+    history: true
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    auto-stretch: true
+    highlight-style: github
+    link-external-icon: false
+---
+
+# The Puzzle {.divider background-color="#d97757"}
+
+[Act I]{.act}
+
+## The same job-training program, two very different answers
+
+A program trained disadvantaged workers. A randomized trial found it raised earnings by about **\$1,794**.
+
+. . .
+
+Throw away the randomized control group, swap in a survey of ordinary Americans, and run the usual difference-in-differences with covariates. Do you still recover **\$1,794**?
+
+. . .
+
+*Robert LaLonde asked exactly this in 1986 — and launched the credibility revolution when the answer was "no."*
+
+::: {.notes}
+The hook: we KNOW the answer because an RCT exists. The question is whether an observational estimator can find it, and whether the way we use covariates matters.
+:::
+
+## The setup {.smaller}
+
+Following [Scott Cunningham's Mixtape Substack](https://causalinf.substack.com/p/covariates-diff-in-diff-and-lalonde), we reproduce the test in Python.
+
+- **Data:** Dehejia-Wahba subsample — 185 NSW trainees + 15,992 CPS controls.
+- **Panel:** two periods, pre = 1975, post = 1978. Outcome = real earnings.
+- **Estimand:** the **ATT** (effect on the treated). Design: observational.
+- **Ground truth:** the experimental ATT ≈ **\$1,794**.
+
+. . .
+
+::: {.callout-tip}
+Swapping the experimental control for CPS changes the ATE, but the treated group stays — so the **ATT target is unchanged** at \$1,794.
+:::
+
+## Why the naive DiD fails: covariate imbalance
+
+![](../did_covariates_lalonde_balance.png)
+
+CPS controls differ from trainees by **+2.3 SD** on race and **−1.6 SD** on prior earnings. The randomized controls do not.
+
+## Different groups, different trends
+
+![](../did_covariates_lalonde_trends.png)
+
+The CPS control sits on a different level *and* slope. Assuming the trainees would have followed it is not credible — this is where covariates must work.
+
+## Four regressions, one number {.smaller}
+
+The 2×2 DiD ATT is computed identically by:
+
+1. Saturated dummies (treatment × post interaction)
+2. Two-way fixed effects + post × treatment
+3. First-difference regression on treatment
+4. Across-group regression on post
+
+. . .
+
+We use the **saturated form** — it is the one that lets us add time-invariant covariates in different places and watch what happens.
+
+# The Spec Ladder {.divider background-color="#6a9bcc"}
+
+[Act II — where does the covariate enter?]{.act}
+
+## Three ways to add a covariate {.smaller}
+
+A covariate $X$ can enter a DiD in three fundamentally different places:
+
+| Placement | Formula | What it changes |
+|---|---|---|
+| **Level** | $+ X$ | the intercept (additive control) |
+| **Effect** | $X \times D$ | the treatment effect (heterogeneity) |
+| **Trend** | $X \times \text{post}$ | the counterfactual **trend** |
+
+. . .
+
+Only the last one addresses why the naive estimate is wrong. Watch the estimate as we climb the ladder.
+
+## The estimate stays inert... {auto-animate=true}
+
+- Spec 0 — No covariates → **\$3,621**
+
+. . .
+
+- Spec A — Additive $X$ (level) → **\$3,621** · inert
+
+. . .
+
+- Spec BT — $X \times$ treatment (effect) → **\$3,621** · inert
+
+. . .
+
+*Time-invariant covariates in the level or the effect never touch the control's trend. Nothing moves.*
+
+## ...until covariates touch the trend {auto-animate=true}
+
+- Spec B — $X \times \text{post}$ (trend) → **\$1,711** ✅
+
+. . .
+
+- Spec C — saturated first differences = HIT (1997) → **\$1,770** ✅
+
+. . .
+
+- IPW (Abadie 2005) → **\$1,861** · DR (Sant'Anna-Zhao 2020) → **\$1,993**
+
+. . .
+
+*The instant covariates bend the counterfactual trend, the estimate snaps to the benchmark.*
+
+## The cliff
+
+![](../did_covariates_lalonde_ladder.png)
+
+## The decision rule
+
+```{mermaid}
+flowchart LR
+    Q{"Where does X enter?"}
+    Q -->|level / effect| I["inert · ~3,621"]
+    Q -->|trend / propensity| C["corrected · ~1,794"]
+    C -.recovers.-> B["RCT benchmark 1,794"]
+```
+
+Covariates in DiD are **not** a robustness knob — they perform a function: satisfying conditional parallel trends and relaxing constant treatment effects.
+
+# The Payoff {.divider background-color="#00a89e"}
+
+[Act III]{.act}
+
+## Covariates rescue LaLonde only when they enter the trend
+
+![](../did_covariates_lalonde_forest.png)
+
+## Independent check: the diff-diff package
+
+![](../did_covariates_lalonde_crosscheck.png)
+
+The `diff-diff` package matches the naive/additive numbers exactly and lands within **\$14** of the by-hand doubly-robust estimate.
+
+## How much should we trust \$1,770 over \$1,711? {.smaller}
+
+::: {.callout-warning}
+## Trust the pattern, not the decimal
+Every corrected estimate's 95% CI spans roughly **\$400 to \$3,100**; the benchmark itself has SE ≈ **\$671**.
+:::
+
+The **\$59** gap between Spec B and Spec C is noise. What is trustworthy is the clean split: trend-ignoring specs are all wrong the same way; trend-modeling specs all move to the truth. Reliability comes from **stability across specifications and across datasets**, not one lucky hit.
+
+## Takeaways {.smaller}
+
+1. **Placement, not inclusion.** Covariates in the level (\$3,621) or the effect (\$3,621) are inert; in the trend (\$1,711 / \$1,770) they correct.
+2. **The common spec fails.** Two-way fixed effects with additive controls is exactly the one that cannot move.
+3. **Two philosophies agree.** Outcome regression and propensity reweighting both land near the \$1,794 truth.
+4. **Report uncertainty honestly.** Wide CIs mean the pattern is the finding, not a ranking of corrected estimates.
+
+## Resources
+
+- **Full tutorial:** [carlos-mendez.org/post/python_did_covariates_lalonde](https://carlos-mendez.org/post/python_did_covariates_lalonde/)
+- **Intro to DiD:** [carlos-mendez.org/post/python_did](https://carlos-mendez.org/post/python_did/)
+- **Source:** Cunningham, *Covariates, diff in diff and LaLonde test*, Scott's Mixtape Substack
+- **RCT-vs-observational benchmarks:** [rctvsobs.org](http://rctvsobs.org/)
+
+*Packages: `pyfixest`, `diff-diff`, `causaldata`.*
+
+# Thank you {.divider background-color="#141413"}
+
+[carlos-mendez.org](https://carlos-mendez.org)

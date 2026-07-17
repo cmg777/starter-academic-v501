@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Covariates in DiD — The LaLonde Test Lab</title>
+<meta name="description" content="Interactive companion to 'Covariates in Difference-in-Differences: The LaLonde Test in Python'. Step through eight specifications and watch the ATT snap to the $1,794 experimental benchmark only when covariates enter the trend.">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Covariates in DiD — The LaLonde Test Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Covariates in Difference-in-Differences: The LaLonde Test in Python</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"    class="tab active" data-pane="pane-intro"    role="tab" aria-selected="true">1 · The Puzzle</button>
+  <button id="tab-explorer" class="tab"        data-pane="pane-explorer" role="tab" aria-selected="false">2 · Spec Explorer</button>
+  <button id="tab-trends"   class="tab"        data-pane="pane-trends"   role="tab" aria-selected="false">3 · Trends &amp; Imbalance</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1: INTRO ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+  <h2>When do covariates rescue a difference-in-differences?</h2>
+  <p class="lede">
+    A job-training program raised earnings by a known <strong>$1,794</strong> — we know because it was
+    evaluated with a randomized trial. Throw the experimental control away, swap in a survey of ordinary
+    Americans, and a naive difference-in-differences returns <strong>$3,621</strong>: roughly twice the
+    truth. This is the <strong>LaLonde test</strong>. The question is whether covariates can fix it — and
+    whether <em>where</em> you put them matters.
+  </p>
+
+  <div class="placement-grid">
+    <div class="placement-card inert">
+      <div class="pc-tag">In the LEVEL</div>
+      <div class="pc-formula">y ~ ... + X</div>
+      <p>Additive controls. Time-invariant, so two-way fixed effects sweep them out. <strong>Inert.</strong></p>
+      <div class="pc-num">$3,621</div>
+    </div>
+    <div class="placement-card inert">
+      <div class="pc-tag">In the EFFECT</div>
+      <div class="pc-formula">X × treatment</div>
+      <p>Heterogeneous treatment effects. Relaxes constant effects but never touches the trend. <strong>Inert.</strong></p>
+      <div class="pc-num">$3,621</div>
+    </div>
+    <div class="placement-card corrected">
+      <div class="pc-tag">In the TREND</div>
+      <div class="pc-formula">X × post</div>
+      <p>Bends the control group's counterfactual trend — the reason the naive estimate is wrong. <strong>Corrected.</strong></p>
+      <div class="pc-num">≈ $1,794</div>
+    </div>
+  </div>
+
+  <p class="lede">
+    The whole story is that only the last placement addresses the problem. Because the survey controls are
+    wildly different from the trainees, and groups with different characteristics are on different earnings
+    trajectories, that imbalance mechanically breaks parallel trends — and only covariates <em>in the
+    trend</em> can repair it. Open the <strong>Spec Explorer</strong> to watch the estimate move.
+  </p>
+  <p class="credit">
+    Reproduces Scott Cunningham's <a href="https://causalinf.substack.com/p/covariates-diff-in-diff-and-lalonde" target="_blank" rel="noopener">“Covariates, diff in diff and LaLonde test.”</a>
+    Estimand: the ATT. Data: Dehejia-Wahba NSW + CPS controls.
+  </p>
+</section>
+
+<!-- ====================== TAB 2: SPEC EXPLORER ====================== -->
+<section id="pane-explorer" class="tab-pane" role="tabpanel" aria-labelledby="tab-explorer">
+  <h2>Climb the ladder: where does the covariate enter?</h2>
+  <p class="lede">
+    Step through the specifications in order. The estimate is flat at <strong>$3,621</strong> while covariates
+    sit in the level or the treatment effect, then <strong>snaps</strong> toward the benchmark the instant they
+    enter the trend.
+  </p>
+
+  <div class="explorer">
+    <div class="explorer-left">
+      <div class="readout">
+        <div class="readout-label">ATT estimate</div>
+        <div id="att-readout" class="readout-num">$3,621</div>
+        <div id="att-badge" class="readout-badge inert">inert · covariate in the level / effect</div>
+      </div>
+      <div id="spec-name" class="spec-name">Spec 0 — No covariates (naive TWFE)</div>
+      <p id="spec-note" class="spec-note">The raw 2×2 difference-in-differences, with no covariates at all. The number to beat.</p>
+      <div class="stepper-controls">
+        <button id="btn-prev" class="step-btn">‹ Prev</button>
+        <button id="btn-play" class="step-btn primary">▶ Play the ladder</button>
+        <button id="btn-next" class="step-btn">Next ›</button>
+      </div>
+      <div id="step-dots" class="step-dots"></div>
+    </div>
+    <div class="explorer-right">
+      <div id="forest" class="chart"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== TAB 3: TRENDS & IMBALANCE ====================== -->
+<section id="pane-trends" class="tab-pane" role="tabpanel" aria-labelledby="tab-trends">
+  <h2>Why the naive estimate is wrong</h2>
+  <p class="lede">
+    The control group's raw earnings path is the crux. The CPS controls sit far above the trainees and drift
+    on a different slope; the randomized controls track the trainees. A DiD that uses the CPS as-is assumes the
+    trainees would have followed that high, flat path — which is not credible.
+  </p>
+  <div id="trends" class="chart wide"></div>
+  <p class="caption">
+    Mean real earnings by group, 1974–1978. Imbalance in <em>levels</em> becomes bias only because the groups
+    are also on different <em>trends</em> — exactly the gap that covariate-by-time interactions close.
+  </p>
+</section>
+
+</main>
+
+<footer class="app-footer">
+  Built with D3. Data precomputed in <code>script.py</code>. ·
+  <a href="../" target="_blank" rel="noopener">Back to the post</a> ·
+  <a href="https://carlos-mendez.org/post/python_did/" target="_blank" rel="noopener">Intro to DiD</a>
+</footer>
+
+<script src="data/estimates.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

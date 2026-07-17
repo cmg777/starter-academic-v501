@@ -1,0 +1,9 @@
+spec,estimator,att,se,ci_low,ci_high,gap_vs_benchmark,class,source
+0,No covariates (naive TWFE),3621.2,632.2,2382.0,4860.4,1827.2,inert,pyfixest (HC1)
+A,Additive X (level),3621.2,671.6,2304.9,4937.6,1827.2,inert,pyfixest (HC1)
+BT,X x treatment (effect),3621.2,652.1,2343.0,4899.4,1827.2,inert,pyfixest g-comp / boot
+B,X x post (trend),1711.1,704.3,330.7,3091.5,-82.9,corrected,pyfixest (HC1)
+C,Saturated FD = HIT,1770.0,701.2,395.6,3144.4,-24.0,corrected,pyfixest g-comp / boot
+-,HIT by hand (1997),1770.0,701.2,395.6,3144.4,-24.0,corrected,by hand / boot
+-,IPW (Abadie 2005),1861.0,816.3,261.0,3460.9,67.0,propensity,by hand / boot
+-,DR (Sant'Anna-Zhao 2020),1993.2,794.4,436.1,3550.2,199.2,propensity,by hand / boot

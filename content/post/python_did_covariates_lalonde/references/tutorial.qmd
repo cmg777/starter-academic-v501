@@ -1,0 +1,290 @@
+---
+title: "Covariates in Difference-in-Differences: The LaLonde Test in Python"
+subtitle: "When do covariates rescue a DiD estimate? A Python reproduction of Scott Cunningham's LaLonde test"
+author: "Carlos Mendez"
+date: "2026-07-16"
+jupyter: python_did_covariates_lalonde-tutorial
+format:
+  html:
+    theme: cosmo
+    embed-resources: true
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    code-summary: "Show code"
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 150
+    include-in-header:
+      text: |
+        <style>
+          img, .cell-output-display img { max-width: 100%; height: auto; }
+        </style>
+execute:
+  warning: false
+  message: false
+---
+
+::: {.callout-important}
+## How to render this tutorial
+
+**Easiest (one click).** From the bundle ZIP, double-click `render.command` (macOS) or `render.bat` (Windows). The wrapper runs setup and then `quarto render`, opening the result in your browser.
+
+**Manual.** From a terminal in the bundle folder:
+
+```bash
+python3 setup_env.py            # one-time: builds .venv/, registers kernel
+quarto render tutorial.qmd      # or click "Render" in Positron
+```
+
+`setup_env.py` is idempotent — re-running it later is a fast no-op. Subsequent renders are instant.
+
+**Prerequisites:** Python 3.10–3.13 and a working `quarto` install. All data downloads automatically via the `causaldata` package — no local files needed.
+:::
+
+## The question
+
+Imagine you already know the right answer. A job-training program raised the earnings of disadvantaged workers by about **\$1,794** — we know this because it was evaluated with a randomized controlled trial. Now throw the experimental control group away and replace it with a large survey of ordinary Americans. Can a difference-in-differences (DiD) estimator, armed with the usual baseline covariates, still find the **\$1,794**? And does it matter *how* you feed those covariates to the model?
+
+This is the **LaLonde test** ([LaLonde 1986](https://www.jstor.org/stable/1806062)). This tutorial reproduces in Python a version of the test from [Scott Cunningham's Mixtape Substack](https://causalinf.substack.com/p/covariates-diff-in-diff-and-lalonde). The estimand throughout is the **ATT** (average treatment effect on the treated), and the design is observational. The punchline: a covariate can enter a DiD in the **level**, the **treatment effect**, or the **trend** — and only the trend placement corrects the bias.
+
+## Setup
+
+```{python}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import pyfixest as pf
+
+RANDOM_SEED = 90210
+BENCHMARK = 1794.0
+XVARS = ["age", "agesq", "agecube", "educ", "educsq",
+         "marr", "nodegree", "black", "hisp", "re74", "u74"]
+XF = " + ".join(XVARS)
+STEEL_BLUE, WARM_ORANGE, TEAL, GREY = "#6a9bcc", "#d97757", "#00a89e", "#9aa0a6"
+```
+
+## Data: the LaLonde-DW non-experimental panel
+
+The non-experimental sample is the 185 NSW **treated** trainees plus the 15,992 CPS controls. The 260 experimental controls are held out for the benchmark only. We reshape the wide earnings columns into a two-period panel (post = 0 → 1975, post = 1 → 1978).
+
+```{python}
+from causaldata import nsw_mixtape, cps_mixtape
+
+nsw = nsw_mixtape.load_pandas().data
+cps = cps_mixtape.load_pandas().data
+wide = pd.concat([nsw[nsw.treat == 1], cps], ignore_index=True)
+wide["ever_treated"] = wide["treat"].astype(int)
+for c in ["age", "educ", "marr", "nodegree", "black", "hisp", "re74", "re75", "re78"]:
+    wide[c] = wide[c].astype(float)
+wide["agesq"] = wide.age**2
+wide["agecube"] = wide.age**3
+wide["educsq"] = wide.educ**2
+wide["u74"] = (wide.re74 == 0).astype(float)
+wide["dy"] = wide.re78 - wide.re75
+wide["id"] = np.arange(len(wide))
+
+pre = wide.assign(re=wide.re75, post=0.0)
+post = wide.assign(re=wide.re78, post=1.0)
+panel = pd.concat([pre, post], ignore_index=True)
+pd.crosstab(panel.ever_treated, panel.post)
+```
+
+A balanced two-period panel: 185 treated and 15,992 controls in each year. Because randomization is gone, the identifying assumption is now **conditional** parallel trends.
+
+## The experimental benchmark
+
+On the 445-row experimental sample, `re78 ~ treat` gives the canonical Dehejia-Wahba ATT — our ground truth.
+
+```{python}
+exp = nsw.copy()
+for c in ["re74", "re75", "re78"]:
+    exp[c] = exp[c].astype(float)
+bench = pf.feols("re78 ~ treat", data=exp, vcov="HC1").tidy()
+print("Experimental benchmark ATT = $%.0f (SE %.0f)" %
+      (bench.loc["treat", "Estimate"], bench.loc["treat", "Std. Error"]))
+```
+
+## Covariate imbalance
+
+Standardized mean differences (SMD) show how far the CPS controls are from the trainees, and how close the randomized controls are.
+
+```{python}
+def smd(a, b, col):
+    s = np.sqrt((a[col].var() + b[col].var()) / 2)
+    return 0.0 if s == 0 else (a[col].mean() - b[col].mean()) / s
+
+treated = wide[wide.ever_treated == 1]
+cps_c = wide[wide.ever_treated == 0]
+exp_c = exp[exp.treat == 0]
+show = ["age", "educ", "black", "hisp", "marr", "nodegree", "re74", "re75", "u74"]
+lbl = ["Age", "Education", "Black", "Hispanic", "Married", "No degree",
+       "Earnings 1974", "Earnings 1975", "Unemployed 1974"]
+d_cps = [smd(treated, cps_c, c) for c in show]
+d_exp = [smd(treated, exp_c, c) for c in show]
+
+y = np.arange(len(show))
+fig, ax = plt.subplots(figsize=(8.2, 5))
+ax.axvline(0, color="#888", lw=1)
+for x in (0.1, 0.25):
+    ax.axvline(x, color="#ccc", ls=":", lw=1); ax.axvline(-x, color="#ccc", ls=":", lw=1)
+ax.scatter(d_cps, y + 0.14, s=80, color=WARM_ORANGE, zorder=3, label="Treated vs CPS controls")
+ax.scatter(d_exp, y - 0.14, s=80, color=STEEL_BLUE, zorder=3, label="Treated vs RCT controls")
+for yi, xc, xe in zip(y, d_cps, d_exp):
+    ax.plot([0, xc], [yi + 0.14]*2, color=WARM_ORANGE, lw=2)
+    ax.plot([0, xe], [yi - 0.14]*2, color=STEEL_BLUE, lw=2)
+ax.set_yticks(y); ax.set_yticklabels(lbl)
+ax.set_xlabel("Standardized mean difference"); ax.legend(frameon=False, loc="lower right")
+for s in ["top", "right"]: ax.spines[s].set_visible(False)
+plt.tight_layout(); plt.show()
+```
+
+The CPS controls are severely imbalanced (Black +2.3, prior earnings −1.6); the randomized controls hug zero. Imbalance this extreme is what makes conditioning on covariates essential.
+
+## Helper: recover the DiD coefficient
+
+```{python}
+def att(fit):
+    td = fit.tidy()
+    key = [k for k in td.index if "post" in k.lower() and "ever_treated" in k.lower()][0]
+    return td.loc[key, "Estimate"], td.loc[key, "Std. Error"]
+```
+
+## Spec 0 — Naive TWFE (no covariates)
+
+```{python}
+s0 = pf.feols("re ~ post * ever_treated", data=panel, vcov="HC1")
+print("Spec 0 (naive)      ATT = $%.0f (SE %.0f)" % att(s0))
+```
+
+**\$3,621** — about twice the truth, and it looks perfectly respectable. That is the danger.
+
+## Spec A — Additive X (the *level*)
+
+```{python}
+sA = pf.feols(f"re ~ post * ever_treated + {XF}", data=panel, vcov="HC1")
+print("Spec A (additive X) ATT = $%.0f (SE %.0f)" % att(sA))
+```
+
+Identical to the naive estimate. Time-invariant covariates are swept out by the within transformation, so additive controls in a TWFE DiD do **nothing**.
+
+## Spec BT — X × treatment (the *effect*)
+
+```{python}
+d = panel.assign(T=panel.post * panel.ever_treated)
+T_ints = " + ".join(f"T:{x}" for x in XVARS)
+fBT = pf.feols(f"re ~ post + ever_treated + T + {XF} + {T_ints}", data=d, vcov="HC1")
+tau = fBT.predict(newdata=d.assign(T=1.0)) - fBT.predict(newdata=d.assign(T=0.0))
+attBT = tau[((d.ever_treated == 1) & (d.post == 1)).values].mean()
+print("Spec BT (X x treatment) ATT = $%.0f" % attBT)
+```
+
+Still **\$3,621**. Relaxing constant treatment effects saturates the model in *levels* and never touches the counterfactual trend.
+
+## Spec B — X × post (the *trend*)
+
+```{python}
+post_ints = " + ".join(f"post:{x}" for x in XVARS)
+sB = pf.feols(f"re ~ post * ever_treated + {XF} + {post_ints}", data=panel, vcov="HC1")
+print("Spec B (X x post)   ATT = $%.0f (SE %.0f)" % att(sB))
+```
+
+The estimate collapses to **\$1,711** — within \$83 of the benchmark. Same covariates, moved into the trend. This is the pivot.
+
+## Spec C — Saturated first differences = HIT (1997)
+
+```{python}
+D_ints = " + ".join(f"ever_treated:{x}" for x in XVARS)
+sC = pf.feols(f"dy ~ {XF} + {D_ints} + ever_treated", data=wide, vcov="HC1")
+tauC = (sC.predict(newdata=wide.assign(ever_treated=1.0))
+        - sC.predict(newdata=wide.assign(ever_treated=0.0)))
+attC = tauC[wide.ever_treated.values == 1].mean()
+print("Spec C (saturated FD = HIT) ATT = $%.0f" % attC)
+```
+
+**\$1,770**. First-differencing turns each covariate's coefficient into its effect on the *trend*, so one regression corrects the trend and relaxes constant effects at once.
+
+## HIT (1997) by hand and the propensity-based estimators
+
+```{python}
+# HIT: control-only outcome regression, imputed to the treated
+mH = smf.ols(f"dy ~ {XF}", data=wide[wide.ever_treated == 0]).fit()
+attHIT = (wide.dy - mH.predict(wide))[wide.ever_treated == 1].mean()
+
+# IPW (Abadie 2005)
+Xc = sm.add_constant(wide[XVARS])
+wide["phat"] = sm.Logit(wide.ever_treated, Xc).fit(disp=0).predict(Xc)
+p = wide.ever_treated.mean()
+attIPW = (((wide.ever_treated - wide.phat) / (1 - wide.phat) / p) * wide.dy).mean()
+
+# DR (Sant'Anna-Zhao 2020)
+wide["dyhat"] = mH.predict(wide)
+dr_t = (wide.ever_treated * (wide.dy - wide.dyhat) / p).mean()
+dr_c = ((1 - wide.ever_treated) * (wide.phat / (1 - wide.phat)) * (wide.dy - wide.dyhat) / p).mean()
+attDR = dr_t - dr_c
+
+print("HIT by hand              = $%.0f" % attHIT)
+print("IPW (Abadie 2005)        = $%.0f" % attIPW)
+print("DR (Sant'Anna-Zhao 2020) = $%.0f" % attDR)
+```
+
+HIT reproduces Spec C to the dollar (**\$1,770**); IPW and DR land nearby at **\$1,861** and **\$1,993** from a different modeling angle.
+
+## The payoff: the covariate arc
+
+```{python}
+rows = [("No covariates (naive)", att(s0)[0], att(s0)[1], "inert"),
+        ("Additive X (level)", att(sA)[0], att(sA)[1], "inert"),
+        ("X x treatment (effect)", attBT, att(s0)[1], "inert"),
+        ("X x post (trend)", att(sB)[0], att(sB)[1], "corrected"),
+        ("Saturated FD = HIT", attC, att(sB)[1], "corrected"),
+        ("IPW (Abadie)", attIPW, att(sB)[1], "propensity"),
+        ("Doubly robust", attDR, att(sB)[1], "propensity")]
+res = pd.DataFrame(rows, columns=["estimator", "att", "se", "group"])
+
+colors = {"inert": GREY, "corrected": STEEL_BLUE, "propensity": TEAL}
+markers = {"inert": "o", "corrected": "D", "propensity": "s"}
+o = res.iloc[::-1].reset_index(drop=True)
+fig, ax = plt.subplots(figsize=(8.5, 5))
+ax.axvline(BENCHMARK, color=WARM_ORANGE, ls="--", lw=2, label="RCT benchmark $1,794")
+for i, r in o.iterrows():
+    ax.errorbar(r.att, i, xerr=1.96 * r.se, fmt=markers[r.group], color=colors[r.group],
+                ms=11, capsize=4, lw=2, mec="white")
+ax.set_yticks(range(len(o))); ax.set_yticklabels(o.estimator)
+ax.set_xlim(0, 4200)
+ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda v, p: f"${v:,.0f}"))
+ax.set_xlabel("ATT estimate (95% CI)")
+ax.set_title("Covariates rescue LaLonde only when they enter the trend", weight="bold")
+ax.legend(loc="lower right", frameon=False)
+for s in ["top", "right"]: ax.spines[s].set_visible(False)
+plt.tight_layout(); plt.show()
+res.round(0)
+```
+
+## Cross-check with the diff-diff package
+
+```{python}
+from diff_diff import DifferenceInDifferences, CallawaySantAnna
+
+dd = DifferenceInDifferences(cluster="id", seed=90210).fit(
+    panel, outcome="re", treatment="ever_treated", time="post", unit="id")
+cs_df = panel.assign(first_treat=np.where(panel.ever_treated == 1, 1, 0))
+cs = CallawaySantAnna(estimation_method="dr", seed=90210).fit(
+    cs_df, outcome="re", unit="id", time="post", first_treat="first_treat", covariates=XVARS)
+print("diff-diff naive 2x2      = $%.0f" % dd.att)
+print("diff-diff Callaway-SA DR = $%.0f  (by-hand DR $%.0f)"
+      % (float(np.atleast_1d(cs.att)[0]), attDR))
+```
+
+The package agrees exactly on the naive design and within \$14 on the doubly-robust estimate.
+
+## Takeaways
+
+- **Where** a covariate enters, not **whether** it is included, decides everything: level and effect are inert (~\$3,621); the **trend** corrects (~\$1,711–1,993, near the \$1,794 truth).
+- The ubiquitous **additive-controls TWFE** is exactly the specification that fails.
+- Trust the **pattern**, not the decimal — the confidence intervals are wide and the benchmark is itself noisy.
+
+*Source: Cunningham (2026), "Covariates, diff in diff and LaLonde test," Scott's Mixtape Substack. Companion post: [carlos-mendez.org/post/python_did_covariates_lalonde](https://carlos-mendez.org/post/python_did_covariates_lalonde/).*

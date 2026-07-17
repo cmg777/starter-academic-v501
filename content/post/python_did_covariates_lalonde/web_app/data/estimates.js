@@ -1,0 +1,85 @@
+// Auto-generated from ../did_covariates_lalonde_estimates.json by script.py pipeline.
+window.ESTIMATES = {
+  "benchmark": 1794.0,
+  "benchmark_se": 670.8,
+  "estimators": [
+    {
+      "spec": "0",
+      "label": "No covariates (naive TWFE)",
+      "att": 3621.2,
+      "se": 632.2,
+      "group": "inert"
+    },
+    {
+      "spec": "A",
+      "label": "Additive X (level)",
+      "att": 3621.2,
+      "se": 671.6,
+      "group": "inert"
+    },
+    {
+      "spec": "BT",
+      "label": "X x treatment (effect)",
+      "att": 3621.2,
+      "se": 652.1,
+      "group": "inert"
+    },
+    {
+      "spec": "B",
+      "label": "X x post (trend)",
+      "att": 1711.1,
+      "se": 704.3,
+      "group": "corrected"
+    },
+    {
+      "spec": "C",
+      "label": "Saturated FD = HIT",
+      "att": 1770.0,
+      "se": 701.2,
+      "group": "corrected"
+    },
+    {
+      "spec": "-",
+      "label": "HIT by hand (1997)",
+      "att": 1770.0,
+      "se": 701.2,
+      "group": "corrected"
+    },
+    {
+      "spec": "-",
+      "label": "IPW (Abadie 2005)",
+      "att": 1861.0,
+      "se": 816.3,
+      "group": "propensity"
+    },
+    {
+      "spec": "-",
+      "label": "DR (Sant'Anna-Zhao 2020)",
+      "att": 1993.2,
+      "se": 794.4,
+      "group": "propensity"
+    }
+  ],
+  "group_trend_means": {
+    "years": [
+      1974,
+      1975,
+      1978
+    ],
+    "treated": [
+      2095.6,
+      1532.1,
+      6349.1
+    ],
+    "cps": [
+      14016.8,
+      13650.8,
+      14846.7
+    ],
+    "experimental": [
+      2107.0,
+      1266.9,
+      4554.8
+    ]
+  }
+};

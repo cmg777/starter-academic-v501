@@ -1,0 +1,35 @@
+======================================================================
+ Covariates in Difference-in-Differences — the LaLonde test in Python
+======================================================================
+pyfixest 0.60.0 | numpy 2.5.1 | pandas 3.0.3
+
+Non-experimental sample: 16,177 units (185 treated, 15,992 CPS controls)
+Cell counts (ever_treated x post):
+post            0.0    1.0
+ever_treated              
+0             15992  15992
+1               185    185
+
+Experimental benchmark (re78 ~ treat) = $1,794 (SE 671); DiD form = $1,529
+Bootstrap: 199 reps, seed 90210, 0 failed draw(s)
+
+SpecEstimator                           ATT      SE   class
+--------------------------------------------------------------
+0   No covariates (naive TWFE)        3,621     632   inert
+A   Additive X (level)                3,621     672   inert
+BT  X x treatment (effect)            3,621     652   inert
+B   X x post (trend)                  1,711     704   corrected
+C   Saturated FD = HIT                1,770     701   corrected
+-   HIT by hand (1997)                1,770     701   corrected
+-   IPW (Abadie 2005)                 1,861     816   propensity
+-   DR (Sant'Anna-Zhao 2020)          1,993     794   propensity
+--------------------------------------------------------------
+    RCT benchmark (target)            1,794
+
+diff-diff cross-check:
+  naive 2x2      by pyfixest $3,621  vs diff-diff $3,621
+  additive X     by pyfixest $3,621  vs diff-diff $3,621
+  doubly robust  by hand   $1,993  vs diff-diff CS $1,979
+
+Saved 5 figures, lalonde_results.csv, lalonde_results.md, did_covariates_lalonde_estimates.json
+=== Script completed successfully ===
