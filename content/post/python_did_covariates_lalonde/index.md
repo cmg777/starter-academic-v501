@@ -38,6 +38,10 @@ links:
   icon_pack: fas
   name: "Python script"
   url: script.py
+- icon: file-code
+  icon_pack: fas
+  name: "Stata do-file"
+  url: analysis.do
 - icon: book
   icon_pack: fas
   name: "Jupyter notebook"
