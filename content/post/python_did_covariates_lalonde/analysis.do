@@ -173,10 +173,14 @@ di "========================================================"
 * with the earnings in that year stored in -re-.
 
 use `wide', clear
-* reshape needs the two outcome columns to share a stub.
-rename re75 re0            // pre  period earnings
-rename re78 re1            // post period earnings
-reshape long re, i(id) j(post)     // post = 0 or 1
+* reshape needs the two outcome columns to share a stub. We use the
+* stub "earn" (NOT "re") on purpose: a stub of "re" would also grab
+* the re74 covariate and turn it into a bogus third period. After the
+* reshape we rename the stacked outcome back to -re-.
+rename re75 earn0            // pre  period earnings
+rename re78 earn1            // post period earnings
+reshape long earn, i(id) j(post)   // post = 0 or 1
+rename earn re
 
 di _newline(1)
 di "Panel cell counts (rows per group x period):"
@@ -278,7 +282,7 @@ scalar sC = el(r(b),1,1)
 
 use `wide', clear
 regress dy $X if ever_treated == 0          // controls' trend only
-predict dyhat, xb                           // predicted change for everyone
+predict double dyhat, xb                     // predicted change for everyone
 gen resid_hit = dy - dyhat
 quietly summarize resid_hit if ever_treated == 1
 scalar hit = r(mean)
@@ -294,7 +298,7 @@ di _newline(1) as txt ">>> HIT (1997) by hand: ATT = " as res %6.0f hit as txt "
 * ~$1,861.
 
 logit ever_treated $X                       // propensity model
-predict phat, pr
+predict double phat, pr
 quietly summarize ever_treated
 scalar p_treat = r(mean)                     // share treated
 gen w_ipw = (ever_treated - phat) / (1 - phat) / p_treat
@@ -314,15 +318,22 @@ di _newline(1) as txt ">>> IPW (Abadie 2005) by hand: ATT = " as res %6.0f ipw a
 *   dr_c = IPW-weighted mean of the control residual
 *   ATT  = dr_t - dr_c
 
-gen resid = dy - dyhat                        // same residual as HIT
-gen dr_t_i = ever_treated * resid / p_treat
-gen dr_c_i = (1 - ever_treated) * (phat/(1-phat)) * resid / p_treat
-quietly summarize dr_t_i
-scalar dr_t = r(mean)
-quietly summarize dr_c_i
-scalar dr_c = r(mean)
-scalar dr = dr_t - dr_c
-di _newline(1) as txt ">>> DR (Sant'Anna-Zhao 2020) by hand: ATT = " as res %6.0f dr as txt " (expect ~1,993, PROPENSITY)"
+* Use double precision throughout: the propensity odds phat/(1-phat)
+* are large for units that look treated, so single precision loses
+* accuracy in the weighted control term. (Note: the scalars below are
+* named so they are NOT abbreviations of any variable name, otherwise
+* Stata would read the variable instead of the scalar.)
+gen double resid = dy - dyhat                 // same residual as HIT
+* Treated piece: the average residual over the treated (equals HIT).
+gen double drpieceT = ever_treated * resid / p_treat
+quietly summarize drpieceT
+scalar att_t = r(mean)
+* Control piece: the propensity-odds-weighted residual over controls.
+gen double drpieceC = (1 - ever_treated) * (phat/(1-phat)) * resid / p_treat
+quietly summarize drpieceC
+scalar att_c = r(mean)
+scalar attDR = att_t - att_c
+di _newline(1) as txt ">>> DR (Sant'Anna-Zhao 2020) by hand: ATT = " as res %6.0f attDR as txt " (expect ~1,993, PROPENSITY)"
 
 
 di _newline(2)
@@ -388,7 +399,7 @@ di "========================================================"
 
 use `panel', clear
 capture noisily drdid re $X, ivar(id) time(post) treatment(ever_treated) drimp
-di _newline(1) as txt "Compare the drdid ATT above with our by-hand DR = " as res %6.0f dr
+di _newline(1) as txt "Compare the drdid ATT above with our by-hand DR = " as res %6.0f attDR
 
 
 di _newline(2)
@@ -404,7 +415,7 @@ di as txt "  B     X x post (trend)                " as res %8.0f sB  as txt "  
 di as txt "  C     Saturated first difference      " as res %8.0f sC  as txt "  CORRECTED"
 di as txt "  --    HIT by hand (1997)              " as res %8.0f hit as txt "  CORRECTED"
 di as txt "  --    IPW (Abadie 2005)               " as res %8.0f ipw as txt "  propensity"
-di as txt "  --    DR (Sant'Anna-Zhao 2020)        " as res %8.0f dr  as txt "  propensity"
+di as txt "  --    DR (Sant'Anna-Zhao 2020)        " as res %8.0f attDR as txt "  propensity"
 di as txt "  ----  --------------------------------  ------  -----------"
 di as txt "        RCT benchmark (the truth)       " as res %8.0f benchmark
 di _newline(1)

@@ -42,6 +42,10 @@ links:
   icon_pack: fas
   name: "Stata do-file"
   url: analysis.do
+- icon: file-alt
+  icon_pack: fas
+  name: "Stata log"
+  url: analysis.log
 - icon: book
   icon_pack: fas
   name: "Jupyter notebook"

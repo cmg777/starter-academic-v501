@@ -1,0 +1,1032 @@
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/carlosmendez/Documents/Github/starter-academic-v501/content
+> /post/python_did_covariates_lalonde/analysis.log
+  log type:  text
+ opened on:  17 Jul 2026, 15:59:47
+
+. 
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================================"
+========================================================
+
+. di "  SECTION 1: BUILD THE NON-EXPERIMENTAL SAMPLE"
+  SECTION 1: BUILD THE NON-EXPERIMENTAL SAMPLE
+
+. di "========================================================"
+========================================================
+
+. 
+. *---------------------------------------------------
+. * Section 1.1: Load the trainees and the CPS controls
+. *---------------------------------------------------
+. * We keep only the 185 *treated* trainees from the NSW
+. * experiment and glue them onto the 15,992 CPS controls.
+. * This is the deliberately hard "observational" sample:
+. * the treated and the controls are NOT comparable.
+. 
+. use "https://github.com/scunning1975/mixtape/raw/master/nsw_mixtape.dta", cle
+> ar
+
+. keep if treat == 1                 // 185 trainees only
+(260 observations deleted)
+
+. tempfile trainees
+
+. save `trainees'
+file /var/folders/3h/bdq32hpj7ln850s11fd2qvqw0000gn/T//St33641.000001 saved
+    as .dta format
+
+. 
+. use "https://github.com/scunning1975/mixtape/raw/master/cps_mixtape.dta", cle
+> ar
+
+. append using `trainees'            // 15,992 CPS + 185 trainees
+(variable data_id was str4, now str20 to accommodate using data's values)
+(variable treat was byte, now float to accommodate using data's values)
+(variable age was byte, now float to accommodate using data's values)
+(variable educ was byte, now float to accommodate using data's values)
+(variable black was byte, now float to accommodate using data's values)
+(variable hisp was byte, now float to accommodate using data's values)
+(variable marr was byte, now float to accommodate using data's values)
+(variable nodegree was byte, now float to accommodate using data's values)
+
+. 
+. *---------------------------------------------------
+. * Section 1.2: Build covariates and the outcome change
+. *---------------------------------------------------
+. * -ever_treated- is our treatment-group flag (D).
+. * -id- gives every person a unique number (used later
+. *  as the panel identifier and the bootstrap cluster).
+. 
+. gen ever_treated = treat
+
+. gen id = _n
+
+. 
+. * The canonical LaLonde covariate set. Note the polynomial
+. * terms in age/education and the "unemployed in 1974" dummy.
+. gen agesq   = age^2
+
+. gen agecube = age^3
+
+. gen educsq  = educ^2
+
+. gen u74     = (re74 == 0)
+
+. 
+. * First difference of earnings across the DiD window:
+. * pre = 1975, post = 1978. dy is the change we will model.
+. gen dy = re78 - re75
+
+. 
+. * Convenience macro holding the 11 covariates, so every
+. * specification below can reuse exactly the same X set.
+. global X "age agesq agecube educ educsq marr nodegree black hisp re74 u74"
+
+. 
+. * Save this one-row-per-person "wide" file. We reload it
+. * whenever a by-hand estimator needs one row per unit.
+. tempfile wide
+
+. save `wide'
+file /var/folders/3h/bdq32hpj7ln850s11fd2qvqw0000gn/T//St33641.000002 saved
+    as .dta format
+
+. 
+. di _newline(1)
+
+
+
+. di "Non-experimental sample:"
+Non-experimental sample:
+
+. tab ever_treated       // 185 treated vs 15,992 CPS controls
+
+ever_treate |
+          d |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |     15,992       98.86       98.86
+          1 |        185        1.14      100.00
+------------+-----------------------------------
+      Total |     16,177      100.00
+
+. 
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================================"
+========================================================
+
+. di "  SECTION 2: THE EXPERIMENTAL BENCHMARK (the truth)"
+  SECTION 2: THE EXPERIMENTAL BENCHMARK (the truth)
+
+. di "========================================================"
+========================================================
+
+. 
+. *---------------------------------------------------
+. * Section 2.1: What the randomized experiment says
+. *---------------------------------------------------
+. * Because NSW randomized who got training, a plain
+. * comparison of 1978 earnings (treated vs the 260
+. * randomized controls) is already the honest ATT.
+. * This ~$1,794 is the number every estimate below is
+. * chasing. We compute it on the ORIGINAL experimental
+. * file (trainees + randomized controls), then set it
+. * aside — the rest of the script never uses it again.
+. 
+. use "https://github.com/scunning1975/mixtape/raw/master/nsw_mixtape.dta", cle
+> ar
+
+. gen dy = re78 - re75
+
+. 
+. di _newline(1)
+
+
+
+. di "Experimental ATT, cross-section (re78 on treat):"
+Experimental ATT, cross-section (re78 on treat):
+
+. regress re78 treat, robust
+
+Linear regression                               Number of obs     =        445
+                                                F(1, 443)         =       7.15
+                                                Prob > F          =     0.0078
+                                                R-squared         =     0.0178
+                                                Root MSE          =     6579.5
+
+------------------------------------------------------------------------------
+             |               Robust
+        re78 | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       treat |   1794.342   670.8245     2.67   0.008     475.9486    3112.736
+       _cons |   4554.801   340.2038    13.39   0.000     3886.187    5223.415
+------------------------------------------------------------------------------
+
+. 
+. di _newline(1)
+
+
+
+. di "Experimental ATT, diff-in-diff form (dy on treat):"
+Experimental ATT, diff-in-diff form (dy on treat):
+
+. regress dy treat, robust
+
+Linear regression                               Number of obs     =        445
+                                                F(1, 443)         =       4.57
+                                                Prob > F          =     0.0330
+                                                R-squared         =     0.0113
+                                                Root MSE          =     7064.9
+
+------------------------------------------------------------------------------
+             |               Robust
+          dy | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       treat |   1529.196   714.9556     2.14   0.033     124.0699    2934.322
+       _cons |   3287.892   375.9324     8.75   0.000      2549.06    4026.725
+------------------------------------------------------------------------------
+
+. 
+. * Remember the target for the final summary table.
+. quietly regress re78 treat, robust
+
+. scalar benchmark = _b[treat]
+
+. di _newline(1) as txt "==> Benchmark ATT = " as res %6.0f benchmark as txt " 
+>  (the truth we want to recover)"
+
+==> Benchmark ATT =   1794  (the truth we want to recover)
+
+. 
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================================"
+========================================================
+
+. di "  SECTION 3: RESHAPE INTO A 2-PERIOD PANEL"
+  SECTION 3: RESHAPE INTO A 2-PERIOD PANEL
+
+. di "========================================================"
+========================================================
+
+. 
+. *---------------------------------------------------
+. * Section 3.1: One row per person-period
+. *---------------------------------------------------
+. * The level specifications need long data: two rows per
+. * person, one for 1975 (post=0) and one for 1978 (post=1),
+. * with the earnings in that year stored in -re-.
+. 
+. use `wide', clear
+
+. * reshape needs the two outcome columns to share a stub. We use the
+. * stub "earn" (NOT "re") on purpose: a stub of "re" would also grab
+. * the re74 covariate and turn it into a bogus third period. After the
+. * reshape we rename the stacked outcome back to -re-.
+. rename re75 earn0            // pre  period earnings
+
+. rename re78 earn1            // post period earnings
+
+. reshape long earn, i(id) j(post)   // post = 0 or 1
+(j = 0 1)
+
+Data                               Wide   ->   Long
+-----------------------------------------------------------------------------
+Number of observations           16,177   ->   32,354      
+Number of variables                  18   ->   18          
+j variable (2 values)                     ->   post
+xij variables:
+                            earn0 earn1   ->   earn
+-----------------------------------------------------------------------------
+
+. rename earn re
+
+. 
+. di _newline(1)
+
+
+
+. di "Panel cell counts (rows per group x period):"
+Panel cell counts (rows per group x period):
+
+. tab ever_treated post              // 2x2 design, clearly visible
+
+ever_treat |         post
+        ed |         0          1 |     Total
+-----------+----------------------+----------
+         0 |    15,992     15,992 |    31,984 
+         1 |       185        185 |       370 
+-----------+----------------------+----------
+     Total |    16,177     16,177 |    32,354 
+
+. 
+. tempfile panel
+
+. save `panel'
+file /var/folders/3h/bdq32hpj7ln850s11fd2qvqw0000gn/T//St33641.000003 saved
+    as .dta format
+
+. 
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================================"
+========================================================
+
+. di "  SECTION 4: EIGHT WAYS TO ESTIMATE THE SAME ATT"
+  SECTION 4: EIGHT WAYS TO ESTIMATE THE SAME ATT
+
+. di "========================================================"
+========================================================
+
+. 
+. *---------------------------------------------------
+. * Spec 0 - Naive TWFE (no covariates)
+. *---------------------------------------------------
+. * The plain 2x2 diff-in-diff. The DiD effect is the
+. * coefficient on the post # treated interaction. With no
+. * covariates it lands at ~$3,621 — roughly double the truth,
+. * because the CPS controls were on a different earnings path.
+. 
+. use `panel', clear
+
+. di _newline(1) as txt ">>> Spec 0: Naive TWFE (expect ~3,621, INERT)"
+
+>>> Spec 0: Naive TWFE (expect ~3,621, INERT)
+
+. regress re i.post##i.ever_treated, robust
+
+Linear regression                               Number of obs     =     32,354
+                                                F(3, 32350)       =    1012.82
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0179
+                                                Root MSE          =     9428.6
+
+------------------------------------------------------------------------------
+             |               Robust
+          re | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.post |   1195.856   105.8044    11.30   0.000     988.4756    1403.237
+1.ever_tre~d |  -12118.75   247.1795   -49.03   0.000    -12603.23   -11634.27
+             |
+        post#|
+ever_treated |
+        1 1  |   3621.232    632.237     5.73   0.000     2382.024     4860.44
+             |
+       _cons |    13650.8   73.30954   186.21   0.000     13507.11    13794.49
+------------------------------------------------------------------------------
+
+. scalar s0 = _b[1.post#1.ever_treated]
+
+. 
+. *---------------------------------------------------
+. * Spec A - Additive covariates (X in the LEVEL)
+. *---------------------------------------------------
+. * Just adding the X's as extra regressors. Intuition:
+. * these covariates are time-invariant, so in a diff-in-diff
+. * they shift both periods equally and cancel out of the
+. * difference. The estimate does not budge from ~$3,621.
+. 
+. di _newline(1) as txt ">>> Spec A: Additive X in the level (expect ~3,621, IN
+> ERT)"
+
+>>> Spec A: Additive X in the level (expect ~3,621, INERT)
+
+. regress re i.post##i.ever_treated $X, robust
+
+Linear regression                               Number of obs     =     32,354
+                                                F(14, 32339)      =    3820.81
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.5785
+                                                Root MSE          =     6178.2
+
+------------------------------------------------------------------------------
+             |               Robust
+          re | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.post |   1195.856   69.05918    17.32   0.000     1060.498    1331.215
+1.ever_tre~d |  -2054.543   265.5732    -7.74   0.000    -2575.077    -1534.01
+             |
+        post#|
+ever_treated |
+        1 1  |   3621.232   671.6117     5.39   0.000     2304.848    4937.616
+             |
+         age |  -299.6044   112.6153    -2.66   0.008    -520.3346   -78.87433
+       agesq |   5.764397   3.314713     1.74   0.082    -.7325641    12.26136
+     agecube |  -.0421077   .0310067    -1.36   0.174    -.1028819    .0186666
+        educ |  -145.1521   57.46307    -2.53   0.012    -257.7819   -32.52238
+      educsq |   13.38997   2.406265     5.56   0.000     8.673605    18.10634
+        marr |   754.6929   98.34644     7.67   0.000     561.9302    947.4556
+    nodegree |  -58.26922   112.8528    -0.52   0.606    -279.4649    162.9265
+       black |  -697.8099   122.3969    -5.70   0.000    -937.7125   -457.9074
+        hisp |  -56.38077   138.8661    -0.41   0.685    -328.5636     215.802
+        re74 |   .7426303   .0051932   143.00   0.000     .7324515    .7528092
+         u74 |  -674.9903     122.99    -5.49   0.000    -916.0552   -433.9254
+       _cons |    7520.16   1295.763     5.80   0.000     4980.417     10059.9
+------------------------------------------------------------------------------
+
+. scalar sA = _b[1.post#1.ever_treated]
+
+. 
+. *---------------------------------------------------
+. * Spec B - Covariates x POST (X in the TREND)
+. *---------------------------------------------------
+. * Now we let each covariate have its OWN time trend by
+. * interacting it with -post-. This lets the controls'
+. * counterfactual path bend to match the trainees, fixing
+. * the parallel-trends violation. The estimate SNAPS down
+. * to ~$1,711 — close to the truth. THIS is the fix.
+. 
+. di _newline(1) as txt ">>> Spec B: X x post, covariates in the trend (expect 
+> ~1,711, CORRECTED)"
+
+>>> Spec B: X x post, covariates in the trend (expect ~1,711, CORRECTED)
+
+. regress re i.post##i.ever_treated $X c.post#(c.age c.agesq c.agecube c.educ c
+> .educsq c.marr c.nodegree c.black c.hisp c.re74 c.u74), robust
+
+Linear regression                               Number of obs     =     32,354
+                                                F(25, 32328)      =    3979.40
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.5919
+                                                Root MSE          =     6079.8
+
+------------------------------------------------------------------------------
+             |               Robust
+          re | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.post |   14498.57   2531.586     5.73   0.000     9536.567    19460.57
+1.ever_tre~d |  -1099.478   277.8145    -3.96   0.000    -1644.005   -554.9515
+             |
+        post#|
+ever_treated |
+        1 1  |   1711.102   704.2712     2.43   0.015     330.7045      3091.5
+             |
+         age |    138.827   110.8917     1.25   0.211    -78.52497     356.179
+       agesq |  -4.793348   3.288019    -1.46   0.145    -11.23799    1.651293
+     agecube |   .0482114   .0308795     1.56   0.118    -.0123136    .1087363
+        educ |  -163.7727   59.62357    -2.75   0.006    -280.6371   -46.90831
+      educsq |   11.82677   2.567786     4.61   0.000     6.793809    16.85972
+        marr |   805.4169   104.4099     7.71   0.000     600.7697    1010.064
+    nodegree |  -190.2574   114.7648    -1.66   0.097    -415.2008    34.68593
+       black |  -413.4691   122.7271    -3.37   0.001    -654.0187   -172.9194
+        hisp |    86.7794     144.47     0.60   0.548    -196.3872     369.946
+        re74 |   .8138955   .0055223   147.38   0.000     .8030715    .8247195
+         u74 |  -593.8947   117.3363    -5.06   0.000    -823.8783   -363.9111
+             |
+c.post#c.age |  -876.8629   219.7483    -3.99   0.000    -1307.578   -446.1481
+             |
+      c.post#|
+     c.agesq |   21.11549   6.476079     3.26   0.001     8.422134    33.80885
+             |
+      c.post#|
+   c.agecube |  -.1806381    .060616    -2.98   0.003    -.2994477   -.0618284
+             |
+      c.post#|
+      c.educ |   37.24119   113.3888     0.33   0.743     -185.005    259.4874
+             |
+      c.post#|
+    c.educsq |   3.126416   4.750725     0.66   0.510    -6.185183    12.43802
+             |
+      c.post#|
+      c.marr |  -101.4481   193.9575    -0.52   0.601    -481.6121     278.716
+             |
+      c.post#|
+  c.nodegree |   263.9764   221.7501     1.19   0.234    -170.6621    698.6149
+             |
+      c.post#|
+     c.black |  -568.6817   242.7486    -2.34   0.019    -1044.478   -92.88535
+             |
+      c.post#|
+      c.hisp |  -286.3203   273.4185    -1.05   0.295    -822.2308    249.5901
+             |
+      c.post#|
+      c.re74 |  -.1425303   .0102349   -13.93   0.000    -.1625911   -.1224694
+             |
+c.post#c.u74 |  -162.1912   237.9174    -0.68   0.495    -628.5182    304.1358
+             |
+       _cons |   868.8035   1274.989     0.68   0.496    -1630.222    3367.829
+------------------------------------------------------------------------------
+
+. scalar sB = _b[1.post#1.ever_treated]
+
+. 
+. *---------------------------------------------------
+. * Spec BT - Covariates x TREATMENT (X in the EFFECT)
+. *---------------------------------------------------
+. * A tempting but wrong "fix": interact X with the DiD
+. * switch T = post x treated (letting the *effect* vary
+. * with X) but WITHOUT giving controls a covariate-specific
+. * trend. Averaging the person-specific effects over the
+. * treated recovers ~$3,621 again — still INERT. Interacting
+. * with the effect is not the same as fixing the trend.
+. 
+. use `panel', clear
+
+. gen T = post * ever_treated                 // the DiD switch
+
+. * Fit levels with T and T#X, then read the ATT off with
+. * -margins-: the average change in prediction when T flips
+. * 0 -> 1, evaluated over the treated-post cells.
+. regress re i.post i.ever_treated T $X c.T#(c.age c.agesq c.agecube c.educ c.e
+> ducsq c.marr c.nodegree c.black c.hisp c.re74 c.u74), robust
+
+Linear regression                               Number of obs     =     32,354
+                                                F(25, 32328)      =    2156.07
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.5795
+                                                Root MSE          =     6171.4
+
+------------------------------------------------------------------------------
+             |               Robust
+          re | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      1.post |   1195.856   69.06934    17.31   0.000     1060.478    1331.235
+1.ever_tre~d |  -2005.512    266.867    -7.52   0.000    -2528.582   -1482.443
+           T |   20432.26   24262.95     0.84   0.400    -27124.04    67988.56
+         age |  -331.4174   112.5773    -2.94   0.003    -552.0731   -110.7617
+       agesq |     6.5502   3.314154     1.98   0.048     .0543344    13.04607
+     agecube |  -.0483097   .0310052    -1.56   0.119    -.1090812    .0124617
+        educ |  -151.0013   57.53727    -2.62   0.009    -263.7765   -38.22607
+      educsq |   13.63531   2.408511     5.66   0.000     8.914541    18.35609
+        marr |   768.8535   98.39491     7.81   0.000     575.9958    961.7112
+    nodegree |  -61.26089   112.6826    -0.54   0.587     -282.123    159.6012
+       black |  -685.6194   122.5212    -5.60   0.000    -925.7656   -445.4732
+        hisp |  -55.92963   138.9075    -0.40   0.687    -328.1935    216.3343
+        re74 |   .7426688   .0051977   142.88   0.000      .732481    .7528566
+         u74 |  -772.0456   123.2429    -6.26   0.000    -1013.606   -530.4849
+             |
+   c.T#c.age |  -2026.927   2368.061    -0.86   0.392    -6668.416    2614.562
+             |
+ c.T#c.agesq |   86.78323   80.44906     1.08   0.281    -70.89993    244.4664
+             |
+         c.T#|
+   c.agecube |   -1.08301   .8685065    -1.25   0.212    -2.785315    .6192951
+             |
+  c.T#c.educ |  -2014.541   1834.296    -1.10   0.272     -5609.83    1580.748
+             |
+c.T#c.educsq |   137.0831   110.2383     1.24   0.214    -78.98805    353.1542
+             |
+  c.T#c.marr |   289.6266   1423.358     0.20   0.839    -2500.207    3079.461
+             |
+         c.T#|
+  c.nodegree |    989.724   2236.194     0.44   0.658      -3393.3    5372.748
+             |
+ c.T#c.black |  -461.3679   1632.651    -0.28   0.777    -3661.424    2738.688
+             |
+  c.T#c.hisp |   1095.539   2646.455     0.41   0.679    -4091.611    6282.689
+             |
+  c.T#c.re74 |  -.4824953   .2489543    -1.94   0.053    -.9704551    .0054644
+             |
+   c.T#c.u74 |   3954.205   1788.499     2.21   0.027     448.6792    7459.731
+             |
+       _cons |   7953.419   1293.481     6.15   0.000     5418.148    10488.69
+------------------------------------------------------------------------------
+
+. di _newline(1) as txt ">>> Spec BT: X x treatment in the effect (expect ~3,62
+> 1, INERT)"
+
+>>> Spec BT: X x treatment in the effect (expect ~3,621, INERT)
+
+. margins if ever_treated==1 & post==1, dydx(T)
+
+Average marginal effects                                   Number of obs = 185
+Model VCE: Robust
+
+Expression: Linear prediction, predict()
+dy/dx wrt:  T
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+           T |   3621.232   601.2084     6.02   0.000     2442.841    4799.623
+------------------------------------------------------------------------------
+
+. scalar sBT = el(r(b),1,1)
+
+. 
+. *---------------------------------------------------
+. * Spec C - Saturated first difference (= HIT)
+. *---------------------------------------------------
+. * Model the earnings CHANGE dy directly, letting the
+. * effect of treatment depend fully on X (a saturated
+. * treated#X interaction). The ATT is the average predicted
+. * treated-minus-control change over the treated. This is
+. * algebraically the Heckman-Ichimura-Todd (1997) estimator
+. * and lands at ~$1,770 — corrected.
+. 
+. use `wide', clear
+
+. regress dy ever_treated $X c.ever_treated#(c.age c.agesq c.agecube c.educ c.e
+> ducsq c.marr c.nodegree c.black c.hisp c.re74 c.u74), robust
+
+Linear regression                               Number of obs     =     16,177
+                                                F(23, 16153)      =      71.95
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.0860
+                                                Root MSE          =     7393.4
+
+------------------------------------------------------------------------------
+             |               Robust
+          dy | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ever_treated |  -5932.945    25327.2    -0.23   0.815    -55577.07    43711.18
+         age |  -942.2437   190.7634    -4.94   0.000    -1316.161   -568.3264
+       agesq |   22.77955   5.618841     4.05   0.000       11.766     33.7931
+     agecube |  -.1941975   .0525867    -3.69   0.000    -.2972733   -.0911217
+        educ |   32.24352   94.94798     0.34   0.734     -153.865    218.3521
+      educsq |   3.422898   3.913922     0.87   0.382    -4.248823    11.09462
+        marr |   -70.4525   164.9977    -0.43   0.669    -393.8662    252.9613
+    nodegree |   294.0368   192.7535     1.53   0.127    -83.78141     671.855
+       black |  -557.7101   206.0771    -2.71   0.007     -961.644   -153.7762
+        hisp |  -286.2534    232.826    -1.23   0.219    -742.6183    170.1114
+        re74 |  -.1429963   .0086122   -16.60   0.000    -.1598771   -.1261155
+         u74 |   -297.446   201.1276    -1.48   0.139    -691.6783    96.78637
+             |
+          c. |
+ever_treated#|
+       c.age |   814.0222   2495.678     0.33   0.744    -4077.783    5705.827
+             |
+          c. |
+ever_treated#|
+     c.agesq |  -12.51978   85.48363    -0.15   0.884    -180.0772    155.0376
+             |
+          c. |
+ever_treated#|
+   c.agecube |   .0137167   .9271464     0.01   0.988    -1.803593    1.831026
+             |
+          c. |
+ever_treated#|
+      c.educ |  -2579.511   1986.791    -1.30   0.194    -6473.842     1314.82
+             |
+          c. |
+ever_treated#|
+    c.educsq |   167.2937    120.083     1.39   0.164     -68.0824    402.6697
+             |
+          c. |
+ever_treated#|
+      c.marr |    39.3865   1444.464     0.03   0.978    -2791.923    2870.696
+             |
+          c. |
+ever_treated#|
+  c.nodegree |  -214.5299   2364.114    -0.09   0.928    -4848.455    4419.395
+             |
+          c. |
+ever_treated#|
+     c.black |  -334.9218   1521.733    -0.22   0.826    -3317.688    2647.844
+             |
+          c. |
+ever_treated#|
+      c.hisp |   950.3661   2830.018     0.34   0.737    -4596.783    6497.515
+             |
+          c. |
+ever_treated#|
+      c.re74 |   .0957624   .2595961     0.37   0.712    -.4130747    .6045994
+             |
+          c. |
+ever_treated#|
+       c.u74 |   5156.794   1850.011     2.79   0.005     1530.569     8783.02
+             |
+       _cons |   15305.16   2184.553     7.01   0.000      11023.2    19587.13
+------------------------------------------------------------------------------
+
+. * margins: average effect of switching ever_treated 0 -> 1,
+. * evaluated on the treated units only (the ATT).
+. di _newline(1) as txt ">>> Spec C: Saturated first difference (expect ~1,770,
+>  CORRECTED)"
+
+>>> Spec C: Saturated first difference (expect ~1,770, CORRECTED)
+
+. margins if ever_treated==1, dydx(ever_treated)
+
+Average marginal effects                                   Number of obs = 185
+Model VCE: Robust
+
+Expression: Linear prediction, predict()
+dy/dx wrt:  ever_treated
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ever_treated |   1769.998   599.9435     2.95   0.003     594.0426    2945.954
+------------------------------------------------------------------------------
+
+. scalar sC = el(r(b),1,1)
+
+. 
+. *---------------------------------------------------
+. * HIT (1997) - Heckman-Ichimura-Todd, by hand
+. *---------------------------------------------------
+. * The transparent version of Spec C. Fit the outcome-change
+. * model on the CONTROLS ONLY to learn their normal earnings
+. * trajectory, predict what each trainee's change "should"
+. * have been, and average the trainees' surprise (actual
+. * minus predicted). ~$1,770.
+. 
+. use `wide', clear
+
+. regress dy $X if ever_treated == 0          // controls' trend only
+
+      Source |       SS           df       MS      Number of obs   =    15,992
+-------------+----------------------------------   F(11, 15980)    =    131.57
+       Model |  7.8978e+10        11  7.1798e+09   Prob > F        =    0.0000
+    Residual |  8.7203e+11    15,980  54570364.5   R-squared       =    0.0830
+-------------+----------------------------------   Adj R-squared   =    0.0824
+       Total |  9.5101e+11    15,991  59471738.9   Root MSE        =    7387.2
+
+------------------------------------------------------------------------------
+          dy | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |  -942.2437    200.105    -4.71   0.000    -1334.472   -550.0153
+       agesq |   22.77955    5.83333     3.91   0.000     11.34557    34.21354
+     agecube |  -.1941975    .054174    -3.58   0.000    -.3003846   -.0880104
+        educ |   32.24352   106.5914     0.30   0.762    -176.6876    241.1747
+      educsq |   3.422898   4.254724     0.80   0.421    -4.916839    11.76264
+        marr |   -70.4525   161.7621    -0.44   0.663    -387.5245    246.6195
+    nodegree |   294.0368   196.8297     1.49   0.135    -91.77156    679.8451
+       black |  -557.7101    227.548    -2.45   0.014     -1003.73   -111.6904
+        hisp |  -286.2534   234.4201    -1.22   0.222    -745.7431    173.2362
+        re74 |  -.1429963   .0086433   -16.54   0.000    -.1599381   -.1260546
+         u74 |   -297.446   219.1389    -1.36   0.175    -726.9828    132.0908
+       _cons |   15305.16   2334.043     6.56   0.000     10730.18    19880.15
+------------------------------------------------------------------------------
+
+. predict double dyhat, xb                     // predicted change for everyone
+
+. gen resid_hit = dy - dyhat
+
+. quietly summarize resid_hit if ever_treated == 1
+
+. scalar hit = r(mean)
+
+. di _newline(1) as txt ">>> HIT (1997) by hand: ATT = " as res %6.0f hit as tx
+> t " (expect ~1,770, CORRECTED)"
+
+>>> HIT (1997) by hand: ATT =   1770 (expect ~1,770, CORRECTED)
+
+. 
+. *---------------------------------------------------
+. * IPW (Abadie 2005) - inverse propensity weighting
+. *---------------------------------------------------
+. * Instead of modelling the outcome, model WHO gets treated.
+. * Fit a propensity score p(X) = P(treated | X), then reweight
+. * the earnings change so the reweighted controls look like
+. * the trainees. Weight w = (D - p)/(1 - p) / share_treated.
+. * ~$1,861.
+. 
+. logit ever_treated $X                       // propensity model
+
+Iteration 0:  Log likelihood = -1011.0713  
+Iteration 1:  Log likelihood = -627.64449  
+Iteration 2:  Log likelihood = -455.96178  
+Iteration 3:  Log likelihood = -426.96611  
+Iteration 4:  Log likelihood = -425.02629  
+Iteration 5:  Log likelihood = -425.01715  
+Iteration 6:  Log likelihood = -425.01715  
+
+Logistic regression                                    Number of obs =  16,177
+                                                       LR chi2(11)   = 1172.11
+                                                       Prob > chi2   =  0.0000
+Log likelihood = -425.01715                            Pseudo R2     =  0.5796
+
+------------------------------------------------------------------------------
+ever_treated | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |   2.378143   .3407398     6.98   0.000     1.710306    3.045981
+       agesq |  -.0665604   .0108359    -6.14   0.000    -.0877983   -.0453225
+     agecube |   .0005688   .0001081     5.26   0.000     .0003569    .0007806
+        educ |   .8954575   .2502137     3.58   0.000     .4050478    1.385867
+      educsq |  -.0524433   .0132578    -3.96   0.000    -.0784281   -.0264585
+        marr |  -1.632919    .246495    -6.62   0.000    -2.116041   -1.149798
+    nodegree |   .8171713   .3223332     2.54   0.011     .1854099    1.448933
+       black |   3.891403   .2649773    14.69   0.000     3.372057    4.410749
+        hisp |   1.621706   .4063509     3.99   0.000     .8252729    2.418139
+        re74 |  -.0001009   .0000248    -4.07   0.000    -.0001494   -.0000523
+         u74 |   1.874043   .2686553     6.98   0.000     1.347488    2.400597
+       _cons |  -34.94402   3.724007    -9.38   0.000    -42.24294    -27.6451
+------------------------------------------------------------------------------
+
+. predict double phat, pr
+
+. quietly summarize ever_treated
+
+. scalar p_treat = r(mean)                     // share treated
+
+. gen w_ipw = (ever_treated - phat) / (1 - phat) / p_treat
+
+. gen contrib_ipw = w_ipw * dy
+
+. quietly summarize contrib_ipw
+
+. scalar ipw = r(mean)
+
+. di _newline(1) as txt ">>> IPW (Abadie 2005) by hand: ATT = " as res %6.0f ip
+> w as txt " (expect ~1,861, PROPENSITY)"
+
+>>> IPW (Abadie 2005) by hand: ATT =   1861 (expect ~1,861, PROPENSITY)
+
+. 
+. *---------------------------------------------------
+. * DR (Sant'Anna-Zhao 2020) - doubly robust
+. *---------------------------------------------------
+. * The best of both worlds: combine the outcome model (dyhat
+. * from the controls, reused from HIT above) with the
+. * propensity weights (phat). It is "doubly robust" because
+. * it stays consistent if EITHER model is correct. ~$1,993.
+. *   dr_t = mean over treated of the residual
+. *   dr_c = IPW-weighted mean of the control residual
+. *   ATT  = dr_t - dr_c
+. 
+. * Use double precision throughout: the propensity odds phat/(1-phat)
+. * are large for units that look treated, so single precision loses
+. * accuracy in the weighted control term. (Note: the scalars below are
+. * named so they are NOT abbreviations of any variable name, otherwise
+. * Stata would read the variable instead of the scalar.)
+. gen double resid = dy - dyhat                 // same residual as HIT
+
+. * Treated piece: the average residual over the treated (equals HIT).
+. gen double drpieceT = ever_treated * resid / p_treat
+
+. quietly summarize drpieceT
+
+. scalar att_t = r(mean)
+
+. * Control piece: the propensity-odds-weighted residual over controls.
+. gen double drpieceC = (1 - ever_treated) * (phat/(1-phat)) * resid / p_treat
+
+. quietly summarize drpieceC
+
+. scalar att_c = r(mean)
+
+. scalar attDR = att_t - att_c
+
+. di _newline(1) as txt ">>> DR (Sant'Anna-Zhao 2020) by hand: ATT = " as res %
+> 6.0f attDR as txt " (expect ~1,993, PROPENSITY)"
+
+>>> DR (Sant'Anna-Zhao 2020) by hand: ATT =   1993 (expect ~1,993, PROPENSITY)
+
+. 
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================================"
+========================================================
+
+. di "  SECTION 5: CLUSTER-BOOTSTRAP STANDARD ERRORS"
+  SECTION 5: CLUSTER-BOOTSTRAP STANDARD ERRORS
+
+. di "========================================================"
+========================================================
+
+. 
+. *---------------------------------------------------
+. * Section 5.1: SEs for the by-hand estimators
+. *---------------------------------------------------
+. * The closed-form regressions above already report robust
+. * SEs. The by-hand HIT / IPW / DR estimators do not, so we
+. * bootstrap them: resample the units (one row per person in
+. * -wide-, so each person is its own cluster), re-estimate,
+. * and take the spread. 199 reps, seed 90210 — matching the
+. * Python post.
+. 
+. * Wrap the three by-hand estimators in a program that
+. * returns them, so -bootstrap- can call it repeatedly.
+. capture program drop hitipwdr
+
+. program define hitipwdr, rclass
+  1.     * -- HIT: outcome regression on controls, surprise on treated
+.     quietly regress dy $X if ever_treated == 0
+  2.     quietly predict double _dyhat, xb
+  3.     quietly gen double _res = dy - _dyhat
+  4.     quietly summarize _res if ever_treated == 1
+  5.     return scalar hit = r(mean)
+  6.     * -- IPW: Abadie weights
+.     quietly logit ever_treated $X
+  7.     quietly predict double _phat, pr
+  8.     quietly summarize ever_treated
+  9.     local p = r(mean)
+ 10.     quietly gen double _wi = (ever_treated - _phat)/(1 - _phat)/`p' * dy
+ 11.     quietly summarize _wi
+ 12.     return scalar ipw = r(mean)
+ 13.     * -- DR: outcome model + propensity weights
+.     quietly gen double _drt = ever_treated * _res / `p'
+ 14.     quietly gen double _drc = (1-ever_treated) * (_phat/(1-_phat)) * _res 
+> / `p'
+ 15.     quietly summarize _drt
+ 16.     local t = r(mean)
+ 17.     quietly summarize _drc
+ 18.     local c = r(mean)
+ 19.     return scalar dr = `t' - `c'
+ 20.     drop _dyhat _res _phat _wi _drt _drc
+ 21. end
+
+. 
+. use `wide', clear
+
+. bootstrap hit=r(hit) ipw=r(ipw) dr=r(dr), reps(199) seed(90210) nodots: hitip
+> wdr
+
+Bootstrap results                                       Number of obs = 16,177
+                                                        Replications  =    199
+
+      Command: hitipwdr
+          hit: r(hit)
+          ipw: r(ipw)
+           dr: r(dr)
+
+------------------------------------------------------------------------------
+             |   Observed   Bootstrap                         Normal-based
+             | coefficient  std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         hit |   1769.998   674.8463     2.62   0.009     447.3239    3092.673
+         ipw |   1860.971   810.6829     2.30   0.022     272.0622    3449.881
+          dr |   1993.155   782.1107     2.55   0.011     460.2462    3526.064
+------------------------------------------------------------------------------
+
+. 
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================================"
+========================================================
+
+. di "  SECTION 6: PACKAGE CROSS-CHECK (drdid)"
+  SECTION 6: PACKAGE CROSS-CHECK (drdid)
+
+. di "========================================================"
+========================================================
+
+. 
+. *---------------------------------------------------
+. * Section 6.1: Does an off-the-shelf command agree?
+. *---------------------------------------------------
+. * Sanity check: the community-standard -drdid- command
+. * should reproduce our by-hand doubly-robust number. We run
+. * it on the long panel. (If drdid is not installed and there
+. * is no internet, this section is skipped by -capture-.)
+. 
+. use `panel', clear
+
+. capture noisily drdid re $X, ivar(id) time(post) treatment(ever_treated) drim
+> p
+
+Doubly robust difference-in-differences                 Number of obs = 32,354
+Outcome model  : weighted least squares
+Treatment model: inverse probability tilting
+------------------------------------------------------------------------------
+             | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+ATET         |
+ever_treated |
+   (1 vs 0)  |   2032.922    707.456     2.87   0.004     646.3334     3419.51
+------------------------------------------------------------------------------
+
+. di _newline(1) as txt "Compare the drdid ATT above with our by-hand DR = " as
+>  res %6.0f attDR
+
+Compare the drdid ATT above with our by-hand DR =   1993
+
+. 
+. 
+. di _newline(2)
+
+
+
+
+. di "========================================================"
+========================================================
+
+. di "  SECTION 7: SUMMARY — the covariate arc"
+  SECTION 7: SUMMARY — the covariate arc
+
+. di "========================================================"
+========================================================
+
+. di as txt "  Spec  Estimator                         ATT     Class"
+  Spec  Estimator                         ATT     Class
+
+. di as txt "  ----  --------------------------------  ------  -----------"
+  ----  --------------------------------  ------  -----------
+
+. di as txt "  0     Naive TWFE (no covariates)      " as res %8.0f s0  as txt 
+> "  inert"
+  0     Naive TWFE (no covariates)          3621  inert
+
+. di as txt "  A     Additive X (level)              " as res %8.0f sA  as txt 
+> "  inert"
+  A     Additive X (level)                  3621  inert
+
+. di as txt "  BT    X x treatment (effect)          " as res %8.0f sBT as txt 
+> "  inert"
+  BT    X x treatment (effect)              3621  inert
+
+. di as txt "  B     X x post (trend)                " as res %8.0f sB  as txt 
+> "  CORRECTED"
+  B     X x post (trend)                    1711  CORRECTED
+
+. di as txt "  C     Saturated first difference      " as res %8.0f sC  as txt 
+> "  CORRECTED"
+  C     Saturated first difference          1770  CORRECTED
+
+. di as txt "  --    HIT by hand (1997)              " as res %8.0f hit as txt 
+> "  CORRECTED"
+  --    HIT by hand (1997)                  1770  CORRECTED
+
+. di as txt "  --    IPW (Abadie 2005)               " as res %8.0f ipw as txt 
+> "  propensity"
+  --    IPW (Abadie 2005)                   1861  propensity
+
+. di as txt "  --    DR (Sant'Anna-Zhao 2020)        " as res %8.0f attDR as tx
+> t "  propensity"
+  --    DR (Sant'Anna-Zhao 2020)            1993  propensity
+
+. di as txt "  ----  --------------------------------  ------  -----------"
+  ----  --------------------------------  ------  -----------
+
+. di as txt "        RCT benchmark (the truth)       " as res %8.0f benchmark
+        RCT benchmark (the truth)           1794
+
+. di _newline(1)
+
+
+
+. di as txt "Lesson: the estimate stays stuck near \$3,621 until the"
+Lesson: the estimate stays stuck near $3,621 until the
+
+. di as txt "covariates touch the control group's TREND (Spec B, C, HIT)"
+covariates touch the control group's TREND (Spec B, C, HIT)
+
+. di as txt "or its treatment probability (IPW, DR). Covariates in the"
+or its treatment probability (IPW, DR). Covariates in the
+
+. di as txt "level (Spec A) or the effect (Spec BT) change nothing."
+level (Spec A) or the effect (Spec BT) change nothing.
+
+. 
+. capture log close
