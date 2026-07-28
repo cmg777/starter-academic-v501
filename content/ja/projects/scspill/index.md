@@ -133,11 +133,11 @@ result.plot(kind="panel")          # counterfactual | effect | top spillovers
 
 ## 謝辞
 
-手法とオリジナルのR/C++実装は Shosei Sakaguchi 氏と Hayato Tagawa 氏によるものであり、両氏はその貢献に基づき本ライブラリの共著者として記載されています。Python実装は Carlos Mendez によるものです。両氏の[レプリケーションパッケージ](https://doi.org/10.5281/zenodo.19066186)はMITライセンスで公開されており、`scspill` の各リリースはその固定済みの結果と交差検証されています。推定器のアーキテクチャは Jared Greathouse 氏の [mlsynth](https://github.com/jgreathouse9/mlsynth) に、ドキュメント基盤は QuaRCS Lab の [geometrics](https://github.com/quarcs-lab/geometrics) パッケージに倣っています。
+本Pythonパッケージは Carlos Mendez が執筆し、保守しています。`sar` モデルとそのオリジナルのR/C++実装は Shosei Sakaguchi 氏と Hayato Tagawa 氏によるものです。同モデルを利用する際は、両氏の論文を引用してください。両氏の[レプリケーションパッケージ](https://doi.org/10.5281/zenodo.19066186)はMITライセンスで公開されており、その著作権表示は本ライブラリの `LICENSE` に保持されています。また `scspill` の各リリースは、その固定済みの結果と交差検証されています。推定器のアーキテクチャは Jared Greathouse 氏の [mlsynth](https://github.com/jgreathouse9/mlsynth) に、ドキュメント基盤は QuaRCS Lab の [geometrics](https://github.com/quarcs-lab/geometrics) パッケージに倣っています。
 
 `scspill` をご利用の際は、ソフトウェアと方法論の論文の両方を引用してください（機械可読なメタデータは [`CITATION.cff`](https://github.com/quarcs-lab/scspill/blob/main/CITATION.cff) にあります）。
 
-> Mendez, C., Sakaguchi, S., & Tagawa, H. (2026). *Synthetic Control Models with Spillovers in Python* (version 0.2.0). <https://github.com/quarcs-lab/scspill>
+> Mendez, C. (2026). *Synthetic Control Models with Spillovers in Python* (version 0.2.1). <https://github.com/quarcs-lab/scspill>
 
 > Sakaguchi, S., & Tagawa, H. (2026). Identification and Bayesian Inference for Synthetic Control Methods with Spillover Effects. *The Econometrics Journal*. <https://doi.org/10.1093/ectj/utag006>
 
