@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: A Python library for Bayesian synthetic control when the treatment leaks — it relaxes SUTVA through a spatial-autoregressive channel and estimates both the effect on the treated unit and the spillover received by every donor, with full Bayesian uncertainty.
+summary: "A Python package of synthetic control models that drop SUTVA on the donor pool — the treatment is allowed to reach the controls, and every model reports two estimands: the effect on the treated unit, purged of contamination, and the spillover received by each donor."
 tags:
 - python
 - causal
@@ -28,10 +28,10 @@ links:
     url: "https://quarcs-lab.github.io/scspill/get-started.html"
     icon_pack: fas
     icon: rocket
-  - name: "The method"
-    url: "https://quarcs-lab.github.io/scspill/articles/method.html"
+  - name: "Models"
+    url: "https://quarcs-lab.github.io/scspill/models/"
     icon_pack: fas
-    icon: square-root-alt
+    icon: layer-group
   - name: "Validation"
     url: "https://quarcs-lab.github.io/scspill/articles/validation.html"
     icon_pack: fas
@@ -50,35 +50,35 @@ url_slides: ""
 url_video: ""
 ---
 
-**Synthetic control when the treatment leaks — the policy effect *and* the spillover received by every donor.**
+**Synthetic control when the treatment leaks — the effect on the treated unit *and* the spillover received by every donor.**
 
-`scspill` is a Python implementation of the Bayesian spatial-spillover synthetic control of [Sakaguchi & Tagawa](https://quarcs-lab.github.io/scspill/articles/method.html) (*Identification and Bayesian Inference for Synthetic Control Methods with Spillover Effects*, The Econometrics Journal). Classical synthetic control assumes the donors are untouched by the policy; when the treatment leaks across borders or trade networks that assumption fails and the estimate is biased. `scspill` relaxes SUTVA by letting the treatment spill over to the donor pool through a **spatial-autoregressive channel** with user-supplied weights, and reports the effect on the treated unit, the spillover received by each donor, and the spillover intensity — each with full Bayesian uncertainty. The synthetic weights use **horseshoe regularization without a simplex constraint**, so donors may be dropped, enter negatively, or extrapolate. The estimator follows the [mlsynth](https://github.com/jgreathouse9/mlsynth) architecture — a pydantic config in, a standardized results object out — so the two libraries compose naturally.
+`scspill` is a Python package of synthetic control models that drop SUTVA on the donor pool. The treatment is allowed to reach the controls, and every model reports two estimands: the effect on the treated unit, purged of the contamination, and the spillover effect received by each donor — something classical synthetic control cannot express at all. The model available today, `sar`, routes spillovers through spatial weights you supply, scaled by a single intensity ρ that is **estimated rather than assumed**; it fits unconstrained horseshoe-shrunk synthetic weights, so donors may be dropped, enter negatively, or extrapolate, and it returns full Bayesian uncertainty for both estimands. At ρ = 0 it collapses exactly to the Bayesian horseshoe synthetic control. The estimator architecture follows [mlsynth](https://github.com/jgreathouse9/mlsynth) — a pydantic config in, a standardized results object out — and the `method` names match its `SPILLSYNTH` dispatcher, so the two libraries compose naturally.
 
 ### 🚀 [Get started](https://quarcs-lab.github.io/scspill/get-started.html)
 
-Fit the model on California's Proposition 99 in about ten lines: the **ATT with a 95% credible interval**, the spillover intensity ρ, the year-by-year spillover received by every donor, MCMC diagnostics, and counterfactual plots.
+Fit a model on California's Proposition 99 in about ten lines: the **ATT with a 95% credible interval**, the spillover intensity ρ, the year-by-year spillover received by every donor, MCMC diagnostics, and counterfactual plots.
 
 [▶ Open in Colab](https://colab.research.google.com/github/quarcs-lab/scspill/blob/main/notebooks/california.ipynb)
 
-### 📐 [The method](https://quarcs-lab.github.io/scspill/articles/method.html)
+### 🧬 [Models](https://quarcs-lab.github.io/scspill/models/)
 
-Identification and the **two-step Bayesian sampler**: horseshoe synthetic weights, the SAR spillover block, and adaptive Metropolis for the spillover intensity. It also documents the defaults that depart from the reference R implementation — each departure has an escape hatch and a benchmark quantifying the difference.
+One model ships today: [`sar`](https://quarcs-lab.github.io/scspill/models/sar.html), the Bayesian spatial-autoregressive spillover SCM of [Sakaguchi & Tagawa (2026)](https://doi.org/10.1093/ectj/utag006). Three further spillover-aware models are on the [roadmap](https://quarcs-lab.github.io/scspill/models/#planned) — Cao & Dowd, the inclusive SCM of Di Stefano & Mellace, and the partial-interference SCG of Grossi et al. They are **not implemented**, and `SCSPILLConfig` rejects their names rather than falling back silently.
 
 ### 🧪 [Validation](https://quarcs-lab.github.io/scspill/articles/validation.html)
 
-Evidence that the sampler is correct: the **Geweke (2004) joint distribution test**, prior-sensitivity grids, prior predictive checks, and cross-validation against the authors' frozen R credible intervals.
+Evidence that the `sar` sampler is correct: the **Geweke (2004) joint distribution test**, prior-sensitivity grids, prior predictive checks, and cross-validation against the authors' frozen R credible intervals.
 
 ## What's inside
 
-**Estimation** — `SCSPILL(config).fit()` returns the ATT and its credible interval, the counterfactual path, the ρ posterior, a time-by-donor spillover panel, and MCMC diagnostics.
+**`scspill`** — the model layer. `SCSPILL(config).fit()` returns the ATT and its credible interval, the counterfactual path, the ρ posterior, a time-by-donor spillover panel, and MCMC diagnostics.
 
-**Validation** — `scspill.validation` implements the Geweke joint distribution test of the sampler, prior-sensitivity grids, and prior predictive checks.
+**`scspill.validation`** — `sar`'s sampler validation: the Geweke joint distribution test, prior-sensitivity grids, and prior predictive checks.
 
-**Simulation** — `scspill.simulate` reproduces the paper's [Monte Carlo study](https://quarcs-lab.github.io/scspill/articles/simulation-study.html): a rook-lattice SAR data-generating process and the SCM / BSCM / SCSPILL comparison behind Tables 1–2.
+**`scspill.simulate`** — `sar`'s [Monte Carlo engine](https://quarcs-lab.github.io/scspill/articles/simulation-study.html): a rook-lattice SAR data-generating process and the SCM / BSCM / SCSPILL comparison behind Tables 1–2 of the paper.
 
-**Data** — `scspill.data` ships the two case studies below, each with its panel and its spatial weights matrices.
+**`scspill.data`** — the bundled spillover panels below. They are model-agnostic, so any model added later can use them unchanged.
 
-**Cross-validated against the R replication package** — the California and Sudan posteriors are checked against the authors' frozen R credible intervals, the Monte Carlo grid against the paper's frozen tables, and the prior predictive statistics to three decimals.
+**`sar` is validated, not just implemented** — it is cross-validated against the authors' R replication package: the California and Sudan posteriors against the frozen R credible intervals, the Monte Carlo grid against the paper's frozen tables, and the prior predictive statistics to three decimals. The defaults are *paper-correct*: several documented bugs of the reference implementation are fixed, each with an escape hatch or a benchmark quantifying the difference — see the [`sar` model page](https://quarcs-lab.github.io/scspill/models/sar.html).
 
 ## Bundled case studies
 
@@ -101,7 +101,7 @@ Requires Python 3.10+.
 
 ## At a glance
 
-Load a bundled case study, fit the sampler, and read off both the treatment effect and the spillovers:
+Load a bundled case study, fit the sampler, and read off both estimands:
 
 ```python
 from scspill import SCSPILL
@@ -119,7 +119,7 @@ result.diagnostics()               # ESS / R-hat / MCSE per chain
 result.plot(kind="panel")          # counterfactual | effect | top spillovers
 ```
 
-Head to [Get started](https://quarcs-lab.github.io/scspill/get-started.html), [The method](https://quarcs-lab.github.io/scspill/articles/method.html) and [Validation](https://quarcs-lab.github.io/scspill/articles/validation.html) to see the estimator in action.
+Head to [Get started](https://quarcs-lab.github.io/scspill/get-started.html), [Models](https://quarcs-lab.github.io/scspill/models/) and [Validation](https://quarcs-lab.github.io/scspill/articles/validation.html) to see the estimators in action.
 
 ## Built on
 
@@ -133,4 +133,12 @@ Head to [Get started](https://quarcs-lab.github.io/scspill/get-started.html), [T
 
 ## Acknowledgement
 
-The method and its reference implementation are by Shosei Sakaguchi and Hayato Tagawa; the estimator architecture follows Jared Greathouse's [mlsynth](https://github.com/jgreathouse9/mlsynth). This package is an independent Python port developed at the [QuaRCS Lab](https://quarcs-lab.org) (Quantitative Regional and Computational Science) and released under the MIT license. If you use `scspill` in your research, please cite the methodological article and the software (see [`CITATION.cff`](https://github.com/quarcs-lab/scspill/blob/main/CITATION.cff)).
+The method and the original R/C++ implementation are the work of Shosei Sakaguchi and Hayato Tagawa, who are credited as co-authors of this library on that basis; the Python implementation is by Carlos Mendez. Their [replication package](https://doi.org/10.5281/zenodo.19066186) is MIT-licensed, and every release of `scspill` is cross-validated against its frozen results. The estimator architecture follows Jared Greathouse's [mlsynth](https://github.com/jgreathouse9/mlsynth); the documentation stack follows the QuaRCS Lab's [geometrics](https://github.com/quarcs-lab/geometrics) package.
+
+If you use `scspill`, please cite both the software and the methodological article (machine-readable metadata lives in [`CITATION.cff`](https://github.com/quarcs-lab/scspill/blob/main/CITATION.cff)):
+
+> Mendez, C., Sakaguchi, S., & Tagawa, H. (2026). *Synthetic Control Models with Spillovers in Python* (version 0.2.0). <https://github.com/quarcs-lab/scspill>
+
+> Sakaguchi, S., & Tagawa, H. (2026). Identification and Bayesian Inference for Synthetic Control Methods with Spillover Effects. *The Econometrics Journal*. <https://doi.org/10.1093/ectj/utag006>
+
+Released under the MIT license.

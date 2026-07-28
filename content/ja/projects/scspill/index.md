@@ -4,7 +4,7 @@ external_link: ""
 image:
   caption: ""
   focal_point: Smart
-summary: 処理が漏れ出す状況におけるベイズ的合成コントロールのためのPythonライブラリ。空間自己回帰チャネルを通じてSUTVAを緩め、処理群への効果と各ドナーが受け取るスピルオーバーの双方を、完全なベイズ的不確実性とともに推定します。
+summary: ドナープールに対するSUTVAを外した合成コントロールモデルのPythonパッケージ。処理がコントロール群に及ぶことを許し、いずれのモデルも2つの推定対象——汚染を取り除いた処理群への効果と、各ドナーが受け取るスピルオーバー——を報告します。
 tags:
 - python
 - causal
@@ -28,10 +28,10 @@ links:
     url: "https://quarcs-lab.github.io/scspill/get-started.html"
     icon_pack: fas
     icon: rocket
-  - name: "手法"
-    url: "https://quarcs-lab.github.io/scspill/articles/method.html"
+  - name: "モデル"
+    url: "https://quarcs-lab.github.io/scspill/models/"
     icon_pack: fas
-    icon: square-root-alt
+    icon: layer-group
   - name: "検証"
     url: "https://quarcs-lab.github.io/scspill/articles/validation.html"
     icon_pack: fas
@@ -50,9 +50,9 @@ url_slides: ""
 url_video: ""
 ---
 
-**処理が漏れ出すときの合成コントロール — 政策効果と、各ドナーが受け取るスピルオーバーを。**
+**処理が漏れ出すときの合成コントロール — 処理群への効果と、各ドナーが受け取るスピルオーバーを。**
 
-`scspill` は、[Sakaguchi・Tagawa](https://quarcs-lab.github.io/scspill/articles/method.html)（*Identification and Bayesian Inference for Synthetic Control Methods with Spillover Effects*, The Econometrics Journal）による空間スピルオーバー付きベイズ合成コントロールのPython実装です。従来の合成コントロールは、ドナーが政策の影響を受けないと仮定します。しかし処理が国境や貿易ネットワークを越えて漏れ出すと、この仮定は成り立たず推定値にバイアスが生じます。`scspill` は、ユーザーが指定した重みによる**空間自己回帰チャネル**を通じて処理がドナープールへ波及することを許し、SUTVAを緩めます。そのうえで、処理群への効果、各ドナーが受け取るスピルオーバー、スピルオーバーの強度を、いずれも完全なベイズ的不確実性とともに報告します。合成ウェイトには**単体制約を課さないホースシュー（horseshoe）正則化**を用いるため、ドナーは除外されることも、負の値をとることも、外挿することもできます。推定器は [mlsynth](https://github.com/jgreathouse9/mlsynth) のアーキテクチャ（pydanticの設定を入力とし、標準化された結果オブジェクトを出力する）に従っており、両ライブラリは自然に組み合わせられます。
+`scspill` は、ドナープールに対するSUTVAを外した合成コントロールモデルのPythonパッケージです。処理がコントロール群に及ぶことを許し、いずれのモデルも2つの推定対象を報告します。すなわち、汚染を取り除いた処理群への効果と、各ドナーが受け取るスピルオーバー効果です。後者は従来の合成コントロールでは表現すること自体ができません。現在利用できるモデル `sar` は、ユーザーが指定した空間重みを通じてスピルオーバーを伝え、その大きさを単一の強度パラメータ ρ で調整します。この ρ は**仮定するのではなく推定されます**。合成ウェイトは制約を課さないホースシュー（horseshoe）縮小推定で求めるため、ドナーは除外されることも、負の値をとることも、外挿することもできます。そして2つの推定対象いずれについても完全なベイズ的不確実性を返します。ρ = 0 のとき、モデルはベイズ的ホースシュー合成コントロールに厳密に一致します。推定器のアーキテクチャは [mlsynth](https://github.com/jgreathouse9/mlsynth)（pydanticの設定を入力とし、標準化された結果オブジェクトを出力する）に従い、`method` の名称は同ライブラリの `SPILLSYNTH` ディスパッチャと一致するため、両者は自然に組み合わせられます。
 
 ### 🚀 [はじめに](https://quarcs-lab.github.io/scspill/get-started.html)
 
@@ -60,25 +60,25 @@ url_video: ""
 
 [▶ Colab で開く](https://colab.research.google.com/github/quarcs-lab/scspill/blob/main/notebooks/california.ipynb)
 
-### 📐 [手法](https://quarcs-lab.github.io/scspill/articles/method.html)
+### 🧬 [モデル](https://quarcs-lab.github.io/scspill/models/)
 
-識別と**2段階のベイズサンプラー**を解説します。ホースシュー合成ウェイト、SARスピルオーバーブロック、スピルオーバー強度に対する適応的メトロポリス法。さらに、R版の参照実装と異なる既定の設定についても記載しており、それぞれに従来挙動へ戻す手段と差分を定量化したベンチマークが用意されています。
+現在提供されているモデルは1つ、[`sar`](https://quarcs-lab.github.io/scspill/models/sar.html) です。[Sakaguchi・Tagawa (2026)](https://doi.org/10.1093/ectj/utag006) による、空間自己回帰型スピルオーバーを備えたベイズ合成コントロールです。さらに3つのスピルオーバー対応モデルが[ロードマップ](https://quarcs-lab.github.io/scspill/models/#planned)にあります。Cao・Dowd のモデル、Di Stefano・Mellace の包括的合成コントロール、Grossi ほかによる部分干渉SCGです。これらは**未実装**であり、`SCSPILLConfig` はこれらの名称を黙って別のモデルで代替せず、明示的に拒否します。
 
 ### 🧪 [検証](https://quarcs-lab.github.io/scspill/articles/validation.html)
 
-サンプラーが正しいことを示す証拠です。**Geweke (2004) の同時分布検定**、事前分布の感度グリッド、事前予測チェック、そして著者らのR実装による固定済み信用区間との交差検証。
+`sar` のサンプラーが正しいことを示す証拠です。**Geweke (2004) の同時分布検定**、事前分布の感度グリッド、事前予測チェック、そして著者らのR実装による固定済み信用区間との交差検証。
 
 ## 機能の概要
 
-**推定** — `SCSPILL(config).fit()` は、ATTとその信用区間、反事実の経路、ρ の事後分布、時点×ドナーのスピルオーバーパネル、MCMC診断を返します。
+**`scspill`** — モデル層。`SCSPILL(config).fit()` は、ATTとその信用区間、反事実の経路、ρ の事後分布、時点×ドナーのスピルオーバーパネル、MCMC診断を返します。
 
-**検証** — `scspill.validation` は、Gewekeの同時分布検定、事前分布の感度グリッド、事前予測チェックを実装します。
+**`scspill.validation`** — `sar` のサンプラー検証。Gewekeの同時分布検定、事前分布の感度グリッド、事前予測チェック。
 
-**シミュレーション** — `scspill.simulate` は、論文の[モンテカルロ研究](https://quarcs-lab.github.io/scspill/articles/simulation-study.html)を再現します。ルーク型格子によるSARデータ生成過程と、表1・表2の基礎となる SCM / BSCM / SCSPILL の比較です。
+**`scspill.simulate`** — `sar` の[モンテカルロエンジン](https://quarcs-lab.github.io/scspill/articles/simulation-study.html)。ルーク型格子によるSARデータ生成過程と、論文の表1・表2の基礎となる SCM / BSCM / SCSPILL の比較です。
 
-**データ** — `scspill.data` には、以下の2つのケーススタディが、パネルと空間重み行列とともに同梱されています。
+**`scspill.data`** — 以下のスピルオーバーパネル。モデルに依存しない形式のため、今後追加されるモデルでもそのまま利用できます。
 
-**R版レプリケーションパッケージとの交差検証** — カリフォルニアとスーダンの事後分布は著者らのR版の固定済み信用区間と、モンテカルロのグリッドは論文の固定済み表と、事前予測統計量は小数第3位まで照合されています。
+**`sar` は実装されているだけでなく検証されています** — 著者らのRレプリケーションパッケージと交差検証されています。カリフォルニアとスーダンの事後分布は固定済みのR信用区間と、モンテカルロのグリッドは論文の固定済みの表と、事前予測統計量は小数第3位まで照合されています。既定の設定は*論文に忠実*で、参照実装に残る複数の既知の不具合が修正されており、それぞれに従来挙動へ戻す手段か差分を定量化したベンチマークが用意されています。詳しくは [`sar` モデルのページ](https://quarcs-lab.github.io/scspill/models/sar.html)をご覧ください。
 
 ## 付属のケーススタディ
 
@@ -101,7 +101,7 @@ Python 3.10 以上が必要です。
 
 ## ひと目で
 
-付属のケーススタディを読み込み、サンプラーを実行して、処理効果とスピルオーバーの双方を確認します。
+付属のケーススタディを読み込み、サンプラーを実行して、2つの推定対象を確認します。
 
 ```python
 from scspill import SCSPILL
@@ -119,7 +119,7 @@ result.diagnostics()               # ESS / R-hat / MCSE per chain
 result.plot(kind="panel")          # counterfactual | effect | top spillovers
 ```
 
-推定器の動きは、[はじめに](https://quarcs-lab.github.io/scspill/get-started.html)、[手法](https://quarcs-lab.github.io/scspill/articles/method.html)、[検証](https://quarcs-lab.github.io/scspill/articles/validation.html)でご覧いただけます。
+推定器の動きは、[はじめに](https://quarcs-lab.github.io/scspill/get-started.html)、[モデル](https://quarcs-lab.github.io/scspill/models/)、[検証](https://quarcs-lab.github.io/scspill/articles/validation.html)でご覧いただけます。
 
 ## 基盤
 
@@ -133,4 +133,12 @@ result.plot(kind="panel")          # counterfactual | effect | top spillovers
 
 ## 謝辞
 
-手法とその参照実装は Shosei Sakaguchi 氏と Hayato Tagawa 氏によるものです。推定器のアーキテクチャは Jared Greathouse 氏の [mlsynth](https://github.com/jgreathouse9/mlsynth) に倣っています。本パッケージは [QuaRCS Lab](https://quarcs-lab.org)（計量地域・計算科学）で開発された独立のPython移植版であり、MITライセンスで公開されています。研究で `scspill` をご利用の際は、方法論の論文とソフトウェア（[`CITATION.cff`](https://github.com/quarcs-lab/scspill/blob/main/CITATION.cff) を参照）を引用してください。
+手法とオリジナルのR/C++実装は Shosei Sakaguchi 氏と Hayato Tagawa 氏によるものであり、両氏はその貢献に基づき本ライブラリの共著者として記載されています。Python実装は Carlos Mendez によるものです。両氏の[レプリケーションパッケージ](https://doi.org/10.5281/zenodo.19066186)はMITライセンスで公開されており、`scspill` の各リリースはその固定済みの結果と交差検証されています。推定器のアーキテクチャは Jared Greathouse 氏の [mlsynth](https://github.com/jgreathouse9/mlsynth) に、ドキュメント基盤は QuaRCS Lab の [geometrics](https://github.com/quarcs-lab/geometrics) パッケージに倣っています。
+
+`scspill` をご利用の際は、ソフトウェアと方法論の論文の両方を引用してください（機械可読なメタデータは [`CITATION.cff`](https://github.com/quarcs-lab/scspill/blob/main/CITATION.cff) にあります）。
+
+> Mendez, C., Sakaguchi, S., & Tagawa, H. (2026). *Synthetic Control Models with Spillovers in Python* (version 0.2.0). <https://github.com/quarcs-lab/scspill>
+
+> Sakaguchi, S., & Tagawa, H. (2026). Identification and Bayesian Inference for Synthetic Control Methods with Spillover Effects. *The Econometrics Journal*. <https://doi.org/10.1093/ectj/utag006>
+
+MITライセンスで公開されています。
