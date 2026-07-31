@@ -1,0 +1,5 @@
+step,elapsed_sec,n,tt,niter,nretain,r_version,estimateW_version,blas,rngkind
+sarw_paper,350.38,90,19,200,100,R version 4.5.2 (2025-10-31),0.2.0,/Library/Frameworks/R.framework/Versions/4.5-x86_64/Resources/lib/libRblas.0.dylib,Mersenne-Twister/Inversion/Rejection
+sarw_long_a,846.78,90,19,400,200,R version 4.5.2 (2025-10-31),0.2.0,/Library/Frameworks/R.framework/Versions/4.5-x86_64/Resources/lib/libRblas.0.dylib,Mersenne-Twister/Inversion/Rejection
+sarw_long_b,811.38,90,19,400,200,R version 4.5.2 (2025-10-31),0.2.0,/Library/Frameworks/R.framework/Versions/4.5-x86_64/Resources/lib/libRblas.0.dylib,Mersenne-Twister/Inversion/Rejection
+sarw_sim,430.65,40,20,2000,1000,R version 4.5.2 (2025-10-31),0.2.0,/Library/Frameworks/R.framework/Versions/4.5-x86_64/Resources/lib/libRblas.0.dylib,Mersenne-Twister/Inversion/Rejection

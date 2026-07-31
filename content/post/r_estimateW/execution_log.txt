@@ -1,0 +1,409 @@
+==============================================================================
+  estimateW - Bayesian estimation of spatial weight matrices
+  Replication of Krisztin & Piribauer (2026), Section 5
+  R 4.5.2  |  estimateW 0.2.0
+  Paper chain: seed 571, niter 200, nretain 100, kbar 7
+==============================================================================
+
+------------------------------------------------------------------------------
+--- Section 1: nuts1growth panel, country crosswalk, EDA
+Panel: 90 NUTS-1 regions x 19 years (2001-2019) = 1710 observations
+Region order is identical in all 19 year blocks: OK
+Countries: 26 | groups: Southern, Northern, Western, CEE, Baltics
+Y: 1710 x 1   Z: 1710 x 4   (intercept | log initial GVA per worker | share low education | share high education)
+Wrote r_estimateW_panel_summary.csv (90 rows)
+
+Growth of GVA per worker, pooled:
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+-0.18112  0.01158  0.02483  0.03106  0.04333  0.33583 
+
+Regions per country group:
+
+Southern Northern  Western      CEE  Baltics 
+      21        6       41       19        3 
+Figure 01 (panel overview) saved.
+
+Pooled OLS baseline (no spatial term):
+                 Estimate   Std. Error     t value     Pr(>|t|)
+(Intercept)  4.199319e-01 0.0185948061  22.5832924 5.132094e-99
+init_gdp_pw -3.677661e-02 0.0019464708 -18.8939955 1.900699e-72
+loweduc     -6.120117e-05 0.0000692265  -0.8840715 3.767822e-01
+higheduc     2.638630e-04 0.0001544331   1.7085905 8.770872e-02
+
+------------------------------------------------------------------------------
+--- Section 2: NUTS-1 geometry and the exogenous benchmark W matrices
+[geo] cache hit: cache/r_estimateW_nuts1_20m_3035.rds
+[geo] CRS EPSG:3035; geometry aligned to panel region order.
+[geo] queen isolates repaired with nearest neighbour (10): CY0, EL4, ES7, FI2, FRM, IE0, ITG, MT0, PT2, PT3
+[geo] queen: mean degree 3.8 | kNN-7: mean degree 7
+Wrote r_estimateW_geo_crosswalk.csv (90 rows); 3 regions outside the map frame
+
+------------------------------------------------------------------------------
+--- Section 3: spatially structured priors and sparsity priors
+Figure 02 (paper Figure 1: spatial prior cases) saved.
+Wrote r_estimateW_prior_sparsity.csv (360 rows)
+Case (b) implied p(k) standard deviation = 4.46e-18 (should be ~0: uniform on k)
+
+Prior expected number of neighbours, n = 30 and n = 90:
+                             case  n expected_k
+1                (a) No shrinkage 30       14.5
+2  (b) Package default: a = b = 1 30       14.5
+3  (c) Strong shrinkage: b = 4.80 30        5.0
+4                (a) No shrinkage 90       44.5
+5  (b) Package default: a = b = 1 90       44.5
+6 (c) Strong shrinkage: b = 11.71 90        7.0
+Figure 03 (paper Table 2: sparsity priors) saved.
+Figure 04 (implied prior on k at n = 90) saved.
+Empirical prior: a = 1, b = ((n-1)-kbar)/kbar = 11.71429, prior link probability = 0.07865
+Unknown off-diagonal cells: 8,010 against 1,710 observations
+
+------------------------------------------------------------------------------
+--- Section 4: paper-exact sarw() fit and Table 3 audit
+[cache] HIT  fit_paper_seed571_n90_t19_i200_r100_kbar7_full  (stored runtime 350.4s)
+
+Structure of the fitted object (first run documents the true shapes):
+  class: estimateW 
+  postb          4 x 100
+  posts          1 x 100
+  postr          1 x 100
+  postw          90 x 90 x 100
+  post.direct    4 x 100
+  post.indirect  4 x 100
+  post.total     4 x 100
+
+summary(res_sarw) - the package's own quick overview:
+       Z1               Z2                 Z3                   Z4           
+ Min.   :0.1533   Min.   :-0.01972   Min.   :-9.303e-05   Min.   :0.0002104  
+ 1st Qu.:0.1688   1st Qu.:-0.01768   1st Qu.:-3.015e-06   1st Qu.:0.0003732  
+ Median :0.1757   Median :-0.01687   Median : 3.122e-05   Median :0.0004329  
+ Mean   :0.1765   Mean   :-0.01692   Mean   : 3.570e-05   Mean   :0.0004413  
+ 3rd Qu.:0.1839   3rd Qu.:-0.01603   3rd Qu.: 7.138e-05   3rd Qu.:0.0005137  
+ Max.   :0.2033   Max.   :-0.01429   Max.   : 1.619e-04   Max.   :0.0007710  
+     sigma2               rho        
+ Min.   :0.0004679   Min.   :0.6780  
+ 1st Qu.:0.0005116   1st Qu.:0.6949  
+ Median :0.0005260   Median :0.7119  
+ Mean   :0.0005285   Mean   :0.7132  
+ 3rd Qu.:0.0005445   3rd Qu.:0.7288  
+ Max.   :0.0005862   Max.   :0.7458  
+Retained draws: 100
+Wrote r_estimateW_posterior_params.csv (15 rows)
+
+Posterior summary of the paper-exact chain:
+                    parameter    block       mean        sd       q025
+1                   intercept     beta  1.765e-01 1.090e-02  1.555e-01
+2  log initial GVA per worker     beta -1.692e-02 1.172e-03 -1.934e-02
+3         share low education     beta  3.570e-05 5.342e-05 -6.111e-05
+4        share high education     beta  4.413e-04 1.096e-04  2.310e-04
+5                         rho      rho  7.132e-01 1.574e-02  6.860e-01
+6                      sigma2   sigma2  5.285e-04 2.270e-05  4.909e-04
+7  log initial GVA per worker   direct -1.880e-02 1.251e-03 -2.144e-02
+8         share low education   direct  3.961e-05 5.927e-05 -6.781e-05
+9        share high education   direct  4.903e-04 1.217e-04  2.567e-04
+10 log initial GVA per worker indirect -3.972e-02 3.855e-03 -4.693e-02
+11        share low education indirect  8.426e-05 1.243e-04 -1.310e-04
+12       share high education indirect  1.036e-03 2.638e-04  4.897e-04
+13 log initial GVA per worker    total -5.852e-02 4.724e-03 -6.706e-02
+14        share low education    total  1.239e-04 1.835e-04 -1.985e-04
+15       share high education    total  1.527e-03 3.816e-04  7.460e-04
+         q500       q975    ess geweke_z      mcse
+1   1.757e-01  0.1984000  52.91  -0.2382 1.498e-03
+2  -1.687e-02 -0.0149700  56.00   0.7163 1.566e-04
+3   3.122e-05  0.0001446  49.39  -2.0940 7.601e-06
+4   4.329e-04  0.0006602 122.20  -0.7697 9.914e-06
+5   7.119e-01  0.7458000  26.53  -3.7440 3.055e-03
+6   5.260e-04  0.0005711  54.03   3.2910 3.089e-06
+7  -1.880e-02 -0.0166800  55.34   1.0130 1.682e-04
+8   3.486e-05  0.0001602  49.21  -2.0970 8.449e-06
+9   4.792e-04  0.0007280 122.10  -0.8688 1.101e-05
+10 -3.980e-02 -0.0333000  37.17   8.5580 6.323e-04
+11  7.737e-05  0.0003336  49.39  -1.6270 1.769e-05
+12  1.074e-03  0.0015180  96.61  -3.3350 2.684e-05
+13 -5.896e-02 -0.0506500  42.53   3.4600 7.243e-04
+14  1.129e-04  0.0004938  49.31  -1.5940 2.613e-05
+15  1.552e-03  0.0022460 106.80  -2.5490 3.693e-05
+Figure 05 (posterior estimates and impacts) saved.
+
+Reproduction audit against the paper's Table 3:
+                                quantity paper_mean    our_mean abs_diff
+                               intercept    0.17651  1.7651e-01 1.03e-06
+              log initial GVA per worker   -0.01692 -1.6922e-02 1.97e-06
+                     share low education    0.00004  3.5695e-05 4.30e-06
+                    share high education    0.00044  4.4129e-04 1.29e-06
+                                     rho    0.71322  7.1322e-01 3.39e-07
+                                  sigma2    0.00053  5.2851e-04 1.49e-06
+   av. direct log initial GVA per worker   -0.01880 -1.8797e-02 3.38e-06
+          av. direct share low education    0.00004  3.9610e-05 3.90e-07
+         av. direct share high education    0.00049  4.9026e-04 2.59e-07
+ av. indirect log initial GVA per worker   -0.03972 -3.9723e-02 3.09e-06
+        av. indirect share low education    0.00008  8.4258e-05 4.26e-06
+       av. indirect share high education    0.00104  1.0365e-03 3.52e-06
+ sd_units mcse_units verdict
+     0.00       0.00   exact
+     0.00       0.01   exact
+     0.09       0.57   exact
+     0.01       0.13   exact
+     0.00       0.00   exact
+     0.07       0.48   exact
+     0.00       0.02   exact
+     0.01       0.05   exact
+     0.00       0.02   exact
+     0.00       0.00   exact
+     0.04       0.24   exact
+     0.01       0.13   exact
+Audit verdicts: exact = 12
+
+------------------------------------------------------------------------------
+--- Section 5: trace plots, longer chains, and convergence diagnostics
+Figure 06 (paper Figure 3: trace plots) saved.
+Robustness chains: 2 x (niter 400 / nretain 200); estimated 23.4 min if not cached
+[cache] HIT  fit_long_seed20260731_n90_t19_i400_r200_kbar7_full  (stored runtime 846.8s)
+[cache] HIT  fit_long_seed20260732_n90_t19_i400_r200_kbar7_full  (stored runtime 811.4s)
+
+Gelman-Rubin potential scale reduction factors (2 chains):
+                           Point est. Upper C.I.
+intercept                      1.0168     1.0350
+log initial GVA per worker     1.0228     1.0451
+share low education            1.0073     1.0366
+share high education           1.0136     1.0144
+rho                            0.9998     1.0047
+sigma2                         1.0114     1.0493
+Wrote r_estimateW_chain_comparison.csv (18 rows)
+
+Chain comparison:
+                  parameter        chain     seed niter nretain       mean
+                  intercept  paper_exact      571   200     100  1.765e-01
+ log initial GVA per worker  paper_exact      571   200     100 -1.692e-02
+        share low education  paper_exact      571   200     100  3.570e-05
+       share high education  paper_exact      571   200     100  4.413e-04
+                        rho  paper_exact      571   200     100  7.132e-01
+                     sigma2  paper_exact      571   200     100  5.285e-04
+                  intercept robustness_a 20260731   400     200  1.818e-01
+ log initial GVA per worker robustness_a 20260731   400     200 -1.742e-02
+        share low education robustness_a 20260731   400     200  3.967e-05
+       share high education robustness_a 20260731   400     200  4.345e-04
+                        rho robustness_a 20260731   400     200  7.131e-01
+                     sigma2 robustness_a 20260731   400     200  5.269e-04
+                  intercept robustness_b 20260732   400     200  1.803e-01
+ log initial GVA per worker robustness_b 20260732   400     200 -1.725e-02
+        share low education robustness_b 20260732   400     200  3.227e-05
+       share high education robustness_b 20260732   400     200  4.321e-04
+                        rho robustness_b 20260732   400     200  7.140e-01
+                     sigma2 robustness_b 20260732   400     200  5.235e-04
+        sd       q025       q975    ess geweke_z runtime_sec gelman_psrf
+ 1.090e-02  1.555e-01  0.1984000  52.91  -0.2382       350.4      1.0170
+ 1.172e-03 -1.934e-02 -0.0149700  56.00   0.7163       350.4      1.0230
+ 5.342e-05 -6.111e-05  0.0001446  49.39  -2.0940       350.4      1.0070
+ 1.096e-04  2.310e-04  0.0006602 122.20  -0.7697       350.4      1.0140
+ 1.574e-02  6.860e-01  0.7458000  26.53  -3.7440       350.4      0.9998
+ 2.270e-05  4.909e-04  0.0005711  54.03   3.2910       350.4      1.0110
+ 1.525e-02  1.541e-01  0.2117000  45.67  -0.4934       846.8      1.0170
+ 1.623e-03 -2.084e-02 -0.0143500  47.78   0.7548       846.8      1.0230
+ 5.478e-05 -7.381e-05  0.0001437  61.30  -0.8120       846.8      1.0070
+ 1.200e-04  2.023e-04  0.0006622  84.30  -1.9630       846.8      1.0140
+ 1.678e-02  6.780e-01  0.7458000  34.76  -3.4510       846.8      0.9998
+ 2.031e-05  4.912e-04  0.0005639  95.34  -0.9751       846.8      1.0110
+ 1.276e-02  1.561e-01  0.2033000 115.00   2.0970       811.4      1.0170
+ 1.317e-03 -1.984e-02 -0.0149900 120.90  -1.9610       811.4      1.0230
+ 5.112e-05 -6.813e-05  0.0001220  60.06   1.6570       811.4      1.0070
+ 9.996e-05  2.340e-04  0.0006369 130.90  -0.7256       811.4      1.0140
+ 1.602e-02  6.780e-01  0.7458000  28.43  -1.6380       811.4      0.9998
+ 2.230e-05  4.811e-04  0.0005685 108.80   1.6390       811.4      1.0110
+Figure 07 (robustness chains) saved.
+Figure 08 (convergence diagnostics) saved.
+
+------------------------------------------------------------------------------
+--- Section 6: posterior mean W, inclusion probabilities, degree distribution
+[cache] HIT  slim_paper_seed571_i200_r100_kbar7  (stored runtime 0.2s)
+Estimated degree: mean 6.47 | median 6.9 | min 1 | max 16.11  (prior anchor k-bar = 7)
+Posterior inclusion probability: mean 0.0727 | max 1 | share above 0.5: 0.41%
+Figure 09 (posterior inclusion probability heatmap) saved.
+Wrote r_estimateW_W_degree.csv (90 rows)
+
+Identification conditions (De Paula, Rasul & Souza 2025, Corollary 3):
+                         assumption                       status
+              I. zero diagonal of W              by construction
+    II. row-wise sum of |rho W| < 1              by construction
+                        II. rho < 1              by construction
+      IV. rows of W sum to 1 (or 0)              by construction
+    V. diagonal of W^2 not constant                       TESTED
+                        VI. rho > 0 IMPOSED by the prior support
+ III. rho * beta != 0 (initial GVA)                       TESTED
+                                               statistic satisfied
+                               max |W_ii| over draws = 0      TRUE
+                                    max row sum = 0.7458      TRUE
+                                        max rho = 0.7458      TRUE
+                            all rows sum to 1 or 0: TRUE      TRUE
+ sd of diag(W^2) across regions: min 0.128, median 0.233      TRUE
+          prior support is (0, 1); min drawn rho = 0.678      TRUE
+               share of draws with |rho*beta| < 1e-4 = 0      TRUE
+Wrote r_estimateW_identification.csv (7 rows)
+Figure 10 (estimated degree by region) saved.
+Wrote r_estimateW_W_posterior_long.csv (8,010 rows)
+Link mass inside the same country: 35.6% (random benchmark 7.1%)
+Link mass inside the same supranational group: 60.5% (random benchmark 30.4%)
+
+------------------------------------------------------------------------------
+--- Section 7: strongest links as networks and country-aggregated chords
+Network graphs show the strongest 10% of links: 801 of W, 801 of the multiplier
+Figures 11-12 (networks for W and the multiplier) saved.
+Wrote r_estimateW_top_links.csv (1602 rows)
+
+Ten strongest estimated links of W:
+ rank from  to same_country w_mean  pip
+    1  EL4 EL6         TRUE 1.0000 1.00
+    2  PL4 PL2         TRUE 1.0000 1.00
+    3  PL8 PL6         TRUE 1.0000 1.00
+    4  EL6 EL5         TRUE 0.9950 1.00
+    5  EL5 EL3         TRUE 0.9900 1.00
+    6  BG4 CZ0        FALSE 0.9833 1.00
+    7  PL2 PL4         TRUE 0.9550 1.00
+    8  HU2 HU3         TRUE 0.9508 0.99
+    9  HU1 HU3         TRUE 0.9135 0.99
+   10  PL7 PL8         TRUE 0.8900 0.92
+Wrote r_estimateW_country_flows.csv (676 rows)
+Figures 13-14 (chord diagrams) saved.
+Density: W 70.6% of off-diagonal cells non-zero, multiplier 92.9%; Spearman rank correlation of the two link rankings = 0.718
+
+------------------------------------------------------------------------------
+--- Section 8: estimated W versus queen contiguity and 7-nearest neighbours
+
+Estimated W against exogenous alternatives:
+         comparator n_links pearson_r spearman_r auc_pip jaccard_top
+   queen_contiguity     342    0.2134     0.1407  0.6982      0.1373
+               knn7     630    0.1854     0.1236  0.6308      0.1540
+       same_country     570    0.2707     0.2286  0.7533      0.2143
+         same_group    2438    0.2799     0.3111  0.6925      0.1838
+ estimated_top10pct     801        NA         NA      NA      1.0000
+ all_pairs_baseline    8010        NA         NA      NA          NA
+ share_top_matched mean_link_dist_km
+            0.1723             237.9
+            0.2385             360.1
+            0.3021             407.4
+            0.6280             800.9
+            1.0000             921.1
+                NA            1331.0
+Figure 15 (exogenous W matrices) saved.
+Figure 16 (estimated W versus geography) saved.
+Figure 17 (map with estimated links) saved.
+Of the top 10% estimated links, 17.2% also share a border and 30.2% are within the same country.
+
+------------------------------------------------------------------------------
+--- Section 9: recovering a KNOWN spatial weight matrix with sim_dgp()
+[cache] HIT  sim_dgp_n40_t20_seed4242  (stored runtime 0s)
+Simulated panel: n = 40, T = 20, true rho = 0.6, true sigma2 = 0.05, 4 neighbours per unit by construction
+Unknown off-diagonal cells: 1,560 against 800 observations
+[cache] HIT  fit_sim_n40_t20_i2000_seed4243  (stored runtime 430.6s)
+
+Ground-truth recovery scorecard:
+              metric    value truth    q025     q975 covered
+                 auc  0.97560    NA      NA       NA      NA
+    precision_at_0.5  0.91430    NA      NA       NA      NA
+       recall_at_0.5  0.60000    NA      NA       NA      NA
+     accuracy_at_0.5  0.95320    NA      NA       NA      NA
+          youden_cut  0.06300    NA      NA       NA      NA
+    recall_at_youden  0.91250    NA      NA       NA      NA
+ precision_at_youden  0.57030    NA      NA       NA      NA
+      hamming_at_0.5 73.00000    NA      NA       NA      NA
+         mean_degree  3.05100  4.00      NA       NA      NA
+           intercept  0.58420  0.50  0.5485  0.62180   FALSE
+              beta_x -1.03200 -1.00 -1.0530 -1.00900   FALSE
+                 rho  0.52820  0.60  0.5085  0.54240   FALSE
+              sigma2  0.06368  0.05  0.0559  0.07251   FALSE
+AUC = 0.976 | recall at 0.5 = 0.6 | precision at 0.5 = 0.914
+Figure 18 (ground-truth recovery) saved.
+
+------------------------------------------------------------------------------
+--- Section 10: model taxonomy, estimated W and exogenous W
+[cache] HIT  sim_tax_n25_t15  (stored runtime 0s)
+[cache] HIT  tax_est_SAR_n25_t15_i400  (stored runtime 29.1s)
+  SAR (estimated W): rho = 0.169 | mean degree 3.08 | 2 slope parameters
+[cache] HIT  tax_est_SDM_n25_t15_i400  (stored runtime 31.9s)
+  SDM (estimated W): rho = 0.414 | mean degree 2.93 | 4 slope parameters
+[cache] HIT  tax_est_SEM_n25_t15_i400  (stored runtime 31.3s)
+  SEM (estimated W): rho = 0.112 | mean degree 2.87 | 2 slope parameters
+[cache] HIT  tax_est_SDEM_n25_t15_i400  (stored runtime 32.7s)
+  SDEM (estimated W): rho = 0.437 | mean degree 3.05 | 4 slope parameters
+[cache] HIT  tax_est_SLX_n25_t15_i400  (stored runtime 13.2s)
+  SLX (estimated W): rho = n/a | mean degree 2.99 | 4 slope parameters
+[cache] HIT  tax_exo_SAR_queen_i2000  (stored runtime 6.7s)
+  SAR (exogenous queen W): rho = 0.607 | 6.7s
+[cache] HIT  tax_exo_SAR_knn7_i2000  (stored runtime 6.5s)
+  SAR (exogenous knn7 W): rho = 0.719 | 6.5s
+[cache] HIT  tax_exo_SDM_queen_i2000  (stored runtime 6.7s)
+  SDM (exogenous queen W): rho = 0.624 | 6.7s
+[cache] HIT  tax_exo_SEM_queen_i2000  (stored runtime 9.2s)
+  SEM (exogenous queen W): rho = 0.632 | 9.2s
+[cache] HIT  tax_exo_SDEM_queen_i2000  (stored runtime 9.6s)
+  SDEM (exogenous queen W): rho = 0.634 | 9.6s
+[cache] HIT  tax_exo_SLX_queen_i2000  (stored runtime 0.6s)
+  SLX (exogenous queen W): rho = n/a | 0.6s
+Wrote r_estimateW_model_taxonomy.csv (11 rows)
+
+Model taxonomy:
+        half model      fn                dataset  W_source  n tt niter
+ estimated_W   SAR  sarw()   simulated n=25, T=15 estimated 25 15   400
+ estimated_W   SDM  sdmw()   simulated n=25, T=15 estimated 25 15   400
+ estimated_W   SEM  semw()   simulated n=25, T=15 estimated 25 15   400
+ estimated_W  SDEM sdemw()   simulated n=25, T=15 estimated 25 15   400
+ estimated_W   SLX  slxw()   simulated n=25, T=15 estimated 25 15   400
+ exogenous_W   SAR   sar() nuts1growth n=90, T=19     queen 90 19  2000
+ exogenous_W   SAR   sar() nuts1growth n=90, T=19      knn7 90 19  2000
+ exogenous_W   SDM   sdm() nuts1growth n=90, T=19     queen 90 19  2000
+ exogenous_W   SEM   sem() nuts1growth n=90, T=19     queen 90 19  2000
+ exogenous_W  SDEM  sdem() nuts1growth n=90, T=19     queen 90 19  2000
+ exogenous_W   SLX   slx() nuts1growth n=90, T=19     queen 90 19  2000
+ rho_mean  rho_sd sigma2_mean n_beta mean_degree has_impacts runtime_sec
+   0.1692 0.06784   0.9903000      2       3.079        TRUE        29.1
+   0.4142 0.02657   0.0713000      4       2.932        TRUE        31.9
+   0.1123 0.07033   1.0270000      2       2.870       FALSE        31.3
+   0.4375 0.06608   0.1520000      4       3.049       FALSE        32.7
+       NA      NA   0.2084000      4       2.993       FALSE        13.2
+   0.6068 0.01633   0.0008806      4       3.800        TRUE         6.7
+   0.7186 0.01980   0.0009645      4       7.000        TRUE         6.5
+   0.6239 0.01659   0.0008608      7       3.800        TRUE         6.7
+   0.6324 0.01619   0.0008581      4       3.800       FALSE         9.2
+   0.6335 0.01724   0.0008571      7       3.800       FALSE         9.6
+       NA      NA   0.0017440      7       3.800       FALSE         0.6
+
+One model, three neighbourhood maps:
+                   map                   variable     direct   indirect
+           Estimated W log initial GVA per worker -0.0188000 -0.0397200
+    Queen contiguity W log initial GVA per worker -0.0207600 -0.0249800
+ 7-nearest-neighbour W log initial GVA per worker -0.0200000 -0.0439600
+           Estimated W       share high education  0.0004903  0.0010360
+    Queen contiguity W       share high education  0.0002987  0.0003606
+ 7-nearest-neighbour W       share high education  0.0002326  0.0005118
+      total    rho ratio_ind_dir
+ -0.0585200 0.7132         2.113
+ -0.0457400 0.6068         1.203
+ -0.0639600 0.7186         2.198
+  0.0015270 0.7132         2.114
+  0.0006593 0.6068         1.207
+  0.0007444 0.7186         2.200
+Figure 19 (three maps, one model) saved.
+
+------------------------------------------------------------------------------
+--- Section 11: summary
+Wrote r_estimateW_runtime.csv (4 rows)
+
+==============================================================================
+HEADLINE
+  rho = 0.71322 (posterior SD 0.01574); paper reports 0.71322 (0.01574)
+  Direct impact of initial productivity  = -0.0188
+  Indirect impact of initial productivity = -0.03972
+  Spillover-to-direct ratio = 2.113x
+  Estimated mean degree = 6.47 against the prior anchor k-bar = 7
+  Link mass inside the same country = 35.6% (random benchmark 7.1%)
+REPRODUCTION AUDIT: 12 exact, 0 within Monte Carlo noise, 0 differing (of 12 quantities)
+
+[CAVEAT] The headline chain retains 100 draws. Posterior means are
+stable at that budget, but posterior standard deviations, credible intervals
+and individual link rankings are not: with 100 retained draws a link
+probability is quantized to 0.01, so a link seen in 3 draws is not
+distinguishable from one seen in 1. The robustness chains in Section 5
+quantify the gap. estimateW is designed for n up to roughly 300.
+==============================================================================
+Artifacts: 19 PNG figures, 15 CSV tables, 19 cache objects
+
+=== Script completed successfully ===

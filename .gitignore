@@ -76,6 +76,10 @@ content/post/*/references/tutorial_files/
 content/post/*/references/tutorial-render.log
 content/post/*/references/.venv/
 content/post/*/references/.quarto/
+# knitr chunk caches and Quarto freeze data are render artefacts too
+content/post/*/_freeze/
+content/post/*/tutorial_cache/
+content/post/*/references/_freeze/
 
 # Quarto SLIDE-DECK output is the OPPOSITE of the tutorial artefacts above: the
 # rendered deck (slides/index.html + slides/slides_files/) IS served by Netlify
@@ -107,3 +111,13 @@ content/cv/*.toc
 content/cv/*.bbl
 content/cv/*.blg
 content/cv/main.pdf
+
+# Krisztin & Piribauer (2026) estimateW paper full text — the specification for
+# the r_estimateW tutorial. CC BY 4.0, but not republished here.
+content/post/r_estimateW/references/
+
+# r_estimateW MCMC cache: 2.2 MB total, and it IS committed on purpose. The
+# three 90-region chains cost ~34 minutes to regenerate; with the cache present
+# `Rscript analysis.R` reproduces every figure and table in about a minute, and
+# tutorial.qmd renders without sampling at all. Delete the directory (or set
+# ESTIMATEW_REFIT=TRUE) to force a genuine recompute.

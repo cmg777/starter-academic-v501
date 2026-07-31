@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Estimating the Spatial Weight Matrix — Interactive Lab</title>
+<meta name="description" content="Interactive companion to 'Who Are My Neighbors? Bayesian Estimation of Spatial Weight Matrices in R'. Explore how the sparsity prior shapes the network, how the estimated map compares with contiguity, and how much the answers move when you change the map.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Estimating the Spatial Weight Matrix — Interactive Lab</h1>
+  <div class="subtitle">
+    A pedagogical companion to <em>Who Are My Neighbors? Bayesian Estimation of Spatial Weight Matrices in R</em>
+    <a class="post-link" href="../" target="_blank" rel="noopener">↗ Back to the post</a>
+  </div>
+</header>
+
+<nav class="tab-strip" role="tablist">
+  <button id="tab-intro"  class="tab active" data-pane="pane-intro"  role="tab" aria-selected="true">1 · The problem</button>
+  <button id="tab-prior"  class="tab"        data-pane="pane-prior"  role="tab" aria-selected="false">2 · Prior explorer</button>
+  <button id="tab-net"    class="tab"        data-pane="pane-net"    role="tab" aria-selected="false">3 · Network explorer</button>
+  <button id="tab-maps"   class="tab"        data-pane="pane-maps"   role="tab" aria-selected="false">4 · Three maps</button>
+</nav>
+
+<main>
+
+<!-- ====================== TAB 1 ====================== -->
+<section id="pane-intro" class="tab-pane active" role="tabpanel" aria-labelledby="tab-intro">
+  <p class="lede">
+    Spatial econometrics normally hands you the neighbourhood map before the analysis starts.
+    This lab lets you poke at what happens when you estimate it instead — on 90 European
+    NUTS-1 regions observed annually from 2001 to 2019.
+  </p>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">Regions</div><div class="stat-value">90</div><div class="stat-sub">NUTS-1, 26 countries</div></div>
+    <div class="stat"><div class="stat-label">Observations</div><div class="stat-value">1,710</div><div class="stat-sub">90 × 19 years</div></div>
+    <div class="stat"><div class="stat-label">Unknown links</div><div class="stat-value orange">8,010</div><div class="stat-sub">every off-diagonal cell</div></div>
+    <div class="stat"><div class="stat-label">Per observation</div><div class="stat-value orange">4.7</div><div class="stat-sub">parameters</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Why this is not an ordinary regression</h3>
+    <p>
+      A spatial autoregressive panel needs an <em>n × n</em> matrix <strong>W</strong> saying who is
+      whose neighbour. Fix it in advance — contiguity, <em>k</em>-nearest neighbours, a distance band —
+      and you have 6 unknowns and 1,710 observations, which is comfortable. Treat every
+      off-diagonal cell as unknown instead and you have <strong>8,016 unknowns</strong> against the same
+      1,710 observations.
+    </p>
+    <p class="note">
+      A model with 4.7 parameters per observation cannot be estimated by likelihood alone.
+      Everything depends on the prior — which is what tab 2 is about.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>The replication</h3>
+    <p>All twelve quantities published in Krisztin &amp; Piribauer (2026), Table 3, reproduce to the
+       five decimal places printed.</p>
+    <div class="chart-area"><div id="chart-audit"></div>
+      <div class="chart-caption">Absolute difference between our estimate and the published value, on a log scale. The dashed line is 10<sup>−5</sup>, the resolution of the printed table.</div>
+    </div>
+  </div>
+
+  <div class="cta-cards">
+    <a class="cta-card" href="#" data-goto="pane-prior">
+      <div class="cta-tag">Tab 2</div><h4>Prior explorer</h4>
+      <p>Drag the expected number of neighbours and watch what you are actually asserting.</p>
+    </a>
+    <a class="cta-card" href="#" data-goto="pane-net">
+      <div class="cta-tag">Tab 3</div><h4>Network explorer</h4>
+      <p>Raise the evidence threshold and see which links survive — and what they have in common.</p>
+    </a>
+    <a class="cta-card" href="#" data-goto="pane-maps">
+      <div class="cta-tag">Tab 4</div><h4>Three maps</h4>
+      <p>Same model, three neighbourhood maps, three different answers.</p>
+    </a>
+  </div>
+</section>
+
+<!-- ====================== TAB 2 ====================== -->
+<section id="pane-prior" class="tab-pane" role="tabpanel" aria-labelledby="tab-prior">
+  <p class="lede">
+    The prior on the links has two parts: <em>where</em> links can be, and <em>how many</em> there are.
+    The second is where the surprises live.
+  </p>
+
+  <div class="grid grid-main-side">
+    <div class="card">
+      <h3>What your prior actually asserts</h3>
+      <div class="chart-area"><div id="chart-prior"></div>
+        <div class="chart-caption">Implied prior distribution over the number of neighbours each region has, at n = 90.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="controls">
+        <div class="control">
+          <label for="kbar">Expected neighbours <span class="value" id="kbar-val">7</span></label>
+          <input type="range" id="kbar" min="0" max="8" step="1" value="3">
+          <div class="hint">Sets <span class="kbd">b = ((n−1) − k̄) / k̄</span> in <span class="kbd">bbinompdf()</span></div>
+        </div>
+        <div class="control">
+          <label><input type="checkbox" id="show-flat" checked> Show the "non-informative" flat prior</label>
+          <div class="hint">That is <span class="kbd">nr_neighbors_prior = rep(1, n)</span></div>
+        </div>
+      </div>
+      <div class="stat-row" style="grid-template-columns:1fr 1fr">
+        <div class="stat"><div class="stat-label">b hyperparameter</div><div class="stat-value teal" id="stat-b">11.71</div></div>
+        <div class="stat"><div class="stat-label">Prior P(link)</div><div class="stat-value teal" id="stat-p">7.87%</div></div>
+      </div>
+      <p class="note" id="prior-note"></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The trap</h3>
+    <p>
+      Writing <span class="kbd">rep(1, n)</span> feels like imposing nothing. At n = 90 it implies a
+      prior expectation of <strong>44.5 neighbours per region</strong> — a belief that every European
+      region is directly wired to half of Europe. With only 19 time periods, that prior would
+      dominate the likelihood rather than be updated by it. Turn the flat curve on above and
+      compare it with an anchor of 7.
+    </p>
+  </div>
+</section>
+
+<!-- ====================== TAB 3 ====================== -->
+<section id="pane-net" class="tab-pane" role="tabpanel" aria-labelledby="tab-net">
+  <p class="lede">
+    Each of the 8,010 possible links has a posterior probability: the share of retained draws in
+    which the model switched it on. Raise the evidence bar and watch which links survive.
+  </p>
+
+  <div class="grid grid-main-side">
+    <div class="card">
+      <h3>What kind of links survive?</h3>
+      <div class="chart-area"><div id="chart-threshold"></div>
+        <div class="chart-caption">Composition of surviving links as the posterior-probability threshold rises. Dashed lines are the base rates across all 8,010 ordered pairs.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="controls">
+        <div class="control">
+          <label for="thr">Minimum posterior probability <span class="value" id="thr-val">0.50</span></label>
+          <input type="range" id="thr" min="0" max="100" step="1" value="50">
+          <div class="hint">Share of the 100 retained draws in which the link was on</div>
+        </div>
+      </div>
+      <div class="stat-row" style="grid-template-columns:1fr 1fr">
+        <div class="stat"><div class="stat-label">Links surviving</div><div class="stat-value" id="stat-n">—</div><div class="stat-sub">of 8,010</div></div>
+        <div class="stat"><div class="stat-label">Mean distance</div><div class="stat-value" id="stat-dist">—</div><div class="stat-sub">baseline 1,331 km</div></div>
+        <div class="stat"><div class="stat-label">Same country</div><div class="stat-value orange" id="stat-sc">—</div><div class="stat-sub">base rate 7.1%</div></div>
+        <div class="stat"><div class="stat-label">Share a border</div><div class="stat-value teal" id="stat-q">—</div><div class="stat-sub">base rate 4.3%</div></div>
+      </div>
+      <p class="note" id="net-note"></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Estimated degree, region by region</h3>
+    <div class="chart-area"><div id="chart-degree"></div>
+      <div class="chart-caption">Posterior mean number of neighbours with 95% credible intervals, ordered by supranational group. Dashed line: the prior anchor of 7.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The strongest estimated links</h3>
+    <div id="table-links"></div>
+  </div>
+</section>
+
+<!-- ====================== TAB 4 ====================== -->
+<section id="pane-maps" class="tab-pane" role="tabpanel" aria-labelledby="tab-maps">
+  <p class="lede">
+    The payoff. Fit the identical model three times, changing nothing but the neighbourhood map.
+    Every sign survives; the magnitudes do not.
+  </p>
+
+  <div class="card">
+    <div class="controls">
+      <div class="control outcome-toggle">
+        <label><input type="radio" name="varsel" value="share high education" checked> Share with high education</label>
+        <label><input type="radio" name="varsel" value="log initial GVA per worker"> Log initial GVA per worker</label>
+      </div>
+    </div>
+    <div class="chart-area"><div id="chart-maps"></div>
+      <div class="chart-caption">Direct, indirect and total impacts under each neighbourhood map.</div>
+    </div>
+    <p class="note" id="maps-note"></p>
+  </div>
+
+  <div class="card">
+    <h3>How well does each assumed map predict the estimated one?</h3>
+    <div class="chart-area"><div id="chart-auc"></div>
+      <div class="chart-caption">Area under the ROC curve, using the posterior link probability as a classifier of each assumed map. 0.5 would be a coin flip.</div>
+    </div>
+    <p class="note">
+      Sharing a country predicts the estimated network better than sharing a border does. That is
+      the central finding of the exercise — and nothing in the specification mentions countries.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer class="app-footer">
+  <p>
+    Data: <span class="kbd">estimateW::nuts1growth</span> (Eurostat, 90 NUTS-1 regions, 2001–2019).
+    Estimates from the paper-exact chain, seed 571, 200 iterations with 100 retained.
+    Replication of Krisztin &amp; Piribauer (2026).
+    <a href="../" target="_blank" rel="noopener">Full tutorial ↗</a>
+  </p>
+</footer>
+
+<script src="https://d3js.org/d3.v7.min.js"
+        integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i"
+        crossorigin="anonymous"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

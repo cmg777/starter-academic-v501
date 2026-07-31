@@ -1,0 +1,8 @@
+assumption,status,statistic,satisfied
+I. zero diagonal of W,by construction,max |W_ii| over draws = 0,TRUE
+II. row-wise sum of |rho W| < 1,by construction,max row sum = 0.7458,TRUE
+II. rho < 1,by construction,max rho = 0.7458,TRUE
+IV. rows of W sum to 1 (or 0),by construction,all rows sum to 1 or 0: TRUE,TRUE
+V. diagonal of W^2 not constant,TESTED,"sd of diag(W^2) across regions: min 0.128, median 0.233",TRUE
+VI. rho > 0,IMPOSED by the prior support,"prior support is (0, 1); min drawn rho = 0.678",TRUE
+III. rho * beta != 0 (initial GVA),TESTED,share of draws with |rho*beta| < 1e-4 = 0,TRUE

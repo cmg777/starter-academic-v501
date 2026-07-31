@@ -1,0 +1,479 @@
+---
+title: "Who Are My Neighbors? Bayesian Estimation of Spatial Weight Matrices in R"
+subtitle: "Estimating W instead of assuming it, with estimateW on 90 European NUTS-1 regions"
+author: "Carlos Mendez"
+date: "2026-07-30"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    theme: darkly
+    fig-width: 9
+    fig-height: 5.5
+    fig-dpi: 300
+execute:
+  warning: false
+  message: false
+  freeze: auto
+---
+
+## 1. Overview
+
+Spatial econometrics normally hands you the neighbourhood map before the analysis starts — contiguity, $k$-nearest neighbours, a distance band — and every spillover estimate is then conditional on that choice being right. This notebook does the opposite: it treats all $n^2 - n$ off-diagonal cells of the adjacency matrix as unknown parameters and estimates them jointly with the spatial parameter, the slopes and the error variance.
+
+It replicates Krisztin & Piribauer (2026) exactly, then extends the analysis with a ground-truth simulation, a tour of the model taxonomy, and a benchmark against real geography.
+
+**Published post:** <https://carlos-mendez.org/post/r_estimatew/>
+
+### Setup
+
+```{r}
+#| label: setup-packages
+PINNED <- c(estimateW = "0.2.0")
+cran <- c("estimateW", "ggplot2", "dplyr", "tidyr", "readr", "tibble",
+          "purrr", "glue", "scales", "patchwork", "coda", "sf")
+missing <- cran[!vapply(cran, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing)) install.packages(missing, repos = "https://cloud.r-project.org")
+
+suppressPackageStartupMessages({
+  library(estimateW); library(ggplot2); library(dplyr); library(tidyr)
+  library(readr); library(tibble); library(purrr); library(glue)
+  library(scales); library(patchwork); library(coda); library(sf)
+})
+set.seed(42)
+packageVersion("estimateW")
+```
+
+Every number below comes from `estimateW` 0.2.0. The exact-reproduction claim in Section 4 depends on it.
+
+```{r}
+#| label: setup-theme
+BG <- "#0f1729"; GRID <- "#1f2b5e"; TEXT <- "#c8d0e0"; WHITE <- "#e8ecf2"
+STEEL <- "#6a9bcc"; ORANGE <- "#d97757"; TEAL <- "#00d4c8"
+
+theme_dark_site <- function(base_size = 12) {
+  theme_minimal(base_size = base_size) +
+    theme(
+      plot.background   = element_rect(fill = BG, colour = NA),
+      panel.background  = element_rect(fill = BG, colour = NA),
+      panel.grid.major  = element_line(colour = GRID, linewidth = 0.3),
+      panel.grid.minor  = element_line(colour = GRID, linewidth = 0.15),
+      axis.text = element_text(colour = TEXT), axis.title = element_text(colour = TEXT),
+      plot.title = element_text(colour = WHITE, face = "bold"),
+      plot.subtitle = element_text(colour = TEXT),
+      legend.background = element_rect(fill = BG, colour = NA),
+      legend.key = element_rect(fill = BG, colour = NA),
+      legend.text = element_text(colour = TEXT), legend.title = element_text(colour = TEXT),
+      strip.background = element_rect(fill = GRID, colour = NA),
+      strip.text = element_text(colour = WHITE, face = "bold"))
+}
+theme_set(theme_dark_site())
+```
+
+### Fetching the cached MCMC output
+
+The headline chain takes about six minutes and the two robustness chains about fourteen each. Rather than make you wait, this notebook downloads the cached fits from the post's repository. Delete the `cache/` folder and run `analysis.R` if you want to regenerate them yourself.
+
+```{r}
+#| label: data-download
+RAW <- paste0("https://raw.githubusercontent.com/cmg777/starter-academic-v501/",
+              "master/content/post/r_estimateW")
+dir.create("cache", showWarnings = FALSE)
+
+need <- c(
+  "cache/r_estimateW_fit_paper_seed571_n90_t19_i200_r100_kbar7_full.rds",
+  "cache/r_estimateW_nuts1_20m_3035.rds",
+  "r_estimateW_chain_comparison.csv",
+  "r_estimateW_sim_recovery.csv",
+  "r_estimateW_model_taxonomy.csv",
+  "r_estimateW_table3_audit.csv"
+)
+for (f in need) {
+  if (!file.exists(f)) {
+    try(download.file(file.path(RAW, f), f, mode = "wb", quiet = TRUE), silent = TRUE)
+  }
+}
+HAVE_CACHE <- file.exists(need[1])
+HAVE_CACHE
+```
+
+## 2. The data
+
+```{r}
+#| label: data-nuts1growth
+data(nuts1growth)
+str(nuts1growth)
+```
+
+```{r}
+#| label: data-matrices
+Y  <- as.matrix(nuts1growth$growth_gdp_pw)
+Z  <- cbind(1, nuts1growth$init_gdp_pw, nuts1growth$loweduc, nuts1growth$higheduc)
+colnames(Z) <- c("intercept", "log initial GVA per worker",
+                 "share low education", "share high education")
+n <- 90; tt <- 19
+regions <- tibble(nuts1 = nuts1growth$NUTS1[nuts1growth$year == 2001]) |>
+  mutate(country = substr(nuts1, 1, 2))
+c(rows = nrow(Y), regressors = ncol(Z), regions = n, years = tt)
+```
+
+Note what is missing from that setup: there is no weight matrix. That absence is the whole point.
+
+### A non-spatial baseline
+
+```{r}
+#| label: fit-ols
+ols <- lm(growth_gdp_pw ~ init_gdp_pw + loweduc + higheduc, data = nuts1growth)
+round(summary(ols)$coefficients, 6)
+```
+
+A one-log-point higher starting productivity is associated with 3.68 percentage points slower growth. Hold that against the spatial estimate below.
+
+## 3. Counting the unknowns, and the prior that makes them estimable
+
+```{r}
+#| label: unknowns
+c(unknown_links = n^2 - n,
+  total_unknowns = 2 + (n^2 - n) + 4,
+  observations = n * tt,
+  params_per_obs = (2 + (n^2 - n) + 4) / (n * tt))
+```
+
+Roughly 4.7 parameters per observation. The likelihood alone cannot do this; the prior is not a technicality, it is the method.
+
+The prior on the links has two independent parts: $\underline{p}_{ij} \propto \underline{\omega}_{ij}\,\underline{m}(k_i)$. The first says *where* links can be, the second *how many* there are.
+
+```{r}
+#| label: fig-prior-sparsity
+#| fig-cap: "The three sparsity priors of the paper's Table 2, and the prior on the neighbour count each implies."
+sparsity_grid <- function(nn, kbar) {
+  k <- 0:(nn - 1); b <- ((nn - 1) - kbar) / kbar
+  cases <- list(rep(1, nn),
+                bbinompdf(k, nsize = nn - 1, a = 1, b = 1),
+                bbinompdf(k, nsize = nn - 1, a = 1, b = b))
+  names(cases) <- c("(a) No shrinkage", "(b) Package default: a = b = 1",
+                    sprintf("(c) Strong shrinkage: b = %.2f", b))
+  bind_rows(lapply(names(cases), function(nm) {
+    m <- cases[[nm]]; p <- choose(nn - 1, k) * m; p <- p / sum(p)
+    tibble(case = nm, k = k, m_k = m / max(m), p_k = p, expected_k = sum(k * p))
+  }))
+}
+sp <- sparsity_grid(30, 5)
+plt <- bind_rows(
+  sp |> transmute(case, k, value = m_k, quantity = "Prior weight m(k)"),
+  sp |> transmute(case, k, value = p_k, quantity = "Implied prior on k")) |>
+  mutate(quantity = factor(quantity, levels = c("Prior weight m(k)", "Implied prior on k")))
+ggplot(plt, aes(k, value)) +
+  geom_col(fill = STEEL, width = 0.8) +
+  geom_vline(data = distinct(sp, case, expected_k),
+             aes(xintercept = expected_k), colour = ORANGE, linetype = "dashed") +
+  facet_grid(quantity ~ case, scales = "free_y", switch = "y",
+             labeller = label_wrap_gen(width = 20)) +
+  labs(title = "What you supply is not what you assert",
+       x = "number of neighbours k", y = NULL) +
+  theme(strip.placement = "outside")
+```
+
+The middle column is the trap: the weight you supply is violently U-shaped, yet the prior it *implies* is perfectly uniform. The binomial coefficient reconciles the two.
+
+```{r}
+#| label: prior-expected-degree
+bind_rows(sparsity_grid(30, 5) |> mutate(n = 30),
+          sparsity_grid(90, 7) |> mutate(n = 90)) |>
+  distinct(n, case, expected_k) |> arrange(n) |> as.data.frame()
+```
+
+At the real sample size, both "non-informative" options expect **44.5 neighbours per region** — every region wired to half of Europe. Only the anchored prior delivers sparsity.
+
+```{r}
+#| label: prior-empirical
+kbar <- 7
+Wprior <- matrix(0.5, ncol = n, nrow = n); diag(Wprior) <- 0
+a_pr <- 1; b_pr <- ((n - 1) - kbar) / kbar
+priorW_hierarchical <- bbinompdf(0:(n - 1), nsize = (n - 1), a = a_pr, b = b_pr)
+AA <- W_priors(n = n, W_prior = Wprior, nr_neighbors_prior = priorW_hierarchical)
+c(b_prior = b_pr, prior_link_prob = kbar / (n - 1))
+```
+
+## 4. The headline fit
+
+This is the paper's call, verbatim. It is shown but not executed here — the chunk below loads the cached result instead.
+
+```{r}
+#| label: fit-sarw-paper
+#| eval: false
+set.seed(571)
+res_sarw <- sarw(Y = Y, tt = tt, Z = Z, niter = 200, nretain = 100, W_prior = AA)
+```
+
+```{r}
+#| label: fit-sarw-load
+res_sarw <- readRDS("cache/r_estimateW_fit_paper_seed571_n90_t19_i200_r100_kbar7_full.rds")
+Z_LABELS <- colnames(Z)
+draws_b <- t(res_sarw$postb); colnames(draws_b) <- Z_LABELS
+draws_r <- as.vector(res_sarw$postr); draws_s <- as.vector(res_sarw$posts)
+vapply(res_sarw[c("postb","posts","postr","postw","post.direct","post.indirect","post.total")],
+       function(x) paste(dim(x), collapse = " x "), character(1))
+```
+
+`postw` is a $90 \times 90 \times 100$ array: a complete neighbourhood map for every retained draw. We are not getting one network, we are getting a posterior over networks.
+
+```{r}
+#| label: posterior-summary
+summarise_block <- function(mat, block, labels = colnames(mat)) {
+  tibble(parameter = labels, block = block,
+         mean = apply(mat, 2, mean), sd = apply(mat, 2, sd),
+         ess = apply(mat, 2, \(v) as.numeric(coda::effectiveSize(v))))
+}
+posterior_params <- bind_rows(
+  summarise_block(draws_b, "beta"),
+  summarise_block(matrix(draws_r, ncol = 1), "rho", "rho"),
+  summarise_block(matrix(draws_s, ncol = 1), "sigma2", "sigma2"),
+  summarise_block(t(res_sarw$post.direct)[, -1, drop = FALSE]   |> `colnames<-`(Z_LABELS[-1]), "direct"),
+  summarise_block(t(res_sarw$post.indirect)[, -1, drop = FALSE] |> `colnames<-`(Z_LABELS[-1]), "indirect"),
+  summarise_block(t(res_sarw$post.total)[, -1, drop = FALSE]    |> `colnames<-`(Z_LABELS[-1]), "total"))
+posterior_params |> mutate(across(where(is.numeric), \(x) signif(x, 4))) |> as.data.frame()
+```
+
+### The reproduction audit
+
+```{r}
+#| label: table3-audit
+if (file.exists("r_estimateW_table3_audit.csv")) {
+  read_csv("r_estimateW_table3_audit.csv", show_col_types = FALSE) |>
+    transmute(quantity, paper_mean, our_mean = signif(our_mean, 5),
+              abs_diff = signif(abs_diff, 3), verdict) |>
+    as.data.frame()
+}
+```
+
+All twelve published quantities reproduce to the five decimals the paper prints. That required the seed, the package version, the RNG kind and the BLAS to coincide; on different hardware, expect agreement only up to Monte Carlo noise.
+
+### Impacts
+
+```{r}
+#| label: fig-impacts
+#| fig-cap: "Posterior means with 95% credible intervals for every reported quantity."
+posterior_params |>
+  mutate(q025 = mean - 1.96 * sd, q975 = mean + 1.96 * sd,
+         lab = ifelse(block %in% c("beta","rho","sigma2"), parameter,
+                      paste0(parameter, " (", block, ")")),
+         grp = factor(parameter, levels = c(Z_LABELS, "rho", "sigma2"))) |>
+  ggplot(aes(mean, reorder(lab, mean), colour = block)) +
+  geom_vline(xintercept = 0, colour = TEXT, linetype = "dotted") +
+  geom_linerange(aes(xmin = q025, xmax = q975)) +
+  geom_point(size = 2.2) +
+  facet_wrap(~grp, scales = "free", ncol = 2) +
+  scale_colour_manual(values = c(beta = STEEL, rho = TEAL, sigma2 = TEXT,
+                                 direct = "#8fd0c8", indirect = ORANGE, total = "#e8b48f"),
+                      name = NULL) +
+  labs(title = "Everything the model says", x = "posterior mean", y = NULL) +
+  theme(legend.position = "top", axis.text.y = element_text(size = 8))
+```
+
+In a SAR model $\Pi_l = (I_n - \rho W)^{-1}\beta_l$, so the split between diagonal and off-diagonal depends only on $\rho$ and $W$. Every variable is therefore forced to share the same indirect-to-direct ratio — about 2.11 here. Variable-specific ratios need a Durbin specification.
+
+## 5. Reading the estimated network
+
+```{r}
+#| label: network-summaries
+W_mean <- apply(res_sarw$postw, c(1, 2), mean)
+W_pip  <- apply(res_sarw$postw > 0, c(1, 2), mean)
+degree <- t(apply(res_sarw$postw > 0, 3, \(m) rowSums(matrix(m, n, n))))
+dimnames(W_mean) <- dimnames(W_pip) <- list(regions$nuts1, regions$nuts1)
+c(mean_degree = mean(colMeans(degree)), prior_anchor = kbar,
+  mean_pip = mean(W_pip[row(W_pip) != col(W_pip)]))
+```
+
+```{r}
+#| label: fig-pip-heatmap
+#| fig-cap: "Posterior probability that region i treats region j as a neighbour, ordered by country."
+ord <- order(regions$country, regions$nuts1)
+lev <- regions$nuts1[ord]
+Wo  <- W_pip[ord, ord]
+expand_grid(ri = seq_len(n), ci = seq_len(n)) |>
+  mutate(from = factor(lev[ri], levels = lev), to = factor(lev[ci], levels = lev),
+         pip = Wo[cbind(ri, ci)]) |>
+  ggplot(aes(to, from, fill = pip)) + geom_raster() + coord_fixed() +
+  scale_fill_gradientn(colours = c("#131c33", "#24406b", STEEL, ORANGE, "#ffe0a3"),
+                       name = "P(link)") +
+  scale_y_discrete(limits = rev(lev)) +
+  labs(title = "The model reconstructed national borders", x = "neighbour j", y = "region i") +
+  theme(axis.text = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank())
+```
+
+```{r}
+#| label: clustering
+edge <- expand_grid(i = seq_len(n), j = seq_len(n)) |>
+  filter(i != j) |>
+  mutate(from = regions$nuts1[i], to = regions$nuts1[j],
+         same_country = regions$country[i] == regions$country[j],
+         w_mean = W_mean[cbind(i, j)], pip = W_pip[cbind(i, j)])
+cs <- as.vector(table(regions$country))
+c(share_same_country = sum(edge$w_mean[edge$same_country]) / sum(edge$w_mean),
+  random_benchmark   = sum(cs * (cs - 1)) / (n * (n - 1)))
+```
+
+Five times more neighbourhood weight on compatriots than chance predicts — and nothing in the specification mentions countries.
+
+```{r}
+#| label: top-links
+edge |> slice_max(w_mean, n = 10) |>
+  transmute(from, to, same_country, w_mean = round(w_mean, 4), pip) |> as.data.frame()
+```
+
+## 6. Does the sampler work? A network we built ourselves
+
+The only way to check an estimator is to run it where you know the answer. This fit is cheap enough to run live.
+
+```{r}
+#| label: fit-sim
+#| cache: true
+set.seed(4242)
+sim <- sim_dgp(n = 40, tt = 20, rho = 0.6, beta3 = c(0.5, -1),
+               sigma2 = 0.05, n_neighbor = 4, intercept = TRUE)
+Om_true <- (sim$W > 0) * 1
+prior_sim <- W_priors(n = 40,
+  W_prior = { m <- matrix(0.5, 40, 40); diag(m) <- 0; m },
+  nr_neighbors_prior = bbinompdf(0:39, nsize = 39, a = 1, b = (39 - 4) / 4))
+set.seed(4243)
+invisible(capture.output(
+  res_sim <- sarw(Y = sim$Y, tt = 20, Z = sim$Z, niter = 500, nretain = 250,
+                  W_prior = prior_sim)))
+pip_sim <- apply(res_sim$postw > 0, c(1, 2), mean)
+off <- row(pip_sim) != col(pip_sim)
+score <- pip_sim[off]; truth <- Om_true[off] == 1
+npos <- sum(truth); nneg <- sum(!truth)
+c(auc = (mean(rank(score)[truth]) - (npos + 1) / 2) / nneg,
+  precision_at_0.5 = sum(score >= 0.5 & truth) / max(sum(score >= 0.5), 1),
+  recall_at_0.5    = sum(score >= 0.5 & truth) / npos)
+```
+
+```{r}
+#| label: fig-sim-recovery
+#| fig-cap: "True adjacency, estimated link probabilities, and their separation."
+hm <- function(M, ttl) {
+  nn <- nrow(M)
+  expand_grid(i = seq_len(nn), j = seq_len(nn)) |>
+    mutate(v = M[cbind(i, j)]) |>
+    ggplot(aes(j, i, fill = v)) + geom_raster() + scale_y_reverse() + coord_fixed() +
+    scale_fill_gradientn(colours = c("#131c33", STEEL, ORANGE)) +
+    labs(title = ttl, x = NULL, y = NULL) +
+    theme(axis.text = element_blank(), axis.ticks = element_blank(),
+          panel.grid = element_blank(), legend.position = "none")
+}
+sep <- tibble(pip = score, link = ifelse(truth, "true link", "true non-link")) |>
+  ggplot(aes(pip, fill = link)) +
+  geom_histogram(bins = 30, position = "identity", alpha = 0.75) +
+  scale_fill_manual(values = c("true link" = ORANGE, "true non-link" = STEEL), name = NULL) +
+  scale_y_continuous(transform = "log1p") +
+  labs(x = "posterior link probability", y = "cells") + theme(legend.position = "top")
+hm(Om_true, "True adjacency") | hm(pip_sim, "Estimated probabilities") | sep
+```
+
+The cached full-length run (2,000 iterations) is stronger still, and it carries the important negative result:
+
+```{r}
+#| label: sim-recovery-cached
+if (file.exists("r_estimateW_sim_recovery.csv")) {
+  read_csv("r_estimateW_sim_recovery.csv", show_col_types = FALSE) |>
+    mutate(across(where(is.numeric), \(x) signif(x, 4))) |> as.data.frame()
+}
+```
+
+Network recovery is excellent (AUC 0.976) but **none of the four structural parameters' 95% intervals cover the truth**. The sparsity prior biases the network sparse and $\rho$ downward, and an autocorrelated chain reports narrower intervals than it has earned. Trust the structure; hedge the intervals.
+
+## 7. The rest of the family, and the maps we would have assumed
+
+The `w` suffix estimates the map; the plain name takes one you supply. These exogenous-W fits are cheap because there is no network to sample.
+
+```{r}
+#| label: fit-exogenous
+#| cache: true
+geo_file <- "cache/r_estimateW_nuts1_20m_3035.rds"
+HAVE_GEO <- file.exists(geo_file)
+if (HAVE_GEO) {
+  geo <- readRDS(geo_file)
+  cxy <- suppressWarnings(sf::st_coordinates(sf::st_point_on_surface(sf::st_geometry(geo))))
+  D   <- as.matrix(dist(cxy)) / 1000
+  touch <- sf::st_touches(geo, sparse = TRUE)
+  Om_q <- matrix(0, n, n)
+  for (i in seq_len(n)) if (length(touch[[i]])) Om_q[i, touch[[i]]] <- 1
+  for (i in which(rowSums(Om_q) == 0)) Om_q[i, order(D[i, ])[2]] <- 1
+  Om_k <- matrix(0, n, n)
+  for (i in seq_len(n)) Om_k[i, order(D[i, ])[2:8]] <- 1
+  rs <- function(M) { s <- rowSums(M); s[s == 0] <- 1; M / s }
+  W_queen <- rs(Om_q); W_knn <- rs(Om_k)
+  invisible(capture.output({
+    fit_q <- sar(Y = Y, tt = tt, W = W_queen, Z = Z, niter = 2000, nretain = 1000)
+    fit_k <- sar(Y = Y, tt = tt, W = W_knn,   Z = Z, niter = 2000, nretain = 1000)
+  }))
+  c(rho_queen = mean(fit_q$postr), rho_knn7 = mean(fit_k$postr),
+    rho_estimated = mean(draws_r))
+}
+```
+
+```{r}
+#| label: three-maps
+if (HAVE_GEO) {
+  imp <- function(f, idx, map) tibble(
+    map = map,
+    direct = mean(f$post.direct[idx, ]), indirect = mean(f$post.indirect[idx, ]),
+    total = mean(f$post.total[idx, ]))
+  bind_rows(
+    imp(res_sarw, 4L, "Estimated W"),
+    imp(fit_q,    4L, "Queen contiguity"),
+    imp(fit_k,    4L, "7-nearest-neighbour")) |>
+    mutate(ratio = indirect / direct,
+           across(where(is.numeric), \(x) signif(x, 4))) |> as.data.frame()
+}
+```
+
+Every sign survives the change of map; the magnitudes do not. The total impact of tertiary education is more than double under the estimated map compared with either assumed one.
+
+```{r}
+#| label: taxonomy-cached
+if (file.exists("r_estimateW_model_taxonomy.csv")) {
+  read_csv("r_estimateW_model_taxonomy.csv", show_col_types = FALSE) |>
+    select(half, model, fn, W_source, n, niter, rho_mean, mean_degree, runtime_sec) |>
+    mutate(across(where(is.numeric), \(x) signif(x, 4))) |> as.data.frame()
+}
+```
+
+On a Durbin-generated panel, only the specifications that include the spatially lagged regressors recover $\rho$: SDM and SDEM return 0.41 and 0.44 against a true 0.50, while SAR and SEM collapse to 0.17 and 0.11. Getting the map right does not rescue a wrong specification.
+
+## 8. Convergence
+
+```{r}
+#| label: convergence-cached
+if (file.exists("r_estimateW_chain_comparison.csv")) {
+  read_csv("r_estimateW_chain_comparison.csv", show_col_types = FALSE) |>
+    select(parameter, chain, niter, mean, sd, ess, gelman_psrf) |>
+    mutate(across(where(is.numeric), \(x) signif(x, 4))) |> as.data.frame()
+}
+```
+
+Gelman-Rubin factors are all at or below 1.023 across two independent chains, so the sampler converges despite rewriting the network inside every sweep. But the effective sample size for $\rho$ is only 26.5 out of 100 retained draws. **Posterior means are reliable; posterior standard deviations, credible intervals and marginal link rankings are not.**
+
+## 9. Identification
+
+Four of the six sufficient conditions in De Paula, Rasul & Souza (2025) hold by construction here. Two are genuinely testable and both pass. One — $\rho > 0$ — is *imposed* by the default prior support of $(0,1)$, so the estimate is evidence about the magnitude of positive spatial dependence, not evidence against negative dependence.
+
+```{r}
+#| label: identification
+pw <- res_sarw$postw; rr <- as.vector(res_sarw$postr); S <- length(rr)
+w2_sd <- vapply(seq_len(S), \(s) { W <- pw[, , s]; sd(diag(W %*% W)) }, numeric(1))
+c(max_abs_diagonal   = max(vapply(seq_len(S), \(s) max(abs(diag(pw[, , s]))), numeric(1))),
+  max_row_sum_rhoW   = max(vapply(seq_len(S), \(s) max(rowSums(abs(rr[s] * pw[, , s]))), numeric(1))),
+  min_sd_diag_W2     = min(w2_sd),
+  min_rho            = min(rr))
+```
+
+## Source files
+
+- Canonical script: [`analysis.R`](https://github.com/cmg777/starter-academic-v501/blob/master/content/post/r_estimateW/analysis.R)
+- Published post: <https://carlos-mendez.org/post/r_estimatew/>
+- Package: <https://CRAN.R-project.org/package=estimateW>
+- Method: Krisztin & Piribauer (2023), *Spatial Economic Analysis* 18(1), 44–63
