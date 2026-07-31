@@ -84,7 +84,7 @@ Measured on the machine used for this post (R 4.5.2, reference BLAS):
 | 18 | `r_estimateW_18_sim_recovery.png` | Ground truth: recovering a known adjacency matrix from simulated data |
 | 19 | `r_estimateW_19_three_maps_impacts.png` | The same SAR model under estimated, contiguity and 7-NN maps |
 
-`featured.webp` is added manually by the site owner and is not produced by this script.
+`featured.webp` (2752 x 1536) is supplied by the site owner and is not produced by this script.
 
 ## Generated Tables (CSV)
 
