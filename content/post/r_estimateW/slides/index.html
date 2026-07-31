@@ -260,12 +260,41 @@
 </section>
 <section id="the-prior-is-not-a-technicality-it-is-the-method" class="slide level2 center">
 <h2>The prior is not a technicality — it <em>is</em> the method</h2>
-<p><span class="math display">\[\underline{p}_{ij} \propto \underline{\omega}_{ij}\,\underline{m}(k_i)\]</span></p>
+<p><span class="math display">\[p_{ij} \;\propto\; \omega_{ij} \;\times\; m(k_i)\]</span></p>
 <p><strong>Where</strong> links can be × <strong>how many</strong> there are.</p>
 <div class="fragment">
 <p>The trap: a “non-informative” flat prior on the neighbour count implies an expectation of <strong>44.5 neighbours per region</strong> — every region wired to half of Europe.</p>
-<p><img data-src="../r_estimateW_04_prior_k_n90.png" style="width:62.0%"></p>
+<aside class="notes">
+<p>The paper writes these hyperparameters with underbars. Dropped here for legibility; the two factors are what matter. Next slide shows what the “non-informative” choice actually asserts.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
+</section>
+<section id="non-informative-means-half-of-europe" class="slide level2 center">
+<h2>“Non-informative” means half of Europe</h2>
+
+<img data-src="../r_estimateW_04_prior_k_n90.png" style="width:74.0%" class="r-stretch"><aside class="notes">
+<p>Grey bell centred at 44.5 is the flat prior. Teal spike at 7 is the anchored one. Same word, opposite belief.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="one-link-at-a-time" class="slide level2 center">
 <h2>One link at a time</h2>
@@ -290,7 +319,7 @@
 <section id="first-check-it-on-a-network-we-built-ourselves" class="slide level2 center">
 <h2>First, check it on a network we built ourselves</h2>
 
-<img data-src="../r_estimateW_18_sim_recovery.png" style="width:88.0%" class="r-stretch"><p><strong>AUC 0.976</strong> · 95.3% of 1,560 cells classified correctly</p>
+<img data-src="../r_estimateW_18_sim_recovery.png" style="width:80.0%" class="r-stretch"><p><strong>AUC 0.976</strong> · 95.3% of 1,560 cells classified correctly</p>
 <aside class="notes">
 <p>Driving test where you placed the cones. Build trust before spending it on real data.</p>
 <style type="text/css">
@@ -395,9 +424,14 @@
 </section>
 <section id="the-model-reconstructed-national-borders" class="slide level2 center">
 <h2>The model reconstructed national borders</h2>
-
-<img data-src="../r_estimateW_09_W_pip_heatmap.png" style="width:52.0%" class="r-stretch"><p>Regions place <strong>35.6%</strong> of their neighbourhood weight on compatriots — chance would give <strong>7.1%</strong>.</p>
-<p>Nothing in the specification mentions countries.</p>
+<div class="columns">
+<div class="column" style="width:46%;">
+<p><img data-src="../r_estimateW_09_W_pip_heatmap.png"></p>
+</div><div class="column" style="width:54%;">
+<p>Regions place <strong>35.6%</strong> of their neighbourhood weight on compatriots.</p>
+<p>Chance would give <strong>7.1%</strong>.</p>
+<p>Nothing in the specification mentions countries — the model saw only growth rates, initial productivity and two education shares.</p>
+</div></div>
 </section>
 <section id="same-country-beats-shared-border" class="slide level2 center">
 <h2>Same country beats shared border</h2>
@@ -431,10 +465,17 @@
 </section>
 <section id="look-at-the-map" class="slide level2 center">
 <h2>Look at the map</h2>
-
-<img data-src="../r_estimateW_17_map_arcs.png" style="width:70.0%" class="r-stretch"><div class="smaller">
-<p>Teal = the pair also shares a border. Orange = it does not.</p>
+<div class="columns">
+<div class="column" style="width:47%;">
+<p><img data-src="../r_estimateW_17_map_arcs.png"></p>
+</div><div class="column" style="width:53%;">
+<div class="smaller">
+<p><strong><span style="color:#00d4c8">Teal</span></strong> — the pair also shares a border.</p>
+<p><strong><span style="color:#d97757">Orange</span></strong> — it does not.</p>
+<p>Long orange arcs dominate: Bulgaria to Czechia, Iberia to the Baltic, Greece to Ireland.</p>
+<p>If the estimated network were essentially contiguity, this would be a mesh of short teal arcs hugging borders.</p>
 </div>
+</div></div>
 </section>
 <section id="three-maps-three-answers" class="slide level2 center" data-background-color="#141413">
 <h2>Three maps, three answers</h2>

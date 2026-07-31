@@ -95,15 +95,28 @@ This is the single most persuasive slide for a sceptical audience. The "standard
 
 ## The prior is not a technicality — it *is* the method
 
-$$\underline{p}_{ij} \propto \underline{\omega}_{ij}\,\underline{m}(k_i)$$
+$$p_{ij} \;\propto\; \omega_{ij} \;\times\; m(k_i)$$
 
-**Where** links can be × **how many** there are.
+**Where** links can be  ×  **how many** there are.
 
 . . .
 
 The trap: a "non-informative" flat prior on the neighbour count implies an expectation of **44.5 neighbours per region** — every region wired to half of Europe.
 
-![](../r_estimateW_04_prior_k_n90.png){width="62%"}
+::: {.notes}
+The paper writes these hyperparameters with underbars. Dropped here for legibility;
+the two factors are what matter. Next slide shows what the "non-informative" choice
+actually asserts.
+:::
+
+## "Non-informative" means half of Europe
+
+![](../r_estimateW_04_prior_k_n90.png){width="74%"}
+
+::: {.notes}
+Grey bell centred at 44.5 is the flat prior. Teal spike at 7 is the anchored one.
+Same word, opposite belief.
+:::
 
 ## One link at a time
 
@@ -121,7 +134,7 @@ Piano-tuning analogy: never solve the whole instrument, fix one string given the
 
 ## First, check it on a network we built ourselves
 
-![](../r_estimateW_18_sim_recovery.png){width="88%"}
+![](../r_estimateW_18_sim_recovery.png){width="80%"}
 
 **AUC 0.976** · 95.3% of 1,560 cells classified correctly
 
@@ -160,11 +173,21 @@ Sparsity biases the network sparse, and $\rho$ down with it. Autocorrelation nar
 
 ## The model reconstructed national borders
 
-![](../r_estimateW_09_W_pip_heatmap.png){width="52%"}
+:::: {.columns}
 
-Regions place **35.6%** of their neighbourhood weight on compatriots — chance would give **7.1%**.
+::: {.column width="46%"}
+![](../r_estimateW_09_W_pip_heatmap.png)
+:::
 
-Nothing in the specification mentions countries.
+::: {.column width="54%"}
+Regions place **35.6%** of their neighbourhood weight on compatriots.
+
+Chance would give **7.1%**.
+
+Nothing in the specification mentions countries — the model saw only growth rates, initial productivity and two education shares.
+:::
+
+::::
 
 ## Same country beats shared border
 
@@ -178,11 +201,25 @@ Strongest estimated links average 921 km, against 1,331 km for a random pair —
 
 ## Look at the map
 
-![](../r_estimateW_17_map_arcs.png){width="70%"}
+:::: {.columns}
 
-::: {.smaller}
-Teal = the pair also shares a border. Orange = it does not.
+::: {.column width="47%"}
+![](../r_estimateW_17_map_arcs.png)
 :::
+
+::: {.column width="53%"}
+::: {.smaller}
+**[Teal]{style="color:#00d4c8"}** — the pair also shares a border.
+
+**[Orange]{style="color:#d97757"}** — it does not.
+
+Long orange arcs dominate: Bulgaria to Czechia, Iberia to the Baltic, Greece to Ireland.
+
+If the estimated network were essentially contiguity, this would be a mesh of short teal arcs hugging borders.
+:::
+:::
+
+::::
 
 ## Three maps, three answers {background-color="#141413"}
 
