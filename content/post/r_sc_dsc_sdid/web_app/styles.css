@@ -1,0 +1,205 @@
+/* styles.css — synthetic-control ladder lab.
+   Dark navy site palette; no external fonts or assets. */
+
+:root {
+  --bg:        #0f1729;
+  --panel:     #16203a;
+  --border:    #1f2b5e;
+  --text:      #e8ecf2;
+  --dim:       #c8d0e0;
+  --muted:     #8b9dc3;
+  --steel:     #6a9bcc;
+  --orange:    #d97757;
+  --teal:      #00d4c8;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 0 1rem 4rem;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+main { max-width: 980px; margin: 0 auto; }
+
+/* ---- hero ---- */
+.hero {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 3rem 0 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.eyebrow {
+  margin: 0 0 .4rem;
+  color: var(--teal);
+  font-size: .78rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  margin: 0 0 .8rem;
+  font-size: clamp(1.7rem, 4.4vw, 2.5rem);
+  line-height: 1.2;
+  font-weight: 650;
+}
+.lede {
+  margin: 0;
+  max-width: 62ch;
+  color: var(--dim);
+  font-size: 1.03rem;
+}
+
+/* ---- panels ---- */
+.panel {
+  margin: 2.2rem 0;
+  padding: 1.4rem 1.4rem 1.6rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.panel-head h2 {
+  margin: 0 0 .35rem;
+  font-size: 1.16rem;
+  font-weight: 620;
+}
+.panel-head p {
+  margin: 0 0 1rem;
+  max-width: 68ch;
+  color: var(--muted);
+  font-size: .93rem;
+}
+
+/* ---- controls ---- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 1.1rem;
+}
+.pill {
+  padding: .42rem .9rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--dim);
+  font-size: .87rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .14s, color .14s, border-color .14s;
+}
+.pill:hover { border-color: var(--steel); color: var(--text); }
+.pill.active {
+  background: var(--steel);
+  border-color: var(--steel);
+  color: #0f1729;
+  font-weight: 600;
+}
+.pill:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+/* ---- charts ---- */
+.chart-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: .4rem 0 .2rem;
+}
+.chart-wrap svg { width: 100%; height: auto; display: block; min-width: 520px; }
+
+/* ---- readout ---- */
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6rem 2.4rem;
+  align-items: baseline;
+  margin: 1rem 0 .4rem;
+  padding: 1rem 1.1rem;
+  background: rgba(106, 155, 204, 0.08);
+  border-left: 3px solid var(--steel);
+  border-radius: 4px;
+}
+.stat { display: flex; flex-direction: column; }
+.stat .num {
+  font-size: 1.7rem;
+  font-weight: 650;
+  line-height: 1.1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.stat .lab {
+  font-size: .8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.blurb {
+  flex-basis: 100%;
+  margin: .2rem 0 0;
+  max-width: 72ch;
+  color: var(--dim);
+  font-size: .92rem;
+}
+
+.note {
+  margin: .9rem 0 0;
+  max-width: 74ch;
+  color: var(--dim);
+  font-size: .92rem;
+  border-left: 3px solid var(--teal);
+  padding-left: .9rem;
+}
+
+.error {
+  padding: 1rem;
+  border: 1px solid var(--orange);
+  border-radius: 8px;
+  color: var(--orange);
+}
+
+/* ---- tooltip ---- */
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 20;
+  padding: .5rem .7rem;
+  background: rgba(15, 23, 41, 0.97);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: .84rem;
+  line-height: 1.45;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .45);
+  transition: opacity .12s;
+}
+.tooltip .dim { color: var(--muted); }
+
+/* ---- footer ---- */
+footer {
+  max-width: 980px;
+  margin: 3rem auto 0;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: .88rem;
+}
+footer a { color: var(--steel); }
+footer .cite { font-size: .82rem; margin-top: .6rem; }
+code {
+  padding: .1em .35em;
+  background: rgba(232, 236, 242, 0.08);
+  border-radius: 3px;
+  font-size: .9em;
+}
+
+@media (max-width: 640px) {
+  .panel { padding: 1.1rem .9rem 1.2rem; }
+  .readout { gap: 1rem 1.4rem; }
+  .stat .num { font-size: 1.4rem; }
+}

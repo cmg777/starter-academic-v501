@@ -58,6 +58,13 @@ content/post/r_sc_bayes_spatial/replication-package/
 # (~220 KB LaTeX; third-party reference material, not source for this post).
 content/post/r_did2/reference/manuscript.tex
 
+# de Brabander, Juodis & Miyazato Szini (2025) replication package for
+# r_sc_dsc_sdid (~4.5 MB: the authors' 34 R scripts, a 2.3 MB MATLAB binary and
+# the article text). prepare_data.R converts the .mat into the two committed
+# CSVs, which are all analysis.R needs. Obtain the package from the article:
+# https://doi.org/10.1080/07474938.2025.2530649
+content/post/r_sc_dsc_sdid/replicationReference/
+
 # Cunningham (2026) "Covariates, diff in diff and LaLonde test" Substack source
 # (his prose + Stata/R code) for python_did_covariates_lalonde -- third-party
 # copyrighted reference material. Hugo already excludes it from the build; it is

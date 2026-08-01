@@ -1,0 +1,412 @@
+---
+title: "From DiD to SDID: A Ladder of Synthetic Control Estimators"
+subtitle: "Seven ways to build a counterfactual United Kingdom, hand-coded and then packaged"
+author: "Carlos Mendez"
+date: "2026-07-31"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    theme: darkly
+    fig-width: 9
+    fig-height: 6
+    fig-dpi: 300
+execute:
+  warning: false
+  message: false
+  freeze: auto
+---
+
+## What this notebook does
+
+The United Kingdom voted to leave the European Union on 23 June 2016. There is only
+one United Kingdom, so the cost of that decision can only be measured against a
+country that never existed. This notebook builds that country seven times over,
+climbing the ladder of single-treated-unit estimators:
+
+| Rung | Estimator | Unit weights | Time weights | Unit effect |
+|---|---|---|---|---|
+| 0 | Difference-in-differences | fixed at $1/J$ | fixed | yes |
+| 1 | Synthetic control | optimised on the simplex | none | **no** |
+| 2 | Demeaned SC | optimised on demeaned data | fixed | yes |
+| 3 | Synthetic DiD | same as DSC | **optimised** | yes |
+| 4 | MASC | cross-validated blend with matching | none | no |
+| 5 | Augmented SC | SC weights + ridge correction | none | no |
+
+Every rung is solved from scratch first, then reproduced with its package.
+
+The companion post, with the full narrative and all eighteen figures, is at
+<https://carlos-mendez.org/post/r_sc_dsc_sdid/>. The canonical script is
+`analysis.R` in this folder.
+
+## Setup
+
+```{r}
+#| label: setup-packages
+required <- c("quadprog", "ggplot2", "patchwork")
+missing  <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing)) install.packages(missing, repos = "https://cloud.r-project.org")
+
+suppressPackageStartupMessages({
+  library(quadprog); library(ggplot2); library(patchwork)
+})
+
+has <- function(p) requireNamespace(p, quietly = TRUE)
+
+# The three GitHub-only packages. Skipped gracefully if absent -- every estimate
+# below is also computed by hand, so the notebook renders either way.
+#   remotes::install_github("synth-inference/synthdid")
+#   remotes::install_github("ebenmichael/augsynth")
+#   masc needs its Gurobi dependency stripped first; see analysis.R.
+
+set.seed(20260801)
+
+STEEL <- "#6a9bcc"; ORANGE <- "#d97757"; TEAL <- "#00d4c8"
+BG <- "#0f1729"; PANEL <- "#1f2b5e"; TXT <- "#c8d0e0"; TXT2 <- "#e8ecf2"
+GREY <- "#54618a"; MUTED <- "#8b9dc3"; GOLD <- "#e8b04b"
+
+theme_site <- function(base_size = 12) {
+  theme_minimal(base_size = base_size) +
+    theme(plot.background  = element_rect(fill = BG, colour = NA),
+          panel.background = element_rect(fill = BG, colour = NA),
+          panel.grid.major = element_line(colour = PANEL, linewidth = 0.3),
+          panel.grid.minor = element_blank(),
+          text = element_text(colour = TXT), axis.text = element_text(colour = TXT),
+          plot.title = element_text(colour = TXT2, face = "bold"),
+          plot.subtitle = element_text(colour = TXT),
+          plot.caption = element_text(colour = MUTED, size = base_size - 3, hjust = 0),
+          legend.text = element_text(colour = TXT),
+          legend.title = element_text(colour = TXT2),
+          legend.key = element_rect(fill = BG, colour = NA),
+          strip.text = element_text(colour = TXT2, face = "bold"),
+          strip.background = element_rect(fill = PANEL, colour = NA))
+}
+theme_set(theme_site())
+```
+
+## The data
+
+Quarterly log real GDP for 24 OECD economies, 1995Q1 to 2020Q4, indexed so each
+country's 1995 average equals one. The United Kingdom is the treated unit and the
+other 23 are the donor pool.
+
+```{r}
+#| label: data-download
+url <- paste0("https://raw.githubusercontent.com/cmg777/starter-academic-v501/",
+              "master/content/post/r_sc_dsc_sdid/brexit_analysis.csv")
+if (!file.exists("brexit_analysis.csv")) download.file(url, "brexit_analysis.csv")
+panel <- read.csv("brexit_analysis.csv", stringsAsFactors = FALSE)
+
+CT     <- unique(panel$country[order(panel$unit_id)])
+Y      <- matrix(panel$log_rgdp[order(panel$unit_id, panel$t)],
+                 nrow = 104, dimnames = list(NULL, CT))
+QLAB   <- panel$quarter_label[panel$unit_id == 1][order(panel$t[panel$unit_id == 1])]
+QDEC   <- panel$date_dec[panel$unit_id == 1][order(panel$t[panel$unit_id == 1])]
+UK     <- which(CT == "United Kingdom")
+DONORS <- setdiff(seq_along(CT), UK)
+
+# CAREFUL: T0 here is the NUMBER of pre-treatment quarters, not a period index.
+# The treatment materialises in 2016Q3, which is t = 87.
+T0 <- 86
+E  <- c(`2018Q4` = 96, `2019Q4` = 100)
+Z1 <- Y[1:T0, UK]; Z0 <- Y[1:T0, DONORS]
+
+cat(sprintf("%d countries x %d quarters (%s to %s); %d donors; %d pre-treatment quarters\n",
+            ncol(Y), nrow(Y), QLAB[1], QLAB[104], length(DONORS), T0))
+```
+
+## The UK inside the donor cloud
+
+```{r}
+#| label: fig-gdp-paths
+long <- data.frame(date = rep(QDEC, 24), country = rep(CT, each = 104),
+                   y = as.vector(Y))
+long$uk <- long$country == "United Kingdom"
+ggplot(subset(long, !uk), aes(date, y, group = country)) +
+  geom_line(colour = GREY, linewidth = 0.35, alpha = 0.75) +
+  geom_line(data = subset(long, uk), colour = ORANGE, linewidth = 1.1) +
+  geom_vline(xintercept = 2016.50, linetype = "dashed", colour = TEAL) +
+  labs(title = "The United Kingdom is one line in a crowd",
+       subtitle = "Log real GDP (1995 average = 1); orange is the UK",
+       x = NULL, y = "log real GDP index")
+```
+
+No single donor tracks the UK, which is why we build a blend. But the 2008-09
+collapse is synchronised across every country, and that common movement is what
+the demeaned and time-weighted estimators exploit.
+
+## One solver, five jobs
+
+Every rung reduces to the same problem: minimise $\lVert b - Aw \rVert^2$ subject
+to $w \ge 0$ and $\sum_k w_k = 1$. Write it once.
+
+```{r}
+#| label: fit-solver
+simplex_ls <- function(A, b, ridge = 1e-10) {
+  k <- ncol(A)
+  w <- solve.QP(crossprod(A) + ridge * diag(k), crossprod(A, b),
+                cbind(rep(1, k), diag(k)), c(1, rep(0, k)), meq = 1)$solution
+  w[w < 1e-10] <- 0
+  w / sum(w)
+}
+
+loss <- function(w, b = 0) -100 * (Y[E, UK] - Y[E, DONORS] %*% w - b)
+res  <- data.frame()
+add  <- function(m, w, b = 0, note = "") {
+  v <- loss(w, b)
+  res <<- rbind(res, data.frame(method = m, `2018Q4` = round(v[1], 3),
+                                `2019Q4` = round(v[2], 3), note = note,
+                                check.names = FALSE))
+  invisible(NULL)
+}
+```
+
+## Rung 0 — Difference-in-differences
+
+Every donor counts the same; a unit fixed effect absorbs the level gap.
+
+```{r}
+#| label: fit-did
+w_did <- rep(1 / length(DONORS), length(DONORS))
+b_did <- mean(Z1 - Z0 %*% w_did)
+add("DiD", w_did, b_did, "uniform weights")
+cat(sprintf("pre-treatment RMSE: %.5f\n", sqrt(mean((Z1 - Z0 %*% w_did - b_did)^2))))
+```
+
+Nearly 5% — roughly double every other rung, and its pre-treatment fit error is
+four times synthetic control's. DiD is fitting a trend divergence that began years
+before the referendum.
+
+## Rung 1 — Synthetic control
+
+$$\hat{\omega}^{sc} = \arg\min_{\omega \in \mathbb{W}} \sum_{t=1}^{T_0} \Big( y_{1,t} - \sum_j \omega_j y_{j,t} \Big)^2$$
+
+```{r}
+#| label: fit-sc
+w_sc <- simplex_ls(Z0, Z1)
+add("SC (hand-coded)", w_sc, 0, "exact quadratic program")
+
+top <- data.frame(country = CT[DONORS], omega = round(w_sc, 4))
+print(head(top[order(-top$omega), ], 8), row.names = FALSE)
+cat(sprintf("\npre-treatment RMSPE: %.5f\n", sqrt(mean((Z1 - Z0 %*% w_sc)^2))))
+```
+
+```{r}
+#| label: fig-sc-fit
+syn <- as.vector(Y[, DONORS] %*% w_sc)
+df  <- data.frame(date = QDEC, uk = Y[, UK], syn = syn, gap = Y[, UK] - syn)
+
+pA <- ggplot(df, aes(date)) +
+  geom_line(aes(y = uk), colour = ORANGE, linewidth = 1) +
+  geom_line(aes(y = syn), colour = STEEL, linewidth = 1, linetype = "22") +
+  geom_vline(xintercept = 2016.50, linetype = "dashed", colour = TEAL) +
+  labs(title = "The UK and its synthetic control", x = NULL, y = "log real GDP index")
+pB <- ggplot(df, aes(date, gap)) +
+  geom_hline(yintercept = 0, colour = MUTED) +
+  geom_vline(xintercept = 2016.50, linetype = "dashed", colour = TEAL) +
+  geom_line(colour = STEEL, linewidth = 0.9) +
+  labs(x = NULL, y = "gap (log points)")
+pA / pB + plot_layout(heights = c(2, 1.2))
+```
+
+## Rung 2 — Demeaned synthetic control
+
+SC has no intercept, so it rejects a blend that moves in perfect parallel but sits
+at a different level. Demean first, add the offset back as a constant.
+
+```{r}
+#| label: fit-dsc
+w_dsc <- simplex_ls(sweep(Z0, 2, colMeans(Z0)), Z1 - mean(Z1))
+b_dsc <- mean(Z1 - Z0 %*% w_dsc)
+add("DSC (hand-coded)", w_dsc, b_dsc, sprintf("offset %+.5f", b_dsc))
+cat(sprintf("correlation of SC and DSC weights: %.4f\n", cor(w_sc, w_dsc)))
+```
+
+The offset is tiny, which is the finding: the synthetic control was already
+level-balanced, so SC was not sacrificing shape to chase level.
+
+## Rung 3 — Synthetic difference-in-differences
+
+The time-weight problem is the unit-weight problem run on the transpose.
+
+- $\omega$ asks which **countries**, blended, reproduce the UK.
+- $\lambda$ asks which **quarters**, blended, reproduce the treatment quarter.
+
+Note the two different demeanings: DSC removes each *country's* time-series mean;
+the $\lambda$ problem removes each *quarter's* cross-sectional mean.
+
+```{r}
+#| label: fit-sdid
+# A has donors as ROWS and quarters as COLUMNS, each quarter demeaned across donors.
+A_lam  <- sweep(t(Z0), 2, colMeans(t(Z0)))
+lambda <- simplex_ls(A_lam, Y[T0 + 1, DONORS] - mean(Y[T0 + 1, DONORS]))
+b_sdid <- drop(lambda %*% (Z1 - Z0 %*% w_dsc))
+add("SDID (hand-coded)", w_dsc, b_sdid,
+    sprintf("%.0f%% of lambda on %s", 100 * lambda[T0], QLAB[T0]))
+
+cat("Top time weights:\n")
+top_l <- order(-lambda)[1:4]
+for (k in top_l) if (lambda[k] > 1e-4) cat(sprintf("  %-8s %.4f\n", QLAB[k], lambda[k]))
+cat(sprintf("\nDSC offset %+.5f  vs  SDID offset %+.5f\n", b_dsc, b_sdid))
+```
+
+```{r}
+#| label: fig-lambda
+ld <- data.frame(date = QDEC[1:T0], lambda = lambda)
+rw <- data.frame(prev = as.vector(Z0[1:(T0-1), ]), cur = as.vector(Z0[2:T0, ]))
+
+pL <- ggplot(ld, aes(date, lambda)) +
+  geom_hline(yintercept = 1/T0, colour = GOLD, linetype = "22") +
+  geom_segment(aes(xend = date, yend = 0), colour = STEEL) +
+  geom_point(colour = STEEL, size = 1.5) +
+  labs(title = "Time weights collapse onto the last pre-treatment quarter",
+       subtitle = "Gold line: the uniform (two-way fixed effects) alternative",
+       x = NULL, y = "lambda")
+pR <- ggplot(rw, aes(prev, cur)) +
+  geom_abline(colour = ORANGE, linetype = "22") +
+  geom_point(colour = STEEL, alpha = 0.3, size = 0.8) +
+  labs(title = "Why: log GDP is nearly a random walk",
+       subtitle = sprintf("correlation %.5f", cor(rw$prev, rw$cur)),
+       x = "quarter t-1", y = "quarter t")
+pL / pR
+```
+
+If the best predictor of next quarter is this quarter, then the best blend of past
+quarters is the most recent one alone. The collapse is a property of GDP, not a bug.
+
+## Rung 4 — MASC
+
+A cross-validated blend of $m$-nearest-neighbour matching and synthetic control.
+
+```{r}
+#| label: fit-masc
+nn <- function(Z0, Z1, m) {
+  d <- colSums((Z1 - Z0)^2)
+  s <- d %in% sort(d)[1:m]
+  as.numeric(s) / sum(s)
+}
+
+# Rolling origin. NOTE: folds must run from 6 to T0-1. Passing masc's
+# `min_preperiods` to current package master yields only 5 folds, selects
+# phi = 1 (pure matching) and does not reproduce the published result.
+set_f <- 6:(T0 - 1)
+wt    <- rep(1 / length(set_f), length(set_f))
+ysc   <- vapply(set_f, function(k) drop(Z0[k+1, ] %*% simplex_ls(Z0[1:k, ], Z1[1:k])), 0)
+ytr   <- Z1[set_f + 1]
+cv <- do.call(rbind, lapply(1:10, function(m) {
+  ymt <- vapply(set_f, function(k) drop(Z0[k+1, ] %*% nn(Z0[1:k, ], Z1[1:k], m)), 0)
+  phi <- min(1, max(0, drop((wt*(ytr-ysc)) %*% (ymt-ysc) / ((wt*(ymt-ysc)) %*% (ymt-ysc)))))
+  data.frame(m = m, phi = phi, cv = sum(wt * (ytr - phi*ymt - (1-phi)*ysc)^2))
+}))
+best   <- cv[which.min(cv$cv), ]
+w_masc <- best$phi * nn(Z0, Z1, best$m) + (1 - best$phi) * w_sc
+add("MASC (hand-coded)", w_masc, 0, sprintf("m = %d, phi = %.3f", best$m, best$phi))
+print(transform(cv, phi = round(phi, 4), cv = signif(cv, 4)), row.names = FALSE)
+```
+
+```{r}
+#| label: fig-masc-cv
+ggplot(cv, aes(factor(m), cv)) +
+  geom_col(fill = STEEL, width = 0.7) +
+  geom_col(data = best, fill = TEAL, width = 0.7) +
+  geom_text(aes(label = sprintf("phi=%.2f", phi)), colour = TXT, vjust = -0.5, size = 3) +
+  labs(title = "MASC cross-validates the blend rather than guessing it",
+       x = "m (matched donors)", y = "rolling-origin CV error")
+```
+
+## Rung 5 — Augmented synthetic control
+
+Drop the non-negativity constraint; a ridge penalty pulls the weights back toward
+the SC solution. Weights may go negative.
+
+The ridge parameter is not ours to invent — `augsynth` picks it by
+leave-one-period-out cross-validation. Feed its choice back into the closed form
+and the two agree exactly.
+
+```{r}
+#| label: fit-ascm
+ascm <- function(lr) {
+  Xc  <- sweep(t(Z0), 2, colMeans(t(Z0)))
+  x1c <- Z1 - colMeans(t(Z0))
+  as.numeric(w_sc + solve(tcrossprod(Xc) + lr * diag(length(DONORS)),
+                          Xc %*% (x1c - crossprod(Xc, w_sc))))
+}
+w_as <- ascm(0.13858)          # the value augsynth's CV selects on this panel
+add("ASCM (hand-coded)", w_as, 0, sprintf("%d negative weights", sum(w_as < 0)))
+neg <- data.frame(country = CT[DONORS], omega = round(w_as, 4))
+print(head(neg[order(neg$omega), ], 5), row.names = FALSE)
+```
+
+## The same rungs, via their packages
+
+```{r}
+#| label: fit-packages
+if (has("synthdid")) {
+  Ysd  <- t(cbind(Y[1:(T0+1), DONORS], Y[1:(T0+1), UK]))   # units x time, treated LAST
+  p_sc <- synthdid::synthdid_estimate(Ysd, N0 = 23, T0 = T0, zeta.omega = 0,
+                                      zeta.lambda = 0, omega.intercept = FALSE,
+                                      lambda.intercept = FALSE)
+  p_sd <- synthdid::synthdid_estimate(Ysd, N0 = 23, T0 = T0, zeta.omega = 0,
+                                      zeta.lambda = 0, omega.intercept = TRUE,
+                                      lambda.intercept = TRUE)
+  o_sc <- attr(p_sc, "weights")$omega
+  o_sd <- attr(p_sd, "weights")$omega
+  l_sd <- attr(p_sd, "weights")$lambda
+  add("SC (synthdid)",   o_sc)
+  add("DSC (synthdid)",  o_sd, mean(Z1 - Z0 %*% o_sd))
+  add("SDID (synthdid)", o_sd, drop(l_sd %*% (Z1 - Z0 %*% o_sd)))
+  cat(sprintf("hand-coded vs package, SC weights: max abs difference %.3e\n",
+              max(abs(w_sc - o_sc))))
+}
+
+if (has("augsynth")) {
+  ad <- data.frame(unitnum = rep(1:24, each = T0 + 1), t = rep(1:(T0 + 1), 24),
+                   value = as.vector(Y[1:(T0 + 1), c(UK, DONORS)]))
+  ad$treatment <- as.integer(ad$unitnum == 1 & ad$t == T0 + 1)
+  a <- augsynth::augsynth(value ~ treatment, unitnum, t, ad,
+                          progfunc = "Ridge", scm = TRUE)
+  add("ASCM (augsynth)", as.numeric(a$weights), 0,
+      sprintf("CV lambda %.5f", a$lambda))
+  cat(sprintf("hand-coded vs package, ASCM weights: max abs difference %.3e\n",
+              max(abs(ascm(a$lambda) - as.numeric(a$weights)))))
+}
+```
+
+The hand-coded SC and the package differ by about 0.016 on individual weights and
+0.02 percentage points on the estimate. That is not a bug: with no ridge penalty
+the objective is nearly flat (condition number around $7 \times 10^5$), so
+`synthdid`'s Frank-Wolfe optimiser stops on its iteration cap rather than at the
+optimum. Section 8.4 of the post works through the whole convergence ladder.
+
+## The ladder, side by side
+
+```{r}
+#| label: results-table
+print(res, row.names = FALSE)
+cat("\nBorn et al. (2019) reported 2.4% at 2018Q4 and 3.6% at 2019Q4.\n")
+```
+
+```{r}
+#| label: fig-ladder
+main <- res[!grepl("hand-coded", res$method) | !grepl("SC \\(|DSC \\(|SDID \\(|ASCM \\(", res$method), ]
+main$method <- factor(main$method, levels = rev(main$method))
+ggplot(main, aes(`2018Q4`, method)) +
+  geom_vline(xintercept = 2.4, colour = ORANGE, linetype = "22") +
+  geom_point(colour = STEEL, size = 3.2) +
+  geom_text(aes(label = sprintf("%.2f", `2018Q4`)), vjust = -1, colour = TXT, size = 3) +
+  labs(title = "Every rung puts the Brexit cost above 2.4%",
+       subtitle = "Estimated 2018Q4 GDP shortfall, treatment dated 2016Q3, no covariates",
+       x = "GDP loss (%)", y = NULL,
+       caption = "Dashed line: Born et al. (2019).")
+```
+
+## Where to go next
+
+The post covers four things this notebook leaves out: the extrapolation-versus-
+interpolation bias decomposition that motivates the whole ladder, the in-sample
+placebo tournament over twenty artificial treatment dates, the covariates verdict,
+and permutation inference. Run `analysis.R` in this folder to reproduce all
+eighteen figures and every table.
+
+<https://carlos-mendez.org/post/r_sc_dsc_sdid/>

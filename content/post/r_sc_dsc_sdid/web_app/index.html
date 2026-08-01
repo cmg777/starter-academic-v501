@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Synthetic Control Ladder — Brexit</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow">Interactive companion</p>
+  <h1>Build a counterfactual United Kingdom</h1>
+  <p class="lede">
+    There is only one United Kingdom, and it voted to leave the European Union.
+    Every estimator below constructs a stand-in for it out of 23 other OECD
+    economies, and they disagree about what Brexit cost. Turn the dials and watch
+    where the disagreement comes from.
+  </p>
+</header>
+
+<main>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>1. The counterfactual</h2>
+    <p>Pick an estimator. The dashed line is the synthetic UK it produces; the shaded
+       band after the referendum is the estimated shortfall.</p>
+  </div>
+
+  <div class="controls" id="method-buttons"></div>
+
+  <div class="chart-wrap"><svg id="chart-paths" role="img"
+       aria-label="Actual and synthetic UK log real GDP over time"></svg></div>
+
+  <div class="readout" id="readout"></div>
+
+  <div class="chart-wrap"><svg id="chart-gap" role="img"
+       aria-label="Gap between actual and synthetic UK over time"></svg></div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>2. Who is in the blend?</h2>
+    <p>The unit weights. Four of the five recipes are nearly the same blend; only the
+       augmented synthetic control is allowed to go negative.</p>
+  </div>
+  <div class="chart-wrap"><svg id="chart-weights" role="img"
+       aria-label="Donor weights for the selected estimator"></svg></div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>3. Which quarters count?</h2>
+    <p>Synthetic difference-in-differences also weights the <em>pre-treatment
+       quarters</em>. Here almost all of that weight lands on one quarter, because
+       log GDP behaves like a random walk.</p>
+  </div>
+  <div class="chart-wrap"><svg id="chart-lambda" role="img"
+       aria-label="Estimated SDID time weights across pre-treatment quarters"></svg></div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>4. The ladder, side by side</h2>
+    <p>Every estimator's answer, against the 2.4% figure previously published for
+       this dataset. Hover a bar for its note.</p>
+  </div>
+  <div class="controls" id="horizon-buttons"></div>
+  <div class="chart-wrap"><svg id="chart-ladder" role="img"
+       aria-label="Estimated GDP loss by method"></svg></div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>5. The fire drill</h2>
+    <p>Move the treatment date back to a quarter when nothing happened, and every
+       estimate is pure error. Lower is better. Switch the grading horizon to see
+       why the published ranking of the three SDID variants does not survive.</p>
+  </div>
+  <div class="controls" id="placebo-buttons"></div>
+  <div class="chart-wrap"><svg id="chart-placebo" role="img"
+       aria-label="Placebo root mean squared error by method"></svg></div>
+  <p class="note" id="placebo-note"></p>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>6. Where the optimiser stopped</h2>
+    <p>With no ridge penalty the objective is nearly flat, so the package's
+       Frank&ndash;Wolfe solver halts on its iteration cap rather than at the optimum.
+       The published estimate is the value it happens to be passing through.</p>
+  </div>
+  <div class="chart-wrap"><svg id="chart-solver" role="img"
+       aria-label="Estimate as a function of optimiser iterations"></svg></div>
+</section>
+
+<footer>
+  <p>
+    Companion to <a href="/post/r_sc_dsc_sdid/">From DiD to SDID: A Ladder of
+    Synthetic Control Estimators</a>. Data and estimates from
+    <code>analysis.R</code>; every number here is computed in R, not in the browser.
+  </p>
+  <p class="cite">
+    de Brabander, Juodis &amp; Miyazato Szini (2025), <em>Econometric Reviews</em>
+    44(10), 1617&ndash;1646 &middot; Born, M&uuml;ller, Schularick &amp; Sedl&aacute;&#269;ek (2019),
+    <em>The Economic Journal</em> 129(623), 2722&ndash;2744.
+  </p>
+</footer>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"
+        integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i"
+        crossorigin="anonymous"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
