@@ -87,7 +87,7 @@ diagram: true
 
 ## Abstract
 
-The United Kingdom voted to leave the European Union on 23 June 2016, and because there is only one United Kingdom, the cost of that decision can only be measured against a country that never existed. This tutorial builds that country seven times over, climbing the ladder of single-treated-unit estimators — difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control — with every rung hand-coded first and then run with its R package. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4, leaving the UK as the treated unit, 23 donors and 86 pre-treatment quarters. Dating the treatment at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.06% under synthetic control, 2.99% under demeaned SC, 2.76% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.20% a year later — every one of them larger than the 2.4% previously reported for this dataset. A placebo tournament over twenty artificial treatment dates ranks the SDID family first, at 0.0067 log points of root mean squared error against 0.0089 for plain synthetic control, and shows that covariates make the counterfactual worse rather than better. Two things emerge that the published tables hide: the headline synthetic-control number is partly an artefact of where the optimiser stopped, and the ranking among the three SDID variants dissolves once they are graded on the same forecast horizon. The whole ladder is then ported to Stata and Python, which reproduces every estimate and sharpens the first of those findings — three independent implementations split into two camps by solver rather than by language.
+The United Kingdom voted to leave the European Union on 23 June 2016, and because there is only one United Kingdom, that decision can only be costed against a country that never existed. This tutorial builds that country seven times over, hand-coding every rung of the single-treated-unit ladder before running it with its R package: difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4: the UK treated, 23 donors, 86 pre-treatment quarters. Dating the treatment at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.06% under synthetic control, 2.99% under demeaned SC, 2.76% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.20% a year later — every one larger than the 2.4% previously reported for this dataset. A placebo tournament over twenty artificial treatment dates ranks the SDID family first, at 0.0067 log points of root mean squared error against 0.0089 for plain SC, and shows covariates make the counterfactual worse rather than better. Two things the published tables hide: the headline synthetic-control number is partly an artefact of where the optimiser stopped, and the ranking among the three SDID variants dissolves once they are graded on the same forecast horizon. Porting the ladder to Stata and Python sharpens the first: three independent implementations split by solver, not by language.
 
 ## 1. Overview
 
@@ -927,7 +927,7 @@ cv <- do.call(rbind, lapply(1:10, function(m) {
 
 ```text
   hand-coded : m = 10, phi = 0.1577
-  masc package: m = 10, phi = 0.1577   |hand - package| = 2.220e-16
+  masc package: m = 10, phi = 0.1577   |hand - package| = 0.000e+00
   MASC                   2018Q4  2.726   2019Q4  3.828   m = 10, phi = 0.158
 ```
 
@@ -1125,7 +1125,7 @@ s_dsc  <- synth(X1 = X1d, X0 = X0d, Z1 = as.matrix(Z1_dm), Z0 = Z0_dm) # DSC cov
 
 **Interpretation.** The first row is the headline. **SC(B) with mean covariates gives 2.43% at 2018Q4 and 3.61% at 2019Q4** — that is Born et al.'s 2.4% and 3.6%, reproduced to the second decimal. So the gap between the earlier published figure and everything else in this post is not a data difference or a coding difference. It is entirely the choice of estimator, and specifically the choice to score covariates in both optimisation loops.
 
-Note also that the four covariate rows sit *below* their no-covariate counterparts in three cases out of four, and that our `Synth`-based numbers drift from the published ones by up to 0.08 percentage points. That drift is honest and expected: the outer optimisation over the predictor-importance matrix is not convex, `Synth` runs a derivative-free search over 92 dimensions, and different starting values land in different local optima. When a specification's answer depends on where the optimiser started, that is information about the specification.
+Note also that the four covariate rows sit *below* their no-covariate counterparts in every case, and that our `Synth`-based numbers drift from the published ones by up to 0.08 percentage points. That drift is honest and expected: the outer optimisation over the predictor-importance matrix is not convex, `Synth` runs a derivative-free search over 92 dimensions, and different starting values land in different local optima. When a specification's answer depends on where the optimiser started, that is information about the specification.
 
 But the decisive evidence is not in this table at all — it is in the placebo tournament. Rerunning section 15 with covariates in the matching set makes almost every estimator *worse*:
 
@@ -1166,7 +1166,7 @@ Four departures from the headline specification, each a short table and a single
  SDID (i)   2.758      2.818
 ```
 
-**Interpretation.** Every estimate moves by less than 0.06 percentage points and all three move *up*. Whatever the no-interference assumption is doing here, it is not driving the result.
+**Interpretation.** Every estimate moves by at most 0.06 percentage points and all three move *up*. Whatever the no-interference assumption is doing here, it is not driving the result.
 
 **(c) The ridge penalty.** Arkhangelsky and coauthors propose an automatic regularisation of the unit weights, whose main theoretical benefit is that it makes the solution unique — which, given section 8.4, is not a trivial gain.
 
@@ -1183,9 +1183,20 @@ In words, the penalty scale is the standard deviation of donors' quarter-to-quar
 
 **Interpretation.** Penalising moves SC up by 0.04, DSC up by 0.11 and SDID down by 0.12. All within the spread we have already seen. The penalty is worth switching on for the uniqueness it buys, not because it changes any conclusion.
 
+**(d) Mean covariates.** Section 16 asks whether covariates help as a matter of estimator design; the same question belongs here as a specification cell, because it is the one departure that moves every rung in the same direction.
+
+```text
+   method no_covariates with_covariates
+       SC         3.056           3.028
+      DSC         2.985           2.942
+ SDID (i)         2.758           2.731
+```
+
+**Interpretation.** All three fall, and none by more than 0.05 percentage points. The covariate route that genuinely moves the answer is SC(B) at 2.43%, and that is a different *estimator* — `Synth`'s nested optimisation over 92 predictors — rather than a different specification of the ones on this ladder. Section 16 has the detail.
+
 ![Specification zoo: estimated 2018Q4 GDP loss under five departures from the headline specification, coloured by method, against Born et al.'s reference line](r_sc_dsc_sdid_17_robustness_grid.png)
 
-**Interpretation.** Across every specification in this section, the estimated loss sits between roughly **2.6% and 3.2%**. Only the SC(B)-with-covariates cell reaches down to 2.4%. That is the whole robustness story in one picture, and it is the reason the source paper insists on reporting a cloud rather than a point.
+**Interpretation.** Across every specification in this section, the estimated loss sits between roughly **2.6% and 3.2%**. Nothing plotted here reaches Born et al.'s 2.4% — the closest is SDID under the ridge penalty, at 2.64. Only SC(B) gets there, and it sits in section 16 rather than in this figure. That is the whole robustness story in one picture, and it is the reason the source paper insists on reporting a cloud rather than a point.
 
 ## 18. Inference: what the paper does not do
 
@@ -1211,14 +1222,14 @@ placebo_space <- lapply(DONORS, function(j) {
   UK post/pre RMSPE ratio : 5.82
   rank among 24 countries : 1
   permutation p-value     : 0.042  (finest attainable: 0.042)
-  synthdid placebo standard error (SDID): 0.00957 log points
+  synthdid placebo standard error (SDID): 0.00948 log points
 ```
 
 ![Twenty-three grey placebo gap paths with the United Kingdom's gap in orange, showing the UK's post-referendum divergence as the most extreme in the sample](r_sc_dsc_sdid_18_placebo_in_space.png)
 
 **Interpretation.** The UK's post-treatment fit error is **5.8 times** its pre-treatment fit error, and that ratio is the **largest of all 24 countries**. The permutation p-value is therefore **0.042**, the smallest value this design can produce. Visually, the orange line leaves the grey band shortly after the referendum and never returns.
 
-The `synthdid` placebo standard error tells a more sobering story: **0.0096 log points**, which puts a conventional 95% interval around the SDID estimate at roughly **0.9% to 4.6%**. The point estimate is much better determined than the interval, which is the normal state of affairs with one treated unit and 23 donors. Anyone quoting "Brexit cost 2.8% of GDP" without that interval is overstating what this design can deliver.
+The `synthdid` placebo standard error tells a more sobering story: **0.0095 log points**, which puts a conventional 95% interval around the SDID estimate at roughly **0.9% to 4.6%**. The point estimate is much better determined than the interval, which is the normal state of affairs with one treated unit and 23 donors. Anyone quoting "Brexit cost 2.8% of GDP" without that interval is overstating what this design can deliver.
 
 ### 18.2 What this can and cannot tell you
 
@@ -1261,12 +1272,12 @@ Shortfall in UK real GDP (%), treatment dated 2016Q3, outcomes only.
 |---|---|---|---|---|---|---|
 | DiD | 4.98 | 4.98 | 4.98 | 6.18 | 6.18 | 6.18 |
 | SC | 3.06 | 3.06 | **3.04** | 4.20 | 4.20 | **4.17** |
-| DSC | 2.98 | 2.98 | 3.00 | 4.12 | 4.12 | 4.10 |
-| SDID | 2.79 | 2.79 | **2.80** | 3.92 | 3.92 | **3.94** |
+| DSC | 2.99 | 2.99 | 2.99 | 4.12 | 4.12 | 4.12 |
+| SDID (ii) | 2.79 | 2.79 | **2.80** | 3.92 | 3.92 | **3.94** |
 | MASC | 2.73 | — | 2.73 | 3.83 | — | 3.83 |
 | ASCM | 3.04 | 3.10 | 3.04 | 4.19 | 4.22 | 4.19 |
 
-Stata reproduces R to five decimal places on every rung it can fit. Python agrees exactly on DiD, MASC and ASCM, and differs in the second decimal on SC, DSC and SDID.
+The SDID row reports variant (ii) in all three languages, so that the comparison is like with like; section 14's headline SDID is variant (i), at 2.76. Stata reproduces R to five decimal places on every rung it can fit. Python agrees on DiD, DSC, MASC and ASCM, and differs in the second decimal on SC and SDID.
 
 ### 19.3 The disagreement is the finding
 
