@@ -66,7 +66,7 @@ Every decimal figure in the brief appears in the source post:
 | 3 | Six estimators forming a ladder, each fixing the last | FULL — Panel 3 |
 | 4 | Extrapolation vs interpolation bias; SDID targets both | FULL — Panel 4 |
 | 5 | The in-sample placebo tournament ranks SDID first | FULL — Panel 5 |
-| 6 | Every rung exceeds the previously published 2.4% | FULL — Panel 6 |
+| 6 | Every stage exceeds the previously published 2.4% | FULL — Panel 6 |
 | 7 | Covariates make the counterfactual worse | PARTIAL — Panel 6 body sentence, no on-image element |
 | 8 | The horizon artefact in the published SDID ranking | PARTIAL — Panel 5 body sentence, no on-image element |
 | 9 | The solver stopped early; the published SC number is an artefact | OMITTED — deliberately |

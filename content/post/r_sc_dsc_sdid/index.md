@@ -61,7 +61,7 @@ links:
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_sc_dsc_sdid/index.md
 slides:
-summary: "Climbing the ladder from difference-in-differences to synthetic difference-in-differences, one rung at a time, with every estimator hand-coded before it is run with its package. The case study is the 2016 Brexit referendum and what it cost UK GDP. Includes cheat sheets in R, Stata and Python."
+summary: "Climbing the ladder from difference-in-differences to synthetic difference-in-differences, one stage at a time, with every estimator hand-coded before it is run with its package. The case study is the 2016 Brexit referendum and what it cost UK GDP. Includes cheat sheets in R, Stata and Python."
 tags:
   - r
   - stata
@@ -87,7 +87,7 @@ diagram: true
 
 ## Abstract
 
-The United Kingdom voted to leave the European Union on 23 June 2016, and because there is only one United Kingdom, that decision can only be costed against a country that never existed. This tutorial builds that country seven times over, hand-coding every rung of the single-treated-unit ladder before running it with its R package: difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4: the UK treated, 23 donors, 86 pre-treatment quarters. Dating the treatment at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.06% under synthetic control, 2.99% under demeaned SC, 2.76% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.20% a year later — every one larger than the 2.4% previously reported for this dataset. A placebo tournament over twenty artificial treatment dates ranks the SDID family first, at 0.0067 log points of root mean squared error against 0.0089 for plain SC, and shows covariates make the counterfactual worse rather than better. Two things the published tables hide: the headline synthetic-control number is partly an artefact of where the optimiser stopped, and the ranking among the three SDID variants dissolves once they are graded on the same forecast horizon. Porting the ladder to Stata and Python sharpens the first: three independent implementations split by solver, not by language.
+The United Kingdom voted to leave the European Union on 23 June 2016, and because there is only one United Kingdom, that decision can only be costed against a country that never existed. This tutorial builds that country seven times over, hand-coding every stage of the single-treated-unit ladder before running it with its R package: difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4: the UK treated, 23 donors, 86 pre-treatment quarters. Dating the treatment at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.06% under synthetic control, 2.99% under demeaned SC, 2.76% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.20% a year later — every one larger than the 2.4% previously reported for this dataset. A placebo tournament over twenty artificial treatment dates ranks the SDID family first, at 0.0067 log points of root mean squared error against 0.0089 for plain SC, and shows covariates make the counterfactual worse rather than better. Two things the published tables hide: the headline synthetic-control number is partly an artefact of where the optimiser stopped, and the ranking among the three SDID variants dissolves once they are graded on the same forecast horizon. Porting the ladder to Stata and Python sharpens the first: three independent implementations split by solver, not by language.
 
 ## 1. Overview
 
@@ -95,15 +95,15 @@ On 23 June 2016 the United Kingdom voted to leave the European Union. Three and 
 
 The standard move is to build that missing country out of the countries we do observe. Take the other OECD economies, give each one a weight, add them up, and require that the resulting blend tracks the real UK quarter by quarter through the two decades *before* the referendum. If the blend and the UK were indistinguishable for eighty-six quarters, the argument goes, the blend is a credible stand-in for the UK afterwards. Whatever gap opens up after 2016 is the estimated effect.
 
-That is the synthetic control method, and it is the second rung of a ladder. This tutorial climbs the whole ladder. We start at the bottom, with difference-in-differences, which is the same construction with the weights frozen at one twenty-third. Then we let the data choose the weights (synthetic control). Then we allow the blend to sit at a different *level* from the UK, provided it moves in parallel (demeaned synthetic control). Then we let the data also choose *which pre-treatment quarters* to hold the blend accountable for (synthetic difference-in-differences). Then two more recent estimators that attack the problem from different directions: a cross-validated blend of matching and synthetic control (MASC), and a ridge-augmented synthetic control that is allowed to use negative weights (ASCM).
+That is the synthetic control method, and it is the second stage of a ladder. This tutorial climbs the whole ladder. We start at the bottom, with difference-in-differences, which is the same construction with the weights frozen at one twenty-third. Then we let the data choose the weights (synthetic control). Then we allow the blend to sit at a different *level* from the UK, provided it moves in parallel (demeaned synthetic control). Then we let the data also choose *which pre-treatment quarters* to hold the blend accountable for (synthetic difference-in-differences). Then two more recent estimators that attack the problem from different directions: a cross-validated blend of matching and synthetic control (MASC), and a ridge-augmented synthetic control that is allowed to use negative weights (ASCM).
 
-Every rung opens with the same question: **what does the previous rung get wrong?** That question has a precise answer, and it is the intellectual centre of this post. Following de Brabander, Juodis and Miyazato Szini [1], we will decompose the error of any weighted counterfactual into two pieces: an *extrapolation* bias and an *interpolation* bias. Synthetic control's unit weights attack only the first. Nearest-neighbour matching attacks only the second. SDID's time weights are what let a single estimator attack both. Once you have that picture, the ladder stops being a list of acronyms and becomes a sequence of answers to one question.
+Every stage opens with the same question: **what does the previous stage get wrong?** That question has a precise answer, and it is the intellectual centre of this post. Following de Brabander, Juodis and Miyazato Szini [1], we will decompose the error of any weighted counterfactual into two pieces: an *extrapolation* bias and an *interpolation* bias. Synthetic control's unit weights attack only the first. Nearest-neighbour matching attacks only the second. SDID's time weights are what let a single estimator attack both. Once you have that picture, the ladder stops being a list of acronyms and becomes a sequence of answers to one question.
 
 We do everything twice. Each estimator is first written from scratch, in ten or twenty lines of R, so you can see exactly which optimisation problem is being solved and what is being held fixed. Only then do we call the package — `synthdid`, `Synth`, `masc`, `augsynth` — and check that the two agree. When they do not agree, we find out why, and in one case the answer turns out to be more interesting than the agreement would have been.
 
-The empirical stakes are real. Born, Müller, Schularick and Sedláček [2] estimated, using this same dataset, that the referendum had cost the UK about 2.4% of GDP by the end of 2018. Every rung of the ladder we build puts the number higher.
+The empirical stakes are real. Born, Müller, Schularick and Sedláček [2] estimated, using this same dataset, that the referendum had cost the UK about 2.4% of GDP by the end of 2018. Every stage of the ladder we build puts the number higher.
 
-> Three companion posts on this site cover pieces of this ground in isolation: [the classic synthetic control on the Basque Country](/post/r_basic_synthetic_control/), [the augmented synthetic control on the Kansas tax cuts](/post/r_augsynth/), and [synthetic difference-in-differences on Proposition 99 in Stata](/post/stata_sdid/). This post is the one that puts them on a single ladder and asks which rung to stand on.
+> Three companion posts on this site cover pieces of this ground in isolation: [the classic synthetic control on the Basque Country](/post/r_basic_synthetic_control/), [the augmented synthetic control on the Kansas tax cuts](/post/r_augsynth/), and [synthetic difference-in-differences on Proposition 99 in Stata](/post/stata_sdid/). This post is the one that puts them on a single ladder and asks which stage to choose.
 
 ### 1.1 Learning objectives
 
@@ -388,7 +388,7 @@ ggplot(donors, aes(date, y, group = country)) +
 
 ![Log real GDP for 24 OECD countries from 1995 to 2020, with the United Kingdom highlighted in orange among 23 grey donor paths and a dashed vertical line at the 2016 referendum](r_sc_dsc_sdid_01_gdp_paths.png)
 
-**Interpretation.** The UK is one line in a crowd. No single donor tracks it, which is the whole reason we will be building a *blend*. But look at 2008–09: every line collapses at once. That synchronised movement is a common factor, and the estimators from rung three onward are built precisely to exploit it.
+**Interpretation.** The UK is one line in a crowd. No single donor tracks it, which is the whole reason we will be building a *blend*. But look at 2008–09: every line collapses at once. That synchronised movement is a common factor, and the estimators from stage three onward are built precisely to exploit it.
 
 Now the same picture with the crowd averaged into a single line. This *is* the difference-in-differences counterfactual, drawn before we name it.
 
@@ -426,7 +426,7 @@ In words, this says: regress the outcome on a country effect, a quarter effect a
 
 The entire ladder is a table of settings for that one expression:
 
-| Rung | Unit weights $\omega$ | Time weights $\lambda$ | Unit effect $\alpha$ | Feasible set for $\omega$ |
+| Stage | Unit weights $\omega$ | Time weights $\lambda$ | Unit effect $\alpha$ | Feasible set for $\omega$ |
 |---|---|---|---|---|
 | DiD | fixed at $1/J$ | fixed at $1/(T\_0-1)$ | yes | — |
 | SC | optimised | none | **no** | simplex |
@@ -464,11 +464,11 @@ graph TD
     style F2 fill:#d97757,stroke:#141413,color:#fff
 ```
 
-Two things are worth pausing on. First, synthetic control is the only rung that switches the unit fixed effect *off*, and that single omission is what forces it to match the UK's level as well as its shape. Second, MASC and ASCM hang off a different branch: they do not re-weight the regression, they change what counts as an admissible weight vector.
+Two things are worth pausing on. First, synthetic control is the only stage that switches the unit fixed effect *off*, and that single omission is what forces it to match the UK's level as well as its shape. Second, MASC and ASCM hang off a different branch: they do not re-weight the regression, they change what counts as an admissible weight vector.
 
 ### 6.1 One solver, used five times
 
-Every rung reduces to the same problem — minimise a sum of squares over the simplex — with different inputs. So we write the solver once:
+Every stage reduces to the same problem — minimise a sum of squares over the simplex — with different inputs. So we write the solver once:
 
 $$\underset{w}{\min} \\, \lVert b - A w \rVert^{2} \quad \text{subject to} \quad w\_k \geq 0 \\, \text{for all } k, \quad \sum\_k w\_k = 1$$
 
@@ -489,7 +489,7 @@ simplex_ls <- function(A, b, ridge = 1e-10) {
 
 The `1e-10` on the diagonal is numerical hygiene so the Cholesky factorisation never fails. It is *not* the regularisation parameter of Arkhangelsky and coauthors, which is a modelling choice we look at in section 17.
 
-## 7. Rung 1 — Difference-in-differences
+## 7. Stage 1 — Difference-in-differences
 
 DiD is the ladder's ground floor: every donor counts the same, and a unit fixed effect absorbs whatever constant level gap remains.
 
@@ -509,11 +509,11 @@ c(loss(w_did, 96, b_did), loss(w_did, 100, b_did))
   pre-treatment RMSE vs the donor average : 0.02175
 ```
 
-**Interpretation.** DiD says Brexit cost the UK **4.98% of GDP** by the end of 2018 and **6.18%** by the end of 2019 — roughly double what every other rung will report. It is not in the source paper's tables, and it should not be trusted: its pre-treatment fit error is **0.0218 log points**, four times what synthetic control will achieve. The estimator is fitting a trend divergence that began years before the referendum and calling it Brexit.
+**Interpretation.** DiD says Brexit cost the UK **4.98% of GDP** by the end of 2018 and **6.18%** by the end of 2019 — roughly double what every other stage will report. It is not in the source paper's tables, and it should not be trusted: its pre-treatment fit error is **0.0218 log points**, four times what synthetic control will achieve. The estimator is fitting a trend divergence that began years before the referendum and calling it Brexit.
 
-DiD's error is that it gave Luxembourg and the United States the same vote. The next rung lets the data vote.
+DiD's error is that it gave Luxembourg and the United States the same vote. The next stage lets the data vote.
 
-## 8. Rung 2 — Synthetic control
+## 8. Stage 2 — Synthetic control
 
 ### 8.1 The optimisation problem
 
@@ -539,7 +539,7 @@ Two constraints, non-negativity and summing to one, sound innocuous. Geometrical
 
 ![Donor countries plotted by their average log GDP early and late in the pre-treatment period, with the convex hull shaded and the UK marked inside it](r_sc_dsc_sdid_04_convex_hull.png)
 
-**Interpretation.** The shaded region is everything a non-negative blend can reach. The UK sits comfortably inside it, which is why synthetic control works well here. Had the orange point fallen outside the band — a very rich or very poor treated unit — no recipe of non-negative shares could have reached it, and we would need rung six.
+**Interpretation.** The shaded region is everything a non-negative blend can reach. The UK sits comfortably inside it, which is why synthetic control works well here. Had the orange point fallen outside the band — a very rich or very poor treated unit — no recipe of non-negative shares could have reached it, and we would need stage six.
 
 That picture is in *outcome* space. The optimisation happens in *weight* space, which is a different object. Restrict attention to the three donors that end up carrying the most weight and you can draw the entire search:
 
@@ -564,7 +564,7 @@ sd_sc <- synthdid_estimate(Y_sd[, 1:87], N0 = 23, T0 = 86,
 w_sc_pkg <- as.numeric(attr(sd_sc, "weights")$omega)
 ```
 
-Why call `synthdid` rather than `Synth` here? Because with no covariates, the classic synthetic-control problem of the equation above *is* `synthdid_estimate` with both intercepts off and both penalties set to zero. Using one optimiser for the whole ladder means every difference we report between rungs is the method, not the solver. `Synth` reappears in section 16, where its nested optimisation is genuinely needed.
+Why call `synthdid` rather than `Synth` here? Because with no covariates, the classic synthetic-control problem of the equation above *is* `synthdid_estimate` with both intercepts off and both penalties set to zero. Using one optimiser for the whole ladder means every difference we report between stages is the method, not the solver. `Synth` reappears in section 16, where its nested optimisation is genuinely needed.
 
 There is a third way to solve the same problem, and we need it in a moment. `synthdid` does not call a quadratic programming solver at all — internally it runs **Frank–Wolfe**, an iterative method that walks toward the optimum one simplex vertex at a time. Porting it is twenty lines, and it is the only way to see what the package is actually doing:
 
@@ -664,7 +664,7 @@ For the rest of the post we report the package answer, so the tables line up wit
 
 **Interpretation.** Twenty-one years of near-perfect tracking, then a gap that opens right at the referendum and keeps widening: **3.06%** by 2018Q4 and **4.20%** by 2019Q4. The flatness of the gap before 2016 is what licenses reading the gap after 2016 as an effect.
 
-## 9. Rung 3 — Demeaned synthetic control
+## 9. Stage 3 — Demeaned synthetic control
 
 ### 9.1 What SC gets wrong
 
@@ -686,14 +686,14 @@ $$\hat{\tau}^{dsc}\_{t} = y\_{1,t} - \sum\_{j=2}^{J+1} \hat{\omega}^{dsc}\_{j}\\
 
 In words, the raw gap minus the offset we already knew about from before the referendum.
 
-Adding $b^{dsc}$ is algebraically identical to putting the unit fixed effect $\alpha\_j$ back into the master regression of section 6. And that gives us a tidy result: **DiD is DSC with the weights frozen at $1/J$.** The ground floor and the third rung are the same estimator with different $\omega$.
+Adding $b^{dsc}$ is algebraically identical to putting the unit fixed effect $\alpha\_j$ back into the master regression of section 6. And that gives us a tidy result: **DiD is DSC with the weights frozen at $1/J$.** The ground floor and the third stage are the same estimator with different $\omega$.
 
 ### 9.2 Two changed lines
 
 ```r
 Z0_dm <- sweep(Z0, 2, colMeans(Z0))       # <-- the only change, part 1
 Z1_dm <- Z1 - mean(Z1)                    # <-- the only change, part 2
-w_dsc_qp <- simplex_ls(Z0_dm, Z1_dm)      # identical call to rung 2
+w_dsc_qp <- simplex_ls(Z0_dm, Z1_dm)      # identical call to stage 2
 
 # The package: one argument flips.
 sd_dsc <- synthdid_estimate(Y_sd[, 1:87], N0 = 23, T0 = 86,
@@ -714,7 +714,7 @@ b_dsc <- mean(Z1 - Z0 %*% w_dsc)
 
 **Interpretation.** DSC is SC's curve slid up by a single number, and here that number is **+0.0024 log points** — about a quarter of one percent. The estimate moves from 3.06% to **2.99%**. This is an anticlimax, and the anticlimax is the finding: a small bias adjustment means the synthetic control was *already* level-balanced, so SC was not sacrificing shape to chase level. On a dataset where the treated unit sits awkwardly relative to the donor pool, this term would be doing real work. Notice also that the two weight vectors correlate at **0.993** — demeaning barely changed who gets picked, only how the result is read off.
 
-## 10. Rung 4 — Synthetic difference-in-differences
+## 10. Stage 4 — Synthetic difference-in-differences
 
 ### 10.1 What DSC gets wrong
 
@@ -735,18 +735,18 @@ In words, find the blend of pre-referendum quarters that best predicts the treat
 
 $$\mathbb{L} = \left\\{ \boldsymbol{\lambda} \in \mathbb{R}^{T\_0-1} : \lambda\_t \geq 0 \\, \text{for all } t, \\, \sum\_{t=1}^{T\_0-1} \lambda\_t = 1 \right\\}$$
 
-> **A trap worth naming.** The word "demeaned" means two *different* things in rung three and rung four. DSC removes each **country's** own time-series mean: `sweep(Z0, 2, colMeans(Z0))`. The SDID time-weight problem removes each **quarter's** cross-sectional mean: `sweep(Z0, 1, rowMeans(Z0))`. Same verb, orthogonal operations. If you take one thing away from this section, take that.
+> **A trap worth naming.** The word "demeaned" means two *different* things in stage three and stage four. DSC removes each **country's** own time-series mean: `sweep(Z0, 2, colMeans(Z0))`. The SDID time-weight problem removes each **quarter's** cross-sectional mean: `sweep(Z0, 1, rowMeans(Z0))`. Same verb, orthogonal operations. If you take one thing away from this section, take that.
 
 The bias adjustment then becomes a weighted average instead of a flat one:
 
 $$b^{sdid} = \sum\_{t=1}^{T\_0-1} \hat{\lambda}^{sdid}\_{t} \left( y\_{1,t} - \sum\_{j=2}^{J+1} \hat{\omega}^{dsc}\_{j}\\, y\_{j,t} \right)$$
 
-Compare that with $b^{dsc}$ two sections above. They are the same expression with $1/(T\_0-1)$ replaced by $\hat{\lambda}\_t$. **That is the entire difference between rungs three and four.** SDID does not even estimate its own unit weights — it reuses DSC's.
+Compare that with $b^{dsc}$ two sections above. They are the same expression with $1/(T\_0-1)$ replaced by $\hat{\lambda}\_t$. **That is the entire difference between stages three and four.** SDID does not even estimate its own unit weights — it reuses DSC's.
 
 ```r
 # A has donors as ROWS and quarters as COLUMNS -- the transpose of the omega
 # problem. `intercept = TRUE` demeans each quarter across donors, rather than
-# each country across quarters as rung 3 did.
+# each country across quarters as stage 3 did.
 #
 # We use the Frank-Wolfe port here rather than simplex_ls, so that the result is
 # comparable with the package to the last bit. The exact QP gives the same
@@ -754,8 +754,8 @@ Compare that with $b^{dsc}$ two sections above. They are the same expression wit
 lambda <- simplex_fw(t(Z0), Y[87, DONORS], intercept = TRUE,
                      min.decrease = 1e-5 * sd(apply(t(Z0), 1, diff)))
 
-b_dsc  <- mean(Z1 - Z0 %*% w_dsc)              # rung 3: flat average
-b_sdid <- drop(lambda %*% (Z1 - Z0 %*% w_dsc)) # rung 4: weighted average
+b_dsc  <- mean(Z1 - Z0 %*% w_dsc)              # stage 3: flat average
+b_sdid <- drop(lambda %*% (Z1 - Z0 %*% w_dsc)) # stage 4: weighted average
 ```
 
 ```text
@@ -802,7 +802,7 @@ The time weights have to be fitted against *something* in the post-treatment per
 
 ## 11. The pivot: extrapolation bias and interpolation bias
 
-We now have four rungs and no principled reason to prefer any of them. This section supplies one, and it is the theoretical contribution of the source paper.
+We now have four stages and no principled reason to prefer any of them. This section supplies one, and it is the theoretical contribution of the source paper.
 
 ### 11.1 A warning about the names
 
@@ -887,7 +887,7 @@ Only one node has two arrows pointing into it. Synthetic control minimises extra
 
 Do not over-learn this. The decomposition assumes a common response function across countries and sets the idiosyncratic error aside entirely. SDID "targets" both biases, but it pays for the privilege by estimating 85 extra parameters, and the source paper's own conclusion is that the gain over DSC is "marginal at best" for the kind of trend specification we have here. Section 20 returns to this.
 
-## 12. Rung 5 — MASC
+## 12. Stage 5 — MASC
 
 ### 12.1 Buying the trade-off explicitly
 
@@ -937,11 +937,11 @@ cv <- do.call(rbind, lapply(1:10, function(m) {
 
 > **A trap in the package.** The published replication code passes `masc`'s `min_preperiods` argument, but current package master reads that value as the fold *start*, producing only five folds. Five folds select $\phi = 1$ — pure matching — and an estimate of 2.36%, which does not match the published result. The authors' numbers correspond to folds running from 6 to $T\_0 - 1$, so we set `set_f` explicitly. Silent, plausible-looking, and wrong by a third of a percentage point.
 
-## 13. Rung 6 — Augmented synthetic control
+## 13. Stage 6 — Augmented synthetic control
 
-### 13.1 What every rung so far assumes
+### 13.1 What every stage so far assumes
 
-All six previous rungs require the UK to lie inside the donors' convex hull — inside the rubber band of section 8.2. When it does not, the pre-treatment fit is imperfect and Abadie's own advice is to stop. Ben-Michael, Feller and Rothstein [12] instead de-bias:
+All six previous stages require the UK to lie inside the donors' convex hull — inside the rubber band of section 8.2. When it does not, the pre-treatment fit is imperfect and Abadie's own advice is to stop. Ben-Michael, Feller and Rothstein [12] instead de-bias:
 
 $$\hat{\boldsymbol{\omega}}^{ascm} = \underset{\boldsymbol{\omega} : \sum\_j \omega\_j = 1}{\arg\min} \\, \frac{1}{2 \lambda^{ridge}} \sum\_{t=1}^{T\_0-1} \left( y\_{1,t} - \sum\_{j=2}^{J+1} \omega\_j\\, y\_{j,t} \right)^{2} + \frac{1}{2} \sum\_{j=2}^{J+1} \left( \omega\_j - \hat{\omega}^{sc}\_{j} \right)^{2}$$
 
@@ -1013,7 +1013,7 @@ In words, multiply the log gap by 100 to get an approximate percentage shortfall
 
 ![Dot plot of every estimator's 2018Q4 and 2019Q4 estimate with Born et al.'s 2.4 per cent marked as a dashed reference line, all estimates lying to the right of it](r_sc_dsc_sdid_15_att_dotplot.png)
 
-**Interpretation.** Every cell of that table reproduces the published one to within 0.01 percentage points. Three things stand out. First, the spread across methods at 2018Q4 is **2.73% to 3.06%** — a range of a third of a percentage point, which is small next to the gap to Born et al.'s 2.40%. Second, the estimated damage **grows over time**, from roughly 2.9% to roughly 4.1%, which looks like a change in the growth rate rather than a one-off level shift. Third, and this is the paper's empirical punchline: **every rung of the ladder puts the cost of the referendum above the previously published figure**, and the methods that adjust for level and timing put it lowest, not highest.
+**Interpretation.** Every cell of that table reproduces the published one to within 0.01 percentage points. Three things stand out. First, the spread across methods at 2018Q4 is **2.73% to 3.06%** — a range of a third of a percentage point, which is small next to the gap to Born et al.'s 2.40%. Second, the estimated damage **grows over time**, from roughly 2.9% to roughly 4.1%, which looks like a change in the growth rate rather than a one-off level shift. Third, and this is the paper's empirical punchline: **every stage of the ladder puts the cost of the referendum above the previously published figure**, and the methods that adjust for level and timing put it lowest, not highest.
 
 ![Six counterfactual paths for the UK zoomed to 2014 through 2020, indistinguishable before the referendum and fanning apart afterwards](r_sc_dsc_sdid_14_all_counterfactuals.png)
 
@@ -1023,7 +1023,7 @@ In words, multiply the log gap by 100 to get an approximate percentage shortfall
 
 **Interpretation.** Four of the five recipes are nearly the same blend, dominated by Hungary, the United States, Japan, Canada and Norway. The SDID and DSC panels are *identical* by construction, since SDID reuses DSC's unit weights and changes only the bias adjustment. Only ASCM crosses zero.
 
-## 15. Which rung should you stand on?
+## 15. Which stage should you choose?
 
 ### 15.1 The in-sample placebo tournament
 
@@ -1081,7 +1081,7 @@ Running every estimator at both horizons settles it:
 
 **Interpretation.** Graded on the same task, the three SDID variants are **indistinguishable** — 0.0067, 0.0066, 0.0066 at one quarter, and 0.0134 for all three at four quarters. The published conclusion that variants (ii) and (iii) "perform the worst" is an artefact of the horizon, not a property of the estimators.
 
-What survives is the finding that matters more: **at either horizon, the whole SDID family beats every other rung**, and the ordering below it is stable — SDID, then MASC, then ASCM, then DSC, then SC. The time weights are doing real work. Which variant supplies them is not settled by this evidence, and variant (i) remains the sensible default simply because it is the cheapest and requires no choice of post-treatment window.
+What survives is the finding that matters more: **at either horizon, the whole SDID family beats every other stage**, and the ordering below it is stable — SDID, then MASC, then ASCM, then DSC, then SC. The time weights are doing real work. Which variant supplies them is not settled by this evidence, and variant (i) remains the sensible default simply because it is the cheapest and requires no choice of post-treatment window.
 
 ## 16. Do covariates help?
 
@@ -1183,7 +1183,7 @@ In words, the penalty scale is the standard deviation of donors' quarter-to-quar
 
 **Interpretation.** Penalising moves SC up by 0.04, DSC up by 0.11 and SDID down by 0.12. All within the spread we have already seen. The penalty is worth switching on for the uniqueness it buys, not because it changes any conclusion.
 
-**(d) Mean covariates.** Section 16 asks whether covariates help as a matter of estimator design; the same question belongs here as a specification cell, because it is the one departure that moves every rung in the same direction.
+**(d) Mean covariates.** Section 16 asks whether covariates help as a matter of estimator design; the same question belongs here as a specification cell, because it is the one departure that moves every stage in the same direction.
 
 ```text
    method no_covariates with_covariates
@@ -1249,7 +1249,7 @@ All three sheets share one device. Each of these packages reports an ATT average
 
 ### 19.1 What maps onto what
 
-| Rung | R | Stata | Python (`mlsynth`) |
+| Stage | R | Stata | Python (`mlsynth`) |
 |---|---|---|---|
 | DiD | `did_estimate()` | `sdid …, method(did)` | `FDID(…).fit().did` |
 | SC | `sc_estimate()` | `sdid …, method(sc)` | `VanillaSC(…)` |
@@ -1268,7 +1268,7 @@ Two entries need explaining before the numbers make sense.
 
 Shortfall in UK real GDP (%), treatment dated 2016Q3, outcomes only.
 
-| Rung | R 2018Q4 | Stata 2018Q4 | Python 2018Q4 | R 2019Q4 | Stata 2019Q4 | Python 2019Q4 |
+| Stage | R 2018Q4 | Stata 2018Q4 | Python 2018Q4 | R 2019Q4 | Stata 2019Q4 | Python 2019Q4 |
 |---|---|---|---|---|---|---|
 | DiD | 4.98 | 4.98 | 4.98 | 6.18 | 6.18 | 6.18 |
 | SC | 3.06 | 3.06 | **3.04** | 4.20 | 4.20 | **4.17** |
@@ -1277,7 +1277,7 @@ Shortfall in UK real GDP (%), treatment dated 2016Q3, outcomes only.
 | MASC | 2.73 | — | 2.73 | 3.83 | — | 3.83 |
 | ASCM | 3.04 | 3.10 | 3.04 | 4.19 | 4.22 | 4.19 |
 
-The SDID row reports variant (ii) in all three languages, so that the comparison is like with like; section 14's headline SDID is variant (i), at 2.76. Stata reproduces R to five decimal places on every rung it can fit. Python agrees on DiD, DSC, MASC and ASCM, and differs in the second decimal on SC and SDID.
+The SDID row reports variant (ii) in all three languages, so that the comparison is like with like; section 14's headline SDID is variant (i), at 2.76. Stata reproduces R to five decimal places at every stage it can fit. Python agrees on DiD, DSC, MASC and ASCM, and differs in the second decimal on SC and SDID.
 
 ### 19.3 The disagreement is the finding
 
@@ -1315,7 +1315,7 @@ Three caveats belong with that number. It is a *net* gap between the UK and a bl
 
 It also cuts the other way, and the source paper says so plainly: SDID's advantage over DSC is marginal once you count the 85 extra parameters it estimates, and neither MASC nor ASCM justifies its computational cost here. Our own placebo results agree — the whole SDID family clusters together, and the gap down to DSC is smaller than the gap between covariates and no covariates.
 
-**So what should you actually do?** Fit the ladder, not a rung. Run an in-sample placebo tournament and check that the horizons are matched. Report the range. If one specification is going to be the headline, choose it before you see the estimates, and show the others anyway. Ferman, Pinto and Possebom [15] have documented how much room for cherry-picking this literature leaves; the honest response is to publish the cloud.
+**So what should you actually do?** Fit the ladder, not a stage. Run an in-sample placebo tournament and check that the horizons are matched. Report the range. If one specification is going to be the headline, choose it before you see the estimates, and show the others anyway. Ferman, Pinto and Possebom [15] have documented how much room for cherry-picking this literature leaves; the honest response is to publish the cloud.
 
 ## 21. Summary and next steps
 
@@ -1327,7 +1327,7 @@ It also cuts the other way, and the source paper says so plainly: SDID's advanta
 - **Two practical traps** cost real accuracy: `masc`'s fold argument silently produces five folds instead of eighty, and a flat objective means `synthdid`'s optimiser stops on its iteration cap rather than at the optimum.
 - **Both traps survive translation.** Porting the ladder to Stata and Python (section 19) reproduces every estimate, and the places where it does not are the solver, not the language: `mlsynth`'s convex solver lands on the exact-QP answer while `synthdid` and Stata's `sdid` stop where Frank–Wolfe stops. Three implementations, two camps, split by solver.
 
-Where to go next: the three cheat sheets if you just want working code — [`cheatsheet_R.R`](cheatsheet_R.R), [`cheatsheet_stata.do`](cheatsheet_stata.do), [`cheatsheet_python.py`](cheatsheet_python.py) — then [multi-country and staggered adoption with `multisynth`](/post/r_sc_multi_country/), [the same SDID estimator in Stata on Proposition 99](/post/stata_sdid/), or [manual demeaning and the FWL theorem](/post/r_demeaning_twfe/) if the unit-fixed-effect story in rung three felt too quick. The Monte Carlo study in the source paper, which stress-tests this ranking on simulated data, is the subject of a future post.
+Where to go next: the three cheat sheets if you just want working code — [`cheatsheet_R.R`](cheatsheet_R.R), [`cheatsheet_stata.do`](cheatsheet_stata.do), [`cheatsheet_python.py`](cheatsheet_python.py) — then [multi-country and staggered adoption with `multisynth`](/post/r_sc_multi_country/), [the same SDID estimator in Stata on Proposition 99](/post/stata_sdid/), or [manual demeaning and the FWL theorem](/post/r_demeaning_twfe/) if the unit-fixed-effect story in stage three felt too quick. The Monte Carlo study in the source paper, which stress-tests this ranking on simulated data, is the subject of a future post.
 
 ## 22. Exercises
 
@@ -1345,7 +1345,7 @@ Where to go next: the three cheat sheets if you just want working code — [`che
 
 7. **Drop the biggest donor.** The United States carries about a fifth of the weight in most specifications, and spillover risk is concentrated in the highest-weighted donors. Re-run the entire ladder without the United States. Does your conclusion about Brexit change? Then ask the harder question: does your conclusion about *which estimator to use* change?
 
-8. **Build your own rung.** DSC and SDID differ only in how the bias adjustment is weighted across pre-periods — flat in one, optimised in the other. Propose a third weighting, for example exponentially decaying weights with a half-life you choose, implement it, and enter it in the placebo tournament. Does it beat SDID?
+8. **Build your own stage.** DSC and SDID differ only in how the bias adjustment is weighted across pre-periods — flat in one, optimised in the other. Propose a third weighting, for example exponentially decaying weights with a half-life you choose, implement it, and enter it in the placebo tournament. Does it beat SDID?
 
 ## 23. References
 

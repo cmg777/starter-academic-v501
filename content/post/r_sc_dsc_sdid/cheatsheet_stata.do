@@ -1,5 +1,5 @@
 *===============================================================================
-* THE SYNTHETIC-CONTROL LADDER IN STATA — one command per rung
+* THE SYNTHETIC-CONTROL LADDER IN STATA — one command per stage
 *
 *   DiD  ->  SC  ->  DSC  ->  SDID  ->  [MASC]  ->  ASCM
 *
@@ -74,7 +74,7 @@ save `base'
 * -egen tt = group(t)- does the renumbering. -sdid- needs contiguous periods.
 *===============================================================================
 
-* Results matrix: rows = rungs, cols = 2018Q4, 2019Q4, SE(2018Q4)
+* Results matrix: rows = stages, cols = 2018Q4, 2019Q4, SE(2018Q4)
 matrix RES = J(6, 3, .)
 matrix rownames RES = DiD SC DSC SDID MASC ASCM
 matrix colnames RES = q2018Q4 q2019Q4 se2018Q4
@@ -86,7 +86,7 @@ foreach m in DiD SC DSC SDID MASC ASCM {
 }
 
 *-------------------------------------------------------------------------------
-* 2. THE LADDER, rungs 0-3: everything -sdid- can do on its own
+* 2. THE LADDER, stages 0-3: everything -sdid- can do on its own
 *-------------------------------------------------------------------------------
 foreach e in 96 100 {
 
@@ -100,13 +100,13 @@ foreach e in 96 100 {
     di as text cond(`e' == 96, "  (2018Q4)", "  (2019Q4)")
     di as text "{hline 79}"
 
-    * --- Rung 0. DiD ----------------------------------------------------------
+    * --- Stage 0. DiD ----------------------------------------------------------
     * Every donor weighted 1/23, every pre-quarter weighted 1/86. Nothing is
     * fitted; the unit fixed effect absorbs the level gap.
     qui sdid log_rgdp unit_id tt treat, vce(noinference) method(did)
     matrix RES[`row_DiD', `col'] = -100 * e(ATT)
 
-    * --- Rung 1. SC -----------------------------------------------------------
+    * --- Stage 1. SC -----------------------------------------------------------
     * Donor weights on the simplex, fitted to the pre-treatment path, no
     * intercept. method(sc) sets the time weights to ZERO (sdid.ado line 951),
     * which is what turns the SDID double difference back into Abadie's
@@ -114,7 +114,7 @@ foreach e in 96 100 {
     qui sdid log_rgdp unit_id tt treat, vce(noinference) method(sc)
     matrix RES[`row_SC', `col'] = -100 * e(ATT)
 
-    * --- Rung 2. DSC ----------------------------------------------------------
+    * --- Stage 2. DSC ----------------------------------------------------------
     * Demeaned SC. There is no dsc command, and none is needed: DSC *is* SC run
     * on outcomes from which each country's own pre-treatment mean has been
     * subtracted. After demeaning, the pre-treatment gap averages to zero by
@@ -125,7 +125,7 @@ foreach e in 96 100 {
     qui sdid ytilde unit_id tt treat, vce(noinference) method(sc)
     matrix RES[`row_DSC', `col'] = -100 * e(ATT)
 
-    * --- Rung 3. SDID ---------------------------------------------------------
+    * --- Stage 3. SDID ---------------------------------------------------------
     * Same unit weights as DSC, but the time weights are fitted too.
     *
     * WATCH THE ZETA ARGUMENTS. The documented default zeta_omega(1e-6) is a
@@ -148,7 +148,7 @@ foreach e in 96 100 {
     * --- Standard errors ------------------------------------------------------
     * vce(placebo) is the right choice with a single treated unit: it permutes
     * treatment across the donor pool. Only computed at 2018Q4, and only for
-    * the rungs sdid can fit.
+    * the stages sdid can fit.
     if `e' == 96 & $SE == 1 {
         foreach spec in DiD SC DSC SDID {
             if "`spec'" == "DiD"  local opt "method(did)"
@@ -163,18 +163,18 @@ foreach e in 96 100 {
 }
 
 *-------------------------------------------------------------------------------
-* 3. Rung 4. MASC — NOT AVAILABLE IN STATA
+* 3. Stage 4. MASC — NOT AVAILABLE IN STATA
 *
 * Kellogg, Mogstad, Pouliot & Torgovitsky's matching-and-synthetic-control
 * estimator has no Stata implementation. The reference implementation is the R
-* package masc (github.com/maxkllgg/masc); see cheatsheet_R.R rung 4, which
+* package masc (github.com/maxkllgg/masc); see cheatsheet_R.R stage 4, which
 * returns 2.73 / 3.83 with m = 10 neighbours and phi = 0.158.
 *
 * The row stays in the table, empty, so the ladder is not silently shortened.
 *-------------------------------------------------------------------------------
 
 *-------------------------------------------------------------------------------
-* 4. Rung 5. ASCM — via allsynth, with two honest caveats
+* 4. Stage 5. ASCM — via allsynth, with two honest caveats
 *
 * CAVEAT 1: DIFFERENT ESTIMATOR. allsynth implements the BIAS-CORRECTED
 * synthetic control of Abadie & L'Hour (2021) and Ben-Michael, Feller &
@@ -274,7 +274,7 @@ matrix RCOL  = (4.98\3.06\2.98\2.79\2.73\3.04)
 di _n _n as text "{hline 92}"
 di as text "UK GDP shortfall (%), 2016Q3 treatment, outcomes only, 23 donors, 86 pre-quarters"
 di as text "{hline 92}"
-di as text %-6s "Rung" %-40s "  Command" %8s "2018Q4" %8s "2019Q4" ///
+di as text %-6s "Stage" %-40s "  Command" %8s "2018Q4" %8s "2019Q4" ///
    %9s "SE 18Q4" %7s "R" %7s "Paper"
 di as text "{hline 92}"
 

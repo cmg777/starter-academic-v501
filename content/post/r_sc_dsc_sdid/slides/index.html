@@ -6,8 +6,8 @@
 <script src="slides_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="slides_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="slides_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-23bbe8b5e4efc1e257f6d59dce478b08.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.9.37">
+<link href="slides_files/libs/quarto-html/quarto-syntax-highlighting-dark-f1aadacce99040138bbb613f9330654f.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.8.27">
 
   <meta name="dcterms.date" content="2026-08-02">
   <title>From DiD to SDID</title>
@@ -17,9 +17,6 @@
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="slides_files/libs/revealjs/dist/reveal.css">
   <style>
-    /* Default styles provided by pandoc.
-    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-    */
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -98,7 +95,7 @@
     code span.vs { color: #9ecbff; } /* VerbatimString */
     code span.wa { color: #ff5555; } /* Warning */
   </style>
-  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-4488a4dd4807c2c9a5603c247e31f6f3.css">
+  <link rel="stylesheet" href="slides_files/libs/revealjs/dist/theme/quarto-9b58ec14c6e77dd4bed0a59f9cec700e.css">
   <link href="slides_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="slides_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -254,7 +251,7 @@
 <h2>One line in a crowd</h2>
 
 <img data-src="../r_sc_dsc_sdid_01_gdp_paths.png" class="r-stretch"><aside class="notes">
-<p>No single donor tracks the UK — which is why we blend them rather than pick one. But notice 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted rungs are built to exploit.</p>
+<p>No single donor tracks the UK — which is why we blend them rather than pick one. But notice 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted stages are built to exploit.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -307,7 +304,7 @@
 <table class="caption-top">
 <thead>
 <tr class="header">
-<th>Rung</th>
+<th>Stage</th>
 <th><span class="math inline">\(\omega\)</span></th>
 <th><span class="math inline">\(\lambda\)</span></th>
 <th>unit effect</th>
@@ -344,8 +341,8 @@
 <p>Two banks of faders. DiD leaves both flat, SC moves one, SDID moves both.</p>
 </div>
 </section>
-<section id="rung-0-difference-in-differences" class="slide level2 center">
-<h2>Rung 0 — Difference-in-differences</h2>
+<section id="stage-0-difference-in-differences" class="slide level2 center">
+<h2>Stage 0 — Difference-in-differences</h2>
 <p>Every donor counts the same.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href=""></a>w_did <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">/</span><span class="dv">23</span>, <span class="dv">23</span>)</span>
 <span id="cb1-2"><a href=""></a>b_did <span class="ot">&lt;-</span> <span class="fu">mean</span>(Z1 <span class="sc">-</span> Z0 <span class="sc">%*%</span> w_did)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -361,8 +358,8 @@
 
 <img data-src="../r_sc_dsc_sdid_02_did_counterfactual.png" class="r-stretch"><p>DiD is fitting a divergence that began in 2013 and calling it Brexit.</p>
 </section>
-<section id="rung-1-synthetic-control" class="slide level2 center">
-<h2>Rung 1 — Synthetic control</h2>
+<section id="stage-1-synthetic-control" class="slide level2 center">
+<h2>Stage 1 — Synthetic control</h2>
 <p><span class="math display">\[\hat{\omega}^{sc} = \arg\min_{\omega \in \mathbb{W}} \sum_{t=1}^{T_0} \Big( y_{1,t} - \sum_j \omega_j y_{j,t} \Big)^{2}\]</span></p>
 <p>Weights that are non-negative and sum to one: the blend must stay inside the donors’ <strong>convex hull</strong>.</p>
 <div class="fragment">
@@ -389,8 +386,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="rung-2-demeaned-sc-allow-a-level-gap" class="slide level2 center">
-<h2>Rung 2 — Demeaned SC: allow a level gap</h2>
+<section id="stage-2-demeaned-sc-allow-a-level-gap" class="slide level2 center">
+<h2>Stage 2 — Demeaned SC: allow a level gap</h2>
 <p>SC has no intercept, so it rejects a blend that moves in perfect parallel but sits slightly below.</p>
 <div class="fragment">
 <p>Demean first, then add the average pre-treatment gap back as a constant.</p>
@@ -404,8 +401,8 @@
 <p>A small adjustment means the SC fit was <em>already</em> level-balanced. On a dataset where the treated unit sits awkwardly, this term does real work.</p>
 </div>
 </section>
-<section id="rung-3-sdid-choose-which-quarters-to-trust" class="slide level2 center">
-<h2>Rung 3 — SDID: choose which quarters to trust</h2>
+<section id="stage-3-sdid-choose-which-quarters-to-trust" class="slide level2 center">
+<h2>Stage 3 — SDID: choose which quarters to trust</h2>
 <p>DSC averages all 86 pre-treatment quarters equally. 1995 gets as much say as 2016.</p>
 <div class="fragment">
 <p><strong>The time-weight problem is the unit-weight problem, transposed.</strong></p>
@@ -461,14 +458,14 @@
 
 <img data-src="../r_sc_dsc_sdid_11_bias_targets.png" class="r-stretch"><p>SC’s unit weights kill extrapolation bias. Matching kills interpolation bias. <strong>SDID’s time weights let one estimator target both.</strong></p>
 </section>
-<section id="rungs-4-and-5-buy-the-trade-off-or-drop-the-constraint" class="slide level2 center">
-<h2>Rungs 4 and 5 — buy the trade-off, or drop the constraint</h2>
+<section id="stages-4-and-5-buy-the-trade-off-or-drop-the-constraint" class="slide level2 center">
+<h2>Stages 4 and 5 — buy the trade-off, or drop the constraint</h2>
 <p><strong>MASC</strong> blends matching and SC, with the mixing weight cross-validated on pre-treatment data. Here it buys <strong>16% matching</strong>. → <strong>2.73%</strong></p>
 <div class="fragment">
 <p><strong>ASCM</strong> drops non-negativity and adds a ridge pull toward the SC weights. Eight donors go negative. → <strong>3.04%</strong></p>
 </div>
 <div class="fragment">
-<p>Both land inside the range the simpler rungs already covered.</p>
+<p>Both land inside the range the simpler stages already covered.</p>
 </div>
 </section></section>
 <section>
@@ -476,13 +473,13 @@
 <h1>The Verdict</h1>
 <p><span class="act">Act IV</span></p>
 </section>
-<section id="every-rung-beats-2.4" class="slide level2 center">
-<h2>Every rung beats 2.4%</h2>
+<section id="every-stage-beats-2.4" class="slide level2 center">
+<h2>Every stage beats 2.4%</h2>
 
 <img data-src="../r_sc_dsc_sdid_15_att_dotplot.png" class="r-stretch"><p><strong>2.73% to 3.06%</strong> at end-2018; <strong>3.83% to 4.20%</strong> at end-2019.</p>
 </section>
-<section id="which-rung-a-fire-drill" class="slide level2 center">
-<h2>Which rung? A fire drill</h2>
+<section id="which-stage-a-fire-drill" class="slide level2 center">
+<h2>Which stage? A fire drill</h2>
 <p>Move the treatment date back to twenty quarters when nothing happened. Every estimate is then pure error.</p>
 <table class="caption-top">
 <thead>
@@ -570,7 +567,7 @@
 <h2>What to take away</h2>
 <ol type="1">
 <li><strong>The bias decomposition is the durable idea.</strong> The leaderboard is perishable.</li>
-<li><strong>Fit the ladder, not a rung.</strong> Report the cloud.</li>
+<li><strong>Fit the ladder, not a stage.</strong> Report the cloud.</li>
 <li><strong>Run a placebo tournament</strong> — and check the horizons match.</li>
 <li><strong>Covariates are not free.</strong> With a long pre-period they may be redundant.</li>
 </ol>

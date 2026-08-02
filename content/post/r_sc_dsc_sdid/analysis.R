@@ -2,7 +2,7 @@
 # From DiD to SDID: a ladder of synthetic control estimators, on Brexit
 #
 # This script powers the tutorial post `r_sc_dsc_sdid`. It climbs the ladder of
-# single-treated-unit estimators, one rung at a time, on the same data:
+# single-treated-unit estimators, one stage at a time, on the same data:
 #
 #     0. DiD    -- unit weights frozen at 1/J, unit and time fixed effects
 #     1. SC     -- unit weights chosen on the simplex, NO intercept
@@ -12,7 +12,7 @@
 #     5. MASC   -- a cross-validated blend of m-nearest-neighbour matching and SC
 #     6. ASCM   -- SC weights plus a ridge correction; weights may go negative
 #
-# Every rung is solved TWICE: once from scratch, so the algorithm is visible,
+# Every stage is solved TWICE: once from scratch, so the algorithm is visible,
 # and once with its package, so the reader learns the production call. Where the
 # two disagree we say so and explain why (see section 5 -- the disagreement is
 # the single most instructive thing in this script).
@@ -376,12 +376,12 @@ cat(sprintf("  donor Gram: smallest eigenvalue %.3e, condition number %.3e\n",
             min(eig), max(eig) / min(eig)))
 
 
-# ── 4. Rung 0: difference-in-differences ──────────────────────────────────────
+# ── 4. Stage 0: difference-in-differences ──────────────────────────────────────
 #
 # Weights frozen at 1/J, plus a unit fixed effect. Three lines of arithmetic.
-# Everything above this rung is the same three lines with a smarter w.
+# Everything above this stage is the same three lines with a smarter w.
 
-rule("4. Rung 0 -- difference-in-differences")
+rule("4. Stage 0 -- difference-in-differences")
 
 w_did <- rep(1 / N0, N0)
 b_did <- mean(Z1 - Z0 %*% w_did)                       # the unit fixed effect
@@ -392,12 +392,12 @@ cat(sprintf("  pre-treatment RMSE vs the donor average : %.5f\n",
             sqrt(mean((Z1 - Z0 %*% w_did - b_did)^2))))
 
 
-# ── 5. Rung 1: synthetic control -- and the solver lesson ─────────────────────
+# ── 5. Stage 1: synthetic control -- and the solver lesson ─────────────────────
 #
 # min over the simplex of the squared pre-treatment prediction error.
 # We solve it three ways and get two different answers. That is the point.
 
-rule("5. Rung 1 -- synthetic control (exact QP vs Frank-Wolfe vs package)")
+rule("5. Stage 1 -- synthetic control (exact QP vs Frank-Wolfe vs package)")
 
 w_sc_qp <- simplex_ls(Z0, Z1)
 w_sc_fw <- simplex_fw(Z0, Z1, min.decrease = MIN_DEC)
@@ -583,13 +583,13 @@ p05 <- ggplot(grid, aes(px, py)) +
 save_fig(p05, "05_simplex_surface", w = 8, h = 7)
 
 
-# ── 7. Rung 2: demeaned synthetic control ─────────────────────────────────────
+# ── 7. Stage 2: demeaned synthetic control ─────────────────────────────────────
 #
 # SC has no intercept, so it rejects a donor blend that moves in perfect
 # parallel but sits at a different level. DSC demeans first and then adds the
 # average pre-treatment gap back as a constant.
 
-rule("7. Rung 2 -- demeaned synthetic control (DSC)")
+rule("7. Stage 2 -- demeaned synthetic control (DSC)")
 
 Z0_dm   <- sweep(Z0, 2, colMeans(Z0))       # each COUNTRY's own time-series mean
 Z1_dm   <- Z1 - mean(Z1)
@@ -632,7 +632,7 @@ p08 <- ggplot(subset(off, date >= 2010), aes(date)) +
 save_fig(p08, "08_dsc_offset")
 
 
-# ── 8. Rung 3: synthetic difference-in-differences ────────────────────────────
+# ── 8. Stage 3: synthetic difference-in-differences ────────────────────────────
 #
 # SDID keeps DSC's unit weights and replaces the FLAT pre-treatment average in
 # the bias adjustment with an optimally weighted one. The time-weight problem is
@@ -642,11 +642,11 @@ save_fig(p08, "08_dsc_offset")
 #   lambda: which QUARTERS, blended, reproduce the treatment
 #           quarter, judged across all donors?               (demean by quarter)
 #
-# CAREFUL: "demeaned" means two different things in rung 2 and rung 3.
+# CAREFUL: "demeaned" means two different things in stage 2 and stage 3.
 #   DSC   -> sweep(Z0, 2, colMeans(Z0))   each country's own time-series mean
 #   SDID  -> sweep(Z0, 1, rowMeans(Z0))   each quarter's cross-sectional mean
 
-rule("8. Rung 3 -- SDID time weights")
+rule("8. Stage 3 -- SDID time weights")
 
 # Three variants, differing only in what the time weights are fitted against.
 # The regressors are the donors' pre-treatment paths TRANSPOSED (donors as rows,
@@ -816,13 +816,13 @@ p11 <- ggplot(tiles, aes(bias, method, fill = level)) +
 save_fig(p11, "11_bias_targets", w = 8, h = 5.5)
 
 
-# ── 10. Rung 4: MASC -- buy the trade-off explicitly ──────────────────────────
+# ── 10. Stage 4: MASC -- buy the trade-off explicitly ──────────────────────────
 #
 # A convex blend of m-nearest-neighbour matching and synthetic control, with
 # BOTH m and the blend weight phi chosen by rolling-origin cross-validation on
 # pre-treatment data only.
 
-rule("10. Rung 4 -- MASC")
+rule("10. Stage 4 -- MASC")
 
 nn_weights <- function(Z0, Z1, m) {
   d   <- colSums((Z1 - Z0)^2)
@@ -895,13 +895,13 @@ p12 <- ggplot(cv_tab, aes(factor(m), cv)) +
 save_fig(p12, "12_masc_cv")
 
 
-# ── 11. Rung 5: augmented synthetic control ───────────────────────────────────
+# ── 11. Stage 5: augmented synthetic control ───────────────────────────────────
 #
 # Replace the non-negativity constraint with a ridge pull toward the SC weights.
 # The weights may now go negative, which is how ASCM reaches a treated unit
 # sitting outside the donors' convex hull.
 
-rule("11. Rung 5 -- augmented synthetic control (ASCM)")
+rule("11. Stage 5 -- augmented synthetic control (ASCM)")
 
 ad <- data.frame(unitnum = rep(seq_len(24), each = T0_Q3 + 1),
                  t       = rep(seq_len(T0_Q3 + 1), 24),
@@ -966,7 +966,7 @@ p15 <- ggplot(dot, aes(loss, method, colour = horizon)) +
   geom_point(size = 3.4) +
   geom_text(aes(label = sprintf("%.2f", loss)), vjust = -1.1, size = 2.9, show.legend = FALSE) +
   scale_colour_manual(values = c("2018Q4" = STEEL, "2019Q4" = TEAL), name = NULL) +
-  labs(title = "Every rung of the ladder puts the Brexit cost above 2.4%",
+  labs(title = "Every stage of the ladder puts the Brexit cost above 2.4%",
        subtitle = "Estimated shortfall in UK GDP, treatment dated 2016Q3, no covariates",
        x = "GDP loss relative to the counterfactual (%)", y = NULL,
        caption = "Dashed lines: the estimates originally reported by Born et al. (2019). DiD is shown for completeness only -- its parallel-trends assumption already failed in figure 02.") +
@@ -1388,7 +1388,7 @@ cat(sprintf("
       at 2018Q4 :  %.2f%% (SC)   %.2f%% (DSC)   %.2f%% (SDID i)   %.2f%% (MASC)   %.2f%% (ASCM)
       at 2019Q4 :  %.2f%% (SC)   %.2f%% (DSC)   %.2f%% (SDID i)   %.2f%% (MASC)   %.2f%% (ASCM)
 
-  Born et al. (2019) reported %.1f%% at 2018Q4. Every rung of the ladder is larger.
+  Born et al. (2019) reported %.1f%% at 2018Q4. Every stage of the ladder is larger.
 
   In-sample placebo over 20 artificial treatment dates, graded like for like at
   one quarter ahead, ranks SDID (i) first on all three error measures

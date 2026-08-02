@@ -74,7 +74,7 @@ Give each donor a weight. Require the blend to track the real UK for twenty-one 
 ![](../r_sc_dsc_sdid_01_gdp_paths.png)
 
 ::: {.notes}
-No single donor tracks the UK — which is why we blend them rather than pick one. But notice 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted rungs are built to exploit.
+No single donor tracks the UK — which is why we blend them rather than pick one. But notice 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted stages are built to exploit.
 :::
 
 ## The previously published answer was 2.4%
@@ -107,7 +107,7 @@ This is the only equation in the deck worth memorising. Everything that follows 
 
 ## Four settings of the same dials
 
-| Rung | $\omega$ | $\lambda$ | unit effect |
+| Stage | $\omega$ | $\lambda$ | unit effect |
 |---|---|---|---|
 | DiD | fixed $1/J$ | fixed | yes |
 | SC | optimised | none | **no** |
@@ -118,7 +118,7 @@ This is the only equation in the deck worth memorising. Everything that follows 
 
 Two banks of faders. DiD leaves both flat, SC moves one, SDID moves both.
 
-## Rung 0 — Difference-in-differences
+## Stage 0 — Difference-in-differences
 
 Every donor counts the same.
 
@@ -141,7 +141,7 @@ Its pre-treatment fit error is **0.0218**, four times synthetic control's.
 
 DiD is fitting a divergence that began in 2013 and calling it Brexit.
 
-## Rung 1 — Synthetic control
+## Stage 1 — Synthetic control
 
 $$\hat{\omega}^{sc} = \arg\min_{\omega \in \mathbb{W}} \sum_{t=1}^{T_0} \Big( y_{1,t} - \sum_j \omega_j y_{j,t} \Big)^{2}$$
 
@@ -163,7 +163,7 @@ Synthetic Britain is roughly one-fifth Hungary, one-fifth the US, one-fifth Japa
 Pins on a corkboard, a rubber band snapped around them. Everything inside is reachable by a non-negative blend; nothing outside is. If the UK's pin fell outside, you would need a negative amount of some country.
 :::
 
-## Rung 2 — Demeaned SC: allow a level gap
+## Stage 2 — Demeaned SC: allow a level gap
 
 SC has no intercept, so it rejects a blend that moves in perfect parallel but sits slightly below.
 
@@ -181,7 +181,7 @@ Here $b^{dsc} = +0.0024$ — a quarter of one percent. The estimate moves 3.06% 
 
 A small adjustment means the SC fit was *already* level-balanced. On a dataset where the treated unit sits awkwardly, this term does real work.
 
-## Rung 3 — SDID: choose which quarters to trust
+## Stage 3 — SDID: choose which quarters to trust
 
 DSC averages all 86 pre-treatment quarters equally. 1995 gets as much say as 2016.
 
@@ -248,7 +248,7 @@ Two independent errors. Fixing one does nothing for the other.
 
 SC's unit weights kill extrapolation bias. Matching kills interpolation bias. **SDID's time weights let one estimator target both.**
 
-## Rungs 4 and 5 — buy the trade-off, or drop the constraint
+## Stages 4 and 5 — buy the trade-off, or drop the constraint
 
 **MASC** blends matching and SC, with the mixing weight cross-validated on pre-treatment data. Here it buys **16% matching**. → **2.73%**
 
@@ -258,19 +258,19 @@ SC's unit weights kill extrapolation bias. Matching kills interpolation bias. **
 
 . . .
 
-Both land inside the range the simpler rungs already covered.
+Both land inside the range the simpler stages already covered.
 
 # The Verdict {.divider background-color="#00d4c8"}
 
 [Act IV]{.act}
 
-## Every rung beats 2.4%
+## Every stage beats 2.4%
 
 ![](../r_sc_dsc_sdid_15_att_dotplot.png)
 
 **2.73% to 3.06%** at end-2018; **3.83% to 4.20%** at end-2019.
 
-## Which rung? A fire drill
+## Which stage? A fire drill
 
 Move the treatment date back to twenty quarters when nothing happened. Every estimate is then pure error.
 
@@ -322,7 +322,7 @@ The published 3.06% is where Frank–Wolfe happens to be at 10,000 iterations. T
 ## What to take away
 
 1. **The bias decomposition is the durable idea.** The leaderboard is perishable.
-2. **Fit the ladder, not a rung.** Report the cloud.
+2. **Fit the ladder, not a stage.** Report the cloud.
 3. **Run a placebo tournament** — and check the horizons match.
 4. **Covariates are not free.** With a long pre-period they may be redundant.
 

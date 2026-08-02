@@ -25,7 +25,7 @@ one United Kingdom, so the cost of that decision can only be measured against a
 country that never existed. This notebook builds that country seven times over,
 climbing the ladder of single-treated-unit estimators:
 
-| Rung | Estimator | Unit weights | Time weights | Unit effect |
+| Stage | Estimator | Unit weights | Time weights | Unit effect |
 |---|---|---|---|---|
 | 0 | Difference-in-differences | fixed at $1/J$ | fixed | yes |
 | 1 | Synthetic control | optimised on the simplex | none | **no** |
@@ -34,7 +34,7 @@ climbing the ladder of single-treated-unit estimators:
 | 4 | MASC | cross-validated blend with matching | none | no |
 | 5 | Augmented SC | SC weights + ridge correction | none | no |
 
-Every rung is solved from scratch first, then reproduced with its package.
+Every stage is solved from scratch first, then reproduced with its package.
 
 The companion post, with the full narrative and all eighteen figures, is at
 <https://carlos-mendez.org/post/r_sc_dsc_sdid/>. The canonical script is
@@ -138,7 +138,7 @@ the demeaned and time-weighted estimators exploit.
 
 ## One solver, five jobs
 
-Every rung reduces to the same problem: minimise $\lVert b - Aw \rVert^2$ subject
+Every stage reduces to the same problem: minimise $\lVert b - Aw \rVert^2$ subject
 to $w \ge 0$ and $\sum_k w_k = 1$. Write it once.
 
 ```{r}
@@ -162,7 +162,7 @@ add  <- function(m, w, b = 0, note = "") {
 }
 ```
 
-## Rung 0 — Difference-in-differences
+## Stage 0 — Difference-in-differences
 
 Every donor counts the same; a unit fixed effect absorbs the level gap.
 
@@ -174,11 +174,11 @@ add("DiD", w_did, b_did, "uniform weights")
 cat(sprintf("pre-treatment RMSE: %.5f\n", sqrt(mean((Z1 - Z0 %*% w_did - b_did)^2))))
 ```
 
-Nearly 5% — roughly double every other rung, and its pre-treatment fit error is
+Nearly 5% — roughly double every other stage, and its pre-treatment fit error is
 four times synthetic control's. DiD is fitting a trend divergence that began years
 before the referendum.
 
-## Rung 1 — Synthetic control
+## Stage 1 — Synthetic control
 
 $$\hat{\omega}^{sc} = \arg\min_{\omega \in \mathbb{W}} \sum_{t=1}^{T_0} \Big( y_{1,t} - \sum_j \omega_j y_{j,t} \Big)^2$$
 
@@ -210,7 +210,7 @@ pB <- ggplot(df, aes(date, gap)) +
 pA / pB + plot_layout(heights = c(2, 1.2))
 ```
 
-## Rung 2 — Demeaned synthetic control
+## Stage 2 — Demeaned synthetic control
 
 SC has no intercept, so it rejects a blend that moves in perfect parallel but sits
 at a different level. Demean first, add the offset back as a constant.
@@ -226,7 +226,7 @@ cat(sprintf("correlation of SC and DSC weights: %.4f\n", cor(w_sc, w_dsc)))
 The offset is tiny, which is the finding: the synthetic control was already
 level-balanced, so SC was not sacrificing shape to chase level.
 
-## Rung 3 — Synthetic difference-in-differences
+## Stage 3 — Synthetic difference-in-differences
 
 The time-weight problem is the unit-weight problem run on the transpose.
 
@@ -275,7 +275,7 @@ pL / pR
 If the best predictor of next quarter is this quarter, then the best blend of past
 quarters is the most recent one alone. The collapse is a property of GDP, not a bug.
 
-## Rung 4 — MASC
+## Stage 4 — MASC
 
 A cross-validated blend of $m$-nearest-neighbour matching and synthetic control.
 
@@ -315,7 +315,7 @@ ggplot(cv, aes(factor(m), cv)) +
        x = "m (matched donors)", y = "rolling-origin CV error")
 ```
 
-## Rung 5 — Augmented synthetic control
+## Stage 5 — Augmented synthetic control
 
 Drop the non-negativity constraint; a ridge penalty pulls the weights back toward
 the SC solution. Weights may go negative.
@@ -338,7 +338,7 @@ neg <- data.frame(country = CT[DONORS], omega = round(w_as, 4))
 print(head(neg[order(neg$omega), ], 5), row.names = FALSE)
 ```
 
-## The same rungs, via their packages
+## The same stages, via their packages
 
 ```{r}
 #| label: fit-packages
@@ -395,7 +395,7 @@ ggplot(main, aes(`2018Q4`, method)) +
   geom_vline(xintercept = 2.4, colour = ORANGE, linetype = "22") +
   geom_point(colour = STEEL, size = 3.2) +
   geom_text(aes(label = sprintf("%.2f", `2018Q4`)), vjust = -1, colour = TXT, size = 3) +
-  labs(title = "Every rung puts the Brexit cost above 2.4%",
+  labs(title = "Every stage puts the Brexit cost above 2.4%",
        subtitle = "Estimated 2018Q4 GDP shortfall, treatment dated 2016Q3, no covariates",
        x = "GDP loss (%)", y = NULL,
        caption = "Dashed line: Born et al. (2019).")

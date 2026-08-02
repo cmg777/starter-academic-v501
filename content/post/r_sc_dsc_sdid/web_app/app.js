@@ -107,7 +107,7 @@
     Charts.placebo("#chart-placebo", plRows, state.stat);
 
     const notes = {
-      h1: "Graded on the same one-quarter task, the three SDID variants are indistinguishable — 0.0067, 0.0066 and 0.0066 — and all three beat every other rung.",
+      h1: "Graded on the same one-quarter task, the three SDID variants are indistinguishable — 0.0067, 0.0066 and 0.0066 — and all three beat every other stage.",
       h4: "At a four-quarter horizon all three SDID variants tie exactly at 0.0134, and the ordering below them is unchanged.",
       paper: "This is the published table. It grades SDID (ii) and (iii) four quarters ahead but everyone else one quarter ahead, which is why those two look twice as bad. Switch to a matched horizon and the gap disappears."
     };

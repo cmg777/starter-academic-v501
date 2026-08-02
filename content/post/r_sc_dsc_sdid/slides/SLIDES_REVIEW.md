@@ -48,10 +48,10 @@ Four bullets, a paragraph and a full-width figure on one slide. Content ran past
 already used successfully by "The rubber band" and "And the time weights collapse". The observation
 about the synchronised 2008-09 collapse moved into speaker notes, where it belongs.
 
-**H2. Slide 2-2 "Rung 0 — Difference-in-differences" overflowed the box.**
+**H2. Slide 2-2 "Stage 0 — Difference-in-differences" overflowed the box.**
 A code block, two reveal fragments and a full-width figure.
 
-*Fix, applied.* Split into "Rung 0" (code + result) and "Parallel trends, failing in plain sight"
+*Fix, applied.* Split into "Stage 0" (code + result) and "Parallel trends, failing in plain sight"
 (the figure, with the one-line reading beneath it).
 
 ### MED — fixed
@@ -74,8 +74,8 @@ skipped line in the deck and now has a slide to itself.
 | Slide | Words counted | Actual prose |
 |---|---|---|
 | Every estimator is the same regression | 112 | ~22 |
-| Rung 1 — Synthetic control | 97 | ~35 |
-| Rung 2 — Demeaned SC | 85 | ~40 |
+| Stage 1 — Synthetic control | 97 | ~35 |
+| Stage 2 — Demeaned SC | 85 | ~40 |
 | Two ways to be wrong | 85 | ~45 |
 | The turkey | 76 | ~76 |
 

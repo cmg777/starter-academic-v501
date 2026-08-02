@@ -36,13 +36,13 @@ Loading local brexit_analysis.csv
   donor Gram: smallest eigenvalue 3.192e-04, condition number 7.487e+05
 
 ==============================================================================
-4. Rung 0 -- difference-in-differences
+4. Stage 0 -- difference-in-differences
 ==============================================================================
   DiD                    2018Q4  4.981   2019Q4  6.182   uniform weights
   pre-treatment RMSE vs the donor average : 0.02175
 
 ==============================================================================
-5. Rung 1 -- synthetic control (exact QP vs Frank-Wolfe vs package)
+5. Stage 1 -- synthetic control (exact QP vs Frank-Wolfe vs package)
 ==============================================================================
   exact QP    : SSR 2.686818e-03   nonzero  9   loss(2018Q4) 3.039
   hand-coded FW: SSR 2.751662e-03   nonzero 13   loss(2018Q4) 3.056
@@ -87,7 +87,7 @@ Loading local brexit_analysis.csv
   [figure] r_sc_dsc_sdid_05_simplex_surface.png
 
 ==============================================================================
-7. Rung 2 -- demeaned synthetic control (DSC)
+7. Stage 2 -- demeaned synthetic control (DSC)
 ==============================================================================
   bias adjustment b_dsc            : +0.00242 log points (0.242% of GDP)
   |QP - package| max weight diff   : 7.523e-03
@@ -96,7 +96,7 @@ Loading local brexit_analysis.csv
   [figure] r_sc_dsc_sdid_08_dsc_offset.png
 
 ==============================================================================
-8. Rung 3 -- SDID time weights
+8. Stage 3 -- SDID time weights
 ==============================================================================
   |hand-coded lambda - synthdid lambda| : 0.000e+00
   lambda(i): 3 nonzero weights; 0.958 on the last pre-period (2016Q2)
@@ -118,7 +118,7 @@ Loading local brexit_analysis.csv
   [figure] r_sc_dsc_sdid_11_bias_targets.png
 
 ==============================================================================
-10. Rung 4 -- MASC
+10. Stage 4 -- MASC
 ==============================================================================
   [cache] masc_cv
   hand-coded : m = 10, phi = 0.1577
@@ -140,7 +140,7 @@ Loading local brexit_analysis.csv
   [figure] r_sc_dsc_sdid_12_masc_cv.png
 
 ==============================================================================
-11. Rung 5 -- augmented synthetic control (ASCM)
+11. Stage 5 -- augmented synthetic control (ASCM)
 ==============================================================================
   [cache] ascm_pkg
   package : sum(w) = 1.0000, min(w) = -0.0090, 8 negative weights
@@ -313,7 +313,7 @@ HEADLINE
       at 2018Q4 :  3.06% (SC)   2.98% (DSC)   2.76% (SDID i)   2.73% (MASC)   3.04% (ASCM)
       at 2019Q4 :  4.20% (SC)   4.12% (DSC)   3.89% (SDID i)   3.83% (MASC)   4.19% (ASCM)
 
-  Born et al. (2019) reported 2.4% at 2018Q4. Every rung of the ladder is larger.
+  Born et al. (2019) reported 2.4% at 2018Q4. Every stage of the ladder is larger.
 
   In-sample placebo over 20 artificial treatment dates, graded like for like at
   one quarter ahead, ranks SDID (i) first on all three error measures

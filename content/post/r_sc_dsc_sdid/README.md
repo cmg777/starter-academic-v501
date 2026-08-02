@@ -101,7 +101,7 @@ pip install -U "git+https://github.com/jgreathouse9/mlsynth.git"
 | 12 | `masc_cv` | The blend is cross-validated, not guessed |
 | 13 | `donor_weights` | Four recipes, nearly one blend |
 | 14 | `all_counterfactuals` | Disagreement is a post-treatment phenomenon |
-| 15 | `att_dotplot` | Every rung beats 2.4% |
+| 15 | `att_dotplot` | Every stage beats 2.4% |
 | 16 | `placebo_tournament` | The fire drill, at two horizons |
 | 17 | `robustness_grid` | The specification zoo |
 | 18 | `placebo_in_space` | What if the referendum had happened elsewhere |
@@ -159,7 +159,7 @@ and the placebo tournament reproduces the published error statistics to four dec
 
 The ladder is fitted three times, once per language. Shortfall at 2018Q4, outcomes only.
 
-| Rung | R | Stata | Python | Paper |
+| Stage | R | Stata | Python | Paper |
 |---|---|---|---|---|
 | DiD | 4.98 | 4.98 | 4.98 | — |
 | SC | 3.06 | 3.06 | **3.04** | 3.06 |
@@ -168,7 +168,7 @@ The ladder is fitted three times, once per language. Shortfall at 2018Q4, outcom
 | MASC | 2.73 | — | 2.73 | 2.73 |
 | ASCM | 3.04 | 3.10 | 3.04 | 3.04 |
 
-Stata reproduces R to five decimals on every rung it can fit. Python's two bolded
+Stata reproduces R to five decimals at every stage it can fit. Python's two bolded
 disagreements are the solver, not the language: `mlsynth` uses a convex solver and lands on
 the exact-QP answer, while `synthdid` and Stata's `sdid` both stop where Frank–Wolfe stops.
 This is section 8.4 of the post confirmed from an independent direction. Section 19 of
