@@ -32,6 +32,7 @@ Nothing else. `setup_env.py` installs the rest into the bundle's own `.venv/`.
 | `analysis.py` | The complete pipeline behind the post: every figure and result table |
 | `cheatsheet_python.py` | One-page quick reference, all six rungs, ~25 seconds to run |
 | `cheatsheet_stata.do` | The same ladder in Stata (`sdid`, `synth`, `allsynth`), for cross-checking |
+| `cheatsheet_R.R` | The same ladder in R (`synthdid`, `Synth`, `masc`, `augsynth`) |
 | `brexit_analysis.csv` | The estimation sample: 24 countries x 104 quarters |
 | `setup_env.py` | Builds `.venv/`, installs pinned packages, registers the kernel |
 | `_quarto.yml` | Wires `setup_env.py` to Quarto's `pre-render` hook |
@@ -46,12 +47,18 @@ python3 setup_env.py            # build the environment (idempotent)
 quarto render tutorial.qmd               # the tutorial
 ```
 
-`cheatsheet_stata.do` needs Stata, not the Python environment. It installs its
-own dependencies from SSC (`sdid`, `synth`, `allsynth`, `distinct`,
-`elasticregress`) and runs in about 20 seconds with `global SE 0`:
+The other two cheat sheets need their own toolchains, not the Python
+environment. Neither writes to disk; both load the data over HTTPS.
 
 ```bash
+# Stata. Installs its own SSC dependencies (sdid, synth, allsynth, distinct,
+# elasticregress). ~20 s with `global SE 0`, ~3 min with standard errors on.
 stata-se -b do cheatsheet_stata.do
+
+# R. Needs synthdid, augsynth and masc from GitHub — the header has the
+# install recipe, including the Gurobi-dependency strip that masc requires.
+# ~30 s with `SE <- FALSE`, ~4 min otherwise.
+Rscript cheatsheet_R.R
 ```
 
 `analysis.py` caches expensive fits under `cache/`. Set `FORCE_REFIT=1` to

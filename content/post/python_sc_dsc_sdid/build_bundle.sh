@@ -26,7 +26,7 @@ for f in tutorial.qmd setup_env.py _quarto.yml render.command render.bat README.
 done
 
 # From the post root: the runnable companions and the data.
-for f in analysis.py cheatsheet_python.py cheatsheet_stata.do brexit_analysis.csv; do
+for f in analysis.py cheatsheet_python.py cheatsheet_stata.do cheatsheet_R.R brexit_analysis.csv; do
   cp "${POST_DIR}/${f}" "${DEST}/${f}"
 done
 

@@ -46,6 +46,10 @@ links:
     icon_pack: fas
     name: "Stata cheat sheet"
     url: cheatsheet_stata.do
+  - icon: bolt
+    icon_pack: fas
+    name: "R cheat sheet"
+    url: cheatsheet_R.R
   - icon: book
     icon_pack: fas
     name: "Jupyter notebook"
@@ -531,14 +535,16 @@ Learn the seven flat accessors and you can read the output of any effect estimat
 
 ### 5.2 Plotting: what the package gives you for free
 
-Every effect result carries a `.plot()` method driven by a `PlotConfig` captured at fit time. Set `display_graphs=True` and you get a figure without writing any Matplotlib at all.
+Every effect result carries a `.plot()` method driven by a `PlotConfig`. Set `display_graphs=True` and you get a figure without writing any Matplotlib at all.
 
 ```python
 res = VanillaSC(cfg(96, inference=False)).fit()
 
 fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
-res.plot(kind="counterfactual", ax=axes[0])
-res.plot(kind="gap", ax=axes[1])
+# display=False on every call. Without it .plot() ends in plt.show(), which in
+# a notebook flushes the figure after the FIRST panel and leaves the second empty.
+res.plot(kind="counterfactual", ax=axes[0], display=False)
+res.plot(kind="gap", ax=axes[1], display=False)
 plt.tight_layout()
 plt.show()
 ```
@@ -546,6 +552,8 @@ plt.show()
 ![Two side-by-side panels produced entirely by mlsynth's own plotting code: on the left the observed treated series against its synthetic counterfactual, on the right the estimated gap between them, both on the package's default light background with red and black lines.](python_sc_dsc_sdid_02_mlsynth_native_plot.png)
 
 That figure is deliberately unstyled — it is what the library draws with no help from us, and it is already publishable. `kind` takes `"auto"`, `"counterfactual"` or `"gap"`; passing `ax=` lets you compose several results into one panel.
+
+The `display=False` above is not cosmetic, and it is worth a paragraph because it is a fourth silent default. `.plot()` ends with `if pc.display: plt.show()`, and the `PlotConfig` it consults is `self.plot_config or PlotConfig()` — but the fitted result's `plot_config` is `None`, so the `display_graphs=False` you set on the config never reaches it and the fallback `PlotConfig()` has `display=True`. In a script the stray `plt.show()` is a harmless no-op under the Agg backend. In a notebook it flushes and closes the figure after the first panel, so the second panel renders blank and a stray `<Figure size 640x480 with 0 Axes>` appears underneath. The per-call `display=False` override is the fix; the same applies any time you compose two `.plot()` calls into one figure.
 
 Cosmetics are configured through the nested `plot` field rather than through Matplotlib, so a house style travels with the config:
 
@@ -1227,7 +1235,9 @@ The synthetic-control objective on this panel has a condition number of roughly 
 - `mlsynth` hands the identical problem to a **convex solver** which runs it to optimality and returns 3.039%.
 - Stata's `sdid` inherits `synthdid`'s Frank-Wolfe and stops in the same place; tighten its convergence with `max_iter(100000) min_dec(1e-9)` and its SDID estimate drifts from 2.79% to 2.80%, which is where `mlsynth` already is.
 
-[`cheatsheet_stata.do`](cheatsheet_stata.do) ships alongside this post so you can run that third leg yourself. It is the same ladder in `sdid`, `synth` and `allsynth`, on the same data and the same two evaluation quarters, and it prints a comparative table with the R column hard-coded for cross-checking. Two things in it are worth reading even if you never open Stata. Its ASCM row is a *different estimator* — `allsynth` implements the bias-corrected synthetic control of Abadie and L'Hour rather than the ridge-augmented version `VanillaSC(augment="ridge")` gives you — and its MASC row is empty, because MASC has no Stata implementation. Reporting those honestly rather than approximating them is the point.
+All three legs ship with this post, so you can run the comparison yourself rather than take it on trust: [`cheatsheet_python.py`](cheatsheet_python.py), [`cheatsheet_R.R`](cheatsheet_R.R) and [`cheatsheet_stata.do`](cheatsheet_stata.do). Same data, same treatment date, same two evaluation quarters, same comparative table at the end — and each file hard-codes the others' column, so a disagreement shows up the moment you run any one of them.
+
+The Stata file is the one worth reading even if you never open Stata. Two things in it. Its ASCM row is a *different estimator* — `allsynth` implements the bias-corrected synthetic control of Abadie and L'Hour rather than the ridge-augmented version `VanillaSC(augment="ridge")` gives you — and its MASC row is empty, because MASC has no Stata implementation. Reporting those honestly rather than approximating them is the point.
 
 Stata's version of the penalty trap is also the nastiest of the three. Its documented default is `zeta_omega(1e-6)`, which looks like a value but is a magic sentinel: `sdid.ado` reads `if (EOmega==1e-6) EtaOmega = (yNtr*yTpost)^(1/4)`, so passing the documented default *explicitly* still requests the full penalty. Only a literal `0` switches it off.
 
@@ -1544,7 +1554,7 @@ Three caveats belong with the number. It is a *net* gap between the UK and a ble
 - **A limitation to carry forward:** with one treated unit and 23 donors, the smallest attainable permutation p-value is 0.042. The design is at its inferential floor, and no estimator choice changes that.
 - **Next:** the same panel with `CLUSTERSC` or `PDA` if you have many more donors; `SequentialSDID` if adoption is staggered; `SPOTSYNTH` if you suspect spillovers onto the donor pool. All three take the config you already wrote.
 
-Two cheat sheets ship with this post: [`cheatsheet_python.py`](cheatsheet_python.py), which prints the whole ladder and a comparative table in about half a minute, and [`cheatsheet_stata.do`](cheatsheet_stata.do), which does the same in Stata in roughly twenty seconds with standard errors off, three minutes with them on. The third leg, [`cheatsheet_R.R`](/post/r_sc_dsc_sdid/cheatsheet_R.R), lives with [the R edition](/post/r_sc_dsc_sdid/), which hand-codes every estimator before calling its package and is the place to go for the derivations. On the wider site, [the classic synthetic control on the Basque Country](/post/r_basic_synthetic_control/), [augmented synthetic control on the Kansas tax cuts](/post/r_augsynth/) and [synthetic difference-in-differences on Proposition 99 in Stata](/post/stata_sdid/) cover single rungs in isolation.
+All three cheat sheets ship with this post, so the cross-language comparison in section 15 is reproducible without leaving the bundle: [`cheatsheet_python.py`](cheatsheet_python.py) (about half a minute), [`cheatsheet_stata.do`](cheatsheet_stata.do) (twenty seconds with standard errors off, three minutes with them on) and [`cheatsheet_R.R`](cheatsheet_R.R) (thirty seconds with `SE <- FALSE`, four minutes otherwise). Each prints the same ladder and the same comparative table on the same data, and each hard-codes the other languages' column so you can check one against another directly. [The R edition of this post](/post/r_sc_dsc_sdid/) hand-codes every estimator before calling its package and is the place to go for the derivations. On the wider site, [the classic synthetic control on the Basque Country](/post/r_basic_synthetic_control/), [augmented synthetic control on the Kansas tax cuts](/post/r_augsynth/) and [synthetic difference-in-differences on Proposition 99 in Stata](/post/stata_sdid/) cover single rungs in isolation.
 
 ## 23. Exercises
 
