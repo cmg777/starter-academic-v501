@@ -45,7 +45,7 @@ links:
 - icon: book
   icon_pack: fas
   name: "Jupyter notebook"
-  url: notebook.ipynb
+  url: https://github.com/cmg777/starter-academic-v501/blob/master/content/post/python_kuznets_dmsp/notebook.ipynb
 - icon: open-data
   icon_pack: ai
   name: "[Python] Google Colab"

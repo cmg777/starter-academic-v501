@@ -45,7 +45,7 @@ links:
   - icon: book
     icon_pack: fas
     name: "Jupyter notebook"
-    url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/python_dynamic_panel/notebook.ipynb
+    url: https://github.com/cmg777/starter-academic-v501/blob/master/content/post/python_dynamic_panel/notebook.ipynb
   - icon: podcast
     icon_pack: fas
     name: AI Podcast

@@ -32,7 +32,7 @@ links:
 - icon: book
   icon_pack: fas
   name: "Jupyter notebook"
-  url: notebook.ipynb
+  url: https://github.com/cmg777/starter-academic-v501/blob/master/content/post/r_demeaning_twfe/notebook.ipynb
 - icon: file-code
   icon_pack: fas
   name: "Quarto project (.zip)"

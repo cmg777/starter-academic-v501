@@ -36,7 +36,7 @@ links:
 - icon: book
   icon_pack: fas
   name: "Jupyter notebook"
-  url: notebook.ipynb
+  url: https://github.com/cmg777/starter-academic-v501/blob/master/content/post/python_fwl/notebook.ipynb
 - icon: markdown
   icon_pack: fab
   name: "MD version"
