@@ -44,6 +44,10 @@ links:
     icon_pack: fas
     name: "Python cheat sheet"
     url: cheatsheet_python.py
+  - icon: python
+    icon_pack: fab
+    name: "Python edition (mlsynth)"
+    url: /post/python_sc_dsc_sdid/
   - icon: file-code
     icon_pack: fas
     name: "Quarto project (.zip)"
@@ -1283,6 +1287,8 @@ Each language has a default that quietly gives you the wrong estimator, and in a
 **MASC's fold set has to be given explicitly in both languages that have MASC.** R's `masc` and Python's `mlsynth.MASC` both cross-validate over a fold set that, left to its default, is not the one the paper uses. Pass `set_f = 6:T0` in R and `set_f=range(6, 87)` in Python and the two agree to three decimals at 2.726. This is the same trap flagged in section 12, and it survives translation.
 
 **`mlsynth.DSC` is not this post's DSC.** mlsynth ships a class named `DSC` which implements *Distributional* Synthetic Control (Gunsilius) — matching whole outcome distributions. The DSC on this ladder is *Demeaned* Synthetic Control, which in mlsynth is `TSSC(method = "MSCa")`. Same three letters, different estimators, and importing the wrong one raises no error at all. It simply answers a different question. The mapping used here follows [mlsynth issue #312](https://github.com/jgreathouse9/mlsynth/issues/312), which is itself a reading of the paper this post replicates.
+
+> The Python column of these tables is only a cheat sheet. **[The Python edition of this post](/post/python_sc_dsc_sdid/)** climbs the same ladder at full length with `mlsynth` alone — every config option, every result field, the three SDID flavours, the covariate routes this cheat sheet skips, and the wider catalogue of estimators the library ships. Read it if you work in Python; read this one for the derivations.
 
 ### 19.5 What each language cannot do
 

@@ -1,0 +1,361 @@
+
+==============================================================================
+0. Setup
+==============================================================================
+  python         3.13.11
+  mlsynth        1.0.0
+  numpy          2.3.5
+  pandas         3.0.1
+  matplotlib     3.10.8
+  cvxpy          1.8.1
+  seed           20260801
+  FORCE_REFIT    False
+  estimators exported by mlsynth: 92
+
+==============================================================================
+1. The data
+==============================================================================
+  panel          2496 rows x 16 columns
+  countries      24  (23 donors)
+  quarters       1995Q1 to 2020Q4  (t = 1..104)
+  treated unit   United Kingdom
+  pre-periods    T0 = 86  (last pre-treatment quarter 2016Q2)
+  evaluated at   2018Q4 (t=96), 2019Q4 (t=100)
+  missing values 0
+
+==============================================================================
+3. The mlsynth surface
+==============================================================================
+  type(result)                  BaseEstimatorResults
+  result.att                    -0.030388
+  result.pre_rmse               0.005589
+  result.fit_diagnostics.r_squared_pre  0.998060
+  result.method_details.method_name     VanillaSC[outcome-only]
+  len(result.donor_weights)     9
+  result.counterfactual.shape   (87,)
+  result.gap.shape              (87,)
+  weights.summary_stats         ['sum_of_weights', 'n_donors', 'n_nonzero', 'n_negative', 'max_abs_weight', 'constraint', 'backend', 'predictor_weights', 'v_agreement']
+
+  Config validation (extra='forbid'):
+    misspelled keyword           -> MlsynthConfigError: 1 validation error for VanillaSCConfig
+    column not in the DataFrame  -> MlsynthDataError: Missing required columns in DataFrame 'df': gdp_log
+
+==============================================================================
+4. The raw paths
+==============================================================================
+  [figure] python_sc_dsc_sdid_01_gdp_paths.png
+  UK log real GDP 1995Q1: -0.0083   2020Q4: 0.5060
+
+==============================================================================
+5. Rung 0 — DiD, via FDID(...).fit().did
+==============================================================================
+  DiD         FDID(...).fit().did                      2018Q4  4.98   2019Q4  6.18   SE  2.19
+  DiD donor weights: 23 donors, all equal to 0.043478 = 1/23
+  DiD pre-treatment RMSE 0.02170, R^2 0.9706
+  Forward DiD selects 4 donors: Norway, Hungary, Austria, United States
+  Forward DiD          2018Q4  2.42   2019Q4  3.80   (pre-RMSE 0.00880 vs DiD's 0.02170)
+
+==============================================================================
+6. Rung 1 — SC, via VanillaSC
+==============================================================================
+  SC          VanillaSC(...)                           2018Q4  3.04   2019Q4  4.17
+              3.04, not R's 3.06 — see the solver section
+  backend chosen by 'auto': VanillaSC[outcome-only]
+  pre-treatment RMSE 0.005589   R^2 0.99806
+  weights: 9 of 9 nonzero, sum 1.000000, simplex (non-negative, sum to 1)
+  donors above 0.01:
+      Hungary          0.2231
+      United States    0.1926
+      Japan            0.1826
+      Canada           0.1751
+      Norway           0.1350
+      Ireland          0.0523
+      Italy            0.0196
+      Portugal         0.0124
+
+==============================================================================
+6a. One estimator, several solvers
+==============================================================================
+  VanillaSC, backend='auto'            2018Q4 3.039   2019Q4 4.172   pre-RMSE 0.005589
+  VanillaSC, backend='outcome-only'    2018Q4 3.039   2019Q4 4.172   pre-RMSE 0.005589
+  VanillaSC, w_constr='simplex'        2018Q4 3.039   2019Q4 4.172   pre-RMSE 0.005589
+  TSSC, method='SC'                    2018Q4 3.039   2019Q4 4.172   pre-RMSE 0.006000
+  R synthdid (Frank-Wolfe, published)  2018Q4 3.060   2019Q4 4.200
+  [table]  solver_comparison.csv
+  [figure] python_sc_dsc_sdid_03_solver_comparison.png
+
+==============================================================================
+6b. mlsynth's own plotting
+==============================================================================
+  [figure] python_sc_dsc_sdid_02_mlsynth_native_plot.png  (package defaults, light theme)
+  PlotConfig fields set: counterfactual_colors, counterfactual_linestyle, display, intervention_color, observed_color, title, xlabel, ylabel
+
+==============================================================================
+6c. The counterfactual path
+==============================================================================
+  [figure] python_sc_dsc_sdid_04_sc_fit_gap.png
+  full-panel SC: pre-RMSE 0.005589, mean post gap -0.02882 log points
+
+==============================================================================
+7. Rung 2 — DSC, via TSSC(method='MSCa')
+==============================================================================
+  DSC         TSSC(..., method="MSCa")                 2018Q4  2.99   2019Q4  4.12
+  MSCa intercept (the bias adjustment): +0.002410 log points  = +0.241% of GDP
+  MSCa pre-RMSE 0.006000 vs SC's 0.005589
+  variants['MSCa'].att (rounded)     -0.03  -> 3.0000%
+  gap[-1] (full precision)           np.float64(-0.0298873295228968)  -> 2.9887%
+  variants['MSCa'].rmse_pre (rounded)0.006
+
+==============================================================================
+7a. The four TSSC variants and the Step-1 selection
+==============================================================================
+  [cache] tssc_all_variants
+  TSSC recommends: SC
+    SC     ATT -0.030387   loss 3.039%   (.att reports -0.03000)   intercept none
+    MSCa   ATT -0.029887   loss 2.989%   (.att reports -0.03000)   intercept +0.00241
+    MSCb   ATT -0.030406   loss 3.041%   (.att reports -0.03000)   intercept none
+    MSCc   ATT -0.030208   loss 3.021%   (.att reports -0.03000)   intercept +0.00282
+  [table]  tssc_variants.csv
+  Step-1 restriction tests:
+    joint                  stat +2.21193   CI [+0.02894, +9.10199]   rejected False
+  TSSC(method='MSCa', inference=False): 0.01s per fit
+  [figure] python_sc_dsc_sdid_05_dsc_offset.png
+
+==============================================================================
+8. Rung 3 — SDID
+==============================================================================
+  SDID        SDID(..., zeta=0.0)                      2018Q4  2.80   2019Q4  3.94   SE  2.64
+  zeta left at its default: 2.67%  (against 2.80% at zeta=0)
+  Same trap as synthdid's zeta.omega in R and sdid's zeta_omega() in Stata.
+  intercept_adjust=True:    2.8012%  (identical — with one post period there is nothing to adjust)
+  cohorts: [87]  (one adoption period, n_treated=1, n_post=1)
+  lambda: 86 weights summing to 1.000000; 1 above 1e-4
+  omega:  23 weights summing to 1.000000
+  inference: ATT -0.02801, SE 0.02636, CI [-0.07968, +0.02365], p = 0.2016, method 'placebo', n_placebo 500
+
+==============================================================================
+8a. Three flavours of SDID
+==============================================================================
+  SDID (i)    2018Q4 2.771   2019Q4 3.908   (lambda fitted on the treatment quarter; paper 2.76)
+  SDID (ii)   2018Q4 2.801   2019Q4 3.937   (lambda fitted on the post-period average; paper 2.79)
+  SDID (iii)  2018Q4 2.801   2019Q4 3.937   (lambda fitted on the evaluation quarter; paper 2.79)
+  [table]  sdid_variants.csv
+  spread across the three flavours at 2018Q4: 0.030 percentage points
+  lambda(i), weights above 1e-4:
+      2008Q4   0.0386
+      2014Q3   0.0029
+      2016Q2   0.9585
+  [figure] python_sc_dsc_sdid_06_sdid_time_weights.png
+  [table]  sdid_time_weights.csv
+
+==============================================================================
+8b. The event study
+==============================================================================
+  [figure] python_sc_dsc_sdid_07_sdid_event_study.png
+  event times -86..17; post-treatment tau mean -0.02809
+  pre-treatment tau mean +0.00208 (should sit near zero)
+  [table]  sdid_event_study.csv
+
+==============================================================================
+9. Rung 4 — MASC
+==============================================================================
+  MASC        MASC(..., set_f=range(6, 87))            2018Q4  2.73   2019Q4  3.83
+  weights.summary_stats: {'constraint': 'simplex (matching+SC blend)', 'phi_hat': 0.15769222338578237, 'm_hat': 10}
+  cross-validation picked m = 10 neighbours and phi = 0.15769
+  -> the estimate is 0.158 x matching + 0.842 x synthetic control
+  pre-RMSE 0.005990 vs SC's 0.005589
+
+==============================================================================
+9a. set_f versus min_preperiods
+==============================================================================
+  set_f=range(6, 87)  [the paper]    2018Q4 2.726   2019Q4 3.828
+  min_preperiods=None [default]      2018Q4 3.191   2019Q4 4.325
+  min_preperiods=43   [ceil(T0/2)]   2018Q4 3.191   2019Q4 4.325
+  [table]  masc_fold_settings.csv
+
+==============================================================================
+9b. Tracing the cross-validation over m
+==============================================================================
+  [cache] masc_cv_by_m
+ m  loss_2018Q4  pre_rmse  phi_hat
+ 1      2.89028   0.00563  0.03808
+ 2      3.01677   0.00559  0.00531
+ 3      2.97685   0.00566  0.06197
+ 4      3.09494   0.00578  0.08790
+ 5      3.18100   0.00587  0.09211
+ 6      3.23477   0.00593  0.08848
+ 7      3.07342   0.00567  0.04640
+ 8      2.96191   0.00583  0.11266
+ 9      2.95586   0.00596  0.12382
+10      2.72551   0.00599  0.15769
+  [table]  masc_cv_table.csv
+  [figure] python_sc_dsc_sdid_08_masc_cv.png
+
+==============================================================================
+10. Rung 5 — ASCM, via VanillaSC(augment='ridge')
+==============================================================================
+  ASCM        VanillaSC(..., augment="ridge")          2018Q4  3.04   2019Q4  4.19
+  ridge_lambda chosen: None
+  weights: sum 1.00000, 8 negative, min -0.0090, max +0.2262
+  pre-RMSE 0.005428 vs SC's 0.005589
+  residualize=True (the paper's 'ASCM res.'): 2018Q4  3.04   2019Q4  4.19
+
+==============================================================================
+11. The whole ladder
+==============================================================================
+  [table]  att_headline.csv
+method                         command  loss_2018Q4  loss_2019Q4  r_post_2018Q4  published_2018Q4
+   DiD             FDID(...).fit().did         4.98         6.18           4.98               NaN
+    SC                  VanillaSC(...)         3.04         4.17           3.06              3.06
+   DSC        TSSC(..., method="MSCa")         2.99         4.12           2.98              2.98
+  SDID             SDID(..., zeta=0.0)         2.80         3.94           2.79              2.79
+  MASC   MASC(..., set_f=range(6, 87))         2.73         3.83           2.73              2.73
+  ASCM VanillaSC(..., augment="ridge")         3.04         4.19           3.04              3.04
+
+  Born et al. (2019) reported 2.4% for this dataset. Every rung here is above it.
+  [table]  donor_weights_by_method.csv
+  [figure] python_sc_dsc_sdid_09_donor_weights.png
+  negative weights across SC/DSC/SDID/MASC/ASCM: 8 (all from ASCM: 8)
+
+==============================================================================
+11a. Counterfactual paths on the full panel
+==============================================================================
+  [cache] full_counterfactuals
+  SC     counterfactual length 104
+  DSC    counterfactual length 104
+  MASC   counterfactual length 104
+  ASCM   counterfactual length 104
+  SDID   counterfactual length 104
+  DiD    counterfactual length 104
+  [figure] python_sc_dsc_sdid_10_all_counterfactuals.png
+  [figure] python_sc_dsc_sdid_11_att_dotplot.png
+
+==============================================================================
+12. The in-sample placebo tournament
+==============================================================================
+  [cache] placebo_insample
+  [table]  placebo_insample_errors.csv
+
+  Horizon h = 1 quarter
+    method   RMSE    MAB  MedAB
+        SC 0.0086 0.0068 0.0051
+       DSC 0.0086 0.0068 0.0051
+  SDID (i) 0.0066 0.0037 0.0016
+ SDID (ii) 0.0066 0.0038 0.0017
+SDID (iii) 0.0066 0.0039 0.0020
+      MASC 0.0080 0.0062 0.0045
+      ASCM 0.0086 0.0068 0.0051
+
+  Horizon h = 4 quarters
+    method   RMSE    MAB  MedAB
+        SC 0.0145 0.0130 0.0123
+       DSC 0.0146 0.0130 0.0125
+  SDID (i) 0.0132 0.0109 0.0101
+ SDID (ii) 0.0133 0.0109 0.0102
+SDID (iii) 0.0133 0.0110 0.0102
+      MASC 0.0140 0.0124 0.0113
+      ASCM 0.0146 0.0130 0.0123
+  [table]  placebo_h1_summary.csv
+  [table]  placebo_h4_summary.csv
+
+  As the paper reports it (mixed horizons), against the published values
+    method   RMSE    MAB  MedAB  horizon  published_RMSE
+        SC 0.0086 0.0068 0.0051        1          0.0089
+       DSC 0.0086 0.0068 0.0051        1          0.0087
+  SDID (i) 0.0066 0.0037 0.0016        1          0.0067
+      MASC 0.0080 0.0062 0.0045        1          0.0080
+      ASCM 0.0086 0.0068 0.0051        1          0.0086
+ SDID (ii) 0.0133 0.0109 0.0102        4          0.0134
+SDID (iii) 0.0133 0.0110 0.0102        4          0.0134
+  [table]  placebo_insample_summary.csv
+  [figure] python_sc_dsc_sdid_12_placebo_tournament.png
+
+==============================================================================
+13. Covariates — three routes through SDID
+==============================================================================
+  covariates={'adjust':...}  2018Q4  3.61   2019Q4  4.85
+  covariates={'match':...}  2018Q4  1.85   2019Q4  2.93
+  covariates={'optimized':...}  2018Q4  3.11   2019Q4  4.56
+
+==============================================================================
+13a. VanillaSC with covariates (the ADH bilevel program)
+==============================================================================
+  [fit]   vanillasc_covariates  (2.8s)
+  default (maxiter=300, popsize=15)    2018Q4   1.32%   pre-RMSE 0.009662   v_agreement 0.0553
+      top predictor weights: imp_share 1.000, exp_share 0.000, labprod_growth 0.000, emp_pop 0.000
+  default (maxiter=300, popsize=15)    2019Q4   2.42%   pre-RMSE 0.009662   v_agreement 0.0553
+      top predictor weights: imp_share 1.000, exp_share 0.000, labprod_growth 0.000, emp_pop 0.000
+  reduced (maxiter=120, popsize=12)    2018Q4   1.11%   pre-RMSE 0.009928   v_agreement 0.08281
+      top predictor weights: labprod_growth 0.419, emp_pop 0.396, cons_share 0.141, inv_share 0.045
+  reduced (maxiter=120, popsize=12)    2019Q4   2.15%   pre-RMSE 0.009928   v_agreement 0.08281
+      top predictor weights: labprod_growth 0.419, emp_pop 0.396, cons_share 0.141, inv_share 0.045
+  Same estimator, same seed, same data; only the optimiser budget differs.
+  A well-identified V would not care. This one does.
+  [table]  vanillasc_covariates.csv
+  [table]  covariate_methods.csv
+  [figure] python_sc_dsc_sdid_13_covariate_methods.png
+
+==============================================================================
+14. Robustness
+==============================================================================
+  treatment date 2016Q3 (headline)    SC  3.04  DSC  2.99  SDID  2.77
+  treatment date 2016Q2               SC  3.09  DSC  3.05  SDID  3.18
+  drop the United States             SC  3.06  DSC  3.04  SDID  2.83
+  zeta = 0 (the paper)                                    SDID  2.80
+  zeta at its default                                     SDID  2.67
+  w_constr='simplex'                     SC  3.04
+  w_constr='ols'                     SC  3.37
+  w_constr='ridge'                     SC  3.37
+  w_constr='lasso'                     SC  2.97
+  [table]  robustness_grid.csv
+
+==============================================================================
+15. Inference — what each estimator will tell you
+==============================================================================
+  [cache] inference_menu
+        method       att  p_value  ci_lower  ci_upper                                                     reported_as  seconds
+       placebo -0.030388 0.041667       NaN       NaN                                  in-space placebo (RMSPE ratio) 0.054469
+          scpi -0.030388      NaN -0.055333 -0.009374         scpi prediction intervals (Cattaneo-Feng-Titiunik 2021) 2.229854
+           lto -0.030388 0.008333       NaN       NaN               leave-two-out refined placebo (Lei-Sudijono 2025) 0.622240
+     conformal -0.030388 0.020000 -0.046603 -0.014292 conformal prediction intervals (Chernozhukov-Wuthrich-Zhu 2021) 2.003116
+         ttest -0.030388 0.005788 -0.040042 -0.020228             debiased SC t-test (Chernozhukov-Wuthrich-Zhu 2025) 0.013252
+jackknife_plus       NaN      NaN       NaN       NaN                                  FAILED: MlsynthEstimationError      NaN
+  [table]  inference_summary.csv
+
+==============================================================================
+15a. Placebo in space
+==============================================================================
+  [cache] placebo_in_space
+  UK post/pre RMSPE ratio ranks 1 of 24  -> permutation p = 0.042
+       country  rmspe_pre  rmspe_post  ratio  rank
+United Kingdom     0.0056      0.0327 5.8488     1
+       Belgium     0.0043      0.0151 3.5231     2
+       Finland     0.0202      0.0666 3.2905     3
+   New Zealand     0.0134      0.0397 2.9693     4
+       Hungary     0.0210      0.0593 2.8193     5
+       Austria     0.0042      0.0111 2.6324     6
+  [table]  placebo_in_space_ratios.csv
+  [figure] python_sc_dsc_sdid_14_placebo_in_space.png
+
+==============================================================================
+16. Assertions
+==============================================================================
+  [ok ] SC at 2018Q4 near 3.04
+  [ok ] DSC at 2018Q4 near 2.99
+  [ok ] SDID at 2018Q4 near 2.80
+  [ok ] MASC at 2018Q4 near 2.73
+  [ok ] ASCM at 2018Q4 near 3.04
+  [ok ] DiD at 2018Q4 near 4.98
+  [ok ] every rung exceeds Born et al.'s 2.4%
+  [ok ] SDID time weights sum to one
+  [ok ] SC weights lie on the simplex
+  [ok ] DiD weights are uniform
+  [ok ] the three SDID flavours agree within 0.05pp
+  [ok ] SDID beats SC in the h=1 placebo
+
+==============================================================================
+Done
+==============================================================================
+  figures written: 14
+  tables  written: 18
+  all assertions passed

@@ -1,0 +1,7 @@
+method,command,loss_2018Q4,loss_2019Q4,se_2018Q4,inference,published_2018Q4,note,r_post_2018Q4
+DiD,FDID(...).fit().did,4.9799999999999995,6.18,2.19,analytic (FDID),,,4.98
+SC,VanillaSC(...),3.038816620781942,4.172083489722339,,in-space placebo,3.06,"3.04, not R's 3.06 — see the solver section",3.06
+DSC,"TSSC(..., method=""MSCa"")",2.9887329522896797,4.124898246299064,,none (disabled),2.98,,2.98
+SDID,"SDID(..., zeta=0.0)",2.801184164375953,3.9373671779090955,2.6360787836686064,placebo (B=500),2.79,,2.79
+MASC,"MASC(..., set_f=range(6, 87))",2.7255053829554345,3.8275147282640196,,none in package,2.73,,2.73
+ASCM,"VanillaSC(..., augment=""ridge"")",3.0447296701278495,4.1868821124108,,in-space placebo,3.04,,3.04

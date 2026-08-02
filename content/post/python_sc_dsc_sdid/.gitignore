@@ -1,0 +1,13 @@
+# analysis.py's memoised fits. Pickles are fragile across Python/pandas
+# versions and useless to a reader; the script regenerates them, and
+# execution_log.txt is the durable record of a run.
+cache/
+
+/.quarto/
+references/.quarto/
+references/.venv/
+references/tutorial.html
+references/tutorial_files/
+**/*.quarto_ipynb
+__pycache__/
+*.pyc

@@ -1,0 +1,608 @@
+---
+title: "The Synthetic Control Ladder in Python"
+subtitle: "A guided tour of `mlsynth` on the Brexit referendum"
+author: "Carlos Mendez"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    number-sections: true
+    code-fold: false
+    code-tools: true
+    embed-resources: true
+    theme: cosmo
+    fig-width: 9
+    fig-height: 5
+    include-in-header:
+      text: |
+        <style>
+        img, .figure img { max-width: 100%; height: auto; }
+        pre { overflow-x: auto; }
+        table { display: block; overflow-x: auto; max-width: 100%; }
+        </style>
+jupyter: sc-dsc-sdid-tutorial
+execute:
+  warning: false
+  message: false
+---
+
+Executable companion to
+[carlos-mendez.org/post/python_sc_dsc_sdid](https://carlos-mendez.org/post/python_sc_dsc_sdid/).
+
+We climb the whole ladder of single-treated-unit estimators — DiD → SC → DSC →
+SDID → MASC → ASCM — with **one `mlsynth` class per rung**, on quarterly log
+real GDP for 24 OECD economies (1995Q1–2020Q4). The United Kingdom is the
+treated unit, 23 countries are donors, and the referendum is dated 2016Q3.
+
+The focus is the *package*: which config field selects which estimator, what
+the result object contains, and where a default will quietly hand you a
+different estimator than the one you meant to fit.
+
+::: {.callout-warning}
+## Naming hazard, before you import anything
+
+`mlsynth` ships a class called `DSC`. It is **not** the estimator in this
+tutorial.
+
+- `mlsynth.DSC` = **Distributional** synthetic control (Gunsilius 2023) —
+  matches whole outcome distributions, needs micro-level data.
+- This tutorial's DSC = **Demeaned** synthetic control (Doudchenko & Imbens
+  2016; Ferman & Pinto 2021) = `TSSC(method="MSCa")`.
+
+Same three letters, different estimators. Importing the wrong one raises no
+error; it just answers a different question.
+:::
+
+## Environment check
+
+`setup_env.py` (wired to Quarto's `pre-render` hook) has already built a
+hermetic `.venv/` next to this file and registered the kernel this document
+uses. This chunk only verifies it.
+
+```{python}
+#| label: setup-packages
+import sys
+from pathlib import Path
+
+assert ".venv" in Path(sys.executable).resolve().parts, (
+    f"Expected the bundle's .venv, got {sys.executable}. "
+    "Run `python3 setup_env.py` first, or use render.command / render.bat."
+)
+
+import importlib.metadata as md
+for pkg in ("mlsynth", "numpy", "pandas", "matplotlib"):
+    try:
+        print(f"  {pkg:<12s} {md.version(pkg)}")
+    except md.PackageNotFoundError:
+        print(f"  {pkg:<12s} MISSING")
+```
+
+```{python}
+import warnings
+warnings.filterwarnings("ignore")
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+import mlsynth
+from mlsynth import FDID, MASC, SDID, TSSC, VanillaSC
+from mlsynth.exceptions import MlsynthConfigError, MlsynthDataError
+
+print("mlsynth", mlsynth.__version__)
+print("estimators exported:", len(mlsynth.__all__))
+```
+
+## The data and the mlsynth contract
+
+Every estimator in the library wants the same five things: a **long-format**
+DataFrame with one row per unit-period, plus the names of the outcome,
+treatment, unit and time columns.
+
+`treat` is a 0/1 indicator that is 1 for the treated unit **in post-treatment
+periods** and 0 everywhere else — including for the treated unit *before*
+treatment. `mlsynth` reads both the donor pool and the treatment date off that
+one column.
+
+```{python}
+URLS = [
+    "brexit_analysis.csv",
+    "https://raw.githubusercontent.com/cmg777/starter-academic-v501/"
+    "master/content/post/python_sc_dsc_sdid/brexit_analysis.csv",
+    "https://raw.githubusercontent.com/cmg777/starter-academic-v501/"
+    "master/content/post/r_sc_dsc_sdid/brexit_analysis.csv",
+]
+for src in URLS:
+    try:
+        panel = pd.read_csv(src)
+        print(f"loaded from {src}")
+        break
+    except Exception:
+        continue
+else:
+    raise RuntimeError("could not load brexit_analysis.csv")
+
+print(f"{panel.shape[0]} rows x {panel.shape[1]} columns")
+print(f"{panel.country.nunique()} countries, quarters t = {panel.t.min()}..{panel.t.max()}")
+```
+
+```{python}
+T0 = 86                                    # pre-treatment quarters, through 2016Q2
+EVAL = {"2018Q4": 96, "2019Q4": 100}
+TREATED = "United Kingdom"
+
+Y = panel.pivot(index="t", columns="country", values="log_rgdp").sort_index()
+DONORS = [c for c in Y.columns if c != TREATED]
+QLAB = panel[panel.country == TREATED].sort_values("t")["quarter_label"].to_numpy()
+QDEC = panel[panel.country == TREATED].sort_values("t")["date_dec"].to_numpy()
+
+print(f"{len(DONORS)} donors, T0 = {T0} (last pre-treatment quarter {QLAB[T0-1]})")
+```
+
+### The one trick that makes everything else simple
+
+Every `mlsynth` estimator reports an ATT averaged over **all** post-treatment
+periods, but we want the shortfall at two specific quarters. Keep the 86
+pre-treatment quarters plus the single quarter of interest, renumber time to
+run 1..87, and "the average over all post periods" becomes an average over one
+period. A bare `.fit()` then returns exactly the number we want.
+
+```{python}
+def window(post, pre=T0):
+    """`pre` pre-treatment quarters + the given post quarter(s), renumbered."""
+    post = [post] if np.isscalar(post) else list(post)
+    sub = panel[(panel.t <= pre) | (panel.t.isin(post))].copy()
+    sub["tt"] = sub.groupby("country")["t"].rank(method="dense").astype(int)
+    sub["treat"] = ((sub.country == TREATED) & (sub.tt > pre)).astype(int)
+    return sub
+
+
+def cfg(post, pre=T0, **extra):
+    """The five fields every mlsynth estimator wants, plus estimator-specific ones."""
+    return dict(df=window(post, pre), outcome="log_rgdp", treat="treat",
+                unitid="country", time="tt", display_graphs=False, **extra)
+
+
+def pct(att):
+    """mlsynth reports treated minus counterfactual. Flip into a % GDP shortfall."""
+    return -100.0 * att
+
+
+def tssc_att(res, variant="MSCa", n_post=1):
+    """Full-precision ATT for a TSSC variant.
+
+    TSSC rounds its scalar summaries (.att comes back as exactly -0.03) but the
+    gap and counterfactual SERIES are full precision.
+    """
+    gap = np.asarray(res.variants[variant].gap, float).ravel()
+    return float(gap[-n_post:].mean())
+```
+
+### Configs are validated
+
+The configs are Pydantic v2 models with `extra = "forbid"`, so a typo raises
+instead of being silently ignored.
+
+```{python}
+base = cfg(EVAL["2018Q4"])
+
+for bad, why in [
+    (dict(base, backendd="outcome-only"), "misspelled keyword"),
+    (dict(base, outcome="gdp_log"),       "column not in the DataFrame"),
+]:
+    try:
+        VanillaSC(bad).fit()
+    except (MlsynthConfigError, MlsynthDataError) as exc:
+        print(f"{why:<28s} -> {type(exc).__name__}: {str(exc).splitlines()[0][:70]}")
+```
+
+## Anatomy of a fit
+
+Build a config, construct the estimator, call `.fit()`, read the result. The
+result carries six sub-models plus seven flat accessors that work on **every**
+effect estimator in the library: `.att`, `.att_ci`, `.counterfactual`, `.gap`,
+`.donor_weights`, `.weight_vector`, `.pre_rmse`.
+
+```{python}
+res = VanillaSC(cfg(EVAL["2018Q4"], inference=False)).fit()
+
+print(f"type(result)                 {type(res).__name__}")
+print(f"result.att                   {res.att:+.6f}")
+print(f"result.pre_rmse              {res.pre_rmse:.6f}")
+print(f"result.method_details.method_name     {res.method_details.method_name}")
+print(f"len(result.donor_weights)    {len(res.donor_weights)}   # only NON-ZERO donors")
+```
+
+Plotting comes free: every effect result carries `.plot()`.
+
+```{python}
+fig, axes = plt.subplots(1, 2, figsize=(12, 4.2))
+res.plot(kind="counterfactual", ax=axes[0])
+res.plot(kind="gap", ax=axes[1])
+plt.tight_layout()
+plt.show()
+```
+
+## Rung 0 — Difference-in-differences
+
+`mlsynth` has no standalone DiD class. The plain two-way estimator comes free
+inside `FDID`, exposed as `.did`. The uniform 1/23 donor weights are the
+giveaway that nothing was fitted.
+
+```{python}
+fdid_res = {k: FDID(cfg(e)).fit() for k, e in EVAL.items()}
+did = {k: r.did for k, r in fdid_res.items()}
+
+print(f"DiD  2018Q4 {pct(did['2018Q4'].att):.2f}%   2019Q4 {pct(did['2019Q4'].att):.2f}%")
+wd = did["2018Q4"].donor_weights
+print(f"donor weights: {len(wd)} donors, all equal to {next(iter(wd.values())):.6f}")
+print(f"pre-treatment RMSE {did['2018Q4'].pre_rmse:.5f}")
+
+f18 = fdid_res["2018Q4"].fdid
+print(f"\nForward DiD (free bonus) selects {len(f18.selected_names)} donors: "
+      f"{', '.join(f18.selected_names)}")
+print(f"Forward DiD  2018Q4 {pct(f18.att):.2f}%   pre-RMSE {f18.pre_rmse:.5f}")
+```
+
+## Rung 1 — Synthetic control
+
+```{python}
+sc = {k: VanillaSC(cfg(e, inference=False)).fit() for k, e in EVAL.items()}
+s18 = sc["2018Q4"]
+
+print(f"SC  2018Q4 {pct(s18.att):.2f}%   2019Q4 {pct(sc['2019Q4'].att):.2f}%")
+print(f"backend chosen by 'auto': {s18.method_details.method_name}")
+print(f"pre-RMSE {s18.pre_rmse:.6f}   R^2 {s18.fit_diagnostics.r_squared_pre:.5f}\n")
+
+for c, w in sorted(s18.donor_weights.items(), key=lambda kv: -kv[1]):
+    if w > 0.01:
+        print(f"    {c:<16s} {w:.4f}")
+```
+
+### One estimator, four solvers
+
+The SC objective on this panel has a condition number of about $7.5\times10^5$:
+a long, narrow, nearly flat valley of near-optimal weight vectors. Any
+optimiser has to decide when to stop walking down it.
+
+```{python}
+for label, klass, kw in [
+    ("VanillaSC, backend='auto'",         VanillaSC, dict(inference=False)),
+    ("VanillaSC, backend='outcome-only'", VanillaSC, dict(backend="outcome-only", inference=False)),
+    ("VanillaSC, w_constr='simplex'",     VanillaSC, dict(w_constr="simplex", inference=False)),
+    ("TSSC, method='SC'",                 TSSC,      dict(method="SC", inference=False)),
+]:
+    r = klass(cfg(EVAL["2018Q4"], **kw)).fit()
+    att = tssc_att(r, "SC") if klass is TSSC else r.effects.att
+    print(f"{label:<36s} 2018Q4 {pct(att):.3f}")
+
+print(f"{'R synthdid (Frank-Wolfe, published)':<36s} 2018Q4 3.060")
+```
+
+Four independent code paths inside `mlsynth` agree at **3.039%**; R's
+`synthdid` stops at **3.06%**. Neither is buggy — a synthetic control estimate
+carries its solver's fingerprint.
+
+## Rung 2 — Demeaned synthetic control
+
+`TSSC(method="MSCa")`. **`TSSC` rounds every scalar it reports**; the series
+are full precision.
+
+```{python}
+dsc = {k: TSSC(cfg(e, method="MSCa", inference=False)).fit() for k, e in EVAL.items()}
+d18 = dsc["2018Q4"].variants["MSCa"]
+
+print(f"DSC  2018Q4 {pct(tssc_att(dsc['2018Q4'])):.2f}%   "
+      f"2019Q4 {pct(tssc_att(dsc['2019Q4'])):.2f}%")
+print(f"MSCa intercept: {d18.intercept:+.6f} log points\n")
+print("The rounding trap:")
+print(f"  variants['MSCa'].att      {d18.att!r}   -> {pct(d18.att):.4f}%")
+print(f"  gap[-1] (full precision)  {float(np.asarray(d18.gap, float)[-1]):.16f}")
+print(f"                            -> {pct(tssc_att(dsc['2018Q4'])):.4f}%")
+```
+
+```{python}
+t_all = TSSC(cfg(EVAL["2018Q4"], draws=500, seed=20260801)).fit()
+print(f"TSSC recommends: {t_all.recommended_method}\n")
+for m in ("SC", "MSCa", "MSCb", "MSCc"):
+    v = t_all.variants[m]
+    ic = "none" if v.intercept is None else f"{v.intercept:+.5f}"
+    print(f"  {m:<5s} loss {pct(tssc_att(t_all, m)):5.3f}%   "
+          f"(.att reports {v.att:+.5f})   intercept {ic}")
+```
+
+## Rung 3 — Synthetic difference-in-differences
+
+**The one setting that carries the result:** `zeta` is a ridge penalty on the
+unit weights, on by default. Every implementation in every language penalises
+by default.
+
+```{python}
+sdid = {k: SDID(cfg(e, zeta=0.0, vce="placebo", B=500, seed=20260801)).fit()
+        for k, e in EVAL.items()}
+s = sdid["2018Q4"]
+
+print(f"SDID  2018Q4 {pct(s.effects.att):.2f}%   2019Q4 {pct(sdid['2019Q4'].effects.att):.2f}%")
+inf = s.inference_detail
+print(f"ATT {inf.att:+.5f}, SE {inf.se:.5f}, CI [{inf.ci[0]:+.5f}, {inf.ci[1]:+.5f}]")
+print(f"p = {inf.p_value:.4f}, n_placebo {inf.n_placebo}\n")
+
+default = SDID(cfg(EVAL["2018Q4"], vce="noinference")).fit()
+print(f"zeta left at its default: {pct(default.effects.att):.2f}%")
+print(f"zeta = 0.0:               {pct(s.effects.att):.2f}%   <- the paper's specification")
+```
+
+### The time weights are not where you would first look
+
+Unit weights are `result.donor_weights`. SDID's time weights live on the
+**cohort** object.
+
+```{python}
+coh = list(sdid["2018Q4"].cohorts.values())[0]
+lam = np.asarray(coh.time_weights, float)
+
+print(f"lambda: {len(lam)} weights summing to {lam.sum():.6f}\n")
+for i in np.where(lam > 1e-4)[0]:
+    print(f"    {QLAB[i]:<8s} {lam[i]:.4f}")
+print(f"\nDiD would use the uniform weight 1/{T0} = {1/T0:.4f} on every quarter.")
+```
+
+```{python}
+fig, ax = plt.subplots(figsize=(10, 4.5))
+ax.axhline(1 / T0, color="#e8b04b", ls="--", lw=1.0,
+           label="uniform (the two-way fixed-effects correction)")
+ax.vlines(QDEC[:T0], 0, lam, color="#6a9bcc", lw=0.8)
+ax.plot(QDEC[:T0], lam, "o", color="#6a9bcc", ms=3.5)
+big = lam > 0.02
+ax.plot(QDEC[:T0][big], lam[big], "o", color="#d97757", ms=9)
+ax.set_xlabel("year"); ax.set_ylabel(r"time weight $\lambda_s$")
+ax.set_title("SDID's time weights collapse onto the last pre-treatment quarter")
+ax.legend()
+plt.show()
+```
+
+Log real GDP behaves close to a random walk, so the best predictor of next
+quarter is *this* quarter. Read the collapse as SDID correctly discovering that
+most of the pre-treatment history is uninformative.
+
+### The event study
+
+```{python}
+full = cfg(list(range(T0 + 1, len(QLAB) + 1)))
+full_sdid = SDID(dict(full, zeta=0.0, vce="placebo", B=200, seed=20260801)).fit()
+
+es = full_sdid.event_study
+et, tau, ci = (np.asarray(es.event_times, float), np.asarray(es.tau, float),
+               np.asarray(es.ci, float))
+print(f"post-treatment tau mean {tau[et > 0].mean():+.5f}")
+print(f"pre-treatment tau mean  {tau[(et < 0) & (et >= -20)].mean():+.5f}   (should be ~0)")
+
+keep = (et >= -20) & (et <= 18)
+fig, ax = plt.subplots(figsize=(10, 4.5))
+ax.axhline(0, color="grey", lw=0.8); ax.axvline(0, color="black", ls="--", lw=1.0)
+ax.fill_between(et[keep], ci[keep, 0], ci[keep, 1], color="#6a9bcc", alpha=0.25)
+ax.plot(et[keep], tau[keep], "o-", color="#d97757", lw=1.7, ms=4)
+ax.set_xlabel("quarters since the referendum"); ax.set_ylabel("effect on log real GDP")
+ax.set_title("SDID event study, straight from result.event_study")
+plt.show()
+```
+
+### Three flavours of SDID
+
+Only variant (iii) falls out of a bare `.fit()`. The other two need the weights
+the result already hands you, applied at a different quarter.
+
+```{python}
+def sdid_weights(post, pre=T0):
+    res = SDID(cfg(post, pre, zeta=0.0, vce="noinference")).fit()
+    return res.donor_weights, np.asarray(list(res.cohorts.values())[0].time_weights, float)
+
+
+def sdid_loss(w, lam, t, pre=T0):
+    wv = np.array([w[c] for c in DONORS])
+    gap = lambda s: float(Y.loc[s, TREATED] - Y.loc[s, DONORS].to_numpy() @ wv)
+    bias = float(sum(lam[s - 1] * gap(s) for s in range(1, pre + 1)))
+    return -100.0 * (gap(t) - bias)
+
+
+variants = {
+    "SDID (i)":   sdid_weights(T0 + 1),
+    "SDID (ii)":  sdid_weights(range(T0 + 1, EVAL["2018Q4"] + 1)),
+    "SDID (iii)": sdid_weights(EVAL["2018Q4"]),
+}
+for name, (w, lam_) in variants.items():
+    print(f"{name:<11s} 2018Q4 {sdid_loss(w, lam_, EVAL['2018Q4']):.3f}")
+```
+
+## Rung 4 — MASC
+
+**The argument that decides the answer** is `set_f`. Its alternative
+`min_preperiods` defaults to $\lceil T_0/2 \rceil$, which is not the fold set
+the paper uses.
+
+```{python}
+M_GRID = list(range(1, 11))
+SET_F = list(range(6, T0 + 1))
+
+masc = {k: MASC(cfg(e, m_grid=M_GRID, set_f=SET_F)).fit() for k, e in EVAL.items()}
+m18 = masc["2018Q4"]
+
+print(f"MASC  2018Q4 {pct(m18.att):.2f}%   2019Q4 {pct(masc['2019Q4'].att):.2f}%")
+print(f"weights.summary_stats: {m18.weights.summary_stats}\n")
+
+for label, kw in [
+    ("set_f=range(6, 87)  [the paper]",  dict(m_grid=M_GRID, set_f=SET_F)),
+    ("min_preperiods=None [default]",    dict(m_grid=M_GRID)),
+]:
+    vals = [pct(MASC(cfg(e, **kw)).fit().att) for e in EVAL.values()]
+    print(f"{label:<34s} 2018Q4 {vals[0]:.3f}   2019Q4 {vals[1]:.3f}")
+```
+
+## Rung 5 — Augmented synthetic control
+
+```{python}
+ascm = {k: VanillaSC(cfg(e, augment="ridge", inference=False)).fit() for k, e in EVAL.items()}
+a18 = ascm["2018Q4"]
+aw = np.array(list(a18.donor_weights.values()))
+
+print(f"ASCM  2018Q4 {pct(a18.att):.2f}%   2019Q4 {pct(ascm['2019Q4'].att):.2f}%")
+print(f"weights: sum {aw.sum():.5f}, {int((aw < -1e-6).sum())} negative, "
+      f"min {aw.min():+.4f}, max {aw.max():+.4f}")
+print(f"pre-RMSE {a18.pre_rmse:.6f} vs SC's {s18.pre_rmse:.6f}")
+```
+
+## The whole ladder, side by side
+
+```{python}
+ladder = pd.DataFrame([
+    ("DiD",  pct(did["2018Q4"].att),          pct(did["2019Q4"].att),          4.98, np.nan),
+    ("SC",   pct(sc["2018Q4"].att),           pct(sc["2019Q4"].att),           3.06, 3.06),
+    ("DSC",  pct(tssc_att(dsc["2018Q4"])),    pct(tssc_att(dsc["2019Q4"])),    2.98, 2.98),
+    ("SDID", pct(sdid["2018Q4"].effects.att), pct(sdid["2019Q4"].effects.att), 2.79, 2.79),
+    ("MASC", pct(masc["2018Q4"].att),         pct(masc["2019Q4"].att),         2.73, 2.73),
+    ("ASCM", pct(ascm["2018Q4"].att),         pct(ascm["2019Q4"].att),         3.04, 3.04),
+], columns=["method", "2018Q4", "2019Q4", "R post", "Paper"])
+ladder.round(2)
+```
+
+Every rung puts the cost above the **2.4%** previously published for this
+dataset.
+
+## Do covariates help? Three meanings of "control for"
+
+`SDIDConfig.covariates` is **not a list**. It is a dictionary keyed by method,
+because the literature contains three different answers.
+
+```{python}
+COVARIATES = ["cons_share", "inv_share", "exp_share", "imp_share",
+              "labprod_growth", "emp_pop"]
+
+print(f"outcomes only                    2018Q4 {pct(sdid['2018Q4'].effects.att):5.2f}")
+for meth in ("adjust", "match", "optimized"):
+    kw = dict(zeta=0.0, vce="noinference", covariates={meth: COVARIATES})
+    if meth == "match":
+        kw["match_pre_periods"] = "last"
+    vals = [pct(SDID(cfg(e, **kw)).fit().effects.att) for e in EVAL.values()]
+    print(f"covariates={{'{meth}': ...}}{' ' * (14 - len(meth))} "
+          f"2018Q4 {vals[0]:5.2f}   2019Q4 {vals[1]:5.2f}")
+```
+
+The three routes disagree by nearly **two percentage points** — more than five
+times the spread across the entire outcomes-only ladder.
+
+### Why: the predictor weights are not identified
+
+Fit the identical model twice, same seed, same data, changing only how long the
+differential-evolution search runs. If $V$ were well identified, the budget
+would not matter.
+
+```{python}
+for label, budget in [("default (maxiter=300, popsize=15)", {}),
+                      ("reduced (maxiter=120, popsize=12)",
+                       dict(mscmt_maxiter=120, mscmt_popsize=12))]:
+    r = VanillaSC(cfg(EVAL["2018Q4"], covariates=COVARIATES, backend="mscmt",
+                      canonical_v="min.loss.w", seed=20260801,
+                      inference=False, **budget)).fit()
+    ss = r.weights.summary_stats
+    print(f"{label:<36s} {pct(r.effects.att):5.2f}%   "
+          f"pre-RMSE {r.fit_diagnostics.rmse_pre:.6f}   "
+          f"v_agreement {ss['v_agreement']:.5f}")
+    top = sorted(ss["predictor_weights"].items(), key=lambda kv: -abs(kv[1]))[:4]
+    print("    " + ", ".join(f"{k} {v:.3f}" for k, v in top))
+
+print(f"\noutcomes-only pre-RMSE for comparison: {s18.pre_rmse:.6f}")
+```
+
+Same estimator, same seed, same data. Shortening the search moves the estimate
+**and** moves the predictor weights from a corner solution on the import share
+to a spread across four predictors. With 86 quarters of the outcome itself, six
+covariate means are not adding information; they are adding a poorly identified
+optimisation problem.
+
+## Inference
+
+```{python}
+rows = []
+for meth in ("placebo", "scpi", "lto", "conformal", "ttest"):
+    r = VanillaSC(cfg(EVAL["2018Q4"], inference=meth, alpha=0.05)).fit()
+    inf_ = r.inference
+    rows.append(dict(method=meth, p_value=inf_.p_value,
+                     ci_lower=inf_.ci_lower, ci_upper=inf_.ci_upper,
+                     reported_as=inf_.method))
+pd.DataFrame(rows)
+```
+
+Read these as orders of magnitude, not digits: they share the point estimate
+and the donor pool, and differ only in how they build a reference distribution
+from 23 donors. SDID's own placebo inference above gave p = 0.20 with an
+interval containing zero.
+
+### Placebo in space
+
+```{python}
+rows = []
+for country in [TREATED] + DONORS:
+    sub = panel.copy()
+    sub["tt"] = sub.groupby("country")["t"].rank(method="dense").astype(int)
+    sub["treat"] = ((sub.country == country) & (sub.tt > T0)).astype(int)
+    r = VanillaSC(dict(df=sub, outcome="log_rgdp", treat="treat", unitid="country",
+                       time="tt", display_graphs=False, inference=False)).fit()
+    gap = np.asarray(r.gap, float).ravel()
+    pre_, post_ = np.sqrt(np.mean(gap[:T0] ** 2)), np.sqrt(np.mean(gap[T0:] ** 2))
+    rows.append(dict(country=country, rmspe_pre=pre_, rmspe_post=post_,
+                     ratio=post_ / pre_, gap=gap))
+
+space = pd.DataFrame([{k: v for k, v in r.items() if k != "gap"} for r in rows])
+space = space.sort_values("ratio", ascending=False).reset_index(drop=True)
+uk_rank = int(space.index[space.country == TREATED][0]) + 1
+print(f"UK ranks {uk_rank} of {len(space)}  ->  permutation p = {uk_rank/len(space):.3f}")
+print(f"(with {len(space)} units the smallest attainable p is {1/len(space):.3f})")
+space.head(6).round(4)
+```
+
+```{python}
+fig, ax = plt.subplots(figsize=(10, 5))
+for r in rows:
+    if r["country"] != TREATED:
+        ax.plot(QDEC[:len(r["gap"])], r["gap"], color="#54618a", lw=0.8, alpha=0.6)
+uk = next(r for r in rows if r["country"] == TREATED)
+ax.plot(QDEC[:len(uk["gap"])], uk["gap"], color="#d97757", lw=2.4, label="United Kingdom")
+ax.plot([], [], color="#54618a", lw=1.0, label="23 placebo donors")
+ax.axhline(0, color="grey", lw=0.8)
+ax.axvline(QDEC[T0], color="black", ls="--", lw=1.0)
+ax.set_xlabel("year"); ax.set_ylabel("gap (log points)")
+ax.set_title("Placebo in space: give every donor the treatment in turn")
+ax.legend(loc="lower left")
+plt.show()
+```
+
+## Summary
+
+- The referendum cost the UK **2.7–3.1% of GDP by end-2018** and **3.8–4.2% by
+  end-2019** on every rung, against 2.4% previously published.
+- `mlsynth` puts all six rungs behind one interface.
+- **Three defaults matter more than the estimator choice.** `zeta` moves SDID
+  by 0.13 points, `set_f` moves MASC by 0.47, and the three covariate methods
+  disagree by 1.76. The ladder's own spread, excluding DiD, is 0.31.
+- **`TSSC` rounds `.att`.** Read the gap series instead.
+- **`mlsynth.DSC` is not this tutorial's DSC.**
+- **A solver leaves a fingerprint.** Four convex paths inside `mlsynth` land on
+  3.039%; R's Frank-Wolfe stops at 3.06%.
+
+The [full post](https://carlos-mendez.org/post/python_sc_dsc_sdid/) adds the
+in-sample placebo tournament over twenty artificial treatment dates, the
+robustness zoo, and a map of the wider `mlsynth` catalogue.
+[The R edition](https://carlos-mendez.org/post/r_sc_dsc_sdid/) hand-codes every
+estimator before calling its package.
+
+---
+
+**Source files.** `analysis.py` is the complete pipeline that produces every
+figure and table in the post; `cheatsheet_python.py` is the one-page
+quick reference. Both are in this bundle.
+
+*AI tools (Claude Code, Gemini, NotebookLM) were used to make the contents of
+this tutorial more accessible to students. Nevertheless, the content may still
+have errors. Caution is needed when applying it to true research projects.*

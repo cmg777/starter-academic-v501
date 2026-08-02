@@ -1,0 +1,10 @@
+check,setting,SC,DSC,SDID
+treatment date,2016Q3 (headline),3.038816620781942,2.9887329522896797,2.771434101056463
+treatment date,2016Q2,3.0886432341980576,3.0497106880543248,3.183447794034222
+donor pool,drop the United States,3.055417396731114,3.0392294246098963,2.8309644302428056
+SDID penalty,zeta = 0 (the paper),,,2.801184164375953
+SDID penalty,zeta at its default,,,2.6694335828849116
+SC constraint,w_constr='simplex',3.0388176594837004,,
+SC constraint,w_constr='ols',3.3726804796051892,,
+SC constraint,w_constr='ridge',3.3716646482633674,,
+SC constraint,w_constr='lasso',2.9686802545011046,,

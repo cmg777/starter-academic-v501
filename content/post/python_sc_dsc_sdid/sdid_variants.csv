@@ -1,0 +1,4 @@
+variant,loss_2018Q4,loss_2019Q4,lambda_fitted_on,published_2018Q4
+SDID (i),2.771434101056463,3.907617114589606,lambda fitted on the treatment quarter,2.76
+SDID (ii),2.801184164375953,3.9373671779090955,lambda fitted on the post-period average,2.79
+SDID (iii),2.801184164375953,3.9373671779090955,lambda fitted on the evaluation quarter,2.79

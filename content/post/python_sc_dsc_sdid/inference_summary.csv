@@ -1,0 +1,7 @@
+method,att,p_value,ci_lower,ci_upper,reported_as,seconds
+placebo,-0.030388166207819423,0.041666666666666664,,,in-space placebo (RMSPE ratio),0.05446910858154297
+scpi,-0.030388166207819423,,-0.05533298639233558,-0.009374405161478305,scpi prediction intervals (Cattaneo-Feng-Titiunik 2021),2.229853868484497
+lto,-0.030388166207819423,0.008333333333333333,,,leave-two-out refined placebo (Lei-Sudijono 2025),0.6222400665283203
+conformal,-0.030388166207819423,0.02,-0.0466030051550181,-0.014291588247538886,conformal prediction intervals (Chernozhukov-Wuthrich-Zhu 2021),2.003115653991699
+ttest,-0.030388166207819423,0.005787677570766353,-0.04004171440878278,-0.020227544964595938,debiased SC t-test (Chernozhukov-Wuthrich-Zhu 2025),0.013252019882202148
+jackknife_plus,,,,,FAILED: MlsynthEstimationError,
