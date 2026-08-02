@@ -61,6 +61,19 @@ grep -rn "url: notebook.ipynb" content/post/*/index.md    # must return nothing
 
 (Fixed across all 15 affected posts on 2026-08-02; `notebook.ipynb` is committed in every one of them, so the GitHub URLs resolve.)
 
+## Script buttons: display in the browser vs download
+
+Whether a linked script opens in the browser or downloads is decided by the `Content-Type` Netlify sends, not by anything in the front matter. Netlify also sends `X-Content-Type-Options: nosniff`, so the browser obeys that type literally.
+
+| Extension | Default type | Behaviour |
+|---|---|---|
+| `.py` | `text/x-python` | displays |
+| `.R` | `text/x-rsrc` | displays |
+| `.do` | `application/x-stata-do` | **downloaded** — overridden to `text/plain` in `netlify.toml` |
+| `.qmd` | (overridden) | `text/plain` + `Content-Disposition: attachment` — deliberately downloads |
+
+If a newly linked file type downloads when it should display, add a `[[headers]]` block to `netlify.toml` setting `Content-Type = "text/plain; charset=utf-8"` and `Content-Disposition = "inline"`. These headers apply only on a deployed build — `hugo server` will not reproduce the behaviour, so verify with `curl -sI <url>` after the deploy lands.
+
 ## Tutorial bundles (`.zip`)
 
 Some Quarto tutorials ship companion files (`setup_env.py`, `_quarto.yml`, `render.command`/`render.bat`, bundle `README.md`) alongside the `.qmd` so students can extract a ZIP and double-click `render.command` (macOS) or `render.bat` (Windows) for a one-click hermetic render.

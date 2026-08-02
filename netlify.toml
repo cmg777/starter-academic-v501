@@ -46,6 +46,17 @@
     Content-Type = "text/plain; charset=utf-8"
     Content-Disposition = "attachment"
 
+# Stata do-files: render in the browser instead of downloading, so a linked
+# script behaves the same way as the .py and .R ones next to it. Netlify types
+# .do as application/x-stata-do, and because we also send nosniff the browser
+# takes that literally and saves the file. Every .do on this site is a script
+# meant to be read, so serve it as text.
+[[headers]]
+  for = "*.do"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Content-Disposition = "inline"
+
 [[plugins]]
   package = "netlify-plugin-hugo-cache-resources"
   [plugins.inputs]
