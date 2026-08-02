@@ -342,7 +342,7 @@ Worth dwelling on. The point estimate is far better determined than the interval
 
 **Post** · [carlos-mendez.org/post/r_sc_dsc_sdid](https://carlos-mendez.org/post/r_sc_dsc_sdid/)
 
-**Code** · `analysis.R` (18 figures, full replication) · `cheatsheet.R` (every estimator in 150 lines)
+**Code** · `analysis.R` (18 figures, full replication) · `cheatsheet_R.R` / `cheatsheet_stata.do` / `cheatsheet_python.py` (every estimator, one package call each)
 
 **Data** · `brexit_analysis.csv`, loadable straight from GitHub
 

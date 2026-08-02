@@ -222,3 +222,104 @@ appears in the sitemap.
 The post now carries eight resource buttons, all verified to resolve after a Hugo build:
 Slides (HTML) · AI slides (PDF) · Web app · R script · Cheat sheet · Quarto project (.zip) ·
 Podcast · MD version.
+
+---
+
+## Update (2026-08-02) — three cheat sheets: R, Stata, Python
+
+**Why.** The original `cheatsheet.R` was hard to use. It mirrored the post's *hand-code it first,
+then call the package* pedagogy, so more than half of it was a hand-rolled `simplex_ls()` QP, a
+hand-rolled nearest-neighbour CV loop and a hand-rolled ridge closed form; only at line 128 did
+it reach the packages, and even then it extracted `attr(est, "weights")$omega` and fed it back
+through a bespoke `loss()`. A reader who wanted "call the function, get the number" had to read
+past 120 lines of machinery that belongs in `analysis.R`.
+
+**The device that fixed it.** Every one of these packages reports an ATT averaged over *all*
+post-treatment periods, which is why the old sheet reconstructed per-quarter effects by hand.
+Truncating the panel to the 86 pre-treatment quarters **plus the single evaluation quarter**
+makes that average an average over one period, so the bare package call returns exactly the
+quantity the post reports. Verified before writing anything: all eight cells (four estimators ×
+two quarters) match the published values exactly. The same trick carries to Stata's `sdid`, to
+`augsynth`, to `masc` and to `mlsynth`. None of the three sheets contains post-estimation
+arithmetic.
+
+**Files.** `cheatsheet.R` → `cheatsheet_R.R` (git mv, rewritten); new `cheatsheet_stata.do` and
+`cheatsheet_python.py`. Each ends with the same comparative table — estimate, standard error,
+the R column and the published value — so they can be read side by side.
+
+### Results
+
+| Rung | R | Stata | Python | Paper |
+|---|---|---|---|---|
+| DiD | 4.98 | 4.98 | 4.98 | — |
+| SC | 3.06 | 3.06 | **3.04** | 3.06 |
+| DSC | 2.98 | 2.98 | 3.00 | 2.98 |
+| SDID | 2.79 | 2.79 | **2.80** | 2.79 |
+| MASC | 2.73 | — | 2.73 | 2.73 |
+| ASCM | 3.04 | 3.10 | 3.04 | 3.04 |
+
+### What the ports turned up
+
+- **The solver story, confirmed independently.** Python's `mlsynth` returns 3.04 / 4.17 for SC —
+  exactly the "SC (exact QP)" row in `att_headline.csv`, on both quarters. It uses a convex
+  solver; `synthdid` and Stata's `sdid` both use Frank–Wolfe on a capped budget and stop at
+  3.06 / 4.20. Tighten `sdid`'s convergence (`max_iter(100000) min_dec(1e-9)`) and SDID drifts
+  from 2.79 to 2.80, which is where Python already is. Three implementations, two camps, split by
+  *solver* rather than by language — much stronger evidence for section 8.4's claim than the
+  original iteration ladder, because nobody wrote `mlsynth` to make that point.
+- **`sdid`'s `zeta_omega(1e-6)` default is a magic sentinel, not a value.** `sdid.ado:904` reads
+  `if (EOmega==1e-6) EtaOmega = (yNtr*yTpost)^(1/4)`, so passing the documented default
+  explicitly still requests the full Arkhangelsky penalty. Only `zeta_omega(0)` switches it off,
+  and it is the difference between 2.79 and 2.66. Cost about twenty minutes to find.
+- **DSC needs no Stata command.** Demeaned SC *is* SC on pre-period-demeaned outcomes: after
+  demeaning, the pre-treatment gap averages to zero, so the double difference collapses to the
+  single one. Three lines of `bysort` + `method(sc)` reproduces R to five decimals.
+- **MASC's fold trap survives translation.** Both `masc` (R) and `mlsynth.MASC` (Python) need
+  `set_f` given explicitly; with it they agree at 2.726, without it they do not.
+- **`mlsynth.DSC` is not this post's DSC.** It is *Distributional* SC (Gunsilius); demeaned SC is
+  `TSSC(method="MSCa")`. Importing the wrong one raises no error. Flagged in a banner at the top
+  of the Python sheet, per mlsynth issue #312.
+
+### Gaps, reported rather than approximated
+
+- **No Stata MASC.** No implementation exists; the row is left empty with a pointer to the R sheet.
+- **Stata ASCM is a different estimator.** `allsynth` does Abadie–L'Hour / Ben-Michael
+  *bias-corrected* SC, not `augsynth`'s *ridge-augmented* SC. Worse, its bias correction is an OLS
+  fit across donors and needs K + 2 controls for K predictors — with 23 donors it cannot take all
+  86 pre-treatment quarters. With sparse single lags the bias-corrected estimate swings between −0.8 and 5.1
+  depending on which quarters you pick, which is not an estimator anyone should report. Block
+  means are far better conditioned; the do-file fits a grid of them and keeps the lowest
+  pre-treatment RMSPE — a rule fixed in advance that never looks at the post-treatment answer.
+  It lands at 3.10 against R's 3.04. Treat the agreement as a coincidence worth noticing, not a
+  replication.
+- **SC(B) is in none of the sheets**, since `Synth`'s nested optimisation over 92 predictors turns
+  a 30-second script into a coffee break. Section 16 and `analysis.R` §14d cover it.
+- **Standard errors are not comparable across languages.** Each sheet reports its own package's
+  recommended inference: R's placebo SEs at 200 reps, Stata's at 50, `augsynth`'s jackknife,
+  `mlsynth`'s analytic FDID error. Named per row so nobody reads them as a common yardstick. Note
+  also that `synthdid`'s placebo vcov resamples, so it needs a seed — the first draft did not have
+  one and produced different SEs on every run.
+
+### Post and housekeeping
+
+- **New section 19, "The same ladder in Stata and Python"** — the mapping table, the three-port
+  comparison, the solver finding, the three shared traps and the gaps. Sections 19–22 renumbered
+  to 20–23; the one internal cross-reference ("Section 19 returns to this", line 870) updated.
+- Front matter: three cheat-sheet buttons replacing one, `categories` and `tags` gain Stata and
+  Python, and the abstract and summary gain a clause about the ports. ES/JA stubs updated to
+  match.
+- Two Stata/Python software entries added to the references, and the R entry relabelled.
+- `build_bundle.sh` stages all three sheets. **Latent bug fixed:** the script called `zip -r` on
+  an existing archive, which appends rather than replaces — the first rebuild silently kept a
+  stale `cheatsheet.R` entry alongside the new files. Now `rm -f`s the zip first. Bundle is 9
+  entries.
+- `slides/slides.qmd:345` and the rendered deck updated; `quarto render` clean.
+- `README.md`: Code table, a per-language Packages section, and a new "The three ports" section
+  carrying the comparison table.
+
+`mlsynth` was installed into an isolated `uv` venv in the scratchpad, not into the repo `.venv`.
+`allsynth`, `distinct` and `elasticregress` were installed from SSC into the user's Stata ado path.
+
+The post now carries ten resource buttons: Slides (HTML) · AI slides (PDF) · Web app · R script ·
+R cheat sheet · Stata cheat sheet · Python cheat sheet · Quarto project (.zip) · Podcast ·
+MD version.

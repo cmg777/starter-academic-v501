@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build the downloadable Quarto project bundle r_sc_dsc_sdid.zip.
-# Stages tutorial.qmd, analysis.R, cheatsheet.R, the estimation sample, a minimal
-# _quarto.yml and a README into a top-level folder, then zips it.
+# Stages tutorial.qmd, analysis.R, the three cheat sheets, the estimation sample,
+# a minimal _quarto.yml and a README into a top-level folder, then zips it.
 # Re-run after editing any source.
 #
 #   bash content/post/r_sc_dsc_sdid/build_bundle.sh
@@ -15,7 +15,9 @@ mkdir -p "$DEST"
 
 cp "$HERE/tutorial.qmd"          "$DEST/tutorial.qmd"
 cp "$HERE/analysis.R"            "$DEST/analysis.R"
-cp "$HERE/cheatsheet.R"          "$DEST/cheatsheet.R"
+cp "$HERE/cheatsheet_R.R"        "$DEST/cheatsheet_R.R"
+cp "$HERE/cheatsheet_stata.do"   "$DEST/cheatsheet_stata.do"
+cp "$HERE/cheatsheet_python.py"  "$DEST/cheatsheet_python.py"
 cp "$HERE/brexit_analysis.csv"   "$DEST/brexit_analysis.csv"
 
 cat > "$DEST/_quarto.yml" <<'YML'
@@ -37,7 +39,9 @@ Executable companion to the blog post:
 |------|---------|
 | `tutorial.qmd` | Self-contained Quarto notebook — prose, code, output and figures inline. Climbs the whole ladder, hand-coding each estimator and then reproducing it with its package. |
 | `analysis.R` | Canonical companion script — the full analysis (18 figures, 18 CSV tables, the placebo tournament, the robustness grid and permutation inference), runnable with `Rscript analysis.R`. |
-| `cheatsheet.R` | The minimum code that produces every estimate, about 150 lines, runs in half a minute. |
+| `cheatsheet_R.R` | Every estimate from a bare package call, no hand-coding. Ends with a comparative table against the published values. |
+| `cheatsheet_stata.do` | The same ladder in Stata via `sdid` and `allsynth`. MASC has no Stata implementation; the row is left empty rather than approximated. |
+| `cheatsheet_python.py` | The same ladder in Python via `mlsynth`. Needs `pip install git+https://github.com/jgreathouse9/mlsynth.git`. |
 | `brexit_analysis.csv` | The estimation sample: 24 OECD countries × 104 quarters (1995Q1–2020Q4), log real GDP plus six covariates, no missing values. |
 | `_quarto.yml` | Minimal Quarto project marker so Positron / RStudio open this folder as a recognised project. |
 
@@ -92,6 +96,9 @@ dataset of Born, Müller, Schularick & Sedláček (2019),
 <https://doi.org/10.1093/ej/uez020>. Please cite both.
 MD
 
+# zip appends to an existing archive, so a renamed or deleted file would linger
+# in the bundle forever. Always start from scratch.
+rm -f "$HERE/$SLUG.zip"
 ( cd "$STAGE" && zip -r -X "$HERE/$SLUG.zip" "$SLUG" >/dev/null )
 rm -rf "$STAGE"
 echo "Built $HERE/$SLUG.zip"

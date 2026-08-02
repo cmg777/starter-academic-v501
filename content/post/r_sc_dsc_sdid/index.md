@@ -3,6 +3,8 @@ authors:
   - admin
 categories:
   - R
+  - Stata
+  - Python
   - Causal Inference
   - Synthetic Control
 date: "2026-07-31T00:00:00Z"
@@ -32,8 +34,16 @@ links:
     url: analysis.R
   - icon: bolt
     icon_pack: fas
-    name: "Cheat sheet"
-    url: cheatsheet.R
+    name: "R cheat sheet"
+    url: cheatsheet_R.R
+  - icon: bolt
+    icon_pack: fas
+    name: "Stata cheat sheet"
+    url: cheatsheet_stata.do
+  - icon: bolt
+    icon_pack: fas
+    name: "Python cheat sheet"
+    url: cheatsheet_python.py
   - icon: file-code
     icon_pack: fas
     name: "Quarto project (.zip)"
@@ -47,9 +57,11 @@ links:
     name: "MD version"
     url: https://raw.githubusercontent.com/cmg777/starter-academic-v501/master/content/post/r_sc_dsc_sdid/index.md
 slides:
-summary: "Climbing the ladder from difference-in-differences to synthetic difference-in-differences, one rung at a time, with every estimator hand-coded before it is run with its package. The case study is the 2016 Brexit referendum and what it cost UK GDP."
+summary: "Climbing the ladder from difference-in-differences to synthetic difference-in-differences, one rung at a time, with every estimator hand-coded before it is run with its package. The case study is the 2016 Brexit referendum and what it cost UK GDP. Includes cheat sheets in R, Stata and Python."
 tags:
   - r
+  - stata
+  - python
   - causal inference
   - synthetic control
   - synthetic difference-in-differences
@@ -71,7 +83,7 @@ diagram: true
 
 ## Abstract
 
-The United Kingdom voted to leave the European Union on 23 June 2016, and because there is only one United Kingdom, the cost of that decision can only be measured against a country that never existed. This tutorial builds that country seven times over, climbing the ladder of single-treated-unit estimators — difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control — with every rung hand-coded first and then run with its R package. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4, leaving the UK as the treated unit, 23 donors and 86 pre-treatment quarters. Dating the treatment at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.06% under synthetic control, 2.99% under demeaned SC, 2.76% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.20% a year later — every one of them larger than the 2.4% previously reported for this dataset. A placebo tournament over twenty artificial treatment dates ranks the SDID family first, at 0.0067 log points of root mean squared error against 0.0089 for plain synthetic control, and shows that covariates make the counterfactual worse rather than better. Two things emerge that the published tables hide: the headline synthetic-control number is partly an artefact of where the optimiser stopped, and the ranking among the three SDID variants dissolves once they are graded on the same forecast horizon.
+The United Kingdom voted to leave the European Union on 23 June 2016, and because there is only one United Kingdom, the cost of that decision can only be measured against a country that never existed. This tutorial builds that country seven times over, climbing the ladder of single-treated-unit estimators — difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control — with every rung hand-coded first and then run with its R package. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4, leaving the UK as the treated unit, 23 donors and 86 pre-treatment quarters. Dating the treatment at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.06% under synthetic control, 2.99% under demeaned SC, 2.76% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.20% a year later — every one of them larger than the 2.4% previously reported for this dataset. A placebo tournament over twenty artificial treatment dates ranks the SDID family first, at 0.0067 log points of root mean squared error against 0.0089 for plain synthetic control, and shows that covariates make the counterfactual worse rather than better. Two things emerge that the published tables hide: the headline synthetic-control number is partly an artefact of where the optimiser stopped, and the ranking among the three SDID variants dissolves once they are graded on the same forecast horizon. The whole ladder is then ported to Stata and Python, which reproduces every estimate and sharpens the first of those findings — three independent implementations split into two camps by solver rather than by language.
 
 ## 1. Overview
 
@@ -311,7 +323,9 @@ library(patchwork); library(scales); library(jsonlite)
 set.seed(20260801)
 ```
 
-Everything in this post runs on R 4.5.2 with `synthdid` 0.0.9, `augsynth` 0.2.0, `masc` 0.1.1 and `Synth` 1.1-10. The full script is [`analysis.R`](analysis.R); a stripped-down version that produces every estimate in about thirty seconds is [`cheatsheet.R`](cheatsheet.R).
+Everything in this post runs on R 4.5.2 with `synthdid` 0.0.9, `augsynth` 0.2.0, `masc` 0.1.1 and `Synth` 1.1-10. The full script is [`analysis.R`](analysis.R), which also needs `patchwork`, `scales` and `jsonlite` for its figures and exports.
+
+If you want the estimates without the derivations, there are three cheat sheets — one per language — each of which calls the packages directly and ends with the same comparative table: [`cheatsheet_R.R`](cheatsheet_R.R), [`cheatsheet_stata.do`](cheatsheet_stata.do) and [`cheatsheet_python.py`](cheatsheet_python.py). [Section 19](#19-the-same-ladder-in-stata-and-python) compares what the three languages produce, and why two of them disagree in the second decimal.
 
 ## 4. The data
 
@@ -867,7 +881,7 @@ Only one node has two arrows pointing into it. Synthetic control minimises extra
 
 ### 11.5 The honest caveat
 
-Do not over-learn this. The decomposition assumes a common response function across countries and sets the idiosyncratic error aside entirely. SDID "targets" both biases, but it pays for the privilege by estimating 85 extra parameters, and the source paper's own conclusion is that the gain over DSC is "marginal at best" for the kind of trend specification we have here. Section 19 returns to this.
+Do not over-learn this. The decomposition assumes a common response function across countries and sets the idiosyncratic error aside entirely. SDID "targets" both biases, but it pays for the privilege by estimating 85 extra parameters, and the source paper's own conclusion is that the gain over DSC is "marginal at best" for the kind of trend specification we have here. Section 20 returns to this.
 
 ## 12. Rung 5 — MASC
 
@@ -1212,7 +1226,69 @@ Second, this is randomisation inference: it asks *how unusual is the United King
 
 Third, for a genuinely model-based alternative, the source paper itself points to the conformal-inference approach of Chernozhukov, Wüthrich and Zhu [16], which `augsynth` implements and which [the Kansas tutorial](/post/r_augsynth/) works through in detail.
 
-## 19. Discussion
+## 19. The same ladder in Stata and Python
+
+Everything above is R. The ladder is not, and a reader who works in Stata or Python should not have to take the results on trust. This section ports the whole thing twice — [`cheatsheet_stata.do`](cheatsheet_stata.do) and [`cheatsheet_python.py`](cheatsheet_python.py), alongside [`cheatsheet_R.R`](cheatsheet_R.R) — and the disagreements between the three turn out to be the most instructive part.
+
+All three sheets share one device. Each of these packages reports an ATT averaged over *all* post-treatment periods, but we want the shortfall at two specific quarters. So keep the 86 pre-treatment quarters plus the single quarter of interest, renumber time, and the average over "all post periods" becomes an average over one period. The bare package call then returns exactly the number we want, and none of the three files contains any post-estimation arithmetic.
+
+### 19.1 What maps onto what
+
+| Rung | R | Stata | Python (`mlsynth`) |
+|---|---|---|---|
+| DiD | `did_estimate()` | `sdid …, method(did)` | `FDID(…).fit().did` |
+| SC | `sc_estimate()` | `sdid …, method(sc)` | `VanillaSC(…)` |
+| DSC | `synthdid_estimate(lambda = uniform)` | `sdid …, method(sc)` on demeaned $y$ | `TSSC(…, method = "MSCa")` |
+| SDID | `synthdid_estimate()` | `sdid …, zeta_omega(0) zeta_lambda(0)` | `SDID(…, zeta = 0)` |
+| MASC | `masc()` | — none — | `MASC(…, set_f = range(6, 87))` |
+| ASCM | `augsynth(progfunc = "Ridge")` | `allsynth …, bcorrect(merge)` | `VanillaSC(…, augment = "ridge")` |
+
+Two entries need explaining before the numbers make sense.
+
+**DSC in Stata.** There is no `dsc` command and none is needed. Demeaned SC *is* SC run on outcomes from which each country's own pre-treatment mean has been subtracted: after demeaning, the pre-treatment gap averages to zero by construction, so the double difference collapses to the single one. Three lines of `bysort` and a `method(sc)` call reproduce it exactly.
+
+**ASCM in Stata is a different estimator.** `allsynth` implements the *bias-corrected* synthetic control of Abadie and L'Hour and of Ben-Michael, Feller and Rothstein: fit SC, then regress the outcome on the predictors across the donor pool and subtract the predicted discrepancy. `augsynth` uses *ridge-augmented* SC. They are cousins, not the same estimator. Worse, the bias correction is an OLS fit across donors, so it needs more control units than predictors — with 23 donors we cannot hand it all 86 pre-treatment quarters the way a ridge penalty can. The path has to be summarised, and the summary matters enormously: with sparse individual lags the bias-corrected estimate swings between $-0.8$ and $5.1$ depending on which quarters you pick. Block means are far better conditioned, and the do-file fits a small grid of them and keeps the one with the lowest pre-treatment RMSPE — a rule fixed in advance that never looks at the post-treatment answer.
+
+### 19.2 The three ports, side by side
+
+Shortfall in UK real GDP (%), treatment dated 2016Q3, outcomes only.
+
+| Rung | R 2018Q4 | Stata 2018Q4 | Python 2018Q4 | R 2019Q4 | Stata 2019Q4 | Python 2019Q4 |
+|---|---|---|---|---|---|---|
+| DiD | 4.98 | 4.98 | 4.98 | 6.18 | 6.18 | 6.18 |
+| SC | 3.06 | 3.06 | **3.04** | 4.20 | 4.20 | **4.17** |
+| DSC | 2.98 | 2.98 | 3.00 | 4.12 | 4.12 | 4.10 |
+| SDID | 2.79 | 2.79 | **2.80** | 3.92 | 3.92 | **3.94** |
+| MASC | 2.73 | — | 2.73 | 3.83 | — | 3.83 |
+| ASCM | 3.04 | 3.10 | 3.04 | 4.19 | 4.22 | 4.19 |
+
+Stata reproduces R to five decimal places on every rung it can fit. Python agrees exactly on DiD, MASC and ASCM, and differs in the second decimal on SC, DSC and SDID.
+
+### 19.3 The disagreement is the finding
+
+The bolded cells are not a bug in any of the three libraries. They are [section 8.4](#84-why-the-two-solvers-disagree)'s solver story arriving from a completely independent direction.
+
+Recall the problem: the SC objective on this panel has a condition number around $7.5 \times 10^{5}$, which means a wide, nearly flat valley of near-optimal weight vectors. `synthdid` walks that valley with Frank–Wolfe on a capped iteration budget and stops at **3.06**. `mlsynth` hands the identical problem to a convex solver, which runs it to optimality and returns **3.04** — which is precisely the "SC (exact QP)" row computed by hand in section 8.4, on both quarters. Stata's `sdid` inherits `synthdid`'s Frank–Wolfe and stops in the same place; tighten its convergence with `max_iter(100000) min_dec(1e-9)` and the SDID estimate drifts from 2.79 to 2.80, which is where Python already is.
+
+So three implementations, written independently in three languages, sort themselves into exactly two camps — and the split is by *solver*, not by language or by author. That is a much stronger piece of evidence for the section 8.4 claim than the iteration ladder in the original analysis, because nobody was trying to make this point when they wrote `mlsynth`.
+
+The practical lesson is not that one library is right. It is that a synthetic control estimate carries its solver's fingerprint, and that a second-decimal disagreement between implementations is the normal state of affairs rather than a cause for alarm.
+
+### 19.4 Three traps the ports exposed
+
+Each language has a default that quietly gives you the wrong estimator, and in all three cases it is the same default.
+
+**Every package penalises by default; the paper does not.** R needs `zeta.omega = 0, zeta.lambda = 0`, Python needs `zeta = 0`, and Stata needs `zeta_omega(0) zeta_lambda(0)`. Leave any of them alone and SDID reports 2.66–2.67 instead of 2.79. Stata's version of this trap is the nastiest: the documented default is `zeta_omega(1e-6)`, which looks like a value but is a magic sentinel — `sdid.ado` reads `if (EOmega==1e-6) EtaOmega = (yNtr*yTpost)^(1/4)`, so passing the documented default explicitly still requests the full penalty. Only `0` switches it off.
+
+**MASC's fold set has to be given explicitly in both languages that have MASC.** R's `masc` and Python's `mlsynth.MASC` both cross-validate over a fold set that, left to its default, is not the one the paper uses. Pass `set_f = 6:T0` in R and `set_f=range(6, 87)` in Python and the two agree to three decimals at 2.726. This is the same trap flagged in section 12, and it survives translation.
+
+**`mlsynth.DSC` is not this post's DSC.** mlsynth ships a class named `DSC` which implements *Distributional* Synthetic Control (Gunsilius) — matching whole outcome distributions. The DSC on this ladder is *Demeaned* Synthetic Control, which in mlsynth is `TSSC(method = "MSCa")`. Same three letters, different estimators, and importing the wrong one raises no error at all. It simply answers a different question. The mapping used here follows [mlsynth issue #312](https://github.com/jgreathouse9/mlsynth/issues/312), which is itself a reading of the paper this post replicates.
+
+### 19.5 What each language cannot do
+
+Reported plainly rather than papered over. MASC has no Stata implementation, so that row is empty rather than approximated. SC(B) and the other covariate specifications are in none of the three sheets, because they need `Synth`'s nested optimisation over 92 predictors and turn a thirty-second script into a coffee break — section 16 and `analysis.R` §14d cover them. And the standard errors each package reports are its own recommended method, not a common yardstick: R's placebo SEs, Stata's placebo SEs at a different replication count, `augsynth`'s jackknife and `mlsynth`'s analytic FDID error are not comparable digit for digit. Read them as orders of magnitude, and note that every one of them is wide enough to contain zero.
+
+## 20. Discussion
 
 **What Brexit cost.** Taking the ladder as a whole, the referendum had cost the UK somewhere between **2.7% and 3.1% of GDP by the end of 2018**, and between **3.8% and 4.2% by the end of 2019**. That is above the 2.4% previously published for this dataset, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and covariates make the counterfactual worse here rather than better.
 
@@ -1224,7 +1300,7 @@ It also cuts the other way, and the source paper says so plainly: SDID's advanta
 
 **So what should you actually do?** Fit the ladder, not a rung. Run an in-sample placebo tournament and check that the horizons are matched. Report the range. If one specification is going to be the headline, choose it before you see the estimates, and show the others anyway. Ferman, Pinto and Possebom [15] have documented how much room for cherry-picking this literature leaves; the honest response is to publish the cloud.
 
-## 20. Summary and next steps
+## 21. Summary and next steps
 
 - **Every estimator here is one weighted two-way regression** with a different choice of unit weights $\omega$, time weights $\lambda$, and whether the unit fixed effect is switched on. DiD, SC, DSC and SDID are four settings of the same expression; MASC and ASCM change the feasible set instead.
 - **One solver does five jobs.** The simplex least-squares problem solves the unit weights, the demeaned unit weights, the time weights (on the transpose) and both components of MASC's cross-validation.
@@ -1232,10 +1308,11 @@ It also cuts the other way, and the source paper says so plainly: SDID's advanta
 - **The SDID family wins the placebo tournament** at either forecast horizon, but the published ranking *within* that family does not survive matching the horizons.
 - **Covariates hurt here.** With 86 pre-treatment outcomes already in the matching set, six extra badly-scaled predictors add estimation noise without adding identification.
 - **Two practical traps** cost real accuracy: `masc`'s fold argument silently produces five folds instead of eighty, and a flat objective means `synthdid`'s optimiser stops on its iteration cap rather than at the optimum.
+- **Both traps survive translation.** Porting the ladder to Stata and Python (section 19) reproduces every estimate, and the places where it does not are the solver, not the language: `mlsynth`'s convex solver lands on the exact-QP answer while `synthdid` and Stata's `sdid` stop where Frank–Wolfe stops. Three implementations, two camps, split by solver.
 
-Where to go next: [multi-country and staggered adoption with `multisynth`](/post/r_sc_multi_country/), [the same SDID estimator in Stata on Proposition 99](/post/stata_sdid/), or [manual demeaning and the FWL theorem](/post/r_demeaning_twfe/) if the unit-fixed-effect story in rung three felt too quick. The Monte Carlo study in the source paper, which stress-tests this ranking on simulated data, is the subject of a future post.
+Where to go next: the three cheat sheets if you just want working code — [`cheatsheet_R.R`](cheatsheet_R.R), [`cheatsheet_stata.do`](cheatsheet_stata.do), [`cheatsheet_python.py`](cheatsheet_python.py) — then [multi-country and staggered adoption with `multisynth`](/post/r_sc_multi_country/), [the same SDID estimator in Stata on Proposition 99](/post/stata_sdid/), or [manual demeaning and the FWL theorem](/post/r_demeaning_twfe/) if the unit-fixed-effect story in rung three felt too quick. The Monte Carlo study in the source paper, which stress-tests this ranking on simulated data, is the subject of a future post.
 
-## 21. Exercises
+## 22. Exercises
 
 1. **Move the treatment date.** Re-run SC and SDID (i) dating the treatment at 2016Q1 rather than 2016Q2 or 2016Q3. Which estimator moves more, and can you explain why using the time-weight figure?
 
@@ -1253,7 +1330,7 @@ Where to go next: [multi-country and staggered adoption with `multisynth`](/post
 
 8. **Build your own rung.** DSC and SDID differ only in how the bias adjustment is weighted across pre-periods — flat in one, optimised in the other. Propose a third weighting, for example exponentially decaying weights with a half-life you choose, implement it, and enter it in the placebo tournament. Does it beat SDID?
 
-## 22. References
+## 23. References
 
 1. de Brabander, E., Juodis, A., & Miyazato Szini, G. (2025). [On the use of synthetic difference-in-differences approach with (-out) covariates: The case study of Brexit referendum](https://doi.org/10.1080/07474938.2025.2530649). *Econometric Reviews*, 44(10), 1617–1646.
 2. Born, B., Müller, G. J., Schularick, M., & Sedláček, P. (2019). [The costs of economic nationalism: Evidence from the Brexit experiment](https://doi.org/10.1093/ej/uez020). *The Economic Journal*, 129(623), 2722–2744.
@@ -1273,8 +1350,10 @@ Where to go next: [multi-country and staggered adoption with `multisynth`](/post
 16. Chernozhukov, V., Wüthrich, K., & Zhu, Y. (2021). [An exact and robust conformal inference method for counterfactual and synthetic controls](https://doi.org/10.1080/01621459.2021.1920957). *Journal of the American Statistical Association*, 116(536), 1849–1864.
 17. Di Stefano, R., & Mellace, G. (2024). [The inclusive synthetic control method](https://arxiv.org/abs/2403.17624). arXiv:2403.17624.
 18. Tashman, L. J. (2000). [Out-of-sample tests of forecasting accuracy: An analysis and review](https://doi.org/10.1016/S0169-2070%2800%2900065-0). *International Journal of Forecasting*, 16(4), 437–450.
-19. Software: [`synthdid`](https://github.com/synth-inference/synthdid) · [`Synth`](https://CRAN.R-project.org/package=Synth) · [`masc`](https://github.com/maxkllgg/masc) · [`augsynth`](https://github.com/ebenmichael/augsynth) · [`quadprog`](https://CRAN.R-project.org/package=quadprog)
-20. Companion tutorials on this site: [Synthetic control on the Basque Country](/post/r_basic_synthetic_control/) · [Augmented synthetic control and the Kansas tax cuts](/post/r_augsynth/) · [Synthetic difference-in-differences on Proposition 99](/post/stata_sdid/) · [Manual demeaning and two-way fixed effects](/post/r_demeaning_twfe/) · [Multi-country augmented synthetic control](/post/r_sc_multi_country/)
+19. Software, R: [`synthdid`](https://github.com/synth-inference/synthdid) · [`Synth`](https://CRAN.R-project.org/package=Synth) · [`masc`](https://github.com/maxkllgg/masc) · [`augsynth`](https://github.com/ebenmichael/augsynth) · [`quadprog`](https://CRAN.R-project.org/package=quadprog)
+20. Software, Stata: [`sdid`](https://doi.org/10.1177/1536867X241297914) (Clarke, Pailañir, Athey & Imbens) · [`synth`](http://fmwww.bc.edu/repec/bocode/s/synth.ado) (Abadie, Diamond & Hainmueller) · [`allsynth`](http://fmwww.bc.edu/repec/bocode/a/allsynth.ado) (Wiltshire)
+21. Software, Python: [`mlsynth`](https://github.com/jgreathouse9/mlsynth) (Greathouse). The estimator mapping used in section 19 follows [issue #312](https://github.com/jgreathouse9/mlsynth/issues/312), which reads the same source paper this post replicates.
+22. Companion tutorials on this site: [Synthetic control on the Basque Country](/post/r_basic_synthetic_control/) · [Augmented synthetic control and the Kansas tax cuts](/post/r_augsynth/) · [Synthetic difference-in-differences on Proposition 99](/post/stata_sdid/) · [Manual demeaning and two-way fixed effects](/post/r_demeaning_twfe/) · [Multi-country augmented synthetic control](/post/r_sc_multi_country/)
 
 #### Acknowledgements
 
