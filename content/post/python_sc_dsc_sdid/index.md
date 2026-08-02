@@ -16,6 +16,10 @@ image:
 links:
   - icon: chalkboard-teacher
     icon_pack: fas
+    name: "Slides (HTML)"
+    url: slides/index.html
+  - icon: chalkboard-teacher
+    icon_pack: fas
     name: "Slides (HTML) — R edition"
     url: https://carlos-mendez.org/post/r_sc_dsc_sdid/slides/index.html
   - icon: file-pdf
