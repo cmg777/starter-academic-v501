@@ -55,9 +55,10 @@ const { chromium } = require('playwright');
 Run with the repo's cached Playwright: `NODE_PATH="$(find ~/.npm/_npx -maxdepth 4 -type d -name node_modules | head -1)" node driver.js <abs path to index.html>` (or `npx playwright@latest install chromium` once if no browser is cached).
 
 ## D. Hugo build
-Build with a pinned binary in the **0.96–0.119** window (e.g. the verify binary
-`/tmp/hugo-verify/hugo` at 0.111.3, or `"$HOME/Library/Application Support/Hugo/0.84.2/hugo"` only
-if ≥0.96 is unavailable — note 0.84.2 fails on `continue`): `hugo --gc --minify --buildFuture`.
+Build with a pinned binary in the **0.96–0.119** window — normally
+`"$HOME/Library/Application Support/Hugo/0.111.3/hugo"` (or the verify binary
+`/tmp/hugo-verify/hugo` at 0.111.3). Never the `0.84.2` or `0.89.4` binaries in that same
+directory; both fail on `continue`. Then: `hugo --gc --minify --buildFuture`.
 Confirm `public/post/<slug>/data/index.html` exists and the post renders with the "Data dictionary"
 button resolving to `/post/<slug>/data/index.html` (and the GitHub data buttons gone if the user
 chose to remove them).

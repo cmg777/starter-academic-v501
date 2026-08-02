@@ -44,9 +44,10 @@ Run after writing all targets unless `--no-build` was passed.
    ```bash
    /tmp/hugo-verify/hugo --gc --minify --buildFuture --quiet
    ```
-   - Binary must be `v0.111.3+extended` (the 0.96–0.119 window the site requires). If
-     `/tmp/hugo-verify/hugo` is gone, re-download Hugo 0.111.3 extended there. **Never** use
-     `~/Library/Application Support/Hugo/0.84.2/hugo` (no `continue` keyword → fails).
+   - Binary must be `v0.111.3+extended` (the 0.96–0.119 window the site requires). Prefer the
+     permanent install at `"$HOME/Library/Application Support/Hugo/0.111.3/hugo"`; if
+     `/tmp/hugo-verify/hugo` is gone, use that instead of re-downloading. **Never** use the
+     `0.84.2` or `0.89.4` binaries in that same directory (no `continue` keyword → fails).
    - A **non-zero exit** or any new **`ERROR`** line fails the run. Report it; do not claim success.
      (A lone `.Path … deprecated` `WARN` is benign — pre-existing on this site.)
 

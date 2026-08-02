@@ -454,7 +454,7 @@ Offer 2–3 copy-pasteable follow-ups (the skill never auto-runs them):
 NEXT STEPS (copy + paste)
 =========================
 1. Preview locally:
-   "$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender
+   "$HOME/Library/Application Support/Hugo/0.111.3/hugo" server --disableFastRender
    open http://localhost:1313/post/<slug>/web_app/
 
 2. Review the post against the app:

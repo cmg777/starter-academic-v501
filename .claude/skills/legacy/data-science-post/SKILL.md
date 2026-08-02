@@ -724,7 +724,7 @@ comments. Key conventions:
    - Verify the remaining file list contains only deliverables
 4. **Run Hugo dev server:**
    ```bash
-   "$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender
+   "$HOME/Library/Application Support/Hugo/0.111.3/hugo" server --disableFastRender
    ```
 5. **Visual checks:**
    - Post renders at `http://localhost:1313/post/<lang>_<slug>/`

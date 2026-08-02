@@ -161,8 +161,10 @@ If `web_app/` is missing entirely, abort with a message suggesting
   On install failure (offline, disk full), surface clearly and
   proceed in `--no-browser` mode for this run.
 - Locate Hugo binary at
-  `$HOME/Library/Application Support/Hugo/0.84.2/hugo` or fall back
-  to `hugo` on `$PATH`.
+  `$HOME/Library/Application Support/Hugo/0.111.3/hugo` or fall back
+  to `hugo` on `$PATH`. Never the 0.84.2 or 0.89.4 binaries in the same
+  directory — both predate the `continue` keyword the site needs and fail
+  to build at all.
 
 ### 0.4 Read reference materials
 

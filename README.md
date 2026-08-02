@@ -203,14 +203,14 @@ The `translate-content` skill applies the glossary at `.claude/skills/translate-
 A local Hugo Extended binary is available at:
 
 ```bash
-~/Library/Application Support/Hugo/0.84.2/hugo
+~/Library/Application Support/Hugo/0.111.3/hugo
 ```
 
-> **Note:** This on-disk binary is v0.84.2, but the site now requires Hugo **≥ 0.96** (the `continue` keyword in `layouts/section/event.html`), so 0.84.2 no longer builds it. Use a 0.96–0.119 **extended** binary for local previews; the project verifies builds with **0.111.3** (the version pinned in `netlify.toml`). The theme minimum is 0.78.
+> **Note:** Older binaries (v0.84.2, v0.89.4) also sit under that directory — **do not use them.** The site requires Hugo **≥ 0.96** (the `continue` keyword in `layouts/section/event.html`), and both fail with `function "continue" not defined` before rendering any content. Use a 0.96–0.119 **extended** binary; 0.111.3 is installed and matches the `netlify.toml` pin. The theme minimum is 0.78.
 
 ```bash
 # Run the dev server
-"$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender
+"$HOME/Library/Application Support/Hugo/0.111.3/hugo" server --disableFastRender
 
 # Or use the convenience script (requires hugo in PATH)
 ./view.sh

@@ -15,9 +15,10 @@ See `README.md` for human-facing docs (directory structure, tech stack, content 
 
 # Key Commands
 
-- Local Hugo binary: `"$HOME/Library/Application Support/Hugo/0.84.2/hugo"` (v0.84.2 Extended)
-- Run local dev server: `"$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender`
-- Build site: `"$HOME/Library/Application Support/Hugo/0.84.2/hugo" --gc --minify`
+- Local Hugo binary: `"$HOME/Library/Application Support/Hugo/0.111.3/hugo"` (v0.111.3 Extended — matches the `netlify.toml` pin)
+- Run local dev server: `"$HOME/Library/Application Support/Hugo/0.111.3/hugo" server --disableFastRender`
+- Build site: `"$HOME/Library/Application Support/Hugo/0.111.3/hugo" --gc --minify`
+- **Do not use the 0.84.2 or 0.89.4 binaries also present under that directory.** Both predate the ≥0.96 floor and fail on `layouts/section/event.html` with `function "continue" not defined` before rendering any content. See **Hugo Version Constraints**.
 - `./update_wowchemy.sh` — update Wowchemy modules and sync Hugo version in netlify.toml
 
 # Content Conventions
@@ -115,6 +116,7 @@ The site is trilingual: **English at `/`** (`content/`), **Spanish at `/es/`** (
 # Hugo Version Constraints
 
 - The site requires Hugo **≥ 0.96** (`layouts/section/event.html` uses the `continue` keyword). `netlify.toml` pins `HUGO_VERSION = 0.111.3`. There is **no Netlify UI env override** — the `netlify.toml` pin is the actual build version. Keep the pin in the 0.96–0.119 window; do not revert it.
+- **Local install matches the pin:** `$HOME/Library/Application Support/Hugo/0.111.3/hugo` (extended, darwin). Installed from the [v0.111.3 release](https://github.com/gohugoio/hugo/releases/tag/v0.111.3) — `hugo_extended_0.111.3_darwin-universal.tar.gz`. Use the same `<version>/hugo` layout when adding a version, and update **Key Commands** when the working version changes.
 - Tested/safe window: **0.96–0.119** extended (verified on 0.111.3). Lower bound = `continue`; upper bound ≈ `site.GoogleAnalytics` removal (~0.120) and `paginate` removal (0.128). Goldmark (not Blackfriday) is used, so the 0.100 Blackfriday removal is irrelevant. Re-verify Wowchemy v5 compatibility before moving outside this window.
 - Theme minimum: 0.78 (theme.toml).
 - Hugo 0.91+ requires a security policy for `WC_POST_CSS` — already configured in `config/_default/config.yaml` under `security.funcs.getenv`.

@@ -29,8 +29,9 @@ Netlify deploy-preview flags, includes future-dated content):
 ```
 
 - Binary must be `v0.111.3+extended` (the 0.96–0.119 window the site requires).
-  If `/tmp/hugo-verify/hugo` is gone, re-download Hugo 0.111.3 extended there.
-  Never use `~/Library/Application Support/Hugo/0.84.2/hugo` (no `continue` keyword).
+  Prefer the permanent install at `"$HOME/Library/Application Support/Hugo/0.111.3/hugo"`;
+  if `/tmp/hugo-verify/hugo` is gone, use that instead of re-downloading.
+  Never use the `0.84.2` or `0.89.4` binaries in that same directory (no `continue` keyword).
 - A non-zero exit or any new `ERROR` line fails the run — report it, do not claim
   success.
 - Spot-check that each new full page emitted `public/<lang>/<section>/<slug>/index.html`,

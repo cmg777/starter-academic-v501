@@ -252,7 +252,7 @@ After delivering the report, offer (do not execute) up to three next steps:
    the deck itself)."
 2. **Re-review** — `/project:review-slides <slug>` (or `focus: <dim>` on the
    dimension just fixed).
-3. **Preview** — `cd content/post/<slug>/slides && "$HOME/Library/Application Support/Hugo/0.84.2/hugo" server --disableFastRender` then open the deck.
+3. **Preview** — `cd content/post/<slug>/slides && "$HOME/Library/Application Support/Hugo/0.111.3/hugo" server --disableFastRender` then open the deck.
 
 State plainly that `review-slides` is read-only: it produced a report and one
 `SLIDES_REVIEW.md` file, and changed nothing else in the bundle.
