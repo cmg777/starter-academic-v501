@@ -16,15 +16,15 @@ image:
 links:
   - icon: chalkboard-teacher
     icon_pack: fas
-    name: "Slides (HTML)"
+    name: "Slides (HTML) — R edition"
     url: https://carlos-mendez.org/post/r_sc_dsc_sdid/slides/index.html
   - icon: file-pdf
     icon_pack: fas
-    name: "AI slides (PDF)"
+    name: "AI slides (PDF) — R edition"
     url: https://carlos-mendez.org/post/r_sc_dsc_sdid/ai-slides.pdf
   - icon: laptop-code
     icon_pack: fas
-    name: "Web app"
+    name: "Web app — R edition"
     url: https://carlos-mendez.org/post/r_sc_dsc_sdid/web_app/index.html
   - icon: open-data
     icon_pack: ai
@@ -84,7 +84,7 @@ diagram: true
 
 ## Abstract
 
-Estimating what a policy cost requires building a version of the world in which it never happened, and the software for doing that is scattered across a dozen packages with a dozen different interfaces. This tutorial is a guided tour of `mlsynth`, a Python library that puts ninety-two panel-data causal estimators behind a single configuration dictionary and a single result object, and it uses that library to climb the whole ladder of single-treated-unit estimators — difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control — one class per rung. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4, leaving the United Kingdom as the treated unit, 23 donors and 86 pre-treatment quarters. Dating the referendum at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.04% under synthetic control, 2.99% under demeaned SC, 2.80% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.19% a year later — every one above the 2.4% previously published for this dataset. An in-sample placebo tournament over twenty artificial treatment dates ranks the SDID family first at 0.0066 log points of root mean squared error against 0.0086 for plain synthetic control. Three findings emerge that only a package-level reading produces: three of the library's defaults each change the answer by more than the spread across the entire ladder, one estimator silently rounds the number you are most likely to quote, and the three routes `mlsynth` offers for "controlling for a covariate" disagree by two full percentage points.
+Estimating what a policy cost requires building a version of the world in which it never happened, and the software for doing that is scattered across a dozen packages with a dozen different interfaces. This tutorial is a guided tour of `mlsynth`, a Python library that puts ninety-two panel-data causal estimators behind a single configuration dictionary and a single result object, and it uses that library to climb the whole ladder of single-treated-unit estimators — difference-in-differences, synthetic control, demeaned synthetic control, synthetic difference-in-differences in three flavours, matching-and-synthetic-control and augmented synthetic control — one class per rung. The data are quarterly log real GDP for 24 OECD economies from 1995Q1 to 2020Q4, leaving the United Kingdom as the treated unit, 23 donors and 86 pre-treatment quarters. Dating the referendum at 2016Q3 and matching on outcomes alone, the estimated shortfall in UK GDP at the end of 2018 is 3.04% under synthetic control, 2.99% under demeaned SC, 2.80% under SDID, 2.73% under MASC and 3.04% under augmented SC, widening to between 3.83% and 4.19% a year later — every one above the 2.4% previously published for this dataset. An in-sample placebo tournament over twenty artificial treatment dates ranks the SDID family first at 0.0066 log points of root mean squared error against 0.0086 for plain synthetic control. Three findings emerge that only a package-level reading produces: three of the library's defaults each change the answer by more than the spread across the entire ladder, one estimator silently rounds the number you are most likely to quote, and the three routes `mlsynth` offers for "controlling for a covariate" disagree by 1.8 percentage points.
 
 ## 1. Overview
 
@@ -719,7 +719,7 @@ weights: 9 nonzero, sum 1.000000, simplex (non-negative, sum to 1)
     Portugal         0.0124
 ```
 
-Synthetic control puts the shortfall at 3.04% by the end of 2018 and 4.17% a year later, with a pre-treatment $R^2$ of 0.998. The synthetic UK is roughly a fifth Hungary, a fifth the United States, a fifth Japan, a sixth Canada and an eighth Norway. Fifteen of the twenty-three donors get nothing at all — this sparsity is a feature of the simplex constraint, not an accident, and it is why synthetic control estimates are usually easy to describe in a sentence.
+Synthetic control puts the shortfall at 3.04% by the end of 2018 and 4.17% a year later, with a pre-treatment $R^2$ of 0.998. The synthetic UK is roughly a fifth Hungary, a fifth the United States, a fifth Japan, a sixth Canada and an eighth Norway. Fourteen of the twenty-three donors get nothing at all — this sparsity is a feature of the simplex constraint, not an accident, and it is why synthetic control estimates are usually easy to describe in a sentence.
 
 Note that the United States carries about a fifth of the counterfactual. That will matter in section 19, when we ask whether the answer survives dropping it.
 
@@ -755,6 +755,9 @@ for label, klass, kw in [
     r = klass(cfg(96, **kw)).fit()
     att = tssc_att(r, "SC") if klass is TSSC else r.effects.att
     print(f"{label:<36s} 2018Q4 {pct(att):.3f}")
+
+# Reference value from the R edition, not refitted here (see section 15).
+print(f"{'R synthdid (Frank-Wolfe, published)':<36s} 2018Q4 3.060")
 ```
 
 ```text
@@ -1178,7 +1181,7 @@ method                         command  loss_2018Q4  loss_2019Q4  r_post_2018Q4 
   ASCM VanillaSC(..., augment="ridge")         3.04         4.19           3.04              3.04
 ```
 
-Reading across the columns: `r_post_2018Q4` is what the R edition of this post reports using `synthdid`, `Synth`, `masc` and `augsynth`; `published_2018Q4` is de Brabander, Juodis and Miyazato Szini [1]. **Four of the six rungs agree with both to two decimals. The two that do not are SC and SDID, and both differ in the same direction and for the same reason.**
+Reading across the columns: `r_post_2018Q4` is what the R edition of this post reports using `synthdid`, `Synth`, `masc` and `augsynth`; `published_2018Q4` is de Brabander, Juodis and Miyazato Szini [1]. **Three of the six rungs — DiD, MASC and ASCM — agree with both to two decimals. DSC lands a hundredth above the published 2.98 only because 2.9887 sits on a rounding boundary; the R edition reports the same estimate as 2.99. The two real disagreements are SC and SDID, and both differ in the same direction and for the same reason.**
 
 Every rung puts the cost of the referendum above the 2.4% that Born, Müller, Schularick and Sedláček [2] published for this same dataset, and the excluding-DiD range is a fairly tight 2.73% to 3.04% at the end of 2018, widening to 3.83% to 4.19% a year later.
 
@@ -1268,7 +1271,7 @@ placebo = pd.DataFrame([placebo_one(k, h) for h in (1, 4) for k in range(61, 81)
   Horizon h = 1 quarter
     method   RMSE    MAB  MedAB
         SC 0.0086 0.0068 0.0051
-       DSC 0.0087 0.0069 0.0050
+       DSC 0.0086 0.0068 0.0051
   SDID (i) 0.0066 0.0037 0.0016
  SDID (ii) 0.0066 0.0038 0.0017
 SDID (iii) 0.0066 0.0039 0.0020
@@ -1278,7 +1281,7 @@ SDID (iii) 0.0066 0.0039 0.0020
 
 ![Two panels of strip plots showing twenty placebo errors for each of the seven estimators, graded one quarter ahead and four quarters ahead, with the root mean squared error marked as an orange diamond and the SDID family visibly tighter around zero.](python_sc_dsc_sdid_12_placebo_tournament.png)
 
-At a one-quarter horizon the whole SDID family scores 0.0066 root mean squared error, against 0.0080 for MASC, 0.0086 for SC and ASCM and 0.0087 for DSC. The gap is even larger in mean absolute bias: 0.0037 for SDID (i) against 0.0068 for SC, close to a factor of two. **The time weights are doing real work**, and this is the paper's central theoretical claim surviving an empirical test.
+At a one-quarter horizon the whole SDID family scores 0.0066 root mean squared error, against 0.0080 for MASC and 0.0086 for SC, DSC and ASCM alike. The gap is even larger in mean absolute bias: 0.0037 for SDID (i) against 0.0068 for SC, close to a factor of two. **The time weights are doing real work**, and this is the paper's central theoretical claim surviving an empirical test.
 
 ### 16.1 The published table is not comparing like with like
 
@@ -1289,7 +1292,7 @@ Running every estimator at both horizons settles it:
 | Method | RMSE, $h = 1$ | RMSE, $h = 4$ | Published |
 |---|---|---|---|
 | SC | 0.0086 | 0.0145 | 0.0089 |
-| DSC | 0.0087 | 0.0146 | 0.0087 |
+| DSC | 0.0086 | 0.0146 | 0.0087 |
 | SDID (i) | 0.0066 | 0.0132 | 0.0067 |
 | SDID (ii) | 0.0066 | 0.0133 | 0.0134 |
 | SDID (iii) | 0.0066 | 0.0133 | 0.0134 |
@@ -1298,7 +1301,7 @@ Running every estimator at both horizons settles it:
 
 Every cell reproduces the published value to within 0.0003 — except the two that were graded on a different exam. Graded on the same task, the three SDID variants are **indistinguishable**: 0.0066 at one quarter, 0.0132–0.0133 at four. The published conclusion that variants (ii) and (iii) "perform the worst" is an artefact of the horizon, not a property of the estimators. This is the same finding the R edition reports, arrived at with a different library, which is about as much corroboration as a result of this kind can get.
 
-What survives is the finding that matters more: **at either horizon the whole SDID family beats every other rung**, and the ordering below it is stable — SDID, then MASC, then ASCM and SC, then DSC.
+What survives is the finding that matters more: **at either horizon the whole SDID family beats every other rung**, and the ordering below it is stable — SDID, then MASC, then SC, ASCM and DSC, and those last three are indistinguishable at one quarter and separated by less than 0.0001 at four.
 
 ## 17. Do covariates help? Three meanings of "control for"
 
@@ -1377,23 +1380,31 @@ This is why the R edition's placebo tournament found covariates make the counter
 `VanillaSC` exposes nine inference methods behind a single `inference=` field, which is unusually generous. Here is what each returns on this panel:
 
 ```python
+rows = []
 for meth in ("placebo", "scpi", "lto", "conformal", "ttest", "jackknife_plus"):
-    r = VanillaSC(cfg(96, inference=meth, alpha=0.05)).fit()
-    inf = r.inference
-    print(f"{meth:<15s} p={inf.p_value}  CI=({inf.ci_lower}, {inf.ci_upper})  {inf.method}")
+    try:
+        r = VanillaSC(cfg(96, inference=meth, alpha=0.05)).fit()
+        inf = r.inference
+        rows.append(dict(method=meth, att=r.att, p_value=inf.p_value,
+                         ci_lower=inf.ci_lower, ci_upper=inf.ci_upper,
+                         reported_as=inf.method))
+    except Exception as exc:
+        rows.append(dict(method=meth, att=np.nan,
+                         reported_as=f"FAILED: {type(exc).__name__}"))
+print(pd.DataFrame(rows).to_string(index=False))
 ```
 
 ```text
-        method       att  p_value  ci_lower  ci_upper                                      reported_as
-       placebo -0.030388 0.041667       NaN       NaN                   in-space placebo (RMSPE ratio)
-          scpi -0.030388      NaN -0.055333 -0.009374  scpi prediction intervals (Cattaneo-Feng-Titiunik)
-           lto -0.030388 0.008333       NaN       NaN        leave-two-out refined placebo (Lei-Sudijono)
-     conformal -0.030388 0.020000 -0.046603 -0.014292   conformal prediction intervals (Chernozhukov et al.)
-         ttest -0.030388 0.005788 -0.040042 -0.020228               debiased SC t-test (Chernozhukov et al.)
-jackknife_plus       NaN      NaN       NaN       NaN                   FAILED: MlsynthEstimationError
+        method       att  p_value  ci_lower  ci_upper                                                     reported_as
+       placebo -0.030388 0.041667       NaN       NaN                                  in-space placebo (RMSPE ratio)
+          scpi -0.030388      NaN -0.055333 -0.009374         scpi prediction intervals (Cattaneo-Feng-Titiunik 2021)
+           lto -0.030388 0.008333       NaN       NaN               leave-two-out refined placebo (Lei-Sudijono 2025)
+     conformal -0.030388 0.020000 -0.046603 -0.014292 conformal prediction intervals (Chernozhukov-Wuthrich-Zhu 2021)
+         ttest -0.030388 0.005788 -0.040042 -0.020228             debiased SC t-test (Chernozhukov-Wuthrich-Zhu 2025)
+jackknife_plus       NaN      NaN       NaN       NaN                                  FAILED: MlsynthEstimationError
 ```
 
-Reported honestly: `jackknife_plus` raises `MlsynthEstimationError` on this configuration and is excluded. The other five all reject at the 5% level, with p-values from 0.006 to 0.042 and every interval excluding zero.
+Reported honestly: `jackknife_plus` raises `MlsynthEstimationError` on this configuration and is excluded. The other five all reject at the 5% level: four report p-values between 0.006 and 0.042, and `scpi` reports no p-value but an interval that stops short of zero.
 
 That looks decisive, and it should be read with more caution than it invites. The five methods are not five independent tests — they all use the same point estimate and the same donor pool, and they differ in how they build a reference distribution from twenty-three donors. Note also that SDID's own placebo inference in section 11 gave p = 0.20 with an interval containing zero. Different estimator, different variance estimator, very different verdict. Read these as orders of magnitude rather than as digits.
 
@@ -1412,6 +1423,11 @@ for country in [TREATED] + DONORS:
     gap = np.asarray(r.gap, float).ravel()
     pre, post = np.sqrt(np.mean(gap[:T0] ** 2)), np.sqrt(np.mean(gap[T0:] ** 2))
     rows.append(dict(country=country, rmspe_pre=pre, rmspe_post=post, ratio=post / pre))
+
+placebo_space = (pd.DataFrame(rows)
+                 .assign(rank=lambda d: d["ratio"].rank(ascending=False).astype(int))
+                 .sort_values("ratio", ascending=False))
+print(placebo_space.head(6).round(4).to_string(index=False))
 ```
 
 The statistic is the ratio of post-treatment to pre-treatment root mean squared prediction error,
@@ -1440,19 +1456,19 @@ It can tell you that the UK's post-2016 divergence is unusual relative to what t
 
 ## 19. Robustness: the specification zoo
 
-Four departures from the headline specification, each one line of config:
+Four departures from the headline specification, each one line of config. The SDID column reports variant (i) for the date and donor-pool rows and variant (ii) — the post's headline — for the `zeta` rows, because those are the variants each check was run on.
 
-```text
-  treatment date 2016Q3 (headline)    SC  3.04  DSC  2.99  SDID  2.77
-  treatment date 2016Q2               SC  3.09  DSC  3.05  SDID  3.18
-  drop the United States              SC  3.06  DSC  3.04  SDID  2.83
-  zeta = 0 (the paper)                                     SDID  2.80
-  zeta at its default                                      SDID  2.67
-  w_constr='simplex'                  SC  3.04
-  w_constr='ols'                      SC  3.37
-  w_constr='ridge'                    SC  3.37
-  w_constr='lasso'                    SC  2.97
-```
+| Departure | SC | DSC | SDID |
+|---|---|---|---|
+| treatment date 2016Q3 (headline) | 3.04 | 2.99 | 2.77 *(i)* |
+| treatment date 2016Q2 | 3.09 | 3.05 | 3.18 *(i)* |
+| drop the United States | 3.06 | 3.04 | 2.83 *(i)* |
+| `zeta = 0` (the paper) | — | — | 2.80 *(ii)* |
+| `zeta` at its default | — | — | 2.67 *(ii)* |
+| `w_constr='simplex'` | 3.04 | — | — |
+| `w_constr='ols'` | 3.37 | — | — |
+| `w_constr='ridge'` | 3.37 | — | — |
+| `w_constr='lasso'` | 2.97 | — | — |
 
 Four observations.
 
@@ -1491,7 +1507,7 @@ For the current list on your installed version, `get_llm_guide()` is authoritati
 
 ## 21. Discussion
 
-**What Brexit cost.** Taking the ladder as a whole, the referendum had cost the UK between **2.7% and 3.1% of GDP by the end of 2018**, and between **3.8% and 4.2% by the end of 2019**. That is above the 2.4% previously published for this dataset, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and section 17 shows covariates make the counterfactual worse here rather than better.
+**What Brexit cost.** Taking the ladder as a whole, the referendum had cost the UK between **2.7% and 3.0% of GDP by the end of 2018**, and between **3.8% and 4.2% by the end of 2019**. That is above the 2.4% previously published for this dataset, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and section 17 shows covariates make the counterfactual worse here rather than better.
 
 Three caveats belong with the number. It is a *net* gap between the UK and a blend of OECD economies, so anything else distinctive that happened to the UK after mid-2016 is inside it. The no-interference assumption is strong over four years when the United States carries a fifth of the weight. And the estimate is a point on a specification cloud rather than a parameter that has been pinned down — every interval in section 18 is wide, and SDID's contains zero.
 
@@ -1511,7 +1527,7 @@ Three caveats belong with the number. It is a *net* gap between the UK and a ble
 
 ## 22. Summary and next steps
 
-- **The Brexit referendum cost the UK 2.7–3.1% of GDP by end-2018 and 3.8–4.2% by end-2019**, on every rung of the ladder, against 2.4% previously published for the same data.
+- **The Brexit referendum cost the UK 2.7–3.0% of GDP by end-2018 and 3.8–4.2% by end-2019**, on every rung of the ladder, against 2.4% previously published for the same data.
 - **`mlsynth` puts all six rungs behind one interface**: `Estimator({"df": ..., "outcome": ..., "treat": ..., "unitid": ..., "time": ...}).fit()`, returning a result with seven flat accessors that work everywhere.
 - **Three defaults matter more than the estimator choice.** `SDID` penalises unit weights unless you set `zeta=0.0` (2.80% vs 2.67%); `MASC` cross-validates on a different fold set unless you set `set_f` (2.73% vs 3.19%); and `SDID`'s three covariate methods disagree by 1.76 percentage points.
 - **The time weights earn their keep.** SDID's placebo RMSE is 0.0066 against 0.0086 for plain SC, a 23% reduction, and the advantage holds at both forecast horizons.
@@ -1526,7 +1542,7 @@ Two companions to this post: [the R edition](/post/r_sc_dsc_sdid/) hand-codes ev
 
 1. **Move the treatment date.** Re-run the headline table with `pre=T0-1` (treatment materialising 2016Q2). Which rung moves most, and can you explain it from the time weights?
 2. **Break the rounding.** Compute DSC's estimate from `variants["MSCa"].att` and from the gap series across all twenty placebo windows in section 16. How large does the discrepancy get?
-3. **Find the third default.** `VanillaSC`'s `inference` defaults to `True`, which runs in-space placebo. Time a fit with `inference=False` against the default, and decide when the difference matters.
+3. **Time the inference default.** `VanillaSC`'s `inference` defaults to `True`, which runs in-space placebo. Time a fit with `inference=False` against the default, and decide when the difference matters.
 4. **Read the simplex.** Print `weights.summary_stats` for all six rungs. Which report `n_negative > 0`, and which report a `constraint` other than the plain simplex?
 5. **Grade the horizon.** Extend section 16's tournament to $h = 8$. Does the SDID family's advantage survive a two-year forecast?
 6. **Separate MASC's two dials.** Fix `m=10` and vary `set_f`; then fix `set_f` and vary `m_grid`. Which of the two drives the 0.47-point swing?
