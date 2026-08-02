@@ -30,7 +30,7 @@ Five defect classes, both posts affected:
 3. **Rounding-boundary mismatches.** DSC's estimate is 2.985 in R and 2.9887 in Python — right on
    the 2.985 boundary. R's §14 printed 2.99, its §19.2 printed 2.98, and its §19.2 Python column
    printed 3.00, which is the *rounded* `TSSC.att` — precisely the trap the Python post documents
-   in its own §10.1. Python's §14 then claimed "four of six rungs agree" when DSC also differs.
+   in its own §10.1. Python's §14 then claimed "four of six stages agree" when DSC also differs.
 4. **Promised-vs-shown counts.** R §17 announced "Four departures", presented three, and its
    figure alt text said five. The figure genuinely has five rows because the covariates departure
    is plotted but was never introduced in prose. Fixed by writing the missing **(d) Mean

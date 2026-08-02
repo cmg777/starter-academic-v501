@@ -93,7 +93,7 @@ Blundell and Bond's (1998) dynamic labor-demand equation on this very dataset: l
 :::
 
 ::: {.notes}
-The arc is an estimator ladder: each rung fails informatively and motivates the next. The meta-lesson to plant now: the winner will not be identified by any single printed statistic — only by the workflow (bracket, weak-instrument logic, proliferation experiment, replication).
+The arc is an estimator ladder: each stage fails informatively and motivates the next. The meta-lesson to plant now: the winner will not be identified by any single printed statistic — only by the workflow (bracket, weak-instrument logic, proliferation experiment, replication).
 :::
 
 # The Investigation {.divider background-color="#6a9bcc"}

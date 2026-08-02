@@ -762,25 +762,25 @@ pred["satyear"] = sum(i * pred[f"satyear_{i}"] for i in range(1, 8)).astype(int)
 pred["group_id"] = pred.filter(["eap", "eca", "lac", "mena", "sa", "ssa"]).idxmax(axis=1)
 ```
 
-Now the ladder. We show four rungs — pooled, region fixed effects, plus national income, and
+Now the ladder. We show four specifications — pooled, region fixed effects, plus national income, and
 the full model — and print the light elasticity at each:
 
 ```python
-# --- Step 2: the ladder of specifications (each rung adds something) --------
+# --- Step 2: the ladder of specifications (each spec adds something) --------
 GEO = ("log_N_pix_top_cod_1_ppix + log_N_pix_low_cod_1_ppix + log_area + "
        "log_region + log_region_X_log_area")                # the geography controls
 specs = {
-  # rung 1: pooled OLS, no fixed effects -- the raw, confounded correlation
+  # spec 1: pooled OLS, no fixed effects -- the raw, confounded correlation
   1: "log_GDP_pc_Region ~ log_Light_ppix_Region",
-  # rung 2: + region & satellite FE -> the clean WITHIN-region elasticity
+  # spec 2: + region & satellite FE -> the clean WITHIN-region elasticity
   2: "log_GDP_pc_Region ~ log_Light_ppix_Region | code_Coutry_Region + satyear",
-  # rung 4: + national income, so light is not credited with rich-vs-poor gaps
+  # spec 4: + national income, so light is not credited with rich-vs-poor gaps
   4: "log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country | Country_ISO + satyear",
-  # rung 7: + all geography controls and world-region FE -- the full model
+  # spec 7: + all geography controls and world-region FE -- the full model
   7: f"log_GDP_pc_Region ~ log_Light_ppix_Region + log_GDP_pc_Country + {GEO} | group_id + satyear",
 }
 
-# --- Step 3: fit each rung and read off the light elasticity ----------------
+# --- Step 3: fit each spec and read off the light elasticity ----------------
 for k, fml in specs.items():
     m = pf.feols(fml, data=pred, vcov={"CRV1": "Country_ISO"})   # cluster by country
     print(f"col {k}: light elasticity = {m.coef()['log_Light_ppix_Region']:.3f}")
@@ -1810,7 +1810,7 @@ effects. `robust cluster(Country_ISO)` makes the standard errors robust and clus
 (this changes the standard errors, not the point estimate).
 
 ```stata
-* --- Step 1: the seven-rung ladder (random effects, as in the paper) --------
+* --- Step 1: the seven-spec ladder (random effects, as in the paper) --------
 use "Prediction_Data.dta", clear
 xtset code_Coutry_Region year
 xi i.code_Coutry_Region                 // region dummies for the OLS column (2)

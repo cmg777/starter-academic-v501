@@ -53,9 +53,9 @@ Japan 0.1773, Canada 0.1612, Norway 0.1256), and the ASCM negative weights match
   Graded like for like at h = 1, the three variants are 0.0067 / 0.0066 / 0.0066 —
   indistinguishable. At h = 4 all three tie at 0.0134. The conclusion that (ii) and (iii)
   "perform the worst" is an artefact of the exam, not a property of the estimators. What
-  survives is that the whole SDID family beats every other rung at either horizon.
+  survives is that the whole SDID family beats every other stage at either horizon.
 - **DiD, which the paper omits, is worth showing.** 4.98% at 2018Q4, nearly double everything
-  else, with four times the pre-treatment fit error. It makes the ladder's first rung concrete.
+  else, with four times the pre-treatment fit error. It makes the ladder's first stage concrete.
 - **Inference (beyond the paper, which reports none by design).** Placebo-in-space puts the UK
   first of 24 with a post/pre RMSPE ratio of 5.82 and p = 0.042 — the smallest value 23 donors
   can produce. The `synthdid` placebo SE of 0.0096 log points implies a 95% interval of roughly
@@ -150,7 +150,7 @@ page bundle: `script-review.md`, `post-review.md`, `infographic-review.md`,
   called out as the hinge of the argument.
 - **An arbitrary constant was hiding an exact result.** `analysis.R` computed its hand-coded ASCM
   with a made-up ridge of `0.01`, printing 3.059 against the package's 3.045 with no explanation,
-  and ASCM was the only rung of seven with no hand-vs-package agreement metric. Reading
+  and ASCM was the only stage of seven with no hand-vs-package agreement metric. Reading
   `augsynth`'s own CV choice back out (`$lambda` = 0.13858) makes the two agree to **3.9e-06**. The
   same `0.01` had propagated to `cheatsheet.R` and `tutorial.qmd`; both corrected. The post now
   shows the closed form too, so ASCM stops being the second place the "hand-code then package"
@@ -249,7 +249,7 @@ the R column and the published value — so they can be read side by side.
 
 ### Results
 
-| Rung | R | Stata | Python | Paper |
+| Stage | R | Stata | Python | Paper |
 |---|---|---|---|---|
 | DiD | 4.98 | 4.98 | 4.98 | — |
 | SC | 3.06 | 3.06 | **3.04** | 3.06 |

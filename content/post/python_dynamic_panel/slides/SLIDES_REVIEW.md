@@ -146,7 +146,7 @@ Every ✗ is a HIGH issue. None found.
 ## Priority action items
 
 1. **[LOW]** Split the slide-4 equation gloss into two short sentences (APPLIED).
-2. **[LOW]** (Deferred) Consider an assertion title for slide 4 "Where we're going" (e.g. "The estimator ladder: each rung fails informatively"). Optional; the roadmap pattern is acceptable.
+2. **[LOW]** (Deferred) Consider an assertion title for slide 4 "Where we're going" (e.g. "The estimator ladder: each stage fails informatively"). Optional; the roadmap pattern is acceptable.
 3. **[LOW]** (Deferred) Optionally tighten the slide-22 rebuttal list-sentence. Deliberate density on a steelman slide; polish only.
 
 ---

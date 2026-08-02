@@ -89,7 +89,7 @@ xtset code_Coutry_Region year
 xi i.code_Coutry_Region                 // region dummies for the OLS column (2)
 set matsize 11000                        // room for ~1,500 region dummies
 
-* --- Step 1: the seven-rung ladder (random effects, as in the paper) --------
+* --- Step 1: the seven-spec ladder (random effects, as in the paper) --------
 * (1) raw RE, no fixed effects
 xtreg log_GDP_pc_Region log_Light_ppix_Region, re robust cluster(Country_ISO)
 * (2) OLS with region + satellite fixed effects (the clean within elasticity)
