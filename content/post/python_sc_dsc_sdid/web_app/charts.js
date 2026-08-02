@@ -69,7 +69,7 @@
 
   // A left-hand category axis that wraps nothing and never clips: the label
   // column is sized by the caller, not guessed here.
-  function catAxis(g, y, ih) {
+  function catAxis(g, y) {
     g.append("g").call(d3.axisLeft(y))
       .call(s => s.selectAll("text").attr("fill", C.text).attr("font-size", 12))
       .call(s => s.selectAll("line,path").attr("stroke", C.muted));
@@ -162,7 +162,7 @@
       .call(d3.axisBottom(x).ticks(6))
       .call(s => s.selectAll("text").attr("fill", C.muted))
       .call(s => s.selectAll("line,path").attr("stroke", C.muted));
-    catAxis(g, y, ih);
+    catAxis(g, y);
 
     g.selectAll("rect").data(rows).join("rect")
       .attr("x", d => x(Math.min(0, d.w)))
@@ -185,7 +185,52 @@
       .text(d => d.w.toFixed(3));
   }
 
-  /* ---- 4. the ladder ----------------------------------------------------- */
+  /* ---- 4. SDID time weights ----------------------------------------------
+     Shared verbatim with the R companion's chart of the same name. */
+  function lambda(sel, quarters, lam) {
+    const W = 900, H = 300, m = { t: 20, r: 20, b: 52, l: 66 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const g = frame(sel, W, H, m);
+
+    const x = d3.scaleBand().domain(d3.range(lam.length)).range([0, iw]).padding(0.15);
+    const y = d3.scaleLinear().domain([0, Math.max(d3.max(lam), 1 / lam.length * 1.6)])
+      .nice().range([ih, 0]);
+
+    g.append("g").attr("transform", `translate(0,${ih})`)
+      .call(d3.axisBottom(x)
+        .tickValues(d3.range(0, lam.length, 8))
+        .tickFormat(i => quarters[i]))
+      .call(s => s.selectAll("text").attr("fill", C.muted)
+                  .attr("transform", "rotate(-40)").attr("text-anchor", "end"))
+      .call(s => s.selectAll("line,path").attr("stroke", C.muted));
+    g.append("g").call(d3.axisLeft(y).ticks(5))
+      .call(s => s.selectAll("text").attr("fill", C.muted))
+      .call(s => s.selectAll("line,path").attr("stroke", C.muted));
+
+    const unif = 1 / lam.length;
+    g.append("line").attr("x1", 0).attr("x2", iw)
+      .attr("y1", y(unif)).attr("y2", y(unif))
+      .attr("stroke", C.gold).attr("stroke-dasharray", "5,4");
+    g.append("text").attr("x", 6).attr("y", y(unif) - 7)
+      .attr("fill", C.gold).attr("font-size", 11)
+      .text("uniform — what difference-in-differences assumes");
+
+    g.selectAll("rect").data(lam.map((v, i) => ({ q: quarters[i], v, i })))
+      .join("rect")
+      .attr("x", d => x(d.i)).attr("y", d => y(d.v))
+      .attr("width", x.bandwidth()).attr("height", d => ih - y(d.v))
+      .attr("fill", d => d.v > 0.02 ? C.orange : C.steel)
+      .on("mousemove", (e, d) => showTip(
+        `<b>${d.q}</b><br>lambda ${d.v.toFixed(4)}` +
+        (d.v > 0.02 ? "" : `<br><span class="dim">below the uniform weight</span>`), e))
+      .on("mouseleave", hideTip);
+
+    g.append("text").attr("x", -ih / 2).attr("y", -48).attr("transform", "rotate(-90)")
+      .attr("text-anchor", "middle").attr("fill", C.muted).attr("font-size", 12)
+      .text("time weight");
+  }
+
+  /* ---- 5. the ladder ----------------------------------------------------- */
   function ladder(sel, rows, key, born) {
     const W = 900, H = 340, m = { t: 26, r: 60, b: 42, l: 130 };
     const iw = W - m.l - m.r, ih = H - m.t - m.b;
@@ -198,7 +243,7 @@
       .call(d3.axisBottom(x).ticks(6))
       .call(s => s.selectAll("text").attr("fill", C.muted))
       .call(s => s.selectAll("line,path").attr("stroke", C.muted));
-    catAxis(g, y, ih);
+    catAxis(g, y);
 
     g.selectAll("rect").data(rows).join("rect")
       .attr("x", 0).attr("y", d => y(d.method))
@@ -245,7 +290,7 @@
       .call(d3.axisBottom(x).ticks(6).tickFormat(d3.format(".4f")))
       .call(s => s.selectAll("text").attr("fill", C.muted))
       .call(s => s.selectAll("line,path").attr("stroke", C.muted));
-    catAxis(g, y, ih);
+    catAxis(g, y);
 
     g.selectAll("rect").data(sorted).join("rect")
       .attr("x", 0).attr("y", d => y(d.method))
@@ -301,7 +346,7 @@
       .call(d3.axisBottom(x).ticks(6).tickFormat(o.fmt))
       .call(s => s.selectAll("text").attr("fill", C.muted))
       .call(s => s.selectAll("line,path").attr("stroke", C.muted));
-    catAxis(g, y, ih);
+    catAxis(g, y);
 
     o.refs.forEach(r => {
       g.append("line").attr("x1", x(r.at)).attr("x2", x(r.at))
@@ -377,7 +422,7 @@
       .call(d3.axisBottom(x).ticks(7))
       .call(s => s.selectAll("text").attr("fill", C.muted))
       .call(s => s.selectAll("line,path").attr("stroke", C.muted));
-    catAxis(g, y, ih);
+    catAxis(g, y);
 
     const rowsG = g.selectAll("g.span").data(rows).join("g").attr("class", "span")
       .attr("transform", d => `translate(0,${y(d.label) + y.bandwidth() / 2})`);
@@ -409,7 +454,11 @@
     const iw = W - m.l - m.r, ih = H - m.t - m.b;
     const g = frame(sel, W, H, m);
 
-    const x = d3.scaleLinear().domain(d3.extent(rows, d => d.multiple)).range([0, iw]);
+    // Pad the domain so the marker at zeta = 0 does not land on the y-axis, where a
+    // dashed rule is invisible.
+    const mx = d3.extent(rows, d => d.multiple);
+    const pad = (mx[1] - mx[0]) * 0.035;
+    const x = d3.scaleLinear().domain([mx[0] - pad, mx[1] + pad]).range([0, iw]);
     const y = d3.scaleLinear().domain(d3.extent(rows, d => d[key])).nice().range([ih, 0]);
 
     g.append("g").attr("transform", `translate(0,${ih})`)
@@ -598,7 +647,7 @@
       .call(d3.axisBottom(x).ticks(6).tickFormat(d3.format(".3f")))
       .call(s => s.selectAll("text").attr("fill", C.muted))
       .call(s => s.selectAll("line,path").attr("stroke", C.muted));
-    catAxis(g, y, ih);
+    catAxis(g, y);
 
     g.append("line").attr("x1", x(0)).attr("x2", x(0))
       .attr("y1", -8).attr("y2", ih)
@@ -637,6 +686,6 @@
 
   global.Charts = {
     paths, gap, weights, ladder, placebo, hbars, spans, zetaCurve,
-    spaghetti, ratios, eventStudy, forest, METHOD_COLOUR, C
+    lambda, spaghetti, ratios, eventStudy, forest, C
   };
 })(window);

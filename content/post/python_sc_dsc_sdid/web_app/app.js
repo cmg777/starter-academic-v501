@@ -17,7 +17,7 @@
              "referendum. No intercept, so the blend has to match the level as well as " +
              "the shape." },
     { key: "DSC", label: "Demeaned SC",
-      blurb: "TSSC(method=\"MSCa\") — not mlsynth.DSC, see panel 5. The same problem on " +
+      blurb: "TSSC(method=\"MSCa\") — not mlsynth.DSC, see panel 6. The same problem on " +
              "demeaned outcomes plus a constant offset. The offset here is tiny, which " +
              "tells you the plain SC fit was already level-balanced." },
     { key: "SDID", label: "Synthetic DiD",
@@ -40,9 +40,22 @@
     { key: "covariates", label: "covariates (SDID)" }
   ];
 
+  // The three ways of choosing what SDID's time weights are fitted against. Only
+  // (iii) falls out of a bare .fit(); the other two are rebuilt from the omega and
+  // lambda the result already hands you. See the post's section 11.3.
+  const FLAVOURS = [
+    { key: "i", label: "SDID (i)", variant: "SDID (i)",
+      why: "fitted on the treatment quarter alone" },
+    { key: "ii", label: "SDID (ii)", variant: "SDID (ii)",
+      why: "fitted on the average across the whole post-treatment block" },
+    { key: "iii", label: "SDID (iii)", variant: "SDID (iii)",
+      why: "fitted on the evaluation quarter, which is what a bare .fit() gives you" }
+  ];
+
   const state = {
     method: "SDID",
     horizon: "loss_2018Q4",
+    flavour: "i",
     dial: "zeta",
     zetaIdx: 0,
     placeboH: "h1",
@@ -71,7 +84,7 @@
   // "1995Q1" -> 1995.0, so the x axis is a real number line rather than an index.
   const toDecimal = q => (+q.slice(0, 4)) + ((+q.slice(5)) - 1) / 4;
 
-  /* ---- panel 4: the anatomy of a fit, built once ------------------------- */
+  /* ---- panel 5: the anatomy of a fit, built once ------------------------- */
   function renderAnatomy() {
     const a = D.anatomy;
 
@@ -147,7 +160,7 @@
     trap.appendChild(p2);
   }
 
-  /* ---- panel 6: how far each option moves the answer --------------------- */
+  /* ---- panel 7: how far each option moves the answer --------------------- */
   function dialRows() {
     const span = (rows, key) => ({
       lo: d3.min(rows, d => d[key]), hi: d3.max(rows, d => d[key])
@@ -195,7 +208,7 @@
       "different answer; this is the whole reason the simplex constraint exists.",
     covariates:
       "Three routes through SDID plus VanillaSC's own, and they span {cov_gap} percentage " +
-      "points — seven times the spread across the entire ladder. See panel 7 for what " +
+      "points — seven times the spread across the entire ladder. See panel 8 for what " +
       "they cost in fit."
   };
 
@@ -342,7 +355,29 @@
           ? `, ${neg} of them negative — a synthetic UK built partly by subtracting countries.`
           : ", all of them non-negative and summing to one.");
 
-    /* --- 3. the ladder --- */
+    /* --- 3. which quarters count --- */
+    buttons("lambda-buttons", FLAVOURS,
+            it => it.key === state.flavour,
+            it => { state.flavour = it.key; });
+    const fl = FLAVOURS.find(f => f.key === state.flavour);
+    const lam = D.lambda[state.flavour];
+    Charts.lambda("#chart-lambda", D.meta.quarters.slice(0, D.meta.t0), lam);
+
+    const big = lam.map((v, i) => ({ v, q: D.meta.quarters[i] }))
+                   .filter(d => d.v > 0.02)
+                   .sort((a, b) => b.v - a.v);
+    const vrow = D.variants.find(v => v.variant === fl.variant);
+    el("lambda-note").textContent =
+      `${fl.label}: lambda ${fl.why}. ` +
+      `${big.length} of the ${lam.length} pre-treatment quarters carry a weight above ` +
+      `0.02, led by ${big[0].q} at ${big[0].v.toFixed(3)}; the uniform weight ` +
+      `difference-in-differences would use is ${(1 / lam.length).toFixed(4)}. ` +
+      `This flavour puts the 2018Q4 shortfall at ${pp(vrow.loss_2018Q4)} and the 2019Q4 ` +
+      `shortfall at ${pp(vrow.loss_2019Q4)}. The three flavours differ by less than ` +
+      `0.05 percentage points, which is the useful finding: the choice looks consequential ` +
+      `and is not.`;
+
+    /* --- 4. the ladder --- */
     const HORIZONS = [
       { key: "loss_2018Q4", label: "At 2018Q4" },
       { key: "loss_2019Q4", label: "At 2019Q4" }
@@ -359,16 +394,33 @@
     el("ladder-note").textContent =
       `Excluding difference-in-differences, which fits nothing, the five remaining stages ` +
       `span ${lo.toFixed(2)}% to ${hi.toFixed(2)}% — ${(hi - lo).toFixed(2)} percentage ` +
-      `points. Keep that number in mind for panel 6: several of the library's defaults ` +
+      `points. Keep that number in mind for panel 7: several of the library's defaults ` +
       `move the answer further than the choice of estimator does.`;
 
-    /* --- 6. the defaults dial --- */
+    /* --- 7. the defaults dial --- */
     const spreadLo = d3.min(noDid, r => r.loss_2018Q4);
-    const spreadHi = d3.max(noDid, r => r.loss_2018Q4);
-    Charts.spans("#chart-spans", dialRows(), { lo: spreadLo, hi: spreadHi });
+    const rows7 = dialRows();
+    const band = { lo: spreadLo, hi: spreadLo + D.meta.ladder_spread };
+    Charts.spans("#chart-spans", rows7, band);
+
+    // This panel's headline is a fact about the data, so derive it rather than
+    // asserting it in the markup where it could quietly go stale.
+    const bandW = band.hi - band.lo;
+    const wider = rows7.filter(r => r.hi - r.lo > bandW);
+    const inside = rows7.filter(r => r.hi - r.lo <= bandW);
+    const names = rs => rs.map(r => r.label.replace(/ \(\w+\)$/, "")).join(", ");
+    el("spans-note").textContent =
+      `${wider.length} of the ${rows7.length} settings clear the band: ${names(wider)}. ` +
+      (inside.length
+        ? `${names(inside)} does not — it moves the estimate ` +
+          `${inside.map(r => (r.hi - r.lo).toFixed(2)).join(", ")}pp against the ladder's ` +
+          `own ${bandW.toFixed(2)}pp, so it is the one setting here that matters less than ` +
+          `the choice of estimator. The post counts it among its three anyway, because it ` +
+          `is the one you are most likely to leave alone by accident.`
+        : "");
     renderDial();
 
-    /* --- 7. covariates --- */
+    /* --- 8. covariates --- */
     const covBase = D.covariates[0];
     Charts.hbars("#chart-cov", D.covariates, {
       valueKey: "loss_2018Q4", labelKey: "spec", labelWidth: 300,
@@ -404,7 +456,7 @@
       `evidence; the predictor-weight problem here is barely identified, and refitting it ` +
       `at a second optimiser budget moves the answer by 0.2 percentage points on its own.`;
 
-    /* --- 8. the fire drill --- */
+    /* --- 9. the fire drill --- */
     const PL = [
       { key: "h1", label: "Graded 1 quarter ahead" },
       { key: "h4", label: "Graded 4 quarters ahead" },
@@ -433,7 +485,7 @@
              "ranking was measuring the task, not the method."
     }[state.placeboH];
 
-    /* --- 9. placebo in space --- */
+    /* --- 10. placebo in space --- */
     Charts.spaghetti("#chart-space", dates, D.in_space_gaps, D.meta.treated, treatDate);
     Charts.ratios("#chart-ratios", D.in_space, D.meta.treated);
     el("space-note").textContent =
@@ -443,7 +495,7 @@
       `attainable p-value is 1/${D.meta.n_units} = ${D.meta.p_floor.toFixed(3)}. The ` +
       `result is at the inferential floor, and no choice of estimator moves it.`;
 
-    /* --- 10. the event study --- */
+    /* --- 11. the event study --- */
     const ES = [
       { key: 20, label: "+/- 20 quarters" },
       { key: 40, label: "+/- 40 quarters" },
@@ -464,7 +516,7 @@
       `because they come from a placebo distribution built on 23 donors; read the shape ` +
       `of the path, not the significance of any one quarter.`;
 
-    /* --- 11. inference --- */
+    /* --- 12. inference --- */
     Charts.forest("#chart-forest", D.inference);
     renderInferenceTable();
     const failed = D.inference.filter(r => r.att == null);
@@ -479,7 +531,7 @@
       `${D.meta.p_floor.toFixed(3)} no matter how large the effect is, so a small p-value ` +
       `from it is a statement about the donor pool as much as about Brexit.`;
 
-    /* --- 12. the solvers --- */
+    /* --- 13. the solvers --- */
     const SOLV = [
       { key: "loss_2018Q4", label: "At 2018Q4" },
       { key: "loss_2019Q4", label: "At 2019Q4" }
@@ -510,14 +562,16 @@
       `to within ${convSpread.toExponential(1)} percentage points, because all four hand ` +
       `the problem to a convex solver that runs to optimality. R's synthdid walks the same ` +
       `valley with Frank-Wolfe on a capped iteration budget and stops at 3.06%. Stata's ` +
-      `sdid inherits that solver and stops in the same place; tighten its convergence and ` +
-      `it drifts to where mlsynth already is. Three languages, two camps, and the split is ` +
+      `sdid inherits that solver and stops early in the same way; tighten its convergence ` +
+      `and its own SDID estimate drifts from 2.79% to 2.80%, which is where mlsynth ` +
+      `already is. Three languages, two camps, and the split is ` +
       `by optimiser rather than by author. When you replicate a published ` +
       `synthetic-control number and land 0.02 away, suspect the solver before the data.`;
   }
 
   /* ---- boot -------------------------------------------------------------- */
   el("zeta-slider").addEventListener("input", ev => {
+    if (!D) return;                // the listener outlives the fetch; D is null until it lands
     state.zetaIdx = +ev.target.value;
     renderDial();
   });

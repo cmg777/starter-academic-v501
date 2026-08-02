@@ -8,6 +8,38 @@
 
 ---
 
+## Resolution — 2026-08-02, same day
+
+Both MED issues and five of the nine LOW items were fixed after this audit. The findings
+below are left as written; this section records what changed, so the audit stays a record
+rather than becoming a to-do list.
+
+| Issue | Status | What changed |
+|------:|--------|--------------|
+| 1 (MED) | fixed | `index.md` §1, §21 and §22 now say "three defaults change the answer materially, two of them by more than the spread". The app's hero drops the count entirely, and panel 7's headline claim moved out of the markup into a data-derived `#spans-note` that names which settings clear the band and which does not — so it cannot go stale. |
+| 2 (MED) | fixed | New **panel 3, "Which quarters count?"** draws `lambda` for all three SDID flavours with a toggle, and reads `variants` for each flavour's estimate. `meta.ladder_spread` now drives panel 7's band instead of being recomputed in JS. `tssc` and `masc_cv` were deleted from `analysis.py` section 17 as duplicates of `anatomy.rounding` and figure 08. `meta.slug` deleted. **Zero unread keys remain**; the payload dropped from 22 keys / 66.7 KB to 20 keys / 65.4 KB while gaining a panel. |
+| 3 (LOW) | fixed | `if (!D) return;` guards the slider listener. |
+| 4 (LOW) | fixed | `METHOD_COLOUR` dropped from the export; `catAxis` lost its unused third parameter. |
+| 5 (LOW) | fixed | Panel 13's note now reads "stops early in the same way; tighten its convergence and its own SDID estimate drifts from 2.79% to 2.80%". |
+| 6 (LOW) | fixed | `zetaCurve` pads its x domain by 3.5% so the `zeta = 0` marker clears the axis. |
+| 7 (LOW) | open | `render()` still redraws every chart on any control click. Measured 26–44 ms; a refactor, not a defect. |
+| 8 (LOW) | fixed | `--dim` and `--gold` added to `write-app/references/theme-tokens.css`, and the `--panel`/`--border` reassignment the two scrolling-panel companions share is now documented there as deliberate. |
+| 9 (LOW) | moot | The concurrent front-matter edit was committed separately by its own session. |
+
+**One thing the re-run caught that this audit did not.** Regenerating `results.json` also
+regenerated the figures, and three of them changed: `01_gdp_paths`, `09_donor_weights` and
+`11_att_dotplot`. The site-wide "rung" → "stage" rename (`dffbb49`) had edited the caption and
+title strings in `analysis.py` without re-running it, so the committed PNGs still read "every
+rung of the ladder" while the script said "stage". The pixel diff is confined to those text
+runs. The three corrected figures are committed with this fix.
+
+The app now has **13 panels**. Verified after the fixes: 1282 contract values match, all
+assets HTTP 200, 16 SVGs all with `role="img"` + `aria-label`, every TOC anchor resolves, no
+console errors, and at a 360 px container 15 of 16 chart wrappers scroll internally with no
+page overflow.
+
+---
+
 ## Verdict: ACCEPT
 
 **Overall assessment.** No HIGH issues; every dimension scores 7 or above. The strongest

@@ -106,7 +106,7 @@ The standard move is to build that missing country out of the countries we do ob
 
 [The R edition of this post](/post/r_sc_dsc_sdid/) climbs that ladder the hard way: every estimator is hand-coded in twenty lines before its package is called, and four separate R packages are needed to cover the six stages. **This post makes a different argument.** Every stage here is a single class from one library, `mlsynth`, and the interesting work is not in deriving the estimators but in *driving the package*: which configuration field selects which estimator, what the result object actually contains, and — the part that turns out to matter most — where a default will quietly hand you a different estimator than the one you meant to fit.
 
-That last point is not a minor caveat. By the end of this post you will have seen three separate defaults, each of which moves the headline estimate by more than the spread across the entire six-stage ladder. Knowing the econometrics is not enough. You have to know the software.
+That last point is not a minor caveat. By the end of this post you will have seen three separate defaults that change the headline estimate materially, two of them by more than the spread across the entire six-stage ladder. Knowing the econometrics is not enough. You have to know the software.
 
 ### 1.1 Learning objectives
 
@@ -1535,7 +1535,7 @@ Three caveats belong with the number. It is a *net* gap between the UK and a ble
 
 **What the software taught.** This is where a package-first reading pays off, and the findings are not econometric.
 
-*Three defaults each move the answer by more than the spread across the ladder.* `zeta` moves SDID by 0.13 percentage points, `set_f` moves MASC by 0.47, and the choice among the three covariate methods moves SDID by 1.76. The ladder's own spread, excluding DiD, is 0.31. **You can pick the wrong default and be further from the truth than if you had picked the wrong estimator.**
+*Three defaults change the answer materially, and two of them by more than the spread across the ladder.* `zeta` moves SDID by 0.13 percentage points, `set_f` moves MASC by 0.47, and the choice among the three covariate methods moves SDID by 1.76. The ladder's own spread, excluding DiD, is 0.31, so `set_f` and the covariate method each clear it on their own while `zeta` stays just inside. **You can pick the wrong default and be further from the truth than if you had picked the wrong estimator.**
 
 *One estimator silently rounds the number you are most likely to quote.* `TSSC` returns `.att` as exactly $-0.03$ while its gap series carries the full $-0.029887$. Nothing warns you.
 
@@ -1551,7 +1551,7 @@ Three caveats belong with the number. It is a *net* gap between the UK and a ble
 
 - **The Brexit referendum cost the UK 2.7–3.0% of GDP by end-2018 and 3.8–4.2% by end-2019**, at every stage of the ladder, against 2.4% previously published for the same data.
 - **`mlsynth` puts all six stages behind one interface**: `Estimator({"df": ..., "outcome": ..., "treat": ..., "unitid": ..., "time": ...}).fit()`, returning a result with seven flat accessors that work everywhere.
-- **Three defaults matter more than the estimator choice.** `SDID` penalises unit weights unless you set `zeta=0.0` (2.80% vs 2.67%); `MASC` cross-validates on a different fold set unless you set `set_f` (2.73% vs 3.19%); and `SDID`'s three covariate methods disagree by 1.76 percentage points.
+- **Three defaults matter, and two of them more than the estimator choice.** `SDID` penalises unit weights unless you set `zeta=0.0` (2.80% vs 2.67%); `MASC` cross-validates on a different fold set unless you set `set_f` (2.73% vs 3.19%); and `SDID`'s three covariate methods disagree by 1.76 percentage points. Against a ladder that spans 0.31, the last two each clear it alone.
 - **The time weights earn their keep.** SDID's placebo RMSE is 0.0066 against 0.0086 for plain SC, a 23% reduction, and the advantage holds at both forecast horizons.
 - **But the published ranking among SDID variants does not survive a matched horizon.** Graded on the same task, the three flavours score 0.0066, 0.0066 and 0.0066.
 - **Covariates hurt here.** They raise the pre-treatment RMSE from 0.0056 to 0.0099 and produce a `v_agreement` of 0.083, both signs of a poorly identified predictor-weight problem.

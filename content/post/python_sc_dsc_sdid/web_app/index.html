@@ -14,8 +14,8 @@
   <p class="lede">
     <code>mlsynth</code> puts the whole ladder of single-treated-unit estimators behind one
     interface. That makes it easy to fit six of them on the Brexit referendum, and it
-    makes something else easy to miss: three of the library's default settings each move
-    the answer around as much as the choice of estimator does. Everything below is
+    makes something else easy to miss: several of the library's default settings move the
+    answer further than the choice of estimator does. Everything below is
     computed in Python by <code>analysis.py</code> and read from a file. Nothing is
     estimated in the browser.
   </p>
@@ -26,11 +26,11 @@
 
 <nav class="toc" aria-label="Panels">
   <span class="toc-head">The ladder</span>
-  <a href="#p1">1 Counterfactual</a><a href="#p2">2 The blend</a><a href="#p3">3 Side by side</a>
+  <a href="#p1">1 Counterfactual</a><a href="#p2">2 The blend</a><a href="#p3">3 The quarters</a><a href="#p4">4 Side by side</a>
   <span class="toc-head">The package</span>
-  <a href="#p4">4 Anatomy</a><a href="#p5">5 Name clash</a><a href="#p6">6 Defaults dial</a><a href="#p7">7 Covariates</a>
+  <a href="#p5">5 Anatomy</a><a href="#p6">6 Name clash</a><a href="#p7">7 Defaults dial</a><a href="#p8">8 Covariates</a>
   <span class="toc-head">The evidence</span>
-  <a href="#p8">8 Fire drill</a><a href="#p9">9 In space</a><a href="#p10">10 Event study</a><a href="#p11">11 Inference</a><a href="#p12">12 Solvers</a>
+  <a href="#p9">9 Fire drill</a><a href="#p10">10 In space</a><a href="#p11">11 Event study</a><a href="#p12">12 Inference</a><a href="#p13">13 Solvers</a>
 </nav>
 
 <p class="part">Part I — the ladder</p>
@@ -69,7 +69,21 @@
 
 <section class="panel" id="p3">
   <div class="panel-head">
-    <h2>3. The ladder, side by side</h2>
+    <h2>3. Which quarters count?</h2>
+    <p>Synthetic difference-in-differences is the one stage that also weights the
+       <em>pre-treatment quarters</em>. Difference-in-differences implicitly gives all
+       eighty-six of them the same weight. SDID fits them instead, and on an outcome that
+       behaves like a random walk it puts almost everything on one.</p>
+  </div>
+  <div class="controls" id="lambda-buttons"></div>
+  <div class="chart-wrap"><svg id="chart-lambda" role="img"
+       aria-label="Estimated SDID time weights across the 86 pre-treatment quarters"></svg></div>
+  <p class="note" id="lambda-note"></p>
+</section>
+
+<section class="panel" id="p4">
+  <div class="panel-head">
+    <h2>4. The ladder, side by side</h2>
     <p>Every stage's answer against the 2.4% previously published for this dataset. Hover a
        bar for the call that produced it and, where they differ, the R edition's number.</p>
   </div>
@@ -81,9 +95,9 @@
 
 <p class="part">Part II — the package</p>
 
-<section class="panel" id="p4">
+<section class="panel" id="p5">
   <div class="panel-head">
-    <h2>4. Anatomy of a fit</h2>
+    <h2>5. Anatomy of a fit</h2>
     <p>Every estimator in the library takes a dictionary and returns an object with the
        same accessors. Learn these two columns once and the other eighty-six estimators
        cost nothing. These are the real values from the synthetic-control fit in panel 1,
@@ -109,9 +123,9 @@
   <div class="trap" id="rounding-trap"></div>
 </section>
 
-<section class="panel" id="p5">
+<section class="panel" id="p6">
   <div class="panel-head">
-    <h2>5. A name that means two things</h2>
+    <h2>6. A name that means two things</h2>
     <p>This is the trap most likely to cost you an afternoon, and it raises no error.</p>
   </div>
 
@@ -140,17 +154,19 @@
      definitions — check the class docstring before you trust the acronym.</p>
 </section>
 
-<section class="panel" id="p6">
+<section class="panel" id="p7">
   <div class="panel-head">
-    <h2>6. The defaults dial</h2>
+    <h2>7. The defaults dial</h2>
     <p>The shaded band is how much the answer moves as you climb the entire ladder, from
        the lowest stage to the highest. Each capsule is how much it moves when you leave
-       one option at its default instead of setting it. Three of the four capsules are
-       wider than the band.</p>
+       one option at its default instead of setting it. A capsule wider than the band is a
+       setting that matters more than the choice of estimator.</p>
   </div>
 
   <div class="chart-wrap"><svg id="chart-spans" role="img"
        aria-label="Range of estimates spanned by each configuration option, against the spread across the whole ladder"></svg></div>
+
+  <p class="note" id="spans-note"></p>
 
   <h3 class="sub">Look at one of them</h3>
   <div class="controls" id="dial-buttons"></div>
@@ -174,9 +190,9 @@
   <p class="note" id="dial-note"></p>
 </section>
 
-<section class="panel" id="p7">
+<section class="panel" id="p8">
   <div class="panel-head">
-    <h2>7. Three meanings of "control for"</h2>
+    <h2>8. Three meanings of "control for"</h2>
     <p>The literature contains three different answers to "add a covariate to synthetic
        difference-in-differences", so <code>mlsynth</code> takes them as a dict keyed by
        method. They are not variations on one estimator. They are three estimators, and on
@@ -198,9 +214,9 @@
 
 <p class="part">Part III — the evidence</p>
 
-<section class="panel" id="p8">
+<section class="panel" id="p9">
   <div class="panel-head">
-    <h2>8. The fire drill</h2>
+    <h2>9. The fire drill</h2>
     <p>Move the treatment date back to a quarter when nothing happened, rebuild the
        counterfactual on data up to that point only, and compare with what actually
        occurred. The true effect is zero, so every estimate is pure error and lower is
@@ -213,9 +229,9 @@
   <p class="note" id="placebo-note"></p>
 </section>
 
-<section class="panel" id="p9">
+<section class="panel" id="p10">
   <div class="panel-head">
-    <h2>9. Placebo in space</h2>
+    <h2>10. Placebo in space</h2>
     <p>The other falsification test: hand the treatment to each donor in turn and refit.
        If the UK's post-referendum gap is nothing special, it will sit inside the crowd.</p>
   </div>
@@ -226,9 +242,9 @@
   <p class="note" id="space-note"></p>
 </section>
 
-<section class="panel" id="p10">
+<section class="panel" id="p11">
   <div class="panel-head">
-    <h2>10. The event study</h2>
+    <h2>11. The event study</h2>
     <p>SDID reports a whole path alongside the headline number, in
        <code>result.event_study</code>. The pre-treatment half is the falsification test a
        single ATT cannot give you: it should sit on zero, and it does.</p>
@@ -239,9 +255,9 @@
   <p class="note" id="es-note"></p>
 </section>
 
-<section class="panel" id="p11">
+<section class="panel" id="p12">
   <div class="panel-head">
-    <h2>11. The inference menu</h2>
+    <h2>12. The inference menu</h2>
     <p>One estimator, one fit, six values of <code>inference=</code>. They disagree about
        the width of the interval and one of them does not run at all — which is worth
        knowing before you build a result around it.</p>
@@ -252,10 +268,10 @@
   <p class="note" id="inference-note"></p>
 </section>
 
-<section class="panel" id="p12">
+<section class="panel" id="p13">
   <div class="panel-head">
-    <h2>12. The solver's fingerprint</h2>
-    <p>Two cells in panel 3 disagree with the R edition. Neither is a bug. The
+    <h2>13. The solver's fingerprint</h2>
+    <p>Two cells in panel 4 disagree with the R edition. Neither is a bug. The
        synthetic-control objective on this panel has a condition number around
        7.5 &times; 10<sup>5</sup> — a long, nearly flat valley of near-optimal weights —
        and the two libraries stop walking down it in different places.</p>

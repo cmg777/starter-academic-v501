@@ -1635,9 +1635,13 @@ else:
     METHODS6 = ["DiD", "SC", "DSC", "SDID", "MASC", "ASCM"]
     space_by_country = {r["country"]: np.asarray(r["gap"], float) for r in space}
 
+    # Every key below is read by web_app/app.js. Nothing is shipped "in case it is
+    # useful later" — an unread key is a claim the app does not make, and it is the
+    # kind of thing that rots. Verify with:
+    #   grep -o 'D\.[a-z_]*' web_app/app.js | sort -u
     payload = clean({
         "meta": dict(
-            slug=SLUG, treated=TREATED, donors=DONORS,
+            treated=TREATED, donors=DONORS,
             quarters=list(QLAB), t0=T0, eval=EVAL,
             born_2018=BORN, born_2019=3.6,
             mlsynth_version=mlsynth.__version__,
@@ -1668,8 +1672,6 @@ else:
         "in_space": recs(space_df),
         "in_space_gaps": space_by_country,
         "solvers": recs(solver_df),
-        "tssc": recs(pd.DataFrame(tssc_rows)),
-        "masc_cv": recs(masc_cv),
         "anatomy": anatomy,
     })
 
