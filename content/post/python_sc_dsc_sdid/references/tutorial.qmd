@@ -217,10 +217,15 @@ print(f"len(result.donor_weights)    {len(res.donor_weights)}   # only NON-ZERO 
 
 Plotting comes free: every effect result carries `.plot()`.
 
+`display=False` is required on each call. `.plot()` ends in `if pc.display: plt.show()`,
+and the fitted result's `plot_config` is `None`, so `display_graphs=False` never reaches
+it and the fallback `PlotConfig()` has `display=True`. Without the override the figure is
+flushed after the first panel and the gap panel renders blank.
+
 ```{python}
 fig, axes = plt.subplots(1, 2, figsize=(12, 4.2))
-res.plot(kind="counterfactual", ax=axes[0])
-res.plot(kind="gap", ax=axes[1])
+res.plot(kind="counterfactual", ax=axes[0], display=False)
+res.plot(kind="gap", ax=axes[1], display=False)
 plt.tight_layout()
 plt.show()
 ```

@@ -456,8 +456,12 @@ rule("6b. mlsynth's own plotting")
 with plt.rc_context(matplotlib.rcParamsDefault):
     fig_native, axes = plt.subplots(1, 2, figsize=(11, 4.2))
     native = VanillaSC(cfg(T_2018Q4, inference=False)).fit()
-    native.plot(kind="counterfactual", ax=axes[0])
-    native.plot(kind="gap", ax=axes[1])
+    # display=False: .plot() ends in `if pc.display: plt.show()` and the result's
+    # plot_config is None, so display_graphs=False never reaches it. Harmless under
+    # Agg, but it blanks the second panel in a notebook. Kept explicit so the script
+    # and the notebook agree.
+    native.plot(kind="counterfactual", ax=axes[0], display=False)
+    native.plot(kind="gap", ax=axes[1], display=False)
     fig_native.suptitle("mlsynth's built-in plots: result.plot(kind=...)",
                         fontsize=13, fontweight="bold")
     fig_native.tight_layout()
