@@ -42,6 +42,10 @@ links:
     icon_pack: fas
     name: "Python cheat sheet"
     url: cheatsheet_python.py
+  - icon: bolt
+    icon_pack: fas
+    name: "Stata cheat sheet"
+    url: cheatsheet_stata.do
   - icon: book
     icon_pack: fas
     name: "Jupyter notebook"
@@ -1221,7 +1225,11 @@ The synthetic-control objective on this panel has a condition number of roughly 
 
 - R's `synthdid` walks the valley with **Frank-Wolfe on a capped iteration budget** and stops at 3.06%.
 - `mlsynth` hands the identical problem to a **convex solver** which runs it to optimality and returns 3.039%.
-- Stata's `sdid` inherits `synthdid`'s Frank-Wolfe and stops in the same place; tighten its convergence and its SDID estimate drifts from 2.79% to 2.80%, which is where `mlsynth` already is.
+- Stata's `sdid` inherits `synthdid`'s Frank-Wolfe and stops in the same place; tighten its convergence with `max_iter(100000) min_dec(1e-9)` and its SDID estimate drifts from 2.79% to 2.80%, which is where `mlsynth` already is.
+
+[`cheatsheet_stata.do`](cheatsheet_stata.do) ships alongside this post so you can run that third leg yourself. It is the same ladder in `sdid`, `synth` and `allsynth`, on the same data and the same two evaluation quarters, and it prints a comparative table with the R column hard-coded for cross-checking. Two things in it are worth reading even if you never open Stata. Its ASCM row is a *different estimator* — `allsynth` implements the bias-corrected synthetic control of Abadie and L'Hour rather than the ridge-augmented version `VanillaSC(augment="ridge")` gives you — and its MASC row is empty, because MASC has no Stata implementation. Reporting those honestly rather than approximating them is the point.
+
+Stata's version of the penalty trap is also the nastiest of the three. Its documented default is `zeta_omega(1e-6)`, which looks like a value but is a magic sentinel: `sdid.ado` reads `if (EOmega==1e-6) EtaOmega = (yNtr*yTpost)^(1/4)`, so passing the documented default *explicitly* still requests the full penalty. Only a literal `0` switches it off.
 
 So three implementations, written independently in three languages, sort themselves into exactly two camps — and the split is by **solver**, not by language or by author. The R edition of this post reached the same conclusion from a completely different direction, by running the Frank-Wolfe iteration ladder by hand and watching the estimate converge to 3.039 as the budget grew. Section 9.2's figure is the same finding a third time: four independent code paths inside `mlsynth`, all convex, all landing on 3.039.
 
@@ -1536,7 +1544,7 @@ Three caveats belong with the number. It is a *net* gap between the UK and a ble
 - **A limitation to carry forward:** with one treated unit and 23 donors, the smallest attainable permutation p-value is 0.042. The design is at its inferential floor, and no estimator choice changes that.
 - **Next:** the same panel with `CLUSTERSC` or `PDA` if you have many more donors; `SequentialSDID` if adoption is staggered; `SPOTSYNTH` if you suspect spillovers onto the donor pool. All three take the config you already wrote.
 
-Two companions to this post: [the R edition](/post/r_sc_dsc_sdid/) hand-codes every estimator before calling its package and is the place to go for the derivations, and its Stata and R cheat sheets sit alongside the [Python cheat sheet](cheatsheet_python.py) here. On the wider site, [the classic synthetic control on the Basque Country](/post/r_basic_synthetic_control/), [augmented synthetic control on the Kansas tax cuts](/post/r_augsynth/) and [synthetic difference-in-differences on Proposition 99 in Stata](/post/stata_sdid/) cover single rungs in isolation.
+Two cheat sheets ship with this post: [`cheatsheet_python.py`](cheatsheet_python.py), which prints the whole ladder and a comparative table in about half a minute, and [`cheatsheet_stata.do`](cheatsheet_stata.do), which does the same in Stata in roughly twenty seconds with standard errors off, three minutes with them on. The third leg, [`cheatsheet_R.R`](/post/r_sc_dsc_sdid/cheatsheet_R.R), lives with [the R edition](/post/r_sc_dsc_sdid/), which hand-codes every estimator before calling its package and is the place to go for the derivations. On the wider site, [the classic synthetic control on the Basque Country](/post/r_basic_synthetic_control/), [augmented synthetic control on the Kansas tax cuts](/post/r_augsynth/) and [synthetic difference-in-differences on Proposition 99 in Stata](/post/stata_sdid/) cover single rungs in isolation.
 
 ## 23. Exercises
 

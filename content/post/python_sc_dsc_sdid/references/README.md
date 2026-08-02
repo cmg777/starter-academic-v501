@@ -31,6 +31,7 @@ Nothing else. `setup_env.py` installs the rest into the bundle's own `.venv/`.
 | `tutorial.qmd` | The executable tutorial — the source of `tutorial.html` |
 | `analysis.py` | The complete pipeline behind the post: every figure and result table |
 | `cheatsheet_python.py` | One-page quick reference, all six rungs, ~25 seconds to run |
+| `cheatsheet_stata.do` | The same ladder in Stata (`sdid`, `synth`, `allsynth`), for cross-checking |
 | `brexit_analysis.csv` | The estimation sample: 24 countries x 104 quarters |
 | `setup_env.py` | Builds `.venv/`, installs pinned packages, registers the kernel |
 | `_quarto.yml` | Wires `setup_env.py` to Quarto's `pre-render` hook |
@@ -43,6 +44,14 @@ python3 setup_env.py            # build the environment (idempotent)
 .venv/bin/python cheatsheet_python.py    # the six rungs, ~25 s
 .venv/bin/python analysis.py             # the full pipeline, ~12 min cold
 quarto render tutorial.qmd               # the tutorial
+```
+
+`cheatsheet_stata.do` needs Stata, not the Python environment. It installs its
+own dependencies from SSC (`sdid`, `synth`, `allsynth`, `distinct`,
+`elasticregress`) and runs in about 20 seconds with `global SE 0`:
+
+```bash
+stata-se -b do cheatsheet_stata.do
 ```
 
 `analysis.py` caches expensive fits under `cache/`. Set `FORCE_REFIT=1` to
