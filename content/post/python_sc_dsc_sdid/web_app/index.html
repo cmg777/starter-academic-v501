@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The mlsynth Ladder Lab — Brexit</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow">Interactive companion</p>
+  <h1>One config dict, six estimators, and the defaults that decide the answer</h1>
+  <p class="lede">
+    <code>mlsynth</code> puts the whole ladder of single-treated-unit estimators behind one
+    interface. That makes it easy to fit six of them on the Brexit referendum, and it
+    makes something else easy to miss: three of the library's default settings each move
+    the answer around as much as the choice of estimator does. Everything below is
+    computed in Python by <code>analysis.py</code> and read from a file. Nothing is
+    estimated in the browser.
+  </p>
+  <p class="meta-line" id="version-line"></p>
+</header>
+
+<main>
+
+<nav class="toc" aria-label="Panels">
+  <span class="toc-head">The ladder</span>
+  <a href="#p1">1 Counterfactual</a><a href="#p2">2 The blend</a><a href="#p3">3 Side by side</a>
+  <span class="toc-head">The package</span>
+  <a href="#p4">4 Anatomy</a><a href="#p5">5 Name clash</a><a href="#p6">6 Defaults dial</a><a href="#p7">7 Covariates</a>
+  <span class="toc-head">The evidence</span>
+  <a href="#p8">8 Fire drill</a><a href="#p9">9 In space</a><a href="#p10">10 Event study</a><a href="#p11">11 Inference</a><a href="#p12">12 Solvers</a>
+</nav>
+
+<p class="part">Part I — the ladder</p>
+
+<section class="panel" id="p1">
+  <div class="panel-head">
+    <h2>1. The counterfactual</h2>
+    <p>Pick a rung. Each one is a single <code>mlsynth</code> class fitted with the same five
+       config fields; the dashed line is the synthetic United Kingdom it produces and the
+       shaded band after the referendum is the estimated shortfall.</p>
+  </div>
+
+  <div class="controls" id="method-buttons"></div>
+
+  <div class="chart-wrap"><svg id="chart-paths" role="img"
+       aria-label="Actual and synthetic United Kingdom log real GDP, 1995 to 2020"></svg></div>
+
+  <div class="readout" id="readout"></div>
+
+  <div class="chart-wrap"><svg id="chart-gap" role="img"
+       aria-label="Gap between the actual and synthetic United Kingdom over time"></svg></div>
+</section>
+
+<section class="panel" id="p2">
+  <div class="panel-head">
+    <h2>2. Who is in the blend?</h2>
+    <p>The unit weights, read straight off <code>result.donor_weights</code>. Four of the
+       six recipes produce nearly the same blend. Only the augmented synthetic control is
+       allowed to go negative, because it is the one rung that drops the simplex
+       constraint.</p>
+  </div>
+  <div class="chart-wrap"><svg id="chart-weights" role="img"
+       aria-label="Donor weights for the selected estimator"></svg></div>
+  <p class="note" id="weights-note"></p>
+</section>
+
+<section class="panel" id="p3">
+  <div class="panel-head">
+    <h2>3. The ladder, side by side</h2>
+    <p>Every rung's answer against the 2.4% previously published for this dataset. Hover a
+       bar for the call that produced it and, where they differ, the R edition's number.</p>
+  </div>
+  <div class="controls" id="horizon-buttons"></div>
+  <div class="chart-wrap"><svg id="chart-ladder" role="img"
+       aria-label="Estimated GDP shortfall by estimator"></svg></div>
+  <p class="note" id="ladder-note"></p>
+</section>
+
+<p class="part">Part II — the package</p>
+
+<section class="panel" id="p4">
+  <div class="panel-head">
+    <h2>4. Anatomy of a fit</h2>
+    <p>Every estimator in the library takes a dictionary and returns an object with the
+       same accessors. Learn these two columns once and the other eighty-six estimators
+       cost nothing. These are the real values from the synthetic-control fit in panel 1,
+       not an illustration.</p>
+  </div>
+
+  <div class="split">
+    <div class="code-card">
+      <h3>The config goes in</h3>
+      <pre><code>VanillaSC({<span id="cfg-lines"></span>
+}).fit()</code></pre>
+      <ul class="fieldlist" id="cfg-notes"></ul>
+    </div>
+    <div class="code-card">
+      <h3>The result comes out</h3>
+      <ul class="fieldlist accessors" id="res-notes"></ul>
+    </div>
+  </div>
+
+  <h3 class="sub">Where estimators deviate</h3>
+  <ul class="fieldlist" id="dev-notes"></ul>
+
+  <div class="trap" id="rounding-trap"></div>
+</section>
+
+<section class="panel" id="p5">
+  <div class="panel-head">
+    <h2>5. A name that means two things</h2>
+    <p>This is the trap most likely to cost you an afternoon, and it raises no error.</p>
+  </div>
+
+  <div class="split">
+    <div class="hazard hazard-bad">
+      <h3><code>mlsynth.DSC</code></h3>
+      <p><strong>Distributional</strong> synthetic control (Gunsilius 2023). Matches
+         Wasserstein quantiles across <em>micro-level</em> data and returns quantile
+         treatment effects. It wants a different dataset and answers a different
+         question.</p>
+      <p class="verdict">Not the estimator in this post.</p>
+    </div>
+    <div class="hazard hazard-good">
+      <h3><code>TSSC(method="MSCa")</code></h3>
+      <p><strong>Demeaned</strong> synthetic control (Doudchenko and Imbens 2016;
+         Ferman and Pinto 2021). Weights on the simplex plus a constant offset, fitted on
+         aggregate panel data.</p>
+      <p class="verdict">This is the post's DSC — rung 2.</p>
+    </div>
+  </div>
+
+  <p class="note">Import the wrong one and nothing warns you. The neighbours are just as
+     close: <code>SCD</code> is a differencing estimator, <code>DRSC</code> is
+     distribution-regression, <code>DSCAR</code> is auto-regressive and
+     <code>MEDSC</code> does mediation. Names in this library are mnemonics, not
+     definitions — check the class docstring before you trust the acronym.</p>
+</section>
+
+<section class="panel" id="p6">
+  <div class="panel-head">
+    <h2>6. The defaults dial</h2>
+    <p>The shaded band is how much the answer moves as you climb the entire ladder, from
+       the lowest rung to the highest. Each capsule is how much it moves when you leave
+       one option at its default instead of setting it. Three of the four capsules are
+       wider than the band.</p>
+  </div>
+
+  <div class="chart-wrap"><svg id="chart-spans" role="img"
+       aria-label="Range of estimates spanned by each configuration option, against the spread across the whole ladder"></svg></div>
+
+  <h3 class="sub">Look at one of them</h3>
+  <div class="controls" id="dial-buttons"></div>
+
+  <div id="dial-zeta" class="dial-view">
+    <div class="slider-row">
+      <label for="zeta-slider">zeta</label>
+      <input type="range" id="zeta-slider" min="0" max="14" step="1" value="0"
+             aria-label="zeta as a multiple of the package default">
+      <output id="zeta-out"></output>
+    </div>
+    <div class="chart-wrap"><svg id="chart-zeta" role="img"
+         aria-label="Estimated shortfall as a function of the SDID unit-weight penalty"></svg></div>
+  </div>
+
+  <div id="dial-bars" class="dial-view">
+    <div class="chart-wrap"><svg id="chart-dial" role="img"
+         aria-label="Estimated shortfall under each setting of the selected option"></svg></div>
+  </div>
+
+  <p class="note" id="dial-note"></p>
+</section>
+
+<section class="panel" id="p7">
+  <div class="panel-head">
+    <h2>7. Three meanings of "control for"</h2>
+    <p>The literature contains three different answers to "add a covariate to synthetic
+       difference-in-differences", so <code>mlsynth</code> takes them as a dict keyed by
+       method. They are not variations on one estimator. They are three estimators, and on
+       this panel they disagree by more than the whole ladder does.</p>
+  </div>
+
+  <div class="chart-wrap"><svg id="chart-cov" role="img"
+       aria-label="Estimated shortfall under each covariate method"></svg></div>
+
+  <h3 class="sub">And now the honest column</h3>
+  <p class="panel-sub">Pre-treatment fit error for the same specifications. The route that
+     lands closest to the published 2.4% is also the one that tracks the UK worst before
+     the referendum.</p>
+  <div class="chart-wrap"><svg id="chart-cov-rmse" role="img"
+       aria-label="Pre-treatment root mean squared error under each covariate method"></svg></div>
+
+  <p class="note" id="cov-note"></p>
+</section>
+
+<p class="part">Part III — the evidence</p>
+
+<section class="panel" id="p8">
+  <div class="panel-head">
+    <h2>8. The fire drill</h2>
+    <p>Move the treatment date back to a quarter when nothing happened, rebuild the
+       counterfactual on data up to that point only, and compare with what actually
+       occurred. The true effect is zero, so every estimate is pure error and lower is
+       better. Switch the grading horizon to see why the published ranking of the three
+       SDID variants does not survive.</p>
+  </div>
+  <div class="controls" id="placebo-buttons"></div>
+  <div class="chart-wrap"><svg id="chart-placebo" role="img"
+       aria-label="Placebo root mean squared error by estimator"></svg></div>
+  <p class="note" id="placebo-note"></p>
+</section>
+
+<section class="panel" id="p9">
+  <div class="panel-head">
+    <h2>9. Placebo in space</h2>
+    <p>The other falsification test: hand the treatment to each donor in turn and refit.
+       If the UK's post-referendum gap is nothing special, it will sit inside the crowd.</p>
+  </div>
+  <div class="chart-wrap"><svg id="chart-space" role="img"
+       aria-label="Gap series for the United Kingdom and 23 placebo donors"></svg></div>
+  <div class="chart-wrap"><svg id="chart-ratios" role="img"
+       aria-label="Post over pre treatment RMSPE ratio, ranked, for all 24 units"></svg></div>
+  <p class="note" id="space-note"></p>
+</section>
+
+<section class="panel" id="p10">
+  <div class="panel-head">
+    <h2>10. The event study</h2>
+    <p>SDID reports a whole path alongside the headline number, in
+       <code>result.event_study</code>. The pre-treatment half is the falsification test a
+       single ATT cannot give you: it should sit on zero, and it does.</p>
+  </div>
+  <div class="controls" id="es-buttons"></div>
+  <div class="chart-wrap"><svg id="chart-es" role="img"
+       aria-label="SDID event study with 95 percent placebo confidence bands"></svg></div>
+  <p class="note" id="es-note"></p>
+</section>
+
+<section class="panel" id="p11">
+  <div class="panel-head">
+    <h2>11. The inference menu</h2>
+    <p>One estimator, one fit, six values of <code>inference=</code>. They disagree about
+       the width of the interval and one of them does not run at all — which is worth
+       knowing before you build a result around it.</p>
+  </div>
+  <div class="chart-wrap"><svg id="chart-forest" role="img"
+       aria-label="ATT and 95 percent intervals under each inference method"></svg></div>
+  <div class="table-wrap"><table class="tbl" id="inference-table"></table></div>
+  <p class="note" id="inference-note"></p>
+</section>
+
+<section class="panel" id="p12">
+  <div class="panel-head">
+    <h2>12. The solver's fingerprint</h2>
+    <p>Two cells in panel 3 disagree with the R edition. Neither is a bug. The
+       synthetic-control objective on this panel has a condition number around
+       7.5 &times; 10<sup>5</sup> — a long, nearly flat valley of near-optimal weights —
+       and the two libraries stop walking down it in different places.</p>
+  </div>
+  <div class="controls" id="solver-buttons"></div>
+  <div class="chart-wrap"><svg id="chart-solvers" role="img"
+       aria-label="Estimated shortfall by solver and implementation"></svg></div>
+  <p class="note" id="solver-note"></p>
+</section>
+
+<footer>
+  <p>
+    Companion to <a href="/post/python_sc_dsc_sdid/">The Synthetic Control Ladder in
+    Python: A Guided Tour of mlsynth on the Brexit Referendum</a>. Every number is computed
+    by <code>analysis.py</code> and shipped in <code>data/results.json</code>; rebuild it
+    with <code>APP_DATA=1 python analysis.py</code>. The
+    <a href="/post/r_sc_dsc_sdid/web_app/index.html">R edition's companion</a> takes the
+    same data from the estimator's side rather than the package's.
+  </p>
+  <p class="cite">
+    de Brabander, Juodis &amp; Miyazato Szini (2025), <em>Econometric Reviews</em>
+    44(10), 1617&ndash;1646 &middot; Born, M&uuml;ller, Schularick &amp; Sedl&aacute;&#269;ek (2019),
+    <em>The Economic Journal</em> 129(623), 2722&ndash;2744 &middot;
+    <code>mlsynth</code> by Jared Greathouse.
+  </p>
+</footer>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"
+        integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i"
+        crossorigin="anonymous"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

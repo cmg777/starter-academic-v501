@@ -28,8 +28,8 @@ links:
     url: https://carlos-mendez.org/post/r_sc_dsc_sdid/ai-slides.pdf
   - icon: laptop-code
     icon_pack: fas
-    name: "Web app — R edition"
-    url: https://carlos-mendez.org/post/r_sc_dsc_sdid/web_app/index.html
+    name: "Web app"
+    url: web_app/index.html
   - icon: open-data
     icon_pack: ai
     name: "[Python] Google Colab"

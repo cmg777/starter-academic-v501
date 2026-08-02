@@ -19,9 +19,12 @@ Install:
 Usage:
     python analysis.py 2>&1 | tee execution_log.txt
     FORCE_REFIT=1 python analysis.py      # invalidate the cache
+    APP_DATA=1    python analysis.py      # also rebuild web_app/data/results.json
 
 Run time: about 12 minutes cold, under a minute warm.
 Outputs:  python_sc_dsc_sdid_*.png (figures) and *.csv (result tables).
+          Under APP_DATA=1, four more app_*.csv tables and the interactive
+          companion's web_app/data/results.json (section 17).
 
 NAMING HAZARD
     mlsynth ships a class called DSC. It is NOT the estimator in this post.
@@ -1374,6 +1377,310 @@ checks = {
 for name, ok in checks.items():
     print(f"  [{'ok ' if ok else 'FAIL'}] {name}")
 failed = [k for k, v in checks.items() if not v]
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 17. WEB-APP DATA  —  guarded, runs only under APP_DATA=1
+#
+# The interactive companion at web_app/ estimates nothing in the browser: every
+# number it draws is computed here and shipped in web_app/data/results.json.
+# That is the whole design. There is one source of truth, so the app cannot
+# drift from the post.
+#
+# The section is guarded because a bare `python analysis.py` should stay
+# reproducible and cheap: re-running it rewrites all fourteen figures, and
+# matplotlib rarely produces byte-identical PNGs. Rebuild the app's data with
+#
+#     APP_DATA=1 python analysis.py
+#
+# Most of what the app needs already exists above and is reused as-is. Four
+# tables are new, and they exist because the app lets a reader *sweep* an
+# option where the post only quotes the two or three settings it discusses.
+# ══════════════════════════════════════════════════════════════════════════════
+
+APP_DATA = bool(os.environ.get("APP_DATA", ""))
+
+if APP_DATA and failed:
+    print("\n  [skip] web-app data — assertions failed, refusing to publish "
+          "numbers from a broken run")
+elif not APP_DATA:
+    print("\n  [skip] web-app data — rerun with APP_DATA=1 to rebuild "
+          "web_app/data/results.json")
+else:
+    import json
+
+    # mlsynth's own penalty formula, so the sweep below is anchored on the value
+    # the package would have chosen rather than on a number typed in here.
+    from mlsynth.utils.sdid_helpers.weights import compute_regularization
+
+    rule("17. Web-app data")
+
+    # --- (a) The zeta sweep -------------------------------------------------
+    #
+    # SDIDConfig.zeta defaults to None, which means "compute it for me":
+    #     zeta* = (N_treated * T_post)^(1/4) * sd(first differences of donors)
+    # There is no number to sweep around until that is evaluated, so evaluate
+    # it, then sweep in multiples of it. Multiple 0 is the paper's
+    # specification; multiple 1 is what you get by leaving the field alone.
+    ZETA_STAR = float(compute_regularization(Y.loc[1:T0, DONORS].to_numpy(), 1))
+    ZETA_MULTIPLES = [0.0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.65, 0.8,
+                      1.0, 1.25, 1.5, 1.75, 2.0]
+
+    def _rmse_of(res):
+        """rmse_pre if the result carries fit diagnostics, else None."""
+        fd = getattr(res, "fit_diagnostics", None)
+        return None if fd is None else getattr(fd, "rmse_pre", None)
+
+    def app_zeta_sweep():
+        rows = []
+        for mult in ZETA_MULTIPLES:
+            z = mult * ZETA_STAR
+            vals, rmse = [], None
+            for e in EVAL.values():
+                r = SDID(cfg(e, zeta=z, vce="noinference")).fit()
+                vals.append(pct(r.effects.att))
+                rmse = _rmse_of(r) or rmse
+            rows.append(dict(multiple=mult, zeta=z, loss_2018Q4=vals[0],
+                             loss_2019Q4=vals[1], pre_rmse=rmse))
+        return pd.DataFrame(rows)
+
+    zeta_df = cache("app_zeta_sweep", app_zeta_sweep)
+    print(f"  zeta* = {ZETA_STAR:.6f}  (what SDID picks when you leave zeta=None)")
+    print(zeta_df.to_string(index=False, float_format=lambda v: f"{v:.4f}"))
+    write_tab(zeta_df, "app_zeta_sweep")
+
+    # --- (b) The constraint set --------------------------------------------
+    # robustness_grid.csv has these at 2018Q4 only and without the fit error.
+    # The app needs both horizons and the RMSE, because the point of the panel
+    # is that the loosest constraint buys the best pre-treatment fit and the
+    # worst answer.
+    def app_wconstr_grid():
+        rows = []
+        for lab, kw in [("default (backend='auto')", {}),
+                        ("w_constr='simplex'", dict(w_constr="simplex")),
+                        ("w_constr='ols'", dict(w_constr="ols")),
+                        ("w_constr='ridge'", dict(w_constr="ridge")),
+                        ("w_constr='lasso'", dict(w_constr="lasso"))]:
+            vals, rmse = [], None
+            for e in EVAL.values():
+                r = VanillaSC(cfg(e, inference=False, **kw)).fit()
+                vals.append(pct(r.att))
+                rmse = _rmse_of(r) or rmse
+            rows.append(dict(setting=lab, loss_2018Q4=vals[0],
+                             loss_2019Q4=vals[1], pre_rmse=rmse))
+        return pd.DataFrame(rows)
+
+    wconstr_df = cache("app_wconstr_grid", app_wconstr_grid)
+    print(wconstr_df.to_string(index=False, float_format=lambda v: f"{v:.4f}"))
+    write_tab(wconstr_df, "app_wconstr_grid")
+
+    # --- (c) MASC's fold set ------------------------------------------------
+    # masc_fold_settings.csv already has the three settings; this adds the
+    # cross-validated m and phi so the panel can say what actually changed.
+    def app_setf_grid():
+        rows = []
+        for lab, kw in [("set_f=range(6, 87)  [the paper]",
+                         dict(m_grid=M_GRID, set_f=SET_F)),
+                        ("min_preperiods=None [default]", dict(m_grid=M_GRID)),
+                        ("min_preperiods=43   [ceil(T0/2)]",
+                         dict(m_grid=M_GRID, min_preperiods=43))]:
+            vals, rmse, m_hat, phi_hat = [], None, None, None
+            for e in EVAL.values():
+                r = MASC(cfg(e, **kw)).fit()
+                vals.append(pct(r.att))
+                rmse = r.pre_rmse
+                ss = r.weights.summary_stats or {}
+                m_hat, phi_hat = ss.get("m_hat"), ss.get("phi_hat")
+            rows.append(dict(setting=lab, loss_2018Q4=vals[0],
+                             loss_2019Q4=vals[1], pre_rmse=rmse,
+                             m_hat=m_hat, phi_hat=phi_hat))
+        return pd.DataFrame(rows)
+
+    setf_df = cache("app_setf_grid", app_setf_grid)
+    print(setf_df.to_string(index=False, float_format=lambda v: f"{v:.4f}"))
+    write_tab(setf_df, "app_setf_grid")
+
+    # --- (d) The covariate routes, with their fit errors --------------------
+    # covariate_methods.csv has the estimates. The honest version of that panel
+    # needs the pre-treatment RMSE beside them, because the specification that
+    # lands closest to the published 2.4% is also the one that fits worst.
+    def app_covariates():
+        base = SDID(cfg(T_2018Q4, zeta=0.0, vce="noinference")).fit()
+        rows = [dict(spec="outcomes only", method="--",
+                     loss_2018Q4=variants["SDID (iii)"][0],
+                     loss_2019Q4=variants["SDID (iii)"][1],
+                     pre_rmse=_rmse_of(base), v_agreement=None)]
+        for meth in ("adjust", "match", "optimized"):
+            kw = dict(zeta=0.0, vce="noinference", covariates={meth: COVARIATES})
+            if meth == "match":
+                kw["match_pre_periods"] = "last"
+            vals, rmse = [], None
+            for e in EVAL.values():
+                r = SDID(cfg(e, **kw)).fit()
+                vals.append(pct(r.effects.att))
+                rmse = _rmse_of(r) or rmse
+            rows.append(dict(spec=f"SDID covariates={{'{meth}': ...}}",
+                             method=meth, loss_2018Q4=vals[0],
+                             loss_2019Q4=vals[1], pre_rmse=rmse,
+                             v_agreement=None))
+        d = [r for r in vsc_cov if r["budget"].startswith("default")]
+        rows.append(dict(spec="VanillaSC(covariates=..., backend='mscmt')",
+                         method="bilevel V", loss_2018Q4=d[0]["loss"],
+                         loss_2019Q4=d[1]["loss"], pre_rmse=d[0]["rmse_pre"],
+                         v_agreement=d[0]["v_agreement"]))
+        return pd.DataFrame(rows)
+
+    app_cov_df = cache("app_covariates", app_covariates)
+    print(app_cov_df.to_string(index=False, float_format=lambda v: f"{v:.4f}"))
+    write_tab(app_cov_df, "app_covariates")
+
+    # --- The ladder's own spread, which the defaults panel measures against --
+    _non_did = ladder[ladder.method != "DiD"]
+    LADDER_SPREAD = float(_non_did.loss_2018Q4.max() - _non_did.loss_2018Q4.min())
+    print(f"  ladder spread at 2018Q4, excluding DiD: {LADDER_SPREAD:.3f}pp")
+    for lab, lo, hi in [
+        ("zeta", zeta_df.loss_2018Q4.min(), zeta_df.loss_2018Q4.max()),
+        ("set_f", setf_df.loss_2018Q4.min(), setf_df.loss_2018Q4.max()),
+        ("w_constr", wconstr_df.loss_2018Q4.min(), wconstr_df.loss_2018Q4.max()),
+        ("covariates", app_cov_df.loss_2018Q4.min(), app_cov_df.loss_2018Q4.max()),
+    ]:
+        print(f"    {lab:<11s} spans {hi - lo:5.2f}pp "
+              f"({'clears' if hi - lo > LADDER_SPREAD else 'inside'} the ladder)")
+
+    # --- What a fit looks like, for the anatomy panel -----------------------
+    _w = window(T_2018Q4)
+    _ss = demo.weights.summary_stats or {}
+    anatomy = {
+        "config": [
+            dict(field="df", value=f"DataFrame, {_w.shape[0]} x {_w.shape[1]}",
+                 note="long format: one row per unit-period"),
+            dict(field="outcome", value='"log_rgdp"', note="the column to explain"),
+            dict(field="treat", value='"treat"',
+                 note="0/1, one for the treated unit after adoption"),
+            dict(field="unitid", value='"country"', note="the panel's unit key"),
+            dict(field="time", value='"tt"', note="the panel's period key"),
+            dict(field="display_graphs", value="False",
+                 note="True pops mlsynth's own matplotlib window"),
+            dict(field="inference", value="False",
+                 note="VanillaSC only; skips the placebo distribution"),
+        ],
+        "result": [
+            dict(accessor="res.att", value=f"{demo.att:+.6f}",
+                 note="treated minus counterfactual, averaged over post periods"),
+            dict(accessor="res.pre_rmse", value=f"{demo.pre_rmse:.6f}",
+                 note="pre-treatment fit error, the only honest quality signal"),
+            dict(accessor="res.fit_diagnostics.r_squared_pre",
+                 value=f"{demo.fit_diagnostics.r_squared_pre:.6f}",
+                 note="near 1 on any trending panel; do not be impressed by it"),
+            dict(accessor="res.method_details.method_name",
+                 value=f'"{demo.method_details.method_name}"',
+                 note="which backend 'auto' actually chose"),
+            dict(accessor="len(res.donor_weights)",
+                 value=f"{len(demo.donor_weights)}",
+                 note="nonzero donors only, not the full pool"),
+            dict(accessor="res.counterfactual.shape",
+                 value=f"{tuple(np.shape(demo.counterfactual))}",
+                 note="the synthetic unit, over the fitted window"),
+            dict(accessor="res.gap.shape", value=f"{tuple(np.shape(demo.gap))}",
+                 note="treated minus counterfactual, period by period"),
+            dict(accessor="res.weights.summary_stats",
+                 value=", ".join(sorted(_ss)),
+                 note="where the estimator-specific dials hide"),
+        ],
+        "deviations": [
+            dict(cls="FDIDResults", extra=".fdid  .did",
+                 note="two estimators in one result; .did is the plain two-way fit"),
+            dict(cls="TSSCResults",
+                 extra=".variants  .selection  .recommended_method",
+                 note="four MSC variants plus the Step-1 restriction tests"),
+            dict(cls="SDIDResults",
+                 extra=".inference_detail  .event_study  .cohorts",
+                 note="time weights live in cohorts[a].time_weights"),
+        ],
+        "rounding": dict(
+            reported=float(t_all.variants["MSCa"].att),
+            exact=float(tssc_att(t_all, "MSCa")),
+            reported_rmse=float(t_all.variants["MSCa"].rmse_pre),
+            loss_from_reported=pct(float(t_all.variants["MSCa"].att)),
+            loss_from_exact=pct(float(tssc_att(t_all, "MSCa"))),
+        ),
+    }
+
+    # --- Assemble results.json ---------------------------------------------
+    def clean(o):
+        """JSON-safe, 8 significant figures, NaN -> null."""
+        if isinstance(o, dict):
+            return {str(k): clean(v) for k, v in o.items()}
+        if isinstance(o, (list, tuple)):
+            return [clean(v) for v in o]
+        if isinstance(o, np.ndarray):
+            return [clean(v) for v in o.tolist()]
+        if isinstance(o, (bool, np.bool_)):
+            return bool(o)
+        if isinstance(o, (int, np.integer)):
+            return int(o)
+        if isinstance(o, (float, np.floating)):
+            v = float(o)
+            return None if not np.isfinite(v) else float(f"{v:.8g}")
+        if o is None or isinstance(o, str):
+            return o
+        try:
+            return None if pd.isna(o) else o
+        except (TypeError, ValueError):
+            return o
+
+    def recs(df):
+        return clean(df.replace({np.nan: None}).to_dict(orient="records"))
+
+    METHODS6 = ["DiD", "SC", "DSC", "SDID", "MASC", "ASCM"]
+    space_by_country = {r["country"]: np.asarray(r["gap"], float) for r in space}
+
+    payload = clean({
+        "meta": dict(
+            slug=SLUG, treated=TREATED, donors=DONORS,
+            quarters=list(QLAB), t0=T0, eval=EVAL,
+            born_2018=BORN, born_2019=3.6,
+            mlsynth_version=mlsynth.__version__,
+            ladder_spread=LADDER_SPREAD,
+            zeta_star=ZETA_STAR,
+            n_units=len(space),
+            p_floor=1.0 / len(space),
+            uk_rank=uk_rank,
+            p_permutation=p_perm,
+        ),
+        "outcome": dict(uk=Y[TREATED].to_numpy()),
+        "counterfactual": {m: np.asarray(cfs[m], float) for m in METHODS6},
+        "weights": {m: wt[m].to_numpy() for m in METHODS6},
+        "results": recs(ladder),
+        "variants": [dict(variant=k, loss_2018Q4=v[0], loss_2019Q4=v[1],
+                          lambda_fitted_on=v[2], published_2018Q4=v[3])
+                     for k, v in variants.items()],
+        "lambda": dict(i=lam_i, ii=lam_ii8, iii=lam_iii8),
+        "placebo_h1": recs(pl_h1), "placebo_h4": recs(pl_h4),
+        "placebo_published": recs(mixed),
+        "zeta_sweep": recs(zeta_df),
+        "wconstr": recs(wconstr_df),
+        "setf": recs(setf_df),
+        "covariates": recs(app_cov_df),
+        "inference": recs(inf_df),
+        "event_study": [dict(event_time=a, tau=b, ci_lower=c, ci_upper=d)
+                        for a, b, c, d in zip(et, tau, ci[:, 0], ci[:, 1])],
+        "in_space": recs(space_df),
+        "in_space_gaps": space_by_country,
+        "solvers": recs(solver_df),
+        "tssc": recs(pd.DataFrame(tssc_rows)),
+        "masc_cv": recs(masc_cv),
+        "anatomy": anatomy,
+    })
+
+    app_dir = Path("web_app") / "data"
+    app_dir.mkdir(parents=True, exist_ok=True)
+    app_json = app_dir / "results.json"
+    with app_json.open("w", encoding="utf-8") as fh:
+        json.dump(payload, fh, ensure_ascii=False, separators=(",", ":"))
+    print(f"  [app]    {app_json}  ({app_json.stat().st_size / 1024:.1f} KB, "
+          f"{len(payload)} top-level keys)")
+
 
 rule("Done")
 print(f"  figures written: {len(list(Path('.').glob(f'{SLUG}_*.png')))}")
