@@ -54,7 +54,7 @@ dropping it — would take both to 9.
 | 9  | 8   | LOW  | `content/post/python_sc_dsc_sdid/index.md:17-20` | The front matter carries an unrelated uncommitted change from a concurrent session (a `Slides (HTML)` entry for a Quarto deck under `slides/`). The two edits do not conflict, but a `git diff` on `index.md` is not attributable to the app alone. | Stage the `Web app` link change separately from the slides entry. |
 
 **Root of issue 1 is in the post, not the app.** `index.md` §1 ("three separate defaults, each of
-which moves the headline estimate by more than the spread across the entire six-rung ladder"),
+which moves the headline estimate by more than the spread across the entire six-stage ladder"),
 §21 and §22 all assert that all three clear the ladder, then give `zeta` as 0.13pp against a
 0.31pp spread. The individual figures are correct; the summarising sentence is not. The app is
 the more accurate of the two documents. Correcting the post is outside this skill's scope.
@@ -67,7 +67,7 @@ the more accurate of the two documents. Correcting the post is outside this skil
 
 1. Install `mlsynth` and read its one-config-dict, one-result-object interface, including the
    Pydantic validation that turns a typo into an exception.
-2. Map each rung onto a specific class and configuration field, and explain why `mlsynth.DSC`
+2. Map each stage onto a specific class and configuration field, and explain why `mlsynth.DSC`
    is not the DSC on this ladder.
 3. Extract the ATT, the donor weights, the time weights, the counterfactual path and the event
    study from a fitted result.
@@ -92,7 +92,7 @@ the more accurate of the two documents. Correcting the post is outside this skil
 
 - Takeaway 1: ~ partial — panel 4 lays out the config and result contracts field by field with
   live values, but Pydantic validation and the four exception types (post §4.2) are absent.
-- Takeaway 2: ✓ covered — every rung's exact call is in panel 1's blurb and panel 3's tooltip,
+- Takeaway 2: ✓ covered — every stage's exact call is in panel 1's blurb and panel 3's tooltip,
   and panel 5 is devoted to the `mlsynth.DSC` clash.
 - Takeaway 3: ~ partial — ATT (panel 1), donor weights (panel 2), counterfactual (panel 1) and
   event study (panel 10) are all drawn; **time weights are not** (issue 2).

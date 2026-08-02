@@ -1,5 +1,5 @@
 """
-THE SYNTHETIC-CONTROL LADDER IN PYTHON — one mlsynth class per rung
+THE SYNTHETIC-CONTROL LADDER IN PYTHON — one mlsynth class per stage
 
     DiD  ->  SC  ->  DSC  ->  SDID  ->  MASC  ->  ASCM
 
@@ -107,8 +107,8 @@ def pct(att: float) -> float:
 results: dict[str, dict] = {}
 
 
-def record(rung, command, values, se=None, inference="--", paper=None, note=""):
-    results[rung] = dict(
+def record(stage, command, values, se=None, inference="--", paper=None, note=""):
+    results[stage] = dict(
         command=command, q2018=values[0], q2019=values[1],
         se=se, inference=inference, paper=paper,
     )
@@ -120,7 +120,7 @@ def record(rung, command, values, se=None, inference="--", paper=None, note=""):
 print("\nBrexit: shortfall in UK real GDP (%), treatment dated 2016Q3, no covariates")
 print("=" * 78)
 
-# ── Rung 0. DiD ───────────────────────────────────────────────────────────────
+# ── Stage 0. DiD ───────────────────────────────────────────────────────────────
 # mlsynth has no standalone DiD class, but FDID (Forward DiD, Li 2024) fits the
 # plain two-way estimator alongside its own and exposes it as `.did`. Weights
 # come back as a uniform 1/23 across every donor, which is the giveaway that
@@ -133,7 +133,7 @@ record(
     se=100 * did["2018Q4"].att_se, inference="analytic (FDID)",
 )
 
-# ── Rung 1. SC ────────────────────────────────────────────────────────────────
+# ── Stage 1. SC ────────────────────────────────────────────────────────────────
 # Donor weights on the simplex, fitted to the pre-treatment path, no intercept.
 # With no covariates VanillaSC takes the "outcome-only" backend: a plain convex
 # QP with a unique solution, no predictor-weight (V) search to go wrong.
@@ -146,7 +146,7 @@ record(
     note="note: 3.04, not R's 3.06 -- see 'On the two disagreements' below",
 )
 
-# ── Rung 2. DSC ───────────────────────────────────────────────────────────────
+# ── Stage 2. DSC ───────────────────────────────────────────────────────────────
 # Demeaned SC: SC plus an intercept, so the blend has to match the SHAPE of the
 # UK's path but not its level. In mlsynth this is the MSCa variant of the
 # two-step estimator. See the naming hazard at the top of this file.
@@ -161,7 +161,7 @@ record(
     inference="none (disabled)", paper=2.98,
 )
 
-# ── Rung 3. SDID ──────────────────────────────────────────────────────────────
+# ── Stage 3. SDID ──────────────────────────────────────────────────────────────
 # Same unit weights as DSC, but the time weights are fitted too.
 #
 # zeta=0 switches off the ridge penalty on the unit weights, because the paper
@@ -178,7 +178,7 @@ record(
 print(f"  {'':<38s} defaults (zeta left alone): "
       f"{pct(SDID(cfg(EVAL['2018Q4'])).fit().effects.att):.2f}")
 
-# ── Rung 4. MASC ──────────────────────────────────────────────────────────────
+# ── Stage 4. MASC ──────────────────────────────────────────────────────────────
 # A cross-validated blend of m-nearest-neighbour matching and SC.
 #
 # SET set_f EXPLICITLY. Left to its default, the cross-validation uses a
@@ -196,7 +196,7 @@ record(
     inference="none in package", paper=2.73,
 )
 
-# ── Rung 5. ASCM ──────────────────────────────────────────────────────────────
+# ── Stage 5. ASCM ──────────────────────────────────────────────────────────────
 # SC weights plus a ridge-regression correction for whatever pre-treatment
 # imbalance SC could not close. One keyword on the class you already used.
 print("\n5. ASCM")
@@ -220,20 +220,20 @@ R_COLUMN = {"DiD": 4.98, "SC": 3.06, "DSC": 2.98, "SDID": 2.79, "MASC": 2.73, "A
 print("\n\n" + "=" * 98)
 print("UK GDP shortfall (%), 2016Q3 treatment, outcomes only, 23 donors, 86 pre-quarters")
 print("=" * 98)
-print(f"{'Rung':<6}{'Command':<34}{'2018Q4':>8}{'2019Q4':>8}{'SE 18Q4':>9}  "
+print(f"{'Stage':<6}{'Command':<34}{'2018Q4':>8}{'2019Q4':>8}{'SE 18Q4':>9}  "
       f"{'Inference':<18}{'R':>6}{'Paper':>7}")
 print("-" * 98)
-for rung, r in results.items():
+for stage, r in results.items():
     se = f"{r['se']:.2f}" if r["se"] is not None else "--"
     paper = f"{r['paper']:.2f}" if r["paper"] is not None else "--"
-    print(f"{rung:<6}{r['command']:<34}{r['q2018']:>8.2f}{r['q2019']:>8.2f}{se:>9}  "
-          f"{r['inference']:<18}{R_COLUMN[rung]:>6.2f}{paper:>7}")
+    print(f"{stage:<6}{r['command']:<34}{r['q2018']:>8.2f}{r['q2019']:>8.2f}{se:>9}  "
+          f"{r['inference']:<18}{R_COLUMN[stage]:>6.2f}{paper:>7}")
 print("-" * 98)
 
 print("""
 ON THE TWO DISAGREEMENTS WITH R
 
-Four rungs agree with R to two decimals. Two do not, and both are worth
+Four stages agree with R to two decimals. Two do not, and both are worth
 understanding rather than rounding away.
 
 SC: 3.04 here, 3.06 in R. This is not a bug in either package -- it is the

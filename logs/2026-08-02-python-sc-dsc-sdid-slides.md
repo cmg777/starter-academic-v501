@@ -24,13 +24,13 @@ Python/mlsynth-first. Brexit is the running case, not the punchline.
 | Act | Divider | Slides | Argument |
 |---|---|---|---|
 | I — One Treated Unit | `#d97757` | 4 | there is one UK; 92 estimators behind one config dict |
-| II — One Config, Six Rungs | `#6a9bcc` | 16 | the weighted two-way regression, then a rung per class |
+| II — One Config, Six Stages | `#6a9bcc` | 16 | the weighted two-way regression, then a stage per class |
 | III — The Defaults | `#141413` | 8 | `zeta`, `set_f`, covariates; silent rounding; solver fingerprint |
-| IV — Which Rung? | `#00d4c8` | 8 | the placebo tournament, the matched exam, the inferential floor |
+| IV — Which Stage? | `#00d4c8` | 8 | the placebo tournament, the matched exam, the inferential floor |
 
 Act III is the part with no counterpart in the R deck. Its opening table is the whole
 argument: `zeta` moves the estimate 0.13 pp, `set_f` 0.47 pp, the covariate method 1.76 pp —
-against a 0.31 pp spread across the entire six-rung ladder.
+against a 0.31 pp spread across the entire six-stage ladder.
 
 ## Title key-result strip
 

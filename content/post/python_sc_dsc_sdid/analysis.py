@@ -6,11 +6,11 @@ THE SYNTHETIC-CONTROL LADDER IN PYTHON — the full mlsynth pipeline
 Companion script for https://carlos-mendez.org/post/python_sc_dsc_sdid/
 The Python counterpart of the R post's analysis.R, with one difference of
 emphasis: analysis.R hand-codes every estimator and then checks it against a
-package. This script does not hand-code anything. Every rung is a single
+package. This script does not hand-code anything. Every stage is a single
 mlsynth class, and the interesting work is in the *options*.
 
 Every estimator comes from mlsynth (Jared Greathouse), which exposes all six
-rungs behind one config-dict API. The mapping was worked out in mlsynth issue
+stages behind one config-dict API. The mapping was worked out in mlsynth issue
 #312: https://github.com/jgreathouse9/mlsynth/issues/312
 
 Install:
@@ -272,13 +272,13 @@ def tssc_att(res, variant: str = "MSCa", n_post: int = 1) -> float:
 LADDER: list[dict] = []
 
 
-def add(rung: str, command: str, q18: float, q19: float, se=None,
+def add(stage: str, command: str, q18: float, q19: float, se=None,
         inference: str = "--", published=None, note: str = "") -> None:
-    LADDER.append(dict(method=rung, command=command, loss_2018Q4=q18,
+    LADDER.append(dict(method=stage, command=command, loss_2018Q4=q18,
                        loss_2019Q4=q19, se_2018Q4=se, inference=inference,
                        published_2018Q4=published, note=note))
     tail = f"   SE {se:5.2f}" if se is not None else ""
-    print(f"  {rung:<11s} {command:<40s} 2018Q4 {q18:5.2f}   2019Q4 {q19:5.2f}{tail}")
+    print(f"  {stage:<11s} {command:<40s} 2018Q4 {q18:5.2f}   2019Q4 {q19:5.2f}{tail}")
     if note:
         print(f"  {'':<11s} {note}")
 
@@ -334,7 +334,7 @@ ax.set_ylabel("log real GDP")
 ax.legend(loc="upper left")
 caption(fig, "The UK is one line among twenty-four. Nothing in this picture "
              "tells you what would have happened without the referendum — that "
-             "is the whole problem, and every rung of the ladder is a different "
+             "is the whole problem, and every stage of the ladder is a different "
              "answer to it.")
 save_fig(fig, "01_gdp_paths", w=9.5, h=6)
 
@@ -343,14 +343,14 @@ print(f"  UK log real GDP {QLAB[0]}: {Y[TREATED].iloc[0]:.4f}"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 5. RUNG 0 — DiD
+# 5. STAGE 0 — DiD
 #
 # mlsynth has no standalone DiD class. FDID (Forward DiD, Li 2024) fits the
 # plain two-way estimator alongside its own and exposes it as `.did`. The
 # uniform 1/23 donor weights are the giveaway that nothing was fitted.
 # ══════════════════════════════════════════════════════════════════════════════
 
-rule("5. Rung 0 — DiD, via FDID(...).fit().did")
+rule("5. Stage 0 — DiD, via FDID(...).fit().did")
 
 fdid_res = {k: FDID(cfg(e)).fit() for k, e in EVAL.items()}
 did = {k: r.did for k, r in fdid_res.items()}
@@ -364,7 +364,7 @@ print(f"  DiD donor weights: {len(wd)} donors, all equal to "
 print(f"  DiD pre-treatment RMSE {did['2018Q4'].pre_rmse:.5f}, "
       f"R^2 {did['2018Q4'].r_squared:.4f}")
 
-# Free bonus rung: FDID itself. Forward selection picks a handful of donors and
+# Free bonus stage: FDID itself. Forward selection picks a handful of donors and
 # then runs DiD on them. It is not on the paper's ladder, but you get it in the
 # same call and it is worth reporting.
 f18, f19 = fdid_res["2018Q4"].fdid, fdid_res["2019Q4"].fdid
@@ -379,10 +379,10 @@ FDID_ROW = dict(method="FDID (bonus)", loss_2018Q4=pct(f18.att),
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 6. RUNG 1 — SC, and the backend question
+# 6. STAGE 1 — SC, and the backend question
 # ══════════════════════════════════════════════════════════════════════════════
 
-rule("6. Rung 1 — SC, via VanillaSC")
+rule("6. Stage 1 — SC, via VanillaSC")
 
 sc = {k: VanillaSC(cfg(e, inference=False)).fit() for k, e in EVAL.items()}
 add("SC", "VanillaSC(...)", pct(sc["2018Q4"].att), pct(sc["2019Q4"].att),
@@ -514,10 +514,10 @@ print(f"  full-panel SC: pre-RMSE {sc_full.pre_rmse:.6f}, "
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 7. RUNG 2 — DSC, via TSSC(method="MSCa")
+# 7. STAGE 2 — DSC, via TSSC(method="MSCa")
 # ══════════════════════════════════════════════════════════════════════════════
 
-rule("7. Rung 2 — DSC, via TSSC(method='MSCa')")
+rule("7. Stage 2 — DSC, via TSSC(method='MSCa')")
 
 dsc = {k: TSSC(cfg(e, method="MSCa", inference=False)).fit() for k, e in EVAL.items()}
 add("DSC", 'TSSC(..., method="MSCa")',
@@ -594,10 +594,10 @@ save_fig(fig, "05_dsc_offset", w=9.5, h=5.6)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 8. RUNG 3 — SDID
+# 8. STAGE 3 — SDID
 # ══════════════════════════════════════════════════════════════════════════════
 
-rule("8. Rung 3 — SDID")
+rule("8. Stage 3 — SDID")
 
 sdid = {k: SDID(cfg(e, zeta=0.0, vce="placebo", B=500, seed=SEED)).fit()
         for k, e in EVAL.items()}
@@ -754,10 +754,10 @@ write_tab(pd.DataFrame({"event_time": et, "tau": tau,
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 9. RUNG 4 — MASC
+# 9. STAGE 4 — MASC
 # ══════════════════════════════════════════════════════════════════════════════
 
-rule("9. Rung 4 — MASC")
+rule("9. Stage 4 — MASC")
 
 M_GRID = list(range(1, 11))
 SET_F = list(range(6, T0 + 1))
@@ -837,10 +837,10 @@ save_fig(fig, "08_masc_cv", w=9.5, h=5.2)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 10. RUNG 5 — ASCM
+# 10. STAGE 5 — ASCM
 # ══════════════════════════════════════════════════════════════════════════════
 
-rule("10. Rung 5 — ASCM, via VanillaSC(augment='ridge')")
+rule("10. Stage 5 — ASCM, via VanillaSC(augment='ridge')")
 
 ascm = {k: VanillaSC(cfg(e, augment="ridge", inference=False)).fit()
         for k, e in EVAL.items()}
@@ -880,7 +880,7 @@ print(ladder[["method", "command", "loss_2018Q4", "loss_2019Q4",
 
 BORN = 2.4
 print(f"\n  Born et al. (2019) reported {BORN}% for this dataset. "
-      f"Every rung here is above it.")
+      f"Every stage here is above it.")
 
 # --- Figure 09: donor weights across methods -------------------------------
 wt = pd.DataFrame({
@@ -916,7 +916,7 @@ ax.annotate("negative weights\n(outside the simplex)", xy=(-0.006, len(order) - 
 caption(fig, f"DiD is omitted: it gives all twenty-three donors 1/23. Donors "
              f"whose largest weight is under 0.004 are dropped. Only ASCM "
              f"enters the shaded negative region, {int((wt['ASCM'] < -1e-6).sum())} "
-             f"times — it is the one rung that relaxes the simplex.")
+             f"times — it is the one stage that relaxes the simplex.")
 save_fig(fig, "09_donor_weights", w=9.5, h=7)
 
 n_neg = int((wt[plot_m].to_numpy() < -1e-6).sum())
@@ -982,7 +982,7 @@ ax.plot(dot.loss_2018Q4, ypos, "o", color=STEEL, ms=9, label="2018Q4")
 ax.plot(dot.loss_2019Q4, ypos, "o", color=ORANGE, ms=9, label="2019Q4")
 ax.set_yticks(ypos); ax.set_yticklabels(dot.method)
 ax.set_xlabel("UK GDP shortfall (%)")
-ax.set_title("Every rung puts the cost above the published 2.4%")
+ax.set_title("Every stage puts the cost above the published 2.4%")
 ax.legend(loc="lower right")
 caption(fig, "The three SDID flavours are shown separately. The spread across "
              "the whole ladder at 2018Q4 is about two percentage points, and "
@@ -1009,7 +1009,7 @@ H_GRID = [1, 4]
 
 
 def placebo_one(k: int, h: int) -> dict:
-    """Every rung refit as if the treatment had happened at quarter k+1."""
+    """Every stage refit as if the treatment had happened at quarter k+1."""
     e = k + h
     row = {"k": k, "last_pre": QLAB[k - 1], "horizon": h}
     row["SC"] = VanillaSC(cfg(e, pre=k, inference=False)).fit().effects.att
@@ -1362,7 +1362,7 @@ checks = {
         abs(ladder.loc[ladder.method == "ASCM", "loss_2018Q4"].iloc[0] - 3.04) < 0.02,
     "DiD at 2018Q4 near 4.98":
         abs(ladder.loc[ladder.method == "DiD", "loss_2018Q4"].iloc[0] - 4.98) < 0.02,
-    "every rung exceeds Born et al.'s 2.4%":
+    "every stage exceeds Born et al.'s 2.4%":
         bool(ladder.loss_2018Q4.min() > BORN),
     "SDID time weights sum to one": abs(lam_i.sum() - 1.0) < 1e-6,
     "SC weights lie on the simplex":

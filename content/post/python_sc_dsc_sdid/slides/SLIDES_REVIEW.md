@@ -50,11 +50,11 @@ table slides the readability rules explicitly permit.
 | #  | Dim | Severity | Location                                         | Issue                                                                 | Suggested fix                                          |
 |---:|----:|----------|--------------------------------------------------|-----------------------------------------------------------------------|--------------------------------------------------------|
 | 1  | 5   | MED      | slide 2-3 — "Five fields, one long panel"        | 188 words; three full-sentence code comments read as an essay          | Cut to one `.comment` gloss; rest to notes — **applied**|
-| 2  | 5   | MED      | slide 2-12 — "Rungs 4 and 5"                     | 136 words; each column stacked two prose sentences plus a number       | Trim both columns to call + one line + number — **applied** |
+| 2  | 5   | MED      | slide 2-12 — "Stages 4 and 5"                     | 136 words; each column stacked two prose sentences plus a number       | Trim both columns to call + one line + number — **applied** |
 | 3  | 5   | MED      | slide 4-5 — "The strongest objection"            | 126 words; objection 39 words, response 41 words, both multi-clause    | Split at the conjunction — **applied**                 |
 | 4  | 5   | MED      | slide 3-6 — "One estimator silently rounds…"     | 103 words; three stacked prose sentences after the code block          | Two sentences; `rmse_pre` line to notes — **applied**  |
-| 5  | 5   | MED      | slide 4-1 — "Score the rungs…"                   | 101 words; 36-word opening sentence with two subordinate clauses       | Two short lines split by `. . .` — **applied**         |
-| 6  | 5   | MED      | slide 2-8 — "Rung 2 — Demeaned SC"               | 93 words; two stacked prose sentences plus a 30-word takeaway          | One anchor line; rationale to notes — **applied**      |
+| 5  | 5   | MED      | slide 4-1 — "Score the stages…"                   | 101 words; 36-word opening sentence with two subordinate clauses       | Two short lines split by `. . .` — **applied**         |
+| 6  | 5   | MED      | slide 2-8 — "Stage 2 — Demeaned SC"               | 93 words; two stacked prose sentences plus a 30-word takeaway          | One anchor line; rationale to notes — **applied**      |
 | 7  | 5   | MED      | slide 3-4 — "Control for a covariate"            | 86 words; table cells carried full-sentence descriptions               | Compress cells to phrases — **applied**                |
 | 8  | 5   | MED      | slide 4-8 — "Materials"                          | 89 words; the cheat-sheet bullet ran 40 words                          | Trim bullets; detail to notes — **applied**            |
 | 9  | 5   | MED      | slide 4-7 — "What to take away"                  | 79 words; item 1 ran 30 words                                          | Trim all four to one clause each — **applied**         |
@@ -62,7 +62,7 @@ table slides the readability rules explicitly permit.
 | 11 | 5   | LOW      | slides 2-1, 2-6, 2-9, 2-12                       | Still flagged dense (111-114 words), but the counter tokenizes MathJax output; real prose load is 15-55 words | No change — equation slides are permitted structured content |
 | 12 | 5   | LOW      | slides 2-2, 2-15, 3-1, 3-4, 3-7, 4-3             | Still flagged dense (61-77 words) — all are tables                     | No change — "structured content: a table" is permitted |
 | 13 | 4   | LOW      | slide 4-8 — "Materials"                          | Label title, not an assertion                                          | Accepted — conventional closing-materials slide        |
-| 14 | 7   | LOW      | slide 2-12 — "Rungs 4 and 5"                     | Two ideas on one slide (MASC and ASCM)                                 | Accepted — the two-column archetype exists for an inseparable contrast |
+| 14 | 7   | LOW      | slide 2-12 — "Stages 4 and 5"                     | Two ideas on one slide (MASC and ASCM)                                 | Accepted — the two-column archetype exists for an inseparable contrast |
 | 15 | 9   | LOW      | figure slides                                    | Captions render below the image, reducing available height             | No overflow measured at 1280×720; monitor if figures are re-exported |
 
 ---
@@ -79,7 +79,7 @@ After:
 
 Why: 39 words → 20; the "could not have been more favourable" and the SE arithmetic move to notes where the speaker says them.
 
-**Issue #6 — slide 2-8 "Rung 2 — Demeaned SC allows a level gap"**
+**Issue #6 — slide 2-8 "Stage 2 — Demeaned SC allows a level gap"**
 
 Before:
 > One extra free parameter — a constant offset — so the blend must match the UK's **shape** but not its **level**.
@@ -127,10 +127,10 @@ Why: 23-word takeaway → 10; three sentences → two; "hands you both a scalar 
 **Issue #9 — slide 4-7 "What to take away"**
 
 Before:
-> 1. **Fit the ladder, not a rung.** Publish the cloud rather than the point — six estimators, one config, thirteen seconds for a twenty-date tournament. There is no practical excuse left for a single specification.
+> 1. **Fit the ladder, not a stage.** Publish the cloud rather than the point — six estimators, one config, thirteen seconds for a twenty-date tournament. There is no practical excuse left for a single specification.
 
 After:
-> 1. **Fit the ladder, not a rung.** Publish the cloud — six estimators, one config, thirteen seconds.
+> 1. **Fit the ladder, not a stage.** Publish the cloud — six estimators, one config, thirteen seconds.
 
 Why: 33 words → 15; the "no practical excuse" claim is a rhetorical beat that belongs in speech, not on the bullet.
 
@@ -206,22 +206,22 @@ No ✗ rows.
 2. One line in a crowd
 3. Ninety-two estimators, one configuration dictionary
 4. Where we're going
-5. Every rung is the same regression, weighted differently
+5. Every stage is the same regression, weighted differently
 6. The ladder is two dials: who counts, and when
 7. Five fields, one long panel — and one config dict
 8. One result object, seven accessors that work everywhere
-9. Rung 0 — DiD weights every country and every quarter the same
-10. Rung 1 — Synthetic control fits who counts
+9. Stage 0 — DiD weights every country and every quarter the same
+10. Stage 1 — Synthetic control fits who counts
 11. Indistinguishable until 2016, then persistently below
-12. Rung 2 — Demeaned SC allows a level gap
-13. Rung 3 — SDID also fits which quarters count
+12. Stage 2 — Demeaned SC allows a level gap
+13. Stage 3 — SDID also fits which quarters count
 14. And the time weights collapse onto one quarter
 15. Flat before, negative after
-16. Rungs 4 and 5 — buy the trade-off, or drop the constraint
+16. Stages 4 and 5 — buy the trade-off, or drop the constraint
 17. Five estimators, essentially the same five countries
 18. The paths agree until the referendum, then fan apart
 19. The whole ladder, side by side
-20. Every rung exceeds the published 2.4%
+20. Every stage exceeds the published 2.4%
 21. Three defaults each move the answer more than the ladder does
 22. `zeta` penalises the unit weights unless you pass a literal zero
 23. `set_f` decides which folds MASC learns from
@@ -230,7 +230,7 @@ No ✗ rows.
 26. One estimator silently rounds the number you are most likely to quote
 27. A name is a mnemonic, not a definition
 28. A synthetic control estimate carries its solver's fingerprint
-29. Score the rungs on a task whose true answer is zero
+29. Score the stages on a task whose true answer is zero
 30. The time weights earn their keep
 31. But the published ranking was graded on a different exam
 32. The UK's gap is deeper than any placebo's
@@ -254,7 +254,7 @@ the deck's differentiator from its R sibling. Titles 4, 19 and 36 are labels rat
   carries its solver's fingerprint" — with a figure showing four convex routes at 3.039 against
   Frank-Wolfe's 3.060, and the three-language corroboration in the notes.
 - **The two-dial framing (slide 6) makes six estimators legible as one table.** Every subsequent
-  rung slide is an expansion of a single row, so the audience always knows where it is.
+  stage slide is an expansion of a single row, so the audience always knows where it is.
 - **Every figure carries real alt text**, closing the accessibility gap present in the R sibling's
   deck, where all seven `![](…)` calls have empty alt attributes.
 - **The Devil's-Advocate slide concedes the actual weakness** — that $p = 0.042$ is the design's

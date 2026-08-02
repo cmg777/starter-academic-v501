@@ -63,7 +63,7 @@ This is the fundamental problem of causal inference, stated as concretely as it 
 [24 countries · 23 donors · 86 pre-treatment quarters · treatment dated 2016Q3.]{.takeaway .fragment}
 
 ::: {.notes}
-No single donor tracks the UK, which is why we blend rather than pick. Two things to notice. First, the series are strongly trending and highly correlated — close to a set of random walks with drift. That will matter enormously when we get to the time weights. Second, look at 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted rungs are built to exploit.
+No single donor tracks the UK, which is why we blend rather than pick. Two things to notice. First, the series are strongly trending and highly correlated — close to a set of random walks with drift. That will matter enormously when we get to the time weights. Second, look at 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted stages are built to exploit.
 
 The panel is quarterly log real GDP assembled by Born, Müller, Schularick and Sedláček, redistributed in the replication package of de Brabander, Juodis and Miyazato Szini. No missing values.
 :::
@@ -74,7 +74,7 @@ One interface for the whole single-treated-unit literature: build a config, call
 
 . . .
 
-**Six rungs in this deck. Eighty-six more estimators behind the same door.**
+**Six stages in this deck. Eighty-six more estimators behind the same door.**
 
 . . .
 
@@ -90,21 +90,21 @@ The version warning is not pedantry. The release numbered 1.0.0 on PyPI is missi
 
 ::: {.incremental}
 - **Read** one config dict and one result object — the entire API surface.
-- **Map** each rung of the ladder onto a specific `mlsynth` class.
+- **Map** each stage of the ladder onto a specific `mlsynth` class.
 - **Identify** the three defaults that change the answer materially.
-- **Compare** the rungs on a placebo tournament, and read the ranking sceptically.
+- **Compare** the stages on a placebo tournament, and read the ranking sceptically.
 - **Report** a cloud of estimates rather than a point.
 :::
 
 ::: {.notes}
-Four acts. Act I is the problem. Act II climbs the ladder — this is the longest stretch and the most code. Act III is where the deck earns its title: the defaults. Act IV asks which rung to stand on and how confident we are allowed to be about the answer.
+Four acts. Act I is the problem. Act II climbs the ladder — this is the longest stretch and the most code. Act III is where the deck earns its title: the defaults. Act IV asks which stage to choose and how confident we are allowed to be about the answer.
 :::
 
-# One Config, Six Rungs {.divider background-color="#6a9bcc"}
+# One Config, Six Stages {.divider background-color="#6a9bcc"}
 
 [Act II]{.act}
 
-## Every rung is the same regression, weighted differently
+## Every stage is the same regression, weighted differently
 
 $$(\hat\tau, \hat\mu, \hat\alpha, \hat\beta) = \arg\min \sum_{i,t} \omega_i \lambda_t \left( Y_{it} - \mu - \alpha_i - \beta_t - \tau D_{it} \right)^2$$
 
@@ -112,7 +112,7 @@ $$(\hat\tau, \hat\mu, \hat\alpha, \hat\beta) = \arg\min \sum_{i,t} \omega_i \lam
 
 . . .
 
-[The rungs differ only in how $\omega$ and $\lambda$ are chosen.]{.takeaway .fragment}
+[The stages differ only in how $\omega$ and $\lambda$ are chosen.]{.takeaway .fragment}
 
 ::: {.notes}
 This is the unifying idea, and it is worth pausing on because it makes the whole ladder legible. Difference-in-differences, synthetic control, demeaned SC and SDID are not four different models. They are one model with four different weighting schemes. MASC and ASCM break the pattern slightly — they change what weights are allowed at all rather than which weights get chosen — which is why the ladder branches at the top rather than continuing straight up.
@@ -120,7 +120,7 @@ This is the unifying idea, and it is worth pausing on because it makes the whole
 
 ## The ladder is two dials: who counts, and when {.smaller}
 
-| Rung | $\omega$ (who counts) | $\lambda$ (when) | mlsynth call |
+| Stage | $\omega$ (who counts) | $\lambda$ (when) | mlsynth call |
 |---|---|---|---|
 | DiD | uniform | uniform | `FDID(cfg).fit().did` |
 | SC | fitted, simplex | uniform | `VanillaSC(cfg)` |
@@ -173,13 +173,13 @@ The `window` helper does one more trick worth knowing: it keeps the 86 pre-treat
 Two traps behind the convenience. `len(result.donor_weights)` is 9 here, not 23 — mlsynth returns only the non-zero weights, so do not treat that dictionary as a dense vector. And `method_details.method_name` reports which backend the "auto" setting actually resolved to, which is precisely the information you need when comparing against another implementation. Come back to that on the solver slide.
 :::
 
-## Rung 0 — DiD weights every country and every quarter the same
+## Stage 0 — DiD weights every country and every quarter the same
 
 ``` {.python}
 did = FDID(cfg(96)).fit().did      # no standalone DiD class; it rides inside FDID
 ```
 
-**4.98%** at end-2018 — nearly double every other rung.
+**4.98%** at end-2018 — nearly double every other stage.
 
 . . .
 
@@ -190,10 +190,10 @@ did = FDID(cfg(96)).fit().did      # no standalone DiD class; it rides inside FD
 ::: {.notes}
 mlsynth has no standalone DiD class and this trips people up. The textbook two-way estimator comes free inside FDID — Forward DiD, Li 2024 — which fits its own estimator and the plain benchmark side by side and exposes them as `.fdid` and `.did`.
 
-A free seventh rung, if you want it: Forward DiD itself selects four donors greedily — Norway, Hungary, Austria, the United States — cuts the pre-treatment RMSE from 0.0217 to 0.0088, and lands at 2.42%, remarkably close to the published 2.4%. Three of its four donors are also among synthetic control's five largest weights.
+A free seventh stage, if you want it: Forward DiD itself selects four donors greedily — Norway, Hungary, Austria, the United States — cuts the pre-treatment RMSE from 0.0217 to 0.0088, and lands at 2.42%, remarkably close to the published 2.4%. Three of its four donors are also among synthetic control's five largest weights.
 :::
 
-## Rung 1 — Synthetic control fits who counts
+## Stage 1 — Synthetic control fits who counts
 
 $$\hat\omega = \arg\min_{\omega \in \mathbb{W}} \sum_{t=1}^{T_0} \Big( Y_{\text{UK},t} - \sum_j \omega_j Y_{j,t} \Big)^2, \qquad \mathbb{W} = \Big\{ \omega : \omega_j \ge 0, \ \sum_j \omega_j = 1 \Big\}$$
 
@@ -219,7 +219,7 @@ Note that the United States carries about a fifth of the counterfactual. We come
 The top panel is the fit; the bottom panel is the estimate. For two decades the gap hovers around zero — that is the credibility of the design, visible rather than assumed. Then it turns persistently negative from 2016 and keeps widening. The shortfall at the end of 2018 is 3.04%; a year later it is 4.17%.
 :::
 
-## Rung 2 — Demeaned SC allows a level gap
+## Stage 2 — Demeaned SC allows a level gap
 
 ``` {.python}
 dsc = TSSC(cfg(96, method="MSCa", inference=False)).fit()   # 2.99%
@@ -237,7 +237,7 @@ In mlsynth this is the MSCa variant of the Li and Shankar two-step estimator, re
 The cost of that convenience is real: four variants with 500 subsampling draws takes about 17 seconds, forcing one variant with inference off takes 0.01 seconds. A factor of roughly 1,700, which is exactly why the placebo tournament in Act IV sets `method=` and `inference=False`.
 :::
 
-## Rung 3 — SDID also fits which quarters count
+## Stage 3 — SDID also fits which quarters count
 
 $$\hat\tau_t = \Big( Y_{\text{UK},t} - \sum_j \hat\omega_j Y_{j,t} \Big) - \sum_{s \le T_0} \hat\lambda_s \Big( Y_{\text{UK},s} - \sum_j \hat\omega_j Y_{j,s} \Big)$$
 
@@ -277,7 +277,7 @@ Practical note: the time weights live on the cohort object, not on `weights`. `l
 `result.event_study` is aggregated alongside the headline ATT, which the R packages on this ladder do not do. The flat pre-treatment path is the part that matters: it is evidence about the design rather than about the effect, and it is the kind of thing a reader will ask for.
 :::
 
-## Rungs 4 and 5 — buy the trade-off, or drop the constraint {.smaller}
+## Stages 4 and 5 — buy the trade-off, or drop the constraint {.smaller}
 
 :::: {.columns}
 ::: {.column width="50%"}
@@ -289,7 +289,7 @@ $$\hat{Y}^{\text{MASC}} = \phi\,\hat{Y}^{\text{match}}_m + (1-\phi)\,\hat{Y}^{\t
 
 CV picks $m = 10$, $\phi = 0.158$.
 
-**2.73%** — the lowest rung.
+**2.73%** — the lowest stage.
 :::
 ::: {.column width="50%"}
 ### ASCM — relax the simplex
@@ -319,7 +319,7 @@ Two mlsynth gotchas here. MASC's tuned dials live in `weights.summary_stats`, no
 [Hungary, the United States, Japan, Canada and Norway carry 87-91% of the counterfactual under every method. Only ASCM ever goes negative.]{.takeaway .fragment}
 
 ::: {.notes}
-Five estimators built on quite different principles are picking essentially the same five countries. That is reassuring in a way the point estimates alone are not: the disagreement between rungs is not a disagreement about which countries resemble the UK.
+Five estimators built on quite different principles are picking essentially the same five countries. That is reassuring in a way the point estimates alone are not: the disagreement between stages is not a disagreement about which countries resemble the UK.
 
 MASC spreads a small uniform-looking 0.0158 across seven otherwise-zero donors — that is the matching component showing through.
 :::
@@ -331,12 +331,12 @@ MASC spreads a small uniform-looking 0.0158 across seven otherwise-zero donors �
 [Difference-in-differences is the clear outlier. The other five are hard to tell apart by eye — which is the point.]{.takeaway .fragment}
 
 ::: {.notes}
-This is one call: fit each rung on the untruncated panel and overlay the counterfactuals. Before 2016 they are all on top of each other and on top of the data. After 2016 they fan, and the fan is the specification uncertainty made visible.
+This is one call: fit each stage on the untruncated panel and overlay the counterfactuals. Before 2016 they are all on top of each other and on top of the data. After 2016 they fan, and the fan is the specification uncertainty made visible.
 :::
 
 ## The whole ladder, side by side {.smaller}
 
-| Rung | mlsynth call | end-2018 | end-2019 | published |
+| Stage | mlsynth call | end-2018 | end-2019 | published |
 |---|---|---:|---:|---:|
 | DiD | `FDID(...).fit().did` | 4.98 | 6.18 | — |
 | SC | `VanillaSC(...)` | 3.04 | 4.17 | 3.06 |
@@ -348,16 +348,16 @@ This is one call: fit each rung on the untruncated panel and overlay the counter
 [The width of the cluster — 2.73-3.04% — not any point inside it, is the honest answer.]{.takeaway .fragment}
 
 ::: {.notes}
-The published column is the R edition of this post, using synthdid, Synth, masc and augsynth. Three of the six rungs — DiD, MASC and ASCM — agree to two decimals. DSC lands a hundredth above only because 2.9887 sits on a rounding boundary.
+The published column is the R edition of this post, using synthdid, Synth, masc and augsynth. Three of the six stages — DiD, MASC and ASCM — agree to two decimals. DSC lands a hundredth above only because 2.9887 sits on a rounding boundary.
 
 The two real disagreements are SC (3.04 against 3.06) and SDID (2.80 against 2.79), and both differ in the same direction and for the same reason. That reason is the last slide of the next act.
 :::
 
-## Every rung exceeds the published 2.4%
+## Every stage exceeds the published 2.4%
 
-![Every rung's estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately; the dashed line is the published 2.4%.](../python_sc_dsc_sdid_11_att_dotplot.png)
+![Every stage's estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately; the dashed line is the published 2.4%.](../python_sc_dsc_sdid_11_att_dotplot.png)
 
-[**2.73-3.04%** at end-2018 and **3.83-4.19%** a year later — every rung above the 2.4% previously published for this same dataset.]{.takeaway .fragment}
+[**2.73-3.04%** at end-2018 and **3.83-4.19%** a year later — every stage above the 2.4% previously published for this same dataset.]{.takeaway .fragment}
 
 ::: {.notes}
 The earlier 2.4% came from a specification that matched on covariates. The covariate slides in the next act show why that matters here: on this panel, covariates make the counterfactual worse rather than better.
@@ -490,11 +490,11 @@ R's synthdid walks it with Frank-Wolfe on a capped iteration budget and stops at
 Four independent code paths inside mlsynth — two backends, an explicit constraint family, and a completely different estimator class — agree to three decimals. This is not a bug in either library. It is the normal state of affairs, and the post ships all three cheat sheets so you can run the comparison yourself.
 :::
 
-# Which Rung? {.divider background-color="#00d4c8"}
+# Which Stage? {.divider background-color="#00d4c8"}
 
 [Act IV]{.act}
 
-## Score the rungs on a task whose true answer is zero
+## Score the stages on a task whose true answer is zero
 
 Move the treatment date to a quarter when nothing happened.
 
@@ -504,7 +504,7 @@ The true effect is zero, so every estimate is pure error.
 
 ``` {.python}
 def placebo_one(k, h):
-    """Fit every rung on 1..k, predict k + h. Truth is zero."""
+    """Fit every stage on 1..k, predict k + h. Truth is zero."""
     ...
 
 errors = [placebo_one(k, h) for k in FAKE_DATES for h in (1, 4)]   # 20 dates
@@ -515,7 +515,7 @@ errors = [placebo_one(k, h) for k in FAKE_DATES for h in (1, 4)]   # 20 dates
 ::: {.notes}
 Everything the earlier acts taught about defaults now pays off in wall-clock time. Twenty dates times seven estimators, refit from scratch each pass, is 140 fits. The four settings that make it tractable are `vce="noinference"` on SDID, `method="MSCa"` and `inference=False` on TSSC, and an explicit `m_grid` on MASC. With TSSC left to select its own variant, that step alone would be around forty minutes.
 
-This is the source paper's answer to "which rung", and it is a good one — but read the next slide before accepting the ranking it produces.
+This is the source paper's answer to "which stage", and it is a good one — but read the next slide before accepting the ranking it produces.
 :::
 
 ## The time weights earn their keep
@@ -547,7 +547,7 @@ MASC at 0.0080 sits between them, which is roughly what you would expect from an
 ::: {.notes}
 Every cell reproduces the published value to within 0.0003 except the two that were graded on a different task. Forecasting a year out is strictly harder, so part of the reported gap is the horizon.
 
-The published conclusion that variants (ii) and (iii) "perform the worst" is an artefact. What survives is the finding that matters more: at either horizon the whole SDID family beats every other rung. The R edition of this post reaches the same conclusion with a different library, which is about as much corroboration as a result of this kind can get.
+The published conclusion that variants (ii) and (iii) "perform the worst" is an artefact. What survives is the finding that matters more: at either horizon the whole SDID family beats every other stage. The R edition of this post reaches the same conclusion with a different library, which is about as much corroboration as a result of this kind can get.
 :::
 
 ## The UK's gap is deeper than any placebo's
@@ -584,15 +584,15 @@ Three further caveats belong with the number. It is a net gap between the UK and
 
 [2.7 – 3.0%]{.bignum}
 
-[UK GDP shortfall at end-2018, on every rung of the ladder · 3.8 – 4.2% a year later · against 2.4% previously published]{.bignum-label}
+[UK GDP shortfall at end-2018, at every stage of the ladder · 3.8 – 4.2% a year later · against 2.4% previously published]{.bignum-label}
 
 ::: {.notes}
-That is the answer, and the range is the answer — not a rounding of some sharper number we could have reported instead. Every rung of the ladder puts the cost above the previously published 2.4%, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and on this panel covariates make the counterfactual worse.
+That is the answer, and the range is the answer — not a rounding of some sharper number we could have reported instead. Every stage of the ladder puts the cost above the previously published 2.4%, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and on this panel covariates make the counterfactual worse.
 :::
 
 ## What to take away
 
-1. **Fit the ladder, not a rung.** Publish the cloud — six estimators, one config, thirteen seconds.
+1. **Fit the ladder, not a stage.** Publish the cloud — six estimators, one config, thirteen seconds.
 2. **Say which defaults you set.** Here that matters more than the estimator's name.
 3. **Pin the commit, not the release.** A version number is not a version.
 4. **A second-decimal disagreement is the optimiser**, not the data.
@@ -615,4 +615,4 @@ On the cheat sheets: same data, same treatment date, same two evaluation quarter
 Next steps from here, all taking the config you already wrote: CLUSTERSC or PDA if you have many more donors than periods; SequentialSDID if adoption is staggered; SPOTSYNTH if you suspect spillovers onto the donor pool.
 :::
 
-# Fit the ladder, not a rung — and publish the cloud, not the point. {.divider background-color="#1a3a8a"}
+# Fit the ladder, not a stage — and publish the cloud, not the point. {.divider background-color="#1a3a8a"}

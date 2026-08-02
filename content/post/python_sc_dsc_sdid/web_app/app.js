@@ -336,7 +336,7 @@
     const neg = w.filter(v => v < -1e-6).length;
     el("weights-note").textContent = state.method === "DiD"
       ? "Difference-in-differences gives all 23 donors exactly 1/23 = 0.0435. It is the " +
-        "only rung whose weights carry no information about the United Kingdom."
+        "only stage whose weights carry no information about the United Kingdom."
       : `${state.method} puts weight on ${nz} of the 23 donors` +
         (neg > 0
           ? `, ${neg} of them negative — a synthetic UK built partly by subtracting countries.`
@@ -357,7 +357,7 @@
     const lo = d3.min(noDid, r => r[state.horizon]);
     const hi = d3.max(noDid, r => r[state.horizon]);
     el("ladder-note").textContent =
-      `Excluding difference-in-differences, which fits nothing, the five remaining rungs ` +
+      `Excluding difference-in-differences, which fits nothing, the five remaining stages ` +
       `span ${lo.toFixed(2)}% to ${hi.toFixed(2)}% — ${(hi - lo).toFixed(2)} percentage ` +
       `points. Keep that number in mind for panel 6: several of the library's defaults ` +
       `move the answer further than the choice of estimator does.`;
@@ -422,7 +422,7 @@
                            .map(r => r.RMSE.toFixed(4)).join(", ");
     el("placebo-note").textContent = {
       h1: "Graded on the same one-quarter task, the three SDID variants are " +
-          "indistinguishable — " + sd + " — and all three beat every other rung. The time " +
+          "indistinguishable — " + sd + " — and all three beat every other stage. The time " +
           "weights earn their keep.",
       h4: "At a four-quarter horizon all three SDID variants tie, and the ordering below " +
           "them is unchanged. Every method degrades, because forecasting four quarters " +

@@ -239,7 +239,7 @@
 
 <img data-src="../python_sc_dsc_sdid_01_gdp_paths.png" class="r-stretch quarto-figure-center"><p class="caption">Log real GDP for 24 OECD economies, 1995-2020. The United Kingdom in orange; the dashed line marks the 2016 referendum.</p><p><span class="takeaway fragment">24 countries · 23 donors · 86 pre-treatment quarters · treatment dated 2016Q3.</span></p>
 <aside class="notes">
-<p>No single donor tracks the UK, which is why we blend rather than pick. Two things to notice. First, the series are strongly trending and highly correlated — close to a set of random walks with drift. That will matter enormously when we get to the time weights. Second, look at 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted rungs are built to exploit.</p>
+<p>No single donor tracks the UK, which is why we blend rather than pick. Two things to notice. First, the series are strongly trending and highly correlated — close to a set of random walks with drift. That will matter enormously when we get to the time weights. Second, look at 2008-09: every line collapses together. That synchronised movement is a common factor, and it is what the demeaned and time-weighted stages are built to exploit.</p>
 <p>The panel is quarterly log real GDP assembled by Born, Müller, Schularick and Sedláček, redistributed in the replication package of de Brabander, Juodis and Miyazato Szini. No missing values.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -257,7 +257,7 @@
 <h2>Ninety-two estimators, one configuration dictionary</h2>
 <p>One interface for the whole single-treated-unit literature: build a config, call <code>.fit()</code>, read a standardized result.</p>
 <div class="fragment">
-<p><strong>Six rungs in this deck. Eighty-six more estimators behind the same door.</strong></p>
+<p><strong>Six stages in this deck. Eighty-six more estimators behind the same door.</strong></p>
 </div>
 <div class="fragment">
 <p><span class="takeaway fragment">Pin the commit, not the release — <code>__version__</code> says <code>1.0.0</code> either way.</span></p>
@@ -281,13 +281,13 @@
 <h2>Where we’re going</h2>
 <ul>
 <li class="fragment"><strong>Read</strong> one config dict and one result object — the entire API surface.</li>
-<li class="fragment"><strong>Map</strong> each rung of the ladder onto a specific <code>mlsynth</code> class.</li>
+<li class="fragment"><strong>Map</strong> each stage of the ladder onto a specific <code>mlsynth</code> class.</li>
 <li class="fragment"><strong>Identify</strong> the three defaults that change the answer materially.</li>
-<li class="fragment"><strong>Compare</strong> the rungs on a placebo tournament, and read the ranking sceptically.</li>
+<li class="fragment"><strong>Compare</strong> the stages on a placebo tournament, and read the ranking sceptically.</li>
 <li class="fragment"><strong>Report</strong> a cloud of estimates rather than a point.</li>
 </ul>
 <aside class="notes">
-<p>Four acts. Act I is the problem. Act II climbs the ladder — this is the longest stretch and the most code. Act III is where the deck earns its title: the defaults. Act IV asks which rung to stand on and how confident we are allowed to be about the answer.</p>
+<p>Four acts. Act I is the problem. Act II climbs the ladder — this is the longest stretch and the most code. Act III is where the deck earns its title: the defaults. Act IV asks which stage to choose and how confident we are allowed to be about the answer.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -301,16 +301,16 @@
       }</style></aside>
 </section></section>
 <section>
-<section id="one-config-six-rungs" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
-<h1>One Config, Six Rungs</h1>
+<section id="one-config-six-stages" class="title-slide slide level1 divider center" data-background-color="#6a9bcc">
+<h1>One Config, Six Stages</h1>
 <p><span class="act">Act II</span></p>
 </section>
-<section id="every-rung-is-the-same-regression-weighted-differently" class="slide level2 center">
-<h2>Every rung is the same regression, weighted differently</h2>
+<section id="every-stage-is-the-same-regression-weighted-differently" class="slide level2 center">
+<h2>Every stage is the same regression, weighted differently</h2>
 <p><span class="math display">\[(\hat\tau, \hat\mu, \hat\alpha, \hat\beta) = \arg\min \sum_{i,t} \omega_i \lambda_t \left( Y_{it} - \mu - \alpha_i - \beta_t - \tau D_{it} \right)^2\]</span></p>
 <p><span class="comment">A two-way fixed-effects regression — but some countries and some quarters count more.</span></p>
 <div class="fragment">
-<p><span class="takeaway fragment">The rungs differ only in how <span class="math inline">\(\omega\)</span> and <span class="math inline">\(\lambda\)</span> are chosen.</span></p>
+<p><span class="takeaway fragment">The stages differ only in how <span class="math inline">\(\omega\)</span> and <span class="math inline">\(\lambda\)</span> are chosen.</span></p>
 <aside class="notes">
 <p>This is the unifying idea, and it is worth pausing on because it makes the whole ladder legible. Difference-in-differences, synthetic control, demeaned SC and SDID are not four different models. They are one model with four different weighting schemes. MASC and ASCM break the pattern slightly — they change what weights are allowed at all rather than which weights get chosen — which is why the ladder branches at the top rather than continuing straight up.</p>
 <style type="text/css">
@@ -337,7 +337,7 @@
 </colgroup>
 <thead>
 <tr class="header">
-<th>Rung</th>
+<th>Stage</th>
 <th><span class="math inline">\(\omega\)</span> (who counts)</th>
 <th><span class="math inline">\(\lambda\)</span> (when)</th>
 <th>mlsynth call</th>
@@ -476,16 +476,16 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="rung-0-did-weights-every-country-and-every-quarter-the-same" class="slide level2 center">
-<h2>Rung 0 — DiD weights every country and every quarter the same</h2>
+<section id="stage-0-did-weights-every-country-and-every-quarter-the-same" class="slide level2 center">
+<h2>Stage 0 — DiD weights every country and every quarter the same</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href=""></a>did <span class="op">=</span> FDID(cfg(<span class="dv">96</span>)).fit().did      <span class="co"># no standalone DiD class; it rides inside FDID</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>4.98%</strong> at end-2018 — nearly double every other rung.</p>
+<p><strong>4.98%</strong> at end-2018 — nearly double every other stage.</p>
 <div class="fragment">
 <p>23 donors, each weighted exactly <span class="math inline">\(1/23 = 0.0435\)</span>. Nothing was fitted.</p>
 <p><span class="takeaway fragment">Pre-treatment RMSE 0.0217 — four times SC’s 0.0056. That gap is why the ladder exists.</span></p>
 <aside class="notes">
 <p>mlsynth has no standalone DiD class and this trips people up. The textbook two-way estimator comes free inside FDID — Forward DiD, Li 2024 — which fits its own estimator and the plain benchmark side by side and exposes them as <code>.fdid</code> and <code>.did</code>.</p>
-<p>A free seventh rung, if you want it: Forward DiD itself selects four donors greedily — Norway, Hungary, Austria, the United States — cuts the pre-treatment RMSE from 0.0217 to 0.0088, and lands at 2.42%, remarkably close to the published 2.4%. Three of its four donors are also among synthetic control’s five largest weights.</p>
+<p>A free seventh stage, if you want it: Forward DiD itself selects four donors greedily — Norway, Hungary, Austria, the United States — cuts the pre-treatment RMSE from 0.0217 to 0.0088, and lands at 2.42%, remarkably close to the published 2.4%. Three of its four donors are also among synthetic control’s five largest weights.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -499,8 +499,8 @@
       }</style></aside>
 </div>
 </section>
-<section id="rung-1-synthetic-control-fits-who-counts" class="slide level2 center">
-<h2>Rung 1 — Synthetic control fits who counts</h2>
+<section id="stage-1-synthetic-control-fits-who-counts" class="slide level2 center">
+<h2>Stage 1 — Synthetic control fits who counts</h2>
 <p><span class="math display">\[\hat\omega = \arg\min_{\omega \in \mathbb{W}} \sum_{t=1}^{T_0} \Big( Y_{\text{UK},t} - \sum_j \omega_j Y_{j,t} \Big)^2, \qquad \mathbb{W} = \Big\{ \omega : \omega_j \ge 0, \ \sum_j \omega_j = 1 \Big\}\]</span></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>sc <span class="op">=</span> VanillaSC(cfg(<span class="dv">96</span>, inference<span class="op">=</span><span class="va">False</span>)).fit()      <span class="co"># 3.04%</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="takeaway fragment">Nine of 23 donors get non-zero weight; the simplex zeroes the rest. Pre-treatment <span class="math inline">\(R^2 = 0.998\)</span>.</span></p>
@@ -537,8 +537,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="rung-2-demeaned-sc-allows-a-level-gap" class="slide level2 center">
-<h2>Rung 2 — Demeaned SC allows a level gap</h2>
+<section id="stage-2-demeaned-sc-allows-a-level-gap" class="slide level2 center">
+<h2>Stage 2 — Demeaned SC allows a level gap</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>dsc <span class="op">=</span> TSSC(cfg(<span class="dv">96</span>, method<span class="op">=</span><span class="st">"MSCa"</span>, inference<span class="op">=</span><span class="va">False</span>)).fit()   <span class="co"># 2.99%</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>One extra free parameter — a constant offset. Match the UK’s <strong>shape</strong>, not its <strong>level</strong>.</p>
 <p><span class="takeaway fragment">The offset is <span class="math inline">\(+0.0024\)</span> log points. Its smallness is the finding: SC was already level-balanced.</span></p>
@@ -558,8 +558,8 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="rung-3-sdid-also-fits-which-quarters-count" class="slide level2 center">
-<h2>Rung 3 — SDID also fits which quarters count</h2>
+<section id="stage-3-sdid-also-fits-which-quarters-count" class="slide level2 center">
+<h2>Stage 3 — SDID also fits which quarters count</h2>
 <p><span class="math display">\[\hat\tau_t = \Big( Y_{\text{UK},t} - \sum_j \hat\omega_j Y_{j,t} \Big) - \sum_{s \le T_0} \hat\lambda_s \Big( Y_{\text{UK},s} - \sum_j \hat\omega_j Y_{j,s} \Big)\]</span></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>sdid <span class="op">=</span> SDID(cfg(<span class="dv">96</span>, zeta<span class="op">=</span><span class="fl">0.0</span>, vce<span class="op">=</span><span class="st">"placebo"</span>, B<span class="op">=</span><span class="dv">500</span>)).fit()   <span class="co"># 2.80%</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="comment">The gap at the evaluation quarter, minus the <span class="math inline">\(\lambda\)</span>-weighted average gap before it.</span></p>
@@ -616,15 +616,15 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="rungs-4-and-5-buy-the-trade-off-or-drop-the-constraint" class="slide level2 smaller center">
-<h2>Rungs 4 and 5 — buy the trade-off, or drop the constraint</h2>
+<section id="stages-4-and-5-buy-the-trade-off-or-drop-the-constraint" class="slide level2 smaller center">
+<h2>Stages 4 and 5 — buy the trade-off, or drop the constraint</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <h3 id="masc-blend-with-matching">MASC — blend with matching</h3>
 <p><span class="math display">\[\hat{Y}^{\text{MASC}} = \phi\,\hat{Y}^{\text{match}}_m + (1-\phi)\,\hat{Y}^{\text{SC}}\]</span></p>
 <p><code>MASC(cfg, m_grid=..., set_f=...)</code></p>
 <p>CV picks <span class="math inline">\(m = 10\)</span>, <span class="math inline">\(\phi = 0.158\)</span>.</p>
-<p><strong>2.73%</strong> — the lowest rung.</p>
+<p><strong>2.73%</strong> — the lowest stage.</p>
 </div><div class="column" style="width:50%;">
 <h3 id="ascm-relax-the-simplex">ASCM — relax the simplex</h3>
 <p>Ridge-correct what the simplex cannot close. Negative weights allowed.</p>
@@ -653,7 +653,7 @@
 
 <img data-src="../python_sc_dsc_sdid_09_donor_weights.png" class="r-stretch quarto-figure-center"><p class="caption">Donor weights under SC, DSC, SDID, MASC and augmented SC across the donor pool; the shaded region marks negative weights.</p><p><span class="takeaway fragment">Hungary, the United States, Japan, Canada and Norway carry 87-91% of the counterfactual under every method. Only ASCM ever goes negative.</span></p>
 <aside class="notes">
-<p>Five estimators built on quite different principles are picking essentially the same five countries. That is reassuring in a way the point estimates alone are not: the disagreement between rungs is not a disagreement about which countries resemble the UK.</p>
+<p>Five estimators built on quite different principles are picking essentially the same five countries. That is reassuring in a way the point estimates alone are not: the disagreement between stages is not a disagreement about which countries resemble the UK.</p>
 <p>MASC spreads a small uniform-looking 0.0158 across seven otherwise-zero donors — that is the matching component showing through.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -672,7 +672,7 @@
 
 <img data-src="../python_sc_dsc_sdid_10_all_counterfactuals.png" class="r-stretch quarto-figure-center"><p class="caption">Six counterfactual paths for the United Kingdom alongside the observed series, 2014-2020.</p><p><span class="takeaway fragment">Difference-in-differences is the clear outlier. The other five are hard to tell apart by eye — which is the point.</span></p>
 <aside class="notes">
-<p>This is one call: fit each rung on the untruncated panel and overlay the counterfactuals. Before 2016 they are all on top of each other and on top of the data. After 2016 they fan, and the fan is the specification uncertainty made visible.</p>
+<p>This is one call: fit each stage on the untruncated panel and overlay the counterfactuals. Before 2016 they are all on top of each other and on top of the data. After 2016 they fan, and the fan is the specification uncertainty made visible.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -690,7 +690,7 @@
 <table class="caption-top">
 <thead>
 <tr class="header">
-<th>Rung</th>
+<th>Stage</th>
 <th>mlsynth call</th>
 <th style="text-align: right;">end-2018</th>
 <th style="text-align: right;">end-2019</th>
@@ -744,7 +744,7 @@
 </table>
 <p><span class="takeaway fragment">The width of the cluster — 2.73-3.04% — not any point inside it, is the honest answer.</span></p>
 <aside class="notes">
-<p>The published column is the R edition of this post, using synthdid, Synth, masc and augsynth. Three of the six rungs — DiD, MASC and ASCM — agree to two decimals. DSC lands a hundredth above only because 2.9887 sits on a rounding boundary.</p>
+<p>The published column is the R edition of this post, using synthdid, Synth, masc and augsynth. Three of the six stages — DiD, MASC and ASCM — agree to two decimals. DSC lands a hundredth above only because 2.9887 sits on a rounding boundary.</p>
 <p>The two real disagreements are SC (3.04 against 3.06) and SDID (2.80 against 2.79), and both differ in the same direction and for the same reason. That reason is the last slide of the next act.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
@@ -758,10 +758,10 @@
           display:block!important;
       }</style></aside>
 </section>
-<section id="every-rung-exceeds-the-published-2.4" class="slide level2 center">
-<h2>Every rung exceeds the published 2.4%</h2>
+<section id="every-stage-exceeds-the-published-2.4" class="slide level2 center">
+<h2>Every stage exceeds the published 2.4%</h2>
 
-<img data-src="../python_sc_dsc_sdid_11_att_dotplot.png" class="r-stretch quarto-figure-center"><p class="caption">Every rung’s estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately; the dashed line is the published 2.4%.</p><p><span class="takeaway fragment"><strong>2.73-3.04%</strong> at end-2018 and <strong>3.83-4.19%</strong> a year later — every rung above the 2.4% previously published for this same dataset.</span></p>
+<img data-src="../python_sc_dsc_sdid_11_att_dotplot.png" class="r-stretch quarto-figure-center"><p class="caption">Every stage’s estimated UK GDP shortfall at 2018Q4 and 2019Q4, with the three SDID flavours shown separately; the dashed line is the published 2.4%.</p><p><span class="takeaway fragment"><strong>2.73-3.04%</strong> at end-2018 and <strong>3.83-4.19%</strong> a year later — every stage above the 2.4% previously published for this same dataset.</span></p>
 <aside class="notes">
 <p>The earlier 2.4% came from a specification that matched on covariates. The covariate slides in the next act show why that matters here: on this panel, covariates make the counterfactual worse rather than better.</p>
 <p>Also visible: the three SDID flavours sit almost on top of each other, within 0.03 percentage points. The choice among SDID variants is not where the uncertainty lives — which is worth remembering when we reach the published placebo ranking.</p>
@@ -1044,24 +1044,24 @@
       }</style></aside>
 </section></section>
 <section>
-<section id="which-rung" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
-<h1>Which Rung?</h1>
+<section id="which-stage" class="title-slide slide level1 divider center" data-background-color="#00d4c8">
+<h1>Which Stage?</h1>
 <p><span class="act">Act IV</span></p>
 </section>
-<section id="score-the-rungs-on-a-task-whose-true-answer-is-zero" class="slide level2 center">
-<h2>Score the rungs on a task whose true answer is zero</h2>
+<section id="score-the-stages-on-a-task-whose-true-answer-is-zero" class="slide level2 center">
+<h2>Score the stages on a task whose true answer is zero</h2>
 <p>Move the treatment date to a quarter when nothing happened.</p>
 <div class="fragment">
 <p>The true effect is zero, so every estimate is pure error.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a><span class="kw">def</span> placebo_one(k, h):</span>
-<span id="cb8-2"><a href=""></a>    <span class="co">"""Fit every rung on 1..k, predict k + h. Truth is zero."""</span></span>
+<span id="cb8-2"><a href=""></a>    <span class="co">"""Fit every stage on 1..k, predict k + h. Truth is zero."""</span></span>
 <span id="cb8-3"><a href=""></a>    ...</span>
 <span id="cb8-4"><a href=""></a></span>
 <span id="cb8-5"><a href=""></a>errors <span class="op">=</span> [placebo_one(k, h) <span class="cf">for</span> k <span class="kw">in</span> FAKE_DATES <span class="cf">for</span> h <span class="kw">in</span> (<span class="dv">1</span>, <span class="dv">4</span>)]   <span class="co"># 20 dates</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><span class="takeaway fragment"><code>inference=False</code> and an explicit <code>m_grid</code> are what keep this to <strong>13 seconds</strong>.</span></p>
 <aside class="notes">
 <p>Everything the earlier acts taught about defaults now pays off in wall-clock time. Twenty dates times seven estimators, refit from scratch each pass, is 140 fits. The four settings that make it tractable are <code>vce="noinference"</code> on SDID, <code>method="MSCa"</code> and <code>inference=False</code> on TSSC, and an explicit <code>m_grid</code> on MASC. With TSSC left to select its own variant, that step alone would be around forty minutes.</p>
-<p>This is the source paper’s answer to “which rung”, and it is a good one — but read the next slide before accepting the ranking it produces.</p>
+<p>This is the source paper’s answer to “which stage”, and it is a good one — but read the next slide before accepting the ranking it produces.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -1153,7 +1153,7 @@
 <p><span class="takeaway fragment">Two rows were graded four quarters ahead. Matched, the three SDID flavours are indistinguishable.</span></p>
 <aside class="notes">
 <p>Every cell reproduces the published value to within 0.0003 except the two that were graded on a different task. Forecasting a year out is strictly harder, so part of the reported gap is the horizon.</p>
-<p>The published conclusion that variants (ii) and (iii) “perform the worst” is an artefact. What survives is the finding that matters more: at either horizon the whole SDID family beats every other rung. The R edition of this post reaches the same conclusion with a different library, which is about as much corroboration as a result of this kind can get.</p>
+<p>The published conclusion that variants (ii) and (iii) “perform the worst” is an artefact. What survives is the finding that matters more: at either horizon the whole SDID family beats every other stage. The R edition of this post reaches the same conclusion with a different library, which is about as much corroboration as a result of this kind can get.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -1212,9 +1212,9 @@
 <section id="what-the-referendum-cost" class="slide level2 center" data-background-color="#1a3a8a">
 <h2>What the referendum cost</h2>
 <p><span class="bignum">2.7 – 3.0%</span></p>
-<p><span class="bignum-label">UK GDP shortfall at end-2018, on every rung of the ladder · 3.8 – 4.2% a year later · against 2.4% previously published</span></p>
+<p><span class="bignum-label">UK GDP shortfall at end-2018, at every stage of the ladder · 3.8 – 4.2% a year later · against 2.4% previously published</span></p>
 <aside class="notes">
-<p>That is the answer, and the range is the answer — not a rounding of some sharper number we could have reported instead. Every rung of the ladder puts the cost above the previously published 2.4%, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and on this panel covariates make the counterfactual worse.</p>
+<p>That is the answer, and the range is the answer — not a rounding of some sharper number we could have reported instead. Every stage of the ladder puts the cost above the previously published 2.4%, and the reason is not exotic: the earlier figure came from a specification that matched on covariates, and on this panel covariates make the counterfactual worse.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -1230,7 +1230,7 @@
 <section id="what-to-take-away" class="slide level2 center">
 <h2>What to take away</h2>
 <ol type="1">
-<li><strong>Fit the ladder, not a rung.</strong> Publish the cloud — six estimators, one config, thirteen seconds.</li>
+<li><strong>Fit the ladder, not a stage.</strong> Publish the cloud — six estimators, one config, thirteen seconds.</li>
 <li><strong>Say which defaults you set.</strong> Here that matters more than the estimator’s name.</li>
 <li><strong>Pin the commit, not the release.</strong> A version number is not a version.</li>
 <li><strong>A second-decimal disagreement is the optimiser</strong>, not the data.</li>
@@ -1273,8 +1273,8 @@
           display:block!important;
       }</style></aside>
 </section></section>
-<section id="fit-the-ladder-not-a-rung-and-publish-the-cloud-not-the-point." class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
-<h1>Fit the ladder, not a rung — and publish the cloud, not the point.</h1>
+<section id="fit-the-ladder-not-a-stage-and-publish-the-cloud-not-the-point." class="title-slide slide level1 divider center" data-background-color="#1a3a8a">
+<h1>Fit the ladder, not a stage — and publish the cloud, not the point.</h1>
 
 </section>
     </div>

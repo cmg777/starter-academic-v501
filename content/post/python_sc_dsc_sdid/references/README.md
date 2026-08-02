@@ -30,7 +30,7 @@ Nothing else. `setup_env.py` installs the rest into the bundle's own `.venv/`.
 |---|---|
 | `tutorial.qmd` | The executable tutorial — the source of `tutorial.html` |
 | `analysis.py` | The complete pipeline behind the post: every figure and result table |
-| `cheatsheet_python.py` | One-page quick reference, all six rungs, ~25 seconds to run |
+| `cheatsheet_python.py` | One-page quick reference, all six stages, ~25 seconds to run |
 | `cheatsheet_stata.do` | The same ladder in Stata (`sdid`, `synth`, `allsynth`), for cross-checking |
 | `cheatsheet_R.R` | The same ladder in R (`synthdid`, `Synth`, `masc`, `augsynth`) |
 | `brexit_analysis.csv` | The estimation sample: 24 countries x 104 quarters |
@@ -42,7 +42,7 @@ Nothing else. `setup_env.py` installs the rest into the bundle's own `.venv/`.
 
 ```bash
 python3 setup_env.py            # build the environment (idempotent)
-.venv/bin/python cheatsheet_python.py    # the six rungs, ~25 s
+.venv/bin/python cheatsheet_python.py    # the six stages, ~25 s
 .venv/bin/python analysis.py             # the full pipeline, ~12 min cold
 quarto render tutorial.qmd               # the tutorial
 ```
@@ -109,7 +109,7 @@ patch versions of NumPy or pandas.
 ## Credit
 
 `mlsynth` is by [Jared Greathouse](https://github.com/jgreathouse9/mlsynth).
-The rung-to-class mapping used throughout follows
+The stage-to-class mapping used throughout follows
 [mlsynth issue #312](https://github.com/jgreathouse9/mlsynth/issues/312).
 The data come from the replication package of de Brabander, Juodis and
 Miyazato Szini (2025), assembled originally by Born, Müller, Schularick and

@@ -1,11 +1,11 @@
 # ══════════════════════════════════════════════════════════════════════════════
-# THE SYNTHETIC-CONTROL LADDER IN R — one package call per rung
+# THE SYNTHETIC-CONTROL LADDER IN R — one package call per stage
 #
 #   DiD  ->  SC  ->  DSC  ->  SDID  ->  MASC  ->  ASCM
 #
 # Every number below comes straight out of a package function. Nothing is
 # hand-coded, nothing is reconstructed from extracted weights. If you want the
-# from-scratch versions -- and the reasons each rung exists -- read analysis.R
+# from-scratch versions -- and the reasons each stage exists -- read analysis.R
 # and the post:
 #     https://carlos-mendez.org/post/r_sc_dsc_sdid/
 #
@@ -35,7 +35,7 @@ suppressPackageStartupMessages({
   library(synthdid)   # DiD, SC, DSC, SDID
   library(masc)       # MASC
   library(augsynth)   # ASCM
-  library(quadprog)   # only for the four-line MASC adapter, see rung 4
+  library(quadprog)   # only for the four-line MASC adapter, see stage 4
 })
 
 # ── Data ──────────────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ EVAL <- c(`2018Q4` = 96, `2019Q4` = 100)
 # about. The average over "all post periods" is then an average over one
 # period, and the bare package call returns exactly the number you want.
 #
-# Every rung below uses this. It is the whole reason there is no arithmetic in
+# Every stage below uses this. It is the whole reason there is no arithmetic in
 # this file.
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -84,7 +84,7 @@ say <- function(name, v) {
 cat("\nBrexit: shortfall in UK real GDP (%), treatment dated 2016Q3, no covariates\n")
 cat(strrep("=", 78), "\n\n")
 
-# ── Rung 0. DiD ───────────────────────────────────────────────────────────────
+# ── Stage 0. DiD ───────────────────────────────────────────────────────────────
 # Every donor weighted 1/23, every pre-quarter weighted 1/86. A unit fixed
 # effect absorbs the level gap. No fitting happens at all.
 cat("0. DiD\n")
@@ -92,7 +92,7 @@ did <- lapply(EVAL, function(e) did_estimate(panel(e), N0, T0))
 R$DiD <- c(sapply(did, pct), sef(did[[1]]))
 say("did_estimate()", R$DiD)
 
-# ── Rung 1. SC ────────────────────────────────────────────────────────────────
+# ── Stage 1. SC ────────────────────────────────────────────────────────────────
 # Donor weights on the simplex, fitted to the treated unit's pre-treatment path.
 # No intercept: the blend has to match the UK's LEVEL as well as its shape.
 # sc_estimate() is synthdid_estimate() with lambda fixed at zero and the omega
@@ -102,13 +102,13 @@ sc <- lapply(EVAL, function(e) sc_estimate(panel(e), N0, T0))
 R$SC <- c(sapply(sc, pct), sef(sc[[1]]))
 say("sc_estimate()", R$SC)
 
-# ── Rung 2. DSC ───────────────────────────────────────────────────────────────
+# ── Stage 2. DSC ───────────────────────────────────────────────────────────────
 # Demeaned SC. Turn the omega intercept back on -- the blend now only has to
 # match the SHAPE, and a constant absorbs the level -- and keep time weights
 # uniform. One argument separates this from SDID.
 #
 # zeta.* = 0 turns off synthdid's ridge penalty, because the paper solves the
-# unpenalised problem. See the note under rung 3 for what the default costs.
+# unpenalised problem. See the note under stage 3 for what the default costs.
 cat("\n2. DSC\n")
 dsc <- lapply(EVAL, function(e)
   synthdid_estimate(panel(e), N0, T0,
@@ -117,7 +117,7 @@ dsc <- lapply(EVAL, function(e)
 R$DSC <- c(sapply(dsc, pct), sef(dsc[[1]]))
 say("synthdid_estimate(lambda=unif)", R$DSC)
 
-# ── Rung 3. SDID ──────────────────────────────────────────────────────────────
+# ── Stage 3. SDID ──────────────────────────────────────────────────────────────
 # Same unit weights as DSC. The one change is that the time weights are now
 # fitted too, so the pre/post comparison leans on the pre-treatment quarters
 # that actually resemble the post-treatment period.
@@ -133,7 +133,7 @@ say("synthdid_estimate()", R$SDID)
 cat(sprintf("  %-22s 2018Q4 %5.2f   <- package defaults, zeta left alone\n",
             "  (same, no zeta arg)", pct(synthdid_estimate(panel(EVAL[1]), N0, T0))))
 
-# ── Rung 4. MASC ──────────────────────────────────────────────────────────────
+# ── Stage 4. MASC ──────────────────────────────────────────────────────────────
 # A cross-validated blend of m-nearest-neighbour matching and SC. The blend
 # weight phi and the neighbour count m are both chosen by rolling-origin CV.
 #
@@ -173,7 +173,7 @@ say("masc()", R$MASC)
 cat(sprintf("  %-22s m = %d neighbours, phi = %.3f (that much weight on matching)\n", "",
             masc_fit[[1]]$m_hat, masc_fit[[1]]$phi_hat))
 
-# ── Rung 5. ASCM ──────────────────────────────────────────────────────────────
+# ── Stage 5. ASCM ──────────────────────────────────────────────────────────────
 # SC weights plus a ridge-regression correction for whatever pre-treatment
 # imbalance SC could not close. Non-negativity is dropped, so weights may go
 # negative -- the counterfactual is allowed to leave the convex hull.
@@ -223,7 +223,7 @@ cat("\n\n", strrep("=", 78), "\n", sep = "")
 cat("UK GDP shortfall (%), 2016Q3 treatment, outcomes only, 23 donors, 86 pre-quarters\n")
 cat(strrep("=", 78), "\n")
 cat(sprintf("%-6s %-36s %7s %7s %8s  %-15s %6s\n",
-            "Rung", "Command", "2018Q4", "2019Q4", "SE 18Q4", "Inference", "Paper"))
+            "Stage", "Command", "2018Q4", "2019Q4", "SE 18Q4", "Inference", "Paper"))
 cat(strrep("-", 78), "\n")
 for (k in names(CMD)) {
   v <- R[[k]]
@@ -239,7 +239,7 @@ cat(strrep("-", 78), "\n")
 cat("
 Four things worth noticing.
 
-1. Every rung clears 2.4%, the figure Born et al. (2019) published for this
+1. Every stage clears 2.4%, the figure Born et al. (2019) published for this
    dataset. The disagreement between methods (2.7 to 3.1) is much smaller than
    their common disagreement with the earlier number.
 
@@ -255,7 +255,7 @@ Four things worth noticing.
    same scale. That is the price of reporting each package's own inference:
    you get what the authors thought was appropriate, not a common yardstick.
 
-4. DiD is the outlier at ~5%, and it is the only rung that never looks at the
+4. DiD is the outlier at ~5%, and it is the only stage that never looks at the
    data to choose its weights.
 
 Not here, deliberately:

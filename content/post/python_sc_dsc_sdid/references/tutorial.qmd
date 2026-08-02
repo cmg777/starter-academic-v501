@@ -32,7 +32,7 @@ Executable companion to
 [carlos-mendez.org/post/python_sc_dsc_sdid](https://carlos-mendez.org/post/python_sc_dsc_sdid/).
 
 We climb the whole ladder of single-treated-unit estimators — DiD → SC → DSC →
-SDID → MASC → ASCM — with **one `mlsynth` class per rung**, on quarterly log
+SDID → MASC → ASCM — with **one `mlsynth` class per stage**, on quarterly log
 real GDP for 24 OECD economies (1995Q1–2020Q4). The United Kingdom is the
 treated unit, 23 countries are donors, and the referendum is dated 2016Q3.
 
@@ -230,7 +230,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Rung 0 — Difference-in-differences
+## Stage 0 — Difference-in-differences
 
 `mlsynth` has no standalone DiD class. The plain two-way estimator comes free
 inside `FDID`, exposed as `.did`. The uniform 1/23 donor weights are the
@@ -251,7 +251,7 @@ print(f"\nForward DiD (free bonus) selects {len(f18.selected_names)} donors: "
 print(f"Forward DiD  2018Q4 {pct(f18.att):.2f}%   pre-RMSE {f18.pre_rmse:.5f}")
 ```
 
-## Rung 1 — Synthetic control
+## Stage 1 — Synthetic control
 
 ```{python}
 sc = {k: VanillaSC(cfg(e, inference=False)).fit() for k, e in EVAL.items()}
@@ -290,7 +290,7 @@ Four independent code paths inside `mlsynth` agree at **3.039%**; R's
 `synthdid` stops at **3.06%**. Neither is buggy — a synthetic control estimate
 carries its solver's fingerprint.
 
-## Rung 2 — Demeaned synthetic control
+## Stage 2 — Demeaned synthetic control
 
 `TSSC(method="MSCa")`. **`TSSC` rounds every scalar it reports**; the series
 are full precision.
@@ -318,7 +318,7 @@ for m in ("SC", "MSCa", "MSCb", "MSCc"):
           f"(.att reports {v.att:+.5f})   intercept {ic}")
 ```
 
-## Rung 3 — Synthetic difference-in-differences
+## Stage 3 — Synthetic difference-in-differences
 
 **The one setting that carries the result:** `zeta` is a ridge penalty on the
 unit weights, on by default. Every implementation in every language penalises
@@ -421,7 +421,7 @@ for name, (w, lam_) in variants.items():
     print(f"{name:<11s} 2018Q4 {sdid_loss(w, lam_, EVAL['2018Q4']):.3f}")
 ```
 
-## Rung 4 — MASC
+## Stage 4 — MASC
 
 **The argument that decides the answer** is `set_f`. Its alternative
 `min_preperiods` defaults to $\lceil T_0/2 \rceil$, which is not the fold set
@@ -445,7 +445,7 @@ for label, kw in [
     print(f"{label:<34s} 2018Q4 {vals[0]:.3f}   2019Q4 {vals[1]:.3f}")
 ```
 
-## Rung 5 — Augmented synthetic control
+## Stage 5 — Augmented synthetic control
 
 ```{python}
 ascm = {k: VanillaSC(cfg(e, augment="ridge", inference=False)).fit() for k, e in EVAL.items()}
@@ -472,7 +472,7 @@ ladder = pd.DataFrame([
 ladder.round(2)
 ```
 
-Every rung puts the cost above the **2.4%** previously published for this
+Every stage puts the cost above the **2.4%** previously published for this
 dataset.
 
 ## Do covariates help? Three meanings of "control for"
@@ -586,8 +586,8 @@ plt.show()
 ## Summary
 
 - The referendum cost the UK **2.7–3.1% of GDP by end-2018** and **3.8–4.2% by
-  end-2019** on every rung, against 2.4% previously published.
-- `mlsynth` puts all six rungs behind one interface.
+  end-2019** at every stage, against 2.4% previously published.
+- `mlsynth` puts all six stages behind one interface.
 - **Three defaults matter more than the estimator choice.** `zeta` moves SDID
   by 0.13 points, `set_f` moves MASC by 0.47, and the three covariate methods
   disagree by 1.76. The ladder's own spread, excluding DiD, is 0.31.

@@ -38,7 +38,7 @@
 <section class="panel" id="p1">
   <div class="panel-head">
     <h2>1. The counterfactual</h2>
-    <p>Pick a rung. Each one is a single <code>mlsynth</code> class fitted with the same five
+    <p>Pick a stage. Each one is a single <code>mlsynth</code> class fitted with the same five
        config fields; the dashed line is the synthetic United Kingdom it produces and the
        shaded band after the referendum is the estimated shortfall.</p>
   </div>
@@ -59,7 +59,7 @@
     <h2>2. Who is in the blend?</h2>
     <p>The unit weights, read straight off <code>result.donor_weights</code>. Four of the
        six recipes produce nearly the same blend. Only the augmented synthetic control is
-       allowed to go negative, because it is the one rung that drops the simplex
+       allowed to go negative, because it is the one stage that drops the simplex
        constraint.</p>
   </div>
   <div class="chart-wrap"><svg id="chart-weights" role="img"
@@ -70,7 +70,7 @@
 <section class="panel" id="p3">
   <div class="panel-head">
     <h2>3. The ladder, side by side</h2>
-    <p>Every rung's answer against the 2.4% previously published for this dataset. Hover a
+    <p>Every stage's answer against the 2.4% previously published for this dataset. Hover a
        bar for the call that produced it and, where they differ, the R edition's number.</p>
   </div>
   <div class="controls" id="horizon-buttons"></div>
@@ -129,7 +129,7 @@
       <p><strong>Demeaned</strong> synthetic control (Doudchenko and Imbens 2016;
          Ferman and Pinto 2021). Weights on the simplex plus a constant offset, fitted on
          aggregate panel data.</p>
-      <p class="verdict">This is the post's DSC — rung 2.</p>
+      <p class="verdict">This is the post's DSC — stage 2.</p>
     </div>
   </div>
 
@@ -144,7 +144,7 @@
   <div class="panel-head">
     <h2>6. The defaults dial</h2>
     <p>The shaded band is how much the answer moves as you climb the entire ladder, from
-       the lowest rung to the highest. Each capsule is how much it moves when you leave
+       the lowest stage to the highest. Each capsule is how much it moves when you leave
        one option at its default instead of setting it. Three of the four capsules are
        wider than the band.</p>
   </div>
