@@ -66,6 +66,10 @@ links:
     icon_pack: fab
     name: "Podcast"
     url: https://open.spotify.com/episode/7wmH9iF0ITNStTeBk47zb1?si=-CtcejVfR_-PncbmSg2rIg
+  - icon: spotify
+    icon_pack: fab
+    name: "Podcast (2)"
+    url: https://creators.spotify.com/pod/profile/carlex777/episodes/Synthetic-control-ladder-and-Brexit-GDP-estimates-e3mspa3
   - icon: markdown
     icon_pack: fab
     name: "MD version"
